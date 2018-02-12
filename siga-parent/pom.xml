@@ -3,10 +3,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.redabogacia</groupId>
-	<artifactId>sspp-parent</artifactId>
+	<artifactId>siga-parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>sspp-parent</name>
-	<description>sspp-parent</description>
+	<name>siga-parent</name>
+	<description>siga-parent</description>
 	<packaging>pom</packaging>
 
 	<parent>

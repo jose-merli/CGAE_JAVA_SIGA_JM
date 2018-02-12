@@ -2,13 +2,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>sspp</artifactId>
-	<name>sspp</name>
-	<description>sspp</description>
+	<artifactId>siga-core</artifactId>
+	<name>siga-core</name>
+	<description>siga-core</description>
 
 	<parent>
 		<groupId>org.redabogacia</groupId>
-		<artifactId>sspp-parent</artifactId>
+		<artifactId>siga-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
