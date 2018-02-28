@@ -1,6 +1,6 @@
 package org.itcgae.siga.security;
 
-import org.itcgae.siga.logger.LoggingFilter;
+import org.itcgae.siga.logger.RequestLoggingFilter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +31,7 @@ public class DevConfigSecurity extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and().cors().and().csrf().disable().authorizeRequests().antMatchers("**").permitAll()
-				.and().addFilterAfter(new LoggingFilter(), BasicAuthenticationFilter.class);
+				.and().addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);
 	}
 
 	@Bean

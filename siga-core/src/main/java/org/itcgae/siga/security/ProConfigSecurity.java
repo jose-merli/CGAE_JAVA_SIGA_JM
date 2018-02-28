@@ -1,6 +1,6 @@
 package org.itcgae.siga.security;
 
-import org.itcgae.siga.logger.LoggingFilter;
+import org.itcgae.siga.logger.RequestLoggingFilter;
 import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,7 +77,7 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 				.addFilterBefore(new CgaeAuthenticationFilter(authenticationManager(), loginMethod, loginUrl,
 						tokenHeaderAuthKey, tokenPrefix), BasicAuthenticationFilter.class)
 				.addFilter(new CgaeAuthorizationFilter(authenticationManager()))
-				.addFilterAfter(new LoggingFilter(), BasicAuthenticationFilter.class);;
+				.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);;
 
 		// Configuramos el token con los parametros de configuracion
 		CgaeUserAuthenticationToken.configure(secretSignKey, expirationTime);

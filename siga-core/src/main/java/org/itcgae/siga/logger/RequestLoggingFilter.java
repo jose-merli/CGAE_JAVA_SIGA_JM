@@ -17,7 +17,7 @@ import javax.servlet.ServletResponse;
 
 import org.slf4j.MDC;
 
-public class LoggingFilter implements Filter{
+public class RequestLoggingFilter implements Filter{
 
 	String callId;
 
