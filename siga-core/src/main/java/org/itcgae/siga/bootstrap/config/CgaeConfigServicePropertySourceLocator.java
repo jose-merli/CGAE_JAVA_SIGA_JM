@@ -38,21 +38,21 @@ import org.springframework.util.StringUtils;
  */
 @Configuration
 @Order(0)
-@PropertySource("classpath:boot.db.properties")
+@PropertySource("classpath:bootstrap.properties")
 public class CgaeConfigServicePropertySourceLocator implements PropertySourceLocator {
 
 	private static Logger LOGGER = LoggerFactory.getLogger(CgaeConfigServicePropertySourceLocator.class);
-	
+
 	@Value("${jndi-name}")
 	private String jndiName;
-	
+
 	@Value("${table-name}")
 	private String tableName;
 
 	@Override
 	public org.springframework.core.env.PropertySource<?> locate(org.springframework.core.env.Environment environment) {
 		CompositePropertySource composite = new CompositePropertySource("configService");
-		LOGGER.info("Recuperando configuracion de la aplicacion desde BBDD");
+		LOGGER.info("Recuperando origen de configuracion de la aplicacion desde BBDD");
 		List<AdmConfig> propertyList = new ArrayList<AdmConfig>();
 		boolean error = false;
 		try {
@@ -60,7 +60,7 @@ public class CgaeConfigServicePropertySourceLocator implements PropertySourceLoc
 			propertyList = getAllPropertiesFromDb(getOracleDataSource());
 
 			for (AdmConfig prop : propertyList) {
-				LOGGER.debug("Clave: " + prop.getClave() + ", Valor: " + prop.getValor());
+				LOGGER.debug("Clave: {}, Valor: {}", prop.getClave(), prop.getValor());
 				putValue(map, prop.getClave(), prop.getValor());
 			}
 
@@ -101,7 +101,9 @@ public class CgaeConfigServicePropertySourceLocator implements PropertySourceLoc
 		try {
 			con = ds.getConnection();
 			stmt = con.createStatement();
-			rs = stmt.executeQuery("select * from " + tableName);
+			String query = "SELECT * FROM " + tableName;
+			rs = stmt.executeQuery(query);
+			LOGGER.info("SQL: {}", query);
 			while (rs.next()) {
 				AdmConfig prop = new AdmConfig();
 				prop.setClave(rs.getString("CLAVE"));
@@ -114,6 +116,7 @@ public class CgaeConfigServicePropertySourceLocator implements PropertySourceLoc
 			throw e;
 		} finally {
 			try {
+				LOGGER.info("Cerrando conexion con BBDD");
 				if (rs != null)
 					rs.close();
 				if (stmt != null)
@@ -127,7 +130,8 @@ public class CgaeConfigServicePropertySourceLocator implements PropertySourceLoc
 	}
 
 	/**
-	 * Recupera el datasource con los datos de conexión sacados
+	 * Recupera el datasource con los datos de conexión sacados del fichero de
+	 * configuracion
 	 * 
 	 * @return
 	 * @throws IOException
@@ -135,12 +139,12 @@ public class CgaeConfigServicePropertySourceLocator implements PropertySourceLoc
 	 */
 	private DataSource getOracleDataSource() throws IOException, NamingException {
 		try {
+			LOGGER.debug("Recuperando datasource {} provisto por el servidor (JNDI)", jndiName);
 			Context ctx = new InitialContext();
 			return (DataSource) ctx.lookup(jndiName);
 		} catch (NamingException e) {
 			throw e;
 		}
 	}
-
 
 }

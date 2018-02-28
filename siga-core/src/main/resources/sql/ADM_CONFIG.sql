@@ -31,5 +31,4 @@ Insert into DEMO_SOCIEDADES.ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEF
 Insert into DEMO_SOCIEDADES.ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values ('11','logging.level.org.springframework.web','INFO','Nivel de debug de framework spring','INFO','0');
 Insert into DEMO_SOCIEDADES.ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values ('12','logging.level.root','INFO','Nivel de logging raiz','INFO','0');
 Insert into DEMO_SOCIEDADES.ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values ('13','logging.pattern.console','%d{LLL-dd HH:mm:ss.SSS} %-5level [%.56thread] --- %.40logger : %msg%n','Patrón de logs',null,'0');
-Insert into DEMO_SOCIEDADES.ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values ('14','logging.level.org.itcgae.sspp.db.mappers','DEBUG','Nivel de trazas de mybatis',null,'0');
 

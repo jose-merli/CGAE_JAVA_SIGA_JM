@@ -1,6 +1,6 @@
 package org.itcgae.siga.security;
 
-
+import org.itcgae.siga.logger.LoggingFilter;
 import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,27 +33,26 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 
 	private SigaUserDetailsService userDetailsService;
-	
+
 	@Value("${security.login.url:/login}")
 	String loginUrl;
-	
+
 	@Value("${security.login.method:POST}")
 	String loginMethod;
-	
+
 	// 1 dia
 	@Value("${security.token.expiration-time:86400000}")
 	long expirationTime;
-	
+
 	@Value("${security.token.sign-key:1234}")
 	String secretSignKey;
-	
+
 	@Value("${security.token.header-auth-key:Authorization}")
 	String tokenHeaderAuthKey;
-	
+
 	@Value("${security.token.prefix:Bearer }")
 	String tokenPrefix;
-	
-	
+
 	@Autowired
 	private CgaeAuthenticationProvider cgaeAuthenticationProvider;
 
@@ -63,8 +62,7 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		
-		
+
 		/*
 		 * 1. Se desactiva el uso de cookies 
 		 * 2. Se activa la configuración CORS con los valores por defecto 
@@ -72,18 +70,15 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 		 * 4. Se indica que el login no requiere autenticación 
 		 * 5. Se indica que el resto de URLs esten securizadas
 		 */
-		httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().and()
-				.csrf().disable()
-				.authorizeRequests()
+		httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				.and().cors().and().csrf().disable().authorizeRequests()
 				.antMatchers(HttpMethod.resolve(loginMethod), loginUrl).permitAll()
-				.antMatchers(HttpMethod.GET, "*").permitAll()
-				.antMatchers(HttpMethod.POST, "/oauth/token").permitAll()
-				.antMatchers(HttpMethod.POST, "/oauth/rtoken").permitAll()
-				.antMatchers(HttpMethod.GET, "/cislpolicy").permitAll()
 				.anyRequest().authenticated().and()
-				.addFilterBefore(new CgaeAuthenticationFilter(authenticationManager(), loginMethod, loginUrl, tokenHeaderAuthKey, tokenPrefix), BasicAuthenticationFilter.class)
-				.addFilter(new CgaeAuthorizationFilter(authenticationManager()));
-		
+				.addFilterBefore(new CgaeAuthenticationFilter(authenticationManager(), loginMethod, loginUrl,
+						tokenHeaderAuthKey, tokenPrefix), BasicAuthenticationFilter.class)
+				.addFilter(new CgaeAuthorizationFilter(authenticationManager()))
+				.addFilterAfter(new LoggingFilter(), BasicAuthenticationFilter.class);;
+
 		// Configuramos el token con los parametros de configuracion
 		CgaeUserAuthenticationToken.configure(secretSignKey, expirationTime);
 		CgaeAuthorizationFilter.configure(secretSignKey, tokenHeaderAuthKey, tokenPrefix);
@@ -91,7 +86,8 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// Se define la clase que recupera los usuarios y el algoritmo para procesar las
+		// Se define la clase que recupera los usuarios y el algoritmo para
+		// procesar las
 		// passwords
 		auth.userDetailsService(userDetailsService);
 		auth.authenticationProvider(cgaeAuthenticationProvider);
