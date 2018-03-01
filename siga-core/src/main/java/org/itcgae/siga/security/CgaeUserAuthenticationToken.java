@@ -17,14 +17,17 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class CgaeUserAuthenticationToken extends AbstractAuthenticationToken {
 
 	private static long expirationTime;
-	
+
 	private static String secretSignKey;
-	
-	protected static void configure(String secretSignKey, long expirationTime){
+
+	private static String tokenPrefix;
+
+	protected static void configure(String secretSignKey, String tokenPrefix, long expirationTime) {
 		CgaeUserAuthenticationToken.expirationTime = expirationTime;
 		CgaeUserAuthenticationToken.secretSignKey = secretSignKey;
+		CgaeUserAuthenticationToken.tokenPrefix = tokenPrefix;
 	}
-	
+
 	private static final long serialVersionUID = 1L;
 
 	private final Object principal;
@@ -148,15 +151,19 @@ public class CgaeUserAuthenticationToken extends AbstractAuthenticationToken {
 			String issuer;
 			issuer = ldapDN.getRdns().stream().filter(a -> a.getType().equals("O")).findFirst().get().getValue()
 					.toString();
-			
-			return Jwts.builder().setIssuedAt(new Date()).setIssuer(issuer)
-					.setSubject(auth.getPrincipal().toString())
+
+			return Jwts.builder().setIssuedAt(new Date()).setIssuer(issuer).setSubject(auth.getPrincipal().toString())
 					.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 					.signWith(SignatureAlgorithm.HS512, secretSignKey).compact();
-			
+
 		} catch (Exception e) {
 			throw new TokenGenerationException(e);
 		}
+	}
+
+	public static String getUserFromJWTToken(String token) {
+		return Jwts.parser().setSigningKey(secretSignKey).parseClaimsJws(token.replace(tokenPrefix, "")).getBody()
+				.getSubject();
 	}
 
 }

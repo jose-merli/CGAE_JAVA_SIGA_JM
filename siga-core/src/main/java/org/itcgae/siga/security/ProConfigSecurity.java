@@ -80,7 +80,7 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 				.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);;
 
 		// Configuramos el token con los parametros de configuracion
-		CgaeUserAuthenticationToken.configure(secretSignKey, expirationTime);
+		CgaeUserAuthenticationToken.configure(secretSignKey, tokenPrefix, expirationTime);
 		CgaeAuthorizationFilter.configure(secretSignKey, tokenHeaderAuthKey, tokenPrefix);
 	}
 
