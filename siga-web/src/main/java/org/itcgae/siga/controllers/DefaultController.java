@@ -13,7 +13,12 @@ import org.itcgae.siga.db.entities.DemoCustomers;
 import org.itcgae.siga.services.IDbService;
 import org.itcgae.siga.services.ITestHeadersService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,9 +35,23 @@ public class DefaultController {
 	ITestHeadersService testHeadersService;
 	
 	
-	@RequestMapping(value="/", produces="text/html")
-	String health() {
-		return "Status: UP";
+	@RequestMapping(value="/", produces="application/json")
+	ResponseEntity<Status>health() {
+		return new ResponseEntity<Status>(new Status("UP"), HttpStatus.OK);
+	}
+	
+	/**
+	 * Este endpoint solo funciona cuando la seguridad está desactivada
+	 * @return
+	 */
+	@RequestMapping("/login")
+	@ConditionalOnProperty(prefix = "security.basic", value = { "enabled" }, havingValue = "false", matchIfMissing = true)
+	ResponseEntity<Status> login(){
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
+                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+		headers.add("Authorization", "developAuthorizationToken");
+		return new ResponseEntity<Status>(new Status("UP"), headers, HttpStatus.OK );
 	}
 	
 	@RequestMapping("/db")
