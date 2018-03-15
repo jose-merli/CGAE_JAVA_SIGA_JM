@@ -4,8 +4,8 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.gen.MenuItem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,32 +14,32 @@ import java.util.List;
 
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
-public class MenuDTO   {
+public class ComboDTO   {
   
-  private List<MenuItem> menuItems = new ArrayList<MenuItem>();
+  private List<ComboItem> combooItems = new ArrayList<ComboItem>();
   private Error error = null;
 
   
   /**
    **/
-  public MenuDTO menuItems(List<MenuItem> menuItems) {
-    this.menuItems = menuItems;
+  public ComboDTO combooItems(List<ComboItem> combooItems) {
+    this.combooItems = combooItems;
     return this;
   }
   
   
-  @JsonProperty("menuItems")
-  public List<MenuItem> getMenuItems() {
-    return menuItems;
+  @JsonProperty("combooItems")
+  public List<ComboItem> getCombooItems() {
+    return combooItems;
   }
-  public void setMenuItems(List<MenuItem> menuItems) {
-    this.menuItems = menuItems;
+  public void setCombooItems(List<ComboItem> combooItems) {
+    this.combooItems = combooItems;
   }
 
   
   /**
    **/
-  public MenuDTO error(Error error) {
+  public ComboDTO error(Error error) {
     this.error = error;
     return this;
   }
@@ -63,22 +63,22 @@ public class MenuDTO   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    MenuDTO menuDTO = (MenuDTO) o;
-    return Objects.equals(this.menuItems, menuDTO.menuItems) &&
-        Objects.equals(this.error, menuDTO.error);
+    ComboDTO comboDTO = (ComboDTO) o;
+    return Objects.equals(this.combooItems, comboDTO.combooItems) &&
+        Objects.equals(this.error, comboDTO.error);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(menuItems, error);
+    return Objects.hash(combooItems, error);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class MenuDTO {\n");
+    sb.append("class ComboDTO {\n");
     
-    sb.append("    menuItems: ").append(toIndentedString(menuItems)).append("\n");
+    sb.append("    combooItems: ").append(toIndentedString(combooItems)).append("\n");
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -1,0 +1,265 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This API allows consult menu items",
+    "version": "v1",
+    "title": "menu"
+  },
+  "host": "api.cgae.com",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/menu": {
+      "get": {
+        "tags": [
+          "getMenu"
+        ],
+        "summary": "get",
+        "deprecated": false,
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "$ref": "#/definitions/MenuDTO"
+            }
+          },
+          "400": {
+            "description": "Bad Request (el formato de la petición no es correcto)",
+            "schema": {
+              "$ref": "#/definitions/MenuDTO"
+            }
+          },
+          "401": {
+            "description": "Unauthorized (el sistema no está autorizado para realizar la petición)",
+            "schema": {
+              "$ref": "#/definitions/MenuDTO"
+            }
+          },
+          "403": {
+            "description": "Forbidden(El cliente no cumple las condiciones establecidas para consultar este servicio)",
+            "schema": {
+              "$ref": "#/definitions/MenuDTO"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/MenuDTO"
+            }
+          }
+        }
+      }
+    },
+    "/menu/instituciones": {
+      "get": {
+        "tags": [
+          "getMenuInstituciones"
+        ],
+        "summary": "get",
+        "deprecated": false,
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "$ref": "#/definitions/ComboDTO"
+            }
+          },
+          "400": {
+            "description": "Bad Request (el formato de la petición no es correcto)",
+            "schema": {
+              "$ref": "#/definitions/ComboDTO"
+            }
+          },
+          "401": {
+            "description": "Unauthorized (el sistema no está autorizado para realizar la petición)",
+            "schema": {
+              "$ref": "#/definitions/ComboDTO"
+            }
+          },
+          "403": {
+            "description": "Forbidden(El cliente no cumple las condiciones establecidas para consultar este servicio)",
+            "schema": {
+              "$ref": "#/definitions/ComboDTO"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/ComboDTO"
+            }
+          }
+        }
+      }
+    },
+    "/menu/perfiles": {
+      "get": {
+        "tags": [
+          "getMenuPerfiles"
+        ],
+        "summary": "get",
+        "deprecated": false,
+        "parameters": [
+          {
+            "name": "institucion",
+            "in": "query",
+            "description": "Identificador de institucon para extraer los perfiles asociados",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "$ref": "#/definitions/ComboDTO"
+            }
+          },
+          "400": {
+            "description": "Bad Request (el formato de la petición no es correcto)",
+            "schema": {
+              "$ref": "#/definitions/ComboDTO"
+            }
+          },
+          "401": {
+            "description": "Unauthorized (el sistema no está autorizado para realizar la petición)",
+            "schema": {
+              "$ref": "#/definitions/ComboDTO"
+            }
+          },
+          "403": {
+            "description": "Forbidden(El cliente no cumple las condiciones establecidas para consultar este servicio)",
+            "schema": {
+              "$ref": "#/definitions/ComboDTO"
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "schema": {
+              "$ref": "#/definitions/ComboDTO"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "MenuDTO": {
+      "type": "object",
+      "properties": {
+        "menuItems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MenuItem"
+          }
+        },
+        "error": {
+          "$ref": "#/definitions/Error"
+        }
+      }
+    },
+    "MenuItem": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "routerLink": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MenuItem"
+          }
+        }
+      }
+    },
+    "ComboDTO": {
+      "type": "object",
+      "properties": {
+        "combooItems": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ComboItem"
+          }
+        },
+        "error": {
+          "$ref": "#/definitions/Error"
+        }
+      }
+    },
+    "ComboItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "Error": {
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "description": "An integer coding the error type. This is given to caller so he can translate them if required.",
+          "type": "integer"
+        },
+        "message": {
+          "description": "A short localized string that describes the error.",
+          "type": "string"
+        },
+        "description": {
+          "description": "(optional) A long localized error description if needed. It can contain precise information about which parameter is missing, or what are the identifier acceptable values.",
+          "type": "string"
+        },
+        "infoURL": {
+          "description": "(optional) A URL to online documentation that provides more information about the error.",
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ErrorDetail"
+          }
+        }
+      }
+    },
+    "ErrorDetail": {
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "description": "An integer coding the error type. This is given to caller so he can translate them if required.",
+          "type": "integer"
+        },
+        "message": {
+          "description": "A short localized string that describes the error.",
+          "type": "string"
+        },
+        "description": {
+          "description": "(optional) A long localized error description if needed. It can contain precise information about which parameter is missing, or what are the identifier acceptable values.",
+          "type": "string"
+        },
+        "infoURL": {
+          "description": "(optional) A URL to online documentation that provides more information about the error.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}
