@@ -1,4 +1,4 @@
-package org.itcgae.siga.security.utils;
+package org.itcgae.siga.commons.utils;
 
 public class TokenGenerationException extends Exception {
 

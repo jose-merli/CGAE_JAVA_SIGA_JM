@@ -395,6 +395,84 @@
 		<table schema="USCGAE_DESA" tableName="CEN_UNSOLOCOL_EJER_NORESID">
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
 		</table> 
+		<table schema="USCGAE_DESA" tableName="GEN_ANIO">
+			<property name="ignoreQuali		fiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_CATALOGOS_MULTIIDIOMA">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_CATALOGOS_WS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_CATEGORIAS_ERROR">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_CODIGOSMAESTROS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_DIASLETRA">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table> 
+		<table schema="USCGAE_DESA" tableName="GEN_DTIPOS_ERROR">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table> 
+		<table schema="USCGAE_DESA" tableName="GEN_ERRORES">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_FECHA">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table> 
+		<table schema="USCGAE_DESA" tableName="GEN_FICHERO">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_MENU">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_MTIPOS_ERROR">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_PARAMETROS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_PERIODO">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_PESTANAS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_PROCESOS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_PROPERTIES">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_PROPERTIES_BACKUP">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table> 
+		<table schema="USCGAE_DESA" tableName="GEN_RECURSOS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_RECURSOS_CATALOGOS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_RECURSPROPS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_TABLAS_MAESTRAS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table> 
+		<table schema="USCGAE_DESA" tableName="GEN_TAREAS">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table> 
+		<table schema="USCGAE_DESA" tableName="GEN_TAREASPENDIENTES">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table> 
+		<table schema="USCGAE_DESA" tableName="GEN_TIPOCAMPO">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>  
+		<table schema="USCGAE_DESA" tableName="GEN_WEBSERVICE_LOG">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table> 
 		
 		
 

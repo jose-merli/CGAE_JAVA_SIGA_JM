@@ -6,7 +6,7 @@ import java.util.Date;
 
 import javax.naming.ldap.LdapName;
 
-import org.itcgae.siga.security.utils.TokenGenerationException;
+import org.itcgae.siga.commons.utils.TokenGenerationException;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

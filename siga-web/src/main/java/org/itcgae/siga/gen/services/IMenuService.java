@@ -1,20 +1,16 @@
-package org.itcgae.siga.services;
+package org.itcgae.siga.gen.services;
 
 import java.util.List;
 
-import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.DTOs.gen.MenuDTO;
+import org.itcgae.siga.DTOs.gen.MenuDTORequest;
 
-public interface IDbService {
+public interface IMenuService {
+
+
 
 	
-	public List<CenInstitucion>findAllInstitucion();
-
-	
-	public List<CenInstitucion> findInstitucionesByName(String name);
+	public List<MenuDTO> selectMenuByExample(MenuDTORequest example);
 
 
-	public List<CenInstitucion> findAllInstitucionSql();
-	
-	
-	public List<CenInstitucion> selectInstitucionPerfil();
 }
