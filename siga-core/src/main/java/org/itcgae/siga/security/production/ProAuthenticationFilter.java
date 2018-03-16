@@ -1,4 +1,4 @@
-package org.itcgae.siga.security;
+package org.itcgae.siga.security.production;
 
 import java.io.IOException;
 import java.security.cert.X509Certificate;
@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.commons.utils.InvalidClientCerticateException;
+import org.itcgae.siga.security.UserAuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,9 +20,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-public class CgaeAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-	Logger LOGGER = LoggerFactory.getLogger(CgaeAuthenticationFilter.class);
+	Logger LOGGER = LoggerFactory.getLogger(ProAuthenticationFilter.class);
 
 	private AuthenticationManager authenticationManager;
 
@@ -29,12 +30,12 @@ public class CgaeAuthenticationFilter extends AbstractAuthenticationProcessingFi
 
 	private static String tokenPrefix;
 
-	public CgaeAuthenticationFilter(AuthenticationManager authenticationManager, String loginMethod, String loginUrl,
+	public ProAuthenticationFilter(AuthenticationManager authenticationManager, String loginMethod, String loginUrl,
 			String tokenHeaderAuthKey, String tokenPrefix) {
 		super(new AntPathRequestMatcher(loginUrl, loginMethod));
 		this.authenticationManager = authenticationManager;
-		CgaeAuthenticationFilter.tokenHeaderAuthKey = tokenHeaderAuthKey;
-		CgaeAuthenticationFilter.tokenPrefix = tokenPrefix;
+		ProAuthenticationFilter.tokenHeaderAuthKey = tokenHeaderAuthKey;
+		ProAuthenticationFilter.tokenPrefix = tokenPrefix;
 	}
 
 	@Override
@@ -53,7 +54,7 @@ public class CgaeAuthenticationFilter extends AbstractAuthenticationProcessingFi
 					throw new InvalidClientCerticateException(e);
 				}
 
-				return authenticationManager.authenticate(new CgaeUserAuthenticationToken(user, certs[0]));
+				return authenticationManager.authenticate(new UserAuthenticationToken(user, certs[0]));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -65,8 +66,8 @@ public class CgaeAuthenticationFilter extends AbstractAuthenticationProcessingFi
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication auth) throws IOException, ServletException {
 		try {
-			if (auth.getClass().equals(CgaeUserAuthenticationToken.class)) {
-				CgaeUserAuthenticationToken userAuthToken = (CgaeUserAuthenticationToken) auth;
+			if (auth.getClass().equals(UserAuthenticationToken.class)) {
+				UserAuthenticationToken userAuthToken = (UserAuthenticationToken) auth;
 				response.addHeader(tokenHeaderAuthKey, tokenPrefix + " " + userAuthToken.generateToken(auth));
 			}
 		} catch (Exception e) {

@@ -1,8 +1,9 @@
-package org.itcgae.siga.security;
+package org.itcgae.siga.security.production;
 
 import java.security.cert.X509Certificate;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.security.UserAuthenticationToken;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -13,16 +14,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Configurable
-public class CgaeAuthenticationProvider implements AuthenticationProvider {
+public class ProAuthenticationProvider implements AuthenticationProvider {
 
-	Logger LOGGER = Logger.getLogger(CgaeAuthenticationProvider.class);
+	Logger LOGGER = Logger.getLogger(ProAuthenticationProvider.class);
 	
 	@Value("${cert-conf-path}")
 	private String certConfPath;
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-		CgaeUserAuthenticationToken cgaeAuthenticaton = (CgaeUserAuthenticationToken) authentication;
+		UserAuthenticationToken cgaeAuthenticaton = (UserAuthenticationToken) authentication;
 		String username = authentication.getPrincipal() + "";
 
 		LOGGER.info("Intento de validar certificado " + username);
@@ -33,7 +34,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 		Validacion result = validaCertificado(cgaeAuthenticaton.getCertificate());
 		
 		if (result.equals(Validacion.OK)){
-			return new CgaeUserAuthenticationToken(cgaeAuthenticaton.getPrincipal(), null,
+			return new UserAuthenticationToken(cgaeAuthenticaton.getPrincipal(), null,
 					cgaeAuthenticaton.getCertificate(), cgaeAuthenticaton.getAuthorities());			
 		} else{
 			throw new BadCredentialsException("Imposible validar el certificado");
@@ -42,7 +43,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 
 	@Override
 	public boolean supports(Class<?> authentication) {
-		return authentication.equals(CgaeUserAuthenticationToken.class);
+		return authentication.equals(UserAuthenticationToken.class);
 	}
 
 	private Validacion validaCertificado(X509Certificate x509Certificate) {
