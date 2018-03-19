@@ -1,27 +1,29 @@
 package org.itcgae.siga.gen.services.impl;
 
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import javax.naming.ldap.LdapName;
 import javax.servlet.http.HttpServletRequest;
 
+import org.assertj.core.util.Strings;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.MenuItem;
 import org.itcgae.siga.commons.utils.Converter;
-import org.itcgae.siga.commons.utils.InvalidClientCerticateException;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmTiposaccesoExample;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.GenMenu;
+import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
@@ -29,6 +31,9 @@ import org.itcgae.siga.gen.services.IMenuService;
 import org.itcgae.siga.security.CgaeUserAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+
+
 
 @Service
 public class MenuServiceImpl implements IMenuService {
@@ -41,71 +46,115 @@ public class MenuServiceImpl implements IMenuService {
 	
 	@Autowired
 	AdmPerfilExtendsMapper perfilMapper;
+	
+	@Autowired
+	AdmUsuariosMapper usuarioMapper;
 
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
 		MenuDTO response = new MenuDTO();
+		List<GenMenu> menuEntities = new ArrayList<GenMenu>();
+		HashMap<String, GenMenu> menuMap = new HashMap<String, GenMenu>();
+		String idLenguaje = new String();
 
+
+		String dni = CgaeUserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		
 		AdmTiposaccesoExample exampleMenu = new AdmTiposaccesoExample();
 
 		exampleMenu.setDistinct(true);
 		exampleMenu.setOrderByClause(" MENU.ORDEN ASC");
-
-		// TODO: idIntitución e idPerfil
-		try {
-			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-			String user = null;
-			if (null != certs && certs.length > 0) {
-				String dn = certs[0].getSubjectX500Principal().getName();
-				LdapName ldapDN = new LdapName(dn);
-				try {
-					user = ldapDN.getRdns().stream().filter(a -> a.getType().equals("CN")).findFirst().get().getValue()
-							.toString();
-				} catch (NoSuchElementException e) {
-					throw new InvalidClientCerticateException(e);
-				}
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		AdmUsuariosExample usuarioExample = new AdmUsuariosExample();
+		usuarioExample.createCriteria().andNifEqualTo(dni);
+		
+		List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExample);
+		
+		if (usuarios == null || usuarios.isEmpty()) {
+			Error error = new Error();
+			error.setCode(400);
+			error.setDescription("400");
+			response.setError(error);
+			return response;
 		}
 		
-		
-		
-		
-		
-		exampleMenu.createCriteria().andIdinstitucionEqualTo(Short.valueOf("2000")).andIdperfilEqualTo("ADG")
+		for(AdmUsuarios usuario:usuarios){
+			idLenguaje = usuario.getIdlenguaje();
+			ComboDTO perfiles = getPerfiles(String.valueOf(usuario.getIdinstitucion()));
+			if (perfiles == null) {
+				Error error = new Error();
+				error.setCode(400);
+				error.setDescription("400");
+				response.setError(error);
+				return response;
+			}
+			for(ComboItem perfil:perfiles.getCombooItems()){
+				exampleMenu.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion()).andIdperfilEqualTo(perfil.getId())
 				.andDerechoaccesoGreaterThan(Short.valueOf("1"));
-		List<GenMenu> menuEntities = menuExtend.selectMenuByExample(exampleMenu);
+				menuEntities = menuExtend.selectMenuByExample(exampleMenu);
+				if (menuEntities == null || menuEntities.isEmpty()) {
+					Error error = new Error();
+					error.setCode(400);
+					error.setDescription("400");
+					response.setError(error);
+					return response;
+				}
+				for(GenMenu menu: menuEntities){
+						menuMap.put(menu.getIdmenu(), menu);
+				}
+			}
+			
+		}
+		menuEntities = new ArrayList<GenMenu>();
+		menuEntities.addAll(menuMap.values());
+		
 
 		if (null != menuEntities && !menuEntities.isEmpty()) {
 			List<MenuItem> items = new ArrayList<MenuItem>();
-			List<GenMenu> rootMenus = menuEntities.stream().filter(i -> i.getIdparent() == null)
+			List<GenMenu> rootMenus = menuEntities.stream().filter(i -> Strings.isNullOrEmpty(i.getIdparent()) || i.getIdparent().equals(" "))
 					.collect(Collectors.toList());
-
-			for (GenMenu dbItem : rootMenus) {
-				
-				MenuItem item = new MenuItem();
-				item.setLabel(dbItem.getIdrecurso());
-				item.setRouterLink(dbItem.getIdrecurso());
-
-				items.add(item);
-			}
-			// TODO: extraer todos los niveles de menus
-			for (Iterator iterator = menuEntities.iterator(); iterator.hasNext();) {
-
-//				GenMenu genMenu = (GenMenu) iterator.next();
-//				MenuItem item = new MenuItem();
-//				item.setLabel(genMenu.getIdrecurso());
-//				item.setRouterLink(genMenu.getIdrecurso());
-//
-//				items.add(item);
-
-			}
+			
+				for (GenMenu dbItem : rootMenus) {
+					MenuItem item = processMenu(dbItem,menuEntities,idLenguaje); 
+					items.add(item);
+				}
 
 			response.setMenuItems(items);
 		}
 
 		return response;
+
+	}
+	
+	
+	private static MenuItem processMenu(GenMenu parent, List<GenMenu> childCandidatesList, String idLenguaje ) {
+	    ArrayList<GenMenu> childList = new ArrayList<GenMenu>();
+	    ArrayList<GenMenu> childListTwo = new ArrayList<GenMenu>();
+	    MenuItem response = new MenuItem();
+	    response.setLabel(parent.getIdrecurso());
+	    //response.setRouterLink(parent.getIdrecurso());
+	    for (GenMenu childTransactions : childCandidatesList) {
+	        childListTwo.add(childTransactions);
+	        if (childTransactions.getIdparent() != null) {
+	            
+	            if (childTransactions.getIdparent().equalsIgnoreCase(parent.getIdmenu())){
+	            	MenuItem responsechild = new MenuItem();
+	            	responsechild.setLabel(childTransactions.getIdrecurso());
+	            	responsechild.setRouterLink(childTransactions.getIdrecurso());
+	            	response.getItems().add(responsechild);
+	                childList.add(childTransactions);
+	                childListTwo.remove(childTransactions);
+	            }
+	        }
+	    }
+
+
+
+	    for (GenMenu child : childList) {
+	    	processMenu(child, childListTwo,idLenguaje);
+	  
+	    }
+
+	    return response;
 
 	}
 
@@ -120,7 +169,7 @@ public class MenuServiceImpl implements IMenuService {
 		List<CenInstitucion> instituciones = institucionMapper.selectByExample(exampleInstitucion);
 		List<ComboItem> combos = new ArrayList<ComboItem>();
 		if (null != instituciones && instituciones.size() > 0) {
-			for (Iterator iterator = instituciones.iterator(); iterator.hasNext();) {
+			for (Iterator<CenInstitucion> iterator = instituciones.iterator(); iterator.hasNext();) {
 				CenInstitucion cenInstitucion = (CenInstitucion) iterator.next();
 				ComboItem combo = new ComboItem();
 				combo.setId(cenInstitucion.getIdinstitucion().toString());
@@ -147,14 +196,14 @@ public class MenuServiceImpl implements IMenuService {
 		
 		AdmPerfilExample examplePerfil = new AdmPerfilExample();
 		examplePerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-		examplePerfil.setOrderByClause("IDINSTITUCION ASC");
+		examplePerfil.setOrderByClause("IDPERFIL ASC");
 		List<AdmPerfil> perfiles = perfilMapper.selectComboPerfilByExample(examplePerfil);
 		List<ComboItem> combos = new ArrayList<ComboItem>();
 		if (null != perfiles && perfiles.size() > 0) {
-			for (Iterator iterator = perfiles.iterator(); iterator.hasNext();) {
+			for (Iterator<AdmPerfil> iterator = perfiles.iterator(); iterator.hasNext();) {
 				AdmPerfil admPerfil = (AdmPerfil) iterator.next();
 				ComboItem combo = new ComboItem();
-				combo.setId(admPerfil.getIdinstitucion().toString());
+				combo.setId(admPerfil.getIdperfil().toString());
 				combo.setValue(admPerfil.getDescripcion());
 				combos.add(combo);
 			}

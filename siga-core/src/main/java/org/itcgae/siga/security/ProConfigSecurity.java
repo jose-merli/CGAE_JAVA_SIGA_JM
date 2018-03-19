@@ -73,6 +73,8 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 		httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and().cors().and().csrf().disable().authorizeRequests()
 				.antMatchers(HttpMethod.resolve(loginMethod), loginUrl).permitAll()
+				.antMatchers(HttpMethod.GET, "/instituciones").permitAll()
+				.antMatchers(HttpMethod.GET, "/perfilespost").permitAll()
 				.anyRequest().authenticated().and()
 				.addFilterBefore(new CgaeAuthenticationFilter(authenticationManager(), loginMethod, loginUrl,
 						tokenHeaderAuthKey, tokenPrefix), BasicAuthenticationFilter.class)
