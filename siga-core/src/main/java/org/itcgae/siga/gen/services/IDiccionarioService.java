@@ -5,7 +5,7 @@ import org.itcgae.siga.DTOs.gen.DiccionarioDTO;
 public interface IDiccionarioService {
 
 
-	public  DiccionarioDTO  getRecursos(String lenguaje);
+	public  DiccionarioDTO  getDiccionario(String lenguaje);
 
 
 }

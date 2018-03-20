@@ -8,10 +8,10 @@ import org.itcgae.siga.DTOs.gen.DiccionarioDTO;
 import org.itcgae.siga.DTOs.gen.DiccionarioItem;
 import org.itcgae.siga.db.entities.AdmLenguajes;
 import org.itcgae.siga.db.entities.AdmLenguajesExample;
-import org.itcgae.siga.db.entities.GenRecursos;
-import org.itcgae.siga.db.entities.GenRecursosExample;
+import org.itcgae.siga.db.entities.GenDiccionario;
+import org.itcgae.siga.db.entities.GenDiccionarioExample;
 import org.itcgae.siga.db.mappers.AdmLenguajesMapper;
-import org.itcgae.siga.db.mappers.GenRecursosMapper;
+import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
 import org.itcgae.siga.gen.services.IDiccionarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,32 +28,33 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 	@Autowired
 	AdmLenguajesMapper lenguajesMapper;
 	@Autowired
-	GenRecursosMapper recursosMapper;
+	GenDiccionarioMapper diccionarioMapper;
 	
 	@Override
-	public DiccionarioDTO getRecursos(String lenguaje) {
+	public DiccionarioDTO getDiccionario(String lenguaje) {
 		DiccionarioDTO response = new DiccionarioDTO();
-		GenRecursosExample example = new GenRecursosExample();
-		if (null != lenguaje && lenguaje != "") {
+		
+		if (null != lenguaje && !lenguaje.equals("")) {
 			List<DiccionarioItem> diccionarioResponse = new ArrayList<DiccionarioItem>();
 			AdmLenguajesExample lenguajeExample = new AdmLenguajesExample();
 			lenguajeExample.createCriteria().andCodigoextEqualTo(lenguaje);
 			List<AdmLenguajes> admLenguajes = lenguajesMapper.selectByExample(lenguajeExample );
 			if (null != admLenguajes && !admLenguajes.isEmpty()) {
 				AdmLenguajes admLenguaje = admLenguajes.get(0);
+				GenDiccionarioExample example = new GenDiccionarioExample();
 				example.createCriteria().andIdlenguajeEqualTo(admLenguaje.getIdlenguaje());
 				example.setOrderByClause(" IDRECURSO ASC");
-				List<GenRecursos> recursos = recursosMapper.selectByExample(example);
-				if (null != recursos && !recursos.isEmpty()) {
-					DiccionarioItem diccionarioItem = new DiccionarioItem();
-					HashMap<String,HashMap<String, String>> recursoItem = new HashMap<String,HashMap<String, String>>();
-					HashMap<String, String> recursoIndividual = new HashMap<String, String>();
-					for(GenRecursos recurso: recursos){
-						recursoIndividual.put(recurso.getIdrecurso(),recurso.getDescripcion());
+				List<GenDiccionario> diccionarios = diccionarioMapper.selectByExample(example);
+				if (null != diccionarios && !diccionarios.isEmpty()) {
+					DiccionarioItem diccionarioItemResponse = new DiccionarioItem();
+					HashMap<String,HashMap<String, String>> diccionariosItem = new HashMap<String,HashMap<String, String>>();
+					HashMap<String, String> diccionarioIndividual = new HashMap<String, String>();
+					for(GenDiccionario diccionario: diccionarios){
+						diccionarioIndividual.put(diccionario.getIdrecurso(),diccionario.getDescripcion());
 					}
-					recursoItem.put(lenguaje,recursoIndividual);
-					diccionarioItem.setDiccionario(recursoItem);
-					diccionarioResponse.add(diccionarioItem);
+					diccionariosItem.put(admLenguaje.getCodigoext(),diccionarioIndividual);
+					diccionarioItemResponse.setDiccionario(diccionariosItem);
+					diccionarioResponse.add(diccionarioItemResponse);
 					response.setDiccionarioItems(diccionarioResponse);
 					return response;
 				}else{
@@ -65,23 +66,20 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
       		List<DiccionarioItem> diccionarioResponse = new ArrayList<DiccionarioItem>();
       		for(AdmLenguajes lang:enumLanguages){
       			String lenguajeExt = lang.getIdlenguaje();
+      			GenDiccionarioExample example = new GenDiccionarioExample();
     			example.createCriteria().andIdlenguajeEqualTo(lenguajeExt);
     			example.setOrderByClause(" IDRECURSO ASC");
-    			List<GenRecursos> recursos = recursosMapper.selectByExample(example);
-    			if (null != recursos && !recursos.isEmpty()) {
-    				DiccionarioItem diccionarioItem = new DiccionarioItem();
-    				HashMap<String,HashMap<String, String>> recursoItem = new HashMap<String,HashMap<String, String>>();
-					HashMap<String, String> recursoIndividual = new HashMap<String, String>();
-					for(GenRecursos recurso: recursos){
-						recursoIndividual.put(recurso.getIdrecurso(),recurso.getDescripcion());
+    			List<GenDiccionario> diccionarios = diccionarioMapper.selectByExample(example);
+    			if (null != diccionarios && !diccionarios.isEmpty()) {
+    				DiccionarioItem diccionarioItemResponse = new DiccionarioItem();
+    				HashMap<String,HashMap<String, String>> diccionarioItem = new HashMap<String,HashMap<String, String>>();
+					HashMap<String, String> diccionarioIndividual = new HashMap<String, String>();
+					for(GenDiccionario diccionario: diccionarios){
+						diccionarioIndividual.put(diccionario.getIdrecurso(),diccionario.getDescripcion());
 					}
-					recursoItem.put(lenguaje,recursoIndividual);
-    				diccionarioItem.setDiccionario(recursoItem);
-    				diccionarioResponse.add(diccionarioItem);
-					response.setDiccionarioItems(diccionarioResponse);
-					return response;
-    			}else{
-    				return response;
+					diccionarioItem.put(lang.getCodigoext(),diccionarioIndividual);
+					diccionarioItemResponse.setDiccionario(diccionarioItem);
+    				diccionarioResponse.add(diccionarioItemResponse);
     			}
       		}
 			response.setDiccionarioItems(diccionarioResponse);
@@ -104,16 +102,16 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
         		String lenguajeExt = lang.getCodigoext();
         		URLClassLoader cargador = (URLClassLoader)ClassLoader.getSystemClassLoader();
         		this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath(); 
-        		//new File(Utils.class.getResource(SIGAReferences.RESOURCE_FILES.RECURSOS_DIR+"/ApplicationResources_"+lenguajeExt.toLowerCase()+".properties").getPath()File());
-        		//outputStream= new FileOutputStream(Utils.class.getResource(SIGAReferences.RESOURCE_FILES.RECURSOS_DIR.getFileName()+"/ApplicationResources_"+lenguajeExt.toLowerCase()+".properties").getPath());
+        		//new File(Utils.class.getResource(SIGAReferences.RESOURCE_FILES.diccionarioS_DIR+"/ApplicationResources_"+lenguajeExt.toLowerCase()+".properties").getPath()File());
+        		//outputStream= new FileOutputStream(Utils.class.getResource(SIGAReferences.RESOURCE_FILES.diccionarioS_DIR.getFileName()+"/ApplicationResources_"+lenguajeExt.toLowerCase()+".properties").getPath());
 				
         		outputStream= new FileOutputStream("/ApplicationResources_"+lenguajeExt.toLowerCase()+".properties");
 				outputStreamWriter=new OutputStreamWriter(outputStream);
 				bufferedWriter = new BufferedWriter(outputStreamWriter);
-	      		List<GenRecursos> enumRecursos= getRecursosDb(lang.getIdlenguaje());
-	      		for (GenRecursos recurso:enumRecursos) {
-	  				String key=(String) recurso.getIdrecurso();
-	  				String value=(String) recurso.getDescripcion();
+	      		List<GenDiccionario> enumdiccionarios= getdiccionariosDb(lang.getIdlenguaje());
+	      		for (GenDiccionario diccionario:enumdiccionarios) {
+	  				String key=(String) diccionario.getIddiccionario();
+	  				String value=(String) diccionario.getDescripcion();
 	  				bufferedWriter.write(key+"="+value+"\n");
 	  				bufferedWriter.flush();
 				}
