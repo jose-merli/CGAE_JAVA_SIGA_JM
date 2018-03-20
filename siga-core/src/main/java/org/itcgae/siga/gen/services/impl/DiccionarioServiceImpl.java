@@ -34,43 +34,52 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 	public DiccionarioDTO getRecursos(String lenguaje) {
 		DiccionarioDTO response = new DiccionarioDTO();
 		GenRecursosExample example = new GenRecursosExample();
-		if (null != lenguaje) {
+		if (null != lenguaje && lenguaje != "") {
 			List<DiccionarioItem> diccionarioResponse = new ArrayList<DiccionarioItem>();
-			example.createCriteria().andIdlenguajeEqualTo(lenguaje);
-			example.setOrderByClause(" IDRECURSO ASC");
-			List<GenRecursos> recursos = recursosMapper.selectByExample(example);
-			if (null != recursos && !recursos.isEmpty()) {
-				DiccionarioItem diccionarioItem = new DiccionarioItem();
-				HashMap<String,HashMap<String, String>> recursoItem = new HashMap<String,HashMap<String, String>>();
-				for(GenRecursos recurso: recursos){
+			AdmLenguajesExample lenguajeExample = new AdmLenguajesExample();
+			lenguajeExample.createCriteria().andCodigoextEqualTo(lenguaje);
+			List<AdmLenguajes> admLenguajes = lenguajesMapper.selectByExample(lenguajeExample );
+			if (null != admLenguajes && !admLenguajes.isEmpty()) {
+				AdmLenguajes admLenguaje = admLenguajes.get(0);
+				example.createCriteria().andIdlenguajeEqualTo(admLenguaje.getIdlenguaje());
+				example.setOrderByClause(" IDRECURSO ASC");
+				List<GenRecursos> recursos = recursosMapper.selectByExample(example);
+				if (null != recursos && !recursos.isEmpty()) {
+					DiccionarioItem diccionarioItem = new DiccionarioItem();
+					HashMap<String,HashMap<String, String>> recursoItem = new HashMap<String,HashMap<String, String>>();
 					HashMap<String, String> recursoIndividual = new HashMap<String, String>();
-					recursoIndividual.put(recurso.getIdlenguaje(),recurso.getDescripcion());
+					for(GenRecursos recurso: recursos){
+						recursoIndividual.put(recurso.getIdrecurso(),recurso.getDescripcion());
+					}
 					recursoItem.put(lenguaje,recursoIndividual);
+					diccionarioItem.setDiccionario(recursoItem);
+					diccionarioResponse.add(diccionarioItem);
+					response.setDiccionarioItems(diccionarioResponse);
+					return response;
+				}else{
+					return response;
 				}
-				diccionarioItem.setDiccionario(recursoItem);
-				diccionarioResponse.add(diccionarioItem);
-			}else{
-				return response;
 			}
-			
 		}else{
       		List<AdmLenguajes> enumLanguages= getLanguages();
       		List<DiccionarioItem> diccionarioResponse = new ArrayList<DiccionarioItem>();
       		for(AdmLenguajes lang:enumLanguages){
-      			String lenguajeExt = lang.getCodigoext();
+      			String lenguajeExt = lang.getIdlenguaje();
     			example.createCriteria().andIdlenguajeEqualTo(lenguajeExt);
     			example.setOrderByClause(" IDRECURSO ASC");
     			List<GenRecursos> recursos = recursosMapper.selectByExample(example);
     			if (null != recursos && !recursos.isEmpty()) {
     				DiccionarioItem diccionarioItem = new DiccionarioItem();
     				HashMap<String,HashMap<String, String>> recursoItem = new HashMap<String,HashMap<String, String>>();
-    				for(GenRecursos recurso: recursos){
-    					HashMap<String, String> recursoIndividual = new HashMap<String, String>();
-    					recursoIndividual.put(recurso.getIdlenguaje(),recurso.getDescripcion());
-    					recursoItem.put(lenguajeExt,recursoIndividual);
-    				}
+					HashMap<String, String> recursoIndividual = new HashMap<String, String>();
+					for(GenRecursos recurso: recursos){
+						recursoIndividual.put(recurso.getIdrecurso(),recurso.getDescripcion());
+					}
+					recursoItem.put(lenguaje,recursoIndividual);
     				diccionarioItem.setDiccionario(recursoItem);
     				diccionarioResponse.add(diccionarioItem);
+					response.setDiccionarioItems(diccionarioResponse);
+					return response;
     			}else{
     				return response;
     			}
