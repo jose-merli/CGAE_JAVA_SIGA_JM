@@ -1,4 +1,4 @@
-package org.itcgae.siga.security;
+package org.itcgae.siga.security.production;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,13 +8,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.itcgae.siga.security.UserAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import io.jsonwebtoken.Jwts;
 
-public class CgaeAuthorizationFilter extends BasicAuthenticationFilter {
+public class ProAuthorizationFilter extends BasicAuthenticationFilter {
 	
 	private static String secretSignKey;
 	
@@ -23,12 +24,12 @@ public class CgaeAuthorizationFilter extends BasicAuthenticationFilter {
 	private static String tokenPrefix;
 
 	protected static void configure(String secretSignKey, String tokenHeaderAuthKey, String tokenPrefix){
-		CgaeAuthorizationFilter.secretSignKey = secretSignKey;
-		CgaeAuthorizationFilter.tokenHeaderAuthKey = tokenHeaderAuthKey;
-		CgaeAuthorizationFilter.tokenPrefix = tokenPrefix;
+		ProAuthorizationFilter.secretSignKey = secretSignKey;
+		ProAuthorizationFilter.tokenHeaderAuthKey = tokenHeaderAuthKey;
+		ProAuthorizationFilter.tokenPrefix = tokenPrefix;
 	}
 	
-	public CgaeAuthorizationFilter(AuthenticationManager authManager) {
+	public ProAuthorizationFilter(AuthenticationManager authManager) {
 		super(authManager);
 	}
 
@@ -40,12 +41,12 @@ public class CgaeAuthorizationFilter extends BasicAuthenticationFilter {
 			chain.doFilter(req, res);
 			return;
 		}
-		CgaeUserAuthenticationToken authentication = getAuthentication(req);
+		UserAuthenticationToken authentication = getAuthentication(req);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		chain.doFilter(req, res);
 	}
 
-	private CgaeUserAuthenticationToken getAuthentication(HttpServletRequest request) {
+	private UserAuthenticationToken getAuthentication(HttpServletRequest request) {
 		String token = request.getHeader(tokenHeaderAuthKey);
 		if (token != null) {
 			// Se procesa el token y se recupera el usuario.
@@ -56,7 +57,7 @@ public class CgaeAuthorizationFilter extends BasicAuthenticationFilter {
 						.getSubject();
 
 			if (user != null) {
-				return new CgaeUserAuthenticationToken(user, null, new ArrayList<>());
+				return new UserAuthenticationToken(user, null, new ArrayList<>());
 			}
 			return null;
 		}

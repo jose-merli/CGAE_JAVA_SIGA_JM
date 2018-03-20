@@ -27,8 +27,29 @@ public class MethodLoggingAspect {
 	public void methodAnotation() {
 	}
 
-	@Pointcut("execution(* org.itcgae.siga.controllers..*.*(..))")
+	@Pointcut("execution(* org.itcgae.siga.*.controllers..*.*(..))")
 	public void controllers() {
+	}
+
+	@Pointcut("execution(* org.itcgae.siga.*.endpoints..*.*(..))")
+	public void webservices() {
+	}
+
+	@Around("webservices()")
+	public Object paintWsLog(ProceedingJoinPoint pjp) throws Throwable {
+
+		Logger logger = LoggerFactory.getLogger(pjp.getTarget().getClass());
+
+		preWsLogging(logger, pjp);
+
+		long startTime = System.nanoTime();
+		Object result = pjp.proceed();
+		long finalTime = System.nanoTime();
+
+		postControllerLogging(logger, pjp, result, startTime, finalTime);
+
+		return result;
+
 	}
 
 	@Around("controllers()")
@@ -77,14 +98,39 @@ public class MethodLoggingAspect {
 					request.getRequestURL().toString()));
 			if (signature.getParameterNames().length > 0) {
 				for (int i = 0; signature.getParameterNames().length > i; i++) {
-
-					sb.append(String.format(" [%s = %s]", signature.getParameterNames()[i],
-							new ObjectMapper().writeValueAsString(pjp.getArgs()[i])));
+					sb.append(String.format(" [%s", signature.getParameterNames()[i]));
+					try {
+						sb.append(String.format(" = %s]", new ObjectMapper().writeValueAsString(pjp.getArgs()[i])));
+					} catch (Exception e) {
+						sb.append(String.format(" = %s]", pjp.getArgs()[i].getClass()));
+					}
 				}
 			}
 			logger.info(sb.toString());
 		} catch (Exception e) {
 			logger.error("Error al llamar al metodo preControllerLogging del aspecto de logado", e);
+		}
+	}
+
+	private void preWsLogging(Logger logger, ProceedingJoinPoint pjp) {
+		try {
+			StringBuilder sb = new StringBuilder();
+			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+					.getRequest();
+
+			MethodSignature signature = (MethodSignature) pjp.getSignature();
+
+			sb.append(String.format("%s ---> %s %s", pjp.getSignature().getName(), request.getMethod(),
+					request.getRequestURL().toString()));
+			if (signature.getParameterNames().length > 0) {
+				for (int i = 0; signature.getParameterNames().length > i; i++) {
+					sb.append(String.format(" [%s = %s]", signature.getParameterNames()[i],
+							pjp.getArgs()[i].toString().replaceAll("\r|\t|\n", "")));
+				}
+			}
+			logger.info(sb.toString());
+		} catch (Exception e) {
+			logger.error("Error al llamar al metodo preWsLogging del aspecto de logado", e);
 		}
 	}
 
@@ -125,8 +171,12 @@ public class MethodLoggingAspect {
 			} else {
 				if (signature.getParameterNames().length > 0) {
 					for (int i = 0; signature.getParameterNames().length > i; i++) {
-						sb.append(String.format("%s = %s", signature.getParameterNames()[i],
-								new ObjectMapper().writeValueAsString(pjp.getArgs()[i])));
+						sb.append(String.format("%s", signature.getParameterNames()[i]));
+						try {
+							sb.append(String.format(" = %s", new ObjectMapper().writeValueAsString(pjp.getArgs()[i])));
+						} catch (Exception e) {
+							sb.append(String.format(" = %s", pjp.getArgs()[i].getClass()));
+						}
 						if (i < (signature.getParameterNames().length - 1)) {
 							sb.append(", ");
 						}
@@ -162,8 +212,12 @@ public class MethodLoggingAspect {
 						.getAnnotation(MethodLogging.class);
 			}
 			if (methodLoggingAnnotation.showReturnValue()) {
-				sb.append(String.format(" return %s = %s", returnType.getName(),
-						new ObjectMapper().writeValueAsString(result)));
+				sb.append(String.format(" return %s", returnType.getName()));
+				try {
+					sb.append(String.format(" = %s", new ObjectMapper().writeValueAsString(result)));
+				} catch (Exception e) {
+					sb.append(String.format(" = %s", result.getClass()));
+				}
 			}
 			logger.info(sb.toString());
 		} catch (Exception e) {

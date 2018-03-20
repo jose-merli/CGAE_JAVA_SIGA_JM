@@ -14,7 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-public class CgaeUserAuthenticationToken extends AbstractAuthenticationToken {
+public class UserAuthenticationToken extends AbstractAuthenticationToken {
 
 	private static long expirationTime;
 
@@ -22,10 +22,10 @@ public class CgaeUserAuthenticationToken extends AbstractAuthenticationToken {
 
 	private static String tokenPrefix;
 
-	protected static void configure(String secretSignKey, String tokenPrefix, long expirationTime) {
-		CgaeUserAuthenticationToken.expirationTime = expirationTime;
-		CgaeUserAuthenticationToken.secretSignKey = secretSignKey;
-		CgaeUserAuthenticationToken.tokenPrefix = tokenPrefix;
+	public static void configure(String secretSignKey, String tokenPrefix, long expirationTime) {
+		UserAuthenticationToken.expirationTime = expirationTime;
+		UserAuthenticationToken.secretSignKey = secretSignKey;
+		UserAuthenticationToken.tokenPrefix = tokenPrefix;
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -40,7 +40,7 @@ public class CgaeUserAuthenticationToken extends AbstractAuthenticationToken {
 	 * {@link #isAuthenticated()} will return <code>false</code>.
 	 *
 	 */
-	public CgaeUserAuthenticationToken(Object principal) {
+	public UserAuthenticationToken(Object principal) {
 		super(null);
 		this.principal = principal;
 		setAuthenticated(false);
@@ -52,7 +52,7 @@ public class CgaeUserAuthenticationToken extends AbstractAuthenticationToken {
 	 * {@link #isAuthenticated()} will return <code>false</code>.
 	 *
 	 */
-	public CgaeUserAuthenticationToken(Object principal, Object credentials) {
+	public UserAuthenticationToken(Object principal, Object credentials) {
 		super(null);
 		this.principal = principal;
 		this.credentials = credentials;
@@ -65,7 +65,7 @@ public class CgaeUserAuthenticationToken extends AbstractAuthenticationToken {
 	 * {@link #isAuthenticated()} will return <code>false</code>.
 	 *
 	 */
-	public CgaeUserAuthenticationToken(Object principal, X509Certificate certificate) {
+	public UserAuthenticationToken(Object principal, X509Certificate certificate) {
 		super(null);
 		this.principal = principal;
 		this.setCertificate(certificate);
@@ -82,7 +82,7 @@ public class CgaeUserAuthenticationToken extends AbstractAuthenticationToken {
 	 * @param credentials
 	 * @param authorities
 	 */
-	public CgaeUserAuthenticationToken(Object principal, Object credentials,
+	public UserAuthenticationToken(Object principal, Object credentials,
 			Collection<? extends GrantedAuthority> authorities) {
 		super(authorities);
 		this.principal = principal;
@@ -100,7 +100,7 @@ public class CgaeUserAuthenticationToken extends AbstractAuthenticationToken {
 	 * @param credentials
 	 * @param authorities
 	 */
-	public CgaeUserAuthenticationToken(Object principal, Object credentials, X509Certificate certificate,
+	public UserAuthenticationToken(Object principal, Object credentials, X509Certificate certificate,
 			Collection<? extends GrantedAuthority> authorities) {
 		super(authorities);
 		this.certificate = certificate;
@@ -153,6 +153,17 @@ public class CgaeUserAuthenticationToken extends AbstractAuthenticationToken {
 					.toString();
 
 			return Jwts.builder().setIssuedAt(new Date()).setIssuer(issuer).setSubject(auth.getPrincipal().toString())
+					.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+					.signWith(SignatureAlgorithm.HS512, secretSignKey).compact();
+
+		} catch (Exception e) {
+			throw new TokenGenerationException(e);
+		}
+	}
+	
+	public String generateToken(String auth) throws TokenGenerationException {
+		try {
+			return Jwts.builder().setIssuedAt(new Date()).setSubject(auth.toString())
 					.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 					.signWith(SignatureAlgorithm.HS512, secretSignKey).compact();
 
