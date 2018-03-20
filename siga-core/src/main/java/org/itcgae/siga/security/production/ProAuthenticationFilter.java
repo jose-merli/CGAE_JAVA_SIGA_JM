@@ -55,7 +55,7 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 				}
 				
 				
-				return authenticationManager.authenticate(new CgaeUserAuthenticationToken(user.substring(user.length()-9,user.length()), certs[0]));
+				return authenticationManager.authenticate(new UserAuthenticationToken(user.substring(user.length()-9,user.length()), certs[0]));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);

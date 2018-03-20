@@ -28,7 +28,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.gen.services.IMenuService;
-import org.itcgae.siga.security.CgaeUserAuthenticationToken;
+import org.itcgae.siga.security.UserAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +58,7 @@ public class MenuServiceImpl implements IMenuService {
 		String idLenguaje = new String();
 
 
-		String dni = CgaeUserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		
 		AdmTiposaccesoExample exampleMenu = new AdmTiposaccesoExample();
 
