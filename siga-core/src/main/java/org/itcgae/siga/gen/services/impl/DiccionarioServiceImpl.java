@@ -37,7 +37,7 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 		if (null != lenguaje && !lenguaje.equals("")) {
 			List<DiccionarioItem> diccionarioResponse = new ArrayList<DiccionarioItem>();
 			AdmLenguajesExample lenguajeExample = new AdmLenguajesExample();
-			lenguajeExample.createCriteria().andCodigoextEqualTo(lenguaje);
+			lenguajeExample.createCriteria().andCodigoextEqualTo(lenguaje.toUpperCase());
 			List<AdmLenguajes> admLenguajes = lenguajesMapper.selectByExample(lenguajeExample );
 			if (null != admLenguajes && !admLenguajes.isEmpty()) {
 				AdmLenguajes admLenguaje = admLenguajes.get(0);
