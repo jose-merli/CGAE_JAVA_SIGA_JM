@@ -60,10 +60,7 @@ public class MenuServiceImpl implements IMenuService {
 
 		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		
-		AdmTiposaccesoExample exampleMenu = new AdmTiposaccesoExample();
 
-		exampleMenu.setDistinct(true);
-		exampleMenu.setOrderByClause(" MENU.ORDEN ASC");
 		AdmUsuariosExample usuarioExample = new AdmUsuariosExample();
 		usuarioExample.createCriteria().andNifEqualTo(dni);
 		
@@ -76,10 +73,18 @@ public class MenuServiceImpl implements IMenuService {
 			response.setError(error);
 			return response;
 		}
-		
-		for(AdmUsuarios usuario:usuarios){
-			idLenguaje = usuario.getIdlenguaje();
-			ComboDTO perfiles = getPerfiles(String.valueOf(usuario.getIdinstitucion()));
+			List<Short> instituciones = new ArrayList<Short>();
+			List<String> idperfiles = new ArrayList<String>();
+			for (AdmUsuarios admUsuarios : usuarios) {
+				instituciones.add(admUsuarios.getIdinstitucion());
+			}
+			idLenguaje = usuarios.get(0).getIdlenguaje();
+			AdmPerfilExample examplePerfil = new AdmPerfilExample();
+			examplePerfil.setDistinct(Boolean.TRUE);
+			examplePerfil.createCriteria().andIdinstitucionIn(instituciones);
+			examplePerfil.setOrderByClause("IDPERFIL ASC");
+			List<AdmPerfil> perfiles = perfilMapper.selectByExample(examplePerfil);
+
 			if (perfiles == null) {
 				Error error = new Error();
 				error.setCode(400);
@@ -87,23 +92,23 @@ public class MenuServiceImpl implements IMenuService {
 				response.setError(error);
 				return response;
 			}
-			for(ComboItem perfil:perfiles.getCombooItems()){
-				exampleMenu.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion()).andIdperfilEqualTo(perfil.getId())
+			for(AdmPerfil perfil:perfiles){
+				idperfiles.add(perfil.getIdperfil());
+			}
+				AdmTiposaccesoExample exampleMenu = new AdmTiposaccesoExample();
+
+				exampleMenu.setDistinct(true);
+				exampleMenu.setOrderByClause(" MENU.ORDEN ASC");
+				exampleMenu.createCriteria().andIdinstitucionIn(instituciones).andIdperfilIn(idperfiles)
 				.andDerechoaccesoGreaterThan(Short.valueOf("1"));
 				menuEntities = menuExtend.selectMenuByExample(exampleMenu);
-				if (menuEntities == null || menuEntities.isEmpty()) {
-					Error error = new Error();
-					error.setCode(400);
-					error.setDescription("400");
-					response.setError(error);
-					return response;
-				}
+
 				for(GenMenu menu: menuEntities){
 						menuMap.put(menu.getIdmenu(), menu);
 				}
-			}
 			
-		}
+			
+
 		menuEntities = new ArrayList<GenMenu>();
 		menuEntities.addAll(menuMap.values());
 		
@@ -131,6 +136,7 @@ public class MenuServiceImpl implements IMenuService {
 	    ArrayList<GenMenu> childListTwo = new ArrayList<GenMenu>();
 	    MenuItem response = new MenuItem();
 	    response.setLabel(parent.getIdrecurso());
+	    response.setRouterLink(parent.getIdrecurso());
 	    //response.setRouterLink(parent.getIdrecurso());
 	    for (GenMenu childTransactions : childCandidatesList) {
 	        childListTwo.add(childTransactions);
@@ -146,14 +152,15 @@ public class MenuServiceImpl implements IMenuService {
 	            }
 	        }
 	    }
-
+    	List<MenuItem> responseChilds = new ArrayList<MenuItem>();
 
 
 	    for (GenMenu child : childList) {
-	    	processMenu(child, childListTwo,idLenguaje);
-	  
+	    	
+	    	responseChilds.add(processMenu(child, childListTwo,idLenguaje));
+	    	
 	    }
-
+	    response.setItems(responseChilds);
 	    return response;
 
 	}

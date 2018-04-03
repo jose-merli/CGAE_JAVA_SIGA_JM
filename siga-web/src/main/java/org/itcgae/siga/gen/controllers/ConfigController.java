@@ -19,7 +19,7 @@ public class ConfigController {
 	IDiccionarioService diccionarioService;
     
     @RequestMapping(value = "/diccionarios", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DiccionarioDTO> getDiccionarios(@RequestParam("idioma") String idioma) {
+	ResponseEntity<DiccionarioDTO> getDiccionarios(@RequestParam(value="idioma", required=false) String idioma) {
     	DiccionarioDTO response = new DiccionarioDTO(); 
     	response = diccionarioService.getDiccionario(idioma);
     	return new ResponseEntity<DiccionarioDTO>(response, HttpStatus.OK);

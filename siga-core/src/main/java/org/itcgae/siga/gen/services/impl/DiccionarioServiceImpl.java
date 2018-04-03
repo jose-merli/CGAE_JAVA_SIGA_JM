@@ -52,7 +52,7 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 					for(GenDiccionario diccionario: diccionarios){
 						diccionarioIndividual.put(diccionario.getIdrecurso(),diccionario.getDescripcion());
 					}
-					diccionariosItem.put(admLenguaje.getCodigoext(),diccionarioIndividual);
+					diccionariosItem.put(admLenguaje.getCodigoext().toLowerCase(),diccionarioIndividual);
 					diccionarioItemResponse.setDiccionario(diccionariosItem);
 					diccionarioResponse.add(diccionarioItemResponse);
 					response.setDiccionarioItems(diccionarioResponse);
@@ -77,7 +77,7 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 					for(GenDiccionario diccionario: diccionarios){
 						diccionarioIndividual.put(diccionario.getIdrecurso(),diccionario.getDescripcion());
 					}
-					diccionarioItem.put(lang.getCodigoext(),diccionarioIndividual);
+					diccionarioItem.put(lang.getCodigoext().toLowerCase(),diccionarioIndividual);
 					diccionarioItemResponse.setDiccionario(diccionarioItem);
     				diccionarioResponse.add(diccionarioItemResponse);
     			}
