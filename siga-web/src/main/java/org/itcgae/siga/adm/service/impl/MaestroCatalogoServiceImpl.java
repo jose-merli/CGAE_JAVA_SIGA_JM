@@ -60,8 +60,8 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 			for (Iterator<GenTablasMaestras> iterator = tablasMaestras.iterator(); iterator.hasNext();) {
 				GenTablasMaestras tablaMaestra = (GenTablasMaestras) iterator.next();
 				ComboItem combo = new ComboItem();
-				combo.setId(tablaMaestra.getIdtablamaestra());
-				combo.setValue(tablaMaestra.getAliastabla());
+				combo.setValue(tablaMaestra.getIdtablamaestra());
+				combo.setLabel(tablaMaestra.getAliastabla());
 				combos.add(combo);
 			}
 

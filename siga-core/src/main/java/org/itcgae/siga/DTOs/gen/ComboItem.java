@@ -60,7 +60,7 @@ public class ComboItem   {
       return false;
     }
     ComboItem comboItem = (ComboItem) o;
-    return Objects.equals(this.label, comboItem.id) &&
+    return Objects.equals(this.label, comboItem.label) &&
         Objects.equals(this.value, comboItem.value);
   }
 

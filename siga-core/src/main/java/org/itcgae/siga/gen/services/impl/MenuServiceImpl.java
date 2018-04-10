@@ -136,7 +136,7 @@ public class MenuServiceImpl implements IMenuService {
 	    ArrayList<GenMenu> childListTwo = new ArrayList<GenMenu>();
 	    MenuItem response = new MenuItem();
 	    response.setLabel(parent.getIdrecurso());
-	    response.setRouterLink(parent.getIdrecurso());
+	    response.setRouterLink(parent.getPath());
 	    //response.setRouterLink(parent.getIdrecurso());
 	    for (GenMenu childTransactions : childCandidatesList) {
 	        childListTwo.add(childTransactions);
@@ -145,7 +145,7 @@ public class MenuServiceImpl implements IMenuService {
 	            if (childTransactions.getIdparent().equalsIgnoreCase(parent.getIdmenu())){
 	            	MenuItem responsechild = new MenuItem();
 	            	responsechild.setLabel(childTransactions.getIdrecurso());
-	            	responsechild.setRouterLink(childTransactions.getIdrecurso());
+	            	responsechild.setRouterLink(childTransactions.getPath());
 	            	response.getItems().add(responsechild);
 	                childList.add(childTransactions);
 	                childListTwo.remove(childTransactions);
@@ -179,13 +179,13 @@ public class MenuServiceImpl implements IMenuService {
 			for (Iterator<CenInstitucion> iterator = instituciones.iterator(); iterator.hasNext();) {
 				CenInstitucion cenInstitucion = (CenInstitucion) iterator.next();
 				ComboItem combo = new ComboItem();
-				combo.setId(cenInstitucion.getIdinstitucion().toString());
+				combo.setValue(cenInstitucion.getIdinstitucion().toString());
 				if (null != cenInstitucion.getFechaenproduccion()) {
 
-					combo.setValue(cenInstitucion.getAbreviatura() + " (En producción: "
+					combo.setLabel(cenInstitucion.getAbreviatura() + " (En producción: "
 							+ Converter.dateToString(cenInstitucion.getFechaenproduccion()) + ")");
 				} else {
-					combo.setValue(cenInstitucion.getAbreviatura());
+					combo.setLabel(cenInstitucion.getAbreviatura());
 				}
 
 				combos.add(combo);
@@ -210,8 +210,8 @@ public class MenuServiceImpl implements IMenuService {
 			for (Iterator<AdmPerfil> iterator = perfiles.iterator(); iterator.hasNext();) {
 				AdmPerfil admPerfil = (AdmPerfil) iterator.next();
 				ComboItem combo = new ComboItem();
-				combo.setId(admPerfil.getIdperfil().toString());
-				combo.setValue(admPerfil.getDescripcion());
+				combo.setValue(admPerfil.getIdperfil().toString());
+				combo.setLabel(admPerfil.getDescripcion());
 				combos.add(combo);
 			}
 
