@@ -1,0 +1,25 @@
+package org.itcgae.siga.adm.service;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.itcgae.siga.DTOs.adm.CatalogoDeleteDTO;
+import org.itcgae.siga.DTOs.adm.CatalogoMaestroDTO;
+import org.itcgae.siga.DTOs.adm.CatalogoRequestDTO;
+import org.itcgae.siga.DTOs.adm.CatalogoUpdateDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+
+public interface IMaestroCatalogoService {
+
+
+	public  ComboDTO getTabla();
+
+	public  CatalogoMaestroDTO  getDatosCatalogo(CatalogoRequestDTO catalogoRequest);
+	
+	public  UpdateResponseDTO  updateDatosCatalogo(CatalogoUpdateDTO catalogoUpdate);
+	
+	public  UpdateResponseDTO  deleteDatosCatalogo(CatalogoDeleteDTO catalogoDelete);
+	
+	public  UpdateResponseDTO  createDatosCatalogo(CatalogoUpdateDTO catalogoCreate,HttpServletRequest request);
+
+}
