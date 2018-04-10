@@ -271,4 +271,28 @@ public class AdmPerfilSqlProvider {
 		}
 		return sql.toString();
 	}
+	
+	
+	/***
+	 * Build the query SQL related with the different types of profiles
+	 * @param example filter used to build the SQL query.
+	 * @return the SQL query for get the different types of profiles
+	 */
+	public String selectComboPerfilDistinctByExample(AdmPerfilExample example)
+	{
+		SQL sql = new SQL();
+		if (example != null && example.isDistinct()) {
+			sql.SELECT_DISTINCT("IDPERFIL");
+		} else {
+			sql.SELECT("IDPERFIL");
+		}
+		sql.SELECT("IDPERFIL");
+		sql.SELECT("DESCRIPCION");
+		sql.FROM("ADM_PERFIL");
+		applyWhere(sql, example, false);
+		if (example != null && example.getOrderByClause() != null) {
+			sql.ORDER_BY(example.getOrderByClause());
+		}
+		return sql.toString();
+	}
 }
