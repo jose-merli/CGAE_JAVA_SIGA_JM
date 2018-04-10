@@ -68,8 +68,8 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		{
 			for (AdmRol admRol : roles) {
 				ComboItem comboItem = new ComboItem();
-				comboItem.setId(admRol.getIdrol());
-				comboItem.setValue(admRol.getDescripcion());
+				comboItem.setValue(admRol.getIdrol());
+				comboItem.setLabel(admRol.getDescripcion());
 				comboItems.add(comboItem);			
 			}
 		}
@@ -106,8 +106,8 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 			hashProfiles.forEach(
 					(id,description) ->{
 						ComboItem comboItem = new ComboItem();
-						comboItem.setId(id);
-						comboItem.setValue(description);
+						comboItem.setValue(id);
+						comboItem.setLabel(description);
 						comboItems.add(comboItem);					
 						}
 			);

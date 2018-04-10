@@ -12,24 +12,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
 public class ComboItem   {
   
-  private String id = null;
+  private String label = null;
   private String value = null;
 
   
   /**
    **/
-  public ComboItem id(String id) {
-    this.id = id;
+  public ComboItem label(String label) {
+    this.label = label;
     return this;
   }
   
   
-  @JsonProperty("id")
-  public String getId() {
-    return id;
+  @JsonProperty("label")
+  public String getLabel() {
+    return label;
   }
-  public void setId(String id) {
-    this.id = id;
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   
@@ -60,22 +60,22 @@ public class ComboItem   {
       return false;
     }
     ComboItem comboItem = (ComboItem) o;
-    return Objects.equals(this.id, comboItem.id) &&
+    return Objects.equals(this.label, comboItem.id) &&
         Objects.equals(this.value, comboItem.value);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, value);
+    return Objects.hash(value, label);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ComboItem {\n");
-    
-    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    value: ").append(toIndentedString(value)).append("\n");
+    
     sb.append("}");
     return sb.toString();
   }
