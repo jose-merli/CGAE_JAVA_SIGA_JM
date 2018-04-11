@@ -5,8 +5,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
@@ -25,14 +23,11 @@ import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.db.entities.AdmRolExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.GenMenu;
 import org.itcgae.siga.db.mappers.AdmRolMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import io.jsonwebtoken.lang.Collections;
 
 @Service
 public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposService{
@@ -66,8 +61,12 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		
 		if(roles!= null && roles.size() > 0)
 		{
+			ComboItem comboItem = new ComboItem();
+			comboItem.setValue("");
+			comboItem.setLabel("");
+			comboItems.add(comboItem);
 			for (AdmRol admRol : roles) {
-				ComboItem comboItem = new ComboItem();
+				 comboItem = new ComboItem();
 				comboItem.setValue(admRol.getIdrol());
 				comboItem.setLabel(admRol.getDescripcion());
 				comboItems.add(comboItem);			
@@ -102,13 +101,16 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				
 			}
 			
-			
+			ComboItem comboItem = new ComboItem();
+			comboItem.setValue("");
+			comboItem.setLabel("");
+			comboItems.add(comboItem);
 			hashProfiles.forEach(
 					(id,description) ->{
-						ComboItem comboItem = new ComboItem();
-						comboItem.setValue(id);
-						comboItem.setLabel(description);
-						comboItems.add(comboItem);					
+						ComboItem comboItem2 = new ComboItem();
+						comboItem2.setValue(id);
+						comboItem2.setLabel(description);
+						comboItems.add(comboItem2);					
 						}
 			);
 			
