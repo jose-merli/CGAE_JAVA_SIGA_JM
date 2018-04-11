@@ -98,16 +98,19 @@ public class AdmUsuariosSqlExtendsProvider {
 	 */
 	public String updateUsersAdmPerfilTable(UsuarioUpdateDTO usuarioUpdateDTO){
 		SQL sql = new SQL();
-		sql.UPDATE("ADM_PERFIL");
+		sql.UPDATE("ADM_USUARIOS_EFECTIVOS_PERFIL");
 		
 		// comprobacion para actualizar campo DESCRIPCION
 		if(!usuarioUpdateDTO.getGrupo().equalsIgnoreCase(""))
 		{
-			sql.SET("DESCRIPCION = '" + usuarioUpdateDTO.getGrupo() + "'");
+			sql.SET("IDPERFIL = '" + usuarioUpdateDTO.getGrupo() + "'");
+			sql.SET("FECHAMODIFICACION = SYSDATE");
 		}
 		
 		// campos obligatorios. filtro para actualizar solo determinados campos
-		sql.WHERE("IDPERFIL = '" + usuarioUpdateDTO.getIdGrupo() + "'");
+		sql.WHERE("IDUSUARIO = '" + usuarioUpdateDTO.getIdUsuario() + "'");
+		sql.WHERE("IDINSTITUCION = '" + usuarioUpdateDTO.getIdInstitucion() + "'");
+		sql.WHERE("IDROL = '" + usuarioUpdateDTO.getRol() + "'");
 		
 		return sql.toString();
 	}

@@ -56,8 +56,8 @@ public class GestionUsuariosGruposController {
     // "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	//@CrossOrigin(allowCredentials = "false")
 	@RequestMapping(value = "/usuarios/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateUsers(@RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
-		UpdateResponseDTO response = gestionUsuariosGruposService.updateUsers(usuarioUpdateDTO);
+	ResponseEntity<UpdateResponseDTO> updateUsers(@RequestBody UsuarioUpdateDTO usuarioUpdateDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = gestionUsuariosGruposService.updateUsers(usuarioUpdateDTO, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	

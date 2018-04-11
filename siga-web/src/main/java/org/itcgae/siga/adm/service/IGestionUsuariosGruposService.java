@@ -20,7 +20,7 @@ public interface IGestionUsuariosGruposService {
 	
 	public UsuarioDTO getUsersSearch(int numPagina, UsuarioRequestDTO usuarioRequestDTO);
 	
-	public UpdateResponseDTO updateUsers(UsuarioUpdateDTO usuarioUpdateDTO);
+	public UpdateResponseDTO updateUsers(UsuarioUpdateDTO usuarioUpdateDTO, HttpServletRequest request);
 	
 	public CreateResponseDTO createUsers(UsuarioCreateDTO usuarioCreateDTO, HttpServletRequest request);
 	

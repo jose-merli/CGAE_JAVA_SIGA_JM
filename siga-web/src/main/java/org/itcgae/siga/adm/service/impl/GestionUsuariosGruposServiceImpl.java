@@ -22,11 +22,14 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.adm.service.IGestionUsuariosGruposService;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
+import org.itcgae.siga.db.entities.AdmPerfilKey;
 import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.db.entities.AdmRolExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.mappers.AdmRolMapper;
+import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.security.UserAuthenticationToken;
@@ -44,6 +47,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoPerfilMapper;
 
 	/***
 	 * Get the different users roles Return ComboDTO (id, value) where id is the
@@ -148,7 +154,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	}
 
 	@Override
-	public UpdateResponseDTO updateUsers(UsuarioUpdateDTO usuarioUpdateDTO) {
+	public UpdateResponseDTO updateUsers(UsuarioUpdateDTO usuarioUpdateDTO, HttpServletRequest request) {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		int response1 = 1;
 		int response2 = 1;
@@ -158,7 +164,46 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 			response1 = admUsuariosExtendsMapper.updateUsersAdmUserTable(usuarioUpdateDTO);
 		}
 		if (!usuarioUpdateDTO.getGrupo().equalsIgnoreCase("")) {
-			response2 = admUsuariosExtendsMapper.updateUsersAdmPerfilTable(usuarioUpdateDTO);
+				AdmPerfilKey key = new AdmPerfilKey();
+				key.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
+				key.setIdperfil(usuarioUpdateDTO.getGrupo());
+				AdmPerfil perfil = admPerfilExtendsMapper.selectByPrimaryKey(key);
+				//Buscamos el perfil para ver si ya existe. En caso de que no exista creamos la relación entre el usuario y el perfil
+				if (null == perfil) {
+					String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
+					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+					exampleUsuarios.createCriteria().andNifEqualTo(dni);
+					exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
+					
+					AdmPerfilExample keyPerfil = new AdmPerfilExample();
+					keyPerfil.setDistinct(Boolean.TRUE);
+					keyPerfil.createCriteria().andIdperfilEqualTo(usuarioUpdateDTO.getGrupo());
+					List<AdmPerfil> perfilExistente = admPerfilExtendsMapper.selectByExample(keyPerfil);
+					//Buscamos el perfil para ver si ya existe. En caso de que no exista
+					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+					AdmUsuarios usuario = usuarios.get(0);
+					AdmPerfil record = new AdmPerfil();
+					record.setUsumodificacion(usuario.getIdusuario());
+					record.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
+					record.setIdperfil(usuarioUpdateDTO.getGrupo());
+					record.setFechamodificacion(new Date());
+					record.setNivelperfil(new Long(0));
+					record.setDescripcion(perfilExistente.get(0).getDescripcion());
+					//Se guarda el perfil para la institucion
+					admPerfilExtendsMapper.insert(record );
+					
+					AdmUsuariosEfectivosPerfil recordUsuarioEfectivo = new AdmUsuariosEfectivosPerfil();
+					recordUsuarioEfectivo.setUsumodificacion(usuario.getIdusuario());
+					recordUsuarioEfectivo.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
+					recordUsuarioEfectivo.setIdperfil(usuarioUpdateDTO.getGrupo());
+					recordUsuarioEfectivo.setFechamodificacion(new Date());
+					recordUsuarioEfectivo.setIdrol(usuarioUpdateDTO.getRol());
+					recordUsuarioEfectivo.setIdusuario(Integer.valueOf(usuarioUpdateDTO.getIdUsuario()));
+					//Se guarda el usuario efectivoPerfil
+					admUsuariosEfectivoPerfilMapper.insert(recordUsuarioEfectivo );
+
+				}
+			
 		}
 
 		if (response1 == 1 && response2 == 1)
@@ -176,11 +221,11 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		int response2 = 1;
 		int response3 = 1;
 
-		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni);
 		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
-		admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		//admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 
