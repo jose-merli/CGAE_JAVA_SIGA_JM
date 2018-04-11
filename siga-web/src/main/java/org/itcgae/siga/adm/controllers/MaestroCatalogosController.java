@@ -36,20 +36,20 @@ public class MaestroCatalogosController {
    
    
    @RequestMapping(value = "/catmaestros/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-   ResponseEntity<CatalogoMaestroDTO> getCatalogos(@RequestBody CatalogoRequestDTO catalogo) {
-	CatalogoMaestroDTO response = maestroCatalogoService.getDatosCatalogo(catalogo);
+   ResponseEntity<CatalogoMaestroDTO> getCatalogos(@RequestBody CatalogoRequestDTO catalogo,HttpServletRequest request) {
+	CatalogoMaestroDTO response = maestroCatalogoService.getDatosCatalogo(catalogo,request);
  	return new ResponseEntity<CatalogoMaestroDTO>(response, HttpStatus.OK);
 	}
    
    @RequestMapping(value = "/catmaestros/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-   ResponseEntity<UpdateResponseDTO> updateCatalogos(@RequestBody CatalogoUpdateDTO catalogo) {
-	   UpdateResponseDTO response = maestroCatalogoService.updateDatosCatalogo(catalogo);
+   ResponseEntity<UpdateResponseDTO> updateCatalogos(@RequestBody CatalogoUpdateDTO catalogo,HttpServletRequest request) {
+	   UpdateResponseDTO response = maestroCatalogoService.updateDatosCatalogo(catalogo,request);
 	   return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
    
    @RequestMapping(value = "/catmaestros/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-   ResponseEntity<UpdateResponseDTO> deleteCatalogos(@RequestBody CatalogoDeleteDTO catalogo) {
-	   UpdateResponseDTO response = maestroCatalogoService.deleteDatosCatalogo(catalogo);
+   ResponseEntity<UpdateResponseDTO> deleteCatalogos(@RequestBody CatalogoDeleteDTO catalogo,HttpServletRequest request) {
+	   UpdateResponseDTO response = maestroCatalogoService.deleteDatosCatalogo(catalogo,request);
 	   return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
    

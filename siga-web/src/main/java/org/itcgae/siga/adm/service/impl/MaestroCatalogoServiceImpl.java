@@ -75,7 +75,9 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 
 
 	@Override
-	public CatalogoMaestroDTO getDatosCatalogo(CatalogoRequestDTO catalogoRequest) {
+	public CatalogoMaestroDTO getDatosCatalogo(CatalogoRequestDTO catalogoRequest,HttpServletRequest request) {
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		catalogoRequest.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
 		CatalogoMaestroDTO response = new CatalogoMaestroDTO();
 		List<CatalogoMaestroItem> catalogoMaestroItem = new ArrayList<CatalogoMaestroItem>();
 		GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
@@ -99,7 +101,9 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 
 
 	@Override
-	public UpdateResponseDTO updateDatosCatalogo(CatalogoUpdateDTO catalogoUpdate) {
+	public UpdateResponseDTO updateDatosCatalogo(CatalogoUpdateDTO catalogoUpdate,HttpServletRequest request) {
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		catalogoUpdate.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
 		UpdateResponseDTO response = new UpdateResponseDTO();
 		GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
 		exampleTablasMaestras.setDistinct(true);
@@ -128,21 +132,23 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 
 
 	@Override
-	public UpdateResponseDTO deleteDatosCatalogo(CatalogoDeleteDTO catalogoDelete) {		
-	UpdateResponseDTO response = new UpdateResponseDTO();
-	GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
-	exampleTablasMaestras.setDistinct(true);
-	exampleTablasMaestras.setOrderByClause("ALIASTABLA ASC");
-	exampleTablasMaestras.createCriteria().andIdtablamaestraEqualTo(catalogoDelete.getTabla());
-	List<GenTablasMaestras> tablasMaestras = tablasMaestrasMapper.selectByExample(exampleTablasMaestras);
+	public UpdateResponseDTO deleteDatosCatalogo(CatalogoDeleteDTO catalogoDelete,HttpServletRequest request) {
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		catalogoDelete.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
+		exampleTablasMaestras.setDistinct(true);
+		exampleTablasMaestras.setOrderByClause("ALIASTABLA ASC");
+		exampleTablasMaestras.createCriteria().andIdtablamaestraEqualTo(catalogoDelete.getTabla());
+		List<GenTablasMaestras> tablasMaestras = tablasMaestrasMapper.selectByExample(exampleTablasMaestras);
+		
+		if (null != tablasMaestras && tablasMaestras.size() > 0) {
+				GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
+				tablasMaestrasMapper.deleteRecursos(tablaMaestra,catalogoDelete);
+			}
 	
-	if (null != tablasMaestras && tablasMaestras.size() > 0) {
-			GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
-			tablasMaestrasMapper.deleteRecursos(tablaMaestra,catalogoDelete);
-		}
-
-	response.setStatus(SigaConstants.OK);
-	return response;
+		response.setStatus(SigaConstants.OK);
+		return response;
 	
 	}
 
@@ -151,6 +157,8 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 
 	@Override
 	public UpdateResponseDTO createDatosCatalogo(CatalogoUpdateDTO catalogoCreate,HttpServletRequest request) {
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		catalogoCreate.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
 		UpdateResponseDTO response = new UpdateResponseDTO();
 		GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
 		exampleTablasMaestras.setDistinct(true);
@@ -179,7 +187,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 				if (null != idInstitucion && idInstitucion.getIdInstitucion().equals("1")) {
 					isInstitucion =  Boolean.TRUE;
 				}
-				String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+				String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni);
 				exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(catalogoCreate.getIdInstitucion()));

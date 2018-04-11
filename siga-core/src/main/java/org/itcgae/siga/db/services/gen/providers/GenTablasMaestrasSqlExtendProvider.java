@@ -93,10 +93,16 @@ public class GenTablasMaestrasSqlExtendProvider {
     public String deleteRecursos(GenTablasMaestras tablaMaestra, CatalogoDeleteDTO catalogo) {
         SQL sql = new SQL();
         sql.UPDATE(tablaMaestra.getIdtablamaestra());
-        
+       // String whereIdRegistro = "( " ;
+        String whereIdRegistro =  "";
         sql.SET(" FECHA_BAJA = SYSDATE " );
-        
-        sql.WHERE(tablaMaestra.getIdcampocodigo() + " = " + catalogo.getIdRegistro());
+        for (int i = 0; i < catalogo.getIdRegistro().length - 1; i++) {
+        	whereIdRegistro =  whereIdRegistro.concat( catalogo.getIdRegistro()[i] + ",");
+		}
+        whereIdRegistro =  whereIdRegistro.concat(catalogo.getIdRegistro()[catalogo.getIdRegistro().length - 1]);
+        //whereIdRegistro =  whereIdRegistro.concat(")");
+        sql.WHERE( " IDINSTITUCION = '" + catalogo.getIdInstitucion() +"'" );
+        sql.WHERE(tablaMaestra.getIdcampocodigo() + " IN (" + whereIdRegistro + " )");
         
         return sql.toString();
     }

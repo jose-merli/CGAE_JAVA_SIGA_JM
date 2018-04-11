@@ -58,7 +58,7 @@ public class MenuServiceImpl implements IMenuService {
 		String idLenguaje = new String();
 
 
-		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
 		
 
 		AdmUsuariosExample usuarioExample = new AdmUsuariosExample();
@@ -160,7 +160,12 @@ public class MenuServiceImpl implements IMenuService {
 	    	responseChilds.add(processMenu(child, childListTwo,idLenguaje));
 	    	
 	    }
-	    response.setItems(responseChilds);
+	    if (null != response.getItems() && response.getItems().size() >0) {
+	    	response.setItems(responseChilds);
+		}else {
+			response.setItems(null);
+		}
+	    
 	    return response;
 
 	}

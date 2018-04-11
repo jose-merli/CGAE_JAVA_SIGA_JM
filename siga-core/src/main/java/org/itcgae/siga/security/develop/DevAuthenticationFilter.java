@@ -40,7 +40,8 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
 		// Usuario 2 -> Usuario de desarrollo del actual SIGA
 		String user = "44149718E";
-		return authenticationManager.authenticate(new UserAuthenticationToken(user));
+		String institucion = "2000";
+		return authenticationManager.authenticate(new UserAuthenticationToken(user.concat(institucion)));
 
 	}
 

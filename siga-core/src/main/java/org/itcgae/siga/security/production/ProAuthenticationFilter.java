@@ -44,18 +44,23 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 		try {
 			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
 			String user = null;
+			String institucion = null;
 			if (null != certs && certs.length > 0) {
 				String dn = certs[0].getSubjectX500Principal().getName();
 				LdapName ldapDN = new LdapName(dn);
 				try {
 					user = ldapDN.getRdns().stream().filter(a -> a.getType().equals("CN")).findFirst().get().getValue()
 							.toString();
+					institucion = ldapDN.getRdns().stream().filter(a -> a.getType().equals("O")).findFirst().get().getValue()
+							.toString();
 				} catch (NoSuchElementException e) {
 					throw new InvalidClientCerticateException(e);
 				}
 				
-				
-				return authenticationManager.authenticate(new UserAuthenticationToken(user.substring(user.length()-9,user.length()), certs[0]));
+				String nif =  user.substring(user.length()-9,user.length());
+				String idInstitucion = institucion.substring(institucion.length()-4,institucion.length());
+				String nifInstitucion = nif.concat(idInstitucion);
+				return authenticationManager.authenticate(new UserAuthenticationToken(nifInstitucion, certs[0]));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);

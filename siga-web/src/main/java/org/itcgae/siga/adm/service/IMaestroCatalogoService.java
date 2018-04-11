@@ -14,11 +14,11 @@ public interface IMaestroCatalogoService {
 
 	public  ComboDTO getTabla();
 
-	public  CatalogoMaestroDTO  getDatosCatalogo(CatalogoRequestDTO catalogoRequest);
+	public  CatalogoMaestroDTO  getDatosCatalogo(CatalogoRequestDTO catalogoRequest,HttpServletRequest request);
 	
-	public  UpdateResponseDTO  updateDatosCatalogo(CatalogoUpdateDTO catalogoUpdate);
+	public  UpdateResponseDTO  updateDatosCatalogo(CatalogoUpdateDTO catalogoUpdate,HttpServletRequest request);
 	
-	public  UpdateResponseDTO  deleteDatosCatalogo(CatalogoDeleteDTO catalogoDelete);
+	public  UpdateResponseDTO  deleteDatosCatalogo(CatalogoDeleteDTO catalogoDelete,HttpServletRequest request);
 	
 	public  UpdateResponseDTO  createDatosCatalogo(CatalogoUpdateDTO catalogoCreate,HttpServletRequest request);
 

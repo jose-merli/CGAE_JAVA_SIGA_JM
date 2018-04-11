@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
 public class CatalogoDeleteDTO   {
   
-  private String idRegistro = null;
+  private String[] idRegistro = null;
   private String tabla = null;
   private String idtabla = null;
   private String idInstitucion = null;
@@ -21,17 +21,17 @@ public class CatalogoDeleteDTO   {
   
   /**
    **/
-  public CatalogoDeleteDTO idRegistro(String idRegistro) {
+  public CatalogoDeleteDTO idRegistro(String[] idRegistro) {
     this.idRegistro = idRegistro;
     return this;
   }
   
   
   @JsonProperty("idRegistro")
-  public String getIdRegistro() {
+  public String[] getIdRegistro() {
     return idRegistro;
   }
-  public void setIdRegistro(String idRegistro) {
+  public void setIdRegistro(String[] idRegistro) {
     this.idRegistro = idRegistro;
   }
 
@@ -59,8 +59,8 @@ public class CatalogoDeleteDTO   {
   
   
   @JsonProperty("idtabla")
-  public String getIdTablaRegistro() {
-    return idRegistro;
+  public String getIdTabla() {
+    return idtabla;
   }
   public void setIdTabla(String idtabla) {
     this.idtabla = idtabla;
