@@ -1,12 +1,15 @@
 package org.itcgae.siga.db.services.adm.mappers;
 
 import java.util.List;
+
+import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioItem;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
@@ -48,5 +51,22 @@ public interface AdmUsuariosExtendsMapper extends AdmUsuariosMapper{
 	int updateUsersAdmPerfilTable(UsuarioUpdateDTO usuarioUpdateDTO);
 	
 	
+	@InsertProvider(type = AdmUsuariosSqlExtendsProvider.class, method = "createUserAdmUsuariosTable")
+	int createUserAdmUsuariosTable(UsuarioCreateDTO usuarioCreateDTO, Integer usuarioModificacion);
 	
+	
+	@InsertProvider(type = AdmUsuariosSqlExtendsProvider.class, method = "createUserAdmUsuarioEfectivoTable")
+	int createUserAdmUsuarioEfectivoTable(UsuarioCreateDTO usuarioCreateDTO, Integer usuarioModificacion);
+	
+	
+	@InsertProvider(type = AdmUsuariosSqlExtendsProvider.class, method = "createUserAdmUsuariosEfectivoPerfilTable")
+	int createUserAdmUsuariosEfectivoPerfilTable(UsuarioCreateDTO usuarioCreateDTO, Integer usuarioModificacion);
+	
+	
+	@UpdateProvider(type = AdmUsuariosSqlExtendsProvider.class, method = "enableUser")
+	int enableUser(UsuarioDeleteDTO usuarioDeleteDTO);
+	
+	
+	@UpdateProvider(type = AdmUsuariosSqlExtendsProvider.class, method = "disableUser")
+	int disableUser(UsuarioDeleteDTO usuarioDeleteDTO);
 }
