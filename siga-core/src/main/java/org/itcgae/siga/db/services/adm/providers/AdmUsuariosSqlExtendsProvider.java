@@ -183,7 +183,7 @@ public class AdmUsuariosSqlExtendsProvider {
 	
 	public String enableUser(UsuarioDeleteDTO usuarioDeleteDTO){
 		SQL sql = new SQL();
-		String whereIdUsuarios = null;
+		String whereIdUsuarios = "";
 		int size = usuarioDeleteDTO.getIdUsuario().size();
 		
 		sql.UPDATE("ADM_USUARIOS");
@@ -203,7 +203,7 @@ public class AdmUsuariosSqlExtendsProvider {
 	
 	public String disableUser(UsuarioDeleteDTO usuarioDeleteDTO){
 		SQL sql = new SQL();
-		String whereIdUsuarios = null;
+		String whereIdUsuarios = "";
 		int size = usuarioDeleteDTO.getIdUsuario().size();
 		
 		sql.UPDATE("ADM_USUARIOS");

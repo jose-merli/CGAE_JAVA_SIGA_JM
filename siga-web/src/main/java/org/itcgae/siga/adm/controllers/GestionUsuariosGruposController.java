@@ -62,7 +62,7 @@ public class GestionUsuariosGruposController {
 	}
 	
 	
-	// no funciona aun
+	
  	@RequestMapping(value = "/usuarios/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
  	ResponseEntity<CreateResponseDTO> createUsers(@RequestBody UsuarioCreateDTO usuarioCreateDTO, HttpServletRequest request) { 
 		CreateResponseDTO response = gestionUsuariosGruposService.createUsers(usuarioCreateDTO, request);
