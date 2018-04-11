@@ -57,13 +57,13 @@ public class MenuServiceImpl implements IMenuService {
 		HashMap<String, GenMenu> menuMap = new HashMap<String, GenMenu>();
 		String idLenguaje = new String();
 
-
+		//Cargamos el Dni del Token
 		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
 		
 
 		AdmUsuariosExample usuarioExample = new AdmUsuariosExample();
 		usuarioExample.createCriteria().andNifEqualTo(dni);
-		
+		//Obtenemos el Usuario para comprobar todas sus instituciones
 		List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExample);
 		
 		if (usuarios == null || usuarios.isEmpty()) {
@@ -83,6 +83,7 @@ public class MenuServiceImpl implements IMenuService {
 			examplePerfil.setDistinct(Boolean.TRUE);
 			examplePerfil.createCriteria().andIdinstitucionIn(instituciones);
 			examplePerfil.setOrderByClause("IDPERFIL ASC");
+			//Obtenemos todos los perfiles para cargar sus puntos de Menú
 			List<AdmPerfil> perfiles = perfilMapper.selectByExample(examplePerfil);
 
 			if (perfiles == null) {
@@ -101,6 +102,7 @@ public class MenuServiceImpl implements IMenuService {
 				exampleMenu.setOrderByClause(" MENU.ORDEN ASC");
 				exampleMenu.createCriteria().andIdinstitucionIn(instituciones).andIdperfilIn(idperfiles)
 				.andDerechoaccesoGreaterThan(Short.valueOf("1"));
+				//Obtenemos todos los puntos de Menú
 				menuEntities = menuExtend.selectMenuByExample(exampleMenu);
 
 				for(GenMenu menu: menuEntities){
@@ -117,7 +119,7 @@ public class MenuServiceImpl implements IMenuService {
 			List<MenuItem> items = new ArrayList<MenuItem>();
 			List<GenMenu> rootMenus = menuEntities.stream().filter(i -> Strings.isNullOrEmpty(i.getIdparent()) || i.getIdparent().equals(" "))
 					.collect(Collectors.toList());
-			
+			//Componemos el menú
 				for (GenMenu dbItem : rootMenus) {
 					MenuItem item = processMenu(dbItem,menuEntities,idLenguaje); 
 					items.add(item);
@@ -132,17 +134,20 @@ public class MenuServiceImpl implements IMenuService {
 	
 	
 	private static MenuItem processMenu(GenMenu parent, List<GenMenu> childCandidatesList, String idLenguaje ) {
+		//Realizamos la carga del menú de forma cíclica dependiende los IdParents
 	    ArrayList<GenMenu> childList = new ArrayList<GenMenu>();
 	    ArrayList<GenMenu> childListTwo = new ArrayList<GenMenu>();
 	    MenuItem response = new MenuItem();
 	    response.setLabel(parent.getIdrecurso());
 	    response.setRouterLink(parent.getPath());
-	    //response.setRouterLink(parent.getIdrecurso());
+
+	    //Recorremos sus hijos
 	    for (GenMenu childTransactions : childCandidatesList) {
 	        childListTwo.add(childTransactions);
 	        if (childTransactions.getIdparent() != null) {
 	            
 	            if (childTransactions.getIdparent().equalsIgnoreCase(parent.getIdmenu())){
+	            	//Vamos almacenando los hijos
 	            	MenuItem responsechild = new MenuItem();
 	            	responsechild.setLabel(childTransactions.getIdrecurso());
 	            	responsechild.setRouterLink(childTransactions.getPath());
@@ -156,7 +161,7 @@ public class MenuServiceImpl implements IMenuService {
 
 
 	    for (GenMenu child : childList) {
-	    	
+	    	//Si tenemos hijos los procesamos de forma individual para ver si tienen más hijos
 	    	responseChilds.add(processMenu(child, childListTwo,idLenguaje));
 	    	
 	    }
@@ -172,6 +177,7 @@ public class MenuServiceImpl implements IMenuService {
 
 	@Override
 	public ComboDTO getInstituciones() {
+		//Cargamos el combo de Instituciones
 		ComboDTO response = new ComboDTO();
 		
 		CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
@@ -204,6 +210,7 @@ public class MenuServiceImpl implements IMenuService {
 
 	@Override
 	public ComboDTO getPerfiles(String idInstitucion) {
+		//Cargamos el combo de Perfil
 		ComboDTO response = new ComboDTO();
 		
 		AdmPerfilExample examplePerfil = new AdmPerfilExample();

@@ -33,7 +33,7 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 	@Override
 	public DiccionarioDTO getDiccionario(String lenguaje) {
 		DiccionarioDTO response = new DiccionarioDTO();
-		
+		// Si nos viene un lenguaje predefinido lo cargamos
 		if (null != lenguaje && !lenguaje.equals("")) {
 			List<DiccionarioItem> diccionarioResponse = new ArrayList<DiccionarioItem>();
 			AdmLenguajesExample lenguajeExample = new AdmLenguajesExample();
@@ -61,6 +61,7 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 					return response;
 				}
 			}
+			//En caso de no tener un lenguaje predefinido, los cargamos todos para generar el diccionario en sesión
 		}else{
       		List<AdmLenguajes> enumLanguages= getLanguages();
       		List<DiccionarioItem> diccionarioResponse = new ArrayList<DiccionarioItem>();
@@ -89,55 +90,12 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 		return response;
 	
 	}
-/*
-  		FileOutputStream outputStream=null;
-  		BufferedWriter bufferedWriter = null;
-    	try {
-      		
-      		OutputStreamWriter outputStreamWriter=null;
-      		List<AdmLenguajes> enumLanguages= getLanguages();
 
-      		for(AdmLenguajes lang:enumLanguages){
-        		// RGG cambio de codigos de lenguaje
-        		String lenguajeExt = lang.getCodigoext();
-        		URLClassLoader cargador = (URLClassLoader)ClassLoader.getSystemClassLoader();
-        		this.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath(); 
-        		//new File(Utils.class.getResource(SIGAReferences.RESOURCE_FILES.diccionarioS_DIR+"/ApplicationResources_"+lenguajeExt.toLowerCase()+".properties").getPath()File());
-        		//outputStream= new FileOutputStream(Utils.class.getResource(SIGAReferences.RESOURCE_FILES.diccionarioS_DIR.getFileName()+"/ApplicationResources_"+lenguajeExt.toLowerCase()+".properties").getPath());
-				
-        		outputStream= new FileOutputStream("/ApplicationResources_"+lenguajeExt.toLowerCase()+".properties");
-				outputStreamWriter=new OutputStreamWriter(outputStream);
-				bufferedWriter = new BufferedWriter(outputStreamWriter);
-	      		List<GenDiccionario> enumdiccionarios= getdiccionariosDb(lang.getIdlenguaje());
-	      		for (GenDiccionario diccionario:enumdiccionarios) {
-	  				String key=(String) diccionario.getIddiccionario();
-	  				String value=(String) diccionario.getDescripcion();
-	  				bufferedWriter.write(key+"="+value+"\n");
-	  				bufferedWriter.flush();
-				}
-				outputStream.close();
-				bufferedWriter.close();
-      		}
-    	} catch (IOException e) {
-      		throw new SigaExceptions("Error generando fichero, "+ e.toString(), "","","","");
-    	} catch (Exception ex) {
-      		throw new SigaExceptions("Error generando fichero, "+ ex.toString(), "","","","");
-    	} finally {
-    	    try {
-				bufferedWriter.close();
-    	        outputStream.close();
-    	    } catch (Exception eee) {}
-    	}
-	}
-		*/
-		
-		
-	
 		
 
 	private List<AdmLenguajes> getLanguages() {
 
-
+		//Cargamos todos los lenguajes
 		AdmLenguajesExample example = new AdmLenguajesExample();
 		example.setOrderByClause(" IDLENGUAJE ASC");
 		List<AdmLenguajes> lenguajes = lenguajesMapper.selectByExample(example );

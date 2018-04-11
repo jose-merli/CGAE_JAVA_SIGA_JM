@@ -49,7 +49,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 	@Override
 	public ComboDTO getTabla() {
 		ComboDTO response = new ComboDTO();
-		
+		//Cargamos la tabla maestra para ver qué catalogos queremos gestionar
 		GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
 		exampleTablasMaestras.setDistinct(true);
 		exampleTablasMaestras.setOrderByClause("ALIASTABLA ASC");
@@ -76,6 +76,9 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 
 	@Override
 	public CatalogoMaestroDTO getDatosCatalogo(CatalogoRequestDTO catalogoRequest,HttpServletRequest request) {
+		//Obtenemos los datos del catálogo con la tabla maestra seleccionada
+		
+		//Obtenemos la institución del Token
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		catalogoRequest.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
 		CatalogoMaestroDTO response = new CatalogoMaestroDTO();
@@ -87,10 +90,9 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		List<GenTablasMaestras> tablasMaestras = tablasMaestrasMapper.selectByExample(exampleTablasMaestras);
 		
 		if (null != tablasMaestras && tablasMaestras.size() > 0) {
-
+				//Obtenemos el catálogo
 				GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
-				 //catalogoMaestroItem =tablasMaestrasMapper.selectCatalogosByTabla(tablaMaestra,catalogoRequest,catalogoRequest.getIdInstitucion());
-				 catalogoMaestroItem =tablasMaestrasMapper.selectCatalogosByTabla(tablaMaestra,catalogoRequest);
+   			    catalogoMaestroItem =tablasMaestrasMapper.selectCatalogosByTabla(tablaMaestra,catalogoRequest);
 			}
 
 		response.setCatalogoMaestroItem(catalogoMaestroItem);
@@ -102,6 +104,9 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 
 	@Override
 	public UpdateResponseDTO updateDatosCatalogo(CatalogoUpdateDTO catalogoUpdate,HttpServletRequest request) {
+		//Editamos los datos del catálogo con la tabla maestra seleccionada
+		
+		//Obtenemos la institución del Token
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		catalogoUpdate.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
 		UpdateResponseDTO response = new UpdateResponseDTO();
@@ -114,7 +119,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		if (null != tablasMaestras && tablasMaestras.size() > 0) {
 
 				GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
-				 //catalogoMaestroItem =tablasMaestrasMapper.selectCatalogosByTabla(tablaMaestra,catalogoRequest,catalogoRequest.getIdInstitucion());
+				//Editamos los datos que se han modificado
 				if (!catalogoUpdate.getCodigoExt().equalsIgnoreCase("") ) {
 					tablasMaestrasMapper.updateCodigoExterno(tablaMaestra,catalogoUpdate);
 				}
@@ -133,6 +138,9 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 
 	@Override
 	public UpdateResponseDTO deleteDatosCatalogo(CatalogoDeleteDTO catalogoDelete,HttpServletRequest request) {
+		//eliminamos los datos del catálogo con la tabla maestra seleccionada
+		
+		//Obtenemos la institución del Token
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		catalogoDelete.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
 		UpdateResponseDTO response = new UpdateResponseDTO();
@@ -141,7 +149,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		exampleTablasMaestras.setOrderByClause("ALIASTABLA ASC");
 		exampleTablasMaestras.createCriteria().andIdtablamaestraEqualTo(catalogoDelete.getTabla());
 		List<GenTablasMaestras> tablasMaestras = tablasMaestrasMapper.selectByExample(exampleTablasMaestras);
-		
+		//Modificamos la fecha de Baja para darle de baja
 		if (null != tablasMaestras && tablasMaestras.size() > 0) {
 				GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
 				tablasMaestrasMapper.deleteRecursos(tablaMaestra,catalogoDelete);
@@ -157,6 +165,9 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 
 	@Override
 	public UpdateResponseDTO createDatosCatalogo(CatalogoUpdateDTO catalogoCreate,HttpServletRequest request) {
+		//Creamos un nuevo registro en el catálogo con la tabla maestra seleccionada
+		
+		//Obtenemos la institución del Token
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		catalogoCreate.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
 		UpdateResponseDTO response = new UpdateResponseDTO();
@@ -169,7 +180,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		if (null != tablasMaestras && tablasMaestras.size() > 0) {
 
 				GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
-				
+				//Obtenemos el recurso para ver si ya existe
 				GenRecursosCatalogosExample exampleRecursos = new GenRecursosCatalogosExample();
 				exampleRecursos.createCriteria().andDescripcionEqualTo(catalogoCreate.getDescripcion());
 				exampleRecursos.createCriteria().andNombretablaEqualTo(tablaMaestra.getIdtablamaestra());
@@ -187,11 +198,13 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 				if (null != idInstitucion && idInstitucion.getIdInstitucion().equals("1")) {
 					isInstitucion =  Boolean.TRUE;
 				}
+				// Obtenemos el DNI del token
 				String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni);
 				exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(catalogoCreate.getIdInstitucion()));
 				usuariosMapper.selectByExample(exampleUsuarios );
+				//Obtenemos el usuario para añadir el USUMODIFICACION
 				List<AdmUsuarios> usuarios = usuariosMapper.selectByExample(exampleUsuarios);
 				AdmUsuarios usuario = usuarios.get(0);
 				tablasMaestrasMapper.createRecursos(tablaMaestra,catalogoCreate,isInstitucion,usuario.getIdusuario());
