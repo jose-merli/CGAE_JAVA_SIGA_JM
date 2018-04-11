@@ -1,5 +1,7 @@
 package org.itcgae.siga.adm.service;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -20,7 +22,7 @@ public interface IGestionUsuariosGruposService {
 	
 	public UpdateResponseDTO updateUsers(UsuarioUpdateDTO usuarioUpdateDTO);
 	
-	public CreateResponseDTO createUsers(UsuarioCreateDTO usuarioCreateDTO);
+	public CreateResponseDTO createUsers(UsuarioCreateDTO usuarioCreateDTO, HttpServletRequest request);
 	
 	public DeleteResponseDTO deleteUsers(UsuarioDeleteDTO usuarioDeleteDTO);
 }

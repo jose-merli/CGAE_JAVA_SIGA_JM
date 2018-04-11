@@ -1,6 +1,11 @@
 package org.itcgae.siga.db.services.adm.providers;
 
+import java.util.Date;
+
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
 
@@ -15,8 +20,7 @@ public class AdmUsuariosSqlExtendsProvider {
 	 * @param usuarioRequestDTO The filter that some web user uses on web page to obtain users information.
 	 * @return The SQL query for data base.
 	 */
-	public String getUsersByFilter(int numPagina, UsuarioRequestDTO usuarioRequestDTO)
-	{
+	public String getUsersByFilter(int numPagina, UsuarioRequestDTO usuarioRequestDTO){
 		SQL sql = new SQL();
 		
 		sql.SELECT("USUARIOS.DESCRIPCION");
@@ -65,8 +69,7 @@ public class AdmUsuariosSqlExtendsProvider {
 	 * @param usuarioUpdateDTO Object that contains the information for actualize the table.
 	 * @return the SQL query
 	 */
-	public String updateUsersAdmUserTable(UsuarioUpdateDTO usuarioUpdateDTO)
-	{
+	public String updateUsersAdmUserTable(UsuarioUpdateDTO usuarioUpdateDTO){
 		SQL sql = new SQL();
 		sql.UPDATE("ADM_USUARIOS");
 		
@@ -88,8 +91,12 @@ public class AdmUsuariosSqlExtendsProvider {
 		return sql.toString();
 	}
 	
-	public String updateUsersAdmPerfilTable(UsuarioUpdateDTO usuarioUpdateDTO)
-	{
+	/**
+	 * Build the SQL query to actualize some characteristics, such as DESCRIPCION from ADM_PERFIL
+	 * @param usuarioUpdateDTO Object that contains the information for actualize the table.
+	 * @return the SQL query
+	 */
+	public String updateUsersAdmPerfilTable(UsuarioUpdateDTO usuarioUpdateDTO){
 		SQL sql = new SQL();
 		sql.UPDATE("ADM_PERFIL");
 		
@@ -101,6 +108,114 @@ public class AdmUsuariosSqlExtendsProvider {
 		
 		// campos obligatorios. filtro para actualizar solo determinados campos
 		sql.WHERE("IDPERFIL = '" + usuarioUpdateDTO.getIdGrupo() + "'");
+		
+		return sql.toString();
+	}
+	
+	
+	
+	/**
+	 * Build the SQL query to create a new user row for adm_usuario table
+	 * @param usuarioCreateDTO Object that contains the information for actualize the table.
+	 * @return the SQL query
+	 */
+	public String createUserAdmUsuariosTable(UsuarioCreateDTO usuarioCreateDTO, Integer usuarioModificacion){
+		SQL sql = new SQL();
+	        
+		sql.INSERT_INTO("ADM_USUARIOS");
+		sql.VALUES("IDUSUARIO", ("(select MAX(IDUSUARIO)  + 1 from ADM_USUARIOS  where IDINSTITUCION = " + "'"
+				+ usuarioCreateDTO.getIdInstitucion() + "' )")); // Realmente este idInstitucion se coge del variable session
+		sql.VALUES("DESCRIPCION", "'" + usuarioCreateDTO.getNombreApellidos() + "'");
+		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuarioModificacion)+"'");
+		sql.VALUES("IDINSTITUCION", "'" + usuarioCreateDTO.getIdInstitucion() + "'");
+		sql.VALUES("NIF", "'" + usuarioCreateDTO.getNif() + "'");
+		sql.VALUES("ACTIVO", "'" + usuarioCreateDTO.getActivo() + "'");
+		sql.VALUES("FECHAALTA", "SYSDATE");
+		sql.VALUES("IDLENGUAJE", "'" + usuarioCreateDTO.getIdLenguaje() + "'");
+		//sql.VALUES("CODIGOEXT", "' '");
+
+		return sql.toString();
+	}
+	
+	
+	/**
+	 * Build the SQL query to create a new user row for adm_usuario_efectivo table
+	 * @param usuarioCreateDTO Object that contains the information for actualize the table.
+	 * @return the SQL query
+	 */
+	public String createUserAdmUsuarioEfectivoTable(UsuarioCreateDTO usuarioCreateDTO, Integer usuarioModificacion){
+		SQL sql = new SQL();
+
+		sql.INSERT_INTO("ADM_USUARIO_EFECTIVO");
+		sql.VALUES("IDUSUARIO", ("(select MAX(IDUSUARIO) from ADM_USUARIOS  where IDINSTITUCION = " + "'"
+				+ usuarioCreateDTO.getIdInstitucion() + "' )"));
+		sql.VALUES("IDINSTITUCION", "'" + usuarioCreateDTO.getIdInstitucion() + "'");
+		sql.VALUES("IDROL", "'" + usuarioCreateDTO.getRol() + "'");
+		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuarioModificacion)+"'");
+		//sql.VALUES("NUMSERIE",  "");
+		
+		return sql.toString();
+	}
+	
+	/**
+	 * Build the SQL query to create a new user row for adm_usuarios_efectivo_perfil table
+	 * @param usuarioCreateDTO Object that contains the information for actualize the table.
+	 * @return the SQL query
+	 */
+	public String createUserAdmUsuariosEfectivoPerfilTable(UsuarioCreateDTO usuarioCreateDTO, Integer usuarioModificacion){
+		SQL sql = new SQL();
+		sql.INSERT_INTO("ADM_USUARIOS_EFECTIVOS_PERFIL");
+
+		
+		sql.VALUES("IDUSUARIO", ("(select MAX(IDUSUARIO) from ADM_USUARIOS  where IDINSTITUCION = " + "'"
+				+ usuarioCreateDTO.getIdInstitucion() + "' )"));
+		sql.VALUES("IDINSTITUCION", "'" + usuarioCreateDTO.getIdInstitucion() + "'");
+		sql.VALUES("IDROL", "'" + usuarioCreateDTO.getRol() + "'");
+		sql.VALUES("IDPERFIL", "'" + usuarioCreateDTO.getGrupo() + "'");
+		sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuarioModificacion)+"'");
+		sql.VALUES("FECHAMODIFICACION", "SYSDATE"); 
+		
+		return sql.toString();
+	}
+	
+	
+	public String enableUser(UsuarioDeleteDTO usuarioDeleteDTO){
+		SQL sql = new SQL();
+		String whereIdUsuarios = null;
+		int size = usuarioDeleteDTO.getIdUsuario().size();
+		
+		sql.UPDATE("ADM_USUARIOS");
+		sql.SET("FECHA_BAJA = NULL");
+		sql.SET("ACTIVO = 'S'");
+		
+		for (int i = 0; i < size - 1; i++) {
+			whereIdUsuarios = whereIdUsuarios.concat(usuarioDeleteDTO.getIdUsuario().get(i) + ",");
+		}
+		whereIdUsuarios = whereIdUsuarios.concat(usuarioDeleteDTO.getIdUsuario().get(size-1));
+		sql.WHERE("IDUSUARIO" + " IN (" + whereIdUsuarios + " )");
+		sql.WHERE("IDINSTITUCION = '" + usuarioDeleteDTO.getIdInstitucion() + "'");
+		
+		return sql.toString();
+	}
+	
+	
+	public String disableUser(UsuarioDeleteDTO usuarioDeleteDTO){
+		SQL sql = new SQL();
+		String whereIdUsuarios = null;
+		int size = usuarioDeleteDTO.getIdUsuario().size();
+		
+		sql.UPDATE("ADM_USUARIOS");
+		sql.SET("FECHA_BAJA = SYSDATE");
+		sql.SET("ACTIVO = 'N'");
+		
+		for (int i = 0; i < size - 1; i++) {
+			whereIdUsuarios = whereIdUsuarios.concat(usuarioDeleteDTO.getIdUsuario().get(i) + ",");
+		}
+		whereIdUsuarios = whereIdUsuarios.concat(usuarioDeleteDTO.getIdUsuario().get(size-1));
+		sql.WHERE("IDUSUARIO" + " IN (" + whereIdUsuarios + " )");
+		sql.WHERE("IDINSTITUCION = '" + usuarioDeleteDTO.getIdInstitucion() + "'");
 		
 		return sql.toString();
 	}

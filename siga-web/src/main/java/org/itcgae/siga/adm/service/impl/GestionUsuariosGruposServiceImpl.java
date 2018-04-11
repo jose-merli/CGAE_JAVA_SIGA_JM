@@ -5,8 +5,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
@@ -25,14 +25,13 @@ import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.db.entities.AdmRolExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.GenMenu;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.mappers.AdmRolMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.security.UserAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import io.jsonwebtoken.lang.Collections;
 
 @Service
 public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposService{
@@ -171,36 +170,68 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	}
 
 	@Override
-	public CreateResponseDTO createUsers(UsuarioCreateDTO usuarioCreateDTO) {
-		// TODO Auto-generated method stub
-		return null;
+	public CreateResponseDTO createUsers(UsuarioCreateDTO usuarioCreateDTO, HttpServletRequest request) {
+		CreateResponseDTO createResponseDTO = new CreateResponseDTO();
+		int response1 = 1;
+		int response2 = 1;
+		int response3 = 1;
+		
+		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni);
+		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
+		admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		AdmUsuarios usuario = usuarios.get(0);
+		
+		if(!usuarioCreateDTO.getIdInstitucion().equalsIgnoreCase(""))
+		{
+			response1 = admUsuariosExtendsMapper.createUserAdmUsuariosTable(usuarioCreateDTO, usuario.getIdusuario());
+		}
+		if(!usuarioCreateDTO.getIdInstitucion().equalsIgnoreCase("") && !usuarioCreateDTO.getRol().equalsIgnoreCase("") && !usuarioCreateDTO.getRol().equalsIgnoreCase(""))
+		{
+			response2 = admUsuariosExtendsMapper.createUserAdmUsuarioEfectivoTable(usuarioCreateDTO, usuario.getIdusuario());
+		}
+		
+		if(!usuarioCreateDTO.getIdInstitucion().equalsIgnoreCase("") && !usuarioCreateDTO.getRol().equalsIgnoreCase("") 
+				&& !usuarioCreateDTO.getRol().equalsIgnoreCase("") && !usuarioCreateDTO.getGrupo().equalsIgnoreCase(""))
+		{
+			response3 = admUsuariosExtendsMapper.createUserAdmUsuariosEfectivoPerfilTable(usuarioCreateDTO, usuario.getIdusuario());
+		}
+		
+		if(response1 == 0 || response2 == 0 || response3 == 0)
+			createResponseDTO.setStatus("ERROR");
+		else
+			createResponseDTO.setStatus("OK");
+		
+		return createResponseDTO;
 	}
 
 	@Override
 	public DeleteResponseDTO deleteUsers(UsuarioDeleteDTO usuarioDeleteDTO) {
 		
-		AdmUsuarios cambioUsuarios = new AdmUsuarios();
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		int response = 1;
-		
-		if(!usuarioDeleteDTO.getIdUsuario().equalsIgnoreCase("") && !usuarioDeleteDTO.getIdInstitucion().equalsIgnoreCase(""))
-		{
-			Date fechaActual  = new Date();
+	
+		if (!usuarioDeleteDTO.getIdUsuario().equals(null) && usuarioDeleteDTO.getIdUsuario().size() != 0
+				&& !usuarioDeleteDTO.getIdInstitucion().equalsIgnoreCase("")) {
 			
-			cambioUsuarios.setIdusuario(Integer.valueOf(usuarioDeleteDTO.getIdUsuario()));
-			cambioUsuarios.setIdinstitucion(Short.valueOf(usuarioDeleteDTO.getIdInstitucion()));
-			cambioUsuarios.setFechaBaja(fechaActual);
-			cambioUsuarios.setActivo("N");
-			response = admUsuariosExtendsMapper.updateByPrimaryKeySelective(cambioUsuarios);
-		}
-		else 
+			// si activo = S, dar de baja => fecha de baja a fecha actual y activo = N
+			if (usuarioDeleteDTO.getActivo() == "S") {
+				response = admUsuariosExtendsMapper.disableUser(usuarioDeleteDTO);
+			}
+			// si activo = N, dar de alta => fecha de baja a null y activo = S
+			else if (usuarioDeleteDTO.getActivo() == "N") {
+				response = admUsuariosExtendsMapper.enableUser(usuarioDeleteDTO);
+			}
+		} else
 			response = 0;
-		
-		if(response == 1)
+
+		if (response == 1)
 			deleteResponseDTO.setStatus("OK");
 		else
 			deleteResponseDTO.setStatus("ERROR");
-		
+
 		return deleteResponseDTO;
 	}
 

@@ -1,8 +1,9 @@
 package org.itcgae.siga.DTOs.adm;
 
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
@@ -12,8 +13,9 @@ public class UsuarioDeleteDTO {
 	private String nif;
 	private String rol;
 	private String grupo;
-	private String idUsuario;
+	private List<String> idUsuario = new ArrayList<String>();
 	private String idInstitucion;
+	private String activo;
 	
 	
 	/**
@@ -94,19 +96,19 @@ public class UsuarioDeleteDTO {
 	
 	/**
 	 **/
-	public UsuarioDeleteDTO idUsuario(String idUsuario) {
+	public UsuarioDeleteDTO idUsuario(List<String> idUsuario) {
 		this.idUsuario = idUsuario;
 		return this;
 	}
 	
 	
 	@JsonProperty("idUsuario")
-	public String getIdUsuario() {
+	public List<String> getIdUsuario() {
 		return idUsuario;
 	}
 	
 	
-	public void setIdUsuario(String idUsuario) {
+	public void setIdUsuario(List<String> idUsuario) {
 		this.idUsuario = idUsuario;
 	}
 	
@@ -130,6 +132,25 @@ public class UsuarioDeleteDTO {
 	}
 	
 	
+	/**
+	 **/
+	public UsuarioDeleteDTO activo(String activo) {
+		this.activo = activo;
+		return this;
+	}
+	
+	
+	@JsonProperty("activo")
+	public String getActivo() {
+		return activo;
+	}
+
+
+	public void setActivo(String activo) {
+		this.activo = activo;
+	}
+	
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -144,13 +165,14 @@ public class UsuarioDeleteDTO {
         Objects.equals(this.rol, usuarioDeleteDTO.rol) &&
         Objects.equals(this.grupo, usuarioDeleteDTO.grupo) &&
         Objects.equals(this.idUsuario, usuarioDeleteDTO.idUsuario) &&
-        Objects.equals(this.idInstitucion, usuarioDeleteDTO.idInstitucion);
+        Objects.equals(this.idInstitucion, usuarioDeleteDTO.idInstitucion) &&
+        Objects.equals(this.activo, usuarioDeleteDTO.activo);
 	}
 
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(nombreApellidos, nif, rol, grupo, idUsuario, idInstitucion);
+		return Objects.hash(nombreApellidos, nif, rol, grupo, idUsuario, idInstitucion, activo);
 	}
 	
 
@@ -165,6 +187,7 @@ public class UsuarioDeleteDTO {
 		sb.append("    grupo: ").append(toIndentedString(grupo)).append("\n");
 		sb.append("    idUsuario: ").append(toIndentedString(idUsuario)).append("\n");
 		sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
+		sb.append("    activo: ").append(toIndentedString(activo)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

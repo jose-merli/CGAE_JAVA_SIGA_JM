@@ -1,5 +1,7 @@
 package org.itcgae.siga.adm.controllers;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -14,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -64,8 +64,8 @@ public class GestionUsuariosGruposController {
 	
 	// no funciona aun
  	@RequestMapping(value = "/usuarios/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
- 	ResponseEntity<CreateResponseDTO> createUsers(@RequestBody UsuarioCreateDTO usuarioCreateDTO) { 
-		CreateResponseDTO response = gestionUsuariosGruposService.createUsers(usuarioCreateDTO);
+ 	ResponseEntity<CreateResponseDTO> createUsers(@RequestBody UsuarioCreateDTO usuarioCreateDTO, HttpServletRequest request) { 
+		CreateResponseDTO response = gestionUsuariosGruposService.createUsers(usuarioCreateDTO, request);
 		return new ResponseEntity<CreateResponseDTO>(response, HttpStatus.OK);
 	}
 	
