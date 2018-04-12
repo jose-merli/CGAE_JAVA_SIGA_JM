@@ -131,6 +131,16 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		exampleTablasMaestras.createCriteria().andIdtablamaestraEqualTo(catalogoUpdate.getTabla());
 		List<GenTablasMaestras> tablasMaestras = tablasMaestrasMapper.selectByExample(exampleTablasMaestras);
 		
+		// Obtenemos el DNI del token
+		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni);
+		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(catalogoUpdate.getIdInstitucion()));
+		
+		//Obtenemos el usuario para añadir el USUMODIFICACION
+		List<AdmUsuarios> usuarios = usuariosMapper.selectByExample(exampleUsuarios);
+		AdmUsuarios usuario = usuarios.get(0);
+		catalogoUpdate.setIdLenguaje(usuario.getIdlenguaje());
 		if (null != tablasMaestras && tablasMaestras.size() > 0) {
 
 				GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
