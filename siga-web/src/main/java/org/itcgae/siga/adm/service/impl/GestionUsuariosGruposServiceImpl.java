@@ -258,15 +258,21 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		if (!usuarioCreateDTO.getIdInstitucion().equalsIgnoreCase("") && !usuarioCreateDTO.getRol().equalsIgnoreCase("")
 				&& !usuarioCreateDTO.getRol().equalsIgnoreCase("")
 				&& !usuarioCreateDTO.getGrupo().equalsIgnoreCase("")) {
-			AdmPerfil record = new AdmPerfil();
-			record.setUsumodificacion(usuario.getIdusuario());
-			record.setIdinstitucion(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
-			record.setIdperfil(usuarioCreateDTO.getGrupo());
-			record.setFechamodificacion(new Date());
-			record.setNivelperfil(new Long(0));
-			record.setDescripcion(usuarioCreateDTO.getGrupo());
-			//Se guarda el perfil para la institucion
-			admPerfilExtendsMapper.insert(record );
+			AdmPerfilKey key = new AdmPerfilKey();
+			key.setIdinstitucion(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
+			key.setIdperfil(usuarioCreateDTO.getGrupo());
+			AdmPerfil perfil = admPerfilExtendsMapper.selectByPrimaryKey(key);
+			if (null == perfil) {
+				AdmPerfil record = new AdmPerfil();
+				record.setUsumodificacion(usuario.getIdusuario());
+				record.setIdinstitucion(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
+				record.setIdperfil(usuarioCreateDTO.getGrupo());
+				record.setFechamodificacion(new Date());
+				record.setNivelperfil(new Long(0));
+				record.setDescripcion(usuarioCreateDTO.getGrupo());
+				//Se guarda el perfil para la institucion
+				admPerfilExtendsMapper.insert(record );
+			}
 			
 			response3 = admUsuariosExtendsMapper.createUserAdmUsuariosEfectivoPerfilTable(usuarioCreateDTO,
 					usuario.getIdusuario());
