@@ -56,10 +56,15 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		exampleTablasMaestras.createCriteria().andFlagborradologicoEqualTo(new Long(0));
 		List<GenTablasMaestras> tablasMaestras = tablasMaestrasMapper.selectByExample(exampleTablasMaestras);
 		List<ComboItem> combos = new ArrayList<ComboItem>();
+		ComboItem combo = new ComboItem();
+		combo.setValue("");
+		combo.setLabel("");
+		combos.add(combo);
+
 		if (null != tablasMaestras && tablasMaestras.size() > 0) {
 			for (Iterator<GenTablasMaestras> iterator = tablasMaestras.iterator(); iterator.hasNext();) {
 				GenTablasMaestras tablaMaestra = (GenTablasMaestras) iterator.next();
-				ComboItem combo = new ComboItem();
+				combo = new ComboItem();
 				combo.setValue(tablaMaestra.getIdtablamaestra());
 				combo.setLabel(tablaMaestra.getAliastabla());
 				combos.add(combo);
@@ -81,6 +86,16 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		//Obtenemos la institución del Token
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		catalogoRequest.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+		
+		// Obtenemos el DNI del token
+		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni);
+		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(catalogoRequest.getIdInstitucion()));
+		//Obtenemos el usuario para añadir el USUMODIFICACION
+		List<AdmUsuarios> usuarios = usuariosMapper.selectByExample(exampleUsuarios);
+		AdmUsuarios usuario = usuarios.get(0);
+		catalogoRequest.setIdLenguaje(usuario.getIdlenguaje());
 		CatalogoMaestroDTO response = new CatalogoMaestroDTO();
 		List<CatalogoMaestroItem> catalogoMaestroItem = new ArrayList<CatalogoMaestroItem>();
 		GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();

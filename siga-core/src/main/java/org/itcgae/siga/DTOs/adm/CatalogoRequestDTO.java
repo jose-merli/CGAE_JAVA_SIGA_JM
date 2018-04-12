@@ -16,6 +16,7 @@ public class CatalogoRequestDTO   {
   private String codigoExt = null;
   private String descripcion = null;
   private String idInstitucion = null;
+  private String idLenguaje = null;
   
   /**
    **/
@@ -84,6 +85,23 @@ public class CatalogoRequestDTO   {
   }
 
 
+  
+  /**
+   **/
+  public CatalogoRequestDTO idLenguaje(String idLenguaje) {
+    this.idLenguaje = idLenguaje;
+    return this;
+  }
+  
+  
+  @JsonProperty("idLenguaje")
+  public String getIdLenguaje() {
+    return idLenguaje;
+  }
+  public void setIdLenguaje(String idLenguaje) {
+    this.idLenguaje = idLenguaje;
+  }
+
   @Override
   public boolean equals(java.lang.Object o) {
     if (this == o) {
@@ -96,7 +114,8 @@ public class CatalogoRequestDTO   {
     return Objects.equals(this.catalogo, comboItem.catalogo) &&
         Objects.equals(this.codigoExt, comboItem.codigoExt)&&
         Objects.equals(this.descripcion, comboItem.descripcion)&&
-        Objects.equals(this.idInstitucion, comboItem.idInstitucion);
+        Objects.equals(this.idInstitucion, comboItem.idInstitucion)&&
+    	Objects.equals(this.idLenguaje, comboItem.idLenguaje);
   }
 
   @Override
@@ -113,6 +132,8 @@ public class CatalogoRequestDTO   {
     sb.append("    codigoExt: ").append(toIndentedString(codigoExt)).append("\n");
     sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
     sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
+    sb.append("    idLenguaje: ").append(toIndentedString(idLenguaje)).append("\n");
+    
     sb.append("}");
     return sb.toString();
   }
