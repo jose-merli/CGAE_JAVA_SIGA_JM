@@ -27,6 +27,7 @@ import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.db.entities.AdmRolExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
+import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilKey;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.mappers.AdmRolMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
@@ -140,10 +141,11 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	 * Call the mapper to get them. Return the users information.
 	 */
 	@Override
-	public UsuarioDTO getUsersSearch(int numPagina, UsuarioRequestDTO usuarioRequestDTO) {
+	public UsuarioDTO getUsersSearch(int numPagina, UsuarioRequestDTO usuarioRequestDTO, HttpServletRequest request) {
 		List<UsuarioItem> usuarioItems = new ArrayList<UsuarioItem>();
 		UsuarioDTO usuarioDTO = new UsuarioDTO();
-
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		usuarioRequestDTO.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
 		usuarioItems = admUsuariosExtendsMapper.getUsersByFilter(numPagina, usuarioRequestDTO);
 
 		if (usuarioItems != null) {
@@ -158,30 +160,33 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		int response1 = 1;
 		int response2 = 1;
-
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String dni = nifInstitucion.substring(0,9);
+		usuarioUpdateDTO.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
 		if (!usuarioUpdateDTO.getActivo().equalsIgnoreCase("")
 				|| !usuarioUpdateDTO.getCodigoExterno().equalsIgnoreCase("")) {
 			response1 = admUsuariosExtendsMapper.updateUsersAdmUserTable(usuarioUpdateDTO);
 		}
 		if (!usuarioUpdateDTO.getGrupo().equalsIgnoreCase("")) {
+				
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni);
+				exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
+				
+	
+				//Buscamos el perfil para ver si ya existe. En caso de que no exista
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				AdmUsuarios usuario = usuarios.get(0);
 				AdmPerfilKey key = new AdmPerfilKey();
 				key.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
 				key.setIdperfil(usuarioUpdateDTO.getGrupo());
 				AdmPerfil perfil = admPerfilExtendsMapper.selectByPrimaryKey(key);
 				//Buscamos el perfil para ver si ya existe. En caso de que no exista creamos la relación entre el usuario y el perfil
 				if (null == perfil) {
-					String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
-					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-					exampleUsuarios.createCriteria().andNifEqualTo(dni);
-					exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
-					
 					AdmPerfilExample keyPerfil = new AdmPerfilExample();
 					keyPerfil.setDistinct(Boolean.TRUE);
 					keyPerfil.createCriteria().andIdperfilEqualTo(usuarioUpdateDTO.getGrupo());
 					List<AdmPerfil> perfilExistente = admPerfilExtendsMapper.selectByExample(keyPerfil);
-					//Buscamos el perfil para ver si ya existe. En caso de que no exista
-					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-					AdmUsuarios usuario = usuarios.get(0);
 					AdmPerfil record = new AdmPerfil();
 					record.setUsumodificacion(usuario.getIdusuario());
 					record.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
@@ -191,7 +196,14 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 					record.setDescripcion(perfilExistente.get(0).getDescripcion());
 					//Se guarda el perfil para la institucion
 					admPerfilExtendsMapper.insert(record );
-					
+				}
+				AdmUsuariosEfectivosPerfilKey keyUsuarioPerfil = new AdmUsuariosEfectivosPerfilKey();
+				keyUsuarioPerfil.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
+				keyUsuarioPerfil.setIdusuario(usuario.getIdusuario());
+				keyUsuarioPerfil.setIdrol(usuarioUpdateDTO.getRol());
+				keyUsuarioPerfil.setIdperfil(usuarioUpdateDTO.getGrupo());
+				AdmUsuariosEfectivosPerfil usuarioPerfil = admUsuariosEfectivoPerfilMapper.selectByPrimaryKey(keyUsuarioPerfil);
+				if (null == usuarioPerfil) {
 					AdmUsuariosEfectivosPerfil recordUsuarioEfectivo = new AdmUsuariosEfectivosPerfil();
 					recordUsuarioEfectivo.setUsumodificacion(usuario.getIdusuario());
 					recordUsuarioEfectivo.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
@@ -201,8 +213,8 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 					recordUsuarioEfectivo.setIdusuario(Integer.valueOf(usuarioUpdateDTO.getIdUsuario()));
 					//Se guarda el usuario efectivoPerfil
 					admUsuariosEfectivoPerfilMapper.insert(recordUsuarioEfectivo );
-
 				}
+				
 			
 		}
 
@@ -221,7 +233,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		int response2 = 1;
 		int response3 = 1;
 
-		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String dni = nifInstitucion.substring(0,9);
+		usuarioCreateDTO.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni);
 		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
@@ -229,6 +243,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 
+		//Obtenemos el idioma
+		
+		usuarioCreateDTO.setIdLenguaje(usuario.getIdlenguaje());
 		if (!usuarioCreateDTO.getIdInstitucion().equalsIgnoreCase("")) {
 			response1 = admUsuariosExtendsMapper.createUserAdmUsuariosTable(usuarioCreateDTO, usuario.getIdusuario());
 		}
@@ -241,6 +258,16 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		if (!usuarioCreateDTO.getIdInstitucion().equalsIgnoreCase("") && !usuarioCreateDTO.getRol().equalsIgnoreCase("")
 				&& !usuarioCreateDTO.getRol().equalsIgnoreCase("")
 				&& !usuarioCreateDTO.getGrupo().equalsIgnoreCase("")) {
+			AdmPerfil record = new AdmPerfil();
+			record.setUsumodificacion(usuario.getIdusuario());
+			record.setIdinstitucion(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
+			record.setIdperfil(usuarioCreateDTO.getGrupo());
+			record.setFechamodificacion(new Date());
+			record.setNivelperfil(new Long(0));
+			record.setDescripcion(usuarioCreateDTO.getGrupo());
+			//Se guarda el perfil para la institucion
+			admPerfilExtendsMapper.insert(record );
+			
 			response3 = admUsuariosExtendsMapper.createUserAdmUsuariosEfectivoPerfilTable(usuarioCreateDTO,
 					usuario.getIdusuario());
 		}
@@ -254,8 +281,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	}
 
 	@Override
-	public DeleteResponseDTO deleteUsers(UsuarioDeleteDTO usuarioDeleteDTO) {
-
+	public DeleteResponseDTO deleteUsers(UsuarioDeleteDTO usuarioDeleteDTO, HttpServletRequest request) {
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		usuarioDeleteDTO.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		int response = 0;
 

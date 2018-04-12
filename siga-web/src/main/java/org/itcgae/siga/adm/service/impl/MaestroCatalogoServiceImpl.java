@@ -203,10 +203,11 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni);
 				exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(catalogoCreate.getIdInstitucion()));
-				usuariosMapper.selectByExample(exampleUsuarios );
+				
 				//Obtenemos el usuario para añadir el USUMODIFICACION
 				List<AdmUsuarios> usuarios = usuariosMapper.selectByExample(exampleUsuarios);
 				AdmUsuarios usuario = usuarios.get(0);
+				catalogoCreate.setIdLenguaje(usuario.getIdlenguaje());
 				tablasMaestrasMapper.createRecursos(tablaMaestra,catalogoCreate,isInstitucion,usuario.getIdusuario());
 				tablasMaestrasMapper.createCatalogo(tablaMaestra,catalogoCreate,isInstitucion,usuario.getIdusuario());
 				

@@ -18,11 +18,11 @@ public interface IGestionUsuariosGruposService {
 	
 	public ComboDTO getUsersProfile();
 	
-	public UsuarioDTO getUsersSearch(int numPagina, UsuarioRequestDTO usuarioRequestDTO);
+	public UsuarioDTO getUsersSearch(int numPagina, UsuarioRequestDTO usuarioRequestDTO, HttpServletRequest request);
 	
 	public UpdateResponseDTO updateUsers(UsuarioUpdateDTO usuarioUpdateDTO, HttpServletRequest request);
 	
 	public CreateResponseDTO createUsers(UsuarioCreateDTO usuarioCreateDTO, HttpServletRequest request);
 	
-	public DeleteResponseDTO deleteUsers(UsuarioDeleteDTO usuarioDeleteDTO);
+	public DeleteResponseDTO deleteUsers(UsuarioDeleteDTO usuarioDeleteDTO, HttpServletRequest request);
 }

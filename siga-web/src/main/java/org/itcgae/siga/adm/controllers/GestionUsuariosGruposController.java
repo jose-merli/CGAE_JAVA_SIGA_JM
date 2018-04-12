@@ -43,8 +43,8 @@ public class GestionUsuariosGruposController {
 	
 	
 	@RequestMapping(value = "/usuarios/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UsuarioDTO> getUsersSearch(@RequestParam("numPagina") int numPagina, @RequestBody UsuarioRequestDTO usuarioRequestDTO) { 
-		UsuarioDTO response = gestionUsuariosGruposService.getUsersSearch(numPagina, usuarioRequestDTO);
+	ResponseEntity<UsuarioDTO> getUsersSearch(@RequestParam("numPagina") int numPagina, @RequestBody UsuarioRequestDTO usuarioRequestDTO, HttpServletRequest request) { 
+		UsuarioDTO response = gestionUsuariosGruposService.getUsersSearch(numPagina, usuarioRequestDTO, request);
 		return new ResponseEntity<UsuarioDTO>(response, HttpStatus.OK);
 	}
 	
@@ -71,8 +71,8 @@ public class GestionUsuariosGruposController {
 	
 	
 	@RequestMapping(value = "/usuarios/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> updateUsers(@RequestBody UsuarioDeleteDTO usuarioDeleteDTO) {
-		DeleteResponseDTO response = gestionUsuariosGruposService.deleteUsers(usuarioDeleteDTO);
+	ResponseEntity<DeleteResponseDTO> updateUsers(@RequestBody UsuarioDeleteDTO usuarioDeleteDTO, HttpServletRequest request) {
+		DeleteResponseDTO response = gestionUsuariosGruposService.deleteUsers(usuarioDeleteDTO, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
 	
