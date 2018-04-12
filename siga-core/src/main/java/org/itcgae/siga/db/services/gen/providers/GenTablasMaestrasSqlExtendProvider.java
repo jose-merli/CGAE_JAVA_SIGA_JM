@@ -30,6 +30,7 @@ public class GenTablasMaestrasSqlExtendProvider {
         sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS RECURSOS ON (RECURSOS.IDRECURSO = " + " TABLA." + tablaMaestra.getIdcampodescripcion() +") ");
         
         sql.WHERE("RECURSOS.IDINSTITUCION = '" + catalogo.getIdInstitucion() + "'");
+        sql.WHERE("RECURSOS.IDLENGUAJE = '" + catalogo.getIdLenguaje() + "'");
         sql.WHERE("TABLA.FECHA_BAJA IS NULL ");
         if (null != catalogo.getCodigoExt() && !catalogo.getCodigoExt().equals("")) {
         	sql.WHERE(" TABLA." + tablaMaestra.getIdcampocodigoext() + " = '" + catalogo.getCodigoExt()+ "'");
