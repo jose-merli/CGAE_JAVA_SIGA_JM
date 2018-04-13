@@ -107,7 +107,7 @@ public class QueryCatalogosDTO   {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ComboItem {\n");
+    sb.append("class QueryCatalogosDTO {\n");
     
     sb.append("    catalogo: ").append(toIndentedString(catalogo)).append("\n");
     sb.append("    codigoExt: ").append(toIndentedString(codigoExt)).append("\n");

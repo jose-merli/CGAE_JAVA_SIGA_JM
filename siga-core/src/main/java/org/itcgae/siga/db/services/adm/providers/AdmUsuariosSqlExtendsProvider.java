@@ -1,9 +1,6 @@
 package org.itcgae.siga.db.services.adm.providers;
 
-import java.util.Date;
-
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
@@ -72,18 +69,8 @@ public class AdmUsuariosSqlExtendsProvider {
 	public String updateUsersAdmUserTable(UsuarioUpdateDTO usuarioUpdateDTO){
 		SQL sql = new SQL();
 		sql.UPDATE("ADM_USUARIOS");
-		
-		// comprobacion para actualizar campo ACTIVO
-		if(!usuarioUpdateDTO.getActivo().equalsIgnoreCase(""))
-		{
-			sql.SET("ACTIVO = '" + usuarioUpdateDTO.getActivo() + "'");
-		}
-		// comprobacion para actualizar campo CODIGOEXT
-		if(!usuarioUpdateDTO.getCodigoExterno().equalsIgnoreCase(""))
-		{
-			sql.SET("CODIGOEXT = '" + usuarioUpdateDTO.getCodigoExterno() + "'");
-		}
-		
+		sql.SET("ACTIVO = '" + usuarioUpdateDTO.getActivo() + "'");
+		sql.SET("CODIGOEXT = '" + usuarioUpdateDTO.getCodigoExterno() + "'");
 		// campos obligatorios. filtro para actualizar solo determinados campos
 		sql.WHERE("IDUSUARIO = '" + usuarioUpdateDTO.getIdUsuario() + "'");
 		sql.WHERE("IDINSTITUCION = '" + usuarioUpdateDTO.getIdInstitucion() + "'");

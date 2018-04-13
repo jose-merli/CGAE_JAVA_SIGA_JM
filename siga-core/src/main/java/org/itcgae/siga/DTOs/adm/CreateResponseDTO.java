@@ -72,7 +72,7 @@ public class CreateResponseDTO {
 	@Override
 	public String toString() {
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("class UsuarioDTO {\n");
+	    sb.append("class CreateResponseDTO {\n");
 	    
 	    sb.append("    usuarioItems: ").append(toIndentedString(status)).append("\n");
 	    sb.append("    error: ").append(toIndentedString(error)).append("\n");

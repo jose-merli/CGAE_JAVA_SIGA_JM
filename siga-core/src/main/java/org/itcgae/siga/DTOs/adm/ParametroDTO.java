@@ -1,42 +1,44 @@
 package org.itcgae.siga.DTOs.adm;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-
-import org.itcgae.siga.DTOs.gen.Error;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
-public class DeleteResponseDTO {
-	
-	private String status = new String();
+public class ParametroDTO {
+
+	private List<ParametroItem> parametrosItems = new ArrayList<ParametroItem>();
 	private Error error = null;
 	
 	
 	/**
-	 */
-	public DeleteResponseDTO status(String status){
-		this.status = status;
+	 **/
+	public ParametroDTO parametrosItems(List<ParametroItem> parametrosItems) {
+		this.parametrosItems = parametrosItems;
 		return this;
 	}
 	
-	@JsonProperty("status")
-	public String getStatus() {
-		return status;
+	
+	@JsonProperty("parametrosItems")
+	public List<ParametroItem> getParametrosItems() {
+		return parametrosItems;
 	}
 	
 	
-	public void setStatus(String status) {
-		this.status = status;
+	public void setParametrosItems(List<ParametroItem> parametrosItems) {
+		this.parametrosItems = parametrosItems;
 	}
 	
 	
 	/**
-	 */
-	public DeleteResponseDTO error(Error error){
+	 **/
+	public ParametroDTO error(Error error) {
 		this.error = error;
 		return this;
 	}
+	
 	
 	
 	@JsonProperty("error")
@@ -58,22 +60,21 @@ public class DeleteResponseDTO {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		DeleteResponseDTO deleteResponseDTO = (DeleteResponseDTO) o;
-		return Objects.equals(this.status, deleteResponseDTO.status) &&
-				Objects.equals(this.error, deleteResponseDTO.error);
+		ParametroDTO parametroDTO = (ParametroDTO) o;
+		return Objects.equals(this.parametrosItems, parametroDTO.parametrosItems) && Objects.equals(this.error, parametroDTO.error);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(status, error);
+		return Objects.hash(parametrosItems, error);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("class DeleteResponseDTO {\n");
-    
-		sb.append("    status: ").append(toIndentedString(status)).append("\n");
+		sb.append("class ParametroDTO {\n");
+
+		sb.append("    parametrosItems: ").append(toIndentedString(parametrosItems)).append("\n");
 		sb.append("    error: ").append(toIndentedString(error)).append("\n");
 		sb.append("}");
 		return sb.toString();

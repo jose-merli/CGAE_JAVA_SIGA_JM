@@ -151,7 +151,7 @@ public class UsuarioRequestDTO {
 	@Override
 	public String toString() {
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("class UsuarioRequest {\n");
+	    sb.append("class UsuarioRequestDTO {\n");
 		sb.append("    nombreApellidos: ").append(toIndentedString(nombreApellidos)).append("\n");
 		sb.append("    nif: ").append(toIndentedString(nif)).append("\n");
 		sb.append("    rol: ").append(toIndentedString(rol)).append("\n");

@@ -211,7 +211,7 @@ public class UsuarioCreateDTO {
 	@Override
 	public String toString() {
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("class UsuarioDTO {\n");
+	    sb.append("class UsuarioCreateDTO {\n");
 	    
 	    sb.append("    nombreApellidos: ").append(toIndentedString(nombreApellidos)).append("\n");
 	    sb.append("    nif: ").append(toIndentedString(nif)).append("\n");
