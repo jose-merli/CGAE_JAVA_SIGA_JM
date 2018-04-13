@@ -167,11 +167,10 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				|| !usuarioUpdateDTO.getCodigoExterno().equalsIgnoreCase("")) {
 			response1 = admUsuariosExtendsMapper.updateUsersAdmUserTable(usuarioUpdateDTO);
 		}
-		//if (null != usuarioUpdateDTO.getGrupo() && usuarioUpdateDTO.getGrupo().length > 0) {
-			if (null != usuarioUpdateDTO.getGrupo() && usuarioUpdateDTO.getGrupo().equalsIgnoreCase("")) {
-				//for (int i = 0; i < usuarioUpdateDTO.getGrupo().length; i++) {
+		if (null != usuarioUpdateDTO.getIdGrupo() && usuarioUpdateDTO.getIdGrupo().length > 0) {
+				for (int i = 0; i < usuarioUpdateDTO.getIdGrupo().length; i++) {
 					
-					//usuarioUpdateDTO.setIdGrupo(usuarioUpdateDTO.getGrupo());
+					usuarioUpdateDTO.setGrupo(usuarioUpdateDTO.getIdGrupo()[i]);
 					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 					exampleUsuarios.createCriteria().andNifEqualTo(dni);
 					exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
@@ -218,7 +217,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 						admUsuariosEfectivoPerfilMapper.insert(recordUsuarioEfectivo );
 					}
 				
-				
+				}
 			
 		}
 
