@@ -58,5 +58,11 @@ public class MaestroCatalogosController {
 	   UpdateResponseDTO response = maestroCatalogoService.createDatosCatalogo(catalogo,request);
 	   return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
+   
+   @RequestMapping(value = "/catmaestros/historico", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+   ResponseEntity<CatalogoMaestroDTO> getCatalogosHistorico(@RequestBody CatalogoRequestDTO catalogo,HttpServletRequest request) {
+	CatalogoMaestroDTO response = maestroCatalogoService.getDatosCatalogoHistorico(catalogo,request);
+ 	return new ResponseEntity<CatalogoMaestroDTO>(response, HttpStatus.OK);
+	}
 	
 }

@@ -21,5 +21,7 @@ public interface IMaestroCatalogoService {
 	public  UpdateResponseDTO  deleteDatosCatalogo(CatalogoDeleteDTO catalogoDelete,HttpServletRequest request);
 	
 	public  UpdateResponseDTO  createDatosCatalogo(CatalogoUpdateDTO catalogoCreate,HttpServletRequest request);
+	
+	public  CatalogoMaestroDTO  getDatosCatalogoHistorico(CatalogoRequestDTO catalogoRequest,HttpServletRequest request);
 
 }

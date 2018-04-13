@@ -12,7 +12,7 @@ public class UsuarioUpdateDTO {
 	private String nombreApellidos;
 	private String nif;
 	private String rol;
-	private String grupo;
+	private String[] grupo;
 	private String idGrupo;
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaAlta;
@@ -81,19 +81,19 @@ public class UsuarioUpdateDTO {
 	
 	/**
 	 */
-	public UsuarioUpdateDTO grupo(String grupo){
+	public UsuarioUpdateDTO grupo(String[] grupo){
 		this.grupo = grupo;
 		return this;
 	}
 	
 	
 	@JsonProperty("grupo")
-	public String getGrupo() {
+	public String[] getGrupo() {
 		return grupo;
 	}
 	
 	
-	public void setGrupo(String grupo) {
+	public void setGrupo(String[] grupo) {
 		this.grupo = grupo;
 	}
 	

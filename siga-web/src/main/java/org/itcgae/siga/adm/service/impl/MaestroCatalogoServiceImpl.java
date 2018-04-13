@@ -242,6 +242,42 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		return response;
 	}
 
+	
+	
+	@Override
+	public CatalogoMaestroDTO getDatosCatalogoHistorico(CatalogoRequestDTO catalogoRequest,HttpServletRequest request) {
+		//Obtenemos los datos del catálogo con la tabla maestra seleccionada
+		
+		//Obtenemos la institución del Token
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		catalogoRequest.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+		
+		// Obtenemos el DNI del token
+		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni);
+		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(catalogoRequest.getIdInstitucion()));
+		//Obtenemos el usuario para añadir el USUMODIFICACION
+		List<AdmUsuarios> usuarios = usuariosMapper.selectByExample(exampleUsuarios);
+		AdmUsuarios usuario = usuarios.get(0);
+		catalogoRequest.setIdLenguaje(usuario.getIdlenguaje());
+		CatalogoMaestroDTO response = new CatalogoMaestroDTO();
+		List<CatalogoMaestroItem> catalogoMaestroItem = new ArrayList<CatalogoMaestroItem>();
+		GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
+		exampleTablasMaestras.setDistinct(true);
+		exampleTablasMaestras.setOrderByClause("ALIASTABLA ASC");
+		exampleTablasMaestras.createCriteria().andIdtablamaestraEqualTo(catalogoRequest.getCatalogo());
+		List<GenTablasMaestras> tablasMaestras = tablasMaestrasMapper.selectByExample(exampleTablasMaestras);
+		
+		if (null != tablasMaestras && tablasMaestras.size() > 0) {
+				//Obtenemos el catálogo
+				GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
+   			    catalogoMaestroItem =tablasMaestrasMapper.selectCatalogosHistoricoByTabla(tablaMaestra,catalogoRequest);
+			}
+
+		response.setCatalogoMaestroItem(catalogoMaestroItem);
+		return response;
+	}
 
 
 

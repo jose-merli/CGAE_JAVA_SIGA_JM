@@ -39,8 +39,8 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			throws AuthenticationException {
 
 		// Usuario 2 -> Usuario de desarrollo del actual SIGA
-		String user = "44149718E";
-		String institucion = "2000";
+		String user = "03862002A";
+		String institucion = "2003";
 		return authenticationManager.authenticate(new UserAuthenticationToken(user.concat(institucion)));
 
 	}
