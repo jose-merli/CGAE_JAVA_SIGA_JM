@@ -12,8 +12,8 @@ public class UsuarioUpdateDTO {
 	private String nombreApellidos;
 	private String nif;
 	private String rol;
-	private String[] grupo;
-	private String idGrupo;
+	private String grupo;
+	private String[] idGrupo;
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaAlta;
 	private String codigoExterno;
@@ -81,38 +81,38 @@ public class UsuarioUpdateDTO {
 	
 	/**
 	 */
-	public UsuarioUpdateDTO grupo(String[] grupo){
+	public UsuarioUpdateDTO grupo(String grupo){
 		this.grupo = grupo;
 		return this;
 	}
 	
 	
 	@JsonProperty("grupo")
-	public String[] getGrupo() {
+	public String getGrupo() {
 		return grupo;
 	}
 	
 	
-	public void setGrupo(String[] grupo) {
+	public void setGrupo(String grupo) {
 		this.grupo = grupo;
 	}
 	
 	
 	/**
 	 */
-	public UsuarioUpdateDTO idGrupo(String idGrupo){
+	public UsuarioUpdateDTO idGrupo(String[] idGrupo){
 		this.idGrupo = idGrupo;
 		return this;
 	}
 	
 	
 	@JsonProperty("idGrupo")
-	public String getIdGrupo() {
+	public String[] getIdGrupo() {
 		return idGrupo;
 	}
 
 
-	public void setIdGrupo(String idGrupo) {
+	public void setIdGrupo(String[] idGrupo) {
 		this.idGrupo = idGrupo;
 	}
 	

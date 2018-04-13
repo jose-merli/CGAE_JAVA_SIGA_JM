@@ -101,9 +101,9 @@ public class AdmUsuariosSqlExtendsProvider {
 		sql.UPDATE("ADM_USUARIOS_EFECTIVOS_PERFIL");
 		
 		// comprobacion para actualizar campo Perfil
-		if(!usuarioUpdateDTO.getIdGrupo().equalsIgnoreCase(""))
+		if(!usuarioUpdateDTO.getGrupo().equalsIgnoreCase(""))
 		{
-			sql.SET("IDPERFIL = '" + usuarioUpdateDTO.getIdGrupo() + "'");
+			sql.SET("IDPERFIL = '" + usuarioUpdateDTO.getGrupo() + "'");
 			sql.SET("FECHAMODIFICACION = SYSDATE");
 		}
 		
