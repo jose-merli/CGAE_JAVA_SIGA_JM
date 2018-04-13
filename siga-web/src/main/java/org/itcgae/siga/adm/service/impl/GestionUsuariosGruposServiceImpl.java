@@ -164,60 +164,62 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		String dni = nifInstitucion.substring(0,9);
 		usuarioUpdateDTO.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+		if (!usuarioUpdateDTO.getActivo().equalsIgnoreCase("")
+				|| !usuarioUpdateDTO.getCodigoExterno().equalsIgnoreCase("")) {
+			response1 = admUsuariosExtendsMapper.updateUsersAdmUserTable(usuarioUpdateDTO);
+		}
+		if (null != usuarioUpdateDTO.getIdGrupo() && usuarioUpdateDTO.getIdGrupo().length > 0) {
+				for (int i = 0; i < usuarioUpdateDTO.getIdGrupo().length; i++) {
+					
+					usuarioUpdateDTO.setGrupo(usuarioUpdateDTO.getIdGrupo()[i]);
+					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+					exampleUsuarios.createCriteria().andNifEqualTo(dni);
+					exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
+					
 		
-		// actualiza la tabla adm_usuarios
-		response1 = admUsuariosExtendsMapper.updateUsersAdmUserTable(usuarioUpdateDTO);
-		
-		if (null != usuarioUpdateDTO.getGrupo() && usuarioUpdateDTO.getGrupo().equalsIgnoreCase("")) {
-
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni);
-			exampleUsuarios.createCriteria()
-					.andIdinstitucionEqualTo(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
-
-			// Buscamos el perfil para ver si ya existe. En caso de que no exista
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			AdmUsuarios usuario = usuarios.get(0);
-			AdmPerfilKey key = new AdmPerfilKey();
-			key.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
-			key.setIdperfil(usuarioUpdateDTO.getGrupo());
-			AdmPerfil perfil = admPerfilExtendsMapper.selectByPrimaryKey(key);
-			// Buscamos el perfil para ver si ya existe. En caso de que no exista creamos la
-			// relación entre el usuario y el perfil
-			if (null == perfil) {
-				AdmPerfilExample keyPerfil = new AdmPerfilExample();
-				keyPerfil.setDistinct(Boolean.TRUE);
-				keyPerfil.createCriteria().andIdperfilEqualTo(usuarioUpdateDTO.getGrupo());
-				List<AdmPerfil> perfilExistente = admPerfilExtendsMapper.selectByExample(keyPerfil);
-				AdmPerfil record = new AdmPerfil();
-				record.setUsumodificacion(usuario.getIdusuario());
-				record.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
-				record.setIdperfil(usuarioUpdateDTO.getGrupo());
-				record.setFechamodificacion(new Date());
-				record.setNivelperfil(new Long(0));
-				record.setDescripcion(perfilExistente.get(0).getDescripcion());
-				// Se guarda el perfil para la institucion
-				admPerfilExtendsMapper.insert(record);
-			}
-			AdmUsuariosEfectivosPerfilKey keyUsuarioPerfil = new AdmUsuariosEfectivosPerfilKey();
-			keyUsuarioPerfil.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
-			keyUsuarioPerfil.setIdusuario(usuario.getIdusuario());
-			keyUsuarioPerfil.setIdrol(usuarioUpdateDTO.getRol());
-			keyUsuarioPerfil.setIdperfil(usuarioUpdateDTO.getGrupo());
-			AdmUsuariosEfectivosPerfil usuarioPerfil = admUsuariosEfectivoPerfilMapper
-					.selectByPrimaryKey(keyUsuarioPerfil);
-			if (null == usuarioPerfil) {
-				AdmUsuariosEfectivosPerfil recordUsuarioEfectivo = new AdmUsuariosEfectivosPerfil();
-				recordUsuarioEfectivo.setUsumodificacion(usuario.getIdusuario());
-				recordUsuarioEfectivo.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
-				recordUsuarioEfectivo.setIdperfil(usuarioUpdateDTO.getGrupo());
-				recordUsuarioEfectivo.setFechamodificacion(new Date());
-				recordUsuarioEfectivo.setIdrol(usuarioUpdateDTO.getRol());
-				recordUsuarioEfectivo.setIdusuario(Integer.valueOf(usuarioUpdateDTO.getIdUsuario()));
-				// Se guarda el usuario efectivoPerfil
-				admUsuariosEfectivoPerfilMapper.insert(recordUsuarioEfectivo);
-			}
-
+					//Buscamos el perfil para ver si ya existe. En caso de que no exista
+					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+					AdmUsuarios usuario = usuarios.get(0);
+					AdmPerfilKey key = new AdmPerfilKey();
+					key.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
+					key.setIdperfil(usuarioUpdateDTO.getGrupo());
+					AdmPerfil perfil = admPerfilExtendsMapper.selectByPrimaryKey(key);
+					//Buscamos el perfil para ver si ya existe. En caso de que no exista creamos la relación entre el usuario y el perfil
+					if (null == perfil) {
+						AdmPerfilExample keyPerfil = new AdmPerfilExample();
+						keyPerfil.setDistinct(Boolean.TRUE);
+						keyPerfil.createCriteria().andIdperfilEqualTo(usuarioUpdateDTO.getGrupo());
+						List<AdmPerfil> perfilExistente = admPerfilExtendsMapper.selectByExample(keyPerfil);
+						AdmPerfil record = new AdmPerfil();
+						record.setUsumodificacion(usuario.getIdusuario());
+						record.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
+						record.setIdperfil(usuarioUpdateDTO.getGrupo());
+						record.setFechamodificacion(new Date());
+						record.setNivelperfil(new Long(0));
+						record.setDescripcion(perfilExistente.get(0).getDescripcion());
+						//Se guarda el perfil para la institucion
+						admPerfilExtendsMapper.insert(record );
+					}
+					AdmUsuariosEfectivosPerfilKey keyUsuarioPerfil = new AdmUsuariosEfectivosPerfilKey();
+					keyUsuarioPerfil.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
+					keyUsuarioPerfil.setIdusuario(usuario.getIdusuario());
+					keyUsuarioPerfil.setIdrol(usuarioUpdateDTO.getRol());
+					keyUsuarioPerfil.setIdperfil(usuarioUpdateDTO.getGrupo());
+					AdmUsuariosEfectivosPerfil usuarioPerfil = admUsuariosEfectivoPerfilMapper.selectByPrimaryKey(keyUsuarioPerfil);
+					if (null == usuarioPerfil) {
+						AdmUsuariosEfectivosPerfil recordUsuarioEfectivo = new AdmUsuariosEfectivosPerfil();
+						recordUsuarioEfectivo.setUsumodificacion(usuario.getIdusuario());
+						recordUsuarioEfectivo.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
+						recordUsuarioEfectivo.setIdperfil(usuarioUpdateDTO.getGrupo());
+						recordUsuarioEfectivo.setFechamodificacion(new Date());
+						recordUsuarioEfectivo.setIdrol(usuarioUpdateDTO.getRol());
+						recordUsuarioEfectivo.setIdusuario(Integer.valueOf(usuarioUpdateDTO.getIdUsuario()));
+						//Se guarda el usuario efectivoPerfil
+						admUsuariosEfectivoPerfilMapper.insert(recordUsuarioEfectivo );
+					}
+				
+				}
+			
 		}
 
 		if (response1 == 1 && response2 == 1)
