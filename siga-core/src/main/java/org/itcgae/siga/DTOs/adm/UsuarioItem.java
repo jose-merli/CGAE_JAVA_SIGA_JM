@@ -19,6 +19,7 @@ public class UsuarioItem {
 	private String perfil = null;
 	private String idInstitucion  = null;
 	private String idUsuario = null;
+	private String[] perfiles = null;
 	
 
 	/**
@@ -190,6 +191,26 @@ public class UsuarioItem {
 		this.idUsuario = idUsuario;
 	}
 	
+	/**
+	 */
+	public UsuarioItem perfiles(String[] perfiles){
+		this.perfiles = perfiles;
+		return this;
+	}
+	
+	
+	@JsonProperty("perfiles")
+	public String[] getperfiles() {
+		return perfiles;
+	}
+
+
+	public void setPerfiles(String[] perfiles) {
+		this.perfiles = perfiles;
+	}
+	
+	
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -208,7 +229,9 @@ public class UsuarioItem {
 	        Objects.equals(this.perfil, usuarioItem.perfil) &&
 	        Objects.equals(this.activo, usuarioItem.activo) &&
 	        Objects.equals(this.idInstitucion, usuarioItem.idInstitucion) &&
-	    	Objects.equals(this.idUsuario, usuarioItem.idUsuario);
+	    	Objects.equals(this.idUsuario, usuarioItem.idUsuario)&&
+	    	Objects.equals(this.perfiles, usuarioItem.perfiles);
+	    
 	}
 
 
@@ -232,6 +255,7 @@ public class UsuarioItem {
 	    sb.append("    grupo: ").append(toIndentedString(activo)).append("\n");
 	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
 	    sb.append("    idUsuario: ").append(toIndentedString(idUsuario)).append("\n");
+	    sb.append("    perfiles: ").append(toIndentedString(perfiles)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}

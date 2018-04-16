@@ -28,10 +28,11 @@ public class AdmUsuariosSqlExtendsProvider {
 		sql.SELECT("USUARIOS.IDINSTITUCION");
 		sql.SELECT("USUARIOS.IDUSUARIO");
 		sql.SELECT("f_siga_roles_usuario(USUARIOS.idinstitucion, USUARIOS.idusuario) as ROLES");
+		sql.SELECT("f_siga_perfiles_usuario(USUARIOS.idinstitucion, USUARIOS.idusuario) as PERFIL");    
 		sql.FROM("ADM_USUARIOS USUARIOS");
 		
 		// comprobacion campo rol del body para aplicar filtro
-		if(!usuarioRequestDTO.getRol().equalsIgnoreCase("")){
+		if(null != usuarioRequestDTO.getRol() && !usuarioRequestDTO.getRol().equalsIgnoreCase("")){
 			sql.WHERE("exists (select 1 from ADM_PERFIL_ROL ROL,"
 					+ " ADM_USUARIO_EFECTIVO UEF where ROL.IDINSTITUCION = USUARIOS.IDINSTITUCION"
 					+ " and ROL.IDROL = UEF.IDROL"
@@ -39,17 +40,17 @@ public class AdmUsuariosSqlExtendsProvider {
 					+ " and UEF.IDUSUARIO = USUARIOS.IDUSUARIO and ROL.IDROL = '" + usuarioRequestDTO.getRol() + "')");		
 		}
 		//comprobacion campo grupo del body para aplicar filtro
-		if(!usuarioRequestDTO.getGrupo().equalsIgnoreCase("")){
+		if(null != usuarioRequestDTO.getGrupo() && !usuarioRequestDTO.getGrupo().equalsIgnoreCase("")){
 			sql.WHERE("exists (select 1 from ADM_USUARIOS_EFECTIVOS_PERFIL UEP where UEP.IDINSTITUCION = USUARIOS.IDINSTITUCION ");
 			sql.WHERE("UEP.IDUSUARIO = USUARIOS.IDUSUARIO and UEP.IDPERFIL = '" + usuarioRequestDTO.getGrupo() + "')");
 		}
 		// comprobacion campo nombreApellidos del body para aplicar filtro
-		if(!usuarioRequestDTO.getNombreApellidos().equalsIgnoreCase("")){
+		if(null != usuarioRequestDTO.getNombreApellidos() &&  !usuarioRequestDTO.getNombreApellidos().equalsIgnoreCase("")){
 			sql.WHERE("USUARIOS.DESCRIPCION = '" + usuarioRequestDTO.getNombreApellidos() + "'");
 		}
 		
 		// comprobacion campo nif del body para aplicar filtro
-		if(!usuarioRequestDTO.getNif().equalsIgnoreCase("")){
+		if(null != usuarioRequestDTO.getNif() && !usuarioRequestDTO.getNif().equalsIgnoreCase("")){
 			sql.WHERE("USUARIOS.NIF = '" + usuarioRequestDTO.getNif() + "'");
 		}
 		

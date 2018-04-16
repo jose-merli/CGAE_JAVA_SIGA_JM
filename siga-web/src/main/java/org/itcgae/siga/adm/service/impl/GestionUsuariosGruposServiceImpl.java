@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.db.entities.AdmRolExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
+import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilKey;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.mappers.AdmRolMapper;
@@ -149,7 +151,15 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		usuarioRequestDTO.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
 		usuarioItems = admUsuariosExtendsMapper.getUsersByFilter(numPagina, usuarioRequestDTO);
 
-		if (usuarioItems != null) {
+		
+		
+		if (usuarioItems != null && usuarioItems.size() > 0) {
+			
+		for (UsuarioItem usuarioItem : usuarioItems) {
+			if (null != usuarioItem.getPerfil() && !usuarioItem.getPerfil().equalsIgnoreCase("") ) {
+				usuarioItem.setPerfiles(usuarioItem.getPerfil().split("; "));
+			}
+		}
 			usuarioDTO.setUsuarioItem(usuarioItems);
 		}
 
