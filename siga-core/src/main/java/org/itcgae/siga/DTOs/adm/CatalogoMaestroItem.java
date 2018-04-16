@@ -1,6 +1,9 @@
 package org.itcgae.siga.DTOs.adm;
 
+import java.util.Date;
 import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -17,6 +20,8 @@ public class CatalogoMaestroItem   {
   private String descripcion = null;
   private String idInstitucion = null;
   private String idRegistro = null;
+  @JsonFormat(pattern = "dd-MM-yyyy")
+  private Date fechaBaja = null;
   
   /**
    **/
@@ -102,6 +107,23 @@ public class CatalogoMaestroItem   {
     this.idInstitucion = idInstitucion;
   }
   
+	/**
+	 */
+	public CatalogoMaestroItem fechaBaja(Date fechaBaja){
+		this.fechaBaja = fechaBaja;
+		return this;
+	}
+	
+	
+	@JsonProperty("fechaBaja")
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+	
+	
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
   
   @Override
   public boolean equals(java.lang.Object o) {
@@ -116,7 +138,8 @@ public class CatalogoMaestroItem   {
         Objects.equals(this.codigoExt, catalogoMaestroItem.codigoExt)&&
         Objects.equals(this.descripcion, catalogoMaestroItem.descripcion)&&
         Objects.equals(this.idInstitucion, catalogoMaestroItem.idInstitucion)&&
-    	Objects.equals(this.idRegistro, catalogoMaestroItem.idRegistro);
+    	Objects.equals(this.idRegistro, catalogoMaestroItem.idRegistro)&&
+    Objects.equals(this.fechaBaja, catalogoMaestroItem.fechaBaja);
   }
 
   @Override
@@ -134,6 +157,7 @@ public class CatalogoMaestroItem   {
     sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
     sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
     sb.append("    idRegistro: ").append(toIndentedString(idRegistro)).append("\n");
+    sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
     sb.append("}");
     return sb.toString();
   }

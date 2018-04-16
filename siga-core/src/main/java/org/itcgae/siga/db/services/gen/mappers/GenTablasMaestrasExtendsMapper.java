@@ -120,7 +120,8 @@ public interface GenTablasMaestrasExtendsMapper extends GenTablasMaestrasMapper{
         @Result(column="CODIGOEXT", property="codigoExt", jdbcType=JdbcType.DECIMAL),
         @Result(column="DESCRIPCION", property="descripcion", jdbcType=JdbcType.DECIMAL),
         @Result(column="IDINSTITUCION", property="idInstitucion", jdbcType=JdbcType.VARCHAR),
-        @Result(column="IDREGISTRO", property="idRegistro", jdbcType=JdbcType.VARCHAR)
+        @Result(column="IDREGISTRO", property="idRegistro", jdbcType=JdbcType.VARCHAR),
+        @Result(column="FECHABAJA", property="fechaBaja", jdbcType=JdbcType.VARCHAR)
 
     })
     List<CatalogoMaestroItem> selectCatalogosHistoricoByTabla(GenTablasMaestras example,CatalogoRequestDTO catalogo);
