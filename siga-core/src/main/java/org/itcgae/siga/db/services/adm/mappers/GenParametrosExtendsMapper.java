@@ -31,6 +31,7 @@ public interface GenParametrosExtendsMapper extends GenParametrosMapper{
 	@Results({
 		@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PARAMETRO", property = "parametro", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDRECURSO", property = "idRecurso", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 	})

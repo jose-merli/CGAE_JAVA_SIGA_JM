@@ -25,7 +25,7 @@ public class ParametrosController {
 	@Autowired
 	private IParametrosService parametrosService;
 	
-	@RequestMapping(value = "/parametros/modelo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/parametros/modulo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getParameterModules() {
 		ComboDTO response = parametrosService.getParameterModules();
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);

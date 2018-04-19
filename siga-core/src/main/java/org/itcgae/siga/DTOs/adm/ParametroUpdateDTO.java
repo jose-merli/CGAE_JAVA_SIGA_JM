@@ -11,9 +11,11 @@ public class ParametroUpdateDTO {
 	private String parametro;
 	private String valor;
 	private String idInstitucion;
+	private String idRecurso;
 	
 	
 	
+
 	/**
 	 **/
 	public ParametroUpdateDTO modulo(String modulo) {
@@ -89,6 +91,26 @@ public class ParametroUpdateDTO {
 		this.idInstitucion = idInstitucion;
 	}
 	
+	
+	/**
+	 **/
+	public ParametroUpdateDTO idRecurso(String idRecurso) {
+		this.idRecurso = idRecurso;
+		return this;
+	}
+	
+	
+	@JsonProperty("idRecurso")
+	public String getIdRecurso() {
+		return idRecurso;
+	}
+
+
+	public void setIdRecurso(String idRecurso) {
+		this.idRecurso = idRecurso;
+	}
+
+	
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -102,12 +124,13 @@ public class ParametroUpdateDTO {
 		return Objects.equals(this.modulo, parametroUpdateDTO.modulo) &&
 				Objects.equals(this.parametro, parametroUpdateDTO.parametro) &&
 				 Objects.equals(this.valor, parametroUpdateDTO.valor) &&
-				 Objects.equals(this.idInstitucion, parametroUpdateDTO.idInstitucion);
+				 Objects.equals(this.idInstitucion, parametroUpdateDTO.idInstitucion) &&
+				 Objects.equals(this.idRecurso, parametroUpdateDTO.idRecurso);
 	}
 
 	@Override
 	public int hashCode() {
-	    return Objects.hash(modulo, parametro, valor, idInstitucion);
+	    return Objects.hash(modulo, parametro, valor, idInstitucion, idRecurso);
 	}
 
 	
@@ -119,6 +142,7 @@ public class ParametroUpdateDTO {
 		sb.append("    parametro: ").append(toIndentedString(parametro)).append("\n");
 		sb.append("    valor: ").append(toIndentedString(valor)).append("\n");
 		sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
+		sb.append("    idRecurso: ").append(toIndentedString(idRecurso)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

@@ -19,6 +19,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
@@ -44,8 +45,13 @@ public class ParametrosServiceImpl implements IParametrosService{
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 
 		comboItems = genParametrosExtendsMapper.getModules();
-
+		
 		if(!comboItems.equals(null) && comboItems.size() > 0) {
+			// añade elemento vacio al princpio para el dropdown de parte front
+			ComboItem comboItem = new ComboItem();
+			comboItem.setLabel("");
+			comboItem.setValue("");
+			comboItems.add(0, comboItem); 
 			combo.setCombooItems(comboItems);
 		}
 
@@ -78,6 +84,7 @@ public class ParametrosServiceImpl implements IParametrosService{
 						parametroItem.setModulo(genparametros.get(i).getModulo());
 						parametroItem.setParametro(genparametros.get(i).getParametro());
 						parametroItem.setValor(genparametros.get(i).getValor());
+						parametroItem.setIdRecurso(genparametros.get(i).getIdrecurso());
 						parametroItems.add(parametroItem);
 					}
 					parametroDTO.setParametrosItems(parametroItems);
@@ -109,7 +116,7 @@ public class ParametrosServiceImpl implements IParametrosService{
 		
 		
 		if (!parametroRequestDTO.getParametrosGenerales().equalsIgnoreCase("") && !parametroRequestDTO.getModulo().equalsIgnoreCase("") && parametroRequestDTO.getIdInstitucion() != null) {
-			if (parametroRequestDTO.getParametrosGenerales().equals("N")) {
+			//if (parametroRequestDTO.getParametrosGenerales().equals("N")) {
 				// Buscar en gen_parametros por modulo e institucion
 				GenParametrosExample genParametrosExample = new GenParametrosExample();
 				genParametrosExample.createCriteria().andIdinstitucionEqualTo(Short.valueOf(parametroRequestDTO.getIdInstitucion())).andModuloEqualTo(parametroRequestDTO.getModulo());
@@ -128,14 +135,14 @@ public class ParametrosServiceImpl implements IParametrosService{
 					}
 					parametroDTO.setParametrosItems(parametroItems);
 				}
-			} else if (parametroRequestDTO.getParametrosGenerales().equals("S")) {
-
-				parametroItems = genParametrosExtendsMapper.getParametersRecord(numPagina, parametroRequestDTO);
-
-				if (parametroItems != null && parametroItems.size() > 0)
-					parametroDTO.setParametrosItems(parametroItems);
-
-			}
+//			} else if (parametroRequestDTO.getParametrosGenerales().equals("S")) {
+//
+//				parametroItems = genParametrosExtendsMapper.getParametersRecord(numPagina, parametroRequestDTO);
+//
+//				if (parametroItems != null && parametroItems.size() > 0)
+//					parametroDTO.setParametrosItems(parametroItems);
+//
+//			}
 		}
 		return parametroDTO;
 	}
@@ -145,8 +152,10 @@ public class ParametrosServiceImpl implements IParametrosService{
 	public UpdateResponseDTO updateParameter(ParametroUpdateDTO parametroUpdateDTO, HttpServletRequest request) {
 		int response = 0;
 		GenParametros genParametros = new GenParametros();
+		GenParametros genParametrosSelect = new GenParametros();
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		GenParametrosKey genParametrosKey = new GenParametrosKey();
 		
 		// Obtener idInstitucion del certificado y idUsuario del certificado
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
@@ -172,7 +181,26 @@ public class ParametrosServiceImpl implements IParametrosService{
 				genParametros.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
 				
 				if(!genParametros.getIdinstitucion().equals(null)){
-					response = genParametrosMapper.insertSelective(genParametros);
+						
+					genParametrosKey.setIdinstitucion(genParametros.getIdinstitucion());
+					genParametrosKey.setModulo(genParametros.getModulo());
+					genParametrosKey.setParametro(genParametros.getParametro());
+					
+					// comprobamos si realmente existe el registro {idinstitucion,modulo, parametro}, ya que fecha de baja puede ser distinta de null y no se muestra al buscar en pantalla
+					genParametrosSelect = genParametrosMapper.selectByPrimaryKey(genParametrosKey);
+					
+					// si no es nulo, entonces hay que actualizar en vez de crear
+					if(genParametrosSelect != null){
+						// actualizamos fecha de baja a null, para que vuelva a estar disponible
+						genParametros.setFechaBaja(null);
+						response = genParametrosMapper.updateByPrimaryKeySelective(genParametros);
+					}
+					// si es nulo, se crea un nuevo registro
+					else {
+						genParametros.setIdrecurso(parametroUpdateDTO.getIdRecurso());
+						response = genParametrosMapper.insertSelective(genParametros);
+					}
+					
 				}
 				
 			}
