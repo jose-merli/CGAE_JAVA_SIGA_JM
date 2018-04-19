@@ -193,7 +193,7 @@ public class GenTablasMaestrasSqlExtendProvider {
         sql.SELECT("'" + tablaMaestra.getIdtablamaestra() + "'" + " AS CATALOGO");
         sql.SELECT("RECURSOS.DESCRIPCION AS DESCRIPCION");
         sql.SELECT(tablaMaestra.getIdcampocodigo() + " AS IDREGISTRO");
-        sql.SELECT("TABLA.FECHABAJA AS FECHABAJA");
+        sql.SELECT("TABLA.FECHA_BAJA AS FECHABAJA");
         sql.FROM(tablaMaestra.getIdtablamaestra() + " TABLA" );
         
         sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS RECURSOS ON (RECURSOS.IDRECURSO = " + " TABLA." + tablaMaestra.getIdcampodescripcion() +") ");
