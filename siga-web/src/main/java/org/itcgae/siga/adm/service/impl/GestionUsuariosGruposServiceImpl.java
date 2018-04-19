@@ -212,7 +212,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 					}
 					AdmUsuariosEfectivosPerfilKey keyUsuarioPerfil = new AdmUsuariosEfectivosPerfilKey();
 					keyUsuarioPerfil.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
-					keyUsuarioPerfil.setIdusuario(usuario.getIdusuario());
+					keyUsuarioPerfil.setIdusuario(Integer.valueOf(usuarioUpdateDTO.getIdUsuario()));
 					keyUsuarioPerfil.setIdrol(usuarioUpdateDTO.getRol());
 					keyUsuarioPerfil.setIdperfil(usuarioUpdateDTO.getGrupo());
 					AdmUsuariosEfectivosPerfil usuarioPerfil = admUsuariosEfectivoPerfilMapper.selectByPrimaryKey(keyUsuarioPerfil);
