@@ -183,8 +183,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 					
 					usuarioUpdateDTO.setGrupo(usuarioUpdateDTO.getIdGrupo()[i]);
 					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-					exampleUsuarios.createCriteria().andNifEqualTo(dni);
-					exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
+					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
 					
 		
 					//Buscamos el perfil para ver si ya existe. En caso de que no exista
@@ -251,8 +250,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		String dni = nifInstitucion.substring(0,9);
 		usuarioCreateDTO.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni);
-		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
 		//admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
@@ -262,8 +260,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		if(!usuarioCreateDTO.getNif().equalsIgnoreCase(""))
 		{
 			AdmUsuariosExample exampleNifInstitucion = new AdmUsuariosExample();
-			exampleNifInstitucion.createCriteria().andNifEqualTo(usuarioCreateDTO.getNif());
-			exampleNifInstitucion.createCriteria().andIdinstitucionEqualTo(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
+			exampleNifInstitucion.createCriteria().andNifEqualTo(usuarioCreateDTO.getNif()).andIdinstitucionEqualTo(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
 			List<AdmUsuarios> userNifInstitucion = admUsuariosExtendsMapper.selectByExample(exampleNifInstitucion);
 			
 			// si no existe un usuario ya con ese dni y ese idInstitucion, se crea

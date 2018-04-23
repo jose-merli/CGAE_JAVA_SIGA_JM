@@ -4,15 +4,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.itcgae.siga.DTOs.adm.UsuarioDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioItem;
 import org.itcgae.siga.DTOs.gen.DiccionarioDTO;
 import org.itcgae.siga.DTOs.gen.DiccionarioItem;
 import org.itcgae.siga.db.entities.AdmLenguajes;
 import org.itcgae.siga.db.entities.AdmLenguajesExample;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioExample;
 import org.itcgae.siga.db.mappers.AdmLenguajesMapper;
+import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
 import org.itcgae.siga.gen.services.IDiccionarioService;
+import org.itcgae.siga.security.UserAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +37,9 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 	AdmLenguajesMapper lenguajesMapper;
 	@Autowired
 	GenDiccionarioMapper diccionarioMapper;
+	
+	@Autowired
+	private AdmUsuariosMapper admUsuariosMapper;
 	
 	@Override
 	public DiccionarioDTO getDiccionario(String lenguaje) {
@@ -101,6 +112,42 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 		List<AdmLenguajes> lenguajes = lenguajesMapper.selectByExample(example );
 		
 		return lenguajes;
+	}
+
+
+
+	@Override
+	public UsuarioDTO getUsuario(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		
+
+		// Obtener idInstitucion del certificado y idUsuario del certificado
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String dni = nifInstitucion.substring(0, 9);
+		Short idInstitucion = Short
+				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios .createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);;
+		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
+		AdmUsuarios usuario = usuarios.get(0);
+		
+		
+		UsuarioDTO response = new UsuarioDTO();
+		
+		List<UsuarioItem> usuarioItem = new ArrayList<>();
+
+		UsuarioItem usuarioResponse = new UsuarioItem();
+		
+		usuarioResponse.setNif(usuario.getNif());
+		usuarioResponse.setNombreApellidos(usuario.getDescripcion());
+		usuarioResponse.setIdLenguaje(usuario.getIdlenguaje());
+		usuarioResponse.setIdInstitucion(String.valueOf(usuario.getIdinstitucion()));
+		usuarioItem.add(usuarioResponse);
+		
+		
+		response.setUsuarioItem(usuarioItem );
+		
+		return response;
 	}
 
 }

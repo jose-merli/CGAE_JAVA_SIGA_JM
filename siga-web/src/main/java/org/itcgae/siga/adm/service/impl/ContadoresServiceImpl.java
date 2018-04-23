@@ -68,8 +68,7 @@ public class ContadoresServiceImpl implements IContadoresService{
 		Short idInstitucion = Short
 				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios .createCriteria().andNifEqualTo(dni);
-		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+		exampleUsuarios .createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 		comboItems = admContadorExtendsMapper.getMode(usuario.getIdlenguaje());
@@ -116,8 +115,7 @@ public class ContadoresServiceImpl implements IContadoresService{
 		Short idInstitucion = Short
 				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios .createCriteria().andNifEqualTo(dni);
-		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 		int response = 0;

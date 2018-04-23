@@ -18,6 +18,8 @@ public class UsuarioItem {
 	private String codigoExterno = null;
 	private String perfil = null;
 	private String idInstitucion  = null;
+	private String idLenguaje  = null;
+	private String descLenguaje  = null;
 	private String idUsuario = null;
 	private String[] perfiles = null;
 	
@@ -190,6 +192,45 @@ public class UsuarioItem {
 	public void setIdUsuario(String idUsuario) {
 		this.idUsuario = idUsuario;
 	}
+	
+	/**
+	 */
+	public UsuarioItem idLenguaje(String idLenguaje){
+		this.idLenguaje = idLenguaje;
+		return this;
+	}
+	
+	
+	@JsonProperty("idLenguaje")
+	public String getIdLenguaje() {
+		return idLenguaje;
+	}
+
+
+	public void setIdLenguaje(String idLenguaje) {
+		this.idLenguaje = idLenguaje;
+	}
+	
+
+	
+	
+	/**
+	 */
+	public UsuarioItem descLenguaje(String descLenguaje){
+		this.descLenguaje = descLenguaje;
+		return this;
+	}
+	
+	
+	@JsonProperty("descLenguaje")
+	public String getDescLenguaje() {
+		return descLenguaje;
+	}
+	
+	public void setDescLenguaje(String descLenguaje) {
+		this.descLenguaje = descLenguaje;
+	}
+	
 	
 	/**
 	 */

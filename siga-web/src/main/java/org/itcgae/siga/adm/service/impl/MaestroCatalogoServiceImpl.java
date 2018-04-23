@@ -90,8 +90,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		// Obtenemos el DNI del token
 		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni);
-		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(catalogoRequest.getIdInstitucion()));
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(catalogoRequest.getIdInstitucion()));
 		//Obtenemos el usuario para añadir el USUMODIFICACION
 		List<AdmUsuarios> usuarios = usuariosMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
@@ -134,8 +133,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		// Obtenemos el DNI del token
 		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni);
-		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(catalogoUpdate.getIdInstitucion()));
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(catalogoUpdate.getIdInstitucion()));
 		
 		//Obtenemos el usuario para añadir el USUMODIFICACION
 		List<AdmUsuarios> usuarios = usuariosMapper.selectByExample(exampleUsuarios);
@@ -226,8 +224,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 				// Obtenemos el DNI del token
 				String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni);
-				exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(catalogoCreate.getIdInstitucion()));
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(catalogoCreate.getIdInstitucion()));
 				
 				//Obtenemos el usuario para añadir el USUMODIFICACION
 				List<AdmUsuarios> usuarios = usuariosMapper.selectByExample(exampleUsuarios);
@@ -255,8 +252,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		// Obtenemos el DNI del token
 		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni);
-		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(Short.valueOf(catalogoRequest.getIdInstitucion()));
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(catalogoRequest.getIdInstitucion()));
 		//Obtenemos el usuario para añadir el USUMODIFICACION
 		List<AdmUsuarios> usuarios = usuariosMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);

@@ -161,8 +161,7 @@ public class ParametrosServiceImpl implements IParametrosService{
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		String dni = nifInstitucion.substring(0,9);
 		Short idInstitucion = Short.valueOf(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
-		exampleUsuarios .createCriteria().andNifEqualTo(dni);
-		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 		
@@ -240,8 +239,7 @@ public class ParametrosServiceImpl implements IParametrosService{
 		String dni = nifInstitucion.substring(0, 9);
 		Short idInstitucion = Short
 				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
-		exampleUsuarios.createCriteria().andNifEqualTo(dni);
-		exampleUsuarios.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 		
