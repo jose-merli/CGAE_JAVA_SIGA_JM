@@ -78,7 +78,7 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 					for(GenDiccionario diccionario: diccionarios){
 						diccionarioIndividual.put(diccionario.getIdrecurso(),diccionario.getDescripcion());
 					}
-					diccionarioItem.put(lang.getCodigoext().toLowerCase(),diccionarioIndividual);
+					diccionarioItem.put(lang.getIdlenguaje(),diccionarioIndividual);
 					diccionarioItemResponse.setDiccionario(diccionarioItem);
     				diccionarioResponse.add(diccionarioItemResponse);
     			}
