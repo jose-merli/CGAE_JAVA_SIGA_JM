@@ -2,7 +2,7 @@ package org.itcgae.siga.adm.service;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.adm.AdmContadorDTO;
+import org.itcgae.siga.DTOs.adm.AdmContadorUpdateDTO;
 import org.itcgae.siga.DTOs.adm.ContadorDTO;
 import org.itcgae.siga.DTOs.adm.ContadorRequestDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -16,7 +16,7 @@ public interface IContadoresService {
 	
 	public ContadorDTO getContadorSearch(int numPagina, ContadorRequestDTO contadorRequestDTO, HttpServletRequest request);
 	
-	public UpdateResponseDTO updateContador(AdmContadorDTO parametroUpdateDTO, HttpServletRequest request);
+	public UpdateResponseDTO updateContador(AdmContadorUpdateDTO contadorUpdateDTO, HttpServletRequest request);
 	
 	
 	
