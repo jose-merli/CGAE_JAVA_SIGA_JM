@@ -6,6 +6,7 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample.Criteria;
 import org.itcgae.siga.db.entities.AdmPerfilExample.Criterion;
+import org.itcgae.siga.db.entities.AdmPerfilRol;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 
@@ -295,4 +296,26 @@ public class AdmPerfilSqlProvider {
 		}
 		return sql.toString();
 	}
+	
+	
+	public String selectRolPerfilDistinctByExample(String idInstitucion,String idPerfil)
+	{
+		SQL sql = new SQL();
+
+		sql.SELECT("ROL.IDROL");
+		sql.SELECT("ROL.DESCRIPCION ");
+		sql.FROM("ADM_ROL ROL ");
+		sql.INNER_JOIN("ADM_PERFIL_ROL PERFIL ON PERFIL.IDROL = ROL.IDROL");
+
+
+		sql.WHERE("PERFIL.IDINSTITUCION = ('" + idInstitucion + "')");
+		sql.WHERE("PERFIL.IDPERFIL = ('" + idPerfil + "')");
+		
+		
+		return sql.toString();
+	}
+	
+	
+	
+	
 }
