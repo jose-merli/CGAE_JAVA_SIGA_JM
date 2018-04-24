@@ -5,8 +5,9 @@ import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
+import org.itcgae.siga.db.mappers.AdmUsuariosSqlProvider;
 
-public class AdmUsuariosSqlExtendsProvider {
+public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 
 	
 
