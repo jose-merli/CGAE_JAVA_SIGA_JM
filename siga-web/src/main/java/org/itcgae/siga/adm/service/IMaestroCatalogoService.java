@@ -7,12 +7,13 @@ import org.itcgae.siga.DTOs.adm.CatalogoMaestroDTO;
 import org.itcgae.siga.DTOs.adm.CatalogoRequestDTO;
 import org.itcgae.siga.DTOs.adm.CatalogoUpdateDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboCatalogoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface IMaestroCatalogoService {
 
 
-	public  ComboDTO getTabla();
+	public  ComboCatalogoDTO getTabla();
 
 	public  CatalogoMaestroDTO  getDatosCatalogo(CatalogoRequestDTO catalogoRequest,HttpServletRequest request);
 	

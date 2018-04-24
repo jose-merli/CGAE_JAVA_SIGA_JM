@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.adm.CatalogoMaestroDTO;
 import org.itcgae.siga.DTOs.adm.CatalogoRequestDTO;
 import org.itcgae.siga.DTOs.adm.CatalogoUpdateDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboCatalogoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.adm.service.IMaestroCatalogoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +30,9 @@ public class MaestroCatalogosController {
 	IMaestroCatalogoService maestroCatalogoService;
 	
    @RequestMapping(value = "/catmaestros/tabla", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getInstituciones() {
-    	ComboDTO response = maestroCatalogoService.getTabla();
-    	return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	ResponseEntity<ComboCatalogoDTO> getTabla() {
+	   ComboCatalogoDTO response = maestroCatalogoService.getTabla();
+    	return new ResponseEntity<ComboCatalogoDTO>(response, HttpStatus.OK);
 	}
    
    
