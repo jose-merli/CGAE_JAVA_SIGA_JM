@@ -14,6 +14,10 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.MenuItem;
+import org.itcgae.siga.DTOs.gen.PermisoDTO;
+import org.itcgae.siga.DTOs.gen.PermisoEntity;
+import org.itcgae.siga.DTOs.gen.PermisoItem;
+import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.commons.utils.Converter;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
@@ -25,6 +29,7 @@ import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.GenMenu;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.gen.services.IMenuService;
@@ -49,6 +54,10 @@ public class MenuServiceImpl implements IMenuService {
 	
 	@Autowired
 	AdmUsuariosMapper usuarioMapper;
+	
+	@Autowired
+	GenProcesosExtendsMapper permisosMapper;
+	
 
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
@@ -231,6 +240,86 @@ public class MenuServiceImpl implements IMenuService {
 		
 		response.setCombooItems(combos);
 		return response;
+	}
+
+
+	@Override
+	public PermisoDTO getPermisos(PermisoRequestItem permisoRequestItem,HttpServletRequest request) {
+		PermisoDTO permisoResponse = new PermisoDTO();
+		// Obtener idInstitucion del certificado y idUsuario del certificado
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String dni = nifInstitucion.substring(0, 9);
+		Short idInstitucion = Short
+				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
+		
+		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucion));
+		List<PermisoEntity> permisosEntity = this.permisosMapper.getProcesosPermisos(permisoRequestItem);
+		
+
+		
+		
+		if (null != permisosEntity && !permisosEntity.isEmpty()) {
+			List<PermisoItem> items = new ArrayList<PermisoItem>();
+			List<PermisoEntity> rootPermisos = permisosEntity.stream().filter(i -> Strings.isNullOrEmpty(i.getParent()) || i.getParent().equals(" "))
+					.collect(Collectors.toList());
+			//Componemos el árbol de permisos
+				for (PermisoEntity dbItem : rootPermisos) {
+					PermisoItem item = processPermisos(dbItem,permisosEntity); 
+					items.add(item);
+				}
+
+				permisoResponse.setPermisoItems(items);
+		}
+		
+		
+		
+		
+		return permisoResponse;
+	}
+
+
+	private PermisoItem processPermisos(PermisoEntity parent, List<PermisoEntity> childCandidatesList) {
+		//Realizamos la carga de la gestión de permisos de forma cíclica dependiende los IdParents
+	    ArrayList<PermisoEntity> childList = new ArrayList<PermisoEntity>();
+	    ArrayList<PermisoEntity> childListTwo = new ArrayList<PermisoEntity>();
+	    PermisoItem response = new PermisoItem();
+	    response.setLabel(parent.getLabel());
+	    response.setData(parent.getData());
+	    response.setDerechoacceso(parent.getDerechoacceso());
+
+	    //Recorremos sus hijos
+	    for (PermisoEntity childTransactions : childCandidatesList) {
+	        childListTwo.add(childTransactions);
+	        if (childTransactions.getParent() != null) {
+	            
+	            if (childTransactions.getParent().equalsIgnoreCase(parent.getData())){
+	            	//Vamos almacenando los hijos
+	            	PermisoItem responsechild = new PermisoItem();
+	            	responsechild.setLabel(childTransactions.getLabel());
+	            	responsechild.setData(childTransactions.getData());
+	            	responsechild.setDerechoacceso(childTransactions.getDerechoacceso());
+	            	response.getChildren().add(responsechild);
+	                childList.add(childTransactions);
+	                childListTwo.remove(childTransactions);
+	            }
+	        }
+	    }
+    	List<PermisoItem> responseChilds = new ArrayList<PermisoItem>();
+
+
+	    for (PermisoEntity child : childList) {
+	    	//Si tenemos hijos los procesamos de forma individual para ver si tienen más hijos
+	    	responseChilds.add(processPermisos(child, childListTwo));
+	    	
+	    }
+	    if (null != response.getChildren() && response.getChildren().size() >0) {
+	    	response.setChildren(responseChilds);
+		}else {
+			response.setChildren(null);
+		}
+	    
+	    return response;
+
 	}
 
 }

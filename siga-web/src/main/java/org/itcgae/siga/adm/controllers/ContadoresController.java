@@ -30,7 +30,7 @@ public class ContadoresController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/contadores/mode", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/contadores/mode", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getContadorMode(HttpServletRequest request) {
 		ComboDTO response = contadoresService.getContadorMode(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
