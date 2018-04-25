@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -85,7 +86,11 @@ public class DevConfigSecurity extends WebSecurityConfigurerAdapter {
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+		CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
+		corsConfiguration.addAllowedMethod(HttpMethod.DELETE);
+		corsConfiguration.addAllowedMethod(HttpMethod.PUT);
+		corsConfiguration.addAllowedMethod(HttpMethod.OPTIONS);
+		source.registerCorsConfiguration("/**", corsConfiguration);
 		return source;
 	}
 }
