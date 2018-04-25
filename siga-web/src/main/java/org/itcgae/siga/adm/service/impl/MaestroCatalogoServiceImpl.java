@@ -13,6 +13,8 @@ import org.itcgae.siga.DTOs.adm.CatalogoRequestDTO;
 import org.itcgae.siga.DTOs.adm.CatalogoUpdateDTO;
 import org.itcgae.siga.DTOs.adm.InstitucionDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.gen.ComboCatalogoDTO;
+import org.itcgae.siga.DTOs.gen.ComboCatalogoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -47,16 +49,16 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 	AdmUsuariosMapper usuariosMapper;
 
 	@Override
-	public ComboDTO getTabla() {
-		ComboDTO response = new ComboDTO();
+	public ComboCatalogoDTO getTabla() {
+		ComboCatalogoDTO response = new ComboCatalogoDTO();
 		//Cargamos la tabla maestra para ver qué catalogos queremos gestionar
 		GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
 		exampleTablasMaestras.setDistinct(true);
 		exampleTablasMaestras.setOrderByClause("ALIASTABLA ASC");
 		exampleTablasMaestras.createCriteria().andFlagborradologicoEqualTo(new Long(0));
 		List<GenTablasMaestras> tablasMaestras = tablasMaestrasMapper.selectByExample(exampleTablasMaestras);
-		List<ComboItem> combos = new ArrayList<ComboItem>();
-		ComboItem combo = new ComboItem();
+		List<ComboCatalogoItem> combos = new ArrayList<ComboCatalogoItem>();
+		ComboCatalogoItem combo = new ComboCatalogoItem();
 		combo.setValue("");
 		combo.setLabel("");
 		combos.add(combo);
@@ -64,15 +66,16 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		if (null != tablasMaestras && tablasMaestras.size() > 0) {
 			for (Iterator<GenTablasMaestras> iterator = tablasMaestras.iterator(); iterator.hasNext();) {
 				GenTablasMaestras tablaMaestra = (GenTablasMaestras) iterator.next();
-				combo = new ComboItem();
+				combo = new ComboCatalogoItem();
 				combo.setValue(tablaMaestra.getIdtablamaestra());
 				combo.setLabel(tablaMaestra.getAliastabla());
+				combo.setLocal(tablaMaestra.getLocal());
 				combos.add(combo);
 			}
 
 		}
 		
-		response.setCombooItems(combos);
+		response.setComboCatalogoItems(combos);
 		return response;
 	}
 

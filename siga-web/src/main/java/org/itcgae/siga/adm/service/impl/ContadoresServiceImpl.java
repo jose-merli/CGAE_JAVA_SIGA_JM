@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.AdmContadorDTO;
+import org.itcgae.siga.DTOs.adm.AdmContadorUpdateDTO;
 import org.itcgae.siga.DTOs.adm.ContadorDTO;
 import org.itcgae.siga.DTOs.adm.ContadorRequestDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -77,7 +78,7 @@ public class ContadoresServiceImpl implements IContadoresService{
 			// añade elemento vacio al princpio para el dropdown de parte front
 			ComboItem comboItem = new ComboItem();
 			comboItem.setLabel("");
-			comboItem.setValue("");
+			comboItem.setValue("-1");
 			comboItems.add(0, comboItem); 
 			combo.setCombooItems(comboItems);
 		}
@@ -105,7 +106,7 @@ public class ContadoresServiceImpl implements IContadoresService{
 	}
 
 	@Override
-	public UpdateResponseDTO updateContador(AdmContadorDTO contadorUpdateDTO, HttpServletRequest request) {
+	public UpdateResponseDTO updateContador(AdmContadorUpdateDTO contadorUpdateDTO, HttpServletRequest request) {
 
 		UpdateResponseDTO updateResponseDTO =  new 	UpdateResponseDTO(); 
 		
@@ -148,7 +149,7 @@ public class ContadoresServiceImpl implements IContadoresService{
 		record.setUsucreacion(contadorUpdateDTO.getUsucreacion());
 
 		//Llamamos al método que actualizará el registro
-		response = this.admContadorExtendsMapper.updateByPrimaryKeySelective(record);
+		response = this.admContadorExtendsMapper.updateByPrimaryKey(record);
 		
 		if(response == 1)
 			updateResponseDTO.setStatus(SigaConstants.OK);

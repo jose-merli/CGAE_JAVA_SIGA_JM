@@ -69,4 +69,7 @@ public interface AdmUsuariosExtendsMapper extends AdmUsuariosMapper{
 	
 	@UpdateProvider(type = AdmUsuariosSqlExtendsProvider.class, method = "disableUser")
 	int disableUser(UsuarioDeleteDTO usuarioDeleteDTO);
+	
+	@UpdateProvider(type = AdmUsuariosSqlExtendsProvider.class, method = "deleteUserGroup")
+	int deleteUserGroup(UsuarioDeleteDTO usuarioDeleteDTO);
 }

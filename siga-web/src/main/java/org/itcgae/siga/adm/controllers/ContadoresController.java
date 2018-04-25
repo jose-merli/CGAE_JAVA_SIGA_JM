@@ -3,6 +3,7 @@ package org.itcgae.siga.adm.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.AdmContadorDTO;
+import org.itcgae.siga.DTOs.adm.AdmContadorUpdateDTO;
 import org.itcgae.siga.DTOs.adm.ContadorDTO;
 import org.itcgae.siga.DTOs.adm.ContadorRequestDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -30,7 +31,7 @@ public class ContadoresController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/contadores/mode", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/contadores/mode", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getContadorMode(HttpServletRequest request) {
 		ComboDTO response = contadoresService.getContadorMode(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
@@ -45,7 +46,7 @@ public class ContadoresController {
 	
 	
 	@RequestMapping(value = "/contadores/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO>updateParameter(@RequestBody AdmContadorDTO contadorUpdateDTO, HttpServletRequest request) { 
+	ResponseEntity<UpdateResponseDTO>updateParameter(@RequestBody AdmContadorUpdateDTO contadorUpdateDTO, HttpServletRequest request) { 
 		UpdateResponseDTO response = contadoresService.updateContador(contadorUpdateDTO, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}

@@ -5,8 +5,9 @@ import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
+import org.itcgae.siga.db.mappers.AdmUsuariosSqlProvider;
 
-public class AdmUsuariosSqlExtendsProvider {
+public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 
 	
 
@@ -206,6 +207,21 @@ public class AdmUsuariosSqlExtendsProvider {
 		}
 		whereIdUsuarios = whereIdUsuarios.concat(usuarioDeleteDTO.getIdUsuario().get(size-1));
 		sql.WHERE("IDUSUARIO" + " IN (" + whereIdUsuarios + " )");
+		sql.WHERE("IDINSTITUCION = '" + usuarioDeleteDTO.getIdInstitucion() + "'");
+		
+		return sql.toString();
+	}
+	
+	public String deleteUserGroup(UsuarioDeleteDTO usuarioDeleteDTO){
+		SQL sql = new SQL();
+		
+		sql.UPDATE("ADM_PERFIL");
+		sql.SET("FECHA_BAJA = SYSDATE");
+		sql.SET("FECHAMODIFICACION = SYSDATE");
+		sql.SET("USUMODIFICACION = '" + usuarioDeleteDTO.getIdUsuario().get(0) + "'");
+
+		
+		sql.WHERE("IDPERFIL = '" +  usuarioDeleteDTO.getGrupo() +  "'");
 		sql.WHERE("IDINSTITUCION = '" + usuarioDeleteDTO.getIdInstitucion() + "'");
 		
 		return sql.toString();

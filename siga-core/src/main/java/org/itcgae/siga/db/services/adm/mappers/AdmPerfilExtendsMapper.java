@@ -9,6 +9,8 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
+import org.itcgae.siga.db.entities.AdmPerfilRol;
+import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.db.mappers.AdmPerfilMapper;
 import org.itcgae.siga.db.services.adm.providers.AdmPerfilSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -39,12 +41,23 @@ public interface AdmPerfilExtendsMapper extends AdmPerfilMapper {
 	@SelectProvider(type = AdmPerfilSqlProvider.class, method = "selectComboPerfilDistinctByExample")
 	@Results({
 		@Result(column = "IDPERFIL", property = "idperfil", jdbcType = JdbcType.VARCHAR, id = true),
-		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
 	})
 	List<AdmPerfil> selectComboPerfilDistinctByExample(AdmPerfilExample example);
 	
 	
 	
-	
+	/***
+	 * Map column of data base to java object (AdmPerfil). This is possible due to this function is associate with the result of a query SQL (selectRolPerfilDistinctByExample.class).
+	 * @param example The filter used to build the  SQL query .
+	 * @return List of objects mapped from data base to java object.
+	 */
+	@SelectProvider(type = AdmPerfilSqlProvider.class, method = "selectRolPerfilDistinctByExample")
+	@Results({
+		@Result(column = "IDROL", property = "idrol", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR)
+	})
+	List<AdmRol> selectRolPerfilDistinctByExample(String idInstitucion,String idPerfil);
 	
 }

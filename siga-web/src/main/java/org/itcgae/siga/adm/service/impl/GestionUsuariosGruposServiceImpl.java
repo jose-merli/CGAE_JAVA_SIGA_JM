@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +14,8 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioGrupoItem;
+import org.itcgae.siga.DTOs.adm.UsuarioGruposDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioItem;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
@@ -29,7 +30,6 @@ import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.db.entities.AdmRolExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
-import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilKey;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.mappers.AdmRolMapper;
@@ -343,6 +343,191 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 			deleteResponseDTO.setStatus("ERROR");
 
 		return deleteResponseDTO;
+	}
+
+	@Override
+	public UsuarioGruposDTO getUsersGroupsSearch(int numPagina, HttpServletRequest request) {
+		UsuarioGruposDTO response = new UsuarioGruposDTO();
+		AdmPerfilExample example = new AdmPerfilExample();
+		List<AdmPerfil> profiles = new ArrayList<AdmPerfil>();
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
+		example.setOrderByClause("DESCRIPCION ASC");
+		example.setDistinct(true);
+		example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andFechaBajaIsNull();
+		profiles = admPerfilExtendsMapper.selectComboPerfilDistinctByExample(example);
+
+		
+		
+		if (profiles != null && profiles.size() > 0) {
+			List<UsuarioGrupoItem> usuarioGrupoItems = new ArrayList<>();
+			
+			for (AdmPerfil admPerfil : profiles) {
+				UsuarioGrupoItem usuarioGrupoItem = new UsuarioGrupoItem();
+				usuarioGrupoItem.setDescripcionGrupo(admPerfil.getDescripcion());
+				usuarioGrupoItem.setIdGrupo(admPerfil.getIdperfil());
+				List<String> rolesasignados = new ArrayList<String>(); 
+				
+				List<AdmRol> perfilesRol = admPerfilExtendsMapper.selectRolPerfilDistinctByExample(institucion,admPerfil.getIdperfil());
+				
+				if (null != perfilesRol && perfilesRol.size()>0) {
+					ComboItem[] rolesAsignadosItem = new ComboItem[perfilesRol.size()];
+					int i = 0;
+					for (AdmRol admRol : perfilesRol) {
+						rolesasignados.add(admRol.getIdrol());
+						rolesAsignadosItem[i] = new ComboItem();
+						rolesAsignadosItem[i].setLabel(admRol.getDescripcion());
+						rolesAsignadosItem[i].setValue(admRol.getIdrol());
+						i++;
+					}
+
+					usuarioGrupoItem.setRolesAsignados(rolesAsignadosItem);
+				}
+				
+
+				
+				AdmRolExample exampleRol = new AdmRolExample();
+
+				if (null != rolesasignados && rolesasignados.size()>0) {
+					exampleRol.createCriteria().andIdrolNotIn(rolesasignados);
+				}
+
+				List<AdmRol> rolNoAsignados = this.admRolMapper.selectByExample(exampleRol );
+
+				if (null != rolNoAsignados && rolNoAsignados.size()>0) {
+					ComboItem[] rolesNoAsignadosItem = new ComboItem[rolNoAsignados.size()];
+					int i = 0;
+					for (AdmRol admRolNoAsignado : rolNoAsignados) {
+						rolesasignados.add(admRolNoAsignado.getIdrol());
+						rolesNoAsignadosItem[i] = new ComboItem();
+						rolesNoAsignadosItem[i].setLabel(admRolNoAsignado.getDescripcion());
+						rolesNoAsignadosItem[i].setValue(admRolNoAsignado.getIdrol());
+						i++;
+					}
+
+					usuarioGrupoItem.setRolesNoAsignados(rolesNoAsignadosItem);
+				}
+				
+				usuarioGrupoItems.add(usuarioGrupoItem);
+			}
+			response.setUsuarioGrupoItem(usuarioGrupoItems);	
+		}
+
+	
+		
+		return response;
+	}
+
+	@Override
+	public DeleteResponseDTO deleteUsersGroup(UsuarioDeleteDTO usuarioDeleteDTO, HttpServletRequest request) {
+
+		
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String dni = nifInstitucion.substring(0,9);
+		usuarioDeleteDTO.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+		
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(usuarioDeleteDTO.getIdInstitucion()));
+		
+
+		//Buscamos el perfil para ver si ya existe. En caso de que no exista
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		AdmUsuarios usuario = usuarios.get(0);
+		List<String> idUsuario = new ArrayList<String>();
+		idUsuario.add(String.valueOf(usuario.getIdusuario()));
+		usuarioDeleteDTO.setIdUsuario(idUsuario);
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		int response = 0;
+
+		if (!usuarioDeleteDTO.getIdUsuario().equals(null) && usuarioDeleteDTO.getIdUsuario().size() > 0
+				&& !usuarioDeleteDTO.getIdInstitucion().equalsIgnoreCase("") && !usuarioDeleteDTO.getIdInstitucion().equals(null)) {
+
+				response = admUsuariosExtendsMapper.deleteUserGroup(usuarioDeleteDTO);
+
+		} else
+			response = 0;
+
+		if (response > 0)
+			deleteResponseDTO.setStatus("OK");
+		else
+			deleteResponseDTO.setStatus("ERROR");
+
+		return deleteResponseDTO;
+	
+	}
+
+	@Override
+	public UsuarioGruposDTO getUsersGroupsHistoric(int numPagina, HttpServletRequest request) {
+		UsuarioGruposDTO response = new UsuarioGruposDTO();
+		AdmPerfilExample example = new AdmPerfilExample();
+		List<AdmPerfil> profiles = new ArrayList<AdmPerfil>();
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
+		example.setOrderByClause("DESCRIPCION ASC");
+		example.setDistinct(true);
+		example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion));
+		profiles = admPerfilExtendsMapper.selectComboPerfilDistinctByExample(example);
+
+		
+		
+		if (profiles != null && profiles.size() > 0) {
+			List<UsuarioGrupoItem> usuarioGrupoItems = new ArrayList<>();
+			
+			for (AdmPerfil admPerfil : profiles) {
+				UsuarioGrupoItem usuarioGrupoItem = new UsuarioGrupoItem();
+				usuarioGrupoItem.setDescripcionGrupo(admPerfil.getDescripcion());
+				usuarioGrupoItem.setIdGrupo(admPerfil.getIdperfil());
+				usuarioGrupoItem.setFechaBaja(admPerfil.getFechaBaja());
+				List<String> rolesasignados = new ArrayList<String>(); 
+				
+				List<AdmRol> perfilesRol = admPerfilExtendsMapper.selectRolPerfilDistinctByExample(institucion,admPerfil.getIdperfil());
+				
+				if (null != perfilesRol && perfilesRol.size()>0) {
+					ComboItem[] rolesAsignadosItem = new ComboItem[perfilesRol.size()];
+					int i = 0;
+					for (AdmRol admRol : perfilesRol) {
+						rolesasignados.add(admRol.getIdrol());
+						rolesAsignadosItem[i] = new ComboItem();
+						rolesAsignadosItem[i].setLabel(admRol.getDescripcion());
+						rolesAsignadosItem[i].setValue(admRol.getIdrol());
+						i++;
+					}
+
+					usuarioGrupoItem.setRolesAsignados(rolesAsignadosItem);
+				}
+				
+
+				
+				AdmRolExample exampleRol = new AdmRolExample();
+
+				if (null != rolesasignados && rolesasignados.size()>0) {
+					exampleRol.createCriteria().andIdrolNotIn(rolesasignados);
+				}
+
+				List<AdmRol> rolNoAsignados = this.admRolMapper.selectByExample(exampleRol );
+
+				if (null != rolNoAsignados && rolNoAsignados.size()>0) {
+					ComboItem[] rolesNoAsignadosItem = new ComboItem[rolNoAsignados.size()];
+					int i = 0;
+					for (AdmRol admRolNoAsignado : rolNoAsignados) {
+						rolesasignados.add(admRolNoAsignado.getIdrol());
+						rolesNoAsignadosItem[i] = new ComboItem();
+						rolesNoAsignadosItem[i].setLabel(admRolNoAsignado.getDescripcion());
+						rolesNoAsignadosItem[i].setValue(admRolNoAsignado.getIdrol());
+						i++;
+					}
+
+					usuarioGrupoItem.setRolesNoAsignados(rolesNoAsignadosItem);
+				}
+				
+				usuarioGrupoItems.add(usuarioGrupoItem);
+			}
+			response.setUsuarioGrupoItem(usuarioGrupoItems);	
+		}
+
+	
+		
+		return response;
 	}
 
 }

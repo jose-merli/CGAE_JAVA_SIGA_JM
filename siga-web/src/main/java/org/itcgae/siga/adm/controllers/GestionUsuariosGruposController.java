@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioGruposDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -74,6 +75,26 @@ public class GestionUsuariosGruposController {
 	ResponseEntity<DeleteResponseDTO> updateUsers(@RequestBody UsuarioDeleteDTO usuarioDeleteDTO, HttpServletRequest request) {
 		DeleteResponseDTO response = gestionUsuariosGruposService.deleteUsers(usuarioDeleteDTO, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	
+	
+	@RequestMapping(value = "/usuariosgrupos/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UsuarioGruposDTO> getUsersGroupsSearch(@RequestParam("numPagina") int numPagina , HttpServletRequest request) { 
+		UsuarioGruposDTO response = gestionUsuariosGruposService.getUsersGroupsSearch(numPagina, request);
+		return new ResponseEntity<UsuarioGruposDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/usuariosgrupos/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> usersGroupsUsers(@RequestBody UsuarioDeleteDTO usuarioDeleteDTO, HttpServletRequest request) {
+		DeleteResponseDTO response = gestionUsuariosGruposService.deleteUsersGroup(usuarioDeleteDTO, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/usuariosgrupos/historico", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UsuarioGruposDTO> getUsersGroupsHistoric(@RequestParam("numPagina") int numPagina , HttpServletRequest request) { 
+		UsuarioGruposDTO response = gestionUsuariosGruposService.getUsersGroupsHistoric(numPagina, request);
+		return new ResponseEntity<UsuarioGruposDTO>(response, HttpStatus.OK);
 	}
 	
 }

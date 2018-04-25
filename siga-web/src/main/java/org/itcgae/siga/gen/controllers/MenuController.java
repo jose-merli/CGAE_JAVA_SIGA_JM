@@ -3,13 +3,17 @@ package org.itcgae.siga.gen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.AdmContadorDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
+import org.itcgae.siga.DTOs.gen.PermisoDTO;
+import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.gen.services.IMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,5 +49,12 @@ public class MenuController {
 //    	List<ComboDTO> lista = menuService.getComboParametros(SigaConstants.COMBO_PERFILES,institucion);
 //    	return lista;
 //	}
-	
+
+    
+    @RequestMapping(value = "/permisos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PermisoDTO> getPermisos(@RequestBody PermisoRequestItem permisoRequestItem,HttpServletRequest request) {
+    	PermisoDTO response = menuService.getPermisos(permisoRequestItem,request);
+    	return new ResponseEntity<PermisoDTO>(response, HttpStatus.OK);
+	}
+    
 }

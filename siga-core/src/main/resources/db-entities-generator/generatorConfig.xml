@@ -5,17 +5,17 @@
 	  <context id="DB2Tables" targetRuntime="MyBatis3">
 	
 		<jdbcConnection 
-			connectionURL="jdbc:oracle:thin:@//192.168.18.6:1546/SIGADES" 
+			connectionURL="jdbc:oracle:thin:@//vmcgaeap004.cloud.es.deloitte.com:1521/cgae" 
 			driverClass="oracle.jdbc.OracleDriver"
-			userId="uscgae_desa"
-			password="desarrollo" />
+			userId="uscgae"
+			password="uscgae" />
 			
 			
 		<javaModelGenerator targetPackage="org.itcgae.siga.db.entities" targetProject="siga-core" />
 		<!-- <sqlMapGenerator targetPackage="com.cgae.db.mappers" targetProject="demo" /> -->
 		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER" implementationPackage="org.itcgae.siga.db.services" />
 		
-		<table schema="USCGAE_DESA" tableName="GEN_PARAMETROS">
+		<table schema="USCGAE" tableName="ADM_PERFIL">
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
 		</table>  
 		
