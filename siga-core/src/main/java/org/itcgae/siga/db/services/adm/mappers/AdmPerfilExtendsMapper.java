@@ -41,14 +41,15 @@ public interface AdmPerfilExtendsMapper extends AdmPerfilMapper {
 	@SelectProvider(type = AdmPerfilSqlProvider.class, method = "selectComboPerfilDistinctByExample")
 	@Results({
 		@Result(column = "IDPERFIL", property = "idperfil", jdbcType = JdbcType.VARCHAR, id = true),
-		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
 	})
 	List<AdmPerfil> selectComboPerfilDistinctByExample(AdmPerfilExample example);
 	
 	
 	
 	/***
-	 * Map column of data base to java object (AdmPerfil). This is possible due to this function is associate with the result of a query SQL (selectComboPerfilDistinctByExample.class).
+	 * Map column of data base to java object (AdmPerfil). This is possible due to this function is associate with the result of a query SQL (selectRolPerfilDistinctByExample.class).
 	 * @param example The filter used to build the  SQL query .
 	 * @return List of objects mapped from data base to java object.
 	 */

@@ -28,4 +28,8 @@ public interface IGestionUsuariosGruposService {
 	public DeleteResponseDTO deleteUsers(UsuarioDeleteDTO usuarioDeleteDTO, HttpServletRequest request);
 
 	public UsuarioGruposDTO getUsersGroupsSearch(int numPagina, HttpServletRequest request);
+
+	public DeleteResponseDTO deleteUsersGroup(UsuarioDeleteDTO usuarioDeleteDTO, HttpServletRequest request);
+
+	public UsuarioGruposDTO getUsersGroupsHistoric(int numPagina, HttpServletRequest request);
 }

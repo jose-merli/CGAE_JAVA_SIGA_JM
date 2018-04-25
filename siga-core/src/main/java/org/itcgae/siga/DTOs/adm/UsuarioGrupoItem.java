@@ -14,6 +14,8 @@ public class UsuarioGrupoItem {
 
 	private String idGrupo = null;
 	private String descripcionGrupo  = null;
+	@JsonFormat(pattern = "dd-MM-yyyy")
+	private Date fechaBaja = null;
 	private ComboItem[] rolesAsignados = null;
 	private ComboItem[] rolesNoAsignados = null;
 	
@@ -92,6 +94,24 @@ public class UsuarioGrupoItem {
 	}
 	
 	
+	/**
+	 */
+	public UsuarioGrupoItem fechaBaja(Date fechaBaja){
+		this.fechaBaja = fechaBaja;
+		return this;
+	}
+	
+	
+	@JsonProperty("fechaBaja")
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+	
+	
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+	
 	
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -106,6 +126,7 @@ public class UsuarioGrupoItem {
 	    return Objects.equals(this.idGrupo, usuarioItem.idGrupo) &&
 	        Objects.equals(this.descripcionGrupo, usuarioItem.descripcionGrupo) &&
 	        Objects.equals(this.rolesAsignados, usuarioItem.rolesAsignados) &&
+	        Objects.equals(this.fechaBaja, usuarioItem.fechaBaja) &&
 	        Objects.equals(this.rolesNoAsignados, usuarioItem.rolesNoAsignados);
 	    
 	}
@@ -113,7 +134,7 @@ public class UsuarioGrupoItem {
 
 	@Override
 	public int hashCode() {
-		 return Objects.hash(idGrupo, descripcionGrupo, rolesAsignados, rolesNoAsignados);
+		 return Objects.hash(idGrupo, descripcionGrupo, rolesAsignados,fechaBaja, rolesNoAsignados);
 	}
 	
 	
@@ -125,6 +146,7 @@ public class UsuarioGrupoItem {
 	    sb.append("    idGrupo: ").append(toIndentedString(idGrupo)).append("\n");
 	    sb.append("    descripcionGrupo: ").append(toIndentedString(descripcionGrupo)).append("\n");
 	    sb.append("    rolesAsignados: ").append(toIndentedString(rolesAsignados)).append("\n");
+	    sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
 	    sb.append("    rolesNoAsignados: ").append(toIndentedString(rolesNoAsignados)).append("\n");
 
 	    sb.append("}");

@@ -85,4 +85,16 @@ public class GestionUsuariosGruposController {
 		return new ResponseEntity<UsuarioGruposDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/usuariosgrupos/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO> usersGroupsUsers(@RequestBody UsuarioDeleteDTO usuarioDeleteDTO, HttpServletRequest request) {
+		DeleteResponseDTO response = gestionUsuariosGruposService.deleteUsersGroup(usuarioDeleteDTO, request);
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/usuariosgrupos/historico", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UsuarioGruposDTO> getUsersGroupsHistoric(@RequestParam("numPagina") int numPagina , HttpServletRequest request) { 
+		UsuarioGruposDTO response = gestionUsuariosGruposService.getUsersGroupsHistoric(numPagina, request);
+		return new ResponseEntity<UsuarioGruposDTO>(response, HttpStatus.OK);
+	}
+	
 }

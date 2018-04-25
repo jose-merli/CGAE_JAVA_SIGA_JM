@@ -212,4 +212,19 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 		return sql.toString();
 	}
 	
+	public String deleteUserGroup(UsuarioDeleteDTO usuarioDeleteDTO){
+		SQL sql = new SQL();
+		
+		sql.UPDATE("ADM_PERFIL");
+		sql.SET("FECHA_BAJA = SYSDATE");
+		sql.SET("FECHAMODIFICACION = SYSDATE");
+		sql.SET("USUMODIFICACION = '" + usuarioDeleteDTO.getIdUsuario().get(0) + "'");
+
+		
+		sql.WHERE("IDPERFIL = '" +  usuarioDeleteDTO.getGrupo() +  "'");
+		sql.WHERE("IDINSTITUCION = '" + usuarioDeleteDTO.getIdInstitucion() + "'");
+		
+		return sql.toString();
+	}
+	
 }
