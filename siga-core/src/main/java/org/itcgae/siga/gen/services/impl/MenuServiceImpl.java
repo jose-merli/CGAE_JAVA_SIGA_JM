@@ -260,7 +260,7 @@ public class MenuServiceImpl implements IMenuService {
 		
 		if (null != permisosEntity && !permisosEntity.isEmpty()) {
 			List<PermisoItem> items = new ArrayList<PermisoItem>();
-			List<PermisoEntity> rootPermisos = permisosEntity.stream().filter(i -> Strings.isNullOrEmpty(i.getParent()) || i.getParent().equals(" "))
+			List<PermisoEntity> rootPermisos = permisosEntity.stream().filter(i -> Strings.isNullOrEmpty(i.getParent()) || i.getParent().equals("0"))
 					.collect(Collectors.toList());
 			//Componemos el árbol de permisos
 				for (PermisoEntity dbItem : rootPermisos) {

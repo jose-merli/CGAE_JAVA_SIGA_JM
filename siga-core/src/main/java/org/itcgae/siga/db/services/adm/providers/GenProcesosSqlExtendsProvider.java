@@ -16,7 +16,7 @@ public class GenProcesosSqlExtendsProvider extends AdmContadorSqlProvider{
 		SQL sql = new SQL();
 
 		sql.SELECT_DISTINCT("PROC.IDPROCESO AS ID");
-		sql.SELECT("PROC.IDPARENT AS PARENT");
+		sql.SELECT("NVL(PROC.IDPARENT,'ARBOL') AS PARENT");
 		sql.SELECT("PROC.DESCRIPCION AS TEXT");
 		sql.SELECT("ACCESO.DERECHOACCESO AS DERECHOACCESO");
 
