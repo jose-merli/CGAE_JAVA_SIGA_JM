@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioGrupoEditDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioGruposDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
@@ -37,8 +38,8 @@ public class GestionUsuariosGruposController {
 	}
 	 
 	@RequestMapping(value = "/usuarios/perfil", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getUsersProfile() {
-		ComboDTO response = gestionUsuariosGruposService.getUsersProfile();
+	ResponseEntity<ComboDTO> getUsersProfile(HttpServletRequest request) {
+		ComboDTO response = gestionUsuariosGruposService.getUsersProfile(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
@@ -97,4 +98,17 @@ public class GestionUsuariosGruposController {
 		return new ResponseEntity<UsuarioGruposDTO>(response, HttpStatus.OK);
 	}
 	
+	
+	@RequestMapping(value = "/usuariosgrupos/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateGroupUsers(@RequestBody UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = gestionUsuariosGruposService.updateGroupUsers(usuarioUpdateDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	
+	@RequestMapping(value = "/usuariosgrupos/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> createGroupUsers(@RequestBody UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = gestionUsuariosGruposService.updateGroupUsers(usuarioUpdateDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
 }

@@ -14,6 +14,7 @@ public class SigaUserDetailsService implements UserDetailsService  {
 	@Override
 	//TODO: Añadir llamada a bbdd para recuperar el usuario
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		System.out.println("Usuario :" + username);
 		return new User(username, "password", emptyList());
 	}
 	

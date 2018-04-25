@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.adm.RolPerfilDTO;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmPerfilRol;
@@ -55,9 +56,10 @@ public interface AdmPerfilExtendsMapper extends AdmPerfilMapper {
 	 */
 	@SelectProvider(type = AdmPerfilSqlProvider.class, method = "selectRolPerfilDistinctByExample")
 	@Results({
-		@Result(column = "IDROL", property = "idrol", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDROL", property = "idRol", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "GRUPOPORDEFECTO", property = "grupopordefecto", jdbcType = JdbcType.VARCHAR)
 	})
-	List<AdmRol> selectRolPerfilDistinctByExample(String idInstitucion,String idPerfil);
+	List<RolPerfilDTO> selectRolPerfilDistinctByExample(String idInstitucion,String idPerfil);
 	
 }
