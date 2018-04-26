@@ -688,7 +688,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				
 				
 				if (null != usuarioUpdateDTO.getRolesAsignados() && usuarioUpdateDTO.getRolesAsignados().length>0) {
-					AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
+					
 					for (ComboCatalogoItem rolesAsignados : usuarioUpdateDTO.getRolesAsignados()) {
 						/*if (null != rolesAsignados.getLocal() && rolesAsignados.getLocal().equals("S")) {
 							examplePerfilRol = new AdmPerfilRolExample();
@@ -745,8 +745,42 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 	@Override
 	public UpdateResponseDTO updateGrupoDefecto(UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
+		String dni = nifInstitucion.substring(0,9);
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
+		
+
+		//Buscamos el perfil para ver si ya existe. En caso de que no exista
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		AdmUsuarios usuario = usuarios.get(0);
+		
+		AdmPerfilRolExample example = new AdmPerfilRolExample();
+		example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).
+		andIdrolEqualTo(usuarioUpdateDTO.getRolesAsignados()[0].getValue()).andGrupopordefectoEqualTo("S");
+
+		List<AdmPerfilRol> perfilesRol = this.admPerfilRolMapper.selectByExample(example );
+		if (null != perfilesRol && perfilesRol.size()>0) {
+			for (AdmPerfilRol admPerfilRol : perfilesRol) {
+				admPerfilRol.setGrupopordefecto("N");
+				this.admPerfilRolMapper.updateByPrimaryKeySelective(admPerfilRol);
+			}
+		}
+		AdmPerfilRol record = new AdmPerfilRol();
+		record.setFechamodificacion(new Date());
+		record.setGrupopordefecto("S");
+		record.setIdperfil(usuarioUpdateDTO.getIdGrupo());
+		record.setIdrol(usuarioUpdateDTO.getRolesAsignados()[0].getValue());
+		record.setIdinstitucion(Short.valueOf(institucion));
+		record.setUsumodificacion(usuario.getIdusuario());
+		this.admPerfilRolMapper.updateByPrimaryKeySelective(record );
+		
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		updateResponseDTO.setStatus(SigaConstants.KO);
+		
+		return updateResponseDTO;
 	}
 
 }
