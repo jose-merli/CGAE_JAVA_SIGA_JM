@@ -37,4 +37,6 @@ public interface IGestionUsuariosGruposService {
 	public UpdateResponseDTO updateGroupUsers(UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request);
 	
 	public UpdateResponseDTO createGroupUsers(UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request);
+
+	public UpdateResponseDTO updateGrupoDefecto(UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request);
 }

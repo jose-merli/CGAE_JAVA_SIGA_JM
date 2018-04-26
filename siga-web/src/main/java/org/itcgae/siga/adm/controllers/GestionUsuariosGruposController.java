@@ -111,4 +111,10 @@ public class GestionUsuariosGruposController {
 		UpdateResponseDTO response = gestionUsuariosGruposService.updateGroupUsers(usuarioUpdateDTO, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
+		
+	@RequestMapping(value = "/usuariosgrupos/updateGrupoDefecto", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateGrupoDefecto(@RequestBody UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = gestionUsuariosGruposService.updateGrupoDefecto(usuarioUpdateDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
 }

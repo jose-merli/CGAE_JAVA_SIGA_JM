@@ -17,6 +17,7 @@ public class UsuarioGrupoItem {
 	private String descripcionRol  = null;
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaBaja = null;
+	private ComboItem[] asignarRolDefecto = null;
 	private ComboItem[] rolesAsignados = null;
 	private ComboItem[] rolesNoAsignados = null;
 	
@@ -56,6 +57,26 @@ public class UsuarioGrupoItem {
 	public void setDescripcionGrupo(String descripcionGrupo) {
 		this.descripcionGrupo = descripcionGrupo;
 	}
+	
+	
+	/**
+	 */
+	public UsuarioGrupoItem asignarRolDefecto(ComboItem[] asignarRolDefecto){
+		this.asignarRolDefecto = asignarRolDefecto;
+		return this;
+	}
+	
+	
+	@JsonProperty("asignarRolDefecto")
+	public ComboItem[] getAsignarRolDefecto() {
+		return asignarRolDefecto;
+	}
+	
+	
+	public void setAsignarRolDefecto(ComboItem[] asignarRolDefecto) {
+		this.asignarRolDefecto = asignarRolDefecto;
+	}
+	
 	
 	
 	/**
@@ -147,6 +168,7 @@ public class UsuarioGrupoItem {
 	        Objects.equals(this.descripcionGrupo, usuarioItem.descripcionGrupo) &&
 	        Objects.equals(this.descripcionRol, usuarioItem.descripcionRol) &&
 	        Objects.equals(this.rolesAsignados, usuarioItem.rolesAsignados) &&
+	        Objects.equals(this.asignarRolDefecto, usuarioItem.asignarRolDefecto) &&
 	        Objects.equals(this.fechaBaja, usuarioItem.fechaBaja) &&
 	        Objects.equals(this.rolesNoAsignados, usuarioItem.rolesNoAsignados);
 	    
@@ -155,7 +177,7 @@ public class UsuarioGrupoItem {
 
 	@Override
 	public int hashCode() {
-		 return Objects.hash(idGrupo, descripcionGrupo, rolesAsignados,fechaBaja, rolesNoAsignados,descripcionRol);
+		 return Objects.hash(idGrupo, descripcionGrupo, rolesAsignados,fechaBaja, rolesNoAsignados,descripcionRol,asignarRolDefecto);
 	}
 	
 	
@@ -170,6 +192,8 @@ public class UsuarioGrupoItem {
 	    sb.append("    rolesAsignados: ").append(toIndentedString(rolesAsignados)).append("\n");
 	    sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
 	    sb.append("    rolesNoAsignados: ").append(toIndentedString(rolesNoAsignados)).append("\n");
+	    sb.append("    asignarRolDefecto: ").append(toIndentedString(asignarRolDefecto)).append("\n");
+	    
 
 	    sb.append("}");
 	    return sb.toString();

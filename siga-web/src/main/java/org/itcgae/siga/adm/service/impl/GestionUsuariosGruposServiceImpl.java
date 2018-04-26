@@ -389,11 +389,17 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				
 				if (null != perfilesRol && perfilesRol.size()>0) {
 					ComboItem[] rolesAsignadosItem = new ComboItem[perfilesRol.size()];
+					List<ComboItem> rolesPorAsignar = new ArrayList<ComboItem>();
 					int i = 0;
 					for (RolPerfilDTO admRol : perfilesRol) {
 						if (admRol.getGrupopordefecto()!= null && admRol.getGrupopordefecto().equals("S")) {
 							usuarioGrupoItem.setDescripcionRol(usuarioGrupoItem.getDescripcionRol().concat(admRol.getDescripcion().concat(", ")));
 							
+						}else {
+							ComboItem rolPorAsignar = new ComboItem();
+							rolPorAsignar.setValue(admRol.getIdRol());
+							rolPorAsignar.setLabel(admRol.getDescripcion());
+							rolesPorAsignar.add(rolPorAsignar);
 						}
 						rolesasignados.add(admRol.getIdRol());
 						rolesAsignadosItem[i] = new ComboItem();
@@ -402,6 +408,16 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 						i++;
 					}
 
+					if (null != rolesPorAsignar && rolesPorAsignar.size()>0) {
+						ComboItem[] añadirRolesNoAsignados = new ComboItem[rolesPorAsignar.size()];
+						int j=0;
+						for (ComboItem comboItem : rolesPorAsignar) {
+							añadirRolesNoAsignados[j] = new ComboItem();
+							añadirRolesNoAsignados[j] = comboItem;
+							j++;
+						}
+						usuarioGrupoItem.setAsignarRolDefecto(añadirRolesNoAsignados);
+					}
 					usuarioGrupoItem.setRolesAsignados(rolesAsignadosItem);
 				}
 				
@@ -742,6 +758,12 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		
 		
 		
+	}
+
+	@Override
+	public UpdateResponseDTO updateGrupoDefecto(UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
