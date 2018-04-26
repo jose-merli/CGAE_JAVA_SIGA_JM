@@ -590,47 +590,44 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		record.setUsumodificacion(usuarios.get(0).getIdusuario());
 		//Actualizamos el registro de perfil
 		this.admPerfilExtendsMapper.updateByPrimaryKeySelective(record);
-		
+		List<String> rolesComprobar = new ArrayList<String>();		
 		if (null != usuarioUpdateDTO.getRolesAsignados() && usuarioUpdateDTO.getRolesAsignados().length>0) {
 			AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
 			examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(usuarioUpdateDTO.getIdGrupo());
 			List<AdmPerfilRol> perfilesRolABorrar = this.admPerfilRolMapper.selectByExample(examplePerfilRol );
+			
+			
 			if (null != perfilesRolABorrar && perfilesRolABorrar.size()>0) {
-				
-				AdmPerfilRolExample keydelete = new AdmPerfilRolExample();
-				keydelete.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(usuarioUpdateDTO.getIdGrupo());
-				
-				this.admPerfilRolMapper.deleteByExample(keydelete );
+			
+
+				for (AdmPerfilRol string : perfilesRolABorrar) {
+					rolesComprobar.add(string.getIdrol());
+				}
+
 			}
 			for (ComboCatalogoItem rolesAsignados : usuarioUpdateDTO.getRolesAsignados()) {
 				
-				if (null != rolesAsignados.getLocal() && rolesAsignados.getLocal().equals("S")) {
-					examplePerfilRol = new AdmPerfilRolExample();
-					examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdrolEqualTo(rolesAsignados.getValue()).andGrupopordefectoEqualTo(rolesAsignados.getLocal());
-					List<AdmPerfilRol> perfilesRol = this.admPerfilRolMapper.selectByExample(examplePerfilRol );
-					if (null != perfilesRol && perfilesRol.size()>0) {
-						AdmPerfilRol perfilRol = perfilesRol.get(0);
-						perfilRol.setGrupopordefecto("N");
-						this.admPerfilRolMapper.updateByPrimaryKey(perfilRol);
-					}
-					AdmPerfilRol recordPerfilRol = new AdmPerfilRol();
-					recordPerfilRol.setFechamodificacion(new Date());
-					recordPerfilRol.setGrupopordefecto(rolesAsignados.getLocal());
-					recordPerfilRol.setIdinstitucion(Short.valueOf(institucion));
-					recordPerfilRol.setIdperfil(usuarioUpdateDTO.getIdGrupo());
-					recordPerfilRol.setIdrol(rolesAsignados.getValue());
-					recordPerfilRol.setUsumodificacion(usuarios.get(0).getIdusuario());
-					this.admPerfilRolMapper.insert(recordPerfilRol );
-					
+				if (rolesComprobar.contains(rolesAsignados.getValue())) {
+					rolesComprobar.remove(rolesAsignados.getValue());
 				}else {
 					AdmPerfilRol recordPerfilRol = new AdmPerfilRol();
 					recordPerfilRol.setFechamodificacion(new Date());
-					recordPerfilRol.setGrupopordefecto(rolesAsignados.getLocal());
+					recordPerfilRol.setGrupopordefecto("N");
 					recordPerfilRol.setIdinstitucion(Short.valueOf(institucion));
 					recordPerfilRol.setIdperfil(usuarioUpdateDTO.getIdGrupo());
 					recordPerfilRol.setIdrol(rolesAsignados.getValue());
 					recordPerfilRol.setUsumodificacion(usuarios.get(0).getIdusuario());
 					this.admPerfilRolMapper.insert(recordPerfilRol );
+				}
+			}
+			
+			if (null != rolesComprobar && rolesComprobar.size()>0) {
+				for (String idRol : rolesComprobar) {
+					
+					AdmPerfilRolExample keydelete = new AdmPerfilRolExample();
+					keydelete.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(usuarioUpdateDTO.getIdGrupo()).andIdrolEqualTo(idRol);
+					
+					this.admPerfilRolMapper.deleteByExample(keydelete );
 				}
 			}
 			
@@ -693,7 +690,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				if (null != usuarioUpdateDTO.getRolesAsignados() && usuarioUpdateDTO.getRolesAsignados().length>0) {
 					AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
 					for (ComboCatalogoItem rolesAsignados : usuarioUpdateDTO.getRolesAsignados()) {
-						if (null != rolesAsignados.getLocal() && rolesAsignados.getLocal().equals("S")) {
+						/*if (null != rolesAsignados.getLocal() && rolesAsignados.getLocal().equals("S")) {
 							examplePerfilRol = new AdmPerfilRolExample();
 							examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdrolEqualTo(rolesAsignados.getValue()).andGrupopordefectoEqualTo(rolesAsignados.getLocal());
 							List<AdmPerfilRol> perfilesRol = this.admPerfilRolMapper.selectByExample(examplePerfilRol );
@@ -711,34 +708,20 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 							recordPerfilRol.setUsumodificacion(usuarios.get(0).getIdusuario());
 							this.admPerfilRolMapper.insert(recordPerfilRol );
 							
-						}else {
+						}else {*/
 							AdmPerfilRol recordPerfilRol = new AdmPerfilRol();
 							recordPerfilRol.setFechamodificacion(new Date());
-							recordPerfilRol.setGrupopordefecto(rolesAsignados.getLocal());
+							recordPerfilRol.setGrupopordefecto("N");
 							recordPerfilRol.setIdinstitucion(Short.valueOf(institucion));
 							recordPerfilRol.setIdperfil(usuarioUpdateDTO.getIdGrupo());
 							recordPerfilRol.setIdrol(rolesAsignados.getValue());
 							recordPerfilRol.setUsumodificacion(usuarios.get(0).getIdusuario());
 							this.admPerfilRolMapper.insert(recordPerfilRol );
-						}
+						//}
 					}
 					
 					
 					
-				}else {
-					
-					AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
-					examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(usuarioUpdateDTO.getIdGrupo());
-					List<AdmPerfilRol> perfilesRolABorrar = this.admPerfilRolMapper.selectByExample(examplePerfilRol );
-					if (null != perfilesRolABorrar && perfilesRolABorrar.size()>0) {
-						
-						AdmPerfilRolExample keydelete = new AdmPerfilRolExample();
-						keydelete.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(usuarioUpdateDTO.getIdGrupo());
-						
-						this.admPerfilRolMapper.deleteByExample(keydelete );
-					}
-					
-					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 
 		}else {
