@@ -68,10 +68,13 @@ public class MenuServiceImpl implements IMenuService {
 
 		//Cargamos el Dni del Token
 		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		
+		Short idInstitucion = Short
+				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
 
 		AdmUsuariosExample usuarioExample = new AdmUsuariosExample();
-		usuarioExample.createCriteria().andNifEqualTo(dni);
+		usuarioExample.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		//Obtenemos el Usuario para comprobar todas sus instituciones
 		List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExample);
 		
@@ -82,15 +85,13 @@ public class MenuServiceImpl implements IMenuService {
 			response.setError(error);
 			return response;
 		}
-			List<Short> instituciones = new ArrayList<Short>();
+
 			List<String> idperfiles = new ArrayList<String>();
-			for (AdmUsuarios admUsuarios : usuarios) {
-				instituciones.add(admUsuarios.getIdinstitucion());
-			}
+
 			idLenguaje = usuarios.get(0).getIdlenguaje();
 			AdmPerfilExample examplePerfil = new AdmPerfilExample();
 			examplePerfil.setDistinct(Boolean.TRUE);
-			examplePerfil.createCriteria().andIdinstitucionIn(instituciones);
+			examplePerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion);
 			examplePerfil.setOrderByClause("IDPERFIL ASC");
 			//Obtenemos todos los perfiles para cargar sus puntos de Menú
 			List<AdmPerfil> perfiles = perfilMapper.selectByExample(examplePerfil);
@@ -109,7 +110,7 @@ public class MenuServiceImpl implements IMenuService {
 
 				exampleMenu.setDistinct(true);
 				exampleMenu.setOrderByClause(" MENU.ORDEN ASC");
-				exampleMenu.createCriteria().andIdinstitucionIn(instituciones).andIdperfilIn(idperfiles)
+				exampleMenu.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdperfilIn(idperfiles)
 				.andDerechoaccesoGreaterThan(Short.valueOf("1"));
 				//Obtenemos todos los puntos de Menú
 				menuEntities = menuExtend.selectMenuByExample(exampleMenu);
@@ -148,6 +149,7 @@ public class MenuServiceImpl implements IMenuService {
 	    ArrayList<GenMenu> childListTwo = new ArrayList<GenMenu>();
 	    MenuItem response = new MenuItem();
 	    response.setLabel(parent.getIdrecurso());
+	    response.setIdclass(parent.getIdclass());
 	    response.setRouterLink(parent.getPath());
 
 	    //Recorremos sus hijos
@@ -159,6 +161,7 @@ public class MenuServiceImpl implements IMenuService {
 	            	//Vamos almacenando los hijos
 	            	MenuItem responsechild = new MenuItem();
 	            	responsechild.setLabel(childTransactions.getIdrecurso());
+	            	responsechild.setIdclass(childTransactions.getIdclass());
 	            	responsechild.setRouterLink(childTransactions.getPath());
 	            	response.getItems().add(responsechild);
 	                childList.add(childTransactions);
@@ -248,7 +251,7 @@ public class MenuServiceImpl implements IMenuService {
 		PermisoDTO permisoResponse = new PermisoDTO();
 		// Obtener idInstitucion del certificado y idUsuario del certificado
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0, 9);
+
 		Short idInstitucion = Short
 				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
 		

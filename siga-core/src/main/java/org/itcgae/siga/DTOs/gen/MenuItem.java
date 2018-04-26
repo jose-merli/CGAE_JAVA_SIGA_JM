@@ -17,6 +17,7 @@ public class MenuItem   {
   
   private String label = null;
   private String routerLink = null;
+  private String idclass = null;
   private List<MenuItem> items = new ArrayList<MenuItem>();
 
   
@@ -71,6 +72,23 @@ public class MenuItem   {
   }
 
   
+  
+  /**
+   **/
+  public MenuItem idclass(String idclass) {
+    this.idclass = idclass;
+    return this;
+  }
+  
+  
+  @JsonProperty("idClass")
+  public String getIdclass() {
+    return idclass;
+  }
+  public void setIdclass(String idclass) {
+    this.idclass = idclass;
+  }
+  
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -83,12 +101,13 @@ public class MenuItem   {
     MenuItem menuItem = (MenuItem) o;
     return Objects.equals(this.label, menuItem.label) &&
         Objects.equals(this.routerLink, menuItem.routerLink) &&
+        Objects.equals(this.idclass, menuItem.idclass) &&
         Objects.equals(this.items, menuItem.items);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(label, routerLink, items);
+    return Objects.hash(label, routerLink, items, idclass);
   }
 
   @Override
@@ -98,6 +117,7 @@ public class MenuItem   {
     
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    routerLink: ").append(toIndentedString(routerLink)).append("\n");
+    sb.append("    idclass: ").append(toIndentedString(idclass)).append("\n");
     sb.append("    items: ").append(toIndentedString(items)).append("\n");
     sb.append("}");
     return sb.toString();

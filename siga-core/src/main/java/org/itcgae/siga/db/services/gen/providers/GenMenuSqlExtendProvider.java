@@ -36,6 +36,7 @@ public class GenMenuSqlExtendProvider extends GenMenuSqlProvider {
         sql.SELECT("MENU.IDPROCESO");
         sql.SELECT("MENU.IDLENGUAJE");
         sql.SELECT("MENU.PATH");
+        sql.SELECT("MENU.IDCLASS");
         sql.FROM("GEN_MENU  MENU INNER JOIN ADM_TIPOSACCESO ACCESO ON  ACCESO.IDPROCESO = MENU.IDPROCESO ");
         this.applyWhereTiposAcceso(sql, example, false);
         

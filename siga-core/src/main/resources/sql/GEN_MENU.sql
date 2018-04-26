@@ -1,5 +1,8 @@
 
 ALTER TABLE GEN_MENU ADD PATH VARCHAR(50) NULL;
+ALTER TABLE GEN_MENU ADD IDCLASS VARCHAR(50) NULL;
+ALTER TABLE GEN_MENU ADD FECHA_BAJA DATE NULL;
+
 
 UPDATE GEN_MENU SET PATH = 'catalogosMaestros' WHERE IDRECURSO = 'menu.administracion.gestionCatalogosMaestros';
 UPDATE GEN_MENU SET PATH = 'gruposUsuarios' WHERE IDRECURSO = 'menu.administracion.gruposDeUsuarios';
@@ -20,3 +23,20 @@ UPDATE GEN_MENU SET PATH = 'nuevaIncorporacion' WHERE IDRECURSO = 'menu.solicitu
 UPDATE GEN_MENU SET PATH = 'mantenimientoGruposFijos' WHERE IDRECURSO = 'menu.censo.mantenimientoGruposFijos';
 UPDATE GEN_MENU SET PATH = 'mantenimientoMandatos' WHERE IDRECURSO = 'menu.censo.mantenimientoMandatos';
 UPDATE GEN_MENU SET PATH = 'busquedaSanciones' WHERE IDRECURSO = 'menu.expedientes.sanciones';
+UPDATE GEN_MENU SET PATH = 'parametrosGenerales' WHERE IDRECURSO = 'menu.administracion.parametrosGenerales';
+UPDATE GEN_MENU SET PATH = 'auditoriaUsuarios' WHERE IDRECURSO = 'menu.administracion.auditoria.usuarios';
+
+
+update gen_menu set IDPARENT = ' ' WHERE IDRECURSO IN ('menu.administracion.gestionCatalogosMaestros');
+update gen_menu set CLASS = 'catalogos' WHERE IDRECURSO IN ('menu.administracion.gestionCatalogosMaestros');
+update gen_menu set CLASS = 'adm' WHERE IDRECURSO IN ('menu.administracion');
+update gen_menu set CLASS = 'plantillas' WHERE IDRECURSO IN ('menu.administracion.gestionCatalogosMaestros');
+
+
+
+
+
+
+
+
+																				
