@@ -4,10 +4,13 @@ package org.itcgae.siga.gen.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.AdmContadorDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
+import org.itcgae.siga.DTOs.gen.PermisoItem;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
+import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.gen.services.IMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,17 +47,17 @@ public class MenuController {
     	return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
     
-//    @RequestMapping(value = "/perfilespost", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-//	List<ComboDTO> getPerfilesPost(@RequestBody ComboDTORequest institucion) {
-//    	List<ComboDTO> lista = menuService.getComboParametros(SigaConstants.COMBO_PERFILES,institucion);
-//    	return lista;
-//	}
-
     
     @RequestMapping(value = "/permisos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<PermisoDTO> getPermisos(@RequestBody PermisoRequestItem permisoRequestItem,HttpServletRequest request) {
     	PermisoDTO response = menuService.getPermisos(permisoRequestItem,request);
     	return new ResponseEntity<PermisoDTO>(response, HttpStatus.OK);
+	}
+
+    @RequestMapping(value = "/permisos/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updatePermisos(@RequestBody PermisoUpdateItem[] permisoRequestItem,HttpServletRequest request) {
+    	UpdateResponseDTO response = menuService.updatePermisos(permisoRequestItem,request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
     
 }

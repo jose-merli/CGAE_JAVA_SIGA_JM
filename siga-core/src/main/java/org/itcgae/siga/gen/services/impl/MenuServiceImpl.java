@@ -1,6 +1,7 @@
 package org.itcgae.siga.gen.services.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 import org.assertj.core.util.Strings;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -18,17 +20,21 @@ import org.itcgae.siga.DTOs.gen.PermisoDTO;
 import org.itcgae.siga.DTOs.gen.PermisoEntity;
 import org.itcgae.siga.DTOs.gen.PermisoItem;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
+import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.commons.utils.Converter;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
+import org.itcgae.siga.db.entities.AdmTiposacceso;
 import org.itcgae.siga.db.entities.AdmTiposaccesoExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.GenMenu;
+import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
@@ -57,6 +63,12 @@ public class MenuServiceImpl implements IMenuService {
 	
 	@Autowired
 	GenProcesosExtendsMapper permisosMapper;
+	
+	@Autowired
+	AdmTiposaccesoMapper tiposAccesoMapper;
+	
+	@Autowired
+    AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
 
 	@Override
@@ -323,6 +335,42 @@ public class MenuServiceImpl implements IMenuService {
 	    
 	    return response;
 
+	}
+
+
+	@Override
+	public UpdateResponseDTO updatePermisos(PermisoUpdateItem[] permisoRequestItem, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
+		String dni = nifInstitucion.substring(0,9);
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
+		
+
+		//Buscamos el perfil para ver si ya existe. En caso de que no exista
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		AdmUsuarios usuario = usuarios.get(0);
+
+		if (null != permisoRequestItem && permisoRequestItem.length>0) {
+			for (int i = 0; i < permisoRequestItem.length; i++) {
+				
+				AdmTiposacceso record = new AdmTiposacceso();
+				record.setDerechoacceso(Short.valueOf(permisoRequestItem[i].getDerechoacceso()));
+				record.setFechamodificacion(new Date());
+				record.setIdperfil(permisoRequestItem[i].getIdGrupo());
+				record.setIdproceso(permisoRequestItem[i].getId());
+				record.setIdinstitucion(Short.valueOf(institucion));
+				record.setUsumodificacion(usuario.getIdusuario());
+				this.tiposAccesoMapper.updateByPrimaryKey(record );
+
+				
+				
+			}
+		}
+		
+		return null;
+		
 	}
 
 }
