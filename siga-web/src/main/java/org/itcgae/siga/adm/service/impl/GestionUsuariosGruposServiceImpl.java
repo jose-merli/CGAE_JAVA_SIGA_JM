@@ -391,12 +391,16 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 					ComboItem[] rolesAsignadosItem = new ComboItem[perfilesRol.size()];
 					List<ComboItem> rolesPorAsignar = new ArrayList<ComboItem>();
 					int i = 0;
+					ComboItem rolPorAsignar = new ComboItem();
+					rolPorAsignar.setValue("");
+					rolPorAsignar.setLabel("");
+					rolesPorAsignar.add(rolPorAsignar);
 					for (RolPerfilDTO admRol : perfilesRol) {
 						if (admRol.getGrupopordefecto()!= null && admRol.getGrupopordefecto().equals("S")) {
 							usuarioGrupoItem.setDescripcionRol(usuarioGrupoItem.getDescripcionRol().concat(admRol.getDescripcion().concat(", ")));
 							
 						}else {
-							ComboItem rolPorAsignar = new ComboItem();
+							rolPorAsignar = new ComboItem();
 							rolPorAsignar.setValue(admRol.getIdRol());
 							rolPorAsignar.setLabel(admRol.getDescripcion());
 							rolesPorAsignar.add(rolPorAsignar);
