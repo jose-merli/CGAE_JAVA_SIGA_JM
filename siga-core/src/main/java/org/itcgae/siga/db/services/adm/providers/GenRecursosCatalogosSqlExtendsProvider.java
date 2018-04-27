@@ -2,8 +2,9 @@ package org.itcgae.siga.db.services.adm.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.MultiidiomaCatalogoSearchDTO;
+import org.itcgae.siga.db.mappers.GenRecursosCatalogosSqlProvider;
 
-public class GenRecursosCatalogosSqlExtendsProvider {
+public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogosSqlProvider{
 
 	public String getCatalogEntity(String idInstitucion){
 		SQL sql = new SQL();
