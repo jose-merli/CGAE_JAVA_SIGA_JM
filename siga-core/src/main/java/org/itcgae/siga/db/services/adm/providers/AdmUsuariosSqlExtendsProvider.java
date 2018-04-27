@@ -3,6 +3,7 @@ package org.itcgae.siga.db.services.adm.providers;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioGrupoDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
 import org.itcgae.siga.db.mappers.AdmUsuariosSqlProvider;
@@ -212,7 +213,7 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 		return sql.toString();
 	}
 	
-	public String deleteUserGroup(UsuarioDeleteDTO usuarioDeleteDTO){
+	public String deleteUserGroup(UsuarioGrupoDeleteDTO usuarioDeleteDTO){
 		SQL sql = new SQL();
 		
 		sql.UPDATE("ADM_PERFIL");
@@ -221,7 +222,7 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 		sql.SET("USUMODIFICACION = '" + usuarioDeleteDTO.getIdUsuario().get(0) + "'");
 
 		
-		sql.WHERE("IDPERFIL = '" +  usuarioDeleteDTO.getGrupo() +  "'");
+		sql.WHERE("IDPERFIL = '" +  usuarioDeleteDTO.getidGrupo() +  "'");
 		sql.WHERE("IDINSTITUCION = '" + usuarioDeleteDTO.getIdInstitucion() + "'");
 		
 		return sql.toString();

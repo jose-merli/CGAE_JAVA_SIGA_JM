@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioGrupoDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioGrupoEditDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioGruposDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
@@ -87,7 +88,7 @@ public class GestionUsuariosGruposController {
 	}
 	
 	@RequestMapping(value = "/usuariosgrupos/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> deleteGroupsUsers(@RequestBody UsuarioDeleteDTO[] usuarioDeleteDTO, HttpServletRequest request) {
+	ResponseEntity<DeleteResponseDTO> deleteGroupsUsers(@RequestBody UsuarioGrupoDeleteDTO[] usuarioDeleteDTO, HttpServletRequest request) {
 		DeleteResponseDTO response = gestionUsuariosGruposService.deleteUsersGroup(usuarioDeleteDTO, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}

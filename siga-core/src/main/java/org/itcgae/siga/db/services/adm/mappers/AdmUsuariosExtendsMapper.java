@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioGrupoDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioItem;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
@@ -71,5 +72,5 @@ public interface AdmUsuariosExtendsMapper extends AdmUsuariosMapper{
 	int disableUser(UsuarioDeleteDTO usuarioDeleteDTO);
 	
 	@UpdateProvider(type = AdmUsuariosSqlExtendsProvider.class, method = "deleteUserGroup")
-	int deleteUserGroup(UsuarioDeleteDTO usuarioDeleteDTO);
+	int deleteUserGroup(UsuarioGrupoDeleteDTO usuarioDeleteDTO);
 }

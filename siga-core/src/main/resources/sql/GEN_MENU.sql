@@ -25,13 +25,14 @@ UPDATE GEN_MENU SET PATH = 'mantenimientoMandatos' WHERE IDRECURSO = 'menu.censo
 UPDATE GEN_MENU SET PATH = 'busquedaSanciones' WHERE IDRECURSO = 'menu.expedientes.sanciones';
 UPDATE GEN_MENU SET PATH = 'parametrosGenerales' WHERE IDRECURSO = 'menu.administracion.parametrosGenerales';
 UPDATE GEN_MENU SET PATH = 'auditoriaUsuarios' WHERE IDRECURSO = 'menu.administracion.auditoria.usuarios';
-
+UPDATE GEN_MENU SET PATH = 'catalogos' WHERE IDRECURSO = 'menu.administracion.gestionMultiidioma.catalogosMaestros';
 
 update gen_menu set IDPARENT = ' ' WHERE IDRECURSO IN ('menu.administracion.gestionCatalogosMaestros');
 update gen_menu set CLASS = 'catalogos' WHERE IDRECURSO IN ('menu.administracion.gestionCatalogosMaestros');
 update gen_menu set CLASS = 'adm' WHERE IDRECURSO IN ('menu.administracion');
 update gen_menu set CLASS = 'plantillas' WHERE IDRECURSO IN ('menu.administracion.gestionCatalogosMaestros');
 
+UPDATE GEN_MENU SET fecha_baja = to_date('26/04/2018','DD/MM/RRRR') WHERE IDRECURSO = 'menu.administracion.perfilrol';
 
 
 
