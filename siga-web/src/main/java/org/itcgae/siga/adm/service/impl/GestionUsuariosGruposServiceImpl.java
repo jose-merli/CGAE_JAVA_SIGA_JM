@@ -460,39 +460,45 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	}
 
 	@Override
-	public DeleteResponseDTO deleteUsersGroup(UsuarioDeleteDTO usuarioDeleteDTO, HttpServletRequest request) {
-
-		
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0,9);
-		usuarioDeleteDTO.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
-		
-		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(usuarioDeleteDTO.getIdInstitucion()));
-		
-
-		//Buscamos el perfil para ver si ya existe. En caso de que no exista
-		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-		AdmUsuarios usuario = usuarios.get(0);
-		List<String> idUsuario = new ArrayList<String>();
-		idUsuario.add(String.valueOf(usuario.getIdusuario()));
-		usuarioDeleteDTO.setIdUsuario(idUsuario);
+	public DeleteResponseDTO deleteUsersGroup(UsuarioDeleteDTO[] usuarioDeleteDTO, HttpServletRequest request) {
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
-		int response = 0;
-
-		if (!usuarioDeleteDTO.getIdUsuario().equals(null) && usuarioDeleteDTO.getIdUsuario().size() > 0
-				&& !usuarioDeleteDTO.getIdInstitucion().equalsIgnoreCase("") && !usuarioDeleteDTO.getIdInstitucion().equals(null)) {
-
-				response = admUsuariosExtendsMapper.deleteUserGroup(usuarioDeleteDTO);
-
-		} else
-			response = 0;
-
-		if (response > 0)
-			deleteResponseDTO.setStatus("OK");
-		else
-			deleteResponseDTO.setStatus("ERROR");
-
+		
+		if (null != usuarioDeleteDTO && usuarioDeleteDTO.length>0) {
+			
+			for (int i = 0; i < usuarioDeleteDTO.length; i++) {
+				
+				
+				String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+				String dni = nifInstitucion.substring(0,9);
+				usuarioDeleteDTO[i].setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+				
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(usuarioDeleteDTO[i].getIdInstitucion()));
+				
+		
+				//Buscamos el perfil para ver si ya existe. En caso de que no exista
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				AdmUsuarios usuario = usuarios.get(0);
+				List<String> idUsuario = new ArrayList<String>();
+				idUsuario.add(String.valueOf(usuario.getIdusuario()));
+				usuarioDeleteDTO[i].setIdUsuario(idUsuario);
+				
+				int response = 0;
+		
+				if (!usuarioDeleteDTO[i].getIdUsuario().equals(null) && usuarioDeleteDTO[i].getIdUsuario().size() > 0
+						&& !usuarioDeleteDTO[i].getIdInstitucion().equalsIgnoreCase("") && !usuarioDeleteDTO[i].getIdInstitucion().equals(null)) {
+		
+						response = admUsuariosExtendsMapper.deleteUserGroup(usuarioDeleteDTO[i]);
+		
+				} else
+					response = 0;
+		
+				if (response > 0)
+					deleteResponseDTO.setStatus("OK");
+				else
+					deleteResponseDTO.setStatus("ERROR");
+			}
+		}
 		return deleteResponseDTO;
 	
 	}

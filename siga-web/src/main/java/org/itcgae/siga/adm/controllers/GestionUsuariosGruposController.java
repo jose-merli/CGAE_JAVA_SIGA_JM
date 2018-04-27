@@ -87,7 +87,7 @@ public class GestionUsuariosGruposController {
 	}
 	
 	@RequestMapping(value = "/usuariosgrupos/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DeleteResponseDTO> usersGroupsUsers(@RequestBody UsuarioDeleteDTO usuarioDeleteDTO, HttpServletRequest request) {
+	ResponseEntity<DeleteResponseDTO> deleteGroupsUsers(@RequestBody UsuarioDeleteDTO[] usuarioDeleteDTO, HttpServletRequest request) {
 		DeleteResponseDTO response = gestionUsuariosGruposService.deleteUsersGroup(usuarioDeleteDTO, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
