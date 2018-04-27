@@ -26,7 +26,7 @@ public interface IMenuService {
 	public PermisoDTO getPermisos(PermisoRequestItem permisoRequestItem, HttpServletRequest request);
 
 
-	public UpdateResponseDTO updatePermisos(PermisoUpdateItem[] permisoRequestItem, HttpServletRequest request);
+	public UpdateResponseDTO updatePermisos(PermisoUpdateItem permisoRequestItem, HttpServletRequest request);
 
 
 }

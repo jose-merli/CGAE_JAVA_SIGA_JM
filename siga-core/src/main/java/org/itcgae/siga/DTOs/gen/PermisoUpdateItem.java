@@ -11,9 +11,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
 public class PermisoUpdateItem   {
   
-  private String idGrupo = null;
-  private String id = null;
-  private String derechoacceso = null;
+  private String idGrupo;
+  private String id;
+  private String derechoacceso;
 
   
   /**

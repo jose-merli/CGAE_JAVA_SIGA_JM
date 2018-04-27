@@ -55,7 +55,7 @@ public class MenuController {
 	}
 
     @RequestMapping(value = "/permisos/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updatePermisos(@RequestBody PermisoUpdateItem[] permisoRequestItem,HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> updatePermisos(@RequestBody PermisoUpdateItem permisoRequestItem,HttpServletRequest request) {
     	UpdateResponseDTO response = menuService.updatePermisos(permisoRequestItem,request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}

@@ -21,6 +21,7 @@ import org.itcgae.siga.DTOs.gen.PermisoEntity;
 import org.itcgae.siga.DTOs.gen.PermisoItem;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
@@ -339,8 +340,9 @@ public class MenuServiceImpl implements IMenuService {
 
 
 	@Override
-	public UpdateResponseDTO updatePermisos(PermisoUpdateItem[] permisoRequestItem, HttpServletRequest request) {
+	public UpdateResponseDTO updatePermisos(PermisoUpdateItem permisoRequestItem, HttpServletRequest request) {
 		// TODO Auto-generated method stub
+		UpdateResponseDTO response = new UpdateResponseDTO();
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
 		String dni = nifInstitucion.substring(0,9);
@@ -352,24 +354,25 @@ public class MenuServiceImpl implements IMenuService {
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 
-		if (null != permisoRequestItem && permisoRequestItem.length>0) {
-			for (int i = 0; i < permisoRequestItem.length; i++) {
+		if (null != permisoRequestItem ) {
+
 				
 				AdmTiposacceso record = new AdmTiposacceso();
-				record.setDerechoacceso(Short.valueOf(permisoRequestItem[i].getDerechoacceso()));
+				record.setDerechoacceso(Short.valueOf(permisoRequestItem.getDerechoacceso()));
 				record.setFechamodificacion(new Date());
-				record.setIdperfil(permisoRequestItem[i].getIdGrupo());
-				record.setIdproceso(permisoRequestItem[i].getId());
+				record.setIdperfil(permisoRequestItem.getIdGrupo());
+				record.setIdproceso(permisoRequestItem.getId());
 				record.setIdinstitucion(Short.valueOf(institucion));
 				record.setUsumodificacion(usuario.getIdusuario());
 				this.tiposAccesoMapper.updateByPrimaryKey(record );
 
 				
 				
-			}
+			
 		}
+		response.setStatus(SigaConstants.OK);
 		
-		return null;
+		return response;
 		
 	}
 
