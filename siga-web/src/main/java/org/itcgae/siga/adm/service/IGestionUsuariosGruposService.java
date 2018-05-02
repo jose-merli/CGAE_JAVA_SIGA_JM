@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.adm.UsuarioDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioGrupoDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioGrupoEditDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioGrupoItem;
 import org.itcgae.siga.DTOs.adm.UsuarioGruposDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
@@ -35,9 +36,9 @@ public interface IGestionUsuariosGruposService {
 
 	public UsuarioGruposDTO getUsersGroupsHistoric(int numPagina, HttpServletRequest request);
 
-	public UpdateResponseDTO updateGroupUsers(UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request);
+	public UpdateResponseDTO updateGroupUsers(UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request);
 	
-	public UpdateResponseDTO createGroupUsers(UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request);
+	public UpdateResponseDTO createGroupUsers(UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request);
 
 	public UpdateResponseDTO updateGrupoDefecto(UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request);
 }

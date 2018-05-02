@@ -20,6 +20,7 @@ import org.itcgae.siga.DTOs.adm.UsuarioGrupoEditDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioGrupoItem;
 import org.itcgae.siga.DTOs.adm.UsuarioGruposDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioItem;
+import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboCatalogoItem;
@@ -584,12 +585,14 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	}
 
 	@Override
-	public UpdateResponseDTO updateGroupUsers(UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request) {
+	public UpdateResponseDTO updateGroupUsers(UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request) {
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
+		String dni = nifInstitucion.substring(0,9);
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
 		//Buscamos el perfil para ver si ya existe. En caso de que no exista
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmPerfilKey key = new AdmPerfilKey();
@@ -616,7 +619,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				}
 
 			}
-			for (ComboCatalogoItem rolesAsignados : usuarioUpdateDTO.getRolesAsignados()) {
+			for (ComboItem rolesAsignados : usuarioUpdateDTO.getRolesAsignados()) {
 				
 				if (rolesComprobar.contains(rolesAsignados.getValue())) {
 					rolesComprobar.remove(rolesAsignados.getValue());
@@ -673,12 +676,13 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	}
 
 	@Override
-	public UpdateResponseDTO createGroupUsers(UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request) {
+	public UpdateResponseDTO createGroupUsers(UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request) {
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
+		String dni = nifInstitucion.substring(0,9);
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
 		//Buscamos el perfil para ver si ya existe. En caso de que no exista
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmPerfilKey key = new AdmPerfilKey();
@@ -700,7 +704,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				
 				if (null != usuarioUpdateDTO.getRolesAsignados() && usuarioUpdateDTO.getRolesAsignados().length>0) {
 					
-					for (ComboCatalogoItem rolesAsignados : usuarioUpdateDTO.getRolesAsignados()) {
+					for (ComboItem rolesAsignados : usuarioUpdateDTO.getRolesAsignados()) {
 						/*if (null != rolesAsignados.getLocal() && rolesAsignados.getLocal().equals("S")) {
 							examplePerfilRol = new AdmPerfilRolExample();
 							examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdrolEqualTo(rolesAsignados.getValue()).andGrupopordefectoEqualTo(rolesAsignados.getLocal());
@@ -740,7 +744,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 			
 			Error error = new Error();
 			
-			error.setMessage("administracion.grupo.duplicado");
+			error.setMessage("administracion.grupo.usuario.duplicado");
 			updateResponseDTO.setError(error );
 		}
 		
@@ -770,7 +774,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		
 		AdmPerfilRolExample example = new AdmPerfilRolExample();
 		example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).
-		andIdrolEqualTo(usuarioUpdateDTO.getRolesAsignados()[0].getValue()).andGrupopordefectoEqualTo("S");
+		andIdrolEqualTo(usuarioUpdateDTO.getAsignarRolDefecto()[0].getValue()).andGrupopordefectoEqualTo("S");
 
 		List<AdmPerfilRol> perfilesRol = this.admPerfilRolMapper.selectByExample(example );
 		if (null != perfilesRol && perfilesRol.size()>0) {
@@ -783,7 +787,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		record.setFechamodificacion(new Date());
 		record.setGrupopordefecto("S");
 		record.setIdperfil(usuarioUpdateDTO.getIdGrupo());
-		record.setIdrol(usuarioUpdateDTO.getRolesAsignados()[0].getValue());
+		record.setIdrol(usuarioUpdateDTO.getAsignarRolDefecto()[0].getValue());
 		record.setIdinstitucion(Short.valueOf(institucion));
 		record.setUsumodificacion(usuario.getIdusuario());
 		this.admPerfilRolMapper.updateByPrimaryKeySelective(record );

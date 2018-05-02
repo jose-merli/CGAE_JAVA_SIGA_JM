@@ -2,6 +2,8 @@ package org.itcgae.siga.db.services.adm.mappers;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
@@ -12,8 +14,12 @@ import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioGrupoDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioItem;
+import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
+import org.itcgae.siga.DTOs.gen.ControlRequestItem;
+import org.itcgae.siga.DTOs.gen.PermisoEntity;
+import org.itcgae.siga.DTOs.gen.PermisoItem;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.services.adm.providers.AdmUsuariosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -73,4 +79,26 @@ public interface AdmUsuariosExtendsMapper extends AdmUsuariosMapper{
 	
 	@UpdateProvider(type = AdmUsuariosSqlExtendsProvider.class, method = "deleteUserGroup")
 	int deleteUserGroup(UsuarioGrupoDeleteDTO usuarioDeleteDTO);
+	
+	
+	@SelectProvider(type = AdmUsuariosSqlExtendsProvider.class, method = "getUsersLog")
+	@Results({
+		@Result(column = "IDUSUARIO", property = "idUsuario", jdbcType = JdbcType.INTEGER),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DNI", property = "dni", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ULTIMACONEX", property = "ultimaConex", jdbcType = JdbcType.DATE),
+		@Result(column = "INSTITUCION", property = "institucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDIOMA", property = "idioma", jdbcType = JdbcType.VARCHAR),
+	})
+	List<UsuarioLogeadoItem> getUsersLog(HttpServletRequest usuarioRequestDTO);
+	
+	
+	@SelectProvider(type = AdmUsuariosSqlExtendsProvider.class, method = "getAccessControls")
+	@Results({
+		@Result(column = "TEXT", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ID", property = "data", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DERECHOACCESO", property = "derechoacceso", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PARENT", property = "parent", jdbcType = JdbcType.VARCHAR)
+	})
+	List<PermisoEntity> getAccessControls(ControlRequestItem controlItem);
 }

@@ -45,6 +45,7 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
 			String user = null;
 			String institucion = "2000";
+			String grupo = "AGE" + "-";
 			if (null != certs && certs.length > 0) {
 				String dn = certs[0].getSubjectX500Principal().getName();
 				LdapName ldapDN = new LdapName(dn);
@@ -58,9 +59,11 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 					throw new InvalidClientCerticateException(e);
 				}
 				
-				String nif =  user.substring(user.length()-9,user.length());
+				String nif =  user.substring(user.length()-9,user.length()) + "-";
 				String idInstitucion = institucion.substring(institucion.length()-4,institucion.length());
-				String nifInstitucion = nif.concat(idInstitucion);
+				
+				String nifInstitucion = nif.concat(grupo.concat(idInstitucion));
+				
 				return authenticationManager.authenticate(new UserAuthenticationToken(nifInstitucion, certs[0]));
 			}
 		} catch (Exception e) {

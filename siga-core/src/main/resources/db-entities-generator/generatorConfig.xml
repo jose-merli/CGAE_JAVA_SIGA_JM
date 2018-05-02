@@ -15,7 +15,7 @@
 		<!-- <sqlMapGenerator targetPackage="com.cgae.db.mappers" targetProject="demo" /> -->
 		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER" implementationPackage="org.itcgae.siga.db.services" />
 		
-		<table schema="USCGAE" tableName="GEN_MENU">
+		<table schema="USCGAE" tableName="ADM_USUARIOS">
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
 		</table>  
 		

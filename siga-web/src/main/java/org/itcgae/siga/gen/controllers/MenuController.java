@@ -5,7 +5,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.AdmContadorDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
 import org.itcgae.siga.DTOs.gen.PermisoItem;
@@ -58,6 +60,14 @@ public class MenuController {
 	ResponseEntity<UpdateResponseDTO> updatePermisos(@RequestBody PermisoUpdateItem permisoRequestItem,HttpServletRequest request) {
     	UpdateResponseDTO response = menuService.updatePermisos(permisoRequestItem,request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+    
+    @RequestMapping(value = "/accesControl", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PermisoDTO> getAcces(@RequestBody ControlRequestItem permisoRequestItem,HttpServletRequest request) {
+    	PermisoDTO response = new PermisoDTO(); 
+    	response = menuService.getAccessControl(permisoRequestItem,request);
+    	return new ResponseEntity<PermisoDTO>(response, HttpStatus.OK);
+
 	}
     
 }

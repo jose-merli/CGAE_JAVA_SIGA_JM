@@ -12,7 +12,7 @@ public class UsuarioGrupoEditDTO {
 
 	private String idGrupo = null;
 	private String descripcionGrupo  = null;
-	private ComboCatalogoItem[] rolesAsignados = null;
+	private ComboCatalogoItem[] asignarRolDefecto = null;
 	
 
 	/**
@@ -54,20 +54,20 @@ public class UsuarioGrupoEditDTO {
 	
 	/**
 	 */
-	public UsuarioGrupoEditDTO rolesAsignados(ComboCatalogoItem[] rolesAsignados){
-		this.rolesAsignados = rolesAsignados;
+	public UsuarioGrupoEditDTO asignarRolDefecto(ComboCatalogoItem[] asignarRolDefecto){
+		this.asignarRolDefecto = asignarRolDefecto;
 		return this;
 	}
 	
 	
-	@JsonProperty("rolesAsignados")
-	public ComboCatalogoItem[] getRolesAsignados() {
-		return rolesAsignados;
+	@JsonProperty("asignarRolDefecto")
+	public ComboCatalogoItem[] getAsignarRolDefecto() {
+		return asignarRolDefecto;
 	}
 	
 	
-	public void setRolesAsignados(ComboCatalogoItem[] rolesAsignados) {
-		this.rolesAsignados = rolesAsignados;
+	public void setAsignarRolDefecto(ComboCatalogoItem[] asignarRolDefecto) {
+		this.asignarRolDefecto = asignarRolDefecto;
 	}
 
 	
@@ -83,14 +83,14 @@ public class UsuarioGrupoEditDTO {
 	    UsuarioGrupoEditDTO usuarioItem = (UsuarioGrupoEditDTO) o;
 	    return Objects.equals(this.idGrupo, usuarioItem.idGrupo) &&
 	        Objects.equals(this.descripcionGrupo, usuarioItem.descripcionGrupo) &&
-	        Objects.equals(this.rolesAsignados, usuarioItem.rolesAsignados);
+	        Objects.equals(this.asignarRolDefecto, usuarioItem.asignarRolDefecto);
     
 	}
 
 
 	@Override
 	public int hashCode() {
-		 return Objects.hash(idGrupo, descripcionGrupo, rolesAsignados);
+		 return Objects.hash(idGrupo, descripcionGrupo, asignarRolDefecto);
 	}
 	
 	
@@ -101,7 +101,7 @@ public class UsuarioGrupoEditDTO {
 	    
 	    sb.append("    idGrupo: ").append(toIndentedString(idGrupo)).append("\n");
 	    sb.append("    descripcionGrupo: ").append(toIndentedString(descripcionGrupo)).append("\n");
-	    sb.append("    rolesAsignados: ").append(toIndentedString(rolesAsignados)).append("\n");
+	    sb.append("    asignarRolDefecto: ").append(toIndentedString(asignarRolDefecto)).append("\n");
 
 	    sb.append("}");
 	    return sb.toString();

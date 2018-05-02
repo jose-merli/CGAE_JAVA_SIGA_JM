@@ -9,10 +9,14 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.ibatis.jdbc.SQL;
 import org.assertj.core.util.Strings;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.MenuItem;
@@ -43,6 +47,7 @@ import org.itcgae.siga.gen.services.IMenuService;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 
 
@@ -128,7 +133,7 @@ public class MenuServiceImpl implements IMenuService {
 				//Obtenemos todos los puntos de Menú
 				menuEntities = menuExtend.selectMenuByExample(exampleMenu);
 
-				for(GenMenu menu: menuEntities){
+				/*for(GenMenu menu: menuEntities){
 						menuMap.put(menu.getIdmenu(), menu);
 				}
 			
@@ -136,7 +141,7 @@ public class MenuServiceImpl implements IMenuService {
 
 		menuEntities = new ArrayList<GenMenu>();
 		menuEntities.addAll(menuMap.values());
-		
+		*/
 
 		if (null != menuEntities && !menuEntities.isEmpty()) {
 			List<MenuItem> items = new ArrayList<MenuItem>();
@@ -374,6 +379,56 @@ public class MenuServiceImpl implements IMenuService {
 		
 		return response;
 		
+	}
+
+
+	@Override
+	public UsuarioLogeadoDTO getUserLog(HttpServletRequest request) {
+
+		
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
+
+		
+		
+		List<UsuarioLogeadoItem> usuario = this.admUsuariosExtendsMapper.getUsersLog(request);
+		UsuarioLogeadoDTO response = new UsuarioLogeadoDTO();
+		
+		response.setUsuarioLogeadoItem(usuario);
+		
+		for (UsuarioLogeadoItem usuarioLogeadoItem : usuario) {
+			
+			
+			AdmUsuarios record =  new AdmUsuarios();
+			
+			record.setIdinstitucion(Short.valueOf(institucion));
+			record.setIdusuario(usuarioLogeadoItem.getIdUsuario());
+			record.setUltimaConexion(new Date());
+			this.admUsuariosExtendsMapper.updateByPrimaryKeySelective(record );
+		}
+		return response;
+	}
+
+
+	@Override
+	public PermisoDTO getAccessControl(ControlRequestItem controlItem, HttpServletRequest request) {
+		
+		PermisoDTO response= new PermisoDTO();
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String[] listParameters = nifInstitucion.split("-");
+		controlItem.setInstitucion(listParameters[2]);
+		controlItem.setIdGrupo(listParameters[1]);
+		List<PermisoEntity> permisos =  this.admUsuariosExtendsMapper.getAccessControls(controlItem);
+		if (null != permisos && permisos.size()>0) {
+			List<PermisoItem> permisosItem = new ArrayList<PermisoItem>();
+			for (PermisoEntity permisoEntity : permisos) {
+				PermisoItem permisoItem = new PermisoItem();
+				permisoItem.setDerechoacceso(permisoEntity.getDerechoacceso());
+				permisosItem.add(permisoItem);
+			}
+			response.setPermisoItems(permisosItem);
+		}
+		return response;
 	}
 
 }

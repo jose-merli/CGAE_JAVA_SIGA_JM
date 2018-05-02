@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.adm.UsuarioDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioGrupoDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioGrupoEditDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioGrupoItem;
 import org.itcgae.siga.DTOs.adm.UsuarioGruposDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
@@ -101,15 +102,15 @@ public class GestionUsuariosGruposController {
 	
 	
 	@RequestMapping(value = "/usuariosgrupos/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateGroupUsers(@RequestBody UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> updateGroupUsers(@RequestBody UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionUsuariosGruposService.updateGroupUsers(usuarioUpdateDTO, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 	
 	@RequestMapping(value = "/usuariosgrupos/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> createGroupUsers(@RequestBody UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request) {
-		UpdateResponseDTO response = gestionUsuariosGruposService.updateGroupUsers(usuarioUpdateDTO, request);
+	ResponseEntity<UpdateResponseDTO> createGroupUsers(@RequestBody UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = gestionUsuariosGruposService.createGroupUsers(usuarioUpdateDTO, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 		

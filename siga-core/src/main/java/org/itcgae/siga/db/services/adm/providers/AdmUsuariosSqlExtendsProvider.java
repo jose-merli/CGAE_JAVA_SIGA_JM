@@ -1,12 +1,17 @@
 package org.itcgae.siga.db.services.adm.providers;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioGrupoDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
+import org.itcgae.siga.DTOs.gen.ControlRequestItem;
+import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.db.mappers.AdmUsuariosSqlProvider;
+import org.itcgae.siga.security.UserAuthenticationToken;
 
 public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 
@@ -225,6 +230,58 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 		sql.WHERE("IDPERFIL = '" +  usuarioDeleteDTO.getidGrupo() +  "'");
 		sql.WHERE("IDINSTITUCION = '" + usuarioDeleteDTO.getIdInstitucion() + "'");
 		
+		return sql.toString();
+	}
+	
+	
+	/***
+	 * Build the SQL query to get users information depending on a filter which in this case is the UsuarioRequestDTO object. 
+	 * @param numPagina The number of the page that will be displayed in web page. Each page contains a portion of users with their information.
+	 * @param usuarioRequestDTO The filter that some web user uses on web page to obtain users information.
+	 * @return The SQL query for data base.
+	 */
+	public String getUsersLog(HttpServletRequest usuarioRequestDTO){
+		SQL sql = new SQL();
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(usuarioRequestDTO.getHeader("Authorization"));
+		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
+		String dni = nifInstitucion.substring(0,9);
+		sql.SELECT("USUARIOS.IDUSUARIO AS IDUSUARIO");
+		sql.SELECT("USUARIOS.DESCRIPCION AS NOMBRE");
+		sql.SELECT("USUARIOS.NIF AS DNI");
+		sql.SELECT("USUARIOS.ULTIMA_CONEXION AS ULTIMACONEX");
+		sql.SELECT("REC.DESCRIPCION AS IDIOMA");
+		sql.SELECT("INST.NOMBRE AS INSTITUCION");
+		sql.FROM(" ADM_USUARIOS USUARIOS");
+		sql.INNER_JOIN(" CEN_INSTITUCION INST ON USUARIOS.IDINSTITUCION = INST.IDINSTITUCION");
+		sql.INNER_JOIN(" ADM_LENGUAJES LENG ON USUARIOS.IDLENGUAJE = LENG.IDLENGUAJE");
+		sql.INNER_JOIN(" GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = LENG.DESCRIPCION AND USUARIOS.IDLENGUAJE = REC.IDLENGUAJE");
+		
+		sql.WHERE("USUARIOS.NIF = '" + dni + "'");
+		// El campo idinstitucion es obligatorio en el body. El filtro se aplica siempre
+		sql.WHERE("USUARIOS.IDINSTITUCION = '" + institucion + "'");
+		sql.WHERE("USUARIOS.ACTIVO = 'S' ");
+		sql.ORDER_BY("USUARIOS.DESCRIPCION ASC");
+		
+		return sql.toString();
+	}
+	
+	
+	public String getAccessControls(ControlRequestItem request){
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("PROC.IDPROCESO AS ID");
+		sql.SELECT("NVL(PROC.IDPARENT,'ARBOL') AS PARENT");
+		sql.SELECT("PROC.DESCRIPCION AS TEXT");
+		sql.SELECT("ACCESO.DERECHOACCESO AS DERECHOACCESO");
+
+		sql.FROM("GEN_PROCESOS PROC");
+		
+		sql.INNER_JOIN("ADM_TIPOSACCESO ACCESO ON PROC.IDPROCESO = ACCESO.IDPROCESO ");
+		sql.WHERE("IDINSTITUCION = ('" + request.getInstitucion() + "')");
+		sql.WHERE("IDPERFIL = ('" + request.getIdGrupo() + "')");
+		sql.WHERE("PROC.IDPROCESO = ('" + request.getIdProceso() + "')");
+
+		sql.ORDER_BY("PARENT DESC, TEXT ASC");
 		return sql.toString();
 	}
 	
