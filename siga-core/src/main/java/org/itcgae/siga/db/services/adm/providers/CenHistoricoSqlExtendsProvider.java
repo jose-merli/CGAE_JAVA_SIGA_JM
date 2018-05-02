@@ -42,25 +42,26 @@ public class CenHistoricoSqlExtendsProvider {
 			
 		}
 		if(null != historicoUsuarioRequestDTO.getUsuario() && !historicoUsuarioRequestDTO.getUsuario().equalsIgnoreCase("")) {
-			sql.WHERE("(UPPER(USU.DESCRIPCION) LIKE '%"+ historicoUsuarioRequestDTO.getUsuario()+"%')");
+			sql.WHERE("(UPPER(USU.DESCRIPCION) LIKE UPPER('%"+ historicoUsuarioRequestDTO.getUsuario()+"%'))");
 		}
 		if(null != historicoUsuarioRequestDTO.getFechaDesde()) {
 			String fechaDesde = dateFormat.format(historicoUsuarioRequestDTO.getFechaDesde());
-			sql.WHERE("HIST.FECHAEFECTIVA >= '" +fechaDesde + "'");
+			sql.WHERE(" TO_DATE(HIST.FECHAEFECTIVA,'DD/MM/RRRR') >= TO_DATE('" +fechaDesde + "', 'DD/MM/RRRR') ");
 		}
 		if(null != historicoUsuarioRequestDTO.getFechaHasta()) {
 			String fechaHasta = dateFormat.format(historicoUsuarioRequestDTO.getFechaHasta());
-			sql.WHERE("HIST.FECHAEFECTIVA <= '" + fechaHasta + "'");
+			sql.WHERE(" TO_DATE(HIST.FECHAEFECTIVA,'DD/MM/RRRR') <= TO_DATE('" +fechaHasta + "', 'DD/MM/RRRR') ");
+		}
+		if(null != historicoUsuarioRequestDTO.getUsuarioAutomatico() && historicoUsuarioRequestDTO.getUsuarioAutomatico().equals("S")) {
+			sql.WHERE(" HIST.USUMODIFICACION = '0'");
 		}
 		
+	
 		// campos que siempre seran obligatorios
 		sql.WHERE(" HIST.IDINSTITUCION = '"+ historicoUsuarioRequestDTO.getIdInstitucion() +"'");
 		sql.WHERE(" USU.IDINSTITUCION = '"+ historicoUsuarioRequestDTO.getIdInstitucion() +"'");
 		sql.WHERE(" CAT.IDLENGUAJE = '"+ historicoUsuarioRequestDTO.getIdLenguaje() +"'");
-		//sql.WHERE("HIST.FECHAEFECTIVA between " + historicoUsuarioRequestDTO.getFechaDesde() + " and " + historicoUsuarioRequestDTO.getFechaHasta());
-		
-		
-		
+
 		return sql.toString();
 	}
 }
