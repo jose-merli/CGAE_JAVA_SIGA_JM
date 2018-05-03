@@ -32,11 +32,14 @@ import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmTiposacceso;
 import org.itcgae.siga.db.entities.AdmTiposaccesoExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
+import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.GenMenu;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
+import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -76,6 +79,8 @@ public class MenuServiceImpl implements IMenuService {
 	@Autowired
     AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
+	@Autowired
+	AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoMapper;
 
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
@@ -111,9 +116,12 @@ public class MenuServiceImpl implements IMenuService {
 			examplePerfil.setDistinct(Boolean.TRUE);
 			examplePerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion);
 			examplePerfil.setOrderByClause("IDPERFIL ASC");
-			//Obtenemos todos los perfiles para cargar sus puntos de Menú
-			List<AdmPerfil> perfiles = perfilMapper.selectByExample(examplePerfil);
-
+			//Obtenemos todos los perfiles del Usuario para cargar sus puntos de Menú
+			AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
+			
+			exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
+			List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
+			
 			if (perfiles == null) {
 				Error error = new Error();
 				error.setCode(400);
@@ -121,27 +129,17 @@ public class MenuServiceImpl implements IMenuService {
 				response.setError(error);
 				return response;
 			}
-			for(AdmPerfil perfil:perfiles){
+			for(AdmUsuariosEfectivosPerfil perfil:perfiles){
 				idperfiles.add(perfil.getIdperfil());
 			}
 				AdmTiposaccesoExample exampleMenu = new AdmTiposaccesoExample();
 
 				exampleMenu.setDistinct(true);
 				exampleMenu.setOrderByClause(" MENU.ORDEN ASC");
-				exampleMenu.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdperfilIn(idperfiles)
-				.andDerechoaccesoGreaterThan(Short.valueOf("1"));
+				exampleMenu.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdperfilIn(idperfiles);
+
 				//Obtenemos todos los puntos de Menú
 				menuEntities = menuExtend.selectMenuByExample(exampleMenu);
-
-				/*for(GenMenu menu: menuEntities){
-						menuMap.put(menu.getIdmenu(), menu);
-				}
-			
-			
-
-		menuEntities = new ArrayList<GenMenu>();
-		menuEntities.addAll(menuMap.values());
-		*/
 
 		if (null != menuEntities && !menuEntities.isEmpty()) {
 			List<MenuItem> items = new ArrayList<MenuItem>();
@@ -414,10 +412,50 @@ public class MenuServiceImpl implements IMenuService {
 	public PermisoDTO getAccessControl(ControlRequestItem controlItem, HttpServletRequest request) {
 		
 		PermisoDTO response= new PermisoDTO();
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		//Cargamos el Dni del Token
+				String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
+				String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+				
+				Short idInstitucion = Short
+						.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
+
+				AdmUsuariosExample usuarioExample = new AdmUsuariosExample();
+				usuarioExample.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+				//Obtenemos el Usuario para comprobar todas sus instituciones
+				List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExample);
+				
+				if (usuarios == null || usuarios.isEmpty()) {
+					Error error = new Error();
+					error.setCode(400);
+					error.setDescription("400");
+					response.setError(error);
+					return response;
+				}
+
+					List<String> idperfiles = new ArrayList<String>();
+
+					//Obtenemos todos los perfiles del Usuario para cargar sus puntos de Menú
+					AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
+					
+					exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
+					List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
+					
+					if (perfiles == null) {
+						Error error = new Error();
+						error.setCode(400);
+						error.setDescription("400");
+						response.setError(error);
+						return response;
+					}
+					for(AdmUsuariosEfectivosPerfil perfil:perfiles){
+						idperfiles.add("'" + perfil.getIdperfil() +"'");
+					}
 		String[] listParameters = nifInstitucion.split("-");
 		controlItem.setInstitucion(listParameters[2]);
-		controlItem.setIdGrupo(listParameters[1]);
+		String str = idperfiles.toString().replace("[", "").replace("]", "");
+		controlItem.setIdGrupo(str);
+
+		
 		List<PermisoEntity> permisos =  this.admUsuariosExtendsMapper.getAccessControls(controlItem);
 		if (null != permisos && permisos.size()>0) {
 			List<PermisoItem> permisosItem = new ArrayList<PermisoItem>();

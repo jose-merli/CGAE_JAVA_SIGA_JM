@@ -45,7 +45,7 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 			throws IOException, ServletException {
 		String header = null;
 		try {
-			header = tokenPrefix + " " + new UserAuthenticationToken("44149718E-AGE-2000").generateToken("44149718E-AGE-2000");
+			header = tokenPrefix + " " + new UserAuthenticationToken("44149718E-Personal-2000").generateToken("44149718E-Personal-2000");
 		} catch (TokenGenerationException e) {
 			e.printStackTrace();
 		}

@@ -12,8 +12,7 @@ public class UsuarioLogeadoItem {
 	private Integer idUsuario = null;
 	private String nombre = null;
 	private String dni  = null;
-	@JsonFormat(pattern = "dd-MM-yyyy")
-	private Date ultimaConex = null;
+	private String ultimaConex = null;
 	private String institucion  = null;
 	private String idioma  = null;
 	
@@ -77,19 +76,19 @@ public class UsuarioLogeadoItem {
 	
 	/**
 	 */
-	public UsuarioLogeadoItem UltimaConex(Date ultimaConex){
+	public UsuarioLogeadoItem UltimaConex(String ultimaConex){
 		this.ultimaConex = ultimaConex;
 		return this;
 	}
 	
 	
 	@JsonProperty("ultimaConex")
-	public Date getUltimaConex() {
+	public String getUltimaConex() {
 		return ultimaConex;
 	}
 	
 	
-	public void setUltimaConex(Date ultimaConex) {
+	public void setUltimaConex(String ultimaConex) {
 		this.ultimaConex = ultimaConex;
 	}
 	

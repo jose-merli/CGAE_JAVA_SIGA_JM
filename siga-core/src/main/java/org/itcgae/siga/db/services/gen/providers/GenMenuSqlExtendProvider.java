@@ -20,31 +20,44 @@ public class GenMenuSqlExtendProvider extends GenMenuSqlProvider {
      */
     public String selectMenuByExample(AdmTiposaccesoExample example) {
         SQL sql = new SQL();
+       
+
+        
         if (example != null && example.isDistinct()) {
             sql.SELECT_DISTINCT("MENU.IDMENU");
         } else {
             sql.SELECT("MENU.IDMENU");
         }
         sql.SELECT("MENU.ORDEN");
-        sql.SELECT("MENU.TAGWIDTH");
         sql.SELECT("MENU.IDPARENT");
-        sql.SELECT("MENU.FECHAMODIFICACION");
-        sql.SELECT("MENU.USUMODIFICACION");
-        sql.SELECT("MENU.URI_IMAGEN");
         sql.SELECT("MENU.IDRECURSO");
-        sql.SELECT("MENU.GEN_MENU_IDMENU");
         sql.SELECT("MENU.IDPROCESO");
-        sql.SELECT("MENU.IDLENGUAJE");
         sql.SELECT("MENU.PATH");
         sql.SELECT("MENU.IDCLASS");
+        sql.SELECT("DECODE(MIN(DECODE(ACCESO.DERECHOACCESO,0,5,ACCESO.DERECHOACCESO)),5,0,MIN(DECODE(ACCESO.DERECHOACCESO,0,5,ACCESO.DERECHOACCESO))) AS DERECHOACCESO");
         sql.FROM(" GEN_MENU  MENU INNER JOIN ADM_TIPOSACCESO ACCESO ON  ACCESO.IDPROCESO = MENU.IDPROCESO AND MENU.FECHA_BAJA IS NULL ");
         this.applyWhereTiposAcceso(sql, example, false);
-        
+        sql.GROUP_BY("MENU.IDMENU, MENU.ORDEN , MENU.IDPARENT, MENU.IDRECURSO,MENU.IDPROCESO, MENU.PATH, MENU.IDCLASS");
         if (example != null && example.getOrderByClause() != null) {
             sql.ORDER_BY(example.getOrderByClause());
         }
         
-        return sql.toString();
+        SQL sql2 = new SQL();
+        
+        sql2.SELECT("MENU.IDMENU");
+        sql2.SELECT("MENU.ORDEN");
+        sql2.SELECT("MENU.IDPARENT");
+        sql2.SELECT("MENU.IDRECURSO");
+        sql2.SELECT("MENU.IDPROCESO");
+        sql2.SELECT("MENU.PATH");
+        sql2.SELECT("MENU.IDCLASS");
+        sql2.SELECT("MENU.DERECHOACCESO");
+        sql2.FROM("( " + sql + ")  MENU");
+        sql2.WHERE(" MENU.DERECHOACCESO > 1");
+        
+        
+        
+        return sql2.toString();
     }
 
 	/**

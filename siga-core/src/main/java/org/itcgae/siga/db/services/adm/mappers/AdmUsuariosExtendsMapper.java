@@ -86,7 +86,7 @@ public interface AdmUsuariosExtendsMapper extends AdmUsuariosMapper{
 		@Result(column = "IDUSUARIO", property = "idUsuario", jdbcType = JdbcType.INTEGER),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DNI", property = "dni", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "ULTIMACONEX", property = "ultimaConex", jdbcType = JdbcType.DATE),
+		@Result(column = "ULTIMACONEX", property = "ultimaConex", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "INSTITUCION", property = "institucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDIOMA", property = "idioma", jdbcType = JdbcType.VARCHAR),
 	})
