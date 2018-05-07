@@ -51,14 +51,15 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 			sql.WHERE("exists (select 1 from ADM_USUARIOS_EFECTIVOS_PERFIL UEP where UEP.IDINSTITUCION = USUARIOS.IDINSTITUCION ");
 			sql.WHERE("UEP.IDUSUARIO = USUARIOS.IDUSUARIO and UEP.IDPERFIL = '" + usuarioRequestDTO.getGrupo() + "')");
 		}
+
 		// comprobacion campo nombreApellidos del body para aplicar filtro
 		if(null != usuarioRequestDTO.getNombreApellidos() &&  !usuarioRequestDTO.getNombreApellidos().equalsIgnoreCase("")){
-			sql.WHERE("USUARIOS.DESCRIPCION = '" + usuarioRequestDTO.getNombreApellidos() + "'");
+			sql.WHERE("(UPPER(USUARIOS.DESCRIPCION) LIKE UPPER ('%" + usuarioRequestDTO.getNombreApellidos() + "%'))");
 		}
 		
 		// comprobacion campo nif del body para aplicar filtro
 		if(null != usuarioRequestDTO.getNif() && !usuarioRequestDTO.getNif().equalsIgnoreCase("")){
-			sql.WHERE("USUARIOS.NIF = '" + usuarioRequestDTO.getNif() + "'");
+			sql.WHERE("(UPPER(USUARIOS.NIF) LIKE UPPER  ('%" + usuarioRequestDTO.getNif() + "%'))");
 		}
 		
 		// El campo idinstitucion es obligatorio en el body. El filtro se aplica siempre
