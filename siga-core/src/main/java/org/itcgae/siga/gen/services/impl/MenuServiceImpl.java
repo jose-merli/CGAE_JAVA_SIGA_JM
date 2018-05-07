@@ -31,6 +31,7 @@ import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmTiposacceso;
 import org.itcgae.siga.db.entities.AdmTiposaccesoExample;
+import org.itcgae.siga.db.entities.AdmTiposaccesoKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
@@ -360,15 +361,31 @@ public class MenuServiceImpl implements IMenuService {
 		if (null != permisoRequestItem ) {
 
 				
-				AdmTiposacceso record = new AdmTiposacceso();
-				record.setDerechoacceso(Short.valueOf(permisoRequestItem.getDerechoacceso()));
-				record.setFechamodificacion(new Date());
-				record.setIdperfil(permisoRequestItem.getIdGrupo());
-				record.setIdproceso(permisoRequestItem.getId());
-				record.setIdinstitucion(Short.valueOf(institucion));
-				record.setUsumodificacion(usuario.getIdusuario());
-				this.tiposAccesoMapper.updateByPrimaryKey(record );
-
+				AdmTiposaccesoKey key = new AdmTiposaccesoKey();
+				key.setIdperfil(permisoRequestItem.getIdGrupo());
+				key.setIdproceso(permisoRequestItem.getId());
+				key.setIdinstitucion(Short.valueOf(institucion));
+				AdmTiposacceso acceso = this.tiposAccesoMapper.selectByPrimaryKey(key );
+			
+				if (acceso != null) {
+					AdmTiposacceso record = new AdmTiposacceso();
+					record.setDerechoacceso(Short.valueOf(permisoRequestItem.getDerechoacceso()));
+					record.setFechamodificacion(new Date());
+					record.setIdperfil(permisoRequestItem.getIdGrupo());
+					record.setIdproceso(permisoRequestItem.getId());
+					record.setIdinstitucion(Short.valueOf(institucion));
+					record.setUsumodificacion(usuario.getIdusuario());
+					this.tiposAccesoMapper.updateByPrimaryKey(record );
+				}else {
+					AdmTiposacceso record = new AdmTiposacceso();
+					record.setDerechoacceso(Short.valueOf(permisoRequestItem.getDerechoacceso()));
+					record.setFechamodificacion(new Date());
+					record.setIdperfil(permisoRequestItem.getIdGrupo());
+					record.setIdproceso(permisoRequestItem.getId());
+					record.setIdinstitucion(Short.valueOf(institucion));
+					record.setUsumodificacion(usuario.getIdusuario());
+					this.tiposAccesoMapper.insert(record );
+				}
 				
 				
 			
