@@ -76,6 +76,7 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.resolve(loginMethod), loginUrl).permitAll()
 				.antMatchers(HttpMethod.GET, "/instituciones").permitAll()
 				.antMatchers(HttpMethod.GET, "/perfilespost").permitAll()
+				.antMatchers(HttpMethod.GET, "/perfiles").permitAll()
 				.anyRequest().authenticated().and()
 				.addFilterBefore(new ProAuthenticationFilter(authenticationManager(), loginMethod, loginUrl,
 						tokenHeaderAuthKey, tokenPrefix), BasicAuthenticationFilter.class)
