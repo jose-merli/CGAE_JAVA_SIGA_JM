@@ -60,9 +60,6 @@ public class SigaUserDetailsService implements UserDetailsService  {
 	//TODO: Añadir llamada a bbdd para recuperar el usuario
 	public UserDetails loadUserByUsername(String nifInstitucion) throws UsernameNotFoundException {
 		
-
-		
-		
 		ControlRequestItem controlItem = new ControlRequestItem();
 		HashMap<String,String> response= new HashMap<String,String>();
 		//Cargamos el Dni del Token
@@ -92,6 +89,8 @@ public class SigaUserDetailsService implements UserDetailsService  {
 			//Obtenemos todos los perfiles del Usuario para cargar sus puntos de Menú
 			AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
 			
+			//TODO: Esta fallando aqui porque no encuentra mi usuario en la anterior busqueda usuarioMapper.selectByExample(usuarioExample) 
+			//DNI 51120235 e id institucion 2000
 			exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
 			List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
 			

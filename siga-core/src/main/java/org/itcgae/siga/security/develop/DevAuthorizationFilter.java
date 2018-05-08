@@ -15,28 +15,21 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.commons.utils.TokenGenerationException;
-import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
-import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
-import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.gen.services.IMenuService;
-import org.itcgae.siga.gen.services.impl.MenuServiceImpl;
 import org.itcgae.siga.security.UserAuthenticationToken;
-import org.itcgae.siga.services.impl.SigaUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
+import org.itcgae.siga.security.UserPrincipalCgae;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Jwts;
 
 
-
+@Service
 public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 	
-
+	private UserDetailsService userDetailsService;
 	
 	private static String secretSignKey;
 	
@@ -50,23 +43,32 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 		DevAuthorizationFilter.tokenPrefix = tokenPrefix;
 	}
 	
-	public DevAuthorizationFilter(AuthenticationManager authManager) {
+	public DevAuthorizationFilter(AuthenticationManager authManager, UserDetailsService userDetailsService) {
 		super(authManager);
-		//this.admUsuariosExtendsMapper = admUsuariosExtendsMapper;
-		//this.admUsuariosEfectivoMapper = admUsuariosEfectivoMapper;
-		//this.usuarioMapper = usuarioMapper;	
+		this.userDetailsService = userDetailsService;
+
 	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
-		String header = null;
-		try {
-			
-			HashMap<String,String> map = getPerm("44149718E-Personal-2000");
-			header = tokenPrefix + " " + new UserAuthenticationToken("44149718E-Personal-2000").generateToken("44149718E-Personal-2000",map);
-		} catch (TokenGenerationException e) {
-			e.printStackTrace();
+		
+		String header = req.getHeader(tokenHeaderAuthKey);
+		
+		if (header == null || !header.startsWith(tokenPrefix)) {
+			UserAuthenticationToken authentication = getAuthentication(req);
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			chain.doFilter(req, res);
+			try {
+				String principal = "44149718E-Personal-2000";
+				UserPrincipalCgae user = (UserPrincipalCgae) userDetailsService.loadUserByUsername(principal);
+				UserAuthenticationToken userToken = new UserAuthenticationToken(principal, null, user, null, new ArrayList<>());
+				
+				
+				header = tokenPrefix + " " + userToken.generateToken("44149718E-Personal-2000");
+			} catch (TokenGenerationException e) {
+				e.printStackTrace();
+			}
 		}
 		HeaderMapRequestWrapper mutableRequest = new HeaderMapRequestWrapper(req);
 		
@@ -89,14 +91,23 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 						.getSubject();
 
 			if (user != null) {
-				return new UserAuthenticationToken(user, null, new ArrayList<>());
+				return new UserAuthenticationToken(user, null, null, null, new ArrayList<>());
 			}
 			return null;
 		}
 		return null;
 	}
 	
-	
+	public UserDetailsService getUserDetailsService() {
+		return userDetailsService;
+	}
+
+	public void setUserDetailsService(UserDetailsService userDetailsService) {
+		this.userDetailsService = userDetailsService;
+	}
+
+
+
 	public class HeaderMapRequestWrapper extends HttpServletRequestWrapper {
         /**
          * construct a wrapper for this request
@@ -151,13 +162,4 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 
     }
 	
-	private HashMap<String, String> getPerm(String string) {
-		
-		SigaUserDetailsService userDetailsService = new SigaUserDetailsService();
-		UserDetails user = userDetailsService.loadUserByUsername(string);
-		return null;
-		
-		
-		
-	}
 }
