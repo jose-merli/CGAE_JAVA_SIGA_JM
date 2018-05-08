@@ -1,8 +1,5 @@
 package org.itcgae.siga.security.develop;
 
-import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
-import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
-import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.logger.RequestLoggingFilter;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.services.impl.SigaUserDetailsService;
@@ -12,7 +9,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -74,7 +70,7 @@ public class DevConfigSecurity extends WebSecurityConfigurerAdapter {
 				.anyRequest().authenticated().and()
 				.addFilterBefore(new DevAuthenticationFilter(authenticationManager(), loginMethod, loginUrl,
 						tokenHeaderAuthKey, tokenPrefix), BasicAuthenticationFilter.class)
-				.addFilter(new DevAuthorizationFilter(authenticationManager()))
+				.addFilter(new DevAuthorizationFilter(authenticationManager(), userDetailsService))
 				.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);
 
 		// Configuramos el token con los parametros de configuracion
@@ -85,17 +81,8 @@ public class DevConfigSecurity extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService);
-		auth.authenticationProvider(authenticationProvider());
-	}
-	
-	
-	@Bean
-	public DevAuthenticationProvider authenticationProvider() {
-		DevAuthenticationProvider authProvider
-	      = new DevAuthenticationProvider();
-	    authProvider.setUserDetailsService(userDetailsService);
-	    //authProvider.setPasswordEncoder(encoder());
-	    return authProvider;
+		devAuthenticationProvider.setUserDetailsService(userDetailsService);
+		auth.authenticationProvider(devAuthenticationProvider);
 	}
 
 	

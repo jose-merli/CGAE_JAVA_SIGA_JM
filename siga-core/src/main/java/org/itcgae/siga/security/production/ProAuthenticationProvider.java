@@ -4,12 +4,14 @@ import java.security.cert.X509Certificate;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserPrincipalCgae;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +22,16 @@ public class ProAuthenticationProvider implements AuthenticationProvider {
 	
 	@Value("${cert-conf-path}")
 	private String certConfPath;
+	
+	private UserDetailsService userDetailsService;
+
+	public UserDetailsService getUserDetailsService() {
+		return userDetailsService;
+	}
+
+	public void setUserDetailsService(UserDetailsService userDetailsService) {
+		this.userDetailsService = userDetailsService;
+	}
 
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -33,8 +45,10 @@ public class ProAuthenticationProvider implements AuthenticationProvider {
 		}
 		Validacion result = validaCertificado(cgaeAuthenticaton.getCertificate());
 		
+		UserPrincipalCgae user = (UserPrincipalCgae) this.userDetailsService.loadUserByUsername(authentication.getPrincipal().toString());
+		
 		if (result.equals(Validacion.OK)){
-			return new UserAuthenticationToken(cgaeAuthenticaton.getPrincipal(), null,
+			return new UserAuthenticationToken(cgaeAuthenticaton.getPrincipal(), null, user,
 					cgaeAuthenticaton.getCertificate(), cgaeAuthenticaton.getAuthorities());			
 		} else{
 			throw new BadCredentialsException("Imposible validar el certificado");

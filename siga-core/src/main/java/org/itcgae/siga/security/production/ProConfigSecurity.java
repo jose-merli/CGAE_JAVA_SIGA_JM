@@ -55,7 +55,7 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 	String tokenPrefix;
 
 	@Autowired
-	private ProAuthenticationProvider cgaeAuthenticationProvider;
+	private ProAuthenticationProvider proAuthenticationProvider;
 
 	public ProConfigSecurity(SigaUserDetailsService userDetailsService) {
 		this.userDetailsService = userDetailsService;
@@ -90,11 +90,9 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// Se define la clase que recupera los usuarios y el algoritmo para
-		// procesar las
-		// passwords
 		auth.userDetailsService(userDetailsService);
-		auth.authenticationProvider(cgaeAuthenticationProvider);
+		proAuthenticationProvider.setUserDetailsService(userDetailsService);
+		auth.authenticationProvider(proAuthenticationProvider);
 	}
 
 	@Bean

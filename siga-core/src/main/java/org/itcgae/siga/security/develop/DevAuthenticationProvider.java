@@ -2,8 +2,8 @@ package org.itcgae.siga.security.develop;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserPrincipalCgae;
 import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,8 +33,8 @@ public class DevAuthenticationProvider extends AbstractUserDetailsAuthentication
 	@Override
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 		UserAuthenticationToken cgaeAuthenticaton = (UserAuthenticationToken) authentication;
-
-		return new UserAuthenticationToken(cgaeAuthenticaton.getPrincipal(), null, null,
+		UserPrincipalCgae user = (UserPrincipalCgae) this.userDetailsService.loadUserByUsername(authentication.getPrincipal().toString());
+		return new UserAuthenticationToken(cgaeAuthenticaton.getPrincipal(), null, user, null,
 				cgaeAuthenticaton.getAuthorities());
 
 	}
