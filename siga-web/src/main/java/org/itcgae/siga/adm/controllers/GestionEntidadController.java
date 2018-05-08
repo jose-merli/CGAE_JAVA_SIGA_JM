@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.EntidadLenguajeInstitucionDTO;
-import org.itcgae.siga.DTOs.adm.UsuarioCreateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.adm.service.IGestionEntidadService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +39,9 @@ public class GestionEntidadController {
 	
 	
 	@RequestMapping(value = "entidad/uploadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	ResponseEntity<String> uploadFile(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
-		String response = gestionEntidadService.uploadFile(request);
-		return new ResponseEntity<String>(response, HttpStatus.OK);
+	ResponseEntity<CreateResponseDTO> uploadFile(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
+		CreateResponseDTO response = gestionEntidadService.uploadFile(request);
+		return new ResponseEntity<CreateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 	

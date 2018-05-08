@@ -2,12 +2,9 @@ package org.itcgae.siga.adm.service.impl;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -38,7 +35,6 @@ import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -94,7 +90,9 @@ public class GestionEntidadServiceImpl implements IGestionEntidadService{
 	}
 
 	@Override
-	public String uploadFile(MultipartHttpServletRequest request) throws IOException {
+	public CreateResponseDTO uploadFile(MultipartHttpServletRequest request) throws IOException {
+		int response = 0;
+		CreateResponseDTO createResponseDTO = new CreateResponseDTO();
 		
 		// Obtenemos datos del usuario logeado
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
@@ -109,7 +107,8 @@ public class GestionEntidadServiceImpl implements IGestionEntidadService{
 		GenPropertiesExample genPropertiesExample = new GenPropertiesExample();
 		genPropertiesExample.createCriteria().andParametroEqualTo("directorios.carpeta.logos");
 		List<GenProperties> properties = genPropertiesMapper.selectByExample(genPropertiesExample);
-		String pathImagenes = properties.get(0).getValor() + File.separator;
+		//String pathImagenes = properties.get(0).getValor() + File.separator;
+		String pathImagenes = properties.get(0).getValor() + "/";
 		
 		// Coger archivo del request
 		Iterator<String> itr = request.getFileNames();
@@ -131,37 +130,22 @@ public class GestionEntidadServiceImpl implements IGestionEntidadService{
 			}
 		}
 		
-//		Random aleatorio=new Random();
-//		fileName=idInstitucion+"_"+aleatorio.nextInt()+"_"+fileName;
-//		
-//		File dir = new File(pathImagenes);
-//		dir.mkdirs();
-//		File serverFile = new File(dir, fileName);
-//		BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-//		stream.write(file.getBytes());
-//		stream.close();
-		//
 		
 		// Crear nombre del archivo a guardar
 		Random aleatorio = new Random();
 		fileName = idInstitucion + "_" + aleatorio.nextInt() + "_" + fileName;
 
-		String data = null;
-		InputStream stream = null;
-		OutputStream bos = null;
+		
+	
+		BufferedOutputStream stream = null;
 		// Guardar el archivo
 		try {
 			File aux = new File(pathImagenes);
+			// creo directorio si no existe
 			aux.mkdirs();
-			stream = new FileInputStream(aux);
-
-			bos = new FileOutputStream(pathImagenes + fileName);
-			int bytesRead = 0;
-			byte[] buffer = new byte[8192];
-			while ((bytesRead = stream.read(buffer, 0, 8192)) != -1) {
-				bos.write(buffer, 0, bytesRead);
-			}
-			data = "The file has been written to \"" + pathImagenes + "\"";
+			File serverFile = new File(pathImagenes, fileName);
+			stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+			stream.write(file.getBytes());
 
 		} catch (FileNotFoundException fnfe) {
 			return null;
@@ -169,7 +153,6 @@ public class GestionEntidadServiceImpl implements IGestionEntidadService{
 			return null;
 		} finally {
 			// close the stream
-			bos.close();
 			stream.close();
 		}
 		
@@ -189,7 +172,7 @@ public class GestionEntidadServiceImpl implements IGestionEntidadService{
 			admGestorinterfazInsertInto.setLogo(fileName);
 			admGestorinterfazInsertInto.setTipoletra("1");
 			admGestorinterfazInsertInto.setUsumodificacion(usuario.getIdusuario());
-			admGestorinterfazMapper.insertSelective(admGestorinterfazInsertInto);
+			response = admGestorinterfazMapper.insertSelective(admGestorinterfazInsertInto);
 		}
 		// si no vacía => update
 		else {
@@ -197,15 +180,23 @@ public class GestionEntidadServiceImpl implements IGestionEntidadService{
 			admGestorinterfaz.setLogo(fileName);
 			admGestorinterfaz.setFechamodificacion(new Date());
 			admGestorinterfaz.setUsumodificacion(usuario.getIdusuario());
-			admGestorinterfazMapper.updateByExampleSelective(admGestorinterfaz, admGestorinterfazExample);
+			response = admGestorinterfazMapper.updateByExampleSelective(admGestorinterfaz, admGestorinterfazExample);
 		}
          
+		if(response == 1)
+			createResponseDTO.setStatus("OK");
+		else 	createResponseDTO.setStatus("ERROR");
 		
-		return null;
+		return createResponseDTO;
 	}
 
 	@Override
 	public CreateResponseDTO uploadLenguage(String idLenguaje, HttpServletRequest request) {
+		int response = 0;
+		CreateResponseDTO createResponseDTO = new CreateResponseDTO();
+		
+		// Como el idLenguage viene en JSON, le quitamos ""
+		idLenguaje = idLenguaje.substring(1,idLenguaje.length()-1);
 		// Obtenemos atributos del usuario logeado
 		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
 		String dni = nifInstitucion.substring(0, 9);
@@ -226,10 +217,13 @@ public class GestionEntidadServiceImpl implements IGestionEntidadService{
 			example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			
 			// actualizamos idlenguaje, fecha modificacion y usuario de modificacion para cen_institucion
-			cenInstitucionExtendsMapper.updateByExampleSelective(record, example);
+			response = cenInstitucionExtendsMapper.updateByExampleSelective(record, example);
 		}
+		if(response == 1)
+			createResponseDTO.setStatus("OK");
+		else 	createResponseDTO.setStatus("ERROR");
 		
-		return null;
+		return createResponseDTO;
 	}
 
 }
