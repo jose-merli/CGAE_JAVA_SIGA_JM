@@ -20,10 +20,8 @@ import org.itcgae.siga.DTOs.adm.UsuarioGrupoEditDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioGrupoItem;
 import org.itcgae.siga.DTOs.adm.UsuarioGruposDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioItem;
-import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
-import org.itcgae.siga.DTOs.gen.ComboCatalogoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -58,8 +56,6 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	
 	@Autowired
 	private AdmPerfilRolMapper admPerfilRolMapper;
-	
-	
 	
 	@Autowired
 	private AdmPerfilExtendsMapper admPerfilExtendsMapper;

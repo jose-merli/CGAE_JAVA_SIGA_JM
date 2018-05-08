@@ -3,10 +3,14 @@ package org.itcgae.siga.security;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.naming.ldap.LdapName;
 
 import org.itcgae.siga.commons.utils.TokenGenerationException;
+import org.itcgae.siga.gen.services.IMenuService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,6 +19,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 public class UserAuthenticationToken extends AbstractAuthenticationToken {
+
 
 	private static long expirationTime;
 
@@ -143,16 +148,22 @@ public class UserAuthenticationToken extends AbstractAuthenticationToken {
 		credentials = null;
 	}
 
-	public String generateToken(Authentication auth) throws TokenGenerationException {
+	public String generateToken(Authentication auth, HashMap<String,String> map) throws TokenGenerationException {
 		try {
 			String dn = this.getCertificate().getSubjectX500Principal().getName();
 			LdapName ldapDN;
 			ldapDN = new LdapName(dn);
 			String issuer;
+			
+			
+			
+			
+
 			issuer = ldapDN.getRdns().stream().filter(a -> a.getType().equals("O")).findFirst().get().getValue()
 					.toString();
 
 			return Jwts.builder().setIssuedAt(new Date()).setIssuer(issuer).setSubject(auth.getPrincipal().toString())
+					.claim("claim",map)
 					.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 					.signWith(SignatureAlgorithm.HS512, secretSignKey).compact();
 
@@ -161,9 +172,14 @@ public class UserAuthenticationToken extends AbstractAuthenticationToken {
 		}
 	}
 	
-	public String generateToken(String auth) throws TokenGenerationException {
+
+
+	public String generateToken(String auth, HashMap<String,String> map) throws TokenGenerationException {
 		try {
-			return Jwts.builder().setIssuedAt(new Date()).setSubject(auth.toString())
+			
+		
+			
+			return Jwts.builder().setIssuedAt(new Date()).setSubject(auth.toString()).claim("claim",map)
 					.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 					.signWith(SignatureAlgorithm.HS512, secretSignKey).compact();
 
@@ -171,10 +187,20 @@ public class UserAuthenticationToken extends AbstractAuthenticationToken {
 			throw new TokenGenerationException(e);
 		}
 	}
+	
+
 
 	public static String getUserFromJWTToken(String token) {
 		return Jwts.parser().setSigningKey(secretSignKey).parseClaimsJws(token.replace(tokenPrefix, "")).getBody()
 				.getSubject();
+	}
+	
+	public static Map<String, String> getPermisosFromJWTToken(String token) {
+		@SuppressWarnings("unchecked")
+		Map<String,String>  claims = (Map<String, String>) Jwts.parser().setSigningKey(secretSignKey).parseClaimsJws(token.replace(tokenPrefix, "")).getBody()
+				.get("claim");
+		 		 
+		 return claims;
 	}
 
 }

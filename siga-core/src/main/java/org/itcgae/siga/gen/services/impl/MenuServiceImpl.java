@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -205,14 +206,14 @@ public class MenuServiceImpl implements IMenuService {
 	}
 
 	@Override
-	public ComboDTO getInstituciones() {
+	public ComboDTO getInstituciones(HttpServletRequest request) {
 		//Cargamos el combo de Instituciones
 		ComboDTO response = new ComboDTO();
 		
 		CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
 		exampleInstitucion.setDistinct(true);
 		exampleInstitucion.setOrderByClause("ABREVIATURA ASC");
-
+		
 		List<CenInstitucion> instituciones = institucionMapper.selectByExample(exampleInstitucion);
 		List<ComboItem> combos = new ArrayList<ComboItem>();
 		if (null != instituciones && instituciones.size() > 0) {
@@ -484,6 +485,69 @@ public class MenuServiceImpl implements IMenuService {
 			response.setPermisoItems(permisosItem);
 		}
 		return response;
+	}
+	
+	
+	@Override
+	public HashMap<String,String> getAccessControlWithOutPerm(String nifInstitucion) {
+		
+		
+		ControlRequestItem controlItem = new ControlRequestItem();
+		HashMap<String,String> response= new HashMap<String,String>();
+		//Cargamos el Dni del Token
+				
+		//String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(authorization);
+		
+		Short idInstitucion = Short
+				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
+
+		String dni = nifInstitucion.substring(0,9);
+		AdmUsuariosExample usuarioExample = new AdmUsuariosExample();
+		usuarioExample.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+		//Obtenemos el Usuario para comprobar todas sus instituciones
+		List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExample);
+		
+		/*if (usuarios == null || usuarios.isEmpty()) {
+			Error error = new Error();
+			error.setCode(400);
+			error.setDescription("400");
+			response.setError(error);
+			return response;
+		}*/
+
+			List<String> idperfiles = new ArrayList<String>();
+
+			//Obtenemos todos los perfiles del Usuario para cargar sus puntos de Menú
+			AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
+			
+			exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
+			List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
+			
+			/*if (perfiles == null) {
+				Error error = new Error();
+				error.setCode(400);
+				error.setDescription("400");
+				response.setError(error);
+				return response;
+			}*/
+			for(AdmUsuariosEfectivosPerfil perfil:perfiles){
+				idperfiles.add("'" + perfil.getIdperfil() +"'");
+			}
+			//Nos quedamos con todos los perfiles para realizar la búsqueda.
+			String[] listParameters = nifInstitucion.split("-");
+			controlItem.setInstitucion(listParameters[2]);
+			String str = idperfiles.toString().replace("[", "").replace("]", "");
+			controlItem.setIdGrupo(str);
+	
+			//Añadimos los permisos a la lista
+			List<PermisoEntity> permisos =  this.admUsuariosExtendsMapper.getAccessControlsWithOutProcess(controlItem);
+			if (null != permisos && permisos.size()>0) {
+				for (PermisoEntity permisoEntity : permisos) {
+					response.put(permisoEntity.getData(), permisoEntity.getDerechoacceso());
+				}
+				
+			}
+			return response;
 	}
 
 }

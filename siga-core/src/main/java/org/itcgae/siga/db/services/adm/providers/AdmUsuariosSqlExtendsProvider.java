@@ -286,4 +286,22 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 		return sql.toString();
 	}
 	
+	public String getAccessControlsWithOutProcess(ControlRequestItem request){
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("PROC.IDPROCESO AS ID");
+		sql.SELECT("NVL(PROC.IDPARENT,'ARBOL') AS PARENT");
+		sql.SELECT("PROC.DESCRIPCION AS TEXT");
+		sql.SELECT("DECODE(MIN(DECODE(ACCESO.DERECHOACCESO,0,5,ACCESO.DERECHOACCESO)),5,0,MIN(DECODE(ACCESO.DERECHOACCESO,0,5,ACCESO.DERECHOACCESO))) AS DERECHOACCESO");
+
+		sql.FROM("GEN_PROCESOS PROC");
+		
+		sql.INNER_JOIN("ADM_TIPOSACCESO ACCESO ON PROC.IDPROCESO = ACCESO.IDPROCESO ");
+		sql.WHERE("IDINSTITUCION = ('" + request.getInstitucion() + "')");
+		sql.WHERE("IDPERFIL IN (" + request.getIdGrupo() + ")");
+		sql.GROUP_BY("PROC.IDPROCESO,PROC.IDPARENT,PROC.DESCRIPCION");
+		sql.ORDER_BY("PARENT DESC, TEXT ASC");
+		return sql.toString();
+	}
+	
 }
