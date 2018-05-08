@@ -15,14 +15,28 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.commons.utils.TokenGenerationException;
+import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
+import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.gen.services.IMenuService;
+import org.itcgae.siga.gen.services.impl.MenuServiceImpl;
 import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.services.impl.SigaUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import io.jsonwebtoken.Jwts;
 
+
+
 public class DevAuthorizationFilter extends BasicAuthenticationFilter {
+	
+
 	
 	private static String secretSignKey;
 	
@@ -38,6 +52,9 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 	
 	public DevAuthorizationFilter(AuthenticationManager authManager) {
 		super(authManager);
+		//this.admUsuariosExtendsMapper = admUsuariosExtendsMapper;
+		//this.admUsuariosEfectivoMapper = admUsuariosEfectivoMapper;
+		//this.usuarioMapper = usuarioMapper;	
 	}
 
 	@Override
@@ -45,7 +62,9 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 			throws IOException, ServletException {
 		String header = null;
 		try {
-			header = tokenPrefix + " " + new UserAuthenticationToken("44149718E-Personal-2000").generateToken("44149718E-Personal-2000");
+			
+			HashMap<String,String> map = getPerm("44149718E-Personal-2000");
+			header = tokenPrefix + " " + new UserAuthenticationToken("44149718E-Personal-2000").generateToken("44149718E-Personal-2000",map);
 		} catch (TokenGenerationException e) {
 			e.printStackTrace();
 		}
@@ -131,4 +150,14 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
         }
 
     }
+	
+	private HashMap<String, String> getPerm(String string) {
+		
+		SigaUserDetailsService userDetailsService = new SigaUserDetailsService();
+		UserDetails user = userDetailsService.loadUserByUsername(string);
+		return null;
+		
+		
+		
+	}
 }

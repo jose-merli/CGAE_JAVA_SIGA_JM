@@ -1,5 +1,7 @@
 package org.itcgae.siga.gen.services;
 
+import java.util.HashMap;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -20,7 +22,7 @@ public interface IMenuService {
 	public MenuDTO getMenu(HttpServletRequest request);
 	
 	
-	public  ComboDTO getInstituciones();
+	public  ComboDTO getInstituciones(HttpServletRequest request);
 	
 	
 	public  ComboDTO getPerfiles(String idInstitucion);
@@ -36,6 +38,8 @@ public interface IMenuService {
 
 
 	public PermisoDTO getAccessControl(ControlRequestItem permisoRequestItem, HttpServletRequest request);
+	
+	public HashMap<String,String> getAccessControlWithOutPerm(String authorization);
 
 
 }

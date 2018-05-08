@@ -101,4 +101,13 @@ public interface AdmUsuariosExtendsMapper extends AdmUsuariosMapper{
 		@Result(column = "PARENT", property = "parent", jdbcType = JdbcType.VARCHAR)
 	})
 	List<PermisoEntity> getAccessControls(ControlRequestItem controlItem);
+	
+	@SelectProvider(type = AdmUsuariosSqlExtendsProvider.class, method = "getAccessControlsWithOutProcess")
+	@Results({
+		@Result(column = "TEXT", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ID", property = "data", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DERECHOACCESO", property = "derechoacceso", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PARENT", property = "parent", jdbcType = JdbcType.VARCHAR)
+	})
+	List<PermisoEntity> getAccessControlsWithOutProcess(ControlRequestItem controlItem);
 }
