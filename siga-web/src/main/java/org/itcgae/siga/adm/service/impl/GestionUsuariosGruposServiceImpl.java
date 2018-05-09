@@ -43,7 +43,7 @@ import org.itcgae.siga.db.mappers.AdmRolMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -114,8 +114,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		
 		
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		example.createCriteria().andFechaBajaIsNull().andIdinstitucionEqualTo(Short.valueOf(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length())));
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		example.createCriteria().andFechaBajaIsNull().andIdinstitucionEqualTo(idInstitucion);
 		example.setOrderByClause("DESCRIPCION ASC");
 		example.setDistinct(true);
 		profiles = admPerfilExtendsMapper.selectComboPerfilDistinctByExample(example);
@@ -161,8 +162,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	public UsuarioDTO getUsersSearch(int numPagina, UsuarioRequestDTO usuarioRequestDTO, HttpServletRequest request) {
 		List<UsuarioItem> usuarioItems = new ArrayList<UsuarioItem>();
 		UsuarioDTO usuarioDTO = new UsuarioDTO();
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		usuarioRequestDTO.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		usuarioRequestDTO.setIdInstitucion(String.valueOf(idInstitucion));
 		usuarioItems = admUsuariosExtendsMapper.getUsersByFilter(numPagina, usuarioRequestDTO);
 
 		
@@ -185,9 +187,10 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		int response1 = 1;
 		int response2 = 1;
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0,9);
-		usuarioUpdateDTO.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		usuarioUpdateDTO.setIdInstitucion(String.valueOf(idInstitucion));
 		if (!usuarioUpdateDTO.getActivo().equalsIgnoreCase("")
 				|| !usuarioUpdateDTO.getCodigoExterno().equalsIgnoreCase("")) {
 			response1 = admUsuariosExtendsMapper.updateUsersAdmUserTable(usuarioUpdateDTO);
@@ -260,9 +263,11 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		int response2 = 1;
 		int response3 = 1;
 
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0,9);
-		usuarioCreateDTO.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+		
+		usuarioCreateDTO.setIdInstitucion(institucion);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
 		//admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
@@ -331,8 +336,10 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 	@Override
 	public DeleteResponseDTO deleteUsers(UsuarioDeleteDTO usuarioDeleteDTO, HttpServletRequest request) {
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		usuarioDeleteDTO.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+		String token = request.getHeader("Authorization");
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+
+		usuarioDeleteDTO.setIdInstitucion(institucion);
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		int response = 0;
 
@@ -364,8 +371,11 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		UsuarioGruposDTO response = new UsuarioGruposDTO();
 		AdmPerfilExample example = new AdmPerfilExample();
 		List<AdmPerfil> profiles = new ArrayList<AdmPerfil>();
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
+
+		String token = request.getHeader("Authorization");
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+
+
 		example.setOrderByClause("DESCRIPCION ASC");
 		example.setDistinct(true);
 		example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andFechaBajaIsNull();
@@ -466,9 +476,11 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 			for (int i = 0; i < usuarioDeleteDTO.length; i++) {
 				
 				
-				String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-				String dni = nifInstitucion.substring(0,9);
-				usuarioDeleteDTO[i].setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+				String token = request.getHeader("Authorization");
+				String dni = UserTokenUtils.getDniFromJWTToken(token);
+				String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+				
+				usuarioDeleteDTO[i].setIdInstitucion(institucion);
 				
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(usuarioDeleteDTO[i].getIdInstitucion()));
@@ -506,8 +518,10 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		UsuarioGruposDTO response = new UsuarioGruposDTO();
 		AdmPerfilExample example = new AdmPerfilExample();
 		List<AdmPerfil> profiles = new ArrayList<AdmPerfil>();
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
+		
+		String token = request.getHeader("Authorization");
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+
 		example.setOrderByClause("DESCRIPCION ASC");
 		example.setDistinct(true);
 		example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion));
@@ -582,9 +596,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 	@Override
 	public UpdateResponseDTO updateGroupUsers(UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request) {
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
-		String dni = nifInstitucion.substring(0,9);
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -673,9 +687,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 	@Override
 	public UpdateResponseDTO createGroupUsers(UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request) {
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
-		String dni = nifInstitucion.substring(0,9);
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short institucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
@@ -695,7 +709,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				record.setUsumodificacion(usuarios.get(0).getIdusuario());
 				record.setNivelperfil(new Long(0));
 				//Actualizamos el registro de perfil
-				int status = this.admPerfilExtendsMapper.insert(record);
+				this.admPerfilExtendsMapper.insert(record);
 				
 				
 				if (null != usuarioUpdateDTO.getRolesAsignados() && usuarioUpdateDTO.getRolesAsignados().length>0) {
@@ -757,9 +771,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	@Override
 	public UpdateResponseDTO updateGrupoDefecto(UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request) {
 		
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
-		String dni = nifInstitucion.substring(0,9);
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
 		

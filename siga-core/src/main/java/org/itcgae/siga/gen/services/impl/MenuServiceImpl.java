@@ -5,12 +5,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.ibatis.jdbc.SQL;
 import org.assertj.core.util.Strings;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
@@ -49,38 +47,34 @@ import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.gen.services.IMenuService;
-import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-
-
-
 
 @Service
 public class MenuServiceImpl implements IMenuService {
 
 	@Autowired
 	GenMenuExtendsMapper menuExtend;
-	
+
 	@Autowired
 	CenInstitucionExtendsMapper institucionMapper;
-	
+
 	@Autowired
 	AdmPerfilExtendsMapper perfilMapper;
-	
+
 	@Autowired
 	AdmUsuariosMapper usuarioMapper;
-	
+
 	@Autowired
 	GenProcesosExtendsMapper permisosMapper;
-	
+
 	@Autowired
 	AdmTiposaccesoMapper tiposAccesoMapper;
-	
+
 	@Autowired
-    AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
-	
+	AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+
 	@Autowired
 	AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoMapper;
 
@@ -88,21 +82,18 @@ public class MenuServiceImpl implements IMenuService {
 	public MenuDTO getMenu(HttpServletRequest request) {
 		MenuDTO response = new MenuDTO();
 		List<GenMenu> menuEntities = new ArrayList<GenMenu>();
-		HashMap<String, GenMenu> menuMap = new HashMap<String, GenMenu>();
 		String idLenguaje = new String();
 
-		//Cargamos el Dni del Token
-		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		
-		Short idInstitucion = Short
-				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
+		// Cargamos el Dni del Token
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		AdmUsuariosExample usuarioExample = new AdmUsuariosExample();
 		usuarioExample.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-		//Obtenemos el Usuario para comprobar todas sus instituciones
+		// Obtenemos el Usuario para comprobar todas sus instituciones
 		List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExample);
-		
+
 		if (usuarios == null || usuarios.isEmpty()) {
 			Error error = new Error();
 			error.setCode(400);
@@ -111,47 +102,50 @@ public class MenuServiceImpl implements IMenuService {
 			return response;
 		}
 
-			List<String> idperfiles = new ArrayList<String>();
+		List<String> idperfiles = new ArrayList<String>();
 
-			idLenguaje = usuarios.get(0).getIdlenguaje();
-			AdmPerfilExample examplePerfil = new AdmPerfilExample();
-			examplePerfil.setDistinct(Boolean.TRUE);
-			examplePerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion);
-			examplePerfil.setOrderByClause("IDPERFIL ASC");
-			//Obtenemos todos los perfiles del Usuario para cargar sus puntos de Menú
-			AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
-			
-			exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
-			List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
-			
-			if (perfiles == null) {
-				Error error = new Error();
-				error.setCode(400);
-				error.setDescription("400");
-				response.setError(error);
-				return response;
-			}
-			for(AdmUsuariosEfectivosPerfil perfil:perfiles){
-				idperfiles.add(perfil.getIdperfil());
-			}
-				AdmTiposaccesoExample exampleMenu = new AdmTiposaccesoExample();
+		idLenguaje = usuarios.get(0).getIdlenguaje();
+		AdmPerfilExample examplePerfil = new AdmPerfilExample();
+		examplePerfil.setDistinct(Boolean.TRUE);
+		examplePerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+		examplePerfil.setOrderByClause("IDPERFIL ASC");
+		// Obtenemos todos los perfiles del Usuario para cargar sus puntos de
+		// Menú
+		AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
 
-				exampleMenu.setDistinct(true);
-				exampleMenu.setOrderByClause(" MENU.ORDEN ASC");
-				exampleMenu.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdperfilIn(idperfiles);
+		exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+				.andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
+		List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
 
-				//Obtenemos todos los puntos de Menú
-				menuEntities = menuExtend.selectMenuByExample(exampleMenu);
+		if (perfiles == null) {
+			Error error = new Error();
+			error.setCode(400);
+			error.setDescription("400");
+			response.setError(error);
+			return response;
+		}
+		for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
+			idperfiles.add(perfil.getIdperfil());
+		}
+		AdmTiposaccesoExample exampleMenu = new AdmTiposaccesoExample();
+
+		exampleMenu.setDistinct(true);
+		exampleMenu.setOrderByClause(" MENU.ORDEN ASC");
+		exampleMenu.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdperfilIn(idperfiles);
+
+		// Obtenemos todos los puntos de Menú
+		menuEntities = menuExtend.selectMenuByExample(exampleMenu);
 
 		if (null != menuEntities && !menuEntities.isEmpty()) {
 			List<MenuItem> items = new ArrayList<MenuItem>();
-			List<GenMenu> rootMenus = menuEntities.stream().filter(i -> Strings.isNullOrEmpty(i.getIdparent()) || i.getIdparent().equals(" "))
+			List<GenMenu> rootMenus = menuEntities.stream()
+					.filter(i -> Strings.isNullOrEmpty(i.getIdparent()) || i.getIdparent().equals(" "))
 					.collect(Collectors.toList());
-			//Componemos el menú
-				for (GenMenu dbItem : rootMenus) {
-					MenuItem item = processMenu(dbItem,menuEntities,idLenguaje); 
-					items.add(item);
-				}
+			// Componemos el menú
+			for (GenMenu dbItem : rootMenus) {
+				MenuItem item = processMenu(dbItem, menuEntities, idLenguaje);
+				items.add(item);
+			}
 
 			response.setMenuItems(items);
 		}
@@ -159,61 +153,61 @@ public class MenuServiceImpl implements IMenuService {
 		return response;
 
 	}
-	
-	
-	private static MenuItem processMenu(GenMenu parent, List<GenMenu> childCandidatesList, String idLenguaje ) {
-		//Realizamos la carga del menú de forma cíclica dependiende los IdParents
-	    ArrayList<GenMenu> childList = new ArrayList<GenMenu>();
-	    ArrayList<GenMenu> childListTwo = new ArrayList<GenMenu>();
-	    MenuItem response = new MenuItem();
-	    response.setLabel(parent.getIdrecurso());
-	    response.setIdclass(parent.getIdclass());
-	    response.setRouterLink(parent.getPath());
 
-	    //Recorremos sus hijos
-	    for (GenMenu childTransactions : childCandidatesList) {
-	        childListTwo.add(childTransactions);
-	        if (childTransactions.getIdparent() != null) {
-	            
-	            if (childTransactions.getIdparent().equalsIgnoreCase(parent.getIdmenu())){
-	            	//Vamos almacenando los hijos
-	            	MenuItem responsechild = new MenuItem();
-	            	responsechild.setLabel(childTransactions.getIdrecurso());
-	            	responsechild.setIdclass(childTransactions.getIdclass());
-	            	responsechild.setRouterLink(childTransactions.getPath());
-	            	response.getItems().add(responsechild);
-	                childList.add(childTransactions);
-	                childListTwo.remove(childTransactions);
-	            }
-	        }
-	    }
-    	List<MenuItem> responseChilds = new ArrayList<MenuItem>();
+	private static MenuItem processMenu(GenMenu parent, List<GenMenu> childCandidatesList, String idLenguaje) {
+		// Realizamos la carga del menú de forma cíclica dependiende los
+		// IdParents
+		ArrayList<GenMenu> childList = new ArrayList<GenMenu>();
+		ArrayList<GenMenu> childListTwo = new ArrayList<GenMenu>();
+		MenuItem response = new MenuItem();
+		response.setLabel(parent.getIdrecurso());
+		response.setIdclass(parent.getIdclass());
+		response.setRouterLink(parent.getPath());
 
+		// Recorremos sus hijos
+		for (GenMenu childTransactions : childCandidatesList) {
+			childListTwo.add(childTransactions);
+			if (childTransactions.getIdparent() != null) {
 
-	    for (GenMenu child : childList) {
-	    	//Si tenemos hijos los procesamos de forma individual para ver si tienen más hijos
-	    	responseChilds.add(processMenu(child, childListTwo,idLenguaje));
-	    	
-	    }
-	    if (null != response.getItems() && response.getItems().size() >0) {
-	    	response.setItems(responseChilds);
-		}else {
+				if (childTransactions.getIdparent().equalsIgnoreCase(parent.getIdmenu())) {
+					// Vamos almacenando los hijos
+					MenuItem responsechild = new MenuItem();
+					responsechild.setLabel(childTransactions.getIdrecurso());
+					responsechild.setIdclass(childTransactions.getIdclass());
+					responsechild.setRouterLink(childTransactions.getPath());
+					response.getItems().add(responsechild);
+					childList.add(childTransactions);
+					childListTwo.remove(childTransactions);
+				}
+			}
+		}
+		List<MenuItem> responseChilds = new ArrayList<MenuItem>();
+
+		for (GenMenu child : childList) {
+			// Si tenemos hijos los procesamos de forma individual para ver si
+			// tienen más hijos
+			responseChilds.add(processMenu(child, childListTwo, idLenguaje));
+
+		}
+		if (null != response.getItems() && response.getItems().size() > 0) {
+			response.setItems(responseChilds);
+		} else {
 			response.setItems(null);
 		}
-	    
-	    return response;
+
+		return response;
 
 	}
 
 	@Override
 	public ComboDTO getInstituciones(HttpServletRequest request) {
-		//Cargamos el combo de Instituciones
+		// Cargamos el combo de Instituciones
 		ComboDTO response = new ComboDTO();
-		
+
 		CenInstitucionExample exampleInstitucion = new CenInstitucionExample();
 		exampleInstitucion.setDistinct(true);
 		exampleInstitucion.setOrderByClause("ABREVIATURA ASC");
-		
+
 		List<CenInstitucion> instituciones = institucionMapper.selectByExample(exampleInstitucion);
 		List<ComboItem> combos = new ArrayList<ComboItem>();
 		if (null != instituciones && instituciones.size() > 0) {
@@ -233,16 +227,16 @@ public class MenuServiceImpl implements IMenuService {
 			}
 
 		}
-		
+
 		response.setCombooItems(combos);
 		return response;
 	}
 
 	@Override
 	public ComboDTO getPerfiles(String idInstitucion) {
-		//Cargamos el combo de Perfil
+		// Cargamos el combo de Perfil
 		ComboDTO response = new ComboDTO();
-		
+
 		AdmPerfilExample examplePerfil = new AdmPerfilExample();
 		examplePerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 		examplePerfil.setOrderByClause("IDPERFIL ASC");
@@ -258,296 +252,230 @@ public class MenuServiceImpl implements IMenuService {
 			}
 
 		}
-		
+
 		response.setCombooItems(combos);
 		return response;
 	}
 
-
 	@Override
-	public PermisoDTO getPermisos(PermisoRequestItem permisoRequestItem,HttpServletRequest request) {
+	public PermisoDTO getPermisos(PermisoRequestItem permisoRequestItem, HttpServletRequest request) {
 		PermisoDTO permisoResponse = new PermisoDTO();
 		// Obtener idInstitucion del certificado y idUsuario del certificado
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		Short idInstitucion = Short
-				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
-		
 		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucion));
 		List<PermisoEntity> permisosEntity = this.permisosMapper.getProcesosPermisos(permisoRequestItem);
-		
 
-		
-		
 		if (null != permisosEntity && !permisosEntity.isEmpty()) {
 			List<PermisoItem> items = new ArrayList<PermisoItem>();
-			List<PermisoEntity> rootPermisos = permisosEntity.stream().filter(i -> Strings.isNullOrEmpty(i.getParent()) || i.getParent().equals("0"))
+			List<PermisoEntity> rootPermisos = permisosEntity.stream()
+					.filter(i -> Strings.isNullOrEmpty(i.getParent()) || i.getParent().equals("0"))
 					.collect(Collectors.toList());
-			//Componemos el árbol de permisos
-				for (PermisoEntity dbItem : rootPermisos) {
-					PermisoItem item = processPermisos(dbItem,permisosEntity); 
-					items.add(item);
-				}
+			// Componemos el árbol de permisos
+			for (PermisoEntity dbItem : rootPermisos) {
+				PermisoItem item = processPermisos(dbItem, permisosEntity);
+				items.add(item);
+			}
 
-				permisoResponse.setPermisoItems(items);
+			permisoResponse.setPermisoItems(items);
 		}
-		
-		
-		
-		
+
 		return permisoResponse;
 	}
 
-
 	private PermisoItem processPermisos(PermisoEntity parent, List<PermisoEntity> childCandidatesList) {
-		//Realizamos la carga de la gestión de permisos de forma cíclica dependiende los IdParents
-	    ArrayList<PermisoEntity> childList = new ArrayList<PermisoEntity>();
-	    ArrayList<PermisoEntity> childListTwo = new ArrayList<PermisoEntity>();
-	    PermisoItem response = new PermisoItem();
-	    response.setLabel(parent.getLabel());
-	    response.setData(parent.getData());
-	    response.setDerechoacceso(parent.getDerechoacceso());
+		// Realizamos la carga de la gestión de permisos de forma cíclica
+		// dependiende los IdParents
+		ArrayList<PermisoEntity> childList = new ArrayList<PermisoEntity>();
+		ArrayList<PermisoEntity> childListTwo = new ArrayList<PermisoEntity>();
+		PermisoItem response = new PermisoItem();
+		response.setLabel(parent.getLabel());
+		response.setData(parent.getData());
+		response.setDerechoacceso(parent.getDerechoacceso());
 
-	    //Recorremos sus hijos
-	    for (PermisoEntity childTransactions : childCandidatesList) {
-	        childListTwo.add(childTransactions);
-	        if (childTransactions.getParent() != null) {
-	            
-	            if (childTransactions.getParent().equalsIgnoreCase(parent.getData())){
-	            	//Vamos almacenando los hijos
-	            	PermisoItem responsechild = new PermisoItem();
-	            	responsechild.setLabel(childTransactions.getLabel());
-	            	responsechild.setData(childTransactions.getData());
-	            	responsechild.setDerechoacceso(childTransactions.getDerechoacceso());
-	            	response.getChildren().add(responsechild);
-	                childList.add(childTransactions);
-	                childListTwo.remove(childTransactions);
-	            }
-	        }
-	    }
-    	List<PermisoItem> responseChilds = new ArrayList<PermisoItem>();
+		// Recorremos sus hijos
+		for (PermisoEntity childTransactions : childCandidatesList) {
+			childListTwo.add(childTransactions);
+			if (childTransactions.getParent() != null) {
 
+				if (childTransactions.getParent().equalsIgnoreCase(parent.getData())) {
+					// Vamos almacenando los hijos
+					PermisoItem responsechild = new PermisoItem();
+					responsechild.setLabel(childTransactions.getLabel());
+					responsechild.setData(childTransactions.getData());
+					responsechild.setDerechoacceso(childTransactions.getDerechoacceso());
+					response.getChildren().add(responsechild);
+					childList.add(childTransactions);
+					childListTwo.remove(childTransactions);
+				}
+			}
+		}
+		List<PermisoItem> responseChilds = new ArrayList<PermisoItem>();
 
-	    for (PermisoEntity child : childList) {
-	    	//Si tenemos hijos los procesamos de forma individual para ver si tienen más hijos
-	    	responseChilds.add(processPermisos(child, childListTwo));
-	    	
-	    }
-	    if (null != response.getChildren() && response.getChildren().size() >0) {
-	    	response.setChildren(responseChilds);
-		}else {
+		for (PermisoEntity child : childList) {
+			// Si tenemos hijos los procesamos de forma individual para ver si
+			// tienen más hijos
+			responseChilds.add(processPermisos(child, childListTwo));
+
+		}
+		if (null != response.getChildren() && response.getChildren().size() > 0) {
+			response.setChildren(responseChilds);
+		} else {
 			response.setChildren(null);
 		}
-	    
-	    return response;
+
+		return response;
 
 	}
-
 
 	@Override
 	public UpdateResponseDTO updatePermisos(PermisoUpdateItem permisoRequestItem, HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		UpdateResponseDTO response = new UpdateResponseDTO();
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
-		String dni = nifInstitucion.substring(0,9);
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short institucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
-		
 
-		//Buscamos el perfil para ver si ya existe. En caso de que no exista
+		// Buscamos el perfil para ver si ya existe. En caso de que no exista
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 
-		if (null != permisoRequestItem ) {
+		if (null != permisoRequestItem) {
 
-				
-				AdmTiposaccesoKey key = new AdmTiposaccesoKey();
-				key.setIdperfil(permisoRequestItem.getIdGrupo());
-				key.setIdproceso(permisoRequestItem.getId());
-				key.setIdinstitucion(Short.valueOf(institucion));
-				AdmTiposacceso acceso = this.tiposAccesoMapper.selectByPrimaryKey(key );
-			
-				if (acceso != null) {
-					AdmTiposacceso record = new AdmTiposacceso();
-					record.setDerechoacceso(Short.valueOf(permisoRequestItem.getDerechoacceso()));
-					record.setFechamodificacion(new Date());
-					record.setIdperfil(permisoRequestItem.getIdGrupo());
-					record.setIdproceso(permisoRequestItem.getId());
-					record.setIdinstitucion(Short.valueOf(institucion));
-					record.setUsumodificacion(usuario.getIdusuario());
-					this.tiposAccesoMapper.updateByPrimaryKey(record );
-				}else {
-					AdmTiposacceso record = new AdmTiposacceso();
-					record.setDerechoacceso(Short.valueOf(permisoRequestItem.getDerechoacceso()));
-					record.setFechamodificacion(new Date());
-					record.setIdperfil(permisoRequestItem.getIdGrupo());
-					record.setIdproceso(permisoRequestItem.getId());
-					record.setIdinstitucion(Short.valueOf(institucion));
-					record.setUsumodificacion(usuario.getIdusuario());
-					this.tiposAccesoMapper.insert(record );
-				}
-				
-				
-			
+			AdmTiposaccesoKey key = new AdmTiposaccesoKey();
+			key.setIdperfil(permisoRequestItem.getIdGrupo());
+			key.setIdproceso(permisoRequestItem.getId());
+			key.setIdinstitucion(Short.valueOf(institucion));
+			AdmTiposacceso acceso = this.tiposAccesoMapper.selectByPrimaryKey(key);
+
+			if (acceso != null) {
+				AdmTiposacceso record = new AdmTiposacceso();
+				record.setDerechoacceso(Short.valueOf(permisoRequestItem.getDerechoacceso()));
+				record.setFechamodificacion(new Date());
+				record.setIdperfil(permisoRequestItem.getIdGrupo());
+				record.setIdproceso(permisoRequestItem.getId());
+				record.setIdinstitucion(Short.valueOf(institucion));
+				record.setUsumodificacion(usuario.getIdusuario());
+				this.tiposAccesoMapper.updateByPrimaryKey(record);
+			} else {
+				AdmTiposacceso record = new AdmTiposacceso();
+				record.setDerechoacceso(Short.valueOf(permisoRequestItem.getDerechoacceso()));
+				record.setFechamodificacion(new Date());
+				record.setIdperfil(permisoRequestItem.getIdGrupo());
+				record.setIdproceso(permisoRequestItem.getId());
+				record.setIdinstitucion(Short.valueOf(institucion));
+				record.setUsumodificacion(usuario.getIdusuario());
+				this.tiposAccesoMapper.insert(record);
+			}
+
 		}
 		response.setStatus(SigaConstants.OK);
-		
-		return response;
-		
-	}
 
+		return response;
+
+	}
 
 	@Override
 	public UsuarioLogeadoDTO getUserLog(HttpServletRequest request) {
 
-		
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		
-		
 		List<UsuarioLogeadoItem> usuario = this.admUsuariosExtendsMapper.getUsersLog(request);
 		UsuarioLogeadoDTO response = new UsuarioLogeadoDTO();
-		
+
 		response.setUsuarioLogeadoItem(usuario);
-		
+
 		for (UsuarioLogeadoItem usuarioLogeadoItem : usuario) {
-			
-			
-			AdmUsuarios record =  new AdmUsuarios();
-			
-			record.setIdinstitucion(Short.valueOf(institucion));
+
+			AdmUsuarios record = new AdmUsuarios();
+
+			record.setIdinstitucion(Short.valueOf(idInstitucion));
 			record.setIdusuario(usuarioLogeadoItem.getIdUsuario());
 			record.setUltimaConexion(new Date());
-			this.admUsuariosExtendsMapper.updateByPrimaryKeySelective(record );
+			this.admUsuariosExtendsMapper.updateByPrimaryKeySelective(record);
 		}
 		return response;
 	}
 
-
 	@Override
 	public PermisoDTO getAccessControl(ControlRequestItem controlItem, HttpServletRequest request) {
+
+		PermisoDTO response = new PermisoDTO();
+		String token = request.getHeader("Authorization");
+
+		HashMap<String,String> permisos = UserTokenUtils.getPermisosFromJWTToken(token);
+		PermisoItem permisoItem = new PermisoItem();
+		permisoItem.setDerechoacceso(permisos.get(controlItem.getIdProceso()));
 		
-		PermisoDTO response= new PermisoDTO();
-		//Cargamos el Dni del Token
-				String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
-				String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-				
-				Short idInstitucion = Short
-						.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
+		List<PermisoItem> permisosItem = new ArrayList<PermisoItem>();
+		permisosItem.add(permisoItem);
+		response.setPermisoItems(permisosItem);
 
-				AdmUsuariosExample usuarioExample = new AdmUsuariosExample();
-				usuarioExample.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-				//Obtenemos el Usuario para comprobar todas sus instituciones
-				List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExample);
-				
-				if (usuarios == null || usuarios.isEmpty()) {
-					Error error = new Error();
-					error.setCode(400);
-					error.setDescription("400");
-					response.setError(error);
-					return response;
-				}
+		return response;
+	}
 
-					List<String> idperfiles = new ArrayList<String>();
+	@Override
+	public HashMap<String, String> getAccessControlWithOutPerm(String nifInstitucion) {
 
-					//Obtenemos todos los perfiles del Usuario para cargar sus puntos de Menú
-					AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
-					
-					exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
-					List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
-					
-					if (perfiles == null) {
-						Error error = new Error();
-						error.setCode(400);
-						error.setDescription("400");
-						response.setError(error);
-						return response;
-					}
-					for(AdmUsuariosEfectivosPerfil perfil:perfiles){
-						idperfiles.add("'" + perfil.getIdperfil() +"'");
-					}
+		ControlRequestItem controlItem = new ControlRequestItem();
+		HashMap<String, String> response = new HashMap<String, String>();
+		// Cargamos el Dni del Token
+
+		// String nifInstitucion =
+		// UserAuthenticationToken.getUserFromJWTToken(authorization);
+
+		Short idInstitucion = Short
+				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
+
+		String dni = nifInstitucion.substring(0, 9);
+		AdmUsuariosExample usuarioExample = new AdmUsuariosExample();
+		usuarioExample.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+		// Obtenemos el Usuario para comprobar todas sus instituciones
+		List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExample);
+
+		/*
+		 * if (usuarios == null || usuarios.isEmpty()) { Error error = new
+		 * Error(); error.setCode(400); error.setDescription("400");
+		 * response.setError(error); return response; }
+		 */
+
+		List<String> idperfiles = new ArrayList<String>();
+
+		// Obtenemos todos los perfiles del Usuario para cargar sus puntos de
+		// Menú
+		AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
+
+		exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+				.andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
+		List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
+
+		/*
+		 * if (perfiles == null) { Error error = new Error();
+		 * error.setCode(400); error.setDescription("400");
+		 * response.setError(error); return response; }
+		 */
+		for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
+			idperfiles.add("'" + perfil.getIdperfil() + "'");
+		}
+		// Nos quedamos con todos los perfiles para realizar la búsqueda.
 		String[] listParameters = nifInstitucion.split("-");
 		controlItem.setInstitucion(listParameters[2]);
 		String str = idperfiles.toString().replace("[", "").replace("]", "");
 		controlItem.setIdGrupo(str);
 
-		
-		List<PermisoEntity> permisos =  this.admUsuariosExtendsMapper.getAccessControls(controlItem);
-		if (null != permisos && permisos.size()>0) {
-			List<PermisoItem> permisosItem = new ArrayList<PermisoItem>();
+		// Añadimos los permisos a la lista
+		List<PermisoEntity> permisos = this.admUsuariosExtendsMapper.getAccessControlsWithOutProcess(controlItem);
+		if (null != permisos && permisos.size() > 0) {
 			for (PermisoEntity permisoEntity : permisos) {
-				PermisoItem permisoItem = new PermisoItem();
-				permisoItem.setDerechoacceso(permisoEntity.getDerechoacceso());
-				permisosItem.add(permisoItem);
+				response.put(permisoEntity.getData(), permisoEntity.getDerechoacceso());
 			}
-			response.setPermisoItems(permisosItem);
+
 		}
 		return response;
-	}
-	
-	
-	@Override
-	public HashMap<String,String> getAccessControlWithOutPerm(String nifInstitucion) {
-		
-		
-		ControlRequestItem controlItem = new ControlRequestItem();
-		HashMap<String,String> response= new HashMap<String,String>();
-		//Cargamos el Dni del Token
-				
-		//String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(authorization);
-		
-		Short idInstitucion = Short
-				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
-
-		String dni = nifInstitucion.substring(0,9);
-		AdmUsuariosExample usuarioExample = new AdmUsuariosExample();
-		usuarioExample.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
-		//Obtenemos el Usuario para comprobar todas sus instituciones
-		List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExample);
-		
-		/*if (usuarios == null || usuarios.isEmpty()) {
-			Error error = new Error();
-			error.setCode(400);
-			error.setDescription("400");
-			response.setError(error);
-			return response;
-		}*/
-
-			List<String> idperfiles = new ArrayList<String>();
-
-			//Obtenemos todos los perfiles del Usuario para cargar sus puntos de Menú
-			AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
-			
-			exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
-			List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
-			
-			/*if (perfiles == null) {
-				Error error = new Error();
-				error.setCode(400);
-				error.setDescription("400");
-				response.setError(error);
-				return response;
-			}*/
-			for(AdmUsuariosEfectivosPerfil perfil:perfiles){
-				idperfiles.add("'" + perfil.getIdperfil() +"'");
-			}
-			//Nos quedamos con todos los perfiles para realizar la búsqueda.
-			String[] listParameters = nifInstitucion.split("-");
-			controlItem.setInstitucion(listParameters[2]);
-			String str = idperfiles.toString().replace("[", "").replace("]", "");
-			controlItem.setIdGrupo(str);
-	
-			//Añadimos los permisos a la lista
-			List<PermisoEntity> permisos =  this.admUsuariosExtendsMapper.getAccessControlsWithOutProcess(controlItem);
-			if (null != permisos && permisos.size()>0) {
-				for (PermisoEntity permisoEntity : permisos) {
-					response.put(permisoEntity.getData(), permisoEntity.getDerechoacceso());
-				}
-				
-			}
-			return response;
 	}
 
 }

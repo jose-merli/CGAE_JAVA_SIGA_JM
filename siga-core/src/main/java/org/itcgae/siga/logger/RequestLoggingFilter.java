@@ -14,7 +14,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.slf4j.MDC;
 
 public class RequestLoggingFilter implements Filter {
@@ -47,7 +47,7 @@ public class RequestLoggingFilter implements Filter {
 		try {
 			String jwtToken = ((HttpServletRequest)request).getHeader("Authorization");
 			
-			return "||".concat(UserAuthenticationToken.getUserFromJWTToken(jwtToken));
+			return "||".concat(UserTokenUtils.getDniFromJWTToken(jwtToken));
 		} catch (Exception e) {
 			return user;
 		}

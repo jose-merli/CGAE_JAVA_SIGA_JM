@@ -1,6 +1,5 @@
 package org.itcgae.siga.adm.service.impl;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,7 +20,7 @@ import org.itcgae.siga.db.entities.CenHistorico;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenTipocambioExtendsMapper;
-import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,9 +45,9 @@ public class AuditoriaUsuariosServiceImpl implements IAuditoriaUsuariosService{
 		ComboItem comboItem = new ComboItem();
 		
 		// Conseguimos idLenguaje del usuario logeado
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0, 9);
-		String idInstitucion = nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length());
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
@@ -74,16 +73,16 @@ public class AuditoriaUsuariosServiceImpl implements IAuditoriaUsuariosService{
 		
 		
 		// Conseguimos idLenguaje e idInstitucion del usuario logeado
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0, 9);
-		String idInstitucion = nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length());
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 		
 		if(null != idInstitucion && null != usuario.getIdlenguaje()) {
-			historicoUsuarioRequestDTO.setIdInstitucion(idInstitucion);
+			historicoUsuarioRequestDTO.setIdInstitucion(String.valueOf(idInstitucion));
 			historicoUsuarioRequestDTO.setIdLenguaje(usuario.getIdlenguaje());
 			historicoUsuarioItem = cenHistoricoExtendsMapper.auditUsersSearch(numPagina, historicoUsuarioRequestDTO);
 			
@@ -100,9 +99,9 @@ public class AuditoriaUsuariosServiceImpl implements IAuditoriaUsuariosService{
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		
 		// Conseguimos idLenguaje e idInstitucion del usuario logeado
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0, 9);
-		String idInstitucion = nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length());
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);

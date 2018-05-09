@@ -15,8 +15,6 @@ import org.itcgae.siga.DTOs.adm.InstitucionDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboCatalogoDTO;
 import org.itcgae.siga.DTOs.gen.ComboCatalogoItem;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.adm.service.IMaestroCatalogoService;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -29,7 +27,7 @@ import org.itcgae.siga.db.entities.GenTablasMaestrasExample;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.mappers.GenRecursosCatalogosMapper;
 import org.itcgae.siga.db.services.gen.mappers.GenTablasMaestrasExtendsMapper;
-import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -87,11 +85,12 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		//Obtenemos los datos del catálogo con la tabla maestra seleccionada
 		
 		//Obtenemos la institución del Token
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		catalogoRequest.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+		catalogoRequest.setIdInstitucion(institucion);
 		
 		// Obtenemos el DNI del token
-		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(catalogoRequest.getIdInstitucion()));
 		//Obtenemos el usuario para añadir el USUMODIFICACION
@@ -124,8 +123,12 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		//Editamos los datos del catálogo con la tabla maestra seleccionada
 		
 		//Obtenemos la institución del Token
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		catalogoUpdate.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+		// Obtenemos el DNI del token
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+		
+		catalogoUpdate.setIdInstitucion(institucion);
 		UpdateResponseDTO response = new UpdateResponseDTO();
 		GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
 		exampleTablasMaestras.setDistinct(true);
@@ -133,8 +136,6 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		exampleTablasMaestras.createCriteria().andIdtablamaestraEqualTo(catalogoUpdate.getTabla());
 		List<GenTablasMaestras> tablasMaestras = tablasMaestrasMapper.selectByExample(exampleTablasMaestras);
 		
-		// Obtenemos el DNI del token
-		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(catalogoUpdate.getIdInstitucion()));
 		
@@ -167,8 +168,10 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		//eliminamos los datos del catálogo con la tabla maestra seleccionada
 		
 		//Obtenemos la institución del Token
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		catalogoDelete.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+		String token = request.getHeader("Authorization");
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+		
+		catalogoDelete.setIdInstitucion(institucion);
 		UpdateResponseDTO response = new UpdateResponseDTO();
 		GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
 		exampleTablasMaestras.setDistinct(true);
@@ -194,8 +197,10 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		//Creamos un nuevo registro en el catálogo con la tabla maestra seleccionada
 		
 		//Obtenemos la institución del Token
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		catalogoCreate.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+		catalogoCreate.setIdInstitucion(institucion);
 		UpdateResponseDTO response = new UpdateResponseDTO();
 		GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
 		exampleTablasMaestras.setDistinct(true);
@@ -224,8 +229,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 				if (null != idInstitucion && idInstitucion.getIdInstitucion().equals("1")) {
 					isInstitucion =  Boolean.TRUE;
 				}
-				// Obtenemos el DNI del token
-				String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
+
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(catalogoCreate.getIdInstitucion()));
 				
@@ -248,12 +252,14 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 	public CatalogoMaestroDTO getDatosCatalogoHistorico(CatalogoRequestDTO catalogoRequest,HttpServletRequest request) {
 		//Obtenemos los datos del catálogo con la tabla maestra seleccionada
 		
-		//Obtenemos la institución del Token
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		catalogoRequest.setIdInstitucion(nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length()));
-		
+		String token = request.getHeader("Authorization");
 		// Obtenemos el DNI del token
-		String dni = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization")).substring(0,9);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		//Obtenemos la institución del Token
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+		
+		catalogoRequest.setIdInstitucion(institucion);
+		
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(catalogoRequest.getIdInstitucion()));
 		//Obtenemos el usuario para añadir el USUMODIFICACION

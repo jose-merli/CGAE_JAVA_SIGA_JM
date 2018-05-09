@@ -21,7 +21,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
-import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,10 +64,9 @@ public class ContadoresServiceImpl implements IContadoresService{
 		ComboDTO combo = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		// Obtener idInstitucion del certificado y idUsuario del certificado
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0, 9);
-		Short idInstitucion = Short
-				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios .createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
@@ -92,12 +91,9 @@ public class ContadoresServiceImpl implements IContadoresService{
 			HttpServletRequest request) {
 		ContadorDTO contadorResponse = new ContadorDTO();
 		// Obtener idInstitucion del certificado y idUsuario del certificado
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0, 9);
-
-
-		String institucion = nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length());
-		contadorRequestDTO.setIdInstitucion(institucion);
+		String token = request.getHeader("Authorization");
+		Short institucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		contadorRequestDTO.setIdInstitucion(String.valueOf(institucion));
 		//Realizamos la llamada al servicio para obtener los contadores
 		List<AdmContadorDTO> contadores = this.admContadorExtendsMapper.getContadoresSearch(numPagina, contadorRequestDTO);
 		contadorResponse.setContadorItems(contadores);
@@ -111,10 +107,9 @@ public class ContadoresServiceImpl implements IContadoresService{
 		UpdateResponseDTO updateResponseDTO =  new 	UpdateResponseDTO(); 
 		
 		// Obtener idInstitucion del certificado y idUsuario del certificado
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0, 9);
-		Short idInstitucion = Short
-				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);

@@ -16,6 +16,8 @@ import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.itcgae.siga.commons.utils.InvalidClientCerticateException;
 import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserCgae;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,8 +28,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-	
-	
 	Logger LOGGER = LoggerFactory.getLogger(ProAuthenticationFilter.class);
 
 	private AuthenticationManager authenticationManager;
@@ -49,44 +49,40 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			throws AuthenticationException {
 		try {
 			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-			String user = null;
+			String commonName = null;
+			String organizationName = null;
 			String grupo = null;
-			String institucion = null;
-			
+			X509Certificate cert = null;
+
 			if (null != certs && certs.length > 0) {
-//				String dn = certs[0].getSubjectX500Principal().getName();
-//				LdapName ldapDN = new LdapName(dn);
-				
-				X509Certificate cert = certs[0];
-
-
+				cert = certs[0];
 				try {
 					X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
 
 					RDN userRdn = x500name.getRDNs(BCStyle.CN)[0];
-					 user = IETFUtils.valueToString(userRdn.getFirst().getValue());
-					
+					commonName = IETFUtils.valueToString(userRdn.getFirst().getValue());
+
 					RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
-					institucion = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
+					organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
 
 					RDN grupoRdn = x500name.getRDNs(BCStyle.T)[0];
 					grupo = IETFUtils.valueToString(grupoRdn.getFirst().getValue());
 
-					logger.info("USER: " + user);
-					logger.info("INSTITUCION: " + institucion);
+					logger.debug("Common Name: " + commonName);
+					logger.debug("Organization Name: " + organizationName);
 				} catch (NoSuchElementException e) {
 					throw new InvalidClientCerticateException(e);
 				}
-				
-				
-				String nif =  user.substring(user.length()-9,user.length());
-				String idInstitucion = institucion.substring(institucion.length()-4,institucion.length());
-				logger.info("NIF: " + nif);
-				logger.info("idInstitucion: " + idInstitucion);
-				String nifInstitucion = nif.concat("-").concat(grupo).concat("-").concat(idInstitucion);
-				logger.info("NifInstitucion: " + nifInstitucion);
 
-				return authenticationManager.authenticate(new UserAuthenticationToken(nifInstitucion, null, null, certs[0], null));
+				String dni = commonName.substring(commonName.length() - 9, commonName.length());
+				String institucion = organizationName.substring(organizationName.length() - 4,
+						organizationName.length());
+				logger.debug("DNI: " + dni);
+				logger.debug("INSTITUCION: " + institucion);
+				logger.debug("GRUPO: " + grupo);
+
+				UserCgae user = new UserCgae(dni, grupo, institucion, null);
+				return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, cert));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -97,18 +93,20 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication auth) throws IOException, ServletException {
-		response.addHeader("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
-                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-		response.addHeader("Access-Control-Expose-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
-                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+		response.addHeader("Access-Control-Allow-Headers",
+				"Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, "
+						+ "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+		response.addHeader("Access-Control-Expose-Headers",
+				"Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, "
+						+ "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 		try {
 			if (auth.getClass().equals(UserAuthenticationToken.class)) {
-				UserAuthenticationToken userAuthToken = (UserAuthenticationToken) auth;
-				response.addHeader(tokenHeaderAuthKey, tokenPrefix + " " + userAuthToken.generateToken(auth));
+				response.addHeader(tokenHeaderAuthKey,
+						tokenPrefix + " " + UserTokenUtils.generateToken((UserAuthenticationToken) auth));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 }
