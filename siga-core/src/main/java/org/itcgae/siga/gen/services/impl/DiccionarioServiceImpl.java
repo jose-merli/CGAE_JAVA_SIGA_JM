@@ -20,7 +20,7 @@ import org.itcgae.siga.db.mappers.AdmLenguajesMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
 import org.itcgae.siga.gen.services.IDiccionarioService;
-import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -122,12 +122,12 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 		
 
 		// Obtener idInstitucion del certificado y idUsuario del certificado
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0, 9);
-		Short idInstitucion = Short
-				.valueOf(nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length()));
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios .createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);;
+		exampleUsuarios .createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 		

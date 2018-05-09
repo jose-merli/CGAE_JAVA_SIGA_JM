@@ -9,9 +9,8 @@ import org.itcgae.siga.DTOs.adm.UsuarioGrupoDeleteDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
-import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.db.mappers.AdmUsuariosSqlProvider;
-import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserTokenUtils;
 
 public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 
@@ -243,9 +242,9 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 	 */
 	public String getUsersLog(HttpServletRequest usuarioRequestDTO){
 		SQL sql = new SQL();
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(usuarioRequestDTO.getHeader("Authorization"));
-		String institucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
-		String dni = nifInstitucion.substring(0,9);
+		String token = usuarioRequestDTO.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short institucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		sql.SELECT("USUARIOS.IDUSUARIO AS IDUSUARIO");
 		sql.SELECT("USUARIOS.DESCRIPCION AS NOMBRE");
 		sql.SELECT("USUARIOS.NIF AS DNI");
@@ -281,6 +280,24 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 		sql.WHERE("IDINSTITUCION = ('" + request.getInstitucion() + "')");
 		sql.WHERE("IDPERFIL IN (" + request.getIdGrupo() + ")");
 		sql.WHERE("PROC.IDPROCESO = ('" + request.getIdProceso() + "')");
+		sql.GROUP_BY("PROC.IDPROCESO,PROC.IDPARENT,PROC.DESCRIPCION");
+		sql.ORDER_BY("PARENT DESC, TEXT ASC");
+		return sql.toString();
+	}
+	
+	public String getAccessControlsWithOutProcess(ControlRequestItem request){
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("PROC.IDPROCESO AS ID");
+		sql.SELECT("NVL(PROC.IDPARENT,'ARBOL') AS PARENT");
+		sql.SELECT("PROC.DESCRIPCION AS TEXT");
+		sql.SELECT("DECODE(MIN(DECODE(ACCESO.DERECHOACCESO,0,5,ACCESO.DERECHOACCESO)),5,0,MIN(DECODE(ACCESO.DERECHOACCESO,0,5,ACCESO.DERECHOACCESO))) AS DERECHOACCESO");
+
+		sql.FROM("GEN_PROCESOS PROC");
+		
+		sql.INNER_JOIN("ADM_TIPOSACCESO ACCESO ON PROC.IDPROCESO = ACCESO.IDPROCESO ");
+		sql.WHERE("IDINSTITUCION = ('" + request.getInstitucion() + "')");
+		sql.WHERE("IDPERFIL IN (" + request.getIdGrupo() + ")");
 		sql.GROUP_BY("PROC.IDPROCESO,PROC.IDPARENT,PROC.DESCRIPCION");
 		sql.ORDER_BY("PARENT DESC, TEXT ASC");
 		return sql.toString();

@@ -1,22 +1,13 @@
 package org.itcgae.siga.db.services.gen.mappers;
 
 import java.util.List;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.DeleteProvider;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.InsertProvider;
-import org.apache.ibatis.annotations.Param;
+
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
-import org.apache.ibatis.annotations.Update;
-import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.db.entities.AdmTiposaccesoExample;
 import org.itcgae.siga.db.entities.GenMenu;
-import org.itcgae.siga.db.entities.GenMenuExample;
-import org.itcgae.siga.db.mappers.GenMenuSqlProvider;
 import org.itcgae.siga.db.services.gen.providers.GenMenuSqlExtendProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

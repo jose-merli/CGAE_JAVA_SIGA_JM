@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserCgae;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,8 +18,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
+public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+	
+	
 	Logger LOGGER = LoggerFactory.getLogger(DevAuthenticationFilter.class);
 
 	private AuthenticationManager authenticationManager;
@@ -25,6 +29,8 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	private static String tokenHeaderAuthKey;
 
 	private static String tokenPrefix;
+	
+	
 
 	public DevAuthenticationFilter(AuthenticationManager authenticationManager, String loginMethod, String loginUrl,
 			String tokenHeaderAuthKey, String tokenPrefix) {
@@ -39,9 +45,8 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			throws AuthenticationException {
 
 		// Usuario 2 -> Usuario de desarrollo del actual SIGA
-		String user = "03862002A";
-		String institucion = "2003";
-		return authenticationManager.authenticate(new UserAuthenticationToken(user.concat(institucion)));
+		UserCgae userDesarrollo = new UserCgae("44149718E", "Personal", "2000", null);
+		return authenticationManager.authenticate(new UserAuthenticationToken(userDesarrollo.getDni(), userDesarrollo, null));
 
 	}
 
@@ -50,16 +55,15 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			Authentication auth) throws IOException, ServletException {
 		response.addHeader("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
                 "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-		response.addHeader("Access-Control-Expose-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
-                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 
 		try {
 			if (auth.getClass().equals(UserAuthenticationToken.class)) {
 				UserAuthenticationToken userAuthToken = (UserAuthenticationToken) auth;
-				response.addHeader(tokenHeaderAuthKey, tokenPrefix + " " + userAuthToken.generateToken(auth.getPrincipal().toString()));
+				response.addHeader(tokenHeaderAuthKey, UserTokenUtils.generateToken(userAuthToken));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
+	}	
+	
 }
