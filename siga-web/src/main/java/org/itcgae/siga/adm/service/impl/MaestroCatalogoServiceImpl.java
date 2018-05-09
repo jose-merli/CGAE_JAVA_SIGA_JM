@@ -177,8 +177,14 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		List<GenTablasMaestras> tablasMaestras = tablasMaestrasMapper.selectByExample(exampleTablasMaestras);
 		//Modificamos la fecha de Baja para darle de baja
 		if (null != tablasMaestras && tablasMaestras.size() > 0) {
-				GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
-				tablasMaestrasMapper.deleteRecursos(tablaMaestra,catalogoDelete);
+			GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
+			InstitucionDTO idInstitucion = tablasMaestrasMapper.selectColumnName(tablaMaestra);
+			Boolean isInstitucion = Boolean.FALSE;
+			if (null != idInstitucion && idInstitucion.getIdInstitucion().equals("1")) {
+				isInstitucion =  Boolean.TRUE;
+			}
+
+				tablasMaestrasMapper.deleteRecursos(tablaMaestra,catalogoDelete,isInstitucion);
 			}
 	
 		response.setStatus(SigaConstants.OK);
