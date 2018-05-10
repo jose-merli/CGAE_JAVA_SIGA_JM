@@ -21,7 +21,7 @@ import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenDiccionarioExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
-import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,8 +62,9 @@ public class MultiidiomaCatalogosServiceImpl implements IMultiidiomaCatalogosSer
 		ComboDTO comboDTO = new ComboDTO();
 		ComboItem comboItem = new ComboItem();
 		// obtener idInstitucion del usuario logeado
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String idInstitucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
+		String token = request.getHeader("Authorization");
+		//Obtenemos la institución del Token
+		String idInstitucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 		
 		if(!idInstitucion.equals(null)) {
 			combooItems = genRecursosCatalogosExtendsMapper.getCatalogEntity(idInstitucion);
@@ -87,8 +88,9 @@ public class MultiidiomaCatalogosServiceImpl implements IMultiidiomaCatalogosSer
 		MultiidiomaCatalogoDTO multiidiomaCatalogoDTO =  new MultiidiomaCatalogoDTO();
 		
 		// obtener idInstitucion del usuario logeado
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String idInstitucion = nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length());
+		String token = request.getHeader("Authorization");
+		//Obtenemos la institución del Token
+		String idInstitucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 		
 		if(!multiidiomaCatalogoSearchDTO.getIdiomaBusqueda().equals(null) &&  !multiidiomaCatalogoSearchDTO.getIdiomaBusqueda().equalsIgnoreCase("") &&
 				!multiidiomaCatalogoSearchDTO.getIdiomaTraduccion().equals(null) && !multiidiomaCatalogoSearchDTO.getIdiomaTraduccion().equalsIgnoreCase("") &&
@@ -111,9 +113,11 @@ public class MultiidiomaCatalogosServiceImpl implements IMultiidiomaCatalogosSer
 		GenRecursosCatalogosExample example = new GenRecursosCatalogosExample();
 		
 		// Conseguimos idUsuario del usuario logeado
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0, 9);
-		String idInstitucion = nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length());
+		String token = request.getHeader("Authorization");
+		// Obtenemos el DNI del token
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		//Obtenemos la institución del Token
+		String idInstitucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
