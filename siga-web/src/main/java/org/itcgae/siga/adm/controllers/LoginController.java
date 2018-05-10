@@ -3,6 +3,7 @@ package org.itcgae.siga.adm.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.HeaderLogoDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioGrupoEditDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
@@ -26,10 +27,11 @@ public class LoginController {
 
 	
 	@Autowired
-	ITestHeadersService testHeadersService;
+	private ITestHeadersService testHeadersService;
 	
 	@Autowired
-	IMenuService menuService;
+	private IMenuService menuService;
+	
 	
 	@RequestMapping(value="/", produces="application/json")
 	ResponseEntity<Status>health() {
@@ -51,6 +53,16 @@ public class LoginController {
 
         return new ResponseEntity<UsuarioLogeadoDTO>(headers, HttpStatus.OK);
     }
+    
+    @RequestMapping(value = "/header/logo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HeaderLogoDTO> getHeaderLogo(HttpServletRequest httpRequest) {
+        
+    	HeaderLogoDTO headerLogoDTO = menuService.getHeaderLogo(httpRequest);
+
+        return new ResponseEntity<HeaderLogoDTO>(headerLogoDTO,HttpStatus.OK);
+    }
+    
+    
     
 	
 }

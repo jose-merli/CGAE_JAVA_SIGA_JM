@@ -1,5 +1,15 @@
 package org.itcgae.siga.gen.services.impl;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.WritableRaster;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -7,10 +17,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.assertj.core.util.Strings;
+import org.itcgae.siga.DTOs.adm.HeaderLogoDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
@@ -27,6 +39,8 @@ import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
+import org.itcgae.siga.db.entities.AdmGestorinterfaz;
+import org.itcgae.siga.db.entities.AdmGestorinterfazExample;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmTiposacceso;
@@ -39,9 +53,13 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.GenMenu;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.mappers.AdmGestorinterfazMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
@@ -52,6 +70,8 @@ import org.itcgae.siga.security.UserAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.jayway.jsonpath.internal.Path;
+
 
 
 
@@ -60,28 +80,34 @@ import org.springframework.stereotype.Service;
 public class MenuServiceImpl implements IMenuService {
 
 	@Autowired
-	GenMenuExtendsMapper menuExtend;
+	private GenMenuExtendsMapper menuExtend;
 	
 	@Autowired
-	CenInstitucionExtendsMapper institucionMapper;
+	private CenInstitucionExtendsMapper institucionMapper;
 	
 	@Autowired
-	AdmPerfilExtendsMapper perfilMapper;
+	private AdmPerfilExtendsMapper perfilMapper;
 	
 	@Autowired
-	AdmUsuariosMapper usuarioMapper;
+	private AdmUsuariosMapper usuarioMapper;
 	
 	@Autowired
-	GenProcesosExtendsMapper permisosMapper;
+	private GenProcesosExtendsMapper permisosMapper;
 	
 	@Autowired
-	AdmTiposaccesoMapper tiposAccesoMapper;
+	private AdmTiposaccesoMapper tiposAccesoMapper;
 	
 	@Autowired
-    AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
 	@Autowired
-	AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoMapper;
+	private AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoMapper;
+	
+	@Autowired
+	private GenPropertiesMapper genPropertiesMapper;
+	
+	@Autowired
+	private AdmGestorinterfazMapper admGestorinterfazMapper;
 
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
@@ -485,5 +511,106 @@ public class MenuServiceImpl implements IMenuService {
 		}
 		return response;
 	}
+
+
+	@Override
+	public HeaderLogoDTO getHeaderLogo(HttpServletRequest httpRequest) {
+		String pathFinal = "";
+		List<GenProperties> genProperties = new ArrayList<GenProperties>();
+		List<AdmGestorinterfaz> admGestorinterfaz = new ArrayList<AdmGestorinterfaz>();
+		HeaderLogoDTO headerLogoDTO = new HeaderLogoDTO();
+		byte[] bytesArray;
+		
+		// Obtenemos atributos del usuario logeado
+		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(httpRequest.getHeader("Authorization"));
+		String dni = nifInstitucion.substring(0, 9);
+		String idInstitucion = nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length());
+		
+		GenPropertiesExample genPropertiesExample = new GenPropertiesExample();
+		genPropertiesExample.createCriteria().andParametroEqualTo("directorios.carpeta.logos");
+		genProperties = genPropertiesMapper.selectByExample(genPropertiesExample);
+		
+		if(!genProperties.isEmpty()) {
+			String path = genProperties.get(0).getValor() + "/";
+			pathFinal = pathFinal.concat(path);
+			
+			AdmGestorinterfazExample admGestorinterfazExample = new AdmGestorinterfazExample();
+			admGestorinterfazExample.createCriteria().andAdmGestorinterfazIdEqualTo(Long.valueOf(idInstitucion));
+			admGestorinterfaz = admGestorinterfazMapper.selectByExample(admGestorinterfazExample);
+			
+			if(!admGestorinterfaz.isEmpty()) {
+				String nameFile = admGestorinterfaz.get(0).getLogo();
+				pathFinal = pathFinal.concat(nameFile);
+				
+				 //coger el archivo y hacerlo un array de bytes
+				//File file = new File(pathFinal);
+				
+//				File file = new File("C://IISIGA/logos/2000_-1293087243_eliminar-pis-de-gato.jpg");
+//				bytesArray = new byte[(int) file.length()];
+//				
+//				FileInputStream fis = null;
+//				
+//				try {
+//					fis = new FileInputStream(file);
+//					fis.read(bytesArray);
+//				} catch (FileNotFoundException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				finally {
+//					// close the stream
+//					try {
+//						fis.close();
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				}
+		
+				// probando con funcion
+				
+				try {
+					bytesArray = extractBytes(pathFinal);
+					headerLogoDTO.setImagen(bytesArray);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					System.out.println("Asdasd");
+				}
+				
+			}
+		}
+		
+		
+		return headerLogoDTO;
+	}
+	
+	public byte[] extractBytes(String ImageName) throws IOException{
+		//String path = new File(".").getAbsolutePath();
+		// C://IISIGA//logos//2000_-1293087243_eliminar-pis-de-gato.jpg
+		File imgPath = new File(ImageName); 
+		String camino = imgPath.getAbsolutePath();
+		String camino1 = camino.replace("\\", "//");
+		File camino2 = new File(camino1);
+//		BufferedImage bufferedImage = ImageIO.read(camino2);
+//		
+//		WritableRaster raster = bufferedImage.getRaster();
+//		DataBufferByte data = (DataBufferByte) raster.getDataBuffer();
+//		
+//		return (data.getData());
+		
+		BufferedImage bufferedImage = ImageIO.read(camino2);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write( bufferedImage, "jpg", baos );
+		baos.flush();
+		byte[] imageInByte = baos.toByteArray();
+		baos.close();
+		
+		return imageInByte;
+		
+	}
+	
 
 }

@@ -2,6 +2,7 @@ package org.itcgae.siga.gen.services;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.HeaderLogoDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
@@ -36,6 +37,9 @@ public interface IMenuService {
 
 
 	public PermisoDTO getAccessControl(ControlRequestItem permisoRequestItem, HttpServletRequest request);
+	
+	
+    public HeaderLogoDTO getHeaderLogo(HttpServletRequest httpRequest);
 
 
 }
