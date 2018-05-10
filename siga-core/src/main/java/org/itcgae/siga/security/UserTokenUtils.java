@@ -90,8 +90,7 @@ public class UserTokenUtils {
 	}
 
 	public static Short getInstitucionFromJWTToken(String token) {
-		return (Short) Short.valueOf((String) Jwts.parser().setSigningKey(secretSignKey).parseClaimsJws(token.replace(tokenPrefix, ""))
-				.getBody().get("institucion"));
+		return Short.valueOf(UserTokenUtils.getInstitucionFromJWTTokenAsString(token));
 	}
 
 	public static String getInstitucionFromJWTTokenAsString(String token) {
