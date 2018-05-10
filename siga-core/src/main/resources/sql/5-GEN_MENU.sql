@@ -34,10 +34,16 @@ update gen_menu set CLASS = 'plantillas' WHERE IDRECURSO IN ('menu.administracio
 
 UPDATE GEN_MENU SET fecha_baja = to_date('26/04/2018','DD/MM/RRRR') WHERE IDRECURSO = 'menu.administracion.perfilrol';
 
+update gen_menu set idrecurso = 'administracion.usuarios.literal.usuariosyperfiles' where idrecurso = 'menu.administracion.usuariosygrupos';
 
+insert into GEN_MENU (IDMENU,ORDEN,TAGWIDTH,IDPARENT,FECHAMODIFICACION,USUMODIFICACION,URI_IMAGEN,IDRECURSO,GEN_MENU_IDMENU,IDPROCESO,IDLENGUAJE,PATH,FECHA_BAJA,IDCLASS) values ('999','31000','100',' ',to_date('04/02/2018','DD/MM/RRRR'),'0',null,'menu.configuracion',null,'999','1',' ',null,'config');
 
+update gen_menu set fecha_baja = sysdate where idMenu = '92';
+update gen_menu set fecha_baja = sysdate where idMenu = '310';
+update gen_menu set fecha_baja = sysdate where idMenu = '311';
+update gen_menu set path = 'auditoriaUsuarios' where idMenu = '125';
 
-
-
-
+update gen_menu set fecha_baja = sysdate where idMenu = '300';
+update gen_menu set idrecurso = 'menu.administracion.parametrosGenerales' where idMenu = '126';
+update gen_menu set path = 'parametrosGenerales' where idMenu = '126';
 																				

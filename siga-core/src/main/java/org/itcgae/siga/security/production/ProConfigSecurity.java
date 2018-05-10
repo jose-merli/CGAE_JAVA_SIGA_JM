@@ -1,7 +1,7 @@
 package org.itcgae.siga.security.production;
 
 import org.itcgae.siga.logger.RequestLoggingFilter;
-import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,7 +55,7 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 	String tokenPrefix;
 
 	@Autowired
-	private ProAuthenticationProvider cgaeAuthenticationProvider;
+	private ProAuthenticationProvider proAuthenticationProvider;
 
 	public ProConfigSecurity(SigaUserDetailsService userDetailsService) {
 		this.userDetailsService = userDetailsService;
@@ -84,17 +84,14 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 				.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);
 
 		// Configuramos el token con los parametros de configuracion
-		UserAuthenticationToken.configure(secretSignKey, tokenPrefix, expirationTime);
-		ProAuthorizationFilter.configure(secretSignKey, tokenHeaderAuthKey, tokenPrefix);
+		UserTokenUtils.configure(secretSignKey, tokenPrefix, expirationTime, tokenHeaderAuthKey);
 	}
 
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		// Se define la clase que recupera los usuarios y el algoritmo para
-		// procesar las
-		// passwords
 		auth.userDetailsService(userDetailsService);
-		auth.authenticationProvider(cgaeAuthenticationProvider);
+		proAuthenticationProvider.setUserDetailsService(userDetailsService);
+		auth.authenticationProvider(proAuthenticationProvider);
 	}
 
 	@Bean

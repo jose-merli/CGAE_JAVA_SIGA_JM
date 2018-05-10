@@ -37,8 +37,8 @@ public class MenuController {
 	}
     
     @RequestMapping(value = "/instituciones", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getInstituciones() {
-    	ComboDTO response = menuService.getInstituciones();
+	ResponseEntity<ComboDTO> getInstituciones( HttpServletRequest request) {
+    	ComboDTO response = menuService.getInstituciones(request);
     	return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
     

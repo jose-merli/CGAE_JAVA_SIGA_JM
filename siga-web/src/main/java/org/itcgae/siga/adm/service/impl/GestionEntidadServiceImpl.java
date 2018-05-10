@@ -33,6 +33,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenDiccionarioExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,12 +62,12 @@ public class GestionEntidadServiceImpl implements IGestionEntidadService{
 	public EntidadLenguajeInstitucionDTO getInstitutionLenguage(HttpServletRequest request) {
 		EntidadLenguajeInstitucionDTO entidadLenguajeInstitucionDTO = new EntidadLenguajeInstitucionDTO();
 		
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0,9);
-		String idInstitucion = nifInstitucion.substring(nifInstitucion.length()-4,nifInstitucion.length());
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		if(null != idInstitucion) {
-			entidadLenguajeInstitucionDTO = cenInstitucionExtendsMapper.getInstitutionLenguage(idInstitucion);
+			entidadLenguajeInstitucionDTO = cenInstitucionExtendsMapper.getInstitutionLenguage(String.valueOf(idInstitucion));
 		}	
 		return entidadLenguajeInstitucionDTO;
 	}
@@ -95,11 +96,11 @@ public class GestionEntidadServiceImpl implements IGestionEntidadService{
 		CreateResponseDTO createResponseDTO = new CreateResponseDTO();
 		
 		// Obtenemos datos del usuario logeado
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0, 9);
-		String idInstitucion = nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length());
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 		
@@ -198,11 +199,11 @@ public class GestionEntidadServiceImpl implements IGestionEntidadService{
 		// Como el idLenguage viene en JSON, le quitamos ""
 		idLenguaje = idLenguaje.substring(1,idLenguaje.length()-1);
 		// Obtenemos atributos del usuario logeado
-		String nifInstitucion = UserAuthenticationToken.getUserFromJWTToken(request.getHeader("Authorization"));
-		String dni = nifInstitucion.substring(0, 9);
-		String idInstitucion = nifInstitucion.substring(nifInstitucion.length() - 4, nifInstitucion.length());
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		AdmUsuarios usuario = usuarios.get(0);
 		

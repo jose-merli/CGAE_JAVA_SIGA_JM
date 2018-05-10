@@ -1,7 +1,7 @@
 package org.itcgae.siga.security.develop;
 
 import org.itcgae.siga.logger.RequestLoggingFilter;
-import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,10 +57,12 @@ public class DevConfigSecurity extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private DevAuthenticationProvider devAuthenticationProvider;
 	
+	
 	public DevConfigSecurity(SigaUserDetailsService userDetailsService) {
 		this.userDetailsService = userDetailsService;
 	}
 
+	
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().and()
@@ -68,20 +70,20 @@ public class DevConfigSecurity extends WebSecurityConfigurerAdapter {
 				.anyRequest().authenticated().and()
 				.addFilterBefore(new DevAuthenticationFilter(authenticationManager(), loginMethod, loginUrl,
 						tokenHeaderAuthKey, tokenPrefix), BasicAuthenticationFilter.class)
-				.addFilter(new DevAuthorizationFilter(authenticationManager()))
+				.addFilter(new DevAuthorizationFilter(authenticationManager(), userDetailsService))
 				.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);
 
 		// Configuramos el token con los parametros de configuracion
-		UserAuthenticationToken.configure(secretSignKey, tokenPrefix, expirationTime);
-		DevAuthorizationFilter.configure(secretSignKey, tokenHeaderAuthKey, tokenPrefix);
+		UserTokenUtils.configure(secretSignKey, tokenPrefix, expirationTime, tokenHeaderAuthKey);
 	}
 
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService);
+		devAuthenticationProvider.setUserDetailsService(userDetailsService);
 		auth.authenticationProvider(devAuthenticationProvider);
 	}
-	
+
 	
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
