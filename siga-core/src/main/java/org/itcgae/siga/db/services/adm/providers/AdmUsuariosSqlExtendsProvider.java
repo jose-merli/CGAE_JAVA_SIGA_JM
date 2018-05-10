@@ -63,7 +63,12 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 		
 		// El campo idinstitucion es obligatorio en el body. El filtro se aplica siempre
 		sql.WHERE("USUARIOS.IDINSTITUCION = '" + usuarioRequestDTO.getIdInstitucion() + "'");
-		sql.WHERE("USUARIOS.ACTIVO = '" + usuarioRequestDTO.getActivo() + "'");
+		
+		// comprobacion campo activo del body para aplicar filtro
+		if(null != usuarioRequestDTO.getActivo() && !usuarioRequestDTO.getActivo().equalsIgnoreCase("")){
+			sql.WHERE("USUARIOS.ACTIVO = '" + usuarioRequestDTO.getActivo() + "'");
+		}
+		
 		sql.ORDER_BY("USUARIOS.DESCRIPCION ASC");
 		
 		return sql.toString();
