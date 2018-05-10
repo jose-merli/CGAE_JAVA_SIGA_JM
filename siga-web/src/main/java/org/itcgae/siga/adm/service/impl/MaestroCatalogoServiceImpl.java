@@ -147,9 +147,9 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 
 				GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
 				//Editamos los datos que se han modificado
-				if (!catalogoUpdate.getCodigoExt().equalsIgnoreCase("") ) {
+				//if (!catalogoUpdate.getCodigoExt().equalsIgnoreCase("") ) {
 					tablasMaestrasMapper.updateCodigoExterno(tablaMaestra,catalogoUpdate);
-				}
+				//}
 				if (!catalogoUpdate.getDescripcion().equalsIgnoreCase("")) {
 					tablasMaestrasMapper.updateRecursos(tablaMaestra,catalogoUpdate);
 				}
