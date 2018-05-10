@@ -111,7 +111,11 @@ public class GestionUsuariosGruposController {
 	@RequestMapping(value = "/usuariosgrupos/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> createGroupUsers(@RequestBody UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionUsuariosGruposService.createGroupUsers(usuarioUpdateDTO, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		if(response.getStatus().equals("OK")) {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+		}
 	}
 		
 	@RequestMapping(value = "/usuariosgrupos/updateGrupoDefecto", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

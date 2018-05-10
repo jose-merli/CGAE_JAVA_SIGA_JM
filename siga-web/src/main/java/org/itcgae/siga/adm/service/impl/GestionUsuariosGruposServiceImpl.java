@@ -376,7 +376,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 
 
-		example.setOrderByClause("DESCRIPCION ASC");
+		example.setOrderByClause("IDPERFIL ASC");
 		example.setDistinct(true);
 		example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andFechaBajaIsNull();
 		profiles = admPerfilExtendsMapper.selectComboPerfilDistinctByExample(example);
@@ -745,9 +745,10 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 						//}
 					}
 					
-					
+				
 					
 				}
+				updateResponseDTO.setStatus(SigaConstants.OK);
 
 		}else {
 			updateResponseDTO.setStatus(SigaConstants.KO);

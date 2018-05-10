@@ -286,7 +286,6 @@ public class AdmPerfilSqlProvider {
 		} else {
 			sql.SELECT("IDPERFIL");
 		}
-		sql.SELECT("IDPERFIL");
 		sql.SELECT("DESCRIPCION");
 		sql.SELECT("FECHA_BAJA");
 		sql.FROM("ADM_PERFIL");
