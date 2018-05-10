@@ -4,7 +4,8 @@ import java.security.cert.X509Certificate;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.security.UserAuthenticationToken;
-import org.itcgae.siga.security.UserPrincipalCgae;
+import org.itcgae.siga.security.UserCgae;
+import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -23,14 +24,14 @@ public class ProAuthenticationProvider implements AuthenticationProvider {
 	@Value("${cert-conf-path}")
 	private String certConfPath;
 	
-	private UserDetailsService userDetailsService;
+	private SigaUserDetailsService userDetailsService;
 
 	public UserDetailsService getUserDetailsService() {
 		return userDetailsService;
 	}
 
 	public void setUserDetailsService(UserDetailsService userDetailsService) {
-		this.userDetailsService = userDetailsService;
+		this.userDetailsService = (SigaUserDetailsService) userDetailsService;
 	}
 
 	@Override
@@ -45,7 +46,7 @@ public class ProAuthenticationProvider implements AuthenticationProvider {
 		}
 		Validacion result = validaCertificado(cgaeAuthenticaton.getCertificate());
 		
-		UserPrincipalCgae user = (UserPrincipalCgae) this.userDetailsService.loadUserByUsername(authentication.getPrincipal().toString());
+		UserCgae user = (UserCgae) this.userDetailsService.loadUserByUsername(cgaeAuthenticaton.getUser());
 		
 		if (result.equals(Validacion.OK)){
 			return new UserAuthenticationToken(cgaeAuthenticaton.getPrincipal(), null, user,

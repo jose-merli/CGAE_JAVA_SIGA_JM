@@ -1,7 +1,7 @@
 package org.itcgae.siga.security.production;
 
 import org.itcgae.siga.logger.RequestLoggingFilter;
-import org.itcgae.siga.security.UserAuthenticationToken;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,8 +84,7 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 				.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);
 
 		// Configuramos el token con los parametros de configuracion
-		UserAuthenticationToken.configure(secretSignKey, tokenPrefix, expirationTime);
-		ProAuthorizationFilter.configure(secretSignKey, tokenHeaderAuthKey, tokenPrefix);
+		UserTokenUtils.configure(secretSignKey, tokenPrefix, expirationTime, tokenHeaderAuthKey);
 	}
 
 	@Override
