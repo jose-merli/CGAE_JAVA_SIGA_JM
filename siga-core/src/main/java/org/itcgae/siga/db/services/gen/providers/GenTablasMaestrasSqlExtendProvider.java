@@ -91,7 +91,7 @@ public class GenTablasMaestrasSqlExtendProvider {
      *
      * @mbg.generated Wed Mar 14 18:23:45 CET 2018
      */
-    public String deleteRecursos(GenTablasMaestras tablaMaestra, CatalogoDeleteDTO catalogo) {
+    public String deleteRecursos(GenTablasMaestras tablaMaestra, CatalogoDeleteDTO catalogo, Boolean idInstitucion) {
         SQL sql = new SQL();
         sql.UPDATE(tablaMaestra.getIdtablamaestra());
        // String whereIdRegistro = "( " ;
@@ -102,7 +102,10 @@ public class GenTablasMaestrasSqlExtendProvider {
 		}
         whereIdRegistro =  whereIdRegistro.concat(catalogo.getIdRegistro()[catalogo.getIdRegistro().length - 1]);
         //whereIdRegistro =  whereIdRegistro.concat(")");
-        sql.WHERE( " IDINSTITUCION = '" + catalogo.getIdInstitucion() +"'" );
+        if (idInstitucion) {
+        	sql.WHERE( " IDINSTITUCION = '" + catalogo.getIdInstitucion() +"'" );
+		}	
+        
         sql.WHERE(tablaMaestra.getIdcampocodigo() + " IN (" + whereIdRegistro + " )");
         
         return sql.toString();
@@ -146,7 +149,9 @@ public class GenTablasMaestrasSqlExtendProvider {
         SQL sql = new SQL();
         
         sql.INSERT_INTO("GEN_RECURSOS_CATALOGOS");
-        sql.VALUES("IDRECURSO", ("(select MAX(IDRECURSO)  + 1 from gen_recursos_catalogos  where NOMBRETABLA = " + "'" + tablaMaestra.getIdtablamaestra() +"' )" ));
+        sql.VALUES("IDRECURSO", ("(select decode (INSTR(idrecurso, '_'),0, idrecurso || '_1',SUBSTR(idrecurso, 1, INSTR(idrecurso, '_')-1) || '_'  || (SUBSTR(idrecurso, INSTR(idrecurso, '_')+1)+1))\r\n" + 
+        		"\r\n" + 
+        		"From(select MAX(IDRECURSO) IDRECURSO from gen_recursos_catalogos  where NOMBRETABLA = " + "'" + tablaMaestra.getIdtablamaestra() +"' ))" ));
        	sql.VALUES("IDINSTITUCION",  "'" +catalogo.getIdInstitucion()+"'");
         sql.VALUES("DESCRIPCION",  "'" +catalogo.getDescripcion()+"'");
         sql.VALUES("IDLENGUAJE", "'" + catalogo.getIdLenguaje()+"'");
