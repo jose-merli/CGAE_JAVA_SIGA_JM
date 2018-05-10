@@ -3,11 +3,10 @@ package org.itcgae.siga.gen.services;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import org.itcgae.siga.DTOs.adm.HeaderLogoDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
-import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
@@ -40,7 +39,7 @@ public interface IMenuService {
 
 	public PermisoDTO getAccessControl(ControlRequestItem permisoRequestItem, HttpServletRequest request);
 	
-    public HeaderLogoDTO getHeaderLogo(HttpServletRequest httpRequest);
+    public void getHeaderLogo(HttpServletRequest httpRequest, HttpServletResponse response);
 
 	public HashMap<String,String> getAccessControlWithOutPerm(String authorization);
 

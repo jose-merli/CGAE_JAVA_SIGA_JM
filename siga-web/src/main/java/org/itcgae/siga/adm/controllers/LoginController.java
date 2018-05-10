@@ -2,12 +2,10 @@ package org.itcgae.siga.adm.controllers;
 
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTOs.adm.HeaderLogoDTO;
-import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.adm.UsuarioGrupoEditDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
-import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
 import org.itcgae.siga.gen.services.IMenuService;
 import org.itcgae.siga.services.ITestHeadersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,6 @@ import org.springframework.boot.actuate.health.Status;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -54,12 +51,12 @@ public class LoginController {
         return new ResponseEntity<UsuarioLogeadoDTO>(headers, HttpStatus.OK);
     }
     
-    @RequestMapping(value = "/header/logo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HeaderLogoDTO> getHeaderLogo(HttpServletRequest httpRequest) {
+    @RequestMapping(value = "/header/logo", method = RequestMethod.GET)
+    public ResponseEntity<HeaderLogoDTO> getHeaderLogo(HttpServletRequest request, HttpServletResponse response) {
         
-    	HeaderLogoDTO headerLogoDTO = menuService.getHeaderLogo(httpRequest);
+    	menuService.getHeaderLogo(request, response);
 
-        return new ResponseEntity<HeaderLogoDTO>(headerLogoDTO,HttpStatus.OK);
+        return new ResponseEntity<HeaderLogoDTO>(HttpStatus.OK);
     }
     
     

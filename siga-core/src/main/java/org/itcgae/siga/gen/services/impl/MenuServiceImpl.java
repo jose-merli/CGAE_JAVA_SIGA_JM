@@ -3,6 +3,8 @@ package org.itcgae.siga.gen.services.impl;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,7 +15,9 @@ import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.assertj.core.util.Strings;
 import org.itcgae.siga.DTOs.adm.HeaderLogoDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -61,6 +65,7 @@ import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.gen.services.IMenuService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 
@@ -502,7 +507,7 @@ public class MenuServiceImpl implements IMenuService {
 
 
 	@Override
-	public HeaderLogoDTO getHeaderLogo(HttpServletRequest httpRequest) {
+	public void getHeaderLogo(HttpServletRequest httpRequest, HttpServletResponse response) {
 		String pathFinal = "";
 		List<GenProperties> genProperties = new ArrayList<GenProperties>();
 		List<AdmGestorinterfaz> admGestorinterfaz = new ArrayList<AdmGestorinterfaz>();
@@ -531,74 +536,27 @@ public class MenuServiceImpl implements IMenuService {
 				pathFinal = pathFinal.concat(nameFile);
 				
 				 //coger el archivo y hacerlo un array de bytes
-				//File file = new File(pathFinal);
+				File file = new File(pathFinal);
 				
 //				File file = new File("C://IISIGA/logos/2000_-1293087243_eliminar-pis-de-gato.jpg");
 //				bytesArray = new byte[(int) file.length()];
-//				
+
 //				FileInputStream fis = null;
 //				
-//				try {
-//					fis = new FileInputStream(file);
-//					fis.read(bytesArray);
-//				} catch (FileNotFoundException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				finally {
-//					// close the stream
-//					try {
-//						fis.close();
-//					} catch (IOException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				}
-		
-				// probando con funcion
-				
-				try {
-					bytesArray = extractBytes(pathFinal);
-					headerLogoDTO.setImagen(bytesArray);
+				try (FileInputStream fis = new FileInputStream(file)){
+					response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+					IOUtils.copy(fis, response.getOutputStream());
+					fis.close();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-					System.out.println("Asdasd");
-				}
-				
+					e.printStackTrace();
+				} 				
 			}
 		}
-		
-		
-		return headerLogoDTO;
-	}
-	
-	public byte[] extractBytes(String ImageName) throws IOException{
-		//String path = new File(".").getAbsolutePath();
-		// C://IISIGA//logos//2000_-1293087243_eliminar-pis-de-gato.jpg
-		File imgPath = new File(ImageName); 
-		String camino = imgPath.getAbsolutePath();
-		String camino1 = camino.replace("\\", "//");
-		File camino2 = new File(camino1);
-//		BufferedImage bufferedImage = ImageIO.read(camino2);
-//		
-//		WritableRaster raster = bufferedImage.getRaster();
-//		DataBufferByte data = (DataBufferByte) raster.getDataBuffer();
-//		
-//		return (data.getData());
-		
-		BufferedImage bufferedImage = ImageIO.read(camino2);
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ImageIO.write( bufferedImage, "jpg", baos );
-		baos.flush();
-		byte[] imageInByte = baos.toByteArray();
-		baos.close();
-		
-		return imageInByte;
-		
-	}
-	
+		return;
+	}	
 
 }
