@@ -1,7 +1,5 @@
 package org.itcgae.siga.gen.services.impl;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,11 +11,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.assertj.core.util.Strings;
 import org.itcgae.siga.DTOs.adm.HeaderLogoDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -74,6 +72,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MenuServiceImpl implements IMenuService {
+	
+	Logger LOGGER = Logger.getLogger(MenuServiceImpl.class);
 
 	@Autowired
 	private GenMenuExtendsMapper menuExtend;
@@ -508,13 +508,14 @@ public class MenuServiceImpl implements IMenuService {
 
 	@Override
 	public void getHeaderLogo(HttpServletRequest httpRequest, HttpServletResponse response) {
+		LOGGER.info("Servicio de recuperacion de logos");
 		String pathFinal = "";
 		List<GenProperties> genProperties = new ArrayList<GenProperties>();
 		List<AdmGestorinterfaz> admGestorinterfaz = new ArrayList<AdmGestorinterfaz>();
-		HeaderLogoDTO headerLogoDTO = new HeaderLogoDTO();
-		byte[] bytesArray;
+	
 		
 		// Obtenemos atributos del usuario logeado
+		LOGGER.debug("Obtenemos atributos del usuario logeado");
 		String token = httpRequest.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short institucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -534,28 +535,27 @@ public class MenuServiceImpl implements IMenuService {
 			if(!admGestorinterfaz.isEmpty()) {
 				String nameFile = admGestorinterfaz.get(0).getLogo();
 				pathFinal = pathFinal.concat(nameFile);
+				LOGGER.info("Se obtiene el logo del path:  " + pathFinal );
 				
-				 //coger el archivo y hacerlo un array de bytes
+				 // Se coge la imagen con el logo
 				File file = new File(pathFinal);
 				
-//				File file = new File("C://IISIGA/logos/2000_-1293087243_eliminar-pis-de-gato.jpg");
-//				bytesArray = new byte[(int) file.length()];
-
-//				FileInputStream fis = null;
-//				
 				try (FileInputStream fis = new FileInputStream(file)){
+					// Parece que soporta otros tipos, como png
 					response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+					// se pasa el logo en la respuesta http
 					IOUtils.copy(fis, response.getOutputStream());
 					fis.close();
 				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOGGER.error("No se ha encontrado el fichero", e);
+					
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					LOGGER.error("No se han podido escribir los datos binarios del logo en la respuesta HttpServletResponse", e);
 					e.printStackTrace();
 				} 				
 			}
 		}
+		LOGGER.info("Servicio de recuperacion de logos -> OK");
 		return;
 	}	
 

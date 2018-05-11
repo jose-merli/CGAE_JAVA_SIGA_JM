@@ -55,7 +55,7 @@ public class LoginController {
     public ResponseEntity<HeaderLogoDTO> getHeaderLogo(HttpServletRequest request, HttpServletResponse response) {
         
     	menuService.getHeaderLogo(request, response);
-
+ 
         return new ResponseEntity<HeaderLogoDTO>(HttpStatus.OK);
     }
     
