@@ -70,7 +70,12 @@ public class GestionUsuariosGruposController {
  	@RequestMapping(value = "/usuarios/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
  	ResponseEntity<CreateResponseDTO> createUsers(@RequestBody UsuarioCreateDTO usuarioCreateDTO, HttpServletRequest request) { 
 		CreateResponseDTO response = gestionUsuariosGruposService.createUsers(usuarioCreateDTO, request);
-		return new ResponseEntity<CreateResponseDTO>(response, HttpStatus.OK);
+	 
+		if(response.getStatus().equals("OK")) {
+			return  new ResponseEntity<CreateResponseDTO>(response, HttpStatus.OK);
+		}else {
+			return  new ResponseEntity<CreateResponseDTO>(response, HttpStatus.FORBIDDEN);
+		}
 	}
 	
 	

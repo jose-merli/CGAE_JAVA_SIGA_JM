@@ -319,6 +319,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 			}
 			else
 			{
+				createResponseDTO.setStatus(SigaConstants.KO);
 				Error err = new Error();
 				err.setMessage("administracion.usuario.ya.asignado.institucion");
 				createResponseDTO.setError(err);
@@ -327,10 +328,10 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		}
 		
 		if (response1 == 0 || response2 == 0 || response3 == 0)
-			createResponseDTO.setStatus("ERROR");
+			createResponseDTO.setStatus(SigaConstants.KO);
 		else
-			createResponseDTO.setStatus("OK");
-
+			createResponseDTO.setStatus(SigaConstants.OK);
+		
 		return createResponseDTO;
 	}
 
