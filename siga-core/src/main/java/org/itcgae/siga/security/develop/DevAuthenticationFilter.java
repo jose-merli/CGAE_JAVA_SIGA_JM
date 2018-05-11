@@ -28,26 +28,23 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
 	private static String tokenHeaderAuthKey;
 
-	private static String tokenPrefix;
-	
-	
-
 	public DevAuthenticationFilter(AuthenticationManager authenticationManager, String loginMethod, String loginUrl,
-			String tokenHeaderAuthKey, String tokenPrefix) {
+			String tokenHeaderAuthKey) {
 		super(new AntPathRequestMatcher(loginUrl, loginMethod));
 		this.authenticationManager = authenticationManager;
 		DevAuthenticationFilter.tokenHeaderAuthKey = tokenHeaderAuthKey;
-		DevAuthenticationFilter.tokenPrefix = tokenPrefix;
 	}
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
-
-		// Usuario 2 -> Usuario de desarrollo del actual SIGA
-		UserCgae userDesarrollo = new UserCgae("44149718E", "Personal", "2000", null);
-		return authenticationManager.authenticate(new UserAuthenticationToken(userDesarrollo.getDni(), userDesarrollo, null));
-
+		
+		String dni = "44149718E";
+		String grupo = request.getParameter("profile");
+		String institucion = request.getParameter("location");
+		
+		UserCgae user = new UserCgae(dni, grupo, institucion, null);
+		return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, null));
 	}
 
 	@Override
@@ -56,6 +53,10 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 		response.addHeader("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
                 "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 
+		response.addHeader("Access-Control-Expose-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
+                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"); 
+		
+		
 		try {
 			if (auth.getClass().equals(UserAuthenticationToken.class)) {
 				UserAuthenticationToken userAuthToken = (UserAuthenticationToken) auth;
