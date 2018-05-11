@@ -45,10 +45,13 @@ public class ProAuthenticationProvider implements AuthenticationProvider {
 			System.setProperty("CERT_CHECK_CONF", certConfPath);
 		}
 		Validacion result = validaCertificado(cgaeAuthenticaton.getCertificate());
+		if (result == null || !result.equals(Validacion.OK)){
+			throw new BadCredentialsException("Imposible validar el certificado");
+		}
 		
 		UserCgae user = (UserCgae) this.userDetailsService.loadUserByUsername(cgaeAuthenticaton.getUser());
 		
-		if (result.equals(Validacion.OK)){
+		if (user != null){
 			return new UserAuthenticationToken(cgaeAuthenticaton.getPrincipal(), null, user,
 					cgaeAuthenticaton.getCertificate(), cgaeAuthenticaton.getAuthorities());			
 		} else{

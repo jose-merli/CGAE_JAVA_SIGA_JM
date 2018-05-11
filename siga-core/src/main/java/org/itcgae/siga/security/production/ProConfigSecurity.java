@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -63,7 +62,12 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
-
+		String [] authorizedRequests = {
+				loginUrl, 
+				"/instituciones", 
+				"/perfilespost", 
+				"/perfiles"		
+		};
 		/*
 		 * 1. Se desactiva el uso de cookies 
 		 * 2. Se activa la configuración CORS con los valores por defecto 
@@ -73,13 +77,10 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 		 */ 
 		httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and().cors().and().csrf().disable().authorizeRequests()
-				.antMatchers(HttpMethod.resolve(loginMethod), loginUrl).permitAll()
-				.antMatchers(HttpMethod.GET, "/instituciones").permitAll()
-				.antMatchers(HttpMethod.GET, "/perfilespost").permitAll()
-				.antMatchers(HttpMethod.GET, "/perfiles").permitAll()
+				.antMatchers(authorizedRequests).permitAll()
 				.anyRequest().authenticated().and()
 				.addFilterBefore(new ProAuthenticationFilter(authenticationManager(), loginMethod, loginUrl,
-						tokenHeaderAuthKey, tokenPrefix), BasicAuthenticationFilter.class)
+						tokenHeaderAuthKey), BasicAuthenticationFilter.class)
 				.addFilter(new ProAuthorizationFilter(authenticationManager()))
 				.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);
 

@@ -23,23 +23,34 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Service;
 
-@Service
+
 public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 
 	private SigaUserDetailsService userDetailsService;
+	
+	private String [] authorizedRequests;
 
-	public DevAuthorizationFilter(AuthenticationManager authManager, UserDetailsService userDetailsService) {
+	public DevAuthorizationFilter(AuthenticationManager authManager, UserDetailsService userDetailsService, String[] authorizedRequests) {
 		super(authManager);
 		this.userDetailsService = (SigaUserDetailsService) userDetailsService;
-
+		this.authorizedRequests = authorizedRequests;
 	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-
+		
+		for (String pattern : authorizedRequests) {
+			if (new AntPathRequestMatcher(pattern).matches(request)){
+				chain.doFilter(request, response);
+				return;
+			}
+		}
+		
+		
 		UserAuthenticationToken authentication = UserTokenUtils.getAuthentication(request);
 		HeaderMapRequestWrapper mutableRequest = new HeaderMapRequestWrapper(request);
 
