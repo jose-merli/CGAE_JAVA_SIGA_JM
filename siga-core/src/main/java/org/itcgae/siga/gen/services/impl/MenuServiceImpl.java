@@ -237,6 +237,10 @@ public class MenuServiceImpl implements IMenuService {
 
 		List<CenInstitucion> instituciones = institucionMapper.selectByExample(exampleInstitucion);
 		List<ComboItem> combos = new ArrayList<ComboItem>();
+		ComboItem comboBlanco = new ComboItem();
+		comboBlanco.setValue("");
+		comboBlanco.setLabel("");
+		combos.add(comboBlanco);
 		if (null != instituciones && instituciones.size() > 0) {
 			for (Iterator<CenInstitucion> iterator = instituciones.iterator(); iterator.hasNext();) {
 				CenInstitucion cenInstitucion = (CenInstitucion) iterator.next();
