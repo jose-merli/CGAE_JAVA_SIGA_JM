@@ -56,7 +56,6 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 		response.addHeader("Access-Control-Expose-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
                 "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"); 
 		
-		
 		try {
 			if (auth.getClass().equals(UserAuthenticationToken.class)) {
 				UserAuthenticationToken userAuthToken = (UserAuthenticationToken) auth;
