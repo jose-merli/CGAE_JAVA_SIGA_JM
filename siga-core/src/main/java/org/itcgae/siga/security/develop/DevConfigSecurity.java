@@ -60,17 +60,23 @@ public class DevConfigSecurity extends WebSecurityConfigurerAdapter {
 	
 	public DevConfigSecurity(SigaUserDetailsService userDetailsService) {
 		this.userDetailsService = userDetailsService;
-	}
-
+	} 
 	
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
+		String [] authorizedRequests = {
+				loginUrl, 
+				"/instituciones", 
+				"/perfilespost", 
+				"/perfiles"		
+		};
 		httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().and()
-				.csrf().disable().authorizeRequests().antMatchers("**").permitAll()
+				.csrf().disable().authorizeRequests()
+				.antMatchers(authorizedRequests).permitAll()
 				.anyRequest().authenticated().and()
 				.addFilterBefore(new DevAuthenticationFilter(authenticationManager(), loginMethod, loginUrl,
-						tokenHeaderAuthKey, tokenPrefix), BasicAuthenticationFilter.class)
-				.addFilter(new DevAuthorizationFilter(authenticationManager(), userDetailsService))
+						tokenHeaderAuthKey), BasicAuthenticationFilter.class)
+				.addFilter(new DevAuthorizationFilter(authenticationManager(), userDetailsService, authorizedRequests))
 				.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);
 
 		// Configuramos el token con los parametros de configuracion

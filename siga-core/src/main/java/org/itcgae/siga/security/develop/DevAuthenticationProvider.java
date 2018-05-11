@@ -41,35 +41,4 @@ public class DevAuthenticationProvider implements AuthenticationProvider {
 		return authentication.equals(UserAuthenticationToken.class);
 	}
 
-//	@Override
-//	protected void additionalAuthenticationChecks(UserDetails userDetails,
-//			UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-//
-//		if (authentication.getCredentials() == null) {
-//			logger.debug("Authentication failed: no credentials provided");
-//
-//			throw new BadCredentialsException(
-//					messages.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
-//		}
-//	}
-//
-//	@Override
-//	protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication)
-//			throws AuthenticationException {
-//
-//		UserDetails loadedUser;
-//
-//		try {
-//			loadedUser = this.getUserDetailsService().loadUserByUsername(username);
-//		} catch (Exception repositoryProblem) {
-//			throw new InternalAuthenticationServiceException(repositoryProblem.getMessage(), repositoryProblem);
-//		}
-//
-//		if (loadedUser == null) {
-//			throw new InternalAuthenticationServiceException(
-//					"UserDetailsService returned null, which is an interface contract violation");
-//		}
-//		return loadedUser;
-//	}
-
 }

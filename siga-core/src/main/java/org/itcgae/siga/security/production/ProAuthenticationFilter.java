@@ -34,14 +34,12 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
 	private static String tokenHeaderAuthKey;
 
-	private static String tokenPrefix;
 
 	public ProAuthenticationFilter(AuthenticationManager authenticationManager, String loginMethod, String loginUrl,
-			String tokenHeaderAuthKey, String tokenPrefix) {
+			String tokenHeaderAuthKey) {
 		super(new AntPathRequestMatcher(loginUrl, loginMethod));
 		this.authenticationManager = authenticationManager;
 		ProAuthenticationFilter.tokenHeaderAuthKey = tokenHeaderAuthKey;
-		ProAuthenticationFilter.tokenPrefix = tokenPrefix;
 	}
 
 	@Override
@@ -101,8 +99,7 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 						+ "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 		try {
 			if (auth.getClass().equals(UserAuthenticationToken.class)) {
-				response.addHeader(tokenHeaderAuthKey,
-						tokenPrefix + " " + UserTokenUtils.generateToken((UserAuthenticationToken) auth));
+				response.addHeader(tokenHeaderAuthKey, UserTokenUtils.generateToken((UserAuthenticationToken) auth));
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
