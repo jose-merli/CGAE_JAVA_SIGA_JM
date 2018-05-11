@@ -21,6 +21,8 @@ import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.security.UserCgae;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -74,41 +76,52 @@ public class SigaUserDetailsService implements UserDetailsService {
 
 		List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExample);
 
-		/*
-		 * if (usuarios == null || usuarios.isEmpty()) { Error error = new
-		 * Error(); error.setCode(400); error.setDescription("400");
-		 * response.setError(error); return response; }
-		 */
+		if (null != usuarios && usuarios.size() >0) {
+			
+			/*
+			 * if (usuarios == null || usuarios.isEmpty()) { Error error = new
+			 * Error(); error.setCode(400); error.setDescription("400");
+			 * response.setError(error); return response; }
+			 */
+	
+			List<String> idperfiles = new ArrayList<String>();
+	
+			// Obtenemos todos los perfiles del Usuario para cargar sus puntos de
+			// Menú
+			AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
+	
+			exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
+					.andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
+			List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
+			if (null != perfiles && perfiles.size() >0) {
+				for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
+					idperfiles.add("'" + perfil.getIdperfil() + "'");
+				}
+		
+				controlItem.setInstitucion(institucion);
+				String str = idperfiles.toString().replace("[", "").replace("]", "");
+				controlItem.setIdGrupo(str);
+		
+				// Añadimos los permisos a la lista
+				List<PermisoEntity> permisos = this.admUsuariosExtendsMapper.getAccessControlsWithOutProcess(controlItem);
 
-		List<String> idperfiles = new ArrayList<String>();
-
-		// Obtenemos todos los perfiles del Usuario para cargar sus puntos de
-		// Menú
-		AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
-
-		exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
-				.andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
-		List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
-
-		for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
-			idperfiles.add("'" + perfil.getIdperfil() + "'");
-		}
-
-		controlItem.setInstitucion(institucion);
-		String str = idperfiles.toString().replace("[", "").replace("]", "");
-		controlItem.setIdGrupo(str);
-
-		// Añadimos los permisos a la lista
-		List<PermisoEntity> permisos = this.admUsuariosExtendsMapper.getAccessControlsWithOutProcess(controlItem);
-		if (null != permisos && permisos.size() > 0) {
-			for (PermisoEntity permisoEntity : permisos) {
-				response.put(permisoEntity.getData(), permisoEntity.getDerechoacceso());
+				if (null != permisos && permisos.size() > 0) {
+					for (PermisoEntity permisoEntity : permisos) {
+						response.put(permisoEntity.getData(), permisoEntity.getDerechoacceso());
+					}
+					return new UserCgae(dni, null, institucion, response);
+				}else {
+					 throw new BadCredentialsException("El usuario no tiene permisos");
+				// TODO: Añadir grupo
+				
+				}
+			}else {
+				throw new AuthenticationCredentialsNotFoundException("Usuario no encontrado en la aplicación");
 			}
-
 		}
-
-		// TODO: Añadir grupo
-		return new UserCgae(dni, null, institucion, response);
+		else {
+			 throw new AuthenticationCredentialsNotFoundException("Usuario no encontrado en la aplicación");
+		}
 	}
 
 }

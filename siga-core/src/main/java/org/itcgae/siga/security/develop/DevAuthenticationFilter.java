@@ -40,8 +40,8 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			throws AuthenticationException {
 		
 		String dni = "44149718E";
-		String grupo = "Personal";
-		String institucion = "2000";
+		String grupo = request.getParameter("profile");
+		String institucion = request.getParameter("location");
 		
 		UserCgae user = new UserCgae(dni, grupo, institucion, null);
 		return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, null));
@@ -53,6 +53,10 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 		response.addHeader("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
                 "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 
+		response.addHeader("Access-Control-Expose-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
+                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"); 
+		
+		
 		try {
 			if (auth.getClass().equals(UserAuthenticationToken.class)) {
 				UserAuthenticationToken userAuthToken = (UserAuthenticationToken) auth;
