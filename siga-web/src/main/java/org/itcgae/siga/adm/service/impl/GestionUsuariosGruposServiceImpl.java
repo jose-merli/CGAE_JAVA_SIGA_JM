@@ -127,10 +127,10 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 			}
 
-			ComboItem comboItem = new ComboItem();
-			comboItem.setValue("");
-			comboItem.setLabel("");
-			comboItems.add(comboItem);
+//			ComboItem comboItem = new ComboItem();
+//			comboItem.setValue("");
+//			comboItem.setLabel("");
+//			comboItems.add(comboItem);
 			hashProfiles.forEach((id, description) -> {
 				ComboItem comboItem2 = new ComboItem();
 				comboItem2.setValue(id);
@@ -316,6 +316,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 					response3 = admUsuariosExtendsMapper.createUserAdmUsuariosEfectivoPerfilTable(usuarioCreateDTO,
 							usuario.getIdusuario());
 				}
+				createResponseDTO.setStatus(SigaConstants.OK);
 			}
 			else
 			{
@@ -327,10 +328,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 			}
 		}
 		
-		if (response1 == 0 || response2 == 0 || response3 == 0)
-			createResponseDTO.setStatus(SigaConstants.KO);
-		else
-			createResponseDTO.setStatus(SigaConstants.OK);
+		
 		
 		return createResponseDTO;
 	}
