@@ -12,4 +12,5 @@ public class SigaConstants {
 	
 	public static String OK = "OK";
 	public static String KO = "KO";
+	public static String InstitucionGeneral = "2000";
 }
