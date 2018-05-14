@@ -30,7 +30,7 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 		sql.FROM(" GEN_RECURSOS_CATALOGOS REC ");
 		sql.WHERE(" IDLENGUAJE = '"+ multiidiomaCatalogoSearchDTO.getIdiomaBusqueda()  + "'");
 		sql.WHERE(" NOMBRETABLA = '" + multiidiomaCatalogoSearchDTO.getNombreTabla() + "'");
-		sql.WHERE(" IDINSTITUCION = '" + idInstitucion + "'");
+		//Se comenta la institución ya que en esta tabla no aplica este filtro: sql.WHERE(" IDINSTITUCION = '" + idInstitucion + "'");
 		sql.ORDER_BY(" DESCRIPCIONBUSCAR ");
 		
 		return sql.toString();
