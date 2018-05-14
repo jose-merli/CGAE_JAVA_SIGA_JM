@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
+import org.itcgae.siga.DTOs.gen.EntornoDTO;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
@@ -40,6 +41,8 @@ public interface IMenuService {
 	public PermisoDTO getAccessControl(ControlRequestItem permisoRequestItem, HttpServletRequest request);
 	
 	public HashMap<String,String> getAccessControlWithOutPerm(String authorization);
+	
+	public EntornoDTO getEntorno( HttpServletRequest request);
 
 
 }

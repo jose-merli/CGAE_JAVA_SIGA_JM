@@ -66,7 +66,8 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 				loginUrl, 
 				"/instituciones", 
 				"/perfilespost", 
-				"/perfiles"		
+				"/perfiles",
+				"/getEntorno"		
 		};
 		/*
 		 * 1. Se desactiva el uso de cookies 

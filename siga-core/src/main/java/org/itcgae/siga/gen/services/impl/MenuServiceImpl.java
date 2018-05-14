@@ -16,6 +16,7 @@ import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
+import org.itcgae.siga.DTOs.gen.EntornoDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.MenuItem;
@@ -26,6 +27,8 @@ import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
+import org.itcgae.siga.db.entities.AdmConfig;
+import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmTiposacceso;
@@ -38,6 +41,7 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.GenMenu;
+import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
@@ -78,6 +82,8 @@ public class MenuServiceImpl implements IMenuService {
 	@Autowired
 	AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoMapper;
 
+	@Autowired 
+	AdmConfigMapper admConfigMapper;
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
 		MenuDTO response = new MenuDTO();
@@ -479,6 +485,18 @@ public class MenuServiceImpl implements IMenuService {
 			}
 
 		}
+		return response;
+	}
+
+	@Override
+	public EntornoDTO getEntorno(HttpServletRequest request) {
+		
+		AdmConfigExample example = new AdmConfigExample();
+		example.createCriteria().andClaveEqualTo("security.basic.enabled");
+		List<AdmConfig> config = admConfigMapper.selectByExample(example );
+		
+		EntornoDTO response = new EntornoDTO();
+		response.setentorno(config.get(0).getValor());
 		return response;
 	}
 

@@ -68,7 +68,8 @@ public class DevConfigSecurity extends WebSecurityConfigurerAdapter {
 				loginUrl, 
 				"/instituciones", 
 				"/perfilespost", 
-				"/perfiles"		
+				"/perfiles",
+				"/getEntorno"		
 		};
 		httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().cors().and()
 				.csrf().disable().authorizeRequests()
