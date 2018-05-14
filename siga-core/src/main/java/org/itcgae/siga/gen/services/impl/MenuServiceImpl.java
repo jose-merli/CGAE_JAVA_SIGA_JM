@@ -1,5 +1,9 @@
 package org.itcgae.siga.gen.services.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,7 +12,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.assertj.core.util.Strings;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
@@ -29,6 +36,8 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
+import org.itcgae.siga.db.entities.AdmGestorinterfaz;
+import org.itcgae.siga.db.entities.AdmGestorinterfazExample;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmTiposacceso;
@@ -41,10 +50,14 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.GenMenu;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.mappers.AdmGestorinterfazMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
@@ -53,34 +66,47 @@ import org.itcgae.siga.db.services.gen.mappers.GenMenuExtendsMapper;
 import org.itcgae.siga.gen.services.IMenuService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+
+
+
+
 
 @Service
 public class MenuServiceImpl implements IMenuService {
+	
+	Logger LOGGER = Logger.getLogger(MenuServiceImpl.class);
 
 	@Autowired
-	GenMenuExtendsMapper menuExtend;
-
+	private GenMenuExtendsMapper menuExtend;
+	
 	@Autowired
-	CenInstitucionExtendsMapper institucionMapper;
-
+	private CenInstitucionExtendsMapper institucionMapper;
+	
 	@Autowired
-	AdmPerfilExtendsMapper perfilMapper;
-
+	private AdmPerfilExtendsMapper perfilMapper;
+	
 	@Autowired
-	AdmUsuariosMapper usuarioMapper;
-
+	private AdmUsuariosMapper usuarioMapper;
+	
 	@Autowired
-	GenProcesosExtendsMapper permisosMapper;
-
+	private GenProcesosExtendsMapper permisosMapper;
+	
 	@Autowired
-	AdmTiposaccesoMapper tiposAccesoMapper;
-
+	private AdmTiposaccesoMapper tiposAccesoMapper;
+	
 	@Autowired
-	AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
-
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
 	@Autowired
-	AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoMapper;
+	private AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoMapper;
+	
+	@Autowired
+	private GenPropertiesMapper genPropertiesMapper;
+	
+	@Autowired
+	private AdmGestorinterfazMapper admGestorinterfazMapper;
 
 	@Autowired 
 	AdmConfigMapper admConfigMapper;
@@ -499,5 +525,59 @@ public class MenuServiceImpl implements IMenuService {
 		response.setentorno(config.get(0).getValor());
 		return response;
 	}
+
+	@Override
+	public void getHeaderLogo(HttpServletRequest httpRequest, HttpServletResponse response) {
+		LOGGER.info("Servicio de recuperacion de logos");
+		String pathFinal = "";
+		List<GenProperties> genProperties = new ArrayList<GenProperties>();
+		List<AdmGestorinterfaz> admGestorinterfaz = new ArrayList<AdmGestorinterfaz>();
+	
+		
+		// Obtenemos atributos del usuario logeado
+		LOGGER.debug("Obtenemos atributos del usuario logeado");
+		String token = httpRequest.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short institucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		GenPropertiesExample genPropertiesExample = new GenPropertiesExample();
+		genPropertiesExample.createCriteria().andParametroEqualTo("directorios.carpeta.logos");
+		genProperties = genPropertiesMapper.selectByExample(genPropertiesExample);
+		
+		if(!genProperties.isEmpty()) {
+			String path = genProperties.get(0).getValor() + "/";
+			pathFinal = pathFinal.concat(path);
+			
+			AdmGestorinterfazExample admGestorinterfazExample = new AdmGestorinterfazExample();
+			admGestorinterfazExample.createCriteria().andAdmGestorinterfazIdEqualTo(Long.valueOf(String.valueOf(institucion)));
+			admGestorinterfaz = admGestorinterfazMapper.selectByExample(admGestorinterfazExample);
+			
+			if(!admGestorinterfaz.isEmpty()) {
+				String nameFile = admGestorinterfaz.get(0).getLogo();
+				pathFinal = pathFinal.concat(nameFile);
+				LOGGER.info("Se obtiene el logo del path:  " + pathFinal );
+				
+				 // Se coge la imagen con el logo
+				File file = new File(pathFinal);
+				
+				try (FileInputStream fis = new FileInputStream(file)){
+					// Parece que soporta otros tipos, como png
+					response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+					// se pasa el logo en la respuesta http
+					IOUtils.copy(fis, response.getOutputStream());
+					fis.close();
+				} catch (FileNotFoundException e) {
+					LOGGER.error("No se ha encontrado el fichero", e);
+					
+				} catch (IOException e) {
+					LOGGER.error("No se han podido escribir los datos binarios del logo en la respuesta HttpServletResponse", e);
+					e.printStackTrace();
+				} 				
+			}
+		}
+		LOGGER.info("Servicio de recuperacion de logos -> OK");
+		return;
+	}	
+
 
 }
