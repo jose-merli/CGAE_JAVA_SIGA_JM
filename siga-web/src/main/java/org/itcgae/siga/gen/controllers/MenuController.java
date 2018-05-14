@@ -3,14 +3,12 @@ package org.itcgae.siga.gen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.adm.AdmContadorDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.adm.UsuarioDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
+import org.itcgae.siga.DTOs.gen.EntornoDTO;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
-import org.itcgae.siga.DTOs.gen.PermisoItem;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.gen.services.IMenuService;
@@ -30,6 +28,15 @@ public class MenuController {
 	@Autowired
 	IMenuService menuService;
     
+	
+	
+    @RequestMapping(value = "/getEntorno", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EntornoDTO> getEntorno(HttpServletRequest request) {
+    	EntornoDTO response = menuService.getEntorno(request);
+    	return new ResponseEntity<EntornoDTO>(response, HttpStatus.OK);
+	}
+	
+	
     @RequestMapping(value = "/menu", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<MenuDTO> getMenu(HttpServletRequest request) {
     	MenuDTO response = menuService.getMenu(request);
