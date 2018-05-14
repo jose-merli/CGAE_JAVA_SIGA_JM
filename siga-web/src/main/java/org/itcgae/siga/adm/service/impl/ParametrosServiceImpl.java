@@ -76,31 +76,19 @@ public class ParametrosServiceImpl implements IParametrosService {
 				&& parametroRequestDTO.getIdInstitucion() != null) {
 			if (parametroRequestDTO.getParametrosGenerales().equals("N")) {
 				// Buscar en gen_parametros por modulo e institucion
-				GenParametrosExample genParametrosExample = new GenParametrosExample();
-				genParametrosExample.createCriteria()
-						.andIdinstitucionEqualTo(Short.valueOf(parametroRequestDTO.getIdInstitucion()))
-						.andModuloEqualTo(parametroRequestDTO.getModulo()).andFechaBajaIsNull();
-				genparametros = genParametrosMapper.selectByExample(genParametrosExample);
-
-				if (genparametros != null && genparametros.size() > 0) {
-					for (int i = 0; i < genparametros.size(); i++) {
-						ParametroItem parametroItem = new ParametroItem();
-						parametroItem.setIdInstitucion(String.valueOf(genparametros.get(i).getIdinstitucion()));
-						parametroItem.setModulo(genparametros.get(i).getModulo());
-						parametroItem.setParametro(genparametros.get(i).getParametro());
-						parametroItem.setValor(genparametros.get(i).getValor());
-						parametroItem.setIdRecurso(genparametros.get(i).getIdrecurso());
-						parametroItems.add(parametroItem);
-					}
-					parametroDTO.setParametrosItems(parametroItems);
-				}
-			} else if (parametroRequestDTO.getParametrosGenerales().equals("S")) {
-
 				parametroItems = genParametrosExtendsMapper.getParametersSearch(numPagina, parametroRequestDTO);
 
 				if (parametroItems != null && parametroItems.size() > 0)
 					parametroDTO.setParametrosItems(parametroItems);
 
+			}
+			 else if (parametroRequestDTO.getParametrosGenerales().equals("S")) {
+
+				parametroItems = genParametrosExtendsMapper.getParametersSearchGeneral(numPagina, parametroRequestDTO);
+
+				if (parametroItems != null && parametroItems.size() > 0)
+					parametroDTO.setParametrosItems(parametroItems);
+				
 			}
 		}
 

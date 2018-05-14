@@ -48,4 +48,16 @@ public interface GenParametrosExtendsMapper extends GenParametrosMapper{
 		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
 	})
 	List<ParametroItem> getParametersRecord(int numPagina, ParametroRequestDTO parametroRequestDTO);
+	
+	
+	@SelectProvider(type = GenParametrosSqlExtendsProvider.class, method = "getParametersSearchGeneral")
+	@Results({
+		@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PARAMETRO", property = "parametro", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDRECURSO", property = "idRecurso", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ParametroItem> getParametersSearchGeneral(int numPagina, ParametroRequestDTO parametroRequestDTO);
+	
 }
