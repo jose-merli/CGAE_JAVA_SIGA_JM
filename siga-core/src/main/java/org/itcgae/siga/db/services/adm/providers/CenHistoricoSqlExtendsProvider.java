@@ -33,13 +33,13 @@ public class CenHistoricoSqlExtendsProvider {
 		sql.INNER_JOIN(" CEN_TIPOCAMBIO TIPO ON TIPO.IDTIPOCAMBIO = HIST.IDTIPOCAMBIO ");
 		sql.INNER_JOIN(" GEN_RECURSOS_CATALOGOS CAT ON  CAT.IDRECURSO = TIPO.DESCRIPCION ");
 		sql.INNER_JOIN(" ADM_USUARIOS USU ON HIST.USUMODIFICACION = USU.IDUSUARIO ");
-		
+
 		// campos que pueden ser opcionales
 		if(null != historicoUsuarioRequestDTO.getIdTipoAccion() && !historicoUsuarioRequestDTO.getIdTipoAccion().equalsIgnoreCase("")){
 			sql.WHERE(" TIPO.IDTIPOCAMBIO = '"+ historicoUsuarioRequestDTO.getIdTipoAccion() +"'");
 		}
 		if(null != historicoUsuarioRequestDTO.getIdPersona() && !historicoUsuarioRequestDTO.getIdPersona().equalsIgnoreCase("")) {
-			sql.WHERE("(UPPER(PER.NOMBRE) LIKE UPPER('%" + historicoUsuarioRequestDTO.getIdPersona() +"%') OR UPPER(PER.APELLIDOS1) LIKE UPPER('%" + historicoUsuarioRequestDTO.getIdPersona() +"%') OR UPPER(PER.APELLIDOS2) LIKE UPPER('%"+historicoUsuarioRequestDTO.getIdPersona() +"%'))");
+			sql.WHERE("(Concat(upper(per.nombre || ' '),Concat(upper(per.apellidos1 || ' '), upper(per.apellidos2 || ' '))) LIKE UPPER('%"+historicoUsuarioRequestDTO.getIdPersona() +"%'))");
 			
 		}
 		if(null != historicoUsuarioRequestDTO.getUsuario() && !historicoUsuarioRequestDTO.getUsuario().equalsIgnoreCase("")) {
