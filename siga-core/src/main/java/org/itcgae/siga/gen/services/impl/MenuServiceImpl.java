@@ -557,22 +557,35 @@ public class MenuServiceImpl implements IMenuService {
 				pathFinal = pathFinal.concat(nameFile);
 				LOGGER.info("Se obtiene el logo del path:  " + pathFinal );
 				
-				 // Se coge la imagen con el logo
-				File file = new File(pathFinal);
+				if(null != pathFinal) {
+					 // Se coge la imagen con el logo
+					File file = new File(pathFinal);
+					FileInputStream fis = null;
+					try {
+						fis = new FileInputStream(file);
+						// Parece que soporta otros tipos, como png
+						response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+						// se pasa el logo en la respuesta http
+						IOUtils.copy(fis, response.getOutputStream());
+						
+					} catch (FileNotFoundException e) {
+						LOGGER.error("No se ha encontrado el fichero", e);
+						
+					} catch (IOException e1) {
+						LOGGER.error("No se han podido escribir los datos binarios del logo en la respuesta HttpServletResponse", e1);
+						e1.printStackTrace();
+					} 	
+					finally{
+						if(null!= fis)
+							try {
+								fis.close();
+							} catch (IOException e) {
+								LOGGER.error("No se ha cerrado el archivo que contiene el logo", e);
+								e.printStackTrace();
+							}
+					}
+				}
 				
-				try (FileInputStream fis = new FileInputStream(file)){
-					// Parece que soporta otros tipos, como png
-					response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-					// se pasa el logo en la respuesta http
-					IOUtils.copy(fis, response.getOutputStream());
-					fis.close();
-				} catch (FileNotFoundException e) {
-					LOGGER.error("No se ha encontrado el fichero", e);
-					
-				} catch (IOException e) {
-					LOGGER.error("No se han podido escribir los datos binarios del logo en la respuesta HttpServletResponse", e);
-					e.printStackTrace();
-				} 				
 			}
 		}
 		LOGGER.info("Servicio de recuperacion de logos -> OK");
