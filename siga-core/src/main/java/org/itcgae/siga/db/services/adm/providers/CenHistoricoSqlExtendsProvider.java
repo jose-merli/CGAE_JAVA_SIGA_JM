@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.HistoricoUsuarioRequestDTO;
+import org.itcgae.siga.commons.constants.SigaConstants;
 
 public class CenHistoricoSqlExtendsProvider {
 
@@ -14,7 +15,7 @@ public class CenHistoricoSqlExtendsProvider {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
 		
 		
-		sql.SELECT("HIST.IDPERSONA");
+		sql.SELECT(" DISTINCT HIST.IDPERSONA");
 		sql.SELECT("HIST.IDHISTORICO");
 		sql.SELECT("HIST.FECHAEFECTIVA");
 		sql.SELECT("HIST.FECHAENTRADA");
@@ -59,9 +60,11 @@ public class CenHistoricoSqlExtendsProvider {
 	
 		// campos que siempre seran obligatorios
 		sql.WHERE(" HIST.IDINSTITUCION = '"+ historicoUsuarioRequestDTO.getIdInstitucion() +"'");
-		sql.WHERE(" USU.IDINSTITUCION = '"+ historicoUsuarioRequestDTO.getIdInstitucion() +"'");
-		sql.WHERE(" CAT.IDLENGUAJE = '"+ historicoUsuarioRequestDTO.getIdLenguaje() +"'");
-
+		if(null != historicoUsuarioRequestDTO.getIdInstitucion() && historicoUsuarioRequestDTO.getIdInstitucion().equals(SigaConstants.COMBO_INSTITUCIONES)) {
+			sql.WHERE(" USU.IDINSTITUCION = '"+ historicoUsuarioRequestDTO.getIdInstitucion() +"'");
+		}
+		sql.WHERE(" CAT.IDLENGUAJE = '"+ historicoUsuarioRequestDTO.getIdLenguaje() +"' ");
+		sql.ORDER_BY(" HIST.IDHISTORICO ");
 		return sql.toString();
 	}
 }
