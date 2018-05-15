@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboCatalogoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.adm.service.IMaestroCatalogoService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -57,7 +58,12 @@ public class MaestroCatalogosController {
    @RequestMapping(value = "/catmaestros/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
    ResponseEntity<UpdateResponseDTO> createCatalogos(@RequestBody CatalogoUpdateDTO catalogo,HttpServletRequest request) {
 	   UpdateResponseDTO response = maestroCatalogoService.createDatosCatalogo(catalogo,request);
+	   if(response.getStatus().equals(SigaConstants.OK))
 	   return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	   
+	   else 
+		   return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	   
 	}
    
    @RequestMapping(value = "/catmaestros/historico", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

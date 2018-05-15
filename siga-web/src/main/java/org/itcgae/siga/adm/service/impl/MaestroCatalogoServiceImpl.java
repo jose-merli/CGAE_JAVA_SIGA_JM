@@ -147,8 +147,10 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 
 				GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
 				//Editamos los datos que se han modificado
-				//if (!catalogoUpdate.getCodigoExt().equalsIgnoreCase("") ) {
-					tablasMaestrasMapper.updateCodigoExterno(tablaMaestra,catalogoUpdate);
+				if (null == catalogoUpdate.getCodigoExt()  ) {
+					catalogoUpdate.setCodigoExt("");
+				}
+				tablasMaestrasMapper.updateCodigoExterno(tablaMaestra,catalogoUpdate);
 				//}
 				if (!catalogoUpdate.getDescripcion().equalsIgnoreCase("")) {
 					tablasMaestrasMapper.updateRecursos(tablaMaestra,catalogoUpdate);
@@ -225,7 +227,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 				List<GenRecursosCatalogos> recursos = recursosCatalogoMapper.selectByExample(exampleRecursos );
 				if (null != recursos && recursos.size() > 0) {
 					Error error = new Error();
-					error.setDescription("Ya existe un registro para esa descripción");
+					error.setMessage("Ya existe un registro para esa descripción");
 					response.setError(error);
 					response.setStatus(SigaConstants.KO);
 					return response;
