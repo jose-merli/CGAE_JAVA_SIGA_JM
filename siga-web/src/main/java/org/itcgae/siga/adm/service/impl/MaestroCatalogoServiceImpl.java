@@ -221,9 +221,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 				GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
 				//Obtenemos el recurso para ver si ya existe
 				GenRecursosCatalogosExample exampleRecursos = new GenRecursosCatalogosExample();
-				exampleRecursos.createCriteria().andDescripcionEqualTo(catalogoCreate.getDescripcion());
-				exampleRecursos.createCriteria().andNombretablaEqualTo(tablaMaestra.getIdtablamaestra());
-				exampleRecursos.createCriteria().andIdinstitucionEqualTo(Short.valueOf(catalogoCreate.getIdInstitucion()));
+				exampleRecursos.createCriteria().andDescripcionEqualTo(catalogoCreate.getDescripcion()).andNombretablaEqualTo(tablaMaestra.getIdtablamaestra()).andIdinstitucionEqualTo(Short.valueOf(catalogoCreate.getIdInstitucion()));
 				List<GenRecursosCatalogos> recursos = recursosCatalogoMapper.selectByExample(exampleRecursos );
 				if (null != recursos && recursos.size() > 0) {
 					Error error = new Error();

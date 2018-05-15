@@ -133,7 +133,8 @@ public class GenTablasMaestrasSqlExtendProvider {
         sql.VALUES("FECHAMODIFICACION", "SYSDATE");
         sql.VALUES("BLOQUEADO", "'N'");
         sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuarioModificacion)+"'");
-        sql.VALUES("DESCRIPCION", ("(select MAX(IDRECURSO) from gen_recursos_catalogos COLUM where NOMBRETABLA = " + "'" + tablaMaestra.getIdtablamaestra() +"' )" ));
+        sql.VALUES("DESCRIPCION", ("(SELECT MAX(IDRECURSO) IDRECURSO FROM (" + 
+        		"select TO_NUMBER(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'99999999999') IDRECURSO from gen_recursos_catalogos  where NOMBRETABLA = " + "'" + tablaMaestra.getIdtablamaestra() +"' ))" ));
         
         return sql.toString();
     }
@@ -149,9 +150,8 @@ public class GenTablasMaestrasSqlExtendProvider {
         SQL sql = new SQL();
         
         sql.INSERT_INTO("GEN_RECURSOS_CATALOGOS");
-        sql.VALUES("IDRECURSO", ("(select decode (INSTR(idrecurso, '_'),0, idrecurso || '_1',SUBSTR(idrecurso, 1, INSTR(idrecurso, '_')-1) || '_'  || (SUBSTR(idrecurso, INSTR(idrecurso, '_')+1)+1))\r\n" + 
-        		"\r\n" + 
-        		"From(select MAX(IDRECURSO) IDRECURSO from gen_recursos_catalogos  where NOMBRETABLA = " + "'" + tablaMaestra.getIdtablamaestra() +"' ))" ));
+        sql.VALUES("IDRECURSO", ("(SELECT MAX(IDRECURSO)+1 IDRECURSO FROM (" + 
+        		"select TO_NUMBER(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'99999999999') IDRECURSO from gen_recursos_catalogos  where NOMBRETABLA = " + "'" + tablaMaestra.getIdtablamaestra() +"' ))" ));
        	sql.VALUES("IDINSTITUCION",  "'" +catalogo.getIdInstitucion()+"'");
         sql.VALUES("DESCRIPCION",  "'" +catalogo.getDescripcion()+"'");
         sql.VALUES("IDLENGUAJE", "'" + catalogo.getIdLenguaje()+"'");
