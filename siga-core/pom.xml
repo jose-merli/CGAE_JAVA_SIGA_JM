@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>org.redabogacia</groupId>
 		<artifactId>siga-parent</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${siga.version}</version>
 	</parent>
 	
 	<properties>
