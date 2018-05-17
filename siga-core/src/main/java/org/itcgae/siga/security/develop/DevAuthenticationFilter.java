@@ -1,12 +1,19 @@
 package org.itcgae.siga.security.develop;
 
 import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.bouncycastle.asn1.x500.RDN;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -38,8 +45,28 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
+		X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+		String commonName = null;
+
+		String dni =  null;
+		X509Certificate cert = null;
+
+		if (null != certs && certs.length > 0) {
+			cert = certs[0];
+				X500Name x500name;
+				try {
+					x500name = new JcaX509CertificateHolder(cert).getSubject();
+					RDN userRdn = x500name.getRDNs(BCStyle.CN)[0];
+					commonName = IETFUtils.valueToString(userRdn.getFirst().getValue());
+					dni = commonName.substring(commonName.length() - 9, commonName.length());
+				} catch (CertificateEncodingException e) {
+
+					e.printStackTrace();
+				}
+		}else {
+			dni = "44149718E";
+		}
 		
-		String dni = "44149718E";
 		String grupo = request.getParameter("profile");
 		String institucion = request.getParameter("location");
 		

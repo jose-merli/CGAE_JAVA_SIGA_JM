@@ -30,7 +30,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
-@ConditionalOnProperty(prefix = "security.basic", value = { "enabled" }, havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "security.basic", value = { "enabled" }, havingValue = "true", matchIfMissing = true)
 public class DevConfigSecurity extends WebSecurityConfigurerAdapter {
 	
 	private SigaUserDetailsService userDetailsService;
