@@ -1,4 +1,4 @@
-package org.itcgae.siga.security.production;
+package org.itcgae.siga.security;
 
 import java.security.cert.X509Certificate;
 
@@ -17,9 +17,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Configurable
-public class ProAuthenticationProvider implements AuthenticationProvider {
+public class CgaeAuthenticationProvider implements AuthenticationProvider {
 
-	Logger LOGGER = Logger.getLogger(ProAuthenticationProvider.class);
+	Logger LOGGER = Logger.getLogger(CgaeAuthenticationProvider.class);
 	
 	@Value("${cert-conf-path}")
 	private String certConfPath;
