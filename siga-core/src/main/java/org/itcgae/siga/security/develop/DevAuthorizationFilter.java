@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.itcgae.siga.commons.utils.TokenGenerationException;
 import org.itcgae.siga.security.UserAuthenticationToken;
 import org.itcgae.siga.security.UserCgae;
@@ -24,10 +25,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.stereotype.Service;
 
 
 public class DevAuthorizationFilter extends BasicAuthenticationFilter {
+	
+	Logger LOGGER = Logger.getLogger(DevAuthenticationFilter.class);
 
 	private SigaUserDetailsService userDetailsService;
 	
@@ -50,6 +52,7 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 			}
 		}
 		
+		LOGGER.info("Se pasa filtro de desarrollo para permitir acceso");
 		
 		UserAuthenticationToken authentication = UserTokenUtils.getAuthentication(request);
 		HeaderMapRequestWrapper mutableRequest = new HeaderMapRequestWrapper(request);
