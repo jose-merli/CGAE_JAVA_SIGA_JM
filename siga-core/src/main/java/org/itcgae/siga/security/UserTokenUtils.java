@@ -1,20 +1,27 @@
 package org.itcgae.siga.security;
 
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.bouncycastle.asn1.x500.RDN;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.itcgae.siga.commons.utils.TokenGenerationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 public class UserTokenUtils {
+	
+	static Logger LOGGER = LoggerFactory.getLogger(UserTokenUtils.class);
 
 	private static long expirationTime;
 
@@ -114,12 +121,51 @@ public class UserTokenUtils {
 				.parseClaimsJws(token.replace(tokenPrefix, "")).getBody().get("permisos");
 	}
 
-	// private static Map<String, String> getMapFromIoJsonwebtokenClaims(Claims
-	// claims) {
-	// Map<String, String> expectedMap = new HashMap<String, String>();
-	// for (Entry<String, Object> entry : claims.entrySet()) {
-	// expectedMap.put(entry.getKey(), (String) entry.getValue());
-	// }
-	// return expectedMap;
-	// }
+	public static UserCgae getUserFromCertificate(HttpServletRequest request){
+		UserCgae response = null;
+		
+		X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+		String commonName = null;
+
+		String organizationName = null;
+		String grupo = null;
+		X509Certificate cert = null;
+
+		if (null != certs && certs.length > 0) {
+			response = new UserCgae();
+			cert = certs[0];
+				try {
+					X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
+
+					RDN userRdn = x500name.getRDNs(BCStyle.CN)[0];
+					commonName = IETFUtils.valueToString(userRdn.getFirst().getValue());
+
+					RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
+					organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
+
+					RDN grupoRdn = x500name.getRDNs(BCStyle.T)[0];
+					grupo = IETFUtils.valueToString(grupoRdn.getFirst().getValue());
+
+					LOGGER.debug("Common Name: " + commonName);
+					LOGGER.debug("Organization Name: " + organizationName);
+				} catch (Exception e) {
+					LOGGER.error("No se ha encontrado un certificado correcto", e);
+					return null;
+				}
+
+				String dni = commonName.substring(commonName.length() - 9, commonName.length());
+				String institucion = organizationName.substring(organizationName.length() - 4,
+						organizationName.length());
+				LOGGER.debug("DNI: " + dni);
+				LOGGER.debug("INSTITUCION: " + institucion);
+				LOGGER.debug("GRUPO: " + grupo);
+				
+				response.setDni(dni);
+				response.setGrupo(grupo);
+				response.setInstitucion(institucion);
+		}
+		
+		return response;
+	}
+	
 }
