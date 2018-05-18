@@ -40,7 +40,7 @@ public class AuditoriaUsuariosController {
 	@RequestMapping(value = "auditoriaUsuarios/update",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> auditUsersUpdate(@RequestBody HistoricoUsuarioUpdateDTO  historicoUsuarioUpdateDTO , HttpServletRequest request){
 		UpdateResponseDTO response = auditoriaUsuariosService.auditUsersUpdate(historicoUsuarioUpdateDTO, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 

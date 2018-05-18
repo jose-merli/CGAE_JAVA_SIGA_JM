@@ -10,7 +10,6 @@ import org.itcgae.siga.DTOs.adm.CatalogoRequestDTO;
 import org.itcgae.siga.DTOs.adm.CatalogoUpdateDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboCatalogoDTO;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.adm.service.IMaestroCatalogoService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +62,6 @@ public class MaestroCatalogosController {
 	   
 	   else 
 		   return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
-	   
 	}
    
    @RequestMapping(value = "/catmaestros/historico", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

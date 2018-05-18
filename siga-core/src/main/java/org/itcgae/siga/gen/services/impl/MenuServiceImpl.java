@@ -76,7 +76,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MenuServiceImpl implements IMenuService {
 	
-	Logger LOGGER = Logger.getLogger(MenuServiceImpl.class);
+	private Logger LOGGER = Logger.getLogger(MenuServiceImpl.class);
 
 	@Autowired
 	private GenMenuExtendsMapper menuExtend;
@@ -537,7 +537,6 @@ public class MenuServiceImpl implements IMenuService {
 		// Obtenemos atributos del usuario logeado
 		LOGGER.debug("Obtenemos atributos del usuario logeado");
 		String token = httpRequest.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short institucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		GenPropertiesExample genPropertiesExample = new GenPropertiesExample();

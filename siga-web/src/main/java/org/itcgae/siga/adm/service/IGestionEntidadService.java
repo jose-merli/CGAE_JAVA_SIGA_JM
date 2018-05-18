@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.EntidadLenguajeInstitucionDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -15,7 +15,7 @@ public interface IGestionEntidadService {
 	
 	public ComboDTO getLenguages(HttpServletRequest request);
 	
-	public CreateResponseDTO uploadFile(MultipartHttpServletRequest request) throws IOException;
+	public UpdateResponseDTO uploadFile(MultipartHttpServletRequest request) throws IOException;
 	
-	public CreateResponseDTO uploadLenguage(String idLenguaje, HttpServletRequest request);
+	public UpdateResponseDTO uploadLenguage(String idLenguaje, HttpServletRequest request);
 }

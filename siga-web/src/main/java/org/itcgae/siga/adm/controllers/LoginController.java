@@ -53,13 +53,7 @@ public class LoginController {
     
     @RequestMapping(value = "/header/logo", method = RequestMethod.GET)
     public ResponseEntity<HeaderLogoDTO> getHeaderLogo(HttpServletRequest request, HttpServletResponse response) {
-        
     	menuService.getHeaderLogo(request, response);
- 
         return new ResponseEntity<HeaderLogoDTO>(HttpStatus.OK);
     }
-    
-    
-    
-	
 }

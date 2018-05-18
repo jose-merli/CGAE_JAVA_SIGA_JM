@@ -4,10 +4,11 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.EntidadLenguajeInstitucionDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.adm.service.IGestionEntidadService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,15 +40,17 @@ public class GestionEntidadController {
 	
 	
 	@RequestMapping(value = "entidad/uploadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	ResponseEntity<CreateResponseDTO> uploadFile(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
-		CreateResponseDTO response = gestionEntidadService.uploadFile(request);
-		return new ResponseEntity<CreateResponseDTO>(response, HttpStatus.OK);
+	ResponseEntity<UpdateResponseDTO> uploadFile(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
+		UpdateResponseDTO response = gestionEntidadService.uploadFile(request);
+		if (response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	
 	@RequestMapping(value = "/entidad/uploadLenguage", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
- 	ResponseEntity<CreateResponseDTO> uploadLenguage(@RequestBody String idLenguaje, HttpServletRequest request) { 
-		CreateResponseDTO response = gestionEntidadService.uploadLenguage(idLenguaje, request);
-		return new ResponseEntity<CreateResponseDTO>(response, HttpStatus.OK);
+ 	ResponseEntity<UpdateResponseDTO> uploadLenguage(@RequestBody String idLenguaje, HttpServletRequest request) { 
+		UpdateResponseDTO response = gestionEntidadService.uploadLenguage(idLenguaje, request);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 }

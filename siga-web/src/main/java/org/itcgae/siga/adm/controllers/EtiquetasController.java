@@ -5,8 +5,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.EtiquetaDTO;
 import org.itcgae.siga.DTOs.adm.EtiquetaSearchDTO;
 import org.itcgae.siga.DTOs.adm.EtiquetaUpdateDTO;
-import org.itcgae.siga.DTOs.adm.ParametroDTO;
-import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.adm.service.IEtiquetasService;
@@ -43,6 +41,6 @@ public class EtiquetasController {
 	@RequestMapping(value = "/etiquetas/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> getParametersSearch(@RequestBody EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request) { 
 		UpdateResponseDTO response = etiquetasService.updateLabel(etiquetaUpdateDTO, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 }

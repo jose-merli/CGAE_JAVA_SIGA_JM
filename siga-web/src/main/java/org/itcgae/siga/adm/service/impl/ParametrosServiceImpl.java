@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.ParametroDTO;
 import org.itcgae.siga.DTOs.adm.ParametroDeleteDTO;
 import org.itcgae.siga.DTOs.adm.ParametroItem;
@@ -15,6 +16,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.adm.service.IParametrosService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenParametros;
@@ -30,6 +32,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class ParametrosServiceImpl implements IParametrosService {
 
+	private Logger LOGGER = Logger.getLogger(ParametrosServiceImpl.class);
+	
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
 
@@ -41,10 +45,14 @@ public class ParametrosServiceImpl implements IParametrosService {
 
 	@Override
 	public ComboDTO getParameterModules() {
+		LOGGER.info("getParameterModules() -> Entrada al servicio para obtener los módulos disponibles para los parámetros generales");
 		ComboDTO combo = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 
+		
+		LOGGER.info("getParameterModules() / genParametrosExtendsMapper.getModules() -> Entrada a genParametrosExtendsMapper para obtener los módulos disponibles para los parámetros generales");
 		comboItems = genParametrosExtendsMapper.getModules();
+		LOGGER.info("getParameterModules() / genParametrosExtendsMapper.getModules() -> Salida de genParametrosExtendsMapper para obtener los módulos disponibles para los parámetros generales");
 
 		if (!comboItems.equals(null) && comboItems.size() > 0) {
 			// añade elemento vacio al princpio para el dropdown de parte front
@@ -55,6 +63,7 @@ public class ParametrosServiceImpl implements IParametrosService {
 			combo.setCombooItems(comboItems);
 		}
 
+		LOGGER.info("getParameterModules() -> Salida del servicio para obtener los módulos disponibles para los parámetros generales");
 		return combo;
 	}
 
@@ -62,7 +71,7 @@ public class ParametrosServiceImpl implements IParametrosService {
 	public ParametroDTO getParametersSearch(int numPagina, ParametroRequestDTO parametroRequestDTO,
 			HttpServletRequest request) {
 
-		List<GenParametros> genparametros = new ArrayList<GenParametros>();
+		LOGGER.info("getParametersSearch() -> Entrada al servicio para buscar los módulos disponibles para los catálogos generales");
 		ParametroDTO parametroDTO = new ParametroDTO();
 		List<ParametroItem> parametroItems = new ArrayList<ParametroItem>();
 
@@ -76,22 +85,23 @@ public class ParametrosServiceImpl implements IParametrosService {
 				&& parametroRequestDTO.getIdInstitucion() != null) {
 			if (parametroRequestDTO.getParametrosGenerales().equals("N")) {
 				// Buscar en gen_parametros por modulo e institucion
+				LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Entrada a genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
 				parametroItems = genParametrosExtendsMapper.getParametersSearch(numPagina, parametroRequestDTO);
+				LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
 
-				if (parametroItems != null && parametroItems.size() > 0)
-					parametroDTO.setParametrosItems(parametroItems);
-
+				parametroDTO.setParametrosItems(parametroItems);
 			}
 			 else if (parametroRequestDTO.getParametrosGenerales().equals("S")) {
-
+				 
+				LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Entrada a genParametrosExtendsMapper para obtener listado de los módulos comunes a todas las instituciones");
 				parametroItems = genParametrosExtendsMapper.getParametersSearchGeneral(numPagina, parametroRequestDTO);
+				LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos comunes a todas las instituciones");
 
-				if (parametroItems != null && parametroItems.size() > 0)
-					parametroDTO.setParametrosItems(parametroItems);
-				
+				parametroDTO.setParametrosItems(parametroItems);
 			}
 		}
 
+		LOGGER.info("getParametersSearch() -> Salida del servicio para buscar los módulos disponibles para los catálogos generales");
 		return parametroDTO;
 
 	}
@@ -99,6 +109,7 @@ public class ParametrosServiceImpl implements IParametrosService {
 	@Override
 	public ParametroDTO getParametersRecord(int numPagina, ParametroRequestDTO parametroRequestDTO,
 			HttpServletRequest request) {
+		LOGGER.info("getParametersRecord() -> Entrada al servicio para buscar histórico de módulos disponibles para la institución del usuario");
 		List<GenParametros> genparametros = new ArrayList<GenParametros>();
 		ParametroDTO parametroDTO = new ParametroDTO();
 		List<ParametroItem> parametroItems = new ArrayList<ParametroItem>();
@@ -111,14 +122,16 @@ public class ParametrosServiceImpl implements IParametrosService {
 		if (!parametroRequestDTO.getParametrosGenerales().equalsIgnoreCase("")
 				&& !parametroRequestDTO.getModulo().equalsIgnoreCase("")
 				&& parametroRequestDTO.getIdInstitucion() != null) {
-			// if (parametroRequestDTO.getParametrosGenerales().equals("N")) {
+			
 			// Buscar en gen_parametros por modulo e institucion
 			GenParametrosExample genParametrosExample = new GenParametrosExample();
 			genParametrosExample.createCriteria()
 					.andIdinstitucionEqualTo(Short.valueOf(parametroRequestDTO.getIdInstitucion()))
 					.andModuloEqualTo(parametroRequestDTO.getModulo());
 
+			LOGGER.info("getParametersRecord() / genParametrosMapper.selectByExample() -> Entrada a genParametrosMapper para obtener listado de los módulos para la institución del usuario");
 			genparametros = genParametrosMapper.selectByExample(genParametrosExample);
+			LOGGER.info("getParametersRecord() / genParametrosMapper.selectByExample() -> Salida de genParametrosMapper para obtener listado de los módulos para la institución del usuario");
 
 			if (genparametros != null && genparametros.size() > 0) {
 				for (int i = 0; i < genparametros.size(); i++) {
@@ -132,23 +145,18 @@ public class ParametrosServiceImpl implements IParametrosService {
 				}
 				parametroDTO.setParametrosItems(parametroItems);
 			}
-			// } else if
-			// (parametroRequestDTO.getParametrosGenerales().equals("S")) {
-			//
-			// parametroItems =
-			// genParametrosExtendsMapper.getParametersRecord(numPagina,
-			// parametroRequestDTO);
-			//
-			// if (parametroItems != null && parametroItems.size() > 0)
-			// parametroDTO.setParametrosItems(parametroItems);
-			//
-			// }
 		}
+		else {
+			LOGGER.warn("getParametersRecord() -> No hay suficiente informaciñon para la búsqueda");
+		}
+		
+		LOGGER.info("getParametersRecord() -> Salida del servicio para buscar histórico de módulos disponibles para la institución del usuario");
 		return parametroDTO;
 	}
 
 	@Override
 	public UpdateResponseDTO updateParameter(ParametroUpdateDTO parametroUpdateDTO, HttpServletRequest request) {
+		LOGGER.info("updateParameter() -> Entrada al servicio para actualizar el valor de un modulo-parámetro");
 		int response = 0;
 		GenParametros genParametros = new GenParametros();
 		GenParametros genParametrosSelect = new GenParametros();
@@ -162,84 +170,107 @@ public class ParametrosServiceImpl implements IParametrosService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+		LOGGER.info("updateParameter() / admUsuariosMapper.selectByExample() -> Entrada a admUsuariosMapper para obtener información del usuario logeado");
 		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
-		AdmUsuarios usuario = usuarios.get(0);
+		LOGGER.info("updateParameter() / admUsuariosMapper.selectByExample() -> Salida de admUsuariosMapper para obtener información del usuario logeado");
+		
+		if(null != usuarios && usuarios.size() > 0) {
+			AdmUsuarios usuario = usuarios.get(0);
 
-		if (!parametroUpdateDTO.getIdInstitucion().equalsIgnoreCase("")
-				&& !parametroUpdateDTO.getModulo().equalsIgnoreCase("")
-				&& !parametroUpdateDTO.getParametro().equalsIgnoreCase("")
-				&& !parametroUpdateDTO.getValor().equalsIgnoreCase("")) {
+			if (!parametroUpdateDTO.getIdInstitucion().equalsIgnoreCase("")
+					&& !parametroUpdateDTO.getModulo().equalsIgnoreCase("")
+					&& !parametroUpdateDTO.getParametro().equalsIgnoreCase("")
+					&& !parametroUpdateDTO.getValor().equalsIgnoreCase("")) {
 
-			// crear registro igual al existente en tabla gen_parametros, pero
-			// con el valor recibido y idInstitucion del usuario logeado
-			if (parametroUpdateDTO.getIdInstitucion().equals("0")) {
+				// crear registro igual al existente en tabla gen_parametros, pero
+				// con el valor recibido y idInstitucion del usuario logeado
+				if (parametroUpdateDTO.getIdInstitucion().equals("0")) {
 
-				// seteo de parametros a GenParametros. idInstitucion de
-				// certificado
-				genParametros.setIdinstitucion(idInstitucion);
-				genParametros.setModulo(parametroUpdateDTO.getModulo());
-				genParametros.setParametro(parametroUpdateDTO.getParametro());
-				genParametros.setValor(parametroUpdateDTO.getValor());
-				genParametros.setFechamodificacion(new Date());
-				genParametros.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
+					// seteo de parametros a GenParametros. idInstitucion de
+					// certificado
+					genParametros.setIdinstitucion(idInstitucion);
+					genParametros.setModulo(parametroUpdateDTO.getModulo());
+					genParametros.setParametro(parametroUpdateDTO.getParametro());
+					genParametros.setValor(parametroUpdateDTO.getValor());
+					genParametros.setFechamodificacion(new Date());
+					genParametros.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
 
-				if (!genParametros.getIdinstitucion().equals(null)) {
+					if (!genParametros.getIdinstitucion().equals(null)) {
 
-					genParametrosKey.setIdinstitucion(genParametros.getIdinstitucion());
-					genParametrosKey.setModulo(genParametros.getModulo());
-					genParametrosKey.setParametro(genParametros.getParametro());
+						genParametrosKey.setIdinstitucion(genParametros.getIdinstitucion());
+						genParametrosKey.setModulo(genParametros.getModulo());
+						genParametrosKey.setParametro(genParametros.getParametro());
 
-					// comprobamos si realmente existe el registro
-					// {idinstitucion,modulo, parametro}, ya que fecha de baja
-					// puede ser distinta de null y no se muestra al buscar en
-					// pantalla
-					genParametrosSelect = genParametrosMapper.selectByPrimaryKey(genParametrosKey);
+						// comprobamos si realmente existe el registro
+						// {idinstitucion,modulo, parametro}, ya que fecha de baja
+						// puede ser distinta de null y no se muestra al buscar en
+						// pantalla
+						LOGGER.info("updateParameter() / genParametrosMapper.selectByPrimaryKey() -> Entrada a genParametrosMapper para comprobar si existe un registro idinstitucion-modulo-parametro");
+						genParametrosSelect = genParametrosMapper.selectByPrimaryKey(genParametrosKey);
+						LOGGER.info("updateParameter() / genParametrosMapper.selectByPrimaryKey() -> Salida de genParametrosMapper para comprobar si existe un registro idinstitucion-modulo-parametro");
 
-					// si no es nulo, entonces hay que actualizar en vez de
-					// crear
-					if (genParametrosSelect != null) {
-						// actualizamos fecha de baja a null, para que vuelva a
-						// estar disponible
-						genParametros.setFechaBaja(null);
-						response = genParametrosMapper.updateByPrimaryKeySelective(genParametros);
-					}
-					// si es nulo, se crea un nuevo registro
-					else {
-						genParametros.setIdrecurso(parametroUpdateDTO.getIdRecurso());
-						response = genParametrosMapper.insertSelective(genParametros);
+						// si no es nulo, entonces hay que actualizar en vez de
+						// crear
+						if (genParametrosSelect != null) {
+							// actualizamos fecha de baja a null, para que vuelva a
+							// estar disponible
+							genParametros.setFechaBaja(null);
+							LOGGER.info("updateParameter() / genParametrosMapper.updateByPrimaryKeySelective() -> Entrada a genParametrosMapper para habilitar un modulo-parametro");
+							response = genParametrosMapper.updateByPrimaryKeySelective(genParametros);
+							LOGGER.info("updateParameter() / genParametrosMapper.updateByPrimaryKeySelective() -> Salida de genParametrosMapper para habilitar un modulo-parametro");
+						}
+						// si es nulo, se crea un nuevo registro
+						else {
+							genParametros.setIdrecurso(parametroUpdateDTO.getIdRecurso());
+							LOGGER.info("updateParameter() / genParametrosMapper.insertSelective() -> Entrada a genParametrosMapper para crear un registro modulo-parametro-valor");
+							response = genParametrosMapper.insertSelective(genParametros);
+							LOGGER.info("updateParameter() / genParametrosMapper.insertSelective() -> Salida de genParametrosMapper para crear un registro modulo-parametro-valor");
+						}
+
 					}
 
 				}
+				// actualiza registro en tabla gen_parametros con idInstitucion
+				// recibido y valor recibido
+				else {
 
+					// seteo de parametros a GenParametros. idInstitucion es el
+					// recibido
+					genParametros.setIdinstitucion(Short.valueOf(parametroUpdateDTO.getIdInstitucion()));
+					genParametros.setModulo(parametroUpdateDTO.getModulo());
+					genParametros.setParametro(parametroUpdateDTO.getParametro());
+					genParametros.setValor(parametroUpdateDTO.getValor());
+					genParametros.setFechamodificacion(new Date());
+					genParametros.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
+					LOGGER.info("updateParameter() / genParametrosMapper.updateByPrimaryKeySelective() -> Entrada a genParametrosMapper para actualizar parámetro a una institucion y valor concretos");
+					response = genParametrosMapper.updateByPrimaryKeySelective(genParametros);
+					LOGGER.info("updateParameter() / genParametrosMapper.updateByPrimaryKeySelective() -> Salida de genParametrosMapper para actualizar parámetro a una institucion y valor concretos");
+				}
 			}
-			// actualiza registro en tabla gen_parametros con idInstitucion
-			// recibido y valor recibido
-			else {
+		}
+		else {
+			response = 0;
+			LOGGER.warn("updateParameter() -> no existen usuarios y/o la institucion son nulas");
+		}
+		
 
-				// seteo de parametros a GenParametros. idInstitucion es el
-				// recibido
-				genParametros.setIdinstitucion(Short.valueOf(parametroUpdateDTO.getIdInstitucion()));
-				genParametros.setModulo(parametroUpdateDTO.getModulo());
-				genParametros.setParametro(parametroUpdateDTO.getParametro());
-				genParametros.setValor(parametroUpdateDTO.getValor());
-				genParametros.setFechamodificacion(new Date());
-				genParametros.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
-
-				response = genParametrosMapper.updateByPrimaryKeySelective(genParametros);
-			}
-
+		// Comprobacion para generar respuesta
+		if (response == 1){
+			updateResponseDTO.setStatus(SigaConstants.OK);
+			LOGGER.warn("updateParameter() -> OK. Se ha actualizado el valor de un módulo-parámetro");
+		}
+		else{
+			updateResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.warn("updateParameter() -> KO. NO se ha podido actualizar el valor de un módulo-parámetro");
 		}
 
-		if (response == 1)
-			updateResponseDTO.setStatus("OK");
-		else
-			updateResponseDTO.setStatus("ERROR");
-
+		LOGGER.info("updateParameter() -> Salida del servicio para actualizar el valor de un módulo-parámetro");
 		return updateResponseDTO;
 	}
 
 	@Override
 	public UpdateResponseDTO deleteParameter(ParametroDeleteDTO parametroDeleteDTO, HttpServletRequest request) {
+		LOGGER.info("deleteParameter() -> Entrada al servicio para eliminar el valor de un modulo-parámetro para la institución del usuario logeado");
 		int response = 0;
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -251,28 +282,50 @@ public class ParametrosServiceImpl implements IParametrosService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+		LOGGER.info("deleteParameter() / admUsuariosMapper.selectByExample() -> Entrada a admUsuariosMapper para obtener información del usuario logeado");
 		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
-		AdmUsuarios usuario = usuarios.get(0);
+		LOGGER.info("deleteParameter() / admUsuariosMapper.selectByExample() -> Salida de admUsuariosMapper para obtener información del usuario logeado");
+		
+		if(null != usuarios && usuarios.size() > 0) {
+			AdmUsuarios usuario = usuarios.get(0);
 
-		if (!parametroDeleteDTO.getIdInstitucion().equalsIgnoreCase("")
-				&& !parametroDeleteDTO.getModulo().equalsIgnoreCase("")
-				&& !parametroDeleteDTO.getParametro().equalsIgnoreCase("")) {
+			if (!parametroDeleteDTO.getIdInstitucion().equalsIgnoreCase("")
+					&& !parametroDeleteDTO.getModulo().equalsIgnoreCase("")
+					&& !parametroDeleteDTO.getParametro().equalsIgnoreCase("")) {
 
-			GenParametros genParametros = new GenParametros();
-			genParametros.setModulo(parametroDeleteDTO.getModulo());
-			genParametros.setParametro(parametroDeleteDTO.getParametro());
-			genParametros.setIdinstitucion(Short.valueOf(parametroDeleteDTO.getIdInstitucion()));
-			genParametros.setFechaBaja(new Date());
-			genParametros.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
+				GenParametros genParametros = new GenParametros();
+				genParametros.setModulo(parametroDeleteDTO.getModulo());
+				genParametros.setParametro(parametroDeleteDTO.getParametro());
+				genParametros.setIdinstitucion(Short.valueOf(parametroDeleteDTO.getIdInstitucion()));
+				genParametros.setFechaBaja(new Date());
+				genParametros.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
 
-			response = genParametrosMapper.updateByPrimaryKeySelective(genParametros);
+				LOGGER.info("deleteParameter() / genParametrosMapper.updateByPrimaryKeySelective() -> Entrada a genParametrosMapper para eliminar el valor de un módulo-parámetro");
+				response = genParametrosMapper.updateByPrimaryKeySelective(genParametros);
+				LOGGER.info("deleteParameter() / genParametrosMapper.updateByPrimaryKeySelective() -> Salida de genParametrosMapper para eliminar el valor de un módulo-parámetro");
+			}
+			else {
+				LOGGER.warn("deleteParameter() -> No hay suficiente información para eliminar el valor de un módulo-parámetro");
+			}
 		}
+		else {
+			response = 0;
+			LOGGER.warn("deleteParameter() -> No existen usuarios y/o la institucion son nulas");
+		}
+		
 
-		if (response == 1)
-			updateResponseDTO.setStatus("OK");
-		else
-			updateResponseDTO.setStatus("ERROR");
+		if (response == 1) {
+			updateResponseDTO.setStatus(SigaConstants.OK);
+			LOGGER.warn("deleteParameter() -> KO. Se ha eliminado correctamente el valor de un módulo-parámetro");
+		}
+			
+		else {
+			updateResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.warn("deleteParameter() -> KO. NO se ha podido eliminar el valor de un módulo-parámetro");
+		}
+			
 
+		LOGGER.info("deleteParameter() -> Salida del servicio para eliminar el valor de un modulo-parámetro para la institución del usuario logeado");
 		return updateResponseDTO;
 	}
 

@@ -16,6 +16,7 @@ import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.adm.service.IGestionUsuariosGruposService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -53,25 +54,18 @@ public class GestionUsuariosGruposController {
 	}
 	
 	
-	// Invalid CORS request => create a CORS Filter that will check Origin header
-	// Invalid CORS request 403 => the request was a legal request, but the server is refusing to respond to it. Unlike a 401 Unauthorized response, authenticanting will make no difference.
-	// check that the authentication is correct (DevAuthenticationFilter.java). Maybe don't allow patch method:
-	// response.addHeader("Access-Control-Expose-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
-    // "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-	//@CrossOrigin(allowCredentials = "false")
 	@RequestMapping(value = "/usuarios/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateUsers(@RequestBody UsuarioUpdateDTO usuarioUpdateDTO, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionUsuariosGruposService.updateUsers(usuarioUpdateDTO, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
-	
 	
 	
  	@RequestMapping(value = "/usuarios/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
  	ResponseEntity<CreateResponseDTO> createUsers(@RequestBody UsuarioCreateDTO usuarioCreateDTO, HttpServletRequest request) { 
 		CreateResponseDTO response = gestionUsuariosGruposService.createUsers(usuarioCreateDTO, request);
 	 
-		if(response.getStatus().equals("OK")) {
+		if(response.getStatus().equals(SigaConstants.OK)) {
 			return  new ResponseEntity<CreateResponseDTO>(response, HttpStatus.OK);
 		}else {
 			return  new ResponseEntity<CreateResponseDTO>(response, HttpStatus.FORBIDDEN);
@@ -84,7 +78,6 @@ public class GestionUsuariosGruposController {
 		DeleteResponseDTO response = gestionUsuariosGruposService.deleteUsers(usuarioDeleteDTO, request);
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 	}
-	
 	
 	
 	@RequestMapping(value = "/usuariosgrupos/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -108,8 +101,8 @@ public class GestionUsuariosGruposController {
 	
 	@RequestMapping(value = "/usuariosgrupos/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateGroupUsers(@RequestBody UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request) {
-		UpdateResponseDTO response = gestionUsuariosGruposService.updateGroupUsers(usuarioUpdateDTO, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		UpdateResponseDTO response = gestionUsuariosGruposService.updateGroupUsers(usuarioUpdateDTO, request);		
+			return  new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 	

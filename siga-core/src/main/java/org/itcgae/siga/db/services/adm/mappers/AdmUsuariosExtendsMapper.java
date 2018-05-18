@@ -19,7 +19,6 @@ import org.itcgae.siga.DTOs.adm.UsuarioRequestDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoEntity;
-import org.itcgae.siga.DTOs.gen.PermisoItem;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.services.adm.providers.AdmUsuariosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;

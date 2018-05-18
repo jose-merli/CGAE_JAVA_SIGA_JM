@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.RolPerfilDTO;
@@ -50,10 +51,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposService {
 
+	private Logger LOGGER = Logger.getLogger(GestionUsuariosGruposServiceImpl.class);
+	
 	@Autowired
 	private AdmRolMapper admRolMapper;
 
-	
 	@Autowired
 	private AdmPerfilRolMapper admPerfilRolMapper;
 	
@@ -72,16 +74,18 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	 */
 	@Override
 	public ComboDTO getUsersRole() {
+		LOGGER.info("getUsersRole() -> Entrada al servicio para los diferentes roles de usuario");
 		AdmRolExample example = new AdmRolExample();
 		List<AdmRol> roles = new ArrayList<AdmRol>();
 		ComboDTO comboDto = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-
 		String unblocked = "N";
 
 		example.createCriteria().andBloqueadoEqualTo(String.valueOf(unblocked));
 		example.setOrderByClause("DESCRIPCION ASC");
+		LOGGER.info("getUsersRole() / admRolMapper.selectByExample() -> Entrada a admRolMapper para obtener listado de roles de usuario");
 		roles = admRolMapper.selectByExample(example);
+		LOGGER.info("getUsersRole() / admRolMapper.selectByExample() -> Salida de admRolMapper para obtener listado de roles de usuario");
 
 		if (roles != null && roles.size() > 0) {
 			ComboItem comboItem = new ComboItem();
@@ -95,8 +99,12 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				comboItems.add(comboItem);
 			}
 		}
+		else {
+			LOGGER.warn("getUsersRole() / admRolMapper.selectByExample() -> No existen roles de usuario");
+		}
 
 		comboDto.setCombooItems(comboItems);
+		LOGGER.info("getUsersRole() -> Salida del servicio para los diferentes roles de usuario");
 		return comboDto;
 	}
 
@@ -107,6 +115,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	 */
 	@Override
 	public ComboDTO getUsersProfile( HttpServletRequest request) {
+		LOGGER.info("getUsersProfile() -> Entrada al servicio para los diferentes perfiles de usuario");
 		AdmPerfilExample example = new AdmPerfilExample();
 		HashMap<String, String> hashProfiles = new HashMap<String, String>();
 		List<AdmPerfil> profiles = new ArrayList<AdmPerfil>();
@@ -119,7 +128,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		example.createCriteria().andFechaBajaIsNull().andIdinstitucionEqualTo(idInstitucion);
 		example.setOrderByClause("DESCRIPCION ASC");
 		example.setDistinct(true);
+		LOGGER.info("getUsersProfile() / admPerfilExtendsMapper.selectComboPerfilDistinctByExample() -> Entrada a admPerfilExtendsMapper para obtener listado de perfiles de usuario");
 		profiles = admPerfilExtendsMapper.selectComboPerfilDistinctByExample(example);
+		LOGGER.info("getUsersProfile() / admPerfilExtendsMapper.selectComboPerfilDistinctByExample() -> Salida de admPerfilExtendsMapper para obtener listado de perfiles de usuario");
 
 		if (profiles != null && profiles.size() > 0) {
 			for (AdmPerfil admPerfil : profiles) {
@@ -127,10 +138,6 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 			}
 
-//			ComboItem comboItem = new ComboItem();
-//			comboItem.setValue("");
-//			comboItem.setLabel("");
-//			comboItems.add(comboItem);
 			hashProfiles.forEach((id, description) -> {
 				ComboItem comboItem2 = new ComboItem();
 				comboItem2.setValue(id);
@@ -148,8 +155,12 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 			comboItems.sort(orderBydDescription);
 
 		}
+		else {
+			LOGGER.warn("getUsersProfile() / admPerfilExtendsMapper.selectComboPerfilDistinctByExample() -> No existen perfiles de usuario");
+		}
 
 		comboDto.setCombooItems(comboItems);
+		LOGGER.info("getUsersProfile() -> Entrada al servicio para los diferentes perfiles de usuario");
 		return comboDto;
 	}
 
@@ -160,41 +171,58 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	 */
 	@Override
 	public UsuarioDTO getUsersSearch(int numPagina, UsuarioRequestDTO usuarioRequestDTO, HttpServletRequest request) {
+		LOGGER.info("getUsersSearch() -> Entrada al servicio para búsqueda de usuarios con filtros");
 		List<UsuarioItem> usuarioItems = new ArrayList<UsuarioItem>();
 		UsuarioDTO usuarioDTO = new UsuarioDTO();
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		usuarioRequestDTO.setIdInstitucion(String.valueOf(idInstitucion));
+		LOGGER.info("getUsersSearch() / admUsuariosExtendsMapper.getUsersByFilter() -> Entrada a admUsuariosExtendsMapper para obtener lista de usuarios por el filtro usado");
 		usuarioItems = admUsuariosExtendsMapper.getUsersByFilter(numPagina, usuarioRequestDTO);
+		LOGGER.info("getUsersSearch() / admUsuariosExtendsMapper.getUsersByFilter() -> Salida de admUsuariosExtendsMapper para obtener lista de usuarios por el filtro usado");
 
-		
-		
 		if (usuarioItems != null && usuarioItems.size() > 0) {
-			
-		for (UsuarioItem usuarioItem : usuarioItems) {
-			if (null != usuarioItem.getPerfil() && !usuarioItem.getPerfil().equalsIgnoreCase("") ) {
-				usuarioItem.setPerfiles(usuarioItem.getPerfil().split("; "));
+			for (UsuarioItem usuarioItem : usuarioItems) {
+				if (null != usuarioItem.getPerfil() && !usuarioItem.getPerfil().equalsIgnoreCase("")) {
+					usuarioItem.setPerfiles(usuarioItem.getPerfil().split("; "));
+				}
 			}
-		}
 			usuarioDTO.setUsuarioItem(usuarioItems);
 		}
+		else {
+			LOGGER.warn("getUsersSearch() / admUsuariosExtendsMapper.getUsersByFilter() -> No se devuelven usuarios para el filtro usado");
+		}
 
+		LOGGER.info("getUsersSearch() -> Salida del servicio para búsqueda de usuarios con filtros");
 		return usuarioDTO;
 	}
 
 	@Override
 	public UpdateResponseDTO updateUsers(UsuarioUpdateDTO usuarioUpdateDTO, HttpServletRequest request) {
+		LOGGER.info("updateUsers() -> Entrada al servicio para actualizar datos de usuario");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		int response1 = 1;
-		int response2 = 1;
+		int response2 = 0;
+		int response3 = 0;
+		boolean serviceOK = true;
+		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		usuarioUpdateDTO.setIdInstitucion(String.valueOf(idInstitucion));
+		
+		LOGGER.debug("updateUsers() -> Pone activo al usuario si no lo estaba");
 		if (!usuarioUpdateDTO.getActivo().equalsIgnoreCase("")
 				|| !usuarioUpdateDTO.getCodigoExterno().equalsIgnoreCase("")) {
+			LOGGER.info("updateUsers() / admUsuariosExtendsMapper.updateUsersAdmUserTable() -> Entrada a admUsuariosExtendsMapper para poner un usuario a activo");
 			response1 = admUsuariosExtendsMapper.updateUsersAdmUserTable(usuarioUpdateDTO);
+			LOGGER.info("updateUsers() / admUsuariosExtendsMapper.updateUsersAdmUserTable() -> Salida de admUsuariosExtendsMapper para poner un usuario a activo");
+			if(response1 == 0) {
+				LOGGER.warn("updateUsers() / admUsuariosExtendsMapper.updateUsersAdmUserTable() -> No se ha podido poner un usuario a activo");
+				serviceOK = false;
+			}
 		}
+		
 		if (null != usuarioUpdateDTO.getIdGrupo() && usuarioUpdateDTO.getIdGrupo().length > 0) {
 				for (int i = 0; i < usuarioUpdateDTO.getIdGrupo().length; i++) {
 					
@@ -202,20 +230,28 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
 					
-		
-					//Buscamos el perfil para ver si ya existe. En caso de que no exista
+					//Buscamos el perfil de un usuario para ver si ya existe
+					LOGGER.debug("updateUsers()  -> Buscamos el perfil de un usuario para ver si ya existe");
+					LOGGER.info("updateUsers() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para búsqueda de usuario por dni e institucion");
 					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+					LOGGER.info("updateUsers() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapperBúsqueda para búsqueda de usuario por dni e institucion");
 					AdmUsuarios usuario = usuarios.get(0);
 					AdmPerfilKey key = new AdmPerfilKey();
 					key.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
 					key.setIdperfil(usuarioUpdateDTO.getGrupo());
+					LOGGER.info("updateUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Entrada a admPerfilExtendsMapper para buscar si existe el perfil de un usuario");
 					AdmPerfil perfil = admPerfilExtendsMapper.selectByPrimaryKey(key);
-					//Buscamos el perfil para ver si ya existe. En caso de que no exista creamos la relación entre el usuario y el perfil
+					LOGGER.info("updateUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Salida de admPerfilExtendsMapper para buscar si existe el perfil de un usuario");
+					
+					//En caso de que no exista un perfil creamos la relación entre el usuario y el perfil
+					LOGGER.debug("updateUsers()  -> En caso de que no exista un perfil creamos la relación entre el usuario y el perfil");
 					if (null == perfil) {
 						AdmPerfilExample keyPerfil = new AdmPerfilExample();
 						keyPerfil.setDistinct(Boolean.TRUE);
 						keyPerfil.createCriteria().andIdperfilEqualTo(usuarioUpdateDTO.getGrupo());
+						LOGGER.info("updateUsers() / admPerfilExtendsMapper.selectByExample() -> Entrada a admPerfilExtendsMapper para buscar la descripción de un perfil de un usuario");
 						List<AdmPerfil> perfilExistente = admPerfilExtendsMapper.selectByExample(keyPerfil);
+						LOGGER.info("updateUsers() / admPerfilExtendsMapper.selectByExample() -> Salida de admPerfilExtendsMapper para buscar la descripción de un perfil de un usuario");
 						AdmPerfil record = new AdmPerfil();
 						record.setUsumodificacion(usuario.getIdusuario());
 						record.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
@@ -224,14 +260,26 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 						record.setNivelperfil(new Long(0));
 						record.setDescripcion(perfilExistente.get(0).getDescripcion());
 						//Se guarda el perfil para la institucion
-						admPerfilExtendsMapper.insert(record );
+						LOGGER.debug("updateUsers()  -> Se guarda el perfil para la institución");
+						LOGGER.info("updateUsers() / admPerfilExtendsMapper.insert() -> Entrada a admPerfilExtendsMapper para añadir una relación entre usuario y perfil");
+						response2 = admPerfilExtendsMapper.insert(record);
+						LOGGER.info("updateUsers() / admPerfilExtendsMapper.insert() -> Salida de admPerfilExtendsMapper para añadir una relación entre usuario y perfil");
+						// Si una inserción de un registro da fallo, la respuesta del servicio deberá ser KO
+						if(response2 == 0) {
+							LOGGER.warn("updateUsers() / admPerfilExtendsMapper.insert() -> No se ha podido añadir una relación entre usuario y perfil");
+							serviceOK = false;
+						}
 					}
+					
 					AdmUsuariosEfectivosPerfilKey keyUsuarioPerfil = new AdmUsuariosEfectivosPerfilKey();
 					keyUsuarioPerfil.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
 					keyUsuarioPerfil.setIdusuario(Integer.valueOf(usuarioUpdateDTO.getIdUsuario()));
 					keyUsuarioPerfil.setIdrol(usuarioUpdateDTO.getRol());
 					keyUsuarioPerfil.setIdperfil(usuarioUpdateDTO.getGrupo());
+					LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilMapper.selectByPrimaryKey() -> Entrada a admUsuariosEfectivoPerfilMapper para comprobar si existe relación entre usuario y perfil en usuariosEfectivos");
 					AdmUsuariosEfectivosPerfil usuarioPerfil = admUsuariosEfectivoPerfilMapper.selectByPrimaryKey(keyUsuarioPerfil);
+					LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilMapper.selectByPrimaryKey() -> Salida de admUsuariosEfectivoPerfilMapper para comprobar si existe relación entre usuario y perfil en usuariosEfectivos");
+					
 					if (null == usuarioPerfil) {
 						AdmUsuariosEfectivosPerfil recordUsuarioEfectivo = new AdmUsuariosEfectivosPerfil();
 						recordUsuarioEfectivo.setUsumodificacion(usuario.getIdusuario());
@@ -241,132 +289,205 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 						recordUsuarioEfectivo.setIdrol(usuarioUpdateDTO.getRol());
 						recordUsuarioEfectivo.setIdusuario(Integer.valueOf(usuarioUpdateDTO.getIdUsuario()));
 						//Se guarda el usuario efectivoPerfil
-						admUsuariosEfectivoPerfilMapper.insert(recordUsuarioEfectivo );
+						LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilMapper.insert() -> Entrada a admUsuariosEfectivoPerfilMapper para añadir una relación de perfil-usuario en tabla admUsuariosEfectivoPerfil");
+						response3 = admUsuariosEfectivoPerfilMapper.insert(recordUsuarioEfectivo );
+						LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilMapper.insert() -> Salida de admUsuariosEfectivoPerfilMapper para añadir una relación de perfil-usuario en tabla admUsuariosEfectivoPerfil");
+						// Si una inserción de un registro da fallo, la respuesta del servicio deberá ser KO
+						if(response3 == 0) {
+							LOGGER.warn("updateUsers() / admUsuariosEfectivoPerfilMapper.insert() -> No se ha podido añadir una relación de perfil-usuario en tabla admUsuariosEfectivoPerfil");
+							serviceOK = false;
+						}
 					}
-				
 				}
-			
 		}
 
-		if (response1 == 1 && response2 == 1)
-			updateResponseDTO.setStatus("OK");
-		else
-			updateResponseDTO.setStatus("ERROR");
+		// comprobar si ha actualizado en bd correctamente
+		if (response1 == 1 && response2 == 1 && response3 == 1 && serviceOK) {
+			updateResponseDTO.setStatus(SigaConstants.OK);
+			LOGGER.info("updateUsers() -> OK. Se han actualizado correctamente los datos de usuario");
+		}
+		else {
+			updateResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.warn("updateUsers() -> KO. NO se han actualizado correctamente los datos de usuario ");
+		}
+			
 
+		LOGGER.info("updateUsers() -> Salida del servicio para actualizar datos de usuario");
 		return updateResponseDTO;
 	}
 
 	@Override
 	public CreateResponseDTO createUsers(UsuarioCreateDTO usuarioCreateDTO, HttpServletRequest request) {
+		LOGGER.info("createUsers() -> Entrada al servicio para creación de usuarios");
 		CreateResponseDTO createResponseDTO = new CreateResponseDTO();
 		int response1 = 1;
 		int response2 = 1;
 		int response3 = 1;
+		int response4 = 1;
+		boolean responseOK = true;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
-		
+		// Asignacion de la institucion del token al usuario que queremos crear
 		usuarioCreateDTO.setIdInstitucion(institucion);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
-		//admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info("createUsers() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-		AdmUsuarios usuario = usuarios.get(0);
-		//Obtenemos el idioma
-		usuarioCreateDTO.setIdLenguaje(usuario.getIdlenguaje());
+		LOGGER.info("createUsers() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 		
-		if(!usuarioCreateDTO.getNif().equalsIgnoreCase(""))
-		{
-			AdmUsuariosExample exampleNifInstitucion = new AdmUsuariosExample();
-			exampleNifInstitucion.createCriteria().andNifEqualTo(usuarioCreateDTO.getNif()).andIdinstitucionEqualTo(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
-			List<AdmUsuarios> userNifInstitucion = admUsuariosExtendsMapper.selectByExample(exampleNifInstitucion);
+		if(null != usuarios && usuarios.size() > 0) {
+			AdmUsuarios usuario = usuarios.get(0);
+			// Asignacion del idioma del usuario logeado al usuario que queremos crear
+			usuarioCreateDTO.setIdLenguaje(usuario.getIdlenguaje());
 			
-			// si no existe un usuario ya con ese dni y ese idInstitucion, se crea
-			if(userNifInstitucion.size() == 0)
-			{
-				if (!usuarioCreateDTO.getIdInstitucion().equalsIgnoreCase("") && !usuarioCreateDTO.getIdInstitucion().equals(null)) {
-					response1 = admUsuariosExtendsMapper.createUserAdmUsuariosTable(usuarioCreateDTO, usuario.getIdusuario());
-				}
-				if (!usuarioCreateDTO.getIdInstitucion().equalsIgnoreCase("") && !usuarioCreateDTO.getIdInstitucion().equals(null) &&
-					!usuarioCreateDTO.getRol().equalsIgnoreCase("") && !usuarioCreateDTO.getRol().equals(null)) {
-					response2 = admUsuariosExtendsMapper.createUserAdmUsuarioEfectivoTable(usuarioCreateDTO,
-							usuario.getIdusuario());
-				}
+			if(!usuarioCreateDTO.getNif().equalsIgnoreCase("")){
+				AdmUsuariosExample exampleNifInstitucion = new AdmUsuariosExample();
+				exampleNifInstitucion.createCriteria().andNifEqualTo(usuarioCreateDTO.getNif()).andIdinstitucionEqualTo(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
+				LOGGER.info("createUsers() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener usuarios por nif e institucion");
+				List<AdmUsuarios> userNifInstitucion = admUsuariosExtendsMapper.selectByExample(exampleNifInstitucion);
+				LOGGER.info("createUsers() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener usuarios por nif e institucion");
+				
+				// si no existe un usuario ya con ese dni y ese idInstitucion, se crea
+				if(userNifInstitucion.size() == 0){
+					if (!usuarioCreateDTO.getIdInstitucion().equalsIgnoreCase("") && !usuarioCreateDTO.getIdInstitucion().equals(null)) {
+						LOGGER.info("createUsers() / admUsuariosExtendsMapper.createUserAdmUsuariosTable() -> Entrada a admUsuariosExtendsMapper añadir registro del usuario en tabla AdmUsuarios");
+						response1 = admUsuariosExtendsMapper.createUserAdmUsuariosTable(usuarioCreateDTO, usuario.getIdusuario());
+						LOGGER.info("createUsers() / admUsuariosExtendsMapper.createUserAdmUsuariosTable() -> Salida de admUsuariosExtendsMapper añadir registro del usuario en tabla AdmUsuarios");
+						if(response1 == 0) {
+							responseOK = false;
+						}
+					}
+					if (!usuarioCreateDTO.getIdInstitucion().equalsIgnoreCase("") && !usuarioCreateDTO.getIdInstitucion().equals(null) &&
+						!usuarioCreateDTO.getRol().equalsIgnoreCase("") && !usuarioCreateDTO.getRol().equals(null)) {
+						LOGGER.info("createUsers() / admUsuariosExtendsMapper.createUserAdmUsuarioEfectivoTable() -> Entrada a admUsuariosExtendsMapper añadir registro del usuario en tabla AdmUsuarioEfectivo");
+						response2 = admUsuariosExtendsMapper.createUserAdmUsuarioEfectivoTable(usuarioCreateDTO,
+								usuario.getIdusuario());
+						LOGGER.info("createUsers() / admUsuariosExtendsMapper.createUserAdmUsuarioEfectivoTable() -> Salida de admUsuariosExtendsMapper añadir registro del usuario en tabla AdmUsuarioEfectivo");
+						if(response2 == 0) {
+							responseOK = false;
+						}
+					}
 
-				if (!usuarioCreateDTO.getIdInstitucion().equalsIgnoreCase("") && !usuarioCreateDTO.getIdInstitucion().equals(null)
-						&& !usuarioCreateDTO.getRol().equalsIgnoreCase("") && !usuarioCreateDTO.getRol().equals(null)
-						&& !usuarioCreateDTO.getGrupo().equalsIgnoreCase("") && !usuarioCreateDTO.getGrupo().equals(null)) {
-					AdmPerfilKey key = new AdmPerfilKey();
-					key.setIdinstitucion(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
-					key.setIdperfil(usuarioCreateDTO.getGrupo());
-					AdmPerfil perfil = admPerfilExtendsMapper.selectByPrimaryKey(key);
-					if (null == perfil) {
-						AdmPerfil record = new AdmPerfil();
-						record.setUsumodificacion(usuario.getIdusuario());
-						record.setIdinstitucion(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
-						record.setIdperfil(usuarioCreateDTO.getGrupo());
-						record.setFechamodificacion(new Date());
-						record.setNivelperfil(new Long(0));
-						record.setDescripcion(usuarioCreateDTO.getGrupo());
-						//Se guarda el perfil para la institucion
-						admPerfilExtendsMapper.insert(record );
+					if (!usuarioCreateDTO.getIdInstitucion().equalsIgnoreCase("") && !usuarioCreateDTO.getIdInstitucion().equals(null)
+							&& !usuarioCreateDTO.getRol().equalsIgnoreCase("") && !usuarioCreateDTO.getRol().equals(null)
+							&& !usuarioCreateDTO.getGrupo().equalsIgnoreCase("") && !usuarioCreateDTO.getGrupo().equals(null)) {
+						AdmPerfilKey key = new AdmPerfilKey();
+						key.setIdinstitucion(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
+						key.setIdperfil(usuarioCreateDTO.getGrupo());
+						LOGGER.info("createUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Entrada a admPerfilExtendsMapper para comprobar si existe un perfil con una institución determinada");
+						AdmPerfil perfil = admPerfilExtendsMapper.selectByPrimaryKey(key);
+						LOGGER.info("createUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Salida de admPerfilExtendsMapper para comprobar si existe un perfil con una institución determinada");
+						if (null == perfil) {
+							AdmPerfil record = new AdmPerfil();
+							record.setUsumodificacion(usuario.getIdusuario());
+							record.setIdinstitucion(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
+							record.setIdperfil(usuarioCreateDTO.getGrupo());
+							record.setFechamodificacion(new Date());
+							record.setNivelperfil(new Long(0));
+							record.setDescripcion(usuarioCreateDTO.getGrupo());
+							//Se guarda el perfil para la institucion
+							LOGGER.info("createUsers() / admPerfilExtendsMapper.insert() -> Entrada a admPerfilExtendsMapper para añadir un perfil con una institución determinada");
+							response3 = admPerfilExtendsMapper.insert(record);
+							LOGGER.info("createUsers() / admPerfilExtendsMapper.insert() -> Salida de admPerfilExtendsMapper para añadir un perfil con una institución determinada");
+							if(response3 == 0) {
+								responseOK = false;
+							}
+						}
+						
+						LOGGER.info("createUsers() / admUsuariosExtendsMapper.createUserAdmUsuariosEfectivoPerfilTable() -> Entrada a admUsuariosExtendsMapper para una relación entre: usuario-perfil con institución determinada");
+						response4 = admUsuariosExtendsMapper.createUserAdmUsuariosEfectivoPerfilTable(usuarioCreateDTO,
+								usuario.getIdusuario());
+						LOGGER.info("createUsers() / admUsuariosExtendsMapper.createUserAdmUsuariosEfectivoPerfilTable() -> Salida de admUsuariosExtendsMapper para una relación entre: usuario-perfil con institución determinada");
+						if(response1 == 4) {
+							responseOK = false;
+						}
 					}
 					
-					response3 = admUsuariosExtendsMapper.createUserAdmUsuariosEfectivoPerfilTable(usuarioCreateDTO,
-							usuario.getIdusuario());
 				}
-				createResponseDTO.setStatus(SigaConstants.OK);
+				else{
+					responseOK = false;// para que se sepa que ha fallado
+					LOGGER.error("createUsers() / admUsuariosExtendsMapper.selectByExample() -> El usuario a crear ya tiene asignada una institución");
+					Error err = new Error();
+					err.setMessage("administracion.usuario.ya.asignado.institucion");
+					createResponseDTO.setError(err);
+				}
 			}
-			else
-			{
-				createResponseDTO.setStatus(SigaConstants.KO);
-				Error err = new Error();
-				err.setMessage("administracion.usuario.ya.asignado.institucion");
-				createResponseDTO.setError(err);
-				
+			else {
+				LOGGER.error("createUsers() -> El usuario a crear no tiene nif");
+				responseOK = false;
 			}
+		}
+		else {
+			LOGGER.info("createUsers() / admUsuariosExtendsMapper.selectByExample() -> No se ha podido obtener información del usuario logeado");
+			responseOK = false;
 		}
 		
 		
-		
+		// comprobar si ha actualizado en bd correctamente
+		if (response1 == 1 && response2 == 1 && response3 == 1 && response4 == 1 && responseOK) {
+			createResponseDTO.setStatus(SigaConstants.OK);
+			LOGGER.info("createUsers() -> OK. Usuario creado correctemente");
+		}
+		else {
+			createResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.warn("createUsers() -> KO. Usuario NO creado correctemente");
+		}
+			
+		LOGGER.info("createUsers() -> Salida del servicio para creación de usuarios");
 		return createResponseDTO;
 	}
 
 	@Override
 	public DeleteResponseDTO deleteUsers(UsuarioDeleteDTO usuarioDeleteDTO, HttpServletRequest request) {
-		String token = request.getHeader("Authorization");
-		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
-
-		usuarioDeleteDTO.setIdInstitucion(institucion);
+		LOGGER.info("deleteUsers() -> Entrada al servicio para deshabilitar usuarios");
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 		int response = 0;
-
+		
+		String token = request.getHeader("Authorization");
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+		// asignar al usuario a eliminar la institucion del token
+		usuarioDeleteDTO.setIdInstitucion(institucion);
+		
 		if (!usuarioDeleteDTO.getIdUsuario().equals(null) && usuarioDeleteDTO.getIdUsuario().size() > 0
 				&& !usuarioDeleteDTO.getIdInstitucion().equalsIgnoreCase("") && !usuarioDeleteDTO.getIdInstitucion().equals(null)) {
-
-			// si activo = S, dar de baja => fecha de baja a fecha actual y
-			// activo = N
+			// si activo = S, dar de baja => fecha de baja a fecha actual y activo = N
 			if (usuarioDeleteDTO.getActivo().equals("S")) {
+				LOGGER.info("createUsers() / admUsuariosExtendsMapper.disableUser() -> Entrada a admUsuariosExtendsMapper para deshabilitar a un usuario");
 				response = admUsuariosExtendsMapper.disableUser(usuarioDeleteDTO);
+				LOGGER.info("createUsers() / admUsuariosExtendsMapper.disableUser() -> Salida de admUsuariosExtendsMapper para deshabilitar a un usuario");
 			}
 			// si activo = N, dar de alta => fecha de baja a null y activo = S
 			else if (usuarioDeleteDTO.getActivo().equals("N")) {
+				LOGGER.info("createUsers() / admUsuariosExtendsMapper.enableUser() -> Entrada a admUsuariosExtendsMapper para habilitar a un usuario");
 				response = admUsuariosExtendsMapper.enableUser(usuarioDeleteDTO);
+				LOGGER.info("createUsers() / admUsuariosExtendsMapper.enableUser() -> Salida de admUsuariosExtendsMapper para habilitar a un usuario");
 			}
-		} else
+		} 
+		else {
 			response = 0;
+			LOGGER.warn("deleteUsers() -> No se puede eliminar ningún usuario (atributos para borrarlo no suficientes)");
+		}
+		
+		
+		// comprobar si ha actualizado en bd correctamente
+		if (response == 1){
+			deleteResponseDTO.setStatus(SigaConstants.OK);
+			LOGGER.info("deleteUsers() -> OK. Usuario eliminado correctamente");
+		}
+		else{
+			deleteResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.warn("deleteUsers() -> KO. Usuario NO eliminado correctamente");
+		}
 
-		if (response > 0)
-			deleteResponseDTO.setStatus("OK");
-		else
-			deleteResponseDTO.setStatus("ERROR");
-
+		LOGGER.info("deleteUsers() -> Salida del servicio para deshabilitar usuarios");
 		return deleteResponseDTO;
 	}
 
 	@Override
 	public UsuarioGruposDTO getUsersGroupsSearch(int numPagina, HttpServletRequest request) {
+		LOGGER.info("getUsersGroupsSearch() -> Entrada al servicio para búsqueda de perfiles de usuario");
 		UsuarioGruposDTO response = new UsuarioGruposDTO();
 		AdmPerfilExample example = new AdmPerfilExample();
 		List<AdmPerfil> profiles = new ArrayList<AdmPerfil>();
@@ -374,13 +495,12 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		String token = request.getHeader("Authorization");
 		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 
-
 		example.setOrderByClause("IDPERFIL ASC");
 		example.setDistinct(true);
 		example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andFechaBajaIsNull();
+		LOGGER.info("getUsersGroupsSearch() / admPerfilExtendsMapper.selectComboPerfilDistinctByExample() -> Entrada a admPerfilExtendsMapper para buscar los diferentes perfiles");
 		profiles = admPerfilExtendsMapper.selectComboPerfilDistinctByExample(example);
-
-		
+		LOGGER.info("getUsersGroupsSearch() / admPerfilExtendsMapper.selectComboPerfilDistinctByExample() -> Salida de admPerfilExtendsMapper para buscar los diferentes perfiles");
 		
 		if (profiles != null && profiles.size() > 0) {
 			List<UsuarioGrupoItem> usuarioGrupoItems = new ArrayList<>();
@@ -391,8 +511,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				usuarioGrupoItem.setIdGrupo(admPerfil.getIdperfil());
 				usuarioGrupoItem.setDescripcionRol(" ");
 				List<String> rolesasignados = new ArrayList<String>(); 
-				
+				LOGGER.info("getUsersGroupsSearch() / admPerfilExtendsMapper.selectRolPerfilDistinctByExample() -> Entrada a admPerfilExtendsMapper para buscar los diferentes roles");
 				List<RolPerfilDTO> perfilesRol = admPerfilExtendsMapper.selectRolPerfilDistinctByExample(institucion,admPerfil.getIdperfil());
+				LOGGER.info("getUsersGroupsSearch() / admPerfilExtendsMapper.selectRolPerfilDistinctByExample() -> Salida de admPerfilExtendsMapper para buscar los diferentes roles");
 				
 				if (null != perfilesRol && perfilesRol.size()>0) {
 					ComboItem[] rolesAsignadosItem = new ComboItem[perfilesRol.size()];
@@ -431,8 +552,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 					}
 					usuarioGrupoItem.setRolesAsignados(rolesAsignadosItem);
 				}
-				
-
+				else {
+					LOGGER.info("getUsersGroupsSearch() / admPerfilExtendsMapper.selectRolPerfilDistinctByExample() -> No existen roles en la búsqueda");
+				}
 				
 				AdmRolExample exampleRol = new AdmRolExample();
 
@@ -440,7 +562,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 					exampleRol.createCriteria().andIdrolNotIn(rolesasignados);
 				}
 
-				List<AdmRol> rolNoAsignados = this.admRolMapper.selectByExample(exampleRol );
+				LOGGER.info("getUsersGroupsSearch() / admRolMapper.selectByExample() -> Entrada a admRolMapper para buscar los roles no asignados a perfiles");
+				List<AdmRol> rolNoAsignados = this.admRolMapper.selectByExample(exampleRol);
+				LOGGER.info("getUsersGroupsSearch() / admRolMapper.selectByExample() -> Salida de admRolMapper para buscar los roles no asignados a perfiles");
 
 				if (null != rolNoAsignados && rolNoAsignados.size()>0) {
 					ComboItem[] rolesNoAsignadosItem = new ComboItem[rolNoAsignados.size()];
@@ -452,7 +576,6 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 						rolesNoAsignadosItem[i].setValue(admRolNoAsignado.getIdrol());
 						i++;
 					}
-
 					usuarioGrupoItem.setRolesNoAsignados(rolesNoAsignadosItem);
 				}
 				
@@ -460,60 +583,75 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 			}
 			response.setUsuarioGrupoItem(usuarioGrupoItems);	
 		}
-
-	
+		else {
+			LOGGER.warn("getUsersGroupsSearch() / admPerfilExtendsMapper.selectComboPerfilDistinctByExample() -> No existen perfiles en la búsqueda");
+		}
 		
+		LOGGER.info("getUsersGroupsSearch() -> Salida del servicio para búsqueda de perfiles de usuario");
 		return response;
 	}
 
 	@Override
 	public DeleteResponseDTO deleteUsersGroup(UsuarioGrupoDeleteDTO[] usuarioDeleteDTO, HttpServletRequest request) {
+		LOGGER.info("deleteUsersGroup() -> Entrada al servicio para eliminar perfiles de usuario");
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		int response = 0;
 		
 		if (null != usuarioDeleteDTO && usuarioDeleteDTO.length>0) {
 			
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+			
 			for (int i = 0; i < usuarioDeleteDTO.length; i++) {
-				
-				
-				String token = request.getHeader("Authorization");
-				String dni = UserTokenUtils.getDniFromJWTToken(token);
-				String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 				
 				usuarioDeleteDTO[i].setIdInstitucion(institucion);
 				
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(usuarioDeleteDTO[i].getIdInstitucion()));
 				
-		
-				//Buscamos el perfil para ver si ya existe. En caso de que no exista
+				LOGGER.info("deleteUsersGroup() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para buscar usuarios por dni e institución");
 				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info("deleteUsersGroup() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para buscar usuarios por dni e institución");
 				AdmUsuarios usuario = usuarios.get(0);
 				List<String> idUsuario = new ArrayList<String>();
 				idUsuario.add(String.valueOf(usuario.getIdusuario()));
 				usuarioDeleteDTO[i].setIdUsuario(idUsuario);
-				
-				int response = 0;
-		
+						
 				if (!usuarioDeleteDTO[i].getIdUsuario().equals(null) && usuarioDeleteDTO[i].getIdUsuario().size() > 0
 						&& !usuarioDeleteDTO[i].getIdInstitucion().equalsIgnoreCase("") && !usuarioDeleteDTO[i].getIdInstitucion().equals(null)) {
 		
+						LOGGER.info("deleteUsersGroup() / admUsuariosExtendsMapper.deleteUserGroup() -> Entrada a admUsuariosExtendsMapper para eliminar perfiles por dni e institución");
 						response = admUsuariosExtendsMapper.deleteUserGroup(usuarioDeleteDTO[i]);
+						LOGGER.info("deleteUsersGroup() / admUsuariosExtendsMapper.deleteUserGroup() -> Salida de admUsuariosExtendsMapper para eliminar perfiles por dni e institución");
 		
-				} else
+				} 
+				else {
 					response = 0;
-		
+					LOGGER.warn("deleteUsersGroup() / admUsuariosExtendsMapper.deleteUserGroup() -> No se puede eliminar el perfil porque falta el idUsuario y/o la institución");
+				}
+				
+				// error no gestionado del todo correcto
 				if (response > 0)
-					deleteResponseDTO.setStatus("OK");
+					deleteResponseDTO.setStatus(SigaConstants.OK); 
 				else
-					deleteResponseDTO.setStatus("ERROR");
+					deleteResponseDTO.setStatus(SigaConstants.KO);
 			}
 		}
+		else {
+			LOGGER.warn("deleteUsersGroup() -> No hay grupos de usuario para eliminar");
+			deleteResponseDTO.setStatus(SigaConstants.KO);
+			
+		}
+		
+		LOGGER.info("deleteUsersGroup() -> Salida del servicio para eliminar perfiles de usuario");	
 		return deleteResponseDTO;
 	
 	}
 
 	@Override
 	public UsuarioGruposDTO getUsersGroupsHistoric(int numPagina, HttpServletRequest request) {
+		LOGGER.info("getUsersGroupsHistoric() -> Entrada al servicio para buscar el histórico de todos los perfiles de usuario");
 		UsuarioGruposDTO response = new UsuarioGruposDTO();
 		AdmPerfilExample example = new AdmPerfilExample();
 		List<AdmPerfil> profiles = new ArrayList<AdmPerfil>();
@@ -524,9 +662,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		example.setOrderByClause("DESCRIPCION ASC");
 		example.setDistinct(true);
 		example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion));
+		LOGGER.info("getUsersGroupsHistoric() / admPerfilExtendsMapper.selectComboPerfilDistinctByExample() -> Entrada a admPerfilExtendsMapper para buscar los distintos perfiles de una institución");
 		profiles = admPerfilExtendsMapper.selectComboPerfilDistinctByExample(example);
-
-		
+		LOGGER.info("getUsersGroupsHistoric() / admUsuariosExtendsMapper.selectComboPerfilDistinctByExample() -> Salida de admPerfilExtendsMapper para buscar los distintos perfiles de una institución");
 		
 		if (profiles != null && profiles.size() > 0) {
 			List<UsuarioGrupoItem> usuarioGrupoItems = new ArrayList<>();
@@ -539,7 +677,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				usuarioGrupoItem.setFechaBaja(admPerfil.getFechaBaja());
 				List<String> rolesasignados = new ArrayList<String>(); 
 				
+				LOGGER.info("getUsersGroupsHistoric() / admPerfilExtendsMapper.selectRolPerfilDistinctByExample() -> Entrada a admPerfilExtendsMapper para buscar la relación entre los distintos roles-perfil(i) para una institución concreta");
 				List<RolPerfilDTO> perfilesRol = admPerfilExtendsMapper.selectRolPerfilDistinctByExample(institucion,admPerfil.getIdperfil());
+				LOGGER.info("getUsersGroupsHistoric() / admPerfilExtendsMapper.selectRolPerfilDistinctByExample() -> Salida de admPerfilExtendsMapper para buscar la relación entre los distintos roles-perfil(i) para una institución concreta");
 				
 				if (null != perfilesRol && perfilesRol.size()>0) {
 					ComboItem[] rolesAsignadosItem = new ComboItem[perfilesRol.size()];
@@ -558,8 +698,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 					usuarioGrupoItem.setRolesAsignados(rolesAsignadosItem);
 				}
-				
-
+				else {
+					LOGGER.warn("getUsersGroupsHistoric() / admPerfilExtendsMapper.selectRolPerfilDistinctByExample() -> No existe relación entre los distintos roles-perfil(i) para una institución concreta");
+				}
 				
 				AdmRolExample exampleRol = new AdmRolExample();
 
@@ -567,7 +708,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 					exampleRol.createCriteria().andIdrolNotIn(rolesasignados);
 				}
 
-				List<AdmRol> rolNoAsignados = this.admRolMapper.selectByExample(exampleRol );
+				LOGGER.info("getUsersGroupsHistoric() / admRolMapper.selectByExample() -> Entrada a admRolMapper para buscar los roles no asignados");
+				List<AdmRol> rolNoAsignados = this.admRolMapper.selectByExample(exampleRol);
+				LOGGER.info("getUsersGroupsHistoric() / admRolMapper.selectByExample() -> Salida de admRolMapper para buscar los roles no asignados");
 
 				if (null != rolNoAsignados && rolNoAsignados.size()>0) {
 					ComboItem[] rolesNoAsignadosItem = new ComboItem[rolNoAsignados.size()];
@@ -582,110 +725,164 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 					usuarioGrupoItem.setRolesNoAsignados(rolesNoAsignadosItem);
 				}
+				else {
+					LOGGER.warn("getUsersGroupsHistoric() / admRolMapper.selectByExample() -> No hay roles no asignados");
+				}
 				
 				usuarioGrupoItems.add(usuarioGrupoItem);
 			}
 			response.setUsuarioGrupoItem(usuarioGrupoItems);	
 		}
+		else {
+			LOGGER.warn("getUsersGroupsHistoric() / admPerfilExtendsMapper.selectComboPerfilDistinctByExample() -> No existen los perfiles de la institución del token actual");
+		}
 
-	
-		
+		LOGGER.info("getUsersGroupsHistoric() -> Salida del servicio para buscar el histórico de todos los perfiles de usuario");
 		return response;
 	}
 
 	@Override
 	public UpdateResponseDTO updateGroupUsers(UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request) {
+		LOGGER.info("updateGroupUsers() -> Entrada al servicio para eliminar perfiles de usuarios");
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-
+		int response = 1;
+		int response1 = 1;
+		int response2 = 1;
+		int response3 = 1; int tamanioResponse3 = 1; // Las inicializamos con el mismo valor
+		boolean responseOK = true;
+		
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
-		//Buscamos el perfil para ver si ya existe. En caso de que no exista
-		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-		AdmPerfilKey key = new AdmPerfilKey();
-		key.setIdinstitucion(Short.valueOf(institucion));
-		key.setIdperfil(usuarioUpdateDTO.getIdGrupo());
-		AdmPerfil record = this.admPerfilExtendsMapper.selectByPrimaryKey(key );
-		record.setDescripcion(usuarioUpdateDTO.getDescripcionGrupo());
-		record.setFechamodificacion(new Date());
-		record.setUsumodificacion(usuarios.get(0).getIdusuario());
-		//Actualizamos el registro de perfil
-		this.admPerfilExtendsMapper.updateByPrimaryKeySelective(record);
-		List<String> rolesComprobar = new ArrayList<String>();		
-		if (null != usuarioUpdateDTO.getRolesAsignados() && usuarioUpdateDTO.getRolesAsignados().length>0) {
-			AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
-			examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(usuarioUpdateDTO.getIdGrupo());
-			List<AdmPerfilRol> perfilesRolABorrar = this.admPerfilRolMapper.selectByExample(examplePerfilRol );
-			
-			
-			if (null != perfilesRolABorrar && perfilesRolABorrar.size()>0) {
-			
-
-				for (AdmPerfilRol string : perfilesRolABorrar) {
-					rolesComprobar.add(string.getIdrol());
-				}
-
-			}
-			for (ComboItem rolesAsignados : usuarioUpdateDTO.getRolesAsignados()) {
+		LOGGER.info("updateGroupUsers() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios = this.admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info("updateGroupUsers() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+		
+		
+		if(null != usuarios && usuarios.size() > 0) {
+			AdmPerfilKey key = new AdmPerfilKey();
+			key.setIdinstitucion(Short.valueOf(institucion));
+			key.setIdperfil(usuarioUpdateDTO.getIdGrupo());
+			LOGGER.info("updateGroupUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Entrada a admPerfilExtendsMapper para buscar un perfil por clave primaria");
+			AdmPerfil record = this.admPerfilExtendsMapper.selectByPrimaryKey(key);
+			LOGGER.info("updateGroupUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Salida de admPerfilExtendsMapper para buscar un perfil por clave primaria");
+			if(null != record) {
+				record.setDescripcion(usuarioUpdateDTO.getDescripcionGrupo());
+				record.setFechamodificacion(new Date());
+				record.setUsumodificacion(usuarios.get(0).getIdusuario());
+				//Actualizamos el registro de perfil
+				LOGGER.info("updateGroupUsers() / admPerfilExtendsMapper.updateByPrimaryKeySelective() -> Entrada a admPerfilExtendsMapper para buscar un perfil por clave primaria");
+				response = this.admPerfilExtendsMapper.updateByPrimaryKeySelective(record);
+				LOGGER.info("updateGroupUsers() / admPerfilExtendsMapper.updateByPrimaryKeySelective() -> Salida de admPerfilExtendsMapper para buscar un perfil por clave primaria");
 				
-				if (rolesComprobar.contains(rolesAsignados.getValue())) {
-					rolesComprobar.remove(rolesAsignados.getValue());
-				}else {
-					AdmPerfilRol recordPerfilRol = new AdmPerfilRol();
-					recordPerfilRol.setFechamodificacion(new Date());
-					recordPerfilRol.setGrupopordefecto("N");
-					recordPerfilRol.setIdinstitucion(Short.valueOf(institucion));
-					recordPerfilRol.setIdperfil(usuarioUpdateDTO.getIdGrupo());
-					recordPerfilRol.setIdrol(rolesAsignados.getValue());
-					recordPerfilRol.setUsumodificacion(usuarios.get(0).getIdusuario());
-					this.admPerfilRolMapper.insert(recordPerfilRol );
-				}
-			}
-			
-			if (null != rolesComprobar && rolesComprobar.size()>0) {
-				for (String idRol : rolesComprobar) {
+				if(response == 1) {
+					List<String> rolesComprobar = new ArrayList<String>();	
 					
-					AdmPerfilRolExample keydelete = new AdmPerfilRolExample();
-					keydelete.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(usuarioUpdateDTO.getIdGrupo()).andIdrolEqualTo(idRol);
-					
-					this.admPerfilRolMapper.deleteByExample(keydelete );
+					if (null != usuarioUpdateDTO.getRolesAsignados() && usuarioUpdateDTO.getRolesAsignados().length>0) {
+						AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
+						examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(usuarioUpdateDTO.getIdGrupo());
+						LOGGER.info("updateGroupUsers() / admPerfilRolMapper.selectByExample() -> Entrada a admPerfilRolMapper para buscar un perfiles para un rol de una institución concreta");
+						List<AdmPerfilRol> perfilesRolABorrar = this.admPerfilRolMapper.selectByExample(examplePerfilRol );
+						LOGGER.info("updateGroupUsers() / admPerfilRolMapper.selectByExample() -> Salida de admPerfilRolMapper para buscar un perfiles para un rol de una institución concreta");
+						
+						if (null != perfilesRolABorrar && perfilesRolABorrar.size()>0) {
+							for (AdmPerfilRol string : perfilesRolABorrar) {
+								rolesComprobar.add(string.getIdrol());
+							}
+						}
+						for (ComboItem rolesAsignados : usuarioUpdateDTO.getRolesAsignados()) {
+							if (rolesComprobar.contains(rolesAsignados.getValue())) {
+								rolesComprobar.remove(rolesAsignados.getValue());
+							}else {
+								AdmPerfilRol recordPerfilRol = new AdmPerfilRol();
+								recordPerfilRol.setFechamodificacion(new Date());
+								recordPerfilRol.setGrupopordefecto("N");
+								recordPerfilRol.setIdinstitucion(Short.valueOf(institucion));
+								recordPerfilRol.setIdperfil(usuarioUpdateDTO.getIdGrupo());
+								recordPerfilRol.setIdrol(rolesAsignados.getValue());
+								recordPerfilRol.setUsumodificacion(usuarios.get(0).getIdusuario());
+								LOGGER.info("updateGroupUsers() / admPerfilRolMapper.insert() -> Entrada a admPerfilRolMapper para crear una relación perfil-rol");
+								response1 = this.admPerfilRolMapper.insert(recordPerfilRol);
+								LOGGER.info("updateGroupUsers() / admPerfilRolMapper.insert() -> Salida a admPerfilRolMapper para crear una relación perfil-rol");
+								// si no inserta bien un registro, el servicio devolverá KO
+								if(response1 == 0) {
+									LOGGER.info("updateGroupUsers() / admPerfilRolMapper.insert() -> No se ha podido crear una relación perfil-rol");
+									responseOK = false;
+								}
+							}
+						}
+						if (null != rolesComprobar && rolesComprobar.size()>0) {
+							for (String idRol : rolesComprobar) {
+								
+								AdmPerfilRolExample keydelete = new AdmPerfilRolExample();
+								keydelete.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(usuarioUpdateDTO.getIdGrupo()).andIdrolEqualTo(idRol);
+								LOGGER.info("updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> Entrada a admPerfilRolMapper para eliminar una relación perfil-rol");
+								response2 = this.admPerfilRolMapper.deleteByExample(keydelete);
+								LOGGER.info("updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> Salida de admPerfilRolMapper para eliminar una relación perfil-rol");
+								if(response2 == 0) {
+									LOGGER.warn("updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> No se ha podido eliminar una relación perfil-rol");
+									responseOK = false;
+								}
+							}
+						}	
+					}
+					else {
+						AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
+						examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(usuarioUpdateDTO.getIdGrupo());
+						LOGGER.info("updateGroupUsers() / admPerfilRolMapper.selectByExample() -> Entrada a admPerfilRolMapper para buscar perfiles con un rol e institución concretos");
+						List<AdmPerfilRol> perfilesRolABorrar = this.admPerfilRolMapper.selectByExample(examplePerfilRol);
+						LOGGER.info("updateGroupUsers() / admPerfilRolMapper.selectByExample() -> Salida de admPerfilRolMapper para buscar perfiles con un rol e institución concretos");
+						if (null != perfilesRolABorrar && perfilesRolABorrar.size()>0) {
+							// cantidad de registros que se van a eliminar. Es lo que debe contener response3
+							tamanioResponse3 = perfilesRolABorrar.size();
+							AdmPerfilRolExample keydelete = new AdmPerfilRolExample();
+							keydelete.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(usuarioUpdateDTO.getIdGrupo());
+							LOGGER.info("updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> Entrada a admPerfilRolMapper para eliminar perfiles concretos con una institución concreta");
+							response3 = this.admPerfilRolMapper.deleteByExample(keydelete);
+							LOGGER.info("updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> Salida de admPerfilRolMapper para eliminar perfiles concretos con una institución concreta");
+							if(response3 == 0) {
+								LOGGER.warn("updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> No se han eliminado perfiles concretos con una institución concreta");
+								responseOK = false;
+							}
+						}
+					}
 				}
-			}
-			
-			
-			
-		}else {
-			
-			AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
-			examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(usuarioUpdateDTO.getIdGrupo());
-			List<AdmPerfilRol> perfilesRolABorrar = this.admPerfilRolMapper.selectByExample(examplePerfilRol );
-			if (null != perfilesRolABorrar && perfilesRolABorrar.size()>0) {
+				else {
+					LOGGER.warn("updateGroupUsers() / admPerfilExtendsMapper.updateByPrimaryKeySelective() -> No se ha actualizado correctamente el perfil por clave primaria");
+					responseOK = false;
+				}
 				
-				AdmPerfilRolExample keydelete = new AdmPerfilRolExample();
-				keydelete.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(usuarioUpdateDTO.getIdGrupo());
-				
-				this.admPerfilRolMapper.deleteByExample(keydelete );
 			}
-			
+			else {
+				LOGGER.warn("updateGroupUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> No existe un perfil por clave primaria");
+				responseOK = false;
+			}
 			
 		}
-
-
+		else {
+			LOGGER.warn("updateGroupUsers() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios para el dni e institucion indicados");
+			responseOK = false;
+		}
 		
-
-			updateResponseDTO.setStatus("OK");
-
+		// comprobar si ha actualizado en bd correctamente
+		if(response ==1 && response1 == 1 && response2 == 1 && tamanioResponse3 == response3 && responseOK) { 
+			updateResponseDTO.setStatus(SigaConstants.OK);
+			LOGGER.info("updateGroupUsers() -> OK. Perfiles de usuario eliminados correctamente");
+		}
+		else{
+			updateResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.info("updateGroupUsers() -> KO. Perfiles de usuario NO eliminados correctamente");
+		}
+		
+		LOGGER.info("updateGroupUsers() -> Salida del servicio para eliminar perfiles de usuarios");
 		return updateResponseDTO;
-		
-		
-		
-		
 	}
 
 	@Override
 	public UpdateResponseDTO createGroupUsers(UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request) {
+		LOGGER.info("createGroupUsers() -> Entrada al servicio de creación de perfiles de usuario");
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short institucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -693,13 +890,17 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
 		//Buscamos el perfil para ver si ya existe. En caso de que no exista
+		LOGGER.info("createGroupUsers() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info("createGroupUsers() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 		AdmPerfilKey key = new AdmPerfilKey();
 		key.setIdinstitucion(Short.valueOf(institucion));
 		key.setIdperfil(usuarioUpdateDTO.getIdGrupo());
-		AdmPerfil record = this.admPerfilExtendsMapper.selectByPrimaryKey(key );
-		if (!(null != record)) {
-					
+		LOGGER.info("createGroupUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Entrada a admPerfilExtendsMapper para obtener un perfil");
+		AdmPerfil record = this.admPerfilExtendsMapper.selectByPrimaryKey(key);
+		LOGGER.info("createGroupUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Salida de admPerfilExtendsMapper para obtener un perfil");
+		
+		if (null == record && null != usuarios && usuarios.size() > 0) {
 				record =  new  AdmPerfil();
 				record.setIdperfil(usuarioUpdateDTO.getIdGrupo());
 				record.setIdinstitucion(Short.valueOf(institucion));
@@ -708,31 +909,12 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				record.setUsumodificacion(usuarios.get(0).getIdusuario());
 				record.setNivelperfil(new Long(0));
 				//Actualizamos el registro de perfil
+				LOGGER.info("createGroupUsers() / admPerfilExtendsMapper.insert() -> Entrada a admPerfilExtendsMapper para crear un nuevo perfil");
 				this.admPerfilExtendsMapper.insert(record);
-				
+				LOGGER.info("createGroupUsers() / admPerfilExtendsMapper.insert() -> Salida de admPerfilExtendsMapper para crear un nuevo perfil");
 				
 				if (null != usuarioUpdateDTO.getRolesAsignados() && usuarioUpdateDTO.getRolesAsignados().length>0) {
-					
 					for (ComboItem rolesAsignados : usuarioUpdateDTO.getRolesAsignados()) {
-						/*if (null != rolesAsignados.getLocal() && rolesAsignados.getLocal().equals("S")) {
-							examplePerfilRol = new AdmPerfilRolExample();
-							examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdrolEqualTo(rolesAsignados.getValue()).andGrupopordefectoEqualTo(rolesAsignados.getLocal());
-							List<AdmPerfilRol> perfilesRol = this.admPerfilRolMapper.selectByExample(examplePerfilRol );
-							if (null != perfilesRol && perfilesRol.size()>0) {
-								AdmPerfilRol perfilRol = perfilesRol.get(0);
-								perfilRol.setGrupopordefecto("N");
-								this.admPerfilRolMapper.updateByPrimaryKey(perfilRol);
-							}
-							AdmPerfilRol recordPerfilRol = new AdmPerfilRol();
-							recordPerfilRol.setFechamodificacion(new Date());
-							recordPerfilRol.setGrupopordefecto(rolesAsignados.getLocal());
-							recordPerfilRol.setIdinstitucion(Short.valueOf(institucion));
-							recordPerfilRol.setIdperfil(usuarioUpdateDTO.getIdGrupo());
-							recordPerfilRol.setIdrol(rolesAsignados.getValue());
-							recordPerfilRol.setUsumodificacion(usuarios.get(0).getIdusuario());
-							this.admPerfilRolMapper.insert(recordPerfilRol );
-							
-						}else {*/
 							AdmPerfilRol recordPerfilRol = new AdmPerfilRol();
 							recordPerfilRol.setFechamodificacion(new Date());
 							recordPerfilRol.setGrupopordefecto("N");
@@ -740,37 +922,33 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 							recordPerfilRol.setIdperfil(usuarioUpdateDTO.getIdGrupo());
 							recordPerfilRol.setIdrol(rolesAsignados.getValue());
 							recordPerfilRol.setUsumodificacion(usuarios.get(0).getIdusuario());
-							this.admPerfilRolMapper.insert(recordPerfilRol );
-						//}
+							LOGGER.info("createGroupUsers() / admPerfilRolMapper.insert() -> Entrada a admPerfilRolMapper para crear una relación perfil-rol");
+							this.admPerfilRolMapper.insert(recordPerfilRol);
+							LOGGER.info("createGroupUsers() / admPerfilRolMapper.insert() -> Salida de admPerfilRolMapper para crear una relación perfil-rol");
 					}
-					
-				
-					
 				}
 				updateResponseDTO.setStatus(SigaConstants.OK);
 
 		}else {
 			updateResponseDTO.setStatus(SigaConstants.KO);
-			
 			Error error = new Error();
-			
 			error.setMessage("administracion.grupo.usuario.duplicado");
-			updateResponseDTO.setError(error );
+			LOGGER.error("createGroupUsers() / admUsuariosExtendsMapper.selectByExample() -> No se ha podido obtener información del usuario logeado");
+			LOGGER.error("createGroupUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Perfil de usuario duplicado");
+			updateResponseDTO.setError(error);
 		}
-		
 
-			
-
-		return updateResponseDTO;
-		
-		
-		
-		
+		LOGGER.info("createGroupUsers() -> Salida del servicio de creación de perfiles de usuario");
+		return updateResponseDTO;	
 	}
 
 	@Override
 	public UpdateResponseDTO updateGrupoDefecto(UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request) {
-		
+		LOGGER.info("updateGrupoDefecto() -> Entrada al servicio de actualización de perfil por defecto");
+		int response = 1;
+		int response1 = 0;
+		boolean responseOK = true;
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
@@ -779,32 +957,56 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		
 
 		//Buscamos el perfil para ver si ya existe. En caso de que no exista
+		LOGGER.info("updateGrupoDefecto() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-		AdmUsuarios usuario = usuarios.get(0);
+		LOGGER.info("updateGrupoDefecto() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 		
-		AdmPerfilRolExample example = new AdmPerfilRolExample();
-		example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).
-		andIdrolEqualTo(usuarioUpdateDTO.getAsignarRolDefecto()[0].getValue()).andGrupopordefectoEqualTo("S");
+		if(null != usuarios && usuarios.size() > 0) {
+			AdmUsuarios usuario = usuarios.get(0);
+			
+			AdmPerfilRolExample example = new AdmPerfilRolExample();
+			example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).
+			andIdrolEqualTo(usuarioUpdateDTO.getAsignarRolDefecto()[0].getValue()).andGrupopordefectoEqualTo("S");
 
-		List<AdmPerfilRol> perfilesRol = this.admPerfilRolMapper.selectByExample(example );
-		if (null != perfilesRol && perfilesRol.size()>0) {
-			for (AdmPerfilRol admPerfilRol : perfilesRol) {
-				admPerfilRol.setGrupopordefecto("N");
-				this.admPerfilRolMapper.updateByPrimaryKeySelective(admPerfilRol);
+			List<AdmPerfilRol> perfilesRol = this.admPerfilRolMapper.selectByExample(example);
+			if (null != perfilesRol && perfilesRol.size()>0) {
+				for (AdmPerfilRol admPerfilRol : perfilesRol) {
+					admPerfilRol.setGrupopordefecto("N");
+					LOGGER.info("updateGrupoDefecto() / admPerfilRolMapper.updateByPrimaryKeySelective() -> Entrada a admPerfilRolMapper para actualizar el perfil a  de un rol");
+					response = this.admPerfilRolMapper.updateByPrimaryKeySelective(admPerfilRol);
+					LOGGER.info("updateGrupoDefecto() / admPerfilRolMapper.updateByPrimaryKeySelective() -> Salida de admPerfilRolMapper para actualizar el perfil de un rol");
+					if(response == 0) {
+						responseOK = false;
+					}
+				}
 			}
+			
+			AdmPerfilRol record = new AdmPerfilRol();
+			record.setFechamodificacion(new Date());
+			record.setGrupopordefecto("S");
+			record.setIdperfil(usuarioUpdateDTO.getIdGrupo());
+			record.setIdrol(usuarioUpdateDTO.getAsignarRolDefecto()[0].getValue());
+			record.setIdinstitucion(Short.valueOf(institucion));
+			record.setUsumodificacion(usuario.getIdusuario());
+			LOGGER.info("updateGrupoDefecto() / admPerfilRolMapper.updateByPrimaryKeySelective() -> Entrada a admPerfilRolMapper para actualizar el perfil de un rol");
+			response1 = this.admPerfilRolMapper.updateByPrimaryKeySelective(record);
+			LOGGER.info("updateGrupoDefecto() / admPerfilRolMapper.updateByPrimaryKeySelective() -> Salida a admPerfilRolMapper para actualizar el perfil de un rol");
+			
 		}
-		AdmPerfilRol record = new AdmPerfilRol();
-		record.setFechamodificacion(new Date());
-		record.setGrupopordefecto("S");
-		record.setIdperfil(usuarioUpdateDTO.getIdGrupo());
-		record.setIdrol(usuarioUpdateDTO.getAsignarRolDefecto()[0].getValue());
-		record.setIdinstitucion(Short.valueOf(institucion));
-		record.setUsumodificacion(usuario.getIdusuario());
-		this.admPerfilRolMapper.updateByPrimaryKeySelective(record );
+		else {
+			LOGGER.warn("updateGrupoDefecto() / admUsuariosExtendsMapper.selectByExample() -> No se ha podido obtener información del usuario logeado");
+		}
 		
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		updateResponseDTO.setStatus(SigaConstants.KO);
+		if(response == 1 && response1 == 1 && responseOK) {
+			updateResponseDTO.setStatus(SigaConstants.OK);
+			LOGGER.info("updateGrupoDefecto() -> OK. Se ha actualizado el perfil por defecto");
+		}
+		else {
+			updateResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.warn("updateGrupoDefecto() -> KO. No se ha podido actualizar el perfil por defecto");
+		}
 		
+		LOGGER.info("updateGrupoDefecto() -> Salida del servicio de actualización de perfil por defecto");
 		return updateResponseDTO;
 	}
 
