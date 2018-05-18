@@ -66,8 +66,8 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 					RDN grupoRdn = x500name.getRDNs(BCStyle.T)[0];
 					grupo = IETFUtils.valueToString(grupoRdn.getFirst().getValue());
 
-					logger.debug("Common Name: " + commonName);
-					logger.debug("Organization Name: " + organizationName);
+					LOGGER.debug("Common Name: " + commonName);
+					LOGGER.debug("Organization Name: " + organizationName);
 				} catch (NoSuchElementException e) {
 					throw new InvalidClientCerticateException(e);
 				}
@@ -75,11 +75,12 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 				String dni = commonName.substring(commonName.length() - 9, commonName.length());
 				String institucion = organizationName.substring(organizationName.length() - 4,
 						organizationName.length());
-				logger.debug("DNI: " + dni);
-				logger.debug("INSTITUCION: " + institucion);
-				logger.debug("GRUPO: " + grupo);
+				LOGGER.debug("DNI: " + dni);
+				LOGGER.debug("INSTITUCION: " + institucion);
+				LOGGER.debug("GRUPO: " + grupo);
 
 				UserCgae user = new UserCgae(dni, grupo, institucion, null);
+				LOGGER.info("Intento de autenticación en siga {}", user);
 				return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, cert));
 			}
 		} catch (Exception e) {
