@@ -100,4 +100,12 @@ public class UserCgae implements UserDetails {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "UserCgae [dni=" + dni + ", grupo=" + grupo + ", institucion=" + institucion + ", permisos=" + permisos
+				+ "]";
+	}
+	
+	
+
 }
