@@ -1,11 +1,13 @@
-package org.itcgae.siga.security.production;
+package org.itcgae.siga.security;
 
 import org.itcgae.siga.logger.RequestLoggingFilter;
-import org.itcgae.siga.security.UserTokenUtils;
+import org.itcgae.siga.security.develop.DevAuthenticationFilter;
+import org.itcgae.siga.security.develop.DevAuthorizationFilter;
+import org.itcgae.siga.security.production.ProAuthenticationFilter;
+import org.itcgae.siga.security.production.ProAuthorizationFilter;
 import org.itcgae.siga.services.impl.SigaUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -29,11 +31,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
-@ConditionalOnProperty(prefix = "security.basic", value = { "enabled" }, havingValue = "true", matchIfMissing = false)
-public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
+//@ConditionalOnProperty(prefix = "security.basic", value = { "enabled" }, havingValue = "false", matchIfMissing = false)
+public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 
 	private SigaUserDetailsService userDetailsService;
 
+	@Value("${security.basic.enabled:true}")
+	Boolean security;
+	
 	@Value("${security.login.url:/login}")
 	String loginUrl;
 
@@ -54,9 +59,9 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 	String tokenPrefix;
 
 	@Autowired
-	private ProAuthenticationProvider proAuthenticationProvider;
+	private CgaeAuthenticationProvider proAuthenticationProvider;
 
-	public ProConfigSecurity(SigaUserDetailsService userDetailsService) {
+	public WebConfigSecurity(SigaUserDetailsService userDetailsService) {
 		this.userDetailsService = userDetailsService;
 	}
 
@@ -64,6 +69,7 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		String [] authorizedRequests = {
 				loginUrl, 
+				"/loginDevelop",
 				"/instituciones", 
 				"/perfilespost", 
 				"/perfiles",
@@ -83,8 +89,14 @@ public class ProConfigSecurity extends WebSecurityConfigurerAdapter {
 				.addFilterBefore(new ProAuthenticationFilter(authenticationManager(), loginMethod, loginUrl,
 						tokenHeaderAuthKey), BasicAuthenticationFilter.class)
 				.addFilter(new ProAuthorizationFilter(authenticationManager()))
+				.addFilterBefore(new DevAuthenticationFilter(authenticationManager(), "GET", "/loginDevelop",
+						tokenHeaderAuthKey), BasicAuthenticationFilter.class)
 				.addFilterAfter(new RequestLoggingFilter(), BasicAuthenticationFilter.class);
-
+		
+		if (!security){
+			httpSecurity.addFilter(new DevAuthorizationFilter(authenticationManager(), userDetailsService, authorizedRequests));
+		}
+		
 		// Configuramos el token con los parametros de configuracion
 		UserTokenUtils.configure(secretSignKey, tokenPrefix, expirationTime, tokenHeaderAuthKey);
 	}
