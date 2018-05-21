@@ -96,7 +96,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		
 		// Obtenemos el DNI del token
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(catalogoRequest.getIdInstitucion()));
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
 		// Obtenemos el usuario para añadir el USUMODIFICACION
 		LOGGER.info("getDatosCatalogo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
