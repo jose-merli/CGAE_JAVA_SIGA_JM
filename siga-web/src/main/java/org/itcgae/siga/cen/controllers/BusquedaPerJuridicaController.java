@@ -2,8 +2,8 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.adm.ContadorDTO;
-import org.itcgae.siga.DTOs.adm.ContadorRequestDTO;
+import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
+import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.IBusquedaPerJuridicaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +36,11 @@ public class BusquedaPerJuridicaController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-//	@RequestMapping(value = "busquedaPerJuridica/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<BusquedaJuridicaDto> searchLegalPersons(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaJuridicaSearchDto busquedaJuridicaSearchDto, HttpServletRequest request) { 
-//		BusquedaJuridicaDto response = busquedaPerJuridicaService.searchLegalPersons(numPagina, busquedaJuridicaSearchDto, request);
-//		return new ResponseEntity<BusquedaJuridicaDto >(response, HttpStatus.OK);
-//	}
+	@RequestMapping(value = "busquedaPerJuridica/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<BusquedaJuridicaDTO> searchLegalPersons(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request) { 
+		BusquedaJuridicaDTO response = busquedaPerJuridicaService.searchLegalPersons(numPagina, busquedaJuridicaSearchDTO, request);
+		return new ResponseEntity<BusquedaJuridicaDTO >(response, HttpStatus.OK);
+	}
 	
 	
 	

@@ -24,12 +24,4 @@ public interface CenTiposociedadExtendsMapper extends CenTiposociedadMapper{
 	})
 	List<ComboItem> getSocietyTypes(String idLenguaje);
 	
-	@SelectProvider(type = CenTiposociedadSqlExtendsProvider.class, method = "getLabel")
-	@Results({
-		@Result(column = "MODULO", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "MODULO", property = "value", jdbcType = JdbcType.VARCHAR)
-	})
-	List<ComboItem> getLabel();
-	
-	
 }

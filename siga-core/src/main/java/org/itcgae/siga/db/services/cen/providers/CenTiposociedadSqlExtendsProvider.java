@@ -17,9 +17,5 @@ public class CenTiposociedadSqlExtendsProvider extends CenTiposociedadSqlProvide
 		return sql.toString();
 	}
 	
-	public String getModules() {
-		SQL sql = new SQL();
-		
-		return sql.toString();
-	}
+	
 }

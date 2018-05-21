@@ -6,7 +6,7 @@ import org.itcgae.siga.db.mappers.CenGruposclienteSqlProvider;
 
 public class CenGruposclienteSqlExtendsProvider extends CenGruposclienteSqlProvider{
 
-	public String getModules(AdmUsuarios usuario) {
+	public String getLabel(AdmUsuarios usuario) {
 		SQL sql = new SQL();
 		
 		sql.SELECT("distinct GRUCLI.IDGRUPO");
