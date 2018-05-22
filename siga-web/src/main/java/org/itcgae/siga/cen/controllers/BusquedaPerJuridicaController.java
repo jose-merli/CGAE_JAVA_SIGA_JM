@@ -30,7 +30,7 @@ public class BusquedaPerJuridicaController {
 	}
 	
 	
-	@RequestMapping(value = "/busquedaPerJuridica/etiqueta",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/busquedaPerJuridica/etiquetas",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getLabel( HttpServletRequest request) {
 		ComboDTO response = busquedaPerJuridicaService.getLabel(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);

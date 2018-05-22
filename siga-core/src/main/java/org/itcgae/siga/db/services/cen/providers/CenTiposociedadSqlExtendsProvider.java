@@ -11,7 +11,7 @@ public class CenTiposociedadSqlExtendsProvider extends CenTiposociedadSqlProvide
 		sql.SELECT("DISTINCT CENT.LETRACIF");
 		sql.SELECT("GENR.DESCRIPCION");
 		sql.FROM(" cen_tiposociedad CENT");
-		sql.INNER_JOIN(" GEN_RECURSOS_CATALOGOS on CENT.DESCRIPCION = GENR.IDRECURSO");
+		sql.INNER_JOIN(" GEN_RECURSOS_CATALOGOS GENR on CENT.DESCRIPCION = GENR.IDRECURSO");
 		sql.WHERE(" GENR.IDLENGUAJE = '" + idLenguaje +"'");
 		
 		return sql.toString();

@@ -122,7 +122,8 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 	@Override
 	public BusquedaJuridicaDTO searchLegalPersons(int numPagina, BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO,
 			HttpServletRequest request) {
-		// TODO Auto-generated method stub
+		
+		
 		return null;
 	}
 
