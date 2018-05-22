@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
+import org.itcgae.siga.DTOs.cen.BusquedaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -15,6 +16,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposociedadExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,9 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 	
 	@Autowired
 	private CenGruposclienteExtendsMapper cenGruposclienteExtendsMapper;
+	
+	@Autowired
+	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
 	
 	@Override
 	public ComboDTO getSocietyTypes(HttpServletRequest request) {
@@ -81,7 +86,7 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 	
 	@Override
 	public ComboDTO getLabel(HttpServletRequest request) {
-
+		LOGGER.info("getLabel() -> Entrada al servicio para obtener los de grupos de clientes");
 		List<ComboItem> comboItem = new ArrayList<ComboItem>();
 		ComboDTO comboDTO = new ComboDTO();
 		
@@ -115,6 +120,7 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 			LOGGER.warn("getLabel() -> idInstitucion del token nula");
 		}
 		
+		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
 		return comboDTO;
 	}
 
@@ -122,9 +128,45 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 	@Override
 	public BusquedaJuridicaDTO searchLegalPersons(int numPagina, BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO,
 			HttpServletRequest request) {
+		LOGGER.info("searchLegalPersons() -> Entrada al servicio para la búsqueda por filtros de personas no colegiadas");
+		
+		List<BusquedaJuridicaItem> busquedaJuridicaItems = new ArrayList<BusquedaJuridicaItem>();
+		BusquedaJuridicaDTO busquedaJuridicaDTO = new BusquedaJuridicaDTO();
+		String idLenguaje = null;
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"searchLegalPersons() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"searchLegalPersons() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				idLenguaje = usuario.getIdlenguaje();
+				
+				busquedaJuridicaItems = cenNocolegiadoExtendsMapper.searchLegalPersons(busquedaJuridicaSearchDTO, idLenguaje, String.valueOf(idInstitucion));
+				busquedaJuridicaDTO.setBusquedaJuridicaItems(busquedaJuridicaItems);
+			} 
+			else {
+				LOGGER.warn("searchLegalPersons() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+			}
+		} 
+		else {
+			LOGGER.warn("searchLegalPersons() -> idInstitucion del token nula");
+		}
 		
 		
-		return null;
+		
+		LOGGER.info("searchLegalPersons() -> Salida del servicio para la búsqueda por filtros de personas no colegiadas");
+		return busquedaJuridicaDTO;
 	}
 
 }

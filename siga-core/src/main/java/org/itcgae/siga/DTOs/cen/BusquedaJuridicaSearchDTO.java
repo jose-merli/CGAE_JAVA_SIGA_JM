@@ -3,7 +3,6 @@ package org.itcgae.siga.DTOs.cen;
 import java.util.Date;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
@@ -12,7 +11,6 @@ public class BusquedaJuridicaSearchDTO {
 	private String tipo;
 	private String nif;
 	private String denominacion;
-	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaConstitucion;
 	private String integrante;
 	private String [] grupos;

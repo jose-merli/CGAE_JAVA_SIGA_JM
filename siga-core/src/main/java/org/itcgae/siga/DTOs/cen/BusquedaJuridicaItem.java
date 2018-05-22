@@ -19,10 +19,13 @@ public class BusquedaJuridicaItem {
 	private String tipo;
 	private String numeroIntegrantes;
 	private String nombresIntegrantes;
+	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaBaja;
+	private String sociedadProfesional;
 	
 	
-	
+
+
 	/**
 	 *
 	 */
@@ -225,6 +228,24 @@ public class BusquedaJuridicaItem {
 	}
 	
 	
+	/**
+	 *
+	 */
+	public BusquedaJuridicaItem sociedadProfesional(String sociedadProfesional){
+		this.sociedadProfesional = sociedadProfesional;
+		return this;
+	}
+	
+	
+	@JsonProperty("sociedadProfesional")
+	public String getSociedadProfesional() {
+		return sociedadProfesional;
+	}
+
+
+	public void setSociedadProfesional(String sociedadProfesional) {
+		this.sociedadProfesional = sociedadProfesional;
+	}
 	
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -244,12 +265,13 @@ public class BusquedaJuridicaItem {
 	    		Objects.equals(this.tipo, busquedaJuridicaItem.tipo) &&
 	    		Objects.equals(this.numeroIntegrantes, busquedaJuridicaItem.numeroIntegrantes) &&
 	    		Objects.equals(this.nombresIntegrantes, busquedaJuridicaItem.nombresIntegrantes) &&
-	    		Objects.equals(this.fechaBaja, busquedaJuridicaItem.fechaBaja);
+	    		Objects.equals(this.fechaBaja, busquedaJuridicaItem.fechaBaja) &&
+	    		Objects.equals(this.sociedadProfesional, busquedaJuridicaItem.sociedadProfesional);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idInstitucion, idPersona, nif, denominacion, abreviatura, fechaConstitucion, tipo, numeroIntegrantes, nombresIntegrantes, fechaBaja);
+	    return Objects.hash(idInstitucion, idPersona, nif, denominacion, abreviatura, fechaConstitucion, tipo, numeroIntegrantes, nombresIntegrantes, fechaBaja, sociedadProfesional);
 	}
 
 	
@@ -268,6 +290,7 @@ public class BusquedaJuridicaItem {
 	    sb.append("    numeroIntegrantes: ").append(toIndentedString(numeroIntegrantes)).append("\n");
 	    sb.append("    nombresIntegrantes: ").append(toIndentedString(nombresIntegrantes)).append("\n");
 	    sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
+	    sb.append("    sociedadProfesional: ").append(toIndentedString(sociedadProfesional)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
