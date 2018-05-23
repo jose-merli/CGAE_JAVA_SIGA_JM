@@ -256,9 +256,15 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 				noColegiadoDelete.setFechaBaja(new Date());
 				noColegiadoDelete.setFechamodificacion(new Date());
 				noColegiadoDelete.setUsumodificacion(usuario.getIdusuario());
+				
 				// filtrado para sentencia sql
+				List <Long> idPersonasDelete = new ArrayList<Long>();
+				for(int i=0; i<busquedaJuridicaDeleteDTO.getIdPersona().length; i++) {
+					idPersonasDelete.add(Long.valueOf(busquedaJuridicaDeleteDTO.getIdPersona()[i]));
+				}
+				
 				CenNocolegiadoExample noColegiadoFiltroDelete = new CenNocolegiadoExample();
-				noColegiadoFiltroDelete.createCriteria().andIdpersonaEqualTo(Long.valueOf(busquedaJuridicaDeleteDTO.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
+				noColegiadoFiltroDelete.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaIn(idPersonasDelete);
 				LOGGER.info(
 						"deleteNotCollegiate() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para eliminar no colegiado");
 				response = cenNocolegiadoExtendsMapper.updateByExampleSelective(noColegiadoDelete, noColegiadoFiltroDelete);
@@ -275,7 +281,7 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 		}
 		
 		// comprobacion actualización
-		if(response == 1) {
+		if(response >= 1) {
 			LOGGER.info("deleteNotCollegiate() -> OK. Delete para no colegiado realizado correctamente");
 			deleteResponseDTO.setStatus(SigaConstants.OK);
 		}
