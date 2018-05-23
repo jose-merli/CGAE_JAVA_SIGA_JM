@@ -151,7 +151,6 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				idLenguaje = usuario.getIdlenguaje();
-				
 				busquedaJuridicaItems = cenNocolegiadoExtendsMapper.searchLegalPersons(busquedaJuridicaSearchDTO, idLenguaje, String.valueOf(idInstitucion));
 				busquedaJuridicaDTO.setBusquedaJuridicaItems(busquedaJuridicaItems);
 			} 
