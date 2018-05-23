@@ -1,5 +1,7 @@
 package org.itcgae.siga.db.services.cen.providers;
 
+import java.text.SimpleDateFormat;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
 import org.itcgae.siga.db.mappers.CenNocolegiadoSqlProvider;
@@ -9,6 +11,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 	
 	public String searchLegalPersons(BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, String idLenguaje, String idInstitucion) {
 		SQL sql = new SQL();
+		
+		// Formateo de fecha para sentencia sql
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		
 		
 		String grupos = "";
 		if(busquedaJuridicaSearchDTO.getGrupos().length > 1) {
@@ -61,7 +67,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		}
 		
 		if(null != busquedaJuridicaSearchDTO.getFechaConstitucion() && !busquedaJuridicaSearchDTO.getFechaConstitucion().equals("")) {
-			sql2.WHERE("TO_DATE(PER.FECHANACIMIENTO,'DD/MM/RRRR') = TO_DATE('" + busquedaJuridicaSearchDTO.getFechaConstitucion() + "', 'DD/MM/RRRR')");
+			String fechaC = dateFormat.format(busquedaJuridicaSearchDTO.getFechaConstitucion());
+			sql2.WHERE("TO_DATE(PER.FECHANACIMIENTO,'DD/MM/RRRR') = TO_DATE('" + fechaC + "', 'DD/MM/RRRR')");
 		}
 		
 		
