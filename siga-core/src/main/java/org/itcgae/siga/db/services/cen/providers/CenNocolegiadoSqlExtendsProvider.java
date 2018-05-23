@@ -11,12 +11,12 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 	
 	public String searchLegalPersons(BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, String idLenguaje, String idInstitucion) {
 		SQL sql = new SQL();
-		
+		SQL sql2 = new SQL();
 		// Formateo de fecha para sentencia sql
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
-		
-		
 		String grupos = "";
+		
+		
 		if(busquedaJuridicaSearchDTO.getGrupos().length > 1) {
 			for (String string : busquedaJuridicaSearchDTO.getGrupos()) {
 				grupos += string;
@@ -28,7 +28,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 			grupos = busquedaJuridicaSearchDTO.getGrupos()[0];
 		}
 		
-		SQL sql2 = new SQL();
+		
 		
 		sql2.SELECT("COL.IDPERSONA AS IDPERSONA");
 		sql2.SELECT("PER.NIFCIF AS NIF");
@@ -108,6 +108,57 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		if(null != busquedaJuridicaSearchDTO.getIntegrante() && !busquedaJuridicaSearchDTO.getIntegrante().equalsIgnoreCase("")) {
 			sql.WHERE("upper(consulta.NOMBRESINTEGRANTES) like upper('%"+ busquedaJuridicaSearchDTO.getIntegrante() + "%')");
 		}
+		
+		return sql.toString();
+	}
+	
+	
+	
+	public String searchHistoricLegalPersons(BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, String idLenguaje, String idInstitucion) {
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		
+		sql2.SELECT("COL.IDPERSONA AS IDPERSONA");
+		sql2.SELECT("PER.NIFCIF AS NIF");
+		sql2.SELECT("CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) AS DENOMINACION");
+		sql2.SELECT("I.ABREVIATURA AS ABREVIATURA");
+		sql2.SELECT("PER.FECHANACIMIENTO AS FECHACONSTITUCION");
+		sql2.SELECT("COL.SOCIEDADPROFESIONAL AS SOCIEDADPROFESIONAL");
+		sql2.SELECT("CA.DESCRIPCION AS TIPO");
+		sql2.SELECT("COL.FECHA_BAJA AS FECHA_BAJA");
+		sql2.SELECT("NVL(COUNT(DISTINCT PER2.IDPERSONA),0) AS NUMEROINTEGRANTES");
+		sql2.SELECT("LISTAGG(CONCAT(PER2.NOMBRE ||' ',CONCAT(PER2.APELLIDOS1 || ' ',PER2.APELLIDOS2)), '; ') WITHIN GROUP (ORDER BY PER2.NOMBRE) AS NOMBRESINTEGRANTES");
+		
+		sql2.FROM("CEN_NOCOLEGIADO COL");
+		
+		sql2.INNER_JOIN(" CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA");
+		sql2.INNER_JOIN(" CEN_INSTITUCION I ON COL.IDINSTITUCION = I.IDINSTITUCION "
+				+ " LEFT JOIN CEN_TIPOSOCIEDAD  TIPOSOCIEDAD ON TIPOSOCIEDAD.LETRACIF = COL.TIPO "
+				+ " LEFT JOIN  GEN_RECURSOS_CATALOGOS CA ON (TIPOSOCIEDAD.DESCRIPCION = CA.IDRECURSO  AND CA.IDLENGUAJE = '" + idLenguaje + "')"
+				+ " LEFT JOIN CEN_GRUPOSCLIENTE_CLIENTE GRUPOS_CLIENTE ON (GRUPOS_CLIENTE.IDINSTITUCION = I.IDINSTITUCION AND COL.IDPERSONA = GRUPOS_CLIENTE.IDPERSONA)"
+				+ " LEFT JOIN CEN_COMPONENTES COM ON (COM.IDPERSONA = COL.IDPERSONA AND COL.IDINSTITUCION = COM.IDINSTITUCION )"
+				+ " LEFT JOIN CEN_CLIENTE CLI ON (COM.CEN_CLIENTE_IDPERSONA = CLI.IDPERSONA AND CLI.IDINSTITUCION = COM.IDINSTITUCION )"
+				+ " LEFT JOIN CEN_PERSONA PER2 ON PER2.IDPERSONA = CLI.IDPERSONA ");
+		
+		sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");	
+		
+		sql2.GROUP_BY("COL.IDINSTITUCION");
+		sql2.GROUP_BY("COL.IDPERSONA");
+		sql2.GROUP_BY("PER.NIFCIF");
+		sql2.GROUP_BY("PER.NOMBRE");
+		sql2.GROUP_BY("PER.APELLIDOS1");
+		sql2.GROUP_BY("PER.APELLIDOS2");
+		sql2.GROUP_BY("I.ABREVIATURA");
+		sql2.GROUP_BY("GRUPOS_CLIENTE.IDGRUPO");
+		sql2.GROUP_BY("PER.FECHANACIMIENTO");
+		sql2.GROUP_BY("COL.SOCIEDADPROFESIONAL");
+		sql2.GROUP_BY("COL.TIPO");
+		sql2.GROUP_BY("CA.DESCRIPCION");
+		sql2.GROUP_BY("COL.FECHA_BAJA");
+		
+		// meter subconsulta de objeto sql2 en objeto sql
+		sql.SELECT("CONSULTA.*");
+		sql.FROM( "(" + sql2 + ") consulta");
 		
 		return sql.toString();
 	}
