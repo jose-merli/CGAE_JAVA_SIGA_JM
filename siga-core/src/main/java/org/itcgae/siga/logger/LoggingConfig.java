@@ -90,7 +90,7 @@ public class LoggingConfig {
 		logFileAppender.start();
 
 		//Logger general aplicacion
-		Logger logApplication = logCtx.getLogger("org.itcgae.sspp");
+		Logger logApplication = logCtx.getLogger("org.itcgae.siga");
 		logApplication.setLevel(Level.toLevel(sigaLevelLog));
 		logApplication.setAdditive(false);
 		logApplication.addAppender(logFileAppender);
