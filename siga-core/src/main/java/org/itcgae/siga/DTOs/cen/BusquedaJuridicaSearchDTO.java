@@ -14,8 +14,9 @@ public class BusquedaJuridicaSearchDTO {
 	private Date fechaConstitucion;
 	private String integrante;
 	private String [] grupos;
+	private String sociedadProfesional;
 	
-	
+
 	/**
 	 *
 	 */
@@ -138,6 +139,26 @@ public class BusquedaJuridicaSearchDTO {
 	}
 	
 	
+	/**
+	 *
+	 */
+	public BusquedaJuridicaSearchDTO sociedadProfesional(String sociedadProfesional){
+		this.sociedadProfesional = sociedadProfesional;
+		return this;
+	}
+	
+	
+	@JsonProperty("sociedadProfesional")
+	public String getSociedadProfesional() {
+		return sociedadProfesional;
+	}
+
+
+	public void setSociedadProfesional(String sociedadProfesional) {
+		this.sociedadProfesional = sociedadProfesional;
+	}
+	
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -152,12 +173,13 @@ public class BusquedaJuridicaSearchDTO {
 	    		Objects.equals(this.denominacion, busquedaJuridicaSearchDTO.denominacion) &&
 	    		Objects.equals(this.fechaConstitucion, busquedaJuridicaSearchDTO.fechaConstitucion) &&
 	    		Objects.equals(this.integrante, busquedaJuridicaSearchDTO.integrante) &&
-	    		Objects.equals(this.grupos, busquedaJuridicaSearchDTO.grupos);
+	    		Objects.equals(this.grupos, busquedaJuridicaSearchDTO.grupos) &&
+	    		Objects.equals(this.sociedadProfesional, busquedaJuridicaSearchDTO.sociedadProfesional);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(tipo, nif, denominacion, fechaConstitucion, integrante, grupos);
+	    return Objects.hash(tipo, nif, denominacion, fechaConstitucion, integrante, grupos, sociedadProfesional);
 	}
 
 	
@@ -172,6 +194,7 @@ public class BusquedaJuridicaSearchDTO {
 	    sb.append("    fechaConstitucion: ").append(toIndentedString(fechaConstitucion)).append("\n");
 	    sb.append("    integrante: ").append(toIndentedString(integrante)).append("\n");
 	    sb.append("    grupos: ").append(toIndentedString(grupos)).append("\n");
+	    sb.append("    sociedadProfesional: ").append(toIndentedString(sociedadProfesional)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
