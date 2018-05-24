@@ -18,7 +18,7 @@ public class GenMenuSqlExtendProvider extends GenMenuSqlProvider {
      *
      * @mbg.generated Wed Mar 14 18:23:45 CET 2018
      */
-    public String selectMenuByExample(AdmTiposaccesoExample example) {
+    public String selectMenuByExample(AdmTiposaccesoExample example, String idInstitucion) {
         SQL sql = new SQL();
        
 
@@ -35,7 +35,11 @@ public class GenMenuSqlExtendProvider extends GenMenuSqlProvider {
         sql.SELECT("MENU.PATH");
         sql.SELECT("MENU.IDCLASS");
         sql.SELECT("DECODE(MIN(DECODE(ACCESO.DERECHOACCESO,0,5,ACCESO.DERECHOACCESO)),5,0,MIN(DECODE(ACCESO.DERECHOACCESO,0,5,ACCESO.DERECHOACCESO))) AS DERECHOACCESO");
-        sql.FROM(" GEN_MENU  MENU INNER JOIN ADM_TIPOSACCESO ACCESO ON  ACCESO.IDPROCESO = MENU.IDPROCESO AND MENU.FECHA_BAJA IS NULL ");
+        sql.FROM(" GEN_MENU  MENU ");
+        sql.INNER_JOIN("ADM_TIPOSACCESO ACCESO ON  ACCESO.IDPROCESO = MENU.IDPROCESO AND MENU.FECHA_BAJA IS NULL ");
+        if (!idInstitucion.equals("2000")) {
+        	sql.INNER_JOIN("GEN_PROCESOS GENPRO ON (GENPRO.IDPROCESO = MENU.IDPROCESO and UPPER(GENPRO.DESCRIPCION) not like UPPER('%hidden%'))");
+		}
         this.applyWhereTiposAcceso(sql, example, false);
         sql.GROUP_BY("MENU.IDMENU, MENU.ORDEN , MENU.IDPARENT, MENU.IDRECURSO,MENU.IDPROCESO, MENU.PATH, MENU.IDCLASS");
         if (example != null && example.getOrderByClause() != null) {

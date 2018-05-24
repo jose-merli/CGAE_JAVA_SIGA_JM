@@ -39,7 +39,7 @@ public interface GenMenuExtendsMapper {
         @Result(column="IDCLASS", property="idclass", jdbcType=JdbcType.VARCHAR),
         @Result(column="PATH", property="path", jdbcType=JdbcType.VARCHAR)
     })
-    List<GenMenu> selectMenuByExample(AdmTiposaccesoExample example);
+    List<GenMenu> selectMenuByExample(AdmTiposaccesoExample example, String idInstitucion);
 
 
 }

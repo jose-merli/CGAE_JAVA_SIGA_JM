@@ -166,7 +166,7 @@ public class MenuServiceImpl implements IMenuService {
 		exampleMenu.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdperfilIn(idperfiles);
 
 		// Obtenemos todos los puntos de Menú
-		menuEntities = menuExtend.selectMenuByExample(exampleMenu);
+		menuEntities = menuExtend.selectMenuByExample(exampleMenu,String.valueOf(idInstitucion));
 
 		if (null != menuEntities && !menuEntities.isEmpty()) {
 			List<MenuItem> items = new ArrayList<MenuItem>();
