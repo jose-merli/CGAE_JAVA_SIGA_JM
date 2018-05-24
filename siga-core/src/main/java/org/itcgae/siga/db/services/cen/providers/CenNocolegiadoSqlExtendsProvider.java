@@ -76,7 +76,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		}
 		else {
 			if(null == busquedaJuridicaSearchDTO.getSociedadProfesional() || busquedaJuridicaSearchDTO.getSociedadProfesional().equals("0") || busquedaJuridicaSearchDTO.getSociedadProfesional().equalsIgnoreCase(""))
-				sql2.WHERE("COL.SOCIEDADPROFESIONAL IS NULL OR COL.SOCIEDADPROFESIONAL = '0'");
+				sql2.WHERE(" (COL.SOCIEDADPROFESIONAL IS NULL OR COL.SOCIEDADPROFESIONAL = '0' )");
 		}
 		
 		
