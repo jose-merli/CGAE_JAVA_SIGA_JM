@@ -3,11 +3,14 @@ package org.itcgae.siga;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.itcgae.siga.logger.LoggingConfig;
 import org.itcgae.siga.logger.MyBatisLoggerInterceptor;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -15,8 +18,16 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 @Configuration
-public class SigaConfiguration {
+public class SigaConfiguration implements ApplicationListener<ApplicationReadyEvent>{
 
+	@Autowired
+	private LoggingConfig loggingConfig;
+	
+	@Override
+	public void onApplicationEvent(ApplicationReadyEvent arg0) {
+		loggingConfig.initLogback();
+	}
+	
 	@Configuration
 	@EnableAutoConfiguration
 	class MyBatisConfig {
