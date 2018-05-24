@@ -12,6 +12,7 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 		
 		sql.SELECT("DISTINCT MODULO");
 		sql.FROM("gen_parametros");
+		sql.ORDER_BY(" MODULO ASC");
 		
 		return sql.toString();
 	}
@@ -32,6 +33,7 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
         sql.WHERE("MODULO = '" + parametroRequestDTO.getModulo() + "'");
         sql.WHERE("FECHA_BAJA IS NULL");
         sql.GROUP_BY("param.modulo, param.parametro, param.idrecurso");
+        sql.ORDER_BY(" PARAM.MODULO ");
 		
 		return sql.toString();
 	}
