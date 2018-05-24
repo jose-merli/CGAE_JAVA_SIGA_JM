@@ -134,7 +134,7 @@ public class MenuServiceImpl implements IMenuService {
 			return response;
 		}
 
-		List<String> idperfiles = new ArrayList<String>();
+		
 
 		idLenguaje = usuarios.get(0).getIdlenguaje();
 		AdmPerfilExample examplePerfil = new AdmPerfilExample();
@@ -156,17 +156,36 @@ public class MenuServiceImpl implements IMenuService {
 			response.setError(error);
 			return response;
 		}
-		for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
-			idperfiles.add(perfil.getIdperfil());
-		}
+		
+		
 		AdmTiposaccesoExample exampleMenu = new AdmTiposaccesoExample();
 
-		exampleMenu.setDistinct(true);
-		exampleMenu.setOrderByClause(" MENU.ORDEN ASC");
-		exampleMenu.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdperfilIn(idperfiles);
+		
+		String idPerfiles = "";
+		for(int i=0 ;i< perfiles.size(); i++) {
+			String contructPerfil = "'";
+			if(perfiles.size() == 1) {
+				contructPerfil += perfiles.get(i).getIdperfil();
+				contructPerfil += "'";
+			}
+			else {
+				if(i != perfiles.size()-1) {
+					contructPerfil += perfiles.get(i).getIdperfil();
+					contructPerfil += "'";
+					contructPerfil += ",";
+					
+				}
+				else {
+					contructPerfil += perfiles.get(i).getIdperfil();
+					contructPerfil += "'";
+				}
+				
+			}
+			idPerfiles+=contructPerfil;
+		}
 
 		// Obtenemos todos los puntos de Menú
-		menuEntities = menuExtend.selectMenuByExample(exampleMenu,String.valueOf(idInstitucion));
+		menuEntities = menuExtend.selectMenuByExample(exampleMenu,String.valueOf(idInstitucion), idPerfiles);
 
 		if (null != menuEntities && !menuEntities.isEmpty()) {
 			List<MenuItem> items = new ArrayList<MenuItem>();

@@ -18,7 +18,7 @@ public class GenMenuSqlExtendProvider extends GenMenuSqlProvider {
      *
      * @mbg.generated Wed Mar 14 18:23:45 CET 2018
      */
-    public String selectMenuByExample(AdmTiposaccesoExample example, String idInstitucion) {
+    public String selectMenuByExample(AdmTiposaccesoExample example, String idInstitucion, String idPerfiles) {
         SQL sql = new SQL();
        
 
@@ -40,11 +40,17 @@ public class GenMenuSqlExtendProvider extends GenMenuSqlProvider {
         if (!idInstitucion.equals("2000")) {
         	sql.INNER_JOIN("GEN_PROCESOS GENPRO ON (GENPRO.IDPROCESO = MENU.IDPROCESO and UPPER(GENPRO.DESCRIPCION) not like UPPER('%hidden%'))");
 		}
-        this.applyWhereTiposAcceso(sql, example, false);
+        //this.applyWhereTiposAcceso(sql, example, false);
+        
+        sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"' and IDPERFIL in (" + idPerfiles +")");
+        
         sql.GROUP_BY("MENU.IDMENU, MENU.ORDEN , MENU.IDPARENT, MENU.IDRECURSO,MENU.IDPROCESO, MENU.PATH, MENU.IDCLASS");
-        if (example != null && example.getOrderByClause() != null) {
-            sql.ORDER_BY(example.getOrderByClause());
-        }
+        
+        sql.ORDER_BY("MENU.ORDEN ASC");
+        
+//        if (example != null && example.getOrderByClause() != null) {
+//            sql.ORDER_BY(example.getOrderByClause());
+//        }
         
         SQL sql2 = new SQL();
         
