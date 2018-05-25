@@ -6,10 +6,15 @@ import java.util.List;
 
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoEntity;
+import org.itcgae.siga.db.entities.AdmPerfil;
+import org.itcgae.siga.db.entities.AdmPerfilExample;
+import org.itcgae.siga.db.entities.AdmRol;
+import org.itcgae.siga.db.entities.AdmRolExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.mappers.AdmRolMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
@@ -55,17 +60,20 @@ public class SigaUserDetailsService implements UserDetailsService {
 
 	@Autowired
 	AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoMapper;
+	
+	@Autowired
+	AdmRolMapper admRol;
 
 	@Override
 	public UserDetails loadUserByUsername(String dni) throws UsernameNotFoundException {
 
-		return new UserCgae(dni, null, null, null);
+		return new UserCgae(dni, null, null, null,null);
 	}
 
 	public UserDetails loadUserByUsername(UserCgae user) throws UsernameNotFoundException {
 
 		String dni = user.getDni();
-//		String grupo = user.getGrupo();
+		String grupo = user.getGrupo();
 		String institucion = user.getInstitucion();
 		ControlRequestItem controlItem = new ControlRequestItem();
 		HashMap<String, String> response = new HashMap<String, String>();
@@ -76,52 +84,65 @@ public class SigaUserDetailsService implements UserDetailsService {
 
 		List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExample);
 
+		
 		if (null != usuarios && usuarios.size() >0) {
 			
-			/*
-			 * if (usuarios == null || usuarios.isEmpty()) { Error error = new
-			 * Error(); error.setCode(400); error.setDescription("400");
-			 * response.setError(error); return response; }
-			 */
-	
 			List<String> idperfiles = new ArrayList<String>();
-	
-			// Obtenemos todos los perfiles del Usuario para cargar sus puntos de
-			// Menú
-			AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
-	
-			exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
-					.andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
-			List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
-			if (null != perfiles && perfiles.size() >0) {
-				for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
+			
+			AdmPerfilExample examplePerfil = new AdmPerfilExample();
+			
+			examplePerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(grupo);
+			List<AdmPerfil> perfilesPuertaAtras = perfilMapper.selectByExample(examplePerfil );
+			
+			if(null != perfilesPuertaAtras && perfilesPuertaAtras.size()>0) {
+				/*
+				 * Tratamos solo el grupo seleccionado en el combo
+				 */
+				for (AdmPerfil perfil : perfilesPuertaAtras) {
 					idperfiles.add("'" + perfil.getIdperfil() + "'");
 				}
-		
-				controlItem.setInstitucion(institucion);
-				String str = idperfiles.toString().replace("[", "").replace("]", "");
-				controlItem.setIdGrupo(str);
-		
-				// Añadimos los permisos a la lista
-				List<PermisoEntity> permisos = this.admUsuariosExtendsMapper.getAccessControlsWithOutProcess(controlItem);
-
-				if (null != permisos && permisos.size() > 0) {
-					for (PermisoEntity permisoEntity : permisos) {
-						response.put(permisoEntity.getData(), permisoEntity.getDerechoacceso());
-					}
-					return new UserCgae(dni, null, institucion, response);
-				}else {
-					 throw new BadCredentialsException("El usuario no tiene permisos");
-				// TODO: Añadir grupo
-				
-				}
 			}else {
-				throw new AuthenticationCredentialsNotFoundException("Usuario no encontrado en la aplicación");
+				AdmRolExample exampleRol = new AdmRolExample();
+				exampleRol.createCriteria().andDescripcionEqualTo(grupo);
+				List<AdmRol> roles = admRol.selectByExample(exampleRol );
+				if (null!= roles && roles.size()>0) {
+					AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
+					exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
+								.andIdusuarioEqualTo(usuarios.get(0).getIdusuario()).andIdrolEqualTo(roles.get(0).getIdrol());
+					List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
+					
+					if(null != perfiles && perfiles.size()>0) {
+						/*
+						 * Tratamos todos los grupos del Rol
+						 */
+						for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
+							idperfiles.add("'" + perfil.getIdperfil() + "'");
+						}
+					}
+				}
 			}
-		}
-		else {
+			
+					controlItem.setInstitucion(institucion);
+					String str = idperfiles.toString().replace("[", "").replace("]", "");
+					controlItem.setIdGrupo(str);
+			
+					// Añadimos los permisos a la lista
+					List<PermisoEntity> permisos = this.admUsuariosExtendsMapper.getAccessControlsWithOutProcess(controlItem);
+	
+					if (null != permisos && permisos.size() > 0) {
+						for (PermisoEntity permisoEntity : permisos) {
+							response.put(permisoEntity.getData(), permisoEntity.getDerechoacceso());
+						}
+						return new UserCgae(dni, grupo, institucion, response,idperfiles);
+					}else {
+						 throw new BadCredentialsException("El usuario no tiene permisos");
+					}
+
+		}else {
 			 throw new AuthenticationCredentialsNotFoundException("Usuario no encontrado en la aplicación");
 		}
+			
+		
 	}
 
 }

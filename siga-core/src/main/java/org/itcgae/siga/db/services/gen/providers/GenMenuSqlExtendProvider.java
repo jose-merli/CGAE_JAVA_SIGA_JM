@@ -3,6 +3,7 @@ package org.itcgae.siga.db.services.gen.providers;
 import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmTiposaccesoExample;
 import org.itcgae.siga.db.entities.GenMenuExample;
 import org.itcgae.siga.db.entities.AdmTiposaccesoExample.Criteria;
@@ -37,7 +38,7 @@ public class GenMenuSqlExtendProvider extends GenMenuSqlProvider {
         sql.SELECT("DECODE(MIN(DECODE(ACCESO.DERECHOACCESO,0,5,ACCESO.DERECHOACCESO)),5,0,MIN(DECODE(ACCESO.DERECHOACCESO,0,5,ACCESO.DERECHOACCESO))) AS DERECHOACCESO");
         sql.FROM(" GEN_MENU  MENU ");
         sql.INNER_JOIN("ADM_TIPOSACCESO ACCESO ON  ACCESO.IDPROCESO = MENU.IDPROCESO AND MENU.FECHA_BAJA IS NULL ");
-        if (!idInstitucion.equals("2000")) {
+        if (!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
         	sql.INNER_JOIN("GEN_PROCESOS GENPRO ON (GENPRO.IDPROCESO = MENU.IDPROCESO and UPPER(GENPRO.DESCRIPCION) not like UPPER('%hidden%'))");
 		}
         //this.applyWhereTiposAcceso(sql, example, false);

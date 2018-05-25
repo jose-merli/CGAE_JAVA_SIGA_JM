@@ -4,6 +4,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -57,6 +58,7 @@ public class UserTokenUtils {
 			return tokenPrefix + Jwts.builder().setIssuedAt(new Date()).setIssuer("CONSEJO GENERAL DE LA ABOGACIA")
 					.setSubject(auth.getPrincipal().toString()).claim("permisos", auth.getUser().getPermisos())
 					.claim("institucion", auth.getUser().getInstitucion()).claim("grupo", auth.getUser().getGrupo())
+					.claim("perfiles", auth.getUser().getPerfiles())
 					.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 					.signWith(SignatureAlgorithm.HS512, secretSignKey).compact();
 
@@ -70,7 +72,7 @@ public class UserTokenUtils {
 
 			return tokenPrefix + Jwts.builder().setIssuedAt(new Date()).setIssuer("CONSEJO GENERAL DE LA ABOGACIA")
 					.setSubject(user.getDni()).claim("permisos", user.getPermisos())
-					.claim("institucion", user.getInstitucion()).claim("grupo", user.getGrupo())
+					.claim("institucion", user.getInstitucion()).claim("grupo", user.getGrupo()).claim("perfiles", user.getPerfiles())
 					.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 					.signWith(SignatureAlgorithm.HS512, secretSignKey).compact();
 
@@ -87,8 +89,11 @@ public class UserTokenUtils {
 		String grupo = (String) Jwts.parser().setSigningKey(secretSignKey)
 				.parseClaimsJws(token.replace(tokenPrefix, "")).getBody().get("grupo");
 		HashMap<String, String> permisos = getPermisosFromJWTToken(token);
+		
+		List<String> perfiles = (List<String>) Jwts.parser().setSigningKey(secretSignKey)
+				.parseClaimsJws(token.replace(tokenPrefix, "")).getBody().get("perfiles");
 
-		return new UserCgae(dni, grupo, institucion, permisos);
+		return new UserCgae(dni, grupo, institucion, permisos,perfiles);
 	}
 
 	public static String getDniFromJWTToken(String token) {
@@ -110,6 +115,10 @@ public class UserTokenUtils {
 				.getBody().get("grupo");
 	}
 
+	public static List<String> getPerfilesFromJWTToken(String token) {
+		return (List<String>) Jwts.parser().setSigningKey(secretSignKey).parseClaimsJws(token.replace(tokenPrefix, ""))
+				.getBody().get("perfiles");
+	}
 	@SuppressWarnings("unchecked")
 	public static HashMap<String, String> getPermisosFromJWTToken(String token) {
 		// Claims claims =

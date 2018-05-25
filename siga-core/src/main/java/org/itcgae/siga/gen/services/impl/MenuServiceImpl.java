@@ -120,6 +120,7 @@ public class MenuServiceImpl implements IMenuService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
 
 		AdmUsuariosExample usuarioExample = new AdmUsuariosExample();
 		usuarioExample.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -137,17 +138,13 @@ public class MenuServiceImpl implements IMenuService {
 		
 
 		idLenguaje = usuarios.get(0).getIdlenguaje();
-		AdmPerfilExample examplePerfil = new AdmPerfilExample();
-		examplePerfil.setDistinct(Boolean.TRUE);
-		examplePerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion);
-		examplePerfil.setOrderByClause("IDPERFIL ASC");
+
 		// Obtenemos todos los perfiles del Usuario para cargar sus puntos de
 		// Menú
 		AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
 
 		exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 				.andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
-		List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
 
 		if (perfiles == null) {
 			Error error = new Error();
@@ -163,21 +160,21 @@ public class MenuServiceImpl implements IMenuService {
 		
 		String idPerfiles = "";
 		for(int i=0 ;i< perfiles.size(); i++) {
-			String contructPerfil = "'";
+			String contructPerfil = "";
 			if(perfiles.size() == 1) {
-				contructPerfil += perfiles.get(i).getIdperfil();
-				contructPerfil += "'";
+				contructPerfil += perfiles.get(i);
+				
 			}
 			else {
 				if(i != perfiles.size()-1) {
-					contructPerfil += perfiles.get(i).getIdperfil();
-					contructPerfil += "'";
+					contructPerfil += perfiles.get(i);
+				
 					contructPerfil += ",";
 					
 				}
 				else {
-					contructPerfil += perfiles.get(i).getIdperfil();
-					contructPerfil += "'";
+					contructPerfil += perfiles.get(i);
+				
 				}
 				
 			}
@@ -293,8 +290,8 @@ public class MenuServiceImpl implements IMenuService {
 		ComboDTO response = new ComboDTO();
 
 		AdmPerfilExample examplePerfil = new AdmPerfilExample();
-		examplePerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-		examplePerfil.setOrderByClause("IDPERFIL ASC");
+		examplePerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andFechaBajaIsNull();
+		examplePerfil.setOrderByClause(" DESCRIPCION ASC ");
 		List<AdmPerfil> perfiles = perfilMapper.selectComboPerfilByExample(examplePerfil);
 		List<ComboItem> combos = new ArrayList<ComboItem>();
 		if (null != perfiles && perfiles.size() > 0) {

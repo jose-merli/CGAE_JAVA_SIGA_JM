@@ -59,8 +59,10 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 
 		if (authentication == null) {
 			// Usuario 2 -> Usuario de desarrollo del actual SIGA
+			List<String> perfiles = new ArrayList<String>(); 
+			perfiles.add("ADG");
 			UserCgae userDesarrollo = (UserCgae) userDetailsService
-					.loadUserByUsername(new UserCgae("44149718E", "Personal", "2000", null));
+					.loadUserByUsername(new UserCgae("44149718E", "Personal", "2000", null,perfiles));
 			authentication = new UserAuthenticationToken(userDesarrollo.getDni(), null, userDesarrollo, null,
 					new ArrayList<>());
 			String header = null;

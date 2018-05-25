@@ -70,4 +70,14 @@ update gen_menu set idparent = '90' where idmenu='95';
 update gen_menu set fecha_baja = '24/05/2018' where idmenu = '127';
 update gen_menu set fecha_baja = null where idrecurso='menu.administracion.informes';
 update gen_menu set idparent = '83' where idrecurso='menu.administracion.informes';
+
+update  GEN_PROCESOS set idPArent = '00' ,idModulo = 'CEN' where idProceso = '112';
+Insert into GEN_PROCESOS (IDPROCESO,IDMODULO,TRAZA,TARGET,FECHAMODIFICACION,USUMODIFICACION,DESCRIPCION,TRANSACCION,IDPARENT,NIVEL) 
+values ('320','ADM','1','Y',to_date('20/11/07','DD/MM/RR'),'0','Contadores','ADM_Contadores','013','10');
+
+
+Insert into GEN_MENU (IDMENU,ORDEN,TAGWIDTH,IDPARENT,FECHAMODIFICACION,USUMODIFICACION,URI_IMAGEN,IDRECURSO,GEN_MENU_IDMENU,IDPROCESO,IDLENGUAJE,PATH,FECHA_BAJA,IDCLASS) 
+values ('320','19962','175','90',to_date('20/11/07','DD/MM/RR'),'0',null,'menu.administracion.contador',null,'320',null,'contadores/0',null,null);
+update GEN_PROCESOS set descripcion = 'HIDDEN_Desplegar Menú Recursos Multiidioma' where IDPROCESO = '019'; -- Resolucion indicencia SIGARNV-79 (33483)
+
 COMMIT;

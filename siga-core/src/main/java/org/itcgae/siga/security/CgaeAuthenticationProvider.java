@@ -77,7 +77,12 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 	private Validacion validaCertificado(X509Certificate x509Certificate) {
 
 		Validacion valCertificadoRespuesta = null;
+		/*valCertificadoRespuesta = Validacion.OK;
+		
+		if (valCertificadoRespuesta.equals(Validacion.OK)){
 
+			return valCertificadoRespuesta;
+		}else{*/
 		if (System.getProperty("CERT_CHECK_CONF") == null) {
 			System.setProperty("CERT_CHECK_CONF", certConfPath);
 		}
@@ -131,6 +136,7 @@ public class CgaeAuthenticationProvider implements AuthenticationProvider {
 		}
 
 		return valCertificadoRespuesta;
+		//}
 
 	}
 

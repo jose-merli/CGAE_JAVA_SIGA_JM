@@ -2,6 +2,7 @@ package org.itcgae.siga.security;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,19 +18,29 @@ public class UserCgae implements UserDetails {
 	private String grupo;
 	private String institucion;
     private HashMap<String,String> permisos;
+    private List<String> perfiles;
 	
-    public UserCgae() {
+    public List<String> getPerfiles() {
+		return perfiles;
+	}
+
+	public void setPerfiles(List<String> perfiles) {
+		this.perfiles = perfiles;
+	}
+
+	public UserCgae() {
 	}
     
 	public UserCgae(String dni) {
 		this.dni = dni;
 	}
 	
-	public UserCgae(String dni, String grupo, String institucion, HashMap<String,String> permisos) {
+	public UserCgae(String dni, String grupo, String institucion, HashMap<String,String> permisos,List<String> perfiles) {
 		this.dni = dni;
 		this.grupo = grupo;
 		this.institucion = institucion;
 		this.permisos = permisos;
+		this.perfiles = perfiles;
 	}
 	
 	public String getDni() {
@@ -102,7 +113,7 @@ public class UserCgae implements UserDetails {
 
 	@Override
 	public String toString() {
-		return "UserCgae [dni=" + dni + ", grupo=" + grupo + ", institucion=" + institucion + ", permisos=" + permisos
+		return "UserCgae [dni=" + dni + ", grupo=" + grupo + ", institucion=" + institucion + ", permisos=" + permisos + ", perfiles=" + perfiles
 				+ "]";
 	}
 	

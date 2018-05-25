@@ -79,7 +79,7 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 				LOGGER.debug("INSTITUCION: " + institucion);
 				LOGGER.debug("GRUPO: " + grupo);
 
-				UserCgae user = new UserCgae(dni, grupo, institucion, null);
+				UserCgae user = new UserCgae(dni, grupo, institucion, null,null);
 				LOGGER.info("Intento de autenticación en siga {}", user);
 				return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, cert));
 			}
