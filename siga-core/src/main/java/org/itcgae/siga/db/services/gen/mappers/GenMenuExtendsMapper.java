@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.db.entities.AdmTiposaccesoExample;
 import org.itcgae.siga.db.entities.GenMenu;
 import org.itcgae.siga.db.services.gen.providers.GenMenuSqlExtendProvider;
 import org.springframework.context.annotation.Primary;
@@ -39,7 +38,7 @@ public interface GenMenuExtendsMapper {
         @Result(column="IDCLASS", property="idclass", jdbcType=JdbcType.VARCHAR),
         @Result(column="PATH", property="path", jdbcType=JdbcType.VARCHAR)
     })
-    List<GenMenu> selectMenuByExample(AdmTiposaccesoExample example, String idInstitucion, String idPerfiles);
+    List<GenMenu> selectMenuByExample(String idInstitucion, String idPerfiles);
 
 
 }

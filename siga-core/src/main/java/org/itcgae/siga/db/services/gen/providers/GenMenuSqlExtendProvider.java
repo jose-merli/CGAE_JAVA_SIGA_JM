@@ -19,16 +19,12 @@ public class GenMenuSqlExtendProvider extends GenMenuSqlProvider {
      *
      * @mbg.generated Wed Mar 14 18:23:45 CET 2018
      */
-    public String selectMenuByExample(AdmTiposaccesoExample example, String idInstitucion, String idPerfiles) {
+    public String selectMenuByExample( String idInstitucion, String idPerfiles) {
         SQL sql = new SQL();
        
 
         
-        if (example != null && example.isDistinct()) {
-            sql.SELECT_DISTINCT("MENU.IDMENU");
-        } else {
-            sql.SELECT("MENU.IDMENU");
-        }
+        sql.SELECT_DISTINCT("MENU.IDMENU");
         sql.SELECT("MENU.ORDEN");
         sql.SELECT("MENU.IDPARENT");
         sql.SELECT("MENU.IDRECURSO");
@@ -41,17 +37,10 @@ public class GenMenuSqlExtendProvider extends GenMenuSqlProvider {
         if (!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
         	sql.INNER_JOIN("GEN_PROCESOS GENPRO ON (GENPRO.IDPROCESO = MENU.IDPROCESO and UPPER(GENPRO.DESCRIPCION) not like UPPER('%hidden%'))");
 		}
-        //this.applyWhereTiposAcceso(sql, example, false);
-        
         sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"' and IDPERFIL in (" + idPerfiles +")");
-        
         sql.GROUP_BY("MENU.IDMENU, MENU.ORDEN , MENU.IDPARENT, MENU.IDRECURSO,MENU.IDPROCESO, MENU.PATH, MENU.IDCLASS");
-        
         sql.ORDER_BY("MENU.ORDEN ASC");
-        
-//        if (example != null && example.getOrderByClause() != null) {
-//            sql.ORDER_BY(example.getOrderByClause());
-//        }
+
         
         SQL sql2 = new SQL();
         

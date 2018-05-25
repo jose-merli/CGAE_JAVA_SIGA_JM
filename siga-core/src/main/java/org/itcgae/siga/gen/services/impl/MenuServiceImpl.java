@@ -141,11 +141,6 @@ public class MenuServiceImpl implements IMenuService {
 
 		// Obtenemos todos los perfiles del Usuario para cargar sus puntos de
 		// Menú
-		AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
-
-		exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-				.andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
-
 		if (perfiles == null) {
 			Error error = new Error();
 			error.setCode(400);
@@ -154,9 +149,6 @@ public class MenuServiceImpl implements IMenuService {
 			return response;
 		}
 		
-		
-		AdmTiposaccesoExample exampleMenu = new AdmTiposaccesoExample();
-
 		
 		String idPerfiles = "";
 		for(int i=0 ;i< perfiles.size(); i++) {
@@ -182,7 +174,7 @@ public class MenuServiceImpl implements IMenuService {
 		}
 
 		// Obtenemos todos los puntos de Menú
-		menuEntities = menuExtend.selectMenuByExample(exampleMenu,String.valueOf(idInstitucion), idPerfiles);
+		menuEntities = menuExtend.selectMenuByExample(String.valueOf(idInstitucion), idPerfiles);
 
 		if (null != menuEntities && !menuEntities.isEmpty()) {
 			List<MenuItem> items = new ArrayList<MenuItem>();
