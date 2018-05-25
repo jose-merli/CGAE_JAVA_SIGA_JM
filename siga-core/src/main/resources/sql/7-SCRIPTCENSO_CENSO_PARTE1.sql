@@ -74,7 +74,7 @@ update gen_menu set idparent = '83' where idrecurso='menu.administracion.informe
 update  GEN_PROCESOS set idPArent = '00' ,idModulo = 'CEN' where idProceso = '112';
 Insert into GEN_PROCESOS (IDPROCESO,IDMODULO,TRAZA,TARGET,FECHAMODIFICACION,USUMODIFICACION,DESCRIPCION,TRANSACCION,IDPARENT,NIVEL) 
 values ('320','ADM','1','Y',to_date('20/11/07','DD/MM/RR'),'0','Contadores','ADM_Contadores','013','10');
-
+update gen_procesos  set idparent = '012' where idproceso = 'I00';
 
 Insert into GEN_MENU (IDMENU,ORDEN,TAGWIDTH,IDPARENT,FECHAMODIFICACION,USUMODIFICACION,URI_IMAGEN,IDRECURSO,GEN_MENU_IDMENU,IDPROCESO,IDLENGUAJE,PATH,FECHA_BAJA,IDCLASS) 
 values ('320','19962','175','90',to_date('20/11/07','DD/MM/RR'),'0',null,'menu.administracion.contador',null,'320',null,'contadores/0',null,null);
