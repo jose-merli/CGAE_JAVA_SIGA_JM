@@ -71,7 +71,5 @@
 		</dependency>
 	</dependencies>
 	
-	 <build> 
-	 	<finalName>siga-core</finalName>
-	 </build> 
+
 </project>
