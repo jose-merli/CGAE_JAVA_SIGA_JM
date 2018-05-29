@@ -16,20 +16,32 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.PersonaJuridicaFotoDTO;
+import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.cen.PersonaJuridicaDTO;
+import org.itcgae.siga.DTOs.cen.PersonaJuridicaItem;
+import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteExample;
+import org.itcgae.siga.db.entities.CenGruposcliente;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -50,8 +62,24 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
 	
+	@Autowired
+	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+	
+	@Autowired
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired 
+	private CenGruposclienteExtendsMapper cenGruposclienteExtendsMapper;
+	
+	@Autowired
+	private CenGruposclienteClienteExtendsMapper cenGruposclienteClienteExtendsMapper;
+	
+	@Autowired
+	private GenRecursosCatalogosExtendsMapper genRecursosCatalogosExtendsMapper;
+	
+	
 	@Override
-	public UpdateResponseDTO loadPhotography(PersonaJuridicaFotoDTO  personaJuridicaFotoDTO, HttpServletRequest request, HttpServletResponse response) {
+	public void loadPhotography( HttpServletRequest request, HttpServletResponse response) {
 		LOGGER.info(
 				"loadPhotography() -> Entrada al servicio para cargar de una ruta la fotografía de una persona jurídica");
 
@@ -77,12 +105,12 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 			// obtener el nombre del archivo de la fotografía
 			LOGGER.info(
 					"loadPhotography() / cenPersonaExtendsMapper.loadPhotography() -> Entrada a cenPersonaExtendsMapper para obtener el nombre del archivo de la fotografía");
-			comboItem = cenPersonaExtendsMapper.loadPhotography(personaJuridicaFotoDTO.getIdPersona());
+			comboItem = cenPersonaExtendsMapper.loadPhotography("2005005356");
 			LOGGER.info(
 					"loadPhotography() / cenPersonaExtendsMapper.loadPhotography() -> Salida de cenPersonaExtendsMapper para obtener el nombre del archivo de la fotografía");
 
 			if (null != comboItem) {
-				pathFinal = pathFinal.concat(comboItem.getValue());
+				pathFinal = pathFinal.concat(comboItem.getLabel());
 				LOGGER.info(
 						"loadPhotography() -> Se obtiene fotografia de la persona jurídica del path:  " + pathFinal);
 
@@ -135,7 +163,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		
 		LOGGER.info("loadPhotography() -> Salida del servicio para cargar de una ruta la fotografía de una persona jurídica");
 		
-		return updateResponseDTO;
+		return;
 	}
 
 	@Override
@@ -228,7 +256,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				cenCliente.setFotografia(fileName);
 				LOGGER.info(
 						"loadPhotography() / cenClienteMapper.updateByExample() -> Entrada a cenClienteMapper actualizar el nombre de la fotografía de una persona jurídica");
-				response = cenClienteMapper.updateByExample(cenCliente, cenClienteExample);
+				response = cenClienteMapper.updateByExampleSelective(cenCliente, cenClienteExample);
 				LOGGER.info(
 						"loadPhotography() / cenClienteMapper.updateByExample() -> Salida de cenClienteMapper actualizar el nombre de la fotografía de una persona jurídica");
 				if(response == 1) {
@@ -262,10 +290,132 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		
 		return updateResponseDTO;
 	}
-	
-	
-	
-	
-	
+
+	@Override
+	public PersonaJuridicaDTO searchGeneralData(int numPagina, PersonaJuridicaSearchDTO personaJuridicaSearchDTO,
+			HttpServletRequest request) {
+		LOGGER.info(
+				"searchGeneralData() -> Entrada al servicio para buscar información general de una persona jurídica");
+		
+		PersonaJuridicaDTO personaJuridicaDTO = new PersonaJuridicaDTO();
+		List<PersonaJuridicaItem> personaJuridicaItems = new ArrayList<PersonaJuridicaItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"searchGeneralData() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"searchGeneralData() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				
+				personaJuridicaSearchDTO.setIdInstitucion(String.valueOf(idInstitucion));
+				personaJuridicaSearchDTO.setIdLenguaje(usuario.getIdlenguaje());
+				LOGGER.info(
+						"searchGeneralData() / cenNocolegiadoExtendsMapper.searchGeneralData() -> Entrada a cenNocolegiadoExtendsMapper para informacion de persona jurídica por filtro");
+				personaJuridicaItems = cenNocolegiadoExtendsMapper.searchGeneralData(personaJuridicaSearchDTO);
+				LOGGER.info(
+						"searchGeneralData() / cenNocolegiadoExtendsMapper.searchGeneralData() -> Salida de cenNocolegiadoExtendsMapper para informacion de persona jurídica por filtro");
+				
+				personaJuridicaDTO.setPersonaJuridicaItems(personaJuridicaItems);
+				
+			} 
+			else {
+				LOGGER.warn("searchGeneralData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+			}
+		} 
+		else {
+			LOGGER.warn("searchGeneralData() -> idInstitucion del token nula");
+		}
+		
+		LOGGER.info(
+				"searchGeneralData() -> Salida del servicio para buscar información general de una persona jurídica");
+		
+		return personaJuridicaDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO createLegalPerson(EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request) {
+		
+		LOGGER.info(
+				"createLegalPerson() -> Entrada al servicio para actualizar información general de una persona jurídica");
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"createLegalPerson() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"createLegalPerson() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				
+				// crear relaciones entre tablas para todos los grupos
+				for (String grupo : etiquetaUpdateDTO.getGrupos()) {
+					
+					cenGruposcliente = cenGruposclienteExtendsMapper.createLegalPerson(String.valueOf(idInstitucion), usuario.getIdlenguaje(), grupo);
+					
+					// existen registros => solo insertar en tabla CEN_GRUPOSCLIENTE_CLIENTE 
+					if(null != cenGruposcliente && cenGruposcliente.size() > 0) {
+						
+						cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion), grupo, String.valueOf(usuario.getIdusuario()));
+					}
+					// no existen registros => solo insertar en: tabla CEN_GRUPOSCLIENTE , GEN_RECURSOS_CATALOGOS  y CEN_GRUPOSCLIENTE_CLIENTE 
+					else {
+						
+						// insertar en GEN_RECURSOS_CATALOGOS para generar recurso
+						String nombreTabla = "CEN_GRUPOSCLIENTE";
+						String campoTabla = "NOMBRE";
+						genRecursosCatalogosExtendsMapper.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion),usuario, grupo, nombreTabla, campoTabla);
+
+						
+						// insertar en CEN_GRUPOSCLIENTE para generar el grupo		
+						cenGruposclienteExtendsMapper.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion), usuario);
+						
+						
+						// insertar en CEN_GRUPOSCLIENTE_CLIENTE para relacionar grupos-usuarios
+						cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion), "", String.valueOf(usuario.getIdusuario()));
+					}
+				}
+				
+				// actualizar tabla cen_persona 
+				cenPersonaExtendsMapper.insertSelectiveForCreateLegalPerson(etiquetaUpdateDTO, usuario);
+				// actualizar tabla cen_colegiado
+				cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion), usuario, etiquetaUpdateDTO);
+				
+				updateResponseDTO.setStatus(SigaConstants.OK);
+
+			} else {
+				LOGGER.warn(
+						"createLegalPerson() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("createLegalPerson() -> idInstitucion del token nula");
+		}
+		
+		
+		LOGGER.info(
+				"createLegalPerson() -> Salida del servicio para actualizar información general de una persona jurídica");
+		
+		
+		return updateResponseDTO;
+	}
 
 }
