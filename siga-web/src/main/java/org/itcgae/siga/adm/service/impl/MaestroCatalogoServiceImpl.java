@@ -143,13 +143,14 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		//Editamos los datos del catálogo con la tabla maestra seleccionada
 		LOGGER.info("updateDatosCatalogo() -> Entrada al servicio para actualizar los datos del catálogo con la tabla maestra seleccionada");
 		UpdateResponseDTO response = new UpdateResponseDTO();
-		
+		List<CatalogoMaestroItem>  catalogoMaestroItems1 = new ArrayList<CatalogoMaestroItem>();  // comprueba campos no repetidos (codexterno)
+		List<CatalogoMaestroItem>  catalogoMaestroItems2 = new ArrayList<CatalogoMaestroItem>();  // comprueba campos no repetidos (descripcion)
 		// Obtenemos el DNI del token e institución del Token
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(catalogoUpdate.getIdInstitucion()));
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
 		LOGGER.info("updateDatosCatalogo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
 		LOGGER.info("updateDatosCatalogo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
@@ -174,17 +175,52 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 					//Editamos los datos que se han modificado
 					if (null == catalogoUpdate.getCodigoExt()  ) {
 						catalogoUpdate.setCodigoExt("");
+					
 					}
-					LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateCodigoExterno() -> Entrada a genTablasMaestrasExtendsMapper para actualizar el codigo externo de una tabla maestra");
-					genTablasMaestrasExtendsMapper.updateCodigoExterno(tablaMaestra,catalogoUpdate);
-					LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateCodigoExterno() -> Salida de genTablasMaestrasExtendsMapper para actualizar el codigo externo de una tabla maestra");
+					
+					// comprueba codigoExt
+					String descripcion = catalogoUpdate.getDescripcion();
+					catalogoUpdate.setDescripcion("");
+					catalogoMaestroItems1 = genTablasMaestrasExtendsMapper.selectNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoUpdate);
+					
+					// comprueba descripcion
+					catalogoUpdate.setDescripcion(descripcion);
+					catalogoMaestroItems2 = genTablasMaestrasExtendsMapper.selectNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoUpdate);
+					
+					// actualiza codExterno
+					if(null != catalogoMaestroItems1 && catalogoMaestroItems1.size() == 0)
+					{
+						LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateCodigoExterno() -> Entrada a genTablasMaestrasExtendsMapper para actualizar el codigo externo de una tabla maestra");
+						genTablasMaestrasExtendsMapper.updateCodigoExterno(tablaMaestra,catalogoUpdate);
+						LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateCodigoExterno() -> Salida de genTablasMaestrasExtendsMapper para actualizar el codigo externo de una tabla maestra");
 
-					if (!catalogoUpdate.getDescripcion().equalsIgnoreCase("")) {
-						LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateRecursos() -> Entrada a genTablasMaestrasExtendsMapper para actualizar la descripcion de una tabla maestra");
-						genTablasMaestrasExtendsMapper.updateRecursos(tablaMaestra,catalogoUpdate);
-						LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateRecursos() -> Salida de genTablasMaestrasExtendsMapper para actualizar la descripcion de una tabla maestra");
+						response.setStatus(SigaConstants.OK);
 					}
-					response.setStatus(SigaConstants.OK);
+					else {
+						response.setStatus(SigaConstants.KO);
+						response.setError(new Error().description("Ya existe el codigo externo"));
+					}
+					
+					// actualiza descripcion
+					if( null!= catalogoMaestroItems2 && catalogoMaestroItems2.size() == 0){
+						if (!catalogoUpdate.getDescripcion().equalsIgnoreCase("")) {
+							LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateRecursos() -> Entrada a genTablasMaestrasExtendsMapper para actualizar la descripcion de una tabla maestra");
+							genTablasMaestrasExtendsMapper.updateRecursos(tablaMaestra,catalogoUpdate);
+							LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateRecursos() -> Salida de genTablasMaestrasExtendsMapper para actualizar la descripcion de una tabla maestra");
+							response.setStatus(SigaConstants.OK);
+						}
+					}
+					else {
+						response.setStatus(SigaConstants.KO);
+						response.setError(new Error().description("Ya existe la descripcion"));
+					}
+					
+					if(catalogoMaestroItems1.size() > 0 && catalogoMaestroItems2.size() > 0) {
+						response.setStatus(SigaConstants.KO);
+						response.setError(new Error().description("Ya existe la descripcion y el codigo externo"));
+					}
+					
+					
 			}
 			else {
 				LOGGER.warn("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.selectByExample() -> No se han encontrado datos");

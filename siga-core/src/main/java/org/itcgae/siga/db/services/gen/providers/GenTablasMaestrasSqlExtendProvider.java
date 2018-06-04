@@ -211,4 +211,35 @@ public class GenTablasMaestrasSqlExtendProvider {
         
         return sql.toString();
     }
+    
+    
+    
+    public String selectNoRepetidosCodigoExtyDescripcion(GenTablasMaestras tablaMaestra,CatalogoUpdateDTO catalogoUpdate) {
+    	SQL sql = new SQL();
+    	
+		sql.SELECT("REC.descripcion");
+		sql.SELECT("TAB.DESCRIPCION AS IDREGISTRO");
+		sql.SELECT("TAB.CODIGOEXT");
+		sql.SELECT("REC.NOMBRETABLA AS CATALOGO");
+		sql.SELECT("REC.idinstitucion");
+		sql.SELECT("TAB.FECHA_BAJA");
+		
+		sql.FROM(tablaMaestra.getIdtablamaestra() + " TAB" );
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON(REC.IDRECURSO = " + " TAB." + tablaMaestra.getIdcampodescripcion() +") ");
+		sql.WHERE(" REC.idinstitucion = '" + catalogoUpdate.getIdInstitucion() + "'");
+		sql.WHERE(" TAB.FECHA_BAJA is null ");
+		sql.WHERE("REC.idlenguaje = '"+ catalogoUpdate.getIdLenguaje() +"'");
+		
+		if(!catalogoUpdate.getDescripcion().equals("")) {
+			sql.WHERE(" upper(REC.descripcion) = upper('" + catalogoUpdate.getDescripcion() +" ')");
+		}
+		
+		
+		if(!catalogoUpdate.getCodigoExt().equals("")) {
+			sql.WHERE("upper(TAB.CODIGOEXT) = upper(' " + catalogoUpdate.getCodigoExt() + " ')");
+		}
+		
+		
+    	return sql.toString();
+    }
 }
