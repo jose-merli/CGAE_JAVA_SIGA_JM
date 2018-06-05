@@ -188,7 +188,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 					catalogoMaestroItems2 = genTablasMaestrasExtendsMapper.selectNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoUpdate);
 					
 					// actualiza codExterno
-					if(null != catalogoMaestroItems1 && catalogoMaestroItems1.size() == 0)
+					if(null == catalogoMaestroItems1 || catalogoMaestroItems1.size() == 0)
 					{
 						LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateCodigoExterno() -> Entrada a genTablasMaestrasExtendsMapper para actualizar el codigo externo de una tabla maestra");
 						genTablasMaestrasExtendsMapper.updateCodigoExterno(tablaMaestra,catalogoUpdate);
@@ -202,7 +202,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 					}
 					
 					// actualiza descripcion
-					if( null!= catalogoMaestroItems2 && catalogoMaestroItems2.size() == 0){
+					if(null == catalogoMaestroItems2 || catalogoMaestroItems2.size() == 0){
 						if (!catalogoUpdate.getDescripcion().equalsIgnoreCase("")) {
 							LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateRecursos() -> Entrada a genTablasMaestrasExtendsMapper para actualizar la descripcion de una tabla maestra");
 							genTablasMaestrasExtendsMapper.updateRecursos(tablaMaestra,catalogoUpdate);

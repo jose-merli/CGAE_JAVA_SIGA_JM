@@ -22,8 +22,30 @@ public class CatalogoMaestroItem   {
   private String idRegistro = null;
   @JsonFormat(pattern = "dd-MM-yyyy")
   private Date fechaBaja = null;
+  private String longitudDescripcion;
+  private String longitudCodigoExt;
+  
+  
   
   /**
+   **/
+  public CatalogoMaestroItem longitudCodigoExt(String longitudCodigoExt) {
+    this.longitudCodigoExt = longitudCodigoExt;
+    return this;
+  }
+  
+  @JsonProperty("longitudCodigoExt")
+   public String getLongitudCodigoExt() {
+	return longitudCodigoExt;
+   }
+
+
+	public void setLongitudCodigoExt(String longitudCodigoExt) {
+		this.longitudCodigoExt = longitudCodigoExt;
+	}
+
+
+   /**
    **/
   public CatalogoMaestroItem catalogo(String catalogo) {
     this.catalogo = catalogo;
@@ -124,6 +146,25 @@ public class CatalogoMaestroItem   {
 	public void setFechaBaja(Date fechaBaja) {
 		this.fechaBaja = fechaBaja;
 	}
+	
+	
+
+	/**
+	 **/
+	public CatalogoMaestroItem longitudDescripcion(String longitudDescripcion) {
+		this.longitudDescripcion = longitudDescripcion;
+		return this;
+	}
+
+	@JsonProperty("longitudDescripcion")
+	public String getLongitudDescripcion() {
+		return longitudDescripcion;
+	}
+
+	public void setLongitudDescripcion(String longitudDescripcion) {
+		this.longitudDescripcion = longitudDescripcion;
+	}
+	
   
   @Override
   public boolean equals(java.lang.Object o) {
@@ -139,18 +180,20 @@ public class CatalogoMaestroItem   {
         Objects.equals(this.descripcion, catalogoMaestroItem.descripcion)&&
         Objects.equals(this.idInstitucion, catalogoMaestroItem.idInstitucion)&&
     	Objects.equals(this.idRegistro, catalogoMaestroItem.idRegistro)&&
-    Objects.equals(this.fechaBaja, catalogoMaestroItem.fechaBaja);
+    	Objects.equals(this.fechaBaja, catalogoMaestroItem.fechaBaja) &&
+    	Objects.equals(this.longitudCodigoExt, catalogoMaestroItem.longitudCodigoExt) &&
+    	Objects.equals(this.longitudDescripcion, catalogoMaestroItem.longitudDescripcion);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(catalogo, codigoExt,descripcion,idInstitucion);
+    return Objects.hash(catalogo, codigoExt,descripcion,idInstitucion,longitudDescripcion, longitudCodigoExt);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ComboItem {\n");
+    sb.append("class CatalogoMaestroItem {\n");
     
     sb.append("    catalogo: ").append(toIndentedString(catalogo)).append("\n");
     sb.append("    codigoExt: ").append(toIndentedString(codigoExt)).append("\n");
@@ -158,6 +201,8 @@ public class CatalogoMaestroItem   {
     sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
     sb.append("    idRegistro: ").append(toIndentedString(idRegistro)).append("\n");
     sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
+    sb.append("    longitudCodigoExt: ").append(toIndentedString(longitudCodigoExt)).append("\n");
+    sb.append("    longitudDescripcion: ").append(toIndentedString(longitudDescripcion)).append("\n");
     sb.append("}");
     return sb.toString();
   }

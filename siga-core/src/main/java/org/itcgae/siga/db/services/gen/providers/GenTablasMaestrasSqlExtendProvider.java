@@ -26,8 +26,11 @@ public class GenTablasMaestrasSqlExtendProvider {
         sql.SELECT("'" + tablaMaestra.getIdtablamaestra() + "'" + " AS CATALOGO");
         sql.SELECT("RECURSOS.DESCRIPCION AS DESCRIPCION");
         sql.SELECT(tablaMaestra.getIdcampocodigo() + " AS IDREGISTRO");
+        sql.SELECT("MAES.LONGITUDCODIGOEXT");
+        sql.SELECT("MAES.LONGITUDDESCRIPCION");
         sql.FROM(tablaMaestra.getIdtablamaestra() + " TABLA" );
         sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS RECURSOS ON (RECURSOS.IDRECURSO = " + " TABLA." + tablaMaestra.getIdcampodescripcion() +") ");
+        sql.INNER_JOIN("GEN_TABLAS_MAESTRAS MAES ON MAES.IDTABLAMAESTRA = '"+tablaMaestra.getIdtablamaestra()+"'");
         
         sql.WHERE("(RECURSOS.IDINSTITUCION = '" + catalogo.getIdInstitucion() + "' OR RECURSOS.IDINSTITUCION IS NULL)");
         sql.WHERE("RECURSOS.IDLENGUAJE = '" + catalogo.getIdLenguaje() + "'");
@@ -231,12 +234,12 @@ public class GenTablasMaestrasSqlExtendProvider {
 		sql.WHERE("REC.idlenguaje = '"+ catalogoUpdate.getIdLenguaje() +"'");
 		
 		if(!catalogoUpdate.getDescripcion().equals("")) {
-			sql.WHERE(" upper(REC.descripcion) = upper('" + catalogoUpdate.getDescripcion() +" ')");
+			sql.WHERE(" upper(REC.descripcion) = upper('" + catalogoUpdate.getDescripcion() +"')");
 		}
 		
 		
 		if(!catalogoUpdate.getCodigoExt().equals("")) {
-			sql.WHERE("upper(TAB.CODIGOEXT) = upper(' " + catalogoUpdate.getCodigoExt() + " ')");
+			sql.WHERE("upper(TAB.CODIGOEXT) = upper('" + catalogoUpdate.getCodigoExt() + "')");
 		}
 		
 		

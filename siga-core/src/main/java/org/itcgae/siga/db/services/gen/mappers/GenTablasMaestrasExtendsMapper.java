@@ -36,8 +36,9 @@ public interface GenTablasMaestrasExtendsMapper extends GenTablasMaestrasMapper{
         @Result(column="CODIGOEXT", property="codigoExt", jdbcType=JdbcType.DECIMAL),
         @Result(column="DESCRIPCION", property="descripcion", jdbcType=JdbcType.DECIMAL),
         @Result(column="IDINSTITUCION", property="idInstitucion", jdbcType=JdbcType.VARCHAR),
-        @Result(column="IDREGISTRO", property="idRegistro", jdbcType=JdbcType.VARCHAR)
-
+        @Result(column="IDREGISTRO", property="idRegistro", jdbcType=JdbcType.VARCHAR),
+        @Result(column="LONGITUDCODIGOEXT", property="longitudCodigoExt", jdbcType=JdbcType.VARCHAR),
+        @Result(column="LONGITUDDESCRIPCION", property="longitudDescripcion", jdbcType=JdbcType.VARCHAR)
     })
     List<CatalogoMaestroItem> selectCatalogosByTabla(GenTablasMaestras example,CatalogoRequestDTO catalogo);
     

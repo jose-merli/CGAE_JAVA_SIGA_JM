@@ -45,7 +45,9 @@ public class MaestroCatalogosController {
    @RequestMapping(value = "/catmaestros/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
    ResponseEntity<UpdateResponseDTO> updateCatalogos(@RequestBody CatalogoUpdateDTO catalogo,HttpServletRequest request) {
 	   UpdateResponseDTO response = maestroCatalogoService.updateDatosCatalogo(catalogo,request);
-	   return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	   if(response.getStatus().equals(SigaConstants.OK))
+		   return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	   else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
    
    @RequestMapping(value = "/catmaestros/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
