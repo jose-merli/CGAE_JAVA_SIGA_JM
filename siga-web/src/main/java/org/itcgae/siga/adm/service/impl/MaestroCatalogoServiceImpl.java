@@ -175,9 +175,39 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 					//Editamos los datos que se han modificado
 					if (null == catalogoUpdate.getCodigoExt()  ) {
 						catalogoUpdate.setCodigoExt("");
-					
+						
 					}
 					
+					
+					// Si nos llega el codigoExt = ""  y una descripcion
+				if (catalogoUpdate.getCodigoExt().equals("")) {
+						catalogoMaestroItems1 = genTablasMaestrasExtendsMapper
+							.selectNoRepetidosCodigoExtyDescripcion(tablaMaestra, catalogoUpdate);
+
+					if (null == catalogoMaestroItems1 || catalogoMaestroItems1.size() == 0) {
+						LOGGER.info(
+								"updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateCodigoExterno() -> Entrada a genTablasMaestrasExtendsMapper para actualizar el codigo externo de una tabla maestra");
+						genTablasMaestrasExtendsMapper.updateCodigoExterno(tablaMaestra, catalogoUpdate);
+						LOGGER.info(
+								"updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateCodigoExterno() -> Salida de genTablasMaestrasExtendsMapper para actualizar el codigo externo de una tabla maestra");
+
+						
+						LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateRecursos() -> Entrada a genTablasMaestrasExtendsMapper para actualizar la descripcion de una tabla maestra");
+						genTablasMaestrasExtendsMapper.updateRecursos(tablaMaestra,catalogoUpdate);
+						LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateRecursos() -> Salida de genTablasMaestrasExtendsMapper para actualizar la descripcion de una tabla maestra");
+					
+						response.setStatus(SigaConstants.OK);
+					} 
+					else {
+						response.setStatus(SigaConstants.KO);
+						Error error = new Error();
+						error.setMessage("Ya existe un registro con esta descripción");
+						response.setError(error);
+						return response;
+						}
+				}
+				else {
+						
 					// comprueba codigoExt
 					String descripcion = catalogoUpdate.getDescripcion();
 					catalogoUpdate.setDescripcion("");
@@ -185,10 +215,12 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 					
 					// comprueba descripcion
 					catalogoUpdate.setDescripcion(descripcion);
+					String codigoExterno = catalogoUpdate.getCodigoExt();
+					catalogoUpdate.setCodigoExt("");
 					catalogoMaestroItems2 = genTablasMaestrasExtendsMapper.selectNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoUpdate);
-					
+					catalogoUpdate.setCodigoExt(codigoExterno);
 					// actualiza codExterno
-					if(null != catalogoMaestroItems1 && catalogoMaestroItems1.size() == 0)
+					if(null == catalogoMaestroItems1 || catalogoMaestroItems1.size() == 0)
 					{
 						LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateCodigoExterno() -> Entrada a genTablasMaestrasExtendsMapper para actualizar el codigo externo de una tabla maestra");
 						genTablasMaestrasExtendsMapper.updateCodigoExterno(tablaMaestra,catalogoUpdate);
@@ -198,27 +230,42 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 					}
 					else {
 						response.setStatus(SigaConstants.KO);
-						response.setError(new Error().description("Ya existe el codigo externo"));
+						Error error = new Error();
+						error.setMessage("Ya existe un registro con este código externo");
+						response.setError(error);	
+						return response;
 					}
 					
 					// actualiza descripcion
-					if( null!= catalogoMaestroItems2 && catalogoMaestroItems2.size() == 0){
+					if( null== catalogoMaestroItems2 || catalogoMaestroItems2.size() == 0){
 						if (!catalogoUpdate.getDescripcion().equalsIgnoreCase("")) {
 							LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateRecursos() -> Entrada a genTablasMaestrasExtendsMapper para actualizar la descripcion de una tabla maestra");
 							genTablasMaestrasExtendsMapper.updateRecursos(tablaMaestra,catalogoUpdate);
 							LOGGER.info("updateDatosCatalogo() / genTablasMaestrasExtendsMapper.updateRecursos() -> Salida de genTablasMaestrasExtendsMapper para actualizar la descripcion de una tabla maestra");
 							response.setStatus(SigaConstants.OK);
+							Error error = new Error();
+							error.setMessage("");
+							
 						}
 					}
 					else {
-						response.setStatus(SigaConstants.KO);
-						response.setError(new Error().description("Ya existe la descripcion"));
+						response.setStatus(SigaConstants.KO);	
+							Error error = new Error();
+							error.setMessage("Ya existe un registro con esta descripción");
+							response.setError(error);							
+						
 					}
+				}
 					
-					if(catalogoMaestroItems1.size() > 0 && catalogoMaestroItems2.size() > 0) {
-						response.setStatus(SigaConstants.KO);
-						response.setError(new Error().description("Ya existe la descripcion y el codigo externo"));
-					}
+					
+					
+					
+//					if(catalogoMaestroItems1.size() > 0 && catalogoMaestroItems2.size() > 0) {
+//						response.setStatus(SigaConstants.KO);
+//						Error error = new Error();
+//						error.setMessage("Ya existe la descripcion y el codigo externo");
+//						response.setError(error);	
+//					}
 					
 					
 			}

@@ -231,15 +231,23 @@ public class GenTablasMaestrasSqlExtendProvider {
 		sql.WHERE("REC.idlenguaje = '"+ catalogoUpdate.getIdLenguaje() +"'");
 		
 		if(!catalogoUpdate.getDescripcion().equals("")) {
-			sql.WHERE(" upper(REC.descripcion) = upper('" + catalogoUpdate.getDescripcion() +" ')");
+			sql.WHERE(" upper(REC.descripcion) = upper('"+ catalogoUpdate.getDescripcion() +"')");
+			sql.WHERE("TAB.IDCOSTEFIJO != '"+ catalogoUpdate.getIdRegistro() +"'");
 		}
 		
 		
 		if(!catalogoUpdate.getCodigoExt().equals("")) {
-			sql.WHERE("upper(TAB.CODIGOEXT) = upper(' " + catalogoUpdate.getCodigoExt() + " ')");
+			sql.WHERE("upper(TAB.CODIGOEXT) = upper('"+ catalogoUpdate.getCodigoExt() + "')");
+			sql.WHERE("TAB.IDCOSTEFIJO != '"+ catalogoUpdate.getIdRegistro() +"'");
+		}
+		
+		if(!catalogoUpdate.getCodigoExt().equals("") && !catalogoUpdate.getDescripcion().equals("")) {
+			sql.WHERE("upper(TAB.CODIGOEXT) = upper('"+ catalogoUpdate.getCodigoExt() + "')");
+			sql.WHERE(" upper(REC.descripcion) = upper('"+ catalogoUpdate.getDescripcion() +"')");
 		}
 		
 		
     	return sql.toString();
     }
+    
 }
