@@ -16,9 +16,9 @@ public class ParametroItem {
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaBaja;
 	private String idRecurso;
+	private String descripcion;
 	
-	
-	
+
 	/**
 	**/
 	public ParametroItem modulo(String modulo) {
@@ -132,6 +132,23 @@ public class ParametroItem {
 	}
 
 	
+	/**
+	**/
+	public ParametroItem descripcion(String descripcion) {
+		this.descripcion = descripcion;
+		return this;
+	}
+	
+	
+	@JsonProperty("descripcion")
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+	
 	
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -147,12 +164,13 @@ public class ParametroItem {
 				Objects.equals(this.valor, parametroItem.valor) &&
 				Objects.equals(this.idInstitucion, parametroItem.idInstitucion) &&
 				Objects.equals(this.fechaBaja, parametroItem.fechaBaja) &&
-				Objects.equals(this.idRecurso, parametroItem.idRecurso);
+				Objects.equals(this.idRecurso, parametroItem.idRecurso) &&
+				Objects.equals(this.descripcion, parametroItem.descripcion);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(modulo, parametro, valor, idInstitucion, fechaBaja, idRecurso);
+		return Objects.hash(modulo, parametro, valor, idInstitucion, fechaBaja, idRecurso, descripcion);
 	}
 
 	@Override
@@ -166,6 +184,7 @@ public class ParametroItem {
 		sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
 		sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
 		sb.append("    idRecurso: ").append(toIndentedString(idRecurso)).append("\n");
+		sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

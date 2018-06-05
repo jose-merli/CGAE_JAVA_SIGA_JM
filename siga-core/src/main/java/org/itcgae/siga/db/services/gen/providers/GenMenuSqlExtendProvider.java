@@ -5,7 +5,6 @@ import java.util.List;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmTiposaccesoExample;
-import org.itcgae.siga.db.entities.GenMenuExample;
 import org.itcgae.siga.db.entities.AdmTiposaccesoExample.Criteria;
 import org.itcgae.siga.db.entities.AdmTiposaccesoExample.Criterion;
 import org.itcgae.siga.db.mappers.GenMenuSqlProvider;
@@ -22,8 +21,6 @@ public class GenMenuSqlExtendProvider extends GenMenuSqlProvider {
     public String selectMenuByExample( String idInstitucion, String idPerfiles) {
         SQL sql = new SQL();
        
-
-        
         sql.SELECT_DISTINCT("MENU.IDMENU");
         sql.SELECT("MENU.ORDEN");
         sql.SELECT("MENU.IDPARENT");

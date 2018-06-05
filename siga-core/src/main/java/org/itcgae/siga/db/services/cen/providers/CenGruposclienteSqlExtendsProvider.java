@@ -18,4 +18,27 @@ public class CenGruposclienteSqlExtendsProvider extends CenGruposclienteSqlProvi
 		
 		return sql.toString();
 	}
+	
+	public String createLegalPerson(String idInstitucion,String idLenguaje, String descripcion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("DISTINCT CLIENTE.*");
+		sql.FROM("CEN_GRUPOSCLIENTE CLIENTE");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CATALOGO ON CLIENTE.NOMBRE = CATALOGO.IDRECURSO AND IDLENGUAJE = '" + idLenguaje + "' ");
+		sql.WHERE("CLIENTE.IDINSTITUCION = '"+ idInstitucion +"'");
+		sql.WHERE("CATALOGO.DESCRIPCION = '" + descripcion +"'");
+			
+		return sql.toString();
+	}
+	
+	public String insertSelectiveForCreateLegalPerson(String idInstitucion, AdmUsuarios usuario) {
+		SQL sql = new SQL();
+		sql.INSERT_INTO("CEN_GRUPOSCLIENTE");
+		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		sql.VALUES("IDGRUPO", "(SELECT MAX(IDGRUPO) + 1 FROM CEN_GRUPOSCLIENTE)");
+		sql.VALUES("IDINSTITUCION", idInstitucion);
+		sql.VALUES("NOMBRE", "(SELECT MAX(IDRECURSO) FROM GEN_RECURSOS_CATALOGOS WHERE NOMBRETABLA = 'CEN_GRUPOSCLIENTE')");
+		sql.VALUES("USUMODIFICACION", String.valueOf(usuario.getIdusuario()));
+		return sql.toString();
+	}
 }

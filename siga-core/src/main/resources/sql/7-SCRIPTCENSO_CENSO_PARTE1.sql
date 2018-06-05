@@ -135,4 +135,12 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosGenerales.literal.noExportarDatos','No exportar datos#GL','0','4',to_date('10/03/04','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosGenerales.literal.noExportarDatos','No exportar datos','0','1',to_date('10/03/04','DD/MM/RR'),'0','19');
 
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatos.literal.fechaBaja','Fecha Baja','0','1',to_date('10/12/05','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatos.literal.fechaBaja','Fecha Baja#GL','0','4',to_date('10/12/05','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatos.literal.fechaBaja','Fecha Baja#EU','0','3',to_date('10/12/05','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatos.literal.fechaBaja','Data Baixa','0','2',to_date('10/12/05','DD/MM/RR'),'0','19');
+
+Update gen_menu Set orden = orden + 13000 Where idmenu In ('90','91') Or idparent In ('90','91','I00','019','125','126','127','92','93','97','99A','99B','310','311','300','132','135','95','96');
+
+
 COMMIT;

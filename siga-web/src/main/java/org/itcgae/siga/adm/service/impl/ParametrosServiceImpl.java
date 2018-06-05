@@ -110,7 +110,6 @@ public class ParametrosServiceImpl implements IParametrosService {
 	public ParametroDTO getParametersRecord(int numPagina, ParametroRequestDTO parametroRequestDTO,
 			HttpServletRequest request) {
 		LOGGER.info("getParametersRecord() -> Entrada al servicio para buscar histórico de módulos disponibles para la institución del usuario");
-		List<GenParametros> genparametros = new ArrayList<GenParametros>();
 		ParametroDTO parametroDTO = new ParametroDTO();
 		List<ParametroItem> parametroItems = new ArrayList<ParametroItem>();
 
@@ -130,21 +129,11 @@ public class ParametrosServiceImpl implements IParametrosService {
 					.andModuloEqualTo(parametroRequestDTO.getModulo());
 
 			LOGGER.info("getParametersRecord() / genParametrosMapper.selectByExample() -> Entrada a genParametrosMapper para obtener listado de los módulos para la institución del usuario");
-			genparametros = genParametrosMapper.selectByExample(genParametrosExample);
+			//genparametros = genParametrosMapper.selectByExample(genParametrosExample);
 			LOGGER.info("getParametersRecord() / genParametrosMapper.selectByExample() -> Salida de genParametrosMapper para obtener listado de los módulos para la institución del usuario");
-
-			if (genparametros != null && genparametros.size() > 0) {
-				for (int i = 0; i < genparametros.size(); i++) {
-					ParametroItem parametroItem = new ParametroItem();
-					parametroItem.setIdInstitucion(String.valueOf(genparametros.get(i).getIdinstitucion()));
-					parametroItem.setModulo(genparametros.get(i).getModulo());
-					parametroItem.setParametro(genparametros.get(i).getParametro());
-					parametroItem.setValor(genparametros.get(i).getValor());
-					parametroItem.setFechaBaja(genparametros.get(i).getFechaBaja());
-					parametroItems.add(parametroItem);
-				}
-				parametroDTO.setParametrosItems(parametroItems);
-			}
+			
+			parametroItems = genParametrosExtendsMapper.getParametersRecord(numPagina, parametroRequestDTO);
+			parametroDTO.setParametrosItems(parametroItems);
 		}
 		else {
 			LOGGER.warn("getParametersRecord() -> No hay suficiente informaciñon para la búsqueda");

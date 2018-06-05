@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.adm.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.MultiidiomaCatalogoSearchDTO;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.GenRecursosCatalogosSqlProvider;
 
 public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogosSqlProvider{
@@ -33,6 +34,26 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 		sql.WHERE(" IDINSTITUCION = '" + idInstitucion + "'");
 		sql.ORDER_BY(" DESCRIPCIONBUSCAR ");
 		
+		return sql.toString();
+	}
+	
+	public String insertSelectiveForCreateLegalPerson(String idInstitucion, AdmUsuarios usuario, String grupo,String nombreTabla, String campoTabla) {
+		SQL sql = new SQL();
+	
+		sql.INSERT_INTO("GEN_RECURSOS_CATALOGOS");		
+		sql.VALUES("IDRECURSO", "(SELECT MAX(IDRECURSO) + 1 FROM GEN_RECURSOS_CATALOGOS WHERE NOMBRETABLA = 'CEN_GRUPOSCLIENTE')");
+		sql.VALUES("DESCRIPCION", grupo);
+		sql.VALUES("IDLENGUAJE", usuario.getIdlenguaje());
+		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		sql.VALUES("USUMODIFICACION", String.valueOf(usuario.getIdusuario()));
+		sql.VALUES("IDINSTITUCION", idInstitucion);
+		sql.VALUES("NOMBRETABLA", nombreTabla);
+		sql.VALUES("CAMPOTABLA", campoTabla);
+		sql.VALUES("IDRECURSOALIAS", "(SELECT LOWER(nombretabla||'.'||campotabla||'.'||idinstitucion||'.'||(count(idRecurso)+2))  FROM  GEN_RECURSOS_CATALOGOS CATALOGO "
+				+ "WHERE CATALOGO.IDINSTITUCION = '" + idInstitucion +"' AND NOMBRETABLA = '"+ nombreTabla +"'   AND IDLENGUAJE = '"+ usuario.getIdlenguaje() +"' "
+				+ "group by nombretabla,campotabla,idinstitucion)");
+
+			
 		return sql.toString();
 	}
 }

@@ -4,6 +4,9 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenNocolegiadoSqlProvider;
 
 public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
@@ -158,6 +161,91 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		// meter subconsulta de objeto sql2 en objeto sql
 		sql.SELECT("CONSULTA.*");
 		sql.FROM( "(" + sql2 + ") consulta");
+		
+		return sql.toString();
+	}
+	
+
+	
+	public String searchGeneralData(PersonaJuridicaSearchDTO personaJuridicaSearchDTO) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT(" DISTINCT COL.IDINSTITUCION AS IDINSTITUCION");
+		sql.SELECT("COL.IDPERSONA AS IDPERSONA");
+		sql.SELECT("COL.ANOTACIONES AS ANOTACIONES");
+		sql.SELECT("PER.NIFCIF AS NIF");
+		sql.SELECT("CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) AS DENOMINACION");
+		sql.SELECT("I.ABREVIATURA AS ABREVIATURA");
+		sql.SELECT("PER.FECHANACIMIENTO AS FECHACONSTITUCION");
+		sql.SELECT("COL.SOCIEDADPROFESIONAL AS SOCIEDADPROFESIONAL");
+		sql.SELECT("TIPOSOCIEDAD.LETRACIF  AS TIPO");
+		sql.SELECT("COL.FECHA_BAJA AS FECHA_BAJA");
+		sql.SELECT("NVL(COUNT(DISTINCT PER2.IDPERSONA),0) AS NUMEROINTEGRANTES");
+		sql.SELECT("LISTAGG(CONCAT(PER2.NOMBRE ||' ',CONCAT(PER2.APELLIDOS1 || ' ',PER2.APELLIDOS2)), ';') WITHIN GROUP (ORDER BY PER2.NOMBRE) AS NOMBRESINTEGRANTES");
+		sql.SELECT("LISTAGG(GRUPOS_CLIENTE.IDGRUPO, ';') WITHIN GROUP (ORDER BY GRUPOS_CLIENTE.IDGRUPO)  OVER (PARTITION BY COL.IDPERSONA) AS IDGRUPO");
+		sql.FROM(" CEN_NOCOLEGIADO COL");
+		sql.INNER_JOIN(" CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA ");
+		sql.INNER_JOIN(" CEN_INSTITUCION I ON COL.IDINSTITUCION = I.IDINSTITUCION ");
+		sql.INNER_JOIN(" CEN_TIPOSOCIEDAD  TIPOSOCIEDAD ON TIPOSOCIEDAD.LETRACIF = COL.TIPO ");
+		sql.INNER_JOIN(" GEN_RECURSOS_CATALOGOS CA ON (TIPOSOCIEDAD.DESCRIPCION = CA.IDRECURSO  AND CA.IDLENGUAJE = '" + personaJuridicaSearchDTO.getIdLenguaje() +"') "
+				+ "LEFT JOIN CEN_GRUPOSCLIENTE_CLIENTE GRUPOS_CLIENTE ON (GRUPOS_CLIENTE.IDINSTITUCION = I.IDINSTITUCION AND COL.IDPERSONA = GRUPOS_CLIENTE.IDPERSONA)"
+				+ "LEFT JOIN CEN_COMPONENTES COM ON (COM.IDPERSONA = COL.IDPERSONA AND COL.IDINSTITUCION = COM.IDINSTITUCION )"
+				+ "LEFT JOIN CEN_CLIENTE CLI ON (COM.CEN_CLIENTE_IDPERSONA = CLI.IDPERSONA AND CLI.IDINSTITUCION = COM.IDINSTITUCION )"
+				+ "LEFT JOIN CEN_PERSONA PER2 ON PER2.IDPERSONA = CLI.IDPERSONA ");
+		sql.WHERE(" I.IDINSTITUCION = '" + personaJuridicaSearchDTO.getIdInstitucion() +"'");
+		sql.WHERE("COL.IDPERSONA = '" + personaJuridicaSearchDTO.getIdPersona() + "'");
+		
+		sql.GROUP_BY("COL.IDINSTITUCION");
+		sql.GROUP_BY("COL.IDPERSONA");
+		sql.GROUP_BY("COL.ANOTACIONES");
+		sql.GROUP_BY("PER.NIFCIF");
+		sql.GROUP_BY("PER.NOMBRE");
+		sql.GROUP_BY("PER.APELLIDOS1");
+		sql.GROUP_BY("PER.APELLIDOS2");
+		sql.GROUP_BY("I.ABREVIATURA");
+		sql.GROUP_BY("PER.FECHANACIMIENTO");
+		sql.GROUP_BY("COL.SOCIEDADPROFESIONAL");
+		sql.GROUP_BY("COL.TIPO");
+		sql.GROUP_BY("TIPOSOCIEDAD.LETRACIF");
+		sql.GROUP_BY("GRUPOS_CLIENTE.IDGRUPO");
+		sql.GROUP_BY("COL.FECHA_BAJA");
+		
+		
+		return sql.toString();
+	}
+	
+	
+	public String insertSelectiveForCreateLegalPerson(String idInstitucion, AdmUsuarios usuario,EtiquetaUpdateDTO etiquetaUpdateDTO) {
+		SQL sql = new SQL();
+		
+
+		sql.INSERT_INTO("CEN_NOCOLEGIADO");
+		
+		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona)");
+		sql.VALUES("IDINSTITUCION", idInstitucion);
+		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		sql.VALUES("USUMODIFICACION", String.valueOf(usuario.getIdusuario()));
+		sql.VALUES("SERIE", "");
+		sql.VALUES("NUMEROREF", "");
+		sql.VALUES("SOCIEDADSJ", "0");
+		sql.VALUES("TIPO", etiquetaUpdateDTO.getTipo());
+		sql.VALUES("ANOTACIONES", etiquetaUpdateDTO.getAnotaciones());
+		sql.VALUES("PREFIJO_NUMREG", "");
+		sql.VALUES("CONTADOR_NUMREG", "");
+		sql.VALUES("SUFIJO_NUMREG", "");
+		sql.VALUES("FECHAFIN", "");
+		sql.VALUES("IDPERSONANOTARIO", "");
+		sql.VALUES("RESENA", "");
+		sql.VALUES("OBJETOSOCIAL", "");
+		sql.VALUES("SOCIEDADPROFESIONAL", "0");
+		sql.VALUES("PREFIJO_NUMSSPP", "");
+		sql.VALUES("CONTADOR_NUMSSPP", "");
+		sql.VALUES("SUFIJO_NUMSSPP", "");
+		sql.VALUES("NOPOLIZA", "");
+		sql.VALUES("COMPANIASEG", "");
+		sql.VALUES("IDENTIFICADORDS", "");
+		sql.VALUES("FECHA_BAJA", null);
 		
 		return sql.toString();
 	}

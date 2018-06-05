@@ -6,9 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
-import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
-import org.itcgae.siga.DTOs.cen.PersonaJuridicaFotoDTO;
+import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.cen.PersonaJuridicaDTO;
+import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.cen.services.ITarjetaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +28,23 @@ public class TarjetaDatosGeneralesController {
 	@Autowired 
 	private ITarjetaDatosGeneralesService tarjetaDatosGeneralesService;
 	
-	@RequestMapping(value = "/personaJuridica/cargarFotografia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UpdateResponseDTO> loadPhotography(@RequestBody PersonaJuridicaFotoDTO personaJuridicaFotoDTO, HttpServletRequest request, HttpServletResponse response) {
-		UpdateResponseDTO response1 = tarjetaDatosGeneralesService.loadPhotography(personaJuridicaFotoDTO, request, response);
-		
-		if(response1.getStatus().equals(SigaConstants.OK))
+//	@RequestMapping(value = "/personaJuridica/cargarFotografia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<UpdateResponseDTO> loadPhotography(@RequestBody PersonaJuridicaFotoDTO personaJuridicaFotoDTO, HttpServletRequest request, HttpServletResponse response) {
+//		UpdateResponseDTO response1 = tarjetaDatosGeneralesService.loadPhotography(personaJuridicaFotoDTO, request, response);
+//		
+//		if(response1.getStatus().equals(SigaConstants.OK))
+//			return new ResponseEntity<UpdateResponseDTO>(HttpStatus.OK);
+//			else return new ResponseEntity<UpdateResponseDTO>(HttpStatus.FORBIDDEN);
+//    }
+	
+	@RequestMapping(value = "/personaJuridica/cargarFotografia", method = RequestMethod.GET)
+  public ResponseEntity<UpdateResponseDTO> loadPhotography(HttpServletRequest request, HttpServletResponse response) {
+		tarjetaDatosGeneralesService.loadPhotography(request, response);
+		//if(response1.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(HttpStatus.OK);
-			else return new ResponseEntity<UpdateResponseDTO>(HttpStatus.FORBIDDEN);
-    }
+			//else return new ResponseEntity<UpdateResponseDTO>(HttpStatus.FORBIDDEN);
+  }
+	
 	
 	
 	@RequestMapping(value = "personaJuridica/uploadFotografia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -47,11 +56,18 @@ public class TarjetaDatosGeneralesController {
 	}
 	
 	
-//	@RequestMapping(value = "busquedaPerJuridica/datosGeneralesSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<BusquedaJuridicaDTO> searchGeneralData(@RequestParam("numPagina") int numPagina, @RequestBody PersonaJuridicaSearch personaJuridicaSearch, HttpServletRequest request) { 
-//		BusquedaJuridicaDTO response = tarjetaDatosGeneralesService.searchGeneralData(numPagina, personaJuridicaDTO, request);
-//		return new ResponseEntity<BusquedaJuridicaDTO >(response, HttpStatus.OK);
-//	}
+	@RequestMapping(value = "busquedaPerJuridica/datosGeneralesSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PersonaJuridicaDTO> searchGeneralData(@RequestParam("numPagina") int numPagina, @RequestBody PersonaJuridicaSearchDTO personaJuridicaSearchDTO, HttpServletRequest request) { 
+		PersonaJuridicaDTO response = tarjetaDatosGeneralesService.searchGeneralData(numPagina, personaJuridicaSearchDTO, request);
+		return new ResponseEntity<PersonaJuridicaDTO >(response, HttpStatus.OK);
+	}
+	
+	
+	@RequestMapping(value = "busquedaPerJuridica/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> createLabel(@RequestBody EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request) { 
+		UpdateResponseDTO response = tarjetaDatosGeneralesService.createLegalPerson(etiquetaUpdateDTO, request);
+		return new ResponseEntity<UpdateResponseDTO >(response, HttpStatus.OK);
+	}
 	
 	
 	

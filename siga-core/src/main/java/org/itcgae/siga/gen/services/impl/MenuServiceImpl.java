@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,7 +43,6 @@ import org.itcgae.siga.db.entities.AdmGestorinterfazExample;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmTiposacceso;
-import org.itcgae.siga.db.entities.AdmTiposaccesoExample;
 import org.itcgae.siga.db.entities.AdmTiposaccesoKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
@@ -50,6 +51,7 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.GenMenu;
+import org.itcgae.siga.db.entities.GenMenuExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
@@ -57,6 +59,7 @@ import org.itcgae.siga.db.mappers.AdmGestorinterfazMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
+import org.itcgae.siga.db.mappers.GenMenuMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -80,6 +83,10 @@ public class MenuServiceImpl implements IMenuService {
 
 	@Autowired
 	private GenMenuExtendsMapper menuExtend;
+	
+	@Autowired
+	private GenMenuMapper menuMapper;
+	
 	
 	@Autowired
 	private CenInstitucionExtendsMapper institucionMapper;
@@ -177,6 +184,33 @@ public class MenuServiceImpl implements IMenuService {
 		menuEntities = menuExtend.selectMenuByExample(String.valueOf(idInstitucion), idPerfiles);
 
 		if (null != menuEntities && !menuEntities.isEmpty()) {
+			Boolean tieneRuedaConf = Boolean.FALSE;
+			Boolean tieneMenuConfi = Boolean.FALSE;
+			for (GenMenu menu : menuEntities) {
+				if (menu.getIdrecurso().equals("menu.configuracion")) {
+					tieneRuedaConf = Boolean.TRUE;
+					break;
+				}else if(menu.getIdrecurso().equals("menu.administracion") || menu.getIdrecurso().equals("menu.administracion.gestionCatalogosMaestros")) {
+					tieneMenuConfi= Boolean.TRUE;
+				}
+			}
+			if (!tieneRuedaConf && tieneMenuConfi) {
+				GenMenuExample exampleMenu = new GenMenuExample();
+				exampleMenu.createCriteria().andIdrecursoEqualTo("menu.configuracion");
+				List<GenMenu> menuConfig = menuMapper.selectByExample(exampleMenu );
+				if (null != menuConfig && menuConfig.size()>0) {
+					menuEntities.add(menuConfig.get(0));
+					Collections.sort(menuEntities, new Comparator<GenMenu>() {
+						@Override
+						public int compare(GenMenu o1, GenMenu o2) {
+
+							return new Long(o1.getOrden()).compareTo(new Long(o2.getOrden()));
+						}
+
+					});
+				}
+			}
+			
 			List<MenuItem> items = new ArrayList<MenuItem>();
 			List<GenMenu> rootMenus = menuEntities.stream()
 					.filter(i -> Strings.isNullOrEmpty(i.getIdparent()) || i.getIdparent().equals(" "))
@@ -545,7 +579,6 @@ public class MenuServiceImpl implements IMenuService {
 		// Obtenemos atributos del usuario logeado
 		LOGGER.debug("Obtenemos atributos del usuario logeado");
 		String token = httpRequest.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short institucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		GenPropertiesExample genPropertiesExample = new GenPropertiesExample();

@@ -28,11 +28,13 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
                 + "null,(select param2.valor from gen_parametros param2 where param.parametro = param2.parametro and idinstitucion = '0' and param.MODULO = param2.MODULO),"
                 + "(select param2.valor from gen_parametros param2 where param.parametro = param2.parametro and idinstitucion = '" + parametroRequestDTO.getIdInstitucion() + "' and param.MODULO =param2.MODULO)) AS VALOR");
         sql.SELECT("DECODE(COUNT(IDINSTITUCION),1,'0','" + parametroRequestDTO.getIdInstitucion() + "') AS IDINSTITUCION");
+        sql.SELECT(" DICC.DESCRIPCION");
         sql.FROM("gen_parametros param ");
+        sql.INNER_JOIN(" gen_diccionario  DICC on PARAM.idrecurso = DICC.IDRECURSO");
         sql.WHERE("IDINSTITUCION IN ('" + parametroRequestDTO.getIdInstitucion() + "','0')");
         sql.WHERE("MODULO = '" + parametroRequestDTO.getModulo() + "'");
         sql.WHERE("FECHA_BAJA IS NULL");
-        sql.GROUP_BY("param.modulo, param.parametro, param.idrecurso");
+        sql.GROUP_BY("param.modulo, param.parametro, param.idrecurso, DICC.DESCRIPCION");
         sql.ORDER_BY(" PARAM.MODULO ");
 		
 		return sql.toString();
@@ -52,12 +54,13 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 				+ "(SELECT PARAM2.VALOR FROM GEN_PARAMETROS PARAM2 WHERE PARAM.PARAMETRO = PARAM2.PARAMETRO AND   IDINSTITUCION = '2000' AND   PARAM.MODULO = PARAM2.MODULO) )AS VALOR");
 		
 		sql.SELECT(" PARAM.IDINSTITUCION ");
+		sql.SELECT("DICC.DESCRIPCION");
 		sql.FROM(" (SELECT DISTINCT PARAMETRO.MODULO, PARAMETRO.PARAMETRO, DECODE(MAX( DECODE(IDINSTITUCION,'2000','9999',IDINSTITUCION )),'9999','2000',MAX(IDINSTITUCION)) IDINSTITUCION "
 				+ " FROM    GEN_PARAMETROS PARAMETRO "
 				+ " WHERE IDINSTITUCION IN ( '"+ parametroRequestDTO.getIdInstitucion() +"', '0', '2000' ) AND   MODULO = '"+ parametroRequestDTO.getModulo() +"' AND   FECHA_BAJA IS NULL "
 				+ " GROUP BY PARAMETRO.MODULO,  PARAMETRO.PARAMETRO ORDER BY PARAMETRO) PARAM ");
 		sql.INNER_JOIN(" GEN_PARAMETROS PARAM3 ON (PARAM3.MODULO = PARAM.MODULO AND PARAM.PARAMETRO = PARAM3.PARAMETRO AND PARAM.IDINSTITUCION = PARAM3.IDINSTITUCION) ");
-
+		sql.INNER_JOIN(" GEN_DICCIONARIO DICC ON PARAM3.IDRECURSO = DICC.IDRECURSO");
 		
 		return sql.toString();
 	}
@@ -73,10 +76,12 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 		
 		sql.SELECT("DECODE(COUNT(IDINSTITUCION),1,'0','" + parametroRequestDTO.getIdInstitucion() + "') AS IDINSTITUCION");
 		sql.SELECT("FECHA_BAJA");
+		sql.SELECT(" DICC.DESCRIPCION");
 		sql.FROM("gen_parametros param");
+		sql.INNER_JOIN(" gen_diccionario  DICC on PARAM.idrecurso = DICC.IDRECURSO");
 		sql.WHERE("IDINSTITUCION IN ('" + parametroRequestDTO.getIdInstitucion() + "','0')");
 		sql.WHERE("MODULO = '" + parametroRequestDTO.getModulo() + "'");
-		sql.GROUP_BY("param.modulo, param.parametro");
+		sql.GROUP_BY("param.modulo, param.parametro,FECHA_BAJA, DICC.DESCRIPCION");
 		
 		return sql.toString();
 	}
