@@ -233,16 +233,25 @@ public class GenTablasMaestrasSqlExtendProvider {
 		sql.WHERE(" TAB.FECHA_BAJA is null ");
 		sql.WHERE("REC.idlenguaje = '"+ catalogoUpdate.getIdLenguaje() +"'");
 		
+		// comprueba si existen otros registros con esa descripcion
 		if(!catalogoUpdate.getDescripcion().equals("")) {
-			sql.WHERE(" upper(REC.descripcion) = upper('" + catalogoUpdate.getDescripcion() +"')");
+			sql.WHERE(" upper(REC.descripcion) = upper('"+catalogoUpdate.getDescripcion()+"')");
+			sql.WHERE("TAB.IDCOSTEFIJO != '"+ catalogoUpdate.getIdRegistro() +"'");
 		}
 		
-		
+		// comprueba si existen otros registros con ese codigoExt
 		if(!catalogoUpdate.getCodigoExt().equals("")) {
-			sql.WHERE("upper(TAB.CODIGOEXT) = upper('" + catalogoUpdate.getCodigoExt() + "')");
+			sql.WHERE("upper(TAB.CODIGOEXT) = upper('"+catalogoUpdate.getCodigoExt()+"')");
+			sql.WHERE("TAB.IDCOSTEFIJO != '"+ catalogoUpdate.getIdRegistro() +"'");
 		}
 		
+		// comprueba codigoext y descripcion. Esto pasa si codigoExt = ""
+		if(!catalogoUpdate.getCodigoExt().equals("") && !catalogoUpdate.getDescripcion().equals("")) {
+			sql.WHERE("upper(TAB.CODIGOEXT) = upper('"+ catalogoUpdate.getCodigoExt() + "')");
+			sql.WHERE(" upper(REC.descripcion) = upper('"+ catalogoUpdate.getDescripcion() +"')");
+		}
 		
     	return sql.toString();
     }
+    
 }

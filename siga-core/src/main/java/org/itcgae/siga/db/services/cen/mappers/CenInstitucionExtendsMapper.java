@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.adm.EntidadLenguajeInstitucionDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
@@ -58,6 +59,12 @@ public interface CenInstitucionExtendsMapper extends CenInstitucionMapper {
 	@Results({ @Result(column = "IDLENGUAJE", property = "idLenguaje", jdbcType = JdbcType.DECIMAL, id = true)
 			})
 	EntidadLenguajeInstitucionDTO getInstitutionLenguage(String idInstitucion);
+	
+	@SelectProvider(type = CenInstitucionSqlExtendsProvider.class, method = "getComboInstituciones")
+	@Results({ @Result(column = "IDINSTITUCION", property = "label"),
+		 		@Result(column = "NOMBRE", property = "value")
+			})
+	List<ComboItem> getComboInstituciones(); 
 	
 	
 }

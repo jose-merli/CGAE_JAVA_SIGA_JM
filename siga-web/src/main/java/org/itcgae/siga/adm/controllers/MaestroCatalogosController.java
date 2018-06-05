@@ -48,6 +48,7 @@ public class MaestroCatalogosController {
 	   if(response.getStatus().equals(SigaConstants.OK))
 		   return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	   else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+
 	}
    
    @RequestMapping(value = "/catmaestros/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
