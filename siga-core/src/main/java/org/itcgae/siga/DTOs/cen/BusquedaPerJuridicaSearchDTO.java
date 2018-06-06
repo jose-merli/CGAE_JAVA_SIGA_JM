@@ -1,6 +1,5 @@
 package org.itcgae.siga.DTOs.cen;
 
-import java.util.Date;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,7 +10,7 @@ public class BusquedaPerJuridicaSearchDTO {
 	private String tipo;
 	private String nif;
 	private String denominacion;
-	private String idInstitucion;
+	private String [] idInstitucion;
 	private String numColegiado;
 	
 
@@ -77,19 +76,19 @@ public class BusquedaPerJuridicaSearchDTO {
 	/**
 	 *
 	 */
-	public BusquedaPerJuridicaSearchDTO idInstitucion(String idInstitucion){
+	public BusquedaPerJuridicaSearchDTO idInstitucion(String [] idInstitucion){
 		this.idInstitucion = idInstitucion;
 		return this;
 	}
 	
 	
 	@JsonProperty("idInstitucion")
-	public String getIdInstitucion() {
+	public String [] getIdInstitucion() {
 		return idInstitucion;
 	}
 
 	
-	public void setIdInstitucion(String idInstitucion) {
+	public void setIdInstitucion(String [] idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
 	
@@ -126,12 +125,13 @@ public class BusquedaPerJuridicaSearchDTO {
 	    return Objects.equals(this.tipo, busquedaJuridicaSearchDTO.tipo) &&
 	    		Objects.equals(this.nif, busquedaJuridicaSearchDTO.nif) &&
 	    		Objects.equals(this.denominacion, busquedaJuridicaSearchDTO.denominacion) &&
-	    		Objects.equals(this.idInstitucion, busquedaJuridicaSearchDTO.idInstitucion);
+	    		Objects.equals(this.idInstitucion, busquedaJuridicaSearchDTO.idInstitucion) &&
+	    		Objects.equals(this.numColegiado, busquedaJuridicaSearchDTO.numColegiado);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(tipo, nif, denominacion, idInstitucion);
+	    return Objects.hash(tipo, nif, denominacion, idInstitucion, numColegiado);
 	}
 
 	
@@ -144,6 +144,7 @@ public class BusquedaPerJuridicaSearchDTO {
 	    sb.append("    nif: ").append(toIndentedString(nif)).append("\n");
 	    sb.append("    denominacion: ").append(toIndentedString(denominacion)).append("\n");
 	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
+	    sb.append("    numColegiado: ").append(toIndentedString(numColegiado)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
