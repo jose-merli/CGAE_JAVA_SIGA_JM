@@ -7,10 +7,10 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaSearchDTO;
-import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaItem;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -30,12 +30,39 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	})
 	ComboItem loadPhotography(String idPersona);
 	
+
 	
-	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "searchPerFisica")	
-	List<BusquedaPerFisicaItem> searchPerFisica(int numpagina, BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO);
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "searchPerFisica")
+	@Results({
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "COLEGIO", property = "colegio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR), 
+		@Result(column = "APELLIDOS", property = "primerApellido", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "RESIDENTE", property = "residente", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ESTADOCOLEGIAL", property = "situacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DENOMINACION", property = "nombre", jdbcType = JdbcType.VARCHAR)	
+	})
+	List<BusquedaPerFisicaItem> searchPerFisica(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, String idLenguaje);
 	
-	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "searchPerFisica")	
-	List<BusquedaPerJuridicaItem> searchPerJuridica(int numpagina, BusquedaPerJuridicaSearchDTO busquedaPerJuridicaSearchDTO);
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "searchPerJuridica")
+	@Results({
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOIDENTIFICACION", property = "idTipoIdentificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DENOMINACION", property = "denominacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHACONSTITUCION", property = "fechaConstitucion", jdbcType = JdbcType.DATE),
+		@Result(column = "SOCIEDADPROFESIONAL", property = "sociedadProfesional", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR), 
+		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "NUMEROINTEGRANTES", property = "numeroIntegrantes", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRESINTEGRANTES", property = "nombresIntegrantes", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
+	})
+	List<BusquedaPerJuridicaItem> searchPerJuridica(int numpagina, BusquedaPerJuridicaSearchDTO busquedaPerJuridicaSearchDTO, String idLenguaje);
 	
 		
 	@InsertProvider(type = CenPersonaSqlExtendsProvider.class, method = "insertSelectiveForCreateLegalPerson")

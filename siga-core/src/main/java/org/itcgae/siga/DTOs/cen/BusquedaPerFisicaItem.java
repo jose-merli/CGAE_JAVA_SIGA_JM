@@ -12,14 +12,19 @@ public class BusquedaPerFisicaItem {
 	private String colegio;
 	private String idPersona;
 	private String nif;
+	private String nombre;
 	private String primerApellido;
 	private String segundoApellido;
 	private String numeroColegiado;
 	private String residente;
 	private String situacion;
 	@JsonFormat(pattern = "dd-MM-yyyy")
-	private Date fechaAlta;
+	private Date fechaNacimiento;
 	
+	
+
+
+
 	/**
 	 *
 	 */
@@ -78,6 +83,24 @@ public class BusquedaPerFisicaItem {
 		this.nif = nif;
 	}
 	
+	/**
+	 *
+	 */
+	public BusquedaPerFisicaItem nombre(String nombre){
+		this.nombre = nombre;
+		return this;
+	}
+	
+	
+	@JsonProperty("nombre")
+	public String getNombre() {
+		return nombre;
+	}
+
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
 	
 	/**
 	 *
@@ -136,7 +159,7 @@ public class BusquedaPerFisicaItem {
 	}
 	
 	
-	public void setNmeroColegiado(String numeroColegiado) {
+	public void setNumeroColegiado(String numeroColegiado) {
 		this.numeroColegiado = numeroColegiado;
 	}
 	
@@ -181,6 +204,27 @@ public class BusquedaPerFisicaItem {
 	}
 	 
 	
+	/**
+	 *
+	 */
+	public BusquedaPerFisicaItem fechaNacimiento(Date fechaNacimiento){
+		this.fechaNacimiento = fechaNacimiento;
+		return this;
+	}
+	
+	
+	
+	@JsonProperty("fechaNacimiento")
+	public Date getFechaNacimiento() {
+		return fechaNacimiento;
+	}
+
+
+
+
+	public void setFechaNacimiento(Date fechaNacimiento) {
+		this.fechaNacimiento = fechaNacimiento;
+	}
 	 
 	
 	@Override
@@ -195,18 +239,19 @@ public class BusquedaPerFisicaItem {
 	    return Objects.equals(this.colegio, busquedaFisicaItem.colegio) &&
 	    		Objects.equals(this.idPersona, busquedaFisicaItem.idPersona) &&
 	    		Objects.equals(this.nif, busquedaFisicaItem.nif) &&
+	    		Objects.equals(this.nombre, busquedaFisicaItem.nombre) &&
 	    		Objects.equals(this.primerApellido, busquedaFisicaItem.primerApellido) &&
 	    		Objects.equals(this.segundoApellido, busquedaFisicaItem.segundoApellido) &&
 	    		Objects.equals(this.numeroColegiado, busquedaFisicaItem.numeroColegiado) &&
 	    		Objects.equals(this.residente, busquedaFisicaItem.residente) &&
 	    		Objects.equals(this.situacion, busquedaFisicaItem.situacion) &&
-	    		Objects.equals(this.fechaAlta, busquedaFisicaItem.fechaAlta) ;
+	    		Objects.equals(this.fechaNacimiento, busquedaFisicaItem.fechaNacimiento) ;
 	}
  
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(colegio, idPersona, nif, primerApellido, segundoApellido, numeroColegiado, residente, situacion, fechaAlta);
+	    return Objects.hash(colegio, idPersona, nif, nombre, primerApellido, segundoApellido, numeroColegiado, residente, situacion, fechaNacimiento);
 	}
 
 	
@@ -218,12 +263,13 @@ public class BusquedaPerFisicaItem {
 	    sb.append("    colegio: ").append(toIndentedString(colegio)).append("\n");
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 	    sb.append("    nif: ").append(toIndentedString(nif)).append("\n");
+	    sb.append("    nombre: ").append(toIndentedString(nombre)).append("\n");
 	    sb.append("    primerApellido: ").append(toIndentedString(primerApellido)).append("\n");
 	    sb.append("    segundoApellido: ").append(toIndentedString(segundoApellido)).append("\n");
 	    sb.append("    numeroColegiado: ").append(toIndentedString(numeroColegiado)).append("\n");
 	    sb.append("    residente: ").append(toIndentedString(residente)).append("\n");
 	    sb.append("    situacion: ").append(toIndentedString(situacion)).append("\n");
-	    sb.append("    fechaAlta: ").append(toIndentedString(fechaAlta)).append("\n");
+	    sb.append("    fechaNacimiento: ").append(toIndentedString(fechaNacimiento)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}

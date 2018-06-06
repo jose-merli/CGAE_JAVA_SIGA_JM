@@ -2,7 +2,6 @@ package org.itcgae.siga.DTOs.cen;
 
 import java.util.Date;
 import java.util.Objects;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -21,9 +20,10 @@ public class BusquedaPerJuridicaItem {
 	private String nombresIntegrantes;
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaBaja;
+	private String idTipoIdentificacion;
+	private String sociedadProfesional;
 	
 	
-
 
 	/**
 	 *
@@ -227,6 +227,46 @@ public class BusquedaPerJuridicaItem {
 	}
 	
 	
+	/**
+	 *
+	 */
+	public BusquedaPerJuridicaItem idTipoIdentificacion(String idTipoIdentificacion){
+		this.idTipoIdentificacion = idTipoIdentificacion;
+		return this;
+	}
+	
+
+	@JsonProperty("idTipoIdentificacion")
+	public String getIdTipoIdentificacion() {
+		return idTipoIdentificacion;
+	}
+
+
+	public void setIdTipoIdentificacion(String idTipoIdentificacion) {
+		this.idTipoIdentificacion = idTipoIdentificacion;
+	}
+
+	
+	/**
+	 *
+	 */
+	public BusquedaPerJuridicaItem sociedadProfesional(String sociedadProfesional){
+		this.sociedadProfesional = sociedadProfesional;
+		return this;
+	}
+	
+	
+	@JsonProperty("sociedadProfesional")
+	public String getSociedadProfesional() {
+		return sociedadProfesional;
+	}
+
+
+	public void setSociedadProfesional(String sociedadProfesional) {
+		this.sociedadProfesional = sociedadProfesional;
+	}
+
+	
 	 
 	
 	@Override
@@ -247,19 +287,21 @@ public class BusquedaPerJuridicaItem {
 	    		Objects.equals(this.tipo, busquedaJuridicaItem.tipo) &&
 	    		Objects.equals(this.numeroIntegrantes, busquedaJuridicaItem.numeroIntegrantes) &&
 	    		Objects.equals(this.nombresIntegrantes, busquedaJuridicaItem.nombresIntegrantes) &&
-	    		Objects.equals(this.fechaBaja, busquedaJuridicaItem.fechaBaja);
+	    		Objects.equals(this.fechaBaja, busquedaJuridicaItem.fechaBaja) &&  
+	    		Objects.equals(this.idTipoIdentificacion, busquedaJuridicaItem.idTipoIdentificacion) &&
+	    		Objects.equals(this.sociedadProfesional, busquedaJuridicaItem.sociedadProfesional);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idInstitucion, idPersona, nif, denominacion, abreviatura, fechaConstitucion, tipo, numeroIntegrantes, nombresIntegrantes, fechaBaja);
+	    return Objects.hash(idInstitucion, idPersona, nif, denominacion, abreviatura, fechaConstitucion, tipo, numeroIntegrantes, nombresIntegrantes, fechaBaja, idTipoIdentificacion, sociedadProfesional);
 	}
 
 	
 	@Override
 	public String toString() {
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("class BusquedaJuridicaItem {\n");
+	    sb.append("class BusquedaPerJuridicaItem {\n");
 	    
 	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
@@ -271,6 +313,8 @@ public class BusquedaPerJuridicaItem {
 	    sb.append("    numeroIntegrantes: ").append(toIndentedString(numeroIntegrantes)).append("\n");
 	    sb.append("    nombresIntegrantes: ").append(toIndentedString(nombresIntegrantes)).append("\n");
 	    sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
+	    sb.append("    idTipoIdentificacion: ").append(toIndentedString(idTipoIdentificacion)).append("\n");
+	    sb.append("    sociedadProfesional: ").append(toIndentedString(sociedadProfesional)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
