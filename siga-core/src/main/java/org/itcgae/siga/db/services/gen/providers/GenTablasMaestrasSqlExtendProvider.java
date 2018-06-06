@@ -217,8 +217,8 @@ public class GenTablasMaestrasSqlExtendProvider {
     
     
     
-    public String selectNoRepetidosCodigoExtyDescripcion(GenTablasMaestras tablaMaestra,CatalogoUpdateDTO catalogoUpdate) {
-    	SQL sql = new SQL();
+    public String selectUpdateNoRepetidosCodigoExtyDescripcion(GenTablasMaestras tablaMaestra,CatalogoUpdateDTO catalogoUpdate) {
+    	SQL sql = new SQL();    	
     	
 		sql.SELECT("REC.descripcion");
 		sql.SELECT("TAB.DESCRIPCION AS IDREGISTRO");
@@ -250,6 +250,37 @@ public class GenTablasMaestrasSqlExtendProvider {
 			sql.WHERE("upper(TAB.CODIGOEXT) = upper('"+ catalogoUpdate.getCodigoExt() + "')");
 			sql.WHERE(" upper(REC.descripcion) = upper('"+ catalogoUpdate.getDescripcion() +"')");
 		}
+		
+    	return sql.toString();
+    }
+    
+    
+    public String selectCreateNoRepetidosCodigoExtyDescripcion(GenTablasMaestras tablaMaestra,CatalogoUpdateDTO catalogoUpdate) {
+    	SQL sql = new SQL();    	
+    	
+		sql.SELECT("REC.descripcion");
+		sql.SELECT("TAB.DESCRIPCION AS IDREGISTRO");
+		sql.SELECT("TAB.CODIGOEXT");
+		sql.SELECT("REC.NOMBRETABLA AS CATALOGO");
+		sql.SELECT("REC.idinstitucion");
+		sql.SELECT("TAB.FECHA_BAJA");
+		
+		sql.FROM(tablaMaestra.getIdtablamaestra() + " TAB" );
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON(REC.IDRECURSO = " + " TAB." + tablaMaestra.getIdcampodescripcion() +") ");
+		sql.WHERE(" REC.idinstitucion = '" + catalogoUpdate.getIdInstitucion() + "'");
+		sql.WHERE(" TAB.FECHA_BAJA is null ");
+		sql.WHERE("REC.idlenguaje = '"+ catalogoUpdate.getIdLenguaje() +"'");
+		
+		// comprueba si existen otros registros con ese codigoExt
+		if(!catalogoUpdate.getCodigoExt().equals("")) {
+			sql.WHERE("upper(TAB.CODIGOEXT) = upper('"+catalogoUpdate.getCodigoExt()+"')");
+		}
+//		
+//		// comprueba codigoext y descripcion. Esto pasa si codigoExt = ""
+//		if(!catalogoUpdate.getCodigoExt().equals("") && !catalogoUpdate.getDescripcion().equals("")) {
+//			sql.WHERE("upper(TAB.CODIGOEXT) = upper('"+ catalogoUpdate.getCodigoExt() + "')");
+//			sql.WHERE(" upper(REC.descripcion) = upper('"+ catalogoUpdate.getDescripcion() +"')");
+//		}
 		
     	return sql.toString();
     }

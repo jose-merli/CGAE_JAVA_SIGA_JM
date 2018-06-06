@@ -182,7 +182,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 				// Si nos llega el codigoExt = ""  y una descripcion
 				if (catalogoUpdate.getCodigoExt().equals("")) {
 						catalogoMaestroItems1 = genTablasMaestrasExtendsMapper
-							.selectNoRepetidosCodigoExtyDescripcion(tablaMaestra, catalogoUpdate);
+							.selectUpdateNoRepetidosCodigoExtyDescripcion(tablaMaestra, catalogoUpdate);
 
 					if (null == catalogoMaestroItems1 || catalogoMaestroItems1.size() == 0) {
 						LOGGER.info(
@@ -211,13 +211,13 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 					// comprueba codigoExt
 					String descripcion = catalogoUpdate.getDescripcion();
 					catalogoUpdate.setDescripcion("");
-					catalogoMaestroItems1 = genTablasMaestrasExtendsMapper.selectNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoUpdate);
+					catalogoMaestroItems1 = genTablasMaestrasExtendsMapper.selectUpdateNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoUpdate);
 					
 					// comprueba descripcion
 					catalogoUpdate.setDescripcion(descripcion);
 					String codigoExterno = catalogoUpdate.getCodigoExt();
 					catalogoUpdate.setCodigoExt("");
-					catalogoMaestroItems2 = genTablasMaestrasExtendsMapper.selectNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoUpdate);
+					catalogoMaestroItems2 = genTablasMaestrasExtendsMapper.selectUpdateNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoUpdate);
 					catalogoUpdate.setCodigoExt(codigoExterno);
 					
 					// actualiza codExterno
@@ -339,6 +339,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 
 	@Override
 	public UpdateResponseDTO createDatosCatalogo(CatalogoUpdateDTO catalogoCreate,HttpServletRequest request) {
+		List<CatalogoMaestroItem>  catalogoMaestroItems1 = new ArrayList<CatalogoMaestroItem>();  // comprueba campos no repetidos (codexterno)
 		//Creamos un nuevo registro en el catálogo con la tabla maestra seleccionada
 		LOGGER.info("createDatosCatalogo() -> Entrada al servicio para crear un nuevo registro en el catálogo con la tabla maestra seleccionada");
 		UpdateResponseDTO response = new UpdateResponseDTO();
@@ -362,12 +363,16 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 			
 			if (null != tablasMaestras && tablasMaestras.size() > 0) {
 					GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
+					
 					//Obtenemos el recurso para ver si ya existe
 					GenRecursosCatalogosExample exampleRecursos = new GenRecursosCatalogosExample();
 					exampleRecursos.createCriteria().andDescripcionEqualTo(catalogoCreate.getDescripcion()).andNombretablaEqualTo(tablaMaestra.getIdtablamaestra()).andIdinstitucionEqualTo(Short.valueOf(catalogoCreate.getIdInstitucion()));
-					LOGGER.info("deleteDatosCatalogo() / genRecursosCatalogosMapper.selectByExample() -> Entrada a genRecursosCatalogosMapper para obtener institución de la columna de una tabla maestra");
+					LOGGER.info("createDatosCatalogo() / genRecursosCatalogosMapper.selectByExample() -> Entrada a genRecursosCatalogosMapper para obtener institución de la columna de una tabla maestra");
 					List<GenRecursosCatalogos> recursos = genRecursosCatalogosMapper.selectByExample(exampleRecursos);
-					LOGGER.info("deleteDatosCatalogo() / genRecursosCatalogosMapper.selectByExample() -> Entrada a genRecursosCatalogosMapper para obtener institución de la columna de una tabla maestra");
+					LOGGER.info("createDatosCatalogo() / genRecursosCatalogosMapper.selectByExample() -> Entrada a genRecursosCatalogosMapper para obtener institución de la columna de una tabla maestra");
+					
+				
+					
 					if (null != recursos && recursos.size() > 0) {
 						Error error = new Error();
 						error.setMessage("Ya existe un registro para esa descripción");
@@ -376,6 +381,8 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 						LOGGER.warn("deleteDatosCatalogo() -> KO. Ya existe un registro para esa descripción");
 						return response;
 					}
+					
+				
 					
 					LOGGER.info("createDatosCatalogo() / genTablasMaestrasExtendsMapper.selectColumnName() -> Entrada a genTablasMaestrasExtendsMapper para obtener institución de la columna de una tabla maestra");
 					InstitucionDTO idInstitucion = genTablasMaestrasExtendsMapper.selectColumnName(tablaMaestra);
@@ -389,31 +396,46 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(catalogoCreate.getIdInstitucion()));
 					
 					//Obtenemos el usuario para añadir el USUMODIFICACION
-					LOGGER.info("deleteDatosCatalogo() / admUsuariosMapper.selectByExample() -> Entrada a admUsuariosMapper para obtener información del usuario logeado");
+					LOGGER.info("createDatosCatalogo() / admUsuariosMapper.selectByExample() -> Entrada a admUsuariosMapper para obtener información del usuario logeado");
 					List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
-					LOGGER.info("deleteDatosCatalogo() / admUsuariosMapper.selectByExample() -> Salida de admUsuariosMapper para obtener información del usuario logeado");
+					LOGGER.info("createDatosCatalogo() / admUsuariosMapper.selectByExample() -> Salida de admUsuariosMapper para obtener información del usuario logeado");
 					if(null != usuarios && usuarios.size() > 0) {
 						AdmUsuarios usuario = usuarios.get(0);
 						catalogoCreate.setIdLenguaje(usuario.getIdlenguaje());
-						LOGGER.info("deleteDatosCatalogo() / genTablasMaestrasExtendsMapper.createRecursos() -> Entrada a genTablasMaestrasExtendsMapper para crear relación entre recursos-catalogos");
-						respuesta1 = genTablasMaestrasExtendsMapper.createRecursos(tablaMaestra,catalogoCreate,isInstitucion,usuario.getIdusuario());
-						LOGGER.info("deleteDatosCatalogo() / genTablasMaestrasExtendsMapper.createRecursos() -> Salida de genTablasMaestrasExtendsMapper para crear relación entre recursos-catalogos");
+								
+						// comprueba codigoExt
+						catalogoMaestroItems1 = genTablasMaestrasExtendsMapper.selectCreateNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoCreate);
 						
-						LOGGER.info("deleteDatosCatalogo() / genTablasMaestrasExtendsMapper.createCatalogo() -> Entrada a genTablasMaestrasExtendsMapper para crear un catálogo de la tabla maestra");
+						//compruebo que el codigo externo no existe y si existe, me salgo
+						if(catalogoMaestroItems1.size()>0)
+						{
+							response.setStatus(SigaConstants.KO);
+							Error error = new Error();
+							error.setMessage("Ya existe un registro con este código externo");
+							response.setError(error);	
+							return response;
+						}			
+						
+						
+						LOGGER.info("createDatosCatalogo() / genTablasMaestrasExtendsMapper.createRecursos() -> Entrada a genTablasMaestrasExtendsMapper para crear relación entre recursos-catalogos");
+						respuesta1 = genTablasMaestrasExtendsMapper.createRecursos(tablaMaestra,catalogoCreate,isInstitucion,usuario.getIdusuario());
+						LOGGER.info("createDatosCatalogo() / genTablasMaestrasExtendsMapper.createRecursos() -> Salida de genTablasMaestrasExtendsMapper para crear relación entre recursos-catalogos");
+						
+						LOGGER.info("createDatosCatalogo() / genTablasMaestrasExtendsMapper.createCatalogo() -> Entrada a genTablasMaestrasExtendsMapper para crear un catálogo de la tabla maestra");
 						respuesta2 = genTablasMaestrasExtendsMapper.createCatalogo(tablaMaestra,catalogoCreate,isInstitucion,usuario.getIdusuario());
-						LOGGER.info("deleteDatosCatalogo() / genTablasMaestrasExtendsMapper.createCatalogo() -> Salida de genTablasMaestrasExtendsMapper para crear un catálogo de la tabla maestra");
+						LOGGER.info("createDatosCatalogo() / genTablasMaestrasExtendsMapper.createCatalogo() -> Salida de genTablasMaestrasExtendsMapper para crear un catálogo de la tabla maestra");
 						
 						if(respuesta1 == 1 && respuesta2 == 1) {
 							response.setStatus(SigaConstants.OK);
 						}
 						else {
 							response.setStatus(SigaConstants.KO);
-							LOGGER.warn("deleteDatosCatalogo() -> KO. NO se ha realizado correctamente la creacion de tablas recursos-catálogos y/o crear un catálogo de la tabla maestra");
+							LOGGER.warn("createDatosCatalogo() -> KO. NO se ha realizado correctamente la creacion de tablas recursos-catálogos y/o crear un catálogo de la tabla maestra");
 						}
 					}
 					else {
 						response.setStatus(SigaConstants.KO);
-						LOGGER.warn("deleteDatosCatalogo() -> KO. NO se han podido obtener los usuarios o no existen");
+						LOGGER.warn("createDatosCatalogo() -> KO. NO se han podido obtener los usuarios o no existen");
 					}
 					
 			}

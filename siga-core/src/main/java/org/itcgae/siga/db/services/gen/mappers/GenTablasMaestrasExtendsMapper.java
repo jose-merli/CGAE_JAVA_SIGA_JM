@@ -131,7 +131,7 @@ public interface GenTablasMaestrasExtendsMapper extends GenTablasMaestrasMapper{
     
     
     
-    @SelectProvider(type=GenTablasMaestrasSqlExtendProvider.class, method="selectNoRepetidosCodigoExtyDescripcion")
+    @SelectProvider(type=GenTablasMaestrasSqlExtendProvider.class, method="selectUpdateNoRepetidosCodigoExtyDescripcion")
     @Results({
         @Result(column="CATALOGO", property="catalogo", jdbcType=JdbcType.VARCHAR, id=true),
         @Result(column="CODIGOEXT", property="codigoExt", jdbcType=JdbcType.DECIMAL),
@@ -141,6 +141,18 @@ public interface GenTablasMaestrasExtendsMapper extends GenTablasMaestrasMapper{
         @Result(column="FECHA_BAJA", property="fechaBaja", jdbcType=JdbcType.VARCHAR)
 
     })
-    List<CatalogoMaestroItem> selectNoRepetidosCodigoExtyDescripcion(GenTablasMaestras tablaMaestra,CatalogoUpdateDTO catalogoUpdate);
+    List<CatalogoMaestroItem> selectUpdateNoRepetidosCodigoExtyDescripcion(GenTablasMaestras tablaMaestra,CatalogoUpdateDTO catalogoUpdate);
+    
+    @SelectProvider(type=GenTablasMaestrasSqlExtendProvider.class, method="selectCreateNoRepetidosCodigoExtyDescripcion")
+    @Results({
+        @Result(column="CATALOGO", property="catalogo", jdbcType=JdbcType.VARCHAR, id=true),
+        @Result(column="CODIGOEXT", property="codigoExt", jdbcType=JdbcType.DECIMAL),
+        @Result(column="DESCRIPCION", property="descripcion", jdbcType=JdbcType.DECIMAL),
+        @Result(column="IDINSTITUCION", property="idInstitucion", jdbcType=JdbcType.VARCHAR),
+        @Result(column="IDREGISTRO", property="idRegistro", jdbcType=JdbcType.VARCHAR),
+        @Result(column="FECHA_BAJA", property="fechaBaja", jdbcType=JdbcType.VARCHAR)
+
+    })
+    List<CatalogoMaestroItem> selectCreateNoRepetidosCodigoExtyDescripcion(GenTablasMaestras tablaMaestra,CatalogoUpdateDTO catalogoUpdate);
    
 }
