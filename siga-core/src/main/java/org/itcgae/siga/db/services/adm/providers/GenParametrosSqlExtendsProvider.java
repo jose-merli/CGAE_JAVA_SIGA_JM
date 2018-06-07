@@ -18,7 +18,7 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 	}
 	
 	
-	public String getParametersSearch(int numPagina, ParametroRequestDTO parametroRequestDTO){
+	public String getParametersSearch(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje){
         SQL sql = new SQL();
 
         sql.SELECT("DISTINCT PARAM.MODULO");
@@ -33,7 +33,8 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
         sql.INNER_JOIN(" gen_diccionario  DICC on PARAM.idrecurso = DICC.IDRECURSO");
         sql.WHERE("IDINSTITUCION IN ('" + parametroRequestDTO.getIdInstitucion() + "','0')");
         sql.WHERE("MODULO = '" + parametroRequestDTO.getModulo() + "'");
-        sql.WHERE("FECHA_BAJA IS NULL");
+        sql.WHERE("FECHA_BAJA IS NULL"); 
+        sql.WHERE("DICC.IDLENGUAJE = '"+idLenguaje+"'");
         sql.GROUP_BY("param.modulo, param.parametro, param.idrecurso, DICC.DESCRIPCION");
         sql.ORDER_BY(" PARAM.MODULO ");
 		
@@ -41,7 +42,7 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 	}
 	
 	
-	public String getParametersSearchGeneral(int numPagina, ParametroRequestDTO parametroRequestDTO){
+	public String getParametersSearchGeneral(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje){
 		SQL sql = new SQL();
 
 		sql.SELECT("DISTINCT PARAM3.MODULO");
@@ -61,11 +62,11 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 				+ " GROUP BY PARAMETRO.MODULO,  PARAMETRO.PARAMETRO ORDER BY PARAMETRO) PARAM ");
 		sql.INNER_JOIN(" GEN_PARAMETROS PARAM3 ON (PARAM3.MODULO = PARAM.MODULO AND PARAM.PARAMETRO = PARAM3.PARAMETRO AND PARAM.IDINSTITUCION = PARAM3.IDINSTITUCION) ");
 		sql.INNER_JOIN(" GEN_DICCIONARIO DICC ON PARAM3.IDRECURSO = DICC.IDRECURSO");
-		
+		 sql.WHERE("DICC.IDLENGUAJE = '"+idLenguaje+"'");
 		return sql.toString();
 	}
 	
-	public String getParametersRecord(int numPagina, ParametroRequestDTO parametroRequestDTO){
+	public String getParametersRecord(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje){
 		SQL sql = new SQL();
 
 		sql.SELECT("DISTINCT PARAM.MODULO");
@@ -81,6 +82,7 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 		sql.INNER_JOIN(" gen_diccionario  DICC on PARAM.idrecurso = DICC.IDRECURSO");
 		sql.WHERE("IDINSTITUCION IN ('" + parametroRequestDTO.getIdInstitucion() + "','0')");
 		sql.WHERE("MODULO = '" + parametroRequestDTO.getModulo() + "'");
+		 sql.WHERE("DICC.IDLENGUAJE = '"+idLenguaje+"'");
 		sql.GROUP_BY("param.modulo, param.parametro,FECHA_BAJA, DICC.DESCRIPCION");
 		
 		return sql.toString();

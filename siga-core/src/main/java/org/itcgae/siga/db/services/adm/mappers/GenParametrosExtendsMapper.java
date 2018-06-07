@@ -36,7 +36,7 @@ public interface GenParametrosExtendsMapper extends GenParametrosMapper{
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ParametroItem> getParametersSearch(int numPagina, ParametroRequestDTO parametroRequestDTO);
+	List<ParametroItem> getParametersSearch(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje);
 	
 	
 	
@@ -49,7 +49,7 @@ public interface GenParametrosExtendsMapper extends GenParametrosMapper{
 		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ParametroItem> getParametersRecord(int numPagina, ParametroRequestDTO parametroRequestDTO);
+	List<ParametroItem> getParametersRecord(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje);
 	
 	
 	@SelectProvider(type = GenParametrosSqlExtendsProvider.class, method = "getParametersSearchGeneral")
@@ -61,6 +61,6 @@ public interface GenParametrosExtendsMapper extends GenParametrosMapper{
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ParametroItem> getParametersSearchGeneral(int numPagina, ParametroRequestDTO parametroRequestDTO);
+	List<ParametroItem> getParametersSearchGeneral(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje);
 	
 }
