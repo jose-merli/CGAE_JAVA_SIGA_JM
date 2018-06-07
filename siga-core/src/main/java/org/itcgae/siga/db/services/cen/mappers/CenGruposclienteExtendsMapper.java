@@ -29,7 +29,7 @@ public interface CenGruposclienteExtendsMapper extends CenGruposclienteMapper{
 	
 	
 
-	@SelectProvider(type = CenGruposclienteSqlExtendsProvider.class, method = "createLegalPerson")
+	@SelectProvider(type = CenGruposclienteSqlExtendsProvider.class, method = "selectDistinctGruposClientes")
 	@Results({
 		 @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
 			@Result(column = "IDGRUPO", property = "idgrupo", jdbcType = JdbcType.DECIMAL, id = true),
@@ -37,7 +37,7 @@ public interface CenGruposclienteExtendsMapper extends CenGruposclienteMapper{
 			@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR)
 	})
-	List<CenGruposcliente> createLegalPerson(String idInstitucion,String idLenguaje, String descripcion);
+	List<CenGruposcliente> selectDistinctGruposClientes(String idInstitucion,String idLenguaje, String descripcion);
 	
 	
 	@InsertProvider(type = CenGruposclienteSqlExtendsProvider.class, method = "insertSelectiveForCreateLegalPerson")

@@ -21,6 +21,8 @@ public interface ITarjetaDatosGeneralesService {
 	public PersonaJuridicaDTO searchGeneralData(int numPagina, @RequestBody PersonaJuridicaSearchDTO personaJuridicaSearchDTO, HttpServletRequest request);
 	
 	public UpdateResponseDTO createLegalPerson(EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request);
+	
+	public UpdateResponseDTO updateLegalPerson(EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request);
 }
 
 
