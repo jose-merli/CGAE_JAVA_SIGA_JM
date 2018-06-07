@@ -404,18 +404,28 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 						catalogoCreate.setIdLenguaje(usuario.getIdlenguaje());
 								
 						// comprueba codigoExt
-						catalogoMaestroItems1 = genTablasMaestrasExtendsMapper.selectCreateNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoCreate);
-						
-						//compruebo que el codigo externo no existe y si existe, me salgo
-						if(catalogoMaestroItems1.size()>0)
-						{
-							response.setStatus(SigaConstants.KO);
-							Error error = new Error();
-							error.setMessage("Ya existe un registro con este código externo");
-							response.setError(error);	
-							return response;
-						}			
-						
+						if(catalogoCreate.getCodigoExt()!=null) {
+							catalogoMaestroItems1 = genTablasMaestrasExtendsMapper.selectCreateNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoCreate);
+							//compruebo que el codigo externo no existe y si existe, me salgo
+							if(catalogoMaestroItems1.size()>0)
+							{
+								response.setStatus(SigaConstants.KO);
+								Error error = new Error();
+								error.setMessage("Ya existe un registro con este código externo");
+								response.setError(error);	
+								return response;
+							}
+							if(catalogoCreate.getCodigoExt().length()>10) {
+								response.setStatus(SigaConstants.KO);
+								Error error = new Error();
+								error.setMessage("El código externo no puede superar los 10 caracteres de longitud");
+								response.setError(error);	
+								return response;
+							}
+						}else {
+							catalogoCreate.setCodigoExt("");
+						}
+												
 						
 						LOGGER.info("createDatosCatalogo() / genTablasMaestrasExtendsMapper.createRecursos() -> Entrada a genTablasMaestrasExtendsMapper para crear relación entre recursos-catalogos");
 						respuesta1 = genTablasMaestrasExtendsMapper.createRecursos(tablaMaestra,catalogoCreate,isInstitucion,usuario.getIdusuario());
@@ -468,7 +478,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 		
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(catalogoRequest.getIdInstitucion()));
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
 		//Obtenemos el usuario para añadir el USUMODIFICACION
 		LOGGER.info("getDatosCatalogoHistorico() / admUsuariosMapper.selectByExample() -> Entrada a admUsuariosMapper para obtener información del usuario logeado");
 		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
