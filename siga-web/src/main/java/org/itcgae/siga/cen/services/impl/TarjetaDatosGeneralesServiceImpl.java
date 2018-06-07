@@ -707,7 +707,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		LOGGER.info(
 				"updateLegalPerson() -> Salida del servicio para actualizar información general de una persona jurídica");
 		
-		return null;
+		return updateResponseDTO;
 	}
 
 }
