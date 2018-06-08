@@ -39,10 +39,12 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilKey;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.mappers.AdmPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmPerfilRolMapper;
 import org.itcgae.siga.db.mappers.AdmRolMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosEfectivoPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +69,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	
 	@Autowired
 	private AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoPerfilMapper;
+	
+	@Autowired
+	private AdmUsuariosEfectivoPerfilExtendsMapper admUsuariosEfectivoPerfilExtendsMapper;
 
 	/***
 	 * Get the different users roles Return ComboDTO (id, value) where id is the
@@ -206,10 +211,20 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		int response3 = 0;
 		boolean serviceOK = true;
 		
+		List<String> gruposAborrar = new ArrayList<String>();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		usuarioUpdateDTO.setIdInstitucion(String.valueOf(idInstitucion));
+		
+		AdmUsuariosExample exampleUsuarios1 = new AdmUsuariosExample();
+		
+		exampleUsuarios1.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+		LOGGER.info("createUsers() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios1 = admUsuariosExtendsMapper.selectByExample(exampleUsuarios1);
+		LOGGER.info("createUsers() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 		
 		LOGGER.debug("updateUsers() -> Pone activo al usuario si no lo estaba");
 		if (!usuarioUpdateDTO.getActivo().equalsIgnoreCase("")
@@ -223,8 +238,34 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 			}
 		}
 		
+		
+		// comprobar perfiles a los que pertenece el usuario antes de modificarlos
+		comboItems = admUsuariosEfectivoPerfilExtendsMapper.getPerfilesUsuario(usuarioUpdateDTO, String.valueOf(idInstitucion));
+		for(int i=0;i<comboItems.size();i++) {
+			gruposAborrar.add(comboItems.get(i).getLabel());
+		}
+		// obtener los perfiles a borrar que ahora ya no pertenecen al usuario
+		for (int i = 0; i < usuarioUpdateDTO.getIdGrupo().length; i++){
+			if(gruposAborrar.contains(usuarioUpdateDTO.getIdGrupo()[i]))
+				gruposAborrar.remove(usuarioUpdateDTO.getIdGrupo()[i]);
+		}
+		
+		// borrar los perfiles que ya no pertenecen al usuario
+		for(int i=0;i< gruposAborrar.size();i++) {
+			AdmPerfil record = new AdmPerfil();
+			record.setFechaBaja(new Date());
+			record.setUsumodificacion(usuarios1.get(0).getIdusuario());
+			AdmPerfilExample example = new AdmPerfilExample();
+			example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdperfilEqualTo(gruposAborrar.get(i));
+			admPerfilExtendsMapper.updateByExampleSelective(record, example);
+		}
+		
+		
+		// actualizar los perfiles nuevos
 		if (null != usuarioUpdateDTO.getIdGrupo() && usuarioUpdateDTO.getIdGrupo().length > 0) {
 				for (int i = 0; i < usuarioUpdateDTO.getIdGrupo().length; i++) {
+					
+					gruposAborrar.add(usuarioUpdateDTO.getIdGrupo()[i]);
 					
 					usuarioUpdateDTO.setGrupo(usuarioUpdateDTO.getIdGrupo()[i]);
 					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -298,6 +339,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 							serviceOK = false;
 						}
 					}
+					
 				}
 		}
 

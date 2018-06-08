@@ -11,15 +11,15 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 	public String getCatalogEntity(String idInstitucion){
 		SQL sql = new SQL();
 		
-		sql.SELECT("distinct NOMBRETABLA");
+		sql.SELECT("distinct REC.NOMBRETABLA");
 		sql.SELECT(" MAES.LOCAL");
 		sql.FROM("GEN_RECURSOS_CATALOGOS REC");
-		sql.INNER_JOIN("GEN_TABLAS_MAESTRAS MAES ON REC.NOMBRETABLA = IDTABLAMAESTRA");
+		sql.INNER_JOIN("GEN_CATALOGOS_MULTIIDIOMA MAES ON REC.NOMBRETABLA = MAES.NOMBRETABLA");
 		
 		if(!idInstitucion.equals(SigaConstants.InstitucionGeneral))
-			sql.WHERE("IDINSTITUCION  = '" + idInstitucion + "'");
+			sql.WHERE("MAES.LOCAL = 'S'");
 		
-		sql.ORDER_BY("NOMBRETABLA");
+		sql.ORDER_BY("REC.NOMBRETABLA");
 		return sql.toString();
 	}
 	
