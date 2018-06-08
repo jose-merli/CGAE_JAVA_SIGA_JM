@@ -23,7 +23,7 @@ public interface GenRecursosCatalogosExtendsMapper extends GenRecursosCatalogosM
 	@SelectProvider(type = GenRecursosCatalogosSqlExtendsProvider.class, method = "getCatalogEntity")
 	@Results({
 		@Result(column = "NOMBRETABLA", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBRETABLA", property = "value", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "LOCAL", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getCatalogEntity(String idInstitucion);
 	

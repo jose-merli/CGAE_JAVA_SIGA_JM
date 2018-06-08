@@ -1,8 +1,6 @@
 package org.itcgae.siga.db.services.gen.providers;
 
-import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.adm.CatalogoDeleteDTO;
 import org.itcgae.siga.DTOs.adm.CatalogoRequestDTO;
 import org.itcgae.siga.DTOs.adm.CatalogoUpdateDTO;

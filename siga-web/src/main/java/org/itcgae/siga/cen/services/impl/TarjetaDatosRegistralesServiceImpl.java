@@ -6,8 +6,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosRegistralesDTO;
 import org.itcgae.siga.DTOs.cen.DatosRegistralesItem;
+import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -118,6 +120,8 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 	@Override
 	public DatosRegistralesDTO searchRegistryDataLegalPerson(PersonaJuridicaSearchDTO personaJuridicaSearchDTO,
 			HttpServletRequest request) {
+		LOGGER.info(
+				"searchRegistryDataLegalPerson() -> Entrada al servicio para recuperar datos registrales de la persona jurídica");
 		
 		DatosRegistralesDTO datosRegistralesDTO = new DatosRegistralesDTO();
 		List<DatosRegistralesItem> datosRegistralesItems = new ArrayList<DatosRegistralesItem>();
@@ -140,8 +144,7 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 
 				AdmUsuarios usuario = usuarios.get(0);
 				
-				//personaJuridicaSearchDTO.setIdInstitucion(String.valueOf(idInstitucion));
-				personaJuridicaSearchDTO.setIdInstitucion("2005");
+				personaJuridicaSearchDTO.setIdInstitucion(String.valueOf(idInstitucion));
 				personaJuridicaSearchDTO.setIdLenguaje(usuario.getIdlenguaje());
 				
 				datosRegistralesItems = cenActividadprofesionalExtendsMapper.searchRegistryDataLegalPerson(personaJuridicaSearchDTO);
@@ -150,7 +153,24 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 			}
 		}
 		
+		
+		LOGGER.info(
+				"searchRegistryDataLegalPerson() -> Salida del servicio para recuperar datos registrales de la persona jurídica");
 		return datosRegistralesDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO updateRegistryDataLegalPerson(
+			PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, HttpServletRequest request) {
+		LOGGER.info(
+				"updateRegistryDataLegalPerson() -> Entrada al servicio para actualizar datos registrales de una persona jurídica");
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		
+		
+		
+		LOGGER.info(
+				"updateRegistryDataLegalPerson() -> Salida del servicio para actualizar datos registrales de una persona jurídica");
+		return updateResponseDTO;
 	}
 
 	

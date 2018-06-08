@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.adm.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.MultiidiomaCatalogoSearchDTO;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.GenRecursosCatalogosSqlProvider;
 
@@ -11,9 +12,14 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 		SQL sql = new SQL();
 		
 		sql.SELECT("distinct NOMBRETABLA");
-		sql.FROM("GEN_RECURSOS_CATALOGOS");
-		sql.WHERE("IDINSTITUCION  = '" + idInstitucion + "'");
+		sql.SELECT(" MAES.LOCAL");
+		sql.FROM("GEN_RECURSOS_CATALOGOS REC");
+		sql.INNER_JOIN("GEN_TABLAS_MAESTRAS MAES ON REC.NOMBRETABLA = IDTABLAMAESTRA");
 		
+		if(!idInstitucion.equals(SigaConstants.InstitucionGeneral))
+			sql.WHERE("IDINSTITUCION  = '" + idInstitucion + "'");
+		
+		sql.ORDER_BY("NOMBRETABLA");
 		return sql.toString();
 	}
 	
@@ -31,7 +37,10 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 		sql.FROM(" GEN_RECURSOS_CATALOGOS REC ");
 		sql.WHERE(" IDLENGUAJE = '"+ multiidiomaCatalogoSearchDTO.getIdiomaBusqueda()  + "'");
 		sql.WHERE(" NOMBRETABLA = '" + multiidiomaCatalogoSearchDTO.getNombreTabla() + "'");
-		sql.WHERE(" IDINSTITUCION = '" + idInstitucion + "'");
+		
+		if(multiidiomaCatalogoSearchDTO.getLocal().equals("S"))
+			sql.WHERE(" IDINSTITUCION = '" + idInstitucion + "'");
+		
 		sql.ORDER_BY(" DESCRIPCIONBUSCAR ");
 		
 		return sql.toString();

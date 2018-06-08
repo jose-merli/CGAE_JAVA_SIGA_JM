@@ -2,7 +2,9 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosRegistralesDTO;
+import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class TarjetaDatosRegistrales {
+public class TarjetaDatosRegistralesController {
 
 	@Autowired
 	private ITarjetaDatosRegistralesService tarjetaDatosRegistralesService;
@@ -40,6 +42,13 @@ public class TarjetaDatosRegistrales {
 	ResponseEntity<DatosRegistralesDTO> searchRegistryDataLegalPerson(@RequestBody PersonaJuridicaSearchDTO personaJuridicaSearchDTO, HttpServletRequest request) { 
 		DatosRegistralesDTO response = tarjetaDatosRegistralesService.searchRegistryDataLegalPerson(personaJuridicaSearchDTO, request);
 		return new ResponseEntity<DatosRegistralesDTO>(response, HttpStatus.OK);
+	}
+	
+	
+	@RequestMapping(value = "perJuridicaDatosRegistrales/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateRegistryDataLegalPerson(@RequestBody PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, HttpServletRequest request) { 
+		UpdateResponseDTO response = tarjetaDatosRegistralesService.updateRegistryDataLegalPerson(perJuridicaDatosRegistralesUpdateDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 	
