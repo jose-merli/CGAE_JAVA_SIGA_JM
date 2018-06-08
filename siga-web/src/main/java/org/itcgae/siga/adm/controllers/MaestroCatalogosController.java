@@ -30,8 +30,8 @@ public class MaestroCatalogosController {
 	IMaestroCatalogoService maestroCatalogoService;
 	
    @RequestMapping(value = "/catmaestros/tabla", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboCatalogoDTO> getTabla() {
-	   ComboCatalogoDTO response = maestroCatalogoService.getTabla();
+	ResponseEntity<ComboCatalogoDTO> getTabla(HttpServletRequest request) {
+	   ComboCatalogoDTO response = maestroCatalogoService.getTabla(request);
     	return new ResponseEntity<ComboCatalogoDTO>(response, HttpStatus.OK);
 	}
    

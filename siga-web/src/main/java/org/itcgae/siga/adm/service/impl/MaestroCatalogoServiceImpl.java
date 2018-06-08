@@ -48,17 +48,29 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 	private AdmUsuariosMapper admUsuariosMapper;
 
 	@Override
-	public ComboCatalogoDTO getTabla() {
+	public ComboCatalogoDTO getTabla(HttpServletRequest request) {
 		LOGGER.info("getTabla() -> Entrada al servicio para obtener las diferentes entidades");
 		ComboCatalogoDTO response = new ComboCatalogoDTO();
 		List<ComboCatalogoItem> combos = new ArrayList<ComboCatalogoItem>();
 		ComboCatalogoItem combo = new ComboCatalogoItem();
 		
+		//Obtenemos la institución del Token
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+		
 		//Cargamos la tabla maestra para ver qué catalogos queremos gestionar
 		GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
 		exampleTablasMaestras.setDistinct(true);
 		exampleTablasMaestras.setOrderByClause("ALIASTABLA ASC");
-		exampleTablasMaestras.createCriteria().andFlagborradologicoEqualTo(new Long(0));
+		
+		if(institucion.equals(SigaConstants.InstitucionGeneral)) {
+			exampleTablasMaestras.createCriteria().andFlagborradologicoEqualTo(new Long(0));
+		}
+		else {
+			exampleTablasMaestras.createCriteria().andFlagborradologicoEqualTo(new Long(0)).andLocalEqualTo("S");
+		}
+		
 		LOGGER.info("getTabla() / genTablasMaestrasExtendsMapper.selectByExample() -> Entrada a genTablasMaestrasExtendsMapper para obtener listado de entidades");
 		List<GenTablasMaestras> tablasMaestras = genTablasMaestrasExtendsMapper.selectByExample(exampleTablasMaestras);
 		LOGGER.info("getTabla() / genTablasMaestrasExtendsMapper.selectByExample() -> Salida de genTablasMaestrasExtendsMapper para obtener listado de entidades");
@@ -103,9 +115,9 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		LOGGER.info("getDatosCatalogo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 		
 		if(null != institucion && null != usuarios && usuarios.size() > 0) {
-			catalogoRequest.setIdInstitucion(institucion);
 			AdmUsuarios usuario = usuarios.get(0);
 			catalogoRequest.setIdLenguaje(usuario.getIdlenguaje());
+			catalogoRequest.setIdInstitucion(institucion);
 				
 			GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
 			exampleTablasMaestras.setDistinct(true);

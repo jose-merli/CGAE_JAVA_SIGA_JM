@@ -10,8 +10,10 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
 import org.itcgae.siga.db.services.cen.providers.CenNocolegiadoSqlExtendsProvider;
@@ -79,4 +81,13 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 	
 	@InsertProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "insertSelectiveForCreateLegalPerson")
 	int insertSelectiveForCreateLegalPerson(String idInstitucion, AdmUsuarios usuario,EtiquetaUpdateDTO etiquetaUpdateDTO);
+	
+	
+	@SelectProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "selectProfesionalActivitiesSociety")
+	@Results({
+		@Result(column = "IDACTIVIDADPROFESIONAL", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> selectProfesionalActivitiesSociety(PersonaJuridicaActividadDTO personaJuridicaActividadDTO, String idLenguaje);
+	
 }

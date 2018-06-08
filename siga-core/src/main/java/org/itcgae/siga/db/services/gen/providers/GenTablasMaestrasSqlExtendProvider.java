@@ -1,6 +1,8 @@
 package org.itcgae.siga.db.services.gen.providers;
 
+import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.adm.CatalogoDeleteDTO;
 import org.itcgae.siga.DTOs.adm.CatalogoRequestDTO;
 import org.itcgae.siga.DTOs.adm.CatalogoUpdateDTO;
@@ -19,31 +21,64 @@ public class GenTablasMaestrasSqlExtendProvider {
      *
      * @mbg.generated Wed Mar 14 18:23:45 CET 2018
      */
-    public String selectRecursos(GenTablasMaestras tablaMaestra,CatalogoRequestDTO catalogo) {
+    public String selectCatalogosByTabla(GenTablasMaestras tablaMaestra,CatalogoRequestDTO catalogo) {
         SQL sql = new SQL();
 
-        sql.SELECT_DISTINCT(tablaMaestra.getIdcampocodigoext() + " AS CODIGOEXT");
-        sql.SELECT("'" + tablaMaestra.getIdtablamaestra() + "'" + " AS CATALOGO");
-        sql.SELECT("RECURSOS.DESCRIPCION AS DESCRIPCION");
-        sql.SELECT(tablaMaestra.getIdcampocodigo() + " AS IDREGISTRO");
+//        sql.SELECT_DISTINCT(tablaMaestra.getIdcampocodigoext() + " AS CODIGOEXT");
+//        sql.SELECT("'" + tablaMaestra.getIdtablamaestra() + "'" + " AS CATALOGO");
+//        sql.SELECT("RECURSOS.DESCRIPCION AS DESCRIPCION");
+//        sql.SELECT(tablaMaestra.getIdcampocodigo() + " AS IDREGISTRO");
+//        sql.SELECT("MAES.LONGITUDCODIGOEXT");
+//        sql.SELECT("MAES.LONGITUDDESCRIPCION");
+//        sql.FROM(tablaMaestra.getIdtablamaestra() + " TABLA" );
+//        sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS RECURSOS ON (RECURSOS.IDRECURSO = " + " TABLA." + tablaMaestra.getIdcampodescripcion() +") ");
+//        sql.INNER_JOIN("GEN_TABLAS_MAESTRAS MAES ON MAES.IDTABLAMAESTRA = '"+tablaMaestra.getIdtablamaestra()+"'");
+//        
+//        sql.WHERE("(RECURSOS.IDINSTITUCION = '" + catalogo.getIdInstitucion() + "' OR RECURSOS.IDINSTITUCION IS NULL)");
+//        sql.WHERE("RECURSOS.IDLENGUAJE = '" + catalogo.getIdLenguaje() + "'");
+//        sql.WHERE("TABLA.FECHA_BAJA IS NULL ");
+//        if (null != catalogo.getCodigoExt() && !catalogo.getCodigoExt().equals("")) {
+//        	sql.WHERE(" TABLA." + tablaMaestra.getIdcampocodigoext() + " = '" + catalogo.getCodigoExt()+ "'");
+//		}	
+//        if (null != catalogo.getDescripcion() && !catalogo.getDescripcion().equals("")) {
+//        	sql.WHERE("RECURSOS.DESCRIPCION = '" + catalogo.getDescripcion() + "'");
+//		}
+//
+//        sql.ORDER_BY(" RECURSOS.DESCRIPCION ASC " );
+        
+        
+       
+        
+      
+        
+        
+        sql.SELECT("TAB.CODIGOEXT AS CODIGOEXT");
+        sql.SELECT("REC.DESCRIPCION AS DESCRIPCION");
+        sql.SELECT("MAES.IDTABLAMAESTRA AS CATALOGO");
+        sql.SELECT("MAES.IDCAMPOCODIGO AS IDREGISTRO");
         sql.SELECT("MAES.LONGITUDCODIGOEXT");
         sql.SELECT("MAES.LONGITUDDESCRIPCION");
-        sql.FROM(tablaMaestra.getIdtablamaestra() + " TABLA" );
-        sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS RECURSOS ON (RECURSOS.IDRECURSO = " + " TABLA." + tablaMaestra.getIdcampodescripcion() +") ");
-        sql.INNER_JOIN("GEN_TABLAS_MAESTRAS MAES ON MAES.IDTABLAMAESTRA = '"+tablaMaestra.getIdtablamaestra()+"'");
         
-        sql.WHERE("(RECURSOS.IDINSTITUCION = '" + catalogo.getIdInstitucion() + "' OR RECURSOS.IDINSTITUCION IS NULL)");
-        sql.WHERE("RECURSOS.IDLENGUAJE = '" + catalogo.getIdLenguaje() + "'");
-        sql.WHERE("TABLA.FECHA_BAJA IS NULL ");
-        if (null != catalogo.getCodigoExt() && !catalogo.getCodigoExt().equals("")) {
-        	sql.WHERE(" TABLA." + tablaMaestra.getIdcampocodigoext() + " = '" + catalogo.getCodigoExt()+ "'");
-		}	
-        if (null != catalogo.getDescripcion() && !catalogo.getDescripcion().equals("")) {
-        	sql.WHERE("RECURSOS.DESCRIPCION = '" + catalogo.getDescripcion() + "'");
+        sql.FROM(tablaMaestra.getIdtablamaestra() + " TAB" );
+        sql.INNER_JOIN("gen_recursos_catalogos REC on TAB.descripcion = REC.idrecurso");
+        sql.INNER_JOIN("GEN_TABLAS_MAESTRAS MAES on REC.nombretabla = MAES.idtablamaestra");
+        
+        sql.WHERE("TAB.fecha_baja is null");
+        sql.WHERE("REC.idlenguaje = '"+catalogo.getIdLenguaje()+"' ");
+        
+        // si el catalogo es local => diferente para cada colegio
+        if(catalogo.getLocal().equals("S")) {
+        	 sql.WHERE("TAB.idinstitucion = '"+catalogo.getIdInstitucion()+"'");
+        }
+        
+		if (null != catalogo.getCodigoExt() && !catalogo.getCodigoExt().equals("")) {
+			sql.WHERE(" TAB." + tablaMaestra.getIdcampocodigoext() + " = '" + catalogo.getCodigoExt() + "'");
 		}
-
-        sql.ORDER_BY(" RECURSOS.DESCRIPCION ASC " );
-        
+		if (null != catalogo.getDescripcion() && !catalogo.getDescripcion().equals("")) {
+			sql.WHERE("REC.DESCRIPCION = '" + catalogo.getDescripcion() + "'");
+		}
+       
+        sql.ORDER_BY("REC.descripcion ASC");
         return sql.toString();
     }
     

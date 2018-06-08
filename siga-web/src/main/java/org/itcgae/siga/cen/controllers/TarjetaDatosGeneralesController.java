@@ -37,7 +37,7 @@ public class TarjetaDatosGeneralesController {
 //			else return new ResponseEntity<UpdateResponseDTO>(HttpStatus.FORBIDDEN);
 //    }
 	
-	@RequestMapping(value = "/personaJuridica/cargarFotografia", method = RequestMethod.GET)
+  @RequestMapping(value = "/personaJuridica/cargarFotografia", method = RequestMethod.GET)
   public ResponseEntity<UpdateResponseDTO> loadPhotography(HttpServletRequest request, HttpServletResponse response) {
 		tarjetaDatosGeneralesService.loadPhotography(request, response);
 		//if(response1.getStatus().equals(SigaConstants.OK))

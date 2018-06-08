@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenNocolegiadoSqlProvider;
@@ -246,6 +247,21 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.VALUES("COMPANIASEG", "");
 		sql.VALUES("IDENTIFICADORDS", "");
 		sql.VALUES("FECHA_BAJA", null);
+		
+		return sql.toString();
+	}
+	
+	
+	public String selectProfesionalActivitiesSociety(PersonaJuridicaActividadDTO personaJuridicaActividadDTO, String idLenguaje) {
+		SQL sql = new SQL();
+		
+		sql.SELECT(" NOCOL_ACT.IDACTIVIDADPROFESIONAL");
+		sql.SELECT("REC.DESCRIPCION");
+		sql.FROM("CEN_NOCOLEGIADO_ACTIVIDAD NOCOL_ACT");
+		sql.INNER_JOIN("CEN_ACTIVIDADPROFESIONAL ACTIVIDAD ON (ACTIVIDAD.IDACTIVIDADPROFESIONAL = NOCOL_ACT.IDACTIVIDADPROFESIONAL )");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON (REC.IDRECURSO = ACTIVIDAD.DESCRIPCION AND REC.IDLENGUAJE = '"+idLenguaje+"')");
+		sql.WHERE("NOCOL_ACT.IDPERSONA = '"+personaJuridicaActividadDTO.getIdPersona()+"' ");
+		sql.WHERE("NOCOL_ACT.IDINSTITUCION = '"+personaJuridicaActividadDTO.getIdInstitucion()+"'");
 		
 		return sql.toString();
 	}

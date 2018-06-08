@@ -17,7 +17,12 @@ public class CatalogoRequestDTO   {
   private String descripcion = null;
   private String idInstitucion = null;
   private String idLenguaje = null;
+  private String local;
   
+  
+  
+
+
   /**
    **/
   public CatalogoRequestDTO catalogo(String catalogo) {
@@ -101,6 +106,24 @@ public class CatalogoRequestDTO   {
   public void setIdLenguaje(String idLenguaje) {
     this.idLenguaje = idLenguaje;
   }
+  
+  /**
+   **/
+  public CatalogoRequestDTO local(String local) {
+    this.local = local;
+    return this;
+  }
+  
+  
+  @JsonProperty("local")
+  public String getLocal() {
+	return local;
+}
+
+
+  public void setLocal(String local) {
+	this.local = local;
+  }
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -115,24 +138,26 @@ public class CatalogoRequestDTO   {
         Objects.equals(this.codigoExt, comboItem.codigoExt)&&
         Objects.equals(this.descripcion, comboItem.descripcion)&&
         Objects.equals(this.idInstitucion, comboItem.idInstitucion)&&
-    	Objects.equals(this.idLenguaje, comboItem.idLenguaje);
+    	Objects.equals(this.idLenguaje, comboItem.idLenguaje) &&
+    	Objects.equals(this.local, comboItem.local); 
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(catalogo, codigoExt,descripcion,idInstitucion);
+    return Objects.hash(catalogo, codigoExt,descripcion,idInstitucion,local);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ComboItem {\n");
+    sb.append("class CatalogoRequestDTO {\n");
     
     sb.append("    catalogo: ").append(toIndentedString(catalogo)).append("\n");
     sb.append("    codigoExt: ").append(toIndentedString(codigoExt)).append("\n");
     sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
     sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
     sb.append("    idLenguaje: ").append(toIndentedString(idLenguaje)).append("\n");
+    sb.append("    local: ").append(toIndentedString(local)).append("\n");
     
     sb.append("}");
     return sb.toString();
