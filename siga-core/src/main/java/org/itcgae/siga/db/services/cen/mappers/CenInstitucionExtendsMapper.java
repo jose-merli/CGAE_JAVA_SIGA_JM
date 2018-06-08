@@ -61,8 +61,8 @@ public interface CenInstitucionExtendsMapper extends CenInstitucionMapper {
 	EntidadLenguajeInstitucionDTO getInstitutionLenguage(String idInstitucion);
 	
 	@SelectProvider(type = CenInstitucionSqlExtendsProvider.class, method = "getComboInstituciones")
-	@Results({ @Result(column = "IDINSTITUCION", property = "label"),
-		 		@Result(column = "NOMBRE", property = "value")
+	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
+		 		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR)
 			})
 	List<ComboItem> getComboInstituciones(); 
 	
