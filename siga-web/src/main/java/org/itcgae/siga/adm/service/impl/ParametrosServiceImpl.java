@@ -74,32 +74,48 @@ public class ParametrosServiceImpl implements IParametrosService {
 		LOGGER.info("getParametersSearch() -> Entrada al servicio para buscar los módulos disponibles para los catálogos generales");
 		ParametroDTO parametroDTO = new ParametroDTO();
 		List<ParametroItem> parametroItems = new ArrayList<ParametroItem>();
-
-		// Obtener idInstitucion del certificado
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		
 		String token = request.getHeader("Authorization");
-		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
-		parametroRequestDTO.setIdInstitucion(institucion);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+		LOGGER.info("updateParameter() / admUsuariosMapper.selectByExample() -> Entrada a admUsuariosMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
+		LOGGER.info("updateParameter() / admUsuariosMapper.selectByExample() -> Salida de admUsuariosMapper para obtener información del usuario logeado");
+		
+		
 
-		if (!parametroRequestDTO.getParametrosGenerales().equalsIgnoreCase("")
-				&& !parametroRequestDTO.getModulo().equalsIgnoreCase("")
-				&& parametroRequestDTO.getIdInstitucion() != null) {
-			if (parametroRequestDTO.getParametrosGenerales().equals("N")) {
-				// Buscar en gen_parametros por modulo e institucion
-				LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Entrada a genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
-				parametroItems = genParametrosExtendsMapper.getParametersSearch(numPagina, parametroRequestDTO);
-				LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
+		if(null != usuarios && usuarios.size() > 0) {
+			AdmUsuarios usuario = usuarios.get(0);
+			parametroRequestDTO.setIdInstitucion(String.valueOf(idInstitucion));
+			
+			if (!parametroRequestDTO.getParametrosGenerales().equalsIgnoreCase("")
+					&& !parametroRequestDTO.getModulo().equalsIgnoreCase("")
+					&& parametroRequestDTO.getIdInstitucion() != null) {
+				if (parametroRequestDTO.getParametrosGenerales().equals("N")) {
+					// Buscar en gen_parametros por modulo e institucion
+					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Entrada a genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
+					parametroItems = genParametrosExtendsMapper.getParametersSearch(numPagina, parametroRequestDTO, usuario.getIdlenguaje());
+					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
 
-				parametroDTO.setParametrosItems(parametroItems);
+					parametroDTO.setParametrosItems(parametroItems);
+				}
+				 else if (parametroRequestDTO.getParametrosGenerales().equals("S")) {
+					 
+					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Entrada a genParametrosExtendsMapper para obtener listado de los módulos comunes a todas las instituciones");
+					parametroItems = genParametrosExtendsMapper.getParametersSearchGeneral(numPagina, parametroRequestDTO, usuario.getIdlenguaje());
+					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos comunes a todas las instituciones");
+
+					parametroDTO.setParametrosItems(parametroItems);
+				}
 			}
-			 else if (parametroRequestDTO.getParametrosGenerales().equals("S")) {
-				 
-				LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Entrada a genParametrosExtendsMapper para obtener listado de los módulos comunes a todas las instituciones");
-				parametroItems = genParametrosExtendsMapper.getParametersSearchGeneral(numPagina, parametroRequestDTO);
-				LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos comunes a todas las instituciones");
-
-				parametroDTO.setParametrosItems(parametroItems);
-			}
+		}	
+		else {
+				
 		}
+		
+		
 
 		LOGGER.info("getParametersSearch() -> Salida del servicio para buscar los módulos disponibles para los catálogos generales");
 		return parametroDTO;
@@ -113,14 +129,21 @@ public class ParametrosServiceImpl implements IParametrosService {
 		ParametroDTO parametroDTO = new ParametroDTO();
 		List<ParametroItem> parametroItems = new ArrayList<ParametroItem>();
 
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		// Obtener idInstitucion del certificado
 		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 		parametroRequestDTO.setIdInstitucion(institucion);
 
 		if (!parametroRequestDTO.getParametrosGenerales().equalsIgnoreCase("")
 				&& !parametroRequestDTO.getModulo().equalsIgnoreCase("")
 				&& parametroRequestDTO.getIdInstitucion() != null) {
+			
+			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
+			List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
+			AdmUsuarios usuario = usuarios.get(0);
 			
 			// Buscar en gen_parametros por modulo e institucion
 			GenParametrosExample genParametrosExample = new GenParametrosExample();
@@ -132,7 +155,7 @@ public class ParametrosServiceImpl implements IParametrosService {
 			//genparametros = genParametrosMapper.selectByExample(genParametrosExample);
 			LOGGER.info("getParametersRecord() / genParametrosMapper.selectByExample() -> Salida de genParametrosMapper para obtener listado de los módulos para la institución del usuario");
 			
-			parametroItems = genParametrosExtendsMapper.getParametersRecord(numPagina, parametroRequestDTO);
+			parametroItems = genParametrosExtendsMapper.getParametersRecord(numPagina, parametroRequestDTO, usuario.getIdlenguaje());
 			parametroDTO.setParametrosItems(parametroItems);
 		}
 		else {
