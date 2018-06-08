@@ -37,7 +37,7 @@ public class TarjetaDatosGeneralesController {
 //			else return new ResponseEntity<UpdateResponseDTO>(HttpStatus.FORBIDDEN);
 //    }
 	
-	@RequestMapping(value = "/personaJuridica/cargarFotografia", method = RequestMethod.GET)
+  @RequestMapping(value = "/personaJuridica/cargarFotografia", method = RequestMethod.GET)
   public ResponseEntity<UpdateResponseDTO> loadPhotography(HttpServletRequest request, HttpServletResponse response) {
 		tarjetaDatosGeneralesService.loadPhotography(request, response);
 		//if(response1.getStatus().equals(SigaConstants.OK))
@@ -64,10 +64,23 @@ public class TarjetaDatosGeneralesController {
 	
 	
 	@RequestMapping(value = "busquedaPerJuridica/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> createLabel(@RequestBody EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request) { 
+	ResponseEntity<UpdateResponseDTO> createLegalPerson(@RequestBody EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request) { 
 		UpdateResponseDTO response = tarjetaDatosGeneralesService.createLegalPerson(etiquetaUpdateDTO, request);
-		return new ResponseEntity<UpdateResponseDTO >(response, HttpStatus.OK);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO >(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO >(response, HttpStatus.FORBIDDEN);
 	}
+	
+	
+	@RequestMapping(value = "busquedaPerJuridica/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateLegalPerson(@RequestBody EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request) { 
+		UpdateResponseDTO response = tarjetaDatosGeneralesService.updateLegalPerson(etiquetaUpdateDTO, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO >(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO >(response, HttpStatus.FORBIDDEN);
+	}
+	
+	
 	
 	
 	

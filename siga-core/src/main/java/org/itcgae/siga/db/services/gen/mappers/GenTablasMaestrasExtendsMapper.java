@@ -30,12 +30,12 @@ public interface GenTablasMaestrasExtendsMapper extends GenTablasMaestrasMapper{
      *
      * @mbg.generated Wed Mar 14 18:23:45 CET 2018
      */
-    @SelectProvider(type=GenTablasMaestrasSqlExtendProvider.class, method="selectRecursos")
+    @SelectProvider(type=GenTablasMaestrasSqlExtendProvider.class, method="selectCatalogosByTabla")
     @Results({
         @Result(column="CATALOGO", property="catalogo", jdbcType=JdbcType.VARCHAR, id=true),
-        @Result(column="CODIGOEXT", property="codigoExt", jdbcType=JdbcType.DECIMAL),
-        @Result(column="DESCRIPCION", property="descripcion", jdbcType=JdbcType.DECIMAL),
-        @Result(column="IDINSTITUCION", property="idInstitucion", jdbcType=JdbcType.VARCHAR),
+        @Result(column="CODIGOEXT", property="codigoExt", jdbcType=JdbcType.VARCHAR),
+        @Result(column="DESCRIPCION", property="descripcion", jdbcType=JdbcType.VARCHAR),
+        //@Result(column="IDINSTITUCION", property="idInstitucion", jdbcType=JdbcType.VARCHAR),
         @Result(column="IDREGISTRO", property="idRegistro", jdbcType=JdbcType.VARCHAR),
         @Result(column="LONGITUDCODIGOEXT", property="longitudCodigoExt", jdbcType=JdbcType.VARCHAR),
         @Result(column="LONGITUDDESCRIPCION", property="longitudDescripcion", jdbcType=JdbcType.VARCHAR)

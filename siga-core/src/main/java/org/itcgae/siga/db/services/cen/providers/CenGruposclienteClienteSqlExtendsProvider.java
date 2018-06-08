@@ -28,6 +28,20 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		return sql.toString();
 	}
 	
+	public String selectGruposPersonaJuridica(String idPersona, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("cli.idgrupo");
+		sql.FROM("CEN_GRUPOSCLIENTE_CLIENTE cli");
+		sql.INNER_JOIN("cen_persona per on cli.idpersona = per.idpersona");
+		sql.WHERE("per.idpersona = '"+idPersona+"'");
+		sql.WHERE("cli.FECHA_BAJA is null");
+		sql.WHERE("idinstitucion = '"+idInstitucion+"'");
+		
+		return sql.toString();
+	}
+	
 	
 }
+
 

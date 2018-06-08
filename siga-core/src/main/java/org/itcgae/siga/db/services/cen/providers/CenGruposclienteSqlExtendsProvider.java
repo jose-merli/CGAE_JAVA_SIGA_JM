@@ -19,7 +19,7 @@ public class CenGruposclienteSqlExtendsProvider extends CenGruposclienteSqlProvi
 		return sql.toString();
 	}
 	
-	public String createLegalPerson(String idInstitucion,String idLenguaje, String descripcion) {
+	public String selectDistinctGruposClientes(String idInstitucion,String idLenguaje, String descripcion) {
 		SQL sql = new SQL();
 		
 		sql.SELECT("DISTINCT CLIENTE.*");

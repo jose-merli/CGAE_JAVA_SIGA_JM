@@ -14,7 +14,10 @@ public class EtiquetaUpdateDTO {
 	private String cuentaContable;
 	private String anotaciones;
 	private String [] grupos;
+	private String idPersona;
 	
+	
+
 	/**
 	 */
 	public EtiquetaUpdateDTO nif(String nif){
@@ -133,6 +136,24 @@ public class EtiquetaUpdateDTO {
 	}
 	
 	
+	/**
+	 */
+	public EtiquetaUpdateDTO idPersona(String idPersona){
+		this.nif = idPersona;
+		return this;
+	}
+	
+	@JsonProperty("idPersona")
+	public String getIdPersona() {
+		return idPersona;
+	}
+
+
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
+	}
+	
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -148,12 +169,13 @@ public class EtiquetaUpdateDTO {
 	    		Objects.equals(this.idioma, etiquetaUpdateDTO.idioma) &&
 	    		Objects.equals(this.cuentaContable, etiquetaUpdateDTO.cuentaContable) &&
 	    		Objects.equals(this.anotaciones, etiquetaUpdateDTO.anotaciones) &&
-	    		Objects.equals(this.grupos, etiquetaUpdateDTO.grupos);
+	    		Objects.equals(this.grupos, etiquetaUpdateDTO.grupos) &&
+	    		Objects.equals(this.idPersona, etiquetaUpdateDTO.idPersona);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(tipo, nif, denominacion, idioma, cuentaContable, anotaciones, grupos);
+	    return Objects.hash(tipo, nif, denominacion, idioma, cuentaContable, anotaciones, grupos, idPersona);
 	}
 
 	
@@ -169,6 +191,7 @@ public class EtiquetaUpdateDTO {
 	    sb.append("    cuentaContable: ").append(toIndentedString(cuentaContable)).append("\n");
 	    sb.append("    anotaciones: ").append(toIndentedString(anotaciones)).append("\n");
 	    sb.append("    grupos: ").append(toIndentedString(grupos)).append("\n");
+	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
