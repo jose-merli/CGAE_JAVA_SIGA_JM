@@ -528,7 +528,7 @@ public class MenuServiceImpl implements IMenuService {
 		AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
 
 		exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-				.andIdusuarioEqualTo(usuarios.get(0).getIdusuario());
+				.andIdusuarioEqualTo(usuarios.get(0).getIdusuario()).andFechaBajaEqualTo(null);
 		List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
 
 		/*

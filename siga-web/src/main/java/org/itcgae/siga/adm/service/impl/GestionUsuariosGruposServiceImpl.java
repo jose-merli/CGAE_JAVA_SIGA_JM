@@ -37,12 +37,10 @@ import org.itcgae.siga.db.entities.AdmRol;
 import org.itcgae.siga.db.entities.AdmRolExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
-import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilKey;
+import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.mappers.AdmPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmPerfilRolMapper;
 import org.itcgae.siga.db.mappers.AdmRolMapper;
-import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosEfectivoPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -67,8 +65,6 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
-	@Autowired
-	private AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoPerfilMapper;
 	
 	@Autowired
 	private AdmUsuariosEfectivoPerfilExtendsMapper admUsuariosEfectivoPerfilExtendsMapper;
@@ -209,6 +205,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		int response1 = 1;
 		int response2 = 0;
 		int response3 = 0;
+		int responseborrado = 1;
 		boolean serviceOK = true;
 		
 		List<String> gruposAborrar = new ArrayList<String>();
@@ -226,6 +223,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		List<AdmUsuarios> usuarios1 = admUsuariosExtendsMapper.selectByExample(exampleUsuarios1);
 		LOGGER.info("createUsers() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 		
+		// pone a activo el usuario si no lo estaba
 		LOGGER.debug("updateUsers() -> Pone activo al usuario si no lo estaba");
 		if (!usuarioUpdateDTO.getActivo().equalsIgnoreCase("")
 				|| !usuarioUpdateDTO.getCodigoExterno().equalsIgnoreCase("")) {
@@ -252,22 +250,31 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		
 		// borrar los perfiles que ya no pertenecen al usuario
 		for(int i=0;i< gruposAborrar.size();i++) {
-			AdmPerfil record = new AdmPerfil();
-			record.setFechaBaja(new Date());
+			
+			AdmUsuariosEfectivosPerfil record = new AdmUsuariosEfectivosPerfil();
+			record.setFechaBaja(new Date()); // fecha_baja será la la actual al dar de baja un perfil de un usuario
 			record.setUsumodificacion(usuarios1.get(0).getIdusuario());
-			AdmPerfilExample example = new AdmPerfilExample();
-			example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdperfilEqualTo(gruposAborrar.get(i));
-			admPerfilExtendsMapper.updateByExampleSelective(record, example);
+			
+			AdmUsuariosEfectivosPerfilExample example = new AdmUsuariosEfectivosPerfilExample();
+			example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdperfilEqualTo(gruposAborrar.get(i)).andIdrolEqualTo(usuarioUpdateDTO.getRol())
+			.andIdusuarioEqualTo(Integer.valueOf(usuarioUpdateDTO.getIdUsuario()));
+			LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilExtendsMapper.updateByExampleSelective() -> Entrada a admUsuariosEfectivoPerfilExtendsMapper para borrar perfiles que ya no pertenecen al usuario");
+			responseborrado= admUsuariosEfectivoPerfilExtendsMapper.updateByExampleSelective(record, example);
+			LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilExtendsMapper.updateByExampleSelective() -> Salida de admUsuariosEfectivoPerfilExtendsMapper para borrar perfiles que ya no pertenecen al usuario");
+			
+			if(responseborrado == 0) {
+				serviceOK = false;
+			}
+			
 		}
-		
 		
 		// actualizar los perfiles nuevos
 		if (null != usuarioUpdateDTO.getIdGrupo() && usuarioUpdateDTO.getIdGrupo().length > 0) {
 				for (int i = 0; i < usuarioUpdateDTO.getIdGrupo().length; i++) {
 					
-					gruposAborrar.add(usuarioUpdateDTO.getIdGrupo()[i]);
-					
+					// mete el grupo (perfil) actual en su variable grupo, que no se usa para nada
 					usuarioUpdateDTO.setGrupo(usuarioUpdateDTO.getIdGrupo()[i]);
+					
 					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
 					
@@ -283,8 +290,8 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 					LOGGER.info("updateUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Entrada a admPerfilExtendsMapper para buscar si existe el perfil de un usuario");
 					AdmPerfil perfil = admPerfilExtendsMapper.selectByPrimaryKey(key);
 					LOGGER.info("updateUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Salida de admPerfilExtendsMapper para buscar si existe el perfil de un usuario");
-					
-					//En caso de que no exista un perfil creamos la relación entre el usuario y el perfil
+
+					//En caso de que no exista un perfil creamos la relación entre el usuario y el perfil => tabla admPerfil
 					LOGGER.debug("updateUsers()  -> En caso de que no exista un perfil creamos la relación entre el usuario y el perfil");
 					if (null == perfil) {
 						AdmPerfilExample keyPerfil = new AdmPerfilExample();
@@ -312,16 +319,16 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 						}
 					}
 					
-					AdmUsuariosEfectivosPerfilKey keyUsuarioPerfil = new AdmUsuariosEfectivosPerfilKey();
-					keyUsuarioPerfil.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
-					keyUsuarioPerfil.setIdusuario(Integer.valueOf(usuarioUpdateDTO.getIdUsuario()));
-					keyUsuarioPerfil.setIdrol(usuarioUpdateDTO.getRol());
-					keyUsuarioPerfil.setIdperfil(usuarioUpdateDTO.getGrupo());
-					LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilMapper.selectByPrimaryKey() -> Entrada a admUsuariosEfectivoPerfilMapper para comprobar si existe relación entre usuario y perfil en usuariosEfectivos");
-					AdmUsuariosEfectivosPerfil usuarioPerfil = admUsuariosEfectivoPerfilMapper.selectByPrimaryKey(keyUsuarioPerfil);
-					LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilMapper.selectByPrimaryKey() -> Salida de admUsuariosEfectivoPerfilMapper para comprobar si existe relación entre usuario y perfil en usuariosEfectivos");
+					AdmUsuariosEfectivosPerfilExample keyUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
+					keyUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(usuarioUpdateDTO.getIdInstitucion())).andIdusuarioEqualTo(Integer.valueOf(usuarioUpdateDTO.getIdUsuario()))
+					.andIdrolEqualTo(usuarioUpdateDTO.getRol()).andIdperfilEqualTo(usuarioUpdateDTO.getGrupo()).andFechaBajaIsNull();
 					
-					if (null == usuarioPerfil) {
+					LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilMapper.selectByExample() -> Entrada a admUsuariosEfectivoPerfilExtendsMapper para comprobar si existe relación entre usuario y perfil en usuariosEfectivos");
+					List<AdmUsuariosEfectivosPerfil> usuarioPerfil = admUsuariosEfectivoPerfilExtendsMapper.selectByExample(keyUsuarioPerfil);
+					LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilMapper.selectByExample() -> Salida de admUsuariosEfectivoPerfilExtendsMapper para comprobar si existe relación entre usuario y perfil en usuariosEfectivos");
+					
+					// si no hay relacion entre usuario y perfil => actualizar tabla adm_Usuarios_Efectivos_Perfil
+					if (usuarioPerfil.isEmpty()) { // con null == usuarioPerfil no servia. Nunca era nulo
 						AdmUsuariosEfectivosPerfil recordUsuarioEfectivo = new AdmUsuariosEfectivosPerfil();
 						recordUsuarioEfectivo.setUsumodificacion(usuario.getIdusuario());
 						recordUsuarioEfectivo.setIdinstitucion(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()));
@@ -329,9 +336,10 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 						recordUsuarioEfectivo.setFechamodificacion(new Date());
 						recordUsuarioEfectivo.setIdrol(usuarioUpdateDTO.getRol());
 						recordUsuarioEfectivo.setIdusuario(Integer.valueOf(usuarioUpdateDTO.getIdUsuario()));
+						recordUsuarioEfectivo.setFechaBaja(null);
 						//Se guarda el usuario efectivoPerfil
 						LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilMapper.insert() -> Entrada a admUsuariosEfectivoPerfilMapper para añadir una relación de perfil-usuario en tabla admUsuariosEfectivoPerfil");
-						response3 = admUsuariosEfectivoPerfilMapper.insert(recordUsuarioEfectivo );
+						response3 = admUsuariosEfectivoPerfilExtendsMapper.insert(recordUsuarioEfectivo );
 						LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilMapper.insert() -> Salida de admUsuariosEfectivoPerfilMapper para añadir una relación de perfil-usuario en tabla admUsuariosEfectivoPerfil");
 						// Si una inserción de un registro da fallo, la respuesta del servicio deberá ser KO
 						if(response3 == 0) {

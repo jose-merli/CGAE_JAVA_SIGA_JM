@@ -20,6 +20,7 @@ public class AdmUsuariosEfectivosPerfilSqlExtendsProvider extends AdmUsuariosEfe
 		sql.WHERE("USUEFEC.idusuario = '"+usuarioUpdateDTO.getIdUsuario()+"'");
 		sql.WHERE("PER.idinstitucion = '"+idInstitucion+"'");
 		sql.WHERE(" USUEFEC.idrol = '"+usuarioUpdateDTO.getRol()+"'");
+		sql.WHERE("USUEFEC.fecha_baja is null");
 		
 		return sql.toString();
 	}
