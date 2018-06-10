@@ -238,7 +238,10 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		
 		
 		// comprobar perfiles a los que pertenece el usuario antes de modificarlos
+		LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilExtendsMapper.getPerfilesUsuario() -> Entrada a admUsuariosEfectivoPerfilExtendsMapper para comprobar perfiles a los que pertenece un usuario");
 		comboItems = admUsuariosEfectivoPerfilExtendsMapper.getPerfilesUsuario(usuarioUpdateDTO, String.valueOf(idInstitucion));
+		LOGGER.info("updateUsers() / admUsuariosEfectivoPerfilExtendsMapper.getPerfilesUsuario() -> Salida de admUsuariosEfectivoPerfilExtendsMapper para comprobar perfiles a los que pertenece un usuario");
+		
 		for(int i=0;i<comboItems.size();i++) {
 			gruposAborrar.add(comboItems.get(i).getLabel());
 		}

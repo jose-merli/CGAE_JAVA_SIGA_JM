@@ -108,7 +108,7 @@ public class SigaUserDetailsService implements UserDetailsService {
 				if (null!= roles && roles.size()>0) {
 					AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
 					exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
-								.andIdusuarioEqualTo(usuarios.get(0).getIdusuario()).andIdrolEqualTo(roles.get(0).getIdrol()).andFechaBajaEqualTo(null);
+								.andIdusuarioEqualTo(usuarios.get(0).getIdusuario()).andIdrolEqualTo(roles.get(0).getIdrol()).andFechaBajaIsNull();
 					List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
 					
 					if(null != perfiles && perfiles.size()>0) {
