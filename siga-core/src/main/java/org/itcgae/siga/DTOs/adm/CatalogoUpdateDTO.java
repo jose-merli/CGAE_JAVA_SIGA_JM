@@ -52,6 +52,7 @@ public class CatalogoUpdateDTO   {
   public void setTabla(String tabla) {
     this.tabla = tabla;
   }
+  
   /**
    **/
   public CatalogoUpdateDTO idtabla(String idtabla) {
@@ -61,9 +62,11 @@ public class CatalogoUpdateDTO   {
   
   
   @JsonProperty("idtabla")
-  public String getIdTablaRegistro() {
-    return idRegistro;
+  public String getIdTabla() {
+    return idtabla;
   }
+  
+  
   public void setIdTabla(String idtabla) {
     this.idtabla = idtabla;
   }

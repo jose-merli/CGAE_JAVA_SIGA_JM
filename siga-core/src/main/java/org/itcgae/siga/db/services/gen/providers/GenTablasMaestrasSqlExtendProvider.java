@@ -53,7 +53,7 @@ public class GenTablasMaestrasSqlExtendProvider {
         sql.SELECT("TAB.CODIGOEXT AS CODIGOEXT");
         sql.SELECT("REC.DESCRIPCION AS DESCRIPCION");
         sql.SELECT("MAES.IDTABLAMAESTRA AS CATALOGO");
-        sql.SELECT("MAES.IDCAMPOCODIGO AS IDREGISTRO");
+        sql.SELECT("REC.IDRECURSO AS IDREGISTRO");
         sql.SELECT("MAES.LONGITUDCODIGOEXT");
         sql.SELECT("MAES.LONGITUDDESCRIPCION");
         
@@ -90,10 +90,12 @@ public class GenTablasMaestrasSqlExtendProvider {
         SQL sql = new SQL();
         sql.UPDATE(tablaMaestra.getIdtablamaestra());
         
-        sql.SET(tablaMaestra.getIdcampocodigoext() + " = '" + catalogo.getCodigoExt() + "'");
+        sql.SET("CODIGOEXT = '" + catalogo.getCodigoExt() + "'");
 
         
-        sql.WHERE(tablaMaestra.getIdcampocodigo() + " = " + catalogo.getIdRegistro());
+        sql.WHERE("DESCRIPCION = '" + catalogo.getIdRegistro() + "'");
+        sql.WHERE("IDINSTITUCION = '"+catalogo.getIdInstitucion()+"'");
+        //sql.WHERE(tablaMaestra.get)
         return sql.toString();
     }
 
@@ -111,10 +113,10 @@ public class GenTablasMaestrasSqlExtendProvider {
         sql.SET("DESCRIPCION = '" + catalogo.getDescripcion() + "'");
 
         
-        sql.WHERE( " IDRECURSO = ( SELECT DESCRIPCION FROM " + tablaMaestra.getIdtablamaestra() +  " WHERE " +  
-        tablaMaestra.getIdcampocodigo() + " = " + catalogo.getIdRegistro() + " AND IDINSTITUCION = " + catalogo.getIdInstitucion() + ")" );
-        sql.WHERE( " IDLENGUAJE = " + catalogo.getIdLenguaje() );
-        sql.WHERE( " IDINSTITUCION = " + catalogo.getIdInstitucion() );
+        sql.WHERE( " IDRECURSO = ( SELECT DESCRIPCION FROM " + tablaMaestra.getIdtablamaestra() + 
+        		" WHERE DESCRIPCION = '" + catalogo.getIdRegistro() + "' AND IDINSTITUCION = '" + catalogo.getIdInstitucion() + "')" );
+        sql.WHERE( " IDLENGUAJE = '" + catalogo.getIdLenguaje() + "'");
+        sql.WHERE( " IDINSTITUCION = '" + catalogo.getIdInstitucion() + "'");
         return sql.toString();
     }
     
@@ -142,7 +144,7 @@ public class GenTablasMaestrasSqlExtendProvider {
         	sql.WHERE( " IDINSTITUCION = '" + catalogo.getIdInstitucion() +"'" );
 		}	
         
-        sql.WHERE(tablaMaestra.getIdcampocodigo() + " IN (" + whereIdRegistro + " )");
+        sql.WHERE("DESCRIPCION IN (" + whereIdRegistro + " )");
         
         return sql.toString();
     }
@@ -269,13 +271,13 @@ public class GenTablasMaestrasSqlExtendProvider {
 		// comprueba si existen otros registros con esa descripcion
 		if(!catalogoUpdate.getDescripcion().equals("")) {
 			sql.WHERE(" upper(REC.descripcion) = upper('"+catalogoUpdate.getDescripcion()+"')");
-			sql.WHERE("TAB.IDCOSTEFIJO != '"+ catalogoUpdate.getIdRegistro() +"'");
+			sql.WHERE("TAB.DESCRIPCION != '"+ catalogoUpdate.getIdRegistro() +"'");
 		}
 		
 		// comprueba si existen otros registros con ese codigoExt
 		if(!catalogoUpdate.getCodigoExt().equals("")) {
 			sql.WHERE("upper(TAB.CODIGOEXT) = upper('"+catalogoUpdate.getCodigoExt()+"')");
-			sql.WHERE("TAB.IDCOSTEFIJO != '"+ catalogoUpdate.getIdRegistro() +"'");
+			sql.WHERE("TAB.DESCRIPCION != '"+ catalogoUpdate.getIdRegistro() +"'");
 		}
 		
 		// comprueba codigoext y descripcion. Esto pasa si codigoExt = ""
