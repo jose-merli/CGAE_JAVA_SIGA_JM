@@ -12,8 +12,12 @@ public class MultiidiomaCatalogoUpdateDTO {
 	private String idLenguaje;
 	private String nombreTabla;
 	private String idInstitucion;
+	private String local;
 	
 	
+	
+
+
 	/**
 	**/
 	public MultiidiomaCatalogoUpdateDTO idRecurso(String idRecurso) {
@@ -111,6 +115,25 @@ public class MultiidiomaCatalogoUpdateDTO {
 	}
 	
 	
+	/**
+	**/
+	public MultiidiomaCatalogoUpdateDTO local(String local) {
+		this.local = local;
+		return this;
+	}
+	
+	
+	
+	@JsonProperty("local")
+	public String getLocal() {
+		return local;
+	}
+
+
+	public void setLocal(String local) {
+		this.local = local;
+	}
+	
 	
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -125,13 +148,14 @@ public class MultiidiomaCatalogoUpdateDTO {
         Objects.equals(this.descripcion, multiidiomaCatalogoUpdateDTO.descripcion) &&
         Objects.equals(this.idLenguaje, multiidiomaCatalogoUpdateDTO.idLenguaje) &&
         Objects.equals(this.nombreTabla, multiidiomaCatalogoUpdateDTO.nombreTabla) &&
-        Objects.equals(this.idInstitucion, multiidiomaCatalogoUpdateDTO.idInstitucion);
+        Objects.equals(this.idInstitucion, multiidiomaCatalogoUpdateDTO.idInstitucion) &&
+		Objects.equals(this.local, multiidiomaCatalogoUpdateDTO.local);
 	}
 
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(idRecurso, descripcion, idLenguaje, nombreTabla, idInstitucion);
+		return Objects.hash(idRecurso, descripcion, idLenguaje, nombreTabla, idInstitucion, local);
 	}
 	
 
@@ -145,6 +169,7 @@ public class MultiidiomaCatalogoUpdateDTO {
 		sb.append("    idLenguaje: ").append(toIndentedString(idLenguaje)).append("\n");
 		sb.append("    nombreTabla: ").append(toIndentedString(nombreTabla)).append("\n");
 		sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
+		sb.append("    local: ").append(toIndentedString(local)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

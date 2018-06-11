@@ -182,9 +182,16 @@ public class MultiidiomaCatalogosServiceImpl implements IMultiidiomaCatalogosSer
 				record.setUsumodificacion(usuario.getIdusuario());
 				
 				// el where sera por idRecurso, idInstitucion, idLenguaje
-				example.createCriteria().andIdrecursoEqualTo(multiidiomaCatalogoUpdateDTO.getIdRecurso())
-						.andIdlenguajeEqualTo(multiidiomaCatalogoUpdateDTO.getIdLenguaje())
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				if(multiidiomaCatalogoUpdateDTO.getLocal().equals("S")) {
+					example.createCriteria().andIdrecursoEqualTo(multiidiomaCatalogoUpdateDTO.getIdRecurso())
+					.andIdlenguajeEqualTo(multiidiomaCatalogoUpdateDTO.getIdLenguaje())
+					.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				}
+				else {
+					example.createCriteria().andIdrecursoEqualTo(multiidiomaCatalogoUpdateDTO.getIdRecurso())
+					.andIdlenguajeEqualTo(multiidiomaCatalogoUpdateDTO.getIdLenguaje());
+				}
+				
 				LOGGER.info("catalogUpdate() / genRecursosCatalogosExtendsMapper.updateByExampleSelective() -> Entrada a genRecursosCatalogosExtendsMapper actualizar el idioma de tradución de un catálogo");
 				response = genRecursosCatalogosExtendsMapper.updateByExampleSelective(record, example);
 				LOGGER.info("catalogUpdate() / genRecursosCatalogosExtendsMapper.updateByExampleSelective() -> Salida de genRecursosCatalogosExtendsMapper actualizar el idioma de tradución de un catálogo");

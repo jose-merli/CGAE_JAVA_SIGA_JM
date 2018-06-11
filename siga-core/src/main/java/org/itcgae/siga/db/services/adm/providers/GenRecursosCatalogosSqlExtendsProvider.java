@@ -38,7 +38,7 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 		sql.INNER_JOIN(multiidiomaCatalogoSearchDTO.getNombreTabla() +  " TAB on TAB." + campoTabla + "= REC.IDRECURSO");
 		sql.WHERE(" REC.IDLENGUAJE = '"+ multiidiomaCatalogoSearchDTO.getIdiomaBusqueda()  + "'");
 		sql.WHERE(" REC.NOMBRETABLA = '" + multiidiomaCatalogoSearchDTO.getNombreTabla() + "'");
-		sql.WHERE("TAB.FECHA_BAJA IS NULL");
+		sql.WHERE("TAB.FECHA_BAJA IS NULL"); 
 		
 		if(multiidiomaCatalogoSearchDTO.getLocal().equals("S"))
 			sql.WHERE(" REC.IDINSTITUCION = '" + idInstitucion + "'");
