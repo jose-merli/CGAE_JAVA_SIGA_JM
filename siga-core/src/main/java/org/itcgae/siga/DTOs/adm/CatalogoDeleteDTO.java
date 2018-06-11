@@ -17,6 +17,7 @@ public class CatalogoDeleteDTO   {
   private String idtabla = null;
   private String idInstitucion = null;
   private String idLenguaje = null;
+  private String local;
   
   
   /**
@@ -101,6 +102,24 @@ public class CatalogoDeleteDTO   {
   public void setIdLenguaje(String idLenguaje) {
     this.idLenguaje = idLenguaje;
   }
+  
+  
+  /**
+   **/
+  public CatalogoDeleteDTO local(String local) {
+    this.local = local;
+    return this;
+  }
+  
+  @JsonProperty("local")
+  public String getLocal() {
+	return local;
+  }
+
+
+  public void setLocal(String local) {
+	this.local = local;
+  }
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -115,13 +134,14 @@ public class CatalogoDeleteDTO   {
         Objects.equals(this.idInstitucion, catalogoItem.idInstitucion)&&
 	    Objects.equals(this.idtabla, catalogoItem.idtabla)&&
 	    Objects.equals(this.tabla, catalogoItem.tabla)&&
-	    Objects.equals(this.idLenguaje, catalogoItem.idLenguaje);
+	    Objects.equals(this.idLenguaje, catalogoItem.idLenguaje) &&
+	    Objects.equals(this.local, catalogoItem.local);
 
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(idRegistro, idInstitucion,idtabla,tabla,idLenguaje);
+    return Objects.hash(idRegistro, idInstitucion,idtabla,tabla,idLenguaje, local);
   }
 
   @Override
@@ -134,6 +154,7 @@ public class CatalogoDeleteDTO   {
     sb.append("    idtabla: ").append(toIndentedString(idtabla)).append("\n");
     sb.append("    idRegistro: ").append(toIndentedString(idRegistro)).append("\n");
     sb.append("    idLenguaje: ").append(toIndentedString(idLenguaje)).append("\n");
+    sb.append("    local: ").append(toIndentedString(local)).append("\n");
     sb.append("}");
     return sb.toString();
   }

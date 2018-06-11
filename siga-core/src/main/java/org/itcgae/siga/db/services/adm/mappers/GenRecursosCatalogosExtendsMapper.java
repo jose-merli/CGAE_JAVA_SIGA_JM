@@ -38,7 +38,7 @@ public interface GenRecursosCatalogosExtendsMapper extends GenRecursosCatalogosM
 		@Result(column = "IDLENGUAJEBUSCAR", property = "idLenguajeBuscar", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDLENGUAJETRADUCIR", property = "idLenguajeTraducir", jdbcType = JdbcType.VARCHAR)
 	})
-	List<MultiidiomaCatalogoItem> getCatalogSearch(int numPagina, MultiidiomaCatalogoSearchDTO multiidiomaCatalogoSearchDTO,String idInstitucion);
+	List<MultiidiomaCatalogoItem> getCatalogSearch(int numPagina, MultiidiomaCatalogoSearchDTO multiidiomaCatalogoSearchDTO,String idInstitucion, String campoTabla);
 	
 	
 	@InsertProvider(type = GenRecursosCatalogosSqlExtendsProvider.class, method = "insertSelectiveForCreateLegalPerson")

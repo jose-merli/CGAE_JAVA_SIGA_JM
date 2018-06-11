@@ -14,7 +14,7 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 		sql.SELECT("distinct REC.NOMBRETABLA");
 		sql.SELECT(" MAES.LOCAL");
 		sql.FROM("GEN_RECURSOS_CATALOGOS REC");
-		sql.INNER_JOIN("GEN_CATALOGOS_MULTIIDIOMA MAES ON REC.NOMBRETABLA = MAES.NOMBRETABLA");
+		sql.INNER_JOIN("GEN_TABLAS_MAESTRAS MAES ON REC.NOMBRETABLA = MAES.IDTABLAMAESTRA");
 		
 		if(!idInstitucion.equals(SigaConstants.InstitucionGeneral))
 			sql.WHERE("MAES.LOCAL = 'S'");
@@ -24,7 +24,7 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 	}
 	
 	
-	public String getCatalogSearch(int numPagina, MultiidiomaCatalogoSearchDTO multiidiomaCatalogoSearchDTO, String idInstitucion) {
+	public String getCatalogSearch(int numPagina, MultiidiomaCatalogoSearchDTO multiidiomaCatalogoSearchDTO, String idInstitucion, String campoTabla) {
 		SQL sql = new SQL();
 		
 		sql.SELECT("DISTINCT REC.IDRECURSO");
@@ -35,11 +35,13 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 		sql.SELECT(" '" +  multiidiomaCatalogoSearchDTO.getIdiomaBusqueda()  + "' as IDLENGUAJEBUSCAR ");
 		sql.SELECT(" '" + multiidiomaCatalogoSearchDTO.getIdiomaTraduccion() + "' as IDLENGUAJETRADUCIR ");
 		sql.FROM(" GEN_RECURSOS_CATALOGOS REC ");
-		sql.WHERE(" IDLENGUAJE = '"+ multiidiomaCatalogoSearchDTO.getIdiomaBusqueda()  + "'");
-		sql.WHERE(" NOMBRETABLA = '" + multiidiomaCatalogoSearchDTO.getNombreTabla() + "'");
+		sql.INNER_JOIN(multiidiomaCatalogoSearchDTO.getNombreTabla() +  " TAB on TAB." + campoTabla + "= REC.IDRECURSO");
+		sql.WHERE(" REC.IDLENGUAJE = '"+ multiidiomaCatalogoSearchDTO.getIdiomaBusqueda()  + "'");
+		sql.WHERE(" REC.NOMBRETABLA = '" + multiidiomaCatalogoSearchDTO.getNombreTabla() + "'");
+		sql.WHERE("TAB.FECHA_BAJA IS NULL");
 		
 		if(multiidiomaCatalogoSearchDTO.getLocal().equals("S"))
-			sql.WHERE(" IDINSTITUCION = '" + idInstitucion + "'");
+			sql.WHERE(" REC.IDINSTITUCION = '" + idInstitucion + "'");
 		
 		sql.ORDER_BY(" DESCRIPCIONBUSCAR ");
 		

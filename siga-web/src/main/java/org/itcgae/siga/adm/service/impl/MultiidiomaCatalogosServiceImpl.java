@@ -20,9 +20,12 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
+import org.itcgae.siga.db.entities.GenTablasMaestras;
+import org.itcgae.siga.db.entities.GenTablasMaestrasExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenDiccionarioExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
+import org.itcgae.siga.db.services.gen.mappers.GenTablasMaestrasExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +44,9 @@ public class MultiidiomaCatalogosServiceImpl implements IMultiidiomaCatalogosSer
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private GenTablasMaestrasExtendsMapper genTablasMaestrasExtendsMapper;
 	
 	@Override
 	public ComboDTO getCatalogLenguage() {
@@ -110,8 +116,19 @@ public class MultiidiomaCatalogosServiceImpl implements IMultiidiomaCatalogosSer
 				!multiidiomaCatalogoSearchDTO.getNombreTabla().equals(null) && !multiidiomaCatalogoSearchDTO.getNombreTabla().equalsIgnoreCase("")){
 			
 			if(!idInstitucion.equals(null)) {
+				
+				
+				GenTablasMaestrasExample example = new GenTablasMaestrasExample();
+				example.createCriteria().andIdtablamaestraEqualTo(multiidiomaCatalogoSearchDTO.getNombreTabla());
+				
+				String campoTabla ="";
+				List<GenTablasMaestras> tablasmaestra = new ArrayList<GenTablasMaestras>();
+				tablasmaestra =  genTablasMaestrasExtendsMapper.selectByExample(example);
+				if(!tablasmaestra.isEmpty())
+					campoTabla = tablasmaestra.get(0).getIdcampodescripcion();
+				
 				LOGGER.info("catalogSearch() / genRecursosCatalogosExtendsMapper.getCatalogSearch() -> Entrada a genRecursosCatalogosExtendsMapper para obtener listado de catálogos de una institución por idiomas");
-				multiidiomaCatalogoItem = genRecursosCatalogosExtendsMapper.getCatalogSearch(numPagina, multiidiomaCatalogoSearchDTO, idInstitucion);
+				multiidiomaCatalogoItem = genRecursosCatalogosExtendsMapper.getCatalogSearch(numPagina, multiidiomaCatalogoSearchDTO, idInstitucion, campoTabla);
 				LOGGER.info("catalogSearch() / genRecursosCatalogosExtendsMapper.getCatalogSearch() -> Salida de genRecursosCatalogosExtendsMapper para obtener listado de catálogos de una institución por idiomas");
 				multiidiomaCatalogoDTO.setMultiidiomaCatalogoItem(multiidiomaCatalogoItem);
 			}
