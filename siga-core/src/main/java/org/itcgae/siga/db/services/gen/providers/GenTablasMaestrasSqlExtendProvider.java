@@ -194,7 +194,7 @@ public class GenTablasMaestrasSqlExtendProvider {
         	sql.VALUES("IDINSTITUCION",  "'" +catalogo.getIdInstitucion()+"'");
         }
         else {
-        	sql.VALUES("IDINSTITUCION", "null"); // esto falla
+        	sql.VALUES("IDINSTITUCION", "null"); 
         }
         //sql.VALUES("IDINSTITUCION",  "'" +catalogo.getIdInstitucion()+"'");
         sql.VALUES("DESCRIPCION",  "'" +catalogo.getDescripcion()+"'");

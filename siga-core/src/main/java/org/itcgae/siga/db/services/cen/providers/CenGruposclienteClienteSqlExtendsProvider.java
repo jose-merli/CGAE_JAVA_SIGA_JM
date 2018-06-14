@@ -23,7 +23,7 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", idUsuario);
 		sql.VALUES("IDINSTITUCION_GRUPO", idInstitucion);
-		sql.VALUES("FECHA_BAJA", null);
+		sql.VALUES("FECHA_BAJA", "null");
 		sql.VALUES("FECHA_INICIO", "SYSDATE");
 		return sql.toString();
 	}

@@ -1,5 +1,6 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +18,14 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosRegistralesService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenNocolegiado;
+import org.itcgae.siga.db.entities.CenNocolegiadoExample;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenActividadprofesionalExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +43,9 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 	
 	@Autowired
 	private CenActividadprofesionalExtendsMapper cenActividadprofesionalExtendsMapper;
+	
+	@Autowired
+	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 	
 	@Override
 	public ComboDTO getActividadProfesionalPer(PersonaJuridicaActividadDTO personaJuridicaActividadDTO,
@@ -135,10 +144,10 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"getActividadProfesional() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchRegistryDataLegalPerson() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
-					"getActividadProfesional() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchRegistryDataLegalPerson() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 
@@ -146,8 +155,11 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 				
 				personaJuridicaSearchDTO.setIdInstitucion(String.valueOf(idInstitucion));
 				personaJuridicaSearchDTO.setIdLenguaje(usuario.getIdlenguaje());
-				
+				LOGGER.info(
+						"searchRegistryDataLegalPerson() / cenActividadprofesionalExtendsMapper.searchRegistryDataLegalPerson() -> Entrada a cenActividadprofesionalExtendsMapper para recuperar datos de registro de persona jurídica");
 				datosRegistralesItems = cenActividadprofesionalExtendsMapper.searchRegistryDataLegalPerson(personaJuridicaSearchDTO);
+				LOGGER.info(
+						"searchRegistryDataLegalPerson() / cenActividadprofesionalExtendsMapper.searchRegistryDataLegalPerson() -> Salida de cenActividadprofesionalExtendsMapper para recuperar datos de registro de persona jurídica");
 				
 				datosRegistralesDTO.setDatosRegistralesItems(datosRegistralesItems);
 			}
@@ -166,6 +178,27 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 				"updateRegistryDataLegalPerson() -> Entrada al servicio para actualizar datos registrales de una persona jurídica");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		CenPersona cenPersona = new CenPersona();
+		CenPersonaExample cenPersonaExample = new CenPersonaExample();
+		cenPersonaExtendsMapper.updateByExampleSelective(cenPersona, cenPersonaExample);
+		
+		// Formateo de fecha para sentencia sql
+//		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+//		String fechaFin = dateFormat.format(perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
+//		String fechaConstitucion = dateFormat.format(perJuridicaDatosRegistralesUpdateDTO.getFechaConstitucion());
+//		
+//		sql.WHERE(" TO_DATE(HIST.FECHAEFECTIVA,'DD/MM/RRRR') <= TO_DATE('" +fechaFin + "', 'DD/MM/RRRR') ");
+//		sql.WHERE(" TO_DATE(HIST.FECHAEFECTIVA,'DD/MM/RRRR') <= TO_DATE('" +fechaConstitucion + "', 'DD/MM/RRRR') ");
+		
+		
+		CenNocolegiado cenNocolegiado = new CenNocolegiado();
+		CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
+		cenNocolegiadoExtendsMapper.updateByExampleSelective(cenNocolegiado, cenNocolegiadoExample);
 		
 		
 		LOGGER.info(
