@@ -4,6 +4,7 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.cen.FichaPerSearchDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenPersonaSqlProvider;
 
@@ -225,6 +226,49 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.VALUES("NATURALDE", "");
 		sql.VALUES("FALLECIDO", "0");
 		sql.VALUES("SEXO", "");
+		
+		return sql.toString();
+	}
+	
+	
+	public String searchPersonFile(FichaPerSearchDTO fichaPerSearch) {
+		
+		SQL sql = new SQL();
+		SQL sql2 = new SQL();
+		SQL sql3 = new SQL();
+			            
+		sql3.SELECT("IDINSTITUCION, IDPERSONA, MAX(FECHAESTADO) AS FE FROM CEN_DATOSCOLEGIALESESTADO GROUP BY IDINSTITUCION, IDPERSONA");
+		
+		sql2.SELECT("A.IDINSTITUCION, A.IDPERSONA, A.IDESTADO FROM CEN_DATOSCOLEGIALESESTADO A,(" + sql3 + ")"
+				+ "B WHERE A.IDINSTITUCION=B.IDINSTITUCION AND A.IDPERSONA=B.IDPERSONA AND A.FECHAESTADO=B.FE");
+		
+		  
+		sql.SELECT("PER.IDPERSONA AS IDPERSONA");
+		sql.SELECT("PER.nifcif AS NIF");
+		sql.SELECT("PER.FECHANACIMIENTO AS FECHAALTA");
+		sql.SELECT("CONCAT(PER.NOMBRE  || ' ', CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) AS NOMBRE");
+		sql.SELECT("I.IDINSTITUCION AS COLEGIO");
+		sql.SELECT("DECODE(COL.NCOLEGIADO,NULL, DECODE(COL.NCOLEGIADO,NULL,DECODE(NOCOL.sociedadprofesional,'1',\r\n" + "NOCOL.NUMEROREF,NULL),COL.NCOLEGIADO )) AS NCOLEGIADO");
+		sql.SELECT("DECODE(CA.DESCRIPCION ,NULL,DECODE(NOCOL.sociedadprofesional,'1',\r\n" + "'Sociedad',DECODE(COL.NCOLEGIADO,NULL,'No colegiado',NULL))");
+		sql.SELECT("CA.DESCRIPCION || \r\n" + "DECODE(COL.SITUACIONRESIDENTE,'0',' NO RESIDENTE ','1',' RESIDENTE ')) AS ESTADOCOLEGIAL");
+		sql.SELECT("PER.FECHANACIMIENTO");
+		sql.SELECT("CA.DESCRIPCION AS ESTADOCOLEGIAL");
+		sql.SELECT("DECODE(COL.SITUACIONRESIDENTE,'0','NO','1','SI') AS RESIDENTE");
+		sql.FROM("CEN_PERSONA PER");
+		sql.LEFT_OUTER_JOIN("CEN_NOCOLEGIADO NOCOL  ON (PER.IDPERSONA = NOCOL.IDPERSONA AND NOCOL.FECHA_BAJA IS NULL)");
+		sql.LEFT_OUTER_JOIN("CEN_COLEGIADO COL  ON PER.IDPERSONA = COL.IDPERSONA");
+		sql.INNER_JOIN("CEN_INSTITUCION I ON (COL.IDINSTITUCION = I.IDINSTITUCION OR NOCOL.IDINSTITUCION = I.IDINSTITUCION)");
+		sql.LEFT_OUTER_JOIN( "(" + sql2 + ") " + "DATOSCOLEGIALES ON (DATOSCOLEGIALES.IDPERSONA  = PER.IDPERSONA AND DATOSCOLEGIALES.IDINSTITUCION = I.IDINSTITUCION)");
+		sql.LEFT_OUTER_JOIN("CEN_ESTADOCOLEGIAL ESTADOCOLEGIAL ON ESTADOCOLEGIAL.IDESTADO = DATOSCOLEGIALES.IDESTADO");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS CA ON (ESTADOCOLEGIAL.DESCRIPCION = CA.IDRECURSO  AND CA.IDLENGUAJE = '1')");
+		sql.WHERE("PER.IDTIPOIDENTIFICACION NOT IN ('20','50')");
+		
+		if (null != fichaPerSearch.getIdPersona() && !fichaPerSearch.getIdPersona().equalsIgnoreCase("")) {
+			sql.WHERE("PER.IDPERSONA = '" + fichaPerSearch.getIdPersona() + "'");
+		}
+		if (null != fichaPerSearch.getIdInstitucion() && !fichaPerSearch.getIdInstitucion().equalsIgnoreCase("")) {
+			sql.WHERE("I.IDINSTITUCION = '" + fichaPerSearch.getIdInstitucion() + "'");
+		}
 		
 		return sql.toString();
 	}

@@ -12,6 +12,8 @@ import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.cen.FichaPerSearchDTO;
+import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
@@ -67,5 +69,18 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		
 	@InsertProvider(type = CenPersonaSqlExtendsProvider.class, method = "insertSelectiveForCreateLegalPerson")
 	int insertSelectiveForCreateLegalPerson(EtiquetaUpdateDTO etiquetaUpdateDTO, AdmUsuarios usuario);
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "searchPersonFile")
+	@Results({
+		@Result(column = "COLEGIO", property = "colegio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "RESIDENTE", property = "residente", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ESTADOCOLEGIAL", property = "situacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.DATE)
+	})
+	List<FichaPersonaItem> searchPersonFile(FichaPerSearchDTO fichaPersona);
 	
 }
