@@ -167,7 +167,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		
 		if (null != busquedaPerJuridicaSearchDTO.getIdInstitucion()
 				&& busquedaPerJuridicaSearchDTO.getIdInstitucion().length > 0) {
-			sql.WHERE("i.idinstitucion in ('" + idInstituciones + "')");
+			sql.WHERE("i.idinstitucion in (" + idInstituciones + ")");
 		}
 		sql.WHERE("col.fecha_baja IS NULL");
 		sql.WHERE("PER.IDTIPOIDENTIFICACION IN ('20','50')");

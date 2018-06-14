@@ -13,9 +13,9 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	private String objetoSocial;
 	private String numeroPoliza;
 	private String companiaAseg;
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	//@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaFin;
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	//@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaConstitucion;
 	private String sociedadProfesional;
 	private String [] actividades;

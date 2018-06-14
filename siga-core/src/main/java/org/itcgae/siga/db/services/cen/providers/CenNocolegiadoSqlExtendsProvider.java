@@ -177,7 +177,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.SELECT("COL.ANOTACIONES AS ANOTACIONES");
 		sql.SELECT("PER.NIFCIF AS NIF");
 		sql.SELECT("CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) AS DENOMINACION");
-		sql.SELECT("I.ABREVIATURA AS ABREVIATURA");
+		sql.SELECT("PER.APELLIDOS1 AS ABREVIATURA");
 		sql.SELECT("PER.FECHANACIMIENTO AS FECHACONSTITUCION");
 		sql.SELECT("COL.SOCIEDADPROFESIONAL AS SOCIEDADPROFESIONAL");
 		sql.SELECT("TIPOSOCIEDAD.LETRACIF  AS TIPO");
@@ -246,7 +246,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.VALUES("NOPOLIZA", "");
 		sql.VALUES("COMPANIASEG", "");
 		sql.VALUES("IDENTIFICADORDS", "");
-		sql.VALUES("FECHA_BAJA", null);
+		sql.VALUES("FECHA_BAJA", "null");
 		
 		return sql.toString();
 	}
