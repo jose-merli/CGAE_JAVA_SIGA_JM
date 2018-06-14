@@ -178,14 +178,30 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 				"updateRegistryDataLegalPerson() -> Entrada al servicio para actualizar datos registrales de una persona jurídica");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		
+		int responseCenPersona = 0;
+		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
+		// 1. Actualizar tabla cen_persona
 		CenPersona cenPersona = new CenPersona();
+		cenPersona.setFechanacimiento(perJuridicaDatosRegistralesUpdateDTO.getFechaConstitucion());
 		CenPersonaExample cenPersonaExample = new CenPersonaExample();
-		cenPersonaExtendsMapper.updateByExampleSelective(cenPersona, cenPersonaExample);
+		cenPersonaExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona()));
+		responseCenPersona = cenPersonaExtendsMapper.updateByExampleSelective(cenPersona, cenPersonaExample);
+		
+		// 2. Actualiza tabla cen_nocolegiado
+		if(responseCenPersona == 1) {
+			CenNocolegiado cenNocolegiado = new CenNocolegiado();
+			
+			CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
+			cenNocolegiadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
+			cenNocolegiadoExtendsMapper.updateByExampleSelective(cenNocolegiado, cenNocolegiadoExample);
+		}
+		
+		
 		
 		// Formateo de fecha para sentencia sql
 //		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");

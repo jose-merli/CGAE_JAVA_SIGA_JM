@@ -3,7 +3,6 @@ package org.itcgae.siga.DTOs.cen;
 import java.util.Date;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
@@ -19,8 +18,11 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	private Date fechaConstitucion;
 	private String sociedadProfesional;
 	private String [] actividades;
+	private String idPersona;
 	
 	
+	
+
 	
 	/**
 	 *
@@ -176,6 +178,24 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	}
 	
 	
+	/**
+	 *
+	 */
+	public PerJuridicaDatosRegistralesUpdateDTO idPersona(String idPersona){
+		this.idPersona = idPersona;
+		return this;
+	}
+	
+	@JsonProperty("idPersona")
+	public String getIdPersona() {
+		return idPersona;
+	}
+
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
+	}
+	
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -192,13 +212,14 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	    		Objects.equals(this.fechaFin, perJuridicaDatosRegistralesUpdateDTO.fechaFin) &&
 	    		Objects.equals(this.fechaConstitucion, perJuridicaDatosRegistralesUpdateDTO.fechaConstitucion) &&
 	    		Objects.equals(this.sociedadProfesional, perJuridicaDatosRegistralesUpdateDTO.sociedadProfesional) &&
-	    		Objects.equals(this.actividades, perJuridicaDatosRegistralesUpdateDTO.actividades);
+	    		Objects.equals(this.actividades, perJuridicaDatosRegistralesUpdateDTO.actividades) &&
+	    		Objects.equals(this.idPersona, perJuridicaDatosRegistralesUpdateDTO.idPersona);
 	}
  
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(resena, objetoSocial, numeroPoliza, companiaAseg, fechaFin, fechaConstitucion, sociedadProfesional, actividades);
+	    return Objects.hash(resena, objetoSocial, numeroPoliza, companiaAseg, fechaFin, fechaConstitucion, sociedadProfesional, actividades, idPersona);
 	}
 
 	
@@ -215,7 +236,8 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	    sb.append("    fechaConstitucion: ").append(toIndentedString(fechaConstitucion)).append("\n");
 	    sb.append("    sociedadProfesional: ").append(toIndentedString(sociedadProfesional)).append("\n");
 	    sb.append("    actividades: ").append(toIndentedString(actividades)).append("\n");
-
+	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
+	    
 	    sb.append("}");
 	    return sb.toString();
 	}
