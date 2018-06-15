@@ -13,6 +13,8 @@ import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.PersonaSearchDTO;
+import org.itcgae.siga.DTOs.cen.RetencionesItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
@@ -89,5 +91,18 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> selectProfesionalActivitiesSociety(PersonaJuridicaActividadDTO personaJuridicaActividadDTO, String idLenguaje);
+	
+	
+	@SelectProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "selectRetenciones")
+	@Results({
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.DATE),
+		@Result(column = "IDRETENCION", property = "idRetencion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "RETENCION", property = "porcentajeRetencion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "RECURSO", property = "recursoRetencion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcionRetencion", jdbcType = JdbcType.VARCHAR)
+	})
+	List<RetencionesItem> selectRetenciones(PersonaSearchDTO personaSearchDto, String idLenguaje, String idInstitucion);
 	
 }
