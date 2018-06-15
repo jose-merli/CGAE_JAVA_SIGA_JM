@@ -1,6 +1,5 @@
 package org.itcgae.siga.db.services.cen.mappers;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Result;
@@ -14,8 +13,6 @@ import org.itcgae.siga.db.mappers.CenActividadprofesionalMapper;
 import org.itcgae.siga.db.services.cen.providers.CenActividadprofesionalSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Service
 @Primary

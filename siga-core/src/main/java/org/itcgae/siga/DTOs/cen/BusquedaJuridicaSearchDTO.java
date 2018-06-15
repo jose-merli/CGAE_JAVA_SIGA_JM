@@ -14,7 +14,7 @@ public class BusquedaJuridicaSearchDTO {
 	private Date fechaConstitucion;
 	private String integrante;
 	private String [] grupos;
-	private String sociedadProfesional;
+	private boolean sociedadesProfesionales;
 	
 
 	/**
@@ -142,20 +142,20 @@ public class BusquedaJuridicaSearchDTO {
 	/**
 	 *
 	 */
-	public BusquedaJuridicaSearchDTO sociedadProfesional(String sociedadProfesional){
-		this.sociedadProfesional = sociedadProfesional;
+	public BusquedaJuridicaSearchDTO sociedadesProfesionales(boolean sociedadesProfesionales){
+		this.sociedadesProfesionales = sociedadesProfesionales;
 		return this;
 	}
 	
 	
-	@JsonProperty("sociedadProfesional")
-	public String getSociedadProfesional() {
-		return sociedadProfesional;
+	@JsonProperty("sociedadesProfesionales")
+	public boolean getSociedadesProfesionales() {
+		return sociedadesProfesionales;
 	}
 
 
-	public void setSociedadProfesional(String sociedadProfesional) {
-		this.sociedadProfesional = sociedadProfesional;
+	public void setSociedadesProfesionales(boolean sociedadesProfesionales) {
+		this.sociedadesProfesionales = sociedadesProfesionales;
 	}
 	
 	
@@ -174,12 +174,12 @@ public class BusquedaJuridicaSearchDTO {
 	    		Objects.equals(this.fechaConstitucion, busquedaJuridicaSearchDTO.fechaConstitucion) &&
 	    		Objects.equals(this.integrante, busquedaJuridicaSearchDTO.integrante) &&
 	    		Objects.equals(this.grupos, busquedaJuridicaSearchDTO.grupos) &&
-	    		Objects.equals(this.sociedadProfesional, busquedaJuridicaSearchDTO.sociedadProfesional);
+	    		Objects.equals(this.sociedadesProfesionales, busquedaJuridicaSearchDTO.sociedadesProfesionales);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(tipo, nif, denominacion, fechaConstitucion, integrante, grupos, sociedadProfesional);
+	    return Objects.hash(tipo, nif, denominacion, fechaConstitucion, integrante, grupos, sociedadesProfesionales);
 	}
 
 	
@@ -194,7 +194,7 @@ public class BusquedaJuridicaSearchDTO {
 	    sb.append("    fechaConstitucion: ").append(toIndentedString(fechaConstitucion)).append("\n");
 	    sb.append("    integrante: ").append(toIndentedString(integrante)).append("\n");
 	    sb.append("    grupos: ").append(toIndentedString(grupos)).append("\n");
-	    sb.append("    sociedadProfesional: ").append(toIndentedString(sociedadProfesional)).append("\n");
+	    sb.append("    sociedadesProfesionales: ").append(toIndentedString(sociedadesProfesionales)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
