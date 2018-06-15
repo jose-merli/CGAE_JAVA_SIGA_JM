@@ -76,11 +76,13 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "RESIDENTE", property = "residente", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESTADOCOLEGIAL", property = "situacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.DATE)
 	})
-	List<FichaPersonaItem> searchPersonFile(FichaPerSearchDTO fichaPersona);
+	List<FichaPersonaItem> searchPersonFile(Short idInstitucion, Long idPersona);
 	
 }

@@ -13,7 +13,7 @@ import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.FichaPerSearchDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
-import org.itcgae.siga.cen.services.FichaPersonaService;
+import org.itcgae.siga.cen.services.IFichaPersonaService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FichaPersonaServiceImpl implements FichaPersonaService{
+public class FichaPersonaServiceImpl implements IFichaPersonaService{
 
 	private Logger LOGGER = Logger.getLogger(FichaPersonaServiceImpl.class);
 	
@@ -65,7 +65,7 @@ public class FichaPersonaServiceImpl implements FichaPersonaService{
 		}
 		
 		if(null != colegiado.getIdpersonanotario()) {
-			List<FichaPersonaItem> fichaPersonaItem = cenPersonaExtendsMapper.searchPersonFile(fichaPerSearch);
+			List<FichaPersonaItem> fichaPersonaItem = cenPersonaExtendsMapper.searchPersonFile(idInstitucion, colegiado.getIdpersonanotario());
 			if(null != fichaPersonaItem) {
 				fichaPersona.setFichaPersonaItem(fichaPersonaItem);
 			}

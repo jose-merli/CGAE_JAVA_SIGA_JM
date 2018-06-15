@@ -231,7 +231,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 	}
 	
 	
-	public String searchPersonFile(FichaPerSearchDTO fichaPerSearch) {
+	public String searchPersonFile(Short idInstitucion, Long idPersona) {
 		
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
@@ -246,7 +246,10 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT("PER.IDPERSONA AS IDPERSONA");
 		sql.SELECT("PER.nifcif AS NIF");
 		sql.SELECT("PER.FECHANACIMIENTO AS FECHAALTA");
-		sql.SELECT("CONCAT(PER.NOMBRE  || ' ', CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) AS NOMBRE");
+//		sql.SELECT("CONCAT(PER.NOMBRE  || ' ', CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) AS NOMBRE");
+		sql.SELECT("PER.NOMBRE AS NOMBRE");
+		sql.SELECT("PER.APELLIDOS1 AS APELLIDO1");
+		sql.SELECT("PER.APELLIDOS2 AS APELLIDO2");
 		sql.SELECT("I.IDINSTITUCION AS COLEGIO");
 		sql.SELECT("DECODE(COL.NCOLEGIADO,NULL, DECODE(COL.NCOLEGIADO,NULL,DECODE(NOCOL.sociedadprofesional,'1',\r\n" + "NOCOL.NUMEROREF,NULL),COL.NCOLEGIADO )) AS NCOLEGIADO");
 		sql.SELECT("DECODE(CA.DESCRIPCION ,NULL,DECODE(NOCOL.sociedadprofesional,'1',\r\n" + "'Sociedad',DECODE(COL.NCOLEGIADO,NULL,'No colegiado',NULL))");
@@ -263,11 +266,11 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS CA ON (ESTADOCOLEGIAL.DESCRIPCION = CA.IDRECURSO  AND CA.IDLENGUAJE = '1')");
 		sql.WHERE("PER.IDTIPOIDENTIFICACION NOT IN ('20','50')");
 		
-		if (null != fichaPerSearch.getIdPersona() && !fichaPerSearch.getIdPersona().equalsIgnoreCase("")) {
-			sql.WHERE("PER.IDPERSONA = '" + fichaPerSearch.getIdPersona() + "'");
+		if (null != idPersona) {
+			sql.WHERE("PER.IDPERSONA = '" + idPersona + "'");
 		}
-		if (null != fichaPerSearch.getIdInstitucion() && !fichaPerSearch.getIdInstitucion().equalsIgnoreCase("")) {
-			sql.WHERE("I.IDINSTITUCION = '" + fichaPerSearch.getIdInstitucion() + "'");
+		if (null != idInstitucion ) {
+			sql.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
 		}
 		
 		return sql.toString();

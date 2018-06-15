@@ -7,6 +7,7 @@ import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.PersonaSearchDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenNocolegiadoSqlProvider;
 
@@ -262,6 +263,30 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON (REC.IDRECURSO = ACTIVIDAD.DESCRIPCION AND REC.IDLENGUAJE = '"+idLenguaje+"')");
 		sql.WHERE("NOCOL_ACT.IDPERSONA = '"+personaJuridicaActividadDTO.getIdPersona()+"' ");
 		sql.WHERE("NOCOL_ACT.IDINSTITUCION = '"+personaJuridicaActividadDTO.getIdInstitucion()+"'");
+		
+		return sql.toString();
+	}
+	
+	public String selectRetenciones(PersonaSearchDTO  personaSearchDto , String idLenguaje, String idInstitucion){
+		SQL sql = new SQL();
+		
+
+		sql.SELECT("PER.IDPERSONA AS IDPERSONA");
+		sql.SELECT("IRPF.FECHAINICIO AS FECHAINICIO");
+		sql.SELECT("IRPF.FECHAFIN AS FECHAFIN");
+		sql.SELECT("IRPF.IDRETENCION AS IDRETENCION");
+		sql.SELECT("RET.RETENCION AS RETENCION");
+		sql.SELECT("RET.DESCRIPCION AS RECURSO");
+		sql.SELECT("CAT.DESCRIPCION AS DESCRIPCION");
+		sql.FROM("CEN_NOCOLEGIADO NOCOL");
+		sql.INNER_JOIN("CEN_PERSONA PER ON PER.IDPERSONA = NOCOL.IDPERSONA");
+		sql.INNER_JOIN("SCS_RETENCIONESIRPF IRPF ON (IRPF.IDPERSONA = NOCOL.IDPERSONA AND IRPF.IDINSTITUCION = NOCOL.IDINSTITUCION)");
+		sql.INNER_JOIN("SCS_MAESTRORETENCIONES RET ON RET.IDRETENCION = IRPF.IDRETENCION");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON (CAT.IDRECURSO = RET.DESCRIPCION AND CAT.IDLENGUAJE = '" + idLenguaje +"')");
+		
+		sql.WHERE("IDPERSONA = '"+ personaSearchDto.getIdPersona() +"'");
+		sql.WHERE("IRPF.IDINSTITUCION = '"+ idInstitucion +"'");
+		sql.ORDER_BY("FECHAINICIO DESC");
 		
 		return sql.toString();
 	}
