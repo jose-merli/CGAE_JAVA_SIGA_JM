@@ -13,6 +13,6 @@ import org.itcgae.siga.DTOs.cen.RetencionesDTO;
 public interface ITarjetaDatosRetencionesService {
 
 	public MaestroRetencionDTO getRetentionTypes(HttpServletRequest request);
-	public RetencionesDTO getRetenciones(PersonaSearchDTO personaSerachDTO, HttpServletRequest request);
+	public RetencionesDTO getRetenciones(int numPagina,PersonaSearchDTO personaSerachDTO, HttpServletRequest request);
 	public UpdateResponseDTO updateRetenciones(List<EtiquetaRetencionesDTO> etiquetaRetencionesDTO, HttpServletRequest request);
 }

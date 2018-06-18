@@ -7,21 +7,39 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EtiquetaRetencionesDTO {
 
-	 private String idPersona;
-	 private String idInstitucion;
+	private String idPersona;
+	private String idInstitucion;
+	private Date fechaInicio;
+	private Date fechaFin;
+	private String idRetencion;
+	private String idUsuario;
+	private Date fechaModificacion;
 	 
-	 private Date fechaInicio;
-	 private Date fechaFin;
-	 private String idRetencion;
-	 private String idUsuario;
-	 private Date fechaModificacion;
-	 
+	
+	
+	/**
+	 *
+	 */
+	public EtiquetaRetencionesDTO idPersona(String idPersona){
+		this.idPersona = idPersona;
+		return this;
+	}
+	
 	 @JsonProperty("idPersona")
 	public String getIdPersona() {
 		return idPersona;
 	}
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public EtiquetaRetencionesDTO idInstitucion(String idInstitucion){
+		this.idInstitucion = idInstitucion;
+		return this;
 	}
 	
 	@JsonProperty("idInstitucion")
@@ -32,6 +50,15 @@ public class EtiquetaRetencionesDTO {
 		this.idInstitucion = idInstitucion;
 	}
 	
+	
+	/**
+	 *
+	 */
+	public EtiquetaRetencionesDTO fechaInicio(Date fechaInicio){
+		this.fechaInicio = fechaInicio;
+		return this;
+	}
+	
 	@JsonProperty("fechaInicio")
 	public Date getFechaInicio() {
 		return fechaInicio;
@@ -40,12 +67,30 @@ public class EtiquetaRetencionesDTO {
 		this.fechaInicio = fechaInicio;
 	}
 	
+	/**
+	 *
+	 */
+	public EtiquetaRetencionesDTO fechaFin(Date fechaFin){
+		this.fechaFin = fechaFin;
+		return this;
+	}
+	
+	
 	@JsonProperty("fechaFin")
 	public Date getFechaFin() {
 		return fechaFin;
 	}
 	public void setFechaFin(Date fechaFin) {
 		this.fechaFin = fechaFin;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public EtiquetaRetencionesDTO fechaFin(String idRetencion){
+		this.idRetencion = idRetencion;
+		return this;
 	}
 	
 	@JsonProperty("idRetencion")
@@ -56,12 +101,30 @@ public class EtiquetaRetencionesDTO {
 		this.idRetencion = idRetencion;
 	}
 	
+	
+	/**
+	 *
+	 */
+	public EtiquetaRetencionesDTO idUsuario(String idUsuario){
+		this.idUsuario = idUsuario;
+		return this;
+	}
+	
 	@JsonProperty("idUsuario")
 	public String getIdUsuario() {
 		return idUsuario;
 	}
 	public void setIdUsuario(String idUsuario) {
 		this.idUsuario = idUsuario;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public EtiquetaRetencionesDTO fechaModificacion(Date fechaModificacion){
+		this.fechaModificacion = fechaModificacion;
+		return this;
 	}
 	
 	@JsonProperty("fechaModificacion")

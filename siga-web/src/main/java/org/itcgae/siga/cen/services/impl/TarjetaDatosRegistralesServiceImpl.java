@@ -192,6 +192,9 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 		int responseCenNoColegiadoActividad = 0;
 		int responseInsertCenNoColegiadoActividad = 0;
 		int responseBorrarCenNoColegiadoActividad = 0;
+		boolean cerrojoDarAlta = true;
+		boolean cerrojoCrearRegistro = true;
+		boolean cerrojoBorrar = true;
 		PersonaJuridicaActividadDTO personaJuridicaActividadDTO = new PersonaJuridicaActividadDTO();
 		ComboDTO comboDTO = new ComboDTO();
 		List<String> actividadesABorrar = new ArrayList<String>();
@@ -205,21 +208,26 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 		LOGGER.info(
-				"searchRegistryDataLegalPerson() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				"updateRegistryDataLegalPerson() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		LOGGER.info(
-				"searchRegistryDataLegalPerson() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+				"updateRegistryDataLegalPerson() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 		if(null != usuarios && usuarios.size() > 0) {
 			AdmUsuarios usuario = usuarios.get(0);
+			
 			// 1. Actualizar tabla cen_persona
 			CenPersona cenPersona = new CenPersona();
 			cenPersona.setFechanacimiento(perJuridicaDatosRegistralesUpdateDTO.getFechaConstitucion());
 			CenPersonaExample cenPersonaExample = new CenPersonaExample();
 			cenPersonaExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona()));
+			LOGGER.info(
+					"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updateByExampleSelective() -> Entrada a cenPersonaExtendsMapper para actualizar fecha de constitución de una persona jurídica");
 			responseCenPersona = cenPersonaExtendsMapper.updateByExampleSelective(cenPersona, cenPersonaExample);
+			LOGGER.info(
+					"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updateByExampleSelective() -> Salida de cenPersonaExtendsMapper para actualizar fecha de constitución de una persona jurídica");
 			
-			// 2. Actualiza tabla cen_nocolegiado
+			// 2. Actualizar tabla cen_nocolegiado
 			if(responseCenPersona == 1) {
 				CenNocolegiado cenNocolegiado = new CenNocolegiado();
 				cenNocolegiado.setResena(perJuridicaDatosRegistralesUpdateDTO.getResena());
@@ -231,11 +239,21 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 				
 				CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
 				cenNocolegiadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
+				LOGGER.info(
+						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
 				
 				responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByExampleSelective(cenNocolegiado, cenNocolegiadoExample);
+				LOGGER.info(
+						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
+				
+			}
+			else {
+				updateResponseDTO.setStatus(SigaConstants.KO);
+				LOGGER.warn(
+						"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updateByExampleSelective() -> "+ updateResponseDTO.getStatus() + ". No se actualizó correctamente la tabla cen_persona");
 			}
 			
-			// 3. Actualiza tabla CEN_NOCOLEGIADO_ACTIVIDAD
+			// 3. Actualizar tabla CEN_NOCOLEGIADO_ACTIVIDAD
 			if(responseCenNocolegiado == 1) {
 				
 				// busca las actividades que estaban asociadas a la persona juridica
@@ -253,7 +271,13 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 					CenNocolegiadoActividadExample cenNocolegiadoActividadExample = new CenNocolegiadoActividadExample();
 					cenNocolegiadoActividadExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona())).andIdactividadprofesionalEqualTo(Short.valueOf(actividad));
 					
+					LOGGER.info(
+							"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.selectByExample() -> Entrada a cenNocolegiadoActividadMapper para comprobar si existe una actividad para una persona jurídica");
+					
 					actividadExistente = cenNocolegiadoActividadMapper.selectByExample(cenNocolegiadoActividadExample);
+					LOGGER.info(
+							"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.selectByExample() -> Salida de cenNocolegiadoActividadMapper para comprobar si existe una actividad para una persona jurídica");
+					
 					if(!actividadExistente.isEmpty()) { // hay registros => poner fecha_baja = null
 						
 						if(null != actividadExistente.get(0).getFechaBaja()) {
@@ -264,15 +288,28 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 							record.setUsumodificacion(usuario.getIdusuario()); 
 							CenNocolegiadoActividadExample example = new CenNocolegiadoActividadExample();
 							example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona())).andIdactividadprofesionalEqualTo(Short.valueOf(actividad));
+							LOGGER.info(
+									"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoActividadMapper para dar de alta una actividad para una persona jurídica");
 							
 							responseCenNoColegiadoActividad = cenNocolegiadoActividadMapper.updateByExampleSelective(record, example);
+							LOGGER.info(
+									"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.updateByExampleSelective() -> Salida de cenNocolegiadoActividadMapper para dar de alta una actividad para una persona jurídica");
+							
+							
+							if(cerrojoDarAlta) {
+								updateResponseDTO.setStatus(SigaConstants.OK);
+								cerrojoDarAlta = false;
+							}
+							
 							if(responseCenNoColegiadoActividad == 0) {
 								updateResponseDTO.setStatus(SigaConstants.KO);
+								LOGGER.warn(
+										"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.updateByExampleSelective() -> " + updateResponseDTO.getStatus() + ".No se pudo dar de alta una actividad asociada a una persona jurídica");
+								
 							}
 						}
 					}
-					else {
-						// crear registro
+					else {  // no hay registros =>  crear registro
 						CenNocolegiadoActividad insertActividad = new CenNocolegiadoActividad();
 						insertActividad.setFechaBaja(null);
 						insertActividad.setFechamodificacion(new Date());
@@ -280,10 +317,23 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 						insertActividad.setIdinstitucion(idInstitucion);
 						insertActividad.setIdpersona(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona()));
 						insertActividad.setUsumodificacion(usuario.getIdusuario());
+						LOGGER.info(
+								"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.insert() -> Entrada a cenNocolegiadoActividadMapper para crear una actividad asociada a una persona jurídica");
 						
 						responseInsertCenNoColegiadoActividad = cenNocolegiadoActividadMapper.insert(insertActividad);
+						LOGGER.info(
+								"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.insert() -> Salida de cenNocolegiadoActividadMapper para crear una actividad asociada a una persona jurídica");
+						
+						if(cerrojoCrearRegistro) {
+							updateResponseDTO.setStatus(SigaConstants.OK);
+							cerrojoCrearRegistro = false;
+						}
+						
 						if(responseInsertCenNoColegiadoActividad == 0) {
 							updateResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.warn(
+									"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.insert() -> " + updateResponseDTO.getStatus() + ".No se pudo crear una actividad asociada a una persona jurídica");
+							
 						}
 					}
 					
@@ -303,16 +353,32 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 					
 					CenNocolegiadoActividadExample exampleBorrar = new CenNocolegiadoActividadExample();
 					exampleBorrar.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona())).andIdactividadprofesionalEqualTo(Short.valueOf(actividadABorrar));
+					LOGGER.info(
+							"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoActividadMapper para desasignar una actividad asociada a una persona jurídica");
 					
 					responseBorrarCenNoColegiadoActividad = cenNocolegiadoActividadMapper.updateByExampleSelective(recordBorrar, exampleBorrar);
+					LOGGER.info(
+							"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.updateByExampleSelective() -> Salida de cenNocolegiadoActividadMapper para desasignar una actividad asociada a una persona jurídica");
+					
+					if(cerrojoBorrar) {
+						updateResponseDTO.setStatus(SigaConstants.OK);
+						cerrojoBorrar = false;
+					}
+						
 					if(responseBorrarCenNoColegiadoActividad == 0) {
 						updateResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.warn(
+								"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.updateByExampleSelective() -> " + updateResponseDTO.getStatus() + ".No se pudo desasignar una actividad asociada a una persona jurídica");
+						
 					}
 				}
 			}
+			else {
+				updateResponseDTO.setStatus(SigaConstants.KO);
+				LOGGER.warn(
+						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> "+ updateResponseDTO.getStatus() + ". No se actualizó correctamente la tabla cen_nocolegiado");
+			}
 		}
-		
-		// me falta poner OK por algun lado
 		
 		LOGGER.info(
 				"updateRegistryDataLegalPerson() -> Salida del servicio para actualizar datos registrales de una persona jurídica");

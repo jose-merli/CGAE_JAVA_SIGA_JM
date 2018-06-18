@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaRetencionesDTO;
 import org.itcgae.siga.DTOs.cen.MaestroRetencionDTO;
@@ -34,6 +35,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencionesService {
 
+	private Logger LOGGER = Logger.getLogger(TarjetaDatosRetencionesServiceImpl.class);
+	
 	@Autowired
 	private ScsMaestroretencionesMapper scsMaestroretencionesMapper;
 	@Autowired
@@ -47,6 +50,8 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 
 	@Override
 	public MaestroRetencionDTO getRetentionTypes(HttpServletRequest request) {
+		LOGGER.info(
+				"getRetentionTypes() -> Entrada al servicio para buscar los tipos de retenciones");
 		MaestroRetencionDTO response = new MaestroRetencionDTO();
 		List<MaestroRetencionItem> retencionesItemList = new ArrayList<MaestroRetencionItem>();
 		org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
@@ -60,70 +65,102 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 		AdmUsuarios usuario = new AdmUsuarios();
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		LOGGER.info(
+				"getRetentionTypes() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info(
+				"getRetentionTypes() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+		
 		if (null != usuarios && usuarios.size() > 0) {
 			usuario = usuarios.get(0);
-		}
-
-		ScsMaestroretencionesExample exampleMaestro = new ScsMaestroretencionesExample();
-		exampleMaestro.setDistinct(true);
-		List<ScsMaestroretenciones> retencionesLista = scsMaestroretencionesMapper.selectByExample(exampleMaestro);
-
-		if (null != retencionesLista && !retencionesLista.isEmpty()) {
-			GenRecursosCatalogosExample exampleRecursos = new GenRecursosCatalogosExample();
-			for (ScsMaestroretenciones scsMaestroretenciones : retencionesLista) {
-				exampleRecursos.createCriteria().andIdrecursoEqualTo(scsMaestroretenciones.getDescripcion())
-						.andIdlenguajeEqualTo(usuario.getIdlenguaje());
-				List<GenRecursosCatalogos> recursos = genRecursosCatalogosMapper.selectByExample(exampleRecursos);
-				if (null != recursos && !recursos.isEmpty()) {
-					MaestroRetencionItem maestroRetencionItem = new MaestroRetencionItem();
-					GenRecursosCatalogos recurso = recursos.get(0);
-					maestroRetencionItem.setLabel(recurso.getDescripcion());
-					maestroRetencionItem.setValue(String.valueOf(scsMaestroretenciones.getIdretencion()));
-					maestroRetencionItem.setPorcentajeRetencion(String.valueOf(scsMaestroretenciones.getRetencion()));
-					retencionesItemList.add(maestroRetencionItem);
+		
+			ScsMaestroretencionesExample exampleMaestro = new ScsMaestroretencionesExample();
+			exampleMaestro.setDistinct(true);
+			LOGGER.info(
+					"getRetentionTypes() / scsMaestroretencionesMapper.selectByExample() -> Entrada a scsMaestroretencionesMapper para obtener las retenciones");
+			List<ScsMaestroretenciones> retencionesLista = scsMaestroretencionesMapper.selectByExample(exampleMaestro);
+			LOGGER.info(
+					"getRetentionTypes() / scsMaestroretencionesMapper.selectByExample() -> Salida de scsMaestroretencionesMapper para obtener las retenciones");
+	
+			if (null != retencionesLista && !retencionesLista.isEmpty()) {
+				GenRecursosCatalogosExample exampleRecursos = new GenRecursosCatalogosExample();
+				for (ScsMaestroretenciones scsMaestroretenciones : retencionesLista) {
+					exampleRecursos.createCriteria().andIdrecursoEqualTo(scsMaestroretenciones.getDescripcion())
+							.andIdlenguajeEqualTo(usuario.getIdlenguaje());
+					LOGGER.info(
+							"getRetentionTypes() / genRecursosCatalogosMapper.selectByExample() -> Entrada a genRecursosCatalogosMapper para obtener obtener la descripción de las retenciones");
+					List<GenRecursosCatalogos> recursos = genRecursosCatalogosMapper.selectByExample(exampleRecursos);
+					LOGGER.info(
+							"getRetentionTypes() / genRecursosCatalogosMapper.selectByExample() -> Salida de genRecursosCatalogosMapper para obtener obtener la descripción de las retenciones");
+					
+					if (null != recursos && !recursos.isEmpty()) {
+						MaestroRetencionItem maestroRetencionItem = new MaestroRetencionItem();
+						GenRecursosCatalogos recurso = recursos.get(0);
+						maestroRetencionItem.setLabel(recurso.getDescripcion());
+						maestroRetencionItem.setValue(String.valueOf(scsMaestroretenciones.getIdretencion()));
+						maestroRetencionItem.setPorcentajeRetencion(String.valueOf(scsMaestroretenciones.getRetencion()));
+						retencionesItemList.add(maestroRetencionItem);
+					}
 				}
+				response.setMaestroRetencionItem(retencionesItemList);
+			}else {
+				response.getError().setDescription("No se han encontrado datos en ScsMaestroRetenciones.");
 			}
-			response.setMaestroRetencionItem(retencionesItemList);
-		}else {
-			response.getError().setDescription("No se han encontrado datos en ScsMaestroRetenciones.");
+			
 		}
+		LOGGER.info(
+				"getRetentionTypes() -> Salida del servicio para buscar los tipos de retenciones");
 
 		return response;
 	}
 
 	@Override
-	public RetencionesDTO getRetenciones(PersonaSearchDTO personaSearchDTO, HttpServletRequest request) {
-		RetencionesDTO response = new RetencionesDTO();
+	public RetencionesDTO getRetenciones(int numPagina,PersonaSearchDTO personaSearchDTO, HttpServletRequest request) {
+		LOGGER.info(
+				"getRetenciones() -> Entrada al servicio para buscar las retenciones de una persona jurídica");
+		RetencionesDTO retencionesDTO = new RetencionesDTO();
 		org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
-		response.setError(error);
+		retencionesDTO.setError(error);
 		
 		// Conseguimos información del usuario logeado
-				String token = request.getHeader("Authorization");
-				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-				String dni = UserTokenUtils.getDniFromJWTToken(token);
-				// Obtenemos el usuario que modifica
-				AdmUsuarios usuario = new AdmUsuarios();
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				if (null != usuarios && usuarios.size() > 0) {
-					usuario = usuarios.get(0);
-				}
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		// Obtenemos el usuario que modifica
+		AdmUsuarios usuario = new AdmUsuarios();
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		LOGGER.info(
+				"getRetenciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info(
+				"getRetenciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+		if (null != usuarios && usuarios.size() > 0) {
+			usuario = usuarios.get(0);
 		
-		
-		List<RetencionesItem> listaRetenciones = cenNocolegiadoExtendsMapper.selectRetenciones(personaSearchDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion));
-		if(null != listaRetenciones && !listaRetenciones.isEmpty()) {
-			response.setRetencionesItemList(listaRetenciones);
-		}else {
-			response.getError().setDescription("No se han encontrado retenciones para el idPersona: " + personaSearchDTO.getIdPersona());
+			LOGGER.info(
+					"getRetenciones() / cenNocolegiadoExtendsMapper.selectRetenciones() -> Entrada a cenNocolegiadoExtendsMapper para obtener las retenciones de la persona jurídica indicada");
+			List<RetencionesItem> listaRetenciones = cenNocolegiadoExtendsMapper.selectRetenciones(personaSearchDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion));
+			LOGGER.info(
+					"getRetenciones() / cenNocolegiadoExtendsMapper.selectRetenciones() -> Salida de cenNocolegiadoExtendsMapper para obtener las retenciones de la persona jurídica indicada");
+			
+			if(null != listaRetenciones && !listaRetenciones.isEmpty()) {
+				retencionesDTO.setRetencionesItemList(listaRetenciones);
+			}else {
+				retencionesDTO.getError().setDescription("No se han encontrado retenciones para el idPersona: " + personaSearchDTO.getIdPersona());
+			}
 		}
 		
-		return response;
+		LOGGER.info(
+				"getRetenciones() -> Salida del servicio para buscar las retenciones de una persona jurídica");
+		
+		return retencionesDTO;
 	}
 
 	@Override
 	public UpdateResponseDTO updateRetenciones(List<EtiquetaRetencionesDTO> etiquetaRetencionesDTO, HttpServletRequest request) {
+		LOGGER.info(
+				"updateRetenciones() -> Entrada al servicio para actualizar las retenciones asociadas a una persona jurídica");
 		UpdateResponseDTO response = new UpdateResponseDTO();
 		org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
 		response.setError(error);
@@ -136,41 +173,48 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 		AdmUsuarios usuario = new AdmUsuarios();
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		LOGGER.info(
+				"updateRetenciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info(
+				"updateRetenciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 		if (null != usuarios && usuarios.size() > 0) {
 			usuario = usuarios.get(0);
+		
+			if(null != etiquetaRetencionesDTO && !etiquetaRetencionesDTO.isEmpty()) {
+				
+				for (EtiquetaRetencionesDTO etiquetaUpdateDTO : etiquetaRetencionesDTO) {
+					ScsRetencionesirpfExample exampleRetenciones = new ScsRetencionesirpfExample();
+					exampleRetenciones.createCriteria().andIdinstitucionEqualTo(Short.valueOf(etiquetaUpdateDTO.getIdInstitucion())).andIdpersonaEqualTo(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
+					scsRetencionesirpfMapper.deleteByExample(exampleRetenciones);
+					
+					ScsRetencionesirpf retenciones = new ScsRetencionesirpf();
+					retenciones.setIdinstitucion(idInstitucion);
+					retenciones.setUsumodificacion(usuario.getUsumodificacion());
+					retenciones.setFechamodificacion(new Date());
+					retenciones.setIdretencion(Integer.getInteger(etiquetaUpdateDTO.getIdRetencion()));
+					retenciones.setFechafin(etiquetaUpdateDTO.getFechaFin());
+					retenciones.setFechainicio(etiquetaUpdateDTO.getFechaInicio());
+					retenciones.setIdpersona(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
+					retenciones.setIdretencion(Integer.valueOf(etiquetaUpdateDTO.getIdRetencion()));
+					try {
+						scsRetencionesirpfMapper.updateByPrimaryKey(retenciones);
+					}catch(Exception e) {
+						response.setStatus(SigaConstants.KO);
+						response.getError().setDescription("La actualización de ScsRetencionesIrpf para el idPersona: " + etiquetaUpdateDTO.getIdPersona() 
+						+ " no se ha realizado correctamente.");
+					}
+					
+				}
+				response.setStatus(SigaConstants.OK);
+			}else {
+				response.getError().setDescription("No se han enviado datos para la actualización.");
+			}
+			
 		}
 		
-		if(null != etiquetaRetencionesDTO && !etiquetaRetencionesDTO.isEmpty()) {
-			
-			
-			for (EtiquetaRetencionesDTO etiquetaUpdateDTO : etiquetaRetencionesDTO) {
-				ScsRetencionesirpfExample exampleRetenciones = new ScsRetencionesirpfExample();
-				exampleRetenciones.createCriteria().andIdinstitucionEqualTo(Short.valueOf(etiquetaUpdateDTO.getIdInstitucion())).andIdpersonaEqualTo(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
-				scsRetencionesirpfMapper.deleteByExample(exampleRetenciones);
-				
-				ScsRetencionesirpf retenciones = new ScsRetencionesirpf();
-				retenciones.setIdinstitucion(idInstitucion);
-				retenciones.setUsumodificacion(usuario.getUsumodificacion());
-				retenciones.setFechamodificacion(new Date());
-				retenciones.setIdretencion(Integer.getInteger(etiquetaUpdateDTO.getIdRetencion()));
-				retenciones.setFechafin(etiquetaUpdateDTO.getFechaFin());
-				retenciones.setFechainicio(etiquetaUpdateDTO.getFechaInicio());
-				retenciones.setIdpersona(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
-				retenciones.setIdretencion(Integer.valueOf(etiquetaUpdateDTO.getIdRetencion()));
-				try {
-					scsRetencionesirpfMapper.updateByPrimaryKey(retenciones);
-				}catch(Exception e) {
-					response.setStatus(SigaConstants.KO);
-					response.getError().setDescription("La actualización de ScsRetencionesIrpf para el idPersona: " + etiquetaUpdateDTO.getIdPersona() 
-					+ " no se ha realizado correctamente.");
-				}
-				
-			}
-			response.setStatus(SigaConstants.OK);
-		}else {
-			response.getError().setDescription("No se han enviado datos para la actualización.");
-		}
+		LOGGER.info(
+				"updateRetenciones() -> Salida del servicio para actualizar las retenciones asociadas a una persona jurídica");
 		return response;
 	}
 	

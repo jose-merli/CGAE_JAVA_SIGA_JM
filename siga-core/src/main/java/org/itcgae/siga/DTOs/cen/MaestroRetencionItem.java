@@ -11,6 +11,17 @@ public class MaestroRetencionItem {
 	private String label;
 	private String porcentajeRetencion;
 	
+	
+	
+	
+	/**
+	 *
+	 */
+	public MaestroRetencionItem value(String value){
+		this.value = value;
+		return this;
+	}
+	
 	@JsonProperty("value")
 	public String getValue() {
 		return value;
@@ -19,12 +30,30 @@ public class MaestroRetencionItem {
 		this.value = value;
 	}
 	
+	
+	/**
+	 *
+	 */
+	public MaestroRetencionItem label(String label){
+		this.label = label;
+		return this;
+	}
+	
 	@JsonProperty("label")
 	public String getLabel() {
 		return label;
 	}
 	public void setLabel(String label) {
 		this.label = label;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public MaestroRetencionItem porcentajeRetencion(String porcentajeRetencion){
+		this.porcentajeRetencion = porcentajeRetencion;
+		return this;
 	}
 	
 	@JsonProperty("porcentajeRetencion")

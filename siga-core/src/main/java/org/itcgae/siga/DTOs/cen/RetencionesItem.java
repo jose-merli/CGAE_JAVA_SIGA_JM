@@ -21,12 +21,30 @@ public class RetencionesItem {
 	private String recursoRetencion;
 	private String descripcionRetencion;
 	
+	
+	/**
+	 *
+	 */
+	public RetencionesItem idPersona(String idPersona){
+		this.idPersona = idPersona;
+		return this;
+	}
+	
 	@JsonProperty("idPersona")
 	public String getIdPersona() {
 		return idPersona;
 	}
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public RetencionesItem fechaInicio(Date fechaInicio){
+		this.fechaInicio = fechaInicio;
+		return this;
 	}
 	
 	@JsonProperty("fechaInicio")
@@ -37,12 +55,29 @@ public class RetencionesItem {
 		this.fechaInicio = fechaInicio;
 	}
 	
+	/**
+	 *
+	 */
+	public RetencionesItem fechaFin(Date fechaFin){
+		this.fechaFin = fechaFin;
+		return this;
+	}
+	
 	@JsonProperty("fechaFin")
 	public Date getFechaFin() {
 		return fechaFin;
 	}
 	public void setFechaFin(Date fechaFin) {
 		this.fechaFin = fechaFin;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public RetencionesItem idRetencion(String idRetencion){
+		this.idRetencion = idRetencion;
+		return this;
 	}
 	
 	@JsonProperty("idRetencion")
@@ -53,6 +88,15 @@ public class RetencionesItem {
 		this.idRetencion = idRetencion;
 	}
 	
+	
+	/**
+	 *
+	 */
+	public RetencionesItem porcentajeRetencion(String porcentajeRetencion){
+		this.porcentajeRetencion = porcentajeRetencion;
+		return this;
+	}
+	
 	@JsonProperty("porcentajeRetencion")
 	public String getPorcentajeRetencion() {
 		return porcentajeRetencion;
@@ -61,12 +105,30 @@ public class RetencionesItem {
 		this.porcentajeRetencion = porcentajeRetencion;
 	}
 	
+
+	/**
+	 *
+	 */
+	public RetencionesItem recursoRetencion(String recursoRetencion){
+		this.recursoRetencion = recursoRetencion;
+		return this;
+	}
+	
 	@JsonProperty("recursoRetencion")
 	public String getRecursoRetencion() {
 		return recursoRetencion;
 	}
 	public void setRecursoRetencion(String recursoRetencion) {
 		this.recursoRetencion = recursoRetencion;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public RetencionesItem descripcionRetencion(String descripcionRetencion){
+		this.descripcionRetencion = descripcionRetencion;
+		return this;
 	}
 	
 	@JsonProperty("descripcionRetencion")
