@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDeleteDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IBusquedaPerJuridicaService;
@@ -21,6 +22,7 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposociedadExtendsMapper;
@@ -44,6 +46,9 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 	
 	@Autowired
 	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+	
+	@Autowired
+	private CenGruposclienteClienteExtendsMapper cenGruposclienteClienteExtendsMapper;
 	
 	@Override
 	public ComboDTO getSocietyTypes(HttpServletRequest request) {
@@ -292,6 +297,29 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 		
 		LOGGER.info("deleteNotCollegiate() -> Salida del servicio para eliminar personas no colegiadas");
 		return deleteResponseDTO;
+	}
+
+
+	@Override
+	public ComboDTO getLabelPerson(PersonaJuridicaSearchDTO personaJuridicaSearchDTO, HttpServletRequest request) {
+		LOGGER.info("getLabelPerson() -> Entrada al servicio para obtener etiquetas de una persona jurídica");
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem>comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		LOGGER.info(
+				"getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
+		comboItems = cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica(personaJuridicaSearchDTO.getIdPersona(), String.valueOf(idInstitucion));
+		LOGGER.info(
+				"getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
+		
+		comboDTO.setCombooItems(comboItems);
+		LOGGER.info("getLabelPerson() -> Salida del servicio para obtener etiquetas de una persona jurídica");
+		return comboDTO;
 	}
 
 

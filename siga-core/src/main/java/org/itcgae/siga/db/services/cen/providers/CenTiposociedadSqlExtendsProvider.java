@@ -13,7 +13,7 @@ public class CenTiposociedadSqlExtendsProvider extends CenTiposociedadSqlProvide
 		sql.FROM(" cen_tiposociedad CENT");
 		sql.INNER_JOIN(" GEN_RECURSOS_CATALOGOS GENR on CENT.DESCRIPCION = GENR.IDRECURSO");
 		sql.WHERE(" GENR.IDLENGUAJE = '" + idLenguaje +"'");
-		
+		sql.ORDER_BY("GENR.DESCRIPCION");
 		return sql.toString();
 	}
 	

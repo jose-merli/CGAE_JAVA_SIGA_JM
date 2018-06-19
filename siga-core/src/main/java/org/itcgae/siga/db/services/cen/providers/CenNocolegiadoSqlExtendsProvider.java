@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
@@ -191,6 +192,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.SELECT("NVL(COUNT(DISTINCT PER2.IDPERSONA),0) AS NUMEROINTEGRANTES");
 		sql.SELECT("LISTAGG(CONCAT(PER2.NOMBRE ||' ',CONCAT(PER2.APELLIDOS1 || ' ',PER2.APELLIDOS2)), ';') WITHIN GROUP (ORDER BY PER2.NOMBRE) AS NOMBRESINTEGRANTES");
 		sql.SELECT("LISTAGG(GRUPOS_CLIENTE.IDGRUPO, ';') WITHIN GROUP (ORDER BY GRUPOS_CLIENTE.IDGRUPO)  OVER (PARTITION BY COL.IDPERSONA) AS IDGRUPO");
+		sql.SELECT("CLI.IDLENGUAJE AS LENGUAJESOCIEDAD");
 		sql.FROM(" CEN_NOCOLEGIADO COL");
 		sql.INNER_JOIN(" CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA ");
 		sql.INNER_JOIN(" CEN_INSTITUCION I ON COL.IDINSTITUCION = I.IDINSTITUCION ");
@@ -217,7 +219,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.GROUP_BY("TIPOSOCIEDAD.LETRACIF");
 		sql.GROUP_BY("GRUPOS_CLIENTE.IDGRUPO");
 		sql.GROUP_BY("COL.FECHA_BAJA");
-		
+		sql.GROUP_BY("CLI.IDLENGUAJE");
 		
 		return sql.toString();
 	}
@@ -293,6 +295,19 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.WHERE("IDPERSONA = '"+ personaSearchDto.getIdPersona() +"'");
 		sql.WHERE("IRPF.IDINSTITUCION = '"+ idInstitucion +"'");
 		sql.ORDER_BY("FECHAINICIO DESC");
+		
+		return sql.toString();
+	}
+	
+	public String disassociatePerson(AdmUsuarios usuario, DesasociarPersonaDTO desasociarPersona) {
+		SQL sql = new SQL();
+		
+		sql.UPDATE("cen_nocolegiado");
+		sql.SET("IDPERSONANOTARIO = null");
+		sql.SET("FECHAMODIFICACION = SYSDATE");
+		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+		sql.WHERE("IDPERSONA = '" + desasociarPersona.getIdPersona() + "'");
+		sql.WHERE("IDINSTITUCION = '" +desasociarPersona.getIdInstitucion()+ "'");
 		
 		return sql.toString();
 	}
