@@ -6,9 +6,11 @@ import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaItem;
@@ -104,5 +106,8 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 		@Result(column = "DESCRIPCION", property = "descripcionRetencion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<RetencionesItem> selectRetenciones(PersonaSearchDTO personaSearchDto, String idLenguaje, String idInstitucion);
+	
+	@UpdateProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "disassociatePerson")
+	int disassociatePerson(AdmUsuarios usuario, DesasociarPersonaDTO desasociarPersona);
 	
 }

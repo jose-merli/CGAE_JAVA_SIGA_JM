@@ -17,6 +17,7 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 		sql.SELECT("IDINSTITUCION");
 		sql.SELECT("NOMBRE");
 		sql.FROM("CEN_INSTITUCION");
+		sql.ORDER_BY("NOMBRE");
 		return sql.toString();
 	}
 	

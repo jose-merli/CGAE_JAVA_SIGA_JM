@@ -12,7 +12,6 @@ import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
-import org.itcgae.siga.DTOs.cen.FichaPerSearchDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;

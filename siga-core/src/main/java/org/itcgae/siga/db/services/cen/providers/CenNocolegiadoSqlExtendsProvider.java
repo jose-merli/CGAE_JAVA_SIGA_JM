@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
@@ -293,6 +294,19 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.WHERE("IDPERSONA = '"+ personaSearchDto.getIdPersona() +"'");
 		sql.WHERE("IRPF.IDINSTITUCION = '"+ idInstitucion +"'");
 		sql.ORDER_BY("FECHAINICIO DESC");
+		
+		return sql.toString();
+	}
+	
+	public String disassociatePerson(AdmUsuarios usuario, DesasociarPersonaDTO desasociarPersona) {
+		SQL sql = new SQL();
+		
+		sql.UPDATE("cen_nocolegiado");
+		sql.SET("IDPERSONANOTARIO = null");
+		sql.SET("FECHAMODIFICACION = SYSDATE");
+		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+		sql.WHERE("IDPERSONA = '" + desasociarPersona.getIdPersona() + "'");
+		sql.WHERE("IDINSTITUCION = '" +desasociarPersona.getIdInstitucion()+ "'");
 		
 		return sql.toString();
 	}

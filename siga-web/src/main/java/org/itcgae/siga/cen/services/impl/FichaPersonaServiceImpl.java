@@ -1,7 +1,6 @@
 package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,8 +18,8 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
-import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +31,12 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 	private Logger LOGGER = Logger.getLogger(FichaPersonaServiceImpl.class);
 	
 	@Autowired
-	private CenNocolegiadoMapper cenNoColegiadoMapper;
-	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
 	
 	@Override
 	public FichaPersonaDTO searchPersonFile(int numPagina, FichaPerSearchDTO fichaPerSearch,
@@ -57,7 +57,7 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 		if(null != fichaPerSearch.getTipoPersona() && fichaPerSearch.getTipoPersona().equals(SigaConstants.TIPO_PERSONA_NOTARIO)) {
 			CenNocolegiadoExample example = new CenNocolegiadoExample();
 			example.createCriteria().andIdpersonaEqualTo(Long.valueOf(fichaPerSearch.getIdPersona()));
-			colegiadoList = cenNoColegiadoMapper.selectByExample(example);
+			colegiadoList = cenNocolegiadoExtendsMapper.selectByExample(example);
 		}
 		
 		if(null != colegiadoList && !colegiadoList.isEmpty()) {
@@ -100,7 +100,7 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 		if(null != desasociarPersona.getTipoPersona() && desasociarPersona.getTipoPersona().equals(SigaConstants.TIPO_PERSONA_NOTARIO)) {
 			CenNocolegiadoExample example = new CenNocolegiadoExample();
 			example.createCriteria().andIdpersonaEqualTo(Long.valueOf(desasociarPersona.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
-			colegiadoList = cenNoColegiadoMapper.selectByExample(example);
+			colegiadoList = cenNocolegiadoExtendsMapper.selectByExample(example);
 		}
 		
 		if(null != colegiadoList && !colegiadoList.isEmpty()) {
@@ -110,16 +110,15 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			return updateResponse;
 		}
 		
-		
 		if(null != colegiado.getIdpersonanotario()) {
-			if(colegiado.getIdpersonanotario().equals(desasociarPersona.getIdPersonaDesasociar())) {
-				CenNocolegiadoExample cenNoColegiadoExample = new CenNocolegiadoExample();
-				cenNoColegiadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(desasociarPersona.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
-				colegiado.setIdpersonanotario(null);
-				colegiado.setFechamodificacion(new Date());
-				colegiado.setUsumodificacion(usuario.getIdusuario());
-				cenNoColegiadoMapper.updateByExampleSelective(colegiado, cenNoColegiadoExample);
-				updateResponse.setStatus("OK");
+			if(String.valueOf(colegiado.getIdpersonanotario()).equals(desasociarPersona.getIdPersonaDesasociar())) {
+				desasociarPersona.setIdInstitucion(String.valueOf(idInstitucion));
+				int response =cenNocolegiadoExtendsMapper.disassociatePerson(usuario, desasociarPersona);
+				if(response == 1)
+					updateResponse.setStatus(SigaConstants.OK);
+				else {
+					updateResponse.setStatus(SigaConstants.KO);
+				}
 			}else {
 				updateResponse.getError().setDescription("La persona seleccionada no es el notario de la sociedad.");
 			}
@@ -144,7 +143,7 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 		if(null != asociarPersona.getTipoPersona() && asociarPersona.getTipoPersona().equals(SigaConstants.TIPO_PERSONA_NOTARIO)) {
 			CenNocolegiadoExample example = new CenNocolegiadoExample();
 			example.createCriteria().andIdpersonaEqualTo(Long.valueOf(asociarPersona.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
-			colegiadoList = cenNoColegiadoMapper.selectByExample(example);
+			colegiadoList = cenNocolegiadoExtendsMapper.selectByExample(example);
 		}
 		
 		if(null != colegiadoList && !colegiadoList.isEmpty()) {
@@ -163,7 +162,7 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 				CenNocolegiadoExample cenNoColegiadoExample = new CenNocolegiadoExample();
 				cenNoColegiadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(asociarPersona.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
 				colegiado.setIdpersonanotario(Long.valueOf(asociarPersona.getIdPersonaAsociar()));
-				cenNoColegiadoMapper.updateByExampleSelective(colegiado, cenNoColegiadoExample);
+				cenNocolegiadoExtendsMapper.updateByExampleSelective(colegiado, cenNoColegiadoExample);
 				updateResponse.setStatus("OK");
 				
 			}

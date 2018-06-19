@@ -6,6 +6,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDeleteDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.IBusquedaPerJuridicaService;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -38,6 +39,15 @@ public class BusquedaPerJuridicaController {
 		ComboDTO response = busquedaPerJuridicaService.getLabel(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
+	
+	
+	@RequestMapping(value = "/busquedaPerJuridica/etiquetasPersona",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getLabelPerson(PersonaJuridicaSearchDTO personaJuridicaSearchDTO, HttpServletRequest request) {
+		ComboDTO response = busquedaPerJuridicaService.getLabelPerson(personaJuridicaSearchDTO,request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	
 	
 	@RequestMapping(value = "busquedaPerJuridica/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<BusquedaJuridicaDTO> searchLegalPersons(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request) { 
