@@ -164,6 +164,10 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 		UpdateResponseDTO response = new UpdateResponseDTO();
 		org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
 		response.setError(error);
+		boolean cerrojoBorrado = true;
+		boolean cerrojoInsercion = true;
+		int responseBorrado = 0;
+		int responseInsercion = 0;
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -184,33 +188,66 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 			if(null != etiquetaRetencionesDTO && !etiquetaRetencionesDTO.isEmpty()) {
 				
 				for (EtiquetaRetencionesDTO etiquetaUpdateDTO : etiquetaRetencionesDTO) {
+					
+					// 1. Borrar las retenciones antiguas
 					ScsRetencionesirpfExample exampleRetenciones = new ScsRetencionesirpfExample();
+					
 					exampleRetenciones.createCriteria().andIdinstitucionEqualTo(Short.valueOf(etiquetaUpdateDTO.getIdInstitucion())).andIdpersonaEqualTo(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
-					scsRetencionesirpfMapper.deleteByExample(exampleRetenciones);
+					LOGGER.info(
+							"updateRetenciones() / scsRetencionesirpfMapper.deleteByExample() -> Entrada a scsRetencionesirpfMapper para obtener borrar retenciones asociadas a personas jurídicas");
+					responseBorrado = scsRetencionesirpfMapper.deleteByExample(exampleRetenciones);
+					LOGGER.info(
+							"updateRetenciones() / scsRetencionesirpfMapper.deleteByExample() -> Salida de scsRetencionesirpfMapper para obtener borrar retenciones asociadas a personas jurídicas");
 					
-					ScsRetencionesirpf retenciones = new ScsRetencionesirpf();
-					retenciones.setIdinstitucion(idInstitucion);
-					retenciones.setUsumodificacion(usuario.getUsumodificacion());
-					retenciones.setFechamodificacion(new Date());
-					retenciones.setIdretencion(Integer.getInteger(etiquetaUpdateDTO.getIdRetencion()));
-					retenciones.setFechafin(etiquetaUpdateDTO.getFechaFin());
-					retenciones.setFechainicio(etiquetaUpdateDTO.getFechaInicio());
-					retenciones.setIdpersona(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
-					retenciones.setIdretencion(Integer.valueOf(etiquetaUpdateDTO.getIdRetencion()));
-					try {
-						scsRetencionesirpfMapper.updateByPrimaryKey(retenciones);
-					}catch(Exception e) {
-						response.setStatus(SigaConstants.KO);
-						response.getError().setDescription("La actualización de ScsRetencionesIrpf para el idPersona: " + etiquetaUpdateDTO.getIdPersona() 
-						+ " no se ha realizado correctamente.");
+					
+					// 2. Añadir retenciones nuevas
+					if(responseBorrado == 1 || responseBorrado > 1) {
+						
+						if(cerrojoBorrado) {
+							response.setStatus(SigaConstants.OK);
+							cerrojoBorrado = false;
+						}
+						
+						ScsRetencionesirpf retenciones = new ScsRetencionesirpf();
+						retenciones.setIdinstitucion(idInstitucion);
+						retenciones.setUsumodificacion(usuario.getUsumodificacion());
+						retenciones.setFechamodificacion(new Date());
+						retenciones.setFechafin(etiquetaUpdateDTO.getFechaFin());
+						retenciones.setFechainicio(etiquetaUpdateDTO.getFechaInicio());
+						retenciones.setIdpersona(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
+						retenciones.setIdretencion(Integer.valueOf(etiquetaUpdateDTO.getIdRetencion()));
+						try {
+							LOGGER.info(
+									"updateRetenciones() / scsRetencionesirpfMapper.insertSelective() -> Entrada a scsRetencionesirpfMapper para añadir retenciones asociadas a personas jurídicas");
+							responseInsercion = scsRetencionesirpfMapper.insertSelective(retenciones);
+							LOGGER.info(
+									"updateRetenciones() / scsRetencionesirpfMapper.insertSelective() -> Salida de scsRetencionesirpfMapper para añadir retenciones asociadas a personas jurídicas");
+							
+							if(responseInsercion == 1 && cerrojoInsercion) {
+								response.setStatus(SigaConstants.OK);
+								cerrojoInsercion = false;
+							}
+							
+							if(responseInsercion == 0) {
+								response.setStatus(SigaConstants.KO);
+							}
+							
+						}catch(Exception e) {
+							response.setStatus(SigaConstants.KO);
+							response.getError().setDescription("La actualización de ScsRetencionesIrpf para el idPersona: " + etiquetaUpdateDTO.getIdPersona() 
+							+ " no se ha realizado correctamente.");
+						}
 					}
-					
+					else {
+						response.setStatus(SigaConstants.KO);
+						LOGGER.warn(
+								"updateRetenciones() / scsRetencionesirpfMapper.deleteByExample() -> " + response.getStatus() + ".No se pudo borrar la retencion asociada a persona jurídica");
+					}
 				}
 				response.setStatus(SigaConstants.OK);
 			}else {
 				response.getError().setDescription("No se han enviado datos para la actualización.");
 			}
-			
 		}
 		
 		LOGGER.info(
