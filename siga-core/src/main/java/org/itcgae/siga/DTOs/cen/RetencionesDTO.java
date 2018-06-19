@@ -12,12 +12,30 @@ public class RetencionesDTO {
 	private List<RetencionesItem> retencionesItemList;
 	private Error error;
 	
+	/**
+	 *
+	 */
+	public RetencionesDTO retencionesItemList(List<RetencionesItem> retencionesItemList){
+		this.retencionesItemList = retencionesItemList;
+		return this;
+	}
+	
+	
 	@JsonProperty("retencionesItemList")
 	public List<RetencionesItem> getRetencionesItemList() {
 		return retencionesItemList;
 	}
 	public void setRetencionesItemList(List<RetencionesItem> retencionesItemList) {
 		this.retencionesItemList = retencionesItemList;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public RetencionesDTO error(Error error){
+		this.error = error;
+		return this;
 	}
 	
 	@JsonProperty("error")

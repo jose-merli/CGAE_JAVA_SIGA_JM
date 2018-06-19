@@ -11,12 +11,29 @@ public class MaestroRetencionDTO {
 	private Error error;
 	
 	
+	/**
+	 *
+	 */
+	public MaestroRetencionDTO maestroRetencionItem( List<MaestroRetencionItem> maestroRetencionItem){
+		this.maestroRetencionItem = maestroRetencionItem;
+		return this;
+	}
+	
 	@JsonProperty("maestroRetencionItem")
 	public List<MaestroRetencionItem> getMaestroRetencionItem() {
 		return maestroRetencionItem;
 	}
 	public void setMaestroRetencionItem(List<MaestroRetencionItem> maestroRetencionItem) {
 		this.maestroRetencionItem = maestroRetencionItem;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public MaestroRetencionDTO error(Error error){
+		this.error = error;
+		return this;
 	}
 	
 	@JsonProperty("error")

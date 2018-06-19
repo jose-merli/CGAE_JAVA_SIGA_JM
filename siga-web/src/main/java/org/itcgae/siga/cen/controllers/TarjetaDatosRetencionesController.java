@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,8 +34,8 @@ public class TarjetaDatosRetencionesController {
 	}
 	
 	@RequestMapping(value = "retenciones/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<RetencionesDTO> getRetenciones(@RequestBody PersonaSearchDTO personaSearchDTO, HttpServletRequest request) { 
-		RetencionesDTO response = tarjetaDatosRetencionesService.getRetenciones(personaSearchDTO, request);
+	ResponseEntity<RetencionesDTO> getRetenciones(@RequestParam("numPagina") int numPagina,@RequestBody PersonaSearchDTO personaSearchDTO, HttpServletRequest request) { 
+		RetencionesDTO response = tarjetaDatosRetencionesService.getRetenciones(numPagina,personaSearchDTO, request);
 		return new ResponseEntity<RetencionesDTO >(response, HttpStatus.OK);
 	}
 	
