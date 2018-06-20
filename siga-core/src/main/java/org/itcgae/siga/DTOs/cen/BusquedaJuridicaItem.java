@@ -25,11 +25,13 @@ public class BusquedaJuridicaItem {
 	
 	
 
+	
+
 
 	/**
 	 *
 	 */
-	public BusquedaJuridicaItem busquedaJuridicaItems(String idInstitucion){
+	public BusquedaJuridicaItem idInstitucion(String idInstitucion){
 		this.idInstitucion = idInstitucion;
 		return this;
 	}

@@ -1,0 +1,3 @@
+DELETE FROM ADM_CONFIG WHERE ID > '18';
+
+commit;
