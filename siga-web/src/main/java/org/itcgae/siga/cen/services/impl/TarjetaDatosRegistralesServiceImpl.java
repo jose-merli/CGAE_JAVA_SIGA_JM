@@ -350,6 +350,7 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 					CenNocolegiadoActividad recordBorrar = new CenNocolegiadoActividad();
 					recordBorrar.setFechamodificacion(new Date());
 					recordBorrar.setUsumodificacion(usuario.getIdusuario());
+					recordBorrar.setFechaBaja(new Date());
 					
 					CenNocolegiadoActividadExample exampleBorrar = new CenNocolegiadoActividadExample();
 					exampleBorrar.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona())).andIdactividadprofesionalEqualTo(Short.valueOf(actividadABorrar));

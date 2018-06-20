@@ -9,10 +9,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
 public class DatosRegistralesItem {
 	
-	private String resenia;
+	private String resena;
 	private String objetoSocial;
 	private String numeroPoliza;
-	private String companiaSeg;
+	private String companiaAseg;
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaFin;
 	@JsonFormat(pattern = "dd-MM-yyyy")
@@ -23,21 +23,21 @@ public class DatosRegistralesItem {
 	
 	/**
 	 */
-	public DatosRegistralesItem resenia(String resenia){
-		this.resenia = resenia;
+	public DatosRegistralesItem resena(String resena){
+		this.resena = resena;
 		return this;
 	}
 	
 	
 	
-	@JsonProperty("resenia")
-	public String getResenia() {
-		return resenia;
+	@JsonProperty("resena")
+	public String getResena() {
+		return resena;
 	}
 	
 	
-	public void setResenia(String resenia) {
-		this.resenia = resenia;
+	public void setResena(String resena) {
+		this.resena = resena;
 	}
 	
 	
@@ -78,19 +78,19 @@ public class DatosRegistralesItem {
 	
 	/**
 	 */
-	public DatosRegistralesItem companiaSeg(String companiaSeg){
-		this.companiaSeg = companiaSeg;
+	public DatosRegistralesItem companiaAseg(String companiaAseg){
+		this.companiaAseg = companiaAseg;
 		return this;
 	}
 	
-	@JsonProperty("companiaSeg")
-	public String getCompaniaSeg() {
-		return companiaSeg;
+	@JsonProperty("companiaAseg")
+	public String getCompaniaAseg() {
+		return companiaAseg;
 	}
 	
 	
-	public void setCompaniaSeg(String companiaSeg) {
-		this.companiaSeg = companiaSeg;
+	public void setCompaniaAseg(String companiaAseg) {
+		this.companiaAseg = companiaAseg;
 	}
 	
 	
@@ -157,10 +157,10 @@ public class DatosRegistralesItem {
 	      return false;
 	    }
 	    DatosRegistralesItem datosRegistralesItem = (DatosRegistralesItem) o;
-	    return Objects.equals(this.resenia, datosRegistralesItem.resenia) &&
+	    return Objects.equals(this.resena, datosRegistralesItem.resena) &&
 	    	   Objects.equals(this.objetoSocial, datosRegistralesItem.objetoSocial) &&
 	    	   Objects.equals(this.numeroPoliza, datosRegistralesItem.numeroPoliza) &&
-	    	   Objects.equals(this.companiaSeg, datosRegistralesItem.companiaSeg) &&
+	    	   Objects.equals(this.companiaAseg, datosRegistralesItem.companiaAseg) &&
 	    	   Objects.equals(this.fechaFin, datosRegistralesItem.fechaFin) &&
 	    	   Objects.equals(this.fechaConstitucion, datosRegistralesItem.fechaConstitucion) &&
 	    	   Objects.equals(this.sociedadProfesional, datosRegistralesItem.sociedadProfesional);
@@ -168,7 +168,7 @@ public class DatosRegistralesItem {
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(resenia, objetoSocial, numeroPoliza, companiaSeg, fechaFin, fechaConstitucion, sociedadProfesional);
+	    return Objects.hash(resena, objetoSocial, numeroPoliza, companiaAseg, fechaFin, fechaConstitucion, sociedadProfesional);
 	}
 
 	
@@ -177,10 +177,10 @@ public class DatosRegistralesItem {
 	    StringBuilder sb = new StringBuilder();
 	    sb.append("class DatosRegistralesItem {\n");
 	    
-	    sb.append("    resenia: ").append(toIndentedString(resenia)).append("\n");
+	    sb.append("    resena: ").append(toIndentedString(resena)).append("\n");
 	    sb.append("    objetoSocial: ").append(toIndentedString(objetoSocial)).append("\n");
 	    sb.append("    numeroPoliza: ").append(toIndentedString(numeroPoliza)).append("\n");
-	    sb.append("    companiaSeg: ").append(toIndentedString(companiaSeg)).append("\n");
+	    sb.append("    companiaAseg: ").append(toIndentedString(companiaAseg)).append("\n");
 	    sb.append("    fechaFin: ").append(toIndentedString(fechaFin)).append("\n");
 	    sb.append("    fechaConstitucion: ").append(toIndentedString(fechaConstitucion)).append("\n");
 	    sb.append("    sociedadProfesional: ").append(toIndentedString(sociedadProfesional)).append("\n");
