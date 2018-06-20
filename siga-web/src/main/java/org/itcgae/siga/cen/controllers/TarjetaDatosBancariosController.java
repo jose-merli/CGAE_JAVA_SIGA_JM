@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDeleteDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
+import org.itcgae.siga.DTOs.cen.MandatosDTO;
 import org.itcgae.siga.cen.services.ITarjetaDatosBancariosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +45,17 @@ public class TarjetaDatosBancariosController {
 	}
 	
 	
+	@RequestMapping(value = "busquedaPerJuridica/datosBancariosGeneralSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DatosBancariosDTO> searchGeneralData(@RequestParam("numPagina") int numPagina, @RequestBody DatosBancariosSearchDTO datosBancariosSearchDTO, HttpServletRequest request) { 
+		DatosBancariosDTO response = tarjetaDatosBancariosService.searchGeneralData(numPagina, datosBancariosSearchDTO, request);
+		return new ResponseEntity<DatosBancariosDTO >(response, HttpStatus.OK);
+	}
 	
 	
-	
-	
+	@RequestMapping(value = "busquedaPerJuridica/MandatosSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<MandatosDTO> searchMandatos(@RequestParam("numPagina") int numPagina, @RequestBody DatosBancariosSearchDTO datosBancariosSearchDTO, HttpServletRequest request) { 
+		MandatosDTO response = tarjetaDatosBancariosService.searchMandatos(numPagina, datosBancariosSearchDTO, request);
+		return new ResponseEntity<MandatosDTO>(response, HttpStatus.OK);
+	}
 
 }

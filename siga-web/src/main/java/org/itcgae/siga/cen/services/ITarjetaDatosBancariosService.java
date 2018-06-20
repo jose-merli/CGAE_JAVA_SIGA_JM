@@ -6,6 +6,7 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDeleteDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
+import org.itcgae.siga.DTOs.cen.MandatosDTO;
 
 public interface ITarjetaDatosBancariosService {
 
@@ -14,7 +15,10 @@ public interface ITarjetaDatosBancariosService {
 	
 	public DeleteResponseDTO deleteBanksData(DatosBancariosDeleteDTO datosBancariosDeleteDTO , HttpServletRequest request);
 	
+	public DatosBancariosDTO searchGeneralData(int numPagina,DatosBancariosSearchDTO datosBancariosSearchDTO , HttpServletRequest request);
 
+	public MandatosDTO searchMandatos(int numPagina, DatosBancariosSearchDTO datosBancariosSearchDTO, HttpServletRequest request);	
+	
 }
 
 

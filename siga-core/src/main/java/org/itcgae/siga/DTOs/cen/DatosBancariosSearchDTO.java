@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class DatosBancariosSearchDTO {
 
 	private String idPersona;
+	private String idCuenta;
 	private String idInstitucion;
 	private boolean historico;
 	
@@ -27,6 +28,21 @@ public class DatosBancariosSearchDTO {
 	}
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
+	}
+	
+	/**
+	 */
+	public DatosBancariosSearchDTO idCuenta(String idCuenta){
+		this.idCuenta = idCuenta;
+		return this;
+	}
+	
+	@JsonProperty("idCuenta")
+	public String getIdCuenta() {
+		return idCuenta;
+	}
+	public void setIdCuenta(String idCuenta) {
+		this.idCuenta = idCuenta;
 	}
 	
 	
@@ -75,14 +91,15 @@ public class DatosBancariosSearchDTO {
 	      return false;
 	    }
 	    DatosBancariosSearchDTO personaJuridicaSearchDTO = (DatosBancariosSearchDTO) o;
-	    return Objects.equals(this.idPersona, personaJuridicaSearchDTO.idPersona) &&
+	    return  Objects.equals(this.idPersona, personaJuridicaSearchDTO.idPersona) &&
+	    		Objects.equals(this.idCuenta, personaJuridicaSearchDTO.idCuenta) &&
 	    		Objects.equals(this.idInstitucion, personaJuridicaSearchDTO.idInstitucion) &&
 	    		Objects.equals(this.historico, personaJuridicaSearchDTO.historico) ;
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona, idInstitucion,historico);
+	    return Objects.hash(idPersona, idCuenta, idInstitucion,historico);
 	}
 
 	
@@ -92,6 +109,7 @@ public class DatosBancariosSearchDTO {
 	    sb.append("class DatosBancariosSearchDTO {\n");
 	    
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
+	    sb.append("    idCuenta: ").append(toIndentedString(idCuenta)).append("\n");
 	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
 	    sb.append("    historico: ").append(toIndentedString(historico)).append("\n");
 

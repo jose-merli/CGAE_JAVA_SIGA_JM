@@ -40,6 +40,33 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 	}
 	
 	
+	public String selectGeneralCuentasBancarias(DatosBancariosSearchDTO datosBancariosSearchDTO, String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("CUENTA.TITULAR");
+		sql.SELECT("CUENTA.IDCUENTA");
+		sql.SELECT("CUENTA.IBAN");
+		sql.SELECT("DECODE(CUENTA.ABONOSJCS,'1',DECODE(CUENTA.ABONOCARGO,'T','ABONO/CARGO', DECODE(CUENTA.ABONOCARGO,'A','ABONO',DECODE(CUENTA.ABONOCARGO,'C','CARGO',''))) || '/SJCS',\r\n" + 
+				"DECODE(CUENTA.ABONOCARGO,'T','ABONO/CARGO', DECODE(CUENTA.ABONOCARGO,'A','ABONO',DECODE(CUENTA.ABONOCARGO,'C','CARGO',''))))AS USO");
+		sql.SELECT("BANCO.BIC");
+		sql.SELECT("CUENTA.CUENTACONTABLE AS CUENTACONTABLE");
+		sql.SELECT("BANCO.NOMBRE AS BANCO");
+		sql.SELECT("PER.NIFCIF AS NIFTITULAR");
+		sql.SELECT("CUENTA.IDINSTITUCION");
+		sql.SELECT("CUENTA.FECHABAJA");
+
+		sql.FROM("CEN_PERSONA PER");
+		sql.INNER_JOIN("CEN_CUENTASBANCARIAS CUENTA ON CUENTA.IDPERSONA = PER.IDPERSONA");
+		sql.INNER_JOIN("CEN_BANCOS BANCO ON BANCO.CODIGO = CUENTA.CBO_CODIGO");
+
+		sql.WHERE("PER.IDPERSONA = '"+datosBancariosSearchDTO.getIdPersona()+"'");
+		sql.WHERE("CUENTA.FECHABAJA is null");
+		sql.WHERE("CUENTA.IDCUENTA = '"+datosBancariosSearchDTO.getIdCuenta()+"'");
+		sql.WHERE("CUENTA.IDINSTITUCION = '"+idInstitucion+"'");
+		
+		return sql.toString();
+	}
+	
+	
 }
 
 

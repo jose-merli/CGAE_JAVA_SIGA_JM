@@ -22,6 +22,10 @@ public class DatosBancariosItem {
 	private Date fechaFirmaProductos;
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaBaja;
+	private String nifTitular;
+	private String banco;
+	private String[] tipoCuenta;
+	private String cuentaContable;
 	
 	
 	
@@ -191,6 +195,66 @@ public class DatosBancariosItem {
 		this.fechaBaja = fechaBaja;
 	}
 	
+	/**
+	 */
+	public DatosBancariosItem nifTitular(String nifTitular){
+		this.nifTitular = nifTitular;
+		return this;
+	}
+	
+	@JsonProperty("nifTitular")
+	public String getNifTitular() {
+		return nifTitular;
+	}
+	public void setNifTitular(String nifTitular) {
+		this.nifTitular = nifTitular;
+	}
+	
+	/**
+	 */
+	public DatosBancariosItem banco(String banco){
+		this.banco = banco;
+		return this;
+	}
+	
+	@JsonProperty("banco")
+	public String getBanco() {
+		return banco;
+	}
+	public void setBanco(String banco) {
+		this.banco = banco;
+	}
+	
+	/**
+	 */
+	public DatosBancariosItem cuentaContable(String cuentaContable){
+		this.cuentaContable = cuentaContable;
+		return this;
+	}
+	
+	@JsonProperty("cuentaContable")
+	public String getCuentaContable() {
+		return cuentaContable;
+	}
+	public void setCuentaContable(String cuentaContable) {
+		this.cuentaContable = cuentaContable;
+	}
+	
+	/**
+	 */
+	public DatosBancariosItem tipoCuenta(String[] tipoCuenta){
+		this.tipoCuenta = tipoCuenta;
+		return this;
+	}
+	
+	@JsonProperty("tipoCuenta")
+	public String[] getTipoCuenta() {
+		return tipoCuenta;
+	}
+	public void setTipoCuenta(String[] tipoCuenta) {
+		this.tipoCuenta = tipoCuenta;
+	}
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -207,6 +271,10 @@ public class DatosBancariosItem {
 	    		Objects.equals(this.bic, personaJuridicaSearchDTO.bic) &&
 	    		Objects.equals(this.uso, personaJuridicaSearchDTO.uso) &&
 	    		Objects.equals(this.iban, personaJuridicaSearchDTO.iban) &&
+	    		Objects.equals(this.banco, personaJuridicaSearchDTO.banco) &&
+	    		Objects.equals(this.tipoCuenta, personaJuridicaSearchDTO.tipoCuenta) &&
+	    		Objects.equals(this.cuentaContable, personaJuridicaSearchDTO.cuentaContable) &&
+	    		Objects.equals(this.nifTitular, personaJuridicaSearchDTO.nifTitular) &&
 	    		Objects.equals(this.fechaBaja, personaJuridicaSearchDTO.fechaBaja) &&
 	    		Objects.equals(this.fechaFirmaProductos, personaJuridicaSearchDTO.fechaFirmaProductos) &&
 	    		Objects.equals(this.fechaFirmaServicios, personaJuridicaSearchDTO.fechaFirmaServicios);
@@ -214,7 +282,7 @@ public class DatosBancariosItem {
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona, idInstitucion,idCuenta,titular,iban,uso,bic,fechaFirmaProductos,fechaFirmaServicios,fechaBaja);
+	    return Objects.hash(idPersona, idInstitucion,idCuenta,titular,iban,uso,bic,banco,tipoCuenta,nifTitular,cuentaContable,fechaFirmaProductos,fechaFirmaServicios,fechaBaja);
 	}
 
 	
@@ -230,6 +298,10 @@ public class DatosBancariosItem {
 	    sb.append("    titular: ").append(toIndentedString(titular)).append("\n");
 	    sb.append("    iban: ").append(toIndentedString(iban)).append("\n");
 	    sb.append("    bic: ").append(toIndentedString(bic)).append("\n");
+	    sb.append("    cuentaContable: ").append(toIndentedString(cuentaContable)).append("\n");
+	    sb.append("    nifTitular: ").append(toIndentedString(nifTitular)).append("\n");
+	    sb.append("    banco: ").append(toIndentedString(banco)).append("\n");
+	    sb.append("    tipoCuenta: ").append(toIndentedString(tipoCuenta)).append("\n");
 	    sb.append("    fechaFirmaServicios: ").append(toIndentedString(fechaFirmaServicios)).append("\n");
 	    sb.append("    fechaFirmaProductos: ").append(toIndentedString(fechaFirmaProductos)).append("\n");
 	    sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");

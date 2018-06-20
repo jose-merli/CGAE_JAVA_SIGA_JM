@@ -12,14 +12,14 @@ import org.itcgae.siga.DTOs.cen.DatosBancariosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDeleteDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
+import org.itcgae.siga.DTOs.cen.MandatosDTO;
+import org.itcgae.siga.DTOs.cen.MandatosItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosBancariosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
 import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
-import org.itcgae.siga.db.entities.CenNocolegiado;
-import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -155,6 +155,128 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		LOGGER.info("deleteBanksData() -> Salida del servicio para eliminar cuentas bancarias ");
 		return deleteResponseDTO;
 	}
+
+
+
+
+	@Override
+	public DatosBancariosDTO searchGeneralData(int numPagina, DatosBancariosSearchDTO datosBancariosSearchDTO,
+			HttpServletRequest request) {
+		LOGGER.info("searchGeneralData() -> Entrada al servicio para la búsqueda por filtros de cuentas bancarias");
+		
+		List<DatosBancariosItem> datosBancariosItem = new ArrayList<DatosBancariosItem>();
+		DatosBancariosDTO datosBancariosDTO = new DatosBancariosDTO();
+
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"searchGeneralData() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"searchGeneralData() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				LOGGER.info(
+						"searchGeneralData() / cenCuentasbancariasExtendsMapper.selectCuentasBancarias() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de cuentas bancarias");
+				datosBancariosItem = cenCuentasbancariasExtendsMapper.selectGeneralCuentasBancarias(datosBancariosSearchDTO, idInstitucion.toString());
+				LOGGER.info(
+						"searchGeneralData() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de cuentas bancarias");
+
+				if (null != datosBancariosItem && datosBancariosItem.size() >0 ) {
+					for (DatosBancariosItem datosBancarios : datosBancariosItem) {
+						if (null != datosBancarios.getUso()) {
+							List<String> usos = new ArrayList<String>();
+							if (datosBancarios.getUso().contains("ABONO")) {
+								usos.add("A");
+							}
+							if (datosBancarios.getUso().contains("CARGO")) {
+								usos.add("C");
+							}
+							if (datosBancarios.getUso().contains("SJCS")) {
+								usos.add("S");
+							}
+							if (null != usos && usos.size()>0) {
+								String[] tiposCuenta = new String[usos.size()];
+								int i = 0;
+								for (String uso : usos) {
+									tiposCuenta[i] = new String();
+									tiposCuenta[i] = uso;
+									i++;
+								}
+								datosBancarios.setTipoCuenta(tiposCuenta);
+							}
+							
+						}
+					}
+				}
+				datosBancariosDTO.setDatosBancariosItem(datosBancariosItem);;
+			} 
+			else {
+				LOGGER.warn("searchGeneralData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+			}
+		} 
+		else {
+			LOGGER.warn("searchGeneralData() -> idInstitucion del token nula");
+		}
+		
+		LOGGER.info("searchBanksData() -> Salida del servicio para la búsqueda por filtros de cuentas bancarias");
+		return datosBancariosDTO;
+	}
+
+
+
+
+	@Override
+	public MandatosDTO searchMandatos(int numPagina, DatosBancariosSearchDTO datosBancariosSearchDTO,
+			HttpServletRequest request) {
+		LOGGER.info("searchMandatos() -> Entrada al servicio para la búsqueda por filtros de cuentas bancarias");
+		
+		List<MandatosItem> mandatosItem = new ArrayList<MandatosItem>();
+		MandatosDTO mandatosDTO = new MandatosDTO();
+
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				LOGGER.info(
+						"searchMandatos() / cenCuentasbancariasExtendsMapper.selectCuentasBancarias() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de cuentas bancarias");
+			//	mandatosItem = cenCuentasbancariasExtendsMapper.selectMandatos(datosBancariosSearchDTO, idInstitucion.toString());
+				LOGGER.info(
+						"searchMandatos() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de cuentas bancarias");
+
+				mandatosDTO.setMandatosItem(mandatosItem);;
+			} 
+			else {
+				LOGGER.warn("searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+			}
+		} 
+		else {
+			LOGGER.warn("searchMandatos() -> idInstitucion del token nula");
+		}
+		
+		LOGGER.info("searchMandatos() -> Salida del servicio para la búsqueda por filtros de cuentas bancarias");
+		return mandatosDTO;
+	}
+
 
 
 

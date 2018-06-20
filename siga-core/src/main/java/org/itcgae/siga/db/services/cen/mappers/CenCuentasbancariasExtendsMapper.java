@@ -37,4 +37,22 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 	})
 	List<DatosBancariosItem> selectCuentasBancarias(DatosBancariosSearchDTO datosBancarios, String idInstitucion);
 	
+	
+	
+	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "selectGeneralCuentasBancarias")
+	@Results({
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCUENTA", property = "idCuenta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TITULAR", property = "titular", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "USO", property = "uso", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IBAN", property = "iban", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "BIC", property = "bic", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CUENTACONTABLE", property = "cuentaContable", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "BANCO", property = "banco", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIFTITULAR", property = "nifTitular", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
+
+	})
+	List<DatosBancariosItem> selectGeneralCuentasBancarias(DatosBancariosSearchDTO datosBancarios, String idInstitucion);
 }
