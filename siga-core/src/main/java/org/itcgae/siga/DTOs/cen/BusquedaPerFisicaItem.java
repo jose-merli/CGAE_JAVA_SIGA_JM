@@ -13,6 +13,7 @@ public class BusquedaPerFisicaItem {
 	private String idPersona;
 	private String nif;
 	private String nombre;
+	private String apellidos;
 	private String primerApellido;
 	private String segundoApellido;
 	private String numeroColegiado;
@@ -102,6 +103,24 @@ public class BusquedaPerFisicaItem {
 		this.nombre = nombre;
 	}
 	
+	/**
+	 *
+	 */
+	public BusquedaPerFisicaItem apellidos(String apellidos){
+		this.apellidos = apellidos;
+		return this;
+	}
+	
+	
+	@JsonProperty("apellidos")
+	public String getApellidos() {
+		return apellidos;
+	}
+	
+	
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
 	/**
 	 *
 	 */
@@ -240,6 +259,7 @@ public class BusquedaPerFisicaItem {
 	    		Objects.equals(this.idPersona, busquedaFisicaItem.idPersona) &&
 	    		Objects.equals(this.nif, busquedaFisicaItem.nif) &&
 	    		Objects.equals(this.nombre, busquedaFisicaItem.nombre) &&
+	    		Objects.equals(this.apellidos, busquedaFisicaItem.apellidos) &&
 	    		Objects.equals(this.primerApellido, busquedaFisicaItem.primerApellido) &&
 	    		Objects.equals(this.segundoApellido, busquedaFisicaItem.segundoApellido) &&
 	    		Objects.equals(this.numeroColegiado, busquedaFisicaItem.numeroColegiado) &&
@@ -251,7 +271,7 @@ public class BusquedaPerFisicaItem {
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(colegio, idPersona, nif, nombre, primerApellido, segundoApellido, numeroColegiado, residente, situacion, fechaNacimiento);
+	    return Objects.hash(colegio, idPersona, nif, nombre, apellidos, primerApellido, segundoApellido, numeroColegiado, residente, situacion, fechaNacimiento);
 	}
 
 	
@@ -264,6 +284,7 @@ public class BusquedaPerFisicaItem {
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 	    sb.append("    nif: ").append(toIndentedString(nif)).append("\n");
 	    sb.append("    nombre: ").append(toIndentedString(nombre)).append("\n");
+	    sb.append("    apellidos: ").append(toIndentedString(apellidos)).append("\n");
 	    sb.append("    primerApellido: ").append(toIndentedString(primerApellido)).append("\n");
 	    sb.append("    segundoApellido: ").append(toIndentedString(segundoApellido)).append("\n");
 	    sb.append("    numeroColegiado: ").append(toIndentedString(numeroColegiado)).append("\n");

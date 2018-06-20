@@ -18,7 +18,7 @@ public class BusquedaPerFisicaDTO {
 	/**
 	 *
 	 */
-	public BusquedaPerFisicaDTO busquedaJuridicaItems(List<BusquedaPerFisicaItem> busquedaFisicaItems){
+	public BusquedaPerFisicaDTO busquedaFisicaItems(List<BusquedaPerFisicaItem> busquedaFisicaItems){
 		this.busquedaFisicaItems = busquedaFisicaItems;
 		return this;
 	}
@@ -81,9 +81,9 @@ public class BusquedaPerFisicaDTO {
 	@Override
 	public String toString() {
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("class BusquedaJuridicaDTO {\n");
+	    sb.append("class BusquedaFisicaDTO {\n");
 	    
-	    sb.append("    busquedaJuridicaItems: ").append(toIndentedString(busquedaFisicaItems)).append("\n");
+	    sb.append("    busquedaFisicaItems: ").append(toIndentedString(busquedaFisicaItems)).append("\n");
 	    sb.append("    error: ").append(toIndentedString(error)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
