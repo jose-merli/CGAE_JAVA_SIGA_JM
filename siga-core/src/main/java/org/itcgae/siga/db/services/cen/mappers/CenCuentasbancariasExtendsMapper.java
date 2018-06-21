@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
+import org.itcgae.siga.DTOs.cen.MandatosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
 import org.itcgae.siga.db.mappers.CenGruposclienteClienteMapper;
@@ -55,4 +56,21 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 
 	})
 	List<DatosBancariosItem> selectGeneralCuentasBancarias(DatosBancariosSearchDTO datosBancarios, String idInstitucion);
+	
+	
+	
+	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "selectMandatos")
+	@Results({
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCUENTA", property = "idCuenta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "REFERENCIASERVICIO", property = "referenciaServicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ESQUEMASERVICIO", property = "esquemaServicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOPAGOSERVICIO", property = "tipoPagoServicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "REFERENCIAPRODUCTO", property = "referenciaProducto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ESQUEMAPRODUCTO", property = "esquemaProducto", jdbcType = JdbcType.DATE),
+		@Result(column = "TIPOPAGOPRODUCTO", property = "tipoPagoProducto", jdbcType = JdbcType.DATE),
+	})
+	List<MandatosItem> selectMandatos(DatosBancariosSearchDTO datosBancarios, String idInstitucion);
+	
 }

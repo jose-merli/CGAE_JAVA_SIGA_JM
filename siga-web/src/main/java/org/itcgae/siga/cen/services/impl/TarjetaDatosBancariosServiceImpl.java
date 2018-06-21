@@ -236,7 +236,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 	@Override
 	public MandatosDTO searchMandatos(int numPagina, DatosBancariosSearchDTO datosBancariosSearchDTO,
 			HttpServletRequest request) {
-		LOGGER.info("searchMandatos() -> Entrada al servicio para la búsqueda por filtros de cuentas bancarias");
+		LOGGER.info("searchMandatos() -> Entrada al servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
 		
 		List<MandatosItem> mandatosItem = new ArrayList<MandatosItem>();
 		MandatosDTO mandatosDTO = new MandatosDTO();
@@ -258,10 +258,10 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 			if (null != usuarios && usuarios.size() > 0) {
 				LOGGER.info(
-						"searchMandatos() / cenCuentasbancariasExtendsMapper.selectCuentasBancarias() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de cuentas bancarias");
-			//	mandatosItem = cenCuentasbancariasExtendsMapper.selectMandatos(datosBancariosSearchDTO, idInstitucion.toString());
+						"searchMandatos() / cenCuentasbancariasExtendsMapper.selectCuentasBancarias() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de mandatos de cuentas bancarias");
+				mandatosItem = cenCuentasbancariasExtendsMapper.selectMandatos(datosBancariosSearchDTO, idInstitucion.toString());
 				LOGGER.info(
-						"searchMandatos() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de cuentas bancarias");
+						"searchMandatos() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de mandatos de cuentas bancarias");
 
 				mandatosDTO.setMandatosItem(mandatosItem);;
 			} 
@@ -273,7 +273,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			LOGGER.warn("searchMandatos() -> idInstitucion del token nula");
 		}
 		
-		LOGGER.info("searchMandatos() -> Salida del servicio para la búsqueda por filtros de cuentas bancarias");
+		LOGGER.info("searchMandatos() -> Salida del servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
 		return mandatosDTO;
 	}
 
