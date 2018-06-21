@@ -22,9 +22,6 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividad;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividadExample;
-import org.itcgae.siga.db.entities.CenNocolegiadoExample;
-import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.mappers.CenNocolegiadoActividadMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenActividadprofesionalExtendsMapper;
@@ -217,34 +214,42 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 			AdmUsuarios usuario = usuarios.get(0);
 			
 			// 1. Actualizar tabla cen_persona
-			CenPersona cenPersona = new CenPersona();
-			cenPersona.setFechanacimiento(perJuridicaDatosRegistralesUpdateDTO.getFechaConstitucion());
-			CenPersonaExample cenPersonaExample = new CenPersonaExample();
-			cenPersonaExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona()));
+//			CenPersona cenPersona = new CenPersona();
+//			cenPersona.setFechanacimiento(perJuridicaDatosRegistralesUpdateDTO.getFechaConstitucion());
+//			cenPersona.setFechamodificacion(fechamodificacion);
+//			cenPersona.setUsumodificacion(usumodificacion);
+//			CenPersonaExample cenPersonaExample = new CenPersonaExample();
+//			cenPersonaExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona()));
+//			responseCenPersona = cenPersonaExtendsMapper.updateByExampleSelective(cenPersona, cenPersonaExample);
+			
 			LOGGER.info(
-					"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updateByExampleSelective() -> Entrada a cenPersonaExtendsMapper para actualizar fecha de constitución de una persona jurídica");
-			responseCenPersona = cenPersonaExtendsMapper.updateByExampleSelective(cenPersona, cenPersonaExample);
+					"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updatebyExampleDataLegalPerson() -> Entrada a cenPersonaExtendsMapper para actualizar fecha de constitución de una persona jurídica");
+			
+			responseCenPersona = cenPersonaExtendsMapper.updatebyExampleDataLegalPerson(perJuridicaDatosRegistralesUpdateDTO, usuario);
 			LOGGER.info(
-					"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updateByExampleSelective() -> Salida de cenPersonaExtendsMapper para actualizar fecha de constitución de una persona jurídica");
+					"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updatebyExampleDataLegalPerson() -> Salida de cenPersonaExtendsMapper para actualizar fecha de constitución de una persona jurídica");
 			
 			// 2. Actualizar tabla cen_nocolegiado
 			if(responseCenPersona == 1) {
 				CenNocolegiado cenNocolegiado = new CenNocolegiado();
 				cenNocolegiado.setResena(perJuridicaDatosRegistralesUpdateDTO.getResena());
-				cenNocolegiado.setObjetosocial(perJuridicaDatosRegistralesUpdateDTO.getObjetoSocial());
-				cenNocolegiado.setNopoliza(perJuridicaDatosRegistralesUpdateDTO.getNumeroPoliza());
-				cenNocolegiado.setCompaniaseg(perJuridicaDatosRegistralesUpdateDTO.getCompaniaAseg());
-				cenNocolegiado.setFechafin(perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
-				cenNocolegiado.setSociedadprofesional(perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional());
-				
-				CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
-				cenNocolegiadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
+//				cenNocolegiado.setObjetosocial(perJuridicaDatosRegistralesUpdateDTO.getObjetoSocial());
+//				cenNocolegiado.setNopoliza(perJuridicaDatosRegistralesUpdateDTO.getNumeroPoliza());
+//				cenNocolegiado.setCompaniaseg(perJuridicaDatosRegistralesUpdateDTO.getCompaniaAseg());
+//				cenNocolegiado.setFechafin(perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
+//				cenNocolegiado.setSociedadprofesional(perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional());
+//				
+//				CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
+//				cenNocolegiadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
+//				
+//				responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByExampleSelective(cenNocolegiado, cenNocolegiadoExample);
+//				
 				LOGGER.info(
-						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
+						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson() -> Entrada a cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
 				
-				responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByExampleSelective(cenNocolegiado, cenNocolegiadoExample);
+				responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson(perJuridicaDatosRegistralesUpdateDTO, String.valueOf(idInstitucion), usuario);
 				LOGGER.info(
-						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
+						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson() -> Salida de cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
 				
 			}
 			else {

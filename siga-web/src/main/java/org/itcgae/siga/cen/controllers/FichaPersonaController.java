@@ -4,10 +4,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.AsociarPersonaDTO;
+import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.FichaPerSearchDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaDTO;
-import org.itcgae.siga.cen.services.impl.FichaPersonaServiceImpl;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.cen.services.IFichaPersonaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class FichaPersonaController {
 
 	@Autowired
-	FichaPersonaServiceImpl fichaPersonaService;
+	private IFichaPersonaService fichaPersonaService;
 	
 	@RequestMapping(value = "/fichaPersona/search",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<FichaPersonaDTO> searchPersonFile(@RequestParam("numPagina") int numPagina, @RequestBody FichaPerSearchDTO fichaPerSearch, HttpServletRequest request) { 
@@ -42,5 +44,14 @@ public class FichaPersonaController {
 		UpdateResponseDTO response = fichaPersonaService.savePerson(asociarPersona, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
+	
+	
+	@RequestMapping(value = "/fichaPersona/crearNotario",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> createPersonFile(@RequestBody CrearPersonaDTO crearPersonaDTO, HttpServletRequest request) { 
+		ComboDTO response = fichaPersonaService.createPersonFile(crearPersonaDTO, request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	
 	
 }

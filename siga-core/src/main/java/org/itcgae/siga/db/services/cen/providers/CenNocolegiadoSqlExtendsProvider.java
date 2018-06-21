@@ -6,6 +6,7 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.PersonaSearchDTO;
@@ -308,6 +309,51 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		sql.WHERE("IDPERSONA = '" + desasociarPersona.getIdPersona() + "'");
 		sql.WHERE("IDINSTITUCION = '" +desasociarPersona.getIdInstitucion()+ "'");
+		
+		return sql.toString();
+	}
+	
+	public String updateByExampleDataLegalPerson(PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, String idInstitucion, AdmUsuarios usuario) {
+		SQL sql = new SQL();
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		
+		sql.UPDATE("cen_nocolegiado");
+		
+		if(!perJuridicaDatosRegistralesUpdateDTO.getResena().equals("")) {
+			sql.SET("RESENA = '" + perJuridicaDatosRegistralesUpdateDTO.getResena() + "'");
+		}
+		
+		if(!perJuridicaDatosRegistralesUpdateDTO.getObjetoSocial().equals("")) {
+			sql.SET("OBJETOSOCIAL = '" + perJuridicaDatosRegistralesUpdateDTO.getObjetoSocial() + "'");
+		}
+	
+		if(!perJuridicaDatosRegistralesUpdateDTO.getNumeroPoliza().equals("")) {
+			sql.SET("NOPOLIZA = '" + perJuridicaDatosRegistralesUpdateDTO.getNumeroPoliza() + "'");
+		}
+		
+		if(!perJuridicaDatosRegistralesUpdateDTO.getCompaniaAseg().equals("")) {
+			sql.SET("COMPANIASEG = '" + perJuridicaDatosRegistralesUpdateDTO.getCompaniaAseg() + "'");
+		}
+		
+		if(null != perJuridicaDatosRegistralesUpdateDTO.getFechaFin()) {
+			String fechaF = dateFormat.format(perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
+			sql.SET("FECHAFIN = '" + fechaF + "'");
+		}
+		
+		if(!perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional().equals("")) {
+			sql.SET("SOCIEDADPROFESIONAL = '" + perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional() + "'");
+		}
+		
+		if(null != usuario.getIdusuario() && !usuario.getIdusuario().equals("")) {
+			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+		}
+		
+		sql.SET("FECHAMODIFICACION = 'SYSDATE'");
+		
+		
+		sql.WHERE("IDPERSONA = '" + perJuridicaDatosRegistralesUpdateDTO.getIdPersona() + "'");
+		sql.WHERE("IDINSTITUCION = '" +idInstitucion+ "'");
 		
 		return sql.toString();
 	}
