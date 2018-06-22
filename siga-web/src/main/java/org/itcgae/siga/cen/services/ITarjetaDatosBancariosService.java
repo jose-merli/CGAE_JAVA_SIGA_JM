@@ -29,7 +29,7 @@ public interface ITarjetaDatosBancariosService {
 
 	public MandatosDTO searchMandatos(int numPagina, DatosBancariosSearchDTO datosBancariosSearchDTO, HttpServletRequest request);
 
-	public UpdateResponseDTO insertBanksData(DatosBancariosInsertDTO datosBancariosInsertDTO, HttpServletRequest request) throws IOException, NamingException, SQLException;
+	public UpdateResponseDTO insertBanksData(DatosBancariosInsertDTO datosBancariosInsertDTO, HttpServletRequest request) throws IOException, NamingException, SQLException, Exception;
 
 	public ComboDTO getLabelEsquema(HttpServletRequest request);
 

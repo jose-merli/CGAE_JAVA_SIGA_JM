@@ -33,8 +33,8 @@ public interface CenActividadprofesionalExtendsMapper extends CenActividadprofes
 		@Result(column = "OBJETOSOCIAL", property = "objetoSocial", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOPOLIZA", property = "numeroPoliza", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "COMPANIASEG", property = "companiaAseg", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.DATE),
-		@Result(column = "FECHANACIMIENTO", property = "fechaConstitucion", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHANACIMIENTO", property = "fechaConstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SOCIEDADPROFESIONAL", property = "sociedadProfesional", jdbcType = JdbcType.VARCHAR)
 	})
 	List<DatosRegistralesItem> searchRegistryDataLegalPerson(PersonaJuridicaSearchDTO personaJuridicaSearchDTO);

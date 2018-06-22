@@ -310,7 +310,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 	@Override
 	public UpdateResponseDTO insertBanksData(DatosBancariosInsertDTO datosBancariosInsertDTO,
-			HttpServletRequest request) throws IOException, NamingException, SQLException {
+			HttpServletRequest request) throws Exception {
 		
 		LOGGER.info("insertBanksData() -> Entrada al servicio para insertar cuentas bancarias");
 		int response = 0;
@@ -387,6 +387,23 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				cuentaBancaria.setDigitocontrol(datosBancariosInsertDTO.getIban().substring(12, 14));
 				cuentaBancaria.setNumerocuenta(datosBancariosInsertDTO.getIban().substring(14, 24));			
 
+				
+				//Si se ha marcado el check abono SJCS se comprueba si existe otra cuenta que ya es abono SJCS
+				if(tieneSCSJ){
+					CenCuentasbancariasExample example = new CenCuentasbancariasExample();
+					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(datosBancariosInsertDTO.getIdPersona())).andIdinstitucionEqualTo(idInstitucion).andAbonosjcsEqualTo("1");
+					List<CenCuentasbancarias> cuenta = cenCuentasbancariasExtendsMapper.selectByExample(example );
+					
+					
+					//if (cuentasAdm.existeCuentaAbonoSJCS(beanCuentas.getIdPersona(), beanCuentas.getIdInstitucion(), beanCuentas.getIdCuenta())) {
+					if (null != cuenta && cuenta.size()>0) 
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setMessage("messages.censo.existeAbonoSJCS");
+						updateResponseDTO.setError(error);
+						return updateResponseDTO;
+					}
+				
+				
 				LOGGER.info(
 						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
 				response = cenCuentasbancariasExtendsMapper.insertSelective(cuentaBancaria);
@@ -451,6 +468,53 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						}
 					}
 				}
+				
+
+				//Se comprueba si se deben revisar las cuentas y se ejecutan los scripts que se encargan de ello
+				
+				// Lanzamos el proceso de revision de suscripciones del letrado 
+				String resultado[] = ejecutarPL_RevisionSuscripcionesLetrado(""+idInstitucion.toString(),
+																						  ""+datosBancariosInsertDTO.getIdPersona(),
+																						  "",
+																						  ""+ usuario.getIdusuario().toString());
+				if ((resultado == null) || (!resultado[0].equals("0"))){
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO"+resultado[1]);
+					updateResponseDTO.setError(error);
+					return updateResponseDTO;
+				}
+				
+				// Este proceso se encarga de actualizar las cosas pendientes asociadas a la cuenta de la persona 
+				String[] resultado1 = ejecutarPL_Revision_Cuenta(
+					""+idInstitucion.toString(),
+					  ""+datosBancariosInsertDTO.getIdPersona(),
+					  ""+newIdCuenta.get(0).getIdCuenta(),
+					  ""+ usuario.getIdusuario().toString());
+				if (resultado1 == null || !resultado1[0].equals("0")) {
+
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado[1]);
+					updateResponseDTO.setError(error);
+					return updateResponseDTO;
+
+				}
+				
+				// Comprueba si va a lanzar el proceso que asocia las suscripciones activas con forma de pago en metalico a la nueva cuenta bancaria
+				if (datosBancariosInsertDTO.getRevisionCuentas()) { 
+					// Este proceso asocia las suscripciones activas con forma de pago en metalico a la nueva cuenta bancaria 
+					resultado1 = ejecutarPL_AltaCuentaCargos(
+						""+idInstitucion.toString(),
+						  ""+datosBancariosInsertDTO.getIdPersona(),
+						  ""+newIdCuenta.get(0).getIdCuenta(),
+						  ""+ usuario.getIdusuario().toString());
+					if (resultado1 == null || !resultado1[0].equals("0")) {
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_ALTA_CUENTA_CARGOS" + resultado[1]);
+						updateResponseDTO.setError(error);
+						return updateResponseDTO;
+					}
+				}		
+				
 			} else {
 				LOGGER.warn(
 						"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -468,7 +532,166 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 
 
-	
+	@Override
+	public ComboDTO getLabelEsquema(HttpServletRequest request) {
+		LOGGER.info("getLabelEsquema() -> Entrada al servicio para la búsqueda de esquemas de mandatos");
+		
+		ComboDTO combo = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if(null != idInstitucion)
+		{
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getLabelEsquema() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if(null != usuarios && usuarios.size() > 0) {
+				
+				AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"getLabelEsquema() / cenNocolegiadoExtendsMapper.getProfesionalActivities() -> Entrada a cenNocolegiadoExtendsMapper obtener lista de esquemas de mandatos");
+				comboItems = cenCuentasbancariasExtendsMapper.getComboEsquemas(usuario.getIdlenguaje());
+				LOGGER.info(
+						"getLabelEsquema() / cenNocolegiadoExtendsMapper.getProfesionalActivities() -> Entrada a cenNocolegiadoExtendsMapper obtener lista de esquemas de mandatos");
+				if (!comboItems.equals(null) && comboItems.size() > 0) {
+					// añade elemento vacio al principio para el dropdown de parte front
+					ComboItem comboItem = new ComboItem();
+					comboItem.setLabel("");
+					comboItem.setValue("");
+					comboItems.add(0, comboItem);
+					combo.setCombooItems(comboItems);
+				}
+			}
+			
+		}
+		
+		
+		LOGGER.info("getLabelEsquema() -> Salida del servicio para la búsqueda de esquemas de mandatos");
+		return combo;
+
+	}
+
+
+
+
+	@Override
+	public UpdateResponseDTO updateMandatos(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request) {
+		
+		LOGGER.info("updateMandatos() -> Entrada al servicio para actualizar mandatos");
+		int response = 0;
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"updateMandatos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"updateMandatos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+					
+				// información a modificar
+				CenMandatosCuentasbancarias record = new CenMandatosCuentasbancarias();
+				record.setFechamodificacion(new Date());
+				record.setUsumodificacion(usuario.getIdusuario());
+				record.setIdmandato(Short.valueOf(mandatosUpdateDTO.getIdMandato()));
+				record.setIdcuenta(Short.valueOf(mandatosUpdateDTO.getIdCuenta()));
+				record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));
+				record.setIdinstitucion(Short.valueOf(idInstitucion));
+				record.setEsquema(Short.valueOf(mandatosUpdateDTO.getEsquema()));
+				// filtrado para sentencia sql
+			
+				LOGGER.info(
+						"updateMandatos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar mandatos");
+				
+				response = cenMandatosCuentasbancariasMapper.updateByPrimaryKeySelective(record);
+				
+				LOGGER.info(
+						"updateMandatos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar mandatos");
+
+			} else {
+				LOGGER.warn(
+						"updateMandatos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("updateMandatos() -> idInstitucion del token nula");
+		}
+		
+		// comprobacion actualización
+		if(response >= 1) {
+			LOGGER.info("updateMandatos() -> OK. Update para mandatos realizado correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
+		else {
+			LOGGER.info("updateMandatos() -> KO. Update para mandatos  NO realizado correctamente");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		}
+		
+		LOGGER.info("deleteBanksData() -> Salida del servicio para actualizar mandatos ");
+		return updateResponseDTO;
+	}
+
+
+
+
+	@Override
+	public BancoBicDTO searchBanks(DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO,
+			HttpServletRequest request) {
+		LOGGER.info("searchMandatos() -> Entrada al servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
+		
+		List<BancoBicItem> bancoBicItem = new ArrayList<BancoBicItem>();
+		BancoBicDTO bancoBic = new BancoBicDTO();
+
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				LOGGER.info(
+						"searchMandatos() / cenCuentasbancariasExtendsMapper.selectCuentasBancarias() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de mandatos de cuentas bancarias");
+				datosBancariosSearchBancoDTO.setiban(datosBancariosSearchBancoDTO.getiban().substring(4, 8));
+				bancoBicItem = cenCuentasbancariasExtendsMapper.selectBanks(datosBancariosSearchBancoDTO);
+				LOGGER.info(
+						"searchMandatos() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de mandatos de cuentas bancarias");
+
+				bancoBic.setBancoBicItem(bancoBicItem);;
+			} 
+			else {
+				LOGGER.warn("searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+			}
+		} 
+		else {
+			LOGGER.warn("searchMandatos() -> idInstitucion del token nula");
+		}
+		
+		LOGGER.info("searchMandatos() -> Salida del servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
+		return bancoBic;
+	}
 	
 	/**
 	   * Calls a PL Funtion
@@ -564,169 +787,100 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 
 
-		@Override
-		public ComboDTO getLabelEsquema(HttpServletRequest request) {
-			LOGGER.info("getLabelEsquema() -> Entrada al servicio para la búsqueda de esquemas de mandatos");
-			
-			ComboDTO combo = new ComboDTO();
-			List<ComboItem> comboItems = new ArrayList<ComboItem>();
-			// Conseguimos información del usuario logeado
-			String token = request.getHeader("Authorization");
-			String dni = UserTokenUtils.getDniFromJWTToken(token);
-			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-			
-			if(null != idInstitucion)
-			{
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-				LOGGER.info(
-						"getLabelEsquema() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				if(null != usuarios && usuarios.size() > 0) {
-					
-					AdmUsuarios usuario = usuarios.get(0);
-					LOGGER.info(
-							"getLabelEsquema() / cenNocolegiadoExtendsMapper.getProfesionalActivities() -> Entrada a cenNocolegiadoExtendsMapper obtener lista de esquemas de mandatos");
-					comboItems = cenCuentasbancariasExtendsMapper.getComboEsquemas(usuario.getIdlenguaje());
-					LOGGER.info(
-							"getLabelEsquema() / cenNocolegiadoExtendsMapper.getProfesionalActivities() -> Entrada a cenNocolegiadoExtendsMapper obtener lista de esquemas de mandatos");
-					if (!comboItems.equals(null) && comboItems.size() > 0) {
-						// añade elemento vacio al principio para el dropdown de parte front
-						ComboItem comboItem = new ComboItem();
-						comboItem.setLabel("");
-						comboItem.setValue("");
-						comboItems.add(0, comboItem);
-						combo.setCombooItems(comboItems);
-					}
-				}
-				
-			}
-			
-			
-			LOGGER.info("getLabelEsquema() -> Salida del servicio para la búsqueda de esquemas de mandatos");
-			return combo;
-
-		}
-
-
-
-
-		@Override
-		public UpdateResponseDTO updateMandatos(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request) {
-			
-			LOGGER.info("updateMandatos() -> Entrada al servicio para actualizar mandatos");
-			int response = 0;
-			UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-			
-			// Conseguimos información del usuario logeado
-			String token = request.getHeader("Authorization");
-			String dni = UserTokenUtils.getDniFromJWTToken(token);
-			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-			if (null != idInstitucion) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-				LOGGER.info(
-						"updateMandatos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				LOGGER.info(
-						"updateMandatos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (null != usuarios && usuarios.size() > 0) {
-					AdmUsuarios usuario = usuarios.get(0);
-						
-					// información a modificar
-					CenMandatosCuentasbancarias record = new CenMandatosCuentasbancarias();
-					record.setFechamodificacion(new Date());
-					record.setUsumodificacion(usuario.getIdusuario());
-					record.setIdmandato(Short.valueOf(mandatosUpdateDTO.getIdMandato()));
-					record.setIdcuenta(Short.valueOf(mandatosUpdateDTO.getIdCuenta()));
-					record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));
-					record.setIdinstitucion(Short.valueOf(idInstitucion));
-					record.setEsquema(Short.valueOf(mandatosUpdateDTO.getEsquema()));
-					// filtrado para sentencia sql
-				
-					LOGGER.info(
-							"updateMandatos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar mandatos");
-					
-					response = cenMandatosCuentasbancariasMapper.updateByPrimaryKeySelective(record);
-					
-					LOGGER.info(
-							"updateMandatos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar mandatos");
-
-				} else {
-					LOGGER.warn(
-							"updateMandatos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
-									+ dni + " e idInstitucion = " + idInstitucion);
-				}
-			} else {
-				LOGGER.warn("updateMandatos() -> idInstitucion del token nula");
-			}
-			
-			// comprobacion actualización
-			if(response >= 1) {
-				LOGGER.info("updateMandatos() -> OK. Update para mandatos realizado correctamente");
-				updateResponseDTO.setStatus(SigaConstants.OK);
-			}
-			else {
-				LOGGER.info("updateMandatos() -> KO. Update para mandatos  NO realizado correctamente");
-				updateResponseDTO.setStatus(SigaConstants.KO);
-			}
-			
-			LOGGER.info("deleteBanksData() -> Salida del servicio para actualizar mandatos ");
-			return updateResponseDTO;
-		}
-
-
-
-
-		@Override
-		public BancoBicDTO searchBanks(DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO,
-				HttpServletRequest request) {
-			LOGGER.info("searchMandatos() -> Entrada al servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
-			
-			List<BancoBicItem> bancoBicItem = new ArrayList<BancoBicItem>();
-			BancoBicDTO bancoBic = new BancoBicDTO();
-
-			
-			// Conseguimos información del usuario logeado
-			String token = request.getHeader("Authorization");
-			String dni = UserTokenUtils.getDniFromJWTToken(token);
-			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-			
-			if (null != idInstitucion) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-				LOGGER.info(
-						"searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				LOGGER.info(
-						"searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (null != usuarios && usuarios.size() > 0) {
-					LOGGER.info(
-							"searchMandatos() / cenCuentasbancariasExtendsMapper.selectCuentasBancarias() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de mandatos de cuentas bancarias");
-					datosBancariosSearchBancoDTO.setiban(datosBancariosSearchBancoDTO.getiban().substring(4, 8));
-					bancoBicItem = cenCuentasbancariasExtendsMapper.selectBanks(datosBancariosSearchBancoDTO);
-					LOGGER.info(
-							"searchMandatos() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de mandatos de cuentas bancarias");
-
-					bancoBic.setBancoBicItem(bancoBicItem);;
-				} 
-				else {
-					LOGGER.warn("searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
-				}
-			} 
-			else {
-				LOGGER.warn("searchMandatos() -> idInstitucion del token nula");
-			}
-			
-			LOGGER.info("searchMandatos() -> Salida del servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
-			return bancoBic;
-		}
+		
 
 
 
 	
+		/**
+		 * PL que realiza una revision de letrado
+		 * @param idInstitucion
+		 * @param idPersona
+		 * @param usuario
+		 * @return
+		 * @throws ClsExceptions
+		 */
+		private  String[] ejecutarPL_RevisionSuscripcionesLetrado (String idInstitucion, String idPersona, String fecha, String usuario) throws Exception {
 
+			Object[] paramIn = new Object[4]; //Parametros de entrada del PL
+			String resultado[] = new String[2]; //Parametros de salida del PL
+		
+			try {
+		 		// Parametros de entrada del PL
+		        paramIn[0] = idInstitucion;
+		        paramIn[1] = idPersona;
+		        paramIn[2] = fecha;
+		        paramIn[3] = usuario;
+
+		        // Ejecucion del PL
+				resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO (?,?,?,?,?,?)}", 2, paramIn);
+				
+			} catch (Exception e) {
+				resultado[0] = "1"; 	// P_NUMREGISTRO
+		    	resultado[1] = "ERROR"; // ERROR P_DATOSERROR        	
+			}
+			
+		    return resultado;
+		}
+		
+		
+		/**
+		 * Este proceso se encarga de actualizar las cosas pendientes asociadas a la cuenta de la persona 
+		 * @param idInstitucion
+		 * @param idPersona
+		 * @param idCuenta
+		 * @param usuario
+		 * @return Codigo y mensaje de error
+		 * @throws ClsExceptions
+		 */
+		private  String[] ejecutarPL_Revision_Cuenta (String idInstitucion, String idPersona, String idCuenta, String usuario) throws Exception {
+			Object[] paramIn = new Object[4]; 	//Parametros de entrada del PL
+			String resultado[] = new String[2]; //Parametros de salida del PL
+		
+			try {
+		 		// Parametros de entrada del PL
+		        paramIn[0] = idInstitucion;
+		        paramIn[1] = idPersona;
+		        paramIn[2] = idCuenta;
+		        paramIn[3] = usuario;
+
+		        // Ejecucion del PL
+				resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA(?,?,?,?,?,?)}", 2, paramIn);
+				
+			} catch (Exception e) {
+				resultado[0] = "1"; 	// P_CODRETORNO
+		    	resultado[1] = "ERROR"; // ERROR P_DATOSERROR        	
+			}
+			
+		    return resultado;
+		}
+		/**
+		 * @param idInstitucion
+		 * @param idPersona
+		 * @param idCuenta
+		 * @param usuario
+		 * @return Codigo y mensaje de error
+		 * @throws ClsExceptions
+		 */
+		private String[] ejecutarPL_AltaCuentaCargos (String idInstitucion, String idPersona, String idCuenta, String usuario) throws Exception {
+			Object[] paramIn = new Object[4]; 	//Parametros de entrada del PL
+			String resultado[] = new String[2]; //Parametros de salida del PL
+		
+			try {
+		 		// Parametros de entrada del PL
+		        paramIn[0] = idInstitucion;
+		        paramIn[1] = idPersona;
+		        paramIn[2] = idCuenta;
+		        paramIn[3] = usuario;
+
+		        // Ejecucion del PL
+				resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_ALTA_CUENTA_CARGOS(?,?,?,?,?,?)}", 2, paramIn);
+				
+			} catch (Exception e) {
+				resultado[0] = "1"; 	// P_CODRETORNO
+		    	resultado[1] = "ERROR"; // ERROR P_DATOSERROR        	
+			}
+			
+		    return resultado;
+		}
 }

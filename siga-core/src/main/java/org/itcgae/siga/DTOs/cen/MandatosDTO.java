@@ -52,9 +52,9 @@ public class MandatosDTO {
 	    if (o == null || getClass() != o.getClass()) {
 	      return false;
 	    }
-	    MandatosDTO datosRegistralesDTO = (MandatosDTO) o;
-	    return Objects.equals(this.mandatosItem , datosRegistralesDTO.mandatosItem ) &&
-	    		Objects.equals(this.error, datosRegistralesDTO.error);
+	    MandatosDTO mandatosDTO = (MandatosDTO) o;
+	    return Objects.equals(this.mandatosItem , mandatosDTO.mandatosItem ) &&
+	    		Objects.equals(this.error, mandatosDTO.error);
 	}
 	
 	@Override

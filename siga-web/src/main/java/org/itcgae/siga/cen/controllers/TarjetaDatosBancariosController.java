@@ -69,7 +69,7 @@ public class TarjetaDatosBancariosController {
 	}
 	
 	@RequestMapping(value = "busquedaPerJuridica/datosBancariosInsert", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> insertBanksData(@RequestBody DatosBancariosInsertDTO datosBancariosInsertDTO, HttpServletRequest request) throws IOException, NamingException, SQLException { 
+	ResponseEntity<UpdateResponseDTO> insertBanksData(@RequestBody DatosBancariosInsertDTO datosBancariosInsertDTO, HttpServletRequest request) throws Exception { 
 		UpdateResponseDTO response = tarjetaDatosBancariosService.insertBanksData(datosBancariosInsertDTO, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
