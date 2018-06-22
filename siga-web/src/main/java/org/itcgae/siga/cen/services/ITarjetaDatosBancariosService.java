@@ -37,6 +37,8 @@ public interface ITarjetaDatosBancariosService {
 
 	public BancoBicDTO searchBanks(DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO, HttpServletRequest request);
 
+	public UpdateResponseDTO updateBanksData(DatosBancariosInsertDTO datosBancariosInsertDTO, HttpServletRequest request) throws Exception;
+
 
 
 	

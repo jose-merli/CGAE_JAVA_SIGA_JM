@@ -14,7 +14,7 @@ public class DatosBancariosInsertDTO {
 	private String iban;
 	private String cuentaContable;
 	private Boolean revisionCuentas;
-	
+	private String idCuenta;
 
 	
 	
@@ -32,6 +32,23 @@ public class DatosBancariosInsertDTO {
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
 	}
+	
+	
+	/**
+	 */
+	public DatosBancariosInsertDTO idCuenta(String idCuenta){
+		this.idPersona = idCuenta;
+		return this;
+	}
+	
+	@JsonProperty("idCuenta")
+	public String getIdCuenta() {
+		return idCuenta;
+	}
+	public void setIdCuenta(String idCuenta) {
+		this.idCuenta = idCuenta;
+	}
+	
 	
 	/**
 	 */
@@ -137,18 +154,19 @@ public class DatosBancariosInsertDTO {
 	    if (o == null || getClass() != o.getClass()) {
 	      return false;
 	    }
-	    DatosBancariosInsertDTO personaJuridicaSearchDTO = (DatosBancariosInsertDTO) o;
-	    return  Objects.equals(this.idPersona, personaJuridicaSearchDTO.idPersona) &&
-	    		Objects.equals(this.iban, personaJuridicaSearchDTO.iban) &&
-	    		Objects.equals(this.tipoCuenta, personaJuridicaSearchDTO.tipoCuenta) &&
-	    		Objects.equals(this.titular, personaJuridicaSearchDTO.titular) &&
-	    		Objects.equals(this.revisionCuentas, personaJuridicaSearchDTO.revisionCuentas) &&
-	    		Objects.equals(this.cuentaContable, personaJuridicaSearchDTO.cuentaContable) ;
+	    DatosBancariosInsertDTO datosBancariosInsertDTO = (DatosBancariosInsertDTO) o;
+	    return  Objects.equals(this.idPersona, datosBancariosInsertDTO.idPersona) &&
+	    		Objects.equals(this.idCuenta, datosBancariosInsertDTO.idCuenta) &&
+	    		Objects.equals(this.iban, datosBancariosInsertDTO.iban) &&
+	    		Objects.equals(this.tipoCuenta, datosBancariosInsertDTO.tipoCuenta) &&
+	    		Objects.equals(this.titular, datosBancariosInsertDTO.titular) &&
+	    		Objects.equals(this.revisionCuentas, datosBancariosInsertDTO.revisionCuentas) &&
+	    		Objects.equals(this.cuentaContable, datosBancariosInsertDTO.cuentaContable) ;
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona, iban, idInstitucion,tipoCuenta,titular,cuentaContable,revisionCuentas);
+	    return Objects.hash(idPersona, idCuenta, iban, idInstitucion,tipoCuenta,titular,cuentaContable,revisionCuentas);
 	}
 
 	
@@ -158,6 +176,7 @@ public class DatosBancariosInsertDTO {
 	    sb.append("class DatosBancariosInsertDTO {\n");
 	    
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
+	    sb.append("    idCuenta: ").append(toIndentedString(idCuenta)).append("\n");
 	    sb.append("    iban: ").append(toIndentedString(iban)).append("\n");
 	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
 	    sb.append("    tipoCuenta: ").append(toIndentedString(tipoCuenta)).append("\n");

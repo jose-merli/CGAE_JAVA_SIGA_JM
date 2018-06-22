@@ -92,10 +92,17 @@ public class TarjetaDatosBancariosController {
 	}
 	
 	@RequestMapping(value = "busquedaPerJuridica/BanksSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<BancoBicDTO> searchMandatos( @RequestBody DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO, HttpServletRequest request) { 
+	ResponseEntity<BancoBicDTO> searchBanks( @RequestBody DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO, HttpServletRequest request) { 
 		BancoBicDTO response = tarjetaDatosBancariosService.searchBanks(datosBancariosSearchBancoDTO, request);
 		return new ResponseEntity<BancoBicDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "busquedaPerJuridica/datosBancariosUpdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateBanksData(@RequestBody DatosBancariosInsertDTO datosBancariosInsertDTO, HttpServletRequest request) throws Exception { 
+		UpdateResponseDTO response = tarjetaDatosBancariosService.updateBanksData(datosBancariosInsertDTO, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
 
 }
