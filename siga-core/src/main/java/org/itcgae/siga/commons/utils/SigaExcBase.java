@@ -62,7 +62,7 @@ public class SigaExcBase extends Exception {
 			if (uri==null) throw new SigaExceptions("URL no reconocida por SIGA");
 			int idexofdo=uri.indexOf(".do");
 			if (idexofdo==-1) throw new SigaExceptions("URL no reconocida por SIGA ("+uri+")");
-			int initindex=uri.length();
+			
 			int indexofslash=uri.indexOf("/",1);
 			if (indexofslash==-1) throw new SigaExceptions("URL no reconocida por SIGA ("+uri+")");
 			proceso=uri.substring(indexofslash+1,idexofdo);

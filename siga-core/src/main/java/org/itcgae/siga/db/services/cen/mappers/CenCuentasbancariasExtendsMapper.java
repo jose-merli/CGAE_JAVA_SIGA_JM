@@ -11,9 +11,7 @@ import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
-import org.itcgae.siga.db.mappers.CenGruposclienteClienteMapper;
 import org.itcgae.siga.db.services.cen.providers.CenCuentasbancariasSqlExtendsProvider;
-import org.itcgae.siga.db.services.cen.providers.CenGruposclienteClienteSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -67,10 +65,26 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 		@Result(column = "REFERENCIASERVICIO", property = "referenciaServicio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESQUEMASERVICIO", property = "esquemaServicio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOPAGOSERVICIO", property = "tipoPagoServicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDMANDATOSERVICIO", property = "idMandatoServicio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "REFERENCIAPRODUCTO", property = "referenciaProducto", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESQUEMAPRODUCTO", property = "esquemaProducto", jdbcType = JdbcType.DATE),
-		@Result(column = "TIPOPAGOPRODUCTO", property = "tipoPagoProducto", jdbcType = JdbcType.DATE),
+		@Result(column = "IDMANDATOPRODUCTO", property = "idMandatoProducto", jdbcType = JdbcType.DATE),
 	})
 	List<MandatosItem> selectMandatos(DatosBancariosSearchDTO datosBancarios, String idInstitucion);
+	
+	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "getComboEsquemas")
+	@Results({
+		@Result(column = "IDCUENTA", property = "idCuenta", jdbcType = JdbcType.VARCHAR),
+	})
+	List<DatosBancariosItem> selectNewIdCuenta(String idPersona);
+
+	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "getComboEsquemas")
+	@Results({ 	@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+				@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR)
+			})
+	List<ComboItem> getComboEsquemas(String idlenguaje); 
+
+
+	
 	
 }

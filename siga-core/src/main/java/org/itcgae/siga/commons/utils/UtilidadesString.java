@@ -12,6 +12,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
+
 
 
 
@@ -23,8 +26,11 @@ import java.util.Properties;
  * Modificada el 22/04/2005 por david.sanchez para incluir tratarImporte().
  */
 public class UtilidadesString {
+	
+	
 
 
+	private static Logger LOGGER = Logger.getLogger(UtilidadesString.class);
 	static public String getMensajeIdioma (String idioma, String key)	{
 
 		Properties prop = new Properties();//(Properties)idiomas.get(idi); 
@@ -108,4 +114,6 @@ public class UtilidadesString {
 		}// for i
 		return output;
 	}
+	
+
 }
