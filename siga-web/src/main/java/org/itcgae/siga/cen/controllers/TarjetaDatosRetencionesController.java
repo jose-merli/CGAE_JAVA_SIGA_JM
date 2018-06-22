@@ -40,8 +40,8 @@ public class TarjetaDatosRetencionesController {
 	}
 	
 	@RequestMapping(value = "retenciones/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateRetenciones(@RequestBody List<EtiquetaRetencionesDTO> etiquetaRetencionesDTO, HttpServletRequest request) { 
-		UpdateResponseDTO response = tarjetaDatosRetencionesService.updateRetenciones(etiquetaRetencionesDTO, request);
+	ResponseEntity<UpdateResponseDTO> updateRetenciones(@RequestBody List<EtiquetaRetencionesDTO> etiquetaRetencionesDTO,@RequestParam("idPersona")String idPersona, HttpServletRequest request) { 
+		UpdateResponseDTO response = tarjetaDatosRetencionesService.updateRetenciones(etiquetaRetencionesDTO,idPersona, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
