@@ -6,7 +6,9 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.cen.BancoBicItem;
 import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
+import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -82,7 +84,16 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 	@Results({ 	@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 				@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR)
 			})
-	List<ComboItem> getComboEsquemas(String idlenguaje); 
+	List<ComboItem> getComboEsquemas(String idlenguaje);
+
+
+	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "selectBanks")
+	@Results({
+		@Result(column = "BANCO", property = "banco", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "BIC", property = "bic", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "BICESPANOL", property = "bicEspanol", jdbcType = JdbcType.VARCHAR),
+	})
+	List<BancoBicItem> selectBanks(DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO); 
 
 
 	

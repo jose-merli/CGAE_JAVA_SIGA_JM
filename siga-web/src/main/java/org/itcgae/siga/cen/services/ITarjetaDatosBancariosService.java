@@ -8,9 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.BancoBicDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDeleteDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosInsertDTO;
+import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDTO;
 import org.itcgae.siga.DTOs.cen.MandatosUpdateDTO;
@@ -32,6 +34,10 @@ public interface ITarjetaDatosBancariosService {
 	public ComboDTO getLabelEsquema(HttpServletRequest request);
 
 	public UpdateResponseDTO updateMandatos(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request);
+
+	public BancoBicDTO searchBanks(DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO, HttpServletRequest request);
+
+
 
 	
 	

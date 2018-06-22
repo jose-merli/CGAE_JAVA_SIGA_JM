@@ -10,9 +10,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.BancoBicDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDeleteDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosInsertDTO;
+import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDTO;
 import org.itcgae.siga.DTOs.cen.MandatosUpdateDTO;
@@ -87,6 +89,12 @@ public class TarjetaDatosBancariosController {
 		if(response.getStatus().equals(SigaConstants.OK))
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "busquedaPerJuridica/BanksSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<BancoBicDTO> searchMandatos( @RequestBody DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO, HttpServletRequest request) { 
+		BancoBicDTO response = tarjetaDatosBancariosService.searchBanks(datosBancariosSearchBancoDTO, request);
+		return new ResponseEntity<BancoBicDTO>(response, HttpStatus.OK);
 	}
 	
 

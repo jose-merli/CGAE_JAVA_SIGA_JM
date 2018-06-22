@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.cen.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.db.mappers.CenGruposclienteClienteSqlProvider;
 
@@ -108,6 +109,18 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		sql.WHERE("IDRECURSO  LIKE 'censo.fichaCliente.datosBancarios.esquema.%'");
 		sql.WHERE("IDLENGUAJE = '"+idlenguaje+"'");
 		sql.ORDER_BY("IDRECURSO");
+		return sql.toString();
+	}
+	
+	public String selectBanks(DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO) {
+		SQL sql = new SQL();
+		sql.SELECT("BANCO.NOMBRE AS BANCO");
+		sql.SELECT("BANCO.BIC AS BIC");
+		sql.SELECT("DECODE(BANCO.IDPAIS,'191','1','0') AS BICESPANOL");
+		sql.FROM("CEN_BANCOS BANCO");
+
+		sql.WHERE("BANCO.CODIGO = '"+datosBancariosSearchBancoDTO.getiban()+"'");
+		
 		return sql.toString();
 	}
 }

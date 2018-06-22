@@ -10,7 +10,7 @@ public class DatosBancariosInsertDTO {
 	private String idPersona;
 	private String idInstitucion;
 	private String titular;
-	private String[] usos;
+	private String[] tipoCuenta;
 	private String iban;
 	private String cuentaContable;
 	
@@ -100,17 +100,17 @@ public class DatosBancariosInsertDTO {
 	
 	/**
 	 */
-	public DatosBancariosInsertDTO usos(String[] usos){
-		this.usos = usos;
+	public DatosBancariosInsertDTO tipoCuenta(String[] tipoCuenta){
+		this.tipoCuenta = tipoCuenta;
 		return this;
 	}
 	
-	@JsonProperty("usos")
-	public String[] getUsos() {
-		return usos;
+	@JsonProperty("tipoCuenta")
+	public String[] getTipoCuenta() {
+		return tipoCuenta;
 	}
-	public void setUsos(String[] usos) {
-		this.usos = usos;
+	public void setTipoCuenta(String[] tipoCuenta) {
+		this.tipoCuenta = tipoCuenta;
 	}
 	
 	
@@ -125,14 +125,14 @@ public class DatosBancariosInsertDTO {
 	    DatosBancariosInsertDTO personaJuridicaSearchDTO = (DatosBancariosInsertDTO) o;
 	    return  Objects.equals(this.idPersona, personaJuridicaSearchDTO.idPersona) &&
 	    		Objects.equals(this.iban, personaJuridicaSearchDTO.iban) &&
-	    		Objects.equals(this.usos, personaJuridicaSearchDTO.usos) &&
+	    		Objects.equals(this.tipoCuenta, personaJuridicaSearchDTO.tipoCuenta) &&
 	    		Objects.equals(this.titular, personaJuridicaSearchDTO.titular) &&
 	    		Objects.equals(this.cuentaContable, personaJuridicaSearchDTO.cuentaContable) ;
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona, iban, idInstitucion,usos,titular,cuentaContable);
+	    return Objects.hash(idPersona, iban, idInstitucion,tipoCuenta,titular,cuentaContable);
 	}
 
 	
@@ -144,7 +144,7 @@ public class DatosBancariosInsertDTO {
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 	    sb.append("    iban: ").append(toIndentedString(iban)).append("\n");
 	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
-	    sb.append("    usos: ").append(toIndentedString(usos)).append("\n");
+	    sb.append("    tipoCuenta: ").append(toIndentedString(tipoCuenta)).append("\n");
 	    sb.append("    titular: ").append(toIndentedString(titular)).append("\n");
 	    sb.append("    cuentaContable: ").append(toIndentedString(cuentaContable)).append("\n");
 

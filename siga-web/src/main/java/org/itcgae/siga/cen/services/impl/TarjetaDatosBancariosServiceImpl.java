@@ -19,10 +19,13 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.BancoBicDTO;
+import org.itcgae.siga.DTOs.cen.BancoBicItem;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDeleteDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosInsertDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
+import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDTO;
 import org.itcgae.siga.DTOs.cen.MandatosItem;
@@ -349,9 +352,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				cuentaBancaria.setTitular(datosBancariosInsertDTO.getTitular());
 
 				//Gestionamos los abonos que nos llegan
-				if (null != datosBancariosInsertDTO.getUsos() && datosBancariosInsertDTO.getUsos().length>0) {
+				if (null != datosBancariosInsertDTO.getTipoCuenta() && datosBancariosInsertDTO.getTipoCuenta().length>0) {
 
-					for (String uso : datosBancariosInsertDTO.getUsos()) {
+					for (String uso : datosBancariosInsertDTO.getTipoCuenta()) {
 						if (uso.equals("S")) {
 							cuentaBancaria.setAbonosjcs("1");
 							tieneSCSJ = Boolean.TRUE;
@@ -672,6 +675,54 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			
 			LOGGER.info("deleteBanksData() -> Salida del servicio para actualizar mandatos ");
 			return updateResponseDTO;
+		}
+
+
+
+
+		@Override
+		public BancoBicDTO searchBanks(DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO,
+				HttpServletRequest request) {
+			LOGGER.info("searchMandatos() -> Entrada al servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
+			
+			List<BancoBicItem> bancoBicItem = new ArrayList<BancoBicItem>();
+			BancoBicDTO bancoBic = new BancoBicDTO();
+
+			
+			// Conseguimos información del usuario logeado
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+			
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (null != usuarios && usuarios.size() > 0) {
+					LOGGER.info(
+							"searchMandatos() / cenCuentasbancariasExtendsMapper.selectCuentasBancarias() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de mandatos de cuentas bancarias");
+					datosBancariosSearchBancoDTO.setiban(datosBancariosSearchBancoDTO.getiban().substring(4, 8));
+					bancoBicItem = cenCuentasbancariasExtendsMapper.selectBanks(datosBancariosSearchBancoDTO);
+					LOGGER.info(
+							"searchMandatos() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de mandatos de cuentas bancarias");
+
+					bancoBic.setBancoBicItem(bancoBicItem);;
+				} 
+				else {
+					LOGGER.warn("searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+				}
+			} 
+			else {
+				LOGGER.warn("searchMandatos() -> idInstitucion del token nula");
+			}
+			
+			LOGGER.info("searchMandatos() -> Salida del servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
+			return bancoBic;
 		}
 
 
