@@ -83,8 +83,9 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 					"getRetentionTypes() / scsMaestroretencionesMapper.selectByExample() -> Salida de scsMaestroretencionesMapper para obtener las retenciones");
 	
 			if (null != retencionesLista && !retencionesLista.isEmpty()) {
-				GenRecursosCatalogosExample exampleRecursos = new GenRecursosCatalogosExample();
+				
 				for (ScsMaestroretenciones scsMaestroretenciones : retencionesLista) {
+					GenRecursosCatalogosExample exampleRecursos = new GenRecursosCatalogosExample();
 					exampleRecursos.createCriteria().andIdrecursoEqualTo(scsMaestroretenciones.getDescripcion())
 							.andIdlenguajeEqualTo(usuario.getIdlenguaje());
 					LOGGER.info(
