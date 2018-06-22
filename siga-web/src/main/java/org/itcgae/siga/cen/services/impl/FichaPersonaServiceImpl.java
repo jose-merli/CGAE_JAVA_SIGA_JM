@@ -26,6 +26,7 @@ import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenTipoidentificacionExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,9 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 	
 	@Autowired
 	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+	
+	@Autowired
+	private CenTipoidentificacionExtendsMapper cenTipoidentificacionExtendsMapper;
 	
 	@Override
 	public FichaPersonaDTO searchPersonFile(int numPagina, FichaPerSearchDTO fichaPerSearch,
@@ -224,6 +228,37 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			comboDTO.getError().description("no se encuentra el idpersona de notario");
 		}
 		
+		comboDTO.setCombooItems(comboItems);
+		
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO getIdentificationTypes(HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+
+		AdmUsuarios usuario = new AdmUsuarios();
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+		if (null != usuarios && usuarios.size() > 0) {
+			usuario = usuarios.get(0);
+
+			comboItems = cenTipoidentificacionExtendsMapper.getIdentificationTypes(usuario.getIdlenguaje());
+
+			ComboItem comboItem = new ComboItem();
+			comboItem.setLabel("");
+			comboItem.setValue("");
+
+			comboItems.add(0, comboItem);
+		}
 		comboDTO.setCombooItems(comboItems);
 		
 		return comboDTO;

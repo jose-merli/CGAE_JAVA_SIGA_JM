@@ -53,5 +53,13 @@ public class FichaPersonaController {
 	}
 	
 	
+	@RequestMapping(value = "/busquedaPerJuridica/tipoSociedad",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getIdentificationTypes( HttpServletRequest request) {
+		ComboDTO response = fichaPersonaService.getIdentificationTypes(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	
+	
 	
 }

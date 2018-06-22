@@ -9,7 +9,6 @@ import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.FichaPerSearchDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.springframework.web.bind.annotation.RequestBody;
 
 public interface IFichaPersonaService {
 
@@ -17,6 +16,8 @@ public interface IFichaPersonaService {
 	public UpdateResponseDTO disassociatePerson(DesasociarPersonaDTO desasociarPersona, HttpServletRequest request);
 	public UpdateResponseDTO savePerson(AsociarPersonaDTO asociarPersona, HttpServletRequest request);
 	
-	public ComboDTO createPersonFile(@RequestBody CrearPersonaDTO crearPersonaDTO, HttpServletRequest request);
+	public ComboDTO createPersonFile(CrearPersonaDTO crearPersonaDTO, HttpServletRequest request);
+	
+	public ComboDTO getIdentificationTypes(HttpServletRequest request);
 
 }
