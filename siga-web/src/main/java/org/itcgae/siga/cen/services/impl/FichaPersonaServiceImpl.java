@@ -176,6 +176,13 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 				
 			}
 			
+		}else {
+			CenNocolegiadoExample cenNoColegiadoExample = new CenNocolegiadoExample();
+			cenNoColegiadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(asociarPersona.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
+			colegiado.setIdpersonanotario(Long.valueOf(asociarPersona.getIdPersonaAsociar()));
+			cenNocolegiadoExtendsMapper.updateByExampleSelective(colegiado, cenNoColegiadoExample);
+			updateResponse.setStatus("OK");
+			
 		}
 		return updateResponse;
 	}
