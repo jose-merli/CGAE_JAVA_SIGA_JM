@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.PersonaSearchDTO;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenNocolegiadoSqlProvider;
 
@@ -43,7 +44,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql2.SELECT("I.ABREVIATURA AS ABREVIATURA");
 		sql2.SELECT("PER.FECHANACIMIENTO AS FECHACONSTITUCION");
 		sql2.SELECT("COL.SOCIEDADPROFESIONAL AS SOCIEDADPROFESIONAL");
-		sql2.SELECT("(select descripcion from GEN_RECURSOS where  idrecurso = 'censo.busquedaClientesAvanzada.literal.Sociedad' and idlenguaje = '"+ idLenguaje+ "') AS TIPO");
+		sql2.SELECT("CA.DESCRIPCION AS TIPO");
 		sql2.SELECT("COL.FECHA_BAJA AS FECHA_BAJA");
 		sql2.SELECT("NVL(COUNT(DISTINCT PER2.IDPERSONA),0) AS NUMEROINTEGRANTES");
 		sql2.SELECT("LISTAGG(CONCAT(PER2.NOMBRE ||' ',CONCAT(PER2.APELLIDOS1 || ' ',PER2.APELLIDOS2)), '; ') WITHIN GROUP (ORDER BY PER2.NOMBRE) AS NOMBRESINTEGRANTES");
@@ -52,7 +53,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		
 		sql2.INNER_JOIN(" CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA");
 		sql2.INNER_JOIN("CEN_INSTITUCION I ON COL.IDINSTITUCION = I.IDINSTITUCION");
-			sql2.LEFT_OUTER_JOIN("CEN_TIPOSOCIEDAD  TIPOSOCIEDAD ON  COL.TIPO = TIPOSOCIEDAD.LETRACIF");
+		sql2.LEFT_OUTER_JOIN("CEN_TIPOSOCIEDAD  TIPOSOCIEDAD ON  COL.TIPO = TIPOSOCIEDAD.LETRACIF");
 		
 		sql2.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS CA ON (TIPOSOCIEDAD.DESCRIPCION = CA.IDRECURSO  AND CA.IDLENGUAJE = '" + idLenguaje + "')");
 		sql2.LEFT_OUTER_JOIN("CEN_GRUPOSCLIENTE_CLIENTE GRUPOS_CLIENTE ON (GRUPOS_CLIENTE.IDINSTITUCION = I.IDINSTITUCION AND COL.IDPERSONA = GRUPOS_CLIENTE.IDPERSONA "
@@ -61,8 +62,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql2.LEFT_OUTER_JOIN("CEN_CLIENTE CLI ON (COM.CEN_CLIENTE_IDPERSONA = CLI.IDPERSONA AND CLI.IDINSTITUCION = COM.IDINSTITUCION )");
 		sql2.LEFT_OUTER_JOIN("CEN_PERSONA PER2 ON PER2.IDPERSONA = CLI.IDPERSONA");
 		
+		if(!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
+			sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
+		}
 		
-		sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
 		sql2.WHERE("COL.FECHA_BAJA IS NULL");
 		if(null != busquedaJuridicaSearchDTO.getNif() && !busquedaJuridicaSearchDTO.getNif().equalsIgnoreCase("")) {
 			sql2.WHERE("PER.NIFCIF = '" + busquedaJuridicaSearchDTO.getNif() + "'");
@@ -83,10 +86,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		
 		
 		if(null != busquedaJuridicaSearchDTO.getTipo() && !busquedaJuridicaSearchDTO.getTipo().equalsIgnoreCase("")) {
-			sql2.WHERE("(COL.TIPO = '2' OR COL.TIPO = '" + busquedaJuridicaSearchDTO.getTipo() + "')");
+			sql2.WHERE("COL.TIPO = '" + busquedaJuridicaSearchDTO.getTipo() + "'");
 		}
 		else {
-			sql2.WHERE("COL.TIPO = '2'");
+			sql2.WHERE("COL.TIPO IN('A','B','C','D','E','F','G','H','J','P','Q','R','S','U','V')");
 		}
 		
 		
@@ -148,10 +151,11 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql2.LEFT_OUTER_JOIN("CEN_PERSONA PER2 ON PER2.IDPERSONA = CLI.IDPERSONA");
 		
 		
+		if(!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
+			sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
+		}
 		
-		sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
-		// se busca solo las sociedades
-		sql2.WHERE("COL.TIPO != '1' OR COL.TIPO != '0'"); 
+		sql2.WHERE("COL.TIPO IN('A','B','C','D','E','F','G','H','J','P','Q','R','S','U','V')");
 		
 		sql2.GROUP_BY("COL.IDINSTITUCION");
 		sql2.GROUP_BY("COL.IDPERSONA");

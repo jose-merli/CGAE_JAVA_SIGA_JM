@@ -60,8 +60,9 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.FROM("CEN_PERSONA PER");
 		// Mybatis cambia el orden de inner join y left_outer_join con sus funciones predefinidas=> siempre pone inner join antes
 		sql.LEFT_OUTER_JOIN("CEN_NOCOLEGIADO NOCOL  ON (PER.IDPERSONA = NOCOL.IDPERSONA AND NOCOL.FECHA_BAJA IS NULL)");
-		sql.LEFT_OUTER_JOIN("CEN_COLEGIADO COL  ON PER.IDPERSONA = COL.IDPERSONA "
-				+ "INNER JOIN CEN_INSTITUCION I ON (COL.IDINSTITUCION = I.IDINSTITUCION OR NOCOL.IDINSTITUCION = I.IDINSTITUCION)");		
+		sql.LEFT_OUTER_JOIN("CEN_COLEGIADO COL  ON PER.IDPERSONA = COL.IDPERSONA ");
+		sql.LEFT_OUTER_JOIN(" CEN_INSTITUCION I ON (COL.IDINSTITUCION = I.IDINSTITUCION OR NOCOL.IDINSTITUCION = I.IDINSTITUCION)");
+	
 		
 		sql2.SELECT("A.IDINSTITUCION");
 		sql2.SELECT("A.IDPERSONA");
@@ -87,7 +88,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.LEFT_OUTER_JOIN("CEN_ESTADOCOLEGIAL ESTADOCOLEGIAL ON ESTADOCOLEGIAL.IDESTADO = DATOSCOLEGIALES.IDESTADO");
 		sql.LEFT_OUTER_JOIN(
 				"GEN_RECURSOS_CATALOGOS CA ON (ESTADOCOLEGIAL.DESCRIPCION = CA.IDRECURSO  AND CA.IDLENGUAJE = '"+idLenguaje+"')");
-		sql.WHERE("PER.IDTIPOIDENTIFICACION NOT IN ('20','50')");
+		sql.WHERE("PER.IDTIPOIDENTIFICACION NOT IN ('20')");
 		if (null != busquedaPerFisicaSearchDTO.getNif() && !busquedaPerFisicaSearchDTO.getNif().equalsIgnoreCase("")) {
 			sql.WHERE("PER.NIFCIF = '" + busquedaPerFisicaSearchDTO.getNif() + "'");
 		}
