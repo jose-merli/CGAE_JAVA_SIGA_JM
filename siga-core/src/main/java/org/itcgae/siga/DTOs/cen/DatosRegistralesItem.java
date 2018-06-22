@@ -1,9 +1,7 @@
 package org.itcgae.siga.DTOs.cen;
 
-import java.util.Date;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
@@ -13,10 +11,10 @@ public class DatosRegistralesItem {
 	private String objetoSocial;
 	private String numeroPoliza;
 	private String companiaAseg;
-	@JsonFormat(pattern = "dd-MM-yyyy")
-	private Date fechaFin;
-	@JsonFormat(pattern = "dd-MM-yyyy")
-	private Date fechaConstitucion;
+	//@JsonFormat(pattern = "dd-MM-yyyy")
+	private String fechaFin;
+	//@JsonFormat(pattern = "dd-MM-yyyy")
+	private String fechaConstitucion;
 	private String sociedadProfesional;
 	
 	
@@ -96,36 +94,36 @@ public class DatosRegistralesItem {
 	
 	/**
 	 */
-	public DatosRegistralesItem fechaFin(Date fechaFin){
+	public DatosRegistralesItem fechaFin(String fechaFin){
 		this.fechaFin = fechaFin;
 		return this;
 	}
 	
 	@JsonProperty("fechaFin")
-	public Date getFechaFin() {
+	public String getFechaFin() {
 		return fechaFin;
 	}
 	
 	
-	public void setFechaFin(Date fechaFin) {
+	public void setFechaFin(String fechaFin) {
 		this.fechaFin = fechaFin;
 	}
 	
 	
 	/**
 	 */
-	public DatosRegistralesItem fechaConstitucion(Date fechaConstitucion){
+	public DatosRegistralesItem fechaConstitucion(String fechaConstitucion){
 		this.fechaConstitucion = fechaConstitucion;
 		return this;
 	}
 	
 	@JsonProperty("fechaConstitucion")
-	public Date getFechaConstitucion() {
+	public String getFechaConstitucion() {
 		return fechaConstitucion;
 	}
 	
 	
-	public void setFechaConstitucion(Date fechaConstitucion) {
+	public void setFechaConstitucion(String fechaConstitucion) {
 		this.fechaConstitucion = fechaConstitucion;
 	}
 	

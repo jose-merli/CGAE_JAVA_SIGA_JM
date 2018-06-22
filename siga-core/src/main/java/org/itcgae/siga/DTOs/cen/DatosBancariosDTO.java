@@ -52,9 +52,9 @@ public class DatosBancariosDTO {
 	    if (o == null || getClass() != o.getClass()) {
 	      return false;
 	    }
-	    DatosBancariosDTO datosRegistralesDTO = (DatosBancariosDTO) o;
-	    return Objects.equals(this.datosBancariosItem, datosRegistralesDTO.datosBancariosItem) &&
-	    		Objects.equals(this.error, datosRegistralesDTO.error);
+	    DatosBancariosDTO datosBancariosDTO = (DatosBancariosDTO) o;
+	    return Objects.equals(this.datosBancariosItem, datosBancariosDTO.datosBancariosItem) &&
+	    		Objects.equals(this.error, datosBancariosDTO.error);
 	}
 	
 	@Override

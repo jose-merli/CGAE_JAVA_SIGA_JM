@@ -14,6 +14,7 @@ public class DatosBancariosItem {
 	private String idInstitucion;
 	private String titular;
 	private String iban;
+	private String ibanFormateado;
 	private String uso;
 	private String bic;
 	@JsonFormat(pattern = "dd-MM-yyyy")
@@ -111,6 +112,21 @@ public class DatosBancariosItem {
 	}
 	public void setIban(String iban) {
 		this.iban = iban;
+	}
+	
+	/**
+	 */
+	public DatosBancariosItem ibanFormateado(String ibanFormateado){
+		this.ibanFormateado = ibanFormateado;
+		return this;
+	}
+	
+	@JsonProperty("ibanFormateado")
+	public String getIbanFormateado() {
+		return ibanFormateado;
+	}
+	public void setIbanFormateado(String ibanFormateado) {
+		this.ibanFormateado = ibanFormateado;
 	}
 	
 	/**
@@ -271,6 +287,7 @@ public class DatosBancariosItem {
 	    		Objects.equals(this.bic, personaJuridicaSearchDTO.bic) &&
 	    		Objects.equals(this.uso, personaJuridicaSearchDTO.uso) &&
 	    		Objects.equals(this.iban, personaJuridicaSearchDTO.iban) &&
+	    		Objects.equals(this.ibanFormateado, personaJuridicaSearchDTO.ibanFormateado) &&
 	    		Objects.equals(this.banco, personaJuridicaSearchDTO.banco) &&
 	    		Objects.equals(this.tipoCuenta, personaJuridicaSearchDTO.tipoCuenta) &&
 	    		Objects.equals(this.cuentaContable, personaJuridicaSearchDTO.cuentaContable) &&
@@ -282,7 +299,7 @@ public class DatosBancariosItem {
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona, idInstitucion,idCuenta,titular,iban,uso,bic,banco,tipoCuenta,nifTitular,cuentaContable,fechaFirmaProductos,fechaFirmaServicios,fechaBaja);
+	    return Objects.hash(idPersona, idInstitucion,idCuenta,titular,iban,ibanFormateado,uso,bic,banco,tipoCuenta,nifTitular,cuentaContable,fechaFirmaProductos,fechaFirmaServicios,fechaBaja);
 	}
 
 	
@@ -297,6 +314,7 @@ public class DatosBancariosItem {
 	    sb.append("    uso: ").append(toIndentedString(uso)).append("\n");
 	    sb.append("    titular: ").append(toIndentedString(titular)).append("\n");
 	    sb.append("    iban: ").append(toIndentedString(iban)).append("\n");
+	    sb.append("    ibanFormateado: ").append(toIndentedString(ibanFormateado)).append("\n");
 	    sb.append("    bic: ").append(toIndentedString(bic)).append("\n");
 	    sb.append("    cuentaContable: ").append(toIndentedString(cuentaContable)).append("\n");
 	    sb.append("    nifTitular: ").append(toIndentedString(nifTitular)).append("\n");

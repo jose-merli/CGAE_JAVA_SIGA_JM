@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.cen.BusquedaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
@@ -110,5 +111,10 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 	
 	@UpdateProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "disassociatePerson")
 	int disassociatePerson(AdmUsuarios usuario, DesasociarPersonaDTO desasociarPersona);
+	
+	
+	@UpdateProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "updateByExampleDataLegalPerson")
+	int updateByExampleDataLegalPerson(PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, String idInstitucion, AdmUsuarios usuario);
+	
 	
 }

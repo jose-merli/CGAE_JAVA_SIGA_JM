@@ -6,13 +6,16 @@ import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
+import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
@@ -85,5 +88,22 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.DATE)
 	})
 	List<FichaPersonaItem> searchPersonFile(Short idInstitucion, Long idPersona);
+	
+	@InsertProvider(type = CenPersonaSqlExtendsProvider.class, method = "insertSelectiveForPersonFile")
+	int insertSelectiveForPersonFile(CrearPersonaDTO crearPersonaDTO, AdmUsuarios usuario);
+	
+	
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "selectMaxIdPersona")
+	@Results({
+		@Result(column = "IDPERSONA1", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA2", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> selectMaxIdPersona();
+	
+	
+	@UpdateProvider(type = CenPersonaSqlExtendsProvider.class, method = "updatebyExampleDataLegalPerson")
+	int updatebyExampleDataLegalPerson(PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, AdmUsuarios usuario);
+	
 	
 }

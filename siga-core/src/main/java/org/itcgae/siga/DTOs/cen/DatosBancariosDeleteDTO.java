@@ -8,26 +8,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class DatosBancariosDeleteDTO {
 
 	private String idPersona;
-	private String[] idCuenta;
+	private String[] idCuentas;
 	private String idInstitucion;
 	
 	
 	/**
 	 *
 	 */
-	public DatosBancariosDeleteDTO idCuenta(String[] idCuenta){
-		this.idCuenta = idCuenta;
+	public DatosBancariosDeleteDTO idCuenta(String[] idCuentas){
+		this.idCuentas = idCuentas;
 		return this;
 	}
 	
-	@JsonProperty("idCuenta")
-	public String[] getIdCuenta() {
-		return idCuenta;
+	@JsonProperty("idCuentas")
+	public String[] getIdCuentas() {
+		return idCuentas;
 	}
 	
 	
-	public void setIdCuenta(String[]  idCuenta) {
-		this.idCuenta = idCuenta;
+	public void setIdCuentas(String[]  idCuentas) {
+		this.idCuentas = idCuentas;
 	}
 	
 	
@@ -79,13 +79,13 @@ public class DatosBancariosDeleteDTO {
 	    }
 	    DatosBancariosDeleteDTO busquedaJuridicaDeleteDTO = (DatosBancariosDeleteDTO) o;
 	    return  Objects.equals(this.idPersona, busquedaJuridicaDeleteDTO.idPersona) &&
-	    		Objects.equals(this.idCuenta, busquedaJuridicaDeleteDTO.idCuenta) &&
+	    		Objects.equals(this.idCuentas, busquedaJuridicaDeleteDTO.idCuentas) &&
 	    		Objects.equals(this.idInstitucion, busquedaJuridicaDeleteDTO.idInstitucion);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona, idInstitucion,idCuenta);
+	    return Objects.hash(idPersona, idInstitucion,idCuentas);
 	}
 
 	
@@ -93,7 +93,7 @@ public class DatosBancariosDeleteDTO {
 	public String toString() {
 	    StringBuilder sb = new StringBuilder();
 	    sb.append("class DatosBancariosDeleteDTO {\n");
-	    sb.append("    idCuenta: ").append(toIndentedString(idCuenta)).append("\n");
+	    sb.append("    idCuenta: ").append(toIndentedString(idCuentas)).append("\n");
 	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 	    sb.append("}");

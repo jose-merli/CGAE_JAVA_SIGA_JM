@@ -1,6 +1,7 @@
 package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,19 +9,24 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.AsociarPersonaDTO;
+import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.FichaPerSearchDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IFichaPersonaService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
+import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenTipoidentificacionExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +43,9 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 	
 	@Autowired
 	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+	
+	@Autowired
+	private CenTipoidentificacionExtendsMapper cenTipoidentificacionExtendsMapper;
 	
 	@Override
 	public FichaPersonaDTO searchPersonFile(int numPagina, FichaPerSearchDTO fichaPerSearch,
@@ -169,6 +178,90 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			
 		}
 		return updateResponse;
+	}
+
+	@Override
+	public ComboDTO createPersonFile(CrearPersonaDTO crearPersonaDTO, HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		
+		AdmUsuarios usuario = new AdmUsuarios();
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		
+		if (null != usuarios && usuarios.size() > 0) {
+			usuario = usuarios.get(0);
+			// creamos el nuevo notario
+			//int response = cenPersonaExtendsMapper.insertSelectiveForPersonFile(crearPersonaDTO, usuario);
+			
+			
+			comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+			Long nuevoIdPersona = Long.valueOf(comboItems.get(0).getValue()) + 1; 
+			CenPersona record = new CenPersona();
+			record.setApellidos1(crearPersonaDTO.getApellido1());
+			record.setApellidos2(crearPersonaDTO.getApellido2());
+			record.setFallecido("0");
+			record.setFechamodificacion(new Date());
+			record.setFechanacimiento(null);
+			record.setIdestadocivil(null);
+			record.setIdpersona(nuevoIdPersona);
+			record.setIdtipoidentificacion(Short.valueOf(crearPersonaDTO.getTipoIdentificacion()));
+			record.setNaturalde(null);
+			record.setNifcif(crearPersonaDTO.getNif());
+			record.setNombre(crearPersonaDTO.getNombre());
+			record.setSexo(null);
+			record.setUsumodificacion(usuario.getIdusuario());
+		
+			cenPersonaExtendsMapper.insert(record);
+			
+			// obtenemos su idpersona
+			comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+		}
+		
+		if(comboItems.isEmpty()) {
+			comboDTO.getError().description("no se encuentra el idpersona de notario");
+		}
+		
+		comboDTO.setCombooItems(comboItems);
+		
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO getIdentificationTypes(HttpServletRequest request) {
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+
+		AdmUsuarios usuario = new AdmUsuarios();
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+		if (null != usuarios && usuarios.size() > 0) {
+			usuario = usuarios.get(0);
+
+			comboItems = cenTipoidentificacionExtendsMapper.getIdentificationTypes(usuario.getIdlenguaje());
+
+			ComboItem comboItem = new ComboItem();
+			comboItem.setLabel("");
+			comboItem.setValue("");
+
+			comboItems.add(0, comboItem);
+		}
+		comboDTO.setCombooItems(comboItems);
+		
+		return comboDTO;
 	}
 	
 
