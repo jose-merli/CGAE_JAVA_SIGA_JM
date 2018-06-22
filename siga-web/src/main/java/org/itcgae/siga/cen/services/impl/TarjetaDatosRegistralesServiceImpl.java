@@ -231,8 +231,8 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 			
 			// 2. Actualizar tabla cen_nocolegiado
 			if(responseCenPersona == 1) {
-				CenNocolegiado cenNocolegiado = new CenNocolegiado();
-				cenNocolegiado.setResena(perJuridicaDatosRegistralesUpdateDTO.getResena());
+//				CenNocolegiado cenNocolegiado = new CenNocolegiado();
+//				cenNocolegiado.setResena(perJuridicaDatosRegistralesUpdateDTO.getResena());
 //				cenNocolegiado.setObjetosocial(perJuridicaDatosRegistralesUpdateDTO.getObjetoSocial());
 //				cenNocolegiado.setNopoliza(perJuridicaDatosRegistralesUpdateDTO.getNumeroPoliza());
 //				cenNocolegiado.setCompaniaseg(perJuridicaDatosRegistralesUpdateDTO.getCompaniaAseg());
