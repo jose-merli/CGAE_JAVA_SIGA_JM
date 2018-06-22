@@ -353,7 +353,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		}
 		
-		sql.SET("FECHAMODIFICACION = 'SYSDATE'");
+		sql.SET("FECHAMODIFICACION = SYSDATE");
 		
 		
 		sql.WHERE("IDPERSONA = '" + perJuridicaDatosRegistralesUpdateDTO.getIdPersona() + "'");

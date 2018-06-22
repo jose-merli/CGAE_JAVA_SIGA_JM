@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.cen.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.db.mappers.CenGruposclienteClienteSqlProvider;
 
@@ -70,25 +71,58 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		SQL sql = new SQL();
 		sql.SELECT("CUENTA.IDCUENTA");
 		sql.SELECT("MANDATOSERVICIO.REFMANDATOSEPA AS REFERENCIASERVICIO");
+		sql.SELECT("MANDATOSERVICIO.IDMANDATO AS IDMANDATOSERVICIO");
 		sql.SELECT("MANDATOSERVICIO.ESQUEMA AS ESQUEMASERVICIO");
 		sql.SELECT("MANDATOSERVICIO.TIPOPAGO AS TIPOPAGOSERVICIO");
 		sql.SELECT("MANDATOPRODUCTO.REFMANDATOSEPA AS REFERENCIAPRODUCTO");
 		sql.SELECT("MANDATOPRODUCTO.ESQUEMA AS ESQUEMAPRODUCTO");
 		sql.SELECT("MANDATOPRODUCTO.TIPOPAGO AS TIPOPAGOPRODUCTO");
-
+		sql.SELECT("MANDATOPRODUCTO.IDMANDATO AS IDMANDATOPRODUCTO");
 		sql.FROM("CEN_PERSONA PER");
 		sql.INNER_JOIN("CEN_CUENTASBANCARIAS CUENTA ON CUENTA.IDPERSONA = PER.IDPERSONA");
-		sql.INNER_JOIN("CEN_MANDATOS_CUENTASBANCARIAS MANDATOSERVICIO ON (PER.IDPERSONA = MANDATOSERVICIO.IDPERSONA AND MANDATOSERVICIO.TIPOMANDATO = '0')");
-		sql.INNER_JOIN("CEN_MANDATOS_CUENTASBANCARIAS MANDATOPRODUCTO ON (PER.IDPERSONA = MANDATOPRODUCTO.IDPERSONA AND MANDATOPRODUCTO.TIPOMANDATO = '1')");
+		sql.INNER_JOIN("CEN_MANDATOS_CUENTASBANCARIAS MANDATOSERVICIO ON (PER.IDPERSONA = MANDATOSERVICIO.IDPERSONA AND MANDATOSERVICIO.TIPOMANDATO = '0' AND MANDATOSERVICIO.IDCUENTA = '"+datosBancariosSearchDTO.getIdCuenta()+"')");
+		sql.INNER_JOIN("CEN_MANDATOS_CUENTASBANCARIAS MANDATOPRODUCTO ON (PER.IDPERSONA = MANDATOPRODUCTO.IDPERSONA AND MANDATOPRODUCTO.TIPOMANDATO = '1' AND MANDATOSERVICIO.IDCUENTA = '"+datosBancariosSearchDTO.getIdCuenta()+"')");
 
 		sql.WHERE("PER.IDPERSONA = '"+datosBancariosSearchDTO.getIdPersona()+"'");
 		sql.WHERE("CUENTA.FECHABAJA is null");
 		sql.WHERE("CUENTA.IDINSTITUCION = '"+idInstitucion+"'");
+		sql.WHERE("CUENTA.IDCUENTA = '"+datosBancariosSearchDTO.getIdCuenta()+"'");
+		
+		return sql.toString();
+	}
+	
+	public String selectNewIdCuenta(String idPersona) {
+		SQL sql = new SQL();
+		sql.SELECT("MAX(CUENTA.IDCUENTA) + 1 AS IDCUENTA");
+		sql.FROM("CEN_CUENTASBANCARIAS CUENTA");
+		sql.WHERE("CUENTA.IDPERSONA = '"+idPersona+"'");
 		
 		return sql.toString();
 	}
 	
 	
+	public String getComboEsquemas(String idlenguaje) {
+		SQL sql = new SQL();
+		sql.SELECT("DECODE(IDRECURSO,'censo.fichaCliente.datosBancarios.esquema.b2b','2',DECODE(IDRECURSO,'censo.fichaCliente.datosBancarios.esquema.core','0','1')) AS VALUE");
+		sql.SELECT("DESCRIPCION");
+		sql.FROM("GEN_RECURSOS");
+		sql.WHERE("IDRECURSO  LIKE 'censo.fichaCliente.datosBancarios.esquema.%'");
+		sql.WHERE("IDLENGUAJE = '"+idlenguaje+"'");
+		sql.ORDER_BY("IDRECURSO");
+		return sql.toString();
+	}
+	
+	public String selectBanks(DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO) {
+		SQL sql = new SQL();
+		sql.SELECT("BANCO.NOMBRE AS BANCO");
+		sql.SELECT("BANCO.BIC AS BIC");
+		sql.SELECT("DECODE(BANCO.IDPAIS,'191','1','0') AS BICESPANOL");
+		sql.FROM("CEN_BANCOS BANCO");
+
+		sql.WHERE("BANCO.CODIGO = '"+datosBancariosSearchBancoDTO.getiban()+"'");
+		
+		return sql.toString();
+	}
 }
 
 

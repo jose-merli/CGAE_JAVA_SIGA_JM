@@ -1,9 +1,7 @@
 package org.itcgae.siga.DTOs.cen;
 
-import java.util.Date;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
@@ -15,10 +13,11 @@ public class MandatosItem {
 	private String referenciaProducto;
 	private String esquemaProducto;
 	private String tipoPagoProducto;
+	private String idMandatoProducto;
 	private String referenciaServicio;
 	private String esquemaServicio;
 	private String tipoPagoServicio;
-	
+	private String idMandatoServicio;
 	
 	
 
@@ -41,6 +40,44 @@ public class MandatosItem {
 		this.idCuenta = idCuenta;
 	}
 	
+	
+	/**
+	 *
+	 */
+	public MandatosItem idMandatoProducto(String idMandatoProducto){
+		this.idMandatoProducto = idMandatoProducto;
+		return this;
+	}
+	
+	
+	@JsonProperty("idMandatoProducto")
+	public String getIdMandatoProducto() {
+		return idMandatoProducto;
+	}
+	
+	
+	public void setIdMandato(String idMandatoProducto) {
+		this.idMandatoProducto = idMandatoProducto;
+	}
+	
+	/**
+	 *
+	 */
+	public MandatosItem idMandatoServicio(String idMandatoServicio){
+		this.idMandatoServicio = idMandatoServicio;
+		return this;
+	}
+	
+	
+	@JsonProperty("idMandatoServicio")
+	public String getIdMandatoServicio() {
+		return idMandatoServicio;
+	}
+	
+	
+	public void setIdMandatoServicio(String idMandatoServicio) {
+		this.idMandatoServicio = idMandatoServicio;
+	}
 	
 	/**
 	 */
@@ -175,20 +212,23 @@ public class MandatosItem {
 	      return false;
 	    }
 	    MandatosItem personaJuridicaSearchDTO = (MandatosItem) o;
-	    return Objects.equals(this.idPersona, personaJuridicaSearchDTO.idPersona) &&
+	    return  Objects.equals(this.idPersona, personaJuridicaSearchDTO.idPersona) &&
 	    		Objects.equals(this.idInstitucion, personaJuridicaSearchDTO.idInstitucion) &&
 	    		Objects.equals(this.idCuenta, personaJuridicaSearchDTO.idCuenta) &&
 	    		Objects.equals(this.referenciaProducto, personaJuridicaSearchDTO.referenciaProducto) &&
 	    		Objects.equals(this.esquemaProducto, personaJuridicaSearchDTO.esquemaProducto) &&
 	    		Objects.equals(this.tipoPagoProducto, personaJuridicaSearchDTO.tipoPagoProducto) &&
+	    		Objects.equals(this.idMandatoProducto, personaJuridicaSearchDTO.idMandatoProducto) &&
 	    		Objects.equals(this.referenciaServicio, personaJuridicaSearchDTO.referenciaServicio) &&
 	    		Objects.equals(this.tipoPagoServicio, personaJuridicaSearchDTO.tipoPagoServicio) &&
-	    		Objects.equals(this.esquemaServicio, personaJuridicaSearchDTO.esquemaServicio);
+	    		Objects.equals(this.esquemaServicio, personaJuridicaSearchDTO.esquemaServicio) &&
+	    		Objects.equals(this.idMandatoServicio, personaJuridicaSearchDTO.idMandatoServicio) 
+	    		;
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona, idInstitucion,idCuenta,referenciaProducto,esquemaProducto,tipoPagoProducto,referenciaServicio,tipoPagoServicio,esquemaServicio);
+	    return Objects.hash(idPersona, idInstitucion,idCuenta,referenciaProducto,esquemaProducto,tipoPagoProducto,idMandatoProducto,referenciaServicio,tipoPagoServicio,esquemaServicio,idMandatoServicio);
 	}
 
 	
@@ -203,10 +243,11 @@ public class MandatosItem {
 	    sb.append("    referenciaProducto: ").append(toIndentedString(referenciaProducto)).append("\n");
 	    sb.append("    esquemaProducto: ").append(toIndentedString(esquemaProducto)).append("\n");
 	    sb.append("    tipoPagoProducto: ").append(toIndentedString(tipoPagoProducto)).append("\n");
+	    sb.append("    idMandatoProducto: ").append(toIndentedString(idMandatoProducto)).append("\n");
 	    sb.append("    referenciaServicio: ").append(toIndentedString(referenciaServicio)).append("\n");
 	    sb.append("    tipoPagoServicio: ").append(toIndentedString(tipoPagoServicio)).append("\n");
 	    sb.append("    esquemaServicio: ").append(toIndentedString(esquemaServicio)).append("\n");
-	    
+	    sb.append("    idMandatoServicio ").append(toIndentedString(idMandatoServicio)).append("\n");
 
 	    sb.append("}");
 	    return sb.toString();

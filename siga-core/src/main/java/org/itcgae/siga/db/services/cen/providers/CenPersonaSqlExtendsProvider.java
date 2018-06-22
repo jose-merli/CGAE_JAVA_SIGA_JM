@@ -317,7 +317,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		}
 		
-		sql.SET("FECHAMODIFICACION = 'SYSDATE'");
+		sql.SET("FECHAMODIFICACION = SYSDATE");
 		
 		sql.WHERE("IDPERSONA = '" + perJuridicaDatosRegistralesUpdateDTO.getIdPersona() + "'");
 		return sql.toString();
