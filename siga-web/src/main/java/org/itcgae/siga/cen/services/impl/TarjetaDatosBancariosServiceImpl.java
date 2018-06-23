@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicItem;
@@ -311,12 +312,12 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 
 	@Override
-	public UpdateResponseDTO insertBanksData(DatosBancariosInsertDTO datosBancariosInsertDTO,
+	public InsertResponseDTO insertBanksData(DatosBancariosInsertDTO datosBancariosInsertDTO,
 			HttpServletRequest request) throws Exception {
 		
 		LOGGER.info("insertBanksData() -> Entrada al servicio para insertar cuentas bancarias");
 		int response = 0;
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -403,10 +404,10 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					
 					//if (cuentasAdm.existeCuentaAbonoSJCS(beanCuentas.getIdPersona(), beanCuentas.getIdInstitucion(), beanCuentas.getIdCuenta())) {
 					if (null != cuenta && cuenta.size()>0) 
-						updateResponseDTO.setStatus(SigaConstants.KO);
+						insertResponseDTO.setStatus(SigaConstants.KO);
 						error.setMessage("messages.censo.existeAbonoSJCS");
-						updateResponseDTO.setError(error);
-						return updateResponseDTO;
+						insertResponseDTO.setError(error);
+						return insertResponseDTO;
 					}
 				
 				
@@ -419,14 +420,15 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				// comprobacion actualización
 				if(response >= 1) {
 					LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
-					updateResponseDTO.setStatus(SigaConstants.OK);
+					insertResponseDTO.setStatus(SigaConstants.OK);
+					insertResponseDTO.setId(idCuenta.toString());
 				}
 				else {
 					LOGGER.info("insertBanksData() -> KO. Insert para cuentas bancarias  NO realizado correctamente");
-					updateResponseDTO.setStatus(SigaConstants.KO);
+					insertResponseDTO.setStatus(SigaConstants.KO);
 					error.setMessage("Error al insertar la cuenta Bancaria");
-					updateResponseDTO.setError(error);
-					return updateResponseDTO;
+					insertResponseDTO.setError(error);
+					return insertResponseDTO;
 				}
 				
 				//Si se ha generado correctamente el registro, procedemos a generar los mandatos.
@@ -445,32 +447,32 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					resultado = callPLProcedure("{call PKG_SIGA_CARGOS.InsertarMandatos(?,?,?,?,?,?)}", 2, paramMandatos);
 					if (resultado == null) {
 						LOGGER.info("insertBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
-						updateResponseDTO.setStatus(SigaConstants.KO);
+						insertResponseDTO.setStatus(SigaConstants.KO);
 						error.setMessage("Error al insertar los mandatos de las cuentas");
-						updateResponseDTO.setError(error);
-						return updateResponseDTO;
+						insertResponseDTO.setError(error);
+						return insertResponseDTO;
 						
 					} else {
 						if (resultado[0].equals("1")) {
 							LOGGER.info("insertBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
-							updateResponseDTO.setStatus(SigaConstants.KO);
+							insertResponseDTO.setStatus(SigaConstants.KO);
 							error.setMessage("messages.censo.direcciones.facturacion");
-							updateResponseDTO.setError(error);
-							return updateResponseDTO;
+							insertResponseDTO.setError(error);
+							return insertResponseDTO;
 							
 						} else if (resultado[0].equals("2")) {
 							LOGGER.info("insertBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
-							updateResponseDTO.setStatus(SigaConstants.KO);
+							insertResponseDTO.setStatus(SigaConstants.KO);
 							error.setMessage("messages.censo.direcciones.facturacion");
-							updateResponseDTO.setError(error);
-							return updateResponseDTO;
+							insertResponseDTO.setError(error);
+							return insertResponseDTO;
 							
 						} else if (!resultado[0].equals("0")) {
 							LOGGER.info("insertBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
-							updateResponseDTO.setStatus(SigaConstants.KO);
+							insertResponseDTO.setStatus(SigaConstants.KO);
 							error.setMessage("Error al insertar los mandatos de las cuentas");
-							updateResponseDTO.setError(error);
-							return updateResponseDTO;
+							insertResponseDTO.setError(error);
+							return insertResponseDTO;
 						}
 					}
 				}
@@ -484,10 +486,10 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 																						  "",
 																						  ""+ usuario.getIdusuario().toString());
 				if ((resultado == null) || (!resultado[0].equals("0"))){
-					updateResponseDTO.setStatus(SigaConstants.KO);
+					insertResponseDTO.setStatus(SigaConstants.KO);
 					error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO"+resultado[1]);
-					updateResponseDTO.setError(error);
-					return updateResponseDTO;
+					insertResponseDTO.setError(error);
+					return insertResponseDTO;
 				}
 				
 				// Este proceso se encarga de actualizar las cosas pendientes asociadas a la cuenta de la persona 
@@ -498,10 +500,10 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					  ""+ usuario.getIdusuario().toString());
 				if (resultado1 == null || !resultado1[0].equals("0")) {
 
-					updateResponseDTO.setStatus(SigaConstants.KO);
+					insertResponseDTO.setStatus(SigaConstants.KO);
 					error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado[1]);
-					updateResponseDTO.setError(error);
-					return updateResponseDTO;
+					insertResponseDTO.setError(error);
+					return insertResponseDTO;
 
 				}
 				
@@ -514,10 +516,10 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						  ""+idCuenta.toString(),
 						  ""+ usuario.getIdusuario().toString());
 					if (resultado1 == null || !resultado1[0].equals("0")) {
-						updateResponseDTO.setStatus(SigaConstants.KO);
+						insertResponseDTO.setStatus(SigaConstants.KO);
 						error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_ALTA_CUENTA_CARGOS" + resultado[1]);
-						updateResponseDTO.setError(error);
-						return updateResponseDTO;
+						insertResponseDTO.setError(error);
+						return insertResponseDTO;
 					}
 				}		
 				
@@ -533,7 +535,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		
 		
 		LOGGER.info("insertBanksData() -> Salida del servicio para insertar cuentas bancarias ");
-		return updateResponseDTO;
+		return insertResponseDTO;
 	}
 
 

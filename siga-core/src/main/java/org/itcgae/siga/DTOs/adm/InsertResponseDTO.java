@@ -11,15 +11,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
-public class UpdateResponseDTO   {
+public class InsertResponseDTO   {
   
   private String status = new String();
+  private String id = new String();
   private Error error = null;
 
   
   /**
    **/
-  public UpdateResponseDTO catalogoMaestroItem(String status) {
+  public InsertResponseDTO status(String status) {
     this.status = status;
     return this;
   }
@@ -32,11 +33,27 @@ public class UpdateResponseDTO   {
   public void setStatus(String status) {
     this.status = status;
   }
+  
+  /**
+   **/
+  public InsertResponseDTO id(String id) {
+    this.id = id;
+    return this;
+  }
+  
+  
+  @JsonProperty("id")
+  public String getId() {
+    return id;
+  }
+  public void setId(String id) {
+    this.id = id;
+  }
 
   
   /**
    **/
-  public UpdateResponseDTO error(Error error) {
+  public InsertResponseDTO error(Error error) {
     this.error = error;
     return this;
   }
@@ -60,22 +77,24 @@ public class UpdateResponseDTO   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    UpdateResponseDTO updateResponseDTO = (UpdateResponseDTO) o;
-    return Objects.equals(this.status, updateResponseDTO.status) &&
-        Objects.equals(this.error, updateResponseDTO.error);
+    InsertResponseDTO insertResponseDTO = (InsertResponseDTO) o;
+    return Objects.equals(this.status, insertResponseDTO.status) &&
+    	Objects.equals(this.id, insertResponseDTO.id) &&
+        Objects.equals(this.error, insertResponseDTO.error);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(status, error);
+    return Objects.hash(status, error,id);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class UpdateResponseDTO {\n");
+    sb.append("class InsertResponseDTO {\n");
     
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("}");
     return sb.toString();

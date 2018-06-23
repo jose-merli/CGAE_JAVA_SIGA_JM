@@ -9,6 +9,7 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDTO;
@@ -69,11 +70,11 @@ public class TarjetaDatosBancariosController {
 	}
 	
 	@RequestMapping(value = "busquedaPerJuridica/datosBancariosInsert", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> insertBanksData(@RequestBody DatosBancariosInsertDTO datosBancariosInsertDTO, HttpServletRequest request) throws Exception { 
-		UpdateResponseDTO response = tarjetaDatosBancariosService.insertBanksData(datosBancariosInsertDTO, request);
+	ResponseEntity<InsertResponseDTO> insertBanksData(@RequestBody DatosBancariosInsertDTO datosBancariosInsertDTO, HttpServletRequest request) throws Exception { 
+		InsertResponseDTO response = tarjetaDatosBancariosService.insertBanksData(datosBancariosInsertDTO, request);
 		if(response.getStatus().equals(SigaConstants.OK))
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value = "busquedaPerJuridica/comboEsquema",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)

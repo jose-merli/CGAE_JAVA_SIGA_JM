@@ -7,6 +7,7 @@ import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDTO;
@@ -29,7 +30,7 @@ public interface ITarjetaDatosBancariosService {
 
 	public MandatosDTO searchMandatos(int numPagina, DatosBancariosSearchDTO datosBancariosSearchDTO, HttpServletRequest request);
 
-	public UpdateResponseDTO insertBanksData(DatosBancariosInsertDTO datosBancariosInsertDTO, HttpServletRequest request) throws IOException, NamingException, SQLException, Exception;
+	public InsertResponseDTO insertBanksData(DatosBancariosInsertDTO datosBancariosInsertDTO, HttpServletRequest request) throws IOException, NamingException, SQLException, Exception;
 
 	public ComboDTO getLabelEsquema(HttpServletRequest request);
 
