@@ -76,7 +76,7 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 	})
 	List<MandatosItem> selectMandatos(DatosBancariosSearchDTO datosBancarios, String idInstitucion);
 	
-	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "getComboEsquemas")
+	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "selectNewIdCuenta")
 	@Results({
 		@Result(column = "IDCUENTA", property = "idCuenta", jdbcType = JdbcType.VARCHAR),
 	})
