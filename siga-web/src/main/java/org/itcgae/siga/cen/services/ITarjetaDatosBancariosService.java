@@ -46,6 +46,8 @@ public interface ITarjetaDatosBancariosService {
 
 	public UpdateResponseDTO updateAnexos(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request);
 
+	public InsertResponseDTO InsertAnexos(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request);
+
 
 
 	

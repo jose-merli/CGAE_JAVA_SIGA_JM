@@ -247,6 +247,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT("PER.NOMBRE AS NOMBRE");
 		sql.SELECT("DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) AS APELLIDO1");
 		sql.SELECT("PER.APELLIDOS2 AS APELLIDO2");
+		sql.SELECT("PER.IDTIPOIDENTIFICACION");
 		sql.FROM("CEN_PERSONA PER ");
 		
 		if (null != idPersona) {
