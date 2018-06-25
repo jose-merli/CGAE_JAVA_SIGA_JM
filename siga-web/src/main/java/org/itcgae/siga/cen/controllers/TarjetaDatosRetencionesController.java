@@ -9,8 +9,6 @@ import org.itcgae.siga.DTOs.cen.EtiquetaRetencionesDTO;
 import org.itcgae.siga.DTOs.cen.MaestroRetencionDTO;
 import org.itcgae.siga.DTOs.cen.PersonaSearchDTO;
 import org.itcgae.siga.DTOs.cen.RetencionesDTO;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.cen.services.ITarjetaDatosRegistralesService;
 import org.itcgae.siga.cen.services.ITarjetaDatosRetencionesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,8 +27,7 @@ public class TarjetaDatosRetencionesController {
 	@Autowired
 	private ITarjetaDatosRetencionesService tarjetaDatosRetencionesService;
 	
-	@Autowired
-	private ITarjetaDatosRegistralesService tarjetaDatosRegistralesService;
+	
 	
 	
 	@RequestMapping(value = "retenciones/tipoRetencion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -52,10 +49,6 @@ public class TarjetaDatosRetencionesController {
 	}
 	
 	
-	@RequestMapping(value = "retenciones/tipoColegio", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getActividadProfesional(HttpServletRequest request) { 
-		ComboDTO response = tarjetaDatosRegistralesService.getActividadProfesional(request);
-		return new ResponseEntity<ComboDTO >(response, HttpStatus.OK);
-	}
+	
 	
 }
