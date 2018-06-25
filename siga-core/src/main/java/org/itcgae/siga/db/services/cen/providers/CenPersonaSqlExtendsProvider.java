@@ -220,18 +220,18 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		
 		sql.INSERT_INTO("CEN_PERSONA");
 		sql.VALUES("IDPERSONA", "(Select max(idpersona) +1 from cen_persona)");
-		sql.VALUES("NOMBRE", etiquetaUpdateDTO.getDenominacion());
-		sql.VALUES("APELLIDOS1", "");
-		sql.VALUES("APELLIDOS2", "");
-		sql.VALUES("NIFCIF", etiquetaUpdateDTO.getNif());
+		sql.VALUES("NOMBRE", "'" +etiquetaUpdateDTO.getDenominacion()+ "'");
+//		sql.VALUES("APELLIDOS1", "");
+//		sql.VALUES("APELLIDOS2", "");
+		sql.VALUES("NIFCIF",  "'" +etiquetaUpdateDTO.getNif()+ "'");
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
-		sql.VALUES("USUMODIFICACION", String.valueOf(usuario.getIdusuario()));
+		sql.VALUES("USUMODIFICACION",  "'" +String.valueOf(usuario.getIdusuario())+ "'");
 		sql.VALUES("IDTIPOIDENTIFICACION", "(SELECT IDTIPOIDENTIFICACION FROM CEN_TIPOIDENTIFICACION WHERE CODIGOEJIS = 'C')");
 		sql.VALUES("FECHANACIMIENTO", "SYSDATE");
-		sql.VALUES("IDESTADOCIVIL", "");
-		sql.VALUES("NATURALDE", "");
-		sql.VALUES("FALLECIDO", "0");
-		sql.VALUES("SEXO", "");
+//		sql.VALUES("IDESTADOCIVIL", "");
+//		sql.VALUES("NATURALDE", "");
+		sql.VALUES("FALLECIDO", "'0'");
+//		sql.VALUES("SEXO", "");
 		
 		return sql.toString();
 	}
@@ -245,7 +245,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT("PER.nifcif AS NIF");
 		sql.SELECT("PER.FECHANACIMIENTO AS FECHAALTA");
 		sql.SELECT("PER.NOMBRE AS NOMBRE");
-		sql.SELECT("PER.APELLIDOS1 AS APELLIDO1");
+		sql.SELECT("DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) AS APELLIDO1");
 		sql.SELECT("PER.APELLIDOS2 AS APELLIDO2");
 		sql.FROM("CEN_PERSONA PER ");
 		

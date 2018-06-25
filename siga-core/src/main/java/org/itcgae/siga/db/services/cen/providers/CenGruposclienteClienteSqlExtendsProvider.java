@@ -14,15 +14,15 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona)");
 		sql.VALUES("IDINSTITUCION", idInstitucion);
 		if(!grupo.equals("")) {
-			sql.VALUES("IDGRUPO", grupo);
+			sql.VALUES("IDGRUPO", "'" +grupo + "'");
 		}
 		else {
 			sql.VALUES("IDGRUPO", "(SELECT MAX(IDGRUPO) FROM CEN_GRUPOSCLIENTE)");
 		}
 		
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
-		sql.VALUES("USUMODIFICACION", idUsuario);
-		sql.VALUES("IDINSTITUCION_GRUPO", idInstitucion);
+		sql.VALUES("USUMODIFICACION", "'" +idUsuario + "'");
+		sql.VALUES("IDINSTITUCION_GRUPO", "'" +idInstitucion+ "'");
 		sql.VALUES("FECHA_BAJA", "null");
 		sql.VALUES("FECHA_INICIO", "SYSDATE");
 		return sql.toString();
