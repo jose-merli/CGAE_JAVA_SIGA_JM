@@ -113,5 +113,13 @@ public class TarjetaDatosBancariosController {
 		DatosBancariosAnexoDTO response = tarjetaDatosBancariosService.searchAnexos(numPagina, datosBancariosSearchAnexosDTO, request);
 		return new ResponseEntity<DatosBancariosAnexoDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "busquedaPerJuridica/updateAnexos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateAnexos(@RequestBody MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request) throws IOException, NamingException, SQLException { 
+		UpdateResponseDTO response = tarjetaDatosBancariosService.updateAnexos(mandatosUpdateDTO, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
 
 }

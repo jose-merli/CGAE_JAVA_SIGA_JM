@@ -44,6 +44,8 @@ public interface ITarjetaDatosBancariosService {
 
 	public DatosBancariosAnexoDTO searchAnexos(int numPagina, DatosBancariosSearchAnexosDTO datosBancariosSearchAnexosDTO, HttpServletRequest request);
 
+	public UpdateResponseDTO updateAnexos(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request);
+
 
 
 	
