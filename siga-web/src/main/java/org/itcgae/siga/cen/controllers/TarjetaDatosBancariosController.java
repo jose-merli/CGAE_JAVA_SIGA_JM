@@ -12,9 +12,11 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicDTO;
+import org.itcgae.siga.DTOs.cen.DatosBancariosAnexoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDeleteDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosInsertDTO;
+import org.itcgae.siga.DTOs.cen.DatosBancariosSearchAnexosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDTO;
@@ -104,6 +106,12 @@ public class TarjetaDatosBancariosController {
 		if(response.getStatus().equals(SigaConstants.OK))
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "busquedaPerJuridica/AnexosSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DatosBancariosAnexoDTO> searchAnexos(@RequestParam("numPagina") int numPagina, @RequestBody DatosBancariosSearchAnexosDTO datosBancariosSearchAnexosDTO, HttpServletRequest request) { 
+		DatosBancariosAnexoDTO response = tarjetaDatosBancariosService.searchAnexos(numPagina, datosBancariosSearchAnexosDTO, request);
+		return new ResponseEntity<DatosBancariosAnexoDTO>(response, HttpStatus.OK);
 	}
 
 }

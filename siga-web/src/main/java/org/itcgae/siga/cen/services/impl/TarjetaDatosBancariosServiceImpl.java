@@ -22,10 +22,13 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicItem;
+import org.itcgae.siga.DTOs.cen.DatosBancariosAnexoDTO;
+import org.itcgae.siga.DTOs.cen.DatosBancariosAnexoItem;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDeleteDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosInsertDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
+import org.itcgae.siga.DTOs.cen.DatosBancariosSearchAnexosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDTO;
@@ -933,7 +936,50 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 	}
 	
 	
-	
+	@Override
+	public DatosBancariosAnexoDTO searchAnexos(int numPagina,
+			DatosBancariosSearchAnexosDTO datosBancariosSearchAnexosDTO, HttpServletRequest request) {
+		LOGGER.info("searchAnexos() -> Entrada al servicio para la búsqueda por filtros de anexos de mandatos de cuentas bancarias");
+		
+		List<DatosBancariosAnexoItem> anexosItem = new ArrayList<DatosBancariosAnexoItem>();
+		DatosBancariosAnexoDTO anexosDTO = new DatosBancariosAnexoDTO();
+
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"searchAnexos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"searchAnexos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				LOGGER.info(
+						"searchAnexos() / cenCuentasbancariasExtendsMapper.selectCuentasBancarias() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de anexos de mandatos de cuentas bancarias");
+				datosBancariosSearchAnexosDTO.setIdInstitucion(idInstitucion.toString());
+				anexosItem = cenCuentasbancariasExtendsMapper.selectAnexos(datosBancariosSearchAnexosDTO);
+				LOGGER.info(
+						"searchAnexos() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de anexos de mandatos de cuentas bancarias");
+
+				anexosDTO.setDatosBancariosAnexoItem(anexosItem);
+			} 
+			else {
+				LOGGER.warn("searchAnexos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+			}
+		} 
+		else {
+			LOGGER.warn("searchAnexos() -> idInstitucion del token nula");
+		}
+		
+		LOGGER.info("searchAnexos() -> Salida del servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
+		return anexosDTO;
+	}
 	
 	
 	/**
@@ -1126,6 +1172,11 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			
 		    return resultado;
 		}
+
+
+
+
+	
 
 
 
