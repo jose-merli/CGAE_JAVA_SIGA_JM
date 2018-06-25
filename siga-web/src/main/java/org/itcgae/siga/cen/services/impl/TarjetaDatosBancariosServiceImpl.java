@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Types;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.itcgae.siga.DTOs.cen.MandatosUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ITarjetaDatosBancariosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmConfig;
@@ -628,6 +630,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));
 				record.setIdinstitucion(Short.valueOf(idInstitucion));
 				record.setEsquema(Short.valueOf(mandatosUpdateDTO.getEsquema()));
+				if (null != mandatosUpdateDTO.getEsquema() && mandatosUpdateDTO.getEsquema().equals("2")) {
+					record.setAutorizacionb2b(Short.valueOf("1"));	
+				}
 				// filtrado para sentencia sql
 			
 				LOGGER.info(
@@ -1087,6 +1092,90 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		return updateResponseDTO;
 	}
 	
+
+	@Override
+	public InsertResponseDTO InsertAnexos(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request) {
+		
+		LOGGER.info("InsertAnexos() -> Entrada al servicio para insertar anexos y mandatos");
+		int response = 0;
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Short idCuenta= 1;
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"InsertAnexos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"InsertAnexos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+					
+				//Lo primero es comprobar si debemos modificar un Mandato o un Anexo.
+				
+				
+				List<NewIdDTO> newIdCuenta = cenCuentasbancariasExtendsMapper.
+						selectNewIdAnexo(mandatosUpdateDTO.getIdPersona(), mandatosUpdateDTO.getIdCuenta(), mandatosUpdateDTO.getIdMandato(),idInstitucion.toString());
+				if (null != newIdCuenta && newIdCuenta.size() > 0 ) {
+					idCuenta = Short.valueOf(newIdCuenta.get(0).getNewId());
+				}
+					
+						// información a modificar
+						CenAnexosCuentasbancarias record = new CenAnexosCuentasbancarias();
+						record.setFechamodificacion(new Date());
+						record.setUsumodificacion(usuario.getIdusuario());
+						record.setIdanexo(idCuenta);
+						record.setIdmandato(Short.valueOf(mandatosUpdateDTO.getIdMandato()));
+						record.setIdcuenta(Short.valueOf(mandatosUpdateDTO.getIdCuenta()));
+						record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));
+						record.setIdinstitucion(idInstitucion);
+						record.setFechacreacion(new Date());
+						record.setFirmaFecha(mandatosUpdateDTO.getFirmafecha());
+						record.setFirmaLugar(mandatosUpdateDTO.getFirmaLugar());
+						record.setOrigen(mandatosUpdateDTO.getDescripcion());
+						record.setEsautomatico(Short.valueOf("1"));
+	
+						// filtrado para sentencia sql
+					
+						LOGGER.info(
+								"InsertAnexos() / cenAnexosCuentasbancariasMapper.insertSelective() -> Entrada a cenAnexosCuentasbancariasMapper para insertar anexos y mandatos");
+						
+						response = cenAnexosCuentasbancariasMapper.insertSelective(record);
+						
+						LOGGER.info(
+								"InsertAnexos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenAnexosCuentasbancariasMapper para insertar anexos y mandatos");
+				
+			} else {
+				LOGGER.warn(
+						"InsertAnexos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("InsertAnexos() -> idInstitucion del token nula");
+		}
+		
+		// comprobacion actualización
+		if(response >= 1) {
+			LOGGER.info("InsertAnexos() -> OK. Insert para anexos y mandatos realizado correctamente");
+			insertResponseDTO.setStatus(SigaConstants.OK);
+			insertResponseDTO.setId(idCuenta.toString());
+		}
+		else {
+			LOGGER.info("InsertAnexos() -> KO. Insert para anexos y mandatos  NO realizado correctamente");
+			insertResponseDTO.setStatus(SigaConstants.KO);
+		}
+		
+		LOGGER.info("deleteBanksData() -> Salida del servicio para actualizar anexos y mandatos ");
+		return insertResponseDTO;
+	}
+
+	
 	
 	/**
 	   * Calls a PL Funtion
@@ -1278,12 +1367,6 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			
 		    return resultado;
 		}
-
-
-
-
-		
-
 
 
 

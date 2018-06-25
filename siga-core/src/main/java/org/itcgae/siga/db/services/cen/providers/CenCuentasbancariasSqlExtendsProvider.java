@@ -103,6 +103,17 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		return sql.toString();
 	}
 	
+	public String selectNewIdAnexo(String idPersona,String idCuenta,String idMandato,String institucion) {
+		SQL sql = new SQL();
+		sql.SELECT("MAX(CUENTA.IDANEXO) + 1 AS IDANEXO");
+		sql.FROM("CEN_ANEXOS_CUENTASBANCARIAS CUENTA");
+		sql.WHERE("CUENTA.IDPERSONA = '"+idPersona+"'");
+		sql.WHERE("CUENTA.IDMANDATO = '"+idMandato+"'");
+		sql.WHERE("CUENTA.IDCUENTA = '"+idCuenta+"'");
+		sql.WHERE("CUENTA.IDINSTITUCION = '"+institucion+"'");
+		return sql.toString();
+	}
+	
 	
 	public String getComboEsquemas(String idlenguaje) {
 		SQL sql = new SQL();

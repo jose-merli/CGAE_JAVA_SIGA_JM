@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
 import org.itcgae.siga.db.services.cen.providers.CenCuentasbancariasSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -115,7 +116,11 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 	})
 	List<DatosBancariosAnexoItem> selectAnexos(DatosBancariosSearchAnexosDTO datosBancariosAnexos);
 	
-	
+	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "selectNewIdAnexo")
+	@Results({
+		@Result(column = "IDANEXO", property = "newId", jdbcType = JdbcType.VARCHAR),
+	})
+	List<NewIdDTO> selectNewIdAnexo(String idPersona,String idCuenta,String idMandato, String idInstitucion);
 	
 	
 	

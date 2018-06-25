@@ -122,4 +122,12 @@ public class TarjetaDatosBancariosController {
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 
+	
+	@RequestMapping(value = "busquedaPerJuridica/insertAnexos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> insertAnexos(@RequestBody MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request) throws IOException, NamingException, SQLException { 
+		InsertResponseDTO response = tarjetaDatosBancariosService.InsertAnexos(mandatosUpdateDTO, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
 }
