@@ -15,6 +15,9 @@ public class EtiquetaUpdateDTO {
 	private String anotaciones;
 	private String [] grupos;
 	private String idPersona;
+	private String abreviatura;
+	
+	
 	
 	
 

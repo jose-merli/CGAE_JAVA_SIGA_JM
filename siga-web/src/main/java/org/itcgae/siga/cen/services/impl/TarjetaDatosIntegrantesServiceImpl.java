@@ -9,11 +9,15 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosIntegrantesService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenCargoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenProvinciasExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,8 +34,12 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 	@Autowired
 	private CenComponentesExtendsMapper cenComponentesExtendsMapper;
 	
-
+	@Autowired
+	private CenProvinciasExtendsMapper cenProvinciasExtendsMapper;
 	
+	@Autowired
+	private CenCargoExtendsMapper cenCargoExtendsMapper;
+
 
 
 
@@ -82,14 +90,80 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 	}
 
 
+	@Override
+	public ComboDTO getProvinces(HttpServletRequest request) {
+		LOGGER.info("getProvinces() -> Entrada al servicio para búsqueda de las provincias");
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		LOGGER.info(
+				"getProvinces() / cenProvinciasExtendsMapper.selectDistinctProvinces() -> Entrada a cenProvinciasExtendsMapper para obtener listado de provincias ");
+		comboItems = cenProvinciasExtendsMapper.selectDistinctProvinces();
+		LOGGER.info(
+				"getProvinces() / cenProvinciasExtendsMapper.selectDistinctProvinces() -> Salida de cenProvinciasExtendsMapper para obtener listado de provincias ");
+		
+		
+		if(null != comboItems && comboItems.size() > 0) {
+			ComboItem element = new ComboItem();
+			element.setLabel("");
+			element.setValue("");
+			comboItems.add(0, element);
+		}
+		
+		comboDTO.setCombooItems(comboItems);
+		
+		LOGGER.info("getProvinces() -> Salida al servicio para búsqueda de las provincias");
+		return comboDTO;
+	}
 
 
+	@Override
+	public ComboDTO getCargos(HttpServletRequest request) {
+		LOGGER.info("getCargos() -> Entrada al servicio para búsqueda de cargos");
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		AdmUsuarios usuario = new AdmUsuarios();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				usuario = usuarios.get(0);
+				
+				LOGGER.info(
+						"getCargos() / cenCargoExtendsMapper.getCargos() -> Entrada a cenCargoExtendsMapper para obtener listado de cargos");
+				comboItems = cenCargoExtendsMapper.getCargos(usuario.getIdlenguaje(), String.valueOf(idInstitucion));
+				LOGGER.info(
+						"getCargos() / cenCargoExtendsMapper.getCargos() -> Salida de cenCargoExtendsMapper para obtener listado de cargos ");
+				
+				
+				if(null != comboItems && comboItems.size() > 0) {
+					ComboItem element = new ComboItem();
+					element.setLabel("");
+					element.setValue("");
+					comboItems.add(0, element);
+				}
+			}
+
+		}
+		
+		comboDTO.setCombooItems(comboItems);
+		
+		LOGGER.info("getCargos() -> Salida al servicio para búsqueda de cargos");
+		return comboDTO;
+	}
 
 	
-
-
-
-
-
-
+	
 }
