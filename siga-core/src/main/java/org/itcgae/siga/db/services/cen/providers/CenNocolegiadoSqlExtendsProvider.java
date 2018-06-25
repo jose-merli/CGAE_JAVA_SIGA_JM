@@ -353,6 +353,16 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		}
 		
+		if(!perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp().equals("")) {
+			sql.SET("PREFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp() + "'");
+		}
+		if(!perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp().equals("")) {
+			sql.SET("CONTADOR_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp() + "'");
+		}
+		if(!perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp().equals("")) {
+			sql.SET("SUFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp() + "'");
+		}
+		
 		sql.SET("FECHAMODIFICACION = SYSDATE");
 		
 		
