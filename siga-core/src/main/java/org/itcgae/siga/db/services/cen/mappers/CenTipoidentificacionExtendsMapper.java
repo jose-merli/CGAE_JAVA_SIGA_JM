@@ -19,8 +19,8 @@ public interface CenTipoidentificacionExtendsMapper extends CenTipoidentificacio
 	
 	@SelectProvider(type = CenTipoidentificacionSqlExtendsProvider.class, method = "getIdentificationTypes")
 	@Results({
-		@Result(column = "DESCRIPCION", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDTIPOIDENTIFICACION", property = "label", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOIDENTIFICACION", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getIdentificationTypes(String idLenguaje);
 }
