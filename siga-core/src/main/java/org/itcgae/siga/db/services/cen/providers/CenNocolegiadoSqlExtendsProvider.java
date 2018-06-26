@@ -10,7 +10,6 @@ import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.PersonaSearchDTO;
-import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenNocolegiadoSqlProvider;
 
@@ -62,7 +61,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql2.LEFT_OUTER_JOIN("CEN_CLIENTE CLI ON (COM.CEN_CLIENTE_IDPERSONA = CLI.IDPERSONA AND CLI.IDINSTITUCION = COM.IDINSTITUCION )");
 		sql2.LEFT_OUTER_JOIN("CEN_PERSONA PER2 ON PER2.IDPERSONA = CLI.IDPERSONA");
 		
-		if(!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
+		if(null != idInstitucion) {
 			sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
 		}
 		
@@ -149,7 +148,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql2.LEFT_OUTER_JOIN("CEN_PERSONA PER2 ON PER2.IDPERSONA = CLI.IDPERSONA");
 		
 		
-		if(!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
+		if(null != idInstitucion) {
 			sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
 		}
 		

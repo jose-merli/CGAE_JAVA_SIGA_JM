@@ -5,9 +5,12 @@ import java.util.List;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenComponentesMapper;
 import org.itcgae.siga.db.services.cen.providers.CenComponentesSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -41,5 +44,10 @@ public interface CenComponentesExtendsMapper extends CenComponentesMapper {
 			@Result(column = "IDCARGO", property = "idCargo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPROVINCIA", property = "idProvincia", jdbcType = JdbcType.VARCHAR) })
 	List<DatosIntegrantesItem> selectIntegrantes(DatosIntegrantesSearchDTO integrantes);
-
+	
+	
+	
+	@UpdateProvider(type = CenComponentesSqlExtendsProvider.class, method = "updateMember")
+	int updateMember(TarjetaIntegrantesUpdateDTO tarjetaIntegrantesUpdateDTO, AdmUsuarios usuario, String idInstitucion);
+	
 }
