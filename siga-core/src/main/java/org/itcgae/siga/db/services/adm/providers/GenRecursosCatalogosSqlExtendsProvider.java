@@ -53,13 +53,13 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 	
 		sql.INSERT_INTO("GEN_RECURSOS_CATALOGOS");		
 		sql.VALUES("IDRECURSO", "(SELECT MAX(IDRECURSO) + 1 FROM GEN_RECURSOS_CATALOGOS WHERE NOMBRETABLA = 'CEN_GRUPOSCLIENTE')");
-		sql.VALUES("DESCRIPCION", grupo);
-		sql.VALUES("IDLENGUAJE", usuario.getIdlenguaje());
+		sql.VALUES("DESCRIPCION", "'"+ grupo + "'");
+		sql.VALUES("IDLENGUAJE", "'"+ usuario.getIdlenguaje() + "'");
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
-		sql.VALUES("USUMODIFICACION", String.valueOf(usuario.getIdusuario()));
-		sql.VALUES("IDINSTITUCION", idInstitucion);
-		sql.VALUES("NOMBRETABLA", nombreTabla);
-		sql.VALUES("CAMPOTABLA", campoTabla);
+		sql.VALUES("USUMODIFICACION", "'"+ String.valueOf(usuario.getIdusuario()) + "'");
+		sql.VALUES("IDINSTITUCION", "'"+ idInstitucion + "'");
+		sql.VALUES("NOMBRETABLA", "'"+nombreTabla + "'");
+		sql.VALUES("CAMPOTABLA", "'"+ campoTabla + "'");
 		sql.VALUES("IDRECURSOALIAS", "(SELECT LOWER(nombretabla||'.'||campotabla||'.'||idinstitucion||'.'||(count(idRecurso)+2))  FROM  GEN_RECURSOS_CATALOGOS CATALOGO "
 				+ "WHERE CATALOGO.IDINSTITUCION = '" + idInstitucion +"' AND NOMBRETABLA = '"+ nombreTabla +"'   AND IDLENGUAJE = '"+ usuario.getIdlenguaje() +"' "
 				+ "group by nombretabla,campotabla,idinstitucion)");

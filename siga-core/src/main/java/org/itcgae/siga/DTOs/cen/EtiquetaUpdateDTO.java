@@ -15,8 +15,28 @@ public class EtiquetaUpdateDTO {
 	private String anotaciones;
 	private String [] grupos;
 	private String idPersona;
+	private String abreviatura;
 	
 	
+	
+	/**
+	 */
+	public EtiquetaUpdateDTO abreviatura(String abreviatura){
+		this.abreviatura = abreviatura;
+		return this;
+	}
+	
+	
+	@JsonProperty("abreviatura")
+	public String getAbreviatura() {
+		return abreviatura;
+	}
+
+
+	public void setAbreviatura(String abreviatura) {
+		this.abreviatura = abreviatura;
+	}
+
 
 	/**
 	 */

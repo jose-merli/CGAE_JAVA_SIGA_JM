@@ -144,7 +144,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT_DISTINCT("per.nifcif AS nif");
 		sql.SELECT_DISTINCT("per.IDTIPOIDENTIFICACION ");
 		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ',per.apellidos2) ) AS denominacion");
-		sql.SELECT_DISTINCT("i.abreviatura AS abreviatura");
+		sql.SELECT_DISTINCT("DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) AS abreviatura");
 		sql.SELECT_DISTINCT("per.fechanacimiento AS fechaconstitucion");
 		sql.SELECT_DISTINCT("col.sociedadprofesional AS sociedadprofesional");
 		sql.SELECT_DISTINCT("ca.descripcion AS tipo");
@@ -220,18 +220,18 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		
 		sql.INSERT_INTO("CEN_PERSONA");
 		sql.VALUES("IDPERSONA", "(Select max(idpersona) +1 from cen_persona)");
-		sql.VALUES("NOMBRE", etiquetaUpdateDTO.getDenominacion());
-		sql.VALUES("APELLIDOS1", "");
-		sql.VALUES("APELLIDOS2", "");
-		sql.VALUES("NIFCIF", etiquetaUpdateDTO.getNif());
+		sql.VALUES("NOMBRE", "'" +etiquetaUpdateDTO.getDenominacion()+ "'");
+//		sql.VALUES("APELLIDOS1", "");
+//		sql.VALUES("APELLIDOS2", "");
+		sql.VALUES("NIFCIF",  "'" +etiquetaUpdateDTO.getNif()+ "'");
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
-		sql.VALUES("USUMODIFICACION", String.valueOf(usuario.getIdusuario()));
+		sql.VALUES("USUMODIFICACION",  "'" +String.valueOf(usuario.getIdusuario())+ "'");
 		sql.VALUES("IDTIPOIDENTIFICACION", "(SELECT IDTIPOIDENTIFICACION FROM CEN_TIPOIDENTIFICACION WHERE CODIGOEJIS = 'C')");
 		sql.VALUES("FECHANACIMIENTO", "SYSDATE");
-		sql.VALUES("IDESTADOCIVIL", "");
-		sql.VALUES("NATURALDE", "");
-		sql.VALUES("FALLECIDO", "0");
-		sql.VALUES("SEXO", "");
+//		sql.VALUES("IDESTADOCIVIL", "");
+//		sql.VALUES("NATURALDE", "");
+		sql.VALUES("FALLECIDO", "'0'");
+//		sql.VALUES("SEXO", "");
 		
 		return sql.toString();
 	}
@@ -245,8 +245,9 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT("PER.nifcif AS NIF");
 		sql.SELECT("PER.FECHANACIMIENTO AS FECHAALTA");
 		sql.SELECT("PER.NOMBRE AS NOMBRE");
-		sql.SELECT("PER.APELLIDOS1 AS APELLIDO1");
+		sql.SELECT("DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) AS APELLIDO1");
 		sql.SELECT("PER.APELLIDOS2 AS APELLIDO2");
+		sql.SELECT("PER.IDTIPOIDENTIFICACION");
 		sql.FROM("CEN_PERSONA PER ");
 		
 		if (null != idPersona) {

@@ -29,6 +29,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteExample;
+import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenGruposcliente;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
@@ -658,6 +659,16 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 					LOGGER.info("updateLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar información de persona juridica en CEN_NOCOLEGIADO");
 					cenNocolegiadoExtendsMapper.updateByExampleSelective(cenNocolegiado, cenNocolegiadoExample);
 					LOGGER.info("updateLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar información de persona juridica en CEN_NOCOLEGIADO");
+					
+					// 3. Actualiza tabla CEN_CLIENTE
+					CenClienteKey key = new CenClienteKey();
+					key.setIdpersona(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
+					key.setIdinstitucion(idInstitucion);
+					CenCliente cenCliente = new CenCliente();
+					cenCliente = cenClienteMapper.selectByPrimaryKey(key);
+					cenCliente.setAsientocontable(etiquetaUpdateDTO.getCuentaContable());
+					
+					cenClienteMapper.updateByPrimaryKey(cenCliente);
 					
 					// elimina grupos que dejan de estar relacionados con el usuario
 					for(int i=0;i < gruposPerJuridicaAntiguos.size(); i++) {

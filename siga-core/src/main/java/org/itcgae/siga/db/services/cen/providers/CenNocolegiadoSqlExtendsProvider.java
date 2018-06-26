@@ -40,14 +40,14 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		
 		sql2.SELECT(" DISTINCT COL.IDPERSONA AS IDPERSONA");
 		sql2.SELECT("PER.NIFCIF AS NIF");
-		sql2.SELECT("CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) AS DENOMINACION");
-		sql2.SELECT("I.ABREVIATURA AS ABREVIATURA");
+		sql2.SELECT("PER.NOMBRE  AS DENOMINACION");
+		sql2.SELECT("DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) AS ABREVIATURA");
 		sql2.SELECT("PER.FECHANACIMIENTO AS FECHACONSTITUCION");
 		sql2.SELECT("COL.SOCIEDADPROFESIONAL AS SOCIEDADPROFESIONAL");
 		sql2.SELECT("CA.DESCRIPCION AS TIPO");
 		sql2.SELECT("COL.FECHA_BAJA AS FECHA_BAJA");
 		sql2.SELECT("NVL(COUNT(DISTINCT PER2.IDPERSONA),0) AS NUMEROINTEGRANTES");
-		sql2.SELECT("LISTAGG(CONCAT(PER2.NOMBRE ||' ',CONCAT(PER2.APELLIDOS1 || ' ',PER2.APELLIDOS2)), '; ') WITHIN GROUP (ORDER BY PER2.NOMBRE) AS NOMBRESINTEGRANTES");
+		sql2.SELECT("LISTAGG(CONCAT(PER2.NOMBRE ||' ',CONCAT(DECODE(PER2.APELLIDOS1,'#NA','',PER2.APELLIDOS1) || ' ',PER2.APELLIDOS2)), '; ') WITHIN GROUP (ORDER BY PER2.NOMBRE) AS NOMBRESINTEGRANTES");
 		
 		sql2.FROM("CEN_NOCOLEGIADO COL");
 		
@@ -98,8 +98,6 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql2.GROUP_BY("PER.NIFCIF");
 		sql2.GROUP_BY("PER.NOMBRE");
 		sql2.GROUP_BY("PER.APELLIDOS1");
-		sql2.GROUP_BY("PER.APELLIDOS2");
-		sql2.GROUP_BY("I.ABREVIATURA");
 		sql2.GROUP_BY("GRUPOS_CLIENTE.IDGRUPO");
 		sql2.GROUP_BY("PER.FECHANACIMIENTO");
 		sql2.GROUP_BY("COL.SOCIEDADPROFESIONAL");
@@ -130,14 +128,14 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		
 		sql2.SELECT("COL.IDPERSONA AS IDPERSONA");
 		sql2.SELECT("PER.NIFCIF AS NIF");
-		sql2.SELECT("CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) AS DENOMINACION");
-		sql2.SELECT("I.ABREVIATURA AS ABREVIATURA");
+		sql2.SELECT("PER.NOMBRE  AS DENOMINACION");
+		sql2.SELECT("DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) AS ABREVIATURA");
 		sql2.SELECT("PER.FECHANACIMIENTO AS FECHACONSTITUCION");
 		sql2.SELECT("COL.SOCIEDADPROFESIONAL AS SOCIEDADPROFESIONAL");
 		sql2.SELECT("(select descripcion from GEN_RECURSOS where  idrecurso = 'censo.busquedaClientesAvanzada.literal.Sociedad' and idlenguaje = '"+ idLenguaje+ "') AS TIPO");
 		sql2.SELECT("COL.FECHA_BAJA AS FECHA_BAJA");
 		sql2.SELECT("NVL(COUNT(DISTINCT PER2.IDPERSONA),0) AS NUMEROINTEGRANTES");
-		sql2.SELECT("LISTAGG(CONCAT(PER2.NOMBRE ||' ',CONCAT(PER2.APELLIDOS1 || ' ',PER2.APELLIDOS2)), '; ') WITHIN GROUP (ORDER BY PER2.NOMBRE) AS NOMBRESINTEGRANTES");
+		sql2.SELECT("LISTAGG(CONCAT(PER2.NOMBRE ||' ',CONCAT(DECODE(PER2.APELLIDOS1,'#NA','',PER2.APELLIDOS1) || ' ',PER2.APELLIDOS2)), '; ') WITHIN GROUP (ORDER BY PER2.NOMBRE) AS NOMBRESINTEGRANTES");
 		
 		sql2.FROM("CEN_NOCOLEGIADO COL");		
 		sql2.INNER_JOIN(" CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA");
@@ -162,8 +160,6 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql2.GROUP_BY("PER.NIFCIF");
 		sql2.GROUP_BY("PER.NOMBRE");
 		sql2.GROUP_BY("PER.APELLIDOS1");
-		sql2.GROUP_BY("PER.APELLIDOS2");
-		sql2.GROUP_BY("I.ABREVIATURA");
 		sql2.GROUP_BY("GRUPOS_CLIENTE.IDGRUPO");
 		sql2.GROUP_BY("PER.FECHANACIMIENTO");
 		sql2.GROUP_BY("COL.SOCIEDADPROFESIONAL");
@@ -188,16 +184,17 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.SELECT("COL.IDPERSONA AS IDPERSONA");
 		sql.SELECT("COL.ANOTACIONES AS ANOTACIONES");
 		sql.SELECT("PER.NIFCIF AS NIF");
-		sql.SELECT("CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) AS DENOMINACION");
-		sql.SELECT("PER.APELLIDOS1 AS ABREVIATURA");
+		sql.SELECT("PER.NOMBRE  AS DENOMINACION");
+		sql.SELECT("DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) AS ABREVIATURA");
 		sql.SELECT("PER.FECHANACIMIENTO AS FECHACONSTITUCION");
 		sql.SELECT("COL.SOCIEDADPROFESIONAL AS SOCIEDADPROFESIONAL");
 		sql.SELECT("TIPOSOCIEDAD.LETRACIF  AS TIPO");
 		sql.SELECT("COL.FECHA_BAJA AS FECHA_BAJA");
 		sql.SELECT("NVL(COUNT(DISTINCT PER2.IDPERSONA),0) AS NUMEROINTEGRANTES");
-		sql.SELECT("LISTAGG(CONCAT(PER2.NOMBRE ||' ',CONCAT(PER2.APELLIDOS1 || ' ',PER2.APELLIDOS2)), ';') WITHIN GROUP (ORDER BY PER2.NOMBRE) AS NOMBRESINTEGRANTES");
+		sql.SELECT("LISTAGG(CONCAT(PER2.NOMBRE ||' ',CONCAT(DECODE(PER2.APELLIDOS1,'#NA','',PER2.APELLIDOS1) || ' ',PER2.APELLIDOS2)), ';') WITHIN GROUP (ORDER BY PER2.NOMBRE) AS NOMBRESINTEGRANTES");
 		sql.SELECT("LISTAGG(GRUPOS_CLIENTE.IDGRUPO, ';') WITHIN GROUP (ORDER BY GRUPOS_CLIENTE.IDGRUPO)  OVER (PARTITION BY COL.IDPERSONA) AS IDGRUPO");
 		sql.SELECT("CLI.IDLENGUAJE AS LENGUAJESOCIEDAD");
+		sql.SELECT("CLI.ASIENTOCONTABLE"); 
 		sql.FROM(" CEN_NOCOLEGIADO COL");
 		sql.INNER_JOIN(" CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA ");
 		sql.INNER_JOIN(" CEN_INSTITUCION I ON COL.IDINSTITUCION = I.IDINSTITUCION ");
@@ -216,8 +213,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.GROUP_BY("PER.NIFCIF");
 		sql.GROUP_BY("PER.NOMBRE");
 		sql.GROUP_BY("PER.APELLIDOS1");
-		sql.GROUP_BY("PER.APELLIDOS2");
-		sql.GROUP_BY("I.ABREVIATURA");
+		sql.GROUP_BY("DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1)");
 		sql.GROUP_BY("PER.FECHANACIMIENTO");
 		sql.GROUP_BY("COL.SOCIEDADPROFESIONAL");
 		sql.GROUP_BY("COL.TIPO");
@@ -225,6 +221,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.GROUP_BY("GRUPOS_CLIENTE.IDGRUPO");
 		sql.GROUP_BY("COL.FECHA_BAJA");
 		sql.GROUP_BY("CLI.IDLENGUAJE");
+		sql.GROUP_BY("CLI.ASIENTOCONTABLE");
 		
 		return sql.toString();
 	}
@@ -237,28 +234,28 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.INSERT_INTO("CEN_NOCOLEGIADO");
 		
 		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona)");
-		sql.VALUES("IDINSTITUCION", idInstitucion);
+		sql.VALUES("IDINSTITUCION", "'" +idInstitucion  +"'");
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
-		sql.VALUES("USUMODIFICACION", String.valueOf(usuario.getIdusuario()));
-		sql.VALUES("SERIE", "");
-		sql.VALUES("NUMEROREF", "");
-		sql.VALUES("SOCIEDADSJ", "0");
-		sql.VALUES("TIPO", etiquetaUpdateDTO.getTipo());
-		sql.VALUES("ANOTACIONES", etiquetaUpdateDTO.getAnotaciones());
-		sql.VALUES("PREFIJO_NUMREG", "");
-		sql.VALUES("CONTADOR_NUMREG", "");
-		sql.VALUES("SUFIJO_NUMREG", "");
-		sql.VALUES("FECHAFIN", "");
-		sql.VALUES("IDPERSONANOTARIO", "");
-		sql.VALUES("RESENA", "");
-		sql.VALUES("OBJETOSOCIAL", "");
-		sql.VALUES("SOCIEDADPROFESIONAL", "0");
-		sql.VALUES("PREFIJO_NUMSSPP", "");
-		sql.VALUES("CONTADOR_NUMSSPP", "");
-		sql.VALUES("SUFIJO_NUMSSPP", "");
-		sql.VALUES("NOPOLIZA", "");
-		sql.VALUES("COMPANIASEG", "");
-		sql.VALUES("IDENTIFICADORDS", "");
+		sql.VALUES("USUMODIFICACION", "'" +String.valueOf(usuario.getIdusuario()) +"'");
+//		sql.VALUES("SERIE", "");
+//		sql.VALUES("NUMEROREF", "");
+		sql.VALUES("SOCIEDADSJ", "'0'");
+		sql.VALUES("TIPO",  "'" +etiquetaUpdateDTO.getTipo() +"'");
+		sql.VALUES("ANOTACIONES",  "'" +etiquetaUpdateDTO.getAnotaciones() +"'");
+//		sql.VALUES("PREFIJO_NUMREG", "");
+//		sql.VALUES("CONTADOR_NUMREG", "");
+//		sql.VALUES("SUFIJO_NUMREG", "");
+//		sql.VALUES("FECHAFIN", "");
+//		sql.VALUES("IDPERSONANOTARIO", "");
+//		sql.VALUES("RESENA", "");
+//		sql.VALUES("OBJETOSOCIAL", "");
+		sql.VALUES("SOCIEDADPROFESIONAL", "'0'");
+//		sql.VALUES("PREFIJO_NUMSSPP", "");
+//		sql.VALUES("CONTADOR_NUMSSPP", "");
+//		sql.VALUES("SUFIJO_NUMSSPP", "");
+//		sql.VALUES("NOPOLIZA", "");
+//		sql.VALUES("COMPANIASEG", "");
+//		sql.VALUES("IDENTIFICADORDS", "");
 		sql.VALUES("FECHA_BAJA", "null");
 		
 		return sql.toString();
@@ -351,6 +348,16 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		
 		if(null != usuario.getIdusuario() && !usuario.getIdusuario().equals("")) {
 			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+		}
+		
+		if(!perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp().equals("")) {
+			sql.SET("PREFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp() + "'");
+		}
+		if(!perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp().equals("")) {
+			sql.SET("CONTADOR_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp() + "'");
+		}
+		if(!perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp().equals("")) {
+			sql.SET("SUFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp() + "'");
 		}
 		
 		sql.SET("FECHAMODIFICACION = SYSDATE");

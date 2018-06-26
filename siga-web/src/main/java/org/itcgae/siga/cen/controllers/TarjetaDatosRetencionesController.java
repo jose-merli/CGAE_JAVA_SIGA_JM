@@ -27,6 +27,9 @@ public class TarjetaDatosRetencionesController {
 	@Autowired
 	private ITarjetaDatosRetencionesService tarjetaDatosRetencionesService;
 	
+	
+	
+	
 	@RequestMapping(value = "retenciones/tipoRetencion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<MaestroRetencionDTO> getRetentionTypes(HttpServletRequest request) { 
 		MaestroRetencionDTO response = tarjetaDatosRetencionesService.getRetentionTypes(request);
@@ -44,5 +47,8 @@ public class TarjetaDatosRetencionesController {
 		UpdateResponseDTO response = tarjetaDatosRetencionesService.updateRetenciones(etiquetaRetencionesDTO,idPersona, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
+	
+	
+	
 	
 }

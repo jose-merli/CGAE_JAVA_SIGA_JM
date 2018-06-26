@@ -7,11 +7,14 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.BancoBicItem;
+import org.itcgae.siga.DTOs.cen.DatosBancariosAnexoItem;
 import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
+import org.itcgae.siga.DTOs.cen.DatosBancariosSearchAnexosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
 import org.itcgae.siga.db.services.cen.providers.CenCuentasbancariasSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -98,6 +101,28 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 	List<BancoBicItem> selectBanks(DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO); 
 
 
+	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "selectAnexos")
+	@Results({
+		@Result(column = "IDMANDATO", property = "idMandato", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDANEXO", property = "idAnexo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCUENTA", property = "idCuenta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOMANDATO", property = "tipoMandato", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAUSO", property = "fechaUso", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FIRMAFECHA", property = "firmaFecha", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FIRMALUGAR", property = "firmaLugar", jdbcType = JdbcType.DATE),
+
+	})
+	List<DatosBancariosAnexoItem> selectAnexos(DatosBancariosSearchAnexosDTO datosBancariosAnexos);
+	
+	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "selectNewIdAnexo")
+	@Results({
+		@Result(column = "IDANEXO", property = "newId", jdbcType = JdbcType.VARCHAR),
+	})
+	List<NewIdDTO> selectNewIdAnexo(String idPersona,String idCuenta,String idMandato, String idInstitucion);
 	
 	
+	
+
 }

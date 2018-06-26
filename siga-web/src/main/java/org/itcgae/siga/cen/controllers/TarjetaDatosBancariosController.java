@@ -12,9 +12,11 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicDTO;
+import org.itcgae.siga.DTOs.cen.DatosBancariosAnexoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosDeleteDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosInsertDTO;
+import org.itcgae.siga.DTOs.cen.DatosBancariosSearchAnexosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDTO;
@@ -105,5 +107,27 @@ public class TarjetaDatosBancariosController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
+	
+	@RequestMapping(value = "busquedaPerJuridica/AnexosSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DatosBancariosAnexoDTO> searchAnexos(@RequestParam("numPagina") int numPagina, @RequestBody DatosBancariosSearchAnexosDTO datosBancariosSearchAnexosDTO, HttpServletRequest request) { 
+		DatosBancariosAnexoDTO response = tarjetaDatosBancariosService.searchAnexos(numPagina, datosBancariosSearchAnexosDTO, request);
+		return new ResponseEntity<DatosBancariosAnexoDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "busquedaPerJuridica/updateAnexos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateAnexos(@RequestBody MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request) throws IOException, NamingException, SQLException { 
+		UpdateResponseDTO response = tarjetaDatosBancariosService.updateAnexos(mandatosUpdateDTO, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
 
+	
+	@RequestMapping(value = "busquedaPerJuridica/insertAnexos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> insertAnexos(@RequestBody MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request) throws IOException, NamingException, SQLException { 
+		InsertResponseDTO response = tarjetaDatosBancariosService.InsertAnexos(mandatosUpdateDTO, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
 }

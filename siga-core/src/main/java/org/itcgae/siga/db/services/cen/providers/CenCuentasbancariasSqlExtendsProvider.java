@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.cen.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.cen.DatosBancariosSearchAnexosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.db.mappers.CenGruposclienteClienteSqlProvider;
@@ -102,6 +103,17 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		return sql.toString();
 	}
 	
+	public String selectNewIdAnexo(String idPersona,String idCuenta,String idMandato,String institucion) {
+		SQL sql = new SQL();
+		sql.SELECT("MAX(CUENTA.IDANEXO) + 1 AS IDANEXO");
+		sql.FROM("CEN_ANEXOS_CUENTASBANCARIAS CUENTA");
+		sql.WHERE("CUENTA.IDPERSONA = '"+idPersona+"'");
+		sql.WHERE("CUENTA.IDMANDATO = '"+idMandato+"'");
+		sql.WHERE("CUENTA.IDCUENTA = '"+idCuenta+"'");
+		sql.WHERE("CUENTA.IDINSTITUCION = '"+institucion+"'");
+		return sql.toString();
+	}
+	
 	
 	public String getComboEsquemas(String idlenguaje) {
 		SQL sql = new SQL();
@@ -122,6 +134,60 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		sql.FROM("CEN_BANCOS BANCO");
 
 		sql.WHERE("BANCO.CODIGO = '"+datosBancariosSearchBancoDTO.getiban()+"'");
+		
+		return sql.toString();
+	}
+	
+	public String selectAnexos(DatosBancariosSearchAnexosDTO datosBancariosSearchAnexosDTO) {
+		SQL sql = new SQL();
+
+        sql.SELECT("IDMANDATO");
+		sql.SELECT("IDANEXO");
+		sql.SELECT("IDPERSONA");
+		sql.SELECT("IDCUENTA");
+		sql.SELECT("DESCRIPCION");
+		sql.SELECT("TIPOMANDATO");
+		sql.SELECT("TIPO");
+		sql.SELECT("TO_CHAR(FECHAUSO,'DD/MM/YYYY') AS FECHAUSO") ;
+		sql.SELECT("TO_CHAR(FIRMAFECHA,'DD/MM/YYYY')AS FIRMAFECHA");
+		sql.SELECT("FIRMALUGAR");
+		sql.FROM("( SELECT\r\n" + 
+				" MANDATO.IDMANDATO\r\n" + 
+				" ,NULL AS IDANEXO\r\n" + 
+				" ,PER.IDPERSONA\r\n" + 
+				" ,MANDATO.IDCUENTA\r\n" + 
+				" ,'' AS DESCRIPCION\r\n" + 
+				" ,DECODE(MANDATO.TIPOMANDATO,1,'PRODUCTO','SERVICIO') AS TIPOMANDATO\r\n" + 
+				" ,'MANDATO' AS TIPO\r\n" + 
+				" ,FECHAUSO\r\n" + 
+				" ,FIRMA_FECHA AS FIRMAFECHA\r\n" + 
+				" ,FIRMA_LUGAR AS FIRMALUGAR\r\n" + 
+				" ,MANDATO.IDINSTITUCION\r\n" + 
+				" FROM CEN_PERSONA PER\r\n" + 
+				"INNER JOIN CEN_MANDATOS_CUENTASBANCARIAS MANDATO ON (PER.IDPERSONA = MANDATO.IDPERSONA)\r\n" + 
+				"\r\n" + 
+				"UNION ALL\r\n" + 
+				"\r\n" + 
+				" SELECT\r\n" + 
+				" MANDATO.IDMANDATO\r\n" + 
+				" ,ANEXO.IDANEXO\r\n" + 
+				" ,PER.IDPERSONA\r\n" + 
+				" ,MANDATO.IDCUENTA\r\n" + 
+				" ,ANEXO.ORIGEN AS DESCRIPCION\r\n" + 
+				" ,DECODE(MANDATO.TIPOMANDATO,1,'PRODUCTO','SERVICIO') AS TIPOMANDATO\r\n" + 
+				" ,'ANEXO' AS TIPO\r\n" + 
+				" ,ANEXO.FECHACREACION AS FECHAUSO\r\n" + 
+				" ,ANEXO.FIRMA_FECHA AS FIRMAFECHA\r\n" + 
+				" ,ANEXO.FIRMA_LUGAR AS FIRMALUGAR\r\n" + 
+				" ,MANDATO.IDINSTITUCION\r\n" + 
+				" FROM CEN_PERSONA PER\r\n" + 
+				"INNER JOIN CEN_MANDATOS_CUENTASBANCARIAS MANDATO ON (PER.IDPERSONA = MANDATO.IDPERSONA)\r\n" + 
+				"INNER JOIN CEN_ANEXOS_CUENTASBANCARIAS ANEXO ON (PER.IDPERSONA = ANEXO.IDPERSONA AND ANEXO.IDCUENTA =  MANDATO.IDCUENTA AND MANDATO.IDMANDATO = ANEXO.IDMANDATO))");
+
+		sql.WHERE("IDPERSONA = '"+datosBancariosSearchAnexosDTO.getIdPersona()+"'");
+		sql.WHERE("IDCUENTA = '"+datosBancariosSearchAnexosDTO.getIdCuenta()+"'");
+		sql.WHERE("IDINSTITUCION = '"+datosBancariosSearchAnexosDTO.getIdInstitucion()+"'");
+		sql.ORDER_BY("TIPO DESC,TIPOMANDATO ");
 		
 		return sql.toString();
 	}
