@@ -214,14 +214,6 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 			AdmUsuarios usuario = usuarios.get(0);
 			
 			// 1. Actualizar tabla cen_persona
-//			CenPersona cenPersona = new CenPersona();
-//			cenPersona.setFechanacimiento(perJuridicaDatosRegistralesUpdateDTO.getFechaConstitucion());
-//			cenPersona.setFechamodificacion(fechamodificacion);
-//			cenPersona.setUsumodificacion(usumodificacion);
-//			CenPersonaExample cenPersonaExample = new CenPersonaExample();
-//			cenPersonaExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona()));
-//			responseCenPersona = cenPersonaExtendsMapper.updateByExampleSelective(cenPersona, cenPersonaExample);
-			
 			LOGGER.info(
 					"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updatebyExampleDataLegalPerson() -> Entrada a cenPersonaExtendsMapper para actualizar fecha de constitución de una persona jurídica");
 			
@@ -231,19 +223,6 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 			
 			// 2. Actualizar tabla cen_nocolegiado
 			if(responseCenPersona == 1) {
-//				CenNocolegiado cenNocolegiado = new CenNocolegiado();
-//				cenNocolegiado.setResena(perJuridicaDatosRegistralesUpdateDTO.getResena());
-//				cenNocolegiado.setObjetosocial(perJuridicaDatosRegistralesUpdateDTO.getObjetoSocial());
-//				cenNocolegiado.setNopoliza(perJuridicaDatosRegistralesUpdateDTO.getNumeroPoliza());
-//				cenNocolegiado.setCompaniaseg(perJuridicaDatosRegistralesUpdateDTO.getCompaniaAseg());
-//				cenNocolegiado.setFechafin(perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
-//				cenNocolegiado.setSociedadprofesional(perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional());
-//				
-//				CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
-//				cenNocolegiadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
-//				
-//				responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByExampleSelective(cenNocolegiado, cenNocolegiadoExample);
-//				
 				LOGGER.info(
 						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson() -> Entrada a cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
 				
@@ -288,15 +267,20 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 						if(null != actividadExistente.get(0).getFechaBaja()) {
 							// dar de alta una actividad asociada a una persona juridica
 							CenNocolegiadoActividad record = new CenNocolegiadoActividad();
-							record.setFechaBaja(null);
+							record.setIdinstitucion(idInstitucion);
+							record.setIdpersona(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona()));
+							record.setIdactividadprofesional(Short.valueOf(actividad));
 							record.setFechamodificacion(new Date());
 							record.setUsumodificacion(usuario.getIdusuario()); 
+							record.setFechaBaja(null);
+							
 							CenNocolegiadoActividadExample example = new CenNocolegiadoActividadExample();
 							example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona())).andIdactividadprofesionalEqualTo(Short.valueOf(actividad));
 							LOGGER.info(
 									"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoActividadMapper para dar de alta una actividad para una persona jurídica");
 							
-							responseCenNoColegiadoActividad = cenNocolegiadoActividadMapper.updateByExampleSelective(record, example);
+							//responseCenNoColegiadoActividad = cenNocolegiadoActividadMapper.updateByExampleSelective(record, example);
+							responseCenNoColegiadoActividad = cenNocolegiadoActividadMapper.updateByExample(record, example);
 							LOGGER.info(
 									"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.updateByExampleSelective() -> Salida de cenNocolegiadoActividadMapper para dar de alta una actividad para una persona jurídica");
 							

@@ -23,6 +23,7 @@ public class DatosIntegrantesItem {
 	private String fechaHistorico;
 	private String nifCif;
 	private String nombre;
+	private String apellidos;
 	private String apellidos1;
 	private String apellidos2;
 	private String nombreCompleto;
@@ -311,7 +312,23 @@ public class DatosIntegrantesItem {
 	}
 
 
+	/**
+	 *
+	 */
+	public DatosIntegrantesItem apellidos(String apellidos){
+		this.apellidos = apellidos;
+		return this;
+	}
+	
+	public String getApellidos() {
+		return apellidos;
+	}
 
+
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
 	/**
 	 *
 	 */

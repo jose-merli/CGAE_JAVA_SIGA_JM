@@ -144,7 +144,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT_DISTINCT("per.nifcif AS nif");
 		sql.SELECT_DISTINCT("per.IDTIPOIDENTIFICACION ");
 		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ',per.apellidos2) ) AS denominacion");
-		sql.SELECT_DISTINCT("i.abreviatura AS abreviatura");
+		sql.SELECT_DISTINCT("DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) AS abreviatura");
 		sql.SELECT_DISTINCT("per.fechanacimiento AS fechaconstitucion");
 		sql.SELECT_DISTINCT("col.sociedadprofesional AS sociedadprofesional");
 		sql.SELECT_DISTINCT("ca.descripcion AS tipo");

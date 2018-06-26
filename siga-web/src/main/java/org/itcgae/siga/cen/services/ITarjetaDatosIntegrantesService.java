@@ -4,12 +4,15 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface ITarjetaDatosIntegrantesService {
 
-
-
-	DatosIntegrantesDTO searchIntegrantesData(int numPagina, DatosIntegrantesSearchDTO datosIntegrantesSearchDTO,	HttpServletRequest request);
+	public DatosIntegrantesDTO searchIntegrantesData(int numPagina, DatosIntegrantesSearchDTO datosIntegrantesSearchDTO,	HttpServletRequest request);
+	
+	public ComboDTO getProvinces(HttpServletRequest request);
+	
+	public ComboDTO getCargos(HttpServletRequest request);
 	
 	
 	

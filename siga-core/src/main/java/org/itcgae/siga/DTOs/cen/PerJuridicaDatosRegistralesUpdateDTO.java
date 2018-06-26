@@ -19,6 +19,68 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	private String sociedadProfesional;
 	private String [] actividades;
 	private String idPersona;
+	private String prefijoNumsspp;
+	private String contadorNumsspp;
+	private String sufijoNumsspp;
+	
+
+	/**
+	 */
+	public PerJuridicaDatosRegistralesUpdateDTO prefijoNumsspp(String prefijoNumsspp){
+		this.prefijoNumsspp = prefijoNumsspp;
+		return this;
+	}
+	
+	@JsonProperty("prefijoNumsspp")
+	public String getPrefijoNumsspp() {
+		return prefijoNumsspp;
+	}
+
+
+
+	public void setPrefijoNumsspp(String prefijoNumsspp) {
+		this.prefijoNumsspp = prefijoNumsspp;
+	}
+
+
+	/**
+	 */
+	public PerJuridicaDatosRegistralesUpdateDTO contadorNumsspp(String contadorNumsspp){
+		this.contadorNumsspp = contadorNumsspp;
+		return this;
+	}
+
+	@JsonProperty("contadorNumsspp")
+	public String getContadorNumsspp() {
+		return contadorNumsspp;
+	}
+
+
+
+	public void setContadorNumsspp(String contadorNumsspp) {
+		this.contadorNumsspp = contadorNumsspp;
+	}
+
+	
+
+	/**
+	 */
+	public PerJuridicaDatosRegistralesUpdateDTO sufijoNumsspp(String sufijoNumsspp){
+		this.sufijoNumsspp = sufijoNumsspp;
+		return this;
+	}
+
+	@JsonProperty("sufijoNumsspp")
+	public String getSufijoNumsspp() {
+		return sufijoNumsspp;
+	}
+
+
+
+	public void setSufijoNumsspp(String sufijoNumsspp) {
+		this.sufijoNumsspp = sufijoNumsspp;
+	}
+
 	
 	
 	
@@ -213,13 +275,16 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	    		Objects.equals(this.fechaConstitucion, perJuridicaDatosRegistralesUpdateDTO.fechaConstitucion) &&
 	    		Objects.equals(this.sociedadProfesional, perJuridicaDatosRegistralesUpdateDTO.sociedadProfesional) &&
 	    		Objects.equals(this.actividades, perJuridicaDatosRegistralesUpdateDTO.actividades) &&
-	    		Objects.equals(this.idPersona, perJuridicaDatosRegistralesUpdateDTO.idPersona);
+	    		Objects.equals(this.idPersona, perJuridicaDatosRegistralesUpdateDTO.idPersona) &&
+	    		Objects.equals(this.prefijoNumsspp, perJuridicaDatosRegistralesUpdateDTO.prefijoNumsspp) &&
+	    		Objects.equals(this.contadorNumsspp, perJuridicaDatosRegistralesUpdateDTO.contadorNumsspp) &&
+	    		Objects.equals(this.sufijoNumsspp, perJuridicaDatosRegistralesUpdateDTO.sufijoNumsspp);
 	}
  
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(resena, objetoSocial, numeroPoliza, companiaAseg, fechaFin, fechaConstitucion, sociedadProfesional, actividades, idPersona);
+	    return Objects.hash(resena, objetoSocial, numeroPoliza, companiaAseg, fechaFin, fechaConstitucion, sociedadProfesional, actividades, idPersona, prefijoNumsspp, contadorNumsspp, sufijoNumsspp);
 	}
 
 	
@@ -237,6 +302,9 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	    sb.append("    sociedadProfesional: ").append(toIndentedString(sociedadProfesional)).append("\n");
 	    sb.append("    actividades: ").append(toIndentedString(actividades)).append("\n");
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
+	    sb.append("    prefijoNumsspp: ").append(toIndentedString(prefijoNumsspp)).append("\n");
+	    sb.append("    contadorNumsspp: ").append(toIndentedString(contadorNumsspp)).append("\n");
+	    sb.append("    sufijoNumsspp: ").append(toIndentedString(sufijoNumsspp)).append("\n");
 	    
 	    sb.append("}");
 	    return sb.toString();

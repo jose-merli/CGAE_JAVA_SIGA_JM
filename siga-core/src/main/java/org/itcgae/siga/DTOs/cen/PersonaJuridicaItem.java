@@ -25,6 +25,8 @@ public class PersonaJuridicaItem {
 	private String IDGrupos;
 	private String sociedadProfesional;
 	private String idLenguajeSociedad;
+	private String asientoContable;
+	
 	
 	
 	
@@ -254,6 +256,24 @@ public class PersonaJuridicaItem {
 		this.idLenguajeSociedad = idLenguajeSociedad;
 	}
 	
+	
+	/**
+	 */
+	public PersonaJuridicaItem asientoContable(String asientoContable){
+		this.asientoContable = asientoContable;
+		return this;
+	}
+	
+	
+	@JsonProperty("asientoContable")
+	public String getAsientoContable() {
+		return asientoContable;
+	}
+
+	public void setAsientoContable(String asientoContable) {
+		this.asientoContable = asientoContable;
+	}
+	
 		
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -277,12 +297,13 @@ public class PersonaJuridicaItem {
 	    		Objects.equals(this.anotaciones, personaJuridicaItem.anotaciones) &&
 	    		Objects.equals(this.IDGrupos, personaJuridicaItem.IDGrupos) &&
 	    		Objects.equals(this.sociedadProfesional, personaJuridicaItem.sociedadProfesional) &&
-	    		Objects.equals(this.idLenguajeSociedad, personaJuridicaItem.idLenguajeSociedad);
+	    		Objects.equals(this.idLenguajeSociedad, personaJuridicaItem.idLenguajeSociedad) &&
+	    		Objects.equals(this.asientoContable, personaJuridicaItem.asientoContable);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idInstitucion, idPersona, nif, denominacion, abreviatura, fechaConstitucion, tipo, numeroIntegrantes, nombresIntegrantes, fechaBaja, anotaciones, IDGrupos, sociedadProfesional, idLenguajeSociedad);
+	    return Objects.hash(idInstitucion, idPersona, nif, denominacion, abreviatura, fechaConstitucion, tipo, numeroIntegrantes, nombresIntegrantes, fechaBaja, anotaciones, IDGrupos, sociedadProfesional, idLenguajeSociedad, asientoContable);
 	}
 
 	
@@ -305,6 +326,7 @@ public class PersonaJuridicaItem {
 	    sb.append("    IDGrupos: ").append(toIndentedString(IDGrupos)).append("\n");
 	    sb.append("    sociedadProfesional: ").append(toIndentedString(sociedadProfesional)).append("\n");
 	    sb.append("    idLenguajeSociedad: ").append(toIndentedString(idLenguajeSociedad)).append("\n"); 
+	    sb.append("    asientoContable: ").append(toIndentedString(asientoContable)).append("\n"); 
 	    sb.append("}");
 	    return sb.toString();
 	}
