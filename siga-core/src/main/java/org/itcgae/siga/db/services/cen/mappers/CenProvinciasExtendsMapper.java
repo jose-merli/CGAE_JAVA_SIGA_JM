@@ -18,8 +18,8 @@ public interface CenProvinciasExtendsMapper extends CenProvinciasMapper{
 	
 	@SelectProvider(type = CenProvinciasSqlExtendsProvider.class, method = "selectDistinctProvinces")
 	@Results({
-		@Result(column = "IDPROVINCIA", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBRE", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPROVINCIA", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> selectDistinctProvinces();
 }
