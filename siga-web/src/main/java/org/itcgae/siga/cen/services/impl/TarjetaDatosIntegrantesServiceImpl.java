@@ -21,6 +21,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
+import org.itcgae.siga.db.entities.CenComponentes;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargoExtendsMapper;
@@ -239,6 +240,8 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		AdmUsuarios usuario = new AdmUsuarios();
+		List<CenComponentes> cenComponentes = new ArrayList<CenComponentes>();
+		ComboItem comboItem = new ComboItem();
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -270,11 +273,33 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 				// 1.2 Si no existe, se crea un registro
 				if(null == cenCliente) {
 					CenCliente record = new CenCliente();
-					record = rellenarInsertCenCliente(tarjetaIntegrantesCreateDTO, usuario, idInstitucion);
-					cenClienteMapper.insert(record);
+					record = rellenarInsertCenCliente(tarjetaIntegrantesCreateDTO, usuario);
+					cenClienteMapper.insertSelective(record);
 				}
 				
+				// 1.3 Insertamos un registro en tabla cen_componentes
+				comboItem = cenComponentesExtendsMapper.selectMaxIDComponente(tarjetaIntegrantesCreateDTO.getIdPersonaPadre(), String.valueOf(idInstitucion));
+				int siguienteIDComponente;
+				if(null != comboItem) {
+					siguienteIDComponente = Integer.valueOf(comboItem.getValue()) + 1;
+				}
+				else {
+					siguienteIDComponente = 1;
+				}
+				tarjetaIntegrantesCreateDTO.setIdComponente(String.valueOf(siguienteIDComponente));
+				cenComponentesExtendsMapper.insertSelectiveForcreateMember(tarjetaIntegrantesCreateDTO, usuario, String.valueOf(idInstitucion));
+				
+				
+				
 			}
+		}
+		else {
+			// 2. No existe un idpersona para el nuevo integrante
+			
+			// 2.1. Insertar en cen_persona
+			// 2.2. Insertar en cen_cliente
+			// 2.3. Insertar en cen_nocolegiado { tipo = session de busqueda no colegiados (para busqueda juridica) || tipo Personal = '1'
+			// 2.3. Insertar en cen_componente
 		}
 		
 		
@@ -287,17 +312,21 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 	}
 	
 	
-	protected CenCliente rellenarInsertCenCliente(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO,AdmUsuarios usuario, Short idInstitucion) {
+	protected CenCliente rellenarInsertCenCliente(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO,AdmUsuarios usuario) {
 		CenCliente record = new CenCliente();
 		
 		record.setIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdComponente()));
-		record.setIdinstitucion(idInstitucion);
+		record.setIdinstitucion(Short.valueOf(tarjetaIntegrantesCreateDTO.getIdInstitucionIntegrante()));
 		record.setFechaalta(new Date());
 		record.setCaracter("P");
 		record.setPublicidad(SigaConstants.DB_FALSE);
 		record.setGuiajudicial(SigaConstants.DB_FALSE);
 		record.setComisiones(SigaConstants.DB_FALSE);
-		//record.setIdtratamiento(SigaConstants.DB_TRUE); // 1
+		record.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
+		record.setFechamodificacion(new Date());
+		record.setUsumodificacion(usuario.getIdusuario());
+		record.setIdlenguaje(usuario.getIdlenguaje());
+		record.setExportarfoto(SigaConstants.DB_FALSE);
 		
 		return record;
 	}

@@ -20,6 +20,12 @@ public class TarjetaIntegrantesCreateDTO {
 	private String idComponente;
 	private String idPersonaPadre;
 	private String idPersonaIntegrante;
+	private String idInstitucionIntegrante;
+	private String idTipoColegio;
+	private String idProvincia;
+	private String numColegiado;
+	private String tipo;
+	
 	
 	
 	/**
@@ -242,6 +248,99 @@ public class TarjetaIntegrantesCreateDTO {
 	}
 	
 	
+	/**
+	 *
+	 */
+	public TarjetaIntegrantesCreateDTO idInstitucionIntegrante(String idInstitucionIntegrante){
+		this.idInstitucionIntegrante = idInstitucionIntegrante;
+		return this;
+	}
+	
+	
+	public String getIdInstitucionIntegrante() {
+		return idInstitucionIntegrante;
+	}
+
+	public void setIdInstitucionIntegrante(String idInstitucionIntegrante) {
+		this.idInstitucionIntegrante = idInstitucionIntegrante;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public TarjetaIntegrantesCreateDTO idTipoColegio(String idTipoColegio){
+		this.idTipoColegio = idTipoColegio;
+		return this;
+	}
+	
+	@JsonProperty("idTipoColegio")
+	public String getIdTipoColegio() {
+		return idTipoColegio;
+	}
+
+	public void setIdTipoColegio(String idTipoColegio) {
+		this.idTipoColegio = idTipoColegio;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public TarjetaIntegrantesCreateDTO idProvincia(String idProvincia){
+		this.idProvincia = idProvincia;
+		return this;
+	}
+	
+	@JsonProperty("idProvincia")
+	public String getIdProvincia() {
+		return idProvincia;
+	}
+
+	public void setIdProvincia(String idProvincia) {
+		this.idProvincia = idProvincia;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public TarjetaIntegrantesCreateDTO numColegiado(String numColegiado){
+		this.numColegiado = numColegiado;
+		return this;
+	}
+	
+	
+	
+	@JsonProperty("numColegiado")
+	public String getNumColegiado() {
+		return numColegiado;
+	}
+
+	public void setNumColegiado(String numColegiado) {
+		this.numColegiado = numColegiado;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public TarjetaIntegrantesCreateDTO tipo(String tipo){
+		this.tipo = tipo;
+		return this;
+	}
+	
+	
+	@JsonProperty("tipo")
+	public String getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
+	
+	
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -263,13 +362,19 @@ public class TarjetaIntegrantesCreateDTO {
 				&& Objects.equals(this.apellido1, tarjetaIntegrantesCreateDTO.apellido1)
 				&& Objects.equals(this.apellido2, tarjetaIntegrantesCreateDTO.apellido2)
 				&& Objects.equals(this.nifcif, tarjetaIntegrantesCreateDTO.nifcif)
-				&& Objects.equals(this.tipoIdentificacion, tarjetaIntegrantesCreateDTO.tipoIdentificacion);
+				&& Objects.equals(this.tipoIdentificacion, tarjetaIntegrantesCreateDTO.tipoIdentificacion) 
+				&& Objects.equals(this.idInstitucionIntegrante, tarjetaIntegrantesCreateDTO.idInstitucionIntegrante) 
+				&& Objects.equals(this.idTipoColegio, tarjetaIntegrantesCreateDTO.idTipoColegio) 
+				&& Objects.equals(this.idProvincia, tarjetaIntegrantesCreateDTO.idProvincia)
+				&& Objects.equals(this.numColegiado, tarjetaIntegrantesCreateDTO.numColegiado)
+				&& Objects.equals(this.tipo, tarjetaIntegrantesCreateDTO.tipo);
 
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(fechaCargo, descripcionCargo, cargo, participacionSociedad, idComponente, idPersonaPadre, idPersonaIntegrante, nombre, apellido1, apellido2, nifcif, tipoIdentificacion);
+		return Objects.hash(fechaCargo, descripcionCargo, cargo, participacionSociedad, idComponente, idPersonaPadre, idPersonaIntegrante, nombre, apellido1, apellido2, nifcif, tipoIdentificacion, idInstitucionIntegrante, idTipoColegio, idProvincia,
+				numColegiado, tipo);
 	}
 
 	@Override
@@ -289,6 +394,11 @@ public class TarjetaIntegrantesCreateDTO {
 		sb.append("    apellido2: ").append(toIndentedString(apellido2)).append("\n");
 		sb.append("    nifcif: ").append(toIndentedString(nifcif)).append("\n");
 		sb.append("    tipoIdentificacion: ").append(toIndentedString(tipoIdentificacion)).append("\n");
+		sb.append("    idInstitucionIntegrante: ").append(toIndentedString(idInstitucionIntegrante)).append("\n");
+		sb.append("    idTipoColegio: ").append(toIndentedString(idTipoColegio)).append("\n"); 
+		sb.append("    idProvincia: ").append(toIndentedString(idProvincia)).append("\n");
+		sb.append("    numColegiado: ").append(toIndentedString(numColegiado)).append("\n");
+		sb.append("    tipo: ").append(toIndentedString(tipo)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
