@@ -1136,6 +1136,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						record.setFechacreacion(mandatosUpdateDTO.getFechaUso());
 						record.setOrigen(mandatosUpdateDTO.getDescripcion());
 						record.setEsautomatico(Short.valueOf("1"));
+						record.setUsucreacion(usuario.getIdusuario());
 	
 						// filtrado para sentencia sql
 					
