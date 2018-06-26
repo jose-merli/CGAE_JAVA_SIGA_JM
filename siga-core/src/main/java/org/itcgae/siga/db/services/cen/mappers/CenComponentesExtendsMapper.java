@@ -18,41 +18,36 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface CenComponentesExtendsMapper extends CenComponentesMapper{
-	
+public interface CenComponentesExtendsMapper extends CenComponentesMapper {
+
 	@SelectProvider(type = CenComponentesSqlExtendsProvider.class, method = "selectIntegrantes")
-	@Results({
-		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDCOMPONENTE", property = "idComponente", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "CARGO", property = "cargo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHACARGO", property = "fechaCargo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHABAJACARGO", property = "fechaBajaCargo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPERSONACOMPONENTE", property = "idPersonaComponente", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "SOCIEDAD", property = "sociedad", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "CAPITALSOCIAL", property = "capitalSocial", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHACARGOINFORME", property = "fechaCargoInforme", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "EJERCIENTE", property = "ejerciente", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHA_HISTORICO", property = "fechaHistorico", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NIFCIF", property = "nifCif", jdbcType = JdbcType.VARCHAR),	
-		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),	
-		@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),	
-		@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),	
-		@Result(column = "NOMBRECOMPLETO", property = "nombreCompleto", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDTIPOCOLEGIO", property = "idTipoColegio", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDCARGO", property = "idCargo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPROVINCIA", property = "idProvincia", jdbcType = JdbcType.VARCHAR)
-	})
+	@Results({ @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDCOMPONENTE", property = "idComponente", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CARGO", property = "cargo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHACARGO", property = "fechaCargo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHABAJACARGO", property = "fechaBajaCargo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONACOMPONENTE", property = "idPersonaComponente", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "SOCIEDAD", property = "sociedad", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CAPITALSOCIAL", property = "capitalSocial", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHACARGOINFORME", property = "fechaCargoInforme", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "EJERCIENTE", property = "ejerciente", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHA_HISTORICO", property = "fechaHistorico", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NIFCIF", property = "nifCif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRECOMPLETO", property = "nombreCompleto", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPOCOLEGIO", property = "idTipoColegio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDCARGO", property = "idCargo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPROVINCIA", property = "idProvincia", jdbcType = JdbcType.VARCHAR) })
 	List<DatosIntegrantesItem> selectIntegrantes(DatosIntegrantesSearchDTO integrantes);
 	
 	
 	
 	@UpdateProvider(type = CenComponentesSqlExtendsProvider.class, method = "updateMember")
 	int updateMember(TarjetaIntegrantesUpdateDTO tarjetaIntegrantesUpdateDTO, AdmUsuarios usuario, String idInstitucion);
-	
-	
-	
-
 	
 }

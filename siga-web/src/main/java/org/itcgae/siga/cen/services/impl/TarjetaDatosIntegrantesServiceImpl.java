@@ -297,7 +297,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		record.setPublicidad(SigaConstants.DB_FALSE);
 		record.setGuiajudicial(SigaConstants.DB_FALSE);
 		record.setComisiones(SigaConstants.DB_FALSE);
-		record.setIdtratamiento(SigaConstants.DB_TRUE);
+		//record.setIdtratamiento(SigaConstants.DB_TRUE); // 1
 		
 		return record;
 	}

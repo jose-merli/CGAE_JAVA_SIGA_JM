@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Types;
-import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -1029,7 +1028,6 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						record.setIdcuenta(Short.valueOf(mandatosUpdateDTO.getIdCuenta()));
 						record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));
 						record.setIdinstitucion(Short.valueOf(idInstitucion));
-						record.setFechacreacion(mandatosUpdateDTO.getFechaUso());
 						record.setFirmaFecha(mandatosUpdateDTO.getFirmafecha());
 						record.setFirmaLugar(mandatosUpdateDTO.getFirmaLugar());
 						record.setOrigen(mandatosUpdateDTO.getDescripcion());
@@ -1135,9 +1133,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						record.setIdcuenta(Short.valueOf(mandatosUpdateDTO.getIdCuenta()));
 						record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));
 						record.setIdinstitucion(idInstitucion);
-						record.setFechacreacion(new Date());
-						record.setFirmaFecha(mandatosUpdateDTO.getFirmafecha());
-						record.setFirmaLugar(mandatosUpdateDTO.getFirmaLugar());
+						record.setFechacreacion(mandatosUpdateDTO.getFechaUso());
 						record.setOrigen(mandatosUpdateDTO.getDescripcion());
 						record.setEsautomatico(Short.valueOf("1"));
 	
