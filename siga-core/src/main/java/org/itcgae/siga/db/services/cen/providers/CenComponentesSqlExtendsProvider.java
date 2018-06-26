@@ -1,7 +1,11 @@
 package org.itcgae.siga.db.services.cen.providers;
 
+import java.text.SimpleDateFormat;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenComponentesSqlProvider;
 
 public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
@@ -39,6 +43,43 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.WHERE("COMPONENTE.FECHABAJA is null");
 		}
 		sql.ORDER_BY("COMPONENTE.IDCOMPONENTE");
+		return sql.toString();
+	}
+	
+	public String updateMember(TarjetaIntegrantesUpdateDTO tarjetaIntegrantesUpdateDTO, AdmUsuarios usuario, String idInstitucion) {
+		SQL sql = new SQL();
+		
+ 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		
+		sql.UPDATE("CEN_COMPONENTES");
+		
+ 		if(null != tarjetaIntegrantesUpdateDTO.getFechaCargo()) {
+ 			String fechaC = dateFormat.format(tarjetaIntegrantesUpdateDTO.getFechaCargo());
+			sql.SET("FECHACARGO = '" + fechaC + "'");
+		}
+ 		
+		if(!tarjetaIntegrantesUpdateDTO.getDescripcionCargo().equals("")) {
+			sql.SET("CARGO = '" + tarjetaIntegrantesUpdateDTO.getDescripcionCargo() + "'");
+		}
+	
+		if(!tarjetaIntegrantesUpdateDTO.getCargo().equals("")) {
+			sql.SET("IDCARGO = '" + tarjetaIntegrantesUpdateDTO.getCargo() + "'");
+		}
+		
+		if(!tarjetaIntegrantesUpdateDTO.getParticipacionSociedad().equals("")) {
+			sql.SET("CAPITALSOCIAL = '" + tarjetaIntegrantesUpdateDTO.getParticipacionSociedad() + "'");
+		}
+
+		
+		sql.SET("FECHAMODIFICACION = SYSDATE");
+		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario()+ "'");
+		
+		
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDPERSONA = '" + tarjetaIntegrantesUpdateDTO.getIdPersona() + "'");
+		sql.WHERE("IDCOMPONENTE = '" + tarjetaIntegrantesUpdateDTO.getIdComponente() + "'");
+		
+		
 		return sql.toString();
 	}
 	
