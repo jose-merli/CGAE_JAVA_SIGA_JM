@@ -172,7 +172,7 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 		response.setError(error);
 		boolean cerrojoBorrado = true;
 		boolean cerrojoInsercion = true;
-		int responseBorrado = 0;
+		
 		int responseInsercion = 0;
 
 		// Conseguimos información del usuario logeado
@@ -197,7 +197,7 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 					.andIdpersonaEqualTo(Long.valueOf(idPersona));
 			LOGGER.info(
 					"updateRetenciones() / scsRetencionesirpfMapper.deleteByExample() -> Entrada a scsRetencionesirpfMapper para obtener borrar retenciones asociadas a personas jurídicas");
-			responseBorrado = scsRetencionesirpfMapper.deleteByExample(exampleRetenciones);
+			scsRetencionesirpfMapper.deleteByExample(exampleRetenciones);
 			LOGGER.info(
 					"updateRetenciones() / scsRetencionesirpfMapper.deleteByExample() -> Salida de scsRetencionesirpfMapper para obtener borrar retenciones asociadas a personas jurídicas");
 

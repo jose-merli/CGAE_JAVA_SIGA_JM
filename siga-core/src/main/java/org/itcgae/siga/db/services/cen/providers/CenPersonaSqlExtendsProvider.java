@@ -34,16 +34,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		
 
 		// Pasamos string [] a string -> Para usarse en sentencia sql in(...)
-		String idInstituciones = "";
-		if (busquedaPerFisicaSearchDTO.getIdInstitucion().length > 1) {
-			for (String string : busquedaPerFisicaSearchDTO.getIdInstitucion()) {
-				idInstituciones += string;
-				idInstituciones += ",";
-			}
-			idInstituciones = idInstituciones.substring(0, idInstituciones.length() - 1);
-		} else if (busquedaPerFisicaSearchDTO.getIdInstitucion().length == 1) {
-			idInstituciones = busquedaPerFisicaSearchDTO.getIdInstitucion()[0];
-		}
+		
 		
 		sql.SELECT("PER.IDPERSONA");
 		sql.SELECT("PER.NOMBRE AS DENOMINACION");
@@ -110,6 +101,16 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		}
 		if (null != busquedaPerFisicaSearchDTO.getIdInstitucion()
 				&& busquedaPerFisicaSearchDTO.getIdInstitucion().length > 0) {
+			String idInstituciones = "";
+			if (busquedaPerFisicaSearchDTO.getIdInstitucion().length > 1) {
+				for (String string : busquedaPerFisicaSearchDTO.getIdInstitucion()) {
+					idInstituciones += string;
+					idInstituciones += ",";
+				}
+				idInstituciones = idInstituciones.substring(0, idInstituciones.length() - 1);
+			} else if (busquedaPerFisicaSearchDTO.getIdInstitucion().length == 1) {
+				idInstituciones = busquedaPerFisicaSearchDTO.getIdInstitucion()[0];
+			}
 			sql.WHERE(" I.IDINSTITUCION  IN  (" + idInstituciones + ")");
 		}
 		 
@@ -121,18 +122,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		
 		
 		
-		// Pasamos string [] a string -> Para usarse en sentencia sql in(...)
-		String idInstituciones = "";
-		if(busquedaPerJuridicaSearchDTO.getIdInstitucion().length > 1) {
-			for(String string : busquedaPerJuridicaSearchDTO.getIdInstitucion()) {
-				idInstituciones += string;
-				idInstituciones += ",";
-			}
-			idInstituciones = idInstituciones.substring(0,idInstituciones.length()-1);
-		}
-		else if(busquedaPerJuridicaSearchDTO.getIdInstitucion().length == 1){
-			idInstituciones = busquedaPerJuridicaSearchDTO.getIdInstitucion()[0];
-		}
+
 		
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
@@ -173,6 +163,18 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		
 		if (null != busquedaPerJuridicaSearchDTO.getIdInstitucion()
 				&& busquedaPerJuridicaSearchDTO.getIdInstitucion().length > 0) {
+			// Pasamos string [] a string -> Para usarse en sentencia sql in(...)
+			String idInstituciones = "";
+			if(busquedaPerJuridicaSearchDTO.getIdInstitucion().length > 1) {
+				for(String string : busquedaPerJuridicaSearchDTO.getIdInstitucion()) {
+					idInstituciones += string;
+					idInstituciones += ",";
+				}
+				idInstituciones = idInstituciones.substring(0,idInstituciones.length()-1);
+			}
+			else if(busquedaPerJuridicaSearchDTO.getIdInstitucion().length == 1){
+				idInstituciones = busquedaPerJuridicaSearchDTO.getIdInstitucion()[0];
+			}
 			sql.WHERE("i.idinstitucion in (" + idInstituciones + ")");
 		}
 		sql.WHERE("col.fecha_baja IS NULL");

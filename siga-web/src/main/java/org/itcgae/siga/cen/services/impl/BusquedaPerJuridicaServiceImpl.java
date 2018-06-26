@@ -308,7 +308,6 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		LOGGER.info(

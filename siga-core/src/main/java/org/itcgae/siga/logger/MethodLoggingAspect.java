@@ -137,11 +137,11 @@ public class MethodLoggingAspect {
 	private void postControllerLogging(Logger logger, ProceedingJoinPoint pjp, Object result, long startTime,
 			long finalTime) {
 		try {
-			HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-					.getResponse();
+			//HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+				//	.getResponse();
 			String methodTime = String.format("%.3f", (finalTime - startTime) / 1000000000.0);
 
-			logger.info("{} <--- {} [{}s]", pjp.getSignature().getName(), response.getStatus(), methodTime);
+			logger.info("{} <--- {} [{}s]", pjp.getSignature().getName(),  methodTime);
 
 		} catch (Exception e) {
 			logger.error("Error al llamar al metodo postControllerLogging del aspecto de logado", e);
