@@ -15,7 +15,7 @@ public class MandatosUpdateDTO {
 	private String esquema;
 	private String firmaLugar;
 	private Date fechaUsoDate;
-	private Date firmaFecha;
+	private Date firmaFechaDate;
 	private String descripcion;
 	
 
@@ -139,16 +139,16 @@ public class MandatosUpdateDTO {
 	/**
 	 */
 	public MandatosUpdateDTO firmafecha(Date firmaFecha){
-		this.firmaFecha = firmaFecha;
+		this.firmaFechaDate = firmaFecha;
 		return this;
 	}
 	
-	@JsonProperty("firmaFecha")
+	@JsonProperty("firmaFechaDate")
 	public Date getFirmafecha() {
-		return firmaFecha;
+		return firmaFechaDate;
 	}
 	public void setFirmafecha(Date firmaFecha) {
-		this.firmaFecha = firmaFecha;
+		this.firmaFechaDate = firmaFecha;
 	}
 	
 	/**
@@ -183,12 +183,12 @@ public class MandatosUpdateDTO {
 	    		Objects.equals(this.descripcion, mandatosUpdateDTO.descripcion) &&
 	    		Objects.equals(this.firmaLugar, mandatosUpdateDTO.firmaLugar) &&
 	    		Objects.equals(this.fechaUsoDate, mandatosUpdateDTO.fechaUsoDate) &&
-	    		Objects.equals(this.firmaFecha, mandatosUpdateDTO.firmaFecha) ;
+	    		Objects.equals(this.firmaFechaDate, mandatosUpdateDTO.firmaFechaDate) ;
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona, idMandato,idAnexo, idCuenta,esquema,descripcion,firmaLugar,fechaUsoDate,firmaFecha);
+	    return Objects.hash(idPersona, idMandato,idAnexo, idCuenta,esquema,descripcion,firmaLugar,fechaUsoDate,firmaFechaDate);
 	}
 
 	
@@ -204,7 +204,7 @@ public class MandatosUpdateDTO {
 	    sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
 	    sb.append("    firmaLugar: ").append(toIndentedString(firmaLugar)).append("\n");
 	    sb.append("    fechaUsoDate: ").append(toIndentedString(fechaUsoDate)).append("\n");
-	    sb.append("    firmaFecha: ").append(toIndentedString(firmaFecha)).append("\n");
+	    sb.append("    firmaFechaDate: ").append(toIndentedString(firmaFechaDate)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
