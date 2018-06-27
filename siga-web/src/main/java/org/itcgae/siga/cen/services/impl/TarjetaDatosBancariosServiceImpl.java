@@ -1,5 +1,9 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -8,6 +12,7 @@ import java.sql.SQLTimeoutException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.naming.Context;
@@ -45,19 +50,27 @@ import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenAnexosCuentasbancarias;
+import org.itcgae.siga.db.entities.CenAnexosCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
 import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenMandatosCuentasbancarias;
 import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasExample;
+import org.itcgae.siga.db.entities.GenFichero;
+import org.itcgae.siga.db.entities.GenRecursos;
+import org.itcgae.siga.db.entities.GenRecursosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.CenAnexosCuentasbancariasMapper;
 import org.itcgae.siga.db.mappers.CenMandatosCuentasbancariasMapper;
+import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.GenFicheroExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 
 @Service
@@ -79,6 +92,14 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 	@Autowired
 	private CenAnexosCuentasbancariasMapper cenAnexosCuentasbancariasMapper;
+	
+	
+	@Autowired
+	private GenFicheroExtendsMapper genFicheroExtendsMapper;
+
+	@Autowired
+	private GenRecursosMapper genRecursosMapper;
+	
 
 	@Override
 	public DatosBancariosDTO searchBanksData(int numPagina, DatosBancariosSearchDTO datosBancariosSearchDTO,
@@ -1170,6 +1191,268 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		
 		LOGGER.info("deleteBanksData() -> Salida del servicio para actualizar anexos y mandatos ");
 		return insertResponseDTO;
+	}
+	
+	@Override
+	public UpdateResponseDTO uploadFile(MultipartHttpServletRequest request) throws IOException {
+		LOGGER.info(
+				"uploadFile() -> Entrada al servicio para guardar una fotografía de una persona jurídica");
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();	
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		List<GenRecursos> genRecursos = new ArrayList<GenRecursos>();
+		AdmUsuarios usuario = new AdmUsuarios();
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		
+		String idPersona = request.getParameter("idPersona");
+		String idCuenta = request.getParameter("idCuenta");
+		String idMandato = request.getParameter("idMandato");
+		String idAnexo = request.getParameter("idAnexo");
+		String tipoMandato = request.getParameter("tipoMandato");
+		
+		int responseGenFichero = 0;
+		int responseMandatoOAnexo = 0;
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		// crear path para almacenar el fichero
+		String pathFichero = "/FILERMSA1000/SIGA/ficheros/archivo/" + String.valueOf(idInstitucion) + "/mandatos/";
+		String fileNewName = idPersona + idCuenta + idMandato;
+		
+		if(!idAnexo.equals("")) {
+			fileNewName += idAnexo;
+		}
+		else{
+			fileNewName += tipoMandato;
+		}
+		
+		// 1. Coger archivo del request
+		LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
+		Iterator<String> itr = request.getFileNames();
+		MultipartFile file = request.getFile(itr.next());
+		String fileName = file.getOriginalFilename();
+		String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+		
+		BufferedOutputStream stream = null;
+		// 2. Guardar el archivo
+		LOGGER.debug("uploadFile() -> Guardar el documento de cuenta bancaria");
+		try {
+			File aux = new File(pathFichero);
+			// creo directorio si no existe
+			aux.mkdirs();
+			File serverFile = new File(pathFichero, fileNewName);
+			stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+			stream.write(file.getBytes());
+		} catch (FileNotFoundException e) {
+			LOGGER.error("uploadFile() -> Error al buscar el documento de cuenta bancaria en el directorio indicado", e);
+		} catch (IOException ioe) {
+			LOGGER.error("uploadFile() -> Error al guardar el documento de cuenta bancaria en el directorio indicado",
+					ioe);
+		} finally {
+			// close the stream
+			LOGGER.debug("uploadFile() -> Cierre del stream de la fotografía de la persona jurídica");
+			stream.close();
+		}
+		
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		LOGGER.info(
+				"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info(
+				"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+		
+		if(null != usuarios && usuarios.size() > 0) {
+			// 3. Crear registro en tabla gen_fichero
+			usuario = usuarios.get(0);
+			comboItems = genFicheroExtendsMapper.selectMaxIdFichero();
+			int newIdFichero = 0;
+			if(comboItems.isEmpty()) {
+				newIdFichero = 1;
+			}
+			else {
+				newIdFichero = Integer.valueOf(comboItems.get(0).getValue()) + 1;
+			}
+			
+			GenFichero genFichero = new GenFichero();
+			genFichero.setIdfichero(Long.valueOf(newIdFichero));
+			genFichero.setIdinstitucion(idInstitucion);
+			genFichero.setExtension(extension);
+			genFichero.setFechamodificacion(new Date());
+			genFichero.setUsumodificacion(usuario.getIdusuario());
+			
+			// obtenemos descripcion de gen_recursos
+			GenRecursosExample genRecursosExample = new GenRecursosExample();
+			genRecursosExample.createCriteria().andIdrecursoEqualTo("fichero.mandatos.descripcion");
+			genRecursos = genRecursosMapper.selectByExample(genRecursosExample);
+			
+			genFichero.setDescripcion(genRecursos.get(0).getDescripcion());
+			// unimos el path + nombre del fichero
+			String directorio = pathFichero + newIdFichero;
+			genFichero.setDirectorio(directorio);
+			responseGenFichero = genFicheroExtendsMapper.insertSelective(genFichero);
+			if(responseGenFichero == 1) {
+				
+				// 4. Cambiar idfichero en tabla CEN_MANDATOS_CUENTASBANCARIAS o CEN_ANEXOS_CUENTASBANCARIAS
+				if(!idAnexo.equals("")) {
+					
+					// actualiza CEN_ANEXOS_CUENTASBANCARIAS
+					CenAnexosCuentasbancarias cenAnexosCuentasbancarias = new CenAnexosCuentasbancarias();
+					cenAnexosCuentasbancarias.setIdficherofirma(Long.valueOf(newIdFichero));
+					CenAnexosCuentasbancariasExample cenAnexosCuentasbancariasExample = new CenAnexosCuentasbancariasExample();
+					cenAnexosCuentasbancariasExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(idPersona)).
+					andIdcuentaEqualTo(Short.valueOf(idCuenta)).andIdmandatoEqualTo(Short.valueOf(idMandato)).andIdanexoEqualTo(Short.valueOf(idAnexo));
+					
+					responseMandatoOAnexo = cenAnexosCuentasbancariasMapper.updateByExampleSelective(cenAnexosCuentasbancarias, cenAnexosCuentasbancariasExample);
+					if(responseMandatoOAnexo == 1) {
+						updateResponseDTO.setStatus(SigaConstants.OK);
+					}
+					else {
+						updateResponseDTO.setStatus(SigaConstants.KO);
+					}
+				}
+				else{
+					
+					// actualiza CEN_MANDATOS_CUENTASBANCARIAS
+					
+					CenMandatosCuentasbancarias cenMandatosCuentasbancarias = new CenMandatosCuentasbancarias();
+					cenMandatosCuentasbancarias.setIdficherofirma(Long.valueOf(newIdFichero));
+					CenMandatosCuentasbancariasExample cenMandatosCuentasbancariasExample = new CenMandatosCuentasbancariasExample();
+					cenMandatosCuentasbancariasExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdcuentaEqualTo(Short.valueOf(idPersona)).
+					andIdcuentaEqualTo(Short.valueOf(idCuenta)).andIdmandatoEqualTo(Short.valueOf(idMandato)).andTipomandatoEqualTo(Short.valueOf(tipoMandato));
+					
+					responseMandatoOAnexo = cenMandatosCuentasbancariasMapper.updateByExampleSelective(cenMandatosCuentasbancarias, cenMandatosCuentasbancariasExample);
+					if(responseMandatoOAnexo == 1) {
+						updateResponseDTO.setStatus(SigaConstants.OK);
+					}
+					else {
+						updateResponseDTO.setStatus(SigaConstants.KO);
+					}
+				}
+			}
+			else {
+				updateResponseDTO.setStatus(SigaConstants.KO);
+			}
+			
+			
+		}
+		
+		
+//		// obtener path para almacenar las fotografias
+//		LOGGER.debug("uploadPhotography() -> Obtener path para almacenar las fotografias");
+//		GenPropertiesExample genPropertiesExample = new GenPropertiesExample();
+//		genPropertiesExample.createCriteria().andParametroEqualTo("directorios.carpeta.fotos");
+//		LOGGER.info(
+//				"loadPhotography() / genPropertiesMapper.selectByExample() -> Entrada a genPropertiesMapper para obtener directorio de la fotografía");
+//		List<GenProperties> properties = genPropertiesMapper.selectByExample(genPropertiesExample);
+//		LOGGER.info(
+//				"loadPhotography() / genPropertiesMapper.selectByExample() -> Salida de genPropertiesMapper para obtener directorio de la fotografía");
+//		
+//		if (null != properties && properties.size() > 0) {
+//			String pathImagenes = properties.get(0).getValor() + "/";
+//
+//			// Coger archivo del request
+//			LOGGER.debug("uploadPhotography() -> Coger fotografía del request");
+//			Iterator<String> itr = request.getFileNames();
+//			MultipartFile file = request.getFile(itr.next());
+//			String fileName = file.getOriginalFilename();
+//			String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+//
+//			// comprobar extension de la fotografia
+//			LOGGER.debug("uploadPhotography() -> Comprobar extension de la fotografia");
+//			if (extension == null || extension.trim().equals("")
+//					|| (!extension.trim().toUpperCase().equals(".JPG") && !extension.trim().toUpperCase().equals(".GIF")
+//							&& !extension.trim().toUpperCase().equals(".PNG")
+//							&& !extension.trim().toUpperCase().equals(".JPEG"))) {
+//
+//				try {
+//					throw new SigaExceptions("messages.error.imagen.tipoNoCorrecto");
+//				} catch (SigaExceptions e) {
+//					e.printStackTrace();
+//				}
+//			}
+//
+//			// Crear nombre del archivo a guardar
+//			LOGGER.debug("uploadPhotography() -> Crear nombre de la fotografía a guardar");
+//			CenPersonaExample cenPersonaExample = new CenPersonaExample();
+//			cenPersonaExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona));
+//			LOGGER.info(
+//					"loadPhotography() / cenPersonaExtendsMapper.selectByExample() -> Entrada a cenPersonaExtendsMapper para nifcif de una persona");
+//			List<CenPersona> cenPersonas = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+//			LOGGER.info(
+//					"loadPhotography() / cenPersonaExtendsMapper.selectByExample() -> Salida de cenPersonaExtendsMapper para nifcif de una persona");
+//
+//			if (null != cenPersonas && cenPersonas.size() > 0) {
+//				String nifCif = cenPersonas.get(0).getNifcif();
+//
+//				fileName = nifCif + "_" + fileName;
+//
+//				BufferedOutputStream stream = null;
+//				// Guardar el archivo
+//				LOGGER.debug("uploadPhotography() -> Guardar la fotografía");
+//				try {
+//					File aux = new File(pathImagenes);
+//					// creo directorio si no existe
+//					aux.mkdirs();
+//					File serverFile = new File(pathImagenes, fileName);
+//					stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+//					stream.write(file.getBytes());
+//
+//				} catch (FileNotFoundException e) {
+//					LOGGER.error("uploadPhotography() -> Error al buscar la fotografía de la persona jurídica en el directorio indicado", e);
+//				} catch (IOException ioe) {
+//					LOGGER.error("uploadPhotography() -> Error al guardar la fotografía de la persona jurídica en el directorio indicado",
+//							ioe);
+//				} finally {
+//					// close the stream
+//					LOGGER.debug("uploadPhotography() -> Cierre del stream de la fotografía de la persona jurídica");
+//					stream.close();
+//				}
+//				
+//				
+//				// actualizar nombre de la fotografia en base de datos
+//				LOGGER.debug("uploadPhotography() -> actualizar nombre de la fotografia en base de datos");
+//				CenClienteExample cenClienteExample = new CenClienteExample();
+//				cenClienteExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona));
+//				CenCliente cenCliente = new CenCliente();
+//				cenCliente.setFotografia(fileName);
+//				LOGGER.info(
+//						"loadPhotography() / cenClienteMapper.updateByExample() -> Entrada a cenClienteMapper actualizar el nombre de la fotografía de una persona jurídica");
+//				response = cenClienteMapper.updateByExampleSelective(cenCliente, cenClienteExample);
+//				LOGGER.info(
+//						"loadPhotography() / cenClienteMapper.updateByExample() -> Salida de cenClienteMapper actualizar el nombre de la fotografía de una persona jurídica");
+//				if(response == 1) {
+//					updateResponseDTO.setStatus(SigaConstants.OK);
+//					LOGGER.warn(
+//							"loadPhotography() / cenClienteMapper.updateByExample() -> " + updateResponseDTO.getStatus() + " .Nombre de la fotografía de una persona jurídica actualizado correctamente");
+//	
+//				}
+//				else {
+//					updateResponseDTO.setStatus(SigaConstants.KO);
+//					LOGGER.warn(
+//							"loadPhotography() / cenClienteMapper.updateByExample() -> " + updateResponseDTO.getStatus() + " .No se ha podido actualizar el nombre de la fotografía de una persona jurídica");
+//				}
+//				
+//			}
+//			else {
+//				updateResponseDTO.setStatus(SigaConstants.KO);
+//				LOGGER.warn(
+//						"loadPhotography() / cenPersonaExtendsMapper.selectByExample() -> " + updateResponseDTO.getStatus() + ".No existen ninguna persona con en idPersona:" + idPersona + " indicado");
+//			}
+//
+//		}
+//		else {
+//			updateResponseDTO.setStatus(SigaConstants.KO);
+//			LOGGER.warn(
+//					"loadPhotography() / genPropertiesMapper.selectByExample() -> " + updateResponseDTO.getStatus() + ".No se pudo obtener el directorio de la fotografía");
+//		}
+//		
+//		LOGGER.info(
+//				"uploadPhotography() -> Salida del servicio para guardar una fotografía de una persona jurídica");
+		
+		return updateResponseDTO;
+		
 	}
 
 	

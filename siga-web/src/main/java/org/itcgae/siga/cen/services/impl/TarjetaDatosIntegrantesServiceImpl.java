@@ -22,7 +22,6 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
-import org.itcgae.siga.db.entities.CenComponentes;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargoExtendsMapper;
@@ -56,8 +55,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
-
-
+	
 
 	@Override
 	public DatosIntegrantesDTO searchIntegrantesData(int numPagina, DatosIntegrantesSearchDTO datosIntegrantesSearchDTO,
@@ -371,6 +369,8 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 	}
 	
 	
+	
+	
 	protected CenCliente rellenarInsertCenCliente(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO,AdmUsuarios usuario) {
 		CenCliente record = new CenCliente();
 		
@@ -401,6 +401,9 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		
 		return crearPersonaDTO;
 	}
+
+
+	
 
 	
 	
