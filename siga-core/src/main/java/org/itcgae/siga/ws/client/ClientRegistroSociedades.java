@@ -24,12 +24,11 @@ public class ClientRegistroSociedades {
 	 */
 	protected String uriService;
 	
-	public GetSociedadesPublicadorResponseDocument getListaSociedades(GetSociedadesPublicadorRequestDocument request) {
+	public GetSociedadesPublicadorResponseDocument getListaSociedades(GetSociedadesPublicadorRequestDocument request, String uriService) {
 
 
 	
-		webServiceTemplate.setDefaultUri("https://vmcgaeap003.cloud.es.deloitte.com/sspp-publicacion/ws/PublicadorSociedadesService");
-		uriService = "https://vmcgaeap003.cloud.es.deloitte.com/sspp-publicacion/ws/PublicadorSociedadesService";
+		webServiceTemplate.setDefaultUri(uriService);
 
 		GetSociedadesPublicadorResponseDocument response = 	(GetSociedadesPublicadorResponseDocument) 
 			webServiceTemplate.marshalSendAndReceive(uriService, request);

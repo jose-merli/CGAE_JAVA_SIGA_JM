@@ -26,24 +26,20 @@ public class ClientCENSO {
 	
 	
 	
-	public ColegiadoResponseDocument busquedaColegiadoConIdentificacion(ColegiadoRequestDocument request) throws Exception {
+	public ColegiadoResponseDocument busquedaColegiadoConIdentificacion(ColegiadoRequestDocument request, String uriService) throws Exception {
 
-		webServiceTemplate.setDefaultUri("https://ecomdes.redabogacia.org/eCOM/services/InfoColegiadosService");
-		uriService = "https://ecomdes.redabogacia.org/eCOM/services/InfoColegiadosService";
+		webServiceTemplate.setDefaultUri(uriService);
 		
-
 		ColegiadoResponseDocument response = (ColegiadoResponseDocument) webServiceTemplate
 				.marshalSendAndReceive(uriService, request);
 	
 		return response;
 	}
 	
-	public BusquedaColegiadoResponseDocument busquedaColegiadoSinIdentificacion(BusquedaColegiadoRequestDocument request) throws Exception {
+	public BusquedaColegiadoResponseDocument busquedaColegiadoSinIdentificacion(BusquedaColegiadoRequestDocument request, String uriService) throws Exception {
 
-		webServiceTemplate.setDefaultUri("https://ecomdes.redabogacia.org/eCOM/services/InfoColegiadosService");
-		uriService = "https://ecomdes.redabogacia.org/eCOM/services/InfoColegiadosService";
-		
-
+		webServiceTemplate.setDefaultUri(uriService);
+	
 		BusquedaColegiadoResponseDocument response = (BusquedaColegiadoResponseDocument) webServiceTemplate
 				.marshalSendAndReceive(uriService, request);
 	

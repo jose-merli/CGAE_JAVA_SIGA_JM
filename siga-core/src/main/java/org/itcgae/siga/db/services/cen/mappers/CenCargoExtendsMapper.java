@@ -20,8 +20,8 @@ public interface CenCargoExtendsMapper extends CenCargoMapper{
 	
 	@SelectProvider(type = CenCargoSqlExtendsProvider.class, method = "getCargos")
 	@Results({
-		@Result(column = "IDCARGO", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCARGO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> getCargos(String idLenguaje, String idInstitucion);
 }

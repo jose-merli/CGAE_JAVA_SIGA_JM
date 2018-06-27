@@ -69,4 +69,18 @@ public class InstitucionServiceImpl implements IInstitucionesService {
 		exampleInstitucion.setOrderByClause("ABREVIATURA ASC");
 		return institucionExtend.selectComboInstitucionByExample(exampleInstitucion );
 	}
+	@Override
+	public List<CenInstitucion> getidInstitucionByCodExterno(String codExterno) {
+		CenInstitucionExample example = new CenInstitucionExample();
+		example.createCriteria().andCodigoextEqualTo(codExterno);
+		
+		return institucion.selectByExample(example);
+	}
+	@Override
+	public List<CenInstitucion> getCodExternoByidInstitucion(String idInstitucion) {
+		CenInstitucionExample example = new CenInstitucionExample();
+		example.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+		return institucion.selectByExample(example);
+	}
 }

@@ -1,11 +1,16 @@
 package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaDTO;
@@ -17,8 +22,13 @@ import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IBusquedaPerService;
+import org.itcgae.siga.cen.services.IInstitucionesService;
+import org.itcgae.siga.db.entities.AdmConfig;
+import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -44,6 +54,7 @@ import com.colegiados.info.redabogacia.IdentificacionType;
 import com.colegiados.info.redabogacia.ColegiadoRequestDocument.ColegiadoRequest;
 import com.colegiados.info.redabogacia.ColegiadoResponseDocument.ColegiadoResponse;
 import com.colegiados.info.redabogacia.ColegiadoResponseDocument.ColegiadoResponse.Colegiado;
+import com.colegiados.info.redabogacia.ColegioType;
 
 @Service
 public class BusquedaPerServiceImpl implements IBusquedaPerService {
@@ -61,10 +72,15 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 	
 	@Autowired
 	private ClientRegistroSociedades clienteRegistroSociedades;
+	
+	@Autowired
+	private AdmConfigMapper admConfigMapper;
 
 	@Autowired
 	private ClientCENSO clientCENSO;
 
+	@Autowired
+	private IInstitucionesService institucionesService;
 	
 	@Override
 	public ComboDTO getLabelColegios(HttpServletRequest request) {
@@ -119,7 +135,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				idLenguaje = usuario.getIdlenguaje();
-
+				
 				LOGGER.info(
 						"searchJuridica() / cenPersonaExtendsMapper.searchPerJuridica() -> Entrada a cenNocolegiadoExtendsMapper para búsqueda de personas juridicas por filtro");
 				busquedaJuridicaItems = cenPersonaExtendsMapper.searchPerJuridica(numPagina, busquedaPerJuridicaSearchDTO, idLenguaje);
@@ -128,44 +144,86 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 
 				//Llamamos al WS de Sociedades para buscar personas jurídicas.
 				if (null == busquedaJuridicaItems || busquedaJuridicaItems.size()==0) {
-					GetSociedadesPublicadorRequestDocument requestSociedades = GetSociedadesPublicadorRequestDocument.Factory.newInstance();
+					AdmConfigExample example = new AdmConfigExample();
+					example.createCriteria().andClaveEqualTo("url.ws.sociedades");
+					List<AdmConfig> config = admConfigMapper.selectByExample(example );
 					
-					GetSociedadesPublicadorRequest requestBody = GetSociedadesPublicadorRequest.Factory.newInstance();
-					if (null != busquedaPerJuridicaSearchDTO && null != busquedaPerJuridicaSearchDTO.getNif()) {
-						requestBody.setNIF(busquedaPerJuridicaSearchDTO.getNif());						
-					}
-					if (null != busquedaPerJuridicaSearchDTO && null != busquedaPerJuridicaSearchDTO.getDenominacion()) {
+					if (null != config && config.size()>0) {
+						GetSociedadesPublicadorRequestDocument requestSociedades = GetSociedadesPublicadorRequestDocument.Factory.newInstance();
 						
-						requestBody.setDenominacion(busquedaPerJuridicaSearchDTO.getDenominacion());						
-					}
-					if (null != busquedaPerJuridicaSearchDTO && null != busquedaPerJuridicaSearchDTO.getTipo()) {
-						requestBody.setTipoSociedad(busquedaPerJuridicaSearchDTO.getTipo());						
-					}					
-					if (null != busquedaPerJuridicaSearchDTO.getIdInstitucion() && busquedaPerJuridicaSearchDTO.getIdInstitucion().length>0) {
-						Colegio[] colegios = new Colegio[busquedaPerJuridicaSearchDTO.getIdInstitucion().length];
-						for (int i = 0; i < busquedaPerJuridicaSearchDTO.getIdInstitucion().length; i++) {
-							Colegio colegio = Colegio.Factory.newInstance();
-							colegio.setCodigoColegio(busquedaPerJuridicaSearchDTO.getIdInstitucion()[i]);
+						GetSociedadesPublicadorRequest requestBody = GetSociedadesPublicadorRequest.Factory.newInstance();
+						if (null != busquedaPerJuridicaSearchDTO && null != busquedaPerJuridicaSearchDTO.getNif()) {
+							requestBody.setNIF(busquedaPerJuridicaSearchDTO.getNif());						
+						}
+						if (null != busquedaPerJuridicaSearchDTO && null != busquedaPerJuridicaSearchDTO.getDenominacion()) {
+							
+							requestBody.setDenominacion(busquedaPerJuridicaSearchDTO.getDenominacion());						
+						}
+						if (null != busquedaPerJuridicaSearchDTO && null != busquedaPerJuridicaSearchDTO.getTipo()) {
+							requestBody.setTipoSociedad(busquedaPerJuridicaSearchDTO.getTipo());						
+						}					
+						if (null != busquedaPerJuridicaSearchDTO.getIdInstitucion() && busquedaPerJuridicaSearchDTO.getIdInstitucion().length>0) {
+							Colegio[] colegios = new Colegio[busquedaPerJuridicaSearchDTO.getIdInstitucion().length];
+							for (int i = 0; i < busquedaPerJuridicaSearchDTO.getIdInstitucion().length; i++) {
+								List<CenInstitucion> instituciones = institucionesService.getCodExternoByidInstitucion(busquedaPerJuridicaSearchDTO.getIdInstitucion()[i]);
+								
+								if (null != instituciones && instituciones.size()>0) {
+									Colegio colegio = Colegio.Factory.newInstance();
+									colegio.setCodigoColegio(instituciones.get(0).getCodigoext());
+									colegios[i] = colegio;
+								}
+								
+								
+							}
+							requestBody.setColegioArray(colegios);
 							
 						}
-						requestBody.setColegioArray(colegios);
+						requestBody.setEntidadOrigen("SIGA");
+						requestBody.setNumPagina(Short.valueOf("1"));
+						requestBody.setNumeroPeticion("1");
+						requestBody.setVersionEsquema("1");
+						Calendar fechaDesde = new GregorianCalendar(2000, Calendar.JANUARY, 01, 12, 00, 00);
+						requestBody.setFechaDesde(fechaDesde);
 						
-					}
-					
-					requestSociedades.setGetSociedadesPublicadorRequest(requestBody);
-					GetSociedadesPublicadorResponseDocument registroSociedades = clienteRegistroSociedades.getListaSociedades(requestSociedades);
-					GetSociedadesPublicadorResponse responseSociedades = GetSociedadesPublicadorResponse.Factory.newInstance();
-					responseSociedades = registroSociedades.getGetSociedadesPublicadorResponse();
-					SociedadesColegio[] sociedadesList = responseSociedades.getSociedadesColegioArray();
-					if (null != sociedadesList && sociedadesList.length>0) {
-						for (int i = 0; i < sociedadesList.length; i++) {
-							SociedadesColegio sociedad = SociedadesColegio.Factory.newInstance();
-							BusquedaPerJuridicaItem busquedaJuridica = new BusquedaPerJuridicaItem();
-						//	busquedaJuridica.setNif(sociedad.getRegistroSociedadArray()[0].getSociedadActualizacion().get);
-						//	sociedad.getRegistroSociedadArray()[1
+						Calendar fechaHasta = new GregorianCalendar(2050, Calendar.JANUARY, 01, 12, 00, 00);
+						requestBody.setFechaHasta(fechaHasta);
+						requestSociedades.setGetSociedadesPublicadorRequest(requestBody);
+						
+						GetSociedadesPublicadorResponseDocument registroSociedades = clienteRegistroSociedades.getListaSociedades(requestSociedades,config.get(0).getValor());
+						GetSociedadesPublicadorResponse responseSociedades = GetSociedadesPublicadorResponse.Factory.newInstance();
+						responseSociedades = registroSociedades.getGetSociedadesPublicadorResponse();
+						SociedadesColegio[] sociedadesList = responseSociedades.getSociedadesColegioArray();
+						if (null != sociedadesList && sociedadesList.length>0) {
+							for (int i = 0; i < sociedadesList.length; i++) {
+								BusquedaPerJuridicaItem busquedaJuridica = new BusquedaPerJuridicaItem();
+								if (null != sociedadesList[i].getRegistroSociedadArray() && sociedadesList[i].getRegistroSociedadArray().length>0) {
+									for (int j = 0; j < sociedadesList[i].getRegistroSociedadArray().length; j++) {
+										if (null != sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion()) {
+											busquedaJuridica = new BusquedaPerJuridicaItem();
+											busquedaJuridica.setDenominacion(sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getDatosSociedad().getDenominacion());
+											busquedaJuridica.setNif(sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getDatosSociedad().getCIFNIF());
+											busquedaJuridica.setFechaConstitucion(sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getFechaConstitucion().getTime());
+											busquedaJuridica.setSociedadProfesional("1");
+											if (null != sociedadesList[i].getColegio()) {
+												List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(sociedadesList[i].getColegio().getCodigoColegio());
+												if (null != instituciones && instituciones.size()>0) {
+													busquedaJuridica.setIdInstitucion(instituciones.get(0).getIdinstitucion().toString());
+												}
+											}
+											if (null != sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getIntegranteSociedadArray() 
+													&& sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getIntegranteSociedadArray().length>0) {
+												busquedaJuridica.setNumeroIntegrantes(String.valueOf(sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getIntegranteSociedadArray().length));
+											}
+											busquedaJuridicaItems.add(busquedaJuridica);
+										}
+									}
+								}
+							//	busquedaJuridica.setNif(sociedad.getRegistroSociedadArray()[0].getSociedadActualizacion().get);
+							//	sociedad.getRegistroSociedadArray()[1
+							}
 						}
+						//registroSociedades.getGetSociedadesPublicadorResponse()
 					}
-					//registroSociedades.getGetSociedadesPublicadorResponse()
 				}
 				
 				busquedaPerJuridicaDTO.setBusquedaPerJuridicaItems(busquedaJuridicaItems);
@@ -224,12 +282,102 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				
 				//Si no encontramos registros, buscamos en la aplicación de Censo
 				if (null == busquedaPerFisicaItems || busquedaPerFisicaItems.size() == 0) {
-					if (null != busquedaPerFisicaSearchDTO.getNif()) {
+					if (null != busquedaPerFisicaSearchDTO.getNif()  && !busquedaPerFisicaSearchDTO.getNif().equals("")) {
 						Colegiado colegiado = buscarColegiado(busquedaPerFisicaSearchDTO.getNif());
+						if (null != colegiado) {
+							BusquedaPerFisicaItem busquedaPerFisica = new BusquedaPerFisicaItem();
+							if (null != colegiado.getDatosPersonales().getApellido1()) {
+								busquedaPerFisica.setPrimerApellido(colegiado.getDatosPersonales().getApellido1());
+							}else{
+								busquedaPerFisica.setPrimerApellido("");
+							}
+							if (null != colegiado.getDatosPersonales().getApellido2()) {
+								busquedaPerFisica.setSegundoApellido(colegiado.getDatosPersonales().getApellido2());
+							}else{
+								busquedaPerFisica.setSegundoApellido("");
+							}
+
+							busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido().concat(busquedaPerFisica.getSegundoApellido()));
+							busquedaPerFisica.setNif(colegiado.getDatosPersonales().getIdentificacion().getNIF());
+							busquedaPerFisica.setNombre(colegiado.getDatosPersonales().getNombre());
+							if (null != colegiado.getColegiacionArray() && colegiado.getColegiacionArray().length>0) {
+								if (null != colegiado.getColegiacionArray()[0].getResidente()) {
+									if (colegiado.getColegiacionArray()[0].getResidente().toString().equals("1")) {
+										busquedaPerFisica.setResidente("SI");
+									}else{
+										busquedaPerFisica.setResidente("NO");
+									}
+									
+								}
+								busquedaPerFisica.setNumeroColegiado(colegiado.getColegiacionArray()[0].getNumColegiado());
+								busquedaPerFisica.setSituacion(colegiado.getColegiacionArray()[0].getSituacion().getSituacionEjerProfesional().toString());
+								if (null != colegiado.getColegiacionArray()[0].getColegio()) {
+									List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiado.getColegiacionArray()[0].getColegio().getCodigoColegio());
+									if (null != instituciones && instituciones.size()>0) {
+										busquedaPerFisica.setColegio(instituciones.get(0).getIdinstitucion().toString());
+									}
+								}
+							}
+							busquedaPerFisicaItems.add(busquedaPerFisica);
+						}
 					}		
 					else {
 						com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado[] colegiado = buscarColegiadoSinDocumentacion(busquedaPerFisicaSearchDTO);
+						if (null != colegiado && colegiado.length>0) {
+							//validamos si nos viene filtro por institucion
+							if (null != busquedaPerFisicaSearchDTO.getIdInstitucion() && busquedaPerFisicaSearchDTO.getIdInstitucion().length>0) {
+								List<String> idInstituciones = new ArrayList<String>();
+								for (int i = 0; i < busquedaPerFisicaSearchDTO.getIdInstitucion().length; i++) {
+									List<CenInstitucion> instituciones = institucionesService.getCodExternoByidInstitucion(busquedaPerFisicaSearchDTO.getIdInstitucion()[i]);
+									
+									if (null != instituciones && instituciones.size()>0) {
+										idInstituciones.add(instituciones.get(0).getCodigoext());
+									}
+								}
+								
+							}
+							for (int i = 0; i < colegiado.length; i++) {
+
+								BusquedaPerFisicaItem busquedaPerFisica = new BusquedaPerFisicaItem();
+								if (null != colegiado[i].getDatosPersonales().getApellido1()) {
+									busquedaPerFisica.setPrimerApellido(colegiado[i].getDatosPersonales().getApellido1());
+								}else{
+									busquedaPerFisica.setPrimerApellido("");
+								}
+								if (null != colegiado[i].getDatosPersonales().getApellido2()) {
+									busquedaPerFisica.setSegundoApellido(colegiado[i].getDatosPersonales().getApellido2());
+								}else{
+									busquedaPerFisica.setSegundoApellido("");
+								}
+
+								busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido().concat(busquedaPerFisica.getSegundoApellido()));
+								busquedaPerFisica.setNif(colegiado[i].getDatosPersonales().getIdentificacion().getNIF());
+								busquedaPerFisica.setNombre(colegiado[i].getDatosPersonales().getNombre());
+								if (null != colegiado[i].getColegiacionArray() && colegiado[i].getColegiacionArray().length>0) {
+									if (null != colegiado[i].getColegiacionArray()[0].getResidente()) {
+										if (colegiado[i].getColegiacionArray()[0].getResidente().toString().equals("1")) {
+											busquedaPerFisica.setResidente("SI");
+										}else{
+											busquedaPerFisica.setResidente("NO");
+										}
+										
+									}
+									busquedaPerFisica.setNumeroColegiado(colegiado[i].getColegiacionArray()[0].getNumColegiado());
+									busquedaPerFisica.setSituacion(colegiado[i].getColegiacionArray()[0].getSituacion().getSituacionEjerProfesional().toString());
+									if (null != colegiado[i].getColegiacionArray()[0].getColegio()) {
+										List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiado[i].getColegiacionArray()[0].getColegio().getCodigoColegio());
+										if (null != instituciones && instituciones.size()>0) {
+											busquedaPerFisica.setColegio(instituciones.get(0).getIdinstitucion().toString());
+										}
+									}
+								}
+								busquedaPerFisicaItems.add(busquedaPerFisica);
+									
+								
+							}
+						}
 					}
+					
 				
 				}
 			} else {
@@ -252,23 +400,34 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 		com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado[] colegiado = null;
 		
 		try {
+			AdmConfigExample example = new AdmConfigExample();
+			example.createCriteria().andClaveEqualTo("url.ws.censo");
+			List<AdmConfig> config = admConfigMapper.selectByExample(example );
 			
-			BusquedaColegiadoRequest colegiadoRequest = BusquedaColegiadoRequest.Factory.newInstance();
-			colegiadoRequest.setNombre(busquedaPerFisicaSearchDTO.getNombre());
-			colegiadoRequest.setApellido1(busquedaPerFisicaSearchDTO.getPrimerApellido());
-			colegiadoRequest.setApellido2(busquedaPerFisicaSearchDTO.getSegundoApellido());
-			if (null != busquedaPerFisicaSearchDTO.getNumColegiado()  ) {
+			if (null != config && config.size()>0) {
+				BusquedaColegiadoRequest colegiadoRequest = BusquedaColegiadoRequest.Factory.newInstance();
+				colegiadoRequest.setNombre(busquedaPerFisicaSearchDTO.getNombre());
+				colegiadoRequest.setApellido1(busquedaPerFisicaSearchDTO.getPrimerApellido());
+				colegiadoRequest.setApellido2(busquedaPerFisicaSearchDTO.getSegundoApellido());
+				
 				com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest.Colegiado colegiadoSearch =com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest.Colegiado.Factory.newInstance();
-				colegiadoSearch.setNumColegiado(busquedaPerFisicaSearchDTO.getNumColegiado());
-				colegiadoRequest.setColegiado(colegiadoSearch);
+				if (null != busquedaPerFisicaSearchDTO.getNumColegiado()  && null != busquedaPerFisicaSearchDTO.getIdInstitucion()) {
+					colegiadoSearch.setNumColegiado(busquedaPerFisicaSearchDTO.getNumColegiado());
+					ColegioType colegio = ColegioType.Factory.newInstance();
+					List<CenInstitucion> instituciones = institucionesService.getCodExternoByidInstitucion(busquedaPerFisicaSearchDTO.getIdInstitucion()[0]);
+					colegio.setCodigoColegio(instituciones.get(0).getCodigoext());
+					colegiadoSearch.setColegio(colegio );
+					colegiadoRequest.setColegiado(colegiadoSearch);
+				}
+
+				BusquedaColegiadoRequestDocument colegiadoRequestDocument = BusquedaColegiadoRequestDocument.Factory.newInstance();
+				colegiadoRequestDocument.setBusquedaColegiadoRequest(colegiadoRequest);
+				BusquedaColegiadoResponseDocument busquedaColegiadoResponseDocument = null;
+
+				busquedaColegiadoResponseDocument = clientCENSO.busquedaColegiadoSinIdentificacion(colegiadoRequestDocument,config.get(0).getValor());
+				BusquedaColegiadoResponse colegiadoResponse = busquedaColegiadoResponseDocument.getBusquedaColegiadoResponse();
+				colegiado = colegiadoResponse.getColegiadoArray();
 			}
-			BusquedaColegiadoRequestDocument colegiadoRequestDocument = BusquedaColegiadoRequestDocument.Factory.newInstance();
-			colegiadoRequestDocument.setBusquedaColegiadoRequest(colegiadoRequest);
-			BusquedaColegiadoResponseDocument busquedaColegiadoResponseDocument = null;
-		
-			busquedaColegiadoResponseDocument = clientCENSO.busquedaColegiadoSinIdentificacion(colegiadoRequestDocument);
-			BusquedaColegiadoResponse colegiadoResponse = busquedaColegiadoResponseDocument.getBusquedaColegiadoResponse();
-			colegiado = colegiadoResponse.getColegiadoArray();
 			
 		} catch (Exception e){
 			LOGGER.error("Error en la llamada a busqueda de colegiados.", e);
@@ -282,26 +441,30 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 		Colegiado colegiado = null;
 		
 		try {
+			AdmConfigExample example = new AdmConfigExample();
+			example.createCriteria().andClaveEqualTo("url.ws.censo");
+			List<AdmConfig> config = admConfigMapper.selectByExample(example );
 			
-			ColegiadoRequest colegiadoRequest = ColegiadoRequest.Factory.newInstance();
-			String tipo = isNifNie(documento);
-			// Rellenamos la peticion
-			IdentificacionType identificacion = IdentificacionType.Factory.newInstance();
-			if(tipo.equals("NIF")){
-				identificacion.setNIF(documento);
-			}else if(tipo.equals("NIE")){
-				identificacion.setNIE(documento);
+			if (null != config && config.size()>0) {
+				ColegiadoRequest colegiadoRequest = ColegiadoRequest.Factory.newInstance();
+				String tipo = isNifNie(documento);
+				// Rellenamos la peticion
+				IdentificacionType identificacion = IdentificacionType.Factory.newInstance();
+				if(tipo.equals("NIF")){
+					identificacion.setNIF(documento);
+				}else if(tipo.equals("NIE")){
+					identificacion.setNIE(documento);
+				}
+				colegiadoRequest.setIdentificacion(identificacion);
+				
+				ColegiadoRequestDocument colegiadoRequestDocument = ColegiadoRequestDocument.Factory.newInstance();
+				colegiadoRequestDocument.setColegiadoRequest(colegiadoRequest);
+				ColegiadoResponseDocument colegiadoResponseDocument = null;
+			
+				colegiadoResponseDocument = clientCENSO.busquedaColegiadoConIdentificacion(colegiadoRequestDocument,config.get(0).getValor());
+				ColegiadoResponse colegiadoResponse = colegiadoResponseDocument.getColegiadoResponse();
+				colegiado = colegiadoResponse.getColegiado();
 			}
-			colegiadoRequest.setIdentificacion(identificacion);
-			
-			ColegiadoRequestDocument colegiadoRequestDocument = ColegiadoRequestDocument.Factory.newInstance();
-			colegiadoRequestDocument.setColegiadoRequest(colegiadoRequest);
-			ColegiadoResponseDocument colegiadoResponseDocument = null;
-		
-			colegiadoResponseDocument = clientCENSO.busquedaColegiadoConIdentificacion(colegiadoRequestDocument);
-			ColegiadoResponse colegiadoResponse = colegiadoResponseDocument.getColegiadoResponse();
-			colegiado = colegiadoResponse.getColegiado();
-			
 		} catch (Exception e){
 			LOGGER.error("Error en la llamada a busqueda de colegiados.", e);
 		}

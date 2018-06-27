@@ -10,11 +10,11 @@ public class CenCargoSqlExtendsProvider extends CenCargoSqlProvider{
 		
 		sql.SELECT_DISTINCT("CAR.IDCARGO");
 		sql.SELECT_DISTINCT("REC.DESCRIPCION");
-		sql.FROM("CEN_CARGO");
+		sql.FROM("CEN_CARGO CAR");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON CAR.DESCRIPCION = REC.IDRECURSO");
 		sql.WHERE("CAR.FECHA_BAJA IS NULL");
-		sql.WHERE("REC.IDLENGUAJE = '");
-		sql.WHERE("REC.IDINSTITUCION = '");
+		sql.WHERE("REC.IDLENGUAJE = '" +idLenguaje + "'");
+		 
 		sql.ORDER_BY("REC.DESCRIPCION");
 		
 		return sql.toString();

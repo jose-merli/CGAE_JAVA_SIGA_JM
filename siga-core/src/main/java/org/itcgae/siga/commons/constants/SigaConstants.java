@@ -13,4 +13,7 @@ public class SigaConstants {
 	public static String OK = "OK";
 	public static String KO = "KO";
 	public static String InstitucionGeneral = "2000";
+	
+	public static String DB_FALSE = "0";
+	public static String DB_TRUE = "1";
 }

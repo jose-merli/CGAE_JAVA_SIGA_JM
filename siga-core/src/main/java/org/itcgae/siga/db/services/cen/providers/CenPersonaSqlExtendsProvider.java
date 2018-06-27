@@ -104,12 +104,12 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 			String idInstituciones = "";
 			if (busquedaPerFisicaSearchDTO.getIdInstitucion().length > 1) {
 				for (String string : busquedaPerFisicaSearchDTO.getIdInstitucion()) {
-					idInstituciones += string;
+					idInstituciones += "'"+string+"'";
 					idInstituciones += ",";
 				}
 				idInstituciones = idInstituciones.substring(0, idInstituciones.length() - 1);
 			} else if (busquedaPerFisicaSearchDTO.getIdInstitucion().length == 1) {
-				idInstituciones = busquedaPerFisicaSearchDTO.getIdInstitucion()[0];
+				idInstituciones = "'"+busquedaPerFisicaSearchDTO.getIdInstitucion()[0]+"'";
 			}
 			sql.WHERE(" I.IDINSTITUCION  IN  (" + idInstituciones + ")");
 		}
@@ -167,13 +167,13 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 			String idInstituciones = "";
 			if(busquedaPerJuridicaSearchDTO.getIdInstitucion().length > 1) {
 				for(String string : busquedaPerJuridicaSearchDTO.getIdInstitucion()) {
-					idInstituciones += string;
+					idInstituciones += "'"+string+"'";
 					idInstituciones += ",";
 				}
 				idInstituciones = idInstituciones.substring(0,idInstituciones.length()-1);
 			}
 			else if(busquedaPerJuridicaSearchDTO.getIdInstitucion().length == 1){
-				idInstituciones = busquedaPerJuridicaSearchDTO.getIdInstitucion()[0];
+				idInstituciones = "'"+busquedaPerJuridicaSearchDTO.getIdInstitucion()[0]+"'";
 			}
 			sql.WHERE("i.idinstitucion in (" + idInstituciones + ")");
 		}

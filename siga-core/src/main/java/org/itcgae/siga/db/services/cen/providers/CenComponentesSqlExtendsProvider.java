@@ -1,7 +1,12 @@
 package org.itcgae.siga.db.services.cen.providers;
 
+import java.text.SimpleDateFormat;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
+import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenComponentesSqlProvider;
 
 public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
@@ -43,4 +48,108 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		return sql.toString();
 	}
 	
+	public String updateMember(TarjetaIntegrantesUpdateDTO tarjetaIntegrantesUpdateDTO, AdmUsuarios usuario, String idInstitucion) {
+		SQL sql = new SQL();
+		
+ 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		
+		sql.UPDATE("CEN_COMPONENTES");
+		
+ 		if(null != tarjetaIntegrantesUpdateDTO.getFechaCargo()) {
+ 			String fechaC = dateFormat.format(tarjetaIntegrantesUpdateDTO.getFechaCargo());
+			sql.SET("FECHACARGO = '" + fechaC + "'");
+		}
+ 		
+		if(!tarjetaIntegrantesUpdateDTO.getDescripcionCargo().equals("")) {
+			sql.SET("CARGO = '" + tarjetaIntegrantesUpdateDTO.getDescripcionCargo() + "'");
+		}
+	
+		if(!tarjetaIntegrantesUpdateDTO.getCargo().equals("")) {
+			sql.SET("IDCARGO = '" + tarjetaIntegrantesUpdateDTO.getCargo() + "'");
+		}
+		
+		if(!tarjetaIntegrantesUpdateDTO.getParticipacionSociedad().equals("")) {
+			sql.SET("CAPITALSOCIAL = '" + tarjetaIntegrantesUpdateDTO.getParticipacionSociedad() + "'");
+		}
+
+		
+		sql.SET("FECHAMODIFICACION = SYSDATE");
+		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario()+ "'");
+		
+		
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDPERSONA = '" + tarjetaIntegrantesUpdateDTO.getIdPersona() + "'");
+		sql.WHERE("IDCOMPONENTE = '" + tarjetaIntegrantesUpdateDTO.getIdComponente() + "'");
+		
+		
+		return sql.toString();
+	}
+	
+	
+	
+	public String insertSelectiveForcreateMember(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO,AdmUsuarios usuario, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		
+		sql.INSERT_INTO("CEN_COMPONENTES");
+		
+		sql.VALUES("IDINSTITUCION", "'" + idInstitucion  +"'");
+		sql.VALUES("IDPERSONA", "'" + tarjetaIntegrantesCreateDTO.getIdPersonaPadre() + "'");
+		sql.VALUES("IDCOMPONENTE", "'" + tarjetaIntegrantesCreateDTO.getIdComponente() + "'");
+		
+		if(!tarjetaIntegrantesCreateDTO.getCargo().equals("")) {
+			sql.VALUES("CARGO", "'" + tarjetaIntegrantesCreateDTO.getDescripcionCargo() + "'");
+		}
+		
+		
+		if(null != tarjetaIntegrantesCreateDTO.getFechaCargo()) {
+			String fechaC = dateFormat.format(tarjetaIntegrantesCreateDTO.getDescripcionCargo());
+			sql.VALUES("FECHACARGO", "'" + fechaC + "'");
+		}
+		
+		
+		sql.VALUES("CEN_CLIENTE_IDPERSONA", "'" + tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante() + "'");
+		sql.VALUES("CEN_CLIENTE_IDINSTITUCION", "'" + tarjetaIntegrantesCreateDTO.getIdInstitucionIntegrante() + "'");
+		sql.VALUES("SOCIEDAD", "'0'");
+		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		sql.VALUES("USUMODIFICACION", "'" + usuario.getIdusuario()+ "'");
+		
+		if(!tarjetaIntegrantesCreateDTO.getIdTipoColegio().equals("")) {
+			sql.VALUES("IDTIPOCOLEGIO", "'" + tarjetaIntegrantesCreateDTO.getIdTipoColegio() + "'");
+		}
+		
+		if(!tarjetaIntegrantesCreateDTO.getIdProvincia().equals("")) {
+			sql.VALUES("IDPROVINCIA", "'" + tarjetaIntegrantesCreateDTO.getIdProvincia() + "'");
+		}
+		
+		if(!tarjetaIntegrantesCreateDTO.getNumColegiado().equals("")) {
+			sql.VALUES("NUMCOLEGIADO", "'" + tarjetaIntegrantesCreateDTO.getNumColegiado() + "'");
+		}
+		
+		if(!tarjetaIntegrantesCreateDTO.getParticipacionSociedad().equals("")) {
+			sql.VALUES("CAPITALSOCIAL", "'" + tarjetaIntegrantesCreateDTO.getParticipacionSociedad() + "'");
+		}
+		
+		if(!tarjetaIntegrantesCreateDTO.getCargo().equals("")) {
+			sql.VALUES("IDCARGO", "'" + tarjetaIntegrantesCreateDTO.getCargo() + "'");
+		}
+		
+		
+		
+		sql.VALUES("FECHABAJA", "null");
+		
+		return sql.toString();
+	}
+	
+	
+	public String selectMaxIDComponente(String idPersonaPadre, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("MAX(IDCOMPONENTE) AS IDCOMPONENTE");
+		sql.FROM("CEN_COMPONENTES");
+		sql.WHERE("IDPERSONA = '" + idPersonaPadre + "'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		return sql.toString();
+	}
 }

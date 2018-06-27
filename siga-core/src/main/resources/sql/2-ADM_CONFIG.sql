@@ -36,5 +36,7 @@ Insert into ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_RE
 Insert into ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values (SEQ_ADM_CONFIG.nextval,'log4j.siga.web.bck.number','5','Número de ficheros de logs almacenados',null,'0');
 Insert into ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values (SEQ_ADM_CONFIG.nextval,'log4j.siga.web.max.size','50mb','Tamaño máximo del fichero de log',null,'0');
 Insert into ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values (SEQ_ADM_CONFIG.nextval,'log4j.siga.web.nivel','DEBUG','Nivel de trazas del fichero de log',null,'0');
+Insert into ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values (SEQ_ADM_CONFIG.nextval,'url.ws.sociedades','https://vmcgaeap003.cloud.es.deloitte.com/sspp-publicacion/ws/PublicadorSociedadesService',null,'0');
+Insert into ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values (SEQ_ADM_CONFIG.nextval,'url.ws.censo','https://ecomdemo.redabogacia.org/eCOM/services/InfoColegiadosService','Url de acceso a los WS de Censo',null,'0');
 
 commit;
