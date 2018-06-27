@@ -116,6 +116,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 			sql.WHERE("upper(consulta.NOMBRESINTEGRANTES) like upper('%"+ busquedaJuridicaSearchDTO.getIntegrante() + "%')");
 		}
 		
+		if(null != busquedaJuridicaSearchDTO.getAbreviatura() && !busquedaJuridicaSearchDTO.getAbreviatura().equalsIgnoreCase("")) {
+			sql.WHERE("upper(consulta.ABREVIATURA) like upper('%"+ busquedaJuridicaSearchDTO.getAbreviatura() + "%')");
+		}
+		
 		return sql.toString();
 	}
 	
