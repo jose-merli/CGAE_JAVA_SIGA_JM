@@ -20,6 +20,7 @@ import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDTO;
 import org.itcgae.siga.DTOs.cen.MandatosUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface ITarjetaDatosBancariosService {
 
@@ -47,6 +48,8 @@ public interface ITarjetaDatosBancariosService {
 	public UpdateResponseDTO updateAnexos(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request);
 
 	public InsertResponseDTO InsertAnexos(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request);
+	
+	public UpdateResponseDTO uploadFile(MultipartHttpServletRequest request) throws IOException;
 
 
 

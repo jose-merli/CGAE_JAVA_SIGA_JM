@@ -3,6 +3,7 @@ package org.itcgae.siga.DTOs.cen;
 import java.util.Date;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
@@ -11,10 +12,12 @@ public class BusquedaJuridicaSearchDTO {
 	private String tipo;
 	private String nif;
 	private String denominacion;
+	//@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaConstitucion;
 	private String integrante;
 	private String [] grupos;
 	private boolean sociedadesProfesionales;
+	private String abreviatura;
 	
 
 	/**
@@ -24,8 +27,7 @@ public class BusquedaJuridicaSearchDTO {
 		this.tipo = tipo;
 		return this;
 	}
-	
-	
+
 	@JsonProperty("tipo")
 	public String getTipo() {
 		return tipo;
@@ -158,6 +160,24 @@ public class BusquedaJuridicaSearchDTO {
 		this.sociedadesProfesionales = sociedadesProfesionales;
 	}
 	
+	/**
+	 *
+	 */
+	public BusquedaJuridicaSearchDTO abreviatura(String abreviatura){
+		this.abreviatura = abreviatura;
+		return this;
+	}
+	
+	@JsonProperty("abreviatura")
+	public String getAbreviatura() {
+		return abreviatura;
+	}
+
+
+	public void setAbreviatura(String abreviatura) {
+		this.abreviatura = abreviatura;
+	}
+
 	
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -174,12 +194,14 @@ public class BusquedaJuridicaSearchDTO {
 	    		Objects.equals(this.fechaConstitucion, busquedaJuridicaSearchDTO.fechaConstitucion) &&
 	    		Objects.equals(this.integrante, busquedaJuridicaSearchDTO.integrante) &&
 	    		Objects.equals(this.grupos, busquedaJuridicaSearchDTO.grupos) &&
-	    		Objects.equals(this.sociedadesProfesionales, busquedaJuridicaSearchDTO.sociedadesProfesionales);
+	    		Objects.equals(this.sociedadesProfesionales, busquedaJuridicaSearchDTO.sociedadesProfesionales) &&
+		Objects.equals(this.abreviatura, busquedaJuridicaSearchDTO.abreviatura);
+
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(tipo, nif, denominacion, fechaConstitucion, integrante, grupos, sociedadesProfesionales);
+	    return Objects.hash(tipo, nif, denominacion, fechaConstitucion, integrante, grupos, sociedadesProfesionales, abreviatura);
 	}
 
 	
@@ -195,6 +217,7 @@ public class BusquedaJuridicaSearchDTO {
 	    sb.append("    integrante: ").append(toIndentedString(integrante)).append("\n");
 	    sb.append("    grupos: ").append(toIndentedString(grupos)).append("\n");
 	    sb.append("    sociedadesProfesionales: ").append(toIndentedString(sociedadesProfesionales)).append("\n");
+	    sb.append("    abreviatura: ").append(toIndentedString(abreviatura)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}

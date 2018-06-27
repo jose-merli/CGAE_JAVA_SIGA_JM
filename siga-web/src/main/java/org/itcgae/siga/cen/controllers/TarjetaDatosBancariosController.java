@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 public class TarjetaDatosBancariosController {
@@ -129,5 +130,14 @@ public class TarjetaDatosBancariosController {
 		if(response.getStatus().equals(SigaConstants.OK))
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	
+	@RequestMapping(value = "busquedaPerJuridica/uploadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<UpdateResponseDTO> uploadFile(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
+		UpdateResponseDTO response = tarjetaDatosBancariosService.uploadFile(request);
+		if (response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 }
