@@ -104,7 +104,15 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('FactSJCS.mantRetencionesJ.literal.tramoLec','Retención#GL','0','4',to_date('12/02/09','DD/MM/RR'),'0','15');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('FactSJCS.mantRetencionesJ.literal.tramoLec','Retención','0','1',to_date('12/02/09','DD/MM/RR'),'0','15');
 
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('facturacion.consultamorosos.literal.comunicaciones','Comunicaciones','0','1',to_date('08/09/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('facturacion.consultamorosos.literal.comunicaciones','Comunicaciones#GL','0','4',to_date('08/09/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('facturacion.consultamorosos.literal.comunicaciones','Comunicacions','0','2',to_date('08/09/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('facturacion.consultamorosos.literal.comunicaciones','Comunicaciones#EU','0','3',to_date('08/09/08','DD/MM/RR'),'0','19');
 
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('facturacion.tarjetas.literal.serviciosInteres','Servicios de interés','0','1',to_date('08/09/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('facturacion.tarjetas.literal.serviciosInteres','Servicios de interés#GL','0','4',to_date('08/09/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('facturacion.tarjetas.literal.serviciosInteres','Serveis d''interès','0','2',to_date('08/09/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('facturacion.tarjetas.literal.serviciosInteres','Servicios de interés#EU','0','3',to_date('08/09/08','DD/MM/RR'),'0','19');
 
 
 commit;
