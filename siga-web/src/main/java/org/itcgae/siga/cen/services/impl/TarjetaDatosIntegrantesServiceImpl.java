@@ -22,10 +22,12 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
+import org.itcgae.siga.db.entities.CenComponentes;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenProvinciasExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -55,7 +57,9 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
-	
+
+	@Autowired
+	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
 
 	@Override
 	public DatosIntegrantesDTO searchIntegrantesData(int numPagina, DatosIntegrantesSearchDTO datosIntegrantesSearchDTO,
@@ -369,7 +373,67 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		return updateResponseDTO;
 	}
 	
-	
+	@Override
+	public UpdateResponseDTO deleteMember(TarjetaIntegrantesUpdateDTO[] tarjetaIntegrantesUpdateDTO,
+			HttpServletRequest request) {
+		
+		LOGGER.info("updateMember() -> Entrada al servicio para actualizar información de integrantes");
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+		int response = 0;
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		LOGGER.info(
+				"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info(
+				"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+		if (null != usuarios && usuarios.size() > 0) {
+			usuario = usuarios.get(0);
+			for (int i = 0; i < tarjetaIntegrantesUpdateDTO.length; i++) {
+				LOGGER.info(
+						"getCargos() / cenComponentesExtendsMapper.updateMember() -> Entrada a cenComponentesExtendsMapper para actualizar datos de un integrante");
+				CenComponentes recordUpdate = new CenComponentes();
+				recordUpdate.setFechabaja(new Date());
+				recordUpdate.setFechamodificacion(new Date());
+				recordUpdate.setUsumodificacion(usuario.getIdusuario());
+				recordUpdate.setIdcomponente(Short.valueOf(tarjetaIntegrantesUpdateDTO[i].getIdComponente()));
+				recordUpdate.setIdinstitucion(idInstitucion);
+				recordUpdate.setIdcomponente(Short.valueOf(tarjetaIntegrantesUpdateDTO[i].getIdComponente()));
+				response = cenComponentesExtendsMapper.updateByPrimaryKeySelective(recordUpdate );
+				
+				LOGGER.info(
+						"getCargos() / cenComponentesExtendsMapper.updateMember() -> Salida de cenComponentesExtendsMapper para actualizar datos de un integrante");
+				
+				updateResponseDTO.setStatus(SigaConstants.OK);
+				if(response == 0) {
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.warn(
+							"getCargos() / cenComponentesExtendsMapper.updateMember() -> " + updateResponseDTO.getStatus() + ". No se pudo actualizar datos de un integrantes");
+					
+				}
+			}
+			
+		}
+		else {
+			updateResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.warn(
+					"getCargos() / admUsuariosExtendsMapper.selectByExample() -> " + updateResponseDTO.getStatus() + ". No existen ningún usuario en base de datos");
+		}
+		
+		
+		
+		LOGGER.info("updateMember() -> Salida del servicio para actualizar información de integrantes");
+		return updateResponseDTO;
+	}
 	
 	
 	protected CenCliente rellenarInsertCenCliente(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO,AdmUsuarios usuario) {

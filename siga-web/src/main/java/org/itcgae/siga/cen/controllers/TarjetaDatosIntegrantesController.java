@@ -77,6 +77,14 @@ public class TarjetaDatosIntegrantesController {
 	}
 	
 	
+	@RequestMapping(value = "tarjetaIntegrantes/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> deleteMember(@RequestBody TarjetaIntegrantesUpdateDTO[] tarjetaIntegrantesUpdateDTO, HttpServletRequest request) { 
+		UpdateResponseDTO response = tarjetaDatosIntegrantesService.deleteMember(tarjetaIntegrantesUpdateDTO, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
 	
 	
 	
