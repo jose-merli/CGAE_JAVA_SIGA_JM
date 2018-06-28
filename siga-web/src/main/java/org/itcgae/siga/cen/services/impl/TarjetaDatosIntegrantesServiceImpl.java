@@ -374,8 +374,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 	}
 	
 	@Override
-	public UpdateResponseDTO deleteMember(TarjetaIntegrantesUpdateDTO[] tarjetaIntegrantesUpdateDTO,
-			HttpServletRequest request) {
+	public UpdateResponseDTO deleteMember(TarjetaIntegrantesUpdateDTO[] tarjetaIntegrantesUpdateDTO, HttpServletRequest request) {
 		
 		LOGGER.info("updateMember() -> Entrada al servicio para actualizar información de integrantes");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -407,7 +406,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 				recordUpdate.setUsumodificacion(usuario.getIdusuario());
 				recordUpdate.setIdcomponente(Short.valueOf(tarjetaIntegrantesUpdateDTO[i].getIdComponente()));
 				recordUpdate.setIdinstitucion(idInstitucion);
-				recordUpdate.setIdcomponente(Short.valueOf(tarjetaIntegrantesUpdateDTO[i].getIdComponente()));
+				recordUpdate.setIdpersona(Long.valueOf(tarjetaIntegrantesUpdateDTO[i].getIdPersona()));
 				response = cenComponentesExtendsMapper.updateByPrimaryKeySelective(recordUpdate );
 				
 				LOGGER.info(
