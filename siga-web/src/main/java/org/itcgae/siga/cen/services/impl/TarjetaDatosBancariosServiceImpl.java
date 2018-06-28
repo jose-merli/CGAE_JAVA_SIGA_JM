@@ -1218,14 +1218,18 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		// crear path para almacenar el fichero
-		String pathFichero = "/FILERMSA1000/SIGA/ficheros/archivo/" + String.valueOf(idInstitucion) + "/mandatos/";
+//		String pathFichero = "/FILERMSA1000/SIGA/ficheros/archivo/" + String.valueOf(idInstitucion) + "/mandatos/";
+		String pathFichero = "C://IISIGA/anexos";
 		String fileNewName = idPersona + idCuenta + idMandato;
 		
-		if(!idAnexo.equals("")) {
-			fileNewName += idAnexo;
+		if(null == idAnexo || idAnexo.equals("") || idAnexo.equals("null")) {
+			if(tipoMandato.equals("SERVICIO"))
+				fileNewName += "0";
+			else if(tipoMandato.equals("PRODUCTO"))
+				fileNewName += "1";
 		}
-		else{
-			fileNewName += tipoMandato;
+		else {
+			fileNewName += idAnexo;
 		}
 		
 		// 1. Coger archivo del request
@@ -1235,6 +1239,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		String fileName = file.getOriginalFilename();
 		String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
 		
+		
+		String fileNewNameNoExtension = fileNewName;
+		fileNewName += extension;
 		BufferedOutputStream stream = null;
 		// 2. Guardar el archivo
 		LOGGER.debug("uploadFile() -> Guardar el documento de cuenta bancaria");
@@ -1288,14 +1295,14 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			genRecursos = genRecursosMapper.selectByExample(genRecursosExample);
 			
 			genFichero.setDescripcion(genRecursos.get(0).getDescripcion());
-			// unimos el path + nombre del fichero
-			String directorio = pathFichero + newIdFichero;
+			// unimos el path + nombre del fichero (sin extension)
+			String directorio = pathFichero + fileNewNameNoExtension;
 			genFichero.setDirectorio(directorio);
 			responseGenFichero = genFicheroExtendsMapper.insertSelective(genFichero);
 			if(responseGenFichero == 1) {
 				
 				// 4. Cambiar idfichero en tabla CEN_MANDATOS_CUENTASBANCARIAS o CEN_ANEXOS_CUENTASBANCARIAS
-				if(!idAnexo.equals("")) {
+				if(!idAnexo.equals("") && !idAnexo.equals("null") && null != idAnexo) {
 					
 					// actualiza CEN_ANEXOS_CUENTASBANCARIAS
 					CenAnexosCuentasbancarias cenAnexosCuentasbancarias = new CenAnexosCuentasbancarias();
@@ -1315,12 +1322,16 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				else{
 					
 					// actualiza CEN_MANDATOS_CUENTASBANCARIAS
-					
+					String auxTipoMandato = "";
+					if(tipoMandato.equals("SERVICIO"))
+						auxTipoMandato = "0";
+					else if(tipoMandato.equals("PRODUCTO"))
+						auxTipoMandato = "1";
 					CenMandatosCuentasbancarias cenMandatosCuentasbancarias = new CenMandatosCuentasbancarias();
 					cenMandatosCuentasbancarias.setIdficherofirma(Long.valueOf(newIdFichero));
 					CenMandatosCuentasbancariasExample cenMandatosCuentasbancariasExample = new CenMandatosCuentasbancariasExample();
-					cenMandatosCuentasbancariasExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdcuentaEqualTo(Short.valueOf(idPersona)).
-					andIdcuentaEqualTo(Short.valueOf(idCuenta)).andIdmandatoEqualTo(Short.valueOf(idMandato)).andTipomandatoEqualTo(Short.valueOf(tipoMandato));
+					cenMandatosCuentasbancariasExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(idPersona)).
+					andIdcuentaEqualTo(Short.valueOf(idCuenta)).andIdmandatoEqualTo(Short.valueOf(idMandato)).andTipomandatoEqualTo(Short.valueOf(auxTipoMandato));
 					
 					responseMandatoOAnexo = cenMandatosCuentasbancariasMapper.updateByExampleSelective(cenMandatosCuentasbancarias, cenMandatosCuentasbancariasExample);
 					if(responseMandatoOAnexo == 1) {
