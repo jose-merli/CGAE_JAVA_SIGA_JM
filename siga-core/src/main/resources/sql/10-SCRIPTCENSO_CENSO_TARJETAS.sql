@@ -114,5 +114,14 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('facturacion.tarjetas.literal.serviciosInteres','Serveis d''interès','0','2',to_date('08/09/08','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('facturacion.tarjetas.literal.serviciosInteres','Servicios de interés#EU','0','3',to_date('08/09/08','DD/MM/RR'),'0','19');
 
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('factSJCS.datosPagos.literal.tipoRetencion','Tipo Retención IRPF','0','1',to_date('11/04/05','DD/MM/RR'),'0','15');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('factSJCS.datosPagos.literal.tipoRetencion','Tipus Retenció IRPF','0','2',to_date('11/04/05','DD/MM/RR'),'0','15');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('factSJCS.datosPagos.literal.tipoRetencion','Tipo Retención IRPF#EU','0','3',to_date('11/04/05','DD/MM/RR'),'0','15');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('factSJCS.datosPagos.literal.tipoRetencion','Tipo Retención IRPF#GL','0','4',to_date('11/04/05','DD/MM/RR'),'0','15');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('factSJCS.datosPagos.literal.porcentajeRetencion','Porcentaje Retención','0','1',to_date('11/04/05','DD/MM/RR'),'0','15');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('factSJCS.datosPagos.literal.porcentajeRetencion','Porcentatge Retenció','0','2',to_date('11/04/05','DD/MM/RR'),'0','15');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('factSJCS.datosPagos.literal.porcentajeRetencion','Porcentaje Retención#EU','0','3',to_date('11/04/05','DD/MM/RR'),'0','15');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('factSJCS.datosPagos.literal.porcentajeRetencion','Porcentaje Retención#GL','0','4',to_date('11/04/05','DD/MM/RR'),'0','15');
 
 commit;
