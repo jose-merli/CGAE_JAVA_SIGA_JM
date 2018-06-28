@@ -20,6 +20,8 @@ public interface ITarjetaDatosIntegrantesService {
 	public UpdateResponseDTO updateMember(TarjetaIntegrantesUpdateDTO tarjetaIntegrantesUpdateDTO, HttpServletRequest request);
 	
 	public UpdateResponseDTO createMember(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO, HttpServletRequest request);
+
+	public UpdateResponseDTO deleteMember(TarjetaIntegrantesUpdateDTO[] tarjetaIntegrantesUpdateDTO,		HttpServletRequest request);
 	
 	
 	
