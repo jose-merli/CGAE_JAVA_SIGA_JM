@@ -259,7 +259,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 			usuario = usuarios.get(0);
 			
 			// 1. Ya existe un idpersona para el nuevo integrante
-			if(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante().equals(""))
+			if(!tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante().equals(""))
 			{
 				int responseCenCliente = 1; // se puede crear o no => se inicializa a 1
 				int responseCenComponentes = 0; // se debe crear siempre
@@ -267,7 +267,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 				// 1.1 Comprobamos que existe en tabla cen_cliente
 				CenCliente cenCliente = new CenCliente();
 				CenClienteKey key = new CenClienteKey();
-				key.setIdinstitucion(idInstitucion);
+				key.setIdinstitucion(Short.valueOf(tarjetaIntegrantesCreateDTO.getIdInstitucionIntegrante()));
 				key.setIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()));
 				cenCliente = cenClienteMapper.selectByPrimaryKey(key);
 				
@@ -305,47 +305,51 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
-		}
-		else {
-			// 2. No existe un idpersona para el nuevo integrante
-			
-			// 2.1. Insertar en cen_persona
-			int responseCenPersona = 0;
-			int responseCenCliente = 0;
-			int responseCenComponentes = 0;
-			CrearPersonaDTO crearPersonaDTO = new CrearPersonaDTO();
-			crearPersonaDTO = rellenarInsertCenPersona(tarjetaIntegrantesCreateDTO, usuario);
-			responseCenPersona = cenPersonaExtendsMapper.insertSelectiveForPersonFile(crearPersonaDTO, usuario);
-			
-			if(responseCenPersona == 1) {
-				// 2.2. Insertar en cen_cliente
+			else {
+				// 2. No existe un idpersona para el nuevo integrante
 				
-				comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
-				String maxIdPersona = comboItems.get(0).getValue();
+				// 2.1. Insertar en cen_persona
+				int responseCenPersona = 0;
+				int responseCenCliente = 0;
+				int responseCenComponentes = 0;
+				CrearPersonaDTO crearPersonaDTO = new CrearPersonaDTO();
+				crearPersonaDTO = rellenarInsertCenPersona(tarjetaIntegrantesCreateDTO, usuario);
+				responseCenPersona = cenPersonaExtendsMapper.insertSelectiveForPersonFile(crearPersonaDTO, usuario);
 				
-				tarjetaIntegrantesCreateDTO.setIdPersonaIntegrante(maxIdPersona);
-				tarjetaIntegrantesCreateDTO.setIdInstitucionIntegrante(String.valueOf(idInstitucion));
-				
-				CenCliente record = new CenCliente();
-				record = rellenarInsertCenCliente(tarjetaIntegrantesCreateDTO, usuario);
-				responseCenCliente = cenClienteMapper.insertSelective(record);
-				if(responseCenCliente == 1) {
-					// 2.3. Insertar en cen_nocolegiado/cen_colegiado { tipo = session de busqueda no colegiados (para busqueda juridica) || tipo Personal = '1' (para busqueda fisica) 
-					// PUNTO 2.3 AHORA MISMO NO SE HACE
-					// 2.4. Insertar en cen_componente
-					comboItem = cenComponentesExtendsMapper.selectMaxIDComponente(tarjetaIntegrantesCreateDTO.getIdPersonaPadre(), String.valueOf(idInstitucion));
-					int siguienteIDComponente;
-					if(null != comboItem) {
-						siguienteIDComponente = Integer.valueOf(comboItem.getValue()) + 1;
-					}
-					else {
-						siguienteIDComponente = 1;
-					}
+				if(responseCenPersona == 1) {
+					// 2.2. Insertar en cen_cliente
 					
-					tarjetaIntegrantesCreateDTO.setIdComponente(String.valueOf(siguienteIDComponente));
-					responseCenComponentes = cenComponentesExtendsMapper.insertSelectiveForcreateMember(tarjetaIntegrantesCreateDTO, usuario, String.valueOf(idInstitucion));
-					if(responseCenComponentes == 1) {
-						updateResponseDTO.setStatus(SigaConstants.OK);
+					comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+					String maxIdPersona = comboItems.get(0).getValue();
+					
+					tarjetaIntegrantesCreateDTO.setIdPersonaIntegrante(maxIdPersona);
+					tarjetaIntegrantesCreateDTO.setIdInstitucionIntegrante(String.valueOf(idInstitucion));
+					
+					CenCliente record = new CenCliente();
+					record = rellenarInsertCenCliente(tarjetaIntegrantesCreateDTO, usuario);
+					responseCenCliente = cenClienteMapper.insertSelective(record);
+					if(responseCenCliente == 1) {
+						// 2.3. Insertar en cen_nocolegiado/cen_colegiado { tipo = session de busqueda no colegiados (para busqueda juridica) || tipo Personal = '1' (para busqueda fisica) 
+						// PUNTO 2.3 AHORA MISMO NO SE HACE
+						// 2.4. Insertar en cen_componente
+						comboItem = cenComponentesExtendsMapper.selectMaxIDComponente(tarjetaIntegrantesCreateDTO.getIdPersonaPadre(), String.valueOf(idInstitucion));
+						int siguienteIDComponente;
+						if(null != comboItem) {
+							siguienteIDComponente = Integer.valueOf(comboItem.getValue()) + 1;
+						}
+						else {
+							siguienteIDComponente = 1;
+						}
+						
+						tarjetaIntegrantesCreateDTO.setIdComponente(String.valueOf(siguienteIDComponente));
+						responseCenComponentes = cenComponentesExtendsMapper.insertSelectiveForcreateMember(tarjetaIntegrantesCreateDTO, usuario, String.valueOf(idInstitucion));
+						if(responseCenComponentes == 1) {
+							updateResponseDTO.setStatus(SigaConstants.OK);
+						}
+						else {
+							updateResponseDTO.setStatus(SigaConstants.KO);
+						}
+						
 					}
 					else {
 						updateResponseDTO.setStatus(SigaConstants.KO);
@@ -356,13 +360,10 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 				
+				
 			}
-			else {
-				updateResponseDTO.setStatus(SigaConstants.KO);
-			}
-			
-			
 		}
+		
 		
 		LOGGER.info("updateMember() -> Salida del servicio para crear un nuevo integrante");
 		return updateResponseDTO;
