@@ -14,8 +14,8 @@ public class TarjetaIntegrantesCreateDTO {
 	private String nifcif;
 	private String tipoIdentificacion;
 	private Date fechaCargo;
-	private String descripcionCargo;
 	private String cargo;
+	private String idCargo;
 	private String participacionSociedad;
 	private String idComponente;
 	private String idPersonaPadre;
@@ -141,24 +141,6 @@ public class TarjetaIntegrantesCreateDTO {
 	/**
 	 *
 	 */
-	public TarjetaIntegrantesCreateDTO descripcionCargo(String descripcionCargo){
-		this.descripcionCargo = descripcionCargo;
-		return this;
-	}
-	
-	
-	@JsonProperty("descripcionCargo")
-	public String getDescripcionCargo() {
-		return descripcionCargo;
-	}
-	public void setDescripcionCargo(String descripcionCargo) {
-		this.descripcionCargo = descripcionCargo;
-	}
-	
-	
-	/**
-	 *
-	 */
 	public TarjetaIntegrantesCreateDTO cargo(String cargo){
 		this.cargo = cargo;
 		return this;
@@ -171,6 +153,27 @@ public class TarjetaIntegrantesCreateDTO {
 	public void setCargo(String cargo) {
 		this.cargo = cargo;
 	}
+	
+	
+	/**
+	 *
+	 */
+	public TarjetaIntegrantesCreateDTO idCargo(String idCargo){
+		this.idCargo = idCargo;
+		return this;
+	}
+	
+	
+	@JsonProperty("idCargo")
+	public String getIdCargo() {
+		return idCargo;
+	}
+	public void setIdCargo(String idCargo) {
+		this.idCargo = idCargo;
+	}
+	
+	
+	
 	
 	
 	/**
@@ -352,8 +355,8 @@ public class TarjetaIntegrantesCreateDTO {
 		}
 		TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO = (TarjetaIntegrantesCreateDTO) o;
 		return Objects.equals(this.fechaCargo, tarjetaIntegrantesCreateDTO.fechaCargo)
-				&& Objects.equals(this.descripcionCargo, tarjetaIntegrantesCreateDTO.descripcionCargo)
-				&& Objects.equals(this.cargo, tarjetaIntegrantesCreateDTO.cargo) 
+				&& Objects.equals(this.cargo, tarjetaIntegrantesCreateDTO.cargo)
+				&& Objects.equals(this.idCargo, tarjetaIntegrantesCreateDTO.idCargo) 
 				&& Objects.equals(this.participacionSociedad, tarjetaIntegrantesCreateDTO.participacionSociedad)
 				&& Objects.equals(this.idComponente, tarjetaIntegrantesCreateDTO.idComponente)
 				&& Objects.equals(this.idPersonaPadre, tarjetaIntegrantesCreateDTO.idPersonaPadre) 
@@ -373,7 +376,7 @@ public class TarjetaIntegrantesCreateDTO {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(fechaCargo, descripcionCargo, cargo, participacionSociedad, idComponente, idPersonaPadre, idPersonaIntegrante, nombre, apellido1, apellido2, nifcif, tipoIdentificacion, idInstitucionIntegrante, idTipoColegio, idProvincia,
+		return Objects.hash(fechaCargo, cargo,idCargo, participacionSociedad, idComponente, idPersonaPadre, idPersonaIntegrante, nombre, apellido1, apellido2, nifcif, tipoIdentificacion, idInstitucionIntegrante, idTipoColegio, idProvincia,
 				numColegiado, tipo);
 	}
 
@@ -383,8 +386,8 @@ public class TarjetaIntegrantesCreateDTO {
 		sb.append("class TarjetaIntegrantesCreateDTO {\n");
 
 		sb.append("    fechaCargo: ").append(toIndentedString(fechaCargo)).append("\n");
-		sb.append("    descripcionCargo: ").append(toIndentedString(descripcionCargo)).append("\n");
 		sb.append("    cargo: ").append(toIndentedString(cargo)).append("\n");
+		sb.append("    idCargo: ").append(toIndentedString(idCargo)).append("\n");
 		sb.append("    participacionSociedad: ").append(toIndentedString(participacionSociedad)).append("\n");
 		sb.append("    idComponente: ").append(toIndentedString(idComponente)).append("\n");
 		sb.append("    idPersonaPadre: ").append(toIndentedString(idPersonaPadre)).append("\n"); 

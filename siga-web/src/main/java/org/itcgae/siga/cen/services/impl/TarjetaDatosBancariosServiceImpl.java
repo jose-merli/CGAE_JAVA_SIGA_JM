@@ -2,6 +2,7 @@ package org.itcgae.siga.cen.services.impl;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,10 +20,13 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.HeaderLogoDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicDTO;
@@ -1348,124 +1352,66 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			
 			
 		}
-		
-		
-//		// obtener path para almacenar las fotografias
-//		LOGGER.debug("uploadPhotography() -> Obtener path para almacenar las fotografias");
-//		GenPropertiesExample genPropertiesExample = new GenPropertiesExample();
-//		genPropertiesExample.createCriteria().andParametroEqualTo("directorios.carpeta.fotos");
-//		LOGGER.info(
-//				"loadPhotography() / genPropertiesMapper.selectByExample() -> Entrada a genPropertiesMapper para obtener directorio de la fotografía");
-//		List<GenProperties> properties = genPropertiesMapper.selectByExample(genPropertiesExample);
-//		LOGGER.info(
-//				"loadPhotography() / genPropertiesMapper.selectByExample() -> Salida de genPropertiesMapper para obtener directorio de la fotografía");
-//		
-//		if (null != properties && properties.size() > 0) {
-//			String pathImagenes = properties.get(0).getValor() + "/";
-//
-//			// Coger archivo del request
-//			LOGGER.debug("uploadPhotography() -> Coger fotografía del request");
-//			Iterator<String> itr = request.getFileNames();
-//			MultipartFile file = request.getFile(itr.next());
-//			String fileName = file.getOriginalFilename();
-//			String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
-//
-//			// comprobar extension de la fotografia
-//			LOGGER.debug("uploadPhotography() -> Comprobar extension de la fotografia");
-//			if (extension == null || extension.trim().equals("")
-//					|| (!extension.trim().toUpperCase().equals(".JPG") && !extension.trim().toUpperCase().equals(".GIF")
-//							&& !extension.trim().toUpperCase().equals(".PNG")
-//							&& !extension.trim().toUpperCase().equals(".JPEG"))) {
-//
-//				try {
-//					throw new SigaExceptions("messages.error.imagen.tipoNoCorrecto");
-//				} catch (SigaExceptions e) {
-//					e.printStackTrace();
-//				}
-//			}
-//
-//			// Crear nombre del archivo a guardar
-//			LOGGER.debug("uploadPhotography() -> Crear nombre de la fotografía a guardar");
-//			CenPersonaExample cenPersonaExample = new CenPersonaExample();
-//			cenPersonaExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona));
-//			LOGGER.info(
-//					"loadPhotography() / cenPersonaExtendsMapper.selectByExample() -> Entrada a cenPersonaExtendsMapper para nifcif de una persona");
-//			List<CenPersona> cenPersonas = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
-//			LOGGER.info(
-//					"loadPhotography() / cenPersonaExtendsMapper.selectByExample() -> Salida de cenPersonaExtendsMapper para nifcif de una persona");
-//
-//			if (null != cenPersonas && cenPersonas.size() > 0) {
-//				String nifCif = cenPersonas.get(0).getNifcif();
-//
-//				fileName = nifCif + "_" + fileName;
-//
-//				BufferedOutputStream stream = null;
-//				// Guardar el archivo
-//				LOGGER.debug("uploadPhotography() -> Guardar la fotografía");
-//				try {
-//					File aux = new File(pathImagenes);
-//					// creo directorio si no existe
-//					aux.mkdirs();
-//					File serverFile = new File(pathImagenes, fileName);
-//					stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-//					stream.write(file.getBytes());
-//
-//				} catch (FileNotFoundException e) {
-//					LOGGER.error("uploadPhotography() -> Error al buscar la fotografía de la persona jurídica en el directorio indicado", e);
-//				} catch (IOException ioe) {
-//					LOGGER.error("uploadPhotography() -> Error al guardar la fotografía de la persona jurídica en el directorio indicado",
-//							ioe);
-//				} finally {
-//					// close the stream
-//					LOGGER.debug("uploadPhotography() -> Cierre del stream de la fotografía de la persona jurídica");
-//					stream.close();
-//				}
-//				
-//				
-//				// actualizar nombre de la fotografia en base de datos
-//				LOGGER.debug("uploadPhotography() -> actualizar nombre de la fotografia en base de datos");
-//				CenClienteExample cenClienteExample = new CenClienteExample();
-//				cenClienteExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona));
-//				CenCliente cenCliente = new CenCliente();
-//				cenCliente.setFotografia(fileName);
-//				LOGGER.info(
-//						"loadPhotography() / cenClienteMapper.updateByExample() -> Entrada a cenClienteMapper actualizar el nombre de la fotografía de una persona jurídica");
-//				response = cenClienteMapper.updateByExampleSelective(cenCliente, cenClienteExample);
-//				LOGGER.info(
-//						"loadPhotography() / cenClienteMapper.updateByExample() -> Salida de cenClienteMapper actualizar el nombre de la fotografía de una persona jurídica");
-//				if(response == 1) {
-//					updateResponseDTO.setStatus(SigaConstants.OK);
-//					LOGGER.warn(
-//							"loadPhotography() / cenClienteMapper.updateByExample() -> " + updateResponseDTO.getStatus() + " .Nombre de la fotografía de una persona jurídica actualizado correctamente");
-//	
-//				}
-//				else {
-//					updateResponseDTO.setStatus(SigaConstants.KO);
-//					LOGGER.warn(
-//							"loadPhotography() / cenClienteMapper.updateByExample() -> " + updateResponseDTO.getStatus() + " .No se ha podido actualizar el nombre de la fotografía de una persona jurídica");
-//				}
-//				
-//			}
-//			else {
-//				updateResponseDTO.setStatus(SigaConstants.KO);
-//				LOGGER.warn(
-//						"loadPhotography() / cenPersonaExtendsMapper.selectByExample() -> " + updateResponseDTO.getStatus() + ".No existen ninguna persona con en idPersona:" + idPersona + " indicado");
-//			}
-//
-//		}
-//		else {
-//			updateResponseDTO.setStatus(SigaConstants.KO);
-//			LOGGER.warn(
-//					"loadPhotography() / genPropertiesMapper.selectByExample() -> " + updateResponseDTO.getStatus() + ".No se pudo obtener el directorio de la fotografía");
-//		}
-//		
-//		LOGGER.info(
-//				"uploadPhotography() -> Salida del servicio para guardar una fotografía de una persona jurídica");
-		
-		return updateResponseDTO;
-		
+		return updateResponseDTO;		
 	}
 
+
+	@Override
+	public HeaderLogoDTO downloadFile(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request,
+			HttpServletResponse response) {
+		
+		File file = new File("C://IISIGA/anexos/2006002472110.pdf");
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream(file);
+			// se pasa el logo en la respuesta http
+			IOUtils.copy(fis, response.getOutputStream());
+			
+		}catch (FileNotFoundException e) {
+			LOGGER.error("No se ha encontrado el fichero", e);
+			
+		} catch (IOException e1) {
+			LOGGER.error("No se han podido escribir los datos binarios del logo en la respuesta HttpServletResponse", e1);
+			e1.printStackTrace();
+		}
+		finally {
+			if(null!= fis)
+				try {
+					fis.close();
+				} catch (IOException e) {
+					LOGGER.error("No se ha cerrado el archivo que contiene el logo", e);
+					e.printStackTrace();
+				}
+		}
+		
+//		File file = new File(pathFinal);
+//		FileInputStream fis = null;
+//		try {
+//			fis = new FileInputStream(file);
+//			// Parece que soporta otros tipos, como png
+//			response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+//			// se pasa el logo en la respuesta http
+//			IOUtils.copy(fis, response.getOutputStream());
+//			
+//		} catch (FileNotFoundException e) {
+//			LOGGER.error("No se ha encontrado el fichero", e);
+//			
+//		} catch (IOException e1) {
+//			LOGGER.error("No se han podido escribir los datos binarios del logo en la respuesta HttpServletResponse", e1);
+//			e1.printStackTrace();
+//		} 	
+//		finally{
+//			if(null!= fis)
+//				try {
+//					fis.close();
+//				} catch (IOException e) {
+//					LOGGER.error("No se ha cerrado el archivo que contiene el logo", e);
+//					e.printStackTrace();
+//				}
+//		}
+		return null;
+	}
+	
 	
 	
 	/**
@@ -1658,6 +1604,11 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			
 		    return resultado;
 		}
+
+
+
+
+
 
 
 

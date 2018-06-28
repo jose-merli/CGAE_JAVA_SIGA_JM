@@ -60,16 +60,16 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.SET("FECHACARGO = '" + fechaC + "'");
 		}
  		
-		if(!tarjetaIntegrantesUpdateDTO.getDescripcionCargo().equals("")) {
-			sql.SET("CARGO = '" + tarjetaIntegrantesUpdateDTO.getDescripcionCargo() + "'");
+		if(!tarjetaIntegrantesUpdateDTO.getCargo().equals("")) {
+			sql.SET("CARGO = '" + tarjetaIntegrantesUpdateDTO.getCargo() + "'");
 		}
 	
-		if(!tarjetaIntegrantesUpdateDTO.getCargo().equals("")) {
-			sql.SET("IDCARGO = '" + tarjetaIntegrantesUpdateDTO.getCargo() + "'");
+		if(!tarjetaIntegrantesUpdateDTO.getIdCargo().equals("")) {
+			sql.SET("IDCARGO = '" + tarjetaIntegrantesUpdateDTO.getIdCargo() + "'");
 		}
 		
-		if(!tarjetaIntegrantesUpdateDTO.getParticipacionSociedad().equals("")) {
-			sql.SET("CAPITALSOCIAL = '" + tarjetaIntegrantesUpdateDTO.getParticipacionSociedad() + "'");
+		if(!tarjetaIntegrantesUpdateDTO.getCapitalSocial().equals("")) {
+			sql.SET("CAPITALSOCIAL = '" + tarjetaIntegrantesUpdateDTO.getCapitalSocial() + "'");
 		}
 
 		
@@ -99,12 +99,12 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.VALUES("IDCOMPONENTE", "'" + tarjetaIntegrantesCreateDTO.getIdComponente() + "'");
 		
 		if(!tarjetaIntegrantesCreateDTO.getCargo().equals("")) {
-			sql.VALUES("CARGO", "'" + tarjetaIntegrantesCreateDTO.getDescripcionCargo() + "'");
+			sql.VALUES("CARGO", "'" + tarjetaIntegrantesCreateDTO.getCargo() + "'");
 		}
 		
 		
 		if(null != tarjetaIntegrantesCreateDTO.getFechaCargo()) {
-			String fechaC = dateFormat.format(tarjetaIntegrantesCreateDTO.getDescripcionCargo());
+			String fechaC = dateFormat.format(tarjetaIntegrantesCreateDTO.getFechaCargo());
 			sql.VALUES("FECHACARGO", "'" + fechaC + "'");
 		}
 		
@@ -131,8 +131,8 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.VALUES("CAPITALSOCIAL", "'" + tarjetaIntegrantesCreateDTO.getParticipacionSociedad() + "'");
 		}
 		
-		if(!tarjetaIntegrantesCreateDTO.getCargo().equals("")) {
-			sql.VALUES("IDCARGO", "'" + tarjetaIntegrantesCreateDTO.getCargo() + "'");
+		if(!tarjetaIntegrantesCreateDTO.getIdCargo().equals("")) {
+			sql.VALUES("IDCARGO", "'" + tarjetaIntegrantesCreateDTO.getIdCargo() + "'");
 		}
 		
 		

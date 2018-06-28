@@ -5,8 +5,10 @@ import java.sql.SQLException;
 
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.HeaderLogoDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicDTO;
@@ -50,6 +52,8 @@ public interface ITarjetaDatosBancariosService {
 	public InsertResponseDTO InsertAnexos(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request);
 	
 	public UpdateResponseDTO uploadFile(MultipartHttpServletRequest request) throws IOException;
+	
+	public HeaderLogoDTO downloadFile(MandatosUpdateDTO mandatosUpdateDTO,HttpServletRequest request, HttpServletResponse response);
 
 
 

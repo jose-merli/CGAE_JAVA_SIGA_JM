@@ -10,9 +10,9 @@ public class TarjetaIntegrantesUpdateDTO {
 	
 	
 	private Date fechaCargo;
-	private String descripcionCargo;
-	private String cargo;
-	private String participacionSociedad;
+	private String cargo; //  descripcionCargo: null --->cargo 
+	private String idCargo;            //  cargo:  ---> idCargo
+	private String capitalSocial; //  participacionSociedad --> capitalSocial 
 	private String idComponente;
 	private String idPersona;
 	
@@ -40,28 +40,11 @@ public class TarjetaIntegrantesUpdateDTO {
 	/**
 	 *
 	 */
-	public TarjetaIntegrantesUpdateDTO descripcionCargo(String descripcionCargo){
-		this.descripcionCargo = descripcionCargo;
-		return this;
-	}
-	
-	
-	@JsonProperty("descripcionCargo")
-	public String getDescripcionCargo() {
-		return descripcionCargo;
-	}
-	public void setDescripcionCargo(String descripcionCargo) {
-		this.descripcionCargo = descripcionCargo;
-	}
-	
-	
-	/**
-	 *
-	 */
 	public TarjetaIntegrantesUpdateDTO cargo(String cargo){
 		this.cargo = cargo;
 		return this;
 	}
+	
 	
 	@JsonProperty("cargo")
 	public String getCargo() {
@@ -75,19 +58,36 @@ public class TarjetaIntegrantesUpdateDTO {
 	/**
 	 *
 	 */
-	public TarjetaIntegrantesUpdateDTO participacionSociedad(String participacionSociedad){
-		this.participacionSociedad = participacionSociedad;
+	public TarjetaIntegrantesUpdateDTO idCargo(String idCargo){
+		this.idCargo = idCargo;
 		return this;
 	}
 	
-	@JsonProperty("participacionSociedad")
-	public String getParticipacionSociedad() {
-		return participacionSociedad;
+	@JsonProperty("idCargo")
+	public String getIdCargo() {
+		return idCargo;
+	}
+	public void setIdCargo(String idCargo) {
+		this.idCargo = idCargo;
 	}
 	
 	
-	public void setParticipacionSociedad(String participacionSociedad) {
-		this.participacionSociedad = participacionSociedad;
+	/**
+	 *
+	 */
+	public TarjetaIntegrantesUpdateDTO capitalSocial(String capitalSocial){
+		this.capitalSocial = capitalSocial;
+		return this;
+	}
+	
+	@JsonProperty("capitalSocial")
+	public String getCapitalSocial() {
+		return capitalSocial;
+	}
+	
+	
+	public void setCapitalSocial(String capitalSocial) {
+		this.capitalSocial = capitalSocial;
 	}
 	
 	
@@ -137,9 +137,9 @@ public class TarjetaIntegrantesUpdateDTO {
 		}
 		TarjetaIntegrantesUpdateDTO tarjetaIntegrantesUpdateDTO = (TarjetaIntegrantesUpdateDTO) o;
 		return Objects.equals(this.fechaCargo, tarjetaIntegrantesUpdateDTO.fechaCargo)
-				&& Objects.equals(this.descripcionCargo, tarjetaIntegrantesUpdateDTO.descripcionCargo)
-				&& Objects.equals(this.cargo, tarjetaIntegrantesUpdateDTO.cargo) 
-				&& Objects.equals(this.participacionSociedad, tarjetaIntegrantesUpdateDTO.participacionSociedad)
+				&& Objects.equals(this.cargo, tarjetaIntegrantesUpdateDTO.cargo)
+				&& Objects.equals(this.idCargo, tarjetaIntegrantesUpdateDTO.idCargo) 
+				&& Objects.equals(this.capitalSocial, tarjetaIntegrantesUpdateDTO.capitalSocial)
 				&& Objects.equals(this.idComponente, tarjetaIntegrantesUpdateDTO.idComponente)
 				&& Objects.equals(this.idPersona, tarjetaIntegrantesUpdateDTO.idPersona);
 
@@ -147,7 +147,7 @@ public class TarjetaIntegrantesUpdateDTO {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(fechaCargo, descripcionCargo, cargo, participacionSociedad, idComponente, idPersona);
+		return Objects.hash(fechaCargo, cargo, idCargo, capitalSocial, idComponente, idPersona);
 	}
 
 	@Override
@@ -156,9 +156,9 @@ public class TarjetaIntegrantesUpdateDTO {
 		sb.append("class TarjetaIntegrantesUpdateDTO {\n");
 
 		sb.append("    fechaCargo: ").append(toIndentedString(fechaCargo)).append("\n");
-		sb.append("    descripcionCargo: ").append(toIndentedString(descripcionCargo)).append("\n");
 		sb.append("    cargo: ").append(toIndentedString(cargo)).append("\n");
-		sb.append("    participacionSociedad: ").append(toIndentedString(participacionSociedad)).append("\n");
+		sb.append("    idCargo: ").append(toIndentedString(idCargo)).append("\n");
+		sb.append("    capitalSocial: ").append(toIndentedString(capitalSocial)).append("\n");
 		sb.append("    idComponente: ").append(toIndentedString(idComponente)).append("\n");
 		sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 		sb.append("}");

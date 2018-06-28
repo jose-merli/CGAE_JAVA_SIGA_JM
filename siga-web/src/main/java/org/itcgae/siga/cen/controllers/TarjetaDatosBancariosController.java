@@ -7,8 +7,10 @@ import java.sql.SQLException;
 
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.adm.HeaderLogoDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicDTO;
@@ -140,4 +142,10 @@ public class TarjetaDatosBancariosController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
+	
+	 @RequestMapping(value = "busquedaPerJuridica/downloadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	    public ResponseEntity<HeaderLogoDTO> downloadFile(@RequestBody MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request, HttpServletResponse response) {
+		 HeaderLogoDTO headerLogoDTO = tarjetaDatosBancariosService.downloadFile(mandatosUpdateDTO, request, response);
+	        return new ResponseEntity<HeaderLogoDTO>(headerLogoDTO, HttpStatus.OK);
+	    }
 }
