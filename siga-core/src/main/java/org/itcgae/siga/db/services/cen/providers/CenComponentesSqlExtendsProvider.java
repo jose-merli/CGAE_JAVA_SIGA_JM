@@ -127,8 +127,8 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.VALUES("NUMCOLEGIADO", "'" + tarjetaIntegrantesCreateDTO.getNumColegiado() + "'");
 		}
 		
-		if(!tarjetaIntegrantesCreateDTO.getParticipacionSociedad().equals("")) {
-			sql.VALUES("CAPITALSOCIAL", "'" + tarjetaIntegrantesCreateDTO.getParticipacionSociedad() + "'");
+		if(!tarjetaIntegrantesCreateDTO.getCapitalSocial().equals("")) {
+			sql.VALUES("CAPITALSOCIAL", "'" + tarjetaIntegrantesCreateDTO.getCapitalSocial() + "'");
 		}
 		
 		if(!tarjetaIntegrantesCreateDTO.getIdCargo().equals("")) {

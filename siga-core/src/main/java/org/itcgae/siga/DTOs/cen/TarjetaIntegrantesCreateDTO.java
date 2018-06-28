@@ -9,14 +9,14 @@ public class TarjetaIntegrantesCreateDTO {
 
 	
 	private String nombre;
-	private String apellido1;
-	private String apellido2;
-	private String nifcif;
+	private String apellidos1;
+	private String apellidos2;
+	private String nifCif;
 	private String tipoIdentificacion;
 	private Date fechaCargo;
 	private String cargo;
 	private String idCargo;
-	private String participacionSociedad;
+	private String capitalSocial;
 	private String idComponente;
 	private String idPersonaPadre;
 	private String idPersonaIntegrante;
@@ -48,56 +48,56 @@ public class TarjetaIntegrantesCreateDTO {
 	/**
 	 *
 	 */
-	public TarjetaIntegrantesCreateDTO apellido1(String apellido1){
-		this.apellido1 = apellido1;
+	public TarjetaIntegrantesCreateDTO apellidos1(String apellidos1){
+		this.apellidos1 = apellidos1;
 		return this;
 	}
 
 	
-	@JsonProperty("apellido1")
-	public String getApellido1() {
-		return apellido1;
+	@JsonProperty("apellidos1")
+	public String getApellidos1() {
+		return apellidos1;
 	}
 
-	public void setApellido1(String apellido1) {
-		this.apellido1 = apellido1;
+	public void setApellidos1(String apellidos1) {
+		this.apellidos1 = apellidos1;
 	}
 
 	
 	/**
 	 *
 	 */
-	public TarjetaIntegrantesCreateDTO apellido2(String apellido2){
-		this.apellido2 = apellido2;
+	public TarjetaIntegrantesCreateDTO apellidos2(String apellidos2){
+		this.apellidos2 = apellidos2;
 		return this;
 	}
 	
 	
-	@JsonProperty("apellido2")
-	public String getApellido2() {
-		return apellido2;
+	@JsonProperty("apellidos2")
+	public String getApellidos2() {
+		return apellidos2;
 	}
 
-	public void setApellido2(String apellido2) {
-		this.apellido2 = apellido2;
+	public void setApellidos2(String apellidos2) {
+		this.apellidos2 = apellidos2;
 	}
 	
 	
 	/**
 	 *
 	 */
-	public TarjetaIntegrantesCreateDTO nifcif(String nifcif){
-		this.nifcif = nifcif;
+	public TarjetaIntegrantesCreateDTO nifCif(String nifCif){
+		this.nifCif = nifCif;
 		return this;
 	}
 	
-	@JsonProperty("nifcif")
-	public String getNifcif() {
-		return nifcif;
+	@JsonProperty("nifCif")
+	public String getNifCif() {
+		return nifCif;
 	}
 
-	public void setNifcif(String nifcif) {
-		this.nifcif = nifcif;
+	public void setNifCif(String nifCif) {
+		this.nifCif = nifCif;
 	}
 	
 	
@@ -179,19 +179,19 @@ public class TarjetaIntegrantesCreateDTO {
 	/**
 	 *
 	 */
-	public TarjetaIntegrantesCreateDTO participacionSociedad(String participacionSociedad){
-		this.participacionSociedad = participacionSociedad;
+	public TarjetaIntegrantesCreateDTO capitalSocial(String capitalSocial){
+		this.capitalSocial = capitalSocial;
 		return this;
 	}
 	
-	@JsonProperty("participacionSociedad")
-	public String getParticipacionSociedad() {
-		return participacionSociedad;
+	@JsonProperty("capitalSocial")
+	public String getCapitalSocial() {
+		return capitalSocial;
 	}
 	
 	
-	public void setParticipacionSociedad(String participacionSociedad) {
-		this.participacionSociedad = participacionSociedad;
+	public void setCapitalSocial(String capitalSocial) {
+		this.capitalSocial = capitalSocial;
 	}
 	
 	
@@ -357,14 +357,14 @@ public class TarjetaIntegrantesCreateDTO {
 		return Objects.equals(this.fechaCargo, tarjetaIntegrantesCreateDTO.fechaCargo)
 				&& Objects.equals(this.cargo, tarjetaIntegrantesCreateDTO.cargo)
 				&& Objects.equals(this.idCargo, tarjetaIntegrantesCreateDTO.idCargo) 
-				&& Objects.equals(this.participacionSociedad, tarjetaIntegrantesCreateDTO.participacionSociedad)
+				&& Objects.equals(this.capitalSocial, tarjetaIntegrantesCreateDTO.capitalSocial)
 				&& Objects.equals(this.idComponente, tarjetaIntegrantesCreateDTO.idComponente)
 				&& Objects.equals(this.idPersonaPadre, tarjetaIntegrantesCreateDTO.idPersonaPadre) 
 				&& Objects.equals(this.idPersonaIntegrante, tarjetaIntegrantesCreateDTO.idPersonaIntegrante)
 				&& Objects.equals(this.nombre, tarjetaIntegrantesCreateDTO.nombre)
-				&& Objects.equals(this.apellido1, tarjetaIntegrantesCreateDTO.apellido1)
-				&& Objects.equals(this.apellido2, tarjetaIntegrantesCreateDTO.apellido2)
-				&& Objects.equals(this.nifcif, tarjetaIntegrantesCreateDTO.nifcif)
+				&& Objects.equals(this.apellidos1, tarjetaIntegrantesCreateDTO.apellidos1)
+				&& Objects.equals(this.apellidos2, tarjetaIntegrantesCreateDTO.apellidos2)
+				&& Objects.equals(this.nifCif, tarjetaIntegrantesCreateDTO.nifCif)
 				&& Objects.equals(this.tipoIdentificacion, tarjetaIntegrantesCreateDTO.tipoIdentificacion) 
 				&& Objects.equals(this.idInstitucionIntegrante, tarjetaIntegrantesCreateDTO.idInstitucionIntegrante) 
 				&& Objects.equals(this.idTipoColegio, tarjetaIntegrantesCreateDTO.idTipoColegio) 
@@ -376,7 +376,7 @@ public class TarjetaIntegrantesCreateDTO {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(fechaCargo, cargo,idCargo, participacionSociedad, idComponente, idPersonaPadre, idPersonaIntegrante, nombre, apellido1, apellido2, nifcif, tipoIdentificacion, idInstitucionIntegrante, idTipoColegio, idProvincia,
+		return Objects.hash(fechaCargo, cargo,idCargo, capitalSocial, idComponente, idPersonaPadre, idPersonaIntegrante, nombre, apellidos1, apellidos2, nifCif, tipoIdentificacion, idInstitucionIntegrante, idTipoColegio, idProvincia,
 				numColegiado, tipo);
 	}
 
@@ -388,14 +388,14 @@ public class TarjetaIntegrantesCreateDTO {
 		sb.append("    fechaCargo: ").append(toIndentedString(fechaCargo)).append("\n");
 		sb.append("    cargo: ").append(toIndentedString(cargo)).append("\n");
 		sb.append("    idCargo: ").append(toIndentedString(idCargo)).append("\n");
-		sb.append("    participacionSociedad: ").append(toIndentedString(participacionSociedad)).append("\n");
+		sb.append("    capitalSocial: ").append(toIndentedString(capitalSocial)).append("\n");
 		sb.append("    idComponente: ").append(toIndentedString(idComponente)).append("\n");
 		sb.append("    idPersonaPadre: ").append(toIndentedString(idPersonaPadre)).append("\n"); 
 		sb.append("    idPersonaIntegrante: ").append(toIndentedString(idPersonaIntegrante)).append("\n");
 		sb.append("    nombre: ").append(toIndentedString(nombre)).append("\n");
-		sb.append("    apellido1: ").append(toIndentedString(apellido1)).append("\n");
-		sb.append("    apellido2: ").append(toIndentedString(apellido2)).append("\n");
-		sb.append("    nifcif: ").append(toIndentedString(nifcif)).append("\n");
+		sb.append("    apellidos1: ").append(toIndentedString(apellidos1)).append("\n");
+		sb.append("    apellidos2: ").append(toIndentedString(apellidos2)).append("\n");
+		sb.append("    nifCif: ").append(toIndentedString(nifCif)).append("\n");
 		sb.append("    tipoIdentificacion: ").append(toIndentedString(tipoIdentificacion)).append("\n");
 		sb.append("    idInstitucionIntegrante: ").append(toIndentedString(idInstitucionIntegrante)).append("\n");
 		sb.append("    idTipoColegio: ").append(toIndentedString(idTipoColegio)).append("\n"); 

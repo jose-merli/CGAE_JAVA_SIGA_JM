@@ -394,9 +394,9 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		CrearPersonaDTO crearPersonaDTO = new CrearPersonaDTO();
 		
 		crearPersonaDTO.setNombre(tarjetaIntegrantesCreateDTO.getNombre());
-		crearPersonaDTO.setApellido1(tarjetaIntegrantesCreateDTO.getApellido1());
-		crearPersonaDTO.setApellido2(tarjetaIntegrantesCreateDTO.getApellido2());
-		crearPersonaDTO.setNif(tarjetaIntegrantesCreateDTO.getNifcif());
+		crearPersonaDTO.setApellido1(tarjetaIntegrantesCreateDTO.getApellidos1());
+		crearPersonaDTO.setApellido2(tarjetaIntegrantesCreateDTO.getApellidos2());
+		crearPersonaDTO.setNif(tarjetaIntegrantesCreateDTO.getNifCif());
 		crearPersonaDTO.setTipoIdentificacion(tarjetaIntegrantesCreateDTO.getTipoIdentificacion());
 		
 		return crearPersonaDTO;
