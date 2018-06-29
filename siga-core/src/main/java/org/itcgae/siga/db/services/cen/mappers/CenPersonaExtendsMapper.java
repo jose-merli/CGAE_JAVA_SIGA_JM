@@ -16,6 +16,7 @@ import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
 import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
+import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
@@ -107,5 +108,9 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	@UpdateProvider(type = CenPersonaSqlExtendsProvider.class, method = "updatebyExampleDataLegalPerson")
 	int updatebyExampleDataLegalPerson(PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, AdmUsuarios usuario);
 	
+	
+	
+	@InsertProvider(type = CenPersonaSqlExtendsProvider.class, method = "insertSelectiveForNewSociety")
+	int insertSelectiveForNewSociety(SociedadCreateDTO sociedadCreateDTO, AdmUsuarios usuario);
 	
 }

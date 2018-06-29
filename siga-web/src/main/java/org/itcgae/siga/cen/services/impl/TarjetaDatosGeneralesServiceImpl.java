@@ -21,6 +21,7 @@ import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -348,7 +349,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 	}
 
 	@Override
-	public UpdateResponseDTO createLegalPerson(EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request) {
+	public UpdateResponseDTO createLegalPerson(SociedadCreateDTO sociedadCreateDTO, HttpServletRequest request) {
 		
 		LOGGER.info(
 				"createLegalPerson() -> Entrada al servicio para actualizar información general de una persona jurídica");
@@ -373,7 +374,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				AdmUsuarios usuario = usuarios.get(0);
 				
 				// crear relaciones entre tablas para todos los grupos
-				for (String grupo : etiquetaUpdateDTO.getGrupos()) {
+				for (String grupo : sociedadCreateDTO.getGrupos()) {
 					LOGGER.info(
 							"createLegalPerson() / cenGruposclienteExtendsMapper.createLegalPerson() -> Entrada a cenGruposclienteExtendsMapper para obtener grupos de clientes");
 					cenGruposcliente = cenGruposclienteExtendsMapper.selectDistinctGruposClientes(String.valueOf(idInstitucion), usuario.getIdlenguaje(), grupo);
@@ -457,7 +458,8 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 					LOGGER.info(
 							"createLegalPerson() / cenPersonaExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenPersonaExtendsMapper para crear una nueva persona");
 					
-					int responseInsertPersona = cenPersonaExtendsMapper.insertSelectiveForCreateLegalPerson(etiquetaUpdateDTO, usuario);
+					//int responseInsertPersona = cenPersonaExtendsMapper.insertSelectiveForCreateLegalPerson(sociedadCreateDTO, usuario);
+					int responseInsertPersona = cenPersonaExtendsMapper.insertSelectiveForNewSociety(sociedadCreateDTO, usuario);
 					LOGGER.info(
 							"createLegalPerson() / cenPersonaExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenPersonaExtendsMapper para crear una nueva persona");
 					
@@ -466,7 +468,8 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 						LOGGER.info(
 								"createLegalPerson() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
 						
-						int responseInsertNoColegiado =  cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion), usuario, etiquetaUpdateDTO);
+						//int responseInsertNoColegiado =  cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion), usuario, etiquetaUpdateDTO);
+						int responseInsertNoColegiado =  cenNocolegiadoExtendsMapper.insertSelectiveForCreateNewSociety(String.valueOf(idInstitucion), usuario, sociedadCreateDTO);
 						LOGGER.info(
 								"createLegalPerson() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
 						

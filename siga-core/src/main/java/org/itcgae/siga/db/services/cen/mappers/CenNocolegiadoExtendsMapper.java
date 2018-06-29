@@ -19,6 +19,7 @@ import org.itcgae.siga.DTOs.cen.PersonaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.PersonaSearchDTO;
 import org.itcgae.siga.DTOs.cen.RetencionesItem;
+import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.DTOs.cen.SociedadesBajaDTO;
 import org.itcgae.siga.DTOs.cen.SociedadesEditadasDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -161,4 +162,6 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 	List<SociedadesEditadasDTO> selectSociedadesEditar(Short idInstitucion, Date fechaDesde, Date fechaHasta);
 
 	
+	@InsertProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "insertSelectiveForCreateNewSociety")
+	int insertSelectiveForCreateNewSociety(String idInstitucion, AdmUsuarios usuario,SociedadCreateDTO sociedadCreateDTO);
 }
