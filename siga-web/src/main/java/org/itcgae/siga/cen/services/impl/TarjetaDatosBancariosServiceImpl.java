@@ -1225,8 +1225,8 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		// crear path para almacenar el fichero
-//		String pathFichero = "/FILERMSA1000/SIGA/ficheros/archivo/" + String.valueOf(idInstitucion) + "/mandatos/";
-		String pathFichero = "C://IISIGA/anexos/";
+		String pathFichero = "/FILERMSA1000/SIGA/ficheros/archivo/" + String.valueOf(idInstitucion) + "/mandatos/";
+		//String pathFichero = "C://IISIGA/anexos/";
 		String fileNewName = idPersona + idCuenta + idMandato;
 		
 		if(null == idAnexo || idAnexo.equals("") || idAnexo.equals("null")) {
@@ -1415,8 +1415,8 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			String pathAbsolute = genFichero.getDirectorio();
 			pathAbsolute += genFichero.getExtension();
 			
-			File file = new File("C://IISIGA/anexos/2006002472110.pdf");
-			//File file = new File(pathAbsolute);
+			//File file = new File("C://IISIGA/anexos/2006002472110.pdf");
+			File file = new File(pathAbsolute);
 			FileInputStream fis = null;
 			try {
 				fis = new FileInputStream(file);
