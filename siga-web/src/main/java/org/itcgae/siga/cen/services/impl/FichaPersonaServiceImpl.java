@@ -148,6 +148,14 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		
+		AdmUsuarios usuario = new AdmUsuarios();
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		
+		
 		
 		if(null != asociarPersona.getTipoPersona() && asociarPersona.getTipoPersona().equals(SigaConstants.TIPO_PERSONA_NOTARIO)) {
 			CenNocolegiadoExample example = new CenNocolegiadoExample();
@@ -168,18 +176,24 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			if(colegiado.getIdpersonanotario().equals(asociarPersona.getIdPersonaAsociar())) {
 				updateResponse.getError().setDescription("La persona seleccionada ya es el notario de la sociedad.");
 			}else {
+				usuario = usuarios.get(0);
 				CenNocolegiadoExample cenNoColegiadoExample = new CenNocolegiadoExample();
 				cenNoColegiadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(asociarPersona.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
 				colegiado.setIdpersonanotario(Long.valueOf(asociarPersona.getIdPersonaAsociar()));
+				colegiado.setFechamodificacion(new Date());
+				colegiado.setUsumodificacion(usuario.getIdusuario());
 				cenNocolegiadoExtendsMapper.updateByExampleSelective(colegiado, cenNoColegiadoExample);
 				updateResponse.setStatus("OK");
 				
 			}
 			
 		}else {
+			usuario = usuarios.get(0);
 			CenNocolegiadoExample cenNoColegiadoExample = new CenNocolegiadoExample();
 			cenNoColegiadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(asociarPersona.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
 			colegiado.setIdpersonanotario(Long.valueOf(asociarPersona.getIdPersonaAsociar()));
+			colegiado.setFechamodificacion(new Date());
+			colegiado.setUsumodificacion(usuario.getIdusuario());
 			cenNocolegiadoExtendsMapper.updateByExampleSelective(colegiado, cenNoColegiadoExample);
 			updateResponse.setStatus("OK");
 			
@@ -224,7 +238,7 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			record.setNombre(crearPersonaDTO.getNombre());
 			record.setSexo(null);
 			record.setUsumodificacion(usuario.getIdusuario());
-		
+		//
 			cenPersonaExtendsMapper.insert(record);
 			
 			// obtenemos su idpersona

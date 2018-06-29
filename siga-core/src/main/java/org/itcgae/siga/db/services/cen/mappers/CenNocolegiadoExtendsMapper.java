@@ -1,5 +1,6 @@
 package org.itcgae.siga.db.services.cen.mappers;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.ibatis.annotations.InsertProvider;
@@ -18,7 +19,10 @@ import org.itcgae.siga.DTOs.cen.PersonaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.PersonaSearchDTO;
 import org.itcgae.siga.DTOs.cen.RetencionesItem;
+import org.itcgae.siga.DTOs.cen.SociedadesBajaDTO;
+import org.itcgae.siga.DTOs.cen.SociedadesEditadasDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
 import org.itcgae.siga.db.services.cen.providers.CenNocolegiadoSqlExtendsProvider;
@@ -117,5 +121,44 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 	@UpdateProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "updateByExampleDataLegalPerson")
 	int updateByExampleDataLegalPerson(PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, String idInstitucion, AdmUsuarios usuario);
 	
+	
+
+
+	@SelectProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "selectSociedadesEliminadas")
+	@Results({
+		@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE), 
+	})
+	List<SociedadesBajaDTO> selectSociedadesEliminadas(Short idInstitucion, Date fechaDesde, Date fechaHasta);
+
+	@SelectProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "selectSociedadesEditadas")
+	@Results({
+		@Result(column = "IDPERSONA", property = "newId", jdbcType = JdbcType.VARCHAR),
+	})
+	List<NewIdDTO> selectSociedadesEditadas(Short idInstitucion, Date fechaDesde, Date fechaHasta);
+
+	
+
+	@SelectProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "selectSociedadesEditar")
+	@Results({
+		@Result(column = "SOCIEDADNIF", property = "sociedadNif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SOCIEDADDENOMINACION", property = "sociedadDenominacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SOCIEDADFORMASOCIAL", property = "sociedadFormaSocial", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SOCIEDADFECHAALTA", property = "sociedadFechaAlta", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "IDENTIFICACIONNOTARIO", property = "notarioIdentificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRENOTARIO", property = "notarioNombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO1NOTARIO", property = "notarioApellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO2NOTARIO", property = "notarioApellido2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SOCIEDADPROFESIONAL", property = "sociedadProfesional", jdbcType = JdbcType.DATE), 
+		@Result(column = "RESENA", property = "resena", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OBJETOSOCIAL", property = "objetoSocial", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHACONSTITUCION", property = "fechaConstitucion", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHACANCELACION", property = "fechaCancelacion", jdbcType = JdbcType.DATE), 
+		@Result(column = "IDENTIFICACIONREGISTRO", property = "identificacionRegistro", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMEROREGISTRO", property = "numeroRegistro", jdbcType = JdbcType.VARCHAR)
+	})
+	List<SociedadesEditadasDTO> selectSociedadesEditar(Short idInstitucion, Date fechaDesde, Date fechaHasta);
+
 	
 }

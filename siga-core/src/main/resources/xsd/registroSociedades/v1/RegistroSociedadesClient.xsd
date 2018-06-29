@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:registroSociedades.ws.sspp.itcgae.org"
+	targetNamespace="urn:registroSociedades.ws.sspp.itcgae.org" elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+	<xs:include schemaLocation="DatosSociedades.xsd" />
+	<xs:element name="setListaSociedadesRequest">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="versionEsquema" minOccurs="0" maxOccurs="1" />
+				<xs:element ref="numeroPeticion" />
+				<xs:element ref="colegio" />
+				<xs:element ref="numPagina" />
+				<xs:element ref="numTotalPaginas" />
+				<xs:element ref="registroSociedad" minOccurs="1"
+					maxOccurs="unbounded" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="setListaSociedadesResponse">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="numeroPeticion" />
+				<xs:element ref="colegio" />
+				<xs:element ref="numPagina" />
+				<xs:element name="errorCliente" type="ErrorType"
+					minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
+
+
+
+
+
+

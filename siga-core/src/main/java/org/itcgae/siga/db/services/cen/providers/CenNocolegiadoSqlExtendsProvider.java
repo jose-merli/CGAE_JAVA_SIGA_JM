@@ -1,6 +1,8 @@
 package org.itcgae.siga.db.services.cen.providers;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
@@ -372,4 +374,81 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		return sql.toString();
 	}
 	
+	public String selectSociedadesEliminadas(Short idInstitucion, Date fechaDesde, Date fechaHasta) {
+		// Formateo de fecha para sentencia sql
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		
+		SQL sql = new SQL();
+		sql.SELECT("PER.NIFCIF AS NIF");
+		sql.SELECT("COL.FECHA_BAJA AS FECHA_BAJA");
+		sql.FROM("CEN_NOCOLEGIADO COL");
+		
+		sql.INNER_JOIN(" CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA");
+		sql.WHERE("IDINSTITUCION = '" +idInstitucion+ "'");
+		String fechadesde = dateFormat.format(fechaDesde);
+		sql.WHERE("TO_DATE(COL.FECHA_BAJA,'DD/MM/RRRR') >= TO_DATE('" + fechadesde + "', 'DD/MM/RRRR')");
+		String fechahasta = dateFormat.format(fechaHasta);
+		sql.WHERE("TO_DATE(COL.FECHA_BAJA,'DD/MM/RRRR') < TO_DATE('" + fechahasta + "', 'DD/MM/RRRR')");
+		
+		
+		return sql.toString();
+		
+	}
+	
+	public String selectSociedadesEditadas(Short idInstitucion, Date fechaDesde, Date fechaHasta) {
+		// Formateo de fecha para sentencia sql
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		
+		SQL sql = new SQL();
+
+		sql.SELECT("COL.IDPERSONA AS IDPERSONA");
+		sql.FROM("CEN_NOCOLEGIADO COL");
+		sql.WHERE("IDINSTITUCION = '" +idInstitucion+ "'");
+		String fechadesde = dateFormat.format(fechaDesde);
+		sql.WHERE("TO_DATE(COL.FECHAMODIFICACION,'DD/MM/RRRR') >= TO_DATE('" + fechadesde + "', 'DD/MM/RRRR')");
+		String fechahasta = dateFormat.format(fechaHasta);
+		sql.WHERE("TO_DATE(COL.FECHAMODIFICACION,'DD/MM/RRRR') < TO_DATE('" + fechahasta + "', 'DD/MM/RRRR')");
+		sql.WHERE("FECHA_BAJA IS NULL");
+		
+		
+		return sql.toString();
+		
+	}
+	
+	public String selectSociedadesEditar(Short idInstitucion, Date fechaDesde, Date fechaHasta) {
+		// Formateo de fecha para sentencia sql
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		
+		SQL sql = new SQL();
+
+		sql.SELECT("PER.IDPERSONA AS IDPERSONA");
+		sql.SELECT("PER.NIFCIF AS SOCIEDADNIF");
+		sql.SELECT("PER.NOMBRE AS SOCIEDADDENOMINACION");
+		sql.SELECT("SOCIEDAD.TIPO AS SOCIEDADFORMASOCIAL");
+		sql.SELECT("PER.FECHANACIMIENTO AS SOCIEDADFECHAALTA ");
+		sql.SELECT("SOCIEDAD.FECHA_BAJA AS FECHA_BAJA");
+		sql.SELECT("NOTARIO.NIFCIF AS IDENTIFICACIONNOTARIO");
+		sql.SELECT("NOTARIO.NOMBRE AS NOMBRENOTARIO");
+		sql.SELECT("NOTARIO.APELLIDOS1 AS APELLIDO1NOTARIO");
+		sql.SELECT("NOTARIO.APELLIDOS2 AS APELLIDO2NOTARIO");
+		sql.SELECT("SOCIEDAD.SOCIEDADPROFESIONAL");
+		sql.SELECT("SOCIEDAD.RESENA AS RESENA");
+		sql.SELECT("SOCIEDAD.OBJETOSOCIAL AS OBJETOSOCIAL");
+		sql.SELECT("PER.FECHANACIMIENTO AS FECHACONSTITUCION ");
+		sql.SELECT("SOCIEDAD.FECHAFIN AS FECHACANCELACION ");
+		sql.SELECT("SOCIEDAD.PREFIJO_NUMSSPP || SOCIEDAD.CONTADOR_NUMSSPP || SOCIEDAD.SUFIJO_NUMSSPP AS IDENTIFICACIONREGISTRO");
+		sql.SELECT("SOCIEDAD.CONTADOR_NUMSSPP AS NUMEROREGISTRO");
+		sql.FROM("CEN_NOCOLEGIADO SOCIEDAD");
+		sql.INNER_JOIN("CEN_PERSONA PER ON PER.IDPERSONA = SOCIEDAD.IDPERSONA");
+		sql.LEFT_OUTER_JOIN("CEN_PERSONA NOTARIO ON NOTARIO.IDPERSONA = SOCIEDAD.IDPERSONANOTARIO");
+		sql.WHERE("SOCIEDAD.IDINSTITUCION = '" +idInstitucion+ "'");
+		String fechadesde = dateFormat.format(fechaDesde);
+		sql.WHERE("TO_DATE(SOCIEDAD.FECHAMODIFICACION,'DD/MM/RRRR') >= TO_DATE('" + fechadesde + "', 'DD/MM/RRRR')");
+		String fechahasta = dateFormat.format(fechaHasta);
+		sql.WHERE("TO_DATE(SOCIEDAD.FECHAMODIFICACION,'DD/MM/RRRR') < TO_DATE('" + fechahasta + "', 'DD/MM/RRRR')");
+		sql.WHERE("SOCIEDAD.FECHA_BAJA IS NULL");
+		
+		return sql.toString();
+		
+	}
 }

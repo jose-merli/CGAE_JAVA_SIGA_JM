@@ -10,6 +10,8 @@ package org.itcgae.siga.commons.utils;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Date;
+import java.util.Calendar;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -35,11 +37,6 @@ public class UtilidadesString {
 
 		Properties prop = new Properties();//(Properties)idiomas.get(idi); 
 		if (prop == null)	{
-			// modificado por raul.ggonzalez 15-12-2004
-			// para que si no encuantra la clave o el bundle 
-			// devuelva el literal tal cual
-			// return "";
-			return key;
 		}
 		String aux = prop.getProperty(key,key);
 		if (aux.equals(key)) {
@@ -114,6 +111,19 @@ public class UtilidadesString {
 		}// for i
 		return output;
 	}
+	
+	public static Calendar toCalendar(Date date){
+		if (null != date) {
+		  Calendar cal = Calendar.getInstance();
+		  cal.setTime(date);
+		  return cal;
+		}else {
+			return null;
+		}
+	}
+	
+	
+	
 	
 
 }

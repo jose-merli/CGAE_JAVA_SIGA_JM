@@ -73,7 +73,8 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 				"/instituciones", 
 				"/perfilespost", 
 				"/perfiles",
-				"/getEntorno"		
+				"/getEntorno",
+				"/ws/**"
 		};
 		/*
 		 * 1. Se desactiva el uso de cookies 

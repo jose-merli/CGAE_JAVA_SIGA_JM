@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:registroSociedades.ws.sspp.itcgae.org" targetNamespace="urn:registroSociedades.ws.sspp.itcgae.org" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:include schemaLocation="DatosSociedades.xsd"/>
+
+  <xs:element name="getListaSociedadesRequest">
+    <xs:annotation>
+      <xs:documentation>Parámetro de entrada</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="numeroPeticion"/>
+        <xs:element ref="fechaDesde"/>
+        <xs:element ref="fechaHasta"/>
+        <xs:element ref="colegio"/>
+        <xs:element ref="conPaginacion"/>
+        <xs:element ref="numPagina"/>
+        <xs:element ref="numElementosPagina"/>
+        <xs:element name="entidadOrigen" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>Nombre de la entidad u organismo que está realizando la petición</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element ref="versionEsquema" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="getListaSociedadesResponse">
+    <xs:annotation>
+      <xs:documentation>Parámetro de salida</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+      <xs:element ref="versionEsquema" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="numeroPeticion"/>
+        <xs:element ref="colegio"/>
+        <xs:element ref="numPagina"/>
+        <xs:element ref="numTotalPaginas"/>
+         <xs:choice minOccurs="0">
+          <xs:element ref="registroSociedad" minOccurs="1" maxOccurs="unbounded"/>
+          <xs:element name="errorServidor" type="ErrorType"/>
+        </xs:choice>
+     </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+
+
+
+
+
+
+
+
+
+
+
+
