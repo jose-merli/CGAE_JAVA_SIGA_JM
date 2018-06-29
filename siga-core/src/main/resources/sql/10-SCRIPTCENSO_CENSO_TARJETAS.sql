@@ -124,4 +124,76 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('factSJCS.datosPagos.literal.porcentajeRetencion','Porcentaje Retención#EU','0','3',to_date('11/04/05','DD/MM/RR'),'0','15');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('factSJCS.datosPagos.literal.porcentajeRetencion','Porcentaje Retención#GL','0','4',to_date('11/04/05','DD/MM/RR'),'0','15');
 
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.apellido1','Primer cognom','0','2',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.apellido1','Primer apellido#GL','0','4',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.apellido1','Primer apellido#EU','0','3',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.apellido1','Primer apellido','0','1',to_date('10/03/04','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.apellido2','Segon cognom','0','2',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.apellido2','Segundo apellido#GL','0','4',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.apellido2','Segundo apellido#EU','0','3',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.apellido2','Segundo apellido','0','1',to_date('10/03/04','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.datosIdentificacion','Datos de identificación','0','1',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.datosIdentificacion','Datos de identificación#GL','0','4',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.datosIdentificacion','Dades d''identificació','0','2',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.datosIdentificacion','Datos de identificación#EU','0','3',to_date('31/03/08','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.datosColegiacion','Datos de colegiación','0','1',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.datosColegiacion','Datos de colegiación#GL','0','4',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.datosColegiacion','Dades de col·legiació','0','2',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.datosColegiacion','Datos de colegiación#EU','0','3',to_date('31/03/08','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientesAvanzada.literal.tipoColegio','Tipo de Colegio#GL','0','4',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientesAvanzada.literal.tipoColegio','Tipo de Colegio#EU','0','3',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientesAvanzada.literal.tipoColegio','Tipus de Col·legi','0','2',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientesAvanzada.literal.tipoColegio','Tipo de Colegio','0','1',to_date('10/03/04','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.datosDireccion.literal.provincia','Provincia#EU','0','3',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.datosDireccion.literal.provincia','Provincia','0','4',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.datosDireccion.literal.provincia','Provincia','0','2',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.datosDireccion.literal.provincia','Provincia','0','1',to_date('10/03/04','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.alterMutua.literal.numeroCuenta','Número de cuenta','0','1',to_date('20/06/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.alterMutua.literal.numeroCuenta','Número de cuenta#GL','0','4',to_date('20/06/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.alterMutua.literal.numeroCuenta','Compte','0','2',to_date('20/06/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.alterMutua.literal.numeroCuenta','Número de cuenta#EU','0','3',to_date('20/06/12','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.resultadoDuplicados.numeroColegiado','Número de colegiado','0','1',to_date('15/12/10','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.resultadoDuplicados.numeroColegiado','Número de colegiado#GL','0','4',to_date('15/12/10','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.resultadoDuplicados.numeroColegiado','Número de col·legiat','0','2',to_date('15/12/10','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.resultadoDuplicados.numeroColegiado','Número de colegiado#EU','0','3',to_date('15/12/10','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.cargo','Vinculación con la Sociedad','0','1',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.cargo','Vinculación con la Sociedad#GL','0','4',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.cargo','Vinculació amb la Societat','0','2',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.cargo','Vinculación con la Sociedad#EU','0','3',to_date('31/03/08','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.fechaCargo','Fecha Cargo#EU','0','3',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.fechaCargo','Data Càrrec','0','2',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.fechaCargo','Fecha Cargo#GL','0','4',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.fechaCargo','Fecha Cargo','0','1',to_date('10/03/04','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.fechaFinCargo','Fecha fin Cargo#EU','0','3',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.fechaFinCargo','Data fi Càrrec','0','2',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.fechaFinCargo','Fecha fin Cargo#GL','0','4',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.fechaFinCargo','Fecha fin Cargo','0','1',to_date('10/03/04','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.cargo','Càrrec','0','2',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.cargo','Cargo#EU','0','3',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.cargo','Cargo#GL','0','4',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.cargo','Cargo','0','1',to_date('10/03/04','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.descripcioncargo','Descripción del cargo#GL','0','4',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.descripcioncargo','Descripció del càrrec','0','2',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.descripcioncargo','Descripción del cargo#EU','0','3',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaComponentesJuridicos.literal.descripcioncargo','Descripción del cargo','0','1',to_date('31/03/08','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.liquidacionSociedad','Liquidación como sociedad','0','1',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.liquidacionSociedad','Liquidación como sociedad#GL','0','4',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.liquidacionSociedad','Liquidació com a societat','0','2',to_date('31/03/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.literal.liquidacionSociedad','Liquidación como sociedad#EU','0','3',to_date('31/03/08','DD/MM/RR'),'0','19');
+
+
+
 commit;

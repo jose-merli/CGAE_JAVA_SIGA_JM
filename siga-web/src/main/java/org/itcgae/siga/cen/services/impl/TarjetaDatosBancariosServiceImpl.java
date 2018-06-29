@@ -26,7 +26,6 @@ import javax.sql.DataSource;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
-import org.itcgae.siga.DTOs.adm.HeaderLogoDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicDTO;
@@ -1357,59 +1356,41 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 
 	@Override
-	public HeaderLogoDTO downloadFile(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request,
+	public ComboItem downloadFile(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request,
 			HttpServletResponse response) {
 		
+		
+		// con esto vaaaa !!!
 		File file = new File("C://IISIGA/anexos/2006002472110.pdf");
 		FileInputStream fis = null;
 		try {
 			fis = new FileInputStream(file);
 			// se pasa el logo en la respuesta http
+			// response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+			//InputStream input = fis;
+			// archivo = IOUtils.toByteArray(input);
 			IOUtils.copy(fis, response.getOutputStream());
-			
-		}catch (FileNotFoundException e) {
-			LOGGER.error("No se ha encontrado el fichero", e);
-			
+
+		} catch (FileNotFoundException e) {
+			System.out.println("Adas");
+
 		} catch (IOException e1) {
-			LOGGER.error("No se han podido escribir los datos binarios del logo en la respuesta HttpServletResponse", e1);
+			System.out.println("Adasd");
 			e1.printStackTrace();
-		}
-		finally {
-			if(null!= fis)
+		} finally {
+			if (null != fis)
 				try {
 					fis.close();
 				} catch (IOException e) {
-					LOGGER.error("No se ha cerrado el archivo que contiene el logo", e);
+					System.out.println("asdasd");
 					e.printStackTrace();
 				}
 		}
+
+		ComboItem comboItem = new ComboItem();
+		comboItem.setLabel("2006002472110.pdf");
 		
-//		File file = new File(pathFinal);
-//		FileInputStream fis = null;
-//		try {
-//			fis = new FileInputStream(file);
-//			// Parece que soporta otros tipos, como png
-//			response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-//			// se pasa el logo en la respuesta http
-//			IOUtils.copy(fis, response.getOutputStream());
-//			
-//		} catch (FileNotFoundException e) {
-//			LOGGER.error("No se ha encontrado el fichero", e);
-//			
-//		} catch (IOException e1) {
-//			LOGGER.error("No se han podido escribir los datos binarios del logo en la respuesta HttpServletResponse", e1);
-//			e1.printStackTrace();
-//		} 	
-//		finally{
-//			if(null!= fis)
-//				try {
-//					fis.close();
-//				} catch (IOException e) {
-//					LOGGER.error("No se ha cerrado el archivo que contiene el logo", e);
-//					e.printStackTrace();
-//				}
-//		}
-		return null;
+		return comboItem;
 	}
 	
 	
