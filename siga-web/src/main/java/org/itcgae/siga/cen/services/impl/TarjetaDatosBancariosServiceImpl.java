@@ -1149,7 +1149,10 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				List<NewIdDTO> newIdCuenta = cenCuentasbancariasExtendsMapper.
 						selectNewIdAnexo(mandatosUpdateDTO.getIdPersona(), mandatosUpdateDTO.getIdCuenta(), mandatosUpdateDTO.getIdMandato(),idInstitucion.toString());
 				if (null != newIdCuenta && newIdCuenta.size() > 0 ) {
-					idCuenta = Short.valueOf(newIdCuenta.get(0).getNewId());
+					if (null!= newIdCuenta.get(0)) {
+						idCuenta = Short.valueOf(newIdCuenta.get(0).getNewId());
+					}
+					
 				}
 					
 						// información a modificar
