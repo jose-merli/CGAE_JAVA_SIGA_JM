@@ -1,5 +1,6 @@
 package org.itcgae.siga.DTOs.cen;
 
+import java.util.Date;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,8 +9,8 @@ public class SociedadCreateDTO {
 
 	private String nif;
 	private String tipo;
-	private String fechaConstitucion;
-	private String fechaBaja;
+	private Date fechaConstitucion;
+	private Date fechaBaja;
 	private String denominacion;
 	private String abreviatura;
 	private String idioma;
@@ -22,36 +23,36 @@ public class SociedadCreateDTO {
 	
 	/**
 	 */
-	public SociedadCreateDTO fechaConstitucion(String fechaConstitucion){
+	public SociedadCreateDTO fechaConstitucion(Date fechaConstitucion){
 		this.fechaConstitucion = fechaConstitucion;
 		return this;
 	}
 	
 	@JsonProperty("fechaConstitucion")
-	public String getFechaConstitucion() {
+	public Date getFechaConstitucion() {
 		return fechaConstitucion;
 	}
 
 
-	public void setFechaConstitucion(String fechaConstitucion) {
+	public void setFechaConstitucion(Date fechaConstitucion) {
 		this.fechaConstitucion = fechaConstitucion;
 	}
 	
 	
 	/**
 	 */
-	public SociedadCreateDTO fechaBaja(String fechaBaja){
+	public SociedadCreateDTO fechaBaja(Date fechaBaja){
 		this.fechaBaja = fechaBaja;
 		return this;
 	}
 
 	@JsonProperty("fechaBaja")
-	public String getFechaBaja() {
+	public Date getFechaBaja() {
 		return fechaBaja;
 	}
 
 
-	public void setFechaBaja(String fechaBaja) {
+	public void setFechaBaja(Date fechaBaja) {
 		this.fechaBaja = fechaBaja;
 	}
 
