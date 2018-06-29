@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
-import org.itcgae.siga.DTOs.adm.HeaderLogoDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicDTO;
@@ -24,6 +23,7 @@ import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDTO;
 import org.itcgae.siga.DTOs.cen.MandatosUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosBancariosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,9 +143,54 @@ public class TarjetaDatosBancariosController {
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
-	 @RequestMapping(value = "busquedaPerJuridica/downloadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-	    public ResponseEntity<HeaderLogoDTO> downloadFile(@RequestBody MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request, HttpServletResponse response) {
-		 HeaderLogoDTO headerLogoDTO = tarjetaDatosBancariosService.downloadFile(mandatosUpdateDTO, request, response);
-	        return new ResponseEntity<HeaderLogoDTO>(headerLogoDTO, HttpStatus.OK);
+	 @RequestMapping(value = "busquedaPerJuridica/downloadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	    public ResponseEntity<ComboItem> downloadFile(@RequestBody MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request, HttpServletResponse response) {
+		 	ComboItem comboItem = tarjetaDatosBancariosService.downloadFile(mandatosUpdateDTO,request,response);
+			return new ResponseEntity<ComboItem>(comboItem, HttpStatus.OK);
 	    }
+	 
+	 
+//	 @RequestMapping(value = "busquedaPerJuridica/downloadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+//	    public ResponseEntity<FilesDTO> downloadFile(@RequestBody MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request) {
+//		 
+//		 FilesDTO filesDTO = new FilesDTO();
+//		 filesDTO.setExtension(".pdf");
+//		 filesDTO.setNameFile("2006002472110");
+//		 // con esto vaaaa !!!
+//		 byte[] archivo = null;
+//			File file = new File("C://IISIGA/anexos/2006002472110.pdf");
+//			FileInputStream fis = null;
+//			try {
+//				fis = new FileInputStream(file);
+//				// se pasa el logo en la respuesta http
+//				//response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+//				InputStream input = fis;
+//				//archivo = IOUtils.toByteArray(input);
+//				
+//				IOUtils.copy(fis, filesDTO.getResponse().getOutputStream());
+//				
+//			}catch (FileNotFoundException e) {
+//				System.out.println("Adas");
+//				
+//			} catch (IOException e1) {
+//				System.out.println("Adasd");
+//				e1.printStackTrace();
+//			}
+//			finally {
+//				if(null!= fis)
+//					try {
+//						fis.close();
+//					} catch (IOException e) {
+//						System.out.println("asdasd");
+//						e.printStackTrace();
+//					}
+//			}
+//		 
+//
+//			
+//			
+//			return new ResponseEntity<FilesDTO>(filesDTO, HttpStatus.OK);
+//	    }
+	 
+	
 }
