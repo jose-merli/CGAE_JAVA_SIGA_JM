@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.PersonaSearchDTO;
+import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenNocolegiadoSqlProvider;
 
@@ -450,5 +451,39 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		
 		return sql.toString();
 		
+	}
+	
+	public String insertSelectiveForCreateNewSociety(String idInstitucion, AdmUsuarios usuario,SociedadCreateDTO sociedadCreateDTO) {
+SQL sql = new SQL();
+		
+
+		sql.INSERT_INTO("CEN_NOCOLEGIADO");
+		
+		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona)");
+		sql.VALUES("IDINSTITUCION", "'" +idInstitucion  +"'");
+		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		sql.VALUES("USUMODIFICACION", "'" +String.valueOf(usuario.getIdusuario()) +"'");
+//		sql.VALUES("SERIE", "");
+//		sql.VALUES("NUMEROREF", "");
+		sql.VALUES("SOCIEDADSJ", "'0'");
+		sql.VALUES("TIPO",  "'" +sociedadCreateDTO.getTipo() +"'");
+		sql.VALUES("ANOTACIONES",  "'" +sociedadCreateDTO.getAnotaciones() +"'");
+//		sql.VALUES("PREFIJO_NUMREG", "");
+//		sql.VALUES("CONTADOR_NUMREG", "");
+//		sql.VALUES("SUFIJO_NUMREG", "");
+//		sql.VALUES("FECHAFIN", "");
+//		sql.VALUES("IDPERSONANOTARIO", "");
+//		sql.VALUES("RESENA", "");
+//		sql.VALUES("OBJETOSOCIAL", "");
+		sql.VALUES("SOCIEDADPROFESIONAL", "'0'");
+//		sql.VALUES("PREFIJO_NUMSSPP", "");
+//		sql.VALUES("CONTADOR_NUMSSPP", "");
+//		sql.VALUES("SUFIJO_NUMSSPP", "");
+//		sql.VALUES("NOPOLIZA", "");
+//		sql.VALUES("COMPANIASEG", "");
+//		sql.VALUES("IDENTIFICADORDS", "");
+		sql.VALUES("FECHA_BAJA", "null");
+		
+		return sql.toString();
 	}
 }

@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
+import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenPersonaSqlProvider;
 
@@ -323,6 +324,41 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SET("FECHAMODIFICACION = SYSDATE");
 		
 		sql.WHERE("IDPERSONA = '" + perJuridicaDatosRegistralesUpdateDTO.getIdPersona() + "'");
+		return sql.toString();
+	}
+	
+	
+	public String insertSelectiveForNewSociety(SociedadCreateDTO sociedadCreateDTO, AdmUsuarios usuario) {
+		SQL sql = new SQL();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		
+		sql.INSERT_INTO("CEN_PERSONA");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona)");
+		
+		if(!sociedadCreateDTO.getDenominacion().equals("")) {
+			sql.VALUES("NOMBRE", "'" + sociedadCreateDTO.getDenominacion() + "'" );
+		}
+		if(!sociedadCreateDTO.getAbreviatura().equals("")) {
+			sql.VALUES("APELLIDOS1", "'" + sociedadCreateDTO.getAbreviatura() + "'");
+		}
+		
+		if(!sociedadCreateDTO.getNif().equals("")) {
+			sql.VALUES("NIFCIF",  "'" + sociedadCreateDTO.getNif() + "'" );
+		}
+		
+		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuario.getIdusuario()) + "'");
+		sql.VALUES("IDTIPOIDENTIFICACION", "'20'");
+		
+		if(null != sociedadCreateDTO.getFechaConstitucion()) {
+			String fechaNacimiento = dateFormat.format(sociedadCreateDTO.getFechaConstitucion());
+			sql.VALUES("FECHANACIMIENTO", "'" + fechaNacimiento + "'");
+		}
+		
+		sql.VALUES("FALLECIDO", "'0'");
+		
+		
+		
 		return sql.toString();
 	}
 }

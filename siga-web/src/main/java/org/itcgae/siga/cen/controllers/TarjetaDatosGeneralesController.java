@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.cen.services.ITarjetaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,8 +65,8 @@ public class TarjetaDatosGeneralesController {
 	
 	
 	@RequestMapping(value = "busquedaPerJuridica/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> createLegalPerson(@RequestBody EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request) { 
-		UpdateResponseDTO response = tarjetaDatosGeneralesService.createLegalPerson(etiquetaUpdateDTO, request);
+	ResponseEntity<UpdateResponseDTO> createLegalPerson(@RequestBody SociedadCreateDTO sociedadCreateDTO, HttpServletRequest request) { 
+		UpdateResponseDTO response = tarjetaDatosGeneralesService.createLegalPerson(sociedadCreateDTO, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO >(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO >(response, HttpStatus.FORBIDDEN);
