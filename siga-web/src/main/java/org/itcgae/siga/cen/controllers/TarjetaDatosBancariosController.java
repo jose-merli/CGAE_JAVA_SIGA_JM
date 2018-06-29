@@ -21,6 +21,7 @@ import org.itcgae.siga.DTOs.cen.DatosBancariosSearchAnexosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDTO;
+import org.itcgae.siga.DTOs.cen.MandatosDownloadDTO;
 import org.itcgae.siga.DTOs.cen.MandatosUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -144,10 +145,19 @@ public class TarjetaDatosBancariosController {
 	}
 	
 	 @RequestMapping(value = "busquedaPerJuridica/downloadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	    public ResponseEntity<ComboItem> downloadFile(@RequestBody MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request, HttpServletResponse response) {
-		 	ComboItem comboItem = tarjetaDatosBancariosService.downloadFile(mandatosUpdateDTO,request,response);
+	    public ResponseEntity<ComboItem> downloadFile(@RequestBody MandatosDownloadDTO mandatosDownloadDTO, HttpServletRequest request, HttpServletResponse response) {
+		 	ComboItem comboItem = tarjetaDatosBancariosService.downloadFile(mandatosDownloadDTO,request,response);
 			return new ResponseEntity<ComboItem>(comboItem, HttpStatus.OK);
 	    }
+	 
+	 
+	 @RequestMapping(value = "busquedaPerJuridica/fileDownloadInformation", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<ComboItem> fileDownloadInformation(@RequestBody MandatosDownloadDTO mandatosDownloadDTO, HttpServletRequest request) { 
+		 ComboItem response = tarjetaDatosBancariosService.fileDownloadInformation(mandatosDownloadDTO, request);
+			return new ResponseEntity<ComboItem>(response, HttpStatus.OK);
+		}
+	
+	 
 	 
 	 
 //	 @RequestMapping(value = "busquedaPerJuridica/downloadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

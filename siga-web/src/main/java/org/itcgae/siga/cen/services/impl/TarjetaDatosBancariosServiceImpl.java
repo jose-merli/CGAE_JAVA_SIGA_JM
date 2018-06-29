@@ -40,6 +40,7 @@ import org.itcgae.siga.DTOs.cen.DatosBancariosSearchAnexosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDTO;
+import org.itcgae.siga.DTOs.cen.MandatosDownloadDTO;
 import org.itcgae.siga.DTOs.cen.MandatosItem;
 import org.itcgae.siga.DTOs.cen.MandatosUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -54,12 +55,15 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenAnexosCuentasbancarias;
 import org.itcgae.siga.db.entities.CenAnexosCuentasbancariasExample;
+import org.itcgae.siga.db.entities.CenAnexosCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
 import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenMandatosCuentasbancarias;
 import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasExample;
+import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasKey;
 import org.itcgae.siga.db.entities.GenFichero;
+import org.itcgae.siga.db.entities.GenFicheroKey;
 import org.itcgae.siga.db.entities.GenRecursos;
 import org.itcgae.siga.db.entities.GenRecursosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
@@ -1222,7 +1226,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		
 		// crear path para almacenar el fichero
 //		String pathFichero = "/FILERMSA1000/SIGA/ficheros/archivo/" + String.valueOf(idInstitucion) + "/mandatos/";
-		String pathFichero = "C://IISIGA/anexos";
+		String pathFichero = "C://IISIGA/anexos/";
 		String fileNewName = idPersona + idCuenta + idMandato;
 		
 		if(null == idAnexo || idAnexo.equals("") || idAnexo.equals("null")) {
@@ -1356,39 +1360,158 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 
 	@Override
-	public ComboItem downloadFile(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request,
+	public ComboItem downloadFile(MandatosDownloadDTO mandatosDownloadDTO, HttpServletRequest request,
 			HttpServletResponse response) {
 		
 		
-		// con esto vaaaa !!!
-		File file = new File("C://IISIGA/anexos/2006002472110.pdf");
-		FileInputStream fis = null;
-		try {
-			fis = new FileInputStream(file);
-			// se pasa el logo en la respuesta http
-			// response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-			//InputStream input = fis;
-			// archivo = IOUtils.toByteArray(input);
-			IOUtils.copy(fis, response.getOutputStream());
-
-		} catch (FileNotFoundException e) {
-			System.out.println("Adas");
-
-		} catch (IOException e1) {
-			System.out.println("Adasd");
-			e1.printStackTrace();
-		} finally {
-			if (null != fis)
-				try {
-					fis.close();
-				} catch (IOException e) {
-					System.out.println("asdasd");
-					e.printStackTrace();
-				}
-		}
-
+		CenMandatosCuentasbancarias cenMandatosCuentasbancarias = new CenMandatosCuentasbancarias();
+		CenAnexosCuentasbancarias cenAnexosCuentasbancarias = new CenAnexosCuentasbancarias();
+		GenFichero genFichero = new GenFichero();
+		Long idFichero = null;
 		ComboItem comboItem = new ComboItem();
-		comboItem.setLabel("2006002472110.pdf");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+			
+		
+		if(null == mandatosDownloadDTO.getIdAnexo() || mandatosDownloadDTO.getIdAnexo().equals("") || mandatosDownloadDTO.getIdAnexo().equals("null")) {
+			// consulta CEN_MANDATOS_CUENTASBANCARIAS
+			CenMandatosCuentasbancariasKey cenMandatosCuentasbancariasKey = new CenMandatosCuentasbancariasKey();
+			cenMandatosCuentasbancariasKey.setIdcuenta(Short.valueOf(mandatosDownloadDTO.getIdCuenta()));
+			cenMandatosCuentasbancariasKey.setIdinstitucion(idInstitucion);
+			cenMandatosCuentasbancariasKey.setIdmandato(Short.valueOf(mandatosDownloadDTO.getIdMandato()));
+			cenMandatosCuentasbancariasKey.setIdpersona(Long.valueOf(mandatosDownloadDTO.getIdPersona()));
+			cenMandatosCuentasbancarias = cenMandatosCuentasbancariasMapper.selectByPrimaryKey(cenMandatosCuentasbancariasKey);
+			
+			if(null != cenMandatosCuentasbancarias)
+				idFichero = cenMandatosCuentasbancarias.getIdficherofirma();
+		}
+		else {
+			// consulta CEN_ANEXOS_CUENTASBANCARIAS
+			
+			CenAnexosCuentasbancariasKey cenAnexosCuentasbancariasKey = new CenAnexosCuentasbancariasKey();
+			cenAnexosCuentasbancariasKey.setIdanexo(Short.valueOf(mandatosDownloadDTO.getIdAnexo()));
+			cenAnexosCuentasbancariasKey.setIdcuenta(Short.valueOf(mandatosDownloadDTO.getIdCuenta()));
+			cenAnexosCuentasbancariasKey.setIdinstitucion(idInstitucion);
+			cenAnexosCuentasbancariasKey.setIdmandato(Short.valueOf(mandatosDownloadDTO.getIdMandato()));
+			cenAnexosCuentasbancariasKey.setIdpersona(Long.valueOf(mandatosDownloadDTO.getIdPersona()));
+			cenAnexosCuentasbancarias = cenAnexosCuentasbancariasMapper.selectByPrimaryKey(cenAnexosCuentasbancariasKey);
+			
+			if(null != cenMandatosCuentasbancarias) {
+				idFichero = cenAnexosCuentasbancarias.getIdficherofirma();
+			}
+				
+			
+		}
+		
+		GenFicheroKey genFicheroKey = new GenFicheroKey();
+		genFicheroKey.setIdfichero(idFichero);
+		genFicheroKey.setIdinstitucion(idInstitucion);
+		genFichero = genFicheroExtendsMapper.selectByPrimaryKey(genFicheroKey);
+		
+		if(null != genFichero) {
+			String pathAbsolute = genFichero.getDirectorio();
+			pathAbsolute += genFichero.getExtension();
+			
+			File file = new File("C://IISIGA/anexos/2006002472110.pdf");
+			//File file = new File(pathAbsolute);
+			FileInputStream fis = null;
+			try {
+				fis = new FileInputStream(file);
+				IOUtils.copy(fis, response.getOutputStream());
+
+			} catch (FileNotFoundException e) {
+				LOGGER.error("No se ha encontrado el fichero", e);
+
+			} catch (IOException e1) {
+				LOGGER.error("No se han podido escribir los datos binarios del logo en la respuesta HttpServletResponse", e1);
+			} finally {
+				if (null != fis)
+					try {
+						fis.close();
+					} catch (IOException e) {
+						LOGGER.error("No se ha cerrado el archivo correctamente", e);
+					}
+			}
+			return comboItem;
+			
+		}
+		else {
+			return null;
+		}
+		
+//		ComboItem comboItem = new ComboItem();
+//		comboItem.setLabel("2006002472110.pdf");
+		
+		
+	}
+	
+	
+	
+	
+	@Override
+	public ComboItem fileDownloadInformation(MandatosDownloadDTO mandatosDownloadDTO, HttpServletRequest request) {
+		CenMandatosCuentasbancarias cenMandatosCuentasbancarias = new CenMandatosCuentasbancarias();
+		CenAnexosCuentasbancarias cenAnexosCuentasbancarias = new CenAnexosCuentasbancarias();
+		GenFichero genFichero = new GenFichero();
+		Long idFichero = null;
+		ComboItem comboItem = new ComboItem();
+		
+		
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if(null == mandatosDownloadDTO.getIdAnexo() || mandatosDownloadDTO.getIdAnexo().equals("") || mandatosDownloadDTO.getIdAnexo().equals("null")) {
+			// consulta CEN_MANDATOS_CUENTASBANCARIAS
+			CenMandatosCuentasbancariasKey cenMandatosCuentasbancariasKey = new CenMandatosCuentasbancariasKey();
+			cenMandatosCuentasbancariasKey.setIdcuenta(Short.valueOf(mandatosDownloadDTO.getIdCuenta()));
+			cenMandatosCuentasbancariasKey.setIdinstitucion(idInstitucion);
+			cenMandatosCuentasbancariasKey.setIdmandato(Short.valueOf(mandatosDownloadDTO.getIdMandato()));
+			cenMandatosCuentasbancariasKey.setIdpersona(Long.valueOf(mandatosDownloadDTO.getIdPersona()));
+			cenMandatosCuentasbancarias = cenMandatosCuentasbancariasMapper.selectByPrimaryKey(cenMandatosCuentasbancariasKey);
+			
+			if(null != cenMandatosCuentasbancarias)
+				idFichero = cenMandatosCuentasbancarias.getIdficherofirma();
+		}
+		else {
+			// consulta CEN_ANEXOS_CUENTASBANCARIAS
+			
+			CenAnexosCuentasbancariasKey cenAnexosCuentasbancariasKey = new CenAnexosCuentasbancariasKey();
+			cenAnexosCuentasbancariasKey.setIdanexo(Short.valueOf(mandatosDownloadDTO.getIdAnexo()));
+			cenAnexosCuentasbancariasKey.setIdcuenta(Short.valueOf(mandatosDownloadDTO.getIdCuenta()));
+			cenAnexosCuentasbancariasKey.setIdinstitucion(idInstitucion);
+			cenAnexosCuentasbancariasKey.setIdmandato(Short.valueOf(mandatosDownloadDTO.getIdMandato()));
+			cenAnexosCuentasbancariasKey.setIdpersona(Long.valueOf(mandatosDownloadDTO.getIdPersona()));
+			cenAnexosCuentasbancarias = cenAnexosCuentasbancariasMapper.selectByPrimaryKey(cenAnexosCuentasbancariasKey);
+			
+			if(null != cenMandatosCuentasbancarias) {
+				idFichero = cenAnexosCuentasbancarias.getIdficherofirma();
+			}
+				
+			
+		}
+		
+		GenFicheroKey genFicheroKey = new GenFicheroKey();
+		genFicheroKey.setIdfichero(idFichero);
+		genFicheroKey.setIdinstitucion(idInstitucion);
+		genFichero = genFicheroExtendsMapper.selectByPrimaryKey(genFicheroKey);
+		
+		if(null != genFichero) {
+			comboItem.setLabel(genFichero.getExtension());
+			String ruta = genFichero.getDirectorio();
+			String [] division = ruta.split("/");
+			String nombreArchivo = division[division.length-1];
+			if(nombreArchivo.contains("/")) {
+				nombreArchivo = nombreArchivo.replace("/", "");
+			}
+			comboItem.setValue(nombreArchivo);
+		}
+		
 		
 		return comboItem;
 	}
@@ -1585,6 +1708,11 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			
 		    return resultado;
 		}
+
+
+
+
+		
 
 
 
