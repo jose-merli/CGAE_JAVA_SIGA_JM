@@ -422,6 +422,8 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						cuentaBancaria.setAbonocargo("C");
 					}else if(tieneAbono) {
 						cuentaBancaria.setAbonocargo("A");
+					}else if(!tieneCargo && !tieneAbono) {
+						cuentaBancaria.setAbonocargo("");
 					}
 				}
 				
@@ -440,12 +442,13 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					
 					
 					//if (cuentasAdm.existeCuentaAbonoSJCS(beanCuentas.getIdPersona(), beanCuentas.getIdInstitucion(), beanCuentas.getIdCuenta())) {
-					if (null != cuenta && cuenta.size()>0) 
+					if (null != cuenta && !cuenta.isEmpty()) {
 						insertResponseDTO.setStatus(SigaConstants.KO);
 						error.setMessage("messages.censo.existeAbonoSJCS");
 						insertResponseDTO.setError(error);
 						return insertResponseDTO;
 					}
+				}
 				
 				
 				LOGGER.info(
@@ -814,6 +817,8 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						cuentaBancaria.setAbonocargo("C");
 					}else if(tieneAbono) {
 						cuentaBancaria.setAbonocargo("A");
+					}else if(!tieneCargo && !tieneAbono) {
+						cuentaBancaria.setAbonocargo("");
 					}
 				}
 				
@@ -832,14 +837,17 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					
 					
 					//if (cuentasAdm.existeCuentaAbonoSJCS(beanCuentas.getIdPersona(), beanCuentas.getIdInstitucion(), beanCuentas.getIdCuenta())) {
-					if (null != cuenta && cuenta.size()>0) 
-						updateResponseDTO.setStatus(SigaConstants.KO);
-						error.setMessage("messages.censo.existeAbonoSJCS");
-						updateResponseDTO.setError(error);
-						return updateResponseDTO;
+					if (null != cuenta && cuenta.size()>0) {
+						if (!cuenta.get(0).getIdcuenta().equals(Short.valueOf(datosBancariosInsertDTO.getIdCuenta()))) {
+							updateResponseDTO.setStatus(SigaConstants.KO);
+							error.setMessage("messages.censo.existeAbonoSJCS");
+							updateResponseDTO.setError(error);
+							return updateResponseDTO;
+						}
+
 					}
 				
-				
+				}
 				LOGGER.info(
 						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
 				response = cenCuentasbancariasExtendsMapper.updateByPrimaryKeySelective(cuentaBancaria);
