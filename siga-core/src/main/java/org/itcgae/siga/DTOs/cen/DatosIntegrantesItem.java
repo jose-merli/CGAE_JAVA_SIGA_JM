@@ -1,10 +1,6 @@
 package org.itcgae.siga.DTOs.cen;
 
-import java.util.Date;
 import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
 public class DatosIntegrantesItem {
@@ -31,7 +27,11 @@ public class DatosIntegrantesItem {
 	private String numColegiado;
 	private String idCargo;
 	private String idProvincia;
-	
+	private String descripcionCargo;
+	private String colegio;
+	private String nombrecolegio;
+	private String descripcionProfesion;
+	private String personaJuridica;	
 	
 	/**
 	 *
@@ -471,11 +471,99 @@ public class DatosIntegrantesItem {
 	
 
 	
+	/**
+	 *
+	 */
+	public DatosIntegrantesItem iddescripcionCargoProvincia(String descripcionCargo){
+		this.descripcionCargo = descripcionCargo;
+		return this;
+	}
 	
-	
+	public String getDescripcionCargo() {
+		return descripcionCargo;
+	}
 
 
+
+	public void setDescripcionCargo(String descripcionCargo) {
+		this.descripcionCargo = descripcionCargo;
+	}
 	
+	/**
+	 *
+	 */
+	public DatosIntegrantesItem colegio(String colegio){
+		this.colegio = colegio;
+		return this;
+	}
+	
+	public String getColegio() {
+		return colegio;
+	}
+
+
+
+	public void setColegio(String colegio) {
+		this.colegio = colegio;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public DatosIntegrantesItem nombrecolegio(String nombrecolegio){
+		this.nombrecolegio = nombrecolegio;
+		return this;
+	}
+	
+	public String getNombrecolegio() {
+		return nombrecolegio;
+	}
+
+
+
+	public void setNombrecolegio(String nombrecolegio) {
+		this.nombrecolegio = nombrecolegio;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public DatosIntegrantesItem descripcionProfesion(String descripcionProfesion){
+		this.descripcionProfesion = descripcionProfesion;
+		return this;
+	}
+	
+	public String getDescripcionProfesion() {
+		return descripcionProfesion;
+	}
+
+
+
+	public void setDescripcionProfesion(String descripcionProfesion) {
+		this.descripcionProfesion = descripcionProfesion;
+	}
+	
+	/**
+	 *
+	 */
+	public DatosIntegrantesItem personaJuridica(String personaJuridica){
+		this.personaJuridica = personaJuridica;
+		return this;
+	}
+	
+	public String getPersonaJuridica() {
+		return personaJuridica;
+	}
+
+
+
+	public void setPersonaJuridica(String personaJuridica) {
+		this.personaJuridica = personaJuridica;
+	}
+
+
 
 	
 	@Override
@@ -507,12 +595,19 @@ public class DatosIntegrantesItem {
 	    		Objects.equals(this.idTipoColegio, datosIntegrantesItem.idTipoColegio) &&
 	    		Objects.equals(this.numColegiado, datosIntegrantesItem.numColegiado) &&
 	    		Objects.equals(this.idCargo, datosIntegrantesItem.idCargo) &&
+	    		Objects.equals(this.descripcionCargo, datosIntegrantesItem.descripcionCargo) &&
+	    		Objects.equals(this.colegio, datosIntegrantesItem.colegio) &&
+	    		Objects.equals(this.nombrecolegio, datosIntegrantesItem.nombrecolegio) &&
+	    		Objects.equals(this.personaJuridica, datosIntegrantesItem.personaJuridica) &&
+	    		Objects.equals(this.descripcionProfesion, datosIntegrantesItem.descripcionProfesion) &&
 	    		Objects.equals(this.idProvincia, datosIntegrantesItem.idProvincia) ;
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona,idInstitucion,idComponente,cargo,fechaCargo,fechaBajaCargo,idPersonaComponente,sociedad,capitalSocial,fechaCargoInforme,ejerciente,fechaHistorico,nifCif,nombre,apellidos1,apellidos2,nombreCompleto,idTipoColegio,numColegiado,idCargo,idProvincia);
+	    return Objects.hash(idPersona,idInstitucion,idComponente,cargo,fechaCargo,fechaBajaCargo,idPersonaComponente,sociedad,capitalSocial,
+	    		fechaCargoInforme,ejerciente,fechaHistorico,nifCif,nombre,apellidos1,apellidos2,nombreCompleto,
+	    		idTipoColegio,numColegiado,idCargo,idProvincia,descripcionCargo,colegio,nombrecolegio,descripcionProfesion,personaJuridica);
 	}
 
 	
@@ -542,6 +637,11 @@ public class DatosIntegrantesItem {
 	    sb.append("    numColegiado: ").append(toIndentedString(numColegiado)).append("\n");
 	    sb.append("    idCargo: ").append(toIndentedString(idCargo)).append("\n");
 	    sb.append("    idProvincia: ").append(toIndentedString(idProvincia)).append("\n");
+	    sb.append("    descripcionCargo: ").append(toIndentedString(descripcionCargo)).append("\n");
+	    sb.append("    colegio: ").append(toIndentedString(colegio)).append("\n");
+	    sb.append("    nombrecolegio: ").append(toIndentedString(nombrecolegio)).append("\n");
+	    sb.append("    descripcionProfesion: ").append(toIndentedString(descripcionProfesion)).append("\n");
+	    sb.append("    personaJuridica: ").append(toIndentedString(personaJuridica)).append("\n");
 
 	    sb.append("}");
 	    return sb.toString();

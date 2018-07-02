@@ -25,6 +25,7 @@ public class SociedadesEditadasDTO {
 	private Date fechaBaja;
 	private Date fechaConstitucion;
 	private String sociedadProfesional;
+	private String idPersona;
 
 	public String getSociedadNif() {
 		return sociedadNif;
@@ -214,7 +215,15 @@ public class SociedadesEditadasDTO {
 	}
 
 
-	
+	public String getIdPersona() {
+		return idPersona;
+	}
+
+
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
+	}
+
 		
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -239,12 +248,13 @@ public class SociedadesEditadasDTO {
 	    		Objects.equals(this.numeroRegistro, sociedadesEditadasDTO.numeroRegistro) &&
 	    		Objects.equals(this.fechaBaja, sociedadesEditadasDTO.fechaBaja) &&
 	    		Objects.equals(this.fechaConstitucion, sociedadesEditadasDTO.fechaConstitucion) &&
+	    		Objects.equals(this.idPersona, sociedadesEditadasDTO.idPersona) &&
 	    		Objects.equals(this.sociedadProfesional, sociedadesEditadasDTO.sociedadProfesional);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(sociedadNif, sociedadDenominacion, sociedadFormaSocial, sociedadFechaAlta, notarioIdentificacion, notarioNombre, notarioApellido1, notarioApellido2, resena, fechaBaja,fechaConstitucion, identificacionRegistro, numeroRegistro, sociedadProfesional, fechaCancelacion);
+	    return Objects.hash(sociedadNif, sociedadDenominacion, sociedadFormaSocial, sociedadFechaAlta, notarioIdentificacion, notarioNombre, notarioApellido1, notarioApellido2, resena,idPersona, fechaBaja,fechaConstitucion, identificacionRegistro, numeroRegistro, sociedadProfesional, fechaCancelacion);
 	}
 
 	
@@ -268,6 +278,7 @@ public class SociedadesEditadasDTO {
 	    sb.append("    sociedadProfesional: ").append(toIndentedString(sociedadProfesional)).append("\n");
 	    sb.append("    fechaCancelacion: ").append(toIndentedString(fechaCancelacion)).append("\n"); 
 	    sb.append("    fechaConstitucion: ").append(toIndentedString(fechaConstitucion)).append("\n"); 
+	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n"); 
 	    sb.append("}");
 	    return sb.toString();
 	}

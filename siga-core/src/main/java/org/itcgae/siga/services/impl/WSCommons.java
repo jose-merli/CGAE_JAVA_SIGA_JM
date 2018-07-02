@@ -2,6 +2,7 @@ package org.itcgae.siga.services.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -10,6 +11,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.xmlbeans.XmlObject;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
+import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
+import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
 import org.itcgae.siga.DTOs.cen.SociedadesBajaDTO;
 import org.itcgae.siga.DTOs.cen.SociedadesEditadasDTO;
 import org.itcgae.siga.commons.constants.SigaConstants.ERROR_SERVER;
@@ -26,18 +30,36 @@ import org.itcgae.siga.db.mappers.CargasWsMapper;
 import org.itcgae.siga.db.mappers.CargasWsPaginaMapper;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.CfgParamColegiosMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.GuardarXmlDaoImpl;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.ValidationException;
+import org.itcgae.sspp.ws.registroSociedades.ColegioDocument.Colegio;
+import org.itcgae.sspp.ws.registroSociedades.ContactoDocument.Contacto;
+import org.itcgae.sspp.ws.registroSociedades.ContactoDocument.Contacto.Fax;
+import org.itcgae.sspp.ws.registroSociedades.ContactoDocument.Contacto.Telefono;
+import org.itcgae.sspp.ws.registroSociedades.ContactoDocument.Contacto.TelefonoMovil;
+import org.itcgae.sspp.ws.registroSociedades.DatosCargoDocument.DatosCargo;
 import org.itcgae.sspp.ws.registroSociedades.DatosEntidad;
 import org.itcgae.sspp.ws.registroSociedades.DatosEntidad.FormaSocial;
 import org.itcgae.sspp.ws.registroSociedades.DatosPersona;
+import org.itcgae.sspp.ws.registroSociedades.DatosProfesionalDocument.DatosProfesional;
 import org.itcgae.sspp.ws.registroSociedades.DatosRegistroDocument.DatosRegistro;
+import org.itcgae.sspp.ws.registroSociedades.DireccionDocument.Direccion;
+import org.itcgae.sspp.ws.registroSociedades.DireccionDocument.Direccion.CorreoElectronico;
+import org.itcgae.sspp.ws.registroSociedades.DireccionDocument.Direccion.Poblacion;
+import org.itcgae.sspp.ws.registroSociedades.DireccionDocument.Direccion.Provincia;
 import org.itcgae.sspp.ws.registroSociedades.ErrorType;
 import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesRequestDocument.GetListaSociedadesRequest;
 import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesResponseDocument.GetListaSociedadesResponse;
 import org.itcgae.sspp.ws.registroSociedades.IdentificacionDocument.Identificacion;
+import org.itcgae.sspp.ws.registroSociedades.IntegranteSociedadDocument.IntegranteSociedad;
+import org.itcgae.sspp.ws.registroSociedades.IntegranteSociedadDocument.IntegranteSociedad.IntegranteFisico;
+import org.itcgae.sspp.ws.registroSociedades.IntegranteSociedadDocument.IntegranteSociedad.IntegranteJuridico;
+import org.itcgae.sspp.ws.registroSociedades.ProfesionalAbogadoDocument.ProfesionalAbogado;
+import org.itcgae.sspp.ws.registroSociedades.ProfesionalDocument.Profesional;
 import org.itcgae.sspp.ws.registroSociedades.RegistroSociedadDocument.RegistroSociedad;
 import org.itcgae.sspp.ws.registroSociedades.SociedadActualizacionDocument.SociedadActualizacion;
 import org.itcgae.sspp.ws.registroSociedades.SociedadActualizacionDocument.SociedadActualizacion.Resena;
@@ -68,7 +90,13 @@ public class WSCommons {
 	
 	@Autowired
 	CenNocolegiadoExtendsMapper cenNoColegiado;
+	
+	@Autowired
+	private CenComponentesExtendsMapper cenComponentesExtendsMapper;
 
+	@Autowired
+	private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
+	
 	private int tamanoPaginacion;
 
 
@@ -431,13 +459,117 @@ public class WSCommons {
 						sociedadActualizacion.setFechaFin(UtilidadesString.toCalendar(regSociedad.getFechaCancelacion()));
 						/*IntegranteSociedad[] argIntegrantes;
 						sociedadActualizacion.setIntegranteSociedadArray(argIntegrantes);*/
+						DatosIntegrantesSearchDTO datosIntegrantesSearchDTO = new DatosIntegrantesSearchDTO();
+						datosIntegrantesSearchDTO.setIdPersona(regSociedad.getIdPersona());
+						List<DatosIntegrantesItem> datosIntegrantesItem = cenComponentesExtendsMapper.selectIntegrantes(datosIntegrantesSearchDTO );
+						if (null != datosIntegrantesItem && datosIntegrantesItem.size()>0) {
+							IntegranteSociedad[] integrantesSociedad = new IntegranteSociedad[datosIntegrantesItem.size()];
+							int i = 0;
+							for (DatosIntegrantesItem integrante : datosIntegrantesItem) {
+								IntegranteSociedad integranteUnitario = IntegranteSociedad.Factory.newInstance();
+								SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+								if (integrante.getPersonaJuridica().equals("0")) {
+									
+
+									IntegranteFisico integranteFisico = IntegranteFisico.Factory.newInstance();
+									DatosCargo cargo = DatosCargo.Factory.newInstance();
+									cargo.setCargo(integrante.getIdCargo());
+									cargo.setDescCargo(integrante.getDescripcionCargo());
+									Date fechaCargo = dateFormat.parse(integrante.getFechaCargo());
+									cargo.setFechaCargo(UtilidadesString.toCalendar(fechaCargo));
+									integranteFisico.setDatosCargo(cargo);
+									DatosPersona datosPersona = DatosPersona.Factory.newInstance();
+									datosPersona.setApellido1(integrante.getApellidos1());
+									datosPersona.setApellido2(integrante.getApellidos2());
+									datosPersona.setNombre(integrante.getNombre());
+									identificacion.setNIF(integrante.getNifCif());
+									datosPersona.setIdentificacion(identificacion);
+									integranteFisico.setDatosPersona(datosPersona);
+									DatosProfesional datosProfesional = DatosProfesional.Factory.newInstance();
+									Profesional profesional = Profesional.Factory.newInstance();
+									Colegio colegio = Colegio.Factory.newInstance();
+									colegio.setCodigoColegio(integrante.getColegio());
+									colegio.setDescripcionColegio(integrante.getNombrecolegio());
+									profesional.setColegio(colegio );
+									profesional.setNumColegiado(integrante.getNumColegiado());
+									profesional.setProfesion(integrante.getDescripcionProfesion());
+									ProfesionalAbogado profesionalAbogado =  ProfesionalAbogado.Factory.newInstance();
+									profesionalAbogado.setColegio(colegio );
+									profesionalAbogado.setNumColegiado(integrante.getNumColegiado());
+									datosProfesional.setProfesional(profesional);
+									datosProfesional.setProfesionalAbogado(profesionalAbogado);
+									integranteFisico.setDatosProfesional(datosProfesional);
+									integranteUnitario.setIntegranteFisico(integranteFisico);
+								}else{
+									IntegranteJuridico integranteJuridico = IntegranteJuridico.Factory.newInstance();
+									DatosCargo cargoJuridico = DatosCargo.Factory.newInstance();
+									cargoJuridico.setCargo(integrante.getIdCargo());
+									
+									cargoJuridico.setDescCargo(integrante.getDescripcionCargo());
+									Date fechaCargoJuridico = dateFormat.parse(integrante.getFechaCargo());
+									cargoJuridico.setFechaCargo(UtilidadesString.toCalendar(fechaCargoJuridico));
+									integranteJuridico.setDatosCargo(cargoJuridico);
+									DatosEntidad datosEntidad = DatosEntidad.Factory.newInstance();
+									datosEntidad.setCIFNIF(integrante.getNifCif());
+									datosEntidad.setDenominacion(integrante.getNombre());
+									//datosEntidad.setFormaSocial(arg0);
+									integranteJuridico.setDatosEntidad(datosEntidad );
+									integranteUnitario.setIntegranteJuridico(integranteJuridico);
+								}
+								integrantesSociedad[i] = integranteUnitario;
+								i++;
+							}
+							
+							sociedadActualizacion.setIntegranteSociedadArray(integrantesSociedad);
+						}
+						
 						boolean argPublicar = Boolean.FALSE;
 						sociedadActualizacion.setPublicar(argPublicar);
 						Resena argResena = Resena.Factory.newInstance();
 						argResena.setStringValue(regSociedad.getResena());
 						sociedadActualizacion.setResena(argResena);
 						sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
-						//registro.setSociedadActualizacion(sociedadActualizacion);
+						
+						List<DatosDireccionesItem> datosDireccionesItem = cenDireccionesExtendsMapper.selectDireccionesWs(regSociedad.getIdPersona());
+						if (null != datosDireccionesItem && datosDireccionesItem.size()>0) {
+							
+							for (DatosDireccionesItem direccionWS : datosDireccionesItem) {
+								
+								Direccion direccion =Direccion.Factory.newInstance();
+								direccion.setCodigoPostal(direccionWS.getCodigoPostal());
+								Contacto[] contacto = new Contacto[1];
+								Fax fax= Fax.Factory.newInstance();
+								fax.setStringValue(direccionWS.getFax());
+								contacto[0] = Contacto.Factory.newInstance();
+								contacto[0].setFax(fax);
+								Telefono telefono = Telefono.Factory.newInstance();
+								telefono.setStringValue(direccionWS.getTelefono());
+								contacto[0].setTelefono(telefono );
+								TelefonoMovil telefonoMovil = TelefonoMovil.Factory.newInstance();
+								telefonoMovil.setStringValue(direccionWS.getMovil());
+								contacto[0].setTelefonoMovil(telefonoMovil );
+								direccion.setContactoArray(contacto);
+								CorreoElectronico correoElectronico = CorreoElectronico.Factory.newInstance();
+								correoElectronico.setStringValue(direccionWS.getCorreoElectronico());
+								direccion.setCorreoElectronico(correoElectronico);
+								//direccion.setDescTipoVia(descripcionTipoVia);
+								
+								direccion.setDomicilio(direccionWS.getDomicilio());
+								
+								direccion.setPaginaWeb(direccionWS.getPaginaWeb());
+								Poblacion poblacion = Poblacion.Factory.newInstance();
+								poblacion.setCodigoPoblacion(direccionWS.getIdExternoPoblacion());
+								poblacion.setDescripcionPoblacion(direccionWS.getNombrePoblacion());
+								direccion.setPoblacion(poblacion);
+								Provincia provincia = Provincia.Factory.newInstance();
+								provincia.setCodigoProvincia(direccionWS.getIdExternoProvincia());
+								provincia.setDescripcionProvincia(direccionWS.getNombreProvincia());
+								direccion.setProvincia(provincia );
+								direccion.setPublicar(Boolean.FALSE);
+								sociedadActualizacion.setDireccion(direccion );
+							}
+						}
+						
 						sociedadesEditadasFinal.add(sociedadActualizacion);
 						//
 		
