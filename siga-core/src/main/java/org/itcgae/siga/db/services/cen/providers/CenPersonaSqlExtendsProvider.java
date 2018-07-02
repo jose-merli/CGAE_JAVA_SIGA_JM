@@ -314,7 +314,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		
 		if(null != perJuridicaDatosRegistralesUpdateDTO.getFechaConstitucion()) {
 			String fechaNacimiento = dateFormat.format(perJuridicaDatosRegistralesUpdateDTO.getFechaConstitucion());
-			sql.SET("FECHANACIMIENTO = '" + fechaNacimiento + "'");
+			sql.SET("FECHANACIMIENTO = TO_DATE('" + fechaNacimiento + "','DD/MM/YY')");
 		}
 		
 		if(null != usuario.getIdusuario()) {
@@ -352,7 +352,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		
 		if(null != sociedadCreateDTO.getFechaConstitucion()) {
 			String fechaNacimiento = dateFormat.format(sociedadCreateDTO.getFechaConstitucion());
-			sql.VALUES("FECHANACIMIENTO", "'" + fechaNacimiento + "'");
+			sql.VALUES("FECHANACIMIENTO", "TO_DATE('" + fechaNacimiento + "','DD/MM/YY')");
 		}
 		
 		sql.VALUES("FALLECIDO", "'0'");
