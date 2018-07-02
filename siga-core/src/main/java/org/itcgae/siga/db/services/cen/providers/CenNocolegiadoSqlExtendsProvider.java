@@ -1,7 +1,6 @@
 package org.itcgae.siga.db.services.cen.providers;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.ibatis.jdbc.SQL;
@@ -44,7 +43,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql2.SELECT("PER.NIFCIF AS NIF");
 		sql2.SELECT("PER.NOMBRE  AS DENOMINACION");
 		sql2.SELECT("DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) AS ABREVIATURA");
-		sql2.SELECT("PER.FECHANACIMIENTO AS FECHACONSTITUCION");
+		sql2.SELECT("TO_CHAR(PER.FECHANACIMIENTO,'DD/MM/YYYY')  AS FECHACONSTITUCION");
 		sql2.SELECT("COL.SOCIEDADPROFESIONAL AS SOCIEDADPROFESIONAL");
 		sql2.SELECT("CA.DESCRIPCION AS TIPO");
 		sql2.SELECT("COL.FECHA_BAJA AS FECHA_BAJA");
@@ -138,7 +137,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql2.SELECT("DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) AS ABREVIATURA");
 		sql2.SELECT("PER.FECHANACIMIENTO AS FECHACONSTITUCION");
 		sql2.SELECT("COL.SOCIEDADPROFESIONAL AS SOCIEDADPROFESIONAL");
-		sql2.SELECT("(select descripcion from GEN_RECURSOS where  idrecurso = 'censo.busquedaClientesAvanzada.literal.Sociedad' and idlenguaje = '"+ idLenguaje+ "') AS TIPO");
+		//sql2.SELECT("(select descripcion from GEN_RECURSOS where  idrecurso = 'censo.busquedaClientesAvanzada.literal.Sociedad' and idlenguaje = '"+ idLenguaje+ "') AS TIPO");
+		sql2.SELECT("CA.DESCRIPCION AS TIPO");
 		sql2.SELECT("COL.FECHA_BAJA AS FECHA_BAJA");
 		sql2.SELECT("NVL(COUNT(DISTINCT PER2.IDPERSONA),0) AS NUMEROINTEGRANTES");
 		sql2.SELECT("LISTAGG(CONCAT(PER2.NOMBRE ||' ',CONCAT(DECODE(PER2.APELLIDOS1,'#NA','',PER2.APELLIDOS1) || ' ',PER2.APELLIDOS2)), '; ') WITHIN GROUP (ORDER BY PER2.NOMBRE) AS NOMBRESINTEGRANTES");

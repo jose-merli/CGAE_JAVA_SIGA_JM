@@ -14,8 +14,8 @@ public class BusquedaJuridicaItem {
 	private String nif;
 	private String denominacion;
 	private String abreviatura;
-	@JsonFormat(pattern = "dd-MM-yyyy")
-	private Date fechaConstitucion;
+	//@JsonFormat(pattern = "dd-MM-yyyy")
+	private String fechaConstitucion;
 	private String tipo;
 	private String numeroIntegrantes;
 	private String nombresIntegrantes;
@@ -132,19 +132,19 @@ public class BusquedaJuridicaItem {
 	/**
 	 *
 	 */
-	public BusquedaJuridicaItem fechaConstitucion(Date fechaConstitucion){
+	public BusquedaJuridicaItem fechaConstitucion(String fechaConstitucion){
 		this.fechaConstitucion = fechaConstitucion;
 		return this;
 	}
 	
 	
 	@JsonProperty("fechaConstitucion")
-	public Date getFechaConstitucion() {
+	public String getFechaConstitucion() {
 		return fechaConstitucion;
 	}
 	
 	
-	public void setFechaConstitucion(Date fechaConstitucion) {
+	public void setFechaConstitucion(String fechaConstitucion) {
 		this.fechaConstitucion = fechaConstitucion;
 	}
 	
