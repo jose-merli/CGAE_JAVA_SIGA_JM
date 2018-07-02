@@ -57,7 +57,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		
  		if(null != tarjetaIntegrantesUpdateDTO.getFechaCargo()) {
  			String fechaC = dateFormat.format(tarjetaIntegrantesUpdateDTO.getFechaCargo());
-			sql.SET("FECHACARGO = '" + fechaC + "'");
+			sql.SET("FECHACARGO = TO_DATE('" + fechaC + "','DD/MM/YY')");
 		}
  		
 		if(!tarjetaIntegrantesUpdateDTO.getCargo().equals("")) {
@@ -99,7 +99,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.VALUES("IDCOMPONENTE", "'" + tarjetaIntegrantesCreateDTO.getIdComponente() + "'");
 		
 		if(!tarjetaIntegrantesCreateDTO.getCargo().equals("")) {
-			sql.VALUES("CARGO", "'" + tarjetaIntegrantesCreateDTO.getCargo() + "'");
+			sql.VALUES("CARGO","TO_DATE('" + tarjetaIntegrantesCreateDTO.getCargo() + "','DD/MM/YY')");
 		}
 		
 		
