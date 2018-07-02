@@ -777,9 +777,13 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 			record.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
 			record.setFechamodificacion(new Date());
 			record.setUsumodificacion(usuario.getIdusuario());
-			record.setIdlenguaje(sociedadCreateDTO.getIdioma());
 			
-			if(null != sociedadCreateDTO.getCuentaContable() || !sociedadCreateDTO.getCuentaContable().equals("") ) {
+			if(null != sociedadCreateDTO.getIdioma() && !sociedadCreateDTO.getIdioma().equals("")) {
+				record.setIdlenguaje(sociedadCreateDTO.getIdioma());
+			}
+		
+			
+			if(null != sociedadCreateDTO.getCuentaContable() && !sociedadCreateDTO.getCuentaContable().equals("") ) {
 				record.setAsientocontable(sociedadCreateDTO.getCuentaContable());
 			}
 			
