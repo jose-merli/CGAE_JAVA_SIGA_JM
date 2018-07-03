@@ -345,7 +345,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		
 		if(null != perJuridicaDatosRegistralesUpdateDTO.getFechaFin()) {
 			String fechaF = dateFormat.format(perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
-			sql.SET("FECHAFIN = 'TO_DATE('" + fechaF + "','DD/MM/YY')");
+			sql.SET("FECHAFIN = TO_DATE('" + fechaF + "','DD/MM/YY')");
 		}
 		
 		if(!perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional().equals("")) {
