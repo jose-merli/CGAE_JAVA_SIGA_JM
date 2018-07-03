@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.PersonaSearchDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenNocolegiadoSqlProvider;
 
@@ -111,16 +112,18 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		// meter subconsulta de objeto sql2 en objeto sql
 		sql.SELECT("CONSULTA.*");
 		sql.FROM( "(" + sql2 + ") consulta");
-		if(null != busquedaJuridicaSearchDTO.getDenominacion() && !busquedaJuridicaSearchDTO.getDenominacion().equalsIgnoreCase("")) {
-			sql.WHERE("UPPER(consulta.DENOMINACION) like UPPER('%" + busquedaJuridicaSearchDTO.getDenominacion() + "%')");
+		
+		
+		if (!UtilidadesString.esCadenaVacia(busquedaJuridicaSearchDTO.getDenominacion())) {
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.DENOMINACION", busquedaJuridicaSearchDTO.getDenominacion()));
 		}
 		
-		if(null != busquedaJuridicaSearchDTO.getIntegrante() && !busquedaJuridicaSearchDTO.getIntegrante().equalsIgnoreCase("")) {
-			sql.WHERE("upper(consulta.NOMBRESINTEGRANTES) like upper('%"+ busquedaJuridicaSearchDTO.getIntegrante() + "%')");
+		if (!UtilidadesString.esCadenaVacia(busquedaJuridicaSearchDTO.getIntegrante())) {
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.NOMBRESINTEGRANTES", busquedaJuridicaSearchDTO.getIntegrante()));
 		}
 		
-		if(null != busquedaJuridicaSearchDTO.getAbreviatura() && !busquedaJuridicaSearchDTO.getAbreviatura().equalsIgnoreCase("")) {
-			sql.WHERE("upper(consulta.ABREVIATURA) like upper('%"+ busquedaJuridicaSearchDTO.getAbreviatura() + "%')");
+		if (!UtilidadesString.esCadenaVacia(busquedaJuridicaSearchDTO.getAbreviatura())) {
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.ABREVIATURA", busquedaJuridicaSearchDTO.getAbreviatura()));
 		}
 		
 		return sql.toString();
