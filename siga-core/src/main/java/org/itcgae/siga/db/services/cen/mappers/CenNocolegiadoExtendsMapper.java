@@ -86,7 +86,7 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 		@Result(column = "IDGRUPO", property = "IDGrupos", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SOCIEDADPROFESIONAL", property = "sociedadProfesional", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "LENGUAJESOCIEDAD", property = "idLenguajeSociedad", jdbcType = JdbcType.VARCHAR), 
-		@Result(column = "ASIENTOCONTABLE", property = "idLenguajeSociedad", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "ASIENTOCONTABLE", property = "cuentaContable", jdbcType = JdbcType.VARCHAR)
 	})
 	List<PersonaJuridicaItem> searchGeneralData(PersonaJuridicaSearchDTO personaJuridicaSearchDTO);
 	
