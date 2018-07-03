@@ -109,13 +109,15 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.VALUES("IDCOMPONENTE", "'" + tarjetaIntegrantesCreateDTO.getIdComponente() + "'");
 		
 		if(!tarjetaIntegrantesCreateDTO.getCargo().equals("")) {
-			sql.VALUES("CARGO","TO_DATE('" + tarjetaIntegrantesCreateDTO.getCargo() + "','DD/MM/YY')");
+	        sql.VALUES("CARGO", "'" + tarjetaIntegrantesCreateDTO.getCargo() + "'");
 		}
-		
+
+
 		
 		if(null != tarjetaIntegrantesCreateDTO.getFechaCargo()) {
 			String fechaC = dateFormat.format(tarjetaIntegrantesCreateDTO.getFechaCargo());
-			sql.VALUES("FECHACARGO", "'" + fechaC + "'");
+			sql.VALUES("FECHACARGO","TO_DATE('" + fechaC + "','DD/MM/YY')");
+			
 		}
 		
 		

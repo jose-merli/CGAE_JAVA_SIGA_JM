@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.PersonaSearchDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenNocolegiadoSqlProvider;
 
@@ -69,7 +70,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		
 		sql2.WHERE("COL.FECHA_BAJA IS NULL");
 		if(null != busquedaJuridicaSearchDTO.getNif() && !busquedaJuridicaSearchDTO.getNif().equalsIgnoreCase("")) {
-			sql2.WHERE("PER.NIFCIF = '" + busquedaJuridicaSearchDTO.getNif() + "'");
+			sql2.WHERE("(UPPER(PER.NIFCIF) LIKE UPPER  ('%" + busquedaJuridicaSearchDTO.getNif() + "%'))");
+
 		}
 		
 		if(!grupos.equalsIgnoreCase("")) {
@@ -110,16 +112,18 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		// meter subconsulta de objeto sql2 en objeto sql
 		sql.SELECT("CONSULTA.*");
 		sql.FROM( "(" + sql2 + ") consulta");
-		if(null != busquedaJuridicaSearchDTO.getDenominacion() && !busquedaJuridicaSearchDTO.getDenominacion().equalsIgnoreCase("")) {
-			sql.WHERE("UPPER(consulta.DENOMINACION) like UPPER('%" + busquedaJuridicaSearchDTO.getDenominacion() + "%')");
+		
+		
+		if (!UtilidadesString.esCadenaVacia(busquedaJuridicaSearchDTO.getDenominacion())) {
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.DENOMINACION", busquedaJuridicaSearchDTO.getDenominacion()));
 		}
 		
-		if(null != busquedaJuridicaSearchDTO.getIntegrante() && !busquedaJuridicaSearchDTO.getIntegrante().equalsIgnoreCase("")) {
-			sql.WHERE("upper(consulta.NOMBRESINTEGRANTES) like upper('%"+ busquedaJuridicaSearchDTO.getIntegrante() + "%')");
+		if (!UtilidadesString.esCadenaVacia(busquedaJuridicaSearchDTO.getIntegrante())) {
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.NOMBRESINTEGRANTES", busquedaJuridicaSearchDTO.getIntegrante()));
 		}
 		
-		if(null != busquedaJuridicaSearchDTO.getAbreviatura() && !busquedaJuridicaSearchDTO.getAbreviatura().equalsIgnoreCase("")) {
-			sql.WHERE("upper(consulta.ABREVIATURA) like upper('%"+ busquedaJuridicaSearchDTO.getAbreviatura() + "%')");
+		if (!UtilidadesString.esCadenaVacia(busquedaJuridicaSearchDTO.getAbreviatura())) {
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.ABREVIATURA", busquedaJuridicaSearchDTO.getAbreviatura()));
 		}
 		
 		return sql.toString();
@@ -199,12 +203,13 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.SELECT("NVL(COUNT(DISTINCT PER2.IDPERSONA),0) AS NUMEROINTEGRANTES");
 		sql.SELECT("LISTAGG(CONCAT(PER2.NOMBRE ||' ',CONCAT(DECODE(PER2.APELLIDOS1,'#NA','',PER2.APELLIDOS1) || ' ',PER2.APELLIDOS2)), ';') WITHIN GROUP (ORDER BY PER2.NOMBRE) AS NOMBRESINTEGRANTES");
 		sql.SELECT("LISTAGG(GRUPOS_CLIENTE.IDGRUPO, ';') WITHIN GROUP (ORDER BY GRUPOS_CLIENTE.IDGRUPO)  OVER (PARTITION BY COL.IDPERSONA) AS IDGRUPO");
-		sql.SELECT("CLI.IDLENGUAJE AS LENGUAJESOCIEDAD");
-		sql.SELECT("CLI.ASIENTOCONTABLE"); 
+		sql.SELECT("CLIENTESOCIEDAD.IDLENGUAJE AS LENGUAJESOCIEDAD");
+		sql.SELECT("CLIENTESOCIEDAD.ASIENTOCONTABLE"); 
 		sql.FROM(" CEN_NOCOLEGIADO COL");
 		sql.INNER_JOIN(" CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA ");
 		sql.INNER_JOIN(" CEN_INSTITUCION I ON COL.IDINSTITUCION = I.IDINSTITUCION ");
-		sql.INNER_JOIN(" CEN_TIPOSOCIEDAD  TIPOSOCIEDAD ON TIPOSOCIEDAD.LETRACIF = COL.TIPO ");
+		sql.INNER_JOIN(" CEN_TIPOSOCIEDAD  TIPOSOCIEDAD ON TIPOSOCIEDAD.LETRACIF = COL.TIPO "
+				+ "LEFT JOIN CEN_CLIENTE CLIENTESOCIEDAD ON (COL.IDPERSONA = CLIENTESOCIEDAD.IDPERSONA AND COL.IDINSTITUCION = CLIENTESOCIEDAD.IDINSTITUCION)");
 		sql.INNER_JOIN(" GEN_RECURSOS_CATALOGOS CA ON (TIPOSOCIEDAD.DESCRIPCION = CA.IDRECURSO  AND CA.IDLENGUAJE = '" + personaJuridicaSearchDTO.getIdLenguaje() +"') "
 				+ "LEFT JOIN CEN_GRUPOSCLIENTE_CLIENTE GRUPOS_CLIENTE ON (GRUPOS_CLIENTE.IDINSTITUCION = I.IDINSTITUCION AND COL.IDPERSONA = GRUPOS_CLIENTE.IDPERSONA)"
 				+ "LEFT JOIN CEN_COMPONENTES COM ON (COM.IDPERSONA = COL.IDPERSONA AND COL.IDINSTITUCION = COM.IDINSTITUCION )"
@@ -226,8 +231,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.GROUP_BY("TIPOSOCIEDAD.LETRACIF");
 		sql.GROUP_BY("GRUPOS_CLIENTE.IDGRUPO");
 		sql.GROUP_BY("COL.FECHA_BAJA");
-		sql.GROUP_BY("CLI.IDLENGUAJE");
-		sql.GROUP_BY("CLI.ASIENTOCONTABLE");
+		sql.GROUP_BY("CLIENTESOCIEDAD.IDLENGUAJE");
+		sql.GROUP_BY("CLIENTESOCIEDAD.ASIENTOCONTABLE");
 		
 		return sql.toString();
 	}
@@ -345,7 +350,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		
 		if(null != perJuridicaDatosRegistralesUpdateDTO.getFechaFin()) {
 			String fechaF = dateFormat.format(perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
-			sql.SET("FECHAFIN = 'TO_DATE('" + fechaF + "','DD/MM/YY')");
+			sql.SET("FECHAFIN = TO_DATE('" + fechaF + "','DD/MM/YY')");
 		}
 		
 		if(!perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional().equals("")) {
@@ -467,7 +472,10 @@ SQL sql = new SQL();
 //		sql.VALUES("NUMEROREF", "");
 		sql.VALUES("SOCIEDADSJ", "'0'");
 		sql.VALUES("TIPO",  "'" +sociedadCreateDTO.getTipo() +"'");
-		sql.VALUES("ANOTACIONES",  "'" +sociedadCreateDTO.getAnotaciones() +"'");
+		if(null != sociedadCreateDTO.getAnotaciones() && !sociedadCreateDTO.getAnotaciones().equals("")) {
+			sql.VALUES("ANOTACIONES",  "'" +sociedadCreateDTO.getAnotaciones() +"'");
+		}
+		
 //		sql.VALUES("PREFIJO_NUMREG", "");
 //		sql.VALUES("CONTADOR_NUMREG", "");
 //		sql.VALUES("SUFIJO_NUMREG", "");

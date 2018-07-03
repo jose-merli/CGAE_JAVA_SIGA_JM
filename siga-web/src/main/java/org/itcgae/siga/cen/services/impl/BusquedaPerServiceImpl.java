@@ -408,8 +408,8 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				colegiadoRequest.setApellido2(busquedaPerFisicaSearchDTO.getSegundoApellido());
 				
 				com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest.Colegiado colegiadoSearch =com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest.Colegiado.Factory.newInstance();
-				if (null != busquedaPerFisicaSearchDTO.getNumColegiado()  && null != busquedaPerFisicaSearchDTO.getIdInstitucion()) {
-					colegiadoSearch.setNumColegiado(busquedaPerFisicaSearchDTO.getNumColegiado());
+				if (null != busquedaPerFisicaSearchDTO.getNumeroColegiado()  && null != busquedaPerFisicaSearchDTO.getIdInstitucion()) {
+					colegiadoSearch.setNumColegiado(busquedaPerFisicaSearchDTO.getNumeroColegiado());
 					ColegioType colegio = ColegioType.Factory.newInstance();
 					List<CenInstitucion> instituciones = institucionesService.getCodExternoByidInstitucion(busquedaPerFisicaSearchDTO.getIdInstitucion()[0]);
 					colegio.setCodigoColegio(instituciones.get(0).getCodigoext());
