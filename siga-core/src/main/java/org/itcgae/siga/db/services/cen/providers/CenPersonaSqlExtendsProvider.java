@@ -204,10 +204,13 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.GROUP_BY("col.fecha_baja ");
 
 		sql2.FROM("( " + sql + ") consulta");
-		if (null != busquedaPerJuridicaSearchDTO.getDenominacion()
-				&& !busquedaPerJuridicaSearchDTO.getDenominacion().equalsIgnoreCase("")) {
-			sql2.WHERE("upper(consulta.denominacion) LIKE upper('%" + busquedaPerJuridicaSearchDTO.getDenominacion()
-					+ "%')");
+		
+		if (!UtilidadesString.esCadenaVacia(busquedaPerJuridicaSearchDTO.getDenominacion())) {
+			sql2.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.denominacion", busquedaPerJuridicaSearchDTO.getDenominacion()));
+		}
+		
+		if (!UtilidadesString.esCadenaVacia(busquedaPerJuridicaSearchDTO.getAbreviatura())) {
+			sql2.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.abreviatura", busquedaPerJuridicaSearchDTO.getAbreviatura()));
 		}
 
 		return sql2.toString();
