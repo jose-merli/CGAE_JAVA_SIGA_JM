@@ -4,9 +4,12 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
+import org.itcgae.siga.DTOs.cen.TarjetaDireccionesUpdateDTO;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,6 +36,12 @@ public class TarjetaDatosDireccionesController {
 		return new ResponseEntity<DatosDireccionesDTO >(response, HttpStatus.OK);
 	}
 	
-	 
+	@RequestMapping(value = "tarjetaDirecciones/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> deleteMember(@RequestBody TarjetaDireccionesUpdateDTO[] tarjetaDireccionesUpdateDTO, HttpServletRequest request) { 
+		UpdateResponseDTO response = tarjetaDatosDireccionesService.deleteDireccion(tarjetaDireccionesUpdateDTO, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
 	
 }

@@ -7,10 +7,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaDTO;
@@ -49,12 +46,12 @@ import com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.Busqueda
 import com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument;
 import com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse;
 import com.colegiados.info.redabogacia.ColegiadoRequestDocument;
-import com.colegiados.info.redabogacia.ColegiadoResponseDocument;
-import com.colegiados.info.redabogacia.IdentificacionType;
 import com.colegiados.info.redabogacia.ColegiadoRequestDocument.ColegiadoRequest;
+import com.colegiados.info.redabogacia.ColegiadoResponseDocument;
 import com.colegiados.info.redabogacia.ColegiadoResponseDocument.ColegiadoResponse;
 import com.colegiados.info.redabogacia.ColegiadoResponseDocument.ColegiadoResponse.Colegiado;
 import com.colegiados.info.redabogacia.ColegioType;
+import com.colegiados.info.redabogacia.IdentificacionType;
 
 @Service
 public class BusquedaPerServiceImpl implements IBusquedaPerService {

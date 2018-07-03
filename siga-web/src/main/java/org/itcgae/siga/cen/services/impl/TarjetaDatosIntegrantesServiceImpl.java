@@ -27,7 +27,6 @@ import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenProvinciasExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -58,8 +57,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
 
-	@Autowired
-	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+
 
 	@Override
 	public DatosIntegrantesDTO searchIntegrantesData(int numPagina, DatosIntegrantesSearchDTO datosIntegrantesSearchDTO,

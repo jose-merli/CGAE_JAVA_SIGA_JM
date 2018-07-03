@@ -1386,7 +1386,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
+
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 			
 		
@@ -1456,8 +1456,6 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			return null;
 		}
 		
-//		ComboItem comboItem = new ComboItem();
-//		comboItem.setLabel("2006002472110.pdf");
 		
 		
 	}
@@ -1477,7 +1475,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		if(null == mandatosDownloadDTO.getIdAnexo() || mandatosDownloadDTO.getIdAnexo().equals("") || mandatosDownloadDTO.getIdAnexo().equals("null")) {
