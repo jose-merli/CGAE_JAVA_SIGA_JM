@@ -20,7 +20,7 @@ public class DatosDireccionesDTO {
 	}
 	
 	
-	public List<DatosDireccionesItem> getDatosIntegrantesItem() {
+	public List<DatosDireccionesItem> getDatosDireccionesItem() {
 		return datosDireccionesItem;
 	}
 	public void setDatosDireccionesItem(List<DatosDireccionesItem> datosDireccionesItem) {
