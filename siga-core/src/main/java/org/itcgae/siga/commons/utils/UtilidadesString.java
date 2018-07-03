@@ -123,7 +123,24 @@ public class UtilidadesString {
 	}
 	
 	
+	public static String filtroTextoBusquedas(String columna, String cadena) {
+		StringBuilder cadenaWhere = new StringBuilder();
+		cadenaWhere.append(" (TRANSLATE(LOWER( " + columna + "),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN') ");
+		cadenaWhere.append(" LIKE");
+		cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')) ");
+		return cadenaWhere.toString();
+		
+	}
 	
+	public static boolean esCadenaVacia(final String cadena) {
+
+		return cadena == null || cadena.trim().isEmpty();
+	}
+
+	public static boolean isNullOrBlank(final Object obj) {
+
+		return obj == null || "".equals(obj.toString().trim());
+	}
 	
 
 }
