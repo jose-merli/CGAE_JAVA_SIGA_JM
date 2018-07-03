@@ -97,9 +97,8 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 					busquedaPerFisicaSearchDTO.getSegundoApellido()));
 		}
 
-		if (null != busquedaPerFisicaSearchDTO.getNumColegiado()
-				&& !busquedaPerFisicaSearchDTO.getNumColegiado().equalsIgnoreCase("")) {
-			sql.WHERE(" COL.NCOLEGIADO = '" + busquedaPerFisicaSearchDTO.getNumColegiado() + "'");
+		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNumeroColegiado())) {
+			sql.WHERE(" COL.NCOLEGIADO = '" + busquedaPerFisicaSearchDTO.getNumeroColegiado() + "'");
 		}
 		
 		if (null != busquedaPerFisicaSearchDTO.getIdInstitucion()

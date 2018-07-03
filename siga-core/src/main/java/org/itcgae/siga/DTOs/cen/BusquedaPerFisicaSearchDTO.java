@@ -12,7 +12,7 @@ public class BusquedaPerFisicaSearchDTO {
 	private String nombre;
 	private String primerApellido;
 	private String segundoApellido;
-	private String numColegiado;
+	private String numeroColegiado;
 	
 	
 
@@ -113,18 +113,18 @@ public class BusquedaPerFisicaSearchDTO {
 	/**
 	 *
 	 */
-	public BusquedaPerFisicaSearchDTO numColegiado(String  numColegiado){
-		this.numColegiado = numColegiado;
+	public BusquedaPerFisicaSearchDTO numColegiado(String  numeroColegiado){
+		this.numeroColegiado = numeroColegiado;
 		return this;
 	}
-	@JsonProperty("numColegiado")
-	public String getNumColegiado() {
-		return numColegiado;
+	@JsonProperty("numeroColegiado")
+	public String getNumeroColegiado() {
+		return numeroColegiado;
 	}
 
 
-	public void setNumColegiado(String numColegiado) {
-		this.numColegiado = numColegiado;
+	public void setNumeroColegiado(String numeroColegiado) {
+		this.numeroColegiado = numeroColegiado;
 	}
 
 
@@ -143,14 +143,14 @@ public class BusquedaPerFisicaSearchDTO {
 	    		Objects.equals(this.nombre, busquedaFisicaSearchDTO.nombre)&&
 	    		Objects.equals(this.primerApellido, busquedaFisicaSearchDTO.primerApellido)&&
 	    		Objects.equals(this.segundoApellido, busquedaFisicaSearchDTO.segundoApellido)&&
-	    		Objects.equals(this.numColegiado, busquedaFisicaSearchDTO.numColegiado);
+	    		Objects.equals(this.numeroColegiado, busquedaFisicaSearchDTO.numeroColegiado);
 	}
 	
 	
 
 	@Override
 	public int hashCode() {
-	    return Objects.hash(nif, idInstitucion, nombre, primerApellido, segundoApellido, numColegiado);
+	    return Objects.hash(nif, idInstitucion, nombre, primerApellido, segundoApellido, numeroColegiado);
 	}
 
 	
@@ -164,7 +164,7 @@ public class BusquedaPerFisicaSearchDTO {
 	    sb.append("    nombre: ").append(toIndentedString(nombre)).append("\n");
 	    sb.append("    primerApellido: ").append(toIndentedString(primerApellido)).append("\n");
 	    sb.append("    segundoApellido: ").append(toIndentedString(segundoApellido)).append("\n");
-	    sb.append("    numColegiado: ").append(toIndentedString(numColegiado)).append("\n");
+	    sb.append("    numColegiado: ").append(toIndentedString(numeroColegiado)).append("\n");
 	    
 	    sb.append("}");
 	    return sb.toString();
