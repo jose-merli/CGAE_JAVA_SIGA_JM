@@ -326,7 +326,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 	public String insertSelectiveForNewSociety(SociedadCreateDTO sociedadCreateDTO, AdmUsuarios usuario) {
 		SQL sql = new SQL();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		sql.INSERT_INTO("CEN_PERSONA");
 		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona)");
@@ -348,7 +348,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 		if (null != sociedadCreateDTO.getFechaConstitucion()) {
 			String fechaNacimiento = dateFormat.format(sociedadCreateDTO.getFechaConstitucion());
-			sql.VALUES("FECHANACIMIENTO", "TO_DATE('" + fechaNacimiento + "','DD/MM/YY')");
+			sql.VALUES("FECHANACIMIENTO", "TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY')");
 		}
 
 		sql.VALUES("FALLECIDO", "'0'");
