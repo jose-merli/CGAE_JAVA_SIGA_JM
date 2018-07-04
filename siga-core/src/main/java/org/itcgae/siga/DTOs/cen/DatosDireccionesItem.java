@@ -30,6 +30,10 @@ public class DatosDireccionesItem {
 	private String paginaWeb;
 	private String idPersona;
 	private String otraProvincia;
+	private String[] idTipoDireccion;
+	private String idTipoDireccionList;
+	
+	
 	
 	public String getTipoDireccion() {
 		return tipoDireccion;
@@ -221,7 +225,34 @@ public class DatosDireccionesItem {
 		this.otraProvincia = otraProvincia;
 	}
 
+	/**
+	* Convert the given object to string with each line indented by 4 spaces
+	* (except the first line).
+	*/
+	private String toIndentedString(java.lang.Object o) {
+	    if (o == null) {
+	      return "null";
+	    }
+	    return o.toString().replace("\n", "\n    ");
+	}
+
+	public String[] getIdTipoDireccion() {
+		return idTipoDireccion;
+	}
+
+	public void setIdTipoDireccion(String[] idTipoDireccion) {
+		this.idTipoDireccion = idTipoDireccion;
+	}
 	
+	public String getIdTipoDireccionList() {
+		return idTipoDireccionList;
+	}
+
+	public void setIdTipoDireccionList(String idTipoDireccionList) {
+		this.idTipoDireccionList = idTipoDireccionList;
+	}
+
+
 
 	
 	
@@ -256,13 +287,14 @@ public class DatosDireccionesItem {
 	    		Objects.equals(this.nombreProvincia, datosDireccionesItem.nombreProvincia) &&
 	    		Objects.equals(this.paginaWeb, datosDireccionesItem.paginaWeb) &&
 	    		Objects.equals(this.otraProvincia, datosDireccionesItem.otraProvincia) &&
+	    		Objects.equals(this.idTipoDireccion, datosDireccionesItem.idTipoDireccion) &&
 	    		Objects.equals(this.fax, datosDireccionesItem.fax);
 	}
 	
 	@Override
 	public int hashCode() {
 	    return Objects.hash(idInstitucion,tipoDireccion,idDireccion,codigoPostal,domicilio,domicilioLista,idPoblacion,idProvincia,idPais,telefono,fechaBaja,movil,
-	    		correoElectronico, idExternoPais, nombrePais, idExternoPoblacion, nombrePoblacion, idExternoProvincia, nombreProvincia, fax,paginaWeb,idPersona,otraProvincia);
+	    		correoElectronico, idExternoPais, nombrePais, idExternoPoblacion, nombrePoblacion, idExternoProvincia, nombreProvincia, fax,paginaWeb,idPersona,otraProvincia,idTipoDireccion);
 	}
 
 	
@@ -293,21 +325,13 @@ public class DatosDireccionesItem {
 	    sb.append("    idExternoProvincia: ").append(toIndentedString(idExternoProvincia)).append("\n");
 	    sb.append("    fax: ").append(toIndentedString(fax)).append("\n");
 	    sb.append("    otraProvincia: ").append(toIndentedString(otraProvincia)).append("\n");
+	    sb.append("    idTipoDireccion: ").append(toIndentedString(idTipoDireccion)).append("\n");
 	    sb.append("    paginaweb: ").append(toIndentedString(paginaWeb)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
 
-	/**
-	* Convert the given object to string with each line indented by 4 spaces
-	* (except the first line).
-	*/
-	private String toIndentedString(java.lang.Object o) {
-	    if (o == null) {
-	      return "null";
-	    }
-	    return o.toString().replace("\n", "\n    ");
-	}
+
 
 
 	

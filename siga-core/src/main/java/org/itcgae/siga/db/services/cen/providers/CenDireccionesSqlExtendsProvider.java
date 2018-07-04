@@ -1,14 +1,7 @@
 package org.itcgae.siga.db.services.cen.providers;
 
-import java.text.SimpleDateFormat;
-
 import org.apache.ibatis.jdbc.SQL;
-import org.aspectj.org.eclipse.jdt.core.IField;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
-import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
-import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
-import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
-import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenComponentesSqlProvider;
 
 public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
@@ -63,6 +56,7 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		
 		sql.SELECT_DISTINCT(" CAT.DESCRIPCION");
 		sql.SELECT("DIRECCION.IDDIRECCION");
+		sql.SELECT("TIPO.IDTIPODIRECCION");
 		sql.SELECT("DIRECCION.CODIGOPOSTAL");
 		sql.SELECT("TO_CHAR(DIRECCION.FECHABAJA,'DD/MM/YYYY') AS FECHABAJA");
 		sql.SELECT("DIRECCION.IDINSTITUCION");
@@ -104,6 +98,7 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		
 		
 		sqlPrincipal.SELECT_DISTINCT("LISTAGG(DIRECCIONES.DESCRIPCION, ';') WITHIN GROUP (ORDER BY DIRECCIONES.DESCRIPCION)  OVER (PARTITION BY DIRECCIONES.IDDIRECCION) AS TIPODIRECCION");
+		sqlPrincipal.SELECT_DISTINCT("LISTAGG(DIRECCIONES.IDTIPODIRECCION, ';') WITHIN GROUP (ORDER BY DIRECCIONES.IDTIPODIRECCION)  OVER (PARTITION BY DIRECCIONES.IDDIRECCION) AS IDTIPODIRECCIONLIST");
 		sqlPrincipal.SELECT("IDDIRECCION");
 		sqlPrincipal.SELECT("CODIGOPOSTAL");
 		sqlPrincipal.SELECT("FECHABAJA");
@@ -129,6 +124,17 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sqlPrincipal.FROM( "(" + sql.toString() + ") DIRECCIONES");
 		
 		return sqlPrincipal.toString();
+	}
+	
+	
+	public String selectNewIdDireccion(String idPersona, String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("MAX(DIRECCION.IDDIRECCION) + 1 AS IDDIRECCION");
+		sql.FROM("CEN_DIRECCIONES DIRECCION");
+		sql.WHERE("DIRECCION.IDPERSONA = '"+idPersona+"'");
+		sql.WHERE("DIRECCION.IDINSTITUCION = '"+idInstitucion+"'");
+		
+		return sql.toString();
 	}
 
 }

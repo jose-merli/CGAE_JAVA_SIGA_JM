@@ -1,6 +1,7 @@
 package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
@@ -18,12 +20,18 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
+import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
+import org.itcgae.siga.db.entities.CenDireccionTipodireccionKey;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPoblaciones;
 import org.itcgae.siga.db.entities.CenPoblacionesExample;
+
+import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
 import org.itcgae.siga.db.mappers.CenPoblacionesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
@@ -36,6 +44,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccionesService{
+
+	
 
 	private Logger LOGGER = Logger.getLogger(TarjetaDatosDireccionesServiceImpl.class);
 	
@@ -52,8 +62,10 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	private CenPaisExtendsMapper cenPaisExtendsMapper;
 	
 	@Autowired
+	private CenDireccionTipodireccionMapper cenDireccionTipodireccionMapper;
+
+	@Autowired
 	private CenTipoDireccionExtendsMapper cenTipoDireccionExtendsMapper;
-	
 	
 	@Override
 	public DatosDireccionesDTO datosDireccionesSearch(int numPagina, DatosDireccionesSearchDTO datosDireccionesSearchDTO,	HttpServletRequest request) {
@@ -84,7 +96,14 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				LOGGER.info(
 						"datosDireccionesSearch() / cenDireccionesExtendsMapper.selectDirecciones() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de direcciones");
 
-				datosDireccionesDTO.setDatosDireccionesItem(datosDireccionesItem);;
+				if (null != datosDireccionesItem && datosDireccionesItem.size()>0) {
+					for (DatosDireccionesItem datosDireccionItem : datosDireccionesItem) {
+						if (!UtilidadesString.esCadenaVacia(datosDireccionItem.getIdTipoDireccionList())) {
+							datosDireccionItem.setIdTipoDireccion(datosDireccionItem.getIdTipoDireccionList().split(";"));
+						}
+					}
+				}
+				datosDireccionesDTO.setDatosDireccionesItem(datosDireccionesItem);
 			} 
 			else {
 				LOGGER.warn("datosDireccionesSearch() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
@@ -291,9 +310,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		boolean tieneSCSJ = Boolean.FALSE;
-		boolean tieneCargo = Boolean.FALSE;
-		boolean tieneAbono = Boolean.FALSE;
+
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -330,39 +347,63 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
 				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
-/*
-				//Gestionamos los abonos que nos llegan
-				if (null != datosDireccionesItem.get && datosBancariosInsertDTO.getTipoCuenta().length>0) {
 
-					for (String uso : datosBancariosInsertDTO.getTipoCuenta()) {
-						if (uso.equals("S")) {
-							cuentaBancaria.setAbonosjcs("1");
-							tieneSCSJ = Boolean.TRUE;
-						}
-						if (uso.equals("C")) {
-							tieneCargo = Boolean.TRUE;
-						
-						}
-						if (uso.equals("A")) {
-							tieneAbono = Boolean.TRUE;
-						
+				
+				CenDireccionTipodireccionExample tipoDireccionexample =  new CenDireccionTipodireccionExample();
+				tipoDireccionexample.createCriteria().andIddireccionEqualTo(Long.valueOf(datosDireccionesItem.getIdDireccion())).andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()));
+				
+				List<CenDireccionTipodireccion> tiposDireccion = cenDireccionTipodireccionMapper.selectByExample(tipoDireccionexample );
+				
+				//Gestionamos los abonos que nos llegan
+				if (null != datosDireccionesItem.getIdTipoDireccion() && datosDireccionesItem.getIdTipoDireccion().length>0) {
+					List<String> idTiposDireccionTotal = new ArrayList<String>();
+					List<String> idTiposDireccionFront = new ArrayList<String>();
+					idTiposDireccionFront.addAll(Arrays.asList(datosDireccionesItem.getIdTipoDireccion()));
+					if (null != tiposDireccion && tiposDireccion.size()>0) {
+						for (CenDireccionTipodireccion cenDireccionTipodireccion : tiposDireccion) {
+							idTiposDireccionTotal.add(cenDireccionTipodireccion.getIdtipodireccion().toString());
 						}
 					}
-					if (!tieneSCSJ) {
-						cuentaBancaria.setAbonosjcs("0");
+					
+					
+					for (String uso : datosDireccionesItem.getIdTipoDireccion()) {
+						if (idTiposDireccionTotal.contains(uso)) {
+							idTiposDireccionTotal.remove(uso);
+							idTiposDireccionFront.remove(uso);
+						}
 					}
-					if (tieneCargo && tieneAbono) {
-						cuentaBancaria.setAbonocargo("T");
-						
-					}else if(tieneCargo) {
-						cuentaBancaria.setAbonocargo("C");
-					}else if(tieneAbono) {
-						cuentaBancaria.setAbonocargo("A");
-					}else if(!tieneCargo && !tieneAbono) {
-						cuentaBancaria.setAbonocargo("");
+					
+					if (null != idTiposDireccionTotal && idTiposDireccionTotal.size()>0) {
+						for (String idTipoDireccionBorrar : idTiposDireccionTotal) {
+							CenDireccionTipodireccionKey TipoDireccionkey = new CenDireccionTipodireccionKey();
+							TipoDireccionkey.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
+							TipoDireccionkey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+							TipoDireccionkey.setIdinstitucion(Short.valueOf(idInstitucion));
+							TipoDireccionkey.setIdtipodireccion(Short.valueOf(idTipoDireccionBorrar));
+							cenDireccionTipodireccionMapper.deleteByPrimaryKey(TipoDireccionkey);
+						}
 					}
+					if (null != idTiposDireccionFront && idTiposDireccionFront.size()>0) {
+						for (String idTipoDireccionInsertar : idTiposDireccionFront) {
+							CenDireccionTipodireccion TipoDireccionrecord = new CenDireccionTipodireccion();
+							TipoDireccionrecord.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
+							TipoDireccionrecord.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+							TipoDireccionrecord.setIdinstitucion(Short.valueOf(idInstitucion));
+							TipoDireccionrecord.setIdtipodireccion(Short.valueOf(idTipoDireccionInsertar));
+							TipoDireccionrecord.setFechamodificacion(new Date());
+							TipoDireccionrecord.setUsumodificacion(usuario.getIdusuario());
+							cenDireccionTipodireccionMapper.insert(TipoDireccionrecord);
+						}
+					}
+					
+				}else{
+					
+					//Eliminamos los tipos de dirección
+					
+					cenDireccionTipodireccionMapper.deleteByExample(tipoDireccionexample);
+					
 				}
-	*/			
+				
 				
 				LOGGER.info(
 						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
@@ -401,141 +442,117 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 
 	@Override
-	public InsertResponseDTO createDirection(DatosDireccionesItem tarjetaIntegrantesCreateDTO,
+	public InsertResponseDTO createDirection(DatosDireccionesItem datosDireccionesItem,
 			HttpServletRequest request) {
 		
-		LOGGER.info("updateMember() -> Entrada al servicio para crear un nuevo integrante");
-		InsertResponseDTO updateResponseDTO = new InsertResponseDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-		AdmUsuarios usuario = new AdmUsuarios();
-		ComboItem comboItem = new ComboItem();
-		/*
-		
+		LOGGER.info("insertBanksData() -> Entrada al servicio para insertar cuentas bancarias");
+		int response = 0;
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-		LOGGER.info(
-				"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-		LOGGER.info(
-				"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-		if (null != usuarios && usuarios.size() > 0) {
-			usuario = usuarios.get(0);
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			Long idDireccion= new Long(1);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				
+				
+				// información a insertar
+				//Obtenemos el nuevo idDireccion
+
+				List<DatosDireccionesItem> newIdDireccion = cenDireccionesExtendsMapper.selectNewIdDireccion(datosDireccionesItem.getIdPersona(),idInstitucion.toString());
+				if (null != newIdDireccion && newIdDireccion.size() > 0 ) {
+					if (null!= newIdDireccion.get(0)) {
+						idDireccion = Long.valueOf(newIdDireccion.get(0).getIdDireccion());
+					}
+					
+				}
+				CenDirecciones direcciones = new CenDirecciones();
+				
+				direcciones.setIddireccion(idDireccion);
+				direcciones.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+				direcciones.setIdinstitucion(Short.valueOf(idInstitucion));
+				direcciones.setFechamodificacion(new Date());
+				direcciones.setUsumodificacion(usuario.getIdusuario());
+				direcciones.setCodigopostal(datosDireccionesItem.getCodigoPostal());
+				direcciones.setCorreoelectronico(datosDireccionesItem.getCorreoElectronico());
+				direcciones.setDomicilio(datosDireccionesItem.getDomicilio());
+				direcciones.setFax1(datosDireccionesItem.getFax());
+				direcciones.setIdpais(datosDireccionesItem.getIdPais());
+				direcciones.setIdpoblacion(datosDireccionesItem.getIdPoblacion());
+				direcciones.setIdprovincia(datosDireccionesItem.getIdProvincia());
+				direcciones.setMovil(datosDireccionesItem.getMovil());
+				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
+				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
+				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
+
+				LOGGER.info(
+						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
+				response = cenDireccionesExtendsMapper.insert(direcciones);
+				LOGGER.info(
+						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
+				
 			
-			// 1. Ya existe un idpersona para el nuevo integrante
-			if(!tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante().equals(""))
-			{
-				int responseCenCliente = 1; // se puede crear o no => se inicializa a 1
-				int responseCenComponentes = 0; // se debe crear siempre
-				
-				// 1.1 Comprobamos que existe en tabla cen_cliente
-				CenCliente cenCliente = new CenCliente();
-				CenClienteKey key = new CenClienteKey();
-				key.setIdinstitucion(Short.valueOf(tarjetaIntegrantesCreateDTO.getIdInstitucionIntegrante()));
-				key.setIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()));
-				cenCliente = cenClienteMapper.selectByPrimaryKey(key);
-				
-				// 1.2 Si no existe, se crea un registro
-				if(null == cenCliente) {
-					CenCliente record = new CenCliente();
-					record = rellenarInsertCenCliente(tarjetaIntegrantesCreateDTO, usuario);
-					responseCenCliente = cenClienteMapper.insertSelective(record);
+				//Gestionamos los abonos que nos llegan
+				if (null != datosDireccionesItem.getIdTipoDireccion() && datosDireccionesItem.getIdTipoDireccion().length>0) {
+
+					List<String> idTiposDireccionFront = new ArrayList<String>();
+					idTiposDireccionFront.addAll(Arrays.asList(datosDireccionesItem.getIdTipoDireccion()));
+
+					
+					for (String idTipoDireccionInsertar : datosDireccionesItem.getIdTipoDireccion()) {
+						CenDireccionTipodireccion TipoDireccionrecord = new CenDireccionTipodireccion();
+						TipoDireccionrecord.setIddireccion(idDireccion);
+						TipoDireccionrecord.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						TipoDireccionrecord.setIdinstitucion(Short.valueOf(idInstitucion));
+						TipoDireccionrecord.setIdtipodireccion(Short.valueOf(idTipoDireccionInsertar));
+						TipoDireccionrecord.setFechamodificacion(new Date());
+						TipoDireccionrecord.setUsumodificacion(usuario.getIdusuario());
+						cenDireccionTipodireccionMapper.insert(TipoDireccionrecord);
+					}
+					
+										
 				}
 				
-				if(responseCenCliente == 1) {
-					// 1.3 Comprobar si esta en cen_nocolegiado/cen_colegiado (no se hace ahora mismo)
-					
-					// 1.4 Insertamos un registro en tabla cen_componentes
-					comboItem = cenComponentesExtendsMapper.selectMaxIDComponente(tarjetaIntegrantesCreateDTO.getIdPersonaPadre(), String.valueOf(idInstitucion));
-					int siguienteIDComponente;
-					if(null != comboItem) {
-						siguienteIDComponente = Integer.valueOf(comboItem.getValue()) + 1;
-					}
-					else {
-						siguienteIDComponente = 1;
-					}
-					
-					tarjetaIntegrantesCreateDTO.setIdComponente(String.valueOf(siguienteIDComponente));
-					responseCenComponentes = cenComponentesExtendsMapper.insertSelectiveForcreateMember(tarjetaIntegrantesCreateDTO, usuario, String.valueOf(idInstitucion));
-					
-					if(responseCenComponentes == 1) {
-						updateResponseDTO.setStatus(SigaConstants.OK);
-					}
-					else {
-						updateResponseDTO.setStatus(SigaConstants.KO);
-					}
+				
+		
+				// comprobacion actualización
+				if(response >= 1) {
+					LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
+					insertResponseDTO.setStatus(SigaConstants.OK);
 				}
 				else {
-					updateResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.info("insertBanksData() -> KO. Insert para cuentas bancarias  NO realizado correctamente");
+					insertResponseDTO.setStatus(SigaConstants.KO);
+					error.setMessage("Error al insertar la cuenta Bancaria");
+					insertResponseDTO.setError(error);
+					return insertResponseDTO;
 				}
+				
+				
+			} else {
+				LOGGER.warn(
+						"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
 			}
-			else {
-				// 2. No existe un idpersona para el nuevo integrante
-				
-				// 2.1. Insertar en cen_persona
-				int responseCenPersona = 0;
-				int responseCenCliente = 0;
-				int responseCenComponentes = 0;
-				CrearPersonaDTO crearPersonaDTO = new CrearPersonaDTO();
-				crearPersonaDTO = rellenarInsertCenPersona(tarjetaIntegrantesCreateDTO, usuario);
-				responseCenPersona = cenPersonaExtendsMapper.insertSelectiveForPersonFile(crearPersonaDTO, usuario);
-				
-				if(responseCenPersona == 1) {
-					// 2.2. Insertar en cen_cliente
-					
-					comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
-					String maxIdPersona = comboItems.get(0).getValue();
-					
-					tarjetaIntegrantesCreateDTO.setIdPersonaIntegrante(maxIdPersona);
-					tarjetaIntegrantesCreateDTO.setIdInstitucionIntegrante(String.valueOf(idInstitucion));
-					
-					CenCliente record = new CenCliente();
-					record = rellenarInsertCenCliente(tarjetaIntegrantesCreateDTO, usuario);
-					responseCenCliente = cenClienteMapper.insertSelective(record);
-					if(responseCenCliente == 1) {
-						// 2.3. Insertar en cen_nocolegiado/cen_colegiado { tipo = session de busqueda no colegiados (para busqueda juridica) || tipo Personal = '1' (para busqueda fisica) 
-						// PUNTO 2.3 AHORA MISMO NO SE HACE
-						// 2.4. Insertar en cen_componente
-						comboItem = cenComponentesExtendsMapper.selectMaxIDComponente(tarjetaIntegrantesCreateDTO.getIdPersonaPadre(), String.valueOf(idInstitucion));
-						int siguienteIDComponente;
-						if(null != comboItem) {
-							siguienteIDComponente = Integer.valueOf(comboItem.getValue()) + 1;
-						}
-						else {
-							siguienteIDComponente = 1;
-						}
-						
-						tarjetaIntegrantesCreateDTO.setIdComponente(String.valueOf(siguienteIDComponente));
-						responseCenComponentes = cenComponentesExtendsMapper.insertSelectiveForcreateMember(tarjetaIntegrantesCreateDTO, usuario, String.valueOf(idInstitucion));
-						if(responseCenComponentes == 1) {
-							updateResponseDTO.setStatus(SigaConstants.OK);
-						}
-						else {
-							updateResponseDTO.setStatus(SigaConstants.KO);
-						}
-						
-					}
-					else {
-						updateResponseDTO.setStatus(SigaConstants.KO);
-					}
-					
-				}
-				else {
-					updateResponseDTO.setStatus(SigaConstants.KO);
-				}
-				
-				
-			}
+		
+		} else {
+			LOGGER.warn("insertBanksData() -> idInstitucion del token nula");
 		}
 		
-		*/
-		LOGGER.info("updateMember() -> Salida del servicio para crear un nuevo integrante");
-		return updateResponseDTO;
+		
+		LOGGER.info("insertBanksData() -> Salida del servicio para insertar cuentas bancarias ");
+		return insertResponseDTO;
 	}
 	
 
