@@ -13,7 +13,7 @@ public class CenPaisSqlExtendsProvider extends CenPaisSqlProvider{
 		sql.SELECT_DISTINCT("PAIS.IDPAIS");
 		sql.SELECT("REC.DESCRIPCION");
 		sql.FROM("CEN_PAIS PAIS");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON (REC.IDRECURSO = PAIS.DESCRIPCION " + 
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON (REC.IDRECURSO = PAIS.NOMBRE " + 
 				"		AND REC.IDLENGUAJE = '"+idLenguaje+"')");
 		sql.ORDER_BY("REC.DESCRIPCION");
 		return sql.toString();
