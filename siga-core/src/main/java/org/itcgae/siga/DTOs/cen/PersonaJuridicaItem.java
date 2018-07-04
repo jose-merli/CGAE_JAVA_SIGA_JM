@@ -14,13 +14,13 @@ public class PersonaJuridicaItem {
 	private String nif;
 	private String denominacion;
 	private String abreviatura;
-	@JsonFormat(pattern = "dd-MM-yyyy")
-	private Date fechaConstitucion;
+	//@JsonFormat(pattern = "dd-MM-yyyy")
+	private String fechaConstitucion;
 	private String tipo;
 	private String numeroIntegrantes;
 	private String nombresIntegrantes;
-	@JsonFormat(pattern = "dd-MM-yyyy")
-	private Date fechaBaja;
+	//@JsonFormat(pattern = "dd-MM-yyyy")
+	private String fechaBaja;
 	private String anotaciones;
 	private String IDGrupos;
 	private String sociedadProfesional;
@@ -112,17 +112,17 @@ public class PersonaJuridicaItem {
 	
 	/**
 	 */
-	public PersonaJuridicaItem fechaConstitucion(Date fechaConstitucion){
+	public PersonaJuridicaItem fechaConstitucion(String fechaConstitucion){
 		this.fechaConstitucion = fechaConstitucion;
 		return this;
 	}
 	
 	
 	@JsonProperty("fechaConstitucion")
-	public Date getFechaConstitucion() {
+	public String getFechaConstitucion() {
 		return fechaConstitucion;
 	}
-	public void setFechaConstitucion(Date fechaConstitucion) {
+	public void setFechaConstitucion(String fechaConstitucion) {
 		this.fechaConstitucion = fechaConstitucion;
 	}
 	
@@ -178,17 +178,17 @@ public class PersonaJuridicaItem {
 	
 	/**
 	 */
-	public PersonaJuridicaItem fechaBaja(Date fechaBaja){
+	public PersonaJuridicaItem fechaBaja(String fechaBaja){
 		this.fechaBaja = fechaBaja;
 		return this;
 	}
 	
 	
 	@JsonProperty("fechaBaja")
-	public Date getFechaBaja() {
+	public String getFechaBaja() {
 		return fechaBaja;
 	}
-	public void setFechaBaja(Date fechaBaja) {
+	public void setFechaBaja(String fechaBaja) {
 		this.fechaBaja = fechaBaja;
 	}
 	

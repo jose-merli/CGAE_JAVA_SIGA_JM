@@ -61,13 +61,13 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 	public String updateMember(TarjetaIntegrantesUpdateDTO tarjetaIntegrantesUpdateDTO, AdmUsuarios usuario, String idInstitucion) {
 		SQL sql = new SQL();
 		
- 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+ 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		
 		sql.UPDATE("CEN_COMPONENTES");
 		
  		if(null != tarjetaIntegrantesUpdateDTO.getFechaCargo()) {
  			String fechaC = dateFormat.format(tarjetaIntegrantesUpdateDTO.getFechaCargo());
-			sql.SET("FECHACARGO = TO_DATE('" + fechaC + "','DD/MM/YY')");
+			sql.SET("FECHACARGO = TO_DATE('" + fechaC + "','DD/MM/YYYY')");
 		}
  		
 		if(!tarjetaIntegrantesUpdateDTO.getCargo().equals("")) {
@@ -100,7 +100,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 	public String insertSelectiveForcreateMember(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO,AdmUsuarios usuario, String idInstitucion) {
 		SQL sql = new SQL();
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		
 		sql.INSERT_INTO("CEN_COMPONENTES");
 		
@@ -116,7 +116,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		
 		if(null != tarjetaIntegrantesCreateDTO.getFechaCargo()) {
 			String fechaC = dateFormat.format(tarjetaIntegrantesCreateDTO.getFechaCargo());
-			sql.VALUES("FECHACARGO","TO_DATE('" + fechaC + "','DD/MM/YY')");
+			sql.VALUES("FECHACARGO","TO_DATE('" + fechaC + "','DD/MM/YYYY')");
 			
 		}
 		

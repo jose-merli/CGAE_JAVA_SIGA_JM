@@ -28,6 +28,8 @@ public class DatosDireccionesItem {
 	private String idExternoProvincia;
 	private String nombreProvincia;
 	private String paginaWeb;
+	private String idPersona;
+	private String otraProvincia;
 	
 	public String getTipoDireccion() {
 		return tipoDireccion;
@@ -187,7 +189,37 @@ public class DatosDireccionesItem {
 	}
 
 
-	
+	public String getPaginaWeb() {
+		return paginaWeb;
+	}
+
+	public void setPaginaWeb(String paginaWeb) {
+		this.paginaWeb = paginaWeb;
+	}
+
+	public String getDomicilioLista() {
+		return domicilioLista;
+	}
+
+	public void setDomicilioLista(String domicilioLista) {
+		this.domicilioLista = domicilioLista;
+	}
+
+	public String getIdPersona() {
+		return idPersona;
+	}
+
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
+	}
+
+	public String getOtraProvincia() {
+		return otraProvincia;
+	}
+
+	public void setOtraProvincia(String otraProvincia) {
+		this.otraProvincia = otraProvincia;
+	}
 
 	
 
@@ -209,6 +241,7 @@ public class DatosDireccionesItem {
 	    		Objects.equals(this.domicilio, datosDireccionesItem.domicilio) &&
 	    		Objects.equals(this.domicilioLista, datosDireccionesItem.domicilioLista) &&
 	    		Objects.equals(this.idPoblacion, datosDireccionesItem.idPoblacion) &&
+	    		Objects.equals(this.idPersona, datosDireccionesItem.idPersona) &&
 	    		Objects.equals(this.idProvincia, datosDireccionesItem.idProvincia) &&
 	    		Objects.equals(this.idPais, datosDireccionesItem.idPais) &&
 	    		Objects.equals(this.telefono, datosDireccionesItem.telefono) &&
@@ -222,13 +255,14 @@ public class DatosDireccionesItem {
 	    		Objects.equals(this.idExternoProvincia, datosDireccionesItem.idExternoProvincia) &&
 	    		Objects.equals(this.nombreProvincia, datosDireccionesItem.nombreProvincia) &&
 	    		Objects.equals(this.paginaWeb, datosDireccionesItem.paginaWeb) &&
+	    		Objects.equals(this.otraProvincia, datosDireccionesItem.otraProvincia) &&
 	    		Objects.equals(this.fax, datosDireccionesItem.fax);
 	}
 	
 	@Override
 	public int hashCode() {
 	    return Objects.hash(idInstitucion,tipoDireccion,idDireccion,codigoPostal,domicilio,domicilioLista,idPoblacion,idProvincia,idPais,telefono,fechaBaja,movil,
-	    		correoElectronico, idExternoPais, nombrePais, idExternoPoblacion, nombrePoblacion, idExternoProvincia, nombreProvincia, fax,paginaWeb);
+	    		correoElectronico, idExternoPais, nombrePais, idExternoPoblacion, nombrePoblacion, idExternoProvincia, nombreProvincia, fax,paginaWeb,idPersona,otraProvincia);
 	}
 
 	
@@ -244,6 +278,7 @@ public class DatosDireccionesItem {
 	    sb.append("    domicilio: ").append(toIndentedString(domicilio)).append("\n");
 	    sb.append("    domicilioLista: ").append(toIndentedString(domicilioLista)).append("\n");
 	    sb.append("    idPoblacion: ").append(toIndentedString(idPoblacion)).append("\n");
+	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 	    sb.append("    idProvincia: ").append(toIndentedString(idProvincia)).append("\n");
 	    sb.append("    idPais: ").append(toIndentedString(idPais)).append("\n");
 	    sb.append("    telefono: ").append(toIndentedString(telefono)).append("\n");
@@ -257,6 +292,7 @@ public class DatosDireccionesItem {
 	    sb.append("    nombreProvincia: ").append(toIndentedString(nombreProvincia)).append("\n");
 	    sb.append("    idExternoProvincia: ").append(toIndentedString(idExternoProvincia)).append("\n");
 	    sb.append("    fax: ").append(toIndentedString(fax)).append("\n");
+	    sb.append("    otraProvincia: ").append(toIndentedString(otraProvincia)).append("\n");
 	    sb.append("    paginaweb: ").append(toIndentedString(paginaWeb)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
@@ -273,21 +309,7 @@ public class DatosDireccionesItem {
 	    return o.toString().replace("\n", "\n    ");
 	}
 
-	public String getPaginaWeb() {
-		return paginaWeb;
-	}
 
-	public void setPaginaWeb(String paginaWeb) {
-		this.paginaWeb = paginaWeb;
-	}
-
-	public String getDomicilioLista() {
-		return domicilioLista;
-	}
-
-	public void setDomicilioLista(String domicilioLista) {
-		this.domicilioLista = domicilioLista;
-	}
 	
 	
 	
