@@ -31,10 +31,6 @@ public class TarjetaDatosDireccionesController {
 	@Autowired 
 	private ITarjetaDatosDireccionesService tarjetaDatosDireccionesService;
 	
-	@Autowired 
-	private ITarjetaDatosIntegrantesService tarjetaDatosIntegrantesService;
-
-	
 	
 	@RequestMapping(value = "busquedaPerJuridica/datosDireccionesSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DatosDireccionesDTO> searchIntegrantesData(@RequestParam("numPagina") int numPagina, @RequestBody DatosDireccionesSearchDTO datosDireccionesSearchDTO, HttpServletRequest request) { 

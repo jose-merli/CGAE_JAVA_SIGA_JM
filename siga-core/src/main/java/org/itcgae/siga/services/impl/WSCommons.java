@@ -461,7 +461,7 @@ public class WSCommons {
 						sociedadActualizacion.setIntegranteSociedadArray(argIntegrantes);*/
 						DatosIntegrantesSearchDTO datosIntegrantesSearchDTO = new DatosIntegrantesSearchDTO();
 						datosIntegrantesSearchDTO.setIdPersona(regSociedad.getIdPersona());
-						List<DatosIntegrantesItem> datosIntegrantesItem = cenComponentesExtendsMapper.selectIntegrantes(datosIntegrantesSearchDTO );
+						List<DatosIntegrantesItem> datosIntegrantesItem = cenComponentesExtendsMapper.selectIntegrantes(datosIntegrantesSearchDTO,null );
 						if (null != datosIntegrantesItem && datosIntegrantesItem.size()>0) {
 							IntegranteSociedad[] integrantesSociedad = new IntegranteSociedad[datosIntegrantesItem.size()];
 							int i = 0;

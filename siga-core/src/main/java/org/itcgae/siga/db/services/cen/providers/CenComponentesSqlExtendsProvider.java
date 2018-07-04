@@ -6,6 +6,7 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenComponentesSqlProvider;
 
@@ -54,8 +55,10 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		if (!integrantesSearchDTO.getHistorico()) {
 			sql.WHERE("COMPONENTE.FECHABAJA is null");
 		}
+		if (UtilidadesString.esCadenaVacia(idInstitucion)) {
+			sql.WHERE("COMPONENTE.idinstitucion = '" + idInstitucion + "'");
+		}
 		
-		sql.WHERE("COMPONENTE.idinstitucion = '" + idInstitucion + "'");
 		sql.ORDER_BY("COMPONENTE.IDCOMPONENTE");
 		return sql.toString();
 	}
