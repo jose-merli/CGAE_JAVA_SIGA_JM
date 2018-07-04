@@ -12,7 +12,7 @@ public class CenHistoricoSqlExtendsProvider {
 		SQL sql = new SQL();
 		
 		// Formateo de fecha para sentencia sql
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		
 		
 		sql.SELECT(" DISTINCT HIST.IDPERSONA");
@@ -47,11 +47,11 @@ public class CenHistoricoSqlExtendsProvider {
 		}
 		if(null != historicoUsuarioRequestDTO.getFechaDesde()) {
 			String fechaDesde = dateFormat.format(historicoUsuarioRequestDTO.getFechaDesde());
-			sql.WHERE(" TO_DATE(HIST.FECHAEFECTIVA,'DD/MM/RRRR') >= TO_DATE('" +fechaDesde + "', 'DD/MM/RRRR') ");
+			sql.WHERE(" TO_DATE(HIST.FECHAEFECTIVA,'DD/MM/YYYY') >= TO_DATE('" +fechaDesde + "', 'DD/MM/YYYY') ");
 		}
 		if(null != historicoUsuarioRequestDTO.getFechaHasta()) {
 			String fechaHasta = dateFormat.format(historicoUsuarioRequestDTO.getFechaHasta());
-			sql.WHERE(" TO_DATE(HIST.FECHAEFECTIVA,'DD/MM/RRRR') <= TO_DATE('" +fechaHasta + "', 'DD/MM/RRRR') ");
+			sql.WHERE(" TO_DATE(HIST.FECHAEFECTIVA,'DD/MM/YYYY') <= TO_DATE('" +fechaHasta + "', 'DD/MM/YYYY') ");
 		}
 		if(null != historicoUsuarioRequestDTO.getUsuarioAutomatico() && historicoUsuarioRequestDTO.getUsuarioAutomatico().equals("S")) {
 			sql.WHERE(" HIST.USUMODIFICACION = '0'");

@@ -362,9 +362,10 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
-		if (null == sociedadCreateDTO.getTipo()) {
-			sociedadCreateDTO.setTipo("B");
-		}
+//		if (null == sociedadCreateDTO.getTipo()) {
+//			sociedadCreateDTO.setTipo("B");
+//		}
+		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -593,7 +594,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 							LOGGER.info(
 									"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
 							
-							int response = cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion), grupo, String.valueOf(usuario.getIdusuario()));
+							int response = cenGruposclienteClienteExtendsMapper.insertSelectiveForUpdateLegalPerson(etiquetaUpdateDTO, String.valueOf(idInstitucion), grupo, String.valueOf(usuario.getIdusuario()));
 							LOGGER.info(
 									"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
 							
@@ -633,7 +634,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 									LOGGER.info(
 											"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
 
-									response3 = cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion), "",String.valueOf(usuario.getIdusuario()));
+									response3 = cenGruposclienteClienteExtendsMapper.insertSelectiveForUpdateLegalPerson(etiquetaUpdateDTO, String.valueOf(idInstitucion), "",String.valueOf(usuario.getIdusuario()));
 									LOGGER.info(
 											"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
 

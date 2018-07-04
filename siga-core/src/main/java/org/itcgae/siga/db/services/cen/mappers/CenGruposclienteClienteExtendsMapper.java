@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.CenGruposclienteClienteMapper;
 import org.itcgae.siga.db.services.cen.providers.CenGruposclienteClienteSqlExtendsProvider;
@@ -28,5 +29,11 @@ public interface CenGruposclienteClienteExtendsMapper extends CenGruposclienteCl
 		@Result(column = "IDGRUPO", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> selectGruposPersonaJuridica(String idPersona, String idInstitucion);
+	
+	
+	
+	@InsertProvider(type = CenGruposclienteClienteSqlExtendsProvider.class, method = "insertSelectiveForUpdateLegalPerson")
+	int insertSelectiveForUpdateLegalPerson(EtiquetaUpdateDTO etiquetaUpdateDTO, String idInstitucion, String grupo, String idUsuario);
+	
 	
 }
