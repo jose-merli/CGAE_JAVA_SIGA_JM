@@ -4,8 +4,10 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaDireccionesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -57,8 +59,8 @@ public class TarjetaDatosDireccionesController {
 	}
 	
 	@RequestMapping(value = "tarjetaDirecciones/poblacion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getPoblacion(HttpServletRequest request) { 
-		ComboDTO response = tarjetaDatosDireccionesService.getPoblacion(request);
+	ResponseEntity<ComboDTO> getPoblacion(@RequestParam("idProvincia") String IdProvincia,HttpServletRequest request) { 
+		ComboDTO response = tarjetaDatosDireccionesService.getPoblacion(request,IdProvincia);
 		return new ResponseEntity<ComboDTO >(response, HttpStatus.OK);
 	}
 	@RequestMapping(value = "tarjetaDirecciones/tipoDireccion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -68,4 +70,19 @@ public class TarjetaDatosDireccionesController {
 	}
 
 
+	@RequestMapping(value = "tarjetaDirecciones/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateDirection(@RequestBody DatosDireccionesItem datosDirecciones, HttpServletRequest request) { 
+		UpdateResponseDTO response = tarjetaDatosDireccionesService.updateDirection(datosDirecciones, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "tarjetaDirecciones/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> createDirection(@RequestBody DatosDireccionesItem datosDirecciones, HttpServletRequest request) { 
+		InsertResponseDTO response = tarjetaDatosDireccionesService.createDirection(datosDirecciones, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
 }
