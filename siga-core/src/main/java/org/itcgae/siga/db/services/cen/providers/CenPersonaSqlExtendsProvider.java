@@ -305,13 +305,13 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 			PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, AdmUsuarios usuario) {
 		SQL sql = new SQL();
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		sql.UPDATE("CEN_PERSONA");
 
 		if (null != perJuridicaDatosRegistralesUpdateDTO.getFechaConstitucion()) {
 			String fechaNacimiento = dateFormat.format(perJuridicaDatosRegistralesUpdateDTO.getFechaConstitucion());
-			sql.SET("FECHANACIMIENTO = TO_DATE('" + fechaNacimiento + "','DD/MM/YY')");
+			sql.SET("FECHANACIMIENTO = TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY')");
 		}
 
 		if (null != usuario.getIdusuario()) {

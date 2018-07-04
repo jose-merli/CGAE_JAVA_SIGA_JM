@@ -22,7 +22,7 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.SELECT_DISTINCT("CAT.DESCRIPCION AS TIPODIRECCION");
 		sql.SELECT("DIRECCION.IDDIRECCION");
 		sql.SELECT("DIRECCION.CODIGOPOSTAL");
-		sql.SELECT("TO_CHAR(DIRECCION.FECHABAJA,'DD/MM/RRRR') AS FECHABAJA");
+		sql.SELECT("TO_CHAR(DIRECCION.FECHABAJA,'DD/MM/YYYY') AS FECHABAJA");
 		sql.SELECT("DIRECCION.IDINSTITUCION");
 		sql.SELECT("DIRECCION.DOMICILIO ");
 		sql.SELECT("DIRECCION.IDPOBLACION");
@@ -64,7 +64,7 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.SELECT_DISTINCT(" CAT.DESCRIPCION");
 		sql.SELECT("DIRECCION.IDDIRECCION");
 		sql.SELECT("DIRECCION.CODIGOPOSTAL");
-		sql.SELECT("TO_CHAR(DIRECCION.FECHABAJA,'DD/MM/RRRR') AS FECHABAJA");
+		sql.SELECT("TO_CHAR(DIRECCION.FECHABAJA,'DD/MM/YYYY') AS FECHABAJA");
 		sql.SELECT("DIRECCION.IDINSTITUCION");
 		sql.SELECT("DIRECCION.DOMICILIO ");
 		sql.SELECT("(DIRECCION.DOMICILIO || ' ' || DIRECCION.CODIGOPOSTAL || ' ' ||POBLACION.NOMBRE || ' ' ||PROVINCIAS.NOMBRE || ' ' || DECODE(DIRECCION.IDPAIS,191,'',CATPAIS.DESCRIPCION) ) AS DOMICILIOLISTA");
@@ -134,13 +134,13 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 	public String updateMember(TarjetaIntegrantesUpdateDTO tarjetaIntegrantesUpdateDTO, AdmUsuarios usuario, String idInstitucion) {
 		SQL sql = new SQL();
 		
- 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+ 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		
 		sql.UPDATE("CEN_COMPONENTES");
 		
  		if(null != tarjetaIntegrantesUpdateDTO.getFechaCargo()) {
  			String fechaC = dateFormat.format(tarjetaIntegrantesUpdateDTO.getFechaCargo());
-			sql.SET("FECHACARGO = TO_DATE('" + fechaC + "','DD/MM/YY')");
+			sql.SET("FECHACARGO = TO_DATE('" + fechaC + "','DD/MM/YYYY')");
 		}
  		
 		if(!tarjetaIntegrantesUpdateDTO.getCargo().equals("")) {
@@ -173,7 +173,7 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 	public String insertSelectiveForcreateMember(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO,AdmUsuarios usuario, String idInstitucion) {
 		SQL sql = new SQL();
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		
 		sql.INSERT_INTO("CEN_COMPONENTES");
 		
@@ -182,7 +182,7 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.VALUES("IDCOMPONENTE", "'" + tarjetaIntegrantesCreateDTO.getIdComponente() + "'");
 		
 		if(!tarjetaIntegrantesCreateDTO.getCargo().equals("")) {
-			sql.VALUES("CARGO","TO_DATE('" + tarjetaIntegrantesCreateDTO.getCargo() + "','DD/MM/YY')");
+			sql.VALUES("CARGO","TO_DATE('" + tarjetaIntegrantesCreateDTO.getCargo() + "','DD/MM/YYYY')");
 		}
 		
 		
