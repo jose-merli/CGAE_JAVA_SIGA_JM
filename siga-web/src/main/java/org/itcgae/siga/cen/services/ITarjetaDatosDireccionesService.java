@@ -6,6 +6,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaDireccionesUpdateDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface ITarjetaDatosDireccionesService {
 
@@ -13,11 +14,12 @@ public interface ITarjetaDatosDireccionesService {
 
 	UpdateResponseDTO deleteDireccion(TarjetaDireccionesUpdateDTO[] tarjetaDireccionesUpdateDTO, HttpServletRequest request);
 
-	
+	ComboDTO getPais(HttpServletRequest request);
 
+	ComboDTO getPoblacion(HttpServletRequest request);
 
+	ComboDTO getTipoDireccion(HttpServletRequest request);
 
-	
 	
 }
 
