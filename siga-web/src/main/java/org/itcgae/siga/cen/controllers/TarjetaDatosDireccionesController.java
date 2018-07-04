@@ -8,7 +8,9 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaDireccionesUpdateDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
+import org.itcgae.siga.cen.services.ITarjetaDatosIntegrantesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,6 +29,8 @@ public class TarjetaDatosDireccionesController {
 	@Autowired 
 	private ITarjetaDatosDireccionesService tarjetaDatosDireccionesService;
 	
+	@Autowired 
+	private ITarjetaDatosIntegrantesService tarjetaDatosIntegrantesService;
 
 	
 	
@@ -44,4 +48,24 @@ public class TarjetaDatosDireccionesController {
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
+
+	
+	@RequestMapping(value = "tarjetaDirecciones/pais", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getPais(HttpServletRequest request) { 
+		ComboDTO response = tarjetaDatosDireccionesService.getPais(request);
+		return new ResponseEntity<ComboDTO >(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "tarjetaDirecciones/poblacion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getPoblacion(HttpServletRequest request) { 
+		ComboDTO response = tarjetaDatosDireccionesService.getPoblacion(request);
+		return new ResponseEntity<ComboDTO >(response, HttpStatus.OK);
+	}
+	@RequestMapping(value = "tarjetaDirecciones/tipoDireccion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getTipoDireccion(HttpServletRequest request) { 
+		ComboDTO response = tarjetaDatosDireccionesService.getTipoDireccion(request);
+		return new ResponseEntity<ComboDTO >(response, HttpStatus.OK);
+	}
+
+
 }
