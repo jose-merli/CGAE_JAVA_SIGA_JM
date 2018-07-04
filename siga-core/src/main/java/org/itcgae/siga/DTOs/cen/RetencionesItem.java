@@ -10,11 +10,11 @@ public class RetencionesItem {
 
 	private String idPersona;
 
-	@JsonFormat(pattern = "dd-MM-yyyy")
-	private Date fechaInicio;
+//	@JsonFormat(pattern = "dd-MM-yyyy")
+	private String fechaInicio;
 	
-	@JsonFormat(pattern = "dd-MM-yyyy")
-	private Date fechaFin;
+//	@JsonFormat(pattern = "dd-MM-yyyy")
+	private String fechaFin;
 	
 	private String idRetencion;
 	private String porcentajeRetencion;
@@ -42,32 +42,32 @@ public class RetencionesItem {
 	/**
 	 *
 	 */
-	public RetencionesItem fechaInicio(Date fechaInicio){
+	public RetencionesItem fechaInicio(String fechaInicio){
 		this.fechaInicio = fechaInicio;
 		return this;
 	}
 	
 	@JsonProperty("fechaInicio")
-	public Date getFechaInicio() {
+	public String getFechaInicio() {
 		return fechaInicio;
 	}
-	public void setFechaInicio(Date fechaInicio) {
+	public void setFechaInicio(String fechaInicio) {
 		this.fechaInicio = fechaInicio;
 	}
 	
 	/**
 	 *
 	 */
-	public RetencionesItem fechaFin(Date fechaFin){
+	public RetencionesItem fechaFin(String fechaFin){
 		this.fechaFin = fechaFin;
 		return this;
 	}
 	
 	@JsonProperty("fechaFin")
-	public Date getFechaFin() {
+	public String getFechaFin() {
 		return fechaFin;
 	}
-	public void setFechaFin(Date fechaFin) {
+	public void setFechaFin(String fechaFin) {
 		this.fechaFin = fechaFin;
 	}
 	

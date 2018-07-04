@@ -106,8 +106,8 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 	@SelectProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "selectRetenciones")
 	@Results({
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.DATE),
-		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDRETENCION", property = "idRetencion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "RETENCION", property = "porcentajeRetencion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "RECURSO", property = "recursoRetencion", jdbcType = JdbcType.VARCHAR),
