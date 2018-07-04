@@ -9,8 +9,8 @@ public class EtiquetaRetencionesDTO {
 
 	private String idPersona;
 	private String idInstitucion;
-	private Date fechaInicio;
-	private Date fechaFin;
+	private String fechaInicio;
+	private String fechaFin;
 	private String idRetencion;
 	private String idUsuario;
 	private Date fechaModificacion;
@@ -54,33 +54,33 @@ public class EtiquetaRetencionesDTO {
 	/**
 	 *
 	 */
-	public EtiquetaRetencionesDTO fechaInicio(Date fechaInicio){
+	public EtiquetaRetencionesDTO fechaInicio(String fechaInicio){
 		this.fechaInicio = fechaInicio;
 		return this;
 	}
 	
 	@JsonProperty("fechaInicio")
-	public Date getFechaInicio() {
+	public String getFechaInicio() {
 		return fechaInicio;
 	}
-	public void setFechaInicio(Date fechaInicio) {
+	public void setFechaInicio(String fechaInicio) {
 		this.fechaInicio = fechaInicio;
 	}
 	
 	/**
 	 *
 	 */
-	public EtiquetaRetencionesDTO fechaFin(Date fechaFin){
+	public EtiquetaRetencionesDTO fechaFin(String fechaFin){
 		this.fechaFin = fechaFin;
 		return this;
 	}
 	
 	
 	@JsonProperty("fechaFin")
-	public Date getFechaFin() {
+	public String getFechaFin() {
 		return fechaFin;
 	}
-	public void setFechaFin(Date fechaFin) {
+	public void setFechaFin(String fechaFin) {
 		this.fechaFin = fechaFin;
 	}
 	
@@ -88,7 +88,7 @@ public class EtiquetaRetencionesDTO {
 	/**
 	 *
 	 */
-	public EtiquetaRetencionesDTO fechaFin(String idRetencion){
+	public EtiquetaRetencionesDTO idRetencion(String idRetencion){
 		this.idRetencion = idRetencion;
 		return this;
 	}

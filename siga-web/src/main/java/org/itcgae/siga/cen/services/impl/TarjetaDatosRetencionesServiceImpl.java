@@ -1,5 +1,7 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,6 +18,7 @@ import org.itcgae.siga.DTOs.cen.RetencionesDTO;
 import org.itcgae.siga.DTOs.cen.RetencionesItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosRetencionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
@@ -172,7 +175,7 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 		response.setError(error);
 		boolean cerrojoBorrado = true;
 		boolean cerrojoInsercion = true;
-		
+
 		int responseInsercion = 0;
 
 		// Conseguimos información del usuario logeado
@@ -208,13 +211,23 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 						response.setStatus(SigaConstants.OK);
 						cerrojoBorrado = false;
 					}
-
+					SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 					ScsRetencionesirpf retenciones = new ScsRetencionesirpf();
 					retenciones.setIdinstitucion(idInstitucion);
 					retenciones.setUsumodificacion(usuario.getUsumodificacion());
 					retenciones.setFechamodificacion(new Date());
-					retenciones.setFechafin(etiquetaUpdateDTO.getFechaFin());
-					retenciones.setFechainicio(etiquetaUpdateDTO.getFechaInicio());
+					try {
+						if (!UtilidadesString.esCadenaVacia(etiquetaUpdateDTO.getFechaFin())) {
+							retenciones.setFechafin(format.parse(etiquetaUpdateDTO.getFechaFin()));
+						}
+						if (!UtilidadesString.esCadenaVacia(etiquetaUpdateDTO.getFechaInicio())) {
+							retenciones.setFechainicio(format.parse(etiquetaUpdateDTO.getFechaInicio()));
+						}
+					} catch (ParseException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+
 					retenciones.setIdpersona(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
 					retenciones.setIdretencion(Integer.valueOf(etiquetaUpdateDTO.getIdRetencion()));
 					try {
@@ -241,7 +254,7 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 
 					response.setStatus(SigaConstants.OK);
 				}
-			} 
+			}
 		}
 
 		LOGGER.info(

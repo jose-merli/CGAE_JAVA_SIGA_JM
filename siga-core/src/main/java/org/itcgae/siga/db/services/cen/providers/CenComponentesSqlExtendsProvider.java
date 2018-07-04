@@ -12,7 +12,7 @@ import org.itcgae.siga.db.mappers.CenComponentesSqlProvider;
 public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 
 	
-	public String selectIntegrantes(DatosIntegrantesSearchDTO integrantesSearchDTO) {
+	public String selectIntegrantes(DatosIntegrantesSearchDTO integrantesSearchDTO, String idInstitucion) {
 		
 		SQL sql = new SQL();
 		
@@ -54,6 +54,8 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		if (!integrantesSearchDTO.getHistorico()) {
 			sql.WHERE("COMPONENTE.FECHABAJA is null");
 		}
+		
+		sql.WHERE("COMPONENTE.idinstitucion = '" + idInstitucion + "'");
 		sql.ORDER_BY("COMPONENTE.IDCOMPONENTE");
 		return sql.toString();
 	}
