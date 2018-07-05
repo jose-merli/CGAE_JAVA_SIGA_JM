@@ -673,7 +673,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 					// 1.actualiza tabla CEN_PERSONA
 					CenPersona cenPersona = new CenPersona();
 					cenPersona.setNombre(etiquetaUpdateDTO.getDenominacion());
-					//cenPersona.setNifcif(etiquetaUpdateDTO.getNif());
+					cenPersona.setApellidos1(etiquetaUpdateDTO.getAbreviatura());
 					cenPersona.setFechamodificacion(new Date());
 					cenPersona.setUsumodificacion(usuario.getIdusuario());
 					CenPersonaExample cenPersonaExample = new CenPersonaExample();
