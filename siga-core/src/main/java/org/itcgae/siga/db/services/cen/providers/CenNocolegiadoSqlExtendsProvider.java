@@ -392,9 +392,9 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.INNER_JOIN(" CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA");
 		sql.WHERE("IDINSTITUCION = '" +idInstitucion+ "'");
 		String fechadesde = dateFormat.format(fechaDesde);
-		sql.WHERE("TO_DATE(COL.FECHA_BAJA,'DD/MM/RRRR') >= TO_DATE('" + fechadesde + "', 'DD/MM/YYYY')");
+		sql.WHERE("COL.FECHA_BAJA >= TO_DATE('" + fechadesde + "', 'DD/MM/YYYY')");
 		String fechahasta = dateFormat.format(fechaHasta);
-		sql.WHERE("TO_DATE(COL.FECHA_BAJA,'DD/MM/RRRR') < TO_DATE('" + fechahasta + "', 'DD/MM/YYYY')");
+		sql.WHERE("COL.FECHA_BAJA < TO_DATE('" + fechahasta + "', 'DD/MM/YYYY')");
 		
 		
 		return sql.toString();
@@ -411,9 +411,9 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.FROM("CEN_NOCOLEGIADO COL");
 		sql.WHERE("IDINSTITUCION = '" +idInstitucion+ "'");
 		String fechadesde = dateFormat.format(fechaDesde);
-		sql.WHERE("TO_DATE(COL.FECHAMODIFICACION,'DD/MM/RRRR') >= TO_DATE('" + fechadesde + "', 'DD/MM/YYYY')");
+		sql.WHERE("COL.FECHAMODIFICACION >= TO_DATE('" + fechadesde + "', 'DD/MM/YYYY')");
 		String fechahasta = dateFormat.format(fechaHasta);
-		sql.WHERE("TO_DATE(COL.FECHAMODIFICACION,'DD/MM/RRRR') < TO_DATE('" + fechahasta + "', 'DD/MM/YYYY')");
+		sql.WHERE("COL.FECHAMODIFICACION < TO_DATE('" + fechahasta + "', 'DD/MM/YYYY')");
 		sql.WHERE("FECHA_BAJA IS NULL");
 		
 		
@@ -449,9 +449,9 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.LEFT_OUTER_JOIN("CEN_PERSONA NOTARIO ON NOTARIO.IDPERSONA = SOCIEDAD.IDPERSONANOTARIO");
 		sql.WHERE("SOCIEDAD.IDINSTITUCION = '" +idInstitucion+ "'");
 		String fechadesde = dateFormat.format(fechaDesde);
-		sql.WHERE("TO_DATE(SOCIEDAD.FECHAMODIFICACION,'DD/MM/YYYY') >= TO_DATE('" + fechadesde + "', 'DD/MM/YYYY')");
+		sql.WHERE("SOCIEDAD.FECHAMODIFICACION >= TO_DATE('" + fechadesde + "', 'DD/MM/YYYY')");
 		String fechahasta = dateFormat.format(fechaHasta);
-		sql.WHERE("TO_DATE(SOCIEDAD.FECHAMODIFICACION,'DD/MM/YYYY') < TO_DATE('" + fechahasta + "', 'DD/MM/YYYY')");
+		sql.WHERE("SOCIEDAD.FECHAMODIFICACION < TO_DATE('" + fechahasta + "', 'DD/MM/YYYY')");
 		sql.WHERE("SOCIEDAD.FECHA_BAJA IS NULL");
 		
 		return sql.toString();
