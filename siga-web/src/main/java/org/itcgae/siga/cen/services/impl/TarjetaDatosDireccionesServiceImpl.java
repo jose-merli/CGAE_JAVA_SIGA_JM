@@ -28,6 +28,8 @@ import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionKey;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
+import org.itcgae.siga.db.entities.CenNocolegiado;
+import org.itcgae.siga.db.entities.CenNocolegiadoKey;
 import org.itcgae.siga.db.entities.CenPoblaciones;
 import org.itcgae.siga.db.entities.CenPoblacionesExample;
 
@@ -417,18 +419,35 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					LOGGER.info(
 							"updateDirection() / cenNocolegiadoExtendsMapper.deleteByExample() -> Salida de cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
 				}
-				
-				
-				
-				
+		
+				//Actualizamos la direccion
 				LOGGER.info(
-						"updateDirection() / cenDireccionesExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
+						"updateDirection() / cenDireccionesExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenDireccionesExtendsMapper para actualizar direcciones");
 				response = cenDireccionesExtendsMapper.updateByPrimaryKeySelective(direcciones);
 				LOGGER.info(
-						"updateDirection() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
-		
+						"updateDirection() / cenDireccionesExtendsMapper.updateByExampleSelective() -> Salida de cenDireccionesExtendsMapper para actualizar direcciones ");
+
+				
+				
 				// comprobacion actualización
 				if(response >= 1) {
+					
+					//Actualizamos la tabla cen_nocolegiados para mandar a sociedades
+					
+					CenNocolegiadoKey noColegiadokey = new CenNocolegiadoKey();
+					noColegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
+					noColegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+					CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(noColegiadokey );
+					
+					noColegiado.setFechamodificacion(new Date());
+					noColegiado.setUsumodificacion(usuario.getIdusuario());
+
+					LOGGER.info(
+							"updateDirection() / cenNocolegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar el noColegiado");
+					cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
+					LOGGER.info(
+							"updateDirection() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar el noColegiado");
+
 					LOGGER.info("updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
 					updateResponseDTO.setStatus(SigaConstants.OK);
 				}
@@ -548,6 +567,23 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		
 				// comprobacion actualización
 				if(response >= 1) {
+					
+					//Actualizamos la tabla cen_nocolegiados para mandar a sociedades
+					
+					CenNocolegiadoKey noColegiadokey = new CenNocolegiadoKey();
+					noColegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
+					noColegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+					CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(noColegiadokey );
+					
+					noColegiado.setFechamodificacion(new Date());
+					noColegiado.setUsumodificacion(usuario.getIdusuario());
+
+					LOGGER.info(
+							"updateDirection() / cenNocolegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar el noColegiado");
+					cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
+					LOGGER.info(
+							"updateDirection() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar el noColegiado");
+
 					LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
 					insertResponseDTO.setStatus(SigaConstants.OK);
 				}
