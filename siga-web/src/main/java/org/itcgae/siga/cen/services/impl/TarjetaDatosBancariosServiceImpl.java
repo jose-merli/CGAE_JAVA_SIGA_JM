@@ -1312,7 +1312,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			
 			// obtenemos descripcion de gen_recursos
 			GenRecursosExample genRecursosExample = new GenRecursosExample();
-			genRecursosExample.createCriteria().andIdrecursoEqualTo("fichero.mandatos.descripcion");
+			genRecursosExample.createCriteria().andIdrecursoEqualTo("fichero.mandatos.descripcion").andIdlenguajeEqualTo(usuario.getIdlenguaje());
 			genRecursos = genRecursosMapper.selectByExample(genRecursosExample);
 			
 			genFichero.setDescripcion(genRecursos.get(0).getDescripcion());
