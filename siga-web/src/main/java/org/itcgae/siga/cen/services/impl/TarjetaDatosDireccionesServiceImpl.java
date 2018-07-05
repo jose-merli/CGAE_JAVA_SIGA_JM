@@ -35,6 +35,7 @@ import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
 import org.itcgae.siga.db.mappers.CenPoblacionesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTipoDireccionExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -66,6 +67,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 	@Autowired
 	private CenTipoDireccionExtendsMapper cenTipoDireccionExtendsMapper;
+	
+	@Autowired
+	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
 	
 	@Override
 	public DatosDireccionesDTO datosDireccionesSearch(int numPagina, DatosDireccionesSearchDTO datosDireccionesSearchDTO,	HttpServletRequest request) {
@@ -302,7 +306,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	public UpdateResponseDTO updateDirection(DatosDireccionesItem datosDireccionesItem,
 			HttpServletRequest request) {
 		
-		LOGGER.info("insertBanksData() -> Entrada al servicio para insertar cuentas bancarias");
+		LOGGER.info("updateDirection() -> Entrada al servicio para actualizar direcciones");
 		int response = 0;
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -315,18 +319,15 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateDirection() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
-					"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateDirection() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				
-				
-				// información a insertar
-				//Obtenemos el nuevo idCuenta
-				
+				//Consultamos la dirección a actualizar
 				CenDireccionesKey key = new  CenDireccionesKey();
 				key.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
 				key.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
@@ -351,7 +352,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				
 				CenDireccionTipodireccionExample tipoDireccionexample =  new CenDireccionTipodireccionExample();
 				tipoDireccionexample.createCriteria().andIddireccionEqualTo(Long.valueOf(datosDireccionesItem.getIdDireccion())).andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()));
-				
+				//Consultamos los tipos de direccion de la direccion a actualizar
 				List<CenDireccionTipodireccion> tiposDireccion = cenDireccionTipodireccionMapper.selectByExample(tipoDireccionexample );
 				
 				//Gestionamos los abonos que nos llegan
@@ -372,7 +373,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							idTiposDireccionFront.remove(uso);
 						}
 					}
-					
+					//Procesamos los distintos tipos de direccion que nos viene en la tabla
 					if (null != idTiposDireccionTotal && idTiposDireccionTotal.size()>0) {
 						for (String idTipoDireccionBorrar : idTiposDireccionTotal) {
 							CenDireccionTipodireccionKey TipoDireccionkey = new CenDireccionTipodireccionKey();
@@ -380,7 +381,12 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							TipoDireccionkey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
 							TipoDireccionkey.setIdinstitucion(Short.valueOf(idInstitucion));
 							TipoDireccionkey.setIdtipodireccion(Short.valueOf(idTipoDireccionBorrar));
+							//Eliminamos las ya existentes y que se han eliminado en el update
+							LOGGER.info(
+									"updateDirection() / cenDireccionTipodireccionMapper.deleteByExample() -> Entrada a cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");							
 							cenDireccionTipodireccionMapper.deleteByPrimaryKey(TipoDireccionkey);
+							LOGGER.info(
+									"updateDirection() / cenNocolegiadoExtendsMapper.deleteByExample() -> Salida de cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
 						}
 					}
 					if (null != idTiposDireccionFront && idTiposDireccionFront.size()>0) {
@@ -392,34 +398,44 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							TipoDireccionrecord.setIdtipodireccion(Short.valueOf(idTipoDireccionInsertar));
 							TipoDireccionrecord.setFechamodificacion(new Date());
 							TipoDireccionrecord.setUsumodificacion(usuario.getIdusuario());
+							//insertamos los nuevos tipos de direccion asociados a la direccion
+							LOGGER.info(
+									"updateDirection() / cenDireccionTipodireccionMapper.insert() -> Entrada a cenDireccionTipodireccionMapper para insertar tiposdedirecciones");
 							cenDireccionTipodireccionMapper.insert(TipoDireccionrecord);
+							LOGGER.info(
+									"updateDirection() / cenNocolegiadoExtendsMapper.insert() -> Salida de cenDireccionTipodireccionMapper para insertar tiposdedirecciones");
 						}
 					}
 					
 				}else{
 					
 					//Eliminamos los tipos de dirección
-					
+
+					LOGGER.info(
+							"updateDirection() / cenDireccionTipodireccionMapper.deleteByExample() -> Entrada a cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
 					cenDireccionTipodireccionMapper.deleteByExample(tipoDireccionexample);
-					
+					LOGGER.info(
+							"updateDirection() / cenNocolegiadoExtendsMapper.deleteByExample() -> Salida de cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
 				}
 				
 				
+				
+				
 				LOGGER.info(
-						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
+						"updateDirection() / cenDireccionesExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
 				response = cenDireccionesExtendsMapper.updateByPrimaryKeySelective(direcciones);
 				LOGGER.info(
-						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
+						"updateDirection() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
 		
 				// comprobacion actualización
 				if(response >= 1) {
-					LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
+					LOGGER.info("updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
 					updateResponseDTO.setStatus(SigaConstants.OK);
 				}
 				else {
-					LOGGER.info("insertBanksData() -> KO. Insert para cuentas bancarias  NO realizado correctamente");
+					LOGGER.info("updateDirection() -> KO. Update para actualizar direcciones  NO realizado correctamente");
 					updateResponseDTO.setStatus(SigaConstants.KO);
-					error.setMessage("Error al insertar la cuenta Bancaria");
+					error.setMessage("Error al actualizar la direccion");
 					updateResponseDTO.setError(error);
 					return updateResponseDTO;
 				}
@@ -427,16 +443,16 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				
 			} else {
 				LOGGER.warn(
-						"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+						"updateDirection() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
 								+ dni + " e idInstitucion = " + idInstitucion);
 			}
 		
 		} else {
-			LOGGER.warn("insertBanksData() -> idInstitucion del token nula");
+			LOGGER.warn("updateDirection() -> idInstitucion del token nula");
 		}
 		
 		
-		LOGGER.info("insertBanksData() -> Salida del servicio para insertar cuentas bancarias ");
+		LOGGER.info("updateDirection() -> Salida del servicio para actualizar direcciones ");
 		return updateResponseDTO;
 	}
 
@@ -445,7 +461,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	public InsertResponseDTO createDirection(DatosDireccionesItem datosDireccionesItem,
 			HttpServletRequest request) {
 		
-		LOGGER.info("insertBanksData() -> Entrada al servicio para insertar cuentas bancarias");
+		LOGGER.info("createDirection() -> Entrada al servicio para insertar cuentas bancarias");
 		int response = 0;
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -458,18 +474,17 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"createDirection() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
-					"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"createDirection() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			Long idDireccion= new Long(1);
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				
 				
-				// información a insertar
-				//Obtenemos el nuevo idDireccion
 
+				//Obtenemos el nuevo idDireccion
 				List<DatosDireccionesItem> newIdDireccion = cenDireccionesExtendsMapper.selectNewIdDireccion(datosDireccionesItem.getIdPersona(),idInstitucion.toString());
 				if (null != newIdDireccion && newIdDireccion.size() > 0 ) {
 					if (null!= newIdDireccion.get(0)) {
@@ -477,6 +492,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					}
 					
 				}
+				//Rellenamos la entidad con la informacion a insertar
 				CenDirecciones direcciones = new CenDirecciones();
 				
 				direcciones.setIddireccion(idDireccion);
@@ -497,10 +513,10 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
 
 				LOGGER.info(
-						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
+						"createDirection() / cenDireccionesExtendsMapper.insert() -> Entrada a cenDireccionesExtendsMapper para insertar direcciones");
 				response = cenDireccionesExtendsMapper.insert(direcciones);
 				LOGGER.info(
-						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
+						"createDirection() / cenDireccionesExtendsMapper.insert() -> Salida de cenDireccionesExtendsMapper para insertar direcciones");
 				
 			
 				//Gestionamos los abonos que nos llegan
@@ -518,7 +534,11 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						TipoDireccionrecord.setIdtipodireccion(Short.valueOf(idTipoDireccionInsertar));
 						TipoDireccionrecord.setFechamodificacion(new Date());
 						TipoDireccionrecord.setUsumodificacion(usuario.getIdusuario());
+						LOGGER.info(
+								"createDirection() / cenDireccionTipodireccionMapper.insert() -> Entrada a cenDireccionTipodireccionMapper para insertar los tipos de direcciones");
 						cenDireccionTipodireccionMapper.insert(TipoDireccionrecord);
+						LOGGER.info(
+								"createDirection() / cenDireccionTipodireccionMapper.insert() -> Salida de cenDireccionTipodireccionMapper para insertar los tipos de direcciones");
 					}
 					
 										
@@ -528,11 +548,11 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		
 				// comprobacion actualización
 				if(response >= 1) {
-					LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
+					LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
 					insertResponseDTO.setStatus(SigaConstants.OK);
 				}
 				else {
-					LOGGER.info("insertBanksData() -> KO. Insert para cuentas bancarias  NO realizado correctamente");
+					LOGGER.info("createDirection() -> KO. Insert para direcciones  NO realizado correctamente");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 					error.setMessage("Error al insertar la cuenta Bancaria");
 					insertResponseDTO.setError(error);
@@ -542,16 +562,16 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				
 			} else {
 				LOGGER.warn(
-						"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+						"createDirection() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
 								+ dni + " e idInstitucion = " + idInstitucion);
 			}
 		
 		} else {
-			LOGGER.warn("insertBanksData() -> idInstitucion del token nula");
+			LOGGER.warn("createDirection() -> idInstitucion del token nula");
 		}
 		
 		
-		LOGGER.info("insertBanksData() -> Salida del servicio para insertar cuentas bancarias ");
+		LOGGER.info("createDirection() -> Salida del servicio para insertar direcciones ");
 		return insertResponseDTO;
 	}
 	
