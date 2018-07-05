@@ -461,7 +461,7 @@ public class WSCommons {
 						sociedadActualizacion.setIntegranteSociedadArray(argIntegrantes);*/
 						DatosIntegrantesSearchDTO datosIntegrantesSearchDTO = new DatosIntegrantesSearchDTO();
 						datosIntegrantesSearchDTO.setIdPersona(regSociedad.getIdPersona());
-						List<DatosIntegrantesItem> datosIntegrantesItem = cenComponentesExtendsMapper.selectIntegrantes(datosIntegrantesSearchDTO,null );
+						List<DatosIntegrantesItem> datosIntegrantesItem = cenComponentesExtendsMapper.selectIntegrantes(datosIntegrantesSearchDTO,idInstitucion.toString() );
 						if (null != datosIntegrantesItem && datosIntegrantesItem.size()>0) {
 							IntegranteSociedad[] integrantesSociedad = new IntegranteSociedad[datosIntegrantesItem.size()];
 							int i = 0;
@@ -475,8 +475,10 @@ public class WSCommons {
 									DatosCargo cargo = DatosCargo.Factory.newInstance();
 									cargo.setCargo(integrante.getIdCargo());
 									cargo.setDescCargo(integrante.getDescripcionCargo());
-									Date fechaCargo = dateFormat.parse(integrante.getFechaCargo());
-									cargo.setFechaCargo(UtilidadesString.toCalendar(fechaCargo));
+									if (!UtilidadesString.esCadenaVacia(integrante.getFechaCargo())) {
+										Date fechaCargo = dateFormat.parse(integrante.getFechaCargo());
+										cargo.setFechaCargo(UtilidadesString.toCalendar(fechaCargo));
+									}
 									integranteFisico.setDatosCargo(cargo);
 									DatosPersona datosPersona = DatosPersona.Factory.newInstance();
 									datosPersona.setApellido1(integrante.getApellidos1());
@@ -506,8 +508,10 @@ public class WSCommons {
 									cargoJuridico.setCargo(integrante.getIdCargo());
 									
 									cargoJuridico.setDescCargo(integrante.getDescripcionCargo());
-									Date fechaCargoJuridico = dateFormat.parse(integrante.getFechaCargo());
-									cargoJuridico.setFechaCargo(UtilidadesString.toCalendar(fechaCargoJuridico));
+									if (!UtilidadesString.esCadenaVacia(integrante.getFechaCargo())) {
+										Date fechaCargoJuridico = dateFormat.parse(integrante.getFechaCargo());
+										cargoJuridico.setFechaCargo(UtilidadesString.toCalendar(fechaCargoJuridico));
+									}
 									integranteJuridico.setDatosCargo(cargoJuridico);
 									DatosEntidad datosEntidad = DatosEntidad.Factory.newInstance();
 									datosEntidad.setCIFNIF(integrante.getNifCif());
