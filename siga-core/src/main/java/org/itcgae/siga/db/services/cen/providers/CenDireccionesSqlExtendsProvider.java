@@ -68,6 +68,7 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.SELECT("DIRECCION.TELEFONO1");
 		sql.SELECT("DIRECCION.FAX1");
 		sql.SELECT("DIRECCION.MOVIL");
+		sql.SELECT("DIRECCION.FECHAMODIFICACION");
 		sql.SELECT("DIRECCION.PAGINAWEB");
 		sql.SELECT("DIRECCION.CORREOELECTRONICO");
 		sql.SELECT("PAIS.CODIGOEXT AS IDEXTERNOPAIS");
@@ -111,6 +112,7 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sqlPrincipal.SELECT("TELEFONO1");
 		sqlPrincipal.SELECT("FAX1");
 		sqlPrincipal.SELECT("MOVIL");
+		sqlPrincipal.SELECT("FECHAMODIFICACION");
 		sqlPrincipal.SELECT("PAGINAWEB");
 		sqlPrincipal.SELECT("CORREOELECTRONICO");
 		sqlPrincipal.SELECT("IDEXTERNOPAIS");

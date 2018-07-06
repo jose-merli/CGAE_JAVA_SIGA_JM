@@ -32,6 +32,7 @@ public class DatosDireccionesItem {
 	private String otraProvincia;
 	private String[] idTipoDireccion;
 	private String idTipoDireccionList;
+	private String fechaModificacion;
 	
 	
 	
@@ -252,6 +253,13 @@ public class DatosDireccionesItem {
 		this.idTipoDireccionList = idTipoDireccionList;
 	}
 
+	public String getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	public void setFechaModificacion(String fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
 
 
 	
@@ -288,13 +296,14 @@ public class DatosDireccionesItem {
 	    		Objects.equals(this.paginaWeb, datosDireccionesItem.paginaWeb) &&
 	    		Objects.equals(this.otraProvincia, datosDireccionesItem.otraProvincia) &&
 	    		Objects.equals(this.idTipoDireccion, datosDireccionesItem.idTipoDireccion) &&
+	    		Objects.equals(this.fechaModificacion, datosDireccionesItem.fechaModificacion) &&
 	    		Objects.equals(this.fax, datosDireccionesItem.fax);
 	}
 	
 	@Override
 	public int hashCode() {
 	    return Objects.hash(idInstitucion,tipoDireccion,idDireccion,codigoPostal,domicilio,domicilioLista,idPoblacion,idProvincia,idPais,telefono,fechaBaja,movil,
-	    		correoElectronico, idExternoPais, nombrePais, idExternoPoblacion, nombrePoblacion, idExternoProvincia, nombreProvincia, fax,paginaWeb,idPersona,otraProvincia,idTipoDireccion);
+	    		correoElectronico, idExternoPais, nombrePais, idExternoPoblacion, nombrePoblacion, idExternoProvincia, fechaModificacion,nombreProvincia, fax,paginaWeb,idPersona,otraProvincia,idTipoDireccion);
 	}
 
 	
@@ -327,9 +336,11 @@ public class DatosDireccionesItem {
 	    sb.append("    otraProvincia: ").append(toIndentedString(otraProvincia)).append("\n");
 	    sb.append("    idTipoDireccion: ").append(toIndentedString(idTipoDireccion)).append("\n");
 	    sb.append("    paginaweb: ").append(toIndentedString(paginaWeb)).append("\n");
+	    sb.append("    fechaModificacion: ").append(toIndentedString(fechaModificacion)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
+
 
 
 
