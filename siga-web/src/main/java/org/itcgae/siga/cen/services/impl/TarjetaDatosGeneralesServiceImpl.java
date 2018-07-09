@@ -51,7 +51,6 @@ import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -87,14 +86,17 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 	
 	
 	@Override
-	public void loadPhotography( HttpServletRequest request, HttpServletResponse response) {
+	public ComboItem loadPhotography(EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request, HttpServletResponse response) {
 		LOGGER.info(
 				"loadPhotography() -> Entrada al servicio para cargar de una ruta la fotografía de una persona jurídica");
 
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		List<GenProperties> genProperties = new ArrayList<GenProperties>();
 		ComboItem comboItem = new ComboItem();
+		List<GenProperties> genProperties = new ArrayList<GenProperties>();
 		String pathFinal = "";
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		// obtener el directorio para la fotografia de la persona
 		LOGGER.debug("loadPhotography() -> Obtener el directorio para la fotografia de la persona jurídica");
@@ -113,7 +115,8 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 			// obtener el nombre del archivo de la fotografía
 			LOGGER.info(
 					"loadPhotography() / cenPersonaExtendsMapper.loadPhotography() -> Entrada a cenPersonaExtendsMapper para obtener el nombre del archivo de la fotografía");
-			comboItem = cenPersonaExtendsMapper.loadPhotography("2005005356");
+			//comboItem = cenPersonaExtendsMapper.loadPhotography(etiquetaUpdateDTO.getIdPersona(), String.valueOf(idInstitucion));
+			comboItem = cenPersonaExtendsMapper.loadPhotography(etiquetaUpdateDTO.getIdPersona(), idInstitucion.toString());
 			LOGGER.info(
 					"loadPhotography() / cenPersonaExtendsMapper.loadPhotography() -> Salida de cenPersonaExtendsMapper para obtener el nombre del archivo de la fotografía");
 
@@ -122,56 +125,39 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				LOGGER.info(
 						"loadPhotography() -> Se obtiene fotografia de la persona jurídica del path:  " + pathFinal);
 
-				// Se coge la imagen con el logo
+				// Se coge la imagen de la persona juridica
 				File file = new File(pathFinal);
 				FileInputStream fis = null;
-
 				try {
 					fis = new FileInputStream(file);
-					// Parece que soporta otros tipos, como png
-					response.setContentType(MediaType.IMAGE_JPEG_VALUE);
-					// se pasa el logo en la respuesta http
 					IOUtils.copy(fis, response.getOutputStream());
-					updateResponseDTO.setStatus(SigaConstants.OK);
-
+		
 				} catch (FileNotFoundException e) {
-					LOGGER.error("loadPhotography() -> No se ha encontrado el fichero", e);
-					updateResponseDTO.setStatus(SigaConstants.KO);
-
+					LOGGER.error("No se ha encontrado el fichero", e);
+		
 				} catch (IOException e1) {
-					LOGGER.error(
-							"loadPhotography() -> No se han podido escribir los datos binarios de la fotografía en la respuesta HttpServletResponse",
-							e1);
-					updateResponseDTO.setStatus(SigaConstants.KO);
-					e1.printStackTrace();
+					LOGGER.error("No se han podido escribir los datos binarios de la imagen en la respuesta HttpServletResponse", e1);
 				} finally {
 					if (null != fis)
 						try {
 							fis.close();
 						} catch (IOException e) {
-							LOGGER.error("loadPhotography() -> No se ha cerrado el archivo que contiene la fotografía", e);
-							updateResponseDTO.setStatus(SigaConstants.KO);
-							e.printStackTrace();
+							LOGGER.error("No se ha cerrado el archivo correctamente", e);
 						}
 				}
-
+				
 			} else {
-				updateResponseDTO.setStatus(SigaConstants.KO);
-				LOGGER.warn("loadPhotography() / cenPersonaExtendsMapper.loadPhotography() -> "
-						+ updateResponseDTO.getStatus()
-						+ ". No se ha podido obtener el nombre del archivo de la fotografía: " + pathFinal);
+				LOGGER.warn("loadPhotography() / cenPersonaExtendsMapper.loadPhotography() -> . No se ha podido obtener el nombre del archivo de la fotografía: " + pathFinal);
 
 			}
 
 		} else {
-			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn("loadPhotography() / genPropertiesMapper.selectByExample() ->" + updateResponseDTO.getStatus()
-					+ ".No se ha podido obtener el directorio para la fotografia de la persona jurídica");
+			LOGGER.warn("loadPhotography() / genPropertiesMapper.selectByExample() -> No se ha podido obtener el directorio para la fotografia de la persona jurídica");
 		}
 		
 		LOGGER.info("loadPhotography() -> Salida del servicio para cargar de una ruta la fotografía de una persona jurídica");
 		
-		return;
+		return comboItem;
 	}
 
 	@Override
@@ -183,6 +169,11 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		String idPersona = request.getParameter("idPersona");
 		int response = 0;
+		
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		// obtener path para almacenar las fotografias
 		LOGGER.debug("uploadPhotography() -> Obtener path para almacenar las fotografias");
@@ -231,7 +222,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 			if (null != cenPersonas && cenPersonas.size() > 0) {
 				String nifCif = cenPersonas.get(0).getNifcif();
 
-				fileName = nifCif + "_" + fileName;
+				fileName = nifCif + "_"  + String.valueOf(idInstitucion) + "_" + fileName;
 
 				BufferedOutputStream stream = null;
 				// Guardar el archivo
@@ -259,7 +250,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				// actualizar nombre de la fotografia en base de datos
 				LOGGER.debug("uploadPhotography() -> actualizar nombre de la fotografia en base de datos");
 				CenClienteExample cenClienteExample = new CenClienteExample();
-				cenClienteExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona));
+				cenClienteExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona)).andIdinstitucionEqualTo(idInstitucion);
 				CenCliente cenCliente = new CenCliente();
 				cenCliente.setFotografia(fileName);
 				LOGGER.info(

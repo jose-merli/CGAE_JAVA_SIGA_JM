@@ -33,7 +33,7 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "NIFCIF", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FOTOGRAFIA", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
-	ComboItem loadPhotography(String idPersona);
+	ComboItem loadPhotography(String idPersona, String idInstitucion);
 	
 
 	

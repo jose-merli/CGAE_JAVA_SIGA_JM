@@ -11,12 +11,13 @@ import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface ITarjetaDatosGeneralesService {
 
-	public void loadPhotography(HttpServletRequest request, HttpServletResponse response);
+	public ComboItem loadPhotography(EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request, HttpServletResponse response);
 	
 	public UpdateResponseDTO uploadPhotography(MultipartHttpServletRequest request) throws IllegalStateException, IOException;
 	
