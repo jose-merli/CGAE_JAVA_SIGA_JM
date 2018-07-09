@@ -15,7 +15,7 @@ import org.itcgae.siga.db.mappers.CenPersonaSqlProvider;
 
 public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
-	public String loadPhotography(String idPersona) {
+	public String loadPhotography(String idPersona, String idInstitucion) {
 		SQL sql = new SQL();
 
 		sql.SELECT("PER.NIFCIF");
@@ -23,6 +23,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.FROM("CEN_CLIENTE CLI");
 		sql.INNER_JOIN("  CEN_PERSONA PER ON PER.IDPERSONA = CLI.IDPERSONA ");
 		sql.WHERE(" PER.IDPERSONA ='" + idPersona + "'");
+		sql.WHERE(" CLI.IDINSTITUCION = '" + idInstitucion + "'");
 
 		return sql.toString();
 	}

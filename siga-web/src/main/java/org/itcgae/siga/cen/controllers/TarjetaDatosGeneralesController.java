@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,16 +40,14 @@ public class TarjetaDatosGeneralesController {
 //			else return new ResponseEntity<UpdateResponseDTO>(HttpStatus.FORBIDDEN);
 //    }
 	
-  @RequestMapping(value = "/personaJuridica/cargarFotografia", method = RequestMethod.GET)
-  public ResponseEntity<UpdateResponseDTO> loadPhotography(HttpServletRequest request, HttpServletResponse response) {
-		tarjetaDatosGeneralesService.loadPhotography(request, response);
-		//if(response1.getStatus().equals(SigaConstants.OK))
-			return new ResponseEntity<UpdateResponseDTO>(HttpStatus.OK);
-			//else return new ResponseEntity<UpdateResponseDTO>(HttpStatus.FORBIDDEN);
-  }
+
+	 @RequestMapping(value = "personaJuridica/cargarFotografia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	    public ResponseEntity<ComboItem> loadPhotography(@RequestBody EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request, HttpServletResponse response) {
+		 	ComboItem comboItem = tarjetaDatosGeneralesService.loadPhotography(etiquetaUpdateDTO,request,response);
+			return new ResponseEntity<ComboItem>(comboItem, HttpStatus.OK);
+	    }
 	
-	
-	
+
 	@RequestMapping(value = "personaJuridica/uploadFotografia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	ResponseEntity<UpdateResponseDTO> uploadPhotography(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
 		UpdateResponseDTO response = tarjetaDatosGeneralesService.uploadPhotography(request);
