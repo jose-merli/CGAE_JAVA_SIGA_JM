@@ -585,6 +585,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							"updateDirection() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar el noColegiado");
 
 					LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
+					insertResponseDTO.setId(idDireccion.toString());
 					insertResponseDTO.setStatus(SigaConstants.OK);
 				}
 				else {

@@ -76,11 +76,13 @@ import org.itcgae.siga.db.services.cen.mappers.GenFicheroExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 
 @Service
+@Transactional(rollbackFor=Exception.class)
 public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosService{
 
 	private Logger LOGGER = Logger.getLogger(TarjetaDatosBancariosServiceImpl.class);
@@ -493,6 +495,18 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						insertResponseDTO.setStatus(SigaConstants.KO);
 						error.setMessage("Error al insertar los mandatos de las cuentas");
 						insertResponseDTO.setError(error);
+						
+						//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+						if (tieneAbono || tieneSCSJ) {
+							if (tieneAbono) {
+								cuentaBancaria.setAbonocargo("A");
+							}else{
+								cuentaBancaria.setAbonocargo(null);
+							}
+							cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
+						}else{
+							cenCuentasbancariasExtendsMapper.deleteByPrimaryKey(cuentaBancaria);
+						}
 						return insertResponseDTO;
 						
 					} else {
@@ -501,6 +515,17 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 							insertResponseDTO.setStatus(SigaConstants.KO);
 							error.setMessage("messages.censo.direcciones.facturacion");
 							insertResponseDTO.setError(error);
+							//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+							if (tieneAbono || tieneSCSJ) {
+								if (tieneAbono) {
+									cuentaBancaria.setAbonocargo("A");
+								}else{
+									cuentaBancaria.setAbonocargo(null);
+								}
+								cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
+							}else{
+								cenCuentasbancariasExtendsMapper.deleteByPrimaryKey(cuentaBancaria);
+							}
 							return insertResponseDTO;
 							
 						} else if (resultado[0].equals("2")) {
@@ -508,6 +533,17 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 							insertResponseDTO.setStatus(SigaConstants.KO);
 							error.setMessage("messages.censo.direcciones.facturacion");
 							insertResponseDTO.setError(error);
+							//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+							if (tieneAbono || tieneSCSJ) {
+								if (tieneAbono) {
+									cuentaBancaria.setAbonocargo("A");
+								}else{
+									cuentaBancaria.setAbonocargo(null);
+								}
+								cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
+							}else{
+								cenCuentasbancariasExtendsMapper.deleteByPrimaryKey(cuentaBancaria);
+							}
 							return insertResponseDTO;
 							
 						} else if (!resultado[0].equals("0")) {
@@ -515,6 +551,17 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 							insertResponseDTO.setStatus(SigaConstants.KO);
 							error.setMessage("Error al insertar los mandatos de las cuentas");
 							insertResponseDTO.setError(error);
+							//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+							if (tieneAbono || tieneSCSJ) {
+								if (tieneAbono) {
+									cuentaBancaria.setAbonocargo("A");
+								}else{
+									cuentaBancaria.setAbonocargo(null);
+								}
+								cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
+							}else{
+								cenCuentasbancariasExtendsMapper.deleteByPrimaryKey(cuentaBancaria);
+							}
 							return insertResponseDTO;
 						}
 					}
@@ -894,6 +941,18 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							error.setMessage("Error al insertar los mandatos de las cuentas");
 							updateResponseDTO.setError(error);
+							//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+							if (tieneAbono || tieneSCSJ) {
+								if (tieneAbono) {
+									cuentaBancaria.setAbonocargo("A");
+								}else{
+									cuentaBancaria.setAbonocargo(null);
+								}
+								cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
+							}else{
+								cuentaBancaria.setAbonocargo(null);
+								cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
+							}
 							return updateResponseDTO;
 							
 						} else {
@@ -902,6 +961,18 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 								updateResponseDTO.setStatus(SigaConstants.KO);
 								error.setMessage("messages.censo.direcciones.facturacion");
 								updateResponseDTO.setError(error);
+								//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+								if (tieneAbono || tieneSCSJ) {
+									if (tieneAbono) {
+										cuentaBancaria.setAbonocargo("A");
+									}else{
+										cuentaBancaria.setAbonocargo(null);
+									}
+									cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
+								}else{
+									cuentaBancaria.setAbonocargo(null);
+									cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
+								}
 								return updateResponseDTO;
 								
 							} else if (resultado[0].equals("2")) {
@@ -909,6 +980,18 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 								updateResponseDTO.setStatus(SigaConstants.KO);
 								error.setMessage("messages.censo.direcciones.facturacion");
 								updateResponseDTO.setError(error);
+								//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+								if (tieneAbono || tieneSCSJ) {
+									if (tieneAbono) {
+										cuentaBancaria.setAbonocargo("A");
+									}else{
+										cuentaBancaria.setAbonocargo(null);
+									}
+									cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
+								}else{
+									cuentaBancaria.setAbonocargo(null);
+									cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
+								}
 								return updateResponseDTO;
 								
 							} else if (!resultado[0].equals("0")) {
@@ -916,6 +999,18 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 								updateResponseDTO.setStatus(SigaConstants.KO);
 								error.setMessage("Error al insertar los mandatos de las cuentas");
 								updateResponseDTO.setError(error);
+								//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+								if (tieneAbono || tieneSCSJ) {
+									if (tieneAbono) {
+										cuentaBancaria.setAbonocargo("A");
+									}else{
+										cuentaBancaria.setAbonocargo(null);
+									}
+									cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
+								}else{
+									cuentaBancaria.setAbonocargo(null);
+									cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
+								}
 								return updateResponseDTO;
 							}
 						}
