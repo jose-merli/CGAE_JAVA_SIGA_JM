@@ -461,10 +461,11 @@ public class MenuServiceImpl implements IMenuService {
 
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
 		List<UsuarioLogeadoItem> usuario = this.admUsuariosExtendsMapper.getUsersLog(request);
 		UsuarioLogeadoDTO response = new UsuarioLogeadoDTO();
-
+		String perfil;
+		//usuario.get(0).setPerfiles(perfil);
 		response.setUsuarioLogeadoItem(usuario);
 
 		for (UsuarioLogeadoItem usuarioLogeadoItem : usuario) {
