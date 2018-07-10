@@ -42,6 +42,7 @@ import org.itcgae.siga.db.entities.AdmGestorinterfaz;
 import org.itcgae.siga.db.entities.AdmGestorinterfazExample;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
+import org.itcgae.siga.db.entities.AdmPerfilKey;
 import org.itcgae.siga.db.entities.AdmTiposacceso;
 import org.itcgae.siga.db.entities.AdmTiposaccesoKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -56,6 +57,7 @@ import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.AdmGestorinterfazMapper;
+import org.itcgae.siga.db.mappers.AdmPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
@@ -117,6 +119,10 @@ public class MenuServiceImpl implements IMenuService {
 
 	@Autowired 
 	AdmConfigMapper admConfigMapper;
+	
+	@Autowired 
+	AdmPerfilMapper adminPerfilMapper;
+	
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
 		MenuDTO response = new MenuDTO();
@@ -464,8 +470,7 @@ public class MenuServiceImpl implements IMenuService {
 		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
 		List<UsuarioLogeadoItem> usuario = this.admUsuariosExtendsMapper.getUsersLog(request);
 		UsuarioLogeadoDTO response = new UsuarioLogeadoDTO();
-		String perfil;
-		//usuario.get(0).setPerfiles(perfil);
+		usuario.get(0).setPerfiles(getDescripcion(perfiles, idInstitucion));
 		response.setUsuarioLogeadoItem(usuario);
 
 		for (UsuarioLogeadoItem usuarioLogeadoItem : usuario) {
@@ -480,6 +485,23 @@ public class MenuServiceImpl implements IMenuService {
 		return response;
 	}
 
+	private String getDescripcion(List<String> perfiles, Short idInstitucion) {
+	
+		String descripcionPerfil = "";
+		
+		for (String string : perfiles) {
+			AdmPerfilKey adminPerfilKey = new AdmPerfilKey();
+			adminPerfilKey.setIdinstitucion(idInstitucion);
+			adminPerfilKey.setIdperfil(string.replace("'",""));
+			
+			AdmPerfil adminPerfil = this.adminPerfilMapper.selectByPrimaryKey(adminPerfilKey);
+			descripcionPerfil += adminPerfil.getDescripcion() + ", ";
+		}
+		
+		
+		return descripcionPerfil.substring(0, descripcionPerfil.length() - 2);
+	}
+	
 	@Override
 	public PermisoDTO getAccessControl(ControlRequestItem controlItem, HttpServletRequest request) {
 
