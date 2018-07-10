@@ -151,6 +151,10 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.ws.literal.fax','Fax','0','1',to_date('20/11/13','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.ws.literal.fax','Fax#GL','0','4',to_date('20/11/13','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.ws.literal.fax','Fax','0','2',to_date('20/11/13','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('administracion.parametrosGenerales.literal.nombre.apellidos','Cognoms & Nom','0','2',to_date('14/08/07','DD/MM/RR'),'0','15');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('administracion.parametrosGenerales.literal.nombre.apellidos','Apellidos & Nombre','0','1',to_date('14/08/07','DD/MM/RR'),'0','15');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('administracion.parametrosGenerales.literal.nombre.apellidos','Apellidos & Nombre#EU','0','3',to_date('14/08/07','DD/MM/RR'),'0','15');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('administracion.parametrosGenerales.literal.nombre.apellidos','Apellidos & Nombre#GL','0','4',to_date('14/08/07','DD/MM/RR'),'0','15');
 
 
 commit;
