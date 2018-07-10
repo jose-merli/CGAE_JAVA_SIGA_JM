@@ -15,8 +15,18 @@ public class UsuarioLogeadoItem {
 	private String ultimaConex = null;
 	private String institucion  = null;
 	private String idioma  = null;
+	private String perfiles  = null;
 	
-	
+
+	public String getPerfiles() {
+		return perfiles;
+	}
+
+
+	public void setPerfiles(String perfiles) {
+		this.perfiles = perfiles;
+	}
+
 
 	/**
 	 */

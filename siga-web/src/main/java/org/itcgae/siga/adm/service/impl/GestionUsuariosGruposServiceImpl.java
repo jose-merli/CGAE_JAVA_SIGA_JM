@@ -149,7 +149,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 			// ordenar por descripcion
 			Comparator<ComboItem> orderBydDescription = new Comparator<ComboItem>() {
 				public int compare(ComboItem combo1, ComboItem combo2) {
-					return String.valueOf(combo1.getValue()).compareTo(String.valueOf(combo2.getValue()));
+					return String.valueOf(combo1.getLabel()).compareTo(String.valueOf(combo2.getLabel()));
 				}
 			};
 
