@@ -14,6 +14,7 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -39,17 +40,20 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
-		X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-
-
-		// Confirmado con CGAE que debe accederse con el usuario con id -1 siempre que se acceda por los combos
-		LOGGER.info("Se accede por los combos");
-		String dni = "44149718E";
-		String grupo = request.getParameter("profile");
-		String institucion = request.getParameter("location");
-		
-		UserCgae user = new UserCgae(dni, grupo, institucion, null,null);
-		return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,certs[0]));
+		try{
+			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+			
+			// Confirmado con CGAE que debe accederse con el usuario con id -1 siempre que se acceda por los combos
+			LOGGER.info("Se accede por los combos");
+			String dni = "44149718E";
+			String grupo = request.getParameter("profile");
+			String institucion = request.getParameter("location");
+			
+			UserCgae user = new UserCgae(dni, grupo, institucion, null,null);
+			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,certs[0]));
+		} catch (Exception e) {
+			throw new BadCredentialsException(e.getMessage());
+		}
 	}
 
 	@Override

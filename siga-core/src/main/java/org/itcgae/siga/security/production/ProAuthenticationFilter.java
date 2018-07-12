@@ -21,6 +21,7 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -84,7 +85,7 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 				return authenticationManager.authenticate(new UserAuthenticationToken(dni, user, cert));
 			}
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new BadCredentialsException(e.getMessage());
 		}
 		return null;
 	}

@@ -47,5 +47,8 @@ public interface IMenuService {
 	public EntornoDTO getEntorno( HttpServletRequest request);
 
 
+	public UpdateResponseDTO validaInstitucion(HttpServletRequest request);
+
+
 
 }

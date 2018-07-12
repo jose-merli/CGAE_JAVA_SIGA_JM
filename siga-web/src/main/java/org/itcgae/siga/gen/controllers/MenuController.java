@@ -48,7 +48,11 @@ public class MenuController {
     	ComboDTO response = menuService.getInstituciones(request);
     	return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
-    
+    @RequestMapping(value = "/validaInstitucion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> validaInstitucion( HttpServletRequest request) {
+    	UpdateResponseDTO response = menuService.validaInstitucion(request);
+    	return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
     
     @RequestMapping(value = "/perfiles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getPerfiles(@RequestParam("institucion") String idInstitucion) {

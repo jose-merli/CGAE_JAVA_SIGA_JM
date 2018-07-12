@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,6 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.assertj.core.util.Strings;
+import org.bouncycastle.asn1.x500.RDN;
+import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x500.style.IETFUtils;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioLogeadoItem;
@@ -36,6 +43,8 @@ import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.Converter;
+import org.itcgae.siga.commons.utils.InvalidClientCerticateException;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmGestorinterfaz;
@@ -72,6 +81,7 @@ import org.itcgae.siga.gen.services.IMenuService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 
@@ -654,6 +664,41 @@ public class MenuServiceImpl implements IMenuService {
 		}
 		LOGGER.info("Servicio de recuperacion de logos -> OK");
 		return;
+	}
+
+	@Override
+	public UpdateResponseDTO validaInstitucion(HttpServletRequest request) {
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		try{
+		X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+		String organizationName = null;
+		X509Certificate cert = null;
+		try {
+			cert = certs[0];
+			X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
+
+			
+
+			RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
+			organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
+
+		} catch (CertificateEncodingException e) {
+			throw new InvalidClientCerticateException(e);
+		}
+
+		String idInstitucion = organizationName.substring(organizationName.length() - 4,
+		organizationName.length());
+		if (!UtilidadesString.esCadenaVacia(idInstitucion)) {
+			if (!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
+				throw new BadCredentialsException("Certificado no validado para CGAE");
+			}
+		}
+
+		} catch (Exception e) {
+			throw new BadCredentialsException(e.getMessage());
+		}
+		response.setStatus(SigaConstants.OK);
+		return response;
 	}	
 
 
