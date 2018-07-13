@@ -15,7 +15,7 @@ public interface IAuditoriaCenHistoricoService {
 
 	public void insertaCenHistorico(Long idPersona, SigaConstants.CEN_TIPOCAMBIO tipoCambio, String descripcion, HttpServletRequest request, String motivo);
 	
-	public void manageAuditoriaDatosGenerales(List<String> gruposPerJuridicaNuevos, List<String> gruposPerJuridicaAntiguos, List<String> gruposNuevosNoAniadidos, CenPersona cenPersonaAnterior, CenPersona cenPersonaPosterior, CenNocolegiado cenNocolegiadoAnterior, 
+	public void manageAuditoriaDatosGenerales(List<String> gruposPerJuridicaNuevos, List<String> gruposPerJuridicaAntiguos, CenPersona cenPersonaAnterior, CenPersona cenPersonaPosterior, CenNocolegiado cenNocolegiadoAnterior, 
 			CenNocolegiado cenNocolegiadoPosterior, CenCliente cenClienteAnterior, CenCliente cenClientePosterior, String accion, HttpServletRequest request, String motivo);
 	
 	public void manageAuditoriaDatosDirecciones(CenDirecciones cenDireccionesAnterior, CenDirecciones cenDireccionesPosterior, String accion, HttpServletRequest request, String motivo);

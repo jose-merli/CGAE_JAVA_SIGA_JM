@@ -109,24 +109,47 @@ public class AuditoriaCenHistoricoServiceImpl implements IAuditoriaCenHistoricoS
 	 * @param cenClientePosterior
 	 */
 	@Override
-	public void manageAuditoriaDatosGenerales(List<String> gruposPerJuridicaNuevos, List<String> gruposPerJuridicaAntiguos, List<String> gruposNuevosNoAniadidos, CenPersona cenPersonaAnterior, CenPersona cenPersonaPosterior, CenNocolegiado cenNocolegiadoAnterior, 
+	public void manageAuditoriaDatosGenerales(List<String> gruposPerJuridicaNuevos, List<String> gruposPerJuridicaAntiguos, CenPersona cenPersonaAnterior, CenPersona cenPersonaPosterior, CenNocolegiado cenNocolegiadoAnterior, 
 			CenNocolegiado cenNocolegiadoPosterior, CenCliente cenClienteAnterior, CenCliente cenClientePosterior, String accion, HttpServletRequest request, String motivo) {
 		
 		switch (accion) {
 		case "UPDATE":
+			// auditoria para cen_persona
 			insertaCenHistorico(cenPersonaPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES, getDescripcionCenPersona(cenPersonaAnterior, cenPersonaPosterior, accion), request, motivo);
+			// auditoria para cen_nocolegiado
 			insertaCenHistorico(cenNocolegiadoPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_COLEGIALES, getDescripcionCenNoColegiado(cenNocolegiadoAnterior, cenNocolegiadoPosterior, accion), request, motivo);
+			// auditoria para cen_cliente
 			insertaCenHistorico(cenClientePosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES, getDescripcionCliente(cenClienteAnterior, cenClientePosterior, accion), request, motivo);
 			// si se añadieron nuevos grupos o se borraron 
-			if(!gruposPerJuridicaAntiguos.isEmpty() || !gruposNuevosNoAniadidos.isEmpty()) {
+			boolean mismosGrupos = false;
+			int contador = 0;
+			// comprueba que la actualización no contiene los mismos grupos
+			if(!gruposPerJuridicaNuevos.isEmpty() && !gruposPerJuridicaAntiguos.isEmpty()) {
+				if(gruposPerJuridicaNuevos.size() == gruposPerJuridicaAntiguos.size()) {
+					for (String nuevoGrupo : gruposPerJuridicaNuevos) {
+						if(gruposPerJuridicaAntiguos.contains(nuevoGrupo)) {
+							contador++;
+						}
+					}
+					
+					if(contador == gruposPerJuridicaNuevos.size())
+						mismosGrupos = true;
+				}
+			}
+			// auditoria para etiquetas
+			if(!mismosGrupos) {
 				insertaCenHistorico(cenClientePosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES,  getDescripcionGrupos(gruposPerJuridicaAntiguos, gruposPerJuridicaNuevos, accion, request), request, motivo);
 			}
 			
 			break;
 		case "INSERT":
+			// auditoria para cen_persona
 			insertaCenHistorico(cenPersonaPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES, getDescripcionCenPersona(cenPersonaAnterior, cenPersonaPosterior, accion), request, motivo);
+			// auditoria para cen_nocolegiado
 			insertaCenHistorico(cenNocolegiadoPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_COLEGIALES, getDescripcionCenNoColegiado(cenNocolegiadoAnterior, cenNocolegiadoPosterior, accion), request, motivo);
+			// auditoria para cen_cliente
 			insertaCenHistorico(cenClientePosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES, getDescripcionCliente(cenClienteAnterior, cenClientePosterior, accion), request, motivo);
+			// auditoria para etiquetas
 			if(null != gruposPerJuridicaNuevos && !gruposPerJuridicaNuevos.isEmpty()) {
 				insertaCenHistorico(cenClientePosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES,  getDescripcionGrupos(gruposPerJuridicaAntiguos, gruposPerJuridicaNuevos, accion, request), request, motivo);
 			}
@@ -438,14 +461,7 @@ public class AuditoriaCenHistoricoServiceImpl implements IAuditoriaCenHistoricoS
 		
 		switch (accion) {
 		case "UPDATE":
-			// tiene los mismos grupos que antes
-			if(gruposPerJuridicaAntiguos.isEmpty()) {
-				getDescripcionGrupos(sb, gruposPersonaJuridica, "REGISTRO ANTERIOR",request);
-			}
-			else {
-				getDescripcionGrupos(sb, gruposPerJuridicaAntiguos, "REGISTRO ANTERIOR",request);
-			}
-			
+			getDescripcionGrupos(sb, gruposPerJuridicaAntiguos, "REGISTRO ANTERIOR",request);
 			getDescripcionGrupos(sb, gruposPersonaJuridica, "REGISTRO ACTUAL", request);
 			break;
 		case "INSERT":
@@ -490,10 +506,14 @@ public class AuditoriaCenHistoricoServiceImpl implements IAuditoriaCenHistoricoS
 					if(i != stringDTO.size() -1) 
 						sb.append(stringDTO.get(i).getValor()).append(";").append(salto);
 					else 
-						sb.append(stringDTO.get(i).getValor()).append(salto);
+						sb.append(stringDTO.get(i).getValor()).append(salto).append(" ");
 				}
 			}
 			
+		}
+		else {
+			sb.append(cabecera).append(salto);
+			addDato(sb, "Grupos fijos", "");
 		}
 	}
 	

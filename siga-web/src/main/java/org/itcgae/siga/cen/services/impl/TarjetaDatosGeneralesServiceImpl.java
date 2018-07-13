@@ -553,7 +553,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 			// obtenemos las etiquetas creadas
 			List<String> gruposPerJuridicaNuevos = Arrays.asList(sociedadCreateDTO.getGrupos());
 			// llamada a auditoria
-			auditoriaCenHistoricoService.manageAuditoriaDatosGenerales(gruposPerJuridicaNuevos, null, null, null, cenPersonaPosterior, null, cenNocolegiadoPosterior, null, cenClientePosterior, "INSERT", request, sociedadCreateDTO.getMotivo());
+			auditoriaCenHistoricoService.manageAuditoriaDatosGenerales(gruposPerJuridicaNuevos, null, null, cenPersonaPosterior, null, cenNocolegiadoPosterior, null, cenClientePosterior, "INSERT", request, sociedadCreateDTO.getMotivo());
 		}
 		
 		LOGGER.info(
@@ -602,8 +602,11 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				gruposPersonaJuridica = cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica(etiquetaUpdateDTO.getIdPersona(), String.valueOf(usuario.getIdinstitucion()));
 				
 				List<String> gruposPerJuridicaAntiguos = new ArrayList<String>();
+				List<String> gruposPerJuridicaAnterior = new ArrayList<String>();
+				
 				for(int i = 0; i< gruposPersonaJuridica.size();i++) {
 					gruposPerJuridicaAntiguos.add(gruposPersonaJuridica.get(i).getLabel());
+					gruposPerJuridicaAnterior.add(gruposPersonaJuridica.get(i).getLabel());
 				}
 				
 				// 2. actualizar relaciones entre tablas para todos los grupos (eliminado y creación)
@@ -790,10 +793,10 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 					if(!updateResponseDTO.getStatus().equals(SigaConstants.KO)) {
 						updateResponseDTO.setStatus(SigaConstants.OK);
 						
-						List<String> gruposPerJuridicaNuevos = Arrays.asList(etiquetaUpdateDTO.getGrupos());
+						List<String> gruposPerJuridicaPosterior = Arrays.asList(etiquetaUpdateDTO.getGrupos());
 						
 						// AUDITORIA  => actualizamos cen_historico si todo es correcto
-						auditoriaCenHistoricoService.manageAuditoriaDatosGenerales(gruposPerJuridicaNuevos, gruposPerJuridicaAntiguos, gruposNuevosNoAniadidos, cenPersonaAnterior, cenPersonaPosterior, cenNocolegiadoAnterior, cenNocolegiadoPosterior, cenClienteAnterior, cenClientePosterior, "UPDATE", request, etiquetaUpdateDTO.getMotivo());
+						auditoriaCenHistoricoService.manageAuditoriaDatosGenerales(gruposPerJuridicaPosterior, gruposPerJuridicaAnterior, cenPersonaAnterior, cenPersonaPosterior, cenNocolegiadoAnterior, cenNocolegiadoPosterior, cenClienteAnterior, cenClientePosterior, "UPDATE", request, etiquetaUpdateDTO.getMotivo());
 						
 						
 					}
