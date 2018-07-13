@@ -1,0 +1,609 @@
+package org.itcgae.siga.gen.services.impl;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.CEN_TIPOCAMBIO;
+import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenCuentasbancarias;
+import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenHistorico;
+import org.itcgae.siga.db.entities.CenNocolegiado;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
+import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
+import org.itcgae.siga.security.UserTokenUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AuditoriaCenHistoricoServiceImpl implements IAuditoriaCenHistoricoService{
+
+	Logger LOGGER = Logger.getLogger(AuditoriaCenHistoricoServiceImpl.class);
+	private static final String salto = "\n";
+	
+	@Autowired
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private CenHistoricoExtendsMapper cenHistoricoExtendsMapper;
+	
+	@Autowired
+	private CenGruposclienteExtendsMapper cenGruposclienteExtendsMapper;
+	
+	@Override
+	public void insertaCenHistorico(Long idPersona, CEN_TIPOCAMBIO tipoCambio, String descripcion,
+			HttpServletRequest request, String motivo) {
+
+		
+		NewIdDTO idHistorico = new NewIdDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		LOGGER.info(
+				"updateLegalPerson() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info(
+				"updateLegalPerson() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+		
+		if (null != usuarios && usuarios.size() > 0) {
+			AdmUsuarios usuario = usuarios.get(0);
+			
+			Short newIdHistorico= new Short("1");
+			idHistorico = cenHistoricoExtendsMapper.selectMaxIDHistoricoByPerson(String.valueOf(idPersona), String.valueOf(idInstitucion));
+			
+			if(null != idHistorico && !idHistorico.getNewId().isEmpty()) {
+				newIdHistorico = Short.valueOf(idHistorico.getNewId());
+			}
+			
+			
+			CenHistorico cenHistorico = new CenHistorico();
+			cenHistorico.setIdpersona(idPersona);
+			cenHistorico.setIdinstitucion(idInstitucion);
+			cenHistorico.setFechaentrada(new Date());
+			cenHistorico.setFechaefectiva(new Date());
+			if(!UtilidadesString.esCadenaVacia(motivo)) {
+				cenHistorico.setMotivo(motivo); 
+			}
+			
+			cenHistorico.setIdtipocambio(tipoCambio.getIdTipoCambio());
+			cenHistorico.setFechamodificacion(new Date());
+			cenHistorico.setUsumodificacion(usuario.getIdusuario());
+			cenHistorico.setIdhistorico(newIdHistorico); 
+			cenHistorico.setDescripcion(descripcion);
+			cenHistorico.setObservaciones(null); 
+			cenHistoricoExtendsMapper.insertSelective(cenHistorico);
+		}	
+	}
+	
+		
+	/***
+	 * Método para gestionar las auditorias cada vez que se realizan cambios en pantalla
+	 * @param gruposPersonaJuridica
+	 * @param gruposPerJuridicaAntiguos
+	 * @param cenPersonaAnterior
+	 * @param cenPersonaPosterior
+	 * @param cenNocolegiadoAnterior
+	 * @param cenNocolegiadoPosterior
+	 * @param cenClienteAnterior
+	 * @param cenClientePosterior
+	 */
+	@Override
+	public void manageAuditoriaDatosGenerales(List<String> gruposPerJuridicaNuevos, List<String> gruposPerJuridicaAntiguos, List<String> gruposNuevosNoAniadidos, CenPersona cenPersonaAnterior, CenPersona cenPersonaPosterior, CenNocolegiado cenNocolegiadoAnterior, 
+			CenNocolegiado cenNocolegiadoPosterior, CenCliente cenClienteAnterior, CenCliente cenClientePosterior, String accion, HttpServletRequest request, String motivo) {
+		
+		switch (accion) {
+		case "UPDATE":
+			insertaCenHistorico(cenPersonaPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES, getDescripcionCenPersona(cenPersonaAnterior, cenPersonaPosterior, accion), request, motivo);
+			insertaCenHistorico(cenNocolegiadoPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_COLEGIALES, getDescripcionCenNoColegiado(cenNocolegiadoAnterior, cenNocolegiadoPosterior, accion), request, motivo);
+			insertaCenHistorico(cenClientePosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES, getDescripcionCliente(cenClienteAnterior, cenClientePosterior, accion), request, motivo);
+			// si se añadieron nuevos grupos o se borraron 
+			if(!gruposPerJuridicaAntiguos.isEmpty() || !gruposNuevosNoAniadidos.isEmpty()) {
+				insertaCenHistorico(cenClientePosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES,  getDescripcionGrupos(gruposPerJuridicaAntiguos, gruposPerJuridicaNuevos, accion, request), request, motivo);
+			}
+			
+			break;
+		case "INSERT":
+			insertaCenHistorico(cenPersonaPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES, getDescripcionCenPersona(cenPersonaAnterior, cenPersonaPosterior, accion), request, motivo);
+			insertaCenHistorico(cenNocolegiadoPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_COLEGIALES, getDescripcionCenNoColegiado(cenNocolegiadoAnterior, cenNocolegiadoPosterior, accion), request, motivo);
+			insertaCenHistorico(cenClientePosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES, getDescripcionCliente(cenClienteAnterior, cenClientePosterior, accion), request, motivo);
+			if(null != gruposPerJuridicaNuevos && !gruposPerJuridicaNuevos.isEmpty()) {
+				insertaCenHistorico(cenClientePosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES,  getDescripcionGrupos(gruposPerJuridicaAntiguos, gruposPerJuridicaNuevos, accion, request), request, motivo);
+			}
+			
+			break;
+		case "DELETE":
+			// para pasar de nocolegiado -> colegiado || borrar sociedad (NO SE HACE)
+			break;
+		default:
+			break;
+		}
+		
+	}
+	
+	@Override
+	public void manageAuditoriaDatosDirecciones(CenDirecciones cenDireccionesAnterior, CenDirecciones cenDireccionesPosterior, String accion, HttpServletRequest request, String motivo) {
+		switch (accion) {
+		case "UPDATE":
+			insertaCenHistorico(cenDireccionesPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DIRECCIONES, getDescripcionCenDirecciones(cenDireccionesAnterior, cenDireccionesPosterior, accion), request, motivo);
+			break;
+		case "INSERT":
+			insertaCenHistorico(cenDireccionesPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DIRECCIONES, getDescripcionCenDirecciones(cenDireccionesAnterior, cenDireccionesPosterior, accion), request, motivo);
+		case "DELETE":
+			// (NO SE HACE PORQUE EXISTE HISTÓRICO)
+			break;
+		default:
+			break;
+		}
+	}
+	
+	
+	@Override
+	public void manageAuditoriaDatosCuentasBancarias(CenCuentasbancarias cenCuentasbancariasAnterior, CenCuentasbancarias cenCuentasbancariasPosterior, String accion, HttpServletRequest request, String motivo) {
+		switch (accion) {
+		case "UPDATE":
+			insertaCenHistorico(cenCuentasbancariasPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_CUENTAS_BANCARIAS, getDescripcionCenCuentasBancarias(cenCuentasbancariasAnterior, cenCuentasbancariasPosterior, accion), request, motivo);
+			break;
+		case "INSERT":
+			insertaCenHistorico(cenCuentasbancariasPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_CUENTAS_BANCARIAS, getDescripcionCenCuentasBancarias(cenCuentasbancariasAnterior, cenCuentasbancariasPosterior, accion), request, motivo);
+		case "DELETE":
+			// (NO SE HACE PORQUE EXISTE HISTÓRICO)
+			break;
+		default:
+			break;
+		}
+	}
+	
+	
+	private void addDato(StringBuffer sb, String descripcion, String valor) {
+		sb.append(" - ").append(descripcion).append(": ").append(valor!=null?valor:"").append(salto);		
+	}
+	
+	
+	public void addDato(StringBuffer sb, String descripcion, Integer valor) {
+		addDato(sb, descripcion, (valor!=null?valor.toString():""));		
+	}
+
+	/**
+	 * 
+	 * @param sb
+	 * @param descripcion
+	 * @param date
+	 */
+	
+	public void addDato(StringBuffer sb, String descripcion, Date date) {
+		DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		addDato(sb, descripcion, (date!=null?df.format(date):""));
+	}
+
+	/**
+	 * 
+	 * @param sb
+	 * @param descripcion
+	 * @param valor
+	 */
+	
+	public void addDato(StringBuffer sb, String descripcion, Long valor) {		
+		addDato(sb, descripcion, (valor!=null?valor.toString():""));		
+	}
+
+	/**
+	 * 
+	 * @param sb
+	 * @param descripcion
+	 * @param valor
+	 */
+	
+	public void addDato(StringBuffer sb, String descripcion, Short valor) {
+		addDato(sb, descripcion, (valor!=null?valor.toString():""));
+	}
+	
+	
+	// DATOS CEN_PERSONA
+	
+	
+	private String getDescripcionCenPersona(CenPersona cenPersonaAnterior, CenPersona cenPersonaPosterior, String accion) {		
+		StringBuffer sb = new StringBuffer();
+		
+		switch (accion) {
+		case "UPDATE":
+			getDescripcionCenPersona(sb, cenPersonaAnterior, "REGISTRO ANTERIOR");
+			getDescripcionCenPersona(sb, cenPersonaPosterior, "REGISTRO ACTUAL");
+			break;
+		case "INSERT":
+			getDescripcionCenPersona(sb, cenPersonaPosterior, "REGISTRO NUEVO");
+			break;
+		case "DELETE":
+			getDescripcionCenPersona(sb, cenPersonaPosterior, "REGISTRO ELIMINADO");
+			break;
+		default:
+			break;
+		}
+		
+		return sb.toString();		
+		  
+	}
+	
+	private String getDescripcionCenPersona(StringBuffer sb, CenPersona cenPersona, String cabecera) {
+		
+		if (cenPersona != null) {
+			sb.append(cabecera).append(salto);
+			addDato(sb, "Idpersona", cenPersona.getIdpersona());
+			addDato(sb, "Nombre", cenPersona.getNombre());	
+			addDato(sb, "Apellidos1", cenPersona.getApellidos1());					
+			addDato(sb, "Apellidos2", cenPersona.getApellidos2());
+			addDato(sb, "Nifcif", cenPersona.getNifcif());
+			addDato(sb, "Fechamodificacion", cenPersona.getFechamodificacion());
+			addDato(sb, "Usumodificacion", cenPersona.getUsumodificacion());
+			addDato(sb, "Idtipoidentificacion", cenPersona.getIdtipoidentificacion());
+			addDato(sb, "Fechanacimiento", cenPersona.getFechanacimiento());
+			addDato(sb, "Idestadocivil", cenPersona.getIdestadocivil());
+			addDato(sb, "Naturalde", cenPersona.getNaturalde());
+			addDato(sb, "Fallecido", cenPersona.getFallecido());
+			addDato(sb, "Sexo", cenPersona.getSexo());
+		}
+				
+		return sb.toString();		
+		  
+	}
+	
+	
+	// DATOS CEN_NOCOLEGIADO
+	
+	private String getDescripcionCenNoColegiado(CenNocolegiado cenNoColegiadoAnterior, CenNocolegiado cenNoColegiadoPosterior, String accion) {
+		StringBuffer sb = new StringBuffer();
+		
+		
+		switch (accion) {
+		case "UPDATE":
+			getDescripcionNocolegiado(sb, cenNoColegiadoAnterior, "REGISTRO ANTERIOR");
+			getDescripcionNocolegiado(sb, cenNoColegiadoPosterior, "REGISTRO ACTUAL");
+			break;
+		case "INSERT":
+			getDescripcionNocolegiado(sb, cenNoColegiadoPosterior, "REGISTRO NUEVO");
+			break;
+		case "DELETE":
+			getDescripcionNocolegiado(sb, cenNoColegiadoPosterior, "REGISTRO ELIMINADO");
+			break;
+		default:
+			break;
+		}
+		
+		return sb.toString();
+	}
+	
+	private void getDescripcionNocolegiado(StringBuffer sb, CenNocolegiado cenNocolegiado, String cabecera) {
+		if (cenNocolegiado != null) {
+			sb.append(cabecera).append(salto);
+			addDato(sb, "Idpersona", cenNocolegiado.getIdpersona());
+			addDato(sb, "Idinstitucion", cenNocolegiado.getIdinstitucion());
+			addDato(sb, "Fechamodificacion", cenNocolegiado.getFechamodificacion());
+			addDato(sb, "Usumodificacion", cenNocolegiado.getUsumodificacion());
+			addDato(sb, "Serie", cenNocolegiado.getSerie());
+			addDato(sb, "Numeroref", cenNocolegiado.getNumeroref());
+			addDato(sb, "Sociedadsj", cenNocolegiado.getSociedadsj());
+			addDato(sb, "Tipo", cenNocolegiado.getTipo());
+			addDato(sb, "Anotaciones", cenNocolegiado.getAnotaciones());
+			addDato(sb, "Prefijo_numreg", cenNocolegiado.getPrefijoNumreg());
+			addDato(sb, "Contador_numreg", cenNocolegiado.getContadorNumreg());
+			addDato(sb, "Sufijo_numreg", cenNocolegiado.getSufijoNumreg());
+			addDato(sb, "Fechafin", cenNocolegiado.getFechafin());
+			addDato(sb, "Idpersonanotario", cenNocolegiado.getIdpersonanotario());
+			addDato(sb, "Resena", cenNocolegiado.getResena());
+			addDato(sb, "Objetosocial", cenNocolegiado.getObjetosocial());
+			addDato(sb, "Sociedadprofesional", cenNocolegiado.getSociedadprofesional());
+			addDato(sb, "Prefijo_numsspp", cenNocolegiado.getPrefijoNumsspp());
+			addDato(sb, "Contador_numsspp", cenNocolegiado.getContadorNumsspp());
+			addDato(sb, "Sufijo_numsspp", cenNocolegiado.getSufijoNumsspp());
+			addDato(sb, "Nopoliza", cenNocolegiado.getNopoliza());
+			addDato(sb, "Companiaseg", cenNocolegiado.getCompaniaseg());
+			addDato(sb, "Identificadords", cenNocolegiado.getIdentificadords());
+			addDato(sb, "Fecha_baja", cenNocolegiado.getFechaBaja());
+			LOGGER.debug("Descripción de no colegiado " + sb.toString());
+		}
+	}
+	
+	
+	// DATOS CEN_CLIENTE
+	
+	
+	private String getDescripcionCliente(CenCliente cenClienteAnterior, CenCliente cenClientePosterior, String accion) {
+		StringBuffer sb = new StringBuffer();
+		
+		switch (accion) {
+		case "UPDATE":
+			getDescripcionCliente(sb, cenClienteAnterior, "REGISTRO ANTERIOR");
+			getDescripcionCliente(sb, cenClientePosterior, "REGISTRO ACTUAL");
+			break;
+		case "INSERT":
+			getDescripcionCliente(sb, cenClientePosterior, "REGISTRO NUEVO");
+			break;
+		case "DELETE":
+			getDescripcionCliente(sb, cenClientePosterior, "REGISTRO ELIMINADO");
+			break;
+		default:
+			break;
+		}
+				
+		return sb.toString();
+	}
+	
+	private void getDescripcionCliente(StringBuffer sb, CenCliente cenCliente, String cabecera) {
+		if (cenCliente != null) {
+			sb.append(cabecera).append(salto);
+			addDato(sb, "Idpersona", cenCliente.getIdpersona());
+			addDato(sb, "Idinstitucion", cenCliente.getIdinstitucion());
+			addDato(sb, "Fechaalta", cenCliente.getFechaalta());
+			addDato(sb, "Caracter", cenCliente.getCaracter());
+			addDato(sb, "Publicidad", cenCliente.getPublicidad());			
+			addDato(sb, "Guiajudicial", cenCliente.getGuiajudicial());
+			addDato(sb, "Abonosbanco", cenCliente.getAbonosbanco());	
+			addDato(sb, "Cargosbanco", cenCliente.getCargosbanco());
+			addDato(sb, "Comisiones", cenCliente.getComisiones());
+			addDato(sb, "Idtratamiento", cenCliente.getIdtratamiento()); 
+			addDato(sb, "Fechamodificacion", cenCliente.getFechamodificacion());
+			addDato(sb, "Usumodificacion", cenCliente.getUsumodificacion());
+			addDato(sb, "Idlenguaje", cenCliente.getIdlenguaje()); 
+			addDato(sb, "Fotografia", cenCliente.getFotografia()); 
+			addDato(sb, "Asientocontable", cenCliente.getAsientocontable()); 
+			addDato(sb, "Letrado", cenCliente.getLetrado()); 
+			addDato(sb, "Fechacarga", cenCliente.getFechacarga());
+			addDato(sb, "Fechaactualizacion", cenCliente.getFechaactualizacion());  
+			addDato(sb, "Fechaexportcenso", cenCliente.getFechaexportcenso());
+			addDato(sb, "Noenviarrevista", cenCliente.getNoenviarrevista());
+			addDato(sb, "Noaparecerredabogacia", cenCliente.getNoaparecerredabogacia());
+			addDato(sb, "Exportarfoto", cenCliente.getExportarfoto());		
+		}
+	}
+	
+	
+	// DATOS CEN_COLEGIADO
+	
+	private String getDescripcionCenColegiado(CenColegiado cenColegiadoAnterior, CenColegiado cenColegiadoPosterior, String accion) {
+		StringBuffer sb = new StringBuffer();
+		
+		
+		switch (accion) {
+		case "UPDATE":
+			getDescripcionCenColegiado(sb, cenColegiadoAnterior, "REGISTRO ANTERIOR");
+			getDescripcionCenColegiado(sb, cenColegiadoPosterior, "REGISTRO ACTUAL");
+			break;
+		case "INSERT":
+			getDescripcionCenColegiado(sb, cenColegiadoPosterior, "REGISTRO NUEVO");
+			break;
+		case "DELETE":
+			getDescripcionCenColegiado(sb, cenColegiadoPosterior, "REGISTRO ELIMINADO");
+			break;
+		default:
+			break;
+		}
+		
+		return sb.toString();
+	}
+	
+	private void getDescripcionCenColegiado(StringBuffer sb, CenColegiado cenColegiado, String cabecera) {
+		if (cenColegiado != null) {
+			sb.append(cabecera).append(salto);
+			addDato(sb, "Idpersona", cenColegiado.getIdpersona());
+			addDato(sb, "Idinstitucion", cenColegiado.getIdinstitucion());
+			addDato(sb, "Fechapresentacion", cenColegiado.getFechapresentacion());
+			addDato(sb, "Fechaincorporacion", cenColegiado.getFechaincorporacion());
+			addDato(sb, "Indtitulacion", cenColegiado.getIndtitulacion());
+			addDato(sb, "Jubilacioncuota", cenColegiado.getJubilacioncuota());
+			addDato(sb, "Situacionejercicio", cenColegiado.getSituacionejercicio());
+			addDato(sb, "Situacionresidente", cenColegiado.getSituacionresidente());	
+			addDato(sb, "Situacionempresa", cenColegiado.getSituacionempresa());
+			addDato(sb, "Fechamodificacion", cenColegiado.getFechamodificacion());
+			addDato(sb, "Usumodificacion", cenColegiado.getUsumodificacion());
+			addDato(sb, "Comunitario", cenColegiado.getComunitario());
+			addDato(sb, "Ncolegiado", cenColegiado.getNcolegiado());
+			addDato(sb, "Fechajura", cenColegiado.getFechajura());
+			addDato(sb, "Ncomunitario", cenColegiado.getNcomunitario());
+			addDato(sb, "Fechatitulacion", cenColegiado.getFechatitulacion());
+			addDato(sb, "Otroscolegios", cenColegiado.getOtroscolegios());
+			addDato(sb, "Fechadeontologia", cenColegiado.getFechadeontologia());
+			addDato(sb, "Fechamovimiento", cenColegiado.getFechamovimiento());
+			addDato(sb, "Idtiposseguro", cenColegiado.getIdtiposseguro());	
+			addDato(sb, "Cuentacontablesjcs", cenColegiado.getCuentacontablesjcs());
+			addDato(sb, "Identificadords", cenColegiado.getIdentificadords());
+			addDato(sb, "Nmutualista", cenColegiado.getNmutualista());
+			addDato(sb, "Numsolicitudcolegiacion", cenColegiado.getNumsolicitudcolegiacion());
+				
+		}
+		
+	}
+	
+	private String getDescripcionGrupos(List<String> gruposPerJuridicaAntiguos, List<String> gruposPersonaJuridica, String accion, HttpServletRequest request) { 
+		StringBuffer sb = new StringBuffer();
+		
+		switch (accion) {
+		case "UPDATE":
+			// tiene los mismos grupos que antes
+			if(gruposPerJuridicaAntiguos.isEmpty()) {
+				getDescripcionGrupos(sb, gruposPersonaJuridica, "REGISTRO ANTERIOR",request);
+			}
+			else {
+				getDescripcionGrupos(sb, gruposPerJuridicaAntiguos, "REGISTRO ANTERIOR",request);
+			}
+			
+			getDescripcionGrupos(sb, gruposPersonaJuridica, "REGISTRO ACTUAL", request);
+			break;
+		case "INSERT":
+			getDescripcionGrupos(sb, gruposPersonaJuridica, "REGISTRO NUEVO", request);
+			break;
+		case "DELETE":
+			getDescripcionGrupos(sb, gruposPersonaJuridica, "REGISTRO ELIMINADO", request);
+			break;
+		default:
+			break;
+		}
+		
+		return sb.toString();
+	}
+	
+	
+	private void getDescripcionGrupos(StringBuffer sb, List<String> gruposPerJuridica, String cabecera, HttpServletRequest request) {
+		List<StringDTO> stringDTO = new ArrayList<StringDTO>();
+		
+		if(gruposPerJuridica != null && gruposPerJuridica.size() > 0) {
+			// Conseguimos información del usuario logeado
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+			
+			// Conseguimos mas información del usuario logeado
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"updateLegalPerson() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"updateLegalPerson() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				stringDTO = cenGruposclienteExtendsMapper.selectDescripcionGrupos(gruposPerJuridica, usuario, String.valueOf(idInstitucion));
+				// label
+				sb.append(cabecera).append(salto);
+				addDato(sb, "Grupos fijos", "");
+				for (int i = 0;i< stringDTO.size(); i ++) {
+					if(i != stringDTO.size() -1) 
+						sb.append(stringDTO.get(i).getValor()).append(";").append(salto);
+					else 
+						sb.append(stringDTO.get(i).getValor()).append(salto);
+				}
+			}
+			
+		}
+	}
+	
+	
+	// DATOS CEN_DIRECCIONES
+	
+	
+	private String getDescripcionCenDirecciones(CenDirecciones cenDireccionesAnterior, CenDirecciones cenDireccionesPosterior, String accion) {
+		StringBuffer sb = new StringBuffer();
+		
+		switch (accion) {
+		case "UPDATE":
+			getDescripcionCenDirecciones(sb, cenDireccionesAnterior, "REGISTRO ANTERIOR");
+			getDescripcionCenDirecciones(sb, cenDireccionesPosterior, "REGISTRO ACTUAL");
+			break;
+		case "INSERT":
+			getDescripcionCenDirecciones(sb, cenDireccionesPosterior, "REGISTRO NUEVO");
+			break;
+		case "DELETE":
+			getDescripcionCenDirecciones(sb, cenDireccionesPosterior, "REGISTRO ELIMINADO"); // no necesario
+			break;
+		default:
+			break;
+		}
+				
+		return sb.toString();
+	}
+	
+	
+	private void getDescripcionCenDirecciones(StringBuffer sb, CenDirecciones cenDirecciones, String cabecera) {
+		if (cenDirecciones != null) {
+			sb.append(cabecera).append(salto);
+			addDato(sb, "Idinstitucion", cenDirecciones.getIdinstitucion());
+			addDato(sb, "Idpersona", cenDirecciones.getIdpersona());
+			addDato(sb, "Iddireccion", cenDirecciones.getIddireccion());
+			addDato(sb, "Fechamodificacion", cenDirecciones.getFechamodificacion());
+			addDato(sb, "Usumodificacion", cenDirecciones.getUsumodificacion());
+			addDato(sb, "Preferente", cenDirecciones.getPreferente());
+			addDato(sb, "Domicilio", cenDirecciones.getDomicilio());
+			addDato(sb, "Codigopostal", cenDirecciones.getCodigopostal());
+			addDato(sb, "Telefono1", cenDirecciones.getTelefono1());
+			addDato(sb, "Telefono2", cenDirecciones.getTelefono2());	
+			addDato(sb, "Movil", cenDirecciones.getMovil());
+			addDato(sb, "Fax1", cenDirecciones.getFax1());
+			addDato(sb, "Fax2", cenDirecciones.getFax2());
+			addDato(sb, "Correoelectronico", cenDirecciones.getCorreoelectronico());
+			addDato(sb, "Paginaweb", cenDirecciones.getPaginaweb());
+			addDato(sb, "Fechabaja", cenDirecciones.getFechabaja());
+			addDato(sb, "IdPais", cenDirecciones.getIdpais());
+			addDato(sb, "Provincia", cenDirecciones.getIdprovincia());
+			addDato(sb, "Poblacion", cenDirecciones.getIdpoblacion());
+			addDato(sb, "Fechacarga", cenDirecciones.getFechacarga());
+			addDato(sb, "Idinstitucionalta", cenDirecciones.getIddireccionalta());
+			addDato(sb, "Poblacionextranjera", cenDirecciones.getPoblacionextranjera());
+			addDato(sb, "Otraprovincia", cenDirecciones.getOtraprovincia());
+		}
+		
+	}
+	
+	
+	// DATOS CEN_CUENTASBANCARIAS
+	
+	
+	private String getDescripcionCenCuentasBancarias(CenCuentasbancarias cenCuentasbancariasAnterior, CenCuentasbancarias cenCuentasbancariasPosterior, String accion) {
+		StringBuffer sb = new StringBuffer();
+		
+		switch (accion) {
+		case "UPDATE":
+			getDescripcionCenCuentasBancarias(sb, cenCuentasbancariasAnterior, "REGISTRO ANTERIOR");
+			getDescripcionCenCuentasBancarias(sb, cenCuentasbancariasPosterior, "REGISTRO ACTUAL");
+			break;
+		case "INSERT":
+			getDescripcionCenCuentasBancarias(sb, cenCuentasbancariasPosterior, "REGISTRO NUEVO");
+			break;
+		case "DELETE":
+			getDescripcionCenCuentasBancarias(sb, cenCuentasbancariasPosterior, "REGISTRO ELIMINADO"); // no necesario
+			break;
+		default:
+			break;
+		}
+				
+		return sb.toString();
+	}
+	
+	
+	private void getDescripcionCenCuentasBancarias(StringBuffer sb, CenCuentasbancarias cenCuentasbancarias, String cabecera) {
+		if (cenCuentasbancarias != null) {
+			sb.append(cabecera).append(salto);
+			addDato(sb, "Idinstitucion", cenCuentasbancarias.getIdinstitucion());
+			addDato(sb, "Idpersona", cenCuentasbancarias.getIdpersona());
+			addDato(sb, "Idcuenta", cenCuentasbancarias.getIdcuenta());
+			addDato(sb, "Abonocargo", cenCuentasbancarias.getAbonocargo());
+			addDato(sb, "cbo_codigo", cenCuentasbancarias.getCboCodigo());
+			addDato(sb, "Codigosucursal", cenCuentasbancarias.getCodigosucursal());
+			addDato(sb, "Digitocontrol", cenCuentasbancarias.getDigitocontrol());
+			addDato(sb, "Numerocuenta", cenCuentasbancarias.getNumerocuenta());
+			addDato(sb, "Titular", cenCuentasbancarias.getTitular());
+			addDato(sb, "Fechamodificacion", cenCuentasbancarias.getFechamodificacion());	
+			addDato(sb, "Usumodificacion", cenCuentasbancarias.getUsumodificacion());
+			addDato(sb, "Abonosjcs", cenCuentasbancarias.getAbonosjcs());
+			addDato(sb, "Fechabaja", cenCuentasbancarias.getFechabaja());
+			addDato(sb, "Cuentacontable", cenCuentasbancarias.getCuentacontable());
+			addDato(sb, "Iban", cenCuentasbancarias.getIban());
+		}
+		
+	}
+	
+	
+	
+	
+	
+
+}

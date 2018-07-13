@@ -9,7 +9,11 @@ public class BusquedaJuridicaDeleteDTO {
 
 	private String [] idPersonaDelete;
 	private String idInstitucion;
+	private String motivo;
 	
+	
+	
+
 	/**
 	 *
 	 */
@@ -48,6 +52,25 @@ public class BusquedaJuridicaDeleteDTO {
 		this.idInstitucion = idInstitucion;
 	}
 	
+	
+	/**
+	 *
+	 */
+	public BusquedaJuridicaDeleteDTO motivo(String motivo){
+		this.motivo = motivo;
+		return this;
+	}
+	
+	
+	@JsonProperty("motivo")
+	public String getMotivo() {
+		return motivo;
+	}
+
+	public void setMotivo(String motivo) {
+		this.motivo = motivo;
+	}
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -58,12 +81,13 @@ public class BusquedaJuridicaDeleteDTO {
 	    }
 	    BusquedaJuridicaDeleteDTO busquedaJuridicaDeleteDTO = (BusquedaJuridicaDeleteDTO) o;
 	    return  Objects.equals(this.idPersonaDelete, busquedaJuridicaDeleteDTO.idPersonaDelete) &&
-	    		Objects.equals(this.idInstitucion, busquedaJuridicaDeleteDTO.idInstitucion);
+	    		Objects.equals(this.idInstitucion, busquedaJuridicaDeleteDTO.idInstitucion) &&
+	    	Objects.equals(this.idInstitucion, busquedaJuridicaDeleteDTO.motivo);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersonaDelete, idInstitucion);
+	    return Objects.hash(idPersonaDelete, idInstitucion, motivo);
 	}
 
 	
@@ -74,6 +98,7 @@ public class BusquedaJuridicaDeleteDTO {
 	    
 	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
 	    sb.append("    idPersonaDelete: ").append(toIndentedString(idPersonaDelete)).append("\n");
+	    sb.append("    motivo: ").append(toIndentedString(motivo)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}

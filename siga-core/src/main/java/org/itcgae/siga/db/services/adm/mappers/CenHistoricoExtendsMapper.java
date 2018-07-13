@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.adm.HistoricoUsuarioItem;
 import org.itcgae.siga.DTOs.adm.HistoricoUsuarioRequestDTO;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.CenHistoricoMapper;
 import org.itcgae.siga.db.services.adm.providers.CenHistoricoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -35,4 +36,13 @@ public interface CenHistoricoExtendsMapper extends CenHistoricoMapper{
 		@Result(column = "PERSONA", property = "persona", jdbcType = JdbcType.VARCHAR)
 	})
 	List<HistoricoUsuarioItem> auditUsersSearch(int numPagina, HistoricoUsuarioRequestDTO historicoUsuarioRequestDTO);
+	
+	
+	
+	@SelectProvider(type = CenHistoricoSqlExtendsProvider.class, method = "selectMaxIDHistoricoByPerson")
+	@Results({
+		@Result(column = "IDHISTORICO", property = "newId", jdbcType = JdbcType.VARCHAR)
+	})
+	NewIdDTO selectMaxIDHistoricoByPerson(String idPersona, String idInstitucion);
+	
 }

@@ -18,9 +18,11 @@ public class SociedadCreateDTO {
 	private String anotaciones;
 	private String [] grupos;
 	private String idPersona;
+	private String motivo;
 	
 	
 	
+
 	/**
 	 */
 	public SociedadCreateDTO fechaConstitucion(Date fechaConstitucion){
@@ -212,6 +214,24 @@ public class SociedadCreateDTO {
 	}
 	
 	
+	/**
+	 */
+	public SociedadCreateDTO motivo(String motivo){
+		this.motivo = motivo;
+		return this;
+	}
+	
+	
+	@JsonProperty("motivo")
+	public String getMotivo() {
+		return motivo;
+	}
+
+	public void setMotivo(String motivo) {
+		this.motivo = motivo;
+	}
+	
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -230,12 +250,13 @@ public class SociedadCreateDTO {
 	    		Objects.equals(this.grupos, sociedadCreateDTO.grupos) &&
 	    		Objects.equals(this.idPersona, sociedadCreateDTO.idPersona) &&
 	    		Objects.equals(this.fechaConstitucion, sociedadCreateDTO.fechaConstitucion) &&
-	    		Objects.equals(this.fechaBaja, sociedadCreateDTO.fechaBaja);
+	    		Objects.equals(this.fechaBaja, sociedadCreateDTO.fechaBaja) &&
+	    		Objects.equals(this.motivo, sociedadCreateDTO.motivo);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(tipo, nif, denominacion, idioma, cuentaContable, anotaciones, grupos, idPersona, fechaConstitucion, fechaBaja);
+	    return Objects.hash(tipo, nif, denominacion, idioma, cuentaContable, anotaciones, grupos, idPersona, fechaConstitucion, fechaBaja, motivo);
 	}
 
 	
@@ -254,6 +275,7 @@ public class SociedadCreateDTO {
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n"); 
 	    sb.append("    fechaConstitucion: ").append(toIndentedString(fechaConstitucion)).append("\n");
 	    sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
+	    sb.append("    motivo: ").append(toIndentedString(motivo)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}

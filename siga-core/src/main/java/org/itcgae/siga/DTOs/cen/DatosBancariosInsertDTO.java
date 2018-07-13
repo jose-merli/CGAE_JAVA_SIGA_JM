@@ -15,9 +15,12 @@ public class DatosBancariosInsertDTO {
 	private String cuentaContable;
 	private Boolean revisionCuentas;
 	private String idCuenta;
+	private String motivo;
+	
+	
 
 	
-	
+
 	/**
 	 */
 	public DatosBancariosInsertDTO idPersona(String idPersona){
@@ -146,6 +149,23 @@ public class DatosBancariosInsertDTO {
 		this.revisionCuentas = revisionCuentas;
 	}
 	
+	
+	/**
+	 */
+	public DatosBancariosInsertDTO motivo(String motivo){
+		this.motivo = motivo;
+		return this;
+	}
+	
+	@JsonProperty("motivo")
+	public String getMotivo() {
+		return motivo;
+	}
+
+	public void setMotivo(String motivo) {
+		this.motivo = motivo;
+	}
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -161,12 +181,13 @@ public class DatosBancariosInsertDTO {
 	    		Objects.equals(this.tipoCuenta, datosBancariosInsertDTO.tipoCuenta) &&
 	    		Objects.equals(this.titular, datosBancariosInsertDTO.titular) &&
 	    		Objects.equals(this.revisionCuentas, datosBancariosInsertDTO.revisionCuentas) &&
-	    		Objects.equals(this.cuentaContable, datosBancariosInsertDTO.cuentaContable) ;
+	    		Objects.equals(this.cuentaContable, datosBancariosInsertDTO.cuentaContable) &&
+	    		Objects.equals(this.motivo, datosBancariosInsertDTO.motivo) ;
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona, idCuenta, iban, idInstitucion,tipoCuenta,titular,cuentaContable,revisionCuentas);
+	    return Objects.hash(idPersona, idCuenta, iban, idInstitucion,tipoCuenta,titular,cuentaContable,revisionCuentas, motivo);
 	}
 
 	
@@ -183,6 +204,7 @@ public class DatosBancariosInsertDTO {
 	    sb.append("    titular: ").append(toIndentedString(titular)).append("\n");
 	    sb.append("    cuentaContable: ").append(toIndentedString(cuentaContable)).append("\n");
 	    sb.append("    revisionCuentas: ").append(toIndentedString(revisionCuentas)).append("\n");
+	    sb.append("    motivo: ").append(toIndentedString(motivo)).append("\n");
 
 	    sb.append("}");
 	    return sb.toString();

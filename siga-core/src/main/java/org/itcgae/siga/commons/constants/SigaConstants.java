@@ -188,4 +188,63 @@ public class SigaConstants {
 			return null;
 		}
 	}
+	
+	public static enum CEN_TIPOCAMBIO{
+		
+		ALTA_COLEGIACION(new Short("1"), "Alta Colegiación"),
+		BAJA_COLEGIACION(new Short("2"), "Baja Colegiación"),
+		ALTA_EJERCICIO(new Short("3"), "Alta Ejercicio"),
+		BAJA_EJERCICIO(new Short("4"), "Baja Ejercicio"),
+		INHABILITACION(new Short("5"), "Inhabilitación"),
+		SUSPENSION_EJERCICIO(new Short("6"), "Suspensión Ejercicio"),
+		MODIFICACION_DATOS_GENERALES(new Short("10"), "Modificación Datos Generales"),
+		MODIFICACION_DATOS_COLEGIALES(new Short("20"), "Modificación Datos Colegiales"),
+		MODIFICACION_DIRECCIONES(new Short("30"), "Modificación Direcciones"),
+		MODIFICACION_CUENTAS_BANCARIAS(new Short("40"), "Modificación Cuentas Bancarias"),
+		MODIFICACION_DATOS_CV(new Short("50"), "Modificación Datos CV"),
+		MODIFICACION_COMPONENTES(new Short("60"), "Modificación Componentes"),
+		MODIFICACION_DATOS_FACTURACIÓN(new Short("70"), "Modificación Datos Facturación"),
+		MODIFICACION_DATOS_TURNO(new Short("80"), "Modificación Datos Turno"),
+		MODIFICACION_DATOS_EXPEDIENTES(new Short("90"), "Modificación Datos Expedientes"),
+		MODIFICACION_OTROS_DATOS(new Short("99"), "Modificación Otros Datos"),
+		OBSERVACIONES(new Short("100"), "Observaciones"),
+		DESIGNACION_MODIFICACION(new Short("101"), "Designación. Modificación"),
+		DESIGNACION_JUSTIFICACION(new Short("102"), "Designación. Justificación"),
+		DESIGNACION_ALTA_DE_ACTUACIONES(new Short("103"), "Designación. Alta de Actuaciones"),
+		ASISTENCIA_ALTA(new Short("104"), "Asistencia. Alta"),
+		ASISTENCIA_MODIFICACION(new Short("105"), "Asistencia. Modificación"),
+		ASISTENCIA_ALTA_DE_ACTUACIONES(new Short("106"), "Asistencia. Alta de Actuaciones"),
+		DESIGNACION_MODIFICACION_DE_ACTUACIONES(new Short("107"), "Designación. Modificación de Actuaciones"),
+		DESIGNACION_ELIMINACION_DE_ACTUACIONES(new Short("108"), "Designación. Eliminación de Actuaciones");
+		
+		
+		private final Short idTipoCambio;
+		private final String descripcionTipoCambio;
+		
+		
+		private CEN_TIPOCAMBIO(Short idTipoCambio,String descripcionTipoCambio ) {
+			this.idTipoCambio = idTipoCambio;
+			this.descripcionTipoCambio = descripcionTipoCambio;
+		}
+
+
+		public Short getIdTipoCambio() {
+			return idTipoCambio;
+		}
+
+
+		public String getDescripcionTipoCambio() {
+			return descripcionTipoCambio;
+		}
+		
+		public static CEN_TIPOCAMBIO getEnum(Short idTipoCambio) {
+			for (CEN_TIPOCAMBIO sc : values()) {
+				if (sc.getIdTipoCambio().shortValue() == idTipoCambio.shortValue()) {
+					return sc;
+				}
+			}
+			return null;
+		}
+		
+	}
 }

@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
+import org.itcgae.siga.db.entities.CenNocolegiadoKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenProperties;
@@ -49,6 +51,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMap
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
+import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,6 +62,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesService{
 
 	private Logger LOGGER = Logger.getLogger(TarjetaDatosGeneralesServiceImpl.class);
+	
 	
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
@@ -83,6 +87,9 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 	
 	@Autowired
 	private GenRecursosCatalogosExtendsMapper genRecursosCatalogosExtendsMapper;
+		
+	@Autowired
+	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
 	
 	
 	@Override
@@ -353,9 +360,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
-//		if (null == sociedadCreateDTO.getTipo()) {
-//			sociedadCreateDTO.setTipo("B");
-//		}
+
 		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -526,6 +531,31 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		}
 		
 		
+		// AUDITORIA  => actualizamos cen_historico si todo es correcto
+		if(insertResponseDTO.getStatus().equals(SigaConstants.OK)) {
+			
+			Long idPersonaCreada = Long.valueOf(insertResponseDTO.getId());
+			// obtenemos registro cen_persona creado
+			CenPersona cenPersonaPosterior = new CenPersona();
+			cenPersonaPosterior = cenPersonaExtendsMapper.selectByPrimaryKey(idPersonaCreada);
+			// obtenemos registro cen_nocolegiado creado
+			CenNocolegiado cenNocolegiadoPosterior = new CenNocolegiado();
+			CenNocolegiadoKey cenNocolegiadoKey = new CenNocolegiadoKey();
+			cenNocolegiadoKey.setIdpersona(idPersonaCreada);
+			cenNocolegiadoKey.setIdinstitucion(idInstitucion);
+			cenNocolegiadoPosterior = cenNocolegiadoExtendsMapper.selectByPrimaryKey(cenNocolegiadoKey);
+			// obtenemos registro cen_cliente creado
+			CenCliente cenClientePosterior = new CenCliente();
+			CenClienteKey cenClienteKey = new CenClienteKey();
+			cenClienteKey.setIdpersona(idPersonaCreada);
+			cenClienteKey.setIdinstitucion(idInstitucion);
+			cenClientePosterior = cenClienteMapper.selectByPrimaryKey(cenClienteKey);
+			// obtenemos las etiquetas creadas
+			List<String> gruposPerJuridicaNuevos = Arrays.asList(sociedadCreateDTO.getGrupos());
+			// llamada a auditoria
+			auditoriaCenHistoricoService.manageAuditoriaDatosGenerales(gruposPerJuridicaNuevos, null, null, null, cenPersonaPosterior, null, cenNocolegiadoPosterior, null, cenClientePosterior, "INSERT", request, sociedadCreateDTO.getMotivo());
+		}
+		
 		LOGGER.info(
 				"createLegalPerson() -> Salida del servicio para actualizar información general de una persona jurídica");
 		
@@ -540,12 +570,21 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				"updateLegalPerson() -> Entrada al servicio para actualizar información general de una persona jurídica");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		List<ComboItem> gruposPersonaJuridica = new ArrayList<ComboItem>();
+		// datos para auditoria (cen_historico)
+		CenPersona cenPersonaAnterior = new CenPersona();
+		CenPersona cenPersonaPosterior = new CenPersona();
+		CenNocolegiado cenNocolegiadoAnterior = new CenNocolegiado();
+		CenNocolegiado cenNocolegiadoPosterior = new CenNocolegiado();
+		CenCliente cenClienteAnterior = new CenCliente();
+		CenCliente cenClientePosterior = new CenCliente();
+		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
+		List<String> gruposNuevosNoAniadidos = new ArrayList<String>();
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
+		
 		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -559,7 +598,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				
-				// obtener grupos de la persona juridica antes de actualizar
+				// 1. obtener grupos de la persona juridica antes de actualizar
 				gruposPersonaJuridica = cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica(etiquetaUpdateDTO.getIdPersona(), String.valueOf(usuario.getIdinstitucion()));
 				
 				List<String> gruposPerJuridicaAntiguos = new ArrayList<String>();
@@ -567,19 +606,22 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 					gruposPerJuridicaAntiguos.add(gruposPersonaJuridica.get(i).getLabel());
 				}
 				
-				// actualizar relaciones entre tablas para todos los grupos (eliminado y creación)
+				// 2. actualizar relaciones entre tablas para todos los grupos (eliminado y creación)
 				for (String grupo : etiquetaUpdateDTO.getGrupos()) {
 					
-					
-					// si el nuevo grupo no está, hay que crearlo
+					// 2.1 si el nuevo grupo no está, hay que crearlo
 					if(!gruposPerJuridicaAntiguos.contains(grupo)) {
+						
+						// guardamos para AUDITORIA los grupos nuevos
+						gruposNuevosNoAniadidos.add(grupo);
+						
 						LOGGER.info(
 								"updateLegalPerson() / cenGruposclienteExtendsMapper.createLegalPerson() -> Entrada a cenGruposclienteExtendsMapper para obtener grupos de clientes");
 						cenGruposcliente = cenGruposclienteExtendsMapper.selectDistinctGruposClientes(String.valueOf(idInstitucion), usuario.getIdlenguaje(), grupo);
 						LOGGER.info(
 								"updateLegalPerson() / cenGruposclienteExtendsMapper.createLegalPerson() -> Salida de cenGruposclienteExtendsMapper para obtener grupos de clientes");
 						
-						// si existen ya registros para ese grupo => solo insertar en tabla CEN_GRUPOSCLIENTE_CLIENTE (relacion persona-grupo)
+						// 2.1.1 si existen ya registros para ese grupo => solo insertar en tabla CEN_GRUPOSCLIENTE_CLIENTE (relacion persona-grupo)
 						if(null != cenGruposcliente && cenGruposcliente.size() > 0) {
 							
 							LOGGER.info(
@@ -595,7 +637,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 										"updateLegalPerson() / cenGruposclienteExtendsMapper.createLegalPerson() -> No se pudo insertar el grupo = " + grupo + " en tabla CEN_GRUPOSCLIENTE_CLIENTE");
 							}
 						}
-						// no existen registros para ese grupo => insertar en: tabla CEN_GRUPOSCLIENTE , GEN_RECURSOS_CATALOGOS  y CEN_GRUPOSCLIENTE_CLIENTE 
+						// 2.1.2 no existen registros para ese grupo => insertar en: tabla CEN_GRUPOSCLIENTE , GEN_RECURSOS_CATALOGOS  y CEN_GRUPOSCLIENTE_CLIENTE 
 						else {
 							int response1 = 0;
 							int response2 = 0;
@@ -650,7 +692,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 							}
 						}
 					}
-					// el grupo ya existe para la persona juridica => eliminar de los grupos antiguos
+					// 2.2 el grupo ya existe para la persona juridica => eliminar de los grupos antiguos
 					else {
 						// eliminamos grupo de los antiguos que tenia la persona juridica para que solo queden los que hay que eliminar
 						gruposPerJuridicaAntiguos.remove(grupo);
@@ -658,10 +700,13 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				}
 				
 				
-				// actualiza campos de la persona jurídica	
+				// 3. actualiza campos de la persona jurídica	
 				if(!updateResponseDTO.getStatus().equals(SigaConstants.KO)) {
 					
-					// 1.actualiza tabla CEN_PERSONA
+					// 3.1.actualiza tabla CEN_PERSONA
+					
+					cenPersonaAnterior = cenPersonaExtendsMapper.selectByPrimaryKey(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
+					
 					CenPersona cenPersona = new CenPersona();
 					cenPersona.setNombre(etiquetaUpdateDTO.getDenominacion());
 					cenPersona.setApellidos1(etiquetaUpdateDTO.getAbreviatura());
@@ -676,7 +721,15 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 					LOGGER.info(
 							"updateLegalPerson() / cenPersonaExtendsMapper.updateByExampleSelective() -> Salida de cenPersonaExtendsMapper para actualizar información de persona juridica en CEN_PERSONA");
 					
-					// 2.Actualiza tabla CEN_NOCOLEGIADO
+					cenPersonaPosterior = cenPersonaExtendsMapper.selectByPrimaryKey(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
+					
+					// 3.2.Actualiza tabla CEN_NOCOLEGIADO
+					
+					CenNocolegiadoKey keyAnterior = new CenNocolegiadoKey();
+					keyAnterior.setIdinstitucion(idInstitucion);
+					keyAnterior.setIdpersona(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
+					cenNocolegiadoAnterior = cenNocolegiadoExtendsMapper.selectByPrimaryKey(keyAnterior);
+					
 					CenNocolegiado cenNocolegiado = new CenNocolegiado();
 					cenNocolegiado.setFechamodificacion(new Date());
 					cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
@@ -688,10 +741,18 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 					cenNocolegiadoExtendsMapper.updateByExampleSelective(cenNocolegiado, cenNocolegiadoExample);
 					LOGGER.info("updateLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar información de persona juridica en CEN_NOCOLEGIADO");
 					
-					// 3. Actualiza tabla CEN_CLIENTE
+					CenNocolegiadoKey keyPosterior = keyAnterior;
+					cenNocolegiadoPosterior = cenNocolegiadoExtendsMapper.selectByPrimaryKey(keyPosterior);
+					
+					// 3.3. Actualiza tabla CEN_CLIENTE
+					
+					
 					CenClienteKey key = new CenClienteKey();
 					key.setIdpersona(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
 					key.setIdinstitucion(idInstitucion);
+					
+					cenClienteAnterior = cenClienteMapper.selectByPrimaryKey(key);
+					
 					CenCliente cenCliente = new CenCliente();
 					cenCliente = cenClienteMapper.selectByPrimaryKey(key);
 					cenCliente.setAsientocontable(etiquetaUpdateDTO.getCuentaContable());
@@ -699,7 +760,10 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 					
 					cenClienteMapper.updateByPrimaryKey(cenCliente);
 					
-					// elimina grupos que dejan de estar relacionados con el usuario
+					
+					cenClientePosterior = cenClienteMapper.selectByPrimaryKey(key);
+					
+					// 3.4 Elimina grupos que dejan de estar relacionados con el usuario
 					for(int i=0;i < gruposPerJuridicaAntiguos.size(); i++) {
 						CenGruposclienteCliente cenGruposclienteCliente = new CenGruposclienteCliente();
 						cenGruposclienteCliente.setFechamodificacion(new Date());
@@ -725,6 +789,13 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 					// si todo ha funcionado correctamente, la respuesta será OK
 					if(!updateResponseDTO.getStatus().equals(SigaConstants.KO)) {
 						updateResponseDTO.setStatus(SigaConstants.OK);
+						
+						List<String> gruposPerJuridicaNuevos = Arrays.asList(etiquetaUpdateDTO.getGrupos());
+						
+						// AUDITORIA  => actualizamos cen_historico si todo es correcto
+						auditoriaCenHistoricoService.manageAuditoriaDatosGenerales(gruposPerJuridicaNuevos, gruposPerJuridicaAntiguos, gruposNuevosNoAniadidos, cenPersonaAnterior, cenPersonaPosterior, cenNocolegiadoAnterior, cenNocolegiadoPosterior, cenClienteAnterior, cenClientePosterior, "UPDATE", request, etiquetaUpdateDTO.getMotivo());
+						
+						
 					}
 				}
 				
@@ -785,4 +856,5 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		return record;
 	}
 
+	
 }

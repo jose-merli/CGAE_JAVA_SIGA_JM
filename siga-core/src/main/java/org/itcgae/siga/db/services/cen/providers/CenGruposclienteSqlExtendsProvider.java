@@ -1,5 +1,7 @@
 package org.itcgae.siga.db.services.cen.providers;
 
+import java.util.List;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenGruposclienteSqlProvider;
@@ -39,6 +41,35 @@ public class CenGruposclienteSqlExtendsProvider extends CenGruposclienteSqlProvi
 		sql.VALUES("IDINSTITUCION", idInstitucion);
 		sql.VALUES("NOMBRE", "(SELECT MAX(IDRECURSO) FROM GEN_RECURSOS_CATALOGOS WHERE NOMBRETABLA = 'CEN_GRUPOSCLIENTE')");
 		sql.VALUES("USUMODIFICACION", String.valueOf(usuario.getIdusuario()));
+		return sql.toString();
+	}
+	
+	public String selectDescripcionGrupos(List<String> grupos, AdmUsuarios usuario, String idInstitucion) {
+		
+		// preparar grupos en sentencia IN
+		String gruposIN = "";
+		for(int i=0;i< grupos.size(); i++) {
+			
+			gruposIN = gruposIN.concat("'");
+			if(i != grupos.size() -1) {
+				gruposIN = gruposIN.concat(grupos.get(i));
+				gruposIN = gruposIN.concat("'");
+				gruposIN = gruposIN.concat(",");
+			}else {
+				gruposIN = gruposIN.concat(grupos.get(i));
+				gruposIN = gruposIN.concat("'");
+			}	
+		}
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("CAT.DESCRIPCION");
+		sql.FROM("CEN_GRUPOSCLIENTE GRU");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON GRU.NOMBRE = CAT.IDRECURSO");
+		sql.WHERE("CAT.IDLENGUAJE = '" + usuario.getIdlenguaje() + "'");
+		sql.WHERE("CAT.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("GRU.IDGRUPO IN (" + gruposIN +  ")");
+		
 		return sql.toString();
 	}
 }

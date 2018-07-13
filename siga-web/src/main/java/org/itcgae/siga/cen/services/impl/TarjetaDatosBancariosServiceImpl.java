@@ -73,6 +73,7 @@ import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.GenFicheroExtendsMapper;
+import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -108,6 +109,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 	@Autowired
 	private GenRecursosMapper genRecursosMapper;
+	
+	@Autowired
+	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
 	
 
 	@Override
@@ -467,6 +471,18 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
 					insertResponseDTO.setStatus(SigaConstants.OK);
 					insertResponseDTO.setId(idCuenta.toString());
+					
+					// AUDITORIA si se creó una cuenta bancaria correctamente
+					CenCuentasbancarias cenCuentasbancariasPosterior = new CenCuentasbancarias();
+					CenCuentasbancariasKey cenCuentasbancariasKey = new CenCuentasbancariasKey();
+					cenCuentasbancariasKey.setIdcuenta(idCuenta);
+					cenCuentasbancariasKey.setIdinstitucion(idInstitucion);
+					cenCuentasbancariasKey.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+					
+					cenCuentasbancariasPosterior = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(cenCuentasbancariasKey);
+					
+					auditoriaCenHistoricoService.manageAuditoriaDatosCuentasBancarias(null, cenCuentasbancariasPosterior, "INSERT", request, datosBancariosInsertDTO.getMotivo());
+					
 				}
 				else {
 					LOGGER.info("insertBanksData() -> KO. Insert para cuentas bancarias  NO realizado correctamente");
@@ -799,10 +815,17 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 	public UpdateResponseDTO updateBanksData(DatosBancariosInsertDTO datosBancariosInsertDTO,
 			HttpServletRequest request) throws Exception {
 		
-		LOGGER.info("insertBanksData() -> Entrada al servicio para insertar cuentas bancarias");
+		LOGGER.info("updateBanksData() -> Entrada al servicio para insertar cuentas bancarias");
 		int response = 0;
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
+		
+		// datos para AUDITORIA
+		List<CenCuentasbancarias> listCenCuentasbancariasAnterior = new ArrayList<CenCuentasbancarias>();
+		CenCuentasbancarias cenCuentasbancariasAnterior = new CenCuentasbancarias();
+		CenCuentasbancarias cenCuentasbancariasPosterior = new CenCuentasbancarias();
+		
+		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -814,18 +837,25 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateBanksData() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
-					"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateBanksData() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				
+				// error que hemos detectado con mybatis. Este error consiste en que dos variables que llaman al mismo metodo de un mapper tienen la misma direccion de memoria.
+				// llamo al metodo selectByExample(..) en vez de selectByPrimaryKey(..) para obtener los datos anterior su actualización
 				
-				// información a insertar
-				//Obtenemos el nuevo idCuenta
+				CenCuentasbancariasExample cenCuentasbancariasExample = new CenCuentasbancariasExample();
+				cenCuentasbancariasExample.createCriteria().andIdcuentaEqualTo(Short.valueOf(datosBancariosInsertDTO.getIdCuenta())).andIdpersonaEqualTo(Long.valueOf(datosBancariosInsertDTO.getIdPersona())).
+				andIdinstitucionEqualTo(idInstitucion);
 				
+				listCenCuentasbancariasAnterior = cenCuentasbancariasExtendsMapper.selectByExample(cenCuentasbancariasExample);
+				cenCuentasbancariasAnterior = listCenCuentasbancariasAnterior.get(0);
+				
+				// información a actualizar
 				CenCuentasbancariasKey key = new  CenCuentasbancariasKey();
 				key.setIdcuenta(Short.valueOf(datosBancariosInsertDTO.getIdCuenta()));
 				key.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
@@ -899,18 +929,31 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				
 				}
 				LOGGER.info(
-						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
+						"updateBanksData() / cenCuentasbancariasExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenCuentasbancariasExtendsMapper para actualizar cuentas bancarias");
 				response = cenCuentasbancariasExtendsMapper.updateByPrimaryKeySelective(cuentaBancaria);
 				LOGGER.info(
-						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
+						"updateBanksData() / cenCuentasbancariasExtendsMapper.updateByPrimaryKeySelective() -> Salida de cenCuentasbancariasExtendsMapper para actualizar cuentas bancarias");
 		
 				// comprobacion actualización
 				if(response >= 1) {
-					LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
+					LOGGER.info("updateBanksData() -> OK. Update para cuentas bancarias realizado correctamente");
 					updateResponseDTO.setStatus(SigaConstants.OK);
+					
+					
+					// AUDITORIA si la actualización se ha realizado bien
+					
+					CenCuentasbancariasKey cenCuentasbancariasKeyPosterior = new CenCuentasbancariasKey();
+					cenCuentasbancariasKeyPosterior.setIdcuenta(Short.valueOf(datosBancariosInsertDTO.getIdCuenta()));
+					cenCuentasbancariasKeyPosterior.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+					cenCuentasbancariasKeyPosterior.setIdinstitucion(Short.valueOf(idInstitucion));
+					
+					cenCuentasbancariasPosterior = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(cenCuentasbancariasKeyPosterior);
+					
+					auditoriaCenHistoricoService.manageAuditoriaDatosCuentasBancarias(cenCuentasbancariasAnterior, cenCuentasbancariasPosterior, "UPDATE", request, datosBancariosInsertDTO.getMotivo());
+					
 				}
 				else {
-					LOGGER.info("insertBanksData() -> KO. Insert para cuentas bancarias  NO realizado correctamente");
+					LOGGER.info("updateBanksData() -> KO. Update para cuentas bancarias  NO realizado correctamente");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 					error.setMessage("Error al insertar la cuenta Bancaria");
 					updateResponseDTO.setError(error);
@@ -937,7 +980,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						String resultado[] = new String[2];
 						resultado = callPLProcedure("{call PKG_SIGA_CARGOS.InsertarMandatos(?,?,?,?,?,?)}", 2, paramMandatos);
 						if (resultado == null) {
-							LOGGER.info("insertBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
+							LOGGER.info("updateBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							error.setMessage("Error al insertar los mandatos de las cuentas");
 							updateResponseDTO.setError(error);
@@ -957,7 +1000,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 							
 						} else {
 							if (resultado[0].equals("1")) {
-								LOGGER.info("insertBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
+								LOGGER.info("updateBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
 								updateResponseDTO.setStatus(SigaConstants.KO);
 								error.setMessage("messages.censo.direcciones.facturacion");
 								updateResponseDTO.setError(error);
@@ -976,7 +1019,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 								return updateResponseDTO;
 								
 							} else if (resultado[0].equals("2")) {
-								LOGGER.info("insertBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
+								LOGGER.info("updateBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
 								updateResponseDTO.setStatus(SigaConstants.KO);
 								error.setMessage("messages.censo.direcciones.facturacion");
 								updateResponseDTO.setError(error);
@@ -995,7 +1038,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 								return updateResponseDTO;
 								
 							} else if (!resultado[0].equals("0")) {
-								LOGGER.info("insertBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
+								LOGGER.info("updateBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
 								updateResponseDTO.setStatus(SigaConstants.KO);
 								error.setMessage("Error al insertar los mandatos de las cuentas");
 								updateResponseDTO.setError(error);
@@ -1065,16 +1108,16 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				
 			} else {
 				LOGGER.warn(
-						"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+						"updateBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
 								+ dni + " e idInstitucion = " + idInstitucion);
 			}
 		
 		} else {
-			LOGGER.warn("insertBanksData() -> idInstitucion del token nula");
+			LOGGER.warn("updateBanksData() -> idInstitucion del token nula");
 		}
 		
 		
-		LOGGER.info("insertBanksData() -> Salida del servicio para insertar cuentas bancarias ");
+		LOGGER.info("updateBanksData() -> Salida del servicio para insertar cuentas bancarias ");
 		return updateResponseDTO;
 	}
 	

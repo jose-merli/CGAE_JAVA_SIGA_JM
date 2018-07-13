@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
@@ -27,12 +26,12 @@ import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionKey;
 import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoKey;
 import org.itcgae.siga.db.entities.CenPoblaciones;
 import org.itcgae.siga.db.entities.CenPoblacionesExample;
-
 import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
 import org.itcgae.siga.db.mappers.CenPoblacionesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -40,6 +39,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTipoDireccionExtendsMapper;
+import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,6 +72,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	
 	@Autowired
 	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+	
+	@Autowired
+	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
 	
 	@Override
 	public DatosDireccionesDTO datosDireccionesSearch(int numPagina, DatosDireccionesSearchDTO datosDireccionesSearchDTO,	HttpServletRequest request) {
@@ -312,6 +315,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		int response = 0;
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
+		List<CenDirecciones> listCenDireccionesAnterior = new ArrayList<CenDirecciones>();
+		CenDirecciones cenDireccionesAnterior = new CenDirecciones();
+		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -328,6 +334,15 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
+				
+				
+				// datos para auditoria
+				CenDireccionesExample cenDireccionesExample = new CenDireccionesExample();
+				cenDireccionesExample.createCriteria().andIddireccionEqualTo(Long.valueOf(datosDireccionesItem.getIdDireccion())).andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona())).
+				andIdinstitucionEqualTo(idInstitucion);
+				listCenDireccionesAnterior = cenDireccionesExtendsMapper.selectByExample(cenDireccionesExample);
+				cenDireccionesAnterior = listCenDireccionesAnterior.get(0);
+				
 				
 				//Consultamos la dirección a actualizar
 				CenDireccionesKey key = new  CenDireccionesKey();
@@ -437,7 +452,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					CenNocolegiadoKey noColegiadokey = new CenNocolegiadoKey();
 					noColegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
 					noColegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-					CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(noColegiadokey );
+					CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(noColegiadokey);
 					
 					noColegiado.setFechamodificacion(new Date());
 					noColegiado.setUsumodificacion(usuario.getIdusuario());
@@ -450,6 +465,18 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 					LOGGER.info("updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
 					updateResponseDTO.setStatus(SigaConstants.OK);
+					
+					
+					// AUDITORIA
+					
+					CenDirecciones cenDireccionesPosterior = new CenDirecciones();
+					CenDireccionesKey keyDireccionesPosterior = new CenDireccionesKey();
+					keyDireccionesPosterior.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
+					keyDireccionesPosterior.setIdinstitucion(idInstitucion);
+					keyDireccionesPosterior.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+					cenDireccionesPosterior = cenDireccionesExtendsMapper.selectByPrimaryKey(keyDireccionesPosterior);
+					
+					auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(cenDireccionesAnterior, cenDireccionesPosterior, "UPDATE", request, datosDireccionesItem.getMotivo());
 				}
 				else {
 					LOGGER.info("updateDirection() -> KO. Update para actualizar direcciones  NO realizado correctamente");
@@ -587,6 +614,18 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
 					insertResponseDTO.setId(idDireccion.toString());
 					insertResponseDTO.setStatus(SigaConstants.OK);
+					
+					// AUDITORIA
+					
+					CenDirecciones cenDireccionesPosterior = new CenDirecciones();
+					
+					CenDireccionesKey key = new CenDireccionesKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setIddireccion(idDireccion);
+					key.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+					cenDireccionesPosterior = cenDireccionesExtendsMapper.selectByPrimaryKey(key);
+					
+					auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(null, cenDireccionesPosterior, "INSERT", request, datosDireccionesItem.getMotivo());
 				}
 				else {
 					LOGGER.info("createDirection() -> KO. Insert para direcciones  NO realizado correctamente");

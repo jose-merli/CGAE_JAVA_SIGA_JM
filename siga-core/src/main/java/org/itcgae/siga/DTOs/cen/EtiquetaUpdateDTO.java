@@ -16,7 +16,7 @@ public class EtiquetaUpdateDTO {
 	private String [] grupos;
 	private String idPersona;
 	private String abreviatura;
-	
+	private String motivo;
 	
 	
 	/**
@@ -174,6 +174,24 @@ public class EtiquetaUpdateDTO {
 	}
 	
 	
+	/**
+	 */
+	public EtiquetaUpdateDTO motivo(String motivo){
+		this.motivo = motivo;
+		return this;
+	}
+	
+	@JsonProperty("motivo")
+	public String getMotivo() {
+		return motivo;
+	}
+
+
+	public void setMotivo(String motivo) {
+		this.motivo = motivo;
+	}
+	
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -190,12 +208,13 @@ public class EtiquetaUpdateDTO {
 	    		Objects.equals(this.cuentaContable, etiquetaUpdateDTO.cuentaContable) &&
 	    		Objects.equals(this.anotaciones, etiquetaUpdateDTO.anotaciones) &&
 	    		Objects.equals(this.grupos, etiquetaUpdateDTO.grupos) &&
-	    		Objects.equals(this.idPersona, etiquetaUpdateDTO.idPersona);
+	    		Objects.equals(this.idPersona, etiquetaUpdateDTO.idPersona) &&
+	    		Objects.equals(this.motivo, etiquetaUpdateDTO.motivo);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(tipo, nif, denominacion, idioma, cuentaContable, anotaciones, grupos, idPersona);
+	    return Objects.hash(tipo, nif, denominacion, idioma, cuentaContable, anotaciones, grupos, idPersona, motivo);
 	}
 
 	
@@ -212,6 +231,7 @@ public class EtiquetaUpdateDTO {
 	    sb.append("    anotaciones: ").append(toIndentedString(anotaciones)).append("\n");
 	    sb.append("    grupos: ").append(toIndentedString(grupos)).append("\n");
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
+	    sb.append("    motivo: ").append(toIndentedString(motivo)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}

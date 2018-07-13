@@ -2,6 +2,8 @@ package org.itcgae.siga.DTOs.cen;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
 public class DatosDireccionesItem {
 
@@ -33,9 +35,21 @@ public class DatosDireccionesItem {
 	private String[] idTipoDireccion;
 	private String idTipoDireccionList;
 	private String fechaModificacion;
+	private String motivo;
 	
 	
 	
+	
+	@JsonProperty("motivo")
+	public String getMotivo() {
+		return motivo;
+	}
+
+	public void setMotivo(String motivo) {
+		this.motivo = motivo;
+	}
+	
+
 	public String getTipoDireccion() {
 		return tipoDireccion;
 	}
@@ -297,13 +311,15 @@ public class DatosDireccionesItem {
 	    		Objects.equals(this.otraProvincia, datosDireccionesItem.otraProvincia) &&
 	    		Objects.equals(this.idTipoDireccion, datosDireccionesItem.idTipoDireccion) &&
 	    		Objects.equals(this.fechaModificacion, datosDireccionesItem.fechaModificacion) &&
-	    		Objects.equals(this.fax, datosDireccionesItem.fax);
+	    		Objects.equals(this.fax, datosDireccionesItem.fax) &&
+	    		Objects.equals(this.motivo, datosDireccionesItem.motivo);
 	}
 	
 	@Override
 	public int hashCode() {
 	    return Objects.hash(idInstitucion,tipoDireccion,idDireccion,codigoPostal,domicilio,domicilioLista,idPoblacion,idProvincia,idPais,telefono,fechaBaja,movil,
-	    		correoElectronico, idExternoPais, nombrePais, idExternoPoblacion, nombrePoblacion, idExternoProvincia, fechaModificacion,nombreProvincia, fax,paginaWeb,idPersona,otraProvincia,idTipoDireccion);
+	    		correoElectronico, idExternoPais, nombrePais, idExternoPoblacion, nombrePoblacion, idExternoProvincia, fechaModificacion,nombreProvincia, fax,paginaWeb,idPersona,otraProvincia,idTipoDireccion,
+	    		motivo);
 	}
 
 	
@@ -337,6 +353,7 @@ public class DatosDireccionesItem {
 	    sb.append("    idTipoDireccion: ").append(toIndentedString(idTipoDireccion)).append("\n");
 	    sb.append("    paginaweb: ").append(toIndentedString(paginaWeb)).append("\n");
 	    sb.append("    fechaModificacion: ").append(toIndentedString(fechaModificacion)).append("\n");
+	    sb.append("    motivo: ").append(toIndentedString(motivo)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
