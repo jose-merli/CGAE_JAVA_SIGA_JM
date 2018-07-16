@@ -14,15 +14,18 @@ import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.FichaPerSearchDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
+import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IFichaPersonaService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -47,6 +50,9 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 	@Autowired
 	private CenTipoidentificacionExtendsMapper cenTipoidentificacionExtendsMapper;
 	
+	@Autowired
+	private CenClienteMapper cenClienteMapper;
+
 	@Override
 	public FichaPersonaDTO searchPersonFile(int numPagina, FichaPerSearchDTO fichaPerSearch,
 			HttpServletRequest request) {
@@ -243,6 +249,15 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			
 			// obtenemos su idpersona
 			comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+
+//			comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+			String maxIdPersona = comboItems.get(0).getValue();
+			
+
+			CenCliente recordCliente = new CenCliente();
+			recordCliente = rellenarInsertCenCliente(usuario,maxIdPersona,idInstitucion);
+			int responseCenCliente = cenClienteMapper.insertSelective(recordCliente);
+			
 		}
 		
 		if(comboItems.isEmpty()) {
@@ -285,5 +300,22 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 		return comboDTO;
 	}
 	
-
+	protected CenCliente rellenarInsertCenCliente(AdmUsuarios usuario, String maxIdPersona, Short idInstitucion) {
+		CenCliente record = new CenCliente();
+		
+		record.setIdpersona(Long.valueOf(maxIdPersona));
+		record.setIdinstitucion(Short.valueOf(idInstitucion));
+		record.setFechaalta(new Date());
+		record.setCaracter("P");
+		record.setPublicidad(SigaConstants.DB_FALSE);
+		record.setGuiajudicial(SigaConstants.DB_FALSE);
+		record.setComisiones(SigaConstants.DB_FALSE);
+		record.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
+		record.setFechamodificacion(new Date());
+		record.setUsumodificacion(usuario.getIdusuario());
+		record.setIdlenguaje(usuario.getIdlenguaje());
+		record.setExportarfoto(SigaConstants.DB_FALSE);
+		
+		return record;
+	}
 }
