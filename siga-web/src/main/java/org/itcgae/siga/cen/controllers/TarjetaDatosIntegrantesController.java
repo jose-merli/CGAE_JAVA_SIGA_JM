@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
+import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesDeleteDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.ITarjetaDatosIntegrantesService;
@@ -78,8 +79,8 @@ public class TarjetaDatosIntegrantesController {
 	
 	
 	@RequestMapping(value = "tarjetaIntegrantes/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> deleteMember(@RequestBody TarjetaIntegrantesUpdateDTO[] tarjetaIntegrantesUpdateDTO, HttpServletRequest request) { 
-		UpdateResponseDTO response = tarjetaDatosIntegrantesService.deleteMember(tarjetaIntegrantesUpdateDTO, request);
+	ResponseEntity<UpdateResponseDTO> deleteMember(@RequestBody TarjetaIntegrantesDeleteDTO[] tarjetaIntegrantesDeleteDTO, HttpServletRequest request) { 
+		UpdateResponseDTO response = tarjetaDatosIntegrantesService.deleteMember(tarjetaIntegrantesDeleteDTO, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);

@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.cen.DatosIntegrantesDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
+import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesDeleteDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -372,7 +373,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 	}
 	
 	@Override
-	public UpdateResponseDTO deleteMember(TarjetaIntegrantesUpdateDTO[] tarjetaIntegrantesUpdateDTO, HttpServletRequest request) {
+	public UpdateResponseDTO deleteMember(TarjetaIntegrantesDeleteDTO[] tarjetaIntegrantesDeleteDTO, HttpServletRequest request) {
 		
 		LOGGER.info("updateMember() -> Entrada al servicio para actualizar información de integrantes");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -395,16 +396,16 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 
 		if (null != usuarios && usuarios.size() > 0) {
 			usuario = usuarios.get(0);
-			for (int i = 0; i < tarjetaIntegrantesUpdateDTO.length; i++) {
+			for (int i = 0; i < tarjetaIntegrantesDeleteDTO.length; i++) {
 				LOGGER.info(
 						"getCargos() / cenComponentesExtendsMapper.updateMember() -> Entrada a cenComponentesExtendsMapper para actualizar datos de un integrante");
 				CenComponentes recordUpdate = new CenComponentes();
 				recordUpdate.setFechabaja(new Date());
 				recordUpdate.setFechamodificacion(new Date());
 				recordUpdate.setUsumodificacion(usuario.getIdusuario());
-				recordUpdate.setIdcomponente(Short.valueOf(tarjetaIntegrantesUpdateDTO[i].getIdComponente()));
+				recordUpdate.setIdcomponente(Short.valueOf(tarjetaIntegrantesDeleteDTO[i].getIdComponente()));
 				recordUpdate.setIdinstitucion(idInstitucion);
-				recordUpdate.setIdpersona(Long.valueOf(tarjetaIntegrantesUpdateDTO[i].getIdPersona()));
+				recordUpdate.setIdpersona(Long.valueOf(tarjetaIntegrantesDeleteDTO[i].getIdPersona()));
 				response = cenComponentesExtendsMapper.updateByPrimaryKeySelective(recordUpdate );
 				
 				LOGGER.info(
