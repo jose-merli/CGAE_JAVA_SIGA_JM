@@ -127,7 +127,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 			LOGGER.info(
 					"loadPhotography() / cenPersonaExtendsMapper.loadPhotography() -> Salida de cenPersonaExtendsMapper para obtener el nombre del archivo de la fotografía");
 
-			if (null != comboItem) {
+			if (null != comboItem && null != comboItem.getLabel()) {
 				pathFinal = pathFinal.concat(comboItem.getLabel());
 				LOGGER.info(
 						"loadPhotography() -> Se obtiene fotografia de la persona jurídica del path:  " + pathFinal);
