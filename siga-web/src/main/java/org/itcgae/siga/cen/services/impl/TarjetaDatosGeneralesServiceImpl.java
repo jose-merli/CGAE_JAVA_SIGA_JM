@@ -361,6 +361,12 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		
 		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
 
+		CenPersonaExample example = new CenPersonaExample();
+		example.createCriteria().andNifcifEqualTo(sociedadCreateDTO.getNif());
+		List<CenPersona> personas =  cenPersonaExtendsMapper.selectByExample(example );
+		if(null != personas && !(personas.size()>0)) {
+			
+		
 		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -387,26 +393,27 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 							"createLegalPerson() / cenPersonaExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenPersonaExtendsMapper para crear una nueva persona");
 					
 					if(responseInsertPersona == 1) {
-						// 1.2 crear registro en tabla cen_nocolegiado
-						LOGGER.info(
-								"createLegalPerson() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateNewSociety() -> Entrada a cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+						// 1.3 crear registro en tabla cen_cliente
+						CenCliente record = new CenCliente();
+						record = rellenarInsertCenClienteNewSociety(sociedadCreateDTO, usuario, idInstitucion);
+						int responseCenCliente = 0;
+						if(null !=record.getIdpersona()) {
+							responseCenCliente = cenClienteMapper.insertSelective(record);
+						}
 						
-						int responseInsertNoColegiado =  cenNocolegiadoExtendsMapper.insertSelectiveForCreateNewSociety(String.valueOf(idInstitucion), usuario, sociedadCreateDTO);
-						LOGGER.info(
-								"createLegalPerson() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
-						
-						if(responseInsertNoColegiado == 1)
+						if(responseCenCliente == 1)
 						{
-							// 1.3 crear registro en tabla cen_cliente
-							CenCliente record = new CenCliente();
-							record = rellenarInsertCenClienteNewSociety(sociedadCreateDTO, usuario, idInstitucion);
-							int responseCenCliente = 0;
-							if(null !=record.getIdpersona()) {
-								responseCenCliente = cenClienteMapper.insertSelective(record);
-							}
+							// 1.2 crear registro en tabla cen_nocolegiado
+							LOGGER.info(
+									"createLegalPerson() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateNewSociety() -> Entrada a cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+							
+							int responseInsertNoColegiado =  cenNocolegiadoExtendsMapper.insertSelectiveForCreateNewSociety(String.valueOf(idInstitucion), usuario, sociedadCreateDTO);
+							LOGGER.info(
+									"createLegalPerson() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+							
 							
 							// comprobar insercion en cen_cliente y obtener el nuevo idpersona creado
-							if(responseCenCliente == 1) {
+							if(responseInsertNoColegiado == 1) {
 								insertResponseDTO.setStatus(SigaConstants.OK);
 								insertResponseDTO.setId(String.valueOf(record.getIdpersona()));
 							}
@@ -530,6 +537,12 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 			LOGGER.warn("createLegalPerson() -> idInstitucion del token nula");
 		}
 		
+		}else {
+			insertResponseDTO.setStatus(SigaConstants.KO);
+			org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+			error.setMessage("messages.censo.nifcifExiste2");
+			insertResponseDTO.setError(error);
+		}
 		
 		// AUDITORIA  => actualizamos cen_historico si todo es correcto
 		if(insertResponseDTO.getStatus().equals(SigaConstants.OK)) {
