@@ -14,7 +14,6 @@ import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.FichaPerSearchDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
-import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IFichaPersonaService;
@@ -22,6 +21,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.CenPersona;
@@ -183,6 +183,18 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 				updateResponse.getError().setDescription("La persona seleccionada ya es el notario de la sociedad.");
 			}else {
 				usuario = usuarios.get(0);
+				//Validamos si existe el cliente para la institucion de la sociedad, en caso de que no exista, se inserta.
+				CenClienteKey key = new CenClienteKey();
+				key.setIdinstitucion(idInstitucion);
+				key.setIdpersona(Long.valueOf(asociarPersona.getIdPersonaAsociar()));
+				
+				CenCliente cliente = cenClienteMapper.selectByPrimaryKey(key );
+				if (!(null != cliente)) {
+					CenCliente recordCliente = new CenCliente();
+					recordCliente = rellenarInsertCenCliente(usuario,asociarPersona.getIdPersonaAsociar(),idInstitucion);
+					int responseCenCliente = cenClienteMapper.insertSelective(recordCliente);
+				}
+
 				CenNocolegiadoExample cenNoColegiadoExample = new CenNocolegiadoExample();
 				cenNoColegiadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(asociarPersona.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
 				colegiado.setIdpersonanotario(Long.valueOf(asociarPersona.getIdPersonaAsociar()));
@@ -195,6 +207,18 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			
 		}else {
 			usuario = usuarios.get(0);
+			//Validamos si existe el cliente para la institucion de la sociedad, en caso de que no exista, se inserta.
+			CenClienteKey key = new CenClienteKey();
+			key.setIdinstitucion(idInstitucion);
+			key.setIdpersona(Long.valueOf(asociarPersona.getIdPersonaAsociar()));
+			
+			CenCliente cliente = cenClienteMapper.selectByPrimaryKey(key );
+			if (!(null != cliente)) {
+				CenCliente recordCliente = new CenCliente();
+				recordCliente = rellenarInsertCenCliente(usuario,asociarPersona.getIdPersonaAsociar(),idInstitucion);
+				int responseCenCliente = cenClienteMapper.insertSelective(recordCliente);
+			}
+			
 			CenNocolegiadoExample cenNoColegiadoExample = new CenNocolegiadoExample();
 			cenNoColegiadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(asociarPersona.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
 			colegiado.setIdpersonanotario(Long.valueOf(asociarPersona.getIdPersonaAsociar()));
@@ -250,7 +274,7 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			// obtenemos su idpersona
 			comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
 
-//			comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+			//comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
 			String maxIdPersona = comboItems.get(0).getValue();
 			
 
