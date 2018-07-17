@@ -656,7 +656,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 						rolesAsignadosItem[i].setValue(admRol.getIdRol());
 						i++;
 					}
-
+					
 					if (null != rolesPorAsignar && rolesPorAsignar.size() > 0) {
 						ComboItem[] añadirRolesNoAsignados = new ComboItem[rolesPorAsignar.size()];
 						int j = 0;
@@ -668,6 +668,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 						usuarioGrupoItem.setAsignarRolDefecto(añadirRolesNoAsignados);
 					}
 					usuarioGrupoItem.setRolesAsignados(rolesAsignadosItem);
+					
 				} else {
 					LOGGER.info(
 							"getUsersGroupsSearch() / admPerfilExtendsMapper.selectRolPerfilDistinctByExample() -> No existen roles en la búsqueda");
@@ -697,8 +698,20 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 					}
 					usuarioGrupoItem.setRolesNoAsignados(rolesNoAsignadosItem);
 				}
-
+				
 				usuarioGrupoItems.add(usuarioGrupoItem);
+			}
+			for(UsuarioGrupoItem usu:usuarioGrupoItems) {
+				if (usu.getDescripcionRol().length()>2) {
+					if(usu.getDescripcionRol().substring(usu.getDescripcionRol().length()- 2).equals(", ") ) {
+						usu.setDescripcionRol(usu.getDescripcionRol().substring(0, usu.getDescripcionRol().length()-2));
+					}else {
+						usu.setDescripcionRol(usu.getDescripcionRol().substring(0, usu.getDescripcionRol().length()));
+					}
+					
+				} else {
+					usu.setDescripcionRol("No tiene asignado ningun Rol por defecto");
+				}
 			}
 			response.setUsuarioGrupoItem(usuarioGrupoItems);
 		} else {
