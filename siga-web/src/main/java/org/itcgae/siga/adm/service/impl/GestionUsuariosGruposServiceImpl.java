@@ -1101,6 +1101,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 			if (null != usuarioUpdateDTO.getRolesAsignados() && usuarioUpdateDTO.getRolesAsignados().length > 0) {
 				for (ComboItem rolesAsignados : usuarioUpdateDTO.getRolesAsignados()) {
+					if (!UtilidadesString.esCadenaVacia(rolesAsignados.getValue())) {
 					AdmPerfilRol recordPerfilRol = new AdmPerfilRol();
 					recordPerfilRol.setFechamodificacion(new Date());
 					recordPerfilRol.setGrupopordefecto("N");
@@ -1113,6 +1114,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 					this.admPerfilRolMapper.insert(recordPerfilRol);
 					LOGGER.info(
 							"createGroupUsers() / admPerfilRolMapper.insert() -> Salida de admPerfilRolMapper para crear una relación perfil-rol");
+					}
 				}
 			}
 			updateResponseDTO.setStatus(SigaConstants.OK);
