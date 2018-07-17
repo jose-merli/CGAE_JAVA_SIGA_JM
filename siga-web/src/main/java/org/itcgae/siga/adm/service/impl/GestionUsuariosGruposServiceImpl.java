@@ -28,6 +28,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.adm.service.IGestionUsuariosGruposService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmPerfilKey;
@@ -912,129 +913,133 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 		if (null != usuarios && usuarios.size() > 0) {
 			for (int i = 0; i < usuarioUpdateDTO.length; i++) {
-
-				AdmPerfilKey key = new AdmPerfilKey();
-				key.setIdinstitucion(Short.valueOf(institucion));
-				key.setIdperfil(usuarioUpdateDTO[i].getIdGrupo());
-				LOGGER.info(
-						"updateGroupUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Entrada a admPerfilExtendsMapper para buscar un perfil por clave primaria");
-				AdmPerfil record = this.admPerfilExtendsMapper.selectByPrimaryKey(key);
-				LOGGER.info(
-						"updateGroupUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Salida de admPerfilExtendsMapper para buscar un perfil por clave primaria");
-				if (null != record) {
-					record.setDescripcion(usuarioUpdateDTO[i].getDescripcionGrupo());
-					record.setFechamodificacion(new Date());
-					record.setUsumodificacion(usuarios.get(0).getIdusuario());
-					// Actualizamos el registro de perfil
+		
+					
+					AdmPerfilKey key = new AdmPerfilKey();
+					key.setIdinstitucion(Short.valueOf(institucion));
+					key.setIdperfil(usuarioUpdateDTO[i].getIdGrupo());
 					LOGGER.info(
-							"updateGroupUsers() / admPerfilExtendsMapper.updateByPrimaryKeySelective() -> Entrada a admPerfilExtendsMapper para buscar un perfil por clave primaria");
-					response = this.admPerfilExtendsMapper.updateByPrimaryKeySelective(record);
+							"updateGroupUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Entrada a admPerfilExtendsMapper para buscar un perfil por clave primaria");
+					AdmPerfil record = this.admPerfilExtendsMapper.selectByPrimaryKey(key);
 					LOGGER.info(
-							"updateGroupUsers() / admPerfilExtendsMapper.updateByPrimaryKeySelective() -> Salida de admPerfilExtendsMapper para buscar un perfil por clave primaria");
-
-					if (response == 1) {
-						List<String> rolesComprobar = new ArrayList<String>();
-
-						if (null != usuarioUpdateDTO[i].getRolesAsignados()
-								&& usuarioUpdateDTO[i].getRolesAsignados().length > 0) {
-							AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
-							examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
-									.andIdperfilEqualTo(usuarioUpdateDTO[i].getIdGrupo());
-							LOGGER.info(
-									"updateGroupUsers() / admPerfilRolMapper.selectByExample() -> Entrada a admPerfilRolMapper para buscar un perfiles para un rol de una institución concreta");
-							List<AdmPerfilRol> perfilesRolABorrar = this.admPerfilRolMapper
-									.selectByExample(examplePerfilRol);
-							LOGGER.info(
-									"updateGroupUsers() / admPerfilRolMapper.selectByExample() -> Salida de admPerfilRolMapper para buscar un perfiles para un rol de una institución concreta");
-
-							if (null != perfilesRolABorrar && perfilesRolABorrar.size() > 0) {
-								for (AdmPerfilRol string : perfilesRolABorrar) {
-									rolesComprobar.add(string.getIdrol());
-								}
-							}
-							for (ComboItem rolesAsignados : usuarioUpdateDTO[i].getRolesAsignados()) {
-								if (rolesComprobar.contains(rolesAsignados.getValue())) {
-									rolesComprobar.remove(rolesAsignados.getValue());
-								} else {
-									AdmPerfilRol recordPerfilRol = new AdmPerfilRol();
-									recordPerfilRol.setFechamodificacion(new Date());
-									recordPerfilRol.setGrupopordefecto("N");
-									recordPerfilRol.setIdinstitucion(Short.valueOf(institucion));
-									recordPerfilRol.setIdperfil(usuarioUpdateDTO[i].getIdGrupo());
-									recordPerfilRol.setIdrol(rolesAsignados.getValue());
-									recordPerfilRol.setUsumodificacion(usuarios.get(0).getIdusuario());
-									LOGGER.info(
-											"updateGroupUsers() / admPerfilRolMapper.insert() -> Entrada a admPerfilRolMapper para crear una relación perfil-rol");
-									response1 = this.admPerfilRolMapper.insert(recordPerfilRol);
-									LOGGER.info(
-											"updateGroupUsers() / admPerfilRolMapper.insert() -> Salida a admPerfilRolMapper para crear una relación perfil-rol");
-									// si no inserta bien un registro, el servicio devolverá KO
-									if (response1 == 0) {
-										LOGGER.info(
-												"updateGroupUsers() / admPerfilRolMapper.insert() -> No se ha podido crear una relación perfil-rol");
-										responseOK = false;
+							"updateGroupUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> Salida de admPerfilExtendsMapper para buscar un perfil por clave primaria");
+					if (null != record) {
+						record.setDescripcion(usuarioUpdateDTO[i].getDescripcionGrupo());
+						record.setFechamodificacion(new Date());
+						record.setUsumodificacion(usuarios.get(0).getIdusuario());
+						// Actualizamos el registro de perfil
+						LOGGER.info(
+								"updateGroupUsers() / admPerfilExtendsMapper.updateByPrimaryKeySelective() -> Entrada a admPerfilExtendsMapper para buscar un perfil por clave primaria");
+						response = this.admPerfilExtendsMapper.updateByPrimaryKeySelective(record);
+						LOGGER.info(
+								"updateGroupUsers() / admPerfilExtendsMapper.updateByPrimaryKeySelective() -> Salida de admPerfilExtendsMapper para buscar un perfil por clave primaria");
+	
+						if (response == 1) {
+							List<String> rolesComprobar = new ArrayList<String>();
+	
+							if (null != usuarioUpdateDTO[i].getRolesAsignados()
+									&& usuarioUpdateDTO[i].getRolesAsignados().length > 0) {
+								AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
+								examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
+										.andIdperfilEqualTo(usuarioUpdateDTO[i].getIdGrupo());
+								LOGGER.info(
+										"updateGroupUsers() / admPerfilRolMapper.selectByExample() -> Entrada a admPerfilRolMapper para buscar un perfiles para un rol de una institución concreta");
+								List<AdmPerfilRol> perfilesRolABorrar = this.admPerfilRolMapper
+										.selectByExample(examplePerfilRol);
+								LOGGER.info(
+										"updateGroupUsers() / admPerfilRolMapper.selectByExample() -> Salida de admPerfilRolMapper para buscar un perfiles para un rol de una institución concreta");
+	
+								if (null != perfilesRolABorrar && perfilesRolABorrar.size() > 0) {
+									for (AdmPerfilRol string : perfilesRolABorrar) {
+										rolesComprobar.add(string.getIdrol());
 									}
 								}
-							}
-							if (null != rolesComprobar && rolesComprobar.size() > 0) {
-								for (String idRol : rolesComprobar) {
-
+								for (ComboItem rolesAsignados : usuarioUpdateDTO[i].getRolesAsignados()) {
+									if (!UtilidadesString.esCadenaVacia(rolesAsignados.getValue())) {
+										if (rolesComprobar.contains(rolesAsignados.getValue())) {
+											rolesComprobar.remove(rolesAsignados.getValue());
+										} else {
+											AdmPerfilRol recordPerfilRol = new AdmPerfilRol();
+											recordPerfilRol.setFechamodificacion(new Date());
+											recordPerfilRol.setGrupopordefecto("N");
+											recordPerfilRol.setIdinstitucion(Short.valueOf(institucion));
+											recordPerfilRol.setIdperfil(usuarioUpdateDTO[i].getIdGrupo());
+											recordPerfilRol.setIdrol(rolesAsignados.getValue());
+											recordPerfilRol.setUsumodificacion(usuarios.get(0).getIdusuario());
+											LOGGER.info(
+													"updateGroupUsers() / admPerfilRolMapper.insert() -> Entrada a admPerfilRolMapper para crear una relación perfil-rol");
+											response1 = this.admPerfilRolMapper.insert(recordPerfilRol);
+											LOGGER.info(
+													"updateGroupUsers() / admPerfilRolMapper.insert() -> Salida a admPerfilRolMapper para crear una relación perfil-rol");
+											// si no inserta bien un registro, el servicio devolverá KO
+											if (response1 == 0) {
+												LOGGER.info(
+														"updateGroupUsers() / admPerfilRolMapper.insert() -> No se ha podido crear una relación perfil-rol");
+												responseOK = false;
+											}
+										}
+									}
+								}
+								if (null != rolesComprobar && rolesComprobar.size() > 0) {
+									for (String idRol : rolesComprobar) {
+	
+										AdmPerfilRolExample keydelete = new AdmPerfilRolExample();
+										keydelete.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
+												.andIdperfilEqualTo(usuarioUpdateDTO[i].getIdGrupo())
+												.andIdrolEqualTo(idRol);
+										LOGGER.info(
+												"updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> Entrada a admPerfilRolMapper para eliminar una relación perfil-rol");
+										response2 = this.admPerfilRolMapper.deleteByExample(keydelete);
+										LOGGER.info(
+												"updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> Salida de admPerfilRolMapper para eliminar una relación perfil-rol");
+										if (response2 == 0) {
+											LOGGER.warn(
+													"updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> No se ha podido eliminar una relación perfil-rol");
+											responseOK = false;
+										}
+									}
+								}
+							} else {
+								AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
+								examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
+										.andIdperfilEqualTo(usuarioUpdateDTO[i].getIdGrupo());
+								LOGGER.info(
+										"updateGroupUsers() / admPerfilRolMapper.selectByExample() -> Entrada a admPerfilRolMapper para buscar perfiles con un rol e institución concretos");
+								List<AdmPerfilRol> perfilesRolABorrar = this.admPerfilRolMapper
+										.selectByExample(examplePerfilRol);
+								LOGGER.info(
+										"updateGroupUsers() / admPerfilRolMapper.selectByExample() -> Salida de admPerfilRolMapper para buscar perfiles con un rol e institución concretos");
+								if (null != perfilesRolABorrar && perfilesRolABorrar.size() > 0) {
+									// cantidad de registros que se van a eliminar. Es lo que debe contener
+									// response3
+									tamanioResponse3 = perfilesRolABorrar.size();
 									AdmPerfilRolExample keydelete = new AdmPerfilRolExample();
 									keydelete.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
-											.andIdperfilEqualTo(usuarioUpdateDTO[i].getIdGrupo())
-											.andIdrolEqualTo(idRol);
+											.andIdperfilEqualTo(usuarioUpdateDTO[i].getIdGrupo());
 									LOGGER.info(
-											"updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> Entrada a admPerfilRolMapper para eliminar una relación perfil-rol");
-									response2 = this.admPerfilRolMapper.deleteByExample(keydelete);
+											"updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> Entrada a admPerfilRolMapper para eliminar perfiles concretos con una institución concreta");
+									response3 = this.admPerfilRolMapper.deleteByExample(keydelete);
 									LOGGER.info(
-											"updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> Salida de admPerfilRolMapper para eliminar una relación perfil-rol");
-									if (response2 == 0) {
+											"updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> Salida de admPerfilRolMapper para eliminar perfiles concretos con una institución concreta");
+									if (response3 == 0) {
 										LOGGER.warn(
-												"updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> No se ha podido eliminar una relación perfil-rol");
+												"updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> No se han eliminado perfiles concretos con una institución concreta");
 										responseOK = false;
 									}
 								}
 							}
 						} else {
-							AdmPerfilRolExample examplePerfilRol = new AdmPerfilRolExample();
-							examplePerfilRol.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
-									.andIdperfilEqualTo(usuarioUpdateDTO[i].getIdGrupo());
-							LOGGER.info(
-									"updateGroupUsers() / admPerfilRolMapper.selectByExample() -> Entrada a admPerfilRolMapper para buscar perfiles con un rol e institución concretos");
-							List<AdmPerfilRol> perfilesRolABorrar = this.admPerfilRolMapper
-									.selectByExample(examplePerfilRol);
-							LOGGER.info(
-									"updateGroupUsers() / admPerfilRolMapper.selectByExample() -> Salida de admPerfilRolMapper para buscar perfiles con un rol e institución concretos");
-							if (null != perfilesRolABorrar && perfilesRolABorrar.size() > 0) {
-								// cantidad de registros que se van a eliminar. Es lo que debe contener
-								// response3
-								tamanioResponse3 = perfilesRolABorrar.size();
-								AdmPerfilRolExample keydelete = new AdmPerfilRolExample();
-								keydelete.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
-										.andIdperfilEqualTo(usuarioUpdateDTO[i].getIdGrupo());
-								LOGGER.info(
-										"updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> Entrada a admPerfilRolMapper para eliminar perfiles concretos con una institución concreta");
-								response3 = this.admPerfilRolMapper.deleteByExample(keydelete);
-								LOGGER.info(
-										"updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> Salida de admPerfilRolMapper para eliminar perfiles concretos con una institución concreta");
-								if (response3 == 0) {
-									LOGGER.warn(
-											"updateGroupUsers() / admPerfilRolMapper.deleteByExample() -> No se han eliminado perfiles concretos con una institución concreta");
-									responseOK = false;
-								}
-							}
+							LOGGER.warn(
+									"updateGroupUsers() / admPerfilExtendsMapper.updateByPrimaryKeySelective() -> No se ha actualizado correctamente el perfil por clave primaria");
+							responseOK = false;
 						}
+	
 					} else {
 						LOGGER.warn(
-								"updateGroupUsers() / admPerfilExtendsMapper.updateByPrimaryKeySelective() -> No se ha actualizado correctamente el perfil por clave primaria");
+								"updateGroupUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> No existe un perfil por clave primaria");
 						responseOK = false;
 					}
-
-				} else {
-					LOGGER.warn(
-							"updateGroupUsers() / admPerfilExtendsMapper.selectByPrimaryKey() -> No existe un perfil por clave primaria");
-					responseOK = false;
-				}
+				
 			}
 		} else {
 			LOGGER.warn(
