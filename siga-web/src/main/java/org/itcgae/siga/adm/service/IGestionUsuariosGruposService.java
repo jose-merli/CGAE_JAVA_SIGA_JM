@@ -36,7 +36,7 @@ public interface IGestionUsuariosGruposService {
 
 	public UsuarioGruposDTO getUsersGroupsHistoric(int numPagina, HttpServletRequest request);
 
-	public UpdateResponseDTO updateGroupUsers(UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request);
+	public UpdateResponseDTO updateGroupUsers(UsuarioGrupoItem[] usuarioUpdateDTO, HttpServletRequest request);
 	
 	public UpdateResponseDTO createGroupUsers(UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request);
 
