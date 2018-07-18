@@ -22,6 +22,7 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	private String prefijoNumsspp;
 	private String contadorNumsspp;
 	private String sufijoNumsspp;
+	private Date fechaBaja;
 	
 
 	/**
@@ -205,6 +206,24 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	/**
 	 *
 	 */
+	public PerJuridicaDatosRegistralesUpdateDTO fechaBaja(Date fechaBaja){
+		this.fechaBaja = fechaBaja;
+		return this;
+	}
+	
+	@JsonProperty("fechaBaja")
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+	
+	
+	/**
+	 *
+	 */
 	public PerJuridicaDatosRegistralesUpdateDTO sociedadProfesional(String sociedadProfesional){
 		this.sociedadProfesional = sociedadProfesional;
 		return this;
@@ -320,7 +339,8 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	    }
 	    return o.toString().replace("\n", "\n    ");
 	}
-	
+
+
 	
 	
 	
