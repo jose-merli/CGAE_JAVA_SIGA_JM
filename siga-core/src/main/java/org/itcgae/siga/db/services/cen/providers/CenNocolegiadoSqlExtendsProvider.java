@@ -305,7 +305,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.INNER_JOIN("SCS_MAESTRORETENCIONES RET ON RET.IDRETENCION = IRPF.IDRETENCION");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON (CAT.IDRECURSO = RET.DESCRIPCION AND CAT.IDLENGUAJE = '" + idLenguaje +"')");
 		
-		sql.WHERE("IDPERSONA = '"+ personaSearchDto.getIdPersona() +"'");
+		sql.WHERE("PER.IDPERSONA = '"+ personaSearchDto.getIdPersona() +"'");
 		sql.WHERE("IRPF.IDINSTITUCION = '"+ idInstitucion +"'");
 		sql.ORDER_BY("FECHAINICIO DESC");
 		
