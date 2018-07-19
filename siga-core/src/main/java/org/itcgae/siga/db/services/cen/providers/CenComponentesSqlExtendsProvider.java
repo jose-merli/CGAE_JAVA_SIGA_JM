@@ -22,13 +22,13 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.SELECT("COMPONENTE.IDCOMPONENTE");
 		sql.SELECT("COMPONENTE.CARGO");
 		sql.SELECT("TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy') AS FECHACARGO");
-		sql.SELECT("COMPONENTE.FECHABAJA AS FECHABAJACARGO");
+		sql.SELECT("TO_CHAR(COMPONENTE.FECHABAJA, 'dd/mm/yyyy') AS FECHABAJACARGO");
 		sql.SELECT("COMPONENTE.CEN_CLIENTE_IDPERSONA AS IDPERSONACOMPONENTE");
 		sql.SELECT("DECODE(COMPONENTE.SOCIEDAD,1,'SI','NO') AS SOCIEDAD");
 		sql.SELECT("COMPONENTE.CAPITALSOCIAL");
 		sql.SELECT("TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy') AS FECHACARGOINFORME");
 		sql.SELECT("DECODE(f_siga_gettipocliente(COMPONENTE.CEN_CLIENTE_IDPERSONA,COMPONENTE.CEN_CLIENTE_IDINSTITUCION,SYSDATE),20,'Ejerciente','') AS EJERCIENTE");
-		sql.SELECT("DECODE(COMPONENTE.FECHABAJA, NULL,TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy'),TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy') || ' -(' || TO_CHAR(COMPONENTE.FECHABAJA, 'dd/mm/yyyy') || ') ' ) AS FECHA_HISTORICO");
+		sql.SELECT("DECODE(TO_CHAR(COMPONENTE.FECHABAJA, 'dd/mm/yyyy'), NULL,TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy'),TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy') || ' -(' || TO_CHAR(COMPONENTE.FECHABAJA, 'dd/mm/yyyy') || ') ' ) AS FECHA_HISTORICO");
 		sql.SELECT("PERSONA.NIFCIF");
 		sql.SELECT("PERSONA.NOMBRE");
 		sql.SELECT("DECODE(PERSONA.APELLIDOS1,'#NA','',PERSONA.APELLIDOS1) AS APELLIDOS1");
@@ -75,6 +75,11 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.SET("FECHACARGO = TO_DATE('" + fechaC + "','DD/MM/YYYY')");
 		}
  		
+ 		if(null != tarjetaIntegrantesUpdateDTO.getFechaBajaCargo()) {
+ 			String fechaB = dateFormat.format(tarjetaIntegrantesUpdateDTO.getFechaBajaCargo());
+			sql.SET("FECHABAJA = TO_DATE('" + fechaB + "','DD/MM/YYYY')");
+		}
+ 		
 		if(!tarjetaIntegrantesUpdateDTO.getCargo().equals("")) {
 			sql.SET("CARGO = '" + tarjetaIntegrantesUpdateDTO.getCargo() + "'");
 		}
@@ -116,8 +121,6 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		if(!tarjetaIntegrantesCreateDTO.getCargo().equals("")) {
 	        sql.VALUES("CARGO", "'" + tarjetaIntegrantesCreateDTO.getCargo() + "'");
 		}
-
-
 		
 		if(null != tarjetaIntegrantesCreateDTO.getFechaCargo()) {
 			String fechaC = dateFormat.format(tarjetaIntegrantesCreateDTO.getFechaCargo());
@@ -125,6 +128,11 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			
 		}
 		
+		if(null != tarjetaIntegrantesCreateDTO.getFechaBajaCargo()) {
+			String fechaB = dateFormat.format(tarjetaIntegrantesCreateDTO.getFechaBajaCargo());
+			sql.VALUES("FECHABAJA","TO_DATE('" + fechaB + "','DD/MM/YYYY')");
+			
+		}
 		
 		sql.VALUES("CEN_CLIENTE_IDPERSONA", "'" + tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante() + "'");
 		sql.VALUES("CEN_CLIENTE_IDINSTITUCION", "'" + tarjetaIntegrantesCreateDTO.getIdInstitucionIntegrante() + "'");
