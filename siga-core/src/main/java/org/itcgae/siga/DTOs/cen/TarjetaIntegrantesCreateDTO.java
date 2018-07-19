@@ -14,6 +14,7 @@ public class TarjetaIntegrantesCreateDTO {
 	private String nifCif;
 	private String tipoIdentificacion;
 	private Date fechaCargo;
+	private Date fechaBajaCargo;
 	private String cargo;
 	private String idCargo;
 	private String capitalSocial;
@@ -26,6 +27,23 @@ public class TarjetaIntegrantesCreateDTO {
 	private String numColegiado;
 	private String tipo;
 	
+	
+
+	/**
+	 *
+	 */
+	public TarjetaIntegrantesCreateDTO fechaBajaCargo(Date fechaBajaCargo){
+		this.fechaBajaCargo = fechaBajaCargo;
+		return this;
+	}
+	
+	@JsonProperty("fechaBajaCargo")
+	public Date getFechaBajaCargo() {
+		return fechaBajaCargo;
+	}
+	public void setFechaBajaCargo(Date fechaBajaCargo) {
+		this.fechaBajaCargo = fechaBajaCargo;
+	}
 	
 	
 	/**
