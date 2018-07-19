@@ -20,5 +20,9 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosBancarios.cabecera','Datos Bancarios#GL','0','4',to_date('10/03/04','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosBancarios.cabecera','Dades Bancàries','0','2',to_date('10/03/04','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosBancarios.cabecera','Datos Bancarios#EU','0','3',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('cen.busqueda.error.busquedageneral','Debe rellenar un campo de búsqueda con un minimo de 3 caracteres','0','1',to_date('01/02/06','DD/MM/RR'),'0','15');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('cen.busqueda.error.busquedageneral','Ha d''emplenar un camp de cerca amb un minimo de 3 caràcters','0','2',to_date('01/02/06','DD/MM/RR'),'0','15');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('cen.busqueda.error.busquedageneral','Debe rellenar un campo de búsqueda con un minimo de 3 caracteres#EU','0','3',to_date('01/02/06','DD/MM/RR'),'0','15');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('cen.busqueda.error.busquedageneral','Debe rellenar un campo de búsqueda con un minimo de 3 caracteres#GL','0','4',to_date('01/02/06','DD/MM/RR'),'0','15');
 
 COMMIT;
