@@ -70,6 +70,7 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter {
 		String [] authorizedRequests = {
 				loginUrl, 
 				"/loginDevelop",
+				"/validaInstitucion",
 				"/instituciones", 
 				"/perfilespost", 
 				"/perfiles",
