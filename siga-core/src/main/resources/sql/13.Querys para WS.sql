@@ -17,7 +17,7 @@ ALTER TABLE cmn_datos_xml ADD CONSTRAINT pk_cmn_datos_xml PRIMARY KEY ( id_datos
 
 CREATE SEQUENCE seq_cmn_datos_xml START WITH 1 INCREMENT BY 1 MAXVALUE 999999999999999 MINVALUE 1;
 
-Insert into ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values (SEQ_ADM_CONFIG.nextval,'url.ws.sociedades','https://vmcgaeap003.cloud.es.deloitte.com/sspp-publicacion/ws/PublicadorSociedadesService',null,'0');
+Insert into ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values (SEQ_ADM_CONFIG.nextval,'url.ws.sociedades','https://vmcgaeap003.cloud.es.deloitte.com/sspp-publicacion/ws/PublicadorSociedadesService','Url de acceso a los WS de Sociedades',null,'0');
 Insert into ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values (SEQ_ADM_CONFIG.nextval,'url.ws.censo','https://ecomdemo.redabogacia.org/eCOM/services/InfoColegiadosService','Url de acceso a los WS de Censo',null,'0');
 
 
