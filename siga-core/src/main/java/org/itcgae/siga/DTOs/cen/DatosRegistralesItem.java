@@ -1,5 +1,6 @@
 package org.itcgae.siga.DTOs.cen;
 
+import java.util.Date;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,7 +20,7 @@ public class DatosRegistralesItem {
 	private String prefijoNumsspp;
 	private String contadorNumsspp;
 	private String sufijoNumsspp;
-	
+	private String fechaBaja;
 
 	/**
 	 */
@@ -155,6 +156,22 @@ public class DatosRegistralesItem {
 	
 	/**
 	 */
+	public DatosRegistralesItem fechaBaja(String fechaBaja){
+		this.fechaBaja = fechaBaja;
+		return this;
+	}
+	
+	@JsonProperty("fechaBaja")
+	public String getFechaBaja() {
+		return fechaBaja;
+	}
+
+	public void setFechaBaja(String fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+	
+	/**
+	 */
 	public DatosRegistralesItem fechaFin(String fechaFin){
 		this.fechaFin = fechaFin;
 		return this;
@@ -221,6 +238,7 @@ public class DatosRegistralesItem {
 	    	   Objects.equals(this.numeroPoliza, datosRegistralesItem.numeroPoliza) &&
 	    	   Objects.equals(this.companiaAseg, datosRegistralesItem.companiaAseg) &&
 	    	   Objects.equals(this.fechaFin, datosRegistralesItem.fechaFin) &&
+	    	   Objects.equals(this.fechaBaja, datosRegistralesItem.fechaBaja) &&
 	    	   Objects.equals(this.fechaConstitucion, datosRegistralesItem.fechaConstitucion) &&
 	    	   Objects.equals(this.sociedadProfesional, datosRegistralesItem.sociedadProfesional) &&
 	    	   Objects.equals(this.prefijoNumsspp, datosRegistralesItem.prefijoNumsspp) &&
@@ -230,7 +248,7 @@ public class DatosRegistralesItem {
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(resena, objetoSocial, numeroPoliza, companiaAseg, fechaFin, fechaConstitucion, sociedadProfesional, prefijoNumsspp, contadorNumsspp, sufijoNumsspp);
+	    return Objects.hash(resena, objetoSocial, numeroPoliza, companiaAseg, fechaFin, fechaBaja, fechaConstitucion, sociedadProfesional, prefijoNumsspp, contadorNumsspp, sufijoNumsspp);
 	}
 
 	
@@ -244,6 +262,7 @@ public class DatosRegistralesItem {
 	    sb.append("    numeroPoliza: ").append(toIndentedString(numeroPoliza)).append("\n");
 	    sb.append("    companiaAseg: ").append(toIndentedString(companiaAseg)).append("\n");
 	    sb.append("    fechaFin: ").append(toIndentedString(fechaFin)).append("\n");
+	    sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
 	    sb.append("    fechaConstitucion: ").append(toIndentedString(fechaConstitucion)).append("\n");
 	    sb.append("    sociedadProfesional: ").append(toIndentedString(sociedadProfesional)).append("\n");
 	    sb.append("    prefijoNumsspp: ").append(toIndentedString(prefijoNumsspp)).append("\n");

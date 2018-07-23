@@ -15,11 +15,29 @@ public class TarjetaIntegrantesUpdateDTO {
 	private String capitalSocial; //  participacionSociedad --> capitalSocial 
 	private String idComponente;
 	private String idPersona;
-	
+	private Date fechaBajaCargo;
+
 	
 	
 	
 
+	/**
+	 *
+	 */
+	public TarjetaIntegrantesUpdateDTO fechaBajaCargo(Date fechaBajaCargo){
+		this.fechaBajaCargo = fechaBajaCargo;
+		return this;
+	}
+	
+	@JsonProperty("fechaBajaCargo")
+	public Date getFechaBajaCargo() {
+		return fechaBajaCargo;
+	}
+	public void setFechaBajaCargo(Date fechaBajaCargo) {
+		this.fechaBajaCargo = fechaBajaCargo;
+	}
+	
+	
 	/**
 	 *
 	 */
@@ -35,11 +53,11 @@ public class TarjetaIntegrantesUpdateDTO {
 	public void setFechaCargo(Date fechaCargo) {
 		this.fechaCargo = fechaCargo;
 	}
-	
-	
 	/**
 	 *
 	 */
+	
+	
 	public TarjetaIntegrantesUpdateDTO cargo(String cargo){
 		this.cargo = cargo;
 		return this;

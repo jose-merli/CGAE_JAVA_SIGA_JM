@@ -34,6 +34,7 @@ public interface CenActividadprofesionalExtendsMapper extends CenActividadprofes
 		@Result(column = "NOPOLIZA", property = "numeroPoliza", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "COMPANIASEG", property = "companiaAseg", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHANACIMIENTO", property = "fechaConstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SOCIEDADPROFESIONAL", property = "sociedadProfesional", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PREFIJO_NUMSSPP", property = "prefijoNumsspp", jdbcType = JdbcType.VARCHAR),

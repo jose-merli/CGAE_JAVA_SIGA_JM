@@ -52,10 +52,15 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		// Mybatis cambia el orden de inner join y left_outer_join con sus funciones
 		// predefinidas=> siempre pone inner join antes
 		sql.LEFT_OUTER_JOIN("CEN_NOCOLEGIADO NOCOL  ON (PER.IDPERSONA = NOCOL.IDPERSONA AND NOCOL.FECHA_BAJA IS NULL)");
+
+		sql.LEFT_OUTER_JOIN("CEN_COLEGIADO COL  ON PER.IDPERSONA = COL.IDPERSONA ");
+		// cambie esto 
 		sql.LEFT_OUTER_JOIN("CEN_CLIENTE CLI  ON PER.IDPERSONA = CLI.IDPERSONA ");
 		sql.LEFT_OUTER_JOIN(
-				" CEN_INSTITUCION I ON (CLI.IDINSTITUCION = I.IDINSTITUCION OR NOCOL.IDINSTITUCION = I.IDINSTITUCION)");
-		sql2.SELECT("A.IDINSTITUCION");
+				" CEN_INSTITUCION I ON (CLI.IDINSTITUCION = I.IDINSTITUCION)");
+
+		sql2.SELECT("A.IDINSTITUCION"); 
+
 		sql2.SELECT("A.IDPERSONA");
 		sql2.SELECT("A.IDESTADO");
 
@@ -128,7 +133,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 		sql2.SELECT("consulta.*");
 
-		sql.SELECT_DISTINCT("col.idpersona AS idpersona");
+		sql.SELECT_DISTINCT("per.idpersona AS idpersona");
 		sql.SELECT_DISTINCT("per.nifcif AS nif");
 		sql.SELECT_DISTINCT("per.IDTIPOIDENTIFICACION ");
 		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ',per.apellidos2) ) AS denominacion");
@@ -140,22 +145,24 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT_DISTINCT("nvl(COUNT(DISTINCT per2.idpersona),0) AS numerointegrantes");
 		sql.SELECT_DISTINCT(
 				"LISTAGG(concat(per2.nombre || ' ',concat(per2.apellidos1 || ' ',per2.apellidos2) ),';') WITHIN GROUP(ORDER BY per2.nombre) AS nombresintegrantes");
-		sql.SELECT("col.idinstitucion AS idinstitucion");
+		sql.SELECT("cliColegiado.idinstitucion AS idinstitucion");
 
 		sql.FROM("cen_persona per");
 
 		sql.LEFT_OUTER_JOIN("cen_nocolegiado col  ON per.idpersona = col.idpersona");
-		sql.LEFT_OUTER_JOIN("cen_institucion i ON col.idinstitucion = i.idinstitucion");
+		sql.LEFT_OUTER_JOIN("cen_cliente cliColegiado ON per.idpersona = cliColegiado.idpersona"); 
+		sql.LEFT_OUTER_JOIN("cen_institucion i ON cliColegiado.idinstitucion = i.idinstitucion");
 		sql.LEFT_OUTER_JOIN("cen_tiposociedad tiposociedad ON tiposociedad.letracif = col.tipo");
 		sql.LEFT_OUTER_JOIN(
 				"gen_recursos_catalogos ca ON ( tiposociedad.descripcion = ca.idrecurso  AND ca.idlenguaje = '"
 						+ idLenguaje + "' )");
 		sql.LEFT_OUTER_JOIN(
-				"cen_gruposcliente_cliente grupos_cliente ON (grupos_cliente.idinstitucion = i.idinstitucion AND col.idpersona = grupos_cliente.idpersona AND ( TO_DATE(grupos_cliente.fecha_inicio,'DD/MM/RRRR') <= SYSDATE    AND ( TO_DATE(grupos_cliente.fecha_baja,'DD/MM/RRRR') >= SYSDATE  OR grupos_cliente.fecha_baja IS NULL)))");
+				"cen_gruposcliente_cliente grupos_cliente ON (grupos_cliente.idinstitucion = col.idinstitucion AND col.idpersona = grupos_cliente.idpersona AND ( TO_DATE(grupos_cliente.fecha_inicio,'DD/MM/RRRR') <= SYSDATE    AND ( TO_DATE(grupos_cliente.fecha_baja,'DD/MM/RRRR') >= SYSDATE  OR grupos_cliente.fecha_baja IS NULL)))");
 		sql.LEFT_OUTER_JOIN(
 				"cen_componentes com ON ( com.idpersona = col.idpersona        AND col.idinstitucion = com.idinstitucion )");
 		sql.LEFT_OUTER_JOIN(
 				"cen_cliente cli ON ( com.cen_cliente_idpersona = cli.idpersona AND cli.idinstitucion = com.idinstitucion )");
+
 		sql.LEFT_OUTER_JOIN("cen_persona per2 ON per2.idpersona = cli.idpersona");
 
 		if (null != busquedaPerJuridicaSearchDTO.getIdInstitucion()
@@ -188,8 +195,8 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 				&& !busquedaPerJuridicaSearchDTO.getNif().equalsIgnoreCase("")) {
 			sql.WHERE("per.nifcif = '" + busquedaPerJuridicaSearchDTO.getNif() + "'");
 		}
-		sql.GROUP_BY("col.idinstitucion");
-		sql.GROUP_BY("col.idpersona");
+		sql.GROUP_BY("cliColegiado.idinstitucion");
+		sql.GROUP_BY("per.idpersona");
 		sql.GROUP_BY("per.nifcif");
 		sql.GROUP_BY("per.IDTIPOIDENTIFICACION");
 		sql.GROUP_BY("per.nombre");
