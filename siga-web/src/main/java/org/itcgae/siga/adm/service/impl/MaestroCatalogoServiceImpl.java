@@ -418,15 +418,6 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 						// comprueba codigoExt
 						if(catalogoCreate.getCodigoExt()!=null) {
 							catalogoMaestroItems1 = genTablasMaestrasExtendsMapper.selectCreateNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoCreate);
-							//compruebo que el codigo externo no existe y si existe, me salgo
-							if(catalogoMaestroItems1.size()>0)
-							{
-								response.setStatus(SigaConstants.KO);
-								Error error = new Error();
-								error.setMessage("Ya existe un registro con este código externo");
-								response.setError(error);	
-								return response;
-							}
 							if(catalogoCreate.getCodigoExt().length()>10) {
 								response.setStatus(SigaConstants.KO);
 								Error error = new Error();
