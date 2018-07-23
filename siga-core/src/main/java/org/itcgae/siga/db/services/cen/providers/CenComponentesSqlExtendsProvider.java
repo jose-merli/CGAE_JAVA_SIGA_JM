@@ -55,7 +55,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		if (!integrantesSearchDTO.getHistorico()) {
 			sql.WHERE("COMPONENTE.FECHABAJA is null");
 		}
-		if (UtilidadesString.esCadenaVacia(idInstitucion)) {
+		if (!UtilidadesString.esCadenaVacia(idInstitucion)) {
 			sql.WHERE("COMPONENTE.idinstitucion = '" + idInstitucion + "'");
 		}
 		
