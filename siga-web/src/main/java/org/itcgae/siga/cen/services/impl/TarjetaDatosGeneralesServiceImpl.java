@@ -116,7 +116,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				"loadPhotography() / genPropertiesMapper.selectByExample() -> Salida de genPropertiesMapper para obtener el directorio para la fotografia de la persona jurídica");
 
 		if (null != genProperties && genProperties.size() > 0) {
-			String path = genProperties.get(0).getValor() + "/";
+			String path = genProperties.get(0).getValor() + "/" + String.valueOf(idInstitucion) + "/";
 			pathFinal = pathFinal.concat(path);
 
 			// obtener el nombre del archivo de la fotografía
@@ -198,7 +198,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				"loadPhotography() / genPropertiesMapper.selectByExample() -> Salida de genPropertiesMapper para obtener directorio de la fotografía");
 		
 		if (null != properties && properties.size() > 0) {
-			String pathImagenes = properties.get(0).getValor() + "/";
+			String pathImagenes = properties.get(0).getValor() + "/" + String.valueOf(idInstitucion) + "/";
 
 			// Coger archivo del request
 			LOGGER.debug("uploadPhotography() -> Coger fotografía del request");
