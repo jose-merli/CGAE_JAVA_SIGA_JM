@@ -1,0 +1,5 @@
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.sociedades.titulo','Búsqueda de Sociedades','0','1',to_date('27/06/18','DD/MM/RR'),'1','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.sociedades.titulo','Cerca de Societats','0','2',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.sociedades.titulo','Búsqueda de Sociedades#EU','0','3',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.sociedades.titulo','Búsqueda de Sociedades#GL','0','4',to_date('10/03/04','DD/MM/RR'),'0','19');
