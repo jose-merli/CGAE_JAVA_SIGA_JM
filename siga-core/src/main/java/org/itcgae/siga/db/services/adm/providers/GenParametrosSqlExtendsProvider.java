@@ -80,7 +80,7 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 		sql.SELECT(" DICC.DESCRIPCION");
 		sql.FROM("gen_parametros param");
 		sql.INNER_JOIN(" gen_diccionario  DICC on PARAM.idrecurso = DICC.IDRECURSO");
-		sql.WHERE("IDINSTITUCION IN ('" + parametroRequestDTO.getIdInstitucion() + "','0')");
+		sql.WHERE("IDINSTITUCION IN ('" + parametroRequestDTO.getIdInstitucion() + "','0', '2000')");
 		sql.WHERE("MODULO = '" + parametroRequestDTO.getModulo() + "'");
 		 sql.WHERE("DICC.IDLENGUAJE = '"+idLenguaje+"'");
 		sql.GROUP_BY("param.modulo, param.parametro,FECHA_BAJA, DICC.DESCRIPCION");

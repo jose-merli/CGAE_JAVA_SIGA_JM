@@ -141,25 +141,30 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		
 				} catch (FileNotFoundException e) {
 					LOGGER.error("No se ha encontrado el fichero", e);
+					comboItem = null;
 		
 				} catch (IOException e1) {
 					LOGGER.error("No se han podido escribir los datos binarios de la imagen en la respuesta HttpServletResponse", e1);
+					comboItem = null;
 				} finally {
 					if (null != fis)
 						try {
 							fis.close();
 						} catch (IOException e) {
 							LOGGER.error("No se ha cerrado el archivo correctamente", e);
+							comboItem = null;
 						}
 				}
 				
 			} else {
 				LOGGER.warn("loadPhotography() / cenPersonaExtendsMapper.loadPhotography() -> . No se ha podido obtener el nombre del archivo de la fotografía: " + pathFinal);
+				comboItem = null;
 
 			}
 
 		} else {
 			LOGGER.warn("loadPhotography() / genPropertiesMapper.selectByExample() -> No se ha podido obtener el directorio para la fotografia de la persona jurídica");
+			comboItem = null;
 		}
 		
 		LOGGER.info("loadPhotography() -> Salida del servicio para cargar de una ruta la fotografía de una persona jurídica");
