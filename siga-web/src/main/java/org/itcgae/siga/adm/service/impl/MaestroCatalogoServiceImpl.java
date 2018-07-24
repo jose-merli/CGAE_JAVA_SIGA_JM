@@ -416,7 +416,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 						catalogoCreate.setIdLenguaje(usuario.getIdlenguaje());
 								
 						// comprueba codigoExt
-						if(catalogoCreate.getCodigoExt()!=null) {
+						if(catalogoCreate.getCodigoExt()!=null || catalogoCreate.getCodigoExt()!="") {
 							catalogoMaestroItems1 = genTablasMaestrasExtendsMapper.selectCreateNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoCreate);
 							if(catalogoCreate.getCodigoExt().length()>10) {
 								response.setStatus(SigaConstants.KO);
