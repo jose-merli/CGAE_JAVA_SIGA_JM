@@ -373,18 +373,35 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 			List<GenTablasMaestras> tablasMaestras = genTablasMaestrasExtendsMapper.selectByExample(exampleTablasMaestras);
 			LOGGER.info("createDatosCatalogo() / genTablasMaestrasExtendsMapper.selectByExample() -> Salida de genTablasMaestrasExtendsMapper para tabla maestra de un catálogo");
 			
+			AdmUsuariosExample exampleUsuarios1 = new AdmUsuariosExample();
+			exampleUsuarios1.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(catalogoCreate.getIdInstitucion()));
+			List<AdmUsuarios> usuarios1 = admUsuariosMapper.selectByExample(exampleUsuarios1);
+			
 			if (null != tablasMaestras && tablasMaestras.size() > 0) {
 					GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
-					
+					AdmUsuarios usuario1 = usuarios1.get(0);
+
 					//Obtenemos el recurso para ver si ya existe
 					GenRecursosCatalogosExample exampleRecursos = new GenRecursosCatalogosExample();
 					exampleRecursos.createCriteria().andDescripcionEqualTo(catalogoCreate.getDescripcion()).andNombretablaEqualTo(tablaMaestra.getIdtablamaestra()).andIdinstitucionEqualTo(Short.valueOf(catalogoCreate.getIdInstitucion()));
-					LOGGER.info("createDatosCatalogo() / genRecursosCatalogosMapper.selectByExample() -> Entrada a genRecursosCatalogosMapper para obtener institución de la columna de una tabla maestra");
 					List<GenRecursosCatalogos> recursos = genRecursosCatalogosMapper.selectByExample(exampleRecursos);
-					LOGGER.info("createDatosCatalogo() / genRecursosCatalogosMapper.selectByExample() -> Entrada a genRecursosCatalogosMapper para obtener institución de la columna de una tabla maestra");
-					
 				
-					
+					// comprueba codigoExt
+					String descripcion = catalogoCreate.getDescripcion();
+					catalogoCreate.setDescripcion("");
+					catalogoCreate.idLenguaje(usuario1.getIdlenguaje());
+//					catalogoCreate.setIdLenguaje(usuario1.getIdlenguaje());
+					catalogoMaestroItems1 = genTablasMaestrasExtendsMapper.selectCreateNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoCreate);
+					catalogoCreate.setDescripcion(descripcion);
+
+					if(catalogoMaestroItems1.size() != 0 && catalogoCreate.getCodigoExt()!=""){
+						response.setStatus(SigaConstants.KO);
+						Error error = new Error();
+						error.setMessage("Ya existe un registro con este código externo");
+						response.setError(error);	
+						return response;
+					}
+										
 					if (null != recursos && recursos.size() > 0) {
 						Error error = new Error();
 						error.setMessage("Ya existe un registro para esa descripción");
@@ -393,8 +410,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 						LOGGER.warn("deleteDatosCatalogo() -> KO. Ya existe un registro para esa descripción");
 						return response;
 					}
-					
-				
+									
 					
 					LOGGER.info("createDatosCatalogo() / genTablasMaestrasExtendsMapper.selectColumnName() -> Entrada a genTablasMaestrasExtendsMapper para obtener institución de la columna de una tabla maestra");
 					InstitucionDTO idInstitucion = genTablasMaestrasExtendsMapper.selectColumnName(tablaMaestra);
@@ -416,7 +432,7 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 						catalogoCreate.setIdLenguaje(usuario.getIdlenguaje());
 								
 						// comprueba codigoExt
-						if(catalogoCreate.getCodigoExt()!=null) {
+						if(catalogoCreate.getCodigoExt()!=null || catalogoCreate.getCodigoExt()!="") {
 							catalogoMaestroItems1 = genTablasMaestrasExtendsMapper.selectCreateNoRepetidosCodigoExtyDescripcion(tablaMaestra,catalogoCreate);
 							if(catalogoCreate.getCodigoExt().length()>10) {
 								response.setStatus(SigaConstants.KO);
