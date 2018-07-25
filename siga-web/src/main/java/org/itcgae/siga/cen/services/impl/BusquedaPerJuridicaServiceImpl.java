@@ -12,16 +12,20 @@ import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDeleteDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.ParametroColegioDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IBusquedaPerJuridicaService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
@@ -49,6 +53,9 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 	
 	@Autowired
 	private CenGruposclienteClienteExtendsMapper cenGruposclienteClienteExtendsMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 	
 	@Override
 	public ComboDTO getSocietyTypes(HttpServletRequest request) {
@@ -324,6 +331,38 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 		comboDTO.setCombooItems(comboItems);
 		LOGGER.info("getLabelPerson() -> Salida del servicio para obtener etiquetas de una persona jurídica");
 		return comboDTO;
+	}
+
+
+	@Override
+	public ParametroColegioDTO searchParametroColegio(StringDTO stringDTO, HttpServletRequest request) {
+		
+		ParametroColegioDTO parametroColegioDTO = new ParametroColegioDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+				
+		// obtenemos un parámetro general necesario para ocultar/mostrar la auditoria
+		String parametro = stringDTO.getValor();
+		//String parametro = "OCULTAR_MOTIVO_MODIFICACION";
+		
+		LOGGER.info(
+				"searchParametroColegio() / genParametrosExtendsMapper.selectParametroPorInstitucion() -> Entrada a genParametrosExtendsMapper para obtener un parámetro de un colegio");
+		
+		stringDTO = genParametrosExtendsMapper.selectParametroPorInstitucion(parametro, String.valueOf(idInstitucion));
+		LOGGER.info(
+				"searchParametroColegio() / genParametrosExtendsMapper.selectParametroPorInstitucion() -> Salida de genParametrosExtendsMapper para obtener un parámetro de un colegio");
+		
+		
+		if(UtilidadesString.esCadenaVacia(stringDTO.getValor())) {
+			parametroColegioDTO.setError(new Error("no hay valor para el parametro especificado"));
+		}
+		
+		parametroColegioDTO.setParametro(stringDTO.getValor());
+		
+		
+		return parametroColegioDTO;
 	}
 
 

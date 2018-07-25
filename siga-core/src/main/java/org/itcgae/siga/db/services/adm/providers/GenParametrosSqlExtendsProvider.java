@@ -88,4 +88,22 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 		return sql.toString();
 	}
 	
+	public String selectParametroPorInstitucion(String parametro, String idInstitucion) {
+		SQL sql = new  SQL();
+		SQL sql2 = new SQL();
+		
+		sql.SELECT("valor as valor");
+		sql.FROM("gen_parametros");
+		sql.WHERE("parametro = '" + parametro +"'");
+		
+		sql2.SELECT("MAX(idinstitucion)");
+		sql2.FROM("gen_parametros");
+		sql2.WHERE("parametro = '"+ parametro +"'");
+		sql2.WHERE("idinstitucion IN ('"+ idInstitucion +"', '0')");
+		
+		sql.WHERE("idinstitucion = (" + sql2 + ")");
+		
+		return sql.toString();
+	}
+	
 }

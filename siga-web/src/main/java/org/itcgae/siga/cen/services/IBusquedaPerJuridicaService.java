@@ -6,7 +6,9 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDeleteDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.ParametroColegioDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface IBusquedaPerJuridicaService {
@@ -22,4 +24,6 @@ public interface IBusquedaPerJuridicaService {
 	public DeleteResponseDTO deleteNotCollegiate(BusquedaJuridicaDeleteDTO busquedaJuridicaDeleteDTO, HttpServletRequest request);
 	
 	public ComboDTO getLabelPerson(PersonaJuridicaSearchDTO personaJuridicaSearchDTO,HttpServletRequest request);
+	
+	public ParametroColegioDTO searchParametroColegio(StringDTO stringDTO, HttpServletRequest request);
 }

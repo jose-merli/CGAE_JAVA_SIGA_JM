@@ -90,7 +90,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		
 	@Autowired
 	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
-	
+		
 	
 	@Override
 	public ComboItem loadPhotography(EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request, HttpServletResponse response) {
@@ -334,6 +334,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				personaJuridicaItems = cenNocolegiadoExtendsMapper.searchGeneralData(personaJuridicaSearchDTO);
 				LOGGER.info(
 						"searchGeneralData() / cenNocolegiadoExtendsMapper.searchGeneralData() -> Salida de cenNocolegiadoExtendsMapper para informacion de persona jurídica por filtro");
+				
 				
 				personaJuridicaDTO.setPersonaJuridicaItems(personaJuridicaItems);
 				

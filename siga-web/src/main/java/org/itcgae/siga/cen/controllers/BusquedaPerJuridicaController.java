@@ -6,7 +6,9 @@ import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDeleteDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.ParametroColegioDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.IBusquedaPerJuridicaService;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -69,6 +71,14 @@ public class BusquedaPerJuridicaController {
 		if(response.getStatus().equals(SigaConstants.OK))
 		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	
+	
+	@RequestMapping(value = "busquedaPerJuridica/parametroColegio", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ParametroColegioDTO> searchParametroColegio(@RequestBody StringDTO stringDTO, HttpServletRequest request) { 
+		ParametroColegioDTO response = busquedaPerJuridicaService.searchParametroColegio(stringDTO, request);
+		return new ResponseEntity<ParametroColegioDTO>(response, HttpStatus.OK);
 	}
 	
 	

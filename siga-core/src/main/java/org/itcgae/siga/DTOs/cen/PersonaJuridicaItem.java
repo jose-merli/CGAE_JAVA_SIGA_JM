@@ -1,9 +1,7 @@
 package org.itcgae.siga.DTOs.cen;
 
-import java.util.Date;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
@@ -26,9 +24,7 @@ public class PersonaJuridicaItem {
 	private String sociedadProfesional;
 	private String idLenguajeSociedad;
 	private String cuentaContable;
-	
-	
-	
+
 	
 
 	/**
@@ -274,6 +270,9 @@ public class PersonaJuridicaItem {
 		this.cuentaContable = cuentaContable;
 	}
 	
+	
+
+	
 		
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -326,7 +325,7 @@ public class PersonaJuridicaItem {
 	    sb.append("    IDGrupos: ").append(toIndentedString(IDGrupos)).append("\n");
 	    sb.append("    sociedadProfesional: ").append(toIndentedString(sociedadProfesional)).append("\n");
 	    sb.append("    idLenguajeSociedad: ").append(toIndentedString(idLenguajeSociedad)).append("\n"); 
-	    sb.append("    cuentaContable: ").append(toIndentedString(cuentaContable)).append("\n"); 
+	    sb.append("    cuentaContable: ").append(toIndentedString(cuentaContable)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}

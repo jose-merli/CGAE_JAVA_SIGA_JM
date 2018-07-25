@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.adm.ParametroItem;
 import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.providers.GenParametrosSqlExtendsProvider;
@@ -62,5 +63,14 @@ public interface GenParametrosExtendsMapper extends GenParametrosMapper{
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ParametroItem> getParametersSearchGeneral(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje);
+	
+	
+	
+	@SelectProvider(type = GenParametrosSqlExtendsProvider.class, method = "selectParametroPorInstitucion")
+	@Results({
+		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.VARCHAR)	
+	})
+	StringDTO selectParametroPorInstitucion(String parametro, String idInstitucion);
+	
 	
 }
