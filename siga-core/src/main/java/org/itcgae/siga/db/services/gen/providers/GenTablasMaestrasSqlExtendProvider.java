@@ -4,6 +4,8 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.CatalogoDeleteDTO;
 import org.itcgae.siga.DTOs.adm.CatalogoRequestDTO;
 import org.itcgae.siga.DTOs.adm.CatalogoUpdateDTO;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.GenTablasMaestras;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -271,7 +273,12 @@ public class GenTablasMaestrasSqlExtendProvider {
 		
 		sql.FROM(tablaMaestra.getIdtablamaestra() + " TAB" );
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON(REC.IDRECURSO = " + " TAB." + tablaMaestra.getIdcampodescripcion() +") ");
-		sql.WHERE(" REC.idinstitucion = '" + catalogoUpdate.getIdInstitucion() + "'");
+		if (!UtilidadesString.esCadenaVacia(catalogoUpdate.getIdInstitucion())) {
+			if (!catalogoUpdate.getIdInstitucion().equals(SigaConstants.InstitucionGeneral)) {
+				sql.WHERE(" REC.idinstitucion = '" + catalogoUpdate.getIdInstitucion() + "'");
+			}
+			
+		}
 		sql.WHERE(" TAB.FECHA_BAJA is null ");
 		sql.WHERE("REC.idlenguaje = '"+ catalogoUpdate.getIdLenguaje() +"'");
 		
@@ -309,7 +316,13 @@ public class GenTablasMaestrasSqlExtendProvider {
 		
 		sql.FROM(tablaMaestra.getIdtablamaestra() + " TAB" );
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON(REC.IDRECURSO = " + " TAB." + tablaMaestra.getIdcampodescripcion() +") ");
-		sql.WHERE(" REC.idinstitucion = '" + catalogoUpdate.getIdInstitucion() + "'");
+		if (!UtilidadesString.esCadenaVacia(catalogoUpdate.getIdInstitucion())) {
+			if (!catalogoUpdate.getIdInstitucion().equals(SigaConstants.InstitucionGeneral)) {
+				sql.WHERE(" REC.idinstitucion = '" + catalogoUpdate.getIdInstitucion() + "'");
+			}
+			
+		}
+
 		sql.WHERE(" TAB.FECHA_BAJA is null ");
 		sql.WHERE("REC.idlenguaje = '"+ catalogoUpdate.getIdLenguaje() +"'");
 		
