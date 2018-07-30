@@ -25,7 +25,7 @@ public interface CenGruposclienteClienteExtendsMapper extends CenGruposclienteCl
 	
 	@SelectProvider(type = CenGruposclienteClienteSqlExtendsProvider.class, method = "selectGruposPersonaJuridica")
 	@Results({
-		@Result(column = "IDGRUPO", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDGRUPO", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> selectGruposPersonaJuridica(String idPersona, String idInstitucion);

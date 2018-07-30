@@ -33,11 +33,14 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		SQL sql = new SQL();
 		
 		sql.SELECT("cli.idgrupo");
+		sql.SELECT("GENR.descripcion");
 		sql.FROM("CEN_GRUPOSCLIENTE_CLIENTE cli");
 		sql.INNER_JOIN("cen_persona per on cli.idpersona = per.idpersona");
+		sql.INNER_JOIN("CEN_GRUPOSCLIENTE GRUCLI on cli.idGrupo = GRUCLI.idGrupo");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO AND GENR.idLenguaje = '1'");
 		sql.WHERE("per.idpersona = '"+idPersona+"'");
 		sql.WHERE("cli.FECHA_BAJA is null");
-		sql.WHERE("idinstitucion = '"+idInstitucion+"'");
+		sql.WHERE("GRUCLI.idinstitucion = '"+idInstitucion+"'");
 		
 		return sql.toString();
 	}
