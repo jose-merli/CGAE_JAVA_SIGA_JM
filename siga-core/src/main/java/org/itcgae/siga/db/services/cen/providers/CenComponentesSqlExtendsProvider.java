@@ -161,9 +161,6 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		}
 		
 		
-		
-		sql.VALUES("FECHABAJA", "null");
-		
 		return sql.toString();
 	}
 	
