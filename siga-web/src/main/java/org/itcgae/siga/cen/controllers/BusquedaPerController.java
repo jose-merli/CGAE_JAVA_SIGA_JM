@@ -42,5 +42,6 @@ public class BusquedaPerController {
 		BusquedaPerFisicaDTO response = busquedaPerService.searchPerFisica(numPagina, busquedaPerJuridicaSearchDTO, request);
 		return new ResponseEntity<BusquedaPerFisicaDTO>(response, HttpStatus.OK);
 	} 
+	//
 	
 }
