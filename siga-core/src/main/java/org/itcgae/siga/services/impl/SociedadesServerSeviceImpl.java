@@ -81,11 +81,11 @@ public class SociedadesServerSeviceImpl implements ISociedadesServerSevice {
 
 			// Creamos la carga comprobando que no exista ya, y si existe recuperamos la
 			// existente
-			carga = obtenerCarga(peticion, idInstitucion, respuesta);
+			//carga = obtenerCarga(peticion, idInstitucion, respuesta);
 
 			// Creamos la pagina comprobando que no existe ya y si existe devolvemos error
 			// construyendo la respuesta
-			pagina = insertaPagina(carga.getIdCarga(), idDatosXml, peticion, respuesta);
+			//pagina = insertaPagina(carga.getIdCarga(), idDatosXml, peticion, respuesta);
 			
 			log.info("Valida la peticion");
 
@@ -111,10 +111,13 @@ public class SociedadesServerSeviceImpl implements ISociedadesServerSevice {
 		respuesta.setNumeroPeticion(peticion.getNumeroPeticion());
 		respuesta.setColegio(peticion.getColegio());
 		respuesta.setNumPagina(peticion.getNumPagina());
-
-
 		respuesta.setRegistroSociedadArray(respuestaCarga);
-
+		if(respuestaCarga != null){
+			respuesta.setNumTotalPaginas((short)respuestaCarga.length);
+		}else{
+			respuesta.setNumTotalPaginas((short)1);
+		}
+		
 		try {
 
 			WSCommons.guardarXML(respuestaDocument.xmlText(), idDatosXml,

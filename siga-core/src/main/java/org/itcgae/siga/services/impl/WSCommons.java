@@ -381,7 +381,7 @@ public class WSCommons {
 	public static short createShortFromBoolean(boolean bool) {
 		return (short) (bool ? 1 : 0);
 	}
-	@Transactional
+	
 	public RegistroSociedad[] cargarSociedades(GetListaSociedadesRequest peticion, Long idWsPagina, Short idInstitucion) {
 
 		//Nos disponemos a consultar los datos de las sociedades que han sufrido modificacion
@@ -391,7 +391,7 @@ public class WSCommons {
 			//List<NewIdDTO> idPersonas = cenNoColegiado.selectSociedadesEditadas(idInstitucion,peticion.getFechaDesde(),peticion.getFechaHasta());
 			
 			tamanoPaginacion = peticion.getNumElementosPagina();
-			List<SociedadesBajaDTO> sociedadesEnBaja = cenNoColegiado.selectSociedadesEliminadas(idInstitucion,new Date(),new Date());
+			List<SociedadesBajaDTO> sociedadesEnBaja = cenNoColegiado.selectSociedadesEliminadas(idInstitucion,peticion.getFechaDesde().getTime(),peticion.getFechaHasta().getTime());
 			
 			List<SociedadesBajaDTO> sociedadesResult = new ArrayList<>();
 			
