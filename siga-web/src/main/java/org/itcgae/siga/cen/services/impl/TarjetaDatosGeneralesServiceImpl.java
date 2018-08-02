@@ -651,8 +651,8 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				List<String> gruposPerJuridicaAnterior = new ArrayList<String>();
 				
 				for(int i = 0; i< gruposPersonaJuridica.size();i++) {
-					gruposPerJuridicaAntiguos.add(gruposPersonaJuridica.get(i).getLabel());
-					gruposPerJuridicaAnterior.add(gruposPersonaJuridica.get(i).getLabel());
+					gruposPerJuridicaAntiguos.add(gruposPersonaJuridica.get(i).getValue());
+					gruposPerJuridicaAnterior.add(gruposPersonaJuridica.get(i).getValue());
 				}
 				
 				// 2. actualizar relaciones entre tablas para todos los grupos (eliminado y creación)
