@@ -88,11 +88,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.SET("IDCARGO = '" + tarjetaIntegrantesUpdateDTO.getIdCargo() + "'");
 		}
 		
-		
 		sql.SET("CAPITALSOCIAL = '" + tarjetaIntegrantesUpdateDTO.getCapitalSocial() + "'");
-		
-
-		
 		sql.SET("FECHAMODIFICACION = SYSDATE");
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario()+ "'");
 		
