@@ -68,7 +68,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class WSCommons {
@@ -450,9 +449,9 @@ public class WSCommons {
 						formaSocial.setStringValue(regSociedad.getSociedadFormaSocial());
 						argSociedad.setFormaSocial(formaSocial );
 						sociedadActualizacion.setDatosSociedad(argSociedad);
-					/*	Direccion argDireccion;
-						argDireccion.set
-						sociedadActualizacion.setDireccion(argDireccion);*/
+						Direccion argDireccion = Direccion.Factory.newInstance();
+						//TODO DIRECCION
+						sociedadActualizacion.setDireccion(argDireccion);
 						sociedadActualizacion.setFechaAlta(UtilidadesString.toCalendar(regSociedad.getSociedadFechaAlta()));
 						sociedadActualizacion.setFechaConstitucion(UtilidadesString.toCalendar(regSociedad.getFechaConstitucion()));
 
