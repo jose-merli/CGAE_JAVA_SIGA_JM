@@ -38,6 +38,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPoblacionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTipoDireccionExtendsMapper;
 import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -76,6 +77,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	@Autowired
 	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
 	
+	@Autowired
+	private CenPoblacionesExtendsMapper cenPoblacionesExtendsMapper;
+		
 	@Override
 	public DatosDireccionesDTO datosDireccionesSearch(int numPagina, DatosDireccionesSearchDTO datosDireccionesSearchDTO,	HttpServletRequest request) {
 		LOGGER.info("searchBanksData() -> Entrada al servicio para la búsqueda por filtros de direcciones");
@@ -233,28 +237,30 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	public ComboDTO getPoblacion(HttpServletRequest request, String idProvincia) {
 		 
 		ComboDTO poblacionesReturn = new ComboDTO();
+		List<ComboItem> poblaciones = new ArrayList<ComboItem>();
 		
 		CenPoblacionesExample example  = new CenPoblacionesExample();
 		example.createCriteria().andIdprovinciaEqualTo(idProvincia);
 		example.setOrderByClause("NOMBRE");
-		List<CenPoblaciones> poblaciones = cenPoblacionesMapper.selectByExample(example  );
-		if (null != poblaciones && poblaciones.size()>0) {
-			List<ComboItem> combooItems = new ArrayList<ComboItem>();
-			ComboItem comboItem = new ComboItem();
-			comboItem.setLabel("");
-			comboItem.setValue("");
-			combooItems.add(comboItem);
-
-			for (CenPoblaciones cenPoblaciones : poblaciones) {
-				comboItem = new ComboItem();
-				comboItem.setLabel(cenPoblaciones.getNombre());
-				comboItem.setValue(cenPoblaciones.getIdpoblacion());
-				combooItems.add(comboItem);
-			}
+		poblaciones = cenPoblacionesExtendsMapper.getComboPoblaciones(idProvincia);
+//		if (null != poblaciones && poblaciones.size()>0) {
+//			List<ComboItem> combooItems = new ArrayList<ComboItem>();
+//			ComboItem comboItem = new ComboItem();
+//			comboItem.setLabel("");
+//			comboItem.setValue("");
+//			combooItems.add(comboItem);
+//
+//			for (CenPoblaciones cenPoblaciones : poblaciones) {
+//				comboItem = new ComboItem();
+//				comboItem.setLabel(cenPoblaciones.getNombre());
+//				comboItem.setValue(cenPoblaciones.getIdpoblacion());
+//				combooItems.add(comboItem);
+//			}
+//		
+//			poblacionesReturn.setCombooItems(combooItems);
+//		}
 		
-			poblacionesReturn.setCombooItems(combooItems);
-		}
-		
+		poblacionesReturn.setCombooItems(poblaciones);
 		
 		return poblacionesReturn;
 	}
