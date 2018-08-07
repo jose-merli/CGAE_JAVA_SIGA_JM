@@ -2,8 +2,11 @@ package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -221,6 +224,18 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					element.setLabel("");
 					element.setValue("");
 					comboItems.add(0, element);
+					
+					// busqueda binaria de España
+					List<String> listaPaises = comboItems.stream().map(object -> Objects.toString(object.getLabel(), null)).collect(Collectors.toList());
+					int indexSpain = Collections.binarySearch(listaPaises, "ESPAÑA");
+					ComboItem elementSpain = new ComboItem();
+					elementSpain.setLabel(comboItems.get(indexSpain).getLabel());
+					elementSpain.setValue(comboItems.get(indexSpain).getValue());
+					comboItems.add(1, elementSpain);
+					
+					// eliminamos españa del indice anterior
+					comboItems.remove(indexSpain+1);
+					
 				}		
 				
 				comboDTO.setCombooItems(comboItems);
