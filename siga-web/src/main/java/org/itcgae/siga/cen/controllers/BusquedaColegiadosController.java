@@ -27,13 +27,13 @@ public class BusquedaColegiadosController {
 	private ITarjetaDatosIntegrantesService tarjetaDatosIntegrantesService;
 	
 	// Faltan combos: Subtipo curriculares (pendiente de analisis)
-	@RequestMapping(value = "/busquedaColegiados/estadoCivil",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "busquedaColegiados/estadoCivil",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getCivilStatus(HttpServletRequest request) {
 		ComboDTO response = busquedaColegiadosService.getCivilStatus(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/busquedaColegiados/situacion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "busquedaColegiados/situacion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getSituacion(HttpServletRequest request) {
 		ComboDTO response = busquedaColegiadosService.getSituacion(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);

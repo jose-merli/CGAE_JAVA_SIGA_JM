@@ -65,6 +65,11 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 				LOGGER.info(
 						"getCivilStatus() / cenEstadocivilExtendsMapper.distinctCivilStatus() -> Salida de cenEstadocivilExtendsMapper para obtener los diferentes tipos de estados civiles");
 				
+				ComboItem comboItem = new ComboItem();
+				comboItem.setLabel("");
+				comboItem.setValue("");
+				comboItems.add(0, comboItem);
+				
 			}
 		}
 		
@@ -105,6 +110,11 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 				LOGGER.info(
 						"getSituacion() / cenEstadocivilExtendsMapper.distinctCivilStatus() -> Salida de cenEstadocivilExtendsMapper para obtener los diferentes tipos de situacion de un colegiado");
 				
+				ComboItem comboItem = new ComboItem();
+				comboItem.setLabel("");
+				comboItem.setValue("");
+				comboItems.add(0, comboItem);
+				
 			}
 		}
 		
@@ -144,6 +154,11 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 				comboItems = cenTiposcvExtendsMapper.selectCategoriaCV(usuario.getIdlenguaje());
 				LOGGER.info(
 						"getCVCategory() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Salida de cenTiposcvExtendsMapper para obtener los diferentes tipos de categorías curriculares");
+				
+				ComboItem comboItem = new ComboItem();
+				comboItem.setLabel("");
+				comboItem.setValue("");
+				comboItems.add(0, comboItem);
 				
 			}
 		}

@@ -14,6 +14,7 @@ public class CenEstadocolegialSqlExtendsProvider extends CenEstadocolegialSqlPro
 		sql.FROM("CEN_ESTADOCOLEGIAL EST");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON EST.DESCRIPCION = CAT.IDRECURSO");
 		sql.WHERE("CAT.IDLENGUAJE = '" + idLenguaje + "'");
+		sql.ORDER_BY("CAT.DESCRIPCION");
 		
 		return sql.toString();
 	}
