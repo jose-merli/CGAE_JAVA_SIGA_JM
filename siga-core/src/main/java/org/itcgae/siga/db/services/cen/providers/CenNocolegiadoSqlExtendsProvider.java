@@ -135,6 +135,22 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
 		
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		String grupos = "";
+		
+		
+		if(busquedaJuridicaSearchDTO.getGrupos().length > 1) {
+			for (String string : busquedaJuridicaSearchDTO.getGrupos()) {
+				grupos += string;
+				grupos += ",";
+			}
+			grupos = grupos.substring(0,grupos.length()-1);
+		}
+		else if(busquedaJuridicaSearchDTO.getGrupos().length == 1){
+			grupos = busquedaJuridicaSearchDTO.getGrupos()[0];
+		}
+		
 		sql2.SELECT("DISTINCT COL.IDPERSONA AS IDPERSONA");
 		sql2.SELECT("PER.NIFCIF AS NIF");
 		sql2.SELECT("PER.NOMBRE  AS DENOMINACION");
@@ -162,8 +178,38 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		if(null != idInstitucion) {
 			sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
 		}
+
+		if(null != idInstitucion) {
+			sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
+		}
 		
-		sql2.WHERE("COL.TIPO IN('A','B','C','D','E','F','G','H','J','P','Q','R','S','U','V')");
+		
+		if(null != busquedaJuridicaSearchDTO.getNif() && !busquedaJuridicaSearchDTO.getNif().equalsIgnoreCase("")) {
+			sql2.WHERE("(UPPER(PER.NIFCIF) LIKE UPPER  ('%" + busquedaJuridicaSearchDTO.getNif() + "%'))");
+
+		}
+		
+		if(!grupos.equalsIgnoreCase("")) {
+			sql2.WHERE("GRUPOS_CLIENTE.IDGRUPO IN ("+ grupos +")");
+		}
+		
+		if(null != busquedaJuridicaSearchDTO.getFechaConstitucion() && !busquedaJuridicaSearchDTO.getFechaConstitucion().equals("")) {
+			String fechaC = dateFormat.format(busquedaJuridicaSearchDTO.getFechaConstitucion());
+			sql2.WHERE("PER.FECHANACIMIENTO = TO_DATE('" + fechaC + "', 'DD/MM/YYYY')");
+		}
+		
+		if(busquedaJuridicaSearchDTO.getSociedadesProfesionales()) {
+			sql2.WHERE("COL.SOCIEDADPROFESIONAL = '1'");
+		}
+		
+		
+		if(null != busquedaJuridicaSearchDTO.getTipo() && !busquedaJuridicaSearchDTO.getTipo().equalsIgnoreCase("")) {
+			sql2.WHERE("COL.TIPO = '" + busquedaJuridicaSearchDTO.getTipo() + "'");
+		}
+		else {
+			sql2.WHERE("COL.TIPO IN('A','B','C','D','E','F','G','H','J','P','Q','R','S','U','V')");
+		}
+		
 		
 		sql2.GROUP_BY("COL.IDINSTITUCION");
 		sql2.GROUP_BY("COL.IDPERSONA");
@@ -180,6 +226,20 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		// meter subconsulta de objeto sql2 en objeto sql
 		sql.SELECT("CONSULTA.*");
 		sql.FROM( "(" + sql2 + ") consulta");
+		
+
+		if (!UtilidadesString.esCadenaVacia(busquedaJuridicaSearchDTO.getDenominacion())) {
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.DENOMINACION", busquedaJuridicaSearchDTO.getDenominacion()));
+		}
+		
+		if (!UtilidadesString.esCadenaVacia(busquedaJuridicaSearchDTO.getIntegrante())) {
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.NOMBRESINTEGRANTES", busquedaJuridicaSearchDTO.getIntegrante()));
+		}
+		
+		if (!UtilidadesString.esCadenaVacia(busquedaJuridicaSearchDTO.getAbreviatura())) {
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.ABREVIATURA", busquedaJuridicaSearchDTO.getAbreviatura()));
+		}
+		
 		
 		return sql.toString();
 	}
