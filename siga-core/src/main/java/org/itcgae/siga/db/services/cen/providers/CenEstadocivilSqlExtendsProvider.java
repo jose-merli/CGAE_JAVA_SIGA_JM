@@ -15,6 +15,7 @@ public class CenEstadocivilSqlExtendsProvider extends CenEstadocivilSqlProvider{
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON CIV.DESCRIPCION = CAT.IDRECURSO");
 		sql.WHERE("CAT.IDLENGUAJE = '" + idLenguaje + "'");
 		sql.WHERE("CIV.FECHA_BAJA IS NULL");
+		sql.ORDER_BY("CAT.DESCRIPCION");
 		
 		return sql.toString();
 	}
