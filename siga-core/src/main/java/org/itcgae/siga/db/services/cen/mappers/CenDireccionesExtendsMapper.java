@@ -49,7 +49,9 @@ public interface CenDireccionesExtendsMapper extends CenDireccionesMapper {
 		@Result(column = "IDEXTERNOPOBLACION", property = "idExternoPoblacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREPOBLACION", property = "nombrePoblacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDEXTERNOPROVINCIA", property = "idExternoProvincia", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBREPROVINCIA", property = "nombreProvincia", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "NOMBREPROVINCIA", property = "nombreProvincia", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "POBLACIONEXTRANJERA", property = "poblacionExtranjera", jdbcType = JdbcType.VARCHAR),
+
 	})
 	List<DatosDireccionesItem> selectDireccionesWs(String idPersona);
 
@@ -100,6 +102,8 @@ public interface CenDireccionesExtendsMapper extends CenDireccionesMapper {
 		@Result(column = "IDEXTERNOPROVINCIA", property = "idExternoProvincia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREPROVINCIA", property = "nombreProvincia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "POBLACIONEXTRANJERA", property = "poblacionExtranjera", jdbcType = JdbcType.VARCHAR)
+
 	})
 	List<DatosDireccionesItem> selectDirecciones(DatosDireccionesSearchDTO datosDireccionesSearchDTO,	String idInstitucion);
 

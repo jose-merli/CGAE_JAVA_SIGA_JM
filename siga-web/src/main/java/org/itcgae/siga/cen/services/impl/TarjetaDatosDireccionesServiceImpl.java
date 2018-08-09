@@ -386,6 +386,10 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
 				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
+				if(datosDireccionesItem.getPoblacionExtranjera()!= "" &&  datosDireccionesItem.getPoblacionExtranjera() != null) {
+					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
+				}
+
 
 				
 				CenDireccionTipodireccionExample tipoDireccionexample =  new CenDireccionTipodireccionExample();
@@ -436,6 +440,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							TipoDireccionrecord.setIdtipodireccion(Short.valueOf(idTipoDireccionInsertar));
 							TipoDireccionrecord.setFechamodificacion(new Date());
 							TipoDireccionrecord.setUsumodificacion(usuario.getIdusuario());
+							
 							//insertamos los nuevos tipos de direccion asociados a la direccion
 							LOGGER.info(
 									"updateDirection() / cenDireccionTipodireccionMapper.insert() -> Entrada a cenDireccionTipodireccionMapper para insertar tiposdedirecciones");
@@ -578,7 +583,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
 				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
-
+				if(datosDireccionesItem.getPoblacionExtranjera()!= "" &&  datosDireccionesItem.getPoblacionExtranjera() != null) {
+					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
+				}				
 				LOGGER.info(
 						"createDirection() / cenDireccionesExtendsMapper.insert() -> Entrada a cenDireccionesExtendsMapper para insertar direcciones");
 				response = cenDireccionesExtendsMapper.insert(direcciones);
