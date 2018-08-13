@@ -89,58 +89,73 @@ public class SigaUserDetailsService implements UserDetailsService {
 			
 			List<String> idperfiles = new ArrayList<String>();
 			
-			AdmPerfilExample examplePerfil = new AdmPerfilExample();
 			
-			examplePerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(grupo);
-			List<AdmPerfil> perfilesPuertaAtras = perfilMapper.selectByExample(examplePerfil );
 			
-			if(null != perfilesPuertaAtras && perfilesPuertaAtras.size()>0) {
-				/*
-				 * Tratamos solo el grupo seleccionado en el combo
-				 */
-				for (AdmPerfil perfil : perfilesPuertaAtras) {
-					idperfiles.add("'" + perfil.getIdperfil() + "'");
-				}
-			}else {
-				AdmRolExample exampleRol = new AdmRolExample();
-				exampleRol.createCriteria().andDescripcionEqualTo(grupo);
-				List<AdmRol> roles = admRol.selectByExample(exampleRol );
-				if (null!= roles && roles.size()>0) {
-					AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
-					exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
-								.andIdusuarioEqualTo(usuarios.get(0).getIdusuario()).andIdrolEqualTo(roles.get(0).getIdrol()).andFechaBajaIsNull();
-					List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
+			
+			String[] grupos = grupo.split(",");
+			if (null != grupos && grupos.length>0) {
+				List<PermisoEntity> permisos = new ArrayList<PermisoEntity>();
+				for (int j = 0; j < grupos.length; j++) {
 					
-					if(null != perfiles && perfiles.size()>0) {
-						/*
-						 * Tratamos todos los grupos del Rol
-						 */
-						for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
-							idperfiles.add("'" + perfil.getIdperfil() + "'");
+				AdmPerfilExample examplePerfil = new AdmPerfilExample();
+				examplePerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion)).andIdperfilEqualTo(grupos[j]);
+				List<AdmPerfil> perfilesPuertaAtras = perfilMapper.selectByExample(examplePerfil );
+				
+				if(null != perfilesPuertaAtras && perfilesPuertaAtras.size()>0) {
+					/*
+					 * Tratamos solo el grupo seleccionado en el combo
+					 */
+					for (AdmPerfil perfil : perfilesPuertaAtras) {
+						idperfiles.add("'" + perfil.getIdperfil() + "'");
+					}
+				}else {
+					AdmRolExample exampleRol = new AdmRolExample();
+					exampleRol.createCriteria().andDescripcionEqualTo(grupo);
+					List<AdmRol> roles = admRol.selectByExample(exampleRol );
+					if (null!= roles && roles.size()>0) {
+						AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
+						exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
+									.andIdusuarioEqualTo(usuarios.get(0).getIdusuario()).andIdrolEqualTo(roles.get(0).getIdrol()).andFechaBajaIsNull();
+						List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
+						
+						if(null != perfiles && perfiles.size()>0) {
+							/*
+							 * Tratamos todos los grupos del Rol
+							 */
+							for (AdmUsuariosEfectivosPerfil perfil : perfiles) {
+								idperfiles.add("'" + perfil.getIdperfil() + "'");
+							}
 						}
 					}
 				}
-			}
-			
-					controlItem.setInstitucion(institucion);
-					String str = idperfiles.toString().replace("[", "").replace("]", "");
-					controlItem.setIdGrupo(str);
-			
-					// Añadimos los permisos a la lista
-					List<PermisoEntity> permisos = this.admUsuariosExtendsMapper.getAccessControlsWithOutProcess(controlItem);
-	
-					if (null != permisos && permisos.size() > 0) {
-						for (PermisoEntity permisoEntity : permisos) {
-							response.put(permisoEntity.getData(), permisoEntity.getDerechoacceso());
+				
+						controlItem.setInstitucion(institucion);
+						String str = idperfiles.toString().replace("[", "").replace("]", "");
+						controlItem.setIdGrupo(str);
+				
+						// Añadimos los permisos a la lista
+						List<PermisoEntity> permisosPorGrupo = this.admUsuariosExtendsMapper.getAccessControlsWithOutProcess(controlItem);
+						permisos.addAll(permisosPorGrupo);
+						if (null != permisosPorGrupo && permisosPorGrupo.size() > 0) {
+						}else {
+							 throw new BadCredentialsException("El usuario no tiene permisos");
 						}
-						return new UserCgae(dni, grupo, institucion, response,idperfiles);
-					}else {
-						 throw new BadCredentialsException("El usuario no tiene permisos");
+		
+				}
+				if (null != permisos && permisos.size() > 0) {
+					for (PermisoEntity permisoEntity : permisos) {
+						response.put(permisoEntity.getData(), permisoEntity.getDerechoacceso());
 					}
-
+					return new UserCgae(dni, grupo, institucion, response,idperfiles);
+				}else {
+					 throw new BadCredentialsException("El usuario no tiene permisos");
+				}	
+		}
+			
 		}else {
 			 throw new AuthenticationCredentialsNotFoundException("Usuario no encontrado en la aplicación");
 		}
+		return null;
 			
 		
 	}
