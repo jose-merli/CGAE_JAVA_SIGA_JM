@@ -240,10 +240,10 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 			LOGGER.info(
 					"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updatebyExampleDataLegalPerson() -> Salida de cenPersonaExtendsMapper para actualizar fecha de constitución de una persona jurídica");
 			
-			// 2. Actualizar tabla cen_nocolegiado
+			// 2. Actualizar tabla cen_reg_mercantil
 			if(responseCenPersona == 1) {
 				LOGGER.info(
-						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson() -> Entrada a cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
+						"updateRegistryDataLegalPerson() / cenRegMercantilMapper.updateByPrimaryKey(); -> Entrada a cenRegMercantilMapper para actualizar datos de una persona jurídica");
 				if(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro()!= null){
 					CenRegMercantil datosRegistro = new CenRegMercantil();
 					datosRegistro.setIdDatosReg(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());

@@ -353,10 +353,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 			sql.SET("FECHAFIN = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
 		}
 		
-		if(null != perJuridicaDatosRegistralesUpdateDTO.getFechaBaja()) {
+		/*if(null != perJuridicaDatosRegistralesUpdateDTO.getFechaBaja()) {
 			String fechaB = dateFormat.format(perJuridicaDatosRegistralesUpdateDTO.getFechaBaja());
 			sql.SET("FECHA_BAJA = TO_DATE('" + fechaB + "','DD/MM/YYYY')");
-		}
+		}*/
 		
 		if(!perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional().equals("")) {
 			sql.SET("SOCIEDADPROFESIONAL = '" + perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional() + "'");
