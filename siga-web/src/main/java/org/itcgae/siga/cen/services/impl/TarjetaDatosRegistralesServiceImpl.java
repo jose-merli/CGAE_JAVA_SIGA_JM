@@ -19,9 +19,14 @@ import org.itcgae.siga.cen.services.ITarjetaDatosRegistralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividad;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividadExample;
+import org.itcgae.siga.db.entities.CenNocolegiadoKey;
+import org.itcgae.siga.db.entities.CenRegMercantil;
 import org.itcgae.siga.db.mappers.CenNocolegiadoActividadMapper;
+import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
+import org.itcgae.siga.db.mappers.CenRegMercantilMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenActividadprofesionalExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
@@ -50,6 +55,11 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 	@Autowired
 	private CenNocolegiadoActividadMapper cenNocolegiadoActividadMapper;
 	
+	@Autowired
+	private CenRegMercantilMapper cenRegMercantilMapper;
+	
+	@Autowired
+	private CenNocolegiadoMapper test;
 	
 	
 	@Override
@@ -194,6 +204,7 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 		
 		int responseCenPersona = 0;
 		int responseCenNocolegiado = 0;
+		int responseCenRegMercantil = 0;
 		int responseCenNoColegiadoActividad = 0;
 		int responseInsertCenNoColegiadoActividad = 0;
 		int responseBorrarCenNoColegiadoActividad = 0;
@@ -229,11 +240,33 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 			LOGGER.info(
 					"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updatebyExampleDataLegalPerson() -> Salida de cenPersonaExtendsMapper para actualizar fecha de constitución de una persona jurídica");
 			
-			// 2. Actualizar tabla cen_nocolegiado
+			// 2. Actualizar tabla cen_reg_mercantil
 			if(responseCenPersona == 1) {
 				LOGGER.info(
-						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson() -> Entrada a cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
-				
+						"updateRegistryDataLegalPerson() / cenRegMercantilMapper.updateByPrimaryKey(); -> Entrada a cenRegMercantilMapper para actualizar datos de una persona jurídica");
+				if(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro()!= null){
+					CenRegMercantil datosRegistro = new CenRegMercantil();
+					datosRegistro.setIdDatosReg(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());
+					datosRegistro.setNumRegistro(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro());
+					datosRegistro.setIdentificacionReg(perJuridicaDatosRegistralesUpdateDTO.getIdentificacionReg());
+					datosRegistro.setFechaInscripcion(perJuridicaDatosRegistralesUpdateDTO.getFechaInscripcion());
+					datosRegistro.setFechaCancelacion(perJuridicaDatosRegistralesUpdateDTO.getFechaCancelacion());
+					datosRegistro.setFechamodificacion(new Date());
+					datosRegistro.setUsumodificacion(usuario.getIdusuario());
+					
+					responseCenRegMercantil = cenRegMercantilMapper.updateByPrimaryKey(datosRegistro);
+				}else{
+					CenRegMercantil datosRegistro = new CenRegMercantil();
+					datosRegistro.setNumRegistro(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro());
+					datosRegistro.setIdentificacionReg(perJuridicaDatosRegistralesUpdateDTO.getIdentificacionReg());
+					datosRegistro.setFechaInscripcion(perJuridicaDatosRegistralesUpdateDTO.getFechaInscripcion());
+					datosRegistro.setFechaCancelacion(perJuridicaDatosRegistralesUpdateDTO.getFechaCancelacion());
+					datosRegistro.setFechamodificacion(new Date());
+					datosRegistro.setUsumodificacion(usuario.getIdusuario());
+					
+					responseCenRegMercantil = cenRegMercantilMapper.insert(datosRegistro);
+					perJuridicaDatosRegistralesUpdateDTO.setIdDatosRegistro(datosRegistro.getIdDatosReg());
+				}
 				responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson(perJuridicaDatosRegistralesUpdateDTO, String.valueOf(idInstitucion), usuario);
 				LOGGER.info(
 						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson() -> Salida de cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
@@ -246,7 +279,7 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 			}
 			
 			// 3. Actualizar tabla CEN_NOCOLEGIADO_ACTIVIDAD
-			if(responseCenNocolegiado == 1) {
+			if(responseCenNocolegiado == 1 && responseCenRegMercantil == 1) {
 				
 				// busca las actividades que estaban asociadas a la persona juridica
 				personaJuridicaActividadDTO.setIdInstitucion(String.valueOf(idInstitucion));

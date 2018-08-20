@@ -1,0 +1,4 @@
+UPDATE "USCGAE"."GEN_DICCIONARIO" SET IDRECURSO = 'censo.consultaDatos.literal.fechaFin', DESCRIPCION = 'Fecha Fin' WHERE IDRECURSO ='censo.consultaDatos.literal.fechaBaja' AND IDLENGUAJE = 1;
+UPDATE "USCGAE"."GEN_DICCIONARIO" SET IDRECURSO = 'censo.consultaDatos.literal.fechaFin', DESCRIPCION = 'Data de finalización' WHERE IDRECURSO ='censo.consultaDatos.literal.fechaBaja' AND IDLENGUAJE = 2;
+UPDATE "USCGAE"."GEN_DICCIONARIO" SET IDRECURSO = 'censo.consultaDatos.literal.fechaFin', DESCRIPCION = 'Fecha Fin#EU' WHERE IDRECURSO ='censo.consultaDatos.literal.fechaBaja' AND IDLENGUAJE = 3;
+UPDATE "USCGAE"."GEN_DICCIONARIO" SET IDRECURSO = 'censo.consultaDatos.literal.fechaFin', DESCRIPCION = 'Fecha Fin#GL' WHERE IDRECURSO ='censo.consultaDatos.literal.fechaBaja' AND IDLENGUAJE = 4;

@@ -413,10 +413,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 			sql.SET("FECHAFIN = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
 		}
 		
-		if(null != perJuridicaDatosRegistralesUpdateDTO.getFechaBaja()) {
+		/*if(null != perJuridicaDatosRegistralesUpdateDTO.getFechaBaja()) {
 			String fechaB = dateFormat.format(perJuridicaDatosRegistralesUpdateDTO.getFechaBaja());
 			sql.SET("FECHA_BAJA = TO_DATE('" + fechaB + "','DD/MM/YYYY')");
-		}
+		}*/
 		
 		if(!perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional().equals("")) {
 			sql.SET("SOCIEDADPROFESIONAL = '" + perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional() + "'");
@@ -426,7 +426,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		}
 		
-		if(!perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp().equals("")) {
+		if(null != perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro() && !perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro().equals("")) {
+			sql.SET("ID_DATOS_REG = '" + perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro() + "'");
+		}
+		/*if(!perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp().equals("")) {
 			sql.SET("PREFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp() + "'");
 		}
 		if(!perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp().equals("")) {
@@ -434,7 +437,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		}
 		if(null!=perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp() && !perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp().equals("")) {
 			sql.SET("SUFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp() + "'");
-		}
+		}*/
 		
 		sql.SET("FECHAMODIFICACION = SYSDATE");
 		

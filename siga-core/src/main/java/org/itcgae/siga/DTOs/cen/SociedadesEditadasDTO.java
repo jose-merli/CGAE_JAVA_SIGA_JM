@@ -26,6 +26,7 @@ public class SociedadesEditadasDTO {
 	private Date fechaConstitucion;
 	private String sociedadProfesional;
 	private String idPersona;
+	private DireccionSocEditadasDTO direccion;
 
 	public String getSociedadNif() {
 		return sociedadNif;
@@ -156,12 +157,20 @@ public class SociedadesEditadasDTO {
 		this.numeroRegistro = numeroRegistro;
 	}
 
+	public DireccionSocEditadasDTO getDireccion() {
+		return direccion;
+	}
 
+
+	public void setDireccion(DireccionSocEditadasDTO direccion) {
+		this.direccion = direccion;
+	}
 	
 	
 	
 	
-	
+
+
 	/**
 	 */
 	public SociedadesEditadasDTO fechaConstitucion(Date fechaConstitucion){
