@@ -90,7 +90,7 @@ public class GenTablasMaestrasSqlExtendProvider {
         SQL sql = new SQL();
         
         SQL sql2 = new SQL();
-        sql2.SELECT("DESCRIPCION");
+        sql2.SELECT(tablaMaestra.getIdcampodescripcion() );
         sql2.FROM(tablaMaestra.getIdtablamaestra());
         sql2.WHERE(tablaMaestra.getIdcampodescripcion() +  "= '" + catalogo.getIdRegistro() + "'");
         if(catalogo.getLocal().equals("S")) {
@@ -168,13 +168,13 @@ public class GenTablasMaestrasSqlExtendProvider {
 		}
         
 
-        sql.VALUES(tablaMaestra.getIdcampocodigo(), "(select MAX("+ tablaMaestra.getIdcampocodigo() +" )  + 1 from "+ tablaMaestra.getIdtablamaestra()   +")" );
+        sql.VALUES(tablaMaestra.getIdcampocodigo(), "(select MAX(TO_NUMBER("+ tablaMaestra.getIdcampocodigo() +" ))  + 1 from "+ tablaMaestra.getIdtablamaestra()   +")" );
         sql.VALUES(tablaMaestra.getIdcampocodigoext(), "'" + catalogo.getCodigoExt() +"'");
         sql.VALUES("FECHAMODIFICACION", "SYSDATE");
         sql.VALUES("BLOQUEADO", "'N'");
         sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuarioModificacion)+"'");
-        sql.VALUES(tablaMaestra.getIdcampodescripcion(), ("(SELECT MAX(IDRECURSO) IDRECURSO FROM (" + 
-        		"select TO_NUMBER(REPLACE(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'null',''),'99999999999') IDRECURSO from gen_recursos_catalogos  where NOMBRETABLA = " + "'" + tablaMaestra.getIdtablamaestra() +"' ))" ));
+        sql.VALUES(tablaMaestra.getIdcampodescripcion(), ("NVL((SELECT MAX(IDRECURSO) IDRECURSO FROM (" + 
+        		"select TO_NUMBER(REPLACE(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'null',''),'99999999999') IDRECURSO from gen_recursos_catalogos  where NOMBRETABLA = " + "'" + tablaMaestra.getIdtablamaestra() +"' )),1)" ));
         
         return sql.toString();
     }
@@ -190,8 +190,8 @@ public class GenTablasMaestrasSqlExtendProvider {
         SQL sql = new SQL();
         
         sql.INSERT_INTO("GEN_RECURSOS_CATALOGOS");
-        sql.VALUES("IDRECURSO", ("(SELECT MAX(IDRECURSO)+1 IDRECURSO FROM (" + 
-        		"select TO_NUMBER(REPLACE(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'null',''),'99999999999') IDRECURSO from gen_recursos_catalogos  where NOMBRETABLA = " + "'" + tablaMaestra.getIdtablamaestra() +"' ))" ));
+        sql.VALUES("IDRECURSO", ("NVL((SELECT MAX(IDRECURSO)+1 IDRECURSO FROM (" + 
+        		"select TO_NUMBER(REPLACE(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'null',''),'99999999999') IDRECURSO from gen_recursos_catalogos  where NOMBRETABLA = " + "'" + tablaMaestra.getIdtablamaestra() +"' )),1)" ));
        	
         if(catalogo.getLocal().equals("S")) {
         	sql.VALUES("IDINSTITUCION",  "'" +catalogo.getIdInstitucion()+"'");
@@ -250,8 +250,9 @@ public class GenTablasMaestrasSqlExtendProvider {
         sql.FROM(tablaMaestra.getIdtablamaestra() + " TABLA" );
         
         sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS RECURSOS ON (RECURSOS.IDRECURSO = " + " TABLA." + tablaMaestra.getIdcampodescripcion() +") ");
-        
-        sql.WHERE("(RECURSOS.IDINSTITUCION = '" + catalogo.getIdInstitucion() + "' )");
+        if(catalogo.getLocal().equals("S")) {
+        	 sql.WHERE("(RECURSOS.IDINSTITUCION = '" + catalogo.getIdInstitucion() + "' )");
+       }
         sql.WHERE("RECURSOS.IDLENGUAJE = '" + catalogo.getIdLenguaje() + "'");
         sql.WHERE("RECURSOS.NOMBRETABLA = '"+tablaMaestra.getIdtablamaestra()+"' ");
        // sql.WHERE("TABLA.FECHA_BAJA IS NULL ");
@@ -278,6 +279,12 @@ public class GenTablasMaestrasSqlExtendProvider {
 		if (!UtilidadesString.esCadenaVacia(catalogoUpdate.getIdInstitucion())) {
 			if (!catalogoUpdate.getIdInstitucion().equals(SigaConstants.InstitucionGeneral)) {
 				sql.WHERE(" REC.idinstitucion = '" + catalogoUpdate.getIdInstitucion() + "'");
+			}else{
+		        if (catalogoUpdate.getLocal().equals("S")) {
+		        	sql.WHERE(" REC.idinstitucion = '" + catalogoUpdate.getIdInstitucion() + "'");
+				}else{
+					sql.WHERE(" REC.idinstitucion is null");
+				}
 			}
 			
 		}
@@ -321,6 +328,12 @@ public class GenTablasMaestrasSqlExtendProvider {
 		if (!UtilidadesString.esCadenaVacia(catalogoUpdate.getIdInstitucion())) {
 			if (!catalogoUpdate.getIdInstitucion().equals(SigaConstants.InstitucionGeneral)) {
 				sql.WHERE(" REC.idinstitucion = '" + catalogoUpdate.getIdInstitucion() + "'");
+			}else{
+		        if (catalogoUpdate.getLocal().equals("S")) {
+		        	sql.WHERE(" REC.idinstitucion = '" + catalogoUpdate.getIdInstitucion() + "'");
+				}else{
+					sql.WHERE(" REC.idinstitucion is null");
+				}
 			}
 			
 		}
