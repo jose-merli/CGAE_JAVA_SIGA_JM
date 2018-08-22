@@ -12,4 +12,16 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('generico.error.permiso.denegado','Actualmente no tiene permisos para visualizar esta información. Consulte en su Colegio','0','1',to_date('12/04/18','DD/MM/RR'),'0','19');
 
 
+update gen_tablas_maestras set flagborradologico = '1' where idtablamaestra in 
+(
+'SCS_DE_EJERCICIO',
+'SCS_DE_ORIGENVAL_BI',
+'SCS_DE_ORIGENVAL_BM',
+'SCS_DE_PERIODICIDAD',
+'SCS_PRESTACION',
+'SCS_ORIGENCAJG',
+'CEN_COMUNIDADESAUTONOMAS',
+'ADM_LENGUAJES',
+'CEN_PAIS'
+);
 COMMIT;
