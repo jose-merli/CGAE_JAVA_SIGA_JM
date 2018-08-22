@@ -153,7 +153,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.VALUES("IDPROVINCIA", "'" + tarjetaIntegrantesCreateDTO.getIdProvincia() + "'");
 		}
 		
-		if(!tarjetaIntegrantesCreateDTO.getFlagSocio().equals("")) {
+		if(!tarjetaIntegrantesCreateDTO.getFlagSocio().equals("") && null != tarjetaIntegrantesCreateDTO.getFlagSocio()) {
 			sql.SET("FLAG_SOCIO = '" + tarjetaIntegrantesCreateDTO.getFlagSocio() + "'");
 		}
 		
