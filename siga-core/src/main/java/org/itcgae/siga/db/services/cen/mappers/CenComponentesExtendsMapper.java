@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 public interface CenComponentesExtendsMapper extends CenComponentesMapper {
 
 	@SelectProvider(type = CenComponentesSqlExtendsProvider.class, method = "selectIntegrantes")
-	@Results({ @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+	/*@Results({ @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDCOMPONENTE", property = "idComponente", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CARGO", property = "cargo", jdbcType = JdbcType.VARCHAR),
@@ -50,7 +50,29 @@ public interface CenComponentesExtendsMapper extends CenComponentesMapper {
 			@Result(column = "NOMBRECOLEGIO", property = "nombrecolegio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DESCRIPCIONPROFESION", property = "descripcionProfesion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PERSONAJURIDICA", property = "personaJuridica", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDPROVINCIA", property = "idProvincia", jdbcType = JdbcType.VARCHAR) })
+			@Result(column = "IDPROVINCIA", property = "idProvincia", jdbcType = JdbcType.VARCHAR) })*/
+	@Results({ @Result(column = "idInstitucionSociedad", property = "idInstitucionSociedad", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idSociedad", property = "idSociedad", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.DATE),
+		@Result(column = "TIPOIDENTIFICACION", property = "tipoIdentificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIFCIF", property = "nifCif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PERSONAJURIDICA", property = "personaJuridica", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "profesionalAbogado", property = "profesionalAbogado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PROFESIONAL", property = "profesional", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "profesion", property = "profesion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "codigocolegio", property = "codigocolegio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "descripcionColegio", property = "descripcionColegio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "cargo", property = "cargo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "descripcionCargo", property = "descripcionCargo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHACARGO", property = "fechaCargo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJACARGO", property = "fechaBajaCargo", jdbcType = JdbcType.DATE),
+		@Result(column = "SOCIEDAD", property = "sociedad", jdbcType = JdbcType.VARCHAR),
+		})
+	
 	List<DatosIntegrantesItem> selectIntegrantes(DatosIntegrantesSearchDTO integrantes, String idInstitucion);
 	
 	

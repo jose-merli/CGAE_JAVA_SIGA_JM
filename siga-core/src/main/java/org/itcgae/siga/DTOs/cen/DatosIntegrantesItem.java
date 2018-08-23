@@ -1,662 +1,306 @@
 package org.itcgae.siga.DTOs.cen;
 
-import java.util.Objects;
+import java.util.Date;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
 public class DatosIntegrantesItem {
 
-	private String idPersona;
-	private String idInstitucion;
-	private String idComponente;
-	private String cargo;
-	private String fechaCargo;
-	private String fechaBajaCargo;
-	private String idPersonaComponente;
-	private String sociedad;
-	private String capitalSocial;
-	private String fechaCargoInforme;
-	private String ejerciente;
-	private String fechaHistorico;
+	private String idSociedad;
+	private String idInstitucionSociedad;
+	private Date fechaModificacion;
+	private String tipoIdentificacion;
 	private String nifCif;
 	private String nombre;
-	private String apellidos;
 	private String apellidos1;
 	private String apellidos2;
-	private String nombreCompleto;
-	private String idTipoColegio;
-	private String numColegiado;
-	private String idCargo;
-	private String idProvincia;
-	private String descripcionCargo;
-	private String colegio;
-	private String nombrecolegio;
-	private String descripcionProfesion;
 	private String personaJuridica;	
+	private String profesionalAbogado;
+	private String profesional;
+	private String profesion;
+	private String codigocolegio;
+	private String descripcionColegio;
+	private String numColegiado;
+	private String cargo;
+	private String descripcionCargo;
+	private Date fechaBajaCargo;
+	private String fechaCargo;
+	private String sociedad;
 	
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem idPersona(String idPersona){
-		this.idPersona = idPersona;
-		return this;
+	public String getIdSociedad() {
+		return idSociedad;
 	}
-	
-	public String getIdPersona() {
-		return idPersona;
+	public void setIdSociedad(String idSociedad) {
+		this.idSociedad = idSociedad;
 	}
-
-
-
-	public void setIdPersona(String idPersona) {
-		this.idPersona = idPersona;
+	public String getIdInstitucionSociedad() {
+		return idInstitucionSociedad;
 	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem idInstitucion(String idInstitucion){
-		this.idInstitucion = idInstitucion;
-		return this;
+	public void setIdInstitucionSociedad(String idInstitucionSociedad) {
+		this.idInstitucionSociedad = idInstitucionSociedad;
 	}
-	
-	public String getIdInstitucion() {
-		return idInstitucion;
+	public Date getFechaModificacion() {
+		return fechaModificacion;
 	}
-
-
-
-	public void setIdInstitucion(String idInstitucion) {
-		this.idInstitucion = idInstitucion;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem idComponente(String idComponente){
-		this.idComponente = idComponente;
-		return this;
+	public void setFechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
 	}
 	
-	public String getIdComponente() {
-		return idComponente;
+	public String getTipoIdentificacion() {
+		return tipoIdentificacion;
 	}
-
-
-
-	public void setIdComponente(String idComponente) {
-		this.idComponente = idComponente;
+	public void setTipoIdentificacion(String tipoIdentificacion) {
+		this.tipoIdentificacion = tipoIdentificacion;
 	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem cargo(String cargo){
-		this.cargo = cargo;
-		return this;
+	public String getNifCif() {
+		return nifCif;
 	}
-	
+	public void setNifCif(String nifCif) {
+		this.nifCif = nifCif;
+	}
+	public String getNombre() {
+		return nombre;
+	}
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+	public String getApellidos1() {
+		return apellidos1;
+	}
+	public void setApellidos1(String apellidos1) {
+		this.apellidos1 = apellidos1;
+	}
+	public String getApellidos2() {
+		return apellidos2;
+	}
+	public void setApellidos2(String apellidos2) {
+		this.apellidos2 = apellidos2;
+	}
+	public String getPersonaJuridica() {
+		return personaJuridica;
+	}
+	public void setPersonaJuridica(String personaJuridica) {
+		this.personaJuridica = personaJuridica;
+	}
+	public String getProfesionalAbogado() {
+		return profesionalAbogado;
+	}
+	public void setProfesionalAbogado(String profesionalAbogado) {
+		this.profesionalAbogado = profesionalAbogado;
+	}
+	public String getProfesional() {
+		return profesional;
+	}
+	public void setProfesional(String profesional) {
+		this.profesional = profesional;
+	}
+	public String getProfesion() {
+		return profesion;
+	}
+	public void setProfesion(String profesion) {
+		this.profesion = profesion;
+	}
+	public String getCodigocolegio() {
+		return codigocolegio;
+	}
+	public void setCodigocolegio(String codigocolegio) {
+		this.codigocolegio = codigocolegio;
+	}
+	public String getDescripcionColegio() {
+		return descripcionColegio;
+	}
+	public void setDescripcionColegio(String descripcionColegio) {
+		this.descripcionColegio = descripcionColegio;
+	}
+	public String getNumColegiado() {
+		return numColegiado;
+	}
+	public void setNumColegiado(String numColegiado) {
+		this.numColegiado = numColegiado;
+	}
 	public String getCargo() {
 		return cargo;
 	}
-
-
-
 	public void setCargo(String cargo) {
 		this.cargo = cargo;
 	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem fechaCargo(String fechaCargo){
-		this.fechaCargo = fechaCargo;
-		return this;
+	public String getDescripcionCargo() {
+		return descripcionCargo;
 	}
+	public void setDescripcionCargo(String descripcionCargo) {
+		this.descripcionCargo = descripcionCargo;
+	}
+	public Date getFechaBajaCargo() {
+		return fechaBajaCargo;
+	}
+	public void setFechaBajaCargo(Date fechaBajaCargo) {
+		this.fechaBajaCargo = fechaBajaCargo;
+	}
+	
 	
 	public String getFechaCargo() {
 		return fechaCargo;
 	}
-
-
-
 	public void setFechaCargo(String fechaCargo) {
 		this.fechaCargo = fechaCargo;
 	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem fechaBajaCargo(String fechaBajaCargo){
-		this.fechaBajaCargo = fechaBajaCargo;
-		return this;
-	}
-	
-	public String getFechaBajaCargo() {
-		return fechaBajaCargo;
-	}
-
-
-
-	public void setFechaBajaCargo(String fechaBajaCargo) {
-		this.fechaBajaCargo = fechaBajaCargo;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem idPersonaComponente(String idPersonaComponente){
-		this.idPersonaComponente = idPersonaComponente;
-		return this;
-	}
-	
-	public String getIdPersonaComponente() {
-		return idPersonaComponente;
-	}
-
-
-
-	public void setIdPersonaComponente(String idPersonaComponente) {
-		this.idPersonaComponente = idPersonaComponente;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem sociedad(String sociedad){
-		this.sociedad = sociedad;
-		return this;
-	}
-	
 	public String getSociedad() {
 		return sociedad;
 	}
-
-
-
 	public void setSociedad(String sociedad) {
 		this.sociedad = sociedad;
 	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem capitalSocial(String capitalSocial){
-		this.capitalSocial = capitalSocial;
-		return this;
-	}
 	
-	public String getCapitalSocial() {
-		return capitalSocial;
-	}
-
-
-
-	public void setCapitalSocial(String capitalSocial) {
-		this.capitalSocial = capitalSocial;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem fechaCargoInforme(String fechaCargoInforme){
-		this.fechaCargoInforme = fechaCargoInforme;
-		return this;
-	}
-	
-	public String getFechaCargoInforme() {
-		return fechaCargoInforme;
-	}
-
-
-
-	public void setFechaCargoInforme(String fechaCargoInforme) {
-		this.fechaCargoInforme = fechaCargoInforme;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem ejerciente(String ejerciente){
-		this.ejerciente = ejerciente;
-		return this;
-	}
-	
-	public String getEjerciente() {
-		return ejerciente;
-	}
-
-
-
-	public void setEjerciente(String ejerciente) {
-		this.ejerciente = ejerciente;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem fechaHistorico(String fechaHistorico){
-		this.fechaHistorico = fechaHistorico;
-		return this;
-	}
-	
-	public String getFechaHistorico() {
-		return fechaHistorico;
-	}
-
-
-
-	public void setFechaHistorico(String fechaHistorico) {
-		this.fechaHistorico = fechaHistorico;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem nifCif(String nifCif){
-		this.nifCif = nifCif;
-		return this;
-	}
-	
-	public String getNifCif() {
-		return nifCif;
-	}
-
-
-
-	public void setNifCif(String nifCif) {
-		this.nifCif = nifCif;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem nombre(String nombre){
-		this.nombre = nombre;
-		return this;
-	}
-	
-	public String getNombre() {
-		return nombre;
-	}
-
-
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem apellidos(String apellidos){
-		this.apellidos = apellidos;
-		return this;
-	}
-	
-	public String getApellidos() {
-		return apellidos;
-	}
-
-
-
-	public void setApellidos(String apellidos) {
-		this.apellidos = apellidos;
-	}
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem apellidos1(String apellidos1){
-		this.apellidos1 = apellidos1;
-		return this;
-	}
-	
-	public String getApellidos1() {
-		return apellidos1;
-	}
-
-
-
-	public void setApellidos1(String apellidos1) {
-		this.apellidos1 = apellidos1;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem apellidos2(String apellidos2){
-		this.apellidos2 = apellidos2;
-		return this;
-	}
-	
-	public String getApellidos2() {
-		return apellidos2;
-	}
-
-
-
-	public void setApellidos2(String apellidos2) {
-		this.apellidos2 = apellidos2;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem nombreCompleto(String nombreCompleto){
-		this.nombreCompleto = nombreCompleto;
-		return this;
-	}
-	
-	public String getNombreCompleto() {
-		return nombreCompleto;
-	}
-
-
-
-	public void setNombreCompleto(String nombreCompleto) {
-		this.nombreCompleto = nombreCompleto;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem idTipoColegio(String idTipoColegio){
-		this.idTipoColegio = idTipoColegio;
-		return this;
-	}
-	
-	public String getIdTipoColegio() {
-		return idTipoColegio;
-	}
-
-
-
-	public void setIdTipoColegio(String idTipoColegio) {
-		this.idTipoColegio = idTipoColegio;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem numColegiado(String numColegiado){
-		this.numColegiado = numColegiado;
-		return this;
-	}
-	
-	public String getNumColegiado() {
-		return numColegiado;
-	}
-
-
-
-	public void setNumColegiado(String numColegiado) {
-		this.numColegiado = numColegiado;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem idCargo(String idCargo){
-		this.idCargo = idCargo;
-		return this;
-	}
-	
-	public String getIdCargo() {
-		return idCargo;
-	}
-
-
-
-	public void setIdCargo(String idCargo) {
-		this.idCargo = idCargo;
-	}
-
-
-
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem idProvincia(String idProvincia){
-		this.idProvincia = idProvincia;
-		return this;
-	}
-	
-	public String getIdProvincia() {
-		return idProvincia;
-	}
-
-
-
-	public void setIdProvincia(String idProvincia) {
-		this.idProvincia = idProvincia;
-	}
-
-
-	
-
-	
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem iddescripcionCargoProvincia(String descripcionCargo){
-		this.descripcionCargo = descripcionCargo;
-		return this;
-	}
-	
-	public String getDescripcionCargo() {
-		return descripcionCargo;
-	}
-
-
-
-	public void setDescripcionCargo(String descripcionCargo) {
-		this.descripcionCargo = descripcionCargo;
-	}
-	
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem colegio(String colegio){
-		this.colegio = colegio;
-		return this;
-	}
-	
-	public String getColegio() {
-		return colegio;
-	}
-
-
-
-	public void setColegio(String colegio) {
-		this.colegio = colegio;
-	}
-	
-	
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem nombrecolegio(String nombrecolegio){
-		this.nombrecolegio = nombrecolegio;
-		return this;
-	}
-	
-	public String getNombrecolegio() {
-		return nombrecolegio;
-	}
-
-
-
-	public void setNombrecolegio(String nombrecolegio) {
-		this.nombrecolegio = nombrecolegio;
-	}
-	
-	
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem descripcionProfesion(String descripcionProfesion){
-		this.descripcionProfesion = descripcionProfesion;
-		return this;
-	}
-	
-	public String getDescripcionProfesion() {
-		return descripcionProfesion;
-	}
-
-
-
-	public void setDescripcionProfesion(String descripcionProfesion) {
-		this.descripcionProfesion = descripcionProfesion;
-	}
-	
-	/**
-	 *
-	 */
-	public DatosIntegrantesItem personaJuridica(String personaJuridica){
-		this.personaJuridica = personaJuridica;
-		return this;
-	}
-	
-	public String getPersonaJuridica() {
-		return personaJuridica;
-	}
-
-
-
-	public void setPersonaJuridica(String personaJuridica) {
-		this.personaJuridica = personaJuridica;
-	}
-
-
-
-	
-	@Override
-	public boolean equals(java.lang.Object o) {
-	    if (this == o) {
-	      return true;
-	    }
-	    if (o == null || getClass() != o.getClass()) {
-	      return false;
-	    }
-	    DatosIntegrantesItem datosIntegrantesItem = (DatosIntegrantesItem) o;
-	    return Objects.equals(this.idPersona, datosIntegrantesItem.idPersona) &&
-	    		Objects.equals(this.idInstitucion, datosIntegrantesItem.idInstitucion) &&
-	    		Objects.equals(this.idComponente, datosIntegrantesItem.idComponente) &&
-	    		Objects.equals(this.cargo, datosIntegrantesItem.cargo) &&
-	    		Objects.equals(this.fechaCargo, datosIntegrantesItem.fechaCargo) &&
-	    		Objects.equals(this.fechaBajaCargo, datosIntegrantesItem.fechaBajaCargo) &&
-	    		Objects.equals(this.idPersonaComponente, datosIntegrantesItem.idPersonaComponente) &&
-	    		Objects.equals(this.sociedad, datosIntegrantesItem.sociedad) &&
-	    		Objects.equals(this.capitalSocial, datosIntegrantesItem.capitalSocial) &&
-	    		Objects.equals(this.fechaCargoInforme, datosIntegrantesItem.fechaCargoInforme) &&
-	    		Objects.equals(this.ejerciente, datosIntegrantesItem.ejerciente) &&
-	    		Objects.equals(this.fechaHistorico, datosIntegrantesItem.fechaHistorico) &&
-	    		Objects.equals(this.nifCif, datosIntegrantesItem.nifCif) &&
-	    		Objects.equals(this.nombre, datosIntegrantesItem.nombre) &&
-	    		Objects.equals(this.apellidos1, datosIntegrantesItem.apellidos1)&&
-	    		Objects.equals(this.apellidos2, datosIntegrantesItem.apellidos2) &&
-	    		Objects.equals(this.nombreCompleto, datosIntegrantesItem.nombreCompleto) &&
-	    		Objects.equals(this.idTipoColegio, datosIntegrantesItem.idTipoColegio) &&
-	    		Objects.equals(this.numColegiado, datosIntegrantesItem.numColegiado) &&
-	    		Objects.equals(this.idCargo, datosIntegrantesItem.idCargo) &&
-	    		Objects.equals(this.descripcionCargo, datosIntegrantesItem.descripcionCargo) &&
-	    		Objects.equals(this.colegio, datosIntegrantesItem.colegio) &&
-	    		Objects.equals(this.nombrecolegio, datosIntegrantesItem.nombrecolegio) &&
-	    		Objects.equals(this.personaJuridica, datosIntegrantesItem.personaJuridica) &&
-	    		Objects.equals(this.descripcionProfesion, datosIntegrantesItem.descripcionProfesion) &&
-	    		Objects.equals(this.idProvincia, datosIntegrantesItem.idProvincia) ;
-	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona,idInstitucion,idComponente,cargo,fechaCargo,fechaBajaCargo,idPersonaComponente,sociedad,capitalSocial,
-	    		fechaCargoInforme,ejerciente,fechaHistorico,nifCif,nombre,apellidos1,apellidos2,nombreCompleto,
-	    		idTipoColegio,numColegiado,idCargo,idProvincia,descripcionCargo,colegio,nombrecolegio,descripcionProfesion,personaJuridica);
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((apellidos1 == null) ? 0 : apellidos1.hashCode());
+		result = prime * result + ((apellidos2 == null) ? 0 : apellidos2.hashCode());
+		result = prime * result + ((cargo == null) ? 0 : cargo.hashCode());
+		result = prime * result + ((codigocolegio == null) ? 0 : codigocolegio.hashCode());
+		result = prime * result + ((descripcionCargo == null) ? 0 : descripcionCargo.hashCode());
+		result = prime * result + ((descripcionColegio == null) ? 0 : descripcionColegio.hashCode());
+		result = prime * result + ((fechaBajaCargo == null) ? 0 : fechaBajaCargo.hashCode());
+		result = prime * result + ((fechaCargo == null) ? 0 : fechaCargo.hashCode());
+		result = prime * result + ((fechaModificacion == null) ? 0 : fechaModificacion.hashCode());
+		result = prime * result + ((idInstitucionSociedad == null) ? 0 : idInstitucionSociedad.hashCode());
+		result = prime * result + ((idSociedad == null) ? 0 : idSociedad.hashCode());
+		result = prime * result + ((nifCif == null) ? 0 : nifCif.hashCode());
+		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
+		result = prime * result + ((numColegiado == null) ? 0 : numColegiado.hashCode());
+		result = prime * result + ((personaJuridica == null) ? 0 : personaJuridica.hashCode());
+		result = prime * result + ((profesion == null) ? 0 : profesion.hashCode());
+		result = prime * result + ((profesional == null) ? 0 : profesional.hashCode());
+		result = prime * result + ((profesionalAbogado == null) ? 0 : profesionalAbogado.hashCode());
+		result = prime * result + ((sociedad == null) ? 0 : sociedad.hashCode());
+		result = prime * result + ((tipoIdentificacion == null) ? 0 : tipoIdentificacion.hashCode());
+		return result;
 	}
-
+	
+	
 	
 	@Override
 	public String toString() {
-	    StringBuilder sb = new StringBuilder();
-	    sb.append("class DatosIntegrantesItem {\n");
-	    
-	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
-	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
-	    sb.append("    idComponente: ").append(toIndentedString(idComponente)).append("\n");
-	    sb.append("    cargo: ").append(toIndentedString(cargo)).append("\n");
-	    sb.append("    fechaCargo: ").append(toIndentedString(fechaCargo)).append("\n");
-	    sb.append("    fechaBajaCargo: ").append(toIndentedString(fechaBajaCargo)).append("\n");
-	    sb.append("    idPersonaComponente: ").append(toIndentedString(idPersonaComponente)).append("\n");
-	    sb.append("    sociedad: ").append(toIndentedString(sociedad)).append("\n");
-	    sb.append("    capitalSocial: ").append(toIndentedString(capitalSocial)).append("\n");
-	    sb.append("    fechaCargoInforme: ").append(toIndentedString(fechaCargoInforme)).append("\n");
-	    sb.append("    ejerciente: ").append(toIndentedString(ejerciente)).append("\n");
-	    sb.append("    fechaHistorico: ").append(toIndentedString(fechaHistorico)).append("\n");
-	    sb.append("    nifCif: ").append(toIndentedString(nifCif)).append("\n");
-	    sb.append("    nombre: ").append(toIndentedString(nombre)).append("\n");
-	    sb.append("    apellidos1: ").append(toIndentedString(apellidos1)).append("\n");
-	    sb.append("    apellidos2: ").append(toIndentedString(apellidos2)).append("\n");
-	    sb.append("    nombreCompleto: ").append(toIndentedString(nombreCompleto)).append("\n");
-	    sb.append("    idTipoColegio: ").append(toIndentedString(idTipoColegio)).append("\n");
-	    sb.append("    numColegiado: ").append(toIndentedString(numColegiado)).append("\n");
-	    sb.append("    idCargo: ").append(toIndentedString(idCargo)).append("\n");
-	    sb.append("    idProvincia: ").append(toIndentedString(idProvincia)).append("\n");
-	    sb.append("    descripcionCargo: ").append(toIndentedString(descripcionCargo)).append("\n");
-	    sb.append("    colegio: ").append(toIndentedString(colegio)).append("\n");
-	    sb.append("    nombrecolegio: ").append(toIndentedString(nombrecolegio)).append("\n");
-	    sb.append("    descripcionProfesion: ").append(toIndentedString(descripcionProfesion)).append("\n");
-	    sb.append("    personaJuridica: ").append(toIndentedString(personaJuridica)).append("\n");
-
-	    sb.append("}");
-	    return sb.toString();
+		return "DatosIntegrantesItem [idSociedad=" + idSociedad + ", idInstitucionSociedad=" + idInstitucionSociedad
+				+ ", fechaModificacion=" + fechaModificacion + ", tipoIdentificacion=" + tipoIdentificacion
+				+ ", nifCif=" + nifCif + ", nombre=" + nombre + ", apellidos1=" + apellidos1 + ", apellidos2="
+				+ apellidos2 + ", personaJuridica=" + personaJuridica + ", profesionalAbogado=" + profesionalAbogado
+				+ ", profesional=" + profesional + ", profesion=" + profesion + ", codigocolegio=" + codigocolegio
+				+ ", descripcionColegio=" + descripcionColegio + ", numColegiado=" + numColegiado + ", cargo=" + cargo
+				+ ", descripcionCargo=" + descripcionCargo + ", fechaBajaCargo=" + fechaBajaCargo + ", fechaCargo="
+				+ fechaCargo + ", sociedad=" + sociedad + "]";
 	}
-
-	/**
-	* Convert the given object to string with each line indented by 4 spaces
-	* (except the first line).
-	*/
-	private String toIndentedString(java.lang.Object o) {
-	    if (o == null) {
-	      return "null";
-	    }
-	    return o.toString().replace("\n", "\n    ");
-	}
-	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DatosIntegrantesItem other = (DatosIntegrantesItem) obj;
+		if (apellidos1 == null) {
+			if (other.apellidos1 != null)
+				return false;
+		} else if (!apellidos1.equals(other.apellidos1))
+			return false;
+		if (apellidos2 == null) {
+			if (other.apellidos2 != null)
+				return false;
+		} else if (!apellidos2.equals(other.apellidos2))
+			return false;
+		if (cargo == null) {
+			if (other.cargo != null)
+				return false;
+		} else if (!cargo.equals(other.cargo))
+			return false;
+		if (codigocolegio == null) {
+			if (other.codigocolegio != null)
+				return false;
+		} else if (!codigocolegio.equals(other.codigocolegio))
+			return false;
+		if (descripcionCargo == null) {
+			if (other.descripcionCargo != null)
+				return false;
+		} else if (!descripcionCargo.equals(other.descripcionCargo))
+			return false;
+		if (descripcionColegio == null) {
+			if (other.descripcionColegio != null)
+				return false;
+		} else if (!descripcionColegio.equals(other.descripcionColegio))
+			return false;
+		if (fechaBajaCargo == null) {
+			if (other.fechaBajaCargo != null)
+				return false;
+		} else if (!fechaBajaCargo.equals(other.fechaBajaCargo))
+			return false;
+		if (fechaCargo == null) {
+			if (other.fechaCargo != null)
+				return false;
+		} else if (!fechaCargo.equals(other.fechaCargo))
+			return false;
+		if (fechaModificacion == null) {
+			if (other.fechaModificacion != null)
+				return false;
+		} else if (!fechaModificacion.equals(other.fechaModificacion))
+			return false;
+		if (idInstitucionSociedad == null) {
+			if (other.idInstitucionSociedad != null)
+				return false;
+		} else if (!idInstitucionSociedad.equals(other.idInstitucionSociedad))
+			return false;
+		if (idSociedad == null) {
+			if (other.idSociedad != null)
+				return false;
+		} else if (!idSociedad.equals(other.idSociedad))
+			return false;
+		if (nifCif == null) {
+			if (other.nifCif != null)
+				return false;
+		} else if (!nifCif.equals(other.nifCif))
+			return false;
+		if (nombre == null) {
+			if (other.nombre != null)
+				return false;
+		} else if (!nombre.equals(other.nombre))
+			return false;
+		if (numColegiado == null) {
+			if (other.numColegiado != null)
+				return false;
+		} else if (!numColegiado.equals(other.numColegiado))
+			return false;
+		if (personaJuridica == null) {
+			if (other.personaJuridica != null)
+				return false;
+		} else if (!personaJuridica.equals(other.personaJuridica))
+			return false;
+		if (profesion == null) {
+			if (other.profesion != null)
+				return false;
+		} else if (!profesion.equals(other.profesion))
+			return false;
+		if (profesional == null) {
+			if (other.profesional != null)
+				return false;
+		} else if (!profesional.equals(other.profesional))
+			return false;
+		if (profesionalAbogado == null) {
+			if (other.profesionalAbogado != null)
+				return false;
+		} else if (!profesionalAbogado.equals(other.profesionalAbogado))
+			return false;
+		if (sociedad == null) {
+			if (other.sociedad != null)
+				return false;
+		} else if (!sociedad.equals(other.sociedad))
+			return false;
+		if (tipoIdentificacion == null) {
+			if (other.tipoIdentificacion != null)
+				return false;
+		} else if (!tipoIdentificacion.equals(other.tipoIdentificacion))
+			return false;
+		return true;
+	}	
 	
 }
