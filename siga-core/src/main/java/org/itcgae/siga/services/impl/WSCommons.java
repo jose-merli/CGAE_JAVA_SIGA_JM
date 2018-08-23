@@ -524,11 +524,11 @@ public class WSCommons {
 						//INSERTAMOS LOS DATOS DE LOS INTEGRANTES
 						DatosIntegrantesSearchDTO datosIntegrantesSearchDTO = new DatosIntegrantesSearchDTO();
 						datosIntegrantesSearchDTO.setIdPersona(regSociedad.getIdPersona());
-						List<DatosIntegrantesWS> datosIntegrantesItem = cenComponentesExtendsMapper.selectIntegrantes(datosIntegrantesSearchDTO,idInstitucion.toString() );
-						if (null != datosIntegrantesItem && datosIntegrantesItem.size()>0) {
-							IntegranteSociedad[] integrantesSociedad = new IntegranteSociedad[datosIntegrantesItem.size()];
+						List<DatosIntegrantesWS> datosIntegrantesWS = cenComponentesExtendsMapper.selectIntegrantesWS(datosIntegrantesSearchDTO,idInstitucion.toString());
+						if (null != datosIntegrantesWS && datosIntegrantesWS.size()>0) {
+							IntegranteSociedad[] integrantesSociedad = new IntegranteSociedad[datosIntegrantesWS.size()];
 							int i = 0;
-							for (DatosIntegrantesWS integrante : datosIntegrantesItem) {
+							for (DatosIntegrantesWS integrante : datosIntegrantesWS) {
 								IntegranteSociedad integranteUnitario = IntegranteSociedad.Factory.newInstance();
 								SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 								if (integrante.getPersonaJuridica().equals("0")) {
