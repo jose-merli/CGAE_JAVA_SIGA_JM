@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.DatosIntegrantesWS;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -73,7 +74,7 @@ public interface CenComponentesExtendsMapper extends CenComponentesMapper {
 		@Result(column = "SOCIEDAD", property = "sociedad", jdbcType = JdbcType.VARCHAR),
 		})
 	
-	List<DatosIntegrantesItem> selectIntegrantes(DatosIntegrantesSearchDTO integrantes, String idInstitucion);
+	List<DatosIntegrantesWS> selectIntegrantes(DatosIntegrantesSearchDTO integrantes, String idInstitucion);
 	
 	
 	

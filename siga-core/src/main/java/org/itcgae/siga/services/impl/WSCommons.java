@@ -14,6 +14,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.DatosIntegrantesWS;
 import org.itcgae.siga.DTOs.cen.SociedadesBajaDTO;
 import org.itcgae.siga.DTOs.cen.SociedadesEditadasDTO;
 import org.itcgae.siga.commons.constants.SigaConstants.ERROR_SERVER;
@@ -523,11 +524,11 @@ public class WSCommons {
 						//INSERTAMOS LOS DATOS DE LOS INTEGRANTES
 						DatosIntegrantesSearchDTO datosIntegrantesSearchDTO = new DatosIntegrantesSearchDTO();
 						datosIntegrantesSearchDTO.setIdPersona(regSociedad.getIdPersona());
-						List<DatosIntegrantesItem> datosIntegrantesItem = cenComponentesExtendsMapper.selectIntegrantes(datosIntegrantesSearchDTO,idInstitucion.toString() );
+						List<DatosIntegrantesWS> datosIntegrantesItem = cenComponentesExtendsMapper.selectIntegrantes(datosIntegrantesSearchDTO,idInstitucion.toString() );
 						if (null != datosIntegrantesItem && datosIntegrantesItem.size()>0) {
 							IntegranteSociedad[] integrantesSociedad = new IntegranteSociedad[datosIntegrantesItem.size()];
 							int i = 0;
-							for (DatosIntegrantesItem integrante : datosIntegrantesItem) {
+							for (DatosIntegrantesWS integrante : datosIntegrantesItem) {
 								IntegranteSociedad integranteUnitario = IntegranteSociedad.Factory.newInstance();
 								SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 								if (integrante.getPersonaJuridica().equals("0")) {
