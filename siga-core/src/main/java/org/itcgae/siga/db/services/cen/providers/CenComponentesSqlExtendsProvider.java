@@ -136,7 +136,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		}
 		
 		
-		if(!tarjetaIntegrantesUpdateDTO.getFlagSocio().equals("")) {
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getFlagSocio())) {
 			sql.SET("FLAG_SOCIO = '" + tarjetaIntegrantesUpdateDTO.getFlagSocio() + "'");
 		}
 
