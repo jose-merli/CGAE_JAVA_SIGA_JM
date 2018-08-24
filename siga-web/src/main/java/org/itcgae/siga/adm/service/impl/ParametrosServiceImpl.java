@@ -218,8 +218,10 @@ public class ParametrosServiceImpl implements IParametrosService {
 							// actualizamos fecha de baja a null, para que vuelva a
 							// estar disponible
 							genParametros.setFechaBaja(null);
+							
 							LOGGER.info("updateParameter() / genParametrosMapper.updateByPrimaryKeySelective() -> Entrada a genParametrosMapper para habilitar un modulo-parametro");
-							response = genParametrosMapper.updateByPrimaryKeySelective(genParametros);
+							response = genParametrosExtendsMapper.updateByExampleFechaBaja(genParametros);
+							//response = genParametrosMapper.updateByPrimaryKeySelective(genParametros);
 							LOGGER.info("updateParameter() / genParametrosMapper.updateByPrimaryKeySelective() -> Salida de genParametrosMapper para habilitar un modulo-parametro");
 						}
 						// si es nulo, se crea un nuevo registro

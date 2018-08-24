@@ -5,12 +5,16 @@ import java.util.List;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.adm.ParametroItem;
 import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
+import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.services.adm.providers.AdmUsuariosSqlExtendsProvider;
 import org.itcgae.siga.db.services.adm.providers.GenParametrosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -76,5 +80,9 @@ public interface GenParametrosExtendsMapper extends GenParametrosMapper{
 	})
 	StringDTO selectParametroPorInstitucion(String parametro, String idInstitucion);
 	
+	
+	
+	@UpdateProvider(type = GenParametrosSqlExtendsProvider.class, method = "updateByExampleFechaBaja")
+	int updateByExampleFechaBaja(GenParametros genParametros);
 	
 }

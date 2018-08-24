@@ -3,6 +3,7 @@ package org.itcgae.siga.db.services.adm.providers;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.mappers.GenParametrosSqlProvider;
 
 public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
@@ -150,6 +151,21 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 		sql2.WHERE("idinstitucion IN ('"+ idInstitucion +"', '0')");
 		
 		sql.WHERE("idinstitucion = (" + sql2 + ")");
+		
+		return sql.toString();
+	}
+	
+	public String updateByExampleFechaBaja(GenParametros genParametros) {
+		SQL sql = new  SQL();
+		
+		sql.UPDATE("gen_parametros");
+		sql.SET("VALOR = '"+ genParametros.getValor() +"'");
+		sql.SET("FECHA_BAJA = NULL");
+		
+		
+		sql.WHERE("MODULO = '" + genParametros.getModulo()+ "'");
+		sql.WHERE("PARAMETRO = '" + genParametros.getParametro()+ "'");
+		sql.WHERE("IDINSTITUCION = '" + genParametros.getIdinstitucion()+ "'");
 		
 		return sql.toString();
 	}
