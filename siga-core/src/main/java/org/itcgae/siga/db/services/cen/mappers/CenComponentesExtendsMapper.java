@@ -41,6 +41,7 @@ public interface CenComponentesExtendsMapper extends CenComponentesMapper {
 		@Result(column = "codigocolegio", property = "codigocolegio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "descripcionColegio", property = "descripcionColegio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SOCIO", property = "socio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "cargo", property = "cargo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "descripcionCargo", property = "descripcionCargo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHACARGO", property = "fechaCargo", jdbcType = JdbcType.VARCHAR),

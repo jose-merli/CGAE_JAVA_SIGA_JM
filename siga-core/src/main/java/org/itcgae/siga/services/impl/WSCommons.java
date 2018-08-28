@@ -69,6 +69,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class WSCommons {
@@ -382,6 +383,7 @@ public class WSCommons {
 		return (short) (bool ? 1 : 0);
 	}
 	
+	
 	public RegistroSociedad[] cargarSociedades(GetListaSociedadesRequest peticion, Long idWsPagina, Short idInstitucion) {
 
 		//Nos disponemos a consultar los datos de las sociedades que han sufrido modificacion
@@ -543,6 +545,11 @@ public class WSCommons {
 											cargo.setFechaCargo(UtilidadesString.toCalendar(fechaCargo));
 										}
 									}
+									if(integrante.getSocio()=="1"){
+										integranteFisico.setSocio(Boolean.TRUE);
+									}else{
+										integranteFisico.setSocio(Boolean.FALSE);
+									}
 									integranteFisico.setDatosCargo(cargo);
 									DatosPersona datosPersona = DatosPersona.Factory.newInstance();
 									datosPersona.setApellido1(integrante.getApellidos1());
@@ -566,6 +573,7 @@ public class WSCommons {
 									datosProfesional.setProfesionalAbogado(profesionalAbogado);
 									integranteFisico.setDatosProfesional(datosProfesional);
 									integranteUnitario.setIntegranteFisico(integranteFisico);
+									integranteUnitario.setFechaModificacion(UtilidadesString.toCalendar(integrante.getFechaModificacion()));
 									integranteUnitario.setPublicar(Boolean.FALSE);
 								}else{
 									IntegranteJuridico integranteJuridico = IntegranteJuridico.Factory.newInstance();
