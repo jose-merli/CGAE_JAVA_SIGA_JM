@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -428,6 +429,7 @@ public class WSCommons {
 						SociedadActualizacion sociedadActualizacion = SociedadActualizacion.Factory.newInstance();
 						
 						boolean argPublicar = Boolean.FALSE;
+
 						sociedadActualizacion.setPublicar(argPublicar);
 						Resena argResena = Resena.Factory.newInstance();
 						argResena.setStringValue(regSociedad.getResena());
@@ -454,6 +456,9 @@ public class WSCommons {
 						argNotario.setIdentificacion(identificacion);
 						sociedadActualizacion.setDatosNotario(argNotario);
 						
+						if (null != regSociedad.getObjetoSocial()) {
+							sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
+						}
 						//Insertamos los datos de la sociedad
 						DatosEntidad argSociedad = DatosEntidad.Factory.newInstance();
 						argSociedad.setCIFNIF(regSociedad.getSociedadNif());
@@ -465,7 +470,7 @@ public class WSCommons {
 						sociedadActualizacion.setFechaAlta(UtilidadesString.toCalendar(regSociedad.getSociedadFechaAlta()));
 						sociedadActualizacion.setFechaConstitucion(UtilidadesString.toCalendar(regSociedad.getFechaConstitucion()));
 						sociedadActualizacion.setFechaFin(UtilidadesString.toCalendar(regSociedad.getFechaFin()));
-						sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
+						//sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
 						//Insertamos los datos de la direccion
 						Direccion argDireccion = Direccion.Factory.newInstance();
 						argDireccion.setDomicilio(regSociedad.getDomicilio());
@@ -617,10 +622,15 @@ public class WSCommons {
 					}
 					try{
 						if (null != sociedadesEditadasResult && sociedadesEditadasResult.size()>0) {
+							
 							for (SociedadActualizacion sociedadActualizacion : sociedadesEditadasResult) {
+//								Thread.sleep(500);
 								RegistroSociedad registro = RegistroSociedad.Factory.newInstance();
 								registro.setSociedadActualizacion(sociedadActualizacion);
+//								Thread.sleep(500);
 								registrosList.add(registro);
+								
+//								Thread.sleep(500);
 							}
 						}
 					}catch(AssertionError e){
