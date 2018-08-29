@@ -436,7 +436,9 @@ public class WSCommons {
 						Resena argResena = Resena.Factory.newInstance();
 						argResena.setStringValue(regSociedad.getResena());
 						sociedadActualizacion.setResena(argResena);
-						sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
+						if (null != regSociedad.getObjetoSocial()) {
+							sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
+						}
 						
 						//Insertamos los datos del registro
 						DatosRegistro argRegistro = DatosRegistro.Factory.newInstance();
@@ -458,9 +460,7 @@ public class WSCommons {
 						argNotario.setIdentificacion(identificacion);
 						sociedadActualizacion.setDatosNotario(argNotario);
 						
-						if (null != regSociedad.getObjetoSocial()) {
-							sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
-						}
+						
 						//Insertamos los datos de la sociedad
 						DatosEntidad argSociedad = DatosEntidad.Factory.newInstance();
 						argSociedad.setCIFNIF(regSociedad.getSociedadNif());
