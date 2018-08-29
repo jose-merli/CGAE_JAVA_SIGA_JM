@@ -44,7 +44,8 @@ public interface AdmUsuariosExtendsMapper extends AdmUsuariosMapper{
 		@Result(column = "CODIGOEXT", property = "codigoExterno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PERFIL", property = "perfil", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDUSUARIO", property = "idUsuario", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDUSUARIO", property = "idUsuario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIFROL", property = "nifRol", jdbcType = JdbcType.VARCHAR)
 	})
 	List<UsuarioItem> getUsersByFilter(int numPagina, UsuarioRequestDTO usuarioRequestDTO);
 	
