@@ -632,13 +632,13 @@ public class WSCommons {
 						if (null != sociedadesEditadasResult && sociedadesEditadasResult.size()>0) {
 							
 							for (SociedadActualizacion sociedadActualizacion : sociedadesEditadasResult) {
-//								Thread.sleep(500);
+
 								RegistroSociedad registro = RegistroSociedad.Factory.newInstance();
 								registro.setSociedadActualizacion(sociedadActualizacion);
-//								Thread.sleep(500);
+
 								registrosList.add(registro);
 								
-//								Thread.sleep(500);
+
 							}
 						}
 					}catch(AssertionError e){
