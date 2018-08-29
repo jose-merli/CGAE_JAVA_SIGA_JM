@@ -19,6 +19,7 @@ public class DatosIntegrantesWS {
 	private String codigocolegio;
 	private String descripcionColegio;
 	private String numColegiado;
+	private String socio;
 	private String cargo;
 	private String descripcionCargo;
 	private Date fechaBajaCargo;
@@ -97,6 +98,13 @@ public class DatosIntegrantesWS {
 	public void setProfesion(String profesion) {
 		this.profesion = profesion;
 	}
+	
+	public String getSocio() {
+		return socio;
+	}
+	public void setSocio(String socio) {
+		this.socio = socio;
+	}
 	public String getCodigocolegio() {
 		return codigocolegio;
 	}
@@ -168,6 +176,7 @@ public class DatosIntegrantesWS {
 		result = prime * result + ((profesional == null) ? 0 : profesional.hashCode());
 		result = prime * result + ((profesionalAbogado == null) ? 0 : profesionalAbogado.hashCode());
 		result = prime * result + ((sociedad == null) ? 0 : sociedad.hashCode());
+		result = prime * result + ((socio == null) ? 0 : socio.hashCode());
 		result = prime * result + ((tipoIdentificacion == null) ? 0 : tipoIdentificacion.hashCode());
 		return result;
 	}
@@ -275,6 +284,11 @@ public class DatosIntegrantesWS {
 				return false;
 		} else if (!sociedad.equals(other.sociedad))
 			return false;
+		if (socio == null) {
+			if (other.socio != null)
+				return false;
+		} else if (!socio.equals(other.socio))
+			return false;
 		if (tipoIdentificacion == null) {
 			if (other.tipoIdentificacion != null)
 				return false;
@@ -289,9 +303,9 @@ public class DatosIntegrantesWS {
 				+ ", nifCif=" + nifCif + ", nombre=" + nombre + ", apellidos1=" + apellidos1 + ", apellidos2="
 				+ apellidos2 + ", personaJuridica=" + personaJuridica + ", profesionalAbogado=" + profesionalAbogado
 				+ ", profesional=" + profesional + ", profesion=" + profesion + ", codigocolegio=" + codigocolegio
-				+ ", descripcionColegio=" + descripcionColegio + ", numColegiado=" + numColegiado + ", cargo=" + cargo
-				+ ", descripcionCargo=" + descripcionCargo + ", fechaBajaCargo=" + fechaBajaCargo + ", fechaCargo="
-				+ fechaCargo + ", sociedad=" + sociedad + "]";
+				+ ", descripcionColegio=" + descripcionColegio + ", numColegiado=" + numColegiado + ", socio=" + socio
+				+ ", cargo=" + cargo + ", descripcionCargo=" + descripcionCargo + ", fechaBajaCargo=" + fechaBajaCargo
+				+ ", fechaCargo=" + fechaCargo + ", sociedad=" + sociedad + "]";
 	}
 	
 	

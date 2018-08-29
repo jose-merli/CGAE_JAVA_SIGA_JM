@@ -32,6 +32,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.SELECT("decode(COMPONENTE.IDTIPOCOLEGIO, 1, INST.CODIGOEXT, null) as codigocolegio");
 		sql.SELECT("decode(COMPONENTE.IDTIPOCOLEGIO, 1,  INST.NOMBRE, PROVINCIAS.NOMBRE) as descripcionColegio");
 		sql.SELECT("COMPONENTE.NUMCOLEGIADO");
+		sql.SELECT("COMPONENTE.FLAG_SOCIO AS SOCIO");
 		sql.SELECT("f_siga_getrecurso(CARGO.descripcion, 1) cargo");
 		sql.SELECT("COMPONENTE.CARGO descripcionCargo");
 		sql.SELECT("TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy') AS FECHACARGO");
