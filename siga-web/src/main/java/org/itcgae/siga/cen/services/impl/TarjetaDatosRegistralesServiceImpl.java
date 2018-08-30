@@ -19,6 +19,8 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosRegistralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmContador;
+import org.itcgae.siga.db.entities.AdmContadorKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividad;
@@ -266,6 +268,25 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 					
 					responseCenRegMercantil = cenRegMercantilMapper.insert(datosRegistro);
 					perJuridicaDatosRegistralesUpdateDTO.setIdDatosRegistro(datosRegistro.getIdDatosReg());
+					// 4. Actualizamos el registro en el contador en caso de que el modo sea correcto.
+					AdmContador contadorDTO = new AdmContador();
+					List<AdmContadorDTO> contadorItem = new ArrayList<AdmContadorDTO>();
+					AdmContadorKey exampleContador = new AdmContadorKey();
+					exampleContador.setIdinstitucion(idInstitucion);
+					exampleContador.setIdcontador("SSPP");
+					contadorDTO = admContadorMapper.selectByPrimaryKey(exampleContador);
+					LOGGER.info(
+							"getDatosContador() / admContadorMapper.getContadoresSearch() -> Entrada a AdmContador para buscar el contador a aplicar");
+					if (null != contadorDTO) {
+						if (contadorDTO.getModo().equals(Short.valueOf("0"))) {
+							if (null != perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp()) {
+								contadorDTO.setContador(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp()));
+								contadorDTO.setFechamodificacion(new Date());
+								contadorDTO.setUsumodificacion(usuario.getIdusuario());
+								admContadorMapper.updateByPrimaryKey(contadorDTO);
+							}
+						}
+					}
 				}
 				responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson(perJuridicaDatosRegistralesUpdateDTO, String.valueOf(idInstitucion), usuario);
 				LOGGER.info(
@@ -403,6 +424,9 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 						
 					}
 				}
+				
+
+				
 			}
 			else {
 				updateResponseDTO.setStatus(SigaConstants.KO);

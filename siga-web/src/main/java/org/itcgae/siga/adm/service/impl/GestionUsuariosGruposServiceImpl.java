@@ -354,8 +354,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				keyUsuarioPerfil.createCriteria()
 						.andIdinstitucionEqualTo(Short.valueOf(usuarioUpdateDTO.getIdInstitucion()))
 						.andIdusuarioEqualTo(Integer.valueOf(usuarioUpdateDTO.getIdUsuario()))
-						.andIdrolEqualTo(usuarioUpdateDTO.getRol()).andIdperfilEqualTo(usuarioUpdateDTO.getGrupo())
-						.andFechaBajaIsNull();
+						.andIdrolEqualTo(usuarioUpdateDTO.getRol()).andIdperfilEqualTo(usuarioUpdateDTO.getGrupo());
 
 				LOGGER.info(
 						"updateUsers() / admUsuariosEfectivoPerfilMapper.selectByExample() -> Entrada a admUsuariosEfectivoPerfilExtendsMapper para comprobar si existe relación entre usuario y perfil en usuariosEfectivos");
@@ -387,6 +386,15 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 						LOGGER.warn(
 								"updateUsers() / admUsuariosEfectivoPerfilMapper.insert() -> No se ha podido añadir una relación de perfil-usuario en tabla admUsuariosEfectivoPerfil");
 						serviceOK = false;
+					}
+				}else{
+					if (null != usuarioPerfil.get(0).getFechaBaja()) {
+						// Se guarda el usuario efectivoPerfil
+						LOGGER.info(
+								"updateUsers() / admUsuariosEfectivoPerfilMapper.insert() -> Entrada a admUsuariosEfectivoPerfilMapper para añadir una relación de perfil-usuario en tabla admUsuariosEfectivoPerfil");
+						AdmUsuariosEfectivosPerfil recordUsuarioEfectivo = usuarioPerfil.get(0);
+						recordUsuarioEfectivo.setFechaBaja(null);
+						response3 = admUsuariosEfectivoPerfilExtendsMapper.updateByExample(recordUsuarioEfectivo, keyUsuarioPerfil);
 					}
 				}
 
