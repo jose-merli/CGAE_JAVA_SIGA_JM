@@ -8,4 +8,5 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.noColegiados.sociedadProfesional','Sociedad Profesional#EU','0','3',to_date('10/03/04','DD/MM/RR'),'0','15');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.noColegiados.sociedadProfesional','Sociedad Profesional#GL','0','4',to_date('10/03/04','DD/MM/RR'),'0','15');
 
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatos.literal.fechaBaja','Fecha Baja','0','1',to_date('10/03/04','DD/MM/RR'),'0','15');
 commit;

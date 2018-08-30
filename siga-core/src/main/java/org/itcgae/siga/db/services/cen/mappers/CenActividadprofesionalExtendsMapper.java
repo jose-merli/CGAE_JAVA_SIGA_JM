@@ -31,7 +31,7 @@ public interface CenActividadprofesionalExtendsMapper extends CenActividadprofes
 	@Results({
 		@Result(column = "RESENA", property = "resena", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OBJETOSOCIAL", property = "objetoSocial", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOPOLIZA", property = "numeroPoliza", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOPOLIZA", property = "numeroPoliza", jdbcType = JdbcType.VARCHAR),  
 		@Result(column = "COMPANIASEG", property = "companiaAseg", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
@@ -39,6 +39,9 @@ public interface CenActividadprofesionalExtendsMapper extends CenActividadprofes
 		@Result(column = "SOCIEDADPROFESIONAL", property = "sociedadProfesional", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ID_DATOS_REG", property = "idDatosRegistro", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NUM_REGISTRO", property = "numRegistro", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "PREFIJO_NUMSSPP", property = "prefijoNumsspp", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "CONTADOR_NUMSSPP", property = "contadorNumsspp", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "SUFIJO_NUMSSPP", property = "sufijoNumsspp", jdbcType = JdbcType.VARCHAR),        
 		@Result(column = "IDENTIFICACION_REG", property = "identificacionReg", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHA_INSCRIPCION", property = "fechaInscripcion", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHA_CANCELACION", property = "fechaCancelacion", jdbcType = JdbcType.DATE)
