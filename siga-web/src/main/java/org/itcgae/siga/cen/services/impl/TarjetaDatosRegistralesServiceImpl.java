@@ -7,6 +7,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.AdmContadorDTO;
+import org.itcgae.siga.DTOs.adm.ContadorRequestDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosRegistralesDTO;
 import org.itcgae.siga.DTOs.cen.DatosRegistralesItem;
@@ -19,14 +21,12 @@ import org.itcgae.siga.cen.services.ITarjetaDatosRegistralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividad;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividadExample;
-import org.itcgae.siga.db.entities.CenNocolegiadoKey;
 import org.itcgae.siga.db.entities.CenRegMercantil;
 import org.itcgae.siga.db.mappers.CenNocolegiadoActividadMapper;
-import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
 import org.itcgae.siga.db.mappers.CenRegMercantilMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenActividadprofesionalExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
@@ -59,7 +59,7 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 	private CenRegMercantilMapper cenRegMercantilMapper;
 	
 	@Autowired
-	private CenNocolegiadoMapper test;
+	private AdmContadorExtendsMapper admContadorMapper;
 	
 	
 	@Override
@@ -414,6 +414,51 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 		LOGGER.info(
 				"updateRegistryDataLegalPerson() -> Salida del servicio para actualizar datos registrales de una persona jurídica");
 		return updateResponseDTO;
+	}
+
+	@Override
+	public AdmContadorDTO getDatosContador(HttpServletRequest request) {
+		LOGGER.info(
+				"getDatosContador() -> Entrada al servicio para obtener el contador a aplicar a una sociedad");
+		AdmContadorDTO contadorDTO = new AdmContadorDTO();
+		List<AdmContadorDTO> contadorItem = new ArrayList<AdmContadorDTO>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if(null != idInstitucion)
+		{
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getDatosContador() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getDatosContador() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			//personaJuridicaActividadDTO.setIdInstitucion(String.valueOf(idInstitucion));
+			
+			
+			if(null != usuarios && usuarios.size() > 0) {
+				LOGGER.info(
+						"getDatosContador() / admContadorMapper.getContadoresSearch() -> Entrada a AdmContador para buscar el contador a aplicar");
+				ContadorRequestDTO exampleContador = new ContadorRequestDTO();
+				exampleContador.setIdInstitucion(idInstitucion.toString());
+				exampleContador.setIdContador("SSPP");
+				contadorItem = admContadorMapper.getContadoresSearch(0, exampleContador );
+				LOGGER.info(
+						"getDatosContador() / admContadorMapper.getContadoresSearch() -> Entrada a AdmContador para buscar el contador a aplicar");
+				if (null != contadorItem && contadorItem.size()>0) {
+					contadorDTO =  contadorItem.get(0);
+				}
+			}
+			
+		}
+		
+		LOGGER.info(
+				"getDatosContador() -> Entrada al servicio para obtener el contador a aplicar a una sociedad");
+		return contadorDTO;
 	}
 
 	
