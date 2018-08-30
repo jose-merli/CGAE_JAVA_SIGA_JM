@@ -492,7 +492,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 	public String selectSociedadesEditar(Short idInstitucion, Date fechaDesde, Date fechaHasta) {
 		// Formateo de fecha para sentencia sql
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		
+		fechaHasta.setHours(23);
 		SQL sql = new SQL();
 
 		/*sql.SELECT("PER.IDPERSONA AS IDPERSONA");
@@ -575,7 +575,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		String fechadesde = dateFormat.format(fechaDesde);
 		sql.WHERE("SOCIEDAD.FECHAMODIFICACION >= TO_DATE('" + fechadesde + "', 'DD/MM/YYYY')");
 		String fechahasta = dateFormat.format(fechaHasta);
-		sql.WHERE("SOCIEDAD.FECHAMODIFICACION < TO_DATE('" + fechahasta + "', 'DD/MM/YYYY')");
+		sql.WHERE("SOCIEDAD.FECHAMODIFICACION <= TO_DATE('" + fechahasta + "', 'DD/MM/YYYY')");
 		sql.WHERE("SOCIEDAD.FECHA_BAJA IS NULL");
 		sql.WHERE("SOCIEDAD.SOCIEDADPROFESIONAL = 1");
 		return sql.toString();

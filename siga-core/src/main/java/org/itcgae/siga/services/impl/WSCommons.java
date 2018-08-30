@@ -437,7 +437,11 @@ public class WSCommons {
 						argResena.setStringValue(regSociedad.getResena());
 						sociedadActualizacion.setResena(argResena);
 						if (null != regSociedad.getObjetoSocial()) {
-							sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
+							if(regSociedad.getObjetoSocial().length()>=20){
+								sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial().substring(0, 20));
+							}else{
+								sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
+							}
 						}
 						
 						//Insertamos los datos del registro
@@ -466,8 +470,13 @@ public class WSCommons {
 						argSociedad.setCIFNIF(regSociedad.getSociedadNif());
 						argSociedad.setDenominacion(regSociedad.getSociedadDenominacion());
 						FormaSocial formaSocial = FormaSocial.Factory.newInstance();
-						formaSocial.setStringValue(regSociedad.getSociedadFormaSocial());
-						argSociedad.setFormaSocial(formaSocial );
+						if(regSociedad.getSociedadFormaSocial().length()>=20){
+							formaSocial.setStringValue(regSociedad.getSociedadFormaSocial().substring(0, 20));
+						}else{
+							formaSocial.setStringValue(regSociedad.getSociedadFormaSocial());
+						}
+						
+						argSociedad.setFormaSocial(formaSocial);
 						sociedadActualizacion.setDatosSociedad(argSociedad);
 						sociedadActualizacion.setFechaAlta(UtilidadesString.toCalendar(regSociedad.getSociedadFechaAlta()));
 						sociedadActualizacion.setFechaConstitucion(UtilidadesString.toCalendar(regSociedad.getFechaConstitucion()));
@@ -492,37 +501,51 @@ public class WSCommons {
 						cElectronico.setStringValue(regSociedad.getCorreoElectronico());
 						cElectronico.setPublicar(Boolean.FALSE);
 						argDireccion.setCorreoElectronico(cElectronico);
+						int contador =0;
+						int contadorContacto = 0;
+						boolean telefono = false;
+						boolean movil = false;
+						boolean faxB = false;
 						//contactos
-						Contacto[] contactosArray = new Contacto[2];
+						if(regSociedad.getTelefono1()!=null){
+							contador++;
+							telefono = true;
+						}
+						if(regSociedad.getMovil()!=null){
+							contador++;
+							movil = true;
+						}
+						if(regSociedad.getFax1()!=null){
+							contador++;
+							faxB = true;
+						}
+						Contacto[] contactosArray = null;
+						if(contador>0){
+							contactosArray = new Contacto[contador];
+								if(telefono){
+									Contacto contacto1 = Contacto.Factory.newInstance();
+									Telefono telefono1 = Telefono.Factory.newInstance();
+									telefono1.setPublicar(Boolean.FALSE);
+									telefono1.setStringValue(regSociedad.getTelefono1());
+									contacto1.setTelefono(telefono1);
+									contactosArray[contadorContacto++] = contacto1;
+								}if(movil){
+									Contacto contacto1 = Contacto.Factory.newInstance();
+									TelefonoMovil movil1 = TelefonoMovil.Factory.newInstance();
+									movil1.setPublicar(Boolean.FALSE);
+									movil1.setStringValue(regSociedad.getMovil());
+									contacto1.setTelefonoMovil(movil1);
+									contactosArray[contadorContacto++] = contacto1;
+								}if(faxB){
+									Contacto contacto1 = Contacto.Factory.newInstance();
+									Fax fax = Fax.Factory.newInstance();
+									fax.setPublicar(Boolean.FALSE);
+									fax.setStringValue(regSociedad.getFax1());
+									contacto1.setFax(fax);
+									contactosArray[contadorContacto++] = contacto1;
+								}
+						}
 						
-						Contacto contacto1 = Contacto.Factory.newInstance();
-						Fax fax = Fax.Factory.newInstance();
-						fax.setPublicar(Boolean.FALSE);
-						fax.setStringValue(regSociedad.getFax1());
-						contacto1.setFax(fax);
-						Telefono telefono1 = Telefono.Factory.newInstance();
-						telefono1.setPublicar(Boolean.FALSE);
-						telefono1.setStringValue(regSociedad.getTelefono1());
-						contacto1.setTelefono(telefono1);
-						TelefonoMovil movil1 = TelefonoMovil.Factory.newInstance();
-						movil1.setPublicar(Boolean.FALSE);
-						movil1.setStringValue(regSociedad.getMovil());
-						contacto1.setTelefonoMovil(movil1);
-						contactosArray[0] = contacto1;
-						Contacto contacto2 = Contacto.Factory.newInstance();
-						Fax fax2 = Fax.Factory.newInstance();
-						fax2.setPublicar(Boolean.FALSE);
-						fax2.setStringValue(regSociedad.getFax2());
-						contacto2.setFax(fax2);
-						Telefono telefono2 = Telefono.Factory.newInstance();
-						telefono2.setPublicar(Boolean.FALSE);
-						telefono2.setStringValue(regSociedad.getTelefono2());
-						contacto2.setTelefono(telefono2);
-						TelefonoMovil movil2 = TelefonoMovil.Factory.newInstance();
-						movil2.setPublicar(Boolean.FALSE);
-						movil2.setStringValue(regSociedad.getMovil());
-						contacto2.setTelefonoMovil(movil2);
-						contactosArray[1] = contacto2;
 						argDireccion.setPaginaWeb(regSociedad.getPaginaWeb());
 						argDireccion.setContactoArray(contactosArray);
 						argDireccion.setPublicar(Boolean.FALSE);
@@ -564,18 +587,21 @@ public class WSCommons {
 									datosPersona.setIdentificacion(identificacion);
 									integranteFisico.setDatosPersona(datosPersona);
 									DatosProfesional datosProfesional = DatosProfesional.Factory.newInstance();
-									Profesional profesional = Profesional.Factory.newInstance();
 									Colegio colegio = Colegio.Factory.newInstance();
 									colegio.setCodigoColegio(integrante.getCodigocolegio());
 									colegio.setDescripcionColegio(integrante.getDescripcionColegio());
-									profesional.setColegio(colegio );
-									profesional.setNumColegiado(integrante.getNumColegiado());
-									profesional.setProfesion(integrante.getDescripcionCargo());
-									ProfesionalAbogado profesionalAbogado =  ProfesionalAbogado.Factory.newInstance();
-									profesionalAbogado.setColegio(colegio );
-									profesionalAbogado.setNumColegiado(integrante.getNumColegiado());
-									datosProfesional.setProfesional(profesional);
-									datosProfesional.setProfesionalAbogado(profesionalAbogado);
+									if(integrante.getProfesional()!=null){
+										Profesional profesional = Profesional.Factory.newInstance();
+										profesional.setColegio(colegio );
+										profesional.setNumColegiado(integrante.getNumColegiado());
+										profesional.setProfesion(integrante.getDescripcionCargo());
+										datosProfesional.setProfesional(profesional);
+									}else{
+										ProfesionalAbogado profesionalAbogado =  ProfesionalAbogado.Factory.newInstance();
+										profesionalAbogado.setColegio(colegio );
+										profesionalAbogado.setNumColegiado(integrante.getNumColegiado());
+										datosProfesional.setProfesionalAbogado(profesionalAbogado);
+									}
 									integranteFisico.setDatosProfesional(datosProfesional);
 									integranteUnitario.setIntegranteFisico(integranteFisico);
 									integranteUnitario.setFechaModificacion(UtilidadesString.toCalendar(integrante.getFechaModificacion()));
