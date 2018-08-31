@@ -2,6 +2,7 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.AdmContadorDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosRegistralesDTO;
 import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
@@ -50,6 +51,13 @@ public class TarjetaDatosRegistralesController {
 		UpdateResponseDTO response = tarjetaDatosRegistralesService.updateRegistryDataLegalPerson(perJuridicaDatosRegistralesUpdateDTO, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "perJuridicaDatosRegistrales/datosContador", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<AdmContadorDTO> getDatosContador(HttpServletRequest request) { 
+		AdmContadorDTO response = tarjetaDatosRegistralesService.getDatosContador(request);
+		return new ResponseEntity<AdmContadorDTO >(response, HttpStatus.OK);
+	}
+	
 	
 	
 }

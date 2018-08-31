@@ -23,7 +23,34 @@ public class DatosRegistralesItem {
 	private Date fechaInscripcion;
 	private Date fechaCancelacion;
 	private String identificacionReg;
-	
+	private String prefijoNumsspp;
+    private String contadorNumsspp;
+    private String sufijoNumsspp;
+	  
+	@JsonProperty("prefijoNumsspp")
+	public String getPrefijoNumsspp() {
+		return prefijoNumsspp;
+	}
+
+	public void setPrefijoNumsspp(String prefijoNumsspp) {
+		this.prefijoNumsspp = prefijoNumsspp;
+	}
+	@JsonProperty("contadorNumsspp")
+	public String getContadorNumsspp() {
+		return contadorNumsspp;
+	}
+
+	public void setContadorNumsspp(String contadorNumsspp) {
+		this.contadorNumsspp = contadorNumsspp;
+	}
+	@JsonProperty("sufijoNumsspp")
+	public String getSufijoNumsspp() {
+		return sufijoNumsspp;
+	}
+
+	public void setSufijoNumsspp(String sufijoNumsspp) {
+		this.sufijoNumsspp = sufijoNumsspp;
+	}
 	
 	/**
 	 */
