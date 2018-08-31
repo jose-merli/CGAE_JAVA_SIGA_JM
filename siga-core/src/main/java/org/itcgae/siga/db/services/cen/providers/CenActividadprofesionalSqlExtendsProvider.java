@@ -44,7 +44,7 @@ public class CenActividadprofesionalSqlExtendsProvider extends CenActividadprofe
 		sql.FROM("CEN_NOCOLEGIADO  NOCOL");
 		
 		sql.INNER_JOIN("CEN_PERSONA PER ON PER.IDPERSONA = NOCOL.IDPERSONA");
-		sql.INNER_JOIN("CEN_REG_MERCANTIL REG_MERC ON REG_MERC.ID_DATOS_REG = NOCOL.ID_DATOS_REG");
+		sql.LEFT_OUTER_JOIN("CEN_REG_MERCANTIL REG_MERC ON REG_MERC.ID_DATOS_REG = NOCOL.ID_DATOS_REG");
 		
 		sql.WHERE("NOCOL.IDPERSONA = '"+personaJuridicaSearchDTO.getIdPersona()+"'");
 		sql.WHERE("NOCOL.IDINSTITUCION = '"+personaJuridicaSearchDTO.getIdInstitucion()+"'");
