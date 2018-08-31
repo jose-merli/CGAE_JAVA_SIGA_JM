@@ -16,6 +16,7 @@ public class CenActividadprofesionalSqlExtendsProvider extends CenActividadprofe
 		sql.FROM("CEN_ACTIVIDADPROFESIONAL ACTIVIDAD");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON (REC.IDRECURSO = ACTIVIDAD.DESCRIPCION " + 
 				"		AND REC.IDLENGUAJE = '"+idLenguaje+"')");
+		sql.WHERE("ACTIVIDAD.FECHA_BAJA IS NULL");
 		sql.ORDER_BY("REC.DESCRIPCION");
 		return sql.toString();
 	}
