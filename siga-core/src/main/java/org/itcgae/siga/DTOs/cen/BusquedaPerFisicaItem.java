@@ -21,10 +21,12 @@ public class BusquedaPerFisicaItem {
 	private String situacion;
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaNacimiento;
+	private String numeroInstitucion;
+	private String idProvincia;
+	private String idActividadProfesional;
 	
 	
-
-
+	
 
 	/**
 	 *
@@ -244,6 +246,64 @@ public class BusquedaPerFisicaItem {
 	public void setFechaNacimiento(Date fechaNacimiento) {
 		this.fechaNacimiento = fechaNacimiento;
 	}
+	
+	
+	/**
+	 *
+	 */
+	public BusquedaPerFisicaItem numeroInstitucion(String numeroInstitucion){
+		this.numeroInstitucion = numeroInstitucion;
+		return this;
+	}
+
+
+	@JsonProperty("numeroInstitucion")
+	public String getNumeroInstitucion() {
+		return numeroInstitucion;
+	}
+
+
+	public void setNumeroInstitucion(String numeroInstitucion) {
+		this.numeroInstitucion = numeroInstitucion;
+	}
+	
+	/**
+	 *
+	 */
+	public BusquedaPerFisicaItem idProvincia(String idProvincia){
+		this.idProvincia = idProvincia;
+		return this;
+	}
+	
+	@JsonProperty("idProvincia")
+	public String getIdProvincia() {
+		return idProvincia;
+	}
+
+
+	public void setIdProvincia(String idProvincia) {
+		this.idProvincia = idProvincia;
+	}
+
+
+	/**
+	 *
+	 */
+	public BusquedaPerFisicaItem idActividadProfesional(String idActividadProfesional){
+		this.idActividadProfesional = idActividadProfesional;
+		return this;
+	}
+	
+	@JsonProperty("idActividadProfesional")
+	public String getIdActividadProfesional() {
+		return idActividadProfesional;
+	}
+
+
+	public void setIdActividadProfesional(String idActividadProfesional) {
+		this.idActividadProfesional = idActividadProfesional;
+	}
+
 	 
 	
 	@Override
@@ -265,13 +325,16 @@ public class BusquedaPerFisicaItem {
 	    		Objects.equals(this.numeroColegiado, busquedaFisicaItem.numeroColegiado) &&
 	    		Objects.equals(this.residente, busquedaFisicaItem.residente) &&
 	    		Objects.equals(this.situacion, busquedaFisicaItem.situacion) &&
-	    		Objects.equals(this.fechaNacimiento, busquedaFisicaItem.fechaNacimiento) ;
+	    		Objects.equals(this.fechaNacimiento, busquedaFisicaItem.fechaNacimiento) &&
+	    		Objects.equals(this.numeroInstitucion, busquedaFisicaItem.numeroInstitucion) &&
+	    		Objects.equals(this.idProvincia, busquedaFisicaItem.idProvincia) &&
+	    		Objects.equals(this.idActividadProfesional, busquedaFisicaItem.idActividadProfesional);
 	}
  
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(colegio, idPersona, nif, nombre, apellidos, primerApellido, segundoApellido, numeroColegiado, residente, situacion, fechaNacimiento);
+	    return Objects.hash(colegio, idPersona, nif, nombre, apellidos, primerApellido, segundoApellido, numeroColegiado, residente, situacion, fechaNacimiento, numeroInstitucion, idProvincia, idActividadProfesional);
 	}
 
 	
@@ -291,6 +354,9 @@ public class BusquedaPerFisicaItem {
 	    sb.append("    residente: ").append(toIndentedString(residente)).append("\n");
 	    sb.append("    situacion: ").append(toIndentedString(situacion)).append("\n");
 	    sb.append("    fechaNacimiento: ").append(toIndentedString(fechaNacimiento)).append("\n");
+	    sb.append("    numeroInstitucion: ").append(toIndentedString(numeroInstitucion)).append("\n");
+	    sb.append("    idProvincia: ").append(toIndentedString(idProvincia)).append("\n");
+	    sb.append("    idActividadProfesional: ").append(toIndentedString(idActividadProfesional)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
