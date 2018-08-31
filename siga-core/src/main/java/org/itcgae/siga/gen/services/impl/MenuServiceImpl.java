@@ -699,6 +699,22 @@ public class MenuServiceImpl implements IMenuService {
 		}
 		response.setStatus(SigaConstants.OK);
 		return response;
+	}
+
+	@Override
+	public ComboItem getInstitucionActual(HttpServletRequest request) {
+		ComboItem comboItem = new ComboItem();
+		CenInstitucion cenInstitucion = new CenInstitucion();
+		// Obtenemos atributos del usuario logeado
+		LOGGER.debug("Obtenemos atributos del usuario logeado");
+		String token = request.getHeader("Authorization");
+		Short institucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		cenInstitucion = institucionMapper.selectByPrimaryKey(institucion);
+		
+		comboItem.setLabel(cenInstitucion.getNombre());
+		comboItem.setValue(String.valueOf(cenInstitucion.getIdinstitucion()));
+		return comboItem;
 	}	
 
 
