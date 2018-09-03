@@ -157,7 +157,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT_DISTINCT(
 				"LISTAGG(concat(per2.nombre || ' ',concat(per2.apellidos1 || ' ',per2.apellidos2) ),';') WITHIN GROUP(ORDER BY per2.nombre) AS nombresintegrantes");
 		sql.SELECT("cliColegiado.idinstitucion AS idinstitucion");
-
+		sql.SELECT("'NO COLEGIADO' AS ESTADOCOLEGIAL");
 		sql.FROM("cen_persona per");
 
 		sql.LEFT_OUTER_JOIN("cen_nocolegiado col  ON per.idpersona = col.idpersona");
