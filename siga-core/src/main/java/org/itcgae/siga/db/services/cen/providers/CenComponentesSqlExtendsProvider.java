@@ -76,7 +76,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.SELECT("COMPONENTE.CAPITALSOCIAL");
 		sql.SELECT("TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy') AS FECHACARGOINFORME");
 		//sql.SELECT("DECODE(f_siga_gettipocliente(COMPONENTE.CEN_CLIENTE_IDPERSONA,COMPONENTE.CEN_CLIENTE_IDINSTITUCION,SYSDATE),20,'Ejerciente','') AS EJERCIENTE");
-		sql.SELECT("NVL(CAT.DESCRIPCION, DECODE(PERSONA.IDTIPOIDENTIFICACION,20,'SOCIEDAD',50,'SOCIEDAD','NO COLEGIADO')) AS EJERCIENTE");
+		sql.SELECT("NVL(CAT.DESCRIPCION, DECODE(PERSONA.IDTIPOIDENTIFICACION,20,'SOCIEDAD','NO COLEGIADO')) AS EJERCIENTE");
 		sql.SELECT("DECODE(TO_CHAR(COMPONENTE.FECHABAJA, 'dd/mm/yyyy'), NULL,TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy'),TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy') || ' -(' || TO_CHAR(COMPONENTE.FECHABAJA, 'dd/mm/yyyy') || ') ' ) AS FECHA_HISTORICO");
 		sql.SELECT("PERSONA.NIFCIF");
 		sql.SELECT("PERSONA.NOMBRE");
@@ -223,7 +223,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.VALUES("IDTIPOCOLEGIO", "'" + tarjetaIntegrantesCreateDTO.getIdTipoColegio() + "'");
 		}
 		
-		if(!tarjetaIntegrantesCreateDTO.getIdProvincia().equals("")) {
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getIdProvincia())) {
 			sql.VALUES("IDPROVINCIA", "'" + tarjetaIntegrantesCreateDTO.getIdProvincia() + "'");
 		}
 		
@@ -231,15 +231,15 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.SET("FLAG_SOCIO = '" + tarjetaIntegrantesCreateDTO.getFlagSocio() + "'");
 		}
 		
-		if(!tarjetaIntegrantesCreateDTO.getNumColegiado().equals("")) {
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getNumColegiado())) {
 			sql.VALUES("NUMCOLEGIADO", "'" + tarjetaIntegrantesCreateDTO.getNumColegiado() + "'");
 		}
 		
-		if(!tarjetaIntegrantesCreateDTO.getCapitalSocial().equals("")) {
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getCapitalSocial())) {
 			sql.VALUES("CAPITALSOCIAL", "'" + tarjetaIntegrantesCreateDTO.getCapitalSocial() + "'");
 		}
 		
-		if(!tarjetaIntegrantesCreateDTO.getIdCargo().equals("")) {
+		if(UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getIdCargo())) {
 			sql.VALUES("IDCARGO", "'" + tarjetaIntegrantesCreateDTO.getIdCargo() + "'");
 		}
 		
