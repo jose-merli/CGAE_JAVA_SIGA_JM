@@ -10,6 +10,7 @@ public class SociedadCreateDTO {
 	private String nif;
 	private String tipo;
 	private Date fechaConstitucion;
+	private Date fechaAlta;
 	private Date fechaBaja;
 	private String denominacion;
 	private String abreviatura;
@@ -21,7 +22,22 @@ public class SociedadCreateDTO {
 	private String motivo;
 	
 	
+	/**
+	 */
+	public SociedadCreateDTO fechaAlta(Date fechaAlta){
+		this.fechaAlta = fechaAlta;
+		return this;
+	}
 	
+	@JsonProperty("fechaAlta")
+	public Date getFechaAlta() {
+		return fechaAlta;
+	}
+
+
+	public void setFechaAlta(Date fechaAlta) {
+		this.fechaAlta = fechaAlta;
+	}
 
 	/**
 	 */

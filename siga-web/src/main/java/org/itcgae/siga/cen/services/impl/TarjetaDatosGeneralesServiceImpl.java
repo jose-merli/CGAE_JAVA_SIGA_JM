@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -897,7 +898,8 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 	
 	
 	protected CenCliente rellenarInsertCenClienteNewSociety(SociedadCreateDTO sociedadCreateDTO ,AdmUsuarios usuario, Short idInstitucion) {
-		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
 		CenCliente record = new CenCliente();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		
@@ -920,6 +922,11 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				record.setIdlenguaje(sociedadCreateDTO.getIdioma());
 			}
 		
+			if (null != sociedadCreateDTO.getFechaAlta()) {
+				record.setFechaalta(sociedadCreateDTO.getFechaAlta());
+//				sql.VALUES("FECHAALTA", "TO_DATE('" + fechaAlta + "','DD/MM/YYYY')");
+			}
+
 			
 			if(null != sociedadCreateDTO.getCuentaContable() && !sociedadCreateDTO.getCuentaContable().equals("") ) {
 				record.setAsientocontable(sociedadCreateDTO.getCuentaContable());

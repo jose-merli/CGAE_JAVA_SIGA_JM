@@ -14,6 +14,7 @@ public class PersonaJuridicaItem {
 	private String abreviatura;
 	//@JsonFormat(pattern = "dd-MM-yyyy")
 	private String fechaConstitucion;
+	private String fechaAlta;
 	private String tipo;
 	private String numeroIntegrantes;
 	private String nombresIntegrantes;
@@ -108,6 +109,23 @@ public class PersonaJuridicaItem {
 	
 	/**
 	 */
+	public PersonaJuridicaItem fechaAlta(String fechaAlta){
+		this.fechaAlta = fechaAlta;
+		return this;
+	}
+	
+	
+	@JsonProperty("fechaAlta")
+	public String getFechaAlta() {
+		return fechaAlta;
+	}
+	public void setFechaAlta(String fechaAlta) {
+		this.fechaAlta = fechaAlta;
+	}
+	
+	/**
+	 */
+	
 	public PersonaJuridicaItem fechaConstitucion(String fechaConstitucion){
 		this.fechaConstitucion = fechaConstitucion;
 		return this;
@@ -124,6 +142,7 @@ public class PersonaJuridicaItem {
 	
 	/**
 	 */
+	
 	public PersonaJuridicaItem tipo(String tipo){
 		this.tipo = tipo;
 		return this;

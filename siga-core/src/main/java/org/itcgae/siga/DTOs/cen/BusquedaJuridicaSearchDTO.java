@@ -14,6 +14,7 @@ public class BusquedaJuridicaSearchDTO {
 	private String denominacion;
 	//@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date fechaConstitucion;
+	private Date fechaAlta;
 	private String integrante;
 	private String [] grupos;
 	private boolean sociedadesProfesionales;
@@ -100,6 +101,25 @@ public class BusquedaJuridicaSearchDTO {
 		this.fechaConstitucion = fechaConstitucion;
 	}
 	
+	/**
+	 *
+	 */
+	public BusquedaJuridicaSearchDTO fechaAlta(Date fechaAlta){
+		this.fechaAlta = fechaAlta;
+		return this;
+	}
+	
+	
+	
+	@JsonProperty("fechaAlta")
+	public Date getFechaAlta() {
+		return fechaAlta;
+	}
+	
+	
+	public void setFechaAlta(Date fechaAlta) {
+		this.fechaAlta = fechaAlta;
+	}
 	
 	/**
 	 *
