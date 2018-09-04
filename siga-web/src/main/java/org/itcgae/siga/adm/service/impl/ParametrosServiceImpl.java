@@ -92,22 +92,22 @@ public class ParametrosServiceImpl implements IParametrosService {
 			if (!parametroRequestDTO.getParametrosGenerales().equalsIgnoreCase("")
 					&& !parametroRequestDTO.getModulo().equalsIgnoreCase("")
 					&& parametroRequestDTO.getIdInstitucion() != null) {
-				if (!String.valueOf(idInstitucion).equals(SigaConstants.InstitucionGeneral)) {
-					// Buscar en gen_parametros por modulo e institucion
-					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Entrada a genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
-					parametroItems = genParametrosExtendsMapper.getParametersSearch(numPagina, parametroRequestDTO, usuario.getIdlenguaje());
-					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
-
-					parametroDTO.setParametrosItems(parametroItems);
-				}
-				 else if (String.valueOf(idInstitucion).equals(SigaConstants.InstitucionGeneral)) {
+//				if (!String.valueOf(idInstitucion).equals(SigaConstants.InstitucionGeneral)) {
+//					// Buscar en gen_parametros por modulo e institucion
+//					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Entrada a genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
+//					parametroItems = genParametrosExtendsMapper.getParametersSearch(numPagina, parametroRequestDTO, usuario.getIdlenguaje());
+//					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
+//
+//					parametroDTO.setParametrosItems(parametroItems);
+//				}
+//				 else if (String.valueOf(idInstitucion).equals(SigaConstants.InstitucionGeneral)) {
 					 
 					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Entrada a genParametrosExtendsMapper para obtener listado de los módulos comunes a todas las instituciones");
-					parametroItems = genParametrosExtendsMapper.getParametersSearchGeneral(numPagina, parametroRequestDTO, usuario.getIdlenguaje());
+					parametroItems = genParametrosExtendsMapper.getParametersSearchGeneral(numPagina, parametroRequestDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion));
 					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos comunes a todas las instituciones");
 
 					parametroDTO.setParametrosItems(parametroItems);
-				}
+//				}
 			}
 		}	
 		else {

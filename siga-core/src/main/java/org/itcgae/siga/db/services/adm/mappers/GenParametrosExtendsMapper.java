@@ -9,12 +9,10 @@ import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.adm.ParametroItem;
 import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
-import org.itcgae.siga.DTOs.adm.UsuarioUpdateDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
-import org.itcgae.siga.db.services.adm.providers.AdmUsuariosSqlExtendsProvider;
 import org.itcgae.siga.db.services.adm.providers.GenParametrosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -70,7 +68,7 @@ public interface GenParametrosExtendsMapper extends GenParametrosMapper{
 		@Result(column = "POSIBLEELIMINAR", property = "posibleEliminar", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDINSTITUCIONACTUAL", property = "idinstitucionActual", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ParametroItem> getParametersSearchGeneral(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje);
+	List<ParametroItem> getParametersSearchGeneral(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje, String idInstitucion);
 	
 	
 	

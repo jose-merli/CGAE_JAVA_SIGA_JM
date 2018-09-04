@@ -2,7 +2,6 @@ package org.itcgae.siga.db.services.adm.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
-import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.mappers.GenParametrosSqlProvider;
 
@@ -50,7 +49,7 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 	}
 	
 	
-	public String getParametersSearchGeneral(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje){
+	public String getParametersSearchGeneral(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje, String idInstitucion){
 		SQL sql = new SQL();
 		SQL sql1 = new SQL();
 		
@@ -73,7 +72,7 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 		
 		sql.FROM("GEN_PARAMETROS PARAM");
 		sql.LEFT_OUTER_JOIN("GEN_DICCIONARIO  DICC ON (PARAM.IDRECURSO = DICC.IDRECURSO  AND DICC.IDLENGUAJE = '"+ idLenguaje + "')");
-		sql.WHERE("(IDINSTITUCION IN ('2000','0')  AND FECHA_BAJA IS NULL) AND MODULO ='" + parametroRequestDTO.getModulo() + "'");
+		sql.WHERE("(IDINSTITUCION IN ('"+idInstitucion+"','0')  AND FECHA_BAJA IS NULL) AND MODULO ='" + parametroRequestDTO.getModulo() + "'");
 		sql.GROUP_BY("PARAM.MODULO, PARAM.PARAMETRO, PARAM.IDRECURSO, DICC.DESCRIPCION");
 		sql.ORDER_BY("PARAM.PARAMETRO");
 
@@ -104,12 +103,12 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 		sql.SELECT("F_SIGA_GETPARAMETROGENERAL(PARAM.MODULO, PARAM.PARAMETRO,'"+ parametroRequestDTO.getIdInstitucion()+"') AS VALOR");
 		
 		// diferenciar entre institucion general y no general
-		if(parametroRequestDTO.getIdInstitucion().equals(SigaConstants.InstitucionGeneral))
-		{
+//		if(parametroRequestDTO.getIdInstitucion().equals(SigaConstants.InstitucionGeneral))
+//		{
 			sql.SELECT("TO_CHAR(MAX(IDINSTITUCION)) AS IDINSTITUCION");
-		}else {
-			sql.SELECT("DECODE(MAX(IDINSTITUCION),'"+ parametroRequestDTO.getIdInstitucion()+"','"+ parametroRequestDTO.getIdInstitucion()+"',TO_CHAR(MIN(IDINSTITUCION))) AS IDINSTITUCION");
-		}
+//		}else {
+//			sql.SELECT("DECODE(MAX(IDINSTITUCION),'"+ parametroRequestDTO.getIdInstitucion()+"','"+ parametroRequestDTO.getIdInstitucion()+"',TO_CHAR(MIN(IDINSTITUCION))) AS IDINSTITUCION");
+//		}
 	
 		sql.SELECT("NVL(DICC.DESCRIPCION, 'SIN DEFINIR') AS DESCRIPCION");
 		sql.SELECT("PARAM.FECHA_BAJA");
@@ -118,13 +117,13 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 		sql.WHERE("PARAM.MODULO = '"+ parametroRequestDTO.getModulo() +"'");
 		
 		// diferenciar entre institucion general y no general
-		if(parametroRequestDTO.getIdInstitucion().equals(SigaConstants.InstitucionGeneral))
-		{
-			sql.WHERE("IDINSTITUCION IN ('"+ parametroRequestDTO.getIdInstitucion()+"','0')");
-		}
-		else {
-			sql.WHERE("IDINSTITUCION IN ('"+ parametroRequestDTO.getIdInstitucion()+"','2000','0')");
-		}
+//		if(parametroRequestDTO.getIdInstitucion().equals(SigaConstants.InstitucionGeneral))
+//		{
+		sql.WHERE("IDINSTITUCION IN ('"+ parametroRequestDTO.getIdInstitucion()+"','0')");
+//		}
+//		else {
+//			sql.WHERE("IDINSTITUCION IN ('"+ parametroRequestDTO.getIdInstitucion()+"','2000','0')");
+//		}
 		
 		sql.WHERE("FECHA_BAJA IS NULL");
 		sql.GROUP_BY("PARAM.MODULO");
