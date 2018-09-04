@@ -22,6 +22,9 @@ public class BusquedaPerJuridicaItem {
 	private Date fechaBaja;
 	private String idTipoIdentificacion;
 	private String sociedadProfesional;
+	private String situacion;
+	
+	
 	
 	
 
@@ -267,6 +270,24 @@ public class BusquedaPerJuridicaItem {
 	}
 
 	
+	/**
+	 *
+	 */
+	public BusquedaPerJuridicaItem situacion(String situacion){
+		this.situacion = situacion;
+		return this;
+	}
+
+	@JsonProperty("situacion")
+	public String getSituacion() {
+		return situacion;
+	}
+
+
+	public void setSituacion(String situacion) {
+		this.situacion = situacion;
+	}
+
 	 
 	
 	@Override
@@ -289,12 +310,13 @@ public class BusquedaPerJuridicaItem {
 	    		Objects.equals(this.nombresIntegrantes, busquedaJuridicaItem.nombresIntegrantes) &&
 	    		Objects.equals(this.fechaBaja, busquedaJuridicaItem.fechaBaja) &&  
 	    		Objects.equals(this.idTipoIdentificacion, busquedaJuridicaItem.idTipoIdentificacion) &&
-	    		Objects.equals(this.sociedadProfesional, busquedaJuridicaItem.sociedadProfesional);
+	    		Objects.equals(this.sociedadProfesional, busquedaJuridicaItem.sociedadProfesional) &&
+	    		Objects.equals(this.situacion, busquedaJuridicaItem.situacion);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idInstitucion, idPersona, nif, denominacion, abreviatura, fechaConstitucion, tipo, numeroIntegrantes, nombresIntegrantes, fechaBaja, idTipoIdentificacion, sociedadProfesional);
+	    return Objects.hash(idInstitucion, idPersona, nif, denominacion, abreviatura, fechaConstitucion, tipo, numeroIntegrantes, nombresIntegrantes, fechaBaja, idTipoIdentificacion, sociedadProfesional, situacion);
 	}
 
 	
@@ -315,6 +337,7 @@ public class BusquedaPerJuridicaItem {
 	    sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
 	    sb.append("    idTipoIdentificacion: ").append(toIndentedString(idTipoIdentificacion)).append("\n");
 	    sb.append("    sociedadProfesional: ").append(toIndentedString(sociedadProfesional)).append("\n");
+	    sb.append("    situacion: ").append(toIndentedString(situacion)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
