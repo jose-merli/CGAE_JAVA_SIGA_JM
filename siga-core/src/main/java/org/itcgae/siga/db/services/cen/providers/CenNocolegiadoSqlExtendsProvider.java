@@ -392,25 +392,27 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		
 		sql.UPDATE("cen_nocolegiado");
 		
-		if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getResena())) {
+		//if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getResena())) {
 			sql.SET("RESENA = '" + perJuridicaDatosRegistralesUpdateDTO.getResena() + "'");
-		}
+		//}
 		
-		if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getObjetoSocial())) {
+		//if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getObjetoSocial())) {
 			sql.SET("OBJETOSOCIAL = '" + perJuridicaDatosRegistralesUpdateDTO.getObjetoSocial() + "'");
-		}
+		//}
 	
-		if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getNumeroPoliza())) {
+		//if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getNumeroPoliza())) {
 			sql.SET("NOPOLIZA = '" + perJuridicaDatosRegistralesUpdateDTO.getNumeroPoliza() + "'");
-		}
+		//}
 		
-		if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getCompaniaAseg())) {
+		//if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getCompaniaAseg())) {
 			sql.SET("COMPANIASEG = '" + perJuridicaDatosRegistralesUpdateDTO.getCompaniaAseg() + "'");
-		}
-		
+		//}
+			
 		if(null != perJuridicaDatosRegistralesUpdateDTO.getFechaFin()) {
 			String fechaF = dateFormat.format(perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
 			sql.SET("FECHAFIN = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+		}else {
+			sql.SET("FECHAFIN = " + perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
 		}
 		
 		/*if(null != perJuridicaDatosRegistralesUpdateDTO.getFechaBaja()) {
@@ -431,12 +433,18 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		}
 		if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp())) {
 			sql.SET("PREFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp() + "'");
+		}else {
+			sql.SET("PREFIJO_NUMSSPP = " + perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp());
 		}
 		if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp())) {
 			sql.SET("CONTADOR_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp() + "'");
+		}else {
+			sql.SET("CONTADOR_NUMSSPP = " + perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp());
 		}
 		if(null!=perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp() && !perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp().equals("")) {
 			sql.SET("SUFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp() + "'");
+		}else {
+			sql.SET("SUFIJO_NUMSSPP = " + perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp());
 		}
 		
 		sql.SET("FECHAMODIFICACION = SYSDATE");

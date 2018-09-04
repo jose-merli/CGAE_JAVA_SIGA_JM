@@ -30,6 +30,7 @@ import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividad;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividadExample;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
+import org.itcgae.siga.db.entities.CenNocolegiadoKey;
 import org.itcgae.siga.db.entities.CenRegMercantil;
 import org.itcgae.siga.db.mappers.CenNocolegiadoActividadMapper;
 import org.itcgae.siga.db.mappers.CenRegMercantilMapper;
@@ -282,13 +283,28 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 			
 			// 2. Actualizar tabla cen_reg_mercantil
 			if(responseCenPersona == 1  ) {
-				if (null != perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional() && perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional().equals("1") ) {
+				//if (null != perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional() && perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional().equals("1") ) {
 				LOGGER.info(
 						"updateRegistryDataLegalPerson() / cenRegMercantilMapper.updateByPrimaryKey(); -> Entrada a cenRegMercantilMapper para actualizar datos de una persona jurídica");
 				if(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro()!= null){
+					
 					CenRegMercantil datosRegistro = new CenRegMercantil();
-					datosRegistro.setIdDatosReg(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());
-					datosRegistro.setNumRegistro(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro());
+					if(!UtilidadesString.esCadenaVacia( perJuridicaDatosRegistralesUpdateDTO.getnumRegistro())) {
+                    datosRegistro.setIdDatosReg(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());
+                    datosRegistro.setNumRegistro(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro());
+					
+//					if(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro() != null) {
+//						datosRegistro.setIdDatosReg(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());
+//					}else {
+//						datosRegistro.setIdDatosReg(Long.parseLong(" "));
+//					}
+//				
+//
+//						datosRegistro.setNumRegistro(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro());
+//					}else {
+//						datosRegistro.setNumRegistro(" ");
+//					}
+					
 					datosRegistro.setIdentificacionReg(perJuridicaDatosRegistralesUpdateDTO.getIdentificacionReg());
 					datosRegistro.setFechaInscripcion(perJuridicaDatosRegistralesUpdateDTO.getFechaInscripcion());
 					datosRegistro.setFechaCancelacion(perJuridicaDatosRegistralesUpdateDTO.getFechaCancelacion());
@@ -296,38 +312,54 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 					datosRegistro.setUsumodificacion(usuario.getIdusuario());
 					
 					responseCenRegMercantil = cenRegMercantilMapper.updateByPrimaryKey(datosRegistro);
+					}else{
+						CenNocolegiado record = new CenNocolegiado();
+						CenNocolegiadoKey key =  new CenNocolegiadoKey(); 
+						key.setIdinstitucion(idInstitucion);
+						key.setIdpersona(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona()));
+
+						record = cenNocolegiadoExtendsMapper.selectByPrimaryKey(key);
+						record.setIdDatosReg(null);
+						
+						
+						responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByPrimaryKey(record);//ExampleDataLegalPerson(perJuridicaDatosRegistralesUpdateDTO, String.valueOf(idInstitucion), usuario);
+						responseCenRegMercantil = cenRegMercantilMapper.deleteByPrimaryKey(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());
+						perJuridicaDatosRegistralesUpdateDTO.setIdDatosRegistro(null);
+					}
 				}else{
-					CenRegMercantil datosRegistro = new CenRegMercantil();
-					datosRegistro.setNumRegistro(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro());
-					datosRegistro.setIdentificacionReg(perJuridicaDatosRegistralesUpdateDTO.getIdentificacionReg());
-					datosRegistro.setFechaInscripcion(perJuridicaDatosRegistralesUpdateDTO.getFechaInscripcion());
-					datosRegistro.setFechaCancelacion(perJuridicaDatosRegistralesUpdateDTO.getFechaCancelacion());
-					datosRegistro.setFechamodificacion(new Date());
-					datosRegistro.setUsumodificacion(usuario.getIdusuario());
-					
-					responseCenRegMercantil = cenRegMercantilMapper.insert(datosRegistro);
-					perJuridicaDatosRegistralesUpdateDTO.setIdDatosRegistro(datosRegistro.getIdDatosReg());
-					// 4. Actualizamos el registro en el contador en caso de que el modo sea correcto.
-					AdmContador contadorDTO = new AdmContador();
-					List<AdmContadorDTO> contadorItem = new ArrayList<AdmContadorDTO>();
-					AdmContadorKey exampleContador = new AdmContadorKey();
-					exampleContador.setIdinstitucion(idInstitucion);
-					exampleContador.setIdcontador("SSPP");
-					contadorDTO = admContadorMapper.selectByPrimaryKey(exampleContador);
-					LOGGER.info(
-							"getDatosContador() / admContadorMapper.getContadoresSearch() -> Entrada a AdmContador para buscar el contador a aplicar");
-					if (null != contadorDTO) {
-						if (contadorDTO.getModo().equals(Short.valueOf("0"))) {
-							if (null != perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp()) {
-								contadorDTO.setContador(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp()));
-								contadorDTO.setFechamodificacion(new Date());
-								contadorDTO.setUsumodificacion(usuario.getIdusuario());
-								admContadorMapper.updateByPrimaryKey(contadorDTO);
+					if(!UtilidadesString.esCadenaVacia( perJuridicaDatosRegistralesUpdateDTO.getnumRegistro())) {
+						CenRegMercantil datosRegistro = new CenRegMercantil();
+						datosRegistro.setNumRegistro(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro());
+						datosRegistro.setIdentificacionReg(perJuridicaDatosRegistralesUpdateDTO.getIdentificacionReg());
+						datosRegistro.setFechaInscripcion(perJuridicaDatosRegistralesUpdateDTO.getFechaInscripcion());
+						datosRegistro.setFechaCancelacion(perJuridicaDatosRegistralesUpdateDTO.getFechaCancelacion());
+						datosRegistro.setFechamodificacion(new Date());
+						datosRegistro.setUsumodificacion(usuario.getIdusuario());
+						
+						responseCenRegMercantil = cenRegMercantilMapper.insert(datosRegistro);
+						perJuridicaDatosRegistralesUpdateDTO.setIdDatosRegistro(datosRegistro.getIdDatosReg());
+						// 4. Actualizamos el registro en el contador en caso de que el modo sea correcto.
+						AdmContador contadorDTO = new AdmContador();
+						List<AdmContadorDTO> contadorItem = new ArrayList<AdmContadorDTO>();
+						AdmContadorKey exampleContador = new AdmContadorKey();
+						exampleContador.setIdinstitucion(idInstitucion);
+						exampleContador.setIdcontador("SSPP");
+						contadorDTO = admContadorMapper.selectByPrimaryKey(exampleContador);
+						LOGGER.info(
+								"getDatosContador() / admContadorMapper.getContadoresSearch() -> Entrada a AdmContador para buscar el contador a aplicar");
+						if (null != contadorDTO) {
+							if (contadorDTO.getModo().equals(Short.valueOf("0"))) {
+								if (null != perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp()) {
+									contadorDTO.setContador(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp()));
+									contadorDTO.setFechamodificacion(new Date());
+									contadorDTO.setUsumodificacion(usuario.getIdusuario());
+									admContadorMapper.updateByPrimaryKey(contadorDTO);
+								}
 							}
 						}
 					}
 				}
-			}
+			//}
 				responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson(perJuridicaDatosRegistralesUpdateDTO, String.valueOf(idInstitucion), usuario);
 				LOGGER.info(
 						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson() -> Salida de cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
