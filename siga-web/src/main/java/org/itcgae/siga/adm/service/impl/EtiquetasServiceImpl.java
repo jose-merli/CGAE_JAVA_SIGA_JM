@@ -49,6 +49,10 @@ public class EtiquetasServiceImpl implements IEtiquetasService{
 		LOGGER.info("getLabelLenguage() / genDiccionarioExtendsMapper.getLabelLenguage() -> Salida de genDiccionarioExtendsMapper para obtener lista de idiomas disponibles en la aplicación");
 		
 		if(null != combooItems && combooItems.size() > 0){
+			// primer elemento a vacio para componente de pantalla dropdown
+			comboItem.setLabel("");
+			comboItem.setValue("");
+			combooItems.add(0,comboItem);
 			comboDTO.setCombooItems(combooItems);
 		}
 		else {
