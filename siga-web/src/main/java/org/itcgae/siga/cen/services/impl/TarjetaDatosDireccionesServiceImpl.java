@@ -220,10 +220,10 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				AdmUsuarios usuario = usuarios.get(0);
 				comboItems = cenPaisExtendsMapper.selectPais(usuario.getIdlenguaje());
 				if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
+					/*ComboItem element = new ComboItem();
 					element.setLabel("");
 					element.setValue("");
-					comboItems.add(0, element);
+					comboItems.add(0, element);*/
 					
 					// busqueda binaria de España
 					List<String> listaPaises = comboItems.stream().map(object -> Objects.toString(object.getLabel(), null)).collect(Collectors.toList());
@@ -231,7 +231,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					ComboItem elementSpain = new ComboItem();
 					elementSpain.setLabel(comboItems.get(indexSpain).getLabel());
 					elementSpain.setValue(comboItems.get(indexSpain).getValue());
-					comboItems.add(1, elementSpain);
+					comboItems.add(0, elementSpain);
 					
 					// eliminamos españa del indice anterior
 					comboItems.remove(indexSpain+1);
@@ -249,33 +249,32 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		return comboDTO;
 	}
 	@Override
-	public ComboDTO getPoblacion(HttpServletRequest request, String idProvincia) {
+	public ComboDTO getPoblacion(HttpServletRequest request, String idProvincia, String filtro) {
 		 
 		ComboDTO poblacionesReturn = new ComboDTO();
-		List<ComboItem> poblaciones = new ArrayList<ComboItem>();
+		List<CenPoblaciones> poblaciones = new ArrayList<CenPoblaciones>();
 		
 		CenPoblacionesExample example  = new CenPoblacionesExample();
-		example.createCriteria().andIdprovinciaEqualTo(idProvincia);
+		example.createCriteria().andIdprovinciaEqualTo(idProvincia).andNombreLike("%"+filtro+"%");
 		example.setOrderByClause("NOMBRE");
-		poblaciones = cenPoblacionesExtendsMapper.getComboPoblaciones(idProvincia);
-//		if (null != poblaciones && poblaciones.size()>0) {
-//			List<ComboItem> combooItems = new ArrayList<ComboItem>();
-//			ComboItem comboItem = new ComboItem();
-//			comboItem.setLabel("");
-//			comboItem.setValue("");
-//			combooItems.add(comboItem);
-//
-//			for (CenPoblaciones cenPoblaciones : poblaciones) {
-//				comboItem = new ComboItem();
-//				comboItem.setLabel(cenPoblaciones.getNombre());
-//				comboItem.setValue(cenPoblaciones.getIdpoblacion());
-//				combooItems.add(comboItem);
-//			}
-//		
-//			poblacionesReturn.setCombooItems(combooItems);
-//		}
+		poblaciones = cenPoblacionesMapper.selectByExample(example);
 		
-		poblacionesReturn.setCombooItems(poblaciones);
+		if (null != poblaciones && poblaciones.size()>0) {
+			List<ComboItem> combooItems = new ArrayList<ComboItem>();
+			ComboItem comboItem = new ComboItem();
+			comboItem.setLabel("");
+			comboItem.setValue("");
+			combooItems.add(comboItem);
+
+			for (CenPoblaciones cenPoblaciones : poblaciones) {
+				comboItem = new ComboItem();
+				comboItem.setLabel(cenPoblaciones.getNombre());
+				comboItem.setValue(cenPoblaciones.getIdpoblacion());
+				combooItems.add(comboItem);
+			}
+	
+			poblacionesReturn.setCombooItems(combooItems);
+		}
 		
 		return poblacionesReturn;
 	}

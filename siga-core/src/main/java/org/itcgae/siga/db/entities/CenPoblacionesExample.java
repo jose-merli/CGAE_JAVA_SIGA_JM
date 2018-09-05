@@ -344,7 +344,7 @@ public class CenPoblacionesExample {
 		}
 
 		public Criteria andNombreLike(String value) {
-			addCriterion("NOMBRE like", value, "nombre");
+			addCriterion("upper(NOMBRE) like", value.toUpperCase(), "nombre");
 			return (Criteria) this;
 		}
 
