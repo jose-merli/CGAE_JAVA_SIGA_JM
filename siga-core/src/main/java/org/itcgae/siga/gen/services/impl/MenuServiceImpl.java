@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -200,6 +201,7 @@ public class MenuServiceImpl implements IMenuService {
 		menuEntities = menuExtend.selectMenuByExample(String.valueOf(idInstitucion), idPerfiles);
 
 		if (null != menuEntities && !menuEntities.isEmpty()) {
+			// Componemos el menú
 			Boolean tieneRuedaConf = Boolean.FALSE;
 			Boolean tieneMenuConfi = Boolean.FALSE;
 			for (GenMenu menu : menuEntities) {
@@ -209,6 +211,7 @@ public class MenuServiceImpl implements IMenuService {
 				}else if(menu.getIdrecurso().equals("menu.administracion") || menu.getIdrecurso().equals("menu.administracion.gestionCatalogosMaestros")) {
 					tieneMenuConfi= Boolean.TRUE;
 				}
+
 			}
 			if (!tieneRuedaConf && tieneMenuConfi) {
 				GenMenuExample exampleMenu = new GenMenuExample();
@@ -231,12 +234,34 @@ public class MenuServiceImpl implements IMenuService {
 			List<GenMenu> rootMenus = menuEntities.stream()
 					.filter(i -> Strings.isNullOrEmpty(i.getIdparent()) || i.getIdparent().equals(" "))
 					.collect(Collectors.toList());
+
 			// Componemos el menú
 			for (GenMenu dbItem : rootMenus) {
 				MenuItem item = processMenu(dbItem, menuEntities, idLenguaje);
 				items.add(item);
 			}
+			List<String> idRecursos = new ArrayList<String>();
+			for (MenuItem dbItem : items) {
+				idRecursos.addAll(recuperaridRecursos(dbItem));
+				if (null !=dbItem.getItems() && dbItem.getItems().size()>0) {
+					
+				}else{
+					if (!dbItem.getTienePadre()) {
+						
+					}
+				}
+			}
+			for (GenMenu menu : menuEntities) {
+				if (!idRecursos.contains(menu.getIdrecurso())) {
+					MenuItem menuItem = new MenuItem();
+					menuItem.setLabel(menu.getIdrecurso());
+					menuItem.setIdclass(menu.getIdclass());
+					menuItem.setRouterLink(menu.getPath());
+					menuItem.setItems(null);
+					items.add(menuItem);
+				}
 
+			}
 			response.setMenuItems(items);
 		}
 
@@ -244,8 +269,21 @@ public class MenuServiceImpl implements IMenuService {
 
 	}
 
+	private Collection<String> recuperaridRecursos(MenuItem dbItem) {
+		Collection<String> ids = new ArrayList<String>();
+		ids.add(dbItem.getLabel());
+		if (null != dbItem.getItems() && dbItem.getItems().size()>0) {
+			for (MenuItem dbItemHijo : dbItem.getItems()) {
+				ids.addAll(recuperaridRecursos(dbItemHijo));
+				
+			}
+		}
+		
+		return ids;
+	}
+
 	private static MenuItem processMenu(GenMenu parent, List<GenMenu> childCandidatesList, String idLenguaje) {
-		// Realizamos la carga del menú de forma cíclica dependiende los
+		// Realizamos la carga del menú de forma cíclica dependiendo los
 		// IdParents
 		ArrayList<GenMenu> childList = new ArrayList<GenMenu>();
 		ArrayList<GenMenu> childListTwo = new ArrayList<GenMenu>();
@@ -253,6 +291,7 @@ public class MenuServiceImpl implements IMenuService {
 		response.setLabel(parent.getIdrecurso());
 		response.setIdclass(parent.getIdclass());
 		response.setRouterLink(parent.getPath());
+		response.setTienePadre(Boolean.TRUE);		
 
 		// Recorremos sus hijos
 		for (GenMenu childTransactions : childCandidatesList) {
@@ -265,14 +304,15 @@ public class MenuServiceImpl implements IMenuService {
 					responsechild.setLabel(childTransactions.getIdrecurso());
 					responsechild.setIdclass(childTransactions.getIdclass());
 					responsechild.setRouterLink(childTransactions.getPath());
+					responsechild.setTienePadre(Boolean.TRUE);
 					response.getItems().add(responsechild);
 					childList.add(childTransactions);
 					childListTwo.remove(childTransactions);
 				}
 			}
+			
 		}
 		List<MenuItem> responseChilds = new ArrayList<MenuItem>();
-
 		for (GenMenu child : childList) {
 			// Si tenemos hijos los procesamos de forma individual para ver si
 			// tienen más hijos
@@ -289,6 +329,8 @@ public class MenuServiceImpl implements IMenuService {
 
 	}
 
+	
+	
 	@Override
 	public ComboDTO getInstituciones(HttpServletRequest request) {
 		// Cargamos el combo de Instituciones

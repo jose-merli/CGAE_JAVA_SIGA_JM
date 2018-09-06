@@ -6,14 +6,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.xmlbeans.XmlObject;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
-import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesWS;
 import org.itcgae.siga.DTOs.cen.SociedadesBajaDTO;
@@ -33,7 +30,6 @@ import org.itcgae.siga.db.mappers.CargasWsPaginaMapper;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.CfgParamColegiosMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.GuardarXmlDaoImpl;
 import org.itcgae.siga.exception.BusinessException;
@@ -70,7 +66,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class WSCommons {
@@ -96,8 +91,6 @@ public class WSCommons {
 	@Autowired
 	private CenComponentesExtendsMapper cenComponentesExtendsMapper;
 
-	@Autowired
-	private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
 	
 	private int tamanoPaginacion;
 
