@@ -47,11 +47,11 @@ public class CenHistoricoSqlExtendsProvider {
 		}
 		if(null != historicoUsuarioRequestDTO.getFechaDesde()) {
 			String fechaDesde = dateFormat.format(historicoUsuarioRequestDTO.getFechaDesde());
-			sql.WHERE(" TO_DATE(HIST.FECHAEFECTIVA,'DD/MM/YYYY') >= TO_DATE('" +fechaDesde + "', 'DD/MM/YYYY') ");
+			sql.WHERE(" HIST.FECHAEFECTIVA >= TO_DATE('" +fechaDesde + "', 'DD/MM/YYYY') ");
 		}
 		if(null != historicoUsuarioRequestDTO.getFechaHasta()) {
 			String fechaHasta = dateFormat.format(historicoUsuarioRequestDTO.getFechaHasta());
-			sql.WHERE(" TO_DATE(HIST.FECHAEFECTIVA,'DD/MM/YYYY') <= TO_DATE('" +fechaHasta + "', 'DD/MM/YYYY') ");
+			sql.WHERE(" HIST.FECHAEFECTIVA <= TO_DATE('" +fechaHasta + "', 'DD/MM/YYYY') ");
 		}
 		if(null != historicoUsuarioRequestDTO.getUsuarioAutomatico() && historicoUsuarioRequestDTO.getUsuarioAutomatico().equals("S")) {
 			sql.WHERE(" HIST.USUMODIFICACION = '0'");

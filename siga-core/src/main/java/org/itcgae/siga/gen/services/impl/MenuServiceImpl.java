@@ -219,6 +219,7 @@ public class MenuServiceImpl implements IMenuService {
 				List<GenMenu> menuConfig = menuMapper.selectByExample(exampleMenu );
 				if (null != menuConfig && menuConfig.size()>0) {
 					menuEntities.add(menuConfig.get(0));
+					tieneRuedaConf = Boolean.TRUE;
 					Collections.sort(menuEntities, new Comparator<GenMenu>() {
 						@Override
 						public int compare(GenMenu o1, GenMenu o2) {
@@ -234,15 +235,22 @@ public class MenuServiceImpl implements IMenuService {
 			List<GenMenu> rootMenus = menuEntities.stream()
 					.filter(i -> Strings.isNullOrEmpty(i.getIdparent()) || i.getIdparent().equals(" "))
 					.collect(Collectors.toList());
-
+			int posicionAInsertar = 0;
 			// Componemos el menú
 			for (GenMenu dbItem : rootMenus) {
 				MenuItem item = processMenu(dbItem, menuEntities, idLenguaje);
 				items.add(item);
 			}
 			List<String> idRecursos = new ArrayList<String>();
+			int i = 0;
 			for (MenuItem dbItem : items) {
+				if (tieneRuedaConf) {
+					if (dbItem.getLabel().equals("menu.configuracion")) {
+						posicionAInsertar = i;
+					}
+				}
 				idRecursos.addAll(recuperaridRecursos(dbItem));
+				i++;
 
 			}
 			for (GenMenu menu : menuEntities) {
@@ -252,10 +260,19 @@ public class MenuServiceImpl implements IMenuService {
 					menuItem.setIdclass(menu.getIdclass());
 					menuItem.setRouterLink(menu.getPath());
 					menuItem.setItems(null);
-					items.add(menuItem);
+					if (tieneRuedaConf) {
+						items.add(posicionAInsertar,menuItem);
+						posicionAInsertar++;
+					}else{
+						items.add(menuItem);
+					}
 				}
 
 			}
+			
+			
+	
+			
 			response.setMenuItems(items);
 		}
 
