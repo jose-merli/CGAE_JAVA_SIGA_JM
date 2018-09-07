@@ -243,13 +243,7 @@ public class MenuServiceImpl implements IMenuService {
 			List<String> idRecursos = new ArrayList<String>();
 			for (MenuItem dbItem : items) {
 				idRecursos.addAll(recuperaridRecursos(dbItem));
-				if (null !=dbItem.getItems() && dbItem.getItems().size()>0) {
-					
-				}else{
-					if (!dbItem.getTienePadre()) {
-						
-					}
-				}
+
 			}
 			for (GenMenu menu : menuEntities) {
 				if (!idRecursos.contains(menu.getIdrecurso())) {
@@ -291,7 +285,7 @@ public class MenuServiceImpl implements IMenuService {
 		response.setLabel(parent.getIdrecurso());
 		response.setIdclass(parent.getIdclass());
 		response.setRouterLink(parent.getPath());
-		response.setTienePadre(Boolean.TRUE);		
+		
 
 		// Recorremos sus hijos
 		for (GenMenu childTransactions : childCandidatesList) {
@@ -304,7 +298,6 @@ public class MenuServiceImpl implements IMenuService {
 					responsechild.setLabel(childTransactions.getIdrecurso());
 					responsechild.setIdclass(childTransactions.getIdclass());
 					responsechild.setRouterLink(childTransactions.getPath());
-					responsechild.setTienePadre(Boolean.TRUE);
 					response.getItems().add(responsechild);
 					childList.add(childTransactions);
 					childListTwo.remove(childTransactions);
