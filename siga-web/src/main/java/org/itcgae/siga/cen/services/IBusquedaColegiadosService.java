@@ -11,4 +11,5 @@ public interface IBusquedaColegiadosService {
 	public ComboDTO getSituacion(HttpServletRequest request);
 	
 	public ComboDTO getCVCategory(HttpServletRequest request);
+	
 }
