@@ -18,4 +18,39 @@ public class CenPoblacionesSqlExtendsProvider extends CenPoblacionesSqlProvider{
 		return sql.toString();
 		
 	}
+	
+	public String selectByFilter(String filtro, String idProvincia) {
+		
+		SQL sql = new SQL();
+
+		sql.SELECT("IDPOBLACION");
+		sql.SELECT("NOMBRE");
+		sql.SELECT("IDPROVINCIA");
+		sql.SELECT("FECHAMODIFICACION");
+		sql.SELECT("USUMODIFICACION");
+		sql.SELECT("IDPARTIDO");
+		sql.SELECT("CODIGOEXT");
+		sql.SELECT("INE");
+		sql.SELECT("IDPOBLACIONMUNICIPIO");
+		sql.SELECT("PRIORIDAD");	
+		
+		sql.FROM("CEN_POBLACIONES");
+		sql.WHERE("IDPROVINCIA ='" + idProvincia + "'");
+		sql.WHERE(filtroTextoBusquedas("NOMBRE", filtro));
+		sql.ORDER_BY("NOMBRE");
+
+		return sql.toString();
+		
+	}
+	
+		public static String filtroTextoBusquedas(String columna, String cadena) {
+				StringBuilder cadenaWhere = new StringBuilder();
+				cadenaWhere.append(" (TRANSLATE(LOWER( " + columna + "),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN') ");
+				cadenaWhere.append(" LIKE");
+				cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')) ");
+				return cadenaWhere.toString();
+				
+			} 
+		 
+
 }

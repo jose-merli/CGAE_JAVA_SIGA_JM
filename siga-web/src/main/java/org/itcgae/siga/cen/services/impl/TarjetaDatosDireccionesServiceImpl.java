@@ -254,10 +254,12 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		ComboDTO poblacionesReturn = new ComboDTO();
 		List<CenPoblaciones> poblaciones = new ArrayList<CenPoblaciones>();
 		
-		CenPoblacionesExample example  = new CenPoblacionesExample();
-		example.createCriteria().andIdprovinciaEqualTo(idProvincia).andNombreLike("%"+filtro+"%");
-		example.setOrderByClause("NOMBRE");
-		poblaciones = cenPoblacionesMapper.selectByExample(example);
+//		CenPoblacionesExample example  = new CenPoblacionesExample();
+//		example.createCriteria().andIdprovinciaEqualTo(idProvincia).andNombreLike("%"+filtro+"%");
+//		example.setOrderByClause("NOMBRE");
+//		poblaciones = cenPoblacionesMapper.selectByExample(example);
+		
+		poblaciones = cenPoblacionesExtendsMapper.selectByFilter(filtro, idProvincia);
 		
 		if (null != poblaciones && poblaciones.size()>0) {
 			List<ComboItem> combooItems = new ArrayList<ComboItem>();
