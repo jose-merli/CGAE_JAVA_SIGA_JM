@@ -22,7 +22,6 @@ public class NoColegiadoItem {
 	private String  etiquetas [];
 	private String  sexo;
 	private String  estadoCivil;
-	private String  categoria;
 	private String  subCategoria;
 	private String domicilio;
 	private String idcv;
@@ -314,23 +313,6 @@ public class NoColegiadoItem {
 	
 	public void setEstadoCivil(String estadoCivil) {
 		this.estadoCivil = estadoCivil;
-	}
-	
-	/**
-	 *
-	 */
-	public NoColegiadoItem categoria(String categoria){
-		this.categoria = categoria;
-		return this;
-	}
-
-	@JsonProperty("categoria")
-	public String getCategoria() {
-		return categoria;
-	}
-	
-	public void setCategoria(String categoria) {
-		this.categoria = categoria;
 	}
 	
 	/**

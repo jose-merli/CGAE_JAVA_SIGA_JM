@@ -2,6 +2,8 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
+import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
@@ -17,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -78,4 +81,10 @@ public class BusquedaNoColegiadosController {
 		NoColegiadoDTO response = busquedaNoColegiadosService.searchNoColegiado(noColegiadoItem, request);
 		return new ResponseEntity<NoColegiadoDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/busquedaNocolegiado/searchHistoric", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<NoColegiadoDTO> searchHistoricLegalPersons(@RequestParam("numPagina") int numPagina, @RequestBody NoColegiadoItem noColegiadoItem, HttpServletRequest request) { 
+		NoColegiadoDTO response = busquedaNoColegiadosService.searchHistoricNoColegiado(numPagina, noColegiadoItem, request);
+		return new ResponseEntity<NoColegiadoDTO >(response, HttpStatus.OK);
+	} 
 }

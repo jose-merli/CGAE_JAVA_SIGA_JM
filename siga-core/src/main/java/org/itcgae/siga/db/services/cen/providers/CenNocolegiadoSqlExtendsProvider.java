@@ -619,4 +619,104 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 	
 		return sql.toString();
 	}
+	
+	public String searchHistoricNoColegiado(NoColegiadoItem noColegiadoItem, String idLenguaje,
+			String idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("nocol.idpersona");
+		sql.SELECT_DISTINCT("nocol.idinstitucion");
+		sql.SELECT_DISTINCT("per.nifcif");
+		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ',per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("per.sexo");
+		sql.SELECT_DISTINCT("per.fechanacimiento");
+		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
+		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
+		sql.SELECT_DISTINCT("dir.movil");
+		sql.SELECT_DISTINCT("nocol.fecha_baja");
+		sql.FROM("cen_nocolegiado nocol");
+
+		sql.INNER_JOIN("cen_persona per on nocol.idpersona = per.idpersona");
+		sql.INNER_JOIN(
+				"cen_cliente cli on (nocol.idpersona = cli.idpersona and nocol.idinstitucion = cli.idinstitucion)");
+		sql.INNER_JOIN("cen_institucion inst on nocol.idinstitucion = inst.idinstitucion");
+
+		sql.LEFT_OUTER_JOIN(
+				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
+		sql.LEFT_OUTER_JOIN(
+				"CEN_DIRECCION_TIPODIRECCION TIPODIRECCION ON (TIPODIRECCION.IDDIRECCION = DIR.IDDIRECCION AND TIPODIRECCION.IDPERSONA = DIR.IDPERSONA AND  TIPODIRECCION.IDINSTITUCION = DIR.IDINSTITUCION)");
+		sql.LEFT_OUTER_JOIN(
+				"cen_datoscv datoscv on (datoscv.idpersona = cli.idpersona and datoscv.idinstitucion = cli.idinstitucion)");
+
+		sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("per.idtipoidentificacion not in '20'");
+
+		if (noColegiadoItem.getNif() != null && noColegiadoItem.getNif() != "") {
+			sql.WHERE("upper(per.nifcif) like upper('%" + noColegiadoItem.getNif() + "%')");
+		}
+		if (noColegiadoItem.getNombre() != null && noColegiadoItem.getNombre() != "") {
+			sql.WHERE("upper(per.nombre) like upper('%" + noColegiadoItem.getNombre() + "%')");
+		}
+		if (noColegiadoItem.getApellidos() != null && noColegiadoItem.getApellidos() != "") {
+			sql.WHERE("UPPER(CONCAT(per.apellidos1,per.apellidos2)) LIKE UPPER('%" + noColegiadoItem.getApellidos()
+					+ "%')");
+		}
+		if (noColegiadoItem.getSexo() != null && noColegiadoItem.getSexo() != "") {
+			sql.WHERE("per.sexo = '" + noColegiadoItem.getSexo() + "'");
+		}
+		if (noColegiadoItem.getTipoDireccion() != null && noColegiadoItem.getTipoDireccion() != "") {
+			sql.WHERE("TIPODIRECCION.IDTIPODIRECCION = '" + noColegiadoItem.getTipoDireccion() + "'");
+		}
+		if (noColegiadoItem.getEstadoCivil() != null && noColegiadoItem.getEstadoCivil() != "") {
+			sql.WHERE("per.idestadocivil = '" + noColegiadoItem.getEstadoCivil() + "'");
+		}
+		if (noColegiadoItem.getCodigoPostal() != null && noColegiadoItem.getCodigoPostal() != "") {
+			sql.WHERE("dir.codigopostal ='" + noColegiadoItem.getCodigoPostal() + "'");
+		}
+		if (noColegiadoItem.getIdProvincia() != null && noColegiadoItem.getIdProvincia() != "") {
+			sql.WHERE("dir.idprovincia = '" + noColegiadoItem.getIdProvincia() + "'");
+		}
+		if (noColegiadoItem.getIdPoblacion() != null && noColegiadoItem.getIdPoblacion() != "") {
+			sql.WHERE("dir.idpoblacion = '" + noColegiadoItem.getIdPoblacion() + "'");
+		}
+		if (noColegiadoItem.getDomicilio() != null && noColegiadoItem.getDomicilio() != "") {
+			sql.WHERE("(dir.domicilio) like upper('" + noColegiadoItem.getDomicilio() + "')");
+		}
+		if (noColegiadoItem.getCorreo() != null && noColegiadoItem.getCorreo() != "") {
+			sql.WHERE("upper(dir.correoelectronico) LIKE upper('%" + noColegiadoItem.getCorreo() + "%')");
+		}
+		if (noColegiadoItem.getTelefono() != null && noColegiadoItem.getTelefono() != "") {
+			sql.WHERE("dir.telefono1 like '%" + noColegiadoItem.getTelefono() + "%'");
+		}
+		if (noColegiadoItem.getMovil() != null && noColegiadoItem.getMovil() != "") {
+			sql.WHERE("dir.movil like '%" + noColegiadoItem.getMovil() + "%'");
+		}
+		if (noColegiadoItem.getEtiquetas() != null && noColegiadoItem.getEtiquetas().length > 0) {
+
+			String etiquetas = "";
+
+			for (int i = 0; noColegiadoItem.getEtiquetas().length > i; i++) {
+
+				if (i == noColegiadoItem.getEtiquetas().length - 1) {
+					etiquetas += "'" + noColegiadoItem.getEtiquetas()[i] + "'";
+				} else {
+					etiquetas += "'" + noColegiadoItem.getEtiquetas()[i] + "',";
+				}
+			}
+
+			sql.WHERE("grucli.IDGRUPO IN (" + etiquetas + ")");
+		}
+		if (noColegiadoItem.getIdcv() != null && noColegiadoItem.getIdcv() != "") {
+			sql.WHERE("datoscv.idcv = '" + noColegiadoItem.getIdcv() + "'");
+		}
+		if (noColegiadoItem.getFechaNacimiento() != null && noColegiadoItem.getFechaNacimiento() != "") {
+			sql.WHERE("(TO_DATE(PER.FECHANACIMIENTO,'DD/MM/RRRR') >= TO_DATE('" + noColegiadoItem.getFechaNacimiento()
+					+ "','DD/MM/YYYY') and ( TO_DATE(PER.FECHANACIMIENTO,'DD/MM/RRRR') <= TO_DATE('" + noColegiadoItem.getFechaNacimiento()
+					+ "','DD/MM/YYYY')))");
+		}
+		
+		sql.ORDER_BY("nocol.IDPERSONA, NOCOL.IDINSTITUCION");
+	
+		return sql.toString();
+	}
 }

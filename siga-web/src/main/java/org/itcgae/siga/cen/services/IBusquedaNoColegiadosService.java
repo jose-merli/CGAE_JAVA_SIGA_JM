@@ -9,4 +9,7 @@ public interface IBusquedaNoColegiadosService {
 
 	public NoColegiadoDTO searchNoColegiado( NoColegiadoItem noColegiadoItem, HttpServletRequest request);
 	
+	public NoColegiadoDTO searchHistoricNoColegiado(int numPagina, NoColegiadoItem noColegiadoItem, HttpServletRequest request);
+
+	
 }
