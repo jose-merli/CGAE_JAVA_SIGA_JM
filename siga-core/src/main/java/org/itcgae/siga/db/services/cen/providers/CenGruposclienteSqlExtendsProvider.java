@@ -72,4 +72,13 @@ public class CenGruposclienteSqlExtendsProvider extends CenGruposclienteSqlProvi
 		
 		return sql.toString();
 	}
+	
+	public String getMaxIdGrupo() {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDGRUPO)");
+		sql.FROM("CEN_GRUPOSCLIENTE");
+		
+		return sql.toString();
+	}
 }

@@ -43,8 +43,11 @@ import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
+import org.itcgae.siga.db.mappers.CenGruposclienteMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.GenRecursosCatalogosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
@@ -91,7 +94,12 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 	@Autowired
 	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
 		
-	
+	@Autowired
+	private CenGruposclienteMapper cenGruposclienteMapper;
+
+	@Autowired
+	private GenRecursosCatalogosMapper genRecursosCatalogosMapper;
+
 	@Override
 	public ComboItem loadPhotography(EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request, HttpServletResponse response) {
 		LOGGER.info(
@@ -931,5 +939,98 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		return record;
 	}
 
-	
+	@Override
+	public InsertResponseDTO createLabel(ComboItem items, HttpServletRequest request) {
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				// Insertamos en GenRecursosCatálogos
+
+				GenRecursosCatalogos genRecursosCatalogos = new GenRecursosCatalogos();
+
+				genRecursosCatalogos.setCampotabla("NOMBRE");
+				genRecursosCatalogos.setDescripcion(items.getLabel());
+				genRecursosCatalogos.setIdlenguaje(usuario.getIdlenguaje());
+
+				String idRecursoBD = genRecursosCatalogosExtendsMapper.getMaxIdRecurso();
+				String idRecurso = String.valueOf(Integer.valueOf(idRecursoBD) + 1);
+				genRecursosCatalogos.setIdrecurso(idRecurso);
+
+				// Obtenemos el idGrupo de CenGrupoCliente
+				Short idGrupoBD = cenGruposclienteExtendsMapper.getMaxIdGrupo();
+				Short idGrupo = (short) (idGrupoBD + (short) 1);
+
+				genRecursosCatalogos.setIdrecursoalias("cen_gruposcliente.nombre." + idInstitucion + "." + idGrupo);
+				genRecursosCatalogos.setUsumodificacion(usuario.getIdusuario());
+				genRecursosCatalogos.setFechamodificacion(new Date());
+				genRecursosCatalogos.setIdinstitucion(idInstitucion);
+				genRecursosCatalogos.setNombretabla("CEN_GRUPOSCLIENTE");
+
+				int resultGenRecursosCatalogos = genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogos);
+
+				if (resultGenRecursosCatalogos == 1) {
+					insertResponseDTO.setStatus(SigaConstants.OK);
+					LOGGER.warn("createLabel() / genRecursosCatalogosExtendsMapper.insert() -> "
+							+ insertResponseDTO.getStatus()
+							+ " .Insertada la descripción en genRecursosCatálogos correctamente");
+
+					// Insertamos en CenGruposCliente
+
+					CenGruposcliente cenGruposcliente = new CenGruposcliente();
+
+					cenGruposcliente.setIdgrupo(idGrupo);
+					cenGruposcliente.setFechamodificacion(new Date());
+					cenGruposcliente.setIdinstitucion(idInstitucion);
+					cenGruposcliente.setNombre(idRecurso);
+					cenGruposcliente.setUsumodificacion(usuario.getIdusuario());
+
+					int resultCenGruposCliente = cenGruposclienteMapper.insert(cenGruposcliente);
+
+					if (resultCenGruposCliente == 1) {
+						insertResponseDTO.setStatus(SigaConstants.OK);
+						LOGGER.warn(
+								"createLabel() / cenGruposclienteMapper.insert() -> " + insertResponseDTO.getStatus()
+										+ " .Insertado el id correctamente en la tabla CenGruposCliente");
+
+						insertResponseDTO.setId(Short.toString(cenGruposcliente.getIdgrupo()));
+
+					} else {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.warn(
+								"createLabel() / cenGruposclienteMapper.insert() -> " + insertResponseDTO.getStatus()
+										+ " .No se ha podido insertar en la tabla CenGruposCliente");
+
+					}
+				} else {
+					insertResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.warn("createLabel() / genRecursosCatalogosExtendsMapper.insert() -> "
+							+ insertResponseDTO.getStatus()
+							+ " .No se ha podido insertar en la tabla genRecursosCatálogos");
+				}
+
+			}
+		}
+
+		return insertResponseDTO;
+	}
 }

@@ -82,8 +82,11 @@ public class TarjetaDatosGeneralesController {
 	}
 	
 	
-	
-	
-	
-
+	@RequestMapping(value = "busquedaPerJuridica/createLabel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> createLabel(@RequestBody ComboItem items, HttpServletRequest request){
+		InsertResponseDTO response = tarjetaDatosGeneralesService.createLabel(items, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.FORBIDDEN);
+	}
 }
