@@ -23,6 +23,8 @@ public interface CenSolicitudincorporacionExtendsMapper {
 			@Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "APELLIDO1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "APELLIDO2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "SEXO", property = "sexo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.DATE),
 			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHASOLICITUD", property = "fechaSolicitud", jdbcType = JdbcType.DATE),
 			@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.DATE),

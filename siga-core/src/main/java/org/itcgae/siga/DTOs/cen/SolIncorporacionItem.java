@@ -11,6 +11,8 @@ public class SolIncorporacionItem {
 	private String apellidos;
 	private String apellido1;
 	private String apellido2;
+	private String sexo;
+	private Date fechaNacimiento;
 	private String numColegiado;
 	private Date fechaSolicitud;
 	private Date fechaEstado;
@@ -62,79 +64,72 @@ public class SolIncorporacionItem {
 	public void setIdSolicitud(String idSolicitud) {
 		this.idSolicitud = idSolicitud;
 	}
-	
-	
-	public String getnumeroIdentificacion() {
+	public String getNumeroIdentificacion() {
 		return numeroIdentificacion;
 	}
-	public void setnumeroIdentificacion(String numeroIdentificacion) {
+	public void setNumeroIdentificacion(String numeroIdentificacion) {
 		this.numeroIdentificacion = numeroIdentificacion;
 	}
-	
-
-	public String getnombre() {
+	public String getNombre() {
 		return nombre;
 	}
-	public void setnombre(String nombre) {
+	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	
-	
 	public String getApellidos() {
 		return apellidos;
 	}
 	public void setApellidos(String apellidos) {
 		this.apellidos = apellidos;
 	}
-	
-	
 	public String getApellido1() {
 		return apellido1;
 	}
 	public void setApellido1(String apellido1) {
 		this.apellido1 = apellido1;
 	}
-	
-	
 	public String getApellido2() {
 		return apellido2;
 	}
 	public void setApellido2(String apellido2) {
 		this.apellido2 = apellido2;
 	}
-	
+	public String getSexo() {
+		return sexo;
+	}
+	public void setSexo(String sexo) {
+		this.sexo = sexo;
+	}
+	public Date getFechaNacimiento() {
+		return fechaNacimiento;
+	}
+	public void setFechaNacimiento(Date fechaNacimiento) {
+		this.fechaNacimiento = fechaNacimiento;
+	}
 	public String getNumColegiado() {
 		return numColegiado;
 	}
 	public void setNumColegiado(String numColegiado) {
 		this.numColegiado = numColegiado;
 	}
-	
-	
 	public Date getFechaSolicitud() {
 		return fechaSolicitud;
 	}
 	public void setFechaSolicitud(Date fechaSolicitud) {
 		this.fechaSolicitud = fechaSolicitud;
 	}
-	
-	
 	public Date getFechaEstado() {
 		return fechaEstado;
 	}
 	public void setFechaEstado(Date fechaEstado) {
 		this.fechaEstado = fechaEstado;
 	}
-	
-	
 	public String getEstadoSolicitud() {
 		return estadoSolicitud;
 	}
 	public void setEstadoSolicitud(String estadoSolicitud) {
 		this.estadoSolicitud = estadoSolicitud;
 	}
-	
-	
 	public String getTipoSolicitud() {
 		return tipoSolicitud;
 	}
@@ -387,6 +382,7 @@ public class SolIncorporacionItem {
 		result = prime * result + ((fax2 == null) ? 0 : fax2.hashCode());
 		result = prime * result + ((fechaEstado == null) ? 0 : fechaEstado.hashCode());
 		result = prime * result + ((fechaIncorporacion == null) ? 0 : fechaIncorporacion.hashCode());
+		result = prime * result + ((fechaNacimiento == null) ? 0 : fechaNacimiento.hashCode());
 		result = prime * result + ((fechaSolicitud == null) ? 0 : fechaSolicitud.hashCode());
 		result = prime * result + ((iban == null) ? 0 : iban.hashCode());
 		result = prime * result + ((idEstado == null) ? 0 : idEstado.hashCode());
@@ -401,15 +397,16 @@ public class SolIncorporacionItem {
 		result = prime * result + ((modalidad == null) ? 0 : modalidad.hashCode());
 		result = prime * result + ((movil == null) ? 0 : movil.hashCode());
 		result = prime * result + ((naturalDe == null) ? 0 : naturalDe.hashCode());
+		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
 		result = prime * result + ((nombrePoblacion == null) ? 0 : nombrePoblacion.hashCode());
 		result = prime * result + ((nombreProvincia == null) ? 0 : nombreProvincia.hashCode());
-		result = prime * result + ((nombre == null) ? 0 : nombre.hashCode());
 		result = prime * result + ((numColegiado == null) ? 0 : numColegiado.hashCode());
 		result = prime * result + ((numeroCuenta == null) ? 0 : numeroCuenta.hashCode());
 		result = prime * result + ((numeroIdentificacion == null) ? 0 : numeroIdentificacion.hashCode());
 		result = prime * result + ((observaciones == null) ? 0 : observaciones.hashCode());
 		result = prime * result + ((pais == null) ? 0 : pais.hashCode());
 		result = prime * result + ((residente == null) ? 0 : residente.hashCode());
+		result = prime * result + ((sexo == null) ? 0 : sexo.hashCode());
 		result = prime * result + ((telefono1 == null) ? 0 : telefono1.hashCode());
 		result = prime * result + ((telefono2 == null) ? 0 : telefono2.hashCode());
 		result = prime * result + ((tipoColegiacion == null) ? 0 : tipoColegiacion.hashCode());
@@ -521,6 +518,11 @@ public class SolIncorporacionItem {
 				return false;
 		} else if (!fechaIncorporacion.equals(other.fechaIncorporacion))
 			return false;
+		if (fechaNacimiento == null) {
+			if (other.fechaNacimiento != null)
+				return false;
+		} else if (!fechaNacimiento.equals(other.fechaNacimiento))
+			return false;
 		if (fechaSolicitud == null) {
 			if (other.fechaSolicitud != null)
 				return false;
@@ -591,6 +593,11 @@ public class SolIncorporacionItem {
 				return false;
 		} else if (!naturalDe.equals(other.naturalDe))
 			return false;
+		if (nombre == null) {
+			if (other.nombre != null)
+				return false;
+		} else if (!nombre.equals(other.nombre))
+			return false;
 		if (nombrePoblacion == null) {
 			if (other.nombrePoblacion != null)
 				return false;
@@ -600,11 +607,6 @@ public class SolIncorporacionItem {
 			if (other.nombreProvincia != null)
 				return false;
 		} else if (!nombreProvincia.equals(other.nombreProvincia))
-			return false;
-		if (nombre == null) {
-			if (other.nombre != null)
-				return false;
-		} else if (!nombre.equals(other.nombre))
 			return false;
 		if (numColegiado == null) {
 			if (other.numColegiado != null)
@@ -635,6 +637,11 @@ public class SolIncorporacionItem {
 			if (other.residente != null)
 				return false;
 		} else if (!residente.equals(other.residente))
+			return false;
+		if (sexo == null) {
+			if (other.sexo != null)
+				return false;
+		} else if (!sexo.equals(other.sexo))
 			return false;
 		if (telefono1 == null) {
 			if (other.telefono1 != null)
@@ -678,23 +685,25 @@ public class SolIncorporacionItem {
 	@Override
 	public String toString() {
 		return "SolIncorporacionItem [idSolicitud=" + idSolicitud + ", numeroIdentificacion=" + numeroIdentificacion
-				+ ", nombre=" + nombre + ", apellidos=" + apellidos + ", apellido1=" + apellido1
-				+ ", apellido2=" + apellido2 + ", numColegiado=" + numColegiado + ", fechaSolicitud=" + fechaSolicitud
-				+ ", fechaEstado=" + fechaEstado + ", estadoSolicitud=" + estadoSolicitud + ", tipoSolicitud="
-				+ tipoSolicitud + ", modalidad=" + modalidad + ", idModalidadDocumentacion=" + idModalidadDocumentacion
-				+ ", idEstado=" + idEstado + ", idTipo=" + idTipo + ", tipoColegiacion=" + tipoColegiacion
-				+ ", tipoIdentificacion=" + tipoIdentificacion + ", idTipoIdentificacion=" + idTipoIdentificacion
-				+ ", observaciones=" + observaciones + ", fechaIncorporacion=" + fechaIncorporacion + ", residente="
-				+ residente + ", naturalDe=" + naturalDe + ", tratamiento=" + tratamiento + ", estadoCivil="
-				+ estadoCivil + ", idEstadoCivil=" + idEstadoCivil + ", pais=" + pais + ", idPais=" + idPais
-				+ ", domicilio=" + domicilio + ", telefono1=" + telefono1 + ", telefono2=" + telefono2 + ", fax1="
-				+ fax1 + ", fax2=" + fax2 + ", movil=" + movil + ", correoElectronico=" + correoElectronico
-				+ ", codigoPostal=" + codigoPostal + ", idPoblacion=" + idPoblacion + ", idProvincia=" + idProvincia
-				+ ", nombrePoblacion=" + nombrePoblacion + ", nombreProvincia=" + nombreProvincia + ", titular="
-				+ titular + ", iban=" + iban + ", abonoCargo=" + abonoCargo + ", abonoJCS=" + abonoJCS + ", cboCodigo="
-				+ cboCodigo + ", codigoSucursal=" + codigoSucursal + ", digitoControl=" + digitoControl
-				+ ", numeroCuenta=" + numeroCuenta + ", banco=" + banco + "]";
+				+ ", nombre=" + nombre + ", apellidos=" + apellidos + ", apellido1=" + apellido1 + ", apellido2="
+				+ apellido2 + ", sexo=" + sexo + ", fechaNacimiento=" + fechaNacimiento + ", numColegiado="
+				+ numColegiado + ", fechaSolicitud=" + fechaSolicitud + ", fechaEstado=" + fechaEstado
+				+ ", estadoSolicitud=" + estadoSolicitud + ", tipoSolicitud=" + tipoSolicitud + ", modalidad="
+				+ modalidad + ", idModalidadDocumentacion=" + idModalidadDocumentacion + ", idEstado=" + idEstado
+				+ ", idTipo=" + idTipo + ", tipoColegiacion=" + tipoColegiacion + ", tipoIdentificacion="
+				+ tipoIdentificacion + ", idTipoIdentificacion=" + idTipoIdentificacion + ", observaciones="
+				+ observaciones + ", fechaIncorporacion=" + fechaIncorporacion + ", residente=" + residente
+				+ ", naturalDe=" + naturalDe + ", tratamiento=" + tratamiento + ", estadoCivil=" + estadoCivil
+				+ ", idEstadoCivil=" + idEstadoCivil + ", pais=" + pais + ", idPais=" + idPais + ", domicilio="
+				+ domicilio + ", telefono1=" + telefono1 + ", telefono2=" + telefono2 + ", fax1=" + fax1 + ", fax2="
+				+ fax2 + ", movil=" + movil + ", correoElectronico=" + correoElectronico + ", codigoPostal="
+				+ codigoPostal + ", idPoblacion=" + idPoblacion + ", idProvincia=" + idProvincia + ", nombrePoblacion="
+				+ nombrePoblacion + ", nombreProvincia=" + nombreProvincia + ", titular=" + titular + ", iban=" + iban
+				+ ", abonoCargo=" + abonoCargo + ", abonoJCS=" + abonoJCS + ", cboCodigo=" + cboCodigo
+				+ ", codigoSucursal=" + codigoSucursal + ", digitoControl=" + digitoControl + ", numeroCuenta="
+				+ numeroCuenta + ", banco=" + banco + "]";
 	}
+	
 	
 	
 	

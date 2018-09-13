@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 
 public class CenSolicitudincorporacionSqlExtendsProvider {
 	
@@ -19,6 +20,8 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		sql.SELECT("CONCAT(APELLIDO1 || ' ',APELLIDO2) as APELLIDOS");
 		sql.SELECT("APELLIDO1 AS APELLIDO1");
 		sql.SELECT("APELLIDO2 AS APELLIDO2");
+		sql.SELECT("SEXO");
+		sql.SELECT("FECHANACIMIENTO AS FECHANACIMIENTO");
 		sql.SELECT("NCOLEGIADO AS NUMCOLEGIADO");
 		sql.SELECT("FECHASOLICITUD");
 		sql.SELECT("FECHAESTADO");
@@ -81,10 +84,10 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 			sql.WHERE("NUMEROIDENTIFICADOR LIKE '%" + solIncorporacionSearchDTO.getNumeroIdentificacion() +"%'");
 		}
 		if(solIncorporacionSearchDTO.getApellidos()!=null && !solIncorporacionSearchDTO.getApellidos().equals("")){
-			sql.WHERE("CONCAT(APELLIDO1,APELLIDO2) LIKE '%"+ solIncorporacionSearchDTO.getApellidos() + "%'");
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("CONCAT(APELLIDO1,APELLIDO2)", solIncorporacionSearchDTO.getApellidos()));
 		}
 		if(solIncorporacionSearchDTO.getNombre()!= null && !solIncorporacionSearchDTO.getNombre().equals("")){
-			sql.WHERE("SOLICITUD.NOMBRE LIKE '%" + solIncorporacionSearchDTO.getNombre() +"%'");
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("SOLICITUD.NOMBRE", solIncorporacionSearchDTO.getNombre()));
 		}
 		
 		if(solIncorporacionSearchDTO.getFechaDesde()!=null && !solIncorporacionSearchDTO.getFechaDesde().equals("")){
