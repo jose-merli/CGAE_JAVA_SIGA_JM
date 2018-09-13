@@ -980,8 +980,8 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				record.setIdlenguaje(sociedadCreateDTO.getIdioma());
 			}
 
-			if (null != sociedadCreateDTO.getFechaAlta()) {
-				record.setFechaalta(sociedadCreateDTO.getFechaAlta());
+			if (null != sociedadCreateDTO.getFechaConstitucion()) {
+				record.setFechaalta(sociedadCreateDTO.getFechaConstitucion());
 				// sql.VALUES("FECHAALTA", "TO_DATE('" + fechaAlta + "','DD/MM/YYYY')");
 			}
 
