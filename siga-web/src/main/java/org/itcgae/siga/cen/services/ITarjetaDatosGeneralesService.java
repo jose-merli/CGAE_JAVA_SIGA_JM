@@ -28,7 +28,5 @@ public interface ITarjetaDatosGeneralesService {
 	public UpdateResponseDTO updateLegalPerson(EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request);
 	
 	public InsertResponseDTO createLabel(ComboItem items, HttpServletRequest request);
-
 }
-
 
