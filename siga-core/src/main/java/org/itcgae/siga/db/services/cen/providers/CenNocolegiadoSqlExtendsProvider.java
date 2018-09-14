@@ -588,6 +588,9 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		sql.WHERE("SOCIEDAD.FECHAMODIFICACION <= TO_DATE('" + fechahasta + "', 'DD/MM/YYYY')");
 		sql.WHERE("SOCIEDAD.FECHA_BAJA IS NULL");
 		sql.WHERE("SOCIEDAD.SOCIEDADPROFESIONAL = 1");
+		
+		sql.ORDER_BY("PER.IDPERSONA");
+		
 		return sql.toString();
 		
 	}

@@ -391,6 +391,7 @@ public class WSCommons {
 			
 			List<SociedadesBajaDTO> sociedadesResult = new ArrayList<>();
 			
+			short totalPaginas = 0;
 			if (sociedadesEnBaja.size() == 0) {
 				LOGGER.info("No se ha encontrado ninguna sociedad con los filtros seleccionados");
 			} else {
@@ -402,6 +403,13 @@ public class WSCommons {
 						sociedadesResult = sociedadesEnBaja.subList((peticion.getNumPagina() - 1) * tamanoPaginacion,
 								sociedadesEnBaja.size());
 					}
+					
+					// Se calcula el numero total de paginas
+					totalPaginas = (short) (sociedadesResult.size() / tamanoPaginacion);
+					if (sociedadesResult.size() % tamanoPaginacion > 0) {
+						totalPaginas++;
+					}
+					
 				}else{
 					sociedadesResult.addAll(sociedadesEnBaja);
 				}
@@ -643,6 +651,13 @@ public class WSCommons {
 								sociedadesEditadasResult = sociedadesEditadasFinal.subList((peticion.getNumPagina() - 1) * tamanoPaginacion,
 										sociedadesEditadasFinal.size());
 							}
+							
+							// Se calcula el numero total de paginas
+							totalPaginas = (short) (sociedadesResult.size() / tamanoPaginacion);
+							if (sociedadesResult.size() % tamanoPaginacion > 0) {
+								totalPaginas++;
+							}
+							
 						}else{
 							sociedadesEditadasResult.addAll(sociedadesEditadasFinal);
 						}
