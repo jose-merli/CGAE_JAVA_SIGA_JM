@@ -378,7 +378,7 @@ public class WSCommons {
 	}
 	
 	
-	public RegistroSociedad[] cargarSociedades(GetListaSociedadesRequest peticion, Long idWsPagina, Short idInstitucion) {
+	public RegistroSociedad[] cargarSociedades(GetListaSociedadesRequest peticion, GetListaSociedadesResponse respuesta, Long idWsPagina, Short idInstitucion) {
 
 		//Nos disponemos a consultar los datos de las sociedades que han sufrido modificacion
 		try {
@@ -409,6 +409,7 @@ public class WSCommons {
 					if (sociedadesResult.size() % tamanoPaginacion > 0) {
 						totalPaginas++;
 					}
+					respuesta.setNumTotalPaginas(totalPaginas);
 					
 				}else{
 					sociedadesResult.addAll(sociedadesEnBaja);
@@ -653,10 +654,11 @@ public class WSCommons {
 							}
 							
 							// Se calcula el numero total de paginas
-							totalPaginas = (short) (sociedadesResult.size() / tamanoPaginacion);
-							if (sociedadesResult.size() % tamanoPaginacion > 0) {
+							totalPaginas = (short) (sociedadesEditadas.size() / tamanoPaginacion);
+							if (sociedadesEditadas.size() % tamanoPaginacion > 0) {
 								totalPaginas++;
 							}
+							respuesta.setNumTotalPaginas(totalPaginas);
 							
 						}else{
 							sociedadesEditadasResult.addAll(sociedadesEditadasFinal);

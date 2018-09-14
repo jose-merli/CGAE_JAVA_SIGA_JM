@@ -95,7 +95,7 @@ public class SociedadesServerSeviceImpl implements ISociedadesServerSevice {
 			
 			
 
-			respuestaCarga = WSCommons.cargarSociedades(peticion, pagina.getIdWsPagina(), idInstitucion);
+			respuestaCarga = WSCommons.cargarSociedades(peticion, respuesta, pagina.getIdWsPagina(), idInstitucion);
 
 		} catch (ValidationException validationException) {
 			erroresValidacion = true;
@@ -112,11 +112,6 @@ public class SociedadesServerSeviceImpl implements ISociedadesServerSevice {
 		respuesta.setColegio(peticion.getColegio());
 		respuesta.setNumPagina(peticion.getNumPagina());
 		respuesta.setRegistroSociedadArray(respuestaCarga);
-		if(respuestaCarga != null){
-			respuesta.setNumTotalPaginas((short)(respuestaCarga.length / peticion.getNumElementosPagina()));
-		}else{
-			respuesta.setNumTotalPaginas((short)1);
-		}
 		
 		try {
 
