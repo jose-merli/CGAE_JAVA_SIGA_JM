@@ -10,5 +10,7 @@ public interface ISolicitudIncorporacionService {
 	
 	public ComboDTO getTipoSolicitud(HttpServletRequest request);
 	public ComboDTO getEstadoSolicitud(HttpServletRequest request);
+	public ComboDTO getTratamiento(HttpServletRequest request);
+	public ComboDTO getEstadoCivil(HttpServletRequest request);
 	public SolIncorporacionDTO datosSolicitudSearch (int numPagina, SolicitudIncorporacionSearchDTO datosSolicitudSearchDTO, HttpServletRequest request);
 }

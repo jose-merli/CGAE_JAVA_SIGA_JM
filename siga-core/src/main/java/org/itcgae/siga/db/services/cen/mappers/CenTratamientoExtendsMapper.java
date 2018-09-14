@@ -7,9 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.db.mappers.CenPaisMapper;
 import org.itcgae.siga.db.mappers.CenTratamientoMapper;
-import org.itcgae.siga.db.services.cen.providers.CenPaisSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenTratamientoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -23,7 +21,7 @@ public interface CenTratamientoExtendsMapper extends CenTratamientoMapper{
 		@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectTratamiento();
+	List<ComboItem> selectTratamiento(String idLenguage);
 	
 
 	
