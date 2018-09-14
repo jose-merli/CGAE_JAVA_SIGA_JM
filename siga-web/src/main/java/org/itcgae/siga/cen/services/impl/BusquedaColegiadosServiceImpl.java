@@ -6,12 +6,15 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IBusquedaColegiadosService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocolegialExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposcvExtendsMapper;
@@ -35,6 +38,9 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 	
 	@Autowired
 	private CenTiposcvExtendsMapper cenTiposcvExtendsMapper;
+	
+	@Autowired
+	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 	
 	@Override
 	public ComboDTO getCivilStatus(HttpServletRequest request) {
@@ -169,5 +175,35 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		
 		return comboDTO;
 	}
+	
+	@Override
+	public ColegiadoDTO searchColegiado(ColegiadoItem colegiadoItem, HttpServletRequest request) {
+
+		LOGGER.info("searchColegiado() -> Entrada al servicio para obtener colegiados");
+
+		ColegiadoDTO colegiadosDTO = new ColegiadoDTO();
+		List<ColegiadoItem> colegiadoItemList = new ArrayList<ColegiadoItem>();
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (null != idInstitucion) {
+
+			colegiadoItemList = cenColegiadoExtendsMapper.selectColegiados(idInstitucion, colegiadoItem);
+			colegiadosDTO.setColegiadoItem(colegiadoItemList);
+
+			if (colegiadoItemList == null || colegiadoItemList.size() == 0) {
+
+				LOGGER.warn(
+						"searchColegiado() / cenColegiadoExtendsMapper.searchColegiado() -> No existen colegiados con las condiciones recibidas en la Institucion = "
+								+ idInstitucion);
+			}
+
+		} else {
+			LOGGER.warn("searchColegiado() -> idInstitucion del token nula");
+		}
+
+		return colegiadosDTO;
+	}
+	
 
 }
