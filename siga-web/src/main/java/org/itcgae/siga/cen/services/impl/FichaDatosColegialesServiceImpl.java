@@ -71,7 +71,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 			if (null != usuarios && usuarios.size() > 0) {
 
-				comboItems = cenTratamientoExtendsMapper.selectTratamiento();				
+				comboItems = cenTratamientoExtendsMapper.selectTratamiento("a");				
 
 				comboDTO.setCombooItems(comboItems);
 

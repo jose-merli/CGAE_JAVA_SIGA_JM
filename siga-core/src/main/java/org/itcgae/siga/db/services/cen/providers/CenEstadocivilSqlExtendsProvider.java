@@ -3,7 +3,7 @@ package org.itcgae.siga.db.services.cen.providers;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.mappers.CenEstadocivilSqlProvider;
 
-public class CenEstadoCivilSqlExtendsProvider extends CenEstadocivilSqlProvider{
+public class CenEstadocivilSqlExtendsProvider extends CenEstadocivilSqlProvider{
 
 	public String distinctCivilStatus(String idLenguaje) {
 		

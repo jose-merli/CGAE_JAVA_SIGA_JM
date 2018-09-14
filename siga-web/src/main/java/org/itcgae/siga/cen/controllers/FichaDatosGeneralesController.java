@@ -26,7 +26,7 @@ public class FichaDatosGeneralesController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/fichaDatosGenerales/estadocivil",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/fichaDatosGenerales/estadoCivil",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getComboEstadoCivil(HttpServletRequest request) {
 		ComboDTO response = fichaDatosGenerales.getEstadoCivil(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
