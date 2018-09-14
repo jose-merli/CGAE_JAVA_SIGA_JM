@@ -475,6 +475,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.WHERE("SOCIEDAD.FECHA_BAJA IS NULL");
 		sql.WHERE("SOCIEDAD.TIPO IN (SELECT LETRACIF FROM CEN_TIPOSOCIEDAD)");
 		sql.WHERE("SOCIEDAD.SOCIEDADPROFESIONAL = 1");
+		
+		sql.ORDER_BY("PER.IDPERSONA");
 
 		return sql.toString();
 

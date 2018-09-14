@@ -113,7 +113,7 @@ public class SociedadesServerSeviceImpl implements ISociedadesServerSevice {
 		respuesta.setNumPagina(peticion.getNumPagina());
 		respuesta.setRegistroSociedadArray(respuestaCarga);
 		if(respuestaCarga != null){
-			respuesta.setNumTotalPaginas((short)respuestaCarga.length);
+			respuesta.setNumTotalPaginas((short)(respuestaCarga.length / peticion.getNumElementosPagina()));
 		}else{
 			respuesta.setNumTotalPaginas((short)1);
 		}

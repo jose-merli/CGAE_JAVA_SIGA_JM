@@ -19,4 +19,16 @@ public class CenEstadocivilSqlExtendsProvider extends CenEstadocivilSqlProvider{
 		
 		return sql.toString();
 	}
+	public String selectEstadoCivil() {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDTRATAMIENTO AS VALUE");
+		sql.SELECT(" f_siga_getrecurso(DESCRIPCION,1) AS LABEL");
+		sql.FROM("CEN_ESTADOCIVIL");
+		sql.ORDER_BY("LABEL");
+
+
+		return sql.toString();
+	}
 }

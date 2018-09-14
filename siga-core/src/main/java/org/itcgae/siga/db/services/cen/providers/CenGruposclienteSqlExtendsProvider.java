@@ -21,14 +21,14 @@ public class CenGruposclienteSqlExtendsProvider extends CenGruposclienteSqlProvi
 		return sql.toString();
 	}
 	
-	public String selectDistinctGruposClientes(String idInstitucion,String idLenguaje, String descripcion) {
+	public String selectDistinctGruposClientes(String idInstitucion,String idLenguaje, String grupo) {
 		SQL sql = new SQL();
 		
 		sql.SELECT("DISTINCT CLIENTE.*");
 		sql.FROM("CEN_GRUPOSCLIENTE CLIENTE");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CATALOGO ON CLIENTE.NOMBRE = CATALOGO.IDRECURSO AND IDLENGUAJE = '" + idLenguaje + "' ");
 		sql.WHERE("CLIENTE.IDINSTITUCION = '"+ idInstitucion +"'");
-		sql.WHERE("CATALOGO.DESCRIPCION = '" + descripcion +"'");
+		sql.WHERE("CLIENTE.IDGRUPO = '" + grupo +"'");
 			
 		return sql.toString();
 	}
@@ -69,6 +69,15 @@ public class CenGruposclienteSqlExtendsProvider extends CenGruposclienteSqlProvi
 		sql.WHERE("CAT.IDLENGUAJE = '" + usuario.getIdlenguaje() + "'");
 		sql.WHERE("CAT.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("GRU.IDGRUPO IN (" + gruposIN +  ")");
+		
+		return sql.toString();
+	}
+	
+	public String getMaxIdGrupo() {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDGRUPO)");
+		sql.FROM("CEN_GRUPOSCLIENTE");
 		
 		return sql.toString();
 	}
