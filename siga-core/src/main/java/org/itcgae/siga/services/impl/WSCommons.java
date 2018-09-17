@@ -684,7 +684,7 @@ public class WSCommons {
 					
 				}
 				
-			
+			respuesta.setNumTotalPaginas(totalPaginas);
 			if (null != registrosList && registrosList.size()>0) {
 				RegistroSociedad[] registrosReturn = new RegistroSociedad[registrosList.size()];
 				int i = 0;
