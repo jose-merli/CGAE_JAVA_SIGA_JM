@@ -643,6 +643,7 @@ public class WSCommons {
 					
 					if (sociedadesEditadasFinal.size() == 0) {
 						LOGGER.info("No se ha encontrado ninguna sociedad con los filtros seleccionados");
+						respuesta.setNumTotalPaginas(totalPaginas);
 					} else {
 						if (peticion.getConPaginacion()) {
 							if (sociedadesEditadasFinal.size() >= peticion.getNumPagina() * tamanoPaginacion) {
