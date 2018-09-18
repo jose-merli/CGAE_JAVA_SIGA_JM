@@ -436,7 +436,13 @@ public class WSCommons {
 
 						sociedadActualizacion.setPublicar(argPublicar);
 						Resena argResena = Resena.Factory.newInstance();
-						argResena.setStringValue(regSociedad.getResena());
+						if(regSociedad.getResena()!=null){
+							if(regSociedad.getResena().length()>100){
+								argResena.setStringValue(regSociedad.getResena().substring(0, 99));
+							}else{
+								argResena.setStringValue(regSociedad.getResena());
+							}
+						}
 						sociedadActualizacion.setResena(argResena);
 						if (null != regSociedad.getObjetoSocial()) {
 							if(regSociedad.getObjetoSocial().length()>=20){
@@ -472,12 +478,13 @@ public class WSCommons {
 						argSociedad.setCIFNIF(regSociedad.getSociedadNif());
 						argSociedad.setDenominacion(regSociedad.getSociedadDenominacion());
 						FormaSocial formaSocial = FormaSocial.Factory.newInstance();
-						if(regSociedad.getSociedadFormaSocial().length()>=20){
-							formaSocial.setStringValue(regSociedad.getSociedadFormaSocial().substring(0, 20));
-						}else{
-							formaSocial.setStringValue(regSociedad.getSociedadFormaSocial());
+						if(regSociedad.getSociedadFormaSocial() != null){
+							if(regSociedad.getSociedadFormaSocial().length()>=20){
+								formaSocial.setStringValue(regSociedad.getSociedadFormaSocial().substring(0, 20));
+							}else{
+								formaSocial.setStringValue(regSociedad.getSociedadFormaSocial());
+							}
 						}
-						
 						argSociedad.setFormaSocial(formaSocial);
 						sociedadActualizacion.setDatosSociedad(argSociedad);
 						sociedadActualizacion.setFechaAlta(UtilidadesString.toCalendar(regSociedad.getSociedadFechaAlta()));
@@ -594,9 +601,19 @@ public class WSCommons {
 									colegio.setDescripcionColegio(integrante.getDescripcionColegio());
 									if(integrante.getProfesional()!=null){
 										Profesional profesional = Profesional.Factory.newInstance();
-										profesional.setColegio(colegio );
+										if(integrante.getCodigocolegio()!=null){
+											profesional.setColegio(colegio);
+										}else{
+											profesional.setNombreColegio(integrante.getDescripcionColegio());
+										}
 										profesional.setNumColegiado(integrante.getNumColegiado());
-										profesional.setProfesion(integrante.getDescripcionCargo());
+										if(integrante.getProfesion()!= null){
+											if(integrante.getProfesion().length()>20){
+												profesional.setProfesion(integrante.getProfesion().substring(0, 19));
+											}else{
+												profesional.setProfesion(integrante.getProfesion());
+											}
+										}
 										datosProfesional.setProfesional(profesional);
 									}else{
 										ProfesionalAbogado profesionalAbogado =  ProfesionalAbogado.Factory.newInstance();
@@ -604,6 +621,7 @@ public class WSCommons {
 										profesionalAbogado.setNumColegiado(integrante.getNumColegiado());
 										datosProfesional.setProfesionalAbogado(profesionalAbogado);
 									}
+									
 									integranteFisico.setDatosProfesional(datosProfesional);
 									integranteUnitario.setIntegranteFisico(integranteFisico);
 									integranteUnitario.setFechaModificacion(UtilidadesString.toCalendar(integrante.getFechaModificacion()));
@@ -614,15 +632,18 @@ public class WSCommons {
 									cargoJuridico.setCargo(integrante.getCargo());
 									
 									cargoJuridico.setDescCargo(integrante.getDescripcionCargo());
-									if (!UtilidadesString.esCadenaVacia(integrante.getFechaCargo().toString())) {
-										Date fechaCargoJuridico = dateFormat.parse(integrante.getFechaCargo().toString());
-										cargoJuridico.setFechaCargo(UtilidadesString.toCalendar(fechaCargoJuridico));
+									if(integrante.getFechaCargo()!=null){
+										if (!UtilidadesString.esCadenaVacia(integrante.getFechaCargo().toString())) {
+											Date fechaCargoJuridico = dateFormat.parse(integrante.getFechaCargo().toString());
+											cargoJuridico.setFechaCargo(UtilidadesString.toCalendar(fechaCargoJuridico));
+										}
 									}
 									integranteJuridico.setDatosCargo(cargoJuridico);
+									integranteUnitario.setFechaModificacion(UtilidadesString.toCalendar(integrante.getFechaModificacion()));
+									integranteUnitario.setPublicar(Boolean.FALSE);
 									DatosEntidad datosEntidad = DatosEntidad.Factory.newInstance();
 									datosEntidad.setCIFNIF(integrante.getNifCif());
 									datosEntidad.setDenominacion(integrante.getNombre());
-									//datosEntidad.setFormaSocial(arg0);
 									integranteJuridico.setDatosEntidad(datosEntidad);
 									integranteUnitario.setIntegranteJuridico(integranteJuridico);
 								}
