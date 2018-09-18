@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenColegiadoSqlProvider;
 
 public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
@@ -13,18 +14,33 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		SQL sql = new SQL();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-		sql.SELECT("col.idpersona");
-		sql.SELECT("col.idinstitucion");
-		sql.SELECT("per.nifcif AS identificacion");
-		sql.SELECT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2) ) AS nombre");
-		sql.SELECT("decode(col.comunitario,0, col.ncolegiado,col.ncomunitario) as numcolegiado");
-		sql.SELECT("cat.descripcion as estadoColegial");
-		sql.SELECT(
+		sql.SELECT_DISTINCT("col.idpersona");
+		sql.SELECT_DISTINCT("col.idinstitucion");
+		sql.SELECT_DISTINCT("per.nifcif");
+		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("per.nombre as solonombre");
+		sql.SELECT_DISTINCT("per.apellidos1");
+		sql.SELECT_DISTINCT("per.apellidos2");
+		sql.SELECT_DISTINCT("per.sexo");
+		sql.SELECT_DISTINCT("per.idestadocivil");
+		sql.SELECT_DISTINCT("per.idtipoidentificacion");
+		sql.SELECT_DISTINCT("per.naturalde");
+		sql.SELECT_DISTINCT("cli.fechaalta");
+		sql.SELECT_DISTINCT("cli.idlenguaje");
+		sql.SELECT_DISTINCT("cli.asientocontable");
+		sql.SELECT_DISTINCT("col.nmutualista");
+		sql.SELECT_DISTINCT("col.fechaincorporacion");
+		sql.SELECT_DISTINCT("col.fechajura");
+		sql.SELECT_DISTINCT("col.fechatitulacion");
+		sql.SELECT_DISTINCT("col.idtiposseguro");
+		sql.SELECT_DISTINCT("decode(col.comunitario,0, col.ncolegiado,col.ncomunitario) as numcolegiado");
+		sql.SELECT_DISTINCT("cat.descripcion as estadoColegial");
+		sql.SELECT_DISTINCT(
 				"concat( decode(col.situacionresidente,0,'No', 'Sí')  || ' / ',decode(col.comunitario,0,'No', 'Sí')) as residenteInscrito");
-		sql.SELECT("per.fechanacimiento");
-		sql.SELECT("dir.correoelectronico AS correo");
-		sql.SELECT("dir.telefono1 AS telefono");
-		sql.SELECT("dir.movil as movil");
+		sql.SELECT_DISTINCT("per.fechanacimiento");
+		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
+		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
+		sql.SELECT_DISTINCT("dir.movil as movil");
 		sql.FROM("cen_colegiado col");
 
 		sql.INNER_JOIN("cen_persona per on col.idpersona = per.idpersona");
@@ -136,37 +152,56 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		if (colegiadoItem.getFechaNacimiento() != null) {
 			String fechaNacimiento = dateFormat.format(colegiadoItem.getFechaNacimiento());
-			sql.WHERE("(TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') >= TO_DATE('" + fechaNacimiento
-					+ "','DD/MM/YYYY') " + " and ( TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') <= TO_DATE('"
-					+ fechaNacimiento + "','DD/MM/YYYY')))");
+			sql.WHERE("(TO_DATE(per.fechanacimiento,'DD/MM/RRRR') >= TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY')"
+					+ " and ( TO_DATE(per.fechanacimiento,'DD/MM/RRRR') <= TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY')))");
 		}
 
 		if (colegiadoItem.getFechaIncorporacion() != null && colegiadoItem.getFechaIncorporacion().length != 0) {
 
-			if (colegiadoItem.getFechaIncorporacion()[1] != null) {
+			if (colegiadoItem.getFechaIncorporacion()[0] != null && colegiadoItem.getFechaIncorporacion()[1] != null) {
+				
+				String fechaIncorporacionDesde = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
+				String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
 
-				String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
-				String fechaIncorporacionDesde = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
-
-				sql.WHERE("(TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') >= TO_DATE('" + fechaIncorporacionHasta
+				sql.WHERE("(TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') >= TO_DATE('" + fechaIncorporacionDesde
 						+ "','DD/MM/YYYY') " + " and ( TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') <= TO_DATE('"
-						+ fechaIncorporacionDesde + "','DD/MM/YYYY')))");
-			} else {
+						+ fechaIncorporacionHasta + "','DD/MM/YYYY')))");
+				
+			} else if (colegiadoItem.getFechaIncorporacion()[0] != null && colegiadoItem.getFechaIncorporacion()[1] == null) {
 
-				String fechaIncorporacion = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
+				String fechaIncorporacionDesde = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
 
-				sql.WHERE("(TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') >= TO_DATE('" + fechaIncorporacion
-						+ "','DD/MM/YYYY') " + " and ( TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') <= TO_DATE('"
-						+ fechaIncorporacion + "','DD/MM/YYYY')))");
+				sql.WHERE("(TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') >= TO_DATE('" + fechaIncorporacionDesde
+						+ "','DD/MM/YYYY'))");
+				
+			} else if (colegiadoItem.getFechaIncorporacion()[0] == null && colegiadoItem.getFechaIncorporacion()[1] != null) {
+
+					String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
+
+					sql.WHERE("( TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') <= TO_DATE('"
+							+ fechaIncorporacionHasta + "','DD/MM/YYYY'))");
+				}
 			}
-		}
 
 		if (colegiadoItem.getEstadoColegial() != null && colegiadoItem.getEstadoColegial() != "") {
 			sql.WHERE("cat.descripcion like '" + colegiadoItem.getEstadoColegial() + "'");
 		}
 
-		sql.ORDER_BY("per.apellidos1");
+		sql.ORDER_BY("per.nombre");
 
+		return sql.toString();
+	}
+	
+	public String getLabel(AdmUsuarios usuario) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("distinct GRUCLI.IDGRUPO");
+		sql.SELECT("GENR.DESCRIPCION");
+		sql.FROM("cen_gruposcliente GRUCLI");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO");
+		sql.WHERE("GENR.IDLENGUAJE = '"+ usuario.getIdlenguaje()+ "'");
+		sql.ORDER_BY("GENR.DESCRIPCION");
 		return sql.toString();
 	}
 }

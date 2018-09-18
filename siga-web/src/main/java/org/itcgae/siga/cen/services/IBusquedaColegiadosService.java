@@ -15,6 +15,8 @@ public interface IBusquedaColegiadosService {
 	public ComboDTO getCVCategory(HttpServletRequest request);
 	
 	public ColegiadoDTO searchColegiado( ColegiadoItem colegiadoItem, HttpServletRequest request);
+	
+	public ComboDTO getLabel(HttpServletRequest request);
 
 	
 }

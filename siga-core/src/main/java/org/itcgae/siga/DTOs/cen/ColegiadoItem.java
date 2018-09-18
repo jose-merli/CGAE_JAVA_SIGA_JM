@@ -18,8 +18,8 @@ public class ColegiadoItem {
 	private String telefono;
 	private String movil;
 	private String estadoColegial;
-	private String fechaBaja;
-
+	private Date fechaBaja;
+	
 	private String  apellidos;
 	private Date [] fechaIncorporacion;
 	private String situacion;
@@ -35,6 +35,20 @@ public class ColegiadoItem {
 	private String tipoCV;
 	private String  idgrupo [];
 	private String  denominacion;
+	
+	private String soloNombre;
+	private String apellidos1;
+	private String apellidos2;
+	private String idTipoIdentificacion;
+	private String naturalDe;
+	private String idLenguaje;
+	private String asientoContable;
+	private String nMutualista;
+	private String idTiposSeguro;
+	private Date incorporacion;
+	private Date fechaJura;
+	private Date fechaTitulacion;
+
 	
 	/**
 	 *
@@ -225,17 +239,17 @@ public class ColegiadoItem {
 	/**
 	 *
 	 */
-	public ColegiadoItem fechaBaja(String fechaBaja){
+	public ColegiadoItem fechaBaja(Date fechaBaja){
 		this.fechaBaja = fechaBaja;
 		return this;
 	}
 
 	@JsonProperty("fechaBaja")
-	public String getFechaBaja() {
+	public Date getFechaBaja() {
 		return fechaBaja;
 	}
 	
-	public void setFechaBaja(String fechaBaja) {
+	public void setFechaBaja(Date fechaBaja) {
 		this.fechaBaja = fechaBaja;
 	}
 	
@@ -493,7 +507,208 @@ public class ColegiadoItem {
 	public void setDenominacion(String denominacion) {
 		this.denominacion = denominacion;
 	}
+		
+	/**
+	 *
+	 */
+	public ColegiadoItem soloNombre(String soloNombre){
+		this.soloNombre = soloNombre;
+		return this;
+	}
 
+	@JsonProperty("soloNombre")
+	public String getSoloNombre() {
+		return soloNombre;
+	}
 	
+	public void setSoloNombre(String soloNombre) {
+		this.soloNombre = soloNombre;
+	}
 	
+	/**
+	 *
+	 */
+	public ColegiadoItem apellidos1(String apellidos1){
+		this.apellidos1 = apellidos1;
+		return this;
+	}
+
+	@JsonProperty("apellidos1")
+	public String getApellidos1() {
+		return apellidos1;
+	}
+	
+	public void setApellidos1(String apellidos1) {
+		this.apellidos1 = apellidos1;
+	}
+
+	/**
+	 *
+	 */
+	public ColegiadoItem apellidos2(String apellidos2){
+		this.apellidos2 = apellidos2;
+		return this;
+	}
+
+	@JsonProperty("apellidos2")
+	public String getApellidos2() {
+		return apellidos2;
+	}
+	
+	public void setApellidos2(String apellidos2) {
+		this.apellidos2 = apellidos2;
+	}
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem idTipoIdentificacion(String idTipoIdentificacion){
+		this.idTipoIdentificacion = idTipoIdentificacion;
+		return this;
+	}
+
+	@JsonProperty("idTipoIdentificacion")
+	public String getIdTipoIdentificacion() {
+		return idTipoIdentificacion;
+	}
+	
+	public void setIdTipoIdentificacion(String idTipoIdentificacion) {
+		this.idTipoIdentificacion = idTipoIdentificacion;
+	}
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem naturalDe(String naturalDe){
+		this.naturalDe = naturalDe;
+		return this;
+	}
+
+	@JsonProperty("naturalDe")
+	public String getNaturalDe() {
+		return naturalDe;
+	}
+	
+	public void setNaturalDe(String naturalDe) {
+		this.naturalDe = naturalDe;
+	}
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem idLenguaje(String idLenguaje){
+		this.naturalDe = idLenguaje;
+		return this;
+	}
+
+	@JsonProperty("idLenguaje")
+	public String getIdLenguaje() {
+		return idLenguaje;
+	}
+	
+	public void setIdLenguaje(String idLenguaje) {
+		this.idLenguaje = idLenguaje;
+	}
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem asientoContable(String asientoContable){
+		this.asientoContable = asientoContable;
+		return this;
+	}
+
+	@JsonProperty("asientoContable")
+	public String getAsientoContable() {
+		return asientoContable;
+	}
+	
+	public void setAsientoContable(String asientoContable) {
+		this.asientoContable = asientoContable;
+	}
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem nMutualista(String nMutualista){
+		this.nMutualista = nMutualista;
+		return this;
+	}
+
+	@JsonProperty("nMutualista")
+	public String getNMutualista() {
+		return nMutualista;
+	}
+	
+	public void setNMutualista(String nMutualista) {
+		this.nMutualista = nMutualista;
+	}
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem idTiposSeguro(String idTiposSeguro){
+		this.idTiposSeguro = idTiposSeguro;
+		return this;
+	}
+
+	@JsonProperty("idTiposSeguro")
+	public String getIdTiposSeguro() {
+		return idTiposSeguro;
+	}
+	
+	public void setIdTiposSeguro(String idTiposSeguro) {
+		this.idTiposSeguro = idTiposSeguro;
+	}
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem incorporacion(Date incorporacion){
+		this.incorporacion = incorporacion;
+		return this;
+	}
+
+	@JsonProperty("incorporacion")
+	public Date getIncorporacion() {
+		return incorporacion;
+	}
+	
+	public void setIncorporacion(Date incorporacion) {
+		this.incorporacion = incorporacion;
+	}
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem fechaJura(Date fechaJura){
+		this.fechaJura = fechaJura;
+		return this;
+	}
+
+	@JsonProperty("fechaJura")
+	public Date getFechaJura() {
+		return fechaJura;
+	}
+	
+	public void setFechaJura(Date fechaJura) {
+		this.fechaJura = fechaJura;
+	}
+
+	/**
+	 *
+	 */
+	public ColegiadoItem fechaTitulacion(Date fechaTitulacion){
+		this.fechaTitulacion = fechaTitulacion;
+		return this;
+	}
+
+	@JsonProperty("fechaTitulacion")
+	public Date getFechaTitulacion() {
+		return fechaTitulacion;
+	}
+	
+	public void setFechaTitulacion(Date fechaTitulacion) {
+		this.fechaTitulacion = fechaTitulacion;
+	}
 }

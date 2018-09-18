@@ -177,6 +177,46 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 	}
 	
 	@Override
+	public ComboDTO getLabel(HttpServletRequest request) {
+		LOGGER.info("getLabel() -> Entrada al servicio para obtener los de grupos de clientes");
+		List<ComboItem> comboItem = new ArrayList<ComboItem>();
+		ComboDTO comboDTO = new ComboDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getLabel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getLabel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			if(null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				// la consulta necesita idinstitucion de token y idlenguaje del usuario logeado
+				usuario.setIdinstitucion(idInstitucion);
+				LOGGER.info("getLabel() / cenGruposclienteExtendsMapper.getLabel() -> Entrada a cenGruposclienteExtendsMapper para obtener lista de tipos de colegios");
+				comboItem = cenColegiadoExtendsMapper.getLabel(usuario);
+				LOGGER.info("getLabel() / cenGruposclienteExtendsMapper.getLabel() -> Salida de cenGruposclienteExtendsMapper para obtener lista de tipos de colegios");
+				comboDTO.setCombooItems(comboItem);
+			}
+			else {
+				LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+			}
+		}
+		else {
+			LOGGER.warn("getLabel() -> idInstitucion del token nula");
+		}
+		
+		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
+		return comboDTO;
+	}
+	
+	@Override
 	public ColegiadoDTO searchColegiado(ColegiadoItem colegiadoItem, HttpServletRequest request) {
 
 		LOGGER.info("searchColegiado() -> Entrada al servicio para obtener colegiados");
