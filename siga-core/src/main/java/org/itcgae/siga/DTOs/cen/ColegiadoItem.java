@@ -21,9 +21,7 @@ public class ColegiadoItem {
 	private String fechaBaja;
 
 	private String  apellidos;
-	private Date fechaIncorporacionDesde;
-	private Date fechaIncorporacionHasta;
-	private Date fechaIncorporacion;
+	private Date [] fechaIncorporacion;
 	private String situacion;
 	private String residencia;
 	private String inscrito;	
@@ -257,56 +255,21 @@ public class ColegiadoItem {
 	public void setApellidos(String apellidos) {
 		this.apellidos = apellidos;
 	}
-	
-	
+		
 	/**
 	 *
 	 */
-	public ColegiadoItem fechaIncorporacionDesde(Date fechaIncorporacionDesde){
-		this.fechaIncorporacionDesde = fechaIncorporacionDesde;
-		return this;
-	}
-
-	@JsonProperty("fechaIncorporacionDesde")
-	public Date getFechaIncorporacionDesde() {
-		return fechaIncorporacionDesde;
-	}
-	
-	public void setFechaIncorporacionDesde(Date fechaIncorporacionDesde) {
-		this.fechaIncorporacionDesde = fechaIncorporacionDesde;
-	}
-	
-	/**
-	 *
-	 */
-	public ColegiadoItem fechaIncorporacionHasta (Date fechaIncorporacionHasta){
-		this.fechaIncorporacionHasta = fechaIncorporacionHasta;
-		return this;
-	}
-
-	@JsonProperty("fechaIncorporacionHasta")
-	public Date getFechaIncorporacionHasta() {
-		return fechaIncorporacionHasta;
-	}
-	
-	public void setFechaIncorporacionHasta(Date fechaIncorporacionHasta) {
-		this.fechaIncorporacionHasta = fechaIncorporacionHasta;
-	}
-	
-	/**
-	 *
-	 */
-	public ColegiadoItem fechaIncorporacion (Date fechaIncorporacion){
+	public ColegiadoItem fechaIncorporacion (Date [] fechaIncorporacion){
 		this.fechaIncorporacion = fechaIncorporacion;
 		return this;
 	}
 
 	@JsonProperty("fechaIncorporacion")
-	public Date getFechaIncorporacion() {
+	public Date [] getFechaIncorporacion() {
 		return fechaIncorporacion;
 	}
 	
-	public void setFechaIncorporacion(Date fechaIncorporacion) {
+	public void setFechaIncorporacion(Date [] fechaIncorporacion) {
 		this.fechaIncorporacion = fechaIncorporacion;
 	}
 	
