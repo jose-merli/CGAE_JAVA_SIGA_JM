@@ -24,6 +24,7 @@ public class NoColegiadoItem {
 	private String  estadoCivil;
 	private String  subCategoria;
 	private String domicilio;
+	private String situacion;
 	private String idcv;
 	private boolean  historico;
 	
@@ -347,6 +348,23 @@ public class NoColegiadoItem {
 	
 	public void setDomicilio(String domicilio) {
 		this.domicilio = domicilio;
+	}
+	
+	/**
+	 *
+	 */
+	public NoColegiadoItem situacion(String situacion){
+		this.domicilio = situacion;
+		return this;
+	}
+
+	@JsonProperty("situacion")
+	public String getSituacion() {
+		return situacion;
+	}
+	
+	public void setSituacion(String situacion) {
+		this.situacion = situacion;
 	}
 	
 	/**

@@ -36,6 +36,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("col.idtiposseguro");
 		sql.SELECT_DISTINCT("cli.comisiones");
 		sql.SELECT_DISTINCT("decode(col.comunitario,0, col.ncolegiado,col.ncomunitario) as numcolegiado");
+		sql.SELECT_DISTINCT("colest.idestado as situacion");
 		sql.SELECT_DISTINCT("cat.descripcion as estadoColegial");
 		sql.SELECT_DISTINCT(
 				"concat( decode(col.situacionresidente,0,'No', 'Sí')  || ' / ',decode(col.comunitario,0,'No', 'Sí')) as residenteInscrito");
