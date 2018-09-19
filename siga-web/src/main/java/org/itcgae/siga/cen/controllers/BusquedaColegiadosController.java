@@ -67,14 +67,16 @@ public class BusquedaColegiadosController {
 		return new ResponseEntity<ComboDTO >(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/busquedaColegiado/etiquetas",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getLabel( HttpServletRequest request) {
+		ComboDTO response = busquedaColegiadosService.getLabel(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+		
 	@RequestMapping(value = "/busquedaColegiado/searchColegiado",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ColegiadoDTO> searchColegiado(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) {
 		ColegiadoDTO response = busquedaColegiadosService.searchColegiado(colegiadoItem, request);
 		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
 	}
-	
-	
-	
-	
-	
+		
 }

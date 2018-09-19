@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenColegiadoSqlProvider;
 
 public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
@@ -14,30 +15,28 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		sql.SELECT_DISTINCT("col.idpersona");
+
+		
+
 		sql.SELECT("col.idinstitucion");
-		sql.SELECT("per.nifcif AS identificacion");
-		
-		
-		sql.SELECT("per.nombre as SOLONOMBRE");
+		sql.SELECT("per.nifcif");
+		sql.SELECT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2) ) AS nombre");
+		sql.SELECT("per.nombre as solonombre");
 		sql.SELECT("per.apellidos1");
 		sql.SELECT("per.apellidos2");
 		sql.SELECT("per.sexo");
 		sql.SELECT("per.idestadocivil");
 		sql.SELECT("per.idtipoidentificacion");
-		sql.SELECT("per.fechanacimiento");
 		sql.SELECT("per.naturalde");
 		sql.SELECT("cli.fechaalta");
 		sql.SELECT("cli.idlenguaje");
 		sql.SELECT("cli.asientocontable");
 		sql.SELECT("col.nmutualista");
 		sql.SELECT("col.fechaincorporacion");
-		sql.SELECT("col.fechapresentacion");
 		sql.SELECT("col.fechajura");
 		sql.SELECT("col.fechatitulacion");
 		sql.SELECT("col.idtiposseguro");
 		sql.SELECT("cli.comisiones");
-		
-		sql.SELECT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2) ) AS nombre");
 		sql.SELECT("decode(col.comunitario,0, col.ncolegiado,col.ncomunitario) as numcolegiado");
 		sql.SELECT("cat.descripcion as estadoColegial");
 		sql.SELECT(
@@ -157,37 +156,58 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		if (colegiadoItem.getFechaNacimiento() != null) {
 			String fechaNacimiento = dateFormat.format(colegiadoItem.getFechaNacimiento());
-			sql.WHERE("(TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') >= TO_DATE('" + fechaNacimiento
-					+ "','DD/MM/YYYY') " + " and ( TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') <= TO_DATE('"
-					+ fechaNacimiento + "','DD/MM/YYYY')))");
+			sql.WHERE("(TO_DATE(per.fechanacimiento,'DD/MM/RRRR') >= TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY')"
+					+ " and ( TO_DATE(per.fechanacimiento,'DD/MM/RRRR') <= TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY')))");
 		}
 
 		if (colegiadoItem.getFechaIncorporacion() != null && colegiadoItem.getFechaIncorporacion().length != 0) {
 
-			if (colegiadoItem.getFechaIncorporacion()[1] != null) {
+			if (colegiadoItem.getFechaIncorporacion()[0] != null && colegiadoItem.getFechaIncorporacion()[1] != null) {
+				
+				String fechaIncorporacionDesde = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
+				String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
 
-				String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
-				String fechaIncorporacionDesde = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
-
-				sql.WHERE("(TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') >= TO_DATE('" + fechaIncorporacionHasta
+				sql.WHERE("(TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') >= TO_DATE('" + fechaIncorporacionDesde
 						+ "','DD/MM/YYYY') " + " and ( TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') <= TO_DATE('"
-						+ fechaIncorporacionDesde + "','DD/MM/YYYY')))");
-			} else {
+						+ fechaIncorporacionHasta + "','DD/MM/YYYY')))");
+				
+			} else if (colegiadoItem.getFechaIncorporacion()[0] != null && colegiadoItem.getFechaIncorporacion()[1] == null) {
 
-				String fechaIncorporacion = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
+				String fechaIncorporacionDesde = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
 
-				sql.WHERE("(TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') >= TO_DATE('" + fechaIncorporacion
-						+ "','DD/MM/YYYY') " + " and ( TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') <= TO_DATE('"
-						+ fechaIncorporacion + "','DD/MM/YYYY')))");
+				sql.WHERE("(TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') >= TO_DATE('" + fechaIncorporacionDesde
+						+ "','DD/MM/YYYY'))");
+				
+			} else if (colegiadoItem.getFechaIncorporacion()[0] == null && colegiadoItem.getFechaIncorporacion()[1] != null) {
+
+					String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
+
+					sql.WHERE("( TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') <= TO_DATE('"
+							+ fechaIncorporacionHasta + "','DD/MM/YYYY'))");
+				}
 			}
-		}
 
 		if (colegiadoItem.getEstadoColegial() != null && colegiadoItem.getEstadoColegial() != "") {
 			sql.WHERE("cat.descripcion like '" + colegiadoItem.getEstadoColegial() + "'");
 		}
 
-		sql.ORDER_BY("NOMBRE");
 
+		sql.ORDER_BY("NOMBRE");
+		//sql.ORDER_BY("per.nombre");
+
+		return sql.toString();
+	}
+	
+	public String getLabel(AdmUsuarios usuario) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("distinct GRUCLI.IDGRUPO");
+		sql.SELECT("GENR.DESCRIPCION");
+		sql.FROM("cen_gruposcliente GRUCLI");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO");
+		sql.WHERE("GENR.IDLENGUAJE = '"+ usuario.getIdlenguaje()+ "'");
+		sql.ORDER_BY("GENR.DESCRIPCION");
 		return sql.toString();
 	}
 }
