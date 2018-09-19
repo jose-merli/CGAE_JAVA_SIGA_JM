@@ -12,8 +12,9 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 	public String selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem) {
 
 		SQL sql = new SQL();
+		SQL sql1 = new SQL();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
+		
 		sql.SELECT_DISTINCT("col.idpersona");
 		sql.SELECT_DISTINCT("col.idinstitucion");
 		sql.SELECT_DISTINCT("per.nifcif");
@@ -33,6 +34,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("col.fechajura");
 		sql.SELECT_DISTINCT("col.fechatitulacion");
 		sql.SELECT_DISTINCT("col.idtiposseguro");
+		sql.SELECT_DISTINCT("cli.comisiones");
 		sql.SELECT_DISTINCT("decode(col.comunitario,0, col.ncolegiado,col.ncomunitario) as numcolegiado");
 		sql.SELECT_DISTINCT("cat.descripcion as estadoColegial");
 		sql.SELECT_DISTINCT(
@@ -40,6 +42,19 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("per.fechanacimiento");
 		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
 		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
+		
+		sql1.SELECT("partidojudicial.nombre");
+		sql1.FROM("cen_partidojudicial partidojudicial");
+		sql1.INNER_JOIN("cen_poblaciones pob on pob.idpartido = partidojudicial.idpartido");
+		sql1.INNER_JOIN("cen_direcciones direcciones on pob.idpoblacion = direcciones.idpoblacion");
+		sql1.INNER_JOIN("CEN_DIRECCION_TIPODIRECCION tipodireccion ON (tipodireccion.IDDIRECCION = direcciones.IDDIRECCION AND"
+				+ " tipodireccion.IDPERSONA = direcciones.IDPERSONA AND  tipodireccion.IDINSTITUCION = direcciones.IDINSTITUCION)");
+		sql1.WHERE("tipodireccion.idtipodireccion = '2'");
+		sql1.WHERE("direcciones.idpersona = dir.idpersona");
+		sql1.WHERE("direcciones.idinstitucion = dir.idinstitucion");
+		sql1.WHERE("direcciones.iddireccion = dir.iddireccion");
+		
+		sql.SELECT_DISTINCT("("+ sql1 + ") as partidoJudicial");
 		sql.SELECT_DISTINCT("dir.movil as movil");
 		sql.FROM("cen_colegiado col");
 
@@ -200,8 +215,10 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("GENR.DESCRIPCION");
 		sql.FROM("cen_gruposcliente GRUCLI");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO");
+		sql.WHERE("GRUCLI.IDINSTITUCION = '"+ usuario.getIdinstitucion()  + "'");
 		sql.WHERE("GENR.IDLENGUAJE = '"+ usuario.getIdlenguaje()+ "'");
 		sql.ORDER_BY("GENR.DESCRIPCION");
+		
 		return sql.toString();
 	}
 }

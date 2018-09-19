@@ -45,6 +45,8 @@ public class ColegiadoItem {
 	private String asientoContable;
 	private String nMutualista;
 	private String idTiposSeguro;
+	private String partidoJudicial;
+	private String comisiones;
 	private Date incorporacion;
 	private Date fechaJura;
 	private Date fechaTitulacion;
@@ -681,6 +683,41 @@ public class ColegiadoItem {
 	/**
 	 *
 	 */
+	public ColegiadoItem partidoJudicial(String partidoJudicial){
+		this.partidoJudicial = partidoJudicial;
+		return this;
+	}
+
+	@JsonProperty("partidoJudicial")
+	public String getPartidoJudicial() {
+		return partidoJudicial;
+	}
+	
+	public void setPartidoJudicial(String partidoJudicial) {
+		this.partidoJudicial = partidoJudicial;
+	}
+	
+
+	/**
+	 *
+	 */
+	public ColegiadoItem comisiones(String comisiones){
+		this.comisiones = comisiones;
+		return this;
+	}
+
+	@JsonProperty("comisiones")
+	public String getComisiones() {
+		return comisiones;
+	}
+	
+	public void setComisiones(String comisiones) {
+		this.comisiones = comisiones;
+	}
+	
+	/**
+	 *
+	 */
 	public ColegiadoItem fechaJura(Date fechaJura){
 		this.fechaJura = fechaJura;
 		return this;
@@ -711,4 +748,5 @@ public class ColegiadoItem {
 	public void setFechaTitulacion(Date fechaTitulacion) {
 		this.fechaTitulacion = fechaTitulacion;
 	}
+	
 }
