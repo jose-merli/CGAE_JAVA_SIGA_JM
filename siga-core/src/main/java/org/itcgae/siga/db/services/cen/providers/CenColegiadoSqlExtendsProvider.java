@@ -202,7 +202,9 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			sql.WHERE("cat.descripcion like '" + colegiadoItem.getEstadoColegial() + "'");
 		}
 
-		sql.ORDER_BY("per.nombre");
+
+		sql.ORDER_BY("NOMBRE");
+		//sql.ORDER_BY("per.nombre");
 
 		return sql.toString();
 	}
