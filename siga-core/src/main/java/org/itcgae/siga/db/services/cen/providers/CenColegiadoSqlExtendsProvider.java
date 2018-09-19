@@ -13,9 +13,30 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		SQL sql = new SQL();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-		sql.SELECT("col.idpersona");
+		sql.SELECT_DISTINCT("col.idpersona");
 		sql.SELECT("col.idinstitucion");
 		sql.SELECT("per.nifcif AS identificacion");
+		
+		
+		sql.SELECT("per.nombre as SOLONOMBRE");
+		sql.SELECT("per.apellidos1");
+		sql.SELECT("per.apellidos2");
+		sql.SELECT("per.sexo");
+		sql.SELECT("per.idestadocivil");
+		sql.SELECT("per.idtipoidentificacion");
+		sql.SELECT("per.fechanacimiento");
+		sql.SELECT("per.naturalde");
+		sql.SELECT("cli.fechaalta");
+		sql.SELECT("cli.idlenguaje");
+		sql.SELECT("cli.asientocontable");
+		sql.SELECT("col.nmutualista");
+		sql.SELECT("col.fechaincorporacion");
+		sql.SELECT("col.fechapresentacion");
+		sql.SELECT("col.fechajura");
+		sql.SELECT("col.fechatitulacion");
+		sql.SELECT("col.idtiposseguro");
+		sql.SELECT("cli.comisiones");
+		
 		sql.SELECT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2) ) AS nombre");
 		sql.SELECT("decode(col.comunitario,0, col.ncolegiado,col.ncomunitario) as numcolegiado");
 		sql.SELECT("cat.descripcion as estadoColegial");
@@ -165,7 +186,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			sql.WHERE("cat.descripcion like '" + colegiadoItem.getEstadoColegial() + "'");
 		}
 
-		sql.ORDER_BY("per.apellidos1");
+		sql.ORDER_BY("NOMBRE");
 
 		return sql.toString();
 	}
