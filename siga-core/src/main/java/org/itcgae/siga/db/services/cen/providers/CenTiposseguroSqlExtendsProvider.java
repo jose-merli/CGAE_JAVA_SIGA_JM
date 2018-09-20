@@ -12,7 +12,7 @@ public class CenTiposseguroSqlExtendsProvider extends CenTiposseguroSqlProvider{
 		sql.SELECT("T.IDTIPOSSEGURO AS LABEL");
 		sql.SELECT("CAT.DESCRIPCION AS VALUE");
 		sql.FROM("CEN_TIPOSSEGURO T");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON (T.NOMBRE = CAT.IDRECURSO");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON (T.NOMBRE = CAT.IDRECURSO)");
 		sql.WHERE("CAT.IDLENGUAJE = '" + idLenguaje + "'");
 		sql.ORDER_BY("CAT.DESCRIPCION");
 		
