@@ -19,8 +19,8 @@ public interface CenTiposseguroExtendsMapper extends CenTiposseguroMapper{
 	
 	@SelectProvider(type = CenTiposseguroSqlExtendsProvider.class, method = "getTypeInsurances")
 	@Results({
-		@Result(column = "LABEL", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "VALUE", property = "label", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getTypeInsurances(String idLenguage);
 }
