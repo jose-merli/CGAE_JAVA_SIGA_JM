@@ -26,13 +26,14 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("per.idestadocivil");
 		sql.SELECT_DISTINCT("per.idtipoidentificacion");
 		sql.SELECT_DISTINCT("per.naturalde");
-		sql.SELECT_DISTINCT("cli.fechaalta");
+		sql.SELECT("TO_CHAR(cli.fechaalta,'DD/MM/YYYY') AS fechaalta");
 		sql.SELECT_DISTINCT("cli.idlenguaje");
 		sql.SELECT_DISTINCT("cli.asientocontable");
 		sql.SELECT_DISTINCT("col.nmutualista");
-		sql.SELECT_DISTINCT("col.fechaincorporacion");
-		sql.SELECT_DISTINCT("col.fechajura");
-		sql.SELECT_DISTINCT("col.fechatitulacion");
+		sql.SELECT("TO_CHAR(col.fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
+		sql.SELECT("TO_CHAR(col.fechajura,'DD/MM/YYYY') AS fechajura");
+		sql.SELECT("TO_CHAR(col.fechatitulacion,'DD/MM/YYYY') AS fechatitulacion");
+		sql.SELECT("TO_CHAR(col.fechapresentacion,'DD/MM/YYYY') AS fechapresentacion");
 		sql.SELECT_DISTINCT("col.idtiposseguro");
 		sql.SELECT_DISTINCT("cli.comisiones");
 		sql.SELECT_DISTINCT("decode(col.comunitario,0, col.ncolegiado,col.ncomunitario) as numcolegiado");
@@ -40,7 +41,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("cat.descripcion as estadoColegial");
 		sql.SELECT_DISTINCT(
 				"concat( decode(col.situacionresidente,0,'No', 'Sí')  || ' / ',decode(col.comunitario,0,'No', 'Sí')) as residenteInscrito");
-		sql.SELECT_DISTINCT("per.fechanacimiento");
+		sql.SELECT("TO_CHAR(per.fechanacimiento,'DD/MM/YYYY') AS fechanacimiento");
 		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
 		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
 		
