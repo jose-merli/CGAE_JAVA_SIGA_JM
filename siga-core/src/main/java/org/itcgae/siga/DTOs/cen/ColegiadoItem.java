@@ -14,12 +14,12 @@ public class ColegiadoItem {
 	private String nombre;
 	private String numColegiado;
 	private String residenteInscrito;
-	private Date fechaNacimiento;
+	private String fechaNacimiento;
 	private String correo;
 	private String telefono;
 	private String movil;
 	private String estadoColegial;
-	private Date fechaBaja;
+	private String fechaBaja;
 	
 	private String  apellidos;
 	private Date [] fechaIncorporacion;
@@ -48,11 +48,15 @@ public class ColegiadoItem {
 	private String idTiposSeguro;
 	private String partidoJudicial;
 	private String comisiones;
-	private Date incorporacion;
-	private Date fechaJura;
-	private Date fechaTitulacion;
-
+	private String incorporacion;
+	private String fechaJura;
+	private String fechaTitulacion;
+	private String fechapresentacion;
 	
+	
+	
+	
+
 	/**
 	 *
 	 */
@@ -157,17 +161,17 @@ public class ColegiadoItem {
 	/**
 	 *
 	 */
-	public ColegiadoItem fechaNacimiento(Date fechaNacimiento){
+	public ColegiadoItem fechaNacimiento(String fechaNacimiento){
 		this.fechaNacimiento = fechaNacimiento;
 		return this;
 	}
 
 	@JsonProperty("fechaNacimiento")
-	public Date getFechaNacimiento() {
+	public String getFechaNacimiento() {
 		return fechaNacimiento;
 	}
 	
-	public void setFechaNacimiento(Date fechaNacimiento) {
+	public void setFechaNacimiento(String fechaNacimiento) {
 		this.fechaNacimiento = fechaNacimiento;
 	}
 	
@@ -242,17 +246,17 @@ public class ColegiadoItem {
 	/**
 	 *
 	 */
-	public ColegiadoItem fechaBaja(Date fechaBaja){
+	public ColegiadoItem fechaBaja(String fechaBaja){
 		this.fechaBaja = fechaBaja;
 		return this;
 	}
 
 	@JsonProperty("fechaBaja")
-	public Date getFechaBaja() {
+	public String getFechaBaja() {
 		return fechaBaja;
 	}
 	
-	public void setFechaBaja(Date fechaBaja) {
+	public void setFechaBaja(String fechaBaja) {
 		this.fechaBaja = fechaBaja;
 	}
 	
@@ -630,6 +634,7 @@ public class ColegiadoItem {
 		this.asientoContable = asientoContable;
 	}
 	
+	
 	/**
 	 *
 	 */
@@ -637,15 +642,17 @@ public class ColegiadoItem {
 		this.nMutualista = nMutualista;
 		return this;
 	}
+	
 
 	@JsonProperty("nMutualista")
-	public String getNMutualista() {
+	public String getnMutualista() {
 		return nMutualista;
 	}
-	
-	public void setNMutualista(String nMutualista) {
+
+	public void setnMutualista(String nMutualista) {
 		this.nMutualista = nMutualista;
 	}
+	
 	
 	/**
 	 *
@@ -667,17 +674,17 @@ public class ColegiadoItem {
 	/**
 	 *
 	 */
-	public ColegiadoItem incorporacion(Date incorporacion){
+	public ColegiadoItem incorporacion(String incorporacion){
 		this.incorporacion = incorporacion;
 		return this;
 	}
 
 	@JsonProperty("incorporacion")
-	public Date getIncorporacion() {
+	public String getIncorporacion() {
 		return incorporacion;
 	}
 	
-	public void setIncorporacion(Date incorporacion) {
+	public void setIncorporacion(String incorporacion) {
 		this.incorporacion = incorporacion;
 	}
 	
@@ -719,35 +726,53 @@ public class ColegiadoItem {
 	/**
 	 *
 	 */
-	public ColegiadoItem fechaJura(Date fechaJura){
+	public ColegiadoItem fechaJura(String fechaJura){
 		this.fechaJura = fechaJura;
 		return this;
 	}
 
 	@JsonProperty("fechaJura")
-	public Date getFechaJura() {
+	public String getFechaJura() {
 		return fechaJura;
 	}
 	
-	public void setFechaJura(Date fechaJura) {
+	public void setFechaJura(String fechaJura) {
 		this.fechaJura = fechaJura;
 	}
 
 	/**
 	 *
 	 */
-	public ColegiadoItem fechaTitulacion(Date fechaTitulacion){
+	public ColegiadoItem fechaTitulacion(String fechaTitulacion){
 		this.fechaTitulacion = fechaTitulacion;
 		return this;
 	}
 
 	@JsonProperty("fechaTitulacion")
-	public Date getFechaTitulacion() {
+	public String getFechaTitulacion() {
 		return fechaTitulacion;
 	}
 	
-	public void setFechaTitulacion(Date fechaTitulacion) {
+	public void setFechaTitulacion(String fechaTitulacion) {
 		this.fechaTitulacion = fechaTitulacion;
+	}
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem fechapresentacion(String fechapresentacion){
+		this.fechapresentacion = fechapresentacion;
+		return this;
+	}
+	
+
+	@JsonProperty("fechapresentacion")
+	public String getFechapresentacion() {
+		return fechapresentacion;
+	}
+
+	public void setFechapresentacion(String fechapresentacion) {
+		this.fechapresentacion = fechapresentacion;
 	}
 	
 	@Override
@@ -755,7 +780,7 @@ public class ColegiadoItem {
 	    return Objects.hash(idPersona, idInstitucion, nif, nombre, numColegiado, residenteInscrito,	fechaNacimiento, correo, telefono, movil, estadoColegial,
 	    		fechaBaja, apellidos, fechaIncorporacion, situacion, residencia, inscrito, idProvincia, idPoblacion, codigoPostal, tipoDireccion, sexo, 
 	    		estadoCivil, domicilio, tipoCV, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
-	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion);
+	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion);
 	}
 
 	
@@ -806,6 +831,7 @@ public class ColegiadoItem {
 	    sb.append("    incorporacion: ").append(toIndentedString(incorporacion)).append("\n");
 	    sb.append("    fechaJura: ").append(toIndentedString(fechaJura)).append("\n");
 	    sb.append("    fechaTitulacion: ").append(toIndentedString(fechaTitulacion)).append("\n");
+	    sb.append("    fechapresentacion: ").append(toIndentedString(fechapresentacion)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
@@ -820,5 +846,7 @@ public class ColegiadoItem {
 	    }
 	    return o.toString().replace("\n", "\n    ");
 	}
+
+
 	
 }
