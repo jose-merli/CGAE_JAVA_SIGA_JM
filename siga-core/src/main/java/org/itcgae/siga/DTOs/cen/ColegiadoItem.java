@@ -1,6 +1,7 @@
 package org.itcgae.siga.DTOs.cen;
 
 import java.util.Date;
+import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -747,6 +748,77 @@ public class ColegiadoItem {
 	
 	public void setFechaTitulacion(Date fechaTitulacion) {
 		this.fechaTitulacion = fechaTitulacion;
+	}
+	
+	@Override
+	public int hashCode() {
+	    return Objects.hash(idPersona, idInstitucion, nif, nombre, numColegiado, residenteInscrito,	fechaNacimiento, correo, telefono, movil, estadoColegial,
+	    		fechaBaja, apellidos, fechaIncorporacion, situacion, residencia, inscrito, idProvincia, idPoblacion, codigoPostal, tipoDireccion, sexo, 
+	    		estadoCivil, domicilio, tipoCV, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
+	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion);
+	}
+
+	
+	@Override
+	public String toString() {
+	    StringBuilder sb = new StringBuilder();
+	    sb.append("class DatosDireccionesItem {\n");
+	    
+	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
+	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
+	    sb.append("    nif: ").append(toIndentedString(nif)).append("\n");
+	    sb.append("    nombre: ").append(toIndentedString(nombre)).append("\n");
+	    sb.append("    numColegiado: ").append(toIndentedString(numColegiado)).append("\n");
+	    sb.append("    residenteInscrito: ").append(toIndentedString(residenteInscrito)).append("\n");
+	    sb.append("    fechaNacimiento: ").append(toIndentedString(fechaNacimiento)).append("\n");
+	    sb.append("    correo: ").append(toIndentedString(correo)).append("\n");
+	    sb.append("    telefono: ").append(toIndentedString(telefono)).append("\n");
+	    sb.append("    movil: ").append(toIndentedString(movil)).append("\n");
+	    sb.append("    estadoColegial: ").append(toIndentedString(estadoColegial)).append("\n");
+	    sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
+	    sb.append("    apellidos: ").append(toIndentedString(apellidos)).append("\n");
+	    sb.append("    fechaIncorporacion: ").append(toIndentedString(fechaIncorporacion)).append("\n");
+	    sb.append("    situacion: ").append(toIndentedString(situacion)).append("\n");
+	    sb.append("    residencia: ").append(toIndentedString(residencia)).append("\n");
+	    sb.append("    inscrito: ").append(toIndentedString(inscrito)).append("\n");
+	    sb.append("    idProvincia: ").append(toIndentedString(idProvincia)).append("\n");
+	    sb.append("    idPoblacion: ").append(toIndentedString(idPoblacion)).append("\n");
+	    sb.append("    codigoPostal: ").append(toIndentedString(codigoPostal)).append("\n");
+	    sb.append("    domicilio: ").append(toIndentedString(domicilio)).append("\n");
+	    sb.append("    tipoDireccion: ").append(toIndentedString(tipoDireccion)).append("\n");
+	    sb.append("    sexo: ").append(toIndentedString(sexo)).append("\n");
+	    sb.append("    estadoCivil: ").append(toIndentedString(estadoCivil)).append("\n");
+	    sb.append("    domicilio: ").append(toIndentedString(domicilio)).append("\n");
+	    sb.append("    tipoCV: ").append(toIndentedString(tipoCV)).append("\n");
+	    sb.append("    idgrupo: ").append(toIndentedString(idgrupo)).append("\n");
+	    sb.append("    denominacion: ").append(toIndentedString(denominacion)).append("\n");
+	    sb.append("    soloNombre: ").append(toIndentedString(soloNombre)).append("\n");
+	    sb.append("    apellidos1: ").append(toIndentedString(apellidos1)).append("\n");
+	    sb.append("    apellidos2: ").append(toIndentedString(apellidos2)).append("\n");
+	    sb.append("    idTipoIdentificacion: ").append(toIndentedString(idTipoIdentificacion)).append("\n");
+	    sb.append("    naturalDe: ").append(toIndentedString(naturalDe)).append("\n");
+	    sb.append("    idLenguaje: ").append(toIndentedString(idLenguaje)).append("\n");
+	    sb.append("    asientoContable: ").append(toIndentedString(asientoContable)).append("\n");
+	    sb.append("    nMutualista: ").append(toIndentedString(nMutualista)).append("\n");
+	    sb.append("    idTiposSeguro: ").append(toIndentedString(idTiposSeguro)).append("\n");
+	    sb.append("    partidoJudicial: ").append(toIndentedString(partidoJudicial)).append("\n");
+	    sb.append("    comisiones: ").append(toIndentedString(comisiones)).append("\n");
+	    sb.append("    incorporacion: ").append(toIndentedString(incorporacion)).append("\n");
+	    sb.append("    fechaJura: ").append(toIndentedString(fechaJura)).append("\n");
+	    sb.append("    fechaTitulacion: ").append(toIndentedString(fechaTitulacion)).append("\n");
+	    sb.append("}");
+	    return sb.toString();
+	}
+	
+	/**
+	* Convert the given object to string with each line indented by 4 spaces
+	* (except the first line).
+	*/
+	private String toIndentedString(java.lang.Object o) {
+	    if (o == null) {
+	      return "null";
+	    }
+	    return o.toString().replace("\n", "\n    ");
 	}
 	
 }

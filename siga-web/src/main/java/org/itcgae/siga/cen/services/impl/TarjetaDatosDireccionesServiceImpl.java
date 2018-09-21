@@ -22,6 +22,8 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionKey;
@@ -35,6 +37,7 @@ import org.itcgae.siga.db.entities.CenPoblacionesExample;
 import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
 import org.itcgae.siga.db.mappers.CenPoblacionesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
@@ -69,6 +72,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 	@Autowired
 	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+
+	@Autowired
+	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 	@Autowired
 	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
@@ -260,10 +266,8 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		ComboDTO poblacionesReturn = new ComboDTO();
 
 		CenPoblacionesExample example = new CenPoblacionesExample();
-		
-		example.createCriteria()
-		.andIdprovinciaEqualTo(idProvincia)
-		.andNombreLike("%"+dataFilter+"%");
+
+		example.createCriteria().andIdprovinciaEqualTo(idProvincia).andNombreLike("%" + dataFilter + "%");
 		example.setOrderByClause("NOMBRE");
 		List<CenPoblaciones> poblaciones = cenPoblacionesMapper.selectByExample(example);
 		if (null != poblaciones && poblaciones.size() > 0) {
@@ -466,24 +470,48 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				// comprobacion actualización
 				if (response >= 1) {
 
-					// Actualizamos la tabla cen_nocolegiados para mandar a sociedades
+					if (datosDireccionesItem.isEsColegiado()) {
 
-					CenNocolegiadoKey noColegiadokey = new CenNocolegiadoKey();
-					noColegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
-					noColegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-					CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(noColegiadokey);
+						// Actualizamos la tabla cen_colegiados para mandar a sociedades
+						CenColegiadoKey colegiadokey = new CenColegiadoKey();
+						colegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
+						colegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						CenColegiado colegiado = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadokey);
 
-					noColegiado.setFechamodificacion(new Date());
-					noColegiado.setUsumodificacion(usuario.getIdusuario());
+						colegiado.setFechamodificacion(new Date());
+						colegiado.setUsumodificacion(usuario.getIdusuario());
 
-					LOGGER.info(
-							"updateDirection() / cenNocolegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar el noColegiado");
-					cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
-					LOGGER.info(
-							"updateDirection() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar el noColegiado");
+						LOGGER.info(
+								"updateDirection() / cenColegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenColegiadoExtendsMapper para actualizar el Colegiado");
+						cenColegiadoExtendsMapper.updateByPrimaryKey(colegiado);
+						LOGGER.info(
+								"updateDirection() / cenColegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenColegiadoExtendsMapper para actualizar el Colegiado");
 
-					LOGGER.info("updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
-					updateResponseDTO.setStatus(SigaConstants.OK);
+						LOGGER.info(
+								"updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
+						updateResponseDTO.setStatus(SigaConstants.OK);
+
+					} else {
+
+						// Actualizamos la tabla cen_nocolegiados para mandar a sociedades
+						CenNocolegiadoKey noColegiadokey = new CenNocolegiadoKey();
+						noColegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
+						noColegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(noColegiadokey);
+
+						noColegiado.setFechamodificacion(new Date());
+						noColegiado.setUsumodificacion(usuario.getIdusuario());
+
+						LOGGER.info(
+								"updateDirection() / cenNocolegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar el noColegiado");
+						cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
+						LOGGER.info(
+								"updateDirection() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar el noColegiado");
+
+						LOGGER.info(
+								"updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
+						updateResponseDTO.setStatus(SigaConstants.OK);
+					}
 
 					// AUDITORIA
 
@@ -605,25 +633,48 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				// comprobacion actualización
 				if (response >= 1) {
 
-					// Actualizamos la tabla cen_nocolegiados para mandar a sociedades
+					if (datosDireccionesItem.isEsColegiado()) {
 
-					CenNocolegiadoKey noColegiadokey = new CenNocolegiadoKey();
-					noColegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
-					noColegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-					CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(noColegiadokey);
+						// Actualizamos la tabla cen_colegiados para mandar a sociedades
+						CenColegiadoKey colegiadokey = new CenColegiadoKey();
+						colegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
+						colegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						CenColegiado colegiado = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadokey);
 
-					noColegiado.setFechamodificacion(new Date());
-					noColegiado.setUsumodificacion(usuario.getIdusuario());
+						colegiado.setFechamodificacion(new Date());
+						colegiado.setUsumodificacion(usuario.getIdusuario());
 
-					LOGGER.info(
-							"updateDirection() / cenNocolegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar el noColegiado");
-					cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
-					LOGGER.info(
-							"updateDirection() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar el noColegiado");
 
-					LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
-					insertResponseDTO.setId(idDireccion.toString());
-					insertResponseDTO.setStatus(SigaConstants.OK);
+						LOGGER.info(
+								"updateDirection() / cenColegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenColegiadoExtendsMapper para actualizar el Colegiado");
+						cenColegiadoExtendsMapper.updateByPrimaryKey(colegiado);
+						LOGGER.info(
+								"updateDirection() / cenColegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenColegiadoExtendsMapper para actualizar el Colegiado");
+
+						LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
+						insertResponseDTO.setId(idDireccion.toString());
+						insertResponseDTO.setStatus(SigaConstants.OK);
+
+					} else {
+						// Actualizamos la tabla cen_nocolegiados para mandar a sociedades
+						CenNocolegiadoKey noColegiadokey = new CenNocolegiadoKey();
+						noColegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
+						noColegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(noColegiadokey);
+
+						noColegiado.setFechamodificacion(new Date());
+						noColegiado.setUsumodificacion(usuario.getIdusuario());
+
+						LOGGER.info(
+								"updateDirection() / cenNocolegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar el noColegiado");
+						cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
+						LOGGER.info(
+								"updateDirection() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar el noColegiado");
+
+						LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
+						insertResponseDTO.setId(idDireccion.toString());
+						insertResponseDTO.setStatus(SigaConstants.OK);
+					}
 
 					// AUDITORIA
 
