@@ -1,5 +1,7 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -12,6 +14,8 @@ import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDeleteDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
+import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
 import org.itcgae.siga.DTOs.cen.ParametroColegioDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -22,8 +26,13 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenGruposclienteCliente;
+import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
@@ -56,6 +65,9 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 	
 	@Autowired
 	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
+	@Autowired
+	private CenPersonaMapper cenPersonaMapper;
 	
 	@Override
 	public ComboDTO getSocietyTypes(HttpServletRequest request) {
@@ -146,8 +158,7 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
 		return comboDTO;
 	}
-
-
+	
 	@Override
 	public BusquedaJuridicaDTO searchLegalPersons(int numPagina, BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO,
 			HttpServletRequest request) {
@@ -313,10 +324,10 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 
 
 	@Override
-	public ComboDTO getLabelPerson(PersonaJuridicaSearchDTO personaJuridicaSearchDTO, HttpServletRequest request) {
+	public ComboEtiquetasDTO getLabelPerson(PersonaJuridicaSearchDTO personaJuridicaSearchDTO, HttpServletRequest request) throws ParseException {
 		LOGGER.info("getLabelPerson() -> Entrada al servicio para obtener etiquetas de una persona jurídica");
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem>comboItems = new ArrayList<ComboItem>();
+		ComboEtiquetasDTO comboEtiquetasDTO = new ComboEtiquetasDTO();
+		List<ComboEtiquetasItem>comboEtiquetasItems = new ArrayList<ComboEtiquetasItem>();
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -324,13 +335,31 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 		
 		LOGGER.info(
 				"getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
-		comboItems = cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica(personaJuridicaSearchDTO.getIdPersona(), String.valueOf(idInstitucion));
+		comboEtiquetasItems = cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica(personaJuridicaSearchDTO.getIdPersona(), String.valueOf(idInstitucion));
 		LOGGER.info(
 				"getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
 		
-		comboDTO.setCombooItems(comboItems);
+		Date date = new Date();
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/mm/yy");
+		String fechaHoy = simpleDateFormat.format(date);
+		
+		for (ComboEtiquetasItem comboEtiquetasItem : comboEtiquetasItems) {
+			Date fechaInicio = simpleDateFormat.parse(comboEtiquetasItem.getFechaInicio());
+		    Date fechaBaja = simpleDateFormat.parse( comboEtiquetasItem.getFechaBaja());
+		    Date fechaActual = simpleDateFormat.parse(fechaHoy);
+		    
+			if(fechaInicio.before(fechaActual) && fechaBaja.after(fechaActual)) {
+				comboEtiquetasItem.setColor("blue");
+			}else if(fechaActual.before(fechaInicio) && fechaBaja.after(fechaInicio)) {
+				comboEtiquetasItem.setColor("green");
+			}else if(fechaInicio.before(fechaBaja) && fechaActual.after(fechaBaja)) {
+				comboEtiquetasItem.setColor("red");
+			}
+		}
+		
+		comboEtiquetasDTO.setComboEtiquetasItems(comboEtiquetasItems);
 		LOGGER.info("getLabelPerson() -> Salida del servicio para obtener etiquetas de una persona jurídica");
-		return comboDTO;
+		return comboEtiquetasDTO;
 	}
 
 
