@@ -40,32 +40,50 @@ public class SolicitudIncorporacionController {
 	
 	
 	@RequestMapping(value="/tipoSolicitud",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getLabelTipoSolicitud(HttpServletRequest request) {
+	ResponseEntity<ComboDTO> getComboTipoSolicitud(HttpServletRequest request) {
 		ComboDTO response = _solicitudIncorporacionService.getTipoSolicitud(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value="/tipoColegiacion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getComboTipoColegiacion(HttpServletRequest request) {
+		ComboDTO response = _solicitudIncorporacionService.getTipoColegiacion(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value="/estadoSolicitud",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getLabelEstadoSolicitud(HttpServletRequest request) {
+	ResponseEntity<ComboDTO> getComboEstadoSolicitud(HttpServletRequest request) {
 		ComboDTO response = _solicitudIncorporacionService.getEstadoSolicitud(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/pais",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getPaises(HttpServletRequest request) {
+	ResponseEntity<ComboDTO> getComboPaises(HttpServletRequest request) {
 		ComboDTO response = _tarjetaDatosDireccionesService.getPais(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/tratamiento",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getTratamiento(HttpServletRequest request) {
+	ResponseEntity<ComboDTO> getComboTratamiento(HttpServletRequest request) {
 		ComboDTO response = _solicitudIncorporacionService.getTratamiento(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/estadoCivil",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getEstadoCivil(HttpServletRequest request) {
+	ResponseEntity<ComboDTO> getComboEstadoCivil(HttpServletRequest request) {
 		ComboDTO response = _solicitudIncorporacionService.getEstadoCivil(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/tipoIdentificacion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getComboTipoIdentificacion(HttpServletRequest request) {
+		ComboDTO response = _solicitudIncorporacionService.getTipoIdentificacion(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value="/modalidadDocumentacion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getComboModalidadDocumentacion(HttpServletRequest request) {
+		ComboDTO response = _solicitudIncorporacionService.getModalidadDocumentacion(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 }
