@@ -19,6 +19,7 @@ import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmRolExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenProcesosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
@@ -62,7 +63,7 @@ public class SigaUserDetailsService implements UserDetailsService {
 	AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivoMapper;
 	
 	@Autowired
-	AdmRolMapper admRol;
+	AdmRolExtendsMapper admRol;
 
 	@Override
 	public UserDetails loadUserByUsername(String dni) throws UsernameNotFoundException {
@@ -109,9 +110,7 @@ public class SigaUserDetailsService implements UserDetailsService {
 						idperfiles.add("'" + perfil.getIdperfil() + "'");
 					}
 				}else {
-					AdmRolExample exampleRol = new AdmRolExample();
-					exampleRol.createCriteria().andDescripcionEqualTo(grupo);
-					List<AdmRol> roles = admRol.selectByExample(exampleRol );
+					List<AdmRol> roles = admRol.selectRolAccesoByExample(grupo );
 					if (null!= roles && roles.size()>0) {
 						AdmUsuariosEfectivosPerfilExample exampleUsuarioPerfil = new AdmUsuariosEfectivosPerfilExample();
 						exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
