@@ -31,7 +31,7 @@ public class ColegiadoItem {
 	private String  codigoPostal;
 	private String  tipoDireccion;
 	private String  sexo;
-	private String estadoCivil;
+	private String idEstadoCivil;
 	private String domicilio;
 	private String tipoCV;
 	private String  idgrupo [];
@@ -53,7 +53,7 @@ public class ColegiadoItem {
 	private String fechaTitulacion;
 	private String fechapresentacion;
 	
-	
+	private String idTratamiento;
 	
 	
 
@@ -433,18 +433,18 @@ public class ColegiadoItem {
 	/**
 	 *
 	 */
-	public ColegiadoItem estadoCivil(String estadoCivil){
-		this.estadoCivil = estadoCivil;
+	public ColegiadoItem idEstadoCivil(String idEstadoCivil){
+		this.idEstadoCivil = idEstadoCivil;
 		return this;
 	}
 
-	@JsonProperty("estadoCivil")
-	public String getEstadoCivil() {
-		return estadoCivil;
+	@JsonProperty("idEstadoCivil")
+	public String getIdEstadoCivil() {
+		return idEstadoCivil;
 	}
 	
-	public void setEstadoCivil(String estadoCivil) {
-		this.estadoCivil = estadoCivil;
+	public void setIdEstadoCivil(String idEstadoCivil) {
+		this.idEstadoCivil = idEstadoCivil;
 	}
 	
 	/**
@@ -775,12 +775,27 @@ public class ColegiadoItem {
 		this.fechapresentacion = fechapresentacion;
 	}
 	
+
+	public ColegiadoItem idTratamiento(String idTratamiento){
+		this.idTratamiento = idTratamiento;
+		return this;
+	}
+	
+	@JsonProperty("idTratamiento")
+	public String getIdtratamiento() {
+		return idTratamiento;
+	}
+
+	public void setIdtratamiento(String idTratamiento) {
+		this.idTratamiento = idTratamiento;
+	}
+	
 	@Override
 	public int hashCode() {
 	    return Objects.hash(idPersona, idInstitucion, nif, nombre, numColegiado, residenteInscrito,	fechaNacimiento, correo, telefono, movil, estadoColegial,
 	    		fechaBaja, apellidos, fechaIncorporacion, situacion, residencia, inscrito, idProvincia, idPoblacion, codigoPostal, tipoDireccion, sexo, 
-	    		estadoCivil, domicilio, tipoCV, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
-	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion);
+	    		idEstadoCivil, domicilio, tipoCV, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
+	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion, idTratamiento);
 	}
 
 	
@@ -812,7 +827,7 @@ public class ColegiadoItem {
 	    sb.append("    domicilio: ").append(toIndentedString(domicilio)).append("\n");
 	    sb.append("    tipoDireccion: ").append(toIndentedString(tipoDireccion)).append("\n");
 	    sb.append("    sexo: ").append(toIndentedString(sexo)).append("\n");
-	    sb.append("    estadoCivil: ").append(toIndentedString(estadoCivil)).append("\n");
+	    sb.append("    idEstadoCivil: ").append(toIndentedString(idEstadoCivil)).append("\n");
 	    sb.append("    domicilio: ").append(toIndentedString(domicilio)).append("\n");
 	    sb.append("    tipoCV: ").append(toIndentedString(tipoCV)).append("\n");
 	    sb.append("    idgrupo: ").append(toIndentedString(idgrupo)).append("\n");
@@ -832,6 +847,8 @@ public class ColegiadoItem {
 	    sb.append("    fechaJura: ").append(toIndentedString(fechaJura)).append("\n");
 	    sb.append("    fechaTitulacion: ").append(toIndentedString(fechaTitulacion)).append("\n");
 	    sb.append("    fechapresentacion: ").append(toIndentedString(fechapresentacion)).append("\n");
+	    sb.append("    idTratamiento: ").append(toIndentedString(idTratamiento)).append("\n");
+
 	    sb.append("}");
 	    return sb.toString();
 	}
@@ -846,6 +863,7 @@ public class ColegiadoItem {
 	    }
 	    return o.toString().replace("\n", "\n    ");
 	}
+
 
 
 	

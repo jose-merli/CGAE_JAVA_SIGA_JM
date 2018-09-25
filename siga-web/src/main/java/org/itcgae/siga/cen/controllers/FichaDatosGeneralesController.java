@@ -2,13 +2,19 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.DatosBancariosInsertDTO;
 //import org.itcgae.siga.DTOs.cen.FichaDatosColegialesDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +36,22 @@ public class FichaDatosGeneralesController {
 	ResponseEntity<ComboDTO> getComboEstadoCivil(HttpServletRequest request) {
 		ComboDTO response = fichaDatosGenerales.getEstadoCivil(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}	
+//	ColegiadoDTO
+	
+	@RequestMapping(value = "/fichaDatosGenerales/datosGeneralesUpdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateGeneralData(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) throws Exception { 
+		UpdateResponseDTO response = fichaDatosGenerales.updateColegiado(colegiadoItem, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
+	
+//	@RequestMapping(value = "busquedaPerJuridica/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+//	ResponseEntity<BusquedaJuridicaDTO> searchLegalPersons(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request) { 
+//		BusquedaJuridicaDTO response = busquedaPerJuridicaService.searchLegalPersons(numPagina, busquedaJuridicaSearchDTO, request);
+//		return new ResponseEntity<BusquedaJuridicaDTO >(response, HttpStatus.OK);
+//	}
 //	
 //	@RequestMapping(value = "/busquedaPerJuridica/etiquetas",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 //	ResponseEntity<ComboDTO> getLabel( HttpServletRequest request) {
@@ -45,13 +66,6 @@ public class FichaDatosGeneralesController {
 //		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 //	}
 //	
-//	
-//	
-//	@RequestMapping(value = "busquedaPerJuridica/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<BusquedaJuridicaDTO> searchLegalPersons(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request) { 
-//		BusquedaJuridicaDTO response = busquedaPerJuridicaService.searchLegalPersons(numPagina, busquedaJuridicaSearchDTO, request);
-//		return new ResponseEntity<BusquedaJuridicaDTO >(response, HttpStatus.OK);
-//	}
 //	
 //	@RequestMapping(value = "busquedaPerJuridica/searchHistoric", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 //	ResponseEntity<BusquedaJuridicaDTO> searchHistoricLegalPersons(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request) { 

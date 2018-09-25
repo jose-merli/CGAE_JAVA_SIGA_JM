@@ -36,6 +36,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("TO_CHAR(col.fechapresentacion,'DD/MM/YYYY') AS fechapresentacion");
 		sql.SELECT_DISTINCT("col.idtiposseguro");
 		sql.SELECT_DISTINCT("cli.comisiones");
+		sql.SELECT_DISTINCT("cli.idtratamiento");
 		sql.SELECT_DISTINCT("decode(col.comunitario,0, col.ncolegiado,col.ncomunitario) as numcolegiado");
 		sql.SELECT_DISTINCT("colest.idestado as situacion");
 		sql.SELECT_DISTINCT("cat.descripcion as estadoColegial");
@@ -107,8 +108,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			sql.WHERE("dir.iddireccion  = '" + colegiadoItem.getTipoDireccion() + "'");
 		}
 
-		if (colegiadoItem.getEstadoCivil() != null && colegiadoItem.getEstadoCivil() != "") {
-			sql.WHERE("per.idestadocivil = '" + colegiadoItem.getEstadoCivil() + "'");
+		if (colegiadoItem.getIdEstadoCivil() != null && colegiadoItem.getIdEstadoCivil() != "") {
+			sql.WHERE("per.idestadocivil = '" + colegiadoItem.getIdEstadoCivil() + "'");
 		}
 
 		if (colegiadoItem.getIdProvincia() != null && colegiadoItem.getIdProvincia() != "") {

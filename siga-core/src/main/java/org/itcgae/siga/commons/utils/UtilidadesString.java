@@ -10,6 +10,8 @@ package org.itcgae.siga.commons.utils;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Calendar;
 import java.util.Properties;
@@ -142,5 +144,12 @@ public class UtilidadesString {
 		return obj == null || "".equals(obj.toString().trim());
 	}
 	
+	public static Date toDate(String string) throws ParseException{
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+		
+		
+		return	format.parse(string);
+		
+	} 
 
 }
