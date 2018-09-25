@@ -93,7 +93,9 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		}
 		sql.SET("FECHA_BAJA = #{record.fechaBaja,jdbcType=TIMESTAMP}");
 		
-		//sql.SET("FECHA_INICIO = #{record.fechaInicio,jdbcType=TIMESTAMP}");
+		if(record.getFechaInicio() != null) {
+			sql.SET("FECHA_INICIO = #{record.fechaInicio,jdbcType=TIMESTAMP}");
+		}
 		
 		applyWhere(sql, example, true);
 		return sql.toString();

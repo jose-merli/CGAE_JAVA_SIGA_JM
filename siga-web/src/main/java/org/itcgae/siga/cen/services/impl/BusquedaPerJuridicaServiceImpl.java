@@ -349,11 +349,11 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 		    Date fechaActual = simpleDateFormat.parse(fechaHoy);
 		    
 			if(fechaInicio.before(fechaActual) && fechaBaja.after(fechaActual)) {
-				comboEtiquetasItem.setColor("blue");
+				comboEtiquetasItem.setColor("#87CEFA"); 
 			}else if(fechaActual.before(fechaInicio) && fechaBaja.after(fechaInicio)) {
-				comboEtiquetasItem.setColor("green");
+				comboEtiquetasItem.setColor("#40E0D0");
 			}else if(fechaInicio.before(fechaBaja) && fechaActual.after(fechaBaja)) {
-				comboEtiquetasItem.setColor("red");
+				comboEtiquetasItem.setColor("#F08080"); 
 			}
 		}
 		
