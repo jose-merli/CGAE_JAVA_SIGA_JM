@@ -2,7 +2,6 @@ package org.itcgae.siga.db.services.cen.providers;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
@@ -527,12 +526,21 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("nocol.idinstitucion");
 		sql.SELECT_DISTINCT("per.nifcif");
 		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ',per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("per.nombre as solonombre");
+		sql.SELECT_DISTINCT("per.apellidos1");
+		sql.SELECT_DISTINCT("per.apellidos2");
 		sql.SELECT_DISTINCT("per.sexo");
+		sql.SELECT_DISTINCT("per.idestadocivil");
+		sql.SELECT_DISTINCT("per.idtipoidentificacion");
+		sql.SELECT_DISTINCT("per.naturalde");
+		sql.SELECT_DISTINCT("cli.idlenguaje");
+		sql.SELECT_DISTINCT("cli.asientocontable");
+		sql.SELECT_DISTINCT("cli.idtratamiento as tratamiento");
 		sql.SELECT_DISTINCT("per.fechanacimiento");
 		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
 		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
 		sql.SELECT_DISTINCT("dir.movil");
-		sql.SELECT_DISTINCT("nocol.fecha_baja");
+		sql.SELECT_DISTINCT("TO_CHAR(nocol.fecha_baja, 'DD/MM/YYYY') AS fechaBaja");
 		sql.FROM("cen_nocolegiado nocol");
 
 		sql.INNER_JOIN("cen_persona per on nocol.idpersona = per.idpersona");
@@ -630,7 +638,16 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("nocol.idinstitucion");
 		sql.SELECT_DISTINCT("per.nifcif");
 		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ',per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("per.nombre as solonombre");
+		sql.SELECT_DISTINCT("per.apellidos1");
+		sql.SELECT_DISTINCT("per.apellidos2");
 		sql.SELECT_DISTINCT("per.sexo");
+		sql.SELECT_DISTINCT("per.idestadocivil");
+		sql.SELECT_DISTINCT("per.idtipoidentificacion");
+		sql.SELECT_DISTINCT("per.naturalde");
+		sql.SELECT_DISTINCT("cli.idlenguaje");
+		sql.SELECT_DISTINCT("cli.asientocontable");
+		sql.SELECT_DISTINCT("cli.idtratamiento as tratamiento");
 		sql.SELECT_DISTINCT("per.fechanacimiento");
 		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
 		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
