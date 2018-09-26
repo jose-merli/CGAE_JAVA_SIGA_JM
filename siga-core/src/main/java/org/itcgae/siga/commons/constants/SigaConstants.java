@@ -247,4 +247,30 @@ public class SigaConstants {
 		}
 		
 	}
+	
+	public static enum CargaMasivaDatosGF{
+		
+		COLEGIADONUMERO("COLEGIADONUMERO"),
+		PERSONANIF("PERSONANIF"),
+		C_IDGRUPO("C_IDGRUPO"),
+		GENERAL("GENERAL"),
+		ACCION("ACCION"),
+		C_IDPERSONA("C_IDPERSONA"),
+		PERSONANOMBRE("PERSONANOMBRE"),
+		NOMBREGRUPO("NOMBREGRUPO"),
+		ERRORES("ERRORES");
+		
+		private final String campo;
+		
+		
+		private CargaMasivaDatosGF(String campo ) {
+			this.campo = campo;
+		}
+
+
+		public String getCampo() {
+			return campo;
+		}
+		
+	}
 }
