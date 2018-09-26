@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
+import org.itcgae.siga.db.services.adm.providers.GenRecursosCatalogosSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenSolicitudincorporacionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -69,5 +70,8 @@ public interface CenSolicitudincorporacionExtendsMapper {
 			@Result(column = "BANCO", property = "banco", jdbcType = JdbcType.VARCHAR),
 			})
 	List<SolIncorporacionItem> getSolicitudes(SolicitudIncorporacionSearchDTO solIncorporacionSearchDTO, String idLenguage);
+	
+	@SelectProvider(type = CenSolicitudincorporacionSqlExtendsProvider.class, method = "getMaxIdSolicitud")
+    Long getMaxIdRecurso();
 
 }
