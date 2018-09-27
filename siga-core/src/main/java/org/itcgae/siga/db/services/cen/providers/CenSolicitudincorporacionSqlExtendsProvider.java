@@ -102,5 +102,13 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		
 		return sql.toString();
 	}
+	
+	public String getMaxIdSolicitud(){
+		SQL sql = new SQL();
+		sql.SELECT("MAX(IDSOLICITUD)");
+		sql.FROM("CEN_SOLICITUDINCORPORACION");
+		return sql.toString();
+	}
+
 
 }
