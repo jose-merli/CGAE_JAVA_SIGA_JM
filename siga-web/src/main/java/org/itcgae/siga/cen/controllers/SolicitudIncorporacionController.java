@@ -3,10 +3,14 @@ package org.itcgae.siga.cen.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionDTO;
+import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.ISolicitudIncorporacionService;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
+import org.itcgae.siga.cen.services.ITarjetaDatosIntegrantesService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,13 +32,22 @@ public class SolicitudIncorporacionController {
 	@Autowired
 	private ITarjetaDatosDireccionesService _tarjetaDatosDireccionesService;
 	
-	
+	@Autowired
+	private ITarjetaDatosIntegrantesService _tarjetaDatosIntegrantesService;
 	
 	@RequestMapping(value = "/searchSolicitud", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<SolIncorporacionDTO> searchSolicitudesData(@RequestParam("numPagina") int numPagina, @RequestBody SolicitudIncorporacionSearchDTO DatosSolicitudSearchDTO, HttpServletRequest request) {
 		
 		SolIncorporacionDTO response = _solicitudIncorporacionService.datosSolicitudSearch(numPagina, DatosSolicitudSearchDTO, request);
 		return new ResponseEntity<SolIncorporacionDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/nuevaSolicitud", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> guardarSolicitud(@RequestBody SolIncorporacionItem solicitudIncorporacionDTO, HttpServletRequest request) {
+		InsertResponseDTO response = _solicitudIncorporacionService.guardarSolicitudIncorporacion(solicitudIncorporacionDTO, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.FORBIDDEN);
 	}
 	
 	
@@ -85,5 +98,11 @@ public class SolicitudIncorporacionController {
 	ResponseEntity<ComboDTO> getComboModalidadDocumentacion(HttpServletRequest request) {
 		ComboDTO response = _solicitudIncorporacionService.getModalidadDocumentacion(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/provincias", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getProvinces(HttpServletRequest request) { 
+		ComboDTO response = _tarjetaDatosIntegrantesService.getProvinces(request);
+		return new ResponseEntity<ComboDTO >(response, HttpStatus.OK);
 	}
 }

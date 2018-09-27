@@ -2,7 +2,9 @@ package org.itcgae.siga.cen.services;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionDTO;
+import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface ISolicitudIncorporacionService {
@@ -16,4 +18,5 @@ public interface ISolicitudIncorporacionService {
 	public ComboDTO getTipoColegiacion(HttpServletRequest request);
 	public ComboDTO getModalidadDocumentacion(HttpServletRequest request);
 	public SolIncorporacionDTO datosSolicitudSearch (int numPagina, SolicitudIncorporacionSearchDTO datosSolicitudSearchDTO, HttpServletRequest request);
+	public InsertResponseDTO guardarSolicitudIncorporacion (SolIncorporacionItem SolIncorporacionDTO, HttpServletRequest request);
 }

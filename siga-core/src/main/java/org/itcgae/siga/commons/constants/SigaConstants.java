@@ -1,6 +1,9 @@
 package org.itcgae.siga.commons.constants;
 
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -248,7 +251,7 @@ public class SigaConstants {
 		
 	}
 	
-	public static enum CargaMasivaDatosGF{
+	public static enum CargaMasivaDatosGFVo{
 		
 		COLEGIADONUMERO("COLEGIADONUMERO"),
 		PERSONANIF("PERSONANIF"),
@@ -263,7 +266,7 @@ public class SigaConstants {
 		private final String campo;
 		
 		
-		private CargaMasivaDatosGF(String campo ) {
+		private CargaMasivaDatosGFVo(String campo ) {
 			this.campo = campo;
 		}
 
@@ -273,7 +276,7 @@ public class SigaConstants {
 		}
 		
 	}
-	
+
 	public static enum CargaMasivaDatosCVVo{
 		
 		COLEGIADONUMERO("COLEGIADONUMERO"),
@@ -308,4 +311,19 @@ public class SigaConstants {
 			return campo;
 		}
 	} 
+
+	public static final List<String> CAMPOSEJEMPLO = Arrays.asList(CargaMasivaDatosGFVo.COLEGIADONUMERO.getCampo(),
+			CargaMasivaDatosGFVo.PERSONANIF.getCampo(), CargaMasivaDatosGFVo.C_IDGRUPO.getCampo(),
+			CargaMasivaDatosGFVo.GENERAL.getCampo(), CargaMasivaDatosGFVo.ACCION.getCampo());
+	public static final List<String> CAMPOSLOG = Arrays.asList(CargaMasivaDatosGFVo.COLEGIADONUMERO.getCampo(),
+			CargaMasivaDatosGFVo.PERSONANIF.getCampo(), CargaMasivaDatosGFVo.PERSONANOMBRE.getCampo(),
+			CargaMasivaDatosGFVo.C_IDPERSONA.getCampo(), CargaMasivaDatosGFVo.C_IDGRUPO.getCampo(),
+			CargaMasivaDatosGFVo.GENERAL.getCampo(), CargaMasivaDatosGFVo.NOMBREGRUPO.getCampo(),
+			CargaMasivaDatosGFVo.ACCION.getCampo(), CargaMasivaDatosGFVo.ERRORES.getCampo());
+
+	public static final String tipoExcelXls = "xls";
+	public static final String tipoExcelXlsx = "xlsx";
+	public static final String nombreFicheroEjemplo = "PlantillaMasivaDatosGF";
+	public static final String nombreFicheroError = "LogErrorCargaMasivaGF";
+
 }
