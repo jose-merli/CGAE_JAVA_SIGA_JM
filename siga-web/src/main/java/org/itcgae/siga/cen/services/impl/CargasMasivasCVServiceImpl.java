@@ -189,6 +189,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 		
 		StringBuffer errorLinea = null;
+		int numLinea = 1;
 		for (Hashtable<String, Object> hashtable : datos) {
 			cargaMasivaDatosCVItem = new CargaMasivaDatosCVItem();
 			
@@ -198,7 +199,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 					cargaMasivaDatosCVItem.setCreditos(Long.valueOf((String)hashtable.get(CargaMasivaDatosCVVo.C_CREDITOS.getCampo())));	
 				} catch (NumberFormatException e) {
 					LOGGER.debug("Los creditos debe ser numericos:"+hashtable.get(CargaMasivaDatosCVVo.C_CREDITOS.getCampo()));
-					errorLinea.append("Creditos debe ser numérico - Error línea: "+ hashtable.keys());
+					errorLinea.append("Creditos debe ser numérico. ");
 				}
 			}
 
@@ -249,7 +250,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 
 				}
 			}else{
-				errorLinea.append("Es obligatorio introducir número de colegiado o nif/cif- Error línea: "+ hashtable.keys());
+				errorLinea.append("Es obligatorio introducir número de colegiado o nif/cif. ");
 				cargaMasivaDatosCVItem.setPersonaNombre("Error");
 			}
 			
@@ -263,24 +264,24 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 				try {
 					cargaMasivaDatosCVItem.setFechaFin(sdf.parse((String)hashtable.get(CargaMasivaDatosCVVo.C_FECHAFIN.getCampo())));
 				} catch (ParseException e1) {
-					errorLinea.append("Fecha Fin mal introducida - Error línea: "+ hashtable.keys());
+					errorLinea.append("Fecha Fin mal introducida. ");
 
 				}
 			if(hashtable.get(CargaMasivaDatosCVVo.C_FECHAINICIO.getCampo())!=null)
 				try {
 					cargaMasivaDatosCVItem.setFechaInicio(sdf.parse((String)hashtable.get(CargaMasivaDatosCVVo.C_FECHAINICIO.getCampo())));
 				} catch (ParseException e1) {
-					errorLinea.append("Fecha Inicio mal introducida - Error línea: "+ hashtable.keys());
+					errorLinea.append("Fecha Inicio mal introducida. ");
 				}
 			
 			if(cargaMasivaDatosCVItem.getFechaInicio()!=null && cargaMasivaDatosCVItem.getFechaFin()!=null && cargaMasivaDatosCVItem.getFechaInicio().compareTo(cargaMasivaDatosCVItem.getFechaFin())>0 ){
-				errorLinea.append("La fecha de inicio no puede ser posterior a la fecha fin - Error línea: "+ hashtable.keys());
+				errorLinea.append("La fecha de inicio no puede ser posterior a la fecha fin. ");
 			}
 			if(hashtable.get(CargaMasivaDatosCVVo.FECHAVERIFICACION.getCampo())!=null)
 				try {
 					cargaMasivaDatosCVItem.setFechaVerificacion(sdf.parse((String)hashtable.get(CargaMasivaDatosCVVo.FECHAVERIFICACION.getCampo())));
 				} catch (ParseException e1) {
-					errorLinea.append("Fecha Verificacion mal introducida - Error línea: "+ hashtable.keys());
+					errorLinea.append("Fecha Verificacion mal introducida. ");
 				}
 
 			if(hashtable.get(CargaMasivaDatosCVVo.TIPOCVCOD.getCampo())!=null){
@@ -291,7 +292,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 					
 					//Llamada a método para obtener idtipocv
 					CenTiposcvExample cenTiposCVExample = new CenTiposcvExample();
-					cenTiposCVExample.createCriteria().andCodigoextEqualTo(Short.toString(tipocvCod));
+					cenTiposCVExample.createCriteria().andIdtipocvEqualTo(tipocvCod);
 					List<CenTiposcv> tiposCV  = cenTiposcvMapper.selectByExample(cenTiposCVExample);
 					
 					if(tiposCV!=null && tiposCV.size()>0){
@@ -314,12 +315,12 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 					cargaMasivaDatosCVItem.setIdTipoCV(tipoCVVo.getIdTipocv());
 				}else{
 					cargaMasivaDatosCVItem.setTipoCVNombre("Error");
-					errorLinea.append("No se ha encontrado el tipo CV - Error línea: "+ hashtable.keys());
+					errorLinea.append("No se ha encontrado el tipo CV. ");
 				}
 				cargaMasivaDatosCVItem.setTipoCVCOD(tipocvCod);
 
 			}else{
-				errorLinea.append("Es obligatorio introducir número de colegiado o nif/cif - Error línea: "+ hashtable.keys());
+				errorLinea.append("Es obligatorio introducir número de colegiado o nif/cif. ");
 				cargaMasivaDatosCVItem.setPersonaNombre("Error");
 			}
 			
@@ -342,7 +343,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 
 						cenTiposcvsubtipo1Example = new CenTiposcvsubtipo1Example();
 
-						cenTiposcvsubtipo1Example.createCriteria().andCodigoextEqualTo(subtipocv1Cod).andIdinstitucionEqualTo(usuario.getIdinstitucion()).andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
+						cenTiposcvsubtipo1Example.createCriteria().andIdtipocvsubtipo1EqualTo(Short.valueOf(subtipocv1Cod)).andIdinstitucionEqualTo(usuario.getIdinstitucion()).andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
 						//cenTiposcvsubtipo1Example.setOrderByClause("DESC");
 
 						tiposcvsubtipo1s =  cenTiposcvsubtipo1Mapper.selectByExample(cenTiposcvsubtipo1Example);
@@ -372,7 +373,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 
 					}else{
 						cargaMasivaDatosCVItem.setSubTipoCV1Nombre("Error");
-						errorLinea.append("No se ha encontrado el subtipo 1 CV - Error línea: "+ hashtable.keys());
+						errorLinea.append("No se ha encontrado el subtipo 1 CV. ");
 					}
 					cargaMasivaDatosCVItem.setSubtipoCV1COD(subtipocv1Cod);
 
@@ -383,7 +384,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 							//					Llamada a método para obtener idtipocv
 
 							CenTiposcvsubtipo2Example cenTiposcvsubtipo2Example = new CenTiposcvsubtipo2Example();
-							cenTiposcvsubtipo2Example.createCriteria().andCodigoextEqualTo(subtipocv2Cod).andIdinstitucionEqualTo(usuario.getIdinstitucion()).andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
+							cenTiposcvsubtipo2Example.createCriteria().andIdtipocvsubtipo2EqualTo(Short.valueOf(subtipocv2Cod)).andIdinstitucionEqualTo(usuario.getIdinstitucion()).andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
 							//cenTiposcvsubtipo2Example.setOrderByClause("DESC");
 
 							List<CenTiposcvsubtipo2> tiposcvsubtipo2s =  cenTiposcvsubtipo2Mapper.selectByExample(cenTiposcvsubtipo2Example);
@@ -411,12 +412,12 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 
 						}else{
 							cargaMasivaDatosCVItem.setSubtipoCV2Nombre("Error");
-							errorLinea.append("No se ha encontrado el subtipo 2 CV - Error línea: "+ hashtable.keys());
+							errorLinea.append("No se ha encontrado el subtipo 2 CV. ");
 						}
 						cargaMasivaDatosCVItem.setSubtipoCV2COD(subtipocv2Cod);
 					}
 				}else{
-					errorLinea.append("Al existir subtipos 1 para este tipo de cv es obligatorio introducir el subtipo 1 - Error línea: "+ hashtable.keys());
+					errorLinea.append("Al existir subtipos 1 para este tipo de cv es obligatorio introducir el subtipo 1. ");
 					cargaMasivaDatosCVItem.setSubTipoCV1Nombre("Error");
 
 				}
@@ -425,8 +426,9 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 				cargaMasivaDatosCVItem.setSubTipoCV1Nombre("Error");
 			}
 			
-			cargaMasivaDatosCVItem.setErrores(errorLinea.toString() + "\n");
+			cargaMasivaDatosCVItem.setErrores("Errores en la línea "+ numLinea + " : " + errorLinea.toString() + "\n");
 			masivaDatosCVVos.add(cargaMasivaDatosCVItem);
+			numLinea = numLinea + 1;
 		}
 		return masivaDatosCVVos;
 	}
