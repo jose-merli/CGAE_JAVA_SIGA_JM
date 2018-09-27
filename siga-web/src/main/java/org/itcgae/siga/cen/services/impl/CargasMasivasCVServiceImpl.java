@@ -90,6 +90,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 	public UpdateResponseDTO uploadFile(MultipartHttpServletRequest request) throws IllegalStateException, IOException {
 		LOGGER.info("uploadFile() -> Entrada al servicio para guardar un archivo");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = updateResponseDTO.getError();
 		
 		// Coger archivo del request
 		LOGGER.debug("uploadFile() -> Coger archivo del request");
@@ -120,7 +121,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 				List<CargaMasivaDatosCVItem> cargaMasivaDatosCVItems = parseExcelFile(datos, usuario);
 				
 				for (CargaMasivaDatosCVItem cargaMasivaDatosCVItem : cargaMasivaDatosCVItems) {
-					if(cargaMasivaDatosCVItem.getErrores() != null) {
+					if(cargaMasivaDatosCVItem.getErrores() == null) {
 						
 						// Comprobar si el registro no existe
 						CenDatoscvKey cenDatoscvKey = new CenDatoscvKey();
@@ -151,18 +152,21 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 							cenDatosCV.setIdtipocvsubtipo2(cargaMasivaDatosCVItem.getIdTipoCVSubtipo2());
 							cenDatosCV.setUsumodificacion(0);
 							
-							cenDatoscvMapper.insertSelective(cenDatosCV);
+							int result = cenDatoscvMapper.insertSelective(cenDatosCV);
+							
+							if(result == 1) {
+								updateResponseDTO.setStatus(SigaConstants.OK);
+							}else {
+								error.setDescription("Error al insertar una fila");
+								updateResponseDTO.setError(error);
+								updateResponseDTO.setStatus(SigaConstants.KO);
+							}
 						}
 						
-						updateResponseDTO.setStatus(SigaConstants.OK);
 					}else {
-						Error error = updateResponseDTO.getError();
 						error.setDescription(cargaMasivaDatosCVItem.getErrores());
 						updateResponseDTO.setError(error);
-						
 						updateResponseDTO.setStatus(SigaConstants.KO);
-						
-						break;
 					}
 				}
 			}
