@@ -100,9 +100,4 @@ public class SolicitudIncorporacionController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/provincias", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getProvinces(HttpServletRequest request) { 
-		ComboDTO response = _tarjetaDatosIntegrantesService.getProvinces(request);
-		return new ResponseEntity<ComboDTO >(response, HttpStatus.OK);
-	}
 }

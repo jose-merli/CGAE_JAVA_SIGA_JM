@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionDTO;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -31,6 +32,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacionService{
@@ -424,9 +426,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					solIncorporacion = mapperDtoToEntity(SolIncorporacionDTO, usuario);
 					update = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				}else{
-					Long idSolicitud = _cenSolicitudincorporacionExtendsMapper.getMaxIdRecurso();
-					idSolicitud =(long) +1;
-					SolIncorporacionDTO.setIdSolicitud(idSolicitud.toString());
+					MaxIdDto idSolicitud = _cenSolicitudincorporacionExtendsMapper.getMaxIdRecurso();
+					Long idMax = idSolicitud.getIdMax() +1;
+					SolIncorporacionDTO.setIdSolicitud(Long.toString(idMax));
 					solIncorporacion = mapperDtoToEntity(SolIncorporacionDTO, usuario);
 					insert = _cenSolicitudincorporacionMapper.insert(solIncorporacion);
 				}
@@ -481,8 +483,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		solIncorporacion.setIdinstitucion(usuario.getIdinstitucion());
 		solIncorporacion.setIdmodalidaddocumentacion(Short.parseShort(dto.getIdModalidadDocumentacion()));
 		solIncorporacion.setIdpais(dto.getIdPais());
-		//solIncorporacion.setIdpoblacion(dto.getIdPoblacion());
-		//solIncorporacion.setIdprovincia(dto.getIdProvincia());
+		solIncorporacion.setDomicilio(dto.getDomicilio());
+		solIncorporacion.setIdpoblacion(dto.getIdPoblacion());
+		solIncorporacion.setIdprovincia(dto.getIdProvincia());
 		solIncorporacion.setIdtipocolegiacion(Short.parseShort(dto.getTipoColegiacion()));
 		solIncorporacion.setIdtipoidentificacion(Short.parseShort(dto.getIdTipoIdentificacion()));
 		solIncorporacion.setIdtiposolicitud(Short.parseShort(dto.getIdTipo()));
