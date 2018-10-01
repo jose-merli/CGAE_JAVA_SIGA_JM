@@ -15,6 +15,7 @@ import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -104,6 +105,12 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "IDPERSONA2", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> selectMaxIdPersona();
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "selectMaxIdPersona2")
+	@Results({
+		@Result(column = "IDPERSONA", property = "idMax", jdbcType = JdbcType.NUMERIC)
+	})
+	MaxIdDto selectMaxIdPersona2();
 	
 	
 	@UpdateProvider(type = CenPersonaSqlExtendsProvider.class, method = "updatebyExampleDataLegalPerson")

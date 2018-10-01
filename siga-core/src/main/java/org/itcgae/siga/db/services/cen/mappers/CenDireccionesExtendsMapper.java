@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -71,8 +72,12 @@ public interface CenDireccionesExtendsMapper extends CenDireccionesMapper {
 		@Result(column = "IDCOMPONENTE", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	ComboItem selectMaxIDComponente(String idPersonaPadre, String idInstitucion);
+	
 
-
+	@SelectProvider(type = CenComponentesSqlExtendsProvider.class, method = "selectMaxIdDireccion")
+	@Results({ @Result(column = "IDDIRECCION", property = "idMax", jdbcType = JdbcType.NUMERIC)
+	})
+	MaxIdDto selectMaxID();
 
 
 

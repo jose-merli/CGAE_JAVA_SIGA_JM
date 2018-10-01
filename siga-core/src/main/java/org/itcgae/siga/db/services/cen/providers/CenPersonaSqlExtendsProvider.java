@@ -307,6 +307,16 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.FROM("cen_persona");
 		return sql.toString();
 	}
+	
+	public String selectMaxIdPersona2() {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("max(idpersona) as idMax");
+		sql.FROM("cen_persona");
+		
+		return sql.toString();
+	}
 
 	public String updatebyExampleDataLegalPerson(
 			PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, AdmUsuarios usuario) {

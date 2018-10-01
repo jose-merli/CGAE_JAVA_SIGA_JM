@@ -19,4 +19,5 @@ public interface ISolicitudIncorporacionService {
 	public ComboDTO getModalidadDocumentacion(HttpServletRequest request);
 	public SolIncorporacionDTO datosSolicitudSearch (int numPagina, SolicitudIncorporacionSearchDTO datosSolicitudSearchDTO, HttpServletRequest request);
 	public InsertResponseDTO guardarSolicitudIncorporacion (SolIncorporacionItem SolIncorporacionDTO, HttpServletRequest request);
+	public InsertResponseDTO aprobarSolicitud (Long idSolicitud, HttpServletRequest request);
 }
