@@ -493,7 +493,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		Long idDireccion;
 		Long idPersonal;
 		Short idBancario;
-		
+		int updateSolicitud = 0;
 		InsertResponseDTO response = new InsertResponseDTO();
 		Error error = new Error();
 		CenSolicitudincorporacion solIncorporacion;
@@ -519,10 +519,17 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				idPersonal = insertarDatosPersonales(solIncorporacion, usuario);
 				idDireccion = insertarDatosDireccion(solIncorporacion, usuario, idPersonal);
 				idBancario = insertarDatosBancarios(solIncorporacion, usuario, idPersonal);
+				solIncorporacion.setIdestado((short)50);
+				solIncorporacion.setFechamodificacion(new Date());
+				solIncorporacion.setUsumodificacion(usuario.getIdusuario());
+				solIncorporacion.setFechaalta(new Date());
+				
+				updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
+				
 				
 					
 				try{
-					if(idPersonal != null && idDireccion!= null && idBancario != null){
+					if(idPersonal != null && idDireccion!= null && idBancario != null && updateSolicitud == 1){
 						response.setId(Long.toString(solIncorporacion.getIdsolicitud()));
 						response.setStatus(SigaConstants.OK);
 						response.setError(null);
@@ -670,4 +677,5 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		return cuenta.getIdcuenta();
 		
 	}
+
 }

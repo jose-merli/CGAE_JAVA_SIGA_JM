@@ -50,6 +50,14 @@ public class SolicitudIncorporacionController {
 		else return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.FORBIDDEN);
 	}
 	
+	@RequestMapping(value = "/aprobarSolicitud", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> aprobarSolicitud(@RequestParam Long idSolicitud,HttpServletRequest request) {
+		
+		InsertResponseDTO response = _solicitudIncorporacionService.aprobarSolicitud(idSolicitud, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.FORBIDDEN);
+	}
 	
 	
 	@RequestMapping(value="/tipoSolicitud",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
