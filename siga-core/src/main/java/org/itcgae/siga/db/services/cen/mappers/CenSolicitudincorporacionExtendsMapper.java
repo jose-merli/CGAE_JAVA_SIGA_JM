@@ -6,9 +6,9 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
-import org.itcgae.siga.db.services.adm.providers.GenRecursosCatalogosSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenSolicitudincorporacionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -43,6 +43,8 @@ public interface CenSolicitudincorporacionExtendsMapper {
 			@Result(column = "RESIDENTE", property = "residente", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NATURALDE", property = "naturalDe", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TRATAMIENTO", property = "tratamiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTRATAMIENTO", property = "idTratamiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDTIPOCOLEGIACION", property = "idTipoColegiacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ESTADOCIVIL", property = "estadoCivil", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDESTADOCIVIL", property = "idEstadoCivil", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PAIS", property = "pais", jdbcType = JdbcType.VARCHAR),
@@ -72,6 +74,8 @@ public interface CenSolicitudincorporacionExtendsMapper {
 	List<SolIncorporacionItem> getSolicitudes(SolicitudIncorporacionSearchDTO solIncorporacionSearchDTO, String idLenguage);
 	
 	@SelectProvider(type = CenSolicitudincorporacionSqlExtendsProvider.class, method = "getMaxIdSolicitud")
-    Long getMaxIdRecurso();
+	@Results({ @Result(column = "IDSOLICITUD", property = "idMax", jdbcType = JdbcType.NUMERIC)})
+	MaxIdDto getMaxIdRecurso();
+	
 
 }

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionDTO;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -17,12 +18,21 @@ import org.itcgae.siga.cen.services.ISolicitudIncorporacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCuentasbancarias;
+import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
+import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
+import org.itcgae.siga.db.mappers.CenDireccionesMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDocumentacionmodalidadExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadoSolicitudExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudincorporacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTipocolegiacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTipoidentificacionExtendsMapper;
@@ -31,6 +41,9 @@ import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import scala.annotation.meta.setter;
+
 
 @Service
 public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacionService{
@@ -66,6 +79,24 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private CenSolicitudincorporacionMapper _cenSolicitudincorporacionMapper;
+	
+	@Autowired
+	private CenPersonaMapper _cenPersonaMapper;
+	
+	@Autowired
+	private CenPersonaExtendsMapper _cenPersonaExtendsMapper;
+	
+	@Autowired
+	private CenDireccionesExtendsMapper _cenDireccionesExtendsMapper;
+	
+	@Autowired
+	private CenDireccionesMapper _cenDireccionesMapper;
+	
+	@Autowired
+	private CenCuentasbancariasExtendsMapper _cenCuentasbancariasExtendsMapper;
+	
+	@Autowired
+	private CenCuentasbancariasMapper _cenCuentasbancariasMapper;
 	
 	@Override
 	public ComboDTO getTipoSolicitud(HttpServletRequest request) {
@@ -424,9 +455,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					solIncorporacion = mapperDtoToEntity(SolIncorporacionDTO, usuario);
 					update = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				}else{
-					Long idSolicitud = _cenSolicitudincorporacionExtendsMapper.getMaxIdRecurso();
-					idSolicitud =(long) +1;
-					SolIncorporacionDTO.setIdSolicitud(idSolicitud.toString());
+					MaxIdDto idSolicitud = _cenSolicitudincorporacionExtendsMapper.getMaxIdRecurso();
+					Long idMax = idSolicitud.getIdMax() +1;
+					SolIncorporacionDTO.setIdSolicitud(Long.toString(idMax));
 					solIncorporacion = mapperDtoToEntity(SolIncorporacionDTO, usuario);
 					insert = _cenSolicitudincorporacionMapper.insert(solIncorporacion);
 				}
@@ -448,9 +479,77 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				
 			}
 		}
+			LOGGER.info("guardarSolicitudIncorporacion() -> Salida del servicio para insertar una solicitud de incorporacion");
 		
 		return response;
 	}
+	
+	@Override
+	public InsertResponseDTO aprobarSolicitud(Long idSolicitud, HttpServletRequest request) {
+		
+		
+		LOGGER.info("aprobarSolicitud() -> Entrada al servicio para aprobar una solicitud");
+		
+		Long idDireccion;
+		Long idPersonal;
+		Short idBancario;
+		int updateSolicitud = 0;
+		InsertResponseDTO response = new InsertResponseDTO();
+		Error error = new Error();
+		CenSolicitudincorporacion solIncorporacion;
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if(idInstitucion != null){
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"aprobarSolicitud() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = _admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"aprobarSolicitud() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
+				
+				//insertamos datos personales
+				idPersonal = insertarDatosPersonales(solIncorporacion, usuario);
+				idDireccion = insertarDatosDireccion(solIncorporacion, usuario, idPersonal);
+				idBancario = insertarDatosBancarios(solIncorporacion, usuario, idPersonal);
+				solIncorporacion.setIdestado((short)50);
+				solIncorporacion.setFechamodificacion(new Date());
+				solIncorporacion.setUsumodificacion(usuario.getIdusuario());
+				solIncorporacion.setFechaalta(new Date());
+				
+				updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
+				
+				
+					
+				try{
+					if(idPersonal != null && idDireccion!= null && idBancario != null && updateSolicitud == 1){
+						response.setId(Long.toString(solIncorporacion.getIdsolicitud()));
+						response.setStatus(SigaConstants.OK);
+						response.setError(null);
+						LOGGER.warn("aprobarSolicitud() / cenSolicitudincorporacionMapper.insert() -> " + solIncorporacion.getIdsolicitud()
+										+ " .Insertado el id correctamente en la tabla Cen_SolicitudIncorporacion");
+					}
+				}catch(Exception e){
+					error.setCode(Integer.parseInt(SigaConstants.KO));
+					error.setMessage(e.getMessage());
+					response.setStatus(SigaConstants.KO);
+					response.setError(error);
+					LOGGER.warn("aprobarSolicitud() / cenSolicitudincorporacionMapper.insert() -> ERROR: " + e.getMessage());
+				}
+				
+			}
+		}
+		LOGGER.info("aprobarSolicitud() -> Salida del servicio para aprobar una solicitud");
+		return response;
+	}
+	
 	
 	private CenSolicitudincorporacion mapperDtoToEntity(SolIncorporacionItem dto, AdmUsuarios usuario){
 		
@@ -481,8 +580,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		solIncorporacion.setIdinstitucion(usuario.getIdinstitucion());
 		solIncorporacion.setIdmodalidaddocumentacion(Short.parseShort(dto.getIdModalidadDocumentacion()));
 		solIncorporacion.setIdpais(dto.getIdPais());
-		//solIncorporacion.setIdpoblacion(dto.getIdPoblacion());
-		//solIncorporacion.setIdprovincia(dto.getIdProvincia());
+		solIncorporacion.setDomicilio(dto.getDomicilio());
+		solIncorporacion.setIdpoblacion(dto.getIdPoblacion());
+		solIncorporacion.setIdprovincia(dto.getIdProvincia());
 		solIncorporacion.setIdtipocolegiacion(Short.parseShort(dto.getTipoColegiacion()));
 		solIncorporacion.setIdtipoidentificacion(Short.parseShort(dto.getIdTipoIdentificacion()));
 		solIncorporacion.setIdtiposolicitud(Short.parseShort(dto.getIdTipo()));
@@ -502,6 +602,79 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		solIncorporacion.setUsumodificacion(usuario.getIdusuario());
 		
 		return solIncorporacion;
+		
+	}
+	
+	private Long insertarDatosPersonales (CenSolicitudincorporacion solicitud, AdmUsuarios usuario){
+		
+		CenPersona datosPersonales = new CenPersona();
+		
+		MaxIdDto personaID = _cenPersonaExtendsMapper.selectMaxIdPersona2();
+		
+		
+		datosPersonales.setIdpersona(personaID.getIdMax()+1);
+		datosPersonales.setNombre(solicitud.getNombre());
+		datosPersonales.setApellidos1(solicitud.getApellido1());
+		datosPersonales.setApellidos2(solicitud.getApellido2());
+		datosPersonales.setFechamodificacion(new Date());
+		datosPersonales.setFechanacimiento(solicitud.getFechanacimiento());
+		datosPersonales.setIdestadocivil(solicitud.getIdestadocivil());
+		datosPersonales.setIdtipoidentificacion(solicitud.getIdtipoidentificacion());
+		datosPersonales.setNaturalde(solicitud.getNaturalde());
+		datosPersonales.setNifcif(solicitud.getNumeroidentificador());
+		datosPersonales.setSexo(solicitud.getSexo());
+		datosPersonales.setUsumodificacion(usuario.getIdusuario());
+		
+		return datosPersonales.getIdpersona();
+	}
+
+	private Long insertarDatosDireccion (CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
+		
+		CenDirecciones direccion = new CenDirecciones();
+		
+		MaxIdDto personaID = _cenDireccionesExtendsMapper.selectMaxID();
+		
+		
+		direccion.setIddireccion(personaID.getIdMax()+1);
+		direccion.setCodigopostal(solicitud.getCodigopostal());
+		direccion.setCorreoelectronico(solicitud.getCorreoelectronico());
+		direccion.setDomicilio(solicitud.getDomicilio());
+		if(solicitud.getFax1() != null)direccion.setFax1(solicitud.getFax1());
+		if(solicitud.getFax2() != null)direccion.setFax1(solicitud.getFax2());
+		direccion.setFechamodificacion(new Date());
+		direccion.setIdinstitucion(usuario.getIdinstitucion());
+		direccion.setIdpais(solicitud.getIdpais());
+		direccion.setIdpersona(idPersona);
+		direccion.setIdpoblacion(solicitud.getIdpoblacion());
+		direccion.setIdprovincia(solicitud.getIdprovincia());
+		direccion.setMovil(solicitud.getMovil());
+		if(solicitud.getTelefono1()!= null)direccion.setTelefono1(solicitud.getTelefono1());
+		if(solicitud.getTelefono2()!= null)direccion.setTelefono1(solicitud.getTelefono2());
+		direccion.setUsumodificacion(usuario.getIdusuario());
+		
+		return direccion.getIddireccion();
+		
+	}
+	
+	private Short insertarDatosBancarios(CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
+		
+		CenCuentasbancarias cuenta = new CenCuentasbancarias();
+		
+		MaxIdDto personaID = _cenCuentasbancariasExtendsMapper.selectMaxID();
+		
+		cuenta.setIdcuenta((short)(personaID.getIdMax()+1));
+		cuenta.setAbonocargo(solicitud.getAbonocargo());
+		cuenta.setAbonosjcs(solicitud.getAbonosjcs());
+		// TODO: cuenta.setCuentacontable(cuentacontable);
+		cuenta.setFechamodificacion(new Date());
+		cuenta.setIban(solicitud.getIban());
+		cuenta.setIdinstitucion(usuario.getIdinstitucion());
+		cuenta.setIdpersona(idPersona);
+		cuenta.setNumerocuenta(solicitud.getNumerocuenta());
+		cuenta.setTitular(solicitud.getTitular());
+		cuenta.setUsumodificacion(usuario.getIdusuario());
+		
+		return cuenta.getIdcuenta();
 		
 	}
 
