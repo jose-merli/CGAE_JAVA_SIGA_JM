@@ -277,41 +277,6 @@ public class SigaConstants {
 		
 	}
 
-	public static enum CargaMasivaDatosCVVo{
-		
-		COLEGIADONUMERO("COLEGIADONUMERO"),
-		PERSONANIF("PERSONANIF"),
-		C_FECHAINICIO("C_FECHAINICIO"),
-		C_FECHAFIN("C_FECHAFIN"),
-		C_CREDITOS("C_CREDITOS"),
-		FECHAVERIFICACION("FECHAVERIFICACION"),
-		TIPOCVCOD("TIPOCVCOD"),
-		SUBTIPOCV1COD("SUBTIPOCV1COD"),
-		SUBTIPOCV2COD("SUBTIPOCV2COD"),
-		PERSONANOMBRE("PERSONANOMBRE"),
-		C_IDPERSONA("C_IDPERSONA"),
-		TIPOCVNOMBRE("TIPOCVNOMBRE"),
-		C_IDTIPOCV("C_IDTIPOCV"),
-		SUBTIPOCV1NOMBRE("SUBTIPOCV1NOMBRE"),
-		C_IDTIPOCVSUBTIPO1("C_IDTIPOCVSUBTIPO1"),
-		SUBTIPOCV2NOMBRE("SUBTIPOCV2NOMBRE"),
-		C_IDTIPOCVSUBTIPO2("C_IDTIPOCVSUBTIPO2"),
-		ERRORES("ERRORES"),
-		C_DESCRIPCION("C_DESCRIPCION");
-			
-		private final String campo;
-			
-			
-		private CargaMasivaDatosCVVo(String campo) {
-			this.campo = campo;
-		}
-
-
-		public String getCampo() {
-			return campo;
-		}
-	} 
-
 	public static final List<String> CAMPOSEJEMPLO = Arrays.asList(CargaMasivaDatosGFVo.COLEGIADONUMERO.getCampo(),
 			CargaMasivaDatosGFVo.PERSONANIF.getCampo(), CargaMasivaDatosGFVo.C_IDGRUPO.getCampo(),
 			CargaMasivaDatosGFVo.GENERAL.getCampo(), CargaMasivaDatosGFVo.ACCION.getCampo());
@@ -326,4 +291,17 @@ public class SigaConstants {
 	public static final String nombreFicheroEjemplo = "PlantillaMasivaDatosGF";
 	public static final String nombreFicheroError = "LogErrorCargaMasivaGF";
 
+	
+	public static enum HISTORICOCAMBIO {		
+		DATOSGENERALES ((short)10),
+		DATOSCV ((short)50);
+		
+		private short id = 0;
+		HISTORICOCAMBIO(short id) {
+			this.id = id;
+		}
+		public short getId() {
+			return this.id;
+		}
+	} 
 }

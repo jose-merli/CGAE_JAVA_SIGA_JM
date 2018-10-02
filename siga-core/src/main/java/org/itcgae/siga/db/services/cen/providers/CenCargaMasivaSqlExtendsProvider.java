@@ -10,10 +10,10 @@ public class CenCargaMasivaSqlExtendsProvider extends CenCargamasivaSqlProvider 
 		
 		SQL sql = new SQL();
 		
-		sql.SELECT("TO_CHAR(ca.fechacarga,'DD/MM/YYYY') AS fechacarga");
-		sql.SELECT("ca.nombrefichero");
-		sql.SELECT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2) ) as usuario");
-		sql.SELECT("ca.numregistros as registros");
+		sql.SELECT_DISTINCT("TO_CHAR(ca.fechacarga,'DD/MM/YYYY') AS fechacarga");
+		sql.SELECT_DISTINCT("ca.nombrefichero");
+		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2) ) as usuario");
+		sql.SELECT_DISTINCT("ca.numregistros as registros");
 		sql.FROM("cen_cargamasiva ca");
 		sql.INNER_JOIN("cen_gruposcliente_cliente cli on (cli.usumodificacion = ca.usumodificacion)");
 		sql.INNER_JOIN("cen_persona per on (per.idpersona = cli.idpersona)");
