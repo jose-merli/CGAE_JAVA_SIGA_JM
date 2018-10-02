@@ -1,25 +1,22 @@
 package org.itcgae.siga.cen.services.impl;
 
-import java.io.File;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
-import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.cen.services.FicherosService;
+import org.itcgae.siga.cen.services.IFicherosService;
 import org.itcgae.siga.db.entities.GenFichero;
-import org.itcgae.siga.db.mappers.GenFicheroMapper;
 import org.itcgae.siga.db.services.cen.mappers.GenFicheroExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FicherosServiceImpl implements FicherosService {
-	private static Logger LOGGER = Logger.getLogger(FicherosServiceImpl.class);
 
+public class FicherosServiceImpl implements IFicherosService {
+	private static Logger LOGGER = Logger.getLogger(FicherosServiceImpl.class);
+	
 	@Autowired
 	private GenFicheroExtendsMapper genFicheroExtendsMapper;
 	
@@ -62,7 +59,6 @@ public class FicherosServiceImpl implements FicherosService {
 		GenFichero genFichero = getVo2Db(ficheroVo);
 		genFichero.setFechamodificacion(new Date());
 		genFichero.setUsumodificacion(ficheroVo.getUsumodificacion());
-		
 		genFicheroExtendsMapper.insert(genFichero);
 		FicheroVo auxFicheroVo = getDb2Vo(genFichero);
 		ficheroVo.setIdfichero(auxFicheroVo.getIdfichero());
@@ -76,7 +72,6 @@ public class FicherosServiceImpl implements FicherosService {
 		FicheroVo ficheroVo = new FicheroVo();
 		ficheroVo.setExtension(objectDb.getExtension());
 		ficheroVo.setDirectorio(objectDb.getDirectorio());
-		
 		ficheroVo.setDescripcion(objectDb.getDescripcion());
 		ficheroVo.setIdfichero(objectDb.getIdfichero());
 		ficheroVo.setIdinstitucion(objectDb.getIdinstitucion());

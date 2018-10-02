@@ -652,7 +652,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 		cenHistorico.setFechaentrada(Calendar.getInstance().getTime());
 		cenHistorico.setFechaefectiva(Calendar.getInstance().getTime());
 		cenHistorico.setMotivo(null);
-		cenHistorico.setIdtipocambio(SigaConstants.HISTORICOCAMBIO.DATOSCV.getId()); 
+		cenHistorico.setIdtipocambio(SigaConstants.HISTORICOCAMBIOCV.DATOSCV.getId()); 
 		cenHistorico.setFechamodificacion(Calendar.getInstance().getTime());
 		cenHistorico.setUsumodificacion(usuario.getIdusuario());
 		
@@ -711,7 +711,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 		cenHistorico.setDescripcion(descripcion.toString());
 		
 		if (cenHistoricoMapper.insert(cenHistorico) != 1) {
-			throw new BusinessException("No se ha insertado correctamente el registro en cenHistorico para el colegio " + usuario.getIdinstitucion() + ", idPersona " + cargaMasivaDatosCVItem.getIdPersona() + " e idTipoCambio " +SigaConstants.HISTORICOCAMBIO.DATOSCV.getId());
+			throw new BusinessException("No se ha insertado correctamente el registro en cenHistorico para el colegio " + usuario.getIdinstitucion() + ", idPersona " + cargaMasivaDatosCVItem.getIdPersona() + " e idTipoCambio " +SigaConstants.HISTORICOCAMBIOCV.DATOSCV.getId());
 		}
 		
 	}
