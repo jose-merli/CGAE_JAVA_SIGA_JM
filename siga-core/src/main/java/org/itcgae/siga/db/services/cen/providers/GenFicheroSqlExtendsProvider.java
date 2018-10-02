@@ -16,4 +16,16 @@ public class GenFicheroSqlExtendsProvider extends GenFicheroSqlProvider{
 		
 		return sql.toString();
 	}
+	
+	public String selectMaxIdFicheroByIdInstitucion(String idInstitucion) {
+        SQL sql = new SQL();
+
+        sql.SELECT("MAX(IDFICHERO) as IDFICHERO");
+        sql.FROM("GEN_FICHERO");
+        sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
+        
+        return sql.toString();
+}
+
+	
 }

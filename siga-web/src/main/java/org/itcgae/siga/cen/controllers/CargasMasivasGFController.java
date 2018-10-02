@@ -1,7 +1,10 @@
 package org.itcgae.siga.cen.controllers;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.CargaMasivaDTO;
 import org.itcgae.siga.DTOs.cen.CargaMasivaItem;
 import org.itcgae.siga.cen.services.ICargasMasivasGFService;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 public class CargasMasivasGFController {
@@ -37,6 +41,14 @@ public class CargasMasivasGFController {
 	ResponseEntity<CargaMasivaDTO> searchEtiquetas(@RequestBody CargaMasivaItem cargaMasivaItem, HttpServletRequest request) {
 		CargaMasivaDTO response = cargasMasivasGFService.searchEtiquetas(cargaMasivaItem, request);
 		return new ResponseEntity<CargaMasivaDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "cargasMasivasEtiquetas/uploadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<UpdateResponseDTO> uploadFile(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
+		UpdateResponseDTO response = cargasMasivasGFService.uploadFileExcel(request);
+		if (response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 
 }
