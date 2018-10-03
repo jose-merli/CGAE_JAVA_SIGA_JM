@@ -32,8 +32,6 @@ public class SolicitudIncorporacionController {
 	@Autowired
 	private ITarjetaDatosDireccionesService _tarjetaDatosDireccionesService;
 	
-	@Autowired
-	private ITarjetaDatosIntegrantesService _tarjetaDatosIntegrantesService;
 	
 	@RequestMapping(value = "/searchSolicitud", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<SolIncorporacionDTO> searchSolicitudesData(@RequestParam("numPagina") int numPagina, @RequestBody SolicitudIncorporacionSearchDTO DatosSolicitudSearchDTO, HttpServletRequest request) {
@@ -52,6 +50,15 @@ public class SolicitudIncorporacionController {
 	
 	@RequestMapping(value = "/aprobarSolicitud", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> aprobarSolicitud(@RequestBody Long idSolicitud,HttpServletRequest request) {
+		
+		InsertResponseDTO response = _solicitudIncorporacionService.denegarsolicitud(idSolicitud, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "/denegarSolicitud", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> denegarSolicitud(@RequestBody Long idSolicitud,HttpServletRequest request) {
 		
 		InsertResponseDTO response = _solicitudIncorporacionService.aprobarSolicitud(idSolicitud, request);
 		if(response.getStatus().equals(SigaConstants.OK))

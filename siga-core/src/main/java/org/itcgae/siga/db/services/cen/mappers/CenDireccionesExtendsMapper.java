@@ -74,7 +74,7 @@ public interface CenDireccionesExtendsMapper extends CenDireccionesMapper {
 	ComboItem selectMaxIDComponente(String idPersonaPadre, String idInstitucion);
 	
 
-	@SelectProvider(type = CenComponentesSqlExtendsProvider.class, method = "selectMaxIdDireccion")
+	@SelectProvider(type = CenDireccionesSqlExtendsProvider.class, method = "selectMaxIdDireccion")
 	@Results({ @Result(column = "IDDIRECCION", property = "idMax", jdbcType = JdbcType.NUMERIC)
 	})
 	MaxIdDto selectMaxID();
