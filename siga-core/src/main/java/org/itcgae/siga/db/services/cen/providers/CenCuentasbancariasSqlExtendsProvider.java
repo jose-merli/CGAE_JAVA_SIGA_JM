@@ -195,7 +195,7 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 	public String selectMaxId(){
 		SQL sql = new SQL();
 		
-		sql.SELECT("MAX(IDCUENTA) AS IDCUENTA");
+		sql.SELECT("MAX(IDCUENTA) +1 AS IDCUENTA");
 		sql.FROM("CEN_CUENTASBANCARIAS");
 		
 		return sql.toString();
