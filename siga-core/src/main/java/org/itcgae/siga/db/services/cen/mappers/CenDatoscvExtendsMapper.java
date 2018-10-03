@@ -7,7 +7,9 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.CenDatoscvMapper;
+import org.itcgae.siga.db.services.adm.providers.GenRecursosCatalogosSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenDatoscvSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -33,4 +35,11 @@ public interface CenDatoscvExtendsMapper extends CenDatoscvMapper {
 
 	})
 	List<FichaDatosCurricularesItem> searchDatosCurriculares(String idPersona, String idInstitucion);
+	
+	
+	@SelectProvider(type = CenDatoscvSqlExtendsProvider.class, method = "getMaxIdCv")
+	@Results({ @Result(column = "IDCV", property = "newId", jdbcType = JdbcType.VARCHAR)
+	
+	})
+	NewIdDTO getMaxIdCv(String idInstitucion, String idPersona);
 }

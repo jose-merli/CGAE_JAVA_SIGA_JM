@@ -802,7 +802,7 @@ public class ColegiadoItem {
 	@Override
 	public String toString() {
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("class DatosDireccionesItem {\n");
+	    sb.append("class ColegiadoItem {\n");
 	    
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");

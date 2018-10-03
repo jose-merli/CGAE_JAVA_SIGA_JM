@@ -32,5 +32,16 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 		
 		return sql.toString();
 	}
+	
+	public String getMaxIdCv(String idInstitucion, String idPersona) {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDCV) AS IDCV");
+		sql.FROM("CEN_DATOSCV");
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
+		sql.WHERE("IDPERSONA = '"+ idPersona +"'");
+		
+		return sql.toString();
+	}
 
 }
