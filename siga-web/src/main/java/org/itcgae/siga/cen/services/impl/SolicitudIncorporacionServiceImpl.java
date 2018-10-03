@@ -1,9 +1,19 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.io.IOException;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
+import java.sql.Types;
 import java.util.Date;
 import java.util.List;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
@@ -16,17 +26,26 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.cen.services.ISolicitudIncorporacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmConfig;
+import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
+import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
+import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDocumentacionmodalidadExtendsMapper;
@@ -42,6 +61,8 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+
 @Service
 public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacionService{
 	
@@ -49,6 +70,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper _admUsuariosExtendsMapper;
+	
+	@Autowired
+	private AdmConfigMapper admConfigMapper;
 	
 	@Autowired
 	private CenTiposolicitudExtendsMapper _cenTiposolicitudSqlExtendsMapper;
@@ -94,6 +118,10 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private CenCuentasbancariasMapper _cenCuentasbancariasMapper;
+	
+	@Autowired
+	private CenColegiadoMapper _cenColegiadoMapper;
+	
 	
 	@Override
 	public ComboDTO getTipoSolicitud(HttpServletRequest request) {
@@ -456,6 +484,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					Long idMax = idSolicitud.getIdMax() +1;
 					SolIncorporacionDTO.setIdSolicitud(Long.toString(idMax));
 					solIncorporacion = mapperDtoToEntity(SolIncorporacionDTO, usuario);
+					solIncorporacion.setIdestado((short)20);
 					insert = _cenSolicitudincorporacionMapper.insert(solIncorporacion);
 				}
 				try{
@@ -490,6 +519,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		Long idDireccion;
 		Long idPersonal;
 		Short idBancario;
+		Long idColegiado;
 		int updateSolicitud = 0;
 		InsertResponseDTO response = new InsertResponseDTO();
 		Error error = new Error();
@@ -509,30 +539,51 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					"aprobarSolicitud() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
-				solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
-				
-				//insertamos datos personales
-				idPersonal = insertarDatosPersonales(solIncorporacion, usuario);
-				idDireccion = insertarDatosDireccion(solIncorporacion, usuario, idPersonal);
-				idBancario = insertarDatosBancarios(solIncorporacion, usuario, idPersonal);
-				solIncorporacion.setIdestado((short)50);
-				solIncorporacion.setFechamodificacion(new Date());
-				solIncorporacion.setUsumodificacion(usuario.getIdusuario());
-				solIncorporacion.setFechaalta(new Date());
-				
-				updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
-				
-				
-					
 				try{
-					if(idPersonal != null && idDireccion!= null && idBancario != null && updateSolicitud == 1){
+					AdmUsuarios usuario = usuarios.get(0);
+					solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
+					
+					//insertamos datos personales
+					idPersonal = insertarDatosPersonales(solIncorporacion, usuario);
+					idDireccion = insertarDatosDireccion(solIncorporacion, usuario, idPersonal);
+					idBancario = insertarDatosBancarios(solIncorporacion, usuario, idPersonal);
+					idColegiado = insertarDatosColegiado(solIncorporacion, usuario, idPersonal);
+					solIncorporacion.setIdestado((short)50);
+					solIncorporacion.setFechamodificacion(new Date());
+					solIncorporacion.setUsumodificacion(usuario.getIdusuario());
+					solIncorporacion.setFechaalta(new Date());
+					
+					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
+					
+				
+					if(idPersonal != null && idDireccion!= null && idBancario != null && idColegiado != null && updateSolicitud == 1){
 						response.setId(Long.toString(solIncorporacion.getIdsolicitud()));
 						response.setStatus(SigaConstants.OK);
 						response.setError(null);
 						LOGGER.warn("aprobarSolicitud() / cenSolicitudincorporacionMapper.insert() -> " + solIncorporacion.getIdsolicitud()
 										+ " .Insertado el id correctamente en la tabla Cen_SolicitudIncorporacion");
+					}else{
+						LOGGER.error("aprobarSolicitud() --> Borramos los registros al no poder aprobar la solicitud");
+						if(idColegiado != null) {
+							CenColegiadoKey keys = new CenColegiadoKey();
+							keys.setIdinstitucion(usuario.getIdinstitucion());
+							keys.setIdpersona(idPersonal);
+							_cenColegiadoMapper.deleteByPrimaryKey(keys);
+						}
+						if(idPersonal != null) 
+							_cenPersonaMapper.deleteByPrimaryKey(idPersonal);
+						
+						if(idDireccion != null){
+							CenDireccionesKey keys = new CenDireccionesKey();
+							keys.setIddireccion(idDireccion);
+							keys.setIdinstitucion(usuario.getIdinstitucion());
+							keys.setIdpersona(idPersonal);
+							_cenDireccionesMapper.deleteByPrimaryKey(keys);
+						}
+						LOGGER.error("aprobarSolicitud() --> Registros borrados, fallo al aprobar la solicitud.");
+							
 					}
+					
 				}catch(Exception e){
 					error.setCode(Integer.parseInt(SigaConstants.KO));
 					error.setMessage(e.getMessage());
@@ -609,7 +660,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		MaxIdDto personaID = _cenPersonaExtendsMapper.selectMaxIdPersona2();
 		
 		
-		datosPersonales.setIdpersona(personaID.getIdMax()+1);
+		datosPersonales.setIdpersona(personaID.getIdMax());
 		datosPersonales.setNombre(solicitud.getNombre());
 		datosPersonales.setApellidos1(solicitud.getApellido1());
 		datosPersonales.setApellidos2(solicitud.getApellido2());
@@ -620,7 +671,10 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		datosPersonales.setNaturalde(solicitud.getNaturalde());
 		datosPersonales.setNifcif(solicitud.getNumeroidentificador());
 		datosPersonales.setSexo(solicitud.getSexo());
+		datosPersonales.setFallecido("0");
 		datosPersonales.setUsumodificacion(usuario.getIdusuario());
+		
+		_cenPersonaMapper.insert(datosPersonales);
 		
 		return datosPersonales.getIdpersona();
 	}
@@ -632,7 +686,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		MaxIdDto personaID = _cenDireccionesExtendsMapper.selectMaxID();
 		
 		
-		direccion.setIddireccion(personaID.getIdMax()+1);
+		direccion.setIddireccion(personaID.getIdMax());
 		direccion.setCodigopostal(solicitud.getCodigopostal());
 		direccion.setCorreoelectronico(solicitud.getCorreoelectronico());
 		direccion.setDomicilio(solicitud.getDomicilio());
@@ -642,37 +696,373 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		direccion.setIdinstitucion(usuario.getIdinstitucion());
 		direccion.setIdpais(solicitud.getIdpais());
 		direccion.setIdpersona(idPersona);
-		direccion.setIdpoblacion(solicitud.getIdpoblacion());
-		direccion.setIdprovincia(solicitud.getIdprovincia());
-		direccion.setMovil(solicitud.getMovil());
+		if(solicitud.getIdpoblacion()!= null)direccion.setIdpoblacion(solicitud.getIdpoblacion());
+		if(solicitud.getIdprovincia()!= null)direccion.setIdprovincia(solicitud.getIdprovincia());
 		if(solicitud.getTelefono1()!= null)direccion.setTelefono1(solicitud.getTelefono1());
 		if(solicitud.getTelefono2()!= null)direccion.setTelefono1(solicitud.getTelefono2());
+		direccion.setMovil(solicitud.getMovil());
 		direccion.setUsumodificacion(usuario.getIdusuario());
+		
+		_cenDireccionesMapper.insert(direccion);
 		
 		return direccion.getIddireccion();
 		
 	}
 	
-	private Short insertarDatosBancarios(CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
+	private Short insertarDatosBancarios(CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona) throws Exception{
 		
 		CenCuentasbancarias cuenta = new CenCuentasbancarias();
-		
+
 		MaxIdDto personaID = _cenCuentasbancariasExtendsMapper.selectMaxID();
-		
-		cuenta.setIdcuenta((short)(personaID.getIdMax()+1));
+		boolean tieneCargo = false;
+		boolean tieneSCSJ = false;
+		boolean tieneAbono = false;
+		cuenta.setIdcuenta((short)(personaID.getIdMax()+0));
 		cuenta.setAbonocargo(solicitud.getAbonocargo());
 		cuenta.setAbonosjcs(solicitud.getAbonosjcs());
-		// TODO: cuenta.setCuentacontable(cuentacontable);
 		cuenta.setFechamodificacion(new Date());
 		cuenta.setIban(solicitud.getIban());
 		cuenta.setIdinstitucion(usuario.getIdinstitucion());
 		cuenta.setIdpersona(idPersona);
 		cuenta.setNumerocuenta(solicitud.getNumerocuenta());
 		cuenta.setTitular(solicitud.getTitular());
+		cuenta.setCboCodigo(solicitud.getIban().substring(4, 8));
+		cuenta.setCodigosucursal(solicitud.getIban().substring(8, 12));
+		cuenta.setDigitocontrol(solicitud.getIban().substring(12, 14));
+		cuenta.setNumerocuenta(solicitud.getIban().substring(14, 24));
 		cuenta.setUsumodificacion(usuario.getIdusuario());
+		
+		List<CenCuentasbancarias> cuentaBancaria = null;
+		
+		if(solicitud.getAbonosjcs().equals("1")){
+			CenCuentasbancariasExample example = new CenCuentasbancariasExample();
+			example.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona)).andIdinstitucionEqualTo(usuario.getIdinstitucion()).andAbonosjcsEqualTo("1");
+			cuentaBancaria = _cenCuentasbancariasExtendsMapper.selectByExample(example);
+			if (null != cuentaBancaria && !cuentaBancaria.isEmpty()) {
+				return null;
+			}
+		}
+		
+		LOGGER.info(
+				"insertarDatosBancarios() / cenNocolegiadoExtendsMapper.insertSelective() -> Entrada a cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
+		_cenCuentasbancariasMapper.insertSelective(cuenta);
+		LOGGER.info(
+				"insertarDatosBancarios() / cenNocolegiadoExtendsMapper.insertSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
+		
+		
+		
+		
+		if (tieneCargo) {
+			Object[] paramMandatos = new Object[4];
+			paramMandatos[0] = usuario.getIdinstitucion().toString();
+			paramMandatos[1] = idPersona;
+			paramMandatos[2] = cuenta.getIdcuenta().toString();
+			paramMandatos[3] = usuario.getIdusuario().toString();
+			
+			String resultado[] = new String[2];
+			resultado = callPLProcedure("{call PKG_SIGA_CARGOS.InsertarMandatos(?,?,?,?,?,?)}", 2, paramMandatos);
+			if (resultado == null) {
+				LOGGER.info("insertBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
+				
+				//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+				if (tieneAbono || tieneSCSJ) {
+					if (tieneAbono) {
+						cuenta.setAbonocargo("A");
+					}else{
+						cuenta.setAbonocargo(null);
+					}
+					_cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuenta);
+				}else{
+					_cenCuentasbancariasExtendsMapper.deleteByPrimaryKey(cuenta);
+				}
+				
+			} else {
+				if (resultado[0].equals("1")) {
+					LOGGER.info("insertBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
+					//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+					if (tieneAbono || tieneSCSJ) {
+						if (tieneAbono) {
+							cuenta.setAbonocargo("A");
+						}else{
+							cuenta.setAbonocargo(null);
+						}
+						_cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuenta);
+					}else{
+						_cenCuentasbancariasExtendsMapper.deleteByPrimaryKey(cuenta);
+					}
+					
+				} else if (resultado[0].equals("2")) {
+					LOGGER.info("insertBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
+
+					//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+					if (tieneAbono || tieneSCSJ) {
+						if (tieneAbono) {
+							cuenta.setAbonocargo("A");
+						}else{
+							cuenta.setAbonocargo(null);
+						}
+						_cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuenta);
+					}else{
+						_cenCuentasbancariasExtendsMapper.deleteByPrimaryKey(cuenta);
+					}
+					
+				} else if (!resultado[0].equals("0")) {
+					LOGGER.info("insertBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
+
+					//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+					if (tieneAbono || tieneSCSJ) {
+						if (tieneAbono) {
+							cuenta.setAbonocargo("A");
+						}else{
+							cuenta.setAbonocargo(null);
+						}
+						_cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuenta);
+					}else{
+						_cenCuentasbancariasExtendsMapper.deleteByPrimaryKey(cuenta);
+					}
+				}
+			}
+			
+		}
+		
+		
+		//Se comprueba si se deben revisar las cuentas y se ejecutan los scripts que se encargan de ello
+		
+		// Lanzamos el proceso de revision de suscripciones del letrado 
+		String resultado[] = ejecutarPL_RevisionSuscripcionesLetrado(""+usuario.getIdinstitucion().toString(),
+																				  ""+idPersona.toString(),
+																				  "",
+																				  ""+ usuario.getIdusuario().toString());
+		if ((resultado == null) || (!resultado[0].equals("0"))){
+			LOGGER.error("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO"+resultado[1]);
+		}
+		
+		// Este proceso se encarga de actualizar las cosas pendientes asociadas a la cuenta de la persona 
+		String[] resultado1 = ejecutarPL_Revision_Cuenta(""+usuario.getIdinstitucion().toString(),""+idPersona.toString(),""+cuenta.getIdcuenta().toString(),
+				""+ usuario.getIdusuario().toString());
+		if (resultado1 == null || !resultado1[0].equals("0")) {
+			LOGGER.error("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado[1]);
+
+		}
+		
+		// Comprueba si va a lanzar el proceso que asocia las suscripciones activas con forma de pago en metalico a la nueva cuenta bancaria
+		/*if (datosBancariosInsertDTO.getRevisionCuentas()) { 
+			// Este proceso asocia las suscripciones activas con forma de pago en metalico a la nueva cuenta bancaria 
+			resultado1 = ejecutarPL_AltaCuentaCargos(
+				""+usuario.getIdinstitucion().toString(),
+				  ""+cuenta.getIdpersona().toString(),
+				  ""+cuenta.getIdcuenta().toString(),
+				  ""+ usuario.getIdusuario().toString());
+			if (resultado1 == null || !resultado1[0].equals("0")) {
+				/*insertResponseDTO.setStatus(SigaConstants.KO);
+				error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_ALTA_CUENTA_CARGOS" + resultado[1]);
+				insertResponseDTO.setError(error);
+				return insertResponseDTO;
+			}
+		}*/
+		
+		
 		
 		return cuenta.getIdcuenta();
 		
 	}
+	
+	private Long insertarDatosColegiado(CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
+		
+		CenColegiado colegiado = new CenColegiado();
+		
+		colegiado.setIdpersona(idPersona);
+		colegiado.setFechaincorporacion(solicitud.getFechaalta());
+		colegiado.setFechamodificacion(new Date());
+		colegiado.setIdinstitucion(usuario.getIdinstitucion());
+		colegiado.setNcolegiado(solicitud.getNcolegiado());
+		colegiado.setUsumodificacion(usuario.getIdusuario());
+		
+		_cenColegiadoMapper.insert(colegiado);
+		
+		return null;
+	}
 
+	
+	/**
+	 * @param idInstitucion
+	 * @param idPersona
+	 * @param idCuenta
+	 * @param usuario
+	 * @return Codigo y mensaje de error
+	 * @throws ClsExceptions
+	 */
+	private String[] ejecutarPL_AltaCuentaCargos (String idInstitucion, String idPersona, String idCuenta, String usuario) throws Exception {
+		Object[] paramIn = new Object[4]; 	//Parametros de entrada del PL
+		String resultado[] = new String[2]; //Parametros de salida del PL
+	
+		try {
+	 		// Parametros de entrada del PL
+	        paramIn[0] = idInstitucion;
+	        paramIn[1] = idPersona;
+	        paramIn[2] = idCuenta;
+	        paramIn[3] = usuario;
+
+	        // Ejecucion del PL
+			resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_ALTA_CUENTA_CARGOS(?,?,?,?,?,?)}", 2, paramIn);
+			
+		} catch (Exception e) {
+			resultado[0] = "1"; 	// P_CODRETORNO
+	    	resultado[1] = "ERROR"; // ERROR P_DATOSERROR        	
+		}
+		
+	    return resultado;
+	}
+	
+	/**
+	 * Este proceso se encarga de actualizar las cosas pendientes asociadas a la cuenta de la persona 
+	 * @param idInstitucion
+	 * @param idPersona
+	 * @param idCuenta
+	 * @param usuario
+	 * @return Codigo y mensaje de error
+	 * @throws ClsExceptions
+	 */
+	private  String[] ejecutarPL_Revision_Cuenta (String idInstitucion, String idPersona, String idCuenta, String usuario) throws Exception {
+		Object[] paramIn = new Object[4]; 	//Parametros de entrada del PL
+		String resultado[] = new String[2]; //Parametros de salida del PL
+	
+		try {
+	 		// Parametros de entrada del PL
+	        paramIn[0] = idInstitucion;
+	        paramIn[1] = idPersona;
+	        paramIn[2] = idCuenta;
+	        paramIn[3] = usuario;
+
+	        // Ejecucion del PL
+			resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA(?,?,?,?,?,?)}", 2, paramIn);
+			
+		} catch (Exception e) {
+			resultado[0] = "1"; 	// P_CODRETORNO
+	    	resultado[1] = "ERROR"; // ERROR P_DATOSERROR        	
+		}
+		
+	    return resultado;
+	}
+	
+	/**
+	   * Calls a PL Funtion
+	   * @author CSD
+	   * @param functionDefinition string that defines the function
+	   * @param inParameters input parameters
+	   * @param outParameters number of output parameters
+	   * @return error code, '0' if ok
+	 * @throws NamingException 
+	 * @throws IOException 
+	 * @throws SQLException 
+	   * @throws ClsExceptions  type Exception
+	   */
+	  private  String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters) throws IOException, NamingException, SQLException  {
+	    String result[] = null;
+	    
+	    if (outParameters>0) result= new String[outParameters];
+	    DataSource ds = getOracleDataSource();
+	    Connection con=ds.getConnection();
+	    try{
+	      CallableStatement cs=con.prepareCall(functionDefinition);
+	      int size=inParameters.length;
+	      
+	      //input Parameters
+	      for(int i=0;i<size;i++){
+	    	  
+
+	        cs.setString(i+1,(String)inParameters[i]);
+	      }
+	      //output Parameters
+	      for(int i=0;i<outParameters;i++){
+	        cs.registerOutParameter(i+size+1,Types.VARCHAR);
+	      }
+	      
+			for (int intento = 1; intento <= 2; intento++) {
+				try {
+					cs.execute();
+					break;
+					
+				} catch (SQLTimeoutException tex) {
+					throw tex;
+		
+				} catch (SQLException ex) {
+					if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la segunda vez deberia funcionar)
+						throw ex;
+					}
+				}
+
+			}      
+
+	      for(int i=0;i<outParameters;i++){
+	        result[i]=cs.getString(i+size+1);
+	      }
+	      cs.close();
+	      return result;
+	      
+	    }catch(SQLTimeoutException ex){
+	        return null;
+	    }catch(SQLException ex){
+	    	return null;
+	    }catch(Exception e){
+	    	return null;
+	    }finally{
+	      con.close();
+	      con = null;
+	    }
+	  }
+	  
+	/**
+	 * Recupera el datasource con los datos de conexión sacados del fichero de
+	 * configuracion
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws NamingException
+	 */
+	private  DataSource getOracleDataSource() throws IOException, NamingException {
+		try {
+			
+			LOGGER.debug("Recuperando datasource {} provisto por el servidor (JNDI)");
+			
+			AdmConfigExample example = new AdmConfigExample();
+			example.createCriteria().andClaveEqualTo("spring.datasource.jndi-name");
+			List<AdmConfig> config = admConfigMapper.selectByExample(example );
+			Context ctx = new InitialContext();
+			return (DataSource) ctx.lookup(config.get(0).getValor());
+		} catch (NamingException e) {
+			throw e;
+		}
+	}
+		
+	/**
+	 * PL que realiza una revision de letrado
+	 * @param idInstitucion
+	 * @param idPersona
+	 * @param usuario
+	 * @return
+	 * @throws ClsExceptions
+	 */
+	private  String[] ejecutarPL_RevisionSuscripcionesLetrado (String idInstitucion, String idPersona, String fecha, String usuario) throws Exception {
+
+		Object[] paramIn = new Object[4]; //Parametros de entrada del PL
+		String resultado[] = new String[2]; //Parametros de salida del PL
+	
+		try {
+	 		// Parametros de entrada del PL
+	        paramIn[0] = idInstitucion;
+	        paramIn[1] = idPersona;
+	        paramIn[2] = fecha;
+	        paramIn[3] = usuario;
+
+	        // Ejecucion del PL
+			resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO (?,?,?,?,?,?)}", 2, paramIn);
+			
+		} catch (Exception e) {
+			resultado[0] = "1"; 	// P_NUMREGISTRO
+	    	resultado[1] = "ERROR"; // ERROR P_DATOSERROR        	
+		}
+		
+	    return resultado;
+	}
 }

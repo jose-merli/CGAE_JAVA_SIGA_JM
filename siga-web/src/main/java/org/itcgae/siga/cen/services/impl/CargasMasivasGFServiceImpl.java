@@ -131,7 +131,8 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			throw new BusinessException("No hay datos para crear el fichero");
 		if (orderList == null)
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
-		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, ICargasMasivasGFService.nombreFicheroEjemplo);
+		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector,
+				ICargasMasivasGFService.nombreFicheroEjemplo);
 
 		LOGGER.info("createExcelFile() -> Salida al servicio que crea la plantilla Excel");
 
@@ -166,8 +167,8 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		datosHashtable.put(CargaMasivaDatosGFItem.C_IDGRUPO, "Requerido");
 		datosHashtable.put(CargaMasivaDatosGFItem.GENERAL, "Requerido. 1 si es general, 0 si es propio del ICA");
 		datosHashtable.put(CargaMasivaDatosGFItem.ACCION, "Requerido");
-		datosHashtable.put(CargaMasivaDatosGFItem.C_FECHAINICIO, "Requerido");
-		datosHashtable.put(CargaMasivaDatosGFItem.C_FECHAFIN, "Requerido");
+		datosHashtable.put(CargaMasivaDatosGFItem.C_FECHAINICIO, "Requerido si accion es A");
+		datosHashtable.put(CargaMasivaDatosGFItem.C_FECHAFIN, "Requerido si accion es A");
 		datosVector.add(datosHashtable);
 
 		// 2. Crea el fichero excel
@@ -250,6 +251,8 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		int registrosErroneos = 0;
+		CenCargamasiva cenCargamasivaGF = new CenCargamasiva();
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -272,17 +275,17 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 						datosHashtable = getLineaCargaMasiva(cargaMasivaDatosGFVo);
 						datos.add(datosHashtable);
 
-						CenGruposclienteCliente cenGruposclienteCliente = new CenGruposclienteCliente();
-						cenGruposclienteCliente.setIdpersona(cargaMasivaDatosGFVo.getIdPersona());
-						cenGruposclienteCliente.setIdinstitucion(cargaMasivaDatosGFVo.getIdInstitucion());
-						cenGruposclienteCliente.setIdgrupo(cargaMasivaDatosGFVo.getIdGrupo());
-						cenGruposclienteCliente.setIdinstitucionGrupo(cargaMasivaDatosGFVo.getIdInstitucionGrupo());
-						cenGruposclienteCliente.setFechamodificacion(new Date());
-						cenGruposclienteCliente.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
-						cenGruposclienteCliente.setFechaInicio(cargaMasivaDatosGFVo.getFechaInicio());
-						cenGruposclienteCliente.setFechaBaja(cargaMasivaDatosGFVo.getFechaFin());
-
 						if (cargaMasivaDatosGFVo.getAccion().equalsIgnoreCase(CargaMasivaDatosGFItem.ALTA)) {
+
+							CenGruposclienteCliente cenGruposclienteCliente = new CenGruposclienteCliente();
+							cenGruposclienteCliente.setIdpersona(cargaMasivaDatosGFVo.getIdPersona());
+							cenGruposclienteCliente.setIdinstitucion(cargaMasivaDatosGFVo.getIdInstitucion());
+							cenGruposclienteCliente.setIdgrupo(cargaMasivaDatosGFVo.getIdGrupo());
+							cenGruposclienteCliente.setIdinstitucionGrupo(cargaMasivaDatosGFVo.getIdInstitucionGrupo());
+							cenGruposclienteCliente.setFechamodificacion(new Date());
+							cenGruposclienteCliente.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
+							cenGruposclienteCliente.setFechaInicio(cargaMasivaDatosGFVo.getFechaInicio());
+							cenGruposclienteCliente.setFechaBaja(cargaMasivaDatosGFVo.getFechaFin());
 
 							int result = cenGruposclienteClienteMapper.insert(cenGruposclienteCliente);
 
@@ -293,20 +296,41 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 							}
 
 						} else {
-							// cenGruposclienteClienteMapper.delete(cenGruposclienteCliente); ¿?
+
+							CenGruposclienteCliente cenGruposclienteClienteBaja = new CenGruposclienteCliente();
+							cenGruposclienteClienteBaja.setIdpersona(cargaMasivaDatosGFVo.getIdPersona());
+							cenGruposclienteClienteBaja.setIdinstitucion(cargaMasivaDatosGFVo.getIdInstitucion());
+							cenGruposclienteClienteBaja.setIdgrupo(cargaMasivaDatosGFVo.getIdGrupo());
+							cenGruposclienteClienteBaja
+									.setIdinstitucionGrupo(cargaMasivaDatosGFVo.getIdInstitucionGrupo());
+							cenGruposclienteClienteBaja.setFechamodificacion(new Date());
+							cenGruposclienteClienteBaja.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
+							cenGruposclienteClienteBaja.setFechaBaja(new Date());
+
+							int result = cenGruposclienteClienteMapper.updateByPrimaryKey(cenGruposclienteClienteBaja);
+
+							if (result == 0) {
+								errores += "Error al insertar una fila";
+								error.setDescription(errores);
+								updateResponseDTO.setError(error);
+							}
 						}
-					}
-					
-					insertaCenHistorico(cargaMasivaDatosGFVo, usuario);
-					revisionLetradoMap = new Hashtable<String, String>();
-					revisionLetradoMap.put("idinstitucion", cargaMasivaDatosGFVo.getIdInstitucion().toString());
-					revisionLetradoMap.put("idpersona", cargaMasivaDatosGFVo.getIdPersona().toString());
-					revisionLetradoMap.put("fecha", "");
-					revisionLetradoMap.put("usuario", usuario.getUsumodificacion().toString());
-					List<String> outRevisionLetradoList = sigaServicesHelperMapper
-							.getProcesoRevisionLetrado(revisionLetradoMap);
-					for (String out : outRevisionLetradoList) {
-						LOGGER.debug("RevisionLetrado:" + out);
+
+						insertaCenHistorico(cargaMasivaDatosGFVo, usuario);
+
+						revisionLetradoMap = new Hashtable<String, String>();
+						revisionLetradoMap.put("idinstitucion", cargaMasivaDatosGFVo.getIdInstitucion().toString());
+						revisionLetradoMap.put("idpersona", cargaMasivaDatosGFVo.getIdPersona().toString());
+						revisionLetradoMap.put("fecha", "");
+						revisionLetradoMap.put("usuario", usuario.getUsumodificacion().toString());
+						List<String> outRevisionLetradoList = sigaServicesHelperMapper
+								.getProcesoRevisionLetrado(revisionLetradoMap);
+						for (String out : outRevisionLetradoList) {
+							LOGGER.debug("RevisionLetrado:" + out);
+						}
+
+					} else {
+						registrosErroneos++;
 					}
 
 					Hashtable<String, Object> e = new Hashtable<String, Object>();
@@ -319,14 +343,14 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 				byte[] bytesLog = ExcelHelper.createExcelBytes(ICargasMasivasGFService.CAMPOSLOG, datosLog);
 
-				CenCargamasiva cenCargamasivaGF = new CenCargamasiva();
 				cenCargamasivaGF.setTipocarga(CargaMasivaDatosGFItem.TIPO_CARGA);
 				cenCargamasivaGF.setIdinstitucion(idInstitucion);
 				cenCargamasivaGF.setNombrefichero(ICargasMasivasGFService.nombreFicheroEjemplo);
 				cenCargamasivaGF.setNumregistros((Integer) cargaMasivaDatosGFItems.size());
+				cenCargamasivaGF.setNumregistroserroneos(registrosErroneos);
 				cenCargamasivaGF.setFechamodificacion(new Date());
 				cenCargamasivaGF.setFechacarga(new Date());
-				cenCargamasivaGF.setUsumodificacion(Integer.valueOf(usuario.getUsumodificacion()));
+				cenCargamasivaGF.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
 
 				Long idFile = uploadFile(file.getBytes(), cenCargamasivaGF, false, usuario);
 				Long idLogFile = uploadFile(bytesLog, cenCargamasivaGF, true, usuario);
@@ -348,6 +372,9 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		LOGGER.info("uploadFile() -> Salida al servicio para subir un archivo");
 		updateResponseDTO.setStatus(SigaConstants.OK);
 		error.setDescription(errores);
+		int correctos = cenCargamasivaGF.getNumregistros() - registrosErroneos;
+		error.setMessage("Fichero cargado correctamente. Registros Correctos: " + correctos
+				+ "<br/> Registros Erroneos: " + cenCargamasivaGF.getNumregistroserroneos());
 		updateResponseDTO.setError(error);
 
 		return updateResponseDTO;
@@ -523,36 +550,45 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 				errorLinea.append("Accion es campo obligatorio. ");
 			}
 
-			// Se comprueba que la fecha inicio y fecha fin sean campos obligatorios
-			if (hashtable.get(CargaMasivaDatosGFItem.C_FECHAINICIO) != null) {
+			// Se comprueba que la fecha inicio y fecha fin sean campos obligatorios excepto
+			// cuando sea una baja
+			if (hashtable.get(CargaMasivaDatosGFItem.C_FECHAINICIO) != null
+					&& hashtable.get(CargaMasivaDatosGFItem.C_FECHAINICIO) != "") {
 
 				try {
 					DateFormat df1 = new SimpleDateFormat("dd-MMM-yyyy"); // for parsing input
-					cargaMasivaDatosGFVo.setFechaInicio(df1.parse((String)hashtable.get(CargaMasivaDatosGFItem.C_FECHAINICIO)));
-	
+					cargaMasivaDatosGFVo
+							.setFechaInicio(df1.parse((String) hashtable.get(CargaMasivaDatosGFItem.C_FECHAINICIO)));
+
 				} catch (ParseException e1) {
 					LOGGER.debug("Error al parsear fecha");
 				}
-						
 
 			} else {
-				LOGGER.debug("Fecha inicio es campo obligatorio");
-				errorLinea.append("Fecha inicio es campo obligatorio. ");
+
+				if (hashtable.get(CargaMasivaDatosGFItem.ACCION) != "B") {
+					LOGGER.debug("Fecha inicio es campo obligatorio");
+					errorLinea.append("Fecha inicio es campo obligatorio. ");
+				}
 			}
 
-			if (hashtable.get(CargaMasivaDatosGFItem.C_FECHAFIN) != null) {
+			if (hashtable.get(CargaMasivaDatosGFItem.C_FECHAFIN) != null
+					&& hashtable.get(CargaMasivaDatosGFItem.C_FECHAFIN) != "") {
 
 				try {
 					DateFormat df1 = new SimpleDateFormat("dd-MMM-yyyy"); // for parsing input
-					cargaMasivaDatosGFVo.setFechaFin(df1.parse((String)hashtable.get(CargaMasivaDatosGFItem.C_FECHAFIN)));
-					
+					cargaMasivaDatosGFVo
+							.setFechaFin(df1.parse((String) hashtable.get(CargaMasivaDatosGFItem.C_FECHAFIN)));
+
 				} catch (ParseException e) {
 					LOGGER.debug("Error al parsear fecha");
 				}
 
 			} else {
-				LOGGER.debug("Fecha fin es campo obligatorio");
-				errorLinea.append("Fecha fin es campo obligatorio. ");
+				if (hashtable.get(CargaMasivaDatosGFItem.ACCION) != "B") {
+					LOGGER.debug("Fecha fin es campo obligatorio");
+					errorLinea.append("Fecha fin es campo obligatorio. ");
+				}
 			}
 
 			// Se comprueba si el colegiado ya tiene asignada la etiqueta
@@ -770,7 +806,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			e.put(CargaMasivaDatosGFItem.ACCION, cargaMasivaDatosGFItem.getAccion());
 		}
 		if (cargaMasivaDatosGFItem.getFechaInicio() != null) {
-			DateFormat df2 = new SimpleDateFormat("dd/MM/yyyy"); 
+			DateFormat df2 = new SimpleDateFormat("dd/MM/yyyy");
 			String fechaInicio = df2.format(cargaMasivaDatosGFItem.getFechaInicio());
 			e.put(CargaMasivaDatosGFItem.C_FECHAINICIO, fechaInicio);
 		}
@@ -814,6 +850,79 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 		LOGGER.info(dateLog + ":fin.CargaMasivaDatosGFImpl.getDirectorioFichero");
 		return directorioFichero.toString();
+	}
+
+	@Override
+	public ResponseEntity<InputStreamResource> downloadOriginalFile(CargaMasivaItem cargaMasivaItem,
+			HttpServletRequest request) {
+
+		LOGGER.info("downloadCurrentFile() -> Entrada al servicio para generar la plantilla original Excel Etiquetas");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		String path = "C:\\Users\\DTUser\\Documents\\gf" + idInstitucion + "\\gruposfijos\\";
+		path += idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + ICargasMasivasGFService.tipoExcelXls;
+		// Se coge la imagen de la persona juridica
+		File file = new File(path);
+
+		// Se convierte el fichero en array de bytes para enviarlo al front
+		InputStream fileStream = null;
+		ResponseEntity<InputStreamResource> res = null;
+		try {
+			fileStream = new FileInputStream(file);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+			headers.setContentLength(file.length());
+			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		LOGGER.info(
+				"downloadCurrentFile() -> Salida del servicio para descargar la plantilla original Excel Etiquetas");
+
+		return res;
+
+	}
+
+	@Override
+	public ResponseEntity<InputStreamResource> downloadLogFile(CargaMasivaItem cargaMasivaItem,
+			HttpServletRequest request) {
+
+		LOGGER.info("downloadLogFile() -> Entrada al servicio para generar la plantilla errores Excel Etiquetas");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		String path = "C:\\Users\\DTUser\\Documents\\gf" + idInstitucion + "\\gruposfijos\\";
+		path += "log_" + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "."
+				+ ICargasMasivasGFService.tipoExcelXls;
+		// Se coge la imagen de la persona juridica
+		File file = new File(path);
+
+		// Se convierte el fichero en array de bytes para enviarlo al front
+		InputStream fileStream = null;
+		ResponseEntity<InputStreamResource> res = null;
+		try {
+			fileStream = new FileInputStream(file);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+			headers.setContentLength(file.length());
+			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		LOGGER.info("downloadLogFile() -> Salida del servicio para descargar la plantilla errores Excel Etiquetas");
+
+		return res;
 	}
 
 }

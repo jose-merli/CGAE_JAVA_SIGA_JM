@@ -312,7 +312,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 		SQL sql = new SQL();
 
-		sql.SELECT("max(idpersona) as idMax");
+		sql.SELECT("max(IDPERSONA) +1 AS IDPERSONA");
 		sql.FROM("cen_persona");
 		
 		return sql.toString();

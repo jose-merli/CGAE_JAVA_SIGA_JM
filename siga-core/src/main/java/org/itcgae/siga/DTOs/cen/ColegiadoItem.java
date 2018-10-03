@@ -3,25 +3,26 @@ package org.itcgae.siga.DTOs.cen;
 import java.util.Date;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ColegiadoItem {
 
-
+	private Boolean colegiado;
+	
 	private String idPersona;
 	private String idInstitucion;
 	private String nif;
 	private String nombre;
 	private String numColegiado;
 	private String residenteInscrito;
-	private String fechaNacimiento;
 	private String correo;
 	private String telefono;
 	private String movil;
-	private String estadoColegial;
-	private String fechaBaja;
+	private String estadoColegial;	
 	
 	private String  apellidos;
+//	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date [] fechaIncorporacion;
 	private String situacion;
 	private String residencia;
@@ -50,16 +51,30 @@ public class ColegiadoItem {
 	private String comisiones;
 	private String incorporacion;
 	private String fechaJura;
+	private String fechaAlta;
 	private String fechaTitulacion;
 	private String fechapresentacion;
+	private String fechaNacimiento;
+	private String fechaBaja;
+	
+	private Date incorporacionDate;
+	private Date fechaJuraDate;
+	private Date fechaAltaDate;
+	private Date fechaTitulacionDate;
+	private Date fechapresentacionDate;
+	private Date fechaNacimientoDate;
+	private Date fechaBajaDate;
+	
 	
 	private String idTratamiento;
 	
 	
 
+	
 	/**
 	 *
 	 */
+	
 	public ColegiadoItem idPersona(String idPersona){
 		this.idPersona = idPersona;
 		return this;
@@ -72,6 +87,23 @@ public class ColegiadoItem {
 	
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
+	}
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem colegiado(Boolean colegiado){
+		this.colegiado = colegiado;
+		return this;
+	}
+	
+	@JsonProperty("colegiado")
+	public Boolean getColegiado() {
+		return colegiado;
+	}
+	
+	public void setColegiado(Boolean colegiado) {
+		this.colegiado = colegiado;
 	}
 	
 	/**
@@ -178,6 +210,57 @@ public class ColegiadoItem {
 	/**
 	 *
 	 */
+	public ColegiadoItem fechaNacimientoDate(Date fechaNacimientoDate){
+		this.fechaNacimientoDate = fechaNacimientoDate;
+		return this;
+	}
+
+	@JsonProperty("fechaNacimientoDate")
+	public Date getFechaNacimientoDate() {
+		return fechaNacimientoDate;
+	}
+	
+	public void setFechaNacimientoDate(Date fechaNacimientoDate) {
+		this.fechaNacimientoDate = fechaNacimientoDate;
+	}
+	/**
+	 *
+	 */
+	public ColegiadoItem fechaAlta(String fechaAlta){
+		this.fechaAlta = fechaAlta;
+		return this;
+	}
+
+	@JsonProperty("fechaAlta")
+	public String getFechaAlta() {
+		return fechaAlta;
+	}
+	
+	public void setFechaAlta(String fechaAlta) {
+		this.fechaAlta = fechaAlta;
+	}
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem fechaAltaDate(Date fechaAltaDate){
+		this.fechaAltaDate = fechaAltaDate;
+		return this;
+	}
+
+	@JsonProperty("fechaAltaDate")
+	public Date getFechaAltaDate() {
+		return fechaAltaDate;
+	}
+	
+	public void setFechaAlta(Date fechaAltaDate) {
+		this.fechaAltaDate = fechaAltaDate;
+	}
+	
+	
+	/**
+	 *fechaAlta
+	 */
 	public ColegiadoItem correo(String correo){
 		this.correo = correo;
 		return this;
@@ -258,6 +341,24 @@ public class ColegiadoItem {
 	
 	public void setFechaBaja(String fechaBaja) {
 		this.fechaBaja = fechaBaja;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem fechaBajaDate(Date fechaBajaDate){
+		this.fechaBajaDate = fechaBajaDate;
+		return this;
+	}
+
+	@JsonProperty("fechaBajaDate")
+	public Date getFechaBajaDate() {
+		return fechaBajaDate;
+	}
+	
+	public void setFechaBajaDate(Date fechaBajaDate) {
+		this.fechaBajaDate = fechaBajaDate;
 	}
 	
 	/**
@@ -688,6 +789,24 @@ public class ColegiadoItem {
 		this.incorporacion = incorporacion;
 	}
 	
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem incorporacionDate(Date incorporacionDate){
+		this.incorporacionDate = incorporacionDate;
+		return this;
+	}
+
+	@JsonProperty("incorporacionDate")
+	public Date getIncorporacionDate() {
+		return incorporacionDate;
+	}
+	
+	public void setIncorporacion(Date incorporacionDate) {
+		this.incorporacionDate = incorporacionDate;
+	}
+	
 	/**
 	 *
 	 */
@@ -743,6 +862,24 @@ public class ColegiadoItem {
 	/**
 	 *
 	 */
+	public ColegiadoItem fechaJuraDate(Date fechaJuraDate){
+		this.fechaJuraDate = fechaJuraDate;
+		return this;
+	}
+
+	@JsonProperty("fechaJuraDate")
+	public Date getFechaJuraDate() {
+		return fechaJuraDate;
+	}
+	
+	public void setFechaJuraDate(Date fechaJuraDate) {
+		this.fechaJuraDate = fechaJuraDate;
+	}
+
+	
+	/**
+	 *
+	 */
 	public ColegiadoItem fechaTitulacion(String fechaTitulacion){
 		this.fechaTitulacion = fechaTitulacion;
 		return this;
@@ -756,6 +893,26 @@ public class ColegiadoItem {
 	public void setFechaTitulacion(String fechaTitulacion) {
 		this.fechaTitulacion = fechaTitulacion;
 	}
+	
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem fechaTitulacionDate(Date fechaTitulacionDate){
+		this.fechaTitulacionDate = fechaTitulacionDate;
+		return this;
+	}
+
+	@JsonProperty("fechaTitulacionDate")
+	public Date getFechaTitulacionDate() {
+		return fechaTitulacionDate;
+	}
+	
+	public void setFechaTitulacionDate(Date fechaTitulacionDate) {
+		this.fechaTitulacionDate = fechaTitulacionDate;
+	}
+	
+	
 	
 	/**
 	 *
@@ -774,6 +931,26 @@ public class ColegiadoItem {
 	public void setFechapresentacion(String fechapresentacion) {
 		this.fechapresentacion = fechapresentacion;
 	}
+	
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem fechapresentacionDate(Date fechapresentacionDate){
+		this.fechapresentacionDate = fechapresentacionDate;
+		return this;
+	}
+	
+
+	@JsonProperty("fechapresentacionDate")
+	public Date getFechapresentacionDate() {
+		return fechapresentacionDate;
+	}
+
+	public void setFechapresentacionDate(Date fechapresentacionDate) {
+		this.fechapresentacionDate = fechapresentacionDate;
+	}
+	
 	
 
 	public ColegiadoItem idTratamiento(String idTratamiento){
@@ -795,14 +972,15 @@ public class ColegiadoItem {
 	    return Objects.hash(idPersona, idInstitucion, nif, nombre, numColegiado, residenteInscrito,	fechaNacimiento, correo, telefono, movil, estadoColegial,
 	    		fechaBaja, apellidos, fechaIncorporacion, situacion, residencia, inscrito, idProvincia, idPoblacion, codigoPostal, tipoDireccion, sexo, 
 	    		idEstadoCivil, domicilio, tipoCV, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
-	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion, idTratamiento);
+	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion, 
+	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate);
 	}
 
-	
+
 	@Override
 	public String toString() {
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("class ColegiadoItem {\n");
+	    sb.append("class DatosDireccionesItem {\n");
 	    
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
@@ -848,7 +1026,18 @@ public class ColegiadoItem {
 	    sb.append("    fechaTitulacion: ").append(toIndentedString(fechaTitulacion)).append("\n");
 	    sb.append("    fechapresentacion: ").append(toIndentedString(fechapresentacion)).append("\n");
 	    sb.append("    idTratamiento: ").append(toIndentedString(idTratamiento)).append("\n");
+	    sb.append("    fechaAlta: ").append(toIndentedString(fechaAlta)).append("\n");
 
+	    sb.append("    fechaJuraDate: ").append(toIndentedString(fechaJuraDate)).append("\n");
+	    sb.append("    fechaTitulacionDate: ").append(toIndentedString(fechaTitulacionDate)).append("\n");
+	    sb.append("    fechapresentacionDate: ").append(toIndentedString(fechapresentacionDate)).append("\n");
+	    sb.append("    fechaNacimientoDate: ").append(toIndentedString(fechaNacimientoDate)).append("\n");
+	    sb.append("    fechaBajaDate: ").append(toIndentedString(fechaBajaDate)).append("\n");
+	    sb.append("    fechaAltaDate: ").append(toIndentedString(fechaAltaDate)).append("\n");
+	    sb.append("    incorporacionDate: ").append(toIndentedString(incorporacionDate)).append("\n");
+
+	    
+		
 	    sb.append("}");
 	    return sb.toString();
 	}

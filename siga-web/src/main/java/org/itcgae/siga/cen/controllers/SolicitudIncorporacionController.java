@@ -51,7 +51,7 @@ public class SolicitudIncorporacionController {
 	}
 	
 	@RequestMapping(value = "/aprobarSolicitud", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> aprobarSolicitud(@RequestParam Long idSolicitud,HttpServletRequest request) {
+	ResponseEntity<InsertResponseDTO> aprobarSolicitud(@RequestBody Long idSolicitud,HttpServletRequest request) {
 		
 		InsertResponseDTO response = _solicitudIncorporacionService.aprobarSolicitud(idSolicitud, request);
 		if(response.getStatus().equals(SigaConstants.OK))

@@ -17,10 +17,14 @@ import org.springframework.stereotype.Service;
 public interface CenCargaMasivaExtendsMapper extends CenCargamasivaMapper {
 
 	@SelectProvider(type = CenCargaMasivaSqlExtendsProvider.class, method = "selectEtiquetas")
-	@Results({ @Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.NUMERIC),
+	@Results({ @Result(column = "NOMBREFICHERO", property = "nombreFichero", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "USUARIO", property = "usuario", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "REGISTROS", property = "registros", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "REGISTROSCORRECTOS", property = "registrosCorrectos", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "REGISTROSERRONEOS", property = "registrosErroneos", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "FECHACARGA", property = "fechaCarga", jdbcType = JdbcType.DATE),
+			@Result(column = "IDFICHERO", property = "idFichero", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDFICHEROLOG", property = "idFicheroLog", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "TIPOCARGA", property = "tipoCarga", jdbcType = JdbcType.VARCHAR),
 	})
 	List<CargaMasivaItem> selectEtiquetas(Short idInstitucion, CargaMasivaItem cargaMasivaItem);
 

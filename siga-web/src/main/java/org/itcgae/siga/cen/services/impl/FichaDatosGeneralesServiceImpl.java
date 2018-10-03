@@ -2,25 +2,20 @@ package org.itcgae.siga.cen.services.impl;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
-import org.itcgae.siga.DTOs.cen.FichaDatosColegialesDTO;
-import org.itcgae.siga.DTOs.cen.ParametroColegioDTO;
-import org.itcgae.siga.DTOs.cen.PersonaJuridicaDTO;
-import org.itcgae.siga.DTOs.cen.PersonaJuridicaItem;
-import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
-import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
+import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.cen.services.IFichaDatosColegialesService;
 import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -29,23 +24,23 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteExample;
 import org.itcgae.siga.db.entities.CenClienteKey;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample;
-import org.itcgae.siga.db.entities.CenGruposcliente;
-import org.itcgae.siga.db.entities.CenGruposclienteCliente;
-import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
-import org.itcgae.siga.db.entities.CenNocolegiadoKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
-import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenDatoscolegialesestadoMapper;
+import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenDatoscolegialesestadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +55,13 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 
 	@Autowired
-	private CenDatoscolegialesestadoMapper cenDatoscolegialesestadoMapper;
+	private CenNocolegiadoExtendsMapper cenNocolegiadoMapper;
+
+	@Autowired
+	private CenColegiadoExtendsMapper cenColegiadoMapper;
+
+	@Autowired
+	private CenDatoscolegialesestadoExtendsMapper cenDatoscolegialesestadoMapper;
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -82,7 +83,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 	@Override
 	public  UpdateResponseDTO updateColegiado(ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException {
-		UpdateResponseDTO response = new UpdateResponseDTO();
+//		UpdateResponseDTO response = new UpdateResponseDTO();
 		LOGGER.info(
 				"updateColegiado() -> Entrada al servicio para actualizar información general de un colegiado");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -119,7 +120,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				cenPersona.setNifcif(colegiadoItem.getNif());
 				cenPersona.setIdtipoidentificacion(Short.parseShort(colegiadoItem.getIdTipoIdentificacion()));
 				cenPersona.setSexo(colegiadoItem.getSexo());
-				cenPersona.setFechanacimiento(UtilidadesString.toDate(colegiadoItem.getFechaNacimiento()));
+				cenPersona.setFechanacimiento(colegiadoItem.getFechaNacimientoDate());
 				cenPersona.setNaturalde(colegiadoItem.getNaturalDe());
 				cenPersona.setIdestadocivil(Short.parseShort(colegiadoItem.getIdEstadoCivil()));
 
@@ -136,8 +137,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				LOGGER.info(
 						"updateColegiado() / cenPersonaExtendsMapper.updateByExampleSelective() -> Salida de cenPersonaExtendsMapper para actualizar información de colegiado en CEN_PERSONA");
 				
-				
-
 
 
 					// 3. Actualiza tabla CEN_CLIENTE
@@ -148,10 +147,11 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 					CenCliente cenCliente = new CenCliente();
 					cenCliente = cenClienteMapper.selectByPrimaryKey(key);
-//					Por ahora no tenemos cuenta contable, se queda pendiente
-//					cenCliente.setAsientocontable(colegiadoItem.getCuentaContable());
+						// Por ahora no tenemos cuenta contable, se queda pendiente
+						//cenCliente.setAsientocontable(colegiadoItem.getCuentaContable());
 					cenCliente.setIdlenguaje(colegiadoItem.getIdLenguaje());
-					cenCliente.setFechaalta(UtilidadesString.toDate(colegiadoItem.getIncorporacion()));
+					cenCliente.setFechaalta(colegiadoItem.getIncorporacionDate());
+//					cenCliente.
 					cenCliente.setFechamodificacion(new Date());
 					cenCliente.setUsumodificacion(usuario.getIdusuario());
 					cenCliente.setComisiones(colegiadoItem.getComisiones());
@@ -160,10 +160,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					cenCliente.setCaracter("P");
 					cenCliente.setPublicidad(SigaConstants.DB_FALSE);
 					cenCliente.setGuiajudicial(SigaConstants.DB_FALSE); 
-					
-					
-//					cenClienteMapper.updateByPrimaryKey(cenCliente);
-
 					
 					CenClienteExample cenClienteExample = new CenClienteExample();
 					cenClienteExample.createCriteria()
@@ -175,6 +171,29 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					LOGGER.info(
 							"updateColegiado() / cenClienteMapper.updateByExampleSelective() -> Salida de cenClienteMapper para actualizar información de colegiado en CEN_CLIENTE");
 					
+								//	3.5 Actualiza CEN_COLEGIADO O CEN_NOCOLEGIADO
+								if(colegiadoItem.getColegiado() == false) {
+									CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
+									cenNocolegiadoExample.createCriteria()
+											.andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
+									
+									CenNocolegiado cenNocolegiado = new CenNocolegiado();
+									cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
+									cenNocolegiado.setFechamodificacion(new Date());
+									
+									cenNocolegiadoMapper.updateByExampleSelective(cenNocolegiado, cenNocolegiadoExample);
+								}else {
+									CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+									cenColegiadoExample.createCriteria()
+											.andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
+									
+									CenColegiado cenColegiado = new CenColegiado();
+									cenColegiado.setUsumodificacion(usuario.getIdusuario());
+									cenColegiado.setFechamodificacion(new Date());
+									
+									cenColegiadoMapper.updateByExampleSelective(cenColegiado, cenColegiadoExample);
+								}
+				
 					
 					
 						//	4. Actualiza la tabla CEN_DATOSCOLEGIALESESTADO
@@ -195,9 +214,13 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							cenEstadoColegial.setFechamodificacion(new Date());
 							cenEstadoColegial.setUsumodificacion(usuario.getIdusuario());
 							cenEstadoColegial.setFechaestado(new Date());
-							cenDatoscolegialesestadoMapper.updateByExample(cenEstadoColegial, cenDatoscolegialesestadoExample);
+							cenDatoscolegialesestadoMapper.insertSelective(cenEstadoColegial);
+//							cenDatoscolegialesestadoMapper.updateByExample(cenEstadoColegial, cenDatoscolegialesestadoExample);
 						}
 					}
+					
+					
+
 
 					updateResponseDTO.setStatus(SigaConstants.OK);
 
@@ -220,7 +243,213 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		return updateResponseDTO;
 		
 	}
+	
+	
+	
+	@Override
+	public InsertResponseDTO createNoColegiado(NoColegiadoItem noColegiadoItem, HttpServletRequest request) throws ParseException {
+		LOGGER.info(
+				"createColegiado() -> Entrada al servicio para actualizar información general de una persona jurídica");
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		List<CenDatoscolegialesestado> cenDatoscolegialesestado = new ArrayList<CenDatoscolegialesestado>();
 
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+//		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
+
+		CenPersonaExample example = new CenPersonaExample();
+		example.createCriteria().andNifcifEqualTo(noColegiadoItem.getNif());
+		List<CenPersona> personas = cenPersonaExtendsMapper.selectByExample(example);
+		
+		if (null != personas && !(personas.size() > 0)) {
+			
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"createColegiado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"createColegiado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+				
+				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
+
+					// 1. crear tablas CEN_PERSONA, CEN_COLEGIADO y CEN_CLIENTE
+					if (!insertResponseDTO.getStatus().equals(SigaConstants.KO)) {
+
+						// 1 crear registro en tabla CEN_PERSONA
+						LOGGER.info(
+								"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForNewSociety() -> Entrada a cenPersonaExtendsMapper para crear una nueva persona");
+
+						CrearPersonaDTO crearPersonaDTO = new CrearPersonaDTO();
+						
+						crearPersonaDTO.setNif(noColegiadoItem.getNif());
+						crearPersonaDTO.setApellido1(noColegiadoItem.getApellidos1());
+						crearPersonaDTO.setApellido2(noColegiadoItem.getApellidos2());
+						crearPersonaDTO.setNombre(noColegiadoItem.getNombre());
+						crearPersonaDTO.setTipoIdentificacion(noColegiadoItem.getIdTipoIdentificacion());
+						
+						int responseInsertPersona = cenPersonaExtendsMapper
+								.insertSelectiveForPersonFile(crearPersonaDTO, usuario);
+						LOGGER.info(
+								"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenPersonaExtendsMapper para crear una nueva persona");
+
+						if (responseInsertPersona == 1) {
+							// 2 crear registro en tabla CEN_CLIENTE
+
+							CenCliente cenCliente = new CenCliente();
+							List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+							comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+
+							if (!comboItems.isEmpty()) {
+								
+								cenCliente.setIdpersona(Long.valueOf(comboItems.get(0).getValue()));						
+								// cenCliente.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+								cenCliente.setIdinstitucion(usuario.getIdinstitucion());
+								cenCliente.setFechaalta(new Date());
+								cenCliente.setCaracter("P");
+								cenCliente.setPublicidad(SigaConstants.DB_FALSE);
+								cenCliente.setGuiajudicial(SigaConstants.DB_FALSE);
+								cenCliente.setComisiones(SigaConstants.DB_FALSE);
+								cenCliente.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
+								cenCliente.setFechamodificacion(new Date());
+								cenCliente.setUsumodificacion(usuario.getIdusuario());
+								cenCliente.setIdlenguaje(usuario.getIdlenguaje());
+								cenCliente.setExportarfoto(SigaConstants.DB_FALSE);
+							}
+							
+							LOGGER.info(
+									"createColegiado() / cenClienteMapper.insert() -> Entrada a cenClienteMapper para crear un nuevo colegiado");
+
+							int responseCenCliente = 0;
+							responseCenCliente = cenClienteMapper.insert(cenCliente);
+							
+							LOGGER.info(
+									"createColegiado() / cenClienteMapper.insert() -> Salida de cenClienteMapper para crear un nuevo colegiado");
+
+							
+//							int responseCenCliente = 0;
+//							if (null != record.getIdpersona()) {
+//								responseCenCliente = cenClienteMapper.insertSelective(record);
+//							}
+
+							if (responseCenCliente == 1) {
+								// 3 crear registro en tabla CEN_NOCOLEGIADO
+								LOGGER.info(
+										"createColegiado() / cenColegiadoExtendsMapper.insertSelectiveForCreateNewSociety() -> Entrada a cenColegiadoExtendsMapper para crear un nuevo colegiado");
+
+										EtiquetaUpdateDTO cenNocolegiado = new EtiquetaUpdateDTO();
+										
+										
+//										cenNocolegiado.setIdinstitucion(Short.parseShort(noColegiadoItem.getIdInstitucion()));
+//										cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
+//										cenNocolegiado.setFechamodificacion(new Date());
+//										cenNocolegiado.setSociedadsj();
+										cenNocolegiado.setTipo(noColegiadoItem.getTipoDireccion());
+										cenNocolegiado.setAnotaciones(noColegiadoItem.getAnotaciones());
+										int responseInsertNoColegiado = cenNocolegiadoMapper.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion), usuario, cenNocolegiado);
+													
+								LOGGER.info(
+										"createColegiado() / cenColegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenColegiadoExtendsMapper para crear un nuevo colegiado");
+
+								// comprobar insercion en cen_cliente y obtener el nuevo idpersona creado
+								if (responseInsertNoColegiado == 1) {
+									insertResponseDTO.setStatus(SigaConstants.OK);
+									
+//									Obtener idPersona creado en CEN_COLEGIADO
+																		
+									//	4. Inserta en la tabla CEN_DATOSCOLEGIALESESTADO
+
+											CenDatoscolegialesestado cenEstadoColegial = new CenDatoscolegialesestado();
+											cenEstadoColegial.setIdestado(Short.parseShort(noColegiadoItem.getSituacion()));
+											
+											cenEstadoColegial.setIdpersona(Long.parseLong(noColegiadoItem.getIdPersona()));
+																						
+											cenEstadoColegial.setIdinstitucion(Short.parseShort(noColegiadoItem.getIdInstitucion()));
+											cenEstadoColegial.setFechamodificacion(new Date());
+											cenEstadoColegial.setUsumodificacion(usuario.getIdusuario());
+											cenEstadoColegial.setFechaestado(new Date());
+											
+											//	Cogerá el Max idPersona en la Query 
+											cenDatoscolegialesestadoMapper.insertColegiado(cenEstadoColegial);
+																		
+								} else {
+									insertResponseDTO.setStatus(SigaConstants.KO);
+									LOGGER.warn(
+											"createColegiado() / cenClienteMapper.insertSelective() -> No se ha podido crear la persona colegiada en tabla CEN_NOCOLEGIADO");
+								}
+
+							}
+
+							else {
+								insertResponseDTO.setStatus(SigaConstants.KO);
+								LOGGER.warn(
+										"createColegiado() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> No se ha podido crear la persona no colegiada en tabla CEN_NOCOLEGIADO");
+							}
+						} else {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.warn(
+									"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForCreateLegalPerson() -> No se ha podido crear la persona no colegiada en tabla CEN_NOCOLEGIADO");
+						}
+
+					}
+					
+				} else {
+					insertResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.warn(
+							"createColegiado() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+									+ dni + " e idInstitucion = " + idInstitucion);
+				}
+				
+				
+				
+				
+				
+			} else {
+				insertResponseDTO.setStatus(SigaConstants.KO);
+				LOGGER.warn("createLegalPerson() -> idInstitucion del token nula");
+			}
+			
+		} else {
+			insertResponseDTO.setStatus(SigaConstants.KO);
+			org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+			error.setMessage("messages.censo.nifcifExiste2");
+			insertResponseDTO.setError(error);
+		}
+		
+		return insertResponseDTO;
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	@Override
 	public ComboDTO getEstadoCivil(HttpServletRequest request) {
 

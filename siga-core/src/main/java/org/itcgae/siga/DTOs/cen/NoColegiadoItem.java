@@ -36,7 +36,8 @@ public class NoColegiadoItem {
 	private String idLenguaje;
 	private String asientoContable;
 	private String tratamiento;
-	
+	private String anotaciones;
+
 	/**
 	 *
 	 */
@@ -546,6 +547,20 @@ public class NoColegiadoItem {
 	
 	public void setTratamiento(String tratamiento) {
 		this.tratamiento = tratamiento;
+	}
+
+	public NoColegiadoItem anotaciones(String anotaciones){
+		this.anotaciones = anotaciones;
+		return this;
+	}
+
+	@JsonProperty("anotaciones")
+	public String getAnotaciones() {
+		return anotaciones;
+	}
+
+	public void setAnotaciones(String anotaciones) {
+		this.anotaciones = anotaciones;
 	}
 	
 }

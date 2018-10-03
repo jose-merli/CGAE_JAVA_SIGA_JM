@@ -1,6 +1,5 @@
 package org.itcgae.siga.DTOs.cen;
 
-import java.util.Date;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,9 +9,12 @@ public class CargaMasivaItem {
 
 	private String nombreFichero;
 	private String usuario;
-	private String registros;
+	private Short registrosCorrectos;
 	private String fechaCarga;
 	private String tipoCarga;
+	private Long idFichero;
+	private Long idFicheroLog;
+	private Short registrosErroneos;
 	
 
 	/**
@@ -52,17 +54,17 @@ public class CargaMasivaItem {
 	/**
 	 *
 	 */
-	public CargaMasivaItem registros(String registros){
-		this.registros = registros;
+	public CargaMasivaItem registrosCorrectos(Short registrosCorrectos){
+		this.registrosCorrectos = registrosCorrectos;
 		return this;
 	}
 	
-	@JsonProperty("registros")
-	public String getRegistros() {
-		return registros;
+	@JsonProperty("registrosCorrectos")
+	public Short getRegistrosCorrectos() {
+		return registrosCorrectos;
 	}
-	public void setRegistros(String registros) {
-		this.registros = registros;
+	public void setRegistrosCorrectos(Short registrosCorrectos) {
+		this.registrosCorrectos = registrosCorrectos;
 	}
 	
 	/**
@@ -85,7 +87,7 @@ public class CargaMasivaItem {
 	/**
 	 *
 	 */
-	public CargaMasivaItem numColegiado(String tipoCarga){
+	public CargaMasivaItem tipoCarga(String tipoCarga){
 		this.tipoCarga = tipoCarga;
 		return this;
 	}
@@ -99,22 +101,76 @@ public class CargaMasivaItem {
 		this.tipoCarga = tipoCarga;
 	}
 	
+	/**
+	 *
+	 */
+	public CargaMasivaItem idFichero(Long idFichero){
+		this.idFichero = idFichero;
+		return this;
+	}
+
+	@JsonProperty("idFichero")
+	public Long getIdFichero() {
+		return idFichero;
+	}
+	
+	public void setIdFichero(Long idFichero) {
+		this.idFichero = idFichero;
+	}
+	
+	/**
+	 *
+	 */
+	public CargaMasivaItem idFicheroLog(Long idFicheroLog){
+		this.idFicheroLog = idFicheroLog;
+		return this;
+	}
+	
+	@JsonProperty("idFicheroLog")
+	public Long getIdFicheroLog() {
+		return idFicheroLog;
+	}
+	
+	public void setIdFicheroLog(Long idFicheroLog) {
+		this.idFicheroLog = idFicheroLog;
+	}
+	
+	/**
+	 *
+	 */
+	public CargaMasivaItem registrosErroneos(Short registrosErroneos){
+		this.registrosErroneos = registrosErroneos;
+		return this;
+	}
+	
+	@JsonProperty("registrosErroneos")
+	public Short getRegistrosErroneos() {
+		return registrosErroneos;
+	}
+	
+	public void setRegistrosErroneos(Short registrosErroneos) {
+		this.registrosErroneos = registrosErroneos;
+	}
+	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(nombreFichero, usuario, registros, fechaCarga, tipoCarga);
+	    return Objects.hash(nombreFichero, usuario, registrosCorrectos, fechaCarga, tipoCarga, idFichero, idFicheroLog, registrosErroneos);
 	}
 
 	
 	@Override
 	public String toString() {
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("class DatosDireccionesItem {\n");
+	    sb.append("class CargaMasivaItem {\n");
 	    
 	    sb.append("    nombreFichero: ").append(toIndentedString(nombreFichero)).append("\n");
 	    sb.append("    usuario: ").append(toIndentedString(usuario)).append("\n");
-	    sb.append("    registros: ").append(toIndentedString(registros)).append("\n");
+	    sb.append("    registros: ").append(toIndentedString(registrosCorrectos)).append("\n");
 	    sb.append("    fechaCarga: ").append(toIndentedString(fechaCarga)).append("\n");
 	    sb.append("    tipoCarga: ").append(toIndentedString(tipoCarga)).append("\n");
+	    sb.append("    idFichero: ").append(toIndentedString(idFichero)).append("\n");
+	    sb.append("    idFicheroLog: ").append(toIndentedString(idFicheroLog)).append("\n");
+	    sb.append("    registrosErroneos: ").append(toIndentedString(registrosErroneos)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
