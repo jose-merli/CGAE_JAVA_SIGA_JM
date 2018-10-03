@@ -3,6 +3,7 @@ package org.itcgae.siga.cen.controllers;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.CargaMasivaDTO;
@@ -34,7 +35,6 @@ public class CargasMasivasGFController {
 	public ResponseEntity<InputStreamResource> downloadExample(HttpServletRequest request) throws SigaExceptions {
 		ResponseEntity<InputStreamResource> response = cargasMasivasGFService.generateExcelEtiquetas();
 		return response;
-
 	}
 	
 	@RequestMapping(value = "cargasMasivas/searchEtiquetas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
@@ -50,5 +50,20 @@ public class CargasMasivasGFController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
+	
+	@RequestMapping(value = "cargasMasivas/downloadOriginalFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	public ResponseEntity<InputStreamResource> downloadOriginalFile(@RequestBody CargaMasivaItem cargaMasivaItem, HttpServletRequest request,
+			HttpServletResponse response) throws SigaExceptions {
+		ResponseEntity<InputStreamResource> res = cargasMasivasGFService.downloadOriginalFile(cargaMasivaItem, request);
+		return res;
+	}
+	
+	@RequestMapping(value = "cargasMasivas/downloadLogFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	public ResponseEntity<InputStreamResource> downloadLogFile(@RequestBody CargaMasivaItem cargaMasivaItem, HttpServletRequest request,
+			HttpServletResponse response) throws SigaExceptions {
+		ResponseEntity<InputStreamResource> res = cargasMasivasGFService.downloadLogFile(cargaMasivaItem, request);
+		return res;
+	}
 
+	
 }

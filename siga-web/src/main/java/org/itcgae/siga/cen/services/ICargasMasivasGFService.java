@@ -40,5 +40,8 @@ public interface ICargasMasivasGFService {
 	public ResponseEntity<InputStreamResource> generateExcelEtiquetas();
 	public CargaMasivaDTO searchEtiquetas(CargaMasivaItem cargaMasivaItem, HttpServletRequest request);
 	public UpdateResponseDTO uploadFileExcel(MultipartHttpServletRequest request) throws IllegalStateException, IOException;
+	public ResponseEntity<InputStreamResource> downloadOriginalFile(CargaMasivaItem cargaMasivaItem, HttpServletRequest request);
+	public ResponseEntity<InputStreamResource> downloadLogFile(CargaMasivaItem cargaMasivaItem, HttpServletRequest request);
 
+	
 }

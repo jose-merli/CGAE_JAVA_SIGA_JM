@@ -11,17 +11,20 @@ public class CenCargaMasivaSqlExtendsProvider extends CenCargamasivaSqlProvider 
 		SQL sql = new SQL();
 		
 		sql.SELECT_DISTINCT("TO_CHAR(ca.fechacarga,'DD/MM/YYYY') AS fechacarga");
-		sql.SELECT_DISTINCT("ca.nombrefichero");
-		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2) ) as usuario");
-		sql.SELECT_DISTINCT("ca.numregistros as registros");
+		sql.SELECT("ca.nombrefichero");
+		sql.SELECT("adm.descripcion as usuario");
+		sql.SELECT("(nvl(ca.numregistros,0) - nvl(ca.numregistroserroneos,0)) as registroscorrectos");
+		sql.SELECT("nvl(ca.numregistroserroneos,0) as registroserroneos");
+		sql.SELECT("ca.idfichero");
+		sql.SELECT("ca.idficherolog");
+		sql.SELECT("ca.tipocarga");
 		sql.FROM("cen_cargamasiva ca");
-		sql.INNER_JOIN("cen_gruposcliente_cliente cli on (cli.usumodificacion = ca.usumodificacion)");
-		sql.INNER_JOIN("cen_persona per on (per.idpersona = cli.idpersona)");
+		sql.INNER_JOIN("adm_usuarios adm on (adm.idusuario = ca.usumodificacion and adm.idinstitucion = ca.idinstitucion)");
 		sql.WHERE("ca.idinstitucion = '"+ idInstitucion  + "'");
 		sql.WHERE("ca.tipocarga = '"+ cargaMasivaItem.getTipoCarga() + "'");
 
 		if (cargaMasivaItem.getFechaCarga() != null && cargaMasivaItem.getFechaCarga() != "") {
-			sql.WHERE("(TO_DATE(ca.fechacarga,'DD/MM/RRRR') like TO_DATE('" + cargaMasivaItem.getFechaCarga() + "','DD/MM/YYYY'))");
+			sql.WHERE("ca.fechacarga>= TO_DATE('" + cargaMasivaItem.getFechaCarga() + "','DD/MM/RRRR') and ca.fechacarga< (TO_DATE('" + cargaMasivaItem.getFechaCarga() + "','DD/MM/YYYY')+1)");
 		}
 		
 		sql.ORDER_BY("ca.nombrefichero");
