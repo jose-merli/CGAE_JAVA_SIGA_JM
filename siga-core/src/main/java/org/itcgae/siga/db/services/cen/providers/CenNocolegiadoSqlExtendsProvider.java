@@ -260,7 +260,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		// sql.VALUES("NUMEROREF", "");
 		sql.VALUES("SOCIEDADSJ", "'0'");
 		sql.VALUES("TIPO", "'" + etiquetaUpdateDTO.getTipo() + "'");
-		sql.VALUES("ANOTACIONES", "'" + etiquetaUpdateDTO.getAnotaciones() + "'");
+		if (null != etiquetaUpdateDTO.getAnotaciones() && !etiquetaUpdateDTO.getAnotaciones().equals("")) {
+			sql.VALUES("ANOTACIONES", "'" + etiquetaUpdateDTO.getAnotaciones() + "'");
+		}	
+		
 		// sql.VALUES("PREFIJO_NUMREG", "");
 		// sql.VALUES("CONTADOR_NUMREG", "");
 		// sql.VALUES("SUFIJO_NUMREG", "");

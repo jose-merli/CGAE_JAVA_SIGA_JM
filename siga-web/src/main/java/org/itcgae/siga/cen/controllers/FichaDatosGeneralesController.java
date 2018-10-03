@@ -2,10 +2,10 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
-import org.itcgae.siga.DTOs.cen.DatosBancariosInsertDTO;
+import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 //import org.itcgae.siga.DTOs.cen.FichaDatosColegialesDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
@@ -37,7 +37,7 @@ public class FichaDatosGeneralesController {
 		ComboDTO response = fichaDatosGenerales.getEstadoCivil(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}	
-//	ColegiadoDTO
+//	createColegiado
 	
 	@RequestMapping(value = "/fichaDatosGenerales/datosGeneralesUpdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateGeneralData(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) throws Exception { 
@@ -45,6 +45,15 @@ public class FichaDatosGeneralesController {
 		if(response.getStatus().equals(SigaConstants.OK))
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	
+	@RequestMapping(value = "/fichaDatosGenerales/datosGeneralesCreateNoColegiado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> createNoColegiado(@RequestBody NoColegiadoItem noColegiadoItem, HttpServletRequest request) throws Exception { 
+		InsertResponseDTO response = fichaDatosGenerales.createNoColegiado(noColegiadoItem, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 //	@RequestMapping(value = "busquedaPerJuridica/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
