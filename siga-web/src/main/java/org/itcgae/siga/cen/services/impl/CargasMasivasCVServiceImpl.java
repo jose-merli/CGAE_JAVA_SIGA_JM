@@ -26,6 +26,7 @@ import org.itcgae.siga.DTOs.cen.SubtiposCVItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ICargasMasivasCVService;
+import org.itcgae.siga.cen.services.ICargasMasivasGFService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
@@ -182,7 +183,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		String errores = "";
-		int numRegistrosErroneos = 0;
+		int registrosErroneos = 0;
 		Vector<Hashtable<String, Object>> datosLog = new Vector<Hashtable<String, Object>>();
 
 		// Coger archivo del request
@@ -193,6 +194,8 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 		// Extraer la información del excel
 		LOGGER.debug("uploadFile() -> Extraer los datos del archivo");
 		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
+
+		CenCargamasiva cenCargamasivacv = new CenCargamasiva();
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -275,8 +278,8 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 						errores += cargaMasivaDatosCVItem.getErrores();
 						error.setDescription(errores);
 						updateResponseDTO.setError(error);
-						
-						numRegistrosErroneos++;
+
+						registrosErroneos++;
 					}
 
 					Hashtable<String, Object> e = new Hashtable<String, Object>();
@@ -287,19 +290,18 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 
 				byte[] bytesLog = ExcelHelper.createExcelBytes(CargaMasivaDatosCVItem.CAMPOSLOG, datosLog);
 
-				CenCargamasiva cenCargamasivacv = new CenCargamasiva();
 				cenCargamasivacv.setTipocarga("CV");
 				cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
 				cenCargamasivacv.setNombrefichero(CargaMasivaDatosCVItem.nombreFicheroEjemplo);
 				cenCargamasivacv.setNumregistros(cargaMasivaDatosCVItems.size());
-				cenCargamasivacv.setNumregistroserroneos(numRegistrosErroneos);
+				cenCargamasivacv.setNumregistroserroneos(registrosErroneos);
 				cenCargamasivacv.setFechamodificacion(new Date());
 				cenCargamasivacv.setFechacarga(new Date());
 				cenCargamasivacv.setUsumodificacion(usuario.getIdusuario());
 
 				Long idFile = uploadFile(file.getBytes(), cenCargamasivacv, false);
 				Long idLogFile = uploadFile(bytesLog, cenCargamasivacv, true);
-				
+
 				cenCargamasivacv.setIdfichero(idFile);
 				cenCargamasivacv.setIdficherolog(idLogFile);
 
@@ -315,6 +317,12 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 
 		LOGGER.info("uploadFile() -> Salida al servicio para subir un archivo");
 		updateResponseDTO.setStatus(SigaConstants.OK);
+		error.setDescription(errores);
+		int correctos = cenCargamasivacv.getNumregistros() - registrosErroneos;
+		error.setMessage("Fichero cargado correctamente. Registros Correctos: " + correctos
+				+ "<br/> Registros Erroneos: " + cenCargamasivacv.getNumregistroserroneos());
+		updateResponseDTO.setError(error);
+
 		return updateResponseDTO;
 	}
 
@@ -798,12 +806,12 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 		ficheroVo.setUsumodificacion(Integer.valueOf(cenCargamasivacv.getUsumodificacion()));
 		ficheroVo.setFechamodificacion(new Date());
 		ficherosServiceImpl.insert(ficheroVo);
-		
+
 		if (isLog) {
 			ficheroVo.setDescripcion("log_" + ficheroVo.getDescripcion());
 			ficheroVo.setNombre("log_" + ficheroVo.getNombre());
 		}
-		
+
 		SIGAServicesHelper.uploadFichero(ficheroVo.getDirectorio(), ficheroVo.getNombre(), ficheroVo.getFichero());
 		LOGGER.info(dateLog + ":fin.CargaMasivaDatosCVImpl.uploadFile");
 		return ficheroVo.getIdfichero();
@@ -869,15 +877,15 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 	@Override
 	public ResponseEntity<InputStreamResource> downloadOriginalFile(CargaMasivaItem cargaMasivaItem,
 			HttpServletRequest request) throws SigaExceptions {
-		
+
 		LOGGER.info("downloadOriginalFile() -> Entrada al servicio para generar la plantilla original");
 
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+
 		// Extraer el path
 		String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
-		path += cargaMasivaItem.getIdFichero() + "_" + cargaMasivaItem.getIdFichero();
+		path += idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + ICargasMasivasGFService.tipoExcelXls;
 		File file = new File(path);
 
 		// Preparar la descarga
@@ -902,15 +910,16 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 	@Override
 	public ResponseEntity<InputStreamResource> downloadLogFile(CargaMasivaItem cargaMasivaItem,
 			HttpServletRequest request) throws SigaExceptions {
-		
+
 		LOGGER.info("downloadOriginalFile() -> Entrada al servicio para generar la plantilla de errores");
 
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+
 		// Extraer el path
 		String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
-		path += cargaMasivaItem.getIdFicheroLog() + "_" + cargaMasivaItem.getIdFichero();
+		path += "log_" + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "."
+				+ ICargasMasivasGFService.tipoExcelXls;
 		File file = new File(path);
 
 		// Preparar la descarga
