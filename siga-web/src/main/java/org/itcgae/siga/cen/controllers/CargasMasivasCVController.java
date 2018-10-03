@@ -46,4 +46,16 @@ public class CargasMasivasCVController {
 		CargaMasivaDTO response = iCargasMasivasCVService.searchCV(cargaMasivaItem, request);
 		return new ResponseEntity<CargaMasivaDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "cargaMasivaDatosCurriculares/downloadOriginalFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	public ResponseEntity<InputStreamResource> downloadOriginalFile(@RequestBody CargaMasivaItem cargaMasivaItem, HttpServletRequest request) throws SigaExceptions {
+		ResponseEntity<InputStreamResource> response = iCargasMasivasCVService.downloadOriginalFile(cargaMasivaItem, request);
+		return response;
+	}
+	
+	@RequestMapping(value = "cargaMasivaDatosCurriculares/downloadLogFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+	public ResponseEntity<InputStreamResource> downloadLogFile(@RequestBody CargaMasivaItem cargaMasivaItem, HttpServletRequest request) throws SigaExceptions {
+		ResponseEntity<InputStreamResource> response = iCargasMasivasCVService.downloadLogFile(cargaMasivaItem, request);
+		return response;
+	}
 }
