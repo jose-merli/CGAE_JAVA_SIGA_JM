@@ -30,21 +30,27 @@ import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenBancos;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
 import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
+import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDocumentacionmodalidadExtendsMapper;
@@ -59,6 +65,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 
 
@@ -120,6 +127,10 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private CenColegiadoMapper _cenColegiadoMapper;
+	
+	
+	@Autowired
+	private CenClienteMapper _cenClienteMapper;
 	
 	
 	@Override
@@ -518,7 +529,8 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		Long idDireccion;
 		Long idPersona;
 		Short idBancario;
-		Long idColegiado;
+		int insertColegiado;
+		int insertCliente;
 		int updateSolicitud = 0;
 		InsertResponseDTO response = new InsertResponseDTO();
 		Error error = new Error();
@@ -544,8 +556,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					
 					//insertamos datos personales
 					idPersona = insertarDatosPersonales(solIncorporacion, usuario);
+					insertCliente = insertarDatosCliente(solIncorporacion, usuario, idPersona);
 					idDireccion = insertarDatosDireccion(solIncorporacion, usuario, idPersona);
-					idColegiado = insertarDatosColegiado(solIncorporacion, usuario, idPersona);
+					insertColegiado = insertarDatosColegiado(solIncorporacion, usuario, idPersona);
 					idBancario = insertarDatosBancarios(solIncorporacion, usuario, idPersona);
 					solIncorporacion.setIdestado((short)50);
 					solIncorporacion.setFechamodificacion(new Date());
@@ -555,7 +568,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 					
 				
-					if(idPersona != null && idDireccion!= null && idBancario != null && idColegiado != null && updateSolicitud == 1){
+					if(idPersona != null && idDireccion!= null && insertCliente == 1 && idBancario != null && insertColegiado == 1 && updateSolicitud == 1){
 						response.setId(Long.toString(solIncorporacion.getIdsolicitud()));
 						response.setStatus(SigaConstants.OK);
 						response.setError(null);
@@ -563,7 +576,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 										+ " .Insertado el id correctamente en la tabla Cen_SolicitudIncorporacion");
 					}else{
 						LOGGER.error("aprobarSolicitud() --> Borramos los registros al no poder aprobar la solicitud");
-						if(idColegiado != null) {
+						if(insertColegiado == 0) {
 							CenColegiadoKey keys = new CenColegiadoKey();
 							keys.setIdinstitucion(usuario.getIdinstitucion());
 							keys.setIdpersona(idPersona);
@@ -578,6 +591,13 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 							keys.setIdinstitucion(usuario.getIdinstitucion());
 							keys.setIdpersona(idPersona);
 							_cenDireccionesMapper.deleteByPrimaryKey(keys);
+						}
+						if(idBancario != null){
+							CenCuentasbancariasKey keys = new CenCuentasbancariasKey();
+							keys.setIdcuenta(idBancario);
+							keys.setIdinstitucion(usuario.getIdinstitucion());
+							keys.setIdpersona(idPersona);
+							_cenCuentasbancariasMapper.deleteByPrimaryKey(keys);
 						}
 						LOGGER.error("aprobarSolicitud() --> Registros borrados, fallo al aprobar la solicitud.");
 							
@@ -727,19 +747,36 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		datosPersonales.setFallecido("0");
 		datosPersonales.setUsumodificacion(usuario.getIdusuario());
 		
-		_cenPersonaMapper.insertSelective(datosPersonales);
+		_cenPersonaMapper.insert(datosPersonales);
 		
 		return datosPersonales.getIdpersona();
+	}
+	
+	private int insertarDatosCliente(CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
+		
+		CenCliente cliente = new CenCliente();
+		
+		cliente.setIdpersona(idPersona);
+		cliente.setIdinstitucion(usuario.getIdinstitucion());
+		cliente.setFechaalta(new Date());
+		cliente.setCaracter("P");
+		cliente.setPublicidad(SigaConstants.DB_FALSE);
+		cliente.setGuiajudicial(SigaConstants.DB_FALSE);
+		cliente.setComisiones(SigaConstants.DB_FALSE);
+		cliente.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
+		cliente.setFechamodificacion(new Date());
+		cliente.setUsumodificacion(usuario.getIdusuario());
+		cliente.setIdlenguaje(usuario.getIdlenguaje());
+		cliente.setExportarfoto(SigaConstants.DB_FALSE);
+		
+		return _cenClienteMapper.insert(cliente);
 	}
 
 	private Long insertarDatosDireccion (CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
 		
 		CenDirecciones direccion = new CenDirecciones();
 		
-		MaxIdDto personaID = _cenDireccionesExtendsMapper.selectMaxID();
-		
-		
-		direccion.setIddireccion(personaID.getIdMax());
+		direccion.setIddireccion(idPersona);
 		direccion.setCodigopostal(solicitud.getCodigopostal());
 		direccion.setCorreoelectronico(solicitud.getCorreoelectronico());
 		direccion.setDomicilio(solicitud.getDomicilio());
@@ -795,6 +832,18 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				return null;
 			}
 		}
+		
+		CenBancos banco = new CenBancos();
+		
+
+		String codigoBanco = solicitud.getCboCodigo() + solicitud.getCodigosucursal() + solicitud.getDigitocontrol() + solicitud.getDigitocontrol();
+		banco.setCodigo(solicitud.getIban().substring(4, 8));
+		banco.setFechamodificacion(new Date());
+		banco.setIdpais(solicitud.getIdpais());
+		banco.setNombre(codigoBanco);
+		banco.setUsumodificacion(usuario.getIdusuario());
+		
+		
 		
 		LOGGER.info(
 				"insertarDatosBancarios() / cenNocolegiadoExtendsMapper.insertSelective() -> Entrada a cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
@@ -920,12 +969,12 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 	}
 	
-	private Long insertarDatosColegiado(CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
+	private int insertarDatosColegiado(CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
 		
 		CenColegiado colegiado = new CenColegiado();
 		
 		colegiado.setIdpersona(idPersona);
-		colegiado.setFechaincorporacion(solicitud.getFechaalta());
+		colegiado.setFechaincorporacion(new Date());
 		colegiado.setFechamodificacion(new Date());
 		colegiado.setIdinstitucion(usuario.getIdinstitucion());
 		colegiado.setNcolegiado(solicitud.getNcolegiado());
@@ -933,9 +982,12 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		colegiado.setFechapresentacion(new Date());
 		colegiado.setJubilacioncuota("0");
 		colegiado.setComunitario("0");
-		_cenColegiadoMapper.insert(colegiado);
+		colegiado.setIndtitulacion("1");
+		colegiado.setSituacionejercicio("0");
+		colegiado.setSituacionempresa("0");
+		colegiado.setSituacionresidente("0");
 		
-		return null;
+		return _cenColegiadoMapper.insert(colegiado);
 	}
 
 	
