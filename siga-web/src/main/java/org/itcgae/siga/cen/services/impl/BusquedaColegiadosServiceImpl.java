@@ -116,10 +116,10 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 				LOGGER.info(
 						"getSituacion() / cenEstadocolegialExtendsMapper.distinctCivilStatus() -> Salida de cenEstadocolegialExtendsMapper para obtener los diferentes tipos de situacion de un colegiado");
 				
-				ComboItem comboItem = new ComboItem();
-				comboItem.setLabel("");
-				comboItem.setValue("");
-				comboItems.add(0, comboItem);
+//				ComboItem comboItem = new ComboItem();
+//				comboItem.setLabel("");
+//				comboItem.setValue("");
+//				comboItems.add(0, comboItem);
 				
 			}
 		}

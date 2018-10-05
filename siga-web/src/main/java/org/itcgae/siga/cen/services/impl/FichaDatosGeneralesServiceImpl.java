@@ -122,8 +122,9 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				cenPersona.setSexo(colegiadoItem.getSexo());
 				cenPersona.setFechanacimiento(colegiadoItem.getFechaNacimientoDate());
 				cenPersona.setNaturalde(colegiadoItem.getNaturalDe());
+				if(colegiadoItem.getIdEstadoCivil() != null) {
 				cenPersona.setIdestadocivil(Short.parseShort(colegiadoItem.getIdEstadoCivil()));
-
+				}
 				cenPersona.setFechamodificacion(new Date());
 				cenPersona.setUsumodificacion(usuario.getIdusuario());
 				
@@ -150,13 +151,14 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						// Por ahora no tenemos cuenta contable, se queda pendiente
 						//cenCliente.setAsientocontable(colegiadoItem.getCuentaContable());
 					cenCliente.setIdlenguaje(colegiadoItem.getIdLenguaje());
+					if(colegiadoItem.getIncorporacionDate()!=null) { 
 					cenCliente.setFechaalta(colegiadoItem.getIncorporacionDate());
-//					cenCliente.
+					}
 					cenCliente.setFechamodificacion(new Date());
 					cenCliente.setUsumodificacion(usuario.getIdusuario());
 					cenCliente.setComisiones(colegiadoItem.getComisiones());
 					cenCliente.setIdtratamiento(Short.parseShort(colegiadoItem.getIdtratamiento()));
-					
+					cenCliente.setAsientocontable(colegiadoItem.getAsientoContable());
 					cenCliente.setCaracter("P");
 					cenCliente.setPublicidad(SigaConstants.DB_FALSE);
 					cenCliente.setGuiajudicial(SigaConstants.DB_FALSE); 
@@ -172,7 +174,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							"updateColegiado() / cenClienteMapper.updateByExampleSelective() -> Salida de cenClienteMapper para actualizar información de colegiado en CEN_CLIENTE");
 					
 								//	3.5 Actualiza CEN_COLEGIADO O CEN_NOCOLEGIADO
-								if(colegiadoItem.getColegiado() == false) {
+								if(colegiadoItem.getColegiado() == false || colegiadoItem.getColegiado() == null) {
 									CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
 									cenNocolegiadoExample.createCriteria()
 											.andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
@@ -186,9 +188,9 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 									CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
 									cenColegiadoExample.createCriteria()
 											.andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
-									
 									CenColegiado cenColegiado = new CenColegiado();
 									cenColegiado.setUsumodificacion(usuario.getIdusuario());
+									cenColegiado.setFechaincorporacion(colegiadoItem.getIncorporacionDate());
 									cenColegiado.setFechamodificacion(new Date());
 									
 									cenColegiadoMapper.updateByExampleSelective(cenColegiado, cenColegiadoExample);
