@@ -358,7 +358,8 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 			e.put(CargaMasivaDatosCVItem.C_CREDITOS, cargaMasivaDatosCVItem.getCreditos());
 		}
 		if (cargaMasivaDatosCVItem.getFechaVerificacion() != null) {
-			e.put(CargaMasivaDatosCVItem.FECHAVERIFICACION, cargaMasivaDatosCVItem.getFechaVerificacion());
+			String fechaVerificacion = df2.format(cargaMasivaDatosCVItem.getFechaVerificacion());
+			e.put(CargaMasivaDatosCVItem.FECHAVERIFICACION, fechaVerificacion);
 		}
 		if (cargaMasivaDatosCVItem.getDescripcion() != null) {
 			e.put(CargaMasivaDatosCVItem.C_DESCRIPCION, cargaMasivaDatosCVItem.getDescripcion());
