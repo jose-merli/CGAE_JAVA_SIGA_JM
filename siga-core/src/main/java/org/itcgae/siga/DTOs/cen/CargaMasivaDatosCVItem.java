@@ -57,6 +57,7 @@ public class CargaMasivaDatosCVItem {
 	private Short idTipoCVSubtipo2;
 	private String errores;
 	private String descripcion;
+	private Short idInstitucion;
 	private Short subTipo1IdInstitucion;
 	private Short subTipo2IdInstitucion;
 	
@@ -185,5 +186,11 @@ public class CargaMasivaDatosCVItem {
 	}
 	public void setIdinstitucionSubt2(Short subTipo2IdInstitucion) {
 		this.subTipo2IdInstitucion = subTipo2IdInstitucion;
+	}
+	public Short getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(Short idInstitucion) {
+		this.idInstitucion = idInstitucion;
 	}
 }

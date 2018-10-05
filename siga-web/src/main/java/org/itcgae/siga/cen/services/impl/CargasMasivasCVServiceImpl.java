@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.CargaMasivaDTO;
 import org.itcgae.siga.DTOs.cen.CargaMasivaDatosCVItem;
+import org.itcgae.siga.DTOs.cen.CargaMasivaDatosGFItem;
 import org.itcgae.siga.DTOs.cen.CargaMasivaItem;
 import org.itcgae.siga.DTOs.cen.FicheroVo;
 import org.itcgae.siga.DTOs.cen.SubtiposCVItem;
@@ -417,11 +418,28 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
 
+		Short idInstitucion = usuario.getIdinstitucion();
+		String idLenguaje = usuario.getIdlenguaje();
+
+		GenRecursosCatalogosKey genRecursosCatalogosKey = new GenRecursosCatalogosKey();
+		genRecursosCatalogosKey.setIdlenguaje(idLenguaje);
+		GenRecursosCatalogos recursosCatalogos = null;
+
+		List<Short> idInstituciones = new ArrayList<Short>();
+		idInstituciones.add(idInstitucion);
+
+		// Comprueba si la institucion que esta logeada es la 2000 si es diferente la
+		// añade a la lista de instituciones
+		if (idInstitucion != CargaMasivaDatosGFItem.IDINSTITUCION_2000) {
+			idInstituciones.add(CargaMasivaDatosGFItem.IDINSTITUCION_2000);
+		}
+
 		StringBuffer errorLinea = null;
 		int numLinea = 1;
 		for (Hashtable<String, Object> hashtable : datos) {
 			cargaMasivaDatosCVItem = new CargaMasivaDatosCVItem();
 
+			cargaMasivaDatosCVItem.setIdInstitucion(idInstitucion);
 			errorLinea = new StringBuffer();
 			if (hashtable.get(CargaMasivaDatosCVItem.C_CREDITOS) != null
 					&& !hashtable.get(CargaMasivaDatosCVItem.C_CREDITOS).toString().equals("")) {
@@ -538,8 +556,6 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 					if (tiposCV != null && tiposCV.size() > 0) {
 						tipoCVVo.setIdtipocv(tiposCV.get(0).getIdtipocv());
 
-						GenRecursosCatalogosKey genRecursosCatalogosKey = new GenRecursosCatalogosKey();
-						genRecursosCatalogosKey.setIdlenguaje(usuario.getIdlenguaje());
 						genRecursosCatalogosKey.setIdrecurso(tiposCV.get(0).getDescripcion());
 
 						GenRecursosCatalogos genRecursosCatalogos = genRecursosCatalogosMapper
@@ -569,7 +585,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 			if (cargaMasivaDatosCVItem.getIdTipoCV() != null) {
 
 				CenTiposcvsubtipo1Example cenTiposcvsubtipo1Example = new CenTiposcvsubtipo1Example();
-				cenTiposcvsubtipo1Example.createCriteria().andIdinstitucionEqualTo(usuario.getIdinstitucion())
+				cenTiposcvsubtipo1Example.createCriteria().andIdinstitucionIn(idInstituciones)
 						.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
 				List<CenTiposcvsubtipo1> tiposcvsubtipo1s = cenTiposcvsubtipo1Mapper
 						.selectByExample(cenTiposcvsubtipo1Example);
@@ -589,15 +605,18 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 						CenTiposcvsubtipo1Example cenTiposcvsubtipo1Example1 = new CenTiposcvsubtipo1Example();
 						cenTiposcvsubtipo1Example1.createCriteria()
 								.andIdtipocvsubtipo1EqualTo(Short.valueOf(subtipocv1Cod))
-								.andIdinstitucionEqualTo(usuario.getIdinstitucion())
+								.andIdinstitucionEqualTo(idInstitucion)
 								.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
+						
+						//ORDERNAR
+						cenTiposcvsubtipo1Example1.setOrderByClause("IDINSTITUCION");
+						
 						tiposcvsubtipo1s = cenTiposcvsubtipo1Mapper.selectByExample(cenTiposcvsubtipo1Example1);
 
 						if (tiposcvsubtipo1s != null && tiposcvsubtipo1s.size() > 0) {
 							subtipoCV1Vo.setSubTipo1IdTipo(tiposcvsubtipo1s.get(0).getIdtipocvsubtipo1());
 							subtipoCV1Vo.setSubTipo1IdInstitucion(tiposcvsubtipo1s.get(0).getIdinstitucion());
 
-							GenRecursosCatalogosKey genRecursosCatalogosKey = new GenRecursosCatalogosKey();
 							genRecursosCatalogosKey.setIdlenguaje(usuario.getIdlenguaje());
 							genRecursosCatalogosKey.setIdrecurso(tiposcvsubtipo1s.get(0).getDescripcion());
 
@@ -633,8 +652,11 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 							CenTiposcvsubtipo2Example cenTiposcvsubtipo2Example = new CenTiposcvsubtipo2Example();
 							cenTiposcvsubtipo2Example.createCriteria()
 									.andIdtipocvsubtipo2EqualTo(Short.valueOf(subtipocv2Cod))
-									.andIdinstitucionEqualTo(usuario.getIdinstitucion())
+									.andIdinstitucionEqualTo(idInstitucion)
 									.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
+							
+							//ORDERNAR
+							cenTiposcvsubtipo2Example.setOrderByClause("IDINSTITUCION");
 
 							List<CenTiposcvsubtipo2> tiposcvsubtipo2s = cenTiposcvsubtipo2Mapper
 									.selectByExample(cenTiposcvsubtipo2Example);
@@ -643,7 +665,6 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 								subtipoCV2Vo.setSubTipo2IdTipo(tiposcvsubtipo2s.get(0).getIdtipocvsubtipo2());
 								subtipoCV2Vo.setSubTipo2IdInstitucion(tiposcvsubtipo2s.get(0).getIdinstitucion());
 
-								GenRecursosCatalogosKey genRecursosCatalogosKey = new GenRecursosCatalogosKey();
 								genRecursosCatalogosKey.setIdlenguaje(usuario.getIdlenguaje());
 								genRecursosCatalogosKey.setIdrecurso(tiposcvsubtipo2s.get(0).getDescripcion());
 
