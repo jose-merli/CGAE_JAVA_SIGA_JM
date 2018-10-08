@@ -1,5 +1,7 @@
 package org.itcgae.siga.DTOs.cen;
 
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class NoColegiadoItem {
@@ -22,6 +24,7 @@ public class NoColegiadoItem {
 	private String  etiquetas [];
 	private String  sexo;
 	private String  estadoCivil;
+	private String idEstadoCivil;
 	private String  subCategoria;
 	private String domicilio;
 	private String situacion;
@@ -35,8 +38,9 @@ public class NoColegiadoItem {
 	private String naturalDe;
 	private String idLenguaje;
 	private String asientoContable;
-	private String tratamiento;
+	private String idTratamiento;
 	private String anotaciones;
+	private Date fechaNacimientoDate;
 
 	/**
 	 *
@@ -54,6 +58,41 @@ public class NoColegiadoItem {
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
 	}
+	
+	/**
+	 *
+	 */
+	public NoColegiadoItem idEstadoCivil(String idEstadoCivil){
+		this.idEstadoCivil = idEstadoCivil;
+		return this;
+	}
+
+	@JsonProperty("idEstadoCivil")
+	public String getidEstadoCivil() {
+		return idEstadoCivil;
+	}
+	
+	public void setidEstadoCivil(String idEstadoCivil) {
+		this.idEstadoCivil = idEstadoCivil;
+	}
+	
+	/**
+	 *
+	 */
+	public NoColegiadoItem fechaNacimientoDate(Date fechaNacimientoDate){
+		this.fechaNacimientoDate = fechaNacimientoDate;
+		return this;
+	}
+	
+	@JsonProperty("fechaNacimientoDate")
+	public Date getFechaNacimientoDate() {
+		return fechaNacimientoDate;
+	}
+	
+	public void setFechaNacimientoDate(Date fechaNacimientoDate) {
+		this.fechaNacimientoDate = fechaNacimientoDate;
+	}
+	
 	
 	/**
 	 *
@@ -535,18 +574,18 @@ public class NoColegiadoItem {
 	/**
 	 *
 	 */
-	public NoColegiadoItem tratamiento(String tratamiento){
-		this.tratamiento = tratamiento;
+	public NoColegiadoItem idTratamiento(String idTratamiento){
+		this.idTratamiento = idTratamiento;
 		return this;
 	}
 
-	@JsonProperty("tratamiento")
-	public String getTratamiento() {
-		return tratamiento;
+	@JsonProperty("idTratamiento")
+	public String getidTratamiento() {
+		return idTratamiento;
 	}
 	
-	public void setTratamiento(String tratamiento) {
-		this.tratamiento = tratamiento;
+	public void setidTratamiento(String idTratamiento) {
+		this.idTratamiento = idTratamiento;
 	}
 
 	public NoColegiadoItem anotaciones(String anotaciones){

@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.mappers.CenPersonaSqlProvider;
 
 public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
@@ -262,6 +263,58 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		if (null != idPersona) {
 			sql.WHERE("PER.IDPERSONA = '" + idPersona + "'");
 		}
+
+		return sql.toString();
+	}
+	
+	public String insertSelectiveForPerson(CenPersona crearPersonaDTO, AdmUsuarios usuario) {
+		SQL sql = new SQL();
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+		
+		sql.INSERT_INTO("CEN_PERSONA");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona)");
+
+		if (!crearPersonaDTO.getNombre().equals("")) {
+			sql.VALUES("NOMBRE", "'" + crearPersonaDTO.getNombre() + "'");
+		}
+		if (!crearPersonaDTO.getApellidos1().equals("")) {
+			sql.VALUES("APELLIDOS1", "'" + crearPersonaDTO.getApellidos1() + "'");
+		}		
+		if (null != crearPersonaDTO.getApellidos2()) {
+			sql.VALUES("APELLIDOS2", "'" + crearPersonaDTO.getApellidos2() + "'");
+		} else {
+			sql.VALUES("APELLIDOS2", "null");
+		}
+		if(crearPersonaDTO.getFechanacimiento() != null) {
+			
+			String fechaNacimiento = dateFormat.format(crearPersonaDTO.getFechanacimiento());
+			sql.VALUES("FECHANACIMIENTO", "(TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY'))");
+//			sql.VALUES("FECHANACIMIENTO", "'" + crearPersonaDTO.getFechanacimiento() + "'");
+		}
+		if (!crearPersonaDTO.getNifcif().equals("")) {
+			sql.VALUES("NIFCIF", "'" + crearPersonaDTO.getNifcif() + "'");
+		} else {
+			sql.VALUES("NIFCIF", "null");
+		}
+		
+		if(!crearPersonaDTO.getIdtipoidentificacion().equals("")) {
+			sql.VALUES("IDTIPOIDENTIFICACION", "'" + crearPersonaDTO.getIdtipoidentificacion() + "'");
+		}
+		if(null != crearPersonaDTO.getSexo()) {
+			sql.VALUES("SEXO", "'" + crearPersonaDTO.getSexo() + "'");
+		}
+		if(null != crearPersonaDTO.getIdestadocivil()) {
+			sql.VALUES("IDESTADOCIVIL", "'" + crearPersonaDTO.getIdestadocivil() + "'");
+		}
+		
+		if(null != crearPersonaDTO.getNaturalde()) {
+			sql.VALUES("NATURALDE", "'" + crearPersonaDTO.getNaturalde() + "'");
+		}
+
+		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuario.getIdusuario()) + "'");
 
 		return sql.toString();
 	}

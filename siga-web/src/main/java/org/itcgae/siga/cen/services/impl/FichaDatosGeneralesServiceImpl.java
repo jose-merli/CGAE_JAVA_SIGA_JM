@@ -289,16 +289,28 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						LOGGER.info(
 								"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForNewSociety() -> Entrada a cenPersonaExtendsMapper para crear una nueva persona");
 
-						CrearPersonaDTO crearPersonaDTO = new CrearPersonaDTO();
+						CenPersona crearPersonaDTO = new CenPersona();
 						
-						crearPersonaDTO.setNif(noColegiadoItem.getNif());
-						crearPersonaDTO.setApellido1(noColegiadoItem.getApellidos1());
-						crearPersonaDTO.setApellido2(noColegiadoItem.getApellidos2());
+						crearPersonaDTO.setNifcif(noColegiadoItem.getNif());
+						crearPersonaDTO.setApellidos1(noColegiadoItem.getApellidos1());
+						crearPersonaDTO.setApellidos2(noColegiadoItem.getApellidos2());
 						crearPersonaDTO.setNombre(noColegiadoItem.getNombre());
-						crearPersonaDTO.setTipoIdentificacion(noColegiadoItem.getIdTipoIdentificacion());
+						crearPersonaDTO.setIdtipoidentificacion(Short.parseShort(noColegiadoItem.getIdTipoIdentificacion()));
+						crearPersonaDTO.setFechanacimiento(noColegiadoItem.getFechaNacimientoDate());
+						if(noColegiadoItem.getSexo()!=null) {
+						crearPersonaDTO.setSexo(noColegiadoItem.getSexo());
+						}
+						if(noColegiadoItem.getNaturalDe()!=null) {
+							crearPersonaDTO.setNaturalde(noColegiadoItem.getNaturalDe());
+
+						}
+						if(noColegiadoItem.getidEstadoCivil() != null) {
+							
+						crearPersonaDTO.setIdestadocivil(Short.parseShort(noColegiadoItem.getidEstadoCivil()));
+						}
 						
 						int responseInsertPersona = cenPersonaExtendsMapper
-								.insertSelectiveForPersonFile(crearPersonaDTO, usuario);
+								.insertSelectiveForPerson(crearPersonaDTO, usuario);
 						LOGGER.info(
 								"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenPersonaExtendsMapper para crear una nueva persona");
 
@@ -350,44 +362,20 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 										EtiquetaUpdateDTO cenNocolegiado = new EtiquetaUpdateDTO();
 										
 										
-//										cenNocolegiado.setIdinstitucion(Short.parseShort(noColegiadoItem.getIdInstitucion()));
-//										cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
-//										cenNocolegiado.setFechamodificacion(new Date());
-//										cenNocolegiado.setSociedadsj();
-										cenNocolegiado.setTipo(noColegiadoItem.getTipoDireccion());
+//										Se pone a cero ya que al ser una persona física no tiene tipo ni sociedadsj
+										cenNocolegiado.setTipo("0");
+//										cenNocolegiado.set
 										cenNocolegiado.setAnotaciones(noColegiadoItem.getAnotaciones());
-										int responseInsertNoColegiado = cenNocolegiadoMapper.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion), usuario, cenNocolegiado);
-													
+										int insertNoColegiado = cenNocolegiadoMapper.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion), usuario, cenNocolegiado);
+												
+										
+											if(insertNoColegiado == 1) {
+												insertResponseDTO.setStatus(SigaConstants.OK);
+												LOGGER.warn(
+														"createColegiado() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> Se ha insertado correctamente la persona en CEN_NOCOLEGIADO");
+											}
 								LOGGER.info(
 										"createColegiado() / cenColegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenColegiadoExtendsMapper para crear un nuevo colegiado");
-
-								// comprobar insercion en cen_cliente y obtener el nuevo idpersona creado
-								if (responseInsertNoColegiado == 1) {
-									insertResponseDTO.setStatus(SigaConstants.OK);
-									
-//									Obtener idPersona creado en CEN_COLEGIADO
-																		
-									//	4. Inserta en la tabla CEN_DATOSCOLEGIALESESTADO
-
-											CenDatoscolegialesestado cenEstadoColegial = new CenDatoscolegialesestado();
-											cenEstadoColegial.setIdestado(Short.parseShort(noColegiadoItem.getSituacion()));
-											
-											cenEstadoColegial.setIdpersona(Long.parseLong(noColegiadoItem.getIdPersona()));
-																						
-											cenEstadoColegial.setIdinstitucion(Short.parseShort(noColegiadoItem.getIdInstitucion()));
-											cenEstadoColegial.setFechamodificacion(new Date());
-											cenEstadoColegial.setUsumodificacion(usuario.getIdusuario());
-											cenEstadoColegial.setFechaestado(new Date());
-											
-											//	Cogerá el Max idPersona en la Query 
-											cenDatoscolegialesestadoMapper.insertColegiado(cenEstadoColegial);
-																		
-								} else {
-									insertResponseDTO.setStatus(SigaConstants.KO);
-									LOGGER.warn(
-											"createColegiado() / cenClienteMapper.insertSelective() -> No se ha podido crear la persona colegiada en tabla CEN_NOCOLEGIADO");
-								}
-
 							}
 
 							else {

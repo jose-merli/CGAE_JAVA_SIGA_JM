@@ -538,7 +538,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("per.naturalde");
 		sql.SELECT_DISTINCT("cli.idlenguaje");
 		sql.SELECT_DISTINCT("cli.asientocontable");
-		sql.SELECT_DISTINCT("cli.idtratamiento as tratamiento");
+		sql.SELECT_DISTINCT("cli.idtratamiento");
 		sql.SELECT_DISTINCT("per.fechanacimiento");
 		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
 		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
@@ -580,8 +580,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if (noColegiadoItem.getTipoDireccion() != null && noColegiadoItem.getTipoDireccion() != "") {
 			sql.WHERE("TIPODIRECCION.IDTIPODIRECCION = '" + noColegiadoItem.getTipoDireccion() + "'");
 		}
-		if (noColegiadoItem.getEstadoCivil() != null && noColegiadoItem.getEstadoCivil() != "") {
-			sql.WHERE("per.idestadocivil = '" + noColegiadoItem.getEstadoCivil() + "'");
+		if (noColegiadoItem.getidEstadoCivil() != null && noColegiadoItem.getidEstadoCivil() != "") {
+			sql.WHERE("per.idestadocivil = '" + noColegiadoItem.getidEstadoCivil() + "'");
 		}
 		if (noColegiadoItem.getCodigoPostal() != null && noColegiadoItem.getCodigoPostal() != "") {
 			sql.WHERE("dir.codigopostal ='" + noColegiadoItem.getCodigoPostal() + "'");
@@ -650,7 +650,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("per.naturalde");
 		sql.SELECT_DISTINCT("cli.idlenguaje");
 		sql.SELECT_DISTINCT("cli.asientocontable");
-		sql.SELECT_DISTINCT("cli.idtratamiento as tratamiento");
+		sql.SELECT_DISTINCT("cli.idtratamiento");
 		sql.SELECT_DISTINCT("per.fechanacimiento");
 		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
 		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
@@ -689,8 +689,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if (noColegiadoItem.getTipoDireccion() != null && noColegiadoItem.getTipoDireccion() != "") {
 			sql.WHERE("TIPODIRECCION.IDTIPODIRECCION = '" + noColegiadoItem.getTipoDireccion() + "'");
 		}
-		if (noColegiadoItem.getEstadoCivil() != null && noColegiadoItem.getEstadoCivil() != "") {
-			sql.WHERE("per.idestadocivil = '" + noColegiadoItem.getEstadoCivil() + "'");
+		if (noColegiadoItem.getidEstadoCivil() != null && noColegiadoItem.getidEstadoCivil() != "") {
+			sql.WHERE("per.idestadocivil = '" + noColegiadoItem.getidEstadoCivil() + "'");
 		}
 		if (noColegiadoItem.getCodigoPostal() != null && noColegiadoItem.getCodigoPostal() != "") {
 			sql.WHERE("dir.codigopostal ='" + noColegiadoItem.getCodigoPostal() + "'");
