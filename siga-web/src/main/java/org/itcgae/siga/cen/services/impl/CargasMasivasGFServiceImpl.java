@@ -32,6 +32,7 @@ import org.itcgae.siga.cen.services.IFicherosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCargamasiva;
@@ -469,12 +470,17 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 			// Comprobacion si el colegiado pertenece al colegio general o a otro diferente
 			// Y si le ha asignado una etiqueta
+			short idInst = cargaMasivaDatosGFVo.getIdInstitucion();
 			if ((hashtable.get(CargaMasivaDatosGFItem.GENERAL) != null
 					&& !hashtable.get(CargaMasivaDatosGFItem.GENERAL).toString().equals(""))
 					&& (hashtable.get(CargaMasivaDatosGFItem.GENERAL).toString().equals("1")
 							|| hashtable.get(CargaMasivaDatosGFItem.GENERAL).toString().equals("0"))) {
+				
+				// Seteamos general
+				cargaMasivaDatosGFVo.setGeneral(hashtable.get(CargaMasivaDatosGFItem.GENERAL).toString().equals(CargaMasivaDatosGFItem.DB_TRUE)? true: false);
+				
 				if (hashtable.get(CargaMasivaDatosGFItem.GENERAL).toString().equals(CargaMasivaDatosGFItem.DB_TRUE))
-					idInstitucion = CargaMasivaDatosGFItem.IDINSTITUCION_2000;
+					idInst = new Short(CargaMasivaDatosGFItem.IDINSTITUCION_2000);
 
 				if (hashtable.get(CargaMasivaDatosGFItem.C_IDGRUPO) != null
 						&& !hashtable.get(CargaMasivaDatosGFItem.C_IDGRUPO).toString().equals("")) {
@@ -482,12 +488,12 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 						Short idGrupo = Short.valueOf((String) hashtable.get(CargaMasivaDatosGFItem.C_IDGRUPO));
 						if (idGrupo > 9999)
 							throw new NumberFormatException();
-						String key = idInstitucion + "||" + idGrupo;
+						String key = idInst + "||" + idGrupo;
 						if (!idGruposHashTable.containsKey(key)) {
 							cenGruposCliente = new CenGruposcliente();
 							// Llamada a metodo para obtener idgrupo
 							cenGruposCliente.setIdgrupo(idGrupo);
-							cenGruposCliente.setIdinstitucion(idInstitucion);
+							cenGruposCliente.setIdinstitucion(idInst);
 
 							CenGruposcliente gruposCliente = cenGruposclienteMapper
 									.selectByPrimaryKey(cenGruposCliente);

@@ -610,7 +610,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 								.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
 						
 						//ORDERNAR
-						cenTiposcvsubtipo1Example1.setOrderByClause("IDINSTITUCION");
+						cenTiposcvsubtipo1Example1.setOrderByClause("IDINSTITUCION DESC");
 						
 						tiposcvsubtipo1s = cenTiposcvsubtipo1Mapper.selectByExample(cenTiposcvsubtipo1Example1);
 
@@ -657,7 +657,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 									.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
 							
 							//ORDERNAR
-							cenTiposcvsubtipo2Example.setOrderByClause("IDINSTITUCION");
+							cenTiposcvsubtipo2Example.setOrderByClause("IDINSTITUCION DESC");
 
 							List<CenTiposcvsubtipo2> tiposcvsubtipo2s = cenTiposcvsubtipo2Mapper
 									.selectByExample(cenTiposcvsubtipo2Example);
