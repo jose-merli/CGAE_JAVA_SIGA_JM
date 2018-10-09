@@ -290,7 +290,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 								"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForNewSociety() -> Entrada a cenPersonaExtendsMapper para crear una nueva persona");
 
 						CenPersona crearPersonaDTO = new CenPersona();
-						
 						crearPersonaDTO.setNifcif(noColegiadoItem.getNif());
 						crearPersonaDTO.setApellidos1(noColegiadoItem.getApellidos1());
 						crearPersonaDTO.setApellidos2(noColegiadoItem.getApellidos2());
@@ -331,7 +330,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 								cenCliente.setCaracter("P");
 								cenCliente.setPublicidad(SigaConstants.DB_FALSE);
 								cenCliente.setGuiajudicial(SigaConstants.DB_FALSE);
-								cenCliente.setComisiones(SigaConstants.DB_FALSE);
+								cenCliente.setComisiones(noColegiadoItem.getComisiones());
 								cenCliente.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
 								cenCliente.setFechamodificacion(new Date());
 								cenCliente.setUsumodificacion(usuario.getIdusuario());
@@ -371,6 +370,8 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 										
 											if(insertNoColegiado == 1) {
 												insertResponseDTO.setStatus(SigaConstants.OK);
+												List<ComboItem> idper = cenPersonaExtendsMapper.selectMaxIdPersona();
+												insertResponseDTO.setId(idper.get(0).getLabel());
 												LOGGER.warn(
 														"createColegiado() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> Se ha insertado correctamente la persona en CEN_NOCOLEGIADO");
 											}
