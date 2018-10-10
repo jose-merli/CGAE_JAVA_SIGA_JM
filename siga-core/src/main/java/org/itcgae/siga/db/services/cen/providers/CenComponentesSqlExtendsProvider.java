@@ -178,5 +178,33 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		return sql.toString();
 	}
 	
+	public String searchSocieties(String idPersona, String idLenguaje, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		
+		sql.SELECT("DISTINCT COMP.IDINSTITUCION as IDINSTITUCION");
+		sql.SELECT("COMP.IDPERSONA AS IDPERSONA");
+		sql.SELECT("PER.NIFCIF AS NIF");
+		sql.SELECT("PER.NOMBRE  AS DENOMINACION");
+		sql.SELECT("DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) AS ABREVIATURA");
+		sql.SELECT("TO_DATE(PER.FECHANACIMIENTO,'DD/MM/YYYY')  AS FECHACONSTITUCION");
+		sql.SELECT("CA.DESCRIPCION AS TIPO");
+		
+		sql.SELECT("( SELECT COUNT('"+ idPersona + "') FROM CEN_COMPONENTES c WHERE C.IDINSTITUCION = '" + idInstitucion + "' AND C.IDPERSONA = per.IDPERSONA ) AS NUMEROINTEGRANTES");
+		
+		sql.FROM("CEN_COMPONENTES comp");
 
+		sql.INNER_JOIN("CEN_PERSONA per ON PER.IDPERSONA = COMP.IDPERSONA");
+		sql.INNER_JOIN("CEN_NOCOLEGIADO noCol ON noCol.IDPERSONA = per.IDPERSONA AND comp.IDINSTITUCION = noCol.IDINSTITUCION");
+		sql.LEFT_OUTER_JOIN("CEN_TIPOSOCIEDAD  TIPOSOCIEDAD ON  noCol.TIPO = TIPOSOCIEDAD.LETRACIF");
+		sql.LEFT_OUTER_JOIN(
+				"GEN_RECURSOS_CATALOGOS CA ON (TIPOSOCIEDAD.DESCRIPCION = CA.IDRECURSO  AND CA.IDLENGUAJE = '"
+						+ idLenguaje + "')");
+		
+		sql.WHERE("comp.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("comp.CEN_CLIENTE_IDPERSONA = '" + idPersona + "'");
+
+		return sql.toString();
+	}
+	
 }

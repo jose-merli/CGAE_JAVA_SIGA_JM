@@ -268,4 +268,32 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		
 		return sql.toString();
 	}
+	
+	public String searchOtherCollegues(String idPersona, String idLenguaje) {
+
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("col.idInstitucion AS idInstitucion");
+		sql.SELECT("per.nifcif AS nif");
+		sql.SELECT("col.ncolegiado AS numeroColegiado");
+		sql.SELECT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2)) AS nombre");
+		sql.SELECT("DECODE (col.situacionresidente, '0', 'SI', 'NO') AS residenteInscrito");
+		sql.SELECT("cat.descripcion AS estadoColegial");
+		sql.SELECT("TO_CHAR(per.fechanacimiento,'DD/MM/YYYY') AS fechaNacimiento");
+		sql.SELECT("dir.correoelectronico AS correo");
+		sql.SELECT("dir.telefono1 AS telefono");
+		sql.SELECT("dir.movil AS movil");
+		
+		sql.FROM("cen_colegiado col");
+
+		sql.INNER_JOIN("cen_persona per ON per.idpersona = col.idpersona");
+		sql.INNER_JOIN("cen_direcciones dir ON dir.idpersona = per.idpersona and dir.idInstitucion = col.idInstitucion and dir.fechabaja is null");
+		sql.INNER_JOIN("cen_datoscolegialesestado dat ON dat.idPersona = per.idPersona and dat.idInstitucion = dir.idInstitucion and dat.fechaestado = (select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = dat.idpersona and datcol.idinstitucion = dat.idinstitucion)");
+		sql.INNER_JOIN("cen_estadocolegial est ON est.idEstado = dat.idEstado");
+		sql.INNER_JOIN("gen_recursos_catalogos cat ON cat.idRecurso = est.descripcion and cat.idLenguaje = '" + idLenguaje + "'");
+
+		sql.WHERE("col.IDPERSONA = '" + idPersona + "'");
+
+		return sql.toString();
+	}
 }
