@@ -31,6 +31,7 @@ public class NoColegiadoItem {
 	private String idcv;
 	private boolean  historico;
 	
+	private String comisiones;
 	private String soloNombre;
 	private String apellidos1;
 	private String apellidos2;
@@ -114,6 +115,26 @@ public class NoColegiadoItem {
 	/**
 	 *
 	 */
+	
+	public NoColegiadoItem comisiones(String comisiones){
+		this.comisiones = comisiones;
+		return this;
+	}
+	
+	@JsonProperty("comisiones")
+	public String getComisiones() {
+		return comisiones;
+	}
+	
+	public void setComisiones(String comisiones) {
+		this.comisiones = comisiones;
+	}
+	
+	/**
+	 *
+	 */
+	
+	
 	public NoColegiadoItem nif(String nif){
 		this.nif = nif;
 		return this;
