@@ -57,9 +57,7 @@ public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegia
 			LOGGER.info(
 						"searchOtherCollegues() / cenComponentesExtendsMapper.searchSocieties() -> Entrada a cenComponentesExtendsMapper para obtener sociedades");
 			    colegiadoItems = cenColegiadoExtendsMapper.searchOtherCollegues(idPersona, idLenguaje);
-				LOGGER.info(
-						"searchOtherCollegues() / cenComponentesExtendsMapper.searchSocieties() -> Salida de cenComponentesExtendsMapper para obtener sociedades");
-
+				LOGGER.info("searchOtherCollegues() / cenComponentesExtendsMapper.searchSocieties() -> Salida de cenComponentesExtendsMapper para obtener sociedades");
 				colegiadoDTO.setColegiadoItem(colegiadoItems);
 			} 
 			else {

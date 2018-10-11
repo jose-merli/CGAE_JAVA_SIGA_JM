@@ -69,16 +69,16 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 		})
 	List<ComboItem> getLabel(AdmUsuarios usuario);
 
-	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiados")
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "searchOtherCollegues")
 	@Results({ @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "SITUACIONRESIDENTE", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "DESCRIPCION", property = "estadoColegial", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADOCOLEGIAL", property = "estadoColegial", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CORREOELECTRONICO", property = "correo", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "TELEFONO1", property = "telefono", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ColegiadoItem> searchOtherCollegues(String idPersona, String idLenguaje);
