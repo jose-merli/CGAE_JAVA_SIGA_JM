@@ -413,6 +413,7 @@ public class WSCommons {
 					
 				}else{
 					sociedadesResult.addAll(sociedadesEnBaja);
+					respuesta.setNumTotalPaginas((short)1);
 				}
 				
 				// Se calcula el numero total de paginas
@@ -693,8 +694,10 @@ public class WSCommons {
 							
 						}else{
 							sociedadesEditadasResult.addAll(sociedadesEditadasFinal);
+							respuesta.setNumTotalPaginas((short)1);
 						}
 					}
+					
 					try{
 						if (null != sociedadesEditadasResult && sociedadesEditadasResult.size()>0) {
 							
@@ -702,10 +705,8 @@ public class WSCommons {
 
 								RegistroSociedad registro = RegistroSociedad.Factory.newInstance();
 								registro.setSociedadActualizacion(sociedadActualizacion);
-
 								registrosList.add(registro);
 								
-
 							}
 						}
 					}catch(AssertionError e){
@@ -714,7 +715,6 @@ public class WSCommons {
 					
 				}
 				
-			respuesta.setNumTotalPaginas(totalPaginas);
 			if (null != registrosList && registrosList.size()>0) {
 				RegistroSociedad[] registrosReturn = new RegistroSociedad[registrosList.size()];
 				int i = 0;
