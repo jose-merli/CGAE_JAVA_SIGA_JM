@@ -15,10 +15,12 @@ import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.services.cen.providers.CenPersonaSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -101,6 +103,8 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	@InsertProvider(type = CenPersonaSqlExtendsProvider.class, method = "insertSelectiveForPersonFile")
 	int insertSelectiveForPersonFile(CrearPersonaDTO crearPersonaDTO, AdmUsuarios usuario);
 	
+	@InsertProvider(type = CenPersonaSqlExtendsProvider.class, method = "insertSelectiveForPerson")
+	int insertSelectiveForPerson(CenPersona crearPersonaDTO, AdmUsuarios usuario);
 	
 	
 	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "selectMaxIdPersona")
@@ -109,6 +113,12 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "IDPERSONA2", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> selectMaxIdPersona();
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "selectMaxIdPersona2")
+	@Results({
+		@Result(column = "IDPERSONA", property = "idMax", jdbcType = JdbcType.NUMERIC)
+	})
+	MaxIdDto selectMaxIdPersona2();
 	
 	
 	@UpdateProvider(type = CenPersonaSqlExtendsProvider.class, method = "updatebyExampleDataLegalPerson")

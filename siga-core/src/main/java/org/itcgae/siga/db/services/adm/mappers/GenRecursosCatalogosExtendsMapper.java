@@ -43,4 +43,7 @@ public interface GenRecursosCatalogosExtendsMapper extends GenRecursosCatalogosM
 	
 	@InsertProvider(type = GenRecursosCatalogosSqlExtendsProvider.class, method = "insertSelectiveForCreateLegalPerson")
 	int insertSelectiveForCreateLegalPerson(String idInstitucion, AdmUsuarios usuario, String grupo,String nombreTabla, String campoTabla);
+	
+	@SelectProvider(type = GenRecursosCatalogosSqlExtendsProvider.class, method = "getMaxIdRecurso")
+    String getMaxIdRecurso();
 }

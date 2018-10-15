@@ -98,6 +98,11 @@
 			<artifactId>axis2-xmlbeans</artifactId>
 			<version>1.7.7</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.apache</groupId>
+		    <artifactId>poi</artifactId>
+		    <version>3.12-20150511</version>
+		</dependency>  
 	</dependencies>
 	
 

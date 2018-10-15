@@ -69,5 +69,3 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 	
 	
 }
-
-

@@ -2,6 +2,7 @@ package org.itcgae.siga.commons.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
@@ -67,12 +68,12 @@ public class SIGAReferences {
 		SIGAReferences.context=context;
 	}
 	
-//	public static InputStream getInputReference(RESOURCE_FILES resource){
-//		if (context!=null)
-//			return context.getResource(resource.getFileName());
-//		else 
-//			return null;
-//	}
+	public static InputStream getInputReference(RESOURCE_FILES resource){
+		if (context!=null)
+			return (InputStream) context.getResource(resource.getFileName());
+		else 
+			return null;
+	}
 
 //	public static OutputStream getOutputReference(RESOURCE_FILES resource) throws MalformedURLException, FileNotFoundException, URISyntaxException{
 //		if (context!=null){

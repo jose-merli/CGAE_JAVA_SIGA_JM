@@ -67,4 +67,14 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 			
 		return sql.toString();
 	}
+	
+	public String getMaxIdRecurso() {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDRECURSO)");
+		sql.FROM("GEN_RECURSOS_CATALOGOS");
+		sql.WHERE("NOMBRETABLA = 'CEN_GRUPOSCLIENTE'");
+		
+		return sql.toString();
+	}
 }

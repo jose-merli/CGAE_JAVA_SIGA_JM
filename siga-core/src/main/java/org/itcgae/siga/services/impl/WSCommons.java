@@ -390,7 +390,7 @@ public class WSCommons {
 			List<SociedadesBajaDTO> sociedadesEnBaja = cenNoColegiado.selectSociedadesEliminadas(idInstitucion,peticion.getFechaDesde().getTime(),peticion.getFechaHasta().getTime());
 			
 			List<SociedadesBajaDTO> sociedadesResult = new ArrayList<>();
-			
+
 			short totalPaginas = 0;
 			if (sociedadesEnBaja.size() == 0) {
 				LOGGER.info("No se ha encontrado ninguna sociedad con los filtros seleccionados");
@@ -414,7 +414,16 @@ public class WSCommons {
 				}else{
 					sociedadesResult.addAll(sociedadesEnBaja);
 				}
+				
+				// Se calcula el numero total de paginas
+				totalPaginas = (short) (sociedadesResult.size() / tamanoPaginacion);
+				if (sociedadesResult.size() % tamanoPaginacion > 0) {
+					totalPaginas++;
+				}
 			}
+			
+			
+			
 			if (null != sociedadesResult && sociedadesResult.size()>0) {
 				for (SociedadesBajaDTO sociedadBajaDTO : sociedadesResult) {
 					

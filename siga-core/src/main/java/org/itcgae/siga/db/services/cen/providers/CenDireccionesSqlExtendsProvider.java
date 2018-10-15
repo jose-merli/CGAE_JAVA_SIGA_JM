@@ -145,5 +145,13 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		
 		return sql.toString();
 	}
+	
+	public String selectMaxIdDireccion() {
+		SQL sql = new SQL();
+		
+		sql.SELECT("MAX(IDDIRECCION) +1 AS IDDIRECCION");
+		sql.FROM("CEN_DIRECCIONES");
+		return sql.toString();
+	}
 
 }
