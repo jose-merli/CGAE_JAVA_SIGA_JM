@@ -1,12 +1,14 @@
 package org.itcgae.siga.cen.controllers;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
@@ -65,7 +67,7 @@ public class TarjetaDatosGeneralesController {
 	
 	
 	@RequestMapping(value = "busquedaPerJuridica/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> createLegalPerson(@RequestBody SociedadCreateDTO sociedadCreateDTO, HttpServletRequest request) { 
+	ResponseEntity<InsertResponseDTO> createLegalPerson(@RequestBody SociedadCreateDTO sociedadCreateDTO, HttpServletRequest request) throws ParseException  { 
 		InsertResponseDTO response = tarjetaDatosGeneralesService.createLegalPerson(sociedadCreateDTO, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.OK);
@@ -74,19 +76,10 @@ public class TarjetaDatosGeneralesController {
 	
 	
 	@RequestMapping(value = "busquedaPerJuridica/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateLegalPerson(@RequestBody EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request) { 
+	ResponseEntity<UpdateResponseDTO> updateLegalPerson(@RequestBody EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request) throws ParseException{ 
 		UpdateResponseDTO response = tarjetaDatosGeneralesService.updateLegalPerson(etiquetaUpdateDTO, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO >(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO >(response, HttpStatus.FORBIDDEN);
-	}
-	
-	
-	@RequestMapping(value = "busquedaPerJuridica/createLabel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> createLabel(@RequestBody ComboItem items, HttpServletRequest request){
-		InsertResponseDTO response = tarjetaDatosGeneralesService.createLabel(items, request);
-		if(response.getStatus().equals(SigaConstants.OK))
-			return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.OK);
-		else return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.FORBIDDEN);
 	}
 }

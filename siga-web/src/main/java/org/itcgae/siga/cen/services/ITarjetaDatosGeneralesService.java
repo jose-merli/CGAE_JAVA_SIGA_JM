@@ -1,6 +1,7 @@
 package org.itcgae.siga.cen.services;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,10 +24,9 @@ public interface ITarjetaDatosGeneralesService {
 	
 	public PersonaJuridicaDTO searchGeneralData(int numPagina, @RequestBody PersonaJuridicaSearchDTO personaJuridicaSearchDTO, HttpServletRequest request);
 	
-	public InsertResponseDTO createLegalPerson(SociedadCreateDTO sociedadCreateDTO, HttpServletRequest request);
+	public InsertResponseDTO createLegalPerson(SociedadCreateDTO sociedadCreateDTO, HttpServletRequest request) throws ParseException;
 	
-	public UpdateResponseDTO updateLegalPerson(EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request);
-	
-	public InsertResponseDTO createLabel(ComboItem items, HttpServletRequest request);
+	public UpdateResponseDTO updateLegalPerson(EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request) throws ParseException;
+
 }
 

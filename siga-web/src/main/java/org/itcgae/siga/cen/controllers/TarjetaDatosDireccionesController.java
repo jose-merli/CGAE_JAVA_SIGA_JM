@@ -58,6 +58,7 @@ public class TarjetaDatosDireccionesController {
 		ComboDTO response = tarjetaDatosDireccionesService.getPoblacion(request,IdProvincia, filtro);
 		return new ResponseEntity<ComboDTO >(response, HttpStatus.OK);
 	}
+	
 	@RequestMapping(value = "tarjetaDirecciones/tipoDireccion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getTipoDireccion(HttpServletRequest request) { 
 		ComboDTO response = tarjetaDatosDireccionesService.getTipoDireccion(request);
