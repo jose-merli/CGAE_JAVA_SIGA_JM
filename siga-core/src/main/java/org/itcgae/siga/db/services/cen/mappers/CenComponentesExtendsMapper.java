@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.cen.BusquedaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
@@ -68,4 +69,17 @@ public interface CenComponentesExtendsMapper extends CenComponentesMapper {
 		@Result(column = "IDCOMPONENTE", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	ComboItem selectMaxIDComponente(String idPersonaPadre, String idInstitucion);
+	
+	@SelectProvider(type = CenComponentesSqlExtendsProvider.class, method = "searchSocieties")
+	@Results({
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DENOMINACION", property = "denominacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHACONSTITUCION", property = "fechaConstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMEROINTEGRANTES", property = "numeroIntegrantes", jdbcType = JdbcType.VARCHAR)
+	})
+	List<BusquedaJuridicaItem> searchSocieties(String idPersona, String idLenguaje, String idInstitucion);
 }
