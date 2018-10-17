@@ -6,12 +6,20 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
+import org.itcgae.siga.DTOs.cen.FichaDatosColegialesDTO;
+import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IFichaDatosColegialesService;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposseguroExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -32,7 +40,8 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 	@Autowired
 	private CenTiposseguroExtendsMapper cenTiposseguroExtendsMapper;
 
-	
+	@Autowired 
+	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 	@Override
 	public ComboDTO getSocietyTypes(HttpServletRequest request) {
 		// TODO Auto-generated method stub
@@ -125,5 +134,51 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		LOGGER.info("getTypeInsurances() -> Salida del servicio para obtener los tipos seguros disponibles");
 		return comboDTO;
 
+	}
+
+	@Override
+	public ColegiadoDTO datosColegialesSearch(int numPagina, ColegiadoItem colegiadoItem,
+			HttpServletRequest request) {
+		
+		LOGGER.info("datosColegialesSearch() -> Entrada al servicio para la búsqueda por filtros de direcciones");
+
+		List<ColegiadoItem> colegiadoListItem = new ArrayList<ColegiadoItem>();
+		ColegiadoDTO datosColegialesDTO = new ColegiadoDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"datosColegialesSearch() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"datosColegialesSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+//				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"datosColegialesSearch() / CenColegiadoExtendsMapper.selectDirecciones() -> Entrada a CenColegiadoExtendsMapper para busqueda de Colegiados");
+				colegiadoListItem = cenColegiadoExtendsMapper.selectColegiaciones(idInstitucion, usuario.getIdlenguaje(), colegiadoItem);
+				LOGGER.info(
+						"datosColegialesSearch() / CenColegiadoExtendsMapper.selectDirecciones() -> Salida de CenColegiadoExtendsMapper para busqueda de Colegiados");
+
+				datosColegialesDTO.setColegiadoItem(colegiadoListItem);
+			} else {
+				LOGGER.warn(
+						"datosColegialesSearch() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("datosColegialesSearch() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("datosColegialesSearch() -> Salida del servicio para la búsqueda por filtros de Colegiados");
+		return datosColegialesDTO;
 	}	
 }

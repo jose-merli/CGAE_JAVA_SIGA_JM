@@ -214,6 +214,33 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		return sql.toString();
 	}
 	
+	
+	
+	public String selectColegiaciones(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("TO_CHAR(fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
+		sql.SELECT("cat.descripcion as estadoColegial");
+		sql.SELECT("situacionresidente as residenteInscrito");
+		sql.SELECT("observaciones");
+		
+		sql.FROM("cen_colegiado col");
+		sql.INNER_JOIN("CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion )");
+		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
+		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '"+idLenguaje+"')");
+		
+		sql.WHERE("col.idpersona = '"+ colegiadoItem.getIdPersona() +"'");
+		sql.WHERE("colest.idinstitucion = '"+ idInstitucion + "'");
+//		sql1.WHERE("dir.fechabaja is null");
+		
+		sql.ORDER_BY("fechaestado");
+		//sql.ORDER_BY("per.nombre");
+
+		return sql.toString();
+	}
+	
+	
 	public String insertSelectiveForCreateNewColegiado(String idInstitucion, AdmUsuarios usuario,
 			CenColegiado cenColegiado) {
 		SQL sql = new SQL();

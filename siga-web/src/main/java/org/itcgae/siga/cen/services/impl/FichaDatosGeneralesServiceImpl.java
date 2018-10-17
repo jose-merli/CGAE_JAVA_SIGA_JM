@@ -11,8 +11,12 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -38,6 +42,7 @@ import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscolegialesestadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -60,6 +65,10 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	@Autowired
 	private CenColegiadoExtendsMapper cenColegiadoMapper;
 
+	@Autowired
+	private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
+	
+	
 	@Autowired
 	private CenDatoscolegialesestadoExtendsMapper cenDatoscolegialesestadoMapper;
 
@@ -244,6 +253,51 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 		return updateResponseDTO;
 		
+	}
+	
+	@Override
+	public DatosDireccionesDTO partidoJudicialSearch(ColegiadoItem colegiadoItem, HttpServletRequest request) {
+		LOGGER.info("searchBanksData() -> Entrada al servicio para la búsqueda por filtros de direcciones");
+	
+		DatosDireccionesDTO datosDireccionesDTO = new DatosDireccionesDTO();
+//		ColegiadoDTO colegiado = new ColegiadoDTO();
+
+		List<DatosDireccionesItem> datosDireccionesItem = new ArrayList<DatosDireccionesItem>();
+//		DatosDireccionesDTO datosDireccionesDTO = new DatosDireccionesDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"datosDireccionesSearch() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"datosDireccionesSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				LOGGER.info(
+						"datosDireccionesSearch() / cenDireccionesExtendsMapper.selectDirecciones() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de direcciones");
+				datosDireccionesItem = cenDireccionesExtendsMapper.selectPartidoJudicial(colegiadoItem.getIdPersona(), idInstitucion.toString());
+				LOGGER.info(
+						"datosDireccionesSearch() / cenDireccionesExtendsMapper.selectDirecciones() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de direcciones");
+
+			} else {
+				LOGGER.warn(
+						"datosDireccionesSearch() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("datosDireccionesSearch() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("datosDireccionesSearch() -> Salida del servicio para la búsqueda por filtros de direcciones");
+		datosDireccionesDTO.setDatosDireccionesItem(datosDireccionesItem);
+		return datosDireccionesDTO;
 	}
 	
 	
