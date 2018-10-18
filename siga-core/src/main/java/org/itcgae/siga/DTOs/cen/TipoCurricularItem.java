@@ -6,10 +6,26 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TipoCurricularItem {
 
+	private String idTipoCV;
+	private String idTipoCvSubtipo1;
 	private String tipoCategoriaCurricular;
 	private String codigoExterno;
 	private String descripcion;
 	
+	@JsonProperty("idTipoCV")
+	public String getIdTipoCV() {
+		return idTipoCV;
+	}
+	public void setIdTipoCV(String idTipoCV) {
+		this.idTipoCV = idTipoCV;
+	}
+	@JsonProperty("idTipoCvSubtipo1")
+	public String getIdTipoCvSubtipo1() {
+		return idTipoCvSubtipo1;
+	}
+	public void setIdTipoCvSubtipo1(String idTipoCvSubtipo1) {
+		this.idTipoCvSubtipo1 = idTipoCvSubtipo1;
+	}
 	@JsonProperty("tipoCategoriaCurricular")
 	public String getTipoCategoriaCurricular() {
 		return tipoCategoriaCurricular;
@@ -43,7 +59,9 @@ public class TipoCurricularItem {
 	      return false;
 	    }
 	    TipoCurricularItem tipoCurricularItem = (TipoCurricularItem) o;
-	    return Objects.equals(this.tipoCategoriaCurricular, tipoCurricularItem.tipoCategoriaCurricular) &&
+	    return Objects.equals(this.idTipoCV, tipoCurricularItem.idTipoCV) &&
+	    		Objects.equals(this.idTipoCvSubtipo1, tipoCurricularItem.idTipoCvSubtipo1) &&
+	    		Objects.equals(this.tipoCategoriaCurricular, tipoCurricularItem.tipoCategoriaCurricular) &&
 	    		Objects.equals(this.codigoExterno, tipoCurricularItem.codigoExterno) &&
 	    		Objects.equals(this.descripcion, tipoCurricularItem.descripcion);
 	}
@@ -59,6 +77,8 @@ public class TipoCurricularItem {
 	    StringBuilder sb = new StringBuilder();
 	    sb.append("class TipoCurricularItem {\n");
 	    
+	    sb.append("    idTipoCV: ").append(toIndentedString(idTipoCV)).append("\n");
+	    sb.append("    idTipoCvSubtipo1: ").append(toIndentedString(idTipoCvSubtipo1)).append("\n");
 	    sb.append("    tipoCategoriaCurricular: ").append(toIndentedString(tipoCategoriaCurricular)).append("\n");
 	    sb.append("    codigoExterno: ").append(toIndentedString(codigoExterno)).append("\n");
 	    sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");

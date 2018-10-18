@@ -8,9 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
-import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
-import org.itcgae.siga.DTOs.cen.BusquedaJuridicaItem;
-import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.TipoCurricularDTO;
 import org.itcgae.siga.DTOs.cen.TipoCurricularItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -20,11 +18,8 @@ import org.itcgae.siga.cen.services.ITipoCurricularService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenCliente;
-import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
-import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo1;
+import org.itcgae.siga.db.entities.CenTiposcvsubtipo1Key;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -46,15 +41,12 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 
 	@Autowired
 	private CenTiposcvExtendsMapper cenTiposcvExtendsMapper;
-	
-	@Autowired 
-	private CenTiposCVSubtipo1ExtendsMapper cenTiposCVSubtipo1ExtendsMapper;
-	
-	@Autowired 
-	private GenRecursosCatalogosExtendsMapper genRecursosCatalogosExtendsMapper;
-	
+
 	@Autowired
-	private CenGruposclienteExtendsMapper cenGruposclienteExtendsMapper;
+	private CenTiposCVSubtipo1ExtendsMapper cenTiposCVSubtipo1ExtendsMapper;
+
+	@Autowired
+	private GenRecursosCatalogosExtendsMapper genRecursosCatalogosExtendsMapper;
 
 	@Override
 	public ComboDTO getComboCategoriaCurricular(HttpServletRequest request) {
@@ -125,8 +117,8 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 
 				LOGGER.info(
 						"search() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Entrada a cenNocolegiadoExtendsMapper para busqueda de personas colegiadas por filtro");
-				tipoCurricularItems = cenTiposCVSubtipo1ExtendsMapper.search(tipoCurricularItem,
-						idLenguaje, String.valueOf(idInstitucion));
+				tipoCurricularItems = cenTiposCVSubtipo1ExtendsMapper.search(tipoCurricularItem, idLenguaje,
+						String.valueOf(idInstitucion));
 				LOGGER.info(
 						"search() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenNocolegiadoExtendsMapper para busqueda de personas no colegiadas por filtro");
 
@@ -151,13 +143,13 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 		LOGGER.info(
 				"createTipoCurricular() -> Entrada al servicio para actualizar información general de una persona jurídica");
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-		
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		String idLenguaje = null;
-		
+
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -170,22 +162,25 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				idLenguaje = usuario.getIdlenguaje();
-				
+
 				LOGGER.info(
 						"createTipoCurricular() / cenTiposCVSubtipo1ExtendsMapper.insert() -> Entrada a cenTiposCVSubtipo1ExtendsMapper para insertar un registro");
-				
+
 				// Vamos a insertar el registro en cenTiposCVSubtipo1
 				CenTiposcvsubtipo1 record = new CenTiposcvsubtipo1();
 				record.setCodigoext(tipoCurricularItem.getCodigoExterno());
-				
+
 				// Consultamos para ver si la descripción existe en genRecursosCatalogos
 				GenRecursosCatalogosExample example = new GenRecursosCatalogosExample();
-				example.createCriteria().andNombretablaEqualTo("CEN_TIPOSCVSUBTIPO1").andCampotablaEqualTo("DESCRIPCION").andDescripcionEqualTo(tipoCurricularItem.getDescripcion()).andIdinstitucionEqualTo(idInstitucion).andIdlenguajeEqualTo(idLenguaje);
-				List<GenRecursosCatalogos> genRecursosCatalogos = genRecursosCatalogosExtendsMapper.selectByExample(example);
-				
-				if(null != genRecursosCatalogos && genRecursosCatalogos.size() > 0) {
+				example.createCriteria().andNombretablaEqualTo("CEN_TIPOSCVSUBTIPO1")
+						.andCampotablaEqualTo("DESCRIPCION").andDescripcionEqualTo(tipoCurricularItem.getDescripcion())
+						.andIdinstitucionEqualTo(idInstitucion).andIdlenguajeEqualTo(idLenguaje);
+				List<GenRecursosCatalogos> genRecursosCatalogos = genRecursosCatalogosExtendsMapper
+						.selectByExample(example);
+
+				if (null != genRecursosCatalogos && genRecursosCatalogos.size() > 0) {
 					record.setDescripcion(genRecursosCatalogos.get(0).getIdrecurso());
-				}else {
+				} else {
 					// No está la descripción, procedemos a insertarla
 					GenRecursosCatalogos genRecursosCatalogo = new GenRecursosCatalogos();
 
@@ -195,30 +190,32 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 					genRecursosCatalogo.setIdinstitucion(idInstitucion);
 					genRecursosCatalogo.setIdlenguaje(idLenguaje);
 
-					NewIdDTO idRecursoBD = genRecursosCatalogosExtendsMapper.getMaxIdRecursoCatalogo(String.valueOf(idInstitucion), idLenguaje);
+					NewIdDTO idRecursoBD = genRecursosCatalogosExtendsMapper
+							.getMaxIdRecursoCatalogo(String.valueOf(idInstitucion), idLenguaje);
 					if (idRecursoBD == null) {
 						genRecursosCatalogo.setIdrecurso("1");
 					} else {
 						long idRecurso = Long.parseLong(idRecursoBD.getNewId()) + 1;
 						genRecursosCatalogo.setIdrecurso(String.valueOf(idRecurso));
 					}
-					
-					genRecursosCatalogo.setIdrecursoalias("cen_tiposcvsubtipo1.descripcion." + idInstitucion + "." + genRecursosCatalogo.getIdrecurso());
-					
+
+					genRecursosCatalogo.setIdrecursoalias("cen_tiposcvsubtipo1.descripcion." + idInstitucion + "."
+							+ genRecursosCatalogo.getIdrecurso());
+
 					genRecursosCatalogo.setNombretabla("CEN_TIPOSCVSUBTIPO1");
 					genRecursosCatalogo.setUsumodificacion(usuario.getUsumodificacion());
-					
-					if(genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo) == 1) {
+
+					if (genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo) == 1) {
 						record.setDescripcion(genRecursosCatalogo.getIdrecurso());
 					}
 				}
-				
-				
+
 				record.setFechamodificacion(new Date());
 				record.setIdinstitucion(idInstitucion);
 				record.setIdtipocv(Short.valueOf(tipoCurricularItem.getTipoCategoriaCurricular()));
-				
-				NewIdDTO idTipoCvSubtipo1 = cenTiposCVSubtipo1ExtendsMapper.getMaxIdCvSubtipo1(String.valueOf(idInstitucion), tipoCurricularItem.getTipoCategoriaCurricular());
+
+				NewIdDTO idTipoCvSubtipo1 = cenTiposCVSubtipo1ExtendsMapper.getMaxIdCvSubtipo1(
+						String.valueOf(idInstitucion), tipoCurricularItem.getTipoCategoriaCurricular());
 
 				if (idTipoCvSubtipo1 == null) {
 					record.setIdtipocvsubtipo1(new Short("1"));
@@ -226,13 +223,12 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 					int newIdTipoCvSubtipo1 = Integer.parseInt(idTipoCvSubtipo1.getNewId()) + 1;
 					record.setIdtipocvsubtipo1((short) newIdTipoCvSubtipo1);
 				}
-				
-				
+
 				record.setUsumodificacion(usuario.getUsumodificacion());
-				
-				if(cenTiposCVSubtipo1ExtendsMapper.insert(record) == 1) {
+
+				if (cenTiposCVSubtipo1ExtendsMapper.insert(record) == 1) {
 					insertResponseDTO.setStatus(SigaConstants.OK);
-				}else {
+				} else {
 					insertResponseDTO.setStatus(SigaConstants.KO);
 					org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
 					error.setMessage("general.message.error.realiza.accion");
@@ -241,7 +237,6 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 				LOGGER.info(
 						"createTipoCurricular() / cenTiposCVSubtipo1ExtendsMapper.insert() -> Salida de cenTiposCVSubtipo1ExtendsMapper para para insertar un registro");
 
-				
 			} else {
 				LOGGER.warn(
 						"createTipoCurricular() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -250,8 +245,39 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 		} else {
 			LOGGER.warn("createTipoCurricular() -> idInstitucion del token nula");
 		}
-		
+
 		return insertResponseDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO updateTipoCurricular(TipoCurricularDTO tipoCurricularDTO, HttpServletRequest request) {
+		LOGGER.info("updateTipoCurricular() -> Entrada al servicio para actualizar información");
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"updateTipoCurricular() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"updateTipoCurricular() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				
+				for (TipoCurricularItem tipoCurricularItem: tipoCurricularDTO.getTipoCurricularItems()) {
+					
+				  // buscar los datos en subtipocv
+				}
+			}
+		}
+		return null;
 	}
 
 }

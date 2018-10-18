@@ -2,6 +2,8 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.TipoCurricularDTO;
 import org.itcgae.siga.DTOs.cen.TipoCurricularItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -42,4 +44,12 @@ public class TipoCurricularController {
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
+	
+	public ResponseEntity<UpdateResponseDTO> updateTipoCurricular(@RequestBody TipoCurricularDTO tipoCurricularDTO, HttpServletRequest request){
+		UpdateResponseDTO response = tipoCurricularService.updateTipoCurricular(tipoCurricularDTO, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO >(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO >(response, HttpStatus.FORBIDDEN);
+	}
+
 }
