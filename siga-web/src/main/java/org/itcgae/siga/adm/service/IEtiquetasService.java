@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 public interface IEtiquetasService {
 
 	public ComboDTO getLabelLenguage();
+	public ComboDTO getLabelLenguageFiltered(HttpServletRequest request);
 	
 	public EtiquetaDTO searchLabels(int numPagina, EtiquetaSearchDTO  etiquetaSearchDTO, HttpServletRequest request);
 	

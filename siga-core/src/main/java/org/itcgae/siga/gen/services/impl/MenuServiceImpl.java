@@ -59,8 +59,14 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenMenu;
 import org.itcgae.siga.db.entities.GenMenuExample;
 import org.itcgae.siga.db.entities.GenProperties;
@@ -71,6 +77,9 @@ import org.itcgae.siga.db.mappers.AdmPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
+import org.itcgae.siga.db.mappers.CenClienteMapper;
+import org.itcgae.siga.db.mappers.CenColegiadoMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.GenMenuMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
@@ -133,6 +142,15 @@ public class MenuServiceImpl implements IMenuService {
 	
 	@Autowired 
 	AdmPerfilMapper adminPerfilMapper;
+	
+	@Autowired
+	private CenPersonaMapper cenPersonaMapper;
+	
+	@Autowired
+	private CenColegiadoMapper cenColegiadoMapper;
+	
+	@Autowired
+	private CenClienteMapper cenClienteMapper;
 	
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
@@ -779,6 +797,67 @@ public class MenuServiceImpl implements IMenuService {
 		comboItem.setLabel(cenInstitucion.getNombre());
 		comboItem.setValue(String.valueOf(cenInstitucion.getIdinstitucion()));
 		return comboItem;
+	}
+
+	@Override
+	public UpdateResponseDTO setIdiomaUsuario(HttpServletRequest request, String idLenguaje) {
+		LOGGER.info("setIdiomaUsuario() --> Entrada al servicio de cambio de idioma");
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		int updateLenguaje = 0;
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if(usuarios!= null &&usuarios.size()>0){
+				AdmUsuarios usuario = usuarios.get(0);
+				usuario.setIdlenguaje(idLenguaje);
+				usuario.setFechamodificacion(new Date());
+				try{
+					updateLenguaje = usuarioMapper.updateByPrimaryKey(usuario);
+					
+					CenPersonaExample examplePersona = new CenPersonaExample();
+					examplePersona.createCriteria().andNifcifEqualTo(dni);
+					List<CenPersona> personaList = cenPersonaMapper.selectByExample(examplePersona);
+					
+					CenColegiado colegiado = null;
+					if(personaList.size() > 0){
+						CenPersona persona = personaList.get(0);
+						CenColegiadoKey key = new CenColegiadoKey();
+						key.setIdinstitucion(idInstitucion);
+						key.setIdpersona(persona.getIdpersona());
+						colegiado = cenColegiadoMapper.selectByPrimaryKey(key);
+						
+					}
+					CenCliente cliente = null;
+					if(colegiado != null){
+						CenClienteKey cke = new CenClienteKey();
+						cke.setIdinstitucion(idInstitucion);
+						cke.setIdpersona(colegiado.getIdpersona());
+						cliente = cenClienteMapper.selectByPrimaryKey(cke);
+					}
+					
+					if(cliente != null){
+						cliente.setIdlenguaje(idLenguaje);
+						cenClienteMapper.updateByPrimaryKey(cliente);
+					}
+					if(updateLenguaje==1){
+						response.setStatus(SigaConstants.OK);
+					}
+				}catch(Exception e) {
+					LOGGER.info("setIdiomaUsuario() --> error al actualizar tabla adm_usuarios:" + e.getMessage());
+					response.setStatus(SigaConstants.KO);
+				}
+			}
+			
+		}
+		LOGGER.info("setIdiomaUsuario() --> Salida del servicio de cambio de idioma");
+		return response;
 	}	
 
 

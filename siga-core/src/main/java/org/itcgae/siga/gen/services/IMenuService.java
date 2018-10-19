@@ -49,6 +49,8 @@ public interface IMenuService {
 
 
 	public UpdateResponseDTO validaInstitucion(HttpServletRequest request);
+	
+	public UpdateResponseDTO setIdiomaUsuario(HttpServletRequest request, String idLenguaje);
 
 	public ComboItem getInstitucionActual(HttpServletRequest request);
 
