@@ -52,7 +52,7 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 		//comprobacion campo grupo del body para aplicar filtro
 		if(null != usuarioRequestDTO.getGrupo() && !usuarioRequestDTO.getGrupo().equalsIgnoreCase("")){
 			sql.WHERE("exists (select 1 from ADM_USUARIOS_EFECTIVOS_PERFIL UEP where UEP.IDINSTITUCION = USUARIOS.IDINSTITUCION ");
-			sql.WHERE("UEP.IDUSUARIO = USUARIOS.IDUSUARIO and UEP.IDPERFIL = '" + usuarioRequestDTO.getGrupo() + "')");
+			sql.WHERE("UEP.IDUSUARIO = USUARIOS.IDUSUARIO and UEP.IDPERFIL = '" + usuarioRequestDTO.getGrupo() + "' and UEP.FECHA_BAJA IS NULL)");
 		}
 
 		// comprobacion campo nombreApellidos del body para aplicar filtro
