@@ -369,7 +369,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider{
 		
 		sql.WHERE("PER.IDPERSONA = '"+ personaSearchDto.getIdPersona() +"'");
 		sql.WHERE("IRPF.IDINSTITUCION = '"+ idInstitucion +"'");
-		sql.ORDER_BY("FECHAINICIO DESC");
+		sql.ORDER_BY("IRPF.FECHAINICIO DESC");
 		
 		return sql.toString();
 	}
