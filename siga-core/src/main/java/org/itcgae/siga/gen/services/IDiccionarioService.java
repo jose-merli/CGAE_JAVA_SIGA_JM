@@ -8,7 +8,7 @@ import org.itcgae.siga.DTOs.gen.DiccionarioDTO;
 public interface IDiccionarioService {
 
 
-	public  DiccionarioDTO  getDiccionario(String lenguaje);
+	public  DiccionarioDTO  getDiccionario(String lenguaje, HttpServletRequest request);
 
 	public  UsuarioDTO getUsuario(HttpServletRequest request);
 

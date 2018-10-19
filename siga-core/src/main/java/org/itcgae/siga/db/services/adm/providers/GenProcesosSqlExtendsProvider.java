@@ -1,13 +1,9 @@
 package org.itcgae.siga.db.services.adm.providers;
 
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTOs.adm.ContadorRequestDTO;
-import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.db.entities.AdmContadorExample.Criterion;
 import org.itcgae.siga.db.mappers.AdmContadorSqlProvider;
-import org.itcgae.siga.db.mappers.GenParametrosSqlProvider;
 
 public class GenProcesosSqlExtendsProvider extends AdmContadorSqlProvider{
 
@@ -24,7 +20,7 @@ public class GenProcesosSqlExtendsProvider extends AdmContadorSqlProvider{
 		sql.FROM("GEN_PROCESOS PROC");
 		
 		sql.LEFT_OUTER_JOIN("ADM_TIPOSACCESO ACCESO ON (PROC.IDPROCESO = ACCESO.IDPROCESO AND IDINSTITUCION = '"+ request.getIdInstitucion() + "'   and acceso.idperfil = '" + request.getIdGrupo() + "')");
-		  if (! request.getIdInstitucion().equals(SigaConstants.InstitucionGeneral)) {
+		  if (!request.getIdGrupo().equals(SigaConstants.Personal) || !request.getIdInstitucion().equals(SigaConstants.InstitucionGeneral)) {
 	        	sql.WHERE(" UPPER(PROC.DESCRIPCION) not like UPPER('%hidden%')");
 			}
 		sql.ORDER_BY("PARENT DESC, TEXT ASC");

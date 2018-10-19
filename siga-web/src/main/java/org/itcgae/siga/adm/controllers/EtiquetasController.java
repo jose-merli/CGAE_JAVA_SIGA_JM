@@ -30,6 +30,12 @@ public class EtiquetasController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/etiquetas/lenguajeFiltrado", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getLenguajes(HttpServletRequest httpRequest) {
+		ComboDTO response = etiquetasService.getLabelLenguageFiltered(httpRequest);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	
 	@RequestMapping(value = "/etiquetas/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EtiquetaDTO> getParametersSearch(@RequestParam("numPagina") int numPagina, @RequestBody EtiquetaSearchDTO etiquetaSearchDTO, HttpServletRequest request) { 

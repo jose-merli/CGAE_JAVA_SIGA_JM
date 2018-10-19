@@ -1,5 +1,6 @@
 package org.itcgae.siga.gen.services;
 
+import java.security.cert.CertificateEncodingException;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,7 @@ public interface IMenuService {
 	public  ComboDTO getPerfiles(String idInstitucion);
 
 
-	public PermisoDTO getPermisos(PermisoRequestItem permisoRequestItem, HttpServletRequest request);
+	public PermisoDTO getPermisos(PermisoRequestItem permisoRequestItem, HttpServletRequest request) throws CertificateEncodingException;
 
 
 	public UpdateResponseDTO updatePermisos(PermisoUpdateItem permisoRequestItem, HttpServletRequest request);
@@ -49,6 +50,8 @@ public interface IMenuService {
 
 
 	public UpdateResponseDTO validaInstitucion(HttpServletRequest request);
+	
+	public UpdateResponseDTO setIdiomaUsuario(HttpServletRequest request, String idLenguaje);
 
 	public ComboItem getInstitucionActual(HttpServletRequest request);
 
