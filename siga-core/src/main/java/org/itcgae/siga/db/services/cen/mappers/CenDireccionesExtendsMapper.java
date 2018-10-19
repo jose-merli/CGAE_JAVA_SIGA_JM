@@ -8,7 +8,9 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
@@ -55,7 +57,10 @@ public interface CenDireccionesExtendsMapper extends CenDireccionesMapper {
 	List<DatosDireccionesItem> selectDireccionesWs(String idPersona);
 
 	
-	
+	@SelectProvider(type = CenDireccionesSqlExtendsProvider.class, method = "selectPartidoJudicial")
+	@Results({ @Result(column = "NOMBREPARTIDO", property = "nombrepartido", jdbcType = JdbcType.VARCHAR)
+	})
+	List<DatosDireccionesItem> selectPartidoJudicial(String idPersona, String idInstitucion);
 	
 	
 	

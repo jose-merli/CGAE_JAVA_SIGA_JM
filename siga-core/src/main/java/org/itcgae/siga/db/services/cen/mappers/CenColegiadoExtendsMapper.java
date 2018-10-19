@@ -59,6 +59,17 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 	})
 	List<ColegiadoItem> selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem);
 
+	
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiaciones")
+	@Results({ 
+		@Result(column = "FECHAINCORPORACION", property = "incorporacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ColegiadoItem> selectColegiaciones(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem);
+	
+	
 	@InsertProvider(type = CenColegiadoSqlExtendsProvider.class, method = "insertSelectiveForCreateNewColegiado")
 	int insertSelectiveForCreateNewColegiado(String idInstitucion, AdmUsuarios usuario,CenColegiado cenColegiado);
 	
@@ -69,4 +80,17 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 		})
 	List<ComboItem> getLabel(AdmUsuarios usuario);
 
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "searchOtherCollegues")
+	@Results({ @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADOCOLEGIAL", property = "estadoColegial", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CORREOELECTRONICO", property = "correo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ColegiadoItem> searchOtherCollegues(String idPersona, String idLenguaje);
 }

@@ -102,7 +102,14 @@
 		    <groupId>org.apache</groupId>
 		    <artifactId>poi</artifactId>
 		    <version>3.12-20150511</version>
-		</dependency>  
+		</dependency>
+		
+		<dependency>
+			<groupId>org.redabogacia</groupId>
+			<artifactId>alterMutuaService</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
 	</dependencies>
 	
 
