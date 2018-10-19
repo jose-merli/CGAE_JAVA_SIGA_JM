@@ -14,7 +14,7 @@ public class SigaConstants {
 	public static String OK = "OK";
 	public static String KO = "KO";
 	public static String InstitucionGeneral = "2000";
-	
+	public static String Personal = "Personal";
 	public static String DB_FALSE = "0";
 	public static String DB_TRUE = "1";
 	public static final String IP_ACCESO_SERVICIO_CARGAS = "IP_ACCESO_SERVICIO_CARGAS";

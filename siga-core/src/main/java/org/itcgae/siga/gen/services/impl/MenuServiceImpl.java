@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -422,13 +423,65 @@ public class MenuServiceImpl implements IMenuService {
 	}
 
 	@Override
-	public PermisoDTO getPermisos(PermisoRequestItem permisoRequestItem, HttpServletRequest request) {
+	public PermisoDTO getPermisos(PermisoRequestItem permisoRequestItem, HttpServletRequest request)  {
 		PermisoDTO permisoResponse = new PermisoDTO();
 		// Obtener idInstitucion del certificado y idUsuario del certificado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String grupo = null;
+		try {
+			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+			String commonName = null;
+			String organizationName = null;
+			String organizationNameNuevo = null;
+			
+			X509Certificate cert = null;
+			if (null != certs && certs.length > 0) {
+				cert = certs[0];
+				try {
+					X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
+
+					RDN userRdn = x500name.getRDNs(BCStyle.CN)[0];
+					commonName = IETFUtils.valueToString(userRdn.getFirst().getValue());
+
+					if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
+						RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
+						organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
+					}else{
+						RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
+						organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
+					}
+
+					RDN grupoRdn = x500name.getRDNs(BCStyle.T)[0];
+					grupo = IETFUtils.valueToString(grupoRdn.getFirst().getValue());
+
+					LOGGER.debug("Common Name: " + commonName);
+					LOGGER.debug("Organization Name: " + organizationName);
+				} catch (NoSuchElementException e) {
+					throw new InvalidClientCerticateException(e);
+				}
+
+				String dni = commonName.substring(commonName.length() - 9, commonName.length());
+				String institucion = null;
+				if (null != organizationNameNuevo) {
+					institucion = organizationNameNuevo.substring(0,
+								4);
+				}else{
+					institucion = organizationName.substring(organizationName.length() - 4,
+						organizationName.length());
+				}
+
+				LOGGER.debug("DNI: " + dni);
+				LOGGER.debug("INSTITUCION: " + institucion);
+				LOGGER.debug("GRUPO: " + grupo);
+				
+			}
+		} catch (Exception e) {
+			throw new BadCredentialsException(e.getMessage());
+		}
 
 		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucion));
+		permisoRequestItem.setIdGrupo(grupo);
 		List<PermisoEntity> permisosEntity = this.permisosMapper.getProcesosPermisos(permisoRequestItem);
 
 		if (null != permisosEntity && !permisosEntity.isEmpty()) {
