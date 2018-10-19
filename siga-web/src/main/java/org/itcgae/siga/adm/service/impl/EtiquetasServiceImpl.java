@@ -19,7 +19,11 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionLenguajes;
+import org.itcgae.siga.db.entities.CenInstitucionLenguajesExample;
+import org.itcgae.siga.db.entities.CenInstitucionLenguajesKey;
 import org.itcgae.siga.db.entities.GenDiccionario;
+import org.itcgae.siga.db.mappers.CenInstitucionLenguajesMapper;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenDiccionarioExtendsMapper;
@@ -40,7 +44,7 @@ public class EtiquetasServiceImpl implements IEtiquetasService{
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
 	@Autowired
-	private CenInstitucionMapper cenInstitucionMapper;
+	private CenInstitucionLenguajesMapper cenInstitucionLenguajesMapper;
 	
 	@Override
 	public ComboDTO getLabelLenguage() {
@@ -163,12 +167,9 @@ public class EtiquetasServiceImpl implements IEtiquetasService{
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
-		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-		AdmUsuarios usuario = usuarios.get(0);
-		
-		CenInstitucion institucion = cenInstitucionMapper.selectByPrimaryKey(idInstitucion);
+		CenInstitucionLenguajesExample example = new CenInstitucionLenguajesExample();
+		example.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+		List<CenInstitucionLenguajes> lenguajes = cenInstitucionLenguajesMapper.selectByExample(example);
 		
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> combooItems = new ArrayList<ComboItem>();
@@ -183,13 +184,15 @@ public class EtiquetasServiceImpl implements IEtiquetasService{
 			comboItem.setValue("");
 			List<ComboItem> comboFiltrado = new ArrayList<ComboItem>();
 			comboFiltrado.add(0,comboItem);
+			
 			for (ComboItem item : combooItems) {
-				if(item.getValue().equals(usuario.getIdlenguaje())){
-					comboFiltrado.add(item);
-				}else if(item.getValue().equals(institucion.getIdlenguaje())){
-					comboFiltrado.add(item);
+				for (CenInstitucionLenguajes lenguaje : lenguajes) {
+					if(item.getValue().equals(lenguaje.getIdlenguaje())){
+						comboFiltrado.add(item);
+					}
 				}
 			}
+			
 			comboDTO.setCombooItems(comboFiltrado);
 		}
 		else {
