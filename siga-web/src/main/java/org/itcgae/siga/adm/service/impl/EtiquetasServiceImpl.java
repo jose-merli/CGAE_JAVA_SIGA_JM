@@ -18,9 +18,16 @@ import org.itcgae.siga.adm.service.IEtiquetasService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionLenguajes;
+import org.itcgae.siga.db.entities.CenInstitucionLenguajesExample;
+import org.itcgae.siga.db.entities.CenInstitucionLenguajesKey;
 import org.itcgae.siga.db.entities.GenDiccionario;
+import org.itcgae.siga.db.mappers.CenInstitucionLenguajesMapper;
+import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenDiccionarioExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,6 +42,9 @@ public class EtiquetasServiceImpl implements IEtiquetasService{
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private CenInstitucionLenguajesMapper cenInstitucionLenguajesMapper;
 	
 	@Override
 	public ComboDTO getLabelLenguage() {
@@ -146,6 +156,52 @@ public class EtiquetasServiceImpl implements IEtiquetasService{
 		
 		LOGGER.info("updateLabel() -> Salida del servicio para actualizar las etiquetas de la aplicación");
 		return updateResponseDTO;
+	}
+
+	@Override
+	public ComboDTO getLabelLenguageFiltered(HttpServletRequest request) {
+		
+		LOGGER.info("getLabelLenguage() -> Entrada al servicio para obtener los idiomas disponibles");
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		CenInstitucionLenguajesExample example = new CenInstitucionLenguajesExample();
+		example.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+		List<CenInstitucionLenguajes> lenguajes = cenInstitucionLenguajesMapper.selectByExample(example);
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> combooItems = new ArrayList<ComboItem>();
+		ComboItem comboItem = new ComboItem();
+		
+		
+		combooItems = genDiccionarioExtendsMapper.getLabelLenguage();
+	
+		if(null != combooItems && combooItems.size() > 0){
+			// primer elemento a vacio para componente de pantalla dropdown
+			comboItem.setLabel("");
+			comboItem.setValue("");
+			List<ComboItem> comboFiltrado = new ArrayList<ComboItem>();
+			comboFiltrado.add(0,comboItem);
+			
+			for (ComboItem item : combooItems) {
+				for (CenInstitucionLenguajes lenguaje : lenguajes) {
+					if(item.getValue().equals(lenguaje.getIdlenguaje())){
+						comboFiltrado.add(item);
+					}
+				}
+			}
+			
+			comboDTO.setCombooItems(comboFiltrado);
+		}
+		else {
+			LOGGER.warn("getLabelLenguage() / genDiccionarioExtendsMapper.getLabelLenguage() -> No hay idiomas disponibles en la base de datos");
+		}
+		
+		
+		LOGGER.info("getLabelLenguage() -> Salida del servicio para obtener los idiomas disponibles");
+		return comboDTO;
 	}
 
 }

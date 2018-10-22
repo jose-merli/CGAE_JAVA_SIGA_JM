@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,8 +60,14 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenMenu;
 import org.itcgae.siga.db.entities.GenMenuExample;
 import org.itcgae.siga.db.entities.GenProperties;
@@ -71,6 +78,9 @@ import org.itcgae.siga.db.mappers.AdmPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
+import org.itcgae.siga.db.mappers.CenClienteMapper;
+import org.itcgae.siga.db.mappers.CenColegiadoMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.GenMenuMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
@@ -133,6 +143,15 @@ public class MenuServiceImpl implements IMenuService {
 	
 	@Autowired 
 	AdmPerfilMapper adminPerfilMapper;
+	
+	@Autowired
+	private CenPersonaMapper cenPersonaMapper;
+	
+	@Autowired
+	private CenColegiadoMapper cenColegiadoMapper;
+	
+	@Autowired
+	private CenClienteMapper cenClienteMapper;
 	
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
@@ -404,13 +423,65 @@ public class MenuServiceImpl implements IMenuService {
 	}
 
 	@Override
-	public PermisoDTO getPermisos(PermisoRequestItem permisoRequestItem, HttpServletRequest request) {
+	public PermisoDTO getPermisos(PermisoRequestItem permisoRequestItem, HttpServletRequest request)  {
 		PermisoDTO permisoResponse = new PermisoDTO();
 		// Obtener idInstitucion del certificado y idUsuario del certificado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String grupo = null;
+		try {
+			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+			String commonName = null;
+			String organizationName = null;
+			String organizationNameNuevo = null;
+			
+			X509Certificate cert = null;
+			if (null != certs && certs.length > 0) {
+				cert = certs[0];
+				try {
+					X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
+
+					RDN userRdn = x500name.getRDNs(BCStyle.CN)[0];
+					commonName = IETFUtils.valueToString(userRdn.getFirst().getValue());
+
+					if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
+						RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
+						organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
+					}else{
+						RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
+						organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
+					}
+
+					RDN grupoRdn = x500name.getRDNs(BCStyle.T)[0];
+					grupo = IETFUtils.valueToString(grupoRdn.getFirst().getValue());
+
+					LOGGER.debug("Common Name: " + commonName);
+					LOGGER.debug("Organization Name: " + organizationName);
+				} catch (NoSuchElementException e) {
+					throw new InvalidClientCerticateException(e);
+				}
+
+				String dni = commonName.substring(commonName.length() - 9, commonName.length());
+				String institucion = null;
+				if (null != organizationNameNuevo) {
+					institucion = organizationNameNuevo.substring(0,
+								4);
+				}else{
+					institucion = organizationName.substring(organizationName.length() - 4,
+						organizationName.length());
+				}
+
+				LOGGER.debug("DNI: " + dni);
+				LOGGER.debug("INSTITUCION: " + institucion);
+				LOGGER.debug("GRUPO: " + grupo);
+				
+			}
+		} catch (Exception e) {
+			throw new BadCredentialsException(e.getMessage());
+		}
 
 		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucion));
+		permisoRequestItem.setIdGrupo(grupo);
 		List<PermisoEntity> permisosEntity = this.permisosMapper.getProcesosPermisos(permisoRequestItem);
 
 		if (null != permisosEntity && !permisosEntity.isEmpty()) {
@@ -779,6 +850,67 @@ public class MenuServiceImpl implements IMenuService {
 		comboItem.setLabel(cenInstitucion.getNombre());
 		comboItem.setValue(String.valueOf(cenInstitucion.getIdinstitucion()));
 		return comboItem;
+	}
+
+	@Override
+	public UpdateResponseDTO setIdiomaUsuario(HttpServletRequest request, String idLenguaje) {
+		LOGGER.info("setIdiomaUsuario() --> Entrada al servicio de cambio de idioma");
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		int updateLenguaje = 0;
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if(usuarios!= null &&usuarios.size()>0){
+				AdmUsuarios usuario = usuarios.get(0);
+				usuario.setIdlenguaje(idLenguaje);
+				usuario.setFechamodificacion(new Date());
+				try{
+					updateLenguaje = usuarioMapper.updateByPrimaryKey(usuario);
+					
+					CenPersonaExample examplePersona = new CenPersonaExample();
+					examplePersona.createCriteria().andNifcifEqualTo(dni);
+					List<CenPersona> personaList = cenPersonaMapper.selectByExample(examplePersona);
+					
+					CenColegiado colegiado = null;
+					if(personaList.size() > 0){
+						CenPersona persona = personaList.get(0);
+						CenColegiadoKey key = new CenColegiadoKey();
+						key.setIdinstitucion(idInstitucion);
+						key.setIdpersona(persona.getIdpersona());
+						colegiado = cenColegiadoMapper.selectByPrimaryKey(key);
+						
+					}
+					CenCliente cliente = null;
+					if(colegiado != null){
+						CenClienteKey cke = new CenClienteKey();
+						cke.setIdinstitucion(idInstitucion);
+						cke.setIdpersona(colegiado.getIdpersona());
+						cliente = cenClienteMapper.selectByPrimaryKey(cke);
+					}
+					
+					if(cliente != null){
+						cliente.setIdlenguaje(idLenguaje);
+						cenClienteMapper.updateByPrimaryKey(cliente);
+					}
+					if(updateLenguaje==1){
+						response.setStatus(SigaConstants.OK);
+					}
+				}catch(Exception e) {
+					LOGGER.info("setIdiomaUsuario() --> error al actualizar tabla adm_usuarios:" + e.getMessage());
+					response.setStatus(SigaConstants.KO);
+				}
+			}
+			
+		}
+		LOGGER.info("setIdiomaUsuario() --> Salida del servicio de cambio de idioma");
+		return response;
 	}	
 
 
