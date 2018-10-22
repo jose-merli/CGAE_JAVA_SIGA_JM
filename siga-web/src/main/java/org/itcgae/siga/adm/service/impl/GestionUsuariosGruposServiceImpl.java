@@ -41,6 +41,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.mappers.AdmPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmPerfilRolMapper;
 import org.itcgae.siga.db.mappers.AdmRolMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
@@ -66,6 +67,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private AdmPerfilMapper admPerfilMapper;
 
 	@Autowired
 	private AdmUsuariosEfectivoPerfilExtendsMapper admUsuariosEfectivoPerfilExtendsMapper;
@@ -905,6 +909,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		int response1 = 1;
 		int response2 = 1;
+		int responsePerfil = 1;
 		boolean responseOK = true;
 		List<AdmPerfilRol> rolesAntiguos = new ArrayList<AdmPerfilRol>();
 
@@ -969,6 +974,31 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 						}
 						
 					}		
+				}
+				
+				//Actualizar la descripcion del perfil
+				if(usuarioUpdateDTO[i].getDescripcionGrupo() != null){
+					
+					AdmPerfilKey key = new AdmPerfilKey();
+					key.setIdinstitucion(Short.valueOf(institucion));
+					key.setIdperfil(usuarioUpdateDTO[i].getIdGrupo());
+					AdmPerfil perfil = admPerfilMapper.selectByPrimaryKey(key);
+					
+					if(perfil != null){
+						perfil.setDescripcion(usuarioUpdateDTO[i].getDescripcionGrupo());
+						perfil.setFechamodificacion(new Date());
+						perfil.setUsumodificacion(usuario.getIdusuario());
+						LOGGER.info("updateGroupUsers() / admPerfilMapper.updateByPrimaryKey() -> Entrada admPerfilMapper para actualizar la descripcion del perfil");
+						admPerfilMapper.updateByPrimaryKey(perfil);
+						LOGGER.info("updateGroupUsers() / admPerfilMapper.updateByPrimaryKey() -> Salida de admPerfilMapper para actualizar la descripcion del perfil");
+					}
+					
+					
+					if(responsePerfil == 0){
+						LOGGER.info("updateGroupUsers() / admPerfilMapper.insertSelective() -> No se ha actualizado la descripción del perfil");
+					}
+					
+					
 				}
 				
 				// 3. Borrar roles que quedan
