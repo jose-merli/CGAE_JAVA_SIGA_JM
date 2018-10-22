@@ -16,6 +16,8 @@ public class TarjetaIntegrantesUpdateDTO {
 	private String idComponente;
 	private String idPersona;
 	private String flagSocio;
+	private String idTipoColegio;
+	private String colegio;
 	private Date fechaBajaCargo;
 	
 	
@@ -158,6 +160,23 @@ public class TarjetaIntegrantesUpdateDTO {
 		this.idPersona = idPersona;
 	}
 	
+	@JsonProperty("idTipoColegio")
+	public String getIdTipoColegio() {
+		return idTipoColegio;
+	}
+
+	public void setIdTipoColegio(String idTipoColegio) {
+		this.idTipoColegio = idTipoColegio;
+	}
+
+	@JsonProperty("colegio")
+	public String getColegio() {
+		return colegio;
+	}
+
+	public void setColegio(String colegio) {
+		this.colegio = colegio;
+	}
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -173,13 +192,15 @@ public class TarjetaIntegrantesUpdateDTO {
 				&& Objects.equals(this.idCargo, tarjetaIntegrantesUpdateDTO.idCargo) 
 				&& Objects.equals(this.capitalSocial, tarjetaIntegrantesUpdateDTO.capitalSocial)
 				&& Objects.equals(this.idComponente, tarjetaIntegrantesUpdateDTO.idComponente)
-				&& Objects.equals(this.idPersona, tarjetaIntegrantesUpdateDTO.idPersona);
+				&& Objects.equals(this.idPersona, tarjetaIntegrantesUpdateDTO.idPersona)
+				&& Objects.equals(this.idTipoColegio, tarjetaIntegrantesUpdateDTO.idTipoColegio)
+				&& Objects.equals(this.colegio, tarjetaIntegrantesUpdateDTO.colegio);
 
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(fechaCargo, cargo, idCargo, capitalSocial, idComponente, idPersona);
+		return Objects.hash(fechaCargo, cargo, idCargo, capitalSocial, idComponente, idPersona, idTipoColegio, colegio);
 	}
 
 	@Override
@@ -193,6 +214,8 @@ public class TarjetaIntegrantesUpdateDTO {
 		sb.append("    capitalSocial: ").append(toIndentedString(capitalSocial)).append("\n");
 		sb.append("    idComponente: ").append(toIndentedString(idComponente)).append("\n");
 		sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
+		sb.append("    idTipoColegio: ").append(toIndentedString(idTipoColegio)).append("\n");
+		sb.append("    colegio: ").append(toIndentedString(colegio)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
