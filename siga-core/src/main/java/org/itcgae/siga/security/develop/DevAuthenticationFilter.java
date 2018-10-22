@@ -49,8 +49,8 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			String grupo = request.getParameter("profile");
 			String institucion = request.getParameter("location");
 			
-			UserCgae user = new UserCgae(dni, grupo, institucion, null,null);
-			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,certs[0]));
+			UserCgae user = new UserCgae(null, grupo, institucion, null,null);
+			return authenticationManager.authenticate(new UserAuthenticationToken(null, user,certs[0]));
 		} catch (Exception e) {
 			throw new BadCredentialsException(e.getMessage());
 		}

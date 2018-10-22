@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoEntity;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmRol;
@@ -80,7 +81,11 @@ public class SigaUserDetailsService implements UserDetailsService {
 		HashMap<String, String> response = new HashMap<String, String>();
 
 		AdmUsuariosExample usuarioExample = new AdmUsuariosExample();
-		usuarioExample.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
+		if (null != user.getDni()) {
+			usuarioExample.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(institucion));
+		}else{
+			usuarioExample.createCriteria().andIdusuarioEqualTo(SigaConstants.IdUsuarioPuertaAtras).andIdinstitucionEqualTo(Short.valueOf(institucion));
+		}
 		// Obtenemos el Usuario para comprobar todas sus instituciones
 
 		List<AdmUsuarios> usuarios = usuarioMapper.selectByExample(usuarioExample);
@@ -89,9 +94,10 @@ public class SigaUserDetailsService implements UserDetailsService {
 		if (null != usuarios && usuarios.size() >0) {
 			
 			List<String> idperfiles = new ArrayList<String>();
-			
-			
-			
+			if (!(null != user.getDni())) {
+				user.setDni(usuarios.get(0).getNif());
+				dni = usuarios.get(0).getNif();
+			}
 			
 			String[] grupos = grupo.split(",");
 			if (null != grupos && grupos.length>0) {
