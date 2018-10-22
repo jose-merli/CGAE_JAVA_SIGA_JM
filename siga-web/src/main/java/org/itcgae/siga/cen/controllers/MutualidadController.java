@@ -24,7 +24,8 @@ public class MutualidadController {
 	ResponseEntity<MutualidadResponseDTO> getEstadoMutualista(EstadoSolicitudDTO estadoSolicitudDTO) {
 		
 		MutualidadResponseDTO response = _mutualidadService.getEstadoMutualista();
-		if(response.isError()!= false)
+		//TODO: se deja esta comprobacion de momento
+		if(response.getIdSolicitudRespuesta()!=null)
 			return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
@@ -33,7 +34,8 @@ public class MutualidadController {
 	ResponseEntity<MutualidadResponseDTO> getEstadoSolicitud(EstadoSolicitudDTO estadoSolicitudDTO) {
 		
 		MutualidadResponseDTO response = _mutualidadService.getEstadoSolicitud();
-		if(response.isError()!= false)
+		//TODO: se deja esta comprobacion de momento
+		if(response.getIdSolicitudRespuesta()!=null)
 			return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
@@ -42,7 +44,8 @@ public class MutualidadController {
 	ResponseEntity<MutualidadResponseDTO> getEnums(EstadoSolicitudDTO estadoSolicitudDTO) {
 		
 		MutualidadResponseDTO response = _mutualidadService.getEnums();
-		if(response.isError()!= false)
+		//TODO: se deja esta comprobacion de momento
+		if(response.getIdSolicitudRespuesta()!=null)
 			return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
@@ -51,7 +54,8 @@ public class MutualidadController {
 	ResponseEntity<MutualidadResponseDTO> solicitudPolizaAccuGratuitos(EstadoSolicitudDTO estadoSolicitudDTO) {
 		
 		MutualidadResponseDTO response = _mutualidadService.MGASolicitudPolizaAccuGratuitos();
-		if(response.isError()!= false)
+		//TODO: se deja esta comprobacion de momento
+		if(response.getIdSolicitudRespuesta()!=null)
 			return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
@@ -60,7 +64,8 @@ public class MutualidadController {
 	ResponseEntity<MutualidadResponseDTO> solicitudPolizaProfesional(EstadoSolicitudDTO estadoSolicitudDTO) {
 		
 		MutualidadResponseDTO response = _mutualidadService.MGASolicitudPolizaProfesional();
-		if(response.isError()!= false)
+		//TODO: se deja esta comprobacion de momento
+		if(response.getIdSolicitudRespuesta()!=null)
 			return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
@@ -69,7 +74,8 @@ public class MutualidadController {
 	ResponseEntity<MutualidadResponseDTO> obtenerCuotaYCapObjetivo(EstadoSolicitudDTO estadoSolicitudDTO) {
 		
 		MutualidadResponseDTO response = _mutualidadService.ObtenerCuotaYCapObjetivo();
-		if(response.isError()!= false)
+		//TODO: se deja esta comprobacion de momento
+		if(response.getIdSolicitudRespuesta()!=null)
 			return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
