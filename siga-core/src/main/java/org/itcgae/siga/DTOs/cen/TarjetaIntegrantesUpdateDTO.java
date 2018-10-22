@@ -12,7 +12,7 @@ public class TarjetaIntegrantesUpdateDTO {
 	private Date fechaCargo;
 	private String cargo; //  descripcionCargo: null --->cargo 
 	private String idCargo;            //  cargo:  ---> idCargo
-	private String capitalSocial; //  participacionSociedad --> capitalSocial 
+	private Double capitalSocial; //  participacionSociedad --> capitalSocial 
 	private String idComponente;
 	private String idPersona;
 	private String flagSocio;
@@ -109,18 +109,18 @@ public class TarjetaIntegrantesUpdateDTO {
 	/**
 	 *
 	 */
-	public TarjetaIntegrantesUpdateDTO capitalSocial(String capitalSocial){
+	public TarjetaIntegrantesUpdateDTO capitalSocial(Double capitalSocial){
 		this.capitalSocial = capitalSocial;
 		return this;
 	}
 	
 	@JsonProperty("capitalSocial")
-	public String getCapitalSocial() {
+	public Double getCapitalSocial() {
 		return capitalSocial;
 	}
 	
 	
-	public void setCapitalSocial(String capitalSocial) {
+	public void setCapitalSocial(Double capitalSocial) {
 		this.capitalSocial = capitalSocial;
 	}
 	
