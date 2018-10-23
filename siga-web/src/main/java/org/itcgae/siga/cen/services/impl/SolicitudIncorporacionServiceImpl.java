@@ -43,6 +43,7 @@ import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
@@ -128,9 +129,11 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	@Autowired
 	private CenColegiadoMapper _cenColegiadoMapper;
 	
-	
 	@Autowired
 	private CenClienteMapper _cenClienteMapper;
+	
+	@Autowired
+	private CenBancosMapper _cenBancosMapper;
 	
 	
 	@Override
@@ -842,6 +845,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		banco.setIdpais(solicitud.getIdpais());
 		banco.setNombre(codigoBanco);
 		banco.setUsumodificacion(usuario.getIdusuario());
+		_cenBancosMapper.insert(banco);
 		
 		
 		
