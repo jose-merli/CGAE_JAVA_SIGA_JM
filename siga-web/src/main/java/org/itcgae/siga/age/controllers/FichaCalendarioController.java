@@ -4,12 +4,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.age.CalendarDTO;
 import org.itcgae.siga.DTOs.age.CalendarItem;
-import org.itcgae.siga.DTOs.age.PermisoCalendarioItem;
+import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.age.PermisosCalendarioDTO;
 import org.itcgae.siga.DTOs.age.PermisosPerfilesCalendarDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.adm.service.IGestionUsuariosGruposService;
 import org.itcgae.siga.age.service.IFichaCalendarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,22 +25,13 @@ public class FichaCalendarioController {
 	
 	@Autowired
 	private IFichaCalendarioService fichaCalendarioService;
-	
-	@Autowired
-	private IGestionUsuariosGruposService gestionUsuariosGruposService;
-	
+		
 	@RequestMapping(value = "fichaCalendario/getCalendarType",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getCalendarType(HttpServletRequest request) {
 		ComboDTO response = fichaCalendarioService.getCalendarType(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
-	
-	@RequestMapping(value = "fichaCalendario/profiles", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getUsersProfile(HttpServletRequest request) {
-		ComboDTO response = gestionUsuariosGruposService.getUsersProfile(request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-	}
-	
+		
 	@RequestMapping(value = "fichaCalendario/updatePermissions", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updatePermissions(@RequestBody PermisosCalendarioDTO permisosCalendarioDTO,
 			HttpServletRequest request) {
@@ -54,10 +45,28 @@ public class FichaCalendarioController {
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "fichaCalendario/updateCalendar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateCalendar(@RequestBody CalendarItem calendarItem,
+			HttpServletRequest request) {
+		UpdateResponseDTO response = fichaCalendarioService.updateCalendar(calendarItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "fichaCalendario/getProfilesPermissions", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<PermisosPerfilesCalendarDTO> getProfilesPermissions(String idCalendario, HttpServletRequest request) {
 		PermisosPerfilesCalendarDTO response = fichaCalendarioService.getProfilesPermissions(idCalendario, request);
 		return new ResponseEntity<PermisosPerfilesCalendarDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "fichaCalendario/getCalendar", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<CalendarDTO> getCalendar(String idCalendario, HttpServletRequest request) {
+		CalendarDTO response = fichaCalendarioService.getCalendar(idCalendario, request);
+		return new ResponseEntity<CalendarDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCalendario/getEventNotifications", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<NotificacionEventoDTO> getEventNotifications(String idCalendario, HttpServletRequest request) {
+		NotificacionEventoDTO response = fichaCalendarioService.getEventNotifications(idCalendario, request);
+		return new ResponseEntity<NotificacionEventoDTO>(response, HttpStatus.OK);
+	}
 }

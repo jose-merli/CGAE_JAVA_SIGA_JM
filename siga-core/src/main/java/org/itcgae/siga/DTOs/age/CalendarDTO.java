@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class CalendarDTO   {
   
   private List<CalendarItem> calendarItems = new ArrayList<CalendarItem>();
+  private CalendarItem calendar = new CalendarItem();
   private Error error = null;
 
   
@@ -29,6 +30,23 @@ public class CalendarDTO   {
   
   public void setCalendarItems(List<CalendarItem> calendarItems) {
     this.calendarItems = calendarItems;
+  }
+  
+  /**
+   * 
+   **/
+  public CalendarDTO calendar(CalendarItem calendar) {
+    this.calendar = calendar;
+    return this;
+  }
+  
+  @JsonProperty("calendar")
+  public CalendarItem calendar() {
+    return calendar;
+  }
+  
+  public void setCalendar(CalendarItem calendar) {
+    this.calendar = calendar;
   }
 
   
@@ -61,12 +79,13 @@ public class CalendarDTO   {
     }
     CalendarDTO calendarDTO = (CalendarDTO) o;
     return Objects.equals(this.calendarItems, calendarDTO.calendarItems) &&
+        Objects.equals(this.calendar, calendarDTO.calendar)&&
         Objects.equals(this.error, calendarDTO.error);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(calendarItems, error);
+    return Objects.hash(calendarItems, calendar, error);
   }
 
   @Override
@@ -75,6 +94,7 @@ public class CalendarDTO   {
     sb.append("class CalendarDTO {\n");
     
     sb.append("    calendarItems: ").append(toIndentedString(calendarItems)).append("\n");
+    sb.append("    calendar: ").append(toIndentedString(calendar)).append("\n");
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("}");
     return sb.toString();
