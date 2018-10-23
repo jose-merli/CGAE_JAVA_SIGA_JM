@@ -442,11 +442,11 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 				idLenguaje = usuario.getIdlenguaje();
 
 				LOGGER.info(
-						"search() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Entrada a cenNocolegiadoExtendsMapper para busqueda de personas colegiadas por filtro");
+						"search() / cenTiposCVSubtipo1ExtendsMapper.getHistory() -> Entrada a cenTiposCVSubtipo1ExtendsMapper para busqueda");
 				
-				tipoCurricularItems = cenTiposcvExtendsMapper.getHistory(tipoCurricularItem, String.valueOf(idInstitucion), idLenguaje);
+				tipoCurricularItems = cenTiposCVSubtipo1ExtendsMapper.getHistory(tipoCurricularItem, String.valueOf(idInstitucion), idLenguaje);
 				LOGGER.info(
-						"search() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenNocolegiadoExtendsMapper para busqueda de personas no colegiadas por filtro");
+						"search() / cenTiposCVSubtipo1ExtendsMapper.getHistory() -> Salida de cenTiposCVSubtipo1ExtendsMapper para busqueda");
 
 				tipoCurricular.setTipoCurricularItems(tipoCurricularItems);
 				;

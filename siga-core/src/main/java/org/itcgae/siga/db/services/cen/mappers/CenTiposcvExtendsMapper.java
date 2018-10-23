@@ -27,16 +27,4 @@ public interface CenTiposcvExtendsMapper extends CenTiposcvMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> selectCategoriaCV(String idLenguaje);
-	
-	
-	@SelectProvider(type = CenTiposcvSqlExtendsProvider.class, method = "getHistory")
-	@Results({
-		@Result(column = "IDTIPOCV", property = "idTipoCV", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDTIPOCVSUBTIPO1", property = "idTipoCvSubtipo1", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "CODIGOEXTERNO", property = "codigoExterno", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
-	})
-	List<TipoCurricularItem> getHistory(TipoCurricularItem tipoCurricularItem, String idInstitucion, String idLenguaje);
-	
 }
