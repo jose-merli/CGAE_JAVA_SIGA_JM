@@ -18,14 +18,14 @@ import org.springframework.stereotype.Service;
 @Primary
 public interface CenTiposCVSubtipo1ExtendsMapper extends CenTiposcvsubtipo1Mapper{
 
-	@SelectProvider(type = CenTiposCVSubtipo1SqlExtendsProvider.class, method = "search")
+	@SelectProvider(type = CenTiposCVSubtipo1SqlExtendsProvider.class, method = "searchTipoCurricular")
 	@Results({
 		@Result(column = "IDTIPOCV", property = "idTipoCV", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOCVSUBTIPO1", property = "idTipoCvSubtipo1", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CODIGOEXTERNO", property = "codigoExterno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 	})
-	List<TipoCurricularItem> search(TipoCurricularItem tipoCurricularItem, String idLenguaje, String idInstitucion);
+	List<TipoCurricularItem> searchTipoCurricular(TipoCurricularItem tipoCurricularItem, String idLenguaje, String idInstitucion);
 	
 	@SelectProvider(type = CenTiposCVSubtipo1SqlExtendsProvider.class, method = "getMaxIdCvSubtipo1")
 	@Results({ @Result(column = "IDTIPOCVSUBTIPO1", property = "newId", jdbcType = JdbcType.VARCHAR)

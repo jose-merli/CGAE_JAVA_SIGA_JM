@@ -7,6 +7,9 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.CatalogoMaestroDTO;
+import org.itcgae.siga.DTOs.adm.CatalogoMaestroItem;
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.TipoCurricularDTO;
@@ -18,10 +21,17 @@ import org.itcgae.siga.cen.services.ITipoCurricularService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenNocolegiado;
+import org.itcgae.siga.db.entities.CenNocolegiadoExample;
+import org.itcgae.siga.db.entities.CenTiposcv;
+import org.itcgae.siga.db.entities.CenTiposcvExample;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo1;
+import org.itcgae.siga.db.entities.CenTiposcvsubtipo1Example;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo1Key;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
+import org.itcgae.siga.db.entities.GenTablasMaestras;
+import org.itcgae.siga.db.entities.GenTablasMaestrasExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
@@ -90,7 +100,7 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 	}
 
 	@Override
-	public TipoCurricularDTO search(int numPagina, TipoCurricularItem tipoCurricularItem, HttpServletRequest request) {
+	public TipoCurricularDTO searchTipoCurricular(int numPagina, TipoCurricularItem tipoCurricularItem, HttpServletRequest request) {
 		LOGGER.info("search() -> Entrada al servicio para la búsqueda por filtro de categoría curricular");
 
 		List<TipoCurricularItem> tipoCurricularItems = new ArrayList<TipoCurricularItem>();
@@ -117,7 +127,7 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 
 				LOGGER.info(
 						"search() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Entrada a cenNocolegiadoExtendsMapper para busqueda de personas colegiadas por filtro");
-				tipoCurricularItems = cenTiposCVSubtipo1ExtendsMapper.search(tipoCurricularItem, idLenguaje,
+				tipoCurricularItems = cenTiposCVSubtipo1ExtendsMapper.searchTipoCurricular(tipoCurricularItem, idLenguaje,
 						String.valueOf(idInstitucion));
 				LOGGER.info(
 						"search() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenNocolegiadoExtendsMapper para busqueda de personas no colegiadas por filtro");
@@ -254,6 +264,8 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 		LOGGER.info("updateTipoCurricular() -> Entrada al servicio para actualizar información");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 
+		CenTiposcvsubtipo1 record = new CenTiposcvsubtipo1();
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -270,14 +282,185 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-				
-				for (TipoCurricularItem tipoCurricularItem: tipoCurricularDTO.getTipoCurricularItems()) {
-					
-				  // buscar los datos en subtipocv
+
+				for (TipoCurricularItem tipoCurricularItem : tipoCurricularDTO.getTipoCurricularItems()) {
+
+					// consultamos si existe la descripción
+					GenRecursosCatalogosExample genRecursosCatalogosExample = new GenRecursosCatalogosExample();
+					genRecursosCatalogosExample.createCriteria()
+							.andDescripcionEqualTo(tipoCurricularItem.getDescripcion())
+							.andIdinstitucionEqualTo(idInstitucion).andIdlenguajeEqualTo(usuario.getIdlenguaje());
+					List<GenRecursosCatalogos> genRecursosCatalogos = genRecursosCatalogosExtendsMapper
+							.selectByExample(genRecursosCatalogosExample);
+
+					if (null != genRecursosCatalogos && !genRecursosCatalogos.isEmpty()) {
+						record.setDescripcion(genRecursosCatalogos.get(0).getIdrecurso());
+					} else {
+						GenRecursosCatalogos genRecursosCatalogo = new GenRecursosCatalogos();
+
+						genRecursosCatalogo.setCampotabla("DESCRIPCION");
+						genRecursosCatalogo.setDescripcion(tipoCurricularItem.getDescripcion());
+						genRecursosCatalogo.setFechamodificacion(new Date());
+						genRecursosCatalogo.setIdinstitucion(idInstitucion);
+						genRecursosCatalogo.setIdlenguaje(usuario.getIdlenguaje());
+
+						NewIdDTO idRecursoBD = genRecursosCatalogosExtendsMapper
+								.getMaxIdRecursoCatalogo(String.valueOf(idInstitucion), usuario.getIdlenguaje());
+						if (idRecursoBD == null) {
+							genRecursosCatalogo.setIdrecurso("1");
+						} else {
+							long idRecurso = Long.parseLong(idRecursoBD.getNewId()) + 1;
+							genRecursosCatalogo.setIdrecurso(String.valueOf(idRecurso));
+						}
+
+						genRecursosCatalogo.setIdrecursoalias("cen_tiposcvsubtipo1.descripcion." + idInstitucion + "."
+								+ genRecursosCatalogo.getIdrecurso());
+
+						genRecursosCatalogo.setNombretabla("CEN_TIPOSCVSUBTIPO1");
+						genRecursosCatalogo.setUsumodificacion(usuario.getUsumodificacion());
+
+						if (genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo) == 1) {
+							record.setDescripcion(genRecursosCatalogo.getIdrecurso());
+						}
+					}
+
+					if (tipoCurricularItem.getIdTipoCV() != null && tipoCurricularItem.getIdTipoCvSubtipo1() != null
+							&& usuario.getIdinstitucion() != null) {
+						record.setCodigoext(tipoCurricularItem.getCodigoExterno());
+						record.setFechamodificacion(new Date());
+						record.setIdinstitucion(idInstitucion);
+						record.setIdtipocv(Short.valueOf(tipoCurricularItem.getIdTipoCV()));
+						record.setIdtipocvsubtipo1(Short.valueOf(tipoCurricularItem.getIdTipoCvSubtipo1()));
+						record.setUsumodificacion(usuario.getUsumodificacion());
+
+						if (cenTiposCVSubtipo1ExtendsMapper.updateByPrimaryKey(record) == 1) {
+							updateResponseDTO.setStatus(SigaConstants.OK);
+						} else {
+							updateResponseDTO.setStatus(SigaConstants.KO);
+						}
+					}
 				}
 			}
 		}
-		return null;
+
+		LOGGER.info("updateTipoCurricular() -> Salida del servicio para actualizar información");
+		return updateResponseDTO;
+	}
+
+	@Override
+	public DeleteResponseDTO deleteTipoCurricular(TipoCurricularDTO tipoCurricularDTO, HttpServletRequest request) {
+		LOGGER.info("deleteTipoCurricular() -> Entrada al servicio para eliminar tipo curricular");
+		
+		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
+		int response = 0;
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"deleteTipoCurricular() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"deleteTipoCurricular() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				// información a modificar
+				CenTiposcvsubtipo1 cenTiposcvsubtipo1 = new CenTiposcvsubtipo1();
+				cenTiposcvsubtipo1.setFechamodificacion(new Date());
+				cenTiposcvsubtipo1.setUsumodificacion(usuario.getIdusuario());
+				cenTiposcvsubtipo1.setFechaBaja(new Date());
+
+				// filtrado para sentencia sql
+				List<Short> idTipoCvDelete = new ArrayList<Short>();
+				List<Short> idTipoCvSuptipo1Delete = new ArrayList<Short>();
+				for (TipoCurricularItem tipoCurricularItem : tipoCurricularDTO.getTipoCurricularItems()) {
+					idTipoCvDelete.add(Short.valueOf(tipoCurricularItem.getIdTipoCV()));
+					idTipoCvSuptipo1Delete.add(Short.valueOf(tipoCurricularItem.getIdTipoCvSubtipo1()));
+				}
+
+				CenTiposcvsubtipo1Example cenTiposcvsubtipo1Example = new CenTiposcvsubtipo1Example();
+				cenTiposcvsubtipo1Example.createCriteria().andIdtipocvIn(idTipoCvDelete).andIdtipocvsubtipo1In(idTipoCvSuptipo1Delete).andIdinstitucionEqualTo(idInstitucion);
+				LOGGER.info(
+						"deleteTipoCurricular() / cenTiposcvExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para eliminar no colegiado");
+				response = cenTiposCVSubtipo1ExtendsMapper.updateByExampleSelective(cenTiposcvsubtipo1, cenTiposcvsubtipo1Example);
+				LOGGER.info(
+						"deleteTipoCurricular() / cenTiposcvExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para eliminar no colegiado");
+
+			} else {
+				LOGGER.warn(
+						"deleteTipoCurricular() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("deleteTipoCurricular() -> idInstitucion del token nula");
+		}
+
+		// comprobacion actualización
+		if (response >= 1) {
+			LOGGER.info("deleteTipoCurricular() -> OK. Delete para tipo curricular realizado correctamente");
+			deleteResponseDTO.setStatus(SigaConstants.OK);
+		} else {
+			LOGGER.info("deleteTipoCurricular() -> KO. Delete para tipo curricular NO realizado correctamente");
+			deleteResponseDTO.setStatus(SigaConstants.KO);
+		}
+
+		LOGGER.info("deleteTipoCurricular() -> Salida del servicio para eliminar tipo curricular");
+		return deleteResponseDTO;
+	}
+
+	@Override
+	public TipoCurricularDTO getHistory(TipoCurricularItem tipoCurricularItem, HttpServletRequest request) {
+		LOGGER.info("search() -> Entrada al servicio para la búsqueda por filtro de categoría curricular");
+
+		List<TipoCurricularItem> tipoCurricularItems = new ArrayList<TipoCurricularItem>();
+		TipoCurricularDTO tipoCurricular = new TipoCurricularDTO();
+		String idLenguaje = null;
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"search() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"search() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				idLenguaje = usuario.getIdlenguaje();
+
+				LOGGER.info(
+						"search() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Entrada a cenNocolegiadoExtendsMapper para busqueda de personas colegiadas por filtro");
+				
+				tipoCurricularItems = cenTiposcvExtendsMapper.getHistory(tipoCurricularItem, String.valueOf(idInstitucion), idLenguaje);
+				LOGGER.info(
+						"search() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenNocolegiadoExtendsMapper para busqueda de personas no colegiadas por filtro");
+
+				tipoCurricular.setTipoCurricularItems(tipoCurricularItems);
+				;
+			} else {
+				LOGGER.warn(
+						"search() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("search() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("search() -> Salida del servicio para la búsqueda por filtro de categoría curricular");
+		return tipoCurricular;
 	}
 
 }
