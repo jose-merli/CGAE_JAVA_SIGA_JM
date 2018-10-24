@@ -1,5 +1,7 @@
 package org.itcgae.siga.form.services;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.form.CursoDTO;
@@ -15,6 +17,10 @@ public interface IBusquedaCursosService {
 	public ComboDTO getTemasCursos(HttpServletRequest request);
 	
 	public CursoDTO searchCurso(CursoItem cursoItem, HttpServletRequest request);
+	
+	public int archivarCursos(List<CursoItem> listCursoItem, HttpServletRequest request);
+	
+	public int desarchivarCursos(List<CursoItem> listCursoItem, HttpServletRequest request);
 	
 	
 }

@@ -222,6 +222,47 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.tutorResponsable','Tutor / Responsable#EU','0','3',sysdate,'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.tutorResponsable','Tutor / Responsable#GL','0','4',sysdate,'0','19');
 
+--Desarchivar
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.boton.desarchivar','Des-archivar','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.boton.desarchivar','Des-arxivar','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.boton.desarchivar','Des-archivar#EU','0','3',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.boton.desarchivar','Des-archivar#GL','0','4',sysdate,'0','19');
+
+--Curso archivado
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.curso.archivado','curso archivado','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.curso.archivado','curs arxivat','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.curso.archivado','curso archivado#EU','0','3',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.curso.archivado','curso archivado#GL','0','4',sysdate,'0','19');
+
+--Cursos archivados
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.cursos.archivados','cursos archivados','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.cursos.archivados','cursos arxivats','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.cursos.archivados','cursos archivados#EU','0','3',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.cursos.archivados','cursos archivados#GL','0','4',sysdate,'0','19');
+
+--Curso desarchivado
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.curso.desarchivado','curso des-archivado','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.curso.desarchivado','curs des-arxivat','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.curso.desarchivado','curso des-archivado#EU','0','3',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.curso.desarchivado','curso des-archivado#GL','0','4',sysdate,'0','19');
+
+--Cursos desarchivados
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.cursos.desarchivados','cursos des-archivados','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.cursos.desarchivados','cursos des-arxivats','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.cursos.desarchivados','cursos des-archivados#EU','0','3',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.mensaje.cursos.desarchivados','cursos des-archivados#GL','0','4',sysdate,'0','19');
+
+--Botón anunciar
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.boton.anunciar','Anunciar','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.boton.anunciar','Anunciar','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.boton.anunciar','Anunciar#EU','0','3',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.boton.anunciar','Anunciar#GL','0','4',sysdate,'0','19');
+
+--Botón des-anunciar
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.boton.desanunciar','Des-anunciar','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.boton.desanunciar','Des-anunciar','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.boton.desanunciar','Des-anunciar#EU','0','3',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaCursos.literal.boton.desanunciar','Des-anunciar#GL','0','4',sysdate,'0','19');
 
 
 

@@ -312,4 +312,28 @@ public class SigaConstants {
 			return this.id;
 		}
 	} 
+	
+	public static final String PLAZAS_DISPO_SI = "1";
+	
+	public static final String PLAZAS_DISPO_NO = "0";
+	
+	public static final String ESTADO_CURSO_ABIERTO = "0";
+	
+	public static final String ESTADO_CURSO_ANUNCIADO = "1";
+	
+	public static final String ESTADO_CURSO_EN_CURSO = "2";
+	
+	public static final String ESTADO_CURSO_IMPARTIDO = "3";
+	
+	public static final String ESTADO_CURSO_FINALIZADO = "4";
+	
+	public static final String ESTADO_CURSO_CANCELADO = "5";
+	
+	public static final Integer CURSO_SIN_ARCHIVAR = 0;
+	
+	public static final Integer CURSO_ARCHIVADO = 1;
+	
+	public static final String AUX_TRANS_TILDES_1 = "áéíóúàèìòùãõâêîôôäëïöüçÁÉÍÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÏÖÜÇ";
+	
+	public static final String AUX_TRANS_TILDES_2 = "aeiouaeiouaoaeiooaeioucAEIOUAEIOUAOAEIOOAEIOUC";
 }
