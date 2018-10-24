@@ -1,7 +1,9 @@
 package org.itcgae.siga.DTOs.cen;
 
+import java.util.Date;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TipoCurricularItem {
@@ -11,6 +13,8 @@ public class TipoCurricularItem {
 	private String tipoCategoriaCurricular;
 	private String codigoExterno;
 	private String descripcion;
+	 @JsonFormat(pattern = "dd-MM-yyyy")
+	  private Date fechaBaja = null;
 	
 	@JsonProperty("idTipoCV")
 	public String getIdTipoCV() {
@@ -50,6 +54,15 @@ public class TipoCurricularItem {
 		this.descripcion = descripcion;
 	}
 	
+	
+	@JsonProperty("fechaBaja")
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -63,12 +76,13 @@ public class TipoCurricularItem {
 	    		Objects.equals(this.idTipoCvSubtipo1, tipoCurricularItem.idTipoCvSubtipo1) &&
 	    		Objects.equals(this.tipoCategoriaCurricular, tipoCurricularItem.tipoCategoriaCurricular) &&
 	    		Objects.equals(this.codigoExterno, tipoCurricularItem.codigoExterno) &&
-	    		Objects.equals(this.descripcion, tipoCurricularItem.descripcion);
+	    		Objects.equals(this.descripcion, tipoCurricularItem.descripcion) &&
+	    		Objects.equals(this.fechaBaja, tipoCurricularItem.fechaBaja);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(tipoCategoriaCurricular, codigoExterno, descripcion);
+	    return Objects.hash(tipoCategoriaCurricular, codigoExterno, descripcion, fechaBaja);
 	}
 
 	
@@ -82,6 +96,7 @@ public class TipoCurricularItem {
 	    sb.append("    tipoCategoriaCurricular: ").append(toIndentedString(tipoCategoriaCurricular)).append("\n");
 	    sb.append("    codigoExterno: ").append(toIndentedString(codigoExterno)).append("\n");
 	    sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
+	    sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}

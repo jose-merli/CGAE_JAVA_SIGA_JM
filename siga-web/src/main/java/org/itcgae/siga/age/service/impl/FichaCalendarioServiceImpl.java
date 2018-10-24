@@ -9,7 +9,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.age.CalendarDTO;
 import org.itcgae.siga.DTOs.age.CalendarItem;
+import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
+import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
 import org.itcgae.siga.DTOs.age.PermisoCalendarioItem;
 import org.itcgae.siga.DTOs.age.PermisosCalendarioDTO;
 import org.itcgae.siga.DTOs.age.PermisosPerfilesCalendarDTO;
@@ -21,10 +24,12 @@ import org.itcgae.siga.age.service.IFichaCalendarioService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AgeCalendario;
+import org.itcgae.siga.db.entities.AgeCalendarioExample;
 import org.itcgae.siga.db.entities.AgePermisoscalendario;
 import org.itcgae.siga.db.entities.AgePermisoscalendarioExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeCalendarioExtendsMapper;
+import org.itcgae.siga.db.services.age.mappers.AgeNotificacioneseventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgePermisosCalendarioExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeTipocalendarioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -47,6 +52,10 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 
 	@Autowired
 	private AgePermisosCalendarioExtendsMapper agePermisosCalendarioExtendsMapper;
+	
+	@Autowired
+	private AgeNotificacioneseventoExtendsMapper ageNotificacioneseventoExtendsMapper;
+	
 
 	@Override
 	public ComboDTO getCalendarType(HttpServletRequest request) {
@@ -76,7 +85,6 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 				comboItems = ageTipocalendarioExtendsMapper.getCalendarType(usuario.getIdlenguaje());
 				LOGGER.info(
 						"getCalendarType() / ageTipocalendarioExtendsMapper.getCalendarType() -> Salida de ageTipocalendarioExtendsMapper para obtener los diferentes tipos de calendarios");
-
 
 			}
 		}
@@ -238,6 +246,108 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 	}
 
 	@Override
+	public UpdateResponseDTO updateCalendar(CalendarItem calendarItem, HttpServletRequest request) {
+		int response = 0;
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"updateCalendar() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"updateCalendar() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				AgeCalendarioExample exampleCalendario = new AgeCalendarioExample();
+				exampleCalendario.createCriteria().andIdcalendarioEqualTo(Long.valueOf(calendarItem.getIdCalendario()))
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+				LOGGER.info(
+						"updateCalendar() / ageCalendarioExtendsMapper.selectByExample(examplePermiso) -> Entrada a ageCalendarioExtendsMapper para buscar si el calendario ya existe");
+
+				List<AgeCalendario> calendarios = ageCalendarioExtendsMapper.selectByExample(exampleCalendario);
+
+				LOGGER.info(
+						"updateCalendar() / ageCalendarioExtendsMapper.selectByExample(examplePermiso) -> Salida a ageCalendarioExtendsMapper para buscar si el calendario ya existe");
+
+				if (null != calendarios && calendarios.size() > 0) {
+					AgeCalendario calendario = calendarios.get(0);
+
+					LOGGER.info(
+							"insertCalendar() / ageCalendarioExtendsMapper.updateByPrimaryKey(calendario) -> Entrada a ageCalendarioExtendsMapper para modificar el calendario");
+
+					calendario.setFechamodificacion(new Date());
+					calendario.setUsumodificacion(usuario.getIdusuario().longValue());
+					calendario.setColor(calendarItem.getColor());
+					calendario.setDescripcion(calendarItem.getDescripcion());
+					response = ageCalendarioExtendsMapper.updateByPrimaryKey(calendario);
+
+					LOGGER.info(
+							"insertCalendar() / ageCalendarioExtendsMapper.updateByPrimaryKey(calendario) -> Salida a ageCalendarioExtendsMapper para modificar el calendario");
+
+				}
+
+				if (response == 0) {
+					error.setCode(400);
+					error.setDescription("Error al modificar nuevo calendario");
+				} else {
+					error.setCode(200);
+				}
+			}
+		}
+
+		updateResponseDTO.setError(error);
+		return updateResponseDTO;
+	}
+
+	@Override
+	public CalendarDTO getCalendar(String idCalendario, HttpServletRequest request) {
+		LOGGER.info(
+				"getCalendar() -> Entrada al servicio para obtener un calendario especifico");
+
+		AgeCalendario calendar = new AgeCalendario();
+		CalendarDTO calendarioDTO = new CalendarDTO();
+		CalendarItem calendarItem = new CalendarItem();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			LOGGER.info(
+					"getCalendar() / ageCalendarioExtendsMapper.selectByPrimaryKey(idCalendario) -> Entrada a ageCalendarioExtendsMapper para obtener los permisos de los perfiles");
+			calendar = ageCalendarioExtendsMapper.selectByPrimaryKey(Long.parseLong(idCalendario));
+			LOGGER.info(
+					"getCalendar() / ageCalendarioExtendsMapper.selectByPrimaryKey(idCalendario) -> Salida de ageCalendarioExtendsMapper para obtener los permisos de los perfiles");
+
+			if (calendar != null) {
+
+				calendarItem.setIdTipoCalendario(calendar.getIdtipocalendario().toString());
+				calendarItem.setColor(calendar.getColor());
+				calendarItem.setDescripcion(calendar.getDescripcion());
+			}
+
+			calendarioDTO.setCalendar(calendarItem);
+
+		}
+
+		LOGGER.info(
+				"getCalendar() -> Salida del servicio para obtener un calendario especifico");
+
+		return calendarioDTO;
+	}
+
+	@Override
 	public PermisosPerfilesCalendarDTO getProfilesPermissions(String idCalendario, HttpServletRequest request) {
 		LOGGER.info(
 				"getPermisosProfiles() -> Entrada al servicio para obtener los permisos de calendario de todos los perfiles");
@@ -251,19 +361,49 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 
 		if (null != idInstitucion) {
 			LOGGER.info(
-					"getCalendarType() / agePermisosCalendarioExtendsMapper.getPermisosProfiles() -> Entrada a agePermisosCalendarioExtendsMapper para obtener los permisos de los perfiles");
+					"getProfilesPermissions() / agePermisosCalendarioExtendsMapper.getPermisosProfiles() -> Entrada a agePermisosCalendarioExtendsMapper para obtener los permisos de los perfiles");
 			profilesCalendar = agePermisosCalendarioExtendsMapper.getProfilesPermissions(idCalendario,
 					idInstitucion.toString());
 			LOGGER.info(
-					"getCalendarType() / agePermisosCalendarioExtendsMapper.getPermisosProfiles() -> Salida de agePermisosCalendarioExtendsMapper para obtener los permisos de los perfiles");
+					"getProfilesPermissions() / agePermisosCalendarioExtendsMapper.getPermisosProfiles() -> Salida de agePermisosCalendarioExtendsMapper para obtener los permisos de los perfiles");
+
+			permisosPerfilesCalendarioDTO.setPermisosPerfilesCalendar(profilesCalendar);
+
 		}
 
 		LOGGER.info(
 				"getPermisosProfiles() -> Salida del servicio para obtener los permisos de calendario de todos los perfiles");
 
-		permisosPerfilesCalendarioDTO.setPermisosPerfilesCalendar(profilesCalendar);
-
 		return permisosPerfilesCalendarioDTO;
 	}
+
+	@Override
+	public NotificacionEventoDTO getEventNotifications(String idCalendario, HttpServletRequest request) {
+		LOGGER.info(
+				"getEventNotifications() -> Entrada al servicio para obtener las notificaciones de eventos de un calendario especifico");
+
+		List<NotificacionEventoItem> eventNotifications = new ArrayList<NotificacionEventoItem>();
+		NotificacionEventoDTO eventNotificationDTO = new NotificacionEventoDTO();
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			LOGGER.info(
+					"getEventNotifications() / ageNotificacioneseventoExtendsMapper.getEventNotifications() -> Entrada a ageNotificacioneseventoMapper para obtener las notificaciones de eventos de un calendario");
+			eventNotifications = ageNotificacioneseventoExtendsMapper.getEventNotifications(idCalendario, idInstitucion.toString());
+			LOGGER.info(
+					"getEventNotifications() / ageNotificacioneseventoExtendsMapper.getEventNotifications() -> Salida de ageNotificacioneseventoMapper para obtener las notificaciones de eventos de un calendario");
+
+			eventNotificationDTO.setEventNotificationItems(eventNotifications);
+
+		}
+
+		LOGGER.info(
+				"getEventNotifications() -> Salida del servicio para obtener las notificaciones de eventos de un calendario especifico");
+
+		return eventNotificationDTO;
+	}
+	
 
 }

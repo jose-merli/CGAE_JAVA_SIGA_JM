@@ -1,6 +1,9 @@
 package org.itcgae.siga.db.services.cen.providers;
 
+import java.text.SimpleDateFormat;
+
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 
 public class CenTiposModificacionesSqlExtendsProvider {
 	
@@ -14,4 +17,12 @@ public class CenTiposModificacionesSqlExtendsProvider {
 		return sql.toString();
 	}
 
+	public String searchModificationRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguage) {
+		
+		SQL sql = new SQL();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		
+		
+		return sql.toString();
+	}
 }
