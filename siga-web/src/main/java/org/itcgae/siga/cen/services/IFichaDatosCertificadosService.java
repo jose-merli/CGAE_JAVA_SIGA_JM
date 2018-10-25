@@ -7,7 +7,9 @@ import org.itcgae.siga.DTOs.cen.CertificadoItem;
 
 public interface IFichaDatosCertificadosService {
 
-	public CertificadoDTO datosCertificadosSearch(int numPagina, CertificadoItem certificadoItem, HttpServletRequest request);
+//	public CertificadoDTO datosCertificadosSearch(int numPagina, CertificadoItem certificadoItem, HttpServletRequest request);
+
+	public CertificadoDTO datosCertificadosSearch(int numPagina, String idPersona, HttpServletRequest request);
 	
 //	public ComboDTO getSocietyTypes(HttpServletRequest request);
 //	

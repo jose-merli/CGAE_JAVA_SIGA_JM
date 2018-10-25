@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesDTO;
+import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesSearchDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaDireccionesUpdateDTO;
 import org.itcgae.siga.cen.services.IFichaDatosCurricularesService;
@@ -32,8 +33,8 @@ public class FichaDatosCurricularesController {
 	}
 	
 	@RequestMapping(value = "/fichaDatosCurriculares/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> deleteDatosCurriculares(@RequestBody FichaDatosCurricularesDTO[] fichaDatosCurricularesDTO, HttpServletRequest request) { 
-		UpdateResponseDTO response = fichaDatosCurriculares.deleteDatosCurriculares(fichaDatosCurricularesDTO, request);
+	ResponseEntity<UpdateResponseDTO> deleteDatosCurriculares(@RequestBody FichaDatosCurricularesItem fichaDatosCurricularesItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = fichaDatosCurriculares.deleteDatosCurriculares(fichaDatosCurricularesItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);

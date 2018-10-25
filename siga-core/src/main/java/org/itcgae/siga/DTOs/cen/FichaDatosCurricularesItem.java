@@ -13,6 +13,7 @@ public class FichaDatosCurricularesItem {
 	private String descripcion;
 	private String categoriaCurricular;
 	private String tipoSubtipo;
+	private String idCv;
 	private String idTipoCv;
 	private String idTipoCvSubtipo1;
 	private String idTipoCvSubtipo2;
@@ -144,6 +145,23 @@ public class FichaDatosCurricularesItem {
 	public void setTipoSubtipo(String tipoSubtipo) {
 		this.tipoSubtipo = tipoSubtipo;
 	}
+	
+	
+
+	public FichaDatosCurricularesItem idCv(String idCv){
+		this.idCv = idCv;
+		return this;
+	}
+	
+	@JsonProperty("idCv")
+	public String getIdCv() {
+		return idCv;
+	}
+
+	public void setIdCv(String idCv) {
+		this.idCv = idCv;
+	}
+	
 
 	public FichaDatosCurricularesItem idTipoCv(String idTipoCv){
 		this.idTipoCv = idTipoCv;

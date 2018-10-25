@@ -61,7 +61,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 	}
 
 	@Override
-	public UpdateResponseDTO deleteDatosCurriculares(FichaDatosCurricularesDTO[] fichaDatosCurricularesDTO, HttpServletRequest request) {
+	public UpdateResponseDTO deleteDatosCurriculares(FichaDatosCurricularesItem fichaDatosCurricularesItem, HttpServletRequest request) {
 		LOGGER.info("deleteDatosCurriculares() -> Entrada al servicio para actualizar información de direcciones");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
@@ -82,7 +82,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 
 		if (null != usuarios && usuarios.size() > 0) {
 			usuario = usuarios.get(0);
-			for (int i = 0; i < fichaDatosCurricularesDTO.length; i++) {
+//			for (int i = 0; i < FichaDatosCurricularesItem.length; i++) {
 				LOGGER.info(
 						"deleteDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Entrada a cenDireccionesExtendsMapper para eliminar un curriculum");
 				CenDatoscv recordUpdate = new CenDatoscv();
@@ -90,10 +90,13 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 				recordUpdate.setFechafin(new Date());
 				recordUpdate.setFechamodificacion(new Date());
 				recordUpdate.setUsumodificacion(usuario.getIdusuario());
+				recordUpdate.setIdpersona(Long.parseLong(fichaDatosCurricularesItem.getIdPersona()));
+//				recordUpdate.setIdcv(fichaDatosCurricularesItem.getid);
 //				recordUpdate.setIddireccion(Long.valueOf(fichaDatosCurricularesDTO[i].getIdDireccion()));
 				recordUpdate.setIdinstitucion(idInstitucion);
+				recordUpdate.setIdcv(Short.parseShort(fichaDatosCurricularesItem.getIdCv()));
 //				recordUpdate.setIdpersona(Long.valueOf(fichaDatosCurricularesDTO[i].getIdPersona()));
-//				response = cenDatoscvExtendsMapper.updateByPrimaryKeySelective(recordUpdate);
+				response = cenDatoscvExtendsMapper.updateByPrimaryKeySelective(recordUpdate);
 
 				LOGGER.info(
 						"deleteDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para eliminar un curriculum");
@@ -105,7 +108,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 							+ updateResponseDTO.getStatus() + ". No se pudo eliminar el curriculum");
 
 				}
-			}
+//			}
 
 		} else {
 			updateResponseDTO.setStatus(SigaConstants.KO);
