@@ -2,9 +2,12 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesSearchDTO;
+import org.itcgae.siga.DTOs.cen.TarjetaDireccionesUpdateDTO;
 import org.itcgae.siga.cen.services.IFichaDatosCurricularesService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,5 +31,12 @@ public class FichaDatosCurricularesController {
 		return new ResponseEntity<FichaDatosCurricularesDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/fichaDatosCurriculares/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> deleteDatosCurriculares(@RequestBody FichaDatosCurricularesDTO[] fichaDatosCurricularesDTO, HttpServletRequest request) { 
+		UpdateResponseDTO response = fichaDatosCurriculares.deleteDatosCurriculares(fichaDatosCurricularesDTO, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
 	
 }

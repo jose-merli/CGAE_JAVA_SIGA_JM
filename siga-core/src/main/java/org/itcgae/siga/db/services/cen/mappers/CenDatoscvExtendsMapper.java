@@ -31,7 +31,8 @@ public interface CenDatoscvExtendsMapper extends CenDatoscvMapper {
 		@Result(column = "IDTIPOCVSUBTIPO1", property = "idTipoCvSubtipo1", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOCVSUBTIPO2", property = "idTipoCvSubtipo2", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CREDITOS", property = "creditos", jdbcType = JdbcType.VARCHAR)
 
 	})
 	List<FichaDatosCurricularesItem> searchDatosCurriculares(String idPersona, String idInstitucion);

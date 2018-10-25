@@ -16,6 +16,7 @@ public class FichaDatosCurricularesItem {
 	private String idTipoCv;
 	private String idTipoCvSubtipo1;
 	private String idTipoCvSubtipo2;
+	private String creditos;
 	
 	
 
@@ -51,6 +52,26 @@ public class FichaDatosCurricularesItem {
 	}
 	
 	
+	/**
+	 * 
+	 * @param fechaInicio
+	 * @return
+	 */
+	
+	public FichaDatosCurricularesItem creditos(String creditos){
+		this.creditos = creditos;
+		return this;
+	}
+	
+	@JsonProperty("creditos")
+	public String getCreditos() {
+		return creditos;
+	}
+
+	public void setCredito(String creditos) {
+		this.creditos = creditos;
+	}
+
 	
 	
 	public FichaDatosCurricularesItem fechaInicio(String fechaInicio){
