@@ -6,10 +6,9 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TipoCurricularItem {
-
+public class SubtipoCurricularItem {
 	private String idTipoCV;
-	private String idTipoCvSubtipo1;
+	private String idTipoCvSubtipo2;
 	private String tipoCategoriaCurricular;
 	private String codigoExterno;
 	private String descripcion;
@@ -23,12 +22,12 @@ public class TipoCurricularItem {
 	public void setIdTipoCV(String idTipoCV) {
 		this.idTipoCV = idTipoCV;
 	}
-	@JsonProperty("idTipoCvSubtipo1")
-	public String getIdTipoCvSubtipo1() {
-		return idTipoCvSubtipo1;
+	@JsonProperty("idTipoCvSubtipo2")
+	public String getIdTipoCvSubtipo2() {
+		return idTipoCvSubtipo2;
 	}
-	public void setIdTipoCvSubtipo1(String idTipoCvSubtipo1) {
-		this.idTipoCvSubtipo1 = idTipoCvSubtipo1;
+	public void setIdTipoCvSubtipo2(String idTipoCvSubtipo2) {
+		this.idTipoCvSubtipo2 = idTipoCvSubtipo2;
 	}
 	@JsonProperty("tipoCategoriaCurricular")
 	public String getTipoCategoriaCurricular() {
@@ -71,13 +70,13 @@ public class TipoCurricularItem {
 	    if (o == null || getClass() != o.getClass()) {
 	      return false;
 	    }
-	    TipoCurricularItem tipoCurricularItem = (TipoCurricularItem) o;
-	    return Objects.equals(this.idTipoCV, tipoCurricularItem.idTipoCV) &&
-	    		Objects.equals(this.idTipoCvSubtipo1, tipoCurricularItem.idTipoCvSubtipo1) &&
-	    		Objects.equals(this.tipoCategoriaCurricular, tipoCurricularItem.tipoCategoriaCurricular) &&
-	    		Objects.equals(this.codigoExterno, tipoCurricularItem.codigoExterno) &&
-	    		Objects.equals(this.descripcion, tipoCurricularItem.descripcion) &&
-	    		Objects.equals(this.fechaBaja, tipoCurricularItem.fechaBaja);
+	    SubtipoCurricularItem subtipoCurricularItem = (SubtipoCurricularItem) o;
+	    return Objects.equals(this.idTipoCV, subtipoCurricularItem.idTipoCV) &&
+	    		Objects.equals(this.idTipoCvSubtipo2, subtipoCurricularItem.idTipoCvSubtipo2) &&
+	    		Objects.equals(this.tipoCategoriaCurricular, subtipoCurricularItem.tipoCategoriaCurricular) &&
+	    		Objects.equals(this.codigoExterno, subtipoCurricularItem.codigoExterno) &&
+	    		Objects.equals(this.descripcion, subtipoCurricularItem.descripcion) &&
+	    		Objects.equals(this.fechaBaja, subtipoCurricularItem.fechaBaja);
 	}
 	
 	@Override
@@ -89,10 +88,10 @@ public class TipoCurricularItem {
 	@Override
 	public String toString() {
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("class TipoCurricularItem {\n");
+	    sb.append("class SubtipoCurricularItem {\n");
 	    
 	    sb.append("    idTipoCV: ").append(toIndentedString(idTipoCV)).append("\n");
-	    sb.append("    idTipoCvSubtipo1: ").append(toIndentedString(idTipoCvSubtipo1)).append("\n");
+	    sb.append("    idTipoCvSubtipo2: ").append(toIndentedString(idTipoCvSubtipo2)).append("\n");
 	    sb.append("    tipoCategoriaCurricular: ").append(toIndentedString(tipoCategoriaCurricular)).append("\n");
 	    sb.append("    codigoExterno: ").append(toIndentedString(codigoExterno)).append("\n");
 	    sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
