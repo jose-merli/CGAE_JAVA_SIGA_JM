@@ -6,7 +6,6 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.CalendarDTO;
 import org.itcgae.siga.DTOs.age.CalendarItem;
-import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.age.PermisosCalendarioDTO;
 import org.itcgae.siga.DTOs.age.PermisosPerfilesCalendarDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -25,6 +24,6 @@ public interface IFichaCalendarioService {
 	
 	public PermisosPerfilesCalendarDTO getProfilesPermissions(String idCalendario, HttpServletRequest request);
 	
-	public NotificacionEventoDTO getEventNotifications(String idCalendario, HttpServletRequest request);
+
 	
 }

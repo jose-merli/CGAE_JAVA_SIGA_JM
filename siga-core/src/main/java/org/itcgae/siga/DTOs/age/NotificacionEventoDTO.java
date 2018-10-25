@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.db.entities.AgeNotificacionesevento;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -25,7 +24,7 @@ public class NotificacionEventoDTO   {
   }
   
   @JsonProperty("eventNotificationItems")
-  public List<NotificacionEventoItem> eventNotificationItems() {
+  public List<NotificacionEventoItem> getEventNotificationItems() {
     return eventNotificationItems;
   }
   

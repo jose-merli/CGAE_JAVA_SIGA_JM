@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.age.PermisosCalendarioDTO;
 import org.itcgae.siga.DTOs.age.PermisosPerfilesCalendarDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.age.service.IDatosNotificacionesService;
 import org.itcgae.siga.age.service.IFichaCalendarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,9 @@ public class FichaCalendarioController {
 	
 	@Autowired
 	private IFichaCalendarioService fichaCalendarioService;
+	
+	@Autowired
+	private IDatosNotificacionesService datosNotificacionesService;
 		
 	@RequestMapping(value = "fichaCalendario/getCalendarType",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getCalendarType(HttpServletRequest request) {
@@ -66,7 +70,19 @@ public class FichaCalendarioController {
 	
 	@RequestMapping(value = "fichaCalendario/getEventNotifications", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<NotificacionEventoDTO> getEventNotifications(String idCalendario, HttpServletRequest request) {
-		NotificacionEventoDTO response = fichaCalendarioService.getEventNotifications(idCalendario, request);
+		NotificacionEventoDTO response = datosNotificacionesService.getEventNotifications(idCalendario, request);
 		return new ResponseEntity<NotificacionEventoDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCalendario/getHistoricEventNotifications", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<NotificacionEventoDTO> getHistoricEventNotifications(String idCalendario, HttpServletRequest request) {
+		NotificacionEventoDTO response = datosNotificacionesService.getHistoricEventNotifications(idCalendario, request);
+		return new ResponseEntity<NotificacionEventoDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCalendario/deleteNotification", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> deleteNotification(@RequestBody NotificacionEventoDTO notificacionDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = datosNotificacionesService.deleteNotification(notificacionDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 }

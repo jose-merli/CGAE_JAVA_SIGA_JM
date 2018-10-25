@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.age.ComboPlantillaEnvioDTO;
 import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.age.service.IDatosNotificacionesService;
@@ -48,14 +49,14 @@ public class DatosNotificacionesController {
 	}
 	
 	@RequestMapping(value = "datosNotificaciones/getTemplates", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getTemplates(HttpServletRequest request) {
-		ComboDTO response = datosNotificacionesService.getTemplates(request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	ResponseEntity<ComboPlantillaEnvioDTO> getTemplates(HttpServletRequest request) {
+		ComboPlantillaEnvioDTO response = datosNotificacionesService.getTemplates(request);
+		return new ResponseEntity<ComboPlantillaEnvioDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "datosNotificaciones/getTypeSend", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getTypeSend(String idPlantillaEnvio, HttpServletRequest request) {
-		ComboDTO response = datosNotificacionesService.getTypeSend(idPlantillaEnvio, request);
+	ResponseEntity<ComboDTO> getTypeSend(String idPlantillaEnvio, String idTipoEnvio, HttpServletRequest request) {
+		ComboDTO response = datosNotificacionesService.getTypeSend(idPlantillaEnvio, idTipoEnvio, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
