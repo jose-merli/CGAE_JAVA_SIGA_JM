@@ -1,8 +1,9 @@
 package org.itcgae.siga.form.controllers;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -44,6 +45,18 @@ public class BusquedaCursosController {
 	ResponseEntity<CursoDTO> searchColegiado(@RequestBody CursoItem cursoItem, HttpServletRequest request) {
 		CursoDTO response = busquedaCursosService.searchCurso(cursoItem, request);
 		return new ResponseEntity<CursoDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "busquedaCursos/archivar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Integer> archivarCursos(@RequestBody List<CursoItem> listCursoItem, HttpServletRequest request) {
+		int response = busquedaCursosService.archivarCursos(listCursoItem, request);
+		return new ResponseEntity<Integer>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "busquedaCursos/desarchivar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Integer> desarchivarCursos(@RequestBody List<CursoItem> listCursoItem, HttpServletRequest request) {
+		int response = busquedaCursosService.desarchivarCursos(listCursoItem, request);
+		return new ResponseEntity<Integer>(response, HttpStatus.OK);
 	}
 	
 	

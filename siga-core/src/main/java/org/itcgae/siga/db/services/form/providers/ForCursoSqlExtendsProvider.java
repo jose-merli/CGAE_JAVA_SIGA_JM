@@ -1,16 +1,15 @@
 package org.itcgae.siga.db.services.form.providers;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.db.mappers.ForCursoSqlProvider;
+import org.itcgae.siga.commons.constants.SigaConstants;
 
 public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 	
-	private static final String PLAZAS_DISPO_SI = "1";
-	private static final String PLAZAS_DISPO_NO = "0";
-
 	public String selectCursos(Short idInstitucion,CursoItem cursoItem) {
 
 		SQL sql = new SQL();
@@ -19,13 +18,15 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		sql.SELECT_DISTINCT("CURSO.IDCURSO");
 		sql.SELECT_DISTINCT("CURSO.CODIGOCURSO");
 		sql.SELECT_DISTINCT("CURSO.NOMBRECURSO");
-		sql.SELECT_DISTINCT("ESTADO.IDESTADOCURSO");
+		sql.SELECT_DISTINCT("CURSO.IDINSTITUCION");
+		sql.SELECT_DISTINCT("CURSO.IDESTADOCURSO AS IDESTADO");
 		sql.SELECT_DISTINCT("CAT.DESCRIPCION AS ESTADO");
 		sql.SELECT_DISTINCT("DECODE(CURSO.IDINSTITUCION,'"+ Short.toString(idInstitucion) +"', CAT1.DESCRIPCION, INSTITUCION.ABREVIATURA) AS VISIBILIDAD");
 		sql.SELECT_DISTINCT("CONCAT(CURSO.PRECIODESDE|| ' - ', CURSO.PRECIOHASTA) AS PRECIOCURSO");
 		sql.SELECT_DISTINCT("CONCAT(CURSO.FECHAINSCRIPCIONDESDE|| ' - ', CURSO.FECHAINSCRIPCIONHASTA) AS FECHAINSCRIPCION");
 		sql.SELECT_DISTINCT("CONCAT(CURSO.FECHAIMPARTICIONDESDE|| ' - ', CURSO.FECHAIMPARTICIONHASTA ) AS FECHAIMPARTICION");
 		sql.SELECT_DISTINCT("CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) AS NOMBREAPELLIDOSFORMADOR");
+		sql.SELECT_DISTINCT("CURSO.FLAGARCHIVADO");
 		
 		sql.FROM("FOR_CURSO CURSO");
 		
@@ -71,7 +72,7 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		}
 		
 		if(cursoItem.getPrecioHasta() != null) {
-			sql.WHERE("CURSO.PRECIOHASTA >= " + Double.toString(cursoItem.getPrecioHasta()));
+			sql.WHERE("CURSO.PRECIOHASTA <= " + Double.toString(cursoItem.getPrecioHasta()));
 		}
 		
 		if(cursoItem.getFechaInscripcionDesde() != null) {
@@ -119,11 +120,11 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 			sqlPlazasDispo.WHERE("INSCRIPCION.IDCURSO = CURSO.IDCURSO AND INSCRIPCION.IDESTADOINSCRIPCION = 1");
 			
 			
-			if(PLAZAS_DISPO_SI.equals(cursoItem.getPlazasDisponibles())) {
+			if(SigaConstants.PLAZAS_DISPO_SI.equals(cursoItem.getPlazasDisponibles())) {
 				sql.WHERE("CURSO.NUMEROPLAZAS > " +"("+ sqlPlazasDispo +")");
 			}
 			
-			if(PLAZAS_DISPO_NO.equals(cursoItem.getPlazasDisponibles())) {
+			if(SigaConstants.PLAZAS_DISPO_NO.equals(cursoItem.getPlazasDisponibles())) {
 				sql.WHERE("CURSO.NUMEROPLAZAS < " +"("+ sqlPlazasDispo +")");
 			}
 			
@@ -131,7 +132,7 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		
 		
 		if (cursoItem.getNombreApellidosFormador() != null && cursoItem.getNombreApellidosFormador() != "") {
-			sql.WHERE("UPPER( CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2) )) LIKE UPPER('%" + cursoItem.getNombreApellidosFormador()+ "%')");
+			sql.WHERE("TRANSLATE(UPPER( CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2) )),'"+ SigaConstants.AUX_TRANS_TILDES_1 + "','" + SigaConstants.AUX_TRANS_TILDES_2 + "') LIKE TRANSLATE(UPPER('%" + cursoItem.getNombreApellidosFormador()+ "%'),'"+ SigaConstants.AUX_TRANS_TILDES_1 + "','" + SigaConstants.AUX_TRANS_TILDES_2 + "')");
 		}
 		
 		return sql.toString();

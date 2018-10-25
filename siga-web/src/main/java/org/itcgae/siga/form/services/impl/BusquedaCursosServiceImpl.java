@@ -1,21 +1,22 @@
 package org.itcgae.siga.form.services.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
-import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ForCurso;
+import org.itcgae.siga.db.entities.ForCursoExample;
+import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenTiposcvExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForEstadocursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForTemacursoExtendsMapper;
@@ -24,6 +25,7 @@ import org.itcgae.siga.form.services.IBusquedaCursosService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.itcgae.siga.commons.constants.SigaConstants;
 
 @Service
 public class BusquedaCursosServiceImpl implements IBusquedaCursosService{
@@ -44,6 +46,9 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService{
 	
 	@Autowired
 	private ForCursoExtendsMapper forCursoExtendsMapper;
+	
+	@Autowired
+	AdmUsuariosMapper admUsuariosMapper;
 	
 	@Override
 	public ComboDTO getVisibilidadCursos(HttpServletRequest request) {
@@ -197,6 +202,133 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService{
 		}
 
 		return cursoDTO;
+	}
+
+	@Override
+	public int archivarCursos(List<CursoItem> listCursoItem, HttpServletRequest request) {
+		
+		LOGGER.info("archivarCursos() -> Entrada al servicio para archivar cursos");
+		
+		List<Long> arrayIds = new ArrayList<>();
+		int resultado = 0;
+		
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		String idInstitucionToString =  String.valueOf(idInstitucion);
+		
+		//Para obtener los ids de los cursos a actualizar
+		for(CursoItem curso : listCursoItem) {
+			
+			//Añadimos a la lista de ids únicamente los ids de los cursos que pueden archivarse
+			if(idInstitucionToString.equals(curso.getIdInstitucion()) && (SigaConstants.CURSO_SIN_ARCHIVAR == curso.getFlagArchivado()) && (SigaConstants.ESTADO_CURSO_CANCELADO.equals(curso.getIdEstado()) || SigaConstants.ESTADO_CURSO_FINALIZADO.equals(curso.getIdEstado()) )) {
+				arrayIds.add(curso.getIdCurso());
+			}
+		}
+		
+		//Si no hay curso que cumpla las condiciones para archivar devolvemos 0
+		if(arrayIds.isEmpty()) {
+			return 0;
+		}else {
+			//Entidad que se va a rellenar con los valores a actualizar
+			ForCurso record = new ForCurso();
+			
+			record.setFlagarchivado((short)1); // estado archivado
+			
+			//Obtenemos el usuario para setear el campo "usumodificiacion"
+			String dniUser = UserTokenUtils.getDniFromJWTToken(token);
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios .createCriteria().andNifEqualTo(dniUser).andIdinstitucionEqualTo(idInstitucion);
+			
+			LOGGER.info(
+					"archivarCursos() / admUsuariosMapper.selectByExample() -> Entrada a admUsuariosMapper para obtener al usuario que está realizando la acción");
+			List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
+			
+			AdmUsuarios usuario = usuarios.get(0);
+			
+			if(usuario == null) {
+				LOGGER.warn(
+						"archivarCursos() / admUsuariosMapper.selectByExample() -> No se ha podido recuperar al usuario logeado, no se realiza el update");
+				return 0; //Devolvemos 0 cursos archivados porque no se va a poder realizar el update al no haber recuperado al usuario
+			}else {
+				record.setUsumodificacion(usuario.getIdusuario().longValue()); // seteamos el usuario de modificacion
+			}
+			
+			record.setFechamodificacion(new Date()); // seteamos la fecha de modificación
+			
+			ForCursoExample example = new ForCursoExample();
+			example.createCriteria().andIdcursoIn(arrayIds);
+			
+			LOGGER.info(
+					"archivarCursos() / forCursoExtendsMapper.updateByExampleSelective() -> Entrada a forCursoExtendsMapper para invocar a updateByExampleSelective para actualizar cursos según los criterios establecidos");
+			resultado = forCursoExtendsMapper.updateByExampleSelective(record, example);
+		}
+		
+		return resultado;
+	}
+
+	@Override
+	public int desarchivarCursos(List<CursoItem> listCursoItem, HttpServletRequest request) {
+		LOGGER.info("desarchivarCursos() -> Entrada al servicio para desarchivar cursos");
+		
+		List<Long> arrayIds = new ArrayList<>();
+		int resultado = 0;
+		
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		String idInstitucionToString =  String.valueOf(idInstitucion);
+		
+		//Para obtener los ids de los cursos a actualizar
+		for(CursoItem curso : listCursoItem) {
+			
+			//Añadimos a la lista de ids únicamente los ids de los cursos que pueden desarchivarse
+			if(idInstitucionToString.equals(curso.getIdInstitucion()) && (SigaConstants.CURSO_ARCHIVADO == curso.getFlagArchivado())) {
+				arrayIds.add(curso.getIdCurso());
+			}
+		}
+		
+		//Si no hay curso que cumpla las condiciones para desarchivar devolvemos 0
+		if(arrayIds.isEmpty()) {
+			return 0;
+		}else {
+		
+			//Entidad que se va a rellenar con los valores a actualizar
+			ForCurso record = new ForCurso();
+			
+			record.setFlagarchivado((short)0); // estado desarchivado
+			
+			//Obtenemos el usuario para setear el campo "usumodificiacion"
+			String dniUser = UserTokenUtils.getDniFromJWTToken(token);
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios .createCriteria().andNifEqualTo(dniUser).andIdinstitucionEqualTo(idInstitucion);
+			
+			LOGGER.info(
+					"desarchivarCursos() / admUsuariosMapper.selectByExample() -> Entrada a admUsuariosMapper para obtener al usuario que está realizando la acción");
+			List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
+			
+			AdmUsuarios usuario = usuarios.get(0);
+			
+			if(usuario == null) {
+				LOGGER.warn(
+						"desarchivarCursos() / admUsuariosMapper.selectByExample() -> No se ha podido recuperar al usuario logeado, no se realiza el update");
+				return 0;  //Devolvemos 0 cursos desarchivados porque no se va a poder realizar el update al no haber recuperado al usuario
+			}else {
+				record.setUsumodificacion(usuario.getIdusuario().longValue()); // seteamos el usuario de modificacion
+			}
+			
+			record.setFechamodificacion(new Date()); // seteamos la fecha de modificación
+			
+			ForCursoExample example = new ForCursoExample();
+			example.createCriteria().andIdcursoIn(arrayIds);
+			
+			LOGGER.info(
+					"desarchivarCursos() / forCursoExtendsMapper.updateByExampleSelective() -> Entrada a forCursoExtendsMapper para invocar a updateByExampleSelective para actualizar cursos según los criterios establecidos");
+			resultado = forCursoExtendsMapper.updateByExampleSelective(record, example);
+			
+		}
+		
+		return resultado;
 	}
 	
 	

@@ -3,7 +3,9 @@ package org.itcgae.siga.cen.services.impl;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.MutualidadResponseDTO;
 import org.itcgae.siga.cen.services.IMutualidadService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class MutualidadServiceImpl implements IMutualidadService{
 
 	private Logger LOGGER = Logger.getLogger(MutualidadServiceImpl.class);

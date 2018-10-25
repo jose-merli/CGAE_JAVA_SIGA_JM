@@ -6,6 +6,7 @@ public class SolicitudDTO {
 	
 	private int idPaquete;
 	private String observaciones;
+	private AseguradoDTO asegurado;
 	
 	
 	public int getIdPaquete() {
@@ -19,6 +20,13 @@ public class SolicitudDTO {
 	}
 	public void setObservaciones(String observaciones) {
 		this.observaciones = observaciones;
+	}
+	
+	public AseguradoDTO getAsegurado() {
+		return asegurado;
+	}
+	public void setAsegurado(AseguradoDTO asegurado) {
+		this.asegurado = asegurado;
 	}
 	
 	@Override

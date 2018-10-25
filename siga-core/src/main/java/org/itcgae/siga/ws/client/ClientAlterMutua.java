@@ -6,13 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
-
-
-import com.altermutua.www.wssiga.GetEstadoColegiadoDocument.GetEstadoColegiado;
-import com.altermutua.www.wssiga.GetEstadoSolicitudDocument.GetEstadoSolicitud;
-import com.altermutua.www.wssiga.GetPropuestasDocument.GetPropuestas;
-import com.altermutua.www.wssiga.GetTarifaSolicitudDocument.GetTarifaSolicitud;
-import com.altermutua.www.wssiga.SetSolicitudAlterDocument.SetSolicitudAlter;
+import com.altermutua.www.wssiga.GetEstadoColegiadoDocument;
+import com.altermutua.www.wssiga.GetEstadoSolicitudDocument;
+import com.altermutua.www.wssiga.GetPropuestasDocument;
+import com.altermutua.www.wssiga.GetTarifaSolicitudDocument;
+import com.altermutua.www.wssiga.SetSolicitudAlterDocument;
 import com.altermutua.www.wssiga.WSRespuesta;
 
 
@@ -34,7 +32,7 @@ public class ClientAlterMutua {
 	private HttpComponentsMessageSender httpComponentsMessageSender;
 	
 	
-	public WSRespuesta getEstadoColegiado (GetEstadoColegiado request , String uriService)throws Exception{
+	public WSRespuesta getEstadoColegiado (GetEstadoColegiadoDocument request , String uriService)throws Exception{
 		
 		
 		webServiceTemplate.setDefaultUri(uriService);
@@ -53,7 +51,7 @@ public class ClientAlterMutua {
 	}
 	
 	
-	public WSRespuesta getEstadoSolicitud (GetEstadoSolicitud request , String uriService)throws Exception{
+	public WSRespuesta getEstadoSolicitud (GetEstadoSolicitudDocument request , String uriService)throws Exception{
 		
 		webServiceTemplate.setDefaultUri(uriService);
 		
@@ -68,7 +66,7 @@ public class ClientAlterMutua {
 		return response;
 	}
 	
-	public WSRespuesta getPropuestas (GetPropuestas request, String uriService) throws Exception{
+	public WSRespuesta getPropuestas (GetPropuestasDocument request, String uriService) throws Exception{
 		
 		
 		webServiceTemplate.setDefaultUri(uriService);
@@ -83,7 +81,7 @@ public class ClientAlterMutua {
 		return response;
 	}
 	
-	public WSRespuesta getTarifaSolicitud (GetTarifaSolicitud request, String uriService) throws Exception{
+	public WSRespuesta getTarifaSolicitud (GetTarifaSolicitudDocument request, String uriService) throws Exception{
 		
 		webServiceTemplate.setDefaultUri(uriService);
 		
@@ -97,7 +95,7 @@ public class ClientAlterMutua {
 		return response;
 	}
 	
-	public WSRespuesta setSolicitudAlter(SetSolicitudAlter request, String uriService) throws Exception{
+	public WSRespuesta setSolicitudAlter(SetSolicitudAlterDocument request, String uriService) throws Exception{
 		
 		webServiceTemplate.setDefaultUri(uriService);
 		
