@@ -8,6 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ComboColegiadoDTO;
+import org.itcgae.siga.DTOs.cen.ComboColegiadoItem;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.cen.services.IFichaColegialOtrasColegiacionesService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -69,6 +74,33 @@ public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegia
 		
 		LOGGER.info("searchOtherCollegues() -> Salida del servicio para la búsqueda de un abogado en distintos colegios");
 		return colegiadoDTO;
+	}
+
+	@Override
+	public ComboColegiadoDTO getLabelColegios(String idPersona, HttpServletRequest request) {
+		LOGGER.info("getLabelColegios() -> Entrada al servicio para la búsqueda de todos los colegios");
+		
+		ComboColegiadoDTO combo = new ComboColegiadoDTO();
+		List<ComboColegiadoItem> comboItems = new ArrayList<ComboColegiadoItem>();
+
+		LOGGER.info(
+				"getLabelColegios() / cenInstitucionExtendsMapper.getComboInstituciones() -> Entrada a cenInstitucionExtendsMapper para busqueda de personas no colegiadas por filtro");
+		comboItems = cenColegiadoExtendsMapper.getLabelColegios(idPersona);
+		LOGGER.info(
+				"getLabelColegios() / cenInstitucionExtendsMapper.getComboInstituciones() -> Salida de cenInstitucionExtendsMapper para busqueda de personas no colegiadas por filtro");
+	
+//		if (!comboItems.equals(null) && comboItems.size() > 0) {
+//			// añade elemento vacio al principio para el dropdown de parte front
+//			ComboColegiadoItem comboItem = new ComboColegiadoItem();
+//			comboItem.setLabel("");
+//			comboItem.setValue("");
+//			comboItems.add(0, comboItem);
+//			combo.setCombooItems(comboItems);
+//		}
+//		
+		combo.setCombooItems(comboItems);
+		LOGGER.info("getLabelColegios() -> Salida del servicio para la búsqueda de todos los colegios");
+		return combo;
 	}
 
 }

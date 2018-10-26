@@ -173,6 +173,10 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.SET("IDTIPOCOLEGIO = '" + tarjetaIntegrantesUpdateDTO.getIdTipoColegio() + "'");
 		}
 		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getIdProvincia())) {
+			sql.SET("IDPROVINCIA = '" + tarjetaIntegrantesUpdateDTO.getIdProvincia() + "'");
+		}
+		
 		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getColegio())) {
 			sql.SET("COLEGIO = '" + tarjetaIntegrantesUpdateDTO.getColegio() + "'");
 		}

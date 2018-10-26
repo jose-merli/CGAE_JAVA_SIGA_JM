@@ -17,6 +17,7 @@ public class TarjetaIntegrantesUpdateDTO {
 	private String idPersona;
 	private String flagSocio;
 	private String idTipoColegio;
+	private String idProvincia;
 	private String colegio;
 	private Date fechaBajaCargo;
 	
@@ -168,6 +169,15 @@ public class TarjetaIntegrantesUpdateDTO {
 	public void setIdTipoColegio(String idTipoColegio) {
 		this.idTipoColegio = idTipoColegio;
 	}
+	
+	@JsonProperty("idProvincia")
+	public String getIdProvincia() {
+		return idProvincia;
+	}
+
+	public void setIdProvincia(String idProvincia) {
+		this.idProvincia = idProvincia;
+	}
 
 	@JsonProperty("colegio")
 	public String getColegio() {
@@ -194,13 +204,14 @@ public class TarjetaIntegrantesUpdateDTO {
 				&& Objects.equals(this.idComponente, tarjetaIntegrantesUpdateDTO.idComponente)
 				&& Objects.equals(this.idPersona, tarjetaIntegrantesUpdateDTO.idPersona)
 				&& Objects.equals(this.idTipoColegio, tarjetaIntegrantesUpdateDTO.idTipoColegio)
+				&& Objects.equals(this.idProvincia, tarjetaIntegrantesUpdateDTO.idProvincia)
 				&& Objects.equals(this.colegio, tarjetaIntegrantesUpdateDTO.colegio);
 
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(fechaCargo, cargo, idCargo, capitalSocial, idComponente, idPersona, idTipoColegio, colegio);
+		return Objects.hash(fechaCargo, cargo, idCargo, capitalSocial, idComponente, idPersona, idTipoColegio, idProvincia, colegio);
 	}
 
 	@Override
@@ -215,6 +226,7 @@ public class TarjetaIntegrantesUpdateDTO {
 		sb.append("    idComponente: ").append(toIndentedString(idComponente)).append("\n");
 		sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 		sb.append("    idTipoColegio: ").append(toIndentedString(idTipoColegio)).append("\n");
+		sb.append("    idProvincia: ").append(toIndentedString(idProvincia)).append("\n");
 		sb.append("    colegio: ").append(toIndentedString(colegio)).append("\n");
 		sb.append("}");
 		return sb.toString();
