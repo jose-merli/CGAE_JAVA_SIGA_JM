@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +28,7 @@ public class AlterMutuaController {
 
 	
 	@RequestMapping(value="/estadoSolicitud",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<AlterMutuaResponseDTO> getEstadoSolicitud(EstadoSolicitudDTO estadoSolicitudDTO) {
+	ResponseEntity<AlterMutuaResponseDTO> getEstadoSolicitud(@RequestBody EstadoSolicitudDTO estadoSolicitudDTO) {
 		
 		AlterMutuaResponseDTO response = _alterMutuaService.getEstadoSolicitud(estadoSolicitudDTO);
 		if(response.isError()!= false)
@@ -37,7 +38,7 @@ public class AlterMutuaController {
 	
 	
 	@RequestMapping(value="/estadoColegiado",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<AlterMutuaResponseDTO> getEstadoColegiado(EstadoColegiadoDTO estadoDTO) {
+	ResponseEntity<AlterMutuaResponseDTO> getEstadoColegiado(@RequestBody EstadoColegiadoDTO estadoDTO) {
 		
 		AlterMutuaResponseDTO response = _alterMutuaService.getEstadoColegiado(estadoDTO);
 		if(response.isError()!= false)
@@ -47,7 +48,7 @@ public class AlterMutuaController {
 	
 	
 	@RequestMapping(value="/propuestas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<AlterMutuaResponseDTO> getPropuestas(PropuestasDTO propuestas) {
+	ResponseEntity<AlterMutuaResponseDTO> getPropuestas(@RequestBody PropuestasDTO propuestas) {
 		
 		AlterMutuaResponseDTO response = _alterMutuaService.getPropuestas(propuestas);
 		if(response.isError()!= false)
@@ -56,7 +57,7 @@ public class AlterMutuaController {
 	}
 	
 	@RequestMapping(value="/tarifaSolicitud",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<AlterMutuaResponseDTO> getTarifaSolicitud(SolicitudDTO solicitud) {
+	ResponseEntity<AlterMutuaResponseDTO> getTarifaSolicitud(@RequestBody SolicitudDTO solicitud) {
 		
 		AlterMutuaResponseDTO response = _alterMutuaService.getTarifaSolicitud(solicitud);
 		if(response.isError()!= false)
@@ -66,7 +67,7 @@ public class AlterMutuaController {
 	
 	
 	@RequestMapping(value="/solicitudAlter",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<AlterMutuaResponseDTO> getComboTipoSolicitud(SolicitudDTO solicitud) {
+	ResponseEntity<AlterMutuaResponseDTO> setSolicitudAlter(@RequestBody SolicitudDTO solicitud) {
 		
 		AlterMutuaResponseDTO response = _alterMutuaService.setSolicitudAlter(solicitud);
 		if(response.isError()!= false)

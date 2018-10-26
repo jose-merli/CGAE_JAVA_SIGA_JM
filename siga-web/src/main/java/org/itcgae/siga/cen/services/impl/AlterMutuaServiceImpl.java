@@ -8,13 +8,17 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.AlterMutuaResponseDTO;
 import org.itcgae.siga.DTOs.cen.EstadoColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.EstadoSolicitudDTO;
+import org.itcgae.siga.DTOs.cen.PersonaDTO;
 import org.itcgae.siga.DTOs.cen.PropuestaDTO;
 import org.itcgae.siga.DTOs.cen.PropuestasDTO;
 import org.itcgae.siga.DTOs.cen.SolicitudDTO;
 import org.itcgae.siga.cen.services.IAlterMutuaService;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.ws.client.ClientAlterMutua;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +28,7 @@ import com.altermutua.www.wssiga.GetEstadoColegiadoDocument;
 import com.altermutua.www.wssiga.GetEstadoSolicitudDocument;
 import com.altermutua.www.wssiga.GetEstadoSolicitudDocument.GetEstadoSolicitud;
 import com.altermutua.www.wssiga.GetPropuestasDocument;
+import com.altermutua.www.wssiga.GetPropuestasDocument.Factory;
 import com.altermutua.www.wssiga.GetPropuestasDocument.GetPropuestas;
 import com.altermutua.www.wssiga.GetTarifaSolicitudDocument;
 import com.altermutua.www.wssiga.GetTarifaSolicitudDocument.GetTarifaSolicitud;
@@ -47,8 +52,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 	private ClientAlterMutua _clientAlterMutua;
 	
 	@Autowired
-	AdmConfigMapper _admConfigMapper;
-	
+	private GenParametrosMapper _genParametrosMapper;
 
 	@Override
 	public AlterMutuaResponseDTO getEstadoSolicitud(EstadoSolicitudDTO estadosolicitudDTO) {
@@ -57,9 +61,10 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 		AlterMutuaResponseDTO responseDTO = new AlterMutuaResponseDTO();
 		try{
 			
-			AdmConfigExample example = new AdmConfigExample();
-			example.createCriteria().andClaveEqualTo("url.censo.alterMutua.estadoSolicitud");
-			List<AdmConfig> config = _admConfigMapper.selectByExample(example);
+			GenParametrosExample example = new GenParametrosExample();
+			example.createCriteria().andIdrecursoEqualTo("administracion.parametro.alterm_url");
+			
+			List<GenParametros> config = _genParametrosMapper.selectByExample(example);
 			
 			if(config != null && config.size() > 0){
 				
@@ -97,9 +102,10 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 		
 		AlterMutuaResponseDTO responseDTO = new AlterMutuaResponseDTO();
 		try{
-			AdmConfigExample example = new AdmConfigExample();
-			example.createCriteria().andClaveEqualTo("url.censo.alterMutua.estadoColegiado");
-			List<AdmConfig> config = _admConfigMapper.selectByExample(example);
+			GenParametrosExample example = new GenParametrosExample();
+			example.createCriteria().andIdrecursoEqualTo("administracion.parametro.alterm_url");
+			
+			List<GenParametros> config = _genParametrosMapper.selectByExample(example);
 			
 			if(config != null && config.size() > 0){
 				
@@ -136,9 +142,10 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 		AlterMutuaResponseDTO response = new AlterMutuaResponseDTO();
 		
 		try{
-			AdmConfigExample example = new AdmConfigExample();
-			example.createCriteria().andClaveEqualTo("url.censo.alterMutua.propuestas");
-			List<AdmConfig> config = _admConfigMapper.selectByExample(example);
+			GenParametrosExample example = new GenParametrosExample();
+			example.createCriteria().andIdrecursoEqualTo("administracion.parametro.alterm_url");
+			
+			List<GenParametros> config = _genParametrosMapper.selectByExample(example);
 			
 			if(config != null && config.size() > 0){
 				
@@ -199,9 +206,10 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 		AlterMutuaResponseDTO responseDTO = new AlterMutuaResponseDTO();
 		
 		try{
-			AdmConfigExample example = new AdmConfigExample();
-			example.createCriteria().andClaveEqualTo("url.censo.alterMutua.tarifaSolicitud");
-			List<AdmConfig> config = _admConfigMapper.selectByExample(example);
+			GenParametrosExample example = new GenParametrosExample();
+			example.createCriteria().andIdrecursoEqualTo("administracion.parametro.alterm_url");
+			
+			List<GenParametros> config = _genParametrosMapper.selectByExample(example);
 			
 			if(config != null && config.size() > 0){
 				
@@ -256,9 +264,10 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 		
 		AlterMutuaResponseDTO response = new AlterMutuaResponseDTO();
 		try{
-			AdmConfigExample example = new AdmConfigExample();
-			example.createCriteria().andClaveEqualTo("url.censo.alterMutua.solicitudAlter");
-			List<AdmConfig> config = _admConfigMapper.selectByExample(example);
+			GenParametrosExample example = new GenParametrosExample();
+			example.createCriteria().andIdrecursoEqualTo("administracion.parametro.alterm_url");
+			
+			List<GenParametros> config = _genParametrosMapper.selectByExample(example);
 			
 			if(config != null && config.size() > 0){
 				
@@ -304,8 +313,52 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 				asegurado.setDireccion(direccion);
 				asegurado.setEstadoCivil(Integer.parseInt(solicitud.getAsegurado().getEstadoCivil()));
 				
-				//TODO: familiares
-				//asegurado.setFamiliaresArray(arg0);
+				
+				if(solicitud.getHerederos() != null){
+					if(solicitud.getFamiliares().size() > 0){
+						WSPersona[] herederos = new WSPersona[solicitud.getHerederos().size()];
+						int index = 0;
+						for (PersonaDTO persona : solicitud.getHerederos()) {
+							WSPersona heredero = WSPersona.Factory.newInstance();
+							Calendar cal = Calendar.getInstance();
+							
+							heredero.setParentesco(Integer.parseInt(persona.getParentesco()));
+							heredero.setApellidos(persona.getApellido());
+							heredero.setNombre(persona.getNombre());
+							heredero.setSexo(Integer.parseInt(persona.getSexo()));
+							heredero.setIdentificador(persona.getIdentificacion());
+							heredero.setTipoIdentificador(Integer.parseInt(persona.getTipoIdentificacion()));
+							cal.setTime(persona.getFechaNacimiento());
+							heredero.setFechaNacimiento(cal);
+							herederos[index] = heredero;
+							index++;
+						}
+						//ver como añadir herederos
+						//asegurado.set
+					}
+					
+				}else{
+					if(solicitud.getFamiliares().size() > 0){
+						WSPersona[] familiares = new WSPersona[solicitud.getFamiliares().size()];
+						int index = 0;
+						for (PersonaDTO persona : solicitud.getFamiliares()) {
+							WSPersona familiar = WSPersona.Factory.newInstance();
+							Calendar cal = Calendar.getInstance();
+							
+							familiar.setParentesco(Integer.parseInt(persona.getParentesco()));
+							familiar.setApellidos(persona.getApellido());
+							familiar.setNombre(persona.getNombre());
+							familiar.setSexo(Integer.parseInt(persona.getSexo()));
+							familiar.setIdentificador(persona.getIdentificacion());
+							familiar.setTipoIdentificador(Integer.parseInt(persona.getTipoIdentificacion()));
+							cal.setTime(persona.getFechaNacimiento());
+							familiar.setFechaNacimiento(cal);
+							familiares[index] = familiar;
+							index++;
+						}
+						asegurado.setFamiliaresArray(familiares);
+					}
+				}
 				//TODO: beneficiarios
 				Calendar cal = Calendar.getInstance();
 				  cal.setTime(solicitud.getAsegurado().getFechaNacimiento());

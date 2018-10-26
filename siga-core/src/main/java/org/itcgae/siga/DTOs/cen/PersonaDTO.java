@@ -9,7 +9,7 @@ public class PersonaDTO {
 	private String sexo;
 	private String nombre;
 	private String apellido;
-	private String tipoIdenticiacion;
+	private String tipoIdentificacion;
 	private String identificacion;
 	private Date fechaNacimiento;
 	
@@ -38,11 +38,11 @@ public class PersonaDTO {
 	public void setApellido(String apellido) {
 		this.apellido = apellido;
 	}
-	public String getTipoIdenticiacion() {
-		return tipoIdenticiacion;
+	public String getTipoIdentificacion() {
+		return tipoIdentificacion;
 	}
-	public void setTipoIdenticiacion(String tipoIdenticiacion) {
-		this.tipoIdenticiacion = tipoIdenticiacion;
+	public void setTipoIdentificacion(String tipoIdentificacion) {
+		this.tipoIdentificacion = tipoIdentificacion;
 	}
 	public String getIdentificacion() {
 		return identificacion;
