@@ -181,6 +181,10 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.SET("COLEGIO = '" + tarjetaIntegrantesUpdateDTO.getColegio() + "'");
 		}
 		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getNumColegiado())) {
+			sql.SET("NUMCOLEGIADO = '" + tarjetaIntegrantesUpdateDTO.getNumColegiado() + "'");
+		}
+		
 		sql.SET("CAPITALSOCIAL = " + tarjetaIntegrantesUpdateDTO.getCapitalSocial());
 		sql.SET("FECHAMODIFICACION = SYSDATE");
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario()+ "'");
@@ -254,6 +258,9 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.VALUES("IDCARGO", "'" + tarjetaIntegrantesCreateDTO.getIdCargo() + "'");
 		}
 		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getColegio())) {
+			sql.VALUES("COLEGIO", "'" + tarjetaIntegrantesCreateDTO.getColegio() + "'");
+		}
 		
 		return sql.toString();
 	}

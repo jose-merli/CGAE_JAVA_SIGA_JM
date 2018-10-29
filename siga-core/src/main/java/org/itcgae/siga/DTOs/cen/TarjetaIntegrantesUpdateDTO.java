@@ -20,6 +20,7 @@ public class TarjetaIntegrantesUpdateDTO {
 	private String idProvincia;
 	private String colegio;
 	private Date fechaBajaCargo;
+	private String numColegiado;
 	
 	
 	
@@ -187,6 +188,23 @@ public class TarjetaIntegrantesUpdateDTO {
 	public void setColegio(String colegio) {
 		this.colegio = colegio;
 	}
+	
+	/**
+	 *
+	 */
+	public TarjetaIntegrantesUpdateDTO numColegiado(String numColegiado){
+		this.numColegiado = numColegiado;
+		return this;
+	}
+	
+	@JsonProperty("numColegiado")
+	public String getNumColegiado() {
+		return numColegiado;
+	}
+	public void setNumColegiado(String numColegiado) {
+		this.numColegiado = numColegiado;
+	}
+	
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -205,13 +223,14 @@ public class TarjetaIntegrantesUpdateDTO {
 				&& Objects.equals(this.idPersona, tarjetaIntegrantesUpdateDTO.idPersona)
 				&& Objects.equals(this.idTipoColegio, tarjetaIntegrantesUpdateDTO.idTipoColegio)
 				&& Objects.equals(this.idProvincia, tarjetaIntegrantesUpdateDTO.idProvincia)
-				&& Objects.equals(this.colegio, tarjetaIntegrantesUpdateDTO.colegio);
+				&& Objects.equals(this.colegio, tarjetaIntegrantesUpdateDTO.colegio)
+		&& Objects.equals(this.numColegiado, tarjetaIntegrantesUpdateDTO.numColegiado);
 
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(fechaCargo, cargo, idCargo, capitalSocial, idComponente, idPersona, idTipoColegio, idProvincia, colegio);
+		return Objects.hash(fechaCargo, cargo, idCargo, capitalSocial, idComponente, idPersona, idTipoColegio, idProvincia, colegio, numColegiado);
 	}
 
 	@Override
@@ -228,6 +247,7 @@ public class TarjetaIntegrantesUpdateDTO {
 		sb.append("    idTipoColegio: ").append(toIndentedString(idTipoColegio)).append("\n");
 		sb.append("    idProvincia: ").append(toIndentedString(idProvincia)).append("\n");
 		sb.append("    colegio: ").append(toIndentedString(colegio)).append("\n");
+		sb.append("    numColegiado: ").append(toIndentedString(numColegiado)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
