@@ -68,7 +68,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
         sql.SELECT_DISTINCT("COMPONENTE.IDINSTITUCION");
         sql.SELECT("COMPONENTE.IDPERSONA");
 		sql.SELECT("COMPONENTE.IDCOMPONENTE");
-		sql.SELECT("COMPONENTE.CARGO");
+		sql.SELECT("RECURSOCARGO.DESCRIPCION as CARGO");
 		sql.SELECT("TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy') AS FECHACARGO");
 		sql.SELECT("TO_CHAR(COMPONENTE.FECHABAJA, 'dd/mm/yyyy') AS FECHABAJACARGO");
 		sql.SELECT("COMPONENTE.CEN_CLIENTE_IDPERSONA AS IDPERSONACOMPONENTE");
@@ -89,7 +89,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.SELECT("COMPONENTE.IDCARGO");
 		sql.SELECT("COMPONENTE.IDPROVINCIA");
 		sql.SELECT("COMPONENTE.FLAG_SOCIO");
-		sql.SELECT("COMPONENTE.COLEGIO");
+		sql.SELECT("COMPONENTE.CEN_CLIENTE_IDINSTITUCION");
 		sql.SELECT("RECURSOCARGO.DESCRIPCION AS DESCRIPCIONCARGO");
 		sql.SELECT("INST.CODIGOEXT AS COLEGIO");
 		sql.SELECT("INST.NOMBRE AS NOMBRECOLEGIO");
@@ -173,8 +173,20 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.SET("IDTIPOCOLEGIO = '" + tarjetaIntegrantesUpdateDTO.getIdTipoColegio() + "'");
 		}
 		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getIdProvincia())) {
+			sql.SET("IDPROVINCIA = '" + tarjetaIntegrantesUpdateDTO.getIdProvincia() + "'");
+		}
+		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getIdPersonaComponente())) {
+			sql.SET("CEN_CLIENTE_IDPERSONA = '" + tarjetaIntegrantesUpdateDTO.getIdPersonaComponente() + "'");
+		}
+		
 		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getColegio())) {
-			sql.SET("COLEGIO = '" + tarjetaIntegrantesUpdateDTO.getColegio() + "'");
+			sql.SET("CEN_CLIENTE_IDINSTITUCION = '" + tarjetaIntegrantesUpdateDTO.getColegio() + "'");
+		}
+		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getNumColegiado())) {
+			sql.SET("NUMCOLEGIADO = '" + tarjetaIntegrantesUpdateDTO.getNumColegiado() + "'");
 		}
 		
 		sql.SET("CAPITALSOCIAL = " + tarjetaIntegrantesUpdateDTO.getCapitalSocial());
@@ -221,7 +233,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		}
 		
 		sql.VALUES("CEN_CLIENTE_IDPERSONA", "'" + tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante() + "'");
-		sql.VALUES("CEN_CLIENTE_IDINSTITUCION", "'" + tarjetaIntegrantesCreateDTO.getIdInstitucionIntegrante() + "'");
+		sql.VALUES("CEN_CLIENTE_IDINSTITUCION", "'" + tarjetaIntegrantesCreateDTO.getColegio() + "'");
 		sql.VALUES("SOCIEDAD", "'0'");
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", "'" + usuario.getIdusuario()+ "'");
@@ -249,7 +261,6 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		if(UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getIdCargo())) {
 			sql.VALUES("IDCARGO", "'" + tarjetaIntegrantesCreateDTO.getIdCargo() + "'");
 		}
-		
 		
 		return sql.toString();
 	}

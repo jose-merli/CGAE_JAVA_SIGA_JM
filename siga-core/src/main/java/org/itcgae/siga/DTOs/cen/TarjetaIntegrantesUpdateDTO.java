@@ -17,8 +17,11 @@ public class TarjetaIntegrantesUpdateDTO {
 	private String idPersona;
 	private String flagSocio;
 	private String idTipoColegio;
+	private String idProvincia;
 	private String colegio;
 	private Date fechaBajaCargo;
+	private String numColegiado;
+	private String idPersonaComponente;
 	
 	
 	
@@ -168,6 +171,15 @@ public class TarjetaIntegrantesUpdateDTO {
 	public void setIdTipoColegio(String idTipoColegio) {
 		this.idTipoColegio = idTipoColegio;
 	}
+	
+	@JsonProperty("idProvincia")
+	public String getIdProvincia() {
+		return idProvincia;
+	}
+
+	public void setIdProvincia(String idProvincia) {
+		this.idProvincia = idProvincia;
+	}
 
 	@JsonProperty("colegio")
 	public String getColegio() {
@@ -177,6 +189,39 @@ public class TarjetaIntegrantesUpdateDTO {
 	public void setColegio(String colegio) {
 		this.colegio = colegio;
 	}
+	
+	/**
+	 *
+	 */
+	public TarjetaIntegrantesUpdateDTO numColegiado(String numColegiado){
+		this.numColegiado = numColegiado;
+		return this;
+	}
+	
+	@JsonProperty("numColegiado")
+	public String getNumColegiado() {
+		return numColegiado;
+	}
+	public void setNumColegiado(String numColegiado) {
+		this.numColegiado = numColegiado;
+	}
+	
+	/**
+	 *
+	 */
+	public TarjetaIntegrantesUpdateDTO idPersonaComponente(String idPersonaComponente){
+		this.idPersonaComponente = idPersonaComponente;
+		return this;
+	}
+	
+	@JsonProperty("idPersonaComponente")
+	public String getIdPersonaComponente() {
+		return idPersonaComponente;
+	}
+	public void setIdPersonaComponente(String idPersonaComponente) {
+		this.idPersonaComponente = idPersonaComponente;
+	}
+	
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -194,13 +239,16 @@ public class TarjetaIntegrantesUpdateDTO {
 				&& Objects.equals(this.idComponente, tarjetaIntegrantesUpdateDTO.idComponente)
 				&& Objects.equals(this.idPersona, tarjetaIntegrantesUpdateDTO.idPersona)
 				&& Objects.equals(this.idTipoColegio, tarjetaIntegrantesUpdateDTO.idTipoColegio)
-				&& Objects.equals(this.colegio, tarjetaIntegrantesUpdateDTO.colegio);
+				&& Objects.equals(this.idProvincia, tarjetaIntegrantesUpdateDTO.idProvincia)
+				&& Objects.equals(this.colegio, tarjetaIntegrantesUpdateDTO.colegio)
+		&& Objects.equals(this.numColegiado, tarjetaIntegrantesUpdateDTO.numColegiado)
+		&& Objects.equals(this.idPersonaComponente, tarjetaIntegrantesUpdateDTO.idPersonaComponente);
 
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(fechaCargo, cargo, idCargo, capitalSocial, idComponente, idPersona, idTipoColegio, colegio);
+		return Objects.hash(fechaCargo, cargo, idCargo, capitalSocial, idComponente, idPersona, idTipoColegio, idProvincia, colegio, numColegiado, idPersonaComponente);
 	}
 
 	@Override
@@ -215,7 +263,10 @@ public class TarjetaIntegrantesUpdateDTO {
 		sb.append("    idComponente: ").append(toIndentedString(idComponente)).append("\n");
 		sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 		sb.append("    idTipoColegio: ").append(toIndentedString(idTipoColegio)).append("\n");
+		sb.append("    idProvincia: ").append(toIndentedString(idProvincia)).append("\n");
 		sb.append("    colegio: ").append(toIndentedString(colegio)).append("\n");
+		sb.append("    numColegiado: ").append(toIndentedString(numColegiado)).append("\n");
+		sb.append("    idPersonaComponente: ").append(toIndentedString(idPersonaComponente)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
