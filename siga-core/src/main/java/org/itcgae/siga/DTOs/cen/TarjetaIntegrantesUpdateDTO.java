@@ -21,6 +21,7 @@ public class TarjetaIntegrantesUpdateDTO {
 	private String colegio;
 	private Date fechaBajaCargo;
 	private String numColegiado;
+	private String idPersonaComponente;
 	
 	
 	
@@ -205,6 +206,22 @@ public class TarjetaIntegrantesUpdateDTO {
 		this.numColegiado = numColegiado;
 	}
 	
+	/**
+	 *
+	 */
+	public TarjetaIntegrantesUpdateDTO idPersonaComponente(String idPersonaComponente){
+		this.idPersonaComponente = idPersonaComponente;
+		return this;
+	}
+	
+	@JsonProperty("idPersonaComponente")
+	public String getIdPersonaComponente() {
+		return idPersonaComponente;
+	}
+	public void setIdPersonaComponente(String idPersonaComponente) {
+		this.idPersonaComponente = idPersonaComponente;
+	}
+	
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -224,13 +241,14 @@ public class TarjetaIntegrantesUpdateDTO {
 				&& Objects.equals(this.idTipoColegio, tarjetaIntegrantesUpdateDTO.idTipoColegio)
 				&& Objects.equals(this.idProvincia, tarjetaIntegrantesUpdateDTO.idProvincia)
 				&& Objects.equals(this.colegio, tarjetaIntegrantesUpdateDTO.colegio)
-		&& Objects.equals(this.numColegiado, tarjetaIntegrantesUpdateDTO.numColegiado);
+		&& Objects.equals(this.numColegiado, tarjetaIntegrantesUpdateDTO.numColegiado)
+		&& Objects.equals(this.idPersonaComponente, tarjetaIntegrantesUpdateDTO.idPersonaComponente);
 
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(fechaCargo, cargo, idCargo, capitalSocial, idComponente, idPersona, idTipoColegio, idProvincia, colegio, numColegiado);
+		return Objects.hash(fechaCargo, cargo, idCargo, capitalSocial, idComponente, idPersona, idTipoColegio, idProvincia, colegio, numColegiado, idPersonaComponente);
 	}
 
 	@Override
@@ -248,6 +266,7 @@ public class TarjetaIntegrantesUpdateDTO {
 		sb.append("    idProvincia: ").append(toIndentedString(idProvincia)).append("\n");
 		sb.append("    colegio: ").append(toIndentedString(colegio)).append("\n");
 		sb.append("    numColegiado: ").append(toIndentedString(numColegiado)).append("\n");
+		sb.append("    idPersonaComponente: ").append(toIndentedString(idPersonaComponente)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
