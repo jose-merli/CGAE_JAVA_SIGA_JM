@@ -22,6 +22,6 @@ public interface EnvTipoenviosExtendsMapper extends EnvTipoenviosMapper {
 		@Result(column = "IDTIPOENVIOS", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> getTypeSend(String idPlantillaEnvio, String idInstitucion, String idLenguaje);
+	List<ComboItem> getTypeSend(String idPlantillaEnvio, String idTipoEnvio, String idInstitucion, String idLenguaje);
 	
 }

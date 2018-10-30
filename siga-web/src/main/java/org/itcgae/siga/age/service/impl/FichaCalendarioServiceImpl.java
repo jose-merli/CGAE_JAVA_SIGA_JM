@@ -11,8 +11,6 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.CalendarDTO;
 import org.itcgae.siga.DTOs.age.CalendarItem;
-import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
-import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
 import org.itcgae.siga.DTOs.age.PermisoCalendarioItem;
 import org.itcgae.siga.DTOs.age.PermisosCalendarioDTO;
 import org.itcgae.siga.DTOs.age.PermisosPerfilesCalendarDTO;
@@ -29,7 +27,6 @@ import org.itcgae.siga.db.entities.AgePermisoscalendario;
 import org.itcgae.siga.db.entities.AgePermisoscalendarioExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeCalendarioExtendsMapper;
-import org.itcgae.siga.db.services.age.mappers.AgeNotificacioneseventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgePermisosCalendarioExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeTipocalendarioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -52,9 +49,6 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 
 	@Autowired
 	private AgePermisosCalendarioExtendsMapper agePermisosCalendarioExtendsMapper;
-	
-	@Autowired
-	private AgeNotificacioneseventoExtendsMapper ageNotificacioneseventoExtendsMapper;
 	
 
 	@Override
@@ -362,8 +356,7 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 		if (null != idInstitucion) {
 			LOGGER.info(
 					"getProfilesPermissions() / agePermisosCalendarioExtendsMapper.getPermisosProfiles() -> Entrada a agePermisosCalendarioExtendsMapper para obtener los permisos de los perfiles");
-			profilesCalendar = agePermisosCalendarioExtendsMapper.getProfilesPermissions(idCalendario,
-					idInstitucion.toString());
+			profilesCalendar = agePermisosCalendarioExtendsMapper.getProfilesPermissions(idCalendario, idInstitucion.toString());
 			LOGGER.info(
 					"getProfilesPermissions() / agePermisosCalendarioExtendsMapper.getPermisosProfiles() -> Salida de agePermisosCalendarioExtendsMapper para obtener los permisos de los perfiles");
 
@@ -377,33 +370,6 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 		return permisosPerfilesCalendarioDTO;
 	}
 
-	@Override
-	public NotificacionEventoDTO getEventNotifications(String idCalendario, HttpServletRequest request) {
-		LOGGER.info(
-				"getEventNotifications() -> Entrada al servicio para obtener las notificaciones de eventos de un calendario especifico");
 
-		List<NotificacionEventoItem> eventNotifications = new ArrayList<NotificacionEventoItem>();
-		NotificacionEventoDTO eventNotificationDTO = new NotificacionEventoDTO();
-
-		String token = request.getHeader("Authorization");
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		if (null != idInstitucion) {
-			LOGGER.info(
-					"getEventNotifications() / ageNotificacioneseventoExtendsMapper.getEventNotifications() -> Entrada a ageNotificacioneseventoMapper para obtener las notificaciones de eventos de un calendario");
-			eventNotifications = ageNotificacioneseventoExtendsMapper.getEventNotifications(idCalendario, idInstitucion.toString());
-			LOGGER.info(
-					"getEventNotifications() / ageNotificacioneseventoExtendsMapper.getEventNotifications() -> Salida de ageNotificacioneseventoMapper para obtener las notificaciones de eventos de un calendario");
-
-			eventNotificationDTO.setEventNotificationItems(eventNotifications);
-
-		}
-
-		LOGGER.info(
-				"getEventNotifications() -> Salida del servicio para obtener las notificaciones de eventos de un calendario especifico");
-
-		return eventNotificationDTO;
-	}
-	
 
 }

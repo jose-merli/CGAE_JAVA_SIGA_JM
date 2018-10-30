@@ -12,6 +12,7 @@ public class EnvPlantillasenviosSqlExtendsProvider extends  EnvPlantillasenviosS
 
 		sql.SELECT_DISTINCT("IDPLANTILLAENVIOS");
 		sql.SELECT("NOMBRE");
+		sql.SELECT("IDTIPOENVIOS");
 		sql.FROM("ENV_PLANTILLASENVIOS");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
 		sql.ORDER_BY("NOMBRE");

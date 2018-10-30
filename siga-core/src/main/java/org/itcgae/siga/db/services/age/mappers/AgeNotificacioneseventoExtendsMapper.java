@@ -34,4 +34,24 @@ public interface AgeNotificacioneseventoExtendsMapper extends AgeNotificacionese
 		
 	})
 	List<NotificacionEventoItem> getEventNotifications(String idCalendario, String idInstitucion);
+	
+	@SelectProvider(type = AgeNotificacioneseventoSqlExtendsProvider.class, method = "getHistoricEventNotifications")
+	@Results({
+		@Result(column = "IDEVENTO", property = "idEvento", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "NOMBREPLANTILLA", property = "nombrePlantilla", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPLANTILLA", property = "idPlantilla", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDCALENDARIO", property = "idCalendario", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPONOTIFICACIONEVENTO", property = "idTipoNotificacion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDUNIDADMEDIDA", property = "idUnidadMedida", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCIONCUANDO", property = "descripcionCuando", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOCUANDO", property = "idTipoCuando", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "NOMBRETIPONOTIFICACION", property = "nombreTipoNotificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDNOTIFICACIONEVENTO", property = "idNotificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR)
+		
+	})
+	List<NotificacionEventoItem> getHistoricEventNotifications(String idCalendario, String idInstitucion);
 }

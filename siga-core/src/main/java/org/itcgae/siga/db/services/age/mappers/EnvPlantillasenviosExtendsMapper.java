@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.services.age.providers.EnvPlantillasenviosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -19,9 +19,10 @@ public interface EnvPlantillasenviosExtendsMapper extends EnvPlantillasenviosMap
 		
 	@SelectProvider(type = EnvPlantillasenviosSqlExtendsProvider.class, method = "getTemplates")
 	@Results({
-		@Result(column = "IDPLANTILLAENVIOS", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantilla", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvio", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "NOMBRE", property = "nombrePlantilla", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> getTemplates(String idInstitucion);
+	List<NotificacionEventoItem> getTemplates(String idInstitucion);
 	
 }
