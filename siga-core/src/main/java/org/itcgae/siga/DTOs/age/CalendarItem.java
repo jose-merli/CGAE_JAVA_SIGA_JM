@@ -15,6 +15,7 @@ public class CalendarItem {
 	private Date fechaBaja;
 	private String idTipoCalendario;
 	private String color;
+	private boolean checked = false;
 
 	/**
 	 **/
@@ -149,6 +150,15 @@ public class CalendarItem {
 
 	public void setColor(String color) {
 		this.color = color;
+	}
+	
+
+	public boolean isChecked() {
+		return checked;
+	}
+
+	public void setChecked(boolean checked) {
+		this.checked = checked;
 	}
 
 	@Override
