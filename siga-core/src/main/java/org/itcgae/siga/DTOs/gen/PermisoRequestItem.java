@@ -17,10 +17,30 @@ public class PermisoRequestItem   {
   
   private String idGrupo = null;
   private String idInstitucion = null;
-
-
+  private String idRolCertificado = null;
+  private String idInstitucionCertificado = null;
   
-  /**
+  public String getIdInstitucionCertificado() {
+	return idInstitucionCertificado;
+}
+
+
+public void setIdInstitucionCertificado(String idInstitucionCertificado) {
+	this.idInstitucionCertificado = idInstitucionCertificado;
+}
+
+
+public String getIdRolCertificado() {
+	return idRolCertificado;
+}
+
+
+public void setIdRolCertificado(String idRolCertificado) {
+	this.idRolCertificado = idRolCertificado;
+}
+
+
+/**
    **/
   public PermisoRequestItem label(String idGrupo) {
     this.idGrupo = idGrupo;
@@ -63,12 +83,13 @@ public class PermisoRequestItem   {
     }
     PermisoRequestItem permisoItem = (PermisoRequestItem) o;
     return Objects.equals(this.idGrupo, permisoItem.idGrupo) &&
-        Objects.equals(this.idInstitucion, permisoItem.idInstitucion);
+        Objects.equals(this.idInstitucion, permisoItem.idInstitucion)&&
+        Objects.equals(this.idRolCertificado, permisoItem.idRolCertificado);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(idGrupo, idInstitucion);
+    return Objects.hash(idGrupo, idInstitucion,idRolCertificado);
   }
 
   @Override
@@ -78,6 +99,7 @@ public class PermisoRequestItem   {
     
     sb.append("    idGrupo: ").append(toIndentedString(idGrupo)).append("\n");
     sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
+    sb.append("    idRolCertificado: ").append(toIndentedString(idRolCertificado)).append("\n");
     sb.append("}");
     return sb.toString();
   }
