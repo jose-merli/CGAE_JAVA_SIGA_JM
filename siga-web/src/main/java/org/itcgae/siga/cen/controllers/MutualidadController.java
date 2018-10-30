@@ -1,6 +1,6 @@
 package org.itcgae.siga.cen.controllers;
 
-import org.itcgae.siga.DTOs.cen.AlterMutuaResponseDTO;
+
 import org.itcgae.siga.DTOs.cen.EstadoSolicitudDTO;
 import org.itcgae.siga.DTOs.cen.MutualidadResponseDTO;
 import org.itcgae.siga.cen.services.IMutualidadService;
@@ -41,7 +41,7 @@ public class MutualidadController {
 	}
 	
 	@RequestMapping(value="/enums",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<MutualidadResponseDTO> getEnums(EstadoSolicitudDTO estadoSolicitudDTO) {
+	ResponseEntity<MutualidadResponseDTO> getEnums() {
 		
 		MutualidadResponseDTO response = _mutualidadService.getEnums();
 		//TODO: se deja esta comprobacion de momento

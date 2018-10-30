@@ -13,11 +13,8 @@ import org.itcgae.siga.DTOs.cen.PropuestaDTO;
 import org.itcgae.siga.DTOs.cen.PropuestasDTO;
 import org.itcgae.siga.DTOs.cen.SolicitudDTO;
 import org.itcgae.siga.cen.services.IAlterMutuaService;
-import org.itcgae.siga.db.entities.AdmConfig;
-import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.ws.client.ClientAlterMutua;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +25,6 @@ import com.altermutua.www.wssiga.GetEstadoColegiadoDocument;
 import com.altermutua.www.wssiga.GetEstadoSolicitudDocument;
 import com.altermutua.www.wssiga.GetEstadoSolicitudDocument.GetEstadoSolicitud;
 import com.altermutua.www.wssiga.GetPropuestasDocument;
-import com.altermutua.www.wssiga.GetPropuestasDocument.Factory;
 import com.altermutua.www.wssiga.GetPropuestasDocument.GetPropuestas;
 import com.altermutua.www.wssiga.GetTarifaSolicitudDocument;
 import com.altermutua.www.wssiga.GetTarifaSolicitudDocument.GetTarifaSolicitud;
@@ -153,20 +149,33 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 				GetPropuestasDocument request = GetPropuestasDocument.Factory.newInstance();
 				GetPropuestas requestBody = GetPropuestas.Factory.newInstance();
 				
-				requestBody.setIntTipoIdentificador(PropuestasDTO.getTipoIdentificador());
+				if(PropuestasDTO.getTipoIdentificador().equals("NIF")){
+					requestBody.setIntTipoIdentificador(1);
+				}else if(PropuestasDTO.getTipoIdentificador().equals("Pasaporte")){
+					requestBody.setIntTipoIdentificador(0);
+				}
 				requestBody.setStrIdentificador(PropuestasDTO.getIdentificador());
-				requestBody.setDtFechaNacimiento(PropuestasDTO.getFechaNacimiento());
-				requestBody.setIntSexo(PropuestasDTO.getSexo());
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(PropuestasDTO.getFechaNacimiento());
+				requestBody.setDtFechaNacimiento(cal);
+				if(PropuestasDTO.getSexo().equals("H")){
+					requestBody.setIntSexo(1);
+				}else if (PropuestasDTO.getSexo().equals("M")){
+					requestBody.setIntSexo(2);
+				}
+				
 				requestBody.setIntTipoPropuesta(PropuestasDTO.getTipoPropuesta());
 				request.setGetPropuestas(requestBody);
 				
 				responseWS = _clientAlterMutua.getPropuestas(request, uriService);
 				
 				if(responseWS != null){
-
+					
 					response.setIdentificador(responseWS.getIdentificador());
 					response.setError(responseWS.getError());
 					response.setMensaje(responseWS.getMensaje());
+					
+					
 					
 					int index = 0;
 					List<PropuestaDTO> propuestas = new ArrayList<PropuestaDTO>();
@@ -315,7 +324,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 				
 				
 				if(solicitud.getHerederos() != null){
-					if(solicitud.getFamiliares().size() > 0){
+					if(solicitud.getHerederos().size() > 0){
 						WSPersona[] herederos = new WSPersona[solicitud.getHerederos().size()];
 						int index = 0;
 						for (PersonaDTO persona : solicitud.getHerederos()) {
@@ -333,10 +342,8 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 							herederos[index] = heredero;
 							index++;
 						}
-						//ver como añadir herederos
-						//asegurado.set
+						WSsolicitud.setHerederosArray(herederos);
 					}
-					
 				}else{
 					if(solicitud.getFamiliares().size() > 0){
 						WSPersona[] familiares = new WSPersona[solicitud.getFamiliares().size()];
@@ -359,9 +366,8 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						asegurado.setFamiliaresArray(familiares);
 					}
 				}
-				//TODO: beneficiarios
 				Calendar cal = Calendar.getInstance();
-				  cal.setTime(solicitud.getAsegurado().getFechaNacimiento());
+				cal.setTime(solicitud.getAsegurado().getFechaNacimiento());
 				asegurado.setFechaNacimiento(cal);
 				asegurado.setIdentificador(solicitud.getAsegurado().getIdentificador());
 				asegurado.setIdioma(Integer.parseInt(solicitud.getAsegurado().getIdioma()));
