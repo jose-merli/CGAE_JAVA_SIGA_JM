@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.db.entities.AgeCalendario;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -65,6 +66,25 @@ public class CalendarDTO   {
   
   public void setError(Error error) {
     this.error = error;
+  }
+  
+  
+  public void fillListCalendarItems(List<AgeCalendario> listAgeCalendario) {
+	  
+	  for(AgeCalendario ageCalendario : listAgeCalendario) {
+		  
+		  CalendarItem calendarItem = new CalendarItem();
+		  
+		  calendarItem.setIdCalendario(ageCalendario.getIdcalendario().toString());
+		  calendarItem.setIdInstitucion(ageCalendario.getIdinstitucion());
+		  calendarItem.descripcion(ageCalendario.getDescripcion());
+		  calendarItem.setColor(ageCalendario.getColor());
+		  calendarItem.setIdTipoCalendario(ageCalendario.getIdtipocalendario().toString());
+		  
+		  this.calendarItems.add(calendarItem);
+		  
+	  }
+	  
   }
 
   
