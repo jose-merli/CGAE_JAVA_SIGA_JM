@@ -13,12 +13,12 @@ public class BusquedaPerJuridicaItem {
 	private String nif;
 	private String denominacion;
 	private String abreviatura;
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaConstitucion;
 	private String tipo;
 	private String numeroIntegrantes;
 	private String nombresIntegrantes;
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaBaja;
 	private String idTipoIdentificacion;
 	private String sociedadProfesional;

@@ -1,5 +1,8 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +23,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosIntegrantesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
@@ -312,8 +316,9 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 					}
 
 					tarjetaIntegrantesCreateDTO.setIdComponente(String.valueOf(siguienteIDComponente));
-					responseCenComponentes = cenComponentesExtendsMapper.insertSelectiveForcreateMember(
-							tarjetaIntegrantesCreateDTO, usuario, String.valueOf(idInstitucion));
+					
+					CenComponentes cenComponentes = getCenComponentes(tarjetaIntegrantesCreateDTO, idInstitucion, usuario.getUsumodificacion());
+					responseCenComponentes = cenComponentesExtendsMapper.insertSelective(cenComponentes);
 
 					if (responseCenComponentes == 1) {
 						updateResponseDTO.setStatus(SigaConstants.OK);
@@ -362,8 +367,10 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 						}
 
 						tarjetaIntegrantesCreateDTO.setIdComponente(String.valueOf(siguienteIDComponente));
-						responseCenComponentes = cenComponentesExtendsMapper.insertSelectiveForcreateMember(
-								tarjetaIntegrantesCreateDTO, usuario, String.valueOf(idInstitucion));
+						
+						CenComponentes cenComponentes = getCenComponentes(tarjetaIntegrantesCreateDTO, idInstitucion, usuario.getUsumodificacion());
+						responseCenComponentes = cenComponentesExtendsMapper.insertSelective(cenComponentes);
+
 						if (responseCenComponentes == 1) {
 							updateResponseDTO.setStatus(SigaConstants.OK);
 						} else {
@@ -383,6 +390,53 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 
 		LOGGER.info("updateMember() -> Salida del servicio para crear un nuevo integrante");
 		return updateResponseDTO;
+	}
+	
+	private CenComponentes getCenComponentes(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO, Short idInstitucion, int usuario) {
+		CenComponentes cenComponentes = new CenComponentes();
+
+		if(null != tarjetaIntegrantesCreateDTO.getCapitalSocial()) {
+			cenComponentes.setCapitalsocial(new BigDecimal(tarjetaIntegrantesCreateDTO.getCapitalSocial(), MathContext.DECIMAL64));
+		}
+		
+		cenComponentes.setCargo(tarjetaIntegrantesCreateDTO.getCargo());
+		cenComponentes.setCenClienteIdinstitucion(Short.valueOf(tarjetaIntegrantesCreateDTO.getColegio()));
+		cenComponentes.setCenClienteIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()));
+		
+		if(null != tarjetaIntegrantesCreateDTO.getFechaBajaCargo()) {
+		cenComponentes.setFechabaja(tarjetaIntegrantesCreateDTO.getFechaBajaCargo());
+		}
+		
+		if(null != tarjetaIntegrantesCreateDTO.getFechaCargo()) {
+			cenComponentes.setFechacargo(tarjetaIntegrantesCreateDTO.getFechaCargo());
+		}
+		cenComponentes.setFechamodificacion(new Date());
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getFlagSocio())) {
+			cenComponentes.setFlagSocio(Short.valueOf(tarjetaIntegrantesCreateDTO.getFlagSocio()));
+		}
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getIdCargo())) {
+			cenComponentes.setIdcargo(Short.valueOf(tarjetaIntegrantesCreateDTO.getIdCargo()));
+		}
+		cenComponentes.setIdcomponente(Short.valueOf(tarjetaIntegrantesCreateDTO.getIdComponente()));
+		cenComponentes.setIdinstitucion(idInstitucion);
+		cenComponentes.setIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaPadre()));
+		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getIdProvincia())) {
+			cenComponentes.setIdprovincia(tarjetaIntegrantesCreateDTO.getIdProvincia());
+		}
+		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getNumColegiado())) {
+			cenComponentes.setNumcolegiado(tarjetaIntegrantesCreateDTO.getNumColegiado());
+		}
+		
+		if(!tarjetaIntegrantesCreateDTO.getIdTipoColegio().equals("")) {
+			cenComponentes.setIdtipocolegio(Short.valueOf(tarjetaIntegrantesCreateDTO.getIdTipoColegio()));
+		}
+		
+		cenComponentes.setSociedad("0");
+		cenComponentes.setUsumodificacion(usuario);
+		
+		return cenComponentes;
 	}
 
 	@Override
