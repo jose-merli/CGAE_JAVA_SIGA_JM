@@ -254,11 +254,11 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.VALUES("NUMCOLEGIADO", "'" + tarjetaIntegrantesCreateDTO.getNumColegiado() + "'");
 		}
 		
-		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getCapitalSocial())) {
-			sql.VALUES("CAPITALSOCIAL", "'" + tarjetaIntegrantesCreateDTO.getCapitalSocial() + "'");
+		if(null != tarjetaIntegrantesCreateDTO.getCapitalSocial()) {
+			sql.VALUES("CAPITALSOCIAL", tarjetaIntegrantesCreateDTO.getCapitalSocial().toString());
 		}
 		
-		if(UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getIdCargo())) {
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getIdCargo())) {
 			sql.VALUES("IDCARGO", "'" + tarjetaIntegrantesCreateDTO.getIdCargo() + "'");
 		}
 		

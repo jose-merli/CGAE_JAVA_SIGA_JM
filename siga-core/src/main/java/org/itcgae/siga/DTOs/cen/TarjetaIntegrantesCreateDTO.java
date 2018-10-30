@@ -16,7 +16,7 @@ public class TarjetaIntegrantesCreateDTO {
 	private Date fechaBajaCargo;
 	private String cargo;
 	private String idCargo;
-	private String capitalSocial;
+	private Double capitalSocial;
 	private String idComponente;
 	private String idPersonaPadre;
 	private String idPersonaIntegrante;
@@ -201,17 +201,17 @@ public class TarjetaIntegrantesCreateDTO {
 	/**
 	 *
 	 */
-	public TarjetaIntegrantesCreateDTO capitalSocial(String capitalSocial) {
+	public TarjetaIntegrantesCreateDTO capitalSocial(Double capitalSocial) {
 		this.capitalSocial = capitalSocial;
 		return this;
 	}
 
 	@JsonProperty("capitalSocial")
-	public String getCapitalSocial() {
+	public Double getCapitalSocial() {
 		return capitalSocial;
 	}
 
-	public void setCapitalSocial(String capitalSocial) {
+	public void setCapitalSocial(Double capitalSocial) {
 		this.capitalSocial = capitalSocial;
 	}
 
