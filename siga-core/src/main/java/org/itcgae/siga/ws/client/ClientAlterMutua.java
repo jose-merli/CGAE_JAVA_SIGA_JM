@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.log4j.Logger;
-import org.itcgae.siga.cen.services.impl.AlterMutuaServiceImpl;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
