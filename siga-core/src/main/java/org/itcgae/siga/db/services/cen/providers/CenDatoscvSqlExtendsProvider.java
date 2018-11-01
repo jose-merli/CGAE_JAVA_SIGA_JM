@@ -40,9 +40,9 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 
 			SQL sql = new SQL();
 			sql.UPDATE("CEN_DATOSCV CEN");
-			if (record.getIdcv() != null) {
-				sql.SET("IDCV ='"+ record.getIdcv() +"'");
-			}
+//			if (record.getIdcv() != null) {
+//				sql.SET("IDCV ='"+ record.getIdcv() +"'");
+//			}
 //			if (record.getIdinstitucion() != null) {
 //				sql.SET("IDINSTITUCION ="+ record.getIdinstitucion()+"");
 //			}
@@ -68,7 +68,7 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 //				sql.SET("FECHAMODIFICACION = '"+ record.getFechamodificacion()+"'");
 				
 				String fechaF = dateFormat.format(record.getFechamodificacion());
-				sql.SET("FECHAMODIFICACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+				sql.SET("FECHAMODIFICACION = '" + fechaF + "'");
 				
 			}
 			
@@ -110,6 +110,9 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 			}
 			sql.WHERE("CEN.IDINSTITUCION = '"+record.getIdinstitucion()+"'");
 			sql.WHERE("CEN.IDPERSONA = '" + record.getIdpersona() +"'");
+			sql.WHERE("IDCV = '" + record.getIdcv() +"'");
+//			sql.SET("IDCV ='"+ record.getIdcv() +"'");
+
 			
 //			applyWhere(sql, example, true);
 			return sql.toString();

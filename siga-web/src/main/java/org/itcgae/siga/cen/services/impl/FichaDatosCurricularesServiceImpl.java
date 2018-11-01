@@ -190,7 +190,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 //				recordUpdate.setFechainicio(fichaDatosCurricularesItem.getFechaDesdeDate());
 //				recordUpdate.setFechafin(fichaDatosCurricularesItem.getFechaHastaDate());
 //				recordUpdate.setFechamovimiento(fichaDatosCurricularesItem.getFechaMovimientoDate());
-//				recordUpdate.setIdcv(Short.parseShort(fichaDatosCurricularesItem.getIdCv()));
+				recordUpdate.setIdcv(Short.parseShort(fichaDatosCurricularesItem.getIdCv()));
 //				recordUpdate.setIdpersona(Long.valueOf(fichaDatosCurricularesDTO[i].getIdPersona()));
 				
 
@@ -198,7 +198,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 				response = cenDatoscvExtendsMapper.updateCurriculo(recordUpdate);
 
 				LOGGER.info(
-						"updateDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para eliminar un curriculum");
+						"updateDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para actualizar un curriculum");
 
 				updateResponseDTO.setStatus(SigaConstants.OK);
 				if (response == 0) {
@@ -217,7 +217,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 					+ ". No existen ningún usuario en base de datos");
 		}
 
-		LOGGER.info("updateDatosCurriculares() -> Salida del servicio para eliminar un curriculum");
+		LOGGER.info("updateDatosCurriculares() -> Salida del servicio para actualizar un curriculum");
 		return updateResponseDTO;
 	}
 	
