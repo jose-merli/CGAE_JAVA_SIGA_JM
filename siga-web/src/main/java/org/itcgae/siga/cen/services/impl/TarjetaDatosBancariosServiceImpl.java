@@ -62,6 +62,8 @@ import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenMandatosCuentasbancarias;
 import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasKey;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenFichero;
 import org.itcgae.siga.db.entities.GenFicheroKey;
 import org.itcgae.siga.db.entities.GenRecursos;
@@ -72,6 +74,7 @@ import org.itcgae.siga.db.mappers.CenMandatosCuentasbancariasMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.GenFicheroExtendsMapper;
 import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -81,53 +84,52 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-
 @Service
-@Transactional(rollbackFor=Exception.class)
-public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosService{
+@Transactional(rollbackFor = Exception.class)
+public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosService {
 
 	private Logger LOGGER = Logger.getLogger(TarjetaDatosBancariosServiceImpl.class);
-	
+
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
-	
+
 	@Autowired
 	private CenCuentasbancariasExtendsMapper cenCuentasbancariasExtendsMapper;
-	
+
 	@Autowired
 	private AdmConfigMapper admConfigMapper;
-	
+
 	@Autowired
 	private CenMandatosCuentasbancariasMapper cenMandatosCuentasbancariasMapper;
 
 	@Autowired
 	private CenAnexosCuentasbancariasMapper cenAnexosCuentasbancariasMapper;
-	
-	
+
 	@Autowired
 	private GenFicheroExtendsMapper genFicheroExtendsMapper;
 
 	@Autowired
 	private GenRecursosMapper genRecursosMapper;
-	
+
 	@Autowired
 	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
-	
+
+	@Autowired
+	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 
 	@Override
 	public DatosBancariosDTO searchBanksData(int numPagina, DatosBancariosSearchDTO datosBancariosSearchDTO,
 			HttpServletRequest request) {
 		LOGGER.info("searchBanksData() -> Entrada al servicio para la búsqueda por filtros de cuentas bancarias");
-		
+
 		List<DatosBancariosItem> datosBancariosItem = new ArrayList<DatosBancariosItem>();
 		DatosBancariosDTO datosBancariosDTO = new DatosBancariosDTO();
 
-		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -140,35 +142,34 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			if (null != usuarios && usuarios.size() > 0) {
 				LOGGER.info(
 						"searchBanksData() / cenCuentasbancariasExtendsMapper.selectCuentasBancarias() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de cuentas bancarias");
-				datosBancariosItem = cenCuentasbancariasExtendsMapper.selectCuentasBancarias(datosBancariosSearchDTO, idInstitucion.toString());
+				datosBancariosItem = cenCuentasbancariasExtendsMapper.selectCuentasBancarias(datosBancariosSearchDTO,
+						idInstitucion.toString());
 				LOGGER.info(
 						"searchBanksData() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de cuentas bancarias");
 
-				datosBancariosDTO.setDatosBancariosItem(datosBancariosItem);;
-			} 
-			else {
-				LOGGER.warn("searchBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+				datosBancariosDTO.setDatosBancariosItem(datosBancariosItem);
+				;
+			} else {
+				LOGGER.warn(
+						"searchBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
 			}
-		} 
-		else {
+		} else {
 			LOGGER.warn("searchBanksData() -> idInstitucion del token nula");
 		}
-		
+
 		LOGGER.info("searchBanksData() -> Salida del servicio para la búsqueda por filtros de cuentas bancarias");
 		return datosBancariosDTO;
 	}
 
-
-
-
 	@Override
 	public DeleteResponseDTO deleteBanksData(DatosBancariosDeleteDTO datosBancariosDeleteDTO,
 			HttpServletRequest request) {
-		
+
 		LOGGER.info("deleteBanksData() -> Entrada al servicio para eliminar cuentas bancarias");
 		int response = 0;
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
-		
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -185,25 +186,28 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-				
+
 				// información a modificar
 				CenCuentasbancarias cuentaBancaria = new CenCuentasbancarias();
 				cuentaBancaria.setFechabaja(new Date());
 				cuentaBancaria.setFechamodificacion(new Date());
 				cuentaBancaria.setUsumodificacion(usuario.getIdusuario());
-				
+
 				// filtrado para sentencia sql
-				List <Short> idCuentasDelete = new ArrayList<Short>();
-				for(int i=0; i<datosBancariosDeleteDTO.getIdCuentas().length; i++) {
+				List<Short> idCuentasDelete = new ArrayList<Short>();
+				for (int i = 0; i < datosBancariosDeleteDTO.getIdCuentas().length; i++) {
 					idCuentasDelete.add(Short.valueOf(datosBancariosDeleteDTO.getIdCuentas()[i]));
 				}
-				
+
 				CenCuentasbancariasExample cenCuentasbancariasDelete = new CenCuentasbancariasExample();
-				cenCuentasbancariasDelete.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(datosBancariosDeleteDTO.getIdPersona())).andIdcuentaIn(idCuentasDelete);
-			
+				cenCuentasbancariasDelete.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdpersonaEqualTo(Long.valueOf(datosBancariosDeleteDTO.getIdPersona()))
+						.andIdcuentaIn(idCuentasDelete);
+
 				LOGGER.info(
 						"deleteBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para eliminar cuentas bancarias");
-				response = cenCuentasbancariasExtendsMapper.updateByExampleSelective(cuentaBancaria, cenCuentasbancariasDelete);
+				response = cenCuentasbancariasExtendsMapper.updateByExampleSelective(cuentaBancaria,
+						cenCuentasbancariasDelete);
 				LOGGER.info(
 						"deleteBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para eliminar cuentas bancarias");
 
@@ -215,38 +219,33 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		} else {
 			LOGGER.warn("deleteBanksData() -> idInstitucion del token nula");
 		}
-		
+
 		// comprobacion actualización
-		if(response >= 1) {
+		if (response >= 1) {
 			LOGGER.info("deleteBanksData() -> OK. Delete para cuentas bancarias realizado correctamente");
 			deleteResponseDTO.setStatus(SigaConstants.OK);
-		}
-		else {
+		} else {
 			LOGGER.info("deleteBanksData() -> KO. Delete para cuentas bancarias  NO realizado correctamente");
 			deleteResponseDTO.setStatus(SigaConstants.KO);
 		}
-		
+
 		LOGGER.info("deleteBanksData() -> Salida del servicio para eliminar cuentas bancarias ");
 		return deleteResponseDTO;
 	}
-
-
-
 
 	@Override
 	public DatosBancariosDTO searchGeneralData(int numPagina, DatosBancariosSearchDTO datosBancariosSearchDTO,
 			HttpServletRequest request) {
 		LOGGER.info("searchGeneralData() -> Entrada al servicio para la búsqueda por filtros de cuentas bancarias");
-		
+
 		List<DatosBancariosItem> datosBancariosItem = new ArrayList<DatosBancariosItem>();
 		DatosBancariosDTO datosBancariosDTO = new DatosBancariosDTO();
 
-		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -259,11 +258,12 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			if (null != usuarios && usuarios.size() > 0) {
 				LOGGER.info(
 						"searchGeneralData() / cenCuentasbancariasExtendsMapper.selectCuentasBancarias() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de cuentas bancarias");
-				datosBancariosItem = cenCuentasbancariasExtendsMapper.selectGeneralCuentasBancarias(datosBancariosSearchDTO, idInstitucion.toString());
+				datosBancariosItem = cenCuentasbancariasExtendsMapper
+						.selectGeneralCuentasBancarias(datosBancariosSearchDTO, idInstitucion.toString());
 				LOGGER.info(
 						"searchGeneralData() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de cuentas bancarias");
 
-				if (null != datosBancariosItem && datosBancariosItem.size() >0 ) {
+				if (null != datosBancariosItem && datosBancariosItem.size() > 0) {
 					for (DatosBancariosItem datosBancarios : datosBancariosItem) {
 						if (null != datosBancarios.getUso()) {
 							List<String> usos = new ArrayList<String>();
@@ -276,7 +276,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 							if (datosBancarios.getUso().contains("SJCS")) {
 								usos.add("S");
 							}
-							if (null != usos && usos.size()>0) {
+							if (null != usos && usos.size() > 0) {
 								String[] tiposCuenta = new String[usos.size()];
 								int i = 0;
 								for (String uso : usos) {
@@ -286,41 +286,39 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 								}
 								datosBancarios.setTipoCuenta(tiposCuenta);
 							}
-							
+
 						}
 					}
 				}
-				datosBancariosDTO.setDatosBancariosItem(datosBancariosItem);;
-			} 
-			else {
-				LOGGER.warn("searchGeneralData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+				datosBancariosDTO.setDatosBancariosItem(datosBancariosItem);
+				;
+			} else {
+				LOGGER.warn(
+						"searchGeneralData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
 			}
-		} 
-		else {
+		} else {
 			LOGGER.warn("searchGeneralData() -> idInstitucion del token nula");
 		}
-		
+
 		LOGGER.info("searchBanksData() -> Salida del servicio para la búsqueda por filtros de cuentas bancarias");
 		return datosBancariosDTO;
 	}
 
-
-
-
 	@Override
 	public MandatosDTO searchMandatos(int numPagina, DatosBancariosSearchDTO datosBancariosSearchDTO,
 			HttpServletRequest request) {
-		LOGGER.info("searchMandatos() -> Entrada al servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
-		
+		LOGGER.info(
+				"searchMandatos() -> Entrada al servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
+
 		List<MandatosItem> mandatosItem = new ArrayList<MandatosItem>();
 		MandatosDTO mandatosDTO = new MandatosDTO();
 
-		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -333,26 +331,26 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			if (null != usuarios && usuarios.size() > 0) {
 				LOGGER.info(
 						"searchMandatos() / cenCuentasbancariasExtendsMapper.selectCuentasBancarias() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de mandatos de cuentas bancarias");
-				mandatosItem = cenCuentasbancariasExtendsMapper.selectMandatos(datosBancariosSearchDTO, idInstitucion.toString());
+				mandatosItem = cenCuentasbancariasExtendsMapper.selectMandatos(datosBancariosSearchDTO,
+						idInstitucion.toString());
 				LOGGER.info(
 						"searchMandatos() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de mandatos de cuentas bancarias");
 
-				mandatosDTO.setMandatosItem(mandatosItem);;
-			} 
-			else {
-				LOGGER.warn("searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+				mandatosDTO.setMandatosItem(mandatosItem);
+				;
+			} else {
+				LOGGER.warn(
+						"searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
 			}
-		} 
-		else {
+		} else {
 			LOGGER.warn("searchMandatos() -> idInstitucion del token nula");
 		}
-		
-		LOGGER.info("searchMandatos() -> Salida del servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
+
+		LOGGER.info(
+				"searchMandatos() -> Salida del servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
 		return mandatosDTO;
 	}
-
-
-
 
 	@Override
 	public InsertResponseDTO insertBanksData(DatosBancariosInsertDTO datosBancariosInsertDTO,
@@ -401,7 +399,32 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				cuentaBancaria.setIban(datosBancariosInsertDTO.getIban());
 				cuentaBancaria.setIdcuenta(idCuenta);
 				cuentaBancaria.setIdinstitucion(idInstitucion);
+				
+//				CenPersona cenPersona = cenPersonaExtendsMapper.selectByPrimaryKey(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+//				
+//				// ESto se hace para actualizar el nif de una persona
+//				if(null != cenPersona) {
+//					if(!cenPersona.getNifcif().equals(datosBancariosInsertDTO.getNifTitular())) {
+//						CenPersona record = new CenPersona();
+//						record.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+//						record.setNifcif(datosBancariosInsertDTO.getNifTitular());
+//						int rdo = cenPersonaExtendsMapper.updateByPrimaryKeySelective(record);
+//						
+//						if(rdo == 1) {
+//							cuentaBancaria.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+//						}
+//					}else {
+//						cuentaBancaria.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+//					}
+//				}
+				
+				// Se actualizará el nif de la persona en caso de cambio del mismo
+				if(null != datosBancariosInsertDTO.getNifTitular()) {
+					updateNifTitular(Long.valueOf(datosBancariosInsertDTO.getIdPersona()), datosBancariosInsertDTO.getNifTitular());
+				}
+				
 				cuentaBancaria.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+			
 				cuentaBancaria.setTitular(datosBancariosInsertDTO.getTitular());
 
 				//Gestionamos los abonos que nos llegan
@@ -643,29 +666,39 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		LOGGER.info("insertBanksData() -> Salida del servicio para insertar cuentas bancarias ");
 		return insertResponseDTO;
 	}
-
-
+	
+	private void updateNifTitular(Long idPersona, String nifTitular) {
+		CenPersona cenPersona = cenPersonaExtendsMapper.selectByPrimaryKey(idPersona);
+		
+		if(null != cenPersona) {
+			if(!cenPersona.getNifcif().equals(nifTitular)) {
+				CenPersona record = new CenPersona();
+				record.setIdpersona(Long.valueOf(idPersona));
+				record.setNifcif(nifTitular);
+				cenPersonaExtendsMapper.updateByPrimaryKeySelective(record);
+			}
+		}
+	}
 
 	@Override
 	public ComboDTO getLabelEsquema(HttpServletRequest request) {
 		LOGGER.info("getLabelEsquema() -> Entrada al servicio para la búsqueda de esquemas de mandatos");
-		
+
 		ComboDTO combo = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		if(null != idInstitucion)
-		{
+
+		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
 					"getLabelEsquema() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			if(null != usuarios && usuarios.size() > 0) {
-				
+			if (null != usuarios && usuarios.size() > 0) {
+
 				AdmUsuarios usuario = usuarios.get(0);
 				LOGGER.info(
 						"getLabelEsquema() / cenNocolegiadoExtendsMapper.getProfesionalActivities() -> Entrada a cenNocolegiadoExtendsMapper obtener lista de esquemas de mandatos");
@@ -681,25 +714,21 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					combo.setCombooItems(comboItems);
 				}
 			}
-			
+
 		}
-		
-		
+
 		LOGGER.info("getLabelEsquema() -> Salida del servicio para la búsqueda de esquemas de mandatos");
 		return combo;
 
 	}
 
-
-
-
 	@Override
 	public UpdateResponseDTO updateMandatos(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request) {
-		
+
 		LOGGER.info("updateMandatos() -> Entrada al servicio para actualizar mandatos");
 		int response = 0;
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -716,7 +745,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-					
+
 				// información a modificar
 				CenMandatosCuentasbancarias record = new CenMandatosCuentasbancarias();
 				record.setFechamodificacion(new Date());
@@ -727,15 +756,15 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				record.setIdinstitucion(Short.valueOf(idInstitucion));
 				record.setEsquema(Short.valueOf(mandatosUpdateDTO.getEsquema()));
 				if (null != mandatosUpdateDTO.getEsquema() && mandatosUpdateDTO.getEsquema().equals("2")) {
-					record.setAutorizacionb2b(Short.valueOf("1"));	
+					record.setAutorizacionb2b(Short.valueOf("1"));
 				}
 				// filtrado para sentencia sql
-			
+
 				LOGGER.info(
 						"updateMandatos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar mandatos");
-				
+
 				response = cenMandatosCuentasbancariasMapper.updateByPrimaryKeySelective(record);
-				
+
 				LOGGER.info(
 						"updateMandatos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar mandatos");
 
@@ -747,38 +776,34 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		} else {
 			LOGGER.warn("updateMandatos() -> idInstitucion del token nula");
 		}
-		
+
 		// comprobacion actualización
-		if(response >= 1) {
+		if (response >= 1) {
 			LOGGER.info("updateMandatos() -> OK. Update para mandatos realizado correctamente");
 			updateResponseDTO.setStatus(SigaConstants.OK);
-		}
-		else {
+		} else {
 			LOGGER.info("updateMandatos() -> KO. Update para mandatos  NO realizado correctamente");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		}
-		
+
 		LOGGER.info("deleteBanksData() -> Salida del servicio para actualizar mandatos ");
 		return updateResponseDTO;
 	}
 
-
-
-
 	@Override
 	public BancoBicDTO searchBanks(DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO,
 			HttpServletRequest request) {
-		LOGGER.info("searchMandatos() -> Entrada al servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
-		
+		LOGGER.info(
+				"searchMandatos() -> Entrada al servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
+
 		List<BancoBicItem> bancoBicItem = new ArrayList<BancoBicItem>();
 		BancoBicDTO bancoBic = new BancoBicDTO();
 
-		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -796,36 +821,36 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				LOGGER.info(
 						"searchMandatos() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de mandatos de cuentas bancarias");
 
-				bancoBic.setBancoBicItem(bancoBicItem);;
-			} 
-			else {
-				LOGGER.warn("searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+				bancoBic.setBancoBicItem(bancoBicItem);
+				;
+			} else {
+				LOGGER.warn(
+						"searchMandatos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
 			}
-		} 
-		else {
+		} else {
 			LOGGER.warn("searchMandatos() -> idInstitucion del token nula");
 		}
-		
-		LOGGER.info("searchMandatos() -> Salida del servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
+
+		LOGGER.info(
+				"searchMandatos() -> Salida del servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
 		return bancoBic;
 	}
-	
-	
+
 	@Override
 	public UpdateResponseDTO updateBanksData(DatosBancariosInsertDTO datosBancariosInsertDTO,
 			HttpServletRequest request) throws Exception {
-		
+
 		LOGGER.info("updateBanksData() -> Entrada al servicio para insertar cuentas bancarias");
 		int response = 0;
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
-		
+
 		// datos para AUDITORIA
 		List<CenCuentasbancarias> listCenCuentasbancariasAnterior = new ArrayList<CenCuentasbancarias>();
 		CenCuentasbancarias cenCuentasbancariasAnterior = new CenCuentasbancarias();
 		CenCuentasbancarias cenCuentasbancariasPosterior = new CenCuentasbancarias();
-		
-		
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -844,25 +869,34 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-				
-				// error que hemos detectado con mybatis. Este error consiste en que dos variables que llaman al mismo metodo de un mapper tienen la misma direccion de memoria.
-				// llamo al metodo selectByExample(..) en vez de selectByPrimaryKey(..) para obtener los datos anterior su actualización
-				
+
+				// error que hemos detectado con mybatis. Este error consiste en que dos
+				// variables que llaman al mismo metodo de un mapper tienen la misma direccion
+				// de memoria.
+				// llamo al metodo selectByExample(..) en vez de selectByPrimaryKey(..) para
+				// obtener los datos anterior su actualización
+
 				CenCuentasbancariasExample cenCuentasbancariasExample = new CenCuentasbancariasExample();
-				cenCuentasbancariasExample.createCriteria().andIdcuentaEqualTo(Short.valueOf(datosBancariosInsertDTO.getIdCuenta())).andIdpersonaEqualTo(Long.valueOf(datosBancariosInsertDTO.getIdPersona())).
-				andIdinstitucionEqualTo(idInstitucion);
-				
-				listCenCuentasbancariasAnterior = cenCuentasbancariasExtendsMapper.selectByExample(cenCuentasbancariasExample);
+				cenCuentasbancariasExample.createCriteria()
+						.andIdcuentaEqualTo(Short.valueOf(datosBancariosInsertDTO.getIdCuenta()))
+						.andIdpersonaEqualTo(Long.valueOf(datosBancariosInsertDTO.getIdPersona()))
+						.andIdinstitucionEqualTo(idInstitucion);
+
+				listCenCuentasbancariasAnterior = cenCuentasbancariasExtendsMapper
+						.selectByExample(cenCuentasbancariasExample);
 				cenCuentasbancariasAnterior = listCenCuentasbancariasAnterior.get(0);
-				
+
 				// información a actualizar
-				CenCuentasbancariasKey key = new  CenCuentasbancariasKey();
+				CenCuentasbancariasKey key = new CenCuentasbancariasKey();
 				key.setIdcuenta(Short.valueOf(datosBancariosInsertDTO.getIdCuenta()));
+				// Se actualizará el nif de la persona en caso de cambio del mismo
+				if(null != datosBancariosInsertDTO.getNifTitular()) {
+					updateNifTitular(Long.valueOf(datosBancariosInsertDTO.getIdPersona()), datosBancariosInsertDTO.getNifTitular());
+				}
 				key.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
 				key.setIdinstitucion(Short.valueOf(idInstitucion));
 				CenCuentasbancarias cuentaBancaria = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(key);
-				
-				
+
 				cuentaBancaria.setFechamodificacion(new Date());
 				cuentaBancaria.setUsumodificacion(usuario.getIdusuario());
 				cuentaBancaria.setCuentacontable(datosBancariosInsertDTO.getCuentaContable());
@@ -870,8 +904,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 				cuentaBancaria.setTitular(datosBancariosInsertDTO.getTitular());
 
-				//Gestionamos los abonos que nos llegan
-				if (null != datosBancariosInsertDTO.getTipoCuenta() && datosBancariosInsertDTO.getTipoCuenta().length>0) {
+				// Gestionamos los abonos que nos llegan
+				if (null != datosBancariosInsertDTO.getTipoCuenta()
+						&& datosBancariosInsertDTO.getTipoCuenta().length > 0) {
 
 					for (String uso : datosBancariosInsertDTO.getTipoCuenta()) {
 						if (uso.equals("S")) {
@@ -880,11 +915,11 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						}
 						if (uso.equals("C")) {
 							tieneCargo = Boolean.TRUE;
-						
+
 						}
 						if (uso.equals("A")) {
 							tieneAbono = Boolean.TRUE;
-						
+
 						}
 					}
 					if (!tieneSCSJ) {
@@ -892,32 +927,32 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					}
 					if (tieneCargo && tieneAbono) {
 						cuentaBancaria.setAbonocargo("T");
-						
-					}else if(tieneCargo) {
+
+					} else if (tieneCargo) {
 						cuentaBancaria.setAbonocargo("C");
-					}else if(tieneAbono) {
+					} else if (tieneAbono) {
 						cuentaBancaria.setAbonocargo("A");
-					}else if(!tieneCargo && !tieneAbono) {
+					} else if (!tieneCargo && !tieneAbono) {
 						cuentaBancaria.setAbonocargo("");
 					}
 				}
-				
-				
+
 				cuentaBancaria.setCboCodigo(datosBancariosInsertDTO.getIban().substring(4, 8));
 				cuentaBancaria.setCodigosucursal(datosBancariosInsertDTO.getIban().substring(8, 12));
 				cuentaBancaria.setDigitocontrol(datosBancariosInsertDTO.getIban().substring(12, 14));
-				cuentaBancaria.setNumerocuenta(datosBancariosInsertDTO.getIban().substring(14, 24));			
+				cuentaBancaria.setNumerocuenta(datosBancariosInsertDTO.getIban().substring(14, 24));
 
-				
-				//Si se ha marcado el check abono SJCS se comprueba si existe otra cuenta que ya es abono SJCS
-				if(tieneSCSJ){
+				// Si se ha marcado el check abono SJCS se comprueba si existe otra cuenta que
+				// ya es abono SJCS
+				if (tieneSCSJ) {
 					CenCuentasbancariasExample example = new CenCuentasbancariasExample();
-					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(datosBancariosInsertDTO.getIdPersona())).andIdinstitucionEqualTo(idInstitucion).andAbonosjcsEqualTo("1");
-					List<CenCuentasbancarias> cuenta = cenCuentasbancariasExtendsMapper.selectByExample(example );
-					
-					
-					//if (cuentasAdm.existeCuentaAbonoSJCS(beanCuentas.getIdPersona(), beanCuentas.getIdInstitucion(), beanCuentas.getIdCuenta())) {
-					if (null != cuenta && cuenta.size()>0) {
+					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(datosBancariosInsertDTO.getIdPersona()))
+							.andIdinstitucionEqualTo(idInstitucion).andAbonosjcsEqualTo("1");
+					List<CenCuentasbancarias> cuenta = cenCuentasbancariasExtendsMapper.selectByExample(example);
+
+					// if (cuentasAdm.existeCuentaAbonoSJCS(beanCuentas.getIdPersona(),
+					// beanCuentas.getIdInstitucion(), beanCuentas.getIdCuenta())) {
+					if (null != cuenta && cuenta.size() > 0) {
 						if (!cuenta.get(0).getIdcuenta().equals(Short.valueOf(datosBancariosInsertDTO.getIdCuenta()))) {
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							error.setMessage("messages.censo.existeAbonoSJCS");
@@ -926,131 +961,143 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						}
 
 					}
-				
+
 				}
 				LOGGER.info(
 						"updateBanksData() / cenCuentasbancariasExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenCuentasbancariasExtendsMapper para actualizar cuentas bancarias");
 				response = cenCuentasbancariasExtendsMapper.updateByPrimaryKeySelective(cuentaBancaria);
 				LOGGER.info(
 						"updateBanksData() / cenCuentasbancariasExtendsMapper.updateByPrimaryKeySelective() -> Salida de cenCuentasbancariasExtendsMapper para actualizar cuentas bancarias");
-		
+
 				// comprobacion actualización
-				if(response >= 1) {
+				if (response >= 1) {
 					LOGGER.info("updateBanksData() -> OK. Update para cuentas bancarias realizado correctamente");
 					updateResponseDTO.setStatus(SigaConstants.OK);
-					
-					
+
 					// AUDITORIA si la actualización se ha realizado bien
-					
+
 					CenCuentasbancariasKey cenCuentasbancariasKeyPosterior = new CenCuentasbancariasKey();
 					cenCuentasbancariasKeyPosterior.setIdcuenta(Short.valueOf(datosBancariosInsertDTO.getIdCuenta()));
 					cenCuentasbancariasKeyPosterior.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
 					cenCuentasbancariasKeyPosterior.setIdinstitucion(Short.valueOf(idInstitucion));
-					
-					cenCuentasbancariasPosterior = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(cenCuentasbancariasKeyPosterior);
-					
-					auditoriaCenHistoricoService.manageAuditoriaDatosCuentasBancarias(cenCuentasbancariasAnterior, cenCuentasbancariasPosterior, "UPDATE", request, datosBancariosInsertDTO.getMotivo());
-					
-				}
-				else {
+
+					cenCuentasbancariasPosterior = cenCuentasbancariasExtendsMapper
+							.selectByPrimaryKey(cenCuentasbancariasKeyPosterior);
+
+					auditoriaCenHistoricoService.manageAuditoriaDatosCuentasBancarias(cenCuentasbancariasAnterior,
+							cenCuentasbancariasPosterior, "UPDATE", request, datosBancariosInsertDTO.getMotivo());
+
+				} else {
 					LOGGER.info("updateBanksData() -> KO. Update para cuentas bancarias  NO realizado correctamente");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 					error.setMessage("Error al insertar la cuenta Bancaria");
 					updateResponseDTO.setError(error);
 					return updateResponseDTO;
 				}
-				
-				//Si se ha generado correctamente el registro, procedemos a generar los mandatos.
-				
-		
-				
-				// Se insertan dos mandatos nuevos a la cuenta, uno para productos y otro para servicios
+
+				// Si se ha generado correctamente el registro, procedemos a generar los
+				// mandatos.
+
+				// Se insertan dos mandatos nuevos a la cuenta, uno para productos y otro para
+				// servicios
 				if (tieneCargo) {
-					
+
 					CenMandatosCuentasbancariasExample exampleMandatos = new CenMandatosCuentasbancariasExample();
-					exampleMandatos.createCriteria().andIdcuentaEqualTo(Short.valueOf(datosBancariosInsertDTO.getIdCuenta())).andIdpersonaEqualTo(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
-					List<CenMandatosCuentasbancarias> mandatos = cenMandatosCuentasbancariasMapper.selectByExample(exampleMandatos );
-					if (!(null != mandatos && mandatos.size()>0)) {
+					exampleMandatos.createCriteria()
+							.andIdcuentaEqualTo(Short.valueOf(datosBancariosInsertDTO.getIdCuenta()))
+							.andIdpersonaEqualTo(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+					List<CenMandatosCuentasbancarias> mandatos = cenMandatosCuentasbancariasMapper
+							.selectByExample(exampleMandatos);
+					if (!(null != mandatos && mandatos.size() > 0)) {
 						Object[] paramMandatos = new Object[4];
 						paramMandatos[0] = idInstitucion.toString();
 						paramMandatos[1] = datosBancariosInsertDTO.getIdPersona();
 						paramMandatos[2] = datosBancariosInsertDTO.getIdCuenta();
 						paramMandatos[3] = usuario.getIdusuario().toString();
-						
+
 						String resultado[] = new String[2];
-						resultado = callPLProcedure("{call PKG_SIGA_CARGOS.InsertarMandatos(?,?,?,?,?,?)}", 2, paramMandatos);
+						resultado = callPLProcedure("{call PKG_SIGA_CARGOS.InsertarMandatos(?,?,?,?,?,?)}", 2,
+								paramMandatos);
 						if (resultado == null) {
-							LOGGER.info("updateBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
+							LOGGER.info(
+									"updateBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							error.setMessage("Error al insertar los mandatos de las cuentas");
 							updateResponseDTO.setError(error);
-							//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+							// Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún
+							// otro se elimina solo el tipo Cargo
 							if (tieneAbono || tieneSCSJ) {
 								if (tieneAbono) {
 									cuentaBancaria.setAbonocargo("A");
-								}else{
+								} else {
 									cuentaBancaria.setAbonocargo(null);
 								}
 								cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
-							}else{
+							} else {
 								cuentaBancaria.setAbonocargo(null);
 								cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
 							}
 							return updateResponseDTO;
-							
+
 						} else {
 							if (resultado[0].equals("1")) {
-								LOGGER.info("updateBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
+								LOGGER.info(
+										"updateBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
 								updateResponseDTO.setStatus(SigaConstants.KO);
 								error.setMessage("messages.censo.direcciones.facturacion");
 								updateResponseDTO.setError(error);
-								//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+								// Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún
+								// otro se elimina solo el tipo Cargo
 								if (tieneAbono || tieneSCSJ) {
 									if (tieneAbono) {
 										cuentaBancaria.setAbonocargo("A");
-									}else{
+									} else {
 										cuentaBancaria.setAbonocargo(null);
 									}
 									cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
-								}else{
+								} else {
 									cuentaBancaria.setAbonocargo(null);
 									cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
 								}
 								return updateResponseDTO;
-								
+
 							} else if (resultado[0].equals("2")) {
-								LOGGER.info("updateBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
+								LOGGER.info(
+										"updateBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
 								updateResponseDTO.setStatus(SigaConstants.KO);
 								error.setMessage("messages.censo.direcciones.facturacion");
 								updateResponseDTO.setError(error);
-								//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+								// Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún
+								// otro se elimina solo el tipo Cargo
 								if (tieneAbono || tieneSCSJ) {
 									if (tieneAbono) {
 										cuentaBancaria.setAbonocargo("A");
-									}else{
+									} else {
 										cuentaBancaria.setAbonocargo(null);
 									}
 									cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
-								}else{
+								} else {
 									cuentaBancaria.setAbonocargo(null);
 									cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
 								}
 								return updateResponseDTO;
-								
+
 							} else if (!resultado[0].equals("0")) {
-								LOGGER.info("updateBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
+								LOGGER.info(
+										"updateBanksData() -> KO. Insert para mandatos cuentas bancarias  NO realizado correctamente");
 								updateResponseDTO.setStatus(SigaConstants.KO);
 								error.setMessage("Error al insertar los mandatos de las cuentas");
 								updateResponseDTO.setError(error);
-								//Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún otro se elimina solo el tipo Cargo
+								// Si solo tiene tipo Cargo, se elimina la cuenta y no se crea, si tiene algún
+								// otro se elimina solo el tipo Cargo
 								if (tieneAbono || tieneSCSJ) {
 									if (tieneAbono) {
 										cuentaBancaria.setAbonocargo("A");
-									}else{
+									} else {
 										cuentaBancaria.setAbonocargo(null);
 									}
 									cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
-								}else{
+								} else {
 									cuentaBancaria.setAbonocargo(null);
 									cenCuentasbancariasExtendsMapper.updateByPrimaryKey(cuentaBancaria);
 								}
@@ -1059,83 +1106,81 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						}
 					}
 				}
-				
 
-				//Se comprueba si se deben revisar las cuentas y se ejecutan los scripts que se encargan de ello
-				
-				// Lanzamos el proceso de revision de suscripciones del letrado 
-				String resultado[] = ejecutarPL_RevisionSuscripcionesLetrado(""+idInstitucion.toString(),
-																						  ""+datosBancariosInsertDTO.getIdPersona(),
-																						  "",
-																						  ""+ usuario.getIdusuario().toString());
-				if ((resultado == null) || (!resultado[0].equals("0"))){
+				// Se comprueba si se deben revisar las cuentas y se ejecutan los scripts que se
+				// encargan de ello
+
+				// Lanzamos el proceso de revision de suscripciones del letrado
+				String resultado[] = ejecutarPL_RevisionSuscripcionesLetrado("" + idInstitucion.toString(),
+						"" + datosBancariosInsertDTO.getIdPersona(), "", "" + usuario.getIdusuario().toString());
+				if ((resultado == null) || (!resultado[0].equals("0"))) {
 					updateResponseDTO.setStatus(SigaConstants.KO);
-					error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO"+resultado[1]);
+					error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO"
+							+ resultado[1]);
 					updateResponseDTO.setError(error);
 					return updateResponseDTO;
 				}
-				
-				// Este proceso se encarga de actualizar las cosas pendientes asociadas a la cuenta de la persona 
-				String[] resultado1 = ejecutarPL_Revision_Cuenta(
-					""+idInstitucion.toString(),
-					  ""+datosBancariosInsertDTO.getIdPersona(),
-					  ""+datosBancariosInsertDTO.getIdCuenta(),
-					  ""+ usuario.getIdusuario().toString());
+
+				// Este proceso se encarga de actualizar las cosas pendientes asociadas a la
+				// cuenta de la persona
+				String[] resultado1 = ejecutarPL_Revision_Cuenta("" + idInstitucion.toString(),
+						"" + datosBancariosInsertDTO.getIdPersona(), "" + datosBancariosInsertDTO.getIdCuenta(),
+						"" + usuario.getIdusuario().toString());
 				if (resultado1 == null || !resultado1[0].equals("0")) {
 
 					updateResponseDTO.setStatus(SigaConstants.KO);
-					error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado[1]);
+					error.setMessage(
+							"Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado[1]);
 					updateResponseDTO.setError(error);
 					return updateResponseDTO;
 
 				}
-				
-				// Comprueba si va a lanzar el proceso que asocia las suscripciones activas con forma de pago en metalico a la nueva cuenta bancaria
-				if (datosBancariosInsertDTO.getRevisionCuentas()) { 
-					// Este proceso asocia las suscripciones activas con forma de pago en metalico a la nueva cuenta bancaria 
-					resultado1 = ejecutarPL_AltaCuentaCargos(
-						""+idInstitucion.toString(),
-						  ""+datosBancariosInsertDTO.getIdPersona(),
-						  ""+datosBancariosInsertDTO.getIdCuenta(),
-						  ""+ usuario.getIdusuario().toString());
+
+				// Comprueba si va a lanzar el proceso que asocia las suscripciones activas con
+				// forma de pago en metalico a la nueva cuenta bancaria
+				if (datosBancariosInsertDTO.getRevisionCuentas()) {
+					// Este proceso asocia las suscripciones activas con forma de pago en metalico a
+					// la nueva cuenta bancaria
+					resultado1 = ejecutarPL_AltaCuentaCargos("" + idInstitucion.toString(),
+							"" + datosBancariosInsertDTO.getIdPersona(), "" + datosBancariosInsertDTO.getIdCuenta(),
+							"" + usuario.getIdusuario().toString());
 					if (resultado1 == null || !resultado1[0].equals("0")) {
 						updateResponseDTO.setStatus(SigaConstants.KO);
-						error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_ALTA_CUENTA_CARGOS" + resultado[1]);
+						error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_ALTA_CUENTA_CARGOS"
+								+ resultado[1]);
 						updateResponseDTO.setError(error);
 						return updateResponseDTO;
 					}
-				}		
-				
+				}
+
 			} else {
 				LOGGER.warn(
 						"updateBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
 								+ dni + " e idInstitucion = " + idInstitucion);
 			}
-		
+
 		} else {
 			LOGGER.warn("updateBanksData() -> idInstitucion del token nula");
 		}
-		
-		
+
 		LOGGER.info("updateBanksData() -> Salida del servicio para insertar cuentas bancarias ");
 		return updateResponseDTO;
 	}
-	
-	
+
 	@Override
 	public DatosBancariosAnexoDTO searchAnexos(int numPagina,
 			DatosBancariosSearchAnexosDTO datosBancariosSearchAnexosDTO, HttpServletRequest request) {
-		LOGGER.info("searchAnexos() -> Entrada al servicio para la búsqueda por filtros de anexos de mandatos de cuentas bancarias");
-		
+		LOGGER.info(
+				"searchAnexos() -> Entrada al servicio para la búsqueda por filtros de anexos de mandatos de cuentas bancarias");
+
 		List<DatosBancariosAnexoItem> anexosItem = new ArrayList<DatosBancariosAnexoItem>();
 		DatosBancariosAnexoDTO anexosDTO = new DatosBancariosAnexoDTO();
 
-		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -1154,27 +1199,27 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						"searchAnexos() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de anexos de mandatos de cuentas bancarias");
 
 				anexosDTO.setDatosBancariosAnexoItem(anexosItem);
-			} 
-			else {
-				LOGGER.warn("searchAnexos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+			} else {
+				LOGGER.warn(
+						"searchAnexos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
 			}
-		} 
-		else {
+		} else {
 			LOGGER.warn("searchAnexos() -> idInstitucion del token nula");
 		}
-		
-		LOGGER.info("searchAnexos() -> Salida del servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
+
+		LOGGER.info(
+				"searchAnexos() -> Salida del servicio para la búsqueda por filtros de mandatos de cuentas bancarias");
 		return anexosDTO;
 	}
-	
 
 	@Override
 	public UpdateResponseDTO updateAnexos(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request) {
-		
+
 		LOGGER.info("updateAnexos() -> Entrada al servicio para actualizar anexos y mandatos");
 		int response = 0;
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1191,57 +1236,56 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-					
-				//Lo primero es comprobar si debemos modificar un Mandato o un Anexo.
-				
-				if (null != mandatosUpdateDTO.getIdAnexo()) {
-					
-						// información a modificar
-						CenAnexosCuentasbancarias record = new CenAnexosCuentasbancarias();
-						record.setFechamodificacion(new Date());
-						record.setUsumodificacion(usuario.getIdusuario());
-						record.setIdanexo(Short.valueOf(mandatosUpdateDTO.getIdAnexo()));
-						record.setIdmandato(Short.valueOf(mandatosUpdateDTO.getIdMandato()));
-						record.setIdcuenta(Short.valueOf(mandatosUpdateDTO.getIdCuenta()));
-						record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));
-						record.setIdinstitucion(Short.valueOf(idInstitucion));
-						record.setFirmaFecha(mandatosUpdateDTO.getFirmafecha());
-						record.setFirmaLugar(mandatosUpdateDTO.getFirmaLugar());
-						record.setOrigen(mandatosUpdateDTO.getDescripcion());
-	
-						// filtrado para sentencia sql
-					
-						LOGGER.info(
-								"updateAnexos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar anexos y mandatos");
-						
-						response = cenAnexosCuentasbancariasMapper.updateByPrimaryKeySelective(record);
-						
-						LOGGER.info(
-								"updateAnexos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar anexos y mandatos");
-				
-				}else {
-						// información a modificar
-						CenMandatosCuentasbancarias record = new CenMandatosCuentasbancarias();
-						record.setFechamodificacion(new Date());
-						record.setUsumodificacion(usuario.getIdusuario());
-						record.setIdmandato(Short.valueOf(mandatosUpdateDTO.getIdMandato()));
-						record.setIdcuenta(Short.valueOf(mandatosUpdateDTO.getIdCuenta()));
-						record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));
-						record.setIdinstitucion(Short.valueOf(idInstitucion));
-						record.setFechauso(mandatosUpdateDTO.getFechaUso());
-						record.setFirmaFecha(mandatosUpdateDTO.getFirmafecha());
-						record.setFirmaLugar(mandatosUpdateDTO.getFirmaLugar());
-						// filtrado para sentencia sql
-					
-						LOGGER.info(
-								"updateAnexos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar anexos y mandatos");
-						
-						response = cenMandatosCuentasbancariasMapper.updateByPrimaryKeySelective(record);
-						
-						LOGGER.info(
-								"updateAnexos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar anexos y mandatos");
 
-					
+				// Lo primero es comprobar si debemos modificar un Mandato o un Anexo.
+
+				if (null != mandatosUpdateDTO.getIdAnexo()) {
+
+					// información a modificar
+					CenAnexosCuentasbancarias record = new CenAnexosCuentasbancarias();
+					record.setFechamodificacion(new Date());
+					record.setUsumodificacion(usuario.getIdusuario());
+					record.setIdanexo(Short.valueOf(mandatosUpdateDTO.getIdAnexo()));
+					record.setIdmandato(Short.valueOf(mandatosUpdateDTO.getIdMandato()));
+					record.setIdcuenta(Short.valueOf(mandatosUpdateDTO.getIdCuenta()));
+					record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));
+					record.setIdinstitucion(Short.valueOf(idInstitucion));
+					record.setFirmaFecha(mandatosUpdateDTO.getFirmafecha());
+					record.setFirmaLugar(mandatosUpdateDTO.getFirmaLugar());
+					record.setOrigen(mandatosUpdateDTO.getDescripcion());
+
+					// filtrado para sentencia sql
+
+					LOGGER.info(
+							"updateAnexos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar anexos y mandatos");
+
+					response = cenAnexosCuentasbancariasMapper.updateByPrimaryKeySelective(record);
+
+					LOGGER.info(
+							"updateAnexos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar anexos y mandatos");
+
+				} else {
+					// información a modificar
+					CenMandatosCuentasbancarias record = new CenMandatosCuentasbancarias();
+					record.setFechamodificacion(new Date());
+					record.setUsumodificacion(usuario.getIdusuario());
+					record.setIdmandato(Short.valueOf(mandatosUpdateDTO.getIdMandato()));
+					record.setIdcuenta(Short.valueOf(mandatosUpdateDTO.getIdCuenta()));
+					record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));
+					record.setIdinstitucion(Short.valueOf(idInstitucion));
+					record.setFechauso(mandatosUpdateDTO.getFechaUso());
+					record.setFirmaFecha(mandatosUpdateDTO.getFirmafecha());
+					record.setFirmaLugar(mandatosUpdateDTO.getFirmaLugar());
+					// filtrado para sentencia sql
+
+					LOGGER.info(
+							"updateAnexos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar anexos y mandatos");
+
+					response = cenMandatosCuentasbancariasMapper.updateByPrimaryKeySelective(record);
+
+					LOGGER.info(
+							"updateAnexos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar anexos y mandatos");
+
 				}
 
 			} else {
@@ -1252,34 +1296,32 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		} else {
 			LOGGER.warn("updateAnexos() -> idInstitucion del token nula");
 		}
-		
+
 		// comprobacion actualización
-		if(response >= 1) {
+		if (response >= 1) {
 			LOGGER.info("updateAnexos() -> OK. Update para anexos y mandatos realizado correctamente");
 			updateResponseDTO.setStatus(SigaConstants.OK);
-		}
-		else {
+		} else {
 			LOGGER.info("updateMandatos() -> KO. Update para anexos y mandatos  NO realizado correctamente");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		}
-		
+
 		LOGGER.info("deleteBanksData() -> Salida del servicio para actualizar anexos y mandatos ");
 		return updateResponseDTO;
 	}
-	
 
 	@Override
 	public InsertResponseDTO InsertAnexos(MandatosUpdateDTO mandatosUpdateDTO, HttpServletRequest request) {
-		
+
 		LOGGER.info("InsertAnexos() -> Entrada al servicio para insertar anexos y mandatos");
 		int response = 0;
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-		
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		Short idCuenta= 1;
+		Short idCuenta = 1;
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -1291,43 +1333,43 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-					
-				//Lo primero es comprobar si debemos modificar un Mandato o un Anexo.
-				
-				
-				List<NewIdDTO> newIdCuenta = cenCuentasbancariasExtendsMapper.
-						selectNewIdAnexo(mandatosUpdateDTO.getIdPersona(), mandatosUpdateDTO.getIdCuenta(), mandatosUpdateDTO.getIdMandato(),idInstitucion.toString());
-				if (null != newIdCuenta && newIdCuenta.size() > 0 ) {
-					if (null!= newIdCuenta.get(0)) {
+
+				// Lo primero es comprobar si debemos modificar un Mandato o un Anexo.
+
+				List<NewIdDTO> newIdCuenta = cenCuentasbancariasExtendsMapper.selectNewIdAnexo(
+						mandatosUpdateDTO.getIdPersona(), mandatosUpdateDTO.getIdCuenta(),
+						mandatosUpdateDTO.getIdMandato(), idInstitucion.toString());
+				if (null != newIdCuenta && newIdCuenta.size() > 0) {
+					if (null != newIdCuenta.get(0)) {
 						idCuenta = Short.valueOf(newIdCuenta.get(0).getNewId());
 					}
-					
+
 				}
-					
-						// información a modificar
-						CenAnexosCuentasbancarias record = new CenAnexosCuentasbancarias();
-						record.setFechamodificacion(new Date());
-						record.setUsumodificacion(usuario.getIdusuario());
-						record.setIdanexo(idCuenta);
-						record.setIdmandato(Short.valueOf(mandatosUpdateDTO.getIdMandato()));
-						record.setIdcuenta(Short.valueOf(mandatosUpdateDTO.getIdCuenta()));
-						record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));
-						record.setIdinstitucion(idInstitucion);
-						record.setFechacreacion(mandatosUpdateDTO.getFechaUso());
-						record.setOrigen(mandatosUpdateDTO.getDescripcion());
-						record.setEsautomatico(Short.valueOf("1"));
-						record.setUsucreacion(usuario.getIdusuario());
-	
-						// filtrado para sentencia sql
-					
-						LOGGER.info(
-								"InsertAnexos() / cenAnexosCuentasbancariasMapper.insertSelective() -> Entrada a cenAnexosCuentasbancariasMapper para insertar anexos y mandatos");
-						
-						response = cenAnexosCuentasbancariasMapper.insertSelective(record);
-						
-						LOGGER.info(
-								"InsertAnexos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenAnexosCuentasbancariasMapper para insertar anexos y mandatos");
-				
+
+				// información a modificar
+				CenAnexosCuentasbancarias record = new CenAnexosCuentasbancarias();
+				record.setFechamodificacion(new Date());
+				record.setUsumodificacion(usuario.getIdusuario());
+				record.setIdanexo(idCuenta);
+				record.setIdmandato(Short.valueOf(mandatosUpdateDTO.getIdMandato()));
+				record.setIdcuenta(Short.valueOf(mandatosUpdateDTO.getIdCuenta()));
+				record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));
+				record.setIdinstitucion(idInstitucion);
+				record.setFechacreacion(mandatosUpdateDTO.getFechaUso());
+				record.setOrigen(mandatosUpdateDTO.getDescripcion());
+				record.setEsautomatico(Short.valueOf("1"));
+				record.setUsucreacion(usuario.getIdusuario());
+
+				// filtrado para sentencia sql
+
+				LOGGER.info(
+						"InsertAnexos() / cenAnexosCuentasbancariasMapper.insertSelective() -> Entrada a cenAnexosCuentasbancariasMapper para insertar anexos y mandatos");
+
+				response = cenAnexosCuentasbancariasMapper.insertSelective(record);
+
+				LOGGER.info(
+						"InsertAnexos() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenAnexosCuentasbancariasMapper para insertar anexos y mandatos");
+
 			} else {
 				LOGGER.warn(
 						"InsertAnexos() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -1336,69 +1378,65 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		} else {
 			LOGGER.warn("InsertAnexos() -> idInstitucion del token nula");
 		}
-		
+
 		// comprobacion actualización
-		if(response >= 1) {
+		if (response >= 1) {
 			LOGGER.info("InsertAnexos() -> OK. Insert para anexos y mandatos realizado correctamente");
 			insertResponseDTO.setStatus(SigaConstants.OK);
 			insertResponseDTO.setId(idCuenta.toString());
-		}
-		else {
+		} else {
 			LOGGER.info("InsertAnexos() -> KO. Insert para anexos y mandatos  NO realizado correctamente");
 			insertResponseDTO.setStatus(SigaConstants.KO);
 		}
-		
+
 		LOGGER.info("deleteBanksData() -> Salida del servicio para actualizar anexos y mandatos ");
 		return insertResponseDTO;
 	}
-	
+
 	@Override
 	public UpdateResponseDTO uploadFile(MultipartHttpServletRequest request) throws IOException {
-		LOGGER.info(
-				"uploadFile() -> Entrada al servicio para guardar una fotografía de una persona jurídica");
-		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();	
+		LOGGER.info("uploadFile() -> Entrada al servicio para guardar una fotografía de una persona jurídica");
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		List<GenRecursos> genRecursos = new ArrayList<GenRecursos>();
 		AdmUsuarios usuario = new AdmUsuarios();
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		
+
 		String idPersona = request.getParameter("idPersona");
 		String idCuenta = request.getParameter("idCuenta");
 		String idMandato = request.getParameter("idMandato");
 		String idAnexo = request.getParameter("idAnexo");
 		String tipoMandato = request.getParameter("tipoMandato");
-		
+
 		int responseGenFichero = 0;
 		int responseMandatoOAnexo = 0;
-		
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+
 		// crear path para almacenar el fichero
 		String pathFichero = "/FILERMSA1000/SIGA/ficheros/archivo/" + String.valueOf(idInstitucion) + "/mandatos/";
-		//String pathFichero = "C://IISIGA/anexos/";
+		// String pathFichero = "C://IISIGA/anexos/";
 		String fileNewName = idPersona + idCuenta + idMandato;
-		
-		if(null == idAnexo || idAnexo.equals("") || idAnexo.equals("null")) {
-			if(tipoMandato.equals("SERVICIO"))
+
+		if (null == idAnexo || idAnexo.equals("") || idAnexo.equals("null")) {
+			if (tipoMandato.equals("SERVICIO"))
 				fileNewName += "0";
-			else if(tipoMandato.equals("PRODUCTO"))
+			else if (tipoMandato.equals("PRODUCTO"))
 				fileNewName += "1";
-		}
-		else {
+		} else {
 			fileNewName += idAnexo;
 		}
-		
+
 		// 1. Coger archivo del request
 		LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
 		Iterator<String> itr = request.getFileNames();
 		MultipartFile file = request.getFile(itr.next());
 		String fileName = file.getOriginalFilename();
 		String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
-		
-		
+
 		String fileNewNameNoExtension = fileNewName;
 		fileNewName += extension;
 		BufferedOutputStream stream = null;
@@ -1412,7 +1450,8 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			stream = new BufferedOutputStream(new FileOutputStream(serverFile));
 			stream.write(file.getBytes());
 		} catch (FileNotFoundException e) {
-			LOGGER.error("uploadFile() -> Error al buscar el documento de cuenta bancaria en el directorio indicado", e);
+			LOGGER.error("uploadFile() -> Error al buscar el documento de cuenta bancaria en el directorio indicado",
+					e);
 		} catch (IOException ioe) {
 			LOGGER.error("uploadFile() -> Error al guardar el documento de cuenta bancaria en el directorio indicado",
 					ioe);
@@ -1421,153 +1460,152 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			LOGGER.debug("uploadFile() -> Cierre del stream de la fotografía de la persona jurídica");
 			stream.close();
 		}
-		
+
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 		LOGGER.info(
 				"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		LOGGER.info(
 				"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-		
-		if(null != usuarios && usuarios.size() > 0) {
+
+		if (null != usuarios && usuarios.size() > 0) {
 			// 3. Crear registro en tabla gen_fichero
 			usuario = usuarios.get(0);
 			comboItems = genFicheroExtendsMapper.selectMaxIdFichero();
 			int newIdFichero = 0;
-			if(comboItems.isEmpty()) {
+			if (comboItems.isEmpty()) {
 				newIdFichero = 1;
-			}
-			else {
+			} else {
 				newIdFichero = Integer.valueOf(comboItems.get(0).getValue()) + 1;
 			}
-			
+
 			GenFichero genFichero = new GenFichero();
 			genFichero.setIdfichero(Long.valueOf(newIdFichero));
 			genFichero.setIdinstitucion(idInstitucion);
 			genFichero.setExtension(extension);
 			genFichero.setFechamodificacion(new Date());
 			genFichero.setUsumodificacion(usuario.getIdusuario());
-			
+
 			// obtenemos descripcion de gen_recursos
 			GenRecursosExample genRecursosExample = new GenRecursosExample();
-			genRecursosExample.createCriteria().andIdrecursoEqualTo("fichero.mandatos.descripcion").andIdlenguajeEqualTo(usuario.getIdlenguaje());
+			genRecursosExample.createCriteria().andIdrecursoEqualTo("fichero.mandatos.descripcion")
+					.andIdlenguajeEqualTo(usuario.getIdlenguaje());
 			genRecursos = genRecursosMapper.selectByExample(genRecursosExample);
-			
+
 			genFichero.setDescripcion(genRecursos.get(0).getDescripcion());
 			// unimos el path + nombre del fichero (sin extension)
 			String directorio = pathFichero + fileNewNameNoExtension;
 			genFichero.setDirectorio(directorio);
 			responseGenFichero = genFicheroExtendsMapper.insertSelective(genFichero);
-			if(responseGenFichero == 1) {
-				
-				// 4. Cambiar idfichero en tabla CEN_MANDATOS_CUENTASBANCARIAS o CEN_ANEXOS_CUENTASBANCARIAS
-				if(!idAnexo.equals("") && !idAnexo.equals("null") && null != idAnexo) {
-					
+			if (responseGenFichero == 1) {
+
+				// 4. Cambiar idfichero en tabla CEN_MANDATOS_CUENTASBANCARIAS o
+				// CEN_ANEXOS_CUENTASBANCARIAS
+				if (!idAnexo.equals("") && !idAnexo.equals("null") && null != idAnexo) {
+
 					// actualiza CEN_ANEXOS_CUENTASBANCARIAS
 					CenAnexosCuentasbancarias cenAnexosCuentasbancarias = new CenAnexosCuentasbancarias();
 					cenAnexosCuentasbancarias.setIdficherofirma(Long.valueOf(newIdFichero));
 					CenAnexosCuentasbancariasExample cenAnexosCuentasbancariasExample = new CenAnexosCuentasbancariasExample();
-					cenAnexosCuentasbancariasExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(idPersona)).
-					andIdcuentaEqualTo(Short.valueOf(idCuenta)).andIdmandatoEqualTo(Short.valueOf(idMandato)).andIdanexoEqualTo(Short.valueOf(idAnexo));
-					
-					responseMandatoOAnexo = cenAnexosCuentasbancariasMapper.updateByExampleSelective(cenAnexosCuentasbancarias, cenAnexosCuentasbancariasExample);
-					if(responseMandatoOAnexo == 1) {
+					cenAnexosCuentasbancariasExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdpersonaEqualTo(Long.valueOf(idPersona)).andIdcuentaEqualTo(Short.valueOf(idCuenta))
+							.andIdmandatoEqualTo(Short.valueOf(idMandato)).andIdanexoEqualTo(Short.valueOf(idAnexo));
+
+					responseMandatoOAnexo = cenAnexosCuentasbancariasMapper
+							.updateByExampleSelective(cenAnexosCuentasbancarias, cenAnexosCuentasbancariasExample);
+					if (responseMandatoOAnexo == 1) {
 						updateResponseDTO.setStatus(SigaConstants.OK);
-					}
-					else {
+					} else {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 					}
-				}
-				else{
-					
+				} else {
+
 					// actualiza CEN_MANDATOS_CUENTASBANCARIAS
 					String auxTipoMandato = "";
-					if(tipoMandato.equals("SERVICIO"))
+					if (tipoMandato.equals("SERVICIO"))
 						auxTipoMandato = "0";
-					else if(tipoMandato.equals("PRODUCTO"))
+					else if (tipoMandato.equals("PRODUCTO"))
 						auxTipoMandato = "1";
 					CenMandatosCuentasbancarias cenMandatosCuentasbancarias = new CenMandatosCuentasbancarias();
 					cenMandatosCuentasbancarias.setIdficherofirma(Long.valueOf(newIdFichero));
 					CenMandatosCuentasbancariasExample cenMandatosCuentasbancariasExample = new CenMandatosCuentasbancariasExample();
-					cenMandatosCuentasbancariasExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(Long.valueOf(idPersona)).
-					andIdcuentaEqualTo(Short.valueOf(idCuenta)).andIdmandatoEqualTo(Short.valueOf(idMandato)).andTipomandatoEqualTo(Short.valueOf(auxTipoMandato));
-					
-					responseMandatoOAnexo = cenMandatosCuentasbancariasMapper.updateByExampleSelective(cenMandatosCuentasbancarias, cenMandatosCuentasbancariasExample);
-					if(responseMandatoOAnexo == 1) {
+					cenMandatosCuentasbancariasExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdpersonaEqualTo(Long.valueOf(idPersona)).andIdcuentaEqualTo(Short.valueOf(idCuenta))
+							.andIdmandatoEqualTo(Short.valueOf(idMandato))
+							.andTipomandatoEqualTo(Short.valueOf(auxTipoMandato));
+
+					responseMandatoOAnexo = cenMandatosCuentasbancariasMapper
+							.updateByExampleSelective(cenMandatosCuentasbancarias, cenMandatosCuentasbancariasExample);
+					if (responseMandatoOAnexo == 1) {
 						updateResponseDTO.setStatus(SigaConstants.OK);
-					}
-					else {
+					} else {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 					}
 				}
-			}
-			else {
+			} else {
 				updateResponseDTO.setStatus(SigaConstants.KO);
 			}
-			
-			
-		}
-		return updateResponseDTO;		
-	}
 
+		}
+		return updateResponseDTO;
+	}
 
 	@Override
 	public ComboItem downloadFile(MandatosDownloadDTO mandatosDownloadDTO, HttpServletRequest request,
 			HttpServletResponse response) {
-		
-		
+
 		CenMandatosCuentasbancarias cenMandatosCuentasbancarias = new CenMandatosCuentasbancarias();
 		CenAnexosCuentasbancarias cenAnexosCuentasbancarias = new CenAnexosCuentasbancarias();
 		GenFichero genFichero = new GenFichero();
 		Long idFichero = null;
 		ComboItem comboItem = new ComboItem();
-		
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-			
-		
-		if(null == mandatosDownloadDTO.getIdAnexo() || mandatosDownloadDTO.getIdAnexo().equals("") || mandatosDownloadDTO.getIdAnexo().equals("null")) {
+
+		if (null == mandatosDownloadDTO.getIdAnexo() || mandatosDownloadDTO.getIdAnexo().equals("")
+				|| mandatosDownloadDTO.getIdAnexo().equals("null")) {
 			// consulta CEN_MANDATOS_CUENTASBANCARIAS
 			CenMandatosCuentasbancariasKey cenMandatosCuentasbancariasKey = new CenMandatosCuentasbancariasKey();
 			cenMandatosCuentasbancariasKey.setIdcuenta(Short.valueOf(mandatosDownloadDTO.getIdCuenta()));
 			cenMandatosCuentasbancariasKey.setIdinstitucion(idInstitucion);
 			cenMandatosCuentasbancariasKey.setIdmandato(Short.valueOf(mandatosDownloadDTO.getIdMandato()));
 			cenMandatosCuentasbancariasKey.setIdpersona(Long.valueOf(mandatosDownloadDTO.getIdPersona()));
-			cenMandatosCuentasbancarias = cenMandatosCuentasbancariasMapper.selectByPrimaryKey(cenMandatosCuentasbancariasKey);
-			
-			if(null != cenMandatosCuentasbancarias)
+			cenMandatosCuentasbancarias = cenMandatosCuentasbancariasMapper
+					.selectByPrimaryKey(cenMandatosCuentasbancariasKey);
+
+			if (null != cenMandatosCuentasbancarias)
 				idFichero = cenMandatosCuentasbancarias.getIdficherofirma();
-		}
-		else {
+		} else {
 			// consulta CEN_ANEXOS_CUENTASBANCARIAS
-			
+
 			CenAnexosCuentasbancariasKey cenAnexosCuentasbancariasKey = new CenAnexosCuentasbancariasKey();
 			cenAnexosCuentasbancariasKey.setIdanexo(Short.valueOf(mandatosDownloadDTO.getIdAnexo()));
 			cenAnexosCuentasbancariasKey.setIdcuenta(Short.valueOf(mandatosDownloadDTO.getIdCuenta()));
 			cenAnexosCuentasbancariasKey.setIdinstitucion(idInstitucion);
 			cenAnexosCuentasbancariasKey.setIdmandato(Short.valueOf(mandatosDownloadDTO.getIdMandato()));
 			cenAnexosCuentasbancariasKey.setIdpersona(Long.valueOf(mandatosDownloadDTO.getIdPersona()));
-			cenAnexosCuentasbancarias = cenAnexosCuentasbancariasMapper.selectByPrimaryKey(cenAnexosCuentasbancariasKey);
-			
-			if(null != cenMandatosCuentasbancarias) {
+			cenAnexosCuentasbancarias = cenAnexosCuentasbancariasMapper
+					.selectByPrimaryKey(cenAnexosCuentasbancariasKey);
+
+			if (null != cenMandatosCuentasbancarias) {
 				idFichero = cenAnexosCuentasbancarias.getIdficherofirma();
 			}
-				
-			
+
 		}
-		
+
 		GenFicheroKey genFicheroKey = new GenFicheroKey();
 		genFicheroKey.setIdfichero(idFichero);
 		genFicheroKey.setIdinstitucion(idInstitucion);
 		genFichero = genFicheroExtendsMapper.selectByPrimaryKey(genFicheroKey);
-		
-		if(null != genFichero) {
+
+		if (null != genFichero) {
 			String pathAbsolute = genFichero.getDirectorio();
 			pathAbsolute += genFichero.getExtension();
-			
-			//File file = new File("C://IISIGA/anexos/2006002472110.pdf");
+
+			// File file = new File("C://IISIGA/anexos/2006002472110.pdf");
 			File file = new File(pathAbsolute);
 			FileInputStream fis = null;
 			try {
@@ -1578,7 +1616,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				LOGGER.error("No se ha encontrado el fichero", e);
 
 			} catch (IOException e1) {
-				LOGGER.error("No se han podido escribir los datos binarios del logo en la respuesta HttpServletResponse", e1);
+				LOGGER.error(
+						"No se han podido escribir los datos binarios del logo en la respuesta HttpServletResponse",
+						e1);
 			} finally {
 				if (null != fis)
 					try {
@@ -1588,19 +1628,13 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					}
 			}
 			return comboItem;
-			
-		}
-		else {
+
+		} else {
 			return null;
 		}
-		
-		
-		
+
 	}
-	
-	
-	
-	
+
 	@Override
 	public ComboItem fileDownloadInformation(MandatosDownloadDTO mandatosDownloadDTO, HttpServletRequest request) {
 		CenMandatosCuentasbancarias cenMandatosCuentasbancarias = new CenMandatosCuentasbancarias();
@@ -1608,273 +1642,258 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		GenFichero genFichero = new GenFichero();
 		Long idFichero = null;
 		ComboItem comboItem = new ComboItem();
-		
-		
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
-		
+
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		if(null == mandatosDownloadDTO.getIdAnexo() || mandatosDownloadDTO.getIdAnexo().equals("") || mandatosDownloadDTO.getIdAnexo().equals("null")) {
+
+		if (null == mandatosDownloadDTO.getIdAnexo() || mandatosDownloadDTO.getIdAnexo().equals("")
+				|| mandatosDownloadDTO.getIdAnexo().equals("null")) {
 			// consulta CEN_MANDATOS_CUENTASBANCARIAS
 			CenMandatosCuentasbancariasKey cenMandatosCuentasbancariasKey = new CenMandatosCuentasbancariasKey();
 			cenMandatosCuentasbancariasKey.setIdcuenta(Short.valueOf(mandatosDownloadDTO.getIdCuenta()));
 			cenMandatosCuentasbancariasKey.setIdinstitucion(idInstitucion);
 			cenMandatosCuentasbancariasKey.setIdmandato(Short.valueOf(mandatosDownloadDTO.getIdMandato()));
 			cenMandatosCuentasbancariasKey.setIdpersona(Long.valueOf(mandatosDownloadDTO.getIdPersona()));
-			cenMandatosCuentasbancarias = cenMandatosCuentasbancariasMapper.selectByPrimaryKey(cenMandatosCuentasbancariasKey);
-			
-			if(null != cenMandatosCuentasbancarias)
+			cenMandatosCuentasbancarias = cenMandatosCuentasbancariasMapper
+					.selectByPrimaryKey(cenMandatosCuentasbancariasKey);
+
+			if (null != cenMandatosCuentasbancarias)
 				idFichero = cenMandatosCuentasbancarias.getIdficherofirma();
-		}
-		else {
+		} else {
 			// consulta CEN_ANEXOS_CUENTASBANCARIAS
-			
+
 			CenAnexosCuentasbancariasKey cenAnexosCuentasbancariasKey = new CenAnexosCuentasbancariasKey();
 			cenAnexosCuentasbancariasKey.setIdanexo(Short.valueOf(mandatosDownloadDTO.getIdAnexo()));
 			cenAnexosCuentasbancariasKey.setIdcuenta(Short.valueOf(mandatosDownloadDTO.getIdCuenta()));
 			cenAnexosCuentasbancariasKey.setIdinstitucion(idInstitucion);
 			cenAnexosCuentasbancariasKey.setIdmandato(Short.valueOf(mandatosDownloadDTO.getIdMandato()));
 			cenAnexosCuentasbancariasKey.setIdpersona(Long.valueOf(mandatosDownloadDTO.getIdPersona()));
-			cenAnexosCuentasbancarias = cenAnexosCuentasbancariasMapper.selectByPrimaryKey(cenAnexosCuentasbancariasKey);
-			
-			if(null != cenMandatosCuentasbancarias) {
+			cenAnexosCuentasbancarias = cenAnexosCuentasbancariasMapper
+					.selectByPrimaryKey(cenAnexosCuentasbancariasKey);
+
+			if (null != cenMandatosCuentasbancarias) {
 				idFichero = cenAnexosCuentasbancarias.getIdficherofirma();
 			}
-				
-			
+
 		}
-		
+
 		GenFicheroKey genFicheroKey = new GenFicheroKey();
 		genFicheroKey.setIdfichero(idFichero);
 		genFicheroKey.setIdinstitucion(idInstitucion);
 		genFichero = genFicheroExtendsMapper.selectByPrimaryKey(genFicheroKey);
-		
-		if(null != genFichero) {
+
+		if (null != genFichero) {
 			comboItem.setLabel(genFichero.getExtension());
 			String ruta = genFichero.getDirectorio();
-			String [] division = ruta.split("/");
-			String nombreArchivo = division[division.length-1];
-			if(nombreArchivo.contains("/")) {
+			String[] division = ruta.split("/");
+			String nombreArchivo = division[division.length - 1];
+			if (nombreArchivo.contains("/")) {
 				nombreArchivo = nombreArchivo.replace("/", "");
 			}
 			comboItem.setValue(nombreArchivo);
 		}
-		
-		
+
 		return comboItem;
 	}
-	
-	
-	
-	/**
-	   * Calls a PL Funtion
-	   * @author CSD
-	   * @param functionDefinition string that defines the function
-	   * @param inParameters input parameters
-	   * @param outParameters number of output parameters
-	   * @return error code, '0' if ok
-	 * @throws NamingException 
-	 * @throws IOException 
-	 * @throws SQLException 
-	   * @throws ClsExceptions  type Exception
-	   */
-	  private  String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters) throws IOException, NamingException, SQLException  {
-	    String result[] = null;
-	    
-	    if (outParameters>0) result= new String[outParameters];
-	    DataSource ds = getOracleDataSource();
-	    Connection con=ds.getConnection();
-	    try{
-	      CallableStatement cs=con.prepareCall(functionDefinition);
-	      int size=inParameters.length;
-	      
-	      //input Parameters
-	      for(int i=0;i<size;i++){
-	    	  
 
-	        cs.setString(i+1,(String)inParameters[i]);
-	      }
-	      //output Parameters
-	      for(int i=0;i<outParameters;i++){
-	        cs.registerOutParameter(i+size+1,Types.VARCHAR);
-	      }
-	      
+	/**
+	 * Calls a PL Funtion
+	 * 
+	 * @author CSD
+	 * @param functionDefinition
+	 *            string that defines the function
+	 * @param inParameters
+	 *            input parameters
+	 * @param outParameters
+	 *            number of output parameters
+	 * @return error code, '0' if ok
+	 * @throws NamingException
+	 * @throws IOException
+	 * @throws SQLException
+	 * @throws ClsExceptions
+	 *             type Exception
+	 */
+	private String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters)
+			throws IOException, NamingException, SQLException {
+		String result[] = null;
+
+		if (outParameters > 0)
+			result = new String[outParameters];
+		DataSource ds = getOracleDataSource();
+		Connection con = ds.getConnection();
+		try {
+			CallableStatement cs = con.prepareCall(functionDefinition);
+			int size = inParameters.length;
+
+			// input Parameters
+			for (int i = 0; i < size; i++) {
+
+				cs.setString(i + 1, (String) inParameters[i]);
+			}
+			// output Parameters
+			for (int i = 0; i < outParameters; i++) {
+				cs.registerOutParameter(i + size + 1, Types.VARCHAR);
+			}
+
 			for (int intento = 1; intento <= 2; intento++) {
 				try {
 					cs.execute();
 					break;
-					
+
 				} catch (SQLTimeoutException tex) {
 					throw tex;
-		
+
 				} catch (SQLException ex) {
-					if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la segunda vez deberia funcionar)
+					if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la
+																		// segunda vez deberia funcionar)
 						throw ex;
 					}
 				}
 
-			}      
-
-	      for(int i=0;i<outParameters;i++){
-	        result[i]=cs.getString(i+size+1);
-	      }
-	      cs.close();
-	      return result;
-	      
-	    }catch(SQLTimeoutException ex){
-	        return null;
-	    }catch(SQLException ex){
-	    	return null;
-	    }catch(Exception e){
-	    	return null;
-	    }finally{
-	      con.close();
-	      con = null;
-	    }
-	  }
-	  
-	  
-		/**
-		 * Recupera el datasource con los datos de conexión sacados del fichero de
-		 * configuracion
-		 * 
-		 * @return
-		 * @throws IOException
-		 * @throws NamingException
-		 */
-		private  DataSource getOracleDataSource() throws IOException, NamingException {
-			try {
-				
-				LOGGER.debug("Recuperando datasource {} provisto por el servidor (JNDI)");
-				
-				AdmConfigExample example = new AdmConfigExample();
-				example.createCriteria().andClaveEqualTo("spring.datasource.jndi-name");
-				List<AdmConfig> config = admConfigMapper.selectByExample(example );
-				Context ctx = new InitialContext();
-				return (DataSource) ctx.lookup(config.get(0).getValor());
-			} catch (NamingException e) {
-				throw e;
 			}
+
+			for (int i = 0; i < outParameters; i++) {
+				result[i] = cs.getString(i + size + 1);
+			}
+			cs.close();
+			return result;
+
+		} catch (SQLTimeoutException ex) {
+			return null;
+		} catch (SQLException ex) {
+			return null;
+		} catch (Exception e) {
+			return null;
+		} finally {
+			con.close();
+			con = null;
+		}
+	}
+
+	/**
+	 * Recupera el datasource con los datos de conexión sacados del fichero de
+	 * configuracion
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws NamingException
+	 */
+	private DataSource getOracleDataSource() throws IOException, NamingException {
+		try {
+
+			LOGGER.debug("Recuperando datasource {} provisto por el servidor (JNDI)");
+
+			AdmConfigExample example = new AdmConfigExample();
+			example.createCriteria().andClaveEqualTo("spring.datasource.jndi-name");
+			List<AdmConfig> config = admConfigMapper.selectByExample(example);
+			Context ctx = new InitialContext();
+			return (DataSource) ctx.lookup(config.get(0).getValor());
+		} catch (NamingException e) {
+			throw e;
+		}
+	}
+
+	/**
+	 * PL que realiza una revision de letrado
+	 * 
+	 * @param idInstitucion
+	 * @param idPersona
+	 * @param usuario
+	 * @return
+	 * @throws ClsExceptions
+	 */
+	private String[] ejecutarPL_RevisionSuscripcionesLetrado(String idInstitucion, String idPersona, String fecha,
+			String usuario) throws Exception {
+
+		Object[] paramIn = new Object[4]; // Parametros de entrada del PL
+		String resultado[] = new String[2]; // Parametros de salida del PL
+
+		try {
+			// Parametros de entrada del PL
+			paramIn[0] = idInstitucion;
+			paramIn[1] = idPersona;
+			paramIn[2] = fecha;
+			paramIn[3] = usuario;
+
+			// Ejecucion del PL
+			resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO (?,?,?,?,?,?)}", 2,
+					paramIn);
+
+		} catch (Exception e) {
+			resultado[0] = "1"; // P_NUMREGISTRO
+			resultado[1] = "ERROR"; // ERROR P_DATOSERROR
 		}
 
+		return resultado;
+	}
 
+	/**
+	 * Este proceso se encarga de actualizar las cosas pendientes asociadas a la
+	 * cuenta de la persona
+	 * 
+	 * @param idInstitucion
+	 * @param idPersona
+	 * @param idCuenta
+	 * @param usuario
+	 * @return Codigo y mensaje de error
+	 * @throws ClsExceptions
+	 */
+	private String[] ejecutarPL_Revision_Cuenta(String idInstitucion, String idPersona, String idCuenta, String usuario)
+			throws Exception {
+		Object[] paramIn = new Object[4]; // Parametros de entrada del PL
+		String resultado[] = new String[2]; // Parametros de salida del PL
 
+		try {
+			// Parametros de entrada del PL
+			paramIn[0] = idInstitucion;
+			paramIn[1] = idPersona;
+			paramIn[2] = idCuenta;
+			paramIn[3] = usuario;
 
-		
+			// Ejecucion del PL
+			resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA(?,?,?,?,?,?)}", 2,
+					paramIn);
 
-
-
-	
-		/**
-		 * PL que realiza una revision de letrado
-		 * @param idInstitucion
-		 * @param idPersona
-		 * @param usuario
-		 * @return
-		 * @throws ClsExceptions
-		 */
-		private  String[] ejecutarPL_RevisionSuscripcionesLetrado (String idInstitucion, String idPersona, String fecha, String usuario) throws Exception {
-
-			Object[] paramIn = new Object[4]; //Parametros de entrada del PL
-			String resultado[] = new String[2]; //Parametros de salida del PL
-		
-			try {
-		 		// Parametros de entrada del PL
-		        paramIn[0] = idInstitucion;
-		        paramIn[1] = idPersona;
-		        paramIn[2] = fecha;
-		        paramIn[3] = usuario;
-
-		        // Ejecucion del PL
-				resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO (?,?,?,?,?,?)}", 2, paramIn);
-				
-			} catch (Exception e) {
-				resultado[0] = "1"; 	// P_NUMREGISTRO
-		    	resultado[1] = "ERROR"; // ERROR P_DATOSERROR        	
-			}
-			
-		    return resultado;
-		}
-		
-		
-		/**
-		 * Este proceso se encarga de actualizar las cosas pendientes asociadas a la cuenta de la persona 
-		 * @param idInstitucion
-		 * @param idPersona
-		 * @param idCuenta
-		 * @param usuario
-		 * @return Codigo y mensaje de error
-		 * @throws ClsExceptions
-		 */
-		private  String[] ejecutarPL_Revision_Cuenta (String idInstitucion, String idPersona, String idCuenta, String usuario) throws Exception {
-			Object[] paramIn = new Object[4]; 	//Parametros de entrada del PL
-			String resultado[] = new String[2]; //Parametros de salida del PL
-		
-			try {
-		 		// Parametros de entrada del PL
-		        paramIn[0] = idInstitucion;
-		        paramIn[1] = idPersona;
-		        paramIn[2] = idCuenta;
-		        paramIn[3] = usuario;
-
-		        // Ejecucion del PL
-				resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA(?,?,?,?,?,?)}", 2, paramIn);
-				
-			} catch (Exception e) {
-				resultado[0] = "1"; 	// P_CODRETORNO
-		    	resultado[1] = "ERROR"; // ERROR P_DATOSERROR        	
-			}
-			
-		    return resultado;
-		}
-		/**
-		 * @param idInstitucion
-		 * @param idPersona
-		 * @param idCuenta
-		 * @param usuario
-		 * @return Codigo y mensaje de error
-		 * @throws ClsExceptions
-		 */
-		private String[] ejecutarPL_AltaCuentaCargos (String idInstitucion, String idPersona, String idCuenta, String usuario) throws Exception {
-			Object[] paramIn = new Object[4]; 	//Parametros de entrada del PL
-			String resultado[] = new String[2]; //Parametros de salida del PL
-		
-			try {
-		 		// Parametros de entrada del PL
-		        paramIn[0] = idInstitucion;
-		        paramIn[1] = idPersona;
-		        paramIn[2] = idCuenta;
-		        paramIn[3] = usuario;
-
-		        // Ejecucion del PL
-				resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_ALTA_CUENTA_CARGOS(?,?,?,?,?,?)}", 2, paramIn);
-				
-			} catch (Exception e) {
-				resultado[0] = "1"; 	// P_CODRETORNO
-		    	resultado[1] = "ERROR"; // ERROR P_DATOSERROR        	
-			}
-			
-		    return resultado;
+		} catch (Exception e) {
+			resultado[0] = "1"; // P_CODRETORNO
+			resultado[1] = "ERROR"; // ERROR P_DATOSERROR
 		}
 
+		return resultado;
+	}
 
+	/**
+	 * @param idInstitucion
+	 * @param idPersona
+	 * @param idCuenta
+	 * @param usuario
+	 * @return Codigo y mensaje de error
+	 * @throws ClsExceptions
+	 */
+	private String[] ejecutarPL_AltaCuentaCargos(String idInstitucion, String idPersona, String idCuenta,
+			String usuario) throws Exception {
+		Object[] paramIn = new Object[4]; // Parametros de entrada del PL
+		String resultado[] = new String[2]; // Parametros de salida del PL
 
+		try {
+			// Parametros de entrada del PL
+			paramIn[0] = idInstitucion;
+			paramIn[1] = idPersona;
+			paramIn[2] = idCuenta;
+			paramIn[3] = usuario;
 
-		
+			// Ejecucion del PL
+			resultado = callPLProcedure("{call PKG_SERVICIOS_AUTOMATICOS.PROCESO_ALTA_CUENTA_CARGOS(?,?,?,?,?,?)}", 2,
+					paramIn);
 
+		} catch (Exception e) {
+			resultado[0] = "1"; // P_CODRETORNO
+			resultado[1] = "ERROR"; // ERROR P_DATOSERROR
+		}
 
-
-
-
-
-
-
-	
-
-
-
-
+		return resultado;
+	}
 
 }
