@@ -1,15 +1,23 @@
 package org.itcgae.siga.DTOs.cen;
 
+import java.util.Date;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class FichaDatosCurricularesItem {
 
 	private String idInstitucion;
 	private String idPersona;
-	private String fechaInicio;
-	private String fechaFin;
+	private String fechaDesde;
+	private String fechaHasta;
+	private String fechaBaja;
+	private String fechaMovimiento;
+//	private Date fechaDesdeDate;
+//	private Date fechaHastaDate;
+//	private Date fechaBajaDate;
+//	private Date fechaMovimientoDate;
 	private String descripcion;
 	private String categoriaCurricular;
 	private String tipoSubtipo;
@@ -18,9 +26,121 @@ public class FichaDatosCurricularesItem {
 	private String idTipoCvSubtipo1;
 	private String idTipoCvSubtipo2;
 	private String creditos;
+	private String certificado;
 	
+	
+	/**
+	 */
 	
 
+	public FichaDatosCurricularesItem certificado(String certificado){
+		this.certificado = certificado;
+		return this;
+	}
+	
+	@JsonProperty("certificado")
+	public String getCertificado() {
+		return certificado;
+	}
+
+	public void setCertificado(String certificado) {
+		this.certificado = certificado;
+	}
+	
+	
+	/**
+	 */
+	
+
+//	public FichaDatosCurricularesItem fechaBajaDate(Date fechaBajaDate){
+//		this.fechaBajaDate = fechaBajaDate;
+//		return this;
+//	}
+//	
+//	@JsonProperty("fechaBaja")
+//	public Date getFechaBajaDate() {
+//		return fechaBajaDate;
+//	}
+//
+//	public void setFechaBajaDate(Date fechaBajaDate) {
+//		this.fechaBajaDate = fechaBajaDate;
+//	}
+	
+	/**
+	 * 
+	 * @param idPersona
+	 * @return
+	 */
+	/**
+	 */
+//	
+//
+//	public FichaDatosCurricularesItem fechaMovimiento(Date fechaMovimientoDate){
+//		this.fechaMovimientoDate = fechaMovimientoDate;
+//		return this;
+//	}
+//	
+//	@JsonProperty("fechaMovimiento")
+//	public Date getFechaMovimientoDate() {
+//		return fechaMovimientoDate;
+//	}
+//
+//	public void setFechaMovimientoDate(Date fechaMovimientoDate) {
+//		this.fechaMovimientoDate = fechaMovimientoDate;
+//	}
+//	
+	/**
+	 * 
+	 * @param idPersona
+	 * @return
+	 */
+	
+	
+	
+	public FichaDatosCurricularesItem fechaBaja(String fechaBaja){
+		this.fechaBaja = fechaBaja;
+		return this;
+	}
+	
+	@JsonProperty("fechaBaja")
+	public String getFechaBaja() {
+		return fechaBaja;
+	}
+
+	public void setFechaBaja(String fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+	
+	/**
+	 * 
+	 * @param idPersona
+	 * @return
+	 */
+	/**
+	 */
+	
+
+	public FichaDatosCurricularesItem fechaMovimiento(String fechaMovimiento){
+		this.fechaMovimiento = fechaMovimiento;
+		return this;
+	}
+	
+	@JsonProperty("fechaMovimiento")
+	public String getFechaMovimiento() {
+		return fechaMovimiento;
+	}
+
+	public void setFechaMovimiento(String fechaMovimiento) {
+		this.fechaMovimiento = fechaMovimiento;
+	}
+	
+	/**
+	 * 
+	 * @param idPersona
+	 * @return
+	 */
+	
+	
 	/**
 	 */
 	
@@ -38,6 +158,12 @@ public class FichaDatosCurricularesItem {
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
+	
+	/**
+	 * 
+	 * @param idPersona
+	 * @return
+	 */
 
 	public FichaDatosCurricularesItem idPersona(String idPersona){
 		this.idPersona = idPersona;
@@ -72,38 +198,90 @@ public class FichaDatosCurricularesItem {
 	public void setCredito(String creditos) {
 		this.creditos = creditos;
 	}
-
 	
-	
-	public FichaDatosCurricularesItem fechaInicio(String fechaInicio){
-		this.fechaInicio = fechaInicio;
+	public FichaDatosCurricularesItem fechaDesde(String fechaDesde){
+		this.fechaDesde = fechaDesde;
 		return this;
 	}
 	
-	@JsonProperty("fechaInicio")
-	public String getFechaInicio() {
-		return fechaInicio;
+	@JsonProperty("fechaDesde")
+	public String getFechaDesde() {
+		return fechaDesde;
 	}
 
-	public void setFechaInicio(String fechaInicio) {
-		this.fechaInicio = fechaInicio;
+	public void setFechaDesde(String fechaDesde) {
+		this.fechaDesde = fechaDesde;
 	}
 
 	
-	public FichaDatosCurricularesItem fechaFin(String fechaFin){
-		this.fechaFin = fechaFin;
+	public FichaDatosCurricularesItem fechaHasta(String fechaHasta){
+		this.fechaHasta = fechaHasta;
 		return this;
 	}
 	
-	@JsonProperty("fechaFin")
-	public String getFechaFin() {
-		return fechaFin;
+	@JsonProperty("fechaHasta")
+	public String getFechaHasta() {
+		return fechaHasta;
 	}
 
-	public void setFechaFin(String fechaFin) {
-		this.fechaFin = fechaFin;
+	public void setFechaHasta(String fechaHasta) {
+		this.fechaHasta = fechaHasta;
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+//	public FichaDatosCurricularesItem fechaDesdeDate(Date fechaDesdeDate){
+//		this.fechaDesdeDate = fechaDesdeDate;
+//		return this;
+//	}
+//	
+//	@JsonProperty("fechaDesdeDate")
+//	public Date getFechaDesdeDate() {
+//		return fechaDesdeDate;
+//	}
+//
+//	public void setFechaDesdeDate(Date fechaDesdeDate) {
+//		this.fechaDesdeDate = fechaDesdeDate;
+//	}
+//
+//	
+//	public FichaDatosCurricularesItem fechaHastaDate(Date fechaHastaDate){
+//		this.fechaHastaDate = fechaHastaDate;
+//		return this;
+//	}
+//	
+//	@JsonProperty("fechaHastaDate")
+//	public Date getFechaHastaDate() {
+//		return fechaHastaDate;
+//	}
+//
+//	public void setFechaHastaDate(Date fechaHastaDate) {
+//		this.fechaHastaDate = fechaHastaDate;
+//	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public FichaDatosCurricularesItem descripcion(String descripcion){
 		this.descripcion = descripcion;
 		return this;
@@ -216,21 +394,24 @@ public class FichaDatosCurricularesItem {
 	    }
 	    FichaDatosCurricularesItem fichaDatosCurricularesItem = (FichaDatosCurricularesItem) o;
 	    return  Objects.equals(this.idPersona, fichaDatosCurricularesItem.idPersona) &&
-	    Objects.equals(this.fechaInicio, fichaDatosCurricularesItem.fechaInicio) &&
-	    Objects.equals(this.fechaFin, fichaDatosCurricularesItem.fechaFin) &&
+	    		Objects.equals(this.fechaBaja, fichaDatosCurricularesItem.fechaBaja) &&
+	    Objects.equals(this.fechaDesde, fichaDatosCurricularesItem.fechaDesde) &&
+	    Objects.equals(this.fechaHasta, fichaDatosCurricularesItem.fechaHasta) &&
 	    Objects.equals(this.descripcion, fichaDatosCurricularesItem.descripcion) &&
 	    Objects.equals(this.categoriaCurricular, fichaDatosCurricularesItem.categoriaCurricular) &&
 	    Objects.equals(this.tipoSubtipo, fichaDatosCurricularesItem.tipoSubtipo) &&
 	    Objects.equals(this.idTipoCv, fichaDatosCurricularesItem.idTipoCv) &&
 	    Objects.equals(this.idTipoCvSubtipo1, fichaDatosCurricularesItem.idTipoCvSubtipo1) &&
 	    Objects.equals(this.idTipoCvSubtipo2, fichaDatosCurricularesItem.idTipoCvSubtipo2) &&
-	    Objects.equals(this.idInstitucion, fichaDatosCurricularesItem.idInstitucion);
+	    Objects.equals(this.idInstitucion, fichaDatosCurricularesItem.idInstitucion)&&
+	    Objects.equals(this.fechaMovimiento, fichaDatosCurricularesItem.fechaMovimiento)&&
+	    Objects.equals(this.certificado, fichaDatosCurricularesItem.certificado);
 
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona, fechaInicio, fechaFin, descripcion, categoriaCurricular, tipoSubtipo, idTipoCv, idTipoCvSubtipo1, idTipoCvSubtipo2, idInstitucion);
+	    return Objects.hash(idPersona, fechaBaja, fechaDesde, fechaHasta, descripcion, categoriaCurricular, tipoSubtipo, idTipoCv, idTipoCvSubtipo1, idTipoCvSubtipo2, idInstitucion);
 	}
 
 	
@@ -240,8 +421,8 @@ public class FichaDatosCurricularesItem {
 	    sb.append("class FichaDatosCurricularesItem {\n");
 	    
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
-	    sb.append("    fechaInicio: ").append(toIndentedString(fechaInicio)).append("\n");
-	    sb.append("    fechaFin: ").append(toIndentedString(fechaFin)).append("\n");
+	    sb.append("    fechaDesde: ").append(toIndentedString(fechaDesde)).append("\n");
+	    sb.append("    fechaHasta: ").append(toIndentedString(fechaHasta)).append("\n");
 	    sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
 	    sb.append("    categoriaCurricular: ").append(toIndentedString(categoriaCurricular)).append("\n");
 	    sb.append("    tipoSubtipo: ").append(toIndentedString(tipoSubtipo)).append("\n");

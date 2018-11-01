@@ -7,11 +7,10 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.TipoCurricularItem;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.CenTiposcvsubtipo1Mapper;
-import org.itcgae.siga.db.services.cen.providers.CenDatoscvSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenTiposCVSubtipo1SqlExtendsProvider;
-import org.itcgae.siga.db.services.cen.providers.CenTiposcvSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +26,17 @@ public interface CenTiposCVSubtipo1ExtendsMapper extends CenTiposcvsubtipo1Mappe
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 	})
 	List<TipoCurricularItem> searchTipoCurricular(TipoCurricularItem tipoCurricularItem, String idLenguaje, String idInstitucion);
+	
+	
+	
+	@SelectProvider(type = CenTiposCVSubtipo1SqlExtendsProvider.class, method = "searchComboTipoCurricular")
+	@Results({
+		@Result(column = "CODIGOEXTERNO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> searchComboTipoCurricular(TipoCurricularItem tipoCurricularItem, String idLenguaje, String idInstitucion);
+	
+	
 	
 	@SelectProvider(type = CenTiposCVSubtipo1SqlExtendsProvider.class, method = "getMaxIdCvSubtipo1")
 	@Results({ @Result(column = "IDTIPOCVSUBTIPO1", property = "newId", jdbcType = JdbcType.VARCHAR)})

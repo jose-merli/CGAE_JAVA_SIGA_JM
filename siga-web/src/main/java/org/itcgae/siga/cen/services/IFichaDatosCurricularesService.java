@@ -2,6 +2,7 @@ package org.itcgae.siga.cen.services;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
@@ -16,6 +17,12 @@ public interface IFichaDatosCurricularesService {
 //			HttpServletRequest request);
 
 	public UpdateResponseDTO deleteDatosCurriculares(FichaDatosCurricularesItem fichaDatosCurricularesItem,
+			HttpServletRequest request);
+
+	public UpdateResponseDTO updateDatosCurriculares(FichaDatosCurricularesItem fichaDatosCurricularesItem,
+			HttpServletRequest request);
+
+	public InsertResponseDTO insertDatosCurriculares(FichaDatosCurricularesItem fichaDatosCurricularesItem,
 			HttpServletRequest request);
 
 

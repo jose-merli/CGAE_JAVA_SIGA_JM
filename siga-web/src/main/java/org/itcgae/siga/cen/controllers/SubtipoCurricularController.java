@@ -7,11 +7,8 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.SubtipoCurricularDTO;
 import org.itcgae.siga.DTOs.cen.SubtipoCurricularItem;
-import org.itcgae.siga.DTOs.cen.TipoCurricularDTO;
-import org.itcgae.siga.DTOs.cen.TipoCurricularItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.ISubtipoCurricularService;
-import org.itcgae.siga.cen.services.ITipoCurricularService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +33,13 @@ public class SubtipoCurricularController {
 		return new ResponseEntity<SubtipoCurricularDTO>(response, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "subtipoCurricular/comboSubtipoCurricular", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getComboSubtipoCurricular(@RequestParam("numPagina") int numPagina,
+		@RequestBody SubtipoCurricularItem subtipoCurricularItem, HttpServletRequest request) {
+		ComboDTO response = subtipoCurricularService.getComboSubtipoCurricular(numPagina, subtipoCurricularItem, request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "subtipoCurricular/createSubtipoCurricular", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> createSubtipoCurricular(@RequestBody SubtipoCurricularItem subtipoCurricularItem,
 			HttpServletRequest request) throws Exception {
