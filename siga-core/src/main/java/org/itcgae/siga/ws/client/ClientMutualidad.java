@@ -13,14 +13,20 @@ import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.soap.SoapHeader;
 import org.springframework.ws.soap.SoapMessage;
 import org.springframework.xml.transform.StringSource;
+
+import samples.servicemodel.microsoft.EstadoMutualistaDocument;
+import samples.servicemodel.microsoft.EstadoSolicitudDocument;
 import samples.servicemodel.microsoft.EstadoSolicitudDocument.EstadoSolicitud;
 import samples.servicemodel.microsoft.GetEnumsDocument;
+import samples.servicemodel.microsoft.MGASolicitudPolizaAccuGratuitosBloqueDocument;
 import samples.servicemodel.microsoft.impl.EstadoMutualistaResponseDocumentImpl;
 import samples.servicemodel.microsoft.impl.EstadoSolicitudDocumentImpl;
+import samples.servicemodel.microsoft.impl.EstadoSolicitudResponseDocumentImpl;
 import samples.servicemodel.microsoft.impl.GetEnumsResponseDocumentImpl;
 import samples.servicemodel.microsoft.impl.MGASolicitudPolizaAccuGratuitosResponseDocumentImpl;
 import samples.servicemodel.microsoft.impl.MGASolicitudPolizaProfesionalResponseDocumentImpl;
 
+import com.altermutua.www.wssiga.GetEstadoColegiadoDocument;
 import com.altermutua.www.wssiga.GetEstadoColegiadoDocument.GetEstadoColegiado;
 
 @Component
@@ -39,7 +45,7 @@ public class ClientMutualidad {
 	
 
 	
-	public IntegracionSolicitudRespuesta getEstadoMutualista (GetEstadoColegiado request , String uriService)throws Exception{
+	public IntegracionSolicitudRespuesta getEstadoMutualista (EstadoMutualistaDocument request , String uriService)throws Exception{
 		
 		
 		
@@ -53,15 +59,15 @@ public class ClientMutualidad {
 		
 	}
 	
-	public EstadoSolicitud getEstadoSolicitud (GetEstadoColegiado request , String uriService)throws Exception{
+	public IntegracionSolicitudRespuesta getEstadoSolicitud (EstadoSolicitudDocument request , String uriService)throws Exception{
 		
 	
 		webServiceTemplate.setDefaultUri(uriService);
 		
-		EstadoSolicitudDocumentImpl responseWS = (EstadoSolicitudDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
+		EstadoSolicitudResponseDocumentImpl responseWS = (EstadoSolicitudResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
 
 		
-		EstadoSolicitud estadoMutualista = responseWS.getEstadoSolicitud();
+		IntegracionSolicitudRespuesta estadoMutualista = responseWS.getEstadoSolicitudResponse().getEstadoSolicitudResult();
 		
 		return estadoMutualista;
 		
@@ -103,7 +109,7 @@ public class ClientMutualidad {
 	}
 	
 
-	public IntegracionSolicitudRespuesta MGASolicitudPolizaAccuGratuitos (GetEstadoColegiado request , String uriService)throws Exception{
+	public IntegracionSolicitudRespuesta MGASolicitudPolizaAccuGratuitos (MGASolicitudPolizaAccuGratuitosBloqueDocument request , String uriService)throws Exception{
 		
 		
 		
@@ -112,13 +118,13 @@ public class ClientMutualidad {
 		MGASolicitudPolizaAccuGratuitosResponseDocumentImpl responseWS = (MGASolicitudPolizaAccuGratuitosResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
 
 		
-		IntegracionSolicitudRespuesta response =responseWS.getMGASolicitudPolizaAccuGratuitosResponse().getMGASolicitudPolizaAccuGratuitosResult();
+		IntegracionSolicitudRespuesta response = responseWS.getMGASolicitudPolizaAccuGratuitosResponse().getMGASolicitudPolizaAccuGratuitosResult();
 		
 		return response;
 		
 	}
 
-	public IntegracionSolicitudRespuesta MGASolicitudPolizaProfesional (GetEstadoColegiado request , String uriService)throws Exception{
+	public IntegracionSolicitudRespuesta MGASolicitudPolizaProfesional (GetEstadoColegiadoDocument request , String uriService)throws Exception{
 		
 		webServiceTemplate.setDefaultUri(uriService);
 		

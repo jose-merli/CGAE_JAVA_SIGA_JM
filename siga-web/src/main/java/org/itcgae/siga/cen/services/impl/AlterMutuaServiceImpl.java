@@ -175,29 +175,26 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					response.setError(responseWS.getError());
 					response.setMensaje(responseWS.getMensaje());
 					
-					
-					
-					int index = 0;
-					List<PropuestaDTO> propuestas = new ArrayList<PropuestaDTO>();
-					while(responseWS.getPropuestas().getWSPropuestaArray(index)!= null){
-						
-						PropuestaDTO propuestaItem = new PropuestaDTO();
-						WSPropuesta propuestaWS = responseWS.getPropuestas().getWSPropuestaArray(index);
-						
-						
-						propuestaItem.setBreve(propuestaWS.getBreve());
-						propuestaItem.setDescripcion(propuestaWS.getDescripcion());
-						propuestaItem.setFamiliares(propuestaWS.getFamiliares());
-						propuestaItem.setHerederos(propuestaWS.getHerederos());
-						propuestaItem.setIdPaquete(propuestaWS.getIdPaquete());
-						propuestaItem.setNombre(propuestaWS.getNombre());
-						propuestaItem.setTarifa(propuestaWS.getTarifa());
-						propuestas.add(propuestaItem);
-						
-						index++;
+					if(responseWS.getPropuestas() != null){
+						List<PropuestaDTO> propuestas = new ArrayList<PropuestaDTO>();
+						for(int i = 0; i < responseWS.getPropuestas().sizeOfWSPropuestaArray();i++){
+							
+							PropuestaDTO propuestaItem = new PropuestaDTO();
+							WSPropuesta propuestaWS = responseWS.getPropuestas().getWSPropuestaArray(i);
+							
+							
+							propuestaItem.setBreve(propuestaWS.getBreve());
+							propuestaItem.setDescripcion(propuestaWS.getDescripcion());
+							propuestaItem.setFamiliares(propuestaWS.getFamiliares());
+							propuestaItem.setHerederos(propuestaWS.getHerederos());
+							propuestaItem.setIdPaquete(propuestaWS.getIdPaquete());
+							propuestaItem.setNombre(propuestaWS.getNombre());
+							propuestaItem.setTarifa(propuestaWS.getTarifa());
+							propuestas.add(propuestaItem);
+							
+						}
+						response.setPropuestas(propuestas);
 					}
-					response.setPropuestas(propuestas);
-					
 				}
 			}
 		}catch(Exception e){
@@ -211,6 +208,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 
 	@Override
 	public AlterMutuaResponseDTO getTarifaSolicitud(SolicitudDTO solicitud) {
+		
 		LOGGER.info("getTarifaSolicitud() --> Entrada al servicio para obtener las tarifas");
 		AlterMutuaResponseDTO responseDTO = new AlterMutuaResponseDTO();
 		
@@ -221,37 +219,119 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 			List<GenParametros> config = _genParametrosMapper.selectByExample(example);
 			
 			if(config != null && config.size() > 0){
-				
-				String uriService = config.get(0).getValor();
-				
-				GetTarifaSolicitudDocument request = GetTarifaSolicitudDocument.Factory.newInstance();
-				GetTarifaSolicitud requestBody = GetTarifaSolicitud.Factory.newInstance();
-				WSSolicitud WSsolicitud = WSSolicitud.Factory.newInstance();
-				WSsolicitud.setIdPaquete(solicitud.getIdPaquete());
-				requestBody.setWsSolicitud(WSsolicitud);
-				request.setGetTarifaSolicitud(requestBody);
-				
-				WSRespuesta response = _clientAlterMutua.getTarifaSolicitud(request, uriService);
-				
-				if(response != null){
+				if(config != null && config.size() > 0){
 					
-					responseDTO.setMensaje(response.getMensaje());
-					responseDTO.setError(response.getError());
+					String uriService = config.get(0).getValor();
 					
-					WSPropuesta propuestaWS = response.getPropuestas().getWSPropuestaArray(0);
-					List<PropuestaDTO> propuestasDTO = new ArrayList<PropuestaDTO>();
+					GetTarifaSolicitudDocument request = GetTarifaSolicitudDocument.Factory.newInstance();
+					GetTarifaSolicitud requestBody = GetTarifaSolicitud.Factory.newInstance();
+					WSSolicitud WSsolicitud = WSSolicitud.Factory.newInstance();
+					WSsolicitud.setIdPaquete(solicitud.getIdPaquete());
+					requestBody.setWsSolicitud(WSsolicitud);
+					WSAsegurado asegurado = WSAsegurado.Factory.newInstance();
+					asegurado.setApellidos(solicitud.getAsegurado().getApellidos());
+					asegurado.setColegio(solicitud.getAsegurado().getColegio());
+					WSCuentaBancaria datosBancarios = WSCuentaBancaria.Factory.newInstance();
+					datosBancarios.setIBAN(solicitud.getAsegurado().getIban());
+					datosBancarios.setDC(solicitud.getAsegurado().getIban().substring(12, 14));
+					datosBancarios.setPais(solicitud.getAsegurado().getIban().substring(0, 2));
+					datosBancarios.setCuenta(solicitud.getAsegurado().getIban().substring(14, 24));
+					asegurado.setCuentaBancaria(datosBancarios);
 					
-					PropuestaDTO propuestaDTO = new PropuestaDTO();
-					propuestaDTO.setBreve(propuestaWS.getBreve());
-					propuestaDTO.setDescripcion(propuestaWS.getDescripcion());
-					propuestaDTO.setFamiliares(propuestaWS.getFamiliares());
-					propuestaDTO.setHerederos(propuestaWS.getHerederos());
-					propuestaDTO.setIdPaquete(propuestaWS.getIdPaquete());
-					propuestaDTO.setNombre(propuestaWS.getNombre());
-					propuestaDTO.setTarifa(propuestaWS.getTarifa());
-					propuestasDTO.add(propuestaDTO);
+					WSDireccion direccion = WSDireccion.Factory.newInstance();
+					direccion.setCodigoPostal(solicitud.getAsegurado().getCp());
+					direccion.setDireccionPostal(solicitud.getAsegurado().getDomicilio());
+					direccion.setEmail(solicitud.getAsegurado().getMail());
+					if(solicitud.getAsegurado().getFax()!= null){
+						direccion.setFax(solicitud.getAsegurado().getFax());
+					}
+					direccion.setMovil(solicitud.getAsegurado().getFax());
+					direccion.setPais(solicitud.getAsegurado().getPais());
+					if(solicitud.getAsegurado().getProvincia()!= null){
+						direccion.setProvincia(solicitud.getAsegurado().getProvincia());
+					}
+					if(solicitud.getAsegurado().getPoblacion()!= null){
+						direccion.setPoblacion(solicitud.getAsegurado().getPoblacion());
+					}
+					if(solicitud.getAsegurado().getTelefono()!= null){
+						direccion.setTelefono1(solicitud.getAsegurado().getTelefono());
+					}
+					if(solicitud.getAsegurado().getTelefono2()!= null){
+						direccion.setTelefono2(solicitud.getAsegurado().getTelefono2());
+					}
+					direccion.setTipoDireccion(Integer.parseInt(solicitud.getAsegurado().getTipoDireccion()));				
+					asegurado.setDireccion(direccion);
+					asegurado.setEstadoCivil(Integer.parseInt(solicitud.getAsegurado().getEstadoCivil()));
 					
-					responseDTO.setPropuestas(propuestasDTO);
+					
+					if(solicitud.getHerederos() != null){
+						if(solicitud.getHerederos().size() > 0){
+							WSPersona[] herederos = new WSPersona[solicitud.getHerederos().size()];
+							int index = 0;
+							for (PersonaDTO persona : solicitud.getHerederos()) {
+								WSPersona heredero = WSPersona.Factory.newInstance();
+								Calendar cal = Calendar.getInstance();
+								
+								heredero.setParentesco(Integer.parseInt(persona.getParentesco()));
+								heredero.setApellidos(persona.getApellido());
+								heredero.setNombre(persona.getNombre());
+								heredero.setSexo(Integer.parseInt(persona.getSexo()));
+								heredero.setIdentificador(persona.getIdentificacion());
+								heredero.setTipoIdentificador(Integer.parseInt(persona.getTipoIdentificacion()));
+								cal.setTime(persona.getFechaNacimiento());
+								heredero.setFechaNacimiento(cal);
+								herederos[index] = heredero;
+								index++;
+							}
+							WSsolicitud.setHerederosArray(herederos);
+						}
+					}else{
+						if(solicitud.getFamiliares().size() > 0){
+							WSPersona[] familiares = new WSPersona[solicitud.getFamiliares().size()];
+							int index = 0;
+							for (PersonaDTO persona : solicitud.getFamiliares()) {
+								WSPersona familiar = WSPersona.Factory.newInstance();
+								Calendar cal = Calendar.getInstance();
+								
+								familiar.setParentesco(Integer.parseInt(persona.getParentesco()));
+								familiar.setApellidos(persona.getApellido());
+								familiar.setNombre(persona.getNombre());
+								familiar.setSexo(Integer.parseInt(persona.getSexo()));
+								familiar.setIdentificador(persona.getIdentificacion());
+								familiar.setTipoIdentificador(Integer.parseInt(persona.getTipoIdentificacion()));
+								cal.setTime(persona.getFechaNacimiento());
+								familiar.setFechaNacimiento(cal);
+								familiares[index] = familiar;
+								index++;
+							}
+							asegurado.setFamiliaresArray(familiares);
+						}
+					}
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(solicitud.getAsegurado().getFechaNacimiento());
+					asegurado.setFechaNacimiento(cal);
+					asegurado.setIdentificador(solicitud.getAsegurado().getIdentificador());
+					asegurado.setIdioma(Integer.parseInt(solicitud.getAsegurado().getIdioma()));
+					asegurado.setNombre(solicitud.getAsegurado().getNombre());
+					asegurado.setPublicidad(solicitud.getAsegurado().isPublicidad());
+					asegurado.setSexo(Integer.parseInt(solicitud.getAsegurado().getSexo()));
+					asegurado.setTipoComunicacion(Integer.parseInt(solicitud.getAsegurado().getMedioComunicacion()));
+					asegurado.setTipoEjercicio(Integer.parseInt(solicitud.getAsegurado().getSitEjercicio()));
+					asegurado.setTipoIdentificador(Integer.parseInt(solicitud.getAsegurado().getTipoIdentificador()));
+					
+					
+					WSsolicitud.setAsegurado(asegurado);
+					request.setGetTarifaSolicitud(requestBody);
+					
+					WSRespuesta responseWS = _clientAlterMutua.getTarifaSolicitud(request, uriService);
+					
+					if(responseWS != null){
+						responseDTO.setIdentificador(responseWS.getIdentificador());
+						responseDTO.setDocumento(responseWS.getDocumento());
+						responseDTO.setError(responseWS.getError());
+						responseDTO.setMensaje(responseWS.getMensaje());
+					}
+					
 				}
 				
 			}
