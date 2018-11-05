@@ -428,7 +428,7 @@ public class MenuServiceImpl implements IMenuService {
 		// Obtener idInstitucion del certificado y idUsuario del certificado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		String grupo = null;
+		String institucion = null;
 		try {
 			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
 			String commonName = null;
@@ -441,9 +441,6 @@ public class MenuServiceImpl implements IMenuService {
 				try {
 					X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
 
-					RDN userRdn = x500name.getRDNs(BCStyle.CN)[0];
-					commonName = IETFUtils.valueToString(userRdn.getFirst().getValue());
-
 					if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
 						RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
 						organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
@@ -452,17 +449,14 @@ public class MenuServiceImpl implements IMenuService {
 						organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
 					}
 
-					RDN grupoRdn = x500name.getRDNs(BCStyle.T)[0];
-					grupo = IETFUtils.valueToString(grupoRdn.getFirst().getValue());
+
 
 					LOGGER.debug("Common Name: " + commonName);
 					LOGGER.debug("Organization Name: " + organizationName);
 				} catch (NoSuchElementException e) {
 					throw new InvalidClientCerticateException(e);
 				}
-
-				String dni = commonName.substring(commonName.length() - 9, commonName.length());
-				String institucion = null;
+				
 				if (null != organizationNameNuevo) {
 					institucion = organizationNameNuevo.substring(0,
 								4);
@@ -471,9 +465,8 @@ public class MenuServiceImpl implements IMenuService {
 						organizationName.length());
 				}
 
-				LOGGER.debug("DNI: " + dni);
 				LOGGER.debug("INSTITUCION: " + institucion);
-				LOGGER.debug("GRUPO: " + grupo);
+
 				
 			}
 		} catch (Exception e) {
@@ -481,7 +474,7 @@ public class MenuServiceImpl implements IMenuService {
 		}
 
 		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucion));
-		permisoRequestItem.setIdGrupo(grupo);
+		permisoRequestItem.setIdInstitucionCertificado(institucion);
 		List<PermisoEntity> permisosEntity = this.permisosMapper.getProcesosPermisos(permisoRequestItem);
 
 		if (null != permisosEntity && !permisosEntity.isEmpty()) {
