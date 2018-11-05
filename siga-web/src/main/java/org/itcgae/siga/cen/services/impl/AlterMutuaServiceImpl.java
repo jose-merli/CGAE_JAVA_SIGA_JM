@@ -227,7 +227,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					GetTarifaSolicitud requestBody = GetTarifaSolicitud.Factory.newInstance();
 					WSSolicitud WSsolicitud = WSSolicitud.Factory.newInstance();
 					WSsolicitud.setIdPaquete(solicitud.getIdPaquete());
-					requestBody.setWsSolicitud(WSsolicitud);
+					
 					WSAsegurado asegurado = WSAsegurado.Factory.newInstance();
 					asegurado.setApellidos(solicitud.getAsegurado().getApellidos());
 					asegurado.setColegio(solicitud.getAsegurado().getColegio());
@@ -272,12 +272,20 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 								WSPersona heredero = WSPersona.Factory.newInstance();
 								Calendar cal = Calendar.getInstance();
 								
-								heredero.setParentesco(Integer.parseInt(persona.getParentesco()));
+								heredero.setParentesco(getParentesco(persona.getParentesco()));
 								heredero.setApellidos(persona.getApellido());
 								heredero.setNombre(persona.getNombre());
-								heredero.setSexo(Integer.parseInt(persona.getSexo()));
+								if(persona.getSexo().equals("H")==true){
+									heredero.setSexo(1);
+								}else{
+									heredero.setSexo(2);
+								}
 								heredero.setIdentificador(persona.getIdentificacion());
-								heredero.setTipoIdentificador(Integer.parseInt(persona.getTipoIdentificacion()));
+								if(persona.getTipoIdentificacion().equals("NIF")){
+									heredero.setTipoIdentificador(0);
+								}else{
+									heredero.setTipoIdentificador(1);
+								}
 								cal.setTime(persona.getFechaNacimiento());
 								heredero.setFechaNacimiento(cal);
 								herederos[index] = heredero;
@@ -293,12 +301,20 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 								WSPersona familiar = WSPersona.Factory.newInstance();
 								Calendar cal = Calendar.getInstance();
 								
-								familiar.setParentesco(Integer.parseInt(persona.getParentesco()));
+								familiar.setParentesco(getParentesco(persona.getParentesco()));
 								familiar.setApellidos(persona.getApellido());
 								familiar.setNombre(persona.getNombre());
-								familiar.setSexo(Integer.parseInt(persona.getSexo()));
+								if(persona.getSexo().equals("H")==true){
+									asegurado.setSexo(1);
+								}else{
+									asegurado.setSexo(2);
+								}
 								familiar.setIdentificador(persona.getIdentificacion());
-								familiar.setTipoIdentificador(Integer.parseInt(persona.getTipoIdentificacion()));
+								if(persona.getTipoIdentificacion().equals("NIF")){
+									familiar.setTipoIdentificador(0);
+								}else{
+									familiar.setTipoIdentificador(1);
+								}
 								cal.setTime(persona.getFechaNacimiento());
 								familiar.setFechaNacimiento(cal);
 								familiares[index] = familiar;
@@ -314,13 +330,23 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					asegurado.setIdioma(Integer.parseInt(solicitud.getAsegurado().getIdioma()));
 					asegurado.setNombre(solicitud.getAsegurado().getNombre());
 					asegurado.setPublicidad(solicitud.getAsegurado().isPublicidad());
-					asegurado.setSexo(Integer.parseInt(solicitud.getAsegurado().getSexo()));
+					if(solicitud.getAsegurado().getSexo().equals("H")==true){
+						asegurado.setSexo(1);
+					}else{
+						asegurado.setSexo(2);
+					}
 					asegurado.setTipoComunicacion(Integer.parseInt(solicitud.getAsegurado().getMedioComunicacion()));
-					asegurado.setTipoEjercicio(Integer.parseInt(solicitud.getAsegurado().getSitEjercicio()));
-					asegurado.setTipoIdentificador(Integer.parseInt(solicitud.getAsegurado().getTipoIdentificador()));
+					asegurado.setTipoEjercicio(Integer.parseInt(solicitud.getAsegurado().getTipoEjercicio()));
+					
+					if(solicitud.getAsegurado().getTipoIdentificador().equals("NIF")==true || solicitud.getAsegurado().getTipoIdentificador().equals("NIE")==true){
+						asegurado.setTipoIdentificador(0);
+					}else{
+						asegurado.setTipoIdentificador(1);
+					}
 					
 					
 					WSsolicitud.setAsegurado(asegurado);
+					requestBody.setWsSolicitud(WSsolicitud);
 					request.setGetTarifaSolicitud(requestBody);
 					
 					WSRespuesta responseWS = _clientAlterMutua.getTarifaSolicitud(request, uriService);
@@ -330,6 +356,27 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						responseDTO.setDocumento(responseWS.getDocumento());
 						responseDTO.setError(responseWS.getError());
 						responseDTO.setMensaje(responseWS.getMensaje());
+						
+						if(responseWS.getPropuestas() != null){
+							List<PropuestaDTO> propuestas = new ArrayList<PropuestaDTO>();
+							for(int i = 0; i < responseWS.getPropuestas().sizeOfWSPropuestaArray();i++){
+								
+								PropuestaDTO propuestaItem = new PropuestaDTO();
+								WSPropuesta propuestaWS = responseWS.getPropuestas().getWSPropuestaArray(i);
+								
+								
+								propuestaItem.setBreve(propuestaWS.getBreve());
+								propuestaItem.setDescripcion(propuestaWS.getDescripcion());
+								propuestaItem.setFamiliares(propuestaWS.getFamiliares());
+								propuestaItem.setHerederos(propuestaWS.getHerederos());
+								propuestaItem.setIdPaquete(propuestaWS.getIdPaquete());
+								propuestaItem.setNombre(propuestaWS.getNombre());
+								propuestaItem.setTarifa(propuestaWS.getTarifa());
+								propuestas.add(propuestaItem);
+								
+							}
+							responseDTO.setPropuestas(propuestas);
+						}
 					}
 					
 				}
@@ -349,9 +396,9 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 	@Override
 	public AlterMutuaResponseDTO setSolicitudAlter(SolicitudDTO solicitud) {
 
-		LOGGER.info("setSolicitudAlter() --> Entrada al servicio para solicitar");
+		LOGGER.info("setSolicitudAlter() -->  Entrada al servicio para enviar datos alter");
+		AlterMutuaResponseDTO responseDTO = new AlterMutuaResponseDTO();
 		
-		AlterMutuaResponseDTO response = new AlterMutuaResponseDTO();
 		try{
 			GenParametrosExample example = new GenParametrosExample();
 			example.createCriteria().andIdrecursoEqualTo("administracion.parametro.alterm_url");
@@ -359,129 +406,200 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 			List<GenParametros> config = _genParametrosMapper.selectByExample(example);
 			
 			if(config != null && config.size() > 0){
-				
-				String uriService = config.get(0).getValor();
-				
-				SetSolicitudAlterDocument request = SetSolicitudAlterDocument.Factory.newInstance();
-				SetSolicitudAlter requestBody = SetSolicitudAlter.Factory.newInstance();
-				WSSolicitud WSsolicitud = WSSolicitud.Factory.newInstance();
-				WSsolicitud.setIdPaquete(solicitud.getIdPaquete());
-				requestBody.setWsSolicitud(WSsolicitud);
-				WSAsegurado asegurado = WSAsegurado.Factory.newInstance();
-				asegurado.setApellidos(solicitud.getAsegurado().getApellidos());
-				asegurado.setColegio(solicitud.getAsegurado().getColegio());
-				WSCuentaBancaria datosBancarios = WSCuentaBancaria.Factory.newInstance();
-				datosBancarios.setIBAN(solicitud.getAsegurado().getIban());
-				datosBancarios.setDC(solicitud.getAsegurado().getIban().substring(12, 14));
-				datosBancarios.setPais(solicitud.getAsegurado().getIban().substring(0, 2));
-				datosBancarios.setCuenta(solicitud.getAsegurado().getIban().substring(14, 24));
-				asegurado.setCuentaBancaria(datosBancarios);
-				
-				WSDireccion direccion = WSDireccion.Factory.newInstance();
-				direccion.setCodigoPostal(solicitud.getAsegurado().getCp());
-				direccion.setDireccionPostal(solicitud.getAsegurado().getDomicilio());
-				direccion.setEmail(solicitud.getAsegurado().getMail());
-				if(solicitud.getAsegurado().getFax()!= null){
-					direccion.setFax(solicitud.getAsegurado().getFax());
-				}
-				direccion.setMovil(solicitud.getAsegurado().getFax());
-				direccion.setPais(solicitud.getAsegurado().getPais());
-				if(solicitud.getAsegurado().getProvincia()!= null){
-					direccion.setProvincia(solicitud.getAsegurado().getProvincia());
-				}
-				if(solicitud.getAsegurado().getPoblacion()!= null){
-					direccion.setPoblacion(solicitud.getAsegurado().getPoblacion());
-				}
-				if(solicitud.getAsegurado().getTelefono()!= null){
-					direccion.setTelefono1(solicitud.getAsegurado().getTelefono());
-				}
-				if(solicitud.getAsegurado().getTelefono2()!= null){
-					direccion.setTelefono2(solicitud.getAsegurado().getTelefono2());
-				}
-				direccion.setTipoDireccion(Integer.parseInt(solicitud.getAsegurado().getTipoDireccion()));				
-				asegurado.setDireccion(direccion);
-				asegurado.setEstadoCivil(Integer.parseInt(solicitud.getAsegurado().getEstadoCivil()));
-				
-				
-				if(solicitud.getHerederos() != null){
-					if(solicitud.getHerederos().size() > 0){
-						WSPersona[] herederos = new WSPersona[solicitud.getHerederos().size()];
-						int index = 0;
-						for (PersonaDTO persona : solicitud.getHerederos()) {
-							WSPersona heredero = WSPersona.Factory.newInstance();
-							Calendar cal = Calendar.getInstance();
-							
-							heredero.setParentesco(Integer.parseInt(persona.getParentesco()));
-							heredero.setApellidos(persona.getApellido());
-							heredero.setNombre(persona.getNombre());
-							heredero.setSexo(Integer.parseInt(persona.getSexo()));
-							heredero.setIdentificador(persona.getIdentificacion());
-							heredero.setTipoIdentificador(Integer.parseInt(persona.getTipoIdentificacion()));
-							cal.setTime(persona.getFechaNacimiento());
-							heredero.setFechaNacimiento(cal);
-							herederos[index] = heredero;
-							index++;
-						}
-						WSsolicitud.setHerederosArray(herederos);
+				if(config != null && config.size() > 0){
+					
+					String uriService = config.get(0).getValor();
+					
+					SetSolicitudAlterDocument request = SetSolicitudAlterDocument.Factory.newInstance();
+					SetSolicitudAlter requestBody = SetSolicitudAlter.Factory.newInstance();
+					WSSolicitud WSsolicitud = WSSolicitud.Factory.newInstance();
+					WSsolicitud.setIdPaquete(solicitud.getIdPaquete());
+					
+					WSAsegurado asegurado = WSAsegurado.Factory.newInstance();
+					asegurado.setApellidos(solicitud.getAsegurado().getApellidos());
+					asegurado.setColegio(solicitud.getAsegurado().getColegio());
+					WSCuentaBancaria datosBancarios = WSCuentaBancaria.Factory.newInstance();
+					datosBancarios.setIBAN(solicitud.getAsegurado().getIban());
+					datosBancarios.setDC(solicitud.getAsegurado().getIban().substring(12, 14));
+					datosBancarios.setPais(solicitud.getAsegurado().getIban().substring(0, 2));
+					datosBancarios.setCuenta(solicitud.getAsegurado().getIban().substring(14, 24));
+					asegurado.setCuentaBancaria(datosBancarios);
+					
+					WSDireccion direccion = WSDireccion.Factory.newInstance();
+					direccion.setCodigoPostal(solicitud.getAsegurado().getCp());
+					direccion.setDireccionPostal(solicitud.getAsegurado().getDomicilio());
+					direccion.setEmail(solicitud.getAsegurado().getMail());
+					if(solicitud.getAsegurado().getFax()!= null){
+						direccion.setFax(solicitud.getAsegurado().getFax());
 					}
-				}else{
-					if(solicitud.getFamiliares().size() > 0){
-						WSPersona[] familiares = new WSPersona[solicitud.getFamiliares().size()];
-						int index = 0;
-						for (PersonaDTO persona : solicitud.getFamiliares()) {
-							WSPersona familiar = WSPersona.Factory.newInstance();
-							Calendar cal = Calendar.getInstance();
-							
-							familiar.setParentesco(Integer.parseInt(persona.getParentesco()));
-							familiar.setApellidos(persona.getApellido());
-							familiar.setNombre(persona.getNombre());
-							familiar.setSexo(Integer.parseInt(persona.getSexo()));
-							familiar.setIdentificador(persona.getIdentificacion());
-							familiar.setTipoIdentificador(Integer.parseInt(persona.getTipoIdentificacion()));
-							cal.setTime(persona.getFechaNacimiento());
-							familiar.setFechaNacimiento(cal);
-							familiares[index] = familiar;
-							index++;
-						}
-						asegurado.setFamiliaresArray(familiares);
+					direccion.setMovil(solicitud.getAsegurado().getFax());
+					direccion.setPais(solicitud.getAsegurado().getPais());
+					if(solicitud.getAsegurado().getProvincia()!= null){
+						direccion.setProvincia(solicitud.getAsegurado().getProvincia());
 					}
+					if(solicitud.getAsegurado().getPoblacion()!= null){
+						direccion.setPoblacion(solicitud.getAsegurado().getPoblacion());
+					}
+					if(solicitud.getAsegurado().getTelefono()!= null){
+						direccion.setTelefono1(solicitud.getAsegurado().getTelefono());
+					}
+					if(solicitud.getAsegurado().getTelefono2()!= null){
+						direccion.setTelefono2(solicitud.getAsegurado().getTelefono2());
+					}
+					direccion.setTipoDireccion(Integer.parseInt(solicitud.getAsegurado().getTipoDireccion()));				
+					asegurado.setDireccion(direccion);
+					asegurado.setEstadoCivil(Integer.parseInt(solicitud.getAsegurado().getEstadoCivil()));
+					
+					
+					if(solicitud.getHerederos() != null){
+						if(solicitud.getHerederos().size() > 0){
+							WSPersona[] herederos = new WSPersona[solicitud.getHerederos().size()];
+							int index = 0;
+							for (PersonaDTO persona : solicitud.getHerederos()) {
+								WSPersona heredero = WSPersona.Factory.newInstance();
+								Calendar cal = Calendar.getInstance();
+								
+								heredero.setParentesco(getParentesco(persona.getParentesco()));
+								heredero.setApellidos(persona.getApellido());
+								heredero.setNombre(persona.getNombre());
+								if(persona.getSexo().equals("H")==true){
+									heredero.setSexo(1);
+								}else{
+									heredero.setSexo(2);
+								}
+								heredero.setIdentificador(persona.getIdentificacion());
+								if(persona.getTipoIdentificacion().equals("NIF")){
+									heredero.setTipoIdentificador(0);
+								}else{
+									heredero.setTipoIdentificador(1);
+								}
+								cal.setTime(persona.getFechaNacimiento());
+								heredero.setFechaNacimiento(cal);
+								herederos[index] = heredero;
+								index++;
+							}
+							WSsolicitud.setHerederosArray(herederos);
+						}
+					}else{
+						if(solicitud.getFamiliares().size() > 0){
+							WSPersona[] familiares = new WSPersona[solicitud.getFamiliares().size()];
+							int index = 0;
+							for (PersonaDTO persona : solicitud.getFamiliares()) {
+								WSPersona familiar = WSPersona.Factory.newInstance();
+								Calendar cal = Calendar.getInstance();
+								
+								familiar.setParentesco(getParentesco(persona.getParentesco()));
+								familiar.setApellidos(persona.getApellido());
+								familiar.setNombre(persona.getNombre());
+								if(persona.getSexo().equals("H")==true){
+									asegurado.setSexo(1);
+								}else{
+									asegurado.setSexo(2);
+								}
+								familiar.setIdentificador(persona.getIdentificacion());
+								if(persona.getTipoIdentificacion().equals("NIF")){
+									familiar.setTipoIdentificador(0);
+								}else{
+									familiar.setTipoIdentificador(1);
+								}
+								cal.setTime(persona.getFechaNacimiento());
+								familiar.setFechaNacimiento(cal);
+								familiares[index] = familiar;
+								index++;
+							}
+							asegurado.setFamiliaresArray(familiares);
+						}
+					}
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(solicitud.getAsegurado().getFechaNacimiento());
+					asegurado.setFechaNacimiento(cal);
+					asegurado.setIdentificador(solicitud.getAsegurado().getIdentificador());
+					asegurado.setIdioma(Integer.parseInt(solicitud.getAsegurado().getIdioma()));
+					asegurado.setNombre(solicitud.getAsegurado().getNombre());
+					asegurado.setPublicidad(solicitud.getAsegurado().isPublicidad());
+					if(solicitud.getAsegurado().getSexo().equals("H")==true){
+						asegurado.setSexo(1);
+					}else{
+						asegurado.setSexo(2);
+					}
+					asegurado.setTipoComunicacion(Integer.parseInt(solicitud.getAsegurado().getMedioComunicacion()));
+					asegurado.setTipoEjercicio(Integer.parseInt(solicitud.getAsegurado().getTipoEjercicio()));
+					
+					if(solicitud.getAsegurado().getTipoIdentificador().equals("NIF")==true || solicitud.getAsegurado().getTipoIdentificador().equals("NIE")==true){
+						asegurado.setTipoIdentificador(0);
+					}else{
+						asegurado.setTipoIdentificador(1);
+					}
+					
+					
+					WSsolicitud.setAsegurado(asegurado);
+					requestBody.setWsSolicitud(WSsolicitud);
+					request.setSetSolicitudAlter(requestBody);
+					
+					WSRespuesta responseWS = _clientAlterMutua.setSolicitudAlter(request, uriService);
+					
+					if(responseWS != null){
+						responseDTO.setIdentificador(responseWS.getIdentificador());
+						responseDTO.setDocumento(responseWS.getDocumento());
+						responseDTO.setError(responseWS.getError());
+						responseDTO.setMensaje(responseWS.getMensaje());
+						
+						if(responseWS.getPropuestas() != null){
+							List<PropuestaDTO> propuestas = new ArrayList<PropuestaDTO>();
+							for(int i = 0; i < responseWS.getPropuestas().sizeOfWSPropuestaArray();i++){
+								
+								PropuestaDTO propuestaItem = new PropuestaDTO();
+								WSPropuesta propuestaWS = responseWS.getPropuestas().getWSPropuestaArray(i);
+								
+								
+								propuestaItem.setBreve(propuestaWS.getBreve());
+								propuestaItem.setDescripcion(propuestaWS.getDescripcion());
+								propuestaItem.setFamiliares(propuestaWS.getFamiliares());
+								propuestaItem.setHerederos(propuestaWS.getHerederos());
+								propuestaItem.setIdPaquete(propuestaWS.getIdPaquete());
+								propuestaItem.setNombre(propuestaWS.getNombre());
+								propuestaItem.setTarifa(propuestaWS.getTarifa());
+								propuestas.add(propuestaItem);
+								
+							}
+							responseDTO.setPropuestas(propuestas);
+						}
+					}
+					
 				}
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(solicitud.getAsegurado().getFechaNacimiento());
-				asegurado.setFechaNacimiento(cal);
-				asegurado.setIdentificador(solicitud.getAsegurado().getIdentificador());
-				asegurado.setIdioma(Integer.parseInt(solicitud.getAsegurado().getIdioma()));
-				asegurado.setNombre(solicitud.getAsegurado().getNombre());
-				asegurado.setPublicidad(solicitud.getAsegurado().isPublicidad());
-				asegurado.setSexo(Integer.parseInt(solicitud.getAsegurado().getSexo()));
-				asegurado.setTipoComunicacion(Integer.parseInt(solicitud.getAsegurado().getMedioComunicacion()));
-				asegurado.setTipoEjercicio(Integer.parseInt(solicitud.getAsegurado().getSitEjercicio()));
-				asegurado.setTipoIdentificador(Integer.parseInt(solicitud.getAsegurado().getTipoIdentificador()));
-				
-				
-				WSsolicitud.setAsegurado(asegurado);
-				request.setSetSolicitudAlter(requestBody);
-				
-				WSRespuesta responseWS = _clientAlterMutua.setSolicitudAlter(request, uriService);
-				
-				if(responseWS != null){
-					response.setIdentificador(responseWS.getIdentificador());
-					response.setDocumento(responseWS.getDocumento());
-					response.setError(responseWS.getError());
-					response.setMensaje(responseWS.getMensaje());
-				}
-				
-				
 				
 			}
+			
 		}catch(Exception e){
 			LOGGER.error("setSolicitudAlter() --> error en el servicio: " + e.getMessage());
-			response.setError(true);
-			response.setMensaje(e.getMessage());
+			responseDTO.setError(true);
+			responseDTO.setMensaje(e.getMessage());
 		}
 		
-		LOGGER.info("setSolicitudAlter() --> Salida del servicio para para solicitar");
-		return response;
+		LOGGER.info("setSolicitudAlter() --> Salida del servicio para enviar datos alter");
+		return responseDTO;
+	}
+	
+	int getParentesco (String parentesco){
+		int id =0;
+		
+		switch(parentesco){
+		case "Hij@":
+			id= 1;
+		case "Suegr@":
+			id = 14;
+		case "Otra Relacion":
+			id =  16;
+		case "Pareja":
+			id =  17;
+		case "No Familiar":
+			id =  18;
+		case "Conyuje":
+			id =  3;
+		case "Padre":
+			id =  4;
+		}
+		return id;
 	}
 
 }
