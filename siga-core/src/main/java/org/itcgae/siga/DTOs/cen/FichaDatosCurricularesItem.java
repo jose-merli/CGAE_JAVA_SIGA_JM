@@ -14,10 +14,10 @@ public class FichaDatosCurricularesItem {
 	private String fechaHasta;
 	private String fechaBaja;
 	private String fechaMovimiento;
-//	private Date fechaDesdeDate;
-//	private Date fechaHastaDate;
+	private Date dateFechaInicio;
+	private Date dateFechaFin;
 //	private Date fechaBajaDate;
-//	private Date fechaMovimientoDate;
+	private Date dateFechaMovimiento;
 	private String descripcion;
 	private String categoriaCurricular;
 	private String tipoSubtipo;
@@ -52,19 +52,19 @@ public class FichaDatosCurricularesItem {
 	 */
 	
 
-//	public FichaDatosCurricularesItem fechaBajaDate(Date fechaBajaDate){
-//		this.fechaBajaDate = fechaBajaDate;
-//		return this;
-//	}
-//	
-//	@JsonProperty("fechaBaja")
-//	public Date getFechaBajaDate() {
-//		return fechaBajaDate;
-//	}
-//
-//	public void setFechaBajaDate(Date fechaBajaDate) {
-//		this.fechaBajaDate = fechaBajaDate;
-//	}
+	public FichaDatosCurricularesItem dateFechaFin(Date dateFechaFin){
+		this.dateFechaFin = dateFechaFin;
+		return this;
+	}
+	
+	@JsonProperty("dateFechaFin")
+	public Date getFechaHastaDate() {
+		return dateFechaFin;
+	}
+
+	public void setFechaHastaDate(Date dateFechaFin) {
+		this.dateFechaFin = dateFechaFin;
+	}
 	
 	/**
 	 * 
@@ -73,22 +73,22 @@ public class FichaDatosCurricularesItem {
 	 */
 	/**
 	 */
-//	
-//
-//	public FichaDatosCurricularesItem fechaMovimiento(Date fechaMovimientoDate){
-//		this.fechaMovimientoDate = fechaMovimientoDate;
-//		return this;
-//	}
-//	
-//	@JsonProperty("fechaMovimiento")
-//	public Date getFechaMovimientoDate() {
-//		return fechaMovimientoDate;
-//	}
-//
-//	public void setFechaMovimientoDate(Date fechaMovimientoDate) {
-//		this.fechaMovimientoDate = fechaMovimientoDate;
-//	}
-//	
+	
+
+	public FichaDatosCurricularesItem fechaMovimiento(Date dateFechaMovimiento){
+		this.dateFechaMovimiento = dateFechaMovimiento;
+		return this;
+	}
+	
+	@JsonProperty("dateFechaMovimiento")
+	public Date getFechaMovimientoDate() {
+		return dateFechaMovimiento;
+	}
+
+	public void setFechaMovimientoDate(Date dateFechaMovimiento) {
+		this.dateFechaMovimiento = dateFechaMovimiento;
+	}
+	
 	/**
 	 * 
 	 * @param idPersona
@@ -256,19 +256,19 @@ public class FichaDatosCurricularesItem {
 //	}
 //
 //	
-//	public FichaDatosCurricularesItem fechaHastaDate(Date fechaHastaDate){
-//		this.fechaHastaDate = fechaHastaDate;
-//		return this;
-//	}
-//	
-//	@JsonProperty("fechaHastaDate")
-//	public Date getFechaHastaDate() {
-//		return fechaHastaDate;
-//	}
-//
-//	public void setFechaHastaDate(Date fechaHastaDate) {
-//		this.fechaHastaDate = fechaHastaDate;
-//	}
+	public FichaDatosCurricularesItem dateFechaInicio(Date dateFechaInicio){
+		this.dateFechaInicio = dateFechaInicio;
+		return this;
+	}
+	
+	@JsonProperty("dateFechaInicio")
+	public Date getFechaDesdeDate() {
+		return dateFechaInicio;
+	}
+
+	public void setFechaDesdeDate(Date dateFechaInicio) {
+		this.dateFechaInicio = dateFechaInicio;
+	}
 	
 	
 	
