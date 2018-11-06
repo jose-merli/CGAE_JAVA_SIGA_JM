@@ -2,15 +2,21 @@ package org.itcgae.siga.DTOs.cen;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class SolicitudModificacionSearchDTO {
 
 	private String idPersona;
 	private String idInstitucion;
 	private String tipoModificacion;
 	private String estado;
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaHasta;
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaDesde;
 	
+	@JsonProperty("idPersona")
 	public String getIdPersona() {
 		return idPersona;
 	}
@@ -19,7 +25,7 @@ public class SolicitudModificacionSearchDTO {
 		this.idPersona = idPersona;
 	}
 
-	
+	@JsonProperty("idInstitucion")
 	public String getIdInstitucion() {
 		return idInstitucion;
 	}
@@ -28,6 +34,7 @@ public class SolicitudModificacionSearchDTO {
 		this.idInstitucion = idInstitucion;
 	}
 
+	@JsonProperty("tipoModificacion")
 	public String getTipoModificacion() {
 		return tipoModificacion;
 	}
@@ -36,6 +43,7 @@ public class SolicitudModificacionSearchDTO {
 		this.tipoModificacion = tipoModificacion;
 	}
 	
+	@JsonProperty("estado")
 	public String getEstado() {
 		return estado;
 	}
@@ -44,6 +52,7 @@ public class SolicitudModificacionSearchDTO {
 		this.estado = estado;
 	}
 	
+	@JsonProperty("fechaHasta")
 	public Date getFechaHasta() {
 		return fechaHasta;
 	}
@@ -52,6 +61,7 @@ public class SolicitudModificacionSearchDTO {
 		this.fechaHasta = fechaHasta;
 	}
 	
+	@JsonProperty("fechaDesde")
 	public Date getFechaDesde() {
 		return fechaDesde;
 	}
