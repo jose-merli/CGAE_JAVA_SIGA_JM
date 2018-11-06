@@ -11,9 +11,7 @@ public class SolicitudModificacionSearchDTO {
 	private String idInstitucion;
 	private String tipoModificacion;
 	private String estado;
-	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaHasta;
-	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaDesde;
 	
 	@JsonProperty("idPersona")

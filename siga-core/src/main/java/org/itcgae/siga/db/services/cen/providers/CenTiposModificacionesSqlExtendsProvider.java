@@ -21,7 +21,7 @@ public class CenTiposModificacionesSqlExtendsProvider {
 	public String searchModificationRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguage) {
 		
 		SQL sql = new SQL();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
 		
 		sql.SELECT_DISTINCT("cat1.DESCRIPCION as ESTADO");
 		sql.SELECT("sol.IDSOLICITUD as IDSOLICITUD");
@@ -53,12 +53,12 @@ public class CenTiposModificacionesSqlExtendsProvider {
 
 		if (null != solicitudModificacionSearchDTO.getFechaDesde()) {
 			String fechaDesde = dateFormat.format(solicitudModificacionSearchDTO.getFechaDesde());
-			sql.WHERE(" TO_DATE(FECHAALTA,'DD/MM/YYYY') >= TO_DATE('" +fechaDesde + "', 'DD/MM/YYYY') ");
+			sql.WHERE(" TO_DATE(sol.FECHAALTA,'DD/MM/YYYY') >= TO_DATE('" +fechaDesde + "', 'DD/MM/YYYY') ");
 		}
 		
 		if (null != solicitudModificacionSearchDTO.getFechaHasta()) {
 			String fechaHasta = dateFormat.format(solicitudModificacionSearchDTO.getFechaHasta());
-			sql.WHERE(" TO_DATE(FECHAALTA,'DD/MM/YYYY') <= TO_DATE('" +fechaHasta + "', 'DD/MM/YYYY') ");
+			sql.WHERE(" TO_DATE(sol.FECHAALTA,'DD/MM/YYYY') <= TO_DATE('" +fechaHasta + "', 'DD/MM/YYYY') ");
 		}
 
 		return sql.toString();
