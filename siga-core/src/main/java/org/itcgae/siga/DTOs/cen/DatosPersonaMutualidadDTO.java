@@ -1,14 +1,20 @@
 package org.itcgae.siga.DTOs.cen;
 
+import java.util.Date;
+
 public class DatosPersonaMutualidadDTO {
 
 	private String apellido1;
 	private String apellido2;
+	private int asistenciaSanitaria;
+	private String[] edadesHijos;
 	private String colegio;
-	private String ejerciente;
+	private int ejerciente;
 	private String estadoCivil;
-	private String fechaNacimiento;
-	private String fechaNacConyuge;
+	private Date fechaNacimiento;
+	private Date fechaNacConyuge;
+	private String idMutualista;
+	private String idSolicitud;
 	private String NIF;
 	private String nacionalidad;
 	private String nombre;
@@ -18,11 +24,29 @@ public class DatosPersonaMutualidadDTO {
 	
 	
 	
+	public String getIdMutualista() {
+		return idMutualista;
+	}
+	public void setIdMutualista(String idMutualista) {
+		this.idMutualista = idMutualista;
+	}
+	public String getIdSolicitud() {
+		return idSolicitud;
+	}
+	public void setIdSolicitud(String idSolicitud) {
+		this.idSolicitud = idSolicitud;
+	}
 	public String getApellido1() {
 		return apellido1;
 	}
 	public void setApellido1(String apellido1) {
 		this.apellido1 = apellido1;
+	}
+	public String[] getEdadesHijos() {
+		return edadesHijos;
+	}
+	public void setEdadesHijos(String[] edadesHijos) {
+		this.edadesHijos = edadesHijos;
 	}
 	public String getApellido2() {
 		return apellido2;
@@ -36,28 +60,37 @@ public class DatosPersonaMutualidadDTO {
 	public void setColegio(String colegio) {
 		this.colegio = colegio;
 	}
-	public String getEjerciente() {
+
+	public int getEjerciente() {
 		return ejerciente;
 	}
-	public void setEjerciente(String ejerciente) {
+	public void setEjerciente(int ejerciente) {
 		this.ejerciente = ejerciente;
 	}
+	public int getAsistenciaSanitaria() {
+		return asistenciaSanitaria;
+	}
+	public void setAsistenciaSanitaria(int asistenciaSanitaria) {
+		this.asistenciaSanitaria = asistenciaSanitaria;
+	}
+
 	public String getEstadoCivil() {
 		return estadoCivil;
 	}
 	public void setEstadoCivil(String estadoCivil) {
 		this.estadoCivil = estadoCivil;
 	}
-	public String getFechaNacimiento() {
+
+	public Date getFechaNacimiento() {
 		return fechaNacimiento;
 	}
-	public void setFechaNacimiento(String fechaNacimiento) {
+	public void setFechaNacimiento(Date fechaNacimiento) {
 		this.fechaNacimiento = fechaNacimiento;
 	}
-	public String getFechaNacConyuge() {
+	public Date getFechaNacConyuge() {
 		return fechaNacConyuge;
 	}
-	public void setFechaNacConyuge(String fechaNacConyuge) {
+	public void setFechaNacConyuge(Date fechaNacConyuge) {
 		this.fechaNacConyuge = fechaNacConyuge;
 	}
 	public String getNIF() {

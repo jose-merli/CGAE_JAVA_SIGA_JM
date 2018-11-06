@@ -6,7 +6,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.datacontract.schemas._2004._07.ArrayOfIntegracionColegiadosBloque;
+import org.datacontract.schemas._2004._07.ArrayOfIntegracionDomicilio;
 import org.datacontract.schemas._2004._07.IntegracionColegiadosBloque;
+import org.datacontract.schemas._2004._07.IntegracionDomicilio;
 import org.datacontract.schemas._2004._07.IntegracionEnumsCombos;
 import org.datacontract.schemas._2004._07.IntegracionPersona;
 import org.datacontract.schemas._2004._07.IntegracionSolicitudRespuesta;
@@ -17,8 +19,8 @@ import org.itcgae.siga.DTOs.cen.EstadoMutualistaDTO;
 import org.itcgae.siga.DTOs.cen.EstadoSolicitudDTO;
 import org.itcgae.siga.DTOs.cen.MutualidadCombosDTO;
 import org.itcgae.siga.DTOs.cen.MutualidadResponseDTO;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ComboMutualidadDTO;
+import org.itcgae.siga.DTOs.gen.ComboItemMutualidad;
 import org.itcgae.siga.cen.services.IMutualidadService;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
@@ -26,6 +28,8 @@ import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.ws.client.ClientMutualidad;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
 
 import samples.servicemodel.microsoft.EstadoMutualistaDocument;
 import samples.servicemodel.microsoft.EstadoMutualistaDocument.EstadoMutualista;
@@ -153,105 +157,105 @@ public class MutualidadServiceImpl implements IMutualidadService{
 					//combo asistencia sanitaria
 					for(int i = 0; i < responseWS.getAsistenciaSanitaria().sizeOfIntegracionTextoValorArray();i++){
 						IntegracionTextoValor[] textoValor = responseWS.getAsistenciaSanitaria().getIntegracionTextoValorArray();
-						ComboDTO combo = new ComboDTO();
-						List<ComboItem> items = new ArrayList<ComboItem>();
+						ComboMutualidadDTO combo = new ComboMutualidadDTO();
+						List<ComboItemMutualidad> items = new ArrayList<ComboItemMutualidad>();
 						for(int x = 0; x < textoValor.length ; i++){
-							ComboItem item = new ComboItem();
+							ComboItemMutualidad item = new ComboItemMutualidad();
 							item.setLabel(textoValor[x].getOpcion());
-							item.setValue(textoValor[x].getValor()+"");
+							item.setValue(textoValor[x].getValor());
 							items.add(item);
 						}
-						combo.combooItems(items);
+						combo.setCombooItems(items);
 						combosResponse.setAsistenciaSanitaria(combo);
 					}
 					
 					//designacion beneficiarios
 					for(int i = 0; i < responseWS.getDesignacionBeneficiarios().sizeOfIntegracionTextoValorArray();i++){
 						IntegracionTextoValor[] textoValor = responseWS.getDesignacionBeneficiarios().getIntegracionTextoValorArray();
-						ComboDTO combo = new ComboDTO();
-						List<ComboItem> items = new ArrayList<ComboItem>();
+						ComboMutualidadDTO combo = new ComboMutualidadDTO();
+						List<ComboItemMutualidad> items = new ArrayList<ComboItemMutualidad>();
 						for(int x = 0; x < textoValor.length ; i++){
-							ComboItem item = new ComboItem();
+							ComboItemMutualidad item = new ComboItemMutualidad();
 							item.setLabel(textoValor[x].getOpcion());
-							item.setValue(textoValor[x].getValor()+"");
+							item.setValue(textoValor[x].getValor());
 							items.add(item);
 						}
-						combo.combooItems(items);
+						combo.setCombooItems(items);
 						combosResponse.setDesignacionBeneficiarios(combo);
 					}
 					
 					//combos designacion ejercientes
 					for(int i = 0; i < responseWS.getEjerciente().sizeOfIntegracionTextoValorArray();i++){
 						IntegracionTextoValor[] textoValor = responseWS.getEjerciente().getIntegracionTextoValorArray();
-						ComboDTO combo = new ComboDTO();
-						List<ComboItem> items = new ArrayList<ComboItem>();
+						ComboMutualidadDTO combo = new ComboMutualidadDTO();
+						List<ComboItemMutualidad> items = new ArrayList<ComboItemMutualidad>();
 						for(int x = 0; x < textoValor.length ; i++){
-							ComboItem item = new ComboItem();
+							ComboItemMutualidad item = new ComboItemMutualidad();
 							item.setLabel(textoValor[x].getOpcion());
-							item.setValue(textoValor[x].getValor()+"");
+							item.setValue(textoValor[x].getValor());
 							items.add(item);
 						}
-						combo.combooItems(items);
+						combo.setCombooItems(items);
 						combosResponse.setEjerciente(combo);
 					}
 					
 					//combos estados civiles
 					for(int i = 0; i < responseWS.getEstadosCiviles().sizeOfIntegracionTextoValorArray();i++){
 						IntegracionTextoValor[] textoValor = responseWS.getEstadosCiviles().getIntegracionTextoValorArray();
-						ComboDTO combo = new ComboDTO();
-						List<ComboItem> items = new ArrayList<ComboItem>();
+						ComboMutualidadDTO combo = new ComboMutualidadDTO();
+						List<ComboItemMutualidad> items = new ArrayList<ComboItemMutualidad>();
 						for(int x = 0; x < textoValor.length ; i++){
-							ComboItem item = new ComboItem();
+							ComboItemMutualidad item = new ComboItemMutualidad();
 							item.setLabel(textoValor[x].getOpcion());
-							item.setValue(textoValor[x].getValor()+"");
+							item.setValue(textoValor[x].getValor());
 							items.add(item);
 						}
-						combo.combooItems(items);
+						combo.setCombooItems(items);
 						combosResponse.setEstadosCiviles(combo);
 					}
 					
 					//combos forma de pago
 					for(int i = 0; i < responseWS.getFormaPago().sizeOfIntegracionTextoValorArray();i++){
 						IntegracionTextoValor[] textoValor = responseWS.getFormaPago().getIntegracionTextoValorArray();
-						ComboDTO combo = new ComboDTO();
-						List<ComboItem> items = new ArrayList<ComboItem>();
+						ComboMutualidadDTO combo = new ComboMutualidadDTO();
+						List<ComboItemMutualidad> items = new ArrayList<ComboItemMutualidad>();
 						for(int x = 0; x < textoValor.length ; i++){
-							ComboItem item = new ComboItem();
+							ComboItemMutualidad item = new ComboItemMutualidad();
 							item.setLabel(textoValor[x].getOpcion());
-							item.setValue(textoValor[x].getValor()+"");
+							item.setValue(textoValor[x].getValor());
 							items.add(item);
 						}
-						combo.combooItems(items);
+						combo.setCombooItems(items);
 						combosResponse.setFormasPago(combo);
 					}
 					
 					//combos opciones coberturas
 					for(int i = 0; i < responseWS.getOpcionesCoberturas().sizeOfIntegracionTextoValorArray();i++){
 						IntegracionTextoValor[] textoValor = responseWS.getOpcionesCoberturas().getIntegracionTextoValorArray();
-						ComboDTO combo = new ComboDTO();
-						List<ComboItem> items = new ArrayList<ComboItem>();
+						ComboMutualidadDTO combo = new ComboMutualidadDTO();
+						List<ComboItemMutualidad> items = new ArrayList<ComboItemMutualidad>();
 						for(int x = 0; x < textoValor.length ; i++){
-							ComboItem item = new ComboItem();
+							ComboItemMutualidad item = new ComboItemMutualidad();
 							item.setLabel(textoValor[x].getOpcion());
-							item.setValue(textoValor[x].getValor()+"");
+							item.setValue(textoValor[x].getValor());
 							items.add(item);
 						}
-						combo.combooItems(items);
+						combo.setCombooItems(items);
 						combosResponse.setOpcionesCoberturas(combo);
 					}
 					
 					//combos sexos
 					for(int i = 0; i < responseWS.getSexos().sizeOfIntegracionTextoValorArray();i++){
 						IntegracionTextoValor[] textoValor = responseWS.getSexos().getIntegracionTextoValorArray();
-						ComboDTO combo = new ComboDTO();
-						List<ComboItem> items = new ArrayList<ComboItem>();
+						ComboMutualidadDTO combo = new ComboMutualidadDTO();
+						List<ComboItemMutualidad> items = new ArrayList<ComboItemMutualidad>();
 						for(int x = 0; x < textoValor.length ; i++){
-							ComboItem item = new ComboItem();
+							ComboItemMutualidad item = new ComboItemMutualidad();
 							item.setLabel(textoValor[x].getOpcion());
-							item.setValue(textoValor[x].getValor()+"");
+							item.setValue(textoValor[x].getValor());
 							items.add(item);
 						}
-						combo.combooItems(items);
+						combo.setCombooItems(items);
 						combosResponse.setSexos(combo);
 					}
 					
@@ -259,15 +263,15 @@ public class MutualidadServiceImpl implements IMutualidadService{
 					//combos tipo direccion
 					for(int i = 0; i < responseWS.getTiposDireccion().sizeOfIntegracionTextoValorArray();i++){
 						IntegracionTextoValor[] textoValor = responseWS.getTiposDireccion().getIntegracionTextoValorArray();
-						ComboDTO combo = new ComboDTO();
-						List<ComboItem> items = new ArrayList<ComboItem>();
+						ComboMutualidadDTO combo = new ComboMutualidadDTO();
+						List<ComboItemMutualidad> items = new ArrayList<ComboItemMutualidad>();
 						for(int x = 0; x < textoValor.length ; i++){
-							ComboItem item = new ComboItem();
+							ComboItemMutualidad item = new ComboItemMutualidad();
 							item.setLabel(textoValor[x].getOpcion());
-							item.setValue(textoValor[x].getValor()+"");
+							item.setValue(textoValor[x].getValor());
 							items.add(item);
 						}
-						combo.combooItems(items);
+						combo.setCombooItems(items);
 						combosResponse.setTiposDireccion(combo);
 					}
 					
@@ -275,15 +279,15 @@ public class MutualidadServiceImpl implements IMutualidadService{
 					//combos tipo domicilio
 					for(int i = 0; i < responseWS.getTiposDomicilio().sizeOfIntegracionTextoValorArray();i++){
 						IntegracionTextoValor[] textoValor = responseWS.getTiposDomicilio().getIntegracionTextoValorArray();
-						ComboDTO combo = new ComboDTO();
-						List<ComboItem> items = new ArrayList<ComboItem>();
+						ComboMutualidadDTO combo = new ComboMutualidadDTO();
+						List<ComboItemMutualidad> items = new ArrayList<ComboItemMutualidad>();
 						for(int x = 0; x < textoValor.length ; i++){
-							ComboItem item = new ComboItem();
+							ComboItemMutualidad item = new ComboItemMutualidad();
 							item.setLabel(textoValor[x].getOpcion());
-							item.setValue(textoValor[x].getValor()+"");
+							item.setValue(textoValor[x].getValor());
 							items.add(item);
 						}
-						combo.combooItems(items);
+						combo.setCombooItems(items);
 						combosResponse.setTiposDomicilio(combo);
 					}
 					
@@ -291,15 +295,15 @@ public class MutualidadServiceImpl implements IMutualidadService{
 					//combos tipo identificador
 					for(int i = 0; i < responseWS.getTiposIdentificador().sizeOfIntegracionTextoValorArray();i++){
 						IntegracionTextoValor[] textoValor = responseWS.getTiposIdentificador().getIntegracionTextoValorArray();
-						ComboDTO combo = new ComboDTO();
-						List<ComboItem> items = new ArrayList<ComboItem>();
+						ComboMutualidadDTO combo = new ComboMutualidadDTO();
+						List<ComboItemMutualidad> items = new ArrayList<ComboItemMutualidad>();
 						for(int x = 0; x < textoValor.length ; i++){
-							ComboItem item = new ComboItem();
+							ComboItemMutualidad item = new ComboItemMutualidad();
 							item.setLabel(textoValor[x].getOpcion());
-							item.setValue(textoValor[x].getValor()+"");
+							item.setValue(textoValor[x].getValor());
 							items.add(item);
 						}
-						combo.combooItems(items);
+						combo.setCombooItems(items);
 						combosResponse.setTiposIdentificador(combo);
 					}
 					
@@ -338,7 +342,47 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			IntegracionPersona persona = IntegracionPersona.Factory.newInstance();
 			persona.setApellido1(solicitud.getDatosPersona().getApellido1());
 			persona.setApellido2(solicitud.getDatosPersona().getApellido2());
-			//persona.setAsistenciaSanitaria(solicitud.getDatos);
+			persona.setColegio(solicitud.getDatosPersona().getColegio());
+			persona.setEjerciente(solicitud.getDatosPersona().getEjerciente());
+			persona.setEstadoCivil(Integer.parseInt(solicitud.getDatosPersona().getEstadoCivil()));
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(solicitud.getDatosPersona().getFechaNacimiento());
+			persona.setFNacimiento(cal);
+			cal.setTime(solicitud.getDatosPersona().getFechaNacConyuge());
+			persona.setFNacimientoConyuge(cal);
+			persona.setNIF(solicitud.getDatosPersona().getNIF());
+			persona.setNacionalidad(solicitud.getDatosPersona().getNacionalidad());
+			persona.setNombre(solicitud.getDatosPersona().getNombre());
+			persona.setNumColegiado(solicitud.getDatosPersona().getNumColegiado());
+			persona.setProfesion(solicitud.getDatosPersona().getProfesion());
+			//Ver como pasarle el sexo
+			//persona.setSexo(solicitud.getDatosPersona().getSexo());
+			colegiadosBloque.setDatosPersona(persona);
+			ArrayOfIntegracionDomicilio domicilios = ArrayOfIntegracionDomicilio.Factory.newInstance();
+			IntegracionDomicilio domicilio = IntegracionDomicilio.Factory.newInstance();
+			domicilio.setBloque(solicitud.getDatosDireccion().getBloque());
+			domicilio.setCP(solicitud.getDatosDireccion().getCp());
+			domicilio.setDireccion(solicitud.getDatosDireccion().getDireccion());
+			domicilio.setEmail(solicitud.getDatosDireccion().getEmail());
+			domicilio.setEsc(solicitud.getDatosDireccion().getEsc());
+			domicilio.setLetra(solicitud.getDatosDireccion().getLetra());
+			domicilio.setMovil(solicitud.getDatosDireccion().getMovil());
+			domicilio.setNum(solicitud.getDatosDireccion().getNum());
+			domicilio.setPiso(solicitud.getDatosDireccion().getPiso());
+			domicilio.setPoblacion(solicitud.getDatosDireccion().getPoblacion());
+			domicilio.setProvincia(solicitud.getDatosDireccion().getProvincia());
+			domicilio.setTfno(solicitud.getDatosDireccion().getTelefono());
+			domicilio.setTipoDireccion(solicitud.getDatosDireccion().getTipoDireccion());
+			domicilio.setTipoDomicilio(solicitud.getDatosDireccion().getTipoDomicilio());
+			domicilio.setTipoVia(solicitud.getDatosDireccion().getTipoVia());
+			
+			
+			
+			//domicilios.setIntegracionDomicilioArray(arg0);
+			
+			
+			
+			colegiadosBloque.setDatosDomicilio(domicilios);
 			
 			try {
 				IntegracionSolicitudRespuesta responseWS = _clientMutualidad.MGASolicitudPolizaAccuGratuitos(request, uriService);
