@@ -400,8 +400,17 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		}
 		
 		cenComponentes.setCargo(tarjetaIntegrantesCreateDTO.getCargo());
-		cenComponentes.setCenClienteIdinstitucion(Short.valueOf(tarjetaIntegrantesCreateDTO.getColegio()));
-		cenComponentes.setCenClienteIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()));
+		
+		if(null != tarjetaIntegrantesCreateDTO.getColegio()) {
+			cenComponentes.setCenClienteIdinstitucion(Short.valueOf(tarjetaIntegrantesCreateDTO.getColegio()));
+		}else {
+			cenComponentes.setCenClienteIdinstitucion(Short.valueOf(idInstitucion));
+		}
+	
+		if(null != tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()) {
+			cenComponentes.setCenClienteIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()));
+		}
+		
 		
 		if(null != tarjetaIntegrantesCreateDTO.getFechaBajaCargo()) {
 		cenComponentes.setFechabaja(tarjetaIntegrantesCreateDTO.getFechaBajaCargo());
