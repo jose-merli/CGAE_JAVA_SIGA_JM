@@ -254,7 +254,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 				recordInsert.setFechamodificacion(new Date());
 				recordInsert.setUsumodificacion(usuario.getIdusuario());
 				recordInsert.setIdpersona(Long.parseLong(fichaDatosCurricularesItem.getIdPersona()));
-				recordInsert.setIdtipocv(Short.parseShort(fichaDatosCurricularesItem.getCategoriaCurricular()));
+				recordInsert.setIdtipocv(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()));
 
 				if("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo1() && null != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()){
 					recordInsert.setIdtipocvsubtipo1(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()));
@@ -282,7 +282,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 //				recordInsert.setIdpersona(Long.valueOf(fichaDatosCurricularesDTO[i].getIdPersona()));
 				
 				NewIdDTO idCvBD = cenDatoscvExtendsMapper
-						.getMaxIdCv(String.valueOf(idInstitucion), usuario.getIdlenguaje());
+						.getMaxIdCv(String.valueOf(idInstitucion), fichaDatosCurricularesItem.getIdPersona());
 				if (idCvBD == null) {
 					recordInsert.setIdcv(Short.parseShort("1"));
 				} else {
@@ -290,7 +290,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 					recordInsert.setIdcv(Short.parseShort(""+idCv));
 				}
 				
-				response = cenDatoscvExtendsMapper.updateCurriculo(recordInsert);
+				response = cenDatoscvExtendsMapper.insertSelective(recordInsert);
 
 				LOGGER.info(
 						"insertDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para insertar un curriculum");
