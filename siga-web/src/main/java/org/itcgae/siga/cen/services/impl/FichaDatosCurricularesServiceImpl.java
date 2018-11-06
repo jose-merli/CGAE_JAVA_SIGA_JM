@@ -87,7 +87,6 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 //			for (int i = 0; i < FichaDatosCurricularesItem.length; i++) {
 				LOGGER.info(
 						"deleteDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Entrada a cenDireccionesExtendsMapper para eliminar un curriculum");
-//				if(fichaDatosCurricularesItem.getFechaBaja()) // Controlar cuando ya tiene fecha fin
 				CenDatoscv recordUpdate = new CenDatoscv();
 				recordUpdate.setFechabaja(new Date());
 				recordUpdate.setFechafin(new Date());
@@ -256,11 +255,25 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 				recordInsert.setUsumodificacion(usuario.getIdusuario());
 				recordInsert.setIdpersona(Long.parseLong(fichaDatosCurricularesItem.getIdPersona()));
 				recordInsert.setIdtipocv(Short.parseShort(fichaDatosCurricularesItem.getCategoriaCurricular()));
-				recordInsert.setIdtipocvsubtipo1(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()));
-				recordInsert.setIdtipocvsubtipo2(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo2()));
+
+				if("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo1() && null != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()){
+					recordInsert.setIdtipocvsubtipo1(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()));
+				}else {
+					recordInsert.setIdtipocvsubtipo1(null);
+				}
+				if("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo2() && null != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()){
+					recordInsert.setIdtipocvsubtipo2(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo2()));
+				}else {
+					recordInsert.setIdtipocvsubtipo2(null);
+				}
+				if(null != fichaDatosCurricularesItem.getCreditos() && "" != fichaDatosCurricularesItem.getCreditos() ){
+					recordInsert.setCreditos(Long.parseLong(fichaDatosCurricularesItem.getCreditos()));
+				}else{
+					recordInsert.setCreditos(null);
+				}
+				
 				recordInsert.setFechainicio(fichaDatosCurricularesItem.getFechaDesdeDate());
 				recordInsert.setFechafin(fichaDatosCurricularesItem.getFechaHastaDate());
-				recordInsert.setCreditos(Long.parseLong(fichaDatosCurricularesItem.getCreditos()));
 				recordInsert.setCertificado(fichaDatosCurricularesItem.getCertificado());
 				recordInsert.setFechamovimiento(fichaDatosCurricularesItem.getFechaMovimientoDate());
 				recordInsert.setDescripcion(fichaDatosCurricularesItem.getDescripcion());
