@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.cen.mappers;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
@@ -45,6 +46,8 @@ public interface CenDatoscvExtendsMapper extends CenDatoscvMapper {
 	@UpdateProvider(type = CenDatoscvSqlExtendsProvider.class, method = "updateCurriculo")
 	int updateCurriculo(CenDatoscv record);
 
+	@InsertProvider(type = CenDatoscvSqlExtendsProvider.class, method = "insertCurriculo")
+	int insertCurriculo(CenDatoscv record);
 	
 	@SelectProvider(type = CenDatoscvSqlExtendsProvider.class, method = "getMaxIdCv")
 	@Results({ @Result(column = "IDCV", property = "newId", jdbcType = JdbcType.VARCHAR)

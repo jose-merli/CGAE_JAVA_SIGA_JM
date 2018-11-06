@@ -76,10 +76,10 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 				List<ComboItem> comboItems = cenTiposcvExtendsMapper.selectCategoriaCV(usuario.getIdlenguaje());
 
 				if (comboItems != null && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
+//					ComboItem element = new ComboItem();
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
 					combo.setCombooItems(comboItems);
 				}
 			}
