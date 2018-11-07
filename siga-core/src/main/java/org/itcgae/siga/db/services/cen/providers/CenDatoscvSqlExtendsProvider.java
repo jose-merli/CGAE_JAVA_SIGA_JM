@@ -90,11 +90,11 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 
 			}
 			if (record.getFechabaja() != null) {
-//				sql.SET("FECHABAJA = '"+record.getFechabaja() + "'");
 				String fechaF = dateFormat.format(record.getFechabaja());
 				sql.SET("FECHABAJA = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+			}else {
+				sql.SET("FECHABAJA = null");
 			}
-			
 			if (record.getIdtipocvsubtipo1() != null) {
 				sql.SET("IDTIPOCVSUBTIPO1 = '"+record.getIdtipocvsubtipo1() + "'");
 				sql1.FROM("CEN_TIPOSCVSUBTIPO1");
