@@ -29,7 +29,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.SELECT("DECODE(f_siga_gettipocliente(COMPONENTE.CEN_CLIENTE_IDPERSONA,COMPONENTE.CEN_CLIENTE_IDINSTITUCION,SYSDATE),20,1,0) AS profesionalAbogado");
 		sql.SELECT("DECODE(DECODE(f_siga_gettipocliente(COMPONENTE.CEN_CLIENTE_IDPERSONA,COMPONENTE.CEN_CLIENTE_IDINSTITUCION,SYSDATE),20,1,0), 1, 0, DECODE(ACTIVIDAD.descripcion, NULL, 0, 1)) AS PROFESIONAL");
 		sql.SELECT("f_siga_getrecurso(ACTIVIDAD.descripcion, 1) AS  profesion");
-		sql.SELECT("decode(COMPONENTE.IDTIPOCOLEGIO, 41, INST.CODIGOEXT, 1, INST.CODIGOEXT, null) as codigocolegio");
+		sql.SELECT("decode(COMPONENTE.IDTIPOCOLEGIO, 1, INST.CODIGOEXT, null) as codigocolegio");
 		sql.SELECT("decode(COMPONENTE.IDTIPOCOLEGIO, 1,  INST.NOMBRE, PROVINCIAS.NOMBRE) as descripcionColegio");
 		sql.SELECT("COMPONENTE.NUMCOLEGIADO");
 		sql.SELECT("COMPONENTE.FLAG_SOCIO AS SOCIO");
