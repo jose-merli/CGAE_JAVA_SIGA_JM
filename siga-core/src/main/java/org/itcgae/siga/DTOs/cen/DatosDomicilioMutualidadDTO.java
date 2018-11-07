@@ -5,21 +5,49 @@ public class DatosDomicilioMutualidadDTO {
 	private String bloque;
 	private String cp;
 	private String direccion;
+	private String direccionContacto;
 	private String email;
 	private String esc;
+	private String idDireccion;
+	private String idMutualista;
 	private String letra;
 	private String movil;
 	private String num;
+	private String pais;
 	private String piso;
 	private String poblacion;
 	private String provincia;
 	private String telefono;
-	private String tipoDireccion;
-	private String tipoDomicilio;
+	private int tipoDireccion;
+	private int tipoDomicilio;
 	private String tipoVia;
 	
 	
 	
+	public String getDireccionContacto() {
+		return direccionContacto;
+	}
+	public void setDireccionContacto(String direccionContacto) {
+		this.direccionContacto = direccionContacto;
+	}
+	public String getIdDireccion() {
+		return idDireccion;
+	}
+	public void setIdDireccion(String idDireccion) {
+		this.idDireccion = idDireccion;
+	}
+	public String getIdMutualista() {
+		return idMutualista;
+	}
+	public void setIdMutualista(String idMutualista) {
+		this.idMutualista = idMutualista;
+	}
+	public String getPais() {
+		return pais;
+	}
+	public void setPais(String pais) {
+		this.pais = pais;
+	}
 	public String getBloque() {
 		return bloque;
 	}
@@ -92,16 +120,17 @@ public class DatosDomicilioMutualidadDTO {
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
 	}
-	public String getTipoDireccion() {
+
+	public int getTipoDireccion() {
 		return tipoDireccion;
 	}
-	public void setTipoDireccion(String tipoDireccion) {
+	public void setTipoDireccion(int tipoDireccion) {
 		this.tipoDireccion = tipoDireccion;
 	}
-	public String getTipoDomicilio() {
+	public int getTipoDomicilio() {
 		return tipoDomicilio;
 	}
-	public void setTipoDomicilio(String tipoDomicilio) {
+	public void setTipoDomicilio(int tipoDomicilio) {
 		this.tipoDomicilio = tipoDomicilio;
 	}
 	public String getTipoVia() {
@@ -110,9 +139,6 @@ public class DatosDomicilioMutualidadDTO {
 	public void setTipoVia(String tipoVia) {
 		this.tipoVia = tipoVia;
 	}
-	
-	
-	
 	
 
 }

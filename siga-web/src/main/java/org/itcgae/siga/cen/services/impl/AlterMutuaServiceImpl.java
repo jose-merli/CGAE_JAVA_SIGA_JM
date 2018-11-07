@@ -8,14 +8,17 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.AlterMutuaResponseDTO;
 import org.itcgae.siga.DTOs.cen.EstadoColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.EstadoSolicitudDTO;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.PersonaDTO;
 import org.itcgae.siga.DTOs.cen.PropuestaDTO;
 import org.itcgae.siga.DTOs.cen.PropuestasDTO;
 import org.itcgae.siga.DTOs.cen.SolicitudDTO;
 import org.itcgae.siga.cen.services.IAlterMutuaService;
+import org.itcgae.siga.db.entities.CenSolicitudalter;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicitudAlterExtendsMapper;
 import org.itcgae.siga.ws.client.ClientAlterMutua;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +37,8 @@ import com.altermutua.www.wssiga.WSCuentaBancaria;
 import com.altermutua.www.wssiga.WSDireccion;
 import com.altermutua.www.wssiga.WSPersona;
 import com.altermutua.www.wssiga.SetSolicitudAlterDocument.SetSolicitudAlter;
+
+
 import com.altermutua.www.wssiga.WSPropuesta;
 import com.altermutua.www.wssiga.WSRespuesta;
 import com.altermutua.www.wssiga.WSSolicitud;
@@ -49,6 +54,9 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 	
 	@Autowired
 	private GenParametrosMapper _genParametrosMapper;
+	
+	@Autowired
+	private CenSolicitudAlterExtendsMapper _cenSolicitudalter;
 
 	@Override
 	public AlterMutuaResponseDTO getEstadoSolicitud(EstadoSolicitudDTO estadosolicitudDTO) {
@@ -540,6 +548,17 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					
 					if(responseWS != null){
 						responseDTO.setIdentificador(responseWS.getIdentificador());
+						if(responseDTO.getIdentificador() > 0){
+							CenSolicitudalter solAlter = new CenSolicitudalter();
+							MaxIdDto idMAx = new MaxIdDto();
+							idMAx = _cenSolicitudalter.getMaxIdRecurso();
+							solAlter.setIdsolicitud(idMAx.getIdMax());
+							solAlter.setApellidos(solicitud.getAsegurado().getApellidos());
+							solAlter.setCorreoelectronico(solicitud.getAsegurado().getMail());
+							
+							
+							
+						}
 						responseDTO.setDocumento(responseWS.getDocumento());
 						responseDTO.setError(responseWS.getError());
 						responseDTO.setMensaje(responseWS.getMensaje());

@@ -501,14 +501,19 @@ public class WSCommons {
 									Colegio colegio = Colegio.Factory.newInstance();
 									colegio.setCodigoColegio(integrante.getColegio());
 									colegio.setDescripcionColegio(integrante.getNombrecolegio());
-									profesional.setColegio(colegio );
-									profesional.setNumColegiado(integrante.getNumColegiado());
-									profesional.setProfesion(integrante.getDescripcionProfesion());
-									ProfesionalAbogado profesionalAbogado =  ProfesionalAbogado.Factory.newInstance();
-									profesionalAbogado.setColegio(colegio );
-									profesionalAbogado.setNumColegiado(integrante.getNumColegiado());
-									datosProfesional.setProfesional(profesional);
-									datosProfesional.setProfesionalAbogado(profesionalAbogado);
+									
+									if(integrante.getAbogado().equals("1") == true){
+										ProfesionalAbogado profesionalAbogado =  ProfesionalAbogado.Factory.newInstance();
+										profesionalAbogado.setColegio(colegio );
+										profesionalAbogado.setNumColegiado(integrante.getNumColegiado());
+										datosProfesional.setProfesionalAbogado(profesionalAbogado);
+									}else{
+										profesional.setColegio(colegio );
+										profesional.setNumColegiado(integrante.getNumColegiado());
+										profesional.setProfesion(integrante.getDescripcionProfesion());
+										datosProfesional.setProfesional(profesional);
+									}
+									
 									integranteFisico.setDatosProfesional(datosProfesional);
 									integranteUnitario.setIntegranteFisico(integranteFisico);
 								}else{
