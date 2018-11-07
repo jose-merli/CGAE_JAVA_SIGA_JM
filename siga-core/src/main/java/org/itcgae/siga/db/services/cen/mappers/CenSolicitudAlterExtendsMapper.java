@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
+import org.itcgae.siga.db.services.cen.providers.CenSolicitudAlterSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 public interface CenSolicitudAlterExtendsMapper {
 
 
-	@SelectProvider(type = CenSolicitudAlterExtendsMapper.class, method = "getMaxIdSolicitud")
+	@SelectProvider(type = CenSolicitudAlterSqlExtendsProvider.class, method = "getMaxIdSolicitud")
 	@Results({ @Result(column = "IDSOLICITUD", property = "idMax", jdbcType = JdbcType.NUMERIC)})
 	MaxIdDto getMaxIdRecurso();
 	
