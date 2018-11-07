@@ -105,8 +105,14 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.redabogacia</groupId>
-			<artifactId>alterMutuaService</artifactId>
+			<groupId>org.redabogacia.alterMutuaServ</groupId>
+			<artifactId>AlterMutuaServ</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.redabogacia.mutualidad</groupId>
+			<artifactId>mutualidadServ</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		

@@ -509,7 +509,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 										+ " .Insertado el id correctamente en la tabla Cen_SolicitudIncorporacion");
 					}
 				}catch(Exception e){
-					error.setCode(Integer.parseInt(SigaConstants.KO));
+					error.setCode(500);
 					error.setMessage(e.getMessage());
 					response.setStatus(SigaConstants.KO);
 					response.setError(error);
