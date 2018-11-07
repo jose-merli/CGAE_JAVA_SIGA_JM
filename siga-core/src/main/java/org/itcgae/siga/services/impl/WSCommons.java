@@ -599,7 +599,12 @@ public class WSCommons {
 									Colegio colegio = Colegio.Factory.newInstance();
 									colegio.setCodigoColegio(integrante.getCodigocolegio());
 									colegio.setDescripcionColegio(integrante.getDescripcionColegio());
-									if(integrante.getProfesional()!=null){
+									if(integrante.getProfesionalAbogado().equals("1")){
+										ProfesionalAbogado profesionalAbogado =  ProfesionalAbogado.Factory.newInstance();
+										profesionalAbogado.setColegio(colegio);
+										profesionalAbogado.setNumColegiado(integrante.getNumColegiado());
+										datosProfesional.setProfesionalAbogado(profesionalAbogado);
+									}else{
 										Profesional profesional = Profesional.Factory.newInstance();
 										if(integrante.getCodigocolegio()!=null){
 											profesional.setColegio(colegio);
@@ -615,13 +620,7 @@ public class WSCommons {
 											}
 										}
 										datosProfesional.setProfesional(profesional);
-									}else{
-										ProfesionalAbogado profesionalAbogado =  ProfesionalAbogado.Factory.newInstance();
-										profesionalAbogado.setColegio(colegio );
-										profesionalAbogado.setNumColegiado(integrante.getNumColegiado());
-										datosProfesional.setProfesionalAbogado(profesionalAbogado);
 									}
-									
 									integranteFisico.setDatosProfesional(datosProfesional);
 									integranteUnitario.setIntegranteFisico(integranteFisico);
 									integranteUnitario.setFechaModificacion(UtilidadesString.toCalendar(integrante.getFechaModificacion()));
