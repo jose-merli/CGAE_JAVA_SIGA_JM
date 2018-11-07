@@ -46,8 +46,8 @@ public interface CenDatoscvExtendsMapper extends CenDatoscvMapper {
 	@UpdateProvider(type = CenDatoscvSqlExtendsProvider.class, method = "updateCurriculo")
 	int updateCurriculo(CenDatoscv record);
 
-	@InsertProvider(type = CenDatoscvSqlExtendsProvider.class, method = "insertCurriculo")
-	int insertCurriculo(CenDatoscv record);
+//	@InsertProvider(type = CenDatoscvSqlExtendsProvider.class, method = "insertCurriculo")
+//	int insertCurriculo(CenDatoscv record);
 	
 	@SelectProvider(type = CenDatoscvSqlExtendsProvider.class, method = "getMaxIdCv")
 	@Results({ @Result(column = "IDCV", property = "newId", jdbcType = JdbcType.VARCHAR)
