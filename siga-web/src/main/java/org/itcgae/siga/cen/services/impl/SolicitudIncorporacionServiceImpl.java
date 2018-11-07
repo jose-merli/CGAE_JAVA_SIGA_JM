@@ -983,6 +983,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		colegiado.setIdinstitucion(usuario.getIdinstitucion());
 		colegiado.setNcolegiado(solicitud.getNcolegiado());
 		colegiado.setUsumodificacion(usuario.getIdusuario());
+		colegiado.setNumsolicitudcolegiacion(solicitud.getIdsolicitud().toString());
 		colegiado.setFechapresentacion(new Date());
 		colegiado.setJubilacioncuota("0");
 		colegiado.setComunitario("0");

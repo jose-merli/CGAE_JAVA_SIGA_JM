@@ -14,12 +14,15 @@ public class PersonaDTO {
 	private Date fechaNacimiento;
 	
 	
+
+
 	public String getParentesco() {
 		return parentesco;
 	}
 	public void setParentesco(String parentesco) {
 		this.parentesco = parentesco;
 	}
+
 	public String getSexo() {
 		return sexo;
 	}

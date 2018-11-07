@@ -31,7 +31,7 @@ public interface CenTiposModificacionesExtendsMapper {
 	@Results({ 	@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.DATE)
 			})

@@ -31,7 +31,7 @@ public class AlterMutuaController {
 	ResponseEntity<AlterMutuaResponseDTO> getEstadoSolicitud(@RequestBody EstadoSolicitudDTO estadoSolicitudDTO) {
 		
 		AlterMutuaResponseDTO response = _alterMutuaService.getEstadoSolicitud(estadoSolicitudDTO);
-		if(response.isError()!= false)
+		if(response != null)
 			return new ResponseEntity<AlterMutuaResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<AlterMutuaResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
@@ -41,7 +41,7 @@ public class AlterMutuaController {
 	ResponseEntity<AlterMutuaResponseDTO> getEstadoColegiado(@RequestBody EstadoColegiadoDTO estadoDTO) {
 		
 		AlterMutuaResponseDTO response = _alterMutuaService.getEstadoColegiado(estadoDTO);
-		if(response.isError()!= false)
+		if(response != null)
 			return new ResponseEntity<AlterMutuaResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<AlterMutuaResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
@@ -51,7 +51,7 @@ public class AlterMutuaController {
 	ResponseEntity<AlterMutuaResponseDTO> getPropuestas(@RequestBody PropuestasDTO propuestas) {
 		
 		AlterMutuaResponseDTO response = _alterMutuaService.getPropuestas(propuestas);
-		if(response.isError()!= false)
+		if(response != null)
 			return new ResponseEntity<AlterMutuaResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<AlterMutuaResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
@@ -60,7 +60,7 @@ public class AlterMutuaController {
 	ResponseEntity<AlterMutuaResponseDTO> getTarifaSolicitud(@RequestBody SolicitudDTO solicitud) {
 		
 		AlterMutuaResponseDTO response = _alterMutuaService.getTarifaSolicitud(solicitud);
-		if(response.isError()!= false)
+		if(response.isError()!= true)
 			return new ResponseEntity<AlterMutuaResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<AlterMutuaResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
@@ -70,7 +70,7 @@ public class AlterMutuaController {
 	ResponseEntity<AlterMutuaResponseDTO> setSolicitudAlter(@RequestBody SolicitudDTO solicitud) {
 		
 		AlterMutuaResponseDTO response = _alterMutuaService.setSolicitudAlter(solicitud);
-		if(response.isError()!= false)
+		if(response != null)
 			return new ResponseEntity<AlterMutuaResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<AlterMutuaResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
