@@ -2,6 +2,7 @@ package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -15,8 +16,12 @@ import org.itcgae.siga.DTOs.cen.PropuestasDTO;
 import org.itcgae.siga.DTOs.cen.SolicitudDTO;
 import org.itcgae.siga.cen.services.IAlterMutuaService;
 import org.itcgae.siga.db.entities.CenSolicitudalter;
+import org.itcgae.siga.db.entities.CenSolicitudalterExample;
+import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.mappers.CenSolicitudalterMapper;
+import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudAlterExtendsMapper;
 import org.itcgae.siga.ws.client.ClientAlterMutua;
@@ -44,6 +49,8 @@ import com.altermutua.www.wssiga.WSRespuesta;
 import com.altermutua.www.wssiga.WSSolicitud;
 
 
+
+
 @Service
 public class AlterMutuaServiceImpl implements IAlterMutuaService{
 	
@@ -56,7 +63,14 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 	private GenParametrosMapper _genParametrosMapper;
 	
 	@Autowired
-	private CenSolicitudAlterExtendsMapper _cenSolicitudalter;
+	private CenSolicitudAlterExtendsMapper _cenSolicitudAlterExtendsMapper;
+	
+	@Autowired
+	private CenSolicitudalterMapper _cenSolicitudalterMapper;
+	
+	@Autowired
+	private CenSolicitudincorporacionMapper _cenSolicitudincorporacionMapper;
+	
 
 	@Override
 	public AlterMutuaResponseDTO getEstadoSolicitud(EstadoSolicitudDTO estadosolicitudDTO) {
@@ -76,19 +90,31 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 				
 				GetEstadoSolicitudDocument request = GetEstadoSolicitudDocument.Factory.newInstance();
 				GetEstadoSolicitud requestBody = GetEstadoSolicitud.Factory.newInstance();
+				CenSolicitudincorporacion solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(estadosolicitudDTO.getIdSolicitud());
+
+				CenSolicitudalterExample solAlterExample = new CenSolicitudalterExample();
+				solAlterExample.createCriteria().andNombreEqualTo(solIncorporacion.getNombre()).andDomicilioEqualTo(solIncorporacion.getDomicilio())
+					.andCodigopostalEqualTo(solIncorporacion.getCodigopostal()).andMovilEqualTo(solIncorporacion.getMovil());
 				
-				
-				requestBody.setIntIdSolicitud(estadosolicitudDTO.getIdSolicitud());
-				requestBody.setBolDuplicado(estadosolicitudDTO.isDuplicado());
-				request.setGetEstadoSolicitud(requestBody);
-				
-				WSRespuesta WSresponse = _clientAlterMutua.getEstadoSolicitud(request, uriService);
-				
-				if(WSresponse != null){
-					responseDTO.setDocumento(WSresponse.getDocumento());
-					responseDTO.setError(WSresponse.getError());
-					responseDTO.setMensaje(WSresponse.getMensaje());
+				List<CenSolicitudalter> solAlter = _cenSolicitudalterMapper.selectByExample(solAlterExample);
+				if(solAlter.size() > 0){
+					CenSolicitudalter solicitud = solAlter.get(0);
+					requestBody.setIntIdSolicitud(Math.toIntExact(solicitud.getIdsolicitudalter()));
+					requestBody.setBolDuplicado(estadosolicitudDTO.isDuplicado());
+					request.setGetEstadoSolicitud(requestBody);
+					
+					WSRespuesta WSresponse = _clientAlterMutua.getEstadoSolicitud(request, uriService);
+					
+					if(WSresponse != null){
+						responseDTO.setDocumento(WSresponse.getDocumento());
+						responseDTO.setError(WSresponse.getError());
+						responseDTO.setMensaje(WSresponse.getMensaje());
+					}
+				}else{
+					responseDTO.setError(true);
+					responseDTO.setMensaje("No existe solicitud de Alter mutua");
 				}
+				
 			}
 		}catch(Exception e){
 			LOGGER.error("getEstadoSolicitud() --> error en el servicio: " + e.getMessage());
@@ -365,6 +391,8 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						responseDTO.setError(responseWS.getError());
 						responseDTO.setMensaje(responseWS.getMensaje());
 						
+						insertarSolicitud(solicitud, responseWS);
+						
 						if(responseWS.getPropuestas() != null){
 							List<PropuestaDTO> propuestas = new ArrayList<PropuestaDTO>();
 							for(int i = 0; i < responseWS.getPropuestas().sizeOfWSPropuestaArray();i++){
@@ -549,14 +577,8 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					if(responseWS != null){
 						responseDTO.setIdentificador(responseWS.getIdentificador());
 						if(responseDTO.getIdentificador() > 0){
-							CenSolicitudalter solAlter = new CenSolicitudalter();
-							MaxIdDto idMAx = new MaxIdDto();
-							idMAx = _cenSolicitudalter.getMaxIdRecurso();
-							solAlter.setIdsolicitud(idMAx.getIdMax());
-							solAlter.setApellidos(solicitud.getAsegurado().getApellidos());
-							solAlter.setCorreoelectronico(solicitud.getAsegurado().getMail());
 							
-							
+							insertarSolicitud(solicitud, responseWS);
 							
 						}
 						responseDTO.setDocumento(responseWS.getDocumento());
@@ -597,6 +619,68 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 		
 		LOGGER.info("setSolicitudAlter() --> Salida del servicio para enviar datos alter");
 		return responseDTO;
+	}
+	
+	private int insertarSolicitud(SolicitudDTO solicitud, WSRespuesta responseWS){
+		
+		CenSolicitudalter solAlter = new CenSolicitudalter();
+		MaxIdDto idMAx = new MaxIdDto();
+		idMAx = _cenSolicitudAlterExtendsMapper.getMaxIdRecurso();
+		
+		solAlter.setIdsolicitud(idMAx.getIdMax());
+		solAlter.setPropuesta("1");
+		solAlter.setNombre(solicitud.getAsegurado().getNombre());
+		solAlter.setApellidos(solicitud.getAsegurado().getApellidos());
+		solAlter.setNumeroidentificador(solicitud.getAsegurado().getIdentificador());
+		solAlter.setDomicilio(solicitud.getAsegurado().getDomicilio());
+		solAlter.setCodigopostal(solicitud.getAsegurado().getCp());
+		if(solicitud.getAsegurado().getTelefono()!= null){
+			solAlter.setTelefono1(solicitud.getAsegurado().getTelefono());
+		}
+		if(solicitud.getAsegurado().getTelefono2()!= null){
+			solAlter.setTelefono2(solicitud.getAsegurado().getTelefono2());
+		}
+		solAlter.setCorreoelectronico(solicitud.getAsegurado().getMail());
+		solAlter.setIdinstitucion(Short.parseShort(solicitud.getAsegurado().getColegio()));
+		solAlter.setFechamodificacion(new Date());
+		solAlter.setFechanacimiento(solicitud.getAsegurado().getFechaNacimiento());
+		solAlter.setIdtipoidentificacion(Short.parseShort(solicitud.getAsegurado().getTipoIdentificador()));
+		solAlter.setIdprovincia(solicitud.getAsegurado().getProvincia());
+		solAlter.setMovil(solicitud.getAsegurado().getMovil());
+		if(solicitud.getAsegurado().getFax() != null){
+			solAlter.setFax(solicitud.getAsegurado().getFax());
+		}
+		solAlter.setIdestadocivil(Short.parseShort(solicitud.getAsegurado().getEstadoCivil()));
+		solAlter.setIdpais(solicitud.getAsegurado().getPais());
+		solAlter.setIdsexo(solicitud.getAsegurado().getSexo());
+		solAlter.setCodigosucursal(solicitud.getAsegurado().getIban().substring(4, 8));
+		solAlter.setCboCodigo(solicitud.getAsegurado().getIban().substring(8, 12));
+		solAlter.setDigitocontrol(solicitud.getAsegurado().getIban().substring(12, 14));
+		solAlter.setNumerocuenta(solicitud.getAsegurado().getIban().substring(14, 24));
+		solAlter.setIban(solicitud.getAsegurado().getIban());
+		if(solicitud.getAsegurado().getProvincia()!= null){
+			solAlter.setProvincia(solicitud.getAsegurado().getProvincia());	
+		}
+		if(solicitud.getAsegurado().getPoblacion() != null){
+			solAlter.setPoblacion(solicitud.getAsegurado().getPoblacion());	
+		}
+		solAlter.setIdpaquete(solicitud.getIdPaquete()+"");
+		solAlter.setIdtipoejercicio(solicitud.getAsegurado().getTipoEjercicio());
+		if(solicitud.getFamiliares()!=null){
+			solAlter.setIdpersona(Long.parseLong(solicitud.getFamiliares().size()+""));
+		}
+		if(solicitud.getHerederos()!=null){
+			solAlter.setIdpersona(Long.parseLong(solicitud.getHerederos().size()+""));
+		}
+		
+		solAlter.setBrevepaquete(responseWS.getPropuestas().getWSPropuestaArray(0).getBreve());
+		solAlter.setDescripcionpaquete(responseWS.getPropuestas().getWSPropuestaArray(0).getDescripcion());
+		solAlter.setTarifapaquete(responseWS.getPropuestas().getWSPropuestaArray(0).getTarifa().toString());
+		solAlter.setNombrepaquete(responseWS.getPropuestas().getWSPropuestaArray(0).getNombre());
+		
+		
+		
+		return _cenSolicitudalterMapper.insert(solAlter);
 	}
 	
 	int getParentesco (String parentesco){
