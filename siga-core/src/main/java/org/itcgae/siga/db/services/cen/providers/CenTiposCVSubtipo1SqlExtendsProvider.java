@@ -52,9 +52,9 @@ public class CenTiposCVSubtipo1SqlExtendsProvider extends CenTiposcvsubtipo1SqlP
 		sql.WHERE("catalogos.IDLENGUAJE = '" + idLenguaje + "'");
 		sql.WHERE("tiposCVSubt1.FECHA_BAJA IS NULL");
 		
-		if (!UtilidadesString.esCadenaVacia(tipoCurricularItem.getTipoCategoriaCurricular())) {
-			sql.WHERE("tiposCVSubt1.IDTIPOCV = '" + tipoCurricularItem.getTipoCategoriaCurricular() + "'");
-		}
+//		if (!UtilidadesString.esCadenaVacia(tipoCurricularItem.getIdTipoCV())) {
+			sql.WHERE("tiposCVSubt1.IDTIPOCV = '" + tipoCurricularItem.getIdTipoCV() + "'");
+//		}
 
 		return sql.toString();
 	}
