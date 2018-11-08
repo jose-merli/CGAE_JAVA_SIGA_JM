@@ -12,6 +12,8 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.SubtipoCurricularDTO;
 import org.itcgae.siga.DTOs.cen.SubtipoCurricularItem;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ISubtipoCurricularService;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -90,6 +92,66 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 		LOGGER.info("search() -> Salida del servicio para la búsqueda por filtro de categoría curricular");
 		return subtipoCurricularDTO;
 	}
+	
+	
+	
+	public ComboDTO getComboSubtipoCurricular(int numPagina, SubtipoCurricularItem subtipoCurricularItem,
+			HttpServletRequest request) {
+		LOGGER.info(
+				"getComboSubtipoCurricular() -> Entrada al servicio para la búsqueda por filtro de categoría curricular");
+
+//		List<SubtipoCurricularItem> subtipoCurricularItems = new ArrayList<SubtipoCurricularItem>();
+//		SubtipoCurricularDTO subtipoCurricularDTO = new SubtipoCurricularDTO();
+		ComboDTO combo = new ComboDTO();
+
+		String idLenguaje = null;
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getComboSubtipoCurricular() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getComboSubtipoCurricular() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				idLenguaje = usuario.getIdlenguaje();
+
+				LOGGER.info(
+						"getComboSubtipoCurricular() / cenTiposCVSubtipo2ExtendsMapper.searchSubtipoCurricular() -> Entrada a cenNocolegiadoExtendsMapper para busqueda de personas colegiadas por filtro");
+				List<ComboItem> comboItems = cenTiposCVSubtipo2ExtendsMapper.searchComboSubtipoCurricular(subtipoCurricularItem,
+						idLenguaje, String.valueOf(idInstitucion));
+				LOGGER.info(
+						"getComboSubtipoCurricular() / cenTiposCVSubtipo2ExtendsMapper.searchSubtipoCurricular() -> Salida de cenNocolegiadoExtendsMapper para busqueda de personas no colegiadas por filtro");
+
+				if (comboItems != null && comboItems.size() > 0) {
+					ComboItem element = new ComboItem();
+					element.setLabel("");
+					element.setValue("");
+					comboItems.add(0, element);
+					combo.setCombooItems(comboItems);
+				}
+				
+			} else {
+				LOGGER.warn(
+						"getComboSubtipoCurricular() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("getComboSubtipoCurricular() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("getComboSubtipoCurricular() -> Salida del servicio para la búsqueda por filtro de categoría curricular");
+		return combo;
+	}
+	
 
 	@Override
 	public InsertResponseDTO createSubtipoCurricular(SubtipoCurricularItem subtipoCurricularItem,

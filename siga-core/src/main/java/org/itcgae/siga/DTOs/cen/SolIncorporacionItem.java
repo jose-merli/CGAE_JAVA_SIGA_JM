@@ -57,7 +57,7 @@ public class SolIncorporacionItem {
 	private String digitoControl;
 	private String numeroCuenta;
 	private String banco;
-	
+	private String idInstitucion;
 	
 	
 	public String getIdTratamiento() {
@@ -373,7 +373,12 @@ public class SolIncorporacionItem {
 		this.banco = banco;
 	}
 	
-	
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
 	
 	@Override
 	public int hashCode() {
@@ -402,6 +407,7 @@ public class SolIncorporacionItem {
 		result = prime * result + ((iban == null) ? 0 : iban.hashCode());
 		result = prime * result + ((idEstado == null) ? 0 : idEstado.hashCode());
 		result = prime * result + ((idEstadoCivil == null) ? 0 : idEstadoCivil.hashCode());
+		result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
 		result = prime * result + ((idModalidadDocumentacion == null) ? 0 : idModalidadDocumentacion.hashCode());
 		result = prime * result + ((idPais == null) ? 0 : idPais.hashCode());
 		result = prime * result + ((idPoblacion == null) ? 0 : idPoblacion.hashCode());
@@ -559,6 +565,11 @@ public class SolIncorporacionItem {
 			if (other.idEstadoCivil != null)
 				return false;
 		} else if (!idEstadoCivil.equals(other.idEstadoCivil))
+			return false;
+		if (idInstitucion == null) {
+			if (other.idInstitucion != null)
+				return false;
+		} else if (!idInstitucion.equals(other.idInstitucion))
 			return false;
 		if (idModalidadDocumentacion == null) {
 			if (other.idModalidadDocumentacion != null)
@@ -729,7 +740,7 @@ public class SolIncorporacionItem {
 				+ ", nombreProvincia=" + nombreProvincia + ", titular=" + titular + ", iban=" + iban + ", abonoCargo="
 				+ abonoCargo + ", abonoJCS=" + abonoJCS + ", cboCodigo=" + cboCodigo + ", codigoSucursal="
 				+ codigoSucursal + ", digitoControl=" + digitoControl + ", numeroCuenta=" + numeroCuenta + ", banco="
-				+ banco + "]";
+				+ banco + ", idInstitucion=" + idInstitucion + "]";
 	}
 	
 	

@@ -12,7 +12,7 @@ public class AseguradoDTO {
 	private Date fechaNacimiento;
 	private String estadoCivil;
 	private String colegio;
-	private String SitEjercicio;
+	private String tipoEjercicio;
 	private String medioComunicacion;
 	private String idioma;
 	private boolean publicidad;
@@ -79,11 +79,12 @@ public class AseguradoDTO {
 	public void setColegio(String colegio) {
 		this.colegio = colegio;
 	}
-	public String getSitEjercicio() {
-		return SitEjercicio;
+
+	public String getTipoEjercicio() {
+		return tipoEjercicio;
 	}
-	public void setSitEjercicio(String sitEjercicio) {
-		SitEjercicio = sitEjercicio;
+	public void setTipoEjercicio(String tipoEjercicio) {
+		this.tipoEjercicio = tipoEjercicio;
 	}
 	public String getMedioComunicacion() {
 		return medioComunicacion;

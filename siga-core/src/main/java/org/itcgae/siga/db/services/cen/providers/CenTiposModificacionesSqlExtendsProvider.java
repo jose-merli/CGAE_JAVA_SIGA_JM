@@ -21,14 +21,14 @@ public class CenTiposModificacionesSqlExtendsProvider {
 	public String searchModificationRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguage) {
 		
 		SQL sql = new SQL();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
 		
 		sql.SELECT_DISTINCT("cat1.DESCRIPCION as ESTADO");
 		sql.SELECT("sol.IDSOLICITUD as IDSOLICITUD");
 		sql.SELECT("cat2.DESCRIPCION as TIPOMODIFICACION");
 		sql.SELECT("col.NCOLEGIADO as NUMCOLEGIADO");
 		sql.SELECT("per.NOMBRE as NOMBRE");
-		sql.SELECT("sol.FECHAALTA as FECHA ");
+		sql.SELECT("sol.FECHAALTA as FECHAALTA");
 		sql.FROM("CEN_SOLICITUDESMODIFICACION sol");
 		sql.INNER_JOIN("CEN_ESTADOSOLICITUDMODIF est on est.IDESTADOSOLIC = sol.IDESTADOSOLIC");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS cat1 on cat1.IDRECURSO = est.DESCRIPCION");
@@ -53,12 +53,12 @@ public class CenTiposModificacionesSqlExtendsProvider {
 
 		if (null != solicitudModificacionSearchDTO.getFechaDesde()) {
 			String fechaDesde = dateFormat.format(solicitudModificacionSearchDTO.getFechaDesde());
-			sql.WHERE(" TO_DATE(FECHAALTA,'DD/MM/YYYY') >= TO_DATE('" +fechaDesde + "', 'DD/MM/YYYY') ");
+			sql.WHERE(" TO_DATE(sol.FECHAALTA,'DD/MM/YYYY') >= TO_DATE('" +fechaDesde + "', 'DD/MM/YYYY') ");
 		}
 		
 		if (null != solicitudModificacionSearchDTO.getFechaHasta()) {
 			String fechaHasta = dateFormat.format(solicitudModificacionSearchDTO.getFechaHasta());
-			sql.WHERE(" TO_DATE(FECHAALTA,'DD/MM/YYYY') <= TO_DATE('" +fechaHasta + "', 'DD/MM/YYYY') ");
+			sql.WHERE(" TO_DATE(sol.FECHAALTA,'DD/MM/YYYY') <= TO_DATE('" +fechaHasta + "', 'DD/MM/YYYY') ");
 		}
 
 		return sql.toString();

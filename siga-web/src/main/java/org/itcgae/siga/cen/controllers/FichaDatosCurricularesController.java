@@ -2,11 +2,11 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesSearchDTO;
-import org.itcgae.siga.DTOs.cen.TarjetaDireccionesUpdateDTO;
 import org.itcgae.siga.cen.services.IFichaDatosCurricularesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +38,22 @@ public class FichaDatosCurricularesController {
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "/fichaDatosCurriculares/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateDatosCurriculares(@RequestBody FichaDatosCurricularesItem fichaDatosCurricularesItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = fichaDatosCurriculares.updateDatosCurriculares(fichaDatosCurricularesItem, request);
+		if(response.getStatus().equals(SigaConstants.OK))//WORK IN PROGRESS
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "/fichaDatosCurriculares/insert", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> insertDatosCurriculares(@RequestBody FichaDatosCurricularesItem fichaDatosCurricularesItem, HttpServletRequest request) { 
+		InsertResponseDTO response = fichaDatosCurriculares.insertDatosCurriculares(fichaDatosCurricularesItem, request);
+		if(response.getStatus().equals(SigaConstants.OK))//WORK IN PROGRESS
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 }

@@ -33,6 +33,34 @@ public class CenTiposCVSubtipo2SqlExtendsProvider extends CenTiposcvsubtipo2SqlP
 		return sql.toString();
 	}
 	
+	public String searchComboSubtipoCurricular(SubtipoCurricularItem subtipoCurricularItem, String idLenguaje,
+			String idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("DISTINCT tiposCVSubt2.IDTIPOCV as IDTIPOCV");
+		sql.SELECT("tiposCVSubt2.IDTIPOCVSUBTIPO2 as IDTIPOCVSUBTIPO2");
+		sql.SELECT("tiposCVSubt2.CODIGOEXT as CODIGOEXTERNO");
+		sql.SELECT("catalogos.DESCRIPCION as DESCRIPCION");
+
+		sql.FROM("CEN_TIPOSCVSUBTIPO2 tiposCVSubt2");
+
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS catalogos on catalogos.IDRECURSO = tiposCVSubt2.DESCRIPCION");
+		sql.INNER_JOIN("CEN_TIPOSCV cenTiposCv on cenTiposCv.IDTIPOCV = tiposCVSubt2.IDTIPOCV");
+
+		sql.WHERE("tiposCVSubt2.IDINSTITUCION ='" + idInstitucion + "'");
+		sql.WHERE("catalogos.IDLENGUAJE = '" + idLenguaje + "'");
+		sql.WHERE("tiposCVSubt2.FECHA_BAJA IS NULL");
+		if(subtipoCurricularItem.getIdTipoCV() != null) {
+			sql.WHERE("tiposCVSubt2.IDTIPOCV= '"+subtipoCurricularItem.getIdTipoCV()+"'");
+		}
+
+		if (!UtilidadesString.esCadenaVacia(subtipoCurricularItem.getTipoCategoriaCurricular())) {
+			sql.WHERE("tiposCVSubt2.IDTIPOCV = '" + subtipoCurricularItem.getTipoCategoriaCurricular() + "'");
+		}
+
+		return sql.toString();
+	}
+	
 	public String getMaxIdCvSubtipo2(String idInstitucion, String idTipoCv) {
 		SQL sql = new SQL();
 
