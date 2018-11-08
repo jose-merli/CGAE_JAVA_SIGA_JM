@@ -16,4 +16,19 @@ public class AgeCalendarioSqlExtendsProvider extends  AgeCalendarioSqlProvider{
 		return sql.toString();
 	}
 	
+	public String getCalendars(String idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("cal.IDCALENDARIO");
+		sql.SELECT("cal.DESCRIPCION");
+		sql.FROM("AGE_CALENDARIO cal");
+//		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tipocuando.DESCRIPCION AND rec.IDLENGUAJE = '"
+//				+ idLenguaje + "')");
+		sql.WHERE("cal.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.ORDER_BY("cal.DESCRIPCION");
+		
+		return sql.toString();
+	}
+	
 }

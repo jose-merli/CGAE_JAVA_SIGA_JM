@@ -10,10 +10,12 @@ public class FormadorCursoItem {
 	private Long idCurso;
 	private Long idPersona;
 	private String idRol;
+	private String rol;
 	private Short idInstitucion;
 	private Long usuModificacion;
 	private Date fechaModificacion;
 	private String idTipoCoste;
+	private String tipoCoste;
 	private String nombreCompleto;
 	private Double tarifa;
 	private Double tutor;
@@ -67,6 +69,24 @@ public class FormadorCursoItem {
 	public void setIdRol(String idRol) {
 		this.idRol = idRol;
 	}
+	
+	/**
+	 * 
+	 **/
+	public FormadorCursoItem rol(String rol) {
+		this.rol = rol;
+		return this;
+	}
+
+	@JsonProperty("rol")
+	public String getRol() {
+		return rol;
+	}
+
+	public void setRol(String rol) {
+		this.rol = rol;
+	}
+	
 	
 	/**
 	 * 
@@ -137,6 +157,23 @@ public class FormadorCursoItem {
 	public void setIdTipoCoste(String idTipoCoste) {
 		this.idTipoCoste = idTipoCoste;
 	}
+	
+	/**
+	 * 
+	 **/
+	public FormadorCursoItem tipoCoste(String tipoCoste) {
+		this.tipoCoste = tipoCoste;
+		return this;
+	}
+
+	@JsonProperty("tipoCoste")
+	public String getTipoCoste() {
+		return tipoCoste;
+	}
+
+	public void setTipoCoste(String tipoCoste) {
+		this.tipoCoste = tipoCoste;
+	}
 
 	/**
 	 * 
@@ -201,10 +238,13 @@ public class FormadorCursoItem {
 		return Objects.equals(this.idCurso, formadorCursoItem.idCurso)
 				&& Objects.equals(this.idPersona, formadorCursoItem.idPersona)
 				&& Objects.equals(this.idRol, formadorCursoItem.idRol)
+				&& Objects.equals(this.rol, formadorCursoItem.rol)
 				&& Objects.equals(this.idInstitucion, formadorCursoItem.idInstitucion)
 				&& Objects.equals(this.usuModificacion, formadorCursoItem.usuModificacion)
 				&& Objects.equals(this.fechaModificacion, formadorCursoItem.fechaModificacion)
 				&& Objects.equals(this.idTipoCoste, formadorCursoItem.idTipoCoste)
+				&& Objects.equals(this.tipoCoste, formadorCursoItem.tipoCoste)
+				&& Objects.equals(this.nombreCompleto, formadorCursoItem.nombreCompleto)
 				&& Objects.equals(this.nombreCompleto, formadorCursoItem.nombreCompleto)
 				&& Objects.equals(this.tarifa, formadorCursoItem.tarifa)
 				&& Objects.equals(this.tutor, formadorCursoItem.tutor);
@@ -213,7 +253,7 @@ public class FormadorCursoItem {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(idCurso, idPersona, idRol, idInstitucion, usuModificacion, fechaModificacion, idTipoCoste, nombreCompleto, tarifa, tutor);
+		return Objects.hash(idCurso, idPersona, idRol, rol, idInstitucion, usuModificacion, fechaModificacion, idTipoCoste, tipoCoste, nombreCompleto, tarifa, tutor);
 	}
 
 	@Override
@@ -224,10 +264,12 @@ public class FormadorCursoItem {
 		sb.append("    idCurso: ").append(toIndentedString(idCurso)).append("\n");
 		sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 		sb.append("    idRol: ").append(toIndentedString(idRol)).append("\n");
+		sb.append("    rol: ").append(toIndentedString(rol)).append("\n");
 		sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
 		sb.append("    usuModificacion: ").append(toIndentedString(usuModificacion)).append("\n");
 		sb.append("    fechaModificacion: ").append(toIndentedString(fechaModificacion)).append("\n");
 		sb.append("    idTipoCoste: ").append(toIndentedString(idTipoCoste)).append("\n");
+		sb.append("    tipoCoste: ").append(toIndentedString(tipoCoste)).append("\n");
 		sb.append("    nombreCompleto: ").append(toIndentedString(nombreCompleto)).append("\n");
 		sb.append("    tarifa: ").append(toIndentedString(tarifa)).append("\n");
 		sb.append("    tutor: ").append(toIndentedString(tutor)).append("\n");

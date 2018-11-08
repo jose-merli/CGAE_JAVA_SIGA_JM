@@ -24,4 +24,11 @@ public interface AgeCalendarioExtendsMapper extends AgeCalendarioMapper{
 	})
 	List<ComboItem> selectMaxCalendar();
 	
+	@SelectProvider(type = AgeCalendarioSqlExtendsProvider.class, method = "getCalendars")
+	@Results({
+		@Result(column = "IDCALENDARIO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> getCalendars(String idInstitucion);
+	
 }
