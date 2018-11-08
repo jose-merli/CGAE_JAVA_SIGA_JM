@@ -9,9 +9,14 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.age.CalendarDTO;
 import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.age.service.IAgendaCalendarioService;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AgeCalendario;
 import org.itcgae.siga.db.entities.AgeCalendarioExample;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeCalendarioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +29,9 @@ public class AgendaCalendarioServiceImpl implements IAgendaCalendarioService {
 
 	@Autowired
 	private AgeCalendarioExtendsMapper ageCalendarioExtendsMapper;
+	
+	@Autowired 
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
 	@Override
 	public CalendarDTO getCalendariosByIdInstitucion(HttpServletRequest request) {
@@ -134,6 +142,44 @@ public class AgendaCalendarioServiceImpl implements IAgendaCalendarioService {
 			eventoDTO.setEventos(listEventos);
 
 			return eventoDTO;
+		}
+
+		@Override
+		public ComboDTO getCalendars(HttpServletRequest request) {
+			LOGGER.info("getCalendars() -> Entrada al servicio para obtener los calendarios");
+
+			ComboDTO comboDTO = new ComboDTO();
+			List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+			// Conseguimos información del usuario logeado
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"getCalendars() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"getCalendars() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
+					LOGGER.info(
+							"getCalendars() / ageTipocalendarioExtendsMapper.getCalendarType() -> Entrada a ageTipocalendarioExtendsMapper para obtener los diferentes tipos de calendarios");
+					comboItems = ageCalendarioExtendsMapper.getCalendars(idInstitucion.toString());
+					LOGGER.info(
+							"getCalendars() / ageTipocalendarioExtendsMapper.getCalendarType() -> Salida de ageTipocalendarioExtendsMapper para obtener los diferentes tipos de calendarios");
+
+				}
+			}
+
+			comboDTO.setCombooItems(comboItems);
+
+			LOGGER.info("getCalendars() -> Salida del servicio para obtener los tipos de calendarios");
+
+			return comboDTO;
 		}
 
 	}

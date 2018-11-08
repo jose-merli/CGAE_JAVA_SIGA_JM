@@ -79,11 +79,6 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService{
 				LOGGER.info(
 						"getVisibilidadCursos() / forVisibilidadcursolExtendsMapper.distinctVisibilidadCurso() -> Salida de forVisibilidadcursolExtendsMapper para obtener la visibilidad de los cursos");
 				
-				//Quitar en un futuro
-				ComboItem comboItem = new ComboItem();
-				comboItem.setLabel("");
-				comboItem.setValue("");
-				comboItems.add(0, comboItem);
 			}
 		}
 		

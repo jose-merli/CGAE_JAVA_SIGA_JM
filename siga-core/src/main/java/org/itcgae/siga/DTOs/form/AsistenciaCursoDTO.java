@@ -6,30 +6,28 @@ import java.util.Objects;
 
 import org.itcgae.siga.DTOs.gen.Error;
 
-
-public class CursoDTO {
-
-	private List<CursoItem> cursoItem = new ArrayList<CursoItem>();
+public class AsistenciaCursoDTO {
+	private List<AsistenciaCursoItem> asistenciaCursoItem = new ArrayList<AsistenciaCursoItem>();
 	private Error error = null;
 	
 	/**
 	 */
-	public CursoDTO CursoItem(List<CursoItem> cursoItem){
-		this.cursoItem = cursoItem;
+	public AsistenciaCursoDTO AsistenciaCursoItem(List<AsistenciaCursoItem> asistenciaCursoItem){
+		this.asistenciaCursoItem = asistenciaCursoItem;
 		return this;
 	}
 	
-	public List<CursoItem> getCursoItem() {
-		return cursoItem;
+	public List<AsistenciaCursoItem> getAsistenciaCursoItem() {
+		return asistenciaCursoItem;
 	}
-	public void setCursoItem(List<CursoItem> cursoItem) {
-		this.cursoItem = cursoItem;
+	public void setAsistenciaCursoItem(List<AsistenciaCursoItem> asistenciaCursoItem) {
+		this.asistenciaCursoItem = asistenciaCursoItem;
 	}
 	
 	
 	/**
 	 */
-	public CursoDTO error(Error error){
+	public AsistenciaCursoDTO error(Error error){
 		this.error = error;
 		return this;
 	}
@@ -49,23 +47,23 @@ public class CursoDTO {
 	    if (o == null || getClass() != o.getClass()) {
 	      return false;
 	    }
-	    CursoDTO CursoDTO = (CursoDTO) o;
-	    return Objects.equals(this.cursoItem, CursoDTO.cursoItem) &&
-	    		Objects.equals(this.error, CursoDTO.error);
+	    AsistenciaCursoDTO asistenciaCursoDTO = (AsistenciaCursoDTO) o;
+	    return Objects.equals(this.asistenciaCursoItem, asistenciaCursoDTO.asistenciaCursoItem) &&
+	    		Objects.equals(this.error, asistenciaCursoDTO.error);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(cursoItem, error);
+	    return Objects.hash(asistenciaCursoItem, error);
 	}
 
 	
 	@Override
 	public String toString() {
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("class CursoDTO {\n");
+	    sb.append("class AsistenciaCursoDTO {\n");
 	    
-	    sb.append("CursoItem: ").append(toIndentedString(cursoItem)).append("\n");
+	    sb.append("AsistenciaCursoItem: ").append(toIndentedString(asistenciaCursoItem)).append("\n");
 	    sb.append("error: ").append(toIndentedString(error)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
@@ -81,5 +79,4 @@ public class CursoDTO {
 	    }
 	    return o.toString().replace("\n", "\n    ");
 	}
-	
 }

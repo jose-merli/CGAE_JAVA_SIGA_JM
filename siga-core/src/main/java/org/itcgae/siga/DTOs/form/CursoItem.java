@@ -1,7 +1,6 @@
 package org.itcgae.siga.DTOs.form;
 
 import java.util.Arrays;
-import java.util.Date;
 
 public class CursoItem {
 	
@@ -15,10 +14,10 @@ public class CursoItem {
 	private String nombreApellidosFormador;
 	private Double precioDesde;
 	private Double precioHasta;
-	private Date fechaInscripcionDesde;
-	private Date fechaInscripcionHasta;
-	private Date fechaImparticionDesde;
-	private Date fechaImparticionHasta;
+	private String fechaInscripcionDesde;
+	private String fechaInscripcionHasta;
+	private String fechaImparticionDesde;
+	private String fechaImparticionHasta;
 	private String [] temas;
 	
 	//Auxiliares pantalla
@@ -91,28 +90,28 @@ public class CursoItem {
 	public void setPrecioHasta(Double precioHasta) {
 		this.precioHasta = precioHasta;
 	}
-	public Date getFechaInscripcionDesde() {
+	public String getFechaInscripcionDesde() {
 		return fechaInscripcionDesde;
 	}
-	public void setFechaInscripcionDesde(Date fechaInscripcionDesde) {
+	public void setFechaInscripcionDesde(String fechaInscripcionDesde) {
 		this.fechaInscripcionDesde = fechaInscripcionDesde;
 	}
-	public Date getFechaInscripcionHasta() {
+	public String getFechaInscripcionHasta() {
 		return fechaInscripcionHasta;
 	}
-	public void setFechaInscripcionHasta(Date fechaInscripcionHasta) {
+	public void setFechaInscripcionHasta(String fechaInscripcionHasta) {
 		this.fechaInscripcionHasta = fechaInscripcionHasta;
 	}
-	public Date getFechaImparticionDesde() {
+	public String getFechaImparticionDesde() {
 		return fechaImparticionDesde;
 	}
-	public void setFechaImparticionDesde(Date fechaImparticionDesde) {
+	public void setFechaImparticionDesde(String fechaImparticionDesde) {
 		this.fechaImparticionDesde = fechaImparticionDesde;
 	}
-	public Date getFechaImparticionHasta() {
+	public String getFechaImparticionHasta() {
 		return fechaImparticionHasta;
 	}
-	public void setFechaImparticionHasta(Date fechaImparticionHasta) {
+	public void setFechaImparticionHasta(String fechaImparticionHasta) {
 		this.fechaImparticionHasta = fechaImparticionHasta;
 	}
 	public String[] getTemas() {

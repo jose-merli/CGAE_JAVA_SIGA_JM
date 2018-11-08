@@ -26,7 +26,11 @@ public interface ForCursoExtendsMapper extends ForCursoMapper {
 			@Result(column = "VISIBILIDAD", property = "visibilidad", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PRECIOCURSO", property = "precioCurso", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAINSCRIPCION", property = "fechaInscripcion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAINSCRIPCIONDESDE", property = "fechaInscripcionDesde", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAINSCRIPCIONHASTA", property = "fechaInscripcionHasta", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAIMPARTICION", property = "fechaImparticion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAIMPARTICIONDESDE", property = "fechaImparticionDesde", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAIMPARTICIONHASTA", property = "fechaImparticionHasta", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBREAPELLIDOSFORMADOR", property = "nombreApellidosFormador", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FLAGARCHIVADO", property = "flagArchivado", jdbcType = JdbcType.NUMERIC)
 	})

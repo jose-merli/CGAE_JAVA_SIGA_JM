@@ -19,6 +19,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDatoscv;
+import org.itcgae.siga.db.entities.CenDatoscvExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -100,6 +101,36 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			recordUpdate.setIdcv(Short.parseShort(fichaDatosCurricularesItem.getIdCv()));
 			// recordUpdate.setIdpersona(Long.valueOf(fichaDatosCurricularesDTO[i].getIdPersona()));
 
+
+			recordUpdate.setFechainicio(fichaDatosCurricularesItem.getFechaDesdeDate());
+			recordUpdate.setCertificado(fichaDatosCurricularesItem.getCertificado());
+			recordUpdate.setFechamovimiento(fichaDatosCurricularesItem.getFechaMovimientoDate());
+			recordUpdate.setDescripcion(fichaDatosCurricularesItem.getDescripcion());
+			recordUpdate.setIdinstitucion(idInstitucion);
+			
+			
+			
+			recordUpdate.setIdpersona(Long.parseLong(fichaDatosCurricularesItem.getIdPersona()));
+			recordUpdate.setIdtipocv(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()));
+
+			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()
+					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()) {
+				recordUpdate.setIdtipocvsubtipo1(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()));
+			} else {
+				recordUpdate.setIdtipocvsubtipo1(null);
+			}
+			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()
+					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()) {
+				recordUpdate.setIdtipocvsubtipo2(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo2()));
+			} else {
+				recordUpdate.setIdtipocvsubtipo2(null);
+			}
+			if (null != fichaDatosCurricularesItem.getCreditos() && "" != fichaDatosCurricularesItem.getCreditos()) {
+				recordUpdate.setCreditos(Long.parseLong(fichaDatosCurricularesItem.getCreditos()));
+			} else {
+				recordUpdate.setCreditos(null);
+			}
+			
 			response = cenDatoscvExtendsMapper.updateCurriculo(recordUpdate);
 
 			LOGGER.info(
@@ -189,10 +220,41 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 
 			recordUpdate.setFechainicio(fichaDatosCurricularesItem.getFechaDesdeDate());
 			recordUpdate.setFechafin(fichaDatosCurricularesItem.getFechaHastaDate());
+			recordUpdate.setFechabaja(fichaDatosCurricularesItem.getFechaHastaDate());
 			recordUpdate.setFechamovimiento(fichaDatosCurricularesItem.getFechaMovimientoDate());
 			recordUpdate.setIdcv(Short.parseShort(fichaDatosCurricularesItem.getIdCv()));
 			// recordUpdate.setIdpersona(Long.valueOf(fichaDatosCurricularesDTO[i].getIdPersona()));
-
+			
+			if(recordUpdate.getFechafin() == null) {
+				CenDatoscvExample example = new CenDatoscvExample();
+				Long idPers = Long.parseLong(fichaDatosCurricularesItem.getIdPersona());
+				example.createCriteria().andIdpersonaEqualTo(idPers).andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
+				List<CenDatoscv> datosCurricularesActivos = cenDatoscvExtendsMapper.selectByExample(example);
+				
+				if(datosCurricularesActivos != null && datosCurricularesActivos.size() != 0) {
+					for(CenDatoscv dato: datosCurricularesActivos) {
+						CenDatoscv Actualizar = new CenDatoscv();
+						Actualizar = dato;
+						Actualizar.setFechabaja(new Date());
+						Actualizar.setFechafin(new Date());
+						Actualizar.setFechamodificacion(new Date());
+						Actualizar.setUsumodificacion(usuario.getIdusuario());
+						response = cenDatoscvExtendsMapper.updateByPrimaryKey(Actualizar);
+//						update by primarykey
+					}
+//					for(int i = 0; i > datosCurricularesActivos.size(); i++) {
+//						CenDatoscv Actualizar = new CenDatoscv();
+//						Actualizar = datosCurricularesActivos.get(i);
+//						Actualizar.setFechabaja(new Date());
+//						Actualizar.setFechafin(new Date());
+//						Actualizar.setFechamodificacion(new Date());
+//						Actualizar.setUsumodificacion(usuario.getIdusuario());
+//						response = cenDatoscvExtendsMapper.updateByPrimaryKey(Actualizar);
+////						update by primarykey
+//					}
+				}
+				
+			}
 			response = cenDatoscvExtendsMapper.updateCurriculo(recordUpdate);
 
 			LOGGER.info(
