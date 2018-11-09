@@ -2,11 +2,14 @@ package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.AdmContadorDTO;
+import org.itcgae.siga.DTOs.adm.ContadorRequestDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosRegistralesDTO;
 import org.itcgae.siga.DTOs.cen.DatosRegistralesItem;
@@ -15,13 +18,23 @@ import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.cen.services.ITarjetaDatosRegistralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.AdmContador;
+import org.itcgae.siga.db.entities.AdmContadorKey;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividad;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividadExample;
+import org.itcgae.siga.db.entities.CenNocolegiadoExample;
+import org.itcgae.siga.db.entities.CenNocolegiadoKey;
+import org.itcgae.siga.db.entities.CenRegMercantil;
 import org.itcgae.siga.db.mappers.CenNocolegiadoActividadMapper;
+import org.itcgae.siga.db.mappers.CenRegMercantilMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenActividadprofesionalExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
@@ -50,6 +63,11 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 	@Autowired
 	private CenNocolegiadoActividadMapper cenNocolegiadoActividadMapper;
 	
+	@Autowired
+	private CenRegMercantilMapper cenRegMercantilMapper;
+	
+	@Autowired
+	private AdmContadorExtendsMapper admContadorMapper;
 	
 	
 	@Override
@@ -194,6 +212,7 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 		
 		int responseCenPersona = 0;
 		int responseCenNocolegiado = 0;
+		int responseCenRegMercantil = 0;
 		int responseCenNoColegiadoActividad = 0;
 		int responseInsertCenNoColegiadoActividad = 0;
 		int responseBorrarCenNoColegiadoActividad = 0;
@@ -220,6 +239,39 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 
 		if(null != usuarios && usuarios.size() > 0) {
 			AdmUsuarios usuario = usuarios.get(0);
+			//Validamos el número de contador para no duplicarlo 
+			Boolean registroValido = Boolean.TRUE;
+			if (!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp()) ) {
+				CenNocolegiadoExample exampleNocolegiado = new CenNocolegiadoExample();
+				if (!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp()) && !UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp()) ) {
+					exampleNocolegiado.createCriteria().andIdinstitucionEqualTo(idInstitucion).andPrefijoNumssppEqualTo(perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp()).
+					andContadorNumssppEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp())).andSufijoNumssppEqualTo(perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp());
+
+				}else if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp())){
+					exampleNocolegiado.createCriteria().andIdinstitucionEqualTo(idInstitucion).andPrefijoNumssppEqualTo(perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp()).
+					andContadorNumssppEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp())).andSufijoNumssppIsNull();
+
+				}else if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp())){
+					exampleNocolegiado.createCriteria().andIdinstitucionEqualTo(idInstitucion).andPrefijoNumssppIsNull().
+					andContadorNumssppEqualTo(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp())).andSufijoNumssppEqualTo(perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp());
+				}
+					
+				List<CenNocolegiado> nocolegiado = cenNocolegiadoExtendsMapper.selectByExample(exampleNocolegiado );
+				
+				if (null != nocolegiado && nocolegiado.size()>0) {
+					for (Iterator iterator = nocolegiado.iterator(); iterator.hasNext();) {
+						CenNocolegiado cenNocolegiado = (CenNocolegiado) iterator.next();
+						if (!cenNocolegiado.getIdpersona().toString().equals(perJuridicaDatosRegistralesUpdateDTO.getIdPersona())) {
+							Error error = new Error();
+							updateResponseDTO.setStatus(SigaConstants.KO);
+							error.setMessage("messages.censo.existeSociedadIgualNumeroRegistro");
+							updateResponseDTO.setError(error);
+							return updateResponseDTO;
+							
+						}
+					}
+				}
+			}
 			
 			// 1. Actualizar tabla cen_persona
 			LOGGER.info(
@@ -229,24 +281,103 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 			LOGGER.info(
 					"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updatebyExampleDataLegalPerson() -> Salida de cenPersonaExtendsMapper para actualizar fecha de constitución de una persona jurídica");
 			
-			// 2. Actualizar tabla cen_nocolegiado
-			if(responseCenPersona == 1) {
+			// 2. Actualizar tabla cen_reg_mercantil
+			if(responseCenPersona == 1  ) {
+				//if (null != perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional() && perJuridicaDatosRegistralesUpdateDTO.getSociedadProfesional().equals("1") ) {
 				LOGGER.info(
-						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson() -> Entrada a cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
-				
+						"updateRegistryDataLegalPerson() / cenRegMercantilMapper.updateByPrimaryKey(); -> Entrada a cenRegMercantilMapper para actualizar datos de una persona jurídica");
+				if(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro()!= null){
+					
+					CenRegMercantil datosRegistro = new CenRegMercantil();
+					if(!UtilidadesString.esCadenaVacia( perJuridicaDatosRegistralesUpdateDTO.getnumRegistro())) {
+                    datosRegistro.setIdDatosReg(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());
+                    datosRegistro.setNumRegistro(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro());
+					
+//					if(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro() != null) {
+//						datosRegistro.setIdDatosReg(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());
+//					}else {
+//						datosRegistro.setIdDatosReg(Long.parseLong(" "));
+//					}
+//				
+//
+//						datosRegistro.setNumRegistro(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro());
+//					}else {
+//						datosRegistro.setNumRegistro(" ");
+//					}
+					
+					datosRegistro.setIdentificacionReg(perJuridicaDatosRegistralesUpdateDTO.getIdentificacionReg());
+					datosRegistro.setFechaInscripcion(perJuridicaDatosRegistralesUpdateDTO.getFechaInscripcion());
+					datosRegistro.setFechaCancelacion(perJuridicaDatosRegistralesUpdateDTO.getFechaCancelacion());
+					datosRegistro.setFechamodificacion(new Date());
+					datosRegistro.setUsumodificacion(usuario.getIdusuario());
+					
+					responseCenRegMercantil = cenRegMercantilMapper.updateByPrimaryKey(datosRegistro);
+					}else{
+						CenNocolegiado record = new CenNocolegiado();
+						CenNocolegiadoKey key =  new CenNocolegiadoKey(); 
+						key.setIdinstitucion(idInstitucion);
+						key.setIdpersona(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getIdPersona()));
+
+						record = cenNocolegiadoExtendsMapper.selectByPrimaryKey(key);
+						record.setIdDatosReg(null);
+						
+						
+						responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByPrimaryKey(record);//ExampleDataLegalPerson(perJuridicaDatosRegistralesUpdateDTO, String.valueOf(idInstitucion), usuario);
+						responseCenRegMercantil = cenRegMercantilMapper.deleteByPrimaryKey(perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro());
+						perJuridicaDatosRegistralesUpdateDTO.setIdDatosRegistro(null);
+					}
+				}else{
+					if(!UtilidadesString.esCadenaVacia( perJuridicaDatosRegistralesUpdateDTO.getnumRegistro())) {
+						CenRegMercantil datosRegistro = new CenRegMercantil();
+						datosRegistro.setNumRegistro(perJuridicaDatosRegistralesUpdateDTO.getnumRegistro());
+						datosRegistro.setIdentificacionReg(perJuridicaDatosRegistralesUpdateDTO.getIdentificacionReg());
+						datosRegistro.setFechaInscripcion(perJuridicaDatosRegistralesUpdateDTO.getFechaInscripcion());
+						datosRegistro.setFechaCancelacion(perJuridicaDatosRegistralesUpdateDTO.getFechaCancelacion());
+						datosRegistro.setFechamodificacion(new Date());
+						datosRegistro.setUsumodificacion(usuario.getIdusuario());
+						
+						responseCenRegMercantil = cenRegMercantilMapper.insert(datosRegistro);
+						perJuridicaDatosRegistralesUpdateDTO.setIdDatosRegistro(datosRegistro.getIdDatosReg());
+						// 4. Actualizamos el registro en el contador en caso de que el modo sea correcto.
+						AdmContador contadorDTO = new AdmContador();
+						List<AdmContadorDTO> contadorItem = new ArrayList<AdmContadorDTO>();
+						AdmContadorKey exampleContador = new AdmContadorKey();
+						exampleContador.setIdinstitucion(idInstitucion);
+						exampleContador.setIdcontador("SSPP");
+						contadorDTO = admContadorMapper.selectByPrimaryKey(exampleContador);
+						LOGGER.info(
+								"getDatosContador() / admContadorMapper.getContadoresSearch() -> Entrada a AdmContador para buscar el contador a aplicar");
+						if (null != contadorDTO) {
+							if (contadorDTO.getModo().equals(Short.valueOf("0"))) {
+								if (null != perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp()) {
+									contadorDTO.setContador(Long.valueOf(perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp()));
+									contadorDTO.setFechamodificacion(new Date());
+									contadorDTO.setUsumodificacion(usuario.getIdusuario());
+									admContadorMapper.updateByPrimaryKey(contadorDTO);
+								}
+							}
+						}
+					}
+				}
+			//}
 				responseCenNocolegiado = cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson(perJuridicaDatosRegistralesUpdateDTO, String.valueOf(idInstitucion), usuario);
 				LOGGER.info(
 						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleDataLegalPerson() -> Salida de cenNocolegiadoExtendsMapper para actualizar datos de una persona jurídica");
 				
 			}
 			else {
+				Error error = new Error();
 				updateResponseDTO.setStatus(SigaConstants.KO);
+				error.setMessage("general.message.error.realiza.accion");
+				updateResponseDTO.setError(error);
 				LOGGER.warn(
 						"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updateByExampleSelective() -> "+ updateResponseDTO.getStatus() + ". No se actualizó correctamente la tabla cen_persona");
+
+				return updateResponseDTO;
 			}
 			
 			// 3. Actualizar tabla CEN_NOCOLEGIADO_ACTIVIDAD
-			if(responseCenNocolegiado == 1) {
+			if(responseCenNocolegiado == 1 ) {
 				
 				// busca las actividades que estaban asociadas a la persona juridica
 				personaJuridicaActividadDTO.setIdInstitucion(String.valueOf(idInstitucion));
@@ -299,9 +430,14 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 							}
 							
 							if(responseCenNoColegiadoActividad == 0) {
+								Error error = new Error();
 								updateResponseDTO.setStatus(SigaConstants.KO);
+								error.setMessage("general.message.error.realiza.accion");
+								updateResponseDTO.setError(error);
 								LOGGER.warn(
-										"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.updateByExampleSelective() -> " + updateResponseDTO.getStatus() + ".No se pudo dar de alta una actividad asociada a una persona jurídica");
+										"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updateByExampleSelective() -> "+ updateResponseDTO.getStatus() + ". No se actualizó correctamente la tabla cen_persona");
+
+								return updateResponseDTO;
 								
 							}
 						}
@@ -327,9 +463,14 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 						}
 						
 						if(responseInsertCenNoColegiadoActividad == 0) {
+							Error error = new Error();
 							updateResponseDTO.setStatus(SigaConstants.KO);
+							error.setMessage("general.message.error.realiza.accion");
+							updateResponseDTO.setError(error);
 							LOGGER.warn(
-									"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.insert() -> " + updateResponseDTO.getStatus() + ".No se pudo crear una actividad asociada a una persona jurídica");
+									"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updateByExampleSelective() -> "+ updateResponseDTO.getStatus() + ". No se actualizó correctamente la tabla cen_persona");
+
+							return updateResponseDTO;
 							
 						}
 					}
@@ -364,23 +505,82 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 					}
 						
 					if(responseBorrarCenNoColegiadoActividad == 0) {
+						Error error = new Error();
 						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setMessage("general.message.error.realiza.accion");
+						updateResponseDTO.setError(error);
 						LOGGER.warn(
-								"updateRegistryDataLegalPerson() / cenNocolegiadoActividadMapper.updateByExampleSelective() -> " + updateResponseDTO.getStatus() + ".No se pudo desasignar una actividad asociada a una persona jurídica");
+								"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updateByExampleSelective() -> "+ updateResponseDTO.getStatus() + ". No se actualizó correctamente la tabla cen_persona");
+
+						return updateResponseDTO;
 						
 					}
 				}
+				
+
+				
 			}
 			else {
+				Error error = new Error();
 				updateResponseDTO.setStatus(SigaConstants.KO);
+				error.setMessage("general.message.error.realiza.accion");
+				updateResponseDTO.setError(error);
 				LOGGER.warn(
-						"updateRegistryDataLegalPerson() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> "+ updateResponseDTO.getStatus() + ". No se actualizó correctamente la tabla cen_nocolegiado");
+						"updateRegistryDataLegalPerson() / cenPersonaExtendsMapper.updateByExampleSelective() -> "+ updateResponseDTO.getStatus() + ". No se actualizó correctamente la tabla cen_persona");
+
+				return updateResponseDTO;
 			}
 		}
 		
 		LOGGER.info(
 				"updateRegistryDataLegalPerson() -> Salida del servicio para actualizar datos registrales de una persona jurídica");
+		updateResponseDTO.setStatus(SigaConstants.OK);
 		return updateResponseDTO;
+	}
+
+	@Override
+	public AdmContadorDTO getDatosContador(HttpServletRequest request) {
+		LOGGER.info(
+				"getDatosContador() -> Entrada al servicio para obtener el contador a aplicar a una sociedad");
+		AdmContadorDTO contadorDTO = new AdmContadorDTO();
+		List<AdmContadorDTO> contadorItem = new ArrayList<AdmContadorDTO>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if(null != idInstitucion)
+		{
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getDatosContador() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getDatosContador() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			//personaJuridicaActividadDTO.setIdInstitucion(String.valueOf(idInstitucion));
+			
+			
+			if(null != usuarios && usuarios.size() > 0) {
+				LOGGER.info(
+						"getDatosContador() / admContadorMapper.getContadoresSearch() -> Entrada a AdmContador para buscar el contador a aplicar");
+				ContadorRequestDTO exampleContador = new ContadorRequestDTO();
+				exampleContador.setIdInstitucion(idInstitucion.toString());
+				exampleContador.setIdContador("SSPP");
+				contadorItem = admContadorMapper.getContadoresSearch(0, exampleContador );
+				LOGGER.info(
+						"getDatosContador() / admContadorMapper.getContadoresSearch() -> Entrada a AdmContador para buscar el contador a aplicar");
+				if (null != contadorItem && contadorItem.size()>0) {
+					contadorDTO =  contadorItem.get(0);
+				}
+			}
+			
+		}
+		
+		LOGGER.info(
+				"getDatosContador() -> Entrada al servicio para obtener el contador a aplicar a una sociedad");
+		return contadorDTO;
 	}
 
 	

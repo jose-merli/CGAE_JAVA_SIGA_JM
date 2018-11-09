@@ -54,10 +54,11 @@ public class TarjetaDatosDireccionesController {
 	}
 	
 	@RequestMapping(value = "tarjetaDirecciones/poblacion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getPoblacion(@RequestParam("idProvincia") String IdProvincia,HttpServletRequest request) { 
-		ComboDTO response = tarjetaDatosDireccionesService.getPoblacion(request,IdProvincia);
+	ResponseEntity<ComboDTO> getPoblacion(@RequestParam("idProvincia") String IdProvincia,@RequestParam("filtro") String filtro ,HttpServletRequest request) { 
+		ComboDTO response = tarjetaDatosDireccionesService.getPoblacion(request,IdProvincia, filtro);
 		return new ResponseEntity<ComboDTO >(response, HttpStatus.OK);
 	}
+	
 	@RequestMapping(value = "tarjetaDirecciones/tipoDireccion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getTipoDireccion(HttpServletRequest request) { 
 		ComboDTO response = tarjetaDatosDireccionesService.getTipoDireccion(request);

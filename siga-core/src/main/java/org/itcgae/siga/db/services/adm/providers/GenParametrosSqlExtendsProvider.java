@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.adm.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
+import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.mappers.GenParametrosSqlProvider;
 
 public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
@@ -20,75 +21,118 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 	
 	public String getParametersSearch(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje){
         SQL sql = new SQL();
-
+        SQL sql1 = new SQL();
+        
         sql.SELECT("DISTINCT PARAM.MODULO");
         sql.SELECT("PARAM.PARAMETRO");
         sql.SELECT("PARAM.IDRECURSO");
-        sql.SELECT("DECODE( (select param2.valor from gen_parametros param2 where param.parametro = param2.parametro and idinstitucion = '" + parametroRequestDTO.getIdInstitucion() + "' and param.MODULO =param2.MODULO),"
-                + "null,(select param2.valor from gen_parametros param2 where param.parametro = param2.parametro and idinstitucion = '0' and param.MODULO = param2.MODULO),"
-                + "(select param2.valor from gen_parametros param2 where param.parametro = param2.parametro and idinstitucion = '" + parametroRequestDTO.getIdInstitucion() + "' and param.MODULO =param2.MODULO)) AS VALOR");
-        sql.SELECT("DECODE(COUNT(IDINSTITUCION),1,'0','" + parametroRequestDTO.getIdInstitucion() + "') AS IDINSTITUCION");
-        sql.SELECT(" DICC.DESCRIPCION");
-        sql.FROM("gen_parametros param ");
-        sql.INNER_JOIN(" gen_diccionario  DICC on PARAM.idrecurso = DICC.IDRECURSO");
-        sql.WHERE("IDINSTITUCION IN ('" + parametroRequestDTO.getIdInstitucion() + "','0')");
-        sql.WHERE("MODULO = '" + parametroRequestDTO.getModulo() + "'");
-        sql.WHERE("FECHA_BAJA IS NULL"); 
-        sql.WHERE("DICC.IDLENGUAJE = '"+idLenguaje+"'");
-        sql.GROUP_BY("param.modulo, param.parametro, param.idrecurso, DICC.DESCRIPCION");
-        sql.ORDER_BY(" PARAM.MODULO ");
+        sql.SELECT("F_SIGA_GETPARAMETROGENERAL(PARAM.MODULO, PARAM.PARAMETRO,'"+ parametroRequestDTO.getIdInstitucion() +"') AS VALOR");
+        sql.SELECT("DECODE(MAX(IDINSTITUCION),'"+ parametroRequestDTO.getIdInstitucion() +"','"+ parametroRequestDTO.getIdInstitucion()+"',MIN(IDINSTITUCION)) AS IDINSTITUCION");
+        sql.SELECT("NVL(DICC.DESCRIPCION, 'SIN DEFINIR') AS DESCRIPCION");
+        
+        sql1.SELECT("'S'");
+		sql1.FROM("GEN_PARAMETROS PARAM2");
+		sql1.WHERE("PARAM2.PARAMETRO = PARAM.PARAMETRO");
+		sql1.WHERE("IDINSTITUCION = '0'");
+		sql1.WHERE("PARAM.MODULO = PARAM2.MODULO");
+		
+		sql.SELECT("NVL((" + sql1+"),'N') AS POSIBLEELIMINAR");
+		sql.SELECT("'"+ parametroRequestDTO.getIdInstitucion() +"' AS IDINSTITUCIONACTUAL");
+        
+        sql.FROM("GEN_PARAMETROS PARAM");
+        sql.LEFT_OUTER_JOIN("GEN_DICCIONARIO  DICC ON (PARAM.IDRECURSO = DICC.IDRECURSO  AND DICC.IDLENGUAJE = '" + idLenguaje +"')");
+        sql.WHERE("(IDINSTITUCION IN ('" + parametroRequestDTO.getIdInstitucion() + "','2000','0')  AND FECHA_BAJA IS NULL) AND MODULO ='"+parametroRequestDTO.getModulo() +"'");
+        sql.GROUP_BY("PARAM.MODULO, PARAM.PARAMETRO, PARAM.IDRECURSO, DICC.DESCRIPCION");
+        sql.ORDER_BY("PARAM.PARAMETRO");
 		
 		return sql.toString();
 	}
 	
 	
-	public String getParametersSearchGeneral(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje){
+	public String getParametersSearchGeneral(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje, String idInstitucion){
 		SQL sql = new SQL();
-
-		sql.SELECT("DISTINCT PARAM3.MODULO");
-		sql.SELECT("PARAM3.PARAMETRO");
-		sql.SELECT("PARAM3.IDRECURSO");
-		sql.SELECT("DECODE((SELECT  PARAM2.VALOR FROM GEN_PARAMETROS PARAM2 WHERE PARAM.PARAMETRO = PARAM2.PARAMETRO AND   IDINSTITUCION = '2000' AND   PARAM.MODULO = PARAM2.MODULO),"
-				+ "NULL, DECODE( (SELECT PARAM2.VALOR FROM GEN_PARAMETROS PARAM2 WHERE PARAM.PARAMETRO = PARAM2.PARAMETRO AND   IDINSTITUCION = '"+ parametroRequestDTO.getIdInstitucion() +"' AND   PARAM.MODULO = PARAM2.MODULO),"
-				+ "NULL, ( SELECT PARAM2.VALOR FROM GEN_PARAMETROS PARAM2 WHERE PARAM.PARAMETRO = PARAM2.PARAMETRO AND   IDINSTITUCION = '0' AND   PARAM.MODULO = PARAM2.MODULO), "
-				+ "(SELECT PARAM2.VALOR FROM GEN_PARAMETROS PARAM2 WHERE PARAM.PARAMETRO = PARAM2.PARAMETRO AND   IDINSTITUCION = '"+ parametroRequestDTO.getIdInstitucion() +"' AND   PARAM.MODULO = PARAM2.MODULO) ),"
-				+ "(SELECT PARAM2.VALOR FROM GEN_PARAMETROS PARAM2 WHERE PARAM.PARAMETRO = PARAM2.PARAMETRO AND   IDINSTITUCION = '2000' AND   PARAM.MODULO = PARAM2.MODULO) )AS VALOR");
+		SQL sql1 = new SQL();
 		
-		sql.SELECT(" PARAM.IDINSTITUCION ");
-		sql.SELECT("DICC.DESCRIPCION");
-		sql.FROM(" (SELECT DISTINCT PARAMETRO.MODULO, PARAMETRO.PARAMETRO,PARAMETRO.FECHA_BAJA, DECODE(MAX( DECODE(IDINSTITUCION,'2000','9999',IDINSTITUCION )),'9999','2000',MAX(IDINSTITUCION)) IDINSTITUCION "
-				+ " FROM    GEN_PARAMETROS PARAMETRO "
-				+ " WHERE IDINSTITUCION IN ( '"+ parametroRequestDTO.getIdInstitucion() +"', '0', '2000' ) AND   MODULO = '"+ parametroRequestDTO.getModulo() +"'  "
-				+ " GROUP BY PARAMETRO.MODULO,  PARAMETRO.FECHA_BAJA,PARAMETRO.PARAMETRO ORDER BY PARAMETRO) PARAM ");
-		sql.INNER_JOIN(" GEN_PARAMETROS PARAM3 ON (PARAM3.MODULO = PARAM.MODULO AND PARAM.PARAMETRO = PARAM3.PARAMETRO AND PARAM.IDINSTITUCION = PARAM3.IDINSTITUCION) ");
-		sql.INNER_JOIN(" GEN_DICCIONARIO DICC ON PARAM3.IDRECURSO = DICC.IDRECURSO");
-		sql.WHERE("DICC.IDLENGUAJE = '"+idLenguaje+"'");
-		sql.WHERE("PARAM.FECHA_BAJA IS NULL");
+		sql.SELECT("DISTINCT PARAM.MODULO");
+		sql.SELECT("PARAM.PARAMETRO");
+		sql.SELECT("PARAM.IDRECURSO");
+		sql.SELECT("F_SIGA_GETPARAMETROGENERAL(PARAM.MODULO, PARAM.PARAMETRO,'" + parametroRequestDTO.getIdInstitucion()+ "') AS VALOR");
+		sql.SELECT("MAX(IDINSTITUCION) AS IDINSTITUCION");
+		sql.SELECT("NVL(DICC.DESCRIPCION, 'SIN DEFINIR') AS DESCRIPCION");
+		
+		sql1.SELECT("'S'");
+		sql1.FROM("GEN_PARAMETROS PARAM2");
+		sql1.WHERE("PARAM2.PARAMETRO = PARAM.PARAMETRO");
+		sql1.WHERE("IDINSTITUCION = '0'");
+		sql1.WHERE("PARAM.MODULO = PARAM2.MODULO");
+		
+		sql.SELECT("NVL((" + sql1+"),'N') AS POSIBLEELIMINAR");
+		sql.SELECT("'"+ parametroRequestDTO.getIdInstitucion() +"' AS IDINSTITUCIONACTUAL");
+		
+		
+		sql.FROM("GEN_PARAMETROS PARAM");
+		sql.LEFT_OUTER_JOIN("GEN_DICCIONARIO  DICC ON (PARAM.IDRECURSO = DICC.IDRECURSO  AND DICC.IDLENGUAJE = '"+ idLenguaje + "')");
+		sql.WHERE("(IDINSTITUCION IN ('"+idInstitucion+"','0')  AND FECHA_BAJA IS NULL) AND MODULO ='" + parametroRequestDTO.getModulo() + "'");
+		sql.GROUP_BY("PARAM.MODULO, PARAM.PARAMETRO, PARAM.IDRECURSO, DICC.DESCRIPCION");
+		sql.ORDER_BY("PARAM.PARAMETRO");
+
 		return sql.toString();
 	}
 	
 	public String getParametersRecord(int numPagina, ParametroRequestDTO parametroRequestDTO, String idLenguaje){
 		SQL sql = new SQL();
-
-		sql.SELECT("DISTINCT PARAM3.MODULO");
-		sql.SELECT("PARAM3.PARAMETRO");
-		sql.SELECT("PARAM3.IDRECURSO");
-		sql.SELECT("PARAM.FECHA_BAJA");
-		sql.SELECT("DECODE((SELECT  PARAM2.VALOR FROM GEN_PARAMETROS PARAM2 WHERE PARAM.PARAMETRO = PARAM2.PARAMETRO AND   IDINSTITUCION = '2000' AND   PARAM.MODULO = PARAM2.MODULO),"
-				+ "NULL, DECODE( (SELECT PARAM2.VALOR FROM GEN_PARAMETROS PARAM2 WHERE PARAM.PARAMETRO = PARAM2.PARAMETRO AND   IDINSTITUCION = '"+ parametroRequestDTO.getIdInstitucion() +"' AND   PARAM.MODULO = PARAM2.MODULO),"
-				+ "NULL, ( SELECT PARAM2.VALOR FROM GEN_PARAMETROS PARAM2 WHERE PARAM.PARAMETRO = PARAM2.PARAMETRO AND   IDINSTITUCION = '0' AND   PARAM.MODULO = PARAM2.MODULO), "
-				+ "(SELECT PARAM2.VALOR FROM GEN_PARAMETROS PARAM2 WHERE PARAM.PARAMETRO = PARAM2.PARAMETRO AND   IDINSTITUCION = '"+ parametroRequestDTO.getIdInstitucion() +"' AND   PARAM.MODULO = PARAM2.MODULO) ),"
-				+ "(SELECT PARAM2.VALOR FROM GEN_PARAMETROS PARAM2 WHERE PARAM.PARAMETRO = PARAM2.PARAMETRO AND   IDINSTITUCION = '2000' AND   PARAM.MODULO = PARAM2.MODULO) )AS VALOR");
+		SQL sql2 = new SQL();
 		
-		sql.SELECT(" PARAM.IDINSTITUCION ");
-		sql.SELECT("DICC.DESCRIPCION");
-		sql.FROM(" (SELECT DISTINCT PARAMETRO.MODULO, PARAMETRO.PARAMETRO,PARAMETRO.FECHA_BAJA, DECODE(MAX( DECODE(IDINSTITUCION,'2000','9999',IDINSTITUCION )),'9999','2000',MAX(IDINSTITUCION)) IDINSTITUCION "
-				+ " FROM    GEN_PARAMETROS PARAMETRO "
-				+ " WHERE IDINSTITUCION IN ( '"+ parametroRequestDTO.getIdInstitucion() +"', '0', '2000' ) AND   MODULO = '"+ parametroRequestDTO.getModulo() +"'  "
-				+ " GROUP BY PARAMETRO.MODULO,  PARAMETRO.FECHA_BAJA,PARAMETRO.PARAMETRO ORDER BY PARAMETRO) PARAM ");
-		sql.INNER_JOIN(" GEN_PARAMETROS PARAM3 ON (PARAM3.MODULO = PARAM.MODULO AND PARAM.PARAMETRO = PARAM3.PARAMETRO AND PARAM.IDINSTITUCION = PARAM3.IDINSTITUCION) ");
-		sql.INNER_JOIN(" GEN_DICCIONARIO DICC ON PARAM3.IDRECURSO = DICC.IDRECURSO");
-		sql.WHERE("DICC.IDLENGUAJE = '"+idLenguaje+"'");
+		sql2.SELECT_DISTINCT("PARAM.MODULO");
+		sql2.SELECT("PARAM.PARAMETRO");
+		sql2.SELECT("PARAM.IDRECURSO");
+		sql2.SELECT("PARAM.VALOR");
+		sql2.SELECT("TO_CHAR(IDINSTITUCION) AS IDINSTITUCION");
+		sql2.SELECT("NVL(DICC.DESCRIPCION, 'SIN DEFINIR') AS DESCRIPCION");
+		sql2.SELECT("PARAM.FECHA_BAJA");
+		sql2.FROM("GEN_PARAMETROS PARAM");
+		sql2.LEFT_OUTER_JOIN("GEN_DICCIONARIO  DICC on (PARAM.IDRECURSO = DICC.IDRECURSO AND DICC.IDLENGUAJE = '"+ idLenguaje +"')");
+		sql2.WHERE("PARAM.MODULO = '"+ parametroRequestDTO.getModulo() +"'");
+		sql2.WHERE("IDINSTITUCION IN ('"+ parametroRequestDTO.getIdInstitucion()+"')");
+		sql2.WHERE("FECHA_BAJA IS NOT NULL");
+		sql2.ORDER_BY("PARAMETRO");
+		
+		sql.SELECT_DISTINCT("PARAM.MODULO");
+		sql.SELECT("PARAM.PARAMETRO");
+		sql.SELECT("PARAM.IDRECURSO");
+		sql.SELECT("F_SIGA_GETPARAMETROGENERAL(PARAM.MODULO, PARAM.PARAMETRO,'"+ parametroRequestDTO.getIdInstitucion()+"') AS VALOR");
+		
+		// diferenciar entre institucion general y no general
+//		if(parametroRequestDTO.getIdInstitucion().equals(SigaConstants.InstitucionGeneral))
+//		{
+			sql.SELECT("TO_CHAR(MAX(IDINSTITUCION)) AS IDINSTITUCION");
+//		}else {
+//			sql.SELECT("DECODE(MAX(IDINSTITUCION),'"+ parametroRequestDTO.getIdInstitucion()+"','"+ parametroRequestDTO.getIdInstitucion()+"',TO_CHAR(MIN(IDINSTITUCION))) AS IDINSTITUCION");
+//		}
+	
+		sql.SELECT("NVL(DICC.DESCRIPCION, 'SIN DEFINIR') AS DESCRIPCION");
+		sql.SELECT("PARAM.FECHA_BAJA");
+		sql.FROM("GEN_PARAMETROS PARAM");
+		sql.LEFT_OUTER_JOIN("GEN_DICCIONARIO  DICC on (PARAM.IDRECURSO = DICC.IDRECURSO AND DICC.IDLENGUAJE = '"+ idLenguaje +"')");
+		sql.WHERE("PARAM.MODULO = '"+ parametroRequestDTO.getModulo() +"'");
+		
+		// diferenciar entre institucion general y no general
+//		if(parametroRequestDTO.getIdInstitucion().equals(SigaConstants.InstitucionGeneral))
+//		{
+		sql.WHERE("IDINSTITUCION IN ('"+ parametroRequestDTO.getIdInstitucion()+"','0')");
+//		}
+//		else {
+//			sql.WHERE("IDINSTITUCION IN ('"+ parametroRequestDTO.getIdInstitucion()+"','2000','0')");
+//		}
+		
+		sql.WHERE("FECHA_BAJA IS NULL");
+		sql.GROUP_BY("PARAM.MODULO");
+		sql.GROUP_BY("PARAM.PARAMETRO");
+		sql.GROUP_BY("PARAM.IDRECURSO");
+		sql.GROUP_BY("DICC.DESCRIPCION");
+		sql.GROUP_BY("PARAM.FECHA_BAJA" + " UNION ALL " + sql2);
+		
+		
 		return sql.toString();
 	}
 	
@@ -106,6 +150,21 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 		sql2.WHERE("idinstitucion IN ('"+ idInstitucion +"', '0')");
 		
 		sql.WHERE("idinstitucion = (" + sql2 + ")");
+		
+		return sql.toString();
+	}
+	
+	public String updateByExampleFechaBaja(GenParametros genParametros) {
+		SQL sql = new  SQL();
+		
+		sql.UPDATE("gen_parametros");
+		sql.SET("VALOR = '"+ genParametros.getValor() +"'");
+		sql.SET("FECHA_BAJA = NULL");
+		
+		
+		sql.WHERE("MODULO = '" + genParametros.getModulo()+ "'");
+		sql.WHERE("PARAMETRO = '" + genParametros.getParametro()+ "'");
+		sql.WHERE("IDINSTITUCION = '" + genParametros.getIdinstitucion()+ "'");
 		
 		return sql.toString();
 	}

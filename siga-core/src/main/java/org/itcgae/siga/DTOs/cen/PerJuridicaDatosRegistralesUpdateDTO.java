@@ -23,8 +23,41 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	private String contadorNumsspp;
 	private String sufijoNumsspp;
 	private Date fechaBaja;
+	private String numRegistro;
+	private Long idDatosRegistro;
+	private String identificacionReg;
+	private Date fechaInscripcion;
+	private Date fechaCancelacion;
 	
 
+	
+	/**
+	 */
+	public PerJuridicaDatosRegistralesUpdateDTO fechaCancelacion(Date fechaCancelacion){
+		this.fechaCancelacion = fechaCancelacion;
+		return this;
+	}
+	@JsonProperty("fechaCancelacion")
+	public Date getFechaCancelacion() {
+		return fechaCancelacion;
+	}
+	public void setFechaCancelacion(Date fechaCancelacion) {
+		this.fechaCancelacion = fechaCancelacion;
+	}
+	
+	/**
+	 */
+	public PerJuridicaDatosRegistralesUpdateDTO fechaInscripcion(Date fechaInscripcion){
+		this.fechaInscripcion = fechaInscripcion;
+		return this;
+	}
+	public Date getFechaInscripcion() {
+		return fechaInscripcion;
+	}
+	public void setFechaInscripcion(Date fechaInscripcion) {
+		this.fechaInscripcion = fechaInscripcion;
+	}
+	
 	/**
 	 */
 	public PerJuridicaDatosRegistralesUpdateDTO prefijoNumsspp(String prefijoNumsspp){
@@ -43,6 +76,22 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 		this.prefijoNumsspp = prefijoNumsspp;
 	}
 
+	
+	/**
+	 */
+	public PerJuridicaDatosRegistralesUpdateDTO identificacionReg(String identificacionReg){
+		this.identificacionReg = identificacionReg;
+		return this;
+	}
+	
+	@JsonProperty("identificacionReg")
+	public String getIdentificacionReg() {
+		return identificacionReg;
+	}
+
+	public void setIdentificacionReg(String identificacionReg) {
+		this.identificacionReg = identificacionReg;
+	}
 
 	/**
 	 */
@@ -104,6 +153,42 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	public void setResena(String resena) {
 		this.resena = resena;
 	}
+	
+	/**
+	 *
+	 */
+	public PerJuridicaDatosRegistralesUpdateDTO numRegistro(String numRegistro){
+		this.numRegistro = numRegistro;
+		return this;
+	}
+	
+	@JsonProperty("numRegistro")
+	public String getnumRegistro() {
+		return numRegistro;
+	}
+	
+	
+	public void setnumRegistro(String numRegistro) {
+		this.numRegistro = numRegistro;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public PerJuridicaDatosRegistralesUpdateDTO idDatosRegistro(Long idDatosRegistro){
+		this.idDatosRegistro = idDatosRegistro;
+		return this;
+	}
+	@JsonProperty("idDatosRegistro")
+	public Long getIdDatosRegistro() {
+		return idDatosRegistro;
+	}
+
+	public void setIdDatosRegistro(Long idDatosRegistro) {
+		this.idDatosRegistro = idDatosRegistro;
+	}
+	
 	
 	
 	/**
@@ -276,7 +361,9 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 		this.idPersona = idPersona;
 	}
 	
-	
+
+
+
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {

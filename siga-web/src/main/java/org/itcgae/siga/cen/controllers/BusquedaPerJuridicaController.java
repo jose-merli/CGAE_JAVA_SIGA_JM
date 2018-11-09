@@ -1,11 +1,16 @@
 package org.itcgae.siga.cen.controllers;
 
+import java.text.ParseException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDeleteDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
+import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
+import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.ParametroColegioDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -44,12 +49,11 @@ public class BusquedaPerJuridicaController {
 	
 					
 	@RequestMapping(value = "/busquedaPerJuridica/etiquetasPersona",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getLabelPerson(@RequestBody PersonaJuridicaSearchDTO personaJuridicaSearchDTO, HttpServletRequest request) {
-		ComboDTO response = busquedaPerJuridicaService.getLabelPerson(personaJuridicaSearchDTO,request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	ResponseEntity<ComboEtiquetasDTO> getLabelPerson(@RequestBody PersonaJuridicaSearchDTO personaJuridicaSearchDTO, HttpServletRequest request) throws ParseException{
+		ComboEtiquetasDTO response = busquedaPerJuridicaService.getLabelPerson(personaJuridicaSearchDTO,request);
+		return new ResponseEntity<ComboEtiquetasDTO>(response, HttpStatus.OK);
 	}
-	
-	
+
 	@RequestMapping(value = "busquedaPerJuridica/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<BusquedaJuridicaDTO> searchLegalPersons(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request) { 
 		BusquedaJuridicaDTO response = busquedaPerJuridicaService.searchLegalPersons(numPagina, busquedaJuridicaSearchDTO, request);

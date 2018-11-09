@@ -38,9 +38,10 @@ public class BusquedaPerController {
 	}
 	
 	@RequestMapping(value = "busquedaPerJuridica/searchFisica", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<BusquedaPerFisicaDTO> searchHistoricLegalPersons(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaPerFisicaSearchDTO busquedaPerJuridicaSearchDTO, HttpServletRequest request) { 
+	ResponseEntity<BusquedaPerFisicaDTO> searchPerFisica(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaPerFisicaSearchDTO busquedaPerJuridicaSearchDTO, HttpServletRequest request) { 
 		BusquedaPerFisicaDTO response = busquedaPerService.searchPerFisica(numPagina, busquedaPerJuridicaSearchDTO, request);
 		return new ResponseEntity<BusquedaPerFisicaDTO>(response, HttpStatus.OK);
 	} 
+	//
 	
 }

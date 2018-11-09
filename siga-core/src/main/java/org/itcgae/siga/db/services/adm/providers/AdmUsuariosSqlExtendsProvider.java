@@ -26,16 +26,20 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 	public String getUsersByFilter(int numPagina, UsuarioRequestDTO usuarioRequestDTO){
 		SQL sql = new SQL();
 		
-		sql.SELECT("USUARIOS.DESCRIPCION");
+		sql.SELECT_DISTINCT("USUARIOS.DESCRIPCION");
 		sql.SELECT("USUARIOS.NIF");
 		sql.SELECT("USUARIOS.FECHAALTA");
 		sql.SELECT("USUARIOS.ACTIVO");
 		sql.SELECT("USUARIOS.CODIGOEXT");
 		sql.SELECT("USUARIOS.IDINSTITUCION");
 		sql.SELECT("USUARIOS.IDUSUARIO");
-		sql.SELECT("f_siga_roles_usuario(USUARIOS.idinstitucion, USUARIOS.idusuario) as ROLES");
-		sql.SELECT("f_siga_perfiles_usuario(USUARIOS.idinstitucion, USUARIOS.idusuario) as PERFIL");    
+		//sql.SELECT("f_siga_roles_usuario(USUARIOS.idinstitucion, USUARIOS.idusuario) as ROLES");
+		sql.SELECT("ROL.DESCRIPCION AS ROLES");
+		sql.SELECT("DECODE(UE.IDROL,NULL,NULL,F_SIGA_PERFILES_USUARIO_ROL(USUARIOS.idinstitucion, USUARIOS.idusuario, UE.IDROL)) as PERFIL");
+		sql.SELECT("(USUARIOS.NIF|| ROL.DESCRIPCION) AS NIFROL");
 		sql.FROM("ADM_USUARIOS USUARIOS");
+		sql.LEFT_OUTER_JOIN("ADM_USUARIO_EFECTIVO UE ON (UE.IDUSUARIO = USUARIOS.IDUSUARIO AND UE.IDINSTITUCION = USUARIOS.IDINSTITUCION)");
+		sql.LEFT_OUTER_JOIN("ADM_ROL ROL ON UE.IDROL=ROL.IDROL ");
 		
 		// comprobacion campo rol del body para aplicar filtro
 		if(null != usuarioRequestDTO.getRol() && !usuarioRequestDTO.getRol().equalsIgnoreCase("")){

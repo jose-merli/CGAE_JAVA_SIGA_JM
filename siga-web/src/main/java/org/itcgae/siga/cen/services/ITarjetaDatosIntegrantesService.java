@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesDeleteDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
@@ -24,7 +25,7 @@ public interface ITarjetaDatosIntegrantesService {
 
 	public UpdateResponseDTO deleteMember(TarjetaIntegrantesDeleteDTO[] tarjetaIntegrantesDeleteDTO,HttpServletRequest request);
 	
-	
+	public StringDTO provinciaColegio(StringDTO idInstitucionIntegrante, HttpServletRequest request);
 	
 	
 	

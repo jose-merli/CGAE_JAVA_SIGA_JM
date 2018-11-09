@@ -20,6 +20,7 @@ public class DatosDireccionesItem {
 	private String fax;
 	private String movil;
 	private String correoElectronico;
+	private String poblacionExtranjera;
 	private String idExternoPais;
 	private String nombrePais;
 	private String idExternoPoblacion;
@@ -47,6 +48,14 @@ public class DatosDireccionesItem {
 		this.motivo = motivo;
 	}
 	
+
+	public String getPoblacionExtranjera() {
+		return poblacionExtranjera;
+	}
+
+	public void setPoblacionExtranjera(String poblacionExtranjera) {
+		this.poblacionExtranjera = poblacionExtranjera;
+	}
 
 	public String getTipoDireccion() {
 		return tipoDireccion;

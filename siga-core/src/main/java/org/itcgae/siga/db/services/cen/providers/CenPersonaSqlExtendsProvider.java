@@ -29,7 +29,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		return sql.toString();
 	}
 
-	public String searchPerFisica(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, String idLenguaje) {
+	public String searchPerFisica(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, String idLenguaje, String idinstitucion) {
 
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
@@ -37,31 +37,31 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 		// Pasamos string [] a string -> Para usarse en sentencia sql in(...)
 
-		sql.SELECT("PER.IDPERSONA");
+		sql.SELECT_DISTINCT("PER.IDPERSONA");
 		sql.SELECT("PER.NOMBRE AS DENOMINACION");
-
 		sql.SELECT("CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2) AS APELLIDOS");
 		sql.SELECT("PER.APELLIDOS1 AS PRIMERAPELLIDO");
 		sql.SELECT("PER.APELLIDOS2 AS SEGUNDOAPELLIDO");
-		sql.SELECT("I.IDINSTITUCION AS COLEGIO");
-		sql.SELECT("COL.NCOLEGIADO");
+		sql.SELECT("PER.NIFCIF AS NIF"); 
 		sql.SELECT("PER.FECHANACIMIENTO");
-		sql.SELECT("CA.DESCRIPCION AS ESTADOCOLEGIAL");
+		sql.SELECT("I.NOMBRE AS COLEGIO");
+		sql.SELECT("I.IDINSTITUCION");
+		sql.SELECT("DECODE(COL.COMUNITARIO,0, COL.NCOLEGIADO,COL.NCOMUNITARIO) AS NUMEROCOLEGIADO");
+		sql.SELECT("NVL(CA.DESCRIPCION, DECODE(PER.IDTIPOIDENTIFICACION,20,'SOCIEDAD','NO COLEGIADO')) AS ESTADOCOLEGIAL");
+		//sql.SELECT("CA.DESCRIPCION AS ESTADOCOLEGIAL");
 		sql.SELECT("DECODE(COL.SITUACIONRESIDENTE,'0','NO','1','SI') AS RESIDENTE");
-		sql.SELECT("PER.NIFCIF AS NIF");
+		sql.SELECT("NVL(DIR.IDPROVINCIA,00)  AS IDPROVINCIA");
+		sql.SELECT("ACT.IDACTIVIDADPROFESIONAL");
+		
 		sql.FROM("CEN_PERSONA PER");
 		// Mybatis cambia el orden de inner join y left_outer_join con sus funciones
 		// predefinidas=> siempre pone inner join antes
-		sql.LEFT_OUTER_JOIN("CEN_NOCOLEGIADO NOCOL  ON (PER.IDPERSONA = NOCOL.IDPERSONA AND NOCOL.FECHA_BAJA IS NULL)");
-
-		sql.LEFT_OUTER_JOIN("CEN_COLEGIADO COL  ON PER.IDPERSONA = COL.IDPERSONA ");
-		// cambie esto 
-		sql.LEFT_OUTER_JOIN("CEN_CLIENTE CLI  ON PER.IDPERSONA = CLI.IDPERSONA ");
-		sql.LEFT_OUTER_JOIN(" CEN_INSTITUCION I ON (CLI.IDINSTITUCION = I.IDINSTITUCION)");
+		sql.LEFT_OUTER_JOIN(" CEN_CLIENTE CLI  ON (PER.IDPERSONA = CLI.IDPERSONA) ");
+		sql.LEFT_OUTER_JOIN("CEN_NOCOLEGIADO NOCOL  ON (PER.IDPERSONA = NOCOL.IDPERSONA AND CLI.IDINSTITUCION = NOCOL.IDINSTITUCION AND NOCOL.FECHA_BAJA IS NULL)");
+		sql.LEFT_OUTER_JOIN(" CEN_COLEGIADO COL  ON (PER.IDPERSONA = COL.IDPERSONA AND CLI.IDINSTITUCION = COL.IDINSTITUCION)");	
+		sql.LEFT_OUTER_JOIN(" CEN_INSTITUCION I ON (CLI.IDINSTITUCION = I.IDINSTITUCION) ");
 
 		sql2.SELECT("A.IDINSTITUCION"); 
-
-
 		sql2.SELECT("A.IDPERSONA");
 		sql2.SELECT("A.IDESTADO");
 
@@ -84,27 +84,35 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.LEFT_OUTER_JOIN(
 				"GEN_RECURSOS_CATALOGOS CA ON (ESTADOCOLEGIAL.DESCRIPCION = CA.IDRECURSO  AND CA.IDLENGUAJE = '"
 						+ idLenguaje + "')");
+		sql.LEFT_OUTER_JOIN("CEN_DIRECCIONES DIR ON (PER.IDPERSONA = DIR.IDPERSONA AND CLI.IDINSTITUCION = DIR.IDINSTITUCION)"); 
+		sql.LEFT_OUTER_JOIN("CEN_NOCOLEGIADO_ACTIVIDAD ACT ON (PER.IDPERSONA = ACT.IDPERSONA AND CLI.IDINSTITUCION = ACT.IDINSTITUCION)");
 		sql.WHERE("PER.IDTIPOIDENTIFICACION NOT IN ('20')");
-		if (null != busquedaPerFisicaSearchDTO.getNif() && !busquedaPerFisicaSearchDTO.getNif().equalsIgnoreCase("")) {
+		
+
+		
+		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
 			sql.WHERE("PER.NIFCIF = '" + busquedaPerFisicaSearchDTO.getNif() + "'");
 		}
-
-		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNombre())) {
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.NOMBRE", busquedaPerFisicaSearchDTO.getNombre()));
-		}
 		
-		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getPrimerApellido())) {
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.APELLIDOS1",
-					busquedaPerFisicaSearchDTO.getPrimerApellido()));
-		}
-		
-		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getSegundoApellido())) {
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.APELLIDOS2",
-					busquedaPerFisicaSearchDTO.getSegundoApellido()));
+		// si el dni no está en los filtros, buscamos por nombre y apellidos si los puso
+		if(UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
+			if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNombre())) {
+				sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.NOMBRE", busquedaPerFisicaSearchDTO.getNombre()));
+			}
+			
+			if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getPrimerApellido())) {
+				sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.APELLIDOS1",
+						busquedaPerFisicaSearchDTO.getPrimerApellido()));
+			}
+			
+			if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getSegundoApellido())) {
+				sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.APELLIDOS2",
+						busquedaPerFisicaSearchDTO.getSegundoApellido()));
+			}
 		}
 
 		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNumeroColegiado())) {
-			sql.WHERE(" COL.NCOLEGIADO = '" + busquedaPerFisicaSearchDTO.getNumeroColegiado() + "'");
+			sql.WHERE(" (COL.NCOLEGIADO = '" + busquedaPerFisicaSearchDTO.getNumeroColegiado() + "' OR COL.COMUNITARIO = '" + busquedaPerFisicaSearchDTO.getNumeroColegiado() + "')");
 		}
 		
 		if (null != busquedaPerFisicaSearchDTO.getIdInstitucion()
@@ -121,10 +129,13 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 			}
 			sql.WHERE(" I.IDINSTITUCION  IN  (" + idInstituciones + ")");
 		}
+		
+		
 
 		return sql.toString();
 
 	}
+	
 
 	public String searchPerJuridica(int numpagina, BusquedaPerJuridicaSearchDTO busquedaPerJuridicaSearchDTO,
 			String idLenguaje) {
@@ -147,7 +158,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT_DISTINCT(
 				"LISTAGG(concat(per2.nombre || ' ',concat(per2.apellidos1 || ' ',per2.apellidos2) ),';') WITHIN GROUP(ORDER BY per2.nombre) AS nombresintegrantes");
 		sql.SELECT("cliColegiado.idinstitucion AS idinstitucion");
-
+		sql.SELECT("'NO COLEGIADO' AS ESTADOCOLEGIAL");
 		sql.FROM("cen_persona per");
 
 		sql.LEFT_OUTER_JOIN("cen_nocolegiado col  ON per.idpersona = col.idpersona");

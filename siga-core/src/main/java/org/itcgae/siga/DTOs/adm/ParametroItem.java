@@ -17,7 +17,11 @@ public class ParametroItem {
 	private Date fechaBaja;
 	private String idRecurso;
 	private String descripcion;
+	private String posibleEliminar;
+	private String idinstitucionActual;
 	
+	
+
 
 	/**
 	**/
@@ -150,6 +154,39 @@ public class ParametroItem {
 	}
 	
 	
+	/**
+	**/
+	public ParametroItem posibleEliminar(String posibleEliminar) {
+		this.posibleEliminar = posibleEliminar;
+		return this;
+	}
+	
+	@JsonProperty("posibleEliminar")
+	public String getPosibleEliminar() {
+		return posibleEliminar;
+	}
+
+	public void setPosibleEliminar(String posibleEliminar) {
+		this.posibleEliminar = posibleEliminar;
+	}
+	
+	/**
+	**/
+	public ParametroItem idinstitucionActual(String idinstitucionActual) {
+		this.idinstitucionActual = idinstitucionActual;
+		return this;
+	}
+
+	@JsonProperty("idinstitucionActual")
+	public String getIdinstitucionActual() {
+		return idinstitucionActual;
+	}
+
+	public void setIdinstitucionActual(String idinstitucionActual) {
+		this.idinstitucionActual = idinstitucionActual;
+	}
+	
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -165,12 +202,14 @@ public class ParametroItem {
 				Objects.equals(this.idInstitucion, parametroItem.idInstitucion) &&
 				Objects.equals(this.fechaBaja, parametroItem.fechaBaja) &&
 				Objects.equals(this.idRecurso, parametroItem.idRecurso) &&
-				Objects.equals(this.descripcion, parametroItem.descripcion);
+				Objects.equals(this.descripcion, parametroItem.descripcion) &&
+				Objects.equals(this.posibleEliminar, parametroItem.posibleEliminar) &&
+				Objects.equals(this.idinstitucionActual, parametroItem.idinstitucionActual);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(modulo, parametro, valor, idInstitucion, fechaBaja, idRecurso, descripcion);
+		return Objects.hash(modulo, parametro, valor, idInstitucion, fechaBaja, idRecurso, descripcion, posibleEliminar, idinstitucionActual);
 	}
 
 	@Override
@@ -185,6 +224,8 @@ public class ParametroItem {
 		sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
 		sb.append("    idRecurso: ").append(toIndentedString(idRecurso)).append("\n");
 		sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
+		sb.append("    posibleEliminar: ").append(toIndentedString(posibleEliminar)).append("\n");
+		sb.append("    idinstitucionActual: ").append(toIndentedString(idinstitucionActual)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

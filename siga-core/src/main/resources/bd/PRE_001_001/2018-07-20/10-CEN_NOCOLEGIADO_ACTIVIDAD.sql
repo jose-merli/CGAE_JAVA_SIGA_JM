@@ -1,0 +1,3 @@
+ALTER TABLE CEN_NOCOLEGIADO_ACTIVIDAD ADD FECHA_BAJA DATE NULL; -- tarjeta datos registrales
+
+commit;

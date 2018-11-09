@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesDeleteDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
@@ -28,6 +29,7 @@ import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenProvinciasExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -58,6 +60,8 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
 
+	@Autowired
+	private CenInstitucionExtendsMapper cenInstitucionExtendsMapper;
 
 
 	@Override
@@ -434,6 +438,18 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 	}
 	
 	
+	@Override
+	public StringDTO provinciaColegio(StringDTO idInstitucionIntegrante, HttpServletRequest request) {
+		StringDTO idProvincia = new StringDTO();
+		
+		
+		idProvincia = cenInstitucionExtendsMapper.selectProvinciaColegio(idInstitucionIntegrante);
+		
+		
+		return idProvincia;
+	}
+	
+	
 	protected CenCliente rellenarInsertCenCliente(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO,AdmUsuarios usuario) {
 		CenCliente record = new CenCliente();
 		
@@ -464,6 +480,9 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		
 		return crearPersonaDTO;
 	}
+
+
+	
 
 
 	

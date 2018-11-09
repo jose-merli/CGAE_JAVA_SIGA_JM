@@ -2,8 +2,11 @@ package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -41,6 +44,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPoblacionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTipoDireccionExtendsMapper;
 import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -78,6 +82,10 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 	@Autowired
 	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
+	
+	@Autowired
+	private CenPoblacionesExtendsMapper cenPoblacionesExtendsMapper;
+		
 
 	@Override
 	public DatosDireccionesDTO datosDireccionesSearch(int numPagina,
@@ -214,13 +222,25 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 				AdmUsuarios usuario = usuarios.get(0);
 				comboItems = cenPaisExtendsMapper.selectPais(usuario.getIdlenguaje());
-				if (null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
+				if(null != comboItems && comboItems.size() > 0) {
+					/*ComboItem element = new ComboItem();
 					element.setLabel("");
 					element.setValue("");
-					comboItems.add(0, element);
-				}
-
+					comboItems.add(0, element);*/
+					
+					// busqueda binaria de España
+					List<String> listaPaises = comboItems.stream().map(object -> Objects.toString(object.getLabel(), null)).collect(Collectors.toList());
+					int indexSpain = Collections.binarySearch(listaPaises, "ESPAÑA");
+					ComboItem elementSpain = new ComboItem();
+					elementSpain.setLabel(comboItems.get(indexSpain).getLabel());
+					elementSpain.setValue(comboItems.get(indexSpain).getValue());
+					comboItems.add(0, elementSpain);
+					
+					// eliminamos españa del indice anterior
+					comboItems.remove(indexSpain+1);
+					
+				}		
+				
 				comboDTO.setCombooItems(comboItems);
 
 			}
@@ -232,15 +252,14 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	}
 
 	@Override
-	public ComboDTO getPoblacion(HttpServletRequest request, String idProvincia) {
-
+	public ComboDTO getPoblacion(HttpServletRequest request, String idProvincia, String filtro) {
+		 
 		ComboDTO poblacionesReturn = new ComboDTO();
-
-		CenPoblacionesExample example = new CenPoblacionesExample();
-		example.createCriteria().andIdprovinciaEqualTo(idProvincia);
-		example.setOrderByClause("NOMBRE");
-		List<CenPoblaciones> poblaciones = cenPoblacionesMapper.selectByExample(example);
-		if (null != poblaciones && poblaciones.size() > 0) {
+		List<CenPoblaciones> poblaciones = new ArrayList<CenPoblaciones>();
+		
+		poblaciones = cenPoblacionesExtendsMapper.selectByFilter(filtro, idProvincia);
+		
+		if (null != poblaciones && poblaciones.size()>0) {
 			List<ComboItem> combooItems = new ArrayList<ComboItem>();
 			ComboItem comboItem = new ComboItem();
 			comboItem.setLabel("");
@@ -253,40 +272,10 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				comboItem.setValue(cenPoblaciones.getIdpoblacion());
 				combooItems.add(comboItem);
 			}
-
+	
 			poblacionesReturn.setCombooItems(combooItems);
 		}
-
-		return poblacionesReturn;
-	}
-
-	@Override
-	public ComboDTO getPoblacionFiltrado(HttpServletRequest request, String idProvincia, String dataFilter) {
-
-		ComboDTO poblacionesReturn = new ComboDTO();
-
-		CenPoblacionesExample example = new CenPoblacionesExample();
-
-		example.createCriteria().andIdprovinciaEqualTo(idProvincia).andNombreLike("%" + dataFilter + "%");
-		example.setOrderByClause("NOMBRE");
-		List<CenPoblaciones> poblaciones = cenPoblacionesMapper.selectByExample(example);
-		if (null != poblaciones && poblaciones.size() > 0) {
-			List<ComboItem> combooItems = new ArrayList<ComboItem>();
-			ComboItem comboItem = new ComboItem();
-			comboItem.setLabel("");
-			comboItem.setValue("");
-			combooItems.add(comboItem);
-
-			for (CenPoblaciones cenPoblaciones : poblaciones) {
-				comboItem = new ComboItem();
-				comboItem.setLabel(cenPoblaciones.getNombre());
-				comboItem.setValue(cenPoblaciones.getIdpoblacion());
-				combooItems.add(comboItem);
-			}
-
-			poblacionesReturn.setCombooItems(combooItems);
-		}
-
+		
 		return poblacionesReturn;
 	}
 
@@ -388,6 +377,10 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
 				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
+				if(datosDireccionesItem.getPoblacionExtranjera()!= "" &&  datosDireccionesItem.getPoblacionExtranjera() != null) {
+					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
+				}
+
 
 				CenDireccionTipodireccionExample tipoDireccionexample = new CenDireccionTipodireccionExample();
 				tipoDireccionexample.createCriteria()
@@ -440,7 +433,6 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							TipoDireccionrecord.setIdtipodireccion(Short.valueOf(idTipoDireccionInsertar));
 							TipoDireccionrecord.setFechamodificacion(new Date());
 							TipoDireccionrecord.setUsumodificacion(usuario.getIdusuario());
-							// insertamos los nuevos tipos de direccion asociados a la direccion
 							LOGGER.info(
 									"updateDirection() / cenDireccionTipodireccionMapper.insert() -> Entrada a cenDireccionTipodireccionMapper para insertar tiposdedirecciones");
 							cenDireccionTipodireccionMapper.insert(TipoDireccionrecord);
@@ -599,7 +591,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
 				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
-
+				if(datosDireccionesItem.getPoblacionExtranjera()!= "" &&  datosDireccionesItem.getPoblacionExtranjera() != null) {
+					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
+				}				
 				LOGGER.info(
 						"createDirection() / cenDireccionesExtendsMapper.insert() -> Entrada a cenDireccionesExtendsMapper para insertar direcciones");
 				response = cenDireccionesExtendsMapper.insert(direcciones);

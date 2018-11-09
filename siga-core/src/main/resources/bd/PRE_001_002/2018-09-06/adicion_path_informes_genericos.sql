@@ -1,0 +1,1 @@
+Update Gen_Menu men Set men.Path = 'informesGenericos' Where men.Idmenu = 'I00';
