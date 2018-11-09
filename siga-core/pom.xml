@@ -103,6 +103,18 @@
 		    <artifactId>poi</artifactId>
 		    <version>3.13</version>
 		</dependency>  
+		<dependency>
+			<groupId>org.redabogacia.alterMutuaServ</groupId>
+			<artifactId>AlterMutuaServ</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.redabogacia.mutualidad</groupId>
+			<artifactId>mutualidadServ</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
 	</dependencies>
 	
 

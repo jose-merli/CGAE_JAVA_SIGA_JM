@@ -35,6 +35,7 @@ public class DatosDireccionesItem {
 	private String fechaModificacion;
 	private String motivo;
 	private boolean esColegiado;
+	private String nombrepartido;
 	
 	
 	
@@ -289,6 +290,14 @@ public class DatosDireccionesItem {
 		this.esColegiado = esColegiado;
 	}
 
+	public String getNombrepartido() {
+		return nombrepartido;
+	}
+
+	public void setNombrepartido(String nombrepartido) {
+		this.nombrepartido = nombrepartido;
+	}
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -324,14 +333,16 @@ public class DatosDireccionesItem {
 	    		Objects.equals(this.fechaModificacion, datosDireccionesItem.fechaModificacion) &&
 	    		Objects.equals(this.fax, datosDireccionesItem.fax) &&
 	    		Objects.equals(this.motivo, datosDireccionesItem.motivo) &&
-	    		Objects.equals(this.esColegiado, datosDireccionesItem.esColegiado);
+	    		Objects.equals(this.esColegiado, datosDireccionesItem.esColegiado) &&
+	    		Objects.equals(this.nombrepartido, datosDireccionesItem.nombrepartido);
+
 	}
 	
 	@Override
 	public int hashCode() {
 	    return Objects.hash(idInstitucion,tipoDireccion,idDireccion,codigoPostal,domicilio,domicilioLista,idPoblacion,idProvincia,idPais,telefono,fechaBaja,movil,
 	    		correoElectronico, idExternoPais, nombrePais, idExternoPoblacion, nombrePoblacion, idExternoProvincia, fechaModificacion,nombreProvincia, fax,paginaWeb,idPersona,otraProvincia,idTipoDireccion,
-	    		motivo, esColegiado);
+	    		motivo, esColegiado, nombrepartido);
 	}
 
 	
@@ -367,8 +378,13 @@ public class DatosDireccionesItem {
 	    sb.append("    fechaModificacion: ").append(toIndentedString(fechaModificacion)).append("\n");
 	    sb.append("    motivo: ").append(toIndentedString(motivo)).append("\n");
 	    sb.append("    esColegiado: ").append(toIndentedString(esColegiado)).append("\n");
+	    sb.append("    nombrepartido: ").append(toIndentedString(nombrepartido)).append("\n");
+
+	    
 	    sb.append("}");
 	    return sb.toString();
 	}
+
+
 	
 }

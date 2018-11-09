@@ -19,7 +19,8 @@ public class ColegiadoItem {
 	private String telefono;
 	private String movil;
 	private String estadoColegial;	
-	
+	private String [] grupos;
+
 	private String  apellidos;
 //	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date [] fechaIncorporacion;
@@ -64,9 +65,9 @@ public class ColegiadoItem {
 	private Date fechaNacimientoDate;
 	private Date fechaBajaDate;
 	
-	
 	private String idTratamiento;
-	
+	private String descripcion;
+	private String observaciones;
 	
 
 	
@@ -87,6 +88,43 @@ public class ColegiadoItem {
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
 	}
+	
+	/**
+	 *
+	 */
+	
+
+	
+	public ColegiadoItem descripcion(String descripcion){
+		this.descripcion = descripcion;
+		return this;
+	}
+	
+	@JsonProperty("descripcion")
+	public String getDescripcion() {
+		return descripcion;
+	}
+	
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
+	/**
+	 */
+	public ColegiadoItem grupos(String [] grupos){
+		this.grupos = grupos;
+		return this;
+	}
+	
+	@JsonProperty("grupos")
+	public String[] getGrupos() {
+		return grupos;
+	}
+
+	public void setGrupos(String[] grupos) {
+		this.grupos = grupos;
+	}
+	
 	
 	/**
 	 *
@@ -122,6 +160,24 @@ public class ColegiadoItem {
 		this.idInstitucion = idInstitucion;
 	}
 		
+	/**
+	 *
+	 */
+	
+	public ColegiadoItem observaciones(String observaciones){
+		this.observaciones = observaciones;
+		return this;
+	}
+	
+	@JsonProperty("observaciones")
+	public String getObservaciones() {
+		return observaciones;
+	}
+	
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
+	
 	/**
 	 *
 	 */
@@ -966,13 +1022,14 @@ public class ColegiadoItem {
 		this.idTratamiento = idTratamiento;
 	}
 	
+
 	@Override
 	public int hashCode() {
 	    return Objects.hash(idPersona, idInstitucion, nif, nombre, numColegiado, residenteInscrito,	fechaNacimiento, correo, telefono, movil, estadoColegial,
 	    		fechaBaja, apellidos, fechaIncorporacion, situacion, residencia, inscrito, idProvincia, idPoblacion, codigoPostal, tipoDireccion, sexo, 
 	    		idEstadoCivil, domicilio, tipoCV, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
 	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion, 
-	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate);
+	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate, observaciones);
 	}
 
 
@@ -1034,6 +1091,7 @@ public class ColegiadoItem {
 	    sb.append("    fechaBajaDate: ").append(toIndentedString(fechaBajaDate)).append("\n");
 	    sb.append("    fechaAltaDate: ").append(toIndentedString(fechaAltaDate)).append("\n");
 	    sb.append("    incorporacionDate: ").append(toIndentedString(incorporacionDate)).append("\n");
+	    sb.append("    observaciones: ").append(toIndentedString(observaciones)).append("\n");
 
 	    
 		
@@ -1051,6 +1109,8 @@ public class ColegiadoItem {
 	    }
 	    return o.toString().replace("\n", "\n    ");
 	}
+
+
 
 
 

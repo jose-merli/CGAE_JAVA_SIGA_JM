@@ -47,7 +47,7 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "FECHAJURA", property = "fechaJura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHATITULACION", property = "fechaTitulacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDTIPOSSERGURO", property = "idTiposSeguro", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDTIPOSSEGURO", property = "idTiposSeguro", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "COMISIONES", property = "comisiones", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PARTIDOJUDICIAL", property = "partidoJudicial", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
@@ -64,6 +64,17 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 	})
 	List<ColegiadoItem> selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem);
 
+	
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiaciones")
+	@Results({ 
+		@Result(column = "FECHAINCORPORACION", property = "incorporacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ColegiadoItem> selectColegiaciones(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem);
+	
+	
 	@InsertProvider(type = CenColegiadoSqlExtendsProvider.class, method = "insertSelectiveForCreateNewColegiado")
 	int insertSelectiveForCreateNewColegiado(String idInstitucion, AdmUsuarios usuario,CenColegiado cenColegiado);
 	

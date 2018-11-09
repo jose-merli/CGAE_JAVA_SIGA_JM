@@ -32,7 +32,6 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBancos;
 import org.itcgae.siga.db.entities.CenCliente;
-import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
@@ -43,6 +42,7 @@ import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
@@ -50,7 +50,6 @@ import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDocumentacionmodalidadExtendsMapper;
@@ -114,9 +113,6 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	private CenPersonaExtendsMapper _cenPersonaExtendsMapper;
 	
 	@Autowired
-	private CenDireccionesExtendsMapper _cenDireccionesExtendsMapper;
-	
-	@Autowired
 	private CenDireccionesMapper _cenDireccionesMapper;
 	
 	@Autowired
@@ -128,9 +124,11 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	@Autowired
 	private CenColegiadoMapper _cenColegiadoMapper;
 	
-	
 	@Autowired
 	private CenClienteMapper _cenClienteMapper;
+	
+	@Autowired
+	private CenBancosMapper _cenBancosMapper;
 	
 	
 	@Override
@@ -506,7 +504,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 										+ " .Insertado el id correctamente en la tabla Cen_SolicitudIncorporacion");
 					}
 				}catch(Exception e){
-					error.setCode(Integer.parseInt(SigaConstants.KO));
+					error.setCode(500);
 					error.setMessage(e.getMessage());
 					response.setStatus(SigaConstants.KO);
 					response.setError(error);
@@ -604,6 +602,8 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					}
 					
 				}catch(Exception e){
+					
+					
 					error.setMessage(e.getMessage());
 					response.setStatus(SigaConstants.KO);
 					response.setError(error);
@@ -622,7 +622,6 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		int update = 0;
 		InsertResponseDTO response = new InsertResponseDTO();
 		Error error = new Error();
-		CenSolicitudincorporacion solIncorporacion;
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -842,6 +841,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		banco.setIdpais(solicitud.getIdpais());
 		banco.setNombre(codigoBanco);
 		banco.setUsumodificacion(usuario.getIdusuario());
+		_cenBancosMapper.insert(banco);
 		
 		
 		
@@ -979,6 +979,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		colegiado.setIdinstitucion(usuario.getIdinstitucion());
 		colegiado.setNcolegiado(solicitud.getNcolegiado());
 		colegiado.setUsumodificacion(usuario.getIdusuario());
+		colegiado.setNumsolicitudcolegiacion(solicitud.getIdsolicitud().toString());
 		colegiado.setFechapresentacion(new Date());
 		colegiado.setJubilacioncuota("0");
 		colegiado.setComunitario("0");

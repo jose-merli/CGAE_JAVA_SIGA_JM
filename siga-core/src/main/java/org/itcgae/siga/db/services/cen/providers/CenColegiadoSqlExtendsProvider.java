@@ -38,7 +38,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("TO_CHAR(col.fechajura,'DD/MM/YYYY') AS fechajura");
 		sql.SELECT("TO_CHAR(col.fechatitulacion,'DD/MM/YYYY') AS fechatitulacion");
 		sql.SELECT("TO_CHAR(col.fechapresentacion,'DD/MM/YYYY') AS fechapresentacion");
-		sql.SELECT_DISTINCT("col.idtiposseguro");
+		sql.SELECT_DISTINCT("TO_CHAR(col.idtiposseguro) AS idTiposSeguro");
 		sql.SELECT_DISTINCT("cli.comisiones");
 		sql.SELECT_DISTINCT("cli.idtratamiento");
 		sql.SELECT_DISTINCT("decode(col.comunitario,0, col.ncolegiado,col.ncomunitario) as numcolegiado");
@@ -215,6 +215,33 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		return sql.toString();
 	}
+	
+	
+	
+	public String selectColegiaciones(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("TO_CHAR(fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
+		sql.SELECT("cat.descripcion as estadoColegial");
+		sql.SELECT("situacionresidente as residenteInscrito");
+		sql.SELECT("observaciones");
+		
+		sql.FROM("cen_colegiado col");
+		sql.INNER_JOIN("CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion )");
+		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
+		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '"+idLenguaje+"')");
+		
+		sql.WHERE("col.idpersona = '"+ colegiadoItem.getIdPersona() +"'");
+		sql.WHERE("colest.idinstitucion = '"+ idInstitucion + "'");
+//		sql1.WHERE("dir.fechabaja is null");
+		
+		sql.ORDER_BY("fechaestado");
+		//sql.ORDER_BY("per.nombre");
+
+		return sql.toString();
+	}
+	
 	
 	public String insertSelectiveForCreateNewColegiado(String idInstitucion, AdmUsuarios usuario,
 			CenColegiado cenColegiado) {

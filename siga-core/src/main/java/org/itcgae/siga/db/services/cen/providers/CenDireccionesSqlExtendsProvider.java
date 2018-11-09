@@ -49,6 +49,22 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 	}
 
 	
+	
+	public String selectPartidoJudicial(String idPersona, String idInstitucion) {		
+		SQL sql = new SQL();
+		
+
+		sql.SELECT("PARTIDO.NOMBRE AS NOMBREPARTIDO");
+		sql.FROM("CEN_DIRECCIONES DIR");
+		sql.INNER_JOIN(" CEN_POBLACIONES POB ON DIR.IDPOBLACION = POB.IDPOBLACION ");
+		sql.INNER_JOIN(" CEN_DIRECCION_TIPODIRECCION TP ON DIR.IDDIRECCION = TP.IDDIRECCION AND DIR.IDPERSONA = TP.IDPERSONA AND TP.IDINSTITUCION = DIR.IDINSTITUCION AND TP.IDTIPODIRECCION = '2'");
+		sql.INNER_JOIN(" CEN_PARTIDOJUDICIAL PARTIDO ON POB.IDPARTIDO = PARTIDO.IDPARTIDO");
+		sql.WHERE(" dir.idpersona = '"+idPersona+"' and dir.idinstitucion = '"+idInstitucion+"' and dir.fechabaja is null");
+		
+		
+		return sql.toString();
+	}
+	
 	public String selectDirecciones(DatosDireccionesSearchDTO datosDireccionesSearchDTO,String idInstitucion) {
 		
 		SQL sqlPrincipal = new SQL();
