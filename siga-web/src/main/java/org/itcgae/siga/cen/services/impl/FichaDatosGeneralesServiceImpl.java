@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
 import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
@@ -111,11 +112,11 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				"updateColegiado() -> Entrada al servicio para actualizar información general de un colegiado");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		List<CenDatoscolegialesestado> cenDatoscolegialesestado = new ArrayList<CenDatoscolegialesestado>();
-		List<ComboItem> gruposPersona = new ArrayList<ComboItem>();
+		List<ComboEtiquetasItem> gruposPersona = new ArrayList<ComboEtiquetasItem>();
 		EtiquetaUpdateDTO etiquetaUpdateDTO = new EtiquetaUpdateDTO();
 		List<String> gruposNuevosNoAniadidos = new ArrayList<String>();
 		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
-
+		ComboEtiquetasItem comboEtiquetasItem = new ComboEtiquetasItem();
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -147,8 +148,8 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				List<String> gruposPerJuridicaAnterior = new ArrayList<String>();
 
 				for (int i = 0; i < gruposPersona.size(); i++) {
-					gruposPerJuridicaAntiguos.add(gruposPersona.get(i).getValue());
-					gruposPerJuridicaAnterior.add(gruposPersona.get(i).getValue());
+					gruposPerJuridicaAntiguos.add(gruposPersona.get(i).getIdGrupo());
+					gruposPerJuridicaAnterior.add(gruposPersona.get(i).getIdGrupo());
 				}
 
 				// 2. actualizar relaciones entre tablas para todos los grupos (eliminado y
@@ -185,9 +186,9 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							if (listarelacionGrupoPersona.isEmpty()) {
 								LOGGER.info(
 										"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
-
+//								revisar
 								int response = cenGruposclienteClienteExtendsMapper.insertSelectiveForUpdateLegalPerson(
-										etiquetaUpdateDTO, String.valueOf(idInstitucion), grupo,
+										comboEtiquetasItem, String.valueOf(idInstitucion), grupo,
 										String.valueOf(usuario.getIdusuario()));
 								LOGGER.info(
 										"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
