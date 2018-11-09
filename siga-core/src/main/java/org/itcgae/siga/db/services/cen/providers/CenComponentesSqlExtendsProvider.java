@@ -12,13 +12,61 @@ import org.itcgae.siga.db.mappers.CenComponentesSqlProvider;
 
 public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 
-	
-	public String selectIntegrantes(DatosIntegrantesSearchDTO integrantesSearchDTO, String idInstitucion) {
+	public String selectIntegrantesWS(DatosIntegrantesSearchDTO integrantesSearchDTO, String idInstitucion) {
 		
 		SQL sql = new SQL();
 		
-		sql.SELECT_DISTINCT("COMPONENTE.IDINSTITUCION");
-		sql.SELECT("COMPONENTE.IDPERSONA");
+		sql.SELECT_DISTINCT("COMPONENTE.IDINSTITUCION idInstitucionSociedad");
+		sql.SELECT("COMPONENTE.IDPERSONA idSociedad");
+		sql.SELECT("COMPONENTE.IDCOMPONENTE");
+		sql.SELECT("COMPONENTE.FECHAMODIFICACION FECHAMODIFICACION");
+		sql.SELECT("DECODE (PERSONA.IDTIPOIDENTIFICACION, 10, 'NIF', 40, 'NIE', 20, 'CIF', NULL) AS TIPOIDENTIFICACION");
+		sql.SELECT("PERSONA.NIFCIF");
+		sql.SELECT("PERSONA.NOMBRE");
+		sql.SELECT("DECODE(PERSONA.APELLIDOS1,'#NA','',PERSONA.APELLIDOS1) AS APELLIDOS1");
+		sql.SELECT("PERSONA.APELLIDOS2");
+		sql.SELECT("DECODE(PERSONA.IDTIPOIDENTIFICACION,'20','1','0') AS PERSONAJURIDICA");
+		sql.SELECT("DECODE(f_siga_gettipocliente(COMPONENTE.CEN_CLIENTE_IDPERSONA,COMPONENTE.CEN_CLIENTE_IDINSTITUCION,SYSDATE),20,1,0) AS profesionalAbogado");
+		sql.SELECT("DECODE(DECODE(f_siga_gettipocliente(COMPONENTE.CEN_CLIENTE_IDPERSONA,COMPONENTE.CEN_CLIENTE_IDINSTITUCION,SYSDATE),20,1,0), 1, 0, DECODE(ACTIVIDAD.descripcion, NULL, 0, 1)) AS PROFESIONAL");
+		sql.SELECT("f_siga_getrecurso(ACTIVIDAD.descripcion, 1) AS  profesion");
+		sql.SELECT("decode(COMPONENTE.IDTIPOCOLEGIO, 41, INST.CODIGOEXT, 1, INST.CODIGOEXT, null) as codigocolegio");
+		sql.SELECT("decode(COMPONENTE.IDTIPOCOLEGIO, 1,  INST.NOMBRE, PROVINCIAS.NOMBRE) as descripcionColegio");
+		sql.SELECT("COMPONENTE.NUMCOLEGIADO");
+		sql.SELECT("COMPONENTE.FLAG_SOCIO AS SOCIO");
+		sql.SELECT("f_siga_getrecurso(CARGO.descripcion, 1) cargo");
+		sql.SELECT("COMPONENTE.CARGO descripcionCargo");
+		sql.SELECT("TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy') AS FECHACARGO");
+		sql.SELECT("COMPONENTE.FECHABAJA AS FECHABAJACARGO");
+		sql.SELECT("DECODE(COMPONENTE.SOCIEDAD,1,'SI','NO') AS SOCIEDAD");
+		
+		sql.FROM("CEN_COMPONENTES COMPONENTE");
+		sql.INNER_JOIN("CEN_PERSONA PERSONA ON PERSONA.IDPERSONA = COMPONENTE.CEN_CLIENTE_IDPERSONA");
+		sql.LEFT_OUTER_JOIN("CEN_INSTITUCION INST ON COMPONENTE.IDINSTITUCION = INST.IDINSTITUCION");
+		sql.LEFT_OUTER_JOIN("CEN_CARGO CARGO ON CARGO.IDCARGO=COMPONENTE.IDCARGO");
+		sql.LEFT_OUTER_JOIN("CEN_ACTIVIDADPROFESIONAL ACTIVIDAD ON (ACTIVIDAD.IDACTIVIDADPROFESIONAL = COMPONENTE.IDTIPOCOLEGIO)");
+		sql.LEFT_OUTER_JOIN("CEN_PROVINCIAS PROVINCIAS ON PROVINCIAS.CODIGOEXT = COMPONENTE.IDPROVINCIA");
+		
+		sql.WHERE("COMPONENTE.FECHABAJA is null");
+		
+		if (!UtilidadesString.esCadenaVacia(integrantesSearchDTO.getIdPersona())) {
+			sql.WHERE("COMPONENTE.IDPERSONA = '" + integrantesSearchDTO.getIdPersona() + "'");
+		}
+		if (!UtilidadesString.esCadenaVacia(idInstitucion)) {
+			sql.WHERE("COMPONENTE.idinstitucion = '" + idInstitucion + "'");
+		}
+		
+		sql.ORDER_BY("COMPONENTE.IDCOMPONENTE");
+		
+		return sql.toString();
+	}
+	public String selectIntegrantes(DatosIntegrantesSearchDTO integrantesSearchDTO, String idInstitucion) {
+		
+		SQL sql = new SQL();
+		SQL sql1 = new SQL();
+		SQL sql2 = new SQL();
+				
+        sql.SELECT_DISTINCT("COMPONENTE.IDINSTITUCION");
+        sql.SELECT("COMPONENTE.IDPERSONA");
 		sql.SELECT("COMPONENTE.IDCOMPONENTE");
 		sql.SELECT("COMPONENTE.CARGO");
 		sql.SELECT("TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy') AS FECHACARGO");
@@ -27,7 +75,8 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.SELECT("DECODE(COMPONENTE.SOCIEDAD,1,'SI','NO') AS SOCIEDAD");
 		sql.SELECT("COMPONENTE.CAPITALSOCIAL");
 		sql.SELECT("TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy') AS FECHACARGOINFORME");
-		sql.SELECT("DECODE(f_siga_gettipocliente(COMPONENTE.CEN_CLIENTE_IDPERSONA,COMPONENTE.CEN_CLIENTE_IDINSTITUCION,SYSDATE),20,'Ejerciente','') AS EJERCIENTE");
+		//sql.SELECT("DECODE(f_siga_gettipocliente(COMPONENTE.CEN_CLIENTE_IDPERSONA,COMPONENTE.CEN_CLIENTE_IDINSTITUCION,SYSDATE),20,'Ejerciente','') AS EJERCIENTE");
+		sql.SELECT("NVL(CAT.DESCRIPCION, DECODE(PERSONA.IDTIPOIDENTIFICACION,20,'SOCIEDAD','NO COLEGIADO')) AS EJERCIENTE");
 		sql.SELECT("DECODE(TO_CHAR(COMPONENTE.FECHABAJA, 'dd/mm/yyyy'), NULL,TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy'),TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy') || ' -(' || TO_CHAR(COMPONENTE.FECHABAJA, 'dd/mm/yyyy') || ') ' ) AS FECHA_HISTORICO");
 		sql.SELECT("PERSONA.NIFCIF");
 		sql.SELECT("PERSONA.NOMBRE");
@@ -39,6 +88,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.SELECT("COMPONENTE.NUMCOLEGIADO");
 		sql.SELECT("COMPONENTE.IDCARGO");
 		sql.SELECT("COMPONENTE.IDPROVINCIA");
+		sql.SELECT("COMPONENTE.FLAG_SOCIO");
 		sql.SELECT("RECURSOCARGO.DESCRIPCION AS DESCRIPCIONCARGO");
 		sql.SELECT("INST.CODIGOEXT AS COLEGIO");
 		sql.SELECT("INST.NOMBRE AS NOMBRECOLEGIO");
@@ -50,9 +100,33 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.INNER_JOIN(" CEN_CLIENTE CLIENTE ON CLIENTE.IDPERSONA = COMPONENTE.CEN_CLIENTE_IDPERSONA ");
 		sql.INNER_JOIN(" CEN_INSTITUCION INST ON COMPONENTE.IDINSTITUCION = INST.IDINSTITUCION");
 		sql.LEFT_OUTER_JOIN("CEN_CARGO CARGO ON CARGO.IDCARGO=COMPONENTE.IDCARGO");
-		sql.LEFT_OUTER_JOIN("gen_recursos_catalogos RECURSOCARGO on (CARGO.descripcion = idrecurso AND RECURSOCARGO.IDLENGUAJE = '1')");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS RECURSOCARGO on (CARGO.descripcion = idrecurso AND RECURSOCARGO.IDLENGUAJE = '1')");
 		sql.LEFT_OUTER_JOIN("CEN_ACTIVIDADPROFESIONAL ACTIVIDAD ON (ACTIVIDAD.IDACTIVIDADPROFESIONAL = COMPONENTE.IDTIPOCOLEGIO )");
-		sql.LEFT_OUTER_JOIN("gen_recursos_catalogos RECURSOACTIVIDAD on (ACTIVIDAD.descripcion = RECURSOACTIVIDAD.idrecurso AND RECURSOACTIVIDAD.IDLENGUAJE = '1')");
+
+		sql1.SELECT("A.IDINSTITUCION");
+		sql1.SELECT("A.IDPERSONA");
+		sql1.SELECT("A.IDESTADO");
+		
+		sql2.SELECT("IDINSTITUCION");
+		sql2.SELECT("IDPERSONA");
+		sql2.SELECT("MAX(FECHAESTADO) AS FE");
+		sql2.FROM("CEN_DATOSCOLEGIALESESTADO");
+		sql2.GROUP_BY("IDINSTITUCION");
+		sql2.GROUP_BY("IDPERSONA");
+			
+		
+		sql1.FROM("CEN_DATOSCOLEGIALESESTADO A, (" + sql2 + ") B");
+		sql1.WHERE("A.IDINSTITUCION=B.IDINSTITUCION");
+		sql1.WHERE("A.IDPERSONA=B.IDPERSONA");
+		sql1.WHERE("A.FECHAESTADO=B.FE");
+		
+		sql.LEFT_OUTER_JOIN("(" + sql1 + ") DATOSCOLEGIALES ON (DATOSCOLEGIALES.IDPERSONA = COMPONENTE.CEN_CLIENTE_IDPERSONA AND DATOSCOLEGIALES.IDINSTITUCION = COMPONENTE.CEN_CLIENTE_IDINSTITUCION)");
+		
+		sql.LEFT_OUTER_JOIN("CEN_ESTADOCOLEGIAL ESTCOL on (DATOSCOLEGIALES.IDESTADO =  ESTCOL.IDESTADO)");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS RECURSOACTIVIDAD on (ACTIVIDAD.descripcion = RECURSOACTIVIDAD.idrecurso AND RECURSOACTIVIDAD.IDLENGUAJE = '1')");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS CAT on ( ESTCOL.descripcion = CAT.idrecurso AND CAT.IDLENGUAJE = '1')");
+	
+		
 		sql.WHERE("COMPONENTE.IDPERSONA = '"+integrantesSearchDTO.getIdPersona()+"'");
 		if (!integrantesSearchDTO.getHistorico()) {
 			sql.WHERE("COMPONENTE.FECHABAJA is null");
@@ -62,6 +136,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		}
 		
 		sql.ORDER_BY("COMPONENTE.IDCOMPONENTE");
+
 		return sql.toString();
 	}
 	
@@ -90,13 +165,17 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.SET("IDCARGO = '" + tarjetaIntegrantesUpdateDTO.getIdCargo() + "'");
 		}
 		
-		if(!tarjetaIntegrantesUpdateDTO.getCapitalSocial().equals("")) {
-			sql.SET("CAPITALSOCIAL = '" + tarjetaIntegrantesUpdateDTO.getCapitalSocial() + "'");
+		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getFlagSocio())) {
+			sql.SET("FLAG_SOCIO = '" + tarjetaIntegrantesUpdateDTO.getFlagSocio() + "'");
 		}
 
 		
+		
+		sql.SET("CAPITALSOCIAL = '" + tarjetaIntegrantesUpdateDTO.getCapitalSocial() + "'");
 		sql.SET("FECHAMODIFICACION = SYSDATE");
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario()+ "'");
+		
 		
 		
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
@@ -146,25 +225,26 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.VALUES("IDTIPOCOLEGIO", "'" + tarjetaIntegrantesCreateDTO.getIdTipoColegio() + "'");
 		}
 		
-		if(!tarjetaIntegrantesCreateDTO.getIdProvincia().equals("")) {
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getIdProvincia())) {
 			sql.VALUES("IDPROVINCIA", "'" + tarjetaIntegrantesCreateDTO.getIdProvincia() + "'");
 		}
 		
-		if(!tarjetaIntegrantesCreateDTO.getNumColegiado().equals("")) {
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getFlagSocio())) {
+			sql.SET("FLAG_SOCIO = '" + tarjetaIntegrantesCreateDTO.getFlagSocio() + "'");
+		}
+		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getNumColegiado())) {
 			sql.VALUES("NUMCOLEGIADO", "'" + tarjetaIntegrantesCreateDTO.getNumColegiado() + "'");
 		}
 		
-		if(!tarjetaIntegrantesCreateDTO.getCapitalSocial().equals("")) {
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getCapitalSocial())) {
 			sql.VALUES("CAPITALSOCIAL", "'" + tarjetaIntegrantesCreateDTO.getCapitalSocial() + "'");
 		}
 		
-		if(!tarjetaIntegrantesCreateDTO.getIdCargo().equals("")) {
+		if(UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getIdCargo())) {
 			sql.VALUES("IDCARGO", "'" + tarjetaIntegrantesCreateDTO.getIdCargo() + "'");
 		}
 		
-		
-		
-		sql.VALUES("FECHABAJA", "null");
 		
 		return sql.toString();
 	}

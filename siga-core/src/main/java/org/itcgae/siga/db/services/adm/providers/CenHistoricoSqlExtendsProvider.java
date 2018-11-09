@@ -32,7 +32,7 @@ public class CenHistoricoSqlExtendsProvider {
 		sql.INNER_JOIN(" CEN_PERSONA PER ON HIST.IDPERSONA = PER.IDPERSONA ");
 		sql.INNER_JOIN(" CEN_TIPOCAMBIO TIPO ON TIPO.IDTIPOCAMBIO = HIST.IDTIPOCAMBIO ");
 		sql.INNER_JOIN(" GEN_RECURSOS_CATALOGOS CAT ON  CAT.IDRECURSO = TIPO.DESCRIPCION ");
-		sql.INNER_JOIN(" ADM_USUARIOS USU ON HIST.USUMODIFICACION = USU.IDUSUARIO ");
+		sql.INNER_JOIN(" ADM_USUARIOS USU ON HIST.USUMODIFICACION = USU.IDUSUARIO AND HIST.IDINSTITUCION = USU.IDINSTITUCION ");
 
 		// campos que pueden ser opcionales
 		if(null != historicoUsuarioRequestDTO.getIdTipoAccion() && !historicoUsuarioRequestDTO.getIdTipoAccion().equalsIgnoreCase("")){
@@ -47,11 +47,11 @@ public class CenHistoricoSqlExtendsProvider {
 		}
 		if(null != historicoUsuarioRequestDTO.getFechaDesde()) {
 			String fechaDesde = dateFormat.format(historicoUsuarioRequestDTO.getFechaDesde());
-			sql.WHERE(" TO_DATE(HIST.FECHAEFECTIVA,'DD/MM/YYYY') >= TO_DATE('" +fechaDesde + "', 'DD/MM/YYYY') ");
+			sql.WHERE(" HIST.FECHAEFECTIVA >= TO_DATE('" +fechaDesde + "', 'DD/MM/YYYY') ");
 		}
 		if(null != historicoUsuarioRequestDTO.getFechaHasta()) {
 			String fechaHasta = dateFormat.format(historicoUsuarioRequestDTO.getFechaHasta());
-			sql.WHERE(" TO_DATE(HIST.FECHAEFECTIVA,'DD/MM/YYYY') <= TO_DATE('" +fechaHasta + "', 'DD/MM/YYYY') ");
+			sql.WHERE(" HIST.FECHAEFECTIVA < TO_DATE('" +fechaHasta + "', 'DD/MM/YYYY') + 1");
 		}
 		if(null != historicoUsuarioRequestDTO.getUsuarioAutomatico() && historicoUsuarioRequestDTO.getUsuarioAutomatico().equals("S")) {
 			sql.WHERE(" HIST.USUMODIFICACION = '0'");

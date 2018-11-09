@@ -11,9 +11,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.xmlbeans.XmlObject;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
-import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.DatosIntegrantesWS;
 import org.itcgae.siga.DTOs.cen.SociedadesBajaDTO;
 import org.itcgae.siga.DTOs.cen.SociedadesEditadasDTO;
 import org.itcgae.siga.commons.constants.SigaConstants.ERROR_SERVER;
@@ -31,7 +30,6 @@ import org.itcgae.siga.db.mappers.CargasWsPaginaMapper;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.CfgParamColegiosMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.GuardarXmlDaoImpl;
 import org.itcgae.siga.exception.BusinessException;
@@ -68,7 +66,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class WSCommons {
@@ -94,8 +91,6 @@ public class WSCommons {
 	@Autowired
 	private CenComponentesExtendsMapper cenComponentesExtendsMapper;
 
-	@Autowired
-	private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
 	
 	private int tamanoPaginacion;
 
@@ -382,7 +377,8 @@ public class WSCommons {
 		return (short) (bool ? 1 : 0);
 	}
 	
-	public RegistroSociedad[] cargarSociedades(GetListaSociedadesRequest peticion, Long idWsPagina, Short idInstitucion) {
+	
+	public RegistroSociedad[] cargarSociedades(GetListaSociedadesRequest peticion, GetListaSociedadesResponse respuesta, Long idWsPagina, Short idInstitucion) {
 
 		//Nos disponemos a consultar los datos de las sociedades que han sufrido modificacion
 		try {
@@ -394,6 +390,7 @@ public class WSCommons {
 			List<SociedadesBajaDTO> sociedadesEnBaja = cenNoColegiado.selectSociedadesEliminadas(idInstitucion,peticion.getFechaDesde().getTime(),peticion.getFechaHasta().getTime());
 			
 			List<SociedadesBajaDTO> sociedadesResult = new ArrayList<>();
+
 			short totalPaginas = 0;
 			if (sociedadesEnBaja.size() == 0) {
 				LOGGER.info("No se ha encontrado ninguna sociedad con los filtros seleccionados");
@@ -406,8 +403,17 @@ public class WSCommons {
 						sociedadesResult = sociedadesEnBaja.subList((peticion.getNumPagina() - 1) * tamanoPaginacion,
 								sociedadesEnBaja.size());
 					}
+					
+					// Se calcula el numero total de paginas
+					totalPaginas = (short) (sociedadesResult.size() / tamanoPaginacion);
+					if (sociedadesResult.size() % tamanoPaginacion > 0) {
+						totalPaginas++;
+					}
+					respuesta.setNumTotalPaginas(totalPaginas);
+					
 				}else{
 					sociedadesResult.addAll(sociedadesEnBaja);
+					respuesta.setNumTotalPaginas((short)1);
 				}
 				
 				// Se calcula el numero total de paginas
@@ -435,58 +441,161 @@ public class WSCommons {
 					List<SociedadActualizacion> sociedadesEditadasFinal = new ArrayList<SociedadActualizacion>();
 					for (SociedadesEditadasDTO regSociedad : sociedadesEditadas) {
 						SociedadActualizacion sociedadActualizacion = SociedadActualizacion.Factory.newInstance();
-						DatosPersona argNotario = DatosPersona.Factory.newInstance();
-						//Insertamos el Notario
-						argNotario.setApellido1(regSociedad.getNotarioApellido1());
-						argNotario.setApellido2(regSociedad.getNotarioApellido2());
-						argNotario.setNombre(regSociedad.getNotarioNombre());
-						Identificacion identificacion = Identificacion.Factory.newInstance() ;
-						identificacion.setNIF(regSociedad.getNotarioIdentificacion());
-						argNotario.setIdentificacion(identificacion);
-						sociedadActualizacion.setDatosNotario(argNotario);
+						
+						boolean argPublicar = Boolean.FALSE;
+
+						sociedadActualizacion.setPublicar(argPublicar);
+						Resena argResena = Resena.Factory.newInstance();
+						if(regSociedad.getResena()!=null){
+							if(regSociedad.getResena().length()>100){
+								argResena.setStringValue(regSociedad.getResena().substring(0, 99));
+							}else{
+								argResena.setStringValue(regSociedad.getResena());
+							}
+						}
+						sociedadActualizacion.setResena(argResena);
+						if (null != regSociedad.getObjetoSocial()) {
+							if(regSociedad.getObjetoSocial().length()>=20){
+								sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial().substring(0, 20));
+							}else{
+								sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
+							}
+						}
+						
 						//Insertamos los datos del registro
 						DatosRegistro argRegistro = DatosRegistro.Factory.newInstance();
 						argRegistro.setFechaCancelacion(UtilidadesString.toCalendar(regSociedad.getFechaCancelacion()));
-						argRegistro.setFechaInscripcion(UtilidadesString.toCalendar(regSociedad.getFechaConstitucion()));
+						argRegistro.setFechaInscripcion(UtilidadesString.toCalendar(regSociedad.getFechaInscripcion()));
 						argRegistro.setIdentificacionRegistro(regSociedad.getIdentificacionRegistro());
 						argRegistro.setNumeroRegistro(regSociedad.getNumeroRegistro());
 						sociedadActualizacion.setDatosRegistro(argRegistro);
+						
+						DatosPersona argNotario = DatosPersona.Factory.newInstance();
+						//Insertamos el Notario
+						Identificacion identificacion = Identificacion.Factory.newInstance();
+						if(regSociedad.getIdentificacionNotario()!=null){
+							identificacion.setNIF(regSociedad.getIdentificacionNotario());
+							argNotario.setApellido1(regSociedad.getApellido1Notario());
+							argNotario.setApellido2(regSociedad.getApellido2Notario());
+							argNotario.setNombre(regSociedad.getNombreNotario());
+						}
+						argNotario.setIdentificacion(identificacion);
+						sociedadActualizacion.setDatosNotario(argNotario);
+						
+						
 						//Insertamos los datos de la sociedad
 						DatosEntidad argSociedad = DatosEntidad.Factory.newInstance();
 						argSociedad.setCIFNIF(regSociedad.getSociedadNif());
 						argSociedad.setDenominacion(regSociedad.getSociedadDenominacion());
 						FormaSocial formaSocial = FormaSocial.Factory.newInstance();
-						formaSocial.setStringValue(regSociedad.getSociedadFormaSocial());
-						argSociedad.setFormaSocial(formaSocial );
+						if(regSociedad.getSociedadFormaSocial() != null){
+							if(regSociedad.getSociedadFormaSocial().length()>=20){
+								formaSocial.setStringValue(regSociedad.getSociedadFormaSocial().substring(0, 20));
+							}else{
+								formaSocial.setStringValue(regSociedad.getSociedadFormaSocial());
+							}
+						}
+						argSociedad.setFormaSocial(formaSocial);
 						sociedadActualizacion.setDatosSociedad(argSociedad);
-					/*	Direccion argDireccion;
-						argDireccion.set
-						sociedadActualizacion.setDireccion(argDireccion);*/
 						sociedadActualizacion.setFechaAlta(UtilidadesString.toCalendar(regSociedad.getSociedadFechaAlta()));
 						sociedadActualizacion.setFechaConstitucion(UtilidadesString.toCalendar(regSociedad.getFechaConstitucion()));
-
-						sociedadActualizacion.setFechaFin(UtilidadesString.toCalendar(regSociedad.getFechaCancelacion()));
-						/*IntegranteSociedad[] argIntegrantes;
-						sociedadActualizacion.setIntegranteSociedadArray(argIntegrantes);*/
+						sociedadActualizacion.setFechaFin(UtilidadesString.toCalendar(regSociedad.getFechaFin()));
+						//sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
+						//Insertamos los datos de la direccion
+						Direccion argDireccion = Direccion.Factory.newInstance();
+						argDireccion.setDomicilio(regSociedad.getDomicilio());
+						argDireccion.setCodigoPostal(regSociedad.getCodigoPostal());
+						//Provincia
+						Provincia provincia = Provincia.Factory.newInstance();
+						provincia.setDescripcionProvincia(regSociedad.getProvincia());
+						provincia.setCodigoProvincia(regSociedad.getCodigoProvincia());
+						argDireccion.setProvincia(provincia);
+						//Poblacion
+						Poblacion poblacion = Poblacion.Factory.newInstance();
+						poblacion.setDescripcionPoblacion(regSociedad.getPoblacion());
+						poblacion.setCodigoPoblacion(regSociedad.getCodigoPoblacion());
+						argDireccion.setPoblacion(poblacion);
+						//Correo electronico
+						CorreoElectronico cElectronico = CorreoElectronico.Factory.newInstance();
+						cElectronico.setStringValue(regSociedad.getCorreoElectronico());
+						cElectronico.setPublicar(Boolean.FALSE);
+						argDireccion.setCorreoElectronico(cElectronico);
+						int contador =0;
+						int contadorContacto = 0;
+						boolean telefono = false;
+						boolean movil = false;
+						boolean faxB = false;
+						//contactos
+						if(regSociedad.getTelefono1()!=null){
+							contador++;
+							telefono = true;
+						}
+						if(regSociedad.getMovil()!=null){
+							contador++;
+							movil = true;
+						}
+						if(regSociedad.getFax1()!=null){
+							contador++;
+							faxB = true;
+						}
+						Contacto[] contactosArray = null;
+						if(contador>0){
+							contactosArray = new Contacto[contador];
+								if(telefono){
+									Contacto contacto1 = Contacto.Factory.newInstance();
+									Telefono telefono1 = Telefono.Factory.newInstance();
+									telefono1.setPublicar(Boolean.FALSE);
+									telefono1.setStringValue(regSociedad.getTelefono1());
+									contacto1.setTelefono(telefono1);
+									contactosArray[contadorContacto++] = contacto1;
+								}if(movil){
+									Contacto contacto1 = Contacto.Factory.newInstance();
+									TelefonoMovil movil1 = TelefonoMovil.Factory.newInstance();
+									movil1.setPublicar(Boolean.FALSE);
+									movil1.setStringValue(regSociedad.getMovil());
+									contacto1.setTelefonoMovil(movil1);
+									contactosArray[contadorContacto++] = contacto1;
+								}if(faxB){
+									Contacto contacto1 = Contacto.Factory.newInstance();
+									Fax fax = Fax.Factory.newInstance();
+									fax.setPublicar(Boolean.FALSE);
+									fax.setStringValue(regSociedad.getFax1());
+									contacto1.setFax(fax);
+									contactosArray[contadorContacto++] = contacto1;
+								}
+						}
+						
+						argDireccion.setPaginaWeb(regSociedad.getPaginaWeb());
+						argDireccion.setContactoArray(contactosArray);
+						argDireccion.setPublicar(Boolean.FALSE);
+						sociedadActualizacion.setDireccion(argDireccion);
+						
+						//INSERTAMOS LOS DATOS DE LOS INTEGRANTES
 						DatosIntegrantesSearchDTO datosIntegrantesSearchDTO = new DatosIntegrantesSearchDTO();
 						datosIntegrantesSearchDTO.setIdPersona(regSociedad.getIdPersona());
-						List<DatosIntegrantesItem> datosIntegrantesItem = cenComponentesExtendsMapper.selectIntegrantes(datosIntegrantesSearchDTO,idInstitucion.toString() );
-						if (null != datosIntegrantesItem && datosIntegrantesItem.size()>0) {
-							IntegranteSociedad[] integrantesSociedad = new IntegranteSociedad[datosIntegrantesItem.size()];
+						List<DatosIntegrantesWS> datosIntegrantesWS = cenComponentesExtendsMapper.selectIntegrantesWS(datosIntegrantesSearchDTO,idInstitucion.toString());
+						if (null != datosIntegrantesWS && datosIntegrantesWS.size()>0) {
+							IntegranteSociedad[] integrantesSociedad = new IntegranteSociedad[datosIntegrantesWS.size()];
 							int i = 0;
-							for (DatosIntegrantesItem integrante : datosIntegrantesItem) {
+							for (DatosIntegrantesWS integrante : datosIntegrantesWS) {
 								IntegranteSociedad integranteUnitario = IntegranteSociedad.Factory.newInstance();
 								SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 								if (integrante.getPersonaJuridica().equals("0")) {
 									
-
 									IntegranteFisico integranteFisico = IntegranteFisico.Factory.newInstance();
 									DatosCargo cargo = DatosCargo.Factory.newInstance();
-									cargo.setCargo(integrante.getIdCargo());
-									cargo.setDescCargo(integrante.getDescripcionCargo());
-									if (!UtilidadesString.esCadenaVacia(integrante.getFechaCargo())) {
-										Date fechaCargo = dateFormat.parse(integrante.getFechaCargo());
-										cargo.setFechaCargo(UtilidadesString.toCalendar(fechaCargo));
+									if(integrante.getCargo() != null){
+										cargo.setCargo(integrante.getCargo());
+										cargo.setDescCargo(integrante.getDescripcionCargo());
+										if (!UtilidadesString.esCadenaVacia(integrante.getFechaCargo())) {
+											Date fechaCargo = dateFormat.parse(integrante.getFechaCargo());
+											cargo.setFechaCargo(UtilidadesString.toCalendar(fechaCargo));
+										}
+									}
+									if(integrante.getSocio()=="1"){
+										integranteFisico.setSocio(Boolean.TRUE);
+									}else{
+										integranteFisico.setSocio(Boolean.FALSE);
 									}
 									integranteFisico.setDatosCargo(cargo);
 									DatosPersona datosPersona = DatosPersona.Factory.newInstance();
@@ -497,41 +606,54 @@ public class WSCommons {
 									datosPersona.setIdentificacion(identificacion);
 									integranteFisico.setDatosPersona(datosPersona);
 									DatosProfesional datosProfesional = DatosProfesional.Factory.newInstance();
-									Profesional profesional = Profesional.Factory.newInstance();
 									Colegio colegio = Colegio.Factory.newInstance();
-									colegio.setCodigoColegio(integrante.getColegio());
-									colegio.setDescripcionColegio(integrante.getNombrecolegio());
-									
-									if(integrante.getAbogado().equals("1") == true){
+									colegio.setCodigoColegio(integrante.getCodigocolegio());
+									colegio.setDescripcionColegio(integrante.getDescripcionColegio());
+									if(integrante.getProfesionalAbogado().equals("1")){
 										ProfesionalAbogado profesionalAbogado =  ProfesionalAbogado.Factory.newInstance();
-										profesionalAbogado.setColegio(colegio );
+										profesionalAbogado.setColegio(colegio);
 										profesionalAbogado.setNumColegiado(integrante.getNumColegiado());
 										datosProfesional.setProfesionalAbogado(profesionalAbogado);
 									}else{
-										profesional.setColegio(colegio );
+										Profesional profesional = Profesional.Factory.newInstance();
+										if(integrante.getCodigocolegio()!=null){
+											profesional.setColegio(colegio);
+										}else{
+											profesional.setNombreColegio(integrante.getDescripcionColegio());
+										}
 										profesional.setNumColegiado(integrante.getNumColegiado());
-										profesional.setProfesion(integrante.getDescripcionProfesion());
+										if(integrante.getProfesion()!= null){
+											if(integrante.getProfesion().length()>20){
+												profesional.setProfesion(integrante.getProfesion().substring(0, 19));
+											}else{
+												profesional.setProfesion(integrante.getProfesion());
+											}
+										}
 										datosProfesional.setProfesional(profesional);
 									}
-									
 									integranteFisico.setDatosProfesional(datosProfesional);
 									integranteUnitario.setIntegranteFisico(integranteFisico);
+									integranteUnitario.setFechaModificacion(UtilidadesString.toCalendar(integrante.getFechaModificacion()));
+									integranteUnitario.setPublicar(Boolean.FALSE);
 								}else{
 									IntegranteJuridico integranteJuridico = IntegranteJuridico.Factory.newInstance();
 									DatosCargo cargoJuridico = DatosCargo.Factory.newInstance();
-									cargoJuridico.setCargo(integrante.getIdCargo());
+									cargoJuridico.setCargo(integrante.getCargo());
 									
 									cargoJuridico.setDescCargo(integrante.getDescripcionCargo());
-									if (!UtilidadesString.esCadenaVacia(integrante.getFechaCargo())) {
-										Date fechaCargoJuridico = dateFormat.parse(integrante.getFechaCargo());
-										cargoJuridico.setFechaCargo(UtilidadesString.toCalendar(fechaCargoJuridico));
+									if(integrante.getFechaCargo()!=null){
+										if (!UtilidadesString.esCadenaVacia(integrante.getFechaCargo().toString())) {
+											Date fechaCargoJuridico = dateFormat.parse(integrante.getFechaCargo().toString());
+											cargoJuridico.setFechaCargo(UtilidadesString.toCalendar(fechaCargoJuridico));
+										}
 									}
 									integranteJuridico.setDatosCargo(cargoJuridico);
+									integranteUnitario.setFechaModificacion(UtilidadesString.toCalendar(integrante.getFechaModificacion()));
+									integranteUnitario.setPublicar(Boolean.FALSE);
 									DatosEntidad datosEntidad = DatosEntidad.Factory.newInstance();
 									datosEntidad.setCIFNIF(integrante.getNifCif());
 									datosEntidad.setDenominacion(integrante.getNombre());
-									//datosEntidad.setFormaSocial(arg0);
-									integranteJuridico.setDatosEntidad(datosEntidad );
+									integranteJuridico.setDatosEntidad(datosEntidad);
 									integranteUnitario.setIntegranteJuridico(integranteJuridico);
 								}
 								integrantesSociedad[i] = integranteUnitario;
@@ -541,61 +663,17 @@ public class WSCommons {
 							sociedadActualizacion.setIntegranteSociedadArray(integrantesSociedad);
 						}
 						
-						boolean argPublicar = Boolean.FALSE;
-						sociedadActualizacion.setPublicar(argPublicar);
-						Resena argResena = Resena.Factory.newInstance();
-						argResena.setStringValue(regSociedad.getResena());
-						sociedadActualizacion.setResena(argResena);
-						sociedadActualizacion.setObjetoSocial(regSociedad.getObjetoSocial());
 						
-						List<DatosDireccionesItem> datosDireccionesItem = cenDireccionesExtendsMapper.selectDireccionesWs(regSociedad.getIdPersona());
-						if (null != datosDireccionesItem && datosDireccionesItem.size()>0) {
-							
-							for (DatosDireccionesItem direccionWS : datosDireccionesItem) {
-								
-								Direccion direccion =Direccion.Factory.newInstance();
-								direccion.setCodigoPostal(direccionWS.getCodigoPostal());
-								Contacto[] contacto = new Contacto[1];
-								Fax fax= Fax.Factory.newInstance();
-								fax.setStringValue(direccionWS.getFax());
-								contacto[0] = Contacto.Factory.newInstance();
-								contacto[0].setFax(fax);
-								Telefono telefono = Telefono.Factory.newInstance();
-								telefono.setStringValue(direccionWS.getTelefono());
-								contacto[0].setTelefono(telefono );
-								TelefonoMovil telefonoMovil = TelefonoMovil.Factory.newInstance();
-								telefonoMovil.setStringValue(direccionWS.getMovil());
-								contacto[0].setTelefonoMovil(telefonoMovil );
-								direccion.setContactoArray(contacto);
-								CorreoElectronico correoElectronico = CorreoElectronico.Factory.newInstance();
-								correoElectronico.setStringValue(direccionWS.getCorreoElectronico());
-								direccion.setCorreoElectronico(correoElectronico);
-								//direccion.setDescTipoVia(descripcionTipoVia);
-								
-								direccion.setDomicilio(direccionWS.getDomicilio());
-								
-								direccion.setPaginaWeb(direccionWS.getPaginaWeb());
-								Poblacion poblacion = Poblacion.Factory.newInstance();
-								poblacion.setCodigoPoblacion(direccionWS.getIdExternoPoblacion());
-								poblacion.setDescripcionPoblacion(direccionWS.getNombrePoblacion());
-								direccion.setPoblacion(poblacion);
-								Provincia provincia = Provincia.Factory.newInstance();
-								provincia.setCodigoProvincia(direccionWS.getIdExternoProvincia());
-								provincia.setDescripcionProvincia(direccionWS.getNombreProvincia());
-								direccion.setProvincia(provincia );
-								direccion.setPublicar(Boolean.FALSE);
-								sociedadActualizacion.setDireccion(direccion );
-							}
-						}
+						
 						
 						sociedadesEditadasFinal.add(sociedadActualizacion);
-						//
 		
 					}
 					List<SociedadActualizacion> sociedadesEditadasResult = new ArrayList<>();
 					
 					if (sociedadesEditadasFinal.size() == 0) {
 						LOGGER.info("No se ha encontrado ninguna sociedad con los filtros seleccionados");
+						respuesta.setNumTotalPaginas(totalPaginas);
 					} else {
 						if (peticion.getConPaginacion()) {
 							if (sociedadesEditadasFinal.size() >= peticion.getNumPagina() * tamanoPaginacion) {
@@ -605,20 +683,37 @@ public class WSCommons {
 								sociedadesEditadasResult = sociedadesEditadasFinal.subList((peticion.getNumPagina() - 1) * tamanoPaginacion,
 										sociedadesEditadasFinal.size());
 							}
+							
+							// Se calcula el numero total de paginas
+							totalPaginas = (short) (sociedadesEditadas.size() / tamanoPaginacion);
+							if (sociedadesEditadas.size() % tamanoPaginacion > 0) {
+								totalPaginas++;
+							}
+							respuesta.setNumTotalPaginas(totalPaginas);
+							
 						}else{
 							sociedadesEditadasResult.addAll(sociedadesEditadasFinal);
+							respuesta.setNumTotalPaginas((short)1);
 						}
 					}
-					if (null != sociedadesEditadasResult && sociedadesEditadasResult.size()>0) {
-						for (SociedadActualizacion sociedadActualizacion : sociedadesEditadasResult) {
-							RegistroSociedad registro = RegistroSociedad.Factory.newInstance();
-							registro.setSociedadActualizacion(sociedadActualizacion);
-							registrosList.add(registro);
+					
+					try{
+						if (null != sociedadesEditadasResult && sociedadesEditadasResult.size()>0) {
+							
+							for (SociedadActualizacion sociedadActualizacion : sociedadesEditadasResult) {
+
+								RegistroSociedad registro = RegistroSociedad.Factory.newInstance();
+								registro.setSociedadActualizacion(sociedadActualizacion);
+								registrosList.add(registro);
+								
+							}
 						}
+					}catch(AssertionError e){
+						LOGGER.info("Excepcion añadiendo los registros en el nodo RegistroSociedad: " + e.getMessage());
 					}
+					
 				}
 				
-			
 			if (null != registrosList && registrosList.size()>0) {
 				RegistroSociedad[] registrosReturn = new RegistroSociedad[registrosList.size()];
 				int i = 0;

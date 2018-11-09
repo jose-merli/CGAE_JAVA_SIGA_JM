@@ -19,7 +19,8 @@ public class ColegiadoItem {
 	private String telefono;
 	private String movil;
 	private String estadoColegial;	
-	
+	private String [] grupos;
+
 	private String  apellidos;
 //	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date [] fechaIncorporacion;
@@ -107,6 +108,23 @@ public class ColegiadoItem {
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
+
+	/**
+	 */
+	public ColegiadoItem grupos(String [] grupos){
+		this.grupos = grupos;
+		return this;
+	}
+	
+	@JsonProperty("grupos")
+	public String[] getGrupos() {
+		return grupos;
+	}
+
+	public void setGrupos(String[] grupos) {
+		this.grupos = grupos;
+	}
+	
 	
 	/**
 	 *

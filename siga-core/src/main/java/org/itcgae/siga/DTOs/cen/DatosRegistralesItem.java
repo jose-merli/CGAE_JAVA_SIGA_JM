@@ -17,69 +17,100 @@ public class DatosRegistralesItem {
 	//@JsonFormat(pattern = "dd-MM-yyyy")
 	private String fechaConstitucion;
 	private String sociedadProfesional;
-	private String prefijoNumsspp;
-	private String contadorNumsspp;
-	private String sufijoNumsspp;
 	private String fechaBaja;
-
-	/**
-	 */
-	public DatosRegistralesItem prefijoNumsspp(String prefijoNumsspp){
-		this.prefijoNumsspp = prefijoNumsspp;
-		return this;
-	}
-	
+	private Long idDatosRegistro;
+	private String numRegistro;
+	private Date fechaInscripcion;
+	private Date fechaCancelacion;
+	private String identificacionReg;
+	private String prefijoNumsspp;
+    private String contadorNumsspp;
+    private String sufijoNumsspp;
+	  
 	@JsonProperty("prefijoNumsspp")
 	public String getPrefijoNumsspp() {
 		return prefijoNumsspp;
 	}
 
-
-
 	public void setPrefijoNumsspp(String prefijoNumsspp) {
 		this.prefijoNumsspp = prefijoNumsspp;
 	}
-
-
-	/**
-	 */
-	public DatosRegistralesItem contadorNumsspp(String contadorNumsspp){
-		this.contadorNumsspp = contadorNumsspp;
-		return this;
-	}
-
 	@JsonProperty("contadorNumsspp")
 	public String getContadorNumsspp() {
 		return contadorNumsspp;
 	}
 
-
-
 	public void setContadorNumsspp(String contadorNumsspp) {
 		this.contadorNumsspp = contadorNumsspp;
 	}
-
-	
-
-	/**
-	 */
-	public DatosRegistralesItem sufijoNumsspp(String sufijoNumsspp){
-		this.sufijoNumsspp = sufijoNumsspp;
-		return this;
-	}
-
 	@JsonProperty("sufijoNumsspp")
 	public String getSufijoNumsspp() {
 		return sufijoNumsspp;
 	}
 
-
-
 	public void setSufijoNumsspp(String sufijoNumsspp) {
 		this.sufijoNumsspp = sufijoNumsspp;
 	}
+	
+	/**
+	 */
+	public DatosRegistralesItem identificacionReg(String identificacionReg){
+		this.identificacionReg = identificacionReg;
+		return this;
+	}
+	
+	@JsonProperty("identificacionReg")
+	public String getIdentificacionReg() {
+		return identificacionReg;
+	}
+
+	public void setIdentificacionReg(String identificacionReg) {
+		this.identificacionReg = identificacionReg;
+	}
 
 
+	/**
+	 */
+	public DatosRegistralesItem fechaCancelacion(Date fechaCancelacion){
+		this.fechaCancelacion = fechaCancelacion;
+		return this;
+	}
+	@JsonProperty("fechaCancelacion")
+	public Date getFechaCancelacion() {
+		return fechaCancelacion;
+	}
+	public void setFechaCancelacion(Date fechaCancelacion) {
+		this.fechaCancelacion = fechaCancelacion;
+	}
+
+	/**
+	 */
+	public DatosRegistralesItem numRegistro(String numRegistro){
+		this.numRegistro = numRegistro;
+		return this;
+	}
+	@JsonProperty("numRegistro")
+	public String getNumRegistro() {
+		return numRegistro;
+	}
+
+	public void setNumRegistro(String numRegistro) {
+		this.numRegistro = numRegistro;
+	}
+	
+	/**
+	 */
+	public DatosRegistralesItem fechaInscripcion(Date fechaInscripcion){
+		this.fechaInscripcion = fechaInscripcion;
+		return this;
+	}
+	public Date getFechaInscripcion() {
+		return fechaInscripcion;
+	}
+	public void setFechaInscripcion(Date fechaInscripcion) {
+		this.fechaInscripcion = fechaInscripcion;
+	}
+	
 
 	/**
 	 */
@@ -208,6 +239,23 @@ public class DatosRegistralesItem {
 	
 	/**
 	 */
+	public DatosRegistralesItem sociedadProfesional(Long idDatosRegistro){
+		this.idDatosRegistro = idDatosRegistro;
+		return this;
+	}
+	
+	@JsonProperty("idDatosRegistro")
+	public Long getidDatosRegistro() {
+		return idDatosRegistro;
+	}
+	
+	
+	public void setidDatosRegistro(Long idDatosRegistro) {
+		this.idDatosRegistro = idDatosRegistro;
+	}
+	
+	/**
+	 */
 	public DatosRegistralesItem sociedadProfesional(String sociedadProfesional){
 		this.sociedadProfesional = sociedadProfesional;
 		return this;
@@ -222,6 +270,7 @@ public class DatosRegistralesItem {
 	public void setSociedadProfesional(String sociedadProfesional) {
 		this.sociedadProfesional = sociedadProfesional;
 	}
+	
 	
 	
 	@Override
@@ -240,15 +289,12 @@ public class DatosRegistralesItem {
 	    	   Objects.equals(this.fechaFin, datosRegistralesItem.fechaFin) &&
 	    	   Objects.equals(this.fechaBaja, datosRegistralesItem.fechaBaja) &&
 	    	   Objects.equals(this.fechaConstitucion, datosRegistralesItem.fechaConstitucion) &&
-	    	   Objects.equals(this.sociedadProfesional, datosRegistralesItem.sociedadProfesional) &&
-	    	   Objects.equals(this.prefijoNumsspp, datosRegistralesItem.prefijoNumsspp) &&
-	    	   Objects.equals(this.contadorNumsspp, datosRegistralesItem.contadorNumsspp) &&
-	    	   Objects.equals(this.sufijoNumsspp, datosRegistralesItem.sufijoNumsspp);
+	    	   Objects.equals(this.sociedadProfesional, datosRegistralesItem.sociedadProfesional);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(resena, objetoSocial, numeroPoliza, companiaAseg, fechaFin, fechaBaja, fechaConstitucion, sociedadProfesional, prefijoNumsspp, contadorNumsspp, sufijoNumsspp);
+	    return Objects.hash(resena, objetoSocial, numeroPoliza, companiaAseg, fechaFin, fechaBaja, fechaConstitucion, sociedadProfesional);
 	}
 
 	
@@ -265,9 +311,6 @@ public class DatosRegistralesItem {
 	    sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
 	    sb.append("    fechaConstitucion: ").append(toIndentedString(fechaConstitucion)).append("\n");
 	    sb.append("    sociedadProfesional: ").append(toIndentedString(sociedadProfesional)).append("\n");
-	    sb.append("    prefijoNumsspp: ").append(toIndentedString(prefijoNumsspp)).append("\n");
-	    sb.append("    contadorNumsspp: ").append(toIndentedString(contadorNumsspp)).append("\n");
-	    sb.append("    sufijoNumsspp: ").append(toIndentedString(sufijoNumsspp)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}

@@ -1,5 +1,6 @@
 package org.itcgae.siga.db.mappers;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
@@ -37,6 +38,8 @@ public class CenClienteSqlProvider {
 	 * @mbg.generated  Wed Mar 14 18:23:45 CET 2018
 	 */
 	public String insertSelective(CenCliente record) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
 		SQL sql = new SQL();
 		sql.INSERT_INTO("CEN_CLIENTE");
 		if (record.getIdinstitucion() != null) {
@@ -105,6 +108,7 @@ public class CenClienteSqlProvider {
 		if (record.getExportarfoto() != null) {
 			sql.VALUES("EXPORTARFOTO", "#{exportarfoto,jdbcType=VARCHAR}");
 		}
+		
 		return sql.toString();
 	}
 

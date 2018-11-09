@@ -50,6 +50,7 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
 			String commonName = null;
 			String organizationName = null;
+			String organizationNameNuevo = null;
 			String grupo = null;
 			X509Certificate cert = null;
 
@@ -61,8 +62,13 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 					RDN userRdn = x500name.getRDNs(BCStyle.CN)[0];
 					commonName = IETFUtils.valueToString(userRdn.getFirst().getValue());
 
-					RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
-					organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
+					if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
+						RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
+						organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
+					}else{
+						RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
+						organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
+					}
 
 					RDN grupoRdn = x500name.getRDNs(BCStyle.T)[0];
 					grupo = IETFUtils.valueToString(grupoRdn.getFirst().getValue());
@@ -74,8 +80,15 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 				}
 
 				String dni = commonName.substring(commonName.length() - 9, commonName.length());
-				String institucion = organizationName.substring(organizationName.length() - 4,
+				String institucion = null;
+				if (null != organizationNameNuevo) {
+					institucion = organizationNameNuevo.substring(0,
+								4);
+				}else{
+					institucion = organizationName.substring(organizationName.length() - 4,
 						organizationName.length());
+				}
+
 				LOGGER.debug("DNI: " + dni);
 				LOGGER.debug("INSTITUCION: " + institucion);
 				LOGGER.debug("GRUPO: " + grupo);

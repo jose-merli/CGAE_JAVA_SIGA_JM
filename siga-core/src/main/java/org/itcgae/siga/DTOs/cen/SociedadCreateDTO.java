@@ -18,6 +18,7 @@ public class SociedadCreateDTO {
 	private String cuentaContable;
 	private String anotaciones;
 	private String [] grupos;
+	private ComboEtiquetasItem[] etiquetas;
 	private String idPersona;
 	private String motivo;
 	
@@ -210,6 +211,24 @@ public class SociedadCreateDTO {
 	public void setGrupos(String[] grupos) {
 		this.grupos = grupos;
 	}
+	
+
+	/**
+	 */
+	public SociedadCreateDTO etiquetas(ComboEtiquetasItem[] etiquetas){
+		this.etiquetas = etiquetas;
+		return this;
+	}
+	
+	@JsonProperty("etiquetas")
+	public ComboEtiquetasItem[] getEtiquetas() {
+		return etiquetas;
+	}
+
+	public void setEtiquetas(ComboEtiquetasItem[] etiquetas) {
+		this.etiquetas = etiquetas;
+	}
+	
 	
 	
 	/**

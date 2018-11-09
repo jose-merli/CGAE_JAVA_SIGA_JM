@@ -3,6 +3,7 @@ package org.itcgae.siga.commons.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.security.UserCgae;
@@ -51,6 +52,26 @@ public class TestUtils{
 		
 	}
 	
+	public List<CursoItem> getListCursosSimulados(String estado, Integer flagArchivado) {
+			
+		List<CursoItem> cursoItems = new ArrayList<CursoItem>();
+		
+		cursoItems.add(getCursoSimulado(estado, flagArchivado));
+		
+		return cursoItems;
+	}	
+	
+	public CursoItem getCursoSimulado(String estado, Integer flagArchivado) {
+		
+		CursoItem cursoItem = new CursoItem();
+		cursoItem.setCodigoCurso("003GREW");
+		cursoItem.setIdInstitucion("2000");
+		cursoItem.setIdEstado(estado);
+		cursoItem.setFlagArchivado(flagArchivado);
+		
+		return cursoItem;
+	}
+	
 	public ComboItem getComboItemVacio() {
 		
 		ComboItem comboItem = new ComboItem();
@@ -65,6 +86,7 @@ public class TestUtils{
 		List<AdmUsuarios> usuarios = new ArrayList<>();
 		AdmUsuarios admUsuarios = new AdmUsuarios();
 		admUsuarios.setIdlenguaje(idLenguaje);
+		admUsuarios.setIdusuario(1);
 		usuarios.add(admUsuarios);
 		return usuarios;
 	}
