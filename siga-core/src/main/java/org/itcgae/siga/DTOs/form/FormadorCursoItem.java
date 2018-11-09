@@ -16,9 +16,13 @@ public class FormadorCursoItem {
 	private Date fechaModificacion;
 	private String idTipoCoste;
 	private String tipoCoste;
-	private String nombreCompleto;
+	private String nombre;
+	private String apellidos;
 	private Double tarifa;
 	private Double tutor;
+	private String nif;
+	private String tipoIdentificacion;
+	private Date fechaBaja;
 
 	/**
 	 **/
@@ -178,18 +182,35 @@ public class FormadorCursoItem {
 	/**
 	 * 
 	 **/
-	public FormadorCursoItem nombreCompleto(String nombreCompleto) {
-		this.nombreCompleto = nombreCompleto;
+	public FormadorCursoItem nombre(String nombre) {
+		this.nombre = nombre;
 		return this;
 	}
 
-	@JsonProperty("nombreCompleto")
-	public String getNombreCompleto() {
-		return nombreCompleto;
+	@JsonProperty("nombre")
+	public String getNombre() {
+		return nombre;
 	}
 
-	public void setNombreCompleto(String nombreCompleto) {
-		this.nombreCompleto = nombreCompleto;
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+	
+	/**
+	 * 
+	 **/
+	public FormadorCursoItem apellidos(String apellidos) {
+		this.apellidos = apellidos;
+		return this;
+	}
+
+	@JsonProperty("apellidos")
+	public String getApellidos() {
+		return apellidos;
+	}
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
 	}
 	
 	/**
@@ -225,6 +246,57 @@ public class FormadorCursoItem {
 	public void setTutor(Double tutor) {
 		this.tutor = tutor;
 	}
+	
+	/**
+	 * 
+	 **/
+	public FormadorCursoItem nif(String nif) {
+		this.nif = nif;
+		return this;
+	}
+
+	@JsonProperty("nif")
+	public String getNif() {
+		return nif;
+	}
+
+	public void setNif(String nif) {
+		this.nif = nif;
+	}
+	
+	/**
+	 * 
+	 **/
+	public FormadorCursoItem tipoIdentificacion(String tipoIdentificacion) {
+		this.tipoIdentificacion = tipoIdentificacion;
+		return this;
+	}
+
+	@JsonProperty("tipoIdentificacion")
+	public String getTipoIdentificacion() {
+		return tipoIdentificacion;
+	}
+
+	public void setTipoIdentificacion(String tipoIdentificacion) {
+		this.tipoIdentificacion = tipoIdentificacion;
+	}
+	
+	/**
+	 * 
+	 **/
+	public FormadorCursoItem fechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+		return this;
+	}
+
+	@JsonProperty("fechaBaja")
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -244,16 +316,20 @@ public class FormadorCursoItem {
 				&& Objects.equals(this.fechaModificacion, formadorCursoItem.fechaModificacion)
 				&& Objects.equals(this.idTipoCoste, formadorCursoItem.idTipoCoste)
 				&& Objects.equals(this.tipoCoste, formadorCursoItem.tipoCoste)
-				&& Objects.equals(this.nombreCompleto, formadorCursoItem.nombreCompleto)
-				&& Objects.equals(this.nombreCompleto, formadorCursoItem.nombreCompleto)
+				&& Objects.equals(this.nombre, formadorCursoItem.nombre)
+				&& Objects.equals(this.apellidos, formadorCursoItem.apellidos)
 				&& Objects.equals(this.tarifa, formadorCursoItem.tarifa)
-				&& Objects.equals(this.tutor, formadorCursoItem.tutor);
+				&& Objects.equals(this.tutor, formadorCursoItem.tutor)
+				&& Objects.equals(this.nif, formadorCursoItem.nif)
+				&& Objects.equals(this.tipoIdentificacion, formadorCursoItem.tipoIdentificacion)
+				&& Objects.equals(this.fechaBaja, formadorCursoItem.fechaBaja);
 	}
 
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(idCurso, idPersona, idRol, rol, idInstitucion, usuModificacion, fechaModificacion, idTipoCoste, tipoCoste, nombreCompleto, tarifa, tutor);
+		return Objects.hash(idCurso, idPersona, idRol, rol, idInstitucion, usuModificacion, fechaModificacion, idTipoCoste, 
+				tipoCoste, nombre, apellidos, tarifa, tutor, nif, tipoIdentificacion, fechaBaja);
 	}
 
 	@Override
@@ -270,9 +346,13 @@ public class FormadorCursoItem {
 		sb.append("    fechaModificacion: ").append(toIndentedString(fechaModificacion)).append("\n");
 		sb.append("    idTipoCoste: ").append(toIndentedString(idTipoCoste)).append("\n");
 		sb.append("    tipoCoste: ").append(toIndentedString(tipoCoste)).append("\n");
-		sb.append("    nombreCompleto: ").append(toIndentedString(nombreCompleto)).append("\n");
+		sb.append("    nombre: ").append(toIndentedString(nombre)).append("\n");
+		sb.append("    apellidos: ").append(toIndentedString(apellidos)).append("\n");
 		sb.append("    tarifa: ").append(toIndentedString(tarifa)).append("\n");
 		sb.append("    tutor: ").append(toIndentedString(tutor)).append("\n");
+		sb.append("    nif: ").append(toIndentedString(nif)).append("\n");
+		sb.append("    tipoIdentificacion: ").append(toIndentedString(tipoIdentificacion)).append("\n");
+		sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

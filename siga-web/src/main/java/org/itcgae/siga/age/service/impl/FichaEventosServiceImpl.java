@@ -57,7 +57,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 					"getTrainers() / forPersonacursoExtendsMapper.getTrainers(idInstitucion, idCurso) -> Salida de forPersonacursoExtendsMapper para obtener los formadores de un curso especifico");
 
 
-			formadoresCursoDTO.setFormadorCursoItem(formadoresCursoItem);
+			formadoresCursoDTO.setFormadoresCursoItem(formadoresCursoItem);
 
 		}
 

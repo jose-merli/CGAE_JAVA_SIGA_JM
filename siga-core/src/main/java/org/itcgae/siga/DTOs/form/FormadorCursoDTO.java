@@ -14,15 +14,15 @@ public class FormadorCursoDTO {
 	
 	/**
 	 */
-	public FormadorCursoDTO FormadorCursoItem(List<FormadorCursoItem> formadoresCursoItem){
+	public FormadorCursoDTO formadoresCursoItem(List<FormadorCursoItem> formadoresCursoItem){
 		this.formadoresCursoItem = formadoresCursoItem;
 		return this;
 	}
 	
-	public List<FormadorCursoItem> getFormadorCursoItem() {
+	public List<FormadorCursoItem> getFormadoresCursoItem() {
 		return formadoresCursoItem;
 	}
-	public void setFormadorCursoItem(List<FormadorCursoItem> formadoresCursoItem) {
+	public void setFormadoresCursoItem(List<FormadorCursoItem> formadoresCursoItem) {
 		this.formadoresCursoItem = formadoresCursoItem;
 	}
 	
