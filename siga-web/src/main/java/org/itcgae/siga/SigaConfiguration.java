@@ -28,6 +28,7 @@ public class SigaConfiguration implements ApplicationListener<ApplicationReadyEv
 		loggingConfig.initLogback();
 	}
 	
+	
 	@Configuration
 	@EnableAutoConfiguration
 	class MyBatisConfig {

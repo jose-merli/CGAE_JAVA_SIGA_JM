@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.db.entities.ScsRetencionesirpf;
 
 
 
@@ -150,6 +151,7 @@ public class UtilidadesString {
 		
 		return	format.parse(string);
 		
-	} 
+	}
+	
 
 }

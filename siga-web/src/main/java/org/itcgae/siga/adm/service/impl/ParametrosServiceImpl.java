@@ -20,7 +20,6 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
@@ -93,22 +92,22 @@ public class ParametrosServiceImpl implements IParametrosService {
 			if (!parametroRequestDTO.getParametrosGenerales().equalsIgnoreCase("")
 					&& !parametroRequestDTO.getModulo().equalsIgnoreCase("")
 					&& parametroRequestDTO.getIdInstitucion() != null) {
-				if (parametroRequestDTO.getParametrosGenerales().equals("N")) {
-					// Buscar en gen_parametros por modulo e institucion
-					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Entrada a genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
-					parametroItems = genParametrosExtendsMapper.getParametersSearch(numPagina, parametroRequestDTO, usuario.getIdlenguaje());
-					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
-
-					parametroDTO.setParametrosItems(parametroItems);
-				}
-				 else if (parametroRequestDTO.getParametrosGenerales().equals("S")) {
+//				if (!String.valueOf(idInstitucion).equals(SigaConstants.InstitucionGeneral)) {
+//					// Buscar en gen_parametros por modulo e institucion
+//					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Entrada a genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
+//					parametroItems = genParametrosExtendsMapper.getParametersSearch(numPagina, parametroRequestDTO, usuario.getIdlenguaje());
+//					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos disponibles de una institución");
+//
+//					parametroDTO.setParametrosItems(parametroItems);
+//				}
+//				 else if (String.valueOf(idInstitucion).equals(SigaConstants.InstitucionGeneral)) {
 					 
 					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Entrada a genParametrosExtendsMapper para obtener listado de los módulos comunes a todas las instituciones");
-					parametroItems = genParametrosExtendsMapper.getParametersSearchGeneral(numPagina, parametroRequestDTO, usuario.getIdlenguaje());
+					parametroItems = genParametrosExtendsMapper.getParametersSearchGeneral(numPagina, parametroRequestDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion));
 					LOGGER.info("getParametersSearch() / genParametrosExtendsMapper.getParametersSearch() -> Salida de genParametrosExtendsMapper para obtener listado de los módulos comunes a todas las instituciones");
 
 					parametroDTO.setParametrosItems(parametroItems);
-				}
+//				}
 			}
 		}	
 		else {
@@ -145,17 +144,9 @@ public class ParametrosServiceImpl implements IParametrosService {
 			List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
 			AdmUsuarios usuario = usuarios.get(0);
 			
-			// Buscar en gen_parametros por modulo e institucion
-			GenParametrosExample genParametrosExample = new GenParametrosExample();
-			genParametrosExample.createCriteria()
-					.andIdinstitucionEqualTo(Short.valueOf(parametroRequestDTO.getIdInstitucion()))
-					.andModuloEqualTo(parametroRequestDTO.getModulo());
-
-			LOGGER.info("getParametersRecord() / genParametrosMapper.selectByExample() -> Entrada a genParametrosMapper para obtener listado de los módulos para la institución del usuario");
-			//genparametros = genParametrosMapper.selectByExample(genParametrosExample);
-			LOGGER.info("getParametersRecord() / genParametrosMapper.selectByExample() -> Salida de genParametrosMapper para obtener listado de los módulos para la institución del usuario");
-			
+			LOGGER.info("getParametersRecord() / genParametrosExtendsMapper.getParametersRecord() -> Entrada a genParametrosExtendsMapper para obtener histórico de parámetros generales de un determinado módulo");
 			parametroItems = genParametrosExtendsMapper.getParametersRecord(numPagina, parametroRequestDTO, usuario.getIdlenguaje());
+			LOGGER.info("getParametersRecord() / genParametrosExtendsMapper.getParametersRecord() -> Salida de genParametrosExtendsMapper para obtener histórico de parámetros generales de un determinado módulo");
 			parametroDTO.setParametrosItems(parametroItems);
 		}
 		else {
@@ -196,7 +187,7 @@ public class ParametrosServiceImpl implements IParametrosService {
 
 				// crear registro igual al existente en tabla gen_parametros, pero
 				// con el valor recibido y idInstitucion del usuario logeado
-				if (parametroUpdateDTO.getIdInstitucion().equals("0")) {
+				if (parametroUpdateDTO.getIdInstitucion().equals("0") || parametroUpdateDTO.getIdInstitucion().equals(SigaConstants.InstitucionGeneral)) {
 
 					// seteo de parametros a GenParametros. idInstitucion de
 					// certificado
@@ -227,8 +218,10 @@ public class ParametrosServiceImpl implements IParametrosService {
 							// actualizamos fecha de baja a null, para que vuelva a
 							// estar disponible
 							genParametros.setFechaBaja(null);
+							
 							LOGGER.info("updateParameter() / genParametrosMapper.updateByPrimaryKeySelective() -> Entrada a genParametrosMapper para habilitar un modulo-parametro");
-							response = genParametrosMapper.updateByPrimaryKeySelective(genParametros);
+							response = genParametrosExtendsMapper.updateByExampleFechaBaja(genParametros);
+							//response = genParametrosMapper.updateByPrimaryKeySelective(genParametros);
 							LOGGER.info("updateParameter() / genParametrosMapper.updateByPrimaryKeySelective() -> Salida de genParametrosMapper para habilitar un modulo-parametro");
 						}
 						// si es nulo, se crea un nuevo registro

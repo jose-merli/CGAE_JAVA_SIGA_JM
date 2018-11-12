@@ -32,8 +32,28 @@ public class DatosIntegrantesItem {
 	private String nombrecolegio;
 	private String descripcionProfesion;
 	private String personaJuridica;	
+
+	private String flagSocio;	
 	private String abogado;
 	
+	/**
+	 *
+	 */
+	public DatosIntegrantesItem flagSocio(String flagSocio){
+		this.flagSocio = flagSocio;
+		return this;
+	}
+	
+	
+	
+	public String getFlagSocio() {
+		return flagSocio;
+	}
+
+	public void setFlagSocio(String flagSocio) {
+		this.flagSocio = flagSocio;
+	}
+
 	/**
 	 *
 	 */
@@ -612,14 +632,16 @@ public class DatosIntegrantesItem {
 	    		Objects.equals(this.nombrecolegio, datosIntegrantesItem.nombrecolegio) &&
 	    		Objects.equals(this.personaJuridica, datosIntegrantesItem.personaJuridica) &&
 	    		Objects.equals(this.descripcionProfesion, datosIntegrantesItem.descripcionProfesion) &&
-	    		Objects.equals(this.idProvincia, datosIntegrantesItem.idProvincia) ;
+	    		Objects.equals(this.idProvincia, datosIntegrantesItem.idProvincia) &&
+	    		Objects.equals(this.flagSocio, datosIntegrantesItem.flagSocio) ;
 	}
 	
 	@Override
 	public int hashCode() {
 	    return Objects.hash(idPersona,idInstitucion,idComponente,cargo,fechaCargo,fechaBajaCargo,idPersonaComponente,sociedad,capitalSocial,
 	    		fechaCargoInforme,ejerciente,fechaHistorico,nifCif,nombre,apellidos1,apellidos2,nombreCompleto,
-	    		idTipoColegio,numColegiado,idCargo,idProvincia,descripcionCargo,colegio,nombrecolegio,descripcionProfesion,personaJuridica);
+	    		idTipoColegio,numColegiado,idCargo,idProvincia,descripcionCargo,colegio,nombrecolegio,descripcionProfesion,personaJuridica
+	    		,flagSocio);
 	}
 
 	
@@ -654,7 +676,8 @@ public class DatosIntegrantesItem {
 	    sb.append("    nombrecolegio: ").append(toIndentedString(nombrecolegio)).append("\n");
 	    sb.append("    descripcionProfesion: ").append(toIndentedString(descripcionProfesion)).append("\n");
 	    sb.append("    personaJuridica: ").append(toIndentedString(personaJuridica)).append("\n");
-
+	    sb.append("    flagSocio: ").append(toIndentedString(flagSocio)).append("\n");
+	    
 	    sb.append("}");
 	    return sb.toString();
 	}

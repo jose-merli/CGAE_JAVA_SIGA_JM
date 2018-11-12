@@ -320,6 +320,10 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 	@Override
 	public UpdateResponseDTO updateNotification(NotificacionEventoItem notificacionUpdate, HttpServletRequest request) {
+		
+		LOGGER.info(
+				"updateNotification() -> Entrada al servicio para modificar las notificaciones de eventos");
+		
 		int response = 0;
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -347,19 +351,19 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 				LOGGER.info(
-						"updateCalendar() / ageNotificacioneseventoMapper.selectByExample(exampleNotificacion) -> Entrada a ageNotificacioneseventoMapper para buscar si existe la notificacion");
+						"updateNotification() / ageNotificacioneseventoMapper.selectByExample(exampleNotificacion) -> Entrada a ageNotificacioneseventoMapper para buscar si existe la notificacion");
 
 				List<AgeNotificacionesevento> notificationList = ageNotificacioneseventoMapper
 						.selectByExample(exampleNotificacion);
 
 				LOGGER.info(
-						"updateCalendar() / ageNotificacioneseventoMapper.selectByExample(exampleNotificacion) -> Salida a ageNotificacioneseventoMapper para buscar si existe la notificacion");
+						"updateNotification() / ageNotificacioneseventoMapper.selectByExample(exampleNotificacion) -> Salida a ageNotificacioneseventoMapper para buscar si existe la notificacion");
 
 				if (null != notificationList && notificationList.size() > 0) {
 					AgeNotificacionesevento notification = notificationList.get(0);
 
 					LOGGER.info(
-							"updateCalendar() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Entrada a ageCalendarioExtendsMapper para modificar la notificacion");
+							"updateNotification() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Entrada a ageCalendarioExtendsMapper para modificar la notificacion");
 
 					notification.setFechamodificacion(new Date());
 					notification.setUsumodificacion(usuario.getIdusuario().longValue());
@@ -371,7 +375,7 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 					response = ageNotificacioneseventoMapper.updateByPrimaryKey(notification);
 
 					LOGGER.info(
-							"updateCalendar() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Salida a ageCalendarioExtendsMapper para modificar la notificacion");
+							"updateNotification() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Salida a ageCalendarioExtendsMapper para modificar la notificacion");
 
 				}
 
@@ -383,6 +387,9 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 				}
 			}
 		}
+		
+		LOGGER.info(
+				"updateNotification() -> Salida del servicio para modificar las notificaciones de eventos");
 
 		updateResponseDTO.setError(error);
 		return updateResponseDTO;
@@ -448,6 +455,10 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 	@Override
 	public UpdateResponseDTO deleteNotification(NotificacionEventoDTO notificacionDTO, HttpServletRequest request) {
+		
+		LOGGER.info(
+				"deleteNotification() -> Entrada al servicio para dar de baja a las notificaciones de eventos de un calendario especifico");
+
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 
@@ -460,10 +471,10 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"updateNotification() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"deleteNotification() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
-					"updateNotification() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"deleteNotification() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -476,19 +487,19 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 							.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 					LOGGER.info(
-							"updateCalendar() / ageNotificacioneseventoMapper.selectByExample(exampleNotificacion) -> Entrada a ageNotificacioneseventoMapper para buscar si existe la notificacion");
+							"deleteNotification() / ageNotificacioneseventoMapper.selectByExample(exampleNotificacion) -> Entrada a ageNotificacioneseventoMapper para buscar si existe la notificacion");
 
 					List<AgeNotificacionesevento> notificationList = ageNotificacioneseventoMapper
 							.selectByExample(exampleNotificacion);
 
 					LOGGER.info(
-							"updateCalendar() / ageNotificacioneseventoMapper.selectByExample(exampleNotificacion) -> Salida a ageNotificacioneseventoMapper para buscar si existe la notificacion");
+							"deleteNotification() / ageNotificacioneseventoMapper.selectByExample(exampleNotificacion) -> Salida a ageNotificacioneseventoMapper para buscar si existe la notificacion");
 
 					if (null != notificationList && notificationList.size() > 0) {
 						AgeNotificacionesevento notification = notificationList.get(0);
 
 						LOGGER.info(
-								"updateCalendar() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Entrada a ageCalendarioExtendsMapper para dar de baja a la notificacion");
+								"deleteNotification() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Entrada a ageCalendarioExtendsMapper para dar de baja a la notificacion");
 
 						notification.setFechamodificacion(new Date());
 						notification.setUsumodificacion(usuario.getIdusuario().longValue());
@@ -496,12 +507,15 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 						ageNotificacioneseventoMapper.updateByPrimaryKey(notification);
 
 						LOGGER.info(
-								"updateCalendar() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Salida a ageCalendarioExtendsMapper para dar de baja a notificacion");
+								"deleteNotification() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Salida a ageCalendarioExtendsMapper para dar de baja a notificacion");
 
 					}
 				}
 			}
 		}
+
+		LOGGER.info(
+				"deleteNotification() -> Salida del servicio para dar de baja a las notificaciones de eventos de un calendario especifico");
 
 		updateResponseDTO.setError(error);
 		return updateResponseDTO;

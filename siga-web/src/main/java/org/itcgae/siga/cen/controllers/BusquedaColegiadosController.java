@@ -50,7 +50,7 @@ public class BusquedaColegiadosController {
 	
 	@RequestMapping(value = "busquedaColegiados/poblacion", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getPoblacion(String idProvincia, String dataFilter, HttpServletRequest request) { 
-		ComboDTO response = tarjetaDatosDireccionesService.getPoblacionFiltrado(request,idProvincia, dataFilter);
+		ComboDTO response = tarjetaDatosDireccionesService.getPoblacion(request,idProvincia, dataFilter);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	

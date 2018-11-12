@@ -165,7 +165,6 @@ public class AgendaCalendarioServiceImpl implements IAgendaCalendarioService {
 						"getCalendars() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (null != usuarios && usuarios.size() > 0) {
-					AdmUsuarios usuario = usuarios.get(0);
 					LOGGER.info(
 							"getCalendars() / ageTipocalendarioExtendsMapper.getCalendarType() -> Entrada a ageTipocalendarioExtendsMapper para obtener los diferentes tipos de calendarios");
 					comboItems = ageCalendarioExtendsMapper.getCalendars(idInstitucion.toString());

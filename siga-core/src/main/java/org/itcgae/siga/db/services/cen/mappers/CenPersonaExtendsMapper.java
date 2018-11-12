@@ -47,13 +47,17 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PRIMERAPELLIDO", property = "primerApellido", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SEGUNDOAPELLIDO", property = "segundoApellido", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMEROCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "RESIDENTE", property = "residente", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESTADOCOLEGIAL", property = "situacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DENOMINACION", property = "nombre", jdbcType = JdbcType.VARCHAR)	
+		@Result(column = "DENOMINACION", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "numeroInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPROVINCIA", property = "idProvincia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDACTIVIDADPROFESIONAL", property = "idActividadProfesional", jdbcType = JdbcType.VARCHAR)
 	})
-	List<BusquedaPerFisicaItem> searchPerFisica(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, String idLenguaje);
+	List<BusquedaPerFisicaItem> searchPerFisica(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, String idLenguaje, String idInstitucion);
+	
 	
 	
 	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "searchPerJuridica")
@@ -69,7 +73,8 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
 		@Result(column = "NUMEROINTEGRANTES", property = "numeroIntegrantes", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRESINTEGRANTES", property = "nombresIntegrantes", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ESTADOCOLEGIAL", property = "situacion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<BusquedaPerJuridicaItem> searchPerJuridica(int numpagina, BusquedaPerJuridicaSearchDTO busquedaPerJuridicaSearchDTO, String idLenguaje);
 	

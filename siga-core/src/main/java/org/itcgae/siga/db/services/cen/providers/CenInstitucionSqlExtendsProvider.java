@@ -3,6 +3,7 @@ package org.itcgae.siga.db.services.cen.providers;
 import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample.Criteria;
 import org.itcgae.siga.db.entities.CenInstitucionExample.Criterion;
@@ -373,6 +374,19 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 		sql.SELECT("distinct CEN.idlenguaje ");
 		sql.FROM(" cen_institucion CEN ");
 		sql.WHERE(" CEN.idinstitucion = '" + idInstitucion +"'");
+		return sql.toString();
+	}
+	
+	public String selectProvinciaColegio(StringDTO idInstitucionIntegrante) {
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("DIR.IDPROVINCIA");
+		sql.FROM("CEN_INSTITUCION I");
+		sql.INNER_JOIN("CEN_PERSONA P ON I.IDPERSONA = P.IDPERSONA");
+		sql.INNER_JOIN("CEN_DIRECCIONES DIR ON (P.IDPERSONA = DIR.IDPERSONA AND  DIR.FECHABAJA IS NULL)");
+		sql.WHERE("DIR.IDPROVINCIA IS NOT NULL");
+		sql.WHERE("I.IDINSTITUCION = '"+idInstitucionIntegrante.getValor()+"'");
+		
 		return sql.toString();
 	}
     

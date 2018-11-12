@@ -22,6 +22,7 @@ public class UsuarioItem {
 	private String descLenguaje  = null;
 	private String idUsuario = null;
 	private String[] perfiles = null;
+	private String nifRol = null;
 	
 
 	/**
@@ -251,6 +252,24 @@ public class UsuarioItem {
 	}
 	
 	
+	/**
+	 */
+	public UsuarioItem nifRol(String nifRol){
+		this.nifRol = nifRol;
+		return this;
+	}
+	
+	
+	@JsonProperty("nifRol")
+	public String getNifRol() {
+		return nifRol;
+	}
+	
+	
+	public void setNifRol(String nifRol) {
+		this.nifRol = nifRol;
+	}
+	
 	
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -271,14 +290,15 @@ public class UsuarioItem {
 	        Objects.equals(this.activo, usuarioItem.activo) &&
 	        Objects.equals(this.idInstitucion, usuarioItem.idInstitucion) &&
 	    	Objects.equals(this.idUsuario, usuarioItem.idUsuario)&&
-	    	Objects.equals(this.perfiles, usuarioItem.perfiles);
+	    	Objects.equals(this.perfiles, usuarioItem.perfiles)&&
+	    	Objects.equals(this.nifRol, usuarioItem.nifRol) ;
 	    
 	}
 
 
 	@Override
 	public int hashCode() {
-		 return Objects.hash(nombreApellidos, nif, fechaAlta, roles, codigoExterno, perfil, activo, idInstitucion, idUsuario);
+		 return Objects.hash(nombreApellidos, nif, fechaAlta, roles, codigoExterno, perfil, activo, idInstitucion, idUsuario,nifRol);
 	}
 	
 	
@@ -297,6 +317,7 @@ public class UsuarioItem {
 	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
 	    sb.append("    idUsuario: ").append(toIndentedString(idUsuario)).append("\n");
 	    sb.append("    perfiles: ").append(toIndentedString(perfiles)).append("\n");
+	    sb.append("    nifRol: ").append(toIndentedString(nifRol)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}

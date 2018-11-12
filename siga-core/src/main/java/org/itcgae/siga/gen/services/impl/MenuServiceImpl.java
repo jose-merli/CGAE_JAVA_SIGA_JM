@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -200,6 +201,7 @@ public class MenuServiceImpl implements IMenuService {
 		menuEntities = menuExtend.selectMenuByExample(String.valueOf(idInstitucion), idPerfiles);
 
 		if (null != menuEntities && !menuEntities.isEmpty()) {
+			// Componemos el menú
 			Boolean tieneRuedaConf = Boolean.FALSE;
 			Boolean tieneMenuConfi = Boolean.FALSE;
 			for (GenMenu menu : menuEntities) {
@@ -209,6 +211,7 @@ public class MenuServiceImpl implements IMenuService {
 				}else if(menu.getIdrecurso().equals("menu.administracion") || menu.getIdrecurso().equals("menu.administracion.gestionCatalogosMaestros")) {
 					tieneMenuConfi= Boolean.TRUE;
 				}
+
 			}
 			if (!tieneRuedaConf && tieneMenuConfi) {
 				GenMenuExample exampleMenu = new GenMenuExample();
@@ -216,6 +219,7 @@ public class MenuServiceImpl implements IMenuService {
 				List<GenMenu> menuConfig = menuMapper.selectByExample(exampleMenu );
 				if (null != menuConfig && menuConfig.size()>0) {
 					menuEntities.add(menuConfig.get(0));
+					tieneRuedaConf = Boolean.TRUE;
 					Collections.sort(menuEntities, new Comparator<GenMenu>() {
 						@Override
 						public int compare(GenMenu o1, GenMenu o2) {
@@ -231,12 +235,44 @@ public class MenuServiceImpl implements IMenuService {
 			List<GenMenu> rootMenus = menuEntities.stream()
 					.filter(i -> Strings.isNullOrEmpty(i.getIdparent()) || i.getIdparent().equals(" "))
 					.collect(Collectors.toList());
+			int posicionAInsertar = 0;
 			// Componemos el menú
 			for (GenMenu dbItem : rootMenus) {
 				MenuItem item = processMenu(dbItem, menuEntities, idLenguaje);
 				items.add(item);
 			}
+			List<String> idRecursos = new ArrayList<String>();
+			int i = 0;
+			for (MenuItem dbItem : items) {
+				if (tieneRuedaConf) {
+					if (dbItem.getLabel().equals("menu.configuracion")) {
+						posicionAInsertar = i;
+					}
+				}
+				idRecursos.addAll(recuperaridRecursos(dbItem));
+				i++;
 
+			}
+			for (GenMenu menu : menuEntities) {
+				if (!idRecursos.contains(menu.getIdrecurso())) {
+					MenuItem menuItem = new MenuItem();
+					menuItem.setLabel(menu.getIdrecurso());
+					menuItem.setIdclass(menu.getIdclass());
+					menuItem.setRouterLink(menu.getPath());
+					menuItem.setItems(null);
+					if (tieneRuedaConf) {
+						items.add(posicionAInsertar,menuItem);
+						posicionAInsertar++;
+					}else{
+						items.add(menuItem);
+					}
+				}
+
+			}
+			
+			
+	
+			
 			response.setMenuItems(items);
 		}
 
@@ -244,8 +280,21 @@ public class MenuServiceImpl implements IMenuService {
 
 	}
 
+	private Collection<String> recuperaridRecursos(MenuItem dbItem) {
+		Collection<String> ids = new ArrayList<String>();
+		ids.add(dbItem.getLabel());
+		if (null != dbItem.getItems() && dbItem.getItems().size()>0) {
+			for (MenuItem dbItemHijo : dbItem.getItems()) {
+				ids.addAll(recuperaridRecursos(dbItemHijo));
+				
+			}
+		}
+		
+		return ids;
+	}
+
 	private static MenuItem processMenu(GenMenu parent, List<GenMenu> childCandidatesList, String idLenguaje) {
-		// Realizamos la carga del menú de forma cíclica dependiende los
+		// Realizamos la carga del menú de forma cíclica dependiendo los
 		// IdParents
 		ArrayList<GenMenu> childList = new ArrayList<GenMenu>();
 		ArrayList<GenMenu> childListTwo = new ArrayList<GenMenu>();
@@ -253,6 +302,7 @@ public class MenuServiceImpl implements IMenuService {
 		response.setLabel(parent.getIdrecurso());
 		response.setIdclass(parent.getIdclass());
 		response.setRouterLink(parent.getPath());
+		
 
 		// Recorremos sus hijos
 		for (GenMenu childTransactions : childCandidatesList) {
@@ -270,9 +320,9 @@ public class MenuServiceImpl implements IMenuService {
 					childListTwo.remove(childTransactions);
 				}
 			}
+			
 		}
 		List<MenuItem> responseChilds = new ArrayList<MenuItem>();
-
 		for (GenMenu child : childList) {
 			// Si tenemos hijos los procesamos de forma individual para ver si
 			// tienen más hijos
@@ -289,6 +339,8 @@ public class MenuServiceImpl implements IMenuService {
 
 	}
 
+	
+	
 	@Override
 	public ComboDTO getInstituciones(HttpServletRequest request) {
 		// Cargamos el combo de Instituciones
@@ -672,22 +724,34 @@ public class MenuServiceImpl implements IMenuService {
 		try{
 		X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
 		String organizationName = null;
+		String organizationNameNuevo = null;
 		X509Certificate cert = null;
 		try {
 			cert = certs[0];
 			X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
 
+
+			if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
+				RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
+				organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
+			}else{
+				RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
+				organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
+			}
 			
-
-			RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
-			organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
-
 		} catch (CertificateEncodingException e) {
 			throw new InvalidClientCerticateException(e);
 		}
 
-		String idInstitucion = organizationName.substring(organizationName.length() - 4,
-		organizationName.length());
+
+		String idInstitucion = null;
+		if (null != organizationNameNuevo) {
+			idInstitucion = organizationNameNuevo.substring(0,
+						4);
+		}else{
+			idInstitucion = organizationName.substring(organizationName.length() - 4,
+				organizationName.length());
+		}
 		if (!UtilidadesString.esCadenaVacia(idInstitucion)) {
 			if (!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
 				throw new BadCredentialsException("Certificado no validado para CGAE");
@@ -699,6 +763,22 @@ public class MenuServiceImpl implements IMenuService {
 		}
 		response.setStatus(SigaConstants.OK);
 		return response;
+	}
+
+	@Override
+	public ComboItem getInstitucionActual(HttpServletRequest request) {
+		ComboItem comboItem = new ComboItem();
+		CenInstitucion cenInstitucion = new CenInstitucion();
+		// Obtenemos atributos del usuario logeado
+		LOGGER.debug("Obtenemos atributos del usuario logeado");
+		String token = request.getHeader("Authorization");
+		Short institucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		cenInstitucion = institucionMapper.selectByPrimaryKey(institucion);
+		
+		comboItem.setLabel(cenInstitucion.getNombre());
+		comboItem.setValue(String.valueOf(cenInstitucion.getIdinstitucion()));
+		return comboItem;
 	}	
 
 

@@ -14,6 +14,7 @@ public class EtiquetaUpdateDTO {
 	private String cuentaContable;
 	private String anotaciones;
 	private String [] grupos;
+	private ComboEtiquetasItem[] etiquetas;
 	private String idPersona;
 	private String abreviatura;
 	private String motivo;
@@ -155,7 +156,22 @@ public class EtiquetaUpdateDTO {
 		this.grupos = grupos;
 	}
 	
+	public EtiquetaUpdateDTO grupos(ComboEtiquetasItem[] etiquetas){
+		this.etiquetas = etiquetas;
+		return this;
+	}
 	
+	@JsonProperty("etiquetas")
+	public ComboEtiquetasItem[] getEtiquetas() {
+		return etiquetas;
+	}
+
+
+	public void setEtiquetas(ComboEtiquetasItem[] etiquetas) {
+		this.etiquetas = etiquetas;
+	}
+
+
 	/**
 	 */
 	public EtiquetaUpdateDTO idPersona(String idPersona){
@@ -208,6 +224,7 @@ public class EtiquetaUpdateDTO {
 	    		Objects.equals(this.cuentaContable, etiquetaUpdateDTO.cuentaContable) &&
 	    		Objects.equals(this.anotaciones, etiquetaUpdateDTO.anotaciones) &&
 	    		Objects.equals(this.grupos, etiquetaUpdateDTO.grupos) &&
+	    		Objects.equals(this.etiquetas, etiquetaUpdateDTO.etiquetas) &&
 	    		Objects.equals(this.idPersona, etiquetaUpdateDTO.idPersona) &&
 	    		Objects.equals(this.motivo, etiquetaUpdateDTO.motivo);
 	}
@@ -230,6 +247,7 @@ public class EtiquetaUpdateDTO {
 	    sb.append("    cuentaContable: ").append(toIndentedString(cuentaContable)).append("\n");
 	    sb.append("    anotaciones: ").append(toIndentedString(anotaciones)).append("\n");
 	    sb.append("    grupos: ").append(toIndentedString(grupos)).append("\n");
+	    sb.append("    etiquetas: ").append(toIndentedString(etiquetas)).append("\n");
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 	    sb.append("    motivo: ").append(toIndentedString(motivo)).append("\n");
 	    sb.append("}");

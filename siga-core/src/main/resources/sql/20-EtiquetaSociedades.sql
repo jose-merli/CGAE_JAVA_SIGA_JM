@@ -88,3 +88,4 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.administracion.gestionMultiidioma.etiquetasSociedad','Etiquetes','0','2',to_date('20/03/18','DD/MM/RR'),'0','8');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.administracion.gestionMultiidioma.etiquetasSociedad','Etiquetas#EU','0','3',to_date('20/03/18','DD/MM/RR'),'0','8');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.administracion.gestionMultiidioma.etiquetasSociedad','Etiquetas#GL','0','4',to_date('20/03/18','DD/MM/RR'),'0','8');
+   
