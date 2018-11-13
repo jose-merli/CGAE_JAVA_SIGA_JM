@@ -242,16 +242,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 						response = cenDatoscvExtendsMapper.updateByPrimaryKey(Actualizar);
 //						update by primarykey
 					}
-//					for(int i = 0; i > datosCurricularesActivos.size(); i++) {
-//						CenDatoscv Actualizar = new CenDatoscv();
-//						Actualizar = datosCurricularesActivos.get(i);
-//						Actualizar.setFechabaja(new Date());
-//						Actualizar.setFechafin(new Date());
-//						Actualizar.setFechamodificacion(new Date());
-//						Actualizar.setUsumodificacion(usuario.getIdusuario());
-//						response = cenDatoscvExtendsMapper.updateByPrimaryKey(Actualizar);
-////						update by primarykey
-//					}
+
 				}
 				
 			}
@@ -333,6 +324,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 
 			recordInsert.setFechainicio(fichaDatosCurricularesItem.getFechaDesdeDate());
 			recordInsert.setFechafin(fichaDatosCurricularesItem.getFechaHastaDate());
+			recordInsert.setFechabaja(fichaDatosCurricularesItem.getFechaHastaDate());
 			recordInsert.setCertificado(fichaDatosCurricularesItem.getCertificado());
 			recordInsert.setFechamovimiento(fichaDatosCurricularesItem.getFechaMovimientoDate());
 			recordInsert.setDescripcion(fichaDatosCurricularesItem.getDescripcion());
@@ -347,6 +339,28 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			} else {
 				int idCv = Integer.parseInt(idCvBD.getNewId()) + 1;
 				recordInsert.setIdcv(Short.parseShort("" + idCv));
+			}
+			
+			if(recordInsert.getFechafin() == null) {
+				CenDatoscvExample example = new CenDatoscvExample();
+				Long idPers = Long.parseLong(fichaDatosCurricularesItem.getIdPersona());
+				example.createCriteria().andIdpersonaEqualTo(idPers).andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
+				List<CenDatoscv> datosCurricularesActivos = cenDatoscvExtendsMapper.selectByExample(example);
+				
+				if(datosCurricularesActivos != null && datosCurricularesActivos.size() != 0) {
+					for(CenDatoscv dato: datosCurricularesActivos) {
+						CenDatoscv Actualizar = new CenDatoscv();
+						Actualizar = dato;
+						Actualizar.setFechabaja(new Date());
+						Actualizar.setFechafin(new Date());
+						Actualizar.setFechamodificacion(new Date());
+						Actualizar.setUsumodificacion(usuario.getIdusuario());
+						response = cenDatoscvExtendsMapper.updateByPrimaryKey(Actualizar);
+//						update by primarykey
+					}
+
+				}
+				
 			}
 
 			response = cenDatoscvExtendsMapper.insertSelective(recordInsert);

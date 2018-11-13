@@ -20,6 +20,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IBusquedaPerService;
 import org.itcgae.siga.cen.services.IInstitucionesService;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -269,15 +270,17 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				AdmUsuarios usuario = usuarios.get(0);
 				idLenguaje = usuario.getIdlenguaje();
 
+				
+				// 1. Buscamos colegiados dentro de nuestro colegio
 				LOGGER.info(
 						"searchPerFisica() / cenPersonaExtendsMapper.searchPerFisica() -> Entrada a cenPersonaExtendsMapper para obtener lista de personas físicas");
-				busquedaPerFisicaItems = cenPersonaExtendsMapper.searchPerFisica(busquedaPerFisicaSearchDTO, idLenguaje);
+				busquedaPerFisicaItems = cenPersonaExtendsMapper.searchPerFisica(busquedaPerFisicaSearchDTO, idLenguaje, String.valueOf(idInstitucion));
 				LOGGER.info(
 						"searchPerFisica() / cenPersonaExtendsMapper.searchPerFisica() -> Salida de cenPersonaExtendsMapper para obtener lista de personas físicas");
 
 				busquedaPerFisicaDTO.setBusquedaFisicaItems(busquedaPerFisicaItems); 
-				
-				//Si no encontramos registros, buscamos en la aplicación de Censo
+								
+				// 2. Si no encontramos registros en BD local, buscamos en la aplicación de Censo
 				if (null == busquedaPerFisicaItems || busquedaPerFisicaItems.size() == 0) {
 					if (null != busquedaPerFisicaSearchDTO.getNif()  && !busquedaPerFisicaSearchDTO.getNif().equals("")) {
 						Colegiado colegiado = buscarColegiado(busquedaPerFisicaSearchDTO.getNif());
@@ -297,6 +300,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 							busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido().concat(busquedaPerFisica.getSegundoApellido()));
 							busquedaPerFisica.setNif(colegiado.getDatosPersonales().getIdentificacion().getNIF());
 							busquedaPerFisica.setNombre(colegiado.getDatosPersonales().getNombre());
+							
 							if (null != colegiado.getColegiacionArray() && colegiado.getColegiacionArray().length>0) {
 								if (null != colegiado.getColegiacionArray()[0].getResidente()) {
 									if (colegiado.getColegiacionArray()[0].getResidente().toString().equals("1")) {
@@ -311,7 +315,8 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 								if (null != colegiado.getColegiacionArray()[0].getColegio()) {
 									List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiado.getColegiacionArray()[0].getColegio().getCodigoColegio());
 									if (null != instituciones && instituciones.size()>0) {
-										busquedaPerFisica.setColegio(instituciones.get(0).getIdinstitucion().toString());
+										busquedaPerFisica.setColegio(instituciones.get(0).getNombre());
+										busquedaPerFisica.setNumeroInstitucion(instituciones.get(0).getIdinstitucion().toString());
 									}
 								}
 							}
@@ -350,6 +355,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 								busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido().concat(busquedaPerFisica.getSegundoApellido()));
 								busquedaPerFisica.setNif(colegiado[i].getDatosPersonales().getIdentificacion().getNIF());
 								busquedaPerFisica.setNombre(colegiado[i].getDatosPersonales().getNombre());
+								
 								if (null != colegiado[i].getColegiacionArray() && colegiado[i].getColegiacionArray().length>0) {
 									if (null != colegiado[i].getColegiacionArray()[0].getResidente()) {
 										if (colegiado[i].getColegiacionArray()[0].getResidente().toString().equals("1")) {
@@ -364,7 +370,8 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 									if (null != colegiado[i].getColegiacionArray()[0].getColegio()) {
 										List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiado[i].getColegiacionArray()[0].getColegio().getCodigoColegio());
 										if (null != instituciones && instituciones.size()>0) {
-											busquedaPerFisica.setColegio(instituciones.get(0).getIdinstitucion().toString());
+											busquedaPerFisica.setColegio(instituciones.get(0).getNombre());
+											busquedaPerFisica.setNumeroInstitucion(instituciones.get(0).getIdinstitucion().toString());
 										}
 									}
 								}
@@ -376,7 +383,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 					}
 					
 				
-				}
+				}				
 			} else {
 				LOGGER.warn(
 						"searchPerFisica() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -414,6 +421,9 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 					List<CenInstitucion> instituciones = institucionesService.getCodExternoByidInstitucion(busquedaPerFisicaSearchDTO.getIdInstitucion()[0]);
 					colegio.setCodigoColegio(instituciones.get(0).getCodigoext());
 					colegiadoSearch.setColegio(colegio );
+					if(!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNumeroColegiado())) {
+						colegiadoSearch.setNumColegiado(busquedaPerFisicaSearchDTO.getNumeroColegiado());
+					}
 					colegiadoRequest.setColegiado(colegiadoSearch);
 				}
 

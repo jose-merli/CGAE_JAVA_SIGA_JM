@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
 import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
@@ -32,6 +33,9 @@ import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample;
+import org.itcgae.siga.db.entities.CenGruposcliente;
+import org.itcgae.siga.db.entities.CenGruposclienteCliente;
+import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.CenPersona;
@@ -40,10 +44,13 @@ import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenDatoscolegialesestadoMapper;
 import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscolegialesestadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
@@ -68,9 +75,17 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	@Autowired
 	private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
 	
-	
+	@Autowired
+	private CenGruposclienteClienteExtendsMapper cenGruposclienteClienteExtendsMapper;
+
 	@Autowired
 	private CenDatoscolegialesestadoExtendsMapper cenDatoscolegialesestadoMapper;
+
+	@Autowired
+	private CenGruposclienteExtendsMapper cenGruposclienteExtendsMapper;
+
+	@Autowired
+	private GenRecursosCatalogosExtendsMapper genRecursosCatalogosExtendsMapper;
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -97,8 +112,11 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				"updateColegiado() -> Entrada al servicio para actualizar información general de un colegiado");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		List<CenDatoscolegialesestado> cenDatoscolegialesestado = new ArrayList<CenDatoscolegialesestado>();
-	
-		
+		List<ComboEtiquetasItem> gruposPersona = new ArrayList<ComboEtiquetasItem>();
+		EtiquetaUpdateDTO etiquetaUpdateDTO = new EtiquetaUpdateDTO();
+		List<String> gruposNuevosNoAniadidos = new ArrayList<String>();
+		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
+		ComboEtiquetasItem comboEtiquetasItem = new ComboEtiquetasItem();
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -120,6 +138,159 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				
 				CenPersona cenPersona = cenPersonaExtendsMapper.selectByPrimaryKey(Long.valueOf(colegiadoItem.getIdPersona()));
 
+				etiquetaUpdateDTO.setIdPersona(colegiadoItem.getIdPersona());
+
+				// 1. obtener grupos de la persona juridica antes de actualizar
+				gruposPersona = cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica(
+						colegiadoItem.getIdPersona(), String.valueOf(usuario.getIdinstitucion()));
+
+				List<String> gruposPerJuridicaAntiguos = new ArrayList<String>();
+				List<String> gruposPerJuridicaAnterior = new ArrayList<String>();
+
+				for (int i = 0; i < gruposPersona.size(); i++) {
+					gruposPerJuridicaAntiguos.add(gruposPersona.get(i).getIdGrupo());
+					gruposPerJuridicaAnterior.add(gruposPersona.get(i).getIdGrupo());
+				}
+
+				// 2. actualizar relaciones entre tablas para todos los grupos (eliminado y
+				// creación)
+				for (String grupo : colegiadoItem.getGrupos()) {
+
+					// 2.1 si el nuevo grupo no está, hay que crearlo
+					if (!gruposPerJuridicaAntiguos.contains(grupo)) {
+
+						// guardamos para AUDITORIA los grupos nuevos
+						gruposNuevosNoAniadidos.add(grupo);
+
+						LOGGER.info(
+								"updateLegalPerson() / cenGruposclienteExtendsMapper.createLegalPerson() -> Entrada a cenGruposclienteExtendsMapper para obtener grupos de clientes");
+						cenGruposcliente = cenGruposclienteExtendsMapper.selectDistinctGruposClientes(
+								String.valueOf(idInstitucion), usuario.getIdlenguaje(), grupo);
+						LOGGER.info(
+								"updateLegalPerson() / cenGruposclienteExtendsMapper.createLegalPerson() -> Salida de cenGruposclienteExtendsMapper para obtener grupos de clientes");
+
+						// 2.1.1 si existen ya registros para ese grupo => solo actualizar/insertar en
+						// tabla CEN_GRUPOSCLIENTE_CLIENTE (relacion persona-grupo)
+						if (null != cenGruposcliente && cenGruposcliente.size() > 0) {
+
+							List<CenGruposclienteCliente> listarelacionGrupoPersona = new ArrayList<CenGruposclienteCliente>();
+							CenGruposclienteClienteExample relacionGrupoPersona = new CenGruposclienteClienteExample();
+							relacionGrupoPersona.createCriteria()
+									.andIdpersonaEqualTo(Long.valueOf(etiquetaUpdateDTO.getIdPersona()))
+									.andIdgrupoEqualTo(Short.valueOf(grupo)).andIdinstitucionEqualTo(idInstitucion);
+							listarelacionGrupoPersona = cenGruposclienteClienteExtendsMapper
+									.selectByExample(relacionGrupoPersona);
+
+							// 2.1.1.1 si no existe registro que relaciona un grupo-persona juridica => se
+							// crea registro en CEN_GRUPOSCLIENTE_CLIENTE
+							if (listarelacionGrupoPersona.isEmpty()) {
+								LOGGER.info(
+										"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
+//								revisar
+								int response = cenGruposclienteClienteExtendsMapper.insertSelectiveForUpdateLegalPerson(
+										comboEtiquetasItem, String.valueOf(idInstitucion), grupo,
+										String.valueOf(usuario.getIdusuario()));
+								LOGGER.info(
+										"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
+
+								if (response == 0) {
+									updateResponseDTO.setStatus(SigaConstants.KO);
+									LOGGER.warn(
+											"updateLegalPerson() / cenGruposclienteExtendsMapper.createLegalPerson() -> No se pudo insertar el grupo = "
+													+ grupo + " en tabla CEN_GRUPOSCLIENTE_CLIENTE");
+								}
+							}
+							// 2.1.1.2 existe registro que relaciona un grupo-persona juridica => se
+							// actualiza la fecha de baja del registro en CEN_GRUPOSCLIENTE_CLIENTE
+							else {
+
+								listarelacionGrupoPersona.get(0).setFechaBaja(null);
+								LOGGER.info(
+										"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.updateByExample() -> Entrada a cenGruposclienteClienteExtendsMapper para actualizar relacion grupo-persona jurídica");
+
+								int response = cenGruposclienteClienteExtendsMapper
+										.updateByExample(listarelacionGrupoPersona.get(0), relacionGrupoPersona);
+								LOGGER.info(
+										"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.updateByExample() -> Salida de cenGruposclienteClienteExtendsMapper para actualizar relacion grupo-persona jurídica");
+
+								if (response == 0) {
+									updateResponseDTO.setStatus(SigaConstants.KO);
+									LOGGER.warn(
+											"updateLegalPerson() / cenGruposclienteExtendsMapper.updateByExample() -> No se pudo actualizar la fecha de baja del grupo = "
+													+ grupo + " en tabla CEN_GRUPOSCLIENTE_CLIENTE");
+								}
+							}
+
+						}
+						// 2.1.2 no existen registros para ese grupo => insertar en: tabla
+						// CEN_GRUPOSCLIENTE , GEN_RECURSOS_CATALOGOS y CEN_GRUPOSCLIENTE_CLIENTE
+						else {
+//							int response1 = 0;
+//							int response2 = 0;
+//							int response3 = 0;
+//							// insertar en GEN_RECURSOS_CATALOGOS para generar recurso
+//							String nombreTabla = "CEN_GRUPOSCLIENTE";
+//							String campoTabla = "NOMBRE";
+//							LOGGER.info(
+//									"updateLegalPerson() / genRecursosCatalogosExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a genRecursosCatalogosExtendsMapper para crear recurso de una persona juridica");
+//							response1 = genRecursosCatalogosExtendsMapper.insertSelectiveForCreateLegalPerson(
+//									String.valueOf(idInstitucion), usuario, grupo, nombreTabla, campoTabla);
+//							LOGGER.info(
+//									"updateLegalPerson() / genRecursosCatalogosExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de genRecursosCatalogosExtendsMapper para crear recurso de una persona juridica");
+//
+//							if (response1 == 1) {
+//
+//								// insertar en CEN_GRUPOSCLIENTE para generar el grupo
+//								LOGGER.info(
+//										"updateLegalPerson() / cenGruposclienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenGruposclienteExtendsMapper para crear grupo de una persona jurídica");
+//
+//								response2 = cenGruposclienteExtendsMapper
+//										.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion), usuario);
+//								LOGGER.info(
+//										"updateLegalPerson() / cenGruposclienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenGruposclienteExtendsMapper para crear grupo de una persona jurídica");
+//
+//								if (response2 == 1) {
+//									// insertar en CEN_GRUPOSCLIENTE_CLIENTE para relacionar grupos-usuarios
+//									LOGGER.info(
+//											"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
+//
+//									response3 = cenGruposclienteClienteExtendsMapper
+//											.insertSelectiveForUpdateLegalPerson(etiquetaUpdateDTO,
+//													String.valueOf(idInstitucion), "",
+//													String.valueOf(usuario.getIdusuario()));
+//									LOGGER.info(
+//											"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
+//
+//									if (response3 == 0) {
+//										updateResponseDTO.setStatus(SigaConstants.KO);
+//										LOGGER.warn(
+//												"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> No se pudo insertar el grupo = "
+//														+ grupo + " en tabla CEN_GRUPOSCLIENTE_CLIENTE");
+//
+//									}
+//								} else {
+//									updateResponseDTO.setStatus(SigaConstants.KO);
+//									LOGGER.warn(
+//											"updateLegalPerson() / cenGruposclienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> No se pudo insertar el grupo = "
+//													+ grupo + " en tabla CEN_GRUPOSCLIENTE");
+//								}
+//							} else {
+//								updateResponseDTO.setStatus(SigaConstants.KO);
+//								LOGGER.warn(
+//										"updateLegalPerson() / genRecursosCatalogosExtendsMapper.insertSelectiveForCreateLegalPerson() -> No se pudo insertar el grupo = "
+//												+ grupo + " en tabla GEN_RECURSOS_CATALOGOS");
+//							}
+						}
+					}
+					// 2.2 el grupo ya existe para la persona juridica => eliminar de los grupos
+					// antiguos
+					else {
+						// eliminamos grupo de los antiguos que tenia la persona juridica para que solo
+						// queden los que hay que eliminar
+						gruposPerJuridicaAntiguos.remove(grupo);
+					}
+				}
+				
 				// 2. Actualizamos la tabla Cen_Persona
 				
 				cenPersona.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));

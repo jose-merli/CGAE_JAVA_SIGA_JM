@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesDeleteDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
@@ -87,7 +88,11 @@ public class TarjetaDatosIntegrantesController {
 	}
 	
 	
-	
+	@RequestMapping(value = "tarjetaIntegrantes/provinciaColegio", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<StringDTO> provinciaColegio(@RequestBody StringDTO idInstitucionIntegrante, HttpServletRequest request) { 
+		StringDTO response = tarjetaDatosIntegrantesService.provinciaColegio(idInstitucionIntegrante, request);
+			return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+	}
 	
 	
 	

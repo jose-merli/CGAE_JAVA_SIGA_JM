@@ -22,5 +22,5 @@ public interface IFichaCursosService {
 
 	public InsertResponseDTO saveTrainersCourse(FormadorCursoItem formadorCursoItem, HttpServletRequest request);
 
-	
+	public UpdateResponseDTO deleteTrainersCourse(FormadorCursoDTO formadorCursoDTO, HttpServletRequest request);
 }

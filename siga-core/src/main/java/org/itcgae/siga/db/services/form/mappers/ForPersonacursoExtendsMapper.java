@@ -27,12 +27,15 @@ public interface ForPersonacursoExtendsMapper extends ForPersonaCursoMapper{
 	@Results({
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDCURSO", property = "idCurso", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "NOMBRE", property = "nombreCompleto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDROL", property = "idRol", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOCOSTE", property = "idTipoCoste", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "TIPOCOSTE", property = "tipoCoste", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TARIFA", property = "tarifa", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "TUTOR", property = "tutor", jdbcType = JdbcType.NUMERIC),
 	})
 	List<FormadorCursoItem> getTrainersCourse(String idInstitucion, String idCurso, String idLenguaje);
 	

@@ -32,7 +32,6 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBancos;
 import org.itcgae.siga.db.entities.CenCliente;
-import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
@@ -51,7 +50,6 @@ import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDocumentacionmodalidadExtendsMapper;
@@ -113,9 +111,6 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private CenPersonaExtendsMapper _cenPersonaExtendsMapper;
-	
-	@Autowired
-	private CenDireccionesExtendsMapper _cenDireccionesExtendsMapper;
 	
 	@Autowired
 	private CenDireccionesMapper _cenDireccionesMapper;
@@ -607,6 +602,8 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					}
 					
 				}catch(Exception e){
+					
+					
 					error.setMessage(e.getMessage());
 					response.setStatus(SigaConstants.KO);
 					response.setError(error);
@@ -625,7 +622,6 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		int update = 0;
 		InsertResponseDTO response = new InsertResponseDTO();
 		Error error = new Error();
-		CenSolicitudincorporacion solIncorporacion;
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);

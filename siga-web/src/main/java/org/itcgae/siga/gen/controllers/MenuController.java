@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.EntornoDTO;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MenuController {
 	
 	@Autowired
-	IMenuService menuService;
+	private IMenuService menuService;
     
 	
 	
@@ -80,5 +81,12 @@ public class MenuController {
     	return new ResponseEntity<PermisoDTO>(response, HttpStatus.OK);
 
 	}
+    
+    
+    @RequestMapping(value = "/getInstitucionActual", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   	ResponseEntity<ComboItem> getInstitucionActual(HttpServletRequest request) {
+    	ComboItem response = menuService.getInstitucionActual(request);
+       	return new ResponseEntity<ComboItem>(response, HttpStatus.OK);
+   	}
     
 }

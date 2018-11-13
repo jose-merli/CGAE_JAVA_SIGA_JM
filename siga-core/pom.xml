@@ -99,11 +99,10 @@
 			<version>1.7.7</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.apache</groupId>
+		    <groupId>org.apache.poi</groupId>
 		    <artifactId>poi</artifactId>
-		    <version>3.12-20150511</version>
-		</dependency>
-		
+		    <version>3.13</version>
+		</dependency>  
 		<dependency>
 			<groupId>org.redabogacia.alterMutuaServ</groupId>
 			<artifactId>AlterMutuaServ</artifactId>

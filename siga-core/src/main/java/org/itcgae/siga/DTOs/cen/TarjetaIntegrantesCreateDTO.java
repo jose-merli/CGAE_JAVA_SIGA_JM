@@ -26,6 +26,23 @@ public class TarjetaIntegrantesCreateDTO {
 	private String idProvincia;
 	private String numColegiado;
 	private String tipo;
+	private String flagSocio;
+	
+	
+	
+	
+	
+	public String getFlagSocio() {
+		return flagSocio;
+	}
+
+	public void setFlagSocio(String flagSocio) {
+		this.flagSocio = flagSocio;
+	}
+
+	
+
+	
 	
 	
 

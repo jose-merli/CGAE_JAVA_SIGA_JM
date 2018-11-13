@@ -54,9 +54,9 @@ public class CenTiposCVSubtipo2SqlExtendsProvider extends CenTiposcvsubtipo2SqlP
 			sql.WHERE("tiposCVSubt2.IDTIPOCV= '"+subtipoCurricularItem.getIdTipoCV()+"'");
 		}
 
-		if (!UtilidadesString.esCadenaVacia(subtipoCurricularItem.getTipoCategoriaCurricular())) {
-			sql.WHERE("tiposCVSubt2.IDTIPOCV = '" + subtipoCurricularItem.getTipoCategoriaCurricular() + "'");
-		}
+//		if (!UtilidadesString.esCadenaVacia(subtipoCurricularItem.getTipoCategoriaCurricular())) {
+			sql.WHERE("tiposCVSubt2.IDTIPOCV = '" + subtipoCurricularItem.getIdTipoCV() + "'");
+//		}
 
 		return sql.toString();
 	}

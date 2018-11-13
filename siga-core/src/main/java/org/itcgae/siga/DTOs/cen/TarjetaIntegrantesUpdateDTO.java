@@ -15,7 +15,21 @@ public class TarjetaIntegrantesUpdateDTO {
 	private String capitalSocial; //  participacionSociedad --> capitalSocial 
 	private String idComponente;
 	private String idPersona;
+	private String flagSocio;
 	private Date fechaBajaCargo;
+	
+	
+	
+	
+	public String getFlagSocio() {
+		return flagSocio;
+	}
+
+	public void setFlagSocio(String flagSocio) {
+		this.flagSocio = flagSocio;
+	}
+
+	
 
 	
 	
