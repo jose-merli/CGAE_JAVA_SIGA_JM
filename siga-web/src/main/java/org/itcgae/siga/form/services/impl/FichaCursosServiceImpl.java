@@ -1,6 +1,7 @@
 package org.itcgae.siga.form.services.impl;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -19,11 +20,13 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.entities.ForPersonaCurso;
 import org.itcgae.siga.db.entities.ForPersonaCursoExample;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForPersonacursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForRolesExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForTipocosteExtendsMapper;
@@ -37,6 +40,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	private Logger LOGGER = Logger.getLogger(FichaCursosServiceImpl.class);
 
+	@Autowired
+	private ForCursoExtendsMapper forCursoExtendsMapper;
+	
 	@Autowired
 	private ForPersonacursoExtendsMapper forPersonacursoExtendsMapper;
 
@@ -55,6 +61,55 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
 
+	@Override
+	public void updateEstadoCursoAuto() {
+		LOGGER.info(
+				"updateEstadoCursoAuto()  -> Entrada al servicio para actualizar automáticamente los cursos que correspondan");
+
+		// Este método se encargará de actualizar el estado de los cursos cuando
+		// corresponda de manera automática (Scheduled)
+		
+		ForCurso forCursoFiltroFechaIni = new ForCurso();
+		ForCurso forCursoFiltroFechaFin = new ForCurso();
+		
+		LOGGER.info(
+				"updateEstadoCursoAuto() / forCursoExtendsMapper.selectCursosFechaAuto() -> Entrada a forCursoExtendsMapper para obtener un listado con cursos");
+		// FechaInicio = FechaActual --> Se cambiará el estado a "En curso"
+		// Recogemos la lista de cursos cuya fechaInicioImpartición sea igual que la fecha actual
+		forCursoFiltroFechaIni.setFechaimparticiondesde(new Date());
+		List<ForCurso> listaCursosFechaIni = forCursoExtendsMapper.selectCursosFechaAuto(forCursoFiltroFechaIni);
+		
+		LOGGER.info(
+				"updateEstadoCursoAuto() / forCursoExtendsMapper.selectCursosFechaAuto() -> Entrada a forCursoExtendsMapper para obtener un listado con cursos");
+		// FechaFin = FechaActual-1 --> Se cambiará el estado a "Impartido"
+		// Recogemos la lista de cursos cuya fechaFinImpartición sea menor que la fecha actual, 
+		// ya que se tiene que cambiar el estado el día después de su fechaFinImpartición
+		Calendar calendar =  Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.add(Calendar.DAY_OF_YEAR, -1);
+		forCursoFiltroFechaFin.setFechaimparticionhasta(calendar.getTime());
+		List<ForCurso> listaCursosFechaFin = forCursoExtendsMapper.selectCursosFechaAuto(forCursoFiltroFechaFin);
+		
+		// TODO Analizar qué hacer en caso de error (int == 0)
+		int correctoEnCurso = 0;
+		int correctoImpartido = 0;
+		
+		LOGGER.info(
+				"updateEstadoCursoAuto() / forCursoExtendsMapper.updateByPrimaryKey() -> Entrada a forCursoExtendsMapper para actualizar el curso");
+		// Recorremos cada lista y haremos el update del estado que corresponda en cada caso
+		for (ForCurso forCurso : listaCursosFechaIni) {
+			forCurso.setIdestadocurso(Long.parseLong(SigaConstants.ESTADO_CURSO_EN_CURSO));
+			forCurso.setFechamodificacion(new Date());
+			correctoEnCurso = forCursoExtendsMapper.updateByPrimaryKeySelective(forCurso);
+		}
+		
+		for (ForCurso forCurso : listaCursosFechaFin) {
+			forCurso.setIdestadocurso(Long.parseLong(SigaConstants.ESTADO_CURSO_IMPARTIDO));
+			forCurso.setFechamodificacion(new Date());
+			correctoImpartido = forCursoExtendsMapper.updateByPrimaryKeySelective(forCurso);
+		}
+	}
+	
 	@Override
 	public FormadorCursoDTO getTrainersCourse(String idCurso, HttpServletRequest request) {
 		LOGGER.info("getTrainersCourse() -> Entrada al servicio para obtener los formadores de un curso especifico");

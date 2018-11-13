@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.mappers.ForCursoSqlProvider;
 
 public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
@@ -141,5 +142,27 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		return sql.toString();
 	}
 	
+	
+	public String selectCursosFechaAuto(ForCurso forCurso) {
+		SQL sql = new SQL();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/YYYY");
+		
+		sql.SELECT_DISTINCT("CURSO.IDCURSO");
+		sql.SELECT("CURSO.IDINSTITUCION");
+		sql.SELECT("TO_DATE(CURSO.FECHAIMPARTICIONDESDE,'dd/MM/YYYY') AS FECHAIMPARTICIONDESDE");
+		sql.SELECT("TO_DATE(CURSO.FECHAIMPARTICIONHASTA,'dd/MM/YYYY') AS FECHAIMPARTICIONHASTA");
+		
+		sql.FROM("FOR_CURSO CURSO");
+		
+		if(forCurso.getFechaimparticiondesde() != null) {
+			sql.WHERE("CURSO.FECHAIMPARTICIONDESDE = '" + dateFormat.format(forCurso.getFechaimparticiondesde()) + "'");
+		}
+		
+		if(forCurso.getFechaimparticionhasta() != null) {
+			sql.WHERE("CURSO.FECHAIMPARTICIONHASTA = '" + dateFormat.format(forCurso.getFechaimparticionhasta()) + "'");
+		}
+		
+		return sql.toString();
+	}
 
 }
