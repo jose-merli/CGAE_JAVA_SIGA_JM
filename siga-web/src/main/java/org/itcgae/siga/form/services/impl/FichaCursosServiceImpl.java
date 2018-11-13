@@ -1,6 +1,7 @@
 package org.itcgae.siga.form.services.impl;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -19,11 +20,13 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.entities.ForPersonaCurso;
 import org.itcgae.siga.db.entities.ForPersonaCursoExample;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForPersonacursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForRolesExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForTipocosteExtendsMapper;
@@ -37,6 +40,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	private Logger LOGGER = Logger.getLogger(FichaCursosServiceImpl.class);
 
+	@Autowired
+	private ForCursoExtendsMapper forCursoExtendsMapper;
+	
 	@Autowired
 	private ForPersonacursoExtendsMapper forPersonacursoExtendsMapper;
 
@@ -55,6 +61,55 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
 
+	@Override
+	public void updateEstadoCursoAuto() {
+		LOGGER.info(
+				"updateEstadoCursoAuto()  -> Entrada al servicio para actualizar automáticamente los cursos que correspondan");
+
+		// Este método se encargará de actualizar el estado de los cursos cuando
+		// corresponda de manera automática (Scheduled)
+		
+		ForCurso forCursoFiltroFechaIni = new ForCurso();
+		ForCurso forCursoFiltroFechaFin = new ForCurso();
+		
+		LOGGER.info(
+				"updateEstadoCursoAuto() / forCursoExtendsMapper.selectCursosFechaAuto() -> Entrada a forCursoExtendsMapper para obtener un listado con cursos");
+		// FechaInicio = FechaActual --> Se cambiará el estado a "En curso"
+		// Recogemos la lista de cursos cuya fechaInicioImpartición sea igual que la fecha actual
+		forCursoFiltroFechaIni.setFechaimparticiondesde(new Date());
+		List<ForCurso> listaCursosFechaIni = forCursoExtendsMapper.selectCursosFechaAuto(forCursoFiltroFechaIni);
+		
+		LOGGER.info(
+				"updateEstadoCursoAuto() / forCursoExtendsMapper.selectCursosFechaAuto() -> Entrada a forCursoExtendsMapper para obtener un listado con cursos");
+		// FechaFin = FechaActual-1 --> Se cambiará el estado a "Impartido"
+		// Recogemos la lista de cursos cuya fechaFinImpartición sea menor que la fecha actual, 
+		// ya que se tiene que cambiar el estado el día después de su fechaFinImpartición
+		Calendar calendar =  Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.add(Calendar.DAY_OF_YEAR, -1);
+		forCursoFiltroFechaFin.setFechaimparticionhasta(calendar.getTime());
+		List<ForCurso> listaCursosFechaFin = forCursoExtendsMapper.selectCursosFechaAuto(forCursoFiltroFechaFin);
+		
+		// TODO Analizar qué hacer en caso de error (int == 0)
+		int correctoEnCurso = 0;
+		int correctoImpartido = 0;
+		
+		LOGGER.info(
+				"updateEstadoCursoAuto() / forCursoExtendsMapper.updateByPrimaryKey() -> Entrada a forCursoExtendsMapper para actualizar el curso");
+		// Recorremos cada lista y haremos el update del estado que corresponda en cada caso
+		for (ForCurso forCurso : listaCursosFechaIni) {
+			forCurso.setIdestadocurso(Long.parseLong(SigaConstants.ESTADO_CURSO_EN_CURSO));
+			forCurso.setFechamodificacion(new Date());
+			correctoEnCurso = forCursoExtendsMapper.updateByPrimaryKeySelective(forCurso);
+		}
+		
+		for (ForCurso forCurso : listaCursosFechaFin) {
+			forCurso.setIdestadocurso(Long.parseLong(SigaConstants.ESTADO_CURSO_IMPARTIDO));
+			forCurso.setFechamodificacion(new Date());
+			correctoImpartido = forCursoExtendsMapper.updateByPrimaryKeySelective(forCurso);
+		}
+	}
+	
 	@Override
 	public FormadorCursoDTO getTrainersCourse(String idCurso, HttpServletRequest request) {
 		LOGGER.info("getTrainersCourse() -> Entrada al servicio para obtener los formadores de un curso especifico");
@@ -216,6 +271,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 						formador.setIdrol(Short.valueOf(formadorCursoItem.getIdRol()));
 						formador.setIdtipocoste(Short.valueOf(formadorCursoItem.getIdTipoCoste()));
 						formador.setTarifa(formadorCursoItem.getTarifa().longValue());
+						formador.setTutor(formadorCursoItem.getTutor());
 						response = forPersonacursoExtendsMapper.updateByPrimaryKey(formador);
 
 						LOGGER.info(
@@ -247,6 +303,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		int responseCenPersona = 1;
 		int responseForPersonaCurso = 1;
 		int responseCenCliente = 1;
+		int responseTutor = 1;
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 
@@ -271,8 +328,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				ForPersonaCursoExample exampleFormador = new ForPersonaCursoExample();
 				exampleFormador.createCriteria().andIdpersonaEqualTo(formadorCursoItem.getIdPersona())
 						.andIdrolEqualTo(Short.valueOf(formadorCursoItem.getIdRol()))
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
-						.andFechabajaIsNull();
+						.andIdcursoEqualTo(formadorCursoItem.getIdCurso())
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andFechabajaIsNull();
 
 				LOGGER.info(
 						"saveTrainersCourse() / forPersonacursoExtendsMapper.selectByExample(exampleFormador) -> Entrada a forPersonacursoExtendsMapper para obtener los formadores de un curso");
@@ -332,32 +389,73 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 						error.setDescription("Error al insertar al nuevo formador en la tabla cen_cliente");
 					} else {
 
-						ForPersonaCurso forPersonaCursoInsert = new ForPersonaCurso();
-						forPersonaCursoInsert.setIdpersona(idPersona);
-						forPersonaCursoInsert.setIdcurso(formadorCursoItem.getIdCurso());
-						forPersonaCursoInsert.setIdrol(Short.valueOf(formadorCursoItem.getIdRol()));
-						forPersonaCursoInsert.setIdinstitucion(idInstitucion);
-						forPersonaCursoInsert.setIdtipocoste(Short.valueOf(formadorCursoItem.getIdTipoCoste()));
-						forPersonaCursoInsert.setTarifa(formadorCursoItem.getTarifa().longValue());
-						forPersonaCursoInsert.setUsumodificacion(usuario.getIdusuario().longValue());
-						forPersonaCursoInsert.setFechamodificacion(new Date());
-						forPersonaCursoInsert.setFechabaja(null);
+						if (formadorCursoItem.getTutor() == ASIGNAR_TUTOR) {
+							ForPersonaCursoExample exampleTutor = new ForPersonaCursoExample();
+							exampleTutor.createCriteria()
+							.andTutorEqualTo(formadorCursoItem.getTutor())
+							.andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andFechabajaIsNull()
+							.andIdcursoEqualTo(formadorCursoItem.getIdCurso());
 
-						LOGGER.info(
-								"saveTrainersCourse() / forPersonacursoExtendsMapper.insert(forPersonaCursoInsert) -> Entrada a ageNotificacioneseventoMapper para insertar un formador");
-						responseForPersonaCurso = forPersonacursoExtendsMapper.insert(forPersonaCursoInsert);
-						LOGGER.info(
-								"saveTrainersCourse() / forPersonacursoExtendsMapper.insert(forPersonaCursoInsert) -> Salida a ageNotificacioneseventoMapper para insertar un formador");
+							LOGGER.info(
+									"saveTrainersCourse() / forPersonacursoExtendsMapper.selectByExample(exampleFormador) -> Entrada a forPersonacursoExtendsMapper para buscar si existe algun formador como tutor");
+
+							List<ForPersonaCurso> tutorList = forPersonacursoExtendsMapper
+									.selectByExample(exampleTutor);
+
+							LOGGER.info(
+									"saveTrainersCourse() / forPersonacursoExtendsMapper.selectByExample(exampleFormador) -> Salida a forPersonacursoExtendsMapper para buscar si existe algun formador como tutor");
+
+							if (null != tutorList && tutorList.size() > 0) {
+								ForPersonaCurso tutor = tutorList.get(0);
+
+								LOGGER.info(
+										"updateTrainersCourse() / forPersonacursoExtendsMapper.updateByPrimaryKey(tutor) -> Entrada a forPersonacursoExtendsMapper para designar el tutor");
+
+								tutor.setFechamodificacion(new Date());
+								tutor.setUsumodificacion(usuario.getIdusuario().longValue());
+								tutor.setTutor(DESIGNAR_TUTOR);
+								responseTutor = forPersonacursoExtendsMapper.updateByPrimaryKey(tutor);
+
+								LOGGER.info(
+										"updateTrainersCourse() / forPersonacursoExtendsMapper.updateByPrimaryKey(tutor) -> Salida a forPersonacursoExtendsMapper para designar el tutor");
+							}
+						}
+
+						if (responseTutor == 0) {
+							error.setCode(400);
+							error.setDescription("Error al designar un tutor a un formador");
+
+						} else {
+
+							ForPersonaCurso forPersonaCursoInsert = new ForPersonaCurso();
+							forPersonaCursoInsert.setIdpersona(idPersona);
+							forPersonaCursoInsert.setIdcurso(formadorCursoItem.getIdCurso());
+							forPersonaCursoInsert.setIdrol(Short.valueOf(formadorCursoItem.getIdRol()));
+							forPersonaCursoInsert.setIdinstitucion(idInstitucion);
+							forPersonaCursoInsert.setIdtipocoste(Short.valueOf(formadorCursoItem.getIdTipoCoste()));
+							forPersonaCursoInsert.setTarifa(formadorCursoItem.getTarifa().longValue());
+							forPersonaCursoInsert.setUsumodificacion(usuario.getIdusuario().longValue());
+							forPersonaCursoInsert.setFechamodificacion(new Date());
+							forPersonaCursoInsert.setFechabaja(null);
+							forPersonaCursoInsert.setTutor(formadorCursoItem.getTutor());
+
+							LOGGER.info(
+									"saveTrainersCourse() / forPersonacursoExtendsMapper.insert(forPersonaCursoInsert) -> Entrada a ageNotificacioneseventoMapper para insertar un formador");
+							responseForPersonaCurso = forPersonacursoExtendsMapper.insert(forPersonaCursoInsert);
+							LOGGER.info(
+									"saveTrainersCourse() / forPersonacursoExtendsMapper.insert(forPersonaCursoInsert) -> Salida a ageNotificacioneseventoMapper para insertar un formador");
+
+							if (responseForPersonaCurso == 0) {
+								error.setCode(400);
+								error.setDescription("Error al insertar nuevo formador");
+							} else {
+								error.setCode(200);
+							}
+						}
+
 					}
 
-					if (responseForPersonaCurso == 0) {
-						error.setCode(400);
-						error.setDescription("Error al insertar nuevo formador");
-					} else {
-						error.setCode(200);
-					}
-					
-				}else {
+				} else {
 					error.setMessage("Ya existe el formador añadido con ese rol");
 				}
 			}
@@ -390,9 +488,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Override
 	public UpdateResponseDTO deleteTrainersCourse(FormadorCursoDTO formadorCursoDTO, HttpServletRequest request) {
-		
-		LOGGER.info(
-				"deleteTrainersCourse() -> Salida del servicio para dar de baja a los formadores de un curso");
+
+		LOGGER.info("deleteTrainersCourse() -> Salida del servicio para dar de baja a los formadores de un curso");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -415,7 +512,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				for (FormadorCursoItem formador : formadorCursoDTO.getFormadoresCursoItem()) {
-					
+
 					ForPersonaCursoExample exampleFormador = new ForPersonaCursoExample();
 					exampleFormador.createCriteria().andIdpersonaEqualTo(formador.getIdPersona())
 							.andIdrolEqualTo(Short.valueOf(formador.getIdRol()))
@@ -423,7 +520,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 					LOGGER.info(
 							"deleteTrainersCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a forPersonacursoExtendsMapper para obtener los formadores de un curso");
-					List<ForPersonaCurso> formadoresList = forPersonacursoExtendsMapper.selectByExample(exampleFormador);
+					List<ForPersonaCurso> formadoresList = forPersonacursoExtendsMapper
+							.selectByExample(exampleFormador);
 					LOGGER.info(
 							"deleteTrainersCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida a forPersonacursoExtendsMapper para obtener los formadores de un curso");
 
@@ -445,9 +543,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				}
 			}
 		}
-		
-		LOGGER.info(
-				"deleteTrainersCourse() -> Salida del servicio para dar de baja a los formadores de un curso");
+
+		LOGGER.info("deleteTrainersCourse() -> Salida del servicio para dar de baja a los formadores de un curso");
 
 		updateResponseDTO.setError(error);
 		return updateResponseDTO;
