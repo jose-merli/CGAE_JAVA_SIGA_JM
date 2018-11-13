@@ -35,28 +35,28 @@ public class AgendaCalendarioServiceImpl implements IAgendaCalendarioService {
 
 	@Override
 	public CalendarDTO getCalendariosByIdInstitucion(HttpServletRequest request) {
-		
+
 		CalendarDTO calendarDTO = new CalendarDTO();
 		AgeCalendarioExample example = new AgeCalendarioExample();
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		if(null != idInstitucion) {
+
+		if (null != idInstitucion) {
 
 			example.createCriteria().andIdinstitucionEqualTo(idInstitucion);
 
 			List<AgeCalendario> listAgeCalendario = ageCalendarioExtendsMapper.selectByExample(example);
-			
-			if(!listAgeCalendario.isEmpty() && listAgeCalendario != null) {
+
+			if (!listAgeCalendario.isEmpty() && listAgeCalendario != null) {
 				calendarDTO.fillListCalendarItems(listAgeCalendario);
 			}
-			
+
 		}
 
-			return calendarDTO;
-		}
+		return calendarDTO;
+	}
 
 		@Override
 		public EventoDTO getEventosByIdCalendario(String idCalendario) {
@@ -165,12 +165,11 @@ public class AgendaCalendarioServiceImpl implements IAgendaCalendarioService {
 						"getCalendars() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 				if (null != usuarios && usuarios.size() > 0) {
-					AdmUsuarios usuario = usuarios.get(0);
 					LOGGER.info(
-							"getCalendars() / ageTipocalendarioExtendsMapper.getCalendarType() -> Entrada a ageTipocalendarioExtendsMapper para obtener los diferentes tipos de calendarios");
+							"getCalendars() / ageCalendarioExtendsMapper.getCalendarType() -> Entrada a ageTipocalendarioExtendsMapper para obtener los diferentes tipos de calendarios");
 					comboItems = ageCalendarioExtendsMapper.getCalendars(idInstitucion.toString());
 					LOGGER.info(
-							"getCalendars() / ageTipocalendarioExtendsMapper.getCalendarType() -> Salida de ageTipocalendarioExtendsMapper para obtener los diferentes tipos de calendarios");
+							"getCalendars() / ageCalendarioExtendsMapper.getCalendarType() -> Salida de ageTipocalendarioExtendsMapper para obtener los diferentes tipos de calendarios");
 
 				}
 			}

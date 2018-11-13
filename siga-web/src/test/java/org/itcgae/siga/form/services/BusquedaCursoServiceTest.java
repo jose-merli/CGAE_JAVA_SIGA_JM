@@ -50,7 +50,7 @@ public class BusquedaCursoServiceTest {
 	private ForCursoExtendsMapper forCursoExtendsMapper;
 
 	@Mock
-	AdmUsuariosMapper admUsuariosMapper;
+	private AdmUsuariosMapper admUsuariosMapper;
 
 	@InjectMocks
 	private BusquedaCursosServiceImpl busquedaCursosServiceImpl;
@@ -64,7 +64,8 @@ public class BusquedaCursoServiceTest {
 		List<ComboItem> comboItemsSimulados = testUtils.getListComboItemsSimulados();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
 
-		// Cuando se encuentre este método con cualquier objeto (anyObject()) dentro del
+		// Cuando se encuentre este método con cualquier objeto del tipo
+		// AdmUsuariosExample (Mockito.any(AdmUsuariosExample.class)) dentro del
 		// servicio "busquedaCursosServiceImpl", devolverá lo que le estamos poniendo en
 		// el thenReturn
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
@@ -92,7 +93,8 @@ public class BusquedaCursoServiceTest {
 		List<ComboItem> comboItemsSimulados = testUtils.getListComboItemsSimulados();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
 
-		// Cuando se encuentre este método con cualquier objeto (anyObject()) dentro del
+		// Cuando se encuentre este método con cualquier objeto del tipo
+		// AdmUsuariosExample (Mockito.any(AdmUsuariosExample.class)) dentro del
 		// servicio "busquedaCursosServiceImpl", devolverá lo que le estamos poniendo en
 		// el thenReturn
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
@@ -120,7 +122,8 @@ public class BusquedaCursoServiceTest {
 		List<ComboItem> comboItemsSimulados = testUtils.getListComboItemsSimulados();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
 
-		// Cuando se encuentre este método con cualquier objeto (anyObject()) dentro del
+		// Cuando se encuentre este método con cualquier objeto del tipo
+		// AdmUsuariosExample (Mockito.any(AdmUsuariosExample.class)) dentro del
 		// servicio "busquedaCursosServiceImpl", devolverá lo que le estamos poniendo en
 		// el thenReturn
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);

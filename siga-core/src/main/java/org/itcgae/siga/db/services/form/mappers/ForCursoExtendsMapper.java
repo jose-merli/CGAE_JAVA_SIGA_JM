@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.form.CursoItem;
+import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.mappers.ForCursoMapper;
 import org.itcgae.siga.db.services.form.providers.ForCursoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -35,5 +36,15 @@ public interface ForCursoExtendsMapper extends ForCursoMapper {
 			@Result(column = "FLAGARCHIVADO", property = "flagArchivado", jdbcType = JdbcType.NUMERIC)
 	})
 	List<CursoItem> selectCursos(Short idInstitucion, CursoItem cursoItem);
+	
+	@SelectProvider(type = ForCursoSqlExtendsProvider.class, method = "selectCursosFechaAuto")
+	@Results({ @Result(column = "IDCURSO", property = "idcurso", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAIMPARTICIONDESDE", property = "fechaimparticiondesde", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAIMPARTICIONHASTA", property = "fechaimparticionhasta", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ForCurso> selectCursosFechaAuto(ForCurso forCurso);
+	
+	
 	
 }

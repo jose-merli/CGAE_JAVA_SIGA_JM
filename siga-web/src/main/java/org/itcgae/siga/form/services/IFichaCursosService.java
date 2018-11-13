@@ -10,6 +10,8 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface IFichaCursosService {
 	
+	public void updateEstadoCursoAuto();
+	
 	public FormadorCursoDTO getTrainersCourse(String idCurso, HttpServletRequest request);
 	
 	public ComboDTO getRolesTrainers(HttpServletRequest request);

@@ -6,6 +6,7 @@ import java.util.List;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AgeCalendario;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -91,6 +92,22 @@ public class TestUtils{
 		return usuarios;
 	}
 	
+	public List<AgeCalendario> getListaAgeCalendariosSimulados(){
+		List<AgeCalendario> listaAgeCalendarios = new ArrayList<AgeCalendario>();
+		listaAgeCalendarios.add(getAgeCalendario());
+		
+		return listaAgeCalendarios;
+	}
 	
+	public AgeCalendario getAgeCalendario(){
+		AgeCalendario ageCalendario = new AgeCalendario();
 
+		ageCalendario.setIdinstitucion((short)2000);
+		ageCalendario.setIdcalendario((long)100);
+		ageCalendario.setDescripcion("Descripcion");
+		ageCalendario.setColor("Red");
+		ageCalendario.setIdtipocalendario((long)1);
+		  
+		return ageCalendario;		
+	}
 }
