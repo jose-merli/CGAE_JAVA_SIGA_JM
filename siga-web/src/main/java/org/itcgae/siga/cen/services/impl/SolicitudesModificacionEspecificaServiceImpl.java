@@ -16,7 +16,9 @@ import org.itcgae.siga.db.mappers.CenSolicitmodifdatosbasicosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class SolicitudesModificacionEspecificaServiceImpl implements ISolicitudesModificacionEspecificaService{
 
 	private Logger LOGGER = Logger.getLogger(SolicitudesModificacionEspecificaServiceImpl.class);

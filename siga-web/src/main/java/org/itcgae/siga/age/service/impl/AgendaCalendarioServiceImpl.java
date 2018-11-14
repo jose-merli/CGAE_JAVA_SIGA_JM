@@ -155,6 +155,7 @@ public class AgendaCalendarioServiceImpl implements IAgendaCalendarioService {
 			String token = request.getHeader("Authorization");
 			String dni = UserTokenUtils.getDniFromJWTToken(token);
 			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+			String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
 			if (null != idInstitucion) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));

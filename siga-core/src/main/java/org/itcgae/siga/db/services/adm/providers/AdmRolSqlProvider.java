@@ -28,6 +28,7 @@ public class AdmRolSqlProvider {
 			sql.SELECT("BLOQUEADO");
 			sql.SELECT("CODIGOEXT2");
 			sql.SELECT("FECHA_BAJA");
+			sql.SELECT("LETRADO");
 			sql.FROM("ADM_ROL");
 			sql.WHERE("(UPPER(DESCRIPCION) = UPPER ('" + descripcion + "'))");
 
