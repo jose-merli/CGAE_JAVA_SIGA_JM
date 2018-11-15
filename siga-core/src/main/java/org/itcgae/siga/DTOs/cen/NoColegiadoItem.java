@@ -21,7 +21,7 @@ public class NoColegiadoItem {
 	private String  codigoPostal;
 	private String  tipoDireccion;
 	private String  apellidos;
-	private String  etiquetas [];
+	private ComboEtiquetasItem[]  etiquetas;
 	private String  sexo;
 	private String  estadoCivil;
 	private String idEstadoCivil;
@@ -338,19 +338,21 @@ public class NoColegiadoItem {
 	/**
 	 *
 	 */
-	public NoColegiadoItem etiquetas(String etiquetas []){
+	public NoColegiadoItem etiquetas(ComboEtiquetasItem[] etiquetas){
 		this.etiquetas = etiquetas;
 		return this;
 	}
 
 	@JsonProperty("etiquetas")
-	public String [] getEtiquetas() {
+	public ComboEtiquetasItem[] getEtiquetas() {
 		return etiquetas;
 	}
-	
-	public void setEtiquetas(String etiquetas []) {
+
+	public void setEtiquetas(ComboEtiquetasItem[] etiquetas) {
 		this.etiquetas = etiquetas;
 	}
+
+
 	
 	/**
 	 *

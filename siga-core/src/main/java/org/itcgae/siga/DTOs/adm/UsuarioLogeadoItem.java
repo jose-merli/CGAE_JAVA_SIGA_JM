@@ -16,7 +16,18 @@ public class UsuarioLogeadoItem {
 	private String institucion  = null;
 	private String idioma  = null;
 	private String perfiles  = null;
+	private String rutaLogout  = null;
 	
+
+	public String getRutaLogout() {
+		return rutaLogout;
+	}
+
+
+	public void setRutaLogout(String rutaLogout) {
+		this.rutaLogout = rutaLogout;
+	}
+
 
 	public String getPerfiles() {
 		return perfiles;

@@ -6,13 +6,14 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.BusquedaSancionesDTO;
+import org.itcgae.siga.DTOs.cen.BusquedaSancionesItem;
+import org.itcgae.siga.DTOs.cen.BusquedaSancionesSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IBusquedaSancionesService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenTiposancionExample;
-import org.itcgae.siga.db.mappers.CenTiposancionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposancionExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -51,9 +52,57 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 			comboItems.add(0, comboItem);
 			comboDTO.setCombooItems(comboItems);
 		}
-		
+
 		LOGGER.info("getComboTipoSancion() -> Salida del servicio para obtener los tipos de sanciones");
 		return comboDTO;
+	}
+
+	@Override
+	public BusquedaSancionesDTO searchBusquedaSanciones(int numPagina,
+			BusquedaSancionesSearchDTO busquedaSancionesSearchDTO, HttpServletRequest request) {
+		LOGGER.info("searchBusquedaSanciones() -> Entrada al servicio para la búsqueda por filtros de sanciones");
+
+		List<BusquedaSancionesItem> busquedaSancionesItems = new ArrayList<BusquedaSancionesItem>();
+		BusquedaSancionesDTO busquedaSancionesDTO = new BusquedaSancionesDTO();
+		String idLenguaje = null;
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"searchBusquedaSanciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"searchBusquedaSanciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				idLenguaje = usuario.getIdlenguaje();
+
+				LOGGER.info(
+						"searchBusquedaSanciones() / cenTiposancionExtendsMapper.searchBusquedaSanciones() -> Entrada a cenNocolegiadoExtendsMapper para busqueda de personas colegiadas por filtro");
+				busquedaSancionesItems = cenTiposancionExtendsMapper.searchBusquedaSanciones(busquedaSancionesSearchDTO,
+						idLenguaje, String.valueOf(idInstitucion));
+				LOGGER.info(
+						"searchBusquedaSanciones() / cenTiposancionExtendsMapper.searchBusquedaSanciones() -> Salida de cenNocolegiadoExtendsMapper para busqueda de personas no colegiadas por filtro");
+
+				busquedaSancionesDTO.setBusquedaSancionesItem(busquedaSancionesItems);
+			} else {
+				LOGGER.warn(
+						"searchBusquedaSanciones() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("searchBusquedaSanciones() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("searchLegalPersons() -> Salida del servicio para la búsqueda por filtros de sanciones");
+		return busquedaSancionesDTO;
 	}
 
 }

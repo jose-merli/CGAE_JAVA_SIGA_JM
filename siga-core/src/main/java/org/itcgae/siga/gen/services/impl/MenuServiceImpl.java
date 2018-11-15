@@ -63,6 +63,8 @@ import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.GenMenu;
 import org.itcgae.siga.db.entities.GenMenuExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
@@ -72,6 +74,7 @@ import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.mappers.GenMenuMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -133,6 +136,9 @@ public class MenuServiceImpl implements IMenuService {
 	
 	@Autowired 
 	AdmPerfilMapper adminPerfilMapper;
+	
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
 	
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
@@ -533,6 +539,7 @@ public class MenuServiceImpl implements IMenuService {
 		List<UsuarioLogeadoItem> usuario = this.admUsuariosExtendsMapper.getUsersLog(request);
 		UsuarioLogeadoDTO response = new UsuarioLogeadoDTO();
 		usuario.get(0).setPerfiles(getDescripcion(perfiles, idInstitucion));
+		usuario.get(0).setRutaLogout(getUserRoutLogout(idInstitucion));
 		response.setUsuarioLogeadoItem(usuario);
 
 		for (UsuarioLogeadoItem usuarioLogeadoItem : usuario) {
@@ -779,6 +786,26 @@ public class MenuServiceImpl implements IMenuService {
 		comboItem.setLabel(cenInstitucion.getNombre());
 		comboItem.setValue(String.valueOf(cenInstitucion.getIdinstitucion()));
 		return comboItem;
+	}
+
+	
+	private String getUserRoutLogout(Short institucion) {
+	
+
+		GenParametrosExample example = new GenParametrosExample();
+		example.createCriteria().andIdinstitucionEqualTo(institucion).andParametroEqualTo("PATH_INICIO_SESION");
+		List<GenParametros> parametros = genParametrosMapper.selectByExample(example );
+		if (null != parametros && parametros.size()>0) {
+			String response = parametros.get(0).getValor();
+			return response;
+		}else{
+			example.clear();
+			example.createCriteria().andIdinstitucionEqualTo(Short.valueOf("0")).andParametroEqualTo("PATH_INICIO_SESION");
+			parametros = genParametrosMapper.selectByExample(example );
+			String response = parametros.get(0).getValor();
+			return response;
+		}
+	
 	}	
 
 

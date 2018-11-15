@@ -48,8 +48,8 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			String dni = "44149718E";
 			String grupo = request.getParameter("profile");
 			String institucion = request.getParameter("location");
-			
-			UserCgae user = new UserCgae(dni, grupo, institucion, null,null);
+			String letrado = request.getParameter("letrado");
+			UserCgae user = new UserCgae(dni, grupo, institucion, null,null,letrado);
 //			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,certs[0]));
 			return authenticationManager.authenticate(new UserAuthenticationToken(dni, user,null));
 		} catch (Exception e) {

@@ -58,7 +58,7 @@ public class UserTokenUtils {
 			return tokenPrefix + Jwts.builder().setIssuedAt(new Date()).setIssuer("CONSEJO GENERAL DE LA ABOGACIA")
 					.setSubject(auth.getPrincipal().toString()).claim("permisos", auth.getUser().getPermisos())
 					.claim("institucion", auth.getUser().getInstitucion()).claim("grupo", auth.getUser().getGrupo())
-					.claim("perfiles", auth.getUser().getPerfiles())
+					.claim("perfiles", auth.getUser().getPerfiles()).claim("letrado", auth.getUser().getLetrado())
 					.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 					.signWith(SignatureAlgorithm.HS512, secretSignKey).compact();
 
@@ -73,6 +73,7 @@ public class UserTokenUtils {
 			return tokenPrefix + Jwts.builder().setIssuedAt(new Date()).setIssuer("CONSEJO GENERAL DE LA ABOGACIA")
 					.setSubject(user.getDni()).claim("permisos", user.getPermisos())
 					.claim("institucion", user.getInstitucion()).claim("grupo", user.getGrupo()).claim("perfiles", user.getPerfiles())
+					.claim("letrado",user.getLetrado())
 					.setExpiration(new Date(System.currentTimeMillis() + expirationTime))
 					.signWith(SignatureAlgorithm.HS512, secretSignKey).compact();
 
@@ -93,7 +94,10 @@ public class UserTokenUtils {
 		List<String> perfiles = (List<String>) Jwts.parser().setSigningKey(secretSignKey)
 				.parseClaimsJws(token.replace(tokenPrefix, "")).getBody().get("perfiles");
 
-		return new UserCgae(dni, grupo, institucion, permisos,perfiles);
+		String letrado = (String) Jwts.parser().setSigningKey(secretSignKey)
+				.parseClaimsJws(token.replace(tokenPrefix, "")).getBody().get("grupo");
+
+		return new UserCgae(dni, grupo, institucion, permisos,perfiles,letrado);
 	}
 
 	public static String getDniFromJWTToken(String token) {
@@ -113,6 +117,10 @@ public class UserTokenUtils {
 	public static String getGrupoFromJWTToken(String token) {
 		return (String) Jwts.parser().setSigningKey(secretSignKey).parseClaimsJws(token.replace(tokenPrefix, ""))
 				.getBody().get("grupo");
+	}
+	public static String getLetradoFromJWTToken(String token) {
+		return (String) Jwts.parser().setSigningKey(secretSignKey).parseClaimsJws(token.replace(tokenPrefix, ""))
+				.getBody().get("letrado");
 	}
 
 	public static List<String> getPerfilesFromJWTToken(String token) {

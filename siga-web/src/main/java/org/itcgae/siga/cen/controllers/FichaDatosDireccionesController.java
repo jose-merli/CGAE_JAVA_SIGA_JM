@@ -77,4 +77,13 @@ public class FichaDatosDireccionesController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
+	
+	
+	@RequestMapping(value = "fichaDatosDirecciones/solicitudUpdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> solicitudUpdateDirection(@RequestBody DatosDireccionesItem datosDirecciones, HttpServletRequest request) { 
+		UpdateResponseDTO response = tarjetaDatosDireccionesService.solicitudUpdateDirection(datosDirecciones, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
 }

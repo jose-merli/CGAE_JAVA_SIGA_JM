@@ -18,7 +18,8 @@ public interface AdmRolExtendsMapper extends AdmRolMapper  {
 	@SelectProvider(type = AdmRolSqlProvider.class, method = "selectRolAccesoByExample")
 	@Results({
 		@Result(column = "IDROL", property = "idrol", jdbcType = JdbcType.VARCHAR, id = true),
-		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
+		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "LETRADO", property = "letrado", jdbcType = JdbcType.NUMERIC)
 	})
 	List<AdmRol> selectRolAccesoByExample(String descripcion);
 	

@@ -37,7 +37,8 @@ public class ColegiadoItem {
 	private String tipoCV;
 	private String  idgrupo [];
 	private String  denominacion;
-	
+	private ComboEtiquetasItem[] etiquetas;
+
 	private String soloNombre;
 	private String apellidos1;
 	private String apellidos2;
@@ -68,9 +69,7 @@ public class ColegiadoItem {
 	private String idTratamiento;
 	private String descripcion;
 	private String observaciones;
-	
 
-	
 	/**
 	 *
 	 */
@@ -538,6 +537,13 @@ public class ColegiadoItem {
 	/**
 	 *
 	 */
+	
+
+	/**
+	 * *
+	 *
+	 **/
+	
 	public ColegiadoItem codigoPostal(String codigoPostal){
 		this.codigoPostal = codigoPostal;
 		return this;
@@ -1108,6 +1114,14 @@ public class ColegiadoItem {
 	      return "null";
 	    }
 	    return o.toString().replace("\n", "\n    ");
+	}
+
+	public ComboEtiquetasItem[] getEtiquetas() {
+		return etiquetas;
+	}
+
+	public void setEtiquetas(ComboEtiquetasItem[] etiquetas) {
+		this.etiquetas = etiquetas;
 	}
 
 
