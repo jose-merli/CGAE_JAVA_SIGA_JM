@@ -94,6 +94,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
+
 
 
 
@@ -153,6 +157,10 @@ public class MenuServiceImpl implements IMenuService {
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
 	
+    @Autowired
+    private GenParametrosMapper genParametrosMapper;
+
+    
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
 		MenuDTO response = new MenuDTO();
@@ -597,6 +605,7 @@ public class MenuServiceImpl implements IMenuService {
 		List<UsuarioLogeadoItem> usuario = this.admUsuariosExtendsMapper.getUsersLog(request);
 		UsuarioLogeadoDTO response = new UsuarioLogeadoDTO();
 		usuario.get(0).setPerfiles(getDescripcion(perfiles, idInstitucion));
+        usuario.get(0).setRutaLogout(getUserRoutLogout(idInstitucion));
 		response.setUsuarioLogeadoItem(usuario);
 
 		for (UsuarioLogeadoItem usuarioLogeadoItem : usuario) {
@@ -905,6 +914,25 @@ public class MenuServiceImpl implements IMenuService {
 		LOGGER.info("setIdiomaUsuario() --> Salida del servicio de cambio de idioma");
 		return response;
 	}	
+	
+    
+    private String getUserRoutLogout(Short institucion) {
+    
 
+        GenParametrosExample example = new GenParametrosExample();
+        example.createCriteria().andIdinstitucionEqualTo(institucion).andParametroEqualTo("PATH_INICIO_SESION");
+        List<GenParametros> parametros = genParametrosMapper.selectByExample(example );
+        if (null != parametros && parametros.size()>0) {
+            String response = parametros.get(0).getValor();
+            return response;
+        }else{
+            example.clear();
+            example.createCriteria().andIdinstitucionEqualTo(Short.valueOf("0")).andParametroEqualTo("PATH_INICIO_SESION");
+            parametros = genParametrosMapper.selectByExample(example );
+            String response = parametros.get(0).getValor();
+            return response;
+        }
+
+    }
 
 }
