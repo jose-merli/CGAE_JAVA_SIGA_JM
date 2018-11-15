@@ -158,6 +158,11 @@ public class TarjetaDatosBancariosController {
 		}
 	
 	 
+	 @RequestMapping(value = "busquedaPerJuridica/getLengthCodCountry", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<Integer> getLengthCodCountry(@RequestBody String ccountry, HttpServletRequest request) { 
+		 int response = tarjetaDatosBancariosService.getLengthCodCountry(ccountry, request);
+			return new ResponseEntity<Integer>(response, HttpStatus.OK);
+		}
 	 
 	 
 //	 @RequestMapping(value = "busquedaPerJuridica/downloadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

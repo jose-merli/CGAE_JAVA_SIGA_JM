@@ -17,6 +17,8 @@ public class DatosBancariosInsertDTO {
 	private String idCuenta;
 	private String motivo;
 	private String nifTitular;
+	private String bic;
+	private String banco;
 
 	/**
 	 */
@@ -179,6 +181,38 @@ public class DatosBancariosInsertDTO {
 		this.nifTitular = nifCif;
 	}
 
+	/**
+	 */
+	public DatosBancariosInsertDTO bic(String bic) {
+		this.bic = bic;
+		return this;
+	}
+
+	@JsonProperty("bic")
+	public String getBic() {
+		return bic;
+	}
+
+	public void setBic(String bic) {
+		this.bic = bic;
+	}
+
+	/**
+	 */
+	public DatosBancariosInsertDTO banco(String banco) {
+		this.banco = banco;
+		return this;
+	}
+
+	@JsonProperty("banco")
+	public String getBanco() {
+		return banco;
+	}
+
+	public void setBanco(String banco) {
+		this.banco = banco;
+	}
+
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -196,13 +230,15 @@ public class DatosBancariosInsertDTO {
 				&& Objects.equals(this.revisionCuentas, datosBancariosInsertDTO.revisionCuentas)
 				&& Objects.equals(this.cuentaContable, datosBancariosInsertDTO.cuentaContable)
 				&& Objects.equals(this.motivo, datosBancariosInsertDTO.motivo)
-				&& Objects.equals(this.nifTitular, datosBancariosInsertDTO.nifTitular);
+				&& Objects.equals(this.nifTitular, datosBancariosInsertDTO.nifTitular)
+				&& Objects.equals(this.bic, datosBancariosInsertDTO.bic)
+				&& Objects.equals(this.banco, datosBancariosInsertDTO.banco);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(idPersona, idCuenta, iban, idInstitucion, tipoCuenta, titular, cuentaContable,
-				revisionCuentas, motivo, nifTitular);
+				revisionCuentas, motivo, nifTitular, bic, banco);
 	}
 
 	@Override
@@ -220,6 +256,8 @@ public class DatosBancariosInsertDTO {
 		sb.append("    revisionCuentas: ").append(toIndentedString(revisionCuentas)).append("\n");
 		sb.append("    motivo: ").append(toIndentedString(motivo)).append("\n");
 		sb.append("    nifTitular: ").append(toIndentedString(nifTitular)).append("\n");
+		sb.append("    bic: ").append(toIndentedString(bic)).append("\n");
+		sb.append("    banco: ").append(toIndentedString(banco)).append("\n");
 
 		sb.append("}");
 		return sb.toString();
