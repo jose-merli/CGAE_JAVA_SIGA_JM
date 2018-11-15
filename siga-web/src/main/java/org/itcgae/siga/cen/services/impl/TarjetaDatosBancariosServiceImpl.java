@@ -414,25 +414,6 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				cuentaBancaria.setIdcuenta(idCuenta);
 				cuentaBancaria.setIdinstitucion(idInstitucion);
 
-				// CenPersona cenPersona =
-				// cenPersonaExtendsMapper.selectByPrimaryKey(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
-				//
-				// // ESto se hace para actualizar el nif de una persona
-				// if(null != cenPersona) {
-				// if(!cenPersona.getNifcif().equals(datosBancariosInsertDTO.getNifTitular())) {
-				// CenPersona record = new CenPersona();
-				// record.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
-				// record.setNifcif(datosBancariosInsertDTO.getNifTitular());
-				// int rdo = cenPersonaExtendsMapper.updateByPrimaryKeySelective(record);
-				//
-				// if(rdo == 1) {
-				// cuentaBancaria.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
-				// }
-				// }else {
-				// cuentaBancaria.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
-				// }
-				// }
-
 				// Se actualizará el nif de la persona en caso de cambio del mismo
 				if (null != datosBancariosInsertDTO.getNifTitular()) {
 					updateNifTitular(Long.valueOf(datosBancariosInsertDTO.getIdPersona()),
@@ -479,15 +460,11 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				// Comprobamos que el código está en cen_bancos, si está se pone sin más en
 				// cbo_codigo, sino se coge el máx del código
 				CenBancosExample cenBancosExample = new CenBancosExample();
-				// cenBancosExample.createCriteria().andCodigoEqualTo(datosBancariosInsertDTO.getIban().substring(4,
-				// 8));
 				cenBancosExample.createCriteria().andBicEqualTo(datosBancariosInsertDTO.getBic())
 						.andNombreEqualTo(datosBancariosInsertDTO.getBanco());
 				List<CenBancos> cenBancos = cenBancosExtendsMapper.selectByExample(cenBancosExample);
 
 				if (null != cenBancos && !cenBancos.isEmpty()) {
-					// cuentaBancaria.setCboCodigo(datosBancariosInsertDTO.getIban().substring(4,
-					// 8));
 					cuentaBancaria.setCboCodigo(cenBancos.get(0).getCodigo()); // Tanto si es ext o esp tiene cod en
 																				// cenBancos
 				} else {
@@ -536,15 +513,6 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					cuentaBancaria.setNumerocuenta(datosBancariosInsertDTO.getIban().substring(14, 24));
 				}
 
-				// if(datosBancariosInsertDTO.getIban().length() < 24) {
-				// String rdo = fill(datosBancariosInsertDTO.getIban().substring(14,
-				// datosBancariosInsertDTO.getIban().length()), 10);
-
-				// }else {
-				// cuentaBancaria.setNumerocuenta(datosBancariosInsertDTO.getIban().substring(14,
-				// 24));
-				// }
-
 				// Si se ha marcado el check abono SJCS se comprueba si existe otra cuenta que
 				// ya es abono SJCS
 				if (tieneSCSJ) {
@@ -553,8 +521,6 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 							.andIdinstitucionEqualTo(idInstitucion).andAbonosjcsEqualTo("1");
 					List<CenCuentasbancarias> cuenta = cenCuentasbancariasExtendsMapper.selectByExample(example);
 
-					// if (cuentasAdm.existeCuentaAbonoSJCS(beanCuentas.getIdPersona(),
-					// beanCuentas.getIdInstitucion(), beanCuentas.getIdCuenta())) {
 					if (null != cuenta && !cuenta.isEmpty()) {
 						insertResponseDTO.setStatus(SigaConstants.KO);
 						error.setMessage("messages.censo.existeAbonoSJCS");
@@ -1065,39 +1031,6 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						updateResponseDTO.setError(error);
 					}
 				}
-				// }else {
-				// //insertar en cen_bancos
-				// NewIdDTO newIdDTO = cenBancosExtendsMapper.getMaxCode();
-				//
-				// CenBancos record = new CenBancos();
-				// record.setBic(datosBancariosInsertDTO.getBic());
-				// record.setCodigo(newIdDTO.getNewId());
-				// record.setFechamodificacion(new Date());
-				//
-				// CenPaisExample cenPaisExample = new CenPaisExample();
-				// cenPaisExample.createCriteria().andCodIsoEqualTo(datosBancariosInsertDTO.getIban().substring(0,
-				// 2));
-				// List<CenPais> cenPais = cenPaisExtendsMapper.selectByExample(cenPaisExample);
-				//
-				// if(null != cenPais && !cenPais.isEmpty()) {
-				// record.setIdpais(cenPais.get(0).getIdpais());
-				// }
-				//
-				//
-				// record.setNombre("BANCO EXTRANJERO");
-				// record.setUsumodificacion(usuario.getIdusuario());
-				//
-				// int res = cenBancosExtendsMapper.insert(record);
-				//
-				// if(res == 0) {
-				// updateResponseDTO.setStatus(SigaConstants.KO);
-				// error.setMessage("Error al actualizar los datos relativos al banco");
-				// updateResponseDTO.setError(error);
-				// }else {
-				// cuentaBancaria.setCboCodigo(record.getCodigo());
-				// }
-				//
-				// }
 
 				cuentaBancaria.setIban(datosBancariosInsertDTO.getIban());
 
@@ -1106,19 +1039,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					cuentaBancaria.setDigitocontrol(datosBancariosInsertDTO.getIban().substring(12, 14));
 					cuentaBancaria.setNumerocuenta(datosBancariosInsertDTO.getIban().substring(14, 24));
 				}
-				// cuentaBancaria.setCodigosucursal(datosBancariosInsertDTO.getIban().substring(8,
-				// 12));
-				// cuentaBancaria.setDigitocontrol(datosBancariosInsertDTO.getIban().substring(12,
-				// 14));
-				// if(datosBancariosInsertDTO.getIban().length() < 24) {
-				// String rdo = fill(datosBancariosInsertDTO.getIban().substring(14,
-				// datosBancariosInsertDTO.getIban().length()), 10);
-				// cuentaBancaria.setNumerocuenta(rdo);
-				// }else {
-				// cuentaBancaria.setNumerocuenta(datosBancariosInsertDTO.getIban().substring(14,
-				// 24));
-				// }
-
+				
 				// Si se ha marcado el check abono SJCS se comprueba si existe otra cuenta que
 				// ya es abono SJCS
 				if (tieneSCSJ) {
@@ -1127,8 +1048,6 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 							.andIdinstitucionEqualTo(idInstitucion).andAbonosjcsEqualTo("1");
 					List<CenCuentasbancarias> cuenta = cenCuentasbancariasExtendsMapper.selectByExample(example);
 
-					// if (cuentasAdm.existeCuentaAbonoSJCS(beanCuentas.getIdPersona(),
-					// beanCuentas.getIdInstitucion(), beanCuentas.getIdCuenta())) {
 					if (null != cuenta && cuenta.size() > 0) {
 						if (!cuenta.get(0).getIdcuenta().equals(Short.valueOf(datosBancariosInsertDTO.getIdCuenta()))) {
 							updateResponseDTO.setStatus(SigaConstants.KO);
@@ -1345,9 +1264,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 	}
 
 	private String fill(String text, int size) {
-//		StringBuilder builder = new StringBuilder('0');
+//		StringBuilder builder = new StringBuilder(text);
 //		while (builder.length() < size) {
-//			builder.append(text);
+//			builder.append('0');
 //		}
 //		return builder.toString();
 		String cadena = "";
