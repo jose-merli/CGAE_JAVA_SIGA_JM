@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -12,11 +13,23 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.form.AsistenciaCursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.form.FormadorCursoItem;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.age.service.IFichaEventosService;
 import org.itcgae.siga.commons.utils.ExcelHelper;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.AgeEvento;
+import org.itcgae.siga.db.mappers.AgeEventoMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.age.mappers.AgeEstadoeventosExtendsMapper;
+import org.itcgae.siga.db.services.age.mappers.AgeTipoeventosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForPersonacursoExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -36,6 +49,75 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	@Autowired
 	private ForPersonacursoExtendsMapper forPersonacursoExtendsMapper;
 	
+	@Autowired
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired 
+	private AgeEventoMapper ageEventoMapper;
+	
+	@Autowired
+	private AgeTipoeventosExtendsMapper ageTipoeventosExtendsMapper;
+	
+	@Autowired
+	private AgeEstadoeventosExtendsMapper ageEstadoeventosExtendsMapper;
+
+	
+	@Override
+	public InsertResponseDTO saveEventCalendar(EventoItem eventoItem, HttpServletRequest request) {
+		int response = 0;
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"saveNotification() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"saveNotification() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				// Creamos un nuevo calendario
+				AgeEvento ageEventoInsert = new AgeEvento();
+				ageEventoInsert.setIdcalendario(Long.valueOf(eventoItem.getIdCalendario()));
+				ageEventoInsert.setTitulo(eventoItem.getTitulo());
+				ageEventoInsert.setFechainicio(eventoItem.getFechaInicio());
+				ageEventoInsert.setFechafin(eventoItem.getFechaFin());
+				ageEventoInsert.setFechabaja(null);
+				ageEventoInsert.setUsumodificacion(usuario.getIdusuario().longValue());
+				ageEventoInsert.setFechamodificacion(new Date());
+				ageEventoInsert.setIdinstitucion(idInstitucion);
+				ageEventoInsert.setLugar(eventoItem.getLugar());
+				ageEventoInsert.setDescripcion(eventoItem.getDescripcion());
+				ageEventoInsert.setRecursos(eventoItem.getRecursos());
+				ageEventoInsert.setIdtipoevento(Long.valueOf(eventoItem.getIdTipoEvento()));
+				ageEventoInsert.setIdestadoevento(Long.valueOf(eventoItem.getIdEstadoEvento()));
+
+				LOGGER.info(
+						"saveEvent() / ageEventoMapper.insert(ageEventoInsert) -> Entrada a ageEventoMapper para insertar un evento");
+				response = ageEventoMapper.insert(ageEventoInsert);
+				LOGGER.info(
+						"saveEvent() / ageEventoMapper.insert(ageEventoInsert) -> Salida a ageEventoMapper para insertar un evento");
+
+				if (response == 0) {
+					error.setCode(400);
+					error.setDescription("Error al insertar nuevo evento");
+				} else {
+					error.setCode(200);
+				}
+			}
+		}
+		insertResponseDTO.setError(error);
+		return insertResponseDTO;
+	}
 
 	@Override
 	public FormadorCursoDTO getTrainersLabels(String idCurso, HttpServletRequest request) {
@@ -128,6 +210,88 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		return res;
 	}
 
+	@Override
+	public ComboDTO getTypeEvent(HttpServletRequest request) {
+		LOGGER.info(
+				"getTypeEvent() -> Entrada al servicio para obtener los tipos de eventos");
 
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getTypeEvent() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getTypeEvent() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"getTypeEvent() / ageTipoeventosExtendsMapper.getTypeEvent() -> Entrada a ageTipoeventosExtendsMapper para obtener los tipos de eventos");
+				comboItems = ageTipoeventosExtendsMapper.getTypeEvent(usuario.getIdlenguaje());
+				LOGGER.info(
+						"getTypeEvent() / ageTipoeventosExtendsMapper.getTypeEvent() -> Salida de ageTipoeventosExtendsMapper para obtener los tipos de eventos");
+
+			}
+		}
+
+		comboDTO.setCombooItems(comboItems);
+
+		LOGGER.info(
+				"getTypeEvent() -> Salida del servicio para obtener los tipos de eventos");
+		
+		return comboDTO;
+
+	}
+
+	@Override
+	public ComboDTO getEventStates(HttpServletRequest request) {
+		LOGGER.info(
+				"getEventStates() -> Entrada al servicio para obtener los estados de eventos");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getEventStates() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getEventStates() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"getEventStates() / ageEstadoeventosExtendsMapper.getEventStates() -> Entrada a ageTipoeventosExtendsMapper para obtener los estados de eventos");
+				comboItems = ageEstadoeventosExtendsMapper.getEventStates(usuario.getIdlenguaje());
+				LOGGER.info(
+						"getEventStates() / ageEstadoeventosExtendsMapper.getEventStates() -> Salida de ageTipoeventosExtendsMapper para obtener los estados de eventos");
+
+			}
+		}
+
+		comboDTO.setCombooItems(comboItems);
+
+		LOGGER.info(
+				"getEventStates() -> Salida del servicio para obtener los estados de eventos");
+		
+		return comboDTO;
+
+	}
 
 }

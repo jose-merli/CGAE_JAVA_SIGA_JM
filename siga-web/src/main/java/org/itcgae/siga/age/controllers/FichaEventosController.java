@@ -3,6 +3,8 @@ package org.itcgae.siga.age.controllers;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.form.AsistenciaCursoDTO;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -27,7 +29,7 @@ public class FichaEventosController {
 	
 	@Autowired 
 	private IAgendaCalendarioService agendaCalendarioService;
-			
+				
 	@RequestMapping(value = "fichaEventos/getTrainersLabels", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<FormadorCursoDTO> getTrainersLabels(String idCurso, HttpServletRequest request) {
 		FormadorCursoDTO response = fichaEventosService.getTrainersLabels(idCurso, request);
@@ -44,6 +46,24 @@ public class FichaEventosController {
 	@RequestMapping(value = "fichaEventos/getCalendars", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getCalendars(HttpServletRequest request) {
 		ComboDTO response = agendaCalendarioService.getCalendars(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaEventos/saveEventCalendar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> saveEvent(@RequestBody EventoItem eventoItem, HttpServletRequest request) {
+		InsertResponseDTO response = fichaEventosService.saveEventCalendar(eventoItem, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaEventos/getTypeEvent", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getTypeEvent(HttpServletRequest request) {
+		ComboDTO response = fichaEventosService.getTypeEvent(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaEventos/getEventStates", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getEventStates(HttpServletRequest request) {
+		ComboDTO response = fichaEventosService.getEventStates(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	

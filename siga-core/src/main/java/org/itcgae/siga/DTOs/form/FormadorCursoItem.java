@@ -17,6 +17,7 @@ public class FormadorCursoItem {
 	private String idTipoCoste;
 	private String tipoCoste;
 	private String nombre;
+	private String nombreCompleto;
 	private String apellidos;
 	private Double tarifa;
 	private Short tutor;
@@ -194,6 +195,23 @@ public class FormadorCursoItem {
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+	
+	/**
+	 * 
+	 **/
+	public FormadorCursoItem nombreCompleto(String nombreCompleto) {
+		this.nombreCompleto = nombreCompleto;
+		return this;
+	}
+
+	@JsonProperty("nombreCompleto")
+	public String getNombreCompleto() {
+		return nombreCompleto;
+	}
+
+	public void setNombreCompleto(String nombreCompleto) {
+		this.nombreCompleto = nombreCompleto;
 	}
 	
 	/**
