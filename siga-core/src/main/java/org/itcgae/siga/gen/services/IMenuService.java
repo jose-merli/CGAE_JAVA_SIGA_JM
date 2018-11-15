@@ -52,4 +52,7 @@ public interface IMenuService {
 
 	public ComboItem getInstitucionActual(HttpServletRequest request);
 
+
+	public ComboItem getLetrado(HttpServletRequest request);
+
 }

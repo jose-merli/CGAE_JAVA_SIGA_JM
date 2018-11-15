@@ -27,7 +27,7 @@ public class FichaDatosCurricularesItem {
 	private String idTipoCvSubtipo2;
 	private String creditos;
 	private String certificado;
-	
+	private String isLetrado;
 	
 	/**
 	 */
@@ -447,6 +447,14 @@ public class FichaDatosCurricularesItem {
 	      return "null";
 	    }
 	    return o.toString().replace("\n", "\n    ");
+	}
+
+	public String getIsLetrado() {
+		return isLetrado;
+	}
+
+	public void setIsLetrado(String isLetrado) {
+		this.isLetrado = isLetrado;
 	}
 	
 }

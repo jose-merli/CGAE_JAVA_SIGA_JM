@@ -18,10 +18,13 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
+import org.itcgae.siga.db.entities.CenSolicitudmodificacioncvExample;
 import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.entities.CenDatoscvExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicitudmodificacioncvExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +42,10 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
+	@Autowired
+	private CenSolicitudmodificacioncvExtendsMapper cenSolicitudmodificacioncvExtendsMapper;
+
+	
 	@Override
 	public FichaDatosCurricularesDTO searchDatosCurriculares(
 			FichaDatosCurricularesSearchDTO fichaDatosCurricularesSearchDTO, HttpServletRequest request) {
@@ -387,4 +394,145 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 		return insertResponseDTO;
 	}
 
+	
+	
+	
+	
+	
+	
+
+	@Override
+	public UpdateResponseDTO solicitudUpdateDatosCurriculares(FichaDatosCurricularesItem fichaDatosCurricularesItem,
+			HttpServletRequest request) {
+		LOGGER.info(
+				"updateDatosCurriculares() -> Entrada al servicio para actualizar información de Datos curriculares");
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+		int response = 0;
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		LOGGER.info(
+				"updateDatosCurriculares() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info(
+				"updateDatosCurriculares() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+		if (null != usuarios && usuarios.size() > 0) {
+			usuario = usuarios.get(0);
+			// for (int i = 0; i < FichaDatosCurricularesItem.length; i++) {
+			LOGGER.info(
+					"updateDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Entrada a cenDireccionesExtendsMapper para actualizar un curriculum");
+			CenSolicitudmodificacioncv recordUpdate = new CenSolicitudmodificacioncv();
+			// recordUpdate.setFechabaja(new Date());
+			// recordUpdate.setFechafin(new Date());
+			recordUpdate.setFechamodificacion(new Date());
+			recordUpdate.setUsumodificacion(usuario.getIdusuario());
+			recordUpdate.setIdpersona(Long.parseLong(fichaDatosCurricularesItem.getIdPersona()));
+			recordUpdate.setIdtipocv(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()));
+
+			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()
+					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()) {
+				recordUpdate.setIdtipocvsubtipo1(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()));
+			} else {
+				recordUpdate.setIdtipocvsubtipo1(null);
+			}
+			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()
+					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()) {
+				recordUpdate.setIdtipocvsubtipo2(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo2()));
+			} else {
+				recordUpdate.setIdtipocvsubtipo2(null);
+			}
+			if (null != fichaDatosCurricularesItem.getDescripcion()
+					&& "" != fichaDatosCurricularesItem.getDescripcion()) {
+				recordUpdate.setDescripcion(fichaDatosCurricularesItem.getDescripcion());
+			}
+			// if(null != fichaDatosCurricularesItem.getIdTipoCv()){
+			// }
+			recordUpdate.setFechamodificacion(new Date());
+			recordUpdate.setUsumodificacion(usuario.getIdusuario());
+			recordUpdate.setFechainicio(fichaDatosCurricularesItem.getFechaDesdeDate());
+			recordUpdate.setFechafin(fichaDatosCurricularesItem.getFechaHastaDate());
+			recordUpdate.setDescripcion(fichaDatosCurricularesItem.getDescripcion());
+			recordUpdate.setIdinstitucion(idInstitucion);
+			recordUpdate.setIdinstitucion(idInstitucion);
+			recordUpdate.setFechainicio(fichaDatosCurricularesItem.getFechaDesdeDate());
+			recordUpdate.setFechafin(fichaDatosCurricularesItem.getFechaHastaDate());
+//			recordUpdate.setFechabaja(fichaDatosCurricularesItem.getFechaHastaDate());
+//			recordUpdate.setFechamovimiento(fichaDatosCurricularesItem.getFechaMovimientoDate());
+
+			NewIdDTO idCvBD = cenDatoscvExtendsMapper.getMaxIdCv(String.valueOf(idInstitucion),
+					fichaDatosCurricularesItem.getIdPersona());
+			if (idCvBD == null) {
+				recordUpdate.setIdcv(Short.parseShort("1"));
+			} else {
+				int idCv = Integer.parseInt(idCvBD.getNewId()) + 1;
+				recordUpdate.setIdcv(Short.parseShort("" + idCv));
+			}
+						// recordUpdate.setIdpersona(Long.valueOf(fichaDatosCurricularesDTO[i].getIdPersona()));
+			
+
+			NewIdDTO idSolicitudBD = cenSolicitudmodificacioncvExtendsMapper.getMaxIdSolicitud(String.valueOf(idInstitucion),
+					fichaDatosCurricularesItem.getIdPersona());
+			if (idSolicitudBD == null) {
+				recordUpdate.setIdsolicitud(Long.parseLong("1"));
+			} else {
+				int idCv = Integer.parseInt(idSolicitudBD.getNewId()) + 1;
+				recordUpdate.setIdsolicitud(Long.parseLong("" + idCv));
+			}
+			
+			if(recordUpdate.getFechafin() == null) {
+				CenSolicitudmodificacioncvExample example = new CenSolicitudmodificacioncvExample();
+				Long idPers = Long.parseLong(fichaDatosCurricularesItem.getIdPersona());
+				example.createCriteria().andIdpersonaEqualTo(idPers).andIdinstitucionEqualTo(idInstitucion).andFechafinIsNull();
+				List<CenSolicitudmodificacioncv> datosCurricularesActivos = cenSolicitudmodificacioncvExtendsMapper.selectByExample(example);
+				
+				if(datosCurricularesActivos != null && datosCurricularesActivos.size() != 0) {
+					for(CenSolicitudmodificacioncv dato: datosCurricularesActivos) {
+						CenSolicitudmodificacioncv Actualizar = new CenSolicitudmodificacioncv();
+						Actualizar = dato;
+//						Actualizar.setFechabaja(new Date());
+						Actualizar.setFechafin(new Date());
+						Actualizar.setFechamodificacion(new Date());
+						Actualizar.setUsumodificacion(usuario.getIdusuario());
+						response = cenSolicitudmodificacioncvExtendsMapper.updateByPrimaryKey(Actualizar);
+//						update by primarykey
+					}
+
+				}
+				
+			}
+			response = cenSolicitudmodificacioncvExtendsMapper.solicitudUpdateCurriculo(recordUpdate);
+
+			LOGGER.info(
+					"updateDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para actualizar un curriculum");
+
+			updateResponseDTO.setStatus(SigaConstants.OK);
+			if (response == 0) {
+				updateResponseDTO.setStatus(SigaConstants.KO);
+				LOGGER.warn("updateDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> "
+						+ updateResponseDTO.getStatus() + ". No se pudo modificar el curriculum");
+
+			} else {
+				updateResponseDTO.setStatus(SigaConstants.OK);
+				LOGGER.warn("updateDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> "
+						+ updateResponseDTO.getStatus() + ". se modificó correctamente el curriculum");
+			}
+		} else {
+			updateResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.warn("updateDatosCurriculares() / admUsuariosExtendsMapper.selectByExample() -> "
+					+ updateResponseDTO.getStatus() + ". No existen ningún usuario en base de datos");
+		}
+
+		LOGGER.info("updateDatosCurriculares() -> Salida del servicio para actualizar un curriculum");
+		return updateResponseDTO;
+	}
+	
+	
+	
 }
