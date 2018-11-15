@@ -17,7 +17,16 @@ public class UserCgae implements UserDetails {
 	private String dni;
 	private String grupo;
 	private String institucion;
-    private HashMap<String,String> permisos;
+	private String letrado;
+    public String getLetrado() {
+		return letrado;
+	}
+
+	public void setLetrado(String letrado) {
+		this.letrado = letrado;
+	}
+
+	private HashMap<String,String> permisos;
     private List<String> perfiles;
 	
     public List<String> getPerfiles() {
@@ -35,12 +44,13 @@ public class UserCgae implements UserDetails {
 		this.dni = dni;
 	}
 	
-	public UserCgae(String dni, String grupo, String institucion, HashMap<String,String> permisos,List<String> perfiles) {
+	public UserCgae(String dni, String grupo, String institucion, HashMap<String,String> permisos,List<String> perfiles,String letrado) {
 		this.dni = dni;
 		this.grupo = grupo;
 		this.institucion = institucion;
 		this.permisos = permisos;
 		this.perfiles = perfiles;
+		this.letrado = letrado;
 	}
 	
 	public String getDni() {
@@ -114,7 +124,7 @@ public class UserCgae implements UserDetails {
 	@Override
 	public String toString() {
 		return "UserCgae [dni=" + dni + ", grupo=" + grupo + ", institucion=" + institucion + ", permisos=" + permisos + ", perfiles=" + perfiles
-				+ "]";
+				+ ", letrado=" + letrado + "]";
 	}
 	
 	

@@ -1,13 +1,17 @@
 package org.itcgae.siga.cen.controllers;
 
+import java.text.ParseException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
+import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 //import org.itcgae.siga.DTOs.cen.FichaDatosColegialesDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
@@ -54,6 +58,11 @@ public class FichaDatosGeneralesController {
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
+	@RequestMapping(value = "/fichaDatosGenerales/etiquetasPersona",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboEtiquetasDTO> getLabelPerson(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException{
+		ComboEtiquetasDTO response = fichaDatosGenerales.getLabelPerson(colegiadoItem,request);
+		return new ResponseEntity<ComboEtiquetasDTO>(response, HttpStatus.OK);
+	}
 	
 	@RequestMapping(value = "/fichaDatosGenerales/datosGeneralesCreateNoColegiado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> createNoColegiado(@RequestBody NoColegiadoItem noColegiadoItem, HttpServletRequest request) throws Exception { 

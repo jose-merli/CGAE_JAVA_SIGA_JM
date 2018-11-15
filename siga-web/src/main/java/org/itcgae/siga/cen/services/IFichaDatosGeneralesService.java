@@ -7,9 +7,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
+import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface IFichaDatosGeneralesService {
@@ -27,6 +29,9 @@ public interface IFichaDatosGeneralesService {
 	public InsertResponseDTO createNoColegiado(NoColegiadoItem noColegiadoItem, HttpServletRequest request) throws ParseException;
 
 	public DatosDireccionesDTO partidoJudicialSearch(ColegiadoItem colegiadoItem, HttpServletRequest request);
+
+	public ComboEtiquetasDTO getLabelPerson(ColegiadoItem colegiadoItem,
+			HttpServletRequest request) throws ParseException;
 
 //	DatosDireccionesItem partidoJudicialSearch(ColegiadoItem colegiadoItem, HttpServletRequest request);
 

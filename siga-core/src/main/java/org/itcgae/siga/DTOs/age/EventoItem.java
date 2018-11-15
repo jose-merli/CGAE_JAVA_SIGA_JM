@@ -1,49 +1,152 @@
 package org.itcgae.siga.DTOs.age;
 
+import java.util.Date;
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class EventoItem {
 
-	private String id;
-	private String title;
+	private String idEvento;
+	private String idCalendario;
+	private Short idInstitucion;
+	private String titulo;
+	private Date fechaInicio;
+	private Date fechaFin;
+	private boolean allDay = false;
 	private String start;
 	private String end;
-	private boolean allDay = false;
 	private String color;
-	private String idCalendario;
 	private Long tipoAcceso;
+	private String lugar;
+	private String descripcion;
+	private String recursos;
+	private String idEstadoEvento;
+	private String idTipoEvento;
+	private Date fechaBaja;
+	private Long usuModificacion;
+	private Date fechaModificacion;
+		
+	/**
+	 **/
+	public EventoItem idEvento(String idEvento) {
+		this.idEvento = idEvento;
+		return this;
+	}
+
+	@JsonProperty("idEvento")
+	public String getIdEvento() {
+		return idEvento;
+	}
+
+	public void setIdEvento(String idEvento) {
+		this.idEvento = idEvento;
+	}
 	
-	public EventoItem() {
-		super();
-	}
-
-	public EventoItem(String id, String title, String start, String end, boolean allDay, String color,
-			String idCalendario, Long tipoAcceso) {
-		super();
-		this.id = id;
-		this.title = title;
-		this.start = start;
-		this.end = end;
-		this.allDay = allDay;
-		this.color = color;
+	/**
+	 **/
+	public EventoItem idCalendario(String idCalendario) {
 		this.idCalendario = idCalendario;
-		this.tipoAcceso = tipoAcceso;
+		return this;
 	}
 
-	public String getId() {
-		return id;
+	@JsonProperty("idCalendario")
+	public String getIdCalendario() {
+		return idCalendario;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setIdCalendario(String idCalendario) {
+		this.idCalendario = idCalendario;
+	}
+	
+	/**
+	 **/
+	public EventoItem idInstitucion(Short idInstitucion) {
+		this.idInstitucion = idInstitucion;
+		return this;
 	}
 
-	public String getTitle() {
-		return title;
+	@JsonProperty("idInstitucion")
+	public Short getIdInstitucion() {
+		return idInstitucion;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setIdInstitucion(Short idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
+	
+	/**
+	 **/
+	public EventoItem titulo(String titulo) {
+		this.titulo = titulo;
+		return this;
 	}
 
+	@JsonProperty("titulo")
+	public String getTitulo() {
+		return titulo;
+	}
+
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
+	
+	/**
+	 **/
+	public EventoItem fechaInicio(Date fechaInicio) {
+		this.fechaInicio = fechaInicio;
+		return this;
+	}
+
+	@JsonProperty("fechaInicio")
+	public Date getFechaInicio() {
+		return fechaInicio;
+	}
+
+	public void setFechaInicio(Date fechaInicio) {
+		this.fechaInicio = fechaInicio;
+	}
+
+	/**
+	 **/
+	public EventoItem fechaFin(Date fechaFin) {
+		this.fechaFin = fechaFin;
+		return this;
+	}
+
+	@JsonProperty("fechaFin")
+	public Date getFechaFin() {
+		return fechaFin;
+	}
+
+	public void setFechaFin(Date fechaFin) {
+		this.fechaFin = fechaFin;
+	}
+	
+	/**
+	 **/
+	public EventoItem allDay(boolean allDay) {
+		this.allDay = allDay;
+		return this;
+	}
+
+	@JsonProperty("allDay")
+	public boolean getAllDay() {
+		return allDay;
+	}
+
+	public void setAllDay(boolean allDay) {
+		this.allDay = allDay;
+	}
+	
+	/**
+	 **/
+	public EventoItem start(String start) {
+		this.start = start;
+		return this;
+	}
+
+	@JsonProperty("start")
 	public String getStart() {
 		return start;
 	}
@@ -51,7 +154,15 @@ public class EventoItem {
 	public void setStart(String start) {
 		this.start = start;
 	}
+	
+	/**
+	 **/
+	public EventoItem end(String end) {
+		this.end = end;
+		return this;
+	}
 
+	@JsonProperty("end")
 	public String getEnd() {
 		return end;
 	}
@@ -59,15 +170,31 @@ public class EventoItem {
 	public void setEnd(String end) {
 		this.end = end;
 	}
-
-	public boolean isAllDay() {
-		return allDay;
+	
+	/**
+	 **/
+	public EventoItem lugar(String lugar) {
+		this.lugar = lugar;
+		return this;
 	}
 
-	public void setAllDay(boolean allDay) {
-		this.allDay = allDay;
+	@JsonProperty("lugar")
+	public String getLugar() {
+		return lugar;
 	}
 
+	public void setLugar(String lugar) {
+		this.lugar = lugar;
+	}
+	
+	/**
+	 **/
+	public EventoItem color(String color) {
+		this.color = color;
+		return this;
+	}
+
+	@JsonProperty("color")
 	public String getColor() {
 		return color;
 	}
@@ -75,13 +202,21 @@ public class EventoItem {
 	public void setColor(String color) {
 		this.color = color;
 	}
-
-	public String getIdCalendario() {
-		return idCalendario;
+	
+	/**
+	 **/
+	public EventoItem descripcion(String descripcion) {
+		this.descripcion = descripcion;
+		return this;
 	}
 
-	public void setIdCalendario(String idCalendario) {
-		this.idCalendario = idCalendario;
+	@JsonProperty("descripcion")
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
 	}
 	
 	public Long getTipoAcceso() {
@@ -92,70 +227,160 @@ public class EventoItem {
 		this.tipoAcceso = tipoAcceso;
 	}
 
+	/**
+	 **/
+	public EventoItem recursos(String recursos) {
+		this.recursos = recursos;
+		return this;
+	}
+
+	@JsonProperty("recursos")
+	public String getRecursos() {
+		return recursos;
+	}
+
+	public void setRecursos(String recursos) {
+		this.recursos = recursos;
+	}
+	
+	/**
+	 **/
+	public EventoItem idEstadoEvento(String idEstadoEvento) {
+		this.idEstadoEvento = idEstadoEvento;
+		return this;
+	}
+
+	@JsonProperty("idEstadoEvento")
+	public String getIdEstadoEvento() {
+		return idEstadoEvento;
+	}
+
+	public void setIdEstadoEvento(String idEstadoEvento) {
+		this.idEstadoEvento = idEstadoEvento;
+	}
+	
+	/**
+	 **/
+	public EventoItem idTipoEvento(String idTipoEvento) {
+		this.idTipoEvento = idTipoEvento;
+		return this;
+	}
+
+	@JsonProperty("idTipoEvento")
+	public String getIdTipoEvento() {
+		return idTipoEvento;
+	}
+
+	public void setIdTipoEvento(String idTipoEvento) {
+		this.idTipoEvento = idTipoEvento;
+	}
+	
+	/**
+	 * 
+	 **/
+	public EventoItem usuModificacion(Long usuModificacion) {
+		this.usuModificacion = usuModificacion;
+		return this;
+	}
+
+	@JsonProperty("usuModificacion")
+	public Long getUsuModificacion() {
+		return usuModificacion;
+	}
+
+	public void setUsuModificacion(Long usuModificacion) {
+		this.usuModificacion = usuModificacion;
+	}
+
+	/**
+	 * 
+	 **/
+	public EventoItem fechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+		return this;
+	}
+
+	@JsonProperty("fechaModificacion")
+	public Date getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+	public void setFechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+	}
+
+	
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (allDay ? 1231 : 1237);
-		result = prime * result + ((color == null) ? 0 : color.hashCode());
-		result = prime * result + ((end == null) ? 0 : end.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((idCalendario == null) ? 0 : idCalendario.hashCode());
-		result = prime * result + ((start == null) ? 0 : start.hashCode());
-		result = prime * result + ((title == null) ? 0 : title.hashCode());
-		return result;
+	public boolean equals(java.lang.Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		EventoItem eventoItem = (EventoItem) o;
+		return Objects.equals(this.idEvento, eventoItem.idEvento)
+				&& Objects.equals(this.idCalendario, eventoItem.idCalendario)
+				&& Objects.equals(this.idInstitucion, eventoItem.idInstitucion)
+				&& Objects.equals(this.titulo, eventoItem.titulo)
+				&& Objects.equals(this.fechaInicio, eventoItem.fechaInicio)
+				&& Objects.equals(this.fechaFin, eventoItem.fechaFin)
+				&& Objects.equals(this.allDay, eventoItem.allDay)
+				&& Objects.equals(this.start, eventoItem.start)
+				&& Objects.equals(this.end, eventoItem.end)
+				&& Objects.equals(this.color, eventoItem.color)
+				&& Objects.equals(this.lugar, eventoItem.lugar)
+				&& Objects.equals(this.descripcion, eventoItem.descripcion)
+				&& Objects.equals(this.recursos, eventoItem.recursos)
+				&& Objects.equals(this.idEstadoEvento, eventoItem.idEstadoEvento)
+				&& Objects.equals(this.idTipoEvento, eventoItem.idTipoEvento)
+				&& Objects.equals(this.usuModificacion, eventoItem.usuModificacion)
+				&& Objects.equals(this.fechaModificacion, eventoItem.fechaModificacion)
+				&& Objects.equals(this.fechaBaja, eventoItem.fechaBaja);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		EventoItem other = (EventoItem) obj;
-		if (allDay != other.allDay)
-			return false;
-		if (color == null) {
-			if (other.color != null)
-				return false;
-		} else if (!color.equals(other.color))
-			return false;
-		if (end == null) {
-			if (other.end != null)
-				return false;
-		} else if (!end.equals(other.end))
-			return false;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (idCalendario == null) {
-			if (other.idCalendario != null)
-				return false;
-		} else if (!idCalendario.equals(other.idCalendario))
-			return false;
-		if (start == null) {
-			if (other.start != null)
-				return false;
-		} else if (!start.equals(other.start))
-			return false;
-		if (title == null) {
-			if (other.title != null)
-				return false;
-		} else if (!title.equals(other.title))
-			return false;
-		return true;
+	public int hashCode() {
+		return Objects.hash(idEvento, idCalendario, idInstitucion, titulo, fechaInicio, fechaFin, allDay, start, end, color, lugar,
+				descripcion, recursos, idEstadoEvento, idTipoEvento, usuModificacion, fechaModificacion, fechaBaja);
 	}
 
 	@Override
 	public String toString() {
-		return "EventoItem [id=" + id + ", title=" + title + ", start=" + start + ", end=" + end + ", allDay=" + allDay
-				+ ", color=" + color + ", idCalendario=" + idCalendario + "]";
+		StringBuilder sb = new StringBuilder();
+		sb.append("class EventoItem {\n");
+
+		sb.append("    idEvento: ").append(toIndentedString(idEvento)).append("\n");
+		sb.append("    idCalendario: ").append(toIndentedString(idCalendario)).append("\n");
+		sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
+		sb.append("    titulo: ").append(toIndentedString(titulo)).append("\n");
+		sb.append("    fechaInicio: ").append(toIndentedString(fechaInicio)).append("\n");
+		sb.append("    fechaFin: ").append(toIndentedString(fechaFin)).append("\n");
+		sb.append("    allDay: ").append(toIndentedString(allDay)).append("\n");
+		sb.append("    start: ").append(toIndentedString(start)).append("\n");
+		sb.append("    end: ").append(toIndentedString(end)).append("\n");
+		sb.append("    color: ").append(toIndentedString(color)).append("\n");
+		sb.append("    lugar: ").append(toIndentedString(lugar)).append("\n");
+		sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
+		sb.append("    recursos: ").append(toIndentedString(recursos)).append("\n");
+		sb.append("    idEstadoEvento: ").append(toIndentedString(idEstadoEvento)).append("\n");
+		sb.append("    idTipoEvento: ").append(toIndentedString(idTipoEvento)).append("\n");
+		sb.append("    usuModificacion: ").append(toIndentedString(usuModificacion)).append("\n");
+		sb.append("    fechaModificacion: ").append(toIndentedString(fechaModificacion)).append("\n");
+		sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
+		sb.append("}");
+		return sb.toString();
+	}
+
+	/**
+	 * Convert the given object to string with each line indented by 4 spaces
+	 * (except the first line).
+	 */
+	private String toIndentedString(java.lang.Object o) {
+		if (o == null) {
+			return "null";
+		}
+		return o.toString().replace("\n", "\n    ");
 	}
 	
-	
-
 }

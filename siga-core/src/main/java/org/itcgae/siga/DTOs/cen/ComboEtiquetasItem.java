@@ -17,6 +17,7 @@ public class ComboEtiquetasItem {
 		this.idGrupo = idGrupo;
 	}
 	
+	
 	@JsonProperty("fechaInicio")
 	public String getFechaInicio() {
 		return fechaInicio;

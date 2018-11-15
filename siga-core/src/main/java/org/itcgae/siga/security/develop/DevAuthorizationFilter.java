@@ -62,7 +62,7 @@ public class DevAuthorizationFilter extends BasicAuthenticationFilter {
 			List<String> perfiles = new ArrayList<String>(); 
 			perfiles.add("ADG");
 			UserCgae userDesarrollo = (UserCgae) userDetailsService
-					.loadUserByUsername(new UserCgae("44149718E", "Personal", "2000", null,perfiles));
+					.loadUserByUsername(new UserCgae("44149718E", "Personal", "2000", null,perfiles, "N"));
 			authentication = new UserAuthenticationToken(userDesarrollo.getDni(), null, userDesarrollo, null,
 					new ArrayList<>());
 			String header = null;
