@@ -15,6 +15,7 @@ public class CalendarItem {
 	private Date fechaBaja;
 	private String idTipoCalendario;
 	private String color;
+	private Long tipoAcceso;
 	private boolean checked = false;
 
 	/**
@@ -159,6 +160,14 @@ public class CalendarItem {
 
 	public void setChecked(boolean checked) {
 		this.checked = checked;
+	}
+	
+	public Long getTipoAcceso() {
+		return tipoAcceso;
+	}
+
+	public void setTipoAcceso(Long tipoAcceso) {
+		this.tipoAcceso = tipoAcceso;
 	}
 
 	@Override

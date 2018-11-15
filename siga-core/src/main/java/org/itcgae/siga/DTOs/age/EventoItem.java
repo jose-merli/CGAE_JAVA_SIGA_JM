@@ -9,13 +9,14 @@ public class EventoItem {
 	private boolean allDay = false;
 	private String color;
 	private String idCalendario;
+	private Long tipoAcceso;
 	
 	public EventoItem() {
 		super();
 	}
 
 	public EventoItem(String id, String title, String start, String end, boolean allDay, String color,
-			String idCalendario) {
+			String idCalendario, Long tipoAcceso) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -24,6 +25,7 @@ public class EventoItem {
 		this.allDay = allDay;
 		this.color = color;
 		this.idCalendario = idCalendario;
+		this.tipoAcceso = tipoAcceso;
 	}
 
 	public String getId() {
@@ -80,6 +82,14 @@ public class EventoItem {
 
 	public void setIdCalendario(String idCalendario) {
 		this.idCalendario = idCalendario;
+	}
+	
+	public Long getTipoAcceso() {
+		return tipoAcceso;
+	}
+
+	public void setTipoAcceso(Long tipoAcceso) {
+		this.tipoAcceso = tipoAcceso;
 	}
 
 	@Override

@@ -28,7 +28,7 @@ public class AgendaCalendarioController {
 	
 	@RequestMapping(value = "agendaCalendario/getEventosByIdCalendario",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EventoDTO> getEventsByCalendarId(@RequestParam("idCalendario") String idCalendario, HttpServletRequest request) {
-		EventoDTO response = agendaCalendarioService.getEventosByIdCalendario(idCalendario);
+		EventoDTO response = agendaCalendarioService.getEventosByIdCalendario(request, idCalendario);
 		return new ResponseEntity<EventoDTO>(response, HttpStatus.OK);
 	}
 		

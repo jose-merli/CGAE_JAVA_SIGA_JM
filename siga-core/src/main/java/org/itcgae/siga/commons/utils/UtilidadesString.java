@@ -13,6 +13,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Calendar;
 import java.util.Properties;
 
@@ -153,5 +154,26 @@ public class UtilidadesString {
 		
 	}
 	
+	public static String prepararPerfiles(List<String> perfiles) {
+		String idPerfiles = "";
+		for (int i = 0; i < perfiles.size(); i++) {
+			String contructPerfil = "";
+			if (perfiles.size() == 1) {
+				contructPerfil += perfiles.get(i);
+			} else {
+				if (i != perfiles.size() - 1) {
+					contructPerfil += perfiles.get(i);
+
+					contructPerfil += ",";
+
+				} else {
+					contructPerfil += perfiles.get(i);
+				}
+			}
+			idPerfiles += contructPerfil;
+		}
+		
+		return idPerfiles;
+	}
 
 }
