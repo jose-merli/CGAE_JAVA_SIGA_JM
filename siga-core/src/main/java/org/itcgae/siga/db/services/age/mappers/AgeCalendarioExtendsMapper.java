@@ -51,10 +51,10 @@ public interface AgeCalendarioExtendsMapper extends AgeCalendarioMapper{
 	@SelectProvider(type = AgeCalendarioSqlExtendsProvider.class, method = "getCalendarioEventos")
 	@Results({
 		@Result(column = "IDCALENDARIO", property = "idCalendario", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDEVENTO", property = "id", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHAINICIO", property = "start", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHAFIN", property = "end", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "TITULO", property = "title", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDEVENTO", property = "idEvento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TITULO", property = "titulo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "COLOR", property = "color", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOACCESO", property = "tipoAcceso", jdbcType = JdbcType.NUMERIC),
 	})
