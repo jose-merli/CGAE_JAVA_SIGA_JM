@@ -95,8 +95,7 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "selectBanks")
 	@Results({
 		@Result(column = "BANCO", property = "banco", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "BIC", property = "bic", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "BICESPANOL", property = "bicEspanol", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "BIC", property = "bic", jdbcType = JdbcType.VARCHAR)
 	})
 	List<BancoBicItem> selectBanks(DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO); 
 
