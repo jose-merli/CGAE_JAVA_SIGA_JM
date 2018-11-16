@@ -53,33 +53,19 @@ public class CenSolicitudmodificacioncvSqlExtendsProvider extends CenSolicitudmo
 		sql.VALUES("IDINSTITUCION", "'" + idInstitucion + "'");
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuario.getIdusuario()) + "'");
-		// sql.VALUES("SERIE", "");
-		// sql.VALUES("NUMEROREF", "");
 		sql.VALUES("SOCIEDADSJ", "'0'");
 		sql.VALUES("TIPO", "'" + etiquetaUpdateDTO.getTipo() + "'");
 		if (null != etiquetaUpdateDTO.getAnotaciones() && !etiquetaUpdateDTO.getAnotaciones().equals("")) {
 			sql.VALUES("ANOTACIONES", "'" + etiquetaUpdateDTO.getAnotaciones() + "'");
 		}	
 		
-		// sql.VALUES("PREFIJO_NUMREG", "");
-		// sql.VALUES("CONTADOR_NUMREG", "");
-		// sql.VALUES("SUFIJO_NUMREG", "");
-		// sql.VALUES("FECHAFIN", "");
-		// sql.VALUES("IDPERSONANOTARIO", "");
-		// sql.VALUES("RESENA", "");
-		// sql.VALUES("OBJETOSOCIAL", "");
 		sql.VALUES("SOCIEDADPROFESIONAL", "'0'");
-		// sql.VALUES("PREFIJO_NUMSSPP", "");
-		// sql.VALUES("CONTADOR_NUMSSPP", "");
-		// sql.VALUES("SUFIJO_NUMSSPP", "");
-		// sql.VALUES("NOPOLIZA", "");
-		// sql.VALUES("COMPANIASEG", "");
-		// sql.VALUES("IDENTIFICADORDS", "");
 		sql.VALUES("FECHA_BAJA", "null");
 
 		return sql.toString();
 	}
 	
+
 	public String solicitudUpdateCurriculo(CenSolicitudmodificacioncv record) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -87,15 +73,19 @@ public class CenSolicitudmodificacioncvSqlExtendsProvider extends CenSolicitudmo
 			SQL sql1 = new SQL();
 			SQL sql2 = new SQL();
 
-			sql.INSERT_INTO("CEN_NOCOLEGIADO");
+			sql.INSERT_INTO("CEN_SOLICITUDMODIFICACIONCV");
 			sql1.SELECT("IDINSTITUCION");
 			sql2.SELECT("IDINSTITUCION");
 	
 			sql.VALUES("IDSOLICITUD", ""+record.getIdsolicitud());
 			
+			sql.VALUES("MOTIVO", "'"+record.getMotivo()+"'");
+			
+			sql.VALUES("IDESTADOSOLIC", "10");
 			if (record.getFechainicio() != null) {				
 				String fechaF = dateFormat.format(record.getFechainicio());
 				sql.VALUES("FECHAINICIO", "TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+				sql.VALUES("FECHAALTA", "TO_DATE('" + fechaF + "','DD/MM/YYYY')");
 			}
 			if (record.getFechafin() != null) {
 				String fechaF = dateFormat.format(record.getFechafin());
@@ -146,16 +136,5 @@ public class CenSolicitudmodificacioncvSqlExtendsProvider extends CenSolicitudmo
 			return sql.toString();
 	}
 	
-	
-	public String getMaxIdSolicitud(String idInstitucion, String idPersona) {
-		SQL sql = new SQL();
-
-		sql.SELECT("MAX(IDSOLICITUD) AS IDSOLICITUD");
-		sql.FROM("CEN_SOLICITUDMODIFICACIONCV");
-		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
-		sql.WHERE("IDPERSONA = '"+ idPersona +"'");
-		
-		return sql.toString();
-	}
 
 }
