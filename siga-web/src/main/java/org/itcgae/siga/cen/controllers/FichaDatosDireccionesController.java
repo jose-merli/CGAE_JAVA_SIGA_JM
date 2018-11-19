@@ -42,8 +42,6 @@ public class FichaDatosDireccionesController {
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
-
-	
 	@RequestMapping(value = "fichaDatosDirecciones/pais", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getPais(HttpServletRequest request) { 
 		ComboDTO response = tarjetaDatosDireccionesService.getPais(request);
@@ -73,6 +71,14 @@ public class FichaDatosDireccionesController {
 	@RequestMapping(value = "fichaDatosDirecciones/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> createDirection(@RequestBody DatosDireccionesItem datosDirecciones, HttpServletRequest request) { 
 		InsertResponseDTO response = tarjetaDatosDireccionesService.createDirection(datosDirecciones, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "fichaDatosDirecciones/solicitudCreate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> solicitudCreateDirection(@RequestBody DatosDireccionesItem datosDirecciones, HttpServletRequest request) { 
+		InsertResponseDTO response = tarjetaDatosDireccionesService.solicitudCreateDirection(datosDirecciones, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
