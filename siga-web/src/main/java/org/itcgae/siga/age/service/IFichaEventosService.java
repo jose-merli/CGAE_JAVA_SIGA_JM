@@ -35,6 +35,9 @@ public interface IFichaEventosService {
 	public ComboDTO getTypeEvent(HttpServletRequest request);
 	
 	public ComboDTO getEventStates(HttpServletRequest request);
+	
+	public ComboDTO getRepeatEvery(HttpServletRequest request);
 
+	public ComboDTO getDaysWeek(HttpServletRequest request);
 	
 }

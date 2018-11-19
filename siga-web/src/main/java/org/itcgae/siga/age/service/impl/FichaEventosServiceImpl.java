@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -26,9 +27,15 @@ import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AgeEvento;
+import org.itcgae.siga.db.entities.AgeRepeticionevento;
+import org.itcgae.siga.db.entities.GenDiccionario;
+import org.itcgae.siga.db.entities.GenDiccionarioExample;
 import org.itcgae.siga.db.mappers.AgeEventoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenDiccionarioExtendsMapper;
+import org.itcgae.siga.db.services.age.mappers.AgeDiassemanaExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeEstadoeventosExtendsMapper;
+import org.itcgae.siga.db.services.age.mappers.AgeRepeticionEventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeTipoeventosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForPersonacursoExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
@@ -60,6 +67,15 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	
 	@Autowired
 	private AgeEstadoeventosExtendsMapper ageEstadoeventosExtendsMapper;
+	
+	@Autowired 
+	private GenDiccionarioExtendsMapper genDiccionarioExtendsMapper;
+	
+	@Autowired 
+	private AgeDiassemanaExtendsMapper ageDiassemanaExtendsMapper;
+	
+	@Autowired 
+	private AgeRepeticionEventoExtendsMapper ageRepeticionEventoExtendsMapper;
 
 	
 	@Override
@@ -68,6 +84,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 
+		String idRepeticionEvento = null;
+		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -84,8 +102,38 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-
-				// Creamos un nuevo calendario
+				
+				if(eventoItem.getDatosRepeticion() != null) {
+					AgeRepeticionevento ageRepeticionEvento = new AgeRepeticionevento();
+					ageRepeticionEvento.setIdinstitucion(idInstitucion);
+					ageRepeticionEvento.setFechainicio(eventoItem.getDatosRepeticion().getFechaInicio());
+					ageRepeticionEvento.setFechafin(eventoItem.getDatosRepeticion().getFechaFin());
+					ageRepeticionEvento.setFechabaja(null);
+					ageRepeticionEvento.setUsumodificacion(usuario.getIdusuario().longValue());
+					ageRepeticionEvento.setFechamodificacion(new Date());
+					if(eventoItem.getDatosRepeticion().getValoresRepeticion().length != 0) {
+						String valoresrepeticion = Arrays.toString(eventoItem.getDatosRepeticion().getValoresRepeticion());
+						ageRepeticionEvento.setValoresrepeticion(valoresrepeticion);
+					}else {
+						ageRepeticionEvento.setValoresrepeticion(null);
+					}
+					ageRepeticionEvento.setTiporepeticion(eventoItem.getDatosRepeticion().getTipoRepeticion());
+					ageRepeticionEvento.setTipodiasrepeticion(eventoItem.getDatosRepeticion().getTipoDiasRepeticion());
+					
+					LOGGER.info(
+							"saveEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Entrada a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
+					response = ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento);
+					LOGGER.info(
+							"saveEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Salida a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
+					
+					LOGGER.info(
+							"saveEventCalendar() / ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent() -> Entrada a ageRepeticionEventoExtendsMapper para obtener idRepeticionEvento de los datos de repeticion insertados");
+					List<ComboItem> repeticionEventoInserted = ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent();
+					LOGGER.info(
+							"saveEventCalendar() / ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent() -> Salida a ageRepeticionEventoExtendsMapper para obtener idRepeticionEvento de los datos de repeticion insertados");
+					idRepeticionEvento = repeticionEventoInserted.get(0).getValue();
+				}
+				
 				AgeEvento ageEventoInsert = new AgeEvento();
 				ageEventoInsert.setIdcalendario(Long.valueOf(eventoItem.getIdCalendario()));
 				ageEventoInsert.setTitulo(eventoItem.getTitulo());
@@ -100,12 +148,16 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 				ageEventoInsert.setRecursos(eventoItem.getRecursos());
 				ageEventoInsert.setIdtipoevento(Long.valueOf(eventoItem.getIdTipoEvento()));
 				ageEventoInsert.setIdestadoevento(Long.valueOf(eventoItem.getIdEstadoEvento()));
+				
+				if(idRepeticionEvento != null) {
+					ageEventoInsert.setIdrepeticionevento(Long.valueOf(idRepeticionEvento));
+				}
 
 				LOGGER.info(
-						"saveEvent() / ageEventoMapper.insert(ageEventoInsert) -> Entrada a ageEventoMapper para insertar un evento");
+						"saveEventCalendar() / ageEventoMapper.insert(ageEventoInsert) -> Entrada a ageEventoMapper para insertar un evento");
 				response = ageEventoMapper.insert(ageEventoInsert);
 				LOGGER.info(
-						"saveEvent() / ageEventoMapper.insert(ageEventoInsert) -> Salida a ageEventoMapper para insertar un evento");
+						"saveEventCalendar() / ageEventoMapper.insert(ageEventoInsert) -> Salida a ageEventoMapper para insertar un evento");
 
 				if (response == 0) {
 					error.setCode(400);
@@ -118,6 +170,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		insertResponseDTO.setError(error);
 		return insertResponseDTO;
 	}
+	
+	
 
 	@Override
 	public FormadorCursoDTO getTrainersLabels(String idCurso, HttpServletRequest request) {
@@ -292,6 +346,103 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		
 		return comboDTO;
 
+	}
+
+	@Override
+	public ComboDTO getRepeatEvery(HttpServletRequest request) {
+		LOGGER.info(
+				"getRepeatEvery() -> Entrada al servicio para obtener el rango de tiempo que va a repetir un eventos");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getRepeatEvery() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getRepeatEvery() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				
+				GenDiccionarioExample exampleDiccionario = new GenDiccionarioExample();
+				exampleDiccionario.createCriteria().andIdlenguajeEqualTo(usuario.getIdlenguaje())
+				.andIdrecursoLike("fichaEventos.datosRepeticion.repetirCada%");
+				
+				LOGGER.info(
+						"getRepeatEvery() / genDiccionarioExtendsMapper.selectByExample(exampleDiccionario) -> Entrada a genDiccionarioExtendsMapper para obtener el rango de tiempo que va a repetir un eventos");
+				
+				List<GenDiccionario> repetirCada = genDiccionarioExtendsMapper.selectByExample(exampleDiccionario);
+				
+				for(GenDiccionario rc : repetirCada) {
+					ComboItem item = new ComboItem();
+					item.setLabel(rc.getDescripcion());
+					item.setValue(String.valueOf(rc.getDescripcion().charAt(0)));
+					
+					comboItems.add(item);
+				}
+				LOGGER.info(
+						"getRepeatEvery() / genDiccionarioExtendsMapper.selectByExample(exampleDiccionario) -> Salida de genDiccionarioExtendsMapper para obtener el rango de tiempo que va a repetir un eventos");
+
+			}
+		}
+
+		comboDTO.setCombooItems(comboItems);
+
+		LOGGER.info(
+				"getRepeatEvery() -> Salida del servicio para obtener el rango de tiempo que va a repetir un eventos");
+		
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO getDaysWeek(HttpServletRequest request) {
+		LOGGER.info(
+				"getDaysWeek() -> Entrada al servicio para obtener los días de la semana");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getDaysWeek() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getDaysWeek() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+								
+				LOGGER.info(
+						"getDaysWeek() / ageDiassemanaExtendsMapper.getDaysWeek(usuario.getIdlenguaje()) -> Entrada a genDiccionarioExtendsMapper para obtener los días de la semana");
+				
+				comboItems = ageDiassemanaExtendsMapper.getDaysWeek(usuario.getIdlenguaje());
+				
+				LOGGER.info(
+						"getDaysWeek() / ageDiassemanaExtendsMapper.getDaysWeek(usuario.getIdlenguaje()) -> Salida de genDiccionarioExtendsMapper para obtener los días de la semana");
+
+			}
+		}
+
+		comboDTO.setCombooItems(comboItems);
+
+		LOGGER.info(
+				"getDaysWeek() -> Salida del servicio para obtener los días de la semana");
+		
+		return comboDTO;
 	}
 
 }

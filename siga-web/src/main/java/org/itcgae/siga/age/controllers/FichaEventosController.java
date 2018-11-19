@@ -67,4 +67,16 @@ public class FichaEventosController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "fichaEventos/getRepeatEvery", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getRepeatEvery(HttpServletRequest request) {
+		ComboDTO response = fichaEventosService.getRepeatEvery(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaEventos/getDaysWeek", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getDaysWeek(HttpServletRequest request) {
+		ComboDTO response = fichaEventosService.getDaysWeek(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 }
