@@ -808,5 +808,19 @@ public class MenuServiceImpl implements IMenuService {
 	
 	}	
 
+	@Override
+	public ComboItem getLetrado(HttpServletRequest request) {
+		// Obtenemos si el usuario logeado es colegiado o administrador
+		ComboItem comboItem = new ComboItem();
+
+		LOGGER.debug("Obtenemos atributos del usuario logeado");
+		String token = request.getHeader("Authorization");
+		String letrado =  UserTokenUtils.getLetradoFromJWTToken(token);
+		
+		comboItem.setLabel(letrado);
+		comboItem.setValue(letrado);
+		return comboItem;
+	}	
+	
 
 }

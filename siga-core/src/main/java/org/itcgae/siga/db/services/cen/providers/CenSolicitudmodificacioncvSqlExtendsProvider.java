@@ -3,10 +3,14 @@ package org.itcgae.siga.db.services.cen.providers;
 import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenDatoscv;
+import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
 import org.itcgae.siga.db.mappers.CenDatoscvSqlProvider;
+import org.itcgae.siga.db.mappers.CenSolicitudmodificacioncvSqlProvider;
 
-public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
+public class CenSolicitudmodificacioncvSqlExtendsProvider extends CenSolicitudmodificacioncvSqlProvider{
 	
 	public String searchDatosCurriculares(String idPersona, String idInstitucion) {
 		SQL sql = new SQL();
@@ -27,6 +31,7 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 		sql.SELECT("DATOS.IDPERSONA");
 		sql.SELECT("DATOS.CREDITOS");
 		sql.SELECT("DATOS.CERTIFICADO");
+//		sql.SELECT("DATOS.CERTIFICADO");
 		sql.FROM("CEN_DATOSCV DATOS");
 		sql.INNER_JOIN("CEN_TIPOSCV TIPOS ON DATOS.IDTIPOCV = TIPOS.IDTIPOCV ");
 		sql.LEFT_OUTER_JOIN("CEN_TIPOSCVSUBTIPO1 SUB1 ON (SUB1.IDTIPOCVSUBTIPO1 = DATOS.IDTIPOCVSUBTIPO1 AND TIPOS.IDTIPOCV = SUB1.IDTIPOCV AND DATOS.IDINSTITUCION = SUB1.IDINSTITUCION) ");
@@ -37,119 +42,110 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 		return sql.toString();
 	}
 	
-	public String updateCurriculo(CenDatoscv record) {
+	
+	public String insertSelectiveForCreateLegalPerson(String idInstitucion, AdmUsuarios usuario,
+			EtiquetaUpdateDTO etiquetaUpdateDTO) {
+		SQL sql = new SQL();
+
+		sql.INSERT_INTO("CEN_NOCOLEGIADO");
+
+		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona)");
+		sql.VALUES("IDINSTITUCION", "'" + idInstitucion + "'");
+		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuario.getIdusuario()) + "'");
+		sql.VALUES("SOCIEDADSJ", "'0'");
+		sql.VALUES("TIPO", "'" + etiquetaUpdateDTO.getTipo() + "'");
+		if (null != etiquetaUpdateDTO.getAnotaciones() && !etiquetaUpdateDTO.getAnotaciones().equals("")) {
+			sql.VALUES("ANOTACIONES", "'" + etiquetaUpdateDTO.getAnotaciones() + "'");
+		}	
+		
+		sql.VALUES("SOCIEDADPROFESIONAL", "'0'");
+		sql.VALUES("FECHA_BAJA", "null");
+
+		return sql.toString();
+	}
+	
+
+	public String solicitudUpdateCurriculo(CenSolicitudmodificacioncv record) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 			SQL sql = new SQL();
 			SQL sql1 = new SQL();
 			SQL sql2 = new SQL();
 
-			sql.UPDATE("CEN_DATOSCV CEN");
+			sql.INSERT_INTO("CEN_SOLICITUDMODIFICACIONCV");
 			sql1.SELECT("IDINSTITUCION");
 			sql2.SELECT("IDINSTITUCION");
 	
+			sql.VALUES("IDSOLICITUD", ""+record.getIdsolicitud());
+			
+			sql.VALUES("MOTIVO", "'"+record.getMotivo()+"'");
+			
+			sql.VALUES("IDESTADOSOLIC", "10");
 			if (record.getFechainicio() != null) {				
 				String fechaF = dateFormat.format(record.getFechainicio());
-				sql.SET("FECHAINICIO = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+				sql.VALUES("FECHAINICIO", "TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+				sql.VALUES("FECHAALTA", "TO_DATE('" + fechaF + "','DD/MM/YYYY')");
 			}
 			if (record.getFechafin() != null) {
 				String fechaF = dateFormat.format(record.getFechafin());
-				sql.SET("FECHAFIN = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+				sql.VALUES("FECHAFIN", "TO_DATE('" + fechaF + "','DD/MM/YYYY')");
 			}else {
-				sql.SET("FECHAFIN = null");
+				sql.VALUES("FECHAFIN","null");
 			}
 			if (record.getDescripcion() != null) {
-				sql.SET("DESCRIPCION = '"+record.getDescripcion() +"'");
+				sql.VALUES("DESCRIPCION"," '"+ record.getDescripcion() +"'");
 			}else {
-				sql.SET("DESCRIPCION = null");
+				sql.VALUES("DESCRIPCION","null");
 			}
 			if (record.getIdtipocv() != null) {
-				sql.SET("IDTIPOCV = '"+record.getIdtipocv() +"'");
+				sql.VALUES("IDTIPOCV","'"+record.getIdtipocv() +"'");
 			}
 			if (record.getFechamodificacion() != null) {
 				String fechaF = dateFormat.format(record.getFechamodificacion());
-				sql.SET("FECHAMODIFICACION = '" + fechaF + "'");
+				sql.VALUES("FECHAMODIFICACION ","'" + fechaF + "'");
 			}							
 			if (record.getUsumodificacion() != null) {
-				sql.SET("USUMODIFICACION =  '"+record.getUsumodificacion() +"'");
+				sql.VALUES("USUMODIFICACION ","'"+record.getUsumodificacion() +"'");
 			}
-			if (record.getCertificado() != null) {
-				sql.SET("CERTIFICADO = '"+record.getCertificado()  + "'");
-			}
-			if (record.getCreditos() != null) {
-				sql.SET("CREDITOS = '"+record.getCreditos() + "'");
-			}else {
-				sql.SET("CREDITOS = null");
-			}
-			if (record.getFechamovimiento() != null) {
-				String fechaF = dateFormat.format(record.getFechamovimiento());
-				sql.SET("FECHAMOVIMIENTO = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-			}else {
-				sql.SET("FECHAMOVIMIENTO = null");
 
-			}
-			if (record.getFechabaja() != null) {
-				String fechaF = dateFormat.format(record.getFechabaja());
-				sql.SET("FECHABAJA = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-			}else {
-				sql.SET("FECHABAJA = null");
-			}
 			if (record.getIdtipocvsubtipo1() != null) {
-				sql.SET("IDTIPOCVSUBTIPO1 = '"+record.getIdtipocvsubtipo1() + "'");
+				sql.VALUES("IDTIPOCVSUBTIPO1 "," '"+record.getIdtipocvsubtipo1() + "'");
 				sql1.FROM("CEN_TIPOSCVSUBTIPO1");
 				sql1.WHERE("IDTIPOCVSUBTIPO1 ='"+ record.getIdtipocvsubtipo1() +"'");
 				sql1.WHERE("IDTIPOCV ='"+ record.getIdtipocv() +"'");
 				sql1.WHERE("ROWNUM = 1");
-				sql.SET("IDINSTITUCION_SUBT1 = ("+sql1 + ")");
+				sql.VALUES("IDINSTITUCION_SUBT1 ","("+sql1 + ")");
 			}else{
 				sql.SET("IDTIPOCVSUBTIPO1 = "+record.getIdtipocvsubtipo1() + "");
 			}
 			
 			if (record.getIdtipocvsubtipo2() != null) {
-				sql.SET("IDTIPOCVSUBTIPO2 = '"+ record.getIdtipocvsubtipo2() + "'");
+				sql.VALUES("IDTIPOCVSUBTIPO2 ","'"+ record.getIdtipocvsubtipo2() + "'");
 				sql2.FROM("CEN_TIPOSCVSUBTIPO2");
 				sql2.WHERE("IDTIPOCVSUBTIPO2 ='"+ record.getIdtipocvsubtipo2() +"'");
 				sql2.WHERE("IDTIPOCV ='"+ record.getIdtipocv() +"'");
 				sql2.WHERE("ROWNUM = 1");
-				sql.SET("IDINSTITUCION_SUBT2 = ("+sql2 + ")");
+				sql.VALUES("IDINSTITUCION_SUBT2 "," ("+sql2 + ")");
 			}else{
-				sql.SET("IDTIPOCVSUBTIPO2 = "+ record.getIdtipocvsubtipo2() + "");
+				sql.VALUES("IDTIPOCVSUBTIPO2 "," "+ record.getIdtipocvsubtipo2() + "");
 		}
-			
-//				sql.SET("IDTIPOCVSUBTIPO1 = '"+record.getIdtipocvsubtipo1() + "'");
-//				sql1.FROM("CEN_TIPOSCVSUBTIPO1");
-//				sql1.WHERE("IDTIPOCVSUBTIPO1 ='"+ record.getIdtipocvsubtipo1() +"'");
-//				sql1.WHERE("IDTIPOCV ='"+ record.getIdtipocv() +"'");
-//				sql1.WHERE("ROWNUM = 1");
-//				sql.SET("IDINSTITUCION_SUBT1 = ("+sql1 + ")");
-//				
-//				sql.SET("IDTIPOCVSUBTIPO2 = '"+ record.getIdtipocvsubtipo2() + "'");
-//				sql2.FROM("CEN_TIPOSCVSUBTIPO2");
-//				sql2.WHERE("IDTIPOCVSUBTIPO2 ='"+ record.getIdtipocvsubtipo2() +"'");
-//				sql2.WHERE("IDTIPOCV ='"+ record.getIdtipocv() +"'");
-//				sql2.WHERE("ROWNUM = 1");
-//				sql.SET("IDINSTITUCION_SUBT2 = ("+sql2 + ")");
-				
-				
-			if (record.getIdinstitucioncargo() != null) {
-				sql.SET("IDINSTITUCIONCARGO = '"+record.getIdinstitucioncargo() + "'");
-			}
-			sql.WHERE("CEN.IDINSTITUCION = '"+record.getIdinstitucion()+"'");
-			sql.WHERE("CEN.IDPERSONA = '" + record.getIdpersona() +"'");
-			sql.WHERE("IDCV = '" + record.getIdcv() +"'");
+			sql.VALUES("IDINSTITUCION ","'"+record.getIdinstitucion()+"'");
+			sql.VALUES("IDPERSONA "," '" + record.getIdpersona() +"'");
+			sql.VALUES("IDCV ","'" + record.getIdcv() +"'");
 			return sql.toString();
 	}
 	
-	
-	public String getMaxIdCv(String idInstitucion, String idPersona) {
+	public String getMaxIdSolicitud(String idInstitucion, String idPersona) {
 		SQL sql = new SQL();
 
-		sql.SELECT("MAX(IDCV) AS IDCV");
-		sql.FROM("CEN_DATOSCV");
+		sql.SELECT("MAX(IDSOLICITUD) AS IDSOLICITUD");
+		sql.FROM("CEN_SOLICITUDMODIFICACIONCV");
 		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
 		sql.WHERE("IDPERSONA = '"+ idPersona +"'");
 		
 		return sql.toString();
 	}
+	
 
 }

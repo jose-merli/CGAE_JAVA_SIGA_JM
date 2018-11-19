@@ -10,7 +10,7 @@ public interface IAgendaCalendarioService {
 	
 	public CalendarDTO getCalendariosByIdInstitucion(HttpServletRequest request);
 	
-	public EventoDTO getEventosByIdCalendario(String idCalendario);
+	public EventoDTO getEventosByIdCalendario(HttpServletRequest request, String idCalendario);
 	
 	public ComboDTO getCalendars(HttpServletRequest request);
 	

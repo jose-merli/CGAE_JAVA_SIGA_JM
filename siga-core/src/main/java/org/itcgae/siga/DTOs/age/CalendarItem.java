@@ -15,6 +15,7 @@ public class CalendarItem {
 	private Date fechaBaja;
 	private String idTipoCalendario;
 	private String color;
+	private Long tipoAcceso;
 	private boolean checked = false;
 
 	/**
@@ -160,6 +161,14 @@ public class CalendarItem {
 	public void setChecked(boolean checked) {
 		this.checked = checked;
 	}
+	
+	public Long getTipoAcceso() {
+		return tipoAcceso;
+	}
+
+	public void setTipoAcceso(Long tipoAcceso) {
+		this.tipoAcceso = tipoAcceso;
+	}
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -177,12 +186,13 @@ public class CalendarItem {
 				&& Objects.equals(this.fechaModificacion, calendarItem.fechaModificacion)
 				&& Objects.equals(this.fechaBaja, calendarItem.fechaBaja)
 				&& Objects.equals(this.idTipoCalendario, calendarItem.idTipoCalendario)
+				&& Objects.equals(this.tipoAcceso, calendarItem.tipoAcceso)
 				&& Objects.equals(this.color, calendarItem.color);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(idCalendario, idInstitucion, descripcion, usuModificacion, fechaModificacion, fechaBaja, idTipoCalendario, color);
+		return Objects.hash(idCalendario, idInstitucion, descripcion, usuModificacion, fechaModificacion, fechaBaja, idTipoCalendario, color, tipoAcceso);
 	}
 
 	@Override
@@ -198,6 +208,7 @@ public class CalendarItem {
 		sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
 		sb.append("    idTipoCalendario: ").append(toIndentedString(idTipoCalendario)).append("\n");
 		sb.append("    color: ").append(toIndentedString(color)).append("\n");
+		sb.append("    tipoAcceso: ").append(toIndentedString(tipoAcceso)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

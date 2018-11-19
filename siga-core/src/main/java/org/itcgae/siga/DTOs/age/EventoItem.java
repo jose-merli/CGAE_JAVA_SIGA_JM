@@ -14,9 +14,8 @@ public class EventoItem {
 	private Date fechaInicio;
 	private Date fechaFin;
 	private boolean allDay = false;
-	private String start;
-	private String end;
 	private String color;
+	private Long tipoAcceso;
 	private String lugar;
 	private String descripcion;
 	private String recursos;
@@ -82,7 +81,7 @@ public class EventoItem {
 		return this;
 	}
 
-	@JsonProperty("titulo")
+	@JsonProperty("title")
 	public String getTitulo() {
 		return titulo;
 	}
@@ -98,7 +97,7 @@ public class EventoItem {
 		return this;
 	}
 
-	@JsonProperty("fechaInicio")
+	@JsonProperty("start")
 	public Date getFechaInicio() {
 		return fechaInicio;
 	}
@@ -114,7 +113,7 @@ public class EventoItem {
 		return this;
 	}
 
-	@JsonProperty("fechaFin")
+	@JsonProperty("end")
 	public Date getFechaFin() {
 		return fechaFin;
 	}
@@ -137,38 +136,6 @@ public class EventoItem {
 
 	public void setAllDay(boolean allDay) {
 		this.allDay = allDay;
-	}
-	
-	/**
-	 **/
-	public EventoItem start(String start) {
-		this.start = start;
-		return this;
-	}
-
-	@JsonProperty("start")
-	public String getStart() {
-		return start;
-	}
-
-	public void setStart(String start) {
-		this.start = start;
-	}
-	
-	/**
-	 **/
-	public EventoItem end(String end) {
-		this.end = end;
-		return this;
-	}
-
-	@JsonProperty("end")
-	public String getEnd() {
-		return end;
-	}
-
-	public void setEnd(String end) {
-		this.end = end;
 	}
 	
 	/**
@@ -217,6 +184,14 @@ public class EventoItem {
 
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
+	}
+	
+	public Long getTipoAcceso() {
+		return tipoAcceso;
+	}
+
+	public void setTipoAcceso(Long tipoAcceso) {
+		this.tipoAcceso = tipoAcceso;
 	}
 
 	/**
@@ -335,8 +310,6 @@ public class EventoItem {
 				&& Objects.equals(this.fechaInicio, eventoItem.fechaInicio)
 				&& Objects.equals(this.fechaFin, eventoItem.fechaFin)
 				&& Objects.equals(this.allDay, eventoItem.allDay)
-				&& Objects.equals(this.start, eventoItem.start)
-				&& Objects.equals(this.end, eventoItem.end)
 				&& Objects.equals(this.color, eventoItem.color)
 				&& Objects.equals(this.lugar, eventoItem.lugar)
 				&& Objects.equals(this.descripcion, eventoItem.descripcion)
@@ -345,14 +318,18 @@ public class EventoItem {
 				&& Objects.equals(this.idTipoEvento, eventoItem.idTipoEvento)
 				&& Objects.equals(this.usuModificacion, eventoItem.usuModificacion)
 				&& Objects.equals(this.fechaModificacion, eventoItem.fechaModificacion)
-				&& Objects.equals(this.fechaBaja, eventoItem.fechaBaja)
-				&& Objects.equals(this.datosRepeticion, eventoItem.datosRepeticion);
+				&& Objects.equals(this.datosRepeticion, eventoItem.datosRepeticion)
+				&& Objects.equals(this.tipoAcceso, eventoItem.tipoAcceso)
+				&& Objects.equals(this.fechaBaja, eventoItem.fechaBaja);
+
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(idEvento, idCalendario, idInstitucion, titulo, fechaInicio, fechaFin, allDay, start, end, color, lugar,
-				descripcion, recursos, idEstadoEvento, idTipoEvento, usuModificacion, fechaModificacion, fechaBaja, datosRepeticion);
+
+		return Objects.hash(idEvento, idCalendario, idInstitucion, titulo, fechaInicio, fechaFin, allDay, color, lugar,
+				descripcion, recursos, idEstadoEvento, idTipoEvento, usuModificacion, fechaModificacion, fechaBaja, tipoAcceso,
+				datosRepeticion);
 	}
 
 	@Override
@@ -367,8 +344,6 @@ public class EventoItem {
 		sb.append("    fechaInicio: ").append(toIndentedString(fechaInicio)).append("\n");
 		sb.append("    fechaFin: ").append(toIndentedString(fechaFin)).append("\n");
 		sb.append("    allDay: ").append(toIndentedString(allDay)).append("\n");
-		sb.append("    start: ").append(toIndentedString(start)).append("\n");
-		sb.append("    end: ").append(toIndentedString(end)).append("\n");
 		sb.append("    color: ").append(toIndentedString(color)).append("\n");
 		sb.append("    lugar: ").append(toIndentedString(lugar)).append("\n");
 		sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
@@ -379,6 +354,7 @@ public class EventoItem {
 		sb.append("    fechaModificacion: ").append(toIndentedString(fechaModificacion)).append("\n");
 		sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
 		sb.append("    datosRepeticion: ").append(toIndentedString(datosRepeticion)).append("\n");
+		sb.append("    tipoAcceso: ").append(toIndentedString(tipoAcceso)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

@@ -7,14 +7,15 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.age.CalendarDTO;
+import org.itcgae.siga.DTOs.age.CalendarItem;
 import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.age.service.IAgendaCalendarioService;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.AgeCalendario;
 import org.itcgae.siga.db.entities.AgeCalendarioExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeCalendarioExtendsMapper;
@@ -42,73 +43,75 @@ public class AgendaCalendarioServiceImpl implements IAgendaCalendarioService {
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
+		String perfilesFormat = UtilidadesString.prepararPerfiles(perfiles);
+		
 		if (null != idInstitucion) {
 
 			example.createCriteria().andIdinstitucionEqualTo(idInstitucion);
 
-			List<AgeCalendario> listAgeCalendario = ageCalendarioExtendsMapper.selectByExample(example);
-
-			if (!listAgeCalendario.isEmpty() && listAgeCalendario != null) {
-				calendarDTO.fillListCalendarItems(listAgeCalendario);
-			}
-
+			List<CalendarItem> listCalendarItem = ageCalendarioExtendsMapper.getCalendariosPermisos(idInstitucion, perfilesFormat);
+			calendarDTO.setCalendarItems(listCalendarItem);
 		}
 
 		return calendarDTO;
 	}
 
-		@Override
-		public EventoDTO getEventosByIdCalendario(String idCalendario) {
-			LOGGER.info("getEventosByidCalendario() -> Entrada al servicio para los eventos de un determinado calendario");
+	@Override
+	public EventoDTO getEventosByIdCalendario(HttpServletRequest request, String idCalendario) {
+		LOGGER.info("getEventosByidCalendario() -> Entrada al servicio para los eventos de un determinado calendario");
 
-			EventoDTO eventoDTO = new EventoDTO();
-			List<EventoItem> listEventos = new ArrayList<EventoItem>();
+		EventoDTO eventoDTO = new EventoDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
+		String perfilesFormat = UtilidadesString.prepararPerfiles(perfiles);
 
-			EventoItem eventoItem = null;
+		List<EventoItem> listEventos = ageCalendarioExtendsMapper.getCalendarioEventos(idInstitucion, perfilesFormat, idCalendario);
+		
+		eventoDTO.setEventos(listEventos);
 
-			
-			eventoDTO.setEventos(listEventos);
-
-			return eventoDTO;
-		}
-
-		@Override
-		public ComboDTO getCalendars(HttpServletRequest request) {
-			LOGGER.info("getCalendars() -> Entrada al servicio para obtener los calendarios");
-
-			ComboDTO comboDTO = new ComboDTO();
-			List<ComboItem> comboItems = new ArrayList<ComboItem>();
-
-			// Conseguimos información del usuario logeado
-			String token = request.getHeader("Authorization");
-			String dni = UserTokenUtils.getDniFromJWTToken(token);
-			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-			String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
-			if (null != idInstitucion) {
-				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-				LOGGER.info(
-						"getCalendars() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-				LOGGER.info(
-						"getCalendars() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-				if (null != usuarios && usuarios.size() > 0) {
-					LOGGER.info(
-							"getCalendars() / ageCalendarioExtendsMapper.getCalendarType() -> Entrada a ageTipocalendarioExtendsMapper para obtener los diferentes tipos de calendarios");
-					comboItems = ageCalendarioExtendsMapper.getCalendars(idInstitucion.toString());
-					LOGGER.info(
-							"getCalendars() / ageCalendarioExtendsMapper.getCalendarType() -> Salida de ageTipocalendarioExtendsMapper para obtener los diferentes tipos de calendarios");
-
-				}
-			}
-
-			comboDTO.setCombooItems(comboItems);
-
-			LOGGER.info("getCalendars() -> Salida del servicio para obtener los tipos de calendarios");
-
-			return comboDTO;
-		}
-
+		return eventoDTO;
 	}
+
+	@Override
+	public ComboDTO getCalendars(HttpServletRequest request) {
+		LOGGER.info("getCalendars() -> Entrada al servicio para obtener los calendarios");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getCalendars() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getCalendars() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"getCalendars() / ageCalendarioExtendsMapper.getCalendarType() -> Entrada a ageTipocalendarioExtendsMapper para obtener los diferentes tipos de calendarios");
+				comboItems = ageCalendarioExtendsMapper.getCalendars(idInstitucion.toString());
+				LOGGER.info(
+						"getCalendars() / ageCalendarioExtendsMapper.getCalendarType() -> Salida de ageTipocalendarioExtendsMapper para obtener los diferentes tipos de calendarios");
+
+			}
+		}
+
+		comboDTO.setCombooItems(comboItems);
+
+		LOGGER.info("getCalendars() -> Salida del servicio para obtener los tipos de calendarios");
+
+		return comboDTO;
+	}
+
+}

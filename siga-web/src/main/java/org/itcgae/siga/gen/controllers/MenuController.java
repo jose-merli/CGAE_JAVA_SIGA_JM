@@ -36,7 +36,7 @@ public class MenuController {
     	EntornoDTO response = menuService.getEntorno(request);
     	return new ResponseEntity<EntornoDTO>(response, HttpStatus.OK);
 	}
-	
+    
 	
     @RequestMapping(value = "/menu", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<MenuDTO> getMenu(HttpServletRequest request) {
@@ -86,6 +86,12 @@ public class MenuController {
     @RequestMapping(value = "/getInstitucionActual", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
    	ResponseEntity<ComboItem> getInstitucionActual(HttpServletRequest request) {
     	ComboItem response = menuService.getInstitucionActual(request);
+       	return new ResponseEntity<ComboItem>(response, HttpStatus.OK);
+   	}
+    
+    @RequestMapping(value = "/getLetrado", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   	ResponseEntity<ComboItem> getLetrado(HttpServletRequest request) {
+    	ComboItem response = menuService.getLetrado(request);
        	return new ResponseEntity<ComboItem>(response, HttpStatus.OK);
    	}
     

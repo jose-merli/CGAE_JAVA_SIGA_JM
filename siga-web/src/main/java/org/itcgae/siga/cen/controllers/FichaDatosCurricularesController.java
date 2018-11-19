@@ -43,7 +43,7 @@ public class FichaDatosCurricularesController {
 	@RequestMapping(value = "/fichaDatosCurriculares/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateDatosCurriculares(@RequestBody FichaDatosCurricularesItem fichaDatosCurricularesItem, HttpServletRequest request) { 
 		UpdateResponseDTO response = fichaDatosCurriculares.updateDatosCurriculares(fichaDatosCurricularesItem, request);
-		if(response.getStatus().equals(SigaConstants.OK))//WORK IN PROGRESS
+		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
@@ -51,9 +51,19 @@ public class FichaDatosCurricularesController {
 	@RequestMapping(value = "/fichaDatosCurriculares/insert", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> insertDatosCurriculares(@RequestBody FichaDatosCurricularesItem fichaDatosCurricularesItem, HttpServletRequest request) { 
 		InsertResponseDTO response = fichaDatosCurriculares.insertDatosCurriculares(fichaDatosCurricularesItem, request);
-		if(response.getStatus().equals(SigaConstants.OK))//WORK IN PROGRESS
+		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
+	
+	
+	@RequestMapping(value = "/fichaDatosCurriculares/solicitudUpdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> solicitudUpdateDatosCurriculares(@RequestBody FichaDatosCurricularesItem fichaDatosCurricularesItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = fichaDatosCurriculares.solicitudUpdateDatosCurriculares(fichaDatosCurricularesItem, request);
+		if(response.getStatus().equals(SigaConstants.OK))//WORK IN PROGRESS
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
 	
 }

@@ -25,6 +25,9 @@ public interface IFichaDatosCurricularesService {
 	public InsertResponseDTO insertDatosCurriculares(FichaDatosCurricularesItem fichaDatosCurricularesItem,
 			HttpServletRequest request);
 
+	public UpdateResponseDTO solicitudUpdateDatosCurriculares(FichaDatosCurricularesItem fichaDatosCurricularesItem,
+			HttpServletRequest request);
+
 
 	
 	
