@@ -136,5 +136,16 @@ public class CenSolicitudmodificacioncvSqlExtendsProvider extends CenSolicitudmo
 			return sql.toString();
 	}
 	
+	public String getMaxIdSolicitud(String idInstitucion, String idPersona) {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDSOLICITUD) AS IDSOLICITUD");
+		sql.FROM("CEN_SOLICITUDMODIFICACIONCV");
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
+		sql.WHERE("IDPERSONA = '"+ idPersona +"'");
+		
+		return sql.toString();
+	}
+	
 
 }

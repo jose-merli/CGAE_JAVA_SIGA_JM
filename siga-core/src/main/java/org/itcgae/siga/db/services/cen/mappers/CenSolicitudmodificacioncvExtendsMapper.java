@@ -53,8 +53,8 @@ public interface CenSolicitudmodificacioncvExtendsMapper extends CenSolicitudmod
 	//	@InsertProvider(type = CenDatoscvSqlExtendsProvider.class, method = "insertCurriculo")
 //	int insertCurriculo(CenDatoscv record);
 	
-	@SelectProvider(type = CenDatoscvSqlExtendsProvider.class, method = "getMaxIdCv")
-	@Results({ @Result(column = "IDCV", property = "newId", jdbcType = JdbcType.VARCHAR)
+	@SelectProvider(type = CenSolicitudmodificacioncvSqlExtendsProvider.class, method = "getMaxIdSolicitud")
+	@Results({ @Result(column = "IDSOLICITUD", property = "newId", jdbcType = JdbcType.VARCHAR)
 	
 	})
 	NewIdDTO getMaxIdSolicitud(String idInstitucion, String idPersona);
