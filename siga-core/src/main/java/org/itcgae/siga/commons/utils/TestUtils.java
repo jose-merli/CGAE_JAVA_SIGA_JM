@@ -3,10 +3,11 @@ package org.itcgae.siga.commons.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.itcgae.siga.DTOs.age.CalendarItem;
+import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AgeCalendario;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -92,22 +93,42 @@ public class TestUtils{
 		return usuarios;
 	}
 	
-	public List<AgeCalendario> getListaAgeCalendariosSimulados(){
-		List<AgeCalendario> listaAgeCalendarios = new ArrayList<AgeCalendario>();
+	public List<CalendarItem> getListaAgeCalendariosSimulados(){
+		List<CalendarItem> listaAgeCalendarios = new ArrayList<CalendarItem>();
 		listaAgeCalendarios.add(getAgeCalendario());
 		
 		return listaAgeCalendarios;
 	}
 	
-	public AgeCalendario getAgeCalendario(){
-		AgeCalendario ageCalendario = new AgeCalendario();
+	public CalendarItem getAgeCalendario(){
+		CalendarItem calendarItem = new CalendarItem();
 
-		ageCalendario.setIdinstitucion((short)2000);
-		ageCalendario.setIdcalendario((long)100);
-		ageCalendario.setDescripcion("Descripcion");
-		ageCalendario.setColor("Red");
-		ageCalendario.setIdtipocalendario((long)1);
+		calendarItem.setIdInstitucion((short)2000);
+		calendarItem.setIdCalendario("100");
+		calendarItem.setDescripcion("Descripcion");
+		calendarItem.setColor("Red");
+		calendarItem.setIdTipoCalendario("1");
 		  
-		return ageCalendario;		
+		return calendarItem;		
+	}
+	
+	public List<EventoItem> getListaEventosSimulados(String idCalendario, Short idInstitucion){
+		List<EventoItem> listaEventos = new ArrayList<EventoItem>();
+		listaEventos.add(getEvento(idCalendario, idInstitucion));
+		
+		return listaEventos;
+	}
+	
+	public EventoItem getEvento(String idCalendario, Short idInstitucion){
+		EventoItem eventoItem = new EventoItem();
+
+		eventoItem.setIdInstitucion(idInstitucion);
+		eventoItem.setIdCalendario(idCalendario);
+		eventoItem.setDescripcion("Descripcion");
+		eventoItem.setColor("Red");
+		eventoItem.setIdTipoEvento("1");
+		eventoItem.setIdEvento("1");
+		  
+		return eventoItem;		
 	}
 }
