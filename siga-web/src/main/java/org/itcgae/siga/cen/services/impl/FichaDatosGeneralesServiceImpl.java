@@ -25,6 +25,7 @@ import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -44,11 +45,13 @@ import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
+import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenDatoscolegialesestadoMapper;
 import org.itcgae.siga.db.mappers.CenGruposclienteMapper;
 import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
+import org.itcgae.siga.db.mappers.CenSolicitmodifdatosbasicosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
@@ -59,6 +62,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMap
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicitmodifdatosbasicosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +87,9 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	
 	@Autowired
 	private CenGruposclienteClienteExtendsMapper cenGruposclienteClienteExtendsMapper;
+
+	@Autowired
+	private  CenSolicitmodifdatosbasicosExtendsMapper  cenSolicitmodifdatosbasicosMapper;
 
 	@Autowired
 	private CenDatoscolegialesestadoExtendsMapper cenDatoscolegialesestadoMapper;
@@ -349,14 +356,16 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					if(colegiadoItem.getIncorporacionDate()!=null) { 
 					cenCliente.setFechaalta(colegiadoItem.getIncorporacionDate());
 					}
+					cenCliente.setPublicidad(colegiadoItem.getPublicidad());
+					cenCliente.setGuiajudicial(colegiadoItem.getGuiaJudicial());
 					cenCliente.setFechamodificacion(new Date());
 					cenCliente.setUsumodificacion(usuario.getIdusuario());
 					cenCliente.setComisiones(colegiadoItem.getComisiones());
 					cenCliente.setIdtratamiento(Short.parseShort(colegiadoItem.getIdtratamiento()));
 					cenCliente.setAsientocontable(colegiadoItem.getAsientoContable());
 					cenCliente.setCaracter("P");
-					cenCliente.setPublicidad(SigaConstants.DB_FALSE);
-					cenCliente.setGuiajudicial(SigaConstants.DB_FALSE); 
+//					cenCliente.setPublicidad(SigaConstants.DB_FALSE);
+//					cenCliente.setGuiajudicial(SigaConstants.DB_FALSE); 
 					
 					CenClienteExample cenClienteExample = new CenClienteExample();
 					cenClienteExample.createCriteria()
@@ -415,12 +424,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 //							cenDatoscolegialesestadoMapper.updateByExample(cenEstadoColegial, cenDatoscolegialesestadoExample);
 						}
 					}
-					
-					
-
-
 					updateResponseDTO.setStatus(SigaConstants.OK);
-
 //				}
 
 			} else {
@@ -528,6 +532,93 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		datosDireccionesDTO.setDatosDireccionesItem(datosDireccionesItem);
 		return datosDireccionesDTO;
 	}
+	
+
+	@Override
+	public InsertResponseDTO solicitudModificacion(NoColegiadoItem noColegiadoItem, HttpServletRequest request) {
+		LOGGER.info(
+				"createColegiado() -> Entrada al servicio para actualizar información general de una persona jurídica");
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+//		List<CenDatoscolegialesestado> cenDatoscolegialesestado = new ArrayList<CenDatoscolegialesestado>();
+//		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
+//		List<String> gruposPerJuridicaNuevos = new ArrayList<String>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+//		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
+			
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"createColegiado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"createColegiado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+				
+				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
+
+					if (!insertResponseDTO.getStatus().equals(SigaConstants.KO)) {
+
+						// 1 crear registro en tabla CEN_SOLICITMODIFDATOSBASICOS
+						LOGGER.info(
+								"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForNewSociety() -> Entrada a cenPersonaExtendsMapper para crear una nueva persona");
+
+						CenSolicitmodifdatosbasicos solicitud = new CenSolicitmodifdatosbasicos();
+
+						NewIdDTO idBD = cenSolicitmodifdatosbasicosMapper.getMaxIdSolicitud(String.valueOf(idInstitucion),
+								noColegiadoItem.getIdPersona());
+						if (idBD == null) {
+							solicitud.setIdsolicitud(Short.parseShort("1"));
+						} else {
+							int idCv = Integer.parseInt(idBD.getNewId());
+							solicitud.setIdsolicitud(Short.parseShort("" + idCv));
+						}
+						solicitud.setPublicidad(noColegiadoItem.getPublicidad());
+						solicitud.setAbonos("B");
+						solicitud.setCargos("B");
+						solicitud.setGuiajudicial(noColegiadoItem.getGuiaJudicial());
+						solicitud.setIdlenguaje(noColegiadoItem.getIdLenguaje());
+						solicitud.setMotivo(noColegiadoItem.getMotivo());
+						solicitud.setIdinstitucion(idInstitucion);
+						solicitud.setIdpersona(Long.parseLong(noColegiadoItem.getIdPersona()));
+						solicitud.setFechamodificacion(new Date());
+						solicitud.setUsumodificacion(usuario.getIdusuario());
+						solicitud.setIdestadosolic(Short.parseShort("10"));
+						solicitud.setFechaalta(new Date());
+//					AGREGAR EL RESTO DE CAMPOS PARA LA INSERCIÓN, PREGUNTAR QUE HACER CON LOS CAMPOS QUE NO SON LA FECHA Y TAMPOCO SON NULLABLES.
+						
+						int responseInsertPersona =  cenSolicitmodifdatosbasicosMapper.insert(solicitud);
+						LOGGER.info(
+								"createColegiado() / cenSolicitmodifdatosbasicosMapper.insert() -> Salida de cenSolicitmodifdatosbasicosMapper para crear una nueva solicitud");
+						if(responseInsertPersona == 1) {
+							insertResponseDTO.setStatus(SigaConstants.OK);
+							LOGGER.info("createColegiado() Solicitud creada correctamente");
+
+						}
+					}
+					
+				} else {
+					insertResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.warn(
+							"createColegiado() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+									+ dni + " e idInstitucion = " + idInstitucion);
+				}
+				
+			} else {
+				insertResponseDTO.setStatus(SigaConstants.KO);
+				LOGGER.warn("createColegiado() -> idInstitucion del token nula");
+			}
+		
+		
+		return insertResponseDTO;
+	}
+
 	
 	
 	

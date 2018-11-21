@@ -65,7 +65,8 @@ public class ColegiadoItem {
 	private Date fechapresentacionDate;
 	private Date fechaNacimientoDate;
 	private Date fechaBajaDate;
-	
+	private String publicidad;
+	private String guiaJudicial;
 	private String idTratamiento;
 	private String descripcion;
 	private String observaciones;
@@ -850,7 +851,24 @@ public class ColegiadoItem {
 		this.incorporacion = incorporacion;
 	}
 	
+	/**
+	 * 
+	 */
+	public String getGuiaJudicial() {
+		return guiaJudicial;
+	}
+
+	public void setGuiaJudicial(String guiaJudicial) {
+		this.guiaJudicial = guiaJudicial;
+	}
 	
+	public String getPublicidad() {
+		return publicidad;
+	}
+
+	public void setPublicidad(String publicidad) {
+		this.publicidad = publicidad;
+	}
 	/**
 	 *
 	 */

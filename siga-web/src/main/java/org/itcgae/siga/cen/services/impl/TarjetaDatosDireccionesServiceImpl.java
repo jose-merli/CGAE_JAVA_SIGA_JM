@@ -1017,7 +1017,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 //						recordUpdate.setIdcv(Short.parseShort("" + idCv));
 //					}
 				}
-				
+				direcciones.setFechaalta(new Date());
 				direcciones.setIddireccion(idDireccion);
 				direcciones.setMotivo(datosDireccionesItem.getMotivo());
 				direcciones.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
@@ -1126,6 +1126,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 //
 //					auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(null, cenDireccionesPosterior,
 //							"INSERT", request, datosDireccionesItem.getMotivo());
+					LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
+					insertResponseDTO.setId(idDireccion.toString());
+					insertResponseDTO.setStatus(SigaConstants.OK);
 				} else {
 					LOGGER.info("createDirection() -> KO. InsertSolicitud para direcciones  NO realizado correctamente");
 					insertResponseDTO.setStatus(SigaConstants.KO);

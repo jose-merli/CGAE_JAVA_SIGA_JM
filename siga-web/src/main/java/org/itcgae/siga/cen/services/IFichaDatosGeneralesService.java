@@ -33,6 +33,8 @@ public interface IFichaDatosGeneralesService {
 	public ComboEtiquetasDTO getLabelPerson(ColegiadoItem colegiadoItem,
 			HttpServletRequest request) throws ParseException;
 
+	public InsertResponseDTO solicitudModificacion(NoColegiadoItem noColegiadoItem, HttpServletRequest request);
+
 //	DatosDireccionesItem partidoJudicialSearch(ColegiadoItem colegiadoItem, HttpServletRequest request);
 
 //	public ColegiadoItem partidoJudicialSearch(ColegiadoItem colegiadoItem, HttpServletRequest request);
