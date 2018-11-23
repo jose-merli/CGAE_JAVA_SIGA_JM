@@ -8,16 +8,15 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
-import org.itcgae.siga.db.mappers.CenSolicitudesmodificacionMapper;
-import org.itcgae.siga.db.services.cen.providers.CenSolicitudesmodificacionSqlExtendsProvider;
+import org.itcgae.siga.db.services.cen.providers.ExpSolicitudBorradoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface CenSolicitudesModificacionExtendsMapper extends CenSolicitudesmodificacionMapper{
+public interface ExpSolicitudBorradoExtendsMapper {
 
-	@SelectProvider(type = CenSolicitudesmodificacionSqlExtendsProvider.class, method = "searchSolModif")
+	@SelectProvider(type = ExpSolicitudBorradoSqlExtendsProvider.class, method = "searchSolModifDatosExpedientes")
 	@Results({ @Result(column = "ESPECIFICA", property = "especifica", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
@@ -29,6 +28,6 @@ public interface CenSolicitudesModificacionExtendsMapper extends CenSolicitudesm
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR) })
-	List<SolModificacionItem> searchSolModif(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-			String idLenguage, String idInstitucion);
+	List<SolModificacionItem> searchSolModifDatosExpedientes(
+			SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion);
 }

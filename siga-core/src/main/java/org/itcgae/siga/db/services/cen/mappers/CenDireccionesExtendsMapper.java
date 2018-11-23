@@ -17,6 +17,7 @@ import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
+import org.itcgae.siga.DTOs.cen.SoliModiDireccionesItem;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -24,6 +25,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.services.cen.providers.CenComponentesSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenDireccionesSqlExtendsProvider;
+import org.itcgae.siga.db.services.cen.providers.CenSoliModiDireccionesSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -86,7 +88,6 @@ public interface CenDireccionesExtendsMapper extends CenDireccionesMapper {
 	MaxIdDto selectMaxID();
 
 
-
 	@SelectProvider(type = CenDireccionesSqlExtendsProvider.class, method = "selectDirecciones")
 	@Results({ @Result(column = "TIPODIRECCION", property = "tipoDireccion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDDIRECCION", property = "idDireccion", jdbcType = JdbcType.VARCHAR),
@@ -116,12 +117,26 @@ public interface CenDireccionesExtendsMapper extends CenDireccionesMapper {
 	})
 	List<DatosDireccionesItem> selectDirecciones(DatosDireccionesSearchDTO datosDireccionesSearchDTO,	String idInstitucion);
 
-	
-
-
 	@SelectProvider(type = CenDireccionesSqlExtendsProvider.class, method = "selectNewIdDireccion")
 	@Results({
 		@Result(column = "IDDIRECCION", property = "idDireccion", jdbcType = JdbcType.VARCHAR),
 	})
 	List<DatosDireccionesItem> selectNewIdDireccion(String idPersona, String idInstitucion);
+	
+	@SelectProvider(type = CenDireccionesSqlExtendsProvider.class, method = "selectDireccionesSolEsp")
+	@Results({ 
+		@Result(column = "CODIGOPOSTAL", property = "codigoPostal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DOMICILIO", property = "domicilio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TELEFONO1", property = "telefono", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FAX1", property = "fax", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "PAGINAWEB", property = "paginaWeb", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CORREOELECTRONICO", property = "correoElectronico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREPAIS", property = "nombrePais", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREPOBLACION", property = "nombrePoblacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREPROVINCIA", property = "nombreProvincia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR)
+	})
+	List<DatosDireccionesItem> selectDireccionesSolEsp(String idPersona, String idDireccion, String idInstitucion);
 }

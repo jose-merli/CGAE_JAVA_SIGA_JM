@@ -6,26 +6,18 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
-import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.db.services.cen.providers.CenSolicitudincorporacionSqlExtendsProvider;
-import org.itcgae.siga.db.services.cen.providers.CenTiposModificacionesSqlExtendsProvider;
+import org.itcgae.siga.db.mappers.CenSolicitmodifdatosbasicosMapper;
+import org.itcgae.siga.db.services.cen.providers.CenSolicitModifDatosBasicosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface CenTiposModificacionesExtendsMapper {
+public interface CenSolicitModifDatosBasicosExtendsMapper extends CenSolicitmodifdatosbasicosMapper{
 
-	@SelectProvider(type = CenTiposModificacionesSqlExtendsProvider.class, method = "getTipoModificacion")
-	@Results({ @Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR) })
-	List<ComboItem> getTipoModificacion(String idLenguage);
-
-	@SelectProvider(type = CenTiposModificacionesSqlExtendsProvider.class, method = "searchModificationRequest")
+	@SelectProvider(type = CenSolicitModifDatosBasicosSqlExtendsProvider.class, method = "searchSolModifDatosGenerales")
 	@Results({ @Result(column = "ESPECIFICA", property = "especifica", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
@@ -37,6 +29,6 @@ public interface CenTiposModificacionesExtendsMapper {
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR)}) 
-	List<SolModificacionItem> searchModificationRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-			String idLenguage, String idInstitucion);
+	List<SolModificacionItem> searchSolModifDatosGenerales(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguaje, String idInstitucion);
 }

@@ -7,30 +7,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SolicitudModificacionSearchDTO {
 
-	private String idPersona;
-	private String idInstitucion;
+	//private String idPersona;
+	//private String idInstitucion;
 	private String tipoModificacion;
 	private String estado;
 	private Date fechaHasta;
 	private Date fechaDesde;
 	
-	@JsonProperty("idPersona")
-	public String getIdPersona() {
-		return idPersona;
-	}
+//	@JsonProperty("idPersona")
+//	public String getIdPersona() {
+//		return idPersona;
+//	}
+//
+//	public void setIdPersona(String idPersona) {
+//		this.idPersona = idPersona;
+//	}
 
-	public void setIdPersona(String idPersona) {
-		this.idPersona = idPersona;
-	}
-
-	@JsonProperty("idInstitucion")
-	public String getIdInstitucion() {
-		return idInstitucion;
-	}
-
-	public void setIdInstitucion(String idInstitucion) {
-		this.idInstitucion = idInstitucion;
-	}
+//	@JsonProperty("idInstitucion")
+//	public String getIdInstitucion() {
+//		return idInstitucion;
+//	}
+//
+//	public void setIdInstitucion(String idInstitucion) {
+//		this.idInstitucion = idInstitucion;
+//	}
 
 	@JsonProperty("tipoModificacion")
 	public String getTipoModificacion() {
@@ -72,8 +72,8 @@ public class SolicitudModificacionSearchDTO {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
-		result = prime * result + ((idPersona == null) ? 0 : idPersona.hashCode());
+		//result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
+		//result = prime * result + ((idPersona == null) ? 0 : idPersona.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((fechaDesde == null) ? 0 : fechaDesde.hashCode());
 		result = prime * result + ((fechaHasta == null) ? 0 : fechaHasta.hashCode());
@@ -90,16 +90,16 @@ public class SolicitudModificacionSearchDTO {
 		if (getClass() != obj.getClass())
 			return false;
 		SolicitudModificacionSearchDTO other = (SolicitudModificacionSearchDTO) obj;
-		if (idPersona == null) {
-			if (other.idPersona != null)
-				return false;
-		} else if (!idPersona.equals(other.idPersona))
-			return false;
-		if (idInstitucion == null) {
-			if (other.idInstitucion != null)
-				return false;
-		} else if (!idInstitucion.equals(other.idInstitucion))
-			return false;
+//		if (idPersona == null) {
+//			if (other.idPersona != null)
+//				return false;
+//		} else if (!idPersona.equals(other.idPersona))
+//			return false;
+//		if (idInstitucion == null) {
+//			if (other.idInstitucion != null)
+//				return false;
+//		} else if (!idInstitucion.equals(other.idInstitucion))
+//			return false;
 		if (estado == null) {
 			if (other.estado != null)
 				return false;
@@ -125,7 +125,8 @@ public class SolicitudModificacionSearchDTO {
 	
 	@Override
 	public String toString() {
-		return "SolicitudModificacionSearchDTO [idPersona=" + idPersona + ", idInstitucion =" + idInstitucion + ", tipoModificacion=" + tipoModificacion + ", estado=" + estado
+		//idPersona=" + idPersona + ", 
+		return "SolicitudModificacionSearchDTO [tipoModificacion=" + tipoModificacion + ", estado=" + estado
 				+ ", fechaHasta=" + fechaHasta + ", fechaDesde=" + fechaDesde + "]";
 	}
 }

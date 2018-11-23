@@ -143,8 +143,8 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 				AdmUsuarios usuario = usuarios.get(0);
 				LOGGER.info(
 						"datosSolicitudSearch() / cenEstadoSolicitudExtendsMapper.selectTipoSolicitud() -> Entrada a cenEstadoSolicitudExtendsMapper para obtener los estados de solicitud");
-				solicitudModificacionSearchDTO.setIdInstitucion(idInstitucion.toString());
-				List<SolModificacionItem> solModificacionItems = cenTiposModificacionesExtendsMapper.searchModificationRequest(solicitudModificacionSearchDTO, usuario.getIdlenguaje());
+				//solicitudModificacionSearchDTO.setIdInstitucion(idInstitucion.toString());
+				List<SolModificacionItem> solModificacionItems = cenTiposModificacionesExtendsMapper.searchModificationRequest(solicitudModificacionSearchDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion));
 				solModificacionDTO.setSolModificacionItems(solModificacionItems);
 
 			}
