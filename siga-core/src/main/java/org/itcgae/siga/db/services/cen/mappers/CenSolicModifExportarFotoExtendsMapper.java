@@ -8,25 +8,16 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
-import org.itcgae.siga.db.mappers.CenSolicitudesmodificacionMapper;
-import org.itcgae.siga.db.services.cen.providers.CenSolicitudesmodificacionSqlExtendsProvider;
+import org.itcgae.siga.db.mappers.CenSolicmodifexportarfotoMapper;
+import org.itcgae.siga.db.services.cen.providers.CenSolicModifExportarFotoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface CenSolicitudesmodificacionExtendsMapper extends CenSolicitudesmodificacionMapper{
-	
+public interface CenSolicModifExportarFotoExtendsMapper extends CenSolicmodifexportarfotoMapper{
 
-	    
-	    @SelectProvider(type = CenSolicitudesmodificacionSqlExtendsProvider.class, method = "getMaxIdSolicitud")
-	    @Results({ @Result(column = "IDSOLICITUD", property = "newId", jdbcType = JdbcType.VARCHAR)
-	    
-	    })
-	    NewIdDTO getMaxIdSolicitud(String idInstitucion, String idPersona);
-
-	@SelectProvider(type = CenSolicitudesmodificacionSqlExtendsProvider.class, method = "searchSolModif")
+	@SelectProvider(type = CenSolicModifExportarFotoSqlExtendsProvider.class, method = "searchSolModifDatosUseFoto")
 	@Results({ @Result(column = "ESPECIFICA", property = "especifica", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
@@ -38,6 +29,6 @@ public interface CenSolicitudesmodificacionExtendsMapper extends CenSolicitudesm
 			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR) })
-	List<SolModificacionItem> searchSolModif(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-			String idLenguage, String idInstitucion);
+	List<SolModificacionItem> searchSolModifDatosUseFoto(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguaje, String idInstitucion);
 }

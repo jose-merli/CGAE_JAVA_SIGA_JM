@@ -1,6 +1,8 @@
 package org.itcgae.siga.db.services.cen.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
+import org.itcgae.siga.commons.utils.SolModifSQLUtils;
 
 public class CenSolicitudesmodificacionSqlExtendsProvider {
 
@@ -10,5 +12,13 @@ public class CenSolicitudesmodificacionSqlExtendsProvider {
 		sql.SELECT("F_SIGA_GETRECURSO(DESCRIPCION," + idLenguage +") AS LABEL");
 		sql.FROM("CEN_TIPOSOLICITUD E");
 		return sql.toString();
+	}
+	
+	public String searchSolModif(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguaje, String idInstitucion) {
+
+		String rdo = "SELECT * FROM (" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+				+ " ) ORDER BY 6 DESC";
+		return rdo;
 	}
 }

@@ -1,29 +1,18 @@
 package org.itcgae.siga.db.services.cen.providers;
 
-import java.text.SimpleDateFormat;
+import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
+import org.itcgae.siga.commons.utils.SolModifSQLUtils;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
-import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.CenDatoscv;
-import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
-import org.itcgae.siga.db.mappers.CenDatoscvSqlProvider;
-import org.itcgae.siga.db.mappers.CenSolicitudmodificacioncvSqlProvider;
-import org.itcgae.siga.db.mappers.CenSolicmodicuentasSqlProvider;
+@Service
+@Primary
+public class CenSolicmodicuentasSqlExtendsProvider {
 
-public class CenSolicmodicuentasSqlExtendsProvider extends CenSolicmodicuentasSqlProvider{
-	
-	
-	public String getMaxIdSolicitud(String idInstitucion, String idPersona) {
-		SQL sql = new SQL();
+	public String searchSolModifDatosBancarios(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion) {
 
-		sql.SELECT("MAX(IDSOLICITUD) AS IDSOLICITUD");
-		sql.FROM("CEN_SOLICMODICUENTAS");
-		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
-		sql.WHERE("IDPERSONA = '"+ idPersona +"'");
-		
-		return sql.toString();
+		String rdo = "SELECT * FROM (" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) UNION ( "
+				+ SolModifSQLUtils.getBancDataRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) ORDER BY 6 DESC";
+		return rdo;
 	}
-	
-
 }

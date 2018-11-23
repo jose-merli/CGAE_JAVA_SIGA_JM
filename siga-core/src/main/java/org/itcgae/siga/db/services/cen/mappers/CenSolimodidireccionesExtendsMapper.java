@@ -17,6 +17,8 @@ import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
+import org.itcgae.siga.DTOs.cen.SolModificacionItem;
+import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -26,6 +28,7 @@ import org.itcgae.siga.db.mappers.CenSolimodidireccionesMapper;
 import org.itcgae.siga.db.services.cen.providers.CenComponentesSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenDireccionesSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenSolicitudmodificacioncvSqlExtendsProvider;
+import org.itcgae.siga.db.services.cen.providers.CenSolimodidireccionesSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -132,4 +135,41 @@ public interface CenSolimodidireccionesExtendsMapper extends CenSolimodidireccio
 		@Result(column = "IDDIRECCION", property = "idDireccion", jdbcType = JdbcType.VARCHAR),
 	})
 	List<DatosDireccionesItem> selectNewIdDireccion(String idPersona, String idInstitucion);
+	
+//	@SelectProvider(type = CenSolimodidireccionesSqlExtendsProvider.class, method = "selectSoliModiDirecciones")
+//	@Results({ @Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "IDDIRECCION", property = "idDireccion", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
+//			//@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.VARCHAR),
+//			//@Result(column = "PREFERENTE", property = "preferente", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "CODIGOPOSTAL", property = "codigoPostal", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "TELEFONO1", property = "telefono", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "DOMICILIO", property = "domicilio", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "FAX1", property = "fax", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "CORREOELECTRONICO", property = "correoElectronico", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "PAGINAWEB", property = "paginaWeb", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "PAIS", property = "pais", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "PROVINCIA", property = "provincia", jdbcType = JdbcType.VARCHAR),
+//			@Result(column = "POBLACION", property = "poblacion", jdbcType = JdbcType.VARCHAR),
+//	@Result(column = "POBLACIONEXTRANJERA", property = "poblacionExtranjera", jdbcType = JdbcType.VARCHAR) })
+//	SoliModiDireccionesItem selectSoliModiDirecciones(String idSolicitud, String idLenguaje);
+
+	
+	@SelectProvider(type = CenSolimodidireccionesSqlExtendsProvider.class, method = "searchSolModifDatosDirecciones")
+	@Results({ @Result(column = "ESPECIFICA", property = "especifica", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.DATE),
+		@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOMODIFICACION", property = "idTipoModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR)}) 
+	List<SolModificacionItem> searchSolModifDatosDirecciones(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguaje, String idInstitucion);
 }

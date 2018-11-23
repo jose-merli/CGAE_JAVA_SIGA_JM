@@ -1,17 +1,17 @@
 package org.itcgae.siga.db.services.cen.providers;
 
-import java.text.SimpleDateFormat;
-
 import org.apache.ibatis.jdbc.SQL;
-import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.CenDatoscv;
-import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
-import org.itcgae.siga.db.mappers.CenDatoscvSqlProvider;
+import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
+import org.itcgae.siga.commons.utils.SolModifSQLUtils;
 import org.itcgae.siga.db.mappers.CenSolicitmodifdatosbasicosSqlProvider;
-import org.itcgae.siga.db.mappers.CenSolicitudmodificacioncvSqlProvider;
 
 public class CenSolicitmodifdatosbasicosSqlExtendsProvider extends CenSolicitmodifdatosbasicosSqlProvider{
+	
+	public String searchSolModifDatosGenerales(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion) {
+		String rdo = "SELECT * FROM (" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) UNION ( "
+				+ SolModifSQLUtils.getBasicDataRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) ORDER BY 6 DESC";
+		return rdo;
+	}
 	
 	public String getMaxIdSolicitud(String idInstitucion, String idPersona) {
 		SQL sql = new SQL();

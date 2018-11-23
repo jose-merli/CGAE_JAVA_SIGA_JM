@@ -9,6 +9,8 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
+import org.itcgae.siga.DTOs.cen.SolModificacionItem;
+import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
@@ -31,6 +33,21 @@ public interface CenSolicitmodifdatosbasicosExtendsMapper extends  CenSolicitmod
 
 	//	@InsertProvider(type = CenDatoscvSqlExtendsProvider.class, method = "insertCurriculo")
 //	int insertCurriculo(CenDatoscv record);
+	
+	@SelectProvider(type = CenSolicitmodifdatosbasicosSqlExtendsProvider.class, method = "searchSolModifDatosGenerales")
+	@Results({ @Result(column = "ESPECIFICA", property = "especifica", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.DATE),
+		@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOMODIFICACION", property = "idTipoModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR)}) 
+	List<SolModificacionItem> searchSolModifDatosGenerales(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguaje, String idInstitucion);
 	
 	@SelectProvider(type = CenSolicitmodifdatosbasicosSqlExtendsProvider.class, method = "getMaxIdSolicitud")
 	@Results({ @Result(column = "IDSOLICITUD", property = "newId", jdbcType = JdbcType.VARCHAR)
