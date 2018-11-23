@@ -136,7 +136,7 @@ public interface CenSolimodidireccionesExtendsMapper extends CenSolimodidireccio
 	})
 	List<DatosDireccionesItem> selectNewIdDireccion(String idPersona, String idInstitucion);
 	
-//	@SelectProvider(type = CenSoliModiDireccionesSqlExtendsProvider.class, method = "selectSoliModiDirecciones")
+//	@SelectProvider(type = CenSolimodidireccionesSqlExtendsProvider.class, method = "selectSoliModiDirecciones")
 //	@Results({ @Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
 //			@Result(column = "IDDIRECCION", property = "idDireccion", jdbcType = JdbcType.VARCHAR),
 //			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
