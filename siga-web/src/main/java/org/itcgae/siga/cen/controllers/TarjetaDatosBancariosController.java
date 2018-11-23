@@ -83,6 +83,18 @@ public class TarjetaDatosBancariosController {
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
+	
+	
+	@RequestMapping(value = "busquedaPerJuridica/datosBancariosInsert", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> solicitudInsertBanksData(@RequestBody DatosBancariosInsertDTO datosBancariosInsertDTO, HttpServletRequest request) throws Exception { 
+		InsertResponseDTO response = tarjetaDatosBancariosService.solicitudInsertBanksData(datosBancariosInsertDTO, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	
+	
 	@RequestMapping(value = "busquedaPerJuridica/comboEsquema",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getLabelColegios(HttpServletRequest request) {
 		ComboDTO response = tarjetaDatosBancariosService.getLabelEsquema(request);

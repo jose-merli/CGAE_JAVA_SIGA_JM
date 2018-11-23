@@ -1006,17 +1006,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						if (null != newIdDireccion.get(0)) {
 							idDireccion = Long.valueOf(newIdDireccion.get(0).getIdDireccion());
 						}
-					}			
-					
-//					NewIdDTO idCvBD = cenSolimodidireccionesExtendsMapper.selectNewIdDireccion(String.valueOf(idInstitucion),
-//							datosDireccionesItem.getIdPersona());
-//					if (idCvBD == null) {
-//						recordUpdate.setIdcv(Short.parseShort("1"));
-//					} else {
-//						int idCv = Integer.parseInt(idCvBD.getNewId());
-//						recordUpdate.setIdcv(Short.parseShort("" + idCv));
-//					}
+					}			// TENEMOS EN CUENTA QUE EL CAMPO IDDIRECCIÓN O SE HAGA NULLABLE O SE ELIMINE LA FK PARA PERMITIR QUE SE GUARDE "newIdDireccion" EN CASO DE SER UNA SOLICITUD DE CREACIÓN.
 				}
+				
 				direcciones.setFechaalta(new Date());
 				direcciones.setIddireccion(idDireccion);
 				direcciones.setMotivo(datosDireccionesItem.getMotivo());
@@ -1036,96 +1028,19 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
 				direcciones.setIdestadosolic(Short.parseShort("10"));
+				
 				if(datosDireccionesItem.getPoblacionExtranjera()!= "" &&  datosDireccionesItem.getPoblacionExtranjera() != null) {
 					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
 				}				
+				
 				LOGGER.info(
 						"createDirection() / cenDireccionesExtendsMapper.insert() -> Entrada a cenDireccionesExtendsMapper para insertar direcciones");
 				response = cenSolimodidireccionesExtendsMapper.insert(direcciones);
 				LOGGER.info(
 						"createDirection() / cenDireccionesExtendsMapper.insert() -> Salida de cenDireccionesExtendsMapper para insertar direcciones");
 
-//				// Gestionamos los abonos que nos llegan
-//				if (null != datosDireccionesItem.getIdTipoDireccion()
-//						&& datosDireccionesItem.getIdTipoDireccion().length > 0) {
-//
-//					List<String> idTiposDireccionFront = new ArrayList<String>();
-//					idTiposDireccionFront.addAll(Arrays.asList(datosDireccionesItem.getIdTipoDireccion()));
-//
-//					for (String idTipoDireccionInsertar : datosDireccionesItem.getIdTipoDireccion()) {
-//						CenDireccionTipodireccion TipoDireccionrecord = new CenDireccionTipodireccion();
-//						TipoDireccionrecord.setIddireccion(idDireccion);
-//						TipoDireccionrecord.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-//						TipoDireccionrecord.setIdinstitucion(Short.valueOf(idInstitucion));
-//						TipoDireccionrecord.setIdtipodireccion(Short.valueOf(idTipoDireccionInsertar));
-//						TipoDireccionrecord.setFechamodificacion(new Date());
-//						TipoDireccionrecord.setUsumodificacion(usuario.getIdusuario());
-//						LOGGER.info(
-//								"createDirection() / cenDireccionTipodireccionMapper.insert() -> Entrada a cenDireccionTipodireccionMapper para insertar los tipos de direcciones");
-//						cenDireccionTipodireccionMapper.insert(TipoDireccionrecord);
-//						LOGGER.info(
-//								"createDirection() / cenDireccionTipodireccionMapper.insert() -> Salida de cenDireccionTipodireccionMapper para insertar los tipos de direcciones");
-//					}
-//
-//				}
-
 				// comprobacion actualización
 				if (response >= 1) {
-
-//					if (datosDireccionesItem.isEsColegiado()) {
-//
-//						// Actualizamos la tabla cen_colegiados para mandar a sociedades
-//						CenColegiadoKey colegiadokey = new CenColegiadoKey();
-//						colegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
-//						colegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-//						CenColegiado colegiado = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadokey);
-//
-//						colegiado.setFechamodificacion(new Date());
-//						colegiado.setUsumodificacion(usuario.getIdusuario());
-//
-//						LOGGER.info(
-//								"updateDirection() / cenColegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenColegiadoExtendsMapper para actualizar el Colegiado");
-//						cenColegiadoExtendsMapper.updateByPrimaryKey(colegiado);
-//						LOGGER.info(
-//								"updateDirection() / cenColegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenColegiadoExtendsMapper para actualizar el Colegiado");
-//
-//						LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
-//						insertResponseDTO.setId(idDireccion.toString());
-//						insertResponseDTO.setStatus(SigaConstants.OK);
-//
-//					} else {
-//						// Actualizamos la tabla cen_nocolegiados para mandar a sociedades
-//						CenNocolegiadoKey noColegiadokey = new CenNocolegiadoKey();
-//						noColegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
-//						noColegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-//						CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(noColegiadokey);
-//
-//						noColegiado.setFechamodificacion(new Date());
-//						noColegiado.setUsumodificacion(usuario.getIdusuario());
-//
-//						LOGGER.info(
-//								"updateDirection() / cenNocolegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar el noColegiado");
-//						cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
-//						LOGGER.info(
-//								"updateDirection() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar el noColegiado");
-//
-//						LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
-//						insertResponseDTO.setId(idDireccion.toString());
-//						insertResponseDTO.setStatus(SigaConstants.OK);
-//					}
-
-					// AUDITORIA
-
-//					CenDirecciones cenDireccionesPosterior = new CenDirecciones();
-//
-//					CenDireccionesKey key = new CenDireccionesKey();
-//					key.setIdinstitucion(idInstitucion);
-//					key.setIddireccion(idDireccion);
-//					key.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-//					cenDireccionesPosterior = cenDireccionesExtendsMapper.selectByPrimaryKey(key);
-//
-//					auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(null, cenDireccionesPosterior,
-//							"INSERT", request, datosDireccionesItem.getMotivo());
 					LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
 					insertResponseDTO.setId(idDireccion.toString());
 					insertResponseDTO.setStatus(SigaConstants.OK);

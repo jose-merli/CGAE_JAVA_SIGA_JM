@@ -70,7 +70,8 @@ public class ColegiadoItem {
 	private String idTratamiento;
 	private String descripcion;
 	private String observaciones;
-
+	private String motivo;
+	
 	/**
 	 *
 	 */
@@ -1140,6 +1141,14 @@ public class ColegiadoItem {
 
 	public void setEtiquetas(ComboEtiquetasItem[] etiquetas) {
 		this.etiquetas = etiquetas;
+	}
+
+	public String getMotivo() {
+		return motivo;
+	}
+
+	public void setMotivo(String motivo) {
+		this.motivo = motivo;
 	}
 
 

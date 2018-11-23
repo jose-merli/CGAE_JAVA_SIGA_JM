@@ -1,5 +1,6 @@
 package org.itcgae.siga.cen.services;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IFichaDatosGeneralesService {
 	
@@ -34,6 +36,9 @@ public interface IFichaDatosGeneralesService {
 			HttpServletRequest request) throws ParseException;
 
 	public InsertResponseDTO solicitudModificacion(NoColegiadoItem noColegiadoItem, HttpServletRequest request);
+
+	public InsertResponseDTO solicitudUploadPhotography(MultipartHttpServletRequest request)
+			throws IllegalStateException, IOException;
 
 //	DatosDireccionesItem partidoJudicialSearch(ColegiadoItem colegiadoItem, HttpServletRequest request);
 
