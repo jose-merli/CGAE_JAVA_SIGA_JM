@@ -8,16 +8,9 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTOs.cen.ColegiadoItem;
-import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
-
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
-import org.itcgae.siga.DTOs.cen.DatosIntegrantesItem;
-import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
-import org.itcgae.siga.DTOs.cen.SoliModiDireccionesItem;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -25,7 +18,6 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.services.cen.providers.CenComponentesSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenDireccionesSqlExtendsProvider;
-import org.itcgae.siga.db.services.cen.providers.CenSoliModiDireccionesSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 

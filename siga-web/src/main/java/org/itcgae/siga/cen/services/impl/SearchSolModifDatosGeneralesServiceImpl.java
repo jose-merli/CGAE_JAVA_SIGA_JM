@@ -3,7 +3,6 @@ package org.itcgae.siga.cen.services.impl;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionDTO;
@@ -17,7 +16,7 @@ import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicos;
 import org.itcgae.siga.db.entities.CenSolmodifacturacionservicio;
 import org.itcgae.siga.db.mappers.CenSolicitudesmodificacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenSolicitModifDatosBasicosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicitmodifdatosbasicosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +30,7 @@ public class SearchSolModifDatosGeneralesServiceImpl implements ISearchSolModifD
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
 	@Autowired
-	private CenSolicitModifDatosBasicosExtendsMapper cenSolicitModifDatosBasicosExtendsMapper;
+	private CenSolicitmodifdatosbasicosExtendsMapper cenSolicitModifDatosBasicosExtendsMapper;
 	
 	@Override
 	public SolModificacionDTO searchSolModifDatosGenerales(int numPagina,

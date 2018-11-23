@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
+import org.itcgae.siga.commons.utils.SolModifSQLUtils;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
@@ -147,5 +149,9 @@ public class CenSolimodidireccionesSqlExtendsProvider extends CenSolicitudmodifi
 		return sql.toString();
 	}
 	
-
+	public String searchSolModifDatosDirecciones(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion) {
+		String rdo = "SELECT * FROM (" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) UNION ( "
+				+ SolModifSQLUtils.getAddressesRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) ORDER BY 6 DESC";
+		return rdo;
+	}
 }

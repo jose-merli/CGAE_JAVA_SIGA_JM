@@ -16,7 +16,7 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenSolicmodicuentas;
 import org.itcgae.siga.db.entities.CenSolimodidirecciones;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenSoliModiDireccionesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolimodidireccionesExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 	private AdmUsuariosExtendsMapper _admUsuariosExtendsMapper;
 	
 	@Autowired
-	private CenSoliModiDireccionesExtendsMapper cenSoliModiDireccionesExtendsMapper;
+	private CenSolimodidireccionesExtendsMapper cenSoliModiDireccionesExtendsMapper;
 	
 	@Override
 	public SolModificacionDTO searchSolModifDatosDirecciones(int numPagina,
