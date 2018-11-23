@@ -41,8 +41,10 @@ public class NoColegiadoItem {
 	private String asientoContable;
 	private String idTratamiento;
 	private String anotaciones;
+	private String publicidad;
+	private String guiaJudicial;
 	private Date fechaNacimientoDate;
-
+	private String motivo;
 	/**
 	 *
 	 */
@@ -465,11 +467,30 @@ public class NoColegiadoItem {
 	}
 	
 
+	public String getGuiaJudicial() {
+		return guiaJudicial;
+	}
+
+	public void setGuiaJudicial(String guiaJudicial) {
+		this.guiaJudicial = guiaJudicial;
+	}
+	
+	public String getPublicidad() {
+		return publicidad;
+	}
+
+	public void setPublicidad(String publicidad) {
+		this.publicidad = publicidad;
+	}
+	
+
 	@JsonProperty("historico")
 	public boolean isHistorico() {
 		return historico;
 	}
 	
+	
+
 	public void setHistorico(boolean historico) {
 		this.historico = historico;
 	}
@@ -623,6 +644,14 @@ public class NoColegiadoItem {
 
 	public void setAnotaciones(String anotaciones) {
 		this.anotaciones = anotaciones;
+	}
+
+	public String getMotivo() {
+		return motivo;
+	}
+
+	public void setMotivo(String motivo) {
+		this.motivo = motivo;
 	}
 	
 }

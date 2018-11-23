@@ -24,6 +24,7 @@ public class EventoItem {
 	private Date fechaBaja;
 	private Long usuModificacion;
 	private Date fechaModificacion;
+	private DatosRepeticionEventoItem datosRepeticion;
 		
 	/**
 	 **/
@@ -274,6 +275,23 @@ public class EventoItem {
 	public void setFechaModificacion(Date fechaModificacion) {
 		this.fechaModificacion = fechaModificacion;
 	}
+	
+	/**
+	 * 
+	 **/
+	public EventoItem datosRepeticion(DatosRepeticionEventoItem datosRepeticion) {
+		this.datosRepeticion = datosRepeticion;
+		return this;
+	}
+
+	@JsonProperty("datosRepeticion")
+	public DatosRepeticionEventoItem getDatosRepeticion() {
+		return datosRepeticion;
+	}
+
+	public void setDatosRepeticion(DatosRepeticionEventoItem datosRepeticion) {
+		this.datosRepeticion = datosRepeticion;
+	}
 
 	
 	@Override
@@ -300,14 +318,18 @@ public class EventoItem {
 				&& Objects.equals(this.idTipoEvento, eventoItem.idTipoEvento)
 				&& Objects.equals(this.usuModificacion, eventoItem.usuModificacion)
 				&& Objects.equals(this.fechaModificacion, eventoItem.fechaModificacion)
+				&& Objects.equals(this.datosRepeticion, eventoItem.datosRepeticion)
 				&& Objects.equals(this.tipoAcceso, eventoItem.tipoAcceso)
 				&& Objects.equals(this.fechaBaja, eventoItem.fechaBaja);
+
 	}
 
 	@Override
 	public int hashCode() {
+
 		return Objects.hash(idEvento, idCalendario, idInstitucion, titulo, fechaInicio, fechaFin, allDay, color, lugar,
-				descripcion, recursos, idEstadoEvento, idTipoEvento, usuModificacion, fechaModificacion, fechaBaja, tipoAcceso);
+				descripcion, recursos, idEstadoEvento, idTipoEvento, usuModificacion, fechaModificacion, fechaBaja, tipoAcceso,
+				datosRepeticion);
 	}
 
 	@Override
@@ -331,6 +353,7 @@ public class EventoItem {
 		sb.append("    usuModificacion: ").append(toIndentedString(usuModificacion)).append("\n");
 		sb.append("    fechaModificacion: ").append(toIndentedString(fechaModificacion)).append("\n");
 		sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
+		sb.append("    datosRepeticion: ").append(toIndentedString(datosRepeticion)).append("\n");
 		sb.append("    tipoAcceso: ").append(toIndentedString(tipoAcceso)).append("\n");
 		sb.append("}");
 		return sb.toString();

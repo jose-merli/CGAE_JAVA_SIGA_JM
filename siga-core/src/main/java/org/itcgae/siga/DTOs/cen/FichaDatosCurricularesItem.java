@@ -26,6 +26,7 @@ public class FichaDatosCurricularesItem {
 	private String idTipoCvSubtipo1;
 	private String idTipoCvSubtipo2;
 	private String creditos;
+private String motivo;
 	private String certificado;
 	private String isLetrado;
 	
@@ -455,6 +456,14 @@ public class FichaDatosCurricularesItem {
 
 	public void setIsLetrado(String isLetrado) {
 		this.isLetrado = isLetrado;
+	}
+
+	public String getMotivo() {
+		return motivo;
+	}
+
+	public void setMotivo(String motivo) {
+		this.motivo = motivo;
 	}
 	
 }

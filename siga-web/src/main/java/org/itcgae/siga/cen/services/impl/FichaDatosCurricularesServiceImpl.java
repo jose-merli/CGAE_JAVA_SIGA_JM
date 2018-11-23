@@ -425,16 +425,15 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 
 		if (null != usuarios && usuarios.size() > 0) {
 			usuario = usuarios.get(0);
-			// for (int i = 0; i < FichaDatosCurricularesItem.length; i++) {
 			LOGGER.info(
 					"updateDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Entrada a cenDireccionesExtendsMapper para actualizar un curriculum");
 			CenSolicitudmodificacioncv recordUpdate = new CenSolicitudmodificacioncv();
-			// recordUpdate.setFechabaja(new Date());
-			// recordUpdate.setFechafin(new Date());
 			recordUpdate.setFechamodificacion(new Date());
 			recordUpdate.setUsumodificacion(usuario.getIdusuario());
 			recordUpdate.setIdpersona(Long.parseLong(fichaDatosCurricularesItem.getIdPersona()));
 			recordUpdate.setIdtipocv(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()));
+			recordUpdate.setMotivo(fichaDatosCurricularesItem.getMotivo());
+
 
 			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()
 					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()) {
@@ -456,22 +455,20 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			// }
 			recordUpdate.setFechamodificacion(new Date());
 			recordUpdate.setUsumodificacion(usuario.getIdusuario());
-			recordUpdate.setFechainicio(fichaDatosCurricularesItem.getFechaDesdeDate());
+			recordUpdate.setFechaalta(fichaDatosCurricularesItem.getFechaDesdeDate());
 			recordUpdate.setFechafin(fichaDatosCurricularesItem.getFechaHastaDate());
 			recordUpdate.setDescripcion(fichaDatosCurricularesItem.getDescripcion());
 			recordUpdate.setIdinstitucion(idInstitucion);
 			recordUpdate.setIdinstitucion(idInstitucion);
 			recordUpdate.setFechainicio(fichaDatosCurricularesItem.getFechaDesdeDate());
 			recordUpdate.setFechafin(fichaDatosCurricularesItem.getFechaHastaDate());
-//			recordUpdate.setFechabaja(fichaDatosCurricularesItem.getFechaHastaDate());
-//			recordUpdate.setFechamovimiento(fichaDatosCurricularesItem.getFechaMovimientoDate());
 
 			NewIdDTO idCvBD = cenDatoscvExtendsMapper.getMaxIdCv(String.valueOf(idInstitucion),
 					fichaDatosCurricularesItem.getIdPersona());
 			if (idCvBD == null) {
 				recordUpdate.setIdcv(Short.parseShort("1"));
 			} else {
-				int idCv = Integer.parseInt(idCvBD.getNewId()) + 1;
+				int idCv = Integer.parseInt(idCvBD.getNewId());
 				recordUpdate.setIdcv(Short.parseShort("" + idCv));
 			}
 						// recordUpdate.setIdpersona(Long.valueOf(fichaDatosCurricularesDTO[i].getIdPersona()));
@@ -486,27 +483,25 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 				recordUpdate.setIdsolicitud(Long.parseLong("" + idCv));
 			}
 			
-			if(recordUpdate.getFechafin() == null) {
-				CenSolicitudmodificacioncvExample example = new CenSolicitudmodificacioncvExample();
-				Long idPers = Long.parseLong(fichaDatosCurricularesItem.getIdPersona());
-				example.createCriteria().andIdpersonaEqualTo(idPers).andIdinstitucionEqualTo(idInstitucion).andFechafinIsNull();
-				List<CenSolicitudmodificacioncv> datosCurricularesActivos = cenSolicitudmodificacioncvExtendsMapper.selectByExample(example);
-				
-				if(datosCurricularesActivos != null && datosCurricularesActivos.size() != 0) {
-					for(CenSolicitudmodificacioncv dato: datosCurricularesActivos) {
-						CenSolicitudmodificacioncv Actualizar = new CenSolicitudmodificacioncv();
-						Actualizar = dato;
-//						Actualizar.setFechabaja(new Date());
-						Actualizar.setFechafin(new Date());
-						Actualizar.setFechamodificacion(new Date());
-						Actualizar.setUsumodificacion(usuario.getIdusuario());
-						response = cenSolicitudmodificacioncvExtendsMapper.updateByPrimaryKey(Actualizar);
-//						update by primarykey
-					}
-
-				}
-				
-			}
+//			Esto informa la fecha baja de los demás datos curriculares cuando no está informada la del actual
+//			if(recordUpdate.getFechafin() == null) {
+//				CenSolicitudmodificacioncvExample example = new CenSolicitudmodificacioncvExample();
+//				Long idPers = Long.parseLong(fichaDatosCurricularesItem.getIdPersona());
+//				example.createCriteria().andIdpersonaEqualTo(idPers).andIdinstitucionEqualTo(idInstitucion).andFechafinIsNull();
+//				List<CenSolicitudmodificacioncv> datosCurricularesActivos = cenSolicitudmodificacioncvExtendsMapper.selectByExample(example);
+//				
+//				if(datosCurricularesActivos != null && datosCurricularesActivos.size() != 0) {
+//					for(CenSolicitudmodificacioncv dato: datosCurricularesActivos) {
+//						CenSolicitudmodificacioncv Actualizar = new CenSolicitudmodificacioncv();
+//						Actualizar = dato;
+//						Actualizar.setFechafin(new Date());
+//						Actualizar.setFechamodificacion(new Date());
+//						Actualizar.setUsumodificacion(usuario.getIdusuario());
+//						response = cenSolicitudmodificacioncvExtendsMapper.updateByPrimaryKey(Actualizar);
+//					}
+//				}
+//			}
+			
 			response = cenSolicitudmodificacioncvExtendsMapper.solicitudUpdateCurriculo(recordUpdate);
 
 			LOGGER.info(

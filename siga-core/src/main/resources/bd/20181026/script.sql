@@ -170,3 +170,13 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('facturacion.busquedaAbonos.literal.fecha2','Fecha de emisión#GL','0','4',to_date('10/12/05','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('facturacion.busquedaAbonos.literal.fecha2','Data d''emisió','0','2',to_date('10/12/05','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('facturacion.busquedaAbonos.literal.fecha2','Fecha de emisión#EU','0','3',to_date('10/12/05','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosGenerales.literal.publicidad','Publicidad#EU','0','3',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosGenerales.literal.publicidad','Publicitat','0','2',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosGenerales.literal.publicidad','Publicidad','0','1',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosGenerales.literal.publicidad','Publicidad#GL','0','4',to_date('10/03/04','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosGenerales.literal.guiaJudicial','Guía Judicial#EU','0','3',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosGenerales.literal.guiaJudicial','Guía Judicial','0','2',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosGenerales.literal.guiaJudicial','Guía Judicial','0','1',to_date('10/03/04','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosGenerales.literal.guiaJudicial','Guía Judicial#GL','0','4',to_date('10/03/04','DD/MM/RR'),'0','19');

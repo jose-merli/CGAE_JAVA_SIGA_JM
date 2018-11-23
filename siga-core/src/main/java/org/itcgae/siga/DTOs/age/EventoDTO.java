@@ -26,8 +26,14 @@ public class EventoDTO   {
 	public void setError(Error error) {
 		this.error = error;
 	}
-	
-	
-  
+
+	@Override
+	public boolean equals(Object obj) {
+		EventoDTO listaObj = (EventoDTO) obj;
+		if(listaObj.getEventos() == eventos)
+			return true;
+		else
+			return false;
+	}
 }
 

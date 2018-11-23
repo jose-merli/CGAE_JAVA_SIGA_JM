@@ -52,7 +52,12 @@ public class AgeCalendarioSqlExtendsProvider extends  AgeCalendarioSqlProvider{
 		
 		sql.GROUP_BY("AGE.IDCALENDARIO, AGE.IDINSTITUCION, AGE.DESCRIPCION, AGE.USUMODIFICACION, AGE.FECHAMODIFICACION, AGE.FECHABAJA, AGE.IDTIPOCALENDARIO, AGE.COLOR");
 		
-		return sql.toString();
+		SQL sql2 = new SQL();
+		sql2.SELECT("*");
+		sql2.FROM("(" + sql.toString() + ")");
+		sql2.WHERE("TIPOACCESO > 1");
+
+		return sql2.toString();
 	}
 	
 	public String getCalendarioEventos(Short idInstitucion, String perfiles, String idCalendario) {
@@ -61,10 +66,16 @@ public class AgeCalendarioSqlExtendsProvider extends  AgeCalendarioSqlProvider{
 
 		sql.SELECT("AGE.IDCALENDARIO");
 		sql.SELECT("AGE.COLOR");
+		sql.SELECT("EVENTO.IDINSTITUCION");
 		sql.SELECT("EVENTO.IDEVENTO");
+		sql.SELECT("EVENTO.IDESTADOEVENTO");
+		sql.SELECT("EVENTO.IDTIPOEVENTO");
 		sql.SELECT("EVENTO.FECHAINICIO");
 		sql.SELECT("EVENTO.FECHAFIN");
 		sql.SELECT("EVENTO.TITULO");
+		sql.SELECT("EVENTO.LUGAR");
+		sql.SELECT("EVENTO.DESCRIPCION");
+		sql.SELECT("EVENTO.RECURSOS");
 		sql.SELECT("NVL(DECODE(MIN(DECODE(AGE_PER.TIPOACCESO,0,5,AGE_PER.TIPOACCESO)),5,0,MIN(DECODE(AGE_PER.TIPOACCESO,0,5,AGE_PER.TIPOACCESO))),0) AS TIPOACCESO");
 		
 		sql.FROM("AGE_EVENTO EVENTO");
@@ -75,7 +86,7 @@ public class AgeCalendarioSqlExtendsProvider extends  AgeCalendarioSqlProvider{
 		sql.WHERE("AGE.IDCALENDARIO = '" + idCalendario + "'");
 		sql.WHERE("AGE.FECHABAJA IS NULL");
 		
-		sql.GROUP_BY("AGE.IDCALENDARIO, AGE.COLOR, EVENTO.IDEVENTO, EVENTO.FECHAINICIO, EVENTO.FECHAFIN, EVENTO.TITULO");
+		sql.GROUP_BY("AGE.IDCALENDARIO, AGE.COLOR, EVENTO.IDEVENTO, EVENTO.FECHAINICIO, EVENTO.FECHAFIN, EVENTO.TITULO, EVENTO.LUGAR, EVENTO.DESCRIPCION, EVENTO.RECURSOS, EVENTO.IDTIPOEVENTO, EVENTO.IDESTADOEVENTO, EVENTO.IDINSTITUCION");
 		
 		return sql.toString();
 	}
