@@ -123,29 +123,17 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 			} else {
 				recordUpdate.setIdtipocvsubtipo2(null);
 			}
-//			if (null != solModifDatosCurricularesItem.getCreditos() && "" != solModifDatosCurricularesItem.getCreditos()) {
-//				recordUpdate.setCreditos(Long.parseLong(solModifDatosCurricularesItem.getCreditos()));
-//			} else {
-//				recordUpdate.setCreditos(null);
-//			}
-//			// if(null != fichaDatosCurricularesItem.getCertificado()){
-//			recordUpdate.setCertificado(solModifDatosCurricularesItem.getCertificado());
-			// }
 			if (null != solModifDatosCurricularesItem.getDescripcion()
 					&& "" != solModifDatosCurricularesItem.getDescripcion()) {
 				recordUpdate.setDescripcion(solModifDatosCurricularesItem.getDescripcion());
 			}
-			// if(null != fichaDatosCurricularesItem.getIdTipoCv()){
-			// }
 			recordUpdate.setIdinstitucion(idInstitucion);
 			recordUpdate.setFechamodificacion(new Date());
 			recordUpdate.setUsumodificacion(usuario.getIdusuario());
 			recordUpdate.setFechainicio(solModifDatosCurricularesItem.getDateFechaInicio());
 			recordUpdate.setFechafin(solModifDatosCurricularesItem.getDateFechaFin());
 			recordUpdate.setFechabaja(solModifDatosCurricularesItem.getDateFechaFin());
-			recordUpdate.setFechamovimiento(solModifDatosCurricularesItem.getDateFechaMovimiento());
 			recordUpdate.setIdcv(Short.parseShort(solModifDatosCurricularesItem.getIdCv()));
-			// recordUpdate.setIdpersona(Long.valueOf(fichaDatosCurricularesDTO[i].getIdPersona()));
 			
 			if(recordUpdate.getFechafin() == null) {
 				CenDatoscvExample example = new CenDatoscvExample();
@@ -171,7 +159,6 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 			responseSolicitud = cenDatoscvExtendsMapper.updateCurriculo(recordUpdate);
 
 		}else {
-//REVISAR LOS CAMPOS QUE NO DEBO PODER INSERTAR.
 			CenDatoscv recordInsert = new CenDatoscv();
 			recordInsert.setFechamodificacion(new Date());
 			recordInsert.setUsumodificacion(usuario.getIdusuario());
@@ -190,17 +177,10 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 			} else {
 				recordInsert.setIdtipocvsubtipo2(null);
 			}
-			if (null != solModifDatosCurricularesItem.getCreditos() && "" != solModifDatosCurricularesItem.getCreditos()) {
-				recordInsert.setCreditos(Long.parseLong(solModifDatosCurricularesItem.getCreditos()));
-			} else {
-				recordInsert.setCreditos(null);
-			}
 
 			recordInsert.setFechainicio(solModifDatosCurricularesItem.getDateFechaInicio());
 			recordInsert.setFechafin(solModifDatosCurricularesItem.getDateFechaFin());
 			recordInsert.setFechabaja(solModifDatosCurricularesItem.getDateFechaFin());
-			recordInsert.setCertificado(solModifDatosCurricularesItem.getCertificado());
-			recordInsert.setFechamovimiento(solModifDatosCurricularesItem.getDateFechaMovimiento());
 			recordInsert.setDescripcion(solModifDatosCurricularesItem.getDescripcion());
 			recordInsert.setIdinstitucion(idInstitucion);
 
@@ -228,7 +208,6 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 						Actualizar.setFechamodificacion(new Date());
 						Actualizar.setUsumodificacion(usuario.getIdusuario());
 						responseSolicitud = cenDatoscvExtendsMapper.updateByPrimaryKey(Actualizar);
-//						update by primarykey
 					}
 
 				}
