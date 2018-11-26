@@ -710,14 +710,15 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 //				cuentaBancaria.setIdsolicitud(idsolicitud);
 				cuentaBancaria.setFechamodificacion(new Date());
 				cuentaBancaria.setUsumodificacion(usuario.getIdusuario());
+				cuentaBancaria.setMotivo(datosBancariosInsertDTO.getMotivo());
 //				cuentaBancaria.setCuentacontable(datosBancariosInsertDTO.getCuentaContable());
-//				cuentaBancaria.set
+				cuentaBancaria.setFechaalta(new Date());
 				cuentaBancaria.setIban(datosBancariosInsertDTO.getIban());
 				cuentaBancaria.setIdcuenta(idCuenta);
 				cuentaBancaria.setIdinstitucion(idInstitucion);
 				cuentaBancaria.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
 				cuentaBancaria.setTitular(datosBancariosInsertDTO.getTitular());
-
+				cuentaBancaria.setIdestadosolic(Short.parseShort("10"));
 				//Gestionamos los abonos que nos llegan
 				if (null != datosBancariosInsertDTO.getTipoCuenta() && datosBancariosInsertDTO.getTipoCuenta().length>0) {
 

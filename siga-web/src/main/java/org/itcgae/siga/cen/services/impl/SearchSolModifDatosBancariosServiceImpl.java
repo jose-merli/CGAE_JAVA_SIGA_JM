@@ -59,10 +59,8 @@ public class SearchSolModifDatosBancariosServiceImpl implements ISearchSolModifD
 						"searchSolModifDatosBancarios() / cenSolicModiCuentasExtendsMapper.searchSolModifDatosBancarios() -> Entrada a cenSoliModiDireccionesExtendsMapper para obtener los resultados de la búsqueda");
 				List<SolModificacionItem> solModificacionItems = cenSolicModiCuentasExtendsMapper.searchSolModifDatosBancarios(solicitudModificacionSearchDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion));
 				solModificacionDTO.setSolModificacionItems(solModificacionItems);
-
 			}
 		}
-
 		LOGGER.info(
 				"searchSolModifDatosBancarios() -> Salida del servicio para recuperar los datos de la búsqueda específica de datos bancarios");
 
