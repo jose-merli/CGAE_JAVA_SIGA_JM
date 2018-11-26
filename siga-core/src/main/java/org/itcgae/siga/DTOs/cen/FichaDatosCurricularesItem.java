@@ -26,7 +26,7 @@ public class FichaDatosCurricularesItem {
 	private String idTipoCvSubtipo1;
 	private String idTipoCvSubtipo2;
 	private String creditos;
-private String motivo;
+	private String motivo;
 	private String certificado;
 	private String isLetrado;
 	
