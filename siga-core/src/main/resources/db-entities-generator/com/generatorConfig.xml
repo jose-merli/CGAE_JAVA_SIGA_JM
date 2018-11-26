@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+	<classPathEntry location="C:\wildfly-11.0.0.Final\standalone\tmp\vfs\deployment\deployment5669994e24ecf3e8\ojdbc6-11.1.0.7.0.jar-d854470650ecc93d\ojdbc6-11.1.0.7.0.jar" />
+	  <context id="DB2Tables" targetRuntime="MyBatis3">
+	
+		<jdbcConnection 
+			connectionURL="jdbc:oracle:thin:@//192.168.18.6:1527/SIGAINT" 
+			driverClass="oracle.jdbc.OracleDriver"
+			userId="USCGAE_INT"
+			password="desarrollo" />
+			
+			
+		<javaModelGenerator targetPackage="org.itcgae.siga.db.entities" targetProject="siga-core" />
+		<!-- <sqlMapGenerator targetPackage="com.cgae.db.mappers" targetProject="demo" /> -->
+		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER" implementationPackage="org.itcgae.siga.db.services" />
+		
+
+		
+		<table schema="USCGAE_INT" tableName="ENV_TIPOENVIOS" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>
+		
+		<table schema="USCGAE_INT" tableName="ENV_ESTADOENVIO" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>
+		
+		<table schema="USCGAE_INT" tableName="ENV_ENVIOS" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOS.NEXTVAL FROM DUAL"/>
+		</table>
+
+		<table schema="USCGAE_INT" tableName="ENV_ENTRADA_ENVIOS" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>
+		
+		<table schema="USCGAE_INT" tableName="ENV_HISTORICOESTADOENVIO" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+			<generatedKey column="IDESTADO" sqlStatement="SELECT SEQ_ENV_HISTORICOESTADOENVIO.NEXTVAL FROM DUAL"/>
+		</table>
+		
+		<table schema="USCGAE_INT" tableName="ENV_CAMPOSPLANTILLA" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+			<generatedKey column="IDCAMPO" sqlStatement="SELECT SEQ_ENV_CAMPOSPLANTILLA.NEXTVAL FROM DUAL"/>
+		</table>
+		
+		<table schema="USCGAE_INT" tableName="ENV_ENVIOPROGRAMADO" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOPROGRAMADO.NEXTVAL FROM DUAL"/>
+		</table>
+		
+		<!--  ENVGRUPOSCLIENTE PENDIENTE DE CREAR EN BDD
+		<table schema="USCGAE_INT" tableName="ENV_GRUPOSCLIENTE" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOPROGRAMADO.NEXTVAL FROM DUAL"/>
+		</table>-->
+
+		<table schema="USCGAE_INT" tableName="ENV_DOCUMENTOS" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+			<generatedKey column="IDDOCUMENTO" sqlStatement="SELECT SEQ_ENV_DOCUMENTOS.NEXTVAL FROM DUAL"/>
+		</table>
+		
+		<table schema="USCGAE_INT" tableName="ENV_DOCUMENTOS" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+			<generatedKey column="IDDOCUMENTO" sqlStatement="SELECT SEQ_ENV_DOCUMENTOS.NEXTVAL FROM DUAL"/>
+		</table>		
+		
+
+	</context>
+</generatorConfiguration>
