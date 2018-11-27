@@ -1,5 +1,6 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,8 +14,14 @@ import org.itcgae.siga.cen.services.ISearchSolModifDatosUseFotoService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
+import org.itcgae.siga.db.entities.CenSolicmodifexportarfotoExample;
+import org.itcgae.siga.db.entities.CenSolimodidirecciones;
+import org.itcgae.siga.db.entities.CenSolimodidireccionesExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicmodifexportarfotoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +37,9 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 
 	@Autowired
 	private CenSolicmodifexportarfotoExtendsMapper cenSolicModifExportarFotoExtendsMapper;
+	
+	@Autowired
+	private CenClienteExtendsMapper cenClienteExtendsMapper;
 	
 	@Override
 	public SolModificacionDTO searchSolModifDatosUseFoto(int numPagina,
@@ -77,7 +87,45 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 				"processSolModifDatosUseFoto() -> Entrada al servicio para actualizar el estado de la solicitud a REALIZADO");
 		
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		AdmUsuarios usuario = new AdmUsuarios();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 		
+		LOGGER.info(
+				"processSolModifDatosCurriculares() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		if (null != usuarios && usuarios.size() > 0) {
+		usuario = usuarios.get(0);
+			
+		CenSolicmodifexportarfoto solicitud = new CenSolicmodifexportarfoto();
+		CenSolicmodifexportarfotoExample example = new CenSolicmodifexportarfotoExample();
+		
+		example.createCriteria().andIdpersonaEqualTo(Long.parseLong(solModificacionItem.getIdPersona()))
+		.andIdinstitucionEqualTo(idInstitucion).andIdsolicitudEqualTo(Short.valueOf(solModificacionItem.getIdSolicitud()));
+		
+		List<CenSolicmodifexportarfoto> lista = cenSolicModifExportarFotoExtendsMapper.selectByExample(example);
+
+		solicitud = lista.get(0);
+		
+		CenCliente modificacion = new CenCliente();
+		modificacion.setIdinstitucion(idInstitucion);
+		modificacion.setIdpersona(solicitud.getIdpersona());
+		modificacion.setFechamodificacion(new Date());
+		modificacion.setUsumodificacion(usuario.getIdusuario());
+		modificacion.setExportarfoto(solicitud.getExportarfoto());
+//		modificacion.setid
+		
+		
+		int responseUpdate = cenClienteExtendsMapper.updateByPrimaryKeySelective(modificacion);
+		
+		if(responseUpdate >= 1) {
 		CenSolicmodifexportarfoto record = new CenSolicmodifexportarfoto();
 		record.setIdsolicitud(Short.valueOf(solModificacionItem.getIdSolicitud()));
 		record.setIdestadosolic((short) 20);
@@ -91,6 +139,13 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 		} 
 		
 		updateResponseDTO.setStatus(SigaConstants.OK);
+		}
+		
+		}else {
+			updateResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.warn("processSolModifDatosGenerales() / No existe el usuario.");
+		}
+		
 		LOGGER.info(
 				"processSolModifDatosUseFoto() -> Salida del servicio para actualizar el estado de la solicitud a REALIZADO");
 		return updateResponseDTO;
