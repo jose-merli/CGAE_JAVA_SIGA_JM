@@ -415,11 +415,11 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				cuentaBancaria.setIdinstitucion(idInstitucion);
 
 				// Se actualizará el nif de la persona en caso de cambio del mismo
-				if (null != datosBancariosInsertDTO.getNifTitular()) {
+			/*	if (null != datosBancariosInsertDTO.getNifTitular()) {
 					updateNifTitular(Long.valueOf(datosBancariosInsertDTO.getIdPersona()),
 							datosBancariosInsertDTO.getNifTitular());
 				}
-
+			 */
 				cuentaBancaria.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
 
 				cuentaBancaria.setTitular(datosBancariosInsertDTO.getTitular());
@@ -945,10 +945,10 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				CenCuentasbancariasKey key = new CenCuentasbancariasKey();
 				key.setIdcuenta(Short.valueOf(datosBancariosInsertDTO.getIdCuenta()));
 				// Se actualizará el nif de la persona en caso de cambio del mismo
-				if (null != datosBancariosInsertDTO.getNifTitular()) {
+				/*if (null != datosBancariosInsertDTO.getNifTitular()) {
 					updateNifTitular(Long.valueOf(datosBancariosInsertDTO.getIdPersona()),
 							datosBancariosInsertDTO.getNifTitular());
-				}
+				}*/
 				key.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
 				key.setIdinstitucion(Short.valueOf(idInstitucion));
 				CenCuentasbancarias cuentaBancaria = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(key);
@@ -995,14 +995,15 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				// Comprobamos que el código está en cen_bancos, si está se pone sin más en
 				// cbo_codigo, sino se coge el máx del código
 				CenBancosExample cenBancosExample = new CenBancosExample();
-				cenBancosExample.createCriteria().andCodigoEqualTo(cuentaBancaria.getCboCodigo());
+				cenBancosExample.createCriteria().andBicEqualTo(datosBancariosInsertDTO.getBic())
+						.andNombreEqualTo(datosBancariosInsertDTO.getBanco());
 				List<CenBancos> cenBancos = cenBancosExtendsMapper.selectByExample(cenBancosExample);
 
 				if (null != cenBancos && !cenBancos.isEmpty()) {
 					cuentaBancaria.setCboCodigo(cenBancos.get(0).getCodigo());
 
 					// Si no tiene la misma denominación de país
-					if (!cuentaBancaria.getIban().equals(datosBancariosInsertDTO.getIban())) {
+					/*if (!cuentaBancaria.getIban().equals(datosBancariosInsertDTO.getIban())) {
 						cenBancos.get(0).setNombre(datosBancariosInsertDTO.getBanco());
 
 						// Actualizar país al ser diferentes
@@ -1029,6 +1030,44 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						error.setMessage("Error al actualizar los datos relativos al banco");
 						updateResponseDTO.setError(error);
+					}*/
+				}else {
+					// insertar en cen_bancos
+					NewIdDTO newIdDTO = cenBancosExtendsMapper.getMaxCode();
+
+					CenBancos record = new CenBancos();
+
+					if (!datosBancariosInsertDTO.getIban().substring(0, 2).equals("ES")) {
+						String rdo = fill(newIdDTO.getNewId(), 5);
+						record.setCodigo(rdo);
+						
+						record.setNombre("BANCO EXTRANJERO");
+					} else {
+						record.setCodigo(datosBancariosInsertDTO.getIban().substring(4, 8));
+						record.setNombre(datosBancariosInsertDTO.getBanco());
+					}
+
+					record.setBic(datosBancariosInsertDTO.getBic());
+					record.setFechamodificacion(new Date());
+
+					CenPaisExample cenPaisExample = new CenPaisExample();
+					cenPaisExample.createCriteria().andCodIsoEqualTo(datosBancariosInsertDTO.getIban().substring(0, 2));
+					List<CenPais> cenPais = cenPaisExtendsMapper.selectByExample(cenPaisExample);
+
+					if (null != cenPais && !cenPais.isEmpty()) {
+						record.setIdpais(cenPais.get(0).getIdpais());
+					}
+
+					record.setUsumodificacion(usuario.getIdusuario());
+
+					int res = cenBancosExtendsMapper.insert(record);
+
+					if (res == 0) {
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setMessage("Error al insertar en CEN_BANCOS");
+						updateResponseDTO.setError(error);
+					} else {
+						cuentaBancaria.setCboCodigo(record.getCodigo());
 					}
 				}
 
