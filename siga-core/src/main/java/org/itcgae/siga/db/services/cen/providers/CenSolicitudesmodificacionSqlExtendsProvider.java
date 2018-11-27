@@ -14,15 +14,15 @@ public class CenSolicitudesmodificacionSqlExtendsProvider {
 		return sql.toString();
 	}
 	
-	public String getMaxIdSolicitud(String idInstitucion, String idPersona) {
-		SQL sql = new SQL();
-		sql.SELECT("MAX(IDSOLICITUD) AS IDSOLICITUD");
-		sql.FROM("CEN_SOLICMODICUENTAS");
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
-		sql.WHERE("IDPERSONA = '" + idPersona + "'");
-
-		return sql.toString();
-	}
+//	public String getMaxIdSolicitud(String idInstitucion, String idPersona) {
+//		SQL sql = new SQL();
+//		sql.SELECT("MAX(IDSOLICITUD) AS IDSOLICITUD");
+//		sql.FROM("CEN_SOLICMODICUENTAS");
+//		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+//		sql.WHERE("IDPERSONA = '" + idPersona + "'");
+//
+//		return sql.toString();
+//	}
 	
 	public String searchSolModif(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
 			String idLenguaje, String idInstitucion) {
