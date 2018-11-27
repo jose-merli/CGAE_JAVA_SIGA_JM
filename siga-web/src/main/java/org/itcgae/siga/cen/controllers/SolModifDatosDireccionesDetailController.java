@@ -4,7 +4,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
+import org.itcgae.siga.DTOs.cen.SoliModiDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.SoliModiDireccionesItem;
+import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.cen.services.ISolModifDatosDireccionesDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +26,14 @@ public class SolModifDatosDireccionesDetailController {
 	private ISolModifDatosDireccionesDetailService solModifDatosDireccionesDetailService;
 	
 	@RequestMapping(value = "solicitudModificacion/searchSolModifDatosDireccionesDetail", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<SoliModiDireccionesItem> searchSolModifDatosDireccionesDetail(@RequestParam("numPagina") int numPagina, @RequestBody StringDTO idSolicitud, HttpServletRequest request) { 
-		SoliModiDireccionesItem response = solModifDatosDireccionesDetailService.searchSolModifDatosDireccionesDetail(numPagina, idSolicitud, request);
+	ResponseEntity<SoliModiDireccionesItem> searchSolModifDatosDireccionesDetail(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		SoliModiDireccionesItem response = solModifDatosDireccionesDetailService.searchSolModifDatosDireccionesDetail(numPagina, solModificacionItem, request);
 		return new ResponseEntity<SoliModiDireccionesItem>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/searchDirecciones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DatosDireccionesDTO> searchDatosDirecciones(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		DatosDireccionesDTO response = solModifDatosDireccionesDetailService.searchDatosDirecciones(numPagina, solModificacionItem, request);
-		return new ResponseEntity<DatosDireccionesDTO>(response, HttpStatus.OK);
+	ResponseEntity<SoliModiDireccionesItem> searchDatosDirecciones(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		SoliModiDireccionesItem response = solModifDatosDireccionesDetailService.searchDatosDirecciones(numPagina, solModificacionItem, request);
+		return new ResponseEntity<SoliModiDireccionesItem>(response, HttpStatus.OK);
 	}
 }

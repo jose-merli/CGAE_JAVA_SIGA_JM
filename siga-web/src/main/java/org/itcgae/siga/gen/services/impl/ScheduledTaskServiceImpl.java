@@ -15,10 +15,10 @@ public class ScheduledTaskServiceImpl implements IScheduledTaskService {
 	@Autowired
 	private IFichaCursosService fichaCursosService;
 	
-	@Scheduled(cron = "${cron.pattern.scheduled.forCurso}")
+	//@Scheduled(cron = "${cron.pattern.scheduled.forCurso}")
 	@Override
 	public void cambiaCursoEnCurso() {
-		fichaCursosService.updateEstadoCursoAuto();
+		//fichaCursosService.updateEstadoCursoAuto();
 	}
 
 }

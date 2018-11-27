@@ -21,4 +21,15 @@ public class CenSolicitudesmodificacionSqlExtendsProvider {
 				+ " ) ORDER BY 6 DESC";
 		return rdo;
 	}
+	
+	public String getMaxIdSolicitud(String idInstitucion, String idPersona) {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDSOLICITUD) AS IDSOLICITUD");
+		sql.FROM("CEN_SOLICITUDESMODIFICACION");
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
+		sql.WHERE("IDPERSONA = '"+ idPersona +"'");
+		
+		return sql.toString();
+	}
 }

@@ -1,5 +1,7 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,11 +15,12 @@ import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.cen.services.ISolModifDatosCurricularesDetailService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenDatoscv;
-import org.itcgae.siga.db.entities.CenDatoscvKey;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
+import org.itcgae.siga.db.entities.CenTiposcv;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo1;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo1Key;
+import org.itcgae.siga.db.entities.CenTiposcvsubtipo2;
+import org.itcgae.siga.db.entities.CenTiposcvsubtipo2Key;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosKey;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -25,6 +28,8 @@ import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudmodificacioncvExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposCVSubtipo1ExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenTiposCVSubtipo2ExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenTiposcvExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,10 +49,16 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 	private CenTiposCVSubtipo1ExtendsMapper cenTiposCVSubtipo1ExtendsMapper;
 
 	@Autowired
+	private CenTiposCVSubtipo2ExtendsMapper cenTiposCVSubtipo2ExtendsMapper;
+
+	@Autowired
 	private GenRecursosCatalogosExtendsMapper genRecursosCatalogosExtendsMapper;
 
 	@Autowired
 	private CenSolicitudmodificacioncvExtendsMapper cenSolicitudmodificacioncvExtendsMapper;
+
+	@Autowired
+	private CenTiposcvExtendsMapper cenTiposcvExtendsMapper;
 
 	@Override
 	public SolModifDatosCurricularesDTO searchDatosCurricularesDetail(int numPagina,
@@ -131,38 +142,134 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 	@Override
 	public SolModifDatosCurricularesItem searchSolModifDatosCurricularesDetail(int numPagina,
 			SolModificacionItem solModificacionItem, HttpServletRequest request) {
-//		SolModifDatosCurricularesItem solModifDatosCurricularesItem = new SolModifDatosCurricularesItem();
-//		
-//		// Conseguimos información del usuario logeado
-//				String token = request.getHeader("Authorization");
-//				String dni = UserTokenUtils.getDniFromJWTToken(token);
-//				Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-//
-//				if (idInstitucion != null) {
-//					AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-//					exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-//					LOGGER.info(
-//							"searchDatosCurricularesDetail() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-//					List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-//					LOGGER.info(
-//							"searchDatosCurricularesDetail() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//					if (usuarios != null && usuarios.size() > 0) {
-//
-//						AdmUsuarios usuario = usuarios.get(0);
-//		CenSolicitudmodificacioncv cenSolicitudmodificacioncv = cenSolicitudmodificacioncvExtendsMapper.selectByPrimaryKey(Long.valueOf(solModificacionItem.getIdSolicitud()));
-//		
-//		CenDatoscvKey cenDatoscvKey = new CenDatoscvKey();
-//		cenDatoscvKey.setIdcv(cenSolicitudmodificacioncv.getIdcv());
-//		cenDatoscvKey.setIdinstitucion(usuario.getIdinstitucion());
-//		cenDatoscvKey.setIdpersona(Long.valueOf(solModificacionItem.getIdPersona()));
-//		
-//		// llamar a cenDatos
-//		CenDatoscv cenDatoscv = cenDatoscvExtendsMapper.selectByPrimaryKey(cenDatoscvKey);
-//		solModifDatosCurricularesItem.setCategoriaCurricular(cenDatoscv.ge);
-//		solModifDatosCurricularesItem.setDescripcion(cenSolicitudmodificacioncv.getDescripcion());
-//					}
-		return null;
+
+		LOGGER.info(
+				"searchSolModifDatosCurricularesDetail() -> Entrada del servicio para recuperar los datos de la solicitud de datos curriculares");
+
+		SolModifDatosCurricularesItem solModifDatosCurricularesItem = new SolModifDatosCurricularesItem();
+		DateFormat formatter = new SimpleDateFormat("dd/MMM/yy");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"searchDatosCurricularesDetail() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"searchDatosCurricularesDetail() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+
+				// Obtenemos los datos de la solicitud consultando por el id de la solicitud
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / cenSolicitudmodificacioncvExtendsMapper.selectByPrimaryKey() -> Entrada a cenSolicitudmodificacioncvExtendsMapper para obtener los datos curriculares de la solicitud");
+
+				CenSolicitudmodificacioncv cenSolicitudmodificacioncv = cenSolicitudmodificacioncvExtendsMapper
+						.selectByPrimaryKey(Long.valueOf(solModificacionItem.getIdSolicitud()));
+
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / cenSolicitudmodificacioncvExtendsMapper.selectByPrimaryKey() -> Salida a cenSolicitudmodificacioncvExtendsMapper para obtener los datos curriculares de la solicitud");
+
+				// Tratamiento necesario para obtener la categoría curricular
+
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / cenTiposcvExtendsMapper.selectByPrimaryKey() -> Entrada a cenTiposcvExtendsMapper para obtener el campo descripcion de la categoría curricular");
+
+				CenTiposcv cenTiposcv = cenTiposcvExtendsMapper
+						.selectByPrimaryKey(cenSolicitudmodificacioncv.getIdtipocv());
+
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / cenTiposcvExtendsMapper.selectByPrimaryKey() -> Salida a cenTiposcvExtendsMapper para obtener el campo descripcion de la categoría curricular");
+
+				GenRecursosCatalogosKey genRecursosCatalogosKey = new GenRecursosCatalogosKey();
+				genRecursosCatalogosKey.setIdrecurso(cenTiposcv.getDescripcion());
+				genRecursosCatalogosKey.setIdlenguaje(usuario.getIdlenguaje());
+
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Entrada a genRecursosCatalogosExtendsMapper para obtener la descripcion de la categoría curricular");
+				GenRecursosCatalogos genRecursosCatalogos = genRecursosCatalogosExtendsMapper
+						.selectByPrimaryKey(genRecursosCatalogosKey);
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Salida a genRecursosCatalogosExtendsMapper para obtener la descripcion de la categoría curricular");
+
+				solModifDatosCurricularesItem.setCategoriaCurricular(genRecursosCatalogos.getDescripcion());
+
+				// Rellenamos el resto de datos que podemos rellenar con lo obtenido en la
+				// consulta de cenSolicitudmodificacioncv
+				solModifDatosCurricularesItem.setDescripcion(cenSolicitudmodificacioncv.getDescripcion());
+				solModifDatosCurricularesItem
+						.setFechaDesde(formatter.format(cenSolicitudmodificacioncv.getFechainicio()));
+				solModifDatosCurricularesItem.setFechaHasta(formatter.format(cenSolicitudmodificacioncv.getFechafin()));
+
+				// Tratamiento necesario para obtener el tipo curricular
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey() -> Entrada a cenTiposcvExtendsMapper para obtener el campo descripcion del tipo curricular");
+
+				CenTiposcvsubtipo1Key cenTiposcvsubtipo1Key = new CenTiposcvsubtipo1Key();
+				cenTiposcvsubtipo1Key.setIdinstitucion(idInstitucion);
+				cenTiposcvsubtipo1Key.setIdtipocv(cenSolicitudmodificacioncv.getIdtipocv());
+				cenTiposcvsubtipo1Key.setIdtipocvsubtipo1(cenSolicitudmodificacioncv.getIdtipocvsubtipo1());
+
+				CenTiposcvsubtipo1 cenTiposcvsubtipo1 = cenTiposCVSubtipo1ExtendsMapper
+						.selectByPrimaryKey(cenTiposcvsubtipo1Key);
+
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey() -> Salida a cenTiposcvExtendsMapper para obtener el campo descripcion del tipo curricular");
+
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Entrada a genRecursosCatalogosExtendsMapper para obtener la descripcion del tipo curricular");
+				GenRecursosCatalogosKey genRecursosCatalogosKeyTC = new GenRecursosCatalogosKey();
+				genRecursosCatalogosKeyTC.setIdrecurso(cenTiposcvsubtipo1.getDescripcion());
+				genRecursosCatalogosKeyTC.setIdlenguaje(usuario.getIdlenguaje());
+
+				GenRecursosCatalogos genRecursosCatalogosTC = genRecursosCatalogosExtendsMapper
+						.selectByPrimaryKey(genRecursosCatalogosKeyTC);
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Salida a genRecursosCatalogosExtendsMapper para obtener la descripcion del tipo curricular");
+
+				solModifDatosCurricularesItem.setTipoCurricular(genRecursosCatalogosTC.getDescripcion());
+
+				// Tratamiento necesario para obtener el subtipo curricular
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey() -> Entrada a cenTiposcvExtendsMapper para obtener el campo descripcion del subtipo curricular");
+
+				CenTiposcvsubtipo2Key cenTiposcvsubtipo2Key = new CenTiposcvsubtipo2Key();
+				cenTiposcvsubtipo2Key.setIdinstitucion(idInstitucion);
+				cenTiposcvsubtipo2Key.setIdtipocv(cenSolicitudmodificacioncv.getIdtipocv());
+				cenTiposcvsubtipo2Key.setIdtipocvsubtipo2(cenSolicitudmodificacioncv.getIdtipocvsubtipo1());
+
+				CenTiposcvsubtipo2 cenTiposcvsubtipo2 = cenTiposCVSubtipo2ExtendsMapper
+						.selectByPrimaryKey(cenTiposcvsubtipo2Key);
+
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey() -> Salida a cenTiposcvExtendsMapper para obtener el campo descripcion del subtipo curricular");
+
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Entrada a genRecursosCatalogosExtendsMapper para obtener la descripcion del subtipo curricular");
+				GenRecursosCatalogosKey genRecursosCatalogosKeySubt = new GenRecursosCatalogosKey();
+				genRecursosCatalogosKeySubt.setIdrecurso(cenTiposcvsubtipo2.getDescripcion());
+				genRecursosCatalogosKeySubt.setIdlenguaje(usuario.getIdlenguaje());
+
+				GenRecursosCatalogos genRecursosCatalogosSubt = genRecursosCatalogosExtendsMapper
+						.selectByPrimaryKey(genRecursosCatalogosKeySubt);
+				LOGGER.info(
+						"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Salida a genRecursosCatalogosExtendsMapper para obtener la descripcion del subtipo curricular");
+
+				solModifDatosCurricularesItem.setSubtiposCurriculares(genRecursosCatalogosSubt.getDescripcion());
+			}
+		}
+
+		LOGGER.info(
+				"searchSolModifDatosCurricularesDetail() -> Salida del servicio para recuperar los datos de la solicitud de datos curriculares");
+
+		return solModifDatosCurricularesItem;
 	}
 
 }

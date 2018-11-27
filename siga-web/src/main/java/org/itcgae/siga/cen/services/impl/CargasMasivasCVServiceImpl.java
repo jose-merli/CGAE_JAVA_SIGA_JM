@@ -417,7 +417,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 		SubtiposCVItem subtipoCV1Vo = null;
 		SubtiposCVItem subtipoCV2Vo = null;
 
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
 		Short idInstitucion = usuario.getIdinstitucion();
 		String idLenguaje = usuario.getIdlenguaje();

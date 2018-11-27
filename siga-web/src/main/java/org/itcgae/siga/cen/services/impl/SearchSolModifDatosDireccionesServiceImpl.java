@@ -72,7 +72,7 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 	}
 
 	@Override
-	public UpdateResponseDTO processSolModifDatosDirecciones(int numPagina, SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO processSolModifDatosDirecciones(SolModificacionItem solModificacionItem,
 			HttpServletRequest request) {
 		LOGGER.info(
 				"processSolModifDatosDirecciones() -> Entrada al servicio para actualizar el estado de la solicitud a REALIZADO");
@@ -98,7 +98,7 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 	}
 
 	@Override
-	public UpdateResponseDTO denySolModifDatosDirecciones(int numPagina, SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO denySolModifDatosDirecciones(SolModificacionItem solModificacionItem,
 			HttpServletRequest request) {
 		LOGGER.info(
 				"denySolModifDatosDirecciones() -> Entrada al servicio para actualizar el estado de la solicitud a DENEGADO");

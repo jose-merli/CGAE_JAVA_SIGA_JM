@@ -1,20 +1,12 @@
 package org.itcgae.siga.DTOs.cen;
 
-import java.util.Date;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SoliModiDireccionesItem {
-	private String idSolicitud;
 	private String idDireccion;
 	private String idPersona;
-	private String motivo;
-	private String nombre;
-	private String fechaModificacion;
-	private String estado;
-	private String fechaAlta;
 	private String codigoPostal;
 	private String telefono;
 	private String domicilio;
@@ -26,19 +18,6 @@ public class SoliModiDireccionesItem {
 	private String provincia;
 	private String poblacion;
 	private String poblacionExtranjera;
-	
-	public SoliModiDireccionesItem idSolicitud(String idSolicitud){
-		this.idSolicitud = idSolicitud;
-		return this;
-	}
-	
-	@JsonProperty("idSolicitud")
-	public String getIdSolicitud() {
-		return idSolicitud;
-	}
-	public void setIdSolicitud(String idSolicitud) {
-		this.idSolicitud = idSolicitud;
-	}
 	
 	public SoliModiDireccionesItem idDireccion(String idDireccion){
 		this.idDireccion = idDireccion;
@@ -64,71 +43,6 @@ public class SoliModiDireccionesItem {
 	}
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
-	}
-	
-	public SoliModiDireccionesItem motivo(String motivo){
-		this.motivo = motivo;
-		return this;
-	}
-	
-	@JsonProperty("motivo")
-	public String getMotivo() {
-		return motivo;
-	}
-	public void setMotivo(String motivo) {
-		this.motivo = motivo;
-	}
-	
-	public SoliModiDireccionesItem nombre(String nombre){
-		this.nombre = nombre;
-		return this;
-	}
-	
-	@JsonProperty("nombre")
-	public String getNombre() {
-		return nombre;
-	}
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-	
-	public SoliModiDireccionesItem fechaModificacion(String fechaModificacion){
-		this.fechaModificacion = fechaModificacion;
-		return this;
-	}
-	
-	@JsonProperty("fechaModificacion")
-	public String getFechaModificacion() {
-		return fechaModificacion;
-	}
-	public void setFechaModificacion(String fechaModificacion) {
-		this.fechaModificacion = fechaModificacion;
-	}
-	
-	public SoliModiDireccionesItem estado(String estado){
-		this.estado = estado;
-		return this;
-	}
-	
-	@JsonProperty("estado")
-	public String getEstado() {
-		return estado;
-	}
-	public void setEstado(String estado) {
-		this.estado = estado;
-	}
-	
-	public SoliModiDireccionesItem fechaAlta(String fechaAlta){
-		this.fechaAlta = fechaAlta;
-		return this;
-	}
-	
-	@JsonProperty("fechaAlta")
-	public String getFechaAlta() {
-		return fechaAlta;
-	}
-	public void setFechaAlta(String fechaAlta) {
-		this.fechaAlta = fechaAlta;
 	}
 	
 	public SoliModiDireccionesItem codigoPostal(String codigoPostal){
@@ -276,9 +190,7 @@ public class SoliModiDireccionesItem {
 	
 	@Override
 	public String toString() {
-		return "SoliModiDireccionesItem [idSolicitud=" + idSolicitud + ", idDireccion=" + idDireccion + ", idPersona=" + idPersona + ", motivo=" + motivo + ", nombre=" + nombre
-				+ ", fechaModificacion=" + fechaModificacion + ", estado=" + estado + ", fechaAlta=" + fechaAlta
-				+ ", codigoPostal=" + codigoPostal + ", telefono=" + telefono
+		return "SoliModiDireccionesItem [idDireccion=" + idDireccion + ", idPersona=" + idPersona + ", codigoPostal=" + codigoPostal + ", telefono=" + telefono
 				+ ", domicilio=" + domicilio + ", movil=" + movil + ", fax=" + fax + ", correoElectronico="
 				+ correoElectronico + ", paginaWeb=" + paginaWeb + ", pais=" + pais + ", provincia=" + provincia
 				+ ", poblacion=" + poblacion + ", poblacionExtranjera=" + poblacionExtranjera + "]";
@@ -286,7 +198,7 @@ public class SoliModiDireccionesItem {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(idSolicitud, idDireccion, idPersona, motivo, nombre, fechaModificacion, estado, fechaAlta, codigoPostal, telefono, domicilio,
+		return Objects.hash(idDireccion, idPersona, codigoPostal, telefono, domicilio,
 			movil, fax, correoElectronico, paginaWeb, pais, provincia, poblacion, poblacionExtranjera);
 	}
 	
