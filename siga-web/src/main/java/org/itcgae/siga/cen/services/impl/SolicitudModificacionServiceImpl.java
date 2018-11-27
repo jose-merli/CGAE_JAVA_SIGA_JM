@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ISolicitudModificacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -20,16 +21,14 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicitudesmodificacion;
-import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadoSolicitudModifExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenSolicitudesModificacionExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicitudesmodificacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposModificacionesExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
 
 @Service
 public class SolicitudModificacionServiceImpl implements ISolicitudModificacionService {
@@ -46,7 +45,7 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 	private CenEstadoSolicitudModifExtendsMapper cenEstadoSolicitudModifExtendsMapper;
 
 	@Autowired
-	private CenSolicitudesModificacionExtendsMapper cenSolicitudesModificacionExtendsMapper;
+	private CenSolicitudesmodificacionExtendsMapper cenSolicitudesModificacionExtendsMapper;
 
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;

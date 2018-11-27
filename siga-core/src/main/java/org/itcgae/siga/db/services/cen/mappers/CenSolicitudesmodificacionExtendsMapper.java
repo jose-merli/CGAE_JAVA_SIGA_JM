@@ -18,14 +18,6 @@ import org.springframework.stereotype.Service;
 @Service
 @Primary
 public interface CenSolicitudesmodificacionExtendsMapper extends CenSolicitudesmodificacionMapper{
-	
-
-	    
-	    @SelectProvider(type = CenSolicitudesmodificacionSqlExtendsProvider.class, method = "getMaxIdSolicitud")
-	    @Results({ @Result(column = "IDSOLICITUD", property = "newId", jdbcType = JdbcType.VARCHAR)
-	    
-	    })
-	    NewIdDTO getMaxIdSolicitud(String idInstitucion, String idPersona);
 
 	@SelectProvider(type = CenSolicitudesmodificacionSqlExtendsProvider.class, method = "searchSolModif")
 	@Results({ @Result(column = "ESPECIFICA", property = "especifica", jdbcType = JdbcType.VARCHAR),
