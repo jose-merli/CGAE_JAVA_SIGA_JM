@@ -15,7 +15,7 @@ public class SolModificacionItem {
 	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaAlta;
 	private String estado;
-	private String idTipoModificacion;
+	private String idTipoModificacion; 
 	private String nombre;
 	private String tipoModificacion;
 	private String numColegiado;
@@ -79,7 +79,7 @@ public class SolModificacionItem {
 
 	@JsonProperty("idTipoModificacion")
 	public String getIdTipoModificacion() {
-		return idSolicitud;
+		return idTipoModificacion;
 	}
 
 	public void setIdTipoModificacion(String idTipoModificacion) {

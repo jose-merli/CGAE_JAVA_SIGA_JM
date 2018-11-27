@@ -31,16 +31,16 @@ public class SearchSolModifDatosBancariosController {
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/processSolModifDatosBancarios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> processSolModifDatosBancarios(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = searchSolModifDatosBancariosService.processSolModifDatosBancarios(numPagina, solModificacionItem, request);
+	ResponseEntity<UpdateResponseDTO> processSolModifDatosBancarios(@RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = searchSolModifDatosBancariosService.processSolModifDatosBancarios(solModificacionItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/denySolModifDatosBancarios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> denySolModifDatosBancarios(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = searchSolModifDatosBancariosService.denySolModifDatosBancarios(numPagina, solModificacionItem, request);
+	ResponseEntity<UpdateResponseDTO> denySolModifDatosBancarios(@RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = searchSolModifDatosBancariosService.denySolModifDatosBancarios(solModificacionItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);

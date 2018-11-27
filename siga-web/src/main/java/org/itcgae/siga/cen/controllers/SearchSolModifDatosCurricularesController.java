@@ -32,16 +32,16 @@ public class SearchSolModifDatosCurricularesController {
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/processSolModifDatosCurriculares", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> processSolModifDatosCurriculares(@RequestParam("numPagina") int numPagina, @RequestBody SolModifDatosCurricularesItem solModifDatosCurricularesItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = searchSolModifDatosCurricularesService.processSolModifDatosCurriculares(numPagina, solModifDatosCurricularesItem, request);
+	ResponseEntity<UpdateResponseDTO> processSolModifDatosCurriculares(@RequestBody SolModifDatosCurricularesItem solModifDatosCurricularesItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = searchSolModifDatosCurricularesService.processSolModifDatosCurriculares(solModifDatosCurricularesItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/denySolModifDatosCurriculares", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> denySolModifDatosCurriculares(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = searchSolModifDatosCurricularesService.denySolModifDatosCurriculares(numPagina, solModificacionItem, request);
+	ResponseEntity<UpdateResponseDTO> denySolModifDatosCurriculares(@RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = searchSolModifDatosCurricularesService.denySolModifDatosCurriculares(solModificacionItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);

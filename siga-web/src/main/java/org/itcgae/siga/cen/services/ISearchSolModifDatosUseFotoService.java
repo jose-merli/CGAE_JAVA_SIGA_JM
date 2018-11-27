@@ -12,10 +12,10 @@ public interface ISearchSolModifDatosUseFotoService {
 	SolModificacionDTO searchSolModifDatosUseFoto(int numPagina,
 			SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, HttpServletRequest request);
 
-	UpdateResponseDTO processSolModifDatosUseFoto(int numPagina, SolModificacionItem solModificacionItem,
+	UpdateResponseDTO processSolModifDatosUseFoto(SolModificacionItem solModificacionItem,
 			HttpServletRequest request);
 	
-	UpdateResponseDTO denySolModifDatosUseFoto(int numPagina, SolModificacionItem solModificacionItem,
+	UpdateResponseDTO denySolModifDatosUseFoto(SolModificacionItem solModificacionItem,
 			HttpServletRequest request);
 	
 }

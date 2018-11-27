@@ -3,6 +3,7 @@ package org.itcgae.siga.cen.services.impl;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionDTO;
@@ -13,8 +14,6 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicos;
-import org.itcgae.siga.db.entities.CenSolmodifacturacionservicio;
-import org.itcgae.siga.db.mappers.CenSolicitudesmodificacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitmodifdatosbasicosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -71,7 +70,7 @@ public class SearchSolModifDatosGeneralesServiceImpl implements ISearchSolModifD
 	}
 
 	@Override
-	public UpdateResponseDTO processSolModifDatosGenerales(int numPagina, SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO processSolModifDatosGenerales(SolModificacionItem solModificacionItem,
 			HttpServletRequest request) {
 		LOGGER.info(
 				"processSolModifDatosGenerales() -> Entrada al servicio para actualizar el estado de la solicitud a REALIZADO");
@@ -97,7 +96,7 @@ public class SearchSolModifDatosGeneralesServiceImpl implements ISearchSolModifD
 	}
 
 	@Override
-	public UpdateResponseDTO denySolModifDatosGenerales(int numPagina, SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO denySolModifDatosGenerales(SolModificacionItem solModificacionItem,
 			HttpServletRequest request) {
 		LOGGER.info(
 				"denySolModifDatosGenerales() -> Entrada al servicio para actualizar el estado de la solicitud a DENEGADO");

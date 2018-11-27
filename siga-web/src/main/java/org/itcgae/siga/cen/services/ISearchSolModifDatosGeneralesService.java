@@ -11,10 +11,10 @@ public interface ISearchSolModifDatosGeneralesService {
 
 	SolModificacionDTO searchSolModifDatosGenerales(int numPagina, SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, HttpServletRequest request);
 
-	UpdateResponseDTO processSolModifDatosGenerales(int numPagina, SolModificacionItem solModificacionItem,
+	UpdateResponseDTO processSolModifDatosGenerales(SolModificacionItem solModificacionItem,
 			HttpServletRequest request);
 
-	UpdateResponseDTO denySolModifDatosGenerales(int numPagina, SolModificacionItem solModificacionItem,
+	UpdateResponseDTO denySolModifDatosGenerales(SolModificacionItem solModificacionItem,
 			HttpServletRequest request); 
 
 }

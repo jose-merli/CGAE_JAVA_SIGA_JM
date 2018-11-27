@@ -71,7 +71,7 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 	}
 
 	@Override
-	public UpdateResponseDTO processSolModifDatosUseFoto(int numPagina, SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO processSolModifDatosUseFoto(SolModificacionItem solModificacionItem,
 			HttpServletRequest request) {
 		LOGGER.info(
 				"processSolModifDatosUseFoto() -> Entrada al servicio para actualizar el estado de la solicitud a REALIZADO");
@@ -81,11 +81,11 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 		CenSolicmodifexportarfoto record = new CenSolicmodifexportarfoto();
 		record.setIdsolicitud(Short.valueOf(solModificacionItem.getIdSolicitud()));
 		record.setIdestadosolic((short) 20);
-		int response = cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKey(record);
+		int response = cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKeySelective(record);
 		
 		if (response == 0) {
 			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn("processSolModifDatosUseFoto() / cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKey() -> "
+			LOGGER.warn("processSolModifDatosUseFoto() / cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKeySelective() -> "
 					+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
 		} 
@@ -97,7 +97,7 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 	}
 
 	@Override
-	public UpdateResponseDTO denySolModifDatosUseFoto(int numPagina, SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO denySolModifDatosUseFoto(SolModificacionItem solModificacionItem,
 			HttpServletRequest request) {
 		LOGGER.info(
 				"denySolModifDatosUseFoto() -> Entrada al servicio para actualizar el estado de la solicitud a DENEGADO");
@@ -107,11 +107,11 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 		CenSolicmodifexportarfoto record = new CenSolicmodifexportarfoto();
 		record.setIdsolicitud(Short.valueOf(solModificacionItem.getIdSolicitud()));
 		record.setIdestadosolic((short) 30);
-		int response = cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKey(record);
+		int response = cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKeySelective(record);
 		
 		if (response == 0) {
 			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn("denySolModifDatosUseFoto() / cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKey() -> "
+			LOGGER.warn("denySolModifDatosUseFoto() / cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKeySelective() -> "
 					+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
 		} 

@@ -82,11 +82,11 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 		CenSolimodidirecciones record = new CenSolimodidirecciones();
 		record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
 		record.setIdestadosolic((short) 20);
-		int response = cenSoliModiDireccionesExtendsMapper.updateByPrimaryKey(record);
+		int response = cenSoliModiDireccionesExtendsMapper.updateByPrimaryKeySelective(record);
 		
 		if (response == 0) {
 			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn("processSolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.updateByPrimaryKey() -> "
+			LOGGER.warn("processSolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.updateByPrimaryKeySelective() -> "
 					+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
 		} 
@@ -108,11 +108,11 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 		CenSolimodidirecciones record = new CenSolimodidirecciones();
 		record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
 		record.setIdestadosolic((short) 30);
-		int response = cenSoliModiDireccionesExtendsMapper.updateByPrimaryKey(record);
+		int response = cenSoliModiDireccionesExtendsMapper.updateByPrimaryKeySelective(record);
 		
 		if (response == 0) {
 			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn("denySolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.updateByPrimaryKey() -> "
+			LOGGER.warn("denySolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.updateByPrimaryKeySelective() -> "
 					+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
 		} 

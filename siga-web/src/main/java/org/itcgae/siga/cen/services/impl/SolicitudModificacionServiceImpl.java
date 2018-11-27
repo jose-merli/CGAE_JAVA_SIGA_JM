@@ -18,10 +18,13 @@ import org.itcgae.siga.cen.services.ISolicitudModificacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicitudesmodificacion;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadoSolicitudModifExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudesmodificacionExtendsMapper;
@@ -46,6 +49,9 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 
 	@Autowired
 	private CenSolicitudesmodificacionExtendsMapper  cenSolicitudesModificacionExtendsMapper;
+	
+	@Autowired
+	private CenClienteExtendsMapper cenClienteExtendsMapper;
 
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
@@ -277,8 +283,41 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 				record.setIdtipomodificacion(Short.valueOf(solModificacionItem.getIdTipoModificacion()));
 				record.setUsumodificacion(usuario.getIdusuario());
 				
-				int response = cenSolicitudesModificacionExtendsMapper.insertSelective(record);
+				// Antes de insertar comprobamos si el usuario existe en cen_cliente
+				CenClienteKey cenClienteKey = new CenClienteKey();
+				cenClienteKey.setIdinstitucion(idInstitucion);
+				cenClienteKey.setIdpersona(Long.valueOf(cenPersona.get(0).getIdpersona()));
+				CenCliente cenCliente = cenClienteExtendsMapper.selectByPrimaryKey(cenClienteKey);
 				
+				if(cenCliente == null) {
+					CenCliente cenClienteToInsert = new CenCliente();
+
+					cenClienteToInsert.setCaracter("P");
+					cenClienteToInsert.setComisiones(SigaConstants.DB_FALSE);
+					cenClienteToInsert.setExportarfoto(SigaConstants.DB_FALSE);
+					cenClienteToInsert.setFechaalta(new Date());
+					cenClienteToInsert.setFechamodificacion(new Date());
+					cenClienteToInsert.setGuiajudicial(SigaConstants.DB_FALSE);
+					cenClienteToInsert.setIdinstitucion(idInstitucion);
+					cenClienteToInsert.setIdlenguaje(usuario.getIdlenguaje());
+					cenClienteToInsert.setIdpersona(cenPersona.get(0).getIdpersona());
+					cenClienteToInsert.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE));
+					cenClienteToInsert.setLetrado("1");
+					cenClienteToInsert.setPublicidad(SigaConstants.DB_FALSE);
+					cenClienteToInsert.setUsumodificacion(usuario.getIdusuario());
+					
+					int clientInsert = cenClienteExtendsMapper.insertSelective(cenClienteToInsert);
+					
+					if(clientInsert == 0) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.warn(
+								"insertGeneralModificationRequest() / cenClienteExtendsMapper.insertSelective() -> "
+										+ insertResponseDTO.getStatus() + " .no se pudo crear el registro en CEN_CLIENTE");
+					}
+				}
+				
+				int response = cenSolicitudesModificacionExtendsMapper.insertSelective(record);
+
 				if(response == 0) {
 					insertResponseDTO.setStatus(SigaConstants.KO);
 					LOGGER.warn(

@@ -3,14 +3,14 @@ package org.itcgae.siga.cen.services;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
-import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.cen.SoliModifFotoItem;
 
 public interface ISolModifDatosUseFotoDetailService {
 
-	StringDTO searchDatosUseFotoDetail(int numPagina, SolModificacionItem solModificacionItem,
+	SoliModifFotoItem searchDatosUseFotoDetail(int numPagina, SolModificacionItem solModificacionItem,
 			HttpServletRequest request);
 
-	StringDTO searchSolModifDatosUseFotoDetail(int numPagina, SolModificacionItem solModificacionItem,
+	SoliModifFotoItem searchSolModifDatosUseFotoDetail(int numPagina, SolModificacionItem solModificacionItem,
 			HttpServletRequest request);
 
 }

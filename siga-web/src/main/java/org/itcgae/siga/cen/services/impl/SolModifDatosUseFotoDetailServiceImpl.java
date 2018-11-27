@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
-import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.cen.SoliModifFotoItem;
 import org.itcgae.siga.cen.services.ISolModifDatosUseFotoDetailService;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
@@ -27,12 +27,12 @@ public class SolModifDatosUseFotoDetailServiceImpl implements ISolModifDatosUseF
 	private CenSolicmodifexportarfotoExtendsMapper  cenSolicModifExportarFotoExtendsMapper;
 
 	@Override
-	public StringDTO searchDatosUseFotoDetail(int numPagina, SolModificacionItem solModificacionItem,
+	public SoliModifFotoItem searchDatosUseFotoDetail(int numPagina, SolModificacionItem solModificacionItem,
 			HttpServletRequest request) {
 
 		LOGGER.info("searchDatosUseFotoDetail() -> Entrada al servicio para obtener los datos de la foto");
 
-		StringDTO rdo = new StringDTO();
+		SoliModifFotoItem rdo = new SoliModifFotoItem();
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -50,7 +50,11 @@ public class SolModifDatosUseFotoDetailServiceImpl implements ISolModifDatosUseF
 
 		if (cenCliente != null) {
 
-			rdo.setValor(cenCliente.getExportarfoto());
+			if((cenCliente.getExportarfoto()).equals("1")) {
+				rdo.setExpFoto("Sí");
+			}else {
+				rdo.setExpFoto("No");
+			}
 		}
 
 		LOGGER.info("searchDatosUseFotoDetail() -> Salida al servicio para obtener los datos de la foto");
@@ -59,12 +63,12 @@ public class SolModifDatosUseFotoDetailServiceImpl implements ISolModifDatosUseF
 	}
 
 	@Override
-	public StringDTO searchSolModifDatosUseFotoDetail(int numPagina, SolModificacionItem solModificacionItem,
+	public SoliModifFotoItem searchSolModifDatosUseFotoDetail(int numPagina, SolModificacionItem solModificacionItem,
 			HttpServletRequest request) {
 
 		LOGGER.info("searchSolModifDatosUseFotoDetail() -> Entrada al servicio para obtener los datos de la foto");
 
-		StringDTO rdo = new StringDTO();
+		SoliModifFotoItem rdo = new SoliModifFotoItem();
 
 		LOGGER.info(
 				"searchSolModifDatosUseFotoDetail() / cenSolicModifExportarFotoExtendsMapper.selectByPrimaryKey() -> Entrada a cenClienteExtendsMapper para obtener parámetro exportar foto");
@@ -76,7 +80,12 @@ public class SolModifDatosUseFotoDetailServiceImpl implements ISolModifDatosUseF
 				"searchSolModifDatosUseFotoDetail() / cenSolicModifExportarFotoExtendsMapper.selectByPrimaryKey() -> Salida de cenClienteExtendsMapper para obtener parámetro exportar foto");
 
 		if (cenSolicmodifexportarfoto != null) {
-			rdo.setValor(cenSolicmodifexportarfoto.getExportarfoto());
+			rdo.setIdPersona(String.valueOf(cenSolicmodifexportarfoto.getIdpersona()));
+			if((cenSolicmodifexportarfoto.getExportarfoto()).equals("1")) {
+				rdo.setExpFoto("Sí");
+			}else {
+				rdo.setExpFoto("No");
+			}
 		}
 
 		LOGGER.info("searchSolModifDatosUseFotoDetail() -> Salida al servicio para obtener los datos de la foto");

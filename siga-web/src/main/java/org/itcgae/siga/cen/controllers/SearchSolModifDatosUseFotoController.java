@@ -31,16 +31,16 @@ public class SearchSolModifDatosUseFotoController {
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/processSolModifDatosUseFoto", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> processSolModifDatosUseFoto(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = searchSolModifDatosUseFotoService.processSolModifDatosUseFoto(numPagina, solModificacionItem, request);
+	ResponseEntity<UpdateResponseDTO> processSolModifDatosUseFoto(@RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = searchSolModifDatosUseFotoService.processSolModifDatosUseFoto(solModificacionItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/denySolModifDatosUseFoto", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> denySolModifDatosUseFoto(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = searchSolModifDatosUseFotoService.denySolModifDatosUseFoto(numPagina, solModificacionItem, request);
+	ResponseEntity<UpdateResponseDTO> denySolModifDatosUseFoto(@RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = searchSolModifDatosUseFotoService.denySolModifDatosUseFoto(solModificacionItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);

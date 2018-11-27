@@ -1,7 +1,7 @@
 package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
-import org.itcgae.siga.DTOs.cen.SolModifDatosCurricularesDTO;
+
 import org.itcgae.siga.DTOs.cen.SolModifDatosCurricularesItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.cen.services.ISolModifDatosCurricularesDetailService;
@@ -22,9 +22,9 @@ public class SolModifDatosCurricularesDetailController {
 	private ISolModifDatosCurricularesDetailService solModifDatosCurricularesDetailService;
 	
 	@RequestMapping(value = "solicitudModificacion/searchDatosCurricularesDetail", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<SolModifDatosCurricularesDTO> searchDatosCurricularesDetail(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		SolModifDatosCurricularesDTO response = solModifDatosCurricularesDetailService.searchDatosCurricularesDetail(numPagina, solModificacionItem, request);
-		return new ResponseEntity<SolModifDatosCurricularesDTO>(response, HttpStatus.OK);
+	ResponseEntity<SolModifDatosCurricularesItem> searchDatosCurricularesDetail(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		SolModifDatosCurricularesItem response = solModifDatosCurricularesDetailService.searchDatosCurricularesDetail(numPagina, solModificacionItem, request);
+		return new ResponseEntity<SolModifDatosCurricularesItem>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/searchSolModifDatosCurricularesDetail", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

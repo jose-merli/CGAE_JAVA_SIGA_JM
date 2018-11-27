@@ -7,7 +7,7 @@ import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 
 public interface ISolModifDatosCurricularesDetailService {
 
-	SolModifDatosCurricularesDTO searchDatosCurricularesDetail(int numPagina, SolModificacionItem solModificacionItem,
+	SolModifDatosCurricularesItem searchDatosCurricularesDetail(int numPagina, SolModificacionItem solModificacionItem,
 			HttpServletRequest request);
 
 	SolModifDatosCurricularesItem searchSolModifDatosCurricularesDetail(int numPagina,

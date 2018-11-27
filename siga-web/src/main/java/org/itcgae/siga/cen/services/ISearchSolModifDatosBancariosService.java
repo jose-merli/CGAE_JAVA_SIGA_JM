@@ -10,10 +10,10 @@ public interface ISearchSolModifDatosBancariosService {
 
 	SolModificacionDTO searchSolModifDatosBancarios(int numPagina, SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, HttpServletRequest request);
 
-	UpdateResponseDTO processSolModifDatosBancarios(int numPagina,
+	UpdateResponseDTO processSolModifDatosBancarios(
 			SolModificacionItem solModificacionItem, HttpServletRequest request);
 
-	UpdateResponseDTO denySolModifDatosBancarios(int numPagina, SolModificacionItem solModificacionItem,
+	UpdateResponseDTO denySolModifDatosBancarios(SolModificacionItem solModificacionItem,
 			HttpServletRequest request); 
 
 }

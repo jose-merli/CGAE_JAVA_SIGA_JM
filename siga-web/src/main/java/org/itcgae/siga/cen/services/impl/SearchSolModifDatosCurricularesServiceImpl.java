@@ -80,7 +80,7 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 	}
 
 	@Override
-	public UpdateResponseDTO processSolModifDatosCurriculares(int numPagina, SolModifDatosCurricularesItem solModifDatosCurricularesItem,
+	public UpdateResponseDTO processSolModifDatosCurriculares(SolModifDatosCurricularesItem solModifDatosCurricularesItem,
 			HttpServletRequest request) {
 		
 		AdmUsuarios usuario = new AdmUsuarios();
@@ -249,7 +249,7 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 	}
 
 	@Override
-	public UpdateResponseDTO denySolModifDatosCurriculares(int numPagina, SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO denySolModifDatosCurriculares(SolModificacionItem solModificacionItem,
 			HttpServletRequest request) {
 		LOGGER.info(
 				"denySolModifDatosCurriculares() -> Entrada al servicio para actualizar el estado de la solicitud a DENEGADO");

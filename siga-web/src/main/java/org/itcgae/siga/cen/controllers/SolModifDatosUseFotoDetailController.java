@@ -2,11 +2,8 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.cen.SolModifDatosCurricularesDTO;
-import org.itcgae.siga.DTOs.cen.SolModifDatosCurricularesItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
-import org.itcgae.siga.DTOs.cen.StringDTO;
-import org.itcgae.siga.cen.services.ISolModifDatosCurricularesDetailService;
+import org.itcgae.siga.DTOs.cen.SoliModifFotoItem;
 import org.itcgae.siga.cen.services.ISolModifDatosUseFotoDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,14 +22,14 @@ public class SolModifDatosUseFotoDetailController {
 	private ISolModifDatosUseFotoDetailService solModifDatosUseFotoDetailService;
 	
 	@RequestMapping(value = "solicitudModificacion/searchDatosUseFotoDetail", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<StringDTO> searchDatosUseFotoDetail(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		StringDTO response = solModifDatosUseFotoDetailService.searchDatosUseFotoDetail(numPagina, solModificacionItem, request);
-		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+	ResponseEntity<SoliModifFotoItem> searchDatosUseFotoDetail(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		SoliModifFotoItem response = solModifDatosUseFotoDetailService.searchDatosUseFotoDetail(numPagina, solModificacionItem, request);
+		return new ResponseEntity<SoliModifFotoItem>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/searchSolModifDatosUseFotoDetail", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<StringDTO> searchSolModifDatosUseFotoDetail(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		StringDTO response = solModifDatosUseFotoDetailService.searchSolModifDatosUseFotoDetail(numPagina, solModificacionItem, request);
-		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+	ResponseEntity<SoliModifFotoItem> searchSolModifDatosUseFotoDetail(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		SoliModifFotoItem response = solModifDatosUseFotoDetailService.searchSolModifDatosUseFotoDetail(numPagina, solModificacionItem, request);
+		return new ResponseEntity<SoliModifFotoItem>(response, HttpStatus.OK);
 	}
 }

@@ -12,10 +12,10 @@ public interface ISearchSolModifDatosCurricularesService {
 
 	SolModificacionDTO searchSolModifDatosCurriculares(int numPagina, SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, HttpServletRequest request);
 
-	UpdateResponseDTO denySolModifDatosCurriculares(int numPagina, SolModificacionItem solModificacionItem,
+	UpdateResponseDTO denySolModifDatosCurriculares(SolModificacionItem solModificacionItem,
 			HttpServletRequest request);
 
-	UpdateResponseDTO processSolModifDatosCurriculares(int numPagina,
+	UpdateResponseDTO processSolModifDatosCurriculares(
 			SolModifDatosCurricularesItem solModifDatosCurricularesItem, HttpServletRequest request); 
 
 }
