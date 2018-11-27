@@ -3,6 +3,7 @@ package org.itcgae.siga.cen.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.SolModifDatosCurricularesItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
@@ -31,8 +32,8 @@ public class SearchSolModifDatosCurricularesController {
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/processSolModifDatosCurriculares", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> processSolModifDatosCurriculares(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = searchSolModifDatosCurricularesService.processSolModifDatosCurriculares(numPagina, solModificacionItem, request);
+	ResponseEntity<UpdateResponseDTO> processSolModifDatosCurriculares(@RequestParam("numPagina") int numPagina, @RequestBody SolModifDatosCurricularesItem solModifDatosCurricularesItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = searchSolModifDatosCurricularesService.processSolModifDatosCurriculares(numPagina, solModifDatosCurricularesItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);

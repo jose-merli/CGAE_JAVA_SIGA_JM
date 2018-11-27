@@ -57,8 +57,7 @@ public class TarjetaDatosGeneralesController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
-	
-	
+		
 	@RequestMapping(value = "busquedaPerJuridica/datosGeneralesSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<PersonaJuridicaDTO> searchGeneralData(@RequestParam("numPagina") int numPagina, @RequestBody PersonaJuridicaSearchDTO personaJuridicaSearchDTO, HttpServletRequest request) { 
 		PersonaJuridicaDTO response = tarjetaDatosGeneralesService.searchGeneralData(numPagina, personaJuridicaSearchDTO, request);

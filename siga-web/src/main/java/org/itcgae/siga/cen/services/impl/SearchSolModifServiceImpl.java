@@ -14,9 +14,8 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenSolicitudesmodificacion;
-import org.itcgae.siga.db.entities.CenSolmodifacturacionservicio;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenSolicitudesModificacionExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicitudesmodificacionExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,7 @@ public class SearchSolModifServiceImpl implements ISearchSolModifService{
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
 	@Autowired
-	private CenSolicitudesModificacionExtendsMapper cenSolicitudesModificacionExtendsMapper;
+	private CenSolicitudesmodificacionExtendsMapper cenSolicitudesModificacionExtendsMapper;
 	
 	@Override
 	public SolModificacionDTO searchSolModif(int numPagina,

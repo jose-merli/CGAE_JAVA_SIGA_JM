@@ -190,8 +190,6 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			LOGGER.info(
 					"updateDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Entrada a cenDireccionesExtendsMapper para actualizar un curriculum");
 			CenDatoscv recordUpdate = new CenDatoscv();
-			// recordUpdate.setFechabaja(new Date());
-			// recordUpdate.setFechafin(new Date());
 			recordUpdate.setFechamodificacion(new Date());
 			recordUpdate.setUsumodificacion(usuario.getIdusuario());
 			recordUpdate.setIdpersona(Long.parseLong(fichaDatosCurricularesItem.getIdPersona()));
@@ -336,8 +334,6 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			recordInsert.setFechamovimiento(fichaDatosCurricularesItem.getFechaMovimientoDate());
 			recordInsert.setDescripcion(fichaDatosCurricularesItem.getDescripcion());
 			recordInsert.setIdinstitucion(idInstitucion);
-			// recordInsert.setIdcv(Short.parseShort(fichaDatosCurricularesItem.getIdCv()));
-			// recordInsert.setIdpersona(Long.valueOf(fichaDatosCurricularesDTO[i].getIdPersona()));
 
 			NewIdDTO idCvBD = cenDatoscvExtendsMapper.getMaxIdCv(String.valueOf(idInstitucion),
 					fichaDatosCurricularesItem.getIdPersona());
@@ -462,15 +458,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			recordUpdate.setIdinstitucion(idInstitucion);
 			recordUpdate.setFechainicio(fichaDatosCurricularesItem.getFechaDesdeDate());
 			recordUpdate.setFechafin(fichaDatosCurricularesItem.getFechaHastaDate());
-
-			NewIdDTO idCvBD = cenDatoscvExtendsMapper.getMaxIdCv(String.valueOf(idInstitucion),
-					fichaDatosCurricularesItem.getIdPersona());
-			if (idCvBD == null) {
-				recordUpdate.setIdcv(Short.parseShort("1"));
-			} else {
-				int idCv = Integer.parseInt(idCvBD.getNewId());
-				recordUpdate.setIdcv(Short.parseShort("" + idCv));
-			}
+			recordUpdate.setIdcv(Short.parseShort(fichaDatosCurricularesItem.getIdCv()));
 						// recordUpdate.setIdpersona(Long.valueOf(fichaDatosCurricularesDTO[i].getIdPersona()));
 			
 
@@ -479,8 +467,8 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			if (idSolicitudBD == null) {
 				recordUpdate.setIdsolicitud(Long.parseLong("1"));
 			} else {
-				int idCv = Integer.parseInt(idSolicitudBD.getNewId()) + 1;
-				recordUpdate.setIdsolicitud(Long.parseLong("" + idCv));
+				int idSolic = Integer.parseInt(idSolicitudBD.getNewId()) + 1;
+				recordUpdate.setIdsolicitud(Long.parseLong("" + idSolic));
 			}
 			
 //			Esto informa la fecha baja de los demás datos curriculares cuando no está informada la del actual

@@ -1,7 +1,9 @@
 package org.itcgae.siga.cen.services.impl;
 
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionDTO;
@@ -13,7 +15,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenSolicmodicuentas;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenSolicModiCuentasExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicmodicuentasExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,7 @@ public class SearchSolModifDatosBancariosServiceImpl implements ISearchSolModifD
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
 	@Autowired
-	private CenSolicModiCuentasExtendsMapper cenSolicModiCuentasExtendsMapper;
+	private CenSolicmodicuentasExtendsMapper cenSolicModiCuentasExtendsMapper;
 	
 	@Override
 	public SolModificacionDTO searchSolModifDatosBancarios(int numPagina,
@@ -57,10 +59,8 @@ public class SearchSolModifDatosBancariosServiceImpl implements ISearchSolModifD
 						"searchSolModifDatosBancarios() / cenSolicModiCuentasExtendsMapper.searchSolModifDatosBancarios() -> Entrada a cenSoliModiDireccionesExtendsMapper para obtener los resultados de la búsqueda");
 				List<SolModificacionItem> solModificacionItems = cenSolicModiCuentasExtendsMapper.searchSolModifDatosBancarios(solicitudModificacionSearchDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion));
 				solModificacionDTO.setSolModificacionItems(solModificacionItems);
-
 			}
 		}
-
 		LOGGER.info(
 				"searchSolModifDatosBancarios() -> Salida del servicio para recuperar los datos de la búsqueda específica de datos bancarios");
 
