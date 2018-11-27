@@ -10,6 +10,8 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.SolModifDatosCurricularesItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
+import org.itcgae.siga.DTOs.cen.SoliModiDireccionesItem;
+import org.itcgae.siga.DTOs.cen.SolicitModifDatosBasicosDTO;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ISearchSolModifDatosCurricularesService;
@@ -19,6 +21,7 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.entities.CenDatoscvExample;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
+import org.itcgae.siga.db.entities.CenSolicitudmodificacioncvExample;
 import org.itcgae.siga.db.entities.CenSolicmodicuentas;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
@@ -104,42 +107,53 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 		LOGGER.info(
 				"processSolModifDatosCurriculares() -> Entrada al servicio para actualizar el estado de la solicitud a REALIZADO");
 		
-		if(solModifDatosCurricularesItem.getIdCv() != null) {
+		CenSolicitudmodificacioncv solicitud = new CenSolicitudmodificacioncv();
+		CenSolicitudmodificacioncvExample example = new CenSolicitudmodificacioncvExample();
+		
+		example.createCriteria().andIdpersonaEqualTo(Long.parseLong(solModifDatosCurricularesItem.getIdPersona()))
+		.andIdinstitucionEqualTo(idInstitucion).andFechafinIsNull().andIdsolicitudEqualTo(Long.parseLong(solModifDatosCurricularesItem.getIdSolicitud()));
+		
+		List<CenSolicitudmodificacioncv> lista = cenSolicitudmodificacioncvExtendsMapper.selectByExample(example);
+
+		solicitud = lista.get(0);
+		
+		
+		if(solicitud.getIdcv() != null) {
 			CenDatoscv recordUpdate = new CenDatoscv();
 			recordUpdate.setFechamodificacion(new Date());
 			recordUpdate.setUsumodificacion(usuario.getIdusuario());
-			recordUpdate.setIdpersona(Long.parseLong(solModifDatosCurricularesItem.getIdPersona()));
-			recordUpdate.setIdtipocv(Short.parseShort(solModifDatosCurricularesItem.getIdTipoCv()));
+			recordUpdate.setIdpersona(solicitud.getIdpersona());
+			recordUpdate.setIdtipocv(solicitud.getIdcv());
 
-			if ("" != solModifDatosCurricularesItem.getIdTipoCvSubtipo1()
-					&& null != solModifDatosCurricularesItem.getIdTipoCvSubtipo1()) {
-				recordUpdate.setIdtipocvsubtipo1(Short.parseShort(solModifDatosCurricularesItem.getIdTipoCvSubtipo1()));
+			if (solicitud.getIdtipocvsubtipo1().equals("")
+					&& null != solicitud.getIdtipocvsubtipo1()) {
+				recordUpdate.setIdtipocvsubtipo1(solicitud.getIdtipocvsubtipo1());
 			} else {
 				recordUpdate.setIdtipocvsubtipo1(null);
 			}
-			if ("" != solModifDatosCurricularesItem.getIdTipoCvSubtipo2()
-					&& null != solModifDatosCurricularesItem.getIdTipoCvSubtipo2()) {
-				recordUpdate.setIdtipocvsubtipo2(Short.parseShort(solModifDatosCurricularesItem.getIdTipoCvSubtipo2()));
+			if (solicitud.getIdtipocvsubtipo2().equals("")
+					&& null != solicitud.getIdtipocvsubtipo2()) {
+				recordUpdate.setIdtipocvsubtipo2(solicitud.getIdtipocvsubtipo2());
 			} else {
 				recordUpdate.setIdtipocvsubtipo2(null);
 			}
-			if (null != solModifDatosCurricularesItem.getDescripcion()
-					&& "" != solModifDatosCurricularesItem.getDescripcion()) {
-				recordUpdate.setDescripcion(solModifDatosCurricularesItem.getDescripcion());
+			if (null != solicitud.getDescripcion()
+					&& "" != solicitud.getDescripcion()) {
+				recordUpdate.setDescripcion(solicitud.getDescripcion());
 			}
 			recordUpdate.setIdinstitucion(idInstitucion);
 			recordUpdate.setFechamodificacion(new Date());
 			recordUpdate.setUsumodificacion(usuario.getIdusuario());
-			recordUpdate.setFechainicio(solModifDatosCurricularesItem.getDateFechaInicio());
-			recordUpdate.setFechafin(solModifDatosCurricularesItem.getDateFechaFin());
-			recordUpdate.setFechabaja(solModifDatosCurricularesItem.getDateFechaFin());
-			recordUpdate.setIdcv(Short.parseShort(solModifDatosCurricularesItem.getIdCv()));
+			recordUpdate.setFechainicio(solicitud.getFechainicio());
+			recordUpdate.setFechafin(solicitud.getFechafin());
+			recordUpdate.setFechabaja(solicitud.getFechafin());
+			recordUpdate.setIdcv((solicitud.getIdcv()));
 			
 			if(recordUpdate.getFechafin() == null) {
-				CenDatoscvExample example = new CenDatoscvExample();
-				Long idPers = Long.parseLong(solModifDatosCurricularesItem.getIdPersona());
-				example.createCriteria().andIdpersonaEqualTo(idPers).andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
-				List<CenDatoscv> datosCurricularesActivos = cenDatoscvExtendsMapper.selectByExample(example);
+				CenDatoscvExample example1 = new CenDatoscvExample();
+				Long idPers = solicitud.getIdpersona();
+				example.createCriteria().andIdpersonaEqualTo(idPers).andIdinstitucionEqualTo(idInstitucion).andFechafinIsNull();
+				List<CenDatoscv> datosCurricularesActivos = cenDatoscvExtendsMapper.selectByExample(example1);
 				
 				if(datosCurricularesActivos != null && datosCurricularesActivos.size() != 0) {
 					for(CenDatoscv dato: datosCurricularesActivos) {
@@ -162,30 +176,30 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 			CenDatoscv recordInsert = new CenDatoscv();
 			recordInsert.setFechamodificacion(new Date());
 			recordInsert.setUsumodificacion(usuario.getIdusuario());
-			recordInsert.setIdpersona(Long.parseLong(solModifDatosCurricularesItem.getIdPersona()));
-			recordInsert.setIdtipocv(Short.parseShort(solModifDatosCurricularesItem.getIdTipoCv()));
+			recordInsert.setIdpersona(solicitud.getIdpersona());
+			recordInsert.setIdtipocv(solicitud.getIdcv());
 
-			if ("" != solModifDatosCurricularesItem.getIdTipoCvSubtipo1()
-					&& null != solModifDatosCurricularesItem.getIdTipoCvSubtipo1()) {
-				recordInsert.setIdtipocvsubtipo1(Short.parseShort(solModifDatosCurricularesItem.getIdTipoCvSubtipo1()));
+			if (solicitud.getIdtipocvsubtipo1().equals("")
+					&& null != solicitud.getIdtipocvsubtipo1()) {
+				recordInsert.setIdtipocvsubtipo1(solicitud.getIdtipocvsubtipo1());
 			} else {
 				recordInsert.setIdtipocvsubtipo1(null);
 			}
-			if ("" != solModifDatosCurricularesItem.getIdTipoCvSubtipo2()
-					&& null != solModifDatosCurricularesItem.getIdTipoCvSubtipo2()) {
-				recordInsert.setIdtipocvsubtipo2(Short.parseShort(solModifDatosCurricularesItem.getIdTipoCvSubtipo2()));
+			if (solicitud.getIdtipocvsubtipo2().equals("")
+					&& null != solicitud.getIdtipocvsubtipo2()) {
+				recordInsert.setIdtipocvsubtipo2(solicitud.getIdtipocvsubtipo2());
 			} else {
 				recordInsert.setIdtipocvsubtipo2(null);
 			}
 
-			recordInsert.setFechainicio(solModifDatosCurricularesItem.getDateFechaInicio());
-			recordInsert.setFechafin(solModifDatosCurricularesItem.getDateFechaFin());
-			recordInsert.setFechabaja(solModifDatosCurricularesItem.getDateFechaFin());
-			recordInsert.setDescripcion(solModifDatosCurricularesItem.getDescripcion());
+			recordInsert.setFechainicio(solicitud.getFechainicio());
+			recordInsert.setFechafin(solicitud.getFechafin());
+			recordInsert.setFechabaja(solicitud.getFechafin());
+			recordInsert.setDescripcion(solicitud.getDescripcion());
 			recordInsert.setIdinstitucion(idInstitucion);
 
 			NewIdDTO idCvBD = cenDatoscvExtendsMapper.getMaxIdCv(String.valueOf(idInstitucion),
-					solModifDatosCurricularesItem.getIdPersona());
+					String.valueOf(solicitud.getIdpersona()));
 			if (idCvBD == null) {
 				recordInsert.setIdcv(Short.parseShort("1"));
 			} else {
@@ -194,10 +208,10 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 			}
 			
 			if(recordInsert.getFechafin() == null) {
-				CenDatoscvExample example = new CenDatoscvExample();
-				Long idPers = Long.parseLong(solModifDatosCurricularesItem.getIdPersona());
-				example.createCriteria().andIdpersonaEqualTo(idPers).andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
-				List<CenDatoscv> datosCurricularesActivos = cenDatoscvExtendsMapper.selectByExample(example);
+				CenDatoscvExample example2 = new CenDatoscvExample();
+				Long idPers = solicitud.getIdpersona();
+				example.createCriteria().andIdpersonaEqualTo(idPers).andIdinstitucionEqualTo(idInstitucion).andFechafinIsNull();
+				List<CenDatoscv> datosCurricularesActivos = cenDatoscvExtendsMapper.selectByExample(example2);
 				
 				if(datosCurricularesActivos != null && datosCurricularesActivos.size() != 0) {
 					for(CenDatoscv dato: datosCurricularesActivos) {
@@ -220,9 +234,9 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 		
 		if(responseSolicitud == 1) {
 			CenSolicitudmodificacioncv record = new CenSolicitudmodificacioncv();
-			record.setIdsolicitud(Long.valueOf(solModifDatosCurricularesItem.getIdSolicitud()));
+			record.setIdsolicitud(solicitud.getIdsolicitud());
 			record.setIdestadosolic((short) 20); 
-			int response = cenSolicitudmodificacioncvExtendsMapper.updateByPrimaryKey(record);
+			int response = cenSolicitudmodificacioncvExtendsMapper.updateByPrimaryKeySelective(record);
 			
 			if (response == 0) {
 				updateResponseDTO.setStatus(SigaConstants.KO);
@@ -259,7 +273,7 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 		CenSolicitudmodificacioncv record = new CenSolicitudmodificacioncv();
 		record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
 		record.setIdestadosolic((short) 30);
-		int response = cenSolicitudmodificacioncvExtendsMapper.updateByPrimaryKey(record);
+		int response = cenSolicitudmodificacioncvExtendsMapper.updateByPrimaryKeySelective(record);
 		
 		if (response == 0) {
 			updateResponseDTO.setStatus(SigaConstants.KO);
