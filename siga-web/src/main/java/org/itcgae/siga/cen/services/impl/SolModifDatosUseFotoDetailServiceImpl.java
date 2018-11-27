@@ -5,14 +5,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.ISolModifDatosUseFotoDetailService;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenSolicModifExportarFotoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicmodifexportarfotoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +24,7 @@ public class SolModifDatosUseFotoDetailServiceImpl implements ISolModifDatosUseF
 	private CenClienteExtendsMapper cenClienteExtendsMapper;
 
 	@Autowired
-	private CenSolicModifExportarFotoExtendsMapper cenSolicModifExportarFotoExtendsMapper;
+	private CenSolicmodifexportarfotoExtendsMapper  cenSolicModifExportarFotoExtendsMapper;
 
 	@Override
 	public StringDTO searchDatosUseFotoDetail(int numPagina, SolModificacionItem solModificacionItem,
