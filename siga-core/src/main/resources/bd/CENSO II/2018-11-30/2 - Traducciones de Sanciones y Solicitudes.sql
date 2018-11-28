@@ -12,7 +12,7 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.tipoSancion.literal','Tipo de Sanción','0','1',to_date('06/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.tipoSancion.literal','Tipo de Sanción#GL','0','4',to_date('06/11/18','DD/MM/RR'),'0','19');
-Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.tipoSancion.literal','Tipus d'Sanció#CA','0','2',to_date('06/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.tipoSancion.literal','Tipus d''Sanció#CA','0','2',to_date('06/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.tipoSancion.literal','Tipo de Sanción#EU','0','3',to_date('06/11/18','DD/MM/RR'),'0','19');
 
 
@@ -30,8 +30,7 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.sancionesRehabilitadas.literal','Sanciones Rehabilitadas','0','1',to_date('07/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.sancionesRehabilitadas.literal','Sanciones Rehabilitadas#GL','0','4',to_date('07/11/18','DD/MM/RR'),'0','19');
-Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.sancionesRehabilitadas.literal','
-Sancions Rehabilitades#CA','0','2',to_date('07/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.sancionesRehabilitadas.literal','Sancions Rehabilitades#CA','0','2',to_date('07/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.sancionesRehabilitadas.literal','Sanciones Rehabilitadas#EU','0','3',to_date('07/11/18','DD/MM/RR'),'0','19');
 
 
@@ -65,15 +64,13 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('messages.censo.existeCuenta','Ya existe una cuenta','0','1',to_date('09/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('messages.censo.existeCuenta','Ya existe una cuenta#GL','0','4',to_date('09/11/18','DD/MM/RR'),'0','19');
-Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('messages.censo.existeCuenta','
-Ja existeix un compte#CA','0','2',to_date('09/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('messages.censo.existeCuenta','Ja existeix un compte#CA','0','2',to_date('09/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('messages.censo.existeCuenta','Ya existe una cuenta#EU','0','3',to_date('09/11/18','DD/MM/RR'),'0','19');
 
 
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.firmeza.literal', 'Firmeza','0','1',to_date('07/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.firmeza.literal','Firmeza#GL','0','4',to_date('07/11/18','DD/MM/RR'),'0','19');
-Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.firmeza.literal','
-Fermesa#CA','0','2',to_date('07/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.firmeza.literal','Fermesa#CA','0','2',to_date('07/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.firmeza.literal','Firmeza#EU','0','3',to_date('07/11/18','DD/MM/RR'),'0','19');
 
 
@@ -159,4 +156,3 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.exportarFoto.literal','Exportar Foto#GL','0','4',to_date('27/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.exportarFoto.literal','Exportar Foto#CA','0','2',to_date('27/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.exportarFoto.literal','Exportar Foto#EU','0','3',to_date('27/11/18','DD/MM/RR'),'0','19');
-
