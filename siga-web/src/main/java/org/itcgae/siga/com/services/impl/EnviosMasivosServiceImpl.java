@@ -1,11 +1,14 @@
 package org.itcgae.siga.com.services.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.com.EnvioMasivoCancelarDto;
+import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
@@ -15,6 +18,18 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.EnvDestinatarios;
+import org.itcgae.siga.db.entities.EnvDestinatariosExample;
+import org.itcgae.siga.db.entities.EnvEnvioprogramado;
+import org.itcgae.siga.db.entities.EnvEnvioprogramadoKey;
+import org.itcgae.siga.db.entities.EnvEnvios;
+import org.itcgae.siga.db.entities.EnvEnviosKey;
+import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
+import org.itcgae.siga.db.entities.EnvHistoricoestadoenvioKey;
+import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
+import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
+import org.itcgae.siga.db.mappers.EnvEnviosMapper;
+import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
@@ -22,6 +37,7 @@ import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
@@ -40,6 +56,18 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	@Autowired
 	private EnvEnviosExtendsMapper _envEnviosExtendsMapper;
+	
+	@Autowired
+	private EnvEnviosMapper _envEnviosMapper;
+	
+	@Autowired
+	private EnvEnvioprogramadoMapper _envEnvioprogramadoMapper;
+	
+	@Autowired
+	private EnvHistoricoestadoenvioMapper _envHistoricoestadoenvioMapper;
+	
+	@Autowired
+	private EnvDestinatariosMapper _envDestinatariosMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -164,5 +192,175 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 		return enviosMasivos;
 	}
 
+	@Override
+	public Error programarEnvio(HttpServletRequest request, List<EnvioProgramadoDto> enviosProgramadosDto) {
+		
+		LOGGER.info("programarEnvio() -> Entrada al servicio para programar los envios");
+		
+		Error respuesta = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				
+				try{
+					
+					for(int i = 0; i <= enviosProgramadosDto.size();i++){
+						//Solo programamos los envios si tiene estado 1(nuevo) o 4(programado)
+						if(enviosProgramadosDto.get(i).getIdEstado().equals("1") || enviosProgramadosDto.get(i).getIdEstado().equals("4")){
+							int update = 0;
+							EnvEnvioprogramadoKey key = new EnvEnvioprogramadoKey();
+							key.setIdenvio(Long.parseLong(enviosProgramadosDto.get(i).getIdEnvio()));
+							key.setIdinstitucion(Short.parseShort(enviosProgramadosDto.get(i).getIdInstitucion()));
+							EnvEnvioprogramado envioProgramado = _envEnvioprogramadoMapper.selectByPrimaryKey(key);
+							envioProgramado.setFechaprogramada(enviosProgramadosDto.get(i).getFechaProgramada());
+							envioProgramado.setFechamodificacion(new Date());
+							envioProgramado.setUsumodificacion(usuario.getIdusuario());
+							update = _envEnvioprogramadoMapper.updateByPrimaryKey(envioProgramado);
+							if(update > 0){
+								EnvEnviosKey keyEnvio = new EnvEnviosKey();
+								keyEnvio.setIdenvio(Long.parseLong(enviosProgramadosDto.get(i).getIdEnvio()));
+								keyEnvio.setIdinstitucion(Short.parseShort(enviosProgramadosDto.get(i).getIdInstitucion()));
+								EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio);
+								envio.setFechaprogramada(enviosProgramadosDto.get(i).getFechaProgramada());
+								envio.setFechamodificacion(new Date());
+								envio.setUsumodificacion(usuario.getIdusuario());
+								_envEnviosMapper.updateByPrimaryKey(envio);
+							}
+						}
+						
+						
+					}
+					respuesta.setCode(200);
+					respuesta.setDescription("Envios Masivos programados correctamente");
+					respuesta.setMessage("Updates correcto");
+					
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error");
+				}
+				
+			}
+				
+		}
+		LOGGER.info("programarEnvio() -> Salida del servicio para programar los envios");
+		return respuesta;
+	}
+
+	@Override
+	public Error cancelarEnvios(HttpServletRequest request, List<EnvioProgramadoDto> envios) {
+		LOGGER.info("cancelarEnvios() -> Entrada al servicio para cancelar envios");
+		
+		Error respuesta = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					for(int i = 0; i <= envios.size();i++){
+						//Solo cancelamos los envios si tiene estado 1(nuevo) o 4(programado)
+						if(envios.get(i).getIdEstado().equals("1") || envios.get(i).getIdEstado().equals("4")){
+							int update = 0;
+							EnvEnviosKey keyEnvio = new EnvEnviosKey();
+							keyEnvio.setIdenvio(Long.parseLong(envios.get(i).getIdEnvio()));
+							keyEnvio.setIdinstitucion(Short.parseShort(envios.get(i).getIdInstitucion()));
+							EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio);
+							envio.setFechabaja(new Date());
+							//Le asignamos el estado 6(archivado)
+							Short idEstado = 6;
+							envio.setIdestado(idEstado);
+							update = _envEnviosMapper.updateByPrimaryKey(envio);
+							if(update > 0){
+								EnvHistoricoestadoenvioKey keyHistorico = new EnvHistoricoestadoenvioKey();
+								keyEnvio.setIdenvio(Long.parseLong(envios.get(i).getIdEnvio()));
+								keyEnvio.setIdinstitucion(Short.parseShort(envios.get(i).getIdInstitucion()));
+								EnvHistoricoestadoenvio historico = _envHistoricoestadoenvioMapper.selectByPrimaryKey(keyHistorico);
+								historico.setFechamodificacion(new Date());
+								historico.setFechaestado(new Date());
+								historico.setUsumodificacion(usuario.getIdusuario());
+								historico.setIdestado(idEstado);
+								_envHistoricoestadoenvioMapper.updateByPrimaryKey(historico);
+							}
+						}
+					}
+					respuesta.setCode(200);
+					respuesta.setDescription("Envios cancelados correctamente");
+					respuesta.setMessage("Updates correcto");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error");
+				}
+				
+				
+			}
+		}
+		LOGGER.info("programarEnvio() -> Salida del servicio para cancelar envios");
+		return respuesta;
+	}
+
+	@Override
+	public Error enviar(HttpServletRequest request, List<EnvioProgramadoDto> envios) {
+		
+		LOGGER.info("enviar() -> Entrada al servicio para enviar");
+		
+		Error respuesta = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					for(int i = 0; i <= envios.size();i++){
+						EnvDestinatariosExample example = new EnvDestinatariosExample();
+						example.createCriteria().andIdenvioEqualTo(Long.parseLong(envios.get(i).getIdEnvio())).andIdinstitucionEqualTo(usuario.getIdinstitucion());
+						List<EnvDestinatarios> destinatarios = _envDestinatariosMapper.selectByExample(example);
+						
+						
+					}
+					respuesta.setCode(200);
+					respuesta.setDescription("Envios masivos enviados correctamente");
+					respuesta.setMessage("Updates correcto");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error");
+				}
+				
+				
+			}
+		}
+		LOGGER.info("enviar() -> Salida del servicio para enviar");
+		return respuesta;
+	}
+	
+	
 
 }

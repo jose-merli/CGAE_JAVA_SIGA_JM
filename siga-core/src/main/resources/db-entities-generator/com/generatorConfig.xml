@@ -49,20 +49,19 @@
 			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOPROGRAMADO.NEXTVAL FROM DUAL"/>
 		</table>
 		
-		<!--  ENVGRUPOSCLIENTE PENDIENTE DE CREAR EN BDD
+		 <!--ENVGRUPOSCLIENTE PENDIENTE DE CREAR EN BDD-->
 		<table schema="USCGAE_INT" tableName="ENV_GRUPOSCLIENTE" >
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
 			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOPROGRAMADO.NEXTVAL FROM DUAL"/>
-		</table>-->
+		</table>
 
 		<table schema="USCGAE_INT" tableName="ENV_DOCUMENTOS" >
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
 			<generatedKey column="IDDOCUMENTO" sqlStatement="SELECT SEQ_ENV_DOCUMENTOS.NEXTVAL FROM DUAL"/>
 		</table>
 		
-		<table schema="USCGAE_INT" tableName="ENV_DOCUMENTOS" >
+		<table schema="USCGAE_INT" tableName="ENV_DESTINATARIOS" >
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
-			<generatedKey column="IDDOCUMENTO" sqlStatement="SELECT SEQ_ENV_DOCUMENTOS.NEXTVAL FROM DUAL"/>
 		</table>		
 		
 
