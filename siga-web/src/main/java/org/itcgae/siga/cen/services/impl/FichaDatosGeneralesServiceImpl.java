@@ -702,7 +702,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							solicitud.setIdsolicitud(Short.parseShort("1"));
 						} else {
 							int idCv = Integer.parseInt(idBD.getNewId());
-							solicitud.setIdsolicitud(Short.parseShort("" + idCv));
+							solicitud.setIdsolicitud(Short.parseShort(""+ (1 + idCv)));
 						}
 						solicitud.setPublicidad(noColegiadoItem.getPublicidad());
 						solicitud.setAbonos("B");
