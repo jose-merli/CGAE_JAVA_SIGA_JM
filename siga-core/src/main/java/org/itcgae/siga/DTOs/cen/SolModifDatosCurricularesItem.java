@@ -30,7 +30,7 @@ public class SolModifDatosCurricularesItem {
 	private String certificado;
 	private String isLetrado;
     
-    @JsonProperty("motivo")
+    @JsonProperty("categoriaCurricular")
 	public String getCategoriaCurricular() {
 		return categoriaCurricular;
 	}
@@ -166,7 +166,7 @@ public class SolModifDatosCurricularesItem {
 		this.idSolicitud = idSolicitud;
 	}
 	
-	@JsonProperty("motivo")
+	@JsonProperty("tipoCurricular")
 	public String getTipoCurricular() {
 		return tipoCurricular;
 	}
@@ -182,7 +182,7 @@ public class SolModifDatosCurricularesItem {
 		this.idCv = idCv;
 	}
 	
-	@JsonProperty("motivo")
+	@JsonProperty("subtiposCurriculares")
 	public String getSubtiposCurriculares() {
 		return subtiposCurriculares;
 	}
@@ -190,7 +190,7 @@ public class SolModifDatosCurricularesItem {
 		this.subtiposCurriculares = subtiposCurriculares;
 	}
 	
-	@JsonProperty("motivo")
+	@JsonProperty("fechaDesde")
 	public String getFechaDesde() {
 		return fechaDesde;
 	}
@@ -198,7 +198,7 @@ public class SolModifDatosCurricularesItem {
 		this.fechaDesde = fechaDesde;
 	}
 	
-	@JsonProperty("motivo")
+	@JsonProperty("fechaHasta")
 	public String getFechaHasta() {
 		return fechaHasta;
 	}
@@ -206,7 +206,7 @@ public class SolModifDatosCurricularesItem {
 		this.fechaHasta = fechaHasta;
 	}
 	
-	@JsonProperty("motivo")
+	@JsonProperty("descripcion")
 	public String getDescripcion() {
 		return descripcion;
 	}

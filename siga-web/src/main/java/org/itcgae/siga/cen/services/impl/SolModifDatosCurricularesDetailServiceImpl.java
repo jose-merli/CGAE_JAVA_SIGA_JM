@@ -68,9 +68,6 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 
 		LOGGER.info("searchDatosCurricularesDetail() -> Entrada al servicio para recuperar los datos curriculares");
 
-		SolModifDatosCurricularesDTO solModifDatosCurricularesDTO = new SolModifDatosCurricularesDTO();
-		List<SolModifDatosCurricularesItem> solModifDatosCurricularesItems = new ArrayList<SolModifDatosCurricularesItem>();
-		List<FichaDatosCurricularesItem> fichaDatosCurricularesItem = new ArrayList<FichaDatosCurricularesItem>();
 		SolModifDatosCurricularesItem solModifDatosCurricularesItem = new SolModifDatosCurricularesItem();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
 		// Conseguimos información del usuario logeado
@@ -115,56 +112,64 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 					solModifDatosCurricularesItem.setFechaDesde(dateFormat.format(cenDatoscv.getFechainicio()));
 					solModifDatosCurricularesItem.setFechaHasta(dateFormat.format(cenDatoscv.getFechafin()));
 
-					// Buscar tipo curricular
-					CenTiposcvsubtipo1Key key = new CenTiposcvsubtipo1Key();
-					key.setIdinstitucion(idInstitucion);
-					key.setIdtipocv(Short.valueOf(cenDatoscv.getIdcv()));
-					key.setIdtipocvsubtipo1(Short.valueOf(cenDatoscv.getIdtipocvsubtipo1()));
+					if (cenDatoscv.getIdtipocvsubtipo1() != null) {
+						// Buscar tipo curricular
+						CenTiposcvsubtipo1Key key = new CenTiposcvsubtipo1Key();
+						key.setIdinstitucion(idInstitucion);
+						key.setIdtipocv(Short.valueOf(cenDatoscv.getIdcv()));
+						key.setIdtipocvsubtipo1(Short.valueOf(cenDatoscv.getIdtipocvsubtipo1()));
 
-					LOGGER.info(
-							"searchDatosCurricularesDetail() / cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey() -> Entrada a cenTiposCVSubtipo1ExtendsMapper para obtener el id de la descripcion");
-					CenTiposcvsubtipo1 cenTiposcvsubtipo1 = cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey(key);
+						LOGGER.info(
+								"searchDatosCurricularesDetail() / cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey() -> Entrada a cenTiposCVSubtipo1ExtendsMapper para obtener el id de la descripcion");
+						CenTiposcvsubtipo1 cenTiposcvsubtipo1 = cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey(key);
 
-					LOGGER.info(
-							"searchDatosCurricularesDetail() / cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey() -> Salida a cenTiposCVSubtipo1ExtendsMapper para obtener el id de la descripcion");
+						LOGGER.info(
+								"searchDatosCurricularesDetail() / cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey() -> Salida a cenTiposCVSubtipo1ExtendsMapper para obtener el id de la descripcion");
 
-					// Buscar descripcion del subtipo en genRecursosCatalogos
-					LOGGER.info(
-							"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Entrada a genRecursosCatalogosExtendsMapper para obtener la descripcion del subtipo");
-					GenRecursosCatalogosKey genRecursosCatalogosKey = new GenRecursosCatalogosKey();
-					genRecursosCatalogosKey.setIdlenguaje(usuario.getIdlenguaje());
-					genRecursosCatalogosKey.setIdrecurso(cenTiposcvsubtipo1.getDescripcion());
+						if (cenTiposcvsubtipo1 != null) {
+							// Buscar descripcion del subtipo en genRecursosCatalogos
+							LOGGER.info(
+									"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Entrada a genRecursosCatalogosExtendsMapper para obtener la descripcion del subtipo");
+							GenRecursosCatalogosKey genRecursosCatalogosKey = new GenRecursosCatalogosKey();
+							genRecursosCatalogosKey.setIdlenguaje(usuario.getIdlenguaje());
+							genRecursosCatalogosKey.setIdrecurso(cenTiposcvsubtipo1.getDescripcion());
 
-					GenRecursosCatalogos genRecursosCatalogos = genRecursosCatalogosExtendsMapper
-							.selectByPrimaryKey(genRecursosCatalogosKey);
+							GenRecursosCatalogos genRecursosCatalogos = genRecursosCatalogosExtendsMapper
+									.selectByPrimaryKey(genRecursosCatalogosKey);
 
-					LOGGER.info(
-							"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Salida a genRecursosCatalogosExtendsMapper para obtener la descripcion del subtipo");
+							LOGGER.info(
+									"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Salida a genRecursosCatalogosExtendsMapper para obtener la descripcion del subtipo");
 
-					solModifDatosCurricularesItem.setTipoCurricular(genRecursosCatalogos.getDescripcion());
+							solModifDatosCurricularesItem.setTipoCurricular(genRecursosCatalogos.getDescripcion());
+						}
+					}
+					
+					
+					if(cenDatoscv.getIdtipocvsubtipo2() != null) {
+						// Buscar subtipo
+						CenTiposcvsubtipo2Key keySC = new CenTiposcvsubtipo2Key();
+						keySC.setIdinstitucion(idInstitucion);
+						keySC.setIdtipocv(Short.valueOf(cenDatoscv.getIdcv()));
+						keySC.setIdtipocvsubtipo2(Short.valueOf(cenDatoscv.getIdtipocvsubtipo2()));
 
-					// Buscar subtipo
-					CenTiposcvsubtipo2Key keySC = new CenTiposcvsubtipo2Key();
-					keySC.setIdinstitucion(idInstitucion);
-					keySC.setIdtipocv(Short.valueOf(cenDatoscv.getIdcv()));
-					keySC.setIdtipocvsubtipo2(Short.valueOf(cenDatoscv.getIdinstitucionSubt2()));
+						CenTiposcvsubtipo2 cenTiposcvsubtipo2 = cenTiposCVSubtipo2ExtendsMapper.selectByPrimaryKey(keySC);
 
-					CenTiposcvsubtipo2 cenTiposcvsubtipo2 = cenTiposCVSubtipo2ExtendsMapper.selectByPrimaryKey(keySC);
+						if (cenTiposcvsubtipo2 != null) {
+							GenRecursosCatalogosKey genRecursosCatalogosKeySC = new GenRecursosCatalogosKey();
+							genRecursosCatalogosKeySC.setIdlenguaje(usuario.getIdlenguaje());
+							genRecursosCatalogosKeySC.setIdrecurso(cenTiposcvsubtipo2.getDescripcion());
 
-					GenRecursosCatalogosKey genRecursosCatalogosKeySC = new GenRecursosCatalogosKey();
-					genRecursosCatalogosKeySC.setIdlenguaje(usuario.getIdlenguaje());
-					genRecursosCatalogosKeySC.setIdrecurso(cenTiposcvsubtipo2.getDescripcion());
+							GenRecursosCatalogos genRecursosCatalogosSC = genRecursosCatalogosExtendsMapper
+									.selectByPrimaryKey(genRecursosCatalogosKeySC);
 
-					GenRecursosCatalogos genRecursosCatalogosSC = genRecursosCatalogosExtendsMapper
-							.selectByPrimaryKey(genRecursosCatalogosKeySC);
-
-					solModifDatosCurricularesItem.setSubtiposCurriculares(genRecursosCatalogosSC.getDescripcion());
-
-					LOGGER.info(
-							"searchDatosCurricularesDetail() -> Salida del servicio para recuperar los datos curriculares");
+							solModifDatosCurricularesItem.setSubtiposCurriculares(genRecursosCatalogosSC.getDescripcion());
+						}
+					}
 				}
 			}
 		}
+
+		LOGGER.info("searchDatosCurricularesDetail() -> Salida del servicio para recuperar los datos curriculares");
 		return solModifDatosCurricularesItem;
 	}
 
@@ -205,7 +210,7 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 
 				solModifDatosCurricularesItem.setIdPersona(String.valueOf(cenSolicitudmodificacioncv.getIdpersona()));
 				solModifDatosCurricularesItem.setIdCv(String.valueOf(cenSolicitudmodificacioncv.getIdcv()));
-				
+
 				LOGGER.info(
 						"searchDatosCurricularesDetail() / cenSolicitudmodificacioncvExtendsMapper.selectByPrimaryKey() -> Salida a cenSolicitudmodificacioncvExtendsMapper para obtener los datos curriculares de la solicitud");
 
@@ -255,18 +260,20 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 				LOGGER.info(
 						"searchDatosCurricularesDetail() / cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey() -> Salida a cenTiposcvExtendsMapper para obtener el campo descripcion del tipo curricular");
 
-				LOGGER.info(
-						"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Entrada a genRecursosCatalogosExtendsMapper para obtener la descripcion del tipo curricular");
-				GenRecursosCatalogosKey genRecursosCatalogosKeyTC = new GenRecursosCatalogosKey();
-				genRecursosCatalogosKeyTC.setIdrecurso(cenTiposcvsubtipo1.getDescripcion());
-				genRecursosCatalogosKeyTC.setIdlenguaje(usuario.getIdlenguaje());
+				if (cenTiposcvsubtipo1 != null) {
+					LOGGER.info(
+							"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Entrada a genRecursosCatalogosExtendsMapper para obtener la descripcion del tipo curricular");
+					GenRecursosCatalogosKey genRecursosCatalogosKeyTC = new GenRecursosCatalogosKey();
+					genRecursosCatalogosKeyTC.setIdrecurso(cenTiposcvsubtipo1.getDescripcion());
+					genRecursosCatalogosKeyTC.setIdlenguaje(usuario.getIdlenguaje());
 
-				GenRecursosCatalogos genRecursosCatalogosTC = genRecursosCatalogosExtendsMapper
-						.selectByPrimaryKey(genRecursosCatalogosKeyTC);
-				LOGGER.info(
-						"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Salida a genRecursosCatalogosExtendsMapper para obtener la descripcion del tipo curricular");
+					GenRecursosCatalogos genRecursosCatalogosTC = genRecursosCatalogosExtendsMapper
+							.selectByPrimaryKey(genRecursosCatalogosKeyTC);
+					LOGGER.info(
+							"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Salida a genRecursosCatalogosExtendsMapper para obtener la descripcion del tipo curricular");
 
-				solModifDatosCurricularesItem.setTipoCurricular(genRecursosCatalogosTC.getDescripcion());
+					solModifDatosCurricularesItem.setTipoCurricular(genRecursosCatalogosTC.getDescripcion());
+				}
 
 				// Tratamiento necesario para obtener el subtipo curricular
 				LOGGER.info(
@@ -283,18 +290,21 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 				LOGGER.info(
 						"searchDatosCurricularesDetail() / cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey() -> Salida a cenTiposcvExtendsMapper para obtener el campo descripcion del subtipo curricular");
 
-				LOGGER.info(
-						"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Entrada a genRecursosCatalogosExtendsMapper para obtener la descripcion del subtipo curricular");
-				GenRecursosCatalogosKey genRecursosCatalogosKeySubt = new GenRecursosCatalogosKey();
-				genRecursosCatalogosKeySubt.setIdrecurso(cenTiposcvsubtipo2.getDescripcion());
-				genRecursosCatalogosKeySubt.setIdlenguaje(usuario.getIdlenguaje());
+				if (cenTiposcvsubtipo2 != null) {
+					LOGGER.info(
+							"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Entrada a genRecursosCatalogosExtendsMapper para obtener la descripcion del subtipo curricular");
+					GenRecursosCatalogosKey genRecursosCatalogosKeySubt = new GenRecursosCatalogosKey();
+					genRecursosCatalogosKeySubt.setIdrecurso(cenTiposcvsubtipo2.getDescripcion());
+					genRecursosCatalogosKeySubt.setIdlenguaje(usuario.getIdlenguaje());
 
-				GenRecursosCatalogos genRecursosCatalogosSubt = genRecursosCatalogosExtendsMapper
-						.selectByPrimaryKey(genRecursosCatalogosKeySubt);
-				LOGGER.info(
-						"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Salida a genRecursosCatalogosExtendsMapper para obtener la descripcion del subtipo curricular");
+					GenRecursosCatalogos genRecursosCatalogosSubt = genRecursosCatalogosExtendsMapper
+							.selectByPrimaryKey(genRecursosCatalogosKeySubt);
+					LOGGER.info(
+							"searchDatosCurricularesDetail() / genRecursosCatalogosExtendsMapper.selectByPrimaryKey() -> Salida a genRecursosCatalogosExtendsMapper para obtener la descripcion del subtipo curricular");
 
-				solModifDatosCurricularesItem.setSubtiposCurriculares(genRecursosCatalogosSubt.getDescripcion());
+					solModifDatosCurricularesItem.setSubtiposCurriculares(genRecursosCatalogosSubt.getDescripcion());
+				}
+
 			}
 		}
 

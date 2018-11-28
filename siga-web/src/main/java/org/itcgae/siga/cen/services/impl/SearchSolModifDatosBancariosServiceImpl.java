@@ -141,6 +141,8 @@ public class SearchSolModifDatosBancariosServiceImpl implements ISearchSolModifD
 			updateResponseDTO.setStatus(SigaConstants.OK);
 			LOGGER.info(
 					"processSolModifDatosBancarios() -> Salida del servicio para actualizar el estado de la solicitud a REALIZADO");
+		}else {
+			updateResponseDTO.setStatus(SigaConstants.KO);
 		}
 		
 		}else {
@@ -170,9 +172,10 @@ public class SearchSolModifDatosBancariosServiceImpl implements ISearchSolModifD
 			LOGGER.warn("denySolModifDatosBancarios() / cenSolicModiCuentasExtendsMapper.updateByPrimaryKeySelective() -> "
 					+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
-		} 
+		} else {
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
 		
-		updateResponseDTO.setStatus(SigaConstants.OK);
 		LOGGER.info(
 				"denySolModifDatosBancarios() -> Salida del servicio para actualizar el estado de la solicitud a DENEGADO");
 		return updateResponseDTO;

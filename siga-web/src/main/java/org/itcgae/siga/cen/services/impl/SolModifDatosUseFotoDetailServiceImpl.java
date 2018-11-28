@@ -74,7 +74,7 @@ public class SolModifDatosUseFotoDetailServiceImpl implements ISolModifDatosUseF
 				"searchSolModifDatosUseFotoDetail() / cenSolicModifExportarFotoExtendsMapper.selectByPrimaryKey() -> Entrada a cenClienteExtendsMapper para obtener parámetro exportar foto");
 
 		CenSolicmodifexportarfoto cenSolicmodifexportarfoto = cenSolicModifExportarFotoExtendsMapper
-				.selectByPrimaryKey(Short.valueOf(solModificacionItem.getIdSolicitud()));
+				.selectByPrimaryKey(Short.parseShort(solModificacionItem.getIdSolicitud()));
 
 		LOGGER.info(
 				"searchSolModifDatosUseFotoDetail() / cenSolicModifExportarFotoExtendsMapper.selectByPrimaryKey() -> Salida de cenClienteExtendsMapper para obtener parámetro exportar foto");

@@ -16,6 +16,7 @@ import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ISearchSolModifDatosCurricularesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDatoscv;
@@ -111,7 +112,7 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 		CenSolicitudmodificacioncvExample example = new CenSolicitudmodificacioncvExample();
 		
 		example.createCriteria().andIdpersonaEqualTo(Long.parseLong(solModifDatosCurricularesItem.getIdPersona()))
-		.andIdinstitucionEqualTo(idInstitucion).andFechafinIsNull().andIdsolicitudEqualTo(Long.parseLong(solModifDatosCurricularesItem.getIdSolicitud()));
+		.andIdinstitucionEqualTo(idInstitucion).andIdestadosolicEqualTo((short) 10).andIdsolicitudEqualTo(Long.parseLong(solModifDatosCurricularesItem.getIdSolicitud()));
 		
 		List<CenSolicitudmodificacioncv> lista = cenSolicitudmodificacioncvExtendsMapper.selectByExample(example);
 
@@ -125,14 +126,12 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 			recordUpdate.setIdpersona(solicitud.getIdpersona());
 			recordUpdate.setIdtipocv(solicitud.getIdcv());
 
-			if (solicitud.getIdtipocvsubtipo1().equals("")
-					&& null != solicitud.getIdtipocvsubtipo1()) {
+			if (!UtilidadesString.esCadenaVacia(String.valueOf(solicitud.getIdtipocvsubtipo1())) || null != solicitud.getIdtipocvsubtipo1()) {
 				recordUpdate.setIdtipocvsubtipo1(solicitud.getIdtipocvsubtipo1());
 			} else {
 				recordUpdate.setIdtipocvsubtipo1(null);
 			}
-			if (solicitud.getIdtipocvsubtipo2().equals("")
-					&& null != solicitud.getIdtipocvsubtipo2()) {
+			if (!UtilidadesString.esCadenaVacia(String.valueOf(solicitud.getIdtipocvsubtipo2())) || null != solicitud.getIdtipocvsubtipo2()) {
 				recordUpdate.setIdtipocvsubtipo2(solicitud.getIdtipocvsubtipo2());
 			} else {
 				recordUpdate.setIdtipocvsubtipo2(null);

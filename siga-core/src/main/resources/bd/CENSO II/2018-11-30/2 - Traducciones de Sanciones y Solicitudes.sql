@@ -12,7 +12,7 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.tipoSancion.literal','Tipo de Sanción','0','1',to_date('06/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.tipoSancion.literal','Tipo de Sanción#GL','0','4',to_date('06/11/18','DD/MM/RR'),'0','19');
-Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.tipoSancion.literal','Tipus d'Sanció#CA','0','2',to_date('06/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.tipoSancion.literal','Tipus d''Sanció#CA','0','2',to_date('06/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.expediente.sanciones.busquedaPorColegio.tipoSancion.literal','Tipo de Sanción#EU','0','3',to_date('06/11/18','DD/MM/RR'),'0','19');
 
 
@@ -132,8 +132,6 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('busquedaSanciones.detalleSancion.texto.literal','Text#CA','0','2',to_date('12/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('busquedaSanciones.detalleSancion.texto.literal','Texto#EU','0','3',to_date('12/11/18','DD/MM/RR'),'0','19');
 
-
-
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.modificacion.literal', 'Modificación','0','1',to_date('20/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.modificacion.literal','Modificación#GL','0','4',to_date('20/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.modificacion.literal','Modificació#CA','0','2',to_date('20/11/18','DD/MM/RR'),'0','19');
@@ -154,9 +152,38 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.poblacionExtranjera.literal','Població Estrangera#CA','0','2',to_date('20/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.poblacionExtranjera.literal','Población Extranjera#EU','0','3',to_date('20/11/18','DD/MM/RR'),'0','19');
 
-
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.exportarFoto.literal', 'Exportar Foto','0','1',to_date('27/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.exportarFoto.literal','Exportar Foto#GL','0','4',to_date('27/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.exportarFoto.literal','Exportar Foto#CA','0','2',to_date('27/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.exportarFoto.literal','Exportar Foto#EU','0','3',to_date('27/11/18','DD/MM/RR'),'0','19');
+
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.abonoCargo.literal','Abono cargo','0','1',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.abonoCargo.literal','Abono cargo#GL','0','4',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.abonoCargo.literal','Abonament Càrrec#CA','0','2',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.abonoCargo.literal','Abono cargo#EU','0','3',to_date('28/11/18','DD/MM/RR'),'0','19');
+
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.digitoControl.literal','Dígito de control','0','1',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.digitoControl.literal','Dígito de control#GL','0','4',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.digitoControl.literal','Dígit de control#CA','0','2',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.digitoControl.literal','Dígito de control#EU','0','3',to_date('28/11/18','DD/MM/RR'),'0','19');
+
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.abonoJCS.literal','Abono JCS','0','1',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.abonoJCS.literal','Abono JCS#GL','0','4',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.abonoJCS.literal','Abono JCS#CA','0','2',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.abonoJCS.literal','Abonament JCS#EU','0','3',to_date('28/11/18','DD/MM/RR'),'0','19');
+
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.iban.literal','Iban','0','1',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.iban.literal','Iban#GL','0','4',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.iban.literal','Anaven#CA','0','2',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.iban.literal','Iban#EU','0','3',to_date('28/11/18','DD/MM/RR'),'0','19');
+
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.codigoSucursal.literal','Código de la sucursal','0','1',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.codigoSucursal.literal','Código de la sucursal#GL','0','4',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.codigoSucursal.literal','Codi de la sucursal#CA','0','2',to_date('28/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('solicitudModificacion.especifica.codigoSucursal.literal','Código de la sucursal#EU','0','3',to_date('28/11/18','DD/MM/RR'),'0','19');
 
