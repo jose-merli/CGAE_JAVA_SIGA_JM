@@ -19,6 +19,7 @@ import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
+import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.entities.CenPersona;
@@ -98,7 +99,7 @@ public class FichaDatosGeneralesServiceTest {
 	private TestUtils testUtils = new TestUtils();
 
 	@Test
-	public void updateColegiado() throws Exception {
+	public void updateColegiadoTest() throws Exception {
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
 		List<ComboItem> comboItemsSimulados = testUtils.getListComboItemsSimulados();
@@ -109,8 +110,6 @@ public class FichaDatosGeneralesServiceTest {
 		List<CenGruposclienteCliente> listarelacionGrupoPersona = testUtils.getListaGruposSimulados();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados("1");
 		CenCliente cliente = testUtils.getCenCliente();
-//		Ejecución del método a testear
-		UpdateResponseDTO response = fichaDatosGeneralesServiceImpl.updateColegiado(colegiado, mockreq);
 
 		//		Mockeo de las llamadas a BD
 		
@@ -132,20 +131,21 @@ public class FichaDatosGeneralesServiceTest {
 				//	if (eliminadoGrupo == 0) { --290--
 		when(cenClienteMapper.selectByPrimaryKey(Mockito.any(CenClienteKey.class))).thenReturn(cliente); 
 				//  if(colegiadoItem.getColegiado() == false || colegiadoItem.getColegiado() == null) { (ELSE) --333--
-		when(cenColegiadoMapper.updateByExampleSelective(Mockito.any(CenColegiado.class), Mockito.any(CenColegiadoExample.class))); 
+		when(cenColegiadoMapper.updateByExampleSelective(Mockito.any(CenColegiado.class), Mockito.any(CenColegiadoExample.class))).thenReturn(1); 
 				
+//		when(cenDatoscolegialesestadoMapper.selectByExample(Mockito.any(CenDatoscolegialesestadoExample.class))).thenReturn(List<CenDatoscolegialesestado> ); 
+//		if(cenDatoscolegialesestado != null && cenDatoscolegialesestado.size()>0) {
+//			if (!cenDatoscolegialesestado.get(0).getIdestado().equals(Short.valueOf(colegiadoItem.getSituacion()))) {
+
+//		Ejecución del método a testear
+		UpdateResponseDTO response = fichaDatosGeneralesServiceImpl.updateColegiado(colegiado, mockreq);
+
 		
-		 
 		
+		UpdateResponseDTO responseEsperado = new UpdateResponseDTO();
 		
+		responseEsperado.setStatus(SigaConstants.OK);
 		
-		ComboDTO comboEsperado = new ComboDTO();
-		
-		ComboItem comboItemVacio = testUtils.getComboItemVacio();
-				
-		comboItemsSimulados.add(0, comboItemVacio);
-		comboEsperado.setCombooItems(comboItemsSimulados);
-		
-//		assertThat(comboResultado).isEqualTo(comboEsperado); Comparar resultado esperado con resultado que trae el TEST
+		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
 	}
 }
