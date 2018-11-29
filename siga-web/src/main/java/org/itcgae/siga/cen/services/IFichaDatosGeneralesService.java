@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IFichaDatosGeneralesService {
 	
-	public ComboDTO getSocietyTypes(HttpServletRequest request);
+//	public ComboDTO getSocietyTypes(HttpServletRequest request);
 	
 	public ComboDTO getTratamiento(HttpServletRequest request);
 

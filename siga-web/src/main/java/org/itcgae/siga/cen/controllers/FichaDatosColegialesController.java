@@ -2,6 +2,7 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
@@ -10,6 +11,7 @@ import org.itcgae.siga.DTOs.cen.FichaDatosColegialesDTO;
 //import org.itcgae.siga.DTOs.cen.FichaDatosColegialesDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.IFichaDatosColegialesService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -45,5 +47,12 @@ public class FichaDatosColegialesController {
 		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/fichaDatosColegiales/datosColegialesUpdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> searchColegialesData(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = fichaDatosColegiales.datosColegialesUpdate(colegiadoItem, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
 	
 }

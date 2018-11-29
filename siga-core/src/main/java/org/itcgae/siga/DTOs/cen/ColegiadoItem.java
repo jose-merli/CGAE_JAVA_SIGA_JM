@@ -15,6 +15,8 @@ public class ColegiadoItem {
 	private String nombre;
 	private String numColegiado;
 	private String residenteInscrito;
+	private String situacionresidente;
+	private String comunitario;
 	private String correo;
 	private String telefono;
 	private String movil;
@@ -922,6 +924,22 @@ public class ColegiadoItem {
 		this.comisiones = comisiones;
 	}
 	
+	public String getSituacionresidente() {
+		return situacionresidente;
+	}
+
+	public void setSituacionresidente(String situacionresidente) {
+		this.situacionresidente = situacionresidente;
+	}
+
+	public String getComunitario() {
+		return comunitario;
+	}
+
+	public void setComunitario(String comunitario) {
+		this.comunitario = comunitario;
+	}
+
 	/**
 	 *
 	 */

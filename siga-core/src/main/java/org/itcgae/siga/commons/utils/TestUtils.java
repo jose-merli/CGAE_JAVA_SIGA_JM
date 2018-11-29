@@ -17,6 +17,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AgeCalendario;
 import org.itcgae.siga.db.entities.AgePermisoscalendario;
 import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.security.UserCgae;
@@ -143,8 +144,27 @@ public class TestUtils{
 		  
 		return eventoItem;		
 	}
-	
+//	new ArrayList<CenDatoscolegialesestado>()
 
+
+	public ArrayList<CenDatoscolegialesestado> getDatosColegialesList(){
+		ArrayList<CenDatoscolegialesestado> listaDatosColegiales = new ArrayList<CenDatoscolegialesestado>();
+		listaDatosColegiales.add(getCenDatoscolegialesestado());
+		
+		return listaDatosColegiales;
+	}
+	
+	public CenDatoscolegialesestado getCenDatoscolegialesestado() {
+		CenDatoscolegialesestado persona = new CenDatoscolegialesestado();
+		persona.setIdpersona(Long.parseLong("1234"));
+		persona.setIdestado(Short.parseShort("1234"));
+		persona.setIdinstitucion(Short.parseShort("1234"));
+		persona.setFechaestado(new Date());
+		persona.setFechamodificacion(new Date());
+		persona.setUsumodificacion(1);
+		return persona;
+	}
+	
 	public List<CenPersona> getListaPersonasSimuladas(Long idpersona,String nifcif){
 		List<CenPersona> listaPersonasSimuladas = new ArrayList<CenPersona>();
 		listaPersonasSimuladas.add(getCenPersona(idpersona, nifcif));
@@ -170,23 +190,57 @@ public class TestUtils{
 		return persona;
 	}
 	
-	public ColegiadoItem getColegiadoItem(Long idpersona,String nif) {
+	public ColegiadoItem getColegiadoItem(Boolean isColegiado, String idGrupo) {
 		ColegiadoItem colegiado = new ColegiadoItem();
-		colegiado.setIdPersona(""+idpersona);
+		colegiado.setIdPersona(String.valueOf(1223));
+		colegiado.setIdInstitucion("2005");
 		colegiado.setNombre("Nombre");
 		colegiado.setApellidos1("apellidos1");
+		colegiado.setIdTipoIdentificacion("10");
 		colegiado.setApellidos2("apellidos2");
-		colegiado.setNif(nif);
+		colegiado.setColegiado(isColegiado);
+		colegiado.setNaturalDe("");
+		colegiado.setIncorporacion(new Date());
+		colegiado.setSituacion("1");
+		colegiado.setNif("20092000V");
+		colegiado.setIdtratamiento("1");
+		colegiado.setComisiones("0");
+		colegiado.setAsientoContable("");
 		colegiado.setSexo("M");
+//		CREAR COMBOETIQUETASITEM Y METERLO EN EL ARRAY
+		colegiado.setEtiquetas(new ComboEtiquetasItem[] {getComboEtiquetasItem(idGrupo)});
 		return colegiado;
 	}
 	
-	public List<ComboEtiquetasItem> getListaEtiquetasSimuladas(){
+	public List<ComboEtiquetasItem> getListaEtiquetasSimuladas(String idGrupo){
 		List<ComboEtiquetasItem> listaEtiquetasSimuladas = new ArrayList<ComboEtiquetasItem>();
-		listaEtiquetasSimuladas.add(getComboEtiquetasItem());
+		listaEtiquetasSimuladas.add(getComboEtiquetasItem(idGrupo));
 		
 		return listaEtiquetasSimuladas;
 	}
+	
+//	public List<ComboEtiquetasItem> getListaEtiquetasSimuladas(){
+//		List<ComboEtiquetasItem> listaEtiquetasSimuladas = new ArrayList<ComboEtiquetasItem>();
+//		listaEtiquetasSimuladas.add(getComboEtiquetasItem());
+//		
+//		return listaEtiquetasSimuladas;
+//	}
+	
+	public List<ComboEtiquetasItem> getComboEtiquetasSimulados(String fInicio, String fBaja, String color){
+		List<ComboEtiquetasItem> listaGruposSimulados = new ArrayList<ComboEtiquetasItem>();
+		listaGruposSimulados.add(getComboEtiquetasItem(fInicio, fBaja, color));
+		
+		return listaGruposSimulados;
+	}
+	
+	public ComboEtiquetasItem getComboEtiquetasItem(String fInicio, String fBaja, String color) {
+		ComboEtiquetasItem etiquetas = new ComboEtiquetasItem();
+		etiquetas.setFechaBaja(fInicio);
+		etiquetas.setFechaInicio(fBaja);
+		etiquetas.setColor(color);
+		return etiquetas;
+	}
+	
 	
 	public List<CenGruposclienteCliente> getListaGruposSimulados(){
 		List<CenGruposclienteCliente> listaGruposSimulados = new ArrayList<CenGruposclienteCliente>();
@@ -206,9 +260,9 @@ public class TestUtils{
 		return gruposCliCli;
 	}
 	
-	public ComboEtiquetasItem getComboEtiquetasItem() {
+	public ComboEtiquetasItem getComboEtiquetasItem(String idGrupo) {
 		ComboEtiquetasItem comboEtiquetas = new ComboEtiquetasItem();
-		comboEtiquetas.setIdGrupo("1");
+		comboEtiquetas.setIdGrupo(idGrupo);
 		comboEtiquetas.setFechaBaja("23/05/2014");
 		comboEtiquetas.setFechaInicio("23/05/2014");
 		comboEtiquetas.setLabel("Label");
