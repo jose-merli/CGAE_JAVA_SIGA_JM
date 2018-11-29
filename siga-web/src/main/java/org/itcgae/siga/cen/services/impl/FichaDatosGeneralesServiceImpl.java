@@ -124,11 +124,11 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	private CenEstadocivilExtendsMapper cenEstadocivilExtendsMapper;
 
 
-	@Override
-	public ComboDTO getSocietyTypes(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public ComboDTO getSocietyTypes(HttpServletRequest request) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public  UpdateResponseDTO updateColegiado(ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException {

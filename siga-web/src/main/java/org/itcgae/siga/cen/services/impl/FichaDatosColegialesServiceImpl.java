@@ -227,7 +227,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				}
 				if(colegiadoItem.getComunitario()!=null) {
 					colegiado.setComunitario(colegiadoItem.getComunitario());
-					}
+				}
 				colegiado.setNmutualista(colegiadoItem.getnMutualista());
 				if(colegiadoItem.getIncorporacionDate()!=null) {
 				colegiado.setFechaincorporacion(colegiadoItem.getIncorporacionDate());
