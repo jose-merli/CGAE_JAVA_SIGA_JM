@@ -46,7 +46,10 @@ public class SolModifDatosBancariosDetailServiceImpl implements ISolModifDatosBa
 				.selectByPrimaryKey(cenCuentasbancariasKey);
 
 		if(cenCuentasBancarias != null) {
-			solModifDatosBancariosItem.setAbonoCargo(cenCuentasBancarias.getAbonocargo());
+			
+			if(cenCuentasBancarias.getAbonocargo() != null) {
+				solModifDatosBancariosItem.setAbonoCargo(cenCuentasBancarias.getAbonocargo());
+			}
 
 			if (cenCuentasBancarias.getAbonosjcs().equals("1")) {
 				solModifDatosBancariosItem.setAbonoJCS("Sí");
@@ -54,13 +57,29 @@ public class SolModifDatosBancariosDetailServiceImpl implements ISolModifDatosBa
 				solModifDatosBancariosItem.setAbonoJCS("No");
 			}
 
+			if(cenCuentasBancarias.getCodigosucursal() != null) {
+				solModifDatosBancariosItem.setCodigoSucursal(cenCuentasBancarias.getCodigosucursal());
+			}
+			
+			if(cenCuentasBancarias.getDigitocontrol() != null){
+				solModifDatosBancariosItem.setDigitoControl(cenCuentasBancarias.getDigitocontrol());
+			}
+			
 			solModifDatosBancariosItem.setIdCuenta(String.valueOf(cenCuentasBancarias.getIdcuenta()));
-			solModifDatosBancariosItem.setCodigoSucursal(cenCuentasBancarias.getCodigosucursal());
-			solModifDatosBancariosItem.setDigitoControl(cenCuentasBancarias.getDigitocontrol());
-			solModifDatosBancariosItem.setIban(cenCuentasBancarias.getIban());
+			
+			if(cenCuentasBancarias.getIban() != null) {
+				solModifDatosBancariosItem.setIban(cenCuentasBancarias.getIban());
+			}
+			
 			solModifDatosBancariosItem.setIdPersona(String.valueOf(cenCuentasBancarias.getIdpersona()));
-			solModifDatosBancariosItem.setNumeroCuenta(cenCuentasBancarias.getNumerocuenta());
-			solModifDatosBancariosItem.setTitular(cenCuentasBancarias.getTitular());
+			
+			if(cenCuentasBancarias.getNumerocuenta() != null) {
+				solModifDatosBancariosItem.setNumeroCuenta(cenCuentasBancarias.getNumerocuenta());
+			}
+			
+			if(cenCuentasBancarias.getTitular() != null) {
+				solModifDatosBancariosItem.setTitular(cenCuentasBancarias.getTitular());
+			}
 		}
 		return solModifDatosBancariosItem;
 	}

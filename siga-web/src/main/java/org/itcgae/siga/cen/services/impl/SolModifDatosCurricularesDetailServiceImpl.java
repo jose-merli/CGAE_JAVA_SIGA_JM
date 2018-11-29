@@ -109,8 +109,14 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 
 					solModifDatosCurricularesItem.setCategoriaCurricular(genRecursosCatalogosCC.getDescripcion());
 					solModifDatosCurricularesItem.setDescripcion(cenDatoscv.getDescripcion());
-					solModifDatosCurricularesItem.setFechaDesde(dateFormat.format(cenDatoscv.getFechainicio()));
-					solModifDatosCurricularesItem.setFechaHasta(dateFormat.format(cenDatoscv.getFechafin()));
+					
+					if(cenDatoscv.getFechainicio() != null) {
+						solModifDatosCurricularesItem.setFechaDesde(dateFormat.format(cenDatoscv.getFechainicio()));
+					}
+					
+					if(cenDatoscv.getFechafin() != null) {
+						solModifDatosCurricularesItem.setFechaHasta(dateFormat.format(cenDatoscv.getFechafin()));
+					}
 
 					if (cenDatoscv.getIdtipocvsubtipo1() != null) {
 						// Buscar tipo curricular
@@ -181,7 +187,7 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 				"searchSolModifDatosCurricularesDetail() -> Entrada del servicio para recuperar los datos de la solicitud de datos curriculares");
 
 		SolModifDatosCurricularesItem solModifDatosCurricularesItem = new SolModifDatosCurricularesItem();
-		DateFormat formatter = new SimpleDateFormat("dd/MMM/yy");
+		DateFormat formatter = new SimpleDateFormat("dd/MM/yy");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -241,9 +247,15 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 				// Rellenamos el resto de datos que podemos rellenar con lo obtenido en la
 				// consulta de cenSolicitudmodificacioncv
 				solModifDatosCurricularesItem.setDescripcion(cenSolicitudmodificacioncv.getDescripcion());
-				solModifDatosCurricularesItem
-						.setFechaDesde(formatter.format(cenSolicitudmodificacioncv.getFechainicio()));
-				solModifDatosCurricularesItem.setFechaHasta(formatter.format(cenSolicitudmodificacioncv.getFechafin()));
+				
+				if(cenSolicitudmodificacioncv.getFechainicio() != null) {
+					solModifDatosCurricularesItem
+					.setFechaDesde(formatter.format(cenSolicitudmodificacioncv.getFechainicio()));
+				}
+
+				if(cenSolicitudmodificacioncv.getFechafin() != null) {
+					solModifDatosCurricularesItem.setFechaHasta(formatter.format(cenSolicitudmodificacioncv.getFechafin()));
+				}
 
 				// Tratamiento necesario para obtener el tipo curricular
 				LOGGER.info(

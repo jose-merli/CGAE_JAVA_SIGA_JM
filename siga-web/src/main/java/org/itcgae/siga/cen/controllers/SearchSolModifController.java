@@ -33,16 +33,16 @@ public class SearchSolModifController {
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/processSolModif", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> processSolModif(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = searchSolModifService.processSolModif(numPagina, solModificacionItem, request);
+	ResponseEntity<UpdateResponseDTO> processSolModif(@RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = searchSolModifService.processSolModif(solModificacionItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/denySolModif", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> denySolModif(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = searchSolModifService.denySolModif(numPagina, solModificacionItem, request);
+	ResponseEntity<UpdateResponseDTO> denySolModif(@RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = searchSolModifService.denySolModif(solModificacionItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);

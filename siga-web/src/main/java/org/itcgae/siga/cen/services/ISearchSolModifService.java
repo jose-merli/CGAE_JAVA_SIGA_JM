@@ -12,9 +12,9 @@ public interface ISearchSolModifService {
 	SolModificacionDTO searchSolModif(int numPagina, SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
 			HttpServletRequest request);
 
-	UpdateResponseDTO processSolModif(int numPagina, SolModificacionItem solModificacionItem,
+	UpdateResponseDTO processSolModif(SolModificacionItem solModificacionItem,
 			HttpServletRequest request);
 
-	UpdateResponseDTO denySolModif(int numPagina, SolModificacionItem solModificacionItem, HttpServletRequest request);
+	UpdateResponseDTO denySolModif(SolModificacionItem solModificacionItem, HttpServletRequest request);
 
 }

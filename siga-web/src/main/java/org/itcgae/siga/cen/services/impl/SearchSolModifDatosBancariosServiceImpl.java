@@ -130,11 +130,11 @@ public class SearchSolModifDatosBancariosServiceImpl implements ISearchSolModifD
 			CenSolicmodicuentas record = new CenSolicmodicuentas();
 			record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
 			record.setIdestadosolic((short) 20);
-			int response = cenSolicModiCuentasExtendsMapper.updateByPrimaryKey(record);
+			int response = cenSolicModiCuentasExtendsMapper.updateByPrimaryKeySelective(record);
 			
 			if (response == 0) {
 				updateResponseDTO.setStatus(SigaConstants.KO);
-				LOGGER.warn("processSolModifDatosBancarios() / cenSolicModiCuentasExtendsMapper.updateByPrimaryKey() -> "
+				LOGGER.warn("processSolModifDatosBancarios() / cenSolicModiCuentasExtendsMapper.updateByPrimaryKeySelective() -> "
 						+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 			} 
 			

@@ -35,17 +35,17 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 
 	@Autowired
 	private AdmUsuariosExtendsMapper _admUsuariosExtendsMapper;
-	
+
 	@Autowired
 	private CenSolimodidireccionesExtendsMapper cenSoliModiDireccionesExtendsMapper;
-	
+
 	@Autowired
 	private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
-	
+
 	@Override
 	public SolModificacionDTO searchSolModifDatosDirecciones(int numPagina,
 			SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, HttpServletRequest request) {
-		
+
 		LOGGER.info(
 				"searchSolModifDatosDirecciones() -> Entrada al servicio para recuperar los datos de la búsqueda específica de direcciones");
 
@@ -69,7 +69,9 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 				AdmUsuarios usuario = usuarios.get(0);
 				LOGGER.info(
 						"searchSolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.searchSolModifDatosDirecciones() -> Entrada a cenSoliModiDireccionesExtendsMapper para obtener los resultados de la búsqueda");
-				List<SolModificacionItem> solModificacionItems = cenSoliModiDireccionesExtendsMapper.searchSolModifDatosDirecciones(solicitudModificacionSearchDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion));
+				List<SolModificacionItem> solModificacionItems = cenSoliModiDireccionesExtendsMapper
+						.searchSolModifDatosDirecciones(solicitudModificacionSearchDTO, usuario.getIdlenguaje(),
+								String.valueOf(idInstitucion));
 				solModificacionDTO.setSolModificacionItems(solModificacionItems);
 
 			}
@@ -86,7 +88,7 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 			HttpServletRequest request) {
 		LOGGER.info(
 				"processSolModifDatosDirecciones() -> Entrada al servicio para actualizar el estado de la solicitud a REALIZADO");
-		
+
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
 
@@ -97,93 +99,97 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-		
+
 		LOGGER.info(
 				"processSolModifDatosCurriculares() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-		
+
 		List<AdmUsuarios> usuarios = _admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		if (null != usuarios && usuarios.size() > 0) {
-		usuario = usuarios.get(0);
-			
-		CenSolimodidirecciones solicitud = new CenSolimodidirecciones();
-		CenSolimodidireccionesExample example = new CenSolimodidireccionesExample();
-		
-		example.createCriteria().andIdpersonaEqualTo(Long.parseLong(solModificacionItem.getIdPersona()))
-		.andIdinstitucionEqualTo(idInstitucion).andIdsolicitudEqualTo(Long.valueOf(solModificacionItem.getIdSolicitud()));
-		
-		List<CenSolimodidirecciones> lista = cenSoliModiDireccionesExtendsMapper.selectByExample(example);
+			usuario = usuarios.get(0);
 
-		solicitud = lista.get(0);
-		
-		CenDirecciones modificacion = new CenDirecciones();
-		modificacion.setIdinstitucion(idInstitucion);
-		modificacion.setIdpersona(solicitud.getIdpersona());
-		modificacion.setFechamodificacion(new Date());
-		modificacion.setUsumodificacion(usuario.getIdusuario());
-		modificacion.setIddireccion(solicitud.getIddireccion());
-//		modificacion.setPreferente(solicitud.getPreferente());
-		modificacion.setCodigopostal(solicitud.getCodigopostal());
-		if(solicitud.getTelefono1()!=null) {
-			modificacion.setTelefono1(solicitud.getTelefono1());
-		}
-//		modificacion.setTelefono2(solicitud.getTelefono2());
-		if(solicitud.getDomicilio()!=null) {
-			modificacion.setDomicilio(solicitud.getDomicilio());
-		}
-		if(solicitud.getMovil()!=null) {
-			modificacion.setMovil(solicitud.getMovil());
-		}
-		if(solicitud.getFax1()!= null) {
-			modificacion.setFax1(solicitud.getFax1());
-		}
-//		modificacion.setFax2(solicitud.getFax2());
-		if(solicitud.getCorreoelectronico()!=null) {
-			modificacion.setCorreoelectronico(solicitud.getCorreoelectronico());
-		}
-		if(solicitud.getPaginaweb()!=null) {
-			modificacion.setPaginaweb(solicitud.getPaginaweb());
-		}
-		modificacion.setIdpais(solicitud.getIdpais());
-		if(solicitud.getIdprovincia()!=null) {
-			modificacion.setIdprovincia(solicitud.getIdprovincia());
-		}
-		if(solicitud.getIdpoblacion()!=null) {
-			modificacion.setIdpoblacion(solicitud.getIdpoblacion());
-		}
-		if(solicitud.getPoblacionextranjera()!=null) {
-			modificacion.setPoblacionextranjera(solicitud.getPoblacionextranjera());
-		}
-		if(solicitud.getOtraprovincia()!=null) {
-			modificacion.setOtraprovincia(solicitud.getOtraprovincia());
-		}
-		
-		
-		
-		
-		int responseUpdate = cenDireccionesExtendsMapper.updateByPrimaryKeySelective(modificacion);
-		
-		if(responseUpdate >= 1) {
-			CenSolimodidirecciones record = new CenSolimodidirecciones();
-			record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
-			record.setIdestadosolic((short) 20);
-			int response = cenSoliModiDireccionesExtendsMapper.updateByPrimaryKeySelective(record);
-			
-			if (response == 0) {
+			CenSolimodidirecciones solicitud = new CenSolimodidirecciones();
+			CenSolimodidireccionesExample example = new CenSolimodidireccionesExample();
+
+			example.createCriteria().andIdpersonaEqualTo(Long.parseLong(solModificacionItem.getIdPersona()))
+					.andIdinstitucionEqualTo(idInstitucion)
+					.andIdsolicitudEqualTo(Long.valueOf(solModificacionItem.getIdSolicitud()));
+
+			List<CenSolimodidirecciones> lista = cenSoliModiDireccionesExtendsMapper.selectByExample(example);
+
+			solicitud = lista.get(0);
+
+			CenDirecciones modificacion = new CenDirecciones();
+			modificacion.setIdinstitucion(idInstitucion);
+			modificacion.setIdpersona(solicitud.getIdpersona());
+			modificacion.setFechamodificacion(new Date());
+			modificacion.setUsumodificacion(usuario.getIdusuario());
+			modificacion.setIddireccion(solicitud.getIddireccion());
+			// modificacion.setPreferente(solicitud.getPreferente());
+			modificacion.setCodigopostal(solicitud.getCodigopostal());
+			if (solicitud.getTelefono1() != null) {
+				modificacion.setTelefono1(solicitud.getTelefono1());
+			}
+			// modificacion.setTelefono2(solicitud.getTelefono2());
+			if (solicitud.getDomicilio() != null) {
+				modificacion.setDomicilio(solicitud.getDomicilio());
+			}
+			if (solicitud.getMovil() != null) {
+				modificacion.setMovil(solicitud.getMovil());
+			}
+			if (solicitud.getFax1() != null) {
+				modificacion.setFax1(solicitud.getFax1());
+			}
+			// modificacion.setFax2(solicitud.getFax2());
+			if (solicitud.getCorreoelectronico() != null) {
+				modificacion.setCorreoelectronico(solicitud.getCorreoelectronico());
+			}
+			if (solicitud.getPaginaweb() != null) {
+				modificacion.setPaginaweb(solicitud.getPaginaweb());
+			}
+			modificacion.setIdpais(solicitud.getIdpais());
+			if (solicitud.getIdprovincia() != null) {
+				modificacion.setIdprovincia(solicitud.getIdprovincia());
+			}
+			if (solicitud.getIdpoblacion() != null) {
+				modificacion.setIdpoblacion(solicitud.getIdpoblacion());
+			}
+			if (solicitud.getPoblacionextranjera() != null) {
+				modificacion.setPoblacionextranjera(solicitud.getPoblacionextranjera());
+			}
+			if (solicitud.getOtraprovincia() != null) {
+				modificacion.setOtraprovincia(solicitud.getOtraprovincia());
+			}
+
+			int responseUpdate = cenDireccionesExtendsMapper.updateByPrimaryKeySelective(modificacion);
+
+			if (responseUpdate >= 1) {
+				updateResponseDTO.setStatus(SigaConstants.OK);
+
+				CenSolimodidirecciones record = new CenSolimodidirecciones();
+				record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
+				record.setIdestadosolic((short) 20);
+				int response = cenSoliModiDireccionesExtendsMapper.updateByPrimaryKeySelective(record);
+
+				if (response == 0) {
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.warn(
+							"processSolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.updateByPrimaryKey() -> "
+									+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
+
+				} else {
+					updateResponseDTO.setStatus(SigaConstants.OK);
+				}
+			}else {
 				updateResponseDTO.setStatus(SigaConstants.KO);
-				LOGGER.warn("processSolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.updateByPrimaryKey() -> "
-						+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
-	
-			} 
-			
-			updateResponseDTO.setStatus(SigaConstants.OK);
-			LOGGER.info(
-					"processSolModifDatosDirecciones() -> Salida del servicio para actualizar el estado de la solicitud a REALIZADO");
-		}
-		
-		}else {
+			}
+
+		} else {
 			updateResponseDTO.setStatus(SigaConstants.KO);
 			LOGGER.warn("processSolModifDatosGenerales() / No existe el usuario.");
 		}
+
+		LOGGER.info(
+				"processSolModifDatosDirecciones() -> Salida del servicio para actualizar el estado de la solicitud a REALIZADO");
 		return updateResponseDTO;
 
 	}
@@ -193,21 +199,22 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 			HttpServletRequest request) {
 		LOGGER.info(
 				"denySolModifDatosDirecciones() -> Entrada al servicio para actualizar el estado de la solicitud a DENEGADO");
-		
+
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		
+
 		CenSolimodidirecciones record = new CenSolimodidirecciones();
 		record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
 		record.setIdestadosolic((short) 30);
 		int response = cenSoliModiDireccionesExtendsMapper.updateByPrimaryKeySelective(record);
-		
+
 		if (response == 0) {
 			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn("denySolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.updateByPrimaryKeySelective() -> "
-					+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
+			LOGGER.warn(
+					"denySolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.updateByPrimaryKeySelective() -> "
+							+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
-		} 
-		
+		}
+
 		updateResponseDTO.setStatus(SigaConstants.OK);
 		LOGGER.info(
 				"denySolModifDatosDirecciones() -> Salida del servicio para actualizar el estado de la solicitud a DENEGADO");

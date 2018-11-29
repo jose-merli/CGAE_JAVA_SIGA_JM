@@ -8,13 +8,14 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
+import org.itcgae.siga.db.mappers.ExpSolicitudborradoMapper;
 import org.itcgae.siga.db.services.cen.providers.ExpSolicitudBorradoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface ExpSolicitudBorradoExtendsMapper {
+public interface ExpSolicitudBorradoExtendsMapper extends ExpSolicitudborradoMapper{
 
 	@SelectProvider(type = ExpSolicitudBorradoSqlExtendsProvider.class, method = "searchSolModifDatosExpedientes")
 	@Results({ @Result(column = "ESPECIFICA", property = "especifica", jdbcType = JdbcType.VARCHAR),

@@ -31,16 +31,16 @@ public class SearchSolModifDatosExpedientesController {
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/processSolModifDatosExpedientes", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> processSolModifDatosExpedientes(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = searchSolModifDatosExpedientesService.processSolModifDatosExpedientes(numPagina, solModificacionItem, request);
+	ResponseEntity<UpdateResponseDTO> processSolModifDatosExpedientes(@RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = searchSolModifDatosExpedientesService.processSolModifDatosExpedientes(solModificacionItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/denySolModifDatosExpedientes", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> denySolModifDatosExpedientes(@RequestParam("numPagina") int numPagina, @RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = searchSolModifDatosExpedientesService.denySolModifDatosExpedientes(numPagina, solModificacionItem, request);
+	ResponseEntity<UpdateResponseDTO> denySolModifDatosExpedientes(@RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = searchSolModifDatosExpedientesService.denySolModifDatosExpedientes(solModificacionItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);

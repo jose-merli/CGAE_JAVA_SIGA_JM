@@ -198,9 +198,10 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 					"processGeneralModificationRequest() / cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective() -> "
 							+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
+		}else {
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 
-		updateResponseDTO.setStatus(SigaConstants.OK);
 		LOGGER.info(
 				"processGeneralModificationRequest() -> Salida del servicio para actualizar el estado de la solicitud a REALIZADO");
 		return updateResponseDTO;
@@ -225,9 +226,10 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 					"denyGeneralModificationRequest() / cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKeySelective() -> "
 							+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
+		}else {
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 
-		updateResponseDTO.setStatus(SigaConstants.OK);
 		LOGGER.info(
 				"denyGeneralModificationRequest() -> Salida del servicio para actualizar el estado de la solicitud a DENEGADO");
 		return updateResponseDTO;
@@ -313,6 +315,8 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 						LOGGER.warn(
 								"insertGeneralModificationRequest() / cenClienteExtendsMapper.insertSelective() -> "
 										+ insertResponseDTO.getStatus() + " .no se pudo crear el registro en CEN_CLIENTE");
+					}else {
+						insertResponseDTO.setStatus(SigaConstants.OK);
 					}
 				}
 				
@@ -324,9 +328,10 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 							"insertGeneralModificationRequest() / cenSolicitudesModificacionExtendsMapper.insertSelective() -> "
 									+ insertResponseDTO.getStatus() + " .no se pudo generar la solicitud");
 
+				}else{
+					insertResponseDTO.setStatus(SigaConstants.OK);
 				}
 				
-				insertResponseDTO.setStatus(SigaConstants.OK);
 
 			}
 		}
