@@ -10,12 +10,12 @@ public class AgeTipocalendarioSqlExtendsProvider extends  AgeTipocalendarioSqlPr
 		
 		SQL sql = new SQL();
 		
-		sql.SELECT_DISTINCT("IDTIPOCALENDARIO");
-		sql.SELECT("DESCRIPCION");
-		sql.FROM("AGE_TIPOCALENDARIO");
-//		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON (REC.IDRECURSO = tipocalendario.DESCRIPCION " + 
-//				"		AND REC.IDLENGUAJE = '"+idLenguaje+"')"); Añadir cuando guardemos la traducción
-		sql.ORDER_BY("DESCRIPCION");
+		sql.SELECT_DISTINCT("tipocalendario.IDTIPOCALENDARIO");
+		sql.SELECT("rec.DESCRIPCION");
+		sql.FROM("AGE_TIPOCALENDARIO tipocalendario");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON (REC.IDRECURSO = tipocalendario.DESCRIPCION " + 
+				"		AND REC.IDLENGUAJE = '" + idLenguaje + "')"); 
+		sql.ORDER_BY("tipocalendario.IDTIPOCALENDARIO");
 		return sql.toString();
 	}
 	

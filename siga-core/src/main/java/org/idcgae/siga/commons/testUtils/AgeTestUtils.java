@@ -1,4 +1,4 @@
-package org.itcgae.siga.commons.utils;
+package org.idcgae.siga.commons.testUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,152 +11,16 @@ import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
 import org.itcgae.siga.DTOs.age.PermisoCalendarioItem;
 import org.itcgae.siga.DTOs.age.PermisosCalendarioDTO;
-import org.itcgae.siga.DTOs.form.CursoItem;
-import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
-import org.itcgae.siga.DTOs.form.FormadorCursoItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.commons.utils.TokenGenerationException;
-import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AgeCalendario;
 import org.itcgae.siga.db.entities.AgeEvento;
 import org.itcgae.siga.db.entities.AgeNotificacionesevento;
 import org.itcgae.siga.db.entities.AgePermisoscalendario;
-import org.itcgae.siga.db.entities.ForCurso;
-import org.itcgae.siga.db.entities.ForPersonaCurso;
 import org.itcgae.siga.db.entities.GenDiccionario;
-import org.itcgae.siga.security.UserCgae;
-import org.itcgae.siga.security.UserTokenUtils;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TestUtils {
-
-	public MockHttpServletRequest getRequestWithGeneralAuthentication() throws TokenGenerationException {
-
-		MockHttpServletRequest mockreq = new MockHttpServletRequest();
-		UserCgae userCgae = new UserCgae();
-		List<String> listPerfiles = new ArrayList<>();
-
-		userCgae.setDni("44149718E");
-		userCgae.setGrupo("ADG");
-		userCgae.setInstitucion("2000");
-		listPerfiles.add("ADG");
-		userCgae.setPerfiles(listPerfiles);
-
-		UserTokenUtils.configure("1234", "Bearer", 1000000, "");
-		String token = UserTokenUtils.generateToken(userCgae);
-
-		mockreq.addHeader("Authorization", token);
-
-		return mockreq;
-	}
-
-	public MockHttpServletRequest getRequestWithGeneralAuthentication2005() throws TokenGenerationException {
-
-		MockHttpServletRequest mockreq = new MockHttpServletRequest();
-		UserCgae userCgae = new UserCgae();
-		List<String> listPerfiles = new ArrayList<>();
-
-		userCgae.setDni("44149718E");
-		userCgae.setGrupo("ADG");
-		userCgae.setInstitucion("2005");
-		listPerfiles.add("ADG");
-		userCgae.setPerfiles(listPerfiles);
-
-		UserTokenUtils.configure("1234", "Bearer", 1000000, "");
-		String token = UserTokenUtils.generateToken(userCgae);
-
-		mockreq.addHeader("Authorization", token);
-
-		return mockreq;
-	}
-
-	public MockHttpServletRequest getRequestWithVariableAuthentication(String idInstitucion) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<ComboItem> getListComboItemsSimulados() {
-
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-
-		ComboItem comboItem_0 = new ComboItem();
-		comboItem_0.setLabel("comboItem_0");
-		comboItem_0.setValue("0");
-		comboItems.add(comboItem_0);
-
-		return comboItems;
-
-	}
-	
-	public List<ComboItem> getListComboItemsLabelTestSimulados(){
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-
-		ComboItem comboItem_0 = new ComboItem();
-		comboItem_0.setLabel("");
-		comboItem_0.setValue("");
-		comboItems.add(comboItem_0);
-
-		return comboItems;
-	}
-	
-	public List<ComboItem> getListComboItemsValoresNulosSimulados() {
-
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-
-		ComboItem comboItem_0 = new ComboItem();
-		ComboItem comboItem_1 = new ComboItem();
-		
-		comboItem_0.setLabel("");
-		comboItem_0.setValue("");
-		comboItems.add(0, comboItem_0);
-		comboItem_1.setLabel("comboItem_0");
-		comboItem_1.setValue("0");
-		comboItems.add(comboItem_1);
-
-		return comboItems;
-
-	}
-
-	public List<CursoItem> getListCursosSimulados(String estado, Integer flagArchivado) {
-
-		List<CursoItem> cursoItems = new ArrayList<CursoItem>();
-
-		cursoItems.add(getCursoSimulado(estado, flagArchivado));
-
-		return cursoItems;
-	}
-
-	public CursoItem getCursoSimulado(String estado, Integer flagArchivado) {
-
-		CursoItem cursoItem = new CursoItem();
-		cursoItem.setCodigoCurso("003GREW");
-		cursoItem.setIdInstitucion("2000");
-		cursoItem.setIdEstado(estado);
-		cursoItem.setFlagArchivado(flagArchivado);
-
-		return cursoItem;
-	}
-
-	public ComboItem getComboItemVacio() {
-
-		ComboItem comboItem = new ComboItem();
-		comboItem.setLabel("");
-		comboItem.setValue("");
-
-		return comboItem;
-
-	}
-
-	public List<AdmUsuarios> getListUsuariosSimulados(String idLenguaje) {
-		List<AdmUsuarios> usuarios = new ArrayList<>();
-		AdmUsuarios admUsuarios = new AdmUsuarios();
-		admUsuarios.setIdlenguaje(idLenguaje);
-		admUsuarios.setIdusuario(1);
-		usuarios.add(admUsuarios);
-		return usuarios;
-	}
+public class AgeTestUtils {
 
 	public List<AgeCalendario> getListaAgeCalendariosSimulados() {
 		List<AgeCalendario> listaAgeCalendarios = new ArrayList<AgeCalendario>();
@@ -230,26 +94,6 @@ public class TestUtils {
 		return listaAgeEventos;
 	}
 
-	public FormadorCursoItem getFormadoresCursoItem() {
-		FormadorCursoItem formador = new FormadorCursoItem();
-
-		formador.setIdInstitucion((short) 2000);
-		formador.setNif("48921787M");
-		formador.setIdPersona(Long.valueOf("43344334"));
-		formador.setIdCurso(Long.valueOf("1"));
-		formador.setIdRol("1");
-		formador.setIdTipoCoste("1");
-		formador.setTarifa(Double.valueOf("10"));
-		return formador;
-	}
-
-	public List<FormadorCursoItem> getListFormadoresCursoItem() {
-		List<FormadorCursoItem> listaFormadoresCursoItem = new ArrayList<FormadorCursoItem>();
-		listaFormadoresCursoItem.add(getFormadoresCursoItem());
-
-		return listaFormadoresCursoItem;
-	}
-
 	public GenDiccionario getGenDiccionario() {
 		GenDiccionario genDiccionario = new GenDiccionario();
 
@@ -276,48 +120,6 @@ public class TestUtils {
 		comboItems.add(comboItem_0);
 
 		return comboItems;
-
-	}
-
-	public List<ForCurso> getListForCursoSimulados() {
-
-		List<ForCurso> listCursos = new ArrayList<ForCurso>();
-
-		ForCurso curso = new ForCurso();
-		curso.setIdcurso(Long.valueOf("1"));
-		curso.setIdinstitucion(Short.valueOf("2000"));
-		curso.setNombrecurso("Prueba");
-
-		listCursos.add(curso);
-
-		return listCursos;
-
-	}
-
-	public FormadorCursoDTO getFormadorCursoDTOSimulado() {
-		FormadorCursoDTO formadorCursoDTO = new FormadorCursoDTO();
-		List<FormadorCursoItem> listaFormadores = new ArrayList<FormadorCursoItem>();
-		listaFormadores.add(getFormadoresCursoItem());
-		formadorCursoDTO.setFormadoresCursoItem(listaFormadores);
-
-		return formadorCursoDTO;
-	}
-
-	public List<ForPersonaCurso> getListForPersonaCursoSimulados() {
-
-		List<ForPersonaCurso> listFormadoresCursos = new ArrayList<ForPersonaCurso>();
-
-		ForPersonaCurso formador = new ForPersonaCurso();
-		formador.setIdcurso(Long.valueOf("1"));
-		formador.setIdinstitucion(Short.valueOf("2000"));
-		formador.setIdpersona(Long.valueOf("43344334"));
-		formador.setIdrol(Short.valueOf("1"));
-		formador.setIdtipocoste(Short.valueOf("1"));
-		formador.setTarifa(Long.valueOf("10"));
-
-		listFormadoresCursos.add(formador);
-
-		return listFormadoresCursos;
 
 	}
 

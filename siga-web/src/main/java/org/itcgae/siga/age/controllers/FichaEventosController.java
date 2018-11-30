@@ -4,6 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.form.AsistenciaCursoDTO;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
@@ -79,4 +81,21 @@ public class FichaEventosController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "fichaEventos/getJudicialDistrict", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getJudicialDistrict(HttpServletRequest request) {
+		ComboDTO response = fichaEventosService.getJudicialDistrict(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaEventos/updateEventCalendar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateEventCalendar(@RequestBody EventoItem eventoItem, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaEventosService.updateEventCalendar(eventoItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaEventos/deleteEventCalendar", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> deleteEventCalendar(@RequestBody EventoDTO eventoDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaEventosService.deleteEventCalendar(eventoDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
 }

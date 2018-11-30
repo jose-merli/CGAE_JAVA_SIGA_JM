@@ -5,11 +5,12 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import org.idcgae.siga.commons.testUtils.AgeTestUtils;
+import org.idcgae.siga.commons.testUtils.TestUtils;
 import org.itcgae.siga.DTOs.age.CalendarDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.age.service.impl.AgendaCalendarioServiceImpl;
-import org.itcgae.siga.commons.utils.TestUtils;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AgeCalendario;
@@ -37,11 +38,13 @@ public class AgendaCalendarioServiceTest {
 	private AgendaCalendarioServiceImpl agendaCalendarioServiceImpl;
 
 	private TestUtils testUtils = new TestUtils();
+	
+	private AgeTestUtils ageTestUtils = new AgeTestUtils();
 
 	@Test
 	public void getCalendariosByIdInstitucionTest() throws Exception {
 
-		List<AgeCalendario> listAgeCalendarioSimulado = testUtils.getListaAgeCalendariosSimulados();
+		List<AgeCalendario> listAgeCalendarioSimulado = ageTestUtils.getListaAgeCalendariosSimulados();
 		
 		when(ageCalendarioExtendsMapper.selectByExample(Mockito.any(AgeCalendarioExample.class))).thenReturn(listAgeCalendarioSimulado);
 

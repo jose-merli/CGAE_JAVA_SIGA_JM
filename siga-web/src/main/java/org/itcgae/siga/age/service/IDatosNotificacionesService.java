@@ -15,7 +15,7 @@ public interface IDatosNotificacionesService {
 	
 	public ComboDTO getMeasuredUnit(HttpServletRequest request);
 	
-	public ComboDTO getTypeWhere (HttpServletRequest request);
+	public ComboDTO getTypeWhere(HttpServletRequest request);
 	
 	public InsertResponseDTO saveNotification(NotificacionEventoItem notificacionItem, HttpServletRequest request);
 	

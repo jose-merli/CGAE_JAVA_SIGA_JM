@@ -32,6 +32,7 @@ import org.itcgae.siga.db.services.age.mappers.AgeTipocalendarioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
@@ -49,7 +50,6 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 
 	@Autowired
 	private AgePermisosCalendarioExtendsMapper agePermisosCalendarioExtendsMapper;
-	
 
 	@Override
 	public ComboDTO getCalendarType(HttpServletRequest request) {
@@ -91,6 +91,7 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO updatePermissions(PermisosCalendarioDTO permisosCalendarioDTO,
 			HttpServletRequest request) {
 		int response = 0;
@@ -112,69 +113,79 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
+				try {
+					for (PermisoCalendarioItem permisoCalendarioItem : permisosCalendarioDTO
+							.permisosCalendarioItems()) {
 
-				for (PermisoCalendarioItem permisoCalendarioItem : permisosCalendarioDTO.permisosCalendarioItems()) {
-
-					AgePermisoscalendarioExample examplePermiso = new AgePermisoscalendarioExample();
-					examplePermiso.createCriteria().andIdperfilEqualTo(permisoCalendarioItem.getIdPerfil())
-							.andIdcalendarioEqualTo(Long.valueOf(permisoCalendarioItem.getIdCalendario()))
-							.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-					LOGGER.info(
-							"insertCalendar() / agePermisosCalendarioExtendsMapper.selectByExample(examplePermiso) -> Entrada a agePermisosCalendarioExtendsMapper para buscar si el perfil ya tiene un permiso");
-
-					List<AgePermisoscalendario> permisos = agePermisosCalendarioExtendsMapper
-							.selectByExample(examplePermiso);
-
-					LOGGER.info(
-							"insertCalendar() / agePermisosCalendarioExtendsMapper.selectByExample(examplePermiso) -> Salida a ageCalendarioExtendsMapper para buscar si el perfil ya tiene un permiso");
-
-					if (null != permisos && permisos.size() > 0) {
-						AgePermisoscalendario permiso = permisos.get(0);
+						AgePermisoscalendarioExample examplePermiso = new AgePermisoscalendarioExample();
+						examplePermiso.createCriteria().andIdperfilEqualTo(permisoCalendarioItem.getIdPerfil())
+								.andIdcalendarioEqualTo(Long.valueOf(permisoCalendarioItem.getIdCalendario()))
+								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 						LOGGER.info(
-								"insertCalendar() / agePermisosCalendarioExtendsMapper.updatePermiso(...) -> Entrada a agePermisosCalendarioExtendsMapper para modificar el permiso de calendario si el perfil ya existe");
+								"insertCalendar() / agePermisosCalendarioExtendsMapper.selectByExample(examplePermiso) -> Entrada a agePermisosCalendarioExtendsMapper para buscar si el perfil ya tiene un permiso");
 
-						permiso.setFechamodificacion(new Date());
-						permiso.setTipoacceso(Long.valueOf(permisoCalendarioItem.getDerechoacceso()));
-						permiso.setUsumodificacion(usuario.getIdusuario().longValue());
-						response = agePermisosCalendarioExtendsMapper.updateByPrimaryKey(permiso);
+						List<AgePermisoscalendario> permisos = agePermisosCalendarioExtendsMapper
+								.selectByExample(examplePermiso);
 
 						LOGGER.info(
-								"insertCalendar() / agePermisosCalendarioExtendsMapper.updatePermiso(...) -> Salida a agePermisosCalendarioExtendsMapper para modificar el permiso de calendario si el perfil ya existe");
+								"insertCalendar() / agePermisosCalendarioExtendsMapper.selectByExample(examplePermiso) -> Salida a ageCalendarioExtendsMapper para buscar si el perfil ya tiene un permiso");
 
-					} else {
+						if (null != permisos && permisos.size() > 0) {
+							AgePermisoscalendario permiso = permisos.get(0);
 
-						AgePermisoscalendario permission = new AgePermisoscalendario();
-						permission.setIdinstitucion(idInstitucion);
-						permission.setIdcalendario(Long.valueOf(permisoCalendarioItem.getIdCalendario()));
-						permission.setTipoacceso(Long.valueOf(permisoCalendarioItem.getDerechoacceso()));
-						permission.setUsumodificacion(usuario.getIdusuario().longValue());
-						permission.setIdperfil(permisoCalendarioItem.getIdPerfil());
-						permission.setFechamodificacion(new Date());
+							LOGGER.info(
+									"insertCalendar() / agePermisosCalendarioExtendsMapper.updatePermiso(...) -> Entrada a agePermisosCalendarioExtendsMapper para modificar el permiso de calendario si el perfil ya existe");
 
-						LOGGER.info(
-								"insertCalendar() / agePermisosCalendarioExtendsMapper.insert(permission) -> Entrada a agePermisosCalendarioExtendsMapper para insertar el nuevo permiso de calendario a un perfil");
+							permiso.setFechamodificacion(new Date());
+							permiso.setTipoacceso(Long.valueOf(permisoCalendarioItem.getDerechoacceso()));
+							permiso.setUsumodificacion(usuario.getIdusuario().longValue());
+							response = agePermisosCalendarioExtendsMapper.updateByPrimaryKey(permiso);
 
-						response = agePermisosCalendarioExtendsMapper.insert(permission);
+							LOGGER.info(
+									"insertCalendar() / agePermisosCalendarioExtendsMapper.updatePermiso(...) -> Salida a agePermisosCalendarioExtendsMapper para modificar el permiso de calendario si el perfil ya existe");
 
-						LOGGER.info(
-								"insertCalendar() / agePermisosCalendarioExtendsMapper.insert(permission) -> Salida a agePermisosCalendarioExtendsMapper para insertar el nuevo permiso de calendario a un perfil");
+						} else {
+
+							AgePermisoscalendario permission = new AgePermisoscalendario();
+							permission.setIdinstitucion(idInstitucion);
+							permission.setIdcalendario(Long.valueOf(permisoCalendarioItem.getIdCalendario()));
+							permission.setTipoacceso(Long.valueOf(permisoCalendarioItem.getDerechoacceso()));
+							permission.setUsumodificacion(usuario.getIdusuario().longValue());
+							permission.setIdperfil(permisoCalendarioItem.getIdPerfil());
+							permission.setFechamodificacion(new Date());
+
+							LOGGER.info(
+									"insertCalendar() / agePermisosCalendarioExtendsMapper.insert(permission) -> Entrada a agePermisosCalendarioExtendsMapper para insertar el nuevo permiso de calendario a un perfil");
+
+							response = agePermisosCalendarioExtendsMapper.insert(permission);
+
+							LOGGER.info(
+									"insertCalendar() / agePermisosCalendarioExtendsMapper.insert(permission) -> Salida a agePermisosCalendarioExtendsMapper para insertar el nuevo permiso de calendario a un perfil");
+
+						}
 
 					}
 
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 				}
-
+				
 				if (response == 0) {
 					error.setCode(400);
-					error.setDescription("Error al insertar un permiso");
+					error.setDescription(
+							"Se ha producido un error en BBDD contacte con su administrador");
 				} else {
 					error.setCode(200);
 				}
 
+
 			}
 		}
 
+		updateResponseDTO.setError(error);
 		return updateResponseDTO;
 
 	}
@@ -306,8 +317,7 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 
 	@Override
 	public CalendarDTO getCalendar(String idCalendario, HttpServletRequest request) {
-		LOGGER.info(
-				"getCalendar() -> Entrada al servicio para obtener un calendario especifico");
+		LOGGER.info("getCalendar() -> Entrada al servicio para obtener un calendario especifico");
 
 		AgeCalendario calendar = new AgeCalendario();
 		CalendarDTO calendarioDTO = new CalendarDTO();
@@ -335,8 +345,7 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 
 		}
 
-		LOGGER.info(
-				"getCalendar() -> Salida del servicio para obtener un calendario especifico");
+		LOGGER.info("getCalendar() -> Salida del servicio para obtener un calendario especifico");
 
 		return calendarioDTO;
 	}
@@ -356,7 +365,8 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 		if (null != idInstitucion) {
 			LOGGER.info(
 					"getProfilesPermissions() / agePermisosCalendarioExtendsMapper.getPermisosProfiles() -> Entrada a agePermisosCalendarioExtendsMapper para obtener los permisos de los perfiles");
-			profilesCalendar = agePermisosCalendarioExtendsMapper.getProfilesPermissions(idCalendario, idInstitucion.toString());
+			profilesCalendar = agePermisosCalendarioExtendsMapper.getProfilesPermissions(idCalendario,
+					idInstitucion.toString());
 			LOGGER.info(
 					"getProfilesPermissions() / agePermisosCalendarioExtendsMapper.getPermisosProfiles() -> Salida de agePermisosCalendarioExtendsMapper para obtener los permisos de los perfiles");
 
@@ -369,7 +379,5 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 
 		return permisosPerfilesCalendarioDTO;
 	}
-
-
 
 }
