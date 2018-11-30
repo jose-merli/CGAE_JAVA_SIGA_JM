@@ -5,6 +5,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import org.idcgae.siga.commons.testUtils.AgeTestUtils;
+import org.idcgae.siga.commons.testUtils.TestUtils;
 import org.itcgae.siga.DTOs.age.CalendarDTO;
 import org.itcgae.siga.DTOs.age.CalendarItem;
 import org.itcgae.siga.DTOs.age.EventoDTO;
@@ -12,7 +14,6 @@ import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.age.service.impl.AgendaCalendarioServiceImpl;
-import org.itcgae.siga.commons.utils.TestUtils;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -38,11 +39,17 @@ public class AgendaCalendarioServiceTest {
 	private AgendaCalendarioServiceImpl agendaCalendarioServiceImpl;
 
 	private TestUtils testUtils = new TestUtils();
+	
+	private AgeTestUtils ageTestUtils = new AgeTestUtils();
 
 	@Test
 	public void getCalendariosByIdInstitucionTest() throws Exception {
 
-		List<CalendarItem> listAgeCalendarioSimulado = testUtils.getListaAgeCalendariosSimulados();
+
+		//List<AgeCalendario> listAgeCalendarioSimulado = ageTestUtils.getListaAgeCalendariosSimulados();
+
+		List<CalendarItem> listAgeCalendarioSimulado = ageTestUtils.getListaCalendariosSimulados();
+
 		
 		when(ageCalendarioExtendsMapper.getCalendariosPermisos(Mockito.anyShort(), Mockito.anyString())).thenReturn(listAgeCalendarioSimulado);
 
@@ -84,7 +91,7 @@ public class AgendaCalendarioServiceTest {
 
 		String idCalendario = "1";
 		Short idInstitucion = 2000;
-		List<EventoItem> listEventosSimulado = testUtils.getListaEventosSimulados(idCalendario, idInstitucion);
+		List<EventoItem> listEventosSimulado = ageTestUtils.getListaEventosSimulados(idCalendario, idInstitucion);
 		
 		when(ageCalendarioExtendsMapper.getCalendarioEventos(Mockito.anyShort(), Mockito.anyString(), Mockito.anyString())).thenReturn(listEventosSimulado);
 

@@ -3,10 +3,10 @@ package org.itcgae.siga.cen.services.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import org.idcgae.siga.commons.testUtils.TestUtils;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SoliModifFotoItem;
 import org.itcgae.siga.commons.utils.CenTestUtils;
-import org.itcgae.siga.commons.utils.TestUtils;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;

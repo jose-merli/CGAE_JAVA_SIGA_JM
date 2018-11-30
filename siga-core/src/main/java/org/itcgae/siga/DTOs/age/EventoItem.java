@@ -24,7 +24,19 @@ public class EventoItem {
 	private Date fechaBaja;
 	private Long usuModificacion;
 	private Date fechaModificacion;
-	private DatosRepeticionEventoItem datosRepeticion;
+
+	private String idTipoCalendario;
+	
+	private String idRepeticionEvento;
+	private Integer valoresRepeticion [];
+	private String valoresRepeticionString;
+	private String tipoDiasRepeticion;
+	private String tipoRepeticion;
+	private Date fechaInicioRepeticion;
+	private Date fechaFinRepeticion;
+
+	private Long idPartidoJudicial;
+
 		
 	/**
 	 **/
@@ -277,23 +289,156 @@ public class EventoItem {
 	}
 	
 	/**
-	 * 
 	 **/
-	public EventoItem datosRepeticion(DatosRepeticionEventoItem datosRepeticion) {
-		this.datosRepeticion = datosRepeticion;
+	public EventoItem idTipoCalendario(String idTipoCalendario) {
+		this.idTipoCalendario = idTipoCalendario;
 		return this;
 	}
 
-	@JsonProperty("datosRepeticion")
-	public DatosRepeticionEventoItem getDatosRepeticion() {
-		return datosRepeticion;
+	@JsonProperty("idTipoCalendario")
+	public String getIdTipoCalendario() {
+		return idTipoCalendario;
 	}
 
-	public void setDatosRepeticion(DatosRepeticionEventoItem datosRepeticion) {
-		this.datosRepeticion = datosRepeticion;
+	public void setIdTipoCalendario(String idTipoCalendario) {
+		this.idTipoCalendario = idTipoCalendario;
 	}
-
 	
+	/**
+	 **/
+	public EventoItem idRepeticionEvento(String idRepeticionEvento) {
+		this.idRepeticionEvento = idRepeticionEvento;
+		return this;
+	}
+
+	@JsonProperty("idRepeticionEvento")
+	public String getIdRepeticionEvento() {
+		return idRepeticionEvento;
+	}
+
+	public void setIdRepeticionEvento(String idRepeticionEvento) {
+		this.idRepeticionEvento = idRepeticionEvento;
+	}
+	
+	
+	/**
+	 **/
+	public EventoItem valoresRepeticion(Integer valoresRepeticion []) {
+		this.valoresRepeticion = valoresRepeticion;
+		return this;
+	}
+
+	@JsonProperty("valoresRepeticion")
+	public Integer [] getValoresRepeticion() {
+		return valoresRepeticion;
+	}
+
+	public void setValoresRepeticion(Integer valoresRepeticion []) {
+		this.valoresRepeticion = valoresRepeticion;
+	}
+	
+	/**
+	 **/
+	public EventoItem valoresRepeticionString(String valoresRepeticionString) {
+		this.valoresRepeticionString = valoresRepeticionString;
+		return this;
+	}
+
+	@JsonProperty("valoresRepeticionString")
+	public String getValoresRepeticionString() {
+		return valoresRepeticionString;
+	}
+
+	public void setValoresRepeticionString(String valoresRepeticionString) {
+		this.valoresRepeticionString = valoresRepeticionString;
+	}
+	
+	/**
+	 **/
+	public EventoItem tipoDiasRepeticion(String tipoDiasRepeticion) {
+		this.tipoDiasRepeticion = tipoDiasRepeticion;
+		return this;
+	}
+
+	@JsonProperty("tipoDiasRepeticion")
+	public String getTipoDiasRepeticion() {
+		return tipoDiasRepeticion;
+	}
+
+	public void setTipoDiasRepeticion(String tipoDiasRepeticion) {
+		this.tipoDiasRepeticion = tipoDiasRepeticion;
+	}
+	
+	/**
+	 **/
+	public EventoItem tipoRepeticion(String tipoRepeticion) {
+		this.tipoRepeticion = tipoRepeticion;
+		return this;
+	}
+
+	@JsonProperty("tipoRepeticion")
+	public String getTipoRepeticion() {
+		return tipoRepeticion;
+	}
+
+
+	public void setTipoRepeticion(String tipoRepeticion) {
+		this.tipoRepeticion = tipoRepeticion;
+	}
+	
+	
+	/**
+	 **/
+	public EventoItem fechaInicioRepeticion(Date fechaInicioRepeticion) {
+		this.fechaInicioRepeticion = fechaInicioRepeticion;
+		return this;
+	}
+
+	@JsonProperty("fechaInicioRepeticion")
+	public Date getFechaInicioRepeticion() {
+		return fechaInicioRepeticion;
+	}
+
+	public void setFechaInicioRepeticion(Date fechaInicioRepeticion) {
+		this.fechaInicioRepeticion = fechaInicioRepeticion;
+	}
+
+	/**
+	 **/
+	public EventoItem fechaFinRepeticion(Date fechaFinRepeticion) {
+		this.fechaFinRepeticion = fechaFinRepeticion;
+		return this;
+	}
+
+	@JsonProperty("fechaFinRepeticion")
+	public Date getFechaFinRepeticion() {
+		return fechaFinRepeticion;
+	}
+
+	public void setFechaFinRepeticion(Date fechaFinRepeticion) {
+		this.fechaFinRepeticion = fechaFinRepeticion;
+	}
+			
+
+	@JsonProperty("fechaBaja")
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+
+	@JsonProperty("i")
+	public Long getIdPartidoJudicial() {
+		return idPartidoJudicial;
+	}
+
+	public void setIdPartidoJudicial(Long idPartidoJudicial) {
+		this.idPartidoJudicial = idPartidoJudicial;
+	}
+
+
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -317,10 +462,22 @@ public class EventoItem {
 				&& Objects.equals(this.idEstadoEvento, eventoItem.idEstadoEvento)
 				&& Objects.equals(this.idTipoEvento, eventoItem.idTipoEvento)
 				&& Objects.equals(this.usuModificacion, eventoItem.usuModificacion)
-				&& Objects.equals(this.fechaModificacion, eventoItem.fechaModificacion)
-				&& Objects.equals(this.datosRepeticion, eventoItem.datosRepeticion)
+				&& Objects.equals(this.recursos, eventoItem.recursos)
+				&& Objects.equals(this.idEstadoEvento, eventoItem.idEstadoEvento)
+				&& Objects.equals(this.idTipoEvento, eventoItem.idTipoEvento)
 				&& Objects.equals(this.tipoAcceso, eventoItem.tipoAcceso)
-				&& Objects.equals(this.fechaBaja, eventoItem.fechaBaja);
+				&& Objects.equals(this.fechaBaja, eventoItem.fechaBaja)
+				&& Objects.equals(this.fechaModificacion, eventoItem.fechaModificacion)
+				&& Objects.equals(this.idTipoCalendario, eventoItem.idTipoCalendario)
+				&& Objects.equals(this.idRepeticionEvento, eventoItem.idRepeticionEvento)
+				&& Objects.equals(this.valoresRepeticion, eventoItem.valoresRepeticion)
+				&& Objects.equals(this.valoresRepeticionString, eventoItem.valoresRepeticionString)
+				&& Objects.equals(this.tipoDiasRepeticion, eventoItem.tipoDiasRepeticion)
+				&& Objects.equals(this.tipoRepeticion, eventoItem.tipoRepeticion)
+				&& Objects.equals(this.fechaInicioRepeticion, eventoItem.fechaInicioRepeticion)
+				&& Objects.equals(this.fechaFinRepeticion, eventoItem.fechaFinRepeticion)
+				&& Objects.equals(this.idPartidoJudicial, eventoItem.idPartidoJudicial);
+
 
 	}
 
@@ -328,10 +485,10 @@ public class EventoItem {
 	public int hashCode() {
 
 		return Objects.hash(idEvento, idCalendario, idInstitucion, titulo, fechaInicio, fechaFin, allDay, color, lugar,
-				descripcion, recursos, idEstadoEvento, idTipoEvento, usuModificacion, fechaModificacion, fechaBaja, tipoAcceso,
-				datosRepeticion);
+				descripcion, recursos, idEstadoEvento, idTipoEvento, usuModificacion, fechaModificacion, fechaBaja, idTipoCalendario, tipoAcceso,
+				idRepeticionEvento, valoresRepeticion, valoresRepeticionString, tipoDiasRepeticion, tipoRepeticion, fechaInicioRepeticion, fechaFinRepeticion,idPartidoJudicial);
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -352,9 +509,17 @@ public class EventoItem {
 		sb.append("    idTipoEvento: ").append(toIndentedString(idTipoEvento)).append("\n");
 		sb.append("    usuModificacion: ").append(toIndentedString(usuModificacion)).append("\n");
 		sb.append("    fechaModificacion: ").append(toIndentedString(fechaModificacion)).append("\n");
+		sb.append("    idTipoCalendario: ").append(toIndentedString(idTipoCalendario)).append("\n");
 		sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
-		sb.append("    datosRepeticion: ").append(toIndentedString(datosRepeticion)).append("\n");
 		sb.append("    tipoAcceso: ").append(toIndentedString(tipoAcceso)).append("\n");
+		sb.append("    idRepeticionEvento: ").append(toIndentedString(idRepeticionEvento)).append("\n");
+		sb.append("    valoresRepeticion: ").append(toIndentedString(valoresRepeticion)).append("\n");
+		sb.append("    valoresRepeticionString: ").append(toIndentedString(valoresRepeticionString)).append("\n");
+		sb.append("    tipoDiasRepeticion: ").append(toIndentedString(tipoDiasRepeticion)).append("\n");
+		sb.append("    tipoRepeticion: ").append(toIndentedString(tipoRepeticion)).append("\n");
+		sb.append("    fechaInicioRepeticion: ").append(toIndentedString(fechaInicioRepeticion)).append("\n");
+		sb.append("    fechaFinRepeticion: ").append(toIndentedString(fechaFinRepeticion)).append("\n");
+				sb.append("    idPartidoJudicial: ").append(toIndentedString(idPartidoJudicial)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

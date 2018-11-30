@@ -10,12 +10,12 @@ public class AgeUnidadMedidaSqlExtendsProvider extends  AgeUnidadmedidaSqlProvid
 
 	SQL sql = new SQL();
 		
-		sql.SELECT_DISTINCT("IDUNIDADMEDIDA");
-		sql.SELECT("DESCRIPCION");
-		sql.FROM("AGE_UNIDADMEDIDA");
-//		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON (REC.IDRECURSO = tipocalendario.DESCRIPCION " + 
-//				"		AND REC.IDLENGUAJE = '"+idLenguaje+"')"); Añadir cuando guardemos la traducción
-		sql.ORDER_BY("DESCRIPCION");
+		sql.SELECT_DISTINCT("uni.IDUNIDADMEDIDA");
+		sql.SELECT("rec.DESCRIPCION");
+		sql.FROM("AGE_UNIDADMEDIDA uni");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON (REC.IDRECURSO = uni.DESCRIPCION " + 
+				"		AND REC.IDLENGUAJE = '"+idLenguaje+"')");
+		sql.ORDER_BY("rec.DESCRIPCION");
 		return sql.toString();
 	}
 	

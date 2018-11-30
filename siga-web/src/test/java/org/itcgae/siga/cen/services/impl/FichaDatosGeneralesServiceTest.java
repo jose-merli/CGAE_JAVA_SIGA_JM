@@ -6,6 +6,8 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.idcgae.siga.commons.testUtils.CenTestUtils;
+import org.idcgae.siga.commons.testUtils.TestUtils;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
@@ -13,7 +15,6 @@ import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.commons.utils.TestUtils;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
@@ -99,18 +100,20 @@ public class FichaDatosGeneralesServiceTest {
 	private FichaDatosGeneralesServiceImpl fichaDatosGeneralesServiceImpl;
 	
 	private TestUtils testUtils = new TestUtils();
+	
+	private CenTestUtils cenTestUtils = new CenTestUtils();
 
 	@Test
 	public void updateColegiadoTest() throws Exception {
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		CenPersona persona = testUtils.getCenPersona((long) 1223, "20092000V");
-		ColegiadoItem colegiado = testUtils.getColegiadoItem(true, "1");
-		List<ComboEtiquetasItem> gruposPersona = testUtils.getListaEtiquetasSimuladas("1");
-		List<CenGruposclienteCliente> listarelacionGrupoPersona = testUtils.getListaGruposSimulados();
+		CenPersona persona = cenTestUtils.getCenPersona((long) 1223, "20092000V");
+		ColegiadoItem colegiado = cenTestUtils.getColegiadoItem(true, "1");
+		List<ComboEtiquetasItem> gruposPersona = cenTestUtils.getListaEtiquetasSimuladas("1");
+		List<CenGruposclienteCliente> listarelacionGrupoPersona = cenTestUtils.getListaGruposSimulados();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados("1");
-		CenCliente cliente = testUtils.getCenCliente();
-		List<CenDatoscolegialesestado> cenDatoscolegialesestado = testUtils.getDatosColegialesList();
+		CenCliente cliente = cenTestUtils.getCenCliente();
+		List<CenDatoscolegialesestado> cenDatoscolegialesestado = cenTestUtils.getDatosColegialesList();
 		
 		//		Mockeo de las llamadas a BD
 		
@@ -141,13 +144,13 @@ public class FichaDatosGeneralesServiceTest {
 	public void updateColegiadoFallosUpdateTest() throws Exception {
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		CenPersona persona = testUtils.getCenPersona((long) 1223, "20092000V");
-		ColegiadoItem colegiado = testUtils.getColegiadoItem(true, "1");
-		List<ComboEtiquetasItem> gruposPersona = testUtils.getListaEtiquetasSimuladas("2");
+		CenPersona persona = cenTestUtils.getCenPersona((long) 1223, "20092000V");
+		ColegiadoItem colegiado = cenTestUtils.getColegiadoItem(true, "1");
+		List<ComboEtiquetasItem> gruposPersona = cenTestUtils.getListaEtiquetasSimuladas("2");
 		List<CenGruposclienteCliente> listarelacionGrupoPersona = new ArrayList<CenGruposclienteCliente>();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados("1");
-		CenCliente cliente = testUtils.getCenCliente();
-		List<CenDatoscolegialesestado> cenDatoscolegialesestado = testUtils.getDatosColegialesList();
+		CenCliente cliente = cenTestUtils.getCenCliente();
+		List<CenDatoscolegialesestado> cenDatoscolegialesestado = cenTestUtils.getDatosColegialesList();
 		
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
@@ -179,13 +182,13 @@ public class FichaDatosGeneralesServiceTest {
 	public void updateColegiadoNoColegiadoYUsuarioLetradoTest() throws Exception {
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		CenPersona persona = testUtils.getCenPersona((long) 1223, "20092000V");
-		ColegiadoItem colegiado = testUtils.getColegiadoItem(false, "1");
-		List<ComboEtiquetasItem> gruposPersona = testUtils.getListaEtiquetasSimuladas("1");
-		List<CenGruposclienteCliente> listarelacionGrupoPersona = testUtils.getListaGruposSimulados();
+		CenPersona persona = cenTestUtils.getCenPersona((long) 1223, "20092000V");
+		ColegiadoItem colegiado = cenTestUtils.getColegiadoItem(false, "1");
+		List<ComboEtiquetasItem> gruposPersona = cenTestUtils.getListaEtiquetasSimuladas("1");
+		List<CenGruposclienteCliente> listarelacionGrupoPersona = cenTestUtils.getListaGruposSimulados();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados("1");
-		CenCliente cliente = testUtils.getCenCliente();
-		List<CenDatoscolegialesestado> cenDatoscolegialesestado = testUtils.getDatosColegialesList();
+		CenCliente cliente = cenTestUtils.getCenCliente();
+		List<CenDatoscolegialesestado> cenDatoscolegialesestado = cenTestUtils.getDatosColegialesList();
 		
 		//		Mockeo de las llamadas a BD
 		
@@ -215,7 +218,7 @@ public class FichaDatosGeneralesServiceTest {
 	public void updateColegiadoNoUsuarioTest() throws Exception {
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		ColegiadoItem colegiado = testUtils.getColegiadoItem(false, "2");
+		ColegiadoItem colegiado = cenTestUtils.getColegiadoItem(false, "2");
 		
 		//		Mockeo de las llamadas a BD
 		
@@ -234,13 +237,13 @@ public class FichaDatosGeneralesServiceTest {
 	public void updateColegiadoEtiquetasAntiguasTest() throws Exception {
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		CenPersona persona = testUtils.getCenPersona((long) 1223, "20092000V");
-		ColegiadoItem colegiado = testUtils.getColegiadoItem(false, "1");
-		List<ComboEtiquetasItem> gruposPersona = testUtils.getListaEtiquetasSimuladas("2");
+		CenPersona persona = cenTestUtils.getCenPersona((long) 1223, "20092000V");
+		ColegiadoItem colegiado = cenTestUtils.getColegiadoItem(false, "1");
+		List<ComboEtiquetasItem> gruposPersona = cenTestUtils.getListaEtiquetasSimuladas("2");
 		List<CenGruposclienteCliente> listarelacionGrupoPersona = new ArrayList<CenGruposclienteCliente>();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados("1");
-		CenCliente cliente = testUtils.getCenCliente();
-		List<CenDatoscolegialesestado> cenDatoscolegialesestado = testUtils.getDatosColegialesList();
+		CenCliente cliente = cenTestUtils.getCenCliente();
+		List<CenDatoscolegialesestado> cenDatoscolegialesestado = cenTestUtils.getDatosColegialesList();
 		
 		//		Mockeo de las llamadas a BD
 		
@@ -270,13 +273,13 @@ public class FichaDatosGeneralesServiceTest {
 	public void updateColegiadoUpdateFallidoTest() throws Exception {
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		CenPersona persona = testUtils.getCenPersona((long) 1223, "20092000V");
-		ColegiadoItem colegiado = testUtils.getColegiadoItem(false, "1");
-		List<ComboEtiquetasItem> gruposPersona = testUtils.getListaEtiquetasSimuladas("2");
-		List<CenGruposclienteCliente> listarelacionGrupoPersona =  testUtils.getListaGruposSimulados();
+		CenPersona persona = cenTestUtils.getCenPersona((long) 1223, "20092000V");
+		ColegiadoItem colegiado = cenTestUtils.getColegiadoItem(false, "1");
+		List<ComboEtiquetasItem> gruposPersona = cenTestUtils.getListaEtiquetasSimuladas("2");
+		List<CenGruposclienteCliente> listarelacionGrupoPersona =  cenTestUtils.getListaGruposSimulados();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados("1");
-		CenCliente cliente = testUtils.getCenCliente();
-		List<CenDatoscolegialesestado> cenDatoscolegialesestado = testUtils.getDatosColegialesList();
+		CenCliente cliente = cenTestUtils.getCenCliente();
+		List<CenDatoscolegialesestado> cenDatoscolegialesestado = cenTestUtils.getDatosColegialesList();
 		
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
@@ -307,8 +310,8 @@ public class FichaDatosGeneralesServiceTest {
 		//		Primero de tres para comprobar los 3 colores distintos posibles.
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		ColegiadoItem colegiado = testUtils.getColegiadoItem(false, "2");
-		List<ComboEtiquetasItem>comboEtiquetasItems = testUtils.getComboEtiquetasSimulados("01/02/2018","02/02/2018","#87CEFA");
+		ColegiadoItem colegiado = cenTestUtils.getColegiadoItem(false, "2");
+		List<ComboEtiquetasItem>comboEtiquetasItems = cenTestUtils.getComboEtiquetasSimulados("01/02/2018","02/02/2018","#87CEFA");
 		ComboEtiquetasDTO responseEsperado = new ComboEtiquetasDTO();
 
 		//		Mockeo de las llamadas a BD
@@ -327,8 +330,8 @@ public class FichaDatosGeneralesServiceTest {
 		//		Segundo de tres para comprobar los 3 colores distintos posibles.
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		ColegiadoItem colegiado = testUtils.getColegiadoItem(false, "2");
-		List<ComboEtiquetasItem>comboEtiquetasItems = testUtils.getComboEtiquetasSimulados("01/02/2018","02/02/2019","#40E0D0");
+		ColegiadoItem colegiado = cenTestUtils.getColegiadoItem(false, "2");
+		List<ComboEtiquetasItem>comboEtiquetasItems = cenTestUtils.getComboEtiquetasSimulados("01/02/2018","02/02/2019","#40E0D0");
 		ComboEtiquetasDTO responseEsperado = new ComboEtiquetasDTO();
 
 		//		Mockeo de las llamadas a BD
@@ -347,8 +350,8 @@ public class FichaDatosGeneralesServiceTest {
 		//		Ultimo de tres para comprobar los 3 colores distintos posibles.
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		ColegiadoItem colegiado = testUtils.getColegiadoItem(false, "2");
-		List<ComboEtiquetasItem>comboEtiquetasItems = testUtils.getComboEtiquetasSimulados("01/02/2018","02/02/2018","#F08080");
+		ColegiadoItem colegiado = cenTestUtils.getColegiadoItem(false, "2");
+		List<ComboEtiquetasItem>comboEtiquetasItems = cenTestUtils.getComboEtiquetasSimulados("01/02/2018","02/02/2018","#F08080");
 		ComboEtiquetasDTO responseEsperado = new ComboEtiquetasDTO();
 
 		//		Mockeo de las llamadas a BD
@@ -368,8 +371,8 @@ public class FichaDatosGeneralesServiceTest {
 		//		Ultimo de tres para comprobar los 3 colores distintos posibles.
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		ColegiadoItem colegiado = testUtils.getColegiadoItem(false, "2");
-		List<ComboEtiquetasItem>comboEtiquetasItems = testUtils.getComboEtiquetasSimulados("01/02/2018","02/02/2018","#F08080");
+		ColegiadoItem colegiado = cenTestUtils.getColegiadoItem(false, "2");
+		List<ComboEtiquetasItem>comboEtiquetasItems = cenTestUtils.getComboEtiquetasSimulados("01/02/2018","02/02/2018","#F08080");
 		DatosDireccionesDTO responseEsperado = new DatosDireccionesDTO();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados("1");
 		List<DatosDireccionesItem> datosDireccionesItem = new ArrayList<DatosDireccionesItem>();
@@ -387,8 +390,8 @@ public class FichaDatosGeneralesServiceTest {
 		//		Ultimo de tres para comprobar los 3 colores distintos posibles.
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		ColegiadoItem colegiado = testUtils.getColegiadoItem(false, "2");
-		List<ComboEtiquetasItem>comboEtiquetasItems = testUtils.getComboEtiquetasSimulados("01/02/2018","02/02/2018","#F08080");
+		ColegiadoItem colegiado = cenTestUtils.getColegiadoItem(false, "2");
+		List<ComboEtiquetasItem>comboEtiquetasItems = cenTestUtils.getComboEtiquetasSimulados("01/02/2018","02/02/2018","#F08080");
 		DatosDireccionesDTO responseEsperado = new DatosDireccionesDTO();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados("1");
 		usuarios.clear();
