@@ -1,33 +1,36 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
-import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
+import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
-import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
@@ -44,11 +47,13 @@ import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
-import org.itcgae.siga.db.entities.GenRecursosCatalogos;
+import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicos;
+import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
-import org.itcgae.siga.db.mappers.CenDatoscolegialesestadoMapper;
-import org.itcgae.siga.db.mappers.CenGruposclienteMapper;
-import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
+import org.itcgae.siga.db.mappers.CenSolicmodifexportarfotoMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
@@ -59,10 +64,14 @@ import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMap
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicitmodifdatosbasicosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicmodifexportarfotoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesService{
@@ -73,16 +82,25 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 
 	@Autowired
+	private GenPropertiesMapper genPropertiesMapper;
+
+	@Autowired
 	private CenNocolegiadoExtendsMapper cenNocolegiadoMapper;
 
 	@Autowired
 	private CenColegiadoExtendsMapper cenColegiadoMapper;
+	
+	@Autowired
+	private CenSolicmodifexportarfotoExtendsMapper cenSolicmodifexportarfoto;
 
 	@Autowired
 	private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
 	
 	@Autowired
 	private CenGruposclienteClienteExtendsMapper cenGruposclienteClienteExtendsMapper;
+
+	@Autowired
+	private  CenSolicitmodifdatosbasicosExtendsMapper  cenSolicitmodifdatosbasicosMapper;
 
 	@Autowired
 	private CenDatoscolegialesestadoExtendsMapper cenDatoscolegialesestadoMapper;
@@ -105,36 +123,22 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	@Autowired
 	private CenEstadocivilExtendsMapper cenEstadocivilExtendsMapper;
 
-	@Autowired
-	private CenGruposclienteMapper cenGruposclienteMapper;
 
-	@Override
-	public ComboDTO getSocietyTypes(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public ComboDTO getSocietyTypes(HttpServletRequest request) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public  UpdateResponseDTO updateColegiado(ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException {
-//		UpdateResponseDTO response = new UpdateResponseDTO();
 		LOGGER.info(
 				"updateColegiado() -> Entrada al servicio para actualizar información general de un colegiado");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-//		List<ComboEtiquetasItem> gruposPersona = new ArrayList<ComboEtiquetasItem>();
 		List<CenDatoscolegialesestado> cenDatoscolegialesestado = new ArrayList<CenDatoscolegialesestado>();
 		List<ComboEtiquetasItem> gruposPersona = new ArrayList<ComboEtiquetasItem>();
 		EtiquetaUpdateDTO etiquetaUpdateDTO = new EtiquetaUpdateDTO();
-//		List<String> gruposNuevosNoAniadidos = new ArrayList<String>();
-//		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
-//		ComboEtiquetasItem comboEtiquetasItem = new ComboEtiquetasItem();
-//		List<String> gruposPerJuridicaPosterior = new ArrayList<String>();
-		CenPersona cenPersonaAnterior = new CenPersona();
-		CenPersona cenPersonaPosterior = new CenPersona();
-//		CenNocolegiado cenNocolegiadoAnterior = new CenNocolegiado();
-//		CenNocolegiado cenNocolegiadoPosterior = new CenNocolegiado();
-//		CenCliente cenClienteAnterior = new CenCliente();
-//		CenCliente cenClientePosterior = new CenCliente();
-//		
+		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -174,8 +178,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				// 2. Recorremos las etiquetas 
 				for (ComboEtiquetasItem etiqueta : colegiadoItem.getEtiquetas()) {
 //
-//				for (ComboEtiquetasItem etiqueta : etiquetaUpdateDTO.getEtiquetas()) {
-
 					// 2.1. Es una etiqueta de nueva y no existe registro en ninguna tabla
 					if(etiqueta.getIdGrupo() != "") {
 						
@@ -262,27 +264,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	
 					// 3.1.actualiza tabla CEN_PERSONA
 	
-//					cenPersonaAnterior = cenPersonaExtendsMapper
-//								.selectByPrimaryKey(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
-//						CenPersona cenPersona1 = new CenPersona();
-//						cenPersona1.setNombre(etiquetaUpdateDTO.getDenominacion());
-//						cenPersona1.setApellidos1(etiquetaUpdateDTO.getAbreviatura());
-//						cenPersona1.setFechamodificacion(new Date());
-//						cenPersona1.setUsumodificacion(usuario.getIdusuario());
-//						CenPersonaExample cenPersonaExample = new CenPersonaExample();
-//						cenPersonaExample.createCriteria()
-//								.andIdpersonaEqualTo(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
-//					
-//						LOGGER.info(
-//								"updateLegalPerson() / cenPersonaExtendsMapper.updateByExampleSelective() -> Entrada a cenPersonaExtendsMapper para actualizar información de persona juridica en CEN_PERSONA");
-//
-//					cenPersonaExtendsMapper.updateByExampleSelective(cenPersona1, cenPersonaExample);
-//						LOGGER.info(
-//								"updateLegalPerson() / cenPersonaExtendsMapper.updateByExampleSelective() -> Salida de cenPersonaExtendsMapper para actualizar información de persona juridica en CEN_PERSONA");
-//
-//						cenPersonaPosterior = cenPersonaExtendsMapper
-//								.selectByPrimaryKey(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
-
 				// 2. Actualizamos la tabla Cen_Persona
 				
 				cenPersona.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
@@ -349,14 +330,16 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					if(colegiadoItem.getIncorporacionDate()!=null) { 
 					cenCliente.setFechaalta(colegiadoItem.getIncorporacionDate());
 					}
+					cenCliente.setPublicidad(colegiadoItem.getPublicidad());
+					cenCliente.setGuiajudicial(colegiadoItem.getGuiaJudicial());
 					cenCliente.setFechamodificacion(new Date());
 					cenCliente.setUsumodificacion(usuario.getIdusuario());
 					cenCliente.setComisiones(colegiadoItem.getComisiones());
 					cenCliente.setIdtratamiento(Short.parseShort(colegiadoItem.getIdtratamiento()));
 					cenCliente.setAsientocontable(colegiadoItem.getAsientoContable());
 					cenCliente.setCaracter("P");
-					cenCliente.setPublicidad(SigaConstants.DB_FALSE);
-					cenCliente.setGuiajudicial(SigaConstants.DB_FALSE); 
+//					cenCliente.setPublicidad(SigaConstants.DB_FALSE);
+//					cenCliente.setGuiajudicial(SigaConstants.DB_FALSE); 
 					
 					CenClienteExample cenClienteExample = new CenClienteExample();
 					cenClienteExample.createCriteria()
@@ -364,7 +347,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					LOGGER.info(
 							"updateColegiado() / cenClienteMapper.updateByExampleSelective() -> Entrada a cenClienteMapper para actualizar información de colegiado en CEN_CLIENTE");
 
-					cenClienteMapper.updateByExampleSelective(cenCliente, cenClienteExample);
 					LOGGER.info(
 							"updateColegiado() / cenClienteMapper.updateByExampleSelective() -> Salida de cenClienteMapper para actualizar información de colegiado en CEN_CLIENTE");
 					
@@ -390,8 +372,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 									
 									cenColegiadoMapper.updateByExampleSelective(cenColegiado, cenColegiadoExample);
 								}
-				
-					
 					
 						//	4. Actualiza la tabla CEN_DATOSCOLEGIALESESTADO
 					
@@ -412,16 +392,9 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							cenEstadoColegial.setUsumodificacion(usuario.getIdusuario());
 							cenEstadoColegial.setFechaestado(new Date());
 							cenDatoscolegialesestadoMapper.insertSelective(cenEstadoColegial);
-//							cenDatoscolegialesestadoMapper.updateByExample(cenEstadoColegial, cenDatoscolegialesestadoExample);
 						}
 					}
-					
-					
-
-
 					updateResponseDTO.setStatus(SigaConstants.OK);
-
-//				}
 
 			} else {
 				updateResponseDTO.setStatus(SigaConstants.KO);
@@ -436,7 +409,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 		LOGGER.info(
 				"updateColegiado() -> Salida del servicio para actualizar información general de un colegiado");
-
 		}
 		return updateResponseDTO;
 	}
@@ -531,12 +503,255 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	
 	
 	
+
+	@Override
+	public InsertResponseDTO solicitudUploadPhotography(MultipartHttpServletRequest request)
+			throws IllegalStateException, IOException {
+
+		LOGGER.info("uploadPhotography() -> Entrada al servicio para guardar una fotografía de una persona jurídica");
+		InsertResponseDTO updateResponseDTO = new InsertResponseDTO();
+		String idPersona = request.getParameter("idPersona");
+		String motivo = request.getParameter("motivo");
+		int response = 0;
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// obtener path para almacenar las fotografias
+		LOGGER.debug("uploadPhotography() -> Obtener path para almacenar las fotografias");
+		GenPropertiesExample genPropertiesExample = new GenPropertiesExample();
+		genPropertiesExample.createCriteria().andParametroEqualTo("directorios.carpeta.fotos");
+		LOGGER.info(
+				"loadPhotography() / genPropertiesMapper.selectByExample() -> Entrada a genPropertiesMapper para obtener directorio de la fotografía");
+		List<GenProperties> properties = genPropertiesMapper.selectByExample(genPropertiesExample);
+		LOGGER.info(
+				"loadPhotography() / genPropertiesMapper.selectByExample() -> Salida de genPropertiesMapper para obtener directorio de la fotografía");
+
+		if (null != properties && properties.size() > 0) {
+			String pathImagenes = properties.get(0).getValor() + "/" + String.valueOf(idInstitucion) + "/";
+
+			// Coger archivo del request
+			LOGGER.debug("uploadPhotography() -> Coger fotografía del request");
+			Iterator<String> itr = request.getFileNames();
+			MultipartFile file = request.getFile(itr.next());
+			String fileName = file.getOriginalFilename();
+			String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+
+			// comprobar extension de la fotografia
+			LOGGER.debug("uploadPhotography() -> Comprobar extension de la fotografia");
+			if (extension == null || extension.trim().equals("")
+					|| (!extension.trim().toUpperCase().equals(".JPG") && !extension.trim().toUpperCase().equals(".GIF")
+							&& !extension.trim().toUpperCase().equals(".PNG")
+							&& !extension.trim().toUpperCase().equals(".JPEG"))) {
+
+				try {
+					throw new SigaExceptions("messages.error.imagen.tipoNoCorrecto");
+				} catch (SigaExceptions e) {
+					e.printStackTrace();
+				}
+			}
+
+			// Crear nombre del archivo a guardar
+			LOGGER.debug("uploadPhotography() -> Crear nombre de la fotografía a guardar");
+			CenPersonaExample cenPersonaExample = new CenPersonaExample();
+			cenPersonaExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona));
+			LOGGER.info(
+					"loadPhotography() / cenPersonaExtendsMapper.selectByExample() -> Entrada a cenPersonaExtendsMapper para nifcif de una persona");
+			List<CenPersona> cenPersonas = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+			LOGGER.info(
+					"loadPhotography() / cenPersonaExtendsMapper.selectByExample() -> Salida de cenPersonaExtendsMapper para nifcif de una persona");
+
+			if (null != cenPersonas && cenPersonas.size() > 0) {
+				String nifCif = cenPersonas.get(0).getNifcif();
+
+				fileName = nifCif + "_" + String.valueOf(idInstitucion) + "_" + fileName;
+
+				BufferedOutputStream stream = null;
+				// Guardar el archivo
+				LOGGER.debug("uploadPhotography() -> Guardar la fotografía");
+				try {
+					File aux = new File(pathImagenes);
+					// creo directorio si no existe
+					aux.mkdirs();
+					File serverFile = new File(pathImagenes, fileName);
+					stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+					stream.write(file.getBytes());
+
+				} catch (FileNotFoundException e) {
+					LOGGER.error(
+							"uploadPhotography() -> Error al buscar la fotografía de la persona jurídica en el directorio indicado",
+							e);
+				} catch (IOException ioe) {
+					LOGGER.error(
+							"uploadPhotography() -> Error al guardar la fotografía de la persona jurídica en el directorio indicado",
+							ioe);
+				} finally {
+					// close the stream
+					LOGGER.debug("uploadPhotography() -> Cierre del stream de la fotografía de la persona jurídica");
+					stream.close();
+				}
+
+				// actualizar nombre de la fotografia en base de datos
+				LOGGER.debug("uploadPhotography() -> actualizar nombre de la fotografia en base de datos");
+//				CenClienteExample cenClienteExample = new CenClienteExample();
+//				cenClienteExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona))
+//						.andIdinstitucionEqualTo(idInstitucion);
+//				CenCliente cenCliente = new CenCliente();
+//				cenCliente.setFotografia(fileName);
+				
+				CenSolicmodifexportarfoto solicitud = new CenSolicmodifexportarfoto();
+				solicitud.setExportarfoto(fileName);
+				solicitud.setFechaalta(new Date());
+				solicitud.setFechamodificacion(new Date());
+				solicitud.setIdestadosolic(Short.parseShort("10"));
+				solicitud.setIdinstitucion(idInstitucion);
+				solicitud.setIdpersona(Long.valueOf(idPersona));
+				
+				NewIdDTO idSolicitudBD = cenSolicmodifexportarfoto.getMaxIdSolicitud(String.valueOf(idInstitucion),
+						idPersona);
+				if (idSolicitudBD == null) {
+					solicitud.setIdsolicitud(Short.parseShort("1"));
+				} else {
+					int id = Integer.parseInt(idSolicitudBD.getNewId()) + 1;
+					solicitud.setIdsolicitud(Short.parseShort("" + id));
+				}
+				
+				solicitud.setMotivo(motivo);
+				solicitud.setUsumodificacion(Integer.parseInt(idPersona));
+				LOGGER.info(
+						"loadPhotography() / cenClienteMapper.updateByExample() -> Entrada a cenClienteMapper actualizar el nombre de la fotografía de una persona jurídica");
+				
+				response = cenSolicmodifexportarfoto.insert(solicitud);
+				
+				LOGGER.info(
+						"loadPhotography() / cenClienteMapper.updateByExample() -> Salida de cenClienteMapper actualizar el nombre de la fotografía de una persona jurídica");
+				if (response == 1) {
+					updateResponseDTO.setStatus(SigaConstants.OK);
+					LOGGER.warn(
+							"loadPhotography() / cenClienteMapper.updateByExample() -> " + updateResponseDTO.getStatus()
+									+ " .Nombre de la fotografía de una persona jurídica actualizado correctamente");
+				} else {
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.warn("loadPhotography() / cenClienteMapper.updateByExample() -> "
+							+ updateResponseDTO.getStatus()
+							+ " .No se ha podido actualizar el nombre de la fotografía de una persona jurídica");
+				}
+
+			} else {
+				updateResponseDTO.setStatus(SigaConstants.KO);
+				LOGGER.warn("loadPhotography() / cenPersonaExtendsMapper.selectByExample() -> "
+						+ updateResponseDTO.getStatus() + ".No existen ninguna persona con en idPersona:" + idPersona
+						+ " indicado");
+			}
+
+		} else {
+			updateResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.warn("loadPhotography() / genPropertiesMapper.selectByExample() -> " + updateResponseDTO.getStatus()
+					+ ".No se pudo obtener el directorio de la fotografía");
+		}
+
+		LOGGER.info("uploadPhotography() -> Salida del servicio para guardar una fotografía de una persona jurídica");
+
+		return updateResponseDTO;
+	}
+	
+	
+	
+
+	@Override
+	public InsertResponseDTO solicitudModificacion(NoColegiadoItem noColegiadoItem, HttpServletRequest request) {
+		LOGGER.info(
+				"createColegiado() -> Entrada al servicio para actualizar información general de una persona jurídica");
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+//		List<CenDatoscolegialesestado> cenDatoscolegialesestado = new ArrayList<CenDatoscolegialesestado>();
+//		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
+//		List<String> gruposPerJuridicaNuevos = new ArrayList<String>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+//		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
+			
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"createColegiado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"createColegiado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+				
+				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
+
+					if (!insertResponseDTO.getStatus().equals(SigaConstants.KO)) {
+
+						// 1 crear registro en tabla CEN_SOLICITMODIFDATOSBASICOS
+						LOGGER.info(
+								"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForNewSociety() -> Entrada a cenPersonaExtendsMapper para crear una nueva persona");
+
+						CenSolicitmodifdatosbasicos solicitud = new CenSolicitmodifdatosbasicos();
+
+						NewIdDTO idBD = cenSolicitmodifdatosbasicosMapper.getMaxIdSolicitud(String.valueOf(idInstitucion),
+								noColegiadoItem.getIdPersona());
+						if (idBD == null) {
+							solicitud.setIdsolicitud(Short.parseShort("1"));
+						} else {
+							int idCv = Integer.parseInt(idBD.getNewId());
+							solicitud.setIdsolicitud(Short.parseShort(""+ (1 + idCv)));
+						}
+						solicitud.setPublicidad(noColegiadoItem.getPublicidad());
+						solicitud.setAbonos("B");
+						solicitud.setCargos("B");
+						solicitud.setGuiajudicial(noColegiadoItem.getGuiaJudicial());
+						solicitud.setIdlenguaje(noColegiadoItem.getIdLenguaje());
+						solicitud.setMotivo(noColegiadoItem.getMotivo());
+						solicitud.setIdinstitucion(idInstitucion);
+						solicitud.setIdpersona(Long.parseLong(noColegiadoItem.getIdPersona()));
+						solicitud.setFechamodificacion(new Date());
+						solicitud.setUsumodificacion(usuario.getIdusuario());
+						solicitud.setIdestadosolic(Short.parseShort("10"));
+						solicitud.setFechaalta(new Date());
+//					AGREGAR EL RESTO DE CAMPOS PARA LA INSERCIÓN, PREGUNTAR QUE HACER CON LOS CAMPOS QUE NO SON LA FECHA Y TAMPOCO SON NULLABLES.
+						
+						int responseInsertPersona =  cenSolicitmodifdatosbasicosMapper.insert(solicitud);
+						LOGGER.info(
+								"createColegiado() / cenSolicitmodifdatosbasicosMapper.insert() -> Salida de cenSolicitmodifdatosbasicosMapper para crear una nueva solicitud");
+						if(responseInsertPersona == 1) {
+							insertResponseDTO.setStatus(SigaConstants.OK);
+							LOGGER.info("createColegiado() Solicitud creada correctamente");
+
+						}
+					}
+					
+				} else {
+					insertResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.warn(
+							"createColegiado() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+									+ dni + " e idInstitucion = " + idInstitucion);
+				}
+				
+			} else {
+				insertResponseDTO.setStatus(SigaConstants.KO);
+				LOGGER.warn("createColegiado() -> idInstitucion del token nula");
+			}
+		
+		
+		return insertResponseDTO;
+	}
+
+	
+	
+	
 	@Override
 	public InsertResponseDTO createNoColegiado(NoColegiadoItem noColegiadoItem, HttpServletRequest request) throws ParseException {
 		LOGGER.info(
 				"createColegiado() -> Entrada al servicio para actualizar información general de una persona jurídica");
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-		List<CenDatoscolegialesestado> cenDatoscolegialesestado = new ArrayList<CenDatoscolegialesestado>();
 		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
 		List<String> gruposPerJuridicaNuevos = new ArrayList<String>();
 

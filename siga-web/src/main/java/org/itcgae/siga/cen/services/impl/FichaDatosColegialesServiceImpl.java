@@ -1,11 +1,13 @@
 package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
@@ -15,9 +17,11 @@ import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IFichaDatosColegialesService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposseguroExtendsMapper;
@@ -181,4 +185,83 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		LOGGER.info("datosColegialesSearch() -> Salida del servicio para la búsqueda por filtros de Colegiados");
 		return datosColegialesDTO;
 	}	
+	
+
+	@Override
+	public UpdateResponseDTO datosColegialesUpdate(ColegiadoItem colegiadoItem,
+			HttpServletRequest request) {
+		
+		LOGGER.info("datosColegialesSearch() -> Entrada al servicio para la búsqueda por filtros de direcciones");
+
+		UpdateResponseDTO response = new UpdateResponseDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"datosColegialesUpdate() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"datosColegialesUpdate() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+//				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"datosColegialesUpdate() / CenColegiadoExtendsMapper.selectDirecciones() -> Entrada a CenColegiadoExtendsMapper para busqueda de Colegiados");
+				
+				CenColegiado colegiado = new CenColegiado();
+				colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+				colegiado.setIdinstitucion(idInstitucion);
+				colegiado.setFechamodificacion(new Date());
+				colegiado.setUsumodificacion(usuario.getIdusuario());
+				colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
+				colegiado.setIdtiposseguro(Short.parseShort(colegiadoItem.getIdTiposSeguro()));
+				if(colegiadoItem.getSituacion()!=null) {
+				colegiado.setSituacionresidente(colegiadoItem.getSituacionresidente());
+				}
+				if(colegiadoItem.getComunitario()!=null) {
+					colegiado.setComunitario(colegiadoItem.getComunitario());
+				}
+				colegiado.setNmutualista(colegiadoItem.getnMutualista());
+				if(colegiadoItem.getIncorporacionDate()!=null) {
+				colegiado.setFechaincorporacion(colegiadoItem.getIncorporacionDate());
+				}
+				if(colegiadoItem.getFechapresentacionDate()!=null) {
+				colegiado.setFechapresentacion(colegiadoItem.getFechapresentacionDate());
+				}
+				colegiado.setFechajura(colegiadoItem.getFechaJuraDate());
+				colegiado.setFechatitulacion(colegiadoItem.getFechaTitulacionDate());
+				
+				int responseUpdate = cenColegiadoExtendsMapper.updateByPrimaryKeySelective(colegiado);
+				LOGGER.info(
+						"datosColegialesUpdate() / CenColegiadoExtendsMapper.selectDirecciones() -> Salida de CenColegiadoExtendsMapper para actualización de Colegiados");
+
+				if(responseUpdate >= 1) {
+					response.setStatus(SigaConstants.OK);
+				}else {
+					response.setStatus(SigaConstants.KO);
+				}
+			} else {
+				LOGGER.warn(
+						"datosColegialesUpdate() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+				response.setStatus(SigaConstants.KO);
+			}
+			
+		} else {
+			LOGGER.warn("datosColegialesUpdate() -> idInstitucion del token nula");
+			response.setStatus(SigaConstants.KO);
+		}
+
+		LOGGER.info("datosColegialesUpdate() -> Salida del servicio para la búsqueda por filtros de Colegiados");
+		return response;
+	}	
+	
+	
 }

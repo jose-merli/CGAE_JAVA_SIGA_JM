@@ -52,7 +52,12 @@ public class AgeCalendarioSqlExtendsProvider extends  AgeCalendarioSqlProvider{
 		
 		sql.GROUP_BY("AGE.IDCALENDARIO, AGE.IDINSTITUCION, AGE.DESCRIPCION, AGE.USUMODIFICACION, AGE.FECHAMODIFICACION, AGE.FECHABAJA, AGE.IDTIPOCALENDARIO, AGE.COLOR");
 		
-		return sql.toString();
+		SQL sql2 = new SQL();
+		sql2.SELECT("*");
+		sql2.FROM("(" + sql.toString() + ")");
+		sql2.WHERE("TIPOACCESO > 1");
+
+		return sql2.toString();
 	}
 	
 	public String getCalendarioEventos(Short idInstitucion, String perfiles, String idCalendario) {

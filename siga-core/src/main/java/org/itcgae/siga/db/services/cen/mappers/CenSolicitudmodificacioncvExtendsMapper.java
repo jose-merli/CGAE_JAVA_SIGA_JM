@@ -9,6 +9,8 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
+import org.itcgae.siga.DTOs.cen.SolModificacionItem;
+import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
@@ -19,6 +21,7 @@ import org.itcgae.siga.db.mappers.CenSolicitudmodificacioncvSqlProvider;
 import org.itcgae.siga.db.services.adm.providers.GenRecursosCatalogosSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenDatoscvSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenSolicitudmodificacioncvSqlExtendsProvider;
+import org.itcgae.siga.db.services.cen.providers.CenTiposModificacionesSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -58,4 +61,19 @@ public interface CenSolicitudmodificacioncvExtendsMapper extends CenSolicitudmod
 	
 	})
 	NewIdDTO getMaxIdSolicitud(String idInstitucion, String idPersona);
+	
+	@SelectProvider(type = CenSolicitudmodificacioncvSqlExtendsProvider.class, method = "searchSolModifDatosCurriculares")
+	@Results({ @Result(column = "ESPECIFICA", property = "especifica", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.DATE),
+		@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOMODIFICACION", property = "idTipoModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR)}) 
+	List<SolModificacionItem> searchSolModifDatosCurriculares(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguage, String idInstitucion);
 }

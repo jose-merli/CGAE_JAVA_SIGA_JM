@@ -619,6 +619,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("cli.asientocontable");
 		sql.SELECT_DISTINCT("cli.idtratamiento");
 		sql.SELECT_DISTINCT("cli.comisiones");
+		sql.SELECT_DISTINCT("cli.publicidad");
+		sql.SELECT_DISTINCT("cli.guiajudicial");
 		sql.SELECT_DISTINCT("per.fechanacimiento");
 		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
 		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
@@ -730,6 +732,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("per.naturalde");
 		sql.SELECT_DISTINCT("cli.idlenguaje");
 		sql.SELECT_DISTINCT("cli.asientocontable");
+		sql.SELECT_DISTINCT("cli.publicidad");
+		sql.SELECT_DISTINCT("cli.guiajudicial");
 		sql.SELECT_DISTINCT("cli.idtratamiento");
 		sql.SELECT_DISTINCT("per.fechanacimiento");
 		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");

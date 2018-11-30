@@ -1,5 +1,6 @@
 package org.itcgae.siga.cen.controllers;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 public class FichaDatosGeneralesController {
@@ -72,6 +74,13 @@ public class FichaDatosGeneralesController {
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
+	@RequestMapping(value = "/fichaDatosGenerales/datosGeneralesSolicitudModificación", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> solicitudModificacion(@RequestBody NoColegiadoItem noColegiadoItem, HttpServletRequest request) throws Exception { 
+		InsertResponseDTO response = fichaDatosGenerales.solicitudModificacion(noColegiadoItem, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
 	
 	@RequestMapping(value = "/fichaDatosGenerales/partidoJudicialSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DatosDireccionesDTO> partidoJudicialSearch(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) { 
@@ -79,5 +88,13 @@ public class FichaDatosGeneralesController {
 		return new ResponseEntity<DatosDireccionesDTO> (response, HttpStatus.OK);
 	}
 	
+
+	@RequestMapping(value = "personaJuridica/solicitudUploadFotografia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<InsertResponseDTO> solicitudUploadPhotography(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
+		InsertResponseDTO response = fichaDatosGenerales.solicitudUploadPhotography(request);
+		if (response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
 	
 }

@@ -58,6 +58,9 @@ public interface ITarjetaDatosBancariosService {
 	
 	public ComboItem fileDownloadInformation(MandatosDownloadDTO mandatosDownloadDTO, HttpServletRequest request);
 
+	public InsertResponseDTO solicitudInsertBanksData(DatosBancariosInsertDTO datosBancariosInsertDTO,
+			HttpServletRequest request) throws Exception;
+
 
 
 	

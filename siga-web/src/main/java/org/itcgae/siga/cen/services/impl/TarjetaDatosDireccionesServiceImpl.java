@@ -20,6 +20,7 @@ import org.itcgae.siga.DTOs.cen.TarjetaDireccionesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -37,6 +38,7 @@ import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoKey;
 import org.itcgae.siga.db.entities.CenPoblaciones;
 import org.itcgae.siga.db.entities.CenPoblacionesExample;
+import org.itcgae.siga.db.entities.CenSolimodidirecciones;
 import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
 import org.itcgae.siga.db.mappers.CenPoblacionesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -45,6 +47,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPoblacionesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolimodidireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTipoDireccionExtendsMapper;
 import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -70,6 +73,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 	@Autowired
 	private CenDireccionTipodireccionMapper cenDireccionTipodireccionMapper;
+
+	@Autowired
+	private CenSolimodidireccionesExtendsMapper cenSolimodidireccionesExtendsMapper;
 
 	@Autowired
 	private CenTipoDireccionExtendsMapper cenTipoDireccionExtendsMapper;
@@ -949,4 +955,114 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	}
 	
 
+	
+	
+	
+	public InsertResponseDTO solicitudCreateDirection(DatosDireccionesItem datosDireccionesItem, HttpServletRequest request) {
+
+		LOGGER.info("createDirection() -> Entrada al servicio para insertar cuentas bancarias");
+		int response = 0;
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"createDirection() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"createDirection() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				CenSolimodidirecciones direcciones = new CenSolimodidirecciones();
+
+//				peta aquí
+				NewIdDTO idSolicitudBD = cenSolimodidireccionesExtendsMapper.getMaxIdSolicitud(String.valueOf(idInstitucion),
+						datosDireccionesItem.getIdPersona());
+				if (idSolicitudBD == null) {
+					direcciones.setIdsolicitud(Long.parseLong("1"));
+				} else {
+					int idCv = Integer.parseInt(idSolicitudBD.getNewId()) + 1;
+					direcciones.setIdsolicitud(Long.parseLong("" + idCv));
+				}
+				Long idDireccion = new Long(1);
+
+				// Rellenamos la entidad con la informacion a insertar
+
+				if(datosDireccionesItem.getIdDireccion() != null) {
+					
+					idDireccion = Long.parseLong(datosDireccionesItem.getIdDireccion());
+					
+				}else{
+					
+					List<DatosDireccionesItem> newIdDireccion = cenSolimodidireccionesExtendsMapper
+							.selectNewIdDireccion(datosDireccionesItem.getIdPersona(), idInstitucion.toString());
+					if (null != newIdDireccion && newIdDireccion.size() > 0) {
+						if (null != newIdDireccion.get(0)) {
+							idDireccion = Long.valueOf(newIdDireccion.get(0).getIdDireccion());
+						}
+					}			// TENEMOS EN CUENTA QUE EL CAMPO IDDIRECCIÓN O SE HAGA NULLABLE O SE ELIMINE LA FK PARA PERMITIR QUE SE GUARDE "newIdDireccion" EN CASO DE SER UNA SOLICITUD DE CREACIÓN.
+				}
+				
+				direcciones.setFechaalta(new Date());
+				direcciones.setIddireccion(idDireccion);
+				direcciones.setMotivo(datosDireccionesItem.getMotivo());
+				direcciones.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+				direcciones.setIdinstitucion(Short.valueOf(idInstitucion));
+				direcciones.setFechamodificacion(new Date());
+				direcciones.setUsumodificacion(usuario.getIdusuario());
+				direcciones.setCodigopostal(datosDireccionesItem.getCodigoPostal());
+				direcciones.setCorreoelectronico(datosDireccionesItem.getCorreoElectronico());
+				direcciones.setDomicilio(datosDireccionesItem.getDomicilio());
+				direcciones.setFax1(datosDireccionesItem.getFax());
+				direcciones.setIdpais(datosDireccionesItem.getIdPais());
+				direcciones.setIdpoblacion(datosDireccionesItem.getIdPoblacion());
+				direcciones.setIdprovincia(datosDireccionesItem.getIdProvincia());
+				direcciones.setMovil(datosDireccionesItem.getMovil());
+				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
+				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
+				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
+				direcciones.setIdestadosolic(Short.parseShort("10"));
+				
+				if(datosDireccionesItem.getPoblacionExtranjera()!= "" &&  datosDireccionesItem.getPoblacionExtranjera() != null) {
+					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
+				}				
+				
+				LOGGER.info(
+						"createDirection() / cenDireccionesExtendsMapper.insert() -> Entrada a cenDireccionesExtendsMapper para insertar direcciones");
+				response = cenSolimodidireccionesExtendsMapper.insert(direcciones);
+				LOGGER.info(
+						"createDirection() / cenDireccionesExtendsMapper.insert() -> Salida de cenDireccionesExtendsMapper para insertar direcciones");
+
+				// comprobacion actualización
+				if (response >= 1) {
+					LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
+					insertResponseDTO.setId(idDireccion.toString());
+					insertResponseDTO.setStatus(SigaConstants.OK);
+				} else {
+					LOGGER.info("createDirection() -> KO. InsertSolicitud para direcciones  NO realizado correctamente");
+					insertResponseDTO.setStatus(SigaConstants.KO);
+					error.setMessage("Error al insertar la Solicitud");
+					insertResponseDTO.setError(error);
+					return insertResponseDTO;
+				}
+
+			} else {
+				LOGGER.warn(
+						"createDirection() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+
+		} else {
+			LOGGER.warn("createDirection() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("createDirection() -> Salida del servicio para insertar direcciones ");
+		return insertResponseDTO;
+	}
 }

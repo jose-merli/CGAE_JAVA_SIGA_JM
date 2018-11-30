@@ -15,6 +15,8 @@ public class ColegiadoItem {
 	private String nombre;
 	private String numColegiado;
 	private String residenteInscrito;
+	private String situacionresidente;
+	private String comunitario;
 	private String correo;
 	private String telefono;
 	private String movil;
@@ -65,11 +67,13 @@ public class ColegiadoItem {
 	private Date fechapresentacionDate;
 	private Date fechaNacimientoDate;
 	private Date fechaBajaDate;
-	
+	private String publicidad;
+	private String guiaJudicial;
 	private String idTratamiento;
 	private String descripcion;
 	private String observaciones;
-
+	private String motivo;
+	
 	/**
 	 *
 	 */
@@ -850,7 +854,24 @@ public class ColegiadoItem {
 		this.incorporacion = incorporacion;
 	}
 	
+	/**
+	 * 
+	 */
+	public String getGuiaJudicial() {
+		return guiaJudicial;
+	}
+
+	public void setGuiaJudicial(String guiaJudicial) {
+		this.guiaJudicial = guiaJudicial;
+	}
 	
+	public String getPublicidad() {
+		return publicidad;
+	}
+
+	public void setPublicidad(String publicidad) {
+		this.publicidad = publicidad;
+	}
 	/**
 	 *
 	 */
@@ -903,6 +924,22 @@ public class ColegiadoItem {
 		this.comisiones = comisiones;
 	}
 	
+	public String getSituacionresidente() {
+		return situacionresidente;
+	}
+
+	public void setSituacionresidente(String situacionresidente) {
+		this.situacionresidente = situacionresidente;
+	}
+
+	public String getComunitario() {
+		return comunitario;
+	}
+
+	public void setComunitario(String comunitario) {
+		this.comunitario = comunitario;
+	}
+
 	/**
 	 *
 	 */
@@ -1122,6 +1159,14 @@ public class ColegiadoItem {
 
 	public void setEtiquetas(ComboEtiquetasItem[] etiquetas) {
 		this.etiquetas = etiquetas;
+	}
+
+	public String getMotivo() {
+		return motivo;
+	}
+
+	public void setMotivo(String motivo) {
+		this.motivo = motivo;
 	}
 
 

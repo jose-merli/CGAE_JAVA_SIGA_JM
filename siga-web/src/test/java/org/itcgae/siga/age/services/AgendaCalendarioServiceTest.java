@@ -8,13 +8,14 @@ import java.util.List;
 import org.idcgae.siga.commons.testUtils.AgeTestUtils;
 import org.idcgae.siga.commons.testUtils.TestUtils;
 import org.itcgae.siga.DTOs.age.CalendarDTO;
+import org.itcgae.siga.DTOs.age.CalendarItem;
+import org.itcgae.siga.DTOs.age.EventoDTO;
+import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.age.service.impl.AgendaCalendarioServiceImpl;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.AgeCalendario;
-import org.itcgae.siga.db.entities.AgeCalendarioExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeCalendarioExtendsMapper;
 import org.junit.Test;
@@ -39,21 +40,28 @@ public class AgendaCalendarioServiceTest {
 
 	private TestUtils testUtils = new TestUtils();
 	
+
+	private org.itcgae.siga.commons.utils.TestUtils commonUtils = new org.itcgae.siga.commons.utils.TestUtils ();
+	
 	private AgeTestUtils ageTestUtils = new AgeTestUtils();
 
 	@Test
 	public void getCalendariosByIdInstitucionTest() throws Exception {
 
-		List<AgeCalendario> listAgeCalendarioSimulado = ageTestUtils.getListaAgeCalendariosSimulados();
+
+		//List<AgeCalendario> listAgeCalendarioSimulado = ageTestUtils.getListaAgeCalendariosSimulados();
+
+		List<CalendarItem> listAgeCalendarioSimulado = ageTestUtils.getListaCalendariosSimulados();
+
 		
-		when(ageCalendarioExtendsMapper.selectByExample(Mockito.any(AgeCalendarioExample.class))).thenReturn(listAgeCalendarioSimulado);
+		when(ageCalendarioExtendsMapper.getCalendariosPermisos(Mockito.anyShort(), Mockito.anyString())).thenReturn(listAgeCalendarioSimulado);
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
 		CalendarDTO calendarResultado = agendaCalendarioServiceImpl.getCalendariosByIdInstitucion(mockreq);
 		
 		CalendarDTO calendarEsperado = new CalendarDTO();
-		calendarEsperado.fillListCalendarItems(listAgeCalendarioSimulado);
+		calendarEsperado.setCalendarItems(listAgeCalendarioSimulado);
 		
 		assertThat(calendarResultado).isEqualTo(calendarEsperado);
 
@@ -80,4 +88,25 @@ public class AgendaCalendarioServiceTest {
 		assertThat(comboResultado).isEqualTo(comboEsperado);
 
 	}
+	
+	@Test
+	public void getEventosByIdCalendario() throws Exception {
+
+		String idCalendario = "1";
+		Short idInstitucion = 2000;
+		List<EventoItem> listEventosSimulado = commonUtils.getListaEventosSimulados(idCalendario, idInstitucion);
+		
+		when(ageCalendarioExtendsMapper.getCalendarioEventos(Mockito.anyShort(), Mockito.anyString(), Mockito.anyString())).thenReturn(listEventosSimulado);
+
+		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
+
+		EventoDTO calendarResultado = agendaCalendarioServiceImpl.getEventosByIdCalendario(mockreq, idCalendario);
+		
+		EventoDTO calendarEsperado = new EventoDTO();
+		calendarEsperado.setEventos(listEventosSimulado);
+		
+		assertThat(calendarResultado).isEqualTo(calendarEsperado);
+
+	}
+	
 }

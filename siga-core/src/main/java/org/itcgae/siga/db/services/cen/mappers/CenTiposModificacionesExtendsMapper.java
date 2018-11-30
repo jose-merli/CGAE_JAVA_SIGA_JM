@@ -19,21 +19,24 @@ import org.springframework.stereotype.Service;
 @Service
 @Primary
 public interface CenTiposModificacionesExtendsMapper {
-	
+
 	@SelectProvider(type = CenTiposModificacionesSqlExtendsProvider.class, method = "getTipoModificacion")
-	@Results({
-		@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR)
-	})
+	@Results({ @Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR) })
 	List<ComboItem> getTipoModificacion(String idLenguage);
 
 	@SelectProvider(type = CenTiposModificacionesSqlExtendsProvider.class, method = "searchModificationRequest")
-	@Results({ 	@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+	@Results({ @Result(column = "ESPECIFICA", property = "especifica", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.DATE)
-			})
-	List<SolModificacionItem> searchModificationRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguage);
+		@Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.DATE),
+		@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOMODIFICACION", property = "idTipoModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR)}) 
+	List<SolModificacionItem> searchModificationRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguage, String idInstitucion);
 }

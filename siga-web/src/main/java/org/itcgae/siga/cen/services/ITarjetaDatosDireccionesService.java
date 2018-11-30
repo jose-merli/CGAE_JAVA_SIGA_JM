@@ -28,6 +28,8 @@ public interface ITarjetaDatosDireccionesService {
 
 	UpdateResponseDTO solicitudUpdateDirection(DatosDireccionesItem datosDirecciones, HttpServletRequest request);
 
+	InsertResponseDTO solicitudCreateDirection(DatosDireccionesItem datosDirecciones, HttpServletRequest request);
+
 	
 }
 
