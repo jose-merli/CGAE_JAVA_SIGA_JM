@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -16,37 +18,57 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
+import org.itcgae.siga.DTOs.age.FestivosItem;
 import org.itcgae.siga.DTOs.form.AsistenciaCursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.form.FormadorCursoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.FestivosDTO;
+import org.itcgae.siga.DTOs.gen.ListOfResult;
 import org.itcgae.siga.age.service.IFichaEventosService;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.AgeCalendario;
+import org.itcgae.siga.db.entities.AgeCalendarioExample;
 import org.itcgae.siga.db.entities.AgeEvento;
+import org.itcgae.siga.db.entities.AgeFestivos;
 import org.itcgae.siga.db.entities.AgeRepeticionevento;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.entities.CenPartidojudicial;
+import org.itcgae.siga.db.entities.CenPoblaciones;
+import org.itcgae.siga.db.entities.CenPoblacionesExample;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioExample;
 import org.itcgae.siga.db.mappers.AgeEventoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.CenPartidojudicialExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenDiccionarioExtendsMapper;
+import org.itcgae.siga.db.services.age.mappers.AgeCalendarioExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeDiassemanaExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeEstadoeventosExtendsMapper;
+import org.itcgae.siga.db.services.age.mappers.AgeFestivosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeRepeticionEventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeTipoeventosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPoblacionesExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForPersonacursoExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class FichaEventosServiceImpl implements IFichaEventosService {
@@ -76,7 +98,24 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	
 	@Autowired 
 	private AgeRepeticionEventoExtendsMapper ageRepeticionEventoExtendsMapper;
+	
+	@Autowired
+	private AgeCalendarioExtendsMapper ageCalendarioExtendsMapper;
 
+	@Autowired
+	private AgeFestivosExtendsMapper ageFestivosExtendsMapper;
+
+	@Autowired
+	private CenInstitucionExtendsMapper cenInstitucionMapper;
+	
+	@Autowired
+	private CenPartidojudicialExtendsMapper cenPartidojudicialExtendsMapper;
+	
+	@Autowired
+	private CenPoblacionesExtendsMapper cenPoblacionesExtendsMapper;
+	
+	@Value("${url.rapis}")
+	private String urlRapis;
 	
 	@Override
 	public InsertResponseDTO saveEventCalendar(EventoItem eventoItem, HttpServletRequest request) {
@@ -443,6 +482,124 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 				"getDaysWeek() -> Salida del servicio para obtener los días de la semana");
 		
 		return comboDTO;
+	}
+	
+	@Override
+	public void generaEventosLaboral() {
+		//TODO Cambiar por la etiqueta de la descripcion del calendario en BBDD
+		String descripcionCalendario = "Calendario Laboral";
+		
+		AgeCalendarioExample ageCalendarioExample = new AgeCalendarioExample();
+		ageCalendarioExample.createCriteria().andDescripcionEqualTo(descripcionCalendario);
+		
+		List<AgeCalendario> listAgeCalendario = ageCalendarioExtendsMapper.selectByExample(ageCalendarioExample);
+		
+		for (AgeCalendario ageCalendario : listAgeCalendario) {
+			Short idInstitucionCalendario = ageCalendario.getIdinstitucion();
+			
+			List<FestivosItem> listFestivosItem = ageFestivosExtendsMapper.getFestivos(idInstitucionCalendario);
+			
+			for (FestivosItem ageFestivos : listFestivosItem) {
+				AgeEvento record = new AgeEvento();
+				
+				record.setIdcalendario(ageCalendario.getIdcalendario());
+				record.setIdinstitucion(idInstitucionCalendario);
+				record.setTitulo(ageFestivos.getTipoFestivo());
+				record.setFechainicio(ageFestivos.getFecha());
+				record.setFechafin(ageFestivos.getFecha());
+				record.setLugar(ageFestivos.getLugar());
+				record.setDescripcion(ageFestivos.getDenominacion());
+				record.setRecursos(null);
+				//TODO Revisar que idEstadoEvento e idTipoEvento se debería de poner
+//				record.setIdestadoevento(idestadoevento);
+				record.setIdtipoevento(Long.parseLong("9"));
+				record.setFechabaja(null);
+				record.setUsumodificacion((long)0);
+				record.setFechamodificacion(new Date());
+				
+				ageEventoMapper.insert(record);
+			}
+			
+		}
+		
+	}
+	
+	//TODO Revisar
+	@Override
+	public void insertarFestivosAuto() {
+		List<CenInstitucion> listCenInstitucion = cenInstitucionMapper.selectByExample(new CenInstitucionExample());
+		
+		for (CenInstitucion cenInstitucion : listCenInstitucion) {
+			Short idInstitucion = cenInstitucion.getIdinstitucion();
+			
+			List<CenPartidojudicial> listCenPartidoJudicial = cenPartidojudicialExtendsMapper.getPartidoByInstitucion(idInstitucion);
+
+			// Obtenemos el listado con los festivos insertados para comprobar que no se inserten duplicados en la misma fecha, misma idInstitucion
+			List<String> listFechaFestivosPrevio = ageFestivosExtendsMapper.getFechaFestivos(idInstitucion);
+			
+			for (CenPartidojudicial cenPartidojudicial : listCenPartidoJudicial) {
+				Long idPartidoJudicial = cenPartidojudicial.getIdpartido();
+				CenPoblacionesExample cenPoblacionExample = new CenPoblacionesExample();
+				cenPoblacionExample.createCriteria().andIdpartidoEqualTo(idPartidoJudicial).andSedejudicialEqualTo((short)1);
+				List<CenPoblaciones> listCenPoblaciones = cenPoblacionesExtendsMapper.selectByExample(cenPoblacionExample);
+				
+				for (CenPoblaciones cenPoblaciones : listCenPoblaciones) {
+					String idPoblacion = cenPoblaciones.getIdpoblacion().substring(0, 5);
+					FestivosDTO festivosDTO = llamadaUrl(idPoblacion).getBody();
+					
+					List<ListOfResult> listResultado = festivosDTO.getListOfResult();
+
+					for (ListOfResult listOfResult : listResultado) {
+						if (!listFechaFestivosPrevio.contains(listOfResult.getFecha())) {
+
+							AgeFestivos ageFestivos = new AgeFestivos();
+
+							ageFestivos.setDenominacion(listOfResult.getDenominacion());
+
+							SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+							try {
+								ageFestivos.setFecha(sdf.parse(listOfResult.getFecha()));
+							} catch (ParseException e) {
+								e.printStackTrace();
+							}
+							ageFestivos.setIdinstitucion(idInstitucion);
+							ageFestivos.setIdpartido(idPartidoJudicial);
+							ageFestivos.setTipofestivo(listOfResult.getTipoDeFestivo().getDenominacion());
+
+							ageFestivosExtendsMapper.insert(ageFestivos);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private ResponseEntity<FestivosDTO> llamadaUrl(String idPartidoJudicial) {
+		RestTemplate restTemplate = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		HttpEntity<String> entity = new HttpEntity<String>(headers);
+		ResponseEntity<FestivosDTO> result = restTemplate
+				.exchange(urlRapis + "festivos/buscar?codigoMunicipio=" + idPartidoJudicial + "&tipoFestivo=&fecha=&page=0&size=9999999",
+				HttpMethod.GET, entity, FestivosDTO.class);
+		
+		return result;
+	}
+	
+	
+	//TODO Revisar
+	private void insertarFestivosEvento(EventoItem eventoItem) {
+		
+		AgeFestivos ageFestivos = new AgeFestivos();
+
+		ageFestivos.setDenominacion(eventoItem.getDescripcion());
+		ageFestivos.setFecha(eventoItem.getFechaInicio());
+		ageFestivos.setIdinstitucion(eventoItem.getIdInstitucion());
+		ageFestivos.setIdpartido(eventoItem.getIdPartidoJudicial());
+		
+		//TODO Poner como property de BBDD
+		ageFestivos.setTipofestivo("Festivo Manual");
+
+		ageFestivosExtendsMapper.insert(ageFestivos);
 	}
 
 }

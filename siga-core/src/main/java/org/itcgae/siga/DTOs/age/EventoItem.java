@@ -25,6 +25,7 @@ public class EventoItem {
 	private Long usuModificacion;
 	private Date fechaModificacion;
 	private DatosRepeticionEventoItem datosRepeticion;
+	private Long idPartidoJudicial;
 		
 	/**
 	 **/
@@ -293,7 +294,24 @@ public class EventoItem {
 		this.datosRepeticion = datosRepeticion;
 	}
 
-	
+	@JsonProperty("fechaBaja")
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+
+	@JsonProperty("i")
+	public Long getIdPartidoJudicial() {
+		return idPartidoJudicial;
+	}
+
+	public void setIdPartidoJudicial(Long idPartidoJudicial) {
+		this.idPartidoJudicial = idPartidoJudicial;
+	}
+
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -320,7 +338,8 @@ public class EventoItem {
 				&& Objects.equals(this.fechaModificacion, eventoItem.fechaModificacion)
 				&& Objects.equals(this.datosRepeticion, eventoItem.datosRepeticion)
 				&& Objects.equals(this.tipoAcceso, eventoItem.tipoAcceso)
-				&& Objects.equals(this.fechaBaja, eventoItem.fechaBaja);
+				&& Objects.equals(this.fechaBaja, eventoItem.fechaBaja)
+				&& Objects.equals(this.idPartidoJudicial, eventoItem.idPartidoJudicial);
 
 	}
 

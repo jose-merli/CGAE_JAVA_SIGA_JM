@@ -40,4 +40,7 @@ public interface IFichaEventosService {
 
 	public ComboDTO getDaysWeek(HttpServletRequest request);
 	
+	public void generaEventosLaboral();
+	
+	public void insertarFestivosAuto();
 }
