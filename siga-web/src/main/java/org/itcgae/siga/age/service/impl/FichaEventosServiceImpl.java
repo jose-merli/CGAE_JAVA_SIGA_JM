@@ -38,11 +38,8 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AgeCalendario;
 import org.itcgae.siga.db.entities.AgeCalendarioExample;
 import org.itcgae.siga.db.entities.AgeEvento;
-
 import org.itcgae.siga.db.entities.AgeEventoExample;
-
 import org.itcgae.siga.db.entities.AgeFestivos;
-
 import org.itcgae.siga.db.entities.AgeRepeticionevento;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
@@ -57,18 +54,13 @@ import org.itcgae.siga.db.services.adm.mappers.GenDiccionarioExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeCalendarioExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeDiassemanaExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeEstadoeventosExtendsMapper;
-
 import org.itcgae.siga.db.services.age.mappers.AgeEventoExtendsMapper;
-import org.itcgae.siga.db.services.age.mappers.AgeRepeticionEventoExtendsMapper;
-import org.itcgae.siga.db.services.age.mappers.AgeTipoeventosExtendsMapper;
-import org.itcgae.siga.db.services.age.mappers.CenInfluenciaExtendsMapper;
-
 import org.itcgae.siga.db.services.age.mappers.AgeFestivosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeRepeticionEventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeTipoeventosExtendsMapper;
+import org.itcgae.siga.db.services.age.mappers.CenInfluenciaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPoblacionesExtendsMapper;
-
 import org.itcgae.siga.db.services.form.mappers.ForPersonacursoExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -82,9 +74,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.web.client.RestTemplate;
 
 
@@ -796,7 +786,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 				record.setUsumodificacion((long)0);
 				record.setFechamodificacion(new Date());
 				
-				ageEventoMapper.insert(record);
+				ageEventoExtendsMapper.insert(record);
 			}
 			
 		}

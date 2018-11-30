@@ -6,6 +6,7 @@ import java.util.List;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.commons.utils.TokenGenerationException;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -118,6 +119,22 @@ public class TestUtils {
 		admUsuarios.setIdusuario(1);
 		usuarios.add(admUsuarios);
 		return usuarios;
+	}
+	
+	public GenDiccionario getGenDiccionario() {
+		GenDiccionario genDiccionario = new GenDiccionario();
+
+		genDiccionario.setIdlenguaje("1");
+		genDiccionario.setDescripcion("descripcion");
+
+		return genDiccionario;
+	}
+
+	public List<GenDiccionario> getListGenDiccionario() {
+		List<GenDiccionario> genDiccionarioList = new ArrayList<GenDiccionario>();
+		genDiccionarioList.add(getGenDiccionario());
+
+		return genDiccionarioList;
 	}
 
 

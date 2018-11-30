@@ -5,17 +5,16 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import org.idcgae.siga.commons.testUtils.TestUtils;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.CenTestUtils;
-import org.itcgae.siga.commons.utils.TestUtils;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
-import org.itcgae.siga.db.entities.CenSolicmodicuentas;
 import org.itcgae.siga.db.entities.CenSolimodidirecciones;
 import org.itcgae.siga.db.entities.CenSolimodidireccionesExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;

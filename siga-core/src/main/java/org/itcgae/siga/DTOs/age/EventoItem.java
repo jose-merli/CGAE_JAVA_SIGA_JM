@@ -475,7 +475,7 @@ public class EventoItem {
 				&& Objects.equals(this.tipoDiasRepeticion, eventoItem.tipoDiasRepeticion)
 				&& Objects.equals(this.tipoRepeticion, eventoItem.tipoRepeticion)
 				&& Objects.equals(this.fechaInicioRepeticion, eventoItem.fechaInicioRepeticion)
-				&& Objects.equals(this.fechaInicioRepeticion, eventoItem.fechaInicioRepeticion);
+				&& Objects.equals(this.fechaFinRepeticion, eventoItem.fechaFinRepeticion)
 				&& Objects.equals(this.idPartidoJudicial, eventoItem.idPartidoJudicial);
 
 

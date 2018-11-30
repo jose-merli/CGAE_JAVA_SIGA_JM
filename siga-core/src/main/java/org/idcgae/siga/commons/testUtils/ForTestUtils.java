@@ -6,6 +6,7 @@ import java.util.List;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.form.FormadorCursoItem;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.entities.ForPersonaCurso;
 import org.itcgae.siga.db.entities.GenDiccionario;
@@ -111,5 +112,23 @@ public class ForTestUtils {
 		return listFormadoresCursos;
 
 	}
+	
+	public List<ComboItem> getListRepeatEverySimulados() {
+
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		ComboItem comboItem_0 = new ComboItem();
+		comboItem_0.setLabel("descripcion");
+		comboItem_0.setValue("d");
+		comboItems.add(comboItem_0);
+
+		return comboItems;
+
+	}
+	
+	
+
+
+
 
 }

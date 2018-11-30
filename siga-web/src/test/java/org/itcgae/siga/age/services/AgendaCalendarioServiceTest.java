@@ -40,9 +40,6 @@ public class AgendaCalendarioServiceTest {
 
 	private TestUtils testUtils = new TestUtils();
 	
-
-	private org.itcgae.siga.commons.utils.TestUtils commonUtils = new org.itcgae.siga.commons.utils.TestUtils ();
-	
 	private AgeTestUtils ageTestUtils = new AgeTestUtils();
 
 	@Test
@@ -94,7 +91,7 @@ public class AgendaCalendarioServiceTest {
 
 		String idCalendario = "1";
 		Short idInstitucion = 2000;
-		List<EventoItem> listEventosSimulado = commonUtils.getListaEventosSimulados(idCalendario, idInstitucion);
+		List<EventoItem> listEventosSimulado = ageTestUtils.getListaEventosSimulados(idCalendario, idInstitucion);
 		
 		when(ageCalendarioExtendsMapper.getCalendarioEventos(Mockito.anyShort(), Mockito.anyString(), Mockito.anyString())).thenReturn(listEventosSimulado);
 

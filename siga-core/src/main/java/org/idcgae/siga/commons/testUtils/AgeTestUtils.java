@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
 import org.itcgae.siga.DTOs.age.PermisoCalendarioItem;
 import org.itcgae.siga.DTOs.age.PermisosCalendarioDTO;
+import org.itcgae.siga.DTOs.age.PermisosPerfilesCalendarItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AgeCalendario;
 import org.itcgae.siga.db.entities.AgeEvento;
@@ -260,5 +261,86 @@ public class AgeTestUtils {
 
 		return listaAgePermisoscalendario;
 	}
+
+	public List<EventoItem> getListaEventosSimulados(String idCalendario, Short idInstitucion){
+		List<EventoItem> listaEventos = new ArrayList<EventoItem>();
+		listaEventos.add(getEvento(idCalendario, idInstitucion));
+		
+		return listaEventos;
+	}
+	
+	public EventoItem getEvento(String idCalendario, Short idInstitucion){
+		EventoItem eventoItem = new EventoItem();
+
+		eventoItem.setIdInstitucion(idInstitucion);
+		eventoItem.setIdCalendario(idCalendario);
+		eventoItem.setDescripcion("Descripcion");
+		eventoItem.setColor("Red");
+		eventoItem.setIdTipoEvento("1");
+		eventoItem.setIdEvento("1");
+		  
+		return eventoItem;		
+	}
+	
+	public List<AgePermisoscalendario> getAgePermisosSimulados(){
+		List<AgePermisoscalendario> permisos = new ArrayList<AgePermisoscalendario>();
+		
+		permisos.add(getAgePermisoCalendarioSimulado());
+		
+		return permisos;
+	}
+	
+	
+	public AgePermisoscalendario getAgePermisoCalendarioSimulado(){
+		AgePermisoscalendario permiso = new AgePermisoscalendario();
+		
+		permiso.setIdcalendario((long)1);
+		permiso.setIdinstitucion((short)2000);
+		permiso.setIdperfil("1");
+		permiso.setIdpermisoscalendario((long)3);
+		
+		return permiso;
+	}
+	
+	public PermisosCalendarioDTO getPermisosCalendarioSimulado() {
+		PermisosCalendarioDTO permisosCalendarioDTO = new PermisosCalendarioDTO();
+		List<PermisoCalendarioItem> permisos = new ArrayList<PermisoCalendarioItem>();
+		
+		permisos.add(getPermisoCalendarioItemSimulado());
+		permisosCalendarioDTO.setPermisoCalendarioItems(permisos);
+		
+		return permisosCalendarioDTO;
+	}
+	
+	public PermisoCalendarioItem getPermisoCalendarioItemSimulado() {
+		PermisoCalendarioItem permiso = new PermisoCalendarioItem();
+		
+		permiso.setDerechoacceso("3");
+		permiso.setIdCalendario("1");
+		permiso.setIdPerfil("1");
+		
+		return permiso;
+	}
+
+	
+	public List<PermisosPerfilesCalendarItem> getListPermisosPerfilesCalendarItemSimulado(){
+		List<PermisosPerfilesCalendarItem> permisosPerfilesCalendarItem = new ArrayList<PermisosPerfilesCalendarItem>();
+		permisosPerfilesCalendarItem.add(getPermisosPerfilesCalendarItemSimulado());
+		
+		return permisosPerfilesCalendarItem;
+	}
+	
+	public PermisosPerfilesCalendarItem getPermisosPerfilesCalendarItemSimulado(){
+		PermisosPerfilesCalendarItem calendar = new PermisosPerfilesCalendarItem();
+
+		calendar.setDerechoacceso("1");
+		calendar.setIdPerfil("1");
+		calendar.setNombrePerfil("1");
+		  
+		return calendar;		
+	}
+
+	
+
 
 }
