@@ -12,50 +12,53 @@ public class EnvEnviosExtendsSqlProvider {
 		SQL sql = new SQL();
 		// Formateo de fecha para sentencia sql
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				
+		sql.SELECT("ENVIO.IDINSTITUCION");
+		sql.SELECT("ENVIO.IDENVIO");
+		sql.SELECT("ENVIO.DESCRIPCION");
+		sql.SELECT("ENVIO.FECHA AS FECHACREACION");
+		sql.SELECT("ENVIO.IDPLANTILLAENVIOS");
+		sql.SELECT("ENVIO.IDESTADO");
+		sql.SELECT("ENVIO.IDTIPOENVIOS");
+		sql.SELECT("ENVIO.IDPLANTILLA");
+		sql.SELECT("ENVIO.FECHAPROGRAMADA");
+		sql.SELECT("ENVIO.FECHABAJA");
+		sql.SELECT("PLANTILLA.ASUNTO");
+		sql.SELECT("PLANTILLA.CUERPO");
+		sql.SELECT("ETIQUETAS.IDGRUPO");
 		
-		sql.SELECT("IDINSTITUCION");
-		sql.SELECT("IDENVIO");
-		sql.SELECT("DESCRIPCION");
-		sql.SELECT("FECHA");
-		sql.SELECT("GENERARDOCUMENTO");
-		sql.SELECT("IMPRIMIRETIQUETAS");
-		sql.SELECT("IDPLANTILLAENVIOS");
-		sql.SELECT("IDESTADO");
-		sql.SELECT("IDTIPOENVIOS");
-		sql.SELECT("FECHAMODIFICACION");
-		sql.SELECT("USUMODIFICACION");
-		sql.SELECT("IDPLANTILLA");
-		sql.SELECT("IDIMPRESORA");
-		sql.SELECT("FECHAPROGRAMADA");
-		sql.SELECT("CONSULTA");
-		sql.SELECT("ACUSERECIBO");
-		sql.SELECT("IDTIPOINTERCAMBIOTELEMATICO");
-		sql.SELECT("COMISIONAJG");
-		sql.SELECT("FECHABAJA");
-		sql.SELECT("CSV");
-		sql.SELECT("IDSOLICITUDECOS");
-		
-		sql.FROM("ENV_ENVIOS");
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion +"'");
+		sql.FROM("ENV_ENVIOS ENVIO");
+		sql.JOIN("ENV_PLANTILLASENVIOS PLANTILLA ON PLANTILLA.IDINSTITUCION = '" + idInstitucion + "' AND PLANTILLA.IDPLANTILLAENVIOS = ENVIO.IDPLANTILLAENVIOS AND PLANTILLA.IDTIPOENVIOS = ENVIO.IDTIPOENVIOS");
+		sql.LEFT_OUTER_JOIN("ENV_ENVIOSGRUPOCLIENTE ETIQUETAS ON (ETIQUETAS.IDENVIO = ENVIO.IDENVIO)");
 		
 		
-		if(filtros.getAsunto() != null){
+		sql.WHERE("ENVIO.IDINSTITUCION = '" + idInstitucion +"'");
+		sql.WHERE("ENVIO.FECHABAJA IS NULL");
+		
+		if(filtros.getAsunto() != null && !filtros.getAsunto().trim().equals("")){
 			sql.WHERE(filtroTextoBusquedas("DESCRIPCION",filtros.getAsunto()));
 		}
-		if(filtros.getEstado() != null){
-			sql.WHERE("IDESTADO = '" + filtros.getEstado() +"'");
+		if(filtros.getidEstado() != null && !filtros.getidEstado().trim().equals("")){
+			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getidEstado() +"'");
 		}
 		if(filtros.getFechaCreacion() != null){
 			String fechaCreacion = dateFormat.format(filtros.getFechaCreacion());
-			sql.WHERE("FECHA = TO_DATE('" +fechaCreacion + "', 'DD/MM/YYYY')");
+			String fechaCreacion2 = dateFormat.format(filtros.getFechaCreacion());
+			fechaCreacion += " 01:00:00";
+			fechaCreacion2 += " 12:59:59";
+			sql.WHERE("(ENVIO.FECHA >= TO_DATE('" +fechaCreacion + "', 'DD/MM/YYYY HH:MI:SS') AND ENVIO.FECHA <= TO_DATE('" +fechaCreacion2 + "', 'DD/MM/YYYY HH:MI:SS'))");
 		}
 		if(filtros.getFechaProgramacion() != null){
 			String fechaProgramacion = dateFormat.format(filtros.getFechaProgramacion());
-			sql.WHERE("FECHA = TO_DATE('" + fechaProgramacion + "', 'DD/MM/YYYY')");
+			String fechaProgramacion2 = dateFormat.format(filtros.getFechaProgramacion());
+			fechaProgramacion += " 01:00:00";
+			fechaProgramacion2 += " 12:59:59";
+			sql.WHERE("(ENVIO.FECHAPROGRAMADA >= TO_DATE('" + fechaProgramacion + "', 'DD/MM/YYYY HH:MI:SS') AND ENVIO.FECHAPROGRAMADA <= TO_DATE('" + fechaProgramacion2 + "', 'DD/MM/YYYY HH:MI:SS'))");
 		}
-		if(filtros.getTipoEnvio() != null){
-			sql.WHERE("IDTIPOENVIOS = '" + filtros.getEstado() +"'");
+		if(filtros.getidTipoEnvio() != null && !filtros.getidTipoEnvio().trim().equals("")){
+			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getidTipoEnvio() +"'");
 		}
+		
 		
 		return sql.toString();
 	}

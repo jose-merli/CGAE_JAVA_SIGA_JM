@@ -17,28 +17,20 @@ import org.springframework.stereotype.Service;
 public interface EnvEnviosExtendsMapper {
 	
 	
-	@SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "selectTipoEnvios")
+	@SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "selectEnvios")
 	@Results({@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDENVIO", property = "idEnvio", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHA", property = "fecha", jdbcType = JdbcType.DATE),
-		@Result(column = "GENERARDOCUMENTO", property = "generarDocumento", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IMPRIMIRETIQUETAS", property = "imprimirEtiquetas", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillasEnvios", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHACREACION", property = "fechaCreacion", jdbcType = JdbcType.DATE),
+		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillasEnvio", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "IDTIPOENVIOS", property = "idEstado", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "FECHAMODIFICACION", property = "value", jdbcType = JdbcType.DATE),
-		@Result(column = "USUMODIFICACION", property = "value", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "IDPLANTILLA", property = "value", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "IDIMPRESORA", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHAPROGRAMADA", property = "value", jdbcType = JdbcType.DATE),
-		@Result(column = "CONSULTA", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "ACUSERECIBO", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDTIPOINTERCAMBIOTELEMATICO", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "COMISIONAJG", property = "value", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "FECHABAJA", property = "value", jdbcType = JdbcType.DATE),
-		@Result(column = "CSV", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDSOLICITUDECOS", property = "value", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvio", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDPLANTILLA", property = "idPlantilla", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHAPROGRAMADA", property = "fechaProgramada", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CUERPO", property = "cuerpo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDGRUPO", property = "idGrupo", jdbcType = JdbcType.VARCHAR)
 	})
 	List<EnviosMasivosItem> selectEnviosMasivosSearch(Short idInstitucion, EnviosMasivosSearch filtros);
 	

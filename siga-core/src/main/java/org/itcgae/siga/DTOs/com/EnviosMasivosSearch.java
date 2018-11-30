@@ -9,8 +9,8 @@ public class EnviosMasivosSearch {
 	private String asunto;
 	private Date fechaCreacion;
 	private Date fechaProgramacion;
-	private String tipoEnvio;
-	private String estado;
+	private String idTipoEnvio;
+	private String idEstado;
 	
 	@JsonProperty("asunto")
 	public String getAsunto() {
@@ -34,19 +34,19 @@ public class EnviosMasivosSearch {
 	public void setFechaProgramacion(Date fechaProgramacion) {
 		this.fechaProgramacion = fechaProgramacion;
 	}
-	@JsonProperty("tipoEnvio")
-	public String getTipoEnvio() {
-		return tipoEnvio;
+	@JsonProperty("idTipoEnvio")
+	public String getidTipoEnvio() {
+		return idTipoEnvio;
 	}
-	public void setTipoEnvio(String tipoEnvio) {
-		this.tipoEnvio = tipoEnvio;
+	public void setidTipoEnvio(String idTipoEnvio) {
+		this.idTipoEnvio = idTipoEnvio;
 	}
-	@JsonProperty("estado")
-	public String getEstado() {
-		return estado;
+	@JsonProperty("idEstado")
+	public String getidEstado() {
+		return idEstado;
 	}
-	public void setEstado(String estado) {
-		this.estado = estado;
+	public void setidEstado(String idEstado) {
+		this.idEstado = idEstado;
 	}
 	
 	

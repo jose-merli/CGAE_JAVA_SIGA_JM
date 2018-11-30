@@ -12,12 +12,14 @@ import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
+import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.EnvCamposplantilla;
 import org.itcgae.siga.db.entities.EnvDestinatarios;
 import org.itcgae.siga.db.entities.EnvDestinatariosExample;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
@@ -358,6 +360,57 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 			}
 		}
 		LOGGER.info("enviar() -> Salida del servicio para enviar");
+		return respuesta;
+	}
+
+	@Override
+	public Error guardarConfiguracion(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta) {
+		
+		LOGGER.info("guardarConfiguracion() -> Entrada al servicio para guardar datos tarjeta configuración");
+		
+		Error respuesta = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					
+					if(datosTarjeta.getIdEnvio() != null){
+						
+						
+					}else{
+						Short idAsunto = 1;
+						Short idCuerpo = 2;
+						EnvCamposplantilla datosAsunto = new EnvCamposplantilla();
+						datosAsunto.setIdcampo(idAsunto);
+						datosAsunto.setIdinstitucion(idInstitucion);
+						datosAsunto.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantilla()));
+						datosAsunto.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+						//datosAsunto.setValor(datosTarjeta.get);
+					}
+					
+					respuesta.setCode(200);
+					respuesta.setDescription("Datos configuracion de envio guardados correctamente");
+					respuesta.setMessage("Updates correcto");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error");
+				}
+				
+				
+			}
+		}
+		LOGGER.info("guardarConfiguracion() -> Salida del servicio para guardar datos tarjeta configuración");
 		return respuesta;
 	}
 	
