@@ -14,7 +14,6 @@ import org.itcgae.siga.commons.utils.CenTestUtils;
 import org.itcgae.siga.commons.utils.TestUtils;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenSolicmodicuentas;
 import org.itcgae.siga.db.entities.CenSolmodifacturacionservicio;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolModifFacturacionServicioExtendsMapper;

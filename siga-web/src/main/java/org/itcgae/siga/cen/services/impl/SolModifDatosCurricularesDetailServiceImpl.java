@@ -2,14 +2,11 @@ package org.itcgae.siga.cen.services.impl;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
-import org.itcgae.siga.DTOs.cen.SolModifDatosCurricularesDTO;
 import org.itcgae.siga.DTOs.cen.SolModifDatosCurricularesItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.cen.services.ISolModifDatosCurricularesDetailService;

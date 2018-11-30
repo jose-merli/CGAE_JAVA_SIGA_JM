@@ -15,7 +15,6 @@ import org.itcgae.siga.commons.utils.TestUtils;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
-import org.itcgae.siga.db.entities.CenSolicmodicuentas;
 import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
 import org.itcgae.siga.db.entities.CenSolicmodifexportarfotoExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
