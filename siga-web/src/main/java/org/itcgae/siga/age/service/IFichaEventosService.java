@@ -42,10 +42,16 @@ public interface IFichaEventosService {
 
 	public ComboDTO getDaysWeek(HttpServletRequest request);
 	
+
 	public ComboDTO getJudicialDistrict(HttpServletRequest request);
 	
 	public UpdateResponseDTO updateEventCalendar(EventoItem eventoItem, HttpServletRequest request);
 
 	public UpdateResponseDTO deleteEventCalendar(EventoDTO eventoDTO, HttpServletRequest request);
+
+
+	public void generaEventosLaboral();
+	
+	public void insertarFestivosAuto();
 
 }

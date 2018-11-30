@@ -3,6 +3,7 @@ package org.idcgae.siga.commons.testUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.itcgae.siga.DTOs.age.CalendarItem;
 import org.itcgae.siga.DTOs.age.ComboPlantillaEnvioDTO;
 import org.itcgae.siga.DTOs.age.ComboPlantillaEnvioItem;
 import org.itcgae.siga.DTOs.age.EventoDTO;
@@ -28,7 +29,24 @@ public class AgeTestUtils {
 
 		return listaAgeCalendarios;
 	}
+	public List<CalendarItem> getListaCalendariosSimulados(){
+		List<CalendarItem> listaAgeCalendarios = new ArrayList<CalendarItem>();
+		listaAgeCalendarios.add(getAgeCalendarioItem());
+		
+		return listaAgeCalendarios;
+	}
+	
+	public CalendarItem getAgeCalendarioItem(){
+		CalendarItem calendarItem = new CalendarItem();
 
+		calendarItem.setIdInstitucion((short)2000);
+		calendarItem.setIdCalendario("100");
+		calendarItem.setDescripcion("Descripcion");
+		calendarItem.setColor("Red");
+		calendarItem.setIdTipoCalendario("1");
+		  
+		return calendarItem;		
+	}
 	public AgeCalendario getAgeCalendario() {
 		AgeCalendario ageCalendario = new AgeCalendario();
 

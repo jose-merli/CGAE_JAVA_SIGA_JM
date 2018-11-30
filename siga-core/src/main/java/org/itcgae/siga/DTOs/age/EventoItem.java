@@ -24,6 +24,7 @@ public class EventoItem {
 	private Date fechaBaja;
 	private Long usuModificacion;
 	private Date fechaModificacion;
+
 	private String idTipoCalendario;
 	
 	private String idRepeticionEvento;
@@ -33,6 +34,9 @@ public class EventoItem {
 	private String tipoRepeticion;
 	private Date fechaInicioRepeticion;
 	private Date fechaFinRepeticion;
+
+	private Long idPartidoJudicial;
+
 		
 	/**
 	 **/
@@ -377,6 +381,7 @@ public class EventoItem {
 		return tipoRepeticion;
 	}
 
+
 	public void setTipoRepeticion(String tipoRepeticion) {
 		this.tipoRepeticion = tipoRepeticion;
 	}
@@ -414,6 +419,26 @@ public class EventoItem {
 		this.fechaFinRepeticion = fechaFinRepeticion;
 	}
 			
+
+	@JsonProperty("fechaBaja")
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+
+	@JsonProperty("i")
+	public Long getIdPartidoJudicial() {
+		return idPartidoJudicial;
+	}
+
+	public void setIdPartidoJudicial(Long idPartidoJudicial) {
+		this.idPartidoJudicial = idPartidoJudicial;
+	}
+
+
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -451,6 +476,8 @@ public class EventoItem {
 				&& Objects.equals(this.tipoRepeticion, eventoItem.tipoRepeticion)
 				&& Objects.equals(this.fechaInicioRepeticion, eventoItem.fechaInicioRepeticion)
 				&& Objects.equals(this.fechaInicioRepeticion, eventoItem.fechaInicioRepeticion);
+				&& Objects.equals(this.idPartidoJudicial, eventoItem.idPartidoJudicial);
+
 
 	}
 
@@ -459,7 +486,7 @@ public class EventoItem {
 
 		return Objects.hash(idEvento, idCalendario, idInstitucion, titulo, fechaInicio, fechaFin, allDay, color, lugar,
 				descripcion, recursos, idEstadoEvento, idTipoEvento, usuModificacion, fechaModificacion, fechaBaja, idTipoCalendario, tipoAcceso,
-				idRepeticionEvento, valoresRepeticion, valoresRepeticionString, tipoDiasRepeticion, tipoRepeticion, fechaInicioRepeticion, fechaFinRepeticion);
+				idRepeticionEvento, valoresRepeticion, valoresRepeticionString, tipoDiasRepeticion, tipoRepeticion, fechaInicioRepeticion, fechaFinRepeticion,idPartidoJudicial);
 	}
 	
 	@Override
@@ -492,6 +519,7 @@ public class EventoItem {
 		sb.append("    tipoRepeticion: ").append(toIndentedString(tipoRepeticion)).append("\n");
 		sb.append("    fechaInicioRepeticion: ").append(toIndentedString(fechaInicioRepeticion)).append("\n");
 		sb.append("    fechaFinRepeticion: ").append(toIndentedString(fechaFinRepeticion)).append("\n");
+				sb.append("    idPartidoJudicial: ").append(toIndentedString(idPartidoJudicial)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
