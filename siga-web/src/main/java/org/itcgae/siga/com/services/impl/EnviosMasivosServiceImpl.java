@@ -198,7 +198,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	}
 
 	@Override
-	public Error programarEnvio(HttpServletRequest request, List<EnvioProgramadoDto> enviosProgramadosDto) {
+	public Error programarEnvio(HttpServletRequest request, EnvioProgramadoDto[] enviosProgramadosDto) {
 		
 		LOGGER.info("programarEnvio() -> Entrada al servicio para programar los envios");
 		
@@ -219,24 +219,24 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				
 				try{
 					
-					for(int i = 0; i <= enviosProgramadosDto.size();i++){
+					for(int i = 0; i <= enviosProgramadosDto.length;i++){
 						//Solo programamos los envios si tiene estado 1(nuevo) o 4(programado)
-						if(enviosProgramadosDto.get(i).getIdEstado().equals("1") || enviosProgramadosDto.get(i).getIdEstado().equals("4")){
+						if(enviosProgramadosDto[i].getIdEstado().equals("1") || enviosProgramadosDto[i].getIdEstado().equals("4")){
 							int update = 0;
 							EnvEnvioprogramadoKey key = new EnvEnvioprogramadoKey();
-							key.setIdenvio(Long.parseLong(enviosProgramadosDto.get(i).getIdEnvio()));
+							key.setIdenvio(Long.parseLong(enviosProgramadosDto[i].getIdEnvio()));
 							key.setIdinstitucion(usuario.getIdinstitucion());
 							EnvEnvioprogramado envioProgramado = _envEnvioprogramadoMapper.selectByPrimaryKey(key);
-							envioProgramado.setFechaprogramada(enviosProgramadosDto.get(i).getFechaProgramada());
+							envioProgramado.setFechaprogramada(enviosProgramadosDto[i].getFechaProgramada());
 							envioProgramado.setFechamodificacion(new Date());
 							envioProgramado.setUsumodificacion(usuario.getIdusuario());
 							update = _envEnvioprogramadoMapper.updateByPrimaryKey(envioProgramado);
 							if(update > 0){
 								EnvEnviosKey keyEnvio = new EnvEnviosKey();
-								keyEnvio.setIdenvio(Long.parseLong(enviosProgramadosDto.get(i).getIdEnvio()));
+								keyEnvio.setIdenvio(Long.parseLong(enviosProgramadosDto[i].getIdEnvio()));
 								keyEnvio.setIdinstitucion(usuario.getIdinstitucion());
 								EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio);
-								envio.setFechaprogramada(enviosProgramadosDto.get(i).getFechaProgramada());
+								envio.setFechaprogramada(enviosProgramadosDto[i].getFechaProgramada());
 								envio.setFechamodificacion(new Date());
 								envio.setUsumodificacion(usuario.getIdusuario());
 								_envEnviosMapper.updateByPrimaryKey(envio);
