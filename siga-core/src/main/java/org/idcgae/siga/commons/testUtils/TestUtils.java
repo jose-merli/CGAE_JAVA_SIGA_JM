@@ -1,8 +1,13 @@
 package org.idcgae.siga.commons.testUtils;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.commons.utils.TokenGenerationException;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -10,6 +15,8 @@ import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,7 +41,32 @@ public class TestUtils {
 
 		return mockreq;
 	}
+	
+	public MockMultipartHttpServletRequest  getMultipartRequestWithGeneralAuthentication() throws TokenGenerationException, IOException {
 
+		MockMultipartHttpServletRequest mockreq = new MockMultipartHttpServletRequest();
+		UserCgae userCgae = new UserCgae();
+		List<String> listPerfiles = new ArrayList<>();
+		
+		userCgae.setDni("44149718E");
+		userCgae.setGrupo("ADG");
+		userCgae.setInstitucion("2000");
+		listPerfiles.add("ADG");
+		userCgae.setPerfiles(listPerfiles);
+
+		mockreq.addParameter("idPersona", "1");
+		UserTokenUtils.configure("1234", "Bearer", 1000000, "");
+		String token = UserTokenUtils.generateToken(userCgae);
+		
+		mockreq.addHeader("Authorization", token); 
+		
+//		FileInputStream inputFile = new FileInputStream( "/path/to/the/file.txt");  
+		MockMultipartFile file = new MockMultipartFile("files", "filename.txt", "text/plain", "hello".getBytes(StandardCharsets.UTF_8));
+		mockreq.addFile(file); 
+
+		return mockreq;
+	}
+	
 	public MockHttpServletRequest getRequestWithGeneralAuthentication2005() throws TokenGenerationException {
 
 		MockHttpServletRequest mockreq = new MockHttpServletRequest();
@@ -55,6 +87,27 @@ public class TestUtils {
 		return mockreq;
 	}
 
+	public MockHttpServletRequest getRequestWithGeneralAuthenticationNoIdInst() throws TokenGenerationException {
+
+		MockHttpServletRequest mockreq = new MockHttpServletRequest();
+		UserCgae userCgae = new UserCgae();
+		List<String> listPerfiles = new ArrayList<>();
+
+		userCgae.setDni("44149718E");
+		userCgae.setGrupo("ADG");
+//		userCgae.setInstitucion("2005");
+		listPerfiles.add("ADG");
+		userCgae.setPerfiles(listPerfiles);
+
+		UserTokenUtils.configure("1234", "Bearer", 1000000, "");
+		String token = UserTokenUtils.generateToken(userCgae);
+
+		mockreq.addHeader("Authorization", token);
+
+		return mockreq;
+	}
+
+	
 	public MockHttpServletRequest getRequestWithVariableAuthentication(String idInstitucion) {
 		// TODO Auto-generated method stub
 		return null;
@@ -119,6 +172,29 @@ public class TestUtils {
 		admUsuarios.setIdusuario(1);
 		usuarios.add(admUsuarios);
 		return usuarios;
+	}
+	
+	
+	public List<FichaDatosCurricularesItem> getListaFichaDatosCurricularesItem() {
+		List<FichaDatosCurricularesItem> curriculares = new ArrayList<>();
+		curriculares.add(getFichaDatosCurricularesItem());
+		return curriculares;
+	}
+	
+	public FichaDatosCurricularesItem getFichaDatosCurricularesItem() {
+		FichaDatosCurricularesItem curriculares = new FichaDatosCurricularesItem();
+		curriculares.setIdPersona("123");
+		curriculares.setIdCv("1234");
+		curriculares.setFechaDesdeDate(new Date());
+		curriculares.setFechaMovimientoDate(new Date());
+		curriculares.setCertificado("!");
+		curriculares.setDescripcion("a");
+		curriculares.setIdInstitucion("2005");
+		curriculares.setIdTipoCv("1");
+		curriculares.setCredito("1");
+		curriculares.setIdTipoCvSubtipo1("1");
+		curriculares.setIdTipoCvSubtipo2("2");
+		return curriculares;
 	}
 	
 	public GenDiccionario getGenDiccionario() {
