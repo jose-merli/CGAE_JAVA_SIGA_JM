@@ -62,6 +62,11 @@ public interface AgeCalendarioExtendsMapper extends AgeCalendarioMapper{
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "RECURSOS", property = "recursos", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOACCESO", property = "tipoAcceso", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHAFINREPETICION", property = "fechaFinRepeticion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAINICIOREPETICION", property = "fechaInicioRepeticion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPODIASREPETICION", property = "tipoDiasRepeticion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOREPETICION", property = "tipoRepeticion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VALORESREPETICION", property = "valoresRepeticionString", jdbcType = JdbcType.VARCHAR),
 	})
 	List<EventoItem> getCalendarioEventos(Short idInstitucion, String perfiles, String idCalendario);
 	

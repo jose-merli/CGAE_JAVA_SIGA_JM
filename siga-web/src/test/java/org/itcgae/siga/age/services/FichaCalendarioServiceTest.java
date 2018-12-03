@@ -5,6 +5,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import org.idcgae.siga.commons.testUtils.AgeTestUtils;
+import org.idcgae.siga.commons.testUtils.TestUtils;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.CalendarDTO;
@@ -16,7 +18,6 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.age.service.impl.FichaCalendarioServiceImpl;
-import org.itcgae.siga.commons.utils.TestUtils;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AgeCalendario;
@@ -54,6 +55,8 @@ public class FichaCalendarioServiceTest {
 	private FichaCalendarioServiceImpl fichaCalendarioServiceImpl;
 
 	private TestUtils testUtils = new TestUtils();
+	
+	private AgeTestUtils ageTestUtils = new AgeTestUtils();
 
 	@Test
 	public void getCalendarTypeTest() throws Exception {
@@ -79,9 +82,9 @@ public class FichaCalendarioServiceTest {
 		String idLenguaje = "1";
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
 		List<ComboItem> comboItems = testUtils.getListComboItemsSimulados();
-		List<AgePermisoscalendario> permisos = testUtils.getAgePermisosSimulados();
+		List<AgePermisoscalendario> permisos = ageTestUtils.getAgePermisosSimulados();
 		UpdateResponseDTO updateResponseEsperado = new UpdateResponseDTO();
-		PermisosCalendarioDTO permisosCalendarioDTO = testUtils.getPermisosCalendarioSimulado();
+		PermisosCalendarioDTO permisosCalendarioDTO = ageTestUtils.getPermisosCalendarioSimulado();
 		
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(ageTipocalendarioExtendsMapper.getCalendarType(Mockito.anyString())).thenReturn(comboItems);
@@ -102,7 +105,7 @@ public class FichaCalendarioServiceTest {
 		List<ComboItem> comboItems = testUtils.getListComboItemsSimulados();
 		List<AgePermisoscalendario> permisos = null;
 		UpdateResponseDTO updateResponseEsperado = new UpdateResponseDTO();
-		PermisosCalendarioDTO permisosCalendarioDTO = testUtils.getPermisosCalendarioSimulado();
+		PermisosCalendarioDTO permisosCalendarioDTO = ageTestUtils.getPermisosCalendarioSimulado();
 		
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(ageTipocalendarioExtendsMapper.getCalendarType(Mockito.anyString())).thenReturn(comboItems);
@@ -120,7 +123,7 @@ public class FichaCalendarioServiceTest {
 	public void saveCalendarTest() throws Exception {
 		String idLenguaje = "1";
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
-		CalendarItem calendarItem = testUtils.getAgeCalendarioItem();
+		CalendarItem calendarItem = ageTestUtils.getAgeCalendarioItem();
 		List<ComboItem> calendarInserted = testUtils.getListComboItemsSimulados();
 		
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
@@ -144,7 +147,7 @@ public class FichaCalendarioServiceTest {
 	public void saveCalendarErrorTest() throws Exception {
 		String idLenguaje = "1";
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
-		CalendarItem calendarItem = testUtils.getAgeCalendarioItem();
+		CalendarItem calendarItem = ageTestUtils.getAgeCalendarioItem();
 		List<ComboItem> calendarInserted = testUtils.getListComboItemsSimulados();
 		
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
@@ -169,8 +172,8 @@ public class FichaCalendarioServiceTest {
 	public void updateCalendarTest() throws Exception {
 		String idLenguaje = "1";
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
-		List<AgeCalendario> calendarios = testUtils.getAgeCalendariosSimulados();
-		CalendarItem calendarItem = testUtils.getAgeCalendarioItem();
+		List<AgeCalendario> calendarios = ageTestUtils.getListaAgeCalendariosSimulados();
+		CalendarItem calendarItem = ageTestUtils.getAgeCalendarioItem();
 		
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(ageCalendarioExtendsMapper.selectByExample(Mockito.any(AgeCalendarioExample.class))).thenReturn(calendarios);
@@ -192,8 +195,8 @@ public class FichaCalendarioServiceTest {
 	public void updateCalendarErrorTest() throws Exception {
 		String idLenguaje = "1";
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
-		List<AgeCalendario> calendarios = testUtils.getAgeCalendariosSimulados();
-		CalendarItem calendarItem = testUtils.getAgeCalendarioItem();
+		List<AgeCalendario> calendarios = ageTestUtils.getListaAgeCalendariosSimulados();
+		CalendarItem calendarItem = ageTestUtils.getAgeCalendarioItem();
 		
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(ageCalendarioExtendsMapper.selectByExample(Mockito.any(AgeCalendarioExample.class))).thenReturn(calendarios);
@@ -214,8 +217,8 @@ public class FichaCalendarioServiceTest {
 	
 	@Test
 	public void getCalendarTest() throws Exception {
-		AgeCalendario ageCalendario = testUtils.getAgeCalendario();
-		CalendarItem calendarItem = testUtils.getAgeCalendarioItem();
+		AgeCalendario ageCalendario = ageTestUtils.getAgeCalendario();
+		CalendarItem calendarItem = ageTestUtils.getAgeCalendarioItem();
 		calendarItem.setIdInstitucion(null);
 		calendarItem.setIdCalendario(null);
 		
@@ -233,7 +236,7 @@ public class FichaCalendarioServiceTest {
 	
 	@Test
 	public void PermisosPerfilesCalendarDTOTest() throws Exception {
-		List<PermisosPerfilesCalendarItem> profilesCalendar = testUtils.getListPermisosPerfilesCalendarItemSimulado();
+		List<PermisosPerfilesCalendarItem> profilesCalendar = ageTestUtils.getListPermisosPerfilesCalendarItemSimulado();
 		
 		when(agePermisosCalendarioExtendsMapper.getProfilesPermissions(Mockito.anyString(), Mockito.anyString())).thenReturn(profilesCalendar);
 		

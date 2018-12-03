@@ -6,12 +6,13 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.idcgae.siga.commons.testUtils.ForTestUtils;
+import org.idcgae.siga.commons.testUtils.TestUtils;
 import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.commons.utils.TestUtils;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ForCurso;
@@ -56,6 +57,8 @@ public class BusquedaCursoServiceTest {
 	private BusquedaCursosServiceImpl busquedaCursosServiceImpl;
 
 	private TestUtils testUtils = new TestUtils();
+	
+	private ForTestUtils forTestUtils = new ForTestUtils();
 
 	@Test
 	public void getVisibilidadCursosTest() throws Exception {
@@ -144,8 +147,8 @@ public class BusquedaCursoServiceTest {
 	@Test
 	public void searchCursoTest() throws Exception {
 		
-		List<CursoItem> cursoItemList = testUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_SIN_ARCHIVAR);
-		CursoItem cursoItemBusqueda = testUtils.getCursoSimulado(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_SIN_ARCHIVAR);
+		List<CursoItem> cursoItemList = forTestUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_SIN_ARCHIVAR);
+		CursoItem cursoItemBusqueda = forTestUtils.getCursoSimulado(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_SIN_ARCHIVAR);
 		
 		when(forCursoExtendsMapper.selectCursos(Mockito.anyShort(), Mockito.any(CursoItem.class))).thenReturn(cursoItemList);
 		
@@ -163,7 +166,7 @@ public class BusquedaCursoServiceTest {
 	@Test
 	public void searchCursoTestKO() throws Exception {
 		
-		CursoItem cursoItemBusqueda = testUtils.getCursoSimulado(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_SIN_ARCHIVAR);
+		CursoItem cursoItemBusqueda = forTestUtils.getCursoSimulado(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_SIN_ARCHIVAR);
 		
 		when(forCursoExtendsMapper.selectCursos(Mockito.anyShort(), Mockito.any(CursoItem.class))).thenReturn(null);
 		
@@ -184,7 +187,7 @@ public class BusquedaCursoServiceTest {
 
 		String idLenguaje = "1";
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
-		List<CursoItem> cursoItemList = testUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_SIN_ARCHIVAR);
+		List<CursoItem> cursoItemList = forTestUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_SIN_ARCHIVAR);
 		
 		when(forCursoExtendsMapper.updateByExampleSelective(Mockito.any(ForCurso.class), Mockito.any(ForCursoExample.class))).thenReturn((int)1);
 		when(admUsuariosMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
@@ -202,7 +205,7 @@ public class BusquedaCursoServiceTest {
 	@Test
 	public void archivarCursosTestKOListVacia() throws Exception {
 
-		List<CursoItem> cursoItemList = testUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_ARCHIVADO);
+		List<CursoItem> cursoItemList = forTestUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_ARCHIVADO);
 		
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
@@ -219,7 +222,7 @@ public class BusquedaCursoServiceTest {
 
 		List<AdmUsuarios> usuarios = new ArrayList<AdmUsuarios>();
 		usuarios.add(null);
-		List<CursoItem> cursoItemList = testUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_SIN_ARCHIVAR);
+		List<CursoItem> cursoItemList = forTestUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_SIN_ARCHIVAR);
 		
 		when(forCursoExtendsMapper.updateByExampleSelective(Mockito.any(ForCurso.class), Mockito.any(ForCursoExample.class))).thenReturn((int)1);
 		when(admUsuariosMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
@@ -239,7 +242,7 @@ public class BusquedaCursoServiceTest {
 
 		String idLenguaje = "1";
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
-		List<CursoItem> cursoItemList = testUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO, SigaConstants.CURSO_ARCHIVADO);
+		List<CursoItem> cursoItemList = forTestUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO, SigaConstants.CURSO_ARCHIVADO);
 		
 		when(forCursoExtendsMapper.updateByExampleSelective(Mockito.any(ForCurso.class), Mockito.any(ForCursoExample.class))).thenReturn((int)1);
 		when(admUsuariosMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
@@ -257,7 +260,7 @@ public class BusquedaCursoServiceTest {
 	@Test
 	public void desarchivarCursosKOListVacia() throws Exception {
 
-		List<CursoItem> cursoItemList = testUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO, SigaConstants.CURSO_SIN_ARCHIVAR);
+		List<CursoItem> cursoItemList = forTestUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO, SigaConstants.CURSO_SIN_ARCHIVAR);
 		
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
@@ -274,7 +277,7 @@ public class BusquedaCursoServiceTest {
 		
 		List<AdmUsuarios> usuarios = new ArrayList<AdmUsuarios>();
 		usuarios.add(null);
-		List<CursoItem> cursoItemList = testUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO, SigaConstants.CURSO_ARCHIVADO);
+		List<CursoItem> cursoItemList = forTestUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO, SigaConstants.CURSO_ARCHIVADO);
 		
 		when(forCursoExtendsMapper.updateByExampleSelective(Mockito.any(ForCurso.class), Mockito.any(ForCursoExample.class))).thenReturn((int)1);
 		when(admUsuariosMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);

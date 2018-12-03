@@ -12,10 +12,10 @@ public interface ISearchSolModifDatosFacturacionService {
 	SolModificacionDTO searchSolModifDatosFacturacion(int numPagina,
 			SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, HttpServletRequest request);
 
-	UpdateResponseDTO processSolModifDatosFacturacion(int numPagina, SolModificacionItem solModificacionItem,
+	UpdateResponseDTO processSolModifDatosFacturacion(SolModificacionItem solModificacionItem,
 			HttpServletRequest request);
 
-	UpdateResponseDTO denySolModifDatosFacturacion(int numPagina, SolModificacionItem solModificacionItem,
+	UpdateResponseDTO denySolModifDatosFacturacion(SolModificacionItem solModificacionItem,
 			HttpServletRequest request);
 
 }

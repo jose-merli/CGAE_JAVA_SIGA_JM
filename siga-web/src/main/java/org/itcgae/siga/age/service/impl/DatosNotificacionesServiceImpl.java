@@ -207,9 +207,8 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 				// Creamos un nuevo calendario
 				AgeNotificacionesevento ageNotificacionEventoInsert = new AgeNotificacionesevento();
-				ageNotificacionEventoInsert.setIdnotificacionevento(Long.parseLong("5"));
 				// IdCalendario es una Secuencia
-				ageNotificacionEventoInsert.setIdevento(Long.parseLong("1"));
+				ageNotificacionEventoInsert.setIdevento(Long.parseLong(notificacionEventoItem.getIdEvento()));
 				ageNotificacionEventoInsert.setIdinstitucion(idInstitucion);
 				ageNotificacionEventoInsert.setUsumodificacion(usuario.getIdusuario().longValue());
 				ageNotificacionEventoInsert.setFechamodificacion(new Date());
@@ -232,7 +231,7 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 				if (response == 0) {
 					error.setCode(400);
-					error.setDescription("Error al insertar nueva notificacion");
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 				} else {
 					error.setCode(200);
 				}
@@ -381,7 +380,7 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 				if (response == 0) {
 					error.setCode(400);
-					error.setDescription("Error al modificar nuevo calendario");
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 				} else {
 					error.setCode(200);
 				}
@@ -406,6 +405,7 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
+		//debere buscar por idevento tmbn
 		if (null != idInstitucion) {
 			LOGGER.info(
 					"getEventNotifications() / ageNotificacioneseventoExtendsMapper.getEventNotifications() -> Entrada a ageNotificacioneseventoMapper para obtener las notificaciones de eventos de un calendario");
@@ -461,6 +461,7 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
+		int response = 0;
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -504,11 +505,17 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 						notification.setFechamodificacion(new Date());
 						notification.setUsumodificacion(usuario.getIdusuario().longValue());
 						notification.setFechabaja(new Date());
-						ageNotificacioneseventoMapper.updateByPrimaryKey(notification);
+						response = ageNotificacioneseventoMapper.updateByPrimaryKey(notification);
 
 						LOGGER.info(
 								"deleteNotification() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Salida a ageCalendarioExtendsMapper para dar de baja a notificacion");
 
+						if (response == 0) {
+							error.setCode(400);
+							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+						} else {
+							error.setCode(200);
+						}
 					}
 				}
 			}

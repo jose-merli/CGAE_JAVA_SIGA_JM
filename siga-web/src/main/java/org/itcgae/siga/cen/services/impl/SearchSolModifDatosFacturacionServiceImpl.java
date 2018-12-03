@@ -71,7 +71,7 @@ public class SearchSolModifDatosFacturacionServiceImpl implements ISearchSolModi
 	}
 
 	@Override
-	public UpdateResponseDTO processSolModifDatosFacturacion(int numPagina, SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO processSolModifDatosFacturacion(SolModificacionItem solModificacionItem,
 			HttpServletRequest request) {
 		LOGGER.info(
 				"processSolModifDatosFacturacion() -> Entrada al servicio para actualizar el estado de la solicitud a REALIZADO");
@@ -81,23 +81,24 @@ public class SearchSolModifDatosFacturacionServiceImpl implements ISearchSolModi
 		CenSolmodifacturacionservicio record = new CenSolmodifacturacionservicio();
 		record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
 		record.setIdestadosolic((short) 20);
-		int response = cenSolModifFacturacionServicioExtendsMapper.updateByPrimaryKey(record);
+		int response = cenSolModifFacturacionServicioExtendsMapper.updateByPrimaryKeySelective(record);
 		
 		if (response == 0) {
 			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn("processSolModifDatosFacturacion() / cenSolModifFacturacionServicioExtendsMapper.updateByPrimaryKey() -> "
+			LOGGER.warn("processSolModifDatosFacturacion() / cenSolModifFacturacionServicioExtendsMapper.updateByPrimaryKeySelective() -> "
 					+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
-		} 
+		} else {
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
 		
-		updateResponseDTO.setStatus(SigaConstants.OK);
 		LOGGER.info(
 				"processSolModifDatosFacturacion() -> Salida del servicio para actualizar el estado de la solicitud a REALIZADO");
 		return updateResponseDTO;
 	}
 
 	@Override
-	public UpdateResponseDTO denySolModifDatosFacturacion(int numPagina, SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO denySolModifDatosFacturacion(SolModificacionItem solModificacionItem,
 			HttpServletRequest request) {
 		LOGGER.info(
 				"denySolModifDatosFacturacion() -> Entrada al servicio para actualizar el estado de la solicitud a DENEGADO");
@@ -107,16 +108,17 @@ public class SearchSolModifDatosFacturacionServiceImpl implements ISearchSolModi
 		CenSolmodifacturacionservicio record = new CenSolmodifacturacionservicio();
 		record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
 		record.setIdestadosolic((short) 30);
-		int response = cenSolModifFacturacionServicioExtendsMapper.updateByPrimaryKey(record);
+		int response = cenSolModifFacturacionServicioExtendsMapper.updateByPrimaryKeySelective(record);
 		
 		if (response == 0) {
 			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn("denySolModifDatosFacturacion() / cenSolModifFacturacionServicioExtendsMapper.updateByPrimaryKey() -> "
+			LOGGER.warn("denySolModifDatosFacturacion() / cenSolModifFacturacionServicioExtendsMapper.updateByPrimaryKeySelective() -> "
 					+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
-		} 
+		}else {
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
 		
-		updateResponseDTO.setStatus(SigaConstants.OK);
 		LOGGER.info(
 				"denySolModifDatosFacturacion() -> Salida del servicio para actualizar el estado de la solicitud a DENEGADO");
 		return updateResponseDTO;

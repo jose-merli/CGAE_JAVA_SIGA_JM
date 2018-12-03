@@ -9,6 +9,8 @@ import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.form.AsistenciaCursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
@@ -40,4 +42,16 @@ public interface IFichaEventosService {
 
 	public ComboDTO getDaysWeek(HttpServletRequest request);
 	
+
+	public ComboDTO getJudicialDistrict(HttpServletRequest request);
+	
+	public UpdateResponseDTO updateEventCalendar(EventoItem eventoItem, HttpServletRequest request);
+
+	public UpdateResponseDTO deleteEventCalendar(EventoDTO eventoDTO, HttpServletRequest request);
+
+
+	public void generaEventosLaboral();
+	
+	public void insertarFestivosAuto();
+
 }

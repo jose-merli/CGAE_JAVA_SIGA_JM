@@ -5,9 +5,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import org.idcgae.siga.commons.testUtils.TestUtils;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.commons.utils.TestUtils;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposancionExtendsMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;

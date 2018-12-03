@@ -136,17 +136,20 @@ public class SearchSolModifDatosGeneralesServiceImpl implements ISearchSolModifD
 					LOGGER.warn("processSolModifDatosGenerales() / cenSolicitModifDatosBasicosExtendsMapper.updateByPrimaryKey() -> "
 							+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
-				} 
-				
-				updateResponseDTO.setStatus(SigaConstants.OK);
-				LOGGER.info(
-						"processSolModifDatosGenerales() -> Salida del servicio para actualizar el estado de la solicitud a REALIZADO");
+				} else {
+					updateResponseDTO.setStatus(SigaConstants.OK);
+				}
+			}else {
+				updateResponseDTO.setStatus(SigaConstants.KO);
 			}
 			
 			}else {
 				updateResponseDTO.setStatus(SigaConstants.KO);
 				LOGGER.warn("processSolModifDatosGenerales() / No existe el usuario.");
 			}
+			
+			LOGGER.info(
+					"processSolModifDatosGenerales() -> Salida del servicio para actualizar el estado de la solicitud a REALIZADO");
 			return updateResponseDTO;
 
 	}
@@ -169,9 +172,10 @@ public class SearchSolModifDatosGeneralesServiceImpl implements ISearchSolModifD
 			LOGGER.warn("denySolModifDatosGenerales() / cenSolicitModifDatosBasicosExtendsMapper.updateByPrimaryKey() -> "
 					+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
-		} 
+		} else {
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
 		
-		updateResponseDTO.setStatus(SigaConstants.OK);
 		LOGGER.info(
 				"denySolModifDatosGenerales() -> Salida del servicio para actualizar el estado de la solicitud a DENEGADO");
 		return updateResponseDTO;

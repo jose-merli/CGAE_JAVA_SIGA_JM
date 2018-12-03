@@ -136,9 +136,10 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 			LOGGER.warn("processSolModifDatosUseFoto() / cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKeySelective() -> "
 					+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
-		} 
+		} else {
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
 		
-		updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 		
 		}else {
@@ -169,9 +170,10 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 			LOGGER.warn("denySolModifDatosUseFoto() / cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKeySelective() -> "
 					+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
-		} 
+		} else {
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
 		
-		updateResponseDTO.setStatus(SigaConstants.OK);
 		LOGGER.info(
 				"denySolModifDatosUseFoto() -> Salida del servicio para actualizar el estado de la solicitud a DENEGADO");
 		return updateResponseDTO;

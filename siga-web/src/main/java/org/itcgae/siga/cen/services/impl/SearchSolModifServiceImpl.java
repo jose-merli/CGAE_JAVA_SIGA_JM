@@ -71,7 +71,7 @@ public class SearchSolModifServiceImpl implements ISearchSolModifService{
 	}
 
 	@Override
-	public UpdateResponseDTO processSolModif(int numPagina, SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO processSolModif(SolModificacionItem solModificacionItem,
 			HttpServletRequest request) {
 		LOGGER.info(
 				"processSolModif() -> Entrada al servicio para actualizar el estado de la solicitud a REALIZADO");
@@ -81,23 +81,24 @@ public class SearchSolModifServiceImpl implements ISearchSolModifService{
 		CenSolicitudesmodificacion record = new CenSolicitudesmodificacion();
 		record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
 		record.setIdestadosolic((short) 20);
-		int response = cenSolicitudesModificacionExtendsMapper.updateByPrimaryKey(record);
+		int response = cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective(record);
 		
 		if (response == 0) {
 			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn("processSolModif() / cenSolicitudesModificacionExtendsMapper.updateByPrimaryKey() -> "
+			LOGGER.warn("processSolModif() / cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective() -> "
 					+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
-		} 
+		} else {
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
 		
-		updateResponseDTO.setStatus(SigaConstants.OK);
 		LOGGER.info(
 				"processSolModif() -> Salida del servicio para actualizar el estado de la solicitud a REALIZADO");
 		return updateResponseDTO;
 	}
 
 	@Override
-	public UpdateResponseDTO denySolModif(int numPagina, SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO denySolModif(SolModificacionItem solModificacionItem,
 			HttpServletRequest request) {
 		LOGGER.info(
 				"denySolModif() -> Entrada al servicio para actualizar el estado de la solicitud a DENEGADO");
@@ -107,16 +108,17 @@ public class SearchSolModifServiceImpl implements ISearchSolModifService{
 		CenSolicitudesmodificacion record = new CenSolicitudesmodificacion();
 		record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
 		record.setIdestadosolic((short) 30);
-		int response = cenSolicitudesModificacionExtendsMapper.updateByPrimaryKey(record);
+		int response = cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective(record);
 		
 		if (response == 0) {
 			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn("denySolModif() / cenSolicitudesModificacionExtendsMapper.updateByPrimaryKey() -> "
+			LOGGER.warn("denySolModif() / cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective() -> "
 					+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
 
-		} 
+		} else {
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
 		
-		updateResponseDTO.setStatus(SigaConstants.OK);
 		LOGGER.info(
 				"denySolModif() -> Salida del servicio para actualizar el estado de la solicitud a DENEGADO");
 		return updateResponseDTO;

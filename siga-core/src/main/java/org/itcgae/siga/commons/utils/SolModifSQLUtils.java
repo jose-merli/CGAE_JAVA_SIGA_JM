@@ -232,7 +232,7 @@ public class SolModifSQLUtils {
 
 		consultaDatosCV.WHERE(
 				"cen_solicitudmodificacioncv.idestadosolic = cen_estadosolicitudmodif.idestadosolic AND cen_solicitudmodificacioncv.idinstitucion = "
-						+ idInstitucion);
+						+ idInstitucion + " AND cen_solicitudmodificacioncv.idcv is not null");
 		
 		return consultaDatosCV.toString();
 	}

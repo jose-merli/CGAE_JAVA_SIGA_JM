@@ -10,12 +10,12 @@ public class AgeTiponotificacioneventoSqlExtendsProvider extends  AgeTiponotific
 		
 		SQL sql = new SQL();
 		
-		sql.SELECT_DISTINCT("IDTIPONOTIFICACIONEVENTO");
-		sql.SELECT("DESCRIPCION");
-		sql.FROM("AGE_TIPONOTIFICACIONEVENTO");
-//		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON (REC.IDRECURSO = tipocalendario.DESCRIPCION " + 
-//				"		AND REC.IDLENGUAJE = '"+idLenguaje+"')"); Añadir cuando guardemos la traducción
-		sql.ORDER_BY("DESCRIPCION");
+		sql.SELECT_DISTINCT("tiponoti.IDTIPONOTIFICACIONEVENTO");
+		sql.SELECT("rec.DESCRIPCION");
+		sql.FROM("AGE_TIPONOTIFICACIONEVENTO tiponoti");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON (REC.IDRECURSO = tiponoti.DESCRIPCION " + 
+				"		AND REC.IDLENGUAJE = '"+idLenguaje+"')");
+		sql.ORDER_BY("rec.DESCRIPCION");
 		return sql.toString();
 	}
 	

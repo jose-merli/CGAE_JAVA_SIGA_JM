@@ -34,6 +34,7 @@ import org.itcgae.siga.form.services.IFichaCursosService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class FichaCursosServiceImpl implements IFichaCursosService {
@@ -341,6 +342,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 					if (formadorCursoItem.getIdPersona() == null) {
 
+						try {
+							
 						CenPersona nuevaPersona = new CenPersona();
 						List<ComboItem> comboItems = new ArrayList<ComboItem>();
 						comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
@@ -360,7 +363,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 						nuevaPersona.setSexo(null);
 						nuevaPersona.setUsumodificacion(usuario.getIdusuario());
 
-						try {
+					
 							LOGGER.info(
 									"saveTrainersCourse() / cenPersonaExtendsMapper.insert(nuevaPersona) -> Entrada a cenPersonaExtendsMapper para insertar en la tabla cen_persona al nuevo formador");
 
@@ -382,11 +385,11 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 					if (responseCenPersona == 0) {
 						error.setCode(400);
-						error.setDescription("Error al insertar al nuevo formador en la tabla cen_persona");
+						error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 
 					} else if (responseCenCliente == 0) {
 						error.setCode(400);
-						error.setDescription("Error al insertar al nuevo formador en la tabla cen_cliente");
+						error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 					} else {
 
 						if (formadorCursoItem.getTutor() == ASIGNAR_TUTOR) {
@@ -423,7 +426,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 						if (responseTutor == 0) {
 							error.setCode(400);
-							error.setDescription("Error al designar un tutor a un formador");
+							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 
 						} else {
 
@@ -447,7 +450,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 							if (responseForPersonaCurso == 0) {
 								error.setCode(400);
-								error.setDescription("Error al insertar nuevo formador");
+								error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 							} else {
 								error.setCode(200);
 							}
@@ -487,12 +490,14 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO deleteTrainersCourse(FormadorCursoDTO formadorCursoDTO, HttpServletRequest request) {
 
 		LOGGER.info("deleteTrainersCourse() -> Salida del servicio para dar de baja a los formadores de un curso");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
+		int response = 1;
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -511,6 +516,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
+				try {
+					
 				for (FormadorCursoItem formador : formadorCursoDTO.getFormadoresCursoItem()) {
 
 					ForPersonaCursoExample exampleFormador = new ForPersonaCursoExample();
@@ -541,7 +548,17 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 					}
 				}
+				
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+				}
 			}
+		}
+		
+		if( response == 1 ) {
+			error.setCode(200);
 		}
 
 		LOGGER.info("deleteTrainersCourse() -> Salida del servicio para dar de baja a los formadores de un curso");

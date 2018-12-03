@@ -249,7 +249,7 @@ public class TestUtils{
 		colegiado.setEtiquetas(new ComboEtiquetasItem[] {getComboEtiquetasItem(idGrupo)});
 		return colegiado;
 	}
-	
+	 
 	public NoColegiadoItem getNoColegiadoItem(String idGrupo) {
 		NoColegiadoItem noColegiado = new NoColegiadoItem();
 		noColegiado.setIdPersona(String.valueOf(1223));
