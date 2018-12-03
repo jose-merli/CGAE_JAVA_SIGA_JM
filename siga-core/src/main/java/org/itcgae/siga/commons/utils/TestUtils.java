@@ -1,5 +1,8 @@
 package org.itcgae.siga.commons.utils;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -11,6 +14,7 @@ import org.itcgae.siga.DTOs.age.PermisosCalendarioDTO;
 import org.itcgae.siga.DTOs.age.PermisosPerfilesCalendarItem;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
+import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -18,12 +22,16 @@ import org.itcgae.siga.db.entities.AgeCalendario;
 import org.itcgae.siga.db.entities.AgePermisoscalendario;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
+import org.itcgae.siga.db.entities.CenGruposcliente;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class TestUtils{
@@ -47,10 +55,32 @@ public class TestUtils{
 		
 		return mockreq;
 	}
-
+	
 	public MockHttpServletRequest  getRequestWithVariableAuthentication(String idInstitucion) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public MockMultipartHttpServletRequest  getMultipartRequestWithGeneralAuthentication() throws TokenGenerationException {
+
+		MockMultipartHttpServletRequest mockreq = new MockMultipartHttpServletRequest();
+		UserCgae userCgae = new UserCgae();
+		List<String> listPerfiles = new ArrayList<>();
+		
+		userCgae.setDni("44149718E");
+		userCgae.setGrupo("ADG");
+		userCgae.setInstitucion("2000");
+		listPerfiles.add("ADG");
+		userCgae.setPerfiles(listPerfiles);
+
+		UserTokenUtils.configure("1234", "Bearer", 1000000, "");
+		String token = UserTokenUtils.generateToken(userCgae);
+		
+		mockreq.addHeader("Authorization", token); 
+//		MultipartFile a2;
+//		mockreq.addFile(a2);
+		
+		return mockreq;
 	}
 	
 	public List<ComboItem> getListComboItemsSimulados() {
@@ -103,6 +133,14 @@ public class TestUtils{
 		admUsuarios.setIdusuario(1);
 		usuarios.add(admUsuarios);
 		return usuarios;
+	}
+	
+	public List<GenProperties> getListGenPropertiesSimulados(){
+		List<GenProperties> properties = new ArrayList<>();
+		GenProperties property = new GenProperties();
+		property.setValor("1");
+		properties.add(property);
+		return properties;
 	}
 	
 	public List<CalendarItem> getListaAgeCalendariosSimulados(){
@@ -212,6 +250,31 @@ public class TestUtils{
 		return colegiado;
 	}
 	
+	public NoColegiadoItem getNoColegiadoItem(String idGrupo) {
+		NoColegiadoItem noColegiado = new NoColegiadoItem();
+		noColegiado.setIdPersona(String.valueOf(1223));
+		noColegiado.setIdInstitucion("2005");
+		noColegiado.setNombre("Nombre");
+		noColegiado.setApellidos1("apellidos1");
+		noColegiado.setGuiaJudicial("1");
+		noColegiado.setIdLenguaje("1");
+		noColegiado.setMotivo("motivo");
+		noColegiado.setIdTipoIdentificacion("10");
+		noColegiado.setApellidos2("apellidos2");
+//		noColegiado.setColegiado(isColegiado);
+		noColegiado.setNaturalDe("");
+//		noColegiado.setIncorporacion(new Date());
+		noColegiado.setSituacion("1");
+		noColegiado.setNif("20092000V");
+//		noColegiado.setIdtratamiento("1");
+		noColegiado.setComisiones("0");
+		noColegiado.setAsientoContable("");
+		noColegiado.setSexo("M");
+//		CREAR COMBOETIQUETASITEM Y METERLO EN EL ARRAY
+		noColegiado.setEtiquetas(new ComboEtiquetasItem[] {getComboEtiquetasItem(idGrupo)});
+		return noColegiado;
+	}
+	
 	public List<ComboEtiquetasItem> getListaEtiquetasSimuladas(String idGrupo){
 		List<ComboEtiquetasItem> listaEtiquetasSimuladas = new ArrayList<ComboEtiquetasItem>();
 		listaEtiquetasSimuladas.add(getComboEtiquetasItem(idGrupo));
@@ -259,6 +322,24 @@ public class TestUtils{
 		gruposCliCli.setIdpersona(Long.parseLong("213"));
 		return gruposCliCli;
 	}
+	
+	public List<CenGruposcliente> getListaGrupCliSimulados(){
+		List<CenGruposcliente> listaGruposSimulados = new ArrayList<CenGruposcliente>();
+		listaGruposSimulados.add(getGrupCliItem());
+		
+		return listaGruposSimulados;
+	}
+	
+	public CenGruposcliente getGrupCliItem() {
+		CenGruposcliente gruposCliCli = new CenGruposcliente();
+		gruposCliCli.setFechamodificacion(new Date());
+		gruposCliCli.setIdgrupo(Short.parseShort("1"));
+		gruposCliCli.setIdinstitucion((short) 2005);
+		gruposCliCli.setNombre("A");
+		gruposCliCli.setUsumodificacion(1234);
+		return gruposCliCli;
+	}
+	
 	
 	public ComboEtiquetasItem getComboEtiquetasItem(String idGrupo) {
 		ComboEtiquetasItem comboEtiquetas = new ComboEtiquetasItem();
