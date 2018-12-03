@@ -30,6 +30,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenTiposcvExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.itcgae.siga.DTOs.gen.Error;
 
 @Service
 public class TipoCurricularServiceImpl implements ITipoCurricularService {
@@ -284,7 +285,7 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 					insertResponseDTO.setStatus(SigaConstants.OK);
 				} else {
 					insertResponseDTO.setStatus(SigaConstants.KO);
-					org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+					Error error = new Error();
 					error.setMessage("general.message.error.realiza.accion");
 					insertResponseDTO.setError(error);
 				}
@@ -384,6 +385,7 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 						}
 					}
 				}
+				
 			}
 		}
 

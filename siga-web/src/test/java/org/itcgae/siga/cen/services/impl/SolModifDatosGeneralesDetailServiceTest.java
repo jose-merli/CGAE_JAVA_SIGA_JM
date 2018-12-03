@@ -5,10 +5,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import org.idcgae.siga.commons.testUtils.CenTestUtils;
 import org.idcgae.siga.commons.testUtils.TestUtils;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SoliModifDatosBasicosItem;
-import org.itcgae.siga.commons.utils.CenTestUtils;
 import org.itcgae.siga.db.entities.AdmLenguajes;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;

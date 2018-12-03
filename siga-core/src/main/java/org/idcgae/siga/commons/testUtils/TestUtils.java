@@ -1,5 +1,9 @@
 package org.idcgae.siga.commons.testUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +14,8 @@ import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.security.UserCgae;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -116,6 +122,7 @@ public class TestUtils {
 		List<AdmUsuarios> usuarios = new ArrayList<>();
 		AdmUsuarios admUsuarios = new AdmUsuarios();
 		admUsuarios.setIdlenguaje(idLenguaje);
+		admUsuarios.setIdinstitucion((short) 2000); 
 		admUsuarios.setIdusuario(1);
 		usuarios.add(admUsuarios);
 		return usuarios;
@@ -136,6 +143,4 @@ public class TestUtils {
 
 		return genDiccionarioList;
 	}
-
-
 }
