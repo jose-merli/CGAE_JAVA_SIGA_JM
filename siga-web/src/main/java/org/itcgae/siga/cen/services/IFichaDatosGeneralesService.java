@@ -24,7 +24,7 @@ public interface IFichaDatosGeneralesService {
 
 	public ComboDTO getEstadoCivil(HttpServletRequest request);
 
-	public ComboDTO getLabel( HttpServletRequest request);
+//	public ComboDTO getLabel( HttpServletRequest request);
 
 	public UpdateResponseDTO updateColegiado(ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException;
 

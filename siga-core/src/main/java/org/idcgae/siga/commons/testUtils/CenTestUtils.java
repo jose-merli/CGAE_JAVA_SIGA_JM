@@ -32,6 +32,7 @@ import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
 import org.itcgae.siga.db.entities.CenDatoscv;
+import org.itcgae.siga.db.entities.CenGruposcliente;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenPais;
 import org.itcgae.siga.db.entities.CenPersona;
@@ -46,6 +47,7 @@ import org.itcgae.siga.db.entities.CenTiposcv;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo1;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo2;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
+import org.itcgae.siga.db.entities.GenProperties;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -758,5 +760,86 @@ public class CenTestUtils {
 		cargaMasivaDTO.setCargaMasivaItem(listaCargaMasivaItem);
 
 		return cargaMasivaDTO;
+	}
+	
+	public List<CenDatoscv> getListCenDatoscv() {
+		List<CenDatoscv> listaCenDatoscv = new ArrayList<CenDatoscv>();
+		CenDatoscv cenDatoscv = new CenDatoscv();
+		cenDatoscv.setFechamodificacion(new Date());
+		cenDatoscv.setIdinstitucion((short) 2005);
+		cenDatoscv.setIdpersona(Long.parseLong("213"));
+		listaCenDatoscv.add(cenDatoscv);
+		return listaCenDatoscv;
+	}
+	
+	public List<GenProperties> getListGenPropertiesSimulados(){
+		List<GenProperties> properties = new ArrayList<>();
+		GenProperties property = new GenProperties();
+		property.setValor("1");
+		properties.add(property);
+		return properties;
+	}
+	
+//	
+//	public CenGruposclienteCliente getGruposCliCliItem() {
+//		CenGruposclienteCliente gruposCliCli = new CenGruposclienteCliente();
+//		gruposCliCli.setFechaInicio(new Date());
+//		gruposCliCli.setFechaBaja(new Date());
+//		gruposCliCli.setFechamodificacion(new Date());
+//		gruposCliCli.setIdgrupo(Short.parseShort("1"));
+//		gruposCliCli.setIdinstitucion((short) 2005);
+//		gruposCliCli.setIdpersona(Long.parseLong("213"));
+//		return gruposCliCli;
+//	}
+	
+	
+	public List<ColegiadoItem> getListaColegiadosSimulada(Boolean isColegiado, String idGrupo){
+		List<ColegiadoItem> listaColegiadosSimulada = new ArrayList<ColegiadoItem>();
+		listaColegiadosSimulada.add(getColegiadoItem(isColegiado, idGrupo));
+		
+		return listaColegiadosSimulada;
+	}
+	
+	
+	public List<CenGruposcliente> getListaGrupCliSimulados(){
+		List<CenGruposcliente> listaGruposSimulados = new ArrayList<CenGruposcliente>();
+		listaGruposSimulados.add(getGrupCliItem());
+		
+		return listaGruposSimulados;
+	}
+	
+	public CenGruposcliente getGrupCliItem() {
+		CenGruposcliente gruposCliCli = new CenGruposcliente();
+		gruposCliCli.setFechamodificacion(new Date());
+		gruposCliCli.setIdgrupo(Short.parseShort("1"));
+		gruposCliCli.setIdinstitucion((short) 2005);
+		gruposCliCli.setNombre("A");
+		gruposCliCli.setUsumodificacion(1234);
+		return gruposCliCli;
+	}
+	
+	public NoColegiadoItem getNoColegiadoItem(String idGrupo) {
+		NoColegiadoItem noColegiado = new NoColegiadoItem();
+		noColegiado.setIdPersona(String.valueOf(1223));
+		noColegiado.setIdInstitucion("2005");
+		noColegiado.setNombre("Nombre");
+		noColegiado.setApellidos1("apellidos1");
+		noColegiado.setGuiaJudicial("1");
+		noColegiado.setIdLenguaje("1");
+		noColegiado.setMotivo("motivo");
+		noColegiado.setIdTipoIdentificacion("10");
+		noColegiado.setApellidos2("apellidos2");
+//		noColegiado.setColegiado(isColegiado);
+		noColegiado.setNaturalDe("");
+//		noColegiado.setIncorporacion(new Date());
+		noColegiado.setSituacion("1");
+		noColegiado.setNif("20092000V");
+//		noColegiado.setIdtratamiento("1");
+		noColegiado.setComisiones("0");
+		noColegiado.setAsientoContable("");
+		noColegiado.setSexo("M");
+//		CREAR COMBOETIQUETASITEM Y METERLO EN EL ARRAY
+		noColegiado.setEtiquetas(new ComboEtiquetasItem[] {getComboEtiquetasItem(idGrupo)});
+		return noColegiado;
 	}
 }
