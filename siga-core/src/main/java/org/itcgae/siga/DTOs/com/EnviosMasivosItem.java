@@ -19,6 +19,8 @@ public class EnviosMasivosItem {
 	private String asunto;
 	private String cuerpo;
 	private String idGrupo;
+	private String estadoEnvio;
+	private String tipoEnvio;
 	
 	
 	public Short getIdInstitucion() {
@@ -99,9 +101,18 @@ public class EnviosMasivosItem {
 	public void setIdGrupo(String idGrupo) {
 		this.idGrupo = idGrupo;
 	}
-	
-	
-	
+	public String getEstadoEnvio() {
+		return estadoEnvio;
+	}
+	public void setEstadoEnvio(String estadoEnvio) {
+		this.estadoEnvio = estadoEnvio;
+	}
+	public String getTipoEnvio() {
+		return tipoEnvio;
+	}
+	public void setTipoEnvio(String tipoEnvio) {
+		this.tipoEnvio = tipoEnvio;
+	}
 	
 
 }

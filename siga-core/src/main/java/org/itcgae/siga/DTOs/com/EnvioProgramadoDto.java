@@ -4,18 +4,11 @@ import java.util.Date;
 
 public class EnvioProgramadoDto {
 	
-	private String idInstitucion;
 	private String idEnvio;
 	private String idEstado;
 	private Date fechaProgramada;
 	
 	
-	public String getIdInstitucion() {
-		return idInstitucion;
-	}
-	public void setIdInstitucion(String idInstitucion) {
-		this.idInstitucion = idInstitucion;
-	}
 	public String getIdEnvio() {
 		return idEnvio;
 	}

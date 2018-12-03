@@ -62,7 +62,7 @@ public class EnviosMasivosController {
 	}
 	
 	@RequestMapping(value = "/programarEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> programarEnvio(HttpServletRequest request, @RequestBody List<EnvioProgramadoDto> enviosProgramadosDto) {
+	ResponseEntity<Error> programarEnvio(HttpServletRequest request, @RequestBody EnvioProgramadoDto[] enviosProgramadosDto) {
 		
 		Error response = _enviosMasivosService.programarEnvio(request, enviosProgramadosDto);
 		if(response.getCode() == 200)
@@ -82,7 +82,7 @@ public class EnviosMasivosController {
 	}
 	
 	@RequestMapping(value = "/cancelarEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> cancelarEnvio(HttpServletRequest request, @RequestBody List<EnvioProgramadoDto> envios) {
+	ResponseEntity<Error> cancelarEnvio(HttpServletRequest request, @RequestBody EnvioProgramadoDto[] envios) {
 		
 		Error response = _enviosMasivosService.cancelarEnvios(request, envios);
 		if(response.getCode() == 200)

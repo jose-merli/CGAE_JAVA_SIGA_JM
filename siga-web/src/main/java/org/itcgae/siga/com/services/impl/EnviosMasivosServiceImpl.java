@@ -7,7 +7,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.com.EnvioMasivoCancelarDto;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
@@ -16,6 +15,7 @@ import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -27,7 +27,6 @@ import org.itcgae.siga.db.entities.EnvEnvioprogramadoKey;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosKey;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
-import org.itcgae.siga.db.entities.EnvHistoricoestadoenvioKey;
 import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
@@ -35,6 +34,7 @@ import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvHistoricoEstadoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +70,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	@Autowired
 	private EnvDestinatariosMapper _envDestinatariosMapper;
+	
+	@Autowired
+	private EnvHistoricoEstadoExtendsMapper _envHistoricoEstadoExtendsMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -175,7 +178,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				AdmUsuarios usuario = usuarios.get(0);
 				
 				try{
-					enviosItemList = _envEnviosExtendsMapper.selectEnviosMasivosSearch(usuario.getIdinstitucion(), filtros);
+					enviosItemList = _envEnviosExtendsMapper.selectEnviosMasivosSearch(usuario.getIdinstitucion(), usuario.getIdlenguaje(), filtros);
 					if(enviosItemList.size()>0){
 						enviosMasivos.setEnviosMasivosItem(enviosItemList);
 					}
@@ -222,7 +225,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							int update = 0;
 							EnvEnvioprogramadoKey key = new EnvEnvioprogramadoKey();
 							key.setIdenvio(Long.parseLong(enviosProgramadosDto.get(i).getIdEnvio()));
-							key.setIdinstitucion(Short.parseShort(enviosProgramadosDto.get(i).getIdInstitucion()));
+							key.setIdinstitucion(usuario.getIdinstitucion());
 							EnvEnvioprogramado envioProgramado = _envEnvioprogramadoMapper.selectByPrimaryKey(key);
 							envioProgramado.setFechaprogramada(enviosProgramadosDto.get(i).getFechaProgramada());
 							envioProgramado.setFechamodificacion(new Date());
@@ -231,7 +234,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							if(update > 0){
 								EnvEnviosKey keyEnvio = new EnvEnviosKey();
 								keyEnvio.setIdenvio(Long.parseLong(enviosProgramadosDto.get(i).getIdEnvio()));
-								keyEnvio.setIdinstitucion(Short.parseShort(enviosProgramadosDto.get(i).getIdInstitucion()));
+								keyEnvio.setIdinstitucion(usuario.getIdinstitucion());
 								EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio);
 								envio.setFechaprogramada(enviosProgramadosDto.get(i).getFechaProgramada());
 								envio.setFechamodificacion(new Date());
@@ -260,7 +263,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	}
 
 	@Override
-	public Error cancelarEnvios(HttpServletRequest request, List<EnvioProgramadoDto> envios) {
+	public Error cancelarEnvios(HttpServletRequest request, EnvioProgramadoDto[] envios) {
 		LOGGER.info("cancelarEnvios() -> Entrada al servicio para cancelar envios");
 		
 		Error respuesta = new Error();
@@ -278,13 +281,13 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
-					for(int i = 0; i <= envios.size();i++){
+					for(int i = 0; i < envios.length;i++){
 						//Solo cancelamos los envios si tiene estado 1(nuevo) o 4(programado)
-						if(envios.get(i).getIdEstado().equals("1") || envios.get(i).getIdEstado().equals("4")){
+						if(envios[i].getIdEstado().equals("1") || envios[i].getIdEstado().equals("4")){
 							int update = 0;
 							EnvEnviosKey keyEnvio = new EnvEnviosKey();
-							keyEnvio.setIdenvio(Long.parseLong(envios.get(i).getIdEnvio()));
-							keyEnvio.setIdinstitucion(Short.parseShort(envios.get(i).getIdInstitucion()));
+							keyEnvio.setIdenvio(Long.parseLong(envios[i].getIdEnvio()));
+							keyEnvio.setIdinstitucion(usuario.getIdinstitucion());
 							EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio);
 							envio.setFechabaja(new Date());
 							//Le asignamos el estado 6(archivado)
@@ -292,15 +295,17 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							envio.setIdestado(idEstado);
 							update = _envEnviosMapper.updateByPrimaryKey(envio);
 							if(update > 0){
-								EnvHistoricoestadoenvioKey keyHistorico = new EnvHistoricoestadoenvioKey();
-								keyEnvio.setIdenvio(Long.parseLong(envios.get(i).getIdEnvio()));
-								keyEnvio.setIdinstitucion(Short.parseShort(envios.get(i).getIdInstitucion()));
-								EnvHistoricoestadoenvio historico = _envHistoricoestadoenvioMapper.selectByPrimaryKey(keyHistorico);
+								
+								EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
+								NewIdDTO idDTO = _envHistoricoEstadoExtendsMapper.selectMaxIDHistorico();
+								historico.setIdhistorico(Short.parseShort(idDTO.getNewId()));
+								historico.setIdenvio(Long.parseLong(envios[i].getIdEnvio()));
+								historico.setIdinstitucion(usuario.getIdinstitucion());
 								historico.setFechamodificacion(new Date());
 								historico.setFechaestado(new Date());
 								historico.setUsumodificacion(usuario.getIdusuario());
 								historico.setIdestado(idEstado);
-								_envHistoricoestadoenvioMapper.updateByPrimaryKey(historico);
+								_envHistoricoestadoenvioMapper.insert(historico);
 							}
 						}
 					}

@@ -7,7 +7,7 @@ import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
 
 public class EnvEnviosExtendsSqlProvider {
 	
-	public String selectEnvios(Short idInstitucion, EnviosMasivosSearch filtros){
+	public String selectEnvios(Short idInstitucion, String idLenguaje,EnviosMasivosSearch filtros){
 		
 		SQL sql = new SQL();
 		// Formateo de fecha para sentencia sql
@@ -26,6 +26,8 @@ public class EnvEnviosExtendsSqlProvider {
 		sql.SELECT("PLANTILLA.ASUNTO");
 		sql.SELECT("PLANTILLA.CUERPO");
 		sql.SELECT("ETIQUETAS.IDGRUPO");
+		sql.SELECT("(SELECT CAT.DESCRIPCION FROM ENV_TIPOENVIOS LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = ENV_TIPOENVIOS.NOMBRE WHERE ENV_TIPOENVIOS.IDTIPOENVIOS = ENVIO.IDTIPOENVIOS AND CAT.IDLENGUAJE = '"+ idLenguaje +"') AS TIPOENVIO");
+		sql.SELECT("(SELECT CAT.DESCRIPCION FROM ENV_ESTADOENVIO ESTADO LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = ESTADO.NOMBRE WHERE ESTADO.IDESTADO = ENVIO.IDESTADO AND CAT.IDLENGUAJE = '"+ idLenguaje +"') AS ESTADOENVIO");
 		
 		sql.FROM("ENV_ENVIOS ENVIO");
 		sql.JOIN("ENV_PLANTILLASENVIOS PLANTILLA ON PLANTILLA.IDINSTITUCION = '" + idInstitucion + "' AND PLANTILLA.IDPLANTILLAENVIOS = ENVIO.IDPLANTILLAENVIOS AND PLANTILLA.IDTIPOENVIOS = ENVIO.IDTIPOENVIOS");
@@ -44,16 +46,16 @@ public class EnvEnviosExtendsSqlProvider {
 		if(filtros.getFechaCreacion() != null){
 			String fechaCreacion = dateFormat.format(filtros.getFechaCreacion());
 			String fechaCreacion2 = dateFormat.format(filtros.getFechaCreacion());
-			fechaCreacion += " 01:00:00";
-			fechaCreacion2 += " 12:59:59";
-			sql.WHERE("(ENVIO.FECHA >= TO_DATE('" +fechaCreacion + "', 'DD/MM/YYYY HH:MI:SS') AND ENVIO.FECHA <= TO_DATE('" +fechaCreacion2 + "', 'DD/MM/YYYY HH:MI:SS'))");
+			fechaCreacion += " 00:00:00";
+			fechaCreacion2 += " 23:59:59";
+			sql.WHERE("(ENVIO.FECHA >= TO_DATE('" +fechaCreacion + "', 'DD/MM/YYYY HH24:MI:SS') AND ENVIO.FECHA <= TO_DATE('" +fechaCreacion2 + "', 'DD/MM/YYYY HH24:MI:SS'))");
 		}
 		if(filtros.getFechaProgramacion() != null){
 			String fechaProgramacion = dateFormat.format(filtros.getFechaProgramacion());
 			String fechaProgramacion2 = dateFormat.format(filtros.getFechaProgramacion());
-			fechaProgramacion += " 01:00:00";
-			fechaProgramacion2 += " 12:59:59";
-			sql.WHERE("(ENVIO.FECHAPROGRAMADA >= TO_DATE('" + fechaProgramacion + "', 'DD/MM/YYYY HH:MI:SS') AND ENVIO.FECHAPROGRAMADA <= TO_DATE('" + fechaProgramacion2 + "', 'DD/MM/YYYY HH:MI:SS'))");
+			fechaProgramacion += " 00:00:00";
+			fechaProgramacion2 += " 23:59:59";
+			sql.WHERE("(ENVIO.FECHAPROGRAMADA >= TO_DATE('" + fechaProgramacion + "', 'DD/MM/YYYY HH24:MI:SS') AND ENVIO.FECHAPROGRAMADA <= TO_DATE('" + fechaProgramacion2 + "', 'DD/MM/YYYY HH24:MI:SS'))");
 		}
 		if(filtros.getidTipoEnvio() != null && !filtros.getidTipoEnvio().trim().equals("")){
 			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getidTipoEnvio() +"'");

@@ -30,9 +30,11 @@ public interface EnvEnviosExtendsMapper {
 		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
 		@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CUERPO", property = "cuerpo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDGRUPO", property = "idGrupo", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDGRUPO", property = "idGrupo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR)
 	})
-	List<EnviosMasivosItem> selectEnviosMasivosSearch(Short idInstitucion, EnviosMasivosSearch filtros);
+	List<EnviosMasivosItem> selectEnviosMasivosSearch(Short idInstitucion, String idLenguaje, EnviosMasivosSearch filtros);
 	
 	
 
