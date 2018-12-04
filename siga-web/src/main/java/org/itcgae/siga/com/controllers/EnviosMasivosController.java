@@ -102,7 +102,7 @@ public class EnviosMasivosController {
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/detalle/plantillas",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/detalle/plantillas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboPlantillas(HttpServletRequest request, String idTipoEnvio) {
 		
 		ComboDTO response = _enviosMasivosService.nombrePlantillas(request, idTipoEnvio);

@@ -19,7 +19,6 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.EnvCamposplantilla;
 import org.itcgae.siga.db.entities.EnvDestinatarios;
 import org.itcgae.siga.db.entities.EnvDestinatariosExample;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
@@ -27,10 +26,14 @@ import org.itcgae.siga.db.entities.EnvEnvioprogramadoKey;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosKey;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
+import org.itcgae.siga.db.entities.EnvPlantillasenvios;
+import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
+import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
+import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
@@ -77,6 +80,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	@Autowired
 	private EnvPlantillaEnviosExtendsMapper _envPlantillaEnviosExtendsMapper;
+	
+	@Autowired
+	private EnvPlantillasenviosMapper _envPlantillasenviosMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -413,20 +419,34 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
+					int update = 0;
+					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
+					key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantilla()));
+					key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+					key.setIdinstitucion(idInstitucion);
+					EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+					plantilla.setAsunto(datosTarjeta.getAsunto());
+					plantilla.setCuerpo(datosTarjeta.getCuerpo());
+					update = _envPlantillasenviosMapper.updateByPrimaryKeyWithBLOBs(plantilla);
 					
-					if(datosTarjeta.getIdEnvio() != null){
-						
-						
-					}else{
-						Short idAsunto = 1;
-						Short idCuerpo = 2;
-						EnvCamposplantilla datosAsunto = new EnvCamposplantilla();
-						datosAsunto.setIdcampo(idAsunto);
-						datosAsunto.setIdinstitucion(idInstitucion);
-						datosAsunto.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantilla()));
-						datosAsunto.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
-						//datosAsunto.setValor(datosTarjeta.get);
+					if(update > 0){
+						if(datosTarjeta.getIdEnvio() == null){
+							EnvEnvios envio = new EnvEnvios();
+							envio.setIdinstitucion(idInstitucion);
+							envio.setDescripcion("Envio creado desde envios Másivos");
+							envio.setFecha(new Date());
+							envio.setGenerardocumento("N");
+							envio.setImprimiretiquetas("N");
+							envio.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantilla()));
+							Short estadoNuevo = 1;
+							envio.setIdestado(estadoNuevo);
+							envio.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+							envio.setFechamodificacion(new Date());
+							envio.setUsumodificacion(usuario.getIdusuario());
+							_envEnviosMapper.insert(envio);
+						}
 					}
+					
 					
 					respuesta.setCode(200);
 					respuesta.setDescription("Datos configuracion de envio guardados correctamente");

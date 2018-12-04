@@ -45,14 +45,13 @@
 <!-- 		</table> -->
 		
 		 
-<!-- 		<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_PLANTILLASENVIO.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table> -->
-		
-		<table schema="USCGAE" tableName="ENV_ENVIOPROGRAMADO" >
+		<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" >
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
 		</table>
+		
+<!-- 		<table schema="USCGAE" tableName="ENV_ENVIOPROGRAMADO" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 		</table> -->
 		
 		 
 <!-- 		<table schema="USCGAE" tableName="ENV_ENVIOSGRUPOCLIENTE" > -->
