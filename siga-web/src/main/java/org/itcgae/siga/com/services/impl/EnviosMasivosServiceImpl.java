@@ -7,6 +7,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.com.DocumentoEnvioItem;
+import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
@@ -21,20 +23,22 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.EnvDestinatarios;
 import org.itcgae.siga.db.entities.EnvDestinatariosExample;
+import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
 import org.itcgae.siga.db.entities.EnvEnvioprogramadoKey;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosKey;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
-import org.itcgae.siga.db.entities.EnvPlantillasenvios;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
+import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvDocumentosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvHistoricoEstadoExtendsMapper;
@@ -83,6 +87,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	@Autowired
 	private EnvPlantillasenviosMapper _envPlantillasenviosMapper;
+	
+	@Autowired
+	private EnvDocumentosExtendsMapper _envDocumentosExtendsMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -382,6 +389,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 						List<EnvDestinatarios> destinatarios = _envDestinatariosMapper.selectByExample(example);
 						
 						
+						
 					}
 					respuesta.setCode(200);
 					respuesta.setDescription("Envios masivos enviados correctamente");
@@ -467,7 +475,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	@Override
 	public ComboDTO nombrePlantillas(HttpServletRequest request, String idtipoEnvio) {
 		
-		LOGGER.info("estadoEnvios() -> Entrada al servicio para obtener plantillas");
+		LOGGER.info("nombrePlantillas() -> Entrada al servicio para obtener plantillas");
 		
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
@@ -484,7 +492,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 			
 			if (null != usuarios && usuarios.size() > 0) {
 
-				AdmUsuarios usuario = usuarios.get(0);
+				
 				comboItems = _envPlantillaEnviosExtendsMapper.getPlantillas(idInstitucion, idtipoEnvio);
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
@@ -499,12 +507,118 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 		}
 		
 		
-		LOGGER.info("estadoEnvios() -> Salida del servicio para obtener plantillas");
+		LOGGER.info("nombrePlantillas() -> Salida del servicio para obtener plantillas");
 		
 		
 		return comboDTO;
 	}
-	
-	
 
+	@Override
+	public Error duplicarEnvio(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta) {
+		
+		LOGGER.info("duplicarEnvio() -> Entrada al servicio para duplicar envío");
+		
+		Error respuesta = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					int update = 0;
+					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
+					key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantilla()));
+					key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+					key.setIdinstitucion(idInstitucion);
+					EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+					plantilla.setAsunto(datosTarjeta.getAsunto());
+					plantilla.setCuerpo(datosTarjeta.getCuerpo());
+					update = _envPlantillasenviosMapper.updateByPrimaryKeyWithBLOBs(plantilla);
+					
+					if(update > 0){
+						if(datosTarjeta.getIdEnvio() == null){
+							EnvEnvios envio = new EnvEnvios();
+							envio.setIdinstitucion(idInstitucion);
+							envio.setDescripcion(datosTarjeta.getDescripcion());
+							envio.setFecha(new Date());
+							envio.setGenerardocumento("N");
+							envio.setImprimiretiquetas("N");
+							envio.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantilla()));
+							Short estadoNuevo = 1;
+							envio.setIdestado(estadoNuevo);
+							envio.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+							envio.setFechamodificacion(new Date());
+							envio.setUsumodificacion(usuario.getIdusuario());
+							_envEnviosMapper.insert(envio);
+						}
+					}
+					
+					
+					respuesta.setCode(200);
+					respuesta.setDescription("Datos configuracion de envio guardados correctamente");
+					respuesta.setMessage("Updates correcto");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error");
+				}
+				
+				
+			}
+		}
+		LOGGER.info("duplicarEnvio() -> Salida del servicio para duplicar el envío");
+		return respuesta;
+	}
+
+	@Override
+	public DocumentosEnvioDTO obtenerDocumentosEnvio(HttpServletRequest request, String idEnvio) {
+		
+		LOGGER.info("obtenerDocumentosEnvio() -> Entrada al servicio para obtener documento de envio");
+		Error error = null;
+		DocumentosEnvioDTO response = new DocumentosEnvioDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				
+				try{
+					
+				List<DocumentoEnvioItem> documentos = _envDocumentosExtendsMapper.selectDocumentosEnvio(idInstitucion, idEnvio);
+				
+				if(documentos.size() > 0){
+					response.setDocumentoEnvioItem(documentos);
+				}
+				
+				}catch(Exception e){
+					error = new Error();
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					error.setMessage("Error");
+					response.setError(error);
+				}
+				
+				
+			}
+		}
+		
+		LOGGER.info("obtenerDocumentosEnvio() -> Salida del servicio para obtener documento de envio");
+		return response;
+	}
+	
 }

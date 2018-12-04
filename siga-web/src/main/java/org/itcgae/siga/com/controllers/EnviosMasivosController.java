@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioMasivoCancelarDto;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
@@ -102,6 +103,16 @@ public class EnviosMasivosController {
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/detalle/duplicarEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> duplicarEnvio(HttpServletRequest request, @RequestBody TarjetaConfiguracionDto datosTarjeta) {
+		
+		Error response = _enviosMasivosService.duplicarEnvio(request, datosTarjeta);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@RequestMapping(value = "/detalle/plantillas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboPlantillas(HttpServletRequest request, @RequestBody String idTipoEnvio) {
 		
@@ -110,6 +121,16 @@ public class EnviosMasivosController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/documentosEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DocumentosEnvioDTO> obtenerDocumentosEnvio(HttpServletRequest request, @RequestBody String idEnvio) {
+		
+		DocumentosEnvioDTO response = _enviosMasivosService.obtenerDocumentosEnvio(request, idEnvio);
+		if(response.getError() == null)
+			return new ResponseEntity<DocumentosEnvioDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<DocumentosEnvioDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }
