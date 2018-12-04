@@ -25,6 +25,7 @@ public interface EnvEnviosExtendsMapper {
 		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillasEnvio", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvio", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "NOMBREPLANTILLA", property = "nombrePlantilla", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPLANTILLA", property = "idPlantilla", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "FECHAPROGRAMADA", property = "fechaProgramada", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),

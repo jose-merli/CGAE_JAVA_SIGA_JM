@@ -45,21 +45,20 @@
 <!-- 		</table> -->
 		
 		 
-		<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" >
+<!-- 		<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_PLANTILLASENVIO.NEXTVAL FROM DUAL"/> -->
+<!-- 		</table> -->
+		
+		<table schema="USCGAE" tableName="ENV_ENVIOPROGRAMADO" >
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
-			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_PLANTILLASENVIO.NEXTVAL FROM DUAL"/>
 		</table>
 		
-<!-- 		<table schema="USCGAE_INT" tableName="ENV_ENVIOPROGRAMADO" > -->
+		 
+<!-- 		<table schema="USCGAE" tableName="ENV_ENVIOSGRUPOCLIENTE" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOPROGRAMADO.NEXTVAL FROM DUAL"/> -->
 <!-- 		</table> -->
-		
-		 
-		<table schema="USCGAE" tableName="ENV_ENVIOSGRUPOCLIENTE" >
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOPROGRAMADO.NEXTVAL FROM DUAL"/>
-		</table>
 
 <!-- 		<table schema="USCGAE_INT" tableName="ENV_DOCUMENTOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->

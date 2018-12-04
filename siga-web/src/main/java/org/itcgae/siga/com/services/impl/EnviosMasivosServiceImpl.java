@@ -35,6 +35,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvHistoricoEstadoExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	@Autowired
 	private EnvHistoricoEstadoExtendsMapper _envHistoricoEstadoExtendsMapper;
+	
+	@Autowired
+	private EnvPlantillaEnviosExtendsMapper _envPlantillaEnviosExtendsMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -198,7 +202,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	}
 
 	@Override
-	public Error programarEnvio(HttpServletRequest request, EnvioProgramadoDto[] enviosProgramadosDto) {
+	public Error programarEnvio(HttpServletRequest request, EnviosMasivosItem[] enviosProgramadosDto) {
 		
 		LOGGER.info("programarEnvio() -> Entrada al servicio para programar los envios");
 		
@@ -219,24 +223,45 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				
 				try{
 					
-					for(int i = 0; i <= enviosProgramadosDto.length;i++){
+					for(int i = 0; i < enviosProgramadosDto.length;i++){
 						//Solo programamos los envios si tiene estado 1(nuevo) o 4(programado)
-						if(enviosProgramadosDto[i].getIdEstado().equals("1") || enviosProgramadosDto[i].getIdEstado().equals("4")){
-							int update = 0;
+						if(enviosProgramadosDto[i].getIdEstado() == 1 || enviosProgramadosDto[i].getIdEstado() == 4){
+							int updateInsert = 0;
 							EnvEnvioprogramadoKey key = new EnvEnvioprogramadoKey();
-							key.setIdenvio(Long.parseLong(enviosProgramadosDto[i].getIdEnvio()));
-							key.setIdinstitucion(usuario.getIdinstitucion());
+							key.setIdenvio(enviosProgramadosDto[i].getIdEnvio());
+							key.setIdinstitucion(idInstitucion);
 							EnvEnvioprogramado envioProgramado = _envEnvioprogramadoMapper.selectByPrimaryKey(key);
-							envioProgramado.setFechaprogramada(enviosProgramadosDto[i].getFechaProgramada());
-							envioProgramado.setFechamodificacion(new Date());
-							envioProgramado.setUsumodificacion(usuario.getIdusuario());
-							update = _envEnvioprogramadoMapper.updateByPrimaryKey(envioProgramado);
-							if(update > 0){
+							if(envioProgramado != null){
+								envioProgramado.setFechaprogramada(enviosProgramadosDto[i].getFechaProgramada());
+								envioProgramado.setFechamodificacion(new Date());
+								envioProgramado.setUsumodificacion(usuario.getIdusuario());
+								updateInsert = _envEnvioprogramadoMapper.updateByPrimaryKey(envioProgramado);
+							}else{
+								envioProgramado = new EnvEnvioprogramado();
+								envioProgramado.setIdenvio(enviosProgramadosDto[i].getIdEnvio());
+								envioProgramado.setIdinstitucion(idInstitucion);
+								envioProgramado.setEstado("0");
+								if(enviosProgramadosDto[i].getIdPlantilla() != null){
+									envioProgramado.setIdplantilla(enviosProgramadosDto[i].getIdPlantilla());
+								}
+								envioProgramado.setIdplantillaenvios(enviosProgramadosDto[i].getIdPlantillasEnvio());
+								envioProgramado.setIdtipoenvios(enviosProgramadosDto[0].getIdTipoEnvio());
+								envioProgramado.setNombre(enviosProgramadosDto[0].getDescripcion());
+								envioProgramado.setFechaprogramada(enviosProgramadosDto[i].getFechaProgramada());
+								envioProgramado.setFechamodificacion(new Date());
+								envioProgramado.setUsumodificacion(usuario.getIdusuario());
+								updateInsert = _envEnvioprogramadoMapper.insert(envioProgramado);
+								
+							}
+							if(updateInsert > 0){
 								EnvEnviosKey keyEnvio = new EnvEnviosKey();
-								keyEnvio.setIdenvio(Long.parseLong(enviosProgramadosDto[i].getIdEnvio()));
+								keyEnvio.setIdenvio(enviosProgramadosDto[i].getIdEnvio());
 								keyEnvio.setIdinstitucion(usuario.getIdinstitucion());
 								EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio);
 								envio.setFechaprogramada(enviosProgramadosDto[i].getFechaProgramada());
+								//estado 4 programado (pendiente automatico)
+								Short idEstado = 4;
+								envio.setIdestado(idEstado);
 								envio.setFechamodificacion(new Date());
 								envio.setUsumodificacion(usuario.getIdusuario());
 								_envEnviosMapper.updateByPrimaryKey(envio);
@@ -417,6 +442,47 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 		}
 		LOGGER.info("guardarConfiguracion() -> Salida del servicio para guardar datos tarjeta configuración");
 		return respuesta;
+	}
+
+	@Override
+	public ComboDTO nombrePlantillas(HttpServletRequest request, String idtipoEnvio) {
+		
+		LOGGER.info("estadoEnvios() -> Entrada al servicio para obtener plantillas");
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+				comboItems = _envPlantillaEnviosExtendsMapper.selectPlantillas(idInstitucion, idtipoEnvio);
+				if(null != comboItems && comboItems.size() > 0) {
+					ComboItem element = new ComboItem();
+					element.setLabel("");
+					element.setValue("");
+					comboItems.add(0, element);
+				}		
+				
+				comboDTO.setCombooItems(comboItems);
+				
+			}
+		}
+		
+		
+		LOGGER.info("estadoEnvios() -> Salida del servicio para obtener plantillas");
+		
+		
+		return comboDTO;
 	}
 	
 	

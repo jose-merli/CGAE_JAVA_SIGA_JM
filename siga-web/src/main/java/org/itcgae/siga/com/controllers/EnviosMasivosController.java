@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.com.EnvioMasivoCancelarDto;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -62,7 +63,7 @@ public class EnviosMasivosController {
 	}
 	
 	@RequestMapping(value = "/programarEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> programarEnvio(HttpServletRequest request, @RequestBody EnvioProgramadoDto[] enviosProgramadosDto) {
+	ResponseEntity<Error> programarEnvio(HttpServletRequest request, @RequestBody EnviosMasivosItem[] enviosProgramadosDto) {
 		
 		Error response = _enviosMasivosService.programarEnvio(request, enviosProgramadosDto);
 		if(response.getCode() == 200)
@@ -99,6 +100,16 @@ public class EnviosMasivosController {
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/plantillas",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboPlantillas(HttpServletRequest request, String idTipoEnvio) {
+		
+		ComboDTO response = _enviosMasivosService.nombrePlantillas(request, idTipoEnvio);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

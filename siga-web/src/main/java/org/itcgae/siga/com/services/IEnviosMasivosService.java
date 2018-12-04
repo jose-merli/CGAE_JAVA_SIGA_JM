@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -16,8 +17,9 @@ public interface IEnviosMasivosService {
 	
 	public ComboDTO estadoEnvios(HttpServletRequest request);
 	public ComboDTO tipoEnvio(HttpServletRequest request);
+	public ComboDTO nombrePlantillas(HttpServletRequest request, String idTipoEnvio);
 	public EnviosMasivosDTO enviosMasivosSearch(HttpServletRequest request, EnviosMasivosSearch filtros);
-	public Error programarEnvio (HttpServletRequest request, EnvioProgramadoDto[] envioProgramarDto);
+	public Error programarEnvio (HttpServletRequest request, EnviosMasivosItem[] envioProgramarDto);
 	public Error cancelarEnvios (HttpServletRequest request, EnvioProgramadoDto[] enviosProgramadosDto);
 	public Error enviar(HttpServletRequest request, List<EnvioProgramadoDto> envios);
 	public Error guardarConfiguracion(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta);

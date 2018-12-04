@@ -14,6 +14,7 @@ public class EnviosMasivosItem {
 	private Short idEstado;
 	private Short idTipoEnvio;
 	private Short idPlantilla;
+	private String nombrePlantilla;
 	private Date fechaProgramada;
 	private Date fechaBaja;
 	private String asunto;
@@ -113,6 +114,13 @@ public class EnviosMasivosItem {
 	public void setTipoEnvio(String tipoEnvio) {
 		this.tipoEnvio = tipoEnvio;
 	}
+	public String getNombrePlantilla() {
+		return nombrePlantilla;
+	}
+	public void setNombrePlantilla(String nombrePlantilla) {
+		this.nombrePlantilla = nombrePlantilla;
+	}
+	
 	
 
 }
