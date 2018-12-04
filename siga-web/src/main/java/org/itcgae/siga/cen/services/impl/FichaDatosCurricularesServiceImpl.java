@@ -162,6 +162,9 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 		return updateResponseDTO;
 	}
 
+	
+	
+	
 	@Override
 	public UpdateResponseDTO updateDatosCurriculares(FichaDatosCurricularesItem fichaDatosCurricularesItem,
 			HttpServletRequest request) {
@@ -277,6 +280,11 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 		return updateResponseDTO;
 	}
 
+	
+	
+	
+	
+	
 	@Override
 	public InsertResponseDTO insertDatosCurriculares(FichaDatosCurricularesItem fichaDatosCurricularesItem,
 			HttpServletRequest request) {

@@ -3,10 +3,10 @@ package org.itcgae.siga.cen.services.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import org.idcgae.siga.commons.testUtils.CenTestUtils;
 import org.idcgae.siga.commons.testUtils.TestUtils;
 import org.itcgae.siga.DTOs.cen.SolModifDatosBancariosItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
-import org.itcgae.siga.commons.utils.CenTestUtils;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
 import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenSolicmodicuentas;
