@@ -46,8 +46,9 @@ import org.itcgae.siga.db.entities.CenSolimodidirecciones;
 import org.itcgae.siga.db.entities.CenTiposcv;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo1;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo2;
-import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenRecursos;
+import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -220,7 +221,7 @@ public class CenTestUtils {
 	public CenCliente getCenCliente() {
 		CenCliente cenCliente = new CenCliente();
 		cenCliente.setFechamodificacion(new Date());
-		cenCliente.setIdinstitucion((short) 2005);
+		cenCliente.setIdinstitucion((short) 2000);
 		cenCliente.setIdpersona(Long.parseLong("213"));
 		return cenCliente;
 	}
@@ -487,6 +488,25 @@ public class CenTestUtils {
 		return listGenRecursosCatalogos;
 	}
 
+	public GenRecursos getGenRecursosSimulado(String descripcion) {
+		GenRecursos genRecursos = new GenRecursos();
+
+		genRecursos.setIdlenguaje("1");
+		genRecursos.setIdrecurso("1234");
+		genRecursos.setDescripcion(descripcion);
+
+		return genRecursos;
+	}
+	
+	public List<GenRecursos> getListGenRecursosSimulado() {
+		List<GenRecursos> listGenRecursos = new ArrayList<GenRecursos>();
+
+		listGenRecursos.add(getGenRecursosSimulado("DESCRIPCIÓN"));
+
+		return listGenRecursos;
+	}
+
+	
 	public CenTiposcvsubtipo1 getCenTiposcvsubtipo1Simulado() {
 		CenTiposcvsubtipo1 cenTiposcvsubtipo1 = new CenTiposcvsubtipo1();
 
