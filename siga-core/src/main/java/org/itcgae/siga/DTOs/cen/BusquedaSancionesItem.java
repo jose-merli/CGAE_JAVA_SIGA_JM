@@ -29,7 +29,9 @@ public class BusquedaSancionesItem {
 	private Date fechaArchivada;
 	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaHasta;
-	
+	private String texto;
+	private String idPersona;
+	private String idSancion;
 	
 	@JsonProperty("colegio")
 	public String getColegio() {
@@ -96,6 +98,13 @@ public class BusquedaSancionesItem {
 	public void setFechaDesde(Date fechaDesde) {
 		this.fechaDesde = fechaDesde;
 	}
+	@JsonProperty("fechaAcuerdo")
+	public Date getFechaAcuerdo() {
+		return fechaAcuerdo;
+	}
+	public void setFechaAcuerdo(Date fechaAcuerdo) {
+		this.fechaAcuerdo = fechaAcuerdo;
+	}
 	@JsonProperty("fechaHasta")
 	public Date getFechaHasta() {
 		return fechaHasta;
@@ -110,7 +119,13 @@ public class BusquedaSancionesItem {
 	public void setFechaRehabilitado(Date fechaRehabilitado) {
 		this.fechaRehabilitado = fechaRehabilitado;
 	}
-	
+	@JsonProperty("fechaArchivada")
+	public Date getFechaArchivada() {
+		return fechaArchivada;
+	}
+	public void setFechaArchivada(Date fechaArchivada) {
+		this.fechaArchivada = fechaArchivada;
+	}
 	@JsonProperty("rehabilitado")
 	public String getRehabilitado() {
 		return rehabilitado;
@@ -134,4 +149,28 @@ public class BusquedaSancionesItem {
 	public void setFirmeza(String firmeza) {
 		this.firmeza = firmeza;
 	}	
+	
+	@JsonProperty("texto")
+	public String getTexto() {
+		return texto;
+	}
+	public void setTexto(String texto) {
+		this.texto = texto;
+	}	
+	
+	@JsonProperty("idPersona")
+	public String getIdPersona() {
+		return idPersona;
+	}
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
+	}
+	
+	@JsonProperty("idSancion")
+	public String getIdSancion() {
+		return idSancion;
+	}
+	public void setIdSancion(String idSancion) {
+		this.idSancion = idSancion;
+	}
 }
