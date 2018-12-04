@@ -4,11 +4,11 @@ import org.apache.ibatis.jdbc.SQL;
 
 public class EnvPlantillaEnviosExtendsSqlProvider {
 	
-	public String selectPlantillas(String idInstitucion, String idTipoEnvio){
+	public String selectPlantillas(Short idInstitucion, String idTipoEnvio){
 		
 		SQL sql = new SQL();
 		
-		sql.SELECT("IDPLANTILLAENVIOS");
+		sql.SELECT("TO_CHAR(IDPLANTILLAENVIOS) AS IDPLANTILLAENVIOS");
 		sql.SELECT("NOMBRE");
 		
 		sql.FROM("ENV_PLANTILLASENVIOS");

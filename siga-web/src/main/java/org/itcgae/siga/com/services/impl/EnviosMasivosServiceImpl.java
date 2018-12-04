@@ -433,7 +433,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 						if(datosTarjeta.getIdEnvio() == null){
 							EnvEnvios envio = new EnvEnvios();
 							envio.setIdinstitucion(idInstitucion);
-							envio.setDescripcion("Envio creado desde envios Másivos");
+							envio.setDescripcion(datosTarjeta.getDescripcion());
 							envio.setFecha(new Date());
 							envio.setGenerardocumento("N");
 							envio.setImprimiretiquetas("N");
@@ -485,7 +485,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 			if (null != usuarios && usuarios.size() > 0) {
 
 				AdmUsuarios usuario = usuarios.get(0);
-				comboItems = _envPlantillaEnviosExtendsMapper.selectPlantillas(idInstitucion, idtipoEnvio);
+				comboItems = _envPlantillaEnviosExtendsMapper.getPlantillas(idInstitucion, idtipoEnvio);
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
 					element.setLabel("");

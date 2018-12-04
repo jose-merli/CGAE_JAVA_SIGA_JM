@@ -8,7 +8,11 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.services.com.providers.EnvEstadoEnvioExtendsSqlProvider;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
 
+@Service
+@Primary
 public interface EnvEstadoEnvioExtendsMapper {
 	
 	@SelectProvider(type = EnvEstadoEnvioExtendsSqlProvider.class, method = "selectEstadoEnvios")

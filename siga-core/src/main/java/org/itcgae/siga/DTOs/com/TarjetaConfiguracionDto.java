@@ -7,6 +7,7 @@ public class TarjetaConfiguracionDto {
 	private String idTipoEnvio;
 	private String asunto;
 	private String cuerpo;
+	private String descripcion;
 	
 	
 	
@@ -40,6 +41,14 @@ public class TarjetaConfiguracionDto {
 	public void setCuerpo(String cuerpo) {
 		this.cuerpo = cuerpo;
 	}
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+	
+	
 	
 	
 }
