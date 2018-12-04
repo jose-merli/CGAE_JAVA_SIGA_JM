@@ -43,13 +43,13 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 
 		sql.INNER_JOIN("CEN_INSTITUCION institucion ON institucion.idInstitucion = sancion.idInstitucionSancion");
 		sql.INNER_JOIN("CEN_PERSONA persona ON persona.idPersona = sancion.idPersona");
-		sql.INNER_JOIN("CEN_COLEGIADO colegiado ON colegiado.idPersona = persona.idPersona AND colegiado.idInstitucion = sancion.idInstitucion");
+		sql.INNER_JOIN("CEN_COLEGIADO colegiado ON colegiado.idPersona = persona.idPersona");
 		sql.INNER_JOIN("CEN_TIPOSANCION tipoSancion ON tipoSancion.idTipoSancion = sancion.idTipoSancion");
 		
-		if(null != idInstitucion) {
-
-			sql.WHERE("sancion.IDINSTITUCION = '" + idInstitucion + "'");
-		}
+//		if(null != idInstitucion) {
+//
+//			sql.WHERE("sancion.IDINSTITUCION = '" + idInstitucion + "'");
+//		}
 		
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getNif())) {
 			sql.WHERE("persona.NIFCIF = '" + busquedaSancionesSearchDTO.getNif() + "'");
@@ -67,8 +67,12 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 			sql.WHERE("persona.APELLIDOS2 = '" + busquedaSancionesSearchDTO.getSegundoApellido() + "'");
 		}
 		
+		
 		if (null != busquedaSancionesSearchDTO.getColegio() && busquedaSancionesSearchDTO.getColegio().length > 0) {
+		
 			sql.WHERE("institucion.IDINSTITUCION IN (" +  String.join(",", busquedaSancionesSearchDTO.getColegio()) + ")");
+		}else {
+			sql.WHERE("institucion.IDINSTITUCION IN (" +  idInstitucion + ")");
 		}
 		
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getTipoSancion())) {

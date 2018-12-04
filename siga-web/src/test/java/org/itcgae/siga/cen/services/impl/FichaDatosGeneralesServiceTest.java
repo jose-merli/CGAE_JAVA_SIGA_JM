@@ -409,7 +409,6 @@ public class FichaDatosGeneralesServiceTest {
 	
 	@Test
 	public void partidoJudicialSearchSinUserTest() throws Exception {
-		//		Ultimo de tres para comprobar los 3 colores distintos posibles.
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
 		ColegiadoItem colegiado = cenTestUtils.getColegiadoItem(false, "2");
@@ -432,11 +431,8 @@ public class FichaDatosGeneralesServiceTest {
 	
 	@Test
 	public void solicitudUploadPhotographyTest() throws Exception {
-		//		Ultimo de tres para comprobar los 3 colores distintos posibles.
 		MockMultipartHttpServletRequest mockreq = testUtils.getMultipartRequestWithGeneralAuthentication();
 
-		
-		ColegiadoItem colegiado = cenTestUtils.getColegiadoItem(false, "2");
 		InsertResponseDTO responseEsperado = new InsertResponseDTO();
 		List<GenProperties> properties = cenTestUtils.getListGenPropertiesSimulados();
 		List<CenPersona> cenPersonas = cenTestUtils.getListaPersonasSimuladas(Long.parseLong("1"), "1");
@@ -457,31 +453,82 @@ public class FichaDatosGeneralesServiceTest {
 		InsertResponseDTO response = fichaDatosGeneralesServiceImpl.solicitudUploadPhotography(mockreq);
 		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
 	}
-//	
-//	@Test
-//	public void solicitudUploadPhotographyIdCambiadoTest() throws Exception {
-//		//		Ultimo de tres para comprobar los 3 colores distintos posibles.
-//		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
-//
-//		ColegiadoItem colegiado = testUtils.getColegiadoItem(false, "2");
-//		DatosDireccionesDTO responseEsperado = new DatosDireccionesDTO();
-//		List<GenProperties> properties = testUtils.getListGenPropertiesSimulados();
-//		List<CenPersona> cenPersonas = testUtils.getListaPersonasSimuladas(Long.parseLong("1"), "1");
-//		NewIdDTO idSolicitudBD = null;
-//		
-//		//		Mockeo de las llamadas a BD
-//		
-//		when(genPropertiesMapper.selectByExample(Mockito.any(GenPropertiesExample.class))).thenReturn(properties);
-//		
-//		when(cenPersonaExtendsMapper.selectByExample(Mockito.any(CenPersonaExample.class))).thenReturn(cenPersonas);
-//		
+
+	@Test
+	public void solicitudUploadPhotographyIdCambiadoTest() throws Exception {
+		MockMultipartHttpServletRequest mockreq = testUtils.getMultipartRequestWithGeneralAuthentication();
+
+		InsertResponseDTO responseEsperado = new InsertResponseDTO();
+		List<GenProperties> properties = cenTestUtils.getListGenPropertiesSimulados();
+		List<CenPersona> cenPersonas = cenTestUtils.getListaPersonasSimuladas(Long.parseLong("1"), "1");
+		NewIdDTO idSolicitudBD = null;
+		
+		//		Mockeo de las llamadas a BD
+		
+		when(genPropertiesMapper.selectByExample(Mockito.any(GenPropertiesExample.class))).thenReturn(properties);
+		
+		when(cenPersonaExtendsMapper.selectByExample(Mockito.any(CenPersonaExample.class))).thenReturn(cenPersonas);
+		
+		when(cenSolicmodifexportarfoto.getMaxIdSolicitud(Mockito.anyString(), Mockito.anyString())).thenReturn(idSolicitudBD);
+		when(cenSolicmodifexportarfoto.insert(Mockito.any(CenSolicmodifexportarfoto.class))).thenReturn(0);
+		responseEsperado.setStatus(SigaConstants.KO);
+
+		//		Ejecución del método a testear
+		InsertResponseDTO response = fichaDatosGeneralesServiceImpl.solicitudUploadPhotography(mockreq);
+		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+	}
+	
+
+	@Test
+	public void solicitudUploadPhotographyNoPersonaTest() throws Exception {
+		MockMultipartHttpServletRequest mockreq = testUtils.getMultipartRequestWithGeneralAuthentication();
+
+		InsertResponseDTO responseEsperado = new InsertResponseDTO();
+		List<GenProperties> properties = cenTestUtils.getListGenPropertiesSimulados();
+		NewIdDTO idSolicitudBD = null;
+		
+		//		Mockeo de las llamadas a BD
+		
+		when(genPropertiesMapper.selectByExample(Mockito.any(GenPropertiesExample.class))).thenReturn(properties);
+		
+		when(cenPersonaExtendsMapper.selectByExample(Mockito.any(CenPersonaExample.class))).thenReturn(null);
+		
+		when(cenSolicmodifexportarfoto.getMaxIdSolicitud(Mockito.anyString(), Mockito.anyString())).thenReturn(idSolicitudBD);
+		when(cenSolicmodifexportarfoto.insert(Mockito.any(CenSolicmodifexportarfoto.class))).thenReturn(0);
+		responseEsperado.setStatus(SigaConstants.KO);
+
+		//		Ejecución del método a testear
+		InsertResponseDTO response = fichaDatosGeneralesServiceImpl.solicitudUploadPhotography(mockreq);
+		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+	}
+	
+	
+	
+	
+	@Test
+	public void solicitudUploadPhotographyErrorTest() throws Exception {
+		MockMultipartHttpServletRequest mockreq = testUtils.getMultipartRequestWithGeneralAuthentication();
+
+		InsertResponseDTO responseEsperado = new InsertResponseDTO();
+		List<GenProperties> properties = null;
+		List<CenPersona> cenPersonas = cenTestUtils.getListaPersonasSimuladas(Long.parseLong("1"), "1");
+		
+		//		Mockeo de las llamadas a BD
+		
+		when(genPropertiesMapper.selectByExample(Mockito.any(GenPropertiesExample.class))).thenReturn(properties);
+		
+		when(cenPersonaExtendsMapper.selectByExample(Mockito.any(CenPersonaExample.class))).thenReturn(cenPersonas);
+		
 //		when(cenSolicmodifexportarfoto.getMaxIdSolicitud(Mockito.anyString(), Mockito.anyString())).thenReturn(idSolicitudBD);
 //		when(cenSolicmodifexportarfoto.insert(Mockito.any(CenSolicmodifexportarfoto.class))).thenReturn(0);
-//
-//		//		Ejecución del método a testear
-//		DatosDireccionesDTO response = fichaDatosGeneralesServiceImpl.solicitudUploadPhotography(mockreq);
-//		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
-//	}
+		responseEsperado.setStatus(SigaConstants.KO);
+
+		//		Ejecución del método a testear
+		InsertResponseDTO response = fichaDatosGeneralesServiceImpl.solicitudUploadPhotography(mockreq);
+		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+	}
+	
+	
 	
 	
 	@Test
