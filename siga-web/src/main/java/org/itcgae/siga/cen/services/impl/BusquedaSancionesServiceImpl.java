@@ -55,6 +55,7 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		List<ComboItem> comboItemsResult = new ArrayList<ComboItem>();
 
 		LOGGER.info(
 				"getComboTipoSancion() / cenTiposancionExtendsMapper.getComboTipoSancion() -> Entrada a cenTiposancionMapper para obtener los diferentes tipos de sanciones");
@@ -63,12 +64,24 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 				"getComboTipoSancion() / cenTiposancionExtendsMapper.getComboTipoSancion() -> Salida de cenTiposancionMapper para obtener los diferentes tipos de sanciones");
 
 		if (!comboItems.equals(null) && comboItems.size() > 0) {
+
 			// añade elemento vacio al principio para el dropdown de parte front
 			ComboItem comboItem = new ComboItem();
 			comboItem.setLabel("");
 			comboItem.setValue("");
-			comboItems.add(0, comboItem);
-			comboDTO.setCombooItems(comboItems);
+			comboItemsResult.add(0, comboItem);
+
+			for (ComboItem comboItemElem : comboItems) {
+				if (!comboItemElem.getLabel().equals("ARCHIVO") && !comboItemElem.getLabel().equals("SANCIÓN JUDICIAL")
+						&& !comboItemElem.getLabel().equals("SANCIÓN_1")
+						&& !comboItemElem.getLabel().equals("DESCONOCIDA")) {
+					comboItemsResult.add(comboItemElem);
+				}
+
+			}
+
+			comboDTO.setCombooItems(comboItemsResult);
+
 		}
 
 		LOGGER.info("getComboTipoSancion() -> Salida del servicio para obtener los tipos de sanciones");
@@ -153,27 +166,28 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 				List<CenPersona> cenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
 				LOGGER.info(
 						"insertSanction() / cenPersonaExtendsMapper.selectByExample() -> Salida a cenPersonaExtendsMapper para obtener el idPersona");
-				
+
 				if (null != cenPersona && !cenPersona.isEmpty()) {
 					Long idPersona = cenPersona.get(0).getIdpersona();
-					
+
 					CenSancion cenSancion = fillCenSancion(usuario, idPersona, busquedaSancionesItem);
-					
-					NewIdDTO idSancion = cenSancionExtendsMapper.getMaxIdSancion(busquedaSancionesItem.getTipoSancion(), String.valueOf(idPersona));
-					
+
+					NewIdDTO idSancion = cenSancionExtendsMapper.getMaxIdSancion(busquedaSancionesItem.getTipoSancion(),
+							String.valueOf(idPersona));
+
 					if (idSancion == null) {
 						cenSancion.setIdsancion((long) 1);
 					} else {
 						int idS = Integer.parseInt(idSancion.getNewId()) + 1;
 						cenSancion.setIdsancion((long) idS);
 					}
-					
+
 					LOGGER.info(
 							"insertSanction() / cenSancionExtendsMapper.insertSelective() -> Entrada a cenSancionExtendsMapper para insertar la sanción");
 					int response = cenSancionExtendsMapper.insertSelective(cenSancion);
 					LOGGER.info(
 							"insertSanction() / cenSancionExtendsMapper.insertSelective() -> Salida a cenSancionExtendsMapper para insertar la sanción");
-					
+
 					if (response == 0) {
 						insertResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.warn("insertSanction() / cenSancionExtendsMapper.insertSelective() -> "
@@ -181,7 +195,7 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 					} else {
 						insertResponseDTO.setStatus(SigaConstants.OK);
 					}
-				}else {
+				} else {
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				}
 
@@ -196,10 +210,10 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 			BusquedaSancionesItem busquedaSancionesItem) {
 		CenSancion cenSancion = new CenSancion();
 
-		if(busquedaSancionesItem.getTipoSancion() != null) {
+		if (busquedaSancionesItem.getTipoSancion() != null) {
 			cenSancion.setIdtiposancion(Short.valueOf(busquedaSancionesItem.getTipoSancion()));
 		}
-		
+
 		cenSancion.setRefcolegio(busquedaSancionesItem.getRefColegio());
 
 		cenSancion.setFechaacuerdo(busquedaSancionesItem.getFechaAcuerdo());
@@ -225,31 +239,30 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 		} else {
 			cenSancion.setChkrehabilitado("0");
 		}
-		
+
 		cenSancion.setChkarchivada("0");
 
 		cenSancion.setFechamodificacion(new Date());
 
-		if(usuario.getIdinstitucion() != null) {
+		if (usuario.getIdinstitucion() != null) {
 			cenSancion.setIdinstitucion(usuario.getIdinstitucion());
 		}
-		
-		if(busquedaSancionesItem.getColegio()!= null) {
+
+		if (busquedaSancionesItem.getColegio() != null) {
 			cenSancion.setIdinstitucionsancion(Short.valueOf(busquedaSancionesItem.getColegio()));
 		}
 
 		cenSancion.setIdpersona(idPersona);
 
 		cenSancion.setTexto(busquedaSancionesItem.getTexto());
-		
-		if(usuario.getIdusuario() != null) {
+
+		if (usuario.getIdusuario() != null) {
 			cenSancion.setUsumodificacion(usuario.getIdusuario());
 		}
 
 		return cenSancion;
 	}
 
-	
 	@Override
 	public UpdateResponseDTO updateSanction(BusquedaSancionesItem busquedaSancionesItem, HttpServletRequest request) {
 		LOGGER.info("insertSanction() -> Entrada al servicio para insertar una sanción");
@@ -275,27 +288,27 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 				LOGGER.info(
 						"insertSanction() / cenSancionExtendsMapper.selectByPrimaryKey() -> Entrada a cenSancionExtendsMapper para ver si existe en la tabla");
-				
+
 				CenSancionKey cenSancionKey = new CenSancionKey();
 				cenSancionKey.setIdinstitucion(usuario.getIdinstitucion());
 				cenSancionKey.setIdpersona(Long.valueOf(busquedaSancionesItem.getIdPersona()));
 				cenSancionKey.setIdsancion(Long.valueOf(busquedaSancionesItem.getIdSancion()));
-				
+
 				CenSancion cenSancion = cenSancionExtendsMapper.selectByPrimaryKey(cenSancionKey);
 				LOGGER.info(
 						"insertSanction() / cenSancionExtendsMapper.selectByPrimaryKey() -> Entrada a cenSancionExtendsMapper para ver si existe en la tabla");
-				
-				
+
 				if (null != cenSancion) {
-					
-					cenSancion = fillCenSancion(usuario, Long.valueOf(busquedaSancionesItem.getIdPersona()), busquedaSancionesItem);
+
+					cenSancion = fillCenSancion(usuario, Long.valueOf(busquedaSancionesItem.getIdPersona()),
+							busquedaSancionesItem);
 
 					LOGGER.info(
 							"insertSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenSancionExtendsMapper para actualizar la sanción");
 					int response = cenSancionExtendsMapper.updateByPrimaryKeySelective(cenSancion);
 					LOGGER.info(
 							"insertSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> Salida a cenSancionExtendsMapper para actualizar la sanción");
-					
+
 					if (response == 0) {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						LOGGER.warn("insertSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> "
@@ -303,7 +316,7 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 					} else {
 						updateResponseDTO.setStatus(SigaConstants.OK);
 					}
-				}else {
+				} else {
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 

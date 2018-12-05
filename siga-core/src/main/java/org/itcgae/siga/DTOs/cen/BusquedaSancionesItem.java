@@ -32,6 +32,9 @@ public class BusquedaSancionesItem {
 	private String texto;
 	private String idPersona;
 	private String idSancion;
+	private String nif;
+	@JsonFormat(pattern = "dd/MM/yyyy")
+	private Date fechaNacimiento;
 	
 	@JsonProperty("colegio")
 	public String getColegio() {
@@ -172,5 +175,21 @@ public class BusquedaSancionesItem {
 	}
 	public void setIdSancion(String idSancion) {
 		this.idSancion = idSancion;
+	}
+	
+	@JsonProperty("nif")
+	public String getNif() {
+		return nif;
+	}
+	public void setNif(String nif) {
+		this.nif = nif;
+	}
+	
+	@JsonProperty("fechaNacimiento")
+	public Date getFechaNacimiento() {
+		return fechaNacimiento;
+	}
+	public void setFechaNacimiento(Date fechaNacimiento) {
+		this.fechaNacimiento = fechaNacimiento;
 	}
 }

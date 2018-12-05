@@ -6,6 +6,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
+import org.itcgae.siga.DTOs.cen.BusquedaSancionesDTO;
+import org.itcgae.siga.DTOs.cen.BusquedaSancionesItem;
+import org.itcgae.siga.DTOs.cen.BusquedaSancionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.CargaMasivaDTO;
 import org.itcgae.siga.DTOs.cen.CargaMasivaItem;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
@@ -861,5 +864,31 @@ public class CenTestUtils {
 //		CREAR COMBOETIQUETASITEM Y METERLO EN EL ARRAY
 		noColegiado.setEtiquetas(new ComboEtiquetasItem[] {getComboEtiquetasItem(idGrupo)});
 		return noColegiado;
+	}
+	
+	public BusquedaSancionesSearchDTO getBusquedaSancionesSearchDTOSimulado() {
+		BusquedaSancionesSearchDTO busquedaSancionesSearchDTO = new BusquedaSancionesSearchDTO();
+
+		busquedaSancionesSearchDTO.setTipoSancion("3");
+
+		return busquedaSancionesSearchDTO;
+	}
+
+	public BusquedaSancionesItem getBusquedaSancionesItemSimulado() {
+		BusquedaSancionesItem busquedaSancionesItem = new BusquedaSancionesItem();
+
+		busquedaSancionesItem.setIdPersona("2005001213");
+		busquedaSancionesItem.setIdSancion("1");
+		busquedaSancionesItem.setTipoSancion("3");
+	
+		return busquedaSancionesItem;
+	}
+
+	public List<BusquedaSancionesItem> getListBusquedaSancionesItemSimulado() {
+		List<BusquedaSancionesItem> listBusquedaSancionesItem = new ArrayList<BusquedaSancionesItem>();
+
+		listBusquedaSancionesItem.add(getBusquedaSancionesItemSimulado());
+
+		return listBusquedaSancionesItem;
 	}
 }

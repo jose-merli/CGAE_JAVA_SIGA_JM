@@ -30,6 +30,8 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 
 		sql.SELECT("DISTINCT institucion.NOMBRE as COLEGIO");
 		sql.SELECT("concat(persona.NOMBRE || ' ',concat(persona.APELLIDOS1 || ' ', persona.APELLIDOS2))  as NOMBRE");
+		sql.SELECT("persona.NIFCIF as NIFCIF");
+		sql.SELECT("persona.FECHANACIMIENTO as FECHANACIMIENTO");
 		sql.SELECT("tipoSancion.DESCRIPCION as TIPOSANCION");
 		sql.SELECT("sancion.REFCGAE as REFCONSEJO");
 		sql.SELECT("sancion.REFCOLEGIO as REFCOLEGIO");
