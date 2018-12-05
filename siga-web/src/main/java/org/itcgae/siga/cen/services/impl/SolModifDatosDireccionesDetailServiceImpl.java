@@ -1,6 +1,5 @@
 package org.itcgae.siga.cen.services.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
-import org.itcgae.siga.DTOs.cen.SoliModiDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.SoliModiDireccionesItem;
 import org.itcgae.siga.cen.services.ISolModifDatosDireccionesDetailService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -163,7 +161,10 @@ public class SolModifDatosDireccionesDetailServiceImpl implements ISolModifDatos
 		soliModiDireccionesItem.setIdDireccion(String.valueOf(cenSolimodidirecciones.getIddireccion()));
 		soliModiDireccionesItem.setIdPersona(String.valueOf(cenSolimodidirecciones.getIdpersona()));
 
-		soliModiDireccionesItem.setDomicilio(cenSolimodidirecciones.getDomicilio());
+		if(cenSolimodidirecciones.getDomicilio() != null) {
+			soliModiDireccionesItem.setDomicilio(cenSolimodidirecciones.getDomicilio());
+		}
+		
 		if (cenPais != null) {
 			GenRecursosCatalogosKey genRecursosCatalogosKey = new GenRecursosCatalogosKey();
 			genRecursosCatalogosKey.setIdlenguaje(usuario.getIdlenguaje());
@@ -173,7 +174,10 @@ public class SolModifDatosDireccionesDetailServiceImpl implements ISolModifDatos
 					.selectByPrimaryKey(genRecursosCatalogosKey);
 			soliModiDireccionesItem.setPais(genRecursosCatalogos.getDescripcion());
 		}
-		soliModiDireccionesItem.setCodigoPostal(cenSolimodidirecciones.getCodigopostal());
+		
+		if(cenSolimodidirecciones.getCodigopostal() != null) {
+			soliModiDireccionesItem.setCodigoPostal(cenSolimodidirecciones.getCodigopostal());
+		}
 
 		if (cenProvincias != null) {
 			soliModiDireccionesItem.setProvincia(cenProvincias.getNombre());
@@ -183,12 +187,29 @@ public class SolModifDatosDireccionesDetailServiceImpl implements ISolModifDatos
 			soliModiDireccionesItem.setPoblacion(cenPoblaciones.getNombre());
 		}
 
-		soliModiDireccionesItem.setPoblacionExtranjera(cenSolimodidirecciones.getPoblacionextranjera());
-		soliModiDireccionesItem.setTelefono(cenSolimodidirecciones.getTelefono1());
-		soliModiDireccionesItem.setFax(cenSolimodidirecciones.getFax1());
-		soliModiDireccionesItem.setMovil(cenSolimodidirecciones.getMovil());
-		soliModiDireccionesItem.setCorreoElectronico(cenSolimodidirecciones.getCorreoelectronico());
-		soliModiDireccionesItem.setPaginaWeb(cenSolimodidirecciones.getPaginaweb());
+		if(cenSolimodidirecciones.getPoblacionextranjera() != null) {
+			soliModiDireccionesItem.setPoblacionExtranjera(cenSolimodidirecciones.getPoblacionextranjera());
+		}
+		
+		if(cenSolimodidirecciones.getTelefono1() != null) {
+			soliModiDireccionesItem.setTelefono(cenSolimodidirecciones.getTelefono1());
+		}
+		
+		if(cenSolimodidirecciones.getFax1() != null) {
+			soliModiDireccionesItem.setFax(cenSolimodidirecciones.getFax1());
+		}
+		
+		if(cenSolimodidirecciones.getMovil() != null) {
+			soliModiDireccionesItem.setMovil(cenSolimodidirecciones.getMovil());
+		}
+		
+		if(cenSolimodidirecciones.getCorreoelectronico() != null) {
+			soliModiDireccionesItem.setCorreoElectronico(cenSolimodidirecciones.getCorreoelectronico());
+		}
+		
+		if(cenSolimodidirecciones.getPaginaweb() != null) {
+			soliModiDireccionesItem.setPaginaWeb(cenSolimodidirecciones.getPaginaweb());
+		}
 
 		return soliModiDireccionesItem;
 	}
@@ -197,17 +218,57 @@ public class SolModifDatosDireccionesDetailServiceImpl implements ISolModifDatos
 
 		SoliModiDireccionesItem soliModiDireccionesItem = new SoliModiDireccionesItem();
 
-		soliModiDireccionesItem.setDomicilio(datosDireccionItem.getDomicilio());
-		soliModiDireccionesItem.setPais(datosDireccionItem.getNombrePais());
-		soliModiDireccionesItem.setCodigoPostal(datosDireccionItem.getCodigoPostal());
-		soliModiDireccionesItem.setProvincia(datosDireccionItem.getNombreProvincia());
-		soliModiDireccionesItem.setPoblacion(datosDireccionItem.getNombrePoblacion());
-		soliModiDireccionesItem.setPoblacionExtranjera(datosDireccionItem.getPoblacionExtranjera());
-		soliModiDireccionesItem.setTelefono(datosDireccionItem.getTelefono());
-		soliModiDireccionesItem.setFax(datosDireccionItem.getFax());
-		soliModiDireccionesItem.setMovil(datosDireccionItem.getMovil());
-		soliModiDireccionesItem.setCorreoElectronico(datosDireccionItem.getCorreoElectronico());
-		soliModiDireccionesItem.setPaginaWeb(datosDireccionItem.getPaginaWeb());
+		if(datosDireccionItem.getIdPersona() != null) {
+			soliModiDireccionesItem.setIdPersona(datosDireccionItem.getIdPersona());
+		}
+		
+		if(datosDireccionItem.getIdDireccion() != null) {
+			soliModiDireccionesItem.setIdDireccion(datosDireccionItem.getIdDireccion());
+		}
+		
+		if(datosDireccionItem.getDomicilio() != null) {
+			soliModiDireccionesItem.setDomicilio(datosDireccionItem.getDomicilio());
+		}
+		
+		if(datosDireccionItem.getNombrePais() != null) {
+			soliModiDireccionesItem.setPais(datosDireccionItem.getNombrePais());
+		}
+		
+		if(datosDireccionItem.getCodigoPostal() != null) {
+			soliModiDireccionesItem.setCodigoPostal(datosDireccionItem.getCodigoPostal());
+		}
+		
+		if(datosDireccionItem.getNombreProvincia() != null) {
+			soliModiDireccionesItem.setProvincia(datosDireccionItem.getNombreProvincia());
+		}
+		
+		if(datosDireccionItem.getNombrePoblacion() != null) {
+			soliModiDireccionesItem.setPoblacion(datosDireccionItem.getNombrePoblacion());
+		}
+		
+		if(datosDireccionItem.getPoblacionExtranjera() != null) {
+			soliModiDireccionesItem.setPoblacionExtranjera(datosDireccionItem.getPoblacionExtranjera());
+		}
+		
+		if(datosDireccionItem.getTelefono() != null) {
+			soliModiDireccionesItem.setTelefono(datosDireccionItem.getTelefono());
+		}
+		
+		if(datosDireccionItem.getFax() != null) {
+			soliModiDireccionesItem.setFax(datosDireccionItem.getFax());
+		}
+		
+		if(datosDireccionItem.getMovil() != null) {
+			soliModiDireccionesItem.setMovil(datosDireccionItem.getMovil());
+		}
+		
+		if(datosDireccionItem.getCorreoElectronico() != null) {
+			soliModiDireccionesItem.setCorreoElectronico(datosDireccionItem.getCorreoElectronico());
+		}
+		
+		if(datosDireccionItem.getPaginaWeb() != null) {
+			soliModiDireccionesItem.setPaginaWeb(datosDireccionItem.getPaginaWeb());
+		}
 
 		return soliModiDireccionesItem;
 	}

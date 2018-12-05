@@ -100,8 +100,6 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 		LOGGER.info(
 				"getComboSubtipoCurricular() -> Entrada al servicio para la búsqueda por filtro de categoría curricular");
 
-//		List<SubtipoCurricularItem> subtipoCurricularItems = new ArrayList<SubtipoCurricularItem>();
-//		SubtipoCurricularDTO subtipoCurricularDTO = new SubtipoCurricularDTO();
 		ComboDTO combo = new ComboDTO();
 
 		String idLenguaje = null;

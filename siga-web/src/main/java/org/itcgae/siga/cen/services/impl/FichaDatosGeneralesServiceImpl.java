@@ -664,17 +664,12 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		LOGGER.info(
 				"createColegiado() -> Entrada al servicio para actualizar información general de una persona jurídica");
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-//		List<CenDatoscolegialesestado> cenDatoscolegialesestado = new ArrayList<CenDatoscolegialesestado>();
-//		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
-//		List<String> gruposPerJuridicaNuevos = new ArrayList<String>();
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-//		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
-			
 			if (null != idInstitucion) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 				exampleUsuarios.createCriteria().andNifEqualTo(dni)
@@ -725,6 +720,9 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							insertResponseDTO.setStatus(SigaConstants.OK);
 							LOGGER.info("createColegiado() Solicitud creada correctamente");
 
+						}else {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.info("createColegiado() La solicitud no ha podido ser creada correctamente");
 						}
 					}
 					
@@ -876,17 +874,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 											}
 								LOGGER.info(
 										"createColegiado() / cenColegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenColegiadoExtendsMapper para crear un nuevo colegiado");
-							
-							
-							
-							
-							
-							
-								
-								
-								
-								
-								
 								
 								// 2. crear/actualizar relaciones entre tablas para todos los grupos
 								if (!insertResponseDTO.getStatus().equals(SigaConstants.KO)) {
@@ -1075,28 +1062,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	}
 
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	@Override
 	public ComboDTO getEstadoCivil(HttpServletRequest request) {
 
@@ -1172,11 +1137,11 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		return comboDTO;
 	}
 
-	@Override
-	public ComboDTO getLabel(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public ComboDTO getLabel(HttpServletRequest request) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	
 }

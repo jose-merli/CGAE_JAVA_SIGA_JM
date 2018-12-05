@@ -102,12 +102,28 @@ public class SolModifDatosBancariosDetailServiceImpl implements ISolModifDatosBa
 			}
 
 			solModifDatosBancariosItem.setIdCuenta(String.valueOf(cenSolicmodicuentas.getIdcuenta()));
-			solModifDatosBancariosItem.setCodigoSucursal(cenSolicmodicuentas.getCodigosucursal());
-			solModifDatosBancariosItem.setDigitoControl(cenSolicmodicuentas.getDigitocontrol());
-			solModifDatosBancariosItem.setIban(cenSolicmodicuentas.getIban());
+			
+			if(cenSolicmodicuentas.getCodigosucursal() != null) {
+				solModifDatosBancariosItem.setCodigoSucursal(cenSolicmodicuentas.getCodigosucursal());
+			}
+				
+			if(cenSolicmodicuentas.getDigitocontrol() != null) {
+				solModifDatosBancariosItem.setDigitoControl(cenSolicmodicuentas.getDigitocontrol());
+			}
+			
+			if(cenSolicmodicuentas.getIban() != null) {
+				solModifDatosBancariosItem.setIban(cenSolicmodicuentas.getIban());
+			}
+			
 			solModifDatosBancariosItem.setIdPersona(String.valueOf(cenSolicmodicuentas.getIdpersona()));
-			solModifDatosBancariosItem.setNumeroCuenta(cenSolicmodicuentas.getNumerocuenta());
-			solModifDatosBancariosItem.setTitular(cenSolicmodicuentas.getTitular());
+			
+			if(cenSolicmodicuentas.getNumerocuenta() != null) {
+				solModifDatosBancariosItem.setNumeroCuenta(cenSolicmodicuentas.getNumerocuenta());
+			}
+			
+			if(cenSolicmodicuentas.getTitular() != null) {
+				solModifDatosBancariosItem.setTitular(cenSolicmodicuentas.getTitular());
+			}
 		}
 
 		return solModifDatosBancariosItem;
