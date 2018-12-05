@@ -1,5 +1,6 @@
 package org.itcgae.siga.com.services.impl;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,18 +25,27 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.EnvDestinatarios;
 import org.itcgae.siga.db.entities.EnvDestinatariosExample;
 import org.itcgae.siga.db.entities.EnvDocumentos;
+import org.itcgae.siga.db.entities.EnvDocumentosExample;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
 import org.itcgae.siga.db.entities.EnvEnvioprogramadoKey;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosKey;
+import org.itcgae.siga.db.entities.EnvEnviosgrupocliente;
+import org.itcgae.siga.db.entities.EnvEnviosgrupoclienteExample;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
+import org.itcgae.siga.db.entities.EnvHistoricoestadoenvioExample;
+import org.itcgae.siga.db.entities.EnvPlantillaremitentes;
+import org.itcgae.siga.db.entities.EnvPlantillaremitentesExample;
+import org.itcgae.siga.db.entities.EnvPlantillaremitentesKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
 import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
+import org.itcgae.siga.db.mappers.EnvEnviosgrupoclienteMapper;
 import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
+import org.itcgae.siga.db.mappers.EnvPlantillaremitentesMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDocumentosExtendsMapper;
@@ -47,9 +57,12 @@ import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 
 @Service
+@Transactional
 public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	
@@ -90,6 +103,15 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	@Autowired
 	private EnvDocumentosExtendsMapper _envDocumentosExtendsMapper;
+	
+	@Autowired
+	private EnvDocumentosMapper _envDocumentosMapper;
+	
+	@Autowired
+	private EnvPlantillaremitentesMapper _envPlantillaremitentesMapper;
+	
+	@Autowired
+	private EnvEnviosgrupoclienteMapper _envEnviosgrupoclienteMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -531,35 +553,94 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			
 			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
+				
 				try{
-					int update = 0;
-					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
-					key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getidPlantillasEnvio()));
-					key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
-					key.setIdinstitucion(idInstitucion);
-					EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
-					plantilla.setAsunto(datosTarjeta.getAsunto());
-					plantilla.setCuerpo(datosTarjeta.getCuerpo());
-					update = _envPlantillasenviosMapper.updateByPrimaryKeyWithBLOBs(plantilla);
+					AdmUsuarios usuario = usuarios.get(0);
+					//tabla env_enviosplantillas
+					EnvPlantillasenviosKey PlantillaKey = new EnvPlantillasenviosKey();
+					PlantillaKey.setIdinstitucion(idInstitucion);
+					PlantillaKey.setIdplantillaenvios(Short.valueOf(datosTarjeta.getidPlantillasEnvio()));
+					PlantillaKey.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvio()));
+					EnvPlantillasenviosWithBLOBs plantillaEnvio =  _envPlantillasenviosMapper.selectByPrimaryKey(PlantillaKey);
+					NewIdDTO idPlantilla = _envPlantillaEnviosExtendsMapper.selectMaxIDPlantillas();
+					Short idPlantillaEnvio = plantillaEnvio.getIdplantillaenvios();
+					Short idPlantillaNuevo = Short.valueOf(idPlantilla.getNewId());
+					plantillaEnvio.setIdplantillaenvios(idPlantillaNuevo);
+					plantillaEnvio.setFechamodificacion(new Date());
+					plantillaEnvio.setUsumodificacion(usuario.getIdusuario());
+					_envPlantillasenviosMapper.insert(plantillaEnvio);
 					
-					if(update > 0){
-						if(datosTarjeta.getIdEnvio() == null){
-							EnvEnvios envio = new EnvEnvios();
-							envio.setIdinstitucion(idInstitucion);
-							envio.setDescripcion(datosTarjeta.getDescripcion());
-							envio.setFecha(new Date());
-							envio.setGenerardocumento("N");
-							envio.setImprimiretiquetas("N");
-							envio.setIdplantillaenvios(Short.parseShort(datosTarjeta.getidPlantillasEnvio()));
-							Short estadoNuevo = 1;
-							envio.setIdestado(estadoNuevo);
-							envio.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
-							envio.setFechamodificacion(new Date());
-							envio.setUsumodificacion(usuario.getIdusuario());
-							_envEnviosMapper.insert(envio);
-						}
+					//tabla env_envios
+					EnvEnviosKey keyEnvio = new EnvEnviosKey();
+					keyEnvio.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
+					keyEnvio.setIdinstitucion(idInstitucion);
+					EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio);
+					Long idEnvio = envio.getIdenvio();
+					NewIdDTO newID = _envEnviosExtendsMapper.selectMaxIDEnvio();
+					//Long idEnvioNuevo = Long.parseLong(newID.getNewId());
+					//envio.setIdenvio(idEnvioNuevo);
+					envio.setIdplantillaenvios(plantillaEnvio.getIdplantillaenvios());
+					envio.setFechamodificacion(new Date());
+					envio.setUsumodificacion(usuario.getIdusuario());
+					_envEnviosMapper.insert(envio);
+					Long idEnvioNuevo = envio.getIdenvio();
+					
+					//tabla env_envioProgramado
+					EnvEnvioprogramadoKey progKey = new EnvEnvioprogramadoKey();
+					progKey.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
+					progKey.setIdinstitucion(idInstitucion);
+					EnvEnvioprogramado programado = _envEnvioprogramadoMapper.selectByPrimaryKey(progKey);
+					if(programado != null){
+						programado.setIdenvio(idEnvioNuevo);
+						programado.setIdplantillaenvios(idPlantillaNuevo);
+						_envEnvioprogramadoMapper.insert(programado);
 					}
+					//tabla env_documentos
+					EnvDocumentosExample docExample = new EnvDocumentosExample();
+					docExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
+					List<EnvDocumentos> documentos = _envDocumentosMapper.selectByExample(docExample);
+					for (EnvDocumentos documento : documentos) {
+						//el id documento se debería de calcular con secuencia en bdd
+						documento.setIdenvio(idEnvioNuevo);
+						documento.setFechamodificacion(new Date());
+						documento.setUsumodificacion(usuario.getIdusuario());
+						_envDocumentosMapper.insert(documento);
+					}
+					
+					//tabla env_historicoestadoenvio
+					EnvHistoricoestadoenvioExample histExample = new EnvHistoricoestadoenvioExample();
+					histExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
+					List<EnvHistoricoestadoenvio> historicosEstados = _envHistoricoestadoenvioMapper.selectByExample(histExample);
+					for (EnvHistoricoestadoenvio envHistorico : historicosEstados) {
+						//el id historico se debería de calcular con secuencia en bdd
+						envHistorico.setIdenvio(idEnvioNuevo);
+						envHistorico.setFechamodificacion(new Date());
+						envHistorico.setUsumodificacion(usuario.getIdusuario());
+						_envHistoricoestadoenvioMapper.insert(envHistorico);
+					}
+					
+					//env_plantilla remitentes
+					EnvPlantillaremitentesExample keyRemitentesExample = new EnvPlantillaremitentesExample();
+					keyRemitentesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdplantillaenviosEqualTo(idPlantillaEnvio).andIdtipoenviosEqualTo(envio.getIdtipoenvios());
+					List<EnvPlantillaremitentes> plantillaRemitentes = _envPlantillaremitentesMapper.selectByExample(keyRemitentesExample);
+					for (EnvPlantillaremitentes envPlantillaremitentes : plantillaRemitentes) {
+						envPlantillaremitentes.setIdplantillaenvios(idPlantillaNuevo);
+						envPlantillaremitentes.setFechamodificacion(new Date());
+						envPlantillaremitentes.setUsumodificacion(usuario.getIdusuario());
+						_envPlantillaremitentesMapper.insert(envPlantillaremitentes);
+					}
+					
+					//env_grupocliente
+					EnvEnviosgrupoclienteExample gruposExample = new EnvEnviosgrupoclienteExample();
+					gruposExample.createCriteria().andIdenvioEqualTo(idEnvio);
+					List<EnvEnviosgrupocliente> grupos = _envEnviosgrupoclienteMapper.selectByExample(gruposExample);
+					for (EnvEnviosgrupocliente envEnviosgrupocliente : grupos) {
+						envEnviosgrupocliente.setIdenvio(idEnvioNuevo);
+						envEnviosgrupocliente.setFechamodificacion(new Date());
+						envEnviosgrupocliente.setUsumodificacion(usuario.getIdusuario());
+						_envEnviosgrupoclienteMapper.insert(envEnviosgrupocliente);
+					}
+					
 					
 					
 					respuesta.setCode(200);

@@ -18,5 +18,13 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 		
 		return sql.toString();
 	}
+	
+	public String selectMaxIDPlantillaEnvio(){
+		
+		SQL sql = new SQL();
+		sql.SELECT("MAX(IDPLANTILLAENVIOS)+1 AS IDMAX");
+		sql.FROM("ENV_PLANTILLASENVIOS");
+		return sql.toString();
+	}
 
 }

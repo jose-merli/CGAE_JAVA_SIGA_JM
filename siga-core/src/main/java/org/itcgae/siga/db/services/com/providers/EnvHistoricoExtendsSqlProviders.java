@@ -11,5 +11,6 @@ public class EnvHistoricoExtendsSqlProviders {
 		sql.FROM("ENV_HISTORICOESTADOENVIO");
 		return sql.toString();
 	}
-
+	
+	
 }

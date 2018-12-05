@@ -66,10 +66,19 @@ public class EnvEnviosExtendsSqlProvider {
 		return sql.toString();
 	}
 	
+	public String selectMaxIDEnvio(){
+		
+		SQL sql = new SQL();
+		sql.SELECT("MAX(IDENVIO)+1 AS IDMAX");
+		sql.FROM("ENV_ENVIOS");
+		return sql.toString();
+	}
+	
 	
 	
 	
 	public static String filtroTextoBusquedas(String columna, String cadena) {
+
 		StringBuilder cadenaWhere = new StringBuilder();
 		cadenaWhere.append(" (TRANSLATE(LOWER( " + columna + "),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') ");
 		cadenaWhere.append(" LIKE");
