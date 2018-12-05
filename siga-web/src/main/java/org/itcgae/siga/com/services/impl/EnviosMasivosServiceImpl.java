@@ -429,7 +429,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				try{
 					int update = 0;
 					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
-					key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getidPlantillaEnvios()));
+					key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getidPlantillasEnvio()));
 					key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
 					key.setIdinstitucion(idInstitucion);
 					EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
@@ -445,7 +445,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							envio.setFecha(new Date());
 							envio.setGenerardocumento("N");
 							envio.setImprimiretiquetas("N");
-							envio.setIdplantillaenvios(Short.parseShort(datosTarjeta.getidPlantillaEnvios()));
+							envio.setIdplantillaenvios(Short.parseShort(datosTarjeta.getidPlantillasEnvio()));
 							Short estadoNuevo = 1;
 							envio.setIdestado(estadoNuevo);
 							envio.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
@@ -535,7 +535,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				try{
 					int update = 0;
 					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
-					key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getidPlantillaEnvios()));
+					key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getidPlantillasEnvio()));
 					key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
 					key.setIdinstitucion(idInstitucion);
 					EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
@@ -551,7 +551,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							envio.setFecha(new Date());
 							envio.setGenerardocumento("N");
 							envio.setImprimiretiquetas("N");
-							envio.setIdplantillaenvios(Short.parseShort(datosTarjeta.getidPlantillaEnvios()));
+							envio.setIdplantillaenvios(Short.parseShort(datosTarjeta.getidPlantillasEnvio()));
 							Short estadoNuevo = 1;
 							envio.setIdestado(estadoNuevo);
 							envio.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
