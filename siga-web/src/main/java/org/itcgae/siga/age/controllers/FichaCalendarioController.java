@@ -68,15 +68,15 @@ public class FichaCalendarioController {
 		return new ResponseEntity<CalendarDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "fichaCalendario/getEventNotifications", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<NotificacionEventoDTO> getEventNotifications(String idCalendario, HttpServletRequest request) {
-		NotificacionEventoDTO response = datosNotificacionesService.getEventNotifications(idCalendario, request);
+	@RequestMapping(value = "fichaCalendario/getCalendarNotifications", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<NotificacionEventoDTO> getCalendarNotifications(String idCalendario, HttpServletRequest request) {
+		NotificacionEventoDTO response = datosNotificacionesService.getCalendarNotifications(idCalendario, request);
 		return new ResponseEntity<NotificacionEventoDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "fichaCalendario/getHistoricEventNotifications", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<NotificacionEventoDTO> getHistoricEventNotifications(String idCalendario, HttpServletRequest request) {
-		NotificacionEventoDTO response = datosNotificacionesService.getHistoricEventNotifications(idCalendario, request);
+	@RequestMapping(value = "fichaCalendario/getHistoricCalendarNotifications", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<NotificacionEventoDTO> getHistoricCalendarNotifications(String idCalendario, HttpServletRequest request) {
+		NotificacionEventoDTO response = datosNotificacionesService.getHistoricCalendarNotifications(idCalendario, request);
 		return new ResponseEntity<NotificacionEventoDTO>(response, HttpStatus.OK);
 	}
 	

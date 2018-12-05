@@ -25,9 +25,9 @@ public interface IDatosNotificacionesService {
 	
 	public UpdateResponseDTO updateNotification(NotificacionEventoItem notificacionItem, HttpServletRequest request);
 	
-	public NotificacionEventoDTO getEventNotifications(String idCalendario, HttpServletRequest request);
+	public NotificacionEventoDTO getCalendarNotifications(String idCalendario, HttpServletRequest request);
 	
-	public NotificacionEventoDTO getHistoricEventNotifications(String idCalendario, HttpServletRequest request);
+	public NotificacionEventoDTO getHistoricCalendarNotifications(String idCalendario, HttpServletRequest request);
 	
 	public UpdateResponseDTO deleteNotification(NotificacionEventoDTO notificacionDTO, HttpServletRequest request);
 }
