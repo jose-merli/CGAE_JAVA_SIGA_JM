@@ -1,17 +1,13 @@
 package org.itcgae.siga.db.services.cen.providers;
 
-import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
-import org.itcgae.siga.DTOs.cen.SoliModiDireccionesItem;
 import org.itcgae.siga.db.mappers.CenComponentesSqlProvider;
 
 public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 	
 	public String selectDireccionesWs(String idPersona) {		
 		SQL sql = new SQL();
-		
 
 		sql.SELECT_DISTINCT("CAT.DESCRIPCION AS TIPODIRECCION");
 		sql.SELECT("DIRECCION.IDDIRECCION");
@@ -51,7 +47,6 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 
 	public String selectPartidoJudicial(String idPersona, String idInstitucion) {		
 		SQL sql = new SQL();
-		
 
 		sql.SELECT("PARTIDO.NOMBRE AS NOMBREPARTIDO");
 		sql.FROM("CEN_DIRECCIONES DIR");
@@ -59,7 +54,6 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.INNER_JOIN(" CEN_DIRECCION_TIPODIRECCION TP ON DIR.IDDIRECCION = TP.IDDIRECCION AND DIR.IDPERSONA = TP.IDPERSONA AND TP.IDINSTITUCION = DIR.IDINSTITUCION AND TP.IDTIPODIRECCION = '2'");
 		sql.INNER_JOIN(" CEN_PARTIDOJUDICIAL PARTIDO ON POB.IDPARTIDO = PARTIDO.IDPARTIDO");
 		sql.WHERE(" dir.idpersona = '"+idPersona+"' and dir.idinstitucion = '"+idInstitucion+"' and dir.fechabaja is null");
-		
 		
 		return sql.toString();
 	}
@@ -110,13 +104,7 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		}
 		sql.WHERE("DIRECCION.IDINSTITUCION = '"+idInstitucion+"'");
 		sql.ORDER_BY("CAT.DESCRIPCION, DIRECCION.IDDIRECCION  ");
-
-		
-		
-		
-		
-		
-		
+	
 		sqlPrincipal.SELECT_DISTINCT("LISTAGG(DIRECCIONES.DESCRIPCION, ';') WITHIN GROUP (ORDER BY DIRECCIONES.DESCRIPCION)  OVER (PARTITION BY DIRECCIONES.IDDIRECCION) AS TIPODIRECCION");
 		sqlPrincipal.SELECT_DISTINCT("LISTAGG(DIRECCIONES.IDTIPODIRECCION, ';') WITHIN GROUP (ORDER BY DIRECCIONES.IDTIPODIRECCION)  OVER (PARTITION BY DIRECCIONES.IDDIRECCION) AS IDTIPODIRECCIONLIST");
 		sqlPrincipal.SELECT("IDDIRECCION");
@@ -133,7 +121,6 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sqlPrincipal.SELECT("MOVIL");
 		sqlPrincipal.SELECT("POBLACIONEXTRANJERA");
 		sqlPrincipal.SELECT("OTRAPROVINCIA");
-
 		sqlPrincipal.SELECT("FECHAMODIFICACION");
 		sqlPrincipal.SELECT("PAGINAWEB");
 		sqlPrincipal.SELECT("CORREOELECTRONICO");

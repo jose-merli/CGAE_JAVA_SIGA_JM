@@ -20,19 +20,7 @@ public class FichaDatosCertificadosController {
 	
 	@Autowired
 	private IFichaDatosCertificadosService fichaDatosCertificados;
-	
-//	@RequestMapping(value = "/fichaDatosColegiales/tratamiento",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<ComboDTO> getLabelPerson(HttpServletRequest request) {
-//		ComboDTO response = fichaDatosColegiales.getTratamiento(request);
-//		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-//	}
-//	
-//	@RequestMapping(value = "/fichaDatosColegiales/tipoSeguro",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<ComboDTO> getTypeInsurances(HttpServletRequest request) {
-//		ComboDTO response = fichaDatosColegiales.getTypeInsurances(request);
-//		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-//	}
-//	
+
 	@RequestMapping(value = "/fichaDatosCertificados/datosCertificadosSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<CertificadoDTO> datosCertificadosSearch(@RequestParam("numPagina") int numPagina, @RequestBody String idPersona, HttpServletRequest request) { 
 		CertificadoDTO response = fichaDatosCertificados.datosCertificadosSearch(numPagina, idPersona, request);
