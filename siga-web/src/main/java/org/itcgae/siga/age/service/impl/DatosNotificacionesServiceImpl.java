@@ -207,12 +207,16 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 				// Creamos un nuevo calendario
 				AgeNotificacionesevento ageNotificacionEventoInsert = new AgeNotificacionesevento();
-				// IdCalendario es una Secuencia
-				ageNotificacionEventoInsert.setIdevento(Long.parseLong(notificacionEventoItem.getIdEvento()));
 				ageNotificacionEventoInsert.setIdinstitucion(idInstitucion);
 				ageNotificacionEventoInsert.setUsumodificacion(usuario.getIdusuario().longValue());
 				ageNotificacionEventoInsert.setFechamodificacion(new Date());
-				ageNotificacionEventoInsert.setIdcalendario(Long.parseLong(notificacionEventoItem.getIdCalendario()));
+
+				if (notificacionEventoItem.getIdEvento() != null) {
+					ageNotificacionEventoInsert.setIdevento(Long.valueOf(notificacionEventoItem.getIdEvento()));
+				} else {
+					ageNotificacionEventoInsert
+							.setIdcalendario(Long.parseLong(notificacionEventoItem.getIdCalendario()));
+				}
 				ageNotificacionEventoInsert
 						.setIdtiponotificacionevento(Long.parseLong(notificacionEventoItem.getIdTipoNotificacion()));
 				ageNotificacionEventoInsert.setCuando(Long.parseLong(notificacionEventoItem.getCuando()));
@@ -319,10 +323,9 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 	@Override
 	public UpdateResponseDTO updateNotification(NotificacionEventoItem notificacionUpdate, HttpServletRequest request) {
-		
-		LOGGER.info(
-				"updateNotification() -> Entrada al servicio para modificar las notificaciones de eventos");
-		
+
+		LOGGER.info("updateNotification() -> Entrada al servicio para modificar las notificaciones de eventos");
+
 		int response = 0;
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -386,16 +389,15 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 				}
 			}
 		}
-		
-		LOGGER.info(
-				"updateNotification() -> Salida del servicio para modificar las notificaciones de eventos");
+
+		LOGGER.info("updateNotification() -> Salida del servicio para modificar las notificaciones de eventos");
 
 		updateResponseDTO.setError(error);
 		return updateResponseDTO;
 	}
 
 	@Override
-	public NotificacionEventoDTO getEventNotifications(String idCalendario, HttpServletRequest request) {
+	public NotificacionEventoDTO getCalendarNotifications(String idCalendario, HttpServletRequest request) {
 		LOGGER.info(
 				"getEventNotifications() -> Entrada al servicio para obtener las notificaciones de eventos de un calendario especifico");
 
@@ -403,18 +405,29 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 		NotificacionEventoDTO eventNotificationDTO = new NotificacionEventoDTO();
 
 		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		//debere buscar por idevento tmbn
 		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"getEventNotifications() / ageNotificacioneseventoExtendsMapper.getEventNotifications() -> Entrada a ageNotificacioneseventoMapper para obtener las notificaciones de eventos de un calendario");
-			eventNotifications = ageNotificacioneseventoExtendsMapper.getEventNotifications(idCalendario,
-					idInstitucion.toString());
+					"getEventNotifications() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
-					"getEventNotifications() / ageNotificacioneseventoExtendsMapper.getEventNotifications() -> Salida de ageNotificacioneseventoMapper para obtener las notificaciones de eventos de un calendario");
+					"getEventNotifications() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			eventNotificationDTO.setEventNotificationItems(eventNotifications);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"getEventNotifications() / ageNotificacioneseventoExtendsMapper.getEventNotifications() -> Entrada a ageNotificacioneseventoMapper para obtener las notificaciones de eventos de un calendario");
+				eventNotifications = ageNotificacioneseventoExtendsMapper.getCalendarNotifications(idCalendario,
+						idInstitucion.toString(), usuario.getIdlenguaje());
+				LOGGER.info(
+						"getEventNotifications() / ageNotificacioneseventoExtendsMapper.getEventNotifications() -> Salida de ageNotificacioneseventoMapper para obtener las notificaciones de eventos de un calendario");
+
+				eventNotificationDTO.setEventNotificationItems(eventNotifications);
+			}
 
 		}
 
@@ -423,9 +436,9 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 		return eventNotificationDTO;
 	}
-	
+
 	@Override
-	public NotificacionEventoDTO getHistoricEventNotifications(String idCalendario, HttpServletRequest request) {
+	public NotificacionEventoDTO getHistoricCalendarNotifications(String idCalendario, HttpServletRequest request) {
 		LOGGER.info(
 				"getHistoricEventNotifications() -> Entrada al servicio para obtener el historico de las notificaciones de eventos de un calendario especifico");
 
@@ -433,17 +446,30 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 		NotificacionEventoDTO eventNotificationDTO = new NotificacionEventoDTO();
 
 		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"getHistoricEventNotifications() / ageNotificacioneseventoExtendsMapper.getEventNotifications() -> Entrada a ageNotificacioneseventoMapper para obtener las notificaciones de eventos de un calendario");
-			eventNotifications = ageNotificacioneseventoExtendsMapper.getHistoricEventNotifications(idCalendario,
-					idInstitucion.toString());
+					"getEventNotifications() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
-					"getHistoricEventNotifications() / ageNotificacioneseventoExtendsMapper.getEventNotifications() -> Salida de ageNotificacioneseventoMapper para obtener las notificaciones de eventos de un calendario");
+					"getEventNotifications() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			eventNotificationDTO.setEventNotificationItems(eventNotifications);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"getHistoricEventNotifications() / ageNotificacioneseventoExtendsMapper.getEventNotifications() -> Entrada a ageNotificacioneseventoMapper para obtener las notificaciones de eventos de un calendario");
+				eventNotifications = ageNotificacioneseventoExtendsMapper.getHistoricCalendarNotifications(idCalendario,
+						idInstitucion.toString(), usuario.getIdlenguaje());
+				LOGGER.info(
+						"getHistoricEventNotifications() / ageNotificacioneseventoExtendsMapper.getEventNotifications() -> Salida de ageNotificacioneseventoMapper para obtener las notificaciones de eventos de un calendario");
+
+				eventNotificationDTO.setEventNotificationItems(eventNotifications);
+
+			}
 
 		}
 
@@ -455,7 +481,7 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 	@Override
 	public UpdateResponseDTO deleteNotification(NotificacionEventoDTO notificacionDTO, HttpServletRequest request) {
-		
+
 		LOGGER.info(
 				"deleteNotification() -> Entrada al servicio para dar de baja a las notificaciones de eventos de un calendario especifico");
 
@@ -481,7 +507,7 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 				AdmUsuarios usuario = usuarios.get(0);
 
 				for (NotificacionEventoItem noti : notificacionDTO.getEventNotificationItems()) {
-					
+
 					AgeNotificacioneseventoExample exampleNotificacion = new AgeNotificacioneseventoExample();
 					exampleNotificacion.createCriteria()
 							.andIdnotificacioneventoEqualTo(Long.valueOf(noti.getIdNotificacion()))
@@ -527,7 +553,5 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 		updateResponseDTO.setError(error);
 		return updateResponseDTO;
 	}
-
-	
 
 }

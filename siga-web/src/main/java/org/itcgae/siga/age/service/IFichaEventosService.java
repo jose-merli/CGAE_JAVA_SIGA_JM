@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
+import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.form.AsistenciaCursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -42,13 +43,15 @@ public interface IFichaEventosService {
 
 	public ComboDTO getDaysWeek(HttpServletRequest request);
 	
-
 	public ComboDTO getJudicialDistrict(HttpServletRequest request);
 	
 	public UpdateResponseDTO updateEventCalendar(EventoItem eventoItem, HttpServletRequest request);
 
 	public UpdateResponseDTO deleteEventCalendar(EventoDTO eventoDTO, HttpServletRequest request);
 
+	public NotificacionEventoDTO getEventNotifications(String idEvento, HttpServletRequest request);
+	
+	public NotificacionEventoDTO getHistoricEventNotifications(String idEvento, HttpServletRequest request);
 
 	public void generaEventosLaboral();
 	

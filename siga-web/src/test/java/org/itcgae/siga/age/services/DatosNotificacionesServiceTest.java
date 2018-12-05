@@ -292,17 +292,18 @@ public class DatosNotificacionesServiceTest {
 	}
 	
 	@Test
-	public void getEventNotificationsTest() throws Exception {
+	public void getCalendarNotificationsTest() throws Exception {
 
 		Short idInstitucion = 2000;
 		String idCalendario = "1";
+		String idLenguaje = "1";
 		List<NotificacionEventoItem> eventNotifications = ageTestUtils.getListNotificacionEventoItem();
 
-		when(ageNotificacioneseventoExtendsMapper.getEventNotifications(idCalendario, idInstitucion.toString())).thenReturn(eventNotifications);
+		when(ageNotificacioneseventoExtendsMapper.getCalendarNotifications(idCalendario, idInstitucion.toString(), idLenguaje)).thenReturn(eventNotifications);
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		NotificacionEventoDTO notificacionEventoDTOResultado = datosNotificacionesServiceImpl.getEventNotifications(idCalendario, mockreq);
+		NotificacionEventoDTO notificacionEventoDTOResultado = datosNotificacionesServiceImpl.getCalendarNotifications(idCalendario, mockreq);
 
 		NotificacionEventoDTO notificacionEventoDTOEsperado = ageTestUtils.getNotificacionEventoDTOSimulado();
 		
@@ -311,17 +312,18 @@ public class DatosNotificacionesServiceTest {
 	}
 
 	@Test
-	public void getHistoricEventNotificationsTest() throws Exception {
+	public void getHistoricCalendarNotificationsTest() throws Exception {
 
 		Short idInstitucion = 2000;
 		String idCalendario = "1";
+		String idLenguaje = "1";
 		List<NotificacionEventoItem> eventNotifications = ageTestUtils.getListNotificacionEventoItem();
 
-		when(ageNotificacioneseventoExtendsMapper.getHistoricEventNotifications(idCalendario, idInstitucion.toString())).thenReturn(eventNotifications);
+		when(ageNotificacioneseventoExtendsMapper.getHistoricCalendarNotifications(idCalendario, idInstitucion.toString(), idLenguaje)).thenReturn(eventNotifications);
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		NotificacionEventoDTO notificacionEventoDTOResultado = datosNotificacionesServiceImpl.getHistoricEventNotifications(idCalendario, mockreq);
+		NotificacionEventoDTO notificacionEventoDTOResultado = datosNotificacionesServiceImpl.getHistoricCalendarNotifications(idCalendario, mockreq);
 
 		NotificacionEventoDTO notificacionEventoDTOEsperado = ageTestUtils.getNotificacionEventoDTOSimulado();
 		

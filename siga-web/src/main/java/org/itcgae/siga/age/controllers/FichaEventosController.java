@@ -7,6 +7,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
+import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.form.AsistenciaCursoDTO;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -97,5 +98,17 @@ public class FichaEventosController {
 	ResponseEntity<UpdateResponseDTO> deleteEventCalendar(@RequestBody EventoDTO eventoDTO, HttpServletRequest request) {
 		UpdateResponseDTO response = fichaEventosService.deleteEventCalendar(eventoDTO, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaEventos/getEventNotifications", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<NotificacionEventoDTO> getEventNotifications(String idEvento, HttpServletRequest request) {
+		NotificacionEventoDTO response = fichaEventosService.getEventNotifications(idEvento, request);
+		return new ResponseEntity<NotificacionEventoDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaEventos/getHistoricEventNotifications", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<NotificacionEventoDTO> getHistoricEventNotifications(String idEvento, HttpServletRequest request) {
+		NotificacionEventoDTO response = fichaEventosService.getHistoricEventNotifications(idEvento, request);
+		return new ResponseEntity<NotificacionEventoDTO>(response, HttpStatus.OK);
 	}
 }
