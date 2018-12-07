@@ -33,7 +33,6 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 		sql.SELECT("persona.NIFCIF as NIFCIF");
 		sql.SELECT("persona.FECHANACIMIENTO as FECHANACIMIENTO");
 		sql.SELECT("tipoSancion.DESCRIPCION as TIPOSANCION");
-		sql.SELECT("sancion.REFCGAE as REFCONSEJO");
 		sql.SELECT("sancion.REFCOLEGIO as REFCOLEGIO");
 		sql.SELECT("sancion.FECHAINICIO as FECHAINICIO");
 		sql.SELECT("sancion.FECHAFIN as FECHAFIN");

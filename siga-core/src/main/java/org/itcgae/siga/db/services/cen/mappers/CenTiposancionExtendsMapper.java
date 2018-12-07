@@ -34,8 +34,6 @@ public interface CenTiposancionExtendsMapper extends CenTiposancionMapper{
 		@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOSANCION", property = "tipoSancion", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "REFCONSEJO", property = "refConsejo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "REFCOLEGIO", property = "refColegio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAINICIO", property = "fechaDesde", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHAFIN", property = "fechaHasta", jdbcType = JdbcType.DATE),

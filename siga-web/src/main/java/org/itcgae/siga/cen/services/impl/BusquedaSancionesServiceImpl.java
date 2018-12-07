@@ -55,7 +55,6 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-		List<ComboItem> comboItemsResult = new ArrayList<ComboItem>();
 
 		LOGGER.info(
 				"getComboTipoSancion() / cenTiposancionExtendsMapper.getComboTipoSancion() -> Entrada a cenTiposancionMapper para obtener los diferentes tipos de sanciones");
@@ -69,19 +68,9 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 			ComboItem comboItem = new ComboItem();
 			comboItem.setLabel("");
 			comboItem.setValue("");
-			comboItemsResult.add(0, comboItem);
+			comboItems.add(0, comboItem);
 
-			for (ComboItem comboItemElem : comboItems) {
-				if (!comboItemElem.getLabel().equals("ARCHIVO") && !comboItemElem.getLabel().equals("SANCIÓN JUDICIAL")
-						&& !comboItemElem.getLabel().equals("SANCIÓN_1")
-						&& !comboItemElem.getLabel().equals("DESCONOCIDA")) {
-					comboItemsResult.add(comboItemElem);
-				}
-
-			}
-
-			comboDTO.setCombooItems(comboItemsResult);
-
+			comboDTO.setCombooItems(comboItems);
 		}
 
 		LOGGER.info("getComboTipoSancion() -> Salida del servicio para obtener los tipos de sanciones");
