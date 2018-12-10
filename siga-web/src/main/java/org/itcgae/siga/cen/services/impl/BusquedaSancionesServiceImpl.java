@@ -1,5 +1,6 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -197,25 +198,43 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 	private CenSancion fillCenSancion(AdmUsuarios usuario, Long idPersona,
 			BusquedaSancionesItem busquedaSancionesItem) {
+		
 		CenSancion cenSancion = new CenSancion();
 
+		cenSancion.setIdsancion(Long.valueOf(busquedaSancionesItem.getIdSancion()));
+		
 		if (busquedaSancionesItem.getTipoSancion() != null) {
 			cenSancion.setIdtiposancion(Short.valueOf(busquedaSancionesItem.getTipoSancion()));
 		}
 
-		cenSancion.setRefcolegio(busquedaSancionesItem.getRefColegio());
+		if(busquedaSancionesItem.getRefColegio() != null) {
+			cenSancion.setRefcolegio(busquedaSancionesItem.getRefColegio());
+		}
 
-		cenSancion.setFechaacuerdo(busquedaSancionesItem.getFechaAcuerdo());
+		if(busquedaSancionesItem.getFechaAcuerdoDate() != null) {
+			cenSancion.setFechaacuerdo(busquedaSancionesItem.getFechaAcuerdoDate());
+		}
 
-		cenSancion.setFechafirmeza(busquedaSancionesItem.getFechaFirmeza());
+		if(busquedaSancionesItem.getFechaFirmezaDate() != null) {
+			cenSancion.setFechafirmeza(busquedaSancionesItem.getFechaFirmezaDate());
+		}
 
-		cenSancion.setFechainicio(busquedaSancionesItem.getFechaDesde());
+		if(busquedaSancionesItem.getFechaDesdeDate() != null) {
+			cenSancion.setFechainicio(busquedaSancionesItem.getFechaDesdeDate());
+		}
 
-		cenSancion.setFechafin(busquedaSancionesItem.getFechaHasta());
+		if(busquedaSancionesItem.getFechaHastaDate() != null) {
+			cenSancion.setFechafin(busquedaSancionesItem.getFechaHastaDate());
+		}
 
-		cenSancion.setFecharehabilitado(busquedaSancionesItem.getFechaRehabilitado());
+		if(busquedaSancionesItem.getFechaRehabilitadoDate() != null) {
+			cenSancion.setFecharehabilitado(busquedaSancionesItem.getFechaRehabilitadoDate());
+		}
 
-		cenSancion.setFechaarchivada(busquedaSancionesItem.getFechaArchivada());
+		
+		if(busquedaSancionesItem.getFechaArchivadaDate() != null) {
+			cenSancion.setFechaarchivada(busquedaSancionesItem.getFechaArchivadaDate());
+		}
 
 		if (busquedaSancionesItem.getFirmeza() != null && busquedaSancionesItem.getFirmeza().equals("Sí")) {
 			cenSancion.setChkfirmeza("1");
@@ -237,13 +256,19 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 			cenSancion.setIdinstitucion(usuario.getIdinstitucion());
 		}
 
-		if (busquedaSancionesItem.getColegio() != null) {
-			cenSancion.setIdinstitucionsancion(Short.valueOf(busquedaSancionesItem.getColegio()));
+		if (busquedaSancionesItem.getIdColegio() != null) {
+			cenSancion.setIdinstitucionsancion(Short.valueOf(busquedaSancionesItem.getIdColegio()));
 		}
 
 		cenSancion.setIdpersona(idPersona);
 
-		cenSancion.setTexto(busquedaSancionesItem.getTexto());
+		if(busquedaSancionesItem.getTexto() != null) {
+			cenSancion.setTexto(busquedaSancionesItem.getTexto());
+		}
+		
+		if(busquedaSancionesItem.getObservaciones() != null) {
+			cenSancion.setObservaciones(busquedaSancionesItem.getObservaciones());
+		}
 
 		if (usuario.getIdusuario() != null) {
 			cenSancion.setUsumodificacion(usuario.getIdusuario());
@@ -254,7 +279,7 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 	@Override
 	public UpdateResponseDTO updateSanction(BusquedaSancionesItem busquedaSancionesItem, HttpServletRequest request) {
-		LOGGER.info("insertSanction() -> Entrada al servicio para insertar una sanción");
+		LOGGER.info("updateSanction() -> Entrada al servicio para insertar una sanción");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 
@@ -267,16 +292,16 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"insertSanction() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateSanction() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
-					"insertSanction() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateSanction() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				LOGGER.info(
-						"insertSanction() / cenSancionExtendsMapper.selectByPrimaryKey() -> Entrada a cenSancionExtendsMapper para ver si existe en la tabla");
+						"updateSanction() / cenSancionExtendsMapper.selectByPrimaryKey() -> Entrada a cenSancionExtendsMapper para ver si existe en la tabla");
 
 				CenSancionKey cenSancionKey = new CenSancionKey();
 				cenSancionKey.setIdinstitucion(usuario.getIdinstitucion());
@@ -285,7 +310,7 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 				CenSancion cenSancion = cenSancionExtendsMapper.selectByPrimaryKey(cenSancionKey);
 				LOGGER.info(
-						"insertSanction() / cenSancionExtendsMapper.selectByPrimaryKey() -> Entrada a cenSancionExtendsMapper para ver si existe en la tabla");
+						"updateSanction() / cenSancionExtendsMapper.selectByPrimaryKey() -> Entrada a cenSancionExtendsMapper para ver si existe en la tabla");
 
 				if (null != cenSancion) {
 
@@ -293,14 +318,14 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 							busquedaSancionesItem);
 
 					LOGGER.info(
-							"insertSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenSancionExtendsMapper para actualizar la sanción");
+							"updateSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenSancionExtendsMapper para actualizar la sanción");
 					int response = cenSancionExtendsMapper.updateByPrimaryKeySelective(cenSancion);
 					LOGGER.info(
-							"insertSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> Salida a cenSancionExtendsMapper para actualizar la sanción");
+							"updateSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> Salida a cenSancionExtendsMapper para actualizar la sanción");
 
 					if (response == 0) {
 						updateResponseDTO.setStatus(SigaConstants.KO);
-						LOGGER.warn("insertSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> "
+						LOGGER.warn("updateSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> "
 								+ updateResponseDTO.getStatus() + ". No se pudo actualizar la sanción");
 					} else {
 						updateResponseDTO.setStatus(SigaConstants.OK);
@@ -312,7 +337,7 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 			}
 		}
 
-		LOGGER.info("insertSanction() -> Salida del servicio para insertar una sanción");
+		LOGGER.info("updateSanction() -> Salida del servicio para insertar una sanción");
 		return updateResponseDTO;
 	}
 

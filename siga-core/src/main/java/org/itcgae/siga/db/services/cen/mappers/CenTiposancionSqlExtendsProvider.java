@@ -29,16 +29,27 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 
 
 		sql.SELECT("DISTINCT institucion.NOMBRE as COLEGIO");
+		sql.SELECT("institucion.IDINSTITUCION as IDCOLEGIO");
+		sql.SELECT("sancion.IDSANCION as IDSANCION");
+		sql.SELECT("persona.IDPERSONA as IDPERSONA");
 		sql.SELECT("concat(persona.NOMBRE || ' ',concat(persona.APELLIDOS1 || ' ', persona.APELLIDOS2))  as NOMBRE");
 		sql.SELECT("persona.NIFCIF as NIFCIF");
-		sql.SELECT("persona.FECHANACIMIENTO as FECHANACIMIENTO");
+		sql.SELECT("TO_CHAR(persona.FECHANACIMIENTO,'DD/MM/YYYY') as FECHANACIMIENTO");
+		sql.SELECT("persona.FECHANACIMIENTO as FECHANACIMIENTODATE");
 		sql.SELECT("tipoSancion.DESCRIPCION as TIPOSANCION");
 		sql.SELECT("sancion.REFCOLEGIO as REFCOLEGIO");
-		sql.SELECT("sancion.FECHAINICIO as FECHAINICIO");
-		sql.SELECT("sancion.FECHAFIN as FECHAFIN");
+		sql.SELECT("TO_CHAR(sancion.FECHAINICIO,'DD/MM/YYYY') as FECHAINICIO");
+		sql.SELECT("sancion.FECHAINICIO as FECHAINICIODATE");
+		sql.SELECT("TO_CHAR(sancion.FECHAFIN,'DD/MM/YYYY') as FECHAFIN");
+		sql.SELECT("sancion.FECHAFIN as FECHAFINDATE");
+		sql.SELECT("TO_CHAR(sancion.FECHAFIRMEZA,'DD/MM/YYYY') as FECHAFIRMEZA");
+		sql.SELECT("sancion.FECHAFIRMEZA as FECHAFIRMEZADATE");
+		sql.SELECT("TO_CHAR(sancion.FECHAACUERDO,'DD/MM/YYYY') as FECHAACUERDO");
+		sql.SELECT("sancion.FECHAACUERDO as FECHAACUERDODATE");
+		sql.SELECT("TO_CHAR(sancion.FECHAREHABILITADO,'DD/MM/YYYY') as FECHAREHABILITADO");
+		sql.SELECT("sancion.FECHAREHABILITADO as FECHAREHABILITADODATE");
 		sql.SELECT("decode(sancion.CHKREHABILITADO,0,'No', 'Sí') as REHABILITADO");
 		sql.SELECT("decode(sancion.CHKFIRMEZA,0,'No', 'Sí') as FIRMEZA");
-
 
 		sql.FROM("CEN_SANCION sancion");
 
@@ -57,15 +68,15 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 		}
 
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getNombre())) {
-			sql.WHERE("persona.NOMBRE = '" + busquedaSancionesSearchDTO.getNombre() + "'");
+			sql.WHERE(filtroTextoBusquedas("persona.NOMBRE", busquedaSancionesSearchDTO.getNombre()));
 		}
 		
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getPrimerApellido())) {
-			sql.WHERE("persona.APELLIDOS1 = '" + busquedaSancionesSearchDTO.getPrimerApellido() + "'");
+			sql.WHERE(filtroTextoBusquedas("persona.APELLIDOS1", busquedaSancionesSearchDTO.getPrimerApellido()));
 		}
 		
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getSegundoApellido())) {
-			sql.WHERE("persona.APELLIDOS2 = '" + busquedaSancionesSearchDTO.getSegundoApellido() + "'");
+			sql.WHERE(filtroTextoBusquedas("persona.APELLIDOS2", busquedaSancionesSearchDTO.getSegundoApellido()));
 		}
 		
 		
@@ -95,30 +106,34 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 		
 		if (null != busquedaSancionesSearchDTO.getFechaDesde()) {
 			String fechaDesde = dateFormat.format(busquedaSancionesSearchDTO.getFechaDesde());
-			sql.WHERE("sancion.FECHAINICIO >= TO_DATE('" + fechaDesde + "', 'DD/MM/YYYY') ");
+			sql.WHERE("TO_DATE(sancion.FECHAINICIO) >= TO_DATE('" + fechaDesde + "', 'DD/MM/YYYY') ");
 		}
 		
 		if (null != busquedaSancionesSearchDTO.getFechaHasta()) {
 			String fechaHasta = dateFormat.format(busquedaSancionesSearchDTO.getFechaHasta());
-			sql.WHERE("sancion.FECHAFIN <= TO_DATE('" + fechaHasta + "', 'DD/MM/YYYY') ");
+			sql.WHERE("TO_DATE(sancion.FECHAFIN) <= TO_DATE('" + fechaHasta + "', 'DD/MM/YYYY') ");
 		}
 		
 		if(busquedaSancionesSearchDTO.getChkArchivadas()) {
-			sql.WHERE("sancion.CHKARCHIVADA = '" + busquedaSancionesSearchDTO.getChkArchivadas()  + "'");
+			sql.WHERE("sancion.CHKARCHIVADA = 1");
+		}else {
+			sql.WHERE("sancion.CHKARCHIVADA = 0");
 		}
 		
 		if(busquedaSancionesSearchDTO.getChkRehabilitados()) {
-			sql.WHERE("sancion.CHKREHABILITADO = '" + busquedaSancionesSearchDTO.getChkRehabilitados()  + "'");
+			sql.WHERE("sancion.CHKREHABILITADO = 1");
+		}else {
+			sql.WHERE("sancion.CHKREHABILITADO = 0");
 		}
 		
 		if (null != busquedaSancionesSearchDTO.getFechaArchivadaDesde()) {
 			String fechaArcDesde = dateFormat.format(busquedaSancionesSearchDTO.getFechaArchivadaDesde());
-			sql.WHERE("sancion.FECHAARCHIVADA >= TO_DATE('" + fechaArcDesde + "', 'DD/MM/YYYY') ");
+			sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) >= TO_DATE('" + fechaArcDesde + "', 'DD/MM/YYYY') ");
 		}
 		
 		if (null != busquedaSancionesSearchDTO.getFechaArchivadaHasta()) {
 			String fechaArcHasta = dateFormat.format(busquedaSancionesSearchDTO.getFechaArchivadaHasta());
-			sql.WHERE("sancion.FECHAARCHIVADA <= TO_DATE('" + fechaArcHasta + "', 'DD/MM/YYYY') ");
+			sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) <= TO_DATE('" + fechaArcHasta + "', 'DD/MM/YYYY') ");
 		}
 		
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getTipo())) {
@@ -129,5 +144,14 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 		
 		return sql.toString();
 	}
+	
+	public static String filtroTextoBusquedas(String columna, String cadena) {
+		StringBuilder cadenaWhere = new StringBuilder();
+		cadenaWhere.append(" (TRANSLATE(LOWER( " + columna + "),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') ");
+		cadenaWhere.append(" LIKE");
+		cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena + "%'),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz')) ");
+		return cadenaWhere.toString();
+		
+	} 
 
 }
