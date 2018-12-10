@@ -293,19 +293,20 @@ public class DatosNotificacionesServiceTest {
 	
 	@Test
 	public void getCalendarNotificationsTest() throws Exception {
-
 		Short idInstitucion = 2000;
 		String idCalendario = "1";
 		String idLenguaje = "1";
 		List<NotificacionEventoItem> eventNotifications = ageTestUtils.getListNotificacionEventoItem();
+		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
 
+		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(ageNotificacioneseventoExtendsMapper.getCalendarNotifications(idCalendario, idInstitucion.toString(), idLenguaje)).thenReturn(eventNotifications);
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
 		NotificacionEventoDTO notificacionEventoDTOResultado = datosNotificacionesServiceImpl.getCalendarNotifications(idCalendario, mockreq);
-
-		NotificacionEventoDTO notificacionEventoDTOEsperado = ageTestUtils.getNotificacionEventoDTOSimulado();
+		NotificacionEventoDTO notificacionEventoDTOEsperado = new NotificacionEventoDTO();
+		notificacionEventoDTOEsperado.setEventNotificationItems(eventNotifications);
 		
 		assertThat(notificacionEventoDTOResultado).isEqualTo(notificacionEventoDTOEsperado);
 
@@ -318,6 +319,9 @@ public class DatosNotificacionesServiceTest {
 		String idCalendario = "1";
 		String idLenguaje = "1";
 		List<NotificacionEventoItem> eventNotifications = ageTestUtils.getListNotificacionEventoItem();
+		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
+
+		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 
 		when(ageNotificacioneseventoExtendsMapper.getHistoricCalendarNotifications(idCalendario, idInstitucion.toString(), idLenguaje)).thenReturn(eventNotifications);
 

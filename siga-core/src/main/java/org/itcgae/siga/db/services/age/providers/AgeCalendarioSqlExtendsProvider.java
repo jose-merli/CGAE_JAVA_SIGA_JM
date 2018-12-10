@@ -60,6 +60,36 @@ public class AgeCalendarioSqlExtendsProvider extends  AgeCalendarioSqlProvider{
 		return sql2.toString();
 	}
 	
+	public String getCalendarioPermiso(Short idInstitucion, String perfiles, Long idCalendario) {
+		
+		SQL sql = new SQL();
+
+		sql.SELECT("AGE.IDCALENDARIO");
+		sql.SELECT("AGE.IDINSTITUCION");
+		sql.SELECT("AGE.DESCRIPCION");
+		sql.SELECT("AGE.USUMODIFICACION");
+		sql.SELECT("AGE.FECHAMODIFICACION");
+		sql.SELECT("AGE.FECHABAJA");
+		sql.SELECT("AGE.IDTIPOCALENDARIO");
+		sql.SELECT("AGE.COLOR");
+		sql.SELECT("NVL(DECODE(MIN(DECODE(AGE_PER.TIPOACCESO,0,5,AGE_PER.TIPOACCESO)),5,0,MIN(DECODE(AGE_PER.TIPOACCESO,0,5,AGE_PER.TIPOACCESO))),0) AS TIPOACCESO");
+		
+		sql.FROM("AGE_CALENDARIO AGE");
+		sql.LEFT_OUTER_JOIN("AGE_PERMISOSCALENDARIO AGE_PER ON AGE.IDCALENDARIO = AGE_PER.IDCALENDARIO AND AGE_PER.IDPERFIL IN (" + perfiles + ")");
+		
+		sql.WHERE("AGE.IDINSTITUCION = '" + String.valueOf(idInstitucion) + "'");
+		sql.WHERE("AGE.IDCALENDARIO = '" + String.valueOf(idCalendario) + "'");
+		
+		sql.GROUP_BY("AGE.IDCALENDARIO, AGE.IDINSTITUCION, AGE.DESCRIPCION, AGE.USUMODIFICACION, AGE.FECHAMODIFICACION, AGE.FECHABAJA, AGE.IDTIPOCALENDARIO, AGE.COLOR");
+		
+		SQL sql2 = new SQL();
+		sql2.SELECT("*");
+		sql2.FROM("(" + sql.toString() + ")");
+		sql2.WHERE("TIPOACCESO > 1");
+
+		return sql2.toString();
+	}
+	
 	public String getCalendarioEventos(Short idInstitucion, String perfiles, String idCalendario) {
 		
 		SQL sql = new SQL();
@@ -76,6 +106,7 @@ public class AgeCalendarioSqlExtendsProvider extends  AgeCalendarioSqlProvider{
 		sql.SELECT("EVENTO.LUGAR");
 		sql.SELECT("EVENTO.DESCRIPCION");
 		sql.SELECT("EVENTO.RECURSOS");
+		sql.SELECT("'1' AS ALLDAY");
 		sql.SELECT("NVL(DECODE(MIN(DECODE(AGE_PER.TIPOACCESO,0,5,AGE_PER.TIPOACCESO)),5,0,MIN(DECODE(AGE_PER.TIPOACCESO,0,5,AGE_PER.TIPOACCESO))),0) AS TIPOACCESO");
 		sql.SELECT("REP.FECHAFIN AS FECHAFINREPETICION");
 		sql.SELECT("REP.FECHAINICIO AS FECHAINICIOREPETICION");
