@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
-import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.mappers.CenColegiadoSqlProvider;
@@ -220,7 +219,107 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		return sql.toString();
 	}
 	
-	
+	public String updateColegiado(CenColegiado record) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		
+		/*if(nu
+		 * 
+		 */
+		SQL sql = new SQL();
+		sql.UPDATE("CEN_COLEGIADO");
+		if (record.getFechapresentacion() != null) {
+//			sql.SET("FECHAPRESENTACION = "+record.getFechapresentacion()+"");
+			String fechaF = dateFormat.format(record.getFechapresentacion());
+			sql.SET("FECHAPRESENTACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+		}else {
+			sql.SET("FECHAPRESENTACION = "+record.getFechapresentacion()+"");
+		}
+		if (record.getFechaincorporacion() != null) {
+			String fechaF = dateFormat.format(record.getFechaincorporacion());
+			sql.SET("FECHAINCORPORACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+		}else {
+			sql.SET("FECHAINCORPORACION = "+record.getFechaincorporacion()+"");
+		}
+		if (record.getIndtitulacion() != null) {
+			sql.SET("INDTITULACION = "+record.getIndtitulacion()+"");
+		}
+		if (record.getJubilacioncuota() != null) {
+			sql.SET("JUBILACIONCUOTA = "+record.getIndtitulacion()+"");
+		}
+		if (record.getSituacionejercicio() != null) {
+			sql.SET("SITUACIONEJERCICIO = "+record.getSituacionejercicio()+"");
+		}
+		if (record.getSituacionresidente() != null) {
+			sql.SET("SITUACIONRESIDENTE = "+record.getSituacionresidente() +"");
+		}
+		if (record.getSituacionempresa() != null) {
+			sql.SET("SITUACIONEMPRESA = "+record.getSituacionempresa()+"");
+		}
+		if (record.getFechamodificacion() != null) {
+			String fechaF = dateFormat.format(record.getFechamodificacion());
+			sql.SET("FECHAMODIFICACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+		}else {
+			sql.SET("FECHAMODIFICACION = "+record.getFechamodificacion()+"");
+		}
+		if (record.getUsumodificacion() != null) {
+			sql.SET("USUMODIFICACION = "+record.getUsumodificacion()+"");
+		}
+		if (record.getComunitario() != null) {
+			sql.SET("COMUNITARIO = "+record.getComunitario() +"");
+		}
+		if (record.getNcolegiado() != null) {
+			sql.SET("NCOLEGIADO = "+record.getNcolegiado()+"");
+		}
+		if (record.getFechajura() != null) {
+			String fechaF = dateFormat.format(record.getFechajura());
+			sql.SET("FECHAJURA = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+		}else {
+			sql.SET("FECHAJURA = "+record.getFechajura()+"");
+		}
+		if (record.getNcomunitario() != null) {
+			sql.SET("NCOMUNITARIO = "+record.getNcomunitario()+"");
+		}
+		if (record.getFechatitulacion() != null) {
+			String fechaF = dateFormat.format(record.getFechatitulacion());
+			sql.SET("FECHATITULACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+		}else {
+			sql.SET("FECHATITULACION = "+record.getFechatitulacion() +"");
+		}
+		if (record.getOtroscolegios() != null) {
+			sql.SET("OTROSCOLEGIOS = "+record.getOtroscolegios()+"");
+		}
+		if (record.getFechadeontologia() != null) {
+			String fechaF = dateFormat.format(record.getFechadeontologia());
+			sql.SET("FECHADEONTOLOGIA = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+		}else {
+			sql.SET("FECHADEONTOLOGIA = "+record.getFechadeontologia()+"");
+		}
+		if (record.getFechamovimiento() != null) {
+			String fechaF = dateFormat.format(record.getFechamovimiento());
+			sql.SET("FECHAMOVIMIENTO = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+		}else {
+			sql.SET("FECHAMOVIMIENTO = "+record.getFechamovimiento()+"");
+		}
+		if (record.getIdtiposseguro() != null) {
+			sql.SET("IDTIPOSSEGURO = "+record.getIdtiposseguro()+"");
+		}
+		if (record.getCuentacontablesjcs() != null) {
+			sql.SET("CUENTACONTABLESJCS = "+record.getCuentacontablesjcs()+"");
+		}
+		if (record.getIdentificadords() != null) {
+			sql.SET("IDENTIFICADORDS = "+record.getIdentificadords()+"");
+		}
+		if (record.getNmutualista() != null) {
+			sql.SET("NMUTUALISTA = "+record.getNmutualista()+"");
+		}
+		if (record.getNumsolicitudcolegiacion() != null) {
+			sql.SET("NUMSOLICITUDCOLEGIACION = "+record.getNumsolicitudcolegiacion()+"");
+		}
+		sql.WHERE("IDINSTITUCION = "+record.getIdinstitucion()+"");
+		sql.WHERE("IDPERSONA = "+record.getIdpersona()+"");
+		return sql.toString();
+	}
+
 	
 	public String selectColegiaciones(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem) {
 

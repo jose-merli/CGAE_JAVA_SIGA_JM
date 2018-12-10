@@ -47,6 +47,20 @@ public interface AgeCalendarioExtendsMapper extends AgeCalendarioMapper{
 	})
 	List<CalendarItem> getCalendariosPermisos(Short idInstitucion, String perfiles);
 	
+	@SelectProvider(type = AgeCalendarioSqlExtendsProvider.class, method = "getCalendarioPermiso")
+	@Results({
+		@Result(column = "IDCALENDARIO", property = "idCalendario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "USUMODIFICACION", property = "usuModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOCALENDARIO", property = "idTipoCalendario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "COLOR", property = "color", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOACCESO", property = "tipoAcceso", jdbcType = JdbcType.NUMERIC),
+	})
+	CalendarItem getCalendarioPermiso(Short idInstitucion, String perfiles, Long idCalendario);
+	
 	
 	@SelectProvider(type = AgeCalendarioSqlExtendsProvider.class, method = "getCalendarioEventos")
 	@Results({
@@ -59,6 +73,7 @@ public interface AgeCalendarioExtendsMapper extends AgeCalendarioMapper{
 		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TITULO", property = "titulo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "LUGAR", property = "lugar", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ALLDAY", property = "allDay", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "RECURSOS", property = "recursos", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOACCESO", property = "tipoAcceso", jdbcType = JdbcType.NUMERIC),

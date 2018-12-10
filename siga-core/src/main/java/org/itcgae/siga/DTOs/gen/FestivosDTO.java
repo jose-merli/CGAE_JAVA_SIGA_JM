@@ -1,4 +1,4 @@
-﻿package org.itcgae.siga.DTOs.gen;
+package org.itcgae.siga.DTOs.gen;
 
 
 import java.util.ArrayList;

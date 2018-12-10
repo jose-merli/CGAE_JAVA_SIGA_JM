@@ -128,7 +128,9 @@ public class ClientMutualidad {
 		
 		webServiceTemplate.setDefaultUri(uriService);
 		
-		GetEnumsResponseDocumentImpl responseWS = (GetEnumsResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
+		GetEnumsResponseDocumentImpl responseWS = (GetEnumsResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
+		
+		/*GetEnumsResponseDocumentImpl responseWS = (GetEnumsResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
 			
 			@Override
 	        public void doWithMessage(WebServiceMessage message) {
@@ -150,7 +152,7 @@ public class ClientMutualidad {
 	            	LOGGER.warn("Error en la llamada al servicio getEnums: " + e.getMessage());
 	            }
 	        }
-	    });
+	    });*/
 		
 		IntegracionEnumsCombos response =responseWS.getGetEnumsResponse().getGetEnumsResult();
 		
