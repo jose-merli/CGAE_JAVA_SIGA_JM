@@ -213,7 +213,6 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				CenColegiado colegiado = new CenColegiado();
 				colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
 				colegiado.setIdinstitucion(idInstitucion);
-				colegiado.setFechamodificacion(new Date());
 				colegiado.setUsumodificacion(usuario.getIdusuario());
 				colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
 				colegiado.setIdtiposseguro(Short.parseShort(colegiadoItem.getIdTiposSeguro()));
@@ -223,17 +222,20 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				if(colegiadoItem.getComunitario()!=null) {
 					colegiado.setComunitario(colegiadoItem.getComunitario());
 				}
-				colegiado.setNmutualista(colegiadoItem.getnMutualista());
-				if(colegiadoItem.getIncorporacionDate()!=null) {
-				colegiado.setFechaincorporacion(colegiadoItem.getIncorporacionDate());
+				if(colegiadoItem.getnMutualista() != null && colegiadoItem.getnMutualista() != "") {
+					colegiado.setNmutualista(colegiadoItem.getnMutualista());
+				}else {
+					colegiado.setNmutualista(null);
 				}
-				if(colegiadoItem.getFechapresentacionDate()!=null) {
-				colegiado.setFechapresentacion(colegiadoItem.getFechapresentacionDate());
-				}
-				colegiado.setFechajura(colegiadoItem.getFechaJuraDate());
-				colegiado.setFechatitulacion(colegiadoItem.getFechaTitulacionDate());
 				
-				int responseUpdate = cenColegiadoExtendsMapper.updateByPrimaryKeySelective(colegiado);
+				colegiado.setFechaincorporacion(colegiadoItem.getIncorporacionDate());
+				colegiado.setFechatitulacion(colegiadoItem.getFechaTitulacionDate());
+				colegiado.setFechapresentacion(colegiadoItem.getFechapresentacionDate());
+				colegiado.setFechajura(colegiadoItem.getFechaJuraDate());
+				
+				colegiado.setFechamodificacion(new Date());
+
+				int responseUpdate = cenColegiadoExtendsMapper.updateColegiado(colegiado);
 				LOGGER.info(
 						"datosColegialesUpdate() / CenColegiadoExtendsMapper.selectDirecciones() -> Salida de CenColegiadoExtendsMapper para actualización de Colegiados");
 

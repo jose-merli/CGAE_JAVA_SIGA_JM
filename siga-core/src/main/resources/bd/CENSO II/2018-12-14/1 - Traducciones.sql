@@ -1,0 +1,4 @@
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.ws.literal.residenteInscrito','Residente / Inscrito','0','1',to_date('20/11/13','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.ws.literal.residenteInscrito','Resident / Inscrit','0','2',to_date('20/11/13','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.ws.literal.residenteInscrito','Residente / Inscrito#EU','0','3',to_date('20/11/13','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.ws.literal.residenteInscrito','Residente / Inscrito#GL','0','4',to_date('20/11/13','DD/MM/RR'),'0','19');
