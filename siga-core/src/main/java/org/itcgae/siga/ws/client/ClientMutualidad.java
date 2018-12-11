@@ -1,11 +1,33 @@
 package org.itcgae.siga.ws.client;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPConstants;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 
+import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.log4j.Logger;
 import org.datacontract.schemas._2004._07.IntegracionEnumsCombos;
 import org.datacontract.schemas._2004._07.IntegracionSolicitudRespuesta;
@@ -16,7 +38,10 @@ import org.springframework.ws.client.core.WebServiceMessageCallback;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.soap.SoapHeader;
 import org.springframework.ws.soap.SoapMessage;
+import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
+import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 import org.springframework.xml.transform.StringSource;
+import org.springframework.ws.transport.http.HttpComponentsMessageSender.RemoveSoapHeadersInterceptor;
 
 import samples.servicemodel.microsoft.EstadoMutualistaDocument;
 import samples.servicemodel.microsoft.EstadoSolicitudDocument;
@@ -127,6 +152,16 @@ public class ClientMutualidad {
 		
 		
 		webServiceTemplate.setDefaultUri(uriService);
+		HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
+		
+		SSLContext ssl = SSLContext.getDefault();
+		SSLConnectionSocketFactory sSLConnectionSocketFactory = new SSLConnectionSocketFactory(ssl, NoopHostnameVerifier.INSTANCE);
+		HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sSLConnectionSocketFactory).addInterceptorFirst(new RemoveSoapHeadersInterceptor()).build();
+		MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+		SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
+		messageSender.setHttpClient(httpClient);
+		webServiceTemplate.setMessageSender(messageSender);
+		webServiceTemplate.setMessageFactory(newSoapMessageFactory);
 		//System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
 		
 		
