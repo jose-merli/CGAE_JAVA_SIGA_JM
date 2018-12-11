@@ -1,6 +1,6 @@
 package org.itcgae.siga.com.services.impl;
 
-import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -36,7 +36,6 @@ import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvioExample;
 import org.itcgae.siga.db.entities.EnvPlantillaremitentes;
 import org.itcgae.siga.db.entities.EnvPlantillaremitentesExample;
-import org.itcgae.siga.db.entities.EnvPlantillaremitentesKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
@@ -48,6 +47,7 @@ import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillaremitentesMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDocumentosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
@@ -112,6 +112,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	@Autowired
 	private EnvEnviosgrupoclienteMapper _envEnviosgrupoclienteMapper;
+	
+	@Autowired
+	private CenGruposclienteClienteExtendsMapper _cenGruposclienteClienteExtendsMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -576,7 +579,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					keyEnvio.setIdinstitucion(idInstitucion);
 					EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio);
 					Long idEnvio = envio.getIdenvio();
-					NewIdDTO newID = _envEnviosExtendsMapper.selectMaxIDEnvio();
+					//NewIdDTO newID = _envEnviosExtendsMapper.selectMaxIDEnvio();
 					//Long idEnvioNuevo = Long.parseLong(newID.getNewId());
 					//envio.setIdenvio(idEnvioNuevo);
 					envio.setIdplantillaenvios(plantillaEnvio.getIdplantillaenvios());
@@ -700,6 +703,47 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 		
 		LOGGER.info("obtenerDocumentosEnvio() -> Salida del servicio para obtener documento de envio");
 		return response;
+	}
+
+	@Override
+	public ComboDTO obtenerEtiquetas(HttpServletRequest request) {
+		
+		LOGGER.info("obtenerEtiquetas() -> Entrada al servicio para obtener combo etiquetas");
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+				comboItems = _cenGruposclienteClienteExtendsMapper.selectGruposEtiquetas(usuario.getIdlenguaje(), idInstitucion.toString());
+				/*if(null != comboItems && comboItems.size() > 0) {
+					ComboItem element = new ComboItem();
+					element.setLabel("");
+					element.setValue("");
+					comboItems.add(0, element);
+				}*/		
+				
+				comboDTO.setCombooItems(comboItems);
+				
+			}
+		}
+		
+		
+		LOGGER.info("obtenerEtiquetas() -> Salida del servicio para obtener combo etiquetas");
+		
+		
+		return comboDTO;
 	}
 	
 }

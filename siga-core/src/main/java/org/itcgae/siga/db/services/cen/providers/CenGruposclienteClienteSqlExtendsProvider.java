@@ -45,6 +45,18 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		return sql.toString();
 	}
 	
+	public String selectGrupos(String idlenguaje, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("GRUCLI.idgrupo");
+		sql.SELECT("GENR.descripcion");
+		sql.FROM("CEN_GRUPOSCLIENTE GRUCLI");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO AND GENR.idLenguaje = '"+idlenguaje+"'");
+		sql.WHERE("GRUCLI.idinstitucion = '"+idInstitucion+"'");
+		sql.ORDER_BY("GENR.descripcion");
+		return sql.toString();
+	}
+	
 	public String insertSelectiveForUpdateLegalPerson(EtiquetaUpdateDTO etiquetaUpdateDTO, String idInstitucion, String grupo, String idUsuario) {
 		SQL sql = new SQL();
 		
