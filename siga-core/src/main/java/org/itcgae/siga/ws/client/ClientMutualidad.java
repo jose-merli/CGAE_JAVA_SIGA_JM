@@ -127,6 +127,8 @@ public class ClientMutualidad {
 		
 		
 		webServiceTemplate.setDefaultUri(uriService);
+		//System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
+		
 		
 		GetEnumsResponseDocumentImpl responseWS = (GetEnumsResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
 		
