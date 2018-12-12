@@ -15,6 +15,7 @@ import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
+import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -775,6 +776,61 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 		
 		
 		return comboDTO;
+	}
+
+	@Override
+	public Error guardarEtiquetasEnvio(HttpServletRequest request, TarjetaEtiquetasDTO etiquetasDTO) {
+		
+		LOGGER.info("guardarEtiquetasEnvio() -> Entrada al servicio para guardar datos etiquetas");
+		
+		Error respuesta = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					
+					//borramos las etiquetas no seleccionadas
+					for (int i = 0; i < etiquetasDTO.getEtiquetasNoSeleccionadas().length; i++) {
+						EnvEnviosgrupoclienteExample example = new EnvEnviosgrupoclienteExample();
+						example.createCriteria().andIdenvioEqualTo(Long.valueOf(etiquetasDTO.getIdEnvio())).andIdgrupoEqualTo(Short.valueOf(etiquetasDTO.getEtiquetasNoSeleccionadas()[i]));
+						_envEnviosgrupoclienteMapper.deleteByExample(example);
+					}
+					
+					//añadimos las etiquetas seleccionadas
+					for (int i = 0; i < etiquetasDTO.getEtiquetasNoSeleccionadas().length; i++) {
+						EnvEnviosgrupocliente etiqueta = new EnvEnviosgrupocliente();
+						etiqueta.setIdenvio(Long.valueOf(etiquetasDTO.getIdEnvio()));
+						etiqueta.setFechamodificacion(new Date());
+						etiqueta.setIdgrupo(Short.valueOf(etiquetasDTO.getEtiquetasSeleccionadas()[i]));
+						etiqueta.setUsumodificacion(usuario.getIdusuario());
+						_envEnviosgrupoclienteMapper.insert(etiqueta);
+					}
+					
+					
+					respuesta.setCode(200);
+					respuesta.setDescription("Datos etiquetas de envio guardados correctamente");
+					respuesta.setMessage("Updates correcto");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error");
+				}
+				
+				
+			}
+		}
+		LOGGER.info("guardarEtiquetasEnvio() -> Salida del servicio para guardar datos etiquetas");
+		return respuesta;
 	}
 	
 }

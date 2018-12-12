@@ -5,12 +5,12 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
-import org.itcgae.siga.DTOs.com.EnvioMasivoCancelarDto;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
+import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/enviosMasivos")
@@ -152,5 +153,26 @@ public class EnviosMasivosController {
 		else
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@RequestMapping(value = "/detalle/guardarEtiquetas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardarEtiquetasEnvio(HttpServletRequest request, @RequestBody TarjetaEtiquetasDTO tarjetaEtiquetas) {
+		
+		Error response = _enviosMasivosService.guardarEtiquetasEnvio(request, tarjetaEtiquetas);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	/*@RequestMapping(value = "/detalle/subirDocumento",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<ComboDTO> obtenerEtiquetasEnvio(MultipartHttpServletRequest request) throws Exception{
+		
+		ComboDTO response = _enviosMasivosService.obtenerEtiquetasEnvio(request);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}*/
+
 
 }
