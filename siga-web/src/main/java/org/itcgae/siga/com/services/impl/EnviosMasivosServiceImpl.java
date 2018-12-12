@@ -50,6 +50,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDocumentosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvEnviosGrupoClienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvHistoricoEstadoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
@@ -115,6 +116,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	@Autowired
 	private CenGruposclienteClienteExtendsMapper _cenGruposclienteClienteExtendsMapper;
+	
+	@Autowired
+	private EnvEnviosGrupoClienteExtendsMapper _envEnviosGrupoClienteExtendsMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -727,13 +731,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 
 				AdmUsuarios usuario = usuarios.get(0);
 				comboItems = _cenGruposclienteClienteExtendsMapper.selectGruposEtiquetas(usuario.getIdlenguaje(), idInstitucion.toString());
-				/*if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}*/		
-				
 				comboDTO.setCombooItems(comboItems);
 				
 			}
@@ -741,6 +738,40 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 		
 		
 		LOGGER.info("obtenerEtiquetas() -> Salida del servicio para obtener combo etiquetas");
+		
+		
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO obtenerEtiquetasEnvio(HttpServletRequest request, String idEnvio) {
+		
+		LOGGER.info("obtenerEtiquetasEnvio() -> Entrada al servicio para obtener las etiquetas de un envio");
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+				comboItems = _envEnviosGrupoClienteExtendsMapper.getGruposEnvio(idEnvio, usuario.getIdlenguaje(), idInstitucion);
+				comboDTO.setCombooItems(comboItems);
+				
+			}
+		}
+		
+		
+		LOGGER.info("obtenerEtiquetasEnvio() -> Salida del servicio para obtener las etiquetas de un envio");
 		
 		
 		return comboDTO;

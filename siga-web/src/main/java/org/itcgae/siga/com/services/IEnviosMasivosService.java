@@ -19,6 +19,7 @@ public interface IEnviosMasivosService {
 	public ComboDTO tipoEnvio(HttpServletRequest request);
 	public ComboDTO nombrePlantillas(HttpServletRequest request, String idTipoEnvio);
 	public ComboDTO obtenerEtiquetas(HttpServletRequest request);
+	public ComboDTO obtenerEtiquetasEnvio(HttpServletRequest request, String idEnvio);
 	public EnviosMasivosDTO enviosMasivosSearch(HttpServletRequest request, EnviosMasivosSearch filtros);
 	public Error programarEnvio (HttpServletRequest request, EnviosMasivosItem[] envioProgramarDto);
 	public Error cancelarEnvios (HttpServletRequest request, EnvioProgramadoDto[] enviosProgramadosDto);
