@@ -1,8 +1,14 @@
 package org.itcgae.siga.com.services.impl;
 
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +20,7 @@ import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
+import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -60,6 +67,8 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 
 
@@ -807,7 +816,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					}
 					
 					//añadimos las etiquetas seleccionadas
-					for (int i = 0; i < etiquetasDTO.getEtiquetasNoSeleccionadas().length; i++) {
+					for (int i = 0; i < etiquetasDTO.getEtiquetasSeleccionadas().length; i++) {
 						EnvEnviosgrupocliente etiqueta = new EnvEnviosgrupocliente();
 						etiqueta.setIdenvio(Long.valueOf(etiquetasDTO.getIdEnvio()));
 						etiqueta.setFechamodificacion(new Date());
@@ -830,6 +839,116 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 			}
 		}
 		LOGGER.info("guardarEtiquetasEnvio() -> Salida del servicio para guardar datos etiquetas");
+		return respuesta;
+	}
+
+	@Override
+	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request) throws IOException {
+		LOGGER.info("uploadFile() -> Entrada al servicio para subir un documento de envio");
+		
+		ResponseDocumentoDTO response = new ResponseDocumentoDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				
+				
+				// crear path para almacenar el fichero
+				String pathFichero = "/FILERMSA1000/SIGA/ficheros/archivo/" + String.valueOf(idInstitucion) + "/documentosEnvio/";
+				
+				// 1. Coger archivo del request
+				LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
+				Iterator<String> itr = request.getFileNames();
+				MultipartFile file = request.getFile(itr.next());
+				String fileName = file.getOriginalFilename();
+				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+				BufferedOutputStream stream = null;
+				try {
+					File aux = new File(pathFichero);
+					// creo directorio si no existe
+					aux.mkdirs();
+					File serverFile = new File(pathFichero, fileName);
+					stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+					stream.write(file.getBytes());
+					response.setNombreDocumento(fileName);
+					response.setRutaDocumento(pathFichero + fileName);
+				} catch (FileNotFoundException e) {
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					response.setError(error);
+					e.printStackTrace();
+					LOGGER.error("uploadFile() -> Error al buscar el documento de envio en el directorio indicado",e);
+				} catch (IOException ioe) {
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription(ioe.getMessage());
+					response.setError(error);
+					ioe.printStackTrace();
+					LOGGER.error("uploadFile() -> Error al guardar el documento de envio en el directorio indicado",ioe);
+				} finally {
+					// close the stream
+					LOGGER.debug("uploadFile() -> Cierre del stream del documento");
+					stream.close();
+				}
+			}
+		}
+		
+
+		
+		LOGGER.info("uploadFile() -> Salida del servicio para subir un documento de envio");
+		return response;
+	}
+
+	@Override
+	public Error guardarDocumentoEnvio(HttpServletRequest request, ResponseDocumentoDTO documentoDTO) {
+		
+		LOGGER.info("guardarConfiguracion() -> Entrada al servicio para guardar datos tarjeta configuración");
+		
+		Error respuesta = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					EnvDocumentos documento = new EnvDocumentos();
+					documento.setIdinstitucion(idInstitucion);
+					documento.setIdenvio(Long.valueOf(documentoDTO.getIdEnvio()));
+					documento.setPathdocumento(documentoDTO.getRutaDocumento());
+					documento.setDescripcion(documentoDTO.getNombreDocumento());
+					documento.setFechamodificacion(new Date());
+					documento.setUsumodificacion(usuario.getIdusuario());
+					_envDocumentosMapper.insert(documento);
+					
+					respuesta.setCode(200);
+					respuesta.setDescription("Datos configuracion de envio guardados correctamente");
+					respuesta.setMessage("Updates correcto");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error al insertar documento");
+				}
+				
+				
+			}
+		}
+		LOGGER.info("guardarConfiguracion() -> Salida del servicio para guardar datos tarjeta configuración");
 		return respuesta;
 	}
 	

@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
+import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -164,15 +165,24 @@ public class EnviosMasivosController {
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	/*@RequestMapping(value = "/detalle/subirDocumento",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	ResponseEntity<ComboDTO> obtenerEtiquetasEnvio(MultipartHttpServletRequest request) throws Exception{
+	@RequestMapping(value = "/detalle/subirDocumento",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<ResponseDocumentoDTO> uploadFile(MultipartHttpServletRequest request) throws Exception{
 		
-		ComboDTO response = _enviosMasivosService.obtenerEtiquetasEnvio(request);
+		ResponseDocumentoDTO response = _enviosMasivosService.uploadFile(request);
 		if(response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}*/
+			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
+	@RequestMapping(value = "/detalle/guardarDocumentoEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardarDocumentosEnvio(HttpServletRequest request, @RequestBody ResponseDocumentoDTO documento) {
+		
+		Error response = _enviosMasivosService.guardarDocumentoEnvio(request, documento);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }
