@@ -79,7 +79,18 @@ public class ClientMutualidad {
 		
 		webServiceTemplate.setDefaultUri(uriService);
 		
-		EstadoMutualistaResponseDocumentImpl responseWS = (EstadoMutualistaResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
+		HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
+		SSLContext ssl = SSLContext.getDefault();
+		SSLConnectionSocketFactory sSLConnectionSocketFactory = new SSLConnectionSocketFactory(ssl, NoopHostnameVerifier.INSTANCE);
+		HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sSLConnectionSocketFactory).addInterceptorFirst(new RemoveSoapHeadersInterceptor()).build();
+		MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+		SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
+		messageSender.setHttpClient(httpClient);
+		webServiceTemplate.setMessageSender(messageSender);
+		webServiceTemplate.setMessageFactory(newSoapMessageFactory);
+		EstadoMutualistaResponseDocumentImpl responseWS = (EstadoMutualistaResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
+		
+		/*EstadoMutualistaResponseDocumentImpl responseWS = (EstadoMutualistaResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
 			
 			@Override
 			public void doWithMessage(WebServiceMessage message) throws IOException, TransformerException {
@@ -102,7 +113,7 @@ public class ClientMutualidad {
 	            }
 				
 			}
-		});
+		});*/
 		
 		IntegracionSolicitudRespuesta estadoMutualista = responseWS.getEstadoMutualistaResponse().getEstadoMutualistaResult();
 		
@@ -114,8 +125,19 @@ public class ClientMutualidad {
 		
 	
 		webServiceTemplate.setDefaultUri(uriService);
+		HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
+		SSLContext ssl = SSLContext.getDefault();
+		SSLConnectionSocketFactory sSLConnectionSocketFactory = new SSLConnectionSocketFactory(ssl, NoopHostnameVerifier.INSTANCE);
+		HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sSLConnectionSocketFactory).addInterceptorFirst(new RemoveSoapHeadersInterceptor()).build();
+		MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+		SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
+		messageSender.setHttpClient(httpClient);
+		webServiceTemplate.setMessageSender(messageSender);
+		webServiceTemplate.setMessageFactory(newSoapMessageFactory);
 		
-		EstadoSolicitudResponseDocumentImpl responseWS = (EstadoSolicitudResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
+		EstadoSolicitudResponseDocumentImpl responseWS = (EstadoSolicitudResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
+		
+		/*EstadoSolicitudResponseDocumentImpl responseWS = (EstadoSolicitudResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
 			
 			@Override
 			public void doWithMessage(WebServiceMessage message) throws IOException, TransformerException {
@@ -138,7 +160,7 @@ public class ClientMutualidad {
 		            }
 				
 			}
-		});
+		});*/
 
 		
 		IntegracionSolicitudRespuesta estadoMutualista = responseWS.getEstadoSolicitudResponse().getEstadoSolicitudResult();
@@ -152,8 +174,8 @@ public class ClientMutualidad {
 		
 		
 		webServiceTemplate.setDefaultUri(uriService);
+		//configuracion para hacer llamada ssl con el webServiceTemplate
 		HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
-		
 		SSLContext ssl = SSLContext.getDefault();
 		SSLConnectionSocketFactory sSLConnectionSocketFactory = new SSLConnectionSocketFactory(ssl, NoopHostnameVerifier.INSTANCE);
 		HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sSLConnectionSocketFactory).addInterceptorFirst(new RemoveSoapHeadersInterceptor()).build();
@@ -162,11 +184,14 @@ public class ClientMutualidad {
 		messageSender.setHttpClient(httpClient);
 		webServiceTemplate.setMessageSender(messageSender);
 		webServiceTemplate.setMessageFactory(newSoapMessageFactory);
-		//System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
-		
 		
 		GetEnumsResponseDocumentImpl responseWS = (GetEnumsResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
 		
+		
+		
+		
+		
+		//System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
 		/*GetEnumsResponseDocumentImpl responseWS = (GetEnumsResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
 			
 			@Override
@@ -203,14 +228,18 @@ public class ClientMutualidad {
 		
 		
 		webServiceTemplate.setDefaultUri(uriService);
+		//configuracion para hacer llamada ssl con el webServiceTemplate
+		HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
+		SSLContext ssl = SSLContext.getDefault();
+		SSLConnectionSocketFactory sSLConnectionSocketFactory = new SSLConnectionSocketFactory(ssl, NoopHostnameVerifier.INSTANCE);
+		HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sSLConnectionSocketFactory).addInterceptorFirst(new RemoveSoapHeadersInterceptor()).build();
+		MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+		SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
+		messageSender.setHttpClient(httpClient);
+		webServiceTemplate.setMessageSender(messageSender);
+		webServiceTemplate.setMessageFactory(newSoapMessageFactory);
 		
-		MGASolicitudPolizaAccuGratuitosResponseDocumentImpl responseWS = (MGASolicitudPolizaAccuGratuitosResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
-			
-			@Override
-			public void doWithMessage(WebServiceMessage message) throws IOException, TransformerException {
-				
-			}
-		});
+		MGASolicitudPolizaAccuGratuitosResponseDocumentImpl responseWS = (MGASolicitudPolizaAccuGratuitosResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
 
 		
 		IntegracionSolicitudRespuesta response = responseWS.getMGASolicitudPolizaAccuGratuitosResponse().getMGASolicitudPolizaAccuGratuitosResult();
@@ -222,6 +251,16 @@ public class ClientMutualidad {
 	public IntegracionSolicitudRespuesta MGASolicitudPolizaProfesional (GetEstadoColegiadoDocument request , String uriService)throws Exception{
 		
 		webServiceTemplate.setDefaultUri(uriService);
+		//configuracion para hacer llamada ssl con el webServiceTemplate
+		HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
+		SSLContext ssl = SSLContext.getDefault();
+		SSLConnectionSocketFactory sSLConnectionSocketFactory = new SSLConnectionSocketFactory(ssl, NoopHostnameVerifier.INSTANCE);
+		HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sSLConnectionSocketFactory).addInterceptorFirst(new RemoveSoapHeadersInterceptor()).build();
+		MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+		SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
+		messageSender.setHttpClient(httpClient);
+		webServiceTemplate.setMessageSender(messageSender);
+		webServiceTemplate.setMessageFactory(newSoapMessageFactory);
 		
 		MGASolicitudPolizaProfesionalResponseDocumentImpl responseWS = (MGASolicitudPolizaProfesionalResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
 
