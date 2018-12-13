@@ -39,35 +39,6 @@ public class ComunicacionesController {
 			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/programarEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> programarEnvio(HttpServletRequest request, @RequestBody EnviosMasivosItem[] enviosProgramadosDto) {
-		
-		Error response = _comunicacionesService.programarEnvio(request, enviosProgramadosDto);
-		if(response.getCode() == 200)
-			return new ResponseEntity<Error>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(value = "/cancelarEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> cancelarEnvio(HttpServletRequest request, @RequestBody EnvioProgramadoDto[] envios) {
-		
-		Error response = _comunicacionesService.cancelarEnvios(request, envios);
-		if(response.getCode() == 200)
-			return new ResponseEntity<Error>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(value = "/detalle/documentosEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DocumentosEnvioDTO> obtenerDocumentosEnvio(HttpServletRequest request, @RequestBody String idEnvio) {
-		
-		DocumentosEnvioDTO response = _comunicacionesService.obtenerDocumentosEnvio(request, idEnvio);
-		if(response.getError() == null)
-			return new ResponseEntity<DocumentosEnvioDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<DocumentosEnvioDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
 	
 	@RequestMapping(value = "/reenviar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Error> reenviar(HttpServletRequest request,  @RequestBody EnviosMasivosItem[] envioItem) {
