@@ -491,13 +491,12 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							envio.setFechamodificacion(new Date());
 							envio.setUsumodificacion(usuario.getIdusuario());
 							_envEnviosMapper.insert(envio);
+
+							respuesta.setCode(200);
+							respuesta.setDescription(envio.getIdenvio().toString());
+							respuesta.setMessage("Updates correcto");
 						}
 					}
-					
-					
-					respuesta.setCode(200);
-					respuesta.setDescription("Datos configuracion de envio guardados correctamente");
-					respuesta.setMessage("Updates correcto");
 				}catch(Exception e){
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
