@@ -8,7 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
+import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IModelosYcomunicacionesService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -80,6 +82,42 @@ public class ModelosYcomunicacionesService implements IModelosYcomunicacionesSer
 		
 		
 		LOGGER.info("getTiposComunicacion() -> Salida del servicio para obtener combo tipos de comunicación");
+		return null;
+	}
+
+
+	@Override
+	public ComboDTO claseComunicacion(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public ComboDTO tipoEnvio(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public DatosModelosComunicacionesDTO modeloYComunicacionesHistoricoSearch(HttpServletRequest request,
+			DatosModelosComunicacionesSearch filtros) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Error duplicarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem modeloComunicacion) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public Error borrarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem modeloComunicacion) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	
