@@ -952,5 +952,51 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 		LOGGER.info("guardarConfiguracion() -> Salida del servicio para guardar datos tarjeta configuración");
 		return respuesta;
 	}
+
+	@Override
+	public Error borrarDocumento(HttpServletRequest request, ResponseDocumentoDTO[] documentoDTO) {
+		
+		LOGGER.info("borrarDocumento() -> Entrada al servicio para borrar un documento");
+		
+		Error respuesta = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					for (int i = 0; i < documentoDTO.length; i++) {
+						File fichero = new File(documentoDTO[i].getRutaDocumento());
+						if(fichero.exists()){
+							fichero.delete();
+							EnvDocumentosExample example = new EnvDocumentosExample();
+							example.createCriteria().andIdenvioEqualTo(Long.valueOf(documentoDTO[i].getIdEnvio())).andPathdocumentoEqualTo(documentoDTO[i].getRutaDocumento());
+							_envDocumentosMapper.deleteByExample(example);
+						}
+					}
+					
+					respuesta.setCode(200);
+					respuesta.setDescription("Documento/s borrado/s correctamente");
+					respuesta.setMessage("Delete correcto");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error al borrar el documento");
+					LOGGER.error("borrarDocumento() -> Error al borrar el documento " + e.getMessage());
+				}
+				
+				
+			}
+		}
+		LOGGER.info("borrarDocumento() -> Salida del servicio para borrar un documento");
+		return respuesta;
+	}
 	
 }

@@ -184,5 +184,15 @@ public class EnviosMasivosController {
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@RequestMapping(value = "/detalle/borrarDocumentoEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> borrarDocumento(HttpServletRequest request, @RequestBody ResponseDocumentoDTO[] documento) {
+		
+		Error response = _enviosMasivosService.borrarDocumento(request, documento);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }

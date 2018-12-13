@@ -31,8 +31,9 @@ public interface IEnviosMasivosService {
 	public Error guardarConfiguracion(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta);
 	public Error duplicarEnvio(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta);
 	public Error guardarEtiquetasEnvio(HttpServletRequest request, TarjetaEtiquetasDTO etiquetasDTO);
-	public Error guardarDocumentoEnvio(HttpServletRequest request, ResponseDocumentoDTO etiquetasDTO);
+	public Error guardarDocumentoEnvio(HttpServletRequest request, ResponseDocumentoDTO documentoDTO);
 	public DocumentosEnvioDTO obtenerDocumentosEnvio(HttpServletRequest request, String idEnvio);
 	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request) throws IOException;
+	public Error borrarDocumento(HttpServletRequest request, ResponseDocumentoDTO[] documentoDTO);
 
 }
