@@ -163,4 +163,44 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 		return null;
 	}
 
+
+
+	@Override
+	public ComboDTO estadoEnvios(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public ComboDTO tipoEnvio(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public Error programarEnvio(HttpServletRequest request, EnviosMasivosItem[] comunicacionesProgramarDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public Error cancelarEnvios(HttpServletRequest request, EnvioProgramadoDto[] comunicacionesProgramadosDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+	@Override
+	public DocumentosEnvioDTO obtenerDocumentosEnvio(HttpServletRequest request, String idEnvio) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
