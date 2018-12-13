@@ -59,9 +59,9 @@
 <!-- 		</table> -->
 		
 		 
-		<table schema="USCGAE" tableName="ENV_ENVIOSGRUPOCLIENTE" >
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-		</table>
+			<table schema="USCGAE" tableName="ENV_ENVIOSGRUPOCLIENTE" >
+				<property name="ignoreQualifiersAtRuntime" value="true"/>
+			</table>
 
 <!-- 		<table schema="USCGAE_INT" tableName="ENV_DOCUMENTOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
