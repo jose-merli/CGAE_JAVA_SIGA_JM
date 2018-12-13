@@ -1,9 +1,13 @@
 package org.itcgae.siga.com.controllers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.ibatis.javassist.NotFoundException;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
@@ -16,6 +20,8 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -194,5 +200,32 @@ public class EnviosMasivosController {
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@RequestMapping(value="/detalle/descargarDocumento", method=RequestMethod.POST, produces=MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<InputStreamResource> obtenerAdjunto(@RequestBody ResponseDocumentoDTO documentoDTO){
+		
+              
+              HttpHeaders headers = null;
+              File file = null;
+              InputStreamResource resource = null;
+                               
+              file = new File(documentoDTO.getRutaDocumento());
+              
+              try{
+                        resource = new InputStreamResource(new FileInputStream(file));                  
+              }catch(FileNotFoundException e){
+                        
+              }
+              
+			  headers = new HttpHeaders();
+			  headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+			  headers.add("Pragma", "no-cache");
+			  headers.add("Expires", "0");
+			  headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentoDTO.getNombreDocumento() + "\"");
+			  System.out.println("The length of the file is : "+file.length());
+  
+              return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+    }
+
 
 }
