@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.DocumentoEnvioItem;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
@@ -868,14 +869,15 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				MultipartFile file = request.getFile(itr.next());
 				String fileName = file.getOriginalFilename();
 				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
-				BufferedOutputStream stream = null;
+				//BufferedOutputStream stream = null;
 				try {
 					File aux = new File(pathFichero);
 					// creo directorio si no existe
 					aux.mkdirs();
 					File serverFile = new File(pathFichero, fileName);
-					stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-					stream.write(file.getBytes());
+					//stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+					//stream.write(file.getBytes());
+					FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
 					response.setNombreDocumento(fileName);
 					response.setRutaDocumento(pathFichero + fileName);
 				} catch (FileNotFoundException e) {
@@ -895,7 +897,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				} finally {
 					// close the stream
 					LOGGER.debug("uploadFile() -> Cierre del stream del documento");
-					stream.close();
+					//stream.close();
 				}
 			}
 		}
