@@ -6,7 +6,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-import org.itcgae.siga.DTOs.cen.BusquedaSancionesDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaSancionesItem;
 import org.itcgae.siga.DTOs.cen.BusquedaSancionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.CargaMasivaDTO;
@@ -41,6 +40,7 @@ import org.itcgae.siga.db.entities.CenPais;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPoblaciones;
 import org.itcgae.siga.db.entities.CenProvincias;
+import org.itcgae.siga.db.entities.CenSancion;
 import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicos;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
 import org.itcgae.siga.db.entities.CenSolicmodicuentas;
@@ -890,5 +890,15 @@ public class CenTestUtils {
 		listBusquedaSancionesItem.add(getBusquedaSancionesItemSimulado());
 
 		return listBusquedaSancionesItem;
+	}
+	
+	public CenSancion getCenSancionSimulado() {
+		CenSancion cenSancion = new CenSancion();
+
+		cenSancion.setIdpersona(Long.valueOf("2005001213"));
+		cenSancion.setIdsancion(Long.valueOf("1"));
+		cenSancion.setIdtiposancion((short) 3);
+		
+		return cenSancion;
 	}
 }

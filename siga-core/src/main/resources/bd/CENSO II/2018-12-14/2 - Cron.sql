@@ -1,0 +1,1 @@
+Insert into ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values ('22','cron.pattern.scheduled.envioCorreoSancionesCgaeDiaHora',' 0 30 20 ? * *','Periodo de ejecución del cron para archivar sanciones',' 0 30 20 ? * *','1');

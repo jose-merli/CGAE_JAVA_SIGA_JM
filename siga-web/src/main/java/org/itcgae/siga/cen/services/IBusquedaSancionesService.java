@@ -17,5 +17,7 @@ public interface IBusquedaSancionesService {
 	InsertResponseDTO insertSanction(BusquedaSancionesItem busquedaSancionesItem, HttpServletRequest request);
 
 	UpdateResponseDTO updateSanction(BusquedaSancionesItem busquedaSancionesItem, HttpServletRequest request);
+	
+	void archivarSancionesRehabilitado();
 
 }

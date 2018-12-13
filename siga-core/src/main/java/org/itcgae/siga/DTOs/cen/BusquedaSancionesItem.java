@@ -9,6 +9,7 @@ public class BusquedaSancionesItem {
 	private String[] idColegios;
 	private String colegio;
 	private String idColegio;
+	private String idInstitucionS;
 	private String nombre;
 	private String tipoSancion;
 	private String estado;
@@ -28,6 +29,7 @@ public class BusquedaSancionesItem {
 	private Date fechaArchivadaDate;
 	private String fechaArchivada;
 	private Date fechaHastaDate;
+	private String archivada;
 	private String fechaHasta;
 	private String texto;
 	private String observaciones;
@@ -51,6 +53,14 @@ public class BusquedaSancionesItem {
 	}
 	public void setIdColegio(String idColegio) {
 		this.idColegio = idColegio;
+	}
+	
+	@JsonProperty("idInstitucionS")
+	public String getIdInstitucionS() {
+		return idInstitucionS;
+	}
+	public void setIdInstitucionS(String idInstitucionS) {
+		this.idInstitucionS = idInstitucionS;
 	}
 	
 	@JsonProperty("multa")
@@ -166,6 +176,13 @@ public class BusquedaSancionesItem {
 	}
 	public void setFechaArchivada(String fechaArchivada) {
 		this.fechaArchivada = fechaArchivada;
+	}
+	@JsonProperty("archivada")
+	public String getArchivada() {
+		return archivada;
+	}
+	public void setArchivada(String archivada) {
+		this.archivada = archivada;
 	}
 	@JsonProperty("fechaHastaDate")
 	public Date getFechaHastaDate() {
