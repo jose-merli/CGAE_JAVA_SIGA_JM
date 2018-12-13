@@ -57,11 +57,10 @@ public class ModelosYcomunicacionesService implements IModelosYcomunicacionesSer
 		return null;
 	}
 	
-	
+
 	@Override
-	public ComboDTO getTiposComunicacion(HttpServletRequest request) {
-		
-		LOGGER.info("getTiposComunicacion() -> Entrada al servicio para obtener combo tipos de comunicación");
+	public ComboDTO claseComunicacion(HttpServletRequest request) {
+		LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo tipos de comunicación");
 
 
 		
@@ -81,14 +80,7 @@ public class ModelosYcomunicacionesService implements IModelosYcomunicacionesSer
 		}
 		
 		
-		LOGGER.info("getTiposComunicacion() -> Salida del servicio para obtener combo tipos de comunicación");
-		return null;
-	}
-
-
-	@Override
-	public ComboDTO claseComunicacion(HttpServletRequest request) {
-		// TODO Auto-generated method stub
+		LOGGER.info("claseComunicacion() -> Salida del servicio para obtener combo tipos de comunicación");
 		return null;
 	}
 

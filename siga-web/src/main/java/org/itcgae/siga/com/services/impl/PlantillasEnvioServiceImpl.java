@@ -6,8 +6,15 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.com.ConsultaItem;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
+import org.itcgae.siga.DTOs.com.PlantillasEnvioDTO;
+import org.itcgae.siga.DTOs.com.RemitenteDTO;
+import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.cen.services.impl.TarjetaDatosDireccionesServiceImpl;
 import org.itcgae.siga.com.services.IPlantillasEnvioService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -64,6 +71,60 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		LOGGER.info("getComboTipoEnvio() -> Salida del servicio para obtener los tipos de envio");
 		
 		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO getComboConsultas(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PlantillasEnvioDTO PlantillasEnvioSearch(HttpServletRequest request, PlantillaEnvioSearchItem filtros) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Error borrarPlantillasEnvio(HttpServletRequest request, PlantillasEnvioDTO plantillasEnvio) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Error guardarDatosGenerales(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ConsultasDTO detalleConsultas(HttpServletRequest request, ConsultasDTO consultas) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Error asociarConsulta(HttpServletRequest request, ConsultaItem consulta) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Error borrarConsulta(HttpServletRequest request, ConsultaItem consulta) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RemitenteDTO detalleRemitente(HttpServletRequest request, String idConsulta) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Error guardarREmitente(HttpServletRequest request, RemitenteDTO remitente) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

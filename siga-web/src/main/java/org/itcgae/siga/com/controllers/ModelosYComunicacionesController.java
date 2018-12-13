@@ -25,7 +25,7 @@ public class ModelosYComunicacionesController {
 	@RequestMapping(value = "/tiposComunicacion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboTiposComunicacion(HttpServletRequest request) {
 		
-		ComboDTO response = _modelosYcomunicacionesService.getTiposComunicacion(request);
+		ComboDTO response = _modelosYcomunicacionesService.claseComunicacion(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
