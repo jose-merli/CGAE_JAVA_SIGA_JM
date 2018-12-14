@@ -8,7 +8,10 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.form.AsistenciaCursoDTO;
+import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.age.service.IAgendaCalendarioService;
@@ -111,4 +114,11 @@ public class FichaEventosController {
 		NotificacionEventoDTO response = fichaEventosService.getHistoricEventNotifications(idEvento, request);
 		return new ResponseEntity<NotificacionEventoDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/fichaEventos/searchEvent",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EventoItem> searchEvent(@RequestBody CursoItem cursoItem, HttpServletRequest request) {
+		EventoItem response = fichaEventosService.searchEvent(cursoItem, request);
+		return new ResponseEntity<EventoItem>(response, HttpStatus.OK);
+	}
+	
 }

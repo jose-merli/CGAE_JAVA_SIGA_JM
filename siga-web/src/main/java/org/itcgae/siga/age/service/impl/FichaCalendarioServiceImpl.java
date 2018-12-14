@@ -206,10 +206,10 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"insertCalendar() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"saveCalendar() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
-					"insertCalendar() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"saveCalendar() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -225,16 +225,16 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 				ageCalendarioInsert.setColor(calendarItem.getColor());
 
 				LOGGER.info(
-						"insertCalendar() / ageCalendarioExtendsMapper.insert(ageCalendarioInsert) -> Entrada a ageCalendarioExtendsMapper para insertar un calendario");
+						"saveCalendar() / ageCalendarioExtendsMapper.insert(ageCalendarioInsert) -> Entrada a ageCalendarioExtendsMapper para insertar un calendario");
 				response = ageCalendarioExtendsMapper.insert(ageCalendarioInsert);
 				LOGGER.info(
-						"insertCalendar() / ageCalendarioExtendsMapper.insert(ageCalendarioInsert) -> Salida a ageCalendarioExtendsMapper para insertar un calendario");
+						"saveCalendar() / ageCalendarioExtendsMapper.insert(ageCalendarioInsert) -> Salida a ageCalendarioExtendsMapper para insertar un calendario");
 
 				LOGGER.info(
-						"insertCalendar() / ageCalendarioExtendsMapper.selectMaxCalendar() -> Entrada a ageCalendarioExtendsMapper para obtener idCalendario del calendario insertado");
+						"saveCalendar() / ageCalendarioExtendsMapper.selectMaxCalendar() -> Entrada a ageCalendarioExtendsMapper para obtener idCalendario del calendario insertado");
 				List<ComboItem> calendarInserted = ageCalendarioExtendsMapper.selectMaxCalendar();
 				LOGGER.info(
-						"insertCalendar() / ageCalendarioExtendsMapper.selectMaxCalendar() -> Salida a ageCalendarioExtendsMapper para obtener idCalendario del calendario insertado");
+						"saveCalendar() / ageCalendarioExtendsMapper.selectMaxCalendar() -> Salida a ageCalendarioExtendsMapper para obtener idCalendario del calendario insertado");
 				idCalendario = calendarInserted.get(0).getValue();
 
 				if (response == 0) {

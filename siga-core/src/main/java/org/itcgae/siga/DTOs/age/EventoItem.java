@@ -36,6 +36,11 @@ public class EventoItem {
 	private Date fechaFinRepeticion;
 
 	private Long idPartidoJudicial;
+	private String idCurso;
+	private String estadoEvento;
+	
+	private String fechaHoraInicio;
+	private String fechaHoraFin;
 
 		
 	/**
@@ -437,6 +442,70 @@ public class EventoItem {
 	public void setIdPartidoJudicial(Long idPartidoJudicial) {
 		this.idPartidoJudicial = idPartidoJudicial;
 	}
+	
+	/**
+	 **/
+	public EventoItem idCurso(String idCurso) {
+		this.idCurso = idCurso;
+		return this;
+	}
+
+	@JsonProperty("idCurso")
+	public String getIdCurso() {
+		return idCurso;
+	}
+
+	public void setIdCurso(String idCurso) {
+		this.idCurso = idCurso;
+	}
+	
+	/**
+	 **/
+	public EventoItem fechaHoraInicio(String fechaHoraInicio) {
+		this.fechaHoraInicio = fechaHoraInicio;
+		return this;
+	}
+
+	@JsonProperty("fechaHoraInicio")
+	public String getFechaHoraInicio() {
+		return fechaHoraInicio;
+	}
+
+	public void setFechaHoraInicio(String fechaHoraInicio) {
+		this.fechaHoraInicio = fechaHoraInicio;
+	}
+	
+	/**
+	 **/
+	public EventoItem fechaHoraFin(String fechaHoraFin) {
+		this.fechaHoraFin = fechaHoraFin;
+		return this;
+	}
+
+	@JsonProperty("fechaHoraFin")
+	public String getFechaHoraFin() {
+		return fechaHoraFin;
+	}
+
+	public void setFechaHoraFin(String fechaHoraFin) {
+		this.fechaHoraFin = fechaHoraFin;
+	}
+	
+	/**
+	 **/
+	public EventoItem estadoEvento(String estadoEvento) {
+		this.estadoEvento = estadoEvento;
+		return this;
+	}
+
+	@JsonProperty("estadoEvento")
+	public String getEstadoEvento() {
+		return estadoEvento;
+	}
+
+	public void setEstadoEvento(String estadoEvento) {
+		this.estadoEvento = estadoEvento;
+	}
 
 
 	@Override
@@ -476,9 +545,12 @@ public class EventoItem {
 				&& Objects.equals(this.tipoRepeticion, eventoItem.tipoRepeticion)
 				&& Objects.equals(this.fechaInicioRepeticion, eventoItem.fechaInicioRepeticion)
 				&& Objects.equals(this.fechaFinRepeticion, eventoItem.fechaFinRepeticion)
-				&& Objects.equals(this.idPartidoJudicial, eventoItem.idPartidoJudicial);
-
-
+				&& Objects.equals(this.idPartidoJudicial, eventoItem.idPartidoJudicial)
+				&& Objects.equals(this.idCurso, eventoItem.idCurso)
+				&& Objects.equals(this.fechaHoraFin, eventoItem.fechaHoraFin)
+				&& Objects.equals(this.fechaHoraInicio, eventoItem.fechaHoraInicio)
+				&& Objects.equals(this.estadoEvento, eventoItem.estadoEvento);
+		
 	}
 
 	@Override
@@ -486,7 +558,8 @@ public class EventoItem {
 
 		return Objects.hash(idEvento, idCalendario, idInstitucion, titulo, fechaInicio, fechaFin, allDay, color, lugar,
 				descripcion, recursos, idEstadoEvento, idTipoEvento, usuModificacion, fechaModificacion, fechaBaja, idTipoCalendario, tipoAcceso,
-				idRepeticionEvento, valoresRepeticion, valoresRepeticionString, tipoDiasRepeticion, tipoRepeticion, fechaInicioRepeticion, fechaFinRepeticion,idPartidoJudicial);
+				idRepeticionEvento, valoresRepeticion, valoresRepeticionString, tipoDiasRepeticion, tipoRepeticion, fechaInicioRepeticion,
+				fechaFinRepeticion,idPartidoJudicial, idCurso,fechaHoraInicio, fechaHoraFin, estadoEvento);
 	}
 	
 	@Override
@@ -519,11 +592,15 @@ public class EventoItem {
 		sb.append("    tipoRepeticion: ").append(toIndentedString(tipoRepeticion)).append("\n");
 		sb.append("    fechaInicioRepeticion: ").append(toIndentedString(fechaInicioRepeticion)).append("\n");
 		sb.append("    fechaFinRepeticion: ").append(toIndentedString(fechaFinRepeticion)).append("\n");
-				sb.append("    idPartidoJudicial: ").append(toIndentedString(idPartidoJudicial)).append("\n");
+		sb.append("    idPartidoJudicial: ").append(toIndentedString(idPartidoJudicial)).append("\n");
+		sb.append("    idCurso: ").append(toIndentedString(idCurso)).append("\n");
+		sb.append("    fechaHoraInicio: ").append(toIndentedString(fechaHoraInicio)).append("\n");
+		sb.append("    fechaHoraFin: ").append(toIndentedString(fechaHoraFin)).append("\n");
+		sb.append("    estadoEvento: ").append(toIndentedString(estadoEvento)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
-
+	
 	/**
 	 * Convert the given object to string with each line indented by 4 spaces
 	 * (except the first line).

@@ -1,10 +1,12 @@
 package org.itcgae.siga.db.services.form.providers;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.mappers.ForCursoSqlProvider;
 
@@ -20,6 +22,8 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		sql.SELECT("CURSO.NOMBRECURSO");
 		sql.SELECT("CURSO.IDINSTITUCION");
 		sql.SELECT("CURSO.IDESTADOCURSO AS IDESTADO");
+		sql.SELECT("CURSO.IDVISIBILIDADCURSO");
+		sql.SELECT("TO_CHAR(CURSO.DESCRIPCION) as DESCRIPCION");
 		sql.SELECT("CAT.DESCRIPCION AS ESTADO");
 		sql.SELECT("DECODE(CURSO.IDINSTITUCION,'"+ Short.toString(idInstitucion) +"', CAT1.DESCRIPCION, INSTITUCION.ABREVIATURA) AS VISIBILIDAD");
 		sql.SELECT("CONCAT(CURSO.PRECIODESDE|| ' - ', CURSO.PRECIOHASTA) AS PRECIOCURSO");
@@ -31,6 +35,10 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		sql.SELECT("TO_CHAR(CURSO.FECHAIMPARTICIONHASTA,'DD/MM/YYYY') AS FECHAIMPARTICIONHASTA");
 		sql.SELECT("CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) AS NOMBREAPELLIDOSFORMADOR");
 		sql.SELECT("CURSO.FLAGARCHIVADO");
+		sql.SELECT("CURSO.LUGAR");
+		sql.SELECT("CURSO.NUMEROPLAZAS as PLAZASDISPONIBLES");
+		sql.SELECT("CURSO.AUTOVALIDACIONINSCRIPCION");
+		sql.SELECT("CURSO.MINIMOASISTENCIA");
 		
 		sql.FROM("FOR_CURSO CURSO");
 		
@@ -78,23 +86,23 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 			sql.WHERE("CURSO.PRECIOHASTA <= " + Double.toString(cursoItem.getPrecioHasta()));
 		}
 		
-		if(cursoItem.getFechaInscripcionDesde() != null) {
-			String fechaInscripcionDesde = dateFormat.format(cursoItem.getFechaInscripcionDesde());
+		if(cursoItem.getFechaInscripcionDesdeDate() != null) {
+			String fechaInscripcionDesde = dateFormat.format(cursoItem.getFechaInscripcionDesdeDate());
 			sql.WHERE("TO_DATE(CURSO.FECHAINSCRIPCIONDESDE,'DD/MM/RRRR') >= TO_DATE('" + fechaInscripcionDesde + "','DD/MM/YYYY')");
 		}
 		
-		if(cursoItem.getFechaInscripcionHasta() != null) {
-			String fechaInscripcionHasta = dateFormat.format(cursoItem.getFechaInscripcionHasta());
+		if(cursoItem.getFechaInscripcionHastaDate() != null) {
+			String fechaInscripcionHasta = dateFormat.format(cursoItem.getFechaInscripcionHastaDate());
 			sql.WHERE("TO_DATE(CURSO.FECHAINSCRIPCIONHASTA,'DD/MM/RRRR') <= TO_DATE('" + fechaInscripcionHasta + "','DD/MM/YYYY')");
 		}
 		
-		if(cursoItem.getFechaImparticionDesde() != null) {
-			String fechaImparticionDesde = dateFormat.format(cursoItem.getFechaImparticionDesde());
+		if(cursoItem.getFechaImparticionDesdeDate() != null) {
+			String fechaImparticionDesde = dateFormat.format(cursoItem.getFechaImparticionDesdeDate());
 			sql.WHERE("TO_DATE(FECHAIMPARTICIONDESDE,'DD/MM/RRRR') >= TO_DATE('" + fechaImparticionDesde + "','DD/MM/YYYY')");
 		}
 		
-		if(cursoItem.getFechaImparticionHasta() != null) {
-			String fechaImparticionHasta = dateFormat.format(cursoItem.getFechaImparticionHasta());
+		if(cursoItem.getFechaImparticionHastaDate() != null) {
+			String fechaImparticionHasta = dateFormat.format(cursoItem.getFechaImparticionHastaDate());
 			sql.WHERE("TO_DATE(FECHAIMPARTICIONHASTA,'DD/MM/RRRR') <= TO_DATE('" + fechaImparticionHasta + "','DD/MM/YYYY')");
 		}
 		
@@ -160,6 +168,96 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		if(forCurso.getFechaimparticionhasta() != null) {
 			sql.WHERE("CURSO.FECHAIMPARTICIONHASTA = '" + dateFormat.format(forCurso.getFechaimparticionhasta()) + "'");
 		}
+		
+		return sql.toString();
+	}
+	
+	public String searchCourseByIdcurso(String idCurso, Short idInstitucion) {
+
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("CURSO.IDCURSO");
+		sql.SELECT("CURSO.CODIGOCURSO");
+		sql.SELECT("CURSO.NOMBRECURSO");
+		sql.SELECT("CURSO.IDINSTITUCION");
+		sql.SELECT("CURSO.IDESTADOCURSO AS IDESTADO");
+		sql.SELECT("CURSO.IDVISIBILIDADCURSO");
+		sql.SELECT("TO_CHAR(CURSO.DESCRIPCION) AS DESCRIPCION");
+		sql.SELECT("CAT.DESCRIPCION AS ESTADO");
+		sql.SELECT("DECODE(CURSO.IDINSTITUCION,'"+ Short.toString(idInstitucion) +"', CAT1.DESCRIPCION, INSTITUCION.ABREVIATURA) AS VISIBILIDAD");
+		sql.SELECT("CONCAT(CURSO.PRECIODESDE|| ' - ', CURSO.PRECIOHASTA) AS PRECIOCURSO");
+		sql.SELECT("CONCAT(CURSO.FECHAINSCRIPCIONDESDE|| ' - ', CURSO.FECHAINSCRIPCIONHASTA) AS FECHAINSCRIPCION");
+		sql.SELECT("CURSO.FECHAINSCRIPCIONDESDE AS FECHAINSCRIPCIONDESDEDATE");
+		sql.SELECT("CURSO.FECHAINSCRIPCIONHASTA AS FECHAINSCRIPCIONHASTADATE");
+		sql.SELECT("CONCAT(CURSO.FECHAIMPARTICIONDESDE|| ' - ', CURSO.FECHAIMPARTICIONHASTA ) AS FECHAIMPARTICION");
+		sql.SELECT("TO_CHAR(CURSO.FECHAIMPARTICIONDESDE,'DD/MM/YYYY') AS FECHAIMPARTICIONDESDE");
+		sql.SELECT("TO_CHAR(CURSO.FECHAIMPARTICIONHASTA,'DD/MM/YYYY') AS FECHAIMPARTICIONHASTA");
+		sql.SELECT("CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) AS NOMBREAPELLIDOSFORMADOR");
+		sql.SELECT("CURSO.FLAGARCHIVADO");
+		sql.SELECT("CURSO.LUGAR");
+		sql.SELECT("CURSO.NUMEROPLAZAS as plazasDisponibles");
+		sql.SELECT("CURSO.AUTOVALIDACIONINSCRIPCION");
+		sql.SELECT("CURSO.MINIMOASISTENCIA");
+		
+		sql.FROM("FOR_CURSO CURSO");
+		
+		sql.INNER_JOIN("CEN_INSTITUCION INSTITUCION ON CURSO.IDINSTITUCION = INSTITUCION.IDINSTITUCION");
+		sql.INNER_JOIN("FOR_ESTADOCURSO ESTADO ON CURSO.IDESTADOCURSO = ESTADO.IDESTADOCURSO");
+		sql.INNER_JOIN("FOR_VISIBILIDADCURSO VISIBILIDAD ON CURSO.IDVISIBILIDADCURSO = VISIBILIDAD.IDVISIBILIDADCURSO");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON (CAT.IDRECURSO = ESTADO.DESCRIPCION AND CAT.IDLENGUAJE = '1' )");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT1 ON (CAT1.IDRECURSO = VISIBILIDAD.DESCRIPCION AND CAT1.IDLENGUAJE = '1' )");
+		sql.LEFT_OUTER_JOIN("FOR_TEMACURSO_CURSO TEMACURSO ON (TEMACURSO.IDCURSO = CURSO.IDCURSO AND TEMACURSO.IDINSTITUCION = CURSO.IDINSTITUCION AND TEMACURSO.FECHABAJA IS NULL)");
+		sql.LEFT_OUTER_JOIN("FOR_PERSONA_CURSO PERCURSO2 ON PERCURSO2.IDCURSO = CURSO.IDCURSO AND PERCURSO2.TUTOR = '1' AND CURSO.IDINSTITUCION = PERCURSO2.IDINSTITUCION");
+		sql.LEFT_OUTER_JOIN("CEN_PERSONA PER ON PER.IDPERSONA = PERCURSO2.IDPERSONA");
+		sql.WHERE("(CURSO.IDINSTITUCION = '" + idInstitucion + "' OR (CURSO.IDINSTITUCION <> '" + idInstitucion + "' AND CURSO.IDVISIBILIDADCURSO = '0'))");
+		sql.WHERE("CURSO.IDCURSO = '" + idCurso + "'");
+
+		return sql.toString();
+	}
+	
+	public String updateCourse (CursoItem cursoItem, AdmUsuarios usuario) {
+		SQL sql = new SQL();
+		
+ 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		
+		sql.UPDATE("FOR_CURSO");
+		
+		sql.SET("FECHAMODIFICACION = TO_DATE('" + dateFormat.format(new Date()) + "','DD/MM/YYYY')");
+		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
+		
+ 		if(null != cursoItem.getNombreCurso()) {
+			sql.SET("NOMBRECURSO ='" + cursoItem.getNombreCurso() + "'");
+		}
+ 		
+ 		if(null != cursoItem.getDescripcionEstado()) {
+			sql.SET("DESCRIPCION ='" + cursoItem.getDescripcionEstado() + "'");
+		}
+
+ 		if(null != cursoItem.getFechaImparticionDesdeDate()) {
+			sql.SET("FECHAIMPARTICIONDESDE = TO_DATE('" + dateFormat.format(cursoItem.getFechaImparticionDesdeDate()) + "','DD/MM/YYYY')");
+		}
+ 		
+ 		if(null != cursoItem.getFechaImparticionHastaDate()) {
+			sql.SET("FECHAIMPARTICIONHASTA = TO_DATE('" + dateFormat.format(cursoItem.getFechaImparticionHastaDate()) + "','DD/MM/YYYY')");
+		}
+ 		
+ 		if(null != cursoItem.getFechaInscripcionDesdeDate()) {
+			sql.SET("FECHAINSCRIPCIONDESDE = TO_DATE('" + dateFormat.format(cursoItem.getFechaInscripcionDesdeDate()) + "','DD/MM/YYYY')");
+		}
+ 		
+ 		if(null != cursoItem.getFechaInscripcionHastaDate()) {
+			sql.SET("FECHAINSCRIPCIONHASTA = TO_DATE('" + dateFormat.format(cursoItem.getFechaInscripcionHastaDate()) + "','DD/MM/YYYY')");
+		}
+ 		
+ 		if(null != cursoItem.getPlazasDisponibles()) {
+			sql.SET("NUMEROPLAZAS ='" + cursoItem.getPlazasDisponibles() + "'");
+		}
+ 		
+ 		if(null != cursoItem.getMinimoAsistencia()) {
+			sql.SET("MINIMOASISTENCIA ='" + cursoItem.getMinimoAsistencia() + "'");
+		}
+ 		
+ 		sql.WHERE("IDCURSO = '" + cursoItem.getIdCurso() + "'");
 		
 		return sql.toString();
 	}
