@@ -34,7 +34,7 @@ import org.itcgae.siga.db.services.com.mappers.EnvDocumentosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvHistoricoEstadoExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.EnvTipoClaseComunicacionExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +54,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	private EnvTipoEnvioExtendsMapper _envTipoEnvioExtendsMapper;
 
 	@Autowired
-	private EnvTipoClaseComunicacionExtendsMapper _envTipoClaseComunicacionExtendsMapper;
+	private ConClaseComunicacionExtendsMapper _envTipoClaseComunicacionExtendsMapper;
 	
 	@Autowired
 	private EnvEstadoEnvioExtendsMapper _envEstadoEnvioExtendsMapper;

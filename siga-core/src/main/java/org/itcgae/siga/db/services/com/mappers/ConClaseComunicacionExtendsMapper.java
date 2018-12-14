@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface EnvTipoClaseComunicacionExtendsMapper {
+public interface ConClaseComunicacionExtendsMapper {
 
 	@SelectProvider(type = EnvTipoEnvioExtendsSqlProvider.class, method = "selectTipoEnvios")
 	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
