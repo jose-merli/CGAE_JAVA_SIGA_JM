@@ -19,6 +19,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.age.service.IFichaCalendarioService;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AgeCalendario;
@@ -326,20 +327,22 @@ public class FichaCalendarioServiceImpl implements IFichaCalendarioService {
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
+		String perfilesFormat = UtilidadesString.prepararPerfiles(perfiles);
 
 		if (null != idInstitucion) {
 			LOGGER.info(
 					"getCalendar() / ageCalendarioExtendsMapper.selectByPrimaryKey(idCalendario) -> Entrada a ageCalendarioExtendsMapper para obtener los permisos de los perfiles");
-			calendar = ageCalendarioExtendsMapper.selectByPrimaryKey(Long.parseLong(idCalendario));
+			calendarItem = ageCalendarioExtendsMapper.getCalendarioPermiso(idInstitucion, perfilesFormat, Long.parseLong(idCalendario));
 			LOGGER.info(
 					"getCalendar() / ageCalendarioExtendsMapper.selectByPrimaryKey(idCalendario) -> Salida de ageCalendarioExtendsMapper para obtener los permisos de los perfiles");
 
-			if (calendar != null) {
-
-				calendarItem.setIdTipoCalendario(calendar.getIdtipocalendario().toString());
-				calendarItem.setColor(calendar.getColor());
-				calendarItem.setDescripcion(calendar.getDescripcion());
-			}
+//			if (calendar != null) {
+//
+//				calendarItem.setIdTipoCalendario(calendar.getIdtipocalendario().toString());
+//				calendarItem.setColor(calendar.getColor());
+//				calendarItem.setDescripcion(calendar.getDescripcion());
+//			}
 
 			calendarioDTO.setCalendar(calendarItem);
 

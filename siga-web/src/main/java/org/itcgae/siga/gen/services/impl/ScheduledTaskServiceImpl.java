@@ -2,6 +2,7 @@ package org.itcgae.siga.gen.services.impl;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.age.service.IFichaEventosService;
+import org.itcgae.siga.cen.services.IBusquedaSancionesService;
 import org.itcgae.siga.form.services.IFichaCursosService;
 import org.itcgae.siga.gen.services.IScheduledTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class ScheduledTaskServiceImpl implements IScheduledTaskService {
 	
 	@Autowired
 	private IFichaEventosService fichaEventosService;
+	
+	@Autowired
+	private IBusquedaSancionesService busquedaSancionesService;
 	
 	@Scheduled(cron = "${cron.pattern.scheduled.forCurso}")
 	@Override
@@ -38,4 +42,12 @@ public class ScheduledTaskServiceImpl implements IScheduledTaskService {
 		LOGGER.info("ScheduledTaskServiceImpl --> insertarFestivos --> SALE generaEventosLaboral");
 	}
 
+	@Scheduled(cron = "${cron.pattern.scheduled.envioCorreoSancionesCgaeDiaHora}")
+	//@Scheduled(cron = "0/59 * * * * ?")
+	@Override
+	public void archivarSancionesRehabilitado() {
+		LOGGER.info("ScheduledTaskServiceImpl --> archivarSancionesRehabilitado --> ENTRA archivarSancionesRehabilitado");
+		busquedaSancionesService.archivarSancionesRehabilitado();
+		LOGGER.info("ScheduledTaskServiceImpl --> archivarSancionesRehabilitado --> SALE archivarSancionesRehabilitado");
+	}
 }

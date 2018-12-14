@@ -95,6 +95,10 @@ public class FichaCalendarioServiceTest {
 
 		UpdateResponseDTO updateResponseResultado = fichaCalendarioServiceImpl.updatePermissions(permisosCalendarioDTO, mockreq);
 		
+		Error error = new Error();
+		error.setCode(200);
+		updateResponseEsperado.setError(error);
+		
 		assertThat(updateResponseResultado).isEqualTo(updateResponseEsperado);
 	}
 	
@@ -116,6 +120,11 @@ public class FichaCalendarioServiceTest {
 
 		UpdateResponseDTO updateResponseResultado = fichaCalendarioServiceImpl.updatePermissions(permisosCalendarioDTO,mockreq);
 
+		Error error = new Error();
+		error.setCode(400);
+		error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+		updateResponseEsperado.setError(error);
+		
 		assertThat(updateResponseResultado).isEqualTo(updateResponseEsperado);
 	}
 	
@@ -222,7 +231,7 @@ public class FichaCalendarioServiceTest {
 		calendarItem.setIdInstitucion(null);
 		calendarItem.setIdCalendario(null);
 		
-		when(ageCalendarioExtendsMapper.selectByPrimaryKey(Mockito.anyLong())).thenReturn(ageCalendario);
+		when(ageCalendarioExtendsMapper.getCalendarioPermiso(Mockito.anyShort(), Mockito.anyString(), Mockito.anyLong())).thenReturn(calendarItem);
 		
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 

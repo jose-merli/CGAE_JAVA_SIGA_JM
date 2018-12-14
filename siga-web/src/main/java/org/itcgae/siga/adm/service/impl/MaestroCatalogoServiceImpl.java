@@ -31,9 +31,11 @@ import org.itcgae.siga.db.services.gen.mappers.GenTablasMaestrasExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
+@Transactional
 public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 
 	private Logger LOGGER = Logger.getLogger(MaestroCatalogoServiceImpl.class);

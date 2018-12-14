@@ -168,7 +168,7 @@ public class GenTablasMaestrasSqlExtendProvider {
 		}
         
 
-        sql.VALUES(tablaMaestra.getIdcampocodigo(), "(select MAX(TO_NUMBER("+ tablaMaestra.getIdcampocodigo() +" ))  + 1 from "+ tablaMaestra.getIdtablamaestra()   +")" );
+        sql.VALUES(tablaMaestra.getIdcampocodigo(), "NVL((select MAX(TO_NUMBER("+ tablaMaestra.getIdcampocodigo() +" ))  + 1 from "+ tablaMaestra.getIdtablamaestra()   +"),1)" );
         sql.VALUES(tablaMaestra.getIdcampocodigoext(), "'" + catalogo.getCodigoExt() +"'");
         sql.VALUES("FECHAMODIFICACION", "SYSDATE");
         sql.VALUES("BLOQUEADO", "'N'");

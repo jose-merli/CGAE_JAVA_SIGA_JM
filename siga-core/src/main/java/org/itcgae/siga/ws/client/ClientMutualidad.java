@@ -1,11 +1,33 @@
 package org.itcgae.siga.ws.client;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPConstants;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 
+import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.log4j.Logger;
 import org.datacontract.schemas._2004._07.IntegracionEnumsCombos;
 import org.datacontract.schemas._2004._07.IntegracionSolicitudRespuesta;
@@ -16,7 +38,10 @@ import org.springframework.ws.client.core.WebServiceMessageCallback;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.soap.SoapHeader;
 import org.springframework.ws.soap.SoapMessage;
+import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
+import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 import org.springframework.xml.transform.StringSource;
+import org.springframework.ws.transport.http.HttpComponentsMessageSender.RemoveSoapHeadersInterceptor;
 
 import samples.servicemodel.microsoft.EstadoMutualistaDocument;
 import samples.servicemodel.microsoft.EstadoSolicitudDocument;
@@ -54,7 +79,18 @@ public class ClientMutualidad {
 		
 		webServiceTemplate.setDefaultUri(uriService);
 		
-		EstadoMutualistaResponseDocumentImpl responseWS = (EstadoMutualistaResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
+		HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
+		SSLContext ssl = SSLContext.getDefault();
+		SSLConnectionSocketFactory sSLConnectionSocketFactory = new SSLConnectionSocketFactory(ssl, NoopHostnameVerifier.INSTANCE);
+		HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sSLConnectionSocketFactory).addInterceptorFirst(new RemoveSoapHeadersInterceptor()).build();
+		MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+		SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
+		messageSender.setHttpClient(httpClient);
+		webServiceTemplate.setMessageSender(messageSender);
+		webServiceTemplate.setMessageFactory(newSoapMessageFactory);
+		EstadoMutualistaResponseDocumentImpl responseWS = (EstadoMutualistaResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
+		
+		/*EstadoMutualistaResponseDocumentImpl responseWS = (EstadoMutualistaResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
 			
 			@Override
 			public void doWithMessage(WebServiceMessage message) throws IOException, TransformerException {
@@ -77,7 +113,7 @@ public class ClientMutualidad {
 	            }
 				
 			}
-		});
+		});*/
 		
 		IntegracionSolicitudRespuesta estadoMutualista = responseWS.getEstadoMutualistaResponse().getEstadoMutualistaResult();
 		
@@ -89,8 +125,19 @@ public class ClientMutualidad {
 		
 	
 		webServiceTemplate.setDefaultUri(uriService);
+		HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
+		SSLContext ssl = SSLContext.getDefault();
+		SSLConnectionSocketFactory sSLConnectionSocketFactory = new SSLConnectionSocketFactory(ssl, NoopHostnameVerifier.INSTANCE);
+		HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sSLConnectionSocketFactory).addInterceptorFirst(new RemoveSoapHeadersInterceptor()).build();
+		MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+		SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
+		messageSender.setHttpClient(httpClient);
+		webServiceTemplate.setMessageSender(messageSender);
+		webServiceTemplate.setMessageFactory(newSoapMessageFactory);
 		
-		EstadoSolicitudResponseDocumentImpl responseWS = (EstadoSolicitudResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
+		EstadoSolicitudResponseDocumentImpl responseWS = (EstadoSolicitudResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
+		
+		/*EstadoSolicitudResponseDocumentImpl responseWS = (EstadoSolicitudResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
 			
 			@Override
 			public void doWithMessage(WebServiceMessage message) throws IOException, TransformerException {
@@ -113,7 +160,7 @@ public class ClientMutualidad {
 		            }
 				
 			}
-		});
+		});*/
 
 		
 		IntegracionSolicitudRespuesta estadoMutualista = responseWS.getEstadoSolicitudResponse().getEstadoSolicitudResult();
@@ -127,8 +174,25 @@ public class ClientMutualidad {
 		
 		
 		webServiceTemplate.setDefaultUri(uriService);
+		//configuracion para hacer llamada ssl con el webServiceTemplate
+		HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
+		SSLContext ssl = SSLContext.getDefault();
+		SSLConnectionSocketFactory sSLConnectionSocketFactory = new SSLConnectionSocketFactory(ssl, NoopHostnameVerifier.INSTANCE);
+		HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sSLConnectionSocketFactory).addInterceptorFirst(new RemoveSoapHeadersInterceptor()).build();
+		MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+		SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
+		messageSender.setHttpClient(httpClient);
+		webServiceTemplate.setMessageSender(messageSender);
+		webServiceTemplate.setMessageFactory(newSoapMessageFactory);
 		
-		GetEnumsResponseDocumentImpl responseWS = (GetEnumsResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
+		GetEnumsResponseDocumentImpl responseWS = (GetEnumsResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
+		
+		
+		
+		
+		
+		//System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
+		/*GetEnumsResponseDocumentImpl responseWS = (GetEnumsResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
 			
 			@Override
 	        public void doWithMessage(WebServiceMessage message) {
@@ -150,7 +214,7 @@ public class ClientMutualidad {
 	            	LOGGER.warn("Error en la llamada al servicio getEnums: " + e.getMessage());
 	            }
 	        }
-	    });
+	    });*/
 		
 		IntegracionEnumsCombos response =responseWS.getGetEnumsResponse().getGetEnumsResult();
 		
@@ -164,14 +228,18 @@ public class ClientMutualidad {
 		
 		
 		webServiceTemplate.setDefaultUri(uriService);
+		//configuracion para hacer llamada ssl con el webServiceTemplate
+		HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
+		SSLContext ssl = SSLContext.getDefault();
+		SSLConnectionSocketFactory sSLConnectionSocketFactory = new SSLConnectionSocketFactory(ssl, NoopHostnameVerifier.INSTANCE);
+		HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sSLConnectionSocketFactory).addInterceptorFirst(new RemoveSoapHeadersInterceptor()).build();
+		MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+		SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
+		messageSender.setHttpClient(httpClient);
+		webServiceTemplate.setMessageSender(messageSender);
+		webServiceTemplate.setMessageFactory(newSoapMessageFactory);
 		
-		MGASolicitudPolizaAccuGratuitosResponseDocumentImpl responseWS = (MGASolicitudPolizaAccuGratuitosResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request, new WebServiceMessageCallback() {
-			
-			@Override
-			public void doWithMessage(WebServiceMessage message) throws IOException, TransformerException {
-				
-			}
-		});
+		MGASolicitudPolizaAccuGratuitosResponseDocumentImpl responseWS = (MGASolicitudPolizaAccuGratuitosResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
 
 		
 		IntegracionSolicitudRespuesta response = responseWS.getMGASolicitudPolizaAccuGratuitosResponse().getMGASolicitudPolizaAccuGratuitosResult();
@@ -183,6 +251,16 @@ public class ClientMutualidad {
 	public IntegracionSolicitudRespuesta MGASolicitudPolizaProfesional (GetEstadoColegiadoDocument request , String uriService)throws Exception{
 		
 		webServiceTemplate.setDefaultUri(uriService);
+		//configuracion para hacer llamada ssl con el webServiceTemplate
+		HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
+		SSLContext ssl = SSLContext.getDefault();
+		SSLConnectionSocketFactory sSLConnectionSocketFactory = new SSLConnectionSocketFactory(ssl, NoopHostnameVerifier.INSTANCE);
+		HttpClient httpClient = HttpClientBuilder.create().setSSLSocketFactory(sSLConnectionSocketFactory).addInterceptorFirst(new RemoveSoapHeadersInterceptor()).build();
+		MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+		SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
+		messageSender.setHttpClient(httpClient);
+		webServiceTemplate.setMessageSender(messageSender);
+		webServiceTemplate.setMessageFactory(newSoapMessageFactory);
 		
 		MGASolicitudPolizaProfesionalResponseDocumentImpl responseWS = (MGASolicitudPolizaProfesionalResponseDocumentImpl)webServiceTemplate.marshalSendAndReceive(uriService, request);
 
