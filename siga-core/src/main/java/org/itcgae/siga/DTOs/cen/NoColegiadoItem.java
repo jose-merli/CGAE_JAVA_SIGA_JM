@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class NoColegiadoItem {
 
 	private String idPersona;
+	private String[] idPersonas;
 	private String idInstitucion;
 	private String nif;
 	private String nombre;
@@ -22,6 +23,7 @@ public class NoColegiadoItem {
 	private String  tipoDireccion;
 	private String  apellidos;
 	private ComboEtiquetasItem[]  etiquetas;
+	private String[] traduccion;
 	private String  sexo;
 	private String  estadoCivil;
 	private String idEstadoCivil;
@@ -60,6 +62,24 @@ public class NoColegiadoItem {
 	
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
+	}
+	
+	
+	/**
+	 *
+	 */
+	public NoColegiadoItem idPersonas(String[] idPersonas){
+		this.idPersonas = idPersonas;
+		return this;
+	}
+	
+	@JsonProperty("idPersonas")
+	public String[] getIdPersonas() {
+		return idPersonas;
+	}
+	
+	public void setIdPersonas(String[] idPersonas) {
+		this.idPersonas = idPersonas;
 	}
 	
 	/**
@@ -354,7 +374,23 @@ public class NoColegiadoItem {
 		this.etiquetas = etiquetas;
 	}
 
-
+	/**
+	 *
+	 */
+	public NoColegiadoItem traduccion(String[] traduccion){
+		this.traduccion = traduccion;
+		return this;
+	}
+	
+	@JsonProperty("traduccion")
+	public String[] getTraduccion() {
+		return traduccion;
+	}
+	
+	public void setTraduccion(String[] traduccion) {
+		this.traduccion = traduccion;
+	}
+	
 	
 	/**
 	 *

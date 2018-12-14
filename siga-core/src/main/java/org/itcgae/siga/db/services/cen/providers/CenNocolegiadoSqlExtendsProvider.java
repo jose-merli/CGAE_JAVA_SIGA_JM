@@ -644,6 +644,12 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("per.idtipoidentificacion not in '20'");
 
+		if(!noColegiadoItem.isHistorico()) {
+			sql.WHERE("NOCOL.FECHA_BAJA is NULL");
+		}else {
+			sql.WHERE("NOCOL.FECHA_BAJA is NOT NULL");
+		}
+		
 		if (noColegiadoItem.getNif() != null && noColegiadoItem.getNif() != "") {
 			sql.WHERE("upper(per.nifcif) like upper('%" + noColegiadoItem.getNif() + "%')");
 		}
@@ -684,16 +690,16 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if (noColegiadoItem.getMovil() != null && noColegiadoItem.getMovil() != "") {
 			sql.WHERE("dir.movil like '%" + noColegiadoItem.getMovil() + "%'");
 		}
-		if (noColegiadoItem.getEtiquetas() != null && noColegiadoItem.getEtiquetas().length > 0) {
+		if (noColegiadoItem.getTraduccion() != null && noColegiadoItem.getTraduccion().length > 0) {
 
 			String etiquetas = "";
 
-			for (int i = 0; noColegiadoItem.getEtiquetas().length > i; i++) {
+			for (int i = 0; noColegiadoItem.getTraduccion().length > i; i++) {
 
-				if (i == noColegiadoItem.getEtiquetas().length - 1) {
-					etiquetas += "'" + noColegiadoItem.getEtiquetas()[i] + "'";
+				if (i == noColegiadoItem.getTraduccion().length - 1) {
+					etiquetas += "'" + noColegiadoItem.getTraduccion()[i] + "'";
 				} else {
-					etiquetas += "'" + noColegiadoItem.getEtiquetas()[i] + "',";
+					etiquetas += "'" + noColegiadoItem.getTraduccion()[i] + "',";
 				}
 			}
 
@@ -744,7 +750,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.INNER_JOIN(
 				"cen_cliente cli on (nocol.idpersona = cli.idpersona and nocol.idinstitucion = cli.idinstitucion)");
 		sql.INNER_JOIN("cen_institucion inst on nocol.idinstitucion = inst.idinstitucion");
-
+		
 		sql.LEFT_OUTER_JOIN(
 				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
 		sql.LEFT_OUTER_JOIN(
@@ -754,7 +760,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 		sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("per.idtipoidentificacion not in '20'");
-
+		
 		if (noColegiadoItem.getNif() != null && noColegiadoItem.getNif() != "") {
 			sql.WHERE("upper(per.nifcif) like upper('%" + noColegiadoItem.getNif() + "%')");
 		}
@@ -795,16 +801,16 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if (noColegiadoItem.getMovil() != null && noColegiadoItem.getMovil() != "") {
 			sql.WHERE("dir.movil like '%" + noColegiadoItem.getMovil() + "%'");
 		}
-		if (noColegiadoItem.getEtiquetas() != null && noColegiadoItem.getEtiquetas().length > 0) {
+		if (noColegiadoItem.getTraduccion() != null && noColegiadoItem.getTraduccion().length > 0) {
 
 			String etiquetas = "";
 
-			for (int i = 0; noColegiadoItem.getEtiquetas().length > i; i++) {
+			for (int i = 0; noColegiadoItem.getTraduccion().length > i; i++) {
 
-				if (i == noColegiadoItem.getEtiquetas().length - 1) {
-					etiquetas += "'" + noColegiadoItem.getEtiquetas()[i] + "'";
+				if (i == noColegiadoItem.getTraduccion().length - 1) {
+					etiquetas += "'" + noColegiadoItem.getTraduccion()[i] + "'";
 				} else {
-					etiquetas += "'" + noColegiadoItem.getEtiquetas()[i] + "',";
+					etiquetas += "'" + noColegiadoItem.getTraduccion()[i] + "',";
 				}
 			}
 
