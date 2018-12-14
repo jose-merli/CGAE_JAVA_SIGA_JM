@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.form.AsistenciaCursoItem;
+import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.exception.BusinessException;
@@ -24,6 +25,10 @@ public interface IFichaEventosService {
 	
 	public static final String NOMBRE = "NOMBRE";
 	public static final String ASISTENCIA = "ASISTENCIA";
+	
+	public static final long TIPO_EVENTO_INICIO_INSCRIPCION = 4;
+	public static final long TIPO_EVENTO_FIN_INSCRIPCION = 5;
+	public static final long TIPO_EVENTO_SESION = 8;
 	
 	public static final List<String> CAMPOSPLANTILLA = Arrays.asList(IFichaEventosService.NOMBRE, IFichaEventosService.ASISTENCIA);
 	
@@ -52,9 +57,12 @@ public interface IFichaEventosService {
 	public NotificacionEventoDTO getEventNotifications(String idEvento, HttpServletRequest request);
 	
 	public NotificacionEventoDTO getHistoricEventNotifications(String idEvento, HttpServletRequest request);
+	
+	public EventoItem searchEvent(CursoItem cursoItem, HttpServletRequest request);
 
 	public void generaEventosLaboral();
 	
 	public void insertarFestivosAuto();
+
 
 }
