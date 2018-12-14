@@ -496,8 +496,16 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							respuesta.setCode(200);
 							respuesta.setDescription(envio.getIdenvio().toString());
 							respuesta.setMessage("Updates correcto");
+						}else{
+							EnvEnvios envio = new EnvEnvios();
+							envio.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
+							envio.setDescripcion(datosTarjeta.getDescripcion());
+							_envEnviosMapper.updateByPrimaryKey(envio);
 						}
 					}
+					respuesta.setCode(200);
+					respuesta.setDescription("Envio editado correctamente");
+					respuesta.setMessage("Éxito");
 				}catch(Exception e){
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
