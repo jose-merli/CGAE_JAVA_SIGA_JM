@@ -4,6 +4,7 @@ package org.itcgae.siga.com.services.impl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -489,10 +490,12 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							envio.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
 							envio.setFechamodificacion(new Date());
 							envio.setUsumodificacion(usuario.getIdusuario());
+							envio.setEnvio("M");
 							_envEnviosMapper.insert(envio);
 							respuesta.setCode(200);
 							respuesta.setDescription(envio.getIdenvio().toString());
-							respuesta.setMessage(envio.getFecha().toString());
+							SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss"); 
+							respuesta.setMessage(dateFormat.format(envio.getFecha()));
 						}else{
 							EnvEnvios envio = new EnvEnvios();
 							envio.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
@@ -500,7 +503,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							_envEnviosMapper.updateByPrimaryKey(envio);
 							respuesta.setCode(200);
 							respuesta.setDescription(envio.getIdenvio().toString());
-							respuesta.setMessage(envio.getFecha().toString());
+							SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss"); 
+							respuesta.setMessage(dateFormat.format(envio.getFecha()));
 						}
 						
 					}

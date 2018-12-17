@@ -104,8 +104,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-					enviosItemList = _envEnviosExtendsMapper.selectEnviosMasivosSearch(usuario.getIdinstitucion(),
-							usuario.getIdlenguaje(), filtros);
+					enviosItemList = _envEnviosExtendsMapper.selectEnviosComunicacionSearch(idInstitucion, usuario.getIdlenguaje(), filtros);
 					if (enviosItemList.size() > 0) {
 						enviosMasivos.setEnviosMasivosItem(enviosItemList);
 					}
@@ -113,6 +112,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 					Error error = new Error();
 					error.setCode(500);
 					error.setMessage(e.getMessage());
+					e.printStackTrace();
 					enviosMasivos.setError(error);
 				}
 
@@ -150,7 +150,31 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	public EnviosMasivosDTO detalleDestinatarios(HttpServletRequest request, String idEnvio) {
 		LOGGER.info("detalleDestinatarios() -> Entrada al servicio para obtener el detalle de los destinatarios del envio");
 		
-		// TODO Auto-generated method stub
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				
+				
+				
+			}
+			
+		
+		}
+		
+		
+		
+		
 		LOGGER.info("detalleDestinatarios() -> Salida del servicio para obtener el detalle de los destinatarios de envio");
 		return null;
 	}

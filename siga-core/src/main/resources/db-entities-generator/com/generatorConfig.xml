@@ -25,7 +25,7 @@
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table> -->
 		
-<!-- 		<table schema="USCGAE_INT" tableName="ENV_ENVIOS" > -->
+<!-- 		<table schema="USCGAE" tableName="ENV_ENVIOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOS.NEXTVAL FROM DUAL"/> -->
 <!-- 		</table> -->
@@ -52,20 +52,24 @@
 		
 <!-- 			<table schema="USCGAE" tableName="ENV_PLANTILLAREMITENTES" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			</table> -->
+<!-- 		</table> -->
 		
 <!-- 		<table schema="USCGAE" tableName="ENV_ENVIOPROGRAMADO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table> -->
+
+			<table schema="USCGAE" tableName="ENV_DESTINATARIOS" >
+				<property name="ignoreQualifiersAtRuntime" value="true"/>
+			</table>
 		
 		 
 <!-- 			<table schema="USCGAE" tableName="ENV_ENVIOSGRUPOCLIENTE" > -->
 <!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 			</table> -->
 			
-			<table schema="USCGAE" tableName="MOD_CLASECOMUNICACIONES" >
-				<property name="ignoreQualifiersAtRuntime" value="true"/>
-			</table>
+<!-- 			<table schema="USCGAE" tableName="MOD_CLASECOMUNICACIONES" > -->
+<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			</table> -->
 
 <!-- 		<table schema="USCGAE_INT" tableName="ENV_DOCUMENTOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
