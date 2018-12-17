@@ -492,7 +492,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							_envEnviosMapper.insert(envio);
 							respuesta.setCode(200);
 							respuesta.setDescription(envio.getIdenvio().toString());
-							respuesta.setMessage("Updates correcto");
+							respuesta.setMessage(envio.getFecha().toString());
 						}else{
 							EnvEnvios envio = new EnvEnvios();
 							envio.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
@@ -500,7 +500,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							_envEnviosMapper.updateByPrimaryKey(envio);
 							respuesta.setCode(200);
 							respuesta.setDescription(envio.getIdenvio().toString());
-							respuesta.setMessage("Updates correcto");
+							respuesta.setMessage(envio.getFecha().toString());
 						}
 						
 					}

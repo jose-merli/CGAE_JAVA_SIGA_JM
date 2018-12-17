@@ -159,8 +159,42 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 
 	@Override
 	public ComboDTO claseComunicacion(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
+		LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clases comunicacion");
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+				comboItems = _envEstadoEnvioExtendsMapper.selectEstadoEnvios(usuario.getIdlenguaje());
+				if(null != comboItems && comboItems.size() > 0) {
+					ComboItem element = new ComboItem();
+					element.setLabel("");
+					element.setValue("");
+					comboItems.add(0, element);
+				}		
+				
+				comboDTO.setCombooItems(comboItems);
+				
+			}
+		}
+		
+		
+		LOGGER.info("claseComunicacion() -> Salida del servicio para obtener combo clases comunicacion");
+		
+		
+		return comboDTO;
 	}
 
 

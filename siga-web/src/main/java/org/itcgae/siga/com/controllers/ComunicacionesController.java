@@ -29,6 +29,16 @@ public class ComunicacionesController {
 	
 
 	
+	@RequestMapping(value = "/clasesComunicacion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboClasesComunicacion(HttpServletRequest request) {
+		
+		ComboDTO response = _comunicacionesService.claseComunicacion(request);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@RequestMapping(value = "/search",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EnviosMasivosDTO> cargasMasivasSearch(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody EnviosMasivosSearch filtros) {
 		
