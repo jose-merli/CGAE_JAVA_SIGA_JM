@@ -18,7 +18,6 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConModulosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConObjetivoExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

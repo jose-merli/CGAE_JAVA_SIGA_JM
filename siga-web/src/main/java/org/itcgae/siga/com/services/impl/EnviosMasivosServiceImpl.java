@@ -1,10 +1,8 @@
 package org.itcgae.siga.com.services.impl;
 
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -492,7 +490,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							envio.setFechamodificacion(new Date());
 							envio.setUsumodificacion(usuario.getIdusuario());
 							_envEnviosMapper.insert(envio);
-
 							respuesta.setCode(200);
 							respuesta.setDescription(envio.getIdenvio().toString());
 							respuesta.setMessage("Updates correcto");
@@ -501,11 +498,14 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							envio.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
 							envio.setDescripcion(datosTarjeta.getDescripcion());
 							_envEnviosMapper.updateByPrimaryKey(envio);
+							respuesta.setCode(200);
+							respuesta.setDescription(envio.getIdenvio().toString());
+							respuesta.setMessage("Updates correcto");
 						}
+						
 					}
-					respuesta.setCode(200);
-					respuesta.setDescription("Envio editado correctamente");
-					respuesta.setMessage("Éxito");
+					
+					
 				}catch(Exception e){
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
