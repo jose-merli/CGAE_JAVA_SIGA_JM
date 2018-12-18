@@ -5,6 +5,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class SigaConstants {
 
+	public static String ACUERDO = "Acuerdo";
+	public static String FIN = "Fin";
+	public static String FIRMEZA = "Firmeza";
+	public static String IMPOSICION = "Imposicion";
+	public static String INICIO = "Inicio";
+	public static String REHABILITADO = "Rehabilitado";
+	public static String RESOLUCION = "Resolucion";
+	
 	public static String COMBO_INSTITUCIONES = "instituciones";
 
 	public static String COMBO_PERFILES = "perfiles";

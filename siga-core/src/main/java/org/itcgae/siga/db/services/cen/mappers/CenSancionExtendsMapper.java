@@ -18,5 +18,5 @@ public interface CenSancionExtendsMapper extends CenSancionMapper{
 	@Results({ @Result(column = "IDSANCION", property = "newId", jdbcType = JdbcType.VARCHAR)
 	
 	})
-	NewIdDTO getMaxIdSancion(String idTipoSancion, String idPersona);
+	NewIdDTO getMaxIdSancion(String idInstitucion, String idPersona);
 }

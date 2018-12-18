@@ -6,14 +6,10 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTOs.cen.BusquedaJuridicaItem;
-import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
-import org.itcgae.siga.DTOs.cen.BusquedaSancionesDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaSancionesItem;
 import org.itcgae.siga.DTOs.cen.BusquedaSancionesSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.CenTiposancionMapper;
-import org.itcgae.siga.db.services.cen.providers.CenNocolegiadoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +27,7 @@ public interface CenTiposancionExtendsMapper extends CenTiposancionMapper{
 	@Results({
 		@Result(column = "COLEGIO", property = "colegio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCOLEGIO", property = "idColegio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucionS", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDSANCION", property = "idSancion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
@@ -50,7 +47,10 @@ public interface CenTiposancionExtendsMapper extends CenTiposancionMapper{
 		@Result(column = "FECHAREHABILITADO", property = "fechaRehabilitado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAREHABILITADODATE", property = "fechaRehabilitadoDate", jdbcType = JdbcType.DATE),
 		@Result(column = "REHABILITADO", property = "rehabilitado", jdbcType = JdbcType.BOOLEAN),
-		@Result(column = "FIRMEZA", property = "firmeza", jdbcType = JdbcType.BOOLEAN)
+		@Result(column = "FIRMEZA", property = "firmeza", jdbcType = JdbcType.BOOLEAN),
+		@Result(column = "ARCHIVADA", property = "archivada", jdbcType = JdbcType.BOOLEAN),
+		@Result(column = "TEXTO", property = "texto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR)
 	})
 	List<BusquedaSancionesItem> searchBusquedaSanciones(BusquedaSancionesSearchDTO busquedaSancionesSearchDTO, String idLenguaje, String idInstitucion);
 }

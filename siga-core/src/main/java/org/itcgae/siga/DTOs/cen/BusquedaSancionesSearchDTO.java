@@ -19,17 +19,28 @@ public class BusquedaSancionesSearchDTO {
 	private String refConsejo;
 	private String refColegio;
 	private boolean chkRehabilitado;
-	private Date fecha;
-	private Date fechaDesde;
-	private Date fechaHasta;
+	private Date fechaDesdeDate;
+	private Date fechaHastaDate;
 	private boolean chkArchivadas;
-	private Date fechaArchivadaDesde;
-	private Date fechaArchivadaHasta;
+	private Date fechaArchivadaDesdeDate;
+	private Date fechaArchivadaHastaDate;
+	
+	private String tipoFecha;
+	
+	
 	
 	// Búsqueda por Sanciones
 	private String tipo;
 	private String origen;
 	private String estado;
+	
+	@JsonProperty("tipoFecha")
+	public String getTipoFecha() {
+		return tipoFecha;
+	}
+	public void setTipoFecha(String tipoFecha) {
+		this.tipoFecha = tipoFecha;
+	}
 	
 	@JsonProperty("nif")
 	public String getNif() {
@@ -103,28 +114,20 @@ public class BusquedaSancionesSearchDTO {
 		this.chkRehabilitado = chkRehabilitado;
 	}
 	
-	@JsonProperty("fecha")
-	public Date getFecha() {
-		return fecha;
-	}
-	public void setFecha(Date fecha) {
-		this.fecha = fecha;
-	}
-	
-	@JsonProperty("fechaDesde")
+	@JsonProperty("fechaDesdeDate")
 	public Date getFechaDesde() {
-		return fechaDesde;
+		return fechaDesdeDate;
 	}
 	public void setFechaDesde(Date fechaDesde) {
-		this.fechaDesde = fechaDesde;
+		this.fechaDesdeDate = fechaDesde;
 	}
 	
-	@JsonProperty("fechaHasta")
+	@JsonProperty("fechaHastaDate")
 	public Date getFechaHasta() {
-		return fechaHasta;
+		return fechaHastaDate;
 	}
 	public void setFechaHasta(Date fechaHasta) {
-		this.fechaHasta = fechaHasta;
+		this.fechaHastaDate = fechaHasta;
 	}
 	
 	@JsonProperty("chkArchivadas")
@@ -135,20 +138,20 @@ public class BusquedaSancionesSearchDTO {
 		this.chkArchivadas = chkArchivadas;
 	}
 	
-	@JsonProperty("fechaArchivadaDesde")
+	@JsonProperty("fechaArchivadaDesdeDate")
 	public Date getFechaArchivadaDesde() {
-		return fechaArchivadaDesde;
+		return fechaArchivadaDesdeDate;
 	}
 	public void setFechaArchivadaDesde(Date fechaArchivadaDesde) {
-		this.fechaArchivadaDesde = fechaArchivadaDesde;
+		this.fechaArchivadaDesdeDate = fechaArchivadaDesde;
 	}
 	
-	@JsonProperty("fechaArchivadaHasta")
+	@JsonProperty("fechaArchivadaHastaDate")
 	public Date getFechaArchivadaHasta() {
-		return fechaArchivadaHasta;
+		return fechaArchivadaHastaDate;
 	}
 	public void setFechaArchivadaHasta(Date fechaArchivadaHasta) {
-		this.fechaArchivadaHasta = fechaArchivadaHasta;
+		this.fechaArchivadaHastaDate = fechaArchivadaHasta;
 	}
 	
 	@JsonProperty("tipo")
@@ -175,6 +178,7 @@ public class BusquedaSancionesSearchDTO {
 		this.estado = estado;
 	}
 	
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -193,12 +197,11 @@ public class BusquedaSancionesSearchDTO {
 	    		Objects.equals(this.refColegio, busquedaSancionesSearchDTO.refColegio) && 
 	    		Objects.equals(this.refConsejo, busquedaSancionesSearchDTO.refConsejo) && 
 	    		Objects.equals(this.chkRehabilitado, busquedaSancionesSearchDTO.chkRehabilitado) && 
-	    Objects.equals(this.fecha, busquedaSancionesSearchDTO.fecha) && 
-	    Objects.equals(this.fechaDesde, busquedaSancionesSearchDTO.fechaDesde) && 
-	    Objects.equals(this.fechaHasta, busquedaSancionesSearchDTO.fechaHasta) && 
+	    Objects.equals(this.fechaDesdeDate, busquedaSancionesSearchDTO.fechaDesdeDate) && 
+	    Objects.equals(this.fechaHastaDate, busquedaSancionesSearchDTO.fechaHastaDate) && 
 	    Objects.equals(this.chkArchivadas, busquedaSancionesSearchDTO.chkArchivadas) && 
-	    Objects.equals(this.fechaArchivadaDesde, busquedaSancionesSearchDTO.fechaArchivadaDesde) && 
-	    Objects.equals(this.fechaArchivadaHasta, busquedaSancionesSearchDTO.fechaArchivadaHasta) && 
+	    Objects.equals(this.fechaArchivadaDesdeDate, busquedaSancionesSearchDTO.fechaArchivadaDesdeDate) && 
+	    Objects.equals(this.fechaArchivadaHastaDate, busquedaSancionesSearchDTO.fechaArchivadaHastaDate) && 
 	    Objects.equals(this.tipo, busquedaSancionesSearchDTO.tipo) && 
 	    Objects.equals(this.origen, busquedaSancionesSearchDTO.origen) && 
 	    Objects.equals(this.estado, busquedaSancionesSearchDTO.estado);
@@ -206,8 +209,8 @@ public class BusquedaSancionesSearchDTO {
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(tipo, nif, nombre, primerApellido, segundoApellido, idColegios, tipoSancion, refColegio, chkRehabilitado, fechaDesde, fechaHasta, chkArchivadas, fechaArchivadaDesde, 
-	    		fechaArchivadaHasta, tipo, origen, estado);
+	    return Objects.hash(tipo, nif, nombre, primerApellido, segundoApellido, idColegios, tipoSancion, refColegio, chkRehabilitado, fechaDesdeDate, fechaHastaDate, chkArchivadas, fechaArchivadaDesdeDate, 
+	    		fechaArchivadaHastaDate, tipo, origen, estado);
 	}
 
 	
@@ -226,11 +229,11 @@ public class BusquedaSancionesSearchDTO {
 	    sb.append("    refColegio: ").append(toIndentedString(refColegio)).append("\n");
 	    sb.append("    refConsejo: ").append(toIndentedString(refConsejo)).append("\n");
 	    sb.append("    chkRehabilitado: ").append(toIndentedString(chkRehabilitado)).append("\n");
-	    sb.append("    fechaDesde: ").append(toIndentedString(fechaDesde)).append("\n");
-	    sb.append("    fechaHasta: ").append(toIndentedString(fechaHasta)).append("\n");
+	    sb.append("    fechaDesde: ").append(toIndentedString(fechaDesdeDate)).append("\n");
+	    sb.append("    fechaHasta: ").append(toIndentedString(fechaHastaDate)).append("\n");
 	    sb.append("    chkArchivadas: ").append(toIndentedString(chkArchivadas)).append("\n");
-	    sb.append("    fechaArchivadaDesde: ").append(toIndentedString(fechaArchivadaDesde)).append("\n");
-	    sb.append("    fechaArchivadaHasta: ").append(toIndentedString(fechaArchivadaHasta)).append("\n");
+	    sb.append("    fechaArchivadaDesde: ").append(toIndentedString(fechaArchivadaDesdeDate)).append("\n");
+	    sb.append("    fechaArchivadaHasta: ").append(toIndentedString(fechaArchivadaHastaDate)).append("\n");
 	    sb.append("    tipo: ").append(toIndentedString(tipo)).append("\n");
 	    sb.append("    origen: ").append(toIndentedString(origen)).append("\n");
 	    sb.append("    estado: ").append(toIndentedString(estado)).append("\n");

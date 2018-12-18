@@ -196,7 +196,7 @@ public class FichaCursosServiceTest {
 		List<ComboItem> comoboItems = testUtils.getListComboItemsSimulados();
 		List<ForPersonaCurso> trainersList = null;
 		List<ForPersonaCurso> tutorList = null;
-		FormadorCursoItem formadorCursoItem = forTestUtils.getFormadoresCursoItem();
+		FormadorCursoDTO formadorCursoDTO = forTestUtils.getFormadorCursoDTOSimulado();
 		
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 
@@ -216,7 +216,7 @@ public class FichaCursosServiceTest {
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		InsertResponseDTO insertResponseDTOResultado = fichaCursosServiceImpl.saveTrainersCourse(formadorCursoItem, mockreq);
+		InsertResponseDTO insertResponseDTOResultado = fichaCursosServiceImpl.saveTrainersCourse(formadorCursoDTO, mockreq);
 
 		InsertResponseDTO insertResponseDTOEsperado = new InsertResponseDTO();
 		Error error = new Error();
@@ -235,7 +235,7 @@ public class FichaCursosServiceTest {
 		List<ComboItem> comoboItems = testUtils.getListComboItemsSimulados();
 		List<ForPersonaCurso> trainersList = forTestUtils.getListForPersonaCursoSimulados();
 		List<ForPersonaCurso> tutorList = forTestUtils.getListForPersonaCursoSimulados();
-		FormadorCursoItem formadorCursoItem = forTestUtils.getFormadoresCursoItem();
+		FormadorCursoDTO formadorCursoDTO = forTestUtils.getFormadorCursoDTOSimulado();
 		
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 
@@ -255,7 +255,7 @@ public class FichaCursosServiceTest {
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		InsertResponseDTO insertResponseDTOResultado = fichaCursosServiceImpl.saveTrainersCourse(formadorCursoItem, mockreq);
+		InsertResponseDTO insertResponseDTOResultado = fichaCursosServiceImpl.saveTrainersCourse(formadorCursoDTO, mockreq);
 
 		InsertResponseDTO insertResponseDTOEsperado = new InsertResponseDTO();
 		Error error = new Error();
@@ -274,7 +274,7 @@ public class FichaCursosServiceTest {
 		List<ComboItem> comoboItems = testUtils.getListComboItemsSimulados();
 		List<ForPersonaCurso> trainersList = null;
 		List<ForPersonaCurso> tutorList = null;
-		FormadorCursoItem formadorCursoItem = forTestUtils.getFormadoresCursoItem();
+		FormadorCursoDTO formadorCursoDTO = forTestUtils.getFormadorCursoDTOSimulado();
 		
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 
@@ -294,7 +294,7 @@ public class FichaCursosServiceTest {
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		InsertResponseDTO insertResponseDTOResultado = fichaCursosServiceImpl.saveTrainersCourse(formadorCursoItem, mockreq);
+		InsertResponseDTO insertResponseDTOResultado = fichaCursosServiceImpl.saveTrainersCourse(formadorCursoDTO, mockreq);
 
 		InsertResponseDTO insertResponseDTOEsperado = new InsertResponseDTO();
 		Error error = new Error();

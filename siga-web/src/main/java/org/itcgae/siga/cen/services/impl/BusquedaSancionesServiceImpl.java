@@ -1,6 +1,5 @@
 package org.itcgae.siga.cen.services.impl;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaSancionesDTO;
@@ -21,12 +19,10 @@ import org.itcgae.siga.cen.services.IBusquedaSancionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSancion;
+import org.itcgae.siga.db.entities.CenSancionExample;
 import org.itcgae.siga.db.entities.CenSancionKey;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSancionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposancionExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -46,9 +42,6 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 	@Autowired
 	private CenSancionExtendsMapper cenSancionExtendsMapper;
-
-	@Autowired
-	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 
 	@Override
 	public ComboDTO getComboTipoSancion(HttpServletRequest request) {
@@ -106,11 +99,11 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 				idLenguaje = usuario.getIdlenguaje();
 
 				LOGGER.info(
-						"searchBusquedaSanciones() / cenTiposancionExtendsMapper.searchBusquedaSanciones() -> Entrada a cenNocolegiadoExtendsMapper para busqueda de personas colegiadas por filtro");
+						"searchBusquedaSanciones() / cenTiposancionExtendsMapper.searchBusquedaSanciones() -> Entrada a cenTiposancionExtendsMapper para busqueda de sanciones por filtro");
 				busquedaSancionesItems = cenTiposancionExtendsMapper.searchBusquedaSanciones(busquedaSancionesSearchDTO,
 						idLenguaje, String.valueOf(idInstitucion));
 				LOGGER.info(
-						"searchBusquedaSanciones() / cenTiposancionExtendsMapper.searchBusquedaSanciones() -> Salida de cenNocolegiadoExtendsMapper para busqueda de personas no colegiadas por filtro");
+						"searchBusquedaSanciones() / cenTiposancionExtendsMapper.searchBusquedaSanciones() -> Salida de cenTiposancionExtendsMapper para busqueda de sanciones por filtro");
 
 				busquedaSancionesDTO.setBusquedaSancionesItem(busquedaSancionesItems);
 			} else {
@@ -149,20 +142,11 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
-				LOGGER.info(
-						"insertSanction() / cenPersonaExtendsMapper.selectByExample() -> Entrada a cenPersonaExtendsMapper para obtener el idPersona");
-				CenPersonaExample cenPersonaExample = new CenPersonaExample();
-				cenPersonaExample.createCriteria().andNifcifEqualTo(dni);
-				List<CenPersona> cenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
-				LOGGER.info(
-						"insertSanction() / cenPersonaExtendsMapper.selectByExample() -> Salida a cenPersonaExtendsMapper para obtener el idPersona");
-
-				if (null != cenPersona && !cenPersona.isEmpty()) {
-					Long idPersona = cenPersona.get(0).getIdpersona();
+					Long idPersona = Long.valueOf(busquedaSancionesItem.getIdPersona());
 
 					CenSancion cenSancion = fillCenSancion(usuario, idPersona, busquedaSancionesItem);
 
-					NewIdDTO idSancion = cenSancionExtendsMapper.getMaxIdSancion(busquedaSancionesItem.getTipoSancion(),
+					NewIdDTO idSancion = cenSancionExtendsMapper.getMaxIdSancion(String.valueOf(usuario.getIdinstitucion()),
 							String.valueOf(idPersona));
 
 					if (idSancion == null) {
@@ -185,9 +169,9 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 					} else {
 						insertResponseDTO.setStatus(SigaConstants.OK);
 					}
-				} else {
-					insertResponseDTO.setStatus(SigaConstants.KO);
-				}
+//				} else {
+//					insertResponseDTO.setStatus(SigaConstants.KO);
+//				}
 
 			}
 		}
@@ -201,7 +185,9 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 		
 		CenSancion cenSancion = new CenSancion();
 
-		cenSancion.setIdsancion(Long.valueOf(busquedaSancionesItem.getIdSancion()));
+		if(busquedaSancionesItem.getIdSancion() != null) {
+			cenSancion.setIdsancion(Long.valueOf(busquedaSancionesItem.getIdSancion()));
+		}
 		
 		if (busquedaSancionesItem.getTipoSancion() != null) {
 			cenSancion.setIdtiposancion(Short.valueOf(busquedaSancionesItem.getTipoSancion()));
@@ -248,7 +234,11 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 			cenSancion.setChkrehabilitado("0");
 		}
 
-		cenSancion.setChkarchivada("0");
+		if (busquedaSancionesItem.getArchivada() != null && busquedaSancionesItem.getArchivada().equals("Sí")) {
+			cenSancion.setChkarchivada("1");
+		} else {
+			cenSancion.setChkarchivada("0");
+		}
 
 		cenSancion.setFechamodificacion(new Date());
 
@@ -340,5 +330,22 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 		LOGGER.info("updateSanction() -> Salida del servicio para insertar una sanción");
 		return updateResponseDTO;
 	}
-
+	
+	@Override
+	public void archivarSancionesRehabilitado() {
+		CenSancionExample cenSancionExample = new CenSancionExample();
+		cenSancionExample.createCriteria().andChkarchivadaEqualTo("0").andFecharehabilitadoIsNotNull().andFecharehabilitadoLessThan(new Date());
+		List<CenSancion> cenSancionList = cenSancionExtendsMapper.selectByExample(cenSancionExample);
+		
+		if(cenSancionList != null && cenSancionList.size() > 0) {
+			for (CenSancion cenSancion : cenSancionList) {
+				
+				cenSancion.setChkarchivada("1");
+				cenSancion.setFechaarchivada(new Date());
+				
+				cenSancionExtendsMapper.updateByPrimaryKeySelective(cenSancion);
+			}
+		}
+		
+	}
 }

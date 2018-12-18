@@ -83,7 +83,9 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.INNER_JOIN(
 				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
 
-		sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
+		if(idInstitucion != Short.parseShort("2000")) {
+			sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
+		}
 		sql.WHERE("per.idtipoidentificacion not in '20'");
 
 		if (colegiadoItem.getNif() != null && colegiadoItem.getNif() != "") {
@@ -338,7 +340,10 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '"+idLenguaje+"')");
 		
 		sql.WHERE("col.idpersona = '"+ colegiadoItem.getIdPersona() +"'");
-		sql.WHERE("colest.idinstitucion = '"+ idInstitucion + "'");
+		
+		if(idInstitucion != Short.parseShort("2000")) {
+			sql.WHERE("colest.idinstitucion = '"+ idInstitucion + "'");
+		}
 //		sql1.WHERE("dir.fechabaja is null");
 		
 		sql.ORDER_BY("fechaestado desc");
@@ -467,8 +472,9 @@ public String selectDatosColegiales(String idPersona, String idInstitucion) {
 		sql.INNER_JOIN("CEN_ESTADOCOLEGIAL EST ON EST.IDESTADO = DAT.IDESTADO");
 	
 		sql.WHERE("CEN.IDPERSONA = '" + idPersona + "'");
-		sql.WHERE("CEN.IDINSTITUCION = '" + idInstitucion + "'");
-		
+		if(idInstitucion != "2000") {
+			sql.WHERE("CEN.IDINSTITUCION = '" + idInstitucion + "'");
+		}
 
 		return sql.toString();
 	}

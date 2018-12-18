@@ -1,6 +1,7 @@
 package org.itcgae.siga.DTOs.form;
 
 import java.util.Arrays;
+import java.util.Date;
 
 public class CursoItem {
 	
@@ -14,11 +15,19 @@ public class CursoItem {
 	private String nombreApellidosFormador;
 	private Double precioDesde;
 	private Double precioHasta;
+	private Date fechaInscripcionDesdeDate;
+	private Date fechaInscripcionHastaDate;
+	private Date fechaImparticionDesdeDate;
+	private Date fechaImparticionHastaDate;
 	private String fechaInscripcionDesde;
 	private String fechaInscripcionHasta;
 	private String fechaImparticionDesde;
 	private String fechaImparticionHasta;
 	private String [] temas;
+	private String minimoAsistencia;
+	private String lugar;
+	private Integer autovalidacionInscripcion;
+	private Integer flagArchivado;
 	
 	//Auxiliares pantalla
 	private String idEstado;
@@ -28,7 +37,9 @@ public class CursoItem {
 	private String precioCurso;
 	private String fechaInscripcion;
 	private String fechaImparticion;
-	private Integer flagArchivado;
+	private String idEventoInicioInscripcion;
+	private String idEventoFinInscripcion;
+	private String idTipoEvento;
 	
 	public Long getIdCurso() {
 		return idCurso;
@@ -89,6 +100,30 @@ public class CursoItem {
 	}
 	public void setPrecioHasta(Double precioHasta) {
 		this.precioHasta = precioHasta;
+	}
+	public Date getFechaInscripcionDesdeDate() {
+		return fechaInscripcionDesdeDate;
+	}
+	public void setFechaInscripcionDesdeDate(Date fechaInscripcionDesdeDate) {
+		this.fechaInscripcionDesdeDate = fechaInscripcionDesdeDate;
+	}
+	public Date getFechaInscripcionHastaDate() {
+		return fechaInscripcionHastaDate;
+	}
+	public void setFechaInscripcionHastaDate(Date fechaInscripcionHastaDate) {
+		this.fechaInscripcionHastaDate = fechaInscripcionHastaDate;
+	}
+	public Date getFechaImparticionDesdeDate() {
+		return fechaImparticionDesdeDate;
+	}
+	public void setFechaImparticionDesdeDate(Date fechaImparticionDesdeDate) {
+		this.fechaImparticionDesdeDate = fechaImparticionDesdeDate;
+	}
+	public Date getFechaImparticionHastaDate() {
+		return fechaImparticionHastaDate;
+	}
+	public void setFechaImparticionHastaDate(Date fechaImparticionHastaDate) {
+		this.fechaImparticionHastaDate = fechaImparticionHastaDate;
 	}
 	public String getFechaInscripcionDesde() {
 		return fechaInscripcionDesde;
@@ -168,6 +203,42 @@ public class CursoItem {
 	public void setFlagArchivado(Integer flagArchivado) {
 		this.flagArchivado = flagArchivado;
 	}
+	public String getLugar() {
+		return lugar;
+	}
+	public void setLugar(String lugar) {
+		this.lugar = lugar;
+	}
+	public String getMinimoAsistencia() {
+		return minimoAsistencia;
+	}
+	public void setMinimoAsistencia(String minimoAsistencia) {
+		this.minimoAsistencia = minimoAsistencia;
+	}
+	public Integer getAutovalidacionInscripcion() {
+		return autovalidacionInscripcion;
+	}
+	public void setAutovalidacionInscripcion(Integer autovalidacionInscripcion) {
+		this.autovalidacionInscripcion = autovalidacionInscripcion;
+	}
+	public String getIdEventoInicioInscripcion() {
+		return idEventoInicioInscripcion;
+	}
+	public void setIdEventoInicioInscripcion(String idEventoInicioInscripcion) {
+		this.idEventoInicioInscripcion = idEventoInicioInscripcion;
+	}
+	public String getIdEventoFinInscripcion() {
+		return idEventoFinInscripcion;
+	}
+	public void setIdEventoFinInscripcion(String idEventoFinInscripcion) {
+		this.idEventoFinInscripcion = idEventoFinInscripcion;
+	}
+	public String getIdTipoEvento() {
+		return idTipoEvento;
+	}
+	public void setIdTipoEvento(String idTipoEvento) {
+		this.idTipoEvento = idTipoEvento;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -182,6 +253,12 @@ public class CursoItem {
 		result = prime * result + ((fechaInscripcion == null) ? 0 : fechaInscripcion.hashCode());
 		result = prime * result + ((fechaInscripcionDesde == null) ? 0 : fechaInscripcionDesde.hashCode());
 		result = prime * result + ((fechaInscripcionHasta == null) ? 0 : fechaInscripcionHasta.hashCode());
+		
+		result = prime * result + ((fechaImparticionDesdeDate == null) ? 0 : fechaImparticionDesdeDate.hashCode());
+		result = prime * result + ((fechaImparticionHastaDate == null) ? 0 : fechaImparticionHastaDate.hashCode());
+		result = prime * result + ((fechaInscripcionDesdeDate == null) ? 0 : fechaInscripcionDesdeDate.hashCode());
+		result = prime * result + ((fechaInscripcionHastaDate == null) ? 0 : fechaInscripcionHastaDate.hashCode());
+		
 		result = prime * result + ((flagArchivado == null) ? 0 : flagArchivado.hashCode());
 		result = prime * result + ((idCurso == null) ? 0 : idCurso.hashCode());
 		result = prime * result + ((idEstado == null) ? 0 : idEstado.hashCode());
@@ -195,7 +272,13 @@ public class CursoItem {
 		result = prime * result + ((precioHasta == null) ? 0 : precioHasta.hashCode());
 		result = prime * result + Arrays.hashCode(temas);
 		result = prime * result + ((visibilidad == null) ? 0 : visibilidad.hashCode());
+		result = prime * result + ((lugar == null) ? 0 : lugar.hashCode());
+		result = prime * result + ((minimoAsistencia == null) ? 0 : minimoAsistencia.hashCode());
+		result = prime * result + ((autovalidacionInscripcion == null) ? 0 : autovalidacionInscripcion.hashCode());
+		result = prime * result + ((idTipoEvento == null) ? 0 : idTipoEvento.hashCode());
+
 		return result;
+		
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -256,6 +339,30 @@ public class CursoItem {
 				return false;
 		} else if (!fechaInscripcionHasta.equals(other.fechaInscripcionHasta))
 			return false;
+		
+		
+		if (fechaImparticionDesdeDate == null) {
+			if (other.fechaImparticionDesdeDate != null)
+				return false;
+		} else if (!fechaImparticionDesdeDate.equals(other.fechaImparticionDesdeDate))
+			return false;
+		if (fechaImparticionHastaDate == null) {
+			if (other.fechaImparticionHastaDate != null)
+				return false;
+		} else if (!fechaImparticionHastaDate.equals(other.fechaImparticionHastaDate))
+			return false;
+		if (fechaInscripcionDesdeDate == null) {
+			if (other.fechaInscripcionDesdeDate != null)
+				return false;
+		} else if (!fechaInscripcionDesdeDate.equals(other.fechaInscripcionDesdeDate))
+			return false;
+		if (fechaInscripcionHastaDate == null) {
+			if (other.fechaInscripcionHastaDate != null)
+				return false;
+		} else if (!fechaInscripcionHastaDate.equals(other.fechaInscripcionHastaDate))
+			return false;
+		
+		
 		if (flagArchivado == null) {
 			if (other.flagArchivado != null)
 				return false;
@@ -318,6 +425,26 @@ public class CursoItem {
 				return false;
 		} else if (!visibilidad.equals(other.visibilidad))
 			return false;
+		if (lugar == null) {
+			if (other.lugar != null)
+				return false;
+		} else if (!lugar.equals(other.lugar))
+			return false;
+		if (minimoAsistencia == null) {
+			if (other.minimoAsistencia != null)
+				return false;
+		} else if (!minimoAsistencia.equals(other.minimoAsistencia))
+			return false;
+		if (autovalidacionInscripcion == null) {
+			if (other.autovalidacionInscripcion != null)
+				return false;
+		} else if (!autovalidacionInscripcion.equals(other.autovalidacionInscripcion))
+			return false;
+		if (idTipoEvento == null) {
+			if (other.idTipoEvento != null)
+				return false;
+		} else if (!idTipoEvento.equals(other.idTipoEvento))
+			return false;
 		return true;
 	}
 	@Override
@@ -328,10 +455,14 @@ public class CursoItem {
 				+ ", precioDesde=" + precioDesde + ", precioHasta=" + precioHasta + ", fechaInscripcionDesde="
 				+ fechaInscripcionDesde + ", fechaInscripcionHasta=" + fechaInscripcionHasta
 				+ ", fechaImparticionDesde=" + fechaImparticionDesde + ", fechaImparticionHasta="
-				+ fechaImparticionHasta + ", temas=" + Arrays.toString(temas) + ", idEstado=" + idEstado
+				+ fechaImparticionHasta + ", fechaInscripcionDesdeDate="
+						+ fechaInscripcionDesdeDate + ", fechaInscripcionHastaDate=" + fechaInscripcionHastaDate
+						+ ", fechaImparticionDesdeDate=" + fechaImparticionDesdeDate + ", fechaImparticionHastaDate="
+						+ fechaImparticionHastaDate + ", temas=" + Arrays.toString(temas) + ", idEstado=" + idEstado
 				+ ", idVisibilidad=" + idVisibilidad + ", idInstitucion=" + idInstitucion + ", descripcionEstado="
 				+ descripcionEstado + ", precioCurso=" + precioCurso + ", fechaInscripcion=" + fechaInscripcion
-				+ ", fechaImparticion=" + fechaImparticion + ", flagArchivado=" + flagArchivado + "]";
+				+ ", fechaImparticion=" + fechaImparticion + ", flagArchivado=" + flagArchivado
+				+ ", lugar=" + lugar + ", minimoAsistencia=" + minimoAsistencia + ", autovalidacionInscripcion=" + autovalidacionInscripcion  + ", idTipoEvento=" + idTipoEvento + "]";
 	}
 	
 	

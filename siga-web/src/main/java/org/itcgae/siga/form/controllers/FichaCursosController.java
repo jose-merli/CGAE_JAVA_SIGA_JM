@@ -4,8 +4,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.age.EventoDTO;
+import org.itcgae.siga.DTOs.form.CursoDTO;
+import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
-import org.itcgae.siga.DTOs.form.FormadorCursoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.form.services.IFichaCursosService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +51,8 @@ public class FichaCursosController {
 	}
 
 	@RequestMapping(value = "fichaCursos/saveTrainersCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> saveTrainersCourse(@RequestBody FormadorCursoItem formadorCursoItem, HttpServletRequest request) {
-		InsertResponseDTO response = fichaCursosService.saveTrainersCourse(formadorCursoItem, request);
+	ResponseEntity<InsertResponseDTO> saveTrainersCourse(@RequestBody FormadorCursoDTO formadorCursoDTO, HttpServletRequest request) {
+		InsertResponseDTO response = fichaCursosService.saveTrainersCourse(formadorCursoDTO, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 	
@@ -58,6 +60,36 @@ public class FichaCursosController {
 	ResponseEntity<UpdateResponseDTO> deleteTrainersCourse(@RequestBody FormadorCursoDTO formadorCursoDTO, HttpServletRequest request) {
 		UpdateResponseDTO response = fichaCursosService.deleteTrainersCourse(formadorCursoDTO, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/getSessionsCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EventoDTO> getSessionsCourse(@RequestBody CursoItem cursoItem, HttpServletRequest request) {
+		EventoDTO response = fichaCursosService.getSessionsCourse(cursoItem, request);
+		return new ResponseEntity<EventoDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/saveCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> saveCourse(@RequestBody CursoItem cursoItem, HttpServletRequest request) {
+		InsertResponseDTO response = fichaCursosService.saveCourse(cursoItem, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/updateCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updatedCourse(@RequestBody CursoItem cursoItem, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaCursosService.updateCourse(cursoItem, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/releaseOrAnnounceCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> releaseOrAnnounceCourse(@RequestBody CursoDTO cursoDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaCursosService.releaseOrAnnounceCourse(cursoDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/searchCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<CursoItem> searchCourse(@RequestBody String idCurso, HttpServletRequest request) {
+		CursoItem response = fichaCursosService.searchCourse(idCurso, request);
+		return new ResponseEntity<CursoItem>(response, HttpStatus.OK);
 	}
 	
 }

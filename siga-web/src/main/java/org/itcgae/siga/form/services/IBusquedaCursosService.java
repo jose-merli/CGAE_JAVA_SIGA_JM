@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -17,6 +18,8 @@ public interface IBusquedaCursosService {
 	public ComboDTO getTemasCursos(HttpServletRequest request);
 	
 	public CursoDTO searchCurso(CursoItem cursoItem, HttpServletRequest request);
+	
+	public InsertResponseDTO saveCourses(List<CursoItem> listCursoItem, HttpServletRequest request);
 	
 	public int archivarCursos(List<CursoItem> listCursoItem, HttpServletRequest request);
 	

@@ -652,7 +652,7 @@ public class ColegiadoItem {
 	/**
 	 *
 	 */
-	public ColegiadoItem idgrupo(String idgrupo []){
+	public ColegiadoItem idgrupo(String[] idgrupo ){
 		this.idgrupo = idgrupo;
 		return this;
 	}
@@ -662,7 +662,7 @@ public class ColegiadoItem {
 		return idgrupo;
 	}
 	
-	public void setIdgrupo(String idgrupo []) {
+	public void setIdgrupo(String[] idgrupo) {
 		this.idgrupo = idgrupo;
 	}
 	

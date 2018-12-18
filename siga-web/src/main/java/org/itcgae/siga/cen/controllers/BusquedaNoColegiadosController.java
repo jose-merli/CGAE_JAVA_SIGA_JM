@@ -2,8 +2,10 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.DatosBancariosDeleteDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
@@ -12,6 +14,7 @@ import org.itcgae.siga.cen.services.IBusquedaColegiadosService;
 import org.itcgae.siga.cen.services.IBusquedaNoColegiadosService;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
 import org.itcgae.siga.cen.services.ITarjetaDatosIntegrantesService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -87,4 +90,13 @@ public class BusquedaNoColegiadosController {
 		NoColegiadoDTO response = busquedaNoColegiadosService.searchHistoricNoColegiado(numPagina, noColegiadoItem, request);
 		return new ResponseEntity<NoColegiadoDTO >(response, HttpStatus.OK);
 	} 
+	
+	@RequestMapping(value = "/busquedaNocolegiado/deleteNoColegiado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DeleteResponseDTO>deleteNoColegiado(@RequestBody NoColegiadoItem noColegiadoItem, HttpServletRequest request) { 
+		DeleteResponseDTO response = busquedaNoColegiadosService.deleteNoColegiado(noColegiadoItem, request);
+		
+		if(response.getStatus().equals(SigaConstants.OK))
+		return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
 }

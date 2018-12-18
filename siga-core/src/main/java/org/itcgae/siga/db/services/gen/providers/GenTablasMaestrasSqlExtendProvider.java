@@ -192,7 +192,7 @@ public class GenTablasMaestrasSqlExtendProvider {
         sql.INSERT_INTO("GEN_RECURSOS_CATALOGOS");
         sql.VALUES("IDRECURSO", ("(SELECT MAX(IDRECURSO)+1 IDRECURSO FROM (" + 
         		"select TO_NUMBER(REPLACE(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'null',''),'99999999999') IDRECURSO from gen_recursos_catalogos  ))" ));
-       	
+
         if(catalogo.getLocal().equals("S")) {
         	sql.VALUES("IDINSTITUCION",  "'" +catalogo.getIdInstitucion()+"'");
         }
