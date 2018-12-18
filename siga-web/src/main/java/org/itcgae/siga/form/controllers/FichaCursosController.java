@@ -8,7 +8,6 @@ import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
-import org.itcgae.siga.DTOs.form.FormadorCursoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.form.services.IFichaCursosService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +51,8 @@ public class FichaCursosController {
 	}
 
 	@RequestMapping(value = "fichaCursos/saveTrainersCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> saveTrainersCourse(@RequestBody FormadorCursoItem formadorCursoItem, HttpServletRequest request) {
-		InsertResponseDTO response = fichaCursosService.saveTrainersCourse(formadorCursoItem, request);
+	ResponseEntity<InsertResponseDTO> saveTrainersCourse(@RequestBody FormadorCursoDTO formadorCursoDTO, HttpServletRequest request) {
+		InsertResponseDTO response = fichaCursosService.saveTrainersCourse(formadorCursoDTO, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 	

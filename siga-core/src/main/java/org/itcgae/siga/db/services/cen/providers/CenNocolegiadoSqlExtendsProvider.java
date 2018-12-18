@@ -62,7 +62,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql2.LEFT_OUTER_JOIN("CEN_CLIENTE CLI ON (COM.CEN_CLIENTE_IDPERSONA = CLI.IDPERSONA AND CLI.IDINSTITUCION = COM.IDINSTITUCION )");
 		sql2.LEFT_OUTER_JOIN("CEN_PERSONA PER2 ON PER2.IDPERSONA = COM.CEN_CLIENTE_IDPERSONA");
 		
-		if(null != idInstitucion) {
+		if(null != idInstitucion && "2000" != idInstitucion) {
 
 			sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
 		}
@@ -180,15 +180,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 				"CEN_CLIENTE CLI ON (COM.CEN_CLIENTE_IDPERSONA = CLI.IDPERSONA AND CLI.IDINSTITUCION = COM.IDINSTITUCION )");
 		sql2.LEFT_OUTER_JOIN("CEN_PERSONA PER2 ON PER2.IDPERSONA = CLI.IDPERSONA");
 
-		if (null != idInstitucion) {
+		if (null != idInstitucion && "2000" != idInstitucion) {
 			sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
 		}
 
-		if(null != idInstitucion) {
-			sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
-		}
-		
-		
 		if(null != busquedaJuridicaSearchDTO.getNif() && !busquedaJuridicaSearchDTO.getNif().equalsIgnoreCase("")) {
 			sql2.WHERE("(UPPER(PER.NIFCIF) LIKE UPPER  ('%" + busquedaJuridicaSearchDTO.getNif() + "%'))");
 
@@ -380,7 +375,9 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 				+ idLenguaje + "')");
 
 		sql.WHERE("PER.IDPERSONA = '" + personaSearchDto.getIdPersona() + "'");
-		sql.WHERE("IRPF.IDINSTITUCION = '" + idInstitucion + "'");
+		if(idInstitucion != "2000") {
+			sql.WHERE("IRPF.IDINSTITUCION = '" + idInstitucion + "'");
+		}
 		sql.ORDER_BY("FECHAINICIO DESC");
 
 		return sql.toString();
@@ -641,7 +638,9 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.LEFT_OUTER_JOIN(
 				"cen_datoscv datoscv on (datoscv.idpersona = cli.idpersona and datoscv.idinstitucion = cli.idinstitucion)");
 
-		sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
+		if(idInstitucion != Short.parseShort("2000")) {
+			sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
+		}
 		sql.WHERE("per.idtipoidentificacion not in '20'");
 
 		if(!noColegiadoItem.isHistorico()) {
@@ -757,8 +756,9 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 				"CEN_DIRECCION_TIPODIRECCION TIPODIRECCION ON (TIPODIRECCION.IDDIRECCION = DIR.IDDIRECCION AND TIPODIRECCION.IDPERSONA = DIR.IDPERSONA AND  TIPODIRECCION.IDINSTITUCION = DIR.IDINSTITUCION)");
 		sql.LEFT_OUTER_JOIN(
 				"cen_datoscv datoscv on (datoscv.idpersona = cli.idpersona and datoscv.idinstitucion = cli.idinstitucion)");
-
-		sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
+		if(idInstitucion != "2000") {
+			sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
+		}
 		sql.WHERE("per.idtipoidentificacion not in '20'");
 		
 		if (noColegiadoItem.getNif() != null && noColegiadoItem.getNif() != "") {
