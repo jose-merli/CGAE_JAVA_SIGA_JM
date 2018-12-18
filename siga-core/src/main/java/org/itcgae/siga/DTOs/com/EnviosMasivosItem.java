@@ -19,7 +19,6 @@ public class EnviosMasivosItem {
 	private Date fechaBaja;
 	private String asunto;
 	private String cuerpo;
-	private String idGrupo;
 	private String estadoEnvio;
 	private String tipoEnvio;
 	
@@ -95,12 +94,6 @@ public class EnviosMasivosItem {
 	}
 	public void setCuerpo(String cuerpo) {
 		this.cuerpo = cuerpo;
-	}
-	public String getIdGrupo() {
-		return idGrupo;
-	}
-	public void setIdGrupo(String idGrupo) {
-		this.idGrupo = idGrupo;
 	}
 	public String getEstadoEnvio() {
 		return estadoEnvio;
