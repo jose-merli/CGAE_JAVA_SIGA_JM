@@ -37,6 +37,8 @@ public class EnvEnviosExtendsSqlProvider {
 		
 		sql.WHERE("ENVIO.IDINSTITUCION = '" + idInstitucion +"'");
 		sql.WHERE("ENVIO.FECHABAJA IS NULL");
+		//con este campo controlamos que sea de envios Masivos
+		sql.WHERE("ENVIO.ENVIO = 'M'");
 		
 		if(filtros.getAsunto() != null && !filtros.getAsunto().trim().equals("")){
 			sql.WHERE(filtroTextoBusquedas("DESCRIPCION",filtros.getAsunto()));
@@ -104,12 +106,16 @@ public class EnvEnviosExtendsSqlProvider {
 		
 		sql.WHERE("ENVIO.IDINSTITUCION = '" + idInstitucion +"'");
 		sql.WHERE("ENVIO.FECHABAJA IS NULL");
+		//controlamos con este campo si es 'A' pertenece a comunicaciones
 		sql.WHERE("ENVIO.ENVIO = 'A'");
 		
 		if(filtros.getAsunto() != null && !filtros.getAsunto().trim().equals("")){
 			sql.WHERE(filtroTextoBusquedas("DESCRIPCION",filtros.getAsunto()));
 		}
 		if(filtros.getidEstado() != null && !filtros.getidEstado().trim().equals("")){
+			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getidEstado() +"'");
+		}
+		if(filtros.getIdClaseComunicacion() != null && !filtros.getIdClaseComunicacion().trim().equals("")){
 			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getidEstado() +"'");
 		}
 		if(filtros.getFechaCreacion() != null){

@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 public interface ConClaseComunicacionExtendsMapper {
 
 	@SelectProvider(type = ConClaseComunicacionesExtendsSqlProvider.class, method = "selectClaseComunicaciones")
-	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+	@Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCLASECOMUNICACION", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectTipoClaseComunicacion(String idLenguaje, Short idInstitucion);
+	List<ComboItem> selectTipoClaseComunicacion();
 }

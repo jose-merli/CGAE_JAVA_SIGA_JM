@@ -36,6 +36,7 @@ import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvHistoricoEstadoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
+import org.itcgae.siga.db.services.com.providers.ConClaseComunicacionesExtendsSqlProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,6 +80,9 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	
 	@Autowired
 	private EnvDocumentosMapper _envDocumentosMapper;
+	
+	@Autowired
+	private ConClaseComunicacionExtendsMapper _conClaseComunicacionExtendsMapper;
 
 
 	/**Realiza la busqueda de comunicaciones **/
@@ -192,8 +196,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 			
 			if (null != usuarios && usuarios.size() > 0) {
 
-				AdmUsuarios usuario = usuarios.get(0);
-				comboItems = _envEstadoEnvioExtendsMapper.selectEstadoEnvios(usuario.getIdlenguaje());
+				comboItems = _conClaseComunicacionExtendsMapper.selectTipoClaseComunicacion();
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
 					element.setLabel("");
