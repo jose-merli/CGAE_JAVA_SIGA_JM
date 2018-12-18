@@ -372,17 +372,14 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							envio.setIdestado(idEstado);
 							update = _envEnviosMapper.updateByPrimaryKey(envio);
 							if(update > 0){
-								
-								EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
-								NewIdDTO idDTO = _envHistoricoEstadoExtendsMapper.selectMaxIDHistorico();
-								historico.setIdhistorico(Short.parseShort(idDTO.getNewId()));
-								historico.setIdenvio(Long.parseLong(envios[i].getIdEnvio()));
-								historico.setIdinstitucion(usuario.getIdinstitucion());
-								historico.setFechamodificacion(new Date());
-								historico.setFechaestado(new Date());
-								historico.setUsumodificacion(usuario.getIdusuario());
-								historico.setIdestado(idEstado);
-								_envHistoricoestadoenvioMapper.insert(historico);
+								EnvHistoricoestadoenvioExample example = new EnvHistoricoestadoenvioExample();
+								example.createCriteria().andIdenvioEqualTo(Long.parseLong(envios[i].getIdEnvio())).andIdinstitucionEqualTo(usuario.getIdinstitucion());
+								List<EnvHistoricoestadoenvio> historico =  _envHistoricoestadoenvioMapper.selectByExample(example);
+								historico.get(0).setFechamodificacion(new Date());
+								historico.get(0).setFechaestado(new Date());
+								historico.get(0).setUsumodificacion(usuario.getIdusuario());
+								historico.get(0).setIdestado(idEstado);
+								_envHistoricoestadoenvioMapper.updateByPrimaryKey(historico.get(0));
 							}
 						}
 					}
@@ -491,7 +488,20 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							envio.setFechamodificacion(new Date());
 							envio.setUsumodificacion(usuario.getIdusuario());
 							envio.setEnvio("M");
-							_envEnviosMapper.insert(envio);
+							int insert = _envEnviosMapper.insert(envio);
+							if(insert >0){
+								EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
+								//NewIdDTO idDTO = _envHistoricoEstadoExtendsMapper.selectMaxIDHistorico();
+								//historico.setIdhistorico(Short.parseShort(idDTO.getNewId()));
+								historico.setIdenvio(envio.getIdenvio());
+								historico.setIdinstitucion(usuario.getIdinstitucion());
+								historico.setFechamodificacion(new Date());
+								historico.setFechaestado(new Date());
+								historico.setUsumodificacion(usuario.getIdusuario());
+								Short idEstado = 1;
+								historico.setIdestado(idEstado);
+								_envHistoricoestadoenvioMapper.insert(historico);
+							}
 							respuesta.setCode(200);
 							respuesta.setDescription(envio.getIdenvio().toString());
 							SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss"); 
@@ -603,13 +613,10 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					keyEnvio.setIdinstitucion(idInstitucion);
 					EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio);
 					Long idEnvio = envio.getIdenvio();
-					//NewIdDTO newID = _envEnviosExtendsMapper.selectMaxIDEnvio();
-					//Long idEnvioNuevo = Long.parseLong(newID.getNewId());
-					//envio.setIdenvio(idEnvioNuevo);
 					envio.setIdplantillaenvios(plantillaEnvio.getIdplantillaenvios());
 					envio.setFechamodificacion(new Date());
 					envio.setUsumodificacion(usuario.getIdusuario());
-					_envEnviosMapper.insert(envio);
+					 _envEnviosMapper.insert(envio);
 					Long idEnvioNuevo = envio.getIdenvio();
 					
 					//tabla env_envioProgramado
@@ -921,7 +928,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	@Override
 	public Error guardarDocumentoEnvio(HttpServletRequest request, ResponseDocumentoDTO documentoDTO) {
 		
-		LOGGER.info("guardarConfiguracion() -> Entrada al servicio para guardar datos tarjeta configuración");
+		LOGGER.info("guardarDocumentoEnvio() -> Entrada al servicio para guardar datos tarjeta docuentos");
 		
 		Error respuesta = new Error();
 		
@@ -945,8 +952,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					documento.setDescripcion(documentoDTO.getNombreDocumento());
 					documento.setFechamodificacion(new Date());
 					documento.setUsumodificacion(usuario.getIdusuario());
-					_envDocumentosMapper.insert(documento);
-					
+					_envDocumentosMapper.insert(documento);		
 					respuesta.setCode(200);
 					respuesta.setDescription("Datos configuracion de envio guardados correctamente");
 					respuesta.setMessage("Updates correcto");
@@ -959,7 +965,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				
 			}
 		}
-		LOGGER.info("guardarConfiguracion() -> Salida del servicio para guardar datos tarjeta configuración");
+		LOGGER.info("guardarDocumentoEnvio() -> Salida del servicio para guardar datos tarjeta documentos");
 		return respuesta;
 	}
 

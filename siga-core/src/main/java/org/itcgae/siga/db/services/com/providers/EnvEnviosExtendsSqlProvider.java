@@ -34,7 +34,7 @@ public class EnvEnviosExtendsSqlProvider {
 		
 		
 		sql.WHERE("ENVIO.IDINSTITUCION = '" + idInstitucion +"'");
-		sql.WHERE("ENVIO.FECHABAJA IS NULL");
+		
 		//con este campo controlamos que sea de envios Masivos
 		sql.WHERE("ENVIO.ENVIO = 'M'");
 		
@@ -43,6 +43,13 @@ public class EnvEnviosExtendsSqlProvider {
 		}
 		if(filtros.getidEstado() != null && !filtros.getidEstado().trim().equals("")){
 			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getidEstado() +"'");
+			if(filtros.getidEstado().equals("6")){
+				sql.WHERE("ENVIO.FECHABAJA IS NOT NULL");
+			}else{
+				sql.WHERE("ENVIO.FECHABAJA IS NULL");
+			}
+		}else{
+			sql.WHERE("ENVIO.FECHABAJA IS NULL");
 		}
 		if(filtros.getFechaCreacion() != null){
 			String fechaCreacion = dateFormat.format(filtros.getFechaCreacion());

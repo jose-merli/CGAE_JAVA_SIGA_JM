@@ -70,7 +70,7 @@ public class ComunicacionesController {
 			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/detalle/configuracion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	/*@RequestMapping(value = "/detalle/configuracion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EnviosMasivosDTO> obtenerConfiguracionEnvio(HttpServletRequest request, @RequestBody String idEnvio) {
 		
 		EnviosMasivosDTO response = _comunicacionesService.detalleConfiguracion(request, idEnvio);
@@ -78,5 +78,5 @@ public class ComunicacionesController {
 			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+	}*/
 }
