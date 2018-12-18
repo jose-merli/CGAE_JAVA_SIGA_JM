@@ -503,8 +503,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							_envEnviosMapper.updateByPrimaryKey(envio);
 							respuesta.setCode(200);
 							respuesta.setDescription(envio.getIdenvio().toString());
-							SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss"); 
-							respuesta.setMessage(dateFormat.format(envio.getFecha()));
 						}
 						
 					}

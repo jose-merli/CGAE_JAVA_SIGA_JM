@@ -135,15 +135,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 		return null;
 	}
 
-	/**Obtiene los datos de la configuración del envío, para cargarlo en la ficha**/
-	@Override
-	public EnviosMasivosDTO detalleConfiguracion(HttpServletRequest request, String idEnvio) {
-		LOGGER.info("detalleConfiguracion() -> Entrada al servicio para obtener el detalle de la configuracion del envio");
-		
-		// TODO Auto-generated method stub
-		LOGGER.info("detalleConfiguracion() -> Salida del servicio para obtener el detalle de la configuracion del envio");
-		return null;
-	}
+
 
 	/**Obtiene los destinatarios del envío, para cargar los destinatarios en la ficha**/
 	@Override
@@ -222,43 +214,5 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	}
 
 
-
-	@Override
-	public ComboDTO estadoEnvios(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-	@Override
-	public ComboDTO tipoEnvio(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-	@Override
-	public Error programarEnvio(HttpServletRequest request, EnviosMasivosItem[] comunicacionesProgramarDto) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-	@Override
-	public Error cancelarEnvios(HttpServletRequest request, EnvioProgramadoDto[] comunicacionesProgramadosDto) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-	@Override
-	public DocumentosEnvioDTO obtenerDocumentosEnvio(HttpServletRequest request, String idEnvio) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }
