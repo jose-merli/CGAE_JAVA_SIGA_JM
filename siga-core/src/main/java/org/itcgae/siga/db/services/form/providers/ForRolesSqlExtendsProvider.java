@@ -10,10 +10,12 @@ public class ForRolesSqlExtendsProvider extends ForRolesSqlProvider{
 		SQL sql = new SQL();
 		
 		sql.SELECT_DISTINCT("rol.IDROL");
-		sql.SELECT("rol.DESCRIPCION");
+		sql.SELECT("cat.DESCRIPCION");
 		sql.FROM("FOR_ROLES rol");
-		sql.WHERE("rol.FECHABAJA IS NULL");
-		sql.ORDER_BY("rol.DESCRIPCION");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS cat ON rol.DESCRIPCION = cat.IDRECURSO");
+		sql.WHERE("rol.FECHA_BAJA IS NULL");
+		sql.WHERE("rol.idinstitucion ='"+ idInstitucion +"'");
+		sql.ORDER_BY("cat.DESCRIPCION");
 		
 		return sql.toString();
 	}

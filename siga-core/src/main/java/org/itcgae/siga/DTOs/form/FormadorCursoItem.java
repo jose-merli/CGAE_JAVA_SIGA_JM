@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class FormadorCursoItem {
 	
+	private String idFormador;
 	private Long idCurso;
 	private Long idPersona;
 	private String idRol;
@@ -25,6 +26,22 @@ public class FormadorCursoItem {
 	private String tipoIdentificacion;
 	private Date fechaBaja;
 
+	/**
+	 **/
+	public FormadorCursoItem idFormador(String idFormador) {
+		this.idFormador = idFormador;
+		return this;
+	}
+
+	@JsonProperty("idFormador")
+	public String getIdFormador() {
+		return idFormador;
+	}
+
+	public void setIdFormador(String idFormador) {
+		this.idFormador = idFormador;
+	}
+	
 	/**
 	 **/
 	public FormadorCursoItem idCurso(Long idCurso) {
@@ -325,7 +342,8 @@ public class FormadorCursoItem {
 			return false;
 		}
 		FormadorCursoItem formadorCursoItem = (FormadorCursoItem) o;
-		return Objects.equals(this.idCurso, formadorCursoItem.idCurso)
+		return  Objects.equals(this.idFormador, formadorCursoItem.idFormador)
+				&& Objects.equals(this.idCurso, formadorCursoItem.idCurso)
 				&& Objects.equals(this.idPersona, formadorCursoItem.idPersona)
 				&& Objects.equals(this.idRol, formadorCursoItem.idRol)
 				&& Objects.equals(this.rol, formadorCursoItem.rol)
@@ -346,7 +364,7 @@ public class FormadorCursoItem {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(idCurso, idPersona, idRol, rol, idInstitucion, usuModificacion, fechaModificacion, idTipoCoste, 
+		return Objects.hash(idFormador, idCurso, idPersona, idRol, rol, idInstitucion, usuModificacion, fechaModificacion, idTipoCoste, 
 				tipoCoste, nombre, apellidos, tarifa, tutor, nif, tipoIdentificacion, fechaBaja);
 	}
 
@@ -355,6 +373,7 @@ public class FormadorCursoItem {
 		StringBuilder sb = new StringBuilder();
 		sb.append("class FormadorCursoItem {\n");
 
+		sb.append("    idFormador: ").append(toIndentedString(idFormador)).append("\n");
 		sb.append("    idCurso: ").append(toIndentedString(idCurso)).append("\n");
 		sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 		sb.append("    idRol: ").append(toIndentedString(idRol)).append("\n");

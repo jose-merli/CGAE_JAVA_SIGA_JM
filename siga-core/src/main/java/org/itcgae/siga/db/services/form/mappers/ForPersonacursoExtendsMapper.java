@@ -25,6 +25,7 @@ public interface ForPersonacursoExtendsMapper extends ForPersonaCursoMapper{
 	
 	@SelectProvider(type = ForPersonacursoSqlExtendsProvider.class, method = "getTrainersCourse")
 	@Results({
+		@Result(column = "IDFORMADOR", property = "idFormador", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDCURSO", property = "idCurso", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),

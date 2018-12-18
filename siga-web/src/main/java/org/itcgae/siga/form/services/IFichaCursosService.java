@@ -8,7 +8,6 @@ import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
-import org.itcgae.siga.DTOs.form.FormadorCursoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface IFichaCursosService {
@@ -31,7 +30,7 @@ public interface IFichaCursosService {
 
 	public UpdateResponseDTO updateTrainersCourse(FormadorCursoDTO formadorCursoDTO, HttpServletRequest request);
 
-	public InsertResponseDTO saveTrainersCourse(FormadorCursoItem formadorCursoItem, HttpServletRequest request);
+	public InsertResponseDTO saveTrainersCourse(FormadorCursoDTO formadorCursoDTO, HttpServletRequest request);
 
 	public UpdateResponseDTO deleteTrainersCourse(FormadorCursoDTO formadorCursoDTO, HttpServletRequest request);
 	
