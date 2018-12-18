@@ -616,6 +616,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					envio.setIdplantillaenvios(plantillaEnvio.getIdplantillaenvios());
 					envio.setFechamodificacion(new Date());
 					envio.setUsumodificacion(usuario.getIdusuario());
+					Short idEstadoPendiente = 1;
+					envio.setIdestado(idEstadoPendiente);
 					 _envEnviosMapper.insert(envio);
 					Long idEnvioNuevo = envio.getIdenvio();
 					
@@ -650,6 +652,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 						envHistorico.setIdenvio(idEnvioNuevo);
 						envHistorico.setFechamodificacion(new Date());
 						envHistorico.setUsumodificacion(usuario.getIdusuario());
+						envHistorico.setIdestado(idEstadoPendiente);
 						_envHistoricoestadoenvioMapper.insert(envHistorico);
 					}
 					
@@ -674,8 +677,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 						envEnviosgrupocliente.setUsumodificacion(usuario.getIdusuario());
 						_envEnviosgrupoclienteMapper.insert(envEnviosgrupocliente);
 					}
-					
-					
 					
 					respuesta.setCode(200);
 					respuesta.setDescription("Datos configuracion de envio guardados correctamente");
