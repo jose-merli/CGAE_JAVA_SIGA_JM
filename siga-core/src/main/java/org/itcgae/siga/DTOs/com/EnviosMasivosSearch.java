@@ -11,6 +11,7 @@ public class EnviosMasivosSearch {
 	private Date fechaProgramacion;
 	private String idTipoEnvio;
 	private String idEstado;
+	private String idClaseComunicacion;
 	
 	@JsonProperty("asunto")
 	public String getAsunto() {
@@ -47,6 +48,14 @@ public class EnviosMasivosSearch {
 	}
 	public void setidEstado(String idEstado) {
 		this.idEstado = idEstado;
+	}
+	
+	@JsonProperty("idClaseComunicacion")
+	public String getIdClaseComunicacion() {
+		return idClaseComunicacion;
+	}
+	public void setIdClaseComunicacion(String idClaseComunicacion) {
+		this.idClaseComunicacion = idClaseComunicacion;
 	}
 	
 	

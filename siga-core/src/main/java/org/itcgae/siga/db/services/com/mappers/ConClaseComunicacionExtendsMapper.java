@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.db.services.com.providers.EnvTipoEnvioExtendsSqlProvider;
+import org.itcgae.siga.db.services.com.providers.ConClaseComunicacionesExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +15,9 @@ import org.springframework.stereotype.Service;
 @Primary
 public interface ConClaseComunicacionExtendsMapper {
 
-	@SelectProvider(type = EnvTipoEnvioExtendsSqlProvider.class, method = "selectTipoEnvios")
-	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+	@SelectProvider(type = ConClaseComunicacionesExtendsSqlProvider.class, method = "selectClaseComunicaciones")
+	@Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCLASECOMUNICACION", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectTipoClaseComunicacion(String idLenguaje);
+	List<ComboItem> selectTipoClaseComunicacion();
 }

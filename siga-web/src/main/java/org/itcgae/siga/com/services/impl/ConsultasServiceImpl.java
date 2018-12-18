@@ -18,7 +18,6 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConModulosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConObjetivoExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -137,8 +136,8 @@ LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clase
 			
 			if (null != usuarios && usuarios.size() > 0) {
 
-				AdmUsuarios usuario = usuarios.get(0);
-				comboItems = _conClaseComunicacionExtendsMapper.selectTipoClaseComunicacion(usuario.getIdlenguaje());
+				
+				comboItems = _conClaseComunicacionExtendsMapper.selectTipoClaseComunicacion();
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
 					element.setLabel("");

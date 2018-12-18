@@ -7,6 +7,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.com.DestinatarioItem;
+import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.DocumentoEnvioItem;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
@@ -35,7 +37,9 @@ import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvHistoricoEstadoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvDestinatariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
+import org.itcgae.siga.db.services.com.providers.ConClaseComunicacionesExtendsSqlProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -79,11 +83,17 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	
 	@Autowired
 	private EnvDocumentosMapper _envDocumentosMapper;
+	
+	@Autowired
+	private ConClaseComunicacionExtendsMapper _conClaseComunicacionExtendsMapper;
+	
+	@Autowired
+	private EnvDestinatariosExtendsMapper _envDestinatariosExtendsMapper;
 
 
 	/**Realiza la busqueda de comunicaciones **/
 	@Override
-	public EnviosMasivosDTO comunicacionesSearch(HttpServletRequest request, EnviosMasivosSearch filtros) {
+ 	public EnviosMasivosDTO comunicacionesSearch(HttpServletRequest request, EnviosMasivosSearch filtros) {
 		LOGGER.info("estadoEnvios() -> Entrada al servicio para obtener combo estado envios");
 
 		EnviosMasivosDTO enviosMasivos = new EnviosMasivosDTO();
@@ -104,8 +114,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-					enviosItemList = _envEnviosExtendsMapper.selectEnviosMasivosSearch(usuario.getIdinstitucion(),
-							usuario.getIdlenguaje(), filtros);
+					enviosItemList = _envEnviosExtendsMapper.selectEnviosComunicacionSearch(idInstitucion, usuario.getIdlenguaje(), filtros);
 					if (enviosItemList.size() > 0) {
 						enviosMasivos.setEnviosMasivosItem(enviosItemList);
 					}
@@ -113,6 +122,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 					Error error = new Error();
 					error.setCode(500);
 					error.setMessage(e.getMessage());
+					e.printStackTrace();
 					enviosMasivos.setError(error);
 				}
 
@@ -135,72 +145,88 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 		return null;
 	}
 
-	/**Obtiene los datos de la configuración del envío, para cargarlo en la ficha**/
-	@Override
-	public EnviosMasivosDTO detalleConfiguracion(HttpServletRequest request, String idEnvio) {
-		LOGGER.info("detalleConfiguracion() -> Entrada al servicio para obtener el detalle de la configuracion del envio");
-		
-		// TODO Auto-generated method stub
-		LOGGER.info("detalleConfiguracion() -> Salida del servicio para obtener el detalle de la configuracion del envio");
-		return null;
-	}
+
 
 	/**Obtiene los destinatarios del envío, para cargar los destinatarios en la ficha**/
 	@Override
-	public EnviosMasivosDTO detalleDestinatarios(HttpServletRequest request, String idEnvio) {
+	public DestinatariosDTO detalleDestinatarios(HttpServletRequest request, String idEnvio) {
 		LOGGER.info("detalleDestinatarios() -> Entrada al servicio para obtener el detalle de los destinatarios del envio");
 		
-		// TODO Auto-generated method stub
+		DestinatariosDTO respuesta = new DestinatariosDTO();
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		try{
+			
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				
+				if (null != usuarios && usuarios.size() > 0) {
+					
+					List<DestinatarioItem> destinatarios = _envDestinatariosExtendsMapper.selectDestinatarios(idInstitucion, idEnvio);
+					if(destinatarios.size()>0){
+						respuesta.setDestinatarios(destinatarios);
+					}
+					
+				}
+				
+			}
+		
+		}catch(Exception e){
+			Error error = new Error();
+			error.setCode(500);
+			error.setDescription("Internal Server error");
+			error.setMessage(e.getMessage());
+		}
+		
 		LOGGER.info("detalleDestinatarios() -> Salida del servicio para obtener el detalle de los destinatarios de envio");
-		return null;
+		return respuesta;
 	}
 
 
 
 	@Override
 	public ComboDTO claseComunicacion(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
+		LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clases comunicacion");
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+
+				comboItems = _conClaseComunicacionExtendsMapper.selectTipoClaseComunicacion();
+				if(null != comboItems && comboItems.size() > 0) {
+					ComboItem element = new ComboItem();
+					element.setLabel("");
+					element.setValue("");
+					comboItems.add(0, element);
+				}		
+				
+				comboDTO.setCombooItems(comboItems);
+				
+			}
+		}
+		
+		
+		LOGGER.info("claseComunicacion() -> Salida del servicio para obtener combo clases comunicacion");
+		
+		
+		return comboDTO;
 	}
 
 
-
-	@Override
-	public ComboDTO estadoEnvios(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-	@Override
-	public ComboDTO tipoEnvio(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-	@Override
-	public Error programarEnvio(HttpServletRequest request, EnviosMasivosItem[] comunicacionesProgramarDto) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-	@Override
-	public Error cancelarEnvios(HttpServletRequest request, EnvioProgramadoDto[] comunicacionesProgramadosDto) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
-	@Override
-	public DocumentosEnvioDTO obtenerDocumentosEnvio(HttpServletRequest request, String idEnvio) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }
