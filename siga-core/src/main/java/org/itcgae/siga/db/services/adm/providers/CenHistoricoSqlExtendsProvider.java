@@ -71,7 +71,7 @@ public class CenHistoricoSqlExtendsProvider {
 	
 	public String selectMaxIDHistoricoByPerson(String idPersona, String idInstitucion) {
 		SQL sql = new SQL();
-		sql.SELECT("MAX(IDHISTORICO)+1 AS IDHISTORICO");
+		sql.SELECT("nvl(MAX(IDHISTORICO)+1,1) AS IDHISTORICO");
 		sql.FROM("CEN_HISTORICO");
 		sql.WHERE("IDPERSONA = '" + idPersona + "'" );
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'" );

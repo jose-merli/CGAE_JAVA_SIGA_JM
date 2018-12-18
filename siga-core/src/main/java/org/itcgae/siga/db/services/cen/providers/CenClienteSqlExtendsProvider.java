@@ -33,5 +33,41 @@ public class CenClienteSqlExtendsProvider extends CenClienteSqlProvider {
 		
 		return sql.toString();
 	}
+	
+	public String getEsLetrado(String idPersona, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("nvl(cen_cliente.letrado,0)AS LETRADO");
+		sql.FROM("cen_cliente");
+		sql.WHERE("IDPERSONA = '"+ idPersona  + "'");
+		sql.WHERE("IDINSTITUCION = '"+ idInstitucion  + "'");
+		
 
+	
+		
+		return sql.toString();
+	}
+	public String getInstitucionesEjerciente(String idPersona, String idInstitucion) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDINSTITUCION");
+		sql.FROM("CEN_DATOSCOLEGIALESESTADO");
+		sql.WHERE("IDPERSONA = '"+ idPersona  + "'");
+		sql.WHERE("IDESTADO = '20'");
+		sql.WHERE("FECHAMODIFICACION = (SELECT max(fechamodificacion) " + 
+				"       	 FROM CEN_DATOSCOLEGIALESESTADO " + 
+				"       	   WHERE IDPERSONA = '"+ idPersona  + "' " + 
+				"       	   and idinstitucion in  " + 
+				"       	 (SELECT idinstitucion  " + 
+				"       	 FROM CEN_INSTITUCION  " + 
+ 
+				"       	  START WITH IDINSTITUCION = '"+ idPersona  + "'" + 
+				"       	 CONNECT BY PRIOR IDINSTITUCION = CEN_INST_IDINSTITUCION) )");
+
+		
+		return sql.toString();
+	}
+	
+	
+	
 }

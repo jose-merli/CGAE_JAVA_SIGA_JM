@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.cen.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
+import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.mappers.CenComponentesSqlProvider;
 
 public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
@@ -102,6 +103,9 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 		if (!datosDireccionesSearchDTO.getHistorico()) {
 			sql.WHERE("DIRECCION.FECHABAJA is null");
 		}
+		if (null != datosDireccionesSearchDTO.getIdTipo()) {
+			sql.WHERE("TIPODIRECCION.IDTIPODIRECCION = '"+datosDireccionesSearchDTO.getIdTipo()+ "'");
+		}
 		sql.WHERE("DIRECCION.IDINSTITUCION = '"+idInstitucion+"'");
 		sql.ORDER_BY("CAT.DESCRIPCION, DIRECCION.IDDIRECCION  ");
 	
@@ -139,7 +143,7 @@ public class CenDireccionesSqlExtendsProvider extends CenComponentesSqlProvider{
 	
 	public String selectNewIdDireccion(String idPersona, String idInstitucion) {
 		SQL sql = new SQL();
-		sql.SELECT("MAX(DIRECCION.IDDIRECCION) + 1 AS IDDIRECCION");
+		sql.SELECT("NVL(MAX(DIRECCION.IDDIRECCION) + 1,1) AS IDDIRECCION");
 		sql.FROM("CEN_DIRECCIONES DIRECCION");
 		sql.WHERE("DIRECCION.IDPERSONA = '"+idPersona+"'");
 		sql.WHERE("DIRECCION.IDINSTITUCION = '"+idInstitucion+"'");
@@ -233,4 +237,46 @@ public String selectDireccionesSolEsp(String idPersona, String idDireccion,Strin
 		
 		return sqlPrincipal.toString();
 	}
+
+
+	public String getNumDirecciones(CenDirecciones beanDir, int tipoDireccionFacturacion) {
+		SQL sql = new SQL();
+		sql.SELECT("SELECT COUNT(1) AS IDDIRECCION");
+		sql.FROM("CEN_DIRECCIONES DIRECCION");
+		sql.JOIN(" CEN_DIRECCION_TIPODIRECCION TIPODIRECCION ON (TIPODIRECCION.IDDIRECCION = DIRECCION.IDDIRECCION AND TIPODIRECCION.IDPERSONA = DIRECCION.IDPERSONA AND  TIPODIRECCION.IDINSTITUCION = DIRECCION.IDINSTITUCION) ");
+		sql.WHERE("DIRECCION.IDINSTITUCION = '"+beanDir.getIdinstitucion()+"'");
+		sql.WHERE("DIRECCION.IDPERSONA = '"+beanDir.getIdpersona()+"'");
+		sql.WHERE("DIRECCION.FECHABAJA IS NULLL");
+		sql.WHERE("TIPODIRECCION.IDTIPODIRECCION = '"+tipoDireccionFacturacion+"'");
+		
+		
+		return sql.toString();
+	}
+	
+	
+	
+	public String getTiposDireccion(Short idinstitucion, Long idPersona, Long idDireccion,	String idioma) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("f_siga_gettiposdireccion("+idinstitucion+", "+idPersona+", "+idDireccion+", "+ idioma +") as DESCRIPCION");
+		sql.FROM("DUAL");
+		return sql.toString();
+	}
+	
+	
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
 }

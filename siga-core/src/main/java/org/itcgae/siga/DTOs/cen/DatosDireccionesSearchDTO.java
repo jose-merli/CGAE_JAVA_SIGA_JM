@@ -10,7 +10,7 @@ public class DatosDireccionesSearchDTO {
 	private String idPersona;
 	private String idInstitucion;
 	private boolean historico;
-	
+	private String idTipo;
 
 	
 	
@@ -110,6 +110,20 @@ public class DatosDireccionesSearchDTO {
 	      return "null";
 	    }
 	    return o.toString().replace("\n", "\n    ");
+	}
+
+	/**
+	 * @return the idTipo
+	 */
+	public String getIdTipo() {
+		return idTipo;
+	}
+
+	/**
+	 * @param idTipo the idTipo to set
+	 */
+	public void setIdTipo(String idTipo) {
+		this.idTipo = idTipo;
 	}
 	
 	

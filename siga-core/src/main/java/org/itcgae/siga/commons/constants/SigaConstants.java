@@ -47,7 +47,59 @@ public class SigaConstants {
 			return mensajeError;
 		}
 	}
-
+    // Tipo direcciones que tienen logica asociada
+	public static final int TIPO_DIRECCION_CENSOWEB		= 3;
+	public static final int TIPO_DIRECCION_DESPACHO		= 2;
+	public static final int TIPO_DIRECCION_GUIA	    	= 5;
+	public static final int TIPO_DIRECCION_GUARDIA  	= 6;
+	public static final int TIPO_DIRECCION_FACTURACION  = 8;
+	public static final int TIPO_DIRECCION_TRASPASO_OJ  = 9;
+	public static final int TIPO_DIRECCION_PUBLICA		= 4;
+	
+	
+	// Estados colegiales
+	public static final int ESTADO_COLEGIAL_SINEJERCER 		= 10;
+	public static final int ESTADO_COLEGIAL_EJERCIENTE		= 20;
+	public static final int ESTADO_COLEGIAL_BAJACOLEGIAL	= 30;
+	public static final int ESTADO_COLEGIAL_INHABILITACION	= 40;
+	public static final int ESTADO_COLEGIAL_SUSPENSION	= 	  50;
+	public static final int ESTADO_COLEGIAL_ALTA	= 	  1020;// Correspnde a una combinacion del estado 10 y 20;
+	
+	//Tipos de Preferente
+	public static final String TIPO_PREFERENTE_CORREO = "C";  
+	public static final String TIPO_PREFERENTE_CORREOELECTRONICO = "E";  
+	public static final String TIPO_PREFERENTE_FAX = "F";  
+	public static final String TIPO_PREFERENTE_SMS = "S"; 
+	
+	// Tipo cambio histórico de censo
+		public static final int TIPO_CAMBIO_HISTORICO_ESTADO_ALTA_COLEGIAL	= 1;
+		public static final int TIPO_CAMBIO_HISTORICO_ESTADO_BAJA_COLEGIAL	= 2;
+		public static final int TIPO_CAMBIO_HISTORICO_ESTADO_ALTA_EJERCICIO	= 3;
+		public static final int TIPO_CAMBIO_HISTORICO_ESTADO_BAJA_EJERCICIO	= 4;
+		public static final int TIPO_CAMBIO_HISTORICO_ESTADO_INHABILITACION	= 5;
+		public static final int TIPO_CAMBIO_HISTORICO_ESTADO_SUSPENSION		= 6;
+		public static final int TIPO_CAMBIO_HISTORICO_DATOS_GENERALES		= 10;
+		public static final int TIPO_CAMBIO_HISTORICO_DATOS_COLEGIALES		= 20;
+		public static final int TIPO_CAMBIO_HISTORICO_DIRECCIONES			= 30;
+		public static final int TIPO_CAMBIO_HISTORICO_CUENTAS_BANCARIAS		= 40;
+		public static final int TIPO_CAMBIO_HISTORICO_DATOS_CV				= 50;
+		public static final int TIPO_CAMBIO_HISTORICO_DATOS_COMPONENTES		= 60;
+		public static final int TIPO_CAMBIO_HISTORICO_DATOS_FACTURACION		= 70;
+		public static final int TIPO_CAMBIO_HISTORICO_TURNOS				= 80;
+		public static final int TIPO_CAMBIO_HISTORICO_EXPEDIENTES			= 90;
+		public static final int TIPO_CAMBIO_HISTORICO_DESIGNACIONMODIFICACION		= 101;
+		public static final int TIPO_CAMBIO_HISTORICO_DESIGNACIONJUSTIFICACION		= 102;
+		public static final int TIPO_CAMBIO_HISTORICO_DESIGNACIONALTAACTUACION		= 103;
+		public static final int TIPO_CAMBIO_HISTORICO_DESIGNACIONMODIFICAACTUACION		= 107;
+		public static final int TIPO_CAMBIO_HISTORICO_DESIGNACIONDELETEACTUACION		= 108;
+		
+		public static final int TIPO_CAMBIO_HISTORICO_ASISTENCIAALTA		= 104;
+		public static final int TIPO_CAMBIO_HISTORICO_ASISTENCIAMODIFICACION		= 105;
+		public static final int TIPO_CAMBIO_HISTORICO_ASISTENCIAALTAACTUACION		= 106;
+		
+	
+	
+	
 	public enum ERROR_CLIENT {
 		XML_NO_VALIDO(null), SERV_NODISPONIBLE("Servicio no disponible."), SERV_CERTNOAUT(
 				"En el caso de comunicaciones con certificado de cliente que el certificado presentado no esté autorizado."), CLI_NOVALIDO(
@@ -93,7 +145,8 @@ public class SigaConstants {
 										"petición servicio ECOS"), RESPUESTA_CLIENTE_ECOS(new Short("6"),
 												"respuesta cliente ECOS"), PETICION_WS_PUBLICADOR(new Short("7"),
 														"petición servicio"), RESPUESTA_WS_PUBLICADOR(new Short("8"),
-																"respuesta servicio");
+																"respuesta servicio"),PETICION_SERVICIO_FUSIONADOR(new Short("9"), "petición servicio"),
+																	RESPUESTA_SERVICIO_FUSIONADOR(new Short("10"), "respuesta servicio");
 
 		private final Short codigo;
 		private final String descripcion;
@@ -123,7 +176,7 @@ public class SigaConstants {
 
 	public static enum MODULO {
 		CARGAS(new Short("1"), "CARGAS"), ADMINISTRACION(new Short("2"), "ADMINISTRACION"), PUBLICACION(new Short("3"),
-				"PUBLICACION");
+				"PUBLICACION"),FUSIONADOR(new Short("4"), "FUSIONADOR");
 
 		private final Short codigo;
 		private final String descripcion;

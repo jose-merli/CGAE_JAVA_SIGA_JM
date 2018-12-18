@@ -823,4 +823,19 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 	
 		return sql.toString();
 	}
+	
+	public String selectColegiacionesIdPersona(Long idPersona) {
+
+		SQL sql = new SQL();
+
+
+		sql.SELECT("col.idinstitucion as IDINSTITUCION");
+		
+		sql.FROM("cen_nocolegiado col");
+		
+		sql.WHERE("col.idpersona = '"+ idPersona +"'");
+		
+	
+		return sql.toString();
+	}
 }

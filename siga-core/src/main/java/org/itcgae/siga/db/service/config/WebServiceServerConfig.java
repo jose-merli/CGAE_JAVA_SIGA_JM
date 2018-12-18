@@ -40,4 +40,23 @@ public class WebServiceServerConfig {
 		xsds.setInline(true);
 		return xsds;
 	}
+	
+	
+	@Bean(name = "FusionadorPersonasService")
+	public DefaultWsdl11Definition fusionadorPersonasWsdl11Definition(@Qualifier("fusionadorPersonasSchema") XsdSchemaCollection fusionadorPersonas) {
+		DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+		wsdl11Definition.setPortTypeName("FusionadorPersonasPort");
+		wsdl11Definition.setLocationUri("/ws/FusionadorPersonasService");
+		wsdl11Definition.setTargetNamespace("urn:fusionadorPersonas.ws.siga.itcgae.org");
+		wsdl11Definition.setSchemaCollection(fusionadorPersonas);
+		
+		return wsdl11Definition;
+	}
+	
+	@Bean(name= "fusionadorPersonasSchema")
+	public XsdSchemaCollection fusionadorPersonasSchema(){
+		CommonsXsdSchemaCollection xsds = new CommonsXsdSchemaCollection(new ClassPathResource("xsd/fusionadorPersonas/v1/FusionadorPersonasServer.xsd"));
+		xsds.setInline(true);
+		return xsds;
+	}
 }
