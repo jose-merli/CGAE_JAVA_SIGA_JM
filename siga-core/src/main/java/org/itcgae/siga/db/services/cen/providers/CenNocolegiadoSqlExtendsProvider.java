@@ -62,7 +62,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql2.LEFT_OUTER_JOIN("CEN_CLIENTE CLI ON (COM.CEN_CLIENTE_IDPERSONA = CLI.IDPERSONA AND CLI.IDINSTITUCION = COM.IDINSTITUCION )");
 		sql2.LEFT_OUTER_JOIN("CEN_PERSONA PER2 ON PER2.IDPERSONA = COM.CEN_CLIENTE_IDPERSONA");
 		
-		if(null != idInstitucion) {
+		if(null != idInstitucion && "2000" != idInstitucion) {
 
 			sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
 		}
@@ -180,15 +180,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 				"CEN_CLIENTE CLI ON (COM.CEN_CLIENTE_IDPERSONA = CLI.IDPERSONA AND CLI.IDINSTITUCION = COM.IDINSTITUCION )");
 		sql2.LEFT_OUTER_JOIN("CEN_PERSONA PER2 ON PER2.IDPERSONA = CLI.IDPERSONA");
 
-		if (null != idInstitucion) {
+		if (null != idInstitucion && "2000" != idInstitucion) {
 			sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
 		}
 
-		if(null != idInstitucion) {
-			sql2.WHERE("I.IDINSTITUCION = '" + idInstitucion + "'");
-		}
-		
-		
 		if(null != busquedaJuridicaSearchDTO.getNif() && !busquedaJuridicaSearchDTO.getNif().equalsIgnoreCase("")) {
 			sql2.WHERE("(UPPER(PER.NIFCIF) LIKE UPPER  ('%" + busquedaJuridicaSearchDTO.getNif() + "%'))");
 
@@ -380,7 +375,9 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 				+ idLenguaje + "')");
 
 		sql.WHERE("PER.IDPERSONA = '" + personaSearchDto.getIdPersona() + "'");
-		sql.WHERE("IRPF.IDINSTITUCION = '" + idInstitucion + "'");
+		if(idInstitucion != "2000") {
+			sql.WHERE("IRPF.IDINSTITUCION = '" + idInstitucion + "'");
+		}
 		sql.ORDER_BY("FECHAINICIO DESC");
 
 		return sql.toString();
@@ -641,9 +638,17 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.LEFT_OUTER_JOIN(
 				"cen_datoscv datoscv on (datoscv.idpersona = cli.idpersona and datoscv.idinstitucion = cli.idinstitucion)");
 
-		sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
+		if(idInstitucion != Short.parseShort("2000")) {
+			sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
+		}
 		sql.WHERE("per.idtipoidentificacion not in '20'");
 
+		if(!noColegiadoItem.isHistorico()) {
+			sql.WHERE("NOCOL.FECHA_BAJA is NULL");
+		}else {
+			sql.WHERE("NOCOL.FECHA_BAJA is NOT NULL");
+		}
+		
 		if (noColegiadoItem.getNif() != null && noColegiadoItem.getNif() != "") {
 			sql.WHERE("upper(per.nifcif) like upper('%" + noColegiadoItem.getNif() + "%')");
 		}
@@ -684,16 +689,16 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if (noColegiadoItem.getMovil() != null && noColegiadoItem.getMovil() != "") {
 			sql.WHERE("dir.movil like '%" + noColegiadoItem.getMovil() + "%'");
 		}
-		if (noColegiadoItem.getEtiquetas() != null && noColegiadoItem.getEtiquetas().length > 0) {
+		if (noColegiadoItem.getTraduccion() != null && noColegiadoItem.getTraduccion().length > 0) {
 
 			String etiquetas = "";
 
-			for (int i = 0; noColegiadoItem.getEtiquetas().length > i; i++) {
+			for (int i = 0; noColegiadoItem.getTraduccion().length > i; i++) {
 
-				if (i == noColegiadoItem.getEtiquetas().length - 1) {
-					etiquetas += "'" + noColegiadoItem.getEtiquetas()[i] + "'";
+				if (i == noColegiadoItem.getTraduccion().length - 1) {
+					etiquetas += "'" + noColegiadoItem.getTraduccion()[i] + "'";
 				} else {
-					etiquetas += "'" + noColegiadoItem.getEtiquetas()[i] + "',";
+					etiquetas += "'" + noColegiadoItem.getTraduccion()[i] + "',";
 				}
 			}
 
@@ -744,17 +749,18 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.INNER_JOIN(
 				"cen_cliente cli on (nocol.idpersona = cli.idpersona and nocol.idinstitucion = cli.idinstitucion)");
 		sql.INNER_JOIN("cen_institucion inst on nocol.idinstitucion = inst.idinstitucion");
-
+		
 		sql.LEFT_OUTER_JOIN(
 				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
 		sql.LEFT_OUTER_JOIN(
 				"CEN_DIRECCION_TIPODIRECCION TIPODIRECCION ON (TIPODIRECCION.IDDIRECCION = DIR.IDDIRECCION AND TIPODIRECCION.IDPERSONA = DIR.IDPERSONA AND  TIPODIRECCION.IDINSTITUCION = DIR.IDINSTITUCION)");
 		sql.LEFT_OUTER_JOIN(
 				"cen_datoscv datoscv on (datoscv.idpersona = cli.idpersona and datoscv.idinstitucion = cli.idinstitucion)");
-
-		sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
+		if(idInstitucion != "2000") {
+			sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
+		}
 		sql.WHERE("per.idtipoidentificacion not in '20'");
-
+		
 		if (noColegiadoItem.getNif() != null && noColegiadoItem.getNif() != "") {
 			sql.WHERE("upper(per.nifcif) like upper('%" + noColegiadoItem.getNif() + "%')");
 		}
@@ -795,16 +801,16 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if (noColegiadoItem.getMovil() != null && noColegiadoItem.getMovil() != "") {
 			sql.WHERE("dir.movil like '%" + noColegiadoItem.getMovil() + "%'");
 		}
-		if (noColegiadoItem.getEtiquetas() != null && noColegiadoItem.getEtiquetas().length > 0) {
+		if (noColegiadoItem.getTraduccion() != null && noColegiadoItem.getTraduccion().length > 0) {
 
 			String etiquetas = "";
 
-			for (int i = 0; noColegiadoItem.getEtiquetas().length > i; i++) {
+			for (int i = 0; noColegiadoItem.getTraduccion().length > i; i++) {
 
-				if (i == noColegiadoItem.getEtiquetas().length - 1) {
-					etiquetas += "'" + noColegiadoItem.getEtiquetas()[i] + "'";
+				if (i == noColegiadoItem.getTraduccion().length - 1) {
+					etiquetas += "'" + noColegiadoItem.getTraduccion()[i] + "'";
 				} else {
-					etiquetas += "'" + noColegiadoItem.getEtiquetas()[i] + "',";
+					etiquetas += "'" + noColegiadoItem.getTraduccion()[i] + "',";
 				}
 			}
 
