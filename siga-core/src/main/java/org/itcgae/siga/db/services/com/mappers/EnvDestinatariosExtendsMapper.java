@@ -13,8 +13,11 @@ public interface EnvDestinatariosExtendsMapper {
 
 	
 	@SelectProvider(type = EnvDestinatariosExtendsSqlProvider.class, method = "selectDestinatarios")
-	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDTIPOENVIOS", property = "value", jdbcType = JdbcType.VARCHAR)
+	@Results({@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIFCIF", property = "NIFCIF", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR)
 	})
 	List<DestinatarioItem> selectDestinatarios(Short idInstitucion, String idEnvio);
 }

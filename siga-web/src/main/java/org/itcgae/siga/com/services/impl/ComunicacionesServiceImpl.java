@@ -7,6 +7,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.com.DestinatarioItem;
+import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.DocumentoEnvioItem;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
@@ -35,6 +37,7 @@ import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvHistoricoEstadoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvDestinatariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.providers.ConClaseComunicacionesExtendsSqlProvider;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -83,11 +86,14 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	
 	@Autowired
 	private ConClaseComunicacionExtendsMapper _conClaseComunicacionExtendsMapper;
+	
+	@Autowired
+	private EnvDestinatariosExtendsMapper _envDestinatariosExtendsMapper;
 
 
 	/**Realiza la busqueda de comunicaciones **/
 	@Override
-	public EnviosMasivosDTO comunicacionesSearch(HttpServletRequest request, EnviosMasivosSearch filtros) {
+ 	public EnviosMasivosDTO comunicacionesSearch(HttpServletRequest request, EnviosMasivosSearch filtros) {
 		LOGGER.info("estadoEnvios() -> Entrada al servicio para obtener combo estado envios");
 
 		EnviosMasivosDTO enviosMasivos = new EnviosMasivosDTO();
@@ -143,36 +149,41 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 
 	/**Obtiene los destinatarios del envío, para cargar los destinatarios en la ficha**/
 	@Override
-	public EnviosMasivosDTO detalleDestinatarios(HttpServletRequest request, String idEnvio) {
+	public DestinatariosDTO detalleDestinatarios(HttpServletRequest request, String idEnvio) {
 		LOGGER.info("detalleDestinatarios() -> Entrada al servicio para obtener el detalle de los destinatarios del envio");
 		
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-		
+		DestinatariosDTO respuesta = new DestinatariosDTO();
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		try{
 			
-			if (null != usuarios && usuarios.size() > 0) {
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 				
-				
+				if (null != usuarios && usuarios.size() > 0) {
+					
+					List<DestinatarioItem> destinatarios = _envDestinatariosExtendsMapper.selectDestinatarios(idInstitucion, idEnvio);
+					if(destinatarios.size()>0){
+						respuesta.setDestinatarios(destinatarios);
+					}
+					
+				}
 				
 			}
-			
 		
+		}catch(Exception e){
+			Error error = new Error();
+			error.setCode(500);
+			error.setDescription("Internal Server error");
+			error.setMessage(e.getMessage());
 		}
 		
-		
-		
-		
 		LOGGER.info("detalleDestinatarios() -> Salida del servicio para obtener el detalle de los destinatarios de envio");
-		return null;
+		return respuesta;
 	}
 
 

@@ -9,8 +9,11 @@ public class EnvDestinatariosExtendsSqlProvider {
 		
 		SQL sql = new SQL();
 		
-		sql.SELECT("*");
-		
+		sql.SELECT("IDPERSONA");
+		sql.SELECT("NIFCIF");
+		sql.SELECT("APELLIDOS1");
+		sql.SELECT("APELLIDOS2");
+		sql.SELECT("NOMBRE");
 		sql.FROM("ENV_DESTINATARIOS");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion +"'");
 		sql.WHERE("IDENVIO = '" + idEnvio +"'");

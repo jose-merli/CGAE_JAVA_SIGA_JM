@@ -2,6 +2,7 @@ package org.itcgae.siga.com.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
@@ -61,13 +62,13 @@ public class ComunicacionesController {
 	}
 	
 	@RequestMapping(value = "/detalle/destinatarios",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<EnviosMasivosDTO> obtenerDestinatariosEnvio(HttpServletRequest request, @RequestBody String idEnvio) {
+	ResponseEntity<DestinatariosDTO> obtenerDestinatariosEnvio(HttpServletRequest request, @RequestBody String idEnvio) {
 		
-		EnviosMasivosDTO response = _comunicacionesService.detalleDestinatarios(request, idEnvio);
+		DestinatariosDTO response = _comunicacionesService.detalleDestinatarios(request, idEnvio);
 		if(response.getError() == null)
-			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<DestinatariosDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<DestinatariosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	/*@RequestMapping(value = "/detalle/configuracion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
