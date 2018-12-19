@@ -1,5 +1,7 @@
 package org.itcgae.siga.form.services;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.form.InscripcionDTO;
@@ -13,5 +15,9 @@ public interface IBusquedaInscripcionService {
 	public InscripcionDTO searchInscripcion(InscripcionItem inscripcionItem, HttpServletRequest request);
 	
 	public ComboDTO getCalificacionesEmitidas(HttpServletRequest request);	
+	
+	public Object updateEstado(List<InscripcionItem> listInscripcionItem, HttpServletRequest request);
+	
+	public int updateCalificacion(InscripcionItem inscripcionItem, HttpServletRequest request);
 	
 }

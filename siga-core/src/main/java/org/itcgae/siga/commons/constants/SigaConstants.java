@@ -397,4 +397,9 @@ public class SigaConstants {
 	public static final String AUX_TRANS_TILDES_1 = "áéíóúàèìòùãõâêîôôäëïöüçÁÉÍÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÏÖÜÇ";
 	
 	public static final String AUX_TRANS_TILDES_2 = "aeiouaeiouaoaeiooaeioucAEIOUAEIOUAOAEIOOAEIOUC";
+	
+	public static final String ESTADO_INSCRIPCION_PENDIENTE = "1";
+	public static final String ESTADO_INSCRIPCION_RECHAZADA = "2";
+	public static final String ESTADO_INSCRIPCION_APROBADA = "3";
+	public static final String ESTADO_INSCRIPCION_CANCELADA = "4";
 }

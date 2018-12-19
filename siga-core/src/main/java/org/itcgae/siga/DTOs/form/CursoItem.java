@@ -41,6 +41,9 @@ public class CursoItem {
 	private String idEventoFinInscripcion;
 	private String idTipoEvento;
 	
+	private String numPlazas;
+	private String inscripciones;
+	
 	public Long getIdCurso() {
 		return idCurso;
 	}
@@ -239,46 +242,59 @@ public class CursoItem {
 	public void setIdTipoEvento(String idTipoEvento) {
 		this.idTipoEvento = idTipoEvento;
 	}
+	
+	public String getNumPlazas() {
+		return numPlazas;
+	}
+	public void setNumPlazas(String numPlazas) {
+		this.numPlazas = numPlazas;
+	}
+	public String getInscripciones() {
+		return inscripciones;
+	}
+	public void setInscripciones(String inscripciones) {
+		this.inscripciones = inscripciones;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((autovalidacionInscripcion == null) ? 0 : autovalidacionInscripcion.hashCode());
 		result = prime * result + ((codigoCurso == null) ? 0 : codigoCurso.hashCode());
 		result = prime * result + ((colegio == null) ? 0 : colegio.hashCode());
 		result = prime * result + ((descripcionEstado == null) ? 0 : descripcionEstado.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((fechaImparticion == null) ? 0 : fechaImparticion.hashCode());
 		result = prime * result + ((fechaImparticionDesde == null) ? 0 : fechaImparticionDesde.hashCode());
+		result = prime * result + ((fechaImparticionDesdeDate == null) ? 0 : fechaImparticionDesdeDate.hashCode());
 		result = prime * result + ((fechaImparticionHasta == null) ? 0 : fechaImparticionHasta.hashCode());
+		result = prime * result + ((fechaImparticionHastaDate == null) ? 0 : fechaImparticionHastaDate.hashCode());
 		result = prime * result + ((fechaInscripcion == null) ? 0 : fechaInscripcion.hashCode());
 		result = prime * result + ((fechaInscripcionDesde == null) ? 0 : fechaInscripcionDesde.hashCode());
-		result = prime * result + ((fechaInscripcionHasta == null) ? 0 : fechaInscripcionHasta.hashCode());
-		
-		result = prime * result + ((fechaImparticionDesdeDate == null) ? 0 : fechaImparticionDesdeDate.hashCode());
-		result = prime * result + ((fechaImparticionHastaDate == null) ? 0 : fechaImparticionHastaDate.hashCode());
 		result = prime * result + ((fechaInscripcionDesdeDate == null) ? 0 : fechaInscripcionDesdeDate.hashCode());
+		result = prime * result + ((fechaInscripcionHasta == null) ? 0 : fechaInscripcionHasta.hashCode());
 		result = prime * result + ((fechaInscripcionHastaDate == null) ? 0 : fechaInscripcionHastaDate.hashCode());
-		
 		result = prime * result + ((flagArchivado == null) ? 0 : flagArchivado.hashCode());
 		result = prime * result + ((idCurso == null) ? 0 : idCurso.hashCode());
 		result = prime * result + ((idEstado == null) ? 0 : idEstado.hashCode());
+		result = prime * result + ((idEventoFinInscripcion == null) ? 0 : idEventoFinInscripcion.hashCode());
+		result = prime * result + ((idEventoInicioInscripcion == null) ? 0 : idEventoInicioInscripcion.hashCode());
 		result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
+		result = prime * result + ((idTipoEvento == null) ? 0 : idTipoEvento.hashCode());
 		result = prime * result + ((idVisibilidad == null) ? 0 : idVisibilidad.hashCode());
+		result = prime * result + ((inscripciones == null) ? 0 : inscripciones.hashCode());
+		result = prime * result + ((lugar == null) ? 0 : lugar.hashCode());
+		result = prime * result + ((minimoAsistencia == null) ? 0 : minimoAsistencia.hashCode());
 		result = prime * result + ((nombreApellidosFormador == null) ? 0 : nombreApellidosFormador.hashCode());
 		result = prime * result + ((nombreCurso == null) ? 0 : nombreCurso.hashCode());
+		result = prime * result + ((numPlazas == null) ? 0 : numPlazas.hashCode());
 		result = prime * result + ((plazasDisponibles == null) ? 0 : plazasDisponibles.hashCode());
 		result = prime * result + ((precioCurso == null) ? 0 : precioCurso.hashCode());
 		result = prime * result + ((precioDesde == null) ? 0 : precioDesde.hashCode());
 		result = prime * result + ((precioHasta == null) ? 0 : precioHasta.hashCode());
 		result = prime * result + Arrays.hashCode(temas);
 		result = prime * result + ((visibilidad == null) ? 0 : visibilidad.hashCode());
-		result = prime * result + ((lugar == null) ? 0 : lugar.hashCode());
-		result = prime * result + ((minimoAsistencia == null) ? 0 : minimoAsistencia.hashCode());
-		result = prime * result + ((autovalidacionInscripcion == null) ? 0 : autovalidacionInscripcion.hashCode());
-		result = prime * result + ((idTipoEvento == null) ? 0 : idTipoEvento.hashCode());
-
 		return result;
-		
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -289,6 +305,11 @@ public class CursoItem {
 		if (getClass() != obj.getClass())
 			return false;
 		CursoItem other = (CursoItem) obj;
+		if (autovalidacionInscripcion == null) {
+			if (other.autovalidacionInscripcion != null)
+				return false;
+		} else if (!autovalidacionInscripcion.equals(other.autovalidacionInscripcion))
+			return false;
 		if (codigoCurso == null) {
 			if (other.codigoCurso != null)
 				return false;
@@ -319,10 +340,20 @@ public class CursoItem {
 				return false;
 		} else if (!fechaImparticionDesde.equals(other.fechaImparticionDesde))
 			return false;
+		if (fechaImparticionDesdeDate == null) {
+			if (other.fechaImparticionDesdeDate != null)
+				return false;
+		} else if (!fechaImparticionDesdeDate.equals(other.fechaImparticionDesdeDate))
+			return false;
 		if (fechaImparticionHasta == null) {
 			if (other.fechaImparticionHasta != null)
 				return false;
 		} else if (!fechaImparticionHasta.equals(other.fechaImparticionHasta))
+			return false;
+		if (fechaImparticionHastaDate == null) {
+			if (other.fechaImparticionHastaDate != null)
+				return false;
+		} else if (!fechaImparticionHastaDate.equals(other.fechaImparticionHastaDate))
 			return false;
 		if (fechaInscripcion == null) {
 			if (other.fechaInscripcion != null)
@@ -334,35 +365,21 @@ public class CursoItem {
 				return false;
 		} else if (!fechaInscripcionDesde.equals(other.fechaInscripcionDesde))
 			return false;
-		if (fechaInscripcionHasta == null) {
-			if (other.fechaInscripcionHasta != null)
-				return false;
-		} else if (!fechaInscripcionHasta.equals(other.fechaInscripcionHasta))
-			return false;
-		
-		
-		if (fechaImparticionDesdeDate == null) {
-			if (other.fechaImparticionDesdeDate != null)
-				return false;
-		} else if (!fechaImparticionDesdeDate.equals(other.fechaImparticionDesdeDate))
-			return false;
-		if (fechaImparticionHastaDate == null) {
-			if (other.fechaImparticionHastaDate != null)
-				return false;
-		} else if (!fechaImparticionHastaDate.equals(other.fechaImparticionHastaDate))
-			return false;
 		if (fechaInscripcionDesdeDate == null) {
 			if (other.fechaInscripcionDesdeDate != null)
 				return false;
 		} else if (!fechaInscripcionDesdeDate.equals(other.fechaInscripcionDesdeDate))
+			return false;
+		if (fechaInscripcionHasta == null) {
+			if (other.fechaInscripcionHasta != null)
+				return false;
+		} else if (!fechaInscripcionHasta.equals(other.fechaInscripcionHasta))
 			return false;
 		if (fechaInscripcionHastaDate == null) {
 			if (other.fechaInscripcionHastaDate != null)
 				return false;
 		} else if (!fechaInscripcionHastaDate.equals(other.fechaInscripcionHastaDate))
 			return false;
-		
-		
 		if (flagArchivado == null) {
 			if (other.flagArchivado != null)
 				return false;
@@ -378,15 +395,45 @@ public class CursoItem {
 				return false;
 		} else if (!idEstado.equals(other.idEstado))
 			return false;
+		if (idEventoFinInscripcion == null) {
+			if (other.idEventoFinInscripcion != null)
+				return false;
+		} else if (!idEventoFinInscripcion.equals(other.idEventoFinInscripcion))
+			return false;
+		if (idEventoInicioInscripcion == null) {
+			if (other.idEventoInicioInscripcion != null)
+				return false;
+		} else if (!idEventoInicioInscripcion.equals(other.idEventoInicioInscripcion))
+			return false;
 		if (idInstitucion == null) {
 			if (other.idInstitucion != null)
 				return false;
 		} else if (!idInstitucion.equals(other.idInstitucion))
 			return false;
+		if (idTipoEvento == null) {
+			if (other.idTipoEvento != null)
+				return false;
+		} else if (!idTipoEvento.equals(other.idTipoEvento))
+			return false;
 		if (idVisibilidad == null) {
 			if (other.idVisibilidad != null)
 				return false;
 		} else if (!idVisibilidad.equals(other.idVisibilidad))
+			return false;
+		if (inscripciones == null) {
+			if (other.inscripciones != null)
+				return false;
+		} else if (!inscripciones.equals(other.inscripciones))
+			return false;
+		if (lugar == null) {
+			if (other.lugar != null)
+				return false;
+		} else if (!lugar.equals(other.lugar))
+			return false;
+		if (minimoAsistencia == null) {
+			if (other.minimoAsistencia != null)
+				return false;
+		} else if (!minimoAsistencia.equals(other.minimoAsistencia))
 			return false;
 		if (nombreApellidosFormador == null) {
 			if (other.nombreApellidosFormador != null)
@@ -397,6 +444,11 @@ public class CursoItem {
 			if (other.nombreCurso != null)
 				return false;
 		} else if (!nombreCurso.equals(other.nombreCurso))
+			return false;
+		if (numPlazas == null) {
+			if (other.numPlazas != null)
+				return false;
+		} else if (!numPlazas.equals(other.numPlazas))
 			return false;
 		if (plazasDisponibles == null) {
 			if (other.plazasDisponibles != null)
@@ -425,26 +477,6 @@ public class CursoItem {
 				return false;
 		} else if (!visibilidad.equals(other.visibilidad))
 			return false;
-		if (lugar == null) {
-			if (other.lugar != null)
-				return false;
-		} else if (!lugar.equals(other.lugar))
-			return false;
-		if (minimoAsistencia == null) {
-			if (other.minimoAsistencia != null)
-				return false;
-		} else if (!minimoAsistencia.equals(other.minimoAsistencia))
-			return false;
-		if (autovalidacionInscripcion == null) {
-			if (other.autovalidacionInscripcion != null)
-				return false;
-		} else if (!autovalidacionInscripcion.equals(other.autovalidacionInscripcion))
-			return false;
-		if (idTipoEvento == null) {
-			if (other.idTipoEvento != null)
-				return false;
-		} else if (!idTipoEvento.equals(other.idTipoEvento))
-			return false;
 		return true;
 	}
 	@Override
@@ -452,19 +484,18 @@ public class CursoItem {
 		return "CursoItem [idCurso=" + idCurso + ", visibilidad=" + visibilidad + ", colegio=" + colegio
 				+ ", codigoCurso=" + codigoCurso + ", nombreCurso=" + nombreCurso + ", estado=" + estado
 				+ ", plazasDisponibles=" + plazasDisponibles + ", nombreApellidosFormador=" + nombreApellidosFormador
-				+ ", precioDesde=" + precioDesde + ", precioHasta=" + precioHasta + ", fechaInscripcionDesde="
-				+ fechaInscripcionDesde + ", fechaInscripcionHasta=" + fechaInscripcionHasta
-				+ ", fechaImparticionDesde=" + fechaImparticionDesde + ", fechaImparticionHasta="
-				+ fechaImparticionHasta + ", fechaInscripcionDesdeDate="
-						+ fechaInscripcionDesdeDate + ", fechaInscripcionHastaDate=" + fechaInscripcionHastaDate
-						+ ", fechaImparticionDesdeDate=" + fechaImparticionDesdeDate + ", fechaImparticionHastaDate="
-						+ fechaImparticionHastaDate + ", temas=" + Arrays.toString(temas) + ", idEstado=" + idEstado
-				+ ", idVisibilidad=" + idVisibilidad + ", idInstitucion=" + idInstitucion + ", descripcionEstado="
-				+ descripcionEstado + ", precioCurso=" + precioCurso + ", fechaInscripcion=" + fechaInscripcion
-				+ ", fechaImparticion=" + fechaImparticion + ", flagArchivado=" + flagArchivado
-				+ ", lugar=" + lugar + ", minimoAsistencia=" + minimoAsistencia + ", autovalidacionInscripcion=" + autovalidacionInscripcion  + ", idTipoEvento=" + idTipoEvento + "]";
-	}
-	
-	
-	
+				+ ", precioDesde=" + precioDesde + ", precioHasta=" + precioHasta + ", fechaInscripcionDesdeDate="
+				+ fechaInscripcionDesdeDate + ", fechaInscripcionHastaDate=" + fechaInscripcionHastaDate
+				+ ", fechaImparticionDesdeDate=" + fechaImparticionDesdeDate + ", fechaImparticionHastaDate="
+				+ fechaImparticionHastaDate + ", fechaInscripcionDesde=" + fechaInscripcionDesde
+				+ ", fechaInscripcionHasta=" + fechaInscripcionHasta + ", fechaImparticionDesde="
+				+ fechaImparticionDesde + ", fechaImparticionHasta=" + fechaImparticionHasta + ", temas="
+				+ Arrays.toString(temas) + ", minimoAsistencia=" + minimoAsistencia + ", lugar=" + lugar
+				+ ", autovalidacionInscripcion=" + autovalidacionInscripcion + ", flagArchivado=" + flagArchivado
+				+ ", idEstado=" + idEstado + ", idVisibilidad=" + idVisibilidad + ", idInstitucion=" + idInstitucion
+				+ ", descripcionEstado=" + descripcionEstado + ", precioCurso=" + precioCurso + ", fechaInscripcion="
+				+ fechaInscripcion + ", fechaImparticion=" + fechaImparticion + ", idEventoInicioInscripcion="
+				+ idEventoInicioInscripcion + ", idEventoFinInscripcion=" + idEventoFinInscripcion + ", idTipoEvento="
+				+ idTipoEvento + ", numPlazas=" + numPlazas + ", inscripciones=" + inscripciones + "]";
+	}	
 }

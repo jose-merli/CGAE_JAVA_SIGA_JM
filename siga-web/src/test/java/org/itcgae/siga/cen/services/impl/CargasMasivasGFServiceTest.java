@@ -172,7 +172,7 @@ public class CargasMasivasGFServiceTest {
 		
 		when(cenClienteExtendsMapper.getIdPersona("3586", "70639511W", (short) 2000)).thenReturn(Long.valueOf(idPersona));
 		
-		when(cenPersonaMapper.selectByPrimaryKey(Long.valueOf(idPersona))).thenReturn(CenPersona);
+		when(cenPersonaMapper.selectByPrimaryKey(Mockito.anyLong())).thenReturn(CenPersona);
 		
 		when(cenGruposclienteMapper.selectByPrimaryKey(Mockito.any(CenGruposcliente.class))).thenReturn(gruposCliente);
 
@@ -218,7 +218,7 @@ public class CargasMasivasGFServiceTest {
 		error.setMessage("Fichero cargado correctamente. Registros Correctos: 1<br/> Registros Erroneos: 1");
 		updateResponseDTOEsperado.setError(error);
 		
-		assertThat(updateResponseDTOResultado.toString()).isEqualTo(updateResponseDTOEsperado.toString());
+		assertThat(updateResponseDTOResultado).isEqualTo(updateResponseDTOEsperado);
 	}
 	
 	/**

@@ -1,5 +1,7 @@
 package org.itcgae.siga.form.controllers;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.form.InscripcionDTO;
@@ -22,13 +24,13 @@ public class BusquedaInscripcionController {
 	private IBusquedaInscripcionService busquedaInscripcionService;
 	
 	@RequestMapping(value = "busquedaInscripciones/estadosInscripciones",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getEstadosCursos(HttpServletRequest request) {
+	ResponseEntity<ComboDTO> getEstadosInscripciones(HttpServletRequest request) {
 		ComboDTO response = busquedaInscripcionService.getEstadosInscripcion(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "busquedaInscripciones/search",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InscripcionDTO> searchColegiado(@RequestBody InscripcionItem inscripcionItem, HttpServletRequest request) {
+	ResponseEntity<InscripcionDTO> searchInscripcion(@RequestBody InscripcionItem inscripcionItem, HttpServletRequest request) {
 		InscripcionDTO response = busquedaInscripcionService.searchInscripcion(inscripcionItem, request);
 		return new ResponseEntity<InscripcionDTO>(response, HttpStatus.OK);
 	}
@@ -37,5 +39,17 @@ public class BusquedaInscripcionController {
 	ResponseEntity<ComboDTO> getCalificacionesEmitidas(HttpServletRequest request) {
 		ComboDTO response = busquedaInscripcionService.getCalificacionesEmitidas(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "busquedaInscripciones/updateEstado",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Object> updateEstado(@RequestBody List<InscripcionItem> listInscripcionItem, HttpServletRequest request) {
+		Object response = busquedaInscripcionService.updateEstado(listInscripcionItem, request);
+		return new ResponseEntity<Object>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "busquedaInscripciones/updateCalificacion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Integer> updateCalificacion(@RequestBody InscripcionItem inscripcionItem, HttpServletRequest request) {
+		Integer response = busquedaInscripcionService.updateCalificacion(inscripcionItem, request);
+		return new ResponseEntity<Integer>(response, HttpStatus.OK);
 	}
 }

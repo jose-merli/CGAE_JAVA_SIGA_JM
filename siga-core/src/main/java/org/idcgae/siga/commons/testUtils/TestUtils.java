@@ -2,12 +2,18 @@ package org.idcgae.siga.commons.testUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.util.IOUtils;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -90,13 +96,14 @@ public class TestUtils {
 		String token = UserTokenUtils.generateToken(userCgae);
 
 		mockreq.addHeader("Authorization", token);
-
-		File file = new File("C:\\Users\\DTUser\\Documents\\input.xls");
+		generaInputXLS();
+		File file = new File(".\\input.xls");
+	
 		FileInputStream input = new FileInputStream(file);
 		MultipartFile multipartFile = new MockMultipartFile("file", file.getName(), "text/plain",
 				IOUtils.toByteArray(input));
 		mockreq.addFile(multipartFile);
-
+		file.deleteOnExit();
 		return mockreq;
 	}
 
@@ -244,5 +251,94 @@ public class TestUtils {
 		genDiccionarioList.add(getGenDiccionario());
 
 		return genDiccionarioList;
+	}
+	
+	public void generaInputXLS() {
+		try {
+			FileOutputStream fileOut = new FileOutputStream("input.xls");
+			HSSFWorkbook workbook = new HSSFWorkbook();
+			HSSFSheet worksheet = workbook.createSheet("input");
+
+			// index from 0,0... cell A1 is cell(0,0)
+			HSSFRow row1 = worksheet.createRow((short) 0);
+
+			HSSFCell cellA1 = row1.createCell(0);
+			cellA1.setCellValue("COLEGIADONUMERO");
+
+			HSSFCell cellB1 = row1.createCell(1);
+			cellB1.setCellValue("PERSONANIF");
+
+			HSSFCell cellC1 = row1.createCell(2);
+			cellC1.setCellValue("C_IDGRUPO");
+
+			HSSFCell cellD1 = row1.createCell(3);
+			cellD1.setCellValue("GENERAL");
+
+			HSSFCell cellE1 = row1.createCell(4);
+			cellE1.setCellValue("ACCION");
+
+			HSSFCell cellF1 = row1.createCell(5);
+			cellF1.setCellValue("C_FECHAINICIO");
+
+			HSSFCell cellG1 = row1.createCell(6);
+			cellG1.setCellValue("C_FECHAFIN");
+			
+			// Fila 2
+			HSSFRow row2 = worksheet.createRow((short) 1);
+
+			HSSFCell cellA2 = row2.createCell(0);
+			cellA2.setCellValue("3586");
+
+			HSSFCell cellB2 = row2.createCell(1);
+			cellB2.setCellValue("70639511W");
+
+			HSSFCell cellC2 = row2.createCell(2);
+			cellC2.setCellValue("19");
+
+			HSSFCell cellD2 = row2.createCell(3);
+			cellD2.setCellValue("0");
+
+			HSSFCell cellE2 = row2.createCell(4);
+			cellE2.setCellValue("A");
+
+			HSSFCell cellF2 = row2.createCell(5);
+			cellF2.setCellValue("27/09/2018");
+
+			HSSFCell cellG2 = row2.createCell(6);
+			cellG2.setCellValue("28/09/2018");
+			
+			// Fila 3
+			HSSFRow row3 = worksheet.createRow((short) 2);
+
+			HSSFCell cellA3 = row3.createCell(0);
+			cellA3.setCellValue("3586");
+
+			HSSFCell cellB3 = row3.createCell(1);
+			cellB3.setCellValue("70639511W");
+
+			HSSFCell cellC3 = row3.createCell(2);
+			cellC3.setCellValue("19");
+
+			HSSFCell cellD3 = row3.createCell(3);
+			cellD3.setCellValue("0");
+
+			HSSFCell cellE3 = row3.createCell(4);
+			cellE3.setCellValue("B");
+
+			HSSFCell cellF3 = row3.createCell(5);
+			cellF3.setCellValue("28/09/2018");
+
+			HSSFCell cellG3 = row3.createCell(6);
+			cellG3.setCellValue("29/09/2018");
+
+			workbook.write(fileOut);
+			fileOut.flush();
+			fileOut.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 }
