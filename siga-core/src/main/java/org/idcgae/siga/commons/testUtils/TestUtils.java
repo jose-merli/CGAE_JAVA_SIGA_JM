@@ -66,7 +66,7 @@ public class TestUtils {
 
 		// FileInputStream inputFile = new FileInputStream( "/path/to/the/file.txt");
 		MockMultipartFile file = new MockMultipartFile("files", "filename.txt", "text/plain",
-				"hello".getBytes(StandardCharsets.UTF_8));
+				"Este archivo es generado como prueba de subida en TestUtils".getBytes(StandardCharsets.UTF_8));
 		mockreq.addFile(file);
 
 		return mockreq;

@@ -211,30 +211,32 @@ public class ClientMutualidad {
 //	                soapEnv.addNamespaceDeclaration("xsd", "http://www.w3.org/2001/XMLSchema");
 //	                soapEnv.addNamespaceDeclaration("xsi", "http://www.w3.org/2001/XMLSchema-instance");
 	                
-	                SaajSoapMessage soapMessager = (SaajSoapMessage) message;
-	                SoapHeaderElement messageId =  soapMessager.getSoapHeader().addHeaderElement(new QName("http://www.w3.org/2005/08/addressing", "MessageID", "wsa"));
-	                messageId.setText("uuid:ac2ff920-e0f3-11e8-99a7-a81d1686d13d");
 	                
-	                SoapHeaderElement to =  soapMessager.getSoapHeader().addHeaderElement(new QName("http://www.w3.org/2005/08/addressing", "To", "wsa"));
-	                to.setText("https://www.mutualidadabogacia.net/IntegracionColegiosDesarrollo/Integracion_Metodos.svc");
-	                
-	                SoapHeaderElement action =  soapMessager.getSoapHeader().addHeaderElement(new QName("http://www.w3.org/2005/08/addressing", "Action", "wsa"));
-	                action.setText("http://Microsoft.ServiceModel.Samples/IIntegracion_Metodos/GetEnums");
-	                
-	                SoapHeaderElement from =  soapMessager.getSoapHeader().addHeaderElement(new QName("http://www.w3.org/2005/08/addressing", "From", "wsa"));
-	                from.setText("<wsa:Address>http://www.w3.org/2005/08/addressing/anonymous</wsa:Address>\n");
+//	                SaajSoapMessage soapMessager = (SaajSoapMessage) message;
+//	                SoapHeaderElement messageId =  soapMessager.getSoapHeader().addHeaderElement(new QName("http://www.w3.org/2005/08/addressing", "MessageID", "wsa"));
+//	                messageId.setText("uuid:ac2ff920-e0f3-11e8-99a7-a81d1686d13d");
+//	                
+//	                SoapHeaderElement to =  soapMessager.getSoapHeader().addHeaderElement(new QName("http://www.w3.org/2005/08/addressing", "To", "wsa"));
+//	                to.setText("https://www.mutualidadabogacia.net/IntegracionColegiosDesarrollo/Integracion_Metodos.svc");
+//	                
+//	                SoapHeaderElement action =  soapMessager.getSoapHeader().addHeaderElement(new QName("http://www.w3.org/2005/08/addressing", "Action", "wsa"));
+//	                action.setText("http://Microsoft.ServiceModel.Samples/IIntegracion_Metodos/GetEnums");
+//	                
+//	                SoapHeaderElement from =  soapMessager.getSoapHeader().addHeaderElement(new QName("http://www.w3.org/2005/08/addressing", "From", "wsa"));
+//	                from.setText("<wsa:Address>http://www.w3.org/2005/08/addressing/anonymous</wsa:Address>\n");
 	                
 //					((SoapMessage)message).setSoapAction("http://Microsoft.ServiceModel.Samples/IIntegracion_Metodos/GetEnums");
-//	                SoapHeader header = soapMessage.getSoapHeader();
-//	                StringSource headerSource = new StringSource(
-//	                		"<wsa:MessageID soapenv:mustUnderstand=\"0\">uuid:ac2ff920-e0f3-11e8-99a7-a81d1686d13d</wsa:MessageID>\n" +
-//	                		"<wsa:To soapenv:mustUnderstand=\"false\">https://www.mutualidadabogacia.net/IntegracionColegiosDesarrollo/Integracion_Metodos.svc</wsa:To>\n" +
-//	                		"<wsa:Action soapenv:mustUnderstand=\"false\">http://Microsoft.ServiceModel.Samples/IIntegracion_Metodos/GetEnums</wsa:Action>\n"
-//	                		+ "<wsa:From xmlns=\"http://www.w3.org/2005/08/addressing\" soapenv:mustUnderstand=\"false\">\n"
-//	                		+ "<wsa:Address>http://www.w3.org/2005/08/addressing/anonymous</wsa:Address>\n"
-//	                		+ "</wsa:From>");
-//	                Transformer transformer = TransformerFactory.newInstance().newTransformer();
-//	                transformer.transform(headerSource, header.getResult());
+					
+	                SoapHeader header = soapMessage.getSoapHeader();
+	                StringSource headerSource = new StringSource(
+	                		"<wsa:MessageID soapenv:mustUnderstand=\"0\">uuid:ac2ff920-e0f3-11e8-99a7-a81d1686d13d</wsa:MessageID>\n" +
+	                		"<wsa:To soapenv:mustUnderstand=\"false\">https://www.mutualidadabogacia.net/IntegracionColegiosDesarrollo/Integracion_Metodos.svc</wsa:To>\n" +
+	                		"<wsa:Action soapenv:mustUnderstand=\"false\">http://Microsoft.ServiceModel.Samples/IIntegracion_Metodos/GetEnums</wsa:Action>\n"
+	                		+ "<wsa:From xmlns=\"http://www.w3.org/2005/08/addressing\" soapenv:mustUnderstand=\"false\">\n"
+	                		+ "<wsa:Address>http://www.w3.org/2005/08/addressing/anonymous</wsa:Address>\n"
+	                		+ "</wsa:From>");
+	                Transformer transformer = TransformerFactory.newInstance().newTransformer();
+	                transformer.transform(headerSource, header.getResult());
 	                
 	            } catch (Exception e) {
 	            	LOGGER.warn("Error en la llamada al servicio getEnums: " + e.getMessage());
