@@ -3,6 +3,8 @@ package org.itcgae.siga.com.services;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.ConsultaItem;
+import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
+import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -26,9 +28,9 @@ public interface IConsultasService {
 
 	public Error guardarDatosGenerales(HttpServletRequest request, ConsultasSearch filtros);
 
-	public Error obtenerModelosComunicacion(HttpServletRequest request, ConsultasSearch filtros);
+	public ConsultaListadoModelosDTO obtenerModelosComunicacion(HttpServletRequest request, String idConsulta);
 
-	public Error obtenerPlantillasEnvio(HttpServletRequest request, ConsultasSearch filtros);
+	public ConsultaListadoPlantillasDTO obtenerPlantillasEnvio(HttpServletRequest request, String idConsulta);
 
 	public Error guardarConsulta(HttpServletRequest request, ConsultasSearch filtros);
 

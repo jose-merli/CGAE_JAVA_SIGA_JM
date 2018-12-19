@@ -2,10 +2,14 @@ package org.itcgae.siga.com.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
+import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IConsultasService;
+import org.itcgae.siga.db.services.com.providers.ConListadoPlantillasExtendsSqlProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -67,4 +71,27 @@ public class ConsultasController {
 		else
 			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	/**Obtiene el listado de los modelos que contienen la consulta**/
+	@RequestMapping(value = "/modelosconsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ConsultaListadoModelosDTO> obtenerModelosComunicacion(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody String idConsulta) {
+		
+		ConsultaListadoModelosDTO response = _consultasService.obtenerModelosComunicacion(request, idConsulta);
+		if(response.getError() == null)
+			return new ResponseEntity<ConsultaListadoModelosDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ConsultaListadoModelosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	/**Obtiene el listado de las plantillas de envío que contienen la consulta**/
+	@RequestMapping(value = "/plantillasconsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ConsultaListadoPlantillasDTO> obtenerPlantillasEnvio(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody String idConsulta) {
+		
+		ConsultaListadoPlantillasDTO response = _consultasService.obtenerPlantillasEnvio(request, idConsulta);
+		if(response.getError() == null)
+			return new ResponseEntity<ConsultaListadoPlantillasDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ConsultaListadoPlantillasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 }

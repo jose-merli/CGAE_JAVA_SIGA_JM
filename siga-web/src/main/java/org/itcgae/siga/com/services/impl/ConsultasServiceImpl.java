@@ -7,8 +7,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
+import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
+import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
+import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -18,6 +22,8 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ConListadoModelosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ConListadoPlantillasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConModulosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConObjetivoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -45,6 +51,12 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	@Autowired
 	private ConConsultasExtendsMapper _conConsultasExtendsMapper;
+	
+	@Autowired
+	private ConListadoModelosExtendsMapper _conListadoModelosExtendsMapper;
+	
+	@Autowired
+	private ConListadoPlantillasExtendsMapper _conListadoPlantillasExtendsMapper;
 	
 	@Override
 	public ComboDTO modulo(HttpServletRequest request) {
@@ -217,15 +229,81 @@ LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clase
 	}
 
 	@Override
-	public java.lang.Error obtenerModelosComunicacion(HttpServletRequest request, ConsultasSearch filtros) {
-		// TODO Auto-generated method stub
-		return null;
+	public ConsultaListadoModelosDTO obtenerModelosComunicacion(HttpServletRequest request, String idConsulta) {
+	LOGGER.info("obtenerModelosComunicacion() -> Entrada al servicio de obtener modelos que contienen la consulta");
+		
+	ConsultaListadoModelosDTO conListadoModelosDTO = new ConsultaListadoModelosDTO();
+		List<ModelosComunicacionItem> modeloList = new ArrayList<ModelosComunicacionItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+					modeloList = _conListadoModelosExtendsMapper.selectListadoModelos(usuario.getIdinstitucion(),
+							 idConsulta);
+					if (modeloList.size() > 0) {
+						conListadoModelosDTO.setListadoModelos(modeloList);
+					}
+				} catch (Exception e) {
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage(e.getMessage());
+					conListadoModelosDTO.setError(error);
+				}
+			}
+		}
+		LOGGER.info("obtenerModelosComunicacion() -> Salida al servicio de obtener modelos que contienen la consulta");
+		
+		return conListadoModelosDTO;
 	}
 
 	@Override
-	public java.lang.Error obtenerPlantillasEnvio(HttpServletRequest request, ConsultasSearch filtros) {
-		// TODO Auto-generated method stub
-		return null;
+	public ConsultaListadoPlantillasDTO obtenerPlantillasEnvio(HttpServletRequest request, String idConsulta) {
+		LOGGER.info("obtenerPlantillasEnvio() -> Entrada al servicio de obtener plantillas que contienen la consulta");
+		
+		ConsultaListadoPlantillasDTO conListadoPlantillasDTO = new ConsultaListadoPlantillasDTO();
+		List<PlantillaEnvioItem> plantillasList = new ArrayList<PlantillaEnvioItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+					plantillasList = _conListadoPlantillasExtendsMapper.selectListadoPlantillas(usuario.getIdinstitucion(),
+							usuario.getIdlenguaje(), idConsulta);
+					if (plantillasList.size() > 0) {
+						conListadoPlantillasDTO.setListadoPlantillas(plantillasList);
+					}
+				} catch (Exception e) {
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage(e.getMessage());
+					conListadoPlantillasDTO.setError(error);
+				}
+			}
+		}
+		LOGGER.info("obtenerPlantillasEnvio() -> Salida al servicio de obtener plantillas que contienen la consulta");
+		
+		return conListadoPlantillasDTO;
 	}
 
 	@Override
