@@ -15,6 +15,7 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		
 		sql.SELECT("INSC.IDINSCRIPCION");
 		sql.SELECT("INSC.IDESTADOINSCRIPCION");
+		sql.SELECT("INSC.IDPERSONA");
 		sql.SELECT("CURSO.IDESTADOCURSO");
 		sql.SELECT("INSC.IDINSTITUCION");
 		sql.SELECT("CURSO.CODIGOCURSO");

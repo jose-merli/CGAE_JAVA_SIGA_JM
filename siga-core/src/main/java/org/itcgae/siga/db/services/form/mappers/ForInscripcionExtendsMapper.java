@@ -25,6 +25,7 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper {
 			@Result(column = "IDESTADOCURSO", property = "idEstadoCurso", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDESTADOINSCRIPCION", property = "idEstadoInscripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PRECIOCURSO", property = "precioCurso", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAIMPARTICIONDESDE", property = "fechaImparticionDesdeFormat", jdbcType = JdbcType.VARCHAR),

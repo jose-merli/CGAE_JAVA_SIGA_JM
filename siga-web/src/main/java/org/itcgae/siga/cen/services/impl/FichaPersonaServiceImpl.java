@@ -342,4 +342,23 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 		
 		return record;
 	}
+	
+	@Override
+	public FichaPersonaItem searchPersona(Long idPersona, HttpServletRequest request) {
+		
+		FichaPersonaItem fichaPersona = new FichaPersonaItem();
+		
+		LOGGER.info(
+				"searchPersona() -> Entrada al servicio para la recuperar la ficha de persona");
+
+		CenPersona fichaCenPersonaItem = cenPersonaExtendsMapper.selectByPrimaryKey(idPersona);
+		if(fichaCenPersonaItem != null){
+			fichaPersona.setNif(fichaCenPersonaItem.getNifcif());
+			fichaPersona.setNombre(fichaCenPersonaItem.getNombre());
+			fichaPersona.setApellido1(fichaCenPersonaItem.getApellidos1());
+			fichaPersona.setApellido2(fichaCenPersonaItem.getApellidos2());
+			fichaPersona.setTipoIdentificacion(String.valueOf(fichaCenPersonaItem.getIdtipoidentificacion()));
+		}
+		return fichaPersona;
+	}
 }
