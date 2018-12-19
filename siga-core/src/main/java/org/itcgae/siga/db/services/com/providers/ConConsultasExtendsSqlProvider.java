@@ -49,7 +49,19 @@ public String selectConsultas(Short idInstitucion, String idLenguaje,ConsultasSe
 		}
 		
 		if(filtros.getGenerica() != null && !filtros.getGenerica().trim().equals("")){
-			sql.WHERE("CONSULTA.GENERAL = '" + filtros.getGenerica() +"'");
+			if(filtros.getGenerica().equals("false")){
+				sql.WHERE("CONSULTA.GENERAL = '" + "N" +"'");
+				sql.OR();
+				sql.WHERE("CONSULTA.GENERAL = '" + "n" +"'");
+				sql.OR();
+				sql.WHERE("CONSULTA.GENERAL = '" + "0" +"'");
+			}else{
+				sql.WHERE("CONSULTA.GENERAL = '" + "S" +"'");
+				sql.OR();
+				sql.WHERE("CONSULTA.GENERAL = '" + "s" +"'");
+				sql.OR();
+				sql.WHERE("CONSULTA.GENERAL = '" + "1" +"'");
+			}
 		}
 		if(filtros.getIdClaseComunicacion() != null && !filtros.getIdClaseComunicacion().trim().equals("")){
 			sql.WHERE("CONSULTA.IDCLASECOMUNICACION = '" + filtros.getIdClaseComunicacion() +"'");

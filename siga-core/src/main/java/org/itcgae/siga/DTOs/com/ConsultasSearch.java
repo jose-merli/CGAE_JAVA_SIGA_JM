@@ -1,6 +1,6 @@
 package org.itcgae.siga.DTOs.com;
 
-import java.util.Date;
+
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -14,7 +14,7 @@ public class ConsultasSearch {
 	private String claseComunicacion;
 	private String idModulo;
 	private String idObjetivo;
-	private String IdClaseComunicacion;
+	private String idClaseComunicacion;
 	
 	
 	@JsonProperty("idModulo")
@@ -33,13 +33,14 @@ public class ConsultasSearch {
 		this.idObjetivo = idObjetivo;
 	}
 	
-	@JsonProperty("IdClaseComunicacion")
+	@JsonProperty("idClaseComunicacion")
 	public String getIdClaseComunicacion() {
-		return IdClaseComunicacion;
+		return idClaseComunicacion;
 	}
 	public void setIdClaseComunicacion(String idClaseComunicacion) {
-		IdClaseComunicacion = idClaseComunicacion;
+		this.idClaseComunicacion = idClaseComunicacion;
 	}
+	
 	@JsonProperty("nombre")
 	public String getNombre() {
 		return nombre;

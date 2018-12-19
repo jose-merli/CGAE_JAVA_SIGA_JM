@@ -11,11 +11,13 @@ import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConModulosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConObjetivoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -40,6 +42,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	@Autowired
 	private ConClaseComunicacionExtendsMapper _conClaseComunicacionExtendsMapper;
+	
+	@Autowired
+	private ConConsultasExtendsMapper _conConsultasExtendsMapper;
 	
 	@Override
 	public ComboDTO modulo(HttpServletRequest request) {
@@ -157,50 +162,84 @@ LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clase
 
 	@Override
 	public ConsultasDTO consultasSearch(HttpServletRequest request, ConsultasSearch filtros) {
+		LOGGER.info("consultasSearch() -> Entrada al servicio de búsqueda de consultas");
+
+		ConsultasDTO consultasDTO = new ConsultasDTO();
+		List<ConsultaItem> consultasList = new ArrayList<ConsultaItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+					consultasList = _conConsultasExtendsMapper.selectConsultasSearch(usuario.getIdinstitucion(),
+							usuario.getIdlenguaje(), filtros);
+					if (consultasList.size() > 0) {
+						consultasDTO.setConsultaItem(consultasList);
+					}
+				} catch (Exception e) {
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage(e.getMessage());
+					consultasDTO.setError(error);
+				}
+			}
+		}
+
+		return consultasDTO;
+	}
+
+	@Override
+	public java.lang.Error duplicarConsulta(HttpServletRequest request, ConsultaItem consultaItem) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Error duplicarConsulta(HttpServletRequest request, ConsultaItem consultaItem) {
+	public java.lang.Error borrarConsulta(HttpServletRequest request, ConsultaItem consultaItem) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Error borrarConsulta(HttpServletRequest request, ConsultaItem consultaItem) {
+	public java.lang.Error guardarDatosGenerales(HttpServletRequest request, ConsultasSearch filtros) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Error guardarDatosGenerales(HttpServletRequest request, ConsultasSearch filtros) {
+	public java.lang.Error obtenerModelosComunicacion(HttpServletRequest request, ConsultasSearch filtros) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Error obtenerModelosComunicacion(HttpServletRequest request, ConsultasSearch filtros) {
+	public java.lang.Error obtenerPlantillasEnvio(HttpServletRequest request, ConsultasSearch filtros) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Error obtenerPlantillasEnvio(HttpServletRequest request, ConsultasSearch filtros) {
+	public java.lang.Error guardarConsulta(HttpServletRequest request, ConsultasSearch filtros) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Error guardarConsulta(HttpServletRequest request, ConsultasSearch filtros) {
+	public java.lang.Error ejecutarConsulta(HttpServletRequest request, String consulta) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public Error ejecutarConsulta(HttpServletRequest request, String consulta) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 	
 }
