@@ -25,19 +25,19 @@
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table> -->
 		
-<!-- 		<table schema="USCGAE" tableName="ENV_ENVIOS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOS.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table> -->
+		<table schema="USCGAE" tableName="ENV_ENVIOS" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOS.NEXTVAL FROM DUAL"/>
+		</table>
 
 <!-- 		<table schema="USCGAE_INT" tableName="ENV_ENTRADA_ENVIOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table> -->
 		
-		<table schema="USCGAE" tableName="ENV_HISTORICOESTADOENVIO" >
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-			<generatedKey column="IDHISTORICO" sqlStatement="SELECT SEQ_ENV_HISTORICOESTADOENVIO.NEXTVAL FROM DUAL"/>
-		</table>
+<!-- 		<table schema="USCGAE" tableName="ENV_HISTORICOESTADOENVIO" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			<generatedKey column="IDHISTORICO" sqlStatement="SELECT SEQ_ENV_HISTORICOESTADOENVIO.NEXTVAL FROM DUAL"/> -->
+<!-- 		</table> -->
 		
 <!-- 		<table schema="USCGAE_INT" tableName="ENV_CAMPOSPLANTILLA" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->

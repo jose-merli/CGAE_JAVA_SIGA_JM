@@ -102,10 +102,12 @@ public class EnvEnviosExtendsSqlProvider {
 		sql.SELECT("PLANTILLA.CUERPO");
 		sql.SELECT("(SELECT CAT.DESCRIPCION FROM ENV_TIPOENVIOS LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = ENV_TIPOENVIOS.NOMBRE WHERE ENV_TIPOENVIOS.IDTIPOENVIOS = ENVIO.IDTIPOENVIOS AND CAT.IDLENGUAJE = '"+ idLenguaje +"') AS TIPOENVIO");
 		sql.SELECT("(SELECT CAT.DESCRIPCION FROM ENV_ESTADOENVIO ESTADO LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = ESTADO.NOMBRE WHERE ESTADO.IDESTADO = ENVIO.IDESTADO AND CAT.IDLENGUAJE = '"+ idLenguaje +"') AS ESTADOENVIO");
+		sql.SELECT("ENVIO.IDMODELOCOMUNICACION");
+		sql.SELECT("MODELO.IDCLASECOMUNICACION");
 		
 		sql.FROM("ENV_ENVIOS ENVIO");
 		sql.JOIN("ENV_PLANTILLASENVIOS PLANTILLA ON PLANTILLA.IDINSTITUCION = '" + idInstitucion + "' AND PLANTILLA.IDPLANTILLAENVIOS = ENVIO.IDPLANTILLAENVIOS AND PLANTILLA.IDTIPOENVIOS = ENVIO.IDTIPOENVIOS");
-		
+		sql.JOIN("MOD_MODELOCOMUNICACION MODELO ON MODELO.IDMODELOCOMUNICACION = ENVIO.IDMODELOCOMUNICACION AND MODELO.IDINSTITUCION = ENVIO.IDINSTITUCION");
 		
 		sql.WHERE("ENVIO.IDINSTITUCION = '" + idInstitucion +"'");
 		sql.WHERE("ENVIO.FECHABAJA IS NULL");
@@ -119,7 +121,10 @@ public class EnvEnviosExtendsSqlProvider {
 			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getidEstado() +"'");
 		}
 		if(filtros.getIdClaseComunicacion() != null && !filtros.getIdClaseComunicacion().trim().equals("")){
-			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getidEstado() +"'");
+			sql.WHERE("MODELO.IDCLASECOMUNICACION = '" + filtros.getIdClaseComunicacion() + "'");
+		}
+		if(filtros.getIdModeloComunicacion() != null && !filtros.getIdModeloComunicacion().trim().equals("")){
+			sql.WHERE("ENVIO.IDMODELOCOMUNICACION = '" + filtros.getIdModeloComunicacion() +"'");
 		}
 		if(filtros.getFechaCreacion() != null){
 			String fechaCreacion = dateFormat.format(filtros.getFechaCreacion());

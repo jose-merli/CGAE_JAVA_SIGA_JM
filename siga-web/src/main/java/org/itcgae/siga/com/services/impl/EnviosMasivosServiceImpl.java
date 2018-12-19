@@ -65,11 +65,11 @@ import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
 
 
 @Service
@@ -78,6 +78,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	
 	private Logger LOGGER = Logger.getLogger(EnviosMasivosServiceImpl.class);
+	
+	@Value("${fichero.tamanioMaximo}")
+	private long TamañoMaximo; 
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -887,40 +890,45 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				MultipartFile file = request.getFile(itr.next());
 				String fileName = file.getOriginalFilename();
 				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
-				//BufferedOutputStream stream = null;
-				try {
-					File aux = new File(pathFichero);
-					// creo directorio si no existe
-					aux.mkdirs();
-					File serverFile = new File(pathFichero, fileName);
-					//stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-					//stream.write(file.getBytes());
-					FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
-					response.setNombreDocumento(fileName);
-					response.setRutaDocumento(pathFichero + fileName);
-				} catch (FileNotFoundException e) {
+				
+				if(file.getSize() < TamañoMaximo && (extension.contains(".doc") || extension.contains(".docx") || extension.contains(".pdf"))){
+					
+					try {
+						File aux = new File(pathFichero);
+						// creo directorio si no existe
+						aux.mkdirs();
+						File serverFile = new File(pathFichero, fileName);
+						FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
+						response.setNombreDocumento(fileName);
+						response.setRutaDocumento(pathFichero + fileName);
+					} catch (FileNotFoundException e) {
+						Error error = new Error();
+						error.setCode(500);
+						error.setDescription(e.getMessage());
+						response.setError(error);
+						e.printStackTrace();
+						LOGGER.error("uploadFile() -> Error al buscar el documento de envio en el directorio indicado",e);
+					} catch (IOException ioe) {
+						Error error = new Error();
+						error.setCode(500);
+						error.setDescription(ioe.getMessage());
+						response.setError(error);
+						ioe.printStackTrace();
+						LOGGER.error("uploadFile() -> Error al guardar el documento de envio en el directorio indicado",ioe);
+					} finally {
+						// close the stream
+						LOGGER.debug("uploadFile() -> Cierre del stream del documento");
+						//stream.close();
+					}
+				}else{
 					Error error = new Error();
-					error.setCode(500);
-					error.setDescription(e.getMessage());
+					error.setCode(400);
+					error.setDescription("Formato no permitido o tamaño maximo de archivo superado");
 					response.setError(error);
-					e.printStackTrace();
-					LOGGER.error("uploadFile() -> Error al buscar el documento de envio en el directorio indicado",e);
-				} catch (IOException ioe) {
-					Error error = new Error();
-					error.setCode(500);
-					error.setDescription(ioe.getMessage());
-					response.setError(error);
-					ioe.printStackTrace();
-					LOGGER.error("uploadFile() -> Error al guardar el documento de envio en el directorio indicado",ioe);
-				} finally {
-					// close the stream
-					LOGGER.debug("uploadFile() -> Cierre del stream del documento");
-					//stream.close();
+					LOGGER.error("uploadFile() -> Error al guardar el documento por formato no permitido o superar el tamaño máximo permitido");
 				}
 			}
 		}
-		
-
 		
 		LOGGER.info("uploadFile() -> Salida del servicio para subir un documento de envio");
 		return response;

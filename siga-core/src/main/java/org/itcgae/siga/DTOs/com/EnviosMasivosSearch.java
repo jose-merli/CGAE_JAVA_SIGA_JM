@@ -12,6 +12,7 @@ public class EnviosMasivosSearch {
 	private String idTipoEnvio;
 	private String idEstado;
 	private String idClaseComunicacion;
+	private String idModeloComunicacion;
 	
 	@JsonProperty("asunto")
 	public String getAsunto() {
@@ -56,6 +57,14 @@ public class EnviosMasivosSearch {
 	}
 	public void setIdClaseComunicacion(String idClaseComunicacion) {
 		this.idClaseComunicacion = idClaseComunicacion;
+	}
+	
+	@JsonProperty("idModeloComunicacion")
+	public String getIdModeloComunicacion() {
+		return idModeloComunicacion;
+	}
+	public void setIdModeloComunicacion(String idModeloComunicacion) {
+		this.idModeloComunicacion = idModeloComunicacion;
 	}
 	
 	

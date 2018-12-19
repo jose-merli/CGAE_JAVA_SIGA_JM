@@ -177,8 +177,15 @@ public class EnviosMasivosController {
 		ResponseDocumentoDTO response = _enviosMasivosService.uploadFile(request);
 		if(response.getError() == null)
 			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		else{
+			if(response.getError().getCode()==400){
+				return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.BAD_REQUEST);
+			}else{
+				return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+			
+		}
+			
 	}
 
 	@RequestMapping(value = "/detalle/guardarDocumentoEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
