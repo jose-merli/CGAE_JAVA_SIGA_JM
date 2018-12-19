@@ -6,6 +6,7 @@ import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 
 public interface IConsultasService {
 
@@ -22,7 +23,7 @@ public interface IConsultasService {
 
 	public Error duplicarConsulta(HttpServletRequest request, ConsultaItem consultaItem);
 
-	public Error borrarConsulta(HttpServletRequest request, ConsultaItem consultaItem);
+	public Error borrarConsulta(HttpServletRequest request, String[] idConsulta);
 
 	public Error guardarDatosGenerales(HttpServletRequest request, ConsultasSearch filtros);
 

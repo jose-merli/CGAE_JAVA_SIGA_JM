@@ -21,8 +21,8 @@ public class EnviosMasivosItem {
 	private String cuerpo;
 	private String estadoEnvio;
 	private String tipoEnvio;
-	private String idModeloComunicacion;
-	private String idClaseComunicacion;
+	private String modeloComunicacion;
+	private String claseComunicacion;
 	
 	
 	public Short getIdInstitucion() {
@@ -115,17 +115,19 @@ public class EnviosMasivosItem {
 	public void setNombrePlantilla(String nombrePlantilla) {
 		this.nombrePlantilla = nombrePlantilla;
 	}
-	public String getIdModeloComunicacion() {
-		return idModeloComunicacion;
+	public String getModeloComunicacion() {
+		return modeloComunicacion;
 	}
-	public void setIdModeloComunicacion(String idModeloComunicacion) {
-		this.idModeloComunicacion = idModeloComunicacion;
+	public void setModeloComunicacion(String modeloComunicacion) {
+		this.modeloComunicacion = modeloComunicacion;
 	}
-	public String getIdClaseComunicacion() {
-		return idClaseComunicacion;
+	public String getClaseComunicacion() {
+		return claseComunicacion;
 	}
-	public void setIdClaseComunicacion(String idClaseComunicacion) {
-		this.idClaseComunicacion = idClaseComunicacion;
+	public void setClaseComunicacion(String claseComunicacion) {
+		this.claseComunicacion = claseComunicacion;
 	}
+
+	
 	
 }

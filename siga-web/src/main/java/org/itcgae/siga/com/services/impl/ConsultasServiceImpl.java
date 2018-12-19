@@ -199,43 +199,43 @@ LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clase
 	}
 
 	@Override
-	public java.lang.Error duplicarConsulta(HttpServletRequest request, ConsultaItem consultaItem) {
+	public Error duplicarConsulta(HttpServletRequest request, ConsultaItem consultaItem) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public java.lang.Error borrarConsulta(HttpServletRequest request, ConsultaItem consultaItem) {
+	public Error borrarConsulta(HttpServletRequest request, String[] idConsulta) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public java.lang.Error guardarDatosGenerales(HttpServletRequest request, ConsultasSearch filtros) {
+	public Error guardarDatosGenerales(HttpServletRequest request, ConsultasSearch filtros) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public java.lang.Error obtenerModelosComunicacion(HttpServletRequest request, ConsultasSearch filtros) {
+	public Error obtenerModelosComunicacion(HttpServletRequest request, ConsultasSearch filtros) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public java.lang.Error obtenerPlantillasEnvio(HttpServletRequest request, ConsultasSearch filtros) {
+	public Error obtenerPlantillasEnvio(HttpServletRequest request, ConsultasSearch filtros) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public java.lang.Error guardarConsulta(HttpServletRequest request, ConsultasSearch filtros) {
+	public Error guardarConsulta(HttpServletRequest request, ConsultasSearch filtros) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public java.lang.Error ejecutarConsulta(HttpServletRequest request, String consulta) {
+	public Error ejecutarConsulta(HttpServletRequest request, String consulta) {
 		// TODO Auto-generated method stub
 		return null;
 	}
