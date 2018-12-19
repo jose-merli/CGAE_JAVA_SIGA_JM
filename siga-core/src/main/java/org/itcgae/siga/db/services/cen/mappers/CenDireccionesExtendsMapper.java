@@ -1,5 +1,6 @@
 package org.itcgae.siga.db.services.cen.mappers;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import org.apache.ibatis.annotations.InsertProvider;
@@ -11,10 +12,12 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesCreateDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaIntegrantesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.services.cen.providers.CenComponentesSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenDireccionesSqlExtendsProvider;
@@ -131,4 +134,40 @@ public interface CenDireccionesExtendsMapper extends CenDireccionesMapper {
 		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR)
 	})
 	List<DatosDireccionesItem> selectDireccionesSolEsp(String idPersona, String idDireccion, String idInstitucion);
+
+	@SelectProvider(type = CenDireccionesSqlExtendsProvider.class, method = "getNumDirecciones")
+	@Results({
+		@Result(column = "IDDIRECCION", property = "idDireccion", jdbcType = JdbcType.VARCHAR),
+	})
+	List<DatosDireccionesItem> getNumDirecciones(CenDirecciones beanDir, int tipoDireccionFacturacion);
+
+	@SelectProvider(type = CenDireccionesSqlExtendsProvider.class, method = "getTiposDireccion")
+	@Results({
+		@Result(column = "DESCRIPCION", property = "valor", jdbcType = JdbcType.VARCHAR),
+	})
+	List<StringDTO> getTiposDireccion(Short idinstitucion, Long idPersona, Long idDireccion,	String idioma);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

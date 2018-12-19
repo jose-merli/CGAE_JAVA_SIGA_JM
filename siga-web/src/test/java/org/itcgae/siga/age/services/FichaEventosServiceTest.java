@@ -78,6 +78,9 @@ public class FichaEventosServiceTest {
 	@Mock
 	private CenInfluenciaExtendsMapper cenInfluenciaExtendsMapper;
 
+	@Mock
+	AgeEvento ageEventoInsert;
+	
 	@InjectMocks
 	private FichaEventosServiceImpl fichaEventosServiceImpl;
 
@@ -87,47 +90,50 @@ public class FichaEventosServiceTest {
 	
 	private ForTestUtils forTestUtils = new ForTestUtils();
 	
-//	@Test
-//	public void saveEventCalendarTest() throws Exception {
-//
-//		String idLenguaje = "1";
-//		EventoItem eventoItem = ageTestUtils.getEventoItem2005();
-//		List<ComboItem> eventos = testUtils.getListComboItemsSimulados();
-//		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
-//		List<ComboItem> repeticionEventoInserted = testUtils.getListComboItemsSimulados();
-//		List<AgeEvento> eventosList = ageTestUtils.getListAgeEventoSimulados();
-//		List<AgeCalendario> calendariosList = ageTestUtils.getListaAgeCalendariosSimulados();
-//
-//		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
-//
-//		when(ageRepeticionEventoExtendsMapper.insert(Mockito.any(AgeRepeticionevento.class))).thenReturn(1);
-//
-//		when(ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent()).thenReturn(repeticionEventoInserted);
-//
-//		when(ageEventoExtendsMapper.insert(Mockito.any(AgeEvento.class))).thenReturn(1);
-//
-//		when(ageEventoExtendsMapper.selectMaxEvent()).thenReturn(eventos);
-//		
-//		when(ageCalendarioExtendsMapper.selectByExample(Mockito.any(AgeCalendarioExample.class))).thenReturn(calendariosList);
-//
-//		when(ageEventoExtendsMapper.selectByExample(Mockito.any(AgeEventoExample.class))).thenReturn(eventosList);
-//
-//		when(ageEventoExtendsMapper.updateByPrimaryKey(Mockito.any(AgeEvento.class))).thenReturn(1);
-//
-//		when(ageEventoExtendsMapper.insert(Mockito.any(AgeEvento.class))).thenReturn(1);
-//
-//		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication2005();
-//
-//		InsertResponseDTO insertResponseDTOResultado = fichaEventosServiceImpl.saveEventCalendar(eventoItem, mockreq);
-//
-//		InsertResponseDTO insertResponseDTOEsperado = new InsertResponseDTO();
-//		Error error = new Error();
-//		error.setCode(200);
-//		insertResponseDTOEsperado.setError(error);
-//
-//		assertThat(insertResponseDTOResultado).isEqualTo(insertResponseDTOEsperado);
-//
-//	}
+	@Test
+	public void saveEventCalendarTest() throws Exception {
+
+		String idLenguaje = "1";
+		EventoItem eventoItem = ageTestUtils.getEventoItem2005();
+		List<ComboItem> eventos = testUtils.getListComboItemsSimulados();
+		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
+		List<ComboItem> repeticionEventoInserted = testUtils.getListComboItemsSimulados();
+		List<AgeEvento> eventosList = ageTestUtils.getListAgeEventoSimulados();
+		List<AgeCalendario> calendariosList = ageTestUtils.getListaAgeCalendariosSimulados();
+
+		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
+
+		when(ageRepeticionEventoExtendsMapper.insert(Mockito.any(AgeRepeticionevento.class))).thenReturn(1);
+
+		when(ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent()).thenReturn(repeticionEventoInserted);
+
+		when(ageEventoExtendsMapper.insert(Mockito.any(AgeEvento.class))).thenReturn(1);
+
+		when(ageEventoExtendsMapper.selectMaxEvent()).thenReturn(eventos);
+		
+		when(ageCalendarioExtendsMapper.selectByExample(Mockito.any(AgeCalendarioExample.class))).thenReturn(calendariosList);
+
+		when(ageEventoExtendsMapper.selectByExample(Mockito.any(AgeEventoExample.class))).thenReturn(eventosList);
+
+		when(ageEventoExtendsMapper.updateByPrimaryKey(Mockito.any(AgeEvento.class))).thenReturn(1);
+
+		when(ageEventoExtendsMapper.insert(Mockito.any(AgeEvento.class))).thenReturn(1);
+
+		
+//		when(ageEventoInsert.getIdevento().toString()).then("1");
+		
+		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication2005();
+
+		InsertResponseDTO insertResponseDTOResultado = fichaEventosServiceImpl.saveEventCalendar(eventoItem, mockreq);
+
+		InsertResponseDTO insertResponseDTOEsperado = new InsertResponseDTO();
+		Error error = new Error();
+		error.setCode(200);
+		insertResponseDTOEsperado.setError(error);
+
+		assertThat(insertResponseDTOResultado).isEqualTo(insertResponseDTOEsperado);
+
+	}
 	
 	@Test
 	public void saveEventCalendarTestKO() throws Exception {

@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -12,7 +11,7 @@
 		<artifactId>siga-parent</artifactId>
 		<version>${siga.version}</version>
 	</parent>
-
+	
 	<properties>
 		<jwt.version>0.7.0</jwt.version>
 	</properties>
@@ -43,7 +42,7 @@
 		<dependency>
 			<groupId>wsdl4j</groupId>
 			<artifactId>wsdl4j</artifactId>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
@@ -83,7 +82,7 @@
 			<artifactId>publicador-sociedades</artifactId>
 			<version>1.0.1</version>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>org.redabogacia</groupId>
 			<artifactId>censo</artifactId>
@@ -100,55 +99,80 @@
 			<version>1.7.7</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>3.13</version>
-		</dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi</artifactId>
+		    <version>3.13</version>
+		</dependency>  
 		<dependency>
 			<groupId>org.redabogacia.alterMutuaServ</groupId>
 			<artifactId>AlterMutuaServ</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>org.redabogacia.mutualidad</groupId>
 			<artifactId>mutualidadServ</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.redabogacia.ds6api</groupId>
-			<artifactId>ds6</artifactId>
+			<groupId>org.redabogacia</groupId>
+			<artifactId>fusionador-personas</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+		
 	</dependencies>
+	
+
+<!-- 	<build> -->
+<!-- 		<plugins> -->
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.codehaus.mojo</groupId> -->
+<!-- 				<artifactId>xmlbeans-maven-plugin</artifactId> -->
+<!-- 				<version>2.3.3</version> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<phase>generate-sources</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>xmlbeans</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 				<inherited>true</inherited> -->
+<!-- 				<configuration> -->
+<!-- 					<source>1.8</source> -->
+<!-- 					<target>1.8</target> -->
+<!-- 					<schemaDirectory>src/main/resources/xsd/fusionadorPersonas/v1</schemaDirectory> -->
+<!-- 					<classGenerationDirectory></classGenerationDirectory> -->
+
+<!-- 					<sourceGenerationDirectory>src/main/java</sourceGenerationDirectory> -->
+<!-- 					<outputJar>fusionador-personas.jar</outputJar> -->
+<!-- 				</configuration> -->
+<!-- 			</plugin> -->
+<!-- 		</plugins> -->
+
+<!-- 	</build> -->
 
 
-	<!-- <build> -->
-	<!-- <plugins> -->
-	<!-- <plugin> -->
-	<!-- <groupId>org.codehaus.mojo</groupId> -->
-	<!-- <artifactId>xmlbeans-maven-plugin</artifactId> -->
-	<!-- <version>2.3.3</version> -->
-	<!-- <executions> -->
-	<!-- <execution> -->
-	<!-- <phase>generate-sources</phase> -->
-	<!-- <goals> -->
-	<!-- <goal>xmlbeans</goal> -->
-	<!-- </goals> -->
-	<!-- </execution> -->
-	<!-- </executions> -->
-	<!-- <inherited>true</inherited> -->
-	<!-- <configuration> -->
-	<!-- <source>1.8</source> -->
-	<!-- <target>1.8</target> -->
-	<!-- <schemaDirectory>src/main/resources/xsd/registroSociedades/v2</schemaDirectory> -->
-	<!-- <classGenerationDirectory></classGenerationDirectory> -->
+<!--    <build> -->
+<!--        <plugins> -->
+<!--            <plugin> -->
+<!--                <groupId>org.jvnet.jaxb2.maven2</groupId> -->
+<!--                <artifactId>maven-jaxb2-plugin</artifactId> -->
+<!--                <version>0.13.2</version> -->
+<!--                <executions> -->
+<!--                    <execution> -->
+<!--                        <id>generate</id> -->
+<!--                        <goals> -->
+<!--                            <goal>generate</goal> -->
+<!--                        </goals> -->
+<!--                    </execution> -->
+<!--                </executions> -->
+<!--                <configuration> -->
+<!--                 <schemaDirectory>src/main/resources/xsd/fusionadorPersonas/v1</schemaDirectory> -->
+<!--                 <generationDirectory>src/main/java/fusionadorPersonas</generationDirectory> -->
+<!--                </configuration> -->
+<!--            </plugin> -->
+<!--        </plugins> -->
+<!--    </build> -->
 
-	<!-- <sourceGenerationDirectory>src/main/java</sourceGenerationDirectory> -->
-	<!-- <outputJar>registro-sociedades.jar</outputJar> -->
-	<!-- </configuration> -->
-	<!-- </plugin> -->
-	<!-- </plugins> -->
-
-	<!-- </build> -->
 </project>

@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenColegiado;
@@ -73,7 +74,9 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 	@Results({ 
 		@Result(column = "FECHAINCORPORACION", property = "incorporacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.DATE),
 		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ColegiadoItem> selectColegiaciones(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem);
@@ -122,5 +125,13 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FichaDatosColegialesItem> selectDatosColegiales(String idPersona, String idInstitucion);
+	
+	
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiacionesIdPersona")
+	@Results({ 
+		@Result(column = "IDINSTITUCION", property = "valor", jdbcType = JdbcType.VARCHAR),
+	})
+	List<StringDTO> selectColegiacionesIdPersona(Long idPersona);
+	
 
 }

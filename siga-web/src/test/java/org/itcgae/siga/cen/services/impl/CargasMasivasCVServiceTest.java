@@ -111,12 +111,7 @@ public class CargasMasivasCVServiceTest {
 		assertThat(response).isNotNull();
 	}
 
-	/** Para ejecutar este test habrá que crear un archivo en la siguiente ruta: C:\\Users\\DTUser\\Documents\\input.xls 
-	 * Con el siguiente bloque de información: 
-	 * COLEGIADONUMERO	PERSONANIF	C_FECHAINICIO	C_FECHAFIN	C_CREDITOS	FECHAVERIFICACION	C_DESCRIPCION	TIPOCVCOD	SUBTIPOCV1COD	SUBTIPOCV2COD
-	 * 3586	            29002353C					                                             DESCRIPCIÓN	         1	          1	              1
-	 * 3544	            29002483C					                                             CARGO	                 1		
-	 **/
+
 	@Test
 	public void uploadFileTest() throws Exception {
 

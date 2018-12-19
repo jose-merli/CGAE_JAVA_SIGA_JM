@@ -24,10 +24,12 @@ import org.itcgae.siga.DTOs.cen.RetencionesItem;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.DTOs.cen.SociedadesBajaDTO;
 import org.itcgae.siga.DTOs.cen.SociedadesEditadasDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
+import org.itcgae.siga.db.services.cen.providers.CenColegiadoSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenNocolegiadoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -232,4 +234,10 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 		@Result(column = "GUIAJUDICIAL", property = "guiaJudicial", jdbcType = JdbcType.VARCHAR)
 	})
 	List<NoColegiadoItem> searchHistoricNoColegiado(NoColegiadoItem noColegiadoItem, String idLenguaje, String idInstitucion);
+	
+	@SelectProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "selectColegiacionesIdPersona")
+	@Results({ 
+		@Result(column = "IDINSTITUCION", property = "valor", jdbcType = JdbcType.VARCHAR),
+	})
+	List<StringDTO> selectColegiacionesIdPersona(Long idPersona);
 }

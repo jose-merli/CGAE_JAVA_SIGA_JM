@@ -389,5 +389,16 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 		
 		return sql.toString();
 	}
+	
+	public String getAbreviaturaInstitucion(String idInstitucionIntegrante) {
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("I.NOMBRE");
+		sql.FROM("CEN_INSTITUCION I");
+		sql.WHERE("I.IDINSTITUCION = '"+idInstitucionIntegrante+"'");
+		
+		return sql.toString();
+	}
+	
     
 }
