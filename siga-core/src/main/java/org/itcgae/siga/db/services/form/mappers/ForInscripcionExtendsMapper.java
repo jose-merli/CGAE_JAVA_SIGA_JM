@@ -25,6 +25,7 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper {
 			@Result(column = "IDESTADOCURSO", property = "idEstadoCurso", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDESTADOINSCRIPCION", property = "idEstadoInscripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PRECIOCURSO", property = "precioCurso", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAIMPARTICIONDESDE", property = "fechaImparticionDesdeFormat", jdbcType = JdbcType.VARCHAR),
@@ -43,6 +44,15 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper {
 	})
 	List<ComboItem> getCalificacionesEmitidas(String idLenguaje);
 	
+
+	@SelectProvider(type = ForInscripcionSqlExtendsProvider.class, method = "getCountIncriptions")
+	@Results({ @Result(column = "PENDIENTE", property = "pendientes", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "RECHAZADO", property = "rechazadas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APROBADO", property = "aprobadas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CANCELADO", property = "canceladas", jdbcType = JdbcType.VARCHAR),
+	})
+	InscripcionItem getCountIncriptions(String idCurso);	
+
 	@SelectProvider(type = ForInscripcionSqlExtendsProvider.class, method = "compruebaPlazas")
 	@Results({ @Result(column = "IDCURSO", property = "idCurso", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "NUMEROPLAZAS", property = "numPlazas", jdbcType = JdbcType.NUMERIC),
@@ -50,4 +60,5 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper {
 			@Result(column = "INSCRIPCIONES", property = "inscripciones", jdbcType = JdbcType.NUMERIC)
 	})
 	CursoItem compruebaPlazas(String idCurso);	
+
 }

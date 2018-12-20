@@ -207,7 +207,7 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 		@Result(column = "COMISIONES", property = "comisiones", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TELEFONO1", property = "telefono", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "fechaBaja", property = "fechaBaja", jdbcType = JdbcType.VARCHAR)
 	})
 	List<NoColegiadoItem> selectNoColegiados(Short idInstitucion, NoColegiadoItem noColegiadoItem);
 	

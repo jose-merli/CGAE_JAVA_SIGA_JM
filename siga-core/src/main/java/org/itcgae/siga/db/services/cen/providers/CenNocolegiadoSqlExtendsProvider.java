@@ -645,8 +645,6 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 		if(!noColegiadoItem.isHistorico()) {
 			sql.WHERE("NOCOL.FECHA_BAJA is NULL");
-		}else {
-			sql.WHERE("NOCOL.FECHA_BAJA is NOT NULL");
 		}
 		
 		if (noColegiadoItem.getNif() != null && noColegiadoItem.getNif() != "") {

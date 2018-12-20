@@ -1,9 +1,16 @@
 package org.itcgae.siga.form.services.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,10 +23,12 @@ import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.form.FormadorCursoItem;
+import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AgeEvento;
@@ -31,20 +40,32 @@ import org.itcgae.siga.db.entities.ForCursoExample;
 import org.itcgae.siga.db.entities.ForEventoCurso;
 import org.itcgae.siga.db.entities.ForPersonaCurso;
 import org.itcgae.siga.db.entities.ForPersonaCursoExample;
+import org.itcgae.siga.db.entities.ForTiposervicioCurso;
+import org.itcgae.siga.db.entities.ForTiposervicioCursoExample;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.ForEventoCursoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeEventoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.ForInscripcionExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForPersonacursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForRolesExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForTipocosteExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.ForTiposervicioCursoExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.ForTiposervicioExtendsMapper;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.form.services.IFichaCursosService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 public class FichaCursosServiceImpl implements IFichaCursosService {
@@ -77,6 +98,15 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Autowired
 	private AgeEventoExtendsMapper ageEventoExtendsMapper;
+
+	@Autowired
+	private ForTiposervicioExtendsMapper forTiposervicioExtendsMapper;
+	
+	@Autowired
+	private ForTiposervicioCursoExtendsMapper forTiposervicioCursoExtendsMapper;
+	
+	@Autowired
+	private ForInscripcionExtendsMapper forInscripcionExtendsMapper;
 
 	@Override
 	public void updateEstadoCursoAuto() {
@@ -623,7 +653,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-
+					//Insertamos curso en la tabla For_Curso
 					forCursoInsert.setIdinstitucion(idInstitucion);
 					forCursoInsert.setUsumodificacion(usuario.getIdusuario().longValue());
 					forCursoInsert.setFechamodificacion(new Date());
@@ -646,6 +676,24 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					LOGGER.info(
 							"saveCourse() / forCursoExtendsMapper.insert(forCursoInsert) -> Salida a forCursoExtendsMapper para insertar un curso");
 
+					//Si existe tiposervicio, se guarda en la tabla TipoServicios					
+					if (cursoItem.getTipoServicios() != null && cursoItem.getTipoServicios().size() > 0) {
+
+						for (ComboItem servicio : cursoItem.getTipoServicios()) {
+												
+							ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
+							forTipoServicioCurso.setFechabaja(null);
+							forTipoServicioCurso.setFechamodificacion(new Date());
+							forTipoServicioCurso.setIdcurso(forCursoInsert.getIdcurso());
+							forTipoServicioCurso.setIdinstitucion(idInstitucion);
+							forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
+							forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+							
+							response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
+							
+						}
+					}
+					
 					// Si existe idEventoInscripcion se debe guardar la relacion entre el evento y
 					// el curso
 					if (cursoItem.getIdEventoInicioInscripcion() != null) {
@@ -764,6 +812,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO updateCourse(CursoItem cursoItem, HttpServletRequest request) {
 		LOGGER.info("updateCourse() -> Entrada al servicio para modificar los eventos");
 
@@ -787,18 +836,103 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
-				LOGGER.info(
-						"updateCourse() / forCursoExtendsMapper.updateByPrimaryKey(event) -> Entrada a forCursoExtendsMapper para modificar un curso");
+				try {
+					LOGGER.info(
+							"updateCourse() / forCursoExtendsMapper.updateByPrimaryKey(event) -> Entrada a forCursoExtendsMapper para modificar un curso");
 
-				response = forCursoExtendsMapper.updateCourse(cursoItem, usuario);
+					response = forCursoExtendsMapper.updateCourse(cursoItem, usuario);
 
-				LOGGER.info(
-						"updateCourse() / forCursoExtendsMapper.updateByPrimaryKey(event) -> Salida a forCursoExtendsMapper para modificar un evento");
+					LOGGER.info(
+							"updateCourse() / forCursoExtendsMapper.updateByPrimaryKey(event) -> Salida a forCursoExtendsMapper para modificar un evento");
 
-				if (response == 0) {
+					if (cursoItem.getTipoServicios() != null && cursoItem.getTipoServicios().size() > 0) {
+						
+						//Añadimos Servicio
+						for (ComboItem servicio : cursoItem.getTipoServicios()) {
+								
+								//Para cada servicio comprobamos si ya existe la relacion
+								ForTiposervicioCursoExample forTiposervicioCursoExample = new ForTiposervicioCursoExample();
+								forTiposervicioCursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdcursoEqualTo(cursoItem.getIdCurso())
+								.andIdttiposervicioEqualTo(Long.valueOf(servicio.getValue()));
+
+								List<ForTiposervicioCurso> forTipoServicioCursoList = forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample);
+
+								//Si no existe la creamos
+								if(forTipoServicioCursoList.isEmpty()) {
+								
+								ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
+								forTipoServicioCurso.setFechabaja(null);
+								forTipoServicioCurso.setFechamodificacion(new Date());
+								forTipoServicioCurso.setIdcurso(cursoItem.getIdCurso());
+								forTipoServicioCurso.setIdinstitucion(idInstitucion);
+								forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
+								forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+								
+								response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
+								
+								//Si existe cambiamos el servicio a null
+								}else {
+									forTipoServicioCursoList.get(0).setFechabaja(null);
+									forTipoServicioCursoList.get(0).setUsumodificacion(usuario.getIdusuario().longValue());
+									forTipoServicioCursoList.get(0).setFechamodificacion(new Date());
+								}
+						}
+						
+						//Eliminamos Servicio
+						ForTiposervicioCursoExample forTiposerviciocursoExample = new ForTiposervicioCursoExample();
+						forTiposerviciocursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdcursoEqualTo(cursoItem.getIdCurso())
+						.andFechabajaIsNull();
+
+						List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList = forTiposervicioCursoExtendsMapper.selectByExample(forTiposerviciocursoExample);
+						List<ForTiposervicioCurso> forTipoServicioCursoDarBaja = new ArrayList<ForTiposervicioCurso>();
+						
+						for (ForTiposervicioCurso servicioAsignadosAntiguos : forTipoServicioCursoAntiguosList) {
+														
+							for (int i = 0; cursoItem.getTipoServicios().size() > i; i++) {
+								
+								if(servicioAsignadosAntiguos.getIdttiposervicio() != Long.valueOf(cursoItem.getTipoServicios().get(i).getValue())) {
+									forTipoServicioCursoDarBaja.add(servicioAsignadosAntiguos);												
+								}
+							}
+						}
+						
+						for(ForTiposervicioCurso servicioCursoBaja : forTipoServicioCursoDarBaja) {
+							
+							servicioCursoBaja.setUsumodificacion(usuario.getIdusuario().longValue());
+							servicioCursoBaja.setFechabaja(new Date());
+							servicioCursoBaja.setFechamodificacion(new Date());
+							
+							response = forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja);
+						}
+					//Comprobamos si existe algun servicio para el curso y les damos de baja
+					}else {
+						//Eliminamos Servicio
+						ForTiposervicioCursoExample forTiposerviciocursoExample = new ForTiposervicioCursoExample();
+						forTiposerviciocursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdcursoEqualTo(cursoItem.getIdCurso())
+						.andFechabajaIsNull();
+
+						List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList = forTiposervicioCursoExtendsMapper.selectByExample(forTiposerviciocursoExample);
+						
+						for (ForTiposervicioCurso servicioAsignadosAntiguos : forTipoServicioCursoAntiguosList) {
+						
+							servicioAsignadosAntiguos.setUsumodificacion(usuario.getIdusuario().longValue());
+							servicioAsignadosAntiguos.setFechabaja(new Date());
+							servicioAsignadosAntiguos.setFechamodificacion(new Date());
+							
+							response = forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioAsignadosAntiguos);
+						}
+					}
+
+				} catch (Exception e) {
+					response = 0;
 					error.setCode(400);
-					error.setDescription("Error al modificar evento");
-				} else {
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+				}
+
+				if (response != 0) {
 					error.setCode(200);
 					updateResponseDTO.setId(cursoItem.getIdCurso().toString());
 				}
@@ -940,5 +1074,162 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		eventoDTO.setEventos(eventoList);
 		return eventoDTO;
 	}
+
+	@Override
+	public ComboDTO getServicesCourse(HttpServletRequest request) {
+		LOGGER.info(
+				"getServicesCourse() -> Entrada al servicio para obtener los tipo de servicio de un curso según la institucion");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			LOGGER.info(
+					"getServicesCourse() / forTiposervicioExtendsMapper.getServiceType -> Entrada a forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según la institucion");
+			comboItems = forTiposervicioExtendsMapper.getServicesCourse(idInstitucion.toString());
+			LOGGER.info(
+					"getServicesCourse() / forTiposervicioExtendsMapper.getServiceType -> Salida de forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según la institucion");
+
+		}
+
+		comboDTO.setCombooItems(comboItems);
+
+		LOGGER.info(
+				"getServicesCourse() -> Salida del servicio para obtener los tipo de servicio de un curso según la institucion");
+
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO getServicesSpecificCourse(HttpServletRequest request, String idCurso) {
+		LOGGER.info(
+				"getServicesSpecificCourse() -> Entrada al servicio para obtener los tipo de servicio de un curso según el curso");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			LOGGER.info(
+					"getServicesSpecificCourse() / forTiposervicioCursoExtendsMapper.getServicesSpecificCourse -> Entrada a forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según el curso");
+			comboItems = forTiposervicioCursoExtendsMapper.getServicesSpecificCourse(idInstitucion.toString(), idCurso);
+			LOGGER.info(
+					"getServicesSpecificCourse() / forTiposervicioCursoExtendsMapper.getServicesSpecificCourse -> Salida de forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según el curso");
+
+		}
+
+		comboDTO.setCombooItems(comboItems);
+
+		LOGGER.info(
+				"getServicesSpecificCourse() -> Salida del servicio para obtener los tipo de servicio de un curso según el curso");
+
+		return comboDTO;
+	}
+
+	@Override
+	public InscripcionItem getCountIncriptions(HttpServletRequest request, String idCurso) {
+		LOGGER.info(
+				"getCountIncriptions() -> Entrada al servicio para obtener un resumen de los estados de las inscripciones a un curso");
+
+		InscripcionItem inscripcionItem = new InscripcionItem();
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		int response = 0;
+
+		if (null != idInstitucion) {
+			
+			try {
+
+			LOGGER.info(
+					"getCountIncriptions() / forInscripcionExtendsMapper.getCountIncriptions -> Entrada a forInscripcionExtendsMapper para obtener un resumen de los estados de las inscripciones a un curso");
+			inscripcionItem = forInscripcionExtendsMapper.getCountIncriptions(idCurso);
+			LOGGER.info(
+					"getCountIncriptions() / forInscripcionExtendsMapper.getCountIncriptions -> Salida de forInscripcionExtendsMapper para obtener un resumen de los estados de las inscripciones a un curso");
+
+			int totales = Integer.parseInt(inscripcionItem.getPendientes()) +  Integer.parseInt(inscripcionItem.getAceptadas()) +
+					 Integer.parseInt(inscripcionItem.getRechazadas()) +  Integer.parseInt(inscripcionItem.getCanceladas());
+			inscripcionItem.setTotales(String.valueOf(totales));
+			
+			}catch (Exception e) {
+				 response = 0;
+			}
+		}
+
+
+		LOGGER.info(
+				"getCountIncriptions() -> Salida del servicio para obtener un resumen de los estados de las inscripciones a un curso");
+
+		return inscripcionItem;
+	}
+
+	@Override
+	public File createExcelInscriptionsFile(List<String> orderList, Vector<Hashtable<String, Object>> datosVector)
+			throws BusinessException {
+		LOGGER.info("createExcelInscriptionsFile() -> Entrada al servicio que crea la plantilla Excel");
+
+		if (orderList == null && datosVector == null)
+			throw new BusinessException("No hay datos para crear el fichero");
+		if (orderList == null)
+			orderList = new ArrayList<String>(datosVector.get(0).keySet());
+		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, "PlantillaInscripciones");
+
+		LOGGER.info("createExcelInscriptionsFile() -> Salida al servicio que crea la plantilla Excel");
+
+		return XLSFile;
+	}
+
+	@Override
+	public ResponseEntity<InputStreamResource> generateExcelInscriptions(CursoItem cursoItem) {
+		LOGGER.info("generateExcelInscriptions() -> Entrada al servicio para generar la plantilla Excel Inscripcion");
+
+		Vector<Hashtable<String, Object>> datosVector = new Vector<Hashtable<String, Object>>();
+		Hashtable<String, Object> datosHashtable = new Hashtable<String, Object>();
+
+		// 1. Se definen las columnas que conforman la plantilla
+
+		// 1.1 Se rellena las fila con el codigo del curso y la forma de pago del curso
+			datosHashtable = new Hashtable<String, Object>();
+			datosHashtable.put(CODIGO_CURSO, cursoItem.getCodigoCurso());
+			datosHashtable.put(FORMA_PAGO, " ");
+			datosHashtable.put(NIF, "Introducir el administrador");
+			datosVector.add(datosHashtable);
+
+		// 2. Crea el fichero excel con las columnas indicadas
+		File file = createExcelInscriptionsFile(IFichaCursosService.CAMPOSPLANTILLA, datosVector);
+
+		// 3. Se convierte el fichero en array de bytes para enviarlo al front
+		InputStream fileStream = null;
+		ResponseEntity<InputStreamResource> res = null;
+		try {
+			fileStream = new FileInputStream(file);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+			headers.setContentLength(file.length());
+			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		LOGGER.info("generateExcelInscriptions() -> Salida del servicio para generar la plantilla Excel Inscripcion");
+
+		return res;
+	}
+
+	@Override
+	public UpdateResponseDTO uploadFileExcel(MultipartHttpServletRequest request)
+			throws IllegalStateException, IOException {
+		return null;
+	}
+
 
 }
