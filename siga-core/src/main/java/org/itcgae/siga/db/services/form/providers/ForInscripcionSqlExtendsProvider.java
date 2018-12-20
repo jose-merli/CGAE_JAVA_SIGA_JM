@@ -14,6 +14,10 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		sql.SELECT("INSC.IDINSCRIPCION");
+		sql.SELECT("INSC.IDESTADOINSCRIPCION");
+		sql.SELECT("INSC.IDPERSONA");
+		sql.SELECT("CURSO.IDESTADOCURSO");
+		sql.SELECT("INSC.IDINSTITUCION");
 		sql.SELECT("CURSO.CODIGOCURSO");
 		sql.SELECT("CURSO.NOMBRECURSO");
 		sql.SELECT("CAT.DESCRIPCION AS ESTADOCURSO");
@@ -53,9 +57,10 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		if (inscripcionItem.getIdEstadoCurso() != null && inscripcionItem.getIdEstadoCurso() != "") {
 			sql.WHERE("ESTADOCURSO.IDESTADOCURSO = '" + inscripcionItem.getIdEstadoCurso() + "'");
 		}
+		
+		if(inscripcionItem.getIdEstadoInscripcion() != null && inscripcionItem.getIdEstadoInscripcion() != "") {
+			sql.WHERE("ESTADOINSC.IDESTADOINSCRIPCION = '" + inscripcionItem.getIdEstadoInscripcion() + "'");
 
-		if (inscripcionItem.getIdEstadoInscripcion() != null && inscripcionItem.getIdEstadoInscripcion() != "") {
-			sql.WHERE("ESTADOINSCRIPCION.IDESTADOINSCRIPCION = '" + inscripcionItem.getIdEstadoInscripcion() + "'");
 		}
 
 		if (inscripcionItem.getIdVisibilidad() != null && inscripcionItem.getIdVisibilidad() != "") {
@@ -109,11 +114,25 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		// TODO Falta filtro de "Certificado emitido -> Si, No, Todos"
 
 		if (inscripcionItem.getPagada() != null) {
-			sql.WHERE("INSC.PAGADA ='" + inscripcionItem.getPagada() + "'");
+			// 0 --> TODOS
+			// 1 --> Si esta pagada la inscripcion
+			// 2 --> No esta pagada la inscripcion
+			if (inscripcionItem.getPagada() == 1)
+				sql.WHERE("INSC.PAGADA ='1'");
+			else if(inscripcionItem.getPagada() == 2)
+				sql.WHERE("INSC.PAGADA ='0' OR INSC.PAGADA IS NULL");
 		}
+		
+		if(inscripcionItem.getIdCalificacion() != null) {
+			if (inscripcionItem.getIdCalificacion() >= 0) {
+				sql.WHERE("INSC.IDCALIFICACION = '" + inscripcionItem.getIdCalificacion() + "'");
+			}else {
+				if(inscripcionItem.getIdCalificacion() == -2) // Sin calificacion
+					sql.WHERE("INSC.IDCALIFICACION IS NULL");
+				else if(inscripcionItem.getIdCalificacion() == -1) // Todas las calificadas
+					sql.WHERE("INSC.IDCALIFICACION IS NOT NULL");
+			}
 
-		if (inscripcionItem.getIdCalificacion() != null) {
-			sql.WHERE("INSC.IDCALIFICACION = '" + inscripcionItem.getIdCalificacion() + "'");
 		}
 
 		return sql.toString();
@@ -161,6 +180,24 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		
 		return sql.toString();
 	}
-	
+
+	public String compruebaPlazas(String idCurso) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("FC.IDCURSO");
+		sql.SELECT("FC.NUMEROPLAZAS");
+		sql.SELECT("FC.NOMBRECURSO");
+		sql.SELECT("COUNT(IDINSCRIPCION) AS INSCRIPCIONES");
+		
+		sql.FROM("FOR_CURSO FC");
+		sql.LEFT_OUTER_JOIN("FOR_INSCRIPCION FI ON FC.IDCURSO = FI.IDCURSO");
+		
+		sql.WHERE("FC.IDCURSO = '" + idCurso + "'");
+		
+		sql.GROUP_BY("FC.IDCURSO, FC.NOMBRECURSO, NUMEROPLAZAS");
+
+		return sql.toString();
+	}
 
 }

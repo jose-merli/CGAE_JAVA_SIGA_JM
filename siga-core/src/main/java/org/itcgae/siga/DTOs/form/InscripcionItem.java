@@ -3,6 +3,14 @@ package org.itcgae.siga.DTOs.form;
 import java.util.Arrays;
 import java.util.Date;
 
+/**
+ * @author DTUser
+ *
+ */
+/**
+ * @author DTUser
+ *
+ */
 public class InscripcionItem {
 	
 	private Long idInscripcion;
@@ -25,6 +33,13 @@ public class InscripcionItem {
 	private Long idCalificacion;
 	private String precioCurso;
 	private String fechaSolicitud;
+	private Long idPersona;
+	
+	// 0 --> Aprobar
+	// 1 --> Cancelar
+	// 2 --> Rechazar
+	private Short tipoAccion;
+	private String motivo;
 	
 	//Auxiliares pantalla
 	private String idEstadoCurso;
@@ -95,7 +110,6 @@ public class InscripcionItem {
 		this.estadoCurso = estadoCurso;
 	}
 	
-
 	public String getFechaInscripcionDesdeFormat() {
 		return fechaInscripcionDesdeFormat;
 	}
@@ -295,6 +309,30 @@ public class InscripcionItem {
 	public void setFechaSolicitud(String fechaSolicitud) {
 		this.fechaSolicitud = fechaSolicitud;
 	}
+	
+	public Long getIdPersona() {
+		return idPersona;
+	}
+
+	public void setIdPersona(Long idPersona) {
+		this.idPersona = idPersona;
+	}
+
+	public Short getTipoAccion() {
+		return tipoAccion;
+	}
+
+	public void setTipoAccion(Short tipoAccion) {
+		this.tipoAccion = tipoAccion;
+	}
+	
+	public String getMotivo() {
+		return motivo;
+	}
+
+	public void setMotivo(String motivo) {
+		this.motivo = motivo;
+	}
 
 	public String getPendientes() {
 		return pendientes;
@@ -349,10 +387,14 @@ public class InscripcionItem {
 		result = prime * result + ((estadoInscripcion == null) ? 0 : estadoInscripcion.hashCode());
 		result = prime * result + ((fechaImparticion == null) ? 0 : fechaImparticion.hashCode());
 		result = prime * result + ((fechaImparticionDesde == null) ? 0 : fechaImparticionDesde.hashCode());
+		result = prime * result + ((fechaImparticionDesdeFormat == null) ? 0 : fechaImparticionDesdeFormat.hashCode());
 		result = prime * result + ((fechaImparticionHasta == null) ? 0 : fechaImparticionHasta.hashCode());
+		result = prime * result + ((fechaImparticionHastaFormat == null) ? 0 : fechaImparticionHastaFormat.hashCode());
 		result = prime * result + ((fechaInscripcion == null) ? 0 : fechaInscripcion.hashCode());
 		result = prime * result + ((fechaInscripcionDesde == null) ? 0 : fechaInscripcionDesde.hashCode());
+		result = prime * result + ((fechaInscripcionDesdeFormat == null) ? 0 : fechaInscripcionDesdeFormat.hashCode());
 		result = prime * result + ((fechaInscripcionHasta == null) ? 0 : fechaInscripcionHasta.hashCode());
+		result = prime * result + ((fechaInscripcionHastaFormat == null) ? 0 : fechaInscripcionHastaFormat.hashCode());
 		result = prime * result + ((fechaSolicitud == null) ? 0 : fechaSolicitud.hashCode());
 		result = prime * result + ((idCalificacion == null) ? 0 : idCalificacion.hashCode());
 		result = prime * result + ((idEstadoCurso == null) ? 0 : idEstadoCurso.hashCode());
@@ -360,12 +402,15 @@ public class InscripcionItem {
 		result = prime * result + ((idFormador == null) ? 0 : idFormador.hashCode());
 		result = prime * result + ((idInscripcion == null) ? 0 : idInscripcion.hashCode());
 		result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
+		result = prime * result + ((idPersona == null) ? 0 : idPersona.hashCode());
 		result = prime * result + ((idVisibilidad == null) ? 0 : idVisibilidad.hashCode());
 		result = prime * result + ((minimaAsistencia == null) ? 0 : minimaAsistencia.hashCode());
+		result = prime * result + ((motivo == null) ? 0 : motivo.hashCode());
 		result = prime * result + ((nombreCurso == null) ? 0 : nombreCurso.hashCode());
 		result = prime * result + ((pagada == null) ? 0 : pagada.hashCode());
 		result = prime * result + ((precioCurso == null) ? 0 : precioCurso.hashCode());
 		result = prime * result + Arrays.hashCode(temas);
+		result = prime * result + ((tipoAccion == null) ? 0 : tipoAccion.hashCode());
 		result = prime * result + ((visibilidad == null) ? 0 : visibilidad.hashCode());
 		result = prime * result + ((pendientes == null) ? 0 : pendientes.hashCode());
 		result = prime * result + ((rechazadas == null) ? 0 : rechazadas.hashCode());
@@ -429,10 +474,20 @@ public class InscripcionItem {
 				return false;
 		} else if (!fechaImparticionDesde.equals(other.fechaImparticionDesde))
 			return false;
+		if (fechaImparticionDesdeFormat == null) {
+			if (other.fechaImparticionDesdeFormat != null)
+				return false;
+		} else if (!fechaImparticionDesdeFormat.equals(other.fechaImparticionDesdeFormat))
+			return false;
 		if (fechaImparticionHasta == null) {
 			if (other.fechaImparticionHasta != null)
 				return false;
 		} else if (!fechaImparticionHasta.equals(other.fechaImparticionHasta))
+			return false;
+		if (fechaImparticionHastaFormat == null) {
+			if (other.fechaImparticionHastaFormat != null)
+				return false;
+		} else if (!fechaImparticionHastaFormat.equals(other.fechaImparticionHastaFormat))
 			return false;
 		if (fechaInscripcion == null) {
 			if (other.fechaInscripcion != null)
@@ -444,10 +499,20 @@ public class InscripcionItem {
 				return false;
 		} else if (!fechaInscripcionDesde.equals(other.fechaInscripcionDesde))
 			return false;
+		if (fechaInscripcionDesdeFormat == null) {
+			if (other.fechaInscripcionDesdeFormat != null)
+				return false;
+		} else if (!fechaInscripcionDesdeFormat.equals(other.fechaInscripcionDesdeFormat))
+			return false;
 		if (fechaInscripcionHasta == null) {
 			if (other.fechaInscripcionHasta != null)
 				return false;
 		} else if (!fechaInscripcionHasta.equals(other.fechaInscripcionHasta))
+			return false;
+		if (fechaInscripcionHastaFormat == null) {
+			if (other.fechaInscripcionHastaFormat != null)
+				return false;
+		} else if (!fechaInscripcionHastaFormat.equals(other.fechaInscripcionHastaFormat))
 			return false;
 		if (fechaSolicitud == null) {
 			if (other.fechaSolicitud != null)
@@ -484,6 +549,11 @@ public class InscripcionItem {
 				return false;
 		} else if (!idInstitucion.equals(other.idInstitucion))
 			return false;
+		if (idPersona == null) {
+			if (other.idPersona != null)
+				return false;
+		} else if (!idPersona.equals(other.idPersona))
+			return false;
 		if (idVisibilidad == null) {
 			if (other.idVisibilidad != null)
 				return false;
@@ -493,6 +563,11 @@ public class InscripcionItem {
 			if (other.minimaAsistencia != null)
 				return false;
 		} else if (!minimaAsistencia.equals(other.minimaAsistencia))
+			return false;
+		if (motivo == null) {
+			if (other.motivo != null)
+				return false;
+		} else if (!motivo.equals(other.motivo))
 			return false;
 		if (nombreCurso == null) {
 			if (other.nombreCurso != null)
@@ -510,6 +585,11 @@ public class InscripcionItem {
 		} else if (!precioCurso.equals(other.precioCurso))
 			return false;
 		if (!Arrays.equals(temas, other.temas))
+			return false;
+		if (tipoAccion == null) {
+			if (other.tipoAccion != null)
+				return false;
+		} else if (!tipoAccion.equals(other.tipoAccion))
 			return false;
 		if (visibilidad == null) {
 			if (other.visibilidad != null)
@@ -562,6 +642,7 @@ public class InscripcionItem {
 				+ ", totales=" + totales + ", fechaInscripcionDesdeFormat=" + fechaInscripcionDesdeFormat
 				+ ", fechaInscripcionHastaFormat=" + fechaInscripcionHastaFormat + ", fechaImparticionDesdeFormat="
 				+ fechaImparticionDesdeFormat + ", fechaImparticionHastaFormat=" + fechaImparticionHastaFormat + "]";
+
 	}
 
 	

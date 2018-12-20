@@ -73,5 +73,13 @@ public interface CenInstitucionExtendsMapper extends CenInstitucionMapper {
 		@Result(column = "IDPROVINCIA", property = "valor", jdbcType = JdbcType.DECIMAL, id = true),
 			})
 	StringDTO selectProvinciaColegio(StringDTO idInstitucionIntegrante);
+
+	
+	
+	@SelectProvider(type = CenInstitucionSqlExtendsProvider.class, method = "getAbreviaturaInstitucion")
+	@Results({ 
+		@Result(column = "NOMBRE", property = "valor", jdbcType = JdbcType.VARCHAR, id = true),
+			})
+	StringDTO getAbreviaturaInstitucion(String stInstitucion);
 	
 }

@@ -19,18 +19,28 @@ public class BusquedaSancionesSearchDTO {
 	private String refConsejo;
 	private String refColegio;
 	private boolean chkRehabilitado;
-	private Date fecha;
-	private Date fechaAcuerdoHasta;
 	private Date fechaDesdeDate;
 	private Date fechaHastaDate;
 	private boolean chkArchivadas;
 	private Date fechaArchivadaDesdeDate;
 	private Date fechaArchivadaHastaDate;
 	
+	private String tipoFecha;
+	
+	
+	
 	// Búsqueda por Sanciones
 	private String tipo;
 	private String origen;
 	private String estado;
+	
+	@JsonProperty("tipoFecha")
+	public String getTipoFecha() {
+		return tipoFecha;
+	}
+	public void setTipoFecha(String tipoFecha) {
+		this.tipoFecha = tipoFecha;
+	}
 	
 	@JsonProperty("nif")
 	public String getNif() {
@@ -104,22 +114,6 @@ public class BusquedaSancionesSearchDTO {
 		this.chkRehabilitado = chkRehabilitado;
 	}
 	
-	@JsonProperty("fecha")
-	public Date getFechaAcuerdoDesde() {
-		return fecha;
-	}
-	public void setFechaAcuerdoDesde(Date fecha) {
-		this.fecha = fecha;
-	}
-	
-	@JsonProperty("fechaAcuerdoHasta")
-	public Date getFechaAcuerdoHasta() {
-		return fechaAcuerdoHasta;
-	}
-	public void setFechaAcuerdoHasta(Date fechaAcuerdoHasta) {
-		this.fechaAcuerdoHasta = fechaAcuerdoHasta;
-	}
-	
 	@JsonProperty("fechaDesdeDate")
 	public Date getFechaDesde() {
 		return fechaDesdeDate;
@@ -184,6 +178,7 @@ public class BusquedaSancionesSearchDTO {
 		this.estado = estado;
 	}
 	
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -202,8 +197,6 @@ public class BusquedaSancionesSearchDTO {
 	    		Objects.equals(this.refColegio, busquedaSancionesSearchDTO.refColegio) && 
 	    		Objects.equals(this.refConsejo, busquedaSancionesSearchDTO.refConsejo) && 
 	    		Objects.equals(this.chkRehabilitado, busquedaSancionesSearchDTO.chkRehabilitado) && 
-	    Objects.equals(this.fecha, busquedaSancionesSearchDTO.fecha) && 
-	    Objects.equals(this.fechaAcuerdoHasta, busquedaSancionesSearchDTO.fechaAcuerdoHasta) && 
 	    Objects.equals(this.fechaDesdeDate, busquedaSancionesSearchDTO.fechaDesdeDate) && 
 	    Objects.equals(this.fechaHastaDate, busquedaSancionesSearchDTO.fechaHastaDate) && 
 	    Objects.equals(this.chkArchivadas, busquedaSancionesSearchDTO.chkArchivadas) && 
@@ -216,7 +209,7 @@ public class BusquedaSancionesSearchDTO {
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(tipo, nif, nombre, primerApellido, segundoApellido, idColegios, tipoSancion, refColegio, chkRehabilitado, fecha, fechaAcuerdoHasta, fechaDesdeDate, fechaHastaDate, chkArchivadas, fechaArchivadaDesdeDate, 
+	    return Objects.hash(tipo, nif, nombre, primerApellido, segundoApellido, idColegios, tipoSancion, refColegio, chkRehabilitado, fechaDesdeDate, fechaHastaDate, chkArchivadas, fechaArchivadaDesdeDate, 
 	    		fechaArchivadaHastaDate, tipo, origen, estado);
 	}
 
@@ -236,8 +229,6 @@ public class BusquedaSancionesSearchDTO {
 	    sb.append("    refColegio: ").append(toIndentedString(refColegio)).append("\n");
 	    sb.append("    refConsejo: ").append(toIndentedString(refConsejo)).append("\n");
 	    sb.append("    chkRehabilitado: ").append(toIndentedString(chkRehabilitado)).append("\n");
-	    sb.append("    fecha: ").append(toIndentedString(fecha)).append("\n");
-	    sb.append("    fechaAcuerdoHasta: ").append(toIndentedString(fechaAcuerdoHasta)).append("\n");
 	    sb.append("    fechaDesde: ").append(toIndentedString(fechaDesdeDate)).append("\n");
 	    sb.append("    fechaHasta: ").append(toIndentedString(fechaHastaDate)).append("\n");
 	    sb.append("    chkArchivadas: ").append(toIndentedString(chkArchivadas)).append("\n");

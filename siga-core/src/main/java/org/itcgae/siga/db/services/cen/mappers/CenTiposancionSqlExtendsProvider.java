@@ -1,14 +1,12 @@
 package org.itcgae.siga.db.services.cen.mappers;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.BusquedaSancionesSearchDTO;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.CenTiposancionSqlProvider;
-
-import io.jsonwebtoken.lang.Strings;
 
 public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider {
 
@@ -24,14 +22,13 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 	public String searchBusquedaSanciones(BusquedaSancionesSearchDTO busquedaSancionesSearchDTO, String idLenguaje,
 			String idInstitucion) {
 		SQL sql = new SQL();
-		
+
 		String rdo = "";
-		
+
 		String fechaDesde = "";
 		String fechaHasta = "";
-		String fechaAcuerdoDesde = "";
-		String fechaAcuerdoHasta = "";
-		
+		String tipoFecha = busquedaSancionesSearchDTO.getTipoFecha();
+
 		// Formateo de fecha para sentencia sql
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -72,6 +69,35 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 		sql.WHERE("(sancion.idInstitucion = '" + idInstitucion
 				+ "' OR (sancion.idInstitucion = '2000' AND sancion.chkFirmeza = '1'))");
 
+		// ARCHIVADA
+		if (busquedaSancionesSearchDTO.getChkArchivadas() == false){
+			sql.WHERE(
+					"(nvl (sancion.chkArchivada,0) = 0 OR nvl (sancion.chkArchivada,0) = 1 AND sancion.fechaArchivada is not null AND sancion.fechaArchivada > sysdate)");
+		} else {
+			sql.WHERE("sancion.CHKARCHIVADA = 1");
+
+			if (busquedaSancionesSearchDTO.getFechaArchivadaDesde() == null
+					&& busquedaSancionesSearchDTO.getFechaArchivadaHasta() == null) {
+				sql.WHERE("(sancion.FECHAARCHIVADA <=sysdate OR sancion.FECHAARCHIVADA is null)");
+			} else {
+				String fechaArcDesde = dateFormat.format(busquedaSancionesSearchDTO.getFechaArchivadaDesde());
+				String fechaArcHasta = dateFormat.format(busquedaSancionesSearchDTO.getFechaArchivadaHasta());
+
+				if (null != busquedaSancionesSearchDTO.getFechaArchivadaDesde()
+						&& null != busquedaSancionesSearchDTO.getFechaArchivadaHasta()) {
+					sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) >= TO_DATE('" + fechaArcDesde
+							+ "', 'DD/MM/YYYY') AND TO_DATE(sancion.FECHAARCHIVADA) <= TO_DATE('" + fechaArcHasta
+							+ "', 'DD/MM/YYYY')");
+				} else if (busquedaSancionesSearchDTO.getFechaArchivadaDesde() == null
+						&& null != busquedaSancionesSearchDTO.getFechaArchivadaHasta()) {
+					sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) <= TO_DATE('" + fechaArcHasta + "', 'DD/MM/YYYY')");
+				} else if (null != busquedaSancionesSearchDTO.getFechaArchivadaDesde()
+						&& busquedaSancionesSearchDTO.getFechaArchivadaHasta() == null) {
+					sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) >= TO_DATE('" + fechaArcDesde + "', 'DD/MM/YYYY')");
+				}
+			}
+		}
+
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getNif())) {
 			sql.WHERE("persona.NIFCIF = '" + busquedaSancionesSearchDTO.getNif() + "'");
 		}
@@ -107,33 +133,7 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 		}
 
 		// FECHA ACUERDO
-		if (null != busquedaSancionesSearchDTO.getFechaAcuerdoDesde()){
-			fechaAcuerdoDesde = dateFormat.format(busquedaSancionesSearchDTO.getFechaAcuerdoDesde());
-		}
-		
-		if(null != busquedaSancionesSearchDTO.getFechaAcuerdoHasta()) {
-			fechaAcuerdoHasta = dateFormat.format(busquedaSancionesSearchDTO.getFechaAcuerdoHasta());
-		}
-		
-		if (null != busquedaSancionesSearchDTO.getFechaAcuerdoDesde()
-				|| null != busquedaSancionesSearchDTO.getFechaAcuerdoHasta()) {
-			
 
-			if (null != busquedaSancionesSearchDTO.getFechaAcuerdoDesde()
-					&& busquedaSancionesSearchDTO.getFechaAcuerdoHasta() != null) {
-				sql.WHERE("TO_DATE(sancion.FECHAACUERDO) >= TO_DATE('" + fechaAcuerdoDesde
-						+ "', 'DD/MM/YYYY') AND TO_DATE(sancion.FECHAARCHIVADA) <= TO_DATE('" + fechaAcuerdoHasta
-						+ "', 'DD/MM/YYYY')");
-			} else if (busquedaSancionesSearchDTO.getFechaAcuerdoDesde() == null
-					&& null != busquedaSancionesSearchDTO.getFechaAcuerdoHasta()) {
-				sql.WHERE("TO_DATE(sancion.FECHAACUERDO) <= TO_DATE('" + fechaAcuerdoHasta + "', 'DD/MM/YYYY')");
-			} else if (null != busquedaSancionesSearchDTO.getFechaAcuerdoDesde()
-					&& busquedaSancionesSearchDTO.getFechaAcuerdoHasta() == null) {
-				sql.WHERE("TO_DATE(sancion.FECHAACUERDO) >= TO_DATE('" + fechaAcuerdoDesde + "', 'DD/MM/YYYY')");
-			}
-		}
-
-		// FECHA PERÍODO
 		if (null != busquedaSancionesSearchDTO.getFechaDesde()) {
 			fechaDesde = dateFormat.format(busquedaSancionesSearchDTO.getFechaDesde());
 		}
@@ -142,8 +142,23 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 			fechaHasta = dateFormat.format(busquedaSancionesSearchDTO.getFechaHasta());
 		}
 
-		if (null != busquedaSancionesSearchDTO.getFechaDesde() || null != busquedaSancionesSearchDTO.getFechaHasta()) {
+		if (tipoFecha.equals(SigaConstants.ACUERDO)) {
+			
+				if (null != busquedaSancionesSearchDTO.getFechaDesde()
+						&& busquedaSancionesSearchDTO.getFechaHasta() != null) {
+					sql.WHERE("TO_DATE(sancion.FECHAACUERDO) >= TO_DATE('" + fechaDesde
+							+ "', 'DD/MM/YYYY') AND TO_DATE(sancion.FECHAACUERDO) <= TO_DATE('" + fechaHasta
+							+ "', 'DD/MM/YYYY')");
+				} else if (busquedaSancionesSearchDTO.getFechaDesde() == null
+						&& null != busquedaSancionesSearchDTO.getFechaHasta()) {
+					sql.WHERE("TO_DATE(sancion.FECHAACUERDO) <= TO_DATE('" + fechaHasta + "', 'DD/MM/YYYY')");
+				} else if (null != busquedaSancionesSearchDTO.getFechaDesde()
+						&& busquedaSancionesSearchDTO.getFechaHasta() == null) {
+					sql.WHERE("TO_DATE(sancion.FECHAACUERDO) >= TO_DATE('" + fechaDesde + "', 'DD/MM/YYYY')");
+				}
+		}
 
+		if (tipoFecha.equals(SigaConstants.FIN)) {
 			if (null != busquedaSancionesSearchDTO.getFechaDesde()
 					&& busquedaSancionesSearchDTO.getFechaHasta() != null) {
 				sql.WHERE("TO_DATE(sancion.FECHAFIN) >= TO_DATE('" + fechaDesde
@@ -156,7 +171,9 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 					&& busquedaSancionesSearchDTO.getFechaHasta() == null) {
 				sql.WHERE("TO_DATE(sancion.FECHAFIN) >= TO_DATE('" + fechaDesde + "', 'DD/MM/YYYY')");
 			}
+		}
 
+		if (tipoFecha.equals(SigaConstants.FIRMEZA)) {
 			if (null != busquedaSancionesSearchDTO.getFechaDesde()
 					&& busquedaSancionesSearchDTO.getFechaHasta() != null) {
 				sql.WHERE("TO_DATE(sancion.FECHAFIRMEZA) >= TO_DATE('" + fechaDesde
@@ -169,9 +186,11 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 					&& busquedaSancionesSearchDTO.getFechaHasta() == null) {
 				sql.WHERE("TO_DATE(sancion.FECHAFIRMEZA) >= TO_DATE('" + fechaDesde + "', 'DD/MM/YYYY')");
 			}
+		}
 
+		if (tipoFecha.equals(SigaConstants.IMPOSICION)) {
 			if (null != busquedaSancionesSearchDTO.getFechaDesde()
-					&& busquedaSancionesSearchDTO.getFechaHasta() != null) {
+					&& busquedaSancionesSearchDTO.getFechaDesde() != null) {
 				sql.WHERE("TO_DATE(sancion.FECHAIMPOSICION) >= TO_DATE('" + fechaDesde
 						+ "', 'DD/MM/YYYY') AND TO_DATE(sancion.FECHAIMPOSICION) <= TO_DATE('" + fechaHasta
 						+ "', 'DD/MM/YYYY')");
@@ -182,7 +201,9 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 					&& busquedaSancionesSearchDTO.getFechaHasta() == null) {
 				sql.WHERE("TO_DATE(sancion.FECHAIMPOSICION) >= TO_DATE('" + fechaDesde + "', 'DD/MM/YYYY')");
 			}
+		}
 
+		if (tipoFecha.equals(SigaConstants.INICIO)) {
 			if (null != busquedaSancionesSearchDTO.getFechaDesde()
 					&& busquedaSancionesSearchDTO.getFechaHasta() != null) {
 				sql.WHERE("TO_DATE(sancion.FECHAINICIO) >= TO_DATE('" + fechaDesde
@@ -195,7 +216,9 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 					&& busquedaSancionesSearchDTO.getFechaHasta() == null) {
 				sql.WHERE("TO_DATE(sancion.FECHAINICIO) >= TO_DATE('" + fechaDesde + "', 'DD/MM/YYYY')");
 			}
+		}
 
+		if (tipoFecha.equals(SigaConstants.REHABILITADO)) {
 			if (null != busquedaSancionesSearchDTO.getFechaDesde()
 					&& busquedaSancionesSearchDTO.getFechaHasta() != null) {
 				sql.WHERE("TO_DATE(sancion.FECHAREHABILITADO) >= TO_DATE('" + fechaDesde
@@ -208,7 +231,9 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 					&& busquedaSancionesSearchDTO.getFechaHasta() == null) {
 				sql.WHERE("TO_DATE(sancion.FECHAREHABILITADO) >= TO_DATE('" + fechaDesde + "', 'DD/MM/YYYY')");
 			}
+		}
 
+		if (tipoFecha.equals(SigaConstants.RESOLUCION)) {
 			if (null != busquedaSancionesSearchDTO.getFechaDesde()
 					&& busquedaSancionesSearchDTO.getFechaHasta() != null) {
 				sql.WHERE("TO_DATE(sancion.FECHARESOLUCION) >= TO_DATE('" + fechaDesde
@@ -222,35 +247,6 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 				sql.WHERE("TO_DATE(sancion.FECHARESOLUCION) >= TO_DATE('" + fechaDesde + "', 'DD/MM/YYYY')");
 			}
 		}
-		
-		// ARCHIVADA
-		if (busquedaSancionesSearchDTO.getChkArchivadas() == false) {
-			sql.WHERE(
-					"nvl (sancion.chkArchivada,0) = 0 OR nvl (sancion.chkArchivada,0) = 1 AND sancion.fechaArchivada is not null AND sancion.fechaArchivada > sysdate");
-		} else {
-			sql.WHERE("sancion.CHKARCHIVADA = 1");
-
-			if (busquedaSancionesSearchDTO.getFechaArchivadaDesde() == null
-					&& busquedaSancionesSearchDTO.getFechaArchivadaHasta() == null) {
-				sql.WHERE("sancion.FECHAARCHIVADA <=sysdate OR sancion.FECHAARCHIVADA is null");
-			} else {
-				String fechaArcDesde = dateFormat.format(busquedaSancionesSearchDTO.getFechaArchivadaDesde());
-				String fechaArcHasta = dateFormat.format(busquedaSancionesSearchDTO.getFechaArchivadaHasta());
-
-				if (null != busquedaSancionesSearchDTO.getFechaArchivadaDesde()
-						&& null != busquedaSancionesSearchDTO.getFechaArchivadaHasta()) {
-					sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) >= TO_DATE('" + fechaArcDesde
-							+ "', 'DD/MM/YYYY') AND TO_DATE(sancion.FECHAARCHIVADA) <= TO_DATE('" + fechaArcHasta
-							+ "', 'DD/MM/YYYY')");
-				} else if (busquedaSancionesSearchDTO.getFechaArchivadaDesde() == null
-						&& null != busquedaSancionesSearchDTO.getFechaArchivadaHasta()) {
-					sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) <= TO_DATE('" + fechaArcHasta + "', 'DD/MM/YYYY')");
-				} else if (null != busquedaSancionesSearchDTO.getFechaArchivadaDesde()
-						&& busquedaSancionesSearchDTO.getFechaArchivadaHasta() == null) {
-					sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) >= TO_DATE('" + fechaArcDesde + "', 'DD/MM/YYYY')");
-				}
-			}
-		}
 
 		if (busquedaSancionesSearchDTO.getChkRehabilitados()) {
 			sql.WHERE("sancion.CHKREHABILITADO = 1");
@@ -259,8 +255,8 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getTipo())) {
 			sql.WHERE("sancion.IDTIPOSANCION = '" + busquedaSancionesSearchDTO.getTipo() + "'");
 		}
-		
-		rdo  = sql.toString() + " ORDER BY NOMBRE";
+
+		rdo = sql.toString() + " ORDER BY NOMBRE";
 		return rdo;
 	}
 

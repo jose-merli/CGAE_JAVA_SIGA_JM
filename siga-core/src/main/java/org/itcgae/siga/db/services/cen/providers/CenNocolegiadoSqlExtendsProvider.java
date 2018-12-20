@@ -645,8 +645,6 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 		if(!noColegiadoItem.isHistorico()) {
 			sql.WHERE("NOCOL.FECHA_BAJA is NULL");
-		}else {
-			sql.WHERE("NOCOL.FECHA_BAJA is NOT NULL");
 		}
 		
 		if (noColegiadoItem.getNif() != null && noColegiadoItem.getNif() != "") {
@@ -826,6 +824,21 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		}
 		
 		sql.ORDER_BY("nocol.IDPERSONA, NOCOL.IDINSTITUCION");
+	
+		return sql.toString();
+	}
+	
+	public String selectColegiacionesIdPersona(Long idPersona) {
+
+		SQL sql = new SQL();
+
+
+		sql.SELECT("col.idinstitucion as IDINSTITUCION");
+		
+		sql.FROM("cen_nocolegiado col");
+		
+		sql.WHERE("col.idpersona = '"+ idPersona +"'");
+		
 	
 		return sql.toString();
 	}

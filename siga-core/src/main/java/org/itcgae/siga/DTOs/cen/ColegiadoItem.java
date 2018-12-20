@@ -35,6 +35,7 @@ public class ColegiadoItem {
 	private String  tipoDireccion;
 	private String  sexo;
 	private String idEstadoCivil;
+	private String idEstado;
 	private String domicilio;
 	private String tipoCV;
 	private String  idgrupo [];
@@ -60,6 +61,7 @@ public class ColegiadoItem {
 	private String fechaNacimiento;
 	private String fechaBaja;
 	
+	private Date fechaEstado;
 	private Date incorporacionDate;
 	private Date fechaJuraDate;
 	private Date fechaAltaDate;
@@ -1168,6 +1170,24 @@ public class ColegiadoItem {
 	public void setMotivo(String motivo) {
 		this.motivo = motivo;
 	}
+
+	public Date getFechaEstado() {
+		return fechaEstado;
+	}
+
+	public void setFechaEstado(Date fechaEstado) {
+		this.fechaEstado = fechaEstado;
+	}
+
+	public String getIdEstado() {
+		return idEstado;
+	}
+
+	public void setIdEstado(String idEstado) {
+		this.idEstado = idEstado;
+	}
+
+
 
 
 

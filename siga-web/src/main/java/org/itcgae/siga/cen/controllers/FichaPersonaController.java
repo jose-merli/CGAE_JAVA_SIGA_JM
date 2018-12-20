@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.FichaPerSearchDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaDTO;
+import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.IFichaPersonaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,12 @@ public class FichaPersonaController {
 	ResponseEntity<FichaPersonaDTO> searchPersonFile(@RequestParam("numPagina") int numPagina, @RequestBody FichaPerSearchDTO fichaPerSearch, HttpServletRequest request) { 
 		FichaPersonaDTO response = fichaPersonaService.searchPersonFile(numPagina, fichaPerSearch, request);
 		return new ResponseEntity<FichaPersonaDTO>(response, HttpStatus.OK);
+	}	
+	
+	@RequestMapping(value = "/fichaPersona/searchPersona",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<FichaPersonaItem> searchPersona(@RequestBody Long idPersona, HttpServletRequest request) { 
+		FichaPersonaItem response = fichaPersonaService.searchPersona(idPersona, request);
+		return new ResponseEntity<FichaPersonaItem>(response, HttpStatus.OK);
 	}	
 	
 	

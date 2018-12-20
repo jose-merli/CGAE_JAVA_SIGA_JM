@@ -78,9 +78,9 @@ public class UpdateResponseDTO   {
       return false;
     }
     UpdateResponseDTO updateResponseDTO = (UpdateResponseDTO) o;
-    return Objects.equals(this.status, updateResponseDTO.status) &&
-    		Objects.equals(this.id, updateResponseDTO.id) &&
-        Objects.equals(this.error, updateResponseDTO.error);
+    return Objects.equals(this.status.toString(), updateResponseDTO.status.toString()) &&
+    		Objects.equals(this.id.toString(), updateResponseDTO.id.toString()) &&
+        Objects.equals(this.error.getCode(), updateResponseDTO.error.getCode());
   }
 
   @Override
