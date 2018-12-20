@@ -304,9 +304,15 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 				if (null != cenSancion) {
 
-					cenSancion = fillCenSancion(usuario, Long.valueOf(busquedaSancionesItem.getIdPersona()),
-							busquedaSancionesItem);
-
+					if(busquedaSancionesItem.getIsRestablecer()) {
+						cenSancion.setChkarchivada("0");
+						cenSancion.setFechaarchivada(null);
+						cenSancion.setFechamodificacion(new Date());
+					}else {
+						cenSancion = fillCenSancion(usuario, Long.valueOf(busquedaSancionesItem.getIdPersona()),
+								busquedaSancionesItem);
+					}
+				
 					LOGGER.info(
 							"updateSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenSancionExtendsMapper para actualizar la sanción");
 					int response = cenSancionExtendsMapper.updateByPrimaryKeySelective(cenSancion);
