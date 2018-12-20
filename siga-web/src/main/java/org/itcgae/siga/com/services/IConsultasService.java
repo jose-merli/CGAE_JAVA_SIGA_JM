@@ -23,9 +23,9 @@ public interface IConsultasService {
 	//TODO: REVISAR DTO de ENTRADA Y SALIDA
 	public ConsultasDTO consultasSearch(HttpServletRequest request, ConsultasSearch filtros);
 
-	public Error duplicarConsulta(HttpServletRequest request, String[] idConsulta);
+	public Error duplicarConsulta(HttpServletRequest request, ConsultaItem[] consultas);
 
-	public Error borrarConsulta(HttpServletRequest request, String[] idConsulta);
+	public Error borrarConsulta(HttpServletRequest request, ConsultaItem[] consultas);
 
 	public Error guardarDatosGenerales(HttpServletRequest request, ConsultasSearch filtros);
 

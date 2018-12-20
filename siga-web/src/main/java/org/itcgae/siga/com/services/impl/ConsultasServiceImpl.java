@@ -24,10 +24,8 @@ import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
-import org.itcgae.siga.db.entities.ModPlantilladocConsultaKey;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
-import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaKey;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
@@ -99,7 +97,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 			
 			if (null != usuarios && usuarios.size() > 0) {
 
-				AdmUsuarios usuario = usuarios.get(0);
+				
 				comboItems = _conModulosExtendsMapper.selectModulos();
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
@@ -233,7 +231,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
-	public Error duplicarConsulta(HttpServletRequest request, String[] idConsulta) {
+	public Error duplicarConsulta(HttpServletRequest request, ConsultaItem[] consultas) {
 		LOGGER.info("duplicarConsulta() -> Entrada al servicio de duplicar consultas");
 
 		Error respuesta = new Error();
@@ -252,10 +250,10 @@ public class ConsultasServiceImpl implements IConsultasService{
 				AdmUsuarios usuario = usuarios.get(0);
 				try {
 					
-					for (int i = 0; i < idConsulta.length; i++) {
+					for (int i = 0; i < consultas.length; i++) {
 						ConConsultaKey key = new ConConsultaKey();
-						key.setIdconsulta(Long.valueOf(idConsulta[0]));
-						key.setIdinstitucion(idInstitucion);
+						key.setIdconsulta(consultas[i].getIdConsulta());
+						key.setIdinstitucion(consultas[i].getIdInstitucion());
 						ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
 						String descripcion = "Copia " + i+1 +" - " + consulta.getDescripcion();
 						consulta.setDescripcion(descripcion);
@@ -277,7 +275,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
-	public Error borrarConsulta(HttpServletRequest request, String[] idConsulta) {
+	public Error borrarConsulta(HttpServletRequest request, ConsultaItem[] consultas) {
 		LOGGER.info("borrarConsulta() -> Entrada al servicio de borrar consulta");
 
 		Error respuesta = new Error();
@@ -295,10 +293,10 @@ public class ConsultasServiceImpl implements IConsultasService{
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try {
-					for (int i = 0; i < idConsulta.length; i++) {
+					for (int i = 0; i < consultas.length; i++) {
 						ConConsultaKey consultaKey = new ConConsultaKey();
-						consultaKey.setIdconsulta(Long.valueOf(idConsulta[0]));
-						consultaKey.setIdinstitucion(idInstitucion);
+						consultaKey.setIdconsulta(consultas[i].getIdConsulta());
+						consultaKey.setIdinstitucion(consultas[i].getIdInstitucion());
 						ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(consultaKey);
 						boolean consultaAsociada = false;
 						if(consulta.getIdobjetivo() != null){
