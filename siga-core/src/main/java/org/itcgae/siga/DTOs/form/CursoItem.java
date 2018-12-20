@@ -2,6 +2,9 @@ package org.itcgae.siga.DTOs.form;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+
+import org.itcgae.siga.DTOs.gen.ComboItem;
 
 public class CursoItem {
 	
@@ -41,6 +44,8 @@ public class CursoItem {
 	private String idEventoFinInscripcion;
 	private String idTipoEvento;
 	
+
+	private List<ComboItem> tipoServicios;
 	private String numPlazas;
 	private String inscripciones;
 	
@@ -241,6 +246,12 @@ public class CursoItem {
 	}
 	public void setIdTipoEvento(String idTipoEvento) {
 		this.idTipoEvento = idTipoEvento;
+	}	
+	public List<ComboItem> getTipoServicios() {
+		return tipoServicios;
+	}
+	public void setTipoServicios(List<ComboItem> tipoServicios) {
+		this.tipoServicios = tipoServicios;
 	}
 	
 	public String getNumPlazas() {
@@ -294,6 +305,12 @@ public class CursoItem {
 		result = prime * result + ((precioHasta == null) ? 0 : precioHasta.hashCode());
 		result = prime * result + Arrays.hashCode(temas);
 		result = prime * result + ((visibilidad == null) ? 0 : visibilidad.hashCode());
+		result = prime * result + ((lugar == null) ? 0 : lugar.hashCode());
+		result = prime * result + ((minimoAsistencia == null) ? 0 : minimoAsistencia.hashCode());
+		result = prime * result + ((autovalidacionInscripcion == null) ? 0 : autovalidacionInscripcion.hashCode());
+		result = prime * result + ((idTipoEvento == null) ? 0 : idTipoEvento.hashCode());
+		result = prime * result + ((tipoServicios == null) ? 0 : tipoServicios.hashCode());
+
 		return result;
 	}
 	@Override
@@ -477,8 +494,36 @@ public class CursoItem {
 				return false;
 		} else if (!visibilidad.equals(other.visibilidad))
 			return false;
+		if (lugar == null) {
+			if (other.lugar != null)
+				return false;
+		} else if (!lugar.equals(other.lugar))
+			return false;
+		if (minimoAsistencia == null) {
+			if (other.minimoAsistencia != null)
+				return false;
+		} else if (!minimoAsistencia.equals(other.minimoAsistencia))
+			return false;
+		if (autovalidacionInscripcion == null) {
+			if (other.autovalidacionInscripcion != null)
+				return false;
+		} else if (!autovalidacionInscripcion.equals(other.autovalidacionInscripcion))
+			return false;
+		if (idTipoEvento == null) {
+			if (other.idTipoEvento != null)
+				return false;
+		} else if (!idTipoEvento.equals(other.idTipoEvento))
+			return false;
+		if (tipoServicios == null) {
+			if (other.tipoServicios != null)
+				return false;
+		} else if (!tipoServicios.equals(other.tipoServicios))
+			return false;
+
 		return true;
 	}
+	
+	
 	@Override
 	public String toString() {
 		return "CursoItem [idCurso=" + idCurso + ", visibilidad=" + visibilidad + ", colegio=" + colegio
@@ -498,4 +543,5 @@ public class CursoItem {
 				+ idEventoInicioInscripcion + ", idEventoFinInscripcion=" + idEventoFinInscripcion + ", idTipoEvento="
 				+ idTipoEvento + ", numPlazas=" + numPlazas + ", inscripciones=" + inscripciones + "]";
 	}	
+
 }
