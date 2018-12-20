@@ -39,4 +39,12 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper {
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> getCalificacionesEmitidas(String idLenguaje);
+	
+	@SelectProvider(type = ForInscripcionSqlExtendsProvider.class, method = "getCountIncriptions")
+	@Results({ @Result(column = "PENDIENTE", property = "pendientes", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "RECHAZADO", property = "rechazadas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APROBADO", property = "aprobadas", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CANCELADO", property = "canceladas", jdbcType = JdbcType.VARCHAR),
+	})
+	InscripcionItem getCountIncriptions(String idCurso);	
 }

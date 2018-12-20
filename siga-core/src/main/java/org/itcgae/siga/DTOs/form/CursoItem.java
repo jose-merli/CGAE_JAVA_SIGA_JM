@@ -2,6 +2,9 @@ package org.itcgae.siga.DTOs.form;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+
+import org.itcgae.siga.DTOs.gen.ComboItem;
 
 public class CursoItem {
 	
@@ -40,6 +43,8 @@ public class CursoItem {
 	private String idEventoInicioInscripcion;
 	private String idEventoFinInscripcion;
 	private String idTipoEvento;
+	
+	private List<ComboItem> tipoServicios;
 	
 	public Long getIdCurso() {
 		return idCurso;
@@ -238,6 +243,12 @@ public class CursoItem {
 	}
 	public void setIdTipoEvento(String idTipoEvento) {
 		this.idTipoEvento = idTipoEvento;
+	}	
+	public List<ComboItem> getTipoServicios() {
+		return tipoServicios;
+	}
+	public void setTipoServicios(List<ComboItem> tipoServicios) {
+		this.tipoServicios = tipoServicios;
 	}
 	@Override
 	public int hashCode() {
@@ -276,6 +287,7 @@ public class CursoItem {
 		result = prime * result + ((minimoAsistencia == null) ? 0 : minimoAsistencia.hashCode());
 		result = prime * result + ((autovalidacionInscripcion == null) ? 0 : autovalidacionInscripcion.hashCode());
 		result = prime * result + ((idTipoEvento == null) ? 0 : idTipoEvento.hashCode());
+		result = prime * result + ((tipoServicios == null) ? 0 : tipoServicios.hashCode());
 
 		return result;
 		
@@ -445,8 +457,15 @@ public class CursoItem {
 				return false;
 		} else if (!idTipoEvento.equals(other.idTipoEvento))
 			return false;
+		if (tipoServicios == null) {
+			if (other.tipoServicios != null)
+				return false;
+		} else if (!tipoServicios.equals(other.tipoServicios))
+			return false;
 		return true;
 	}
+	
+	
 	@Override
 	public String toString() {
 		return "CursoItem [idCurso=" + idCurso + ", visibilidad=" + visibilidad + ", colegio=" + colegio
@@ -462,7 +481,9 @@ public class CursoItem {
 				+ ", idVisibilidad=" + idVisibilidad + ", idInstitucion=" + idInstitucion + ", descripcionEstado="
 				+ descripcionEstado + ", precioCurso=" + precioCurso + ", fechaInscripcion=" + fechaInscripcion
 				+ ", fechaImparticion=" + fechaImparticion + ", flagArchivado=" + flagArchivado
-				+ ", lugar=" + lugar + ", minimoAsistencia=" + minimoAsistencia + ", autovalidacionInscripcion=" + autovalidacionInscripcion  + ", idTipoEvento=" + idTipoEvento + "]";
+				+ ", lugar=" + lugar + ", minimoAsistencia=" + minimoAsistencia + ","
+						+ " autovalidacionInscripcion=" + autovalidacionInscripcion  + ","
+						+ " tipoServicios=" + tipoServicios  + ", idTipoEvento=" + idTipoEvento + "]";
 	}
 	
 	
