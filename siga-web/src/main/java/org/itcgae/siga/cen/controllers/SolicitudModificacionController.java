@@ -1,5 +1,7 @@
 package org.itcgae.siga.cen.controllers;
 
+import java.util.ArrayList;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -46,16 +48,16 @@ public class SolicitudModificacionController {
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/processGeneralModificationRequest", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> processGeneralModificationRequest(@RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = solicitudModificacionService.processGeneralModificationRequest(solModificacionItem, request);
+	ResponseEntity<UpdateResponseDTO> processGeneralModificationRequest(@RequestBody ArrayList<SolModificacionItem> solModificacionDTO, HttpServletRequest request) { 
+		UpdateResponseDTO response = solicitudModificacionService.processGeneralModificationRequest(solModificacionDTO, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value = "solicitudModificacion/denyGeneralModificationRequest", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> denyGeneralModificationRequest(@RequestBody SolModificacionItem solModificacionItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = solicitudModificacionService.denyGeneralModificationRequest(solModificacionItem, request);
+	ResponseEntity<UpdateResponseDTO> denyGeneralModificationRequest(@RequestBody ArrayList<SolModificacionItem> solModificacionDTO, HttpServletRequest request) { 
+		UpdateResponseDTO response = solicitudModificacionService.denyGeneralModificationRequest(solModificacionDTO, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);

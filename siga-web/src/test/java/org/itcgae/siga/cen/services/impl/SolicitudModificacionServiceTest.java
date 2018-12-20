@@ -3,6 +3,7 @@ package org.itcgae.siga.cen.services.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.idcgae.siga.commons.testUtils.CenTestUtils;
@@ -139,14 +140,15 @@ public class SolicitudModificacionServiceTest {
 		String idLenguaje = "1";
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
 		SolModificacionItem solModificacionItem = cenTestUtils.getSolModificacionItemSimulado();
-
+		ArrayList<SolModificacionItem> solModificacionDTO = new ArrayList<SolModificacionItem>();
+		solModificacionDTO.add(solModificacionItem);
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 
 		when(cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective(Mockito.any(CenSolicitudesmodificacion.class))).thenReturn(1);
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		UpdateResponseDTO updateResponseDTOResultado = solicitudModificacionServiceImpl.processGeneralModificationRequest(solModificacionItem, mockreq);
+		UpdateResponseDTO updateResponseDTOResultado = solicitudModificacionServiceImpl.processGeneralModificationRequest(solModificacionDTO, mockreq);
 		
 
 		UpdateResponseDTO updateResponseDTOEsperado = new UpdateResponseDTO();
@@ -162,6 +164,8 @@ public class SolicitudModificacionServiceTest {
 		String idLenguaje = "1";
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
 		SolModificacionItem solModificacionItem = cenTestUtils.getSolModificacionItemSimulado();
+		ArrayList<SolModificacionItem> solModificacionDTO = new ArrayList<SolModificacionItem>();
+		solModificacionDTO.add(solModificacionItem);
 
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 
@@ -169,7 +173,7 @@ public class SolicitudModificacionServiceTest {
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		UpdateResponseDTO updateResponseDTOResultado = solicitudModificacionServiceImpl.processGeneralModificationRequest(solModificacionItem, mockreq);
+		UpdateResponseDTO updateResponseDTOResultado = solicitudModificacionServiceImpl.processGeneralModificationRequest(solModificacionDTO, mockreq);
 		
 
 		UpdateResponseDTO updateResponseDTOEsperado = new UpdateResponseDTO();
@@ -182,12 +186,14 @@ public class SolicitudModificacionServiceTest {
 	public void denyGeneralModificationRequestTest() throws Exception {
 
 		SolModificacionItem solModificacionItem = cenTestUtils.getSolModificacionItemSimulado();
-
+		ArrayList<SolModificacionItem> solModificacionDTO = new ArrayList<SolModificacionItem>();
+		solModificacionDTO.add(solModificacionItem);
+		
 		when(cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective(Mockito.any(CenSolicitudesmodificacion.class))).thenReturn(1);
 		
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		UpdateResponseDTO updateResponseDTOResultado = solicitudModificacionServiceImpl.denyGeneralModificationRequest(solModificacionItem, mockreq);
+		UpdateResponseDTO updateResponseDTOResultado = solicitudModificacionServiceImpl.denyGeneralModificationRequest(solModificacionDTO, mockreq);
 		
 
 		UpdateResponseDTO updateResponseDTOEsperado = new UpdateResponseDTO();
@@ -200,12 +206,14 @@ public class SolicitudModificacionServiceTest {
 	public void denyGeneralModificationRequestKOTest() throws Exception {
 
 		SolModificacionItem solModificacionItem = cenTestUtils.getSolModificacionItemSimulado();
-
+		ArrayList<SolModificacionItem> solModificacionDTO = new ArrayList<SolModificacionItem>();
+		solModificacionDTO.add(solModificacionItem);
+		
 		when(cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective(Mockito.any(CenSolicitudesmodificacion.class))).thenReturn(0);
 		
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		UpdateResponseDTO updateResponseDTOResultado = solicitudModificacionServiceImpl.denyGeneralModificationRequest(solModificacionItem, mockreq);
+		UpdateResponseDTO updateResponseDTOResultado = solicitudModificacionServiceImpl.denyGeneralModificationRequest(solModificacionDTO, mockreq);
 		
 
 		UpdateResponseDTO updateResponseDTOEsperado = new UpdateResponseDTO();

@@ -1,5 +1,7 @@
 package org.itcgae.siga.cen.services;
 
+import java.util.ArrayList;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -13,10 +15,10 @@ public interface ISolicitudModificacionService {
 	public ComboDTO getComboTipoModificacion(HttpServletRequest request);
 	public ComboDTO getComboEstado(HttpServletRequest request);
 	public SolModificacionDTO searchModificationRequest(int numPagina, SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, HttpServletRequest request);
-	public UpdateResponseDTO processGeneralModificationRequest(SolModificacionItem solModificacionItem,
-			HttpServletRequest request);
-	public UpdateResponseDTO denyGeneralModificationRequest(SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO processGeneralModificationRequest(ArrayList<SolModificacionItem> solModificacionDTO,
 			HttpServletRequest request);
 	public InsertResponseDTO insertGeneralModificationRequest(SolModificacionItem solModificacionItem,
+			HttpServletRequest request);
+	public UpdateResponseDTO denyGeneralModificationRequest(ArrayList<SolModificacionItem> solModificacionDTO,
 			HttpServletRequest request); 
 }

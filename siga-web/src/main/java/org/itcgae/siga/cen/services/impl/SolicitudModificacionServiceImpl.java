@@ -1,5 +1,6 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -180,58 +181,70 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 	}
 
 	@Override
-	public UpdateResponseDTO processGeneralModificationRequest(SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO processGeneralModificationRequest(ArrayList<SolModificacionItem> solModificacionDTO,
 			HttpServletRequest request) {
 		LOGGER.info(
 				"processGeneralModificationRequest() -> Entrada al servicio para actualizar el estado de la solicitud a REALIZADO");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-
-		CenSolicitudesmodificacion record = new CenSolicitudesmodificacion();
-		record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
-		record.setIdestadosolic((short) 20);
-		int response = cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective(record);
-
-		if (response == 0) {
-			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn(
-					"processGeneralModificationRequest() / cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective() -> "
-							+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
-
-		}else {
-			updateResponseDTO.setStatus(SigaConstants.OK);
+		int i = 0;
+		while(i < solModificacionDTO.size()) {
+			SolModificacionItem solModificacionItem = solModificacionDTO.get(i);
+			
+			CenSolicitudesmodificacion record = new CenSolicitudesmodificacion();
+			record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
+			record.setIdestadosolic((short) 20);
+			int response = cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective(record);
+	
+			if (response == 0) {
+				updateResponseDTO.setStatus(SigaConstants.KO);
+				LOGGER.warn(
+						"processGeneralModificationRequest() / cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective() -> "
+								+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
+			}else {
+				updateResponseDTO.setStatus(SigaConstants.OK);
+			}
+	
+			LOGGER.info(
+					"processGeneralModificationRequest() -> Salida del servicio para actualizar el estado de la solicitud a REALIZADO");
+			i++;
 		}
+//		for(int i = 0 ; solModificacionDTO.size() < i; i++ ) {
 
-		LOGGER.info(
-				"processGeneralModificationRequest() -> Salida del servicio para actualizar el estado de la solicitud a REALIZADO");
+//		}
+		
 		return updateResponseDTO;
 	}
 
 	@Override
-	public UpdateResponseDTO denyGeneralModificationRequest(SolModificacionItem solModificacionItem,
+	public UpdateResponseDTO denyGeneralModificationRequest(ArrayList<SolModificacionItem> solModificacionDTO,
 			HttpServletRequest request) {
 		LOGGER.info(
 				"denyGeneralModificationRequest() -> Entrada al servicio para actualizar el estado de la solicitud a DENEGADO");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-
-		CenSolicitudesmodificacion record = new CenSolicitudesmodificacion();
-		record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
-		record.setIdestadosolic((short) 30);
-		int response = cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective(record);
-
-		if (response == 0) {
-			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn(
-					"denyGeneralModificationRequest() / cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKeySelective() -> "
-							+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
-
-		}else {
-			updateResponseDTO.setStatus(SigaConstants.OK);
-		}
-
-		LOGGER.info(
-				"denyGeneralModificationRequest() -> Salida del servicio para actualizar el estado de la solicitud a DENEGADO");
+		int i = 0;
+		while(i < solModificacionDTO.size()) {
+			SolModificacionItem solModificacionItem = solModificacionDTO.get(i);
+		
+			CenSolicitudesmodificacion record = new CenSolicitudesmodificacion();
+			record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
+			record.setIdestadosolic((short) 30);
+			int response = cenSolicitudesModificacionExtendsMapper.updateByPrimaryKeySelective(record);
+	
+			if (response == 0) {
+				updateResponseDTO.setStatus(SigaConstants.KO);
+				LOGGER.warn(
+						"denyGeneralModificationRequest() / cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKeySelective() -> "
+								+ updateResponseDTO.getStatus() + " .no se pudo procesar la solicitud");
+			}else {
+				updateResponseDTO.setStatus(SigaConstants.OK);
+			}
+	
+			LOGGER.info(
+					"denyGeneralModificationRequest() -> Salida del servicio para actualizar el estado de la solicitud a DENEGADO");
+			i++;
+			}
 		return updateResponseDTO;
 	}
 
