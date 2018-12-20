@@ -364,9 +364,43 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
-	public Error guardarDatosGenerales(HttpServletRequest request, ConsultasSearch filtros) {
-		// TODO Auto-generated method stub
-		return null;
+	public Error guardarDatosGenerales(HttpServletRequest request, ConsultaItem consultaDTO) {
+		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar tarjeta general");
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error respuesta = new Error();
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					ConConsulta consulta = new ConConsulta();
+					consulta.setIdmodulo(consultaDTO.getIdModulo());
+					consulta.setIdinstitucion(idInstitucion);
+					consulta.setDescripcion(consulta.getDescripcion());
+					consulta.setIdobjetivo(consultaDTO.getIdObjetivo());
+					consulta.setIdclasecomunicacion(consultaDTO.getIdClaseComunicacion());
+					consulta.setGeneral(consultaDTO.getGenerica());
+					consulta.setFechamodificacion(new Date());
+					consulta.setUsumodificacion(usuario.getIdusuario());
+					_conConsultaMapper.insert(consulta);
+					
+				}catch (Exception e) {
+					respuesta.setCode(500);
+					respuesta.setMessage("Error al borrar consulta");
+					respuesta.setDescription(e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
+		LOGGER.info("guardarDatosGenerales() -> Salida del servicio para guardar tarjeta general");
+		return respuesta;
 	}
 
 	@Override

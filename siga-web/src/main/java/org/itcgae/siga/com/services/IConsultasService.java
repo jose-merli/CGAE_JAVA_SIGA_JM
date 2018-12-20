@@ -27,7 +27,7 @@ public interface IConsultasService {
 
 	public Error borrarConsulta(HttpServletRequest request, ConsultaItem[] consultas);
 
-	public Error guardarDatosGenerales(HttpServletRequest request, ConsultasSearch filtros);
+	public Error guardarDatosGenerales(HttpServletRequest request, ConsultaItem consulta);
 
 	public ConsultaListadoModelosDTO obtenerModelosComunicacion(HttpServletRequest request, String idConsulta);
 
