@@ -1,6 +1,7 @@
 package org.itcgae.siga.com.services.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,13 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
+import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
+import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
+import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
+import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
+import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
+import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
@@ -60,8 +67,15 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	@Autowired
 	private ConListadoPlantillasExtendsMapper _conListadoPlantillasExtendsMapper;
-
+	
+	@Autowired
 	private ConConsultaMapper _conConsultaMapper;
+	
+	@Autowired
+	private ModPlantilladocConsultaMapper _modPlantilladocConsultaMapper;
+	
+	@Autowired
+	private ModPlantillaenvioConsultaMapper _modPlantillaenvioConsultaMapper;
 
 	
 	@Override
@@ -83,7 +97,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 			
 			if (null != usuarios && usuarios.size() > 0) {
 
-				AdmUsuarios usuario = usuarios.get(0);
+				
 				comboItems = _conModulosExtendsMapper.selectModulos();
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
@@ -217,14 +231,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
-	public Error duplicarConsulta(HttpServletRequest request, ConsultaItem consultaItem) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Error borrarConsulta(HttpServletRequest request, String[] idConsulta) {
-		LOGGER.info("borrarConsulta() -> Entrada al servicio de búsqueda de consultas");
+	public Error duplicarConsulta(HttpServletRequest request, ConsultaItem[] consultas) {
+		LOGGER.info("duplicarConsulta() -> Entrada al servicio de duplicar consultas");
 
 		Error respuesta = new Error();
 
@@ -239,15 +247,108 @@ public class ConsultasServiceImpl implements IConsultasService{
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (null != usuarios && usuarios.size() > 0) {
-				
+				AdmUsuarios usuario = usuarios.get(0);
 				try {
-					for (int i = 0; i < idConsulta.length; i++) {
+					
+					for (int i = 0; i < consultas.length; i++) {
 						ConConsultaKey key = new ConConsultaKey();
-						key.setIdconsulta(Long.valueOf(idConsulta[0]));
-						key.setIdinstitucion(idInstitucion);
-						_conConsultaMapper.deleteByPrimaryKey(key);
+						key.setIdconsulta(consultas[i].getIdConsulta());
+						key.setIdinstitucion(consultas[i].getIdInstitucion());
+						ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
+						String descripcion = "Copia " + i+1 +" - " + consulta.getDescripcion();
+						consulta.setDescripcion(descripcion);
+						consulta.setFechamodificacion(new Date());
+						consulta.setUsumodificacion(usuario.getIdusuario());
+						_conConsultaMapper.insert(consulta);
+					}
+					 
+				}catch (Exception e) {
+					respuesta.setCode(500);
+					respuesta.setMessage("Error al duplicar las consultas");
+					respuesta.setDescription(e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
+		LOGGER.info("duplicarConsulta() -> Salida del servicio de duplicar consultas");
+		return respuesta;
+	}
+
+	@Override
+	public Error borrarConsulta(HttpServletRequest request, ConsultaItem[] consultas) {
+		LOGGER.info("borrarConsulta() -> Entrada al servicio de borrar consulta");
+
+		Error respuesta = new Error();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try {
+					boolean noBorrada = false;
+					for (int i = 0; i < consultas.length; i++) {
+						ConConsultaKey consultaKey = new ConConsultaKey();
+						consultaKey.setIdconsulta(consultas[i].getIdConsulta());
+						consultaKey.setIdinstitucion(consultas[i].getIdInstitucion());
+						ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(consultaKey);
+						boolean consultaAsociada = false;
+						if(consulta.getIdobjetivo() != null){
+							ModPlantilladocConsultaExample plantillaDocExample = new ModPlantilladocConsultaExample();
+							plantillaDocExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdconsultaEqualTo(consulta.getIdconsulta());
+							List<ModPlantilladocConsulta> plantillaConsulta = _modPlantilladocConsultaMapper.selectByExample(plantillaDocExample);
+							if(plantillaConsulta != null && plantillaConsulta.size() > 0){
+								consultaAsociada = true;
+							}
+							ModPlantillaenvioConsultaExample envioConsultaExample = new ModPlantillaenvioConsultaExample();
+							envioConsultaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdconsultaEqualTo(consulta.getIdconsulta());
+							List<ModPlantillaenvioConsulta> plantillaEnvio = _modPlantillaenvioConsultaMapper.selectByExample(envioConsultaExample);
+							if(plantillaEnvio != null && plantillaEnvio.size() > 0){
+								consultaAsociada = true;
+							}
+						}
+						boolean general = false;
+						
+						if(consulta.getGeneral().equals("S") || consulta.getGeneral().equals("1")){
+							general = true;
+						}
+						if(general){
+							//las consultas genericas solo las puede borrar el colegio general
+							if(idInstitucion == 2000){
+								if(!consultaAsociada){
+									_conConsultaMapper.deleteByPrimaryKey(consultaKey);
+								}else{
+									consulta.setFechabaja(new Date());
+									consulta.setFechamodificacion(new Date());
+									consulta.setUsumodificacion(usuario.getIdusuario());
+									_conConsultaMapper.updateByPrimaryKey(consulta);
+								}
+							}
+						}else if(!general && idInstitucion == consulta.getIdinstitucion()){
+							if(!consultaAsociada){
+								_conConsultaMapper.deleteByPrimaryKey(consultaKey);
+							}else{
+								consulta.setFechabaja(new Date());
+								consulta.setFechamodificacion(new Date());
+								consulta.setUsumodificacion(usuario.getIdusuario());
+								_conConsultaMapper.updateByPrimaryKey(consulta);
+							}
+						}else{
+							noBorrada = true;
+						}
 					}
 					respuesta.setCode(200);
+					//Si ha habido alguna consulta no borrada se le indica mediante un mensaje al front para indicarselo al usuario
+					if(noBorrada){
+						respuesta.setMessage("noBorrar");
+					}
 					respuesta.setDescription("Consultas borradas");
 				} catch (Exception e) {
 					respuesta.setCode(500);
@@ -257,15 +358,49 @@ public class ConsultasServiceImpl implements IConsultasService{
 				}
 			}
 		}
-		LOGGER.info("borrarConsulta() -> Salida del servicio de búsqueda de consultas");
+		LOGGER.info("borrarConsulta() -> Salida del servicio de borrar consulta");
 		return respuesta;
 
 	}
 
 	@Override
-	public Error guardarDatosGenerales(HttpServletRequest request, ConsultasSearch filtros) {
-		// TODO Auto-generated method stub
-		return null;
+	public Error guardarDatosGenerales(HttpServletRequest request, ConsultaItem consultaDTO) {
+		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar tarjeta general");
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error respuesta = new Error();
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					ConConsulta consulta = new ConConsulta();
+					consulta.setIdmodulo(consultaDTO.getIdModulo());
+					consulta.setIdinstitucion(idInstitucion);
+					consulta.setDescripcion(consulta.getDescripcion());
+					consulta.setIdobjetivo(consultaDTO.getIdObjetivo());
+					consulta.setIdclasecomunicacion(consultaDTO.getIdClaseComunicacion());
+					consulta.setGeneral(consultaDTO.getGenerica());
+					consulta.setFechamodificacion(new Date());
+					consulta.setUsumodificacion(usuario.getIdusuario());
+					_conConsultaMapper.insert(consulta);
+					
+				}catch (Exception e) {
+					respuesta.setCode(500);
+					respuesta.setMessage("Error al borrar consulta");
+					respuesta.setDescription(e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
+		LOGGER.info("guardarDatosGenerales() -> Salida del servicio para guardar tarjeta general");
+		return respuesta;
 	}
 
 	@Override
