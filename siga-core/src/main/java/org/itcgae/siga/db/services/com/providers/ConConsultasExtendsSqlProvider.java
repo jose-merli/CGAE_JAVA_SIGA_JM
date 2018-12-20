@@ -34,8 +34,7 @@ public String selectConsultas(Short idInstitucion, String idLenguaje,ConsultasSe
 		sql.SELECT("(SELECT CLASE.NOMBRE  FROM MOD_CLASECOMUNICACIONES CLASE WHERE CLASE.IDCLASECOMUNICACION=CONSULTA.IDCLASECOMUNICACION) AS NOMBRECLASE");
 		sql.FROM("CON_CONSULTA CONSULTA");
 		
-		sql.WHERE("CONSULTA.IDINSTITUCION = '" + idInstitucion +"'");
-		sql.WHERE("CONSULTA.FECHABAJA IS NULL");
+	
 		
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
 			sql.WHERE(filtroTextoBusquedas("CONSULTA.DESCRIPCION",filtros.getNombre()));
@@ -50,17 +49,9 @@ public String selectConsultas(Short idInstitucion, String idLenguaje,ConsultasSe
 		
 		if(filtros.getGenerica() != null && !filtros.getGenerica().trim().equals("")){
 			if(filtros.getGenerica().equals("false")){
-				sql.WHERE("CONSULTA.GENERAL = '" + "N" +"'");
-				sql.OR();
-				sql.WHERE("CONSULTA.GENERAL = '" + "n" +"'");
-				sql.OR();
-				sql.WHERE("CONSULTA.GENERAL = '" + "0" +"'");
+				sql.WHERE("CONSULTA.GENERAL = 'N' OR CONSULTA.GENERAL = 'n'OR CONSULTA.GENERAL = '0' AND CONSULTA.IDINSTITUCION = '" + idInstitucion +"'");
 			}else{
-				sql.WHERE("CONSULTA.GENERAL = '" + "S" +"'");
-				sql.OR();
-				sql.WHERE("CONSULTA.GENERAL = '" + "s" +"'");
-				sql.OR();
-				sql.WHERE("CONSULTA.GENERAL = '" + "1" +"'");
+				sql.WHERE("CONSULTA.GENERAL = 'S' OR CONSULTA.GENERAL = 's' OR  CONSULTA.GENERAL = '1' AND CONSULTA.IDINSTITUCION = '2000' OR CONSULTA.IDINSTITUCION = '" + idInstitucion +"'");
 			}
 		}
 		if(filtros.getIdClaseComunicacion() != null && !filtros.getIdClaseComunicacion().trim().equals("")){
@@ -69,6 +60,7 @@ public String selectConsultas(Short idInstitucion, String idLenguaje,ConsultasSe
 		if(filtros.getIdObjetivo() != null && !filtros.getIdObjetivo().trim().equals("")){
 			sql.WHERE("CONSULTA.IDOBJETIVO = '" + filtros.getIdObjetivo() +"'");
 		}
+		sql.WHERE("CONSULTA.FECHABAJA IS NULL");
 		return sql.toString();
 	}
 

@@ -4,7 +4,7 @@ import org.apache.ibatis.jdbc.SQL;
 
 public class ConListadoPlantillasExtendsSqlProvider {
 
-	public String selectListadoPlantillas(Short idInstitucion, String idLenguaje, Short idConsulta) {
+	public String selectListadoPlantillas(Short idInstitucion, String idLenguaje, String idConsulta) {
 
 		SQL sql = new SQL();
 	
