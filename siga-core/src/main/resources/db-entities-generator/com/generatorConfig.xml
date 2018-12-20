@@ -29,6 +29,15 @@
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOS.NEXTVAL FROM DUAL"/> -->
 <!-- 		</table> -->
+<<<<<<< HEAD
+=======
+		
+		
+			<table schema="USCGAE" tableName="CON_CONSULTA" >
+				<property name="ignoreQualifiersAtRuntime" value="true"/>
+				<generatedKey column="IDCONSULTA" sqlStatement="SELECT SEQ_CON_CONSULTA.NEXTVAL FROM DUAL"/>
+			</table>
+>>>>>>> generado entidad para consultas y servicio de borrar
 
 <!-- 		<table schema="USCGAE_INT" tableName="ENV_ENTRADA_ENVIOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->

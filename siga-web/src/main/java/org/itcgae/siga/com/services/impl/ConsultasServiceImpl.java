@@ -19,6 +19,9 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ConConsulta;
+import org.itcgae.siga.db.entities.ConConsultaKey;
+import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
@@ -53,10 +56,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 	private ConConsultasExtendsMapper _conConsultasExtendsMapper;
 	
 	@Autowired
+<<<<<<< HEAD
 	private ConListadoModelosExtendsMapper _conListadoModelosExtendsMapper;
 	
 	@Autowired
 	private ConListadoPlantillasExtendsMapper _conListadoPlantillasExtendsMapper;
+=======
+	private ConConsultaMapper _conConsultaMapper;
+>>>>>>> generado entidad para consultas y servicio de borrar
 	
 	@Override
 	public ComboDTO modulo(HttpServletRequest request) {
@@ -206,7 +213,7 @@ LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clase
 				}
 			}
 		}
-
+		LOGGER.info("consultasSearch() -> Salida del servicio de búsqueda de consultas");
 		return consultasDTO;
 	}
 
@@ -217,9 +224,48 @@ LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clase
 	}
 
 	@Override
+<<<<<<< HEAD
 	public java.lang.Error borrarConsulta(HttpServletRequest request, ConsultaItem consultaItem) {
 		// TODO Auto-generated method stub
 		return null;
+=======
+	public Error borrarConsulta(HttpServletRequest request, String[] idConsulta) {
+		LOGGER.info("borrarConsulta() -> Entrada al servicio de búsqueda de consultas");
+
+		Error respuesta = new Error();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+				
+				try {
+					for (int i = 0; i < idConsulta.length; i++) {
+						ConConsultaKey key = new ConConsultaKey();
+						key.setIdconsulta(Long.valueOf(idConsulta[0]));
+						key.setIdinstitucion(idInstitucion);
+						_conConsultaMapper.deleteByPrimaryKey(key);
+					}
+					respuesta.setCode(200);
+					respuesta.setDescription("Consultas borradas");
+				} catch (Exception e) {
+					respuesta.setCode(500);
+					respuesta.setMessage("Error al borrar consulta");
+					respuesta.setDescription(e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
+		LOGGER.info("borrarConsulta() -> Salida del servicio de búsqueda de consultas");
+		return respuesta;
+>>>>>>> generado entidad para consultas y servicio de borrar
 	}
 
 	@Override

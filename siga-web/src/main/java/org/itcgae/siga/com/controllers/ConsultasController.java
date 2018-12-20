@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.itcgae.siga.DTOs.gen.Error;
 
 @RestController
 @RequestMapping(value = "/consultas")
@@ -72,6 +73,7 @@ public class ConsultasController {
 			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+<<<<<<< HEAD
 	/**Obtiene el listado de los modelos que contienen la consulta**/
 	@RequestMapping(value = "/modelosconsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ConsultaListadoModelosDTO> obtenerModelosComunicacion(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody String idConsulta) {
@@ -93,5 +95,17 @@ public class ConsultasController {
 		else
 			return new ResponseEntity<ConsultaListadoPlantillasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+=======
+	@RequestMapping(value = "/borrarConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> cargasMasivasSearch(HttpServletRequest request, @RequestBody String[] idConsulta) {
+		
+		Error response = _consultasService.borrarConsulta(request, idConsulta);
+		if(response.getCode()==200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+>>>>>>> generado entidad para consultas y servicio de borrar
 	
 }
