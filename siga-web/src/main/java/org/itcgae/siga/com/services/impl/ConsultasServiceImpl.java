@@ -293,6 +293,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try {
+					boolean noBorrada = false;
 					for (int i = 0; i < consultas.length; i++) {
 						ConConsultaKey consultaKey = new ConConsultaKey();
 						consultaKey.setIdconsulta(consultas[i].getIdConsulta());
@@ -314,6 +315,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 							}
 						}
 						boolean general = false;
+						
 						if(consulta.getGeneral().equals("S") || consulta.getGeneral().equals("1")){
 							general = true;
 						}
@@ -322,22 +324,31 @@ public class ConsultasServiceImpl implements IConsultasService{
 							if(idInstitucion == 2000){
 								if(!consultaAsociada){
 									_conConsultaMapper.deleteByPrimaryKey(consultaKey);
-								}
-							}else if (idInstitucion == consulta.getIdinstitucion()){
-								if(!consultaAsociada){
-									_conConsultaMapper.deleteByPrimaryKey(consultaKey);
+								}else{
+									consulta.setFechabaja(new Date());
+									consulta.setFechamodificacion(new Date());
+									consulta.setUsumodificacion(usuario.getIdusuario());
+									_conConsultaMapper.updateByPrimaryKey(consulta);
 								}
 							}
-						}else if(!general && !consultaAsociada){
-							_conConsultaMapper.deleteByPrimaryKey(consultaKey);
+						}else if(!general && idInstitucion == consulta.getIdinstitucion()){
+							if(!consultaAsociada){
+								_conConsultaMapper.deleteByPrimaryKey(consultaKey);
+							}else{
+								consulta.setFechabaja(new Date());
+								consulta.setFechamodificacion(new Date());
+								consulta.setUsumodificacion(usuario.getIdusuario());
+								_conConsultaMapper.updateByPrimaryKey(consulta);
+							}
 						}else{
-							consulta.setFechabaja(new Date());
-							consulta.setFechamodificacion(new Date());
-							consulta.setUsumodificacion(usuario.getIdusuario());
-							_conConsultaMapper.updateByPrimaryKey(consulta);
+							noBorrada = true;
 						}
 					}
 					respuesta.setCode(200);
+					//Si ha habido alguna consulta no borrada se le indica mediante un mensaje al front para indicarselo al usuario
+					if(noBorrada){
+						respuesta.setMessage("noBorrar");
+					}
 					respuesta.setDescription("Consultas borradas");
 				} catch (Exception e) {
 					respuesta.setCode(500);
