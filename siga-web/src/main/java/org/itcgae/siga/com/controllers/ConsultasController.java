@@ -97,7 +97,7 @@ public class ConsultasController {
 	}
 
 	@RequestMapping(value = "/borrarConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> cargasMasivasSearch(HttpServletRequest request, @RequestBody String[] idConsulta) {
+	ResponseEntity<Error> borrarConsulta(HttpServletRequest request, @RequestBody String[] idConsulta) {
 		
 		Error response = _consultasService.borrarConsulta(request, idConsulta);
 		if(response.getCode()==200)
@@ -105,6 +105,17 @@ public class ConsultasController {
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@RequestMapping(value = "/duplicarConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> duplicarConsulta(HttpServletRequest request, @RequestBody String[] idConsulta) {
+		
+		Error response = _consultasService.borrarConsulta(request, idConsulta);
+		if(response.getCode()==200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	
 	
 }
