@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.db.services.com.providers.ConListadoPlantillasExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -22,5 +23,5 @@ public interface ConListadoPlantillasExtendsMapper {
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ACUSERECIBO", property = "acuseRecibo", jdbcType = JdbcType.VARCHAR)
 		})
-	List<PlantillaEnvioItem> selectListadoPlantillas(Short idInstitucion,String idLenguaje,String idConsulta);
+	List<PlantillaEnvioItem> selectListadoPlantillas(Short idInstitucion,String idLenguaje,ConsultaItem consulta);
 }

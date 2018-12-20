@@ -269,7 +269,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
-	public ConsultaListadoModelosDTO obtenerModelosComunicacion(HttpServletRequest request, String idConsulta) {
+	public ConsultaListadoModelosDTO obtenerModelosComunicacion(HttpServletRequest request, ConsultaItem consulta) {
 	LOGGER.info("obtenerModelosComunicacion() -> Entrada al servicio de obtener modelos que contienen la consulta");
 		
 	ConsultaListadoModelosDTO conListadoModelosDTO = new ConsultaListadoModelosDTO();
@@ -282,7 +282,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(consulta.getIdInstitucion()));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (null != usuarios && usuarios.size() > 0) {
@@ -290,7 +290,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 				try {
 					modeloList = _conListadoModelosExtendsMapper.selectListadoModelos(usuario.getIdinstitucion(),
-							 idConsulta);
+							 consulta);
 					if (modeloList.size() > 0) {
 						conListadoModelosDTO.setListadoModelos(modeloList);
 					}
@@ -308,7 +308,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
-	public ConsultaListadoPlantillasDTO obtenerPlantillasEnvio(HttpServletRequest request, String idConsulta) {
+	public ConsultaListadoPlantillasDTO obtenerPlantillasEnvio(HttpServletRequest request, ConsultaItem consulta) {
 		LOGGER.info("obtenerPlantillasEnvio() -> Entrada al servicio de obtener plantillas que contienen la consulta");
 		
 		ConsultaListadoPlantillasDTO conListadoPlantillasDTO = new ConsultaListadoPlantillasDTO();
@@ -321,7 +321,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(consulta.getIdInstitucion()));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (null != usuarios && usuarios.size() > 0) {
@@ -329,7 +329,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 				try {
 					plantillasList = _conListadoPlantillasExtendsMapper.selectListadoPlantillas(usuario.getIdinstitucion(),
-							usuario.getIdlenguaje(), idConsulta);
+							usuario.getIdlenguaje(), consulta);
 					if (plantillasList.size() > 0) {
 						conListadoPlantillasDTO.setListadoPlantillas(plantillasList);
 					}

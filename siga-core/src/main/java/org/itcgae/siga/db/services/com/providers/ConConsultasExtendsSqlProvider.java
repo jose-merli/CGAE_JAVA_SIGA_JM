@@ -35,6 +35,13 @@ public String selectConsultas(Short idInstitucion, String idLenguaje,ConsultasSe
 		sql.FROM("CON_CONSULTA CONSULTA");
 		
 	
+		if(filtros.getIdClaseComunicacion() != null && !filtros.getIdClaseComunicacion().trim().equals("")){
+			sql.WHERE("CONSULTA.IDCLASECOMUNICACION = '" + filtros.getIdClaseComunicacion() +"'");
+		}
+		if(filtros.getIdObjetivo() != null && !filtros.getIdObjetivo().trim().equals("")){
+			sql.WHERE("CONSULTA.IDOBJETIVO = '" + filtros.getIdObjetivo() +"'");
+		}
+		sql.WHERE("CONSULTA.FECHABAJA IS NULL");
 		
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
 			sql.WHERE(filtroTextoBusquedas("CONSULTA.DESCRIPCION",filtros.getNombre()));
@@ -48,19 +55,13 @@ public String selectConsultas(Short idInstitucion, String idLenguaje,ConsultasSe
 		}
 		
 		if(filtros.getGenerica() != null && !filtros.getGenerica().trim().equals("")){
-			if(filtros.getGenerica().equals("false")){
-				sql.WHERE("CONSULTA.GENERAL = 'N' OR CONSULTA.GENERAL = 'n'OR CONSULTA.GENERAL = '0' AND CONSULTA.IDINSTITUCION = '" + idInstitucion +"'");
+			if(filtros.getGenerica().equals("0")){
+				sql.WHERE("(CONSULTA.GENERAL = 'N' OR CONSULTA.GENERAL = 'n'OR CONSULTA.GENERAL = '0' AND CONSULTA.IDINSTITUCION = '" + idInstitucion +"')");
 			}else{
-				sql.WHERE("CONSULTA.GENERAL = 'S' OR CONSULTA.GENERAL = 's' OR  CONSULTA.GENERAL = '1' AND CONSULTA.IDINSTITUCION = '2000' OR CONSULTA.IDINSTITUCION = '" + idInstitucion +"'");
+				sql.WHERE("(CONSULTA.GENERAL = 'S' OR CONSULTA.GENERAL = 's' OR  CONSULTA.GENERAL = '1' AND CONSULTA.IDINSTITUCION = '2000' OR CONSULTA.IDINSTITUCION = '" + idInstitucion +"')");
 			}
 		}
-		if(filtros.getIdClaseComunicacion() != null && !filtros.getIdClaseComunicacion().trim().equals("")){
-			sql.WHERE("CONSULTA.IDCLASECOMUNICACION = '" + filtros.getIdClaseComunicacion() +"'");
-		}
-		if(filtros.getIdObjetivo() != null && !filtros.getIdObjetivo().trim().equals("")){
-			sql.WHERE("CONSULTA.IDOBJETIVO = '" + filtros.getIdObjetivo() +"'");
-		}
-		sql.WHERE("CONSULTA.FECHABAJA IS NULL");
+		
 		return sql.toString();
 	}
 

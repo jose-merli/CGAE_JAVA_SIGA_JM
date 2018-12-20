@@ -29,9 +29,9 @@ public interface IConsultasService {
 
 	public Error guardarDatosGenerales(HttpServletRequest request, ConsultasSearch filtros);
 
-	public ConsultaListadoModelosDTO obtenerModelosComunicacion(HttpServletRequest request, String idConsulta);
+	public ConsultaListadoModelosDTO obtenerModelosComunicacion(HttpServletRequest request, ConsultaItem idConsulta);
 
-	public ConsultaListadoPlantillasDTO obtenerPlantillasEnvio(HttpServletRequest request, String idConsulta);
+	public ConsultaListadoPlantillasDTO obtenerPlantillasEnvio(HttpServletRequest request, ConsultaItem consulta);
 
 	public Error guardarConsulta(HttpServletRequest request, ConsultasSearch filtros);
 
