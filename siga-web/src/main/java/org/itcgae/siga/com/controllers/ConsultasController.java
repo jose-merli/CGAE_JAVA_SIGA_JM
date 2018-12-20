@@ -73,7 +73,7 @@ public class ConsultasController {
 			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-<<<<<<< HEAD
+
 	/**Obtiene el listado de los modelos que contienen la consulta**/
 	@RequestMapping(value = "/modelosconsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ConsultaListadoModelosDTO> obtenerModelosComunicacion(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody String idConsulta) {
@@ -95,7 +95,7 @@ public class ConsultasController {
 		else
 			return new ResponseEntity<ConsultaListadoPlantillasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-=======
+
 	@RequestMapping(value = "/borrarConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Error> cargasMasivasSearch(HttpServletRequest request, @RequestBody String[] idConsulta) {
 		
@@ -106,6 +106,5 @@ public class ConsultasController {
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
->>>>>>> generado entidad para consultas y servicio de borrar
 	
 }

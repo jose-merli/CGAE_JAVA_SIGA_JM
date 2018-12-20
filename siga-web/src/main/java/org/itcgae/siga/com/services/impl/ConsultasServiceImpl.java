@@ -56,18 +56,17 @@ public class ConsultasServiceImpl implements IConsultasService{
 	private ConConsultasExtendsMapper _conConsultasExtendsMapper;
 	
 	@Autowired
-<<<<<<< HEAD
 	private ConListadoModelosExtendsMapper _conListadoModelosExtendsMapper;
 	
 	@Autowired
 	private ConListadoPlantillasExtendsMapper _conListadoPlantillasExtendsMapper;
-=======
+
 	private ConConsultaMapper _conConsultaMapper;
->>>>>>> generado entidad para consultas y servicio de borrar
+
 	
 	@Override
 	public ComboDTO modulo(HttpServletRequest request) {
-LOGGER.info("modulo() -> Entrada al servicio para obtener combo modulos");
+		LOGGER.info("modulo() -> Entrada al servicio para obtener combo modulos");
 		
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
@@ -105,7 +104,7 @@ LOGGER.info("modulo() -> Entrada al servicio para obtener combo modulos");
 
 	@Override
 	public ComboDTO objetivo(HttpServletRequest request) {
-LOGGER.info("objetivo() -> Entrada al servicio para obtener combo objetivos");
+		LOGGER.info("objetivo() -> Entrada al servicio para obtener combo objetivos");
 		
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
@@ -143,7 +142,7 @@ LOGGER.info("objetivo() -> Entrada al servicio para obtener combo objetivos");
 
 	@Override
 	public ComboDTO claseComunicacion(HttpServletRequest request) {
-LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo claseComunicacion");
+		LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo claseComunicacion");
 		
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
@@ -218,17 +217,12 @@ LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clase
 	}
 
 	@Override
-	public java.lang.Error duplicarConsulta(HttpServletRequest request, ConsultaItem consultaItem) {
+	public Error duplicarConsulta(HttpServletRequest request, ConsultaItem consultaItem) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-<<<<<<< HEAD
-	public java.lang.Error borrarConsulta(HttpServletRequest request, ConsultaItem consultaItem) {
-		// TODO Auto-generated method stub
-		return null;
-=======
 	public Error borrarConsulta(HttpServletRequest request, String[] idConsulta) {
 		LOGGER.info("borrarConsulta() -> Entrada al servicio de búsqueda de consultas");
 
@@ -265,11 +259,11 @@ LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clase
 		}
 		LOGGER.info("borrarConsulta() -> Salida del servicio de búsqueda de consultas");
 		return respuesta;
->>>>>>> generado entidad para consultas y servicio de borrar
+
 	}
 
 	@Override
-	public java.lang.Error guardarDatosGenerales(HttpServletRequest request, ConsultasSearch filtros) {
+	public Error guardarDatosGenerales(HttpServletRequest request, ConsultasSearch filtros) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -353,13 +347,13 @@ LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clase
 	}
 
 	@Override
-	public java.lang.Error guardarConsulta(HttpServletRequest request, ConsultasSearch filtros) {
+	public Error guardarConsulta(HttpServletRequest request, ConsultasSearch filtros) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public java.lang.Error ejecutarConsulta(HttpServletRequest request, String consulta) {
+	public Error ejecutarConsulta(HttpServletRequest request, String consulta) {
 		// TODO Auto-generated method stub
 		return null;
 	}
