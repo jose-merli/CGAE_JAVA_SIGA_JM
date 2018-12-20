@@ -2,6 +2,7 @@ package org.itcgae.siga.com.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
@@ -97,9 +98,9 @@ public class ConsultasController {
 	}
 
 	@RequestMapping(value = "/borrarConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> borrarConsulta(HttpServletRequest request, @RequestBody String[] idConsulta) {
+	ResponseEntity<Error> borrarConsulta(HttpServletRequest request, @RequestBody ConsultaItem[] consultas) {
 		
-		Error response = _consultasService.borrarConsulta(request, idConsulta);
+		Error response = _consultasService.borrarConsulta(request, consultas);
 		if(response.getCode()==200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
@@ -107,13 +108,24 @@ public class ConsultasController {
 	}
 	
 	@RequestMapping(value = "/duplicarConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> duplicarConsulta(HttpServletRequest request, @RequestBody String[] idConsulta) {
+	ResponseEntity<Error> duplicarConsulta(HttpServletRequest request, @RequestBody ConsultaItem[] consultas) {
 		
-		Error response = _consultasService.borrarConsulta(request, idConsulta);
+		Error response = _consultasService.borrarConsulta(request, consultas);
 		if(response.getCode()==200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/confGeneral",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardarTarjetaGeneral(HttpServletRequest request, @RequestBody ConsultaItem[] consultas) {
+		
+		/*Error response = _consultasService.duplicar(request, idConsulta);
+		if(response.getCode()==200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);*/
+		return null;
 	}
 	
 	
