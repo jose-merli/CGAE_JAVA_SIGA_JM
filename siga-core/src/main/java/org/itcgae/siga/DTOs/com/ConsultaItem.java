@@ -3,56 +3,35 @@ package org.itcgae.siga.DTOs.com;
 import java.util.Date;
 
 public class ConsultaItem {
-	private Short idInstitucion;
-	private Long idConsulta;
+	private String idInstitucion;
+	private String idConsulta;
 	private String nombre;
 	private String generica;
 	private String tipoConsulta;
-	private Short idModulo;
+	private String idModulo;
 	private Date fechaModificacion;
-	private Short usuModificacion;
+	private String usuModificacion;
 	private String bases;
-	private Long idTabla;
+	private String idTabla;
 	private String experta;
 	private String descripcion;
 	private Date fechaBaja;
-	private Long idObjetivo;
-	private Long idClase;
-	private Short idClaseComunicacion;
+	private String idObjetivo;
+	private String idClase;
+	private String idClaseComunicacion;
 	private String modulo;
 	private String objetivo;
 	private String claseComunicacion;
-	
-	
-	
-	public String getModulo() {
-		return modulo;
-	}
-	public void setModulo(String modulo) {
-		this.modulo = modulo;
-	}
-	public String getObjetivo() {
-		return objetivo;
-	}
-	public void setObjetivo(String objetivo) {
-		this.objetivo = objetivo;
-	}
-	public String getClaseComunicacion() {
-		return claseComunicacion;
-	}
-	public void setClaseComunicacion(String claseComunicacion) {
-		this.claseComunicacion = claseComunicacion;
-	}
-	public Short getIdInstitucion() {
+	public String getIdInstitucion() {
 		return idInstitucion;
 	}
-	public void setIdInstitucion(Short idInstitucion) {
+	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
-	public Long getIdConsulta() {
+	public String getIdConsulta() {
 		return idConsulta;
 	}
-	public void setIdConsulta(Long idConsulta) {
+	public void setIdConsulta(String idConsulta) {
 		this.idConsulta = idConsulta;
 	}
 	public String getNombre() {
@@ -73,10 +52,10 @@ public class ConsultaItem {
 	public void setTipoConsulta(String tipoConsulta) {
 		this.tipoConsulta = tipoConsulta;
 	}
-	public Short getIdModulo() {
+	public String getIdModulo() {
 		return idModulo;
 	}
-	public void setIdModulo(Short idModulo) {
+	public void setIdModulo(String idModulo) {
 		this.idModulo = idModulo;
 	}
 	public Date getFechaModificacion() {
@@ -85,10 +64,10 @@ public class ConsultaItem {
 	public void setFechaModificacion(Date fechaModificacion) {
 		this.fechaModificacion = fechaModificacion;
 	}
-	public Short getUsuModificacion() {
+	public String getUsuModificacion() {
 		return usuModificacion;
 	}
-	public void setUsuModificacion(Short usuModificacion) {
+	public void setUsuModificacion(String usuModificacion) {
 		this.usuModificacion = usuModificacion;
 	}
 	public String getBases() {
@@ -97,10 +76,10 @@ public class ConsultaItem {
 	public void setBases(String bases) {
 		this.bases = bases;
 	}
-	public Long getIdTabla() {
+	public String getIdTabla() {
 		return idTabla;
 	}
-	public void setIdTabla(Long idTabla) {
+	public void setIdTabla(String idTabla) {
 		this.idTabla = idTabla;
 	}
 	public String getExperta() {
@@ -109,7 +88,6 @@ public class ConsultaItem {
 	public void setExperta(String experta) {
 		this.experta = experta;
 	}
-	
 	public String getDescripcion() {
 		return descripcion;
 	}
@@ -122,23 +100,43 @@ public class ConsultaItem {
 	public void setFechaBaja(Date fechaBaja) {
 		this.fechaBaja = fechaBaja;
 	}
-	public Long getIdObjetivo() {
+	public String getIdObjetivo() {
 		return idObjetivo;
 	}
-	public void setIdObjetivo(Long idObjetivo) {
+	public void setIdObjetivo(String idObjetivo) {
 		this.idObjetivo = idObjetivo;
 	}
-	public Long getIdClase() {
+	public String getIdClase() {
 		return idClase;
 	}
-	public void setIdClase(Long idClase) {
+	public void setIdClase(String idClase) {
 		this.idClase = idClase;
 	}
-	public Short getIdClaseComunicacion() {
+	public String getIdClaseComunicacion() {
 		return idClaseComunicacion;
 	}
-	public void setIdClaseComunicacion(Short idClaseComunicacion) {
+	public void setIdClaseComunicacion(String idClaseComunicacion) {
 		this.idClaseComunicacion = idClaseComunicacion;
 	}
+	public String getModulo() {
+		return modulo;
+	}
+	public void setModulo(String modulo) {
+		this.modulo = modulo;
+	}
+	public String getObjetivo() {
+		return objetivo;
+	}
+	public void setObjetivo(String objetivo) {
+		this.objetivo = objetivo;
+	}
+	public String getClaseComunicacion() {
+		return claseComunicacion;
+	}
+	public void setClaseComunicacion(String claseComunicacion) {
+		this.claseComunicacion = claseComunicacion;
+	}
+	
+
 	
 }

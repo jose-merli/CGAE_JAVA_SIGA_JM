@@ -252,8 +252,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 					
 					for (int i = 0; i < consultas.length; i++) {
 						ConConsultaKey key = new ConConsultaKey();
-						key.setIdconsulta(consultas[i].getIdConsulta());
-						key.setIdinstitucion(consultas[i].getIdInstitucion());
+						key.setIdconsulta(Long.valueOf(consultas[i].getIdConsulta()));
+						key.setIdinstitucion(Short.valueOf(consultas[i].getIdInstitucion()));
 						ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
 						String descripcion = "Copia " + i+1 +" - " + consulta.getDescripcion();
 						consulta.setDescripcion(descripcion);
@@ -296,8 +296,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 					boolean noBorrada = false;
 					for (int i = 0; i < consultas.length; i++) {
 						ConConsultaKey consultaKey = new ConConsultaKey();
-						consultaKey.setIdconsulta(consultas[i].getIdConsulta());
-						consultaKey.setIdinstitucion(consultas[i].getIdInstitucion());
+						consultaKey.setIdconsulta(Long.valueOf(consultas[i].getIdConsulta()));
+						consultaKey.setIdinstitucion(Short.valueOf(consultas[i].getIdInstitucion()));
 						ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(consultaKey);
 						boolean consultaAsociada = false;
 						if(consulta.getIdobjetivo() != null){
@@ -330,6 +330,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 									consulta.setUsumodificacion(usuario.getIdusuario());
 									_conConsultaMapper.updateByPrimaryKey(consulta);
 								}
+							}else{
+								noBorrada = true;
 							}
 						}else if(!general && idInstitucion == consulta.getIdinstitucion()){
 							if(!consultaAsociada){
@@ -381,14 +383,26 @@ public class ConsultasServiceImpl implements IConsultasService{
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
 					ConConsulta consulta = new ConConsulta();
-					consulta.setIdmodulo(consultaDTO.getIdModulo());
+					consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
 					consulta.setIdinstitucion(idInstitucion);
 					consulta.setDescripcion(consulta.getDescripcion());
-					consulta.setIdobjetivo(consultaDTO.getIdObjetivo());
-					consulta.setIdclasecomunicacion(consultaDTO.getIdClaseComunicacion());
+					consulta.setIdobjetivo(Long.parseLong(consultaDTO.getIdObjetivo()));
+					consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
 					consulta.setGeneral(consultaDTO.getGenerica());
 					consulta.setFechamodificacion(new Date());
 					consulta.setUsumodificacion(usuario.getIdusuario());
+					/*switch(consultaDTO.getIdObjetivo().toString()){
+						case 1:
+							break;
+						case 2:
+							break;
+						case 3:
+							break;
+						case 4:
+							break;
+						case 5:
+							break;
+					}*/
 					_conConsultaMapper.insert(consulta);
 					
 				}catch (Exception e) {
