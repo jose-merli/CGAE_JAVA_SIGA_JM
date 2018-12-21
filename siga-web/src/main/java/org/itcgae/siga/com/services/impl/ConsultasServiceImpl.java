@@ -483,7 +483,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 	@Override
 	public Error guardarConsulta(HttpServletRequest request, ConsultasSearch filtros) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 

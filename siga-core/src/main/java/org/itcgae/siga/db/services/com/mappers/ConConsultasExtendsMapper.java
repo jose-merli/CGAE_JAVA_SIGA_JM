@@ -27,8 +27,7 @@ public interface ConConsultasExtendsMapper {
 			@Result(column = "IDTABLA", property = "idTabla", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "ESEXPERTA", property = "experta", jdbcType = JdbcType.VARCHAR),
 			// CLOB
-			// @Result(column = "SENTENCIA", property = "sentencia", jdbcType =
-			// JdbcType.VARCHAR),
+			@Result(column = "SENTENCIA", property = "sentencia", jdbcType =JdbcType.CLOB),
 			@Result(column = "OBSERVACIONES", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
 			@Result(column = "IDOBJETIVO", property = "idObjetivo", jdbcType = JdbcType.NUMERIC),

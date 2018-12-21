@@ -22,9 +22,15 @@ public class ConsultaItem {
 	private String modulo;
 	private String objetivo;
 	private String claseComunicacion;
+	private String sentencia;
 	
 	
-	
+	public String getSentencia() {
+		return sentencia;
+	}
+	public void setSentencia(String sentencia) {
+		this.sentencia = sentencia;
+	}
 	public String getModulo() {
 		return modulo;
 	}
