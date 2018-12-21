@@ -122,7 +122,7 @@ public class FichaCursosController {
 	@RequestMapping(value = "fichaCursos/downloadTemplateFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
 	public ResponseEntity<InputStreamResource> downloadTemplateFile(@RequestBody CursoItem cursoItem, HttpServletRequest request,
 			HttpServletResponse response) throws SigaExceptions {
-		ResponseEntity<InputStreamResource> res = fichaCursosService.generateExcelInscriptions(cursoItem);
+		ResponseEntity<InputStreamResource> res = fichaCursosService.generateExcelInscriptions(cursoItem, request);
 		return res;
 	}
 	

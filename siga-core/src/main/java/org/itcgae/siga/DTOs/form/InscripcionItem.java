@@ -34,6 +34,7 @@ public class InscripcionItem {
 	private String precioCurso;
 	private String fechaSolicitud;
 	private Long idPersona;
+	private String nombrePersona;
 	
 	// 0 --> Aprobar
 	// 1 --> Cancelar
@@ -55,12 +56,17 @@ public class InscripcionItem {
 	private String aprobadas;
 	private String canceladas;
 	private String totales;
+	private String formaPago;
+	
+	private String idCurso;
 	
 	//Auxiliares para filtros de fechas
 	private String fechaInscripcionDesdeFormat;
 	private String fechaInscripcionHastaFormat;
 	private String fechaImparticionDesdeFormat;
 	private String fechaImparticionHastaFormat;
+	
+	private String errores;
 
 	public Long getIdInscripcion() {
 		return idInscripcion;
@@ -350,12 +356,12 @@ public class InscripcionItem {
 		this.rechazadas = rechazadas;
 	}
 
-	public String getAceptadas() {
+	public String getAprobadas() {
 		return aprobadas;
 	}
 
-	public void setAceptadas(String aceptadas) {
-		this.aprobadas = aceptadas;
+	public void setAprobadas(String aprobadas) {
+		this.aprobadas = aprobadas;
 	}
 
 	public String getCanceladas() {
@@ -372,6 +378,38 @@ public class InscripcionItem {
 
 	public void setTotales(String totales) {
 		this.totales = totales;
+	}
+
+	public String getNombrePersona() {
+		return nombrePersona;
+	}
+
+	public void setNombrePersona(String nombrePersona) {
+		this.nombrePersona = nombrePersona;
+	}
+
+	public String getFormaPago() {
+		return formaPago;
+	}
+
+	public void setFormaPago(String formaPago) {
+		this.formaPago = formaPago;
+	}
+	
+	public String getErrores() {
+		return errores;
+	}
+
+	public void setErrores(String errores) {
+		this.errores = errores;
+	}
+	
+	public String getIdCurso() {
+		return idCurso;
+	}
+
+	public void setIdCurso(String idCurso) {
+		this.idCurso = idCurso;
 	}
 
 	@Override
@@ -417,6 +455,10 @@ public class InscripcionItem {
 		result = prime * result + ((aprobadas == null) ? 0 : aprobadas.hashCode());
 		result = prime * result + ((canceladas == null) ? 0 : canceladas.hashCode());
 		result = prime * result + ((totales == null) ? 0 : totales.hashCode());
+		result = prime * result + ((nombrePersona == null) ? 0 : nombrePersona.hashCode());
+		result = prime * result + ((formaPago == null) ? 0 : formaPago.hashCode());
+		result = prime * result + ((errores == null) ? 0 : errores.hashCode());
+		result = prime * result + ((idCurso == null) ? 0 : idCurso.hashCode());
 		return result;
 	}
 
@@ -621,9 +663,29 @@ public class InscripcionItem {
 				return false;
 		} else if (!totales.equals(other.totales))
 			return false;
+		if (nombrePersona == null) {
+			if (other.nombrePersona != null)
+				return false;
+		} else if (!nombrePersona.equals(other.nombrePersona))
+			return false;
+		if (formaPago == null) {
+			if (other.formaPago != null)
+				return false;
+		} else if (!formaPago.equals(other.formaPago))
+			return false;
+		if (errores == null) {
+			if (other.errores != null)
+				return false;
+		} else if (!errores.equals(other.errores))
+			return false;
+		if (idCurso == null) {
+			if (other.idCurso != null)
+				return false;
+		} else if (!idCurso.equals(other.idCurso))
+			return false;
 		return true;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "InscripcionItem [idInscripcion=" + idInscripcion + ", visibilidad=" + visibilidad + ", colegio="
@@ -641,9 +703,10 @@ public class InscripcionItem {
 				+ pendientes + ", rechazadas=" + rechazadas + ", aceptadas=" + aprobadas + ", canceladas=" + canceladas
 				+ ", totales=" + totales + ", fechaInscripcionDesdeFormat=" + fechaInscripcionDesdeFormat
 				+ ", fechaInscripcionHastaFormat=" + fechaInscripcionHastaFormat + ", fechaImparticionDesdeFormat="
-				+ fechaImparticionDesdeFormat + ", fechaImparticionHastaFormat=" + fechaImparticionHastaFormat + "]";
+				+ fechaImparticionDesdeFormat + ", fechaImparticionHastaFormat=" + fechaImparticionHastaFormat
+				+ ", nombrePersona=" + nombrePersona + ", formaPago=" + formaPago + ", errores=" + errores + ", idCurso=" + idCurso  + "]";
 
 	}
-
+	
 	
 }

@@ -32,11 +32,16 @@ public interface IFichaCursosService {
 	
 	public static final long ABIERTO_CURSO = 0; 
 	
+	public static final long INSCRIPCION_PENDIENTE = 1; 
+	
 	public static final String CODIGO_CURSO = "CÓDIGO CURSO";
 	public static final String FORMA_PAGO = "FORMA PAGO";
 	public static final String NIF = "NIF";
+	public static final String NOMBRE_PERSONA = "NOMBRE_PERSONA";
 	
 	public static final List<String> CAMPOSPLANTILLA = Arrays.asList(CODIGO_CURSO, FORMA_PAGO, NIF);
+	public static final List<String> CAMPOSPLOG = Arrays.asList(CODIGO_CURSO, FORMA_PAGO, NIF, NOMBRE_PERSONA);
+
 
 	public void updateEstadoCursoAuto();
 	
@@ -70,7 +75,7 @@ public interface IFichaCursosService {
 	
 	public File createExcelInscriptionsFile(List<String> orderList, Vector<Hashtable<String, Object>> datosVector) throws BusinessException;
 	
-	public ResponseEntity<InputStreamResource> generateExcelInscriptions(CursoItem cursoItem);
+	public ResponseEntity<InputStreamResource> generateExcelInscriptions(CursoItem cursoItem, HttpServletRequest request);
 
 	public UpdateResponseDTO uploadFileExcel(MultipartHttpServletRequest request) throws IllegalStateException, IOException;
 

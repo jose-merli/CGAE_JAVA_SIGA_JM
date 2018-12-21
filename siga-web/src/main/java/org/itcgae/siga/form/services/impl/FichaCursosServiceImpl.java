@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +21,10 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
+import org.itcgae.siga.DTOs.cen.CargaMasivaDatosGFItem;
+import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
+import org.itcgae.siga.DTOs.cen.FicheroVo;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
@@ -27,25 +33,39 @@ import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.cen.services.ICargasMasivasGFService;
+import org.itcgae.siga.cen.services.IFicherosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
+import org.itcgae.siga.commons.utils.SIGAServicesHelper;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AgeEvento;
 import org.itcgae.siga.db.entities.AgeEventoExample;
 import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteExample;
+import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.entities.ForCursoExample;
 import org.itcgae.siga.db.entities.ForEventoCurso;
+import org.itcgae.siga.db.entities.ForInscripcion;
+import org.itcgae.siga.db.entities.ForInscripcionExample;
+import org.itcgae.siga.db.entities.ForInscripcionesmasivas;
 import org.itcgae.siga.db.entities.ForPersonaCurso;
 import org.itcgae.siga.db.entities.ForPersonaCursoExample;
 import org.itcgae.siga.db.entities.ForTiposervicioCurso;
 import org.itcgae.siga.db.entities.ForTiposervicioCursoExample;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.entities.GenRecursosCatalogosKey;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.ForEventoCursoMapper;
+import org.itcgae.siga.db.mappers.ForInscripcionesmasivasMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeEventoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForInscripcionExtendsMapper;
@@ -54,6 +74,7 @@ import org.itcgae.siga.db.services.form.mappers.ForRolesExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForTipocosteExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForTiposervicioCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForTiposervicioExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.PysFormapagoExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.form.services.IFichaCursosService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -65,6 +86,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
@@ -101,12 +123,27 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Autowired
 	private ForTiposervicioExtendsMapper forTiposervicioExtendsMapper;
-	
+
 	@Autowired
 	private ForTiposervicioCursoExtendsMapper forTiposervicioCursoExtendsMapper;
-	
+
 	@Autowired
 	private ForInscripcionExtendsMapper forInscripcionExtendsMapper;
+
+	@Autowired
+	private PysFormapagoExtendsMapper pysFormapagoExtendsMapper;
+
+	@Autowired
+	private GenPropertiesMapper genPropertiesMapper;
+
+	@Autowired
+	private ForInscripcionesmasivasMapper forInscripcionesmasivasMapper;
+
+	@Autowired
+	private IFicherosService ficherosService;
+
+	@Autowired
+	private CenClienteExtendsMapper cenClienteExtendsMapper;
 
 	@Override
 	public void updateEstadoCursoAuto() {
@@ -653,7 +690,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-					//Insertamos curso en la tabla For_Curso
+					// Insertamos curso en la tabla For_Curso
 					forCursoInsert.setIdinstitucion(idInstitucion);
 					forCursoInsert.setUsumodificacion(usuario.getIdusuario().longValue());
 					forCursoInsert.setFechamodificacion(new Date());
@@ -676,11 +713,11 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					LOGGER.info(
 							"saveCourse() / forCursoExtendsMapper.insert(forCursoInsert) -> Salida a forCursoExtendsMapper para insertar un curso");
 
-					//Si existe tiposervicio, se guarda en la tabla TipoServicios					
+					// Si existe tiposervicio, se guarda en la tabla TipoServicios
 					if (cursoItem.getTipoServicios() != null && cursoItem.getTipoServicios().size() > 0) {
 
 						for (ComboItem servicio : cursoItem.getTipoServicios()) {
-												
+
 							ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
 							forTipoServicioCurso.setFechabaja(null);
 							forTipoServicioCurso.setFechamodificacion(new Date());
@@ -688,12 +725,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							forTipoServicioCurso.setIdinstitucion(idInstitucion);
 							forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
 							forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
-							
+
 							response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
-							
+
 						}
 					}
-					
+
 					// Si existe idEventoInscripcion se debe guardar la relacion entre el evento y
 					// el curso
 					if (cursoItem.getIdEventoInicioInscripcion() != null) {
@@ -846,21 +883,22 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							"updateCourse() / forCursoExtendsMapper.updateByPrimaryKey(event) -> Salida a forCursoExtendsMapper para modificar un evento");
 
 					if (cursoItem.getTipoServicios() != null && cursoItem.getTipoServicios().size() > 0) {
-						
-						//Añadimos Servicio
+
+						// Añadimos Servicio
 						for (ComboItem servicio : cursoItem.getTipoServicios()) {
-								
-								//Para cada servicio comprobamos si ya existe la relacion
-								ForTiposervicioCursoExample forTiposervicioCursoExample = new ForTiposervicioCursoExample();
-								forTiposervicioCursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdcursoEqualTo(cursoItem.getIdCurso())
-								.andIdttiposervicioEqualTo(Long.valueOf(servicio.getValue()));
 
-								List<ForTiposervicioCurso> forTipoServicioCursoList = forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample);
+							// Para cada servicio comprobamos si ya existe la relacion
+							ForTiposervicioCursoExample forTiposervicioCursoExample = new ForTiposervicioCursoExample();
+							forTiposervicioCursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andIdcursoEqualTo(cursoItem.getIdCurso())
+									.andIdttiposervicioEqualTo(Long.valueOf(servicio.getValue()));
 
-								//Si no existe la creamos
-								if(forTipoServicioCursoList.isEmpty()) {
-								
+							List<ForTiposervicioCurso> forTipoServicioCursoList = forTiposervicioCursoExtendsMapper
+									.selectByExample(forTiposervicioCursoExample);
+
+							// Si no existe la creamos
+							if (forTipoServicioCursoList.isEmpty()) {
+
 								ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
 								forTipoServicioCurso.setFechabaja(null);
 								forTipoServicioCurso.setFechamodificacion(new Date());
@@ -868,60 +906,61 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 								forTipoServicioCurso.setIdinstitucion(idInstitucion);
 								forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
 								forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
-								
+
 								response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
-								
-								//Si existe cambiamos el servicio a null
-								}else {
-									forTipoServicioCursoList.get(0).setFechabaja(null);
-									forTipoServicioCursoList.get(0).setUsumodificacion(usuario.getIdusuario().longValue());
-									forTipoServicioCursoList.get(0).setFechamodificacion(new Date());
-								}
+
+								// Si existe cambiamos el servicio a null
+							} else {
+								forTipoServicioCursoList.get(0).setFechabaja(null);
+								forTipoServicioCursoList.get(0).setUsumodificacion(usuario.getIdusuario().longValue());
+								forTipoServicioCursoList.get(0).setFechamodificacion(new Date());
+							}
 						}
-						
-						//Eliminamos Servicio
+
+						// Eliminamos Servicio
 						ForTiposervicioCursoExample forTiposerviciocursoExample = new ForTiposervicioCursoExample();
 						forTiposerviciocursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andIdcursoEqualTo(cursoItem.getIdCurso())
-						.andFechabajaIsNull();
+								.andIdcursoEqualTo(cursoItem.getIdCurso()).andFechabajaIsNull();
 
-						List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList = forTiposervicioCursoExtendsMapper.selectByExample(forTiposerviciocursoExample);
+						List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList = forTiposervicioCursoExtendsMapper
+								.selectByExample(forTiposerviciocursoExample);
 						List<ForTiposervicioCurso> forTipoServicioCursoDarBaja = new ArrayList<ForTiposervicioCurso>();
-						
+
 						for (ForTiposervicioCurso servicioAsignadosAntiguos : forTipoServicioCursoAntiguosList) {
-														
+
 							for (int i = 0; cursoItem.getTipoServicios().size() > i; i++) {
-								
-								if(servicioAsignadosAntiguos.getIdttiposervicio() != Long.valueOf(cursoItem.getTipoServicios().get(i).getValue())) {
-									forTipoServicioCursoDarBaja.add(servicioAsignadosAntiguos);												
+
+								if (servicioAsignadosAntiguos.getIdttiposervicio() != Long
+										.valueOf(cursoItem.getTipoServicios().get(i).getValue())) {
+									forTipoServicioCursoDarBaja.add(servicioAsignadosAntiguos);
 								}
 							}
 						}
-						
-						for(ForTiposervicioCurso servicioCursoBaja : forTipoServicioCursoDarBaja) {
-							
+
+						for (ForTiposervicioCurso servicioCursoBaja : forTipoServicioCursoDarBaja) {
+
 							servicioCursoBaja.setUsumodificacion(usuario.getIdusuario().longValue());
 							servicioCursoBaja.setFechabaja(new Date());
 							servicioCursoBaja.setFechamodificacion(new Date());
-							
+
 							response = forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja);
 						}
-					//Comprobamos si existe algun servicio para el curso y les damos de baja
-					}else {
-						//Eliminamos Servicio
+						// Comprobamos si existe algun servicio para el curso y les damos de baja
+					} else {
+						// Eliminamos Servicio
 						ForTiposervicioCursoExample forTiposerviciocursoExample = new ForTiposervicioCursoExample();
 						forTiposerviciocursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andIdcursoEqualTo(cursoItem.getIdCurso())
-						.andFechabajaIsNull();
+								.andIdcursoEqualTo(cursoItem.getIdCurso()).andFechabajaIsNull();
 
-						List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList = forTiposervicioCursoExtendsMapper.selectByExample(forTiposerviciocursoExample);
-						
+						List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList = forTiposervicioCursoExtendsMapper
+								.selectByExample(forTiposerviciocursoExample);
+
 						for (ForTiposervicioCurso servicioAsignadosAntiguos : forTipoServicioCursoAntiguosList) {
-						
+
 							servicioAsignadosAntiguos.setUsumodificacion(usuario.getIdusuario().longValue());
 							servicioAsignadosAntiguos.setFechabaja(new Date());
 							servicioAsignadosAntiguos.setFechamodificacion(new Date());
-							
+
 							response = forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioAsignadosAntiguos);
 						}
 					}
@@ -1145,24 +1184,25 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		int response = 0;
 
 		if (null != idInstitucion) {
-			
+
 			try {
 
-			LOGGER.info(
-					"getCountIncriptions() / forInscripcionExtendsMapper.getCountIncriptions -> Entrada a forInscripcionExtendsMapper para obtener un resumen de los estados de las inscripciones a un curso");
-			inscripcionItem = forInscripcionExtendsMapper.getCountIncriptions(idCurso);
-			LOGGER.info(
-					"getCountIncriptions() / forInscripcionExtendsMapper.getCountIncriptions -> Salida de forInscripcionExtendsMapper para obtener un resumen de los estados de las inscripciones a un curso");
+				LOGGER.info(
+						"getCountIncriptions() / forInscripcionExtendsMapper.getCountIncriptions -> Entrada a forInscripcionExtendsMapper para obtener un resumen de los estados de las inscripciones a un curso");
+				inscripcionItem = forInscripcionExtendsMapper.getCountIncriptions(idCurso);
+				LOGGER.info(
+						"getCountIncriptions() / forInscripcionExtendsMapper.getCountIncriptions -> Salida de forInscripcionExtendsMapper para obtener un resumen de los estados de las inscripciones a un curso");
 
-			int totales = Integer.parseInt(inscripcionItem.getPendientes()) +  Integer.parseInt(inscripcionItem.getAceptadas()) +
-					 Integer.parseInt(inscripcionItem.getRechazadas()) +  Integer.parseInt(inscripcionItem.getCanceladas());
-			inscripcionItem.setTotales(String.valueOf(totales));
-			
-			}catch (Exception e) {
-				 response = 0;
+				int totales = Integer.parseInt(inscripcionItem.getPendientes())
+						+ Integer.parseInt(inscripcionItem.getAprobadas())
+						+ Integer.parseInt(inscripcionItem.getRechazadas())
+						+ Integer.parseInt(inscripcionItem.getCanceladas());
+				inscripcionItem.setTotales(String.valueOf(totales));
+
+			} catch (Exception e) {
+				response = 0;
 			}
 		}
-
 
 		LOGGER.info(
 				"getCountIncriptions() -> Salida del servicio para obtener un resumen de los estados de las inscripciones a un curso");
@@ -1187,37 +1227,74 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	public ResponseEntity<InputStreamResource> generateExcelInscriptions(CursoItem cursoItem) {
+	public ResponseEntity<InputStreamResource> generateExcelInscriptions(CursoItem cursoItem,
+			HttpServletRequest request) {
 		LOGGER.info("generateExcelInscriptions() -> Entrada al servicio para generar la plantilla Excel Inscripcion");
 
+		ResponseEntity<InputStreamResource> res = null;
 		Vector<Hashtable<String, Object>> datosVector = new Vector<Hashtable<String, Object>>();
 		Hashtable<String, Object> datosHashtable = new Hashtable<String, Object>();
+		List<StringDTO> modosPago = new ArrayList<StringDTO>();
 
-		// 1. Se definen las columnas que conforman la plantilla
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		// 1.1 Se rellena las fila con el codigo del curso y la forma de pago del curso
-			datosHashtable = new Hashtable<String, Object>();
-			datosHashtable.put(CODIGO_CURSO, cursoItem.getCodigoCurso());
-			datosHashtable.put(FORMA_PAGO, " ");
-			datosHashtable.put(NIF, "Introducir el administrador");
-			datosVector.add(datosHashtable);
+		if (null != idInstitucion) {
 
-		// 2. Crea el fichero excel con las columnas indicadas
-		File file = createExcelInscriptionsFile(IFichaCursosService.CAMPOSPLANTILLA, datosVector);
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"generateExcelInscriptions() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"generateExcelInscriptions() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-		// 3. Se convierte el fichero en array de bytes para enviarlo al front
-		InputStream fileStream = null;
-		ResponseEntity<InputStreamResource> res = null;
-		try {
-			fileStream = new FileInputStream(file);
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
 
-			headers.setContentLength(file.length());
-			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+				// 1. Se definen las columnas que conforman la plantilla
+
+				// 1.1 Se rellena las fila con el codigo del curso y la forma de pago del curso
+				datosHashtable = new Hashtable<String, Object>();
+				datosHashtable.put(CODIGO_CURSO, cursoItem.getCodigoCurso());
+
+				LOGGER.info(
+						"generateExcelInscriptions() / pysFormapagoExtendsMapper.getWayToPay -> Entrada a pysFormapagoExtendsMapper para obtener los metodos de pago existentes");
+				modosPago = pysFormapagoExtendsMapper.getWayToPay(usuario.getIdlenguaje());
+				LOGGER.info(
+						"generateExcelInscriptions() / pysFormapagoExtendsMapper.getWayToPay -> Salida de pysFormapagoExtendsMapper para obtener los metodos de pago existentes");
+
+				String[] modosPagoArray = new String[modosPago.size()];
+				// modosPagoArray = modosPago.toArray(modosPagoArray);
+
+				for (int i = 0; i < modosPago.size(); i++) {
+					modosPagoArray[i] = String.valueOf(modosPago.get(i).getValor());
+				}
+
+				datosHashtable.put(FORMA_PAGO, modosPagoArray);
+				datosHashtable.put(NIF, "");
+				datosVector.add(datosHashtable);
+
+				// 2. Crea el fichero excel con las columnas indicadas
+				File file = createExcelInscriptionsFile(IFichaCursosService.CAMPOSPLANTILLA, datosVector);
+
+				// 3. Se convierte el fichero en array de bytes para enviarlo al front
+				InputStream fileStream = null;
+
+				try {
+					fileStream = new FileInputStream(file);
+					HttpHeaders headers = new HttpHeaders();
+					headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+					headers.setContentLength(file.length());
+					res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+							HttpStatus.OK);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 
 		LOGGER.info("generateExcelInscriptions() -> Salida del servicio para generar la plantilla Excel Inscripcion");
@@ -1226,10 +1303,373 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
+	@Transactional
 	public UpdateResponseDTO uploadFileExcel(MultipartHttpServletRequest request)
 			throws IllegalStateException, IOException {
-		return null;
+		LOGGER.info("uploadFile() -> Entrada al servicio para guardar un archivo");
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+
+		// Controlar errores
+		Error error = new Error();
+		String errores = "";
+
+		// Coger archivo del request
+		LOGGER.debug("uploadFile() -> Coger archivo del request");
+		Iterator<String> itr = request.getFileNames();
+		MultipartFile file = request.getFile(itr.next());
+
+		// Extraer la información del excel
+		LOGGER.debug("uploadFile() -> Extraer los datos del archivo");
+		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
+		Vector<Hashtable<String, Object>> datosLog = new Vector<Hashtable<String, Object>>();
+		Hashtable<String, Object> datosHashtable = null;
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		int registrosErroneos = 0;
+		ForInscripcionesmasivas forInscripcionesmasivas = new ForInscripcionesmasivas();
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"uploadFileExcel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"uploadFileExcel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				List<InscripcionItem> inscripcionList = parseExcelFile(datos, usuario);
+
+				for (InscripcionItem inscripcion : inscripcionList) {
+					if (!inscripcion.getErrores().isEmpty()) {
+						registrosErroneos++;
+					}
+				}
+
+				if (registrosErroneos != 0) {
+
+					try {
+						for (InscripcionItem inscripcion : inscripcionList) {
+							if (inscripcion.getErrores().isEmpty()) {
+
+								ForInscripcion inscripcionInsert = new ForInscripcion();
+								inscripcionInsert.setFechabaja(null);
+								inscripcionInsert.setFechamodificacion(new Date());
+								inscripcionInsert.setIdcurso(Long.valueOf(inscripcion.getIdCurso()));
+								inscripcionInsert.setIdestadoinscripcion(INSCRIPCION_PENDIENTE);
+								inscripcionInsert.setIdinstitucion(idInstitucion);
+								inscripcionInsert.setIdpersona(inscripcion.getIdPersona());
+								inscripcionInsert.setUsumodificacion(usuario.getIdusuario().longValue());
+
+								forInscripcionExtendsMapper.insert(inscripcionInsert);
+
+							} else {
+								registrosErroneos++;
+							}
+
+							Hashtable<String, Object> e = new Hashtable<String, Object>();
+							e = convertItemtoHash(inscripcion);
+							// Guardar log
+							datosLog.add(e);
+							errores += inscripcion.getErrores();
+
+						}
+
+					} catch (Exception e) {
+						error.setCode(400);
+						error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					}
+				} else {
+					error.setCode(400);
+					error.setDescription("Hay errores en las inscripciones subidas");
+				}
+
+				byte[] bytesLog = ExcelHelper.createExcelBytes(IFichaCursosService.CAMPOSPLOG, datosLog);
+
+				forInscripcionesmasivas.setIdinstitucion(idInstitucion);
+				forInscripcionesmasivas.setNombrefichero(ICargasMasivasGFService.nombreFicheroEjemplo);
+				forInscripcionesmasivas.setFechamodificacion(new Date());
+				forInscripcionesmasivas.setUsumodificacion(Long.valueOf(usuario.getIdusuario()));
+				forInscripcionesmasivas.setIdcurso(Long.valueOf("27"));
+
+				Long idFile = uploadFile(file.getBytes(), forInscripcionesmasivas, false, usuario);
+				// Long idLogFile = uploadFile(bytesLog, cenCargamasivaGF, true, usuario);
+				// forInscripcionesmasivas.setIdfichero(idFile);
+				// forInscripcionesmasivas.setIdficherolog(idLogFile);
+				//
+				int result = forInscripcionesmasivasMapper.insert(forInscripcionesmasivas);
+
+				if (result == 0) {
+					errores += "Error al insertar en cargas masivas";
+					error.setDescription(errores);
+					updateResponseDTO.setError(error);
+				}
+
+			}
+
+		}
+
+		LOGGER.info("uploadFile() -> Salida al servicio para subir un archivo");
+		updateResponseDTO.setStatus(SigaConstants.OK);
+		error.setDescription(errores);
+		// int correctos = cenCargamasivaGF.getNumregistros() - registrosErroneos;
+		// error.setMessage("Fichero cargado correctamente. Registros Correctos: " +
+		// correctos
+		// + "<br/> Registros Erroneos: " + cenCargamasivaGF.getNumregistroserroneos());
+		updateResponseDTO.setError(error);
+		return updateResponseDTO;
 	}
 
+	public List<InscripcionItem> parseExcelFile(Vector<Hashtable<String, Object>> datos, AdmUsuarios usuario)
+			throws BusinessException {
+
+		List<InscripcionItem> inscripcionItemList = new ArrayList<InscripcionItem>();
+		InscripcionItem inscripcionItem = null;
+
+		Hashtable<Long, String> personaHashtable = new Hashtable<Long, String>();
+		Short idInstitucion = usuario.getIdinstitucion();
+
+		StringBuffer errorLinea = null;
+
+		for (Hashtable<String, Object> hashtable : datos) {
+
+			inscripcionItem = new InscripcionItem();
+			inscripcionItem.setIdInstitucion(idInstitucion.toString());
+			errorLinea = new StringBuffer();
+
+			// Comprobacion si el codigo curso esta introducido es correcto
+			if ((hashtable.get(CODIGO_CURSO) != null && !hashtable.get(CODIGO_CURSO).toString().equals(""))) {
+
+				ForCursoExample forCursoExample = new ForCursoExample();
+				forCursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andCodigocursoEqualTo(hashtable.get(CODIGO_CURSO).toString());
+
+				LOGGER.info(
+						"parseExcelFile() / forPersonacursoExtendsMapper.selectByExample(exampleFormador) -> Entrada a forPersonacursoExtendsMapper para buscar el formador existente");
+
+				List<ForCurso> cursoList = forCursoExtendsMapper.selectByExample(forCursoExample);
+
+				LOGGER.info(
+						"parseExcelFile() / forPersonacursoExtendsMapper.selectByExample(exampleFormador) -> Salida a forPersonacursoExtendsMapper para buscar el formador existente");
+
+				if (null != cursoList && cursoList.size() > 0) {
+					ForCurso curso = cursoList.get(0);
+					inscripcionItem.setCodigoCurso(curso.getCodigocurso());
+					inscripcionItem.setIdCurso(curso.getIdcurso().toString());
+				} else {
+					inscripcionItem.setCodigoCurso("Error");
+					errorLinea.append("Es obligatorio introducir el código del curso.");
+				}
+
+			} else {
+				errorLinea.append("Es obligatorio introducir el código del curso.");
+				inscripcionItem.setCodigoCurso("Error");
+			}
+
+			// Comprobacion si el metodo de pago esta introducido
+			if ((hashtable.get(FORMA_PAGO) != null && !hashtable.get(FORMA_PAGO).toString().equals(""))) {
+
+				LOGGER.info(
+						"generateExcelInscriptions() / pysFormapagoExtendsMapper.getWayToPay -> Entrada a pysFormapagoExtendsMapper para obtener los metodos de pago existentes");
+				List<StringDTO> modosPagosList = pysFormapagoExtendsMapper.getWayToPay(usuario.getIdlenguaje());
+				LOGGER.info(
+						"generateExcelInscriptions() / pysFormapagoExtendsMapper.getWayToPay -> Salida de pysFormapagoExtendsMapper para obtener los metodos de pago existentes");
+
+				boolean isModoPago = false;
+
+				for (StringDTO modoPago : modosPagosList) {
+					if (modoPago.getValor().equals(hashtable.get(FORMA_PAGO))) {
+						isModoPago = true;
+					}
+				}
+
+				if (isModoPago) {
+					inscripcionItem.setFormaPago((String) hashtable.get(FORMA_PAGO));
+				} else {
+					inscripcionItem.setFormaPago("Error");
+					errorLinea.append("Es obligatorio decir la forma de pago del curso.");
+				}
+
+			} else {
+				errorLinea.append("Es obligatorio decir la forma de pago del curso.");
+				inscripcionItem.setFormaPago("Error");
+			}
+
+			// Comprobar que el nif esta introducido
+			if (hashtable.get(NIF) != null && !hashtable.get(NIF).toString().equals("")) {
+
+				try {
+					// Se comprueba si esta en cen_persona
+					Long idPersona = getIdPersonaVerify((String) hashtable.get(NIF), idInstitucion);
+					inscripcionItem.setIdPersona(idPersona);
+
+				} catch (Exception e) {
+					errorLinea.append(e.getMessage() + ". ");
+					inscripcionItem.setNombrePersona("Error");
+				}
+
+				// Si se encuentre debemos comprobar que este en cen_cliente
+				if (inscripcionItem.getIdPersona() != null) {
+					FichaPersonaItem persona = new FichaPersonaItem();
+					persona = getPersonaVerify(inscripcionItem.getIdPersona().toString(), idInstitucion.toString());
+
+					if (persona != null) {
+						CenClienteExample cenClienteExample = new CenClienteExample();
+						cenClienteExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdpersonaEqualTo(inscripcionItem.getIdPersona());
+
+						List<CenCliente> cenClienteList = cenClienteExtendsMapper.selectByExample(cenClienteExample);
+						if (null == cenClienteList || cenClienteList.size() == 0) {
+
+							// Crear CenCliente
+							// CRear noColegiado
+						}
+
+					} else {
+						errorLinea.append("No existe la persona.");
+						inscripcionItem.setNombrePersona("Error");
+					}
+
+				} else {
+					errorLinea.append("Es obligatorio introducir el nif/cif. ");
+					inscripcionItem.setNombrePersona("Error");
+				}
+
+				// Se comprueba si la persona esta inscrita ya en el curso, si no esta inscrita
+				// se inscribe
+
+				if (inscripcionItem.getIdCurso() != null && inscripcionItem.getIdCurso() != ""
+						&& inscripcionItem.getIdPersona() != null) {
+
+					ForInscripcionExample forInscripcionExample = new ForInscripcionExample();
+					forInscripcionExample.createCriteria().andIdcursoEqualTo(Long.valueOf(inscripcionItem.getIdCurso()))
+							.andIdpersonaEqualTo(inscripcionItem.getIdPersona());
+
+					LOGGER.info(
+							"parseExcelFile() / forPersonacursoExtendsMapper.selectByExample(exampleFormador) -> Entrada a forPersonacursoExtendsMapper para buscar el formador existente");
+
+					List<ForInscripcion> inscripcionList = forInscripcionExtendsMapper
+							.selectByExample(forInscripcionExample);
+
+					LOGGER.info(
+							"parseExcelFile() / forPersonacursoExtendsMapper.selectByExample(exampleFormador) -> Salida a forPersonacursoExtendsMapper para buscar el formador existente");
+
+					if (null != inscripcionList && inscripcionList.size() > 0) {
+						inscripcionItem.setDescripcionEstado("Error");
+						errorLinea.append("Ya esta el usuario inscrito.");
+					}
+				}
+
+				inscripcionItem.setErrores(errorLinea.toString());
+				inscripcionItemList.add(inscripcionItem);
+
+			}
+		}
+
+		return inscripcionItemList;
+	}
+
+	private Long uploadFile(byte[] excelBytes, ForInscripcionesmasivas forInscripcionesmasivas, boolean isLog,
+			AdmUsuarios usuario) throws BusinessException {
+		Date dateLog = new Date(0);
+		LOGGER.info(dateLog + ":inicio.CargaInscripcionesMasiva.uploadFile");
+		FicheroVo ficheroVo = new FicheroVo();
+
+		String directorioFichero = getDirectorioFichero(forInscripcionesmasivas.getIdinstitucion());
+		ficheroVo.setDirectorio(directorioFichero);
+		String nombreFicheroString = forInscripcionesmasivas.getNombrefichero();
+		ficheroVo.setNombre(nombreFicheroString);
+		ficheroVo.setDescripcion("Carga Masiva " + ficheroVo.getNombre());
+
+		ficheroVo.setIdinstitucion(forInscripcionesmasivas.getIdinstitucion());
+		ficheroVo.setFichero(excelBytes);
+		ficheroVo.setExtension("xls");
+
+		ficheroVo.setUsumodificacion(Integer.valueOf(usuario.getUsumodificacion()));
+		ficheroVo.setFechamodificacion(new Date());
+		ficherosService.insert(ficheroVo);
+
+		if (isLog) {
+			String descripcion = "log_" + ficheroVo.getDescripcion();
+			ficheroVo.setDescripcion(descripcion);
+			String nombreFichero = "log_" + ficheroVo.getNombre();
+			ficheroVo.setNombre(nombreFichero);
+		}
+
+		SIGAServicesHelper.uploadFichero(ficheroVo.getDirectorio(), ficheroVo.getNombre(), ficheroVo.getFichero());
+		LOGGER.info(dateLog + ":fin.CargaMasivaInscripcion.uploadFile");
+		return ficheroVo.getIdfichero();
+
+	}
+
+	private String getDirectorioFichero(Short idInstitucion) {
+		Date dateLog = new Date();
+		LOGGER.info(dateLog + ":inicio.CargaInscripcionesMasiva.getDirectorioFichero");
+
+		// Extraer propiedad
+		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("gen.ficheros.path");
+		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
+		// genPropertiesPath.get(0).getValor()
+		StringBuffer directorioFichero = new StringBuffer("C:\\Users\\DTUser\\Documents\\cargas");
+		directorioFichero.append(idInstitucion);
+		directorioFichero.append(File.separator);
+
+		// Extraer propiedad
+		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
+		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.cargamasivaGF");
+		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
+		// genPropertiesDirectorio.get(0).getValor()
+		directorioFichero.append("inscripciones");
+
+		LOGGER.info(dateLog + ":fin.CargaMasivaInscripciones.getDirectorioFichero");
+		return directorioFichero.toString();
+	}
+
+	public Long getIdPersonaVerify(String personaNif, Short idInstitucion) {
+
+		Long idPersonaSearch = null;
+
+		if (personaNif == null || personaNif == "") {
+			throw new BusinessException("Campo nif obligatorio");
+		} else if (personaNif != null && personaNif != "") {
+			idPersonaSearch = cenPersonaExtendsMapper.getIdPersonaWithNif(personaNif);
+		}
+
+		return idPersonaSearch;
+	}
+
+	public FichaPersonaItem getPersonaVerify(String idPersona, String string) {
+
+		FichaPersonaItem personaSearch = null;
+
+		if (idPersona == null || idPersona == "") {
+			throw new BusinessException("Campo nif obligatorio");
+		} else if (idPersona != null && idPersona != "") {
+			personaSearch = cenPersonaExtendsMapper.getPersonaisColegiadoWithIdPersona(idPersona, string.toString());
+		}
+
+		return personaSearch;
+	}
+
+	private Hashtable<String, Object> convertItemtoHash(InscripcionItem inscripcionItem) {
+		Hashtable<String, Object> e = new Hashtable<String, Object>();
+
+		if (inscripcionItem.getCodigoCurso() != null) {
+			e.put(CODIGO_CURSO, inscripcionItem.getCodigoCurso());
+		}
+		if (inscripcionItem.getFormaPago() != null) {
+			e.put(FORMA_PAGO, inscripcionItem.getFormaPago());
+		}
+		if (inscripcionItem.getIdPersona() != null) {
+			e.put(NIF, inscripcionItem.getNombrePersona());
+		}
+		return e;
+	}
 
 }

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface ForInscripcionExtendsMapper extends ForInscripcionMapper {
+public interface ForInscripcionExtendsMapper extends ForInscripcionMapper{
 
 	@SelectProvider(type = ForInscripcionSqlExtendsProvider.class, method = "selectInscripciones")
 	@Results({ @Result(column = "IDINSCRIPCION", property = "idInscripcion", jdbcType = JdbcType.NUMERIC),

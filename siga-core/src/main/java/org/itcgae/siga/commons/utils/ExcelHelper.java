@@ -5,20 +5,28 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.DVConstraint;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFDataValidation;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.DataValidation;
+import org.apache.poi.ss.usermodel.DataValidationConstraint;
+import org.apache.poi.ss.usermodel.DataValidationHelper;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.exception.BusinessException;
 
 /**
@@ -104,6 +112,7 @@ public class ExcelHelper {
 		return createExcelFile(cabecera, datos,"fichero");
 		
 	}
+	
 	public static File createExcelFile(List<String> cabecera, Vector<Hashtable<String, Object>> datos,String nombreFichero) throws BusinessException {
 		HSSFWorkbook generarLibroExcelUnaHoja = createExcel(cabecera, datos);
 		File returnFile = null;
@@ -294,7 +303,15 @@ public class ExcelHelper {
 									hssfCell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
 									hssfCell.setCellValue(Double.parseDouble(valor.toString()));
 									hssfCellStyleContenido.setAlignment(HSSFCellStyle.ALIGN_RIGHT); 
-								} else {
+								}else if(valor instanceof String []) {
+									DataValidationHelper dvHelper = hssfSheet.getDataValidationHelper();
+									 DVConstraint dvConstraint = DVConstraint.createExplicitListConstraint((String []) valor);
+									  CellRangeAddressList addressList = new CellRangeAddressList(1, 1, 1, 1);            
+									  DataValidation validation = dvHelper.createValidation(
+									    dvConstraint, addressList);
+									  validation.setSuppressDropDownArrow(false);
+									  hssfSheet.addValidationData(validation);
+								}else {
 									hssfCell.setCellType(HSSFCell.CELL_TYPE_STRING);
 									HSSFRichTextString textCell = new HSSFRichTextString(valor.toString());
 									hssfCell.setCellValue(textCell);

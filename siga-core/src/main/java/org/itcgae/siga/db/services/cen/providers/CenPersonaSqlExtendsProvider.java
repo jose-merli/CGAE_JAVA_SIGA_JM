@@ -436,4 +436,32 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String getPersonaisColegiadoWithIdPersona(String idPersona, String idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("PER.IDPERSONA");
+		sql.SELECT("PER.NOMBRE AS NOMBRE");
+		sql.SELECT("PER.APELLIDOS1 AS APELLIDO1");
+		sql.SELECT("PER.APELLIDOS2 AS APELLIDO2");
+		sql.SELECT("PER.NIFCIF AS NIF"); 
+		sql.FROM("cen_persona per");
+		sql.INNER_JOIN("cen_colegiado col on per.idPersona = col.idpersona and col.idInstitucion =" + idInstitucion);
+		sql.WHERE("per.IDPERSONA = '" + idPersona + "'");
+
+		return sql.toString();
+		
+	}
+	
+	public String getIdPersonaWithNif(String personaNif) {
+		SQL sql = new SQL();
+
+		sql.SELECT("p.idpersona");
+		sql.FROM("cen_persona p");
+		sql.WHERE("p.nifcif = '" + personaNif + "'");
+
+		return sql.toString();
+	}
+	
+
 }
