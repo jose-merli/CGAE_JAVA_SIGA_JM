@@ -142,36 +142,80 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
-					Long idPersona = Long.valueOf(busquedaSancionesItem.getIdPersona());
+				Long idPersona = Long.valueOf(busquedaSancionesItem.getIdPersona());
 
-					CenSancion cenSancion = fillCenSancion(usuario, idPersona, busquedaSancionesItem);
+				CenSancion cenSancion = fillCenSancion(usuario, idPersona, busquedaSancionesItem);
 
-					NewIdDTO idSancion = cenSancionExtendsMapper.getMaxIdSancion(String.valueOf(usuario.getIdinstitucion()),
-							String.valueOf(idPersona));
+				NewIdDTO idSancion = cenSancionExtendsMapper.getMaxIdSancion(String.valueOf(usuario.getIdinstitucion()),
+						String.valueOf(idPersona));
 
-					if (idSancion == null) {
-						cenSancion.setIdsancion((long) 1);
-					} else {
-						int idS = Integer.parseInt(idSancion.getNewId()) + 1;
-						cenSancion.setIdsancion((long) idS);
-					}
+				if (idSancion == null) {
+					cenSancion.setIdsancion((long) 1);
+				} else {
+					int idS = Integer.parseInt(idSancion.getNewId()) + 1;
+					cenSancion.setIdsancion((long) idS);
+				}
 
-					LOGGER.info(
-							"insertSanction() / cenSancionExtendsMapper.insertSelective() -> Entrada a cenSancionExtendsMapper para insertar la sanción");
-					int response = cenSancionExtendsMapper.insertSelective(cenSancion);
-					LOGGER.info(
-							"insertSanction() / cenSancionExtendsMapper.insertSelective() -> Salida a cenSancionExtendsMapper para insertar la sanción");
+				LOGGER.info(
+						"insertSanction() / cenSancionExtendsMapper.insertSelective() -> Entrada a cenSancionExtendsMapper para insertar la sanción");
+				int response = cenSancionExtendsMapper.insertSelective(cenSancion);
+				LOGGER.info(
+						"insertSanction() / cenSancionExtendsMapper.insertSelective() -> Salida a cenSancionExtendsMapper para insertar la sanción");
 
-					if (response == 0) {
-						insertResponseDTO.setStatus(SigaConstants.KO);
-						LOGGER.warn("insertSanction() / cenSancionExtendsMapper.insertSelective() -> "
-								+ insertResponseDTO.getStatus() + ". No se pudo insertar la sanción");
+				if (response == 0) {
+					insertResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.warn("insertSanction() / cenSancionExtendsMapper.insertSelective() -> "
+							+ insertResponseDTO.getStatus() + ". No se pudo insertar la sanción");
+				} else {
+
+					if (busquedaSancionesItem.getFechaFirmezaDate() != null
+							&& busquedaSancionesItem.getFirmeza().equals("No")) {
+
+						LOGGER.info(
+								"insertSanction() / cenSancionExtendsMapper.selectByPrimaryKey() -> Entrada a cenSancionExtendsMapper para ver si existe en la tabla");
+
+						CenSancionKey cenSancionKey = new CenSancionKey();
+						cenSancionKey.setIdinstitucion(cenSancion.getIdinstitucion());
+						cenSancionKey.setIdpersona(Long.valueOf(cenSancion.getIdpersona()));
+						cenSancionKey.setIdsancion(Long.valueOf(cenSancion.getIdsancion()));
+
+						CenSancion cenSancionRegistry = cenSancionExtendsMapper.selectByPrimaryKey(cenSancionKey);
+						LOGGER.info(
+								"insertSanction() / cenSancionExtendsMapper.selectByPrimaryKey() -> Entrada a cenSancionExtendsMapper para ver si existe en la tabla");
+
+						if (null != cenSancionRegistry) {
+							CenSancion registry = new CenSancion();
+
+							registry = cenSancion;
+
+							registry.setIdsancionorigen(cenSancion.getIdsancion());
+							registry.setIdinstitucion((short) 2000);
+							registry.setIdinstitucionsancion(usuario.getIdinstitucion());
+							registry.setIdinstitucionorigen(usuario.getIdinstitucion());
+
+							LOGGER.info(
+									"insertSanction() / cenSancionExtendsMapper.insertSelective() -> Entrada a cenSancionExtendsMapper para insertar la sanción");
+							int responseD = cenSancionExtendsMapper.insertSelective(registry);
+							LOGGER.info(
+									"insertSanction() / cenSancionExtendsMapper.insertSelective() -> Salida a cenSancionExtendsMapper para insertar la sanción");
+
+							if (responseD == 0) {
+								insertResponseDTO.setStatus(SigaConstants.KO);
+								LOGGER.warn("insertSanction() / cenSancionExtendsMapper.insertSelective() -> "
+										+ insertResponseDTO.getStatus() + ". No se pudo insertar la sanción");
+							} else {
+								insertResponseDTO.setStatus(SigaConstants.OK);
+							}
+						}
+
 					} else {
 						insertResponseDTO.setStatus(SigaConstants.OK);
 					}
-//				} else {
-//					insertResponseDTO.setStatus(SigaConstants.KO);
-//				}
+
+				}
+				// } else {
+				// insertResponseDTO.setStatus(SigaConstants.KO);
+				// }
 
 			}
 		}
@@ -182,43 +226,42 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 	private CenSancion fillCenSancion(AdmUsuarios usuario, Long idPersona,
 			BusquedaSancionesItem busquedaSancionesItem) {
-		
+
 		CenSancion cenSancion = new CenSancion();
 
-		if(busquedaSancionesItem.getIdSancion() != null) {
+		if (busquedaSancionesItem.getIdSancion() != null) {
 			cenSancion.setIdsancion(Long.valueOf(busquedaSancionesItem.getIdSancion()));
 		}
-		
+
 		if (busquedaSancionesItem.getTipoSancion() != null) {
 			cenSancion.setIdtiposancion(Short.valueOf(busquedaSancionesItem.getTipoSancion()));
 		}
 
-		if(busquedaSancionesItem.getRefColegio() != null) {
+		if (busquedaSancionesItem.getRefColegio() != null) {
 			cenSancion.setRefcolegio(busquedaSancionesItem.getRefColegio());
 		}
 
-		if(busquedaSancionesItem.getFechaAcuerdoDate() != null) {
+		if (busquedaSancionesItem.getFechaAcuerdoDate() != null) {
 			cenSancion.setFechaacuerdo(busquedaSancionesItem.getFechaAcuerdoDate());
 		}
 
-		if(busquedaSancionesItem.getFechaFirmezaDate() != null) {
+		if (busquedaSancionesItem.getFechaFirmezaDate() != null) {
 			cenSancion.setFechafirmeza(busquedaSancionesItem.getFechaFirmezaDate());
 		}
 
-		if(busquedaSancionesItem.getFechaDesdeDate() != null) {
+		if (busquedaSancionesItem.getFechaDesdeDate() != null) {
 			cenSancion.setFechainicio(busquedaSancionesItem.getFechaDesdeDate());
 		}
 
-		if(busquedaSancionesItem.getFechaHastaDate() != null) {
+		if (busquedaSancionesItem.getFechaHastaDate() != null) {
 			cenSancion.setFechafin(busquedaSancionesItem.getFechaHastaDate());
 		}
 
-		if(busquedaSancionesItem.getFechaRehabilitadoDate() != null) {
+		if (busquedaSancionesItem.getFechaRehabilitadoDate() != null) {
 			cenSancion.setFecharehabilitado(busquedaSancionesItem.getFechaRehabilitadoDate());
 		}
 
-		
-		if(busquedaSancionesItem.getFechaArchivadaDate() != null) {
+		if (busquedaSancionesItem.getFechaArchivadaDate() != null) {
 			cenSancion.setFechaarchivada(busquedaSancionesItem.getFechaArchivadaDate());
 		}
 
@@ -252,11 +295,11 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 		cenSancion.setIdpersona(idPersona);
 
-		if(busquedaSancionesItem.getTexto() != null) {
+		if (busquedaSancionesItem.getTexto() != null) {
 			cenSancion.setTexto(busquedaSancionesItem.getTexto());
 		}
-		
-		if(busquedaSancionesItem.getObservaciones() != null) {
+
+		if (busquedaSancionesItem.getObservaciones() != null) {
 			cenSancion.setObservaciones(busquedaSancionesItem.getObservaciones());
 		}
 
@@ -304,15 +347,15 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 				if (null != cenSancion) {
 
-					if(busquedaSancionesItem.getIsRestablecer()) {
+					if (busquedaSancionesItem.getIsRestablecer()) {
 						cenSancion.setChkarchivada("0");
 						cenSancion.setFechaarchivada(null);
 						cenSancion.setFechamodificacion(new Date());
-					}else {
+					} else {
 						cenSancion = fillCenSancion(usuario, Long.valueOf(busquedaSancionesItem.getIdPersona()),
 								busquedaSancionesItem);
 					}
-				
+
 					LOGGER.info(
 							"updateSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenSancionExtendsMapper para actualizar la sanción");
 					int response = cenSancionExtendsMapper.updateByPrimaryKeySelective(cenSancion);
@@ -324,7 +367,66 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 						LOGGER.warn("updateSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> "
 								+ updateResponseDTO.getStatus() + ". No se pudo actualizar la sanción");
 					} else {
-						updateResponseDTO.setStatus(SigaConstants.OK);
+
+						if (busquedaSancionesItem.getFechaFirmezaDate() != null
+								&& busquedaSancionesItem.getFirmeza().equals("No")) {
+							
+							CenSancion registry = new CenSancion();
+							LOGGER.info(
+									"updateSanction() / cenSancionExtendsMapper.selectByPrimaryKey() -> Entrada a cenSancionExtendsMapper para ver si existe en la tabla");
+
+							CenSancionExample cenSancionExample = new CenSancionExample();
+							cenSancionExample.createCriteria().andIdinstitucionEqualTo((short) 2000).andIdpersonaEqualTo(cenSancion.getIdpersona()).andIdsancionEqualTo(Long.valueOf(cenSancion.getIdsancion())).andIdsancionorigenEqualTo(cenSancion.getIdsancion()).andIdinstitucionsancionEqualTo(usuario.getIdinstitucion()).andIdinstitucionorigenEqualTo(usuario.getIdinstitucion());
+
+							List<CenSancion> cenSancionD = cenSancionExtendsMapper.selectByExample(cenSancionExample);
+							
+							LOGGER.info(
+									"updateSanction() / cenSancionESxtendsMapper.selectByPrimaryKey() -> Entrada a cenSancionExtendsMapper para ver si existe en la tabla");
+
+							if(cenSancionD.isEmpty()) {
+								
+								registry = cenSancion;
+
+								registry.setIdsancionorigen(cenSancion.getIdsancion());
+								registry.setIdinstitucion((short) 2000);
+								registry.setIdinstitucionsancion(usuario.getIdinstitucion());
+								registry.setIdinstitucionorigen(usuario.getIdinstitucion());
+
+								LOGGER.info(
+										"updateSanction() / cenSancionExtendsMapper.insertSelective() -> Entrada a cenSancionExtendsMapper para insertar la sanción");
+								int responseD = cenSancionExtendsMapper.insertSelective(registry);
+								LOGGER.info(
+										"updateSanction() / cenSancionExtendsMapper.insertSelective() -> Salida a cenSancionExtendsMapper para insertar la sanción");
+
+								if (responseD == 0) {
+									updateResponseDTO.setStatus(SigaConstants.KO);
+									LOGGER.warn("insertSanction() / cenSancionExtendsMapper.insertSelective() -> "
+											+ updateResponseDTO.getStatus() + ". No se pudo insertar la sanción");
+								} else {
+									updateResponseDTO.setStatus(SigaConstants.OK);
+								}
+							}else {
+								CenSancionExample cenSancionExample1 = new CenSancionExample();
+								cenSancionExample1.createCriteria().andIdinstitucionEqualTo((short) 2000).andIdpersonaEqualTo(cenSancion.getIdpersona()).andIdsancionEqualTo(Long.valueOf(cenSancion.getIdsancion())).andIdsancionorigenEqualTo(cenSancion.getIdsancion()).andIdinstitucionsancionEqualTo(usuario.getIdinstitucion()).andIdinstitucionorigenEqualTo(usuario.getIdinstitucion());
+								cenSancion.setIdinstitucion((short)2000); 
+								LOGGER.info(
+										"updateSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenSancionExtendsMapper para actualizar la sanción");
+								int responseDD = cenSancionExtendsMapper.updateByExample(cenSancion, cenSancionExample1);
+								LOGGER.info(
+										"updateSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> Salida a cenSancionExtendsMapper para actualizar la sanción");
+
+								if (responseDD == 0) {
+									updateResponseDTO.setStatus(SigaConstants.KO);
+									LOGGER.warn("updateSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> "
+											+ updateResponseDTO.getStatus() + ". No se pudo actualizar la sanción");
+								} else {
+									updateResponseDTO.setStatus(SigaConstants.OK);
+								}
+							}
+							
+						} else {
+							updateResponseDTO.setStatus(SigaConstants.OK);
+						}
 					}
 				} else {
 					updateResponseDTO.setStatus(SigaConstants.KO);
@@ -336,22 +438,23 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 		LOGGER.info("updateSanction() -> Salida del servicio para insertar una sanción");
 		return updateResponseDTO;
 	}
-	
+
 	@Override
 	public void archivarSancionesRehabilitado() {
 		CenSancionExample cenSancionExample = new CenSancionExample();
-		cenSancionExample.createCriteria().andChkarchivadaEqualTo("0").andFecharehabilitadoIsNotNull().andFecharehabilitadoLessThan(new Date());
+		cenSancionExample.createCriteria().andChkarchivadaEqualTo("0").andFecharehabilitadoIsNotNull()
+				.andFecharehabilitadoLessThan(new Date());
 		List<CenSancion> cenSancionList = cenSancionExtendsMapper.selectByExample(cenSancionExample);
-		
-		if(cenSancionList != null && cenSancionList.size() > 0) {
+
+		if (cenSancionList != null && cenSancionList.size() > 0) {
 			for (CenSancion cenSancion : cenSancionList) {
-				
+
 				cenSancion.setChkarchivada("1");
 				cenSancion.setFechaarchivada(new Date());
-				
+
 				cenSancionExtendsMapper.updateByPrimaryKeySelective(cenSancion);
 			}
 		}
-		
+
 	}
 }
