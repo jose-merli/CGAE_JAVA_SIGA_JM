@@ -189,7 +189,7 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 							registry = cenSancion;
 
 							registry.setIdsancionorigen(cenSancion.getIdsancion());
-							registry.setIdinstitucion((short) 2000);
+							registry.setIdinstitucion(Short.valueOf(SigaConstants.InstitucionGeneral));
 							registry.setIdinstitucionsancion(usuario.getIdinstitucion());
 							registry.setIdinstitucionorigen(usuario.getIdinstitucion());
 
@@ -376,7 +376,7 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 									"updateSanction() / cenSancionExtendsMapper.selectByPrimaryKey() -> Entrada a cenSancionExtendsMapper para ver si existe en la tabla");
 
 							CenSancionExample cenSancionExample = new CenSancionExample();
-							cenSancionExample.createCriteria().andIdinstitucionEqualTo((short) 2000).andIdpersonaEqualTo(cenSancion.getIdpersona()).andIdsancionEqualTo(Long.valueOf(cenSancion.getIdsancion())).andIdsancionorigenEqualTo(cenSancion.getIdsancion()).andIdinstitucionsancionEqualTo(usuario.getIdinstitucion()).andIdinstitucionorigenEqualTo(usuario.getIdinstitucion());
+							cenSancionExample.createCriteria().andIdinstitucionEqualTo(Short.valueOf(SigaConstants.InstitucionGeneral)).andIdpersonaEqualTo(cenSancion.getIdpersona()).andIdsancionEqualTo(Long.valueOf(cenSancion.getIdsancion())).andIdsancionorigenEqualTo(cenSancion.getIdsancion()).andIdinstitucionsancionEqualTo(usuario.getIdinstitucion()).andIdinstitucionorigenEqualTo(usuario.getIdinstitucion());
 
 							List<CenSancion> cenSancionD = cenSancionExtendsMapper.selectByExample(cenSancionExample);
 							
@@ -388,7 +388,7 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 								registry = cenSancion;
 
 								registry.setIdsancionorigen(cenSancion.getIdsancion());
-								registry.setIdinstitucion((short) 2000);
+								registry.setIdinstitucion(Short.valueOf(SigaConstants.InstitucionGeneral));
 								registry.setIdinstitucionsancion(usuario.getIdinstitucion());
 								registry.setIdinstitucionorigen(usuario.getIdinstitucion());
 
@@ -407,8 +407,8 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 								}
 							}else {
 								CenSancionExample cenSancionExample1 = new CenSancionExample();
-								cenSancionExample1.createCriteria().andIdinstitucionEqualTo((short) 2000).andIdpersonaEqualTo(cenSancion.getIdpersona()).andIdsancionEqualTo(Long.valueOf(cenSancion.getIdsancion())).andIdsancionorigenEqualTo(cenSancion.getIdsancion()).andIdinstitucionsancionEqualTo(usuario.getIdinstitucion()).andIdinstitucionorigenEqualTo(usuario.getIdinstitucion());
-								cenSancion.setIdinstitucion((short)2000); 
+								cenSancionExample1.createCriteria().andIdinstitucionEqualTo(Short.valueOf(SigaConstants.InstitucionGeneral)).andIdpersonaEqualTo(cenSancion.getIdpersona()).andIdsancionEqualTo(Long.valueOf(cenSancion.getIdsancion())).andIdsancionorigenEqualTo(cenSancion.getIdsancion()).andIdinstitucionsancionEqualTo(usuario.getIdinstitucion()).andIdinstitucionorigenEqualTo(usuario.getIdinstitucion());
+								cenSancion.setIdinstitucion(Short.valueOf(SigaConstants.InstitucionGeneral)); 
 								LOGGER.info(
 										"updateSanction() / cenSancionExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenSancionExtendsMapper para actualizar la sanción");
 								int responseDD = cenSancionExtendsMapper.updateByExample(cenSancion, cenSancionExample1);
