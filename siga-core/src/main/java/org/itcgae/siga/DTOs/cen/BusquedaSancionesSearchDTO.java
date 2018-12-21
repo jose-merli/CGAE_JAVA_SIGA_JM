@@ -21,7 +21,7 @@ public class BusquedaSancionesSearchDTO {
 	private boolean chkRehabilitado;
 	private Date fechaDesdeDate;
 	private Date fechaHastaDate;
-	private boolean chkArchivadas;
+	private Boolean chkArchivadas;
 	private Date fechaArchivadaDesdeDate;
 	private Date fechaArchivadaHastaDate;
 	
@@ -131,10 +131,10 @@ public class BusquedaSancionesSearchDTO {
 	}
 	
 	@JsonProperty("chkArchivadas")
-	public boolean getChkArchivadas() {
+	public Boolean getChkArchivadas() {
 		return chkArchivadas;
 	}
-	public void setChkArchivadas(boolean chkArchivadas) {
+	public void setChkArchivadas(Boolean chkArchivadas) {
 		this.chkArchivadas = chkArchivadas;
 	}
 	

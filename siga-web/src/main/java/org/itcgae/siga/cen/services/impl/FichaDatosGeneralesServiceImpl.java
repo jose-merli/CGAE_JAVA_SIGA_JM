@@ -16,6 +16,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
@@ -286,8 +287,19 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						.andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona()));
 				LOGGER.info(
 						"updateColegiado() / cenPersonaExtendsMapper.updateByExampleSelective() -> Entrada a cenPersonaExtendsMapper para actualizar información de colegiado en CEN_PERSONA");
-
-				cenPersonaExtendsMapper.updateByExampleSelective(cenPersona, cenPersonaExample1);
+				
+				CenPersonaExample dniRepetido = new CenPersonaExample();
+				dniRepetido.createCriteria().andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona())).andNifcifNotEqualTo(colegiadoItem.getNif());
+				List<CenPersona> busqueda = cenPersonaExtendsMapper.selectByExample(dniRepetido);
+				if(busqueda.isEmpty()) {
+					cenPersonaExtendsMapper.updateByExampleSelective(cenPersona, cenPersonaExample1);
+				}else {
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					Error error = new Error();
+//					Ya existe un usuario con este número de identificación
+					error.setMessage("gratuita.personaJG.literal.numDocumentoExistente");
+					updateResponseDTO.setError(error);
+				}
 				LOGGER.info(
 						"updateColegiado() / cenPersonaExtendsMapper.updateByExampleSelective() -> Salida de cenPersonaExtendsMapper para actualizar información de colegiado en CEN_PERSONA");
 				
@@ -346,7 +358,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							.andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
 					LOGGER.info(
 							"updateColegiado() / cenClienteMapper.updateByExampleSelective() -> Entrada a cenClienteMapper para actualizar información de colegiado en CEN_CLIENTE");
-
+					cenClienteMapper.updateByExampleSelective(cenCliente, cenClienteExample);
 					LOGGER.info(
 							"updateColegiado() / cenClienteMapper.updateByExampleSelective() -> Salida de cenClienteMapper para actualizar información de colegiado en CEN_CLIENTE");
 					
@@ -394,7 +406,9 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							cenDatoscolegialesestadoMapper.insertSelective(cenEstadoColegial);
 						}
 					}
-					updateResponseDTO.setStatus(SigaConstants.OK);
+					if(!updateResponseDTO.getStatus().equals(SigaConstants.KO)) {
+						updateResponseDTO.setStatus(SigaConstants.OK);
+					}
 
 			} else {
 				updateResponseDTO.setStatus(SigaConstants.KO);

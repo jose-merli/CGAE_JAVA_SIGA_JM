@@ -70,30 +70,32 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 				+ "' OR (sancion.idInstitucion = '2000' AND sancion.chkFirmeza = '1'))");
 
 		// ARCHIVADA
-		if (busquedaSancionesSearchDTO.getChkArchivadas() == false){
-			sql.WHERE(
-					"(nvl (sancion.chkArchivada,0) = 0 OR nvl (sancion.chkArchivada,0) = 1 AND sancion.fechaArchivada is not null AND sancion.fechaArchivada > sysdate)");
-		} else {
-			sql.WHERE("sancion.CHKARCHIVADA = 1");
-
-			if (busquedaSancionesSearchDTO.getFechaArchivadaDesde() == null
-					&& busquedaSancionesSearchDTO.getFechaArchivadaHasta() == null) {
-				sql.WHERE("(sancion.FECHAARCHIVADA <=sysdate OR sancion.FECHAARCHIVADA is null)");
+		if(busquedaSancionesSearchDTO.getChkArchivadas() != null) {
+			if (busquedaSancionesSearchDTO.getChkArchivadas() == false){
+				sql.WHERE(
+						"(nvl (sancion.chkArchivada,0) = 0 OR nvl (sancion.chkArchivada,0) = 1 AND sancion.fechaArchivada is not null AND sancion.fechaArchivada > sysdate)");
 			} else {
-				String fechaArcDesde = dateFormat.format(busquedaSancionesSearchDTO.getFechaArchivadaDesde());
-				String fechaArcHasta = dateFormat.format(busquedaSancionesSearchDTO.getFechaArchivadaHasta());
+				sql.WHERE("sancion.CHKARCHIVADA = 1");
 
-				if (null != busquedaSancionesSearchDTO.getFechaArchivadaDesde()
-						&& null != busquedaSancionesSearchDTO.getFechaArchivadaHasta()) {
-					sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) >= TO_DATE('" + fechaArcDesde
-							+ "', 'DD/MM/YYYY') AND TO_DATE(sancion.FECHAARCHIVADA) <= TO_DATE('" + fechaArcHasta
-							+ "', 'DD/MM/YYYY')");
-				} else if (busquedaSancionesSearchDTO.getFechaArchivadaDesde() == null
-						&& null != busquedaSancionesSearchDTO.getFechaArchivadaHasta()) {
-					sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) <= TO_DATE('" + fechaArcHasta + "', 'DD/MM/YYYY')");
-				} else if (null != busquedaSancionesSearchDTO.getFechaArchivadaDesde()
+				if (busquedaSancionesSearchDTO.getFechaArchivadaDesde() == null
 						&& busquedaSancionesSearchDTO.getFechaArchivadaHasta() == null) {
-					sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) >= TO_DATE('" + fechaArcDesde + "', 'DD/MM/YYYY')");
+					sql.WHERE("(sancion.FECHAARCHIVADA <=sysdate OR sancion.FECHAARCHIVADA is null)");
+				} else {
+					String fechaArcDesde = dateFormat.format(busquedaSancionesSearchDTO.getFechaArchivadaDesde());
+					String fechaArcHasta = dateFormat.format(busquedaSancionesSearchDTO.getFechaArchivadaHasta());
+
+					if (null != busquedaSancionesSearchDTO.getFechaArchivadaDesde()
+							&& null != busquedaSancionesSearchDTO.getFechaArchivadaHasta()) {
+						sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) >= TO_DATE('" + fechaArcDesde
+								+ "', 'DD/MM/YYYY') AND TO_DATE(sancion.FECHAARCHIVADA) <= TO_DATE('" + fechaArcHasta
+								+ "', 'DD/MM/YYYY')");
+					} else if (busquedaSancionesSearchDTO.getFechaArchivadaDesde() == null
+							&& null != busquedaSancionesSearchDTO.getFechaArchivadaHasta()) {
+						sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) <= TO_DATE('" + fechaArcHasta + "', 'DD/MM/YYYY')");
+					} else if (null != busquedaSancionesSearchDTO.getFechaArchivadaDesde()
+							&& busquedaSancionesSearchDTO.getFechaArchivadaHasta() == null) {
+						sql.WHERE("TO_DATE(sancion.FECHAARCHIVADA) >= TO_DATE('" + fechaArcDesde + "', 'DD/MM/YYYY')");
+					}
 				}
 			}
 		}

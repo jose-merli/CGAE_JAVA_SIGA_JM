@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
 import org.itcgae.siga.DTOs.form.InscripcionDTO;
 import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -34,6 +35,18 @@ public class BusquedaInscripcionController {
 		InscripcionDTO response = busquedaInscripcionService.searchInscripcion(inscripcionItem, request);
 		return new ResponseEntity<InscripcionDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/busquedaInscripciones/searchPersona",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<FichaPersonaItem> searchPersona(HttpServletRequest request) { 
+		FichaPersonaItem response = busquedaInscripcionService.searchPersona(request);
+		return new ResponseEntity<FichaPersonaItem>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/busquedaInscripciones/isAdministrador",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Boolean> isAdministrador(HttpServletRequest request) { 
+		Boolean response = busquedaInscripcionService.isAdministrador(request);
+		return new ResponseEntity<Boolean>(response, HttpStatus.OK);
+	}	
 	
 	@RequestMapping(value = "busquedaInscripciones/calificacionesEmitidas",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getCalificacionesEmitidas(HttpServletRequest request) {

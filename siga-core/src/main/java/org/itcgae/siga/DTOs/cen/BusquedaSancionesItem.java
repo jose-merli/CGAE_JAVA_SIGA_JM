@@ -39,6 +39,8 @@ public class BusquedaSancionesItem {
 	private String fechaNacimiento;
 	private Date fechaNacimientoDate;
 	
+	private boolean restablecer;
+	
 	@JsonProperty("colegio")
 	public String getColegio() {
 		return colegio;
@@ -274,5 +276,13 @@ public class BusquedaSancionesItem {
 	}
 	public void setFechaNacimientoDate(Date fechaNacimientoDate) {
 		this.fechaNacimientoDate = fechaNacimientoDate;
+	}
+	
+	@JsonProperty("restablecer")
+	public boolean getIsRestablecer() {
+		return restablecer;
+	}
+	public void setIsRestablecer(boolean restablecer) {
+		this.restablecer = restablecer;
 	}
 }
