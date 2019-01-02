@@ -256,6 +256,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						key.setIdinstitucion(Short.valueOf(consultas[i].getIdInstitucion()));
 						ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
 						String descripcion = "Copia " + i+1 +" - " + consulta.getDescripcion();
+						consulta.setIdinstitucion(idInstitucion);
 						consulta.setDescripcion(descripcion);
 						consulta.setFechamodificacion(new Date());
 						consulta.setUsumodificacion(usuario.getIdusuario());
@@ -382,32 +383,88 @@ public class ConsultasServiceImpl implements IConsultasService{
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
-					ConConsulta consulta = new ConConsulta();
-					consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
-					consulta.setIdinstitucion(idInstitucion);
-					consulta.setDescripcion(consulta.getDescripcion());
-					consulta.setIdobjetivo(Long.parseLong(consultaDTO.getIdObjetivo()));
-					consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
-					consulta.setGeneral(consultaDTO.getGenerica());
-					consulta.setFechamodificacion(new Date());
-					consulta.setUsumodificacion(usuario.getIdusuario());
-					/*switch(consultaDTO.getIdObjetivo().toString()){
-						case 1:
+					boolean camposIncorrectos = false;
+					if(consultaDTO.getIdConsulta() == null){
+						ConConsulta consulta = new ConConsulta();
+						consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
+						consulta.setIdinstitucion(idInstitucion);
+						consulta.setObservaciones(consulta.getObservaciones());
+						consulta.setDescripcion(consulta.getDescripcion());
+						consulta.setIdobjetivo(Long.parseLong(consultaDTO.getIdObjetivo()));
+						consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
+						if(consultaDTO.getGenerica().equals("1")){
+							consulta.setGeneral("S");
+						}else{
+							consulta.setGeneral("N");
+						}
+						consulta.setFechamodificacion(new Date());
+						consulta.setUsumodificacion(usuario.getIdusuario());
+						switch(consultaDTO.getIdObjetivo().toString()){
+							case "1":
+								consulta.setTipoconsulta("E");
+								break;
+							case "2":
+								consulta.setTipoconsulta("M");
+								break;
+							case "3":
+								consulta.setTipoconsulta("W");
+								break;
+							case "4":
+								consulta.setTipoconsulta("C");
+								break;
+						}
+						_conConsultaMapper.insert(consulta);
+						respuesta.setMessage("Consulta creada");
+					}else{
+						ConConsultaKey key = new ConConsultaKey();
+						key.setIdconsulta(Long.parseLong(consultaDTO.getIdConsulta()));
+						key.setIdinstitucion(Short.parseShort(consultaDTO.getIdInstitucion()));
+						ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
+						consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
+						consulta.setDescripcion(consultaDTO.getNombre());
+						consulta.setObservaciones(consultaDTO.getDescripcion());
+						if(consultaDTO.getGenerica().equals("1")){
+							consulta.setGeneral("S");
+						}else{
+							consulta.setGeneral("N");
+						}
+						consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
+						switch(consultaDTO.getIdObjetivo()){
+						case "1":
+							//Destinarios
+							consulta.setTipoconsulta("E");
+							camposIncorrectos = comprobarCamposDestinarios(consulta.getSentencia());
+							insertarSelectDestinatarios(consulta.getSentencia());
 							break;
-						case 2:
+						case "2":
+							consulta.setTipoconsulta("M");
 							break;
-						case 3:
+						case "3":
+							consulta.setTipoconsulta("W");
 							break;
-						case 4:
+						case "4":
+							consulta.setTipoconsulta("C");
 							break;
-						case 5:
+						default:
+							consulta.setTipoconsulta("C");
 							break;
-					}*/
-					_conConsultaMapper.insert(consulta);
+						}
+						
+						if(consultaDTO.getIdObjetivo().equals("E")){
+							if(!camposIncorrectos){
+								respuesta.setCode(400);
+								respuesta.setMessage("La estructura de la consulta no es correcta");
+							}
+						}else{
+							respuesta.setCode(200);
+							respuesta.setMessage("Consulta actualizada");
+						}
+						
+					}
 					
 				}catch (Exception e) {
 					respuesta.setCode(500);
-					respuesta.setMessage("Error al borrar consulta");
+					respuesta.setMessage("Error al guardar consulta");
 					respuesta.setDescription(e.getMessage());
 					e.printStackTrace();
 				}
@@ -506,7 +563,65 @@ public class ConsultasServiceImpl implements IConsultasService{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 	
+	public boolean comprobarCamposDestinarios (String sentencia){
+		boolean camposIncorrectos = false;
+		
+		if(!sentencia.contains("CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\"")){
+			camposIncorrectos = true;
+		}
+		if(!sentencia.contains("CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\"")){
+			camposIncorrectos = true;
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
+			camposIncorrectos = true;
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\"")){
+			camposIncorrectos = true;
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\"")){
+			camposIncorrectos = true;
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.MOVIL AS \"MOVIL\"")){
+			camposIncorrectos = true;
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.FAX1 AS \"FAX1\"")){
+			camposIncorrectos = true;
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.FAX2 AS \"FAX2\"")){
+			camposIncorrectos = true;
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\"")){
+			camposIncorrectos = true;
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\"")){
+			camposIncorrectos = true;
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\"")){
+			camposIncorrectos = true;
+		}
+		
+		return camposIncorrectos;
+	}
+
+	public boolean comprobarEtiquetas(String sentencia){
+		boolean etiquetasInsuficientes = false;
+		
+		if(!sentencia.contains("<SELECT>") && !sentencia.contains("</SELECT>")){
+			etiquetasInsuficientes = true;
+		}
+		if(!sentencia.contains("<FROM>") && !sentencia.contains("</FROM>")){
+			etiquetasInsuficientes = true;
+		}
+		return etiquetasInsuficientes;
+	}
+	
+	public String insertarSelectDestinatarios (String sentencia){
+		int indexInicio = sentencia.indexOf("<SELECT>" +6);
+		int indexFinal = sentencia.indexOf("</SELECT>");
+		String select = sentencia.substring(indexInicio, indexFinal);
+		
+		return "";
+	}
 	
 }
