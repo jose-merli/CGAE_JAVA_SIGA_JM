@@ -402,15 +402,19 @@ public class ConsultasServiceImpl implements IConsultasService{
 						switch(consultaDTO.getIdObjetivo().toString()){
 							case "1":
 								consulta.setTipoconsulta("E");
+								consulta.setSentencia(insertarSelectDestinatarios()+ "<FROM></FROM>");
 								break;
 							case "2":
 								consulta.setTipoconsulta("M");
+								consulta.setSentencia("<SELECT></SELECT><FROM></FROM>");
 								break;
 							case "3":
 								consulta.setTipoconsulta("W");
+								consulta.setSentencia("<SELECT></SELECT><FROM></FROM>");
 								break;
 							case "4":
 								consulta.setTipoconsulta("C");
+								consulta.setSentencia("<SELECT></SELECT><FROM></FROM>");
 								break;
 						}
 						_conConsultaMapper.insert(consulta);
@@ -434,7 +438,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 							//Destinarios
 							consulta.setTipoconsulta("E");
 							camposIncorrectos = comprobarCamposDestinarios(consulta.getSentencia());
-							insertarSelectDestinatarios(consulta.getSentencia());
+							//insertarSelectDestinatarios(consulta.getSentencia());
 							break;
 						case "2":
 							consulta.setTipoconsulta("M");
@@ -459,6 +463,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 							respuesta.setCode(200);
 							respuesta.setMessage("Consulta actualizada");
 						}
+						respuesta.setCode(200);
+						respuesta.setMessage("Consulta actualizada");
 						
 					}
 					
@@ -617,11 +623,71 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 	
 	public String insertarSelectDestinatarios (String sentencia){
+		
 		int indexInicio = sentencia.indexOf("<SELECT>" +6);
 		int indexFinal = sentencia.indexOf("</SELECT>");
 		String select = sentencia.substring(indexInicio, indexFinal);
 		
-		return "";
+		if(!sentencia.contains("CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\"")){
+			select+= " CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\"";
+		}
+		if(!sentencia.contains("CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\"")){
+			select+= " CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\"";
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
+			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"";	
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\"")){
+			select+= " CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\"";
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
+			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"";	
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\"")){
+			select+= " CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\"";
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.MOVIL AS \"MOVIL\"")){
+			select+= " CEN_DIRECCIONES.MOVIL AS \"MOVIL\"";	
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
+			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"";	
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.FAX1 AS \"FAX1\"")){
+			select+= " CEN_DIRECCIONES.FAX1 AS \"FAX1\"";	
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
+			select+= " CEN_DIRECCIONES.FAX2 AS \"FAX2\"";
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\"")){
+			select+= " CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\"";
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\"")){
+			select+= " CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\"";
+		}
+		if(!sentencia.contains("CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\"")){
+			select+= " CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\"";
+		}
+		StringBuffer sentenciaFinal = new StringBuffer(sentencia);
+		sentenciaFinal.insert(indexInicio, select);
+		
+		return sentenciaFinal.toString();
+	}
+	
+	public String insertarSelectDestinatarios (){
+
+		return "<SELECT>CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\""
+				+ "CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\""
+				+ "CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\""
+				+ "CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\""
+				+ "CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\""
+				+ "CEN_DIRECCIONES.MOVIL AS \"MOVIL\""
+				+ "CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\""
+				+ "CEN_DIRECCIONES.FAX1 AS \"FAX1\""
+				+ "CEN_DIRECCIONES.FAX2 AS \"FAX2\""
+				+ "CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\""
+				+ "CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\""
+				+ "CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\""
+				+ "</SELECT>";
 	}
 	
 }

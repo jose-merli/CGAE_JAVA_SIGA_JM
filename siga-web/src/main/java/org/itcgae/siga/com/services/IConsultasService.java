@@ -33,7 +33,7 @@ public interface IConsultasService {
 
 	public ConsultaListadoPlantillasDTO obtenerPlantillasEnvio(HttpServletRequest request, ConsultaItem consulta);
 
-	public Error guardarConsulta(HttpServletRequest request, ConsultasSearch filtros);
+	public Error guardarConsulta(HttpServletRequest request, ConsultaItem consulta);
 
 	public Error ejecutarConsulta(HttpServletRequest request, String consulta);
 }
