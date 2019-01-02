@@ -559,9 +559,47 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
-	public Error guardarConsulta(HttpServletRequest request, ConsultasSearch filtros) {
+	public Error guardarConsulta(HttpServletRequest request, ConsultaItem consultaDTO) {
+		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar tarjeta general");
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error respuesta = new Error();
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					boolean camposIncorrectos = false;
+					
+					ConConsultaKey key = new ConConsultaKey();
+					key.setIdconsulta(Long.parseLong(consultaDTO.getIdConsulta()));
+					key.setIdinstitucion(Short.parseShort(consultaDTO.getIdInstitucion()));
+					ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
+					camposIncorrectos = comprobarEtiquetas(consultaDTO.getSentencia());
+					
+					if(camposIncorrectos){
+						respuesta.setCode(400);
+						respuesta.setMessage("Etiquetas insuficientes");
+					}else{
+						
+					}
+				}catch (Exception e) {
+					respuesta.setCode(500);
+					respuesta.setMessage("Error al guardar consulta");
+					respuesta.setDescription(e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
 		
-		return null;
+		LOGGER.info("guardarDatosGenerales() -> Salida del servicio para guardar tarjeta general");
+		return respuesta;
 	}
 
 	@Override
