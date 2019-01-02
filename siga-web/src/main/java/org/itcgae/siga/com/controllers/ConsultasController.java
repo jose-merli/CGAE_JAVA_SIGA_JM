@@ -118,14 +118,14 @@ public class ConsultasController {
 	}
 	
 	@RequestMapping(value = "/confGeneral",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> guardarTarjetaGeneral(HttpServletRequest request, @RequestBody ConsultaItem[] consultas) {
+	ResponseEntity<Error> guardarTarjetaGeneral(HttpServletRequest request, @RequestBody ConsultaItem consulta) {
 		
-		/*Error response = _consultasService.duplicar(request, idConsulta);
+		Error response = _consultasService.guardarConsulta(request, consulta);
 		if(response.getCode()==200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);*/
-		return null;
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		
 	}
 	
 	

@@ -388,8 +388,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 						ConConsulta consulta = new ConConsulta();
 						consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
 						consulta.setIdinstitucion(idInstitucion);
-						consulta.setObservaciones(consulta.getObservaciones());
-						consulta.setDescripcion(consulta.getDescripcion());
+						consulta.setObservaciones(consultaDTO.getDescripcion());
+						consulta.setDescripcion(consultaDTO.getNombre());
 						consulta.setIdobjetivo(Long.parseLong(consultaDTO.getIdObjetivo()));
 						consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
 						if(consultaDTO.getGenerica().equals("1")){
@@ -585,9 +585,12 @@ public class ConsultasServiceImpl implements IConsultasService{
 					
 					if(camposIncorrectos){
 						respuesta.setCode(400);
-						respuesta.setMessage("Etiquetas insuficientes");
+						respuesta.setMessage("Campos incorrectos");
 					}else{
-						
+						consulta.setSentencia(consultaDTO.getSentencia());
+						_conConsultaMapper.updateByPrimaryKey(consulta);
+						respuesta.setCode(200);
+						respuesta.setMessage("Consulta guardada");
 					}
 				}catch (Exception e) {
 					respuesta.setCode(500);
