@@ -68,12 +68,12 @@
 						<xs:documentation>id Persona de origen</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="listaDirecciones" type="xs:string">
+				<xs:element name="listaDirecciones" type="xs:string" nillable="true">
 					<xs:annotation>
 						<xs:documentation>Listado de direcciones</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="listaDireccionesNoSeleccionadas" type="xs:string">
+				<xs:element name="listaDireccionesNoSeleccionadas" type="xs:string" nillable="true">
 					<xs:annotation>
 						<xs:documentation>Listado de direcciones No seleccionadas</xs:documentation>
 					</xs:annotation>
