@@ -392,7 +392,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setDescripcion(consultaDTO.getNombre());
 						consulta.setIdobjetivo(Long.parseLong(consultaDTO.getIdObjetivo()));
 						consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
-						consulta.setGeneral(consulta.getGeneral());
+						consulta.setGeneral(consultaDTO.getGenerica());
 						consulta.setFechamodificacion(new Date());
 						consulta.setUsumodificacion(usuario.getIdusuario());
 						switch(consultaDTO.getIdObjetivo().toString()){
@@ -424,7 +424,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
 						consulta.setDescripcion(consultaDTO.getNombre());
 						consulta.setObservaciones(consultaDTO.getDescripcion());
-						consulta.setGeneral(consulta.getGeneral());
+						consulta.setGeneral(consultaDTO.getGenerica());
 						consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
 						switch(consultaDTO.getIdObjetivo()){
 						case "1":
