@@ -120,7 +120,7 @@ public class ConsultasController {
 	@RequestMapping(value = "/confGeneral",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Error> guardarTarjetaGeneral(HttpServletRequest request, @RequestBody ConsultaItem consulta) {
 		
-		Error response = _consultasService.guardarConsulta(request, consulta);
+		Error response = _consultasService.guardarDatosGenerales(request, consulta);
 		if(response.getCode()==200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
