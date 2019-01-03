@@ -1,6 +1,8 @@
 package org.itcgae.siga.gen.controllers;
 
 
+import java.security.cert.CertificateEncodingException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
@@ -67,7 +69,7 @@ public class MenuController {
     
     
     @RequestMapping(value = "/permisos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<PermisoDTO> getPermisos(@RequestBody PermisoRequestItem permisoRequestItem,HttpServletRequest request) {
+	ResponseEntity<PermisoDTO> getPermisos(@RequestBody PermisoRequestItem permisoRequestItem,HttpServletRequest request) throws CertificateEncodingException {
     	PermisoDTO response = menuService.getPermisos(permisoRequestItem,request);
     	return new ResponseEntity<PermisoDTO>(response, HttpStatus.OK);
 	}

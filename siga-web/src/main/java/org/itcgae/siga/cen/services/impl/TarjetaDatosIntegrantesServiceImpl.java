@@ -1,5 +1,8 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,6 +23,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosIntegrantesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
@@ -36,24 +40,23 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 @Service
-public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegrantesService{
+public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegrantesService {
 
 	private Logger LOGGER = Logger.getLogger(TarjetaDatosIntegrantesServiceImpl.class);
-	
+
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
-	
+
 	@Autowired
 	private CenComponentesExtendsMapper cenComponentesExtendsMapper;
-	
+
 	@Autowired
 	private CenProvinciasExtendsMapper cenProvinciasExtendsMapper;
-	
+
 	@Autowired
 	private CenCargoExtendsMapper cenCargoExtendsMapper;
-	
+
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 
@@ -63,21 +66,19 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 	@Autowired
 	private CenInstitucionExtendsMapper cenInstitucionExtendsMapper;
 
-
 	@Override
 	public DatosIntegrantesDTO searchIntegrantesData(int numPagina, DatosIntegrantesSearchDTO datosIntegrantesSearchDTO,
 			HttpServletRequest request) {
 		LOGGER.info("searchIntegrantesData() -> Entrada al servicio para la búsqueda por filtros de integrantes ");
-		
+
 		List<DatosIntegrantesItem> datosIntegrantesItem = new ArrayList<DatosIntegrantesItem>();
 		DatosIntegrantesDTO datosIntegrantesDTO = new DatosIntegrantesDTO();
 
-		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -91,51 +92,49 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 				LOGGER.info(
 						"searchIntegrantesData() / cenComponentesExtendsMapper.selectIntegrantes() -> Entrada a cenCuentasbancariasExtendsMapper para busqueda de integrantes ");
 				datosIntegrantesSearchDTO.setIdInstitucion(idInstitucion.toString());
-				datosIntegrantesItem = cenComponentesExtendsMapper.selectIntegrantes(datosIntegrantesSearchDTO, String.valueOf(idInstitucion));
+				datosIntegrantesItem = cenComponentesExtendsMapper.selectIntegrantes(datosIntegrantesSearchDTO,
+						String.valueOf(idInstitucion));
 				LOGGER.info(
 						"searchIntegrantesData() / cenComponentesExtendsMapper.selectIntegrantes() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de integrantes ");
 
 				datosIntegrantesDTO.setDatosIntegrantesItem(datosIntegrantesItem);
-			} 
-			else {
-				LOGGER.warn("searchIntegrantesData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
+			} else {
+				LOGGER.warn(
+						"searchIntegrantesData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
 			}
-		} 
-		else {
+		} else {
 			LOGGER.warn("searchIntegrantesData() -> idInstitucion del token nula");
 		}
-		
+
 		LOGGER.info("searchIntegrantesData() -> Salida del servicio para la búsqueda por filtros de integrantes ");
 		return datosIntegrantesDTO;
 	}
-
 
 	@Override
 	public ComboDTO getProvinces(HttpServletRequest request) {
 		LOGGER.info("getProvinces() -> Entrada al servicio para búsqueda de las provincias");
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-		
+
 		LOGGER.info(
 				"getProvinces() / cenProvinciasExtendsMapper.selectDistinctProvinces() -> Entrada a cenProvinciasExtendsMapper para obtener listado de provincias ");
 		comboItems = cenProvinciasExtendsMapper.selectDistinctProvinces();
 		LOGGER.info(
 				"getProvinces() / cenProvinciasExtendsMapper.selectDistinctProvinces() -> Salida de cenProvinciasExtendsMapper para obtener listado de provincias ");
-		
-		
-		if(null != comboItems && comboItems.size() > 0) {
+
+		if (null != comboItems && comboItems.size() > 0) {
 			ComboItem element = new ComboItem();
 			element.setLabel("");
 			element.setValue("");
 			comboItems.add(0, element);
 		}
-		
+
 		comboDTO.setCombooItems(comboItems);
-		
+
 		LOGGER.info("getProvinces() -> Salida al servicio para búsqueda de las provincias");
 		return comboDTO;
 	}
-
 
 	@Override
 	public ComboDTO getCargos(HttpServletRequest request) {
@@ -143,12 +142,12 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		AdmUsuarios usuario = new AdmUsuarios();
-		
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -160,15 +159,14 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 
 			if (null != usuarios && usuarios.size() > 0) {
 				usuario = usuarios.get(0);
-				
+
 				LOGGER.info(
 						"getCargos() / cenCargoExtendsMapper.getCargos() -> Entrada a cenCargoExtendsMapper para obtener listado de cargos");
 				comboItems = cenCargoExtendsMapper.getCargos(usuario.getIdlenguaje(), String.valueOf(idInstitucion));
 				LOGGER.info(
 						"getCargos() / cenCargoExtendsMapper.getCargos() -> Salida de cenCargoExtendsMapper para obtener listado de cargos ");
-				
-				
-				if(null != comboItems && comboItems.size() > 0) {
+
+				if (null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
 					element.setLabel("");
 					element.setValue("");
@@ -177,29 +175,27 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 			}
 
 		}
-		
+
 		comboDTO.setCombooItems(comboItems);
-		
+
 		LOGGER.info("getCargos() -> Salida al servicio para búsqueda de cargos");
 		return comboDTO;
 	}
 
-
 	@Override
 	public UpdateResponseDTO updateMember(TarjetaIntegrantesUpdateDTO tarjetaIntegrantesUpdateDTO,
 			HttpServletRequest request) {
-		
+
 		LOGGER.info("updateMember() -> Entrada al servicio para actualizar información de integrantes");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
 		int response = 0;
-		
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		
+
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 		LOGGER.info(
@@ -210,50 +206,71 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 
 		if (null != usuarios && usuarios.size() > 0) {
 			usuario = usuarios.get(0);
-			
-			LOGGER.info(
-					"getCargos() / cenComponentesExtendsMapper.updateMember() -> Entrada a cenComponentesExtendsMapper para actualizar datos de un integrante");
-			response = cenComponentesExtendsMapper.updateMember(tarjetaIntegrantesUpdateDTO, usuario, String.valueOf(idInstitucion));
-			LOGGER.info(
-					"getCargos() / cenComponentesExtendsMapper.updateMember() -> Salida de cenComponentesExtendsMapper para actualizar datos de un integrante");
-			
-			updateResponseDTO.setStatus(SigaConstants.OK);
-			if(response == 0) {
-				updateResponseDTO.setStatus(SigaConstants.KO);
-				LOGGER.warn(
-						"getCargos() / cenComponentesExtendsMapper.updateMember() -> " + updateResponseDTO.getStatus() + ". No se pudo actualizar datos de un integrantes");
-				
+
+			// 1. Ya existe un idpersona para el nuevo integrante
+			if (!tarjetaIntegrantesUpdateDTO.getIdPersonaComponente().equals("")) {
+
+				int responseCenCliente = 1; 
+		
+				// 1.1 Comprobamos que existe en tabla cen_cliente
+				CenCliente cenCliente = new CenCliente();
+				CenClienteKey key = new CenClienteKey();
+				key.setIdinstitucion(Short.valueOf(tarjetaIntegrantesUpdateDTO.getColegio()));
+				key.setIdpersona(Long.valueOf(tarjetaIntegrantesUpdateDTO.getIdPersonaComponente()));
+				cenCliente = cenClienteMapper.selectByPrimaryKey(key);
+
+				// 1.2 Si no existe, se crea un registro
+				if (null == cenCliente) {
+					CenCliente record = new CenCliente();
+					record = rellenarInsertCenClienteUpdate(tarjetaIntegrantesUpdateDTO, usuario);
+					responseCenCliente = cenClienteMapper.insertSelective(record);
+				}
+
+				if (responseCenCliente == 1) {
+
+					LOGGER.info(
+							"getCargos() / cenComponentesExtendsMapper.updateMember() -> Entrada a cenComponentesExtendsMapper para actualizar datos de un integrante");
+					response = cenComponentesExtendsMapper.updateMember(tarjetaIntegrantesUpdateDTO, usuario,
+							String.valueOf(idInstitucion));
+					LOGGER.info(
+							"getCargos() / cenComponentesExtendsMapper.updateMember() -> Salida de cenComponentesExtendsMapper para actualizar datos de un integrante");
+
+					updateResponseDTO.setStatus(SigaConstants.OK);
+					if (response == 0) {
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.warn("getCargos() / cenComponentesExtendsMapper.updateMember() -> "
+								+ updateResponseDTO.getStatus() + ". No se pudo actualizar datos de un integrantes");
+
+					}
+				}
+
 			}
-		}
-		else {
+
+		} else {
 			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn(
-					"getCargos() / admUsuariosExtendsMapper.selectByExample() -> " + updateResponseDTO.getStatus() + ". No existen ningún usuario en base de datos");
+			LOGGER.warn("getCargos() / admUsuariosExtendsMapper.selectByExample() -> " + updateResponseDTO.getStatus()
+					+ ". No existen ningún usuario en base de datos");
 		}
-		
-		
-		
+
 		LOGGER.info("updateMember() -> Salida del servicio para actualizar información de integrantes");
 		return updateResponseDTO;
 	}
 
-
 	@Override
 	public UpdateResponseDTO createMember(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO,
 			HttpServletRequest request) {
-		
+
 		LOGGER.info("updateMember() -> Entrada al servicio para crear un nuevo integrante");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		AdmUsuarios usuario = new AdmUsuarios();
 		ComboItem comboItem = new ComboItem();
-		
-		
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 		LOGGER.info(
@@ -264,57 +281,56 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 
 		if (null != usuarios && usuarios.size() > 0) {
 			usuario = usuarios.get(0);
-			
+
 			// 1. Ya existe un idpersona para el nuevo integrante
-			if(!tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante().equals(""))
-			{
+			if (!tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante().equals("")) {
 				int responseCenCliente = 1; // se puede crear o no => se inicializa a 1
 				int responseCenComponentes = 0; // se debe crear siempre
-				
+
 				// 1.1 Comprobamos que existe en tabla cen_cliente
 				CenCliente cenCliente = new CenCliente();
 				CenClienteKey key = new CenClienteKey();
-				key.setIdinstitucion(Short.valueOf(tarjetaIntegrantesCreateDTO.getIdInstitucionIntegrante()));
+				key.setIdinstitucion(Short.valueOf(tarjetaIntegrantesCreateDTO.getColegio()));
 				key.setIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()));
 				cenCliente = cenClienteMapper.selectByPrimaryKey(key);
-				
+
 				// 1.2 Si no existe, se crea un registro
-				if(null == cenCliente) {
+				if (null == cenCliente) {
 					CenCliente record = new CenCliente();
 					record = rellenarInsertCenCliente(tarjetaIntegrantesCreateDTO, usuario);
 					responseCenCliente = cenClienteMapper.insertSelective(record);
 				}
-				
-				if(responseCenCliente == 1) {
-					// 1.3 Comprobar si esta en cen_nocolegiado/cen_colegiado (no se hace ahora mismo)
-					
+
+				if (responseCenCliente == 1) {
+					// 1.3 Comprobar si esta en cen_nocolegiado/cen_colegiado (no se hace ahora
+					// mismo)
+
 					// 1.4 Insertamos un registro en tabla cen_componentes
-					comboItem = cenComponentesExtendsMapper.selectMaxIDComponente(tarjetaIntegrantesCreateDTO.getIdPersonaPadre(), String.valueOf(idInstitucion));
+					comboItem = cenComponentesExtendsMapper.selectMaxIDComponente(
+							tarjetaIntegrantesCreateDTO.getIdPersonaPadre(), String.valueOf(idInstitucion));
 					int siguienteIDComponente;
-					if(null != comboItem) {
+					if (null != comboItem) {
 						siguienteIDComponente = Integer.valueOf(comboItem.getValue()) + 1;
-					}
-					else {
+					} else {
 						siguienteIDComponente = 1;
 					}
-					
+
 					tarjetaIntegrantesCreateDTO.setIdComponente(String.valueOf(siguienteIDComponente));
-					responseCenComponentes = cenComponentesExtendsMapper.insertSelectiveForcreateMember(tarjetaIntegrantesCreateDTO, usuario, String.valueOf(idInstitucion));
 					
-					if(responseCenComponentes == 1) {
+					CenComponentes cenComponentes = getCenComponentes(tarjetaIntegrantesCreateDTO, idInstitucion, usuario.getUsumodificacion());
+					responseCenComponentes = cenComponentesExtendsMapper.insertSelective(cenComponentes);
+
+					if (responseCenComponentes == 1) {
 						updateResponseDTO.setStatus(SigaConstants.OK);
-					}
-					else {
+					} else {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 					}
-				}
-				else {
+				} else {
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
-			}
-			else {
+			} else {
 				// 2. No existe un idpersona para el nuevo integrante
-				
+
 				// 2.1. Insertar en cen_persona
 				int responseCenPersona = 0;
 				int responseCenCliente = 0;
@@ -322,74 +338,130 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 				CrearPersonaDTO crearPersonaDTO = new CrearPersonaDTO();
 				crearPersonaDTO = rellenarInsertCenPersona(tarjetaIntegrantesCreateDTO, usuario);
 				responseCenPersona = cenPersonaExtendsMapper.insertSelectiveForPersonFile(crearPersonaDTO, usuario);
-				
-				if(responseCenPersona == 1) {
+
+				if (responseCenPersona == 1) {
 					// 2.2. Insertar en cen_cliente
-					
+
 					comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
 					String maxIdPersona = comboItems.get(0).getValue();
-					
+
 					tarjetaIntegrantesCreateDTO.setIdPersonaIntegrante(maxIdPersona);
 					tarjetaIntegrantesCreateDTO.setIdInstitucionIntegrante(String.valueOf(idInstitucion));
-					
+
 					CenCliente record = new CenCliente();
 					record = rellenarInsertCenCliente(tarjetaIntegrantesCreateDTO, usuario);
 					responseCenCliente = cenClienteMapper.insertSelective(record);
-					if(responseCenCliente == 1) {
-						// 2.3. Insertar en cen_nocolegiado/cen_colegiado { tipo = session de busqueda no colegiados (para busqueda juridica) || tipo Personal = '1' (para busqueda fisica) 
+					if (responseCenCliente == 1) {
+						// 2.3. Insertar en cen_nocolegiado/cen_colegiado { tipo = session de busqueda
+						// no colegiados (para busqueda juridica) || tipo Personal = '1' (para busqueda
+						// fisica)
 						// PUNTO 2.3 AHORA MISMO NO SE HACE
 						// 2.4. Insertar en cen_componente
-						comboItem = cenComponentesExtendsMapper.selectMaxIDComponente(tarjetaIntegrantesCreateDTO.getIdPersonaPadre(), String.valueOf(idInstitucion));
+						comboItem = cenComponentesExtendsMapper.selectMaxIDComponente(
+								tarjetaIntegrantesCreateDTO.getIdPersonaPadre(), String.valueOf(idInstitucion));
 						int siguienteIDComponente;
-						if(null != comboItem) {
+						if (null != comboItem) {
 							siguienteIDComponente = Integer.valueOf(comboItem.getValue()) + 1;
-						}
-						else {
+						} else {
 							siguienteIDComponente = 1;
 						}
-						
+
 						tarjetaIntegrantesCreateDTO.setIdComponente(String.valueOf(siguienteIDComponente));
-						responseCenComponentes = cenComponentesExtendsMapper.insertSelectiveForcreateMember(tarjetaIntegrantesCreateDTO, usuario, String.valueOf(idInstitucion));
-						if(responseCenComponentes == 1) {
+						
+						CenComponentes cenComponentes = getCenComponentes(tarjetaIntegrantesCreateDTO, idInstitucion, usuario.getUsumodificacion());
+						responseCenComponentes = cenComponentesExtendsMapper.insertSelective(cenComponentes);
+
+						if (responseCenComponentes == 1) {
 							updateResponseDTO.setStatus(SigaConstants.OK);
-						}
-						else {
+						} else {
 							updateResponseDTO.setStatus(SigaConstants.KO);
 						}
-						
-					}
-					else {
+
+					} else {
 						updateResponseDTO.setStatus(SigaConstants.KO);
 					}
-					
-				}
-				else {
+
+				} else {
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
-				
-				
+
 			}
 		}
-		
-		
+
 		LOGGER.info("updateMember() -> Salida del servicio para crear un nuevo integrante");
 		return updateResponseDTO;
 	}
 	
-	@Override
-	public UpdateResponseDTO deleteMember(TarjetaIntegrantesDeleteDTO[] tarjetaIntegrantesDeleteDTO, HttpServletRequest request) {
+	private CenComponentes getCenComponentes(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO, Short idInstitucion, int usuario) {
+		CenComponentes cenComponentes = new CenComponentes();
+
+		if(null != tarjetaIntegrantesCreateDTO.getCapitalSocial()) {
+			cenComponentes.setCapitalsocial(new BigDecimal(tarjetaIntegrantesCreateDTO.getCapitalSocial(), MathContext.DECIMAL64));
+		}
 		
+		cenComponentes.setCargo(tarjetaIntegrantesCreateDTO.getCargo());
+		
+		if(null != tarjetaIntegrantesCreateDTO.getColegio()) {
+			cenComponentes.setCenClienteIdinstitucion(Short.valueOf(tarjetaIntegrantesCreateDTO.getColegio()));
+		}else {
+			cenComponentes.setCenClienteIdinstitucion(Short.valueOf(idInstitucion));
+		}
+	
+		if(null != tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()) {
+			cenComponentes.setCenClienteIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()));
+		}
+		
+		
+		if(null != tarjetaIntegrantesCreateDTO.getFechaBajaCargo()) {
+		cenComponentes.setFechabaja(tarjetaIntegrantesCreateDTO.getFechaBajaCargo());
+		}
+		
+		if(null != tarjetaIntegrantesCreateDTO.getFechaCargo()) {
+			cenComponentes.setFechacargo(tarjetaIntegrantesCreateDTO.getFechaCargo());
+		}
+		cenComponentes.setFechamodificacion(new Date());
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getFlagSocio())) {
+			cenComponentes.setFlagSocio(Short.valueOf(tarjetaIntegrantesCreateDTO.getFlagSocio()));
+		}
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getIdCargo())) {
+			cenComponentes.setIdcargo(Short.valueOf(tarjetaIntegrantesCreateDTO.getIdCargo()));
+		}
+		cenComponentes.setIdcomponente(Short.valueOf(tarjetaIntegrantesCreateDTO.getIdComponente()));
+		cenComponentes.setIdinstitucion(idInstitucion);
+		cenComponentes.setIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaPadre()));
+		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getIdProvincia())) {
+			cenComponentes.setIdprovincia(tarjetaIntegrantesCreateDTO.getIdProvincia());
+		}
+		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getNumColegiado())) {
+			cenComponentes.setNumcolegiado(tarjetaIntegrantesCreateDTO.getNumColegiado());
+		}
+		
+		if(!tarjetaIntegrantesCreateDTO.getIdTipoColegio().equals("")) {
+			cenComponentes.setIdtipocolegio(Short.valueOf(tarjetaIntegrantesCreateDTO.getIdTipoColegio()));
+		}
+		
+		cenComponentes.setSociedad("0");
+		cenComponentes.setUsumodificacion(usuario);
+		
+		return cenComponentes;
+	}
+
+	@Override
+	public UpdateResponseDTO deleteMember(TarjetaIntegrantesDeleteDTO[] tarjetaIntegrantesDeleteDTO,
+			HttpServletRequest request) {
+
 		LOGGER.info("updateMember() -> Entrada al servicio para actualizar información de integrantes");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		AdmUsuarios usuario = new AdmUsuarios();
 		int response = 0;
-		
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		
+
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 		LOGGER.info(
@@ -410,49 +482,43 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 				recordUpdate.setIdcomponente(Short.valueOf(tarjetaIntegrantesDeleteDTO[i].getIdComponente()));
 				recordUpdate.setIdinstitucion(idInstitucion);
 				recordUpdate.setIdpersona(Long.valueOf(tarjetaIntegrantesDeleteDTO[i].getIdPersona()));
-				response = cenComponentesExtendsMapper.updateByPrimaryKeySelective(recordUpdate );
-				
+				response = cenComponentesExtendsMapper.updateByPrimaryKeySelective(recordUpdate);
+
 				LOGGER.info(
 						"getCargos() / cenComponentesExtendsMapper.updateMember() -> Salida de cenComponentesExtendsMapper para actualizar datos de un integrante");
-				
+
 				updateResponseDTO.setStatus(SigaConstants.OK);
-				if(response == 0) {
+				if (response == 0) {
 					updateResponseDTO.setStatus(SigaConstants.KO);
-					LOGGER.warn(
-							"getCargos() / cenComponentesExtendsMapper.updateMember() -> " + updateResponseDTO.getStatus() + ". No se pudo actualizar datos de un integrantes");
-					
+					LOGGER.warn("getCargos() / cenComponentesExtendsMapper.updateMember() -> "
+							+ updateResponseDTO.getStatus() + ". No se pudo actualizar datos de un integrantes");
+
 				}
 			}
-			
-		}
-		else {
+
+		} else {
 			updateResponseDTO.setStatus(SigaConstants.KO);
-			LOGGER.warn(
-					"getCargos() / admUsuariosExtendsMapper.selectByExample() -> " + updateResponseDTO.getStatus() + ". No existen ningún usuario en base de datos");
+			LOGGER.warn("getCargos() / admUsuariosExtendsMapper.selectByExample() -> " + updateResponseDTO.getStatus()
+					+ ". No existen ningún usuario en base de datos");
 		}
-		
-		
-		
+
 		LOGGER.info("updateMember() -> Salida del servicio para actualizar información de integrantes");
 		return updateResponseDTO;
 	}
-	
-	
+
 	@Override
 	public StringDTO provinciaColegio(StringDTO idInstitucionIntegrante, HttpServletRequest request) {
 		StringDTO idProvincia = new StringDTO();
-		
-		
+
 		idProvincia = cenInstitucionExtendsMapper.selectProvinciaColegio(idInstitucionIntegrante);
-		
-		
+
 		return idProvincia;
 	}
-	
-	
-	protected CenCliente rellenarInsertCenCliente(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO,AdmUsuarios usuario) {
+
+	protected CenCliente rellenarInsertCenCliente(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO,
+			AdmUsuarios usuario) {
 		CenCliente record = new CenCliente();
-		
+
 		record.setIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()));
 		record.setIdinstitucion(Short.valueOf(tarjetaIntegrantesCreateDTO.getIdInstitucionIntegrante()));
 		record.setFechaalta(new Date());
@@ -465,28 +531,41 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		record.setUsumodificacion(usuario.getIdusuario());
 		record.setIdlenguaje(usuario.getIdlenguaje());
 		record.setExportarfoto(SigaConstants.DB_FALSE);
-		
+
 		return record;
 	}
-	
-	protected  CrearPersonaDTO rellenarInsertCenPersona(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO, AdmUsuarios usuario) {
+
+	protected CenCliente rellenarInsertCenClienteUpdate(TarjetaIntegrantesUpdateDTO tarjetaIntegrantesUpdateDTO,
+			AdmUsuarios usuario) {
+		CenCliente record = new CenCliente();
+
+		record.setIdpersona(Long.valueOf(tarjetaIntegrantesUpdateDTO.getIdPersonaComponente()));
+		record.setIdinstitucion(Short.valueOf(tarjetaIntegrantesUpdateDTO.getColegio()));
+		record.setFechaalta(new Date());
+		record.setCaracter("P");
+		record.setPublicidad(SigaConstants.DB_FALSE);
+		record.setGuiajudicial(SigaConstants.DB_FALSE);
+		record.setComisiones(SigaConstants.DB_FALSE);
+		record.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
+		record.setFechamodificacion(new Date());
+		record.setUsumodificacion(usuario.getIdusuario());
+		record.setIdlenguaje(usuario.getIdlenguaje());
+		record.setExportarfoto(SigaConstants.DB_FALSE);
+
+		return record;
+	}
+
+	protected CrearPersonaDTO rellenarInsertCenPersona(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO,
+			AdmUsuarios usuario) {
 		CrearPersonaDTO crearPersonaDTO = new CrearPersonaDTO();
-		
+
 		crearPersonaDTO.setNombre(tarjetaIntegrantesCreateDTO.getNombre());
 		crearPersonaDTO.setApellido1(tarjetaIntegrantesCreateDTO.getApellidos1());
 		crearPersonaDTO.setApellido2(tarjetaIntegrantesCreateDTO.getApellidos2());
 		crearPersonaDTO.setNif(tarjetaIntegrantesCreateDTO.getNifCif());
 		crearPersonaDTO.setTipoIdentificacion(tarjetaIntegrantesCreateDTO.getTipoIdentificacion());
-		
+
 		return crearPersonaDTO;
 	}
 
-
-	
-
-
-	
-
-	
-	
 }

@@ -22,7 +22,6 @@ public class ColegiadoItem {
 	private String movil;
 	private String estadoColegial;	
 	private String [] grupos;
-
 	private String  apellidos;
 //	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date [] fechaIncorporacion;
@@ -35,13 +34,13 @@ public class ColegiadoItem {
 	private String  tipoDireccion;
 	private String  sexo;
 	private String idEstadoCivil;
+
 	private String idEstado;
 	private String domicilio;
 	private String tipoCV;
 	private String  idgrupo [];
 	private String  denominacion;
 	private ComboEtiquetasItem[] etiquetas;
-
 	private String soloNombre;
 	private String apellidos1;
 	private String apellidos2;
@@ -60,7 +59,7 @@ public class ColegiadoItem {
 	private String fechapresentacion;
 	private String fechaNacimiento;
 	private String fechaBaja;
-	
+
 	private Date fechaEstado;
 	private Date incorporacionDate;
 	private Date fechaJuraDate;
@@ -75,6 +74,8 @@ public class ColegiadoItem {
 	private String descripcion;
 	private String observaciones;
 	private String motivo;
+
+
 	
 	/**
 	 *
@@ -113,6 +114,7 @@ public class ColegiadoItem {
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
+
 
 	/**
 	 */
@@ -539,17 +541,7 @@ public class ColegiadoItem {
 	public void setIdPoblacion(String idPoblacion) {
 		this.idPoblacion = idPoblacion;
 	}
-	
-	/**
-	 *
-	 */
-	
 
-	/**
-	 * *
-	 *
-	 **/
-	
 	public ColegiadoItem codigoPostal(String codigoPostal){
 		this.codigoPostal = codigoPostal;
 		return this;
@@ -652,7 +644,9 @@ public class ColegiadoItem {
 	/**
 	 *
 	 */
+
 	public ColegiadoItem idgrupo(String[] idgrupo ){
+	
 		this.idgrupo = idgrupo;
 		return this;
 	}
@@ -874,6 +868,7 @@ public class ColegiadoItem {
 	public void setPublicidad(String publicidad) {
 		this.publicidad = publicidad;
 	}
+
 	/**
 	 *
 	 */
@@ -926,6 +921,7 @@ public class ColegiadoItem {
 		this.comisiones = comisiones;
 	}
 	
+
 	public String getSituacionresidente() {
 		return situacionresidente;
 	}
@@ -941,6 +937,7 @@ public class ColegiadoItem {
 	public void setComunitario(String comunitario) {
 		this.comunitario = comunitario;
 	}
+
 
 	/**
 	 *
@@ -1155,6 +1152,7 @@ public class ColegiadoItem {
 	    return o.toString().replace("\n", "\n    ");
 	}
 
+
 	public ComboEtiquetasItem[] getEtiquetas() {
 		return etiquetas;
 	}
@@ -1187,11 +1185,5 @@ public class ColegiadoItem {
 		this.idEstado = idEstado;
 	}
 
-
-
-
-
-
-
-	
 }
+

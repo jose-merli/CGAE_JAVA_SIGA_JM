@@ -14,19 +14,26 @@ import org.itcgae.siga.db.entities.AdmLenguajes;
 import org.itcgae.siga.db.entities.AdmLenguajesExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioExample;
 import org.itcgae.siga.db.mappers.AdmLenguajesMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
+import org.itcgae.siga.db.mappers.CenClienteMapper;
+import org.itcgae.siga.db.mappers.CenColegiadoMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.gen.services.IDiccionarioService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-
-
-
 
 
 @Service
@@ -41,21 +48,70 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 	@Autowired
 	private AdmUsuariosMapper admUsuariosMapper;
 	
+	@Autowired
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private CenPersonaMapper cenPersonaMapper;
+	
+	@Autowired
+	private CenColegiadoMapper cenColegiadoMapper;
+	
+	@Autowired
+	private CenClienteMapper cenClienteMapper;
+	
 	@Override
-	public DiccionarioDTO getDiccionario(String lenguaje) {
+	public DiccionarioDTO getDiccionario(String lenguaje,HttpServletRequest request) {
 		DiccionarioDTO response = new DiccionarioDTO();
 		// Si nos viene un lenguaje predefinido lo cargamos
 		if (null != lenguaje && !lenguaje.equals("")) {
+			
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+			
+			CenPersonaExample examplePersona = new CenPersonaExample();
+			examplePersona.createCriteria().andNifcifEqualTo(dni);
+			List<CenPersona> personaList = cenPersonaMapper.selectByExample(examplePersona);
+			
+			CenColegiado colegiado = null;
+			if(personaList.size() > 0){
+				CenPersona persona = personaList.get(0);
+				CenColegiadoKey key = new CenColegiadoKey();
+				key.setIdinstitucion(idInstitucion);
+				key.setIdpersona(persona.getIdpersona());
+				colegiado = cenColegiadoMapper.selectByPrimaryKey(key);
+				
+			}
+			CenCliente cliente = null;
+			if(colegiado != null){
+				CenClienteKey cke = new CenClienteKey();
+				cke.setIdinstitucion(idInstitucion);
+				cke.setIdpersona(colegiado.getIdpersona());
+				cliente = cenClienteMapper.selectByPrimaryKey(cke);
+			}
+			
+		
+			
 			List<DiccionarioItem> diccionarioResponse = new ArrayList<DiccionarioItem>();
 			AdmLenguajesExample lenguajeExample = new AdmLenguajesExample();
 			lenguajeExample.createCriteria().andCodigoextEqualTo(lenguaje.toUpperCase());
-			List<AdmLenguajes> admLenguajes = lenguajesMapper.selectByExample(lenguajeExample );
+			List<AdmLenguajes> admLenguajes = lenguajesMapper.selectByExample(lenguajeExample);
+			
 			if (null != admLenguajes && !admLenguajes.isEmpty()) {
+				
 				AdmLenguajes admLenguaje = admLenguajes.get(0);
 				GenDiccionarioExample example = new GenDiccionarioExample();
-				example.createCriteria().andIdlenguajeEqualTo(admLenguaje.getIdlenguaje());
+				
+				if(cliente.getIdlenguaje()!= null){
+					example.createCriteria().andIdlenguajeEqualTo(cliente.getIdlenguaje());
+				}else{
+					example.createCriteria().andIdlenguajeEqualTo(admLenguaje.getIdlenguaje());
+				}
+				
 				example.setOrderByClause(" IDRECURSO ASC");
 				List<GenDiccionario> diccionarios = diccionarioMapper.selectByExample(example);
+				
 				if (null != diccionarios && !diccionarios.isEmpty()) {
 					DiccionarioItem diccionarioItemResponse = new DiccionarioItem();
 					HashMap<String,HashMap<String, String>> diccionariosItem = new HashMap<String,HashMap<String, String>>();
@@ -118,13 +174,33 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 
 	@Override
 	public UsuarioDTO getUsuario(HttpServletRequest request) {
-		// TODO Auto-generated method stub
 		
-
+		
 		// Obtener idInstitucion del certificado y idUsuario del certificado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		CenPersonaExample examplePersona = new CenPersonaExample();
+		examplePersona.createCriteria().andNifcifEqualTo(dni);
+		List<CenPersona> personaList = cenPersonaMapper.selectByExample(examplePersona);
+		
+		CenColegiado colegiado = null;
+		if(personaList.size() > 0){
+			CenPersona persona = personaList.get(0);
+			CenColegiadoKey key = new CenColegiadoKey();
+			key.setIdinstitucion(idInstitucion);
+			key.setIdpersona(persona.getIdpersona());
+			colegiado = cenColegiadoMapper.selectByPrimaryKey(key);
+			
+		}
+		CenCliente cliente = null;
+		if(colegiado != null){
+			CenClienteKey cke = new CenClienteKey();
+			cke.setIdinstitucion(idInstitucion);
+			cke.setIdpersona(colegiado.getIdpersona());
+			cliente = cenClienteMapper.selectByPrimaryKey(cke);
+		}
 		
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios .createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
@@ -140,12 +216,15 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 		
 		usuarioResponse.setNif(usuario.getNif());
 		usuarioResponse.setNombreApellidos(usuario.getDescripcion());
+		if(cliente!= null){
+			usuarioResponse.setIdLenguaje(cliente.getIdlenguaje());
+		}else{
+			usuarioResponse.setIdLenguaje(usuario.getIdlenguaje());
+		}
 		usuarioResponse.setIdLenguaje(usuario.getIdlenguaje());
 		usuarioResponse.setIdInstitucion(String.valueOf(usuario.getIdinstitucion()));
 		usuarioItem.add(usuarioResponse);
-		
-		
-		response.setUsuarioItem(usuarioItem );
+		response.setUsuarioItem(usuarioItem);
 		
 		return response;
 	}
