@@ -127,7 +127,7 @@ public class ConsultasController {
 	}
 	
 	
-	@RequestMapping(value = "/confGeneral",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/confConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Error> guardarConsulta(HttpServletRequest request, @RequestBody ConsultaItem consulta) {
 		
 		Error response = _consultasService.guardarConsulta(request, consulta);
