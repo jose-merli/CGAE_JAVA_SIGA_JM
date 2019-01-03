@@ -820,6 +820,12 @@ public class MenuServiceImpl implements IMenuService {
 		comboItem.setLabel(letrado);
 		comboItem.setValue(letrado);
 		return comboItem;
+	}
+
+	@Override
+	public UpdateResponseDTO setIdiomaUsuario(HttpServletRequest request, String idLenguaje) {
+		// TODO Auto-generated method stub
+		return null;
 	}	
 	
 
