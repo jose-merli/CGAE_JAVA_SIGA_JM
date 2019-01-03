@@ -446,7 +446,6 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT("PER.APELLIDOS2 AS APELLIDO2");
 		sql.SELECT("PER.NIFCIF AS NIF"); 
 		sql.FROM("cen_persona per");
-		sql.INNER_JOIN("cen_colegiado col on per.idPersona = col.idpersona and col.idInstitucion =" + idInstitucion);
 		sql.WHERE("per.IDPERSONA = '" + idPersona + "'");
 
 		return sql.toString();

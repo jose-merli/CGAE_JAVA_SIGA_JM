@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.PysFormapagoMapper;
 import org.itcgae.siga.db.services.form.providers.PysFormapagoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -21,4 +22,13 @@ public interface PysFormapagoExtendsMapper extends PysFormapagoMapper{
 		@Result(column = "DESCRIPCION", property = "valor", jdbcType = JdbcType.VARCHAR),
 	})
 	List<StringDTO> getWayToPay(String idLenguaje);
+
+	@SelectProvider(type = PysFormapagoSqlExtendsProvider.class, method = "getWayToPayWithIdFormapago")
+	@Results({
+		@Result(column = "IDFORMAPAGO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+
+	})
+	List<ComboItem> getWayToPayWithIdFormapago(String idLenguaje);
+
 }
