@@ -392,11 +392,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setDescripcion(consultaDTO.getNombre());
 						consulta.setIdobjetivo(Long.parseLong(consultaDTO.getIdObjetivo()));
 						consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
-						if(consultaDTO.getGenerica().equals("1")){
-							consulta.setGeneral("S");
-						}else{
-							consulta.setGeneral("N");
-						}
+						consulta.setGeneral(consulta.getGeneral());
 						consulta.setFechamodificacion(new Date());
 						consulta.setUsumodificacion(usuario.getIdusuario());
 						switch(consultaDTO.getIdObjetivo().toString()){
@@ -419,6 +415,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						}
 						_conConsultaMapper.insert(consulta);
 						respuesta.setMessage("Consulta creada");
+						respuesta.setCode(200);
 					}else{
 						ConConsultaKey key = new ConConsultaKey();
 						key.setIdconsulta(Long.parseLong(consultaDTO.getIdConsulta()));
@@ -427,11 +424,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
 						consulta.setDescripcion(consultaDTO.getNombre());
 						consulta.setObservaciones(consultaDTO.getDescripcion());
-						if(consultaDTO.getGenerica().equals("1")){
-							consulta.setGeneral("S");
-						}else{
-							consulta.setGeneral("N");
-						}
+						consulta.setGeneral(consulta.getGeneral());
 						consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
 						switch(consultaDTO.getIdObjetivo()){
 						case "1":
@@ -458,13 +451,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 							if(!camposIncorrectos){
 								respuesta.setCode(400);
 								respuesta.setMessage("La estructura de la consulta no es correcta");
+							}else{
+								respuesta.setCode(200);
+								respuesta.setMessage("Consulta actualizada");
 							}
 						}else{
 							respuesta.setCode(200);
 							respuesta.setMessage("Consulta actualizada");
 						}
-						respuesta.setCode(200);
-						respuesta.setMessage("Consulta actualizada");
 						
 					}
 					
