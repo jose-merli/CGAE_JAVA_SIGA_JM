@@ -133,6 +133,8 @@ public class ConsultasController {
 		Error response = _consultasService.guardarConsulta(request, consulta);
 		if(response.getCode()==200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else if(response.getCode()==400)
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		

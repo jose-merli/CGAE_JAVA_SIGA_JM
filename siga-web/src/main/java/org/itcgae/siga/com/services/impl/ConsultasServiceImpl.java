@@ -648,10 +648,10 @@ public class ConsultasServiceImpl implements IConsultasService{
 	public boolean comprobarEtiquetas(String sentencia){
 		boolean etiquetasInsuficientes = false;
 		
-		if(!sentencia.contains("<SELECT>") && !sentencia.contains("</SELECT>")){
+		if((!sentencia.contains("<SELECT>") && !sentencia.contains("</SELECT>")) || !sentencia.contains("SELECT")){
 			etiquetasInsuficientes = true;
 		}
-		if(!sentencia.contains("<FROM>") && !sentencia.contains("</FROM>")){
+		if(!sentencia.contains("<FROM>") && !sentencia.contains("</FROM>") || !sentencia.contains("FROM")){
 			etiquetasInsuficientes = true;
 		}
 		return etiquetasInsuficientes;
