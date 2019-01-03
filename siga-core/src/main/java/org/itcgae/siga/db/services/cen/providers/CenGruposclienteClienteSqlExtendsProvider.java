@@ -28,8 +28,9 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", "'" +idUsuario + "'");
 		sql.VALUES("IDINSTITUCION_GRUPO", "'" +idInstitucion+ "'");
-		sql.VALUES("FECHA_BAJA", "'" + etiqueta.getFechaBaja() + "'");
-		sql.VALUES("FECHA_INICIO", "'" + etiqueta.getFechaInicio() + "'");
+		sql.VALUES("FECHA_BAJA", "TO_DATE('" + etiqueta.getFechaBaja() + "','DD/MM/YYYY')");
+		sql.VALUES("FECHA_INICIO", "TO_DATE('" + etiqueta.getFechaInicio() + "','DD/MM/YYYY')");
+		
 		return sql.toString();
 	}
 	
@@ -53,7 +54,7 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 	
 	public String insertSelectiveForUpdateLegalPerson(ComboEtiquetasItem etiqueta, String idPersona, String idInstitucion, String idUsuario) {
 		SQL sql = new SQL();
-		
+
 		sql.INSERT_INTO("CEN_GRUPOSCLIENTE_CLIENTE");
 		sql.VALUES("IDPERSONA", "'" + idPersona + "'");
 		sql.VALUES("IDINSTITUCION", "'" + idInstitucion + "'");
@@ -61,8 +62,11 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", "'" +idUsuario + "'");
 		sql.VALUES("IDINSTITUCION_GRUPO", "'" +idInstitucion+ "'");
-		sql.VALUES("FECHA_BAJA", "'" + etiqueta.getFechaBaja() + "'");
-		sql.VALUES("FECHA_INICIO", "'" + etiqueta.getFechaInicio() + "'");
+//		sql.VALUES("FECHA_BAJA", "'" + etiqueta.getFechaBaja() + "'");
+//		sql.VALUES("FECHA_INICIO", "'" + etiqueta.getFechaInicio() + "'");
+		sql.VALUES("FECHA_BAJA", "TO_DATE('" + etiqueta.getFechaBaja() + "','DD/MM/YYYY')");
+		sql.VALUES("FECHA_INICIO", "TO_DATE('" + etiqueta.getFechaInicio() + "','DD/MM/YYYY')");
+		
 		return sql.toString();
 	}
 	
