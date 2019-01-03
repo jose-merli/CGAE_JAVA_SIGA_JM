@@ -2,12 +2,13 @@ package org.itcgae.siga.ws.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPConstants;
+import javax.xml.soap.SOAPException;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.xmlbeans.XmlBeansMarshaller;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.springframework.ws.config.annotation.EnableWs;
@@ -16,12 +17,9 @@ import org.springframework.ws.server.EndpointAdapter;
 import org.springframework.ws.server.EndpointMapping;
 import org.springframework.ws.server.endpoint.adapter.GenericMarshallingMethodEndpointAdapter;
 import org.springframework.ws.server.endpoint.mapping.PayloadRootAnnotationMethodEndpointMapping;
+import org.springframework.ws.soap.saaj.SaajSoapMessageFactory;
 import org.springframework.ws.soap.server.SoapMessageDispatcher;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
-import org.springframework.ws.transport.http.MessageDispatcherServlet;
-import org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition;
-import org.springframework.xml.xsd.XsdSchemaCollection;
-import org.springframework.xml.xsd.commons.CommonsXsdSchemaCollection;
 
 
 @EnableWs
@@ -73,5 +71,22 @@ public class WebServiceClientConfig extends WsConfigurerAdapter {
 
 		return httpComponentsMessageSender;
 	}
+
+	
+
+	    @Bean
+	    public MutualidadClient webServiceTemplateMutualidad() throws SOAPException {
+	        MutualidadClient client = new MutualidadClient();
+	        //request.setId(id);
+	    	WebServiceTemplate webServiceTemplate = new WebServiceTemplate();
+	    	MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
+	    	SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
+	    	webServiceTemplate.setMessageFactory(newSoapMessageFactory);
+	    	webServiceTemplate.setDefaultUri("https://www.mutualidadabogacia.net/IntegracionColegiosDesarrollo/Integracion_Metodos.svc");
+	    	webServiceTemplate.setMarshaller(new XmlBeansMarshaller());
+	    	webServiceTemplate.setUnmarshaller(new XmlBeansMarshaller());
+	    	client.setWebServiceTemplate(webServiceTemplate);
+	        return client;
+	    }
 
 }

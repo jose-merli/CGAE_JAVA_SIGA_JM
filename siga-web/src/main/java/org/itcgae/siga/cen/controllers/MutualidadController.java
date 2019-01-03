@@ -7,6 +7,7 @@ import org.itcgae.siga.DTOs.cen.EstadoMutualistaDTO;
 import org.itcgae.siga.DTOs.cen.EstadoSolicitudDTO;
 import org.itcgae.siga.DTOs.cen.MutualidadCombosDTO;
 import org.itcgae.siga.DTOs.cen.MutualidadResponseDTO;
+import org.itcgae.siga.DTOs.ws.mutualidad.RespuestaMutualidad;
 import org.itcgae.siga.cen.services.IMutualidadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,12 +45,12 @@ public class MutualidadController {
 	}
 	
 	@RequestMapping(value="/enums",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<MutualidadCombosDTO> getEnums() {
+	ResponseEntity<RespuestaMutualidad> getEnums() {
 		
-		MutualidadCombosDTO response = _mutualidadService.getEnums();
+		RespuestaMutualidad response = _mutualidadService.getEnums();
 		if(response!=null)
-			return new ResponseEntity<MutualidadCombosDTO>(response, HttpStatus.OK);
-		else return new ResponseEntity<MutualidadCombosDTO>(response, HttpStatus.FORBIDDEN);
+			return new ResponseEntity<RespuestaMutualidad>(response, HttpStatus.OK);
+		else return new ResponseEntity<RespuestaMutualidad>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value="/solicitudPolizaAccuGratuitos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
