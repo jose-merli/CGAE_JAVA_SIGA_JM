@@ -3,6 +3,8 @@ package org.itcgae.siga.com.services.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -582,7 +584,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 						respuesta.setMessage("Campos incorrectos");
 					}else{
 						consulta.setSentencia(consultaDTO.getSentencia());
-						_conConsultaMapper.updateByPrimaryKey(consulta);
+						consulta.setFechamodificacion(new Date());
+						consulta.setUsumodificacion(usuario.getIdusuario());
+						_conConsultaMapper.updateByPrimaryKeyWithBLOBs(consulta);
 						respuesta.setCode(200);
 						respuesta.setMessage("Consulta guardada");
 					}
@@ -647,11 +651,17 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 	public boolean comprobarEtiquetas(String sentencia){
 		boolean etiquetasInsuficientes = false;
+//		Pattern regexSelect = Pattern.compile("\\bSELECT\\b");
+//		Matcher match = regexSelect.matcher(sentencia);
+//		
+//		if(!match.find()){
+//			etiquetasInsuficientes = true;
+//		}
 		
-		if((!sentencia.contains("<SELECT>") && !sentencia.contains("</SELECT>")) || !sentencia.contains("SELECT")){
+		if(!sentencia.contains("<SELECT>") || !sentencia.contains("</SELECT>") || !sentencia.contains("SELECT")){
 			etiquetasInsuficientes = true;
 		}
-		if(!sentencia.contains("<FROM>") && !sentencia.contains("</FROM>") || !sentencia.contains("FROM")){
+		if(!sentencia.contains("<FROM>") || !sentencia.contains("</FROM>") || !sentencia.contains("FROM")){
 			etiquetasInsuficientes = true;
 		}
 		return etiquetasInsuficientes;
