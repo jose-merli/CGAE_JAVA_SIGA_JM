@@ -24,6 +24,7 @@ public class GenDiccionarioSqlExtendsProvider extends GenDiccionarioSqlProvider{
 	}
 	
 	
+	
 
 	public String searchLabels(int numPagina, EtiquetaSearchDTO etiquetaSearchDTO) {
 		SQL sql = new SQL();

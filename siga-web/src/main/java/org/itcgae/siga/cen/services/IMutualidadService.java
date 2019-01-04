@@ -2,6 +2,7 @@ package org.itcgae.siga.cen.services;
 
 
 import org.itcgae.siga.DTOs.cen.CuotaYCapObjetivoDTO;
+import org.itcgae.siga.DTOs.cen.CuotaYCapitalObjetivoResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosSolicitudGratuitaDTO;
 import org.itcgae.siga.DTOs.cen.EstadoMutualistaDTO;
 import org.itcgae.siga.DTOs.cen.EstadoSolicitudDTO;
@@ -15,6 +16,6 @@ public interface IMutualidadService {
 	public MutualidadCombosDTO getEnums();
 	public MutualidadResponseDTO MGASolicitudPolizaAccuGratuitos(DatosSolicitudGratuitaDTO datosSolicitud);
 	public MutualidadResponseDTO MGASolicitudPolizaProfesional(DatosSolicitudGratuitaDTO datosSolicitud);
-	public MutualidadResponseDTO ObtenerCuotaYCapObjetivo(CuotaYCapObjetivoDTO datosCuota);
+	public CuotaYCapitalObjetivoResponseDTO ObtenerCuotaYCapObjetivo(CuotaYCapObjetivoDTO datosCuota);
 	
 }

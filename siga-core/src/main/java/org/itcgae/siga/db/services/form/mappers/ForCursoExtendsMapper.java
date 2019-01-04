@@ -42,7 +42,10 @@ public interface ForCursoExtendsMapper extends ForCursoMapper {
 			@Result(column = "FECHAIMPARTICIONHASTA", property = "fechaImparticionHasta", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBREAPELLIDOSFORMADOR", property = "nombreApellidosFormador", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FLAGARCHIVADO", property = "flagArchivado", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "AUTOVALIDACIONINSCRIPCION", property = "autovalidacionInscripcion", jdbcType = JdbcType.NUMERIC)
+			@Result(column = "AUTOVALIDACIONINSCRIPCION", property = "autovalidacionInscripcion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "ENCUESTASATISFACCION", property = "encuesta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INFORMACIONADICIONAL", property = "adicional", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DOCUMENTACIONADJUNTA", property = "adjunto", jdbcType = JdbcType.VARCHAR)
 	
 	})
 	List<CursoItem> selectCursos(Short idInstitucion, CursoItem cursoItem);
@@ -78,7 +81,10 @@ public interface ForCursoExtendsMapper extends ForCursoMapper {
 			@Result(column = "FECHAIMPARTICIONHASTA", property = "fechaImparticionHasta", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBREAPELLIDOSFORMADOR", property = "nombreApellidosFormador", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FLAGARCHIVADO", property = "flagArchivado", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "AUTOVALIDACIONINSCRIPCION", property = "autovalidacionInscripcion", jdbcType = JdbcType.NUMERIC)
+			@Result(column = "AUTOVALIDACIONINSCRIPCION", property = "autovalidacionInscripcion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "ENCUESTASATISFACCION", property = "encuesta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INFORMACIONADICIONAL", property = "adicional", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "DOCUMENTACIONADJUNTA", property = "adjunto", jdbcType = JdbcType.VARCHAR)
 	
 	})
 	CursoItem searchCourseByIdcurso(String idCurso, Short idInstitucion);

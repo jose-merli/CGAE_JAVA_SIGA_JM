@@ -2,6 +2,7 @@ package org.itcgae.siga.cen.controllers;
 
 
 import org.itcgae.siga.DTOs.cen.CuotaYCapObjetivoDTO;
+import org.itcgae.siga.DTOs.cen.CuotaYCapitalObjetivoResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosSolicitudGratuitaDTO;
 import org.itcgae.siga.DTOs.cen.EstadoMutualistaDTO;
 import org.itcgae.siga.DTOs.cen.EstadoSolicitudDTO;
@@ -71,12 +72,12 @@ public class MutualidadController {
 	}
 	
 	@RequestMapping(value="/obtenerCuotaYCapObjetivo",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<MutualidadResponseDTO> obtenerCuotaYCapObjetivo(@RequestBody CuotaYCapObjetivoDTO datosCuota) {
+	ResponseEntity<CuotaYCapitalObjetivoResponseDTO> obtenerCuotaYCapObjetivo(@RequestBody CuotaYCapObjetivoDTO datosCuota) {
 		
-		MutualidadResponseDTO response = _mutualidadService.ObtenerCuotaYCapObjetivo(datosCuota);
+		CuotaYCapitalObjetivoResponseDTO response = _mutualidadService.ObtenerCuotaYCapObjetivo(datosCuota);
 		if(response!=null)
-			return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.OK);
-		else return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.FORBIDDEN);
+			return new ResponseEntity<CuotaYCapitalObjetivoResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<CuotaYCapitalObjetivoResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 
 }

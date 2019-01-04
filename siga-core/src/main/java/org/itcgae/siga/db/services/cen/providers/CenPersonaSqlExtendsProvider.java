@@ -50,7 +50,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT("NVL(CA.DESCRIPCION, DECODE(PER.IDTIPOIDENTIFICACION,20,'SOCIEDAD','NO COLEGIADO')) AS ESTADOCOLEGIAL");
 		//sql.SELECT("CA.DESCRIPCION AS ESTADOCOLEGIAL");
 		sql.SELECT("DECODE(COL.SITUACIONRESIDENTE,'0','NO','1','SI') AS RESIDENTE");
-		sql.SELECT("NVL(DIR.IDPROVINCIA,00)  AS IDPROVINCIA");
+		sql.SELECT("DIR.IDPROVINCIA  AS IDPROVINCIA");
 		sql.SELECT("ACT.IDACTIVIDADPROFESIONAL");
 		
 		sql.FROM("CEN_PERSONA PER");
@@ -446,7 +446,6 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT("PER.APELLIDOS2 AS APELLIDO2");
 		sql.SELECT("PER.NIFCIF AS NIF"); 
 		sql.FROM("cen_persona per");
-		sql.INNER_JOIN("cen_colegiado col on per.idPersona = col.idpersona and col.idInstitucion =" + idInstitucion);
 		sql.WHERE("per.IDPERSONA = '" + idPersona + "'");
 
 		return sql.toString();

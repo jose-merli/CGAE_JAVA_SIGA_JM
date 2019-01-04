@@ -9,6 +9,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.ForTemacursoMapper;
 import org.itcgae.siga.db.services.form.providers.ForTemacursoSqlExtendsProvider;
+import org.itcgae.siga.db.services.form.providers.ForTiposervicioCursoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -22,4 +23,18 @@ public interface ForTemacursoExtendsMapper extends ForTemacursoMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> distinctTemaCurso(String idLenguaje);
+	
+	@SelectProvider(type = ForTemacursoSqlExtendsProvider.class, method = "getTopicsCourse")
+	@Results({
+		@Result(column = "IDTEMACURSO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> getTopicsCourse(String idLenguaje, String idInstitucion);
+	
+	@SelectProvider(type = ForTemacursoSqlExtendsProvider.class, method = "getTopicsSpecificCourse")
+	@Results({
+		@Result(column = "IDTEMACURSO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> getTopicsSpecificCourse(String idInstitucion, String idCurso);
 }

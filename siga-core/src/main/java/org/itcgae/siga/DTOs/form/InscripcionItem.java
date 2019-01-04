@@ -35,6 +35,8 @@ public class InscripcionItem {
 	private String fechaSolicitud;
 	private Long idPersona;
 	private String nombrePersona;
+	private String nifPersona;
+	private String formaPagoNombre;
 	
 	// 0 --> Aprobar
 	// 1 --> Cancelar
@@ -412,6 +414,22 @@ public class InscripcionItem {
 		this.idCurso = idCurso;
 	}
 
+	public String getNifPersona() {
+		return nifPersona;
+	}
+
+	public void setNifPersona(String nifPersona) {
+		this.nifPersona = nifPersona;
+	}
+
+	public String getFormaPagoNombre() {
+		return formaPagoNombre;
+	}
+
+	public void setFormaPagoNombre(String formaPagoNombre) {
+		this.formaPagoNombre = formaPagoNombre;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -459,6 +477,10 @@ public class InscripcionItem {
 		result = prime * result + ((formaPago == null) ? 0 : formaPago.hashCode());
 		result = prime * result + ((errores == null) ? 0 : errores.hashCode());
 		result = prime * result + ((idCurso == null) ? 0 : idCurso.hashCode());
+		result = prime * result + ((nifPersona == null) ? 0 : nifPersona.hashCode());
+		result = prime * result + ((formaPagoNombre == null) ? 0 : formaPagoNombre.hashCode());
+
+
 		return result;
 	}
 
@@ -683,6 +705,16 @@ public class InscripcionItem {
 				return false;
 		} else if (!idCurso.equals(other.idCurso))
 			return false;
+		if (nifPersona == null) {
+			if (other.nifPersona != null)
+				return false;
+		} else if (!nifPersona.equals(other.nifPersona))
+			return false;
+		if (formaPagoNombre == null) {
+			if (other.formaPagoNombre != null)
+				return false;
+		} else if (!formaPagoNombre.equals(other.formaPagoNombre))
+			return false;
 		return true;
 	}
 	
@@ -704,7 +736,8 @@ public class InscripcionItem {
 				+ ", totales=" + totales + ", fechaInscripcionDesdeFormat=" + fechaInscripcionDesdeFormat
 				+ ", fechaInscripcionHastaFormat=" + fechaInscripcionHastaFormat + ", fechaImparticionDesdeFormat="
 				+ fechaImparticionDesdeFormat + ", fechaImparticionHastaFormat=" + fechaImparticionHastaFormat
-				+ ", nombrePersona=" + nombrePersona + ", formaPago=" + formaPago + ", errores=" + errores + ", idCurso=" + idCurso  + "]";
+				+ ", nombrePersona=" + nombrePersona + ", formaPago=" + formaPago + ", errores=" + errores + ", idCurso=" + idCurso
+				+ ", nifPersona =" + nifPersona + ", formaPagoNombre =" + formaPagoNombre + "]";
 
 	}
 	

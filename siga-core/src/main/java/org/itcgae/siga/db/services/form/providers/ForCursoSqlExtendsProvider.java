@@ -39,6 +39,9 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		sql.SELECT("CURSO.NUMEROPLAZAS as PLAZASDISPONIBLES");
 		sql.SELECT("CURSO.AUTOVALIDACIONINSCRIPCION");
 		sql.SELECT("CURSO.MINIMOASISTENCIA");
+		sql.SELECT("CURSO.ENCUESTASATISFACCION");
+		sql.SELECT("CURSO.INFORMACIONADICIONAL");
+		sql.SELECT("CURSO.DOCUMENTACIONADJUNTA");
 		
 		sql.FROM("FOR_CURSO CURSO");
 		
@@ -198,6 +201,9 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		sql.SELECT("CURSO.NUMEROPLAZAS as plazasDisponibles");
 		sql.SELECT("CURSO.AUTOVALIDACIONINSCRIPCION");
 		sql.SELECT("CURSO.MINIMOASISTENCIA");
+		sql.SELECT("CURSO.ENCUESTASATISFACCION");
+		sql.SELECT("CURSO.INFORMACIONADICIONAL");
+		sql.SELECT("CURSO.DOCUMENTACIONADJUNTA");
 		
 		sql.FROM("FOR_CURSO CURSO");
 		
@@ -259,6 +265,18 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
  		
  		if(null != cursoItem.getAutovalidacionInscripcion()) {
 			sql.SET("AUTOVALIDACIONINSCRIPCION = '" + cursoItem.getAutovalidacionInscripcion() + "'");
+		}
+ 		
+ 		if(cursoItem.getEncuesta() != null) {
+			sql.SET("ENCUESTASATISFACCION = '" + cursoItem.getEncuesta() + "'");
+		}
+		
+		if(cursoItem.getAdicional() != null) {
+			sql.SET("INFORMACIONADICIONAL = '" + cursoItem.getAdicional() + "'");
+		}
+		
+		if(cursoItem.getAdjunto() != null) {
+			sql.SET("DOCUMENTACIONADJUNTA = '" + cursoItem.getAdjunto() + "'");
 		}
  		
  		sql.WHERE("IDCURSO = '" + cursoItem.getIdCurso() + "'");

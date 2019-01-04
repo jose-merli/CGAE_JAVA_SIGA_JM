@@ -51,12 +51,12 @@
 		<dependency>
 			<groupId>org.redabogacia</groupId>
 			<artifactId>redabogacia-access-control-core</artifactId>
-			<version>1.1.8</version>
+			<version>1.1.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.redabogacia</groupId>
 			<artifactId>redabogacia-access-control-asn1</artifactId>
-			<version>1.1.8</version>
+			<version>1.1.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -98,6 +98,7 @@
 			<artifactId>axis2-xmlbeans</artifactId>
 			<version>1.7.7</version>
 		</dependency>
+
 		<dependency>
 		    <groupId>org.apache.poi</groupId>
 		    <artifactId>poi</artifactId>

@@ -18,9 +18,12 @@ public class SigaConstants {
 	public static String COMBO_PERFILES = "perfiles";
 	public static String TIPO_PERSONA_NOTARIO = "Notario";
 
+	
+	public static Integer IdUsuarioPuertaAtras = 1;
 	public static String OK = "OK";
 	public static String KO = "KO";
 	public static String InstitucionGeneral = "2000";
+	public static String Personal = "Personal";
 
 	public static String DB_FALSE = "0";
 	public static String DB_TRUE = "1";

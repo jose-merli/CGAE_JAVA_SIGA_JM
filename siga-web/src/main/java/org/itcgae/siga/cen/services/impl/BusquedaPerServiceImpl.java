@@ -141,88 +141,88 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 						"searchJuridica() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenNocolegiadoExtendsMapper para búsqueda de personas juridicas por filtro");
 
 				//Llamamos al WS de Sociedades para buscar personas jurídicas.
-				if (null == busquedaJuridicaItems || busquedaJuridicaItems.size()==0) {
-					AdmConfigExample example = new AdmConfigExample();
-					example.createCriteria().andClaveEqualTo("url.ws.sociedades");
-					List<AdmConfig> config = admConfigMapper.selectByExample(example );
-					
-					if (null != config && config.size()>0) {
-						GetSociedadesPublicadorRequestDocument requestSociedades = GetSociedadesPublicadorRequestDocument.Factory.newInstance();
-						
-						GetSociedadesPublicadorRequest requestBody = GetSociedadesPublicadorRequest.Factory.newInstance();
-						if (null != busquedaPerJuridicaSearchDTO && null != busquedaPerJuridicaSearchDTO.getNif()) {
-							requestBody.setNIF(busquedaPerJuridicaSearchDTO.getNif());						
-						}
-						if (null != busquedaPerJuridicaSearchDTO && null != busquedaPerJuridicaSearchDTO.getDenominacion()) {
-							
-							requestBody.setDenominacion(busquedaPerJuridicaSearchDTO.getDenominacion());						
-						}
-						if (null != busquedaPerJuridicaSearchDTO && null != busquedaPerJuridicaSearchDTO.getTipo()) {
-							requestBody.setTipoSociedad(busquedaPerJuridicaSearchDTO.getTipo());						
-						}					
-						if (null != busquedaPerJuridicaSearchDTO.getIdInstitucion() && busquedaPerJuridicaSearchDTO.getIdInstitucion().length>0) {
-							Colegio[] colegios = new Colegio[busquedaPerJuridicaSearchDTO.getIdInstitucion().length];
-							for (int i = 0; i < busquedaPerJuridicaSearchDTO.getIdInstitucion().length; i++) {
-								List<CenInstitucion> instituciones = institucionesService.getCodExternoByidInstitucion(busquedaPerJuridicaSearchDTO.getIdInstitucion()[i]);
-								
-								if (null != instituciones && instituciones.size()>0) {
-									Colegio colegio = Colegio.Factory.newInstance();
-									colegio.setCodigoColegio(instituciones.get(0).getCodigoext());
-									colegios[i] = colegio;
-								}
-								
-								
-							}
-							requestBody.setColegioArray(colegios);
-							
-						}
-						requestBody.setEntidadOrigen("SIGA");
-						requestBody.setNumPagina(Short.valueOf("1"));
-						requestBody.setNumeroPeticion("1");
-						requestBody.setVersionEsquema("1");
-						Calendar fechaDesde = new GregorianCalendar(2000, Calendar.JANUARY, 01, 12, 00, 00);
-						requestBody.setFechaDesde(fechaDesde);
-						
-						Calendar fechaHasta = new GregorianCalendar(2050, Calendar.JANUARY, 01, 12, 00, 00);
-						requestBody.setFechaHasta(fechaHasta);
-						requestSociedades.setGetSociedadesPublicadorRequest(requestBody);
-						
-						GetSociedadesPublicadorResponseDocument registroSociedades = clienteRegistroSociedades.getListaSociedades(requestSociedades,config.get(0).getValor());
-						GetSociedadesPublicadorResponse responseSociedades = GetSociedadesPublicadorResponse.Factory.newInstance();
-						responseSociedades = registroSociedades.getGetSociedadesPublicadorResponse();
-						SociedadesColegio[] sociedadesList = responseSociedades.getSociedadesColegioArray();
-						if (null != sociedadesList && sociedadesList.length>0) {
-							for (int i = 0; i < sociedadesList.length; i++) {
-								BusquedaPerJuridicaItem busquedaJuridica = new BusquedaPerJuridicaItem();
-								if (null != sociedadesList[i].getRegistroSociedadArray() && sociedadesList[i].getRegistroSociedadArray().length>0) {
-									for (int j = 0; j < sociedadesList[i].getRegistroSociedadArray().length; j++) {
-										if (null != sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion()) {
-											busquedaJuridica = new BusquedaPerJuridicaItem();
-											busquedaJuridica.setDenominacion(sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getDatosSociedad().getDenominacion());
-											busquedaJuridica.setNif(sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getDatosSociedad().getCIFNIF());
-											busquedaJuridica.setFechaConstitucion(sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getFechaConstitucion().getTime());
-											busquedaJuridica.setSociedadProfesional("1");
-											if (null != sociedadesList[i].getColegio()) {
-												List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(sociedadesList[i].getColegio().getCodigoColegio());
-												if (null != instituciones && instituciones.size()>0) {
-													busquedaJuridica.setIdInstitucion(instituciones.get(0).getIdinstitucion().toString());
-												}
-											}
-											if (null != sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getIntegranteSociedadArray() 
-													&& sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getIntegranteSociedadArray().length>0) {
-												busquedaJuridica.setNumeroIntegrantes(String.valueOf(sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getIntegranteSociedadArray().length));
-											}
-											busquedaJuridicaItems.add(busquedaJuridica);
-										}
-									}
-								}
-							//	busquedaJuridica.setNif(sociedad.getRegistroSociedadArray()[0].getSociedadActualizacion().get);
-							//	sociedad.getRegistroSociedadArray()[1
-							}
-						}
-						//registroSociedades.getGetSociedadesPublicadorResponse()
-					}
-				}
+//				if (null == busquedaJuridicaItems || busquedaJuridicaItems.size()==0) {
+//					AdmConfigExample example = new AdmConfigExample();
+//					example.createCriteria().andClaveEqualTo("url.ws.sociedades");
+//					List<AdmConfig> config = admConfigMapper.selectByExample(example );
+//					
+//					if (null != config && config.size()>0) {
+//						GetSociedadesPublicadorRequestDocument requestSociedades = GetSociedadesPublicadorRequestDocument.Factory.newInstance();
+//						
+//						GetSociedadesPublicadorRequest requestBody = GetSociedadesPublicadorRequest.Factory.newInstance();
+//						if (null != busquedaPerJuridicaSearchDTO && null != busquedaPerJuridicaSearchDTO.getNif()) {
+//							requestBody.setNIF(busquedaPerJuridicaSearchDTO.getNif());						
+//						}
+//						if (null != busquedaPerJuridicaSearchDTO && null != busquedaPerJuridicaSearchDTO.getDenominacion()) {
+//							
+//							requestBody.setDenominacion(busquedaPerJuridicaSearchDTO.getDenominacion());						
+//						}
+//						if (null != busquedaPerJuridicaSearchDTO && null != busquedaPerJuridicaSearchDTO.getTipo()) {
+//							requestBody.setTipoSociedad(busquedaPerJuridicaSearchDTO.getTipo());						
+//						}					
+//						if (null != busquedaPerJuridicaSearchDTO.getIdInstitucion() && busquedaPerJuridicaSearchDTO.getIdInstitucion().length>0) {
+//							Colegio[] colegios = new Colegio[busquedaPerJuridicaSearchDTO.getIdInstitucion().length];
+//							for (int i = 0; i < busquedaPerJuridicaSearchDTO.getIdInstitucion().length; i++) {
+//								List<CenInstitucion> instituciones = institucionesService.getCodExternoByidInstitucion(busquedaPerJuridicaSearchDTO.getIdInstitucion()[i]);
+//								
+//								if (null != instituciones && instituciones.size()>0) {
+//									Colegio colegio = Colegio.Factory.newInstance();
+//									colegio.setCodigoColegio(instituciones.get(0).getCodigoext());
+//									colegios[i] = colegio;
+//								}
+//								
+//								
+//							}
+//							requestBody.setColegioArray(colegios);
+//							
+//						}
+//						requestBody.setEntidadOrigen("SIGA");
+//						requestBody.setNumPagina(Short.valueOf("1"));
+//						requestBody.setNumeroPeticion("1");
+//						requestBody.setVersionEsquema("1");
+//						Calendar fechaDesde = new GregorianCalendar(2000, Calendar.JANUARY, 01, 12, 00, 00);
+//						requestBody.setFechaDesde(fechaDesde);
+//						
+//						Calendar fechaHasta = new GregorianCalendar(2050, Calendar.JANUARY, 01, 12, 00, 00);
+//						requestBody.setFechaHasta(fechaHasta);
+//						requestSociedades.setGetSociedadesPublicadorRequest(requestBody);
+//						
+//						GetSociedadesPublicadorResponseDocument registroSociedades = clienteRegistroSociedades.getListaSociedades(requestSociedades,config.get(0).getValor());
+//						GetSociedadesPublicadorResponse responseSociedades = GetSociedadesPublicadorResponse.Factory.newInstance();
+//						responseSociedades = registroSociedades.getGetSociedadesPublicadorResponse();
+//						SociedadesColegio[] sociedadesList = responseSociedades.getSociedadesColegioArray();
+//						if (null != sociedadesList && sociedadesList.length>0) {
+//							for (int i = 0; i < sociedadesList.length; i++) {
+//								BusquedaPerJuridicaItem busquedaJuridica = new BusquedaPerJuridicaItem();
+//								if (null != sociedadesList[i].getRegistroSociedadArray() && sociedadesList[i].getRegistroSociedadArray().length>0) {
+//									for (int j = 0; j < sociedadesList[i].getRegistroSociedadArray().length; j++) {
+//										if (null != sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion()) {
+//											busquedaJuridica = new BusquedaPerJuridicaItem();
+//											busquedaJuridica.setDenominacion(sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getDatosSociedad().getDenominacion());
+//											busquedaJuridica.setNif(sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getDatosSociedad().getCIFNIF());
+//											busquedaJuridica.setFechaConstitucion(sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getFechaConstitucion().getTime());
+//											busquedaJuridica.setSociedadProfesional("1");
+//											if (null != sociedadesList[i].getColegio()) {
+//												List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(sociedadesList[i].getColegio().getCodigoColegio());
+//												if (null != instituciones && instituciones.size()>0) {
+//													busquedaJuridica.setIdInstitucion(instituciones.get(0).getIdinstitucion().toString());
+//												}
+//											}
+//											if (null != sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getIntegranteSociedadArray() 
+//													&& sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getIntegranteSociedadArray().length>0) {
+//												busquedaJuridica.setNumeroIntegrantes(String.valueOf(sociedadesList[i].getRegistroSociedadArray()[0].getSociedadActualizacion().getIntegranteSociedadArray().length));
+//											}
+//											busquedaJuridicaItems.add(busquedaJuridica);
+//										}
+//									}
+//								}
+//							//	busquedaJuridica.setNif(sociedad.getRegistroSociedadArray()[0].getSociedadActualizacion().get);
+//							//	sociedad.getRegistroSociedadArray()[1
+//							}
+//						}
+//						//registroSociedades.getGetSociedadesPublicadorResponse()
+//					}
+//				}
 				
 				busquedaPerJuridicaDTO.setBusquedaPerJuridicaItems(busquedaJuridicaItems);
 				

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.EventoDTO;
+import org.itcgae.siga.DTOs.form.CargaMasivaInscripcionesDTO;
 import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
@@ -127,11 +128,41 @@ public class FichaCursosController {
 	}
 	
 	@RequestMapping(value = "fichaCursos/uploadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	ResponseEntity<UpdateResponseDTO> uploadFile(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
-		UpdateResponseDTO response = fichaCursosService.uploadFileExcel(request);
+	ResponseEntity<UpdateResponseDTO> uploadFile(@RequestParam("idCurso") int idCurso, MultipartHttpServletRequest request) throws IllegalStateException, IOException{
+		UpdateResponseDTO response = fichaCursosService.uploadFileExcel(idCurso, request);
 		if (response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "fichaCursos/getMassiveLoadInscriptions",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<CargaMasivaInscripcionesDTO> getMassiveLoadInscriptions(@RequestParam("idCurso") String idCurso, HttpServletRequest request) {
+		CargaMasivaInscripcionesDTO response = fichaCursosService.getMassiveLoadInscriptions(request, idCurso);
+		return new ResponseEntity<CargaMasivaInscripcionesDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/deleteInscriptionsCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> deleteInscriptionsCourse(@RequestBody CargaMasivaInscripcionesDTO cargaMasivaInscripcionesDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaCursosService.deleteInscriptionsCourse(cargaMasivaInscripcionesDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/autovalidateInscriptionsCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> autovalidateInscriptionsCourse(@RequestBody CargaMasivaInscripcionesDTO cargaMasivaInscripcionesDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaCursosService.autovalidateInscriptionsCourse(cargaMasivaInscripcionesDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/getTopicsCourse",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getTopicsCourse(HttpServletRequest request) {
+		ComboDTO response = fichaCursosService.getTopicsCourse(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/getTopicsSpecificCourse",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getTopicsSpecificCourse(@RequestParam("idCurso") String idCurso, HttpServletRequest request) {
+		ComboDTO response = fichaCursosService.getTopicsSpecificCourse(request, idCurso);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
 }
