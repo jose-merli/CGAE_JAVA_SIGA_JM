@@ -2,12 +2,12 @@ package org.itcgae.siga.cen.controllers;
 
 
 import org.itcgae.siga.DTOs.cen.CuotaYCapObjetivoDTO;
+import org.itcgae.siga.DTOs.cen.CuotaYCapitalObjetivoResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosSolicitudGratuitaDTO;
 import org.itcgae.siga.DTOs.cen.EstadoMutualistaDTO;
 import org.itcgae.siga.DTOs.cen.EstadoSolicitudDTO;
 import org.itcgae.siga.DTOs.cen.MutualidadCombosDTO;
 import org.itcgae.siga.DTOs.cen.MutualidadResponseDTO;
-import org.itcgae.siga.DTOs.ws.mutualidad.RespuestaMutualidad;
 import org.itcgae.siga.cen.services.IMutualidadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,12 +45,12 @@ public class MutualidadController {
 	}
 	
 	@RequestMapping(value="/enums",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<RespuestaMutualidad> getEnums() {
+	ResponseEntity<MutualidadCombosDTO> getEnums() {
 		
-		RespuestaMutualidad response = _mutualidadService.getEnums();
+		MutualidadCombosDTO response = _mutualidadService.getEnums();
 		if(response!=null)
-			return new ResponseEntity<RespuestaMutualidad>(response, HttpStatus.OK);
-		else return new ResponseEntity<RespuestaMutualidad>(response, HttpStatus.FORBIDDEN);
+			return new ResponseEntity<MutualidadCombosDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<MutualidadCombosDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value="/solicitudPolizaAccuGratuitos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
@@ -72,12 +72,12 @@ public class MutualidadController {
 	}
 	
 	@RequestMapping(value="/obtenerCuotaYCapObjetivo",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<MutualidadResponseDTO> obtenerCuotaYCapObjetivo(@RequestBody CuotaYCapObjetivoDTO datosCuota) {
+	ResponseEntity<CuotaYCapitalObjetivoResponseDTO> obtenerCuotaYCapObjetivo(@RequestBody CuotaYCapObjetivoDTO datosCuota) {
 		
-		MutualidadResponseDTO response = _mutualidadService.ObtenerCuotaYCapObjetivo(datosCuota);
+		CuotaYCapitalObjetivoResponseDTO response = _mutualidadService.ObtenerCuotaYCapObjetivo(datosCuota);
 		if(response!=null)
-			return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.OK);
-		else return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.FORBIDDEN);
+			return new ResponseEntity<CuotaYCapitalObjetivoResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<CuotaYCapitalObjetivoResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 
 }
