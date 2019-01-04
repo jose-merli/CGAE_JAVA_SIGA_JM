@@ -115,6 +115,11 @@
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>
+			<groupId>org.redabogacia.ds6api</groupId>
+			<artifactId>ds6</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.redabogacia</groupId>
 			<artifactId>fusionador-personas</artifactId>
 			<version>1.0.0</version>
