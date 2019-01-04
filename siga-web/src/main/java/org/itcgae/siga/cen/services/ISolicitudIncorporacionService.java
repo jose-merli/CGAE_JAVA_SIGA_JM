@@ -21,4 +21,7 @@ public interface ISolicitudIncorporacionService {
 	public InsertResponseDTO guardarSolicitudIncorporacion (SolIncorporacionItem SolIncorporacionDTO, HttpServletRequest request);
 	public InsertResponseDTO aprobarSolicitud (Long idSolicitud, HttpServletRequest request);
 	public InsertResponseDTO denegarsolicitud (Long idSolicitud, HttpServletRequest request);
+	 public SolIncorporacionItem numColegiadoSearch(SolIncorporacionItem solIncorporacionItem, HttpServletRequest request);
+	public SolIncorporacionItem nifExistenteSearch(SolIncorporacionItem solIncorporacionItem,
+			HttpServletRequest request);
 }

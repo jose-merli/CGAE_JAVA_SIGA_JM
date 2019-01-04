@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Types;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +35,7 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBancos;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
 import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
@@ -40,6 +43,7 @@ import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
@@ -50,6 +54,7 @@ import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDocumentacionmodalidadExtendsMapper;
@@ -107,7 +112,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	private CenSolicitudincorporacionMapper _cenSolicitudincorporacionMapper;
 	
 	@Autowired
-	private CenPersonaMapper _cenPersonaMapper;
+	private CenPersonaExtendsMapper _cenPersonaMapper;
 	
 	@Autowired
 	private CenPersonaExtendsMapper _cenPersonaExtendsMapper;
@@ -122,7 +127,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	private CenCuentasbancariasMapper _cenCuentasbancariasMapper;
 	
 	@Autowired
-	private CenColegiadoMapper _cenColegiadoMapper;
+	private CenColegiadoExtendsMapper _cenColegiadoMapper;
 	
 	@Autowired
 	private CenClienteMapper _cenClienteMapper;
@@ -234,20 +239,104 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					"datosSolicitudSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			
 			if(usuarios != null && usuarios.size()>0){
-				
 				AdmUsuarios usuario = usuarios.get(0);
 				LOGGER.info("datosSolicitudSearch() / cenEstadoSolicitudExtendsMapper.selectTipoSolicitud() -> Entrada a cenEstadoSolicitudExtendsMapper para obtener los estados de solicitud");
 				solicitudIncorporacionSearchDTO.setIdInstitucion(idInstitucion.toString());
 				List<SolIncorporacionItem> SolIncorporacionItemList = _cenSolicitudincorporacionExtendsMapper.getSolicitudes(solicitudIncorporacionSearchDTO, usuario.getIdlenguaje());
 				solIncorporacionDTO.setSolIncorporacionItems(SolIncorporacionItemList);
-				
 			}
 		}
-		
 		LOGGER.info("getTipoSolicitud() -> Salida del servicio para recuperar las solicitudes de incorporación");
-		
 		return solIncorporacionDTO;
 	}
+	
+	@Override
+	public SolIncorporacionItem numColegiadoSearch(SolIncorporacionItem solIncorporacionItem,
+			HttpServletRequest request) {
+//		SI encuentra algún colegiado utilizando este número de colegiado devolverá dicho número, en caso de no existir ningún colegiado con ese número devolverá el string "disponible"
+		LOGGER.info("numColegiadoSearch() -> Entrada al servicio para recuperar las solicitudes de incorporación");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		SolIncorporacionItem solIncorporacionResult = new SolIncorporacionItem();
+		solIncorporacionResult.setNumColegiado(null);
+		if(idInstitucion!= null){
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"numColegiadoSearch() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = _admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"numColegiadoSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			if(usuarios != null && usuarios.size()>0){
+				CenColegiadoExample exampleColegiado = new CenColegiadoExample();
+				exampleColegiado.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andNcolegiadoEqualTo(solIncorporacionItem.getNumColegiado());
+
+				List<CenColegiado> resultados =  _cenColegiadoMapper.selectByExample(exampleColegiado);
+				if(resultados.size() > 0) {
+					solIncorporacionResult.setNumColegiado(resultados.get(0).getNcolegiado());
+				}else {
+					solIncorporacionResult.setNumColegiado("disponible");
+				}
+			}
+		}
+		LOGGER.info("getTipoSolicitud() -> Salida del servicio para recuperar las solicitudes de incorporación");
+		return solIncorporacionResult;
+	}
+	
+	@Override
+	public SolIncorporacionItem nifExistenteSearch(SolIncorporacionItem solIncorporacionItem,
+			HttpServletRequest request) {
+//		SI encuentra algún colegiado utilizando este número de colegiado devolverá dicho número, en caso de no existir ningún colegiado con ese número devolverá el string "disponible"
+		LOGGER.info("numColegiadoSearch() -> Entrada al servicio para recuperar las solicitudes de incorporación");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		SolIncorporacionItem solIncorporacionResult = new SolIncorporacionItem();
+		solIncorporacionResult.setNumColegiado(null);
+		if(idInstitucion!= null){
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"numColegiadoSearch() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = _admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"numColegiadoSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			if(usuarios != null && usuarios.size()>0){
+				CenPersonaExample examplePersona = new CenPersonaExample();
+				examplePersona.createCriteria().andNifcifEqualTo(solIncorporacionItem.getNumeroIdentificacion());
+				DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
+				List<CenPersona> resultados =  _cenPersonaMapper.selectByExample(examplePersona);
+				if(resultados.size() > 0) {
+					solIncorporacionResult.setNombre(resultados.get(0).getNombre());
+					solIncorporacionResult.setApellido1(resultados.get(0).getApellidos1());
+					solIncorporacionResult.setApellido2(resultados.get(0).getApellidos2());
+					solIncorporacionResult.setNumeroIdentificacion(resultados.get(0).getNifcif());
+					solIncorporacionResult.setIdTipoIdentificacion(String.valueOf(resultados.get(0).getIdtipoidentificacion()));
+					if(resultados.get(0).getFechanacimiento() != null) {
+						solIncorporacionResult.setFechaNacimientoStr(df.format(resultados.get(0).getFechanacimiento()));
+					}
+					solIncorporacionResult.setIdEstadoCivil(String.valueOf(resultados.get(0).getIdestadocivil()));
+					if(resultados.get(0).getNaturalde() != null) {
+						solIncorporacionResult.setNaturalDe(resultados.get(0).getNaturalde());
+					}
+					solIncorporacionResult.setSexo(resultados.get(0).getSexo());
+				}else {
+					solIncorporacionResult.setNumeroIdentificacion("disponible");
+				}
+			}
+		}
+		LOGGER.info("getTipoSolicitud() -> Salida del servicio para recuperar las solicitudes de incorporación");
+		return solIncorporacionResult;
+	}
+
 
 	@Override
 	public ComboDTO getTratamiento(HttpServletRequest request) {
@@ -564,7 +653,6 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					solIncorporacion.setFechaalta(new Date());
 					
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
-					
 				
 					if(idPersona != null && idDireccion!= null && insertCliente == 1 && idBancario != null && insertColegiado == 1 && updateSolicitud == 1){
 						response.setId(Long.toString(solIncorporacion.getIdsolicitud()));
@@ -598,11 +686,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 							_cenCuentasbancariasMapper.deleteByPrimaryKey(keys);
 						}
 						LOGGER.error("aprobarSolicitud() --> Registros borrados, fallo al aprobar la solicitud.");
-							
 					}
 					
 				}catch(Exception e){
-					
 					
 					error.setMessage(e.getMessage());
 					response.setStatus(SigaConstants.KO);

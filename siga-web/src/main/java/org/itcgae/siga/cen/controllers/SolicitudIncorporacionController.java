@@ -34,9 +34,20 @@ public class SolicitudIncorporacionController {
 	
 	@RequestMapping(value = "/searchSolicitud", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<SolIncorporacionDTO> searchSolicitudesData(@RequestParam("numPagina") int numPagina, @RequestBody SolicitudIncorporacionSearchDTO DatosSolicitudSearchDTO, HttpServletRequest request) {
-		
 		SolIncorporacionDTO response = _solicitudIncorporacionService.datosSolicitudSearch(numPagina, DatosSolicitudSearchDTO, request);
 		return new ResponseEntity<SolIncorporacionDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/searchNumColegiado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<SolIncorporacionItem> searchNumColegiado( @RequestBody SolIncorporacionItem solIncorporacionItem, HttpServletRequest request) {
+		SolIncorporacionItem response = _solicitudIncorporacionService.numColegiadoSearch(solIncorporacionItem, request);
+		return new ResponseEntity<SolIncorporacionItem>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/searchNifExistente", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<SolIncorporacionItem> searchNifExistente( @RequestBody SolIncorporacionItem solIncorporacionItem, HttpServletRequest request) {
+		SolIncorporacionItem response = _solicitudIncorporacionService.nifExistenteSearch(solIncorporacionItem, request);
+		return new ResponseEntity<SolIncorporacionItem>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/nuevaSolicitud", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
