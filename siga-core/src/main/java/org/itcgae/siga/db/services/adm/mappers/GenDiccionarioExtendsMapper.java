@@ -10,7 +10,6 @@ import org.itcgae.siga.DTOs.adm.EtiquetaItem;
 import org.itcgae.siga.DTOs.adm.EtiquetaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
-import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.providers.GenDiccionarioSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -26,7 +25,7 @@ public interface GenDiccionarioExtendsMapper extends GenDiccionarioMapper{
 	})
 	List<ComboItem> getLabelLenguage();
 	
-	
+
 	
 	@SelectProvider(type = GenDiccionarioSqlExtendsProvider.class, method = "searchLabels")
 	@Results({

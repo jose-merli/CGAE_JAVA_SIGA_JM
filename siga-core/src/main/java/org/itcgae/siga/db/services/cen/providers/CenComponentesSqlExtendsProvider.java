@@ -29,7 +29,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.SELECT("DECODE(f_siga_gettipocliente(COMPONENTE.CEN_CLIENTE_IDPERSONA,COMPONENTE.CEN_CLIENTE_IDINSTITUCION,SYSDATE),20,1,0) AS profesionalAbogado");
 		sql.SELECT("DECODE(DECODE(f_siga_gettipocliente(COMPONENTE.CEN_CLIENTE_IDPERSONA,COMPONENTE.CEN_CLIENTE_IDINSTITUCION,SYSDATE),20,1,0), 1, 0, DECODE(ACTIVIDAD.descripcion, NULL, 0, 1)) AS PROFESIONAL");
 		sql.SELECT("f_siga_getrecurso(ACTIVIDAD.descripcion, 1) AS  profesion");
-		sql.SELECT("decode(COMPONENTE.IDTIPOCOLEGIO, 41, INST.CODIGOEXT, 1, INST.CODIGOEXT, null) as codigocolegio");
+		sql.SELECT("decode(COMPONENTE.IDTIPOCOLEGIO, 1, INST.CODIGOEXT, null) as codigocolegio");
 		sql.SELECT("decode(COMPONENTE.IDTIPOCOLEGIO, 1,  INST.NOMBRE, PROVINCIAS.NOMBRE) as descripcionColegio");
 		sql.SELECT("COMPONENTE.NUMCOLEGIADO");
 		sql.SELECT("COMPONENTE.FLAG_SOCIO AS SOCIO");
@@ -68,7 +68,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
         sql.SELECT_DISTINCT("COMPONENTE.IDINSTITUCION");
         sql.SELECT("COMPONENTE.IDPERSONA");
 		sql.SELECT("COMPONENTE.IDCOMPONENTE");
-		sql.SELECT("COMPONENTE.CARGO");
+		sql.SELECT("RECURSOCARGO.DESCRIPCION as CARGO");
 		sql.SELECT("TO_CHAR(COMPONENTE.FECHACARGO, 'dd/mm/yyyy') AS FECHACARGO");
 		sql.SELECT("TO_CHAR(COMPONENTE.FECHABAJA, 'dd/mm/yyyy') AS FECHABAJACARGO");
 		sql.SELECT("COMPONENTE.CEN_CLIENTE_IDPERSONA AS IDPERSONACOMPONENTE");
@@ -89,6 +89,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.SELECT("COMPONENTE.IDCARGO");
 		sql.SELECT("COMPONENTE.IDPROVINCIA");
 		sql.SELECT("COMPONENTE.FLAG_SOCIO");
+		sql.SELECT("COMPONENTE.CEN_CLIENTE_IDINSTITUCION");
 		sql.SELECT("RECURSOCARGO.DESCRIPCION AS DESCRIPCIONCARGO");
 		sql.SELECT("INST.CODIGOEXT AS COLEGIO");
 		sql.SELECT("INST.NOMBRE AS NOMBRECOLEGIO");
@@ -170,9 +171,27 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.SET("FLAG_SOCIO = '" + tarjetaIntegrantesUpdateDTO.getFlagSocio() + "'");
 		}
 
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getIdTipoColegio())) {
+			sql.SET("IDTIPOCOLEGIO = '" + tarjetaIntegrantesUpdateDTO.getIdTipoColegio() + "'");
+		}
 		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getIdProvincia())) {
+			sql.SET("IDPROVINCIA = '" + tarjetaIntegrantesUpdateDTO.getIdProvincia() + "'");
+		}
 		
-		sql.SET("CAPITALSOCIAL = '" + tarjetaIntegrantesUpdateDTO.getCapitalSocial() + "'");
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getIdPersonaComponente())) {
+			sql.SET("CEN_CLIENTE_IDPERSONA = '" + tarjetaIntegrantesUpdateDTO.getIdPersonaComponente() + "'");
+		}
+		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getColegio())) {
+			sql.SET("CEN_CLIENTE_IDINSTITUCION = '" + tarjetaIntegrantesUpdateDTO.getColegio() + "'");
+		}
+		
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesUpdateDTO.getNumColegiado())) {
+			sql.SET("NUMCOLEGIADO = '" + tarjetaIntegrantesUpdateDTO.getNumColegiado() + "'");
+		}
+		
+		sql.SET("CAPITALSOCIAL = " + tarjetaIntegrantesUpdateDTO.getCapitalSocial());
 		sql.SET("FECHAMODIFICACION = SYSDATE");
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario()+ "'");
 		
@@ -216,7 +235,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		}
 		
 		sql.VALUES("CEN_CLIENTE_IDPERSONA", "'" + tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante() + "'");
-		sql.VALUES("CEN_CLIENTE_IDINSTITUCION", "'" + tarjetaIntegrantesCreateDTO.getIdInstitucionIntegrante() + "'");
+		sql.VALUES("CEN_CLIENTE_IDINSTITUCION", "'" + tarjetaIntegrantesCreateDTO.getColegio() + "'");
 		sql.VALUES("SOCIEDAD", "'0'");
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", "'" + usuario.getIdusuario()+ "'");
@@ -237,14 +256,13 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 			sql.VALUES("NUMCOLEGIADO", "'" + tarjetaIntegrantesCreateDTO.getNumColegiado() + "'");
 		}
 		
-		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getCapitalSocial())) {
-			sql.VALUES("CAPITALSOCIAL", "'" + tarjetaIntegrantesCreateDTO.getCapitalSocial() + "'");
+		if(null != tarjetaIntegrantesCreateDTO.getCapitalSocial()) {
+			sql.VALUES("CAPITALSOCIAL", tarjetaIntegrantesCreateDTO.getCapitalSocial().toString());
 		}
 		
-		if(UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getIdCargo())) {
+		if(!UtilidadesString.esCadenaVacia(tarjetaIntegrantesCreateDTO.getIdCargo())) {
 			sql.VALUES("IDCARGO", "'" + tarjetaIntegrantesCreateDTO.getIdCargo() + "'");
 		}
-		
 		
 		return sql.toString();
 	}

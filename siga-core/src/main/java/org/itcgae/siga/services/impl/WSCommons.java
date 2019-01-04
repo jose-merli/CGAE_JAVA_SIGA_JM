@@ -1023,95 +1023,101 @@ public class WSCommons {
 			// Aunque el proceso de fusion (en PL) ya se encarga de combinar las direcciones, 
 			// tenemos que comprobar las unicidades de direcciones. Para ello, es mejor moverlas ahora y comprobar las unicidades
 			conjuntoColegiosIguales = new HashSet<String>();
-			//TODO 
-			String[] direcciones = peticionEntrada.getGetFusionadorPersonasRequest().getDatosFusionador().getListaDirecciones().split(",");
-			String[] direccion;
-			if (direcciones.length > 0) {
-				CenDirecciones beanDireccion = new CenDirecciones();
-
-				String idInstitucionComun, idDireccionOrigen;
+			if (null != peticionEntrada.getGetFusionadorPersonasRequest().getDatosFusionador().getListaDirecciones()) {
 				
-				
-				//HttpServletRequest preguntarAlUsuario = null;
-				for (int i = 0; i < direcciones.length; i++) {
-					direccion = direcciones[i].split("&&");
-					if (direccion.length > 1) {
-						idInstitucionComun = direccion[0];
-						idDireccionOrigen = direccion[2];
-						
-						
-						
-						// hay que asegurarse que existe el cliente de CGAE
-						if (idInstitucionComun.equalsIgnoreCase(String.valueOf(SigaConstants.InstitucionGeneral))) {
-							CenClienteKey clientekey = new CenClienteKey();
-							clientekey.setIdinstitucion(Short.valueOf(SigaConstants.InstitucionGeneral));
-							clientekey.setIdpersona(Long.valueOf(idPersonaDestino));
-							if (cenClienteExtendsMapper.selectByPrimaryKey(clientekey ) == null) {
-								clientekey.setIdpersona(Long.valueOf(idPersonaOrigen));
-								CenCliente cliente = cenClienteExtendsMapper.selectByPrimaryKey(clientekey );
-								cliente.setIdpersona(Long.valueOf(idPersonaDestino));
-								cenClienteExtendsMapper.insert(cliente);
+			
+				String[] direcciones = peticionEntrada.getGetFusionadorPersonasRequest().getDatosFusionador().getListaDirecciones().split(",");
+				String[] direccion;
+				if (null != direcciones && direcciones.length > 0) {
+					CenDirecciones beanDireccion = new CenDirecciones();
+	
+					String idInstitucionComun, idDireccionOrigen;
+					
+					
+					//HttpServletRequest preguntarAlUsuario = null;
+					for (int i = 0; i < direcciones.length; i++) {
+						direccion = direcciones[i].split("&&");
+						if (direccion.length > 1) {
+							idInstitucionComun = direccion[0];
+							idDireccionOrigen = direccion[2];
+							
+							
+							
+							// hay que asegurarse que existe el cliente de CGAE
+							if (idInstitucionComun.equalsIgnoreCase(String.valueOf(SigaConstants.InstitucionGeneral))) {
+								CenClienteKey clientekey = new CenClienteKey();
+								clientekey.setIdinstitucion(Short.valueOf(SigaConstants.InstitucionGeneral));
+								clientekey.setIdpersona(Long.valueOf(idPersonaDestino));
+								if (cenClienteExtendsMapper.selectByPrimaryKey(clientekey ) == null) {
+									clientekey.setIdpersona(Long.valueOf(idPersonaOrigen));
+									CenCliente cliente = cenClienteExtendsMapper.selectByPrimaryKey(clientekey );
+									cliente.setIdpersona(Long.valueOf(idPersonaDestino));
+									cenClienteExtendsMapper.insert(cliente);
+								}
 							}
-						}
-						
-						CenDireccionesKey direccioneskey = new CenDireccionesKey();
-						direccioneskey.setIddireccion(Long.valueOf(idDireccionOrigen));
-						direccioneskey.setIdinstitucion(Short.valueOf(idInstitucionComun));
-						direccioneskey.setIdpersona(Long.valueOf(idPersonaOrigen));
-						// recuperando el registro original que se va a copiar
-						CenDirecciones direccionConsultada = cenDireccionesExtendsMapper.selectByPrimaryKey(direccioneskey );
-						
-							if (null != direccionConsultada) {
+							
+							CenDireccionesKey direccioneskey = new CenDireccionesKey();
+							direccioneskey.setIddireccion(Long.valueOf(idDireccionOrigen));
+							direccioneskey.setIdinstitucion(Short.valueOf(idInstitucionComun));
+							direccioneskey.setIdpersona(Long.valueOf(idPersonaOrigen));
+							// recuperando el registro original que se va a copiar
+							CenDirecciones direccionConsultada = cenDireccionesExtendsMapper.selectByPrimaryKey(direccioneskey );
+							
+								if (null != direccionConsultada) {
+									
 								
-							
-							// comprobando los tipos
-							CenDireccionTipodireccionExample tipoDireccionexample = new CenDireccionTipodireccionExample();
-							tipoDireccionexample.createCriteria().andIddireccionEqualTo(Long.valueOf(idDireccionOrigen)).andIdinstitucionEqualTo(Short.valueOf(idInstitucionComun)).andIdpersonaEqualTo(Long.valueOf(idPersonaOrigen));
-							List<CenDireccionTipodireccion> tiposDireccion= cenTipoDireccionMapper.selectByExample(tipoDireccionexample);
-							List<String> tiposOriginales = new ArrayList<String>();
-							for (CenDireccionTipodireccion cenDireccionTipodireccion : tiposDireccion) {
-								tiposOriginales.add(cenDireccionTipodireccion.getIdtipodireccion().toString());
-							}		
-							List<String> tiposAinsertar = revisarTiposEnDireccionesExistentes(idInstitucionComun, idPersonaDestino, tiposOriginales);
-							CenDireccionTipodireccion vBeanTipoDir [];
-							if (tiposAinsertar.size() == 0) {
+								// comprobando los tipos
+								CenDireccionTipodireccionExample tipoDireccionexample = new CenDireccionTipodireccionExample();
+								tipoDireccionexample.createCriteria().andIddireccionEqualTo(Long.valueOf(idDireccionOrigen)).andIdinstitucionEqualTo(Short.valueOf(idInstitucionComun)).andIdpersonaEqualTo(Long.valueOf(idPersonaOrigen));
+								List<CenDireccionTipodireccion> tiposDireccion= cenTipoDireccionMapper.selectByExample(tipoDireccionexample);
+								List<String> tiposOriginales = new ArrayList<String>();
+								for (CenDireccionTipodireccion cenDireccionTipodireccion : tiposDireccion) {
+									tiposOriginales.add(cenDireccionTipodireccion.getIdtipodireccion().toString());
+								}		
+								List<String> tiposAinsertar = revisarTiposEnDireccionesExistentes(idInstitucionComun, idPersonaDestino, tiposOriginales);
+								CenDireccionTipodireccion vBeanTipoDir [];
+								if (tiposAinsertar.size() == 0) {
+									direccionConsultada.setFechabaja(new Date());
+									//.put(CenDireccionesBean.C_FECHABAJA, "sysdate");
+									// y dejamos los tipos originales
+									vBeanTipoDir = establecerTipoDireccion(tiposOriginales.toArray(new String[0]));
+								} else {
+									vBeanTipoDir = establecerTipoDireccion(tiposAinsertar.toArray(new String[0]));
+								}
+								
+								// comprobando las preferencias
+								String preferencias = direccionConsultada.getPreferente();
+								preferencias = revisarPreferenciasEnDireccionesExistentes(idInstitucionComun, idPersonaDestino, preferencias);
+								direccionConsultada.setPreferente(preferencias);
+								//hashDireccion.put(CenDireccionesBean.C_PREFERENTE, preferencias); 
+								
+								// insertando en la persona destino
+								direccionConsultada.setIdpersona(Long.valueOf(idPersonaDestino));
+								insertarDireccionConHistorico(direccionConsultada, vBeanTipoDir, "Dirección movida a persona destino antes de fusión", null,"1");
+								
+								// borrando la direccion de origen
+								direccionConsultada.setIdpersona(Long.valueOf(idPersonaOrigen));
 								direccionConsultada.setFechabaja(new Date());
-								//.put(CenDireccionesBean.C_FECHABAJA, "sysdate");
-								// y dejamos los tipos originales
-								vBeanTipoDir = establecerTipoDireccion(tiposOriginales.toArray(new String[0]));
-							} else {
-								vBeanTipoDir = establecerTipoDireccion(tiposAinsertar.toArray(new String[0]));
+								cenDireccionesExtendsMapper.updateByPrimaryKey(direccionConsultada);
+								
+								// guardando la institucion en la que se estan tratando direcciones
+								conjuntoColegiosIguales.add(idInstitucionComun);
 							}
-							
-							// comprobando las preferencias
-							String preferencias = direccionConsultada.getPreferente();
-							preferencias = revisarPreferenciasEnDireccionesExistentes(idInstitucionComun, idPersonaDestino, preferencias);
-							direccionConsultada.setPreferente(preferencias);
-							//hashDireccion.put(CenDireccionesBean.C_PREFERENTE, preferencias); 
-							
-							// insertando en la persona destino
-							direccionConsultada.setIdpersona(Long.valueOf(idPersonaDestino));
-							insertarDireccionConHistorico(direccionConsultada, vBeanTipoDir, "Dirección movida a persona destino antes de fusión", null,"1");
-							
-							// borrando la direccion de origen
-							direccionConsultada.setIdpersona(Long.valueOf(idPersonaOrigen));
-							direccionConsultada.setFechabaja(new Date());
-							cenDireccionesExtendsMapper.updateByPrimaryKey(direccionConsultada);
-							
-							// guardando la institucion en la que se estan tratando direcciones
-							conjuntoColegiosIguales.add(idInstitucionComun);
 						}
 					}
 				}
 			}
+			if (null != peticionEntrada.getGetFusionadorPersonasRequest().getDatosFusionador().getListaDireccionesNoSeleccionadas()) {
+				
 			// anyadiendo tambien el listado de colegios iguales de los que se ha deseleccionado todas las direcciones
-			direcciones = peticionEntrada.getGetFusionadorPersonasRequest().getDatosFusionador().getListaDireccionesNoSeleccionadas().split(",");
-			if (direcciones.length > 0) {
-				for (int i = 0; i < direcciones.length; i++) {
-					direccion = direcciones[i].split("&&");
-					if (direccion.length > 1) {
-						idInstitucion = direccion[0];
-						conjuntoColegiosIguales.add(idInstitucion);
+				String[] direcciones = peticionEntrada.getGetFusionadorPersonasRequest().getDatosFusionador().getListaDireccionesNoSeleccionadas().split(",");
+				if (null != direcciones &&  direcciones.length > 0) {
+					for (int i = 0; i < direcciones.length; i++) {
+						String[] direccion = direcciones[i].split("&&");
+						if (direccion.length > 1) {
+							idInstitucion = direccion[0];
+							conjuntoColegiosIguales.add(idInstitucion);
+						}
 					}
 				}
 			}

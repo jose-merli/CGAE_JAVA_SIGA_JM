@@ -56,7 +56,7 @@ public class UserTokenUtils {
 	public static String generateToken(UserAuthenticationToken auth) throws TokenGenerationException {
 		try {
 			return tokenPrefix + Jwts.builder().setIssuedAt(new Date()).setIssuer("CONSEJO GENERAL DE LA ABOGACIA")
-					.setSubject(auth.getPrincipal().toString()).claim("permisos", auth.getUser().getPermisos())
+					.setSubject(auth.getUser().getDni()).claim("permisos", auth.getUser().getPermisos())
 					.claim("institucion", auth.getUser().getInstitucion()).claim("grupo", auth.getUser().getGrupo())
 					.claim("perfiles", auth.getUser().getPerfiles()).claim("letrado", auth.getUser().getLetrado())
 					.setExpiration(new Date(System.currentTimeMillis() + expirationTime))

@@ -3,7 +3,6 @@ package org.itcgae.siga.services.impl;
 import java.util.List;
 
 import org.apache.xmlbeans.XmlObject;
-import org.itcgae.siga.DTOs.gen.FusionadorItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ERROR_SERVER;
 import org.itcgae.siga.commons.constants.SigaConstants.ID_TIPO_CARGA;
@@ -20,17 +19,13 @@ import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.ValidationException;
 import org.itcgae.siga.services.IFusionadorPersonasServerService;
-import org.itcgae.siga.services.ISociedadesServerSevice;
-import org.itcgae.siga.ws.fusionadorPersonas.GetFusionadorPersonasResponseDocument;
-import org.itcgae.siga.ws.fusionadorPersonas.GetFusionadorPersonasResponseDocument.GetFusionadorPersonasResponse;
 import org.itcgae.siga.ws.fusionadorPersonas.GetFusionadorPersonasRequestDocument;
 import org.itcgae.siga.ws.fusionadorPersonas.GetFusionadorPersonasRequestDocument.GetFusionadorPersonasRequest;
+import org.itcgae.siga.ws.fusionadorPersonas.GetFusionadorPersonasResponseDocument;
+import org.itcgae.siga.ws.fusionadorPersonas.GetFusionadorPersonasResponseDocument.GetFusionadorPersonasResponse;
 import org.itcgae.sspp.ws.registroSociedades.ColegioDocument.Colegio;
-import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesRequestDocument;
 import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesRequestDocument.GetListaSociedadesRequest;
-import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesResponseDocument;
 import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesResponseDocument.GetListaSociedadesResponse;
-import org.itcgae.sspp.ws.registroSociedades.RegistroSociedadDocument.RegistroSociedad;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +69,7 @@ public class FusionadorPersonasServerSeviceImpl implements IFusionadorPersonasSe
 		short estadoCarga = 1;
 		String errorPagina = null;
 		boolean paginaYaOK=false;
-		Short idInstitucion=null;
+	
 		try {
 			
 			log.info("Guarda el XML");
@@ -85,17 +80,17 @@ public class FusionadorPersonasServerSeviceImpl implements IFusionadorPersonasSe
 
 			// Validamos la peticion que nos ha llegado pidiendo que construya el xml de
 			// respuesta de error con los errores encontrados si corresponde
-			WSCommons.validaPeticion(peticion, respuesta, true);
+		//	WSCommons.validaPeticion(peticion, respuesta, true);
 			
 			
 
 			mensaje  =  WSCommons.fusionarPersonas(peticionEntrada);
 
 
-		} catch (ValidationException validationException) {
+		/*} catch (ValidationException validationException) {
 			erroresValidacion = true;
 
-		} catch (BusinessException bException) {
+		*/} catch (BusinessException bException) {
 			erroresGenerales = true;
 			log.error("Error en la carga: " + bException);
 			// TODO Construir respuesta con eeror general

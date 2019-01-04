@@ -7,24 +7,26 @@ import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.cen.ComboColegiadoItem;
+
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
+
 import org.itcgae.siga.db.mappers.CenColegiadoSqlProvider;
 import org.itcgae.siga.db.services.cen.providers.CenColegiadoSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenNocolegiadoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
-import org.itcgae.siga.db.mappers.CenColegiadoMapper;
-import org.itcgae.siga.db.services.cen.providers.CenColegiadoSqlExtendsProvider;
-import org.springframework.stereotype.Service;
+
 
 @Service
 @Primary
@@ -93,6 +95,7 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 		@Result(column = "IDGRUPO", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 		})
+
 	List<ComboItem> getLabel(AdmUsuarios usuario);
 
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "searchOtherCollegues")
@@ -108,7 +111,6 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ColegiadoItem> searchOtherCollegues(String idPersona, String idLenguaje);
-
 
 	
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectDatosColegiales")
@@ -132,6 +134,13 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 		@Result(column = "IDINSTITUCION", property = "valor", jdbcType = JdbcType.VARCHAR),
 	})
 	List<StringDTO> selectColegiacionesIdPersona(Long idPersona);
-	
+
+
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "getLabelColegios")
+	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR)})
+	List<ComboColegiadoItem> getLabelColegios(String idPersona);
+
 
 }

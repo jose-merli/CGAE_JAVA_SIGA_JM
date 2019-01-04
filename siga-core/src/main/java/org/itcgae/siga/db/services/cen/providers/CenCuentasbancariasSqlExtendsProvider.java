@@ -130,7 +130,6 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		SQL sql = new SQL();
 		sql.SELECT("BANCO.NOMBRE AS BANCO");
 		sql.SELECT("BANCO.BIC AS BIC");
-		sql.SELECT("DECODE(BANCO.IDPAIS,'191','1','0') AS BICESPANOL");
 		sql.FROM("CEN_BANCOS BANCO");
 
 		sql.WHERE("BANCO.CODIGO = '"+datosBancariosSearchBancoDTO.getiban()+"'");
