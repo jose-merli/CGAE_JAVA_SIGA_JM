@@ -153,4 +153,16 @@ public class FichaCursosController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "fichaCursos/getTopicsCourse",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getTopicsCourse(HttpServletRequest request) {
+		ComboDTO response = fichaCursosService.getTopicsCourse(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/getTopicsSpecificCourse",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getTopicsSpecificCourse(@RequestParam("idCurso") String idCurso, HttpServletRequest request) {
+		ComboDTO response = fichaCursosService.getTopicsSpecificCourse(request, idCurso);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 }

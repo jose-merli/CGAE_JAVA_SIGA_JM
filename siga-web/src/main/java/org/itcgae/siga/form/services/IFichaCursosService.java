@@ -102,6 +102,8 @@ public interface IFichaCursosService {
 	
 	public UpdateResponseDTO autovalidateInscriptionsCourse(CargaMasivaInscripcionesDTO cargaMasivaInscripcionesDTO, HttpServletRequest request);
 
-	
+	public ComboDTO getTopicsCourse(HttpServletRequest request);
+
+	public ComboDTO getTopicsSpecificCourse(HttpServletRequest request, String idCurso);
 
 }

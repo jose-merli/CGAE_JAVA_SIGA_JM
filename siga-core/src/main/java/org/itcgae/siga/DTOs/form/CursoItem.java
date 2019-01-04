@@ -26,11 +26,13 @@ public class CursoItem {
 	private String fechaInscripcionHasta;
 	private String fechaImparticionDesde;
 	private String fechaImparticionHasta;
-	private String [] temas;
 	private String minimoAsistencia;
 	private String lugar;
 	private Integer autovalidacionInscripcion;
 	private Integer flagArchivado;
+	private String adicional;
+	private String encuesta;
+	private String adjunto;
 	
 	//Auxiliares pantalla
 	private String idEstado;
@@ -46,6 +48,8 @@ public class CursoItem {
 	
 
 	private List<ComboItem> tipoServicios;
+	private List<ComboItem> temasCombo;
+	private String [] temas;
 	private String numPlazas;
 	private String inscripciones;
 	
@@ -163,6 +167,12 @@ public class CursoItem {
 	public void setTemas(String[] temas) {
 		this.temas = temas;
 	}
+	public List<ComboItem> getTemasCombo() {
+		return temasCombo;
+	}
+	public void setTemasCombo(List<ComboItem> temasCombo) {
+		this.temasCombo = temasCombo;
+	}
 	public String getIdEstado() {
 		return idEstado;
 	}
@@ -266,14 +276,35 @@ public class CursoItem {
 	public void setInscripciones(String inscripciones) {
 		this.inscripciones = inscripciones;
 	}
+	public String getAdicional() {
+		return adicional;
+	}
+	public void setAdicional(String adicional) {
+		this.adicional = adicional;
+	}
+	public String getEncuesta() {
+		return encuesta;
+	}
+	public void setEncuesta(String encuesta) {
+		this.encuesta = encuesta;
+	}
+	public String getAdjunto() {
+		return adjunto;
+	}
+	public void setAdjunto(String adjunto) {
+		this.adjunto = adjunto;
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((adicional == null) ? 0 : adicional.hashCode());
+		result = prime * result + ((adjunto == null) ? 0 : adjunto.hashCode());
 		result = prime * result + ((autovalidacionInscripcion == null) ? 0 : autovalidacionInscripcion.hashCode());
 		result = prime * result + ((codigoCurso == null) ? 0 : codigoCurso.hashCode());
 		result = prime * result + ((colegio == null) ? 0 : colegio.hashCode());
 		result = prime * result + ((descripcionEstado == null) ? 0 : descripcionEstado.hashCode());
+		result = prime * result + ((encuesta == null) ? 0 : encuesta.hashCode());
 		result = prime * result + ((estado == null) ? 0 : estado.hashCode());
 		result = prime * result + ((fechaImparticion == null) ? 0 : fechaImparticion.hashCode());
 		result = prime * result + ((fechaImparticionDesde == null) ? 0 : fechaImparticionDesde.hashCode());
@@ -304,13 +335,9 @@ public class CursoItem {
 		result = prime * result + ((precioDesde == null) ? 0 : precioDesde.hashCode());
 		result = prime * result + ((precioHasta == null) ? 0 : precioHasta.hashCode());
 		result = prime * result + Arrays.hashCode(temas);
-		result = prime * result + ((visibilidad == null) ? 0 : visibilidad.hashCode());
-		result = prime * result + ((lugar == null) ? 0 : lugar.hashCode());
-		result = prime * result + ((minimoAsistencia == null) ? 0 : minimoAsistencia.hashCode());
-		result = prime * result + ((autovalidacionInscripcion == null) ? 0 : autovalidacionInscripcion.hashCode());
-		result = prime * result + ((idTipoEvento == null) ? 0 : idTipoEvento.hashCode());
+		result = prime * result + ((temasCombo == null) ? 0 : temasCombo.hashCode());
 		result = prime * result + ((tipoServicios == null) ? 0 : tipoServicios.hashCode());
-
+		result = prime * result + ((visibilidad == null) ? 0 : visibilidad.hashCode());
 		return result;
 	}
 	@Override
@@ -322,6 +349,16 @@ public class CursoItem {
 		if (getClass() != obj.getClass())
 			return false;
 		CursoItem other = (CursoItem) obj;
+		if (adicional == null) {
+			if (other.adicional != null)
+				return false;
+		} else if (!adicional.equals(other.adicional))
+			return false;
+		if (adjunto == null) {
+			if (other.adjunto != null)
+				return false;
+		} else if (!adjunto.equals(other.adjunto))
+			return false;
 		if (autovalidacionInscripcion == null) {
 			if (other.autovalidacionInscripcion != null)
 				return false;
@@ -341,6 +378,11 @@ public class CursoItem {
 			if (other.descripcionEstado != null)
 				return false;
 		} else if (!descripcionEstado.equals(other.descripcionEstado))
+			return false;
+		if (encuesta == null) {
+			if (other.encuesta != null)
+				return false;
+		} else if (!encuesta.equals(other.encuesta))
 			return false;
 		if (estado == null) {
 			if (other.estado != null)
@@ -489,41 +531,23 @@ public class CursoItem {
 			return false;
 		if (!Arrays.equals(temas, other.temas))
 			return false;
-		if (visibilidad == null) {
-			if (other.visibilidad != null)
+		if (temasCombo == null) {
+			if (other.temasCombo != null)
 				return false;
-		} else if (!visibilidad.equals(other.visibilidad))
-			return false;
-		if (lugar == null) {
-			if (other.lugar != null)
-				return false;
-		} else if (!lugar.equals(other.lugar))
-			return false;
-		if (minimoAsistencia == null) {
-			if (other.minimoAsistencia != null)
-				return false;
-		} else if (!minimoAsistencia.equals(other.minimoAsistencia))
-			return false;
-		if (autovalidacionInscripcion == null) {
-			if (other.autovalidacionInscripcion != null)
-				return false;
-		} else if (!autovalidacionInscripcion.equals(other.autovalidacionInscripcion))
-			return false;
-		if (idTipoEvento == null) {
-			if (other.idTipoEvento != null)
-				return false;
-		} else if (!idTipoEvento.equals(other.idTipoEvento))
+		} else if (!temasCombo.equals(other.temasCombo))
 			return false;
 		if (tipoServicios == null) {
 			if (other.tipoServicios != null)
 				return false;
 		} else if (!tipoServicios.equals(other.tipoServicios))
 			return false;
-
+		if (visibilidad == null) {
+			if (other.visibilidad != null)
+				return false;
+		} else if (!visibilidad.equals(other.visibilidad))
+			return false;
 		return true;
 	}
-	
-	
 	@Override
 	public String toString() {
 		return "CursoItem [idCurso=" + idCurso + ", visibilidad=" + visibilidad + ", colegio=" + colegio
@@ -534,14 +558,16 @@ public class CursoItem {
 				+ ", fechaImparticionDesdeDate=" + fechaImparticionDesdeDate + ", fechaImparticionHastaDate="
 				+ fechaImparticionHastaDate + ", fechaInscripcionDesde=" + fechaInscripcionDesde
 				+ ", fechaInscripcionHasta=" + fechaInscripcionHasta + ", fechaImparticionDesde="
-				+ fechaImparticionDesde + ", fechaImparticionHasta=" + fechaImparticionHasta + ", temas="
-				+ Arrays.toString(temas) + ", minimoAsistencia=" + minimoAsistencia + ", lugar=" + lugar
-				+ ", autovalidacionInscripcion=" + autovalidacionInscripcion + ", flagArchivado=" + flagArchivado
-				+ ", idEstado=" + idEstado + ", idVisibilidad=" + idVisibilidad + ", idInstitucion=" + idInstitucion
-				+ ", descripcionEstado=" + descripcionEstado + ", precioCurso=" + precioCurso + ", fechaInscripcion="
-				+ fechaInscripcion + ", fechaImparticion=" + fechaImparticion + ", idEventoInicioInscripcion="
-				+ idEventoInicioInscripcion + ", idEventoFinInscripcion=" + idEventoFinInscripcion + ", idTipoEvento="
-				+ idTipoEvento + ", numPlazas=" + numPlazas + ", inscripciones=" + inscripciones + "]";
-	}	
+				+ fechaImparticionDesde + ", fechaImparticionHasta=" + fechaImparticionHasta + ", minimoAsistencia="
+				+ minimoAsistencia + ", lugar=" + lugar + ", autovalidacionInscripcion=" + autovalidacionInscripcion
+				+ ", flagArchivado=" + flagArchivado + ", adicional=" + adicional + ", encuesta=" + encuesta
+				+ ", adjunto=" + adjunto + ", idEstado=" + idEstado + ", idVisibilidad=" + idVisibilidad
+				+ ", idInstitucion=" + idInstitucion + ", descripcionEstado=" + descripcionEstado + ", precioCurso="
+				+ precioCurso + ", fechaInscripcion=" + fechaInscripcion + ", fechaImparticion=" + fechaImparticion
+				+ ", idEventoInicioInscripcion=" + idEventoInicioInscripcion + ", idEventoFinInscripcion="
+				+ idEventoFinInscripcion + ", idTipoEvento=" + idTipoEvento + ", tipoServicios=" + tipoServicios
+				+ ", temasCombo=" + temasCombo + ", temas=" + Arrays.toString(temas) + ", numPlazas=" + numPlazas
+				+ ", inscripciones=" + inscripciones + "]";
+	}
 
 }
