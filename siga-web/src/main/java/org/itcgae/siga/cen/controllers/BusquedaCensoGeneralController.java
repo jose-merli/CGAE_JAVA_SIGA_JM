@@ -23,17 +23,12 @@ public class BusquedaCensoGeneralController {
 	private IBusquedaCensoGeneralService busquedaCensoGeneralService;
 	
 	
-	@RequestMapping(value = "busquedaCensoGeneral/searchNif", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "busquedaCensoGeneral/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<BusquedaPerFisicaDTO> searchJuridica(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, HttpServletRequest request) { 
-		BusquedaPerFisicaDTO response = busquedaCensoGeneralService.searchByNif(numPagina, busquedaPerFisicaSearchDTO, request);
+		BusquedaPerFisicaDTO response = busquedaCensoGeneralService.search(numPagina, busquedaPerFisicaSearchDTO, request);
 		return new ResponseEntity<BusquedaPerFisicaDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "busquedaCensoGeneral/searchName", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<BusquedaPerFisicaDTO> searchPerFisica(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, HttpServletRequest request) { 
-		BusquedaPerFisicaDTO response = busquedaCensoGeneralService.searchByName(numPagina, busquedaPerFisicaSearchDTO, request);
-		return new ResponseEntity<BusquedaPerFisicaDTO>(response, HttpStatus.OK);
-	} 
-	//
+
 	
 }
