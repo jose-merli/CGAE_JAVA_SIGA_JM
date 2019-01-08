@@ -13,10 +13,13 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.form.CargaMasivaInscripcionesDTO;
+import org.itcgae.siga.DTOs.form.CertificadoCursoDTO;
+import org.itcgae.siga.DTOs.form.CertificadoCursoItem;
 import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.form.InscripcionItem;
+import org.itcgae.siga.DTOs.form.PreciosCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.core.io.InputStreamResource;
@@ -26,21 +29,23 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 public interface IFichaCursosService {
 	
 	public static final Short DESIGNAR_TUTOR = 0; 
-	
 	public static final Short ASIGNAR_TUTOR = 1; 
-	
 	public static final long ANUNCIADO_CURSO = 1; 
-	
-	public static final long ABIERTO_CURSO = 0; 
+	public static final long ABIERTO_CURSO = 0;
+	public static final long FINALIZADO_CURSO = 0; 
 	
 	public static final long INSCRIPCION_PENDIENTE = 1; 
 	public static final long INSCRIPCION_CANCELADA = 4; 
 	public static final long INSCRIPCION_APROBADA = 3; 
 	public static final long INSCRIPCION_RECHAZADA = 2; 
 
+	public static final String EVENTO_PLANIFICADO = "1"; 
+	public static final String EVENTO_CANCELADO = "3";
+	public static final String EVENTO_SESION = "8";
 	
 	public static final short ID_TIPO_SERVICIOS_FORMACION = 5;
 	public static final short PERIOCIDAD_1MES = 1;
+	public static final short MODULO_CONTADOR = 11;
 
 	
 	public static final String CODIGO_CURSO = "CÓDIGO CURSO";
@@ -105,5 +110,23 @@ public interface IFichaCursosService {
 	public ComboDTO getTopicsCourse(HttpServletRequest request);
 
 	public ComboDTO getTopicsSpecificCourse(HttpServletRequest request, String idCurso);
+	
+	public UpdateResponseDTO cancelCourse(CursoDTO cursoDTO , HttpServletRequest request);
+
+	public UpdateResponseDTO finishCourse(CursoDTO cursoDTO , HttpServletRequest request);
+	
+	public PreciosCursoDTO getPricesCourse(HttpServletRequest request, String idCurso);
+	
+	public ComboDTO getQualificationsCourse(HttpServletRequest request);
+	
+	public CertificadoCursoDTO getTypesCertificatesCourse (HttpServletRequest request);
+	
+	public CertificadoCursoDTO getCertificatesCourse(HttpServletRequest request, String idCurso);
+
+	public InsertResponseDTO saveCertificateCourse(CertificadoCursoItem certificadoCursoItem, HttpServletRequest request);
+
+	public UpdateResponseDTO updateCertificatesCourse(CertificadoCursoDTO certifcadoCursoDTO, HttpServletRequest request);
+
+
 
 }

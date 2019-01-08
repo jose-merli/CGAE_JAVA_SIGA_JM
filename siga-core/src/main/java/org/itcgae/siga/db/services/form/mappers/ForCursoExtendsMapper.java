@@ -45,7 +45,9 @@ public interface ForCursoExtendsMapper extends ForCursoMapper {
 			@Result(column = "AUTOVALIDACIONINSCRIPCION", property = "autovalidacionInscripcion", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "ENCUESTASATISFACCION", property = "encuesta", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "INFORMACIONADICIONAL", property = "adicional", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "DOCUMENTACIONADJUNTA", property = "adjunto", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "DOCUMENTACIONADJUNTA", property = "adjunto", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAFINIMPARTICION", property = "fechaImparticionHasta", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAINICIOIMPARTICION", property = "fechaImparticionDesde", jdbcType = JdbcType.VARCHAR)
 	
 	})
 	List<CursoItem> selectCursos(Short idInstitucion, CursoItem cursoItem);
@@ -91,6 +93,5 @@ public interface ForCursoExtendsMapper extends ForCursoMapper {
 	
 	@UpdateProvider(type = ForCursoSqlExtendsProvider.class, method = "updateCourse")
 	int updateCourse (CursoItem cursoItem, AdmUsuarios usuario);
-	
 	
 }
