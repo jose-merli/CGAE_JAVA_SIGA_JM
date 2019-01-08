@@ -8,6 +8,7 @@ import java.sql.SQLTimeoutException;
 import java.sql.Types;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,12 +21,17 @@ import javax.sql.DataSource;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.cen.BancoBicItem;
+import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
+import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
+import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionDTO;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ISolicitudIncorporacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmConfig;
@@ -33,7 +39,9 @@ import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenBancos;
+import org.itcgae.siga.db.entities.CenBancosExample;
 import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteExample;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
@@ -41,7 +49,10 @@ import org.itcgae.siga.db.entities.CenCuentasbancarias;
 import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
+import org.itcgae.siga.db.entities.CenPais;
+import org.itcgae.siga.db.entities.CenPaisExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
@@ -54,12 +65,14 @@ import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenBancosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDocumentacionmodalidadExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadoSolicitudExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudincorporacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTipocolegiacionExtendsMapper;
@@ -118,7 +131,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	private CenPersonaExtendsMapper _cenPersonaExtendsMapper;
 	
 	@Autowired
-	private CenDireccionesMapper _cenDireccionesMapper;
+	private CenDireccionesExtendsMapper _cenDireccionesMapper;
 	
 	@Autowired
 	private CenCuentasbancariasExtendsMapper _cenCuentasbancariasExtendsMapper;
@@ -134,8 +147,16 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private CenBancosMapper _cenBancosMapper;
-	
-	
+
+	@Autowired
+	private CenBancosExtendsMapper cenBancosExtendsMapper;
+
+	@Autowired
+	private CenPaisExtendsMapper cenPaisExtendsMapper;
+
+	@Autowired
+	private CenCuentasbancariasExtendsMapper cenCuentasbancariasExtendsMapper;
+
 	@Override
 	public ComboDTO getTipoSolicitud(HttpServletRequest request) {
 		LOGGER.info("getTipoSolicitud() -> Entrada al servicio para cargar el tipo de solicitud");
@@ -832,9 +853,17 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		datosPersonales.setFallecido("0");
 		datosPersonales.setUsumodificacion(usuario.getIdusuario());
 		
-		_cenPersonaMapper.insert(datosPersonales);
+		CenPersonaExample ejemplo = new CenPersonaExample();
+		ejemplo.createCriteria().andNifcifEqualTo(solicitud.getNumeroidentificador());
+		List <CenPersona> busqueda = _cenPersonaMapper.selectByExample(ejemplo);
+
+		if(busqueda.isEmpty()) {
+			_cenPersonaMapper.insert(datosPersonales);
+			return datosPersonales.getIdpersona();
+		}else {
+			return busqueda.get(0).getIdpersona();
+		}
 		
-		return datosPersonales.getIdpersona();
 	}
 	
 	private int insertarDatosCliente(CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
@@ -854,14 +883,24 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		cliente.setIdlenguaje(usuario.getIdlenguaje());
 		cliente.setExportarfoto(SigaConstants.DB_FALSE);
 		
-		return _cenClienteMapper.insert(cliente);
+		CenClienteExample ejemploCliente = new CenClienteExample();
+		ejemploCliente.createCriteria().andIdpersonaEqualTo(idPersona).andIdinstitucionEqualTo(usuario.getIdinstitucion());
+		
+		List <CenCliente> listaExistente = _cenClienteMapper.selectByExample(ejemploCliente);
+		if(listaExistente.isEmpty()) {
+			return _cenClienteMapper.insert(cliente);
+		}else {
+			return 1;
+		}
 	}
 
 	private Long insertarDatosDireccion (CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
 		
 		CenDirecciones direccion = new CenDirecciones();
 		
-		direccion.setIddireccion(idPersona);
+		MaxIdDto direccionID = _cenDireccionesMapper.selectMaxID();
+		
+		direccion.setIddireccion(direccionID.getIdMax());
 		direccion.setCodigopostal(solicitud.getCodigopostal());
 		direccion.setCorreoelectronico(solicitud.getCorreoelectronico());
 		direccion.setDomicilio(solicitud.getDomicilio());
@@ -918,27 +957,91 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			}
 		}
 		
-		CenBancos banco = new CenBancos();
+//		CenBancos banco = new CenBancos();
 		
+		DatosBancariosSearchDTO datosBancariosSearchDTO = new DatosBancariosSearchDTO();
+		datosBancariosSearchDTO.setIdCuenta(solicitud.getIban().substring(4, 8));
+		if(solicitud.getIdpersona() != null) {
+			datosBancariosSearchDTO.setIdPersona(solicitud.getIdpersona().toString());
+		}else {
+			datosBancariosSearchDTO.setIdPersona(idPersona.toString());
+		}
+		datosBancariosSearchDTO.setIdInstitucion(solicitud.getIdinstitucion().toString());
+//		datosBancariosSearchDTO.setIdPersona(solicitud.getIdpersona());
+		
+		List<DatosBancariosItem> datosBancariosItem = new ArrayList<DatosBancariosItem>();
+		datosBancariosItem = cenCuentasbancariasExtendsMapper.selectCuentasBancarias(datosBancariosSearchDTO,
+				solicitud.getIdinstitucion().toString());
 
-		String codigoBanco = solicitud.getCboCodigo() + solicitud.getCodigosucursal() + solicitud.getDigitocontrol() + solicitud.getDigitocontrol();
-		banco.setCodigo(solicitud.getIban().substring(4, 8));
-		banco.setFechamodificacion(new Date());
-		banco.setIdpais(solicitud.getIdpais());
-		banco.setNombre(codigoBanco);
-		banco.setUsumodificacion(usuario.getIdusuario());
-		_cenBancosMapper.insert(banco);
+		List<BancoBicItem> bancoBicItem = new ArrayList<BancoBicItem>();
+
+		DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO = new DatosBancariosSearchBancoDTO();
+		datosBancariosSearchBancoDTO.setiban(solicitud.getIban().substring(4, 8));
+		bancoBicItem = cenCuentasbancariasExtendsMapper.selectBanks(datosBancariosSearchBancoDTO);
 		
-		
+		// Comprobamos que el código está en cen_bancos, si está se pone sin más en
+		// cbo_codigo, sino se coge el máx del código
+		CenBancosExample cenBancosExample = new CenBancosExample();
+		cenBancosExample.createCriteria().andBicEqualTo(bancoBicItem.get(0).getBic())
+				.andCodigoEqualTo(solicitud.getIban().substring(4, 8));
+		List<CenBancos> cenBancos = cenBancosExtendsMapper.selectByExample(cenBancosExample);
+
+		if (null != cenBancos && !cenBancos.isEmpty()) {
+//			cuentaBancaria.setCboCodigo(cenBancos.get(0).getCodigo()); // Tanto si es ext o esp tiene cod en
+																		// cenBancos
+		} else {
+			// insertar en cen_bancos
+			NewIdDTO newIdDTO = cenBancosExtendsMapper.getMaxCode();
+
+			CenBancos record = new CenBancos();
+			
+//			String codigoBanco = solicitud.getCboCodigo() + solicitud.getCodigosucursal() + solicitud.getDigitocontrol() + solicitud.getDigitocontrol();
+//			banco.setCodigo(solicitud.getIban().substring(4, 8));
+//			banco.setFechamodificacion(new Date());
+//			banco.setIdpais(solicitud.getIdpais());
+//			banco.setNombre(codigoBanco);
+//			banco.setUsumodificacion(usuario.getIdusuario());
+//			_cenBancosMapper.insert(banco);
+
+			if (!solicitud.getIban().substring(0, 2).equals("ES")) {
+				String rdo = fill(newIdDTO.getNewId(), 5);
+				record.setCodigo(rdo);
+				
+				record.setNombre("BANCO EXTRANJERO");
+			} else {
+				record.setCodigo(solicitud.getIban().substring(4, 8));
+				record.setNombre(solicitud.getBanco());
+			}
+
+			record.setBic(solicitud.getBic());
+			record.setFechamodificacion(new Date());
+
+			CenPaisExample cenPaisExample = new CenPaisExample();
+			cenPaisExample.createCriteria().andCodIsoEqualTo(solicitud.getIban().substring(0, 2));
+			List<CenPais> cenPais = cenPaisExtendsMapper.selectByExample(cenPaisExample);
+
+			if (null != cenPais && !cenPais.isEmpty()) {
+				record.setIdpais(cenPais.get(0).getIdpais());
+			}
+
+			record.setUsumodificacion(usuario.getIdusuario());
+
+			int res = cenBancosExtendsMapper.insert(record);
+
+//			if (res == 0) {
+//				insertResponseDTO.setStatus(SigaConstants.KO);
+//				error.setMessage("Error al insertar en CEN_BANCOS");
+//				insertResponseDTO.setError(error);
+//			} else {
+//				cuentaBancaria.setCboCodigo(record.getCodigo());
+//			}
+		}
 		
 		LOGGER.info(
 				"insertarDatosBancarios() / cenNocolegiadoExtendsMapper.insertSelective() -> Entrada a cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
 		_cenCuentasbancariasMapper.insertSelective(cuenta);
 		LOGGER.info(
 				"insertarDatosBancarios() / cenNocolegiadoExtendsMapper.insertSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
-		
-		
-		
 		
 		if (tieneCargo) {
 			Object[] paramMandatos = new Object[4];
@@ -1010,9 +1113,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					}
 				}
 			}
-			
 		}
-		
 		
 		//Se comprueba si se deben revisar las cuentas y se ejecutan los scripts que se encargan de ello
 		
@@ -1049,10 +1150,32 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			}
 		}*/
 		
-		
-		
 		return cuenta.getIdcuenta();
 		
+	}
+	
+	private String fill(String text, int size) {
+		String cadena = "";
+
+		if (text != null) {
+			if (text != "") {
+				int lengthCad = size - text.length();
+
+				if (lengthCad == 0 || lengthCad < 0) {
+					return text;
+				} else if (lengthCad >= 1) {
+					for (int i = 0; i < lengthCad; i++) {
+						cadena += "0";
+					}
+
+					return cadena + text;
+				}
+			} else {
+				return text;
+			}
+		} 
+		
+		return text;
 	}
 	
 	private int insertarDatosColegiado(CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
@@ -1073,8 +1196,16 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		colegiado.setSituacionejercicio("0");
 		colegiado.setSituacionempresa("0");
 		colegiado.setSituacionresidente("0");
+
+		CenColegiadoExample ejemploColegiado = new CenColegiadoExample();
+		ejemploColegiado.createCriteria().andIdpersonaEqualTo(idPersona);
 		
-		return _cenColegiadoMapper.insert(colegiado);
+		List <CenColegiado> listaColegiados = _cenColegiadoMapper.selectByExample(ejemploColegiado);
+		if(listaColegiados.isEmpty()) {
+			return _cenColegiadoMapper.insert(colegiado);
+		} else {
+			return 1;
+		}
 	}
 
 	
