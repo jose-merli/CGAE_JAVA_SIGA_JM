@@ -17,27 +17,26 @@ public class PlantillaEnvioItem {
 //	IDDIRECCION                NUMBER(10)    
 //	IDPERSONA                  NUMBER(10) 
 	
-	private Short idTipoEnvios;
-	private Short idPlantillaEnvios;
+	private String idTipoEnvios;
+	private String idPlantillaEnvios;
 	private String nombre;
-	private Short idInstitucion;
+	private String idInstitucion;
 	private String acuseRecibo;
 	private Date fechaBaja;
 	private String asunto;
 	private String cuerpo;
-	private Long idDireccion;
-	private Long idPersona;
-	
-	public Short getIdTipoEnvios() {
+	private String idDireccion;
+	private String idPersona;
+	public String getIdTipoEnvios() {
 		return idTipoEnvios;
 	}
-	public void setIdTipoEnvios(Short idTipoEnvios) {
+	public void setIdTipoEnvios(String idTipoEnvios) {
 		this.idTipoEnvios = idTipoEnvios;
 	}
-	public Short getIdPlantillaEnvios() {
+	public String getIdPlantillaEnvios() {
 		return idPlantillaEnvios;
 	}
-	public void setIdPlantillaEnvios(Short idPlantillaEnvios) {
+	public void setIdPlantillaEnvios(String idPlantillaEnvios) {
 		this.idPlantillaEnvios = idPlantillaEnvios;
 	}
 	public String getNombre() {
@@ -46,10 +45,10 @@ public class PlantillaEnvioItem {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public Short getIdInstitucion() {
+	public String getIdInstitucion() {
 		return idInstitucion;
 	}
-	public void setIdInstitucion(Short idInstitucion) {
+	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
 	public String getAcuseRecibo() {
@@ -76,18 +75,20 @@ public class PlantillaEnvioItem {
 	public void setCuerpo(String cuerpo) {
 		this.cuerpo = cuerpo;
 	}
-	public Long getIdDireccion() {
+	public String getIdDireccion() {
 		return idDireccion;
 	}
-	public void setIdDireccion(Long idDireccion) {
+	public void setIdDireccion(String idDireccion) {
 		this.idDireccion = idDireccion;
 	}
-	public Long getIdPersona() {
+	public String getIdPersona() {
 		return idPersona;
 	}
-	public void setIdPersona(Long idPersona) {
+	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
 	}
+	
+	
 	
 	
 }

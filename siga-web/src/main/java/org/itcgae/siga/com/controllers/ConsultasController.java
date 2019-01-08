@@ -75,7 +75,7 @@ public class ConsultasController {
 
 	/**Obtiene el listado de los modelos que contienen la consulta**/
 	@RequestMapping(value = "/modelosconsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ConsultaListadoModelosDTO> obtenerModelosComunicacion(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody ConsultaItem consulta) {
+	ResponseEntity<ConsultaListadoModelosDTO> obtenerModelosComunicacion(HttpServletRequest request, @RequestBody ConsultaItem consulta) {
 		
 		ConsultaListadoModelosDTO response = _consultasService.obtenerModelosComunicacion(request, consulta);
 		if(response.getError() == null)
@@ -86,7 +86,7 @@ public class ConsultasController {
 	
 	/**Obtiene el listado de las plantillas de envío que contienen la consulta**/
 	@RequestMapping(value = "/plantillasconsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ConsultaListadoPlantillasDTO> obtenerPlantillasEnvio(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody ConsultaItem consulta) {
+	ResponseEntity<ConsultaListadoPlantillasDTO> obtenerPlantillasEnvio(HttpServletRequest request, @RequestBody ConsultaItem consulta) {
 		
 		ConsultaListadoPlantillasDTO response = _consultasService.obtenerPlantillasEnvio(request, consulta);
 		if(response.getError() == null)

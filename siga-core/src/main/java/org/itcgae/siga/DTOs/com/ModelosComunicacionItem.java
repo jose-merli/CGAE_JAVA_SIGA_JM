@@ -14,19 +14,19 @@ public class ModelosComunicacionItem {
 //	FECHAMODIFICACION             DATE           
 //	USUMODIFICACION               NUMBER(5)  
 	
-	private Long idModeloComunicacion;
+	private String idModeloComunicacion;
 	private String nombre;
-	private Short orden;
-	private Short idInstitucion;
+	private String orden;
+	private String idInstitucion;
 	private String descripcion;
 	private String preseleccionar;
-	private Short idClaseComunicacion;
+	private String idClaseComunicacion;
 	private Date fechaBaja;
 	
-	public Long getIdModeloComunicacion() {
+	public String getIdModeloComunicacion() {
 		return idModeloComunicacion;
 	}
-	public void setIdModeloComunicacion(Long idModeloComunicacion) {
+	public void setIdModeloComunicacion(String idModeloComunicacion) {
 		this.idModeloComunicacion = idModeloComunicacion;
 	}
 	public String getNombre() {
@@ -35,16 +35,16 @@ public class ModelosComunicacionItem {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public Short getOrden() {
+	public String getOrden() {
 		return orden;
 	}
-	public void setOrden(Short orden) {
+	public void setOrden(String orden) {
 		this.orden = orden;
 	}
-	public Short getIdInstitucion() {
+	public String getIdInstitucion() {
 		return idInstitucion;
 	}
-	public void setIdInstitucion(Short idInstitucion) {
+	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
 	public String getDescripcion() {
@@ -59,10 +59,10 @@ public class ModelosComunicacionItem {
 	public void setPreseleccionar(String preseleccionar) {
 		this.preseleccionar = preseleccionar;
 	}
-	public Short getIdClaseComunicacion() {
+	public String getIdClaseComunicacion() {
 		return idClaseComunicacion;
 	}
-	public void setIdClaseComunicacion(Short idClaseComunicacion) {
+	public void setIdClaseComunicacion(String idClaseComunicacion) {
 		this.idClaseComunicacion = idClaseComunicacion;
 	}
 	public Date getFechaBaja() {
@@ -71,6 +71,7 @@ public class ModelosComunicacionItem {
 	public void setFechaBaja(Date fechaBaja) {
 		this.fechaBaja = fechaBaja;
 	}
+	
 	
 	
 }
