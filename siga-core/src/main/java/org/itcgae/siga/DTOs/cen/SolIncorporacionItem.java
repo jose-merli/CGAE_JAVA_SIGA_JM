@@ -13,6 +13,7 @@ public class SolIncorporacionItem {
 	private String apellido2;
 	private String sexo;
 	private Date fechaNacimiento;
+	private String fechaNacimientoStr;
 	private String numColegiado;
 	private Date fechaSolicitud;
 	private Date fechaEstado;
@@ -323,6 +324,12 @@ public class SolIncorporacionItem {
 	}
 	public void setTitular(String titular) {
 		this.titular = titular;
+	}
+	public String getFechaNacimientoStr() {
+		return fechaNacimientoStr;
+	}
+	public void setFechaNacimientoStr(String fechaNacimientoStr) {
+		this.fechaNacimientoStr = fechaNacimientoStr;
 	}
 	public String getIban() {
 		return iban;

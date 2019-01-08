@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -176,6 +177,17 @@ public class UtilidadesString {
 		}
 		
 		return idPerfiles;
+	}
+	
+	public static List<String> formateaListaPerfiles(List<String> perfiles){
+		List<String> listaPerfilesFormat = new ArrayList<String>();
+		
+		for (String cadena : perfiles) {
+			cadena = cadena.replace("'", "");
+			listaPerfilesFormat.add(cadena);
+		}
+		
+		return listaPerfilesFormat;
 	}
 	
     public static Date removeTime(Date date) {
