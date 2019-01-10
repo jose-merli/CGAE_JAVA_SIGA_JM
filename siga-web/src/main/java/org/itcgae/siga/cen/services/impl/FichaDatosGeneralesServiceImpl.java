@@ -46,6 +46,7 @@ import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
+import org.itcgae.siga.db.entities.CenNocolegiadoKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicos;
@@ -771,14 +772,10 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+		int ultimoInsert = 0;
 //		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
 
-		CenPersonaExample example = new CenPersonaExample();
-		example.createCriteria().andNifcifEqualTo(noColegiadoItem.getNif());
-		List<CenPersona> personas = cenPersonaExtendsMapper.selectByExample(example);
-		
-		if (null != personas && !(personas.size() > 0)) {
+
 			
 			if (null != idInstitucion) {
 				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -794,8 +791,11 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					AdmUsuarios usuario = usuarios.get(0);
 
 					// 1. crear tablas CEN_PERSONA, CEN_COLEGIADO y CEN_CLIENTE
-					if (!insertResponseDTO.getStatus().equals(SigaConstants.KO)) {
-
+					CenPersonaExample example = new CenPersonaExample();
+					example.createCriteria().andNifcifEqualTo(noColegiadoItem.getNif());
+					List<CenPersona> personas = cenPersonaExtendsMapper.selectByExample(example);
+					
+					if (null != personas && !(personas.size() > 0)) {
 						// 1 crear registro en tabla CEN_PERSONA
 						LOGGER.info(
 								"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForNewSociety() -> Entrada a cenPersonaExtendsMapper para crear una nueva persona");
@@ -819,22 +819,34 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						crearPersonaDTO.setIdestadocivil(Short.parseShort(noColegiadoItem.getidEstadoCivil()));
 						}
 						
-						int responseInsertPersona = cenPersonaExtendsMapper
+						 ultimoInsert = cenPersonaExtendsMapper
 								.insertSelectiveForPerson(crearPersonaDTO, usuario);
 						LOGGER.info(
 								"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenPersonaExtendsMapper para crear una nueva persona");
-
-						if (responseInsertPersona == 1) {
-							// 2 crear registro en tabla CEN_CLIENTE
-
-							CenCliente cenCliente = new CenCliente();
+					}
+						if (ultimoInsert == 1 || (null != personas && personas.size() > 0)) {
 							List<ComboItem> comboItems = new ArrayList<ComboItem>();
-
-							comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
-
-							if (!comboItems.isEmpty()) {
+							Long idPersona = Long.valueOf(0);
+							if (null != personas && personas.size() > 0 ) {
+								idPersona = personas.get(0).getIdpersona();
+							}else {
+								comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+								idPersona = Long.valueOf(comboItems.get(0).getValue());
+							}
+							CenClienteKey key = new CenClienteKey();
+							key.setIdinstitucion(usuario.getIdinstitucion());
+							key.setIdpersona(idPersona);
+							// 2 crear registro en tabla CEN_CLIENTE
+							CenCliente cliente = cenClienteMapper.selectByPrimaryKey(key );
+							if (null == cliente) {
 								
-								cenCliente.setIdpersona(Long.valueOf(comboItems.get(0).getValue()));						
+							
+							CenCliente cenCliente = new CenCliente();
+							
+
+							//if (!comboItems.isEmpty()) {
+								
+								cenCliente.setIdpersona(idPersona);						
 								// cenCliente.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
 								cenCliente.setIdinstitucion(usuario.getIdinstitucion());
 								cenCliente.setFechaalta(new Date());
@@ -847,25 +859,27 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 								cenCliente.setUsumodificacion(usuario.getIdusuario());
 								cenCliente.setIdlenguaje(usuario.getIdlenguaje());
 								cenCliente.setExportarfoto(SigaConstants.DB_FALSE);
-							}
+							//}
 							
 							LOGGER.info(
 									"createColegiado() / cenClienteMapper.insert() -> Entrada a cenClienteMapper para crear un nuevo colegiado");
 
-							int responseCenCliente = 0;
-							responseCenCliente = cenClienteMapper.insert(cenCliente);
+							ultimoInsert = cenClienteMapper.insert(cenCliente);
 							
 							LOGGER.info(
 									"createColegiado() / cenClienteMapper.insert() -> Salida de cenClienteMapper para crear un nuevo colegiado");
 
-							
-//							int responseCenCliente = 0;
-//							if (null != record.getIdpersona()) {
-//								responseCenCliente = cenClienteMapper.insertSelective(record);
-//							}
-
-							if (responseCenCliente == 1) {
+						
+							}
+							if (ultimoInsert == 1 || null != cliente) {
+								CenNocolegiadoKey noColegiadokey = new CenNocolegiadoKey();
+								noColegiadokey.setIdinstitucion(usuario.getIdinstitucion());
+								noColegiadokey.setIdpersona(idPersona);
+								CenNocolegiado nocol = cenNocolegiadoMapper.selectByPrimaryKey(noColegiadokey );
 								// 3 crear registro en tabla CEN_NOCOLEGIADO
+								if (null == nocol) {
+									
+								
 								LOGGER.info(
 										"createColegiado() / cenColegiadoExtendsMapper.insertSelectiveForCreateNewSociety() -> Entrada a cenColegiadoExtendsMapper para crear un nuevo colegiado");
 
@@ -874,7 +888,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 										
 //										Se pone a cero ya que al ser una persona física no tiene tipo ni sociedadsj
 										cenNocolegiado.setTipo("0");
-//										cenNocolegiado.set
+										cenNocolegiado.setIdPersona(idPersona.toString());
 										cenNocolegiado.setAnotaciones(noColegiadoItem.getAnotaciones());
 										int insertNoColegiado = cenNocolegiadoMapper.insertSelectiveForCreateLegalPerson(String.valueOf(idInstitucion), usuario, cenNocolegiado);
 												
@@ -910,7 +924,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 													List<CenGruposclienteCliente> listarelacionGrupoPersona = new ArrayList<CenGruposclienteCliente>();
 													CenGruposclienteClienteExample relacionGrupoPersona = new CenGruposclienteClienteExample();
 													relacionGrupoPersona.createCriteria()
-															.andIdpersonaEqualTo(Long.valueOf(cenCliente.getIdpersona()))
+															.andIdpersonaEqualTo(Long.valueOf(insertResponseDTO.getId()))
 															.andIdgrupoEqualTo(Short.valueOf(etiqueta.getIdGrupo()))
 															.andIdinstitucionEqualTo(idInstitucion);
 													listarelacionGrupoPersona = cenGruposclienteClienteExtendsMapper
@@ -1025,15 +1039,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 											}
 										}
 									}
-								}
-							
-							
-							
-							
-							
-							
-							
-							
+								
 							
 							}
 							else {
@@ -1041,13 +1047,19 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 								LOGGER.warn(
 										"createColegiado() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> No se ha podido crear la persona no colegiada en tabla CEN_NOCOLEGIADO");
 							}
+							}else {
+									insertResponseDTO.setStatus(SigaConstants.KO);
+									org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+									error.setMessage("messages.censo.nifcifExiste2");
+									insertResponseDTO.setError(error);
+								}
 						} else {
 							insertResponseDTO.setStatus(SigaConstants.KO);
 							LOGGER.warn(
 									"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForCreateLegalPerson() -> No se ha podido crear la persona no colegiada en tabla CEN_NOCOLEGIADO");
 						}
 
-					}
+					
 					
 				} else {
 					insertResponseDTO.setStatus(SigaConstants.KO);
@@ -1057,7 +1069,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				}
 				
 				
-				
+			} 
 				
 				
 			} else {
@@ -1065,12 +1077,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				LOGGER.warn("createLegalPerson() -> idInstitucion del token nula");
 			}
 			
-		} else {
-			insertResponseDTO.setStatus(SigaConstants.KO);
-			org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
-			error.setMessage("messages.censo.nifcifExiste2");
-			insertResponseDTO.setError(error);
-		}
+		
 		
 		return insertResponseDTO;
 	}

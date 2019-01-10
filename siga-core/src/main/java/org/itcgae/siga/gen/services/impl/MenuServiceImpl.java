@@ -435,7 +435,7 @@ public class MenuServiceImpl implements IMenuService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucion));
-		List<PermisoEntity> permisosEntity = this.permisosMapper.getProcesosPermisos(permisoRequestItem);
+		List<PermisoEntity> permisosEntity = permisosMapper.getProcesosPermisos(permisoRequestItem);
 
 		if (null != permisosEntity && !permisosEntity.isEmpty()) {
 			List<PermisoItem> items = new ArrayList<PermisoItem>();

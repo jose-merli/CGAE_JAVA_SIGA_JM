@@ -307,7 +307,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 		sql.INSERT_INTO("CEN_NOCOLEGIADO");
 
-		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona)");
+		sql.VALUES("IDPERSONA", etiquetaUpdateDTO.getIdPersona());
 		sql.VALUES("IDINSTITUCION", "'" + idInstitucion + "'");
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuario.getIdusuario()) + "'");
@@ -640,7 +640,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.LEFT_OUTER_JOIN(
 				"cen_datoscv datoscv on (datoscv.idpersona = cli.idpersona and datoscv.idinstitucion = cli.idinstitucion)");
 
-		if(idInstitucion != Short.parseShort("2000")) {
+		if(idInstitucion != null) {
 			sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
 		}
 		sql.WHERE("per.idtipoidentificacion not in '20'");
