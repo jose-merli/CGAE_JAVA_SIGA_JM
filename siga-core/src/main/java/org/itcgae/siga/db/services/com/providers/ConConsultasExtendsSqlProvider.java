@@ -1,17 +1,14 @@
 package org.itcgae.siga.db.services.com.providers;
 
-import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 
 public class ConConsultasExtendsSqlProvider {
 	
-public String selectConsultas(Short idInstitucion, String idLenguaje,ConsultasSearch filtros){
-		
+	public String selectConsultas(Short idInstitucion, String idLenguaje,ConsultasSearch filtros){
+			
 		SQL sql = new SQL();
-		// Formateo de fecha para sentencia sql
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				
 		sql.SELECT("CONSULTA.IDINSTITUCION");
 		sql.SELECT("CONSULTA.IDCONSULTA");
@@ -66,13 +63,50 @@ public String selectConsultas(Short idInstitucion, String idLenguaje,ConsultasSe
 		return sql.toString();
 	}
 
-public static String filtroTextoBusquedas(String columna, String cadena) {
-
-	StringBuilder cadenaWhere = new StringBuilder();
-	cadenaWhere.append(" (TRANSLATE(LOWER( " + columna + "),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') ");
-	cadenaWhere.append(" LIKE");
-	cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena + "%'),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz')) ");
-	return cadenaWhere.toString();
+	public String ejecConsulta (String consulta){
+		SQL sql = new SQL();
+		
+		int inicioSelect = consulta.indexOf("<SELECT>" +7);
+		int finSelect = consulta.indexOf("</SELECT>");
+		String select = consulta.substring(inicioSelect, finSelect);
+		sql.SELECT(select);
+		
+		int inicioFrom = consulta.indexOf("<FROM>" +5);
+		int finFrom = consulta.indexOf("</FROM>");
+		String from = consulta.substring(inicioFrom, finFrom);
+		sql.FROM(from);
+		
+		if(consulta.contains("<WHERE>")){
+			int inicioWhere = consulta.indexOf("<WHERE>" +7);
+			int finWhere = consulta.indexOf("</WHERE>");
+			String where = consulta.substring(inicioWhere, finWhere);
+			sql.WHERE(where);
+		}
+		
+		if(consulta.contains("<ORDERBY>")){
+			int inicioOrder = consulta.indexOf("<WHERE>" +7);
+			int finOrder = consulta.indexOf("</WHERE>");
+			String orderBy = consulta.substring(inicioOrder, finOrder);
+			sql.ORDER_BY(orderBy);
+		}
+		
+		return sql.toString();
+	}
 	
-} 
+	public String selectMaxIdConsulta(){
+		SQL sql = new SQL();
+		sql.SELECT("max(idconsulta)+1 as IDMAX");
+		sql.FROM("CON_CONSULTA");
+		return sql.toString();
+	}
+
+	public static String filtroTextoBusquedas(String columna, String cadena) {
+	
+		StringBuilder cadenaWhere = new StringBuilder();
+		cadenaWhere.append(" (TRANSLATE(LOWER( " + columna + "),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') ");
+		cadenaWhere.append(" LIKE");
+		cadenaWhere.append(" TRANSLATE(LOWER('%" + cadena + "%'),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz')) ");
+		return cadenaWhere.toString();
+		
+	} 
 }

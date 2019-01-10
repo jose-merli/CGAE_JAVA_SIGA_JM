@@ -2,7 +2,9 @@ package org.itcgae.siga.com.services.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +21,7 @@ import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -388,6 +391,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 					boolean camposIncorrectos = false;
 					if(consultaDTO.getIdConsulta() == null){
 						ConConsulta consulta = new ConConsulta();
+						NewIdDTO maxId = _conConsultasExtendsMapper.selectMaxIDConsulta();
+						consulta.setIdconsulta(Long.valueOf(maxId.getNewId()));
 						consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
 						consulta.setIdinstitucion(idInstitucion);
 						consulta.setObservaciones(consultaDTO.getDescripcion());
@@ -436,9 +441,11 @@ public class ConsultasServiceImpl implements IConsultasService{
 							//insertarSelectDestinatarios(consulta.getSentencia());
 							break;
 						case "2":
+							//Multidocumento	
 							consulta.setTipoconsulta("M");
 							break;
 						case "3":
+							//condicionales
 							consulta.setTipoconsulta("W");
 							break;
 						case "4":
@@ -605,8 +612,45 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 	@Override
 	public Error ejecutarConsulta(HttpServletRequest request, String consulta) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		LOGGER.info("ejecutarConsulta() -> Entrada al servicio para ejecutar una consulta");
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Error respuesta = new Error();
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					Map<String,String> mapa = new HashMap<String,String>();
+					mapa.put("selectValue", obtenerSelect(consulta));
+					mapa.put("fromValue", obtenerFrom(consulta));
+					mapa.put("whereValue", obtenerWhere(consulta));
+					mapa.put("orderByValue", obtenerOrderBy(consulta));
+					mapa.put("groupByValue", obtenerGroupBy(consulta));
+					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
+					if(result != null){
+						LOGGER.info("datos: " + result);
+					}
+					respuesta.setCode(200);
+					respuesta.setMessage("Consulta ejecutada");
+				}catch (Exception e) {
+					respuesta.setCode(500);
+					respuesta.setMessage("Error al guardar consulta");
+					respuesta.setDescription(e.getMessage());
+					e.printStackTrace();
+				}
+		
+			}
+		}
+		LOGGER.info("ejecutarConsulta() -> Salida del servicio para ejecutar una consulta");
+		return respuesta;
 	}
 	
 	public boolean comprobarCamposDestinarios (String sentencia){
@@ -669,9 +713,10 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	public String insertarSelectDestinatarios (String sentencia){
 		
-		int indexInicio = sentencia.indexOf("<SELECT>" +6);
+		int indexInicio = sentencia.indexOf("<SELECT>")+8;
 		int indexFinal = sentencia.indexOf("</SELECT>");
 		String select = sentencia.substring(indexInicio, indexFinal);
+
 		
 		if(!sentencia.contains("CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\"")){
 			select+= " CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\"";
@@ -733,6 +778,66 @@ public class ConsultasServiceImpl implements IConsultasService{
 				+ "CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\""
 				+ "CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\""
 				+ "</SELECT>";
+	}
+	
+	public String obtenerSelect(String consulta){
+		String select = " ";
+		
+		int inicioSelect = consulta.indexOf("<SELECT>")+8;
+		int finSelect = consulta.indexOf("</SELECT>");
+		select = consulta.substring(inicioSelect, finSelect);
+		select = select.replace("select", "");
+		
+		return select;
+	}
+	
+	public String obtenerFrom(String consulta){
+		String from = "";
+		
+		int inicioFrom = consulta.indexOf("<FROM>")+6;
+		int finFrom = consulta.indexOf("</FROM>");
+		from = consulta.substring(inicioFrom, finFrom);
+		from = from.replace("from", "");
+		return from;
+	}
+	
+	public String obtenerWhere(String consulta){
+		String where = "";
+		
+		if(consulta.indexOf("<WHERE>") != -1){
+			int inicioWhere = consulta.indexOf("<WHERE>")+8;
+			int finWhere = consulta.indexOf("</WHERE>");
+			where = consulta.substring(inicioWhere, finWhere);
+			where = where.replace("where", "");
+		}
+
+		return where;
+	}
+	
+	public String obtenerOrderBy(String consulta){
+		String orderBy = "";
+
+		if(consulta.indexOf("<ORDERBY>") != -1){
+			int inicioOrder = consulta.indexOf("<ORDERBY>")+10;
+			int finOrder = consulta.indexOf("</ORDERBY>");
+			orderBy = consulta.substring(inicioOrder, finOrder);
+		}
+
+
+		return orderBy;
+	}
+	
+	public String obtenerGroupBy(String consulta){
+		String groupBy = "";
+
+		if(consulta.indexOf("<GROUPBY>") != -1){
+			int inicioGroupBy = consulta.indexOf("<GROUPBY>")+10;
+			int finGroupBy = consulta.indexOf("</GROUPBY>");
+			groupBy = consulta.substring(inicioGroupBy, finGroupBy)+" ";
+		}
+
+
+		return groupBy;
 	}
 	
 }

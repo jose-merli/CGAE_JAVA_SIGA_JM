@@ -1,5 +1,9 @@
 package org.itcgae.siga.com.controllers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.ConsultaItem;
@@ -11,6 +15,8 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -126,7 +132,6 @@ public class ConsultasController {
 		
 	}
 	
-	
 	@RequestMapping(value = "/confConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Error> guardarConsulta(HttpServletRequest request, @RequestBody ConsultaItem consulta) {
 		
@@ -137,6 +142,38 @@ public class ConsultasController {
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+	}
+	
+	@RequestMapping(value = "/ejecutarConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> ejecutarConsulta(HttpServletRequest request, @RequestBody String consulta) {
+		
+		Error response = _consultasService.ejecutarConsulta(request, consulta);
+		
+		if(response.getCode()==200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else if(response.getCode()==400)
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		/*HttpHeaders headers = null;
+		File file = null;
+		InputStreamResource resource = null;                
+		file = new File(documentoDTO.getRutaDocumento());
+		try{
+			resource = new InputStreamResource(new FileInputStream(file));                  
+		}catch(FileNotFoundException e){
+    		e.printStackTrace();    
+		}	  
+		headers = new HttpHeaders();
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Expires", "0");
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentoDTO.getNombreDocumento() + "\"");
+		System.out.println("The length of the file is : "+file.length());
+		  
+		return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);*/
 		
 	}
 	

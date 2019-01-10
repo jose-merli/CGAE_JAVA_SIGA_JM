@@ -30,22 +30,18 @@
 <!-- 			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOS.NEXTVAL FROM DUAL"/> -->
 <!-- 		</table> -->
 
-		
-		
 			<table schema="USCGAE" tableName="CON_CONSULTA" >
 				<property name="ignoreQualifiersAtRuntime" value="true"/>
-				<generatedKey column="IDCONSULTA" sqlStatement="SELECT SEQ_CON_CONSULTA.NEXTVAL FROM DUAL"/>
 			</table>
-
 
 <!-- 		<table schema="USCGAE_INT" tableName="ENV_ENTRADA_ENVIOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table> -->
 		
-		<table schema="USCGAE" tableName="ENV_HISTORICOESTADOENVIO" >
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-			<generatedKey column="IDHISTORICO" sqlStatement="SELECT SEQ_ENV_HISTORICOESTADOENVIO.NEXTVAL FROM DUAL"/>
-		</table>
+<!-- 		<table schema="USCGAE" tableName="ENV_HISTORICOESTADOENVIO" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			<generatedKey column="IDHISTORICO" sqlStatement="SELECT SEQ_ENV_HISTORICOESTADOENVIO.NEXTVAL FROM DUAL"/> -->
+<!-- 		</table> -->
 		
 <!-- 		<table schema="USCGAE_INT" tableName="ENV_CAMPOSPLANTILLA" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->

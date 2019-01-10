@@ -203,28 +203,24 @@ public class EnviosMasivosController {
 	
 	@RequestMapping(value="/detalle/descargarDocumento", method=RequestMethod.POST, produces=MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<InputStreamResource> obtenerAdjunto(@RequestBody ResponseDocumentoDTO documentoDTO){
-		
-              
-              HttpHeaders headers = null;
-              File file = null;
-              InputStreamResource resource = null;
-                               
-              file = new File(documentoDTO.getRutaDocumento());
-              
-              try{
-                        resource = new InputStreamResource(new FileInputStream(file));                  
-              }catch(FileNotFoundException e){
-                        
-              }
-              
-			  headers = new HttpHeaders();
-			  headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-			  headers.add("Pragma", "no-cache");
-			  headers.add("Expires", "0");
-			  headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentoDTO.getNombreDocumento() + "\"");
-			  System.out.println("The length of the file is : "+file.length());
-  
-              return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+            
+		HttpHeaders headers = null;
+		File file = null;
+		InputStreamResource resource = null;                
+		file = new File(documentoDTO.getRutaDocumento());
+		try{
+			resource = new InputStreamResource(new FileInputStream(file));                  
+		}catch(FileNotFoundException e){
+    		e.printStackTrace();    
+		}	  
+		headers = new HttpHeaders();
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Expires", "0");
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentoDTO.getNombreDocumento() + "\"");
+		System.out.println("The length of the file is : "+file.length());
+		  
+		return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
     }
 
 

@@ -13,6 +13,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -43,6 +44,9 @@ public class SigaConfiguration implements ApplicationListener<ApplicationReadyEv
 			SqlSessionFactoryBean sqlSessionFactory = new SqlSessionFactoryBean();
 			sqlSessionFactory.setDataSource(dataSource);
 			org.apache.ibatis.session.Configuration config = new org.apache.ibatis.session.Configuration();
+			//Para usar mappers de xml
+			PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+			sqlSessionFactory.setMapperLocations(resolver.getResources("classpath:org/itcgae/siga/db/services/com/mappers/MapperConsulta.xml"));
 			configurationCustomizer.customize(config);
 			sqlSessionFactory.setConfiguration(config);
 			return sqlSessionFactory.getObject();

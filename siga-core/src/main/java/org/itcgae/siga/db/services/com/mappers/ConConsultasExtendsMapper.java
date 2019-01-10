@@ -1,13 +1,19 @@
 package org.itcgae.siga.db.services.com.mappers;
 
-import java.util.List;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.ResultType;
 import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.services.com.providers.ConConsultasExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -38,4 +44,14 @@ public interface ConConsultasExtendsMapper {
 			@Result(column = "NOMBRECLASE", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR) })
 	List<ConsultaItem> selectConsultasSearch(Short idInstitucion, String idLenguaje, ConsultasSearch filtros);
 
-}
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectMaxIdConsulta")
+	@Results({
+		@Result(column = "IDMAX", property = "newId", jdbcType = JdbcType.VARCHAR)
+	})
+	NewIdDTO selectMaxIDConsulta();
+	
+
+
+	@ResultType(value = List.class)
+	public List<Map<String, Object>> ejecutarConsulta(@Param(value = "select") Map<String,String> querys);
+}	
