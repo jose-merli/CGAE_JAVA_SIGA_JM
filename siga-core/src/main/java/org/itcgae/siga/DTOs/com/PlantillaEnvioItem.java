@@ -27,6 +27,7 @@ public class PlantillaEnvioItem {
 	private String cuerpo;
 	private String idDireccion;
 	private String idPersona;
+	
 	public String getIdTipoEnvios() {
 		return idTipoEnvios;
 	}
