@@ -79,6 +79,15 @@ public class ConConsultasExtendsSqlProvider {
 				+ "AND IDTIPOENVIOS ='"+ idtipoEnvio +"' AND IDINSTITUCION='"+ idInstitucion +"') AND FECHABAJA is null AND IDINSTITUCION = '"+ idInstitucion +"'");
 		return sql.toString();
 	}
+	
+	public String selectConsultasDisponibles(Short idInstitucion){
+		
+		SQL sql = new SQL();
+		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION");
+		sql.FROM("CON_CONSULTA");
+		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"' AND FECHABAJA IS NULL");
+		return sql.toString();
+	}
 
 	public static String filtroTextoBusquedas(String columna, String cadena) {
 	

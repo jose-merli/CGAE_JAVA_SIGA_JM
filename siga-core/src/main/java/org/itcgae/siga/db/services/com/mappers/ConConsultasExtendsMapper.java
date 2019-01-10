@@ -12,8 +12,10 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.services.com.providers.ConConsultasExtendsSqlProvider;
+import org.itcgae.siga.db.services.com.providers.EnvEstadoEnvioExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -61,4 +63,10 @@ public interface ConConsultasExtendsMapper {
 
 	@ResultType(value = List.class)
 	public List<Map<String, Object>> ejecutarConsulta(@Param(value = "select") Map<String,String> querys);
+	
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasDisponibles")
+	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> selectConsultasDisponibles(Short IdInstitucion);
 }	

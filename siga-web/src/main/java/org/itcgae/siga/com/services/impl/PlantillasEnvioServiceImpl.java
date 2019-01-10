@@ -61,8 +61,38 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	public ComboDTO getComboConsultas(HttpServletRequest request) {
 		LOGGER.info("getComboConsultas() -> Entrada al servicio para obtener las consultas disponibles");
 		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+				comboItems = _conConsultasExtendsMapper.selectConsultasDisponibles(idInstitucion);
+				if(null != comboItems && comboItems.size() > 0) {
+					ComboItem element = new ComboItem();
+					element.setLabel("");
+					element.setValue("");
+					comboItems.add(0, element);
+				}		
+				
+				comboDTO.setCombooItems(comboItems);
+				
+			}
+		}
+		
 		LOGGER.info("getComboConsultas() -> Salida del servicio para obtener las consultas disponibles");
-		return null;
+		return comboDTO;
 	}
 
 	@Override
