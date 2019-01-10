@@ -56,44 +56,6 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	@Autowired
 	private ConConsultasExtendsMapper _conConsultasExtendsMapper;
 
-	
-	@Override
-	public ComboDTO getComboTipoEnvio(HttpServletRequest request) {
-		
-		LOGGER.info("getComboTipoEnvio() -> Entrada al servicio para obtener los tipos de envio");
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-		
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-			
-			if (null != usuarios && usuarios.size() > 0) {
-				
-				if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}		
-				
-				comboDTO.setCombooItems(comboItems);
-				
-			}
-			
-		}
-		LOGGER.info("getComboTipoEnvio() -> Salida del servicio para obtener los tipos de envio");
-		
-		return comboDTO;
-	}
 
 	@Override
 	public ComboDTO getComboConsultas(HttpServletRequest request) {
