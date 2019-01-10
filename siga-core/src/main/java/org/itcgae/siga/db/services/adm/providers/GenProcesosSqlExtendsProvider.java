@@ -20,8 +20,8 @@ public class GenProcesosSqlExtendsProvider extends AdmContadorSqlProvider{
 		sql.FROM("GEN_PROCESOS PROC");
 		
 		sql.LEFT_OUTER_JOIN("ADM_TIPOSACCESO ACCESO ON (PROC.IDPROCESO = ACCESO.IDPROCESO AND IDINSTITUCION = '"+ request.getIdInstitucion() + "'   and acceso.idperfil = '" + request.getIdGrupo() + "')");
-		// || !request.getIdInstitucion().equals(SigaConstants.InstitucionGeneral)) {
-		  if (!request.getIdInstitucionCertificado().equals(SigaConstants.InstitucionGeneral)) {
+		// || !request.getIdInstitucionCertificado().equals(SigaConstants.InstitucionGeneral)
+		  if (!request.getIdInstitucion().equals(SigaConstants.InstitucionGeneral)) {
 	        	sql.WHERE(" UPPER(PROC.DESCRIPCION) not like UPPER('%hidden%')");
 			}
 		sql.ORDER_BY("PARENT DESC, TEXT ASC");

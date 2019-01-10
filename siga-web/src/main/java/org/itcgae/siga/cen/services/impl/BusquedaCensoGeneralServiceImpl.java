@@ -18,7 +18,10 @@ import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.ws.client.ClientCENSO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +54,8 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 	@Autowired
 	private IInstitucionesService institucionesService;
 	
+	@Autowired
+	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 	
 
 	@Override
@@ -169,6 +174,17 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 										busquedaPerFisica.setDomicilio(colegiado.getLocalizacion().getDomicilio());
 										
 									}
+									
+									// Extraemos el idPersona
+									CenPersonaExample cenPersonaExample = new CenPersonaExample();
+									cenPersonaExample.createCriteria().andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
+									List<CenPersona> cenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+									
+									
+									if(!cenPersona.isEmpty()) {
+										busquedaPerFisica.setIdPersona(String.valueOf(cenPersona.get(0).getIdpersona()));
+									}
+									
 									busquedaPerFisicaItems.add(busquedaPerFisica);
 								}
 							}
@@ -180,6 +196,7 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 				}else{
 					com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado[] colegiadoName = null;
 					BusquedaColegiadoRequest colegiadoRequest = BusquedaColegiadoRequest.Factory.newInstance();
+					
 					if (null != busquedaPerFisicaSearchDTO.getNombre()){
 						colegiadoRequest.setNombre(busquedaPerFisicaSearchDTO.getNombre());
 					}
@@ -243,6 +260,17 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 	
 									busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido().concat(busquedaPerFisica.getSegundoApellido()));
 									busquedaPerFisica.setNif(colegiadoName[i].getDatosPersonales().getIdentificacion().getNIF());
+									
+									// Extraemos el idPersona
+									CenPersonaExample cenPersonaExample = new CenPersonaExample();
+									cenPersonaExample.createCriteria().andNifcifEqualTo(colegiadoName[i].getDatosPersonales().getIdentificacion().getNIF());
+									List<CenPersona> cenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+									
+									
+									if(!cenPersona.isEmpty()) {
+										busquedaPerFisica.setIdPersona(String.valueOf(cenPersona.get(0).getIdpersona()));
+									}
+									
 									busquedaPerFisica.setNombre(colegiadoName[i].getDatosPersonales().getNombre());
 									
 									if (null != colegiadoName2.getResidente()) {

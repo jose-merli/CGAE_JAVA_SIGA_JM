@@ -285,9 +285,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		ForInscripcion forInscripcionInsert = new ForInscripcion();
-
+		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -347,8 +345,6 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 					}else {
 						response = 0;
 					}
-					
-					
 					
 				} catch (Exception e) {
 					response = 0;
