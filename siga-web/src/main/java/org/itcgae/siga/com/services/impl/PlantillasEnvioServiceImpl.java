@@ -28,8 +28,10 @@ import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
+import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.PlantillasEnvioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,9 +44,13 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
+	
+	@Autowired
+	private PlantillasEnvioExtendsMapper _plantillasEnvioExtendsMapper;
+	
 	@Autowired
 	private EnvPlantillasenviosMapper _envPlantillasenviosMapper;
-	
+
 	
 	@Override
 	public ComboDTO getComboTipoEnvio(HttpServletRequest request) {
@@ -66,9 +72,6 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			
 			if (null != usuarios && usuarios.size() > 0) {
-
-				AdmUsuarios usuario = usuarios.get(0);
-				//comboItems = cenTipoDireccionExtendsMapper.selectTipoDireccion(usuario.getIdlenguaje());
 				
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
@@ -96,28 +99,39 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	@Override
 	public PlantillasEnvioDTO PlantillasEnvioSearch(HttpServletRequest request, PlantillaEnvioSearchItem filtros) {
 		
-		LOGGER.info("getComboTipoEnvio() -> Entrada al servicio para obtener los tipos de envio");
+		LOGGER.info("PlantillasEnvioSearch() -> Entrada al servicio para la busqueda de plantillas de envio");
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+		
+		PlantillasEnvioDTO respuesta = new PlantillasEnvioDTO();
+		List<PlantillaEnvioItem> plantillasItem = new ArrayList<PlantillaEnvioItem>();
+		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-			
-			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
-
+			try{
+				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
+					plantillasItem = _plantillasEnvioExtendsMapper.selectPlantillasEnvios(idInstitucion, filtros);
+					if(plantillasItem != null && plantillasItem.size()> 0){
+						respuesta.setPlantillasItem(plantillasItem);
+					}
+				}
+			}catch(Exception e){
+				Error error = new Error();
+				error.setCode(500);
+				error.setMessage(e.getMessage());
 			}
-			
+		
 		}
-		LOGGER.info("getComboTipoEnvio() -> Salida del servicio para obtener los tipos de envio");
-		return null;
+		LOGGER.info("PlantillasEnvioSearch() -> Salida del servicio para la busqueda de plantillas de envio");
+		return respuesta;
 	}
 
 	@Override
@@ -176,29 +190,51 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 
 	@Override
 	public Error guardarDatosGenerales(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta) {
-LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar los datos generales de la plantilla");
+		LOGGER.info("PlantillasEnvioSearch() -> Entrada al servicio para la busqueda de plantillas de envio");
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+		
+		Error respuesta = new Error();
+		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-			
-			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
+			try{
+				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
+					if(datosTarjeta.getidPlantillasEnvio() != null){
+						EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
+						key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getidPlantillasEnvio()));
+						key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+						key.setIdinstitucion(idInstitucion);
+						EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+						if(datosTarjeta.getIdTipoEnvio().equals("") || datosTarjeta.getIdTipoEnvio().equals("")){
+							plantilla.setAsunto(datosTarjeta.getAsunto());
+							plantilla.setCuerpo(datosTarjeta.getCuerpo());
+						}
+						
+						plantilla.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvio()));
+						_envPlantillasenviosMapper.updateByPrimaryKeyWithBLOBs(plantilla);
+					}else{
+						EnvPlantillasenviosWithBLOBs plantilla = new EnvPlantillasenviosWithBLOBs();
+					}
 
+				}
+			}catch(Exception e){
+				respuesta.setCode(500);
+				respuesta.setDescription("Error al guardar datos generales");
+				respuesta.setMessage(e.getMessage());
 			}
-			
-		}
 		
-		LOGGER.info("guardarDatosGenerales() -> Salida del servicio para guardar los datos generales de la plantilla");
-		return null;
+		}
+		LOGGER.info("PlantillasEnvioSearch() -> Salida del servicio para la busqueda de plantillas de envio");
+		return respuesta;
 	}
 
 	@Override

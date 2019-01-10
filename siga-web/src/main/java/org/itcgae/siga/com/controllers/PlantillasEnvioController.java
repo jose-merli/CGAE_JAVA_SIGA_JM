@@ -2,8 +2,10 @@ package org.itcgae.siga.com.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
+import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
+import org.itcgae.siga.DTOs.com.PlantillasEnvioDTO;
+import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.com.services.IPlantillasEnvioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.itcgae.siga.DTOs.gen.Error;
 
 @RestController
 @RequestMapping(value = "/plantillasEnvio")
@@ -32,11 +35,27 @@ public class PlantillasEnvioController {
 	
 	
 	@RequestMapping(value = "/plantillasEnvioSearch",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DatosModelosComunicacionesDTO> PlantillasEnvioSearch(HttpServletRequest request, PlantillaEnvioSearchItem filtros) {
+	ResponseEntity<PlantillasEnvioDTO> PlantillasEnvioSearch(HttpServletRequest request, PlantillaEnvioSearchItem filtros) {
 		
-		/*DatosModelosComunicacionesDTO response = _modelosYcomunicacionesService.modeloYComunicacionesSearch(request, filtros);
-		return new ResponseEntity<DatosModelosComunicacionesDTO>(response, HttpStatus.OK);*/
-		return null;
+		PlantillasEnvioDTO respuesta = _plantillasEnvioService.PlantillasEnvioSearch(request, filtros);
+		
+		if(respuesta.getError()!= null)
+			return new ResponseEntity<PlantillasEnvioDTO>(respuesta, HttpStatus.OK);
+		else
+			return new ResponseEntity<PlantillasEnvioDTO>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+	}
+	
+	@RequestMapping(value = "/plantillasEnvioSearch",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> PlantillasEnvioSearch(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta) {
+		
+		Error respuesta = _plantillasEnvioService.guardarDatosGenerales(request, datosTarjeta);
+		
+		if(respuesta.getCode()== 200)
+			return new ResponseEntity<Error>(respuesta, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
+		
 	}
 	
 

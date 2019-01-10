@@ -103,8 +103,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	@Autowired
 	private EnvDestinatariosMapper _envDestinatariosMapper;
 	
-	@Autowired
-	private EnvHistoricoEstadoExtendsMapper _envHistoricoEstadoExtendsMapper;
 	
 	@Autowired
 	private EnvPlantillaEnviosExtendsMapper _envPlantillaEnviosExtendsMapper;
