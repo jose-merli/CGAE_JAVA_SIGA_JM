@@ -1,5 +1,8 @@
 package org.itcgae.siga.commons.constants;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -380,8 +383,19 @@ public class SigaConstants {
 	public static final String PLAZAS_DISPO_SI = "1";
 	
 	public static final String PLAZAS_DISPO_NO = "0";
+		
+	public static final String AUX_TRANS_TILDES_1 = "áéíóúàèìòùãõâêîôôäëïöüçÁÉÍÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÏÖÜÇ";
 	
-	public static final String ESTADO_CURSO_ABIERTO = "0";
+	public static final String AUX_TRANS_TILDES_2 = "aeiouaeiouaoaeiooaeioucAEIOUAEIOUAOAEIOOAEIOUC";
+	
+	public static final String ESTADO_INSCRIPCION_PENDIENTE = "1";
+	public static final String ESTADO_INSCRIPCION_RECHAZADA = "2";
+	public static final String ESTADO_INSCRIPCION_APROBADA = "3";
+	public static final String ESTADO_INSCRIPCION_CANCELADA = "4";
+	
+	//FICHA CURSO
+	
+public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static final String ESTADO_CURSO_ANUNCIADO = "1";
 	
@@ -396,13 +410,83 @@ public class SigaConstants {
 	public static final Integer CURSO_SIN_ARCHIVAR = 0;
 	
 	public static final Integer CURSO_ARCHIVADO = 1;
+
+	public static final Short DESIGNAR_TUTOR = 0; 
+	public static final Short ASIGNAR_TUTOR = 1; 
+	public static final long ANUNCIADO_CURSO = 1; 
+	public static final long ABIERTO_CURSO = 0;
+	public static final long FINALIZADO_CURSO = 4; 
+	public static final long CANCELADO_CURSO = 5; 
 	
-	public static final String AUX_TRANS_TILDES_1 = "áéíóúàèìòùãõâêîôôäëïöüçÁÉÍÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÏÖÜÇ";
+	public static final long INSCRIPCION_PENDIENTE = 1; 
+	public static final long INSCRIPCION_CANCELADA = 4; 
+	public static final long INSCRIPCION_APROBADA = 3; 
+	public static final long INSCRIPCION_RECHAZADA = 2; 
+
+	public static final String EVENTO_PLANIFICADO = "1"; 
+	public static final String EVENTO_CANCELADO = "3";
+	public static final String EVENTO_SESION = "8";
 	
-	public static final String AUX_TRANS_TILDES_2 = "aeiouaeiouaoaeiooaeioucAEIOUAEIOUAOAEIOOAEIOUC";
+	public static final short ID_TIPO_SERVICIOS_FORMACION = 5;
+	public static final short PERIOCIDAD_1MES = 1;
+	public static final short MODULO_CONTADOR = 11;
+
 	
-	public static final String ESTADO_INSCRIPCION_PENDIENTE = "1";
-	public static final String ESTADO_INSCRIPCION_RECHAZADA = "2";
-	public static final String ESTADO_INSCRIPCION_APROBADA = "3";
-	public static final String ESTADO_INSCRIPCION_CANCELADA = "4";
+	public static final String CODIGO_CURSO = "CÓDIGO CURSO";
+	public static final String FORMA_PAGO = "FORMA PAGO";
+	public static final String NIF = "NIF";
+	public static final String NOMBRE_PERSONA = "NOMBRE_PERSONA";
+	public static final String NOMBRE_CURSO = "NOMBRE_CURSO";
+	public static final String ESTADO = "ESTADO";
+	public static final String ERRORES = "ERRORES";
+	
+	public static final List<String> CAMPOSPLANTILLACURSO = Arrays.asList(CODIGO_CURSO, FORMA_PAGO, NIF);
+	public static final List<String> CAMPOSPLOGCURSO = Arrays.asList(CODIGO_CURSO, NOMBRE_CURSO, FORMA_PAGO, NIF, NOMBRE_PERSONA, ERRORES);
+	
+	
+	//FICHA EVENTOS
+	
+	public static final String NOMBRE = "NOMBRE";
+	public static final String ASISTENCIA = "ASISTENCIA";
+	
+	public static final long TIPO_EVENTO_INICIO_INSCRIPCION = 4;
+	public static final long TIPO_EVENTO_FIN_INSCRIPCION = 5;
+	public static final long TIPO_EVENTO_SESION = 8;
+	
+	public static final List<String> CAMPOSPLANTILLAEVENTOS = Arrays.asList(NOMBRE);
+	
+	//CARGA MASIVA GF
+	
+	public static final String ALTA = "A";
+	public static final String BAJA = "B";
+	public static final String C_IDGRUPO = "C_IDGRUPO";
+	public static final String ACCION = "ACCION";
+	public static final String GENERAL = "GENERAL";
+	public static final String NOMBREGRUPO = "NOMBREGRUPO";
+	public static final String PERSONANOMBRE = "PERSONANOMBRE";
+	public static final String C_IDPERSONA = "C_IDPERSONA";
+	public static final String PERSONANIF = "PERSONANIF";
+	public static final String COLEGIADONUMERO = "COLEGIADONUMERO";
+	public static final Short IDINSTITUCION_2000 = 2000;
+	public static final String TIPO_CARGA = "GF";
+	public static final String C_FECHAINICIO = "C_FECHAINICIO";
+	public static final String C_FECHAFIN = "C_FECHAFIN";
+	
+	public static final List<String> CAMPOSEJEMPLOGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, 
+			C_IDGRUPO, GENERAL, ACCION, C_FECHAINICIO,
+			C_FECHAFIN);
+
+	
+	public static final List<String> CAMPOSLOGGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, 
+			PERSONANOMBRE, C_IDPERSONA, C_IDGRUPO, 
+			GENERAL, NOMBREGRUPO, ACCION, C_FECHAINICIO,
+			C_FECHAFIN, ERRORES);
+
+	public static final String tipoExcelXls = "xls";
+	public static final String tipoExcelXlsx = "xlsx";
+	public static final String nombreFicheroEjemplo = "PlantillaMasivaDatosGF";
+	public static final String nombreFicheroError = "LogErrorCargaMasivaGF";
+	
+	
+
 }

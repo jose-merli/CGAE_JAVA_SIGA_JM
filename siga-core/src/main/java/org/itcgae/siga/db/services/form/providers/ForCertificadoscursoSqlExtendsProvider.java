@@ -26,6 +26,7 @@ public class ForCertificadoscursoSqlExtendsProvider extends ForCertificadoscurso
 
 		sql.WHERE("cer.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("cer.idCurso = '" + idCurso + "'");
+		sql.WHERE("cer.FECHABAJA IS NULL");
 
 		return sql.toString();
 	}

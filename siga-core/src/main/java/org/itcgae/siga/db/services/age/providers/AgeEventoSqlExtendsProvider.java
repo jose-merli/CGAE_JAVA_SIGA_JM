@@ -60,6 +60,7 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		sql.SELECT("cat.descripcion as estadoEvento");
 		sql.SELECT("evento.idtipoevento");
 		sql.SELECT("cal.IDTIPOCALENDARIO");
+		sql.SELECT("ec.IDCURSO");
 		sql.FROM("AGE_EVENTO evento");
 		sql.INNER_JOIN(
 				"FOR_EVENTO_CURSO ec on (evento.idEvento = ec.idEvento and evento.idinstitucion = ec.idinstitucion)");

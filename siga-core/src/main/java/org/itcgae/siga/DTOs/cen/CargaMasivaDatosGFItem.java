@@ -7,23 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class CargaMasivaDatosGFItem {
 	
-	public static final String ALTA = "A";
-	public static final String BAJA = "B";
-	public static final String C_IDGRUPO = "C_IDGRUPO";
-	public static final String ACCION = "ACCION";
-	public static final String GENERAL = "GENERAL";
-	public static final String NOMBREGRUPO = "NOMBREGRUPO";
-	public static final String PERSONANOMBRE = "PERSONANOMBRE";
-	public static final String C_IDPERSONA = "C_IDPERSONA";
-	public static final String PERSONANIF = "PERSONANIF";
-	public static final String ERRORES = "ERRORES";
-	public static final String COLEGIADONUMERO = "COLEGIADONUMERO";
-	public static final Short IDINSTITUCION_2000 = 2000;
-	public static final String DB_TRUE = "1";
-	public static final String TIPO_CARGA = "GF";
-	public static final String C_FECHAINICIO = "C_FECHAINICIO";
-	public static final String C_FECHAFIN = "C_FECHAFIN";
-	
 	private Short idGrupo;
 	private String nombreGrupo;
 	private Short idInstitucion;
