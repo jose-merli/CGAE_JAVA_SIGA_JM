@@ -23,14 +23,7 @@ public class PlantillasEnvioExtendsSqlProvider {
 		}
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("") ){
 			sql.WHERE(filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
-		}
-		if(!filtros.getTipoEnvio().trim().equals("") && filtros.getTipoEnvio() != null){
-			sql.WHERE("PLANTILLA.IDTIPOENVIOS = '" + filtros.getTipoEnvio() +"'");
-		}
-		if(filtros.getNombre().trim().equals("") && filtros.getNombre() != null){
-			sql.WHERE(filtroTextoBusquedas("PLANTILLA.NOMBRE", filtros.getNombre()));
-
-		}
+		}	
 		
 		return sql.toString();
 	}
