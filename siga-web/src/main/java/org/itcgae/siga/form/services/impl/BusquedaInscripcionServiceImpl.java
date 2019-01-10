@@ -22,7 +22,6 @@ import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.ForCambioinscripcion;
 import org.itcgae.siga.db.entities.ForInscripcion;
 import org.itcgae.siga.db.entities.ForInscripcionExample;
-import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.mappers.ForCambioinscripcionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -56,9 +55,6 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 	
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
-	
-	@Autowired
-	private AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivosPerfil;
 	
 	@Override
 	public ComboDTO getEstadosInscripcion(HttpServletRequest request) {
@@ -109,7 +105,23 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 	public InscripcionDTO searchInscripcion(InscripcionItem inscripcionItem, HttpServletRequest request) {
 
 		LOGGER.info("searchInscripcion() -> Entrada al servicio para obtener inscripciones");
+		
+		String token = request.getHeader("Authorization");
+		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<CenPersona> listCenPersona;
 
+		if (letrado.equalsIgnoreCase("S")) {
+			CenPersonaExample cenPersonaExample = new CenPersonaExample();
+			cenPersonaExample.createCriteria().andNifcifEqualTo(dni);
+			listCenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+			if(!listCenPersona.isEmpty()) {
+				CenPersona cenPersona = listCenPersona.get(0);
+				inscripcionItem.setIdPersona(cenPersona.getIdpersona());
+			}
+		}
+		
 		InscripcionDTO inscripcionDTO = new InscripcionDTO();
 		List<InscripcionItem> inscripcionItemList = new ArrayList<InscripcionItem>();
 		

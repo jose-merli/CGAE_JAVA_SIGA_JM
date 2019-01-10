@@ -2,7 +2,6 @@ package org.itcgae.siga.form.services;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -28,43 +27,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IFichaCursosService {
 	
-	public static final Short DESIGNAR_TUTOR = 0; 
-	public static final Short ASIGNAR_TUTOR = 1; 
-	public static final long ANUNCIADO_CURSO = 1; 
-	public static final long ABIERTO_CURSO = 0;
-	public static final long FINALIZADO_CURSO = 0; 
-	
-	public static final long INSCRIPCION_PENDIENTE = 1; 
-	public static final long INSCRIPCION_CANCELADA = 4; 
-	public static final long INSCRIPCION_APROBADA = 3; 
-	public static final long INSCRIPCION_RECHAZADA = 2; 
-
-	public static final String EVENTO_PLANIFICADO = "1"; 
-	public static final String EVENTO_CANCELADO = "3";
-	public static final String EVENTO_SESION = "8";
-	
-	public static final short ID_TIPO_SERVICIOS_FORMACION = 5;
-	public static final short PERIOCIDAD_1MES = 1;
-	public static final short MODULO_CONTADOR = 11;
-
-	
-	public static final String CODIGO_CURSO = "CÓDIGO CURSO";
-	public static final String FORMA_PAGO = "FORMA PAGO";
-	public static final String NIF = "NIF";
-	public static final String NOMBRE_PERSONA = "NOMBRE_PERSONA";
-	public static final String NOMBRE_CURSO = "NOMBRE_CURSO";
-	public static final String ESTADO = "ESTADO";
-	public static final String ERRORES = "ERRORES";
-	
-	public static final List<String> CAMPOSPLANTILLA = Arrays.asList(CODIGO_CURSO, FORMA_PAGO, NIF);
-	public static final List<String> CAMPOSPLOG = Arrays.asList(CODIGO_CURSO, NOMBRE_CURSO, FORMA_PAGO, NIF, NOMBRE_PERSONA, ERRORES);
-	
-	public static final String tipoExcelXls = "xls";
-	public static final String tipoExcelXlsx = "xlsx";
-	public static final String nombreFicheroEjemplo = "PlantillaMasivaInscripciones";
-	public static final String nombreFicheroError = "LogErrorCargaMasivaInscripciones";
-
-
 	public void updateEstadoCursoAuto();
 	
 	public FormadorCursoDTO getTrainersCourse(String idCurso, HttpServletRequest request);
@@ -127,6 +89,6 @@ public interface IFichaCursosService {
 
 	public UpdateResponseDTO updateCertificatesCourse(CertificadoCursoDTO certifcadoCursoDTO, HttpServletRequest request);
 
-
+	public UpdateResponseDTO deleteCertificatesCourse(CertificadoCursoDTO certifcadoCursoDTO, HttpServletRequest request);
 
 }

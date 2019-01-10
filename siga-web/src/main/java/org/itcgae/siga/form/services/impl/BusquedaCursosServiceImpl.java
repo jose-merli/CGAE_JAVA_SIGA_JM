@@ -187,16 +187,41 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService {
 		List<CursoItem> cursoItemList = new ArrayList<CursoItem>();
 
 		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		if (null != idInstitucion) {
-			cursoItemList = forCursoExtendsMapper.selectCursos(idInstitucion, cursoItem);
-			cursoDTO.setCursoItem(cursoItemList);
+			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			
+			LOGGER.info(
+					"searchCurso() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			LOGGER.info(
+					"searchCurso() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-			if (cursoItemList == null || cursoItemList.size() == 0) {
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				
+				LOGGER.info(
+						"searchCurso() / forCursoExtendsMapper.selectCursos() -> Entrada a forCursoExtendsMapper para obtener los cursos");
+				
+				cursoItemList = forCursoExtendsMapper.selectCursos(idInstitucion, cursoItem, usuario.getIdlenguaje());
+				
+				LOGGER.info(
+						"searchCurso() / forCursoExtendsMapper.selectCursos() -> Entrada a forCursoExtendsMapper para obtener los cursos");
+				
+				cursoDTO.setCursoItem(cursoItemList);
 
-				LOGGER.warn(
-						"searchCurso() / forCursoExtendsMapper.selectCursos() -> No existen cursos para el filtro introducido");
+				if (cursoItemList == null || cursoItemList.size() == 0) {
+
+					LOGGER.warn(
+							"searchCurso() / forCursoExtendsMapper.selectCursos() -> No existen cursos para el filtro introducido");
+				}
+
 			}
 		}
 
@@ -401,7 +426,7 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService {
 							forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
 							forEventoCurso.setIdinstitucion(idInstitucion);
 
-//							response = forEventoCursoMapper.insert(forEventoCurso);
+							// response = forEventoCursoMapper.insert(forEventoCurso);
 
 							// Se da de alta al evento creado para ese curso
 
@@ -413,80 +438,88 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService {
 							LOGGER.info(
 									"saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) -> Entrada a ageEventoExtendsMapper para buscar el evento que debemos dar de alta");
 
-//							List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(exampleEvento);
+							// List<AgeEvento> eventoList =
+							// ageEventoExtendsMapper.selectByExample(exampleEvento);
 
 							LOGGER.info(
 									"saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) -> Salida a ageEventoExtendsMapper para buscar el evento que debemos dar de alta");
 
-//							if (null != eventoList && eventoList.size() > 0) {
-//								AgeEvento evento = eventoList.get(0);
+							// if (null != eventoList && eventoList.size() > 0) {
+							// AgeEvento evento = eventoList.get(0);
 
-//								evento.setIdevento(Long.valueOf(cursoItem.getIdEventoInicioInscripcion()));
-//								evento.setFechabaja(null);
-//								evento.setFechamodificacion(new Date());
-//								evento.setUsumodificacion(usuario.getIdusuario().longValue());
+							// evento.setIdevento(Long.valueOf(cursoItem.getIdEventoInicioInscripcion()));
+							// evento.setFechabaja(null);
+							// evento.setFechamodificacion(new Date());
+							// evento.setUsumodificacion(usuario.getIdusuario().longValue());
 
-								LOGGER.info(
-										"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
+							LOGGER.info(
+									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
 
-//								response = ageEventoExtendsMapper.updateByPrimaryKey(evento);
+							// response = ageEventoExtendsMapper.updateByPrimaryKey(evento);
 
-								LOGGER.info(
-										"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
-
-							}
+							LOGGER.info(
+									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
 
 						}
 
-						// Si existe idEventoInscripcion se debe guardar la relacion entre el evento y
-						// el curso
-//						if (cursoItem.getIdEventoFinInscripcion() != null) {
-//
-//							ForEventoCurso forEventoCurso = new ForEventoCurso();
-//							forEventoCurso.setFechabaja(null);
-//							forEventoCurso.setFechamodificacion(new Date());
-//							forEventoCurso.setIdcurso(forCursoInsert.getIdcurso());
-//							forEventoCurso.setIdevento(Long.valueOf(cursoItem.getIdEventoFinInscripcion()));
-//							forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
-//							forEventoCurso.setIdinstitucion(idInstitucion);
-//
-//							response = forEventoCursoMapper.insert(forEventoCurso);
-//
-//							// Se da de alta al evento creado para ese curso
-//
-//							AgeEventoExample exampleEvento = new AgeEventoExample();
-//							exampleEvento.createCriteria()
-//									.andIdeventoEqualTo(Long.valueOf(cursoItem.getIdEventoFinInscripcion()))
-//									.andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andFechabajaIsNotNull();
-//
-//							LOGGER.info(
-//									"saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) -> Entrada a ageEventoExtendsMapper para buscar el evento que debemos dar de alta");
-//
-//							List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(exampleEvento);
-//
-//							LOGGER.info(
-//									"saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) -> Salida a ageEventoExtendsMapper para buscar el evento que debemos dar de alta");
-//
-//							if (null != eventoList && eventoList.size() > 0) {
-//								AgeEvento evento = eventoList.get(0);
-//
-//								evento.setIdevento(Long.valueOf(cursoItem.getIdEventoFinInscripcion()));
-//								evento.setFechabaja(null);
-//								evento.setFechamodificacion(new Date());
-//								evento.setUsumodificacion(usuario.getIdusuario().longValue());
-//
-//								LOGGER.info(
-//										"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
-//
-//								response = ageEventoExtendsMapper.updateByPrimaryKey(evento);
-//
-//								LOGGER.info(
-//										"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
-//
-//							}
-//
-//						}
-//					}
+					}
+
+					// Si existe idEventoInscripcion se debe guardar la relacion entre el evento y
+					// el curso
+					// if (cursoItem.getIdEventoFinInscripcion() != null) {
+					//
+					// ForEventoCurso forEventoCurso = new ForEventoCurso();
+					// forEventoCurso.setFechabaja(null);
+					// forEventoCurso.setFechamodificacion(new Date());
+					// forEventoCurso.setIdcurso(forCursoInsert.getIdcurso());
+					// forEventoCurso.setIdevento(Long.valueOf(cursoItem.getIdEventoFinInscripcion()));
+					// forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+					// forEventoCurso.setIdinstitucion(idInstitucion);
+					//
+					// response = forEventoCursoMapper.insert(forEventoCurso);
+					//
+					// // Se da de alta al evento creado para ese curso
+					//
+					// AgeEventoExample exampleEvento = new AgeEventoExample();
+					// exampleEvento.createCriteria()
+					// .andIdeventoEqualTo(Long.valueOf(cursoItem.getIdEventoFinInscripcion()))
+					// .andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andFechabajaIsNotNull();
+					//
+					// LOGGER.info(
+					// "saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) ->
+					// Entrada a ageEventoExtendsMapper para buscar el evento que debemos dar de
+					// alta");
+					//
+					// List<AgeEvento> eventoList =
+					// ageEventoExtendsMapper.selectByExample(exampleEvento);
+					//
+					// LOGGER.info(
+					// "saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) ->
+					// Salida a ageEventoExtendsMapper para buscar el evento que debemos dar de
+					// alta");
+					//
+					// if (null != eventoList && eventoList.size() > 0) {
+					// AgeEvento evento = eventoList.get(0);
+					//
+					// evento.setIdevento(Long.valueOf(cursoItem.getIdEventoFinInscripcion()));
+					// evento.setFechabaja(null);
+					// evento.setFechamodificacion(new Date());
+					// evento.setUsumodificacion(usuario.getIdusuario().longValue());
+					//
+					// LOGGER.info(
+					// "saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada
+					// a ageEventoExtendsMapper para dar de alta al evento");
+					//
+					// response = ageEventoExtendsMapper.updateByPrimaryKey(evento);
+					//
+					// LOGGER.info(
+					// "saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada
+					// a ageEventoExtendsMapper para dar de alta al evento");
+					//
+					// }
+					//
+					// }
+					// }
 
 				} catch (Exception e) {
 					response = 0;

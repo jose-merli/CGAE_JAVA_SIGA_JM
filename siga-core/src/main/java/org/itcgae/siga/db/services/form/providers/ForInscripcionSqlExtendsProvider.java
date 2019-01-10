@@ -16,6 +16,8 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.SELECT("INSC.IDINSCRIPCION");
 		sql.SELECT("INSC.IDESTADOINSCRIPCION");
 		sql.SELECT("INSC.IDPERSONA");
+		sql.SELECT("INSC.EMITIRCERTIFICADO");
+		sql.SELECT("INSC.CERTIFICADOEMITIDO");
 		sql.SELECT("CURSO.IDESTADOCURSO");
 		sql.SELECT("CURSO.IDCURSO");
 		sql.SELECT("INSC.IDINSTITUCION");
@@ -43,8 +45,16 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.LEFT_OUTER_JOIN(
 				"FOR_PERSONA_CURSO PERCURSO2 ON PERCURSO2.IDCURSO = CURSO.IDCURSO AND PERCURSO2.TUTOR = '1' AND CURSO.IDINSTITUCION = PERCURSO2.IDINSTITUCION");
 
+		if (inscripcionItem.getIdCurso() != null && inscripcionItem.getIdCurso() != "") {
+			sql.WHERE("INSC.IDCURSO = '" + inscripcionItem.getIdCurso() + "'");
+		}
+		
 		if (inscripcionItem.getColegio() != null && inscripcionItem.getColegio() != "") {
 			sql.WHERE("INSC.IDINSTITUCION = '" + inscripcionItem.getColegio() + "'");
+		}
+		
+		if (inscripcionItem.getIdPersona() != null) {
+			sql.WHERE("INSC.IDPERSONA = '" + inscripcionItem.getIdPersona() + "'");
 		}
 
 		if (inscripcionItem.getCodigoCurso() != null && inscripcionItem.getCodigoCurso() != "") {
@@ -112,8 +122,18 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 			sql.WHERE("PERCURSO2.IDPERSONA ='" + inscripcionItem.getIdFormador() + "'");
 		}
 
-		// TODO Falta filtro de "Certificado emitido -> Si, No, Todos"
-
+		if(inscripcionItem.getCertificadoEmitido() != null) {
+			// 0 --> TODOS
+			// 1 --> Si tiene certificadoEmitido
+			// 2 --> No tiene certificadoEmitido
+		
+			if(inscripcionItem.getCertificadoEmitido() == 1) {
+				sql.WHERE("INSC.CERTIFICADOEMITIDO = '1'");
+			}else if(inscripcionItem.getCertificadoEmitido() == 2) {
+				sql.WHERE("INSC.CERTIFICADOEMITIDO = '0' OR INSC.CERTIFICADOEMITIDO IS NULL");
+			}
+		}
+		
 		if (inscripcionItem.getPagada() != null) {
 			// 0 --> TODOS
 			// 1 --> Si esta pagada la inscripcion
