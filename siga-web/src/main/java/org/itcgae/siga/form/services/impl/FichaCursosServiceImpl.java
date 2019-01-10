@@ -106,6 +106,7 @@ import org.itcgae.siga.db.services.form.mappers.PysServiciosinstitucionExtendsMa
 import org.itcgae.siga.db.services.form.mappers.PysSuscripcionExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.form.services.IFichaCursosService;
+import org.itcgae.siga.form.services.IFichaInscripcionService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -215,6 +216,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Autowired
 	private ForCertificadoscursoExtendsMapper forCertificadoscursoExtendsMapper;
+
+	@Autowired
+	private IFichaInscripcionService fichaInscripcionService;
 
 	@Override
 	public void updateEstadoCursoAuto() {
@@ -2434,16 +2438,6 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							for (ForInscripcion inscription : inscriptionList) {
 
 								if (inscription.getIdestadoinscripcion() == SigaConstants.INSCRIPCION_PENDIENTE) {
-									LOGGER.info(
-											"autovalidateInscriptionsCourse() / forInscripcionExtendsMapper.updateByPrimaryKey() -> Entrada a forInscripcionExtendsMapper cambiar el estado a las inscripciones aprobada");
-
-									inscription.setFechamodificacion(new Date());
-									inscription.setUsumodificacion(usuario.getIdusuario().longValue());
-									inscription.setIdestadoinscripcion(SigaConstants.INSCRIPCION_APROBADA);
-									response = forInscripcionExtendsMapper.updateByPrimaryKey(inscription);
-
-									LOGGER.info(
-											"autovalidateInscriptionsCourse() / forInscripcionExtendsMapper.updateByPrimaryKey() -> Salida a forInscripcionExtendsMapper cambiar el estado a las inscripciones a aprobada");
 
 									PysPeticioncomprasuscripcion pysPeticioncomprasuscripcion = new PysPeticioncomprasuscripcion();
 									pysPeticioncomprasuscripcion.setFechamodificacion(new Date());
@@ -2529,6 +2523,19 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 									LOGGER.info(
 											"autovalidateInscriptionsCourse() / pysSuscripcionExtendsMapper.insert() -> Salida a pysSuscripcionExtendsMapper para insertar la suscripcion a la inscripcion");
+
+									LOGGER.info(
+											"autovalidateInscriptionsCourse() / forInscripcionExtendsMapper.updateByPrimaryKey() -> Entrada a forInscripcionExtendsMapper cambiar el estado a las inscripciones aprobada");
+
+									// Guardamos el idPeticion y actualizamos la inscripcion a aprobada
+									inscription.setFechamodificacion(new Date());
+									inscription.setIdpeticionsuscripcion(Long.valueOf(idPeticion.getNewId()));
+									inscription.setUsumodificacion(usuario.getIdusuario().longValue());
+									inscription.setIdestadoinscripcion(SigaConstants.INSCRIPCION_APROBADA);
+									response = forInscripcionExtendsMapper.updateByPrimaryKey(inscription);
+
+									LOGGER.info(
+											"autovalidateInscriptionsCourse() / forInscripcionExtendsMapper.updateByPrimaryKey() -> Salida a forInscripcionExtendsMapper cambiar el estado a las inscripciones a aprobada");
 
 								} else {
 									error.setDescription(
@@ -2840,6 +2847,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		int response = 2;
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
+		int numFinishCourse = 0;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -2879,10 +2887,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 						if (null != forCursoList && forCursoList.size() > 0) {
 
+							ForCurso curso = forCursoList.get(0);
+
 							ForInscripcionExample forInscripcionExample = new ForInscripcionExample();
 							forInscripcionExample.createCriteria().andIdcursoEqualTo(cursoItem.getIdCurso())
 									.andIdestadoinscripcionEqualTo(SigaConstants.INSCRIPCION_APROBADA)
-									.andIdinstitucionEqualTo(idInstitucion).andIdcalificacionIsNull();
+									.andIdinstitucionEqualTo(idInstitucion).andCalificacionIsNull();
 
 							LOGGER.info(
 									"finishCourse() / forCursoExtendsMapper.selectByExample() -> Entrada a forCursoExtendsMapper para comprobar las calificaciones de los alumnos de un curso");
@@ -2893,11 +2903,49 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							LOGGER.info(
 									"finishCourse() / forCursoExtendsMapper.selectByExample() -> Entrada a forCursoExtendsMapper para comprobar las calificaciones de los alumnos de un curso");
 
-							//Si se ha calificado previamente a todos los alumnos se finaliza el curso
+							// Si se ha calificado previamente a todos los alumnos se finaliza el curso y
+							// Se generan los certificados para cada inscripcion
 							if (null == forInscripcionList || forInscripcionList.size() == 0) {
 
-								ForCurso curso = forCursoList.get(0);
+								InscripcionItem inscripcionItem = new InscripcionItem();
+								inscripcionItem.setIdCurso(curso.getIdcurso().toString());
+								inscripcionItem.setIdInstitucion(idInstitucion.toString());
+								inscripcionItem
+										.setIdEstadoInscripcion(String.valueOf(SigaConstants.INSCRIPCION_APROBADA));
 
+								LOGGER.info(
+										"finishCourse() / forInscripcionExtendsMapper.selectInscripciones() -> Entrada a forInscripcionExtendsMapper para buscar las inscripciones a las cuales se generara un certificado");
+
+								List<InscripcionItem> inscriptionItemList = forInscripcionExtendsMapper
+										.selectInscripciones(inscripcionItem);
+
+								LOGGER.info(
+										"finishCourse() / forInscripcionExtendsMapper.selectInscripciones() -> Entrada a forInscripcionExtendsMapper para buscar las inscripciones a las cuales se generara un certificado");
+
+								// Generamos los certificados para cada curso si existen inscripciones para este
+								// curso
+								if (null != inscriptionItemList && inscriptionItemList.size() > 0) {
+
+									for (InscripcionItem inscripcion : inscriptionItemList) {
+										InsertResponseDTO responseInsert = fichaInscripcionService
+												.generarSolicitudCertificados(inscripcion, request);
+
+										if (responseInsert.getError().getCode() == 400) {
+											response = 0;
+											error.setCode(400);
+											error.setDescription(
+													"Se ha producido un error en BBDD contacte con su administrador");
+										} else {
+											response = 1;
+											error.setCode(200);
+											error.setDescription(
+													"Se ha generado correctamente el certificado de la inscripcion");
+
+										}
+									}
+								}
+
+								// Generados los certificados finalizamos el curso
 								curso.setIdestadocurso(SigaConstants.FINALIZADO_CURSO);
 								curso.setUsumodificacion(usuario.getIdusuario().longValue());
 								curso.setFechamodificacion(new Date());
@@ -2909,14 +2957,17 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 								LOGGER.info(
 										"finishCourse() / forCursoExtendsMapper.updateByPrimaryKey() -> Entrada a forCursoExtendsMapper para finalizar el curso");
-								
-							//Si queda algún alumno por calificar no se puede finalizar el curso	
-							}else {
-								error.setDescription("No se puede finalizar el curso poque todavía quedan alumnos por calificar");
+
+								// Si queda algún alumno por calificar no se puede finalizar el curso
+							} else {
+								error.setDescription(
+										"No se puede finalizar el curso poque todavía quedan alumnos por calificar");
+								numFinishCourse += 1;
 							}
 
 						} else {
 							error.setDescription("El curso no esta en estado impartido y no se puede finalizar");
+							numFinishCourse += 1;
 						}
 					}
 
@@ -2931,7 +2982,17 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 		if (response == 1) {
 			error.setCode(200);
-			error.setDescription("Se ha finalizado el curso correctamente");
+
+			if (cursoDTO.getCursoItem()!= null && cursoDTO.getCursoItem().size() > 1) {
+				if (numFinishCourse == cursoDTO.getCursoItem().size()) {
+					error.setDescription("No se pueden finalizar los curso poque todavía quedan alumnos por calificar o porque su estado no sea impartido");
+				} else {
+					error.setDescription("Se han finalizado " + numFinishCourse + "/" + cursoDTO.getCursoItem().size()
+							+ " cursos selecionados");
+				}
+			} else {
+				error.setDescription("Se ha finalizado el curso correctamente");
+			}
 		}
 
 		LOGGER.info("finishCourse() -> Salida del servicio para finalizar un curso");
@@ -3347,6 +3408,190 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 		LOGGER.info("deleteCertificatesCourse() -> Entrada al servicio para eliminar el certificado de un curso");
 
+		return updateResponseDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO releaseCourse(CursoDTO cursoDTO, HttpServletRequest request) {
+		LOGGER.info("releaseCourse() -> Entrada al servicio para desanunciar los cursos");
+
+		int response = 2;
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int numReleaseCourse = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"releaseCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"releaseCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+					for (CursoItem curso : cursoDTO.getCursoItem()) {
+
+						ForCursoExample exampleCourse = new ForCursoExample();
+						exampleCourse.createCriteria().andIdcursoEqualTo(Long.valueOf(curso.getIdCurso()))
+								.andIdestadocursoEqualTo(SigaConstants.ANUNCIADO_CURSO)
+								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+						LOGGER.info(
+								"releaseCourse() / forCursoExtendsMapper.selectByExample(exampleCourse) -> Entrada a forCursoExtendsMapper para comprobar si el curso esta anunciado");
+
+						List<ForCurso> courseList = forCursoExtendsMapper.selectByExample(exampleCourse);
+
+						LOGGER.info(
+								"releaseCourse() / forCursoExtendsMapper.selectByExample(exampleCourse) -> Salida a forCursoExtendsMapper para comprobar si el curso esta anunciado");
+
+						if (null != courseList && courseList.size() > 0) {
+							ForCurso course = courseList.get(0);
+
+							LOGGER.info(
+									"releaseCourse() / forCursoExtendsMapper.updateByPrimaryKey(event) -> Entrada a forCursoExtendsMapper para desanunciar el curso");
+
+							course.setFechamodificacion(new Date());
+							course.setUsumodificacion(usuario.getIdusuario().longValue());
+							course.setIdestadocurso(SigaConstants.ABIERTO_CURSO);
+							response = forCursoExtendsMapper.updateByPrimaryKey(course);
+
+							LOGGER.info(
+									"releaseCourse() / forCursoExtendsMapper.updateByPrimaryKey(event) -> Salida a forCursoExtendsMapper para desanunciar el curso");
+
+							numReleaseCourse += 1;
+						}
+					}
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+				}
+
+				if (response == 1) {
+					error.setCode(200);
+					
+					error.setDescription("Se han desanunciado " + numReleaseCourse + "/"
+							+ cursoDTO.getCursoItem().size() + " cursos selecionados");
+				}else if(response == 2) {
+					
+					if (cursoDTO.getCursoItem().size() == cursoDTO.getCursoItem().size()-numReleaseCourse) {
+						error.setDescription(
+								"No se puede desanunciar los cursos seleccionados porque su estado no es anunciado");
+					} else {
+						error.setDescription("Se han desanunciado " + numReleaseCourse + "/"
+								+ cursoDTO.getCursoItem().size() + " cursos selecionados");
+					}
+				}
+			}
+		}
+
+		LOGGER.info("releaseCourse() -> Salida del servicio para desanunciar los cursos");
+
+		updateResponseDTO.setError(error);
+		return updateResponseDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO announceCourse(CursoDTO cursoDTO, HttpServletRequest request) {
+		LOGGER.info("announceCourse() -> Entrada al servicio para anunciar los cursos");
+
+		int response = 2;
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int numAnnounceCourse = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"announceCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"announceCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+					for (CursoItem curso : cursoDTO.getCursoItem()) {
+
+						ForCursoExample exampleCourse = new ForCursoExample();
+						exampleCourse.createCriteria().andIdcursoEqualTo(Long.valueOf(curso.getIdCurso()))
+								.andIdestadocursoEqualTo(SigaConstants.ABIERTO_CURSO)
+								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+						LOGGER.info(
+								"announceCourse() / forCursoExtendsMapper.selectByExample(exampleCourse) -> Entrada a forCursoExtendsMapper para comprobar si el curso esta abierto");
+
+						List<ForCurso> courseList = forCursoExtendsMapper.selectByExample(exampleCourse);
+
+						LOGGER.info(
+								"announceCourse() / forCursoExtendsMapper.selectByExample(exampleCourse) -> Salida a forCursoExtendsMapper para comprobar si el curso esta abierto");
+
+						if (null != courseList && courseList.size() > 0) {
+							ForCurso course = courseList.get(0);
+
+							LOGGER.info(
+									"announceCourse() / forCursoExtendsMapper.updateByPrimaryKey(event) -> Entrada a forCursoExtendsMapper para anunciar el curso");
+
+							course.setFechamodificacion(new Date());
+							course.setUsumodificacion(usuario.getIdusuario().longValue());
+							course.setIdestadocurso(SigaConstants.ANUNCIADO_CURSO);
+							response = forCursoExtendsMapper.updateByPrimaryKey(course);
+
+							LOGGER.info(
+									"announceCourse() / forCursoExtendsMapper.updateByPrimaryKey(event) -> Salida a forCursoExtendsMapper para anunciar el curso");
+
+							numAnnounceCourse += 1;
+						}
+					}
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+				}
+
+				if (response == 1) {
+					error.setCode(200);
+					
+					error.setDescription("Se han anunciado " + numAnnounceCourse + "/"
+							+ cursoDTO.getCursoItem().size() + " cursos selecionados");
+				}else if(response == 2) {
+					
+					if (cursoDTO.getCursoItem().size() == cursoDTO.getCursoItem().size()-numAnnounceCourse) {
+						error.setDescription(
+								"No se puede anunciar los cursos seleccionados porque su estado no es abierto");
+					} else {
+						error.setDescription("Se han anunciado " + numAnnounceCourse + "/"
+								+ cursoDTO.getCursoItem().size() + " cursos selecionados");
+					}
+				}
+			}
+		}
+
+		LOGGER.info("announceCourse() -> Salida del servicio para para anunciar los cursos");
+
+		updateResponseDTO.setError(error);
 		return updateResponseDTO;
 	}
 
