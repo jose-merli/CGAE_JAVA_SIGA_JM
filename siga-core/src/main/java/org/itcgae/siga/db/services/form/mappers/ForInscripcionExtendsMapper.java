@@ -36,7 +36,9 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper{
 			@Result(column = "MINIMAASISTENCIA", property = "minimaAsistencia", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "CERTIFICADOEMITIDO", property = "certificadoEmitido", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "EMITIRCERTIFICADO", property = "emitirCertificado", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "CALIFICACION", property = "calificacion", jdbcType = JdbcType.NUMERIC)
+			@Result(column = "CALIFICACION", property = "calificacion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDPETICIONSUSCRIPCION", property = "idPeticionSuscripcion", jdbcType = JdbcType.NUMERIC)
+
 	})
 	List<InscripcionItem> selectInscripciones(InscripcionItem inscripcionItem);	
 	

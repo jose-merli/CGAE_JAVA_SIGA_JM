@@ -39,6 +39,7 @@ public class InscripcionItem {
 	private String nombrePersona;
 	private String nifPersona;
 	private String formaPagoNombre;
+	private Long idPeticionSuscripcion;
 	
 	// 0 --> Aprobar
 	// 1 --> Cancelar
@@ -448,6 +449,14 @@ public class InscripcionItem {
 		this.emitirCertificado = emitirCertificado;
 	}
 
+	public Long getIdPeticionSuscripcion() {
+		return idPeticionSuscripcion;
+	}
+
+	public void setIdPeticionSuscripcion(Long idPeticionSuscripcion) {
+		this.idPeticionSuscripcion = idPeticionSuscripcion;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -485,6 +494,7 @@ public class InscripcionItem {
 		result = prime * result + ((idInscripcion == null) ? 0 : idInscripcion.hashCode());
 		result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
 		result = prime * result + ((idPersona == null) ? 0 : idPersona.hashCode());
+		result = prime * result + ((idPeticionSuscripcion == null) ? 0 : idPeticionSuscripcion.hashCode());
 		result = prime * result + ((idVisibilidad == null) ? 0 : idVisibilidad.hashCode());
 		result = prime * result + ((minimaAsistencia == null) ? 0 : minimaAsistencia.hashCode());
 		result = prime * result + ((motivo == null) ? 0 : motivo.hashCode());
@@ -676,6 +686,11 @@ public class InscripcionItem {
 				return false;
 		} else if (!idPersona.equals(other.idPersona))
 			return false;
+		if (idPeticionSuscripcion == null) {
+			if (other.idPeticionSuscripcion != null)
+				return false;
+		} else if (!idPeticionSuscripcion.equals(other.idPeticionSuscripcion))
+			return false;
 		if (idVisibilidad == null) {
 			if (other.idVisibilidad != null)
 				return false;
@@ -759,14 +774,17 @@ public class InscripcionItem {
 				+ ", idCalificacion=" + idCalificacion + ", precioCurso=" + precioCurso + ", fechaSolicitud="
 				+ fechaSolicitud + ", fechaSolicitudDate=" + fechaSolicitudDate + ", idPersona=" + idPersona
 				+ ", nombrePersona=" + nombrePersona + ", nifPersona=" + nifPersona + ", formaPagoNombre="
-				+ formaPagoNombre + ", tipoAccion=" + tipoAccion + ", motivo=" + motivo + ", idEstadoCurso="
-				+ idEstadoCurso + ", idEstadoInscripcion=" + idEstadoInscripcion + ", idVisibilidad=" + idVisibilidad
-				+ ", idInstitucion=" + idInstitucion + ", descripcionEstado=" + descripcionEstado
-				+ ", fechaInscripcion=" + fechaInscripcion + ", fechaImparticion=" + fechaImparticion + ", pendientes="
-				+ pendientes + ", rechazadas=" + rechazadas + ", aprobadas=" + aprobadas + ", canceladas=" + canceladas
-				+ ", totales=" + totales + ", formaPago=" + formaPago + ", idCurso=" + idCurso
-				+ ", fechaInscripcionDesdeFormat=" + fechaInscripcionDesdeFormat + ", fechaInscripcionHastaFormat="
-				+ fechaInscripcionHastaFormat + ", fechaImparticionDesdeFormat=" + fechaImparticionDesdeFormat
-				+ ", fechaImparticionHastaFormat=" + fechaImparticionHastaFormat + ", errores=" + errores + "]";
+				+ formaPagoNombre + ", idPeticionSuscripcion=" + idPeticionSuscripcion + ", tipoAccion=" + tipoAccion
+				+ ", motivo=" + motivo + ", idEstadoCurso=" + idEstadoCurso + ", idEstadoInscripcion="
+				+ idEstadoInscripcion + ", idVisibilidad=" + idVisibilidad + ", idInstitucion=" + idInstitucion
+				+ ", descripcionEstado=" + descripcionEstado + ", fechaInscripcion=" + fechaInscripcion
+				+ ", fechaImparticion=" + fechaImparticion + ", pendientes=" + pendientes + ", rechazadas=" + rechazadas
+				+ ", aprobadas=" + aprobadas + ", canceladas=" + canceladas + ", totales=" + totales + ", formaPago="
+				+ formaPago + ", idCurso=" + idCurso + ", fechaInscripcionDesdeFormat=" + fechaInscripcionDesdeFormat
+				+ ", fechaInscripcionHastaFormat=" + fechaInscripcionHastaFormat + ", fechaImparticionDesdeFormat="
+				+ fechaImparticionDesdeFormat + ", fechaImparticionHastaFormat=" + fechaImparticionHastaFormat
+				+ ", errores=" + errores + "]";
 	}
+
+	
 }

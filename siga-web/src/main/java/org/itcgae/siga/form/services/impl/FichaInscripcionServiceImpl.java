@@ -307,11 +307,9 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 					
 					for (ForCertificadoscurso forCertificadosCurso : listCertificadosCurso) {
 						PysProductossolicitados pysRecord = new PysProductossolicitados();
-						
-						NewIdDTO idPeticion = pysProductosSolicitadosExtendsMapper.selectMaxIdPeticion(idInstitucion, forCertificadosCurso.getIdtipoproducto().shortValue(), forCertificadosCurso.getIdproducto(), forCertificadosCurso.getIdproductoinstitucion());
-						
+											
 						pysRecord.setIdinstitucion(idInstitucion);
-						pysRecord.setIdpeticion(Long.parseLong(idPeticion.getNewId()));
+						pysRecord.setIdpeticion(inscripcionItem.getIdPeticionSuscripcion());
 						pysRecord.setIdtipoproducto(forCertificadosCurso.getIdtipoproducto()!=null ? forCertificadosCurso.getIdtipoproducto().shortValue() : null);
 						pysRecord.setIdproducto(forCertificadosCurso.getIdproducto());
 						pysRecord.setIdproductoinstitucion(forCertificadosCurso.getIdproductoinstitucion());
@@ -322,7 +320,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 						pysRecord.setValor(forCertificadosCurso.getPrecio());
 						pysRecord.setFechamodificacion(new Date());
 						pysRecord.setUsumodificacion(usuario.getIdusuario());
-						pysRecord.setIddireccion(1L);
+//						pysRecord.setIddireccion(1L);
 						pysRecord.setIdinstitucionorigen(idInstitucion);
 						pysRecord.setNofacturable("1");
 						pysRecord.setFecharecepcionsolicitud(new Date());
