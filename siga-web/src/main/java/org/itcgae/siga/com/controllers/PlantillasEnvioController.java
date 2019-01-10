@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.itcgae.siga.DTOs.gen.Error;
 
@@ -35,7 +37,7 @@ public class PlantillasEnvioController {
 	
 	
 	@RequestMapping(value = "/plantillasEnvioSearch",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<PlantillasEnvioDTO> PlantillasEnvioSearch(HttpServletRequest request, PlantillaEnvioSearchItem filtros) {
+	ResponseEntity<PlantillasEnvioDTO> PlantillasEnvioSearch(@RequestParam("numPagina") int numPagina,HttpServletRequest request, @RequestBody PlantillaEnvioSearchItem filtros) {
 		
 		PlantillasEnvioDTO respuesta = _plantillasEnvioService.PlantillasEnvioSearch(request, filtros);
 		
@@ -46,8 +48,8 @@ public class PlantillasEnvioController {
 		
 	}
 	
-	@RequestMapping(value = "/plantillasEnvioSearch",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> PlantillasEnvioSearch(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta) {
+	@RequestMapping(value = "/datosGenerales",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> PlantillasEnvioSearch(HttpServletRequest request, @RequestBody TarjetaConfiguracionDto datosTarjeta) {
 		
 		Error respuesta = _plantillasEnvioService.guardarDatosGenerales(request, datosTarjeta);
 		

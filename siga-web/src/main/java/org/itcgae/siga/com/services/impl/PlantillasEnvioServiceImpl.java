@@ -214,16 +214,26 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
 						key.setIdinstitucion(idInstitucion);
 						EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
-						if(datosTarjeta.getIdTipoEnvio().equals("") || datosTarjeta.getIdTipoEnvio().equals("")){
-							plantilla.setAsunto(datosTarjeta.getAsunto());
-							plantilla.setCuerpo(datosTarjeta.getCuerpo());
-						}
-						
+						plantilla.setAsunto(datosTarjeta.getAsunto());
+						plantilla.setCuerpo(datosTarjeta.getCuerpo());
 						plantilla.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvio()));
+						plantilla.setFechamodificacion(new Date());
+						plantilla.setUsumodificacion(usuario.getIdusuario());
 						_envPlantillasenviosMapper.updateByPrimaryKeyWithBLOBs(plantilla);
 					}else{
 						EnvPlantillasenviosWithBLOBs plantilla = new EnvPlantillasenviosWithBLOBs();
+						plantilla.setIdinstitucion(idInstitucion);
+						plantilla.setIdtipoenvios(Short.parseShort(datosTarjeta.getidPlantillasEnvio()));
+						plantilla.setNombre(datosTarjeta.getDescripcion());
+						if(datosTarjeta.getIdTipoEnvio().equals("1") || datosTarjeta.getIdTipoEnvio().equals("2")){
+							plantilla.setAsunto(datosTarjeta.getAsunto());
+							plantilla.setCuerpo(datosTarjeta.getCuerpo());
+						}
+						plantilla.setFechamodificacion(new Date());
+						plantilla.setUsumodificacion(usuario.getIdusuario());
 					}
+					respuesta.setCode(200);
+					respuesta.setMessage("Plantilla guardada correctamente");
 
 				}
 			}catch(Exception e){
