@@ -132,7 +132,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		if (orderList == null)
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
 		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector,
-				ICargasMasivasGFService.nombreFicheroEjemplo);
+				SigaConstants.nombreFicheroEjemplo);
 
 		LOGGER.info("createExcelFile() -> Salida al servicio que crea la plantilla Excel");
 
@@ -151,28 +151,28 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		// 1. Se defonen las columnas que conforman la plantilla
 
 		// 1.1 Se rellena la primera fila
-		datosHashtable.put(CargaMasivaDatosGFItem.COLEGIADONUMERO, "nnnnnn");
-		datosHashtable.put(CargaMasivaDatosGFItem.PERSONANIF, "nnnnnnnna");
-		datosHashtable.put(CargaMasivaDatosGFItem.C_IDGRUPO, "nnnn");
-		datosHashtable.put(CargaMasivaDatosGFItem.GENERAL, "1/0");
-		datosHashtable.put(CargaMasivaDatosGFItem.ACCION, "A/B");
-		datosHashtable.put(CargaMasivaDatosGFItem.C_FECHAINICIO, "dd/MM/yyyy");
-		datosHashtable.put(CargaMasivaDatosGFItem.C_FECHAFIN, "dd/MM/yyyy");
+		datosHashtable.put(SigaConstants.COLEGIADONUMERO, "nnnnnn");
+		datosHashtable.put(SigaConstants.PERSONANIF, "nnnnnnnna");
+		datosHashtable.put(SigaConstants.C_IDGRUPO, "nnnn");
+		datosHashtable.put(SigaConstants.GENERAL, "1/0");
+		datosHashtable.put(SigaConstants.ACCION, "A/B");
+		datosHashtable.put(SigaConstants.C_FECHAINICIO, "dd/MM/yyyy");
+		datosHashtable.put(SigaConstants.C_FECHAFIN, "dd/MM/yyyy");
 		datosVector.add(datosHashtable);
 
 		// 1.1 Se rellena la segunda fila
 		datosHashtable = new Hashtable<String, Object>();
-		datosHashtable.put(CargaMasivaDatosGFItem.COLEGIADONUMERO, "Opcional. Si nulo nif/cif requerido");
-		datosHashtable.put(CargaMasivaDatosGFItem.PERSONANIF, "Opcional. Si nulo colegiadonumero requerido");
-		datosHashtable.put(CargaMasivaDatosGFItem.C_IDGRUPO, "Requerido");
-		datosHashtable.put(CargaMasivaDatosGFItem.GENERAL, "Requerido. 1 si es general, 0 si es propio del ICA");
-		datosHashtable.put(CargaMasivaDatosGFItem.ACCION, "Requerido");
-		datosHashtable.put(CargaMasivaDatosGFItem.C_FECHAINICIO, "Requerido si accion es A");
-		datosHashtable.put(CargaMasivaDatosGFItem.C_FECHAFIN, "Requerido si accion es A");
+		datosHashtable.put(SigaConstants.COLEGIADONUMERO, "Opcional. Si nulo nif/cif requerido");
+		datosHashtable.put(SigaConstants.PERSONANIF, "Opcional. Si nulo colegiadonumero requerido");
+		datosHashtable.put(SigaConstants.C_IDGRUPO, "Requerido");
+		datosHashtable.put(SigaConstants.GENERAL, "Requerido. 1 si es general, 0 si es propio del ICA");
+		datosHashtable.put(SigaConstants.ACCION, "Requerido");
+		datosHashtable.put(SigaConstants.C_FECHAINICIO, "Requerido si accion es A");
+		datosHashtable.put(SigaConstants.C_FECHAFIN, "Requerido si accion es A");
 		datosVector.add(datosHashtable);
 
 		// 2. Crea el fichero excel
-		File file = createExcelFile(ICargasMasivasGFService.CAMPOSEJEMPLO, datosVector);
+		File file = createExcelFile(SigaConstants.CAMPOSEJEMPLOGF, datosVector);
 
 		// 3. Se convierte el fichero en array de bytes para enviarlo al front
 		InputStream fileStream = null;
@@ -275,7 +275,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 						datosHashtable = getLineaCargaMasiva(cargaMasivaDatosGFVo);
 						datos.add(datosHashtable);
 
-						if (cargaMasivaDatosGFVo.getAccion().equalsIgnoreCase(CargaMasivaDatosGFItem.ALTA)) {
+						if (cargaMasivaDatosGFVo.getAccion().equalsIgnoreCase(SigaConstants.ALTA)) {
 
 							CenGruposclienteCliente cenGruposclienteCliente = new CenGruposclienteCliente();
 							cenGruposclienteCliente.setIdpersona(cargaMasivaDatosGFVo.getIdPersona());
@@ -341,11 +341,11 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 				}
 
-				byte[] bytesLog = ExcelHelper.createExcelBytes(ICargasMasivasGFService.CAMPOSLOG, datosLog);
+				byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGF, datosLog);
 
-				cenCargamasivaGF.setTipocarga(CargaMasivaDatosGFItem.TIPO_CARGA);
+				cenCargamasivaGF.setTipocarga(SigaConstants.TIPO_CARGA);
 				cenCargamasivaGF.setIdinstitucion(idInstitucion);
-				cenCargamasivaGF.setNombrefichero(ICargasMasivasGFService.nombreFicheroEjemplo);
+				cenCargamasivaGF.setNombrefichero(SigaConstants.nombreFicheroEjemplo);
 				cenCargamasivaGF.setNumregistros((Integer) cargaMasivaDatosGFItems.size());
 				cenCargamasivaGF.setNumregistroserroneos(registrosErroneos);
 				cenCargamasivaGF.setFechamodificacion(new Date());
@@ -402,8 +402,8 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 		// Comprueba si la institucion que esta logeada es la 2000 si es diferente la
 		// añade a la lista de instituciones
-		if (idInstitucion != CargaMasivaDatosGFItem.IDINSTITUCION_2000) {
-			idInstituciones.add(CargaMasivaDatosGFItem.IDINSTITUCION_2000);
+		if (idInstitucion != SigaConstants.IDINSTITUCION_2000) {
+			idInstituciones.add(SigaConstants.IDINSTITUCION_2000);
 		}
 
 		StringBuffer errorLinea = null;
@@ -419,12 +419,12 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			// si la institucion es el CGAE no miramos en Colegiado porque no tiene sentido
 			// ya que no va a encontrar nada
 
-			if (hashtable.get(CargaMasivaDatosGFItem.COLEGIADONUMERO) != null
-					&& !hashtable.get(CargaMasivaDatosGFItem.COLEGIADONUMERO).toString().equals(""))
-				cargaMasivaDatosGFVo.setColegiadoNumero((String) hashtable.get(CargaMasivaDatosGFItem.COLEGIADONUMERO));
-			if (hashtable.get(CargaMasivaDatosGFItem.PERSONANIF) != null
-					&& !hashtable.get(CargaMasivaDatosGFItem.PERSONANIF).toString().equals(""))
-				cargaMasivaDatosGFVo.setPersonaNif((String) hashtable.get(CargaMasivaDatosGFItem.PERSONANIF));
+			if (hashtable.get(SigaConstants.COLEGIADONUMERO) != null
+					&& !hashtable.get(SigaConstants.COLEGIADONUMERO).toString().equals(""))
+				cargaMasivaDatosGFVo.setColegiadoNumero((String) hashtable.get(SigaConstants.COLEGIADONUMERO));
+			if (hashtable.get(SigaConstants.PERSONANIF) != null
+					&& !hashtable.get(SigaConstants.PERSONANIF).toString().equals(""))
+				cargaMasivaDatosGFVo.setPersonaNif((String) hashtable.get(SigaConstants.PERSONANIF));
 			if (cargaMasivaDatosGFVo.getColegiadoNumero() != null || cargaMasivaDatosGFVo.getPersonaNif() != null) {
 
 				try {
@@ -470,21 +470,21 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			// Comprobacion si el colegiado pertenece al colegio general o a otro diferente
 			// Y si le ha asignado una etiqueta
 			short idInst = cargaMasivaDatosGFVo.getIdInstitucion();
-			if ((hashtable.get(CargaMasivaDatosGFItem.GENERAL) != null
-					&& !hashtable.get(CargaMasivaDatosGFItem.GENERAL).toString().equals(""))
-					&& (hashtable.get(CargaMasivaDatosGFItem.GENERAL).toString().equals("1")
-							|| hashtable.get(CargaMasivaDatosGFItem.GENERAL).toString().equals("0"))) {
+			if ((hashtable.get(SigaConstants.GENERAL) != null
+					&& !hashtable.get(SigaConstants.GENERAL).toString().equals(""))
+					&& (hashtable.get(SigaConstants.GENERAL).toString().equals("1")
+							|| hashtable.get(SigaConstants.GENERAL).toString().equals("0"))) {
 				
 				// Seteamos general
-				cargaMasivaDatosGFVo.setGeneral(hashtable.get(CargaMasivaDatosGFItem.GENERAL).toString().equals(CargaMasivaDatosGFItem.DB_TRUE)? true: false);
+				cargaMasivaDatosGFVo.setGeneral(hashtable.get(SigaConstants.GENERAL).toString().equals(SigaConstants.DB_TRUE)? true: false);
 				
-				if (hashtable.get(CargaMasivaDatosGFItem.GENERAL).toString().equals(CargaMasivaDatosGFItem.DB_TRUE))
-					idInst = new Short(CargaMasivaDatosGFItem.IDINSTITUCION_2000);
+				if (hashtable.get(SigaConstants.GENERAL).toString().equals(SigaConstants.DB_TRUE))
+					idInst = new Short(SigaConstants.IDINSTITUCION_2000);
 
-				if (hashtable.get(CargaMasivaDatosGFItem.C_IDGRUPO) != null
-						&& !hashtable.get(CargaMasivaDatosGFItem.C_IDGRUPO).toString().equals("")) {
+				if (hashtable.get(SigaConstants.C_IDGRUPO) != null
+						&& !hashtable.get(SigaConstants.C_IDGRUPO).toString().equals("")) {
 					try {
-						Short idGrupo = Short.valueOf((String) hashtable.get(CargaMasivaDatosGFItem.C_IDGRUPO));
+						Short idGrupo = Short.valueOf((String) hashtable.get(SigaConstants.C_IDGRUPO));
 						if (idGrupo > 9999)
 							throw new NumberFormatException();
 						String key = idInst + "||" + idGrupo;
@@ -537,15 +537,15 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 			// Se comprueba si se quiere dar de alta o de baja a la etiqueta para el
 			// colegiado indicado
-			if (hashtable.get(CargaMasivaDatosGFItem.ACCION) != null) {
-				String accion = (String) hashtable.get(CargaMasivaDatosGFItem.ACCION);
-				if (!accion.equalsIgnoreCase(CargaMasivaDatosGFItem.ALTA)
-						&& !accion.equalsIgnoreCase(CargaMasivaDatosGFItem.BAJA)) {
+			if (hashtable.get(SigaConstants.ACCION) != null) {
+				String accion = (String) hashtable.get(SigaConstants.ACCION);
+				if (!accion.equalsIgnoreCase(SigaConstants.ALTA)
+						&& !accion.equalsIgnoreCase(SigaConstants.BAJA)) {
 					LOGGER.debug("La accion debe ser A o B");
 					errorLinea.append("La accion debe ser ");
-					errorLinea.append(CargaMasivaDatosGFItem.ALTA);
+					errorLinea.append(SigaConstants.ALTA);
 					errorLinea.append(" o ");
-					errorLinea.append(CargaMasivaDatosGFItem.BAJA);
+					errorLinea.append(SigaConstants.BAJA);
 					errorLinea.append(". ");
 					cargaMasivaDatosGFVo.setAccion("Error");
 				} else
@@ -557,13 +557,13 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 			// Se comprueba que la fecha inicio y fecha fin sean campos obligatorios excepto
 			// cuando sea una baja
-			if (hashtable.get(CargaMasivaDatosGFItem.C_FECHAINICIO) != null
-					&& hashtable.get(CargaMasivaDatosGFItem.C_FECHAINICIO) != "") {
+			if (hashtable.get(SigaConstants.C_FECHAINICIO) != null
+					&& hashtable.get(SigaConstants.C_FECHAINICIO) != "") {
 
 				try {
 					DateFormat df1 = new SimpleDateFormat("dd-MMM-yyyy"); // for parsing input
 					cargaMasivaDatosGFVo
-							.setFechaInicio(df1.parse((String) hashtable.get(CargaMasivaDatosGFItem.C_FECHAINICIO)));
+							.setFechaInicio(df1.parse((String) hashtable.get(SigaConstants.C_FECHAINICIO)));
 
 				} catch (ParseException e1) {
 					LOGGER.debug("Error al parsear fecha");
@@ -571,26 +571,26 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 			} else {
 
-				if (hashtable.get(CargaMasivaDatosGFItem.ACCION) != "B") {
+				if (hashtable.get(SigaConstants.ACCION) != "B") {
 					LOGGER.debug("Fecha inicio es campo obligatorio");
 					errorLinea.append("Fecha inicio es campo obligatorio. ");
 				}
 			}
 
-			if (hashtable.get(CargaMasivaDatosGFItem.C_FECHAFIN) != null
-					&& hashtable.get(CargaMasivaDatosGFItem.C_FECHAFIN) != "") {
+			if (hashtable.get(SigaConstants.C_FECHAFIN) != null
+					&& hashtable.get(SigaConstants.C_FECHAFIN) != "") {
 
 				try {
 					DateFormat df1 = new SimpleDateFormat("dd-MMM-yyyy"); // for parsing input
 					cargaMasivaDatosGFVo
-							.setFechaFin(df1.parse((String) hashtable.get(CargaMasivaDatosGFItem.C_FECHAFIN)));
+							.setFechaFin(df1.parse((String) hashtable.get(SigaConstants.C_FECHAFIN)));
 
 				} catch (ParseException e) {
 					LOGGER.debug("Error al parsear fecha");
 				}
 
 			} else {
-				if (hashtable.get(CargaMasivaDatosGFItem.ACCION) != "B") {
+				if (hashtable.get(SigaConstants.ACCION) != "B") {
 					LOGGER.debug("Fecha fin es campo obligatorio");
 					errorLinea.append("Fecha fin es campo obligatorio. ");
 				}
@@ -606,14 +606,14 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 				cenGruposclienteClienteKey.setIdinstitucionGrupo(cargaMasivaDatosGFVo.getIdInstitucionGrupo());
 				cenGruposclienteClienteKey.setIdgrupo(cargaMasivaDatosGFVo.getIdGrupo());
 				/** 4. Comprobacion que la persona no esta asignada ya al grupo **/
-				if (cargaMasivaDatosGFVo.getAccion().equalsIgnoreCase(CargaMasivaDatosGFItem.ALTA)) {
+				if (cargaMasivaDatosGFVo.getAccion().equalsIgnoreCase(SigaConstants.ALTA)) {
 					CenGruposclienteCliente cenGruposclienteCliente = cenGruposclienteClienteMapper
 							.selectByPrimaryKey(cenGruposclienteClienteKey);
 					if (cenGruposclienteCliente != null) {
 						LOGGER.debug("process.usuario.ya.asignado");
 						errorLinea.append("Usuario ya asignado a ese grupo fijo. ");
 					}
-				} else if (cargaMasivaDatosGFVo.getAccion().equalsIgnoreCase(CargaMasivaDatosGFItem.BAJA)) {
+				} else if (cargaMasivaDatosGFVo.getAccion().equalsIgnoreCase(SigaConstants.BAJA)) {
 					/**
 					 * 5. Comprobacion que la persona existe en el grupo donde se quiere dar de baja
 					 **/
@@ -670,25 +670,25 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 	private Hashtable<String, Object> getLineaCargaMasiva(CargaMasivaDatosGFItem cargaMasivaDatosCVVo) {
 		Hashtable<String, Object> datosHashtable = new Hashtable<String, Object>();
-		datosHashtable.put(CargaMasivaDatosGFItem.COLEGIADONUMERO,
+		datosHashtable.put(SigaConstants.COLEGIADONUMERO,
 				cargaMasivaDatosCVVo.getColegiadoNumero() == null ? "" : cargaMasivaDatosCVVo.getColegiadoNumero());
-		datosHashtable.put(CargaMasivaDatosGFItem.PERSONANIF,
+		datosHashtable.put(SigaConstants.PERSONANIF,
 				cargaMasivaDatosCVVo.getPersonaNif() == null ? "" : cargaMasivaDatosCVVo.getPersonaNif());
-		datosHashtable.put(CargaMasivaDatosGFItem.PERSONANOMBRE,
+		datosHashtable.put(SigaConstants.PERSONANOMBRE,
 				cargaMasivaDatosCVVo.getPersonaNombre() == null ? "" : cargaMasivaDatosCVVo.getPersonaNombre());
-		datosHashtable.put(CargaMasivaDatosGFItem.C_IDPERSONA,
+		datosHashtable.put(SigaConstants.C_IDPERSONA,
 				cargaMasivaDatosCVVo.getIdPersona() == null ? "" : cargaMasivaDatosCVVo.getIdPersona());
-		datosHashtable.put(CargaMasivaDatosGFItem.C_IDGRUPO,
+		datosHashtable.put(SigaConstants.C_IDGRUPO,
 				cargaMasivaDatosCVVo.getIdGrupo() == null ? "" : cargaMasivaDatosCVVo.getIdGrupo());
 		if (cargaMasivaDatosCVVo.getIdInstitucionGrupo() == null)
-			datosHashtable.put(CargaMasivaDatosGFItem.GENERAL, "");
+			datosHashtable.put(SigaConstants.GENERAL, "");
 		else
-			datosHashtable.put(CargaMasivaDatosGFItem.GENERAL,
-					cargaMasivaDatosCVVo.getIdInstitucionGrupo() == CargaMasivaDatosGFItem.IDINSTITUCION_2000 ? "1"
+			datosHashtable.put(SigaConstants.GENERAL,
+					cargaMasivaDatosCVVo.getIdInstitucionGrupo() == SigaConstants.IDINSTITUCION_2000 ? "1"
 							: "0");
-		datosHashtable.put(CargaMasivaDatosGFItem.NOMBREGRUPO,
+		datosHashtable.put(SigaConstants.NOMBREGRUPO,
 				cargaMasivaDatosCVVo.getNombreGrupo() == null ? "" : cargaMasivaDatosCVVo.getNombreGrupo());
-		datosHashtable.put(CargaMasivaDatosGFItem.ACCION,
+		datosHashtable.put(SigaConstants.ACCION,
 				cargaMasivaDatosCVVo.getAccion() == null ? "" : cargaMasivaDatosCVVo.getAccion());
 		return datosHashtable;
 	}
@@ -718,7 +718,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		}
 
 		StringBuffer descripcion = new StringBuffer();
-		if (cargaMasivaObject.getAccion().equalsIgnoreCase(CargaMasivaDatosGFItem.ALTA)) {
+		if (cargaMasivaObject.getAccion().equalsIgnoreCase(SigaConstants.ALTA)) {
 			// descripcion =
 			GenRecursosExample genRecursosExample = new GenRecursosExample();
 			genRecursosExample.createCriteria().andIdrecursoEqualTo("historico.literal.registroNuevo")
@@ -790,44 +790,44 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		Hashtable<String, Object> e = new Hashtable<String, Object>();
 
 		if (cargaMasivaDatosGFItem.getColegiadoNumero() != null) {
-			e.put(CargaMasivaDatosGFItem.COLEGIADONUMERO, cargaMasivaDatosGFItem.getColegiadoNumero());
+			e.put(SigaConstants.COLEGIADONUMERO, cargaMasivaDatosGFItem.getColegiadoNumero());
 		}
 		if (cargaMasivaDatosGFItem.getPersonaNif() != null) {
-			e.put(CargaMasivaDatosGFItem.PERSONANIF, cargaMasivaDatosGFItem.getPersonaNif());
+			e.put(SigaConstants.PERSONANIF, cargaMasivaDatosGFItem.getPersonaNif());
 		}
 		if (cargaMasivaDatosGFItem.getPersonaNombre() != null) {
-			e.put(CargaMasivaDatosGFItem.PERSONANOMBRE, cargaMasivaDatosGFItem.getPersonaNombre());
+			e.put(SigaConstants.PERSONANOMBRE, cargaMasivaDatosGFItem.getPersonaNombre());
 		}
 		if (cargaMasivaDatosGFItem.getIdPersona() != null) {
-			e.put(CargaMasivaDatosGFItem.C_IDPERSONA, cargaMasivaDatosGFItem.getIdPersona());
+			e.put(SigaConstants.C_IDPERSONA, cargaMasivaDatosGFItem.getIdPersona());
 		}
 		if (cargaMasivaDatosGFItem.getIdGrupo() != null) {
-			e.put(CargaMasivaDatosGFItem.C_IDGRUPO, cargaMasivaDatosGFItem.getIdGrupo());
+			e.put(SigaConstants.C_IDGRUPO, cargaMasivaDatosGFItem.getIdGrupo());
 		}
 		if (cargaMasivaDatosGFItem.getNombreGrupo() != null) {
-			e.put(CargaMasivaDatosGFItem.NOMBREGRUPO, cargaMasivaDatosGFItem.getNombreGrupo());
+			e.put(SigaConstants.NOMBREGRUPO, cargaMasivaDatosGFItem.getNombreGrupo());
 		}
 		if (cargaMasivaDatosGFItem.getAccion() != null) {
-			e.put(CargaMasivaDatosGFItem.ACCION, cargaMasivaDatosGFItem.getAccion());
+			e.put(SigaConstants.ACCION, cargaMasivaDatosGFItem.getAccion());
 		}
 		if (cargaMasivaDatosGFItem.getFechaInicio() != null) {
 			DateFormat df2 = new SimpleDateFormat("dd/MM/yyyy");
 			String fechaInicio = df2.format(cargaMasivaDatosGFItem.getFechaInicio());
-			e.put(CargaMasivaDatosGFItem.C_FECHAINICIO, fechaInicio);
+			e.put(SigaConstants.C_FECHAINICIO, fechaInicio);
 		}
 		if (cargaMasivaDatosGFItem.getFechaFin() != null) {
 			DateFormat df2 = new SimpleDateFormat("dd/MM/yyyy");
 			String fechaFin = df2.format(cargaMasivaDatosGFItem.getFechaFin());
-			e.put(CargaMasivaDatosGFItem.C_FECHAFIN, fechaFin);
+			e.put(SigaConstants.C_FECHAFIN, fechaFin);
 		}
 		if (cargaMasivaDatosGFItem.getErrores() != null) {
-			e.put(CargaMasivaDatosGFItem.ERRORES, cargaMasivaDatosGFItem.getErrores());
+			e.put(SigaConstants.ERRORES, cargaMasivaDatosGFItem.getErrores());
 		}
 
 		if (cargaMasivaDatosGFItem.getGeneral()) {
-			e.put(CargaMasivaDatosGFItem.GENERAL, "1");
+			e.put(SigaConstants.GENERAL, "1");
 		} else {
-			e.put(CargaMasivaDatosGFItem.GENERAL, "0");
+			e.put(SigaConstants.GENERAL, "0");
 		}
 
 		return e;
@@ -868,7 +868,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		String path = "C:\\Users\\DTUser\\Documents\\gf" + idInstitucion + "\\gruposfijos\\";
-		path += idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + ICargasMasivasGFService.tipoExcelXls;
+		path += idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
 		// Se coge la imagen de la persona juridica
 		File file = new File(path);
 
@@ -906,7 +906,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 		String path = "C:\\Users\\DTUser\\Documents\\gf" + idInstitucion + "\\gruposfijos\\";
 		path += "log_" + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "."
-				+ ICargasMasivasGFService.tipoExcelXls;
+				+ SigaConstants.tipoExcelXls;
 		// Se coge la imagen de la persona juridica
 		File file = new File(path);
 

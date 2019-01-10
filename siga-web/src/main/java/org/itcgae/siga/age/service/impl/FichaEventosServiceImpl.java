@@ -20,12 +20,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.age.AsistenciaEventoDTO;
+import org.itcgae.siga.DTOs.age.AsistenciaEventoItem;
 import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.age.FestivosItem;
 import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
-import org.itcgae.siga.DTOs.form.AsistenciaCursoItem;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.form.FormadorCursoItem;
@@ -35,9 +36,12 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.FestivosDTO;
 import org.itcgae.siga.DTOs.gen.ListOfResult;
 import org.itcgae.siga.age.service.IFichaEventosService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.AgeAsistenciaEvento;
+import org.itcgae.siga.db.entities.AgeAsistenciaEventoExample;
 import org.itcgae.siga.db.entities.AgeCalendario;
 import org.itcgae.siga.db.entities.AgeCalendarioExample;
 import org.itcgae.siga.db.entities.AgeEvento;
@@ -60,6 +64,7 @@ import org.itcgae.siga.db.mappers.ForEventoCursoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenPartidojudicialExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenDiccionarioExtendsMapper;
+import org.itcgae.siga.db.services.age.mappers.AgeAsistenciaeventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeCalendarioExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeDiassemanaExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeEstadoeventosExtendsMapper;
@@ -134,12 +139,15 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 	@Autowired
 	private AgeNotificacioneseventoExtendsMapper ageNotificacioneseventoExtendsMapper;
-	
+
 	@Autowired
 	private ForCursoExtendsMapper forCursoExtendsMapper;
-	
+
 	@Autowired
 	private ForEventoCursoMapper forEventoCursoMapper;
+
+	@Autowired
+	private AgeAsistenciaeventoExtendsMapper ageAsistenciaeventoExtendsMapper;
 
 	@Value("${url.rapis}")
 	private String urlRapis;
@@ -226,8 +234,10 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 						ageEventoInsert.setTitulo(eventoItem.getTitulo());
 						ageEventoInsert.setFechainicio(eventoItem.getFechaInicio());
 						ageEventoInsert.setFechafin(eventoItem.getFechaFin());
-						if ((eventoItem.getIdCurso() == null && Long.valueOf(eventoItem.getIdTipoEvento()) == TIPO_EVENTO_INICIO_INSCRIPCION)
-								|| (eventoItem.getIdCurso() == null && Long.valueOf(eventoItem.getIdTipoEvento()) == TIPO_EVENTO_FIN_INSCRIPCION )) {
+						if ((eventoItem.getIdCurso() == null && Long
+								.valueOf(eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION)
+								|| (eventoItem.getIdCurso() == null && Long.valueOf(
+										eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION)) {
 							ageEventoInsert.setFechabaja(new Date());
 						} else {
 							ageEventoInsert.setFechabaja(null);
@@ -267,9 +277,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 								error.setCode(400);
 								error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 							} else {
-								
-								if(Long.valueOf(eventoItem.getIdTipoEvento()) == TIPO_EVENTO_SESION) {
-									
+
+								if (Long.valueOf(eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_SESION) {
+
 									ForEventoCurso forEventoCurso = new ForEventoCurso();
 									forEventoCurso.setFechabaja(null);
 									forEventoCurso.setFechamodificacion(new Date());
@@ -279,9 +289,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 									forEventoCurso.setIdinstitucion(idInstitucion);
 
 									response = forEventoCursoMapper.insert(forEventoCurso);
-									
+
 								}
-								
+
 								// Si existen datos de repetición se generan los eventos duplicados del generado
 								if (idRepeticionEvento != null) {
 
@@ -530,10 +540,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 				response = generateNotificationsEvents(idCalendario, ageEventoInsert.getIdinstitucion().toString(),
 						usuario);
-				
-				
-				if(Long.valueOf(eventoItem.getIdTipoEvento()) == TIPO_EVENTO_SESION) {
-					
+
+				if (Long.valueOf(eventoItem.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_SESION) {
+
 					ForEventoCurso forEventoCurso = new ForEventoCurso();
 					forEventoCurso.setFechabaja(null);
 					forEventoCurso.setFechamodificacion(new Date());
@@ -544,9 +553,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 					LOGGER.info(
 							"generateEvents() / forEventoCursoMapper.insert(forEventoCurso) -> Entrada a forEventoCursoMapper para insertar la relacion entre evento sesion y el curso");
-					
+
 					response = forEventoCursoMapper.insert(forEventoCurso);
-					
+
 					LOGGER.info(
 							"generateEvents() / forEventoCursoMapper.insert(forEventoCurso) -> Entrada a forEventoCursoMapper para insertar la relacion entre evento sesion y el curso");
 				}
@@ -652,7 +661,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 			throw new BusinessException("No hay datos para crear el fichero");
 		if (orderList == null)
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
-		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, "PlantillaAsistencia");
+		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, "Lista de Inscritos");
 
 		LOGGER.info("createExcelAssistanceFile() -> Salida al servicio que crea la plantilla Excel");
 
@@ -661,7 +670,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	}
 
 	@Override
-	public ResponseEntity<InputStreamResource> generateExcelAssistance(List<AsistenciaCursoItem> asistenciasCursoItem) {
+	public ResponseEntity<InputStreamResource> generateExcelAssistance(List<AsistenciaEventoItem> asistenciasEventoItem) {
 
 		LOGGER.info("generateExcelAssistance() -> Entrada al servicio para generar la plantilla Excel Asistencia");
 
@@ -671,15 +680,14 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		// 1. Se definen las columnas que conforman la plantilla
 
 		// 1.1 Se rellena las filas con los asistentes al curso
-		for (AsistenciaCursoItem asist : asistenciasCursoItem) {
+		for (AsistenciaEventoItem asist : asistenciasEventoItem) {
 			datosHashtable = new Hashtable<String, Object>();
-			datosHashtable.put(IFichaEventosService.NOMBRE, asist.getNombre());
-			datosHashtable.put(IFichaEventosService.ASISTENCIA, " ");
+			datosHashtable.put(SigaConstants.NOMBRE, asist.getNombrePersona());
 			datosVector.add(datosHashtable);
 		}
 
 		// 2. Crea el fichero excel
-		File file = createExcelAssistanceFile(IFichaEventosService.CAMPOSPLANTILLA, datosVector);
+		File file = createExcelAssistanceFile(SigaConstants.CAMPOSPLANTILLAEVENTOS, datosVector);
 
 		// 3. Se convierte el fichero en array de bytes para enviarlo al front
 		InputStream fileStream = null;
@@ -1084,8 +1092,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 					LOGGER.info(
 							"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageCalendarioExtendsMapper para modificar un evento");
 
-					if(event.getIdtipoevento() == TIPO_EVENTO_INICIO_INSCRIPCION || event.getIdtipoevento() == TIPO_EVENTO_FIN_INSCRIPCION) {
-						
+					if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION
+							|| event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
+
 						ForCursoExample exampleCurso = new ForCursoExample();
 						exampleCurso.createCriteria().andIdcursoEqualTo(Long.valueOf(eventoItem.getIdCurso()))
 								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -1106,9 +1115,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 							curso.setFechamodificacion(new Date());
 							curso.setUsumodificacion(usuario.getIdusuario().longValue());
-							if(event.getIdtipoevento() == TIPO_EVENTO_INICIO_INSCRIPCION) {
+							if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION) {
 								curso.setFechainscripciondesde(eventoItem.getFechaInicio());
-							}else if(event.getIdtipoevento() == TIPO_EVENTO_FIN_INSCRIPCION) {
+							} else if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
 								curso.setFechainscripcionhasta(eventoItem.getFechaInicio());
 							}
 
@@ -1306,7 +1315,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 			LOGGER.info(
 					"searchEvent() / ageEventoExtendsMapper.searchEvent() -> Entrada a ageEventoExtendsMapper para obtener un evento especifico");
-			eventoItem = ageEventoExtendsMapper.searchEvent(cursoItem.getIdTipoEvento(), cursoItem.getIdCurso().toString(), idInstitucion.toString());
+			eventoItem = ageEventoExtendsMapper.searchEvent(cursoItem.getIdTipoEvento(),
+					cursoItem.getIdCurso().toString(), idInstitucion.toString());
 			LOGGER.info(
 					"searchEvent() / ageEventoExtendsMapper.searchEvent() -> Salida de ageEventoExtendsMapper para obtener un evento especifico");
 
@@ -1315,6 +1325,125 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		LOGGER.info("searchEvent() -> Salida del servicio para obtener un evento especifico");
 
 		return eventoItem;
+	}
+
+	@Override
+	public AsistenciaEventoDTO getEntryListCourse(String idCurso, HttpServletRequest request) {
+		LOGGER.info("getEntryListCourse() -> Entrada al servicio para obtener los inscritos a un curso");
+
+		AsistenciaEventoDTO asistenciaEventoDTO = new AsistenciaEventoDTO();
+		List<AsistenciaEventoItem> asistenciasEventoItem = new ArrayList<AsistenciaEventoItem>();
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			LOGGER.info(
+					"getEntryListCourse() / ageEventoExtendsMapper.searchEvent() -> Entrada a ageEventoExtendsMapper para obtener un evento especifico");
+			asistenciasEventoItem = ageAsistenciaeventoExtendsMapper.getEntryListCourse(idCurso);
+			LOGGER.info(
+					"getEntryListCourse() / ageEventoExtendsMapper.searchEvent() -> Salida de ageEventoExtendsMapper para obtener un evento especifico");
+
+		}
+
+		asistenciaEventoDTO.asistenciaEventoItem(asistenciasEventoItem);
+
+		LOGGER.info("getEntryListCourse() -> Salida del servicio para obtener los inscritos a un curso");
+
+		return asistenciaEventoDTO;
+	}
+
+	@Override
+	@Transactional
+	public InsertResponseDTO saveAssistancesCourse(AsistenciaEventoDTO asistenciaEventoDTO,
+			HttpServletRequest request) {
+		LOGGER.info(
+				"saveAssistancesCourse() -> Entrada al servicio para guardar las asistencia de una sesión de un curso");
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 2;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"saveAssistancesCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"saveAssistancesCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+
+					for (AsistenciaEventoItem asistenciaEventoItem : asistenciaEventoDTO.getAsistenciaEventoItem()) {
+
+						// Comprobamos si esta resgistrado
+
+						AgeAsistenciaEventoExample ageAsistenciaEventoExample = new AgeAsistenciaEventoExample();
+						ageAsistenciaEventoExample.createCriteria()
+								.andIdinscripcionEqualTo(Long.valueOf(asistenciaEventoItem.getIdInscripcion()))
+								.andIdeventoEqualTo(Long.valueOf(asistenciaEventoItem.getIdEvento()))
+								.andIdinstitucionEqualTo(idInstitucion);
+
+						List<AgeAsistenciaEvento> asistenciasList = ageAsistenciaeventoExtendsMapper
+								.selectByExample(ageAsistenciaEventoExample);
+
+						// Si no esta registrado lo guardamos
+						if (null == asistenciasList || asistenciasList.size() == 0) {
+
+							AgeAsistenciaEvento ageAsistenciaEvento = new AgeAsistenciaEvento();
+							ageAsistenciaEvento.setFechabaja(null);
+							ageAsistenciaEvento.setFechamodificacion(new Date());
+							ageAsistenciaEvento.setIdinstitucion(idInstitucion);
+							ageAsistenciaEvento.setUsumodificacion(usuario.getIdusuario().longValue());
+							ageAsistenciaEvento.setIdevento(Long.valueOf(asistenciaEventoItem.getIdEvento()));
+							ageAsistenciaEvento.setIdinscripcion(Long.valueOf(asistenciaEventoItem.getIdInscripcion()));
+							ageAsistenciaEvento.setAsistencia(Short.valueOf(asistenciaEventoItem.getAsistencia()));
+
+							response = ageAsistenciaeventoExtendsMapper.insert(ageAsistenciaEvento);
+
+							// Si esta registrado lo actualizamos
+						} else {
+
+							AgeAsistenciaEvento asistenciaUpdate = asistenciasList.get(0);
+
+							asistenciaUpdate.setFechamodificacion(new Date());
+							asistenciaUpdate.setUsumodificacion(usuario.getIdusuario().longValue());
+							asistenciaUpdate.setAsistencia(Short.valueOf(asistenciaEventoItem.getAsistencia()));
+
+							response = ageAsistenciaeventoExtendsMapper.updateByPrimaryKey(asistenciaUpdate);
+
+						}
+					}
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+				}
+			}
+
+		}
+
+		if (response == 1) {
+			error.setCode(200);
+			error.setDescription("Asistencias registradas correctamente");
+		}
+
+		insertResponseDTO.setError(error);
+
+		LOGGER.info(
+				"saveAssistancesCourse() -> Entrada al servicio para guardar las asistencia de una sesión de un curso");
+
+		return insertResponseDTO;
 	}
 
 }
