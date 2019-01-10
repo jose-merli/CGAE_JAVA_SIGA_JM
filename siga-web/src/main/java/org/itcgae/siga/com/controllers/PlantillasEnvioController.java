@@ -2,6 +2,9 @@ package org.itcgae.siga.com.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.ConsultaItem;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.PlantillaDatosConsultaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
 import org.itcgae.siga.DTOs.com.PlantillasEnvioDTO;
@@ -57,6 +60,30 @@ public class PlantillasEnvioController {
 			return new ResponseEntity<Error>(respuesta, HttpStatus.OK);
 		else
 			return new ResponseEntity<Error>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+	}
+	
+	@RequestMapping(value = "/asociarConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardarConsulta(HttpServletRequest request, @RequestBody PlantillaDatosConsultaDTO consulta) {
+		
+		Error respuesta = _plantillasEnvioService.asociarConsulta(request, consulta);
+		
+		if(respuesta.getCode()== 200)
+			return new ResponseEntity<Error>(respuesta, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+	}
+	
+	@RequestMapping(value = "/consultasPlantillas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ConsultasDTO> obtenerConsultas(HttpServletRequest request, @RequestBody TarjetaConfiguracionDto consulta) {
+		
+		ConsultasDTO respuesta = _plantillasEnvioService.detalleConsultas(request, consulta);
+		
+		if(respuesta.getError()!= null)
+			return new ResponseEntity<ConsultasDTO>(respuesta, HttpStatus.OK);
+		else
+			return new ResponseEntity<ConsultasDTO>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
 		
 	}
 	

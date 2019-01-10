@@ -63,40 +63,20 @@ public class ConConsultasExtendsSqlProvider {
 		return sql.toString();
 	}
 
-	public String ejecConsulta (String consulta){
-		SQL sql = new SQL();
-		
-		int inicioSelect = consulta.indexOf("<SELECT>" +7);
-		int finSelect = consulta.indexOf("</SELECT>");
-		String select = consulta.substring(inicioSelect, finSelect);
-		sql.SELECT(select);
-		
-		int inicioFrom = consulta.indexOf("<FROM>" +5);
-		int finFrom = consulta.indexOf("</FROM>");
-		String from = consulta.substring(inicioFrom, finFrom);
-		sql.FROM(from);
-		
-		if(consulta.contains("<WHERE>")){
-			int inicioWhere = consulta.indexOf("<WHERE>" +7);
-			int finWhere = consulta.indexOf("</WHERE>");
-			String where = consulta.substring(inicioWhere, finWhere);
-			sql.WHERE(where);
-		}
-		
-		if(consulta.contains("<ORDERBY>")){
-			int inicioOrder = consulta.indexOf("<WHERE>" +7);
-			int finOrder = consulta.indexOf("</WHERE>");
-			String orderBy = consulta.substring(inicioOrder, finOrder);
-			sql.ORDER_BY(orderBy);
-		}
-		
-		return sql.toString();
-	}
 	
 	public String selectMaxIdConsulta(){
 		SQL sql = new SQL();
 		sql.SELECT("max(idconsulta)+1 as IDMAX");
 		sql.FROM("CON_CONSULTA");
+		return sql.toString();
+	}
+	
+	public String selectConsultasPlantilla(Short idInstitucion, String idPlantillaEnvios, String idtipoEnvio){
+		SQL sql = new SQL();
+		sql.SELECT("IDINSTITUCION, IDCONSULTA, DESCRIPCION, OBSERVACIONES, TIPOCONSULTA");
+		sql.FROM("con_consulta");
+		sql.WHERE("IDCONSULTA IN (SELECT IDCONSULTA FROM MOD_PLANTILLAENVIO_CONSULTA WHERE IDPLANTILLAENVIOS='"+ idPlantillaEnvios +"' "
+				+ "AND IDTIPOENVIOS ='"+ idtipoEnvio +"' AND IDINSTITUCION='"+ idInstitucion +"') AND FECHABAJA is null AND IDINSTITUCION = '"+ idInstitucion +"'");
 		return sql.toString();
 	}
 

@@ -27,7 +27,21 @@ public class PlantillaEnvioItem {
 	private String cuerpo;
 	private String idDireccion;
 	private String idPersona;
+	private String descripcion;
+	private String tipoEnvio;
 	
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+	public String getTipoEnvio() {
+		return tipoEnvio;
+	}
+	public void setTipoEnvio(String tipoEnvio) {
+		this.tipoEnvio = tipoEnvio;
+	}
 	public String getIdTipoEnvios() {
 		return idTipoEnvios;
 	}
@@ -88,8 +102,5 @@ public class PlantillaEnvioItem {
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
 	}
-	
-	
-	
 	
 }

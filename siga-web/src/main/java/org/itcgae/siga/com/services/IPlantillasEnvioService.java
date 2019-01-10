@@ -2,8 +2,9 @@ package org.itcgae.siga.com.services;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.com.ConsultaItem;
+
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.PlantillaDatosConsultaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
 import org.itcgae.siga.DTOs.com.PlantillasEnvioDTO;
@@ -21,10 +22,10 @@ public interface IPlantillasEnvioService {
 	public PlantillasEnvioDTO PlantillasEnvioSearch(HttpServletRequest request, PlantillaEnvioSearchItem filtros);
 	public Error borrarPlantillasEnvio(HttpServletRequest request, PlantillaEnvioItem[] plantillasEnvio);
 	public Error guardarDatosGenerales(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta);
-	public ConsultasDTO detalleConsultas(HttpServletRequest request, ConsultasDTO consultas);
-	public Error asociarConsulta(HttpServletRequest request, ConsultaItem consulta);
-	public Error borrarConsulta(HttpServletRequest request, ConsultaItem consulta);
+	public ConsultasDTO detalleConsultas(HttpServletRequest request, TarjetaConfiguracionDto consulta);
+	public Error asociarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO consulta);
+	public Error borrarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO consulta);
 	public RemitenteDTO detalleRemitente(HttpServletRequest request, String idConsulta);
-	public Error guardarREmitente(HttpServletRequest request, RemitenteDTO remitente);
+	public Error guardarRemitente(HttpServletRequest request, RemitenteDTO remitente);
 	
 }

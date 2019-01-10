@@ -8,10 +8,13 @@ public class PlantillasEnvioExtendsSqlProvider {
 	public String selectPlantillas(Short idInstitucion, PlantillaEnvioSearchItem filtros){
 		SQL sql = new SQL();
 		
-		sql.SELECT("idPlantillaEnvios, idTipoEnvios, nombre, idInstitucion, acuseRecibo, fechaBaja,"
-				+ "asunto, cuerpo, idDireccion, idPersona");
-		sql.FROM("env_plantillasenvios");
-		sql.WHERE("FECHABAJA is not null");
+		sql.SELECT("PLANTILLA.idPlantillaEnvios, PLANTILLA.idTipoEnvios, PLANTILLA.nombre, PLANTILLA.idInstitucion, PLANTILLA.acuseRecibo,PLANTILLA.fechaBaja, PLANTILLA.asunto, PLANTILLA.cuerpo");
+		sql.SELECT("PLANTILLA.idDireccion, PLANTILLA.idPersona, PLANTILLA.DESCRIPCION");
+		sql.SELECT("(SELECT CAT.DESCRIPCION FROM ENV_TIPOENVIOS LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = ENV_TIPOENVIOS.NOMBRE WHERE ENV_TIPOENVIOS.IDTIPOENVIOS = "
+				+ "ENV.IDTIPOENVIOS AND CAT.IDLENGUAJE = '1') AS TIPOENVIO");
+		sql.FROM("ENV_PLANTILLASENVIOS PLANTILLA");
+		sql.JOIN("ENV_ENVIOS ENV ON ENV.IDPLANTILLAENVIOS = PLANTILLA.IDPLANTILLAENVIOS AND ENV.IDINSTITUCION = PLANTILLA.IDINSTITUCION");
+		sql.WHERE("FECHABAJA is null");
 		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
 		
 		if(!filtros.getTipoEnvio().trim().equals("") && filtros.getTipoEnvio() != null){
