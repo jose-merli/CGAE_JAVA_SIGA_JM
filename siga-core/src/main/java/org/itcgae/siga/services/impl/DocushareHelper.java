@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,6 +19,7 @@ import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.xerox.docushare.DSContentElement;
 import com.xerox.docushare.DSException;
@@ -32,13 +34,14 @@ import com.xerox.docushare.FileContentElement;
 import com.xerox.docushare.object.DSCollection;
 import com.xerox.docushare.object.DSDocument;
 
+@Service
 public class DocushareHelper {
 
 	private static Logger log = LoggerFactory.getLogger(DocushareHelper.class);
 
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
-
+	private static boolean MODO_DEBUG_LOCAL = true;
 	private static String DOCUSHARE_HOST = "DOCUSHARE_HOST";
 	private static String DOCUSHARE_PORT = "DOCUSHARE_PORT";
 	private static String DOCUSHARE_DOMAIN = "DOCUSHARE_DOMAIN";
@@ -51,7 +54,7 @@ public class DocushareHelper {
 
 	private static String ID_DOCUSHARE_CENSO = "ID_DOCUSHARE_CENSO";
 	private static String ID_DOCUSHARE_NOCOLEGIADO = "ID_DOCUSHARE_NOCOLEGIADO";
-
+	private static String PATH_DOCUSHARE_DEBUG = "/ds";
 	private short idInstitucion;
 	private DSServer server;
 	private DSSession dssession;
@@ -63,79 +66,114 @@ public class DocushareHelper {
 
 		String datosConexion = null;
 		try {
-			List<String> listaParametros= new ArrayList<>();
+			String host = null;
+			String port = null;
+			String domain = null;
+
+			// parámetros particulares del colegio
+			String user = null;
+			String password = null;
+			List<String> listaParametros = new ArrayList<>();
 			listaParametros.add(DOCUSHARE_HOST);
 			listaParametros.add(DOCUSHARE_PORT);
 			listaParametros.add(DOCUSHARE_DOMAIN);
 			listaParametros.add(DOCUSHARE_USER);
 			listaParametros.add(DOCUSHARE_PASSWORD);
 			GenParametrosExample example = new GenParametrosExample();
-			example.createCriteria().andParametroIn(listaParametros); 
+			example.createCriteria().andParametroIn(listaParametros).andIdinstitucionEqualTo(this.idInstitucion);
 			List<GenParametros> config = genParametrosMapper.selectByExample(example);
-			
-			if(config != null && config.size() > 0){
-				 
-				String host = config.get(0).getValor();
-				String port = config.get(0).getValor();
-				String domain = config.get(0).getValor();
-				
-				//parámetros particulares del colegio
-				String user = config.get(0).getValor();
-				String password = config.get(0).getValor();
-				datosConexion = String.format("Parámetros de conexión docushare del colegio %s: HOST:'%s', PORT:'%s', DOMAIN:'%s', USER:'%s', PASSWORD:'%s'", this.idInstitucion, host, port, domain, user, password); 
-				
-				log.debug(datosConexion);			
-			
+
+			if (config != null && config.size() > 0) {
+				for (int i = 0; i < config.size(); i++) {
+					switch (config.get(i).getParametro()) {
+					case "DOCUSHARE_HOST":
+						host = config.get(i).getValor();
+						break;
+					case "DOCUSHARE_PORT":
+						port = config.get(i).getValor();
+						break;
+					case "DOCUSHARE_DOMAIN":
+						domain = config.get(i).getValor();
+						break;
+					case "DOCUSHARE_USER":
+						user = config.get(i).getValor();
+						break;
+					case "DOCUSHARE_PASSWORD":
+						password = config.get(i).getValor();
+						break;
+					default:
+						break;
+					}
+				}
+
+				datosConexion = String.format(
+						"Parámetros de conexión docushare del colegio %s: HOST:'%s', PORT:'%s', DOMAIN:'%s', USER:'%s', PASSWORD:'%s'",
+						this.idInstitucion, host, port, domain, user, password);
+
+				log.debug(datosConexion);
+
 				int iPort = 0;
 				try {
 					iPort = Integer.parseInt(port);
 				} catch (Exception e) {
-					String error = String.format("El parámetro %s no está configurado correctamente para el colegio %s. Comprobar que es un número válido.", DOCUSHARE_PORT, this.idInstitucion);
+					String error = String.format(
+							"El parámetro %s no está configurado correctamente para el colegio %s. Comprobar que es un número válido.",
+							DOCUSHARE_PORT, this.idInstitucion);
 					log.error(error);
 				}
-				
+				String msg=  "HOST: " + host + "PORT: " + iPort ;
+						 
+				log.info(msg);
 				server = DSFactory.createServer(host, iPort);
 				log.debug("Creado server con Docushare correctamente para el colegio " + this.idInstitucion);
 				dssession = server.createSession(domain, user, password);
 				log.debug("Creada session con Docushare correctamente para el colegio " + this.idInstitucion);
-				
+
 			}
-			
-//			GenParametrosService genParametrosService = (GenParametrosService) BusinessManager.getInstance().getService(GenParametrosService.class);
-//	
-//			String host = getValor(genParametrosService, DOCUSHARE_HOST, true);
-//			String port = getValor(genParametrosService, DOCUSHARE_PORT, true);
-//			String domain = getValor(genParametrosService, DOCUSHARE_DOMAIN, true);
-//			
-//			//parámetros particulares del colegio
-//			String user = getValor(genParametrosService, DOCUSHARE_USER, false);
-//			String password = getValor(genParametrosService, DOCUSHARE_PASSWORD, false);
-			
-//			datosConexion = String.format("Parámetros de conexión docushare del colegio %s: HOST:'%s', PORT:'%s', DOMAIN:'%s', USER:'%s', PASSWORD:'%s'", this.idInstitucion, host, port, domain, user, password); 
-//			
-//			log.debug(datosConexion);			
-//		
-//			int iPort = 0;
-//			try {
-//				iPort = Integer.parseInt(port);
-//			} catch (Exception e) {
-//				String error = String.format("El parámetro %s no está configurado correctamente para el colegio %s. Comprobar que es un número válido.", DOCUSHARE_PORT, this.idInstitucion);
-//				log.error(error);
-//			}
-//			
-//			server = DSFactory.createServer(host, iPort);
-//			log.debug("Creado server con Docushare correctamente para el colegio " + this.idInstitucion);
-//			dssession = server.createSession(domain, user, password);
-//			log.debug("Creada session con Docushare correctamente para el colegio " + this.idInstitucion);
-//			
-		
+
+			// GenParametrosService genParametrosService = (GenParametrosService)
+			// BusinessManager.getInstance().getService(GenParametrosService.class);
+			//
+			// String host = getValor(genParametrosService, DOCUSHARE_HOST, true);
+			// String port = getValor(genParametrosService, DOCUSHARE_PORT, true);
+			// String domain = getValor(genParametrosService, DOCUSHARE_DOMAIN, true);
+			//
+			// //parámetros particulares del colegio
+			// String user = getValor(genParametrosService, DOCUSHARE_USER, false);
+			// String password = getValor(genParametrosService, DOCUSHARE_PASSWORD, false);
+
+			// datosConexion = String.format("Parámetros de conexión docushare del colegio
+			// %s: HOST:'%s', PORT:'%s', DOMAIN:'%s', USER:'%s', PASSWORD:'%s'",
+			// this.idInstitucion, host, port, domain, user, password);
+			//
+			// log.debug(datosConexion);
+			//
+			// int iPort = 0;
+			// try {
+			// iPort = Integer.parseInt(port);
+			// } catch (Exception e) {
+			// String error = String.format("El parámetro %s no está configurado
+			// correctamente para el colegio %s. Comprobar que es un número válido.",
+			// DOCUSHARE_PORT, this.idInstitucion);
+			// log.error(error);
+			// }
+			//
+			// server = DSFactory.createServer(host, iPort);
+			// log.debug("Creado server con Docushare correctamente para el colegio " +
+			// this.idInstitucion);
+			// dssession = server.createSession(domain, user, password);
+			// log.debug("Creada session con Docushare correctamente para el colegio " +
+			// this.idInstitucion);
+			//
+
 		} catch (Exception e) {
-			//Se ha producido un error. No se ha podido conectar con el servidor DocuShare.
-			String mensaje = "Se ha producido un error. No se ha podido conectar con el servidor DocuShare. " + datosConexion;
+			// Se ha producido un error. No se ha podido conectar con el servidor DocuShare.
+			String mensaje = "Se ha producido un error. No se ha podido conectar con el servidor DocuShare. "
+					+ datosConexion;
 			log.error(mensaje, e);
 			throw new Exception(mensaje, e);
 		}
-		
+
 	}
 
 	/**
@@ -147,22 +185,24 @@ public class DocushareHelper {
 	 * @throws Exception
 	 */
 	private String buscaCollection(String pathRecibido, String title) throws Exception {
-
+		if (MODO_DEBUG_LOCAL) {
+			return buscaCollectionMODO_DEBUG_LOCAL(PATH_DOCUSHARE_DEBUG, title);
+		}
 		String idColl = null;
 
 		createSession();
 
 		try {
-//			GenParametrosService genParametrosService = (GenParametrosService) BusinessManager.getInstance()
-//					.getService(GenParametrosService.class);
-			List<String> listaParametros= new ArrayList<>();
+			// GenParametrosService genParametrosService = (GenParametrosService)
+			// BusinessManager.getInstance()
+			// .getService(GenParametrosService.class);
+			List<String> listaParametros = new ArrayList<>();
 			listaParametros.add(pathRecibido);
-		
+
 			GenParametrosExample example = new GenParametrosExample();
-			example.createCriteria().andParametroIn(listaParametros); 
+			example.createCriteria().andParametroIn(listaParametros);
 			List<GenParametros> config = genParametrosMapper.selectByExample(example);
-			
-			
+
 			String path = config.get(0).getValor();
 
 			if (path != null) {
@@ -190,12 +230,100 @@ public class DocushareHelper {
 		return idColl;
 	}
 
-	public String buscaCollectionCenso(String title) throws Exception {
+	public String buscaCollectionCenso(String title, short idInstitucion) throws Exception {
+		this.idInstitucion = idInstitucion;
 		return buscaCollection(PATH_DOCUSHARE_CENSO, title);
 	}
 
 	public String buscaCollectionNoColegiado(String title) throws Exception {
 		return buscaCollection(PATH_DOCUSHARE_NOCOLEGIADO, title);
+	}
+
+	private String buscaCollectionMODO_DEBUG_LOCAL(String parent, String title) {
+		File file = new File(parent, title);
+		if (file != null && file.exists()) {
+			return file.getAbsolutePath();
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Método para pruebas en local
+	 * 
+	 * @param title
+	 * @return
+	 * @throws Exception
+	 */
+	public File getDocumentMODO_DEBUG_LOCAL(String title) {
+		File file = new File(title);
+		return file;
+	}
+
+	/**
+	 * Método para pruebas en local
+	 * 
+	 * @param identificadorDS
+	 * @return
+	 * @throws SIGAServiceException
+	 */
+	private List<DocuShareObjectVO> getContenidoCollectionMODO_DEBUG_LOCAL(String identificadorDS) throws Exception {
+		List<DocuShareObjectVO> datos = new ArrayList<DocuShareObjectVO>();
+		try {
+			File file = new File(identificadorDS);
+
+			if (file != null) {
+				List<DocuShareObjectVO> listDir = new ArrayList<DocuShareObjectVO>();
+				List<DocuShareObjectVO> listArch = new ArrayList<DocuShareObjectVO>();
+				File[] filesHijos = file.listFiles();
+				if (filesHijos != null) {
+					for (File fileHijo : filesHijos) {
+						DocuShareObjectVO dsObj = null;
+						if (fileHijo.isDirectory()) {
+							dsObj = new DocuShareObjectVO( );
+							dsObj.setTipo("0");
+							dsObj.setId(fileHijo.getAbsolutePath());
+							dsObj.setTitle(fileHijo.getName());
+							dsObj.setDescription("");
+							dsObj.setSummary("");
+							dsObj.setOriginalFilename("");
+							dsObj.setFechaModificacion(new Date(fileHijo.lastModified()));
+							listDir.add(dsObj);
+						} else {
+							dsObj = new DocuShareObjectVO( );
+							dsObj.setTipo("1");
+							dsObj.setId(fileHijo.getAbsolutePath());
+							dsObj.setTitle(fileHijo.getName());
+							dsObj.setDescription("Descripcion - " + fileHijo.getName());
+							dsObj.setFechaModificacion(new Date(fileHijo.lastModified()));
+							dsObj.setOriginalFilename("Filename Original - " + fileHijo.getName());
+							dsObj.setSummary("Resumen - " + fileHijo.getName());
+							dsObj.setSizeKB(fileHijo.length() / 1024);
+							if (dsObj.getSizeKB() == 0) {
+								dsObj.setSizeKB(1);
+							}
+							listArch.add(dsObj);
+						}
+					}
+				}
+
+//				Collections.sort(listDir);
+//				Collections.sort(listArch);
+
+				datos.addAll(listDir);
+				datos.addAll(listArch);
+
+			}
+
+		} catch (Exception e) {
+			String mensaje = String.format(
+					"Se ha producido un error al obtener el contenido de la coleccion con identificadorDS = '%s' para el colegio %s",
+					identificadorDS, this.idInstitucion);
+			log.error(mensaje, e);
+
+		}
+		return datos;
+
 	}
 
 	/**
@@ -231,6 +359,9 @@ public class DocushareHelper {
 		if (collection == null || collection.trim().equals("")) {
 			throw new IllegalArgumentException("El nombre de la colección no puede ser nula o vacía");
 		}
+		if (MODO_DEBUG_LOCAL) {
+			return getContenidoCollectionMODO_DEBUG_LOCAL(collection);
+		}
 
 		List<DocuShareObjectVO> list = new ArrayList<DocuShareObjectVO>();
 
@@ -259,7 +390,8 @@ public class DocushareHelper {
 								+ collection + " del colegio " + this.idInstitucion);
 
 						if (dsObject instanceof DSCollection) {
-							DocuShareObjectVO dsObj = new DocuShareObjectVO(DocuShareObjectVO.DocuShareTipo.COLLECTION);
+							DocuShareObjectVO dsObj = new DocuShareObjectVO();
+							dsObj.setTipo("0");
 							dsObj.setId(dsObject.getHandle().toString());
 							dsObj.setTitle(dsObject.getTitle());
 							dsObj.setFechaModificacion(dsObject.getModifiedDate());
@@ -268,8 +400,10 @@ public class DocushareHelper {
 							dsObj.setOriginalFilename("");
 							listDir.add(dsObj);
 						} else if (dsObject instanceof DSDocument) {
-							DocuShareObjectVO dsObj = new DocuShareObjectVO(DocuShareObjectVO.DocuShareTipo.DOCUMENT);
+							DocuShareObjectVO dsObj = new DocuShareObjectVO();
+							dsObj.setTipo("1");
 							dsObj.setId(dsObject.getHandle().toString());
+
 							dsObj.setTitle(dsObject.getTitle());
 							dsObj.setDescription(dsObject.getDescription());
 							dsObj.setFechaModificacion(dsObject.getModifiedDate());
@@ -283,12 +417,12 @@ public class DocushareHelper {
 						}
 					}
 
-					Collections.sort(listDir);
-					Collections.sort(listArch, new Comparator<DocuShareObjectVO>() {
-						public int compare(DocuShareObjectVO o1, DocuShareObjectVO o2) {
-							return (-1) * o1.getFechaModificacion().compareTo(o2.getFechaModificacion());
-						}
-					});
+//					Collections.sort(listDir);
+//					Collections.sort(listArch, new Comparator<DocuShareObjectVO>() {
+//						public int compare(DocuShareObjectVO o1, DocuShareObjectVO o2) {
+//							return (-1) * o1.getFechaModificacion().compareTo(o2.getFechaModificacion());
+//						}
+//					});
 
 					list.addAll(listDir);
 					list.addAll(listArch);
@@ -316,6 +450,10 @@ public class DocushareHelper {
 	 * @throws Exception
 	 */
 	public File getDocument(String title) throws Exception {
+
+		if (MODO_DEBUG_LOCAL) {
+			return getDocumentMODO_DEBUG_LOCAL(title);
+		}
 
 		ReadProperties rp = new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
 		String rutaDirectorioTemp = rp.returnProperty("sjcs.directorioFisicoTemporalSJCSJava");
