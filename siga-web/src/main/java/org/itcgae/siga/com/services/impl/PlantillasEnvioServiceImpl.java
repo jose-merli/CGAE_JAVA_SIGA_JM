@@ -216,27 +216,30 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
-					if(datosTarjeta.getidPlantillasEnvio() != null){
+					if(datosTarjeta.getIdPlantillasEnvio() != null){
 						EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
-						key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getidPlantillasEnvio()));
+						key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillasEnvio()));
 						key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
 						key.setIdinstitucion(idInstitucion);
 						EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
 						plantilla.setAsunto(datosTarjeta.getAsunto());
 						plantilla.setCuerpo(datosTarjeta.getCuerpo());
 						plantilla.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvio()));
+						plantilla.setNombre(datosTarjeta.getNombre());
+						plantilla.setDescripcion(datosTarjeta.getDescripcion());
 						plantilla.setFechamodificacion(new Date());
 						plantilla.setUsumodificacion(usuario.getIdusuario());
 						_envPlantillasenviosMapper.updateByPrimaryKeyWithBLOBs(plantilla);
 					}else{
 						EnvPlantillasenviosWithBLOBs plantilla = new EnvPlantillasenviosWithBLOBs();
 						plantilla.setIdinstitucion(idInstitucion);
-						plantilla.setIdtipoenvios(Short.parseShort(datosTarjeta.getidPlantillasEnvio()));
+						plantilla.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdPlantillasEnvio()));
 						plantilla.setNombre(datosTarjeta.getDescripcion());
 						if(datosTarjeta.getIdTipoEnvio().equals("1") || datosTarjeta.getIdTipoEnvio().equals("2")){
 							plantilla.setAsunto(datosTarjeta.getAsunto());
 							plantilla.setCuerpo(datosTarjeta.getCuerpo());
 						}
+						plantilla.setDescripcion(datosTarjeta.getDescripcion());
 						plantilla.setFechamodificacion(new Date());
 						plantilla.setUsumodificacion(usuario.getIdusuario());
 						_envPlantillasenviosMapper.insert(plantilla);
@@ -373,7 +376,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
-					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(idInstitucion, consulta.getidPlantillasEnvio(), consulta.getIdTipoEnvio());
+					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(idInstitucion, consulta.getIdPlantillasEnvio(), consulta.getIdTipoEnvio());
 					if(consultaItems != null && consultaItems.size()>0){
 						respuesta.setConsultaItem(consultaItems);
 					}

@@ -30,9 +30,9 @@
 <!-- 			<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOS.NEXTVAL FROM DUAL"/> -->
 <!-- 		</table> -->
 
-			<table schema="USCGAE" tableName="CON_CONSULTA" >
-				<property name="ignoreQualifiersAtRuntime" value="true"/>
-			</table>
+<!-- 			<table schema="USCGAE" tableName="CON_CONSULTA" > -->
+<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			</table> -->
 
 <!-- 		<table schema="USCGAE_INT" tableName="ENV_ENTRADA_ENVIOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
@@ -49,9 +49,9 @@
 <!-- 		</table> -->
 		
 		 
-<!-- 		<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table> -->
+		<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>
 		
 <!-- 			<table schema="USCGAE" tableName="ENV_PLANTILLAREMITENTES" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->

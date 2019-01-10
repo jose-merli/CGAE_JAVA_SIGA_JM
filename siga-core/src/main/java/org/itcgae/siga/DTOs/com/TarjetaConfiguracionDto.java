@@ -8,20 +8,27 @@ public class TarjetaConfiguracionDto {
 	private String asunto;
 	private String cuerpo;
 	private String descripcion;
+	private String nombre;
 	
 	
-	
+
+	public String getIdPlantillasEnvio() {
+		return idPlantillasEnvio;
+	}
+	public void setIdPlantillasEnvio(String idPlantillasEnvio) {
+		this.idPlantillasEnvio = idPlantillasEnvio;
+	}
+	public String getNombre() {
+		return nombre;
+	}
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
 	public String getIdEnvio() {
 		return idEnvio;
 	}
 	public void setIdEnvio(String idEnvio) {
 		this.idEnvio = idEnvio;
-	}
-	public String getidPlantillasEnvio() {
-		return idPlantillasEnvio;
-	}
-	public void setidPlantillasEnvio(String idPlantillasEnvio) {
-		this.idPlantillasEnvio = idPlantillasEnvio;
 	}
 	public String getIdTipoEnvio() {
 		return idTipoEnvio;
