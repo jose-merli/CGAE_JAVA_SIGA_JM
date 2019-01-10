@@ -29,15 +29,7 @@ public class PlantillasEnvioController {
 	@Autowired
 	IPlantillasEnvioService _plantillasEnvioService;
 	
-	
-	@RequestMapping(value = "/tiposComunicacion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboTiposComunicacion(HttpServletRequest request) {
-		
-		ComboDTO response = _plantillasEnvioService.getComboTipoEnvio(request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-		
-	}
-	
+
 	
 	@RequestMapping(value = "/plantillasEnvioSearch",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<PlantillasEnvioDTO> PlantillasEnvioSearch(@RequestParam("numPagina") int numPagina,HttpServletRequest request, @RequestBody PlantillaEnvioSearchItem filtros) {
