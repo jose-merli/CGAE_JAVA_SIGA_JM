@@ -19,5 +19,23 @@ public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSq
 		
 		return sql.toString();
 	}
+	
+	public String selectPricesCourse(Short idInstitucion, Long idServicio, String idLenguaje, String codigoCurso) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("pys.DESCRIPCION");
+		sql.SELECT("pys.VALOR");
+		sql.SELECT("pys.PORDEFECTO");
+		sql.SELECT("cat.DESCRIPCION as PERIOCIDAD");
+		sql.FROM("PYS_PRECIOSSERVICIOS pys");
+		sql.INNER_JOIN("PYS_PERIODICIDAD per on per.IDPERIODICIDAD = pys.IDPERIODICIDAD");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS cat ON per.DESCRIPCION = cat.IDRECURSO and idLenguaje = '" + idLenguaje + "'");
+		sql.WHERE("pys.idInstitucion =" + idInstitucion);
+		sql.WHERE("pys.descripcion like '%" + codigoCurso + "%'");
+		sql.WHERE("pys.idServicio = " + idServicio);
+		
+		return sql.toString();
+	}
 
 }

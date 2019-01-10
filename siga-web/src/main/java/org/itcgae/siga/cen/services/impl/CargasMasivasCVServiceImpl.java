@@ -431,8 +431,8 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 
 		// Comprueba si la institucion que esta logeada es la 2000 si es diferente la
 		// añade a la lista de instituciones
-		if (idInstitucion != CargaMasivaDatosGFItem.IDINSTITUCION_2000) {
-			idInstituciones.add(CargaMasivaDatosGFItem.IDINSTITUCION_2000);
+		if (idInstitucion != SigaConstants.IDINSTITUCION_2000) {
+			idInstituciones.add(SigaConstants.IDINSTITUCION_2000);
 		}
 
 		StringBuffer errorLinea = null;
@@ -907,7 +907,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 
 		// Extraer el path
 		String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
-		path += idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + ICargasMasivasGFService.tipoExcelXls;
+		path += idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
 		File file = new File(path);
 
 		// Preparar la descarga
@@ -941,7 +941,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 		// Extraer el path
 		String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
 		path += "log_" + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "."
-				+ ICargasMasivasGFService.tipoExcelXls;
+				+ SigaConstants.tipoExcelXls;
 		File file = new File(path);
 
 		// Preparar la descarga

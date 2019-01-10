@@ -6,28 +6,30 @@ import java.util.Objects;
 
 import org.itcgae.siga.DTOs.gen.Error;
 
-public class AsistenciaCursoDTO {
-	private List<AsistenciaCursoItem> asistenciaCursoItem = new ArrayList<AsistenciaCursoItem>();
+
+public class PreciosCursoDTO {
+
+	private List<PreciosCursoItem> preciosCursoItem = new ArrayList<PreciosCursoItem>();
 	private Error error = null;
 	
 	/**
 	 */
-	public AsistenciaCursoDTO AsistenciaCursoItem(List<AsistenciaCursoItem> asistenciaCursoItem){
-		this.asistenciaCursoItem = asistenciaCursoItem;
+	public PreciosCursoDTO PreciosCursoItem(List<PreciosCursoItem> preciosCursoItem){
+		this.preciosCursoItem = preciosCursoItem;
 		return this;
 	}
 	
-	public List<AsistenciaCursoItem> getAsistenciaCursoItem() {
-		return asistenciaCursoItem;
+	public List<PreciosCursoItem> getPreciosCursoItem() {
+		return preciosCursoItem;
 	}
-	public void setAsistenciaCursoItem(List<AsistenciaCursoItem> asistenciaCursoItem) {
-		this.asistenciaCursoItem = asistenciaCursoItem;
+	public void setPreciosCursoItem(List<PreciosCursoItem> preciosCursoItem) {
+		this.preciosCursoItem = preciosCursoItem;
 	}
 	
 	
 	/**
 	 */
-	public AsistenciaCursoDTO error(Error error){
+	public PreciosCursoDTO error(Error error){
 		this.error = error;
 		return this;
 	}
@@ -47,23 +49,23 @@ public class AsistenciaCursoDTO {
 	    if (o == null || getClass() != o.getClass()) {
 	      return false;
 	    }
-	    AsistenciaCursoDTO asistenciaCursoDTO = (AsistenciaCursoDTO) o;
-	    return Objects.equals(this.asistenciaCursoItem, asistenciaCursoDTO.asistenciaCursoItem) &&
-	    		Objects.equals(this.error, asistenciaCursoDTO.error);
+	    PreciosCursoDTO CursoDTO = (PreciosCursoDTO) o;
+	    return Objects.equals(this.preciosCursoItem, CursoDTO.preciosCursoItem) &&
+	    		Objects.equals(this.error, CursoDTO.error);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(asistenciaCursoItem, error);
+	    return Objects.hash(preciosCursoItem, error);
 	}
 
 	
 	@Override
 	public String toString() {
 	    StringBuilder sb = new StringBuilder();
-	    sb.append("class AsistenciaCursoDTO {\n");
+	    sb.append("class PreciosCursoDTO {\n");
 	    
-	    sb.append("AsistenciaCursoItem: ").append(toIndentedString(asistenciaCursoItem)).append("\n");
+	    sb.append("PreciosCursoItem: ").append(toIndentedString(preciosCursoItem)).append("\n");
 	    sb.append("error: ").append(toIndentedString(error)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
@@ -79,4 +81,5 @@ public class AsistenciaCursoDTO {
 	    }
 	    return o.toString().replace("\n", "\n    ");
 	}
+	
 }

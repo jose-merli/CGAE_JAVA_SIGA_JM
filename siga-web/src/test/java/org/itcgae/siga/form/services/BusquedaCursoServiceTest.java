@@ -150,7 +150,7 @@ public class BusquedaCursoServiceTest {
 		List<CursoItem> cursoItemList = forTestUtils.getListCursosSimulados(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_SIN_ARCHIVAR);
 		CursoItem cursoItemBusqueda = forTestUtils.getCursoSimulado(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_SIN_ARCHIVAR);
 		
-		when(forCursoExtendsMapper.selectCursos(Mockito.anyShort(), Mockito.any(CursoItem.class))).thenReturn(cursoItemList);
+		when(forCursoExtendsMapper.selectCursos(Mockito.anyShort(), Mockito.any(CursoItem.class), Mockito.anyString())).thenReturn(cursoItemList);
 		
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
@@ -168,7 +168,7 @@ public class BusquedaCursoServiceTest {
 		
 		CursoItem cursoItemBusqueda = forTestUtils.getCursoSimulado(SigaConstants.ESTADO_CURSO_CANCELADO,SigaConstants.CURSO_SIN_ARCHIVAR);
 		
-		when(forCursoExtendsMapper.selectCursos(Mockito.anyShort(), Mockito.any(CursoItem.class))).thenReturn(null);
+		when(forCursoExtendsMapper.selectCursos(Mockito.anyShort(), Mockito.any(CursoItem.class), Mockito.anyString())).thenReturn(null);
 		
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 

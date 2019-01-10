@@ -15,17 +15,13 @@ import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
-import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.ForCambioinscripcion;
 import org.itcgae.siga.db.entities.ForInscripcion;
 import org.itcgae.siga.db.entities.ForInscripcionExample;
-import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.mappers.ForCambioinscripcionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -59,9 +55,6 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 	
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
-	
-	@Autowired
-	private AdmUsuariosEfectivosPerfilMapper admUsuariosEfectivosPerfil;
 	
 	@Override
 	public ComboDTO getEstadosInscripcion(HttpServletRequest request) {
@@ -112,7 +105,23 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 	public InscripcionDTO searchInscripcion(InscripcionItem inscripcionItem, HttpServletRequest request) {
 
 		LOGGER.info("searchInscripcion() -> Entrada al servicio para obtener inscripciones");
+		
+		String token = request.getHeader("Authorization");
+		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<CenPersona> listCenPersona;
 
+		if (letrado.equalsIgnoreCase("S")) {
+			CenPersonaExample cenPersonaExample = new CenPersonaExample();
+			cenPersonaExample.createCriteria().andNifcifEqualTo(dni);
+			listCenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+			if(!listCenPersona.isEmpty()) {
+				CenPersona cenPersona = listCenPersona.get(0);
+				inscripcionItem.setIdPersona(cenPersona.getIdpersona());
+			}
+		}
+		
 		InscripcionDTO inscripcionDTO = new InscripcionDTO();
 		List<InscripcionItem> inscripcionItemList = new ArrayList<InscripcionItem>();
 		
@@ -434,38 +443,41 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 	public Boolean isAdministrador(HttpServletRequest request) {
 		Boolean isAdministrador = Boolean.FALSE;
 		
-		List<AdmUsuariosEfectivosPerfil> listCenPersonaItem;
+//		List<AdmUsuariosEfectivosPerfil> listCenPersonaItem;
 		
 		String token = request.getHeader("Authorization");
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
-
+//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+//		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
+		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+		
 		//Obtenemos el usuario para setear el campo "usumodificiacion"
-		String dniUser = UserTokenUtils.getDniFromJWTToken(token);
-		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-		exampleUsuarios.createCriteria().andNifEqualTo(dniUser).andIdinstitucionEqualTo(idInstitucion);
+//		String dniUser = UserTokenUtils.getDniFromJWTToken(token);
+//		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+//		exampleUsuarios.createCriteria().andNifEqualTo(dniUser).andIdinstitucionEqualTo(idInstitucion);
+//		
+//		LOGGER.info(
+//				"isAdministrador() / admUsuariosMapper.selectByExample() -> Entrada a admUsuariosMapper para obtener al usuario que está realizando la acción");
+//		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
+//		
+//		AdmUsuarios usuario = usuarios.get(0);
+//		
+//		if(usuario == null) {
+//			LOGGER.warn(
+//					"isAdministrador() / admUsuariosMapper.selectByExample() -> No se ha podido recuperar al usuario logeado, no se realiza el update");
+//			return isAdministrador;
+//		} else {
+//			AdmUsuariosEfectivosPerfilExample admUsuariosEfectivosPerfilExample = new AdmUsuariosEfectivosPerfilExample();
+//			admUsuariosEfectivosPerfilExample.createCriteria().andIdusuarioEqualTo(usuario.getIdusuario()).andIdinstitucionEqualTo(idInstitucion).andIdperfilIn(UtilidadesString.formateaListaPerfiles(perfiles));
+//			listCenPersonaItem = admUsuariosEfectivosPerfil.selectByExample(admUsuariosEfectivosPerfilExample);
+//			
+//			if(!listCenPersonaItem.isEmpty()) {
+//				isAdministrador = Boolean.TRUE;
+//			}
+//			
+//		}
 		
-		LOGGER.info(
-				"isAdministrador() / admUsuariosMapper.selectByExample() -> Entrada a admUsuariosMapper para obtener al usuario que está realizando la acción");
-		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
-		
-		AdmUsuarios usuario = usuarios.get(0);
-		
-		if(usuario == null) {
-			LOGGER.warn(
-					"isAdministrador() / admUsuariosMapper.selectByExample() -> No se ha podido recuperar al usuario logeado, no se realiza el update");
-			return isAdministrador;
-		} else {
-			AdmUsuariosEfectivosPerfilExample admUsuariosEfectivosPerfilExample = new AdmUsuariosEfectivosPerfilExample();
-			admUsuariosEfectivosPerfilExample.createCriteria().andIdusuarioEqualTo(usuario.getIdusuario()).andIdinstitucionEqualTo(idInstitucion).andIdperfilIn(perfiles);
-			listCenPersonaItem = admUsuariosEfectivosPerfil.selectByExample(admUsuariosEfectivosPerfilExample);
-			
-			if(!listCenPersonaItem.isEmpty()) {
-				isAdministrador = Boolean.TRUE;
-			}
-			
-		}
-			
+		if(letrado.equalsIgnoreCase("N"))
+			isAdministrador = Boolean.TRUE;
 			
 		return isAdministrador;
 	}

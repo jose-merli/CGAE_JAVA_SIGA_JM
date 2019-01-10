@@ -58,7 +58,28 @@ public interface AgeEventoExtendsMapper extends AgeEventoMapper{
 		@Result(column = "IDESTADOEVENTO", property = "idEstadoEvento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESTADOEVENTO", property = "estadoEvento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOEVENTO", property = "idTipoEvento", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDCURSO", property = "idCurso", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDTIPOCALENDARIO", property = "idTipoCalendario", jdbcType = JdbcType.NUMERIC),
 	})
 	List<EventoItem> getSessionsCourse(String idTipoEvento, String idCurso, String idInstitucion);
+	
+	@SelectProvider(type = AgeEventoSqlExtendsProvider.class, method = "getSessionsCourseByState")
+	@Results({
+		@Result(column = "IDEVENTO", property = "idEvento", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDCALENDARIO", property = "idCalendario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TITULO", property = "titulo", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAHORAINICIO", property = "fechaHoraInicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAHORAFIN", property = "fechaHoraFin", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "LUGAR", property = "lugar", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "RECURSOS", property = "recursos", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDESTADOEVENTO", property = "idEstadoEvento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ESTADOEVENTO", property = "estadoEvento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOEVENTO", property = "idTipoEvento", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOCALENDARIO", property = "idTipoCalendario", jdbcType = JdbcType.NUMERIC),
+	})
+	List<EventoItem> getSessionsCourseByState(String idTipoEvento, String idCurso, String idInstitucion, String idEstado);
 }

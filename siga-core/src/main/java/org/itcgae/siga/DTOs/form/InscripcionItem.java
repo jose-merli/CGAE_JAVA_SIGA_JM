@@ -30,9 +30,11 @@ public class InscripcionItem {
 	private Long pagada;
 	private Long idFormador;
 	private Long certificadoEmitido;
+	private Long emitirCertificado;
 	private Long idCalificacion;
 	private String precioCurso;
 	private String fechaSolicitud;
+	private Date fechaSolicitudDate;
 	private Long idPersona;
 	private String nombrePersona;
 	private String nifPersona;
@@ -414,6 +416,14 @@ public class InscripcionItem {
 		this.idCurso = idCurso;
 	}
 
+	public Date getFechaSolicitudDate() {
+		return fechaSolicitudDate;
+	}
+
+	public void setFechaSolicitudDate(Date fechaSolicitudDate) {
+		this.fechaSolicitudDate = fechaSolicitudDate;
+	}
+
 	public String getNifPersona() {
 		return nifPersona;
 	}
@@ -430,15 +440,27 @@ public class InscripcionItem {
 		this.formaPagoNombre = formaPagoNombre;
 	}
 
+	public Long getEmitirCertificado() {
+		return emitirCertificado;
+	}
+
+	public void setEmitirCertificado(Long emitirCertificado) {
+		this.emitirCertificado = emitirCertificado;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((aprobadas == null) ? 0 : aprobadas.hashCode());
 		result = prime * result + ((calificacion == null) ? 0 : calificacion.hashCode());
+		result = prime * result + ((canceladas == null) ? 0 : canceladas.hashCode());
 		result = prime * result + ((certificadoEmitido == null) ? 0 : certificadoEmitido.hashCode());
 		result = prime * result + ((codigoCurso == null) ? 0 : codigoCurso.hashCode());
 		result = prime * result + ((colegio == null) ? 0 : colegio.hashCode());
 		result = prime * result + ((descripcionEstado == null) ? 0 : descripcionEstado.hashCode());
+		result = prime * result + ((emitirCertificado == null) ? 0 : emitirCertificado.hashCode());
+		result = prime * result + ((errores == null) ? 0 : errores.hashCode());
 		result = prime * result + ((estadoCurso == null) ? 0 : estadoCurso.hashCode());
 		result = prime * result + ((estadoInscripcion == null) ? 0 : estadoInscripcion.hashCode());
 		result = prime * result + ((fechaImparticion == null) ? 0 : fechaImparticion.hashCode());
@@ -452,7 +474,11 @@ public class InscripcionItem {
 		result = prime * result + ((fechaInscripcionHasta == null) ? 0 : fechaInscripcionHasta.hashCode());
 		result = prime * result + ((fechaInscripcionHastaFormat == null) ? 0 : fechaInscripcionHastaFormat.hashCode());
 		result = prime * result + ((fechaSolicitud == null) ? 0 : fechaSolicitud.hashCode());
+		result = prime * result + ((fechaSolicitudDate == null) ? 0 : fechaSolicitudDate.hashCode());
+		result = prime * result + ((formaPago == null) ? 0 : formaPago.hashCode());
+		result = prime * result + ((formaPagoNombre == null) ? 0 : formaPagoNombre.hashCode());
 		result = prime * result + ((idCalificacion == null) ? 0 : idCalificacion.hashCode());
+		result = prime * result + ((idCurso == null) ? 0 : idCurso.hashCode());
 		result = prime * result + ((idEstadoCurso == null) ? 0 : idEstadoCurso.hashCode());
 		result = prime * result + ((idEstadoInscripcion == null) ? 0 : idEstadoInscripcion.hashCode());
 		result = prime * result + ((idFormador == null) ? 0 : idFormador.hashCode());
@@ -462,25 +488,17 @@ public class InscripcionItem {
 		result = prime * result + ((idVisibilidad == null) ? 0 : idVisibilidad.hashCode());
 		result = prime * result + ((minimaAsistencia == null) ? 0 : minimaAsistencia.hashCode());
 		result = prime * result + ((motivo == null) ? 0 : motivo.hashCode());
+		result = prime * result + ((nifPersona == null) ? 0 : nifPersona.hashCode());
 		result = prime * result + ((nombreCurso == null) ? 0 : nombreCurso.hashCode());
+		result = prime * result + ((nombrePersona == null) ? 0 : nombrePersona.hashCode());
 		result = prime * result + ((pagada == null) ? 0 : pagada.hashCode());
+		result = prime * result + ((pendientes == null) ? 0 : pendientes.hashCode());
 		result = prime * result + ((precioCurso == null) ? 0 : precioCurso.hashCode());
+		result = prime * result + ((rechazadas == null) ? 0 : rechazadas.hashCode());
 		result = prime * result + Arrays.hashCode(temas);
 		result = prime * result + ((tipoAccion == null) ? 0 : tipoAccion.hashCode());
-		result = prime * result + ((visibilidad == null) ? 0 : visibilidad.hashCode());
-		result = prime * result + ((pendientes == null) ? 0 : pendientes.hashCode());
-		result = prime * result + ((rechazadas == null) ? 0 : rechazadas.hashCode());
-		result = prime * result + ((aprobadas == null) ? 0 : aprobadas.hashCode());
-		result = prime * result + ((canceladas == null) ? 0 : canceladas.hashCode());
 		result = prime * result + ((totales == null) ? 0 : totales.hashCode());
-		result = prime * result + ((nombrePersona == null) ? 0 : nombrePersona.hashCode());
-		result = prime * result + ((formaPago == null) ? 0 : formaPago.hashCode());
-		result = prime * result + ((errores == null) ? 0 : errores.hashCode());
-		result = prime * result + ((idCurso == null) ? 0 : idCurso.hashCode());
-		result = prime * result + ((nifPersona == null) ? 0 : nifPersona.hashCode());
-		result = prime * result + ((formaPagoNombre == null) ? 0 : formaPagoNombre.hashCode());
-
-
+		result = prime * result + ((visibilidad == null) ? 0 : visibilidad.hashCode());
 		return result;
 	}
 
@@ -493,10 +511,20 @@ public class InscripcionItem {
 		if (getClass() != obj.getClass())
 			return false;
 		InscripcionItem other = (InscripcionItem) obj;
+		if (aprobadas == null) {
+			if (other.aprobadas != null)
+				return false;
+		} else if (!aprobadas.equals(other.aprobadas))
+			return false;
 		if (calificacion == null) {
 			if (other.calificacion != null)
 				return false;
 		} else if (!calificacion.equals(other.calificacion))
+			return false;
+		if (canceladas == null) {
+			if (other.canceladas != null)
+				return false;
+		} else if (!canceladas.equals(other.canceladas))
 			return false;
 		if (certificadoEmitido == null) {
 			if (other.certificadoEmitido != null)
@@ -517,6 +545,16 @@ public class InscripcionItem {
 			if (other.descripcionEstado != null)
 				return false;
 		} else if (!descripcionEstado.equals(other.descripcionEstado))
+			return false;
+		if (emitirCertificado == null) {
+			if (other.emitirCertificado != null)
+				return false;
+		} else if (!emitirCertificado.equals(other.emitirCertificado))
+			return false;
+		if (errores == null) {
+			if (other.errores != null)
+				return false;
+		} else if (!errores.equals(other.errores))
 			return false;
 		if (estadoCurso == null) {
 			if (other.estadoCurso != null)
@@ -583,10 +621,30 @@ public class InscripcionItem {
 				return false;
 		} else if (!fechaSolicitud.equals(other.fechaSolicitud))
 			return false;
+		if (fechaSolicitudDate == null) {
+			if (other.fechaSolicitudDate != null)
+				return false;
+		} else if (!fechaSolicitudDate.equals(other.fechaSolicitudDate))
+			return false;
+		if (formaPago == null) {
+			if (other.formaPago != null)
+				return false;
+		} else if (!formaPago.equals(other.formaPago))
+			return false;
+		if (formaPagoNombre == null) {
+			if (other.formaPagoNombre != null)
+				return false;
+		} else if (!formaPagoNombre.equals(other.formaPagoNombre))
+			return false;
 		if (idCalificacion == null) {
 			if (other.idCalificacion != null)
 				return false;
 		} else if (!idCalificacion.equals(other.idCalificacion))
+			return false;
+		if (idCurso == null) {
+			if (other.idCurso != null)
+				return false;
+		} else if (!idCurso.equals(other.idCurso))
 			return false;
 		if (idEstadoCurso == null) {
 			if (other.idEstadoCurso != null)
@@ -633,20 +691,40 @@ public class InscripcionItem {
 				return false;
 		} else if (!motivo.equals(other.motivo))
 			return false;
+		if (nifPersona == null) {
+			if (other.nifPersona != null)
+				return false;
+		} else if (!nifPersona.equals(other.nifPersona))
+			return false;
 		if (nombreCurso == null) {
 			if (other.nombreCurso != null)
 				return false;
 		} else if (!nombreCurso.equals(other.nombreCurso))
+			return false;
+		if (nombrePersona == null) {
+			if (other.nombrePersona != null)
+				return false;
+		} else if (!nombrePersona.equals(other.nombrePersona))
 			return false;
 		if (pagada == null) {
 			if (other.pagada != null)
 				return false;
 		} else if (!pagada.equals(other.pagada))
 			return false;
+		if (pendientes == null) {
+			if (other.pendientes != null)
+				return false;
+		} else if (!pendientes.equals(other.pendientes))
+			return false;
 		if (precioCurso == null) {
 			if (other.precioCurso != null)
 				return false;
 		} else if (!precioCurso.equals(other.precioCurso))
+			return false;
+		if (rechazadas == null) {
+			if (other.rechazadas != null)
+				return false;
+		} else if (!rechazadas.equals(other.rechazadas))
 			return false;
 		if (!Arrays.equals(temas, other.temas))
 			return false;
@@ -655,69 +733,19 @@ public class InscripcionItem {
 				return false;
 		} else if (!tipoAccion.equals(other.tipoAccion))
 			return false;
-		if (visibilidad == null) {
-			if (other.visibilidad != null)
-				return false;
-		} else if (!visibilidad.equals(other.visibilidad))
-			return false;
-		if (pendientes == null) {
-			if (other.pendientes != null)
-				return false;
-		} else if (!pendientes.equals(other.pendientes))
-			return false;
-		if (rechazadas == null) {
-			if (other.rechazadas != null)
-				return false;
-		} else if (!rechazadas.equals(other.rechazadas))
-			return false;
-		if (aprobadas == null) {
-			if (other.aprobadas != null)
-				return false;
-		} else if (!aprobadas.equals(other.aprobadas))
-			return false;
-		if (canceladas == null) {
-			if (other.canceladas != null)
-				return false;
-		} else if (!canceladas.equals(other.canceladas))
-			return false;
 		if (totales == null) {
 			if (other.totales != null)
 				return false;
 		} else if (!totales.equals(other.totales))
 			return false;
-		if (nombrePersona == null) {
-			if (other.nombrePersona != null)
+		if (visibilidad == null) {
+			if (other.visibilidad != null)
 				return false;
-		} else if (!nombrePersona.equals(other.nombrePersona))
-			return false;
-		if (formaPago == null) {
-			if (other.formaPago != null)
-				return false;
-		} else if (!formaPago.equals(other.formaPago))
-			return false;
-		if (errores == null) {
-			if (other.errores != null)
-				return false;
-		} else if (!errores.equals(other.errores))
-			return false;
-		if (idCurso == null) {
-			if (other.idCurso != null)
-				return false;
-		} else if (!idCurso.equals(other.idCurso))
-			return false;
-		if (nifPersona == null) {
-			if (other.nifPersona != null)
-				return false;
-		} else if (!nifPersona.equals(other.nifPersona))
-			return false;
-		if (formaPagoNombre == null) {
-			if (other.formaPagoNombre != null)
-				return false;
-		} else if (!formaPagoNombre.equals(other.formaPagoNombre))
+		} else if (!visibilidad.equals(other.visibilidad))
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "InscripcionItem [idInscripcion=" + idInscripcion + ", visibilidad=" + visibilidad + ", colegio="
@@ -727,19 +755,18 @@ public class InscripcionItem {
 				+ ", fechaImparticionDesde=" + fechaImparticionDesde + ", fechaImparticionHasta="
 				+ fechaImparticionHasta + ", minimaAsistencia=" + minimaAsistencia + ", temas=" + Arrays.toString(temas)
 				+ ", calificacion=" + calificacion + ", pagada=" + pagada + ", idFormador=" + idFormador
-				+ ", certificadoEmitido=" + certificadoEmitido + ", idCalificacion=" + idCalificacion + ", precioCurso="
-				+ precioCurso + ", fechaSolicitud=" + fechaSolicitud + ", idEstadoCurso=" + idEstadoCurso
-				+ ", idEstadoInscripcion=" + idEstadoInscripcion + ", idVisibilidad=" + idVisibilidad
+				+ ", certificadoEmitido=" + certificadoEmitido + ", emitirCertificado=" + emitirCertificado
+				+ ", idCalificacion=" + idCalificacion + ", precioCurso=" + precioCurso + ", fechaSolicitud="
+				+ fechaSolicitud + ", fechaSolicitudDate=" + fechaSolicitudDate + ", idPersona=" + idPersona
+				+ ", nombrePersona=" + nombrePersona + ", nifPersona=" + nifPersona + ", formaPagoNombre="
+				+ formaPagoNombre + ", tipoAccion=" + tipoAccion + ", motivo=" + motivo + ", idEstadoCurso="
+				+ idEstadoCurso + ", idEstadoInscripcion=" + idEstadoInscripcion + ", idVisibilidad=" + idVisibilidad
 				+ ", idInstitucion=" + idInstitucion + ", descripcionEstado=" + descripcionEstado
 				+ ", fechaInscripcion=" + fechaInscripcion + ", fechaImparticion=" + fechaImparticion + ", pendientes="
-				+ pendientes + ", rechazadas=" + rechazadas + ", aceptadas=" + aprobadas + ", canceladas=" + canceladas
-				+ ", totales=" + totales + ", fechaInscripcionDesdeFormat=" + fechaInscripcionDesdeFormat
-				+ ", fechaInscripcionHastaFormat=" + fechaInscripcionHastaFormat + ", fechaImparticionDesdeFormat="
-				+ fechaImparticionDesdeFormat + ", fechaImparticionHastaFormat=" + fechaImparticionHastaFormat
-				+ ", nombrePersona=" + nombrePersona + ", formaPago=" + formaPago + ", errores=" + errores + ", idCurso=" + idCurso
-				+ ", nifPersona =" + nifPersona + ", formaPagoNombre =" + formaPagoNombre + "]";
-
+				+ pendientes + ", rechazadas=" + rechazadas + ", aprobadas=" + aprobadas + ", canceladas=" + canceladas
+				+ ", totales=" + totales + ", formaPago=" + formaPago + ", idCurso=" + idCurso
+				+ ", fechaInscripcionDesdeFormat=" + fechaInscripcionDesdeFormat + ", fechaInscripcionHastaFormat="
+				+ fechaInscripcionHastaFormat + ", fechaImparticionDesdeFormat=" + fechaImparticionDesdeFormat
+				+ ", fechaImparticionHastaFormat=" + fechaImparticionHastaFormat + ", errores=" + errores + "]";
 	}
-	
-	
 }

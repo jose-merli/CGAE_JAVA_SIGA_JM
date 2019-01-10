@@ -16,7 +16,10 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.SELECT("INSC.IDINSCRIPCION");
 		sql.SELECT("INSC.IDESTADOINSCRIPCION");
 		sql.SELECT("INSC.IDPERSONA");
+		sql.SELECT("INSC.EMITIRCERTIFICADO");
+		sql.SELECT("INSC.CERTIFICADOEMITIDO");
 		sql.SELECT("CURSO.IDESTADOCURSO");
+		sql.SELECT("CURSO.IDCURSO");
 		sql.SELECT("INSC.IDINSTITUCION");
 		sql.SELECT("CURSO.CODIGOCURSO");
 		sql.SELECT("CURSO.NOMBRECURSO");
@@ -42,8 +45,16 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.LEFT_OUTER_JOIN(
 				"FOR_PERSONA_CURSO PERCURSO2 ON PERCURSO2.IDCURSO = CURSO.IDCURSO AND PERCURSO2.TUTOR = '1' AND CURSO.IDINSTITUCION = PERCURSO2.IDINSTITUCION");
 
+		if (inscripcionItem.getIdCurso() != null && inscripcionItem.getIdCurso() != "") {
+			sql.WHERE("INSC.IDCURSO = '" + inscripcionItem.getIdCurso() + "'");
+		}
+		
 		if (inscripcionItem.getColegio() != null && inscripcionItem.getColegio() != "") {
 			sql.WHERE("INSC.IDINSTITUCION = '" + inscripcionItem.getColegio() + "'");
+		}
+		
+		if (inscripcionItem.getIdPersona() != null) {
+			sql.WHERE("INSC.IDPERSONA = '" + inscripcionItem.getIdPersona() + "'");
 		}
 
 		if (inscripcionItem.getCodigoCurso() != null && inscripcionItem.getCodigoCurso() != "") {
@@ -111,8 +122,18 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 			sql.WHERE("PERCURSO2.IDPERSONA ='" + inscripcionItem.getIdFormador() + "'");
 		}
 
-		// TODO Falta filtro de "Certificado emitido -> Si, No, Todos"
-
+		if(inscripcionItem.getCertificadoEmitido() != null) {
+			// 0 --> TODOS
+			// 1 --> Si tiene certificadoEmitido
+			// 2 --> No tiene certificadoEmitido
+		
+			if(inscripcionItem.getCertificadoEmitido() == 1) {
+				sql.WHERE("INSC.CERTIFICADOEMITIDO = '1'");
+			}else if(inscripcionItem.getCertificadoEmitido() == 2) {
+				sql.WHERE("INSC.CERTIFICADOEMITIDO = '0' OR INSC.CERTIFICADOEMITIDO IS NULL");
+			}
+		}
+		
 		if (inscripcionItem.getPagada() != null) {
 			// 0 --> TODOS
 			// 1 --> Si esta pagada la inscripcion
@@ -197,6 +218,59 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		
 		sql.GROUP_BY("FC.IDCURSO, FC.NOMBRECURSO, NUMEROPLAZAS");
 
+		return sql.toString();
+	}
+	
+	
+	public String searchCourseByIdcurso(String idCurso, Short idInstitucion) {
+
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("CURSO.IDCURSO");
+		sql.SELECT("CURSO.CODIGOCURSO");
+		sql.SELECT("CURSO.NOMBRECURSO");
+		sql.SELECT("CURSO.IDINSTITUCION");
+		sql.SELECT("CURSO.IDESTADOCURSO AS IDESTADO");
+		sql.SELECT("CURSO.IDVISIBILIDADCURSO");
+		sql.SELECT("TO_CHAR(CURSO.DESCRIPCION) AS DESCRIPCION");
+		sql.SELECT("CAT.DESCRIPCION AS ESTADO");
+		sql.SELECT("DECODE(CURSO.IDINSTITUCION,'"+ Short.toString(idInstitucion) +"', CAT1.DESCRIPCION, INSTITUCION.ABREVIATURA) AS VISIBILIDAD");
+		sql.SELECT("CONCAT(CURSO.PRECIODESDE|| ' - ', CURSO.PRECIOHASTA) AS PRECIOCURSO");
+		sql.SELECT("CONCAT(CURSO.FECHAINSCRIPCIONDESDE|| ' - ', CURSO.FECHAINSCRIPCIONHASTA) AS FECHAINSCRIPCION");
+		sql.SELECT("CURSO.FECHAINSCRIPCIONDESDE AS FECHAINSCRIPCIONDESDEDATE");
+		sql.SELECT("CURSO.FECHAINSCRIPCIONHASTA AS FECHAINSCRIPCIONHASTADATE");
+		sql.SELECT("CONCAT(CURSO.FECHAIMPARTICIONDESDE|| ' - ', CURSO.FECHAIMPARTICIONHASTA ) AS FECHAIMPARTICION");
+		sql.SELECT("TO_CHAR(CURSO.FECHAIMPARTICIONDESDE,'DD/MM/YYYY') AS FECHAIMPARTICIONDESDE");
+		sql.SELECT("TO_CHAR(CURSO.FECHAIMPARTICIONHASTA,'DD/MM/YYYY') AS FECHAIMPARTICIONHASTA");
+		sql.SELECT("CURSO.FLAGARCHIVADO");
+		sql.SELECT("CURSO.LUGAR");
+		sql.SELECT("CURSO.NUMEROPLAZAS as plazasDisponibles");
+		sql.SELECT("CURSO.AUTOVALIDACIONINSCRIPCION");
+		sql.SELECT("CURSO.MINIMOASISTENCIA");
+		
+		sql.FROM("FOR_CURSO CURSO");
+		
+		sql.INNER_JOIN("CEN_INSTITUCION INSTITUCION ON CURSO.IDINSTITUCION = INSTITUCION.IDINSTITUCION");
+		sql.INNER_JOIN("FOR_ESTADOCURSO ESTADO ON CURSO.IDESTADOCURSO = ESTADO.IDESTADOCURSO");
+		sql.INNER_JOIN("FOR_VISIBILIDADCURSO VISIBILIDAD ON CURSO.IDVISIBILIDADCURSO = VISIBILIDAD.IDVISIBILIDADCURSO");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON (CAT.IDRECURSO = ESTADO.DESCRIPCION AND CAT.IDLENGUAJE = '1' )");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT1 ON (CAT1.IDRECURSO = VISIBILIDAD.DESCRIPCION AND CAT1.IDLENGUAJE = '1' )");
+		sql.LEFT_OUTER_JOIN("FOR_TEMACURSO_CURSO TEMACURSO ON (TEMACURSO.IDCURSO = CURSO.IDCURSO AND TEMACURSO.IDINSTITUCION = CURSO.IDINSTITUCION AND TEMACURSO.FECHABAJA IS NULL)");
+		sql.LEFT_OUTER_JOIN("FOR_PERSONA_CURSO PERCURSO2 ON PERCURSO2.IDCURSO = CURSO.IDCURSO AND PERCURSO2.TUTOR = '1' AND CURSO.IDINSTITUCION = PERCURSO2.IDINSTITUCION");
+		sql.LEFT_OUTER_JOIN("CEN_PERSONA PER ON PER.IDPERSONA = PERCURSO2.IDPERSONA");
+		sql.WHERE("(CURSO.IDINSTITUCION = '" + idInstitucion + "' OR (CURSO.IDINSTITUCION <> '" + idInstitucion + "' AND CURSO.IDVISIBILIDADCURSO = '0'))");
+		sql.WHERE("CURSO.IDCURSO = '" + idCurso + "'");
+
+		return sql.toString();
+	}
+	
+	public String selectMaxIdInscripcion() {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("max(idinscripcion) as IDINSCRIPCION1");
+		sql.SELECT("max(idinscripcion) as IDINSCRIPCION2");
+		sql.FROM("for_inscripcion");
 		return sql.toString();
 	}
 

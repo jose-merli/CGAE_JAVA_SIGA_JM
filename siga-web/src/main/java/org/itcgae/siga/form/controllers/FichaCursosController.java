@@ -8,12 +8,17 @@ import javax.servlet.http.HttpServletResponse;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.EventoDTO;
+import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.form.CargaMasivaInscripcionesDTO;
+import org.itcgae.siga.DTOs.form.CertificadoCursoDTO;
+import org.itcgae.siga.DTOs.form.CertificadoCursoItem;
 import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.form.InscripcionItem;
+import org.itcgae.siga.DTOs.form.PreciosCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.age.service.IFichaEventosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.form.services.IFichaCursosService;
@@ -34,6 +39,9 @@ public class FichaCursosController {
 	
 	@Autowired
 	private IFichaCursosService fichaCursosService;
+	
+	@Autowired
+	private IFichaEventosService fichaEventosService;
 	
 			
 	@RequestMapping(value = "fichaCursos/getTrainersCourse", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -163,6 +171,72 @@ public class FichaCursosController {
 	ResponseEntity<ComboDTO> getTopicsSpecificCourse(@RequestParam("idCurso") String idCurso, HttpServletRequest request) {
 		ComboDTO response = fichaCursosService.getTopicsSpecificCourse(request, idCurso);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/cancelCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> cancelCourse(@RequestBody CursoDTO cursoDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaCursosService.cancelCourse(cursoDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/finishCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> finishCourse(@RequestBody CursoDTO cursoDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaCursosService.finishCourse(cursoDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/getPricesCourse",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PreciosCursoDTO> getPricesCourse(@RequestParam("idCurso") String idCurso, HttpServletRequest request) {
+		PreciosCursoDTO response = fichaCursosService.getPricesCourse(request, idCurso);
+		return new ResponseEntity<PreciosCursoDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/getQualificationsCourse",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getQualificationsCourse(HttpServletRequest request) {
+		ComboDTO response = fichaCursosService.getQualificationsCourse(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/getTypesCertificatesCourse",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<CertificadoCursoDTO> getTypesCertificatesCourse(HttpServletRequest request) {
+		CertificadoCursoDTO response = fichaCursosService.getTypesCertificatesCourse(request);
+		return new ResponseEntity<CertificadoCursoDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/getCertificatesCourse",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<CertificadoCursoDTO> getCertificatesCourse(@RequestParam("idCurso") String idCurso, HttpServletRequest request) {
+		CertificadoCursoDTO response = fichaCursosService.getCertificatesCourse(request, idCurso);
+		return new ResponseEntity<CertificadoCursoDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/saveCertificateCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> saveCertificateCourse(@RequestBody CertificadoCursoItem certificadoCursoItem, HttpServletRequest request) {
+		InsertResponseDTO response = fichaCursosService.saveCertificateCourse(certificadoCursoItem, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/updateCertificatesCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateCertificatesCourse(@RequestBody CertificadoCursoDTO certificadoCursoDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaCursosService.updateCertificatesCourse(certificadoCursoDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/deleteCertificatesCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> deleteCertificatesCourse(@RequestBody CertificadoCursoDTO certificadoCursoDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaCursosService.deleteCertificatesCourse(certificadoCursoDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/duplicateSessionsCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> duplicateSessionCourse(@RequestBody EventoItem eventoItem, HttpServletRequest request) {
+		InsertResponseDTO response = fichaEventosService.saveEventCalendar(eventoItem, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/cancelSessionsCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> cancelSessionsCourse(@RequestBody EventoDTO eventoDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaEventosService.deleteEventCalendar(eventoDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 }

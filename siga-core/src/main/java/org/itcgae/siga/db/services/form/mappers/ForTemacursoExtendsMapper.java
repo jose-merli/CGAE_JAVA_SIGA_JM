@@ -9,7 +9,6 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.ForTemacursoMapper;
 import org.itcgae.siga.db.services.form.providers.ForTemacursoSqlExtendsProvider;
-import org.itcgae.siga.db.services.form.providers.ForTiposervicioCursoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 

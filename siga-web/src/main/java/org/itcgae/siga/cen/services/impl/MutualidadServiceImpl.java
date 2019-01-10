@@ -348,89 +348,44 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			MGASolicitudPolizaAccuGratuitosDocument request = MGASolicitudPolizaAccuGratuitosDocument.Factory.newInstance();
 			samples.servicemodel.microsoft.MGASolicitudPolizaAccuGratuitosDocument.MGASolicitudPolizaAccuGratuitos requestBody = samples.servicemodel.microsoft.MGASolicitudPolizaAccuGratuitosDocument.MGASolicitudPolizaAccuGratuitos.Factory.newInstance();
 			
-//			IntegracionPersona persona = IntegracionPersona.Factory.newInstance();
-//			persona.setApellido1(solicitud.getDatosPersona().getApellido1());
-//			persona.setApellido2(solicitud.getDatosPersona().getApellido2());
-//			persona.setColegio(solicitud.getDatosPersona().getColegio());
-//			persona.setEjerciente(solicitud.getDatosPersona().getEjerciente());
-//			persona.setEstadoCivil(Integer.parseInt(solicitud.getDatosPersona().getEstadoCivil()));
-//			Calendar cal = Calendar.getInstance();
-//			cal.setTime(solicitud.getDatosPersona().getFechaNacimiento());
-//			persona.setFNacimiento(cal);
-//			cal.setTime(solicitud.getDatosPersona().getFechaNacConyuge());
-//			persona.setFNacimientoConyuge(cal);
-//			persona.setNIF(solicitud.getDatosPersona().getNIF());
-//			persona.setNacionalidad(solicitud.getDatosPersona().getNacionalidad());
-//			persona.setNombre(solicitud.getDatosPersona().getNombre());
-//			persona.setNumColegiado(solicitud.getDatosPersona().getNumColegiado());
-//			persona.setProfesion(solicitud.getDatosPersona().getProfesion());
-//			//Ver como pasarle el sexo
-//			//persona.setSexo(solicitud.getDatosPersona().getSexo());
-//			//colegiadosBloque.setDatosPersona(persona);
-//			ArrayOfIntegracionDomicilio domicilios = ArrayOfIntegracionDomicilio.Factory.newInstance();
-//			IntegracionDomicilio domicilio = IntegracionDomicilio.Factory.newInstance();
-//			domicilio.setBloque(solicitud.getDatosDireccion().getBloque());
-//			domicilio.setCP(solicitud.getDatosDireccion().getCp());
-//			domicilio.setDireccion(solicitud.getDatosDireccion().getDireccion());
-//			domicilio.setEmail(solicitud.getDatosDireccion().getEmail());
-//			domicilio.setEsc(solicitud.getDatosDireccion().getEsc());
-//			domicilio.setLetra(solicitud.getDatosDireccion().getLetra());
-//			domicilio.setMovil(solicitud.getDatosDireccion().getMovil());
-//			domicilio.setNum(solicitud.getDatosDireccion().getNum());
-//			domicilio.setPiso(solicitud.getDatosDireccion().getPiso());
-//			domicilio.setPoblacion(solicitud.getDatosDireccion().getPoblacion());
-//			domicilio.setProvincia(solicitud.getDatosDireccion().getProvincia());
-//			domicilio.setTfno(solicitud.getDatosDireccion().getTelefono());
-//			domicilio.setTipoDireccion(solicitud.getDatosDireccion().getTipoDireccion());
-//			domicilio.setTipoDomicilio(solicitud.getDatosDireccion().getTipoDomicilio());
-//			domicilio.setTipoVia(solicitud.getDatosDireccion().getTipoVia());
-//			
-//			domicilios.setIntegracionDomicilioArray(0,domicilio);
-//			
-//			IntegracionSolicitud solicitudIntegracion = IntegracionSolicitud.Factory.newInstance();
-//			Calendar date = new GregorianCalendar();
-//			solicitudIntegracion.setFecha(date);
-//			solicitudIntegracion.setValorEntrada("53054856C");
-//			solicitudIntegracion.setIdTipoIdentificador(1);
-//			solicitudIntegracion.setIdTipoSolicitud(1);
-
-			
 			IntegracionPersona persona = IntegracionPersona.Factory.newInstance();
-			persona.setApellido1("SAIZ");
-			persona.setApellido2("USANO");
-			persona.setColegio("Ilustre Colegio De Abogados De Alcoy");
-			persona.setEjerciente(1);
+			persona.setApellido1(solicitud.getDatosPersona().getApellido1());
+			persona.setApellido2(solicitud.getDatosPersona().getApellido2());
+			persona.setColegio(solicitud.getDatosPersona().getColegio());
+			persona.setEjerciente(solicitud.getDatosPersona().getEjerciente());
+			persona.setEstadoCivil(Integer.parseInt(solicitud.getDatosPersona().getEstadoCivil()));
 			Calendar cal = Calendar.getInstance();
-			cal.setTime(new Date());
+			cal.setTime(solicitud.getDatosPersona().getFechaNacimiento());
 			persona.setFNacimiento(cal);
-			cal.setTime(new Date());
+			cal.setTime(solicitud.getDatosPersona().getFechaNacConyuge());
 			persona.setFNacimientoConyuge(cal);
-			persona.setNIF("53054856C");
-			persona.setNombre("JUAN ANTONIO");
-			persona.setNumColegiado("5562");
-			persona.setProfesion("ABOGADO");
+			persona.setNIF(solicitud.getDatosPersona().getNIF());
+			persona.setNacionalidad(solicitud.getDatosPersona().getNacionalidad());
+			persona.setNombre(solicitud.getDatosPersona().getNombre());
+			persona.setNumColegiado(solicitud.getDatosPersona().getNumColegiado());
+			persona.setProfesion(solicitud.getDatosPersona().getProfesion());
 			//Ver como pasarle el sexo
-			persona.setSexo(1);
-
+			persona.setSexo(Integer.parseInt(solicitud.getDatosPersona().getSexo()));
+			//colegiadosBloque.setDatosPersona(persona);
 			ArrayOfIntegracionDomicilio domicilios = ArrayOfIntegracionDomicilio.Factory.newInstance();
 			IntegracionDomicilio domicilio = IntegracionDomicilio.Factory.newInstance();
-
-			domicilio.setCP("46015");
-			domicilio.setDireccion("asdf");
-			domicilio.setEmail("asdf@asdf.es");
-			domicilio.setMovil("635351542");
-			domicilio.setNum("1");
-
-			domicilio.setPoblacion("Valencia");
-			domicilio.setProvincia("Valencia/València");
-			domicilio.setTfno("123123123");
-			domicilio.setTipoDireccion(1);
-			domicilio.setTipoDomicilio(1);
+			domicilio.setBloque(solicitud.getDatosDireccion().getBloque());
+			domicilio.setCP(solicitud.getDatosDireccion().getCp());
+			domicilio.setDireccion(solicitud.getDatosDireccion().getDireccion());
+			domicilio.setEmail(solicitud.getDatosDireccion().getEmail());
+			domicilio.setEsc(solicitud.getDatosDireccion().getEsc());
+			domicilio.setLetra(solicitud.getDatosDireccion().getLetra());
+			domicilio.setMovil(solicitud.getDatosDireccion().getMovil());
+			domicilio.setNum(solicitud.getDatosDireccion().getNum());
+			domicilio.setPiso(solicitud.getDatosDireccion().getPiso());
+			domicilio.setPoblacion(solicitud.getDatosDireccion().getPoblacion());
+			domicilio.setProvincia(solicitud.getDatosDireccion().getProvincia());
+			domicilio.setTfno(solicitud.getDatosDireccion().getTelefono());
+			domicilio.setTipoDireccion(solicitud.getDatosDireccion().getTipoDireccion());
+			domicilio.setTipoDomicilio(solicitud.getDatosDireccion().getTipoDomicilio());
+			domicilio.setTipoVia(solicitud.getDatosDireccion().getTipoVia());
 			
-			IntegracionDomicilio[] domi = (IntegracionDomicilio[]) Array.newInstance(IntegracionDomicilio.class, 1);
-			domi[0] = IntegracionDomicilio.Factory.newInstance();
-			domi[0] = domicilio;
-			domicilios.setIntegracionDomicilioArray(domi);
+			domicilios.setIntegracionDomicilioArray(0,domicilio);
 			
 			IntegracionSolicitud solicitudIntegracion = IntegracionSolicitud.Factory.newInstance();
 			Calendar date = new GregorianCalendar();
@@ -438,11 +393,57 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			solicitudIntegracion.setValorEntrada("53054856C");
 			solicitudIntegracion.setIdTipoIdentificador(1);
 			solicitudIntegracion.setIdTipoSolicitud(1);
+
+			
+//			IntegracionPersona persona = IntegracionPersona.Factory.newInstance();
+//			persona.setApellido1("SAIZ");
+//			persona.setApellido2("USANO");
+//			persona.setColegio("Ilustre Colegio De Abogados De Alcoy");
+//			persona.setEjerciente(1);
+//			Calendar cal = Calendar.getInstance();
+//			cal.setTime(new Date());
+//			persona.setFNacimiento(cal);
+//			cal.setTime(new Date());
+//			persona.setFNacimientoConyuge(cal);
+//			persona.setNIF("53054856C");
+//			persona.setNombre("JUAN ANTONIO");
+//			persona.setNumColegiado("5562");
+//			persona.setProfesion("ABOGADO");
+//			//Ver como pasarle el sexo
+//			persona.setSexo(1);
+//
+//			ArrayOfIntegracionDomicilio domicilios = ArrayOfIntegracionDomicilio.Factory.newInstance();
+//			IntegracionDomicilio domicilio = IntegracionDomicilio.Factory.newInstance();
+//
+//			domicilio.setCP("46015");
+//			domicilio.setDireccion("asdf");
+//			domicilio.setEmail("asdf@asdf.es");
+//			domicilio.setMovil("635351542");
+//			domicilio.setNum("1");
+//
+//			domicilio.setPoblacion("Valencia");
+//			domicilio.setProvincia("Valencia/València");
+//			domicilio.setTfno("123123123");
+//			domicilio.setTipoDireccion(1);
+//			domicilio.setTipoDomicilio(1);
+//			
+//			IntegracionDomicilio[] domi = (IntegracionDomicilio[]) Array.newInstance(IntegracionDomicilio.class, 1);
+//			domi[0] = IntegracionDomicilio.Factory.newInstance();
+//			domi[0] = domicilio;
+//			domicilios.setIntegracionDomicilioArray(domi);
+//			
+//			IntegracionSolicitud solicitudIntegracion = IntegracionSolicitud.Factory.newInstance();
+//			Calendar date = new GregorianCalendar();
+//			solicitudIntegracion.setFecha(date);
+//			solicitudIntegracion.setValorEntrada("53054856C");
+//			solicitudIntegracion.setIdTipoIdentificador(1);
+//			solicitudIntegracion.setIdTipoSolicitud(1);
 			
 			requestBody.setDatosDomicilio(domicilios);
 			requestBody.setDatosSolicitud(solicitudIntegracion);
 			requestBody.setDatosPersona(persona);
 			request.setMGASolicitudPolizaAccuGratuitos(requestBody);
+			
 			try {
 				IntegracionSolicitudRespuesta responseWS = _clientMutualidad.MGASolicitudPolizaAccuGratuitos(request, uriService);
 				response.setIdSolicitud(responseWS.getIdSolicitud());
@@ -461,10 +462,10 @@ public class MutualidadServiceImpl implements IMutualidadService{
 	}
 
 	@Override
-	public MutualidadResponseDTO MGASolicitudPolizaProfesional(DatosSolicitudGratuitaDTO datosSolicitud) {
+	public MutualidadResponseDTO MGASolicitudPolizaProfesional(DatosSolicitudGratuitaDTO solicitud) {
 		LOGGER.info("MGASolicitudPolizaProfesional() --> Entrada al servicio para solicitar la poliza profesional");
 		
-MutualidadResponseDTO response = new MutualidadResponseDTO();
+		MutualidadResponseDTO response = new MutualidadResponseDTO();
 		
 		GenParametrosExample example = new GenParametrosExample();
 		example.createCriteria().andIdrecursoEqualTo("administracion.parametro.url_ws_mutualidad");
@@ -478,84 +479,46 @@ MutualidadResponseDTO response = new MutualidadResponseDTO();
 			MGASolicitudPolizaProfesionalDocument request = MGASolicitudPolizaProfesionalDocument.Factory.newInstance();
 			samples.servicemodel.microsoft.MGASolicitudPolizaProfesionalDocument.MGASolicitudPolizaProfesional requestBody = samples.servicemodel.microsoft.MGASolicitudPolizaProfesionalDocument.MGASolicitudPolizaProfesional.Factory.newInstance();
 			
-//			IntegracionPersona persona = IntegracionPersona.Factory.newInstance();
-//			persona.setApellido1(solicitud.getDatosPersona().getApellido1());
-//			persona.setApellido2(solicitud.getDatosPersona().getApellido2());
-//			persona.setColegio(solicitud.getDatosPersona().getColegio());
-//			persona.setEjerciente(solicitud.getDatosPersona().getEjerciente());
-//			persona.setEstadoCivil(Integer.parseInt(solicitud.getDatosPersona().getEstadoCivil()));
-//			Calendar cal = Calendar.getInstance();
-//			cal.setTime(solicitud.getDatosPersona().getFechaNacimiento());
-//			persona.setFNacimiento(cal);
-//			cal.setTime(solicitud.getDatosPersona().getFechaNacConyuge());
-//			persona.setFNacimientoConyuge(cal);
-//			persona.setNIF(solicitud.getDatosPersona().getNIF());
-//			persona.setNacionalidad(solicitud.getDatosPersona().getNacionalidad());
-//			persona.setNombre(solicitud.getDatosPersona().getNombre());
-//			persona.setNumColegiado(solicitud.getDatosPersona().getNumColegiado());
-//			persona.setProfesion(solicitud.getDatosPersona().getProfesion());
-//			//Ver como pasarle el sexo
-//			//persona.setSexo(solicitud.getDatosPersona().getSexo());
-//			//colegiadosBloque.setDatosPersona(persona);
-//			ArrayOfIntegracionDomicilio domicilios = ArrayOfIntegracionDomicilio.Factory.newInstance();
-//			IntegracionDomicilio domicilio = IntegracionDomicilio.Factory.newInstance();
+			IntegracionPersona persona = IntegracionPersona.Factory.newInstance();
+			persona.setApellido1(solicitud.getDatosPersona().getApellido1());
+			if(solicitud.getDatosPersona().getApellido2() != null) {
+				persona.setApellido2(solicitud.getDatosPersona().getApellido2());
+			}
+			persona.setColegio(solicitud.getDatosPersona().getColegio());
+			persona.setEjerciente(solicitud.getDatosPersona().getEjerciente());
+			persona.setEstadoCivil(Integer.parseInt(solicitud.getDatosPersona().getEstadoCivil()));
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(solicitud.getDatosPersona().getFechaNacimiento());
+			persona.setFNacimiento(cal);
+			if(null != solicitud.getDatosPersona().getFechaNacConyuge()) {
+				cal.setTime(solicitud.getDatosPersona().getFechaNacConyuge());
+				persona.setFNacimientoConyuge(cal);
+			}
+			persona.setNIF(solicitud.getDatosPersona().getNIF());
+			persona.setNacionalidad(solicitud.getDatosPersona().getNacionalidad());
+			persona.setNombre(solicitud.getDatosPersona().getNombre());
+			persona.setNumColegiado(solicitud.getDatosPersona().getNumColegiado());
+			persona.setProfesion(solicitud.getDatosPersona().getProfesion());
+			//Ver como pasarle el sexo
+			persona.setSexo(Integer.parseInt(solicitud.getDatosPersona().getSexo()));
+			//colegiadosBloque.setDatosPersona(persona);
+			ArrayOfIntegracionDomicilio domicilios = ArrayOfIntegracionDomicilio.Factory.newInstance();
+			IntegracionDomicilio domicilio = IntegracionDomicilio.Factory.newInstance();
 //			domicilio.setBloque(solicitud.getDatosDireccion().getBloque());
-//			domicilio.setCP(solicitud.getDatosDireccion().getCp());
-//			domicilio.setDireccion(solicitud.getDatosDireccion().getDireccion());
-//			domicilio.setEmail(solicitud.getDatosDireccion().getEmail());
+			domicilio.setCP(solicitud.getDatosDireccion().getCp());
+			domicilio.setDireccion(solicitud.getDatosDireccion().getDireccion());
+			domicilio.setEmail(solicitud.getDatosDireccion().getEmail());
 //			domicilio.setEsc(solicitud.getDatosDireccion().getEsc());
 //			domicilio.setLetra(solicitud.getDatosDireccion().getLetra());
-//			domicilio.setMovil(solicitud.getDatosDireccion().getMovil());
-//			domicilio.setNum(solicitud.getDatosDireccion().getNum());
+			domicilio.setMovil(solicitud.getDatosDireccion().getMovil());
+			domicilio.setNum(solicitud.getDatosDireccion().getNum());
 //			domicilio.setPiso(solicitud.getDatosDireccion().getPiso());
-//			domicilio.setPoblacion(solicitud.getDatosDireccion().getPoblacion());
-//			domicilio.setProvincia(solicitud.getDatosDireccion().getProvincia());
-//			domicilio.setTfno(solicitud.getDatosDireccion().getTelefono());
+			domicilio.setPoblacion(solicitud.getDatosDireccion().getPoblacion());
+			domicilio.setProvincia(solicitud.getDatosDireccion().getProvincia());
+			domicilio.setTfno(solicitud.getDatosDireccion().getTelefono());
 //			domicilio.setTipoDireccion(solicitud.getDatosDireccion().getTipoDireccion());
 //			domicilio.setTipoDomicilio(solicitud.getDatosDireccion().getTipoDomicilio());
 //			domicilio.setTipoVia(solicitud.getDatosDireccion().getTipoVia());
-//			
-//			domicilios.setIntegracionDomicilioArray(0,domicilio);
-//			
-//			IntegracionSolicitud solicitudIntegracion = IntegracionSolicitud.Factory.newInstance();
-//			Calendar date = new GregorianCalendar();
-//			solicitudIntegracion.setFecha(date);
-//			solicitudIntegracion.setValorEntrada("53054856C");
-//			solicitudIntegracion.setIdTipoIdentificador(1);
-//			solicitudIntegracion.setIdTipoSolicitud(1);
-
-			
-			IntegracionPersona persona = IntegracionPersona.Factory.newInstance();
-			persona.setApellido1("SAIZ");
-			persona.setApellido2("USANO");
-			persona.setColegio("Ilustre Colegio De Abogados De Alcoy");
-			persona.setEjerciente(1);
-			Calendar cal = Calendar.getInstance();
-			cal.setTime(new Date());
-			persona.setFNacimiento(cal);
-			cal.setTime(new Date());
-			persona.setFNacimientoConyuge(cal);
-			persona.setNIF("53054856C");
-			persona.setNombre("JUAN ANTONIO");
-			persona.setNumColegiado("5562");
-			persona.setProfesion("ABOGADO");
-			//Ver como pasarle el sexo
-			persona.setSexo(1);
-
-			ArrayOfIntegracionDomicilio domicilios = ArrayOfIntegracionDomicilio.Factory.newInstance();
-			IntegracionDomicilio domicilio = IntegracionDomicilio.Factory.newInstance();
-
-			domicilio.setCP("46015");
-			domicilio.setDireccion("asdf");
-			domicilio.setEmail("asdf@asdf.es");
-			domicilio.setMovil("635351542");
-			domicilio.setNum("1");
-
-			domicilio.setPoblacion("Valencia");
-			domicilio.setProvincia("Valencia/València");
-			domicilio.setTfno("123123123");
-			domicilio.setTipoDireccion(1);
-			domicilio.setTipoDomicilio(1);
 			
 			IntegracionDomicilio[] domi = (IntegracionDomicilio[]) Array.newInstance(IntegracionDomicilio.class, 1);
 			domi[0] = IntegracionDomicilio.Factory.newInstance();
@@ -565,9 +528,54 @@ MutualidadResponseDTO response = new MutualidadResponseDTO();
 			IntegracionSolicitud solicitudIntegracion = IntegracionSolicitud.Factory.newInstance();
 			Calendar date = new GregorianCalendar();
 			solicitudIntegracion.setFecha(date);
-			solicitudIntegracion.setValorEntrada("53054856C");
+			solicitudIntegracion.setValorEntrada(persona.getNIF());
 			solicitudIntegracion.setIdTipoIdentificador(1);
 			solicitudIntegracion.setIdTipoSolicitud(1);
+
+			
+//			IntegracionPersona persona = IntegracionPersona.Factory.newInstance();
+//			persona.setApellido1("SAIZ");
+//			persona.setApellido2("USANO");
+//			persona.setColegio("Ilustre Colegio De Abogados De Alcoy");
+//			persona.setEjerciente(1);
+//			Calendar cal = Calendar.getInstance();
+//			cal.setTime(new Date());
+//			persona.setFNacimiento(cal);
+//			cal.setTime(new Date());
+//			persona.setFNacimientoConyuge(cal);
+//			persona.setNIF("53054856C");
+//			persona.setNombre("JUAN ANTONIO");
+//			persona.setNumColegiado("5562");
+//			persona.setProfesion("ABOGADO");
+//			//Ver como pasarle el sexo
+//			persona.setSexo(1);
+//
+//			ArrayOfIntegracionDomicilio domicilios = ArrayOfIntegracionDomicilio.Factory.newInstance();
+//			IntegracionDomicilio domicilio = IntegracionDomicilio.Factory.newInstance();
+//
+//			domicilio.setCP("46015");
+//			domicilio.setDireccion("asdf");
+//			domicilio.setEmail("asdf@asdf.es");
+//			domicilio.setMovil("635351542");
+//			domicilio.setNum("1");
+//
+//			domicilio.setPoblacion("Valencia");
+//			domicilio.setProvincia("Valencia/València");
+//			domicilio.setTfno("123123123");
+//			domicilio.setTipoDireccion(1);
+//			domicilio.setTipoDomicilio(1);
+//			
+//			IntegracionDomicilio[] domi = (IntegracionDomicilio[]) Array.newInstance(IntegracionDomicilio.class, 1);
+//			domi[0] = IntegracionDomicilio.Factory.newInstance();
+//			domi[0] = domicilio;
+//			domicilios.setIntegracionDomicilioArray(domi);
+//			
+//			IntegracionSolicitud solicitudIntegracion = IntegracionSolicitud.Factory.newInstance();
+//			Calendar date = new GregorianCalendar();
+//			solicitudIntegracion.setFecha(date);
+//			solicitudIntegracion.setValorEntrada("53054856C");
+//			solicitudIntegracion.setIdTipoIdentificador(1);
+//			solicitudIntegracion.setIdTipoSolicitud(1);
 			
 			requestBody.setDatosDomicilio(domicilios);
 			requestBody.setDatosSolicitud(solicitudIntegracion);
