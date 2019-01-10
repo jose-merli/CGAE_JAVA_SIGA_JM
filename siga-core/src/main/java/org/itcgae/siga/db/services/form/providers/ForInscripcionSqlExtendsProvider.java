@@ -118,8 +118,18 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 			sql.WHERE("PERCURSO2.IDPERSONA ='" + inscripcionItem.getIdFormador() + "'");
 		}
 
-		// TODO Falta filtro de "Certificado emitido -> Si, No, Todos"
-
+		if(inscripcionItem.getCertificadoEmitido() != null) {
+			// 0 --> TODOS
+			// 1 --> Si tiene certificadoEmitido
+			// 2 --> No tiene certificadoEmitido
+		
+			if(inscripcionItem.getCertificadoEmitido() == 1) {
+				sql.WHERE("INSC.CERTIFICADOEMITIDO = '1'");
+			}else if(inscripcionItem.getCertificadoEmitido() == 2) {
+				sql.WHERE("INSC.CERTIFICADOEMITIDO = '0' OR INSC.CERTIFICADOEMITIDO IS NULL");
+			}
+		}
+		
 		if (inscripcionItem.getPagada() != null) {
 			// 0 --> TODOS
 			// 1 --> Si esta pagada la inscripcion

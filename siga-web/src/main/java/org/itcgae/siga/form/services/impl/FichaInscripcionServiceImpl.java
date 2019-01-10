@@ -285,9 +285,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		ForInscripcion forInscripcionInsert = new ForInscripcion();
-
+		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -350,8 +348,6 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 						response = 0;
 					}
 					
-					
-					
 				} catch (Exception e) {
 					response = 0;
 				}
@@ -363,7 +359,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 				} else {
 					error.setCode(200);
 
-					insertResponseDTO.setId(Long.toString(forInscripcionInsert.getIdcurso()));
+					insertResponseDTO.setId(inscripcionItem.getIdCurso());
 					insertResponseDTO.setError(error);
 					insertResponseDTO.setStatus(SigaConstants.OK);
 				}
