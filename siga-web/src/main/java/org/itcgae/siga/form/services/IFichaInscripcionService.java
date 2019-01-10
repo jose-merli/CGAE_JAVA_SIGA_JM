@@ -18,4 +18,7 @@ public interface IFichaInscripcionService {
 	public UpdateResponseDTO updateInscripcion(InscripcionItem inscripcionItem, HttpServletRequest request);
 	
 	public InsertResponseDTO guardarPersona(AsociarPersonaDTO asociarPersona, HttpServletRequest request);
+	
+	public InsertResponseDTO generarSolicitudCertificados(InscripcionItem inscripcionItem, HttpServletRequest request);
+	
 }

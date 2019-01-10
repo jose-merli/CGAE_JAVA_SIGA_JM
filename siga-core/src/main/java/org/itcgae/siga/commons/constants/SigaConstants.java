@@ -405,4 +405,10 @@ public class SigaConstants {
 	public static final String ESTADO_INSCRIPCION_RECHAZADA = "2";
 	public static final String ESTADO_INSCRIPCION_APROBADA = "3";
 	public static final String ESTADO_INSCRIPCION_CANCELADA = "4";
+	
+	public static final String NOTA_SUSPENSO = "1";
+	public static final String NOTA_APROBADO = "2";
+	public static final String NOTA_BIEN = "3";
+	public static final String NOTA_NOTABLE= "4";
+	public static final String NOTA_SOBRESALIENTE = "5";
 }
