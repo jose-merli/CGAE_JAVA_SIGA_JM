@@ -15,15 +15,22 @@ import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
+import org.itcgae.siga.db.entities.ForCertificadoscurso;
+import org.itcgae.siga.db.entities.ForCertificadoscursoExample;
 import org.itcgae.siga.db.entities.ForInscripcion;
 import org.itcgae.siga.db.entities.ForInscripcionExample;
+import org.itcgae.siga.db.entities.PysProductossolicitados;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.ForCertificadoscursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForInscripcionExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.PysProductossolicitadosExtendsMapper;
 import org.itcgae.siga.form.services.IFichaInscripcionService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +50,12 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 	
 	@Autowired
 	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+	
+	@Autowired
+	private PysProductossolicitadosExtendsMapper pysProductosSolicitadosExtendsMapper;
+	
+	@Autowired
+	private ForCertificadoscursoExtendsMapper forCertificadosCursoExtendsMapper;
 	
 	@Override
 	public CursoItem searchCourse(String idCurso, HttpServletRequest request) {
@@ -88,10 +101,10 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"saveCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"saveInscripcion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
-					"saveCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"saveInscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -106,10 +119,10 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 					forInscripcionInsert.setIdestadoinscripcion(Long.parseLong(inscripcionItem.getIdEstadoInscripcion()));	
 					
 					LOGGER.info(
-							"insertSelective() / forInscripcionExtendsMapper.insert(forInscripcionInsert) -> Entrada a forInscripcionExtendsMapper para insertar una inscripcion");
+							"saveInscripcion() / forInscripcionExtendsMapper.insertSelective(forInscripcionInsert) -> Entrada a forInscripcionExtendsMapper para insertar una inscripcion");
 					response = forInscripcionExtendsMapper.insertSelective(forInscripcionInsert);
 					LOGGER.info(
-							"insertSelective() / forInscripcionExtendsMapper.insert(forInscripcionInsert) -> Salida a forInscripcionExtendsMapper para insertar una inscripcion");
+							"saveInscripcion() / forInscripcionExtendsMapper.insertSelective(forInscripcionInsert) -> Salida a forInscripcionExtendsMapper para insertar una inscripcion");
 
 					comboItems = forInscripcionExtendsMapper.selectMaxIdInscripcion();
 					
@@ -172,7 +185,12 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 					ForInscripcion record = new ForInscripcion();
 					record.setFechamodificacion(new Date());
 					record.setUsumodificacion(usuario.getIdusuario().longValue());
-					record.setIdpersona(inscripcionItem.getIdPersona());
+					
+					if(inscripcionItem.getIdPersona() != null)
+						record.setIdpersona(inscripcionItem.getIdPersona());
+					
+					if(inscripcionItem.getEmitirCertificado() != null)
+						record.setEmitircertificado(inscripcionItem.getEmitirCertificado().shortValue());
 					
 					ForInscripcionExample example = new ForInscripcionExample();
 					example.createCriteria().andIdinscripcionEqualTo(inscripcionItem.getIdInscripcion());
@@ -252,4 +270,109 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 		}
 		return insertResponse;
 	}
+	
+	@Override
+	@Transactional
+	public InsertResponseDTO generarSolicitudCertificados(InscripcionItem inscripcionItem, HttpServletRequest request) {
+
+		LOGGER.info("generarSolicitudCertificados() -> Entrada al servicio para generar una solicitud de certificado");
+		
+		int response = 0;
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		List<ForCertificadoscurso> listCertificadosCurso;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		ForInscripcion forInscripcionInsert = new ForInscripcion();
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"generarSolicitudCertificados() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"generarSolicitudCertificados() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+					// Obtenemos los distintos certificados con los que generaremos las distintas solicitudes
+					ForCertificadoscursoExample certificadosCursoExample = new ForCertificadoscursoExample();
+					certificadosCursoExample.createCriteria().andIdcalificacionEqualTo(Long.parseLong(UtilidadesString.traduceNota(inscripcionItem.getCalificacion())));
+					
+					listCertificadosCurso = forCertificadosCursoExtendsMapper.selectByExample(certificadosCursoExample);
+					
+					for (ForCertificadoscurso forCertificadosCurso : listCertificadosCurso) {
+						PysProductossolicitados pysRecord = new PysProductossolicitados();
+						
+						NewIdDTO idPeticion = pysProductosSolicitadosExtendsMapper.selectMaxIdPeticion(idInstitucion, forCertificadosCurso.getIdtipoproducto().shortValue(), forCertificadosCurso.getIdproducto(), forCertificadosCurso.getIdproductoinstitucion());
+						
+						pysRecord.setIdinstitucion(idInstitucion);
+						pysRecord.setIdpeticion(Long.parseLong(idPeticion.getNewId()));
+						pysRecord.setIdtipoproducto(forCertificadosCurso.getIdtipoproducto()!=null ? forCertificadosCurso.getIdtipoproducto().shortValue() : null);
+						pysRecord.setIdproducto(forCertificadosCurso.getIdproducto());
+						pysRecord.setIdproductoinstitucion(forCertificadosCurso.getIdproductoinstitucion());
+						pysRecord.setIdpersona(inscripcionItem.getIdPersona());
+						pysRecord.setIdformapago(Short.valueOf("10"));
+						pysRecord.setCantidad(1);
+						pysRecord.setAceptado("A");
+						pysRecord.setValor(forCertificadosCurso.getPrecio());
+						pysRecord.setFechamodificacion(new Date());
+						pysRecord.setUsumodificacion(usuario.getIdusuario());
+						pysRecord.setIddireccion(1L);
+						pysRecord.setIdinstitucionorigen(idInstitucion);
+						pysRecord.setNofacturable("1");
+						pysRecord.setFecharecepcionsolicitud(new Date());
+						
+						LOGGER.info(
+								"insertSelective() / pysProductosSolicitadosExtendsMapper.insertSelective(pysRecord) -> Entrada a forInscripcionExtendsMapper para insertar una inscripcion");
+						response += pysProductosSolicitadosExtendsMapper.insertSelective(pysRecord);
+						
+						LOGGER.info(
+								"insertSelective() / pysProductosSolicitadosExtendsMapper.insertSelective(pysRecord) -> Salida a forInscripcionExtendsMapper para insertar una inscripcion");
+						
+					}
+					
+					if(response == listCertificadosCurso.size()) {
+						ForInscripcion recordInscripcion = new ForInscripcion();
+						recordInscripcion.setIdinscripcion(inscripcionItem.getIdInscripcion());
+						recordInscripcion.setCertificadoemitido(Short.valueOf("1"));
+						recordInscripcion.setFechamodificacion(new Date());
+						recordInscripcion.setUsumodificacion(usuario.getIdusuario().longValue());
+						
+						forInscripcionExtendsMapper.updateByPrimaryKeySelective(recordInscripcion);
+					}else {
+						response = 0;
+					}
+					
+					
+					
+				} catch (Exception e) {
+					response = 0;
+				}
+				
+				if (response == 0) {
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					insertResponseDTO.setStatus(SigaConstants.KO);
+				} else {
+					error.setCode(200);
+
+					insertResponseDTO.setId(Long.toString(forInscripcionInsert.getIdcurso()));
+					insertResponseDTO.setError(error);
+					insertResponseDTO.setStatus(SigaConstants.OK);
+				}
+			}
+		}
+		
+		LOGGER.info("generarSolicitudCertificados() -> Salida del servicio para insertar una inscripcion");
+		
+		return insertResponseDTO;
+	}
+	
 }

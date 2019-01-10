@@ -228,6 +228,30 @@ public class UtilidadesString {
 	
 	  
 
+	public static String traduceNota(Double nota) {
+		String notaString = "";
 
+		// Controlamos que la nota no sea null y que sea una nota correcta entre 0 y 10
+		if (nota == null || (nota < 0 || nota > 10)) {
+			return null;
+		} else {
+			if (nota >= 0 && nota < 5)
+				notaString = SigaConstants.NOTA_SUSPENSO;
+
+			if (nota == 5)
+				notaString = SigaConstants.NOTA_APROBADO;
+
+			if (nota == 6)
+				notaString = SigaConstants.NOTA_BIEN;
+
+			if (nota >= 7 && nota < 9)
+				notaString = SigaConstants.NOTA_NOTABLE;
+
+			if (nota >= 9 && nota <= 10)
+				notaString = SigaConstants.NOTA_SOBRESALIENTE;
+		}
+
+		return notaString;
+	}
 
 }

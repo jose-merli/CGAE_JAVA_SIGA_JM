@@ -431,7 +431,6 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final short PERIOCIDAD_1MES = 1;
 	public static final short MODULO_CONTADOR = 11;
 
-	
 	public static final String CODIGO_CURSO = "CÓDIGO CURSO";
 	public static final String FORMA_PAGO = "FORMA PAGO";
 	public static final String NIF = "NIF";
@@ -487,6 +486,10 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String nombreFicheroEjemplo = "PlantillaMasivaDatosGF";
 	public static final String nombreFicheroError = "LogErrorCargaMasivaGF";
 	
-	
+	public static final String NOTA_SUSPENSO = "1";
+	public static final String NOTA_APROBADO = "2";
+	public static final String NOTA_BIEN = "3";
+	public static final String NOTA_NOTABLE= "4";
+	public static final String NOTA_SOBRESALIENTE = "5";
 
 }

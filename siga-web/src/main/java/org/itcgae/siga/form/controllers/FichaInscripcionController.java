@@ -47,4 +47,10 @@ public class FichaInscripcionController {
 		InsertResponseDTO response = fichaInscripcionService.guardarPersona(asociarPersona, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "fichaInscripcion/generarSolicitudCertificados",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> generarSolicitudCertificados(@RequestBody InscripcionItem inscripcionItem, HttpServletRequest request) { 
+		InsertResponseDTO response = fichaInscripcionService.generarSolicitudCertificados(inscripcionItem, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
 }

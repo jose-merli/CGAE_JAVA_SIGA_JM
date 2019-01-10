@@ -1,5 +1,6 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -26,6 +27,7 @@ import com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument;
 import com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest;
 import com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument;
 import com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse;
+import com.colegiados.info.redabogacia.ColegiacionType;
 import com.colegiados.info.redabogacia.ColegiadoRequestDocument;
 import com.colegiados.info.redabogacia.ColegiadoRequestDocument.ColegiadoRequest;
 import com.colegiados.info.redabogacia.ColegiadoResponseDocument;
@@ -88,98 +90,105 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 				
 					
 					if (null != colegiado) {
-						Boolean encontrado = Boolean.TRUE;
-						if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNombre())) {
-							if (!busquedaPerFisicaSearchDTO.getNombre().equals(colegiado.getDatosPersonales().getNombre())) {
-								encontrado = Boolean.FALSE;
-							}
-						}
-						if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getPrimerApellido())) {
-							if (!busquedaPerFisicaSearchDTO.getPrimerApellido().equals(colegiado.getDatosPersonales().getApellido1())) {
-								encontrado = Boolean.FALSE;
-							}
-						}
-						if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getSegundoApellido())) {
-							if (!busquedaPerFisicaSearchDTO.getSegundoApellido().equals(colegiado.getDatosPersonales().getApellido2())) {
-								encontrado = Boolean.FALSE;
-							}
-						}
-						if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNumeroColegiado())) {
-							if (null != colegiado.getColegiacionArray() && colegiado.getColegiacionArray().length>0) {
-								encontrado = Boolean.FALSE;
-								for (int i = 0; i < colegiado.getColegiacionArray().length; i++) {
-									if (busquedaPerFisicaSearchDTO.getNumeroColegiado().equals(colegiado.getColegiacionArray()[i].getNumColegiado())) {
-										encontrado = Boolean.TRUE;
+						if (null != colegiado.getColegiacionArray() && colegiado.getColegiacionArray().length>0) {
+							for (ColegiacionType colegiadoColegiacion : colegiado.getColegiacionArray()) {
+								Boolean encontrado = Boolean.TRUE;
+								if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNombre())) {
+									if (!busquedaPerFisicaSearchDTO.getNombre().equals(colegiado.getDatosPersonales().getNombre())) {
+										encontrado = Boolean.FALSE;
 									}
 								}
-
-							}
-
-						}
-						if (null !=busquedaPerFisicaSearchDTO.getIdInstitucion() && busquedaPerFisicaSearchDTO.getIdInstitucion().length>0) {
-							if (null != colegiado.getColegiacionArray() && colegiado.getColegiacionArray().length>0) {
-								encontrado = Boolean.FALSE;
-								for (int i = 0; i < colegiado.getColegiacionArray().length; i++) {
-									for (int j = 0; j <  busquedaPerFisicaSearchDTO.getIdInstitucion().length; j++) {
-										List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiado.getColegiacionArray()[0].getColegio().getCodigoColegio());
-										if (busquedaPerFisicaSearchDTO.getIdInstitucion()[j].equals(String.valueOf(instituciones.get(0).getIdinstitucion()))) {
-											encontrado = Boolean.TRUE;
+								if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getPrimerApellido())) {
+									if (!busquedaPerFisicaSearchDTO.getPrimerApellido().equals(colegiado.getDatosPersonales().getApellido1())) {
+										encontrado = Boolean.FALSE;
+									}
+								}
+								if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getSegundoApellido())) {
+									if (!busquedaPerFisicaSearchDTO.getSegundoApellido().equals(colegiado.getDatosPersonales().getApellido2())) {
+										encontrado = Boolean.FALSE;
+									}
+								}
+								if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNumeroColegiado())) {
+									if (null != colegiado.getColegiacionArray() && colegiado.getColegiacionArray().length>0) {
+										encontrado = Boolean.FALSE;
+											if (busquedaPerFisicaSearchDTO.getNumeroColegiado().equals(colegiadoColegiacion.getNumColegiado())) {
+												encontrado = Boolean.TRUE;
+											}
+									}
+		
+								}
+								if (null !=busquedaPerFisicaSearchDTO.getIdInstitucion() && busquedaPerFisicaSearchDTO.getIdInstitucion().length>0) {
+										encontrado = Boolean.FALSE;
+											for (int j = 0; j <  busquedaPerFisicaSearchDTO.getIdInstitucion().length; j++) {
+												List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiadoColegiacion.getColegio().getCodigoColegio());
+												if (busquedaPerFisicaSearchDTO.getIdInstitucion()[j].equals(String.valueOf(instituciones.get(0).getIdinstitucion()))) {
+													encontrado = Boolean.TRUE;
+												}
+											}
+									}
+		
+								if (encontrado) {
+									
+									BusquedaPerFisicaItem busquedaPerFisica = new BusquedaPerFisicaItem();
+									if (null != colegiado.getDatosPersonales().getApellido1()) {
+										busquedaPerFisica.setPrimerApellido(colegiado.getDatosPersonales().getApellido1());
+									}else{
+										busquedaPerFisica.setPrimerApellido("");
+									}
+									if (null != colegiado.getDatosPersonales().getApellido2()) {
+										busquedaPerFisica.setSegundoApellido(colegiado.getDatosPersonales().getApellido2());
+									}else{
+										busquedaPerFisica.setSegundoApellido("");
+									}
+					
+									busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido().concat(busquedaPerFisica.getSegundoApellido()));
+									busquedaPerFisica.setNif(colegiado.getDatosPersonales().getIdentificacion().getNIF());
+									busquedaPerFisica.setNombre(colegiado.getDatosPersonales().getNombre());
+									if (null != colegiadoColegiacion.getResidente()) {
+										if (colegiadoColegiacion.getResidente().toString().equals("1")) {
+											busquedaPerFisica.setResidente("SI");
+										}else{
+											busquedaPerFisica.setResidente("NO");
+										}
+										
+									}
+									busquedaPerFisica.setNumeroColegiado(colegiadoColegiacion.getNumColegiado());
+									busquedaPerFisica.setSituacion(colegiadoColegiacion.getSituacion().getSituacionEjerProfesional().toString());
+									
+									SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy");
+									String fechaEstado = format1.format(colegiadoColegiacion.getSituacion().getFechaSituacion().getTime());     
+									busquedaPerFisica.setFechaEstado(fechaEstado);
+									if (null != colegiado.getColegiacionArray()[0].getColegio()) {
+										List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiadoColegiacion.getColegio().getCodigoColegio());
+										if (null != instituciones && instituciones.size()>0) {
+											busquedaPerFisica.setColegio(instituciones.get(0).getNombre());
+											busquedaPerFisica.setNumeroInstitucion(instituciones.get(0).getIdinstitucion().toString());
 										}
 									}
-
-								}
-
-							}
-
-						}
-						if (encontrado) {
-							
-							BusquedaPerFisicaItem busquedaPerFisica = new BusquedaPerFisicaItem();
-							if (null != colegiado.getDatosPersonales().getApellido1()) {
-								busquedaPerFisica.setPrimerApellido(colegiado.getDatosPersonales().getApellido1());
-							}else{
-								busquedaPerFisica.setPrimerApellido("");
-							}
-							if (null != colegiado.getDatosPersonales().getApellido2()) {
-								busquedaPerFisica.setSegundoApellido(colegiado.getDatosPersonales().getApellido2());
-							}else{
-								busquedaPerFisica.setSegundoApellido("");
-							}
-			
-							busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido().concat(busquedaPerFisica.getSegundoApellido()));
-							busquedaPerFisica.setNif(colegiado.getDatosPersonales().getIdentificacion().getNIF());
-							busquedaPerFisica.setNombre(colegiado.getDatosPersonales().getNombre());
-							
-							if (null != colegiado.getColegiacionArray() && colegiado.getColegiacionArray().length>0) {
-								if (null != colegiado.getColegiacionArray()[0].getResidente()) {
-									if (colegiado.getColegiacionArray()[0].getResidente().toString().equals("1")) {
-										busquedaPerFisica.setResidente("SI");
-									}else{
-										busquedaPerFisica.setResidente("NO");
+									if (null != colegiado.getLocalizacion()) {
+										busquedaPerFisica.setDomicilio(colegiado.getLocalizacion().getDomicilio());
+										
 									}
-									
-								}
-								busquedaPerFisica.setNumeroColegiado(colegiado.getColegiacionArray()[0].getNumColegiado());
-								busquedaPerFisica.setSituacion(colegiado.getColegiacionArray()[0].getSituacion().getSituacionEjerProfesional().toString());
-								if (null != colegiado.getColegiacionArray()[0].getColegio()) {
-									List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiado.getColegiacionArray()[0].getColegio().getCodigoColegio());
-									if (null != instituciones && instituciones.size()>0) {
-										busquedaPerFisica.setColegio(instituciones.get(0).getNombre());
-										busquedaPerFisica.setNumeroInstitucion(instituciones.get(0).getIdinstitucion().toString());
-									}
+									busquedaPerFisicaItems.add(busquedaPerFisica);
 								}
 							}
 						
-							busquedaPerFisicaItems.add(busquedaPerFisica);
+							
 							busquedaPerFisicaDTO.setBusquedaFisicaItems(busquedaPerFisicaItems);
 						}
 					}
 				}else{
 					com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado[] colegiadoName = null;
 					BusquedaColegiadoRequest colegiadoRequest = BusquedaColegiadoRequest.Factory.newInstance();
-					colegiadoRequest.setNombre(busquedaPerFisicaSearchDTO.getNombre());
-					colegiadoRequest.setApellido1(busquedaPerFisicaSearchDTO.getPrimerApellido());
-					colegiadoRequest.setApellido2(busquedaPerFisicaSearchDTO.getSegundoApellido());
+					if (null != busquedaPerFisicaSearchDTO.getNombre()){
+						colegiadoRequest.setNombre(busquedaPerFisicaSearchDTO.getNombre());
+					}
+					if (null != busquedaPerFisicaSearchDTO.getPrimerApellido()){
+						colegiadoRequest.setApellido1(busquedaPerFisicaSearchDTO.getPrimerApellido());
+					}
+					if (null != busquedaPerFisicaSearchDTO.getSegundoApellido()){
+						colegiadoRequest.setApellido2(busquedaPerFisicaSearchDTO.getSegundoApellido());
+					}
 					
 					com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest.Colegiado colegiadoSearch =com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest.Colegiado.Factory.newInstance();
 					if (null != busquedaPerFisicaSearchDTO.getNumeroColegiado()  && null != busquedaPerFisicaSearchDTO.getIdInstitucion()) {
@@ -217,42 +226,58 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 						}
 						for (int i = 0; i < colegiadoName.length; i++) {
 
-							BusquedaPerFisicaItem busquedaPerFisica = new BusquedaPerFisicaItem();
-							if (null != colegiadoName[i].getDatosPersonales().getApellido1()) {
-								busquedaPerFisica.setPrimerApellido(colegiadoName[i].getDatosPersonales().getApellido1());
-							}else{
-								busquedaPerFisica.setPrimerApellido("");
-							}
-							if (null != colegiadoName[i].getDatosPersonales().getApellido2()) {
-								busquedaPerFisica.setSegundoApellido(colegiadoName[i].getDatosPersonales().getApellido2());
-							}else{
-								busquedaPerFisica.setSegundoApellido("");
-							}
-
-							busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido().concat(busquedaPerFisica.getSegundoApellido()));
-							busquedaPerFisica.setNif(colegiadoName[i].getDatosPersonales().getIdentificacion().getNIF());
-							busquedaPerFisica.setNombre(colegiadoName[i].getDatosPersonales().getNombre());
 							
 							if (null != colegiadoName[i].getColegiacionArray() && colegiadoName[i].getColegiacionArray().length>0) {
-								if (null != colegiadoName[i].getColegiacionArray()[0].getResidente()) {
-									if (colegiadoName[i].getColegiacionArray()[0].getResidente().toString().equals("1")) {
-										busquedaPerFisica.setResidente("SI");
+								for (ColegiacionType colegiadoName2 : colegiadoName[i].getColegiacionArray()) {
+									BusquedaPerFisicaItem busquedaPerFisica = new BusquedaPerFisicaItem();
+									if (null != colegiadoName[i].getDatosPersonales().getApellido1()) {
+										busquedaPerFisica.setPrimerApellido(colegiadoName[i].getDatosPersonales().getApellido1());
 									}else{
-										busquedaPerFisica.setResidente("NO");
+										busquedaPerFisica.setPrimerApellido("");
+									}
+									if (null != colegiadoName[i].getDatosPersonales().getApellido2()) {
+										busquedaPerFisica.setSegundoApellido(colegiadoName[i].getDatosPersonales().getApellido2());
+									}else{
+										busquedaPerFisica.setSegundoApellido("");
+									}
+	
+									busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido().concat(busquedaPerFisica.getSegundoApellido()));
+									busquedaPerFisica.setNif(colegiadoName[i].getDatosPersonales().getIdentificacion().getNIF());
+									busquedaPerFisica.setNombre(colegiadoName[i].getDatosPersonales().getNombre());
+									
+									if (null != colegiadoName2.getResidente()) {
+										if (colegiadoName2.getResidente().toString().equals("1")) {
+											busquedaPerFisica.setResidente("SI");
+										}else{
+											busquedaPerFisica.setResidente("NO");
+										}
+										
+									}
+									busquedaPerFisica.setNumeroColegiado(colegiadoName2.getNumColegiado());
+									if (null != colegiadoName2.getSituacion()) {
+										if (null != colegiadoName2.getSituacion().getSituacionEjerProfesional()) {
+											busquedaPerFisica.setSituacion(colegiadoName[i].getColegiacionArray()[0].getSituacion().getSituacionEjerProfesional().toString());
+											SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy");
+											String fechaEstado = format1.format(colegiadoName2.getSituacion().getFechaSituacion().getTime());     
+											busquedaPerFisica.setFechaEstado(fechaEstado);
+										}
 									}
 									
-								}
-								busquedaPerFisica.setNumeroColegiado(colegiadoName[i].getColegiacionArray()[0].getNumColegiado());
-								busquedaPerFisica.setSituacion(colegiadoName[i].getColegiacionArray()[0].getSituacion().getSituacionEjerProfesional().toString());
-								if (null != colegiadoName[i].getColegiacionArray()[0].getColegio()) {
-									List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiadoName[i].getColegiacionArray()[0].getColegio().getCodigoColegio());
-									if (null != instituciones && instituciones.size()>0) {
-										busquedaPerFisica.setColegio(instituciones.get(0).getNombre());
-										busquedaPerFisica.setNumeroInstitucion(instituciones.get(0).getIdinstitucion().toString());
+									if (null != colegiadoName2.getColegio()) {
+										List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiadoName2.getColegio().getCodigoColegio());
+										if (null != instituciones && instituciones.size()>0) {
+											busquedaPerFisica.setColegio(instituciones.get(0).getNombre());
+											busquedaPerFisica.setNumeroInstitucion(instituciones.get(0).getIdinstitucion().toString());
+										}
 									}
+									if (null != colegiadoName[i].getLocalizacion()) {
+										busquedaPerFisica.setDomicilio(colegiadoName[i].getLocalizacion().getDomicilio());
+										
+									}
+									busquedaPerFisicaItems.add(busquedaPerFisica);
 								}
 							}
-							busquedaPerFisicaItems.add(busquedaPerFisica);
+
 								
 							
 						}
@@ -265,6 +290,12 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 			LOGGER.error("Error en la llamada a busqueda de colegiados.", e);
 		}
 		
+		
+		if (null != busquedaPerFisicaDTO) {
+			for (BusquedaPerFisicaItem busquedaPerFisicaItem : busquedaPerFisicaDTO.getBusquedaFisicaItems()) {
+				
+			}
+		}
 		return busquedaPerFisicaDTO;
 	}
 

@@ -16,6 +16,8 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.SELECT("INSC.IDINSCRIPCION");
 		sql.SELECT("INSC.IDESTADOINSCRIPCION");
 		sql.SELECT("INSC.IDPERSONA");
+		sql.SELECT("INSC.EMITIRCERTIFICADO");
+		sql.SELECT("INSC.CERTIFICADOEMITIDO");
 		sql.SELECT("CURSO.IDESTADOCURSO");
 		sql.SELECT("CURSO.IDCURSO");
 		sql.SELECT("INSC.IDINSTITUCION");
@@ -49,6 +51,10 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		
 		if (inscripcionItem.getColegio() != null && inscripcionItem.getColegio() != "") {
 			sql.WHERE("INSC.IDINSTITUCION = '" + inscripcionItem.getColegio() + "'");
+		}
+		
+		if (inscripcionItem.getIdPersona() != null) {
+			sql.WHERE("INSC.IDPERSONA = '" + inscripcionItem.getIdPersona() + "'");
 		}
 
 		if (inscripcionItem.getCodigoCurso() != null && inscripcionItem.getCodigoCurso() != "") {

@@ -10,7 +10,6 @@ import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.ForInscripcionMapper;
-import org.itcgae.siga.db.services.cen.providers.CenPersonaSqlExtendsProvider;
 import org.itcgae.siga.db.services.form.providers.ForInscripcionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -35,6 +34,8 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper{
 			@Result(column = "FECHASOLICITUD", property = "fechaSolicitud", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ESTADOINSCRIPCION", property = "estadoInscripcion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MINIMAASISTENCIA", property = "minimaAsistencia", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "CERTIFICADOEMITIDO", property = "certificadoEmitido", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "EMITIRCERTIFICADO", property = "emitirCertificado", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "CALIFICACION", property = "calificacion", jdbcType = JdbcType.NUMERIC)
 	})
 	List<InscripcionItem> selectInscripciones(InscripcionItem inscripcionItem);	
