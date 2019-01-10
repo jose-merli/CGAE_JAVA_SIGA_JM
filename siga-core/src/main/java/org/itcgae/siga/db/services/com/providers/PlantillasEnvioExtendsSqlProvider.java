@@ -14,14 +14,14 @@ public class PlantillasEnvioExtendsSqlProvider {
 				+ "ENV.IDTIPOENVIOS AND CAT.IDLENGUAJE = '1') AS TIPOENVIO");
 		sql.FROM("ENV_PLANTILLASENVIOS PLANTILLA");
 		sql.JOIN("ENV_ENVIOS ENV ON ENV.IDPLANTILLAENVIOS = PLANTILLA.IDPLANTILLAENVIOS AND ENV.IDINSTITUCION = PLANTILLA.IDINSTITUCION");
-		sql.WHERE("FECHABAJA is null");
-		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
+		sql.WHERE("PLANTILLA.FECHABAJA is null");
+		sql.WHERE("PLANTILLA.IDINSTITUCION = '"+ idInstitucion +"'");
 		
 		if(!filtros.getTipoEnvio().trim().equals("") && filtros.getTipoEnvio() != null){
-			sql.WHERE("IDTIPOENVIOS = '" + filtros.getTipoEnvio() +"'");
+			sql.WHERE("PLANTILLA.IDTIPOENVIOS = '" + filtros.getTipoEnvio() +"'");
 		}
 		if(filtros.getNombre().trim().equals("") && filtros.getNombre() != null){
-			sql.WHERE(filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
+			sql.WHERE(filtroTextoBusquedas("PLANTILLA.NOMBRE", filtros.getNombre()));
 		}
 		
 		return sql.toString();
