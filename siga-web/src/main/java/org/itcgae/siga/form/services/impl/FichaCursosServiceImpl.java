@@ -742,7 +742,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 		LOGGER.info("saveCourse() -> Entrada al servicio para insertar un curso");
 
-		int response = 0;
+		int response = 2;
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
 
@@ -826,7 +826,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							forTemacursoCurso.setFechabaja(null);
 							forTemacursoCurso.setFechamodificacion(new Date());
 							forTemacursoCurso.setIdinstitucion(idInstitucion);
-							forTemacursoCurso.setIdcurso(cursoItem.getIdCurso());
+							forTemacursoCurso.setIdcurso(forCursoInsert.getIdcurso());
 							forTemacursoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
 							forTemacursoCurso.setIdtemacurso(Long.valueOf(tema.getValue()));
 
@@ -875,7 +875,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							LOGGER.info(
 									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
 
-							response = ageEventoExtendsMapper.updateByPrimaryKey(evento);
+							response = ageEventoExtendsMapper.updateByPrimaryKeySelective(evento);
 
 							LOGGER.info(
 									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
@@ -924,7 +924,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							LOGGER.info(
 									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
 
-							response = ageEventoExtendsMapper.updateByPrimaryKey(evento);
+							response = ageEventoExtendsMapper.updateByPrimaryKeySelective(evento);
 
 							LOGGER.info(
 									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
