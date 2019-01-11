@@ -24,7 +24,7 @@ public class InscripcionItem {
 	private Date fechaInscripcionHasta;
 	private Date fechaImparticionDesde;
 	private Date fechaImparticionHasta;
-	private Long minimaAsistencia;
+	private String minimaAsistencia;
 	private String [] temas;
 	private Double calificacion;
 	private Long pagada;
@@ -257,11 +257,11 @@ public class InscripcionItem {
 		this.estadoInscripcion = estadoInscripcion;
 	}
 	
-	public Long getMinimaAsistencia() {
+	public String getMinimaAsistencia() {
 		return minimaAsistencia;
 	}
 
-	public void setMinimaAsistencia(Long minimaAsistencia) {
+	public void setMinimaAsistencia(String minimaAsistencia) {
 		this.minimaAsistencia = minimaAsistencia;
 	}
 
@@ -784,7 +784,5 @@ public class InscripcionItem {
 				+ ", fechaInscripcionHastaFormat=" + fechaInscripcionHastaFormat + ", fechaImparticionDesdeFormat="
 				+ fechaImparticionDesdeFormat + ", fechaImparticionHastaFormat=" + fechaImparticionHastaFormat
 				+ ", errores=" + errores + "]";
-	}
-
-	
+	}	
 }

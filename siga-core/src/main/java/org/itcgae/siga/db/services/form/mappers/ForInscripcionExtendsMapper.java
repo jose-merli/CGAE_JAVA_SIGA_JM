@@ -9,6 +9,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ForInscripcionMapper;
 import org.itcgae.siga.db.services.form.providers.ForInscripcionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -99,4 +100,10 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper{
 		@Result(column = "IDINSCRIPCION2", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> selectMaxIdInscripcion();
+	
+	@SelectProvider(type = ForInscripcionSqlExtendsProvider.class, method = "checkMinimaAsistencia")
+	@Results({
+		@Result(column = "asistenciaminima", property = "newId", jdbcType = JdbcType.VARCHAR)
+	})
+	NewIdDTO checkMinimaAsistencia(Short idInstitucion, Long idInscripcion);
 }

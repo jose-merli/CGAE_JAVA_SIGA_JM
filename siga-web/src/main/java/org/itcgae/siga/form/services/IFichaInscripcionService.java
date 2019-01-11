@@ -21,4 +21,6 @@ public interface IFichaInscripcionService {
 	
 	public InsertResponseDTO generarSolicitudCertificados(InscripcionItem inscripcionItem, HttpServletRequest request);
 	
+	public String compruebaMinimaAsistencia(InscripcionItem inscripcionItem, HttpServletRequest request);
+	
 }
