@@ -4,7 +4,7 @@ public class TarjetaConfiguracionDto {
 	
 	private String idEnvio;
 	private String idPlantillasEnvio;
-	private String idTipoEnvio;
+	private String idTipoEnvios;
 	private String asunto;
 	private String cuerpo;
 	private String descripcion;
@@ -30,11 +30,12 @@ public class TarjetaConfiguracionDto {
 	public void setIdEnvio(String idEnvio) {
 		this.idEnvio = idEnvio;
 	}
-	public String getIdTipoEnvio() {
-		return idTipoEnvio;
+	
+	public String getIdTipoEnvios() {
+		return idTipoEnvios;
 	}
-	public void setIdTipoEnvio(String idTipoEnvio) {
-		this.idTipoEnvio = idTipoEnvio;
+	public void setIdTipoEnvios(String idTipoEnvios) {
+		this.idTipoEnvios = idTipoEnvios;
 	}
 	public String getAsunto() {
 		return asunto;

@@ -211,12 +211,12 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					if(datosTarjeta.getIdPlantillasEnvio() != null){
 						EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
 						key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillasEnvio()));
-						key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+						key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 						key.setIdinstitucion(idInstitucion);
 						EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
 						plantilla.setAsunto(datosTarjeta.getAsunto());
 						plantilla.setCuerpo(datosTarjeta.getCuerpo());
-						plantilla.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvio()));
+						plantilla.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvios()));
 						plantilla.setNombre(datosTarjeta.getNombre());
 						plantilla.setDescripcion(datosTarjeta.getDescripcion());
 						plantilla.setFechamodificacion(new Date());
@@ -227,7 +227,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						plantilla.setIdinstitucion(idInstitucion);
 						plantilla.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdPlantillasEnvio()));
 						plantilla.setNombre(datosTarjeta.getDescripcion());
-						if(datosTarjeta.getIdTipoEnvio().equals("1") || datosTarjeta.getIdTipoEnvio().equals("2")){
+						if(datosTarjeta.getIdTipoEnvios().equals("1") || datosTarjeta.getIdTipoEnvios().equals("2")){
 							plantilla.setAsunto(datosTarjeta.getAsunto());
 							plantilla.setCuerpo(datosTarjeta.getCuerpo());
 						}
@@ -368,7 +368,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
-					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(idInstitucion, consulta.getIdPlantillasEnvio(), consulta.getIdTipoEnvio());
+					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(idInstitucion, consulta.getIdPlantillasEnvio(), consulta.getIdTipoEnvios());
 					if(consultaItems != null && consultaItems.size()>0){
 						respuesta.setConsultaItem(consultaItems);
 					}
