@@ -2678,6 +2678,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		LOGGER.info("cancelCourse() -> Entrada al servicio para cancelar las inscripciones y sesiones de un curso");
 
 		int response = 2;
+		int numCancelCourse = 0;
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 
@@ -2702,10 +2703,13 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				String estadoFinalizado = String.valueOf(SigaConstants.FINALIZADO_CURSO);
+				String estadoCancelado = String.valueOf(SigaConstants.CANCELADO_CURSO);
+
 
 				try {
 					for (CursoItem cursoItem : cursoDTO.getCursoItem()) {
-						if (cursoItem.getIdEstado() != null && !cursoItem.getIdEstado().equals(estadoFinalizado)) {
+						if (cursoItem.getIdEstado() != null && !cursoItem.getIdEstado().equals(estadoFinalizado)
+								&& !cursoItem.getIdEstado().equals(estadoCancelado)) {
 
 							// Se buscan las inscripciones que pertenecen al curso
 							ForInscripcionExample forInscripcionExample = new ForInscripcionExample();
@@ -2816,8 +2820,10 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							LOGGER.info(
 									"cancelCourse() / forCursoExtendsMapper.updateByPrimaryKey() -> Entrada a forCursoExtendsMapper cancelamos el curso");
 
+							numCancelCourse += 1;
+							
 						} else {
-							error.setDescription("El curso no se puede cancelar porque ya esta finalizado");
+							error.setDescription("El curso no se puede cancelar porque ya esta finalizado o cancelado");
 						}
 					}
 				} catch (Exception e) {
@@ -2827,10 +2833,29 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				}
 			}
 		}
-
+		
 		if (response == 1) {
 			error.setCode(200);
-			error.setDescription("Se ha cancelado el curso correctamente");
+			
+			if (cursoDTO.getCursoItem() != null && cursoDTO.getCursoItem().size() == 1) {
+				error.setDescription("Se ha cancelado el curso correctamente");
+			} else {
+				error.setDescription("Se han cancelado " + numCancelCourse + "/"
+						+ cursoDTO.getCursoItem().size() + " cursos seleccionados");
+			}
+			
+		}else if(response == 2) {
+			
+			if (cursoDTO.getCursoItem().size() == 1) {
+				error.setDescription(
+						"No se puede cancelar el curso seleccionado porque esta finalizado o cancelado");
+			} else if (cursoDTO.getCursoItem().size() == cursoDTO.getCursoItem().size()-numCancelCourse) {
+				error.setDescription(
+						"No se puede cancelar los cursos seleccionados porque estan finalizados o cancelados");
+			} else {
+				error.setDescription("Se han cancelado " + numCancelCourse + "/"
+						+ cursoDTO.getCursoItem().size() + " cursos selecionados");
+			}
 		}
 
 		LOGGER.info("cancelCourse() -> Salida del servicio para cancelar las inscripciones y sesiones de un curso");
@@ -2848,7 +2873,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int numFinishCourse = 0;
-
+		boolean faltaAlumnos = false;
+		boolean cursoNoImpartido = false;
+		
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -2958,16 +2985,19 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 								LOGGER.info(
 										"finishCourse() / forCursoExtendsMapper.updateByPrimaryKey() -> Entrada a forCursoExtendsMapper para finalizar el curso");
 
+								numFinishCourse += 1;
+								
 								// Si queda algún alumno por calificar no se puede finalizar el curso
 							} else {
+								faltaAlumnos = true;
 								error.setDescription(
 										"No se puede finalizar el curso poque todavía quedan alumnos por calificar");
-								numFinishCourse += 1;
+								
 							}
 
 						} else {
+							cursoNoImpartido = true;
 							error.setDescription("El curso no esta en estado impartido y no se puede finalizar");
-							numFinishCourse += 1;
 						}
 					}
 
@@ -2982,16 +3012,31 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 		if (response == 1) {
 			error.setCode(200);
-
-			if (cursoDTO.getCursoItem()!= null && cursoDTO.getCursoItem().size() > 1) {
-				if (numFinishCourse == cursoDTO.getCursoItem().size()) {
-					error.setDescription("No se pueden finalizar los curso poque todavía quedan alumnos por calificar o porque su estado no sea impartido");
-				} else {
-					error.setDescription("Se han finalizado " + numFinishCourse + "/" + cursoDTO.getCursoItem().size()
-							+ " cursos selecionados");
-				}
-			} else {
+			
+			if (cursoDTO.getCursoItem() != null && cursoDTO.getCursoItem().size() == 1) {
 				error.setDescription("Se ha finalizado el curso correctamente");
+			} else {
+				error.setDescription("Se han finalizado " + numFinishCourse + "/"
+						+ cursoDTO.getCursoItem().size() + " cursos seleccionados");
+			}
+			
+		}else if(response == 2) {
+			
+			if (cursoDTO.getCursoItem().size() == 1) {
+				if(faltaAlumnos) {
+					error.setDescription(
+							"No se puede finalizar el curso seleccionado porque faltan alumnos por calificar");
+				}else if(cursoNoImpartido) {
+					error.setDescription(
+							"No se puede finalizar el curso seleccionado porque no esta impartido o esta finalizado");
+				}
+				
+			} else if (cursoDTO.getCursoItem().size() == cursoDTO.getCursoItem().size()-numFinishCourse) {
+				error.setDescription(
+						"No se pueden finalizar los cursos seleccionados porque estan finalizados o no estan impartidos");
+			} else {
+				error.setDescription("Se han finalizado " + numFinishCourse + "/"
+						+ cursoDTO.getCursoItem().size() + " cursos selecionados");
 			}
 		}
 
