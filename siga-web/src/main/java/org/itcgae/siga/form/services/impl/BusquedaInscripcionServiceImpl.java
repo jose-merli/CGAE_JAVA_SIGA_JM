@@ -15,6 +15,7 @@ import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenPersona;
@@ -378,9 +379,13 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 
 		forInscripcionRecord.setFechamodificacion(new Date()); // seteamos la fecha de modificación
 		forInscripcionRecord.setCalificacion(new BigDecimal(inscripcionItem.getCalificacion()));
+
+		String idCalificacion = UtilidadesString.traduceNota(inscripcionItem.getCalificacion());
+		forInscripcionRecord.setIdcalificacion(idCalificacion != null ? Long.parseLong(idCalificacion) : null);
 		
 		ForInscripcionExample example = new ForInscripcionExample();
 		example.createCriteria().andIdinscripcionEqualTo(inscripcionItem.getIdInscripcion());
+		
 
 		LOGGER.info(
 				"updateCalificacion() / forInscripcionExtendsMapper.updateByExampleSelective() -> Entrada a forInscripcionExtendsMapper para invocar a updateByExampleSelective para actualizar inscripciones según los criterios establecidos");

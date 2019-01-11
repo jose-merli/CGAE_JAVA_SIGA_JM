@@ -13,7 +13,7 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		SQL sql = new SQL();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-		sql.SELECT("INSC.IDINSCRIPCION");
+		sql.SELECT_DISTINCT("INSC.IDINSCRIPCION");
 		sql.SELECT("INSC.IDESTADOINSCRIPCION");
 		sql.SELECT("INSC.IDPERSONA");
 		sql.SELECT("INSC.EMITIRCERTIFICADO");
@@ -45,7 +45,8 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.INNER_JOIN("FOR_VISIBILIDADCURSO VISIBILIDAD ON CURSO.IDVISIBILIDADCURSO = VISIBILIDAD.IDVISIBILIDADCURSO");
 		sql.LEFT_OUTER_JOIN(
 				"FOR_PERSONA_CURSO PERCURSO2 ON PERCURSO2.IDCURSO = CURSO.IDCURSO AND PERCURSO2.TUTOR = '1' AND CURSO.IDINSTITUCION = PERCURSO2.IDINSTITUCION");
-
+		sql.ORDER_BY("TO_DATE(FECHASOLICITUD) DESC");
+		
 		if (inscripcionItem.getIdCurso() != null && inscripcionItem.getIdCurso() != "") {
 			sql.WHERE("INSC.IDCURSO = '" + inscripcionItem.getIdCurso() + "'");
 		}
