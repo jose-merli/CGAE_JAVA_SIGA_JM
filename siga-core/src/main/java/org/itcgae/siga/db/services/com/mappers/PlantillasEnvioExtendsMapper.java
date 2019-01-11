@@ -8,8 +8,6 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
-import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.db.services.com.providers.EnvEstadoEnvioExtendsSqlProvider;
 import org.itcgae.siga.db.services.com.providers.PlantillasEnvioExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
