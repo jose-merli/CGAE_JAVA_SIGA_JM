@@ -53,4 +53,10 @@ public class FichaInscripcionController {
 		InsertResponseDTO response = fichaInscripcionService.generarSolicitudCertificados(inscripcionItem, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "fichaInscripcion/checkMinimaAsistencia",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<String> checkMinimaAsitencia(@RequestBody InscripcionItem inscripcionItem, HttpServletRequest request) { 
+		String response = fichaInscripcionService.compruebaMinimaAsistencia(inscripcionItem, request);
+		return new ResponseEntity<String>(response, HttpStatus.OK);
+	}
 }

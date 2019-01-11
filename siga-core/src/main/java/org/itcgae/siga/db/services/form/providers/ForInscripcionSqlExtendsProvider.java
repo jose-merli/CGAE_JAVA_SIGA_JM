@@ -28,7 +28,7 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.SELECT("TO_CHAR(CURSO.FECHAIMPARTICIONDESDE,'DD/MM/YYYY') AS FECHAIMPARTICIONDESDE");
 		sql.SELECT("TO_CHAR(CURSO.FECHAIMPARTICIONHASTA,'DD/MM/YYYY') AS FECHAIMPARTICIONHASTA");
 		sql.SELECT("TO_CHAR(INSC.FECHASOLICITUD,'DD/MM/YYYY') AS FECHASOLICITUD");
-		sql.SELECT("CURSO.MINIMOASISTENCIA AS MINIMAASISTENCIA");
+		sql.SELECT("case when NVL(CURSO.MINIMOASISTENCIA,0) > DECODE(count (idasistenciaevento),0,-1) then 'NO' else 'SI' end MINIMAASISTENCIA");
 		sql.SELECT("CAT2.DESCRIPCION AS ESTADOINSCRIPCION");
 		sql.SELECT("INSC.CALIFICACION");
 		sql.SELECT("INSC.IDPETICIONSUSCRIPCION");
@@ -36,6 +36,8 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.FROM("FOR_INSCRIPCION INSC");
 
 		sql.INNER_JOIN("FOR_CURSO CURSO ON INSC.IDCURSO = CURSO.IDCURSO");
+		sql.LEFT_OUTER_JOIN("for_evento_curso eventocurso on eventocurso.idcurso = CURSO.idcurso");
+		sql.LEFT_OUTER_JOIN("age_asistencia_evento asis on asis.idevento = eventocurso.idevento");
 		sql.INNER_JOIN("FOR_ESTADOCURSO ESTADOCURSO ON CURSO.IDESTADOCURSO = ESTADOCURSO.IDESTADOCURSO");
 		sql.INNER_JOIN(
 				"GEN_RECURSOS_CATALOGOS CAT ON (CAT.IDRECURSO = ESTADOCURSO.DESCRIPCION AND CAT.IDLENGUAJE = '1' )");
@@ -157,6 +159,8 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 			}
 
 		}
+		
+		sql.GROUP_BY("INSC.IDINSCRIPCION, INSC.IDESTADOINSCRIPCION, INSC.IDPERSONA, INSC.EMITIRCERTIFICADO, INSC.CERTIFICADOEMITIDO,CURSO.IDESTADOCURSO, CURSO.IDCURSO, INSC.IDINSTITUCION, CURSO.CODIGOCURSO, CURSO.NOMBRECURSO, CAT.DESCRIPCION, CONCAT(CURSO.PRECIODESDE|| ' - ', CURSO.PRECIOHASTA), TO_CHAR(CURSO.FECHAIMPARTICIONDESDE,'DD/MM/YYYY'), TO_CHAR(CURSO.FECHAIMPARTICIONHASTA,'DD/MM/YYYY'), TO_CHAR(INSC.FECHASOLICITUD,'DD/MM/YYYY'), CAT2.DESCRIPCION, INSC.CALIFICACION, INSC.IDPETICIONSUSCRIPCION, CURSO.MINIMOASISTENCIA");
 
 		return sql.toString();
 	}
@@ -275,5 +279,23 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.FROM("for_inscripcion");
 		return sql.toString();
 	}
+	
+	public String checkMinimaAsistencia(Short idInstitucion, Long idInscripcion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT(
+				"case when fc.MINIMOASISTENCIA > count (idasistenciaevento) then 0 else 1 end asistenciaminima");
+		sql.FROM("for_inscripcion insc");
+		sql.INNER_JOIN("for_curso fc on insc.idcurso = fc.idcurso");
+		sql.INNER_JOIN("for_evento_curso eventocurso on eventocurso.idcurso = fc.idcurso");
+		sql.INNER_JOIN("age_asistencia_evento asis on asis.idevento = eventocurso.idevento");
+		sql.WHERE("insc.idinscripcion = '" + idInscripcion + "'");
+		sql.WHERE("insc.idinstitucion = '" + idInstitucion + "'");
+		sql.GROUP_BY("fc.minimoasistencia");
+
+		return sql.toString();
+	}
 
 }
+

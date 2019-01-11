@@ -368,5 +368,31 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 		
 		return insertResponseDTO;
 	}
+
+	@Override
+	public String compruebaMinimaAsistencia(InscripcionItem inscripcionItem, HttpServletRequest request)
+	{
+		LOGGER.info("compruebaMinimaAsistencia() -> Entrada del servicio comprobar la minimaAsistencia");
+		
+		String minimaAsistencia = "";
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		Long idInscripcion = inscripcionItem.getIdInscripcion();
+
+		try {
+			NewIdDTO checkMinimaAsistencia = forInscripcionExtendsMapper.checkMinimaAsistencia(idInstitucion,
+					idInscripcion);
+
+			minimaAsistencia = checkMinimaAsistencia.getNewId();
+		} catch (Exception e) {
+			minimaAsistencia = "0";
+		}
+		
+		LOGGER.info("compruebaMinimaAsistencia() -> Salida del servicio comprobar la minimaAsistencia");
+		
+		return minimaAsistencia;
+	}
 	
 }
