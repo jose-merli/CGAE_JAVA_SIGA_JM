@@ -18,6 +18,7 @@ import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IPlantillasEnvioService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -30,7 +31,7 @@ import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.PlantillasEnvioExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
 	@Autowired
-	private PlantillasEnvioExtendsMapper _plantillasEnvioExtendsMapper;
+	EnvPlantillaEnviosExtendsMapper _envPlantillaEnviosExtendsMapper;
 	
 	@Autowired
 	private EnvPlantillasenviosMapper _envPlantillasenviosMapper;
@@ -116,7 +117,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
-					plantillasItem = _plantillasEnvioExtendsMapper.selectPlantillasEnvios(idInstitucion, filtros);
+					plantillasItem = _envPlantillaEnviosExtendsMapper.selectPlantillasEnvios(idInstitucion, filtros);
 					if(plantillasItem != null && plantillasItem.size()> 0){
 						respuesta.setPlantillasItem(plantillasItem);
 					}
@@ -207,9 +208,9 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
-					if(datosTarjeta.getIdPlantillasEnvio() != null){
+					if(datosTarjeta.getIdPlantillaEnvios() != null){
 						EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
-						key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillasEnvio()));
+						key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillaEnvios()));
 						key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 						key.setIdinstitucion(idInstitucion);
 						EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
@@ -223,8 +224,10 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						_envPlantillasenviosMapper.updateByPrimaryKeyWithBLOBs(plantilla);
 					}else{
 						EnvPlantillasenviosWithBLOBs plantilla = new EnvPlantillasenviosWithBLOBs();
+						NewIdDTO id = _envPlantillaEnviosExtendsMapper.selectMaxIDPlantillas();
+						plantilla.setIdplantillaenvios(Short.valueOf(id.getNewId()));
 						plantilla.setIdinstitucion(idInstitucion);
-						plantilla.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdPlantillasEnvio()));
+						plantilla.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 						plantilla.setNombre(datosTarjeta.getDescripcion());
 						if(datosTarjeta.getIdTipoEnvios().equals("1") || datosTarjeta.getIdTipoEnvios().equals("2")){
 							plantilla.setAsunto(datosTarjeta.getAsunto());
@@ -367,7 +370,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
-					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(idInstitucion, consulta.getIdPlantillasEnvio(), consulta.getIdTipoEnvios());
+					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(idInstitucion, consulta.getIdPlantillaEnvios(), consulta.getIdTipoEnvios());
 					if(consultaItems != null && consultaItems.size()>0){
 						respuesta.setConsultaItem(consultaItems);
 					}

@@ -463,7 +463,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				try{
 					int update = 0;
 					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
-					key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillasEnvio()));
+					key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillaEnvios()));
 					key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 					key.setIdinstitucion(idInstitucion);
 					EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
@@ -479,7 +479,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							envio.setFecha(new Date());
 							envio.setGenerardocumento("N");
 							envio.setImprimiretiquetas("N");
-							envio.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillasEnvio()));
+							envio.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillaEnvios()));
 							Short estadoNuevo = 1;
 							envio.setIdestado(estadoNuevo);
 							envio.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
@@ -594,7 +594,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					//tabla env_enviosplantillas
 					EnvPlantillasenviosKey PlantillaKey = new EnvPlantillasenviosKey();
 					PlantillaKey.setIdinstitucion(idInstitucion);
-					PlantillaKey.setIdplantillaenvios(Short.valueOf(datosTarjeta.getIdPlantillasEnvio()));
+					PlantillaKey.setIdplantillaenvios(Short.valueOf(datosTarjeta.getIdPlantillaEnvios()));
 					PlantillaKey.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvios()));
 					EnvPlantillasenviosWithBLOBs plantillaEnvio =  _envPlantillasenviosMapper.selectByPrimaryKey(PlantillaKey);
 					NewIdDTO idPlantilla = _envPlantillaEnviosExtendsMapper.selectMaxIDPlantillas();

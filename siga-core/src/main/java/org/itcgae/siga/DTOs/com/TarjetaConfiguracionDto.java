@@ -3,7 +3,7 @@ package org.itcgae.siga.DTOs.com;
 public class TarjetaConfiguracionDto {
 	
 	private String idEnvio;
-	private String idPlantillasEnvio;
+	private String idPlantillaEnvios;
 	private String idTipoEnvios;
 	private String asunto;
 	private String cuerpo;
@@ -11,12 +11,11 @@ public class TarjetaConfiguracionDto {
 	private String nombre;
 	
 	
-
-	public String getIdPlantillasEnvio() {
-		return idPlantillasEnvio;
+	public String getIdPlantillaEnvios() {
+		return idPlantillaEnvios;
 	}
-	public void setIdPlantillasEnvio(String idPlantillasEnvio) {
-		this.idPlantillasEnvio = idPlantillasEnvio;
+	public void setIdPlantillaEnvios(String idPlantillaEnvios) {
+		this.idPlantillaEnvios = idPlantillaEnvios;
 	}
 	public String getNombre() {
 		return nombre;

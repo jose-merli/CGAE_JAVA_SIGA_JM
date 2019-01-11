@@ -3,7 +3,7 @@ package org.itcgae.siga.DTOs.com;
 public class PlantillaEnvioSearchItem {
 	
 	private String nombre;
-	private String tipoEnvio;
+	private String idTipoEnvios;
 	
 	
 	public String getNombre() {
@@ -12,12 +12,13 @@ public class PlantillaEnvioSearchItem {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public String getTipoEnvio() {
-		return tipoEnvio;
+	public String getIdTipoEnvios() {
+		return idTipoEnvios;
 	}
-	public void setTipoEnvio(String tipoEnvio) {
-		this.tipoEnvio = tipoEnvio;
+	public void setIdTipoEnvios(String idTipoEnvios) {
+		this.idTipoEnvios = idTipoEnvios;
 	}
+
 	
 	
 }
