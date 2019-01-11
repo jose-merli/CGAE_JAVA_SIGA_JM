@@ -34,7 +34,7 @@ public interface EnvPlantillaEnviosExtendsMapper {
 		})
 	List<PlantillaEnvioItem> selectPlantillasEnvios(Short idInstitucion, PlantillaEnvioSearchItem filtros);
 	
-	@SelectProvider(type = EnvPlantillaEnviosExtendsSqlProvider.class, method = "selectPlantillas")
+	@SelectProvider(type = EnvPlantillaEnviosExtendsSqlProvider.class, method = "getPlantillas")
 	@Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPLANTILLAENVIOS", property = "value", jdbcType = JdbcType.VARCHAR)
 	})

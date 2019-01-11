@@ -30,7 +30,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 	
 	
 	
-	public String selectPlantillas(Short idInstitucion, String idTipoEnvio){
+	public String getPlantillas(Short idInstitucion, String idTipoEnvio){
 		
 		SQL sql = new SQL();
 		
