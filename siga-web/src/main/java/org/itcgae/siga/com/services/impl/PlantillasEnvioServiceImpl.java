@@ -229,7 +229,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						plantilla.setIdplantillaenvios(Short.valueOf(id.getNewId()));
 						plantilla.setIdinstitucion(idInstitucion);
 						plantilla.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
-						plantilla.setNombre(datosTarjeta.getDescripcion());
+						plantilla.setNombre(datosTarjeta.getNombre());
 						if(datosTarjeta.getIdTipoEnvios().equals("1") || datosTarjeta.getIdTipoEnvios().equals("2")){
 							plantilla.setAsunto(datosTarjeta.getAsunto());
 							plantilla.setCuerpo(datosTarjeta.getCuerpo());
@@ -346,7 +346,44 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 
 	@Override
 	public Error guardarRemitente(HttpServletRequest request, RemitenteDTO remitente) {
-		// TODO Auto-generated method stub
+		LOGGER.info("guardarRemitente() -> Entrada al servicio para añadir un remitente");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		Error respuesta = new Error();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info("guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info("guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			try{
+				if (null != usuarios && usuarios.size() > 0) {
+					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setIdplantillaenvios(Short.valueOf(remitente.getIdPlantillaEnvios()));
+					key.setIdtipoenvios(Short.valueOf(remitente.getIdTipoEnvios()));
+					
+					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+					plantilla.setIddireccion(Long.valueOf(remitente.getIdDireccion()));
+					plantilla.setIdpersona(Long.valueOf(remitente.getIdPersona()));
+					_envPlantillasenviosMapper.updateByPrimaryKey(plantilla);
+					respuesta.setCode(200);
+					respuesta.setMessage("Remitente guardado correctamente");
+				}
+			}catch(Exception e){
+				respuesta.setCode(500);
+				respuesta.setDescription("Error al asociar consulta a la plantilla");
+				respuesta.setMessage(e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		
+		LOGGER.info("guardarRemitente() -> Salida del servicio para servicio para añadir un remitente");
 		return null;
 	}
 
@@ -390,7 +427,31 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 
 	@Override
 	public RemitenteDTO detalleRemitente(HttpServletRequest request, String idConsulta) {
-		// TODO Auto-generated method stub
+		LOGGER.info("guardarRemitente() -> Entrada al servicio para obtener detalles del remitente");
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info("guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info("guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			try{
+				if (null != usuarios && usuarios.size() > 0) {
+					
+				}
+			}catch(Exception e){
+//				respuesta.setCode(500);
+//				respuesta.setDescription("Error al asociar consulta a la plantilla");
+//				respuesta.setMessage(e.getMessage());
+//				e.printStackTrace();
+			}
+		}
+		
+		LOGGER.info("guardarRemitente() -> Salida del servicio para obtener detalles del remitente");
 		return null;
 	}
 
