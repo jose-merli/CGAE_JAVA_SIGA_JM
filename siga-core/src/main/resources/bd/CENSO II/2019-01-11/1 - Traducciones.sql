@@ -12,3 +12,33 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.opcionCobertura','Opció de Cobertura','0','2',to_date('18/01/12','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.opcionCobertura','Opcion de Cobertura#EU','0','3',to_date('18/01/12','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.opcionCobertura','Opcion de Cobertura#GL','0','4',to_date('18/01/12','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.cuotaMensual','Cuota Mensual','0','1',to_date('18/01/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.cuotaMensual','Quota Mensual','0','2',to_date('18/01/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.cuotaMensual','Cuota Mensual#EU','0','3',to_date('18/01/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.cuotaMensual','Cuota Mensual#GL','0','4',to_date('18/01/12','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.capitalObjetivo','Capital objetivo estimado a los 65 años','0','1',to_date('18/01/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.capitalObjetivo','Capital objectiu estimat als 65 anys','0','2',to_date('18/01/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.capitalObjetivo','Capital objetivo estimado a los 65 años#EU','0','3',to_date('18/01/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.capitalObjetivo','Capital objetivo estimado a los 65 años#GL','0','4',to_date('18/01/12','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosRegistrales.literal.DatosPoliza','Datos Póliza','0','1',to_date('12/05/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosRegistrales.literal.DatosPoliza','Dades Pòlissa','0','2',to_date('12/05/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosRegistrales.literal.DatosPoliza','Datos Póliza#EU','0','3',to_date('12/05/08','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.consultaDatosRegistrales.literal.DatosPoliza','Datos Póliza#GL','0','4',to_date('12/05/08','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.beneficiarios','Beneficiarios','0','1',to_date('18/01/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.beneficiarios','Beneficiaris','0','2',to_date('18/01/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.beneficiarios','Beneficiarios#EU','0','3',to_date('18/01/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.beneficiarios','Beneficiarios#GL','0','4',to_date('18/01/12','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.asistenciaSanitaria','Asistencia Sanitaria','0','1',to_date('18/01/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.asistenciaSanitaria','Assistència Sanitària','0','2',to_date('18/01/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.asistenciaSanitaria','Asistencia Sanitaria#EU','0','3',to_date('18/01/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.mutualidad.literal.asistenciaSanitaria','Asistencia Sanitaria#GL','0','4',to_date('18/01/12','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('gratuita.personaJG.literal.unidadFamiliar','Unidad familiar','0','1',to_date('10/12/05','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('gratuita.personaJG.literal.unidadFamiliar','Unitat familiar','0','2',to_date('10/12/05','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('gratuita.personaJG.literal.unidadFamiliar','Unidad familiar#EU','0','3',to_date('10/12/05','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('gratuita.personaJG.literal.unidadFamiliar','Unidad familiar#GL','0','4',to_date('10/12/05','DD/MM/RR'),'0','19');
