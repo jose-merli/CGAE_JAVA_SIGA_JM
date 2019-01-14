@@ -101,7 +101,7 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 				"getComboSubtipoCurricular() -> Entrada al servicio para la búsqueda por filtro de categoría curricular");
 
 		ComboDTO combo = new ComboDTO();
-
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		String idLenguaje = null;
 
 		// Conseguimos información del usuario logeado
@@ -124,24 +124,28 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 
 				LOGGER.info(
 						"getComboSubtipoCurricular() / cenTiposCVSubtipo2ExtendsMapper.searchSubtipoCurricular() -> Entrada a cenNocolegiadoExtendsMapper para busqueda de personas colegiadas por filtro");
-				List<ComboItem> comboItems = cenTiposCVSubtipo2ExtendsMapper.searchComboSubtipoCurricular(subtipoCurricularItem,
+				comboItems = cenTiposCVSubtipo2ExtendsMapper.searchComboSubtipoCurricular(subtipoCurricularItem,
 						idLenguaje, String.valueOf(idInstitucion));
 				LOGGER.info(
 						"getComboSubtipoCurricular() / cenTiposCVSubtipo2ExtendsMapper.searchSubtipoCurricular() -> Salida de cenNocolegiadoExtendsMapper para busqueda de personas no colegiadas por filtro");
 
 				if (comboItems != null && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
 					combo.setCombooItems(comboItems);
 				}
+//					ComboItem element = new ComboItem();
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
+					
+				//}
 				
 			} else {
 				LOGGER.warn(
 						"getComboSubtipoCurricular() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
 								+ dni + " e idInstitucion = " + idInstitucion);
 			}
+			
+			
 		} else {
 			LOGGER.warn("getComboSubtipoCurricular() -> idInstitucion del token nula");
 		}
