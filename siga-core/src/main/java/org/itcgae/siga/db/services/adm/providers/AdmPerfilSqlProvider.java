@@ -316,6 +316,18 @@ public class AdmPerfilSqlProvider {
 	}
 	
 	
-	
+	public String selectListadoPerfiles (Short idInstitucion){
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDPERFIL,DESCRIPCION,NIVELPERFIL");
+		
+		sql.FROM("ADM_PERFIL");
+		
+		sql.WHERE("IDINSTITUCION = " + idInstitucion + " AND FECHA_BAJA IS NULL");
+		sql.ORDER_BY("DESCRIPCION ASC");		
+		
+		return sql.toString();
+	}
 	
 }

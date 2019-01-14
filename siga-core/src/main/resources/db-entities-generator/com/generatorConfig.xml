@@ -49,9 +49,14 @@
 <!-- 		</table> -->
 		
 		 
-		<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" >
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-		</table>
+<!-- 		<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 		</table> -->
+
+<!-- 		<table schema="USCGAE" tableName="MOD_MODELOCOMUNICACION" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			<generatedKey column="IDMODELOCOMUNICACION" sqlStatement="SELECT SEQ_MOD_MODELOCOMUNICAION FROM DUAL"/> -->
+<!-- 		</table> -->
 		
 <!-- 			<table schema="USCGAE" tableName="ENV_PLANTILLAREMITENTES" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->

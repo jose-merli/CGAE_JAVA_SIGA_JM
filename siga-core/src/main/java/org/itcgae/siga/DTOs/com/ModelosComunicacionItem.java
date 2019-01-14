@@ -23,6 +23,10 @@ public class ModelosComunicacionItem {
 	private String idClaseComunicacion;
 	private Date fechaBaja;
 	
+	private String visible;
+	private String institucion;
+	private String clase;
+	
 	public String getIdModeloComunicacion() {
 		return idModeloComunicacion;
 	}
