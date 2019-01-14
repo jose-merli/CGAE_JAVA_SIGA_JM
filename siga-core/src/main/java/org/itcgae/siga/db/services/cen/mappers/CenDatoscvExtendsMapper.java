@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
+import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesSearchDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.mappers.CenDatoscvMapper;
@@ -41,7 +42,7 @@ public interface CenDatoscvExtendsMapper extends CenDatoscvMapper {
 		@Result(column = "CREDITOS", property = "creditos", jdbcType = JdbcType.VARCHAR)
 
 	})
-	List<FichaDatosCurricularesItem> searchDatosCurriculares(String idPersona, String idInstitucion);
+	List<FichaDatosCurricularesItem> searchDatosCurriculares(String idPersona, boolean historico, String idInstitucion);
 	
 	@UpdateProvider(type = CenDatoscvSqlExtendsProvider.class, method = "updateCurriculo")
 	int updateCurriculo(CenDatoscv record);

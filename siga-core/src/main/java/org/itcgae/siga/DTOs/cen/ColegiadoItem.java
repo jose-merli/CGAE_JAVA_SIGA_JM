@@ -74,6 +74,7 @@ public class ColegiadoItem {
 	private String descripcion;
 	private String observaciones;
 	private String motivo;
+	private String subtipoCV [];
 
 
 	
@@ -1064,6 +1065,22 @@ public class ColegiadoItem {
 		this.idTratamiento = idTratamiento;
 	}
 	
+	
+	public ColegiadoItem subtipoCV(String[] subtipoCV ){
+		
+		this.subtipoCV = subtipoCV;
+		return this;
+	}
+
+	@JsonProperty("subtipoCV")
+	public String [] getSubtipoCV() {
+		return subtipoCV;
+	}
+	
+	public void setSubtipoCV(String[] subtipoCV) {
+		this.subtipoCV = subtipoCV;
+	}
+	
 
 	@Override
 	public int hashCode() {
@@ -1071,7 +1088,7 @@ public class ColegiadoItem {
 	    		fechaBaja, apellidos, fechaIncorporacion, situacion, residencia, inscrito, idProvincia, idPoblacion, codigoPostal, tipoDireccion, sexo, 
 	    		idEstadoCivil, domicilio, tipoCV, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
 	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion, 
-	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate, observaciones);
+	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate, observaciones, subtipoCV);
 	}
 
 
@@ -1134,6 +1151,7 @@ public class ColegiadoItem {
 	    sb.append("    fechaAltaDate: ").append(toIndentedString(fechaAltaDate)).append("\n");
 	    sb.append("    incorporacionDate: ").append(toIndentedString(incorporacionDate)).append("\n");
 	    sb.append("    observaciones: ").append(toIndentedString(observaciones)).append("\n");
+	    sb.append("    subtipoCV: ").append(toIndentedString(subtipoCV)).append("\n");
 
 	    
 		

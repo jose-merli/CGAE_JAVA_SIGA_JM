@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class FichaDatosCurricularesSearchDTO {
 
 	private String idPersona;
+	private boolean historico;
 	
 
 	/**
@@ -25,6 +26,24 @@ public class FichaDatosCurricularesSearchDTO {
 		this.idPersona = idPersona;
 	}
 	
+	/**
+	 *
+	 */
+	public FichaDatosCurricularesSearchDTO historico(boolean historico){
+		this.historico = historico;
+		return this;
+	}
+	
+	
+	@JsonProperty("historico")
+	public boolean getHistorico() {
+		return historico;
+	}
+
+
+	public void setHistorico(boolean historico) {
+		this.historico = historico;
+	}
 	
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -35,12 +54,13 @@ public class FichaDatosCurricularesSearchDTO {
 	      return false;
 	    }
 	    FichaDatosCurricularesSearchDTO datosBancariosInsertDTO = (FichaDatosCurricularesSearchDTO) o;
-	    return  Objects.equals(this.idPersona, datosBancariosInsertDTO.idPersona);
+	    return  Objects.equals(this.idPersona, datosBancariosInsertDTO.idPersona) &&
+	    		Objects.equals(this.historico, datosBancariosInsertDTO.historico);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona);
+	    return Objects.hash(idPersona, historico);
 	}
 
 	
@@ -50,6 +70,7 @@ public class FichaDatosCurricularesSearchDTO {
 	    sb.append("class DatosBancariosInsertDTO {\n");
 	    
 	    sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
+	    sb.append("    historico: ").append(toIndentedString(historico)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}

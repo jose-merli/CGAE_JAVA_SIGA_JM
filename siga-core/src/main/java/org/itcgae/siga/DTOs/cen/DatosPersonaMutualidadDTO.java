@@ -2,6 +2,8 @@ package org.itcgae.siga.DTOs.cen;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class DatosPersonaMutualidadDTO {
 
 	private String apellido1;
@@ -15,13 +17,14 @@ public class DatosPersonaMutualidadDTO {
 	private Date fechaNacConyuge;
 	private String idMutualista;
 	private String idSolicitud;
+	@JsonProperty("NIF")
 	private String NIF;
 	private String nacionalidad;
 	private String nombre;
 	private String NumColegiado;
 	private String profesion;
 	private String sexo;
-	
+	private int numHijos;
 	
 	
 	public String getIdMutualista() {
@@ -97,7 +100,7 @@ public class DatosPersonaMutualidadDTO {
 		return NIF;
 	}
 	public void setNIF(String nIF) {
-		NIF = nIF;
+		this.NIF = nIF;
 	}
 	public String getNacionalidad() {
 		return nacionalidad;
@@ -128,6 +131,12 @@ public class DatosPersonaMutualidadDTO {
 	}
 	public void setSexo(String sexo) {
 		this.sexo = sexo;
+	}
+	public int getNumHijos() {
+		return numHijos;
+	}
+	public void setNumHijos(int numHijos) {
+		this.numHijos = numHijos;
 	}
 	
 }
