@@ -88,9 +88,9 @@
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table>		 -->
 
-<!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOC_CONSULTA" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table> -->
+		<table schema="USCGAE" tableName="MOD_PLANTILLADOC_CONSULTA" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>
 
 <!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLAENVIO_CONSULTA" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
