@@ -17,22 +17,22 @@ public class NoColegiadoItem {
 	private String movil;
 	private String fechaBaja;
 
-	private String  idProvincia;
-	private String  idPoblacion;
-	private String  codigoPostal;
-	private String  tipoDireccion;
-	private String  apellidos;
-	private ComboEtiquetasItem[]  etiquetas;
+	private String idProvincia;
+	private String idPoblacion;
+	private String codigoPostal;
+	private String tipoDireccion;
+	private String apellidos;
+	private ComboEtiquetasItem[] etiquetas;
 	private String[] traduccion;
-	private String  sexo;
-	private String  estadoCivil;
+	private String sexo;
+	private String estadoCivil;
 	private String idEstadoCivil;
-	private String  subCategoria;
+	private String subCategoria;
 	private String domicilio;
 	private String situacion;
 	private String idcv;
-	private boolean  historico;
-	
+	private boolean historico;
+
 	private String comisiones;
 	private String soloNombre;
 	private String apellidos1;
@@ -47,45 +47,48 @@ public class NoColegiadoItem {
 	private String guiaJudicial;
 	private Date fechaNacimientoDate;
 	private String motivo;
+
+	private String subtipoCV[];
+	private String tipoCV;
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem idPersona(String idPersona){
+	public NoColegiadoItem idPersona(String idPersona) {
 		this.idPersona = idPersona;
 		return this;
 	}
-	
+
 	@JsonProperty("idPersona")
 	public String getIdPersona() {
 		return idPersona;
 	}
-	
+
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
 	}
-	
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem idPersonas(String[] idPersonas){
+	public NoColegiadoItem idPersonas(String[] idPersonas) {
 		this.idPersonas = idPersonas;
 		return this;
 	}
-	
+
 	@JsonProperty("idPersonas")
 	public String[] getIdPersonas() {
 		return idPersonas;
 	}
-	
+
 	public void setIdPersonas(String[] idPersonas) {
 		this.idPersonas = idPersonas;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem idEstadoCivil(String idEstadoCivil){
+	public NoColegiadoItem idEstadoCivil(String idEstadoCivil) {
 		this.idEstadoCivil = idEstadoCivil;
 		return this;
 	}
@@ -94,86 +97,85 @@ public class NoColegiadoItem {
 	public String getidEstadoCivil() {
 		return idEstadoCivil;
 	}
-	
+
 	public void setidEstadoCivil(String idEstadoCivil) {
 		this.idEstadoCivil = idEstadoCivil;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem fechaNacimientoDate(Date fechaNacimientoDate){
+	public NoColegiadoItem fechaNacimientoDate(Date fechaNacimientoDate) {
 		this.fechaNacimientoDate = fechaNacimientoDate;
 		return this;
 	}
-	
+
 	@JsonProperty("fechaNacimientoDate")
 	public Date getFechaNacimientoDate() {
 		return fechaNacimientoDate;
 	}
-	
+
 	public void setFechaNacimientoDate(Date fechaNacimientoDate) {
 		this.fechaNacimientoDate = fechaNacimientoDate;
 	}
-	
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem idInstitucion(String idInstitucion){
+	public NoColegiadoItem idInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 		return this;
 	}
-	
+
 	@JsonProperty("idInstitucion")
 	public String getIdInstitucion() {
 		return idInstitucion;
 	}
-	
+
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
-	
+
 	/**
 	 *
 	 */
-	
-	public NoColegiadoItem comisiones(String comisiones){
+
+	public NoColegiadoItem comisiones(String comisiones) {
 		this.comisiones = comisiones;
 		return this;
 	}
-	
+
 	@JsonProperty("comisiones")
 	public String getComisiones() {
 		return comisiones;
 	}
-	
+
 	public void setComisiones(String comisiones) {
 		this.comisiones = comisiones;
 	}
-	
+
 	/**
 	 *
 	 */
-	
-	
-	public NoColegiadoItem nif(String nif){
+
+	public NoColegiadoItem nif(String nif) {
 		this.nif = nif;
 		return this;
 	}
-	
+
 	@JsonProperty("nif")
 	public String getNif() {
 		return nif;
 	}
+
 	public void setNif(String nif) {
 		this.nif = nif;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem nombre(String nombre){
+	public NoColegiadoItem nombre(String nombre) {
 		this.nombre = nombre;
 		return this;
 	}
@@ -182,15 +184,15 @@ public class NoColegiadoItem {
 	public String getNombre() {
 		return nombre;
 	}
-	
+
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem fechaNacimiento(String fechaNacimiento){
+	public NoColegiadoItem fechaNacimiento(String fechaNacimiento) {
 		this.fechaNacimiento = fechaNacimiento;
 		return this;
 	}
@@ -199,15 +201,15 @@ public class NoColegiadoItem {
 	public String getFechaNacimiento() {
 		return fechaNacimiento;
 	}
-	
+
 	public void setFechaNacimiento(String fechaNacimiento) {
 		this.fechaNacimiento = fechaNacimiento;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem correo(String correo){
+	public NoColegiadoItem correo(String correo) {
 		this.correo = correo;
 		return this;
 	}
@@ -216,15 +218,15 @@ public class NoColegiadoItem {
 	public String getCorreo() {
 		return correo;
 	}
-	
+
 	public void setCorreo(String correo) {
 		this.correo = correo;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem telefono(String telefono){
+	public NoColegiadoItem telefono(String telefono) {
 		this.telefono = telefono;
 		return this;
 	}
@@ -233,15 +235,50 @@ public class NoColegiadoItem {
 	public String getTelefono() {
 		return telefono;
 	}
-	
+
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem movil(String movil){
+	public NoColegiadoItem tipoCV(String tipoCV) {
+		this.tipoCV = tipoCV;
+		return this;
+	}
+
+	@JsonProperty("tipoCV")
+	public String getTipoCV() {
+		return tipoCV;
+	}
+
+	public void setTipoCV(String tipoCV) {
+		this.tipoCV = tipoCV;
+	}
+
+	/**
+	 *
+	 */
+	public NoColegiadoItem subtipoCV(String[] subtipoCV) {
+
+		this.subtipoCV = subtipoCV;
+		return this;
+	}
+
+	@JsonProperty("subtipoCV")
+	public String[] getSubtipoCV() {
+		return subtipoCV;
+	}
+
+	public void setSubtipoCV(String[] subtipoCV) {
+		this.subtipoCV = subtipoCV;
+	}
+
+	/**
+	 *
+	 */
+	public NoColegiadoItem movil(String movil) {
 		this.movil = movil;
 		return this;
 	}
@@ -250,15 +287,15 @@ public class NoColegiadoItem {
 	public String getMovil() {
 		return movil;
 	}
-	
+
 	public void setMovil(String movil) {
 		this.movil = movil;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem fechaBaja(String fechaBaja){
+	public NoColegiadoItem fechaBaja(String fechaBaja) {
 		this.fechaBaja = fechaBaja;
 		return this;
 	}
@@ -267,15 +304,15 @@ public class NoColegiadoItem {
 	public String getFechaBaja() {
 		return fechaBaja;
 	}
-	
+
 	public void setFechaBaja(String fechaBaja) {
 		this.fechaBaja = fechaBaja;
 	}
-		
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem idProvincia(String idProvincia){
+	public NoColegiadoItem idProvincia(String idProvincia) {
 		this.idProvincia = idProvincia;
 		return this;
 	}
@@ -284,15 +321,15 @@ public class NoColegiadoItem {
 	public String getIdProvincia() {
 		return idProvincia;
 	}
-	
+
 	public void setIdProvincia(String idProvincia) {
 		this.idProvincia = idProvincia;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem idPoblacion(String idPoblacion){
+	public NoColegiadoItem idPoblacion(String idPoblacion) {
 		this.idPoblacion = idPoblacion;
 		return this;
 	}
@@ -301,15 +338,15 @@ public class NoColegiadoItem {
 	public String getIdPoblacion() {
 		return idPoblacion;
 	}
-	
+
 	public void setIdPoblacion(String idPoblacion) {
 		this.idPoblacion = idPoblacion;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem codigoPostal(String codigoPostal){
+	public NoColegiadoItem codigoPostal(String codigoPostal) {
 		this.codigoPostal = codigoPostal;
 		return this;
 	}
@@ -318,15 +355,15 @@ public class NoColegiadoItem {
 	public String getCodigoPostal() {
 		return codigoPostal;
 	}
-	
+
 	public void setCodigoPostal(String codigoPostal) {
 		this.codigoPostal = codigoPostal;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem tipoDireccion(String tipoDireccion){
+	public NoColegiadoItem tipoDireccion(String tipoDireccion) {
 		this.tipoDireccion = tipoDireccion;
 		return this;
 	}
@@ -335,15 +372,15 @@ public class NoColegiadoItem {
 	public String getTipoDireccion() {
 		return tipoDireccion;
 	}
-	
+
 	public void setTipoDireccion(String tipoDireccion) {
 		this.tipoDireccion = tipoDireccion;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem apellidos(String apellidos){
+	public NoColegiadoItem apellidos(String apellidos) {
 		this.apellidos = apellidos;
 		return this;
 	}
@@ -352,15 +389,15 @@ public class NoColegiadoItem {
 	public String getApellidos() {
 		return apellidos;
 	}
-	
+
 	public void setApellidos(String apellidos) {
 		this.apellidos = apellidos;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem etiquetas(ComboEtiquetasItem[] etiquetas){
+	public NoColegiadoItem etiquetas(ComboEtiquetasItem[] etiquetas) {
 		this.etiquetas = etiquetas;
 		return this;
 	}
@@ -377,25 +414,24 @@ public class NoColegiadoItem {
 	/**
 	 *
 	 */
-	public NoColegiadoItem traduccion(String[] traduccion){
+	public NoColegiadoItem traduccion(String[] traduccion) {
 		this.traduccion = traduccion;
 		return this;
 	}
-	
+
 	@JsonProperty("traduccion")
 	public String[] getTraduccion() {
 		return traduccion;
 	}
-	
+
 	public void setTraduccion(String[] traduccion) {
 		this.traduccion = traduccion;
 	}
-	
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem sexo(String sexo){
+	public NoColegiadoItem sexo(String sexo) {
 		this.sexo = sexo;
 		return this;
 	}
@@ -404,15 +440,15 @@ public class NoColegiadoItem {
 	public String getSexo() {
 		return sexo;
 	}
-	
+
 	public void setSexo(String sexo) {
 		this.sexo = sexo;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem estadoCivil(String estadoCivil){
+	public NoColegiadoItem estadoCivil(String estadoCivil) {
 		this.estadoCivil = estadoCivil;
 		return this;
 	}
@@ -421,15 +457,15 @@ public class NoColegiadoItem {
 	public String getEstadoCivil() {
 		return estadoCivil;
 	}
-	
+
 	public void setEstadoCivil(String estadoCivil) {
 		this.estadoCivil = estadoCivil;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem subCategoria(String subCategoria){
+	public NoColegiadoItem subCategoria(String subCategoria) {
 		this.subCategoria = subCategoria;
 		return this;
 	}
@@ -438,15 +474,15 @@ public class NoColegiadoItem {
 	public String getSubCategoria() {
 		return subCategoria;
 	}
-	
+
 	public void setSubCategoria(String subCategoria) {
 		this.subCategoria = subCategoria;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem domicilio(String domicilio){
+	public NoColegiadoItem domicilio(String domicilio) {
 		this.domicilio = domicilio;
 		return this;
 	}
@@ -455,15 +491,15 @@ public class NoColegiadoItem {
 	public String getDomicilio() {
 		return domicilio;
 	}
-	
+
 	public void setDomicilio(String domicilio) {
 		this.domicilio = domicilio;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem situacion(String situacion){
+	public NoColegiadoItem situacion(String situacion) {
 		this.domicilio = situacion;
 		return this;
 	}
@@ -472,15 +508,15 @@ public class NoColegiadoItem {
 	public String getSituacion() {
 		return situacion;
 	}
-	
+
 	public void setSituacion(String situacion) {
 		this.situacion = situacion;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem idcv(String idcv){
+	public NoColegiadoItem idcv(String idcv) {
 		this.idcv = idcv;
 		return this;
 	}
@@ -489,19 +525,18 @@ public class NoColegiadoItem {
 	public String getIdcv() {
 		return idcv;
 	}
-	
+
 	public void setIdcv(String idcv) {
 		this.idcv = idcv;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem historico(boolean historico){
+	public NoColegiadoItem historico(boolean historico) {
 		this.historico = historico;
 		return this;
 	}
-	
 
 	public String getGuiaJudicial() {
 		return guiaJudicial;
@@ -510,7 +545,7 @@ public class NoColegiadoItem {
 	public void setGuiaJudicial(String guiaJudicial) {
 		this.guiaJudicial = guiaJudicial;
 	}
-	
+
 	public String getPublicidad() {
 		return publicidad;
 	}
@@ -518,23 +553,20 @@ public class NoColegiadoItem {
 	public void setPublicidad(String publicidad) {
 		this.publicidad = publicidad;
 	}
-	
 
 	@JsonProperty("historico")
 	public boolean isHistorico() {
 		return historico;
 	}
-	
-	
 
 	public void setHistorico(boolean historico) {
 		this.historico = historico;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem soloNombre(String soloNombre){
+	public NoColegiadoItem soloNombre(String soloNombre) {
 		this.soloNombre = soloNombre;
 		return this;
 	}
@@ -543,15 +575,15 @@ public class NoColegiadoItem {
 	public String getSoloNombre() {
 		return soloNombre;
 	}
-	
+
 	public void setSoloNombre(String soloNombre) {
 		this.soloNombre = soloNombre;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem apellidos1(String apellidos1){
+	public NoColegiadoItem apellidos1(String apellidos1) {
 		this.apellidos1 = apellidos1;
 		return this;
 	}
@@ -560,7 +592,7 @@ public class NoColegiadoItem {
 	public String getApellidos1() {
 		return apellidos1;
 	}
-	
+
 	public void setApellidos1(String apellidos1) {
 		this.apellidos1 = apellidos1;
 	}
@@ -568,7 +600,7 @@ public class NoColegiadoItem {
 	/**
 	 *
 	 */
-	public NoColegiadoItem apellidos2(String apellidos2){
+	public NoColegiadoItem apellidos2(String apellidos2) {
 		this.apellidos2 = apellidos2;
 		return this;
 	}
@@ -577,15 +609,15 @@ public class NoColegiadoItem {
 	public String getApellidos2() {
 		return apellidos2;
 	}
-	
+
 	public void setApellidos2(String apellidos2) {
 		this.apellidos2 = apellidos2;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem idTipoIdentificacion(String idTipoIdentificacion){
+	public NoColegiadoItem idTipoIdentificacion(String idTipoIdentificacion) {
 		this.idTipoIdentificacion = idTipoIdentificacion;
 		return this;
 	}
@@ -594,15 +626,15 @@ public class NoColegiadoItem {
 	public String getIdTipoIdentificacion() {
 		return idTipoIdentificacion;
 	}
-	
+
 	public void setIdTipoIdentificacion(String idTipoIdentificacion) {
 		this.idTipoIdentificacion = idTipoIdentificacion;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem naturalDe(String naturalDe){
+	public NoColegiadoItem naturalDe(String naturalDe) {
 		this.naturalDe = naturalDe;
 		return this;
 	}
@@ -611,15 +643,15 @@ public class NoColegiadoItem {
 	public String getNaturalDe() {
 		return naturalDe;
 	}
-	
+
 	public void setNaturalDe(String naturalDe) {
 		this.naturalDe = naturalDe;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem idLenguaje(String idLenguaje){
+	public NoColegiadoItem idLenguaje(String idLenguaje) {
 		this.naturalDe = idLenguaje;
 		return this;
 	}
@@ -628,15 +660,15 @@ public class NoColegiadoItem {
 	public String getIdLenguaje() {
 		return idLenguaje;
 	}
-	
+
 	public void setIdLenguaje(String idLenguaje) {
 		this.idLenguaje = idLenguaje;
 	}
-	
+
 	/**
 	 *
 	 */
-	public NoColegiadoItem asientoContable(String asientoContable){
+	public NoColegiadoItem asientoContable(String asientoContable) {
 		this.asientoContable = asientoContable;
 		return this;
 	}
@@ -645,16 +677,15 @@ public class NoColegiadoItem {
 	public String getAsientoContable() {
 		return asientoContable;
 	}
-	
+
 	public void setAsientoContable(String asientoContable) {
 		this.asientoContable = asientoContable;
 	}
 
-
 	/**
 	 *
 	 */
-	public NoColegiadoItem idTratamiento(String idTratamiento){
+	public NoColegiadoItem idTratamiento(String idTratamiento) {
 		this.idTratamiento = idTratamiento;
 		return this;
 	}
@@ -663,12 +694,12 @@ public class NoColegiadoItem {
 	public String getidTratamiento() {
 		return idTratamiento;
 	}
-	
+
 	public void setidTratamiento(String idTratamiento) {
 		this.idTratamiento = idTratamiento;
 	}
 
-	public NoColegiadoItem anotaciones(String anotaciones){
+	public NoColegiadoItem anotaciones(String anotaciones) {
 		this.anotaciones = anotaciones;
 		return this;
 	}
@@ -689,5 +720,5 @@ public class NoColegiadoItem {
 	public void setMotivo(String motivo) {
 		this.motivo = motivo;
 	}
-	
+
 }
