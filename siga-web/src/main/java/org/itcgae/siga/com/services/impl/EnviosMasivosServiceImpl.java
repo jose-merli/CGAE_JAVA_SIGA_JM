@@ -60,7 +60,6 @@ import org.itcgae.siga.db.services.com.mappers.EnvDocumentosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosGrupoClienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.EnvHistoricoEstadoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -421,9 +420,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 						EnvDestinatariosExample example = new EnvDestinatariosExample();
 						example.createCriteria().andIdenvioEqualTo(Long.parseLong(envios.get(i).getIdEnvio())).andIdinstitucionEqualTo(usuario.getIdinstitucion());
 						List<EnvDestinatarios> destinatarios = _envDestinatariosMapper.selectByExample(example);
-						
-						
-						
 					}
 					respuesta.setCode(200);
 					respuesta.setDescription("Envios masivos enviados correctamente");
@@ -960,7 +956,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					respuesta.setDescription(e.getMessage());
 					respuesta.setMessage("Error al insertar documento");
 				}
-				
 				
 			}
 		}

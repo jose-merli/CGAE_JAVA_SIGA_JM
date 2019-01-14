@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
+import org.itcgae.siga.DTOs.com.PersonaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDatosConsultaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
@@ -125,6 +126,19 @@ public class PlantillasEnvioController {
 			return new ResponseEntity<RemitenteDTO>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
 		
 	}
+	
+	@RequestMapping(value = "/personaYdirecciones",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<RemitenteDTO> obtenerPersonaYdirecciones(HttpServletRequest request, @RequestBody PersonaDTO persona) {
+		
+		RemitenteDTO respuesta = _plantillasEnvioService.obtenerPersonaYdireccion(request, persona);
+		
+		if(respuesta.getError() == null)
+			return new ResponseEntity<RemitenteDTO>(respuesta, HttpStatus.OK);
+		else
+			return new ResponseEntity<RemitenteDTO>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+	}
+	
 	
 	@RequestMapping(value = "/finalidadConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<FinalidadConsultaDTO> obtenerFinalidadConsulta(HttpServletRequest request, @RequestBody String idConsulta) {

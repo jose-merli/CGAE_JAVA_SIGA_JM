@@ -5,12 +5,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
+import org.itcgae.siga.DTOs.com.PersonaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDatosConsultaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
 import org.itcgae.siga.DTOs.com.PlantillasEnvioDTO;
 import org.itcgae.siga.DTOs.com.RemitenteDTO;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
+import org.itcgae.siga.DTOs.com.TarjetaRemitenteDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 
@@ -26,7 +28,8 @@ public interface IPlantillasEnvioService {
 	public Error asociarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO consulta);
 	public Error borrarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO consulta);
 	public RemitenteDTO detalleRemitente(HttpServletRequest request, PlantillaDatosConsultaDTO consulta);
-	public Error guardarRemitente(HttpServletRequest request, RemitenteDTO remitente);
+	public RemitenteDTO obtenerPersonaYdireccion(HttpServletRequest request, PersonaDTO persona);
+	public Error guardarRemitente(HttpServletRequest request, TarjetaRemitenteDTO remitente);
 	public FinalidadConsultaDTO obtenerFinalidad(HttpServletRequest request, String idConsulta);
 	
 }

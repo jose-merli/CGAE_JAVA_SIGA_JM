@@ -10,15 +10,18 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
+import org.itcgae.siga.DTOs.com.PersonaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDatosConsultaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
 import org.itcgae.siga.DTOs.com.PlantillasEnvioDTO;
 import org.itcgae.siga.DTOs.com.RemitenteDTO;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
+import org.itcgae.siga.DTOs.com.TarjetaRemitenteDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -27,6 +30,7 @@ import org.itcgae.siga.com.services.IPlantillasEnvioService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.ConConsulta;
@@ -174,26 +178,17 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try {
-					boolean noBorrada = false;
 					for (int i = 0; i < plantillasEnvio.length; i++) {
 						EnvPlantillasenviosKey plantillaEnvioKey = new EnvPlantillasenviosKey();
 						plantillaEnvioKey.setIdplantillaenvios(Short.valueOf(plantillasEnvio[i].getIdPlantillaEnvios()));
 						plantillaEnvioKey.setIdinstitucion(Short.valueOf(plantillasEnvio[i].getIdInstitucion()));
 						EnvPlantillasenvios plantillaEnvios = _envPlantillasenviosMapper.selectByPrimaryKey(plantillaEnvioKey);
-						if(idInstitucion == plantillaEnvios.getIdinstitucion()){
-								plantillaEnvios.setFechabaja(new Date());
-								plantillaEnvios.setFechamodificacion(new Date());
-								plantillaEnvios.setUsumodificacion(usuario.getIdusuario());
-								_envPlantillasenviosMapper.updateByPrimaryKey(plantillaEnvios);
-						}else{
-							noBorrada = true;
-						}
+						plantillaEnvios.setFechabaja(new Date());
+						plantillaEnvios.setFechamodificacion(new Date());
+						plantillaEnvios.setUsumodificacion(usuario.getIdusuario());
+						_envPlantillasenviosMapper.updateByPrimaryKey(plantillaEnvios);
 					}
 					respuesta.setCode(200);
-					//Si ha habido alguna consulta no borrada se le indica mediante un mensaje al front para indicarselo al usuario
-					if(noBorrada){
-						respuesta.setMessage("noBorrar");
-					}
 					respuesta.setDescription("Plantillas de envío borradas");
 				} catch (Exception e) {
 					respuesta.setCode(500);
@@ -361,7 +356,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	}
 
 	@Override
-	public Error guardarRemitente(HttpServletRequest request, RemitenteDTO remitente) {
+	public Error guardarRemitente(HttpServletRequest request, TarjetaRemitenteDTO remitente) {
 		LOGGER.info("guardarRemitente() -> Entrada al servicio para añadir un remitente");
 		
 		// Conseguimos información del usuario logeado
@@ -473,35 +468,36 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					remitente.setApellido1(persona.getApellidos1());
 					remitente.setApellido2(persona.getApellidos2());
 					
-					
 					CenDireccionesKey keyDirecciones = new CenDireccionesKey();
 					keyDirecciones.setIddireccion(plantilla.getIddireccion());
 					keyDirecciones.setIdinstitucion(idInstitucion);
 					keyDirecciones.setIdpersona(plantilla.getIdpersona());
 					CenDirecciones direccion = _cenDireccionesMapper.selectByPrimaryKey(keyDirecciones);
-					remitente.setIdDireccion(direccion.getIddireccion().toString());
-					remitente.setDomicilio(direccion.getDomicilio());
-					remitente.setIdPoblacion(direccion.getIdpoblacion().toString());
-					remitente.setIdProvincia(direccion.getIdprovincia());
-					remitente.setIdPais(direccion.getIdpais());
-					remitente.setCodigoPostal(direccion.getCodigopostal());
-					Map<String,String> contactos = new HashMap<String, String>();
+					List<DatosDireccionesItem> direccionList = new ArrayList<DatosDireccionesItem>();
+					DatosDireccionesItem direccionItem = new DatosDireccionesItem();
+					direccionItem.setIdDireccion(direccion.getIddireccion().toString());
+					direccionItem.setDomicilio(direccion.getDomicilio());
+					direccionItem.setIdPoblacion(direccion.getIdpoblacion().toString());
+					direccionItem.setIdProvincia(direccion.getIdprovincia());
+					direccionItem.setIdPais(direccion.getIdpais());
+					direccionItem.setCodigoPostal(direccion.getCodigopostal());
 					if(direccion.getTelefono1()!=null)
-						contactos.put("telefono1", direccion.getTelefono1());
+						direccionItem.setTelefono(direccion.getTelefono1());
 					if(direccion.getTelefono2() != null)
-						contactos.put("telefono2", direccion.getTelefono2());
+						direccionItem.setTelefono2(direccion.getTelefono2());
 					if(direccion.getMovil()!= null)
-						contactos.put("movil", direccion.getMovil());
+						direccion.setMovil(direccion.getMovil());
 					if(direccion.getFax1() != null)
-						contactos.put("fax1", direccion.getFax1());
+						direccion.setFax1(direccion.getFax1());
 					if(direccion.getFax2() != null)
-						contactos.put("fax2", direccion.getFax2());
+						direccion.setFax2(direccion.getFax2());
 					if(direccion.getCorreoelectronico() != null)
-						contactos.put("correoElectronico", direccion.getCorreoelectronico());
+						direccion.setCorreoelectronico(direccion.getCorreoelectronico());
 					if(direccion.getPaginaweb() != null)
-						contactos.put("web", direccion.getPaginaweb());
-					remitente.setContactos(contactos);
-
+						direccion.setPaginaweb(direccion.getPaginaweb());
+					direccionList.add(direccionItem);
+					remitente.setDireccion(direccionList);
+					
 				}
 			}catch(Exception e){
 				Error error = new Error();
@@ -536,6 +532,8 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					ConConsultaKey key = new ConConsultaKey();
+					key.setIdconsulta(Long.valueOf(idConsulta));
+					key.setIdinstitucion(idInstitucion);
 					ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
 					int inicioSelect = consulta.getSentencia().indexOf("<SELECT>")+8;
 					int finSelect = consulta.getSentencia().indexOf("</SELECT>");
@@ -554,6 +552,69 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		
 		LOGGER.info("obtenerFinalidad() -> Salida del servicio para obtener la finalidad de una consulta");
 		return finalidadDTO;
+	}
+
+	@Override
+	public RemitenteDTO obtenerPersonaYdireccion(HttpServletRequest request, PersonaDTO personaDTO) {
+		LOGGER.info("obtenerPersonaYdireccion() -> Entrada al servicio para obtener detalles del remitente");
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		RemitenteDTO remitente = new RemitenteDTO();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info("obtenerPersonaYdireccion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info("obtenerPersonaYdireccion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			try{
+				if (null != usuarios && usuarios.size() > 0) {
+					CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.valueOf(personaDTO.getIdPersona()));
+					remitente.setIdPersona(persona.getIdpersona().toString());
+					remitente.setNombre(persona.getNombre());
+					remitente.setApellido1(persona.getApellidos1());
+					remitente.setApellido2(persona.getApellidos2());
+					
+					CenDireccionesExample example = new CenDireccionesExample();
+					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(personaDTO.getIdPersona())).andIdinstitucionEqualTo(Short.valueOf(personaDTO.getIdInstitucion()));
+					List<CenDirecciones> direcciones = _cenDireccionesMapper.selectByExample(example);
+					if(direcciones != null && direcciones.size() > 0){
+						List<DatosDireccionesItem> direccionesList = new ArrayList<DatosDireccionesItem>();
+						for (CenDirecciones item : direcciones) {
+							DatosDireccionesItem direccion = new DatosDireccionesItem();
+							direccion.setIdDireccion(item.getIddireccion().toString());
+							direccion.setDomicilio(item.getDomicilio());
+							direccion.setIdPoblacion(item.getIdpoblacion().toString());
+							direccion.setIdProvincia(item.getIdprovincia());
+							direccion.setIdPais(item.getIdpais());
+							direccion.setCodigoPostal(item.getCodigopostal());
+							direccion.setTelefono(item.getTelefono1());
+							direccion.setTelefono2(item.getTelefono2());
+							direccion.setMovil(item.getMovil());
+							direccion.setFax(item.getFax1());
+							direccion.setFax2(item.getFax2());
+							direccion.setCorreoElectronico(item.getCorreoelectronico());
+							direccion.setPaginaWeb(item.getPaginaweb());
+							direccionesList.add(direccion);
+						}
+						remitente.setDireccion(direccionesList);
+					}
+
+				}
+			}catch(Exception e){
+				Error error = new Error();
+				error.setCode(500);
+				error.setDescription("Error al obtener persona y direccion");
+				error.setMessage(e.getMessage());
+				remitente.setError(error);
+				e.printStackTrace();
+			}
+		}
+		
+		LOGGER.info("obtenerPersonaYdireccion() -> Salida del servicio para obtener detalles del remitente");
+		return remitente;
 	}
 
 }
