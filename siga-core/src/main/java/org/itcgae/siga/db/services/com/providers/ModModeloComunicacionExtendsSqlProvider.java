@@ -59,6 +59,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 			sql.WHERE("FECHABAJA is NULL");
 		}
 		
+		sql.ORDER_BY("IDMODELOCOMUNICACION ASC");
 		
 		return sql.toString();
 	}

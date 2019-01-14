@@ -21,6 +21,8 @@ public class SigaConstants {
 	public static final String IP_ACCESO_SERVICIO_CARGAS = "IP_ACCESO_SERVICIO_CARGAS";
 	public static final String ACTIVAR_CLIENTE_SERVICIO_CARGAS = "ACTIVAR_CLIENTE_SERVICIO_CARGAS";
 	
+	public static String SUFIJO_MODULO_COM_DUPLICADO = "_Copia";
+	
 	
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(
