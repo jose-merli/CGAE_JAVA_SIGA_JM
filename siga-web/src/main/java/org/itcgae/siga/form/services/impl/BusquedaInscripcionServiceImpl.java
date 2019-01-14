@@ -214,6 +214,7 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				arrayIds = comprobarAccionAprobar(listInscripcionItem, idInstitucionToString);
 				idEstadoUpdate = 3L;
 			} else {
+//				arrayCursosIds = formateaListaCursosError(listInscripcionItem, idInstitucionToString);
 				return arrayCursosIds;
 			}
 			break;
@@ -229,10 +230,13 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 			break;
 		}
 		
-		//Si no hay inscripciones que cumplan las condiciones para actualizar su estado
-		if(arrayIds.isEmpty()) {
-			return 0;
-		}else {
+		// Si no hay inscripciones que cumplan las condiciones para actualizar su estado
+		if (arrayIds.isEmpty()) {
+			// TODO este método no comprueba correctamente los cursos que han fallado. REVISAR
+			// Actualmente se usa para que al front le llegue un array --> List<String>
+			arrayCursosIds = formateaListaCursosError(listInscripcionItem, idInstitucionToString);
+			return arrayCursosIds;
+		} else {
 		
 			//Entidad que se va a rellenar con los valores a actualizar
 			ForInscripcion record = new ForInscripcion();
@@ -282,6 +286,21 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 			// Añadimos a la lista de ids únicamente los ids de las inscripciones que puedan ser aceptadas
 			if (idInstitucionToString.equals(inscripcion.getIdInstitucion()) && (SigaConstants.ESTADO_INSCRIPCION_PENDIENTE.equals(inscripcion.getIdEstadoInscripcion()))) {
 				arrayIds.add(inscripcion.getIdInscripcion());
+			}
+		}
+
+		return arrayIds;
+	}
+	
+	public List<String> formateaListaCursosError(List<InscripcionItem> listInscripcionItem, String idInstitucionToString) {
+		// Aprobar inscripción: aprobará la inscripción o inscripciones seleccionadas
+		// que estén en estado Pendiente.  
+		List<String> arrayIds = new ArrayList<>();
+		for (InscripcionItem inscripcion : listInscripcionItem) {
+
+			// Añadimos a la lista de ids únicamente los ids de las inscripciones que puedan ser aceptadas
+			if (!idInstitucionToString.equals(inscripcion.getIdInstitucion()) || (!SigaConstants.ESTADO_INSCRIPCION_PENDIENTE.equals(inscripcion.getIdEstadoInscripcion()))) {
+				arrayIds.add(inscripcion.getNombreCurso());
 			}
 		}
 
@@ -399,9 +418,9 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 		List<String> arrayCursoIds = new ArrayList<>();
 		
 		for (InscripcionItem inscripcionItem : listInscripcionItem) {
-			CursoItem cursoItem = forInscripcionExtendsMapper.compruebaPlazas(inscripcionItem.getCodigoCurso()); 
+			CursoItem cursoItem = forInscripcionExtendsMapper.compruebaPlazas(inscripcionItem.getIdCurso()); 
 
-			Integer numPlazas = Integer.parseInt(cursoItem.getNumPlazas());
+			Integer numPlazas = Integer.parseInt(cursoItem.getNumPlazas() == null ? "0" : cursoItem.getNumPlazas());
 			Integer inscripciones = Integer.parseInt(cursoItem.getInscripciones());
 			
 			if(inscripciones >= numPlazas)

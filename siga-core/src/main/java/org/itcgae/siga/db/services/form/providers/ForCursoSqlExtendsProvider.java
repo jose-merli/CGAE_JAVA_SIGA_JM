@@ -320,6 +320,10 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		if(cursoItem.getIdVisibilidad() != null) {
 			sql.SET("IDVISIBILIDADCURSO = '" + cursoItem.getIdVisibilidad() + "'");
 		}
+		
+		if(cursoItem.getLugar() != null) {
+			sql.SET("LUGAR = '" + cursoItem.getLugar() + "'");
+		}
  		
  		sql.WHERE("IDCURSO = '" + cursoItem.getIdCurso() + "'");
 		

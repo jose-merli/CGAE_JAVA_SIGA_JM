@@ -20,6 +20,8 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.ForCertificadoscurso;
 import org.itcgae.siga.db.entities.ForCertificadoscursoExample;
@@ -27,6 +29,7 @@ import org.itcgae.siga.db.entities.ForInscripcion;
 import org.itcgae.siga.db.entities.ForInscripcionExample;
 import org.itcgae.siga.db.entities.PysProductossolicitados;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCertificadoscursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForInscripcionExtendsMapper;
@@ -56,6 +59,9 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 	
 	@Autowired
 	private ForCertificadoscursoExtendsMapper forCertificadosCursoExtendsMapper;
+	
+	@Autowired
+	private CenClienteExtendsMapper cenClienteExtendsMapper;
 	
 	@Override
 	public CursoItem searchCourse(String idCurso, HttpServletRequest request) {
@@ -111,7 +117,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 
 				try {
 					// Insertamos inscripcion en la tabla FOR_INSCRIPCION
-					forInscripcionInsert.setIdinstitucion(idInstitucion);
+					forInscripcionInsert.setIdinstitucion(inscripcionItem.getIdInstitucion() != null ? Short.valueOf(inscripcionItem.getIdInstitucion()) : null);
 					forInscripcionInsert.setUsumodificacion(usuario.getIdusuario().longValue());
 					forInscripcionInsert.setFechamodificacion(new Date());
 					forInscripcionInsert.setFechasolicitud(inscripcionItem.getFechaSolicitudDate());
@@ -179,9 +185,6 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-					LOGGER.info(
-							"updateInscripcion() / forInscripcionExtendsMapper.updateByExampleSelective() -> Entrada a forInscripcionExtendsMapper para modificar una inscripcion");
-
 					ForInscripcion record = new ForInscripcion();
 					record.setFechamodificacion(new Date());
 					record.setUsumodificacion(usuario.getIdusuario().longValue());
@@ -194,7 +197,66 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 					
 					ForInscripcionExample example = new ForInscripcionExample();
 					example.createCriteria().andIdinscripcionEqualTo(inscripcionItem.getIdInscripcion());
-					
+
+					// Si el curso al que nos hemos inscrito es de otra institucion,
+					// se creara un usuario no colegiado en la institucion del curso.
+					// Comprobamos si el curso es de distinta institucion que el usuario al que
+					// queremos asignar la inscripcion
+					if (inscripcionItem.getIdPersona() != null) {
+						CenClienteKey key = new CenClienteKey();
+						key.setIdpersona(inscripcionItem.getIdPersona());
+						key.setIdinstitucion(Short.valueOf(inscripcionItem.getIdInstitucion()));
+						CenCliente cenCliente = cenClienteExtendsMapper.selectByPrimaryKey(key);
+						
+						// Si la persona no se encuentra en la misma institucion del curso/inscripcion
+						// tendremos que insertar el no-colegiado con esa institucion
+						if(cenCliente == null) {
+							
+							cenCliente = new CenCliente();
+							cenCliente.setIdpersona(inscripcionItem.getIdPersona());
+							cenCliente.setIdinstitucion(Short.valueOf(inscripcionItem.getIdInstitucion()));
+							cenCliente.setFechaalta(new Date());
+							cenCliente.setCaracter("P");
+							cenCliente.setPublicidad(SigaConstants.DB_FALSE);
+							cenCliente.setGuiajudicial(SigaConstants.DB_FALSE);
+							// Para crear un cliente debemos rellenar comisiones, con que dato?
+							cenCliente.setComisiones("0");
+							cenCliente.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
+							cenCliente.setFechamodificacion(new Date());
+							cenCliente.setUsumodificacion(usuario.getIdusuario());
+							cenCliente.setIdlenguaje(usuario.getIdlenguaje());
+							cenCliente.setExportarfoto(SigaConstants.DB_FALSE);
+
+							LOGGER.info(
+									"generateExcelInscriptions() / cenClienteMapper.insert() -> Entrada a cenClienteMapper para crear un nuevo colegiado");
+
+							int responseCenCliente = 0;
+							responseCenCliente = cenClienteExtendsMapper.insert(cenCliente);
+
+							if (responseCenCliente > 0) {
+								CenNocolegiado noColegiadoRecord = new CenNocolegiado();
+
+								noColegiadoRecord.setTipo("0");
+								noColegiadoRecord.setIdpersona(inscripcionItem.getIdPersona());
+								noColegiadoRecord.setIdinstitucion(Short.valueOf(inscripcionItem.getIdInstitucion()));
+								noColegiadoRecord.setFechamodificacion(new Date());
+								noColegiadoRecord.setUsumodificacion(usuario.getIdusuario());
+								// Para crear un nocoleagiado debemos rellenar campo sociedadsj
+								noColegiadoRecord.setSociedadsj("0");
+
+								LOGGER.info(
+										"updateInscripcion() / cenNocolegiadoExtendsMapper.insert() -> Entrada a cenNocolegiadoExtendsMapper para insertar un no-colegiado");
+								cenNocolegiadoExtendsMapper.insert(noColegiadoRecord);
+								LOGGER.info(
+										"updateInscripcion() / cenNocolegiadoExtendsMapper.insert() -> Salida a cenNocolegiadoExtendsMapper para insertar un no-colegiado");
+							}
+						}
+						
+					}
+
+					LOGGER.info(
+							"updateInscripcion() / forInscripcionExtendsMapper.updateByExampleSelective() -> Entrada a forInscripcionExtendsMapper para modificar una inscripcion");
+
 					response = forInscripcionExtendsMapper.updateByExampleSelective(record, example);
 
 					LOGGER.info(
