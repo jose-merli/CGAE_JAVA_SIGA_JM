@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.cen.EstadoMutualistaDTO;
 import org.itcgae.siga.DTOs.cen.EstadoSolicitudDTO;
 import org.itcgae.siga.DTOs.cen.MutualidadCombosDTO;
 import org.itcgae.siga.DTOs.cen.MutualidadResponseDTO;
+import org.itcgae.siga.db.entities.CenSolicitudmutualidad;
 
 public interface IMutualidadService {
 	
@@ -19,5 +20,6 @@ public interface IMutualidadService {
 	public MutualidadResponseDTO MGASolicitudPolizaAccuGratuitos(DatosSolicitudGratuitaDTO datosSolicitud, HttpServletRequest request);
 	public MutualidadResponseDTO MGASolicitudPolizaProfesional(DatosSolicitudGratuitaDTO datosSolicitud, HttpServletRequest request);
 	public CuotaYCapitalObjetivoResponseDTO ObtenerCuotaYCapObjetivo(CuotaYCapObjetivoDTO datosCuota);
+	public CenSolicitudmutualidad obtenerSolicitud(CenSolicitudmutualidad datosCuota, HttpServletRequest request);
 	
 }
