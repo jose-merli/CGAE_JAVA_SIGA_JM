@@ -3,20 +3,19 @@ package org.itcgae.siga.DTOs.com;
 public class TarjetaConfiguracionDto {
 	
 	private String idEnvio;
-	private String idPlantillasEnvio;
-	private String idTipoEnvio;
+	private String idPlantillaEnvios;
+	private String idTipoEnvios;
 	private String asunto;
 	private String cuerpo;
 	private String descripcion;
 	private String nombre;
 	
 	
-
-	public String getIdPlantillasEnvio() {
-		return idPlantillasEnvio;
+	public String getIdPlantillaEnvios() {
+		return idPlantillaEnvios;
 	}
-	public void setIdPlantillasEnvio(String idPlantillasEnvio) {
-		this.idPlantillasEnvio = idPlantillasEnvio;
+	public void setIdPlantillaEnvios(String idPlantillaEnvios) {
+		this.idPlantillaEnvios = idPlantillaEnvios;
 	}
 	public String getNombre() {
 		return nombre;
@@ -30,11 +29,12 @@ public class TarjetaConfiguracionDto {
 	public void setIdEnvio(String idEnvio) {
 		this.idEnvio = idEnvio;
 	}
-	public String getIdTipoEnvio() {
-		return idTipoEnvio;
+	
+	public String getIdTipoEnvios() {
+		return idTipoEnvios;
 	}
-	public void setIdTipoEnvio(String idTipoEnvio) {
-		this.idTipoEnvio = idTipoEnvio;
+	public void setIdTipoEnvios(String idTipoEnvios) {
+		this.idTipoEnvios = idTipoEnvios;
 	}
 	public String getAsunto() {
 		return asunto;

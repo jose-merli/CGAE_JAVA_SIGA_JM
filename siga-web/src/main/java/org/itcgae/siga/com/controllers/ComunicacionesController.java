@@ -3,8 +3,6 @@ package org.itcgae.siga.com.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.DestinatariosDTO;
-import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
-import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;

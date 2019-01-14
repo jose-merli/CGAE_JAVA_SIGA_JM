@@ -463,8 +463,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				try{
 					int update = 0;
 					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
-					key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillasEnvio()));
-					key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+					key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillaEnvios()));
+					key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 					key.setIdinstitucion(idInstitucion);
 					EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
 					plantilla.setAsunto(datosTarjeta.getAsunto());
@@ -479,10 +479,10 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							envio.setFecha(new Date());
 							envio.setGenerardocumento("N");
 							envio.setImprimiretiquetas("N");
-							envio.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillasEnvio()));
+							envio.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillaEnvios()));
 							Short estadoNuevo = 1;
 							envio.setIdestado(estadoNuevo);
-							envio.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+							envio.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 							envio.setFechamodificacion(new Date());
 							envio.setUsumodificacion(usuario.getIdusuario());
 							envio.setEnvio("M");
@@ -594,8 +594,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					//tabla env_enviosplantillas
 					EnvPlantillasenviosKey PlantillaKey = new EnvPlantillasenviosKey();
 					PlantillaKey.setIdinstitucion(idInstitucion);
-					PlantillaKey.setIdplantillaenvios(Short.valueOf(datosTarjeta.getIdPlantillasEnvio()));
-					PlantillaKey.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvio()));
+					PlantillaKey.setIdplantillaenvios(Short.valueOf(datosTarjeta.getIdPlantillaEnvios()));
+					PlantillaKey.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvios()));
 					EnvPlantillasenviosWithBLOBs plantillaEnvio =  _envPlantillasenviosMapper.selectByPrimaryKey(PlantillaKey);
 					NewIdDTO idPlantilla = _envPlantillaEnviosExtendsMapper.selectMaxIDPlantillas();
 					Short idPlantillaEnvio = plantillaEnvio.getIdplantillaenvios();

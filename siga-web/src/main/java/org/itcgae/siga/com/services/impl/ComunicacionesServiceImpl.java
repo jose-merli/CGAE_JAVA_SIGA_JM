@@ -1,7 +1,6 @@
 package org.itcgae.siga.com.services.impl;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,37 +8,19 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.DestinatariosDTO;
-import org.itcgae.siga.DTOs.com.DocumentoEnvioItem;
-import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
-import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IComunicacionesService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.EnvEnvioprogramado;
-import org.itcgae.siga.db.entities.EnvEnvioprogramadoKey;
-import org.itcgae.siga.db.entities.EnvEnvios;
-import org.itcgae.siga.db.entities.EnvEnviosKey;
-import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
-import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
-import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
-import org.itcgae.siga.db.mappers.EnvEnviosMapper;
-import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.EnvDocumentosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.EnvHistoricoEstadoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDestinatariosExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
-import org.itcgae.siga.db.services.com.providers.ConClaseComunicacionesExtendsSqlProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,36 +34,10 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
-
-	@Autowired
-	private EnvTipoEnvioExtendsMapper _envTipoEnvioExtendsMapper;
-
-	@Autowired
-	private ConClaseComunicacionExtendsMapper _envTipoClaseComunicacionExtendsMapper;
-	
-	@Autowired
-	private EnvEstadoEnvioExtendsMapper _envEstadoEnvioExtendsMapper;
 	
 	@Autowired
 	private EnvEnviosExtendsMapper _envEnviosExtendsMapper;
 	
-	@Autowired
-	private EnvEnviosMapper _envEnviosMapper;
-	
-	@Autowired
-	private EnvHistoricoestadoenvioMapper _envHistoricoestadoenvioMapper;
-	
-	@Autowired
-	private EnvHistoricoEstadoExtendsMapper _envHistoricoEstadoExtendsMapper;
-	
-	@Autowired
-	private EnvEnvioprogramadoMapper _envEnvioprogramadoMapper;
-	
-	@Autowired
-	private EnvDocumentosExtendsMapper _envDocumentosExtendsMapper;
-	
-	@Autowired
-	private EnvDocumentosMapper _envDocumentosMapper;
 	
 	@Autowired
 	private ConClaseComunicacionExtendsMapper _conClaseComunicacionExtendsMapper;

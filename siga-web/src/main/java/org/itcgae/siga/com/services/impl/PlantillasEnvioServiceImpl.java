@@ -18,6 +18,7 @@ import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IPlantillasEnvioService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -30,7 +31,7 @@ import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.PlantillasEnvioExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,9 +44,8 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 	
-	
 	@Autowired
-	private PlantillasEnvioExtendsMapper _plantillasEnvioExtendsMapper;
+	EnvPlantillaEnviosExtendsMapper _envPlantillaEnviosExtendsMapper;
 	
 	@Autowired
 	private EnvPlantillasenviosMapper _envPlantillasenviosMapper;
@@ -77,7 +77,6 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			
 			if (null != usuarios && usuarios.size() > 0) {
 
-				AdmUsuarios usuario = usuarios.get(0);
 				comboItems = _conConsultasExtendsMapper.selectConsultasDisponibles(idInstitucion);
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
@@ -111,13 +110,13 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
-					AdmUsuarios usuario = usuarios.get(0);
-					plantillasItem = _plantillasEnvioExtendsMapper.selectPlantillasEnvios(idInstitucion, filtros);
+					
+					plantillasItem = _envPlantillaEnviosExtendsMapper.selectPlantillasEnvios(idInstitucion, filtros);
 					if(plantillasItem != null && plantillasItem.size()> 0){
 						respuesta.setPlantillasItem(plantillasItem);
 					}
@@ -148,7 +147,9 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info("PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info("PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -202,21 +203,21 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
-					if(datosTarjeta.getIdPlantillasEnvio() != null){
+					if(datosTarjeta.getIdPlantillaEnvios() != null){
 						EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
-						key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillasEnvio()));
-						key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+						key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillaEnvios()));
+						key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 						key.setIdinstitucion(idInstitucion);
 						EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
 						plantilla.setAsunto(datosTarjeta.getAsunto());
 						plantilla.setCuerpo(datosTarjeta.getCuerpo());
-						plantilla.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvio()));
+						plantilla.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvios()));
 						plantilla.setNombre(datosTarjeta.getNombre());
 						plantilla.setDescripcion(datosTarjeta.getDescripcion());
 						plantilla.setFechamodificacion(new Date());
@@ -224,10 +225,12 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						_envPlantillasenviosMapper.updateByPrimaryKeyWithBLOBs(plantilla);
 					}else{
 						EnvPlantillasenviosWithBLOBs plantilla = new EnvPlantillasenviosWithBLOBs();
+						NewIdDTO id = _envPlantillaEnviosExtendsMapper.selectMaxIDPlantillas();
+						plantilla.setIdplantillaenvios(Short.valueOf(id.getNewId()));
 						plantilla.setIdinstitucion(idInstitucion);
-						plantilla.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdPlantillasEnvio()));
-						plantilla.setNombre(datosTarjeta.getDescripcion());
-						if(datosTarjeta.getIdTipoEnvio().equals("1") || datosTarjeta.getIdTipoEnvio().equals("2")){
+						plantilla.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
+						plantilla.setNombre(datosTarjeta.getNombre());
+						if(datosTarjeta.getIdTipoEnvios().equals("1") || datosTarjeta.getIdTipoEnvios().equals("2")){
 							plantilla.setAsunto(datosTarjeta.getAsunto());
 							plantilla.setCuerpo(datosTarjeta.getCuerpo());
 						}
@@ -266,9 +269,9 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("asociarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("asociarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
@@ -298,7 +301,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 
 	@Override
 	public Error borrarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO consulta) {
-		LOGGER.info("PlantillasEnvioSearch() -> Salida del servicio para asociar una consulta a la plantilla de envio");
+		LOGGER.info("borrarConsulta() -> Salida del servicio para borrar una consulta a la plantilla de envio");
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -310,9 +313,9 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("borrarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("borrarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
@@ -336,14 +339,51 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		}
 		
 		
-		LOGGER.info("PlantillasEnvioSearch() -> Salida del servicio para asociar una consulta a la plantilla de envio");
+		LOGGER.info("borrarConsulta() -> Salida del servicio para borrar una consulta a la plantilla de envio");
 		return respuesta;
 	}
 
 
 	@Override
 	public Error guardarRemitente(HttpServletRequest request, RemitenteDTO remitente) {
-		// TODO Auto-generated method stub
+		LOGGER.info("guardarRemitente() -> Entrada al servicio para añadir un remitente");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		Error respuesta = new Error();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info("guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info("guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			try{
+				if (null != usuarios && usuarios.size() > 0) {
+					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setIdplantillaenvios(Short.valueOf(remitente.getIdPlantillaEnvios()));
+					key.setIdtipoenvios(Short.valueOf(remitente.getIdTipoEnvios()));
+					
+					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+					plantilla.setIddireccion(Long.valueOf(remitente.getIdDireccion()));
+					plantilla.setIdpersona(Long.valueOf(remitente.getIdPersona()));
+					_envPlantillasenviosMapper.updateByPrimaryKey(plantilla);
+					respuesta.setCode(200);
+					respuesta.setMessage("Remitente guardado correctamente");
+				}
+			}catch(Exception e){
+				respuesta.setCode(500);
+				respuesta.setDescription("Error al asociar consulta a la plantilla");
+				respuesta.setMessage(e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		
+		LOGGER.info("guardarRemitente() -> Salida del servicio para servicio para añadir un remitente");
 		return null;
 	}
 
@@ -362,13 +402,12 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("detalleConsultas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("getComboTipoEnvio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("detalleConsultas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
-					AdmUsuarios usuario = usuarios.get(0);
-					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(idInstitucion, consulta.getIdPlantillasEnvio(), consulta.getIdTipoEnvio());
+					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(idInstitucion, consulta.getIdPlantillaEnvios(), consulta.getIdTipoEnvios());
 					if(consultaItems != null && consultaItems.size()>0){
 						respuesta.setConsultaItem(consultaItems);
 					}
@@ -388,7 +427,31 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 
 	@Override
 	public RemitenteDTO detalleRemitente(HttpServletRequest request, String idConsulta) {
-		// TODO Auto-generated method stub
+		LOGGER.info("guardarRemitente() -> Entrada al servicio para obtener detalles del remitente");
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info("guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info("guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			try{
+				if (null != usuarios && usuarios.size() > 0) {
+					
+				}
+			}catch(Exception e){
+//				respuesta.setCode(500);
+//				respuesta.setDescription("Error al asociar consulta a la plantilla");
+//				respuesta.setMessage(e.getMessage());
+//				e.printStackTrace();
+			}
+		}
+		
+		LOGGER.info("guardarRemitente() -> Salida del servicio para obtener detalles del remitente");
 		return null;
 	}
 
