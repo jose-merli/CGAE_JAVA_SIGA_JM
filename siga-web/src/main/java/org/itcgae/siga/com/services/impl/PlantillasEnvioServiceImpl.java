@@ -291,7 +291,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					consultaAsoc.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
 					consultaAsoc.setIdplantillaenvios(Short.valueOf(consulta.getIdPlantillaEnvios()));
 					consultaAsoc.setIdinstitucion(idInstitucion);
-					consultaAsoc.setIdtipoenvios(Short.valueOf(consulta.getIdTipoEnvio()));
+					consultaAsoc.setIdtipoenvios(Short.valueOf(consulta.getIdTipoEnvios()));
 					consultaAsoc.setUsumodificacion(usuario.getIdusuario());
 					consultaAsoc.setFechamodificacion(new Date());
 					_modPlantillaenvioConsultaMapper.insert(consultaAsoc);
@@ -391,7 +391,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 				}
 			}catch(Exception e){
 				respuesta.setCode(500);
-				respuesta.setDescription("Error al asociar consulta a la plantilla");
+				respuesta.setDescription("Error al guardar un remitente");
 				respuesta.setMessage(e.getMessage());
 				e.printStackTrace();
 			}
@@ -460,7 +460,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
 					key.setIdinstitucion(idInstitucion);
 					key.setIdplantillaenvios(Short.valueOf(datosPlantilla.getIdPlantillaEnvios()));
-					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvio()));
+					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
 					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
 					CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(plantilla.getIdpersona());
 					remitente.setIdPersona(persona.getIdpersona().toString());

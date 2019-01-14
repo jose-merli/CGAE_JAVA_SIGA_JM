@@ -3,7 +3,7 @@ package org.itcgae.siga.DTOs.com;
 public class PlantillaDatosConsultaDTO {
 	
 	private String idPlantillaEnvios;
-	private String idTipoEnvio;
+	private String idTipoEnvios;
 	private String idConsulta;
 	
 	
@@ -14,11 +14,11 @@ public class PlantillaDatosConsultaDTO {
 	public void setIdPlantillaEnvios(String idPlantillaEnvios) {
 		this.idPlantillaEnvios = idPlantillaEnvios;
 	}
-	public String getIdTipoEnvio() {
-		return idTipoEnvio;
+	public String getIdTipoEnvios() {
+		return idTipoEnvios;
 	}
-	public void setIdTipoEnvio(String idTipoEnvio) {
-		this.idTipoEnvio = idTipoEnvio;
+	public void setIdTipoEnvios(String idTipoEnvios) {
+		this.idTipoEnvios = idTipoEnvios;
 	}
 	public String getIdConsulta() {
 		return idConsulta;
