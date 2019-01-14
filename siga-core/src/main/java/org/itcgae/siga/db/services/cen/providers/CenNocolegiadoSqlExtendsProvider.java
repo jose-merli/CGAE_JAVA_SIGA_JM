@@ -637,8 +637,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
 		sql.LEFT_OUTER_JOIN(
 				"CEN_DIRECCION_TIPODIRECCION TIPODIRECCION ON (TIPODIRECCION.IDDIRECCION = DIR.IDDIRECCION AND TIPODIRECCION.IDPERSONA = DIR.IDPERSONA AND  TIPODIRECCION.IDINSTITUCION = DIR.IDINSTITUCION)");
-		sql.LEFT_OUTER_JOIN(
-				"cen_datoscv datoscv on (datoscv.idpersona = cli.idpersona and datoscv.idinstitucion = cli.idinstitucion)");
+			
+		sql.LEFT_OUTER_JOIN("cen_datosCV datosCV ON ( datosCV.idInstitucion = nocol.idInstitucion and datosCV.idPersona = per.idPersona )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcv cenTipoCV ON ( cenTipoCV.idTipoCV = datosCV.idTipoCV )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt ON ( subt.idTipoCV = datosCV.idTipoCV and subt.idInstitucion = nocol.idInstitucion )");
 
 		if(idInstitucion != null) {
 			sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
@@ -704,9 +706,28 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 			sql.WHERE("grucli.IDGRUPO IN (" + etiquetas + ")");
 		}
-		if (noColegiadoItem.getIdcv() != null && noColegiadoItem.getIdcv() != "") {
-			sql.WHERE("datoscv.idcv = '" + noColegiadoItem.getIdcv() + "'");
+		
+		if (noColegiadoItem.getTipoCV() != null && noColegiadoItem.getTipoCV() != "") {
+			sql.WHERE("datoscv.idcv = '" + noColegiadoItem.getTipoCV() + "'");
 		}
+
+		if (noColegiadoItem.getSubtipoCV() != null && noColegiadoItem.getSubtipoCV().length > 0) {
+			
+			String etiquetas = "";
+
+			for (int i = 0; noColegiadoItem.getSubtipoCV().length > i; i++) {
+
+				if (i == noColegiadoItem.getSubtipoCV().length - 1) {
+					etiquetas += "'" + noColegiadoItem.getSubtipoCV()[i] + "'";
+				} else {
+					etiquetas += "'" + noColegiadoItem.getSubtipoCV()[i] + "',";
+				}
+			}
+
+			sql.WHERE("subt.IDTIPOCVSUBTIPO2 IN (" + etiquetas + ")");
+			
+		}
+		
 		if (noColegiadoItem.getFechaNacimiento() != null && noColegiadoItem.getFechaNacimiento() != "") {
 			sql.WHERE("(TO_DATE(PER.FECHANACIMIENTO,'DD/MM/RRRR') >= TO_DATE('" + noColegiadoItem.getFechaNacimiento()
 					+ "','DD/MM/YYYY') and ( TO_DATE(PER.FECHANACIMIENTO,'DD/MM/RRRR') <= TO_DATE('" + noColegiadoItem.getFechaNacimiento()
