@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IModelosYcomunicacionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -31,6 +33,7 @@ import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModModeloPerfilesExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,6 +64,9 @@ public class ModelosYcomunicacionesService implements IModelosYcomunicacionesSer
 	
 	@Autowired
 	private ModPlantilladocConsultaMapper modPlantilladocConsultaMapper;
+	
+	@Autowired
+	private ModModeloPerfilesExtendsMapper modModeloPerfilesExtendsMapper;
 
 	
 	@Override
@@ -292,6 +298,48 @@ public class ModelosYcomunicacionesService implements IModelosYcomunicacionesSer
 		}
 		LOGGER.info("borrarModeloComunicaciones() -> Salida del servicio para borrar un modelo de comunicación");
 		return respuesta;
+	}
+
+	@Override
+	public ComboDTO obtenerPerfilesModelo(HttpServletRequest request, String idModeloComunicacion) {
+		LOGGER.info("obtenerPerfilesModelo() -> Entrada al servicio para obtener los perfiles asignados al modelo");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					comboItems = modModeloPerfilesExtendsMapper.selectPerfilesModelo(idInstitucion, Long.parseLong(idModeloComunicacion));
+					if(null != comboItems && comboItems.size() > 0) {
+						ComboItem element = new ComboItem();
+						element.setLabel("");
+						element.setValue("");
+						comboItems.add(0, element);
+					}		
+					
+					comboDTO.setCombooItems(comboItems);
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage("Error al obtener los perfiles");
+					error.description(e.getMessage());
+					e.printStackTrace();
+				}
+			}		
+		}		
+		
+		LOGGER.info("obtenerPerfilesModelo() -> Salida del servicio para obtener los perfiles asignados al modelo");
+		return comboDTO;
 	}
 
 }

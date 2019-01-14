@@ -10,6 +10,8 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.PerfilDTO;
 import org.itcgae.siga.DTOs.com.PerfilesDTO;
+import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.adm.service.IPerfilService;
 import org.itcgae.siga.db.entities.AdmPerfil;
@@ -91,7 +93,7 @@ public class PerfilServiceImpl implements IPerfilService {
 	}
 
 	@Override
-	public PerfilesDTO getPerfiles(HttpServletRequest request) {
+	public ComboDTO getPerfiles(HttpServletRequest request) {
 		LOGGER.info("getPerfiles() -> Entrada al servicio para obtener los perfiles disponibles");
 		
 		// Conseguimos información del usuario logeado
@@ -99,31 +101,28 @@ public class PerfilServiceImpl implements IPerfilService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
-		PerfilesDTO respuesta = new PerfilesDTO();
-		List<PerfilDTO> perfilesDTO = new ArrayList<PerfilDTO>();
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);			
 			if (null != usuarios && usuarios.size() > 0) {
-				try{
-					perfilesDTO = admPerfilExtendsMapper.selectListadoPerfiles(idInstitucion);					
-					if(perfilesDTO != null && perfilesDTO.size()> 0){
-						respuesta.setPerfiles(perfilesDTO);
-					}
-				}catch(Exception e){
-					Error error = new Error();
-					error.setCode(500);
-					error.setMessage("Error al obtener los perfiles");
-					error.description(e.getMessage());
-					e.printStackTrace();
-				}
-			}
+				comboItems = admPerfilExtendsMapper.selectListadoPerfiles(idInstitucion);
+				if(null != comboItems && comboItems.size() > 0) {
+					ComboItem element = new ComboItem();
+					element.setLabel("");
+					element.setValue("");
+					comboItems.add(0, element);
+				}		
+				
+				comboDTO.setCombooItems(comboItems);
+			}		
 		}		
 		
 		LOGGER.info("getPerfiles() -> Salida del servicio para obtener los perfiles disponibles");
-		return respuesta;
+		return comboDTO;
 	}
 
 }

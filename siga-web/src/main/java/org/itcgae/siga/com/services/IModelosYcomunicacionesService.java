@@ -15,5 +15,7 @@ public interface IModelosYcomunicacionesService {
 	public DatosModelosComunicacionesDTO modeloYComunicacionesHistoricoSearch(HttpServletRequest request, DatosModelosComunicacionesSearch filtros);
 	public Error duplicarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem modeloComunicacion);
 	public Error borrarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem modeloComunicacion);
+
+	public ComboDTO obtenerPerfilesModelo(HttpServletRequest request, String idModeloComunicacion);
 	
 }

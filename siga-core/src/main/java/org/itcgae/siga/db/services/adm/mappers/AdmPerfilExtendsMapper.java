@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.adm.RolPerfilDTO;
 import org.itcgae.siga.DTOs.com.PerfilDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.mappers.AdmPerfilMapper;
@@ -62,10 +63,9 @@ public interface AdmPerfilExtendsMapper extends AdmPerfilMapper {
 	List<RolPerfilDTO> selectRolPerfilDistinctByExample(String idInstitucion,String idPerfil);
 	
 	@SelectProvider(type = AdmPerfilSqlProvider.class, method = "selectListadoPerfiles")
-	@Results({ @Result(column = "IDPERFIL", property = "idPerfil", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NIVELPERFIL", property = "idPlantillaEnvios", jdbcType = JdbcType.NUMERIC)
+	@Results({ @Result(column = "IDPERFIL", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 		})
-	List<PerfilDTO> selectListadoPerfiles(Short idInstitucion);
+	List<ComboItem> selectListadoPerfiles(Short idInstitucion);
 	
 }

@@ -30,11 +30,24 @@ public class ModelosYComunicacionesController {
 	@Autowired
 	PerfilServiceImpl perfilServiceImpl;
 	
-	@RequestMapping(value = "/perfiles",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<PerfilesDTO> perfiles(HttpServletRequest request) {
+	@RequestMapping(value = "/detalle/perfiles",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> perfiles(HttpServletRequest request) {
 		
-		PerfilesDTO response = perfilServiceImpl.getPerfiles(request);		
-		return new ResponseEntity<PerfilesDTO>(response, HttpStatus.OK);
+		ComboDTO response = perfilServiceImpl.getPerfiles(request);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/perfilesModelo",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> obtenerEtiquetasEnvio(HttpServletRequest request, @RequestBody String idModeloComuncacion) {
+		
+		ComboDTO response = _modelosYcomunicacionesService.obtenerPerfilesModelo(request, idModeloComuncacion);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/search",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
