@@ -20,7 +20,9 @@ public class DatosDireccionesItem {
 	private String idProvincia;
 	private String idPais;
 	private String telefono;
+	private String telefono2;
 	private String fax;
+	private String fax2;
 	private String movil;
 	private String correoElectronico;
 	private String poblacionExtranjera;
@@ -85,6 +87,22 @@ public class DatosDireccionesItem {
 
 	public String getFechaBaja() {
 		return fechaBaja;
+	}
+
+	public String getTelefono2() {
+		return telefono2;
+	}
+
+	public String getFax2() {
+		return fax2;
+	}
+
+	public void setTelefono2(String telefono2) {
+		this.telefono2 = telefono2;
+	}
+
+	public void setFax2(String fax2) {
+		this.fax2 = fax2;
 	}
 
 	public void setFechaBaja(String fechaBaja) {
