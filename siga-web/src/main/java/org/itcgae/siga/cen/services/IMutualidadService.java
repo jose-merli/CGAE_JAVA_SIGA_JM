@@ -1,6 +1,8 @@
 package org.itcgae.siga.cen.services;
 
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.itcgae.siga.DTOs.cen.CuotaYCapObjetivoDTO;
 import org.itcgae.siga.DTOs.cen.CuotaYCapitalObjetivoResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosSolicitudGratuitaDTO;
@@ -14,8 +16,8 @@ public interface IMutualidadService {
 	public MutualidadResponseDTO getEstadoSolicitud(EstadoSolicitudDTO estadoSolicitud);
 	public MutualidadResponseDTO getEstadoMutualista(EstadoMutualistaDTO estadoMutualistaDTO);
 	public MutualidadCombosDTO getEnums();
-	public MutualidadResponseDTO MGASolicitudPolizaAccuGratuitos(DatosSolicitudGratuitaDTO datosSolicitud);
-	public MutualidadResponseDTO MGASolicitudPolizaProfesional(DatosSolicitudGratuitaDTO datosSolicitud);
+	public MutualidadResponseDTO MGASolicitudPolizaAccuGratuitos(DatosSolicitudGratuitaDTO datosSolicitud, HttpServletRequest request);
+	public MutualidadResponseDTO MGASolicitudPolizaProfesional(DatosSolicitudGratuitaDTO datosSolicitud, HttpServletRequest request);
 	public CuotaYCapitalObjetivoResponseDTO ObtenerCuotaYCapObjetivo(CuotaYCapObjetivoDTO datosCuota);
 	
 }

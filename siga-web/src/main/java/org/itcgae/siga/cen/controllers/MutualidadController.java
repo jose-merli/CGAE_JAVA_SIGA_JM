@@ -1,6 +1,8 @@
 package org.itcgae.siga.cen.controllers;
 
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.itcgae.siga.DTOs.cen.CuotaYCapObjetivoDTO;
 import org.itcgae.siga.DTOs.cen.CuotaYCapitalObjetivoResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosSolicitudGratuitaDTO;
@@ -54,18 +56,18 @@ public class MutualidadController {
 	}
 	
 	@RequestMapping(value="/solicitudPolizaAccuGratuitos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<MutualidadResponseDTO> solicitudPolizaAccuGratuitos(@RequestBody DatosSolicitudGratuitaDTO estadoSolicitudDTO) {
+	ResponseEntity<MutualidadResponseDTO> solicitudPolizaAccuGratuitos(@RequestBody DatosSolicitudGratuitaDTO estadoSolicitudDTO, HttpServletRequest request) {
 		
-		MutualidadResponseDTO response = _mutualidadService.MGASolicitudPolizaAccuGratuitos(estadoSolicitudDTO);
+		MutualidadResponseDTO response = _mutualidadService.MGASolicitudPolizaAccuGratuitos(estadoSolicitudDTO,request);
 		if(response.getIdSolicitudRespuesta()!=null)
 			return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value="/solicitudPolizaProfesional",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<MutualidadResponseDTO> solicitudPolizaProfesional(@RequestBody DatosSolicitudGratuitaDTO estadoSolicitudDTO) {
+	ResponseEntity<MutualidadResponseDTO> solicitudPolizaProfesional(@RequestBody DatosSolicitudGratuitaDTO estadoSolicitudDTO, HttpServletRequest request) {
 		
-		MutualidadResponseDTO response = _mutualidadService.MGASolicitudPolizaProfesional(estadoSolicitudDTO);
+		MutualidadResponseDTO response = _mutualidadService.MGASolicitudPolizaProfesional(estadoSolicitudDTO,request);
 		if(response!=null)
 			return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<MutualidadResponseDTO>(response, HttpStatus.FORBIDDEN);
