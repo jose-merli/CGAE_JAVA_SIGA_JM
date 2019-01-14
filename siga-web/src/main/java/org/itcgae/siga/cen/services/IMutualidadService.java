@@ -17,8 +17,8 @@ public interface IMutualidadService {
 	public MutualidadResponseDTO getEstadoSolicitud(EstadoSolicitudDTO estadoSolicitud);
 	public MutualidadResponseDTO getEstadoMutualista(EstadoMutualistaDTO estadoMutualistaDTO);
 	public MutualidadCombosDTO getEnums();
-	public MutualidadResponseDTO MGASolicitudPolizaAccuGratuitos(DatosSolicitudGratuitaDTO datosSolicitud);
-	public MutualidadResponseDTO MGASolicitudPolizaProfesional(DatosSolicitudGratuitaDTO datosSolicitud);
+	public MutualidadResponseDTO MGASolicitudPolizaAccuGratuitos(DatosSolicitudGratuitaDTO datosSolicitud, HttpServletRequest request);
+	public MutualidadResponseDTO MGASolicitudPolizaProfesional(DatosSolicitudGratuitaDTO datosSolicitud, HttpServletRequest request);
 	public CuotaYCapitalObjetivoResponseDTO ObtenerCuotaYCapObjetivo(CuotaYCapObjetivoDTO datosCuota);
 	public CenSolicitudmutualidad obtenerSolicitud(CenSolicitudmutualidad datosCuota, HttpServletRequest request);
 	

@@ -2919,7 +2919,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							ForInscripcionExample forInscripcionExample = new ForInscripcionExample();
 							forInscripcionExample.createCriteria().andIdcursoEqualTo(cursoItem.getIdCurso())
 									.andIdestadoinscripcionEqualTo(SigaConstants.INSCRIPCION_APROBADA)
-									.andIdinstitucionEqualTo(idInstitucion).andCalificacionIsNull();
+									.andIdinstitucionEqualTo(curso.getIdinstitucion()).andCalificacionIsNotNull();
 
 							LOGGER.info(
 									"finishCourse() / forCursoExtendsMapper.selectByExample() -> Entrada a forCursoExtendsMapper para comprobar las calificaciones de los alumnos de un curso");
@@ -2932,7 +2932,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 							// Si se ha calificado previamente a todos los alumnos se finaliza el curso y
 							// Se generan los certificados para cada inscripcion
-							if (null == forInscripcionList || forInscripcionList.size() == 0) {
+							if (null != forInscripcionList && forInscripcionList.size() > 0) {
 
 								InscripcionItem inscripcionItem = new InscripcionItem();
 								inscripcionItem.setIdCurso(curso.getIdcurso().toString());

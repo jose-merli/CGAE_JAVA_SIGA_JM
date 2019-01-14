@@ -3,22 +3,22 @@ package org.itcgae.siga.cen.services.impl;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.datacontract.schemas._2004._07.ArrayOfIntegracionColegiadosBloque;
 import org.datacontract.schemas._2004._07.ArrayOfIntegracionDomicilio;
-import org.datacontract.schemas._2004._07.ArrayOfIntegracionSolicitudRespuesta;
-import org.datacontract.schemas._2004._07.IntegracionColegiadosBloque;
+import org.datacontract.schemas._2004._07.IntegracionBeneficiarios;
 import org.datacontract.schemas._2004._07.IntegracionCuotaYCapitalObjetivoJubilacion;
+import org.datacontract.schemas._2004._07.IntegracionDatosBancarios;
+import org.datacontract.schemas._2004._07.IntegracionDatosPoliza;
 import org.datacontract.schemas._2004._07.IntegracionDomicilio;
 import org.datacontract.schemas._2004._07.IntegracionEnumsCombos;
 import org.datacontract.schemas._2004._07.IntegracionPersona;
 import org.datacontract.schemas._2004._07.IntegracionSolicitud;
+import org.datacontract.schemas._2004._07.IntegracionSolicitudEstados;
 import org.datacontract.schemas._2004._07.IntegracionSolicitudRespuesta;
 import org.datacontract.schemas._2004._07.IntegracionTextoValor;
 import org.itcgae.siga.DTOs.cen.CuotaYCapObjetivoDTO;
@@ -31,20 +31,30 @@ import org.itcgae.siga.DTOs.cen.MutualidadResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboItemMutualidad;
 import org.itcgae.siga.DTOs.gen.ComboMutualidadDTO;
 import org.itcgae.siga.cen.services.IMutualidadService;
+
+import org.itcgae.siga.db.entities.CenInstitucion;
+
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenSolicitudmutualidad;
 import org.itcgae.siga.db.entities.CenSolicitudmutualidadExample;
+
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.CenSolicitudmutualidadMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
+
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.ws.client.ClientMutualidad;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.microsoft.schemas._2003._10.serialization.arrays.ArrayOfstring;
 
 import samples.servicemodel.microsoft.EstadoMutualistaDocument;
 import samples.servicemodel.microsoft.EstadoMutualistaDocument.EstadoMutualista;
@@ -52,8 +62,6 @@ import samples.servicemodel.microsoft.EstadoSolicitudDocument;
 import samples.servicemodel.microsoft.EstadoSolicitudDocument.EstadoSolicitud;
 import samples.servicemodel.microsoft.GetEnumsDocument;
 import samples.servicemodel.microsoft.GetEnumsDocument.GetEnums;
-import samples.servicemodel.microsoft.MGASolicitudPolizaAccuGratuitosBloqueDocument;
-import samples.servicemodel.microsoft.MGASolicitudPolizaAccuGratuitosBloqueDocument.MGASolicitudPolizaAccuGratuitosBloque;
 import samples.servicemodel.microsoft.MGASolicitudPolizaAccuGratuitosDocument;
 import samples.servicemodel.microsoft.MGASolicitudPolizaProfesionalDocument;
 import samples.servicemodel.microsoft.ObtenerCuotaYCapObjetivoDocument;
@@ -76,6 +84,8 @@ public class MutualidadServiceImpl implements IMutualidadService{
 	private CenSolicitudmutualidadMapper cenSolicitudmutualidadMapper;
 
 	
+	@Autowired
+	private CenInstitucionExtendsMapper cenInstitucionExtendsMapper;
 	
 	@Override
 	public MutualidadResponseDTO getEstadoSolicitud(EstadoSolicitudDTO estadoSolicitud) {
@@ -348,7 +358,7 @@ public class MutualidadServiceImpl implements IMutualidadService{
 	}
 
 	@Override
-	public MutualidadResponseDTO MGASolicitudPolizaAccuGratuitos(DatosSolicitudGratuitaDTO solicitud) {
+	public MutualidadResponseDTO MGASolicitudPolizaAccuGratuitos(DatosSolicitudGratuitaDTO solicitud, HttpServletRequest requestController) {
 		LOGGER.info("MGASolicitudPolizaAccuGratuitos() --> Entrada al servicio para solicitar la poliza gratuita");
 		
 		MutualidadResponseDTO response = new MutualidadResponseDTO();
@@ -412,50 +422,6 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			solicitudIntegracion.setIdTipoSolicitud(1);
 
 			
-//			IntegracionPersona persona = IntegracionPersona.Factory.newInstance();
-//			persona.setApellido1("SAIZ");
-//			persona.setApellido2("USANO");
-//			persona.setColegio("Ilustre Colegio De Abogados De Alcoy");
-//			persona.setEjerciente(1);
-//			Calendar cal = Calendar.getInstance();
-//			cal.setTime(new Date());
-//			persona.setFNacimiento(cal);
-//			cal.setTime(new Date());
-//			persona.setFNacimientoConyuge(cal);
-//			persona.setNIF("53054856C");
-//			persona.setNombre("JUAN ANTONIO");
-//			persona.setNumColegiado("5562");
-//			persona.setProfesion("ABOGADO");
-//			//Ver como pasarle el sexo
-//			persona.setSexo(1);
-//
-//			ArrayOfIntegracionDomicilio domicilios = ArrayOfIntegracionDomicilio.Factory.newInstance();
-//			IntegracionDomicilio domicilio = IntegracionDomicilio.Factory.newInstance();
-//
-//			domicilio.setCP("46015");
-//			domicilio.setDireccion("asdf");
-//			domicilio.setEmail("asdf@asdf.es");
-//			domicilio.setMovil("635351542");
-//			domicilio.setNum("1");
-//
-//			domicilio.setPoblacion("Valencia");
-//			domicilio.setProvincia("Valencia/València");
-//			domicilio.setTfno("123123123");
-//			domicilio.setTipoDireccion(1);
-//			domicilio.setTipoDomicilio(1);
-//			
-//			IntegracionDomicilio[] domi = (IntegracionDomicilio[]) Array.newInstance(IntegracionDomicilio.class, 1);
-//			domi[0] = IntegracionDomicilio.Factory.newInstance();
-//			domi[0] = domicilio;
-//			domicilios.setIntegracionDomicilioArray(domi);
-//			
-//			IntegracionSolicitud solicitudIntegracion = IntegracionSolicitud.Factory.newInstance();
-//			Calendar date = new GregorianCalendar();
-//			solicitudIntegracion.setFecha(date);
-//			solicitudIntegracion.setValorEntrada("53054856C");
-//			solicitudIntegracion.setIdTipoIdentificador(1);
-//			solicitudIntegracion.setIdTipoSolicitud(1);
-			
 			requestBody.setDatosDomicilio(domicilios);
 			requestBody.setDatosSolicitud(solicitudIntegracion);
 			requestBody.setDatosPersona(persona);
@@ -479,9 +445,13 @@ public class MutualidadServiceImpl implements IMutualidadService{
 	}
 
 	@Override
-	public MutualidadResponseDTO MGASolicitudPolizaProfesional(DatosSolicitudGratuitaDTO solicitud) {
+	public MutualidadResponseDTO MGASolicitudPolizaProfesional(DatosSolicitudGratuitaDTO solicitud, HttpServletRequest requestController) {
 		LOGGER.info("MGASolicitudPolizaProfesional() --> Entrada al servicio para solicitar la poliza profesional");
 		
+		String token = requestController.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		CenInstitucion institucion = cenInstitucionExtendsMapper.selectByPrimaryKey(idInstitucion);
 		MutualidadResponseDTO response = new MutualidadResponseDTO();
 		
 		GenParametrosExample example = new GenParametrosExample();
@@ -501,9 +471,11 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			if(solicitud.getDatosPersona().getApellido2() != null) {
 				persona.setApellido2(solicitud.getDatosPersona().getApellido2());
 			}
-			persona.setColegio(solicitud.getDatosPersona().getColegio());
+			
 			persona.setEjerciente(solicitud.getDatosPersona().getEjerciente());
+			persona.setAsistenciaSanitaria(solicitud.getDatosPersona().getAsistenciaSanitaria());
 			persona.setEstadoCivil(Integer.parseInt(solicitud.getDatosPersona().getEstadoCivil()));
+			persona.setColegio(institucion.getAbreviatura());
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(solicitud.getDatosPersona().getFechaNacimiento());
 			persona.setFNacimiento(cal);
@@ -515,31 +487,64 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			persona.setNacionalidad(solicitud.getDatosPersona().getNacionalidad());
 			persona.setNombre(solicitud.getDatosPersona().getNombre());
 			persona.setNumColegiado(solicitud.getDatosPersona().getNumColegiado());
-			persona.setProfesion(solicitud.getDatosPersona().getProfesion());
-			//Ver como pasarle el sexo
+			persona.setProfesion("Abogado");
+
 			persona.setSexo(Integer.parseInt(solicitud.getDatosPersona().getSexo()));
+			persona.setNumHijos(solicitud.getDatosPersona().getNumHijos());
+			if (null != solicitud.getDatosPersona().getEdadesHijos() && solicitud.getDatosPersona().getEdadesHijos().length>0) {
+				solicitud.getDatosPersona().getEdadesHijos();
+				ArrayOfstring edades = ArrayOfstring.Factory.newInstance();
+				edades.setStringArray(solicitud.getDatosPersona().getEdadesHijos());
+				persona.setEdadesHijos(edades);
+			}
+			
 			//colegiadosBloque.setDatosPersona(persona);
 			ArrayOfIntegracionDomicilio domicilios = ArrayOfIntegracionDomicilio.Factory.newInstance();
 			IntegracionDomicilio domicilio = IntegracionDomicilio.Factory.newInstance();
-//			domicilio.setBloque(solicitud.getDatosDireccion().getBloque());
+
 			domicilio.setCP(solicitud.getDatosDireccion().getCp());
 			domicilio.setDireccion(solicitud.getDatosDireccion().getDireccion());
 			domicilio.setEmail(solicitud.getDatosDireccion().getEmail());
-//			domicilio.setEsc(solicitud.getDatosDireccion().getEsc());
-//			domicilio.setLetra(solicitud.getDatosDireccion().getLetra());
 			domicilio.setMovil(solicitud.getDatosDireccion().getMovil());
-			domicilio.setNum(solicitud.getDatosDireccion().getNum());
-//			domicilio.setPiso(solicitud.getDatosDireccion().getPiso());
+			domicilio.setPais(solicitud.getDatosDireccion().getPais());
 			domicilio.setPoblacion(solicitud.getDatosDireccion().getPoblacion());
 			domicilio.setProvincia(solicitud.getDatosDireccion().getProvincia());
 			domicilio.setTfno(solicitud.getDatosDireccion().getTelefono());
-//			domicilio.setTipoDireccion(solicitud.getDatosDireccion().getTipoDireccion());
-//			domicilio.setTipoDomicilio(solicitud.getDatosDireccion().getTipoDomicilio());
-//			domicilio.setTipoVia(solicitud.getDatosDireccion().getTipoVia());
+			domicilio.setTipoDireccion(1);
+			domicilio.setTipoDomicilio(1);
+			domicilio.setDireccionContacto(1);
+			domicilio.setTipoVia("");
+			domicilio.setBloque("");
+			domicilio.setEsc("");
+			domicilio.setLetra("");
+			domicilio.setPiso("");
+			domicilio.setNum("");
+			IntegracionDomicilio domicilio2 = IntegracionDomicilio.Factory.newInstance();
+
+			domicilio2.setCP(solicitud.getDatosDireccion().getCp());
+			domicilio2.setDireccion(solicitud.getDatosDireccion().getDireccion());
+			domicilio2.setEmail(solicitud.getDatosDireccion().getEmail());
+			domicilio2.setMovil(solicitud.getDatosDireccion().getMovil());
+			domicilio2.setPais(solicitud.getDatosDireccion().getPais());
+			domicilio2.setPoblacion(solicitud.getDatosDireccion().getPoblacion());
+			domicilio2.setProvincia(solicitud.getDatosDireccion().getProvincia());
+			domicilio2.setTfno(solicitud.getDatosDireccion().getTelefono());
+			domicilio2.setTipoDireccion(2);
+			domicilio2.setTipoDomicilio(2);
+			domicilio2.setDireccionContacto(2);
+			domicilio2.setTipoVia("");
+			domicilio2.setBloque("");
+			domicilio2.setEsc("");
+			domicilio2.setLetra("");
+			domicilio2.setPiso("");
+			domicilio2.setNum("");
 			
-			IntegracionDomicilio[] domi = (IntegracionDomicilio[]) Array.newInstance(IntegracionDomicilio.class, 1);
+			IntegracionDomicilio[] domi = (IntegracionDomicilio[]) Array.newInstance(IntegracionDomicilio.class, 2);
 			domi[0] = IntegracionDomicilio.Factory.newInstance();
 			domi[0] = domicilio;
+			domi[1] = IntegracionDomicilio.Factory.newInstance();
+			domi[1] = domicilio2;
+			
 			domicilios.setIntegracionDomicilioArray(domi);
 			
 			IntegracionSolicitud solicitudIntegracion = IntegracionSolicitud.Factory.newInstance();
@@ -547,57 +552,42 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			solicitudIntegracion.setFecha(date);
 			solicitudIntegracion.setValorEntrada(persona.getNIF());
 			solicitudIntegracion.setIdTipoIdentificador(1);
-			solicitudIntegracion.setIdTipoSolicitud(1);
+			solicitudIntegracion.setIdTipoSolicitud(2);
 
 			
-//			IntegracionPersona persona = IntegracionPersona.Factory.newInstance();
-//			persona.setApellido1("SAIZ");
-//			persona.setApellido2("USANO");
-//			persona.setColegio("Ilustre Colegio De Abogados De Alcoy");
-//			persona.setEjerciente(1);
-//			Calendar cal = Calendar.getInstance();
-//			cal.setTime(new Date());
-//			persona.setFNacimiento(cal);
-//			cal.setTime(new Date());
-//			persona.setFNacimientoConyuge(cal);
-//			persona.setNIF("53054856C");
-//			persona.setNombre("JUAN ANTONIO");
-//			persona.setNumColegiado("5562");
-//			persona.setProfesion("ABOGADO");
-//			//Ver como pasarle el sexo
-//			persona.setSexo(1);
-//
-//			ArrayOfIntegracionDomicilio domicilios = ArrayOfIntegracionDomicilio.Factory.newInstance();
-//			IntegracionDomicilio domicilio = IntegracionDomicilio.Factory.newInstance();
-//
-//			domicilio.setCP("46015");
-//			domicilio.setDireccion("asdf");
-//			domicilio.setEmail("asdf@asdf.es");
-//			domicilio.setMovil("635351542");
-//			domicilio.setNum("1");
-//
-//			domicilio.setPoblacion("Valencia");
-//			domicilio.setProvincia("Valencia/València");
-//			domicilio.setTfno("123123123");
-//			domicilio.setTipoDireccion(1);
-//			domicilio.setTipoDomicilio(1);
-//			
-//			IntegracionDomicilio[] domi = (IntegracionDomicilio[]) Array.newInstance(IntegracionDomicilio.class, 1);
-//			domi[0] = IntegracionDomicilio.Factory.newInstance();
-//			domi[0] = domicilio;
-//			domicilios.setIntegracionDomicilioArray(domi);
-//			
-//			IntegracionSolicitud solicitudIntegracion = IntegracionSolicitud.Factory.newInstance();
-//			Calendar date = new GregorianCalendar();
-//			solicitudIntegracion.setFecha(date);
-//			solicitudIntegracion.setValorEntrada("53054856C");
-//			solicitudIntegracion.setIdTipoIdentificador(1);
-//			solicitudIntegracion.setIdTipoSolicitud(1);
+			IntegracionDatosBancarios datosBancarios = IntegracionDatosBancarios.Factory.newInstance();
+			datosBancarios.setEntidad(solicitud.getDatosBancarios().getEntidad());
+			datosBancarios.setDC(solicitud.getDatosBancarios().getDc());
+			datosBancarios.setIban(solicitud.getDatosBancarios().getIban());
+			datosBancarios.setNCuenta(solicitud.getDatosBancarios().getnCuenta());
+			datosBancarios.setSwift(solicitud.getDatosBancarios().getSwift());
+			datosBancarios.setOficina(solicitud.getDatosBancarios().getOficina());
+			datosBancarios.setTipoCuenta(1);
+
+			IntegracionBeneficiarios datosBeneficiarios = IntegracionBeneficiarios.Factory.newInstance();
+			//datosBeneficiarios.setIdPoliza(solicitud.getDatosBeneficiario().getIdPoliza());
+			datosBeneficiarios.setIdTipoBeneficiario(solicitud.getDatosBeneficiario().getIdTipoBeneficiario());
+			datosBeneficiarios.setTextoOtros(solicitud.getDatosBeneficiario().getTextoOtros());
 			
+			
+			IntegracionDatosPoliza datosPoliza = IntegracionDatosPoliza.Factory.newInstance();
+			datosPoliza.setFormaPago(solicitud.getDatosPoliza().getFormaPago());
+			datosPoliza.setTextoOtros(solicitud.getDatosPoliza().getTextoOtros());
+			datosPoliza.setOpcionesCobertura(solicitud.getDatosPoliza().getOpcionesCobertura());
+			
+			
+			IntegracionSolicitudEstados datosSolicitudEstado = IntegracionSolicitudEstados.Factory.newInstance();
+		
+			requestBody.setDatosBancarios(datosBancarios);
 			requestBody.setDatosDomicilio(domicilios);
 			requestBody.setDatosSolicitud(solicitudIntegracion);
 			requestBody.setDatosPersona(persona);
-			request.setMGASolicitudPolizaProfesional(requestBody);
+
+			requestBody.setDatosBeneficiarios(datosBeneficiarios);
+			requestBody.setDatosPoliza(datosPoliza);
+			
+			requestBody.setDatosSolicitudEstados(datosSolicitudEstado);
+			request.setMGASolicitudPolizaProfesional(requestBody); 
 			try {
 				IntegracionSolicitudRespuesta responseWS = _clientMutualidad.MGASolicitudPolizaProfesional(request, uriService);
 				response.setIdSolicitud(responseWS.getIdSolicitud());
@@ -618,8 +608,6 @@ public class MutualidadServiceImpl implements IMutualidadService{
 	@Override
 	public CuotaYCapitalObjetivoResponseDTO ObtenerCuotaYCapObjetivo(CuotaYCapObjetivoDTO datosCuota) {
 		LOGGER.info("MGASolicitudPolizaProfesional() --> Entrada al servicio para obtener la cuota y capital objetivo");
-		
-		MutualidadResponseDTO response = new MutualidadResponseDTO();
 		
 		GenParametrosExample example = new GenParametrosExample();
 		example.createCriteria().andIdrecursoEqualTo("administracion.parametro.url_ws_mutualidad");
