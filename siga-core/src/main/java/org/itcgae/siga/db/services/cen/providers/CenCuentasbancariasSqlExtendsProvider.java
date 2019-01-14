@@ -63,7 +63,7 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		sql.INNER_JOIN("CEN_BANCOS BANCO ON BANCO.CODIGO = CUENTA.CBO_CODIGO");
 
 		sql.WHERE("PER.IDPERSONA = '"+datosBancariosSearchDTO.getIdPersona()+"'");
-		sql.WHERE("CUENTA.FECHABAJA is null");
+		//sql.WHERE("CUENTA.FECHABAJA is null");
 		sql.WHERE("CUENTA.IDCUENTA = '"+datosBancariosSearchDTO.getIdCuenta()+"'");
 		sql.WHERE("CUENTA.IDINSTITUCION = '"+idInstitucion+"'");
 		

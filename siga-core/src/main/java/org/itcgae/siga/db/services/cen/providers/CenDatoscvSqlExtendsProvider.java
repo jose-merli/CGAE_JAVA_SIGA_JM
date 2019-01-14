@@ -3,18 +3,20 @@ package org.itcgae.siga.db.services.cen.providers;
 import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesSearchDTO;
 import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.mappers.CenDatoscvSqlProvider;
 
 public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 	
-	public String searchDatosCurriculares(String idPersona, String idInstitucion) {
+	public String searchDatosCurriculares(String idPersona, boolean historico, String idInstitucion) {
 		SQL sql = new SQL();
 		SQL sql1 = new SQL();
 		
 		sql.SELECT("TO_CHAR(FECHAINICIO,'DD/MM/YYYY') AS FECHADESDE");
 		sql.SELECT("TO_CHAR(FECHAFIN,'DD/MM/YYYY') AS FECHAHASTA");
 		sql.SELECT("TO_CHAR(FECHAMOVIMIENTO,'DD/MM/YYYY') AS FECHAMOVIMIENTO");
+		sql.SELECT("TO_CHAR(FECHABAJA,'DD/MM/YYYY') AS FECHABAJA");
 		sql1.SELECT("F_SIGA_GETRECURSO(DESCRIPCION,1) AS LABEL FROM CEN_TIPOSCV E WHERE IDTIPOCV = DATOS.IDTIPOCV");
 		sql.SELECT("DATOS.DESCRIPCION, (" + sql1 + ")  AS CATEGORIACURRICULAR");		
 		sql.SELECT("DATOS.DESCRIPCION, (" + sql1 + ")  AS DESCRIPCION");		
@@ -33,6 +35,9 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 		sql.LEFT_OUTER_JOIN("CEN_TIPOSCVSUBTIPO2 SUB2 ON (SUB2.IDTIPOCVSUBTIPO2 = DATOS.IDTIPOCVSUBTIPO2 AND TIPOS.IDTIPOCV = SUB2.IDTIPOCV AND DATOS.IDINSTITUCION = SUB2.IDINSTITUCION) ");
 		sql.WHERE("DATOS.IDINSTITUCION = '"+idInstitucion+"'");
 		sql.WHERE("DATOS.IDPERSONA = '"+idPersona+"'");
+		if (!historico) {
+			sql.WHERE("DATOS.FECHABAJA is null");
+		}
 		
 		return sql.toString();
 	}

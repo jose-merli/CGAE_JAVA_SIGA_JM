@@ -61,7 +61,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 
 		if (null != idInstitucion) {
 			fichaDatosCurricularesItem = cenDatoscvExtendsMapper.searchDatosCurriculares(
-					fichaDatosCurricularesSearchDTO.getIdPersona(), String.valueOf(idInstitucion));
+					fichaDatosCurricularesSearchDTO.getIdPersona(), fichaDatosCurricularesSearchDTO.getHistorico(), String.valueOf(idInstitucion));
 			fichaDatosCurricularesDTO.setFichaDatosCurricularesItem(fichaDatosCurricularesItem);
 
 		}
