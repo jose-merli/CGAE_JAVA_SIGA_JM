@@ -1,6 +1,5 @@
 package org.itcgae.siga.com.services.impl;
 
-import static org.mockito.Matchers.intThat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -273,7 +272,6 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		return respuesta;
 	}
 
-
 	@Override
 	public Error asociarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO consulta) {
 		LOGGER.info("asociarConsulta() -> Entrada al servicio para asociar una consulta a la plantilla de envio");
@@ -296,7 +294,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					AdmUsuarios usuario = usuarios.get(0);
 					ModPlantillaenvioConsulta consultaAsoc = new ModPlantillaenvioConsulta();
 					consultaAsoc.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
-					consultaAsoc.setIdplantillaenvios(Short.valueOf(consulta.getIdPlantilla()));
+					consultaAsoc.setIdplantillaenvios(Short.valueOf(consulta.getIdPlantillaEnvios()));
 					consultaAsoc.setIdinstitucion(idInstitucion);
 					consultaAsoc.setIdtipoenvios(Short.valueOf(consulta.getIdTipoEnvio()));
 					consultaAsoc.setUsumodificacion(usuario.getIdusuario());
@@ -340,7 +338,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					AdmUsuarios usuario = usuarios.get(0);
 					ModPlantillaenvioConsultaKey key = new ModPlantillaenvioConsultaKey();
 					key.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
-					key.setIdplantillaenvios(Short.valueOf(consulta.getIdPlantilla()));
+					key.setIdplantillaenvios(Short.valueOf(consulta.getIdPlantillaEnvios()));
 					ModPlantillaenvioConsulta con = _modPlantillaenvioConsultaMapper.selectByPrimaryKey(key);
 					con.setFechabaja(new Date());
 					con.setUsumodificacion(usuario.getIdusuario());
@@ -361,7 +359,6 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		LOGGER.info("borrarConsulta() -> Salida del servicio para borrar una consulta a la plantilla de envio");
 		return respuesta;
 	}
-
 
 	@Override
 	public Error guardarRemitente(HttpServletRequest request, RemitenteDTO remitente) {
@@ -467,7 +464,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					
 					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
 					key.setIdinstitucion(idInstitucion);
-					key.setIdplantillaenvios(Short.valueOf(datosPlantilla.getIdPlantilla()));
+					key.setIdplantillaenvios(Short.valueOf(datosPlantilla.getIdPlantillaEnvios()));
 					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvio()));
 					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
 					CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(plantilla.getIdpersona());

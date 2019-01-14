@@ -2,16 +2,17 @@ package org.itcgae.siga.DTOs.com;
 
 public class PlantillaDatosConsultaDTO {
 	
-	private String idPlantilla;
+	private String idPlantillaEnvios;
 	private String idTipoEnvio;
 	private String idConsulta;
 	
 	
-	public String getIdPlantilla() {
-		return idPlantilla;
+
+	public String getIdPlantillaEnvios() {
+		return idPlantillaEnvios;
 	}
-	public void setIdPlantilla(String idPlantilla) {
-		this.idPlantilla = idPlantilla;
+	public void setIdPlantillaEnvios(String idPlantillaEnvios) {
+		this.idPlantillaEnvios = idPlantillaEnvios;
 	}
 	public String getIdTipoEnvio() {
 		return idTipoEnvio;

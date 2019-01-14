@@ -45,7 +45,7 @@ public class PlantillasEnvioController {
 	}
 	
 	@RequestMapping(value = "/datosGenerales",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> PlantillasEnvioSearch(HttpServletRequest request, @RequestBody TarjetaConfiguracionDto datosTarjeta) {
+	ResponseEntity<Error> guardarDatosGenerales(HttpServletRequest request, @RequestBody TarjetaConfiguracionDto datosTarjeta) {
 		
 		Error respuesta = _plantillasEnvioService.guardarDatosGenerales(request, datosTarjeta);
 		
@@ -57,9 +57,21 @@ public class PlantillasEnvioController {
 	}
 	
 	@RequestMapping(value = "/asociarConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> guardarConsulta(HttpServletRequest request, @RequestBody PlantillaDatosConsultaDTO consulta) {
+	ResponseEntity<Error> asociarConsulta(HttpServletRequest request, @RequestBody PlantillaDatosConsultaDTO consulta) {
 		
 		Error respuesta = _plantillasEnvioService.asociarConsulta(request, consulta);
+		
+		if(respuesta.getCode()== 200)
+			return new ResponseEntity<Error>(respuesta, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+	}
+	
+	@RequestMapping(value = "/desasociarConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> desasociarConsulta(HttpServletRequest request, @RequestBody PlantillaDatosConsultaDTO consulta) {
+		
+		Error respuesta = _plantillasEnvioService.borrarConsulta(request, consulta);
 		
 		if(respuesta.getCode()== 200)
 			return new ResponseEntity<Error>(respuesta, HttpStatus.OK);
@@ -80,7 +92,6 @@ public class PlantillasEnvioController {
 		
 	}
 	
-	
 	@RequestMapping(value = "/consultasPlantillas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ConsultasDTO> obtenerConsultasPlantilla(HttpServletRequest request, @RequestBody TarjetaConfiguracionDto consulta) {
 		
@@ -92,6 +103,7 @@ public class PlantillasEnvioController {
 			return new ResponseEntity<ConsultasDTO>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
 		
 	}
+	
 	@RequestMapping(value = "/consultasDisp",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> obtenerConsultas(HttpServletRequest request) {
 		
@@ -126,4 +138,15 @@ public class PlantillasEnvioController {
 		
 	}
 	
+	@RequestMapping(value = "/guardarRemitente",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardarRemitente(HttpServletRequest request, @RequestBody RemitenteDTO remitente) {
+		
+		Error respuesta = _plantillasEnvioService.guardarRemitente(request, remitente);
+		
+		if(respuesta.getCode()== 200)
+			return new ResponseEntity<Error>(respuesta, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+	}
 }
