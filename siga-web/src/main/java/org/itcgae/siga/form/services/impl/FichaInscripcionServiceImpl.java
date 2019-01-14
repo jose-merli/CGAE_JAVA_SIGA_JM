@@ -307,11 +307,9 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 					
 					for (ForCertificadoscurso forCertificadosCurso : listCertificadosCurso) {
 						PysProductossolicitados pysRecord = new PysProductossolicitados();
-						
-						NewIdDTO idPeticion = pysProductosSolicitadosExtendsMapper.selectMaxIdPeticion(idInstitucion, forCertificadosCurso.getIdtipoproducto().shortValue(), forCertificadosCurso.getIdproducto(), forCertificadosCurso.getIdproductoinstitucion());
-						
+											
 						pysRecord.setIdinstitucion(idInstitucion);
-						pysRecord.setIdpeticion(Long.parseLong(idPeticion.getNewId()));
+						pysRecord.setIdpeticion(inscripcionItem.getIdPeticionSuscripcion());
 						pysRecord.setIdtipoproducto(forCertificadosCurso.getIdtipoproducto()!=null ? forCertificadosCurso.getIdtipoproducto().shortValue() : null);
 						pysRecord.setIdproducto(forCertificadosCurso.getIdproducto());
 						pysRecord.setIdproductoinstitucion(forCertificadosCurso.getIdproductoinstitucion());
@@ -322,7 +320,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 						pysRecord.setValor(forCertificadosCurso.getPrecio());
 						pysRecord.setFechamodificacion(new Date());
 						pysRecord.setUsumodificacion(usuario.getIdusuario());
-						pysRecord.setIddireccion(1L);
+//						pysRecord.setIddireccion(1L);
 						pysRecord.setIdinstitucionorigen(idInstitucion);
 						pysRecord.setNofacturable("1");
 						pysRecord.setFecharecepcionsolicitud(new Date());
@@ -369,6 +367,32 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 		LOGGER.info("generarSolicitudCertificados() -> Salida del servicio para insertar una inscripcion");
 		
 		return insertResponseDTO;
+	}
+
+	@Override
+	public String compruebaMinimaAsistencia(InscripcionItem inscripcionItem, HttpServletRequest request)
+	{
+		LOGGER.info("compruebaMinimaAsistencia() -> Entrada del servicio comprobar la minimaAsistencia");
+		
+		String minimaAsistencia = "";
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		Long idInscripcion = inscripcionItem.getIdInscripcion();
+
+		try {
+			NewIdDTO checkMinimaAsistencia = forInscripcionExtendsMapper.checkMinimaAsistencia(idInstitucion,
+					idInscripcion);
+
+			minimaAsistencia = checkMinimaAsistencia.getNewId();
+		} catch (Exception e) {
+			minimaAsistencia = "0";
+		}
+		
+		LOGGER.info("compruebaMinimaAsistencia() -> Salida del servicio comprobar la minimaAsistencia");
+		
+		return minimaAsistencia;
 	}
 	
 }

@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.datacontract.schemas._2004._07.ArrayOfIntegracionColegiadosBloque;
 import org.datacontract.schemas._2004._07.ArrayOfIntegracionDomicilio;
@@ -29,9 +31,17 @@ import org.itcgae.siga.DTOs.cen.MutualidadResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboItemMutualidad;
 import org.itcgae.siga.DTOs.gen.ComboMutualidadDTO;
 import org.itcgae.siga.cen.services.IMutualidadService;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenSolicitudmutualidad;
+import org.itcgae.siga.db.entities.CenSolicitudmutualidadExample;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.mappers.CenSolicitudmutualidadMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.ws.client.ClientMutualidad;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,6 +68,13 @@ public class MutualidadServiceImpl implements IMutualidadService{
 	
 	@Autowired
 	private ClientMutualidad _clientMutualidad;
+
+	@Autowired
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+
+	@Autowired
+	private CenSolicitudmutualidadMapper cenSolicitudmutualidadMapper;
+
 	
 	
 	@Override
@@ -639,4 +656,40 @@ public class MutualidadServiceImpl implements IMutualidadService{
 		return cuotaCapitalResponse;
 	}
 
+	
+	@Override
+	public CenSolicitudmutualidad obtenerSolicitud(CenSolicitudmutualidad datosCuota, HttpServletRequest request) {
+		LOGGER.info("MGASolicitudPolizaProfesional() --> Entrada al servicio para obtener la cuota y capital objetivo");
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		CenSolicitudmutualidad solicitudResponse = new CenSolicitudmutualidad();
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"updateColegiado() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"updateColegiado() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				CenSolicitudmutualidadExample ejemplo = new CenSolicitudmutualidadExample();
+				ejemplo.createCriteria().andNumeroidentificadorEqualTo(datosCuota.getNumeroidentificador()).andIdinstitucionEqualTo(idInstitucion);
+				List<CenSolicitudmutualidad> solicMutualidad = new ArrayList<CenSolicitudmutualidad>();
+				solicMutualidad = cenSolicitudmutualidadMapper.selectByExample(ejemplo);
+				if(solicMutualidad.size() > 0) {
+					solicitudResponse = solicMutualidad.get(0);
+				}
+			}else {
+				LOGGER.warn("deleteDatosCurriculares() / admUsuariosExtendsMapper.selectByExample() -> "
+						+ SigaConstants.KO + ". No existen ningún usuario en base de datos");
+			}
+			LOGGER.info("MGASolicitudPolizaProfesional() --> Salida del servicio para obtener la cuota y capital objetivo");
+		}
+		return solicitudResponse;
+	}
+	
 }

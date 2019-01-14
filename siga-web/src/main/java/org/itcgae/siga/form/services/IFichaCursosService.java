@@ -91,4 +91,8 @@ public interface IFichaCursosService {
 
 	public UpdateResponseDTO deleteCertificatesCourse(CertificadoCursoDTO certifcadoCursoDTO, HttpServletRequest request);
 
+	public UpdateResponseDTO releaseCourse(CursoDTO cursoDTO , HttpServletRequest request);
+
+	public UpdateResponseDTO announceCourse(CursoDTO cursoDTO , HttpServletRequest request);
+
 }

@@ -5,26 +5,25 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class DocuShareObjectVO implements Comparable<DocuShareObjectVO>{
+@javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
+public class DocuShareObjectVO  {
 
-	public static enum DocuShareTipo {
-		COLLECTION
-		, DOCUMENT
-	}
-	
+	 
+
 	private String id;
-	private String title;	
+	private String title;
 	private String description;
-	private DocuShareTipo tipo;
+	private String tipo;
 	private Date fechaModificacion;
 	private long sizeKB;
 	private String summary;
 	private String originalFilename;
-	
-	public DocuShareObjectVO(DocuShareTipo tipo) {
-		this.tipo = tipo;
-	}
+	private String idPersona;
+ 
 
+
+
+	@JsonProperty("id")
 	public String getId() {
 		return id;
 	}
@@ -33,6 +32,15 @@ public class DocuShareObjectVO implements Comparable<DocuShareObjectVO>{
 		this.id = id;
 	}
 
+	/**
+	 *
+	 */
+	public DocuShareObjectVO title(String title) {
+		this.title = title;
+		return this;
+	}
+
+	@JsonProperty("title")
 	public String getTitle() {
 		return title;
 	}
@@ -41,11 +49,20 @@ public class DocuShareObjectVO implements Comparable<DocuShareObjectVO>{
 		this.title = title;
 	}
 
-	public DocuShareTipo getTipo() {
+	/**
+	*
+	*/
+	public DocuShareObjectVO tipo(String tipo) {
+		this.tipo = tipo;
+		return this;
+	}
+
+	@JsonProperty("tipo")
+	public String getTipo() {
 		return tipo;
 	}
 
-	public void setTipo(DocuShareTipo tipo) {
+	public void setTipo(String tipo) {
 		this.tipo = tipo;
 	}
 
@@ -55,7 +72,17 @@ public class DocuShareObjectVO implements Comparable<DocuShareObjectVO>{
 		}
 		return 0;
 	}
+	/**
+	 *
+	 */
+	public DocuShareObjectVO fechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
+		return this;
+	}
 
+	
+
+	@JsonProperty("fechaModificacion")
 	public Date getFechaModificacion() {
 		return fechaModificacion;
 	}
@@ -63,7 +90,14 @@ public class DocuShareObjectVO implements Comparable<DocuShareObjectVO>{
 	public void setFechaModificacion(Date fechaModificacion) {
 		this.fechaModificacion = fechaModificacion;
 	}
-
+	/**
+	 *
+	 */
+	public DocuShareObjectVO sizeKB(Long sizeKB) {
+		this.sizeKB = sizeKB;
+		return this;
+	}
+	@JsonProperty("sizeKB")
 	public long getSizeKB() {
 		return sizeKB;
 	}
@@ -72,6 +106,15 @@ public class DocuShareObjectVO implements Comparable<DocuShareObjectVO>{
 		this.sizeKB = sizeKB;
 	}
 
+	/**
+	 *
+	 */
+	public DocuShareObjectVO description(String description) {
+		this.description = description;
+		return this;
+	}
+
+	@JsonProperty("description")
 	public String getDescription() {
 		return description;
 	}
@@ -79,7 +122,16 @@ public class DocuShareObjectVO implements Comparable<DocuShareObjectVO>{
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	/**
+	 *
+	 */
+	public DocuShareObjectVO summary(String summary) {
+		this.summary = summary;
+		return this;
+	}
 
+
+	@JsonProperty("summary")
 	public String getSummary() {
 		return summary;
 	}
@@ -87,7 +139,16 @@ public class DocuShareObjectVO implements Comparable<DocuShareObjectVO>{
 	public void setSummary(String summary) {
 		this.summary = summary;
 	}
+	/**
+	 *
+	 */
+	public DocuShareObjectVO originalFilename(String originalFilename) {
+		this.originalFilename = originalFilename;
+		return this;
+	}
 
+	
+	@JsonProperty("originalFilename")
 	public String getOriginalFilename() {
 		return originalFilename;
 	}
@@ -96,7 +157,21 @@ public class DocuShareObjectVO implements Comparable<DocuShareObjectVO>{
 		this.originalFilename = originalFilename;
 	}
 
+	/**
+	 *
+	 */
+	public DocuShareObjectVO idPersona(String idPersona) {
+		this.idPersona = idPersona;
+		return this;
+	}
 
+	@JsonProperty("idPersona")
+	public String getIdPersona() {
+		return idPersona;
+	}
 
-	
+	public void setIdPersona(String idPersona) {
+		this.idPersona = idPersona;
+	}
+
 }

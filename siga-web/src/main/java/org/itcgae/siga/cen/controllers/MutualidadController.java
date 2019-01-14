@@ -1,6 +1,8 @@
 package org.itcgae.siga.cen.controllers;
 
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.itcgae.siga.DTOs.cen.CuotaYCapObjetivoDTO;
 import org.itcgae.siga.DTOs.cen.CuotaYCapitalObjetivoResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosSolicitudGratuitaDTO;
@@ -9,6 +11,7 @@ import org.itcgae.siga.DTOs.cen.EstadoSolicitudDTO;
 import org.itcgae.siga.DTOs.cen.MutualidadCombosDTO;
 import org.itcgae.siga.DTOs.cen.MutualidadResponseDTO;
 import org.itcgae.siga.cen.services.IMutualidadService;
+import org.itcgae.siga.db.entities.CenSolicitudmutualidad;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -78,6 +81,16 @@ public class MutualidadController {
 		if(response!=null)
 			return new ResponseEntity<CuotaYCapitalObjetivoResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<CuotaYCapitalObjetivoResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	
+	@RequestMapping(value="/searchSolicitud",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<CenSolicitudmutualidad> obtenerSolicitud(@RequestBody CenSolicitudmutualidad datosSolicitud, HttpServletRequest request) {
+		
+		CenSolicitudmutualidad response = _mutualidadService.obtenerSolicitud(datosSolicitud, request);
+		if(response!=null)
+			return new ResponseEntity<CenSolicitudmutualidad>(response, HttpStatus.OK);
+		else return new ResponseEntity<CenSolicitudmutualidad>(response, HttpStatus.FORBIDDEN);
 	}
 
 }

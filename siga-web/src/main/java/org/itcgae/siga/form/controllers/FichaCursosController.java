@@ -239,4 +239,16 @@ public class FichaCursosController {
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "fichaCursos/releaseCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> releaseCourse(@RequestBody CursoDTO cursoDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaCursosService.releaseCourse(cursoDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/announceCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> announceCourse(@RequestBody CursoDTO cursoDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaCursosService.announceCourse(cursoDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
 }
