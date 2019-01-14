@@ -41,7 +41,7 @@ public class DocushareHelper {
 
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
-	private static boolean MODO_DEBUG_LOCAL = true;
+	private static boolean MODO_DEBUG_LOCAL = false;
 	private static String DOCUSHARE_HOST = "DOCUSHARE_HOST";
 	private static String DOCUSHARE_PORT = "DOCUSHARE_PORT";
 	private static String DOCUSHARE_DOMAIN = "DOCUSHARE_DOMAIN";
@@ -175,7 +175,27 @@ public class DocushareHelper {
 		}
 
 	}
-
+//	private String getValor(GenParametrosService genParametrosService, String idParametro, boolean oInstitucion0) throws SIGAServiceException {
+//		
+//		GenParametros genParametros = new GenParametros();
+//		genParametros.setIdinstitucion(this.idInstitucion);
+//		genParametros.setModulo(MODULO.GEN.name());
+//		genParametros.setParametro(idParametro);
+//		
+//		if (oInstitucion0) {
+//			genParametros = genParametrosService.getGenParametroInstitucionORvalor0(genParametros);
+//		} else {
+//			genParametros = genParametrosService.get(genParametros);
+//		}
+//			
+//		
+//		if (genParametros == null || genParametros.getValor() == null || genParametros.getValor().trim().equals("")) {
+//			String error = String.format("El parámetro %s no está configurado correctamente para el colegio %s", idParametro, this.idInstitucion);
+//			log.error(error);
+//			throw new SIGAServiceException(error);
+//		}
+//		return genParametros.getValor();
+//	}
 	/**
 	 * Busca una collection a partir de una path y un nombre de collection
 	 * 
@@ -200,7 +220,7 @@ public class DocushareHelper {
 			listaParametros.add(pathRecibido);
 
 			GenParametrosExample example = new GenParametrosExample();
-			example.createCriteria().andParametroIn(listaParametros);
+			example.createCriteria().andParametroEqualTo(pathRecibido).andIdinstitucionEqualTo(this.idInstitucion);
 			List<GenParametros> config = genParametrosMapper.selectByExample(example);
 
 			String path = config.get(0).getValor();

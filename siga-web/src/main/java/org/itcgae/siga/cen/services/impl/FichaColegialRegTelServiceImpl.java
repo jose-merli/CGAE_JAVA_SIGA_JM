@@ -38,7 +38,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		dir = docushareHelper.buscaCollectionCenso("prueba", idInstitucion);
+		dir = docushareHelper.buscaCollectionCenso(idPersona, idInstitucion);
 		List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(dir);
 		docushareDTO.setDocuShareObjectVO(docus);
 		return docushareDTO;
@@ -52,7 +52,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		dir = docushareHelper.buscaCollectionCenso("prueba/" + docu.getTitle(), idInstitucion);
+		dir = docushareHelper.buscaCollectionCenso(docu.getIdPersona()+ "/" + docu.getTitle(), idInstitucion);
 		List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(dir);
 		docushareDTO.setDocuShareObjectVO(docus);
 		return docushareDTO;
@@ -65,7 +65,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		dir = docushareHelper.buscaCollectionCenso("prueba/" + docushareObjectVO.getTitle(), idInstitucion);
+		dir = docushareHelper.buscaCollectionCenso(docushareObjectVO.getIdPersona()+"/" + docushareObjectVO.getTitle(), idInstitucion);
 		List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(dir);
 		// Se convierte el fichero en array de bytes para enviarlo al front
 		File file = new File(dir);
