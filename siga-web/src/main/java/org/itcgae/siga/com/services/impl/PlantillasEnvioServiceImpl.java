@@ -1,14 +1,19 @@
 package org.itcgae.siga.com.services.impl;
 
+import static org.mockito.Matchers.intThat;
+
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDatosConsultaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
@@ -22,11 +27,19 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IPlantillasEnvioService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenDireccionesKey;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.ConConsulta;
+import org.itcgae.siga.db.entities.ConConsultaKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenvios;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
+import org.itcgae.siga.db.mappers.CenDireccionesMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
+import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -55,7 +68,15 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	
 	@Autowired
 	private ConConsultasExtendsMapper _conConsultasExtendsMapper;
+	
+	@Autowired
+	private CenPersonaMapper _cenPersonaMapper;
 
+	@Autowired 
+	private CenDireccionesMapper _cenDireccionesMapper;
+	
+	@Autowired
+	private ConConsultaMapper _conConsultaMapper;
 
 	@Override
 	public ComboDTO getComboConsultas(HttpServletRequest request) {
@@ -160,9 +181,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						plantillaEnvioKey.setIdplantillaenvios(Short.valueOf(plantillasEnvio[i].getIdPlantillaEnvios()));
 						plantillaEnvioKey.setIdinstitucion(Short.valueOf(plantillasEnvio[i].getIdInstitucion()));
 						EnvPlantillasenvios plantillaEnvios = _envPlantillasenviosMapper.selectByPrimaryKey(plantillaEnvioKey);
-		
-						
-						if( idInstitucion == plantillaEnvios.getIdinstitucion()){
+						if(idInstitucion == plantillaEnvios.getIdinstitucion()){
 								plantillaEnvios.setFechabaja(new Date());
 								plantillaEnvios.setFechamodificacion(new Date());
 								plantillaEnvios.setUsumodificacion(usuario.getIdusuario());
@@ -363,6 +382,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			LOGGER.info("guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
 					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
 					key.setIdinstitucion(idInstitucion);
 					key.setIdplantillaenvios(Short.valueOf(remitente.getIdPlantillaEnvios()));
@@ -371,6 +391,8 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
 					plantilla.setIddireccion(Long.valueOf(remitente.getIdDireccion()));
 					plantilla.setIdpersona(Long.valueOf(remitente.getIdPersona()));
+					plantilla.setFechamodificacion(new Date());
+					plantilla.setUsumodificacion(usuario.getIdusuario());
 					_envPlantillasenviosMapper.updateByPrimaryKey(plantilla);
 					respuesta.setCode(200);
 					respuesta.setMessage("Remitente guardado correctamente");
@@ -384,7 +406,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		}
 		
 		LOGGER.info("guardarRemitente() -> Salida del servicio para servicio para añadir un remitente");
-		return null;
+		return respuesta;
 	}
 
 	@Override
@@ -426,35 +448,115 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	}
 
 	@Override
-	public RemitenteDTO detalleRemitente(HttpServletRequest request, String idConsulta) {
-		LOGGER.info("guardarRemitente() -> Entrada al servicio para obtener detalles del remitente");
+	public RemitenteDTO detalleRemitente(HttpServletRequest request, PlantillaDatosConsultaDTO datosPlantilla) {
+		LOGGER.info("detalleRemitente() -> Entrada al servicio para obtener detalles del remitente");
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		RemitenteDTO remitente = new RemitenteDTO();
 		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("detalleRemitente() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("guardarRemitente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("detalleRemitente() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					
+					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setIdplantillaenvios(Short.valueOf(datosPlantilla.getIdPlantilla()));
+					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvio()));
+					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+					CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(plantilla.getIdpersona());
+					remitente.setIdPersona(persona.getIdpersona().toString());
+					remitente.setNombre(persona.getNombre());
+					remitente.setApellido1(persona.getApellidos1());
+					remitente.setApellido2(persona.getApellidos2());
+					
+					
+					CenDireccionesKey keyDirecciones = new CenDireccionesKey();
+					keyDirecciones.setIddireccion(plantilla.getIddireccion());
+					keyDirecciones.setIdinstitucion(idInstitucion);
+					keyDirecciones.setIdpersona(plantilla.getIdpersona());
+					CenDirecciones direccion = _cenDireccionesMapper.selectByPrimaryKey(keyDirecciones);
+					remitente.setIdDireccion(direccion.getIddireccion().toString());
+					remitente.setDomicilio(direccion.getDomicilio());
+					remitente.setIdPoblacion(direccion.getIdpoblacion().toString());
+					remitente.setIdProvincia(direccion.getIdprovincia());
+					remitente.setIdPais(direccion.getIdpais());
+					remitente.setCodigoPostal(direccion.getCodigopostal());
+					Map<String,String> contactos = new HashMap<String, String>();
+					if(direccion.getTelefono1()!=null)
+						contactos.put("telefono1", direccion.getTelefono1());
+					if(direccion.getTelefono2() != null)
+						contactos.put("telefono2", direccion.getTelefono2());
+					if(direccion.getMovil()!= null)
+						contactos.put("movil", direccion.getMovil());
+					if(direccion.getFax1() != null)
+						contactos.put("fax1", direccion.getFax1());
+					if(direccion.getFax2() != null)
+						contactos.put("fax2", direccion.getFax2());
+					if(direccion.getCorreoelectronico() != null)
+						contactos.put("correoElectronico", direccion.getCorreoelectronico());
+					if(direccion.getPaginaweb() != null)
+						contactos.put("web", direccion.getPaginaweb());
+					remitente.setContactos(contactos);
+
 				}
 			}catch(Exception e){
-//				respuesta.setCode(500);
-//				respuesta.setDescription("Error al asociar consulta a la plantilla");
-//				respuesta.setMessage(e.getMessage());
-//				e.printStackTrace();
+				Error error = new Error();
+				error.setCode(500);
+				error.setDescription("Error al obtener detalles remitente");
+				error.setMessage(e.getMessage());
+				remitente.setError(error);
+				e.printStackTrace();
 			}
 		}
 		
-		LOGGER.info("guardarRemitente() -> Salida del servicio para obtener detalles del remitente");
-		return null;
+		LOGGER.info("detalleRemitente() -> Salida del servicio para obtener detalles del remitente");
+		return remitente;
 	}
 
-
+	@Override
+	public FinalidadConsultaDTO obtenerFinalidad(HttpServletRequest request, String idConsulta) {
+		LOGGER.info("obtenerFinalidad() -> Entrada al servicio para obtener la finalidad de una consulta");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		FinalidadConsultaDTO finalidadDTO = new FinalidadConsultaDTO();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info("obtenerFinalidad() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info("obtenerFinalidad() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			try{
+				if (null != usuarios && usuarios.size() > 0) {
+					ConConsultaKey key = new ConConsultaKey();
+					ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
+					int inicioSelect = consulta.getSentencia().indexOf("<SELECT>")+8;
+					int finSelect = consulta.getSentencia().indexOf("</SELECT>");
+					String finalidad = consulta.getSentencia().substring(inicioSelect, finSelect);
+					finalidadDTO.setFinalidad(finalidad);
+				}
+			}catch(Exception e){
+				Error error = new Error();
+				error.setCode(500);
+				error.setDescription("Error al obtener detalles remitente");
+				error.setMessage(e.getMessage());
+				finalidadDTO.setError(error);
+				e.printStackTrace();
+			}
+		}
+		
+		LOGGER.info("obtenerFinalidad() -> Salida del servicio para obtener la finalidad de una consulta");
+		return finalidadDTO;
+	}
 
 }
