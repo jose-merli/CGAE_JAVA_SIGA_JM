@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
 import org.itcgae.siga.DTOs.com.PlantillasEnvioDTO;
 import org.itcgae.siga.DTOs.com.RemitenteDTO;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
+import org.itcgae.siga.DTOs.com.TarjetaRemitenteDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.com.services.IPlantillasEnvioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,7 +154,7 @@ public class PlantillasEnvioController {
 	}
 	
 	@RequestMapping(value = "/guardarRemitente",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> guardarRemitente(HttpServletRequest request, @RequestBody RemitenteDTO remitente) {
+	ResponseEntity<Error> guardarRemitente(HttpServletRequest request, @RequestBody TarjetaRemitenteDTO remitente){
 		
 		Error respuesta = _plantillasEnvioService.guardarRemitente(request, remitente);
 		
