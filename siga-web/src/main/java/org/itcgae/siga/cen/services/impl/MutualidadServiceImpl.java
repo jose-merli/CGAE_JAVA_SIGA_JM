@@ -362,7 +362,10 @@ public class MutualidadServiceImpl implements IMutualidadService{
 		LOGGER.info("MGASolicitudPolizaAccuGratuitos() --> Entrada al servicio para solicitar la poliza gratuita");
 		
 		MutualidadResponseDTO response = new MutualidadResponseDTO();
+		String token = requestController.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
+		CenInstitucion institucion = cenInstitucionExtendsMapper.selectByPrimaryKey(idInstitucion);
 		GenParametrosExample example = new GenParametrosExample();
 		example.createCriteria().andIdrecursoEqualTo("administracion.parametro.url_ws_mutualidad");
 		
@@ -377,54 +380,97 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			
 			IntegracionPersona persona = IntegracionPersona.Factory.newInstance();
 			persona.setApellido1(solicitud.getDatosPersona().getApellido1());
-			persona.setApellido2(solicitud.getDatosPersona().getApellido2());
-			persona.setColegio(solicitud.getDatosPersona().getColegio());
-			persona.setEjerciente(solicitud.getDatosPersona().getEjerciente());
-			persona.setEstadoCivil(Integer.parseInt(solicitud.getDatosPersona().getEstadoCivil()));
+			if(solicitud.getDatosPersona().getApellido2() != null) {
+				persona.setApellido2(solicitud.getDatosPersona().getApellido2());
+			}
+			
+			persona.setEjerciente(rellenarEjerciente(solicitud.getDatosPersona().getEjerciente()));
+			persona.setAsistenciaSanitaria(solicitud.getDatosPersona().getAsistenciaSanitaria());
+			persona.setEstadoCivil(parseaEstadoCivil(solicitud.getDatosPersona().getEstadoCivil()));
+			persona.setColegio(institucion.getAbreviatura());
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(solicitud.getDatosPersona().getFechaNacimiento());
 			persona.setFNacimiento(cal);
-			cal.setTime(solicitud.getDatosPersona().getFechaNacConyuge());
-			persona.setFNacimientoConyuge(cal);
+			if(null != solicitud.getDatosPersona().getFechaNacConyuge()) {
+				cal.setTime(solicitud.getDatosPersona().getFechaNacConyuge());
+				persona.setFNacimientoConyuge(cal);
+			}
 			persona.setNIF(solicitud.getDatosPersona().getNIF());
 			persona.setNacionalidad(solicitud.getDatosPersona().getNacionalidad());
 			persona.setNombre(solicitud.getDatosPersona().getNombre());
 			persona.setNumColegiado(solicitud.getDatosPersona().getNumColegiado());
-			persona.setProfesion(solicitud.getDatosPersona().getProfesion());
-			//Ver como pasarle el sexo
+			persona.setProfesion("Abogado");
+
 			persona.setSexo(Integer.parseInt(solicitud.getDatosPersona().getSexo()));
+			persona.setNumHijos(solicitud.getDatosPersona().getNumHijos());
+			if (null != solicitud.getDatosPersona().getEdadesHijos() && solicitud.getDatosPersona().getEdadesHijos().length>0) {
+				solicitud.getDatosPersona().getEdadesHijos();
+				ArrayOfstring edades = ArrayOfstring.Factory.newInstance();
+				edades.setStringArray(solicitud.getDatosPersona().getEdadesHijos());
+				persona.setEdadesHijos(edades);
+			}
+			
 			//colegiadosBloque.setDatosPersona(persona);
 			ArrayOfIntegracionDomicilio domicilios = ArrayOfIntegracionDomicilio.Factory.newInstance();
 			IntegracionDomicilio domicilio = IntegracionDomicilio.Factory.newInstance();
-			domicilio.setBloque(solicitud.getDatosDireccion().getBloque());
+
 			domicilio.setCP(solicitud.getDatosDireccion().getCp());
 			domicilio.setDireccion(solicitud.getDatosDireccion().getDireccion());
 			domicilio.setEmail(solicitud.getDatosDireccion().getEmail());
-			domicilio.setEsc(solicitud.getDatosDireccion().getEsc());
-			domicilio.setLetra(solicitud.getDatosDireccion().getLetra());
 			domicilio.setMovil(solicitud.getDatosDireccion().getMovil());
-			domicilio.setNum(solicitud.getDatosDireccion().getNum());
-			domicilio.setPiso(solicitud.getDatosDireccion().getPiso());
+			domicilio.setPais(solicitud.getDatosDireccion().getPais());
 			domicilio.setPoblacion(solicitud.getDatosDireccion().getPoblacion());
 			domicilio.setProvincia(solicitud.getDatosDireccion().getProvincia());
 			domicilio.setTfno(solicitud.getDatosDireccion().getTelefono());
-			domicilio.setTipoDireccion(solicitud.getDatosDireccion().getTipoDireccion());
-			domicilio.setTipoDomicilio(solicitud.getDatosDireccion().getTipoDomicilio());
-			domicilio.setTipoVia(solicitud.getDatosDireccion().getTipoVia());
+			domicilio.setTipoDireccion(1);
+			domicilio.setTipoDomicilio(1);
+			domicilio.setDireccionContacto(1);
+			domicilio.setTipoVia("");
+			domicilio.setBloque("");
+			domicilio.setEsc("");
+			domicilio.setLetra("");
+			domicilio.setPiso("");
+			domicilio.setNum("");
+	
 			
-			domicilios.setIntegracionDomicilioArray(0,domicilio);
+			IntegracionDomicilio[] domi = (IntegracionDomicilio[]) Array.newInstance(IntegracionDomicilio.class, 1);
+			domi[0] = IntegracionDomicilio.Factory.newInstance();
+			domi[0] = domicilio;
+
+			
+			domicilios.setIntegracionDomicilioArray(domi);
 			
 			IntegracionSolicitud solicitudIntegracion = IntegracionSolicitud.Factory.newInstance();
 			Calendar date = new GregorianCalendar();
 			solicitudIntegracion.setFecha(date);
-			solicitudIntegracion.setValorEntrada("53054856C");
+			solicitudIntegracion.setValorEntrada(persona.getNIF());
 			solicitudIntegracion.setIdTipoIdentificador(1);
 			solicitudIntegracion.setIdTipoSolicitud(1);
 
 			
+			IntegracionDatosBancarios datosBancarios = IntegracionDatosBancarios.Factory.newInstance();
+
+
+			IntegracionBeneficiarios datosBeneficiarios = IntegracionBeneficiarios.Factory.newInstance();
+			//datosBeneficiarios.setIdPoliza(solicitud.getDatosBeneficiario().getIdPoliza());
+			datosBeneficiarios.setIdTipoBeneficiario(solicitud.getDatosBeneficiario().getIdTipoBeneficiario());
+			datosBeneficiarios.setTextoOtros(solicitud.getDatosBeneficiario().getTextoOtros());
+			
+			
+			IntegracionDatosPoliza datosPoliza = IntegracionDatosPoliza.Factory.newInstance();
+			
+			
+			IntegracionSolicitudEstados datosSolicitudEstado = IntegracionSolicitudEstados.Factory.newInstance();
+		
+			requestBody.setDatosBancarios(datosBancarios);
 			requestBody.setDatosDomicilio(domicilios);
 			requestBody.setDatosSolicitud(solicitudIntegracion);
 			requestBody.setDatosPersona(persona);
+
+			requestBody.setDatosBeneficiarios(datosBeneficiarios);
+			requestBody.setDatosPoliza(datosPoliza);
+			
+			requestBody.setDatosSolicitudEstados(datosSolicitudEstado);
 			request.setMGASolicitudPolizaAccuGratuitos(requestBody);
 			
 			try {
@@ -474,7 +520,7 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			
 			persona.setEjerciente(solicitud.getDatosPersona().getEjerciente());
 			persona.setAsistenciaSanitaria(solicitud.getDatosPersona().getAsistenciaSanitaria());
-			persona.setEstadoCivil(Integer.parseInt(solicitud.getDatosPersona().getEstadoCivil()));
+			persona.setEstadoCivil(parseaEstadoCivil(solicitud.getDatosPersona().getEstadoCivil()));
 			persona.setColegio(institucion.getAbreviatura());
 			Calendar cal = Calendar.getInstance();
 			cal.setTime(solicitud.getDatosPersona().getFechaNacimiento());
@@ -595,6 +641,8 @@ public class MutualidadServiceImpl implements IMutualidadService{
 				response.setNMutualista(responseWS.getNMutualista());
 				response.setPDF(responseWS.getPDF());
 				response.setValorRespuesta(responseWS.getValorRespuesta());
+				
+				MutualidadResponseDTO respuestaSeguro = this.MGASolicitudPolizaAccuGratuitos(solicitud, requestController);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -679,5 +727,56 @@ public class MutualidadServiceImpl implements IMutualidadService{
 		}
 		return solicitudResponse;
 	}
+	
+	private int rellenarEjerciente(int ejerciente) {
+		 int ejercienteWS = 0;
+        
+       
+        switch (ejerciente){
+        case 10:        ejercienteWS = 1; break; // Reincorporación Ejerciente
+        case 20:        ejercienteWS = 1; break; // Reincorporación No Ejerciente
+        case 30:        ejercienteWS = 1; break; // Incorporación Ejerciente
+        case 40:        ejercienteWS = 1; break; // Incorporación No Ejerciente
+        default:         ejercienteWS = 1; break; // No se debe dar el caso
+        // De momento ponemos todo como cuenta propia en vez de ajena
+        }
+        return ejercienteWS;
+	}
+	
+	/**
+     * Parsea el estado civil de los valores del SIGA a los de la Mutualidad
+     * @param eCivil
+     * @return
+     */
+     private Integer parseaEstadoCivil(String eCivil) {          
+               int eCivilWS = 0;
+               int eCivilSIGA = 0;
+               if(!eCivil.equalsIgnoreCase("")){
+                        eCivilSIGA = Integer.parseInt(eCivil);
+               }
+               
+               /** CR-Cambio en los valores de Estado civil 
+                *  Los valores nuevos son:
+                                  Soltero -> 1
+                                  Casado         -> 2
+                                  Viudo -> 3
+                                  Separado      -> 4
+                                  Divorciado     -> 5
+                                  Desconocido -> 6
+                                  Pareja de Hecho -> 7
+               */
+               
+               switch (eCivilSIGA){
+                        case 1:         eCivilWS = 2; break; // Casado
+                        case 2:         eCivilWS = 1; break; // Soltero
+                        case 3:         eCivilWS = 3; break; // Viudo
+                        case 4:         eCivilWS = 4; break; // Separado
+                        case 5:         eCivilWS = 5; break; // Divorciado
+                        case 6:         eCivilWS = 7; break; // Pareja de hecho
+                        default:eCivilWS = 6; break; // Desconocido
+               }
+               
+               return eCivilWS;
+     }
 	
 }
