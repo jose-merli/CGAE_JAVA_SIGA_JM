@@ -11,9 +11,9 @@ public class ModModeloPerfilesExtendsSqlProvider {
 		sql.SELECT("modeloPerfil.IDPERFIL");
 		sql.SELECT("admPerfil.DESCRIPCION");
 		
-		sql.FROM("MOD_MODELOSPERFILES modeloPerfil");
+		sql.FROM("MOD_MODELO_PERFILES modeloPerfil");
 		
-		sql.INNER_JOIN("adm_perfil admPerfil ON admPerfil.IDPERFIL = modeloPerfil.IDPERFIL");	
+		sql.INNER_JOIN("adm_perfil admPerfil ON admPerfil.IDPERFIL = modeloPerfil.IDPERFIL AND admPerfil.Idinstitucion = modeloPerfil.Idinstitucion");	
 		
 		sql.WHERE("modeloPerfil.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("modeloPerfil.IDMODELOCOMUNICACION = " + idModeloComunicacion);

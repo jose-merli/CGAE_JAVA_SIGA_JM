@@ -25,9 +25,9 @@ public interface ModModeloComunicacionExtendsMapper {
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PRESELECCIONAR", property = "preseleccionar", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "NOMBRECLASE", property = "clase", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRECLASE", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ABREVIATURA", property = "institucion", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ModelosComunicacionItem> selectModulosComunicacion(DatosModelosComunicacionesSearch filtros, boolean historico);
+	List<ModelosComunicacionItem> selectModelosComunicacion(DatosModelosComunicacionesSearch filtros, boolean historico);
 	
 }

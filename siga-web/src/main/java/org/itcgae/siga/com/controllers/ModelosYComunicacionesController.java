@@ -5,7 +5,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
-import org.itcgae.siga.DTOs.com.PerfilesDTO;
+import org.itcgae.siga.DTOs.com.PlantillasDocumentosDto;
+import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDto;
+import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.adm.service.impl.PerfilServiceImpl;
@@ -28,27 +30,7 @@ public class ModelosYComunicacionesController {
 	IModelosYcomunicacionesService _modelosYcomunicacionesService;
 	
 	@Autowired
-	PerfilServiceImpl perfilServiceImpl;
-	
-	@RequestMapping(value = "/detalle/perfiles",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> perfiles(HttpServletRequest request) {
-		
-		ComboDTO response = perfilServiceImpl.getPerfiles(request);
-		if(response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(value = "/detalle/perfilesModelo",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> obtenerEtiquetasEnvio(HttpServletRequest request, @RequestBody String idModeloComuncacion) {
-		
-		ComboDTO response = _modelosYcomunicacionesService.obtenerPerfilesModelo(request, idModeloComuncacion);
-		if(response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+	PerfilServiceImpl perfilServiceImpl;	
 	
 	@RequestMapping(value = "/search",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DatosModelosComunicacionesDTO> modelosComunicacionSearch(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody DatosModelosComunicacionesSearch filtros) {
@@ -84,6 +66,56 @@ public class ModelosYComunicacionesController {
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+
+	@RequestMapping(value = "/detalle/datosGenerales",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardarDatosGenerales(HttpServletRequest request, @RequestBody TarjetaModeloConfiguracionDto datosTarjeta) {
+		
+		Error respuesta = _modelosYcomunicacionesService.guardarDatosGenerales(request, datosTarjeta);
+		
+		if(respuesta.getCode()== 200)
+			return new ResponseEntity<Error>(respuesta, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+	}
+	
+	@RequestMapping(value = "/detalle/perfiles",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> perfiles(HttpServletRequest request) {
+		
+		ComboDTO response = perfilServiceImpl.getPerfiles(request);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/perfilesModelo",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> obtenerEtiquetasEnvio(HttpServletRequest request, @RequestBody String idModeloComuncacion) {
+		
+		ComboDTO response = _modelosYcomunicacionesService.obtenerPerfilesModelo(request, idModeloComuncacion);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/guardarPerfiles",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardarPerfilesModelo(HttpServletRequest request, @RequestBody TarjetaPerfilesDTO tarjetaPerfiles) {
+
+		Error response = _modelosYcomunicacionesService.guardarPerfilesModelo(request, tarjetaPerfiles);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/informes",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PlantillasDocumentosDto> obtenerInformes(HttpServletRequest request, @RequestBody String idModeloComuncacion, @RequestBody String idInstitucion) {
+		
+		PlantillasDocumentosDto response = _modelosYcomunicacionesService.obtenerInformes(request, idModeloComuncacion, idInstitucion);
+		return new ResponseEntity<PlantillasDocumentosDto>(response, HttpStatus.OK);
 	}
 
 }

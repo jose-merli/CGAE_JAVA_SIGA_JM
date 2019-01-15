@@ -22,6 +22,7 @@ public class SigaConstants {
 	public static final String ACTIVAR_CLIENTE_SERVICIO_CARGAS = "ACTIVAR_CLIENTE_SERVICIO_CARGAS";
 	
 	public static String SUFIJO_MODULO_COM_DUPLICADO = "_Copia";
+	public static int NOMBRE_MAXLENGTH = 100;
 	
 	
 	public enum ERROR_SERVER {

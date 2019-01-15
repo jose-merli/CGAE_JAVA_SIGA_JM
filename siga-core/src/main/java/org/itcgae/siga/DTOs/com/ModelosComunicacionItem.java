@@ -25,7 +25,7 @@ public class ModelosComunicacionItem {
 	
 	private String visible;
 	private String institucion;
-	private String clase;
+	private String claseComunicacion;
 	
 	public String getIdModeloComunicacion() {
 		return idModeloComunicacion;
@@ -74,6 +74,24 @@ public class ModelosComunicacionItem {
 	}
 	public void setFechaBaja(Date fechaBaja) {
 		this.fechaBaja = fechaBaja;
+	}
+	public String getVisible() {
+		return visible;
+	}
+	public void setVisible(String visible) {
+		this.visible = visible;
+	}
+	public String getInstitucion() {
+		return institucion;
+	}
+	public void setInstitucion(String institucion) {
+		this.institucion = institucion;
+	}
+	public String getClaseComunicacion() {
+		return claseComunicacion;
+	}
+	public void setClaseComunicacion(String claseComunicacion) {
+		this.claseComunicacion = claseComunicacion;
 	}
 	
 	

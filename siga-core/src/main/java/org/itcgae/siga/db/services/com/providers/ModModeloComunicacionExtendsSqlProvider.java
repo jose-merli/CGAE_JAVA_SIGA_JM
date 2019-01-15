@@ -31,20 +31,20 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.INNER_JOIN("CEN_INSTITUCION inst ON inst.IDINSTITUCION = modelo.IDINSTITUCION");
 		
 		if(filtros.getIdInstitucion() != null && !filtros.getIdInstitucion().trim().equals("")){
-			sql.WHERE("IDINSTITUCION = '"+filtros.getIdInstitucion()+"'");
+			sql.WHERE("modelo.IDINSTITUCION = '"+filtros.getIdInstitucion()+"'");
 		}
 		if(filtros.getIdClaseComunicacion() != null && !filtros.getIdClaseComunicacion().trim().equals("")){
-			sql.WHERE("IDCLASECOMUNICACION = '"+filtros.getIdClaseComunicacion()+"'");
+			sql.WHERE("modelo.IDCLASECOMUNICACION = '"+filtros.getIdClaseComunicacion()+"'");
 		}
 		
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
-			sql.WHERE("NOMBRE = '"+filtros.getNombre()+"'");
+			sql.WHERE("modelo.NOMBRE LIKE '%"+filtros.getNombre()+"%'");
 		}
 		if(filtros.getPreseleccionar() != null && !filtros.getPreseleccionar().trim().equals("")){
-			sql.WHERE("PRESELECCIONAR = '"+filtros.getPreseleccionar()+"'");	
+			sql.WHERE("modelo.PRESELECCIONAR = '"+filtros.getPreseleccionar()+"'");	
 		}
 		if(filtros.getVisible() != null && !filtros.getVisible().trim().equals("")){
-			sql.WHERE("VISIBLE = '"+filtros.getIdInstitucion()+"'");	
+			sql.WHERE("modelo.VISIBLE = '"+filtros.getIdInstitucion()+"'");	
 		}
 		
 		if(historico){
@@ -53,10 +53,10 @@ public class ModModeloComunicacionExtendsSqlProvider {
 				String fechaBaja2 = dateFormat.format(filtros.getFechaBaja());
 				fechaBaja += " 00:00:00";
 				fechaBaja2 += " 23:59:59";
-				sql.WHERE("(FECHABAJA >= TO_DATE('" +fechaBaja + "', 'DD/MM/YYYY HH24:MI:SS') AND FECHABAJA <= TO_DATE('" +fechaBaja2 + "', 'DD/MM/YYYY HH24:MI:SS'))");
+				sql.WHERE("(modelo.FECHABAJA >= TO_DATE('" +fechaBaja + "', 'DD/MM/YYYY HH24:MI:SS') AND modelo.FECHABAJA <= TO_DATE('" +fechaBaja2 + "', 'DD/MM/YYYY HH24:MI:SS'))");
 			}
 		}else{
-			sql.WHERE("FECHABAJA is NULL");
+			sql.WHERE("modelo.FECHABAJA is NULL");
 		}
 		
 		sql.ORDER_BY("IDMODELOCOMUNICACION ASC");
