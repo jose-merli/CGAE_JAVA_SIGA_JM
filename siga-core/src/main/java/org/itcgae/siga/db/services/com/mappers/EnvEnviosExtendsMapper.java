@@ -10,7 +10,6 @@ import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.services.com.providers.EnvEnviosExtendsSqlProvider;
-import org.itcgae.siga.db.services.com.providers.EnvHistoricoExtendsSqlProviders;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 

@@ -11,23 +11,18 @@ import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoDto;
+import org.itcgae.siga.DTOs.com.PlantillaModeloItem;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDto;
-import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
-import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
+import org.itcgae.siga.DTOs.com.PlantillasModeloDTO;
 import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IModelosYcomunicacionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.EnvEnviosgrupocliente;
-import org.itcgae.siga.db.entities.EnvEnviosgrupoclienteExample;
-import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
-import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.ModModeloPerfiles;
 import org.itcgae.siga.db.entities.ModModeloPerfilesExample;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
@@ -518,6 +513,43 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			}
 		}
 		LOGGER.info("guardarPerfilesModelo() -> Salida del servicio para guardar datos perfiles");
+		return respuesta;
+	}
+
+	@Override
+	public PlantillasModeloDTO obtenerPlantillasModelo(HttpServletRequest request, String idModelo) {
+		LOGGER.info("obtenerPlantillasModelo() -> Entrada al servicio para obtener plantillas del modelo");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		PlantillasModeloDTO respuesta = new PlantillasModeloDTO();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					List<PlantillaModeloItem> plantillas = modModeloPlantillaDocumentoExtendsMapper.getPlantillasDocumento(idModelo, usuario.getIdlenguaje());
+					if(plantillas != null && plantillas.size() > 0){
+						respuesta.setPlantillas(plantillas);
+					}
+					
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					error.setMessage("Error");
+					respuesta.setError(error);
+				}
+			}
+		}
+		
+		LOGGER.info("obtenerPlantillasModelo() -> Salida del servicio para obtener plantillas del modelo");
 		return respuesta;
 	}
 }

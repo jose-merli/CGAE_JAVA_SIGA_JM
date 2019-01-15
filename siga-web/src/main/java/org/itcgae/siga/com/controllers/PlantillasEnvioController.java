@@ -129,9 +129,9 @@ public class PlantillasEnvioController {
 	}
 	
 	@RequestMapping(value = "/personaYdirecciones",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<RemitenteDTO> obtenerPersonaYdirecciones(HttpServletRequest request, @RequestBody PersonaDTO persona) {
+	ResponseEntity<RemitenteDTO> obtenerPersonaYdirecciones(HttpServletRequest request, @RequestBody String idPersona) {
 		
-		RemitenteDTO respuesta = _plantillasEnvioService.obtenerPersonaYdireccion(request, persona);
+		RemitenteDTO respuesta = _plantillasEnvioService.obtenerPersonaYdireccion(request, idPersona);
 		
 		if(respuesta.getError() == null)
 			return new ResponseEntity<RemitenteDTO>(respuesta, HttpStatus.OK);

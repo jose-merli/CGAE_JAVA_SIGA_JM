@@ -3,9 +3,7 @@ package org.itcgae.siga.com.services.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,7 +12,6 @@ import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
-import org.itcgae.siga.DTOs.com.PersonaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDatosConsultaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
@@ -557,7 +554,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	}
 
 	@Override
-	public RemitenteDTO obtenerPersonaYdireccion(HttpServletRequest request, PersonaDTO personaDTO) {
+	public RemitenteDTO obtenerPersonaYdireccion(HttpServletRequest request, String idPersona) {
 		LOGGER.info("obtenerPersonaYdireccion() -> Entrada al servicio para obtener detalles del remitente");
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -573,14 +570,14 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			LOGGER.info("obtenerPersonaYdireccion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
-					CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.valueOf(personaDTO.getIdPersona()));
+					CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.valueOf(idPersona));
 					remitente.setIdPersona(persona.getIdpersona().toString());
 					remitente.setNombre(persona.getNombre());
 					remitente.setApellido1(persona.getApellidos1());
 					remitente.setApellido2(persona.getApellidos2());
 					
 					CenDireccionesExample example = new CenDireccionesExample();
-					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(personaDTO.getIdPersona())).andIdinstitucionEqualTo(Short.valueOf(personaDTO.getIdInstitucion()));
+					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona));
 					List<CenDirecciones> direcciones = _cenDireccionesMapper.selectByExample(example);
 					if(direcciones != null && direcciones.size() > 0){
 						List<DatosDireccionesItem> direccionesList = new ArrayList<DatosDireccionesItem>();
