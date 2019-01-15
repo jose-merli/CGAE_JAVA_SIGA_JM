@@ -2,8 +2,6 @@ package org.itcgae.siga.commons.constants;
 
 import java.util.Arrays;
 import java.util.List;
-
-import org.itcgae.siga.DTOs.cen.CargaMasivaDatosCVItem;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,8 +23,10 @@ public class SigaConstants {
 	public static Integer IdUsuarioPuertaAtras = 1;
 	public static String OK = "OK";
 	public static String KO = "KO";
+
 	public static Integer CODE_200 = 200; 
 	public static Integer CODE_400 = 400; 
+
 	public static String InstitucionGeneral = "2000";
 	public static String Personal = "Personal";
 
