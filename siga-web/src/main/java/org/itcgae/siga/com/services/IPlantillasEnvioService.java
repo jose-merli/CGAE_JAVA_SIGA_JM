@@ -26,7 +26,7 @@ public interface IPlantillasEnvioService {
 	public Error guardarDatosGenerales(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta);
 	public ConsultasDTO detalleConsultas(HttpServletRequest request, TarjetaConfiguracionDto consulta);
 	public Error asociarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO consulta);
-	public Error borrarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO consulta);
+	public Error desAsociarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO[] consulta);
 	public RemitenteDTO detalleRemitente(HttpServletRequest request, PlantillaDatosConsultaDTO consulta);
 	public RemitenteDTO obtenerPersonaYdireccion(HttpServletRequest request, PersonaDTO persona);
 	public Error guardarRemitente(HttpServletRequest request, TarjetaRemitenteDTO remitente);

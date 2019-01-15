@@ -291,7 +291,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					consultaAsoc.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
 					consultaAsoc.setIdplantillaenvios(Short.valueOf(consulta.getIdPlantillaEnvios()));
 					consultaAsoc.setIdinstitucion(idInstitucion);
-					consultaAsoc.setIdtipoenvios(Short.valueOf(consulta.getIdTipoEnvio()));
+					consultaAsoc.setIdtipoenvios(Short.valueOf(consulta.getIdTipoEnvios()));
 					consultaAsoc.setUsumodificacion(usuario.getIdusuario());
 					consultaAsoc.setFechamodificacion(new Date());
 					_modPlantillaenvioConsultaMapper.insert(consultaAsoc);
@@ -312,7 +312,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	}
 
 	@Override
-	public Error borrarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO consulta) {
+	public Error desAsociarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO[] consulta) {
 		LOGGER.info("borrarConsulta() -> Salida del servicio para borrar una consulta a la plantilla de envio");
 		
 		// Conseguimos información del usuario logeado
@@ -331,14 +331,16 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
-					ModPlantillaenvioConsultaKey key = new ModPlantillaenvioConsultaKey();
-					key.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
-					key.setIdplantillaenvios(Short.valueOf(consulta.getIdPlantillaEnvios()));
-					ModPlantillaenvioConsulta con = _modPlantillaenvioConsultaMapper.selectByPrimaryKey(key);
-					con.setFechabaja(new Date());
-					con.setUsumodificacion(usuario.getIdusuario());
-					con.setFechamodificacion(new Date());
-					_modPlantillaenvioConsultaMapper.updateByPrimaryKey(con);
+					for (int i = 0; i < consulta.length; i++) {
+						ModPlantillaenvioConsultaKey key = new ModPlantillaenvioConsultaKey();
+						key.setIdconsulta(Long.valueOf(consulta[i].getIdConsulta()));
+						key.setIdplantillaenvios(Short.valueOf(consulta[i].getIdPlantillaEnvios()));
+						ModPlantillaenvioConsulta con = _modPlantillaenvioConsultaMapper.selectByPrimaryKey(key);
+						con.setFechabaja(new Date());
+						con.setUsumodificacion(usuario.getIdusuario());
+						con.setFechamodificacion(new Date());
+						_modPlantillaenvioConsultaMapper.updateByPrimaryKey(con);
+					}
 					respuesta.setCode(200);
 					respuesta.setMessage("Consulta desAsocidada correctamente");
 				}
@@ -391,7 +393,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 				}
 			}catch(Exception e){
 				respuesta.setCode(500);
-				respuesta.setDescription("Error al asociar consulta a la plantilla");
+				respuesta.setDescription("Error al guardar un remitente");
 				respuesta.setMessage(e.getMessage());
 				e.printStackTrace();
 			}
@@ -460,7 +462,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
 					key.setIdinstitucion(idInstitucion);
 					key.setIdplantillaenvios(Short.valueOf(datosPlantilla.getIdPlantillaEnvios()));
-					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvio()));
+					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
 					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
 					CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(plantilla.getIdpersona());
 					remitente.setIdPersona(persona.getIdpersona().toString());

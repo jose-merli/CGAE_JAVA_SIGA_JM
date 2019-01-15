@@ -71,9 +71,9 @@ public class PlantillasEnvioController {
 	}
 	
 	@RequestMapping(value = "/desasociarConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> desasociarConsulta(HttpServletRequest request, @RequestBody PlantillaDatosConsultaDTO consulta) {
+	ResponseEntity<Error> desasociarConsulta(HttpServletRequest request, @RequestBody PlantillaDatosConsultaDTO[] consulta) {
 		
-		Error respuesta = _plantillasEnvioService.borrarConsulta(request, consulta);
+		Error respuesta = _plantillasEnvioService.desAsociarConsulta(request, consulta);
 		
 		if(respuesta.getCode()== 200)
 			return new ResponseEntity<Error>(respuesta, HttpStatus.OK);
