@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDto;
 import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
+import org.itcgae.siga.DTOs.com.PlantillasModeloDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.adm.service.impl.PerfilServiceImpl;
@@ -116,6 +117,17 @@ public class ModelosYComunicacionesController {
 		
 		PlantillasDocumentosDto response = _modelosYcomunicacionesService.obtenerInformes(request, idModeloComuncacion, idInstitucion);
 		return new ResponseEntity<PlantillasDocumentosDto>(response, HttpStatus.OK);
+	}
+	@RequestMapping(value = "detalle/plantillasEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PlantillasModeloDTO> obtenerPlantillasEnvio(HttpServletRequest request, String idModelo) {
+		
+		PlantillasModeloDTO response = _modelosYcomunicacionesService.obtenerPlantillasModelo(request, idModelo);
+
+		if(response.getError() == null)
+			return new ResponseEntity<PlantillasModeloDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<PlantillasModeloDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
 	}
 
 }
