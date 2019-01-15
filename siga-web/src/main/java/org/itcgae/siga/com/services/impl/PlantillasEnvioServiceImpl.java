@@ -583,6 +583,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						List<DatosDireccionesItem> direccionesList = new ArrayList<DatosDireccionesItem>();
 						for (CenDirecciones item : direcciones) {
 							DatosDireccionesItem direccion = new DatosDireccionesItem();
+							direccion.setIdInstitucion(item.getIdinstitucion().toString());
 							direccion.setIdDireccion(item.getIddireccion().toString());
 							direccion.setDomicilio(item.getDomicilio());
 							direccion.setIdPoblacion(item.getIdpoblacion().toString());

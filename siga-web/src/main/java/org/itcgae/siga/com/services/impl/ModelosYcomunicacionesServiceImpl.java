@@ -29,6 +29,7 @@ import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumentoExample;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvio;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvioExample;
+import org.itcgae.siga.db.entities.ModModeloPlantillaenvioKey;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
@@ -550,6 +551,45 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		}
 		
 		LOGGER.info("obtenerPlantillasModelo() -> Salida del servicio para obtener plantillas del modelo");
+		return respuesta;
+	}
+
+	@Override
+	public Error borrarPlantillaModelo(HttpServletRequest request, String idModelo, String idPlantillaEnvios) {
+		LOGGER.info("borrarPlantillaModelo() -> Entrada al servicio para obtener plantillas del modelo");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+
+		Error respuesta = new Error();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
+					key.setIdmodelocomunicacion(Long.valueOf(idModelo));
+					key.setIdplantillaenvios(Short.valueOf(idPlantillaEnvios));
+					ModModeloPlantillaenvio plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
+					plantilla.setFechabaja(new Date());
+					//plantilla.s
+					respuesta.setCode(200);
+					respuesta.setMessage("Plantillas borradas");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error al borrar plantillas");
+					e.printStackTrace();
+				}
+			}
+		}
+		LOGGER.info("borrarPlantillaModelo() -> Salida del servicio para obtener plantillas del modelo");
 		return respuesta;
 	}
 }

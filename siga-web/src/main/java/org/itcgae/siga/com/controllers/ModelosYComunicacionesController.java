@@ -130,4 +130,13 @@ public class ModelosYComunicacionesController {
 
 	}
 
+	@RequestMapping(value = "/detalle/borrarPlantilla",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> borrarPlantilla(HttpServletRequest request, @RequestBody String idModeloComunicacion, @RequestBody String idPlantillaEnvios) {
+
+		Error response = _modelosYcomunicacionesService.borrarPlantillaModelo(request, idModeloComunicacion, idPlantillaEnvios);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }

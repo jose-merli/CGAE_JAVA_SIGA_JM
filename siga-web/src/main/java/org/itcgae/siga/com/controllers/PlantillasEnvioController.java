@@ -4,7 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
-import org.itcgae.siga.DTOs.com.PersonaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDatosConsultaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;

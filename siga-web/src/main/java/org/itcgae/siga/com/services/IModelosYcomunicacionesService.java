@@ -23,5 +23,6 @@ public interface IModelosYcomunicacionesService {
 	public PlantillasDocumentosDto obtenerInformes(HttpServletRequest request, String idInstitucion, String idModeloComuncacion);
 	public Error guardarPerfilesModelo(HttpServletRequest request, TarjetaPerfilesDTO perfilesDTO);
 	public Error guardarDatosGenerales(HttpServletRequest request, TarjetaModeloConfiguracionDto datosTarjeta);
+	public Error borrarPlantillaModelo(HttpServletRequest request, String idModelo, String idPlantillaEnvios);
 	
 }
