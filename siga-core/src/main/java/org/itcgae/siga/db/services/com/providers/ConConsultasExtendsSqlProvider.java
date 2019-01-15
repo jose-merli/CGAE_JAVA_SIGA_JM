@@ -76,7 +76,7 @@ public class ConConsultasExtendsSqlProvider {
 		sql.SELECT("IDINSTITUCION, IDCONSULTA, DESCRIPCION, OBSERVACIONES, TIPOCONSULTA");
 		sql.FROM("con_consulta");
 		sql.WHERE("IDCONSULTA IN (SELECT IDCONSULTA FROM MOD_PLANTILLAENVIO_CONSULTA WHERE IDPLANTILLAENVIOS='"+ idPlantillaEnvios +"' "
-				+ "AND IDTIPOENVIOS ='"+ idtipoEnvio +"' AND IDINSTITUCION='"+ idInstitucion +"') AND FECHABAJA is null AND IDINSTITUCION = '"+ idInstitucion +"'");
+				+ "AND IDTIPOENVIOS ='"+ idtipoEnvio +"' AND IDINSTITUCION='"+ idInstitucion +"' AND FECHABAJA is null) AND IDINSTITUCION = '"+ idInstitucion +"'");
 		return sql.toString();
 	}
 	

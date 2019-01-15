@@ -461,10 +461,12 @@ public class ConsultasServiceImpl implements IConsultasService{
 								respuesta.setCode(400);
 								respuesta.setMessage("La estructura de la consulta no es correcta");
 							}else{
+								_conConsultaMapper.updateByPrimaryKeyWithBLOBs(consulta);
 								respuesta.setCode(200);
 								respuesta.setMessage("Consulta actualizada");
 							}
 						}else{
+							_conConsultaMapper.updateByPrimaryKeyWithBLOBs(consulta);
 							respuesta.setCode(200);
 							respuesta.setMessage("Consulta actualizada");
 						}
