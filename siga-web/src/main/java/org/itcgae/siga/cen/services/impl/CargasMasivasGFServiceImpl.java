@@ -476,7 +476,11 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 					personaHashtable.put(cargaMasivaDatosGFVo.getIdPersona(), nombreString);
 
+				}else {
+					errorLinea.append("No existe la persona seleccionada");
+					cargaMasivaDatosGFVo.setPersonaNombre("Error");
 				}
+
 
 			} else {
 				errorLinea.append("Es obligatorio introducir número de colegiado o nif/cif. ");
