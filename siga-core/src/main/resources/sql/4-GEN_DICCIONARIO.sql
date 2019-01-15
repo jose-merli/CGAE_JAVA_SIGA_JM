@@ -1909,6 +1909,10 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('certificados.solicitudes.literal.titulo.personacolegio','Dades personals i de col·legi','0','2',to_date('05/02/18','DD/MM/RR'),'0','22');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('certificados.solicitudes.literal.titulo.personacolegio','Datos personales y de colegio#EU','0','3',to_date('05/02/18','DD/MM/RR'),'0','22');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('certificados.solicitudes.literal.titulo.personacolegio','Datos personales y de colegio#GL','0','4',to_date('05/02/18','DD/MM/RR'),'0','22');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.datosCv.literal.fechaCarga','Fecha carga','0','1',to_date('06/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.datosCv.literal.fechaCarga','Fecha carga#GL','0','4',to_date('06/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.datosCv.literal.fechaCarga','Data càrrega#CA','0','2',to_date('06/11/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.datosCv.literal.fechaCarga','Fecha carga#EU','0','3',to_date('06/11/18','DD/MM/RR'),'0','19');
 
 
 COMMIT;
