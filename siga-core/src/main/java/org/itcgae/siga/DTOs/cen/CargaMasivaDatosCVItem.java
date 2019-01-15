@@ -1,42 +1,9 @@
 package org.itcgae.siga.DTOs.cen;
 
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 public class CargaMasivaDatosCVItem {
-	public static final List<String> CAMPOSEJEMPLO = Arrays.asList(CargaMasivaDatosCVItem.COLEGIADONUMERO,CargaMasivaDatosCVItem.PERSONANIF,
-			CargaMasivaDatosCVItem.C_FECHAINICIO,CargaMasivaDatosCVItem.C_FECHAFIN,CargaMasivaDatosCVItem.C_CREDITOS,CargaMasivaDatosCVItem.FECHAVERIFICACION,CargaMasivaDatosCVItem.C_DESCRIPCION
-			,CargaMasivaDatosCVItem.TIPOCVCOD,CargaMasivaDatosCVItem.SUBTIPOCV1COD,CargaMasivaDatosCVItem.SUBTIPOCV2COD);
-	public static final List<String> CAMPOSLOG = Arrays.asList(CargaMasivaDatosCVItem.COLEGIADONUMERO,CargaMasivaDatosCVItem.PERSONANIF,CargaMasivaDatosCVItem.PERSONANOMBRE,CargaMasivaDatosCVItem.C_IDPERSONA,
-			CargaMasivaDatosCVItem.C_FECHAINICIO ,CargaMasivaDatosCVItem.C_FECHAFIN,CargaMasivaDatosCVItem.C_CREDITOS,CargaMasivaDatosCVItem.FECHAVERIFICACION,CargaMasivaDatosCVItem.C_DESCRIPCION
-			,CargaMasivaDatosCVItem.TIPOCVCOD,CargaMasivaDatosCVItem.TIPOCVNOMBRE,CargaMasivaDatosCVItem.C_IDTIPOCV,CargaMasivaDatosCVItem.SUBTIPOCV1COD,CargaMasivaDatosCVItem.SUBTIPOCV1NOMBRE,CargaMasivaDatosCVItem.C_IDTIPOCVSUBTIPO1,CargaMasivaDatosCVItem.SUBTIPOCV2COD,CargaMasivaDatosCVItem.SUBTIPOCV2NOMBRE,CargaMasivaDatosCVItem.C_IDTIPOCVSUBTIPO2,CargaMasivaDatosCVItem.ERRORES);
-	public static final String tipoExcelXls = "xls";
-	public static final String tipoExcelXlsx ="xlsx";
-	public static final String nombreFicheroEjemplo ="PlantillaMasivaDatosCV";
-	public static final String nombreFicheroError ="LogErrorCargaMasivaCV";
 	
-	
-	public static final String C_IDTIPOCV = "IDTIPOCV";
-    public static final String C_CREDITOS = "C_CREDITOS";
-    public static final String C_IDPERSONA = "C_IDPERSONA";
-    public static final String C_IDTIPOCVSUBTIPO1 = "C_IDTIPOCVSUBTIPO1";
-    public static final String C_IDTIPOCVSUBTIPO2 = "C_IDTIPOCVSUBTIPO2";
-	public static final String TIPOCVCOD = "TIPOCVCOD";
-	public static final String SUBTIPOCV1COD = "SUBTIPOCV1COD";
-	public static final String SUBTIPOCV2COD = "SUBTIPOCV2COD";
-	public static final String TIPOCVNOMBRE = "TIPOCVNOMBRE";
-	public static final String SUBTIPOCV1NOMBRE = "SUBTIPOCV1NOMBRE";
-	public static final String SUBTIPOCV2NOMBRE = "SUBTIPOCV2NOMBRE";
-	public static final String FECHAVERIFICACION = "FECHAVERIFICACION";
-	
-	public static final String C_FECHAINICIO = "C_FECHAINICIO";
-    public static final String C_FECHAFIN = "C_FECHAFIN";
-    public static final String C_DESCRIPCION = "C_DESCRIPCION";
-    public static final String COLEGIADONUMERO = "COLEGIADONUMERO";
-    public static final String PERSONANIF = "PERSONANIF";
-    public static final String PERSONANOMBRE = "PERSONANOMBRE";
-    public static final String ERRORES = "ERRORES";
     
 	private String colegiadoNumero;
 	private String personaNIF;

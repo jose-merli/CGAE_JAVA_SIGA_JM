@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
@@ -35,6 +36,9 @@ import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCargamasiva;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoExample;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.entities.CenDatoscvKey;
 import org.itcgae.siga.db.entities.CenHistorico;
@@ -63,6 +67,7 @@ import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargaMasivaExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -106,7 +111,9 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 	private GenRecursosMapper genRecursosMapper;
 	@Autowired
 	private CenHistoricoExtendsMapper cenHistoricoExtendsMapper;
-
+@Autowired 
+private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+	
 	@Override
 	public File createExcelFile(List<String> orderList, Vector<Hashtable<String, Object>> datosVector)
 			throws BusinessException {
@@ -114,7 +121,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 			throw new BusinessException("No hay datos para crear el fichero");
 		if (orderList == null)
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
-		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, CargaMasivaDatosCVItem.nombreFicheroEjemplo);
+		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemploCV);
 		return XLSFile;
 	}
 
@@ -129,34 +136,34 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 		// 1. Se defonen las columnas que conforman la plantilla
 
 		// 1.1 Se rellena la primera fila
-		datosHashtable.put(CargaMasivaDatosCVItem.COLEGIADONUMERO, "nnnnnn");
-		datosHashtable.put(CargaMasivaDatosCVItem.PERSONANIF, "nnnnnnnna");
-		datosHashtable.put(CargaMasivaDatosCVItem.C_FECHAINICIO, "dd/mm/yyyy");
-		datosHashtable.put(CargaMasivaDatosCVItem.C_FECHAFIN, "dd/mm/yyyy");
-		datosHashtable.put(CargaMasivaDatosCVItem.C_CREDITOS, "nnn");
-		datosHashtable.put(CargaMasivaDatosCVItem.FECHAVERIFICACION, "dd/mm/yyyy");
-		datosHashtable.put(CargaMasivaDatosCVItem.C_DESCRIPCION, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-		datosHashtable.put(CargaMasivaDatosCVItem.TIPOCVCOD, "aaa");
-		datosHashtable.put(CargaMasivaDatosCVItem.SUBTIPOCV1COD, "aaa");
-		datosHashtable.put(CargaMasivaDatosCVItem.SUBTIPOCV2COD, "aaa");
+		datosHashtable.put(SigaConstants.COLEGIADONUMERO, "nnnnnn");
+		datosHashtable.put(SigaConstants.PERSONANIF, "nnnnnnnna");
+		datosHashtable.put(SigaConstants.C_FECHAINICIO, "dd/MM/yyyy");
+		datosHashtable.put(SigaConstants.C_FECHAFIN, "dd/MM/yyyy");
+		datosHashtable.put(SigaConstants.C_CREDITOS, "nnn");
+		datosHashtable.put(SigaConstants.FECHAVERIFICACION, "dd/MM/yyyy");
+		datosHashtable.put(SigaConstants.C_DESCRIPCION, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+		datosHashtable.put(SigaConstants.TIPOCVCOD, "aaa");
+		datosHashtable.put(SigaConstants.SUBTIPOCV1COD, "aaa");
+		datosHashtable.put(SigaConstants.SUBTIPOCV2COD, "aaa");
 		datosVector.add(datosHashtable);
 
 		// 1.1 Se rellena la segunda fila
 		datosHashtable = new Hashtable<String, Object>();
-		datosHashtable.put(CargaMasivaDatosCVItem.COLEGIADONUMERO, "Opcional. Si nulo nif/cif requerido");
-		datosHashtable.put(CargaMasivaDatosCVItem.PERSONANIF, "Opcional. Si nulo colegiadonumero requerido");
-		datosHashtable.put(CargaMasivaDatosCVItem.C_FECHAINICIO, "Opcional");
-		datosHashtable.put(CargaMasivaDatosCVItem.C_FECHAFIN, "Opcional");
-		datosHashtable.put(CargaMasivaDatosCVItem.C_CREDITOS, "Opcional");
-		datosHashtable.put(CargaMasivaDatosCVItem.FECHAVERIFICACION, "Opcional");
-		datosHashtable.put(CargaMasivaDatosCVItem.C_DESCRIPCION, "Opcional");
-		datosHashtable.put(CargaMasivaDatosCVItem.TIPOCVCOD, "Requerido");
-		datosHashtable.put(CargaMasivaDatosCVItem.SUBTIPOCV1COD, "Opcional");
-		datosHashtable.put(CargaMasivaDatosCVItem.SUBTIPOCV2COD, "Opcional");
+		datosHashtable.put(SigaConstants.COLEGIADONUMERO, "Opcional. Si nulo nif/cif requerido");
+		datosHashtable.put(SigaConstants.PERSONANIF, "Opcional. Si nulo colegiadonumero requerido");
+		datosHashtable.put(SigaConstants.C_FECHAINICIO, "Opcional");
+		datosHashtable.put(SigaConstants.C_FECHAFIN, "Opcional");
+		datosHashtable.put(SigaConstants.C_CREDITOS, "Opcional");
+		datosHashtable.put(SigaConstants.FECHAVERIFICACION, "Opcional");
+		datosHashtable.put(SigaConstants.C_DESCRIPCION, "Opcional");
+		datosHashtable.put(SigaConstants.TIPOCVCOD, "Requerido");
+		datosHashtable.put(SigaConstants.SUBTIPOCV1COD, "Opcional");
+		datosHashtable.put(SigaConstants.SUBTIPOCV2COD, "Opcional");
 		datosVector.add(datosHashtable);
 
 		// 2. Crea el fichero excel
-		File file = createExcelFile(CargaMasivaDatosCVItem.CAMPOSEJEMPLO, datosVector);
+		File file = createExcelFile(SigaConstants.CAMPOSEJEMPLOCV, datosVector);
 
 		// 3. Se convierte el fichero en array de bytes para enviarlo al front
 		InputStream fileStream = null;
@@ -191,6 +198,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 		LOGGER.debug("uploadFile() -> Coger archivo del request");
 		Iterator<String> itr = request.getFileNames();
 		MultipartFile file = request.getFile(itr.next());
+		String nombreFichero = file.getOriginalFilename(); 
 
 		// Extraer la información del excel
 		LOGGER.debug("uploadFile() -> Extraer los datos del archivo");
@@ -218,17 +226,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 
 				for (CargaMasivaDatosCVItem cargaMasivaDatosCVItem : cargaMasivaDatosCVItems) {
 					if (cargaMasivaDatosCVItem.getErrores() == null) {
-
-						// Comprobar si el registro no existe
-						CenDatoscvKey cenDatoscvKey = new CenDatoscvKey();
-						cenDatoscvKey.setIdcv(cargaMasivaDatosCVItem.getIdTipoCV());
-						cenDatoscvKey.setIdinstitucion(usuario.getIdinstitucion());
-						cenDatoscvKey.setIdpersona(cargaMasivaDatosCVItem.getIdPersona());
-
-						CenDatoscv cenDatoscv = cenDatoscvMapperExtends.selectByPrimaryKey(cenDatoscvKey);
-
-						// No existe ese registro --> proceder a insertar
-						if (cenDatoscv == null) {
+						
 							CenDatoscv cenDatosCV = new CenDatoscv();
 							cenDatosCV.setCertificado("1");
 							cenDatosCV.setCreditos(cargaMasivaDatosCVItem.getCreditos());
@@ -240,7 +238,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 							cenDatosCV.setIdinstitucion(usuario.getIdinstitucion());
 							cenDatosCV.setIdinstitucioncargo(usuario.getIdinstitucion());
 							cenDatosCV.setIdinstitucionSubt1(cargaMasivaDatosCVItem.getIdinstitucionSubt1());
-							cenDatosCV.setIdinstitucionSubt2(cargaMasivaDatosCVItem.getIdTipoCVSubtipo2());
+							cenDatosCV.setIdinstitucionSubt2(cargaMasivaDatosCVItem.getIdinstitucionSubt2());
 							cenDatosCV.setIdpersona(cargaMasivaDatosCVItem.getIdPersona());
 
 							NewIdDTO idCv = cenDatoscvMapperExtends.getMaxIdCv(
@@ -269,12 +267,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 							// error.setDescription(errores);
 							// updateResponseDTO.setError(error);
 							// }
-						} else {
-							errores += "El registro ya existe.<br/>";
-							error.setDescription(errores);
-							updateResponseDTO.setError(error);
-						}
-
+						
 					} else {
 						errores += cargaMasivaDatosCVItem.getErrores();
 						error.setDescription(errores);
@@ -288,40 +281,48 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 					// Guardar log
 					datosLog.add(e);
 				}
+				
+				if(cargaMasivaDatosCVItems.isEmpty()) {
+					error.setMessage("No existen registros en el fichero.");
+					updateResponseDTO.setStatus(SigaConstants.OK); 
+				}else {
+					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGCV, datosLog);
 
-				byte[] bytesLog = ExcelHelper.createExcelBytes(CargaMasivaDatosCVItem.CAMPOSLOG, datosLog);
+					cenCargamasivacv.setTipocarga("CV");
+					cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
+					cenCargamasivacv.setNombrefichero(nombreFichero);
+					cenCargamasivacv.setNumregistros(cargaMasivaDatosCVItems.size());
+					cenCargamasivacv.setNumregistroserroneos(registrosErroneos);
+					cenCargamasivacv.setFechamodificacion(new Date());
+					cenCargamasivacv.setFechacarga(new Date());
+					cenCargamasivacv.setUsumodificacion(usuario.getIdusuario());
 
-				cenCargamasivacv.setTipocarga("CV");
-				cenCargamasivacv.setIdinstitucion(usuario.getIdinstitucion());
-				cenCargamasivacv.setNombrefichero(CargaMasivaDatosCVItem.nombreFicheroEjemplo);
-				cenCargamasivacv.setNumregistros(cargaMasivaDatosCVItems.size());
-				cenCargamasivacv.setNumregistroserroneos(registrosErroneos);
-				cenCargamasivacv.setFechamodificacion(new Date());
-				cenCargamasivacv.setFechacarga(new Date());
-				cenCargamasivacv.setUsumodificacion(usuario.getIdusuario());
+					Long idFile = uploadFile(file.getBytes(), cenCargamasivacv, false);
+					Long idLogFile = uploadFile(bytesLog, cenCargamasivacv, true);
 
-				Long idFile = uploadFile(file.getBytes(), cenCargamasivacv, false);
-				Long idLogFile = uploadFile(bytesLog, cenCargamasivacv, true);
+					cenCargamasivacv.setIdfichero(idFile);
+					cenCargamasivacv.setIdficherolog(idLogFile);
 
-				cenCargamasivacv.setIdfichero(idFile);
-				cenCargamasivacv.setIdficherolog(idLogFile);
+					int result = cenCargaMasivaExtendsMapper.insert(cenCargamasivacv);
+					
+					if (result == 0) {
+						error.setCode(SigaConstants.CODE_400);
+						errores += "Error al insertar en cargas masivas";
+					} 
+					
+					LOGGER.info("uploadFile() -> Salida al servicio para subir un archivo");
+					updateResponseDTO.setStatus(SigaConstants.OK);
+					error.setDescription(errores);
+					int correctos = cenCargamasivacv.getNumregistros() - registrosErroneos;
+					error.setMessage("Fichero cargado correctamente. Registros Correctos: " + correctos
+							+ "<br/> Registros Erroneos: " + cenCargamasivacv.getNumregistroserroneos());
+					error.setCode(SigaConstants.CODE_200); 
+				}
 
-				cenCargaMasivaExtendsMapper.insert(cenCargamasivacv);
-
-				// if(result == 0){
-				// errores += "Error al insertar en cargas masivas. <br/>";
-				// error.setDescription(errores);
-				// updateResponseDTO.setError(error);
-				// }
+				
 			}
 		}
 
-		LOGGER.info("uploadFile() -> Salida al servicio para subir un archivo");
-		updateResponseDTO.setStatus(SigaConstants.OK);
-		error.setDescription(errores);
-		int correctos = cenCargamasivacv.getNumregistros() - registrosErroneos;
-		error.setMessage("Fichero cargado correctamente. Registros Correctos: " + correctos
-				+ "<br/> Registros Erroneos: " + cenCargamasivacv.getNumregistroserroneos());
 		updateResponseDTO.setError(error);
 
 		return updateResponseDTO;
@@ -335,64 +336,64 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 		Hashtable<String, Object> e = new Hashtable<String, Object>();
 
 		if (cargaMasivaDatosCVItem.getColegiadoNumero() != null) {
-			e.put(CargaMasivaDatosCVItem.COLEGIADONUMERO, cargaMasivaDatosCVItem.getColegiadoNumero());
+			e.put(SigaConstants.COLEGIADONUMERO, cargaMasivaDatosCVItem.getColegiadoNumero());
 		}
 		if (cargaMasivaDatosCVItem.getPersonaNIF() != null) {
-			e.put(CargaMasivaDatosCVItem.PERSONANIF, cargaMasivaDatosCVItem.getPersonaNIF());
+			e.put(SigaConstants.PERSONANIF, cargaMasivaDatosCVItem.getPersonaNIF());
 		}
 		if (cargaMasivaDatosCVItem.getPersonaNombre() != null) {
-			e.put(CargaMasivaDatosCVItem.PERSONANOMBRE, cargaMasivaDatosCVItem.getPersonaNombre());
+			e.put(SigaConstants.PERSONANOMBRE, cargaMasivaDatosCVItem.getPersonaNombre());
 		}
 		if (cargaMasivaDatosCVItem.getIdPersona() != null) {
-			e.put(CargaMasivaDatosCVItem.C_IDPERSONA, cargaMasivaDatosCVItem.getIdPersona());
+			e.put(SigaConstants.C_IDPERSONA, cargaMasivaDatosCVItem.getIdPersona());
 		}
 		if (cargaMasivaDatosCVItem.getFechaInicio() != null) {
 			String fechaInicio = df2.format(cargaMasivaDatosCVItem.getFechaInicio());
-			e.put(CargaMasivaDatosCVItem.C_FECHAINICIO, fechaInicio);
+			e.put(SigaConstants.C_FECHAINICIO, fechaInicio);
 		}
 		if (cargaMasivaDatosCVItem.getFechaFin() != null) {
 			String fechaFin = df2.format(cargaMasivaDatosCVItem.getFechaFin());
-			e.put(CargaMasivaDatosCVItem.C_FECHAFIN, fechaFin);
+			e.put(SigaConstants.C_FECHAFIN, fechaFin);
 		}
 		if (cargaMasivaDatosCVItem.getCreditos() != null) {
-			e.put(CargaMasivaDatosCVItem.C_CREDITOS, cargaMasivaDatosCVItem.getCreditos());
+			e.put(SigaConstants.C_CREDITOS, cargaMasivaDatosCVItem.getCreditos());
 		}
 		if (cargaMasivaDatosCVItem.getFechaVerificacion() != null) {
 			String fechaVerificacion = df2.format(cargaMasivaDatosCVItem.getFechaVerificacion());
-			e.put(CargaMasivaDatosCVItem.FECHAVERIFICACION, fechaVerificacion);
+			e.put(SigaConstants.FECHAVERIFICACION, fechaVerificacion);
 		}
 		if (cargaMasivaDatosCVItem.getDescripcion() != null) {
-			e.put(CargaMasivaDatosCVItem.C_DESCRIPCION, cargaMasivaDatosCVItem.getDescripcion());
+			e.put(SigaConstants.C_DESCRIPCION, cargaMasivaDatosCVItem.getDescripcion());
 		}
 		if (cargaMasivaDatosCVItem.getTipoCVCOD() != null) {
-			e.put(CargaMasivaDatosCVItem.TIPOCVCOD, cargaMasivaDatosCVItem.getTipoCVCOD());
+			e.put(SigaConstants.TIPOCVCOD, cargaMasivaDatosCVItem.getTipoCVCOD());
 		}
 		if (cargaMasivaDatosCVItem.getTipoCVNombre() != null) {
-			e.put(CargaMasivaDatosCVItem.TIPOCVNOMBRE, cargaMasivaDatosCVItem.getTipoCVNombre());
+			e.put(SigaConstants.TIPOCVNOMBRE, cargaMasivaDatosCVItem.getTipoCVNombre());
 		}
 		if (cargaMasivaDatosCVItem.getIdTipoCV() != null) {
-			e.put(CargaMasivaDatosCVItem.C_IDTIPOCV, cargaMasivaDatosCVItem.getIdTipoCV());
+			e.put(SigaConstants.C_IDTIPOCV, cargaMasivaDatosCVItem.getIdTipoCV());
 		}
 		if (cargaMasivaDatosCVItem.getSubtipoCV1COD() != null) {
-			e.put(CargaMasivaDatosCVItem.SUBTIPOCV1COD, cargaMasivaDatosCVItem.getSubtipoCV1COD());
+			e.put(SigaConstants.SUBTIPOCV1COD, cargaMasivaDatosCVItem.getSubtipoCV1COD());
 		}
 		if (cargaMasivaDatosCVItem.getSubTipoCV1Nombre() != null) {
-			e.put(CargaMasivaDatosCVItem.SUBTIPOCV1NOMBRE, cargaMasivaDatosCVItem.getSubTipoCV1Nombre());
+			e.put(SigaConstants.SUBTIPOCV1NOMBRE, cargaMasivaDatosCVItem.getSubTipoCV1Nombre());
 		}
 		if (cargaMasivaDatosCVItem.getIdTipoCVSubtipo1() != null) {
-			e.put(CargaMasivaDatosCVItem.C_IDTIPOCVSUBTIPO1, cargaMasivaDatosCVItem.getIdTipoCVSubtipo1());
+			e.put(SigaConstants.C_IDTIPOCVSUBTIPO1, cargaMasivaDatosCVItem.getIdTipoCVSubtipo1());
 		}
 		if (cargaMasivaDatosCVItem.getSubtipoCV2COD() != null) {
-			e.put(CargaMasivaDatosCVItem.SUBTIPOCV2COD, cargaMasivaDatosCVItem.getSubtipoCV2COD());
+			e.put(SigaConstants.SUBTIPOCV2COD, cargaMasivaDatosCVItem.getSubtipoCV2COD());
 		}
 		if (cargaMasivaDatosCVItem.getSubtipoCV2Nombre() != null) {
-			e.put(CargaMasivaDatosCVItem.SUBTIPOCV2NOMBRE, cargaMasivaDatosCVItem.getSubtipoCV2Nombre());
+			e.put(SigaConstants.SUBTIPOCV2NOMBRE, cargaMasivaDatosCVItem.getSubtipoCV2Nombre());
 		}
 		if (cargaMasivaDatosCVItem.getIdTipoCVSubtipo2() != null) {
-			e.put(CargaMasivaDatosCVItem.C_IDTIPOCVSUBTIPO2, cargaMasivaDatosCVItem.getIdTipoCVSubtipo2());
+			e.put(SigaConstants.C_IDTIPOCVSUBTIPO2, cargaMasivaDatosCVItem.getIdTipoCVSubtipo2());
 		}
 		if (cargaMasivaDatosCVItem.getErrores() != null) {
-			e.put(CargaMasivaDatosCVItem.ERRORES, cargaMasivaDatosCVItem.getErrores());
+			e.put(SigaConstants.ERRORES, cargaMasivaDatosCVItem.getErrores());
 		}
 
 		LOGGER.info(dateLog + ":fin.CargaMasivaDatosCVImpl.convertItemtoHash");
@@ -417,7 +418,6 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 		SubtiposCVItem subtipoCV1Vo = null;
 		SubtiposCVItem subtipoCV2Vo = null;
 
-		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
 		Short idInstitucion = usuario.getIdinstitucion();
 		String idLenguaje = usuario.getIdlenguaje();
@@ -442,25 +442,25 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 
 			cargaMasivaDatosCVItem.setIdInstitucion(idInstitucion);
 			errorLinea = new StringBuffer();
-			if (hashtable.get(CargaMasivaDatosCVItem.C_CREDITOS) != null
-					&& !hashtable.get(CargaMasivaDatosCVItem.C_CREDITOS).toString().equals("")) {
+			if (hashtable.get(SigaConstants.C_CREDITOS) != null
+					&& !hashtable.get(SigaConstants.C_CREDITOS).toString().equals("")) {
 				try {
 					cargaMasivaDatosCVItem
-							.setCreditos(Long.valueOf((String) hashtable.get(CargaMasivaDatosCVItem.C_CREDITOS)));
+							.setCreditos(Long.valueOf((String) hashtable.get(SigaConstants.C_CREDITOS)));
 				} catch (NumberFormatException e) {
-					LOGGER.debug("Los creditos debe ser numericos:" + hashtable.get(CargaMasivaDatosCVItem.C_CREDITOS));
+					LOGGER.debug("Los creditos debe ser numericos:" + hashtable.get(SigaConstants.C_CREDITOS));
 					errorLinea.append("Creditos debe ser numérico. ");
 				}
 			}
 
 			// Llamada a método para obtener idpersona
-			if (hashtable.get(CargaMasivaDatosCVItem.COLEGIADONUMERO) != null
-					&& !hashtable.get(CargaMasivaDatosCVItem.COLEGIADONUMERO).toString().equals(""))
+			if (hashtable.get(SigaConstants.COLEGIADONUMERO) != null
+					&& !hashtable.get(SigaConstants.COLEGIADONUMERO).toString().equals(""))
 				cargaMasivaDatosCVItem
-						.setColegiadoNumero((String) hashtable.get(CargaMasivaDatosCVItem.COLEGIADONUMERO));
-			if (hashtable.get(CargaMasivaDatosCVItem.PERSONANIF) != null
-					&& !hashtable.get(CargaMasivaDatosCVItem.PERSONANIF).toString().equals(""))
-				cargaMasivaDatosCVItem.setPersonaNIF((String) hashtable.get(CargaMasivaDatosCVItem.PERSONANIF));
+						.setColegiadoNumero((String) hashtable.get(SigaConstants.COLEGIADONUMERO));
+			if (hashtable.get(SigaConstants.PERSONANIF) != null
+					&& !hashtable.get(SigaConstants.PERSONANIF).toString().equals(""))
+				cargaMasivaDatosCVItem.setPersonaNIF((String) hashtable.get(SigaConstants.PERSONANIF));
 			if (cargaMasivaDatosCVItem.getColegiadoNumero() != null || cargaMasivaDatosCVItem.getPersonaNIF() != null) {
 
 				try {
@@ -470,6 +470,8 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 					List<CenPersona> cenPersona = cenPersonaMapper.selectByExample(cenPersonaExample);
 
 					cargaMasivaDatosCVItem.setIdPersona(cenPersona.get(0).getIdpersona());
+					
+					
 
 				} catch (Exception e) {
 					errorLinea.append(e.getMessage() + ". ");
@@ -502,29 +504,45 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 					personaHashtable.put(cargaMasivaDatosCVItem.getIdPersona(), nombreString);
 
 				}
+				
+				if(cargaMasivaDatosCVItem.getColegiadoNumero() != null) {						
+						// Comprobamos si el num de colegiado pertenece a esa persona
+						CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+						cenColegiadoExample.createCriteria().andIdpersonaEqualTo(cargaMasivaDatosCVItem.getIdPersona()).andIdinstitucionEqualTo(idInstitucion).andNcolegiadoEqualTo(cargaMasivaDatosCVItem.getColegiadoNumero());
+						
+						List<CenColegiado> cenColegiado = cenColegiadoExtendsMapper.selectByExample(cenColegiadoExample);
+						
+						if(cenColegiado.isEmpty()) {
+							errorLinea.append("El número de colegiado no coincide con la persona dada. ");
+						}
+				}
 			} else {
 				errorLinea.append("Es obligatorio introducir número de colegiado o nif/cif. ");
 				cargaMasivaDatosCVItem.setPersonaNombre("Error");
 			}
 
-			if (hashtable.get(CargaMasivaDatosCVItem.C_DESCRIPCION) != null
-					&& !hashtable.get(CargaMasivaDatosCVItem.C_DESCRIPCION).toString().equals(""))
-				cargaMasivaDatosCVItem.setDescripcion((String) hashtable.get(CargaMasivaDatosCVItem.C_DESCRIPCION));
+			if (hashtable.get(SigaConstants.C_DESCRIPCION) != null
+					&& !hashtable.get(SigaConstants.C_DESCRIPCION).toString().equals(""))
+				cargaMasivaDatosCVItem.setDescripcion((String) hashtable.get(SigaConstants.C_DESCRIPCION));
 
-			if (hashtable.get(CargaMasivaDatosCVItem.C_FECHAFIN) != null
-					&& !hashtable.get(CargaMasivaDatosCVItem.C_FECHAFIN).toString().equals(""))
+			if (hashtable.get(SigaConstants.C_FECHAFIN) != null
+					&& !hashtable.get(SigaConstants.C_FECHAFIN).toString().equals(""))
 				try {
+					DateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
+
 					cargaMasivaDatosCVItem
-							.setFechaFin(sdf.parse((String) hashtable.get(CargaMasivaDatosCVItem.C_FECHAFIN)));
+							.setFechaFin(sdf.parse((String) hashtable.get(SigaConstants.C_FECHAFIN)));
 				} catch (ParseException e1) {
 					errorLinea.append("Fecha Fin mal introducida. ");
 
 				}
-			if (hashtable.get(CargaMasivaDatosCVItem.C_FECHAINICIO) != null
-					&& !hashtable.get(CargaMasivaDatosCVItem.C_FECHAINICIO).toString().equals(""))
+			if (hashtable.get(SigaConstants.C_FECHAINICIO) != null
+					&& !hashtable.get(SigaConstants.C_FECHAINICIO).toString().equals(""))
 				try {
+					DateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
+
 					cargaMasivaDatosCVItem
-							.setFechaInicio(sdf.parse((String) hashtable.get(CargaMasivaDatosCVItem.C_FECHAINICIO)));
+							.setFechaInicio(sdf.parse((String) hashtable.get(SigaConstants.C_FECHAINICIO)));
 				} catch (ParseException e1) {
 					errorLinea.append("Fecha Inicio mal introducida. ");
 				}
@@ -533,19 +551,21 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 					&& cargaMasivaDatosCVItem.getFechaInicio().compareTo(cargaMasivaDatosCVItem.getFechaFin()) > 0) {
 				errorLinea.append("La fecha de inicio no puede ser posterior a la fecha fin. ");
 			}
-			if (hashtable.get(CargaMasivaDatosCVItem.FECHAVERIFICACION) != null
-					&& !hashtable.get(CargaMasivaDatosCVItem.FECHAVERIFICACION).toString().equals(""))
+			if (hashtable.get(SigaConstants.FECHAVERIFICACION) != null
+					&& !hashtable.get(SigaConstants.FECHAVERIFICACION).toString().equals(""))
 				try {
+					DateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
+
 					cargaMasivaDatosCVItem.setFechaVerificacion(
-							sdf.parse((String) hashtable.get(CargaMasivaDatosCVItem.FECHAVERIFICACION)));
+							sdf.parse((String) hashtable.get(SigaConstants.FECHAVERIFICACION)));
 				} catch (ParseException e1) {
 					errorLinea.append("Fecha Verificacion mal introducida. ");
 				}
 
-			if (hashtable.get(CargaMasivaDatosCVItem.TIPOCVCOD) != null
-					&& !hashtable.get(CargaMasivaDatosCVItem.TIPOCVCOD).toString().equals("")) {
+			if (hashtable.get(SigaConstants.TIPOCVCOD) != null
+					&& !hashtable.get(SigaConstants.TIPOCVCOD).toString().equals("")) {
 
-				Short tipocvCod = new Short(String.valueOf(hashtable.get(CargaMasivaDatosCVItem.TIPOCVCOD)));
+				Short tipocvCod = new Short(String.valueOf(hashtable.get(SigaConstants.TIPOCVCOD)));
 				if (!tipoCvHashtable.containsKey(Short.toString(tipocvCod))) {
 					tipoCVVo = new SubtiposCVItem();
 
@@ -592,13 +612,13 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 						.selectByExample(cenTiposcvsubtipo1Example);
 
 				if (tiposcvsubtipo1s != null && tiposcvsubtipo1s.size() > 0
-						&& hashtable.get(CargaMasivaDatosCVItem.SUBTIPOCV1COD) == null) {
+						&& hashtable.get(SigaConstants.SUBTIPOCV1COD) == null) {
 					errorLinea.append(
 							"Al existir subtipos 1 para este tipo de cv es obligatorio introducir el subtipo 1 ");
 					cargaMasivaDatosCVItem.setSubTipoCV1Nombre("Error");
-				} else if (hashtable.get(CargaMasivaDatosCVItem.SUBTIPOCV1COD) != null
-						&& !hashtable.get(CargaMasivaDatosCVItem.SUBTIPOCV1COD).toString().equals("")) {
-					String subtipocv1Cod = (String) hashtable.get(CargaMasivaDatosCVItem.SUBTIPOCV1COD);
+				} else if (hashtable.get(SigaConstants.SUBTIPOCV1COD) != null
+						&& !hashtable.get(SigaConstants.SUBTIPOCV1COD).toString().equals("")) {
+					String subtipocv1Cod = (String) hashtable.get(SigaConstants.SUBTIPOCV1COD);
 					if (!subtipo1CvHashtable.containsKey(subtipocv1Cod)) {
 						subtipoCV1Vo = new SubtiposCVItem();
 						// Llamada a método para obtener idtipocv
@@ -643,9 +663,9 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 					cargaMasivaDatosCVItem.setSubtipoCV1COD(subtipocv1Cod);
 
 					if (cargaMasivaDatosCVItem.getIdTipoCVSubtipo1() != null
-							&& hashtable.get(CargaMasivaDatosCVItem.SUBTIPOCV2COD) != null
-							&& !hashtable.get(CargaMasivaDatosCVItem.SUBTIPOCV2COD).toString().equals("")) {
-						String subtipocv2Cod = (String) hashtable.get(CargaMasivaDatosCVItem.SUBTIPOCV2COD);
+							&& hashtable.get(SigaConstants.SUBTIPOCV2COD) != null
+							&& !hashtable.get(SigaConstants.SUBTIPOCV2COD).toString().equals("")) {
+						String subtipocv2Cod = (String) hashtable.get(SigaConstants.SUBTIPOCV2COD);
 						if (!subtipo2CvHashtable.containsKey(subtipocv2Cod)) {
 							subtipoCV2Vo = new SubtiposCVItem();
 							// Llamada a método para obtener idtipocv
@@ -817,8 +837,8 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 
 		String directorioFichero = getDirectorioFichero(cenCargamasivacv.getIdinstitucion());
 		ficheroVo.setDirectorio(directorioFichero);
-		String[] nombreFicheroStrings = cenCargamasivacv.getNombrefichero().split("\\.");
-		ficheroVo.setNombre(nombreFicheroStrings[0]);
+		String nombreFicheroString = cenCargamasivacv.getNombrefichero();
+		ficheroVo.setNombre(nombreFicheroString); 
 		ficheroVo.setDescripcion("Carga Masiva " + ficheroVo.getNombre());
 
 		ficheroVo.setIdinstitucion(cenCargamasivacv.getIdinstitucion());
@@ -845,12 +865,11 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 
 		// Extraer propiedad
 		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
-		genPropertiesExampleP.createCriteria().andParametroEqualTo("gen.ficheros.path");
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("cen.cargaExcel.ficheros.path");
 		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
-
-		// Esto se usará -- no borrar!! es para traer el directorio de BD --
-		// genPropertiesPath.get(0).getValor()
-		StringBuffer directorioFichero = new StringBuffer("C:\\Users\\DTUser\\Documents\\CV");
+		String pathCV = genPropertiesPath.get(0).getValor(); 
+		
+		StringBuffer directorioFichero = new StringBuffer(pathCV);
 		directorioFichero.append(idInstitucion);
 		directorioFichero.append(File.separator);
 
@@ -858,10 +877,7 @@ public class CargasMasivasCVServiceImpl implements ICargasMasivasCVService {
 		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
 		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.cargamasivaCV");
 		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
-
-		// Esto se usará -- no borrar!! es para traer el path de BD --
-		// genPropertiesDirectorio.get(0).getValor()
-		directorioFichero.append("cargas");
+		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
 
 		LOGGER.info(dateLog + ":fin.CargaMasivaDatosCVImpl.getDirectorioFichero");
 		return directorioFichero.toString();
