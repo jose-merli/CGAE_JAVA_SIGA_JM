@@ -944,8 +944,9 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		// Extraer el path
-		String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
-		path += idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
+		//String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
+		String path = getDirectorioFichero(idInstitucion);
+		path += File.separator + idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
 		File file = new File(path);
 
 		// Preparar la descarga
@@ -977,8 +978,9 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		// Extraer el path
-		String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
-		path += "log_" + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "."
+		//String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
+		String path = getDirectorioFichero(idInstitucion);
+		path += File.separator +"log_" + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "."
 				+ SigaConstants.tipoExcelXls;
 		File file = new File(path);
 
