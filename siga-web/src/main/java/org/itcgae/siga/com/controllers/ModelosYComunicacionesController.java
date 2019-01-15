@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
+import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDto;
 import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
@@ -118,6 +119,7 @@ public class ModelosYComunicacionesController {
 		PlantillasDocumentosDto response = _modelosYcomunicacionesService.obtenerInformes(request, idModeloComuncacion, idInstitucion);
 		return new ResponseEntity<PlantillasDocumentosDto>(response, HttpStatus.OK);
 	}
+	
 	@RequestMapping(value = "detalle/plantillasEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<PlantillasModeloDTO> obtenerPlantillasEnvio(HttpServletRequest request, String idModelo) {
 		
@@ -129,11 +131,33 @@ public class ModelosYComunicacionesController {
 			return new ResponseEntity<PlantillasModeloDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
+	
+	@RequestMapping(value = "detalle/plantillasEnvioHist",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PlantillasModeloDTO> obtenerPlantillasEnvioHist(HttpServletRequest request, String idModelo) {
+		
+		PlantillasModeloDTO response = _modelosYcomunicacionesService.obtenerPlantillasModeloHist(request, idModelo);
+
+		if(response.getError() == null)
+			return new ResponseEntity<PlantillasModeloDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<PlantillasModeloDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
 
 	@RequestMapping(value = "/detalle/borrarPlantilla",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> borrarPlantilla(HttpServletRequest request, @RequestBody String idModeloComunicacion, @RequestBody String idPlantillaEnvios) {
+	ResponseEntity<Error> borrarPlantilla(HttpServletRequest request, @RequestBody String idModeloComunicacion, @RequestBody PlantillaModeloBorrarDTO[] plantillas) {
 
-		Error response = _modelosYcomunicacionesService.borrarPlantillaModelo(request, idModeloComunicacion, idPlantillaEnvios);
+		Error response = _modelosYcomunicacionesService.borrarPlantillaModelo(request, plantillas);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/guardarPlantilla",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardarPlantilla(HttpServletRequest request, @RequestBody String idModeloComunicacion, @RequestBody String idPlantillaEnvios) {
+
+		Error response = _modelosYcomunicacionesService.guardarPlantillaModelo(request, idModeloComunicacion, idPlantillaEnvios);
 		if(response.getCode() == 200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else

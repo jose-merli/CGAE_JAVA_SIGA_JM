@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoDto;
+import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillaModeloItem;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDto;
 import org.itcgae.siga.DTOs.com.PlantillasModeloDTO;
@@ -38,6 +39,7 @@ import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
+import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPerfilesExtendsMapper;
@@ -553,9 +555,46 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		LOGGER.info("obtenerPlantillasModelo() -> Salida del servicio para obtener plantillas del modelo");
 		return respuesta;
 	}
+	
+	@Override
+	public PlantillasModeloDTO obtenerPlantillasModeloHist(HttpServletRequest request, String idModelo) {
+		LOGGER.info("obtenerPlantillasModeloHist() -> Entrada al servicio para obtener plantillas del modelo HIST");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		PlantillasModeloDTO respuesta = new PlantillasModeloDTO();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					List<PlantillaModeloItem> plantillas = modModeloPlantillaDocumentoExtendsMapper.getPlantillasDocumentoHist(idModelo, usuario.getIdlenguaje());
+					if(plantillas != null && plantillas.size() > 0){
+						respuesta.setPlantillas(plantillas);
+					}
+					
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					error.setMessage("Error");
+					respuesta.setError(error);
+				}
+			}
+		}
+		
+		LOGGER.info("obtenerPlantillasModeloHist() -> Salida del servicio para obtener plantillas del modelo HIST");
+		return respuesta;
+	}
 
 	@Override
-	public Error borrarPlantillaModelo(HttpServletRequest request, String idModelo, String idPlantillaEnvios) {
+	public Error borrarPlantillaModelo(HttpServletRequest request, PlantillaModeloBorrarDTO[] plantillas) {
 		LOGGER.info("borrarPlantillaModelo() -> Entrada al servicio para obtener plantillas del modelo");
 		
 		// Conseguimos información del usuario logeado
@@ -573,12 +612,16 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
-					ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
-					key.setIdmodelocomunicacion(Long.valueOf(idModelo));
-					key.setIdplantillaenvios(Short.valueOf(idPlantillaEnvios));
-					ModModeloPlantillaenvio plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
-					plantilla.setFechabaja(new Date());
-					//plantilla.s
+					for (int i = 0; i < plantillas.length; i++) {
+						ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
+						key.setIdmodelocomunicacion(Long.valueOf(plantillas[i].getIdModelo()));
+						key.setIdplantillaenvios(Short.valueOf(plantillas[i].getIdPlantillaEnvios()));
+						ModModeloPlantillaenvio plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
+						plantilla.setFechabaja(new Date());
+						plantilla.setFechamodificacion(new Date());
+						plantilla.setUsumodificacion(usuario.getIdusuario());
+						modModeloPlantillaenvioMapper.updateByPrimaryKey(plantilla);
+					}
 					respuesta.setCode(200);
 					respuesta.setMessage("Plantillas borradas");
 				}catch(Exception e){
@@ -592,4 +635,45 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		LOGGER.info("borrarPlantillaModelo() -> Salida del servicio para obtener plantillas del modelo");
 		return respuesta;
 	}
+
+	
+	@Override
+	public Error guardarPlantillaModelo(HttpServletRequest request, String idModelo, String idPlantillaEnvios) {
+		LOGGER.info("guardarPlantillaModelo() -> Entrada al servicio para guardar la plantilla del modelo");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		Error respuesta = new Error();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					ModModeloPlantillaenvio plantilla = new ModModeloPlantillaenvio();
+					plantilla.setIdmodelocomunicacion(Long.valueOf(idModelo));
+					plantilla.setIdplantillaenvios(Short.valueOf(idPlantillaEnvios));
+					plantilla.setUsumodificacion(usuario.getIdusuario());
+					plantilla.setFechamodificacion(new Date());
+					modModeloPlantillaenvioMapper.insert(plantilla);
+					respuesta.setCode(200);
+					respuesta.setDescription("Plantilla guardada");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error al guardar plantilla");
+				}
+			}
+		}
+		
+		LOGGER.info("guardarPlantillaModelo() -> Salida del servicio para guardar la plantilla del modelo");
+		return respuesta;
+	}
+
+
 }

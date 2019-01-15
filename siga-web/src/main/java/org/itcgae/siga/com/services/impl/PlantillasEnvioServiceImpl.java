@@ -248,9 +248,10 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						plantilla.setFechamodificacion(new Date());
 						plantilla.setUsumodificacion(usuario.getIdusuario());
 						_envPlantillasenviosMapper.insert(plantilla);
+						respuesta.setMessage(plantilla.getIdplantillaenvios().toString());
 					}
 					respuesta.setCode(200);
-					respuesta.setMessage("Plantilla guardada correctamente");
+					
 
 				}
 			}catch(Exception e){

@@ -4,9 +4,16 @@ public class PlantillaModeloItem {
 	
 	private String idPlantillaEnvios;
 	private String nombrePlantilla;
+	private String idTipoEnvios;
 	private String tipoEnvio;
 	
 	
+	public String getIdTipoEnvios() {
+		return idTipoEnvios;
+	}
+	public void setIdTipoEnvios(String idTipoEnvios) {
+		this.idTipoEnvios = idTipoEnvios;
+	}
 	public String getIdPlantillaEnvios() {
 		return idPlantillaEnvios;
 	}
