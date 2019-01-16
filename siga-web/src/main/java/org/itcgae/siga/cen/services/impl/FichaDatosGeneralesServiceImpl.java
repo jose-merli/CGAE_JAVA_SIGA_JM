@@ -708,12 +708,15 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 						NewIdDTO idBD = cenSolicitmodifdatosbasicosMapper.getMaxIdSolicitud(String.valueOf(idInstitucion),
 								noColegiadoItem.getIdPersona());
-						if (idBD == null) {
-							solicitud.setIdsolicitud(Short.parseShort("1"));
-						} else {
-							int idCv = Integer.parseInt(idBD.getNewId());
-							solicitud.setIdsolicitud(Short.parseShort(""+ (1 + idCv)));
-						}
+//						if (idBD == null) {
+//							solicitud.setIdsolicitud(Short.parseShort("1"));
+//						} else {
+//							int idCv = Integer.parseInt(idBD.getNewId());
+//							solicitud.setIdsolicitud(Short.parseShort(""+ (1 + idCv)));
+//						}
+						
+						int idCv = Integer.parseInt(idBD.getNewId());
+						solicitud.setIdsolicitud(Short.parseShort(""+ (1 + idCv)));
 						solicitud.setPublicidad(noColegiadoItem.getPublicidad());
 						solicitud.setAbonos("B");
 						solicitud.setCargos("B");

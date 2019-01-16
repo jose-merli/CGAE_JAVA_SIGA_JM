@@ -17,5 +17,9 @@ public interface IFichaColegialRegTelService {
 
 	public DocushareDTO searchListDir(int numPagina, DocuShareObjectVO docu, HttpServletRequest request) throws Exception;
 	
+	public DocushareDTO searchListDocNoCol(int numPagina, String idPersona, HttpServletRequest request) throws Exception;
+
+	public DocushareDTO searchListDirNoCol(int numPagina, DocuShareObjectVO docu, HttpServletRequest request) throws Exception;
+	
 	public ResponseEntity<InputStreamResource> downloadDoc(DocuShareObjectVO cargaMasivaItem, HttpServletRequest request) throws Exception;
 }

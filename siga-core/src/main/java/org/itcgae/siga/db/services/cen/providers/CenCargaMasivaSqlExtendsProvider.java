@@ -18,6 +18,7 @@ public class CenCargaMasivaSqlExtendsProvider extends CenCargamasivaSqlProvider 
 		sql.SELECT("ca.idfichero");
 		sql.SELECT("ca.idficherolog");
 		sql.SELECT("ca.tipocarga");
+		sql.SELECT("ca.fechacarga");
 		sql.FROM("cen_cargamasiva ca");
 		sql.INNER_JOIN("adm_usuarios adm on (adm.idusuario = ca.usumodificacion and adm.idinstitucion = ca.idinstitucion)");
 		sql.WHERE("ca.idinstitucion = '"+ idInstitucion  + "'");
@@ -27,7 +28,7 @@ public class CenCargaMasivaSqlExtendsProvider extends CenCargamasivaSqlProvider 
 			sql.WHERE("ca.fechacarga>= TO_DATE('" + cargaMasivaItem.getFechaCarga() + "','DD/MM/RRRR') and ca.fechacarga< (TO_DATE('" + cargaMasivaItem.getFechaCarga() + "','DD/MM/YYYY')+1)");
 		}
 		
-		sql.ORDER_BY("ca.nombrefichero");
+		sql.ORDER_BY("ca.fechacarga desc");
 		
 		return sql.toString();
 	}
