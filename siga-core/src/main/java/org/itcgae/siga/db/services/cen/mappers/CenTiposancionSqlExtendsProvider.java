@@ -257,6 +257,11 @@ public class CenTiposancionSqlExtendsProvider extends CenTiposancionSqlProvider 
 		if (!UtilidadesString.esCadenaVacia(busquedaSancionesSearchDTO.getTipo())) {
 			sql.WHERE("sancion.IDTIPOSANCION = '" + busquedaSancionesSearchDTO.getTipo() + "'");
 		}
+		
+		//TODO revisar si solo es cuando se entra como colegiado
+		if (busquedaSancionesSearchDTO.getChkFirmeza()) {
+			sql.WHERE("sancion.CHKREHABILITADO = 1");
+		}
 
 		rdo = sql.toString() + " ORDER BY NOMBRE";
 		return rdo;
