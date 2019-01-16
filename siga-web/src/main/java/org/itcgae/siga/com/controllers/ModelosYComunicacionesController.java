@@ -170,6 +170,49 @@ public class ModelosYComunicacionesController {
 		
 		ComboDTO response = _modelosYcomunicacionesService.obtenerSufijos(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-	}	
+	}
+	@RequestMapping(value = "detalle/plantillasEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PlantillasModeloDTO> obtenerPlantillasEnvio(HttpServletRequest request, @RequestBody String idModelo) {
+		
+		PlantillasModeloDTO response = _modelosYcomunicacionesService.obtenerPlantillasEnviosModeloSearch(request, idModelo);
+
+		if(response.getError() == null)
+			return new ResponseEntity<PlantillasModeloDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<PlantillasModeloDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
+	@RequestMapping(value = "detalle/plantillasEnvioHist",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PlantillasModeloDTO> obtenerPlantillasEnvioHist(HttpServletRequest request, String idModelo) {
+		
+		PlantillasModeloDTO response = _modelosYcomunicacionesService.obtenerPlantillasEnviosModeloSearchHist(request, idModelo);
+
+		if(response.getError() == null)
+			return new ResponseEntity<PlantillasModeloDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<PlantillasModeloDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+
+	@RequestMapping(value = "/detalle/borrarPlantilla",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> borrarPlantilla(HttpServletRequest request, @RequestBody PlantillaModeloBorrarDTO[] plantillas) {
+
+		Error response = _modelosYcomunicacionesService.borrarPlantillaEnviosModelo(request, plantillas);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/guardarPlantilla",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardarPlantilla(HttpServletRequest request, @RequestBody String idModeloComunicacion, @RequestBody String idPlantillaEnvios) {
+
+		Error response = _modelosYcomunicacionesService.guardarPlantillaEnviosModelo(request, idModeloComunicacion, idPlantillaEnvios);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 	
 }

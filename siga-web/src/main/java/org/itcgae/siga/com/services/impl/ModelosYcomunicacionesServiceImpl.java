@@ -14,7 +14,10 @@ import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoDTO;
+import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
+import org.itcgae.siga.DTOs.com.PlantillaModeloItem;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDTO;
+import org.itcgae.siga.DTOs.com.PlantillasModeloDTO;
 import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
@@ -32,6 +35,7 @@ import org.itcgae.siga.db.entities.ModModeloPlantilladocumentoExample;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumentoKey;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvio;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvioExample;
+import org.itcgae.siga.db.entities.ModModeloPlantillaenvioKey;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
@@ -47,9 +51,11 @@ import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPerfilesExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPlantillaDocumentoExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModModeloPlantillaEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocFormatoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocSufijoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
+import org.itcgae.siga.db.services.com.providers.ModModeloPlantillaDocumentoExtendsSqlProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -102,6 +108,8 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	@Autowired
 	private ConConsultasExtendsMapper _conConsultasExtendsMapper;
 
+	@Autowired
+	private ModModeloPlantillaEnvioExtendsMapper _modModeloPlantillaEnvioExtendsMapper;
 	
 	@Override
 	public DatosModelosComunicacionesDTO modeloYComunicacionesSearch(HttpServletRequest request, DatosModelosComunicacionesSearch filtros, boolean historico) {
@@ -732,5 +740,160 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		
 		LOGGER.info("obtenerConsultasDisponibles() -> Salida del servicio para obtener las disponibles para la clase y la institucion");
 		return comboDTO;
-	}	
+	}
+	@Override
+	public PlantillasModeloDTO obtenerPlantillasEnviosModeloSearch(HttpServletRequest request, String idModelo) {
+		LOGGER.info("obtenerPlantillasModelo() -> Entrada al servicio para obtener plantillas del modelo");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		PlantillasModeloDTO respuesta = new PlantillasModeloDTO();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					List<PlantillaModeloItem> plantillas = _modModeloPlantillaEnvioExtendsMapper.getPlantillasModelo(idModelo, usuario.getIdlenguaje());
+					if(plantillas != null && plantillas.size() > 0){
+						respuesta.setPlantillas(plantillas);
+					}
+					
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					error.setMessage("Error");
+					respuesta.setError(error);
+				}
+			}
+		}
+		
+		LOGGER.info("obtenerPlantillasModelo() -> Salida del servicio para obtener plantillas del modelo");
+		return respuesta;
+	}
+	
+	@Override
+	public PlantillasModeloDTO obtenerPlantillasEnviosModeloSearchHist(HttpServletRequest request, String idModelo) {
+		LOGGER.info("obtenerPlantillasModeloHist() -> Entrada al servicio para obtener plantillas del modelo HIST");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		PlantillasModeloDTO respuesta = new PlantillasModeloDTO();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					List<PlantillaModeloItem> plantillas = _modModeloPlantillaEnvioExtendsMapper.getPlantillasModeloHist(idModelo, usuario.getIdlenguaje());
+					if(plantillas != null && plantillas.size() > 0){
+						respuesta.setPlantillas(plantillas);
+					}
+					
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					error.setMessage("Error");
+					respuesta.setError(error);
+				}
+			}
+		}
+		
+		LOGGER.info("obtenerPlantillasModeloHist() -> Salida del servicio para obtener plantillas del modelo HIST");
+		return respuesta;
+	}
+
+	@Override
+	public Error borrarPlantillaEnviosModelo(HttpServletRequest request, PlantillaModeloBorrarDTO[] plantillas) {
+		LOGGER.info("borrarPlantillaModelo() -> Entrada al servicio para obtener plantillas del modelo");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+
+		Error respuesta = new Error();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					for (int i = 0; i < plantillas.length; i++) {
+						ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
+						key.setIdmodelocomunicacion(Long.valueOf(plantillas[i].getIdModelo()));
+						key.setIdplantillaenvios(Short.valueOf(plantillas[i].getIdPlantillaEnvios()));
+						ModModeloPlantillaenvio plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
+						plantilla.setFechabaja(new Date());
+						plantilla.setFechamodificacion(new Date());
+						plantilla.setUsumodificacion(usuario.getIdusuario());
+						modModeloPlantillaenvioMapper.updateByPrimaryKey(plantilla);
+					}
+					respuesta.setCode(200);
+					respuesta.setMessage("Plantillas borradas");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error al borrar plantillas");
+					e.printStackTrace();
+				}
+			}
+		}
+		LOGGER.info("borrarPlantillaModelo() -> Salida del servicio para obtener plantillas del modelo");
+		return respuesta;
+	}
+
+	@Override
+	public Error guardarPlantillaEnviosModelo(HttpServletRequest request, String idModelo, String idPlantillaEnvios) {
+		LOGGER.info("guardarPlantillaModelo() -> Entrada al servicio para guardar la plantilla del modelo");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		Error respuesta = new Error();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					ModModeloPlantillaenvio plantilla = new ModModeloPlantillaenvio();
+					plantilla.setIdmodelocomunicacion(Long.valueOf(idModelo));
+					plantilla.setIdplantillaenvios(Short.valueOf(idPlantillaEnvios));
+					plantilla.setUsumodificacion(usuario.getIdusuario());
+					plantilla.setFechamodificacion(new Date());
+					modModeloPlantillaenvioMapper.insert(plantilla);
+					respuesta.setCode(200);
+					respuesta.setDescription("Plantilla guardada");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error al guardar plantilla");
+				}
+			}
+		}
+		
+		LOGGER.info("guardarPlantillaModelo() -> Salida del servicio para guardar la plantilla del modelo");
+		return respuesta;
+	}
+
 }

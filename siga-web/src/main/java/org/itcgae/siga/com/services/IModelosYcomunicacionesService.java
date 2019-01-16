@@ -6,7 +6,9 @@ import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
+import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDTO;
+import org.itcgae.siga.DTOs.com.PlantillasModeloDTO;
 import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
@@ -30,5 +32,9 @@ public interface IModelosYcomunicacionesService {
 	public ComboDTO obtenerFormatoSalida(HttpServletRequest request);
 	public ComboDTO obtenerSufijos(HttpServletRequest request);
 	public ComboDTO obtenerConsultasDisponibles(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
+	public Error guardarPlantillaEnviosModelo(HttpServletRequest request, String idModelo, String idPlantillaEnvios);
+	public PlantillasModeloDTO obtenerPlantillasEnviosModeloSearch(HttpServletRequest request, String idModelo);
+	public PlantillasModeloDTO obtenerPlantillasEnviosModeloSearchHist(HttpServletRequest request, String idModelo);
+	public Error borrarPlantillaEnviosModelo(HttpServletRequest request, PlantillaModeloBorrarDTO[] plantillas);
 	
 }
