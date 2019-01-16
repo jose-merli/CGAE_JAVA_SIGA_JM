@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.com.PlantillaModeloItem;
-import org.itcgae.siga.db.services.com.providers.ModModeloPlantillaDocumentoExtendsSqlProvider;
+import org.itcgae.siga.db.services.com.providers.ModModeloPlantillaEnviosExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Primary
 public interface ModModeloPlantillaEnvioExtendsMapper {
 
-	@SelectProvider(type = ModModeloPlantillaDocumentoExtendsSqlProvider.class, method = "selectPlantillasModelo")
+	@SelectProvider(type = ModModeloPlantillaEnviosExtendsSqlProvider.class, method = "selectPlantillasModelo")
 	@Results({@Result(column = "NOMBRE", property = "nombrePlantilla", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
@@ -24,7 +24,7 @@ public interface ModModeloPlantillaEnvioExtendsMapper {
 	})
 	List<PlantillaModeloItem> getPlantillasModelo(String idModelo, String idLenguaje);
 	
-	@SelectProvider(type = ModModeloPlantillaDocumentoExtendsSqlProvider.class, method = "selectPlantillasModeloHIST")
+	@SelectProvider(type = ModModeloPlantillaEnviosExtendsSqlProvider.class, method = "selectPlantillasModeloHIST")
 	@Results({@Result(column = "NOMBRE", property = "nombrePlantilla", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
