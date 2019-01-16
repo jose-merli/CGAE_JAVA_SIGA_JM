@@ -22,7 +22,10 @@ public class DatosPersonaMutualidadDTO {
 	private String nacionalidad;
 	private String nombre;
 	private String NumColegiado;
+	private String idTratamiento;
+	private String tipoSolicitud;
 	private String profesion;
+	private String tipoIdentificacion;
 	private String sexo;
 	private int numHijos;
 	
@@ -137,6 +140,24 @@ public class DatosPersonaMutualidadDTO {
 	}
 	public void setNumHijos(int numHijos) {
 		this.numHijos = numHijos;
+	}
+	public String getIdTratamiento() {
+		return idTratamiento;
+	}
+	public void setIdTratamiento(String idTratamiento) {
+		this.idTratamiento = idTratamiento;
+	}
+	public String getTipoSolicitud() {
+		return tipoSolicitud;
+	}
+	public void setTipoSolicitud(String tipoSolicitud) {
+		this.tipoSolicitud = tipoSolicitud;
+	}
+	public String getTipoIdentificacion() {
+		return tipoIdentificacion;
+	}
+	public void setTipoIdentificacion(String tipoIdentificacion) {
+		this.tipoIdentificacion = tipoIdentificacion;
 	}
 	
 }
