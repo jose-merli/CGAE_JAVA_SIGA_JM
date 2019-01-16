@@ -201,7 +201,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 
 	@Override
 	public Error guardarDatosGenerales(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta) {
-		LOGGER.info("PlantillasEnvioSearch() -> Entrada al servicio para la busqueda de plantillas de envio");
+		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para la busqueda de plantillas de envio");
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -213,9 +213,9 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("guardarDatosGenerales() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("guardarDatosGenerales() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
@@ -252,7 +252,6 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					}
 					respuesta.setCode(200);
 					
-
 				}
 			}catch(Exception e){
 				respuesta.setCode(500);
@@ -261,7 +260,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			}
 		
 		}
-		LOGGER.info("PlantillasEnvioSearch() -> Salida del servicio para la busqueda de plantillas de envio");
+		LOGGER.info("guardarDatosGenerales() -> Salida del servicio para la busqueda de plantillas de envio");
 		return respuesta;
 	}
 
@@ -311,7 +310,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 
 	@Override
 	public Error desAsociarConsulta(HttpServletRequest request, PlantillaDatosConsultaDTO[] consulta) {
-		LOGGER.info("borrarConsulta() -> Salida del servicio para borrar una consulta a la plantilla de envio");
+		LOGGER.info("desAsociarConsulta() -> Salida del servicio para borrar una consulta a la plantilla de envio");
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -323,9 +322,9 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info("borrarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("desAsociarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info("borrarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			LOGGER.info("desAsociarConsulta() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
@@ -351,7 +350,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		}
 		
 		
-		LOGGER.info("borrarConsulta() -> Salida del servicio para borrar una consulta a la plantilla de envio");
+		LOGGER.info("desAsociarConsulta() -> Salida del servicio para borrar una consulta a la plantilla de envio");
 		return respuesta;
 	}
 
@@ -470,7 +469,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					
 					CenDireccionesKey keyDirecciones = new CenDireccionesKey();
 					keyDirecciones.setIddireccion(plantilla.getIddireccion());
-					keyDirecciones.setIdinstitucion(idInstitucion);
+					keyDirecciones.setIdinstitucion(plantilla.getIdinstitucion());
 					keyDirecciones.setIdpersona(plantilla.getIdpersona());
 					CenDirecciones direccion = _cenDireccionesMapper.selectByPrimaryKey(keyDirecciones);
 					List<DatosDireccionesItem> direccionList = new ArrayList<DatosDireccionesItem>();
@@ -578,7 +577,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					remitente.setApellido2(persona.getApellidos2());
 					
 					CenDireccionesExample example = new CenDireccionesExample();
-					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona));
+					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona)).andIdinstitucionEqualTo(idInstitucion);
 					List<CenDirecciones> direcciones = _cenDireccionesMapper.selectByExample(example);
 					if(direcciones != null && direcciones.size() > 0){
 						List<DatosDireccionesItem> direccionesList = new ArrayList<DatosDireccionesItem>();

@@ -433,6 +433,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setObservaciones(consultaDTO.getDescripcion());
 						consulta.setGeneral(consultaDTO.getGenerica());
 						consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
+						consulta.setIdobjetivo(Long.valueOf(consultaDTO.getIdObjetivo()));
 						switch(consultaDTO.getIdObjetivo()){
 						case "1":
 							//Destinarios

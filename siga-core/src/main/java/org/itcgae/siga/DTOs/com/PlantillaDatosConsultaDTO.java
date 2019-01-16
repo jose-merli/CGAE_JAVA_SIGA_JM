@@ -5,9 +5,15 @@ public class PlantillaDatosConsultaDTO {
 	private String idPlantillaEnvios;
 	private String idTipoEnvios;
 	private String idConsulta;
-	
+	private String idInstitucion;
 	
 
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
 	public String getIdPlantillaEnvios() {
 		return idPlantillaEnvios;
 	}

@@ -1,8 +1,6 @@
 package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,13 +30,6 @@ import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.ws.client.ClientCENSO;
-import org.itcgae.siga.ws.client.ClientRegistroSociedades;
-import org.itcgae.sspp.ws.publicadorSociedades.ColegioDocument.Colegio;
-import org.itcgae.sspp.ws.publicadorSociedades.GetSociedadesPublicadorRequestDocument;
-import org.itcgae.sspp.ws.publicadorSociedades.GetSociedadesPublicadorRequestDocument.GetSociedadesPublicadorRequest;
-import org.itcgae.sspp.ws.publicadorSociedades.GetSociedadesPublicadorResponseDocument;
-import org.itcgae.sspp.ws.publicadorSociedades.GetSociedadesPublicadorResponseDocument.GetSociedadesPublicadorResponse;
-import org.itcgae.sspp.ws.publicadorSociedades.SociedadesColegio;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,9 +58,6 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
-	
-	@Autowired
-	private ClientRegistroSociedades clienteRegistroSociedades;
 	
 	@Autowired
 	private AdmConfigMapper admConfigMapper;
