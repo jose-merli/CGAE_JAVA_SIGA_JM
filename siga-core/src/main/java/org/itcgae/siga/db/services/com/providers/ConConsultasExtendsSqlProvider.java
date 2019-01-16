@@ -80,12 +80,16 @@ public class ConConsultasExtendsSqlProvider {
 		return sql.toString();
 	}
 	
-	public String selectConsultasDisponibles(Short idInstitucion){
+	public String selectConsultasDisponibles(Short idInstitucion, Long idClaseComunicacion){
 		
 		SQL sql = new SQL();
 		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION");
 		sql.FROM("CON_CONSULTA");
 		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"' AND FECHABAJA IS NULL");
+		
+		if(idClaseComunicacion != null){
+			sql.WHERE("IDCLASECOMINICACION = '"+ idClaseComunicacion +"'");
+		}
 		return sql.toString();
 	}
 

@@ -1,6 +1,6 @@
 package org.itcgae.siga.DTOs.com;
 
-public class TarjetaModeloConfiguracionDto {
+public class TarjetaModeloConfiguracionDTO {
 	
 	private String idModeloComunicacion;
 	private String idClaseComunicacion;

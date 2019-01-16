@@ -5,15 +5,15 @@ import java.util.List;
 
 import org.itcgae.siga.DTOs.gen.Error;
 
-public class PlantillasDocumentosDto {
-	private List<PlantillaDocumentoDto> plantillasDocumentos = new ArrayList<PlantillaDocumentoDto>();
+public class PlantillasDocumentosDTO {
+	private List<PlantillaDocumentoDTO> plantillasDocumentos = new ArrayList<PlantillaDocumentoDTO>();
 	private Error error = null;	
 	
 
-	public List<PlantillaDocumentoDto> getPlantillasDocumentos() {
+	public List<PlantillaDocumentoDTO> getPlantillasDocumentos() {
 		return plantillasDocumentos;
 	}
-	public void setPlantillasDocumentos(List<PlantillaDocumentoDto> plantillasDocumentos) {
+	public void setPlantillasDocumentos(List<PlantillaDocumentoDTO> plantillasDocumentos) {
 		this.plantillasDocumentos = plantillasDocumentos;
 	}
 	public Error getError() {
@@ -41,7 +41,7 @@ public class PlantillasDocumentosDto {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		PlantillasDocumentosDto other = (PlantillasDocumentosDto) obj;
+		PlantillasDocumentosDTO other = (PlantillasDocumentosDTO) obj;
 		if (error == null) {
 			if (other.error != null)
 				return false;

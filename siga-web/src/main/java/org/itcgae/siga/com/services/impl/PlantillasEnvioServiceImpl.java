@@ -101,7 +101,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			
 			if (null != usuarios && usuarios.size() > 0) {
 
-				comboItems = _conConsultasExtendsMapper.selectConsultasDisponibles(idInstitucion);
+				comboItems = _conConsultasExtendsMapper.selectConsultasDisponibles(idInstitucion, null);
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
 					element.setLabel("");

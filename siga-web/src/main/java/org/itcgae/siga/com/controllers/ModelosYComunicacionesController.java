@@ -2,12 +2,15 @@ package org.itcgae.siga.com.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
-import org.itcgae.siga.DTOs.com.PlantillasDocumentosDto;
-import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDto;
+import org.itcgae.siga.DTOs.com.PlantillaDocumentoDTO;
+import org.itcgae.siga.DTOs.com.PlantillasDocumentosDTO;
+import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
+import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.adm.service.impl.PerfilServiceImpl;
@@ -58,7 +61,7 @@ public class ModelosYComunicacionesController {
 	}
 	
 	@RequestMapping(value = "/borrar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> borrarModelo(HttpServletRequest request, ModelosComunicacionItem modelo) {
+	ResponseEntity<Error> borrarModelo(HttpServletRequest request, @RequestBody ModelosComunicacionItem modelo) {
 		
 		Error response = _modelosYcomunicacionesService.borrarModeloComunicaciones(request, modelo);
 
@@ -70,7 +73,7 @@ public class ModelosYComunicacionesController {
 	
 
 	@RequestMapping(value = "/detalle/datosGenerales",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> guardarDatosGenerales(HttpServletRequest request, @RequestBody TarjetaModeloConfiguracionDto datosTarjeta) {
+	ResponseEntity<Error> guardarDatosGenerales(HttpServletRequest request, @RequestBody TarjetaModeloConfiguracionDTO datosTarjeta) {
 		
 		Error respuesta = _modelosYcomunicacionesService.guardarDatosGenerales(request, datosTarjeta);
 		
@@ -92,9 +95,9 @@ public class ModelosYComunicacionesController {
 	}
 	
 	@RequestMapping(value = "/detalle/perfilesModelo",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> obtenerEtiquetasEnvio(HttpServletRequest request, @RequestBody String idModeloComuncacion) {
+	ResponseEntity<ComboDTO> obtenerEtiquetasEnvio(HttpServletRequest request, @RequestBody ModelosComunicacionItem modelo) {
 		
-		ComboDTO response = _modelosYcomunicacionesService.obtenerPerfilesModelo(request, idModeloComuncacion);
+		ComboDTO response = _modelosYcomunicacionesService.obtenerPerfilesModelo(request, modelo.getIdInstitucion(), modelo.getIdModeloComunicacion());
 		if(response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
@@ -112,10 +115,60 @@ public class ModelosYComunicacionesController {
 	}
 	
 	@RequestMapping(value = "/detalle/informes",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<PlantillasDocumentosDto> obtenerInformes(HttpServletRequest request, @RequestBody String idModeloComuncacion, @RequestBody String idInstitucion) {
+	ResponseEntity<PlantillasDocumentosDTO> obtenerInformes(HttpServletRequest request, @RequestBody ModelosComunicacionItem modelo) {
 		
-		PlantillasDocumentosDto response = _modelosYcomunicacionesService.obtenerInformes(request, idModeloComuncacion, idInstitucion);
-		return new ResponseEntity<PlantillasDocumentosDto>(response, HttpStatus.OK);
+		PlantillasDocumentosDTO response = _modelosYcomunicacionesService.obtenerInformes(request, modelo.getIdInstitucion(), modelo.getIdModeloComunicacion());
+		return new ResponseEntity<PlantillasDocumentosDTO>(response, HttpStatus.OK);
+	}
+	
+	//TODO
+	@RequestMapping(value = "/detalle/guardarInformes",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PlantillasDocumentosDTO> guardarInformes(HttpServletRequest request, @RequestBody String idModeloComuncacion, @RequestBody String idInstitucion) {
+		
+		PlantillasDocumentosDTO response = _modelosYcomunicacionesService.obtenerInformes(request, idModeloComuncacion, idInstitucion);
+		return new ResponseEntity<PlantillasDocumentosDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/combo/consultas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> obtenerComboConsultas(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		
+		ComboDTO response = _modelosYcomunicacionesService.obtenerConsultasDisponibles(request, plantillaDoc);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/plantilla/consultas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ConsultasDTO> obtenerConsultas(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		
+		ConsultasDTO response = _modelosYcomunicacionesService.obtenerConsultasPlantilla(request, plantillaDoc, false);
+		return new ResponseEntity<ConsultasDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/plantilla/consultas/historico",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ConsultasDTO> obtenerConsultasHistorico(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		
+		ConsultasDTO response = _modelosYcomunicacionesService.obtenerConsultasPlantilla(request, plantillaDoc, true);
+		return new ResponseEntity<ConsultasDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/guardarPlantillaDoc",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardarPlantillaDocumento(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		
+		Error response = _modelosYcomunicacionesService.guardarPlantillaDocumento(request, plantillaDoc);
+		return new ResponseEntity<Error>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/plantilla/formatos",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> obtenerFormatoSalida(HttpServletRequest request) {
+		
+		ComboDTO response = _modelosYcomunicacionesService.obtenerFormatoSalida(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/plantilla/sufijos",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> obtenerSufijos(HttpServletRequest request) {
+		
+		ComboDTO response = _modelosYcomunicacionesService.obtenerSufijos(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 
 }

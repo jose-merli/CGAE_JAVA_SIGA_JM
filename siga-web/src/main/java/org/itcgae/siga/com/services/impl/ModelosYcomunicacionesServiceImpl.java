@@ -7,45 +7,49 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.com.ConsultaItem;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.ConsultasSearch;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
-import org.itcgae.siga.DTOs.com.PlantillaDocumentoDto;
-import org.itcgae.siga.DTOs.com.PlantillasDocumentosDto;
-import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
-import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
-import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDto;
+import org.itcgae.siga.DTOs.com.PlantillaDocumentoDTO;
+import org.itcgae.siga.DTOs.com.PlantillasDocumentosDTO;
+import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
+import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IModelosYcomunicacionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.EnvEnviosgrupocliente;
-import org.itcgae.siga.db.entities.EnvEnviosgrupoclienteExample;
-import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
-import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.ModModeloPerfiles;
 import org.itcgae.siga.db.entities.ModModeloPerfilesExample;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumentoExample;
+import org.itcgae.siga.db.entities.ModModeloPlantilladocumentoKey;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvio;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvioExample;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
+import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.mappers.ModModeloPerfilesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
+import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPerfilesExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPlantillaDocumentoExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocFormatoExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocSufijoExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,16 +76,31 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	private ModModeloPlantilladocumentoMapper modModeloPlantilladocumentoMapper;
 	
 	@Autowired
+	private ModPlantilladocumentoMapper modPlantilladocumentoMapper;
+	
+	@Autowired
 	private ModModeloPlantillaenvioMapper modModeloPlantillaenvioMapper;
 	
 	@Autowired
 	private ModPlantilladocConsultaMapper modPlantilladocConsultaMapper;
 	
 	@Autowired
+	private ModPlantillaDocumentoConsultaExtendsMapper modPlantillaDocumentoConsultaExtendsMapper;
+	
+	@Autowired
 	private ModModeloPerfilesExtendsMapper modModeloPerfilesExtendsMapper;
 	
 	@Autowired
 	private ModModeloPlantillaDocumentoExtendsMapper modModeloPlantillaDocumentoExtendsMapper;
+	
+	@Autowired
+	private ModPlantillaDocSufijoExtendsMapper modPlantillaDocSufijoExtendsMapper;
+	
+	@Autowired
+	private ModPlantillaDocFormatoExtendsMapper modPlantillaDocFormatoExtendsMapper;
+	
+	@Autowired
+	private ConConsultasExtendsMapper _conConsultasExtendsMapper;
 
 	
 	@Override
@@ -323,25 +342,25 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	}
 
 	@Override
-	public ComboDTO obtenerPerfilesModelo(HttpServletRequest request, String idModeloComunicacion) {
+	public ComboDTO obtenerPerfilesModelo(HttpServletRequest request, String idInstitucion, String idModeloComunicacion) {
 		LOGGER.info("obtenerPerfilesModelo() -> Entrada al servicio para obtener los perfiles asignados al modelo");
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		
-		if (null != idInstitucion) {
+		if (null != idInstitucionUser) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucionUser));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
 			
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
-					comboItems = modModeloPerfilesExtendsMapper.selectPerfilesModelo(idInstitucion, Long.parseLong(idModeloComunicacion));
+					comboItems = modModeloPerfilesExtendsMapper.selectPerfilesModelo(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion));
 					if(null != comboItems && comboItems.size() > 0) {
 						ComboItem element = new ComboItem();
 						element.setLabel("");
@@ -365,7 +384,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	}
 
 	@Override
-	public PlantillasDocumentosDto obtenerInformes(HttpServletRequest request, String idInstitucion, String idModeloComuncacion) {
+	public PlantillasDocumentosDTO obtenerInformes(HttpServletRequest request, String idInstitucion, String idModeloComuncacion) {
 		LOGGER.info("obtenerInformes() -> Entrada al servicio para obtener los informes de un modelo de comunicación");
 		
 		// Conseguimos información del usuario logeado
@@ -373,8 +392,8 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
-		PlantillasDocumentosDto respuesta = new PlantillasDocumentosDto();
-		List<PlantillaDocumentoDto> plantillasItem = new ArrayList<PlantillaDocumentoDto>();
+		PlantillasDocumentosDTO respuesta = new PlantillasDocumentosDTO();
+		List<PlantillaDocumentoDTO> plantillasItem = new ArrayList<PlantillaDocumentoDTO>();
 		
 		if (null != idInstitucionUser) {
 			
@@ -403,7 +422,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	}
 
 	@Override
-	public Error guardarDatosGenerales(HttpServletRequest request, TarjetaModeloConfiguracionDto datosTarjeta) {
+	public Error guardarDatosGenerales(HttpServletRequest request, TarjetaModeloConfiguracionDTO datosTarjeta) {
 		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar los datos generales del modelo de comunicación");
 		
 		// Conseguimos información del usuario logeado
@@ -520,4 +539,238 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		LOGGER.info("guardarPerfilesModelo() -> Salida del servicio para guardar datos perfiles");
 		return respuesta;
 	}
+
+	@Override
+	public Error guardarPlantillaDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar los datos generales del modelo de comunicación");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		Error respuesta = new Error();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			try{
+				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
+					if(plantillaDoc.getIdPlantillaDocumento() != null){
+						
+						ModPlantilladocumento modPlantillaDoc = modPlantilladocumentoMapper.selectByPrimaryKey(Long.parseLong(plantillaDoc.getIdPlantillaDocumento()));
+						modPlantillaDoc.setFechamodificacion(new Date());
+						modPlantillaDoc.setIdioma(plantillaDoc.getIdioma());
+						modPlantillaDoc.setPlantilla(plantillaDoc.getPlantilla());
+						modPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
+						modPlantilladocumentoMapper.updateByPrimaryKey(modPlantillaDoc);
+						
+						ModModeloPlantilladocumentoKey modModeloPlantillaDocKey = new ModModeloPlantilladocumentoKey();
+						modModeloPlantillaDocKey.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+						modModeloPlantillaDocKey.setIdplantilladocumento(Long.parseLong(plantillaDoc.getIdPlantillaDocumento()));
+						
+						ModModeloPlantilladocumento modModeloPlantillaDoc = modModeloPlantilladocumentoMapper.selectByPrimaryKey(modModeloPlantillaDocKey);
+						modModeloPlantillaDoc.setFechamodificacion(new Date());
+						modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getFormatoSalida());
+						modModeloPlantillaDoc.setNombreficherosalida(plantillaDoc.getFicheroSalida());
+						modModeloPlantillaDoc.setSufijo(plantillaDoc.getSufijo());
+						modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
+						
+						modModeloPlantilladocumentoMapper.updateByPrimaryKey(modModeloPlantillaDoc);
+					}else{
+						ModPlantilladocumento modPlantillaDoc = new ModPlantilladocumento();
+						modPlantillaDoc.setFechamodificacion(new Date());
+						modPlantillaDoc.setIdioma(plantillaDoc.getIdioma());
+						modPlantillaDoc.setPlantilla(plantillaDoc.getPlantilla());
+						modPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
+						modPlantilladocumentoMapper.insert(modPlantillaDoc);
+						
+						ModModeloPlantilladocumento modModuloPlantillaDoc = new ModModeloPlantilladocumento();
+						modModuloPlantillaDoc.setFechamodificacion(new Date());
+						modModuloPlantillaDoc.setFormatosalida(plantillaDoc.getFormatoSalida());
+						modModuloPlantillaDoc.setNombreficherosalida(plantillaDoc.getFicheroSalida());
+						modModuloPlantillaDoc.setSufijo(plantillaDoc.getSufijo());
+						modModuloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
+						modModuloPlantillaDoc.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
+						modModuloPlantillaDoc.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+						
+						modModeloPlantilladocumentoMapper.insert(modModuloPlantillaDoc);
+					}
+					respuesta.setCode(200);
+					respuesta.setMessage("Datos generales guardados correctamente");
+
+				}
+			}catch(Exception e){
+				respuesta.setCode(500);
+				respuesta.setDescription("Error al guardar datos generales");
+				respuesta.setMessage(e.getMessage());
+			}
+		
+		}
+		LOGGER.info("guardarDatosGenerales() -> Salida del servicio para guardar los datos generales del modelo de comunicación");
+		return respuesta;
+	}	
+
+	@Override
+	public ComboDTO obtenerFormatoSalida(HttpServletRequest request) {
+		LOGGER.info("obtenerFormatoSalida() -> Entrada al servicio para obtener combo formatos de salida");
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+				comboItems = modPlantillaDocFormatoExtendsMapper.selectFormatos(usuario.getIdlenguaje());
+				if(null != comboItems && comboItems.size() > 0) {
+					ComboItem element = new ComboItem();
+					element.setLabel("");
+					element.setValue("");
+					comboItems.add(0, element);
+				}		
+				
+				comboDTO.setCombooItems(comboItems);
+				
+			}
+		}
+		
+		
+		LOGGER.info("obtenerFormatoSalida() -> Salida del servicio para obtener combo formatos de salida");
+		
+		
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO obtenerSufijos(HttpServletRequest request) {
+		LOGGER.info("obtenerSufijos() -> Entrada al servicio para obtener combo sufijos");
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+				comboItems = modPlantillaDocSufijoExtendsMapper.selectSufijos(usuario.getIdlenguaje());
+				if(null != comboItems && comboItems.size() > 0) {
+					ComboItem element = new ComboItem();
+					element.setLabel("");
+					element.setValue("");
+					comboItems.add(0, element);
+				}		
+				
+				comboDTO.setCombooItems(comboItems);
+				
+			}
+		}
+		
+		
+		LOGGER.info("obtenerSufijos() -> Salida del servicio para obtener combo sufijos");
+		
+		
+		return comboDTO;
+	}
+	
+	@Override
+	public ConsultasDTO obtenerConsultasPlantilla(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc, boolean historico) {
+		LOGGER.info("obtenerConsultasPlantilla() -> Entrada al servicio para obtener las consultas de una plantilla de documento");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ConsultasDTO respuesta = new ConsultasDTO();
+		List<ConsultaItem> listaConsultaItem = new ArrayList<ConsultaItem>();
+		
+		if (null != idInstitucionUser) {
+			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucionUser));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					listaConsultaItem = modPlantillaDocumentoConsultaExtendsMapper.selectPlantillaDocConsultas(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()), Long.parseLong(plantillaDoc.getIdPlantillaDocumento()), historico);			
+					if(listaConsultaItem != null && listaConsultaItem.size()> 0){
+						respuesta.setConsultaItem(listaConsultaItem);
+					}
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage("Error al obtener los perfiles");
+					error.description(e.getMessage());
+					e.printStackTrace();
+				}				
+			}
+		}
+		
+		
+		LOGGER.info("obtenerConsultasPlantilla() -> Salida del servicio para obtener las consultas de una plantilla de documento");
+		return respuesta;
+	}
+
+	@Override
+	public ComboDTO obtenerConsultasDisponibles(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		LOGGER.info("obtenerConsultasDisponibles() -> Entrada al servicio para obtener las disponibles para la clase y la institucion");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		if (null != idInstitucionUser) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucionUser));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					comboItems = _conConsultasExtendsMapper.selectConsultasDisponibles(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdClaseComunicacion()));
+					if(null != comboItems && comboItems.size() > 0) {
+						ComboItem element = new ComboItem();
+						element.setLabel("");
+						element.setValue("");
+						comboItems.add(0, element);
+					}		
+					
+					comboDTO.setCombooItems(comboItems);
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage("Error al obtener los perfiles");
+					error.description(e.getMessage());
+					e.printStackTrace();
+				}
+			}		
+		}		
+		
+		LOGGER.info("obtenerConsultasDisponibles() -> Salida del servicio para obtener las disponibles para la clase y la institucion");
+		return comboDTO;
+	}	
 }

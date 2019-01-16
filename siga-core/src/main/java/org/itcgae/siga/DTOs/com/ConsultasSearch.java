@@ -15,6 +15,7 @@ public class ConsultasSearch {
 	private String idModulo;
 	private String idObjetivo;
 	private String idClaseComunicacion;
+	private String idInstitucion;
 	
 	
 	@JsonProperty("idModulo")
@@ -87,6 +88,14 @@ public class ConsultasSearch {
 	}
 	public void setClaseComunicacion(String claseComunicacion) {
 		this.claseComunicacion = claseComunicacion;
+	}
+	
+	@JsonProperty("idInstitucion")
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
 	}
 	
 	

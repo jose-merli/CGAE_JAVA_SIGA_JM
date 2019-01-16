@@ -17,7 +17,7 @@ public class ModModeloPlantillaDocumentoExtendsSqlProvider {
 		sql.FROM("MOD_MODELO_PLANTILLADOCUMENTO modeloPlantillaDocumento");	
 		sql.INNER_JOIN("MOD_PLANTILLADOCUMENTO plantillaDocumento ON modeloPlantillaDocumento.IDPLANTILLADOCUMENTO = plantillaDocumento.IDPLANTILLADOCUMENTO");
 		
-		sql.WHERE("plantillaDocumento.IDMODELOCOMUNICACION = " + idModeloComunicacion);
+		sql.WHERE("modeloPlantillaDocumento.IDMODELOCOMUNICACION = " + idModeloComunicacion);
 		
 		return sql.toString();
 	}
