@@ -3,6 +3,7 @@ package org.itcgae.siga.cen.services.impl;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.CenSolicmodifexportarfotoDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SoliModifFotoItem;
 import org.itcgae.siga.cen.services.ISolModifDatosUseFotoDetailService;
@@ -73,8 +74,8 @@ public class SolModifDatosUseFotoDetailServiceImpl implements ISolModifDatosUseF
 		LOGGER.info(
 				"searchSolModifDatosUseFotoDetail() / cenSolicModifExportarFotoExtendsMapper.selectByPrimaryKey() -> Entrada a cenClienteExtendsMapper para obtener parámetro exportar foto");
 
-		CenSolicmodifexportarfoto cenSolicmodifexportarfoto = cenSolicModifExportarFotoExtendsMapper
-				.selectByPrimaryKey(Short.parseShort(solModificacionItem.getIdSolicitud()));
+		CenSolicmodifexportarfotoDTO cenSolicmodifexportarfoto = cenSolicModifExportarFotoExtendsMapper
+				.selectByPrimaryKeyDTO(Long.parseLong(solModificacionItem.getIdSolicitud()));
 
 		LOGGER.info(
 				"searchSolModifDatosUseFotoDetail() / cenSolicModifExportarFotoExtendsMapper.selectByPrimaryKey() -> Salida de cenClienteExtendsMapper para obtener parámetro exportar foto");
