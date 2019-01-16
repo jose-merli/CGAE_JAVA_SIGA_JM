@@ -225,9 +225,14 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		List<ColegiadoItem> colegiadoItemList = new ArrayList<ColegiadoItem>();
 
 		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		if (null != idInstitucion) {
+			if(colegiadoItem.getSearchLoggedUser() == true) {
+//				colegiadoItem.setNif(dni);
+				colegiadoItem.setNif("29002353C");
 
+			}
 			colegiadoItemList = cenColegiadoExtendsMapper.selectColegiados(idInstitucion, colegiadoItem);
 			colegiadosDTO.setColegiadoItem(colegiadoItemList);
 
