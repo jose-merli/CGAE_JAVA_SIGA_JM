@@ -766,7 +766,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
-					List<PlantillaModeloItem> plantillas = _modModeloPlantillaEnvioExtendsMapper.getPlantillasModelo(idModelo, usuario.getIdlenguaje());
+					List<PlantillaModeloItem> plantillas = _modModeloPlantillaEnvioExtendsMapper.getPlantillasModelo(idModelo, idInstitucion, usuario.getIdlenguaje());
 					if(plantillas != null && plantillas.size() > 0){
 						respuesta.setPlantillas(plantillas);
 					}
@@ -803,7 +803,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
-					List<PlantillaModeloItem> plantillas = _modModeloPlantillaEnvioExtendsMapper.getPlantillasModeloHist(idModelo, usuario.getIdlenguaje());
+					List<PlantillaModeloItem> plantillas = _modModeloPlantillaEnvioExtendsMapper.getPlantillasModeloHist(idModelo, idInstitucion, usuario.getIdlenguaje());
 					if(plantillas != null && plantillas.size() > 0){
 						respuesta.setPlantillas(plantillas);
 					}

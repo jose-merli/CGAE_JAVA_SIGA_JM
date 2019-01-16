@@ -339,7 +339,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 							}else{
 								noBorrada = true;
 							}
-						}else if(!general && idInstitucion == consulta.getIdinstitucion()){
+						}else if(!general && consulta.getIdinstitucion().equals(idInstitucion)){
 							if(!consultaAsociada){
 								_conConsultaMapper.deleteByPrimaryKey(consultaKey);
 							}else{
@@ -421,7 +421,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 								break;
 						}
 						_conConsultaMapper.insert(consulta);
-						respuesta.setMessage("Consulta creada");
+						respuesta.setMessage(consulta.getIdconsulta().toString());
 						respuesta.setCode(200);
 					}else{
 						ConConsultaKey key = new ConConsultaKey();
@@ -464,12 +464,12 @@ public class ConsultasServiceImpl implements IConsultasService{
 							}else{
 								_conConsultaMapper.updateByPrimaryKeyWithBLOBs(consulta);
 								respuesta.setCode(200);
-								respuesta.setMessage(consulta.getIdconsulta().toString());
+								respuesta.setMessage("Consulta editada");
 							}
 						}else{
 							_conConsultaMapper.updateByPrimaryKeyWithBLOBs(consulta);
 							respuesta.setCode(200);
-							respuesta.setMessage(consulta.getIdconsulta().toString());
+							respuesta.setMessage("Consulta editada");
 						}
 						
 					}
@@ -585,7 +585,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 					
 					ConConsultaKey key = new ConConsultaKey();
 					key.setIdconsulta(Long.parseLong(consultaDTO.getIdConsulta()));
-					key.setIdinstitucion(Short.parseShort(consultaDTO.getIdInstitucion()));
+					key.setIdinstitucion(idInstitucion);
 					ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
 					camposIncorrectos = comprobarEtiquetas(consultaDTO.getSentencia());
 					

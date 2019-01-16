@@ -22,7 +22,7 @@ public interface ModModeloPlantillaEnvioExtendsMapper {
 		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PORDEFECTO", property = "porDefecto", jdbcType = JdbcType.VARCHAR),
 	})
-	List<PlantillaModeloItem> getPlantillasModelo(String idModelo, String idLenguaje);
+	List<PlantillaModeloItem> getPlantillasModelo(String idModelo, Short idInstitucion, String idLenguaje);
 	
 	@SelectProvider(type = ModModeloPlantillaEnviosExtendsSqlProvider.class, method = "selectPlantillasModeloHIST")
 	@Results({@Result(column = "NOMBRE", property = "nombrePlantilla", jdbcType = JdbcType.VARCHAR),
@@ -31,5 +31,5 @@ public interface ModModeloPlantillaEnvioExtendsMapper {
 		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PORDEFECTO", property = "porDefecto", jdbcType = JdbcType.VARCHAR),
 	})
-	List<PlantillaModeloItem> getPlantillasModeloHist(String idModelo, String idLenguaje);
+	List<PlantillaModeloItem> getPlantillasModeloHist(String idModelo, Short idInstitucion, String idLenguaje);
 }
