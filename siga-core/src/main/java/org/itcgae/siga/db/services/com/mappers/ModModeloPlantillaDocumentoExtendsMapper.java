@@ -23,5 +23,6 @@ public interface ModModeloPlantillaDocumentoExtendsMapper {
 		@Result(column = "FECHAASOCIACION", property = "fechaAsociacion", jdbcType = JdbcType.DATE)
 	})
 	List<PlantillaDocumentoDTO> selectInformes(Short idInstitucion, Long idModeloComunicacion);
+
 	
 }

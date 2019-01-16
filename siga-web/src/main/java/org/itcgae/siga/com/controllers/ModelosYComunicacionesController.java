@@ -6,8 +6,9 @@ import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
-import org.itcgae.siga.DTOs.com.PlantillaDocumentoDTO;
+import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDTO;
+import org.itcgae.siga.DTOs.com.PlantillasModeloDTO;
 import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
@@ -38,14 +39,14 @@ public class ModelosYComunicacionesController {
 	@RequestMapping(value = "/search",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DatosModelosComunicacionesDTO> modelosComunicacionSearch(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody DatosModelosComunicacionesSearch filtros) {
 		
-		DatosModelosComunicacionesDTO response = _modelosYcomunicacionesService.modeloYComunicacionesSearch(request, filtros);
+		DatosModelosComunicacionesDTO response = _modelosYcomunicacionesService.modeloYComunicacionesSearch(request, filtros, false);
 		return new ResponseEntity<DatosModelosComunicacionesDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/search/historico",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DatosModelosComunicacionesDTO> modelosComunicacionHistoricoSearch(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody DatosModelosComunicacionesSearch filtros) {
 		
-		DatosModelosComunicacionesDTO response = _modelosYcomunicacionesService.modeloYComunicacionesHistoricoSearch(request, filtros);
+		DatosModelosComunicacionesDTO response = _modelosYcomunicacionesService.modeloYComunicacionesSearch(request, filtros, true);
 		return new ResponseEntity<DatosModelosComunicacionesDTO>(response, HttpStatus.OK);
 	}
 	
@@ -169,6 +170,6 @@ public class ModelosYComunicacionesController {
 		
 		ComboDTO response = _modelosYcomunicacionesService.obtenerSufijos(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-	}
-
+	}	
+	
 }

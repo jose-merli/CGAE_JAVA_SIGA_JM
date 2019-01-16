@@ -104,7 +104,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 
 	
 	@Override
-	public DatosModelosComunicacionesDTO modeloYComunicacionesSearch(HttpServletRequest request, DatosModelosComunicacionesSearch filtros) {
+	public DatosModelosComunicacionesDTO modeloYComunicacionesSearch(HttpServletRequest request, DatosModelosComunicacionesSearch filtros, boolean historico) {
 		
 		LOGGER.info("modeloYComunicacionesSearch() -> Entrada al servicio para busqueda de modelos de comunicación");
 		
@@ -123,7 +123,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
-					modelosItem = modModeloComunicacionExtendsMapper.selectModelosComunicacion(filtros, false);	
+					modelosItem = modModeloComunicacionExtendsMapper.selectModelosComunicacion(filtros, historico);	
 					if(modelosItem != null && modelosItem.size()> 0){
 						respuesta.setModelosComunicacionItem(modelosItem);
 					}
@@ -140,47 +140,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		
 		LOGGER.info("modeloYComunicacionesSearch() -> Salida del servicio para busqueda de modelos de comunicación");
 		return respuesta;
-	}
-
-	@Override
-	public DatosModelosComunicacionesDTO modeloYComunicacionesHistoricoSearch(HttpServletRequest request,
-			DatosModelosComunicacionesSearch filtros) {
-		
-		LOGGER.info("modeloYComunicacionesHistoricoSearch() -> Entrada al servicio para busqueda de modelos de comunicación con histórico");
-		
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		DatosModelosComunicacionesDTO respuesta = new DatosModelosComunicacionesDTO();
-		List<ModelosComunicacionItem> modelosItem = new ArrayList<ModelosComunicacionItem>();
-		
-		if (null != idInstitucion) {
-			
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
-			if (null != usuarios && usuarios.size() > 0) {
-				try{
-					modelosItem = modModeloComunicacionExtendsMapper.selectModelosComunicacion(filtros, true);			
-					if(modelosItem != null && modelosItem.size()> 0){
-						respuesta.setModelosComunicacionItem(modelosItem);
-					}
-				}catch(Exception e){
-					Error error = new Error();
-					error.setCode(500);
-					error.setMessage("Error al obtener los perfiles");
-					error.description(e.getMessage());
-					e.printStackTrace();
-				}				
-			}
-		}
-		
-		
-		LOGGER.info("modeloYComunicacionesHistoricoSearch() -> Salida del servicio para busqueda de modelos de comunicación con histórico");
-		return respuesta;
-	}
+	}	
 
 
 	@Override
