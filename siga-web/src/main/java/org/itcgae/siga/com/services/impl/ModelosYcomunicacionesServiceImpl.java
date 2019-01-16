@@ -267,7 +267,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 
 
 	@Override
-	public Error borrarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem modeloComunicacion) {
+	public Error borrarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem[] modeloComunicacion) {
 		LOGGER.info("borrarModeloComunicaciones() -> Entrada al servicio para borrar un módulo de comunicación");
 		
 		Error respuesta = new Error();
@@ -287,13 +287,16 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 				try{
 					AdmUsuarios usuario = usuarios.get(0);				
 					
-					//Tabla mod_modelocomunicacion
-					ModModelocomunicacion modelo = new ModModelocomunicacion();
-					modelo.setIdmodelocomunicacion(Long.parseLong(modeloComunicacion.getIdModeloComunicacion()));
-					modelo.setFechabaja(new Date());
-					modelo.setFechamodificacion(new Date());
-					
-					modModelocomunicacionMapper.updateByPrimaryKeySelective(modelo);				
+					for(ModelosComunicacionItem modeloCom : modeloComunicacion){
+						//Tabla mod_modelocomunicacion
+						ModModelocomunicacion modelo = new ModModelocomunicacion();
+						modelo.setIdmodelocomunicacion(Long.parseLong(modeloCom.getIdModeloComunicacion()));
+						modelo.setFechabaja(new Date());
+						modelo.setFechamodificacion(new Date());
+						
+						modModelocomunicacionMapper.updateByPrimaryKeySelective(modelo);
+					}
+							
 					
 					respuesta.setCode(200);
 					respuesta.setDescription("Datos borrados correctamente");
@@ -719,7 +722,11 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
-					comboItems = _conConsultasExtendsMapper.selectConsultasDisponibles(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdClaseComunicacion()));
+					Long idClaseComunicacion = null;
+					if(plantillaDoc.getIdClaseComunicacion() != null){
+						idClaseComunicacion = Long.parseLong(plantillaDoc.getIdClaseComunicacion());
+					}
+					comboItems = _conConsultasExtendsMapper.selectConsultasDisponibles(Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion);
 					if(null != comboItems && comboItems.size() > 0) {
 						ComboItem element = new ComboItem();
 						element.setLabel("");

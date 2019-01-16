@@ -62,7 +62,7 @@ public class ModelosYComunicacionesController {
 	}
 	
 	@RequestMapping(value = "/borrar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> borrarModelo(HttpServletRequest request, @RequestBody ModelosComunicacionItem modelo) {
+	ResponseEntity<Error> borrarModelo(HttpServletRequest request, @RequestBody ModelosComunicacionItem[] modelo) {
 		
 		Error response = _modelosYcomunicacionesService.borrarModeloComunicaciones(request, modelo);
 
