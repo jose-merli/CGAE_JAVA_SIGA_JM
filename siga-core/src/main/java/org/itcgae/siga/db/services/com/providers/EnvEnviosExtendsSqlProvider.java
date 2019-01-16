@@ -53,10 +53,10 @@ public class EnvEnviosExtendsSqlProvider {
 		}
 		if(filtros.getFechaCreacion() != null){
 			String fechaCreacion = dateFormat.format(filtros.getFechaCreacion());
-			String fechaCreacion2 = dateFormat.format(filtros.getFechaCreacion());
+//			String fechaCreacion2 = dateFormat.format(filtros.getFechaCreacion());
 			fechaCreacion += " 00:00:00";
-			fechaCreacion2 += " 23:59:59";
-			sql.WHERE("(ENVIO.FECHA >= TO_DATE('" +fechaCreacion + "', 'DD/MM/YYYY HH24:MI:SS') AND ENVIO.FECHA <= TO_DATE('" +fechaCreacion2 + "', 'DD/MM/YYYY HH24:MI:SS'))");
+//			fechaCreacion2 += " 23:59:59";
+			sql.WHERE("(ENVIO.FECHA >= TO_DATE('" +fechaCreacion + "', 'DD/MM/YYYY HH24:MI:SS'))");
 		}
 		if(filtros.getFechaProgramacion() != null){
 			String fechaProgramacion = dateFormat.format(filtros.getFechaProgramacion());
@@ -123,10 +123,10 @@ public class EnvEnviosExtendsSqlProvider {
 		}
 		if(filtros.getFechaCreacion() != null){
 			String fechaCreacion = dateFormat.format(filtros.getFechaCreacion());
-			String fechaCreacion2 = dateFormat.format(filtros.getFechaCreacion());
+//			String fechaCreacion2 = dateFormat.format(filtros.getFechaCreacion());
 			fechaCreacion += " 00:00:00";
-			fechaCreacion2 += " 23:59:59";
-			sql.WHERE("(ENVIO.FECHA >= TO_DATE('" +fechaCreacion + "', 'DD/MM/YYYY HH24:MI:SS') AND ENVIO.FECHA <= TO_DATE('" +fechaCreacion2 + "', 'DD/MM/YYYY HH24:MI:SS'))");
+//			fechaCreacion2 += " 23:59:59";
+			sql.WHERE("(ENVIO.FECHA >= TO_DATE('" +fechaCreacion + "', 'DD/MM/YYYY HH24:MI:SS'))");
 		}
 		if(filtros.getFechaProgramacion() != null){
 			String fechaProgramacion = dateFormat.format(filtros.getFechaProgramacion());
