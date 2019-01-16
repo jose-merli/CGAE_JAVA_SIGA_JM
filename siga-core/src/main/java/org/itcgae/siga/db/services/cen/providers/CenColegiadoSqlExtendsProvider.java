@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
-import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.mappers.CenColegiadoSqlProvider;
@@ -90,11 +89,14 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.INNER_JOIN(
 				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
 
+		sql.LEFT_OUTER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIR ON (CLI.IDPERSONA = TIPODIR.IDPERSONA AND"  
+	                + " DIR.IDDIRECCION = TIPODIR.IDDIRECCION AND CLI.IDINSTITUCION = TIPODIR.IDINSTITUCION AND "
+	                + " INST.IDINSTITUCION = DIR.IDINSTITUCION)"); 
 		sql.LEFT_OUTER_JOIN(
 				"cen_datosCV datosCV ON ( datosCV.idInstitucion = col.idInstitucion and datosCV.idPersona = per.idPersona )");
 		sql.LEFT_OUTER_JOIN("cen_tiposcv cenTipoCV ON ( cenTipoCV.idTipoCV = datosCV.idTipoCV )");
-		sql.LEFT_OUTER_JOIN(
-				"cen_tiposcvsubtipo2 subt ON ( subt.idTipoCV = datosCV.idTipoCV and subt.idInstitucion = col.idInstitucion )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt2 ON ( subt2.idTipoCV = datosCV.idTipoCV and subt2.idInstitucion = col.idInstitucion )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = col.idInstitucion )");
 
 		if (idInstitucion != Short.parseShort("2000")) {
 			sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
@@ -128,7 +130,9 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 
 		if (colegiadoItem.getTipoDireccion() != null && colegiadoItem.getTipoDireccion() != "") {
-			sql.WHERE("dir.iddireccion  = '" + colegiadoItem.getTipoDireccion() + "'");
+			sql.WHERE("tipodir.idtipodireccion = "+ colegiadoItem.getTipoDireccion());
+		}else {
+			sql.WHERE("tipodir.idtipodireccion = 2");
 		}
 
 		if (colegiadoItem.getIdEstadoCivil() != null && colegiadoItem.getIdEstadoCivil() != "") {
@@ -163,21 +167,12 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			sql.WHERE("datoscv.idcv = '" + colegiadoItem.getTipoCV() + "'");
 		}
 
-		if (colegiadoItem.getSubtipoCV() != null && colegiadoItem.getSubtipoCV().length > 0) {
-
-			String etiquetas = "";
-
-			for (int i = 0; colegiadoItem.getSubtipoCV().length > i; i++) {
-
-				if (i == colegiadoItem.getSubtipoCV().length - 1) {
-					etiquetas += "'" + colegiadoItem.getSubtipoCV()[i] + "'";
-				} else {
-					etiquetas += "'" + colegiadoItem.getSubtipoCV()[i] + "',";
-				}
-			}
-
-			sql.WHERE("subt.IDTIPOCVSUBTIPO2 IN (" + etiquetas + ")");
-
+		if (colegiadoItem.getSubTipoCV1() != null && colegiadoItem.getSubTipoCV1() != "") {
+			sql.WHERE("subt1.idtipocvsubtipo1 = '" + colegiadoItem.getSubTipoCV1() + "'");
+		}
+		
+		if (colegiadoItem.getSubTipoCV2() != null && colegiadoItem.getSubTipoCV2() != "") {
+			sql.WHERE("subt2.idtipocvsubtipo2 = '" + colegiadoItem.getSubTipoCV2() + "'");
 		}
 
 		if (colegiadoItem.getSituacion() != null && colegiadoItem.getSituacion() != "") {
@@ -207,14 +202,6 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 			sql.WHERE("grucli.IDGRUPO IN (" + etiquetas + ")");
 		}
-
-//		if (colegiadoItem.getFechaNacimiento() != null) {
-//			String fechaNacimiento = dateFormat.format(colegiadoItem.getFechaNacimiento());
-//			sql.WHERE("(TO_DATE(per.fechanacimiento,'DD/MM/RRRR') >= TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY')"
-//					+ " and ( TO_DATE(per.fechanacimiento,'DD/MM/RRRR') <= TO_DATE('" + fechaNacimiento
-//					+ "','DD/MM/YYYY')))");
-//
-//		}
 
 		if (colegiadoItem.getFechaIncorporacion() != null && colegiadoItem.getFechaIncorporacion().length != 0) {
 

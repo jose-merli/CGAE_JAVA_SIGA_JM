@@ -601,6 +601,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 		SQL sql = new SQL();
 
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
 		sql.SELECT_DISTINCT("nocol.idpersona");
 		sql.SELECT_DISTINCT("nocol.idinstitucion");
 		sql.SELECT_DISTINCT("per.nifcif");
@@ -635,12 +637,14 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 				+ "        ( TO_DATE(grucli.fecha_baja,'DD/MM/YYYY') >= SYSDATE OR grucli.fecha_baja IS NULL)))");
 		sql.LEFT_OUTER_JOIN(
 				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
-		sql.LEFT_OUTER_JOIN(
-				"CEN_DIRECCION_TIPODIRECCION TIPODIRECCION ON (TIPODIRECCION.IDDIRECCION = DIR.IDDIRECCION AND TIPODIRECCION.IDPERSONA = DIR.IDPERSONA AND  TIPODIRECCION.IDINSTITUCION = DIR.IDINSTITUCION)");
-			
+		
+		sql.LEFT_OUTER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIR ON (CLI.IDPERSONA = TIPODIR.IDPERSONA AND"  
+                + " DIR.IDDIRECCION = TIPODIR.IDDIRECCION AND CLI.IDINSTITUCION = TIPODIR.IDINSTITUCION AND "
+                + " INST.IDINSTITUCION = DIR.IDINSTITUCION)"); 
 		sql.LEFT_OUTER_JOIN("cen_datosCV datosCV ON ( datosCV.idInstitucion = nocol.idInstitucion and datosCV.idPersona = per.idPersona )");
 		sql.LEFT_OUTER_JOIN("cen_tiposcv cenTipoCV ON ( cenTipoCV.idTipoCV = datosCV.idTipoCV )");
-		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt ON ( subt.idTipoCV = datosCV.idTipoCV and subt.idInstitucion = nocol.idInstitucion )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt2 ON ( subt2.idTipoCV = datosCV.idTipoCV and subt2.idInstitucion = nocol.idInstitucion )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = nocol.idInstitucion )");
 
 		if(idInstitucion != null) {
 			sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
@@ -665,7 +669,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			sql.WHERE("per.sexo = '" + noColegiadoItem.getSexo() + "'");
 		}
 		if (noColegiadoItem.getTipoDireccion() != null && noColegiadoItem.getTipoDireccion() != "") {
-			sql.WHERE("TIPODIRECCION.IDTIPODIRECCION = '" + noColegiadoItem.getTipoDireccion() + "'");
+			sql.WHERE("tipodir.idtipodireccion = "+ noColegiadoItem.getTipoDireccion());
 		}
 		if (noColegiadoItem.getidEstadoCivil() != null && noColegiadoItem.getidEstadoCivil() != "") {
 			sql.WHERE("per.idestadocivil = '" + noColegiadoItem.getidEstadoCivil() + "'");
@@ -691,16 +695,16 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if (noColegiadoItem.getMovil() != null && noColegiadoItem.getMovil() != "") {
 			sql.WHERE("dir.movil like '%" + noColegiadoItem.getMovil() + "%'");
 		}
-		if (noColegiadoItem.getTraduccion() != null && noColegiadoItem.getTraduccion().length > 0) {
+		if (noColegiadoItem.getIdGrupo() != null && noColegiadoItem.getIdGrupo().length > 0) {
 
 			String etiquetas = "";
 
-			for (int i = 0; noColegiadoItem.getTraduccion().length > i; i++) {
+			for (int i = 0; noColegiadoItem.getIdGrupo().length > i; i++) {
 
-				if (i == noColegiadoItem.getTraduccion().length - 1) {
-					etiquetas += "'" + noColegiadoItem.getTraduccion()[i] + "'";
+				if (i == noColegiadoItem.getIdGrupo().length - 1) {
+					etiquetas += "'" + noColegiadoItem.getIdGrupo()[i] + "'";
 				} else {
-					etiquetas += "'" + noColegiadoItem.getTraduccion()[i] + "',";
+					etiquetas += "'" + noColegiadoItem.getIdGrupo()[i] + "',";
 				}
 			}
 
@@ -711,27 +715,41 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			sql.WHERE("datoscv.idcv = '" + noColegiadoItem.getTipoCV() + "'");
 		}
 
-		if (noColegiadoItem.getSubtipoCV() != null && noColegiadoItem.getSubtipoCV().length > 0) {
-			
-			String etiquetas = "";
-
-			for (int i = 0; noColegiadoItem.getSubtipoCV().length > i; i++) {
-
-				if (i == noColegiadoItem.getSubtipoCV().length - 1) {
-					etiquetas += "'" + noColegiadoItem.getSubtipoCV()[i] + "'";
-				} else {
-					etiquetas += "'" + noColegiadoItem.getSubtipoCV()[i] + "',";
-				}
-			}
-
-			sql.WHERE("subt.IDTIPOCVSUBTIPO2 IN (" + etiquetas + ")");
-			
+		if (noColegiadoItem.getSubTipoCV1() != null && noColegiadoItem.getSubTipoCV1() != "") {
+			sql.WHERE("subt1.idtipocvsubtipo1 = '" + noColegiadoItem.getSubTipoCV1() + "'");
 		}
 		
-		if (noColegiadoItem.getFechaNacimiento() != null && noColegiadoItem.getFechaNacimiento() != "") {
-			sql.WHERE("(TO_DATE(PER.FECHANACIMIENTO,'DD/MM/RRRR') >= TO_DATE('" + noColegiadoItem.getFechaNacimiento()
-					+ "','DD/MM/YYYY') and ( TO_DATE(PER.FECHANACIMIENTO,'DD/MM/RRRR') <= TO_DATE('" + noColegiadoItem.getFechaNacimiento()
-					+ "','DD/MM/YYYY')))");
+		if (noColegiadoItem.getSubTipoCV2() != null && noColegiadoItem.getSubTipoCV2() != "") {
+			sql.WHERE("subt2.idtipocvsubtipo2 = '" + noColegiadoItem.getSubTipoCV2() + "'");
+		}
+				
+		if (noColegiadoItem.getFechaNacimientoRango() != null && noColegiadoItem.getFechaNacimientoRango().length != 0) {
+
+			if (noColegiadoItem.getFechaNacimientoRango()[0] != null && noColegiadoItem.getFechaNacimientoRango()[1] != null) {
+
+				String getFechaNacimientoDesde = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[0]);
+				String getFechaNacimientoHasta = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[1]);
+
+				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
+						+ "','DD/MM/YYYY') " + " and ( per.fechanacimiento <= TO_DATE('"
+						+ getFechaNacimientoHasta + "','DD/MM/YYYY')))");
+
+			} else if (noColegiadoItem.getFechaNacimientoRango()[0] != null
+					&& noColegiadoItem.getFechaNacimientoRango()[1] == null) {
+
+				String getFechaNacimientoDesde = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[0]);
+
+				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
+						+ "','DD/MM/YYYY'))");
+
+			} else if (noColegiadoItem.getFechaNacimientoRango()[0] == null
+					&& noColegiadoItem.getFechaNacimientoRango()[1] != null) {
+
+				String getFechaNacimientoHasta = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[1]);
+
+				sql.WHERE("( per.fechanacimiento <= TO_DATE('" + getFechaNacimientoHasta
+						+ "','DD/MM/YYYY'))");
+			}
 		}
 		
 		sql.ORDER_BY("nocol.IDPERSONA, NOCOL.IDINSTITUCION");
@@ -742,6 +760,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 	public String searchHistoricNoColegiado(NoColegiadoItem noColegiadoItem, String idLenguaje,
 			String idInstitucion) {
 		SQL sql = new SQL();
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		sql.SELECT_DISTINCT("nocol.idpersona");
 		sql.SELECT_DISTINCT("nocol.idinstitucion");
@@ -775,8 +795,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
 		sql.LEFT_OUTER_JOIN(
 				"CEN_DIRECCION_TIPODIRECCION TIPODIRECCION ON (TIPODIRECCION.IDDIRECCION = DIR.IDDIRECCION AND TIPODIRECCION.IDPERSONA = DIR.IDPERSONA AND  TIPODIRECCION.IDINSTITUCION = DIR.IDINSTITUCION)");
+		
 		sql.LEFT_OUTER_JOIN(
 				"cen_datoscv datoscv on (datoscv.idpersona = cli.idpersona and datoscv.idinstitucion = cli.idinstitucion)");
+		
 		if(idInstitucion != "2000") {
 			sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
 		}
@@ -796,7 +818,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			sql.WHERE("per.sexo = '" + noColegiadoItem.getSexo() + "'");
 		}
 		if (noColegiadoItem.getTipoDireccion() != null && noColegiadoItem.getTipoDireccion() != "") {
-			sql.WHERE("TIPODIRECCION.IDTIPODIRECCION = '" + noColegiadoItem.getTipoDireccion() + "'");
+			sql.WHERE("TIPODIRECCION.idtipodireccion = "+ noColegiadoItem.getTipoDireccion());
 		}
 		if (noColegiadoItem.getidEstadoCivil() != null && noColegiadoItem.getidEstadoCivil() != "") {
 			sql.WHERE("per.idestadocivil = '" + noColegiadoItem.getidEstadoCivil() + "'");
@@ -822,16 +844,16 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if (noColegiadoItem.getMovil() != null && noColegiadoItem.getMovil() != "") {
 			sql.WHERE("dir.movil like '%" + noColegiadoItem.getMovil() + "%'");
 		}
-		if (noColegiadoItem.getTraduccion() != null && noColegiadoItem.getTraduccion().length > 0) {
+		if (noColegiadoItem.getIdGrupo() != null && noColegiadoItem.getIdGrupo().length > 0) {
 
 			String etiquetas = "";
 
-			for (int i = 0; noColegiadoItem.getTraduccion().length > i; i++) {
+			for (int i = 0; noColegiadoItem.getIdGrupo().length > i; i++) {
 
-				if (i == noColegiadoItem.getTraduccion().length - 1) {
-					etiquetas += "'" + noColegiadoItem.getTraduccion()[i] + "'";
+				if (i == noColegiadoItem.getIdGrupo().length - 1) {
+					etiquetas += "'" + noColegiadoItem.getIdGrupo()[i] + "'";
 				} else {
-					etiquetas += "'" + noColegiadoItem.getTraduccion()[i] + "',";
+					etiquetas += "'" + noColegiadoItem.getIdGrupo()[i] + "',";
 				}
 			}
 
@@ -840,10 +862,34 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if (noColegiadoItem.getIdcv() != null && noColegiadoItem.getIdcv() != "") {
 			sql.WHERE("datoscv.idcv = '" + noColegiadoItem.getIdcv() + "'");
 		}
-		if (noColegiadoItem.getFechaNacimiento() != null && noColegiadoItem.getFechaNacimiento() != "") {
-			sql.WHERE("(TO_DATE(PER.FECHANACIMIENTO,'DD/MM/RRRR') >= TO_DATE('" + noColegiadoItem.getFechaNacimiento()
-					+ "','DD/MM/YYYY') and ( TO_DATE(PER.FECHANACIMIENTO,'DD/MM/RRRR') <= TO_DATE('" + noColegiadoItem.getFechaNacimiento()
-					+ "','DD/MM/YYYY')))");
+
+		if (noColegiadoItem.getFechaNacimientoRango() != null && noColegiadoItem.getFechaNacimientoRango().length != 0) {
+
+			if (noColegiadoItem.getFechaNacimientoRango()[0] != null && noColegiadoItem.getFechaNacimientoRango()[1] != null) {
+
+				String getFechaNacimientoDesde = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[0]);
+				String getFechaNacimientoHasta = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[1]);
+
+				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
+						+ "','DD/MM/YYYY') " + " and ( per.fechanacimiento <= TO_DATE('"
+						+ getFechaNacimientoHasta + "','DD/MM/YYYY')))");
+
+			} else if (noColegiadoItem.getFechaNacimientoRango()[0] != null
+					&& noColegiadoItem.getFechaNacimientoRango()[1] == null) {
+
+				String getFechaNacimientoDesde = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[0]);
+
+				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
+						+ "','DD/MM/YYYY'))");
+
+			} else if (noColegiadoItem.getFechaNacimientoRango()[0] == null
+					&& noColegiadoItem.getFechaNacimientoRango()[1] != null) {
+
+				String getFechaNacimientoHasta = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[1]);
+
+				sql.WHERE("( per.fechanacimiento <= TO_DATE('" + getFechaNacimientoHasta
+						+ "','DD/MM/YYYY'))");
+			}
 		}
 		
 		sql.ORDER_BY("nocol.IDPERSONA, NOCOL.IDINSTITUCION");

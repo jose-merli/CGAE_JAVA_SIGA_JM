@@ -19,5 +19,7 @@ public interface ITipoCurricularService {
 //	public ComboDTO getComboTipoCurricular(int numPagina, TipoCurricularItem tipoCurricularItem, HttpServletRequest request);
 	public ComboDTO getComboTipoCurricular(int numPagina, TipoCurricularItem tipoCurricularItem,
 			HttpServletRequest request);
+	
+	public ComboDTO getCurricularTypeCombo(String idTipoCV, HttpServletRequest request);
 
 }

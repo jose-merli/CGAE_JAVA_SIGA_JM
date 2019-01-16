@@ -17,4 +17,6 @@ public interface ISubtipoCurricularService {
 	public SubtipoCurricularDTO getHistory(SubtipoCurricularItem subtipoCurricularItem, HttpServletRequest request);
 	public ComboDTO getComboSubtipoCurricular(int numPagina, SubtipoCurricularItem subtipoCurricularItem,
 			HttpServletRequest request);
+	
+	public ComboDTO getCurricularSubtypeCombo(String idTipoCV, HttpServletRequest request);
 }
