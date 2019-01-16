@@ -80,7 +80,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 			identificadorDS = config.get(0).getIdentificadords();
 		}
 		//NO COLEGIADO
-		identificadorDS = "Collection-179";
+//		identificadorDS = "Collection-179";
 		if (identificadorDS != null) {
 			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS);
 			docushareDTO.setDocuShareObjectVO(docus);
@@ -160,7 +160,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 			identificadorDS = config.get(0).getIdentificadords();
 		}
 		//NO COLEGIADO
-		identificadorDS = "Collection-179";
+//		identificadorDS = "Collection-179";
 		if (identificadorDS != null) {
 			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS);
 			docushareDTO.setDocuShareObjectVO(docus);
