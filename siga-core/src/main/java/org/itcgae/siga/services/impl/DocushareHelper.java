@@ -15,7 +15,11 @@ import org.itcgae.siga.commons.utils.ReadProperties;
 import org.itcgae.siga.commons.utils.SIGAReferences;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +45,8 @@ public class DocushareHelper {
 
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
+	@Autowired
+	private GenPropertiesMapper genPropertiesMapper;
 	private static boolean MODO_DEBUG_LOCAL = false;
 	private static String DOCUSHARE_HOST = "DOCUSHARE_HOST";
 	private static String DOCUSHARE_PORT = "DOCUSHARE_PORT";
@@ -61,6 +67,9 @@ public class DocushareHelper {
 
 	// Para que coja el idioma español !!! Debería cogerlo desde el bundle de
 	// xmlbeans pero no lo coge
+	public void setIdInstitucion(short idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
 
 	private void createSession() throws Exception {
 
@@ -79,6 +88,7 @@ public class DocushareHelper {
 			listaParametros.add(DOCUSHARE_DOMAIN);
 			listaParametros.add(DOCUSHARE_USER);
 			listaParametros.add(DOCUSHARE_PASSWORD);
+
 			GenParametrosExample example = new GenParametrosExample();
 			example.createCriteria().andParametroIn(listaParametros).andIdinstitucionEqualTo(this.idInstitucion);
 			List<GenParametros> config = genParametrosMapper.selectByExample(example);
@@ -110,7 +120,7 @@ public class DocushareHelper {
 						"Parámetros de conexión docushare del colegio %s: HOST:'%s', PORT:'%s', DOMAIN:'%s', USER:'%s', PASSWORD:'%s'",
 						this.idInstitucion, host, port, domain, user, password);
 
-				log.debug(datosConexion);
+				log.info(datosConexion);
 
 				int iPort = 0;
 				try {
@@ -121,50 +131,17 @@ public class DocushareHelper {
 							DOCUSHARE_PORT, this.idInstitucion);
 					log.error(error);
 				}
-				String msg=  "HOST: " + host + "PORT: " + iPort ;
-						 
+				String msg = "HOST: " + host + "PORT: " + iPort;
+
 				log.info(msg);
 				server = DSFactory.createServer(host, iPort);
-				log.debug("Creado server con Docushare correctamente para el colegio " + this.idInstitucion);
+				log.info("Creado server con Docushare correctamente para el colegio " + this.idInstitucion);
 				dssession = server.createSession(domain, user, password);
-				log.debug("Creada session con Docushare correctamente para el colegio " + this.idInstitucion);
+				log.info("Creada session con Docushare correctamente para el colegio " + this.idInstitucion);
 
 			}
 
-			// GenParametrosService genParametrosService = (GenParametrosService)
-			// BusinessManager.getInstance().getService(GenParametrosService.class);
-			//
-			// String host = getValor(genParametrosService, DOCUSHARE_HOST, true);
-			// String port = getValor(genParametrosService, DOCUSHARE_PORT, true);
-			// String domain = getValor(genParametrosService, DOCUSHARE_DOMAIN, true);
-			//
-			// //parámetros particulares del colegio
-			// String user = getValor(genParametrosService, DOCUSHARE_USER, false);
-			// String password = getValor(genParametrosService, DOCUSHARE_PASSWORD, false);
-
-			// datosConexion = String.format("Parámetros de conexión docushare del colegio
-			// %s: HOST:'%s', PORT:'%s', DOMAIN:'%s', USER:'%s', PASSWORD:'%s'",
-			// this.idInstitucion, host, port, domain, user, password);
-			//
-			// log.debug(datosConexion);
-			//
-			// int iPort = 0;
-			// try {
-			// iPort = Integer.parseInt(port);
-			// } catch (Exception e) {
-			// String error = String.format("El parámetro %s no está configurado
-			// correctamente para el colegio %s. Comprobar que es un número válido.",
-			// DOCUSHARE_PORT, this.idInstitucion);
-			// log.error(error);
-			// }
-			//
-			// server = DSFactory.createServer(host, iPort);
-			// log.debug("Creado server con Docushare correctamente para el colegio " +
-			// this.idInstitucion);
-			// dssession = server.createSession(domain, user, password);
-			// log.debug("Creada session con Docushare correctamente para el colegio " +
-			// this.idInstitucion);
-			//
+			 
 
 		} catch (Exception e) {
 			// Se ha producido un error. No se ha podido conectar con el servidor DocuShare.
@@ -175,27 +152,8 @@ public class DocushareHelper {
 		}
 
 	}
-//	private String getValor(GenParametrosService genParametrosService, String idParametro, boolean oInstitucion0) throws SIGAServiceException {
-//		
-//		GenParametros genParametros = new GenParametros();
-//		genParametros.setIdinstitucion(this.idInstitucion);
-//		genParametros.setModulo(MODULO.GEN.name());
-//		genParametros.setParametro(idParametro);
-//		
-//		if (oInstitucion0) {
-//			genParametros = genParametrosService.getGenParametroInstitucionORvalor0(genParametros);
-//		} else {
-//			genParametros = genParametrosService.get(genParametros);
-//		}
-//			
-//		
-//		if (genParametros == null || genParametros.getValor() == null || genParametros.getValor().trim().equals("")) {
-//			String error = String.format("El parámetro %s no está configurado correctamente para el colegio %s", idParametro, this.idInstitucion);
-//			log.error(error);
-//			throw new SIGAServiceException(error);
-//		}
-//		return genParametros.getValor();
-//	}
+
+	 
 	/**
 	 * Busca una collection a partir de una path y un nombre de collection
 	 * 
@@ -300,7 +258,7 @@ public class DocushareHelper {
 					for (File fileHijo : filesHijos) {
 						DocuShareObjectVO dsObj = null;
 						if (fileHijo.isDirectory()) {
-							dsObj = new DocuShareObjectVO( );
+							dsObj = new DocuShareObjectVO();
 							dsObj.setTipo("0");
 							dsObj.setId(fileHijo.getAbsolutePath());
 							dsObj.setTitle(fileHijo.getName());
@@ -310,7 +268,7 @@ public class DocushareHelper {
 							dsObj.setFechaModificacion(new Date(fileHijo.lastModified()));
 							listDir.add(dsObj);
 						} else {
-							dsObj = new DocuShareObjectVO( );
+							dsObj = new DocuShareObjectVO();
 							dsObj.setTipo("1");
 							dsObj.setId(fileHijo.getAbsolutePath());
 							dsObj.setTitle(fileHijo.getName());
@@ -327,8 +285,8 @@ public class DocushareHelper {
 					}
 				}
 
-//				Collections.sort(listDir);
-//				Collections.sort(listArch);
+				// Collections.sort(listDir);
+				// Collections.sort(listArch);
 
 				datos.addAll(listDir);
 				datos.addAll(listArch);
@@ -352,7 +310,7 @@ public class DocushareHelper {
 	 * @throws DSException
 	 */
 	private void close() throws Exception {
-		log.debug("Cerrando conexión con Docushare para el colegio " + this.idInstitucion + "...");
+		log.info("Cerrando conexión con Docushare para el colegio " + this.idInstitucion + "...");
 		try {
 			if (server != null) {
 				server.close();
@@ -437,12 +395,12 @@ public class DocushareHelper {
 						}
 					}
 
-//					Collections.sort(listDir);
-//					Collections.sort(listArch, new Comparator<DocuShareObjectVO>() {
-//						public int compare(DocuShareObjectVO o1, DocuShareObjectVO o2) {
-//							return (-1) * o1.getFechaModificacion().compareTo(o2.getFechaModificacion());
-//						}
-//					});
+					// Collections.sort(listDir);
+					// Collections.sort(listArch, new Comparator<DocuShareObjectVO>() {
+					// public int compare(DocuShareObjectVO o1, DocuShareObjectVO o2) {
+					// return (-1) * o1.getFechaModificacion().compareTo(o2.getFechaModificacion());
+					// }
+					// });
 
 					list.addAll(listDir);
 					list.addAll(listArch);
@@ -475,8 +433,13 @@ public class DocushareHelper {
 			return getDocumentMODO_DEBUG_LOCAL(title);
 		}
 
-		ReadProperties rp = new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
-		String rutaDirectorioTemp = rp.returnProperty("sjcs.directorioFisicoTemporalSJCSJava");
+		// Extraer propiedad
+		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("sjcs.directorioFisicoTemporalSJCSJava");
+		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
+
+		String rutaDirectorioTemp = genPropertiesPath.get(0).getValor();
+
 		File fileParent = new File(rutaDirectorioTemp);
 
 		File file = null;

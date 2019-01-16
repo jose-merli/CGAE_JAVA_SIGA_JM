@@ -98,6 +98,17 @@ public class LoggingConfig {
 		logSpring.setLevel(Level.WARN);
 		logApplication.setAdditive(false);
 		logSpring.addAppender(logFileAppender);
+		
+		Logger logSpringws = logCtx.getLogger("org.springframework.ws.client.MessageTracing.sent");
+		logSpringws.setLevel(Level.INFO);
+		logApplication.setAdditive(false);
+		logSpringws.addAppender(logFileAppender);
+		
+		Logger logSpringws2 = logCtx.getLogger("org.springframework.ws.server.MessageTracing.sent");
+		logSpringws2.setLevel(Level.INFO);
+		logApplication.setAdditive(false);
+		logSpringws2.addAppender(logFileAppender);
+		
 
 		//Root logger
 		Logger root = (Logger)LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
