@@ -10,6 +10,7 @@ public class ColegiadoItem {
 	private Boolean colegiado;
 	
 	private String idPersona;
+	private Boolean searchLoggedUser;
 	private String idInstitucion;
 	private String nif;
 	private String nombre;
@@ -1219,6 +1220,14 @@ public class ColegiadoItem {
 	      return "null";
 	    }
 	    return o.toString().replace("\n", "\n    ");
+	}
+
+	public Boolean getSearchLoggedUser() {
+		return searchLoggedUser;
+	}
+
+	public void setSearchLoggedUser(Boolean searchLoggedUser) {
+		this.searchLoggedUser = searchLoggedUser;
 	}
 
 

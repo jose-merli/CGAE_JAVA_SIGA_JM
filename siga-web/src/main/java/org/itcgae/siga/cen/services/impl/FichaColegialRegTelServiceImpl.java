@@ -80,7 +80,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 			identificadorDS = config.get(0).getIdentificadords();
 		}
 		//NO COLEGIADO
-		identificadorDS = "Collection-179";
+//		identificadorDS = "Collection-179";
 		if (identificadorDS != null) {
 			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS);
 			docushareDTO.setDocuShareObjectVO(docus);
@@ -108,20 +108,20 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 	@Override
 	public ResponseEntity<InputStreamResource> downloadDoc(DocuShareObjectVO docushareObjectVO,
 			HttpServletRequest request) throws Exception {
-		File dir = null;
+		File file = null;
 		String identificadorDS = null;
 		identificadorDS = docushareObjectVO.getId();
-		dir= docushareHelper.getDocument(identificadorDS);
+		file= docushareHelper.getDocument(identificadorDS);
 		// Se convierte el fichero en array de bytes para enviarlo al front
 
 		InputStream fileStream = null;
 		ResponseEntity<InputStreamResource> res = null;
 		try {
-			fileStream = new FileInputStream(dir);
+			fileStream = new FileInputStream(file);
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.parseMediaType(MediaType.APPLICATION_PDF_VALUE)); 
     
-			headers.setContentLength(dir.length());
+			headers.setContentLength(file.length());
 			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -160,7 +160,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 			identificadorDS = config.get(0).getIdentificadords();
 		}
 		//NO COLEGIADO
-		identificadorDS = "Collection-179";
+//		identificadorDS = "Collection-179";
 		if (identificadorDS != null) {
 			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS);
 			docushareDTO.setDocuShareObjectVO(docus);
