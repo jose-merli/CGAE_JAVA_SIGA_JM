@@ -205,7 +205,7 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 		@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.DATE),
 		@Result(column = "CORREO", property = "correo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "COMISIONES", property = "comisiones", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "TELEFONO1", property = "telefono", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechaBaja", property = "fechaBaja", jdbcType = JdbcType.VARCHAR)
 	})

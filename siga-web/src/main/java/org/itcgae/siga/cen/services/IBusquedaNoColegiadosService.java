@@ -13,5 +13,7 @@ public interface IBusquedaNoColegiadosService {
 	public NoColegiadoDTO searchHistoricNoColegiado(int numPagina, NoColegiadoItem noColegiadoItem, HttpServletRequest request);
 
 	public DeleteResponseDTO deleteNoColegiado(NoColegiadoItem noColegiadoItem, HttpServletRequest request);
+	
+
 
 }

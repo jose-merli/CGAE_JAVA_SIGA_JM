@@ -14,8 +14,6 @@ import org.itcgae.siga.cen.services.IBusquedaNoColegiadosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenCuentasbancarias;
-import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -34,6 +32,7 @@ public class BusquedaNoColegiadosServiceImpl implements IBusquedaNoColegiadosSer
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+
 
 	@Override
 	public NoColegiadoDTO searchNoColegiado(NoColegiadoItem noColegiadoItem, HttpServletRequest request) {
@@ -161,4 +160,6 @@ public class BusquedaNoColegiadosServiceImpl implements IBusquedaNoColegiadosSer
 		LOGGER.info("deleteNoColegiado() -> Salida del servicio para eliminar personas no colegiadas");
 		return deleteResponseDTO;
 	}
+	
+	
 }

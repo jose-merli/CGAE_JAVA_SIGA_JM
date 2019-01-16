@@ -43,6 +43,7 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 
 	@Autowired
 	private GenRecursosCatalogosExtendsMapper genRecursosCatalogosExtendsMapper;
+	
 
 	@Override
 	public SubtipoCurricularDTO searchSubtipoCurricular(int numPagina, SubtipoCurricularItem subtipoCurricularItem,
@@ -473,5 +474,51 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 
 		LOGGER.info("getHistory() -> Salida del servicio para la búsqueda");
 		return subtipoCurricularDTO;
+	}
+	
+	@Override
+	public ComboDTO getCurricularSubtypeCombo (String idTipoCV, HttpServletRequest request) {
+		
+		LOGGER.info("getCurricularSubtypeCombo() -> Entrada al servicio para obtener los tipos curriculares");
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			
+			LOGGER.info(
+					"getCurricularSubtypeCombo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			LOGGER.info(
+					"getCurricularSubtypeCombo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			if(null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				
+				LOGGER.info(
+						"getCurricularSubtypeCombo() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Entrada a cenTiposcvExtendsMapper para obtener los diferentes tipos curriculares");
+				
+				comboItems = cenTiposCVSubtipo2ExtendsMapper.searchCurricularSubtypeCombo(idTipoCV, usuario.getIdlenguaje(), idInstitucion.toString());
+				
+				LOGGER.info(
+						"getCurricularSubtypeCombo() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Salida de cenTiposcvExtendsMapper para obtener los diferentes tipos curriculares");
+				
+			}
+		}
+		
+		comboDTO.setCombooItems(comboItems);
+		
+		LOGGER.info("getCurricularSubtypeCombo() -> Salida del servicio para obtener los tipos curriculares");
+		
+		return comboDTO;
 	}
 }

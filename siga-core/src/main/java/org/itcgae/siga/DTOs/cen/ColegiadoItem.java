@@ -38,6 +38,8 @@ public class ColegiadoItem {
 	private String idEstado;
 	private String domicilio;
 	private String tipoCV;
+	private String subTipoCV1;
+	private String subTipoCV2;
 	private String  idgrupo [];
 	private String  denominacion;
 	private ComboEtiquetasItem[] etiquetas;
@@ -75,8 +77,9 @@ public class ColegiadoItem {
 	private String observaciones;
 	private String motivo;
 	private String subtipoCV [];
-
-
+	
+	
+	
 	
 	/**
 	 *
@@ -662,6 +665,40 @@ public class ColegiadoItem {
 	/**
 	 *
 	 */
+	public ColegiadoItem subTipoCV1(String subTipoCV1){
+		this.subTipoCV1 = subTipoCV1;
+		return this;
+	}
+
+	@JsonProperty("subTipoCV1")
+	public String getSubTipoCV1() {
+		return subTipoCV1;
+	}
+	
+	public void setSubTipoCV1(String subTipoCV1) {
+		this.subTipoCV1 = subTipoCV1;
+	}	
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem subTipoCV2(String subTipoCV2){
+		this.subTipoCV2 = subTipoCV2;
+		return this;
+	}
+
+	@JsonProperty("subTipoCV2")
+	public String getSubTipoCV2() {
+		return subTipoCV2;
+	}
+	
+	public void setSubTipoCV2(String subTipoCV2) {
+		this.subTipoCV2 = subTipoCV2;
+	}	
+	
+	/**
+	 *
+	 */
 
 	public ColegiadoItem idgrupo(String[] idgrupo ){
 	
@@ -1135,7 +1172,7 @@ public class ColegiadoItem {
 	public int hashCode() {
 	    return Objects.hash(idPersona, idInstitucion, nif, nombre, numColegiado, residenteInscrito,	fechaNacimiento, correo, telefono, movil, estadoColegial,
 	    		fechaBaja, apellidos, fechaIncorporacion, situacion, residencia, inscrito, idProvincia, idPoblacion, codigoPostal, tipoDireccion, sexo, 
-	    		idEstadoCivil, domicilio, tipoCV, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
+	    		idEstadoCivil, domicilio, tipoCV, subTipoCV1, subTipoCV2, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
 	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion, 
 	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate, observaciones, subtipoCV,
 	    		fechaNacimientoRango);
@@ -1173,6 +1210,8 @@ public class ColegiadoItem {
 	    sb.append("    idEstadoCivil: ").append(toIndentedString(idEstadoCivil)).append("\n");
 	    sb.append("    domicilio: ").append(toIndentedString(domicilio)).append("\n");
 	    sb.append("    tipoCV: ").append(toIndentedString(tipoCV)).append("\n");
+	    sb.append("    subTipoCV1: ").append(toIndentedString(subTipoCV1)).append("\n");
+	    sb.append("    subTipoCV2: ").append(toIndentedString(subTipoCV2)).append("\n");
 	    sb.append("    idgrupo: ").append(toIndentedString(idgrupo)).append("\n");
 	    sb.append("    denominacion: ").append(toIndentedString(denominacion)).append("\n");
 	    sb.append("    soloNombre: ").append(toIndentedString(soloNombre)).append("\n");

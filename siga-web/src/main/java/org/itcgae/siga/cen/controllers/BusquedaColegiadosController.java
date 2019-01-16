@@ -6,8 +6,10 @@ import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.IBusquedaColegiadosService;
+import org.itcgae.siga.cen.services.ISubtipoCurricularService;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
 import org.itcgae.siga.cen.services.ITarjetaDatosIntegrantesService;
+import org.itcgae.siga.cen.services.ITipoCurricularService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,6 +31,12 @@ public class BusquedaColegiadosController {
 	
 	@Autowired
 	private ITarjetaDatosIntegrantesService tarjetaDatosIntegrantesService;
+
+	@Autowired
+	private ITipoCurricularService tipoCurricularService;
+	
+	@Autowired
+	private ISubtipoCurricularService subtipoCurricularService;
 	
 	// Faltan combos: Subtipo curriculares (pendiente de analisis)
 	@RequestMapping(value = "busquedaColegiados/estadoCivil",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
@@ -77,6 +86,18 @@ public class BusquedaColegiadosController {
 	ResponseEntity<ColegiadoDTO> searchColegiado(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) {
 		ColegiadoDTO response = busquedaColegiadosService.searchColegiado(colegiadoItem, request);
 		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "busquedaColegiados/getCurricularTypeCombo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getCurricularTypeCombo(@RequestParam("idTipoCV") String idTipoCV, HttpServletRequest request) { 
+		ComboDTO response = tipoCurricularService.getCurricularTypeCombo(idTipoCV, request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "busquedaColegiados/getCurricularSubtypeCombo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getCurricularSubtypeCombo(@RequestParam("idTipoCV") String idTipoCV, HttpServletRequest request) { 
+		ComboDTO response = subtipoCurricularService.getCurricularSubtypeCombo(idTipoCV, request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 		
 }

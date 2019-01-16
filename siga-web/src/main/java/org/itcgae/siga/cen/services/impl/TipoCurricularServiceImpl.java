@@ -508,5 +508,45 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 		LOGGER.info("search() -> Salida del servicio para la búsqueda por filtro de categoría curricular");
 		return tipoCurricular;
 	}
+	
+	@Override
+	public ComboDTO getCurricularTypeCombo (String idTipoCV, HttpServletRequest request) {
+		
+		LOGGER.info("getCurricularTypeCombo() -> Entrada al servicio para obtener los tipos curriculares");
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if(null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getCurricularTypeCombo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getCurricularTypeCombo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			if(null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"getCurricularTypeCombo() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Entrada a cenTiposcvExtendsMapper para obtener los diferentes tipos curriculares");
+				comboItems = cenTiposCVSubtipo1ExtendsMapper.searchCurricularTypeCombo(idTipoCV, usuario.getIdlenguaje(), idInstitucion.toString());
+				LOGGER.info(
+						"getCurricularTypeCombo() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Salida de cenTiposcvExtendsMapper para obtener los diferentes tipos curriculares");
+				
+			}
+		}
+		
+		comboDTO.setCombooItems(comboItems);
+		
+		LOGGER.info("getCurricularTypeCombo() -> Salida del servicio para obtener los tipos curriculares");
+		
+		return comboDTO;
+	}
 
 }
