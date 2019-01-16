@@ -3,6 +3,7 @@ package org.itcgae.siga.cen.services.impl;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -83,7 +84,6 @@ public class MutualidadServiceImpl implements IMutualidadService{
 	@Autowired
 	private CenSolicitudmutualidadMapper cenSolicitudmutualidadMapper;
 
-	
 	@Autowired
 	private CenInstitucionExtendsMapper cenInstitucionExtendsMapper;
 	
@@ -364,7 +364,7 @@ public class MutualidadServiceImpl implements IMutualidadService{
 		MutualidadResponseDTO response = new MutualidadResponseDTO();
 		String token = requestController.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		CenInstitucion institucion = cenInstitucionExtendsMapper.selectByPrimaryKey(idInstitucion);
 		GenParametrosExample example = new GenParametrosExample();
 		example.createCriteria().andIdrecursoEqualTo("administracion.parametro.url_ws_mutualidad");
@@ -372,7 +372,12 @@ public class MutualidadServiceImpl implements IMutualidadService{
 		List<GenParametros> config = _genParametrosMapper.selectByExample(example);
 		
 		if(config != null && config.size() > 0){
-			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"datosColegialesUpdate() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			AdmUsuarios usuario = usuarios.get(0);
 			String uriService = config.get(0).getValor();
 			
 			MGASolicitudPolizaAccuGratuitosDocument request = MGASolicitudPolizaAccuGratuitosDocument.Factory.newInstance();
@@ -453,8 +458,8 @@ public class MutualidadServiceImpl implements IMutualidadService{
 
 			IntegracionBeneficiarios datosBeneficiarios = IntegracionBeneficiarios.Factory.newInstance();
 			//datosBeneficiarios.setIdPoliza(solicitud.getDatosBeneficiario().getIdPoliza());
-			datosBeneficiarios.setIdTipoBeneficiario(solicitud.getDatosBeneficiario().getIdTipoBeneficiario());
-			datosBeneficiarios.setTextoOtros(solicitud.getDatosBeneficiario().getTextoOtros());
+			//datosBeneficiarios.setIdTipoBeneficiario(solicitud.getDatosBeneficiario().getIdTipoBeneficiario());
+			//datosBeneficiarios.setTextoOtros(solicitud.getDatosBeneficiario().getTextoOtros());
 			
 			
 			IntegracionDatosPoliza datosPoliza = IntegracionDatosPoliza.Factory.newInstance();
@@ -480,6 +485,59 @@ public class MutualidadServiceImpl implements IMutualidadService{
 				response.setNMutualista(responseWS.getNMutualista());
 				response.setPDF(responseWS.getPDF());
 				response.setValorRespuesta(responseWS.getValorRespuesta());
+
+//				Inserción en CEN_SOLICITUDMUTUALIDAD 
+				CenSolicitudmutualidad solicitudMutualidad = new CenSolicitudmutualidad();
+						
+				solicitudMutualidad.setIdsolicitudincorporacion(Long.parseLong(String.valueOf(responseWS.getIdSolicitud())));
+				solicitudMutualidad.setFechamodificacion(new Date());
+				solicitudMutualidad.setFechanacimiento(solicitud.getDatosPersona().getFechaNacimiento());
+				if(null != solicitud.getDatosPersona().getFechaNacConyuge()) {
+					solicitudMutualidad.setFechanacimientoconyuge(solicitud.getDatosPersona().getFechaNacConyuge());
+				}
+				solicitudMutualidad.setNumeroidentificador(solicitud.getDatosPersona().getNIF());
+				solicitudMutualidad.setPais(solicitud.getDatosPersona().getNacionalidad());
+				solicitudMutualidad.setNombre(solicitud.getDatosPersona().getNombre());
+				solicitudMutualidad.setIdsexo(solicitud.getDatosPersona().getSexo());
+				solicitudMutualidad.setNumerohijos(Short.valueOf(String.valueOf(solicitud.getDatosPersona().getNumHijos())));
+				if (null != solicitud.getDatosPersona().getEdadesHijos() && solicitud.getDatosPersona().getEdadesHijos().length>0) {
+					solicitud.getDatosPersona().getEdadesHijos();
+					String[] edades = solicitud.getDatosPersona().getEdadesHijos();
+					solicitudMutualidad.setEdadhijo1(Short.parseShort(edades[0]));
+					solicitudMutualidad.setEdadhijo2(Short.parseShort(edades[1]));
+					solicitudMutualidad.setEdadhijo3(Short.parseShort(edades[2]));
+					solicitudMutualidad.setEdadhijo4(Short.parseShort(edades[3]));
+					solicitudMutualidad.setEdadhijo5(Short.parseShort(edades[4]));
+					solicitudMutualidad.setEdadhijo6(Short.parseShort(edades[5]));
+				}
+				solicitudMutualidad.setAsistenciasanitaria(String.valueOf(solicitud.getDatosPersona().getAsistenciaSanitaria()));
+				solicitudMutualidad.setCodigopostal(solicitud.getDatosDireccion().getCp());
+				solicitudMutualidad.setDomicilio(solicitud.getDatosDireccion().getDireccion());
+				solicitudMutualidad.setCorreoelectronico(solicitud.getDatosDireccion().getEmail());
+				solicitudMutualidad.setMovil(solicitud.getDatosDireccion().getMovil());
+				solicitudMutualidad.setPais(solicitud.getDatosDireccion().getPais());
+				solicitudMutualidad.setPoblacion(solicitud.getDatosDireccion().getPoblacion());
+				solicitudMutualidad.setProvincia(solicitud.getDatosDireccion().getProvincia());
+				solicitudMutualidad.setTelefono1(solicitud.getDatosDireccion().getTelefono());
+						
+				solicitudMutualidad.setDigitocontrol(solicitud.getDatosBancarios().getDc());
+				solicitudMutualidad.setIban(solicitud.getDatosBancarios().getIban());
+				solicitudMutualidad.setNumerocuenta(solicitud.getDatosBancarios().getnCuenta());
+				solicitudMutualidad.setSwift(solicitud.getDatosBancarios().getSwift());
+				solicitudMutualidad.setApellido1(solicitud.getDatosPersona().getApellido1());
+				solicitudMutualidad.setApellido2(solicitud.getDatosPersona().getApellido2());
+				solicitudMutualidad.setPeriodicidadpago(String.valueOf(solicitud.getDatosPoliza().getFormaPago()));
+				solicitudMutualidad.setCobertura(String.valueOf(solicitud.getDatosPoliza().getOpcionesCobertura()));
+				solicitudMutualidad.setFechasolicitud(new Date());
+				solicitudMutualidad.setIdtratamiento(Short.parseShort(solicitud.getDatosPersona().getIdTratamiento()));
+				solicitudMutualidad.setIdinstitucion(idInstitucion);
+				solicitudMutualidad.setIdestado(Short.parseShort("1"));
+//				solicitudMutualidad.setIdtiposolicitud(solicitud.getDatosPersona().getTipoSolicitud());
+				solicitudMutualidad.setIdtiposolicitud("S");
+				solicitudMutualidad.setUsumodificacion(usuario.getIdusuario());
+				solicitudMutualidad.setIdtipoidentificacion(Short.parseShort(solicitud.getDatosPersona().getTipoIdentificacion()));
+				solicitudMutualidad.setFechaestado(new Date());
+				cenSolicitudmutualidadMapper.insert(solicitudMutualidad);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -496,7 +554,7 @@ public class MutualidadServiceImpl implements IMutualidadService{
 		
 		String token = requestController.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		CenInstitucion institucion = cenInstitucionExtendsMapper.selectByPrimaryKey(idInstitucion);
 		MutualidadResponseDTO response = new MutualidadResponseDTO();
 		
@@ -506,6 +564,14 @@ public class MutualidadServiceImpl implements IMutualidadService{
 		List<GenParametros> config = _genParametrosMapper.selectByExample(example);
 		
 		if(config != null && config.size() > 0){
+			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"datosColegialesUpdate() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			AdmUsuarios usuario = usuarios.get(0);
+
 			
 			String uriService = config.get(0).getValor();
 			
@@ -518,7 +584,7 @@ public class MutualidadServiceImpl implements IMutualidadService{
 				persona.setApellido2(solicitud.getDatosPersona().getApellido2());
 			}
 			
-			persona.setEjerciente(solicitud.getDatosPersona().getEjerciente());
+			persona.setEjerciente(rellenarEjerciente(solicitud.getDatosPersona().getEjerciente()));
 			persona.setAsistenciaSanitaria(solicitud.getDatosPersona().getAsistenciaSanitaria());
 			persona.setEstadoCivil(parseaEstadoCivil(solicitud.getDatosPersona().getEstadoCivil()));
 			persona.setColegio(institucion.getAbreviatura());
@@ -643,6 +709,59 @@ public class MutualidadServiceImpl implements IMutualidadService{
 				response.setValorRespuesta(responseWS.getValorRespuesta());
 				
 				MutualidadResponseDTO respuestaSeguro = this.MGASolicitudPolizaAccuGratuitos(solicitud, requestController);
+				
+//				Inserción en CEN_SOLICITUDMUTUALIDAD 
+				CenSolicitudmutualidad solicitudMutualidad = new CenSolicitudmutualidad();
+						
+				solicitudMutualidad.setIdsolicitudincorporacion(Long.parseLong(String.valueOf(responseWS.getIdSolicitud())));
+				solicitudMutualidad.setFechamodificacion(new Date());
+				solicitudMutualidad.setFechanacimiento(solicitud.getDatosPersona().getFechaNacimiento());
+				if(null != solicitud.getDatosPersona().getFechaNacConyuge()) {
+					solicitudMutualidad.setFechanacimientoconyuge(solicitud.getDatosPersona().getFechaNacConyuge());
+				}
+				solicitudMutualidad.setNumeroidentificador(solicitud.getDatosPersona().getNIF());
+				solicitudMutualidad.setPais(solicitud.getDatosPersona().getNacionalidad());
+				solicitudMutualidad.setNombre(solicitud.getDatosPersona().getNombre());
+				solicitudMutualidad.setIdsexo(solicitud.getDatosPersona().getSexo());
+				solicitudMutualidad.setNumerohijos(Short.valueOf(String.valueOf(solicitud.getDatosPersona().getNumHijos())));
+				if (null != solicitud.getDatosPersona().getEdadesHijos() && solicitud.getDatosPersona().getEdadesHijos().length>0) {
+					solicitud.getDatosPersona().getEdadesHijos();
+					String[] edades = solicitud.getDatosPersona().getEdadesHijos();
+					solicitudMutualidad.setEdadhijo1(Short.parseShort(edades[0]));
+					solicitudMutualidad.setEdadhijo2(Short.parseShort(edades[1]));
+					solicitudMutualidad.setEdadhijo3(Short.parseShort(edades[2]));
+					solicitudMutualidad.setEdadhijo4(Short.parseShort(edades[3]));
+					solicitudMutualidad.setEdadhijo5(Short.parseShort(edades[4]));
+					solicitudMutualidad.setEdadhijo6(Short.parseShort(edades[5]));
+				}
+				solicitudMutualidad.setAsistenciasanitaria(String.valueOf(solicitud.getDatosPersona().getAsistenciaSanitaria()));
+				solicitudMutualidad.setCodigopostal(solicitud.getDatosDireccion().getCp());
+				solicitudMutualidad.setDomicilio(solicitud.getDatosDireccion().getDireccion());
+				solicitudMutualidad.setCorreoelectronico(solicitud.getDatosDireccion().getEmail());
+				solicitudMutualidad.setMovil(solicitud.getDatosDireccion().getMovil());
+				solicitudMutualidad.setPais(solicitud.getDatosDireccion().getPais());
+				solicitudMutualidad.setPoblacion(solicitud.getDatosDireccion().getPoblacion());
+				solicitudMutualidad.setProvincia(solicitud.getDatosDireccion().getProvincia());
+				solicitudMutualidad.setTelefono1(solicitud.getDatosDireccion().getTelefono());
+						
+				solicitudMutualidad.setDigitocontrol(solicitud.getDatosBancarios().getDc());
+				solicitudMutualidad.setIban(solicitud.getDatosBancarios().getIban());
+				solicitudMutualidad.setNumerocuenta(solicitud.getDatosBancarios().getnCuenta());
+				solicitudMutualidad.setSwift(solicitud.getDatosBancarios().getSwift());
+				solicitudMutualidad.setApellido1(solicitud.getDatosPersona().getApellido1());
+				solicitudMutualidad.setApellido2(solicitud.getDatosPersona().getApellido2());
+				solicitudMutualidad.setPeriodicidadpago(String.valueOf(solicitud.getDatosPoliza().getFormaPago()));
+				solicitudMutualidad.setCobertura(String.valueOf(solicitud.getDatosPoliza().getOpcionesCobertura()));
+				solicitudMutualidad.setFechasolicitud(new Date());
+				solicitudMutualidad.setIdtratamiento(Short.parseShort(solicitud.getDatosPersona().getIdTratamiento()));
+				solicitudMutualidad.setIdinstitucion(idInstitucion);
+				solicitudMutualidad.setIdestado(Short.parseShort("1"));
+//				solicitudMutualidad.setIdtiposolicitud(solicitud.getDatosPersona().getTipoSolicitud());
+				solicitudMutualidad.setIdtiposolicitud("P");
+				solicitudMutualidad.setUsumodificacion(usuario.getIdusuario());
+				solicitudMutualidad.setIdtipoidentificacion(Short.parseShort(solicitud.getDatosPersona().getTipoIdentificacion()));
+				solicitudMutualidad.setFechaestado(new Date());
+				cenSolicitudmutualidadMapper.insert(solicitudMutualidad);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

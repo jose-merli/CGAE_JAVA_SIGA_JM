@@ -57,7 +57,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		
 		sql2.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS CA ON (TIPOSOCIEDAD.DESCRIPCION = CA.IDRECURSO  AND CA.IDLENGUAJE = '" + idLenguaje + "')");
 		sql2.LEFT_OUTER_JOIN("CEN_GRUPOSCLIENTE_CLIENTE GRUPOS_CLIENTE ON (GRUPOS_CLIENTE.IDINSTITUCION = I.IDINSTITUCION AND COL.IDPERSONA = GRUPOS_CLIENTE.IDPERSONA "
-		+ "AND (TO_DATE(grupos_cliente.fecha_inicio,'DD/MM/YYYY') <= SYSDATE  AND ( TO_DATE(grupos_cliente.fecha_baja,'DD/MM/YYYY') >= SYSDATE OR grupos_cliente.fecha_baja IS NULL )))");
+		+ "AND (grupos_cliente.fecha_inicio <= SYSDATE  AND ( grupos_cliente.fecha_baja >= SYSDATE OR grupos_cliente.fecha_baja IS NULL )))");
 		sql2.LEFT_OUTER_JOIN("CEN_COMPONENTES COM ON (COM.IDPERSONA = COL.IDPERSONA AND COL.IDINSTITUCION = COM.IDINSTITUCION AND COM.FECHABAJA IS NULL)");
 		sql2.LEFT_OUTER_JOIN("CEN_CLIENTE CLI ON (COM.CEN_CLIENTE_IDPERSONA = CLI.IDPERSONA AND CLI.IDINSTITUCION = COM.IDINSTITUCION )");
 		sql2.LEFT_OUTER_JOIN("CEN_PERSONA PER2 ON PER2.IDPERSONA = COM.CEN_CLIENTE_IDPERSONA");
@@ -173,7 +173,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 						+ idLenguaje + "')");
 		sql2.LEFT_OUTER_JOIN(
 				"CEN_GRUPOSCLIENTE_CLIENTE GRUPOS_CLIENTE ON (GRUPOS_CLIENTE.IDINSTITUCION = I.IDINSTITUCION AND COL.IDPERSONA = GRUPOS_CLIENTE.IDPERSONA "
-						+ "AND (TO_DATE(grupos_cliente.fecha_inicio,'DD/MM/RRRR') <= SYSDATE  AND ( TO_DATE(grupos_cliente.fecha_baja,'DD/MM/RRRR') >= SYSDATE OR grupos_cliente.fecha_baja IS NULL )))");
+						+ "AND ( grupos_cliente.fecha_inicio <= SYSDATE  AND ( grupos_cliente.fecha_baja >= SYSDATE OR grupos_cliente.fecha_baja IS NULL )))");
 		sql2.LEFT_OUTER_JOIN(
 				"CEN_COMPONENTES COM ON (COM.IDPERSONA = COL.IDPERSONA AND COL.IDINSTITUCION = COM.IDINSTITUCION AND COM.FECHABAJA IS NULL)");
 		sql2.LEFT_OUTER_JOIN(
