@@ -1191,14 +1191,19 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 							LOGGER.info(
 									"deleteEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(eventDelete) -> Entrada a ageEventoExtendsMapper para dar de baja el evento");
 
-							eventDelete.setFechamodificacion(new Date());
-							eventDelete.setUsumodificacion(usuario.getIdusuario().longValue());
-							eventDelete.setFechabaja(new Date());
-							ageEventoExtendsMapper.updateByPrimaryKey(eventDelete);
+							if (eventDelete.getIdestadoevento() == 1) {
+								eventDelete.setFechamodificacion(new Date());
+								eventDelete.setUsumodificacion(usuario.getIdusuario().longValue());
+								eventDelete.setFechabaja(new Date());
+								ageEventoExtendsMapper.updateByPrimaryKey(eventDelete);
 
-							LOGGER.info(
-									"deleteEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(eventDelete) -> Salida a ageEventoExtendsMapper para dar de baja el evento");
-
+								LOGGER.info(
+										"deleteEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(eventDelete) -> Salida a ageEventoExtendsMapper para dar de baja el evento");
+							} else if (eventList.size() == 1) {
+								response = 0;
+								error.setCode(400);
+								error.setDescription("Sólo se pueden cancelar sesiones en estado planificado");
+							}
 						}
 					}
 

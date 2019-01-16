@@ -30,14 +30,27 @@ public class FichaColegialRegTelController {
 	private IFichaColegialRegTelService  iFichaColegialRegtelService;
 	
 	@RequestMapping(value = "fichaColegialRegTel/searchListDoc", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DocushareDTO> searchSocieties(@RequestParam("numPagina") int numPagina, @RequestBody String idPersona,HttpServletRequest request) throws Exception { 
+	ResponseEntity<DocushareDTO> searchList(@RequestParam("numPagina") int numPagina, @RequestBody String idPersona,HttpServletRequest request) throws Exception { 
 		DocushareDTO response = iFichaColegialRegtelService.searchListDoc(numPagina, idPersona, request);
 		return new ResponseEntity<DocushareDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "fichaColegialRegTel/searchListDocNoCol", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DocushareDTO> searchListNoCol(@RequestParam("numPagina") int numPagina, @RequestBody String idPersona,HttpServletRequest request) throws Exception { 
+		DocushareDTO response = iFichaColegialRegtelService.searchListDocNoCol(numPagina, idPersona, request);
+		return new ResponseEntity<DocushareDTO>(response, HttpStatus.OK);
+	}
+	
+	
 	@RequestMapping(value = "fichaColegialRegTel/searchListDir", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DocushareDTO> searchDir(@RequestParam("numPagina") int numPagina, @RequestBody DocuShareObjectVO docu, HttpServletRequest request) throws Exception { 
 		DocushareDTO response = iFichaColegialRegtelService.searchListDir(numPagina, docu, request);
+		return new ResponseEntity<DocushareDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaColegialRegTel/searchListDirNoCol", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DocushareDTO> searchDirNoCol(@RequestParam("numPagina") int numPagina, @RequestBody DocuShareObjectVO docu, HttpServletRequest request) throws Exception { 
+		DocushareDTO response = iFichaColegialRegtelService.searchListDirNoCol(numPagina, docu, request);
 		return new ResponseEntity<DocushareDTO>(response, HttpStatus.OK);
 	}
 	
