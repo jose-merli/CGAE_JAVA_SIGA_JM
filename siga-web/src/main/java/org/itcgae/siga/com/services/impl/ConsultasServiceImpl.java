@@ -464,12 +464,12 @@ public class ConsultasServiceImpl implements IConsultasService{
 							}else{
 								_conConsultaMapper.updateByPrimaryKeyWithBLOBs(consulta);
 								respuesta.setCode(200);
-								respuesta.setMessage("Consulta actualizada");
+								respuesta.setMessage(consulta.getIdconsulta().toString());
 							}
 						}else{
 							_conConsultaMapper.updateByPrimaryKeyWithBLOBs(consulta);
 							respuesta.setCode(200);
-							respuesta.setMessage("Consulta actualizada");
+							respuesta.setMessage(consulta.getIdconsulta().toString());
 						}
 						
 					}
