@@ -462,23 +462,40 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 					&& !hashtable.get(SigaConstants.PERSONANIF).toString().equals(""))
 				cargaMasivaDatosCVItem.setPersonaNIF((String) hashtable.get(SigaConstants.PERSONANIF));
 			if (cargaMasivaDatosCVItem.getColegiadoNumero() != null || cargaMasivaDatosCVItem.getPersonaNIF() != null) {
-
-				try {
-
-					CenPersonaExample cenPersonaExample = new CenPersonaExample();
-					cenPersonaExample.createCriteria().andNifcifEqualTo(cargaMasivaDatosCVItem.getPersonaNIF());
-					List<CenPersona> cenPersona = cenPersonaMapper.selectByExample(cenPersonaExample);
-
-					cargaMasivaDatosCVItem.setIdPersona(cenPersona.get(0).getIdpersona());
-					
-					
-
-				} catch (Exception e) {
-					errorLinea.append(e.getMessage() + ". ");
-					cargaMasivaDatosCVItem.setPersonaNombre("Error");
+				if (cargaMasivaDatosCVItem.getPersonaNIF() != null) {
+						try {
+		
+							CenPersonaExample cenPersonaExample = new CenPersonaExample();
+							cenPersonaExample.createCriteria().andNifcifEqualTo(cargaMasivaDatosCVItem.getPersonaNIF());
+							List<CenPersona> cenPersona = cenPersonaMapper.selectByExample(cenPersonaExample);
+		
+							cargaMasivaDatosCVItem.setIdPersona(cenPersona.get(0).getIdpersona());
+						    if(cargaMasivaDatosCVItem.getColegiadoNumero() != null) {						
+								// Comprobamos si el num de colegiado pertenece a esa persona
+								CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+								cenColegiadoExample.createCriteria().andIdpersonaEqualTo(cargaMasivaDatosCVItem.getIdPersona()).andIdinstitucionEqualTo(idInstitucion).andNcolegiadoEqualTo(cargaMasivaDatosCVItem.getColegiadoNumero());
+								
+								List<CenColegiado> cenColegiado = cenColegiadoExtendsMapper.selectByExample(cenColegiadoExample);
+								
+								if(cenColegiado.isEmpty()) {
+									errorLinea.append("El número de colegiado no coincide con la persona introducida. ");
+								}
+							 }
+		
+						} catch (Exception e) {
+							errorLinea.append("No se ha encontrado una persona con el Nif introducido");
+							cargaMasivaDatosCVItem.setPersonaNombre("Error");
+						}
+				}if(null == cargaMasivaDatosCVItem.getIdPersona() && cargaMasivaDatosCVItem.getColegiadoNumero() != null){
+					CenColegiadoExample exampleColegiado = new CenColegiadoExample();
+					exampleColegiado.createCriteria().andNcolegiadoEqualTo(cargaMasivaDatosCVItem.getColegiadoNumero()).andIdinstitucionEqualTo(idInstitucion);
+					List<CenColegiado> colegiado = cenColegiadoExtendsMapper.selectByExample(exampleColegiado );
+					if (null != colegiado && colegiado.size()>0) {
+						cargaMasivaDatosCVItem.setIdPersona(colegiado.get(0).getIdpersona());
+					}
 				}
-
 				if (cargaMasivaDatosCVItem.getIdPersona() != null) {
+
 					String nombreString = null;
 					if (!personaHashtable.containsKey(cargaMasivaDatosCVItem.getIdPersona())) {
 
@@ -503,19 +520,12 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 					personaHashtable.put(cargaMasivaDatosCVItem.getIdPersona(), nombreString);
 
-				}
-				
-				if(cargaMasivaDatosCVItem.getColegiadoNumero() != null) {						
-						// Comprobamos si el num de colegiado pertenece a esa persona
-						CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
-						cenColegiadoExample.createCriteria().andIdpersonaEqualTo(cargaMasivaDatosCVItem.getIdPersona()).andIdinstitucionEqualTo(idInstitucion).andNcolegiadoEqualTo(cargaMasivaDatosCVItem.getColegiadoNumero());
-						
-						List<CenColegiado> cenColegiado = cenColegiadoExtendsMapper.selectByExample(cenColegiadoExample);
-						
-						if(cenColegiado.isEmpty()) {
-							errorLinea.append("El número de colegiado no coincide con la persona dada. ");
-						}
-				}
+				}	
+				else {
+					errorLinea.append("No existe la persona seleccionada");
+					cargaMasivaDatosCVItem.setPersonaNombre("Error");
+				}		
+
 			} else {
 				errorLinea.append("Es obligatorio introducir número de colegiado o nif/cif. ");
 				cargaMasivaDatosCVItem.setPersonaNombre("Error");
@@ -564,41 +574,46 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 			if (hashtable.get(SigaConstants.TIPOCVCOD) != null
 					&& !hashtable.get(SigaConstants.TIPOCVCOD).toString().equals("")) {
+ 
+				try{
+					Short tipocvCod = new Short(String.valueOf(hashtable.get(SigaConstants.TIPOCVCOD)));
 
-				Short tipocvCod = new Short(String.valueOf(hashtable.get(SigaConstants.TIPOCVCOD)));
-				if (!tipoCvHashtable.containsKey(Short.toString(tipocvCod))) {
-					tipoCVVo = new SubtiposCVItem();
-
-					// Llamada a método para obtener idtipocv
-					CenTiposcvExample cenTiposCVExample = new CenTiposcvExample();
-					cenTiposCVExample.createCriteria().andIdtipocvEqualTo(tipocvCod);
-					List<CenTiposcv> tiposCV = cenTiposcvMapper.selectByExample(cenTiposCVExample);
-
-					if (tiposCV != null && tiposCV.size() > 0) {
-						tipoCVVo.setIdtipocv(tiposCV.get(0).getIdtipocv());
-
-						genRecursosCatalogosKey.setIdrecurso(tiposCV.get(0).getDescripcion());
-
-						GenRecursosCatalogos genRecursosCatalogos = genRecursosCatalogosMapper
-								.selectByPrimaryKey(genRecursosCatalogosKey);
-
-						tipoCVVo.setTipocvDescripcion(genRecursosCatalogos.getDescripcion());
+					if (!tipoCvHashtable.containsKey(Short.toString(tipocvCod))) {
+						tipoCVVo = new SubtiposCVItem();
+	
+						// Llamada a método para obtener idtipocv
+						CenTiposcvExample cenTiposCVExample = new CenTiposcvExample();
+						cenTiposCVExample.createCriteria().andIdtipocvEqualTo(tipocvCod);
+						List<CenTiposcv> tiposCV = cenTiposcvMapper.selectByExample(cenTiposCVExample);
+	
+						if (tiposCV != null && tiposCV.size() > 0) {
+							tipoCVVo.setIdtipocv(tiposCV.get(0).getIdtipocv());
+	
+							genRecursosCatalogosKey.setIdrecurso(tiposCV.get(0).getDescripcion());
+	
+							GenRecursosCatalogos genRecursosCatalogos = genRecursosCatalogosMapper
+									.selectByPrimaryKey(genRecursosCatalogosKey);
+	
+							tipoCVVo.setTipocvDescripcion(genRecursosCatalogos.getDescripcion());
+						}
+					} else {
+						tipoCVVo = tipoCvHashtable.get(Short.toString(tipocvCod));
 					}
-				} else {
-					tipoCVVo = tipoCvHashtable.get(Short.toString(tipocvCod));
+					tipoCvHashtable.put(Short.toString(tipocvCod), tipoCVVo);
+					if (tipoCVVo.getTipocvDescripcion() != null) {
+						cargaMasivaDatosCVItem.setTipoCVNombre(tipoCVVo.getTipocvDescripcion());
+						cargaMasivaDatosCVItem.setIdTipoCV(tipoCVVo.getIdTipocv());
+					} else {
+						cargaMasivaDatosCVItem.setTipoCVNombre("Error");
+						errorLinea.append("No se ha encontrado el tipo CV. ");
+					}
+					cargaMasivaDatosCVItem.setTipoCVCOD(tipocvCod);
+				} catch (Exception e1) {
+					errorLinea.append("TIPOCVCOD mal introducido. ");
 				}
-				tipoCvHashtable.put(Short.toString(tipocvCod), tipoCVVo);
-				if (tipoCVVo.getTipocvDescripcion() != null) {
-					cargaMasivaDatosCVItem.setTipoCVNombre(tipoCVVo.getTipocvDescripcion());
-					cargaMasivaDatosCVItem.setIdTipoCV(tipoCVVo.getIdTipocv());
-				} else {
-					cargaMasivaDatosCVItem.setTipoCVNombre("Error");
-					errorLinea.append("No se ha encontrado el tipo CV. ");
-				}
-				cargaMasivaDatosCVItem.setTipoCVCOD(tipocvCod);
-
+				
 			} else {
-				errorLinea.append("Es obligatorio introducir número de colegiado o nif/cif. ");
+				errorLinea.append("Es obligatorio introducir tipocvcod. ");
 				cargaMasivaDatosCVItem.setPersonaNombre("Error");
 			}
 
@@ -618,6 +633,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 					cargaMasivaDatosCVItem.setSubTipoCV1Nombre("Error");
 				} else if (hashtable.get(SigaConstants.SUBTIPOCV1COD) != null
 						&& !hashtable.get(SigaConstants.SUBTIPOCV1COD).toString().equals("")) {
+					try{
 					String subtipocv1Cod = (String) hashtable.get(SigaConstants.SUBTIPOCV1COD);
 					if (!subtipo1CvHashtable.containsKey(subtipocv1Cod)) {
 						subtipoCV1Vo = new SubtiposCVItem();
@@ -661,10 +677,13 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 						errorLinea.append("No se ha encontrado el subtipo 1 CV. ");
 					}
 					cargaMasivaDatosCVItem.setSubtipoCV1COD(subtipocv1Cod);
-
+					} catch (Exception e1) {
+						errorLinea.append("SUBTIPOCV1COD mal introducido. ");
+					}
 					if (cargaMasivaDatosCVItem.getIdTipoCVSubtipo1() != null
 							&& hashtable.get(SigaConstants.SUBTIPOCV2COD) != null
 							&& !hashtable.get(SigaConstants.SUBTIPOCV2COD).toString().equals("")) {
+						try{
 						String subtipocv2Cod = (String) hashtable.get(SigaConstants.SUBTIPOCV2COD);
 						if (!subtipo2CvHashtable.containsKey(subtipocv2Cod)) {
 							subtipoCV2Vo = new SubtiposCVItem();
@@ -708,6 +727,9 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 							errorLinea.append("No se ha encontrado el subtipo 2 CV. ");
 						}
 						cargaMasivaDatosCVItem.setSubtipoCV2COD(subtipocv2Cod);
+					} catch (Exception e1) {
+						errorLinea.append("SUBTIPOCV2COD mal introducido. ");
+					}
 					}
 				} else {
 					errorLinea.append(
@@ -922,8 +944,9 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		// Extraer el path
-		String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
-		path += idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
+		//String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
+		String path = getDirectorioFichero(idInstitucion);
+		path += File.separator + idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
 		File file = new File(path);
 
 		// Preparar la descarga
@@ -955,8 +978,9 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		// Extraer el path
-		String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
-		path += "log_" + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "."
+		//String path = "C:\\Users\\DTUser\\Documents\\CV" + idInstitucion + "\\cargas\\";
+		String path = getDirectorioFichero(idInstitucion);
+		path += File.separator +"log_" + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "."
 				+ SigaConstants.tipoExcelXls;
 		File file = new File(path);
 

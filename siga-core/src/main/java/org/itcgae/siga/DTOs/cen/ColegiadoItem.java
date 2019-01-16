@@ -23,8 +23,8 @@ public class ColegiadoItem {
 	private String estadoColegial;	
 	private String [] grupos;
 	private String  apellidos;
-//	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date [] fechaIncorporacion;
+	private Date [] fechaNacimientoRango;
 	private String situacion;
 	private String residencia;
 	private String inscrito;	
@@ -456,6 +456,23 @@ public class ColegiadoItem {
 	
 	public void setFechaIncorporacion(Date [] fechaIncorporacion) {
 		this.fechaIncorporacion = fechaIncorporacion;
+	}
+	
+	/**
+	 *
+	 */
+	public ColegiadoItem fechaNacimientoRango (Date [] fechaNacimientoRango){
+		this.fechaNacimientoRango = fechaNacimientoRango;
+		return this;
+	}
+
+	@JsonProperty("fechaNacimientoRango")
+	public Date [] getFechaNacimientoRango() {
+		return fechaNacimientoRango;
+	}
+	
+	public void setFechaNacimientoRango(Date [] fechaNacimientoRango) {
+		this.fechaNacimientoRango = fechaNacimientoRango;
 	}
 	
 	/**
@@ -1081,6 +1098,38 @@ public class ColegiadoItem {
 		this.subtipoCV = subtipoCV;
 	}
 	
+	public ComboEtiquetasItem[] getEtiquetas() {
+		return etiquetas;
+	}
+
+	public void setEtiquetas(ComboEtiquetasItem[] etiquetas) {
+		this.etiquetas = etiquetas;
+	}
+
+	public String getMotivo() {
+		return motivo;
+	}
+
+	public void setMotivo(String motivo) {
+		this.motivo = motivo;
+	}
+
+	public Date getFechaEstado() {
+		return fechaEstado;
+	}
+
+	public void setFechaEstado(Date fechaEstado) {
+		this.fechaEstado = fechaEstado;
+	}
+
+	public String getIdEstado() {
+		return idEstado;
+	}
+
+	public void setIdEstado(String idEstado) {
+		this.idEstado = idEstado;
+	}
+	
 
 	@Override
 	public int hashCode() {
@@ -1088,7 +1137,8 @@ public class ColegiadoItem {
 	    		fechaBaja, apellidos, fechaIncorporacion, situacion, residencia, inscrito, idProvincia, idPoblacion, codigoPostal, tipoDireccion, sexo, 
 	    		idEstadoCivil, domicilio, tipoCV, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
 	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion, 
-	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate, observaciones, subtipoCV);
+	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate, observaciones, subtipoCV,
+	    		fechaNacimientoRango);
 	}
 
 
@@ -1152,6 +1202,7 @@ public class ColegiadoItem {
 	    sb.append("    incorporacionDate: ").append(toIndentedString(incorporacionDate)).append("\n");
 	    sb.append("    observaciones: ").append(toIndentedString(observaciones)).append("\n");
 	    sb.append("    subtipoCV: ").append(toIndentedString(subtipoCV)).append("\n");
+	    sb.append("    fechaNacimientoRango: ").append(toIndentedString(subtipoCV)).append("\n");
 
 	    
 		
@@ -1171,37 +1222,7 @@ public class ColegiadoItem {
 	}
 
 
-	public ComboEtiquetasItem[] getEtiquetas() {
-		return etiquetas;
-	}
-
-	public void setEtiquetas(ComboEtiquetasItem[] etiquetas) {
-		this.etiquetas = etiquetas;
-	}
-
-	public String getMotivo() {
-		return motivo;
-	}
-
-	public void setMotivo(String motivo) {
-		this.motivo = motivo;
-	}
-
-	public Date getFechaEstado() {
-		return fechaEstado;
-	}
-
-	public void setFechaEstado(Date fechaEstado) {
-		this.fechaEstado = fechaEstado;
-	}
-
-	public String getIdEstado() {
-		return idEstado;
-	}
-
-	public void setIdEstado(String idEstado) {
-		this.idEstado = idEstado;
-	}
+	
 
 }
 

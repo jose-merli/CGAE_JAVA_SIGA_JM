@@ -1,6 +1,5 @@
 package org.itcgae.siga.db.services.cen.providers;
 
-
 import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
@@ -12,13 +11,14 @@ import org.itcgae.siga.db.mappers.CenColegiadoSqlProvider;
 
 public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
-
 	public String selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem) {
 
 		SQL sql = new SQL();
 		SQL sql1 = new SQL();
+		SQL sql2 = new SQL();
+
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		
+
 		sql.SELECT_DISTINCT("col.idpersona");
 		sql.SELECT_DISTINCT("col.idinstitucion");
 		sql.SELECT_DISTINCT("per.nifcif");
@@ -61,14 +61,15 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql1.FROM("cen_partidojudicial partidojudicial");
 		sql1.INNER_JOIN("cen_poblaciones pob on pob.idpartido = partidojudicial.idpartido");
 		sql1.INNER_JOIN("cen_direcciones direcciones on pob.idpoblacion = direcciones.idpoblacion");
-		sql1.INNER_JOIN("CEN_DIRECCION_TIPODIRECCION tipodireccion ON (tipodireccion.IDDIRECCION = direcciones.IDDIRECCION AND"
-				+ " tipodireccion.IDPERSONA = direcciones.IDPERSONA AND  tipodireccion.IDINSTITUCION = direcciones.IDINSTITUCION)");
+		sql1.INNER_JOIN(
+				"CEN_DIRECCION_TIPODIRECCION tipodireccion ON (tipodireccion.IDDIRECCION = direcciones.IDDIRECCION AND"
+						+ " tipodireccion.IDPERSONA = direcciones.IDPERSONA AND  tipodireccion.IDINSTITUCION = direcciones.IDINSTITUCION)");
 
 		sql1.WHERE("tipodireccion.idtipodireccion = '2'");
 		sql1.WHERE("direcciones.idpersona = dir.idpersona");
 		sql1.WHERE("direcciones.idinstitucion = dir.idinstitucion");
 		sql1.WHERE("direcciones.iddireccion = dir.iddireccion");
-		
+
 		sql.SELECT_DISTINCT("(" + sql1 + ") as partidoJudicial");
 
 		sql.SELECT_DISTINCT("dir.movil as movil");
@@ -89,11 +90,13 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.INNER_JOIN(
 				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
 
-		sql.LEFT_OUTER_JOIN("cen_datosCV datosCV ON ( datosCV.idInstitucion = col.idInstitucion and datosCV.idPersona = per.idPersona )");
-		 sql.LEFT_OUTER_JOIN("cen_tiposcv cenTipoCV ON ( cenTipoCV.idTipoCV = datosCV.idTipoCV )");
-		 sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt ON ( subt.idTipoCV = datosCV.idTipoCV and subt.idInstitucion = col.idInstitucion )");
-		
-		if(idInstitucion != Short.parseShort("2000")) {
+		sql.LEFT_OUTER_JOIN(
+				"cen_datosCV datosCV ON ( datosCV.idInstitucion = col.idInstitucion and datosCV.idPersona = per.idPersona )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcv cenTipoCV ON ( cenTipoCV.idTipoCV = datosCV.idTipoCV )");
+		sql.LEFT_OUTER_JOIN(
+				"cen_tiposcvsubtipo2 subt ON ( subt.idTipoCV = datosCV.idTipoCV and subt.idInstitucion = col.idInstitucion )");
+
+		if (idInstitucion != Short.parseShort("2000")) {
 			sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
 		}
 
@@ -161,7 +164,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 
 		if (colegiadoItem.getSubtipoCV() != null && colegiadoItem.getSubtipoCV().length > 0) {
-			
+
 			String etiquetas = "";
 
 			for (int i = 0; colegiadoItem.getSubtipoCV().length > i; i++) {
@@ -174,9 +177,9 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			}
 
 			sql.WHERE("subt.IDTIPOCVSUBTIPO2 IN (" + etiquetas + ")");
-			
+
 		}
-		
+
 		if (colegiadoItem.getSituacion() != null && colegiadoItem.getSituacion() != "") {
 			sql.WHERE("colest.idestado ='" + colegiadoItem.getSituacion() + "'");
 		}
@@ -205,12 +208,13 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			sql.WHERE("grucli.IDGRUPO IN (" + etiquetas + ")");
 		}
 
-		if (colegiadoItem.getFechaNacimiento() != null) {
-			String fechaNacimiento = dateFormat.format(colegiadoItem.getFechaNacimiento());
-			sql.WHERE("(TO_DATE(per.fechanacimiento,'DD/MM/RRRR') >= TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY')"
-					+ " and ( TO_DATE(per.fechanacimiento,'DD/MM/RRRR') <= TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY')))");
-
-		}
+//		if (colegiadoItem.getFechaNacimiento() != null) {
+//			String fechaNacimiento = dateFormat.format(colegiadoItem.getFechaNacimiento());
+//			sql.WHERE("(TO_DATE(per.fechanacimiento,'DD/MM/RRRR') >= TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY')"
+//					+ " and ( TO_DATE(per.fechanacimiento,'DD/MM/RRRR') <= TO_DATE('" + fechaNacimiento
+//					+ "','DD/MM/YYYY')))");
+//
+//		}
 
 		if (colegiadoItem.getFechaIncorporacion() != null && colegiadoItem.getFechaIncorporacion().length != 0) {
 
@@ -230,131 +234,158 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 				sql.WHERE("(TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') >= TO_DATE('" + fechaIncorporacionDesde
 						+ "','DD/MM/YYYY'))");
-				
-			} else if (colegiadoItem.getFechaIncorporacion()[0] == null && colegiadoItem.getFechaIncorporacion()[1] != null) {
 
-					String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
+			} else if (colegiadoItem.getFechaIncorporacion()[0] == null
+					&& colegiadoItem.getFechaIncorporacion()[1] != null) {
 
-					sql.WHERE("( TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') <= TO_DATE('"
-							+ fechaIncorporacionHasta + "','DD/MM/YYYY'))");
-				}
+				String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
+
+				sql.WHERE("( TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') <= TO_DATE('" + fechaIncorporacionHasta
+						+ "','DD/MM/YYYY'))");
 			}
-
+		}
 
 		if (colegiadoItem.getEstadoColegial() != null && colegiadoItem.getEstadoColegial() != "") {
 			sql.WHERE("cat.descripcion like '" + colegiadoItem.getEstadoColegial() + "'");
 		}
+		
+		if (colegiadoItem.getFechaNacimientoRango() != null && colegiadoItem.getFechaNacimientoRango().length != 0) {
 
+			if (colegiadoItem.getFechaNacimientoRango()[0] != null && colegiadoItem.getFechaNacimientoRango()[1] != null) {
 
+				String getFechaNacimientoDesde = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[0]);
+				String getFechaNacimientoHasta = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[1]);
+
+				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
+						+ "','DD/MM/YYYY') " + " and ( per.fechanacimiento <= TO_DATE('"
+						+ getFechaNacimientoHasta + "','DD/MM/YYYY')))");
+
+			} else if (colegiadoItem.getFechaNacimientoRango()[0] != null
+					&& colegiadoItem.getFechaNacimientoRango()[1] == null) {
+
+				String getFechaNacimientoDesde = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[0]);
+
+				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
+						+ "','DD/MM/YYYY'))");
+
+			} else if (colegiadoItem.getFechaNacimientoRango()[0] == null
+					&& colegiadoItem.getFechaNacimientoRango()[1] != null) {
+
+				String getFechaNacimientoHasta = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[1]);
+
+				sql.WHERE("( per.fechanacimiento <= TO_DATE('" + getFechaNacimientoHasta
+						+ "','DD/MM/YYYY'))");
+			}
+		}
 
 		sql.ORDER_BY("NOMBRE");
-		//sql.ORDER_BY("per.nombre");
 
-		return sql.toString();
+		sql2.SELECT("*");
+		sql2.FROM("(" + sql + ")");
+		sql2.WHERE("rownum < 5000");
+
+		return sql2.toString();
 	}
-	
+
 	public String updateColegiado(CenColegiado record) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		
-		/*if(nu
-		 * 
-		 */
+
 		SQL sql = new SQL();
 		sql.UPDATE("CEN_COLEGIADO");
 		if (record.getFechapresentacion() != null) {
-//			sql.SET("FECHAPRESENTACION = "+record.getFechapresentacion()+"");
+			// sql.SET("FECHAPRESENTACION = "+record.getFechapresentacion()+"");
 			String fechaF = dateFormat.format(record.getFechapresentacion());
 			sql.SET("FECHAPRESENTACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-		}else {
-			sql.SET("FECHAPRESENTACION = "+record.getFechapresentacion()+"");
+		} else {
+			sql.SET("FECHAPRESENTACION = " + record.getFechapresentacion() + "");
 		}
 		if (record.getFechaincorporacion() != null) {
 			String fechaF = dateFormat.format(record.getFechaincorporacion());
 			sql.SET("FECHAINCORPORACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-		}else {
-			sql.SET("FECHAINCORPORACION = "+record.getFechaincorporacion()+"");
+		} else {
+			sql.SET("FECHAINCORPORACION = " + record.getFechaincorporacion() + "");
 		}
 		if (record.getIndtitulacion() != null) {
-			sql.SET("INDTITULACION = "+record.getIndtitulacion()+"");
+			sql.SET("INDTITULACION = " + record.getIndtitulacion() + "");
 		}
 		if (record.getJubilacioncuota() != null) {
-			sql.SET("JUBILACIONCUOTA = "+record.getIndtitulacion()+"");
+			sql.SET("JUBILACIONCUOTA = " + record.getIndtitulacion() + "");
 		}
 		if (record.getSituacionejercicio() != null) {
-			sql.SET("SITUACIONEJERCICIO = "+record.getSituacionejercicio()+"");
+			sql.SET("SITUACIONEJERCICIO = " + record.getSituacionejercicio() + "");
 		}
 		if (record.getSituacionresidente() != null) {
-			sql.SET("SITUACIONRESIDENTE = "+record.getSituacionresidente() +"");
+			sql.SET("SITUACIONRESIDENTE = " + record.getSituacionresidente() + "");
 		}
 		if (record.getSituacionempresa() != null) {
-			sql.SET("SITUACIONEMPRESA = "+record.getSituacionempresa()+"");
+			sql.SET("SITUACIONEMPRESA = " + record.getSituacionempresa() + "");
 		}
 		if (record.getFechamodificacion() != null) {
 			String fechaF = dateFormat.format(record.getFechamodificacion());
 			sql.SET("FECHAMODIFICACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-		}else {
-			sql.SET("FECHAMODIFICACION = "+record.getFechamodificacion()+"");
+		} else {
+			sql.SET("FECHAMODIFICACION = " + record.getFechamodificacion() + "");
 		}
 		if (record.getUsumodificacion() != null) {
-			sql.SET("USUMODIFICACION = "+record.getUsumodificacion()+"");
+			sql.SET("USUMODIFICACION = " + record.getUsumodificacion() + "");
 		}
 		if (record.getComunitario() != null) {
-			sql.SET("COMUNITARIO = "+record.getComunitario() +"");
+			sql.SET("COMUNITARIO = " + record.getComunitario() + "");
 		}
 		if (record.getNcolegiado() != null) {
-			sql.SET("NCOLEGIADO = "+record.getNcolegiado()+"");
+			sql.SET("NCOLEGIADO = " + record.getNcolegiado() + "");
 		}
 		if (record.getFechajura() != null) {
 			String fechaF = dateFormat.format(record.getFechajura());
 			sql.SET("FECHAJURA = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-		}else {
-			sql.SET("FECHAJURA = "+record.getFechajura()+"");
+		} else {
+			sql.SET("FECHAJURA = " + record.getFechajura() + "");
 		}
 		if (record.getNcomunitario() != null) {
-			sql.SET("NCOMUNITARIO = "+record.getNcomunitario()+"");
+			sql.SET("NCOMUNITARIO = " + record.getNcomunitario() + "");
 		}
 		if (record.getFechatitulacion() != null) {
 			String fechaF = dateFormat.format(record.getFechatitulacion());
 			sql.SET("FECHATITULACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-		}else {
-			sql.SET("FECHATITULACION = "+record.getFechatitulacion() +"");
+		} else {
+			sql.SET("FECHATITULACION = " + record.getFechatitulacion() + "");
 		}
 		if (record.getOtroscolegios() != null) {
-			sql.SET("OTROSCOLEGIOS = "+record.getOtroscolegios()+"");
+			sql.SET("OTROSCOLEGIOS = " + record.getOtroscolegios() + "");
 		}
 		if (record.getFechadeontologia() != null) {
 			String fechaF = dateFormat.format(record.getFechadeontologia());
 			sql.SET("FECHADEONTOLOGIA = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-		}else {
-			sql.SET("FECHADEONTOLOGIA = "+record.getFechadeontologia()+"");
+		} else {
+			sql.SET("FECHADEONTOLOGIA = " + record.getFechadeontologia() + "");
 		}
 		if (record.getFechamovimiento() != null) {
 			String fechaF = dateFormat.format(record.getFechamovimiento());
 			sql.SET("FECHAMOVIMIENTO = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-		}else {
-			sql.SET("FECHAMOVIMIENTO = "+record.getFechamovimiento()+"");
+		} else {
+			sql.SET("FECHAMOVIMIENTO = " + record.getFechamovimiento() + "");
 		}
 		if (record.getIdtiposseguro() != null) {
-			sql.SET("IDTIPOSSEGURO = "+record.getIdtiposseguro()+"");
+			sql.SET("IDTIPOSSEGURO = " + record.getIdtiposseguro() + "");
 		}
 		if (record.getCuentacontablesjcs() != null) {
-			sql.SET("CUENTACONTABLESJCS = "+record.getCuentacontablesjcs()+"");
+			sql.SET("CUENTACONTABLESJCS = " + record.getCuentacontablesjcs() + "");
 		}
 		if (record.getIdentificadords() != null) {
-			sql.SET("IDENTIFICADORDS = "+record.getIdentificadords()+"");
+			sql.SET("IDENTIFICADORDS = " + record.getIdentificadords() + "");
 		}
 		if (record.getNmutualista() != null) {
-			sql.SET("NMUTUALISTA = "+record.getNmutualista()+"");
+			sql.SET("NMUTUALISTA = " + record.getNmutualista() + "");
 		}
 		if (record.getNumsolicitudcolegiacion() != null) {
-			sql.SET("NUMSOLICITUDCOLEGIACION = "+record.getNumsolicitudcolegiacion()+"");
+			sql.SET("NUMSOLICITUDCOLEGIACION = " + record.getNumsolicitudcolegiacion() + "");
 		}
-		sql.WHERE("IDINSTITUCION = "+record.getIdinstitucion()+"");
-		sql.WHERE("IDPERSONA = "+record.getIdpersona()+"");
+		sql.WHERE("IDINSTITUCION = " + record.getIdinstitucion() + "");
+		sql.WHERE("IDPERSONA = " + record.getIdpersona() + "");
+
 		return sql.toString();
 	}
 
-	
 	public String selectColegiaciones(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem) {
 
 		SQL sql = new SQL();
@@ -365,41 +396,39 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("observaciones");
 		sql.SELECT("colest.fechaestado AS fechaestado");
 		sql.SELECT("colest.idestado AS idEstado");
-		
+
 		sql.FROM("cen_colegiado col");
-		sql.INNER_JOIN("CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion )");
+		sql.INNER_JOIN(
+				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion )");
 		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
-		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '"+idLenguaje+"')");
-		
-		sql.WHERE("col.idpersona = '"+ colegiadoItem.getIdPersona() +"'");
-		
-		if(idInstitucion != Short.parseShort("2000")) {
-			sql.WHERE("colest.idinstitucion = '"+ idInstitucion + "'");
+		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '"
+				+ idLenguaje + "')");
+
+		sql.WHERE("col.idpersona = '" + colegiadoItem.getIdPersona() + "'");
+
+		if (idInstitucion != Short.parseShort("2000")) {
+			sql.WHERE("colest.idinstitucion = '" + idInstitucion + "'");
 		}
-//		sql1.WHERE("dir.fechabaja is null");
-		
+		// sql1.WHERE("dir.fechabaja is null");
+
 		sql.ORDER_BY("fechaestado desc");
-		//sql.ORDER_BY("per.nombre");
+		// sql.ORDER_BY("per.nombre");
 
 		return sql.toString();
 	}
-	
-	
+
 	public String selectColegiacionesIdPersona(Long idPersona) {
 
 		SQL sql = new SQL();
 
-
 		sql.SELECT("col.idinstitucion as IDINSTITUCION");
-		
+
 		sql.FROM("cen_colegiado col");
-		
-		sql.WHERE("col.idpersona = '"+ idPersona +"'");
-		
-		
+
+		sql.WHERE("col.idpersona = '" + idPersona + "'");
+
 		return sql.toString();
 	}
-	
 
 	public String insertSelectiveForCreateNewColegiado(String idInstitucion, AdmUsuarios usuario,
 			CenColegiado cenColegiado) {
@@ -439,7 +468,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 	}
 
 	public String getLabel(AdmUsuarios usuario) {
-		
+
 		SQL sql = new SQL();
 		sql.SELECT("distinct GRUCLI.IDGRUPO");
 		sql.SELECT("GENR.DESCRIPCION");
@@ -466,23 +495,25 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("dir.telefono1 AS telefono");
 		sql.SELECT("dir.movil AS movil");
 
-		
 		sql.FROM("cen_colegiado col");
 
 		sql.INNER_JOIN("cen_persona per ON per.idpersona = col.idpersona");
-		sql.INNER_JOIN("cen_direcciones dir ON dir.idpersona = per.idpersona and dir.idInstitucion = col.idInstitucion and dir.fechabaja is null");
-		sql.INNER_JOIN("cen_datoscolegialesestado dat ON dat.idPersona = per.idPersona and dat.idInstitucion = dir.idInstitucion and dat.fechaestado = (select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = dat.idpersona and datcol.idinstitucion = dat.idinstitucion)");
+		sql.INNER_JOIN(
+				"cen_direcciones dir ON dir.idpersona = per.idpersona and dir.idInstitucion = col.idInstitucion and dir.fechabaja is null");
+		sql.INNER_JOIN(
+				"cen_datoscolegialesestado dat ON dat.idPersona = per.idPersona and dat.idInstitucion = dir.idInstitucion and dat.fechaestado = (select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = dat.idpersona and datcol.idinstitucion = dat.idinstitucion)");
 		sql.INNER_JOIN("cen_estadocolegial est ON est.idEstado = dat.idEstado");
-		sql.INNER_JOIN("gen_recursos_catalogos cat ON cat.idRecurso = est.descripcion and cat.idLenguaje = '" + idLenguaje + "'");
+		sql.INNER_JOIN("gen_recursos_catalogos cat ON cat.idRecurso = est.descripcion and cat.idLenguaje = '"
+				+ idLenguaje + "'");
 
 		sql.WHERE("col.IDPERSONA = '" + idPersona + "'");
 		return sql.toString();
 	}
 
 	public String selectDatosColegiales(String idPersona, String idInstitucion) {
-		
+
 		SQL sql = new SQL();
-		
+
 		sql.SELECT("CEN.NCOLEGIADO");
 		sql.SELECT("SEG.NOMBRE");
 		sql.SELECT("CEN.NMUTUALISTA");
@@ -494,14 +525,15 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("CASE WHEN CEN.COMUNITARIO = 1 THEN 'Si' ELSE 'No' END AS COMUNITARIO");
 		sql.SELECT("EST.DESCRIPCION");
 		sql.SELECT("DAT.OBSERVACIONES");
-		
+
 		sql.FROM("CEN_COLEGIADO CEN");
 		sql.LEFT_OUTER_JOIN("CEN_TIPOSSEGURO SEG ON SEG.IDTIPOSSEGURO = CEN.IDTIPOSSEGURO");
-		sql.INNER_JOIN("CEN_DATOSCOLEGIALESESTADO DAT ON (DAT.IDPERSONA = CEN.IDPERSONA AND DAT.IDINSTITUCION = CEN.IDINSTITUCION)");
+		sql.INNER_JOIN(
+				"CEN_DATOSCOLEGIALESESTADO DAT ON (DAT.IDPERSONA = CEN.IDPERSONA AND DAT.IDINSTITUCION = CEN.IDINSTITUCION)");
 		sql.INNER_JOIN("CEN_ESTADOCOLEGIAL EST ON EST.IDESTADO = DAT.IDESTADO");
-	
+
 		sql.WHERE("CEN.IDPERSONA = '" + idPersona + "'");
-		if(idInstitucion != "2000") {
+		if (idInstitucion != "2000") {
 			sql.WHERE("CEN.IDINSTITUCION = '" + idInstitucion + "'");
 		}
 

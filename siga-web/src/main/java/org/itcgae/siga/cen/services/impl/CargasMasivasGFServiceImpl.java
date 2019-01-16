@@ -476,7 +476,11 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 					personaHashtable.put(cargaMasivaDatosGFVo.getIdPersona(), nombreString);
 
+				}else {
+					errorLinea.append("No existe la persona seleccionada");
+					cargaMasivaDatosGFVo.setPersonaNombre("Error");
 				}
+
 
 			} else {
 				errorLinea.append("Es obligatorio introducir número de colegiado o nif/cif. ");
@@ -893,8 +897,9 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		String path = "C:\\Users\\DTUser\\Documents\\gf" + idInstitucion + "\\gruposfijos\\";
-		path += idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
+		//String path = "C:\\Users\\DTUser\\Documents\\gf" + idInstitucion + "\\gruposfijos\\";
+		String path = getDirectorioFichero(idInstitucion);
+		path += File.separator + idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
 		// Se coge la imagen de la persona juridica
 		File file = new File(path);
 
@@ -930,8 +935,9 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		String path = "C:\\Users\\DTUser\\Documents\\gf" + idInstitucion + "\\gruposfijos\\";
-		path += "log_" + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "." + SigaConstants.tipoExcelXls;
+		//String path = "C:\\Users\\DTUser\\Documents\\gf" + idInstitucion + "\\gruposfijos\\";
+		String path = getDirectorioFichero(idInstitucion);
+		path += File.separator + "log_" + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "." + SigaConstants.tipoExcelXls;
 		// Se coge la imagen de la persona juridica
 		File file = new File(path);
 
