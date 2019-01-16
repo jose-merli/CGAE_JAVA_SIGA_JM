@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.ISolicitudModificacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -69,5 +70,12 @@ public class SolicitudModificacionController {
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.FORBIDDEN);
+	}
+	
+	
+	@RequestMapping(value = "solicitudModificacion/verifyPerson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<StringDTO> verifyPerson(HttpServletRequest request) { 
+		StringDTO response = solicitudModificacionService.verifyPerson(request);
+		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
 	}
 }

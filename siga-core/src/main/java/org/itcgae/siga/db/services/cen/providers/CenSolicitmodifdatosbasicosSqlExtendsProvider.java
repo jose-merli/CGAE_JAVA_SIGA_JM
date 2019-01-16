@@ -18,8 +18,8 @@ public class CenSolicitmodifdatosbasicosSqlExtendsProvider extends CenSolicitmod
 
 		sql.SELECT("MAX(IDSOLICITUD) AS IDSOLICITUD");
 		sql.FROM("CEN_SOLICITMODIFDATOSBASICOS");
-		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
-		sql.WHERE("IDPERSONA = '"+ idPersona +"'");
+//		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
+//		sql.WHERE("IDPERSONA = '"+ idPersona +"'");
 		
 		return sql.toString();
 	}

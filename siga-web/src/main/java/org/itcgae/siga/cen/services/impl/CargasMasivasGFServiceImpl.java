@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 
@@ -75,10 +76,10 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 	@Autowired
-	ICargasMasivasGFService cargasMasivasGFService;
+	private ICargasMasivasGFService cargasMasivasGFService;
 
 	@Autowired
-	CenCargaMasivaExtendsMapper cenCargaMasivaExtendsMapper;
+	private CenCargaMasivaExtendsMapper cenCargaMasivaExtendsMapper;
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -87,37 +88,37 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 	private GenRecursosCatalogosMapper genRecursosCatalogosMapper;
 
 	@Autowired
-	CenGruposclienteMapper cenGruposclienteMapper;
+	private CenGruposclienteMapper cenGruposclienteMapper;
 
 	@Autowired
-	CenPersonaMapper cenPersonaMapper;
+	private CenPersonaMapper cenPersonaMapper;
 
 	@Autowired
-	CenClienteExtendsMapper cenClienteExtendsMapper;
+	private CenClienteExtendsMapper cenClienteExtendsMapper;
 
 	@Autowired
-	CenGruposclienteClienteMapper cenGruposclienteClienteMapper;
+	private CenGruposclienteClienteMapper cenGruposclienteClienteMapper;
 
 	@Autowired
-	CenHistoricoMapper cenHistoricoMapper;
+	private CenHistoricoMapper cenHistoricoMapper;
 
 	@Autowired
-	CenCargamasivaMapper cenCargamasivaMapper;
+	private CenCargamasivaMapper cenCargamasivaMapper;
 
 	@Autowired
-	IFicherosService ficherosService;
+	private IFicherosService ficherosService;
 
 	@Autowired
-	GenPropertiesMapper genPropertiesMapper;
+	private GenPropertiesMapper genPropertiesMapper;
 
 	@Autowired
-	GenRecursosMapper genRecursosMapper;
+	private GenRecursosMapper genRecursosMapper;
 
 	@Autowired
-	SIGAServicesHelperMapper sigaServicesHelperMapper;
+	private SIGAServicesHelperMapper sigaServicesHelperMapper;
 
 	@Autowired
-	CenHistoricoExtendsMapper cenHistoricoExtendsMapper;
+	private CenHistoricoExtendsMapper cenHistoricoExtendsMapper;
 
 	private Logger LOGGER = Logger.getLogger(CargasMasivasGFServiceImpl.class);
 
@@ -131,8 +132,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			throw new BusinessException("No hay datos para crear el fichero");
 		if (orderList == null)
 			orderList = new ArrayList<String>(datosVector.get(0).keySet());
-		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector,
-				SigaConstants.nombreFicheroEjemplo);
+		File XLSFile = ExcelHelper.createExcelFile(orderList, datosVector, SigaConstants.nombreFicheroEjemplo);
 
 		LOGGER.info("createExcelFile() -> Salida al servicio que crea la plantilla Excel");
 
@@ -239,6 +239,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		LOGGER.debug("uploadFile() -> Coger archivo del request");
 		Iterator<String> itr = request.getFileNames();
 		MultipartFile file = request.getFile(itr.next());
+		String nombreFichero = file.getOriginalFilename();
 
 		// Extraer la información del excel
 		LOGGER.debug("uploadFile() -> Extraer los datos del archivo");
@@ -341,41 +342,54 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 				}
 
-				byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGF, datosLog);
+				if (cargaMasivaDatosGFItems.isEmpty()) {
+					error.setMessage("No existen registros en el fichero.");
+					updateResponseDTO.setStatus(SigaConstants.OK);
+					
+				} else {
 
-				cenCargamasivaGF.setTipocarga(SigaConstants.TIPO_CARGA);
-				cenCargamasivaGF.setIdinstitucion(idInstitucion);
-				cenCargamasivaGF.setNombrefichero(SigaConstants.nombreFicheroEjemplo);
-				cenCargamasivaGF.setNumregistros((Integer) cargaMasivaDatosGFItems.size());
-				cenCargamasivaGF.setNumregistroserroneos(registrosErroneos);
-				cenCargamasivaGF.setFechamodificacion(new Date());
-				cenCargamasivaGF.setFechacarga(new Date());
-				cenCargamasivaGF.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
+					byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSLOGGF, datosLog);
 
-				Long idFile = uploadFile(file.getBytes(), cenCargamasivaGF, false, usuario);
-				Long idLogFile = uploadFile(bytesLog, cenCargamasivaGF, true, usuario);
-				cenCargamasivaGF.setIdfichero(idFile);
-				cenCargamasivaGF.setIdficherolog(idLogFile);
+					cenCargamasivaGF.setTipocarga(SigaConstants.TIPO_CARGA);
+					cenCargamasivaGF.setIdinstitucion(idInstitucion);
+					cenCargamasivaGF.setNombrefichero(nombreFichero);
+					cenCargamasivaGF.setNumregistros((Integer) cargaMasivaDatosGFItems.size());
+					cenCargamasivaGF.setNumregistroserroneos(registrosErroneos);
+					cenCargamasivaGF.setFechamodificacion(new Date());
+					cenCargamasivaGF.setFechacarga(new Date());
+					cenCargamasivaGF.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
 
-				int result = cenCargamasivaMapper.insert(cenCargamasivaGF);
+					Long idFile = uploadFile(file.getBytes(), cenCargamasivaGF, false, usuario);
+					Long idLogFile = uploadFile(bytesLog, cenCargamasivaGF, true, usuario);
+					cenCargamasivaGF.setIdfichero(idFile);
+					cenCargamasivaGF.setIdficherolog(idLogFile);
 
-				if (result == 0) {
-					errores += "Error al insertar en cargas masivas";
+					int result = cenCargamasivaMapper.insert(cenCargamasivaGF);
+
+					if (result == 0) {
+						error.setCode(SigaConstants.CODE_400);
+						errores += "Error al insertar en cargas masivas";
+					}
+					
+					
+					updateResponseDTO.setStatus(SigaConstants.OK);
 					error.setDescription(errores);
+					int correctos = cenCargamasivaGF.getNumregistros() - registrosErroneos;
+					error.setMessage("Fichero cargado correctamente. Registros Correctos: " + correctos
+							+ "<br/> Registros Erroneos: " + cenCargamasivaGF.getNumregistroserroneos());
+					error.setCode(SigaConstants.CODE_200);
 					updateResponseDTO.setError(error);
 				}
+				
+				error.setDescription(errores);
+				updateResponseDTO.setError(error);
 
 			}
 
 		}
 
 		LOGGER.info("uploadFile() -> Salida al servicio para subir un archivo");
-		updateResponseDTO.setStatus(SigaConstants.OK);
-		error.setDescription(errores);
-		int correctos = cenCargamasivaGF.getNumregistros() - registrosErroneos;
-		error.setMessage("Fichero cargado correctamente. Registros Correctos: " + correctos
-				+ "<br/> Registros Erroneos: " + cenCargamasivaGF.getNumregistroserroneos());
-		updateResponseDTO.setError(error);
+		
 
 		return updateResponseDTO;
 	}
@@ -396,6 +410,8 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		GenRecursosCatalogosKey genRecursosCatalogosKey = new GenRecursosCatalogosKey();
 		genRecursosCatalogosKey.setIdlenguaje(idLenguaje);
 		GenRecursosCatalogos recursosCatalogos = null;
+
+		boolean noEncontradoGrupoFijo = false;
 
 		List<Short> idInstituciones = new ArrayList<Short>();
 		idInstituciones.add(idInstitucion);
@@ -460,10 +476,14 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 					personaHashtable.put(cargaMasivaDatosGFVo.getIdPersona(), nombreString);
 
+				}else {
+					errorLinea.append("No existe la persona seleccionada");
+					cargaMasivaDatosGFVo.setPersonaNombre("Error");
 				}
 
+
 			} else {
-				errorLinea.append("Es obligatorio introducir nUmero de colegiado o nif/cif. ");
+				errorLinea.append("Es obligatorio introducir número de colegiado o nif/cif. ");
 				cargaMasivaDatosGFVo.setPersonaNombre("Error");
 			}
 
@@ -474,10 +494,11 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 					&& !hashtable.get(SigaConstants.GENERAL).toString().equals(""))
 					&& (hashtable.get(SigaConstants.GENERAL).toString().equals("1")
 							|| hashtable.get(SigaConstants.GENERAL).toString().equals("0"))) {
-				
+
 				// Seteamos general
-				cargaMasivaDatosGFVo.setGeneral(hashtable.get(SigaConstants.GENERAL).toString().equals(SigaConstants.DB_TRUE)? true: false);
-				
+				cargaMasivaDatosGFVo.setGeneral(
+						hashtable.get(SigaConstants.GENERAL).toString().equals(SigaConstants.DB_TRUE) ? true : false);
+
 				if (hashtable.get(SigaConstants.GENERAL).toString().equals(SigaConstants.DB_TRUE))
 					idInst = new Short(SigaConstants.IDINSTITUCION_2000);
 
@@ -501,29 +522,35 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 								recursosCatalogos = genRecursosCatalogosMapper
 										.selectByPrimaryKey(genRecursosCatalogosKey);
 								cenGruposCliente.setNombre(recursosCatalogos.getDescripcion());
+
+								if (cenGruposCliente.getNombre() != null) {
+									cargaMasivaDatosGFVo.setIdGrupo(cenGruposCliente.getIdgrupo());
+									cargaMasivaDatosGFVo.setIdInstitucionGrupo(cenGruposCliente.getIdinstitucion());
+									cargaMasivaDatosGFVo.setNombreGrupo(cenGruposCliente.getNombre());
+
+								} else {
+									cargaMasivaDatosGFVo.setNombreGrupo("Error");
+									errorLinea.append("No se ha encontrado el grupo fijo. ");
+									noEncontradoGrupoFijo = true;
+								}
+
 							} else {
 								cargaMasivaDatosGFVo.setNombreGrupo("Error");
 								errorLinea.append("No se ha encontrado el grupo fijo. ");
+								noEncontradoGrupoFijo = true;
+
 							}
 
 						} else {
 							cenGruposCliente = idGruposHashTable.get(key);
 						}
 						idGruposHashTable.put(key, cenGruposCliente);
-						if (cenGruposCliente.getNombre() != null) {
-							cargaMasivaDatosGFVo.setIdGrupo(cenGruposCliente.getIdgrupo());
-							cargaMasivaDatosGFVo.setIdInstitucionGrupo(cenGruposCliente.getIdinstitucion());
-							cargaMasivaDatosGFVo.setNombreGrupo(cenGruposCliente.getNombre());
 
-						} else {
-							cargaMasivaDatosGFVo.setNombreGrupo("Error");
-							errorLinea.append("No se ha encontrado el grupo fijo. ");
-						}
 						cargaMasivaDatosGFVo.setIdGrupo(idGrupo);
 						cargaMasivaDatosGFVo.setIdInstitucionGrupo(idInstitucion);
 					} catch (NumberFormatException e) {
 						cargaMasivaDatosGFVo.setNombreGrupo("Error");
-						errorLinea.append("El identificador de Grupo Fijo debe ser num�rico de valor menor que 9999.");
+						errorLinea.append("El identificador de Grupo Fijo debe ser numerico de valor menor que 9999.");
 					}
 				} else {
 					cargaMasivaDatosGFVo.setNombreGrupo("Error");
@@ -539,8 +566,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			// colegiado indicado
 			if (hashtable.get(SigaConstants.ACCION) != null) {
 				String accion = (String) hashtable.get(SigaConstants.ACCION);
-				if (!accion.equalsIgnoreCase(SigaConstants.ALTA)
-						&& !accion.equalsIgnoreCase(SigaConstants.BAJA)) {
+				if (!accion.equalsIgnoreCase(SigaConstants.ALTA) && !accion.equalsIgnoreCase(SigaConstants.BAJA)) {
 					LOGGER.debug("La accion debe ser A o B");
 					errorLinea.append("La accion debe ser ");
 					errorLinea.append(SigaConstants.ALTA);
@@ -561,9 +587,8 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 					&& hashtable.get(SigaConstants.C_FECHAINICIO) != "") {
 
 				try {
-					DateFormat df1 = new SimpleDateFormat("dd-MMM-yyyy"); // for parsing input
-					cargaMasivaDatosGFVo
-							.setFechaInicio(df1.parse((String) hashtable.get(SigaConstants.C_FECHAINICIO)));
+					DateFormat df1 = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH); // for parsing input
+					cargaMasivaDatosGFVo.setFechaInicio(df1.parse((String) hashtable.get(SigaConstants.C_FECHAINICIO)));
 
 				} catch (ParseException e1) {
 					LOGGER.debug("Error al parsear fecha");
@@ -571,57 +596,65 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 
 			} else {
 
-				if (hashtable.get(SigaConstants.ACCION) != "B") {
+				if (!hashtable.get(SigaConstants.ACCION).equals("B")) {
 					LOGGER.debug("Fecha inicio es campo obligatorio");
 					errorLinea.append("Fecha inicio es campo obligatorio. ");
 				}
 			}
 
-			if (hashtable.get(SigaConstants.C_FECHAFIN) != null
-					&& hashtable.get(SigaConstants.C_FECHAFIN) != "") {
+			if (hashtable.get(SigaConstants.C_FECHAFIN) != null && hashtable.get(SigaConstants.C_FECHAFIN) != "") {
 
 				try {
-					DateFormat df1 = new SimpleDateFormat("dd-MMM-yyyy"); // for parsing input
-					cargaMasivaDatosGFVo
-							.setFechaFin(df1.parse((String) hashtable.get(SigaConstants.C_FECHAFIN)));
+					DateFormat df1 = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH); // for parsing input
+					cargaMasivaDatosGFVo.setFechaFin(df1.parse((String) hashtable.get(SigaConstants.C_FECHAFIN)));
 
 				} catch (ParseException e) {
 					LOGGER.debug("Error al parsear fecha");
 				}
 
 			} else {
-				if (hashtable.get(SigaConstants.ACCION) != "B") {
+				if (!hashtable.get(SigaConstants.ACCION).equals("B")) {
 					LOGGER.debug("Fecha fin es campo obligatorio");
 					errorLinea.append("Fecha fin es campo obligatorio. ");
 				}
 			}
 
-			// Se comprueba si el colegiado ya tiene asignada la etiqueta
-			if (cargaMasivaDatosGFVo.getIdInstitucion() != null && cargaMasivaDatosGFVo.getIdPersona() != null
-					&& cargaMasivaDatosGFVo.getIdInstitucionGrupo() != null
-					&& cargaMasivaDatosGFVo.getIdGrupo() != null) {
-				CenGruposclienteClienteKey cenGruposclienteClienteKey = new CenGruposclienteClienteKey();
-				cenGruposclienteClienteKey.setIdinstitucion(cargaMasivaDatosGFVo.getIdInstitucion());
-				cenGruposclienteClienteKey.setIdpersona(cargaMasivaDatosGFVo.getIdPersona());
-				cenGruposclienteClienteKey.setIdinstitucionGrupo(cargaMasivaDatosGFVo.getIdInstitucionGrupo());
-				cenGruposclienteClienteKey.setIdgrupo(cargaMasivaDatosGFVo.getIdGrupo());
-				/** 4. Comprobacion que la persona no esta asignada ya al grupo **/
-				if (cargaMasivaDatosGFVo.getAccion().equalsIgnoreCase(SigaConstants.ALTA)) {
-					CenGruposclienteCliente cenGruposclienteCliente = cenGruposclienteClienteMapper
-							.selectByPrimaryKey(cenGruposclienteClienteKey);
-					if (cenGruposclienteCliente != null) {
-						LOGGER.debug("process.usuario.ya.asignado");
-						errorLinea.append("Usuario ya asignado a ese grupo fijo. ");
-					}
-				} else if (cargaMasivaDatosGFVo.getAccion().equalsIgnoreCase(SigaConstants.BAJA)) {
-					/**
-					 * 5. Comprobacion que la persona existe en el grupo donde se quiere dar de baja
-					 **/
-					CenGruposclienteCliente cenGruposclienteCliente = cenGruposclienteClienteMapper
-							.selectByPrimaryKey(cenGruposclienteClienteKey);
-					if (cenGruposclienteCliente == null) {
-						LOGGER.debug("process.usuario.noexiste");
-						errorLinea.append("Usuario no tiene asignado ese grupo Fijo. ");
+			if (!noEncontradoGrupoFijo) {
+				// Se comprueba si el colegiado ya tiene asignada la etiqueta
+				if (cargaMasivaDatosGFVo.getIdInstitucion() != null && cargaMasivaDatosGFVo.getIdPersona() != null
+						&& cargaMasivaDatosGFVo.getIdInstitucionGrupo() != null
+						&& cargaMasivaDatosGFVo.getIdGrupo() != null) {
+					CenGruposclienteClienteKey cenGruposclienteClienteKey = new CenGruposclienteClienteKey();
+					cenGruposclienteClienteKey.setIdinstitucion(cargaMasivaDatosGFVo.getIdInstitucion());
+					cenGruposclienteClienteKey.setIdpersona(cargaMasivaDatosGFVo.getIdPersona());
+					cenGruposclienteClienteKey.setIdinstitucionGrupo(cargaMasivaDatosGFVo.getIdInstitucionGrupo());
+					cenGruposclienteClienteKey.setIdgrupo(cargaMasivaDatosGFVo.getIdGrupo());
+					/** 4. Comprobacion que la persona no esta asignada ya al grupo **/
+					if (cargaMasivaDatosGFVo.getAccion().equalsIgnoreCase(SigaConstants.ALTA)) {
+						CenGruposclienteCliente cenGruposclienteCliente = cenGruposclienteClienteMapper
+								.selectByPrimaryKey(cenGruposclienteClienteKey);
+						if (cenGruposclienteCliente != null) {
+							LOGGER.debug("process.usuario.ya.asignado");
+							errorLinea.append("Usuario ya asignado a ese grupo fijo. ");
+						}
+					} else if (cargaMasivaDatosGFVo.getAccion().equalsIgnoreCase(SigaConstants.BAJA)) {
+						/**
+						 * 5. Comprobacion que la persona existe en el grupo donde se quiere dar de baja
+						 **/
+						CenGruposclienteCliente cenGruposclienteCliente = cenGruposclienteClienteMapper
+								.selectByPrimaryKey(cenGruposclienteClienteKey);
+						if (cenGruposclienteCliente == null) {
+							LOGGER.debug("process.usuario.noexiste");
+							errorLinea.append("Usuario no tiene asignado ese grupo Fijo. ");
+						} else {
+							/**
+							 * 6. Comprobacion que la persona ya esta dada de baja
+							 **/
+							if (cenGruposclienteCliente.getFechaBaja() != null) {
+								LOGGER.debug("process.usuario.noexiste");
+								errorLinea.append("El usuario ya esta dado de baja. ");
+							}
+						}
 					}
 				}
 			}
@@ -684,8 +717,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			datosHashtable.put(SigaConstants.GENERAL, "");
 		else
 			datosHashtable.put(SigaConstants.GENERAL,
-					cargaMasivaDatosCVVo.getIdInstitucionGrupo() == SigaConstants.IDINSTITUCION_2000 ? "1"
-							: "0");
+					cargaMasivaDatosCVVo.getIdInstitucionGrupo() == SigaConstants.IDINSTITUCION_2000 ? "1" : "0");
 		datosHashtable.put(SigaConstants.NOMBREGRUPO,
 				cargaMasivaDatosCVVo.getNombreGrupo() == null ? "" : cargaMasivaDatosCVVo.getNombreGrupo());
 		datosHashtable.put(SigaConstants.ACCION,
@@ -836,22 +868,20 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 	private String getDirectorioFichero(Short idInstitucion) {
 		Date dateLog = new Date();
 		LOGGER.info(dateLog + ":inicio.CargaMasivaDatosGFImpl.getDirectorioFichero");
-
-		// Extraer propiedad
+		
 		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
-		genPropertiesExampleP.createCriteria().andParametroEqualTo("gen.ficheros.path");
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("cen.cargaExcel.ficheros.path");
 		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
-		// genPropertiesPath.get(0).getValor()
-		StringBuffer directorioFichero = new StringBuffer("C:\\Users\\DTUser\\Documents\\gf");
+		String pathGF = genPropertiesPath.get(0).getValor();
+
+		StringBuffer directorioFichero = new StringBuffer(pathGF);
 		directorioFichero.append(idInstitucion);
 		directorioFichero.append(File.separator);
 
-		// Extraer propiedad
 		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
 		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.cargamasivaGF");
 		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
-		// genPropertiesDirectorio.get(0).getValor()
-		directorioFichero.append("gruposfijos");
+		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
 
 		LOGGER.info(dateLog + ":fin.CargaMasivaDatosGFImpl.getDirectorioFichero");
 		return directorioFichero.toString();
@@ -867,8 +897,9 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		String path = "C:\\Users\\DTUser\\Documents\\gf" + idInstitucion + "\\gruposfijos\\";
-		path += idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
+		//String path = "C:\\Users\\DTUser\\Documents\\gf" + idInstitucion + "\\gruposfijos\\";
+		String path = getDirectorioFichero(idInstitucion);
+		path += File.separator + idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
 		// Se coge la imagen de la persona juridica
 		File file = new File(path);
 
@@ -904,9 +935,9 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		String path = "C:\\Users\\DTUser\\Documents\\gf" + idInstitucion + "\\gruposfijos\\";
-		path += "log_" + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "."
-				+ SigaConstants.tipoExcelXls;
+		//String path = "C:\\Users\\DTUser\\Documents\\gf" + idInstitucion + "\\gruposfijos\\";
+		String path = getDirectorioFichero(idInstitucion);
+		path += File.separator + "log_" + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "." + SigaConstants.tipoExcelXls;
 		// Se coge la imagen de la persona juridica
 		File file = new File(path);
 

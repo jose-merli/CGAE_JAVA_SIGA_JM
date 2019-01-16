@@ -2,7 +2,6 @@ package org.itcgae.siga.commons.constants;
 
 import java.util.Arrays;
 import java.util.List;
-
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,11 +19,14 @@ public class SigaConstants {
 
 	public static String COMBO_PERFILES = "perfiles";
 	public static String TIPO_PERSONA_NOTARIO = "Notario";
-
 	
 	public static Integer IdUsuarioPuertaAtras = 1;
 	public static String OK = "OK";
 	public static String KO = "KO";
+
+	public static Integer CODE_200 = 200; 
+	public static Integer CODE_400 = 400; 
+
 	public static String InstitucionGeneral = "2000";
 	public static String Personal = "Personal";
 
@@ -491,5 +493,32 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String NOTA_BIEN = "3";
 	public static final String NOTA_NOTABLE= "4";
 	public static final String NOTA_SOBRESALIENTE = "5";
+	
+	//CARGA MASIVA CV
 
+	public static final String C_IDTIPOCV = "IDTIPOCV";
+    public static final String C_CREDITOS = "C_CREDITOS";
+    public static final String C_IDTIPOCVSUBTIPO1 = "C_IDTIPOCVSUBTIPO1";
+    public static final String C_IDTIPOCVSUBTIPO2 = "C_IDTIPOCVSUBTIPO2";
+	public static final String TIPOCVCOD = "TIPOCVCOD";
+	public static final String SUBTIPOCV1COD = "SUBTIPOCV1COD";
+	public static final String SUBTIPOCV2COD = "SUBTIPOCV2COD";
+	public static final String TIPOCVNOMBRE = "TIPOCVNOMBRE";
+	public static final String SUBTIPOCV1NOMBRE = "SUBTIPOCV1NOMBRE";
+	public static final String SUBTIPOCV2NOMBRE = "SUBTIPOCV2NOMBRE";
+	public static final String FECHAVERIFICACION = "FECHAVERIFICACION";
+    public static final String C_DESCRIPCION = "C_DESCRIPCION";
+
+    public static final String nombreFicheroEjemploCV = "PlantillaMasivaDatosCV";
+    
+	public static final List<String> CAMPOSEJEMPLOCV = Arrays.asList(COLEGIADONUMERO,PERSONANIF,
+			C_FECHAINICIO,C_FECHAFIN,C_CREDITOS,FECHAVERIFICACION,C_DESCRIPCION,TIPOCVCOD,SUBTIPOCV1COD,SUBTIPOCV2COD);
+	public static final List<String> CAMPOSLOGCV = Arrays.asList(COLEGIADONUMERO,PERSONANIF,PERSONANOMBRE,C_IDPERSONA,
+			C_FECHAINICIO ,C_FECHAFIN,C_CREDITOS,FECHAVERIFICACION,C_DESCRIPCION
+			,TIPOCVCOD,TIPOCVNOMBRE,C_IDTIPOCV,SUBTIPOCV1COD,SUBTIPOCV1NOMBRE,C_IDTIPOCVSUBTIPO1,SUBTIPOCV2COD,SUBTIPOCV2NOMBRE,C_IDTIPOCVSUBTIPO2,ERRORES);
+
+	
+	
+	
+ 
 }

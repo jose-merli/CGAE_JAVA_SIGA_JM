@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface ISolicitudModificacionService {
@@ -20,5 +21,6 @@ public interface ISolicitudModificacionService {
 	public InsertResponseDTO insertGeneralModificationRequest(SolModificacionItem solModificacionItem,
 			HttpServletRequest request);
 	public UpdateResponseDTO denyGeneralModificationRequest(ArrayList<SolModificacionItem> solModificacionDTO,
-			HttpServletRequest request); 
+			HttpServletRequest request);
+	public StringDTO verifyPerson(HttpServletRequest request); 
 }
