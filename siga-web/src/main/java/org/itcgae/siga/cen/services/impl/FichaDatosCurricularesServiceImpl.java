@@ -81,7 +81,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 	}
 
 	@Override
-	public UpdateResponseDTO deleteDatosCurriculares(FichaDatosCurricularesItem fichaDatosCurricularesItem,
+	public UpdateResponseDTO deleteDatosCurriculares(FichaDatosCurricularesDTO fichaDatosCurricularesDTO,
 			HttpServletRequest request) {
 		LOGGER.info("deleteDatosCurriculares() -> Entrada al servicio para actualizar información de direcciones");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -103,6 +103,10 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 
 		if (null != usuarios && usuarios.size() > 0) {
 			usuario = usuarios.get(0);
+			
+			for (FichaDatosCurricularesItem fichaDatosCurricularesItem : fichaDatosCurricularesDTO.getFichaDatosCurricularesItem()) {
+				
+			
 			// for (int i = 0; i < FichaDatosCurricularesItem.length; i++) {
 			LOGGER.info(
 					"deleteDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Entrada a cenDireccionesExtendsMapper para eliminar un curriculum");
@@ -157,7 +161,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 						+ updateResponseDTO.getStatus() + ". No se pudo eliminar el curriculum");
 
 			}
-			// }
+		 }
 
 		} else {
 			updateResponseDTO.setStatus(SigaConstants.KO);
