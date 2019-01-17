@@ -412,7 +412,11 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 								}else {
 									CenSancionExample cenSancionExample1 = new CenSancionExample();
 									cenSancionExample1.createCriteria().andIdinstitucionEqualTo(Short.valueOf(SigaConstants.InstitucionGeneral)).andIdpersonaEqualTo(cenSancion.getIdpersona()).andIdsancionEqualTo(Long.valueOf(cenSancion.getIdsancion()));
-									cenSancion.setIdinstitucion(Short.valueOf(SigaConstants.InstitucionGeneral)); 
+
+									cenSancion.setIdsancionorigen(cenSancion.getIdsancion());
+									cenSancion.setIdinstitucion(Short.valueOf(SigaConstants.InstitucionGeneral));
+									cenSancion.setIdinstitucionsancion(usuario.getIdinstitucion());
+									cenSancion.setIdinstitucionorigen(usuario.getIdinstitucion());
 
 									if (cenSancionD.get(0).getFechafin() != null)
 										cenSancion.setFechafin(null);

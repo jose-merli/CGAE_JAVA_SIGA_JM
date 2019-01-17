@@ -33,10 +33,9 @@ public class SubtipoCurricularController {
 		return new ResponseEntity<SubtipoCurricularDTO>(response, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "subtipoCurricular/comboSubtipoCurricular", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getComboSubtipoCurricular(@RequestParam("numPagina") int numPagina,
-		@RequestBody SubtipoCurricularItem subtipoCurricularItem, HttpServletRequest request) {
-		ComboDTO response = subtipoCurricularService.getComboSubtipoCurricular(numPagina, subtipoCurricularItem, request);
+	@RequestMapping(value = "subtipoCurricular/getCurricularSubtypeCombo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getCurricularSubtypeCombo(@RequestParam("idTipoCV") String idTipoCV, HttpServletRequest request) {
+		ComboDTO response = subtipoCurricularService.getCurricularSubtypeCombo(idTipoCV, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	

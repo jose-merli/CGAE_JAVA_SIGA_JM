@@ -17,7 +17,8 @@ public class NoColegiadoItem {
 	private String telefono;
 	private String movil;
 	private String fechaBaja;
-
+	private String noAparecerRedAbogacia;
+	
 	private String idProvincia;
 	private String idPoblacion;
 	private String codigoPostal;
@@ -1061,6 +1062,14 @@ public class NoColegiadoItem {
 				+ ", fechaNacimientoDate=" + fechaNacimientoDate + ", fechaNacimientoRango="
 				+ Arrays.toString(fechaNacimientoRango) + ", motivo=" + motivo + ", subtipoCV="
 				+ Arrays.toString(subtipoCV) + ", tipoCV=" + tipoCV + ", subTipoCV1=" + subTipoCV1 + ", subTipoCV2=" + subTipoCV2 + "]";
+	}
+
+	public String getNoAparecerRedAbogacia() {
+		return noAparecerRedAbogacia;
+	}
+
+	public void setNoAparecerRedAbogacia(String noAparecerRedAbogacia) {
+		this.noAparecerRedAbogacia = noAparecerRedAbogacia;
 	}
 
 	

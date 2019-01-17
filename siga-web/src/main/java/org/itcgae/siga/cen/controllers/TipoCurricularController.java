@@ -36,16 +36,9 @@ public class TipoCurricularController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-//	@RequestMapping(value = "tipoCurricular/comboTipoCurricular", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<ComboDTO> getComboTipoCurricular(@RequestBody TipoCurricularItem tipoCurricularItem, HttpServletRequest request) {
-//		ComboDTO response = tipoCurricularService.getComboTipoCurricular(tipoCurricularItem, request);
-//		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-//	}
-	
-	@RequestMapping(value = "tipoCurricular/comboTipoCurricular", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getComboTipoCurricular(@RequestParam("numPagina") int numPagina,
-		@RequestBody TipoCurricularItem tipoCurricularItem, HttpServletRequest request) {
-		ComboDTO response = tipoCurricularService.getComboTipoCurricular(numPagina, tipoCurricularItem, request);
+	@RequestMapping(value = "tipoCurricular/getCurricularTypeCombo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getCurricularTypeCombo(@RequestParam("idTipoCV") String idTipoCV, HttpServletRequest request) {
+		ComboDTO response = tipoCurricularService.getCurricularTypeCombo(idTipoCV, request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}	
 	

@@ -436,6 +436,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					cenCliente.setIdtratamiento(Short.parseShort(colegiadoItem.getIdtratamiento()));
 					cenCliente.setAsientocontable(colegiadoItem.getAsientoContable());
 					cenCliente.setCaracter("P");
+					cenCliente.setNoaparecerredabogacia(colegiadoItem.getNoAparecerRedAbogacia());
 //					cenCliente.setPublicidad(SigaConstants.DB_FALSE);
 //					cenCliente.setGuiajudicial(SigaConstants.DB_FALSE); 
 					
@@ -947,6 +948,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 								cenCliente.setUsumodificacion(usuario.getIdusuario());
 								cenCliente.setIdlenguaje(usuario.getIdlenguaje());
 								cenCliente.setExportarfoto(SigaConstants.DB_FALSE);
+								cenCliente.setNoaparecerredabogacia(noColegiadoItem.getNoAparecerRedAbogacia());
 							//}
 							
 							LOGGER.info(

@@ -207,7 +207,8 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 		@Result(column = "COMISIONES", property = "comisiones", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "fechaBaja", property = "fechaBaja", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "fechaBaja", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOAPARECERREDABOGACIA", property = "noAparecerRedAbogacia", jdbcType = JdbcType.VARCHAR)
 	})
 	List<NoColegiadoItem> selectNoColegiados(Short idInstitucion, NoColegiadoItem noColegiadoItem);
 	
@@ -231,7 +232,8 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PUBLICIDAD", property = "publicidad", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "GUIAJUDICIAL", property = "guiaJudicial", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "GUIAJUDICIAL", property = "guiaJudicial", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOAPARECERREDABOGACIA", property = "noAparecerRedAbogacia", jdbcType = JdbcType.VARCHAR)
 	})
 	List<NoColegiadoItem> searchHistoricNoColegiado(NoColegiadoItem noColegiadoItem, String idLenguaje, String idInstitucion);
 	

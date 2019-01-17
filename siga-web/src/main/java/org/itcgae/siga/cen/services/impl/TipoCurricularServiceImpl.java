@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.cen.TipoCurricularDTO;
 import org.itcgae.siga.DTOs.cen.TipoCurricularItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ITipoCurricularService;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -30,7 +31,6 @@ import org.itcgae.siga.db.services.cen.mappers.CenTiposcvExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.itcgae.siga.DTOs.gen.Error;
 
 @Service
 public class TipoCurricularServiceImpl implements ITipoCurricularService {
@@ -89,60 +89,6 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 		LOGGER.info("getComboCategoriaCurricular() -> Salida del servicio para obtener la categoría curricular");
 		return combo;
 	}
-
-	
-	@Override
-	public ComboDTO getComboTipoCurricular(int numPagina, TipoCurricularItem tipoCurricularItem, HttpServletRequest request) {
-		LOGGER.info("getTipoSolicitud() -> Entrada al servicio para cargar el tipo curricular");
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		ComboDTO combo = new ComboDTO();
-
-		if (idInstitucion != null) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			LOGGER.info(
-					"getComboCategoriaCurricular() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			LOGGER.info(
-					"getComboCategoriaCurricular() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (usuarios != null && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
-
-				
-				LOGGER.info(
-						"search() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Entrada a cenNocolegiadoExtendsMapper para busqueda de personas colegiadas por filtro");
-				List<ComboItem> comboItems = cenTiposCVSubtipo1ExtendsMapper.searchComboTipoCurricular(tipoCurricularItem, usuario.getIdlenguaje(),
-						String.valueOf(idInstitucion));
-				LOGGER.info(
-						"search() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenNocolegiadoExtendsMapper para busqueda de personas no colegiadas por filtro");
-
-//				combo.setTipoCurricularItems(comboItems);
-//				LOGGER.info(
-//						"getComboCategoriaCurricular() / cenTiposolicitudSqlExtendsMapper.selectTipoSolicitud() -> Entrada a cenTiposolicitudSqlExtendsMapper para obtener los tipos de solicitud");
-//				List<ComboItem> comboItems = cenTiposcvExtendsMapper.selectCategoriaCV(usuario.getIdlenguaje());
-//				if (comboItems != null && comboItems.size() > 0) {
-//					combo.setCombooItems(comboItems);
-//				}
-				
-				if (comboItems != null && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-					combo.setCombooItems(comboItems);
-				}
-			}
-
-		}
-		LOGGER.info("getComboCategoriaCurricular() -> Salida del servicio para obtener la categoría curricular");
-		return combo;
-	}
-	
 	
 	@Override
 	public TipoCurricularDTO searchTipoCurricular(int numPagina, TipoCurricularItem tipoCurricularItem, HttpServletRequest request) {
@@ -533,9 +479,12 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 			
 			if(null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
+				
 				LOGGER.info(
 						"getCurricularTypeCombo() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Entrada a cenTiposcvExtendsMapper para obtener los diferentes tipos curriculares");
+				
 				comboItems = cenTiposCVSubtipo1ExtendsMapper.searchCurricularTypeCombo(idTipoCV, usuario.getIdlenguaje(), idInstitucion.toString());
+				
 				LOGGER.info(
 						"getCurricularTypeCombo() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Salida de cenTiposcvExtendsMapper para obtener los diferentes tipos curriculares");
 				

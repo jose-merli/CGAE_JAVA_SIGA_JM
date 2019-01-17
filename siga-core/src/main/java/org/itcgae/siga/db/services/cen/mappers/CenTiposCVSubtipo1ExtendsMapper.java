@@ -26,16 +26,7 @@ public interface CenTiposCVSubtipo1ExtendsMapper extends CenTiposcvsubtipo1Mappe
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 	})
 	List<TipoCurricularItem> searchTipoCurricular(TipoCurricularItem tipoCurricularItem, String idLenguaje, String idInstitucion);
-	
-	
-	
-	@SelectProvider(type = CenTiposCVSubtipo1SqlExtendsProvider.class, method = "searchComboTipoCurricular")
-	@Results({
-		@Result(column = "IDTIPOCVSUBTIPO1", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
-	})
-	List<ComboItem> searchComboTipoCurricular(TipoCurricularItem tipoCurricularItem, String idLenguaje, String idInstitucion);
-	
+		
 	@SelectProvider(type = CenTiposCVSubtipo1SqlExtendsProvider.class, method = "searchCurricularTypeCombo")
 	@Results({
 		@Result(column = "IDTIPOCVSUBTIPO1", property = "value", jdbcType = JdbcType.VARCHAR),

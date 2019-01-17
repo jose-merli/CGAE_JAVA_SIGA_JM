@@ -15,8 +15,6 @@ public interface ISubtipoCurricularService {
 	public UpdateResponseDTO updateSubtipoCurricular(SubtipoCurricularDTO subtipoCurricularDTO, HttpServletRequest request);
 	public DeleteResponseDTO deleteSubtipoCurricular(SubtipoCurricularDTO subtipoCurricularDTO, HttpServletRequest request);
 	public SubtipoCurricularDTO getHistory(SubtipoCurricularItem subtipoCurricularItem, HttpServletRequest request);
-	public ComboDTO getComboSubtipoCurricular(int numPagina, SubtipoCurricularItem subtipoCurricularItem,
-			HttpServletRequest request);
-	
+
 	public ComboDTO getCurricularSubtypeCombo(String idTipoCV, HttpServletRequest request);
 }
