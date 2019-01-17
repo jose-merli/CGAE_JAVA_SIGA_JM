@@ -2,22 +2,14 @@ package org.itcgae.siga.DTOs.com;
 
 import org.itcgae.siga.DTOs.gen.Error;
 
-public class ResponseDocumentoDTO {
+public class DocumentoPlantillaDTO {
 	
 	private String rutaDocumento;
 	private String nombreDocumento;
-	private String idEnvio;
 	private String idPlantillaDocumento;
 	private String idioma;
 	private Error error;
 	
-	
-	public String getIdEnvio() {
-		return idEnvio;
-	}
-	public void setIdEnvio(String idEnvio) {
-		this.idEnvio = idEnvio;
-	}
 	public String getRutaDocumento() {
 		return rutaDocumento;
 	}

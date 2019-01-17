@@ -251,4 +251,36 @@ public class SigaConstants {
 		}
 		
 	}
+	
+	public static enum OBJETIVO {
+		DESTINATARIOS(new Long("1"), "DESTINATARIOS"),
+		MULTIDOCUMENTO(new Long("2"), "MULTIDOCUMENTO"),
+		CONDICIONAL(new Long("3"), "CONDICIONAL"),
+		DATOS(new Long("4"), "DATOS");
+		
+		private final Long codigo;
+		private final String descripcion;
+
+		OBJETIVO(Long codigo, String descripcion) {
+			this.codigo = codigo;
+			this.descripcion = descripcion;
+		}
+
+		public Long getCodigo() {
+			return codigo;
+		}
+
+		public String getDescripcion() {
+			return descripcion;
+		}
+
+		public static OBJETIVO getEnum(Short codigo) {
+			for (OBJETIVO sc : values()) {
+				if (sc.getCodigo().shortValue() == codigo.shortValue()) {
+					return sc;
+				}
+			}
+			return null;
+		}
+	}
 }

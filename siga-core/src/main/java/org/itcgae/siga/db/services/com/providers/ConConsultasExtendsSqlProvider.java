@@ -88,7 +88,7 @@ public class ConConsultasExtendsSqlProvider {
 		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"' AND FECHABAJA IS NULL");
 		
 		if(idClaseComunicacion != null){
-			sql.WHERE("IDCLASECOMINICACION = '"+ idClaseComunicacion +"'");
+			sql.WHERE("IDCLASECOMUNICACION = '"+ idClaseComunicacion +"'");
 		}
 		return sql.toString();
 	}

@@ -2,13 +2,16 @@ package org.itcgae.siga.com.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.ConsultaPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
+import org.itcgae.siga.DTOs.com.DocumentoPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDTO;
 import org.itcgae.siga.DTOs.com.PlantillasModeloDTO;
+import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 @RequestMapping(value = "/modelos")
@@ -124,9 +128,9 @@ public class ModelosYComunicacionesController {
 	
 	//TODO
 	@RequestMapping(value = "/detalle/guardarInformes",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<PlantillasDocumentosDTO> guardarInformes(HttpServletRequest request, @RequestBody String idModeloComuncacion, @RequestBody String idInstitucion) {
+	ResponseEntity<PlantillasDocumentosDTO> guardarInformes(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		
-		PlantillasDocumentosDTO response = _modelosYcomunicacionesService.obtenerInformes(request, idModeloComuncacion, idInstitucion);
+		PlantillasDocumentosDTO response = _modelosYcomunicacionesService.guardarInformes(request, plantillaDoc);
 		return new ResponseEntity<PlantillasDocumentosDTO>(response, HttpStatus.OK);
 	}
 	
@@ -151,10 +155,17 @@ public class ModelosYComunicacionesController {
 		return new ResponseEntity<ConsultasDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/plantilla/consultas/guardar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardarConsultas(HttpServletRequest request, @RequestBody ConsultaPlantillaDTO consultaPlantilla) {
+		
+		Error response = _modelosYcomunicacionesService.guardarConsultaPlantilla(request, consultaPlantilla);
+		return new ResponseEntity<Error>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/guardarPlantillaDoc",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Error> guardarPlantillaDocumento(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		
-		Error response = _modelosYcomunicacionesService.guardarPlantillaDocumento(request, plantillaDoc);
+		Error response = _modelosYcomunicacionesService.guardarModPlantillaDocumento(request, plantillaDoc);
 		return new ResponseEntity<Error>(response, HttpStatus.OK);
 	}
 	
@@ -213,6 +224,26 @@ public class ModelosYComunicacionesController {
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/subirPlantilla",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<ResponseDocumentoDTO> uploadFile(MultipartHttpServletRequest request) throws Exception{
+		
+		ResponseDocumentoDTO response = _modelosYcomunicacionesService.uploadFile(request);
+		if(response.getError() == null)
+			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.OK);	
+		else
+			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/insertarPlantilla",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ResponseDocumentoDTO> insertarPlantilla(HttpServletRequest request, @RequestBody DocumentoPlantillaDTO documento) throws Exception{
+		
+		ResponseDocumentoDTO response = _modelosYcomunicacionesService.guardarPlantillaDocumento(request, documento);
+		if(response.getError() == null)
+			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.OK);	
+		else
+			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 }

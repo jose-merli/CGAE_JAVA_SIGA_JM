@@ -58,3 +58,25 @@ tablespace TS_SIGA
   
 alter table MOD_PLANTILLADOC_SUFIJO
   add constraint PK_MOD_PLANTILLADOC_SUFIJO primary key (IDSUFIJO);
+  
+  
+  
+-- Add/modify columns 
+alter table MOD_PLANTILLADOC_CONSULTA add IDPLANTILLACONSULTA number(10) not null;
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table MOD_PLANTILLADOC_CONSULTA
+  drop constraint PK_PLANTILLADOCCONSULTA cascade;
+alter table MOD_PLANTILLADOC_CONSULTA
+  add constraint PK_PLANTILLADOCCONSULTA primary key (IDPLANTILLACONSULTA)
+  using index 
+  tablespace TS_SIGA
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );

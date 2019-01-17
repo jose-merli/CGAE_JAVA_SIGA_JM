@@ -1,6 +1,8 @@
 package org.itcgae.siga.DTOs.com;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class TarjetaPlantillaDocumentoDTO {
 	private String idModeloComunicacion;
@@ -17,6 +19,10 @@ public class TarjetaPlantillaDocumentoDTO {
 	private String datos;
 	private Date fechaAsociacion;
 	private String plantilla;
+	private String idConsulta;
+	
+	private List<DocumentoPlantillaDTO> plantillas = new ArrayList<DocumentoPlantillaDTO>();
+	private List<Long> sufijos = new ArrayList<Long>();
 	
 	public String getIdioma() {
 		return idioma;
@@ -101,6 +107,24 @@ public class TarjetaPlantillaDocumentoDTO {
 	}
 	public void setIdClaseComunicacion(String idClaseComunicacion) {
 		this.idClaseComunicacion = idClaseComunicacion;
+	}
+	public String getIdConsulta() {
+		return idConsulta;
+	}
+	public void setIdConsulta(String idConsulta) {
+		this.idConsulta = idConsulta;
+	}
+	public List<DocumentoPlantillaDTO> getPlantillas() {
+		return plantillas;
+	}
+	public void setPlantillas(List<DocumentoPlantillaDTO> plantillas) {
+		this.plantillas = plantillas;
+	}
+	public List<Long> getSufijos() {
+		return sufijos;
+	}
+	public void setSufijos(List<Long> sufijos) {
+		this.sufijos = sufijos;
 	}
 	
 	

@@ -6,15 +6,15 @@ import java.util.List;
 import org.itcgae.siga.DTOs.gen.Error;
 
 public class PlantillasDocumentosDTO {
-	private List<PlantillaDocumentoDTO> plantillasDocumentos = new ArrayList<PlantillaDocumentoDTO>();
+	private List<PlantillaModeloDocumentoDTO> plantillasModeloDocumentos = new ArrayList<PlantillaModeloDocumentoDTO>();
 	private Error error = null;	
 	
 
-	public List<PlantillaDocumentoDTO> getPlantillasDocumentos() {
-		return plantillasDocumentos;
+	public List<PlantillaModeloDocumentoDTO> getPlantillasModeloDocumentos() {
+		return plantillasModeloDocumentos;
 	}
-	public void setPlantillasDocumentos(List<PlantillaDocumentoDTO> plantillasDocumentos) {
-		this.plantillasDocumentos = plantillasDocumentos;
+	public void setPlantillasModeloDocumentos(List<PlantillaModeloDocumentoDTO> plantillasModeloDocumentos) {
+		this.plantillasModeloDocumentos = plantillasModeloDocumentos;
 	}
 	public Error getError() {
 		return error;
@@ -29,7 +29,7 @@ public class PlantillasDocumentosDTO {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((error == null) ? 0 : error.hashCode());
-		result = prime * result + ((plantillasDocumentos == null) ? 0 : plantillasDocumentos.hashCode());
+		result = prime * result + ((plantillasModeloDocumentos == null) ? 0 : plantillasModeloDocumentos.hashCode());
 		return result;
 	}
 	
@@ -47,17 +47,17 @@ public class PlantillasDocumentosDTO {
 				return false;
 		} else if (!error.equals(other.error))
 			return false;
-		if (plantillasDocumentos == null) {
-			if (other.plantillasDocumentos != null)
+		if (plantillasModeloDocumentos == null) {
+			if (other.plantillasModeloDocumentos != null)
 				return false;
-		} else if (!plantillasDocumentos.equals(other.plantillasDocumentos))
+		} else if (!plantillasModeloDocumentos.equals(other.plantillasModeloDocumentos))
 			return false;
 		return true;
 	}
 	
 	@Override
 	public String toString() {
-		return "PlantillasDocumentos [plantillasDocumentos=" + plantillasDocumentos + ", error=" + error
+		return "PlantillasModeloDocumentos [plantillasModeloDocumentos=" + plantillasModeloDocumentos + ", error=" + error
 				+ "]";
 	}
 }

@@ -1,23 +1,32 @@
 package org.itcgae.siga.com.services.impl;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
+import org.itcgae.siga.DTOs.com.ConsultaPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
+import org.itcgae.siga.DTOs.com.DocumentoPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
+import org.itcgae.siga.DTOs.com.PlantillaModeloDocumentoDTO;
 import org.itcgae.siga.DTOs.com.PlantillaModeloItem;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDTO;
 import org.itcgae.siga.DTOs.com.PlantillasModeloDTO;
+import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
@@ -28,6 +37,9 @@ import org.itcgae.siga.com.services.IModelosYcomunicacionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ConConsulta;
+import org.itcgae.siga.db.entities.ConConsultaKey;
+import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.ModModeloPerfiles;
 import org.itcgae.siga.db.entities.ModModeloPerfilesExample;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
@@ -39,7 +51,9 @@ import org.itcgae.siga.db.entities.ModModeloPlantillaenvioKey;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
+import org.itcgae.siga.db.entities.ModPlantilladocConsultaKey;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
+import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.mappers.ModModeloPerfilesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
@@ -59,6 +73,8 @@ import org.itcgae.siga.db.services.com.providers.ModModeloPlantillaDocumentoExte
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacionesService{
@@ -110,6 +126,9 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 
 	@Autowired
 	private ModModeloPlantillaEnvioExtendsMapper _modModeloPlantillaEnvioExtendsMapper;
+	
+	@Autowired
+	private ConConsultaMapper conConsultaMapper;
 	
 	@Override
 	public DatosModelosComunicacionesDTO modeloYComunicacionesSearch(HttpServletRequest request, DatosModelosComunicacionesSearch filtros, boolean historico) {
@@ -364,7 +383,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		PlantillasDocumentosDTO respuesta = new PlantillasDocumentosDTO();
-		List<PlantillaDocumentoDTO> plantillasItem = new ArrayList<PlantillaDocumentoDTO>();
+		List<PlantillaModeloDocumentoDTO> plantillasItem = new ArrayList<PlantillaModeloDocumentoDTO>();
 		
 		if (null != idInstitucionUser) {
 			
@@ -373,9 +392,10 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
-					plantillasItem = modModeloPlantillaDocumentoExtendsMapper.selectInformes(Short.parseShort(idInstitucion), Long.parseLong(idModeloComuncacion));			
+					AdmUsuarios usuario = usuarios.get(0);
+					plantillasItem = modModeloPlantillaDocumentoExtendsMapper.selectInformes(Short.parseShort(idInstitucion), Long.parseLong(idModeloComuncacion), usuario.getIdlenguaje());			
 					if(plantillasItem != null && plantillasItem.size()> 0){
-						respuesta.setPlantillasDocumentos(plantillasItem);
+						respuesta.setPlantillasModeloDocumentos(plantillasItem);
 					}
 				}catch(Exception e){
 					Error error = new Error();
@@ -512,8 +532,8 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	}
 
 	@Override
-	public Error guardarPlantillaDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
-		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar los datos generales del modelo de comunicación");
+	public Error guardarModPlantillaDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		LOGGER.info("guardarModPlantillaDocumento() -> Entrada al servicio para guardar los datos de la plantilla de documento");
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -530,14 +550,56 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
-					if(plantillaDoc.getIdPlantillaDocumento() != null){
+					
+					if(plantillaDoc.getIdModeloComunicacion() != null){
+						if(plantillaDoc.getPlantillas() != null && plantillaDoc.getPlantillas().size() > 0){
+							
+							for(DocumentoPlantillaDTO idPlantillaDoc : plantillaDoc.getPlantillas()){
+								
+								ModPlantilladocumento modPlantillaDoc = modPlantilladocumentoMapper.selectByPrimaryKey(Long.parseLong(idPlantillaDoc.getIdPlantillaDocumento()));
+								
+								if(modPlantillaDoc != null){
+									ModModeloPlantilladocumentoKey modModeloPlantillaDocKey = new ModModeloPlantilladocumentoKey();
+									modModeloPlantillaDocKey.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+									modModeloPlantillaDocKey.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
+									
+									ModModeloPlantilladocumento modModeloPlantillaDoc = modModeloPlantilladocumentoMapper.selectByPrimaryKey(modModeloPlantillaDocKey);
+									
+									if(modModeloPlantillaDoc != null){
+										modModeloPlantillaDoc.setFechamodificacion(new Date());
+										modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getFormatoSalida());
+										modModeloPlantillaDoc.setNombreficherosalida(plantillaDoc.getFicheroSalida());
+										modModeloPlantillaDoc.setSufijo(plantillaDoc.getSufijo());
+										modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
+										modModeloPlantillaDoc.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());										
+										modModeloPlantilladocumentoMapper.updateByPrimaryKey(modModeloPlantillaDoc);
+									}else{
+										ModModeloPlantilladocumento modModuloPlantillaDoc = new ModModeloPlantilladocumento();
+										modModuloPlantillaDoc.setFechamodificacion(new Date());
+										modModuloPlantillaDoc.setFormatosalida(plantillaDoc.getFormatoSalida());
+										modModuloPlantillaDoc.setNombreficherosalida(plantillaDoc.getFicheroSalida());
+										modModuloPlantillaDoc.setSufijo(plantillaDoc.getSufijo());
+										modModuloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
+										modModuloPlantillaDoc.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
+										modModuloPlantillaDoc.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+										modModuloPlantillaDoc.setFechaasociacion(new Date());
+										
+										modModeloPlantilladocumentoMapper.insert(modModuloPlantillaDoc);
+									}
+								}		
+								
+							}
+						}
+					}else{
+						respuesta.setCode(500);
+						respuesta.setDescription("Error al guardar la plantilla de documento");
+						respuesta.setMessage("Error al guardar la plantilla de documento");
+					}
+					
+					
+					/*if(plantillaDoc.getIdPlantillaDocumento() != null){
 						
-						ModPlantilladocumento modPlantillaDoc = modPlantilladocumentoMapper.selectByPrimaryKey(Long.parseLong(plantillaDoc.getIdPlantillaDocumento()));
-						modPlantillaDoc.setFechamodificacion(new Date());
-						modPlantillaDoc.setIdioma(plantillaDoc.getIdioma());
-						modPlantillaDoc.setPlantilla(plantillaDoc.getPlantilla());
-						modPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
-						modPlantilladocumentoMapper.updateByPrimaryKey(modPlantillaDoc);
+						
 						
 						ModModeloPlantilladocumentoKey modModeloPlantillaDocKey = new ModModeloPlantilladocumentoKey();
 						modModeloPlantillaDocKey.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
@@ -569,9 +631,9 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						modModuloPlantillaDoc.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
 						
 						modModeloPlantilladocumentoMapper.insert(modModuloPlantillaDoc);
-					}
+					}*/
 					respuesta.setCode(200);
-					respuesta.setMessage("Datos generales guardados correctamente");
+					respuesta.setMessage("Datos plantilla de documento guardados correctamente");
 
 				}
 			}catch(Exception e){
@@ -581,7 +643,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			}
 		
 		}
-		LOGGER.info("guardarDatosGenerales() -> Salida del servicio para guardar los datos generales del modelo de comunicación");
+		LOGGER.info("guardarModPlantillaDocumento() -> Salida del servicio para guardar los datos de la plantilla de documento");
 		return respuesta;
 	}	
 
@@ -903,4 +965,223 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		return respuesta;
 	}
 
+
+	@Override
+	public Error guardarConsultaPlantilla(HttpServletRequest request, ConsultaPlantillaDTO consultaPlantilla) {
+		LOGGER.info("guardarConsultaPlantilla() -> Entrada al servicio para guardar una consulta de la plantilla");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		Error respuesta = new Error();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{		
+					
+					//Obtenemos las consultas asignadas a la plantilla del documento
+					List<ConsultaItem> listaConsultas = modPlantillaDocumentoConsultaExtendsMapper.selectPlantillaDocConsultas(Short.parseShort(consultaPlantilla.getIdInstitucion()),Long.parseLong(consultaPlantilla.getIdModeloComunicacion()),Long.parseLong(consultaPlantilla.getIdPlantillaDocumento()), false);
+					
+					boolean consultaValida = true;
+					int consultaDatos = 0;
+					int consultaDestinatario = 0;
+					int consultaMultidocumento = 0;
+					int consultaCondicion = 0;
+					
+					if(listaConsultas != null && listaConsultas.size() > 0){
+						for(ConsultaItem consultaItem : listaConsultas){
+							if(Long.parseLong(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo()){
+								consultaDestinatario++;
+							}else if(Long.parseLong(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo()){
+								consultaMultidocumento++;
+							}else if(Long.parseLong(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.CONDICIONAL.getCodigo()){
+								consultaCondicion++;
+							}else if(Long.parseLong(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.DATOS.getCodigo()){
+								consultaDatos++;
+							}
+						}
+					}					
+					
+					// Comprobamos el objetivo de la consulta
+					ConConsultaKey consultaKey = new ConConsultaKey();
+					consultaKey.setIdconsulta(Long.parseLong(consultaPlantilla.getIdConsulta()));
+					consultaKey.setIdinstitucion(Short.parseShort(consultaPlantilla.getIdInstitucion()));
+					ConConsulta conConsulta = conConsultaMapper.selectByPrimaryKey(consultaKey);
+					Long objetivo = conConsulta.getIdobjetivo();
+					
+					if(objetivo == SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo() && consultaDestinatario >=1){
+						consultaValida = false;
+					}else if(objetivo == SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo() && consultaMultidocumento >=1){
+						consultaValida = false;
+					}else if(objetivo == SigaConstants.OBJETIVO.CONDICIONAL.getCodigo() && consultaCondicion >=1){
+						consultaValida = false;
+					}
+					
+					if(consultaValida){
+						if(consultaPlantilla.getIdPlantillaConsulta() != null && !"".equalsIgnoreCase(consultaPlantilla.getIdPlantillaConsulta())){
+							ModPlantilladocConsulta consulta = new ModPlantilladocConsulta();
+							
+							consulta = modPlantilladocConsultaMapper.selectByPrimaryKey(Long.parseLong(consultaPlantilla.getIdPlantillaConsulta()));
+						
+							consulta.setUsumodificacion(usuario.getIdusuario());
+							consulta.setFechamodificacion(new Date());
+							consulta.setIdconsulta(Long.parseLong(consultaPlantilla.getIdConsulta()));						
+							
+							modPlantilladocConsultaMapper.updateByPrimaryKey(consulta);
+						}else{
+							ModPlantilladocConsulta consulta = new ModPlantilladocConsulta();
+							consulta.setIdinstitucion(Short.parseShort(consultaPlantilla.getIdInstitucion()));
+							consulta.setIdmodelocomunicacion(Long.parseLong(consultaPlantilla.getIdModeloComunicacion()));
+							consulta.setIdplantilladocumento(Long.parseLong(consultaPlantilla.getIdPlantillaDocumento()));
+							consulta.setFechabaja(null);
+							consulta.setUsumodificacion(usuario.getIdusuario());
+							consulta.setFechamodificacion(new Date());
+							
+							modPlantilladocConsultaMapper.insert(consulta);
+						}
+						
+						respuesta.setCode(200);
+						respuesta.setDescription("Consulta guardada");
+					}else{
+						respuesta.setCode(500);
+						respuesta.setDescription("Consulta no válida");
+						respuesta.setMessage("Error al guardar la consulta");
+					}
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error al guardar la consulta");
+				}
+			}
+		}
+		
+		LOGGER.info("guardarPlantillaModelo() -> Entrada al servicio para guardar una consulta de la plantilla");
+		return respuesta;
+	}
+
+
+	@Override
+	public PlantillasDocumentosDTO guardarInformes(HttpServletRequest request,
+			TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request) {
+		LOGGER.info("uploadFile() -> Entrada al servicio para subir una plantilla de documento");
+		
+		ResponseDocumentoDTO response = new ResponseDocumentoDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				
+				
+				// crear path para almacenar el fichero
+				String pathFichero = "/FILERMSA1000/SIGA/ficheros/archivo/" + String.valueOf(idInstitucion) + "/plantillaDocumentos/";
+				
+				// 1. Coger archivo del request
+				LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
+				Iterator<String> itr = request.getFileNames();
+				MultipartFile file = request.getFile(itr.next());
+				String fileName = file.getOriginalFilename();
+				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+				//BufferedOutputStream stream = null;
+				try {
+					File aux = new File(pathFichero);
+					// creo directorio si no existe
+					aux.mkdirs();
+					File serverFile = new File(pathFichero, fileName);
+					//stream = new BufferedOutputStream(new FileOutputStream(serverFile));
+					//stream.write(file.getBytes());
+					FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
+					response.setNombreDocumento(fileName);
+					response.setRutaDocumento(pathFichero + fileName);
+				} catch (FileNotFoundException e) {
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					response.setError(error);
+					e.printStackTrace();
+					LOGGER.error("uploadFile() -> Error al buscar la plantilla de documento en el directorio indicado",e);
+				} catch (IOException ioe) {
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription(ioe.getMessage());
+					response.setError(error);
+					ioe.printStackTrace();
+					LOGGER.error("uploadFile() -> Error al guardar la plantilla de documento en el directorio indicado",ioe);
+				} finally {
+					// close the stream
+					LOGGER.debug("uploadFile() -> Cierre del stream del documento");
+					//stream.close();
+				}
+			}
+		}
+
+		
+		LOGGER.info("uploadFile() -> Salida del servicio para subir una plantilla de documento");
+		return response;
+	}
+	
+	
+	@Override
+	public ResponseDocumentoDTO guardarPlantillaDocumento(HttpServletRequest request, DocumentoPlantillaDTO documento) {
+		LOGGER.info("guardarPlantillaDocumento() -> Entrada al servicio para guardar la plantilla de documento");
+
+		Error error = new Error();
+		ResponseDocumentoDTO response = new ResponseDocumentoDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					ModPlantilladocumento modPlantillaDoc = new ModPlantilladocumento();
+					
+					modPlantillaDoc.setFechamodificacion(new Date());
+					modPlantillaDoc.setIdioma(documento.getIdioma());
+					modPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
+					modPlantillaDoc.setPlantilla(documento.getNombreDocumento());
+					modPlantilladocumentoMapper.insert(modPlantillaDoc);
+					
+					response.setIdioma(documento.getIdioma());
+					response.setNombreDocumento(documento.getNombreDocumento());
+					response.setRutaDocumento(documento.getNombreDocumento());
+					response.setIdPlantillaDocumento(String.valueOf(modPlantillaDoc.getIdplantilladocumento()));
+				}catch(Exception e){
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					error.setMessage("Error al insertar documento");
+					documento.setError(error);
+				}
+				
+			}
+		}
+		LOGGER.info("guardarPlantillaDocumento() -> Salida del servicio para guardar la plantilla de documento");
+		return response;
+	}	
 }
