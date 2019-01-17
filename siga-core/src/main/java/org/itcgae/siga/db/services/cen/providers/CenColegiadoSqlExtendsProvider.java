@@ -379,7 +379,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		sql.SELECT("TO_CHAR(fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
 		sql.SELECT("cat.descripcion as estadoColegial");
-		sql.SELECT("situacionresidente as residenteInscrito");
+		sql.SELECT("decode (situacionresidente, 1, 'Si', 0, 'No') as residenteInscrito");
 		sql.SELECT("observaciones");
 		sql.SELECT("colest.fechaestado AS fechaestado");
 		sql.SELECT("colest.idestado AS idEstado");
