@@ -798,6 +798,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		
 		sql.LEFT_OUTER_JOIN(
 				"cen_datoscv datoscv on (datoscv.idpersona = cli.idpersona and datoscv.idinstitucion = cli.idinstitucion)");
+		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt2 ON ( subt2.idTipoCV = datosCV.idTipoCV and subt2.idInstitucion = nocol.idInstitucion )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = nocol.idInstitucion )");
 		
 		if(idInstitucion != "2000") {
 			sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
@@ -859,8 +861,17 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 			sql.WHERE("grucli.IDGRUPO IN (" + etiquetas + ")");
 		}
+		
 		if (noColegiadoItem.getIdcv() != null && noColegiadoItem.getIdcv() != "") {
 			sql.WHERE("datoscv.idcv = '" + noColegiadoItem.getIdcv() + "'");
+		}
+		
+		if (noColegiadoItem.getSubTipoCV1() != null && noColegiadoItem.getSubTipoCV1() != "") {
+			sql.WHERE("subt1.idtipocvsubtipo1 = '" + noColegiadoItem.getSubTipoCV1() + "'");
+		}
+		
+		if (noColegiadoItem.getSubTipoCV2() != null && noColegiadoItem.getSubTipoCV2() != "") {
+			sql.WHERE("subt2.idtipocvsubtipo2 = '" + noColegiadoItem.getSubTipoCV2() + "'");
 		}
 
 		if (noColegiadoItem.getFechaNacimientoRango() != null && noColegiadoItem.getFechaNacimientoRango().length != 0) {

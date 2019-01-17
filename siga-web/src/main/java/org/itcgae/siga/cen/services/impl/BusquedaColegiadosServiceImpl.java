@@ -228,9 +228,9 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		if (null != idInstitucion) {
-			if(colegiadoItem.getSearchLoggedUser() == true) {
-//				colegiadoItem.setNif(dni);
-				colegiadoItem.setNif("29002353C");
+			if(null !=colegiadoItem.getSearchLoggedUser() && colegiadoItem.getSearchLoggedUser()) {
+				colegiadoItem.setNif(dni);
+//				colegiadoItem.setNif("29002353C");
 
 			}
 			colegiadoItemList = cenColegiadoExtendsMapper.selectColegiados(idInstitucion, colegiadoItem);
