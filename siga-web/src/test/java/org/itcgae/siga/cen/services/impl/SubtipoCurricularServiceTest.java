@@ -93,7 +93,7 @@ public class SubtipoCurricularServiceTest {
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		ComboDTO comboResultado = subtipoCurricularServiceImpl.getComboSubtipoCurricular(1, subtipoCurricularItem, mockreq);
+		ComboDTO comboResultado = subtipoCurricularServiceImpl.getCurricularSubtypeCombo("1", mockreq);
 		
 		ComboDTO comboEsperado = new ComboDTO();
 		

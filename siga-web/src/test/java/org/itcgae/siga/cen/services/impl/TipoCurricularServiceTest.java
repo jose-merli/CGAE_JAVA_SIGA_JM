@@ -81,31 +81,6 @@ public class TipoCurricularServiceTest {
 	}
 
 	@Test
-	public void getComboTipoCurricularTest() throws Exception {
-
-		String idLenguaje = "1";
-		String idInstitucion = "2000";
-		List<ComboItem> comboItemsSimulados = testUtils.getListComboItemsSimulados();
-		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
-		TipoCurricularItem tipoCurricularItem = cenTestUtils.getTipoCurricularItemSimulado();
-				
-		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
-		when(cenTiposCVSubtipo1ExtendsMapper
-				.searchComboTipoCurricular(tipoCurricularItem, idLenguaje, idInstitucion)).thenReturn(comboItemsSimulados);
-
-		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
-
-		ComboDTO comboResultado = tipoCurricularServiceImpl.getComboTipoCurricular(1, tipoCurricularItem, mockreq);
-		
-		ComboDTO comboEsperado = new ComboDTO();
-		
-		comboEsperado.setCombooItems(comboItemsSimulados);
-		
-		assertThat(comboResultado).isEqualTo(comboEsperado);
-
-	}
-
-	@Test
 	public void searchTipoCurricularTest() throws Exception {
 
 		String idLenguaje = "1";
