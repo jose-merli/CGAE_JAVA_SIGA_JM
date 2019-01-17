@@ -50,7 +50,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql2.SELECT("F_SIGA_GETINTEGRANTES(COL.IDINSTITUCION,COL.IDPERSONA)  AS NOMBRESINTEGRANTES");
 		
 		sql2.FROM("CEN_NOCOLEGIADO COL");
-
+		
 		sql2.INNER_JOIN(" CEN_PERSONA PER ON PER.IDPERSONA = COL.IDPERSONA");
 		sql2.INNER_JOIN("CEN_INSTITUCION I ON COL.IDINSTITUCION = I.IDINSTITUCION");
 		sql2.LEFT_OUTER_JOIN("CEN_TIPOSOCIEDAD  TIPOSOCIEDAD ON  COL.TIPO = TIPOSOCIEDAD.LETRACIF");
@@ -613,6 +613,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("per.sexo");
 		sql.SELECT_DISTINCT("per.idestadocivil");
 		sql.SELECT_DISTINCT("per.idtipoidentificacion");
+		sql.SELECT_DISTINCT("cli.NOAPARECERREDABOGACIA");
 		sql.SELECT_DISTINCT("per.naturalde");
 		sql.SELECT_DISTINCT("cli.idlenguaje");
 		sql.SELECT_DISTINCT("cli.asientocontable");

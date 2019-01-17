@@ -19,15 +19,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicItem;
 import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionDTO;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
+import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -48,8 +49,9 @@ import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
 import org.itcgae.siga.db.entities.CenCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
+import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
+import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
 import org.itcgae.siga.db.entities.CenDirecciones;
-import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPais;
 import org.itcgae.siga.db.entities.CenPaisExample;
@@ -59,10 +61,9 @@ import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
-import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
-import org.itcgae.siga.db.mappers.CenDireccionesMapper;
-import org.itcgae.siga.db.mappers.CenPersonaMapper;
+import org.itcgae.siga.db.mappers.CenDatoscolegialesestadoMapper;
+import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenBancosExtendsMapper;
@@ -145,8 +146,6 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	@Autowired
 	private CenClienteMapper _cenClienteMapper;
 	
-	@Autowired
-	private CenBancosMapper _cenBancosMapper;
 
 	@Autowired
 	private CenBancosExtendsMapper cenBancosExtendsMapper;
@@ -157,6 +156,11 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	@Autowired
 	private CenCuentasbancariasExtendsMapper cenCuentasbancariasExtendsMapper;
 
+	@Autowired
+	private CenDatoscolegialesestadoMapper cenDatoscolegialesestadoMapper;
+	
+	@Autowired
+	private CenDireccionTipodireccionMapper cenDireccionTipoDireccionMapper;
 	@Override
 	public ComboDTO getTipoSolicitud(HttpServletRequest request) {
 		LOGGER.info("getTipoSolicitud() -> Entrada al servicio para cargar el tipo de solicitud");
@@ -186,9 +190,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				
 				if(comboItems != null && comboItems.size() >0){
 					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
 					combo.setCombooItems(comboItems);
 				}
 			}
@@ -226,10 +230,10 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				List<ComboItem> comboItems = _cenEstadoSolicitudExtendsMapper.selectEstadoSolicitud(usuario.getIdlenguaje());
 				
 				if(comboItems != null && comboItems.size() >0){
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
+//					ComboItem element = new ComboItem();
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
 					combo.setCombooItems(comboItems);
 				}
 			}
@@ -388,9 +392,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				
 				if(comboItems != null && comboItems.size() >0){
 					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
 					combo.setCombooItems(comboItems);
 				}
 			}
@@ -429,9 +433,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				
 				if(comboItems != null && comboItems.size() >0){
 					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
 					combo.setCombooItems(comboItems);
 				}
 			}
@@ -471,9 +475,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				
 				if(comboItems != null && comboItems.size() >0){
 					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
 					combo.setCombooItems(comboItems);
 				}
 			}
@@ -513,9 +517,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				
 				if(comboItems != null && comboItems.size() >0){
 					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
 					combo.setCombooItems(comboItems);
 				}
 			}
@@ -555,9 +559,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				
 				if(comboItems != null && comboItems.size() >0){
 					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
 					combo.setCombooItems(comboItems);
 				}
 			}
@@ -672,7 +676,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					solIncorporacion.setFechamodificacion(new Date());
 					solIncorporacion.setUsumodificacion(usuario.getIdusuario());
 					solIncorporacion.setFechaalta(new Date());
-					
+					solIncorporacion.setFechaestado(new Date());
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				
 					if(idPersona != null && idDireccion!= null && insertCliente == 1 && idBancario != null && insertColegiado == 1 && updateSolicitud == 1){
@@ -749,6 +753,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					CenSolicitudincorporacion solicitud = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
 					solicitud.setIdestado((short)30);
 					solicitud.setFechamodificacion(new Date());
+					solicitud.setFechaestado(new Date());
 					solicitud.setUsumodificacion(usuario.getIdusuario());
 					update = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solicitud);
 					if(update ==1){
@@ -898,9 +903,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		CenDirecciones direccion = new CenDirecciones();
 		
-		MaxIdDto direccionID = _cenDireccionesMapper.selectMaxID();
+		 List<DatosDireccionesItem> direccionID = _cenDireccionesMapper.selectNewIdDireccion(idPersona.toString(),usuario.getIdinstitucion().toString());
 		
-		direccion.setIddireccion(direccionID.getIdMax());
+		direccion.setIddireccion(Long.valueOf(direccionID.get(0).getIdDireccion()));
 		direccion.setCodigopostal(solicitud.getCodigopostal());
 		direccion.setCorreoelectronico(solicitud.getCorreoelectronico());
 		direccion.setDomicilio(solicitud.getDomicilio());
@@ -919,6 +924,25 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		_cenDireccionesMapper.insert(direccion);
 		
+		CenDireccionTipodireccion tipoDireccion =  new CenDireccionTipodireccion();
+		tipoDireccion.setFechamodificacion(new Date());
+		tipoDireccion.setIddireccion(direccion.getIddireccion());
+		tipoDireccion.setIdinstitucion(usuario.getIdinstitucion());
+		tipoDireccion.setIdpersona(idPersona);
+		tipoDireccion.setUsumodificacion(usuario.getIdusuario());
+		
+		//Traspaso a OOJ
+		tipoDireccion.setIdtipodireccion(Short.valueOf("9"));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		
+		//Despacho
+		tipoDireccion.setIdtipodireccion(Short.valueOf("2"));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		
+		//CensoWeb
+		tipoDireccion.setIdtipodireccion(Short.valueOf("3"));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+	
 		return direccion.getIddireccion();
 		
 	}
@@ -1190,8 +1214,14 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		colegiado.setUsumodificacion(usuario.getIdusuario());
 		colegiado.setNumsolicitudcolegiacion(solicitud.getIdsolicitud().toString());
 		colegiado.setFechapresentacion(new Date());
+		if (solicitud.getIdtipocolegiacion() == 10) {
+			colegiado.setComunitario("1");
+			colegiado.setNcomunitario(solicitud.getNcolegiado());;
+		}else{
+			colegiado.setComunitario("0");
+		}
 		colegiado.setJubilacioncuota("0");
-		colegiado.setComunitario("0");
+		
 		colegiado.setIndtitulacion("1");
 		colegiado.setSituacionejercicio("0");
 		colegiado.setSituacionempresa("0");
@@ -1202,7 +1232,29 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		List <CenColegiado> listaColegiados = _cenColegiadoMapper.selectByExample(ejemploColegiado);
 		if(listaColegiados.isEmpty()) {
-			return _cenColegiadoMapper.insert(colegiado);
+			int resultado = _cenColegiadoMapper.insert(colegiado);
+			
+			if (resultado == 1) {
+				CenDatoscolegialesestado datosColegiales = new CenDatoscolegialesestado();
+				datosColegiales.setFechaestado(new Date());
+				datosColegiales.setFechamodificacion(new Date());
+				if (null != solicitud.getIdtiposolicitud()) {
+					if (solicitud.getIdtiposolicitud() == 10 || solicitud.getIdtiposolicitud() == 30 ) {
+						datosColegiales.setIdestado(Short.valueOf("20"));
+					}else{
+						datosColegiales.setIdestado(Short.valueOf("10"));
+					}
+				}else{
+					datosColegiales.setIdestado(Short.valueOf("10"));
+				}
+
+				datosColegiales.setIdinstitucion(usuario.getIdinstitucion());
+				datosColegiales.setIdpersona(idPersona);
+				datosColegiales.setUsumodificacion(usuario.getIdusuario());
+				datosColegiales.setObservaciones(solicitud.getObservaciones());
+				resultado = cenDatoscolegialesestadoMapper.insert(datosColegiales );
+			}
+			return resultado;
 		} else {
 			return 1;
 		}
