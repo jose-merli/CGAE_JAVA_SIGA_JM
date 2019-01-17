@@ -441,7 +441,7 @@ public class NoColegiadoItem {
 		return this;
 	}
 
-	@JsonProperty("idGrupo")
+	@JsonProperty("idgrupo")
 	public String[] getIdGrupo() {
 		return idGrupo;
 	}
