@@ -634,8 +634,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.INNER_JOIN("cen_institucion inst on nocol.idinstitucion = inst.idinstitucion");
 
 		sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
-				+ "    (grucli.idinstitucion = inst.idinstitucion and nocol.idpersona = grucli.idpersona and (TO_DATE(grucli.fecha_inicio,'DD/MM/YYYY') <= SYSDATE and \r\n"
-				+ "        ( TO_DATE(grucli.fecha_baja,'DD/MM/YYYY') >= SYSDATE OR grucli.fecha_baja IS NULL)))");
+				+ "    (grucli.idinstitucion = inst.idinstitucion and nocol.idpersona = grucli.idpersona and (grucli.fecha_inicio <= SYSDATE and \r\n"
+				+ "        ( grucli.fecha_baja >= SYSDATE OR grucli.fecha_baja IS NULL)))");
 		sql.LEFT_OUTER_JOIN(
 				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
 		
