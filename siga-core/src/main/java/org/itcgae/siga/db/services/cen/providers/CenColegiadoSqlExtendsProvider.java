@@ -28,7 +28,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("per.sexo");
 		sql.SELECT_DISTINCT("per.idestadocivil");
 		sql.SELECT_DISTINCT("cli.publicidad");
-		sql.SELECT_DISTINCT("cli.guiajudicial");
+		sql.SELECT_DISTINCT("cli.noaparecerredabogacia");
 
 		sql.SELECT_DISTINCT("per.idtipoidentificacion");
 		sql.SELECT_DISTINCT("per.naturalde");

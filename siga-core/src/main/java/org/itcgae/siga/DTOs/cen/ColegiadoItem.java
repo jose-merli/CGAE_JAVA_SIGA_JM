@@ -10,6 +10,7 @@ public class ColegiadoItem {
 	private Boolean colegiado;
 	
 	private String idPersona;
+	private String noAparecerRedAbogacia;
 	private Boolean searchLoggedUser;
 	private String idInstitucion;
 	private String nif;
@@ -1267,6 +1268,14 @@ public class ColegiadoItem {
 
 	public void setSearchLoggedUser(Boolean searchLoggedUser) {
 		this.searchLoggedUser = searchLoggedUser;
+	}
+
+	public String getNoAparecerRedAbogacia() {
+		return noAparecerRedAbogacia;
+	}
+
+	public void setNoAparecerRedAbogacia(String noAparecerRedAbogacia) {
+		this.noAparecerRedAbogacia = noAparecerRedAbogacia;
 	}
 
 
