@@ -650,9 +650,9 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 							/**
 							 * 6. Comprobacion que la persona ya esta dada de baja
 							 **/
-							if (cenGruposclienteCliente.getFechaBaja() != null) {
+							if (cenGruposclienteCliente.getFechaBaja() != null && cenGruposclienteCliente.getFechaBaja().before(new Date())) {
 								LOGGER.debug("process.usuario.noexiste");
-								errorLinea.append("El usuario ya esta dado de baja. ");
+								errorLinea.append("La etiqueta ya está dada de baja. ");
 							}
 						}
 					}
