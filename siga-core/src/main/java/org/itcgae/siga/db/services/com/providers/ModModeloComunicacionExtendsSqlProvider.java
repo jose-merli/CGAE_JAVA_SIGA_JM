@@ -20,6 +20,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.SELECT("modelo.ORDEN");
 		sql.SELECT("modelo.IDINSTITUCION");
 		sql.SELECT("modelo.DESCRIPCION");
+		sql.SELECT("modelo.FECHABAJA");
 		sql.SELECT("modelo.PRESELECCIONAR");
 		sql.SELECT("modelo.IDCLASECOMUNICACION");
 		sql.SELECT("modelo.FECHABAJA");
