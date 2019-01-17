@@ -7,7 +7,7 @@
 	<resultMap type="hashmap" id="mapa">
 	</resultMap>
 	<select id="ejecutarConsulta" parameterType="hashmap" resultMap="mapa">
-		select #{select.selectValue} from #{select.fromValue}
+		select #{select.selectValue} from #{fromValue}
 		<if test="select.wherevalue != ''">
     	where #{select.whereValue}
   		</if>

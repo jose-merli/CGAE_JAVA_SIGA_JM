@@ -4,7 +4,14 @@ public class PlantillaModeloBorrarDTO {
 	
 	private String idModelo;
 	private String idPlantillaEnvios;
+	private String porDefecto;
 	
+	public String getPorDefecto() {
+		return porDefecto;
+	}
+	public void setPorDefecto(String porDefecto) {
+		this.porDefecto = porDefecto;
+	}
 	public String getIdModelo() {
 		return idModelo;
 	}
