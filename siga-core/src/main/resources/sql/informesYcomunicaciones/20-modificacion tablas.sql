@@ -80,3 +80,5 @@ alter table MOD_PLANTILLADOC_CONSULTA
     minextents 1
     maxextents unlimited
   );
+  
+  alter table mod_modelo_plantilladocumento add IDINFORME number(10);

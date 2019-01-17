@@ -1,12 +1,15 @@
 package org.itcgae.siga.com.services;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.ConsultaPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
-import org.itcgae.siga.DTOs.com.DocumentoPlantillaDTO;
+import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
+import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDTO;
@@ -32,6 +35,7 @@ public interface IModelosYcomunicacionesService {
 	public Error guardarModPlantillaDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 	public Error guardarDatosGenerales(HttpServletRequest request, TarjetaModeloConfiguracionDTO datosTarjeta);
 	public ConsultasDTO obtenerConsultasPlantilla(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc, boolean historico);
+	public DocumentosPlantillaDTO obtenerPlantillasInforme(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 	public ComboDTO obtenerFormatoSalida(HttpServletRequest request);
 	public ComboDTO obtenerSufijos(HttpServletRequest request);
 	public ComboDTO obtenerConsultasDisponibles(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
@@ -42,6 +46,6 @@ public interface IModelosYcomunicacionesService {
 	public Error guardarConsultaPlantilla(HttpServletRequest request, ConsultaPlantillaDTO consultaPlantilla);
 	public PlantillasDocumentosDTO guardarInformes(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request);
-	public ResponseDocumentoDTO guardarPlantillaDocumento(HttpServletRequest request, DocumentoPlantillaDTO documento);
+	public ResponseDocumentoDTO guardarPlantillaDocumento(HttpServletRequest request, DocumentoPlantillaItem documento);
 	
 }

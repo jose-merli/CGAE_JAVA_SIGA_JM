@@ -2,12 +2,13 @@ package org.itcgae.siga.DTOs.com;
 
 import org.itcgae.siga.DTOs.gen.Error;
 
-public class DocumentoPlantillaDTO {
+public class DocumentoPlantillaItem {
 	
 	private String rutaDocumento;
 	private String nombreDocumento;
 	private String idPlantillaDocumento;
 	private String idioma;
+	private String idInforme;
 	private Error error;
 	
 	public String getRutaDocumento() {
@@ -39,6 +40,12 @@ public class DocumentoPlantillaDTO {
 	}
 	public void setIdioma(String idioma) {
 		this.idioma = idioma;
+	}
+	public String getIdInforme() {
+		return idInforme;
+	}
+	public void setIdInforme(String idInforme) {
+		this.idInforme = idInforme;
 	}
 	
 

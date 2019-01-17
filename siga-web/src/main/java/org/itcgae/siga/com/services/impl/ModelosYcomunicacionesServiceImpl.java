@@ -17,7 +17,8 @@ import org.itcgae.siga.DTOs.com.ConsultaPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
-import org.itcgae.siga.DTOs.com.DocumentoPlantillaDTO;
+import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
+import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
@@ -52,6 +53,7 @@ import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaKey;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
+import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.mappers.ModModeloPerfilesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
@@ -68,6 +70,7 @@ import org.itcgae.siga.db.services.com.mappers.ModModeloPlantillaEnvioExtendsMap
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocFormatoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocSufijoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -124,6 +127,9 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 
 	@Autowired
 	private ModModeloPlantillaEnvioExtendsMapper _modModeloPlantillaEnvioExtendsMapper;
+	
+	@Autowired
+	private ModPlantillaDocumentoExtendsMapper modPlantillaDocumentoExtendsMapper;
 	
 	@Autowired
 	private ConConsultaMapper conConsultaMapper;
@@ -552,7 +558,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					if(plantillaDoc.getIdModeloComunicacion() != null){
 						if(plantillaDoc.getPlantillas() != null && plantillaDoc.getPlantillas().size() > 0){
 							
-							for(DocumentoPlantillaDTO idPlantillaDoc : plantillaDoc.getPlantillas()){
+							for(DocumentoPlantillaItem idPlantillaDoc : plantillaDoc.getPlantillas()){
 								
 								ModPlantilladocumento modPlantillaDoc = modPlantilladocumentoMapper.selectByPrimaryKey(Long.parseLong(idPlantillaDoc.getIdPlantillaDocumento()));
 								
@@ -1139,7 +1145,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	
 	
 	@Override
-	public ResponseDocumentoDTO guardarPlantillaDocumento(HttpServletRequest request, DocumentoPlantillaDTO documento) {
+	public ResponseDocumentoDTO guardarPlantillaDocumento(HttpServletRequest request, DocumentoPlantillaItem documento) {
 		LOGGER.info("guardarPlantillaDocumento() -> Entrada al servicio para guardar la plantilla de documento");
 
 		Error error = new Error();
@@ -1180,6 +1186,43 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			}
 		}
 		LOGGER.info("guardarPlantillaDocumento() -> Salida del servicio para guardar la plantilla de documento");
+		return response;
+	}
+
+
+	@Override
+	public DocumentosPlantillaDTO obtenerPlantillasInforme(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		LOGGER.info("obtenerPlantilla() -> Entrada al servicio para obtener las plantillas asociadas a un informe");
+
+		Error error = new Error();
+		List<DocumentoPlantillaItem> items = new ArrayList<DocumentoPlantillaItem>();
+		DocumentosPlantillaDTO response = new DocumentosPlantillaDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					items = modPlantillaDocumentoExtendsMapper.selectPlantillasByInforme(Long.parseLong(plantillaDoc.getIdInforme()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+					
+					response.setDocumentoPlantillaItem(items);
+				}catch(Exception e){
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					error.setMessage("Error al obtener las plantillas");
+				}
+				
+			}
+		}
+		LOGGER.info("obtenerPlantillasInforme() -> Salida del servicio las plantillas asociadas a un informe");
 		return response;
 	}	
 }

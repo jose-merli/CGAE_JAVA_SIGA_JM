@@ -20,8 +20,9 @@ public class TarjetaPlantillaDocumentoDTO {
 	private Date fechaAsociacion;
 	private String plantilla;
 	private String idConsulta;
+	private String idInforme;
 	
-	private List<DocumentoPlantillaDTO> plantillas = new ArrayList<DocumentoPlantillaDTO>();
+	private List<DocumentoPlantillaItem> plantillas = new ArrayList<DocumentoPlantillaItem>();
 	private List<Long> sufijos = new ArrayList<Long>();
 	
 	public String getIdioma() {
@@ -114,10 +115,10 @@ public class TarjetaPlantillaDocumentoDTO {
 	public void setIdConsulta(String idConsulta) {
 		this.idConsulta = idConsulta;
 	}
-	public List<DocumentoPlantillaDTO> getPlantillas() {
+	public List<DocumentoPlantillaItem> getPlantillas() {
 		return plantillas;
 	}
-	public void setPlantillas(List<DocumentoPlantillaDTO> plantillas) {
+	public void setPlantillas(List<DocumentoPlantillaItem> plantillas) {
 		this.plantillas = plantillas;
 	}
 	public List<Long> getSufijos() {
@@ -125,6 +126,12 @@ public class TarjetaPlantillaDocumentoDTO {
 	}
 	public void setSufijos(List<Long> sufijos) {
 		this.sufijos = sufijos;
+	}
+	public String getIdInforme() {
+		return idInforme;
+	}
+	public void setIdInforme(String idInforme) {
+		this.idInforme = idInforme;
 	}
 	
 	

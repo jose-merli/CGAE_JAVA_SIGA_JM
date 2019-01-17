@@ -6,7 +6,8 @@ import org.itcgae.siga.DTOs.com.ConsultaPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
-import org.itcgae.siga.DTOs.com.DocumentoPlantillaDTO;
+import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
+import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDTO;
@@ -237,7 +238,7 @@ public class ModelosYComunicacionesController {
 	}
 	
 	@RequestMapping(value = "/detalle/insertarPlantilla",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ResponseDocumentoDTO> insertarPlantilla(HttpServletRequest request, @RequestBody DocumentoPlantillaDTO documento) throws Exception{
+	ResponseEntity<ResponseDocumentoDTO> insertarPlantilla(HttpServletRequest request, @RequestBody DocumentoPlantillaItem documento) throws Exception{
 		
 		ResponseDocumentoDTO response = _modelosYcomunicacionesService.guardarPlantillaDocumento(request, documento);
 		if(response.getError() == null)
@@ -245,5 +246,16 @@ public class ModelosYComunicacionesController {
 		else
 			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@RequestMapping(value = "/detalle/plantillas",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DocumentosPlantillaDTO> obtenerPlantillasInforme(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) throws Exception{
+		
+		DocumentosPlantillaDTO response = _modelosYcomunicacionesService.obtenerPlantillasInforme(request, plantillaDoc);
+		if(response.getError() == null)
+			return new ResponseEntity<DocumentosPlantillaDTO>(response, HttpStatus.OK);	
+		else
+			return new ResponseEntity<DocumentosPlantillaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	
 }
