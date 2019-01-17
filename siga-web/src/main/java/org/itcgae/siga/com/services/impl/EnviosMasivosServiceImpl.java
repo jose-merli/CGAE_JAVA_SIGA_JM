@@ -28,6 +28,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.EnvDestinatarios;
@@ -873,7 +874,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				
 				
 				// crear path para almacenar el fichero
-				String pathFichero = "/FILERMSA1000/SIGA/ficheros/archivo/" + String.valueOf(idInstitucion) + "/documentosEnvio/";
+				
+				String pathFichero = SigaConstants.rutaficherosInformesYcomunicaciones + String.valueOf(idInstitucion) + SigaConstants.carpetaDocumentosEnvio;
 				
 				// 1. Coger archivo del request
 				LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
@@ -982,6 +984,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 			
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
+					boolean noBorrado = false;
 					for (int i = 0; i < documentoDTO.length; i++) {
 						File fichero = new File(documentoDTO[i].getRutaDocumento());
 						if(fichero.exists()){
@@ -989,12 +992,19 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 							EnvDocumentosExample example = new EnvDocumentosExample();
 							example.createCriteria().andIdenvioEqualTo(Long.valueOf(documentoDTO[i].getIdEnvio())).andPathdocumentoEqualTo(documentoDTO[i].getRutaDocumento());
 							_envDocumentosMapper.deleteByExample(example);
+						}else{
+							noBorrado = true;
 						}
 					}
-					
-					respuesta.setCode(200);
-					respuesta.setDescription("Documento/s borrado/s correctamente");
-					respuesta.setMessage("Delete correcto");
+					if(noBorrado){
+						respuesta.setCode(400);
+						respuesta.setDescription("Algunos Documento/s no se han borrado");
+					}else{
+						respuesta.setCode(200);
+						respuesta.setDescription("Documento/s borrado/s correctamente");
+						respuesta.setMessage("Delete correcto");
+					}
+
 				}catch(Exception e){
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
