@@ -196,7 +196,7 @@ public class ModelosYComunicacionesController {
 	}
 	
 	@RequestMapping(value = "detalle/plantillasEnvioHist",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<PlantillasModeloDTO> obtenerPlantillasEnvioHist(HttpServletRequest request, String idModelo) {
+	ResponseEntity<PlantillasModeloDTO> obtenerPlantillasEnvioHist(HttpServletRequest request, @RequestBody String idModelo) {
 		
 		PlantillasModeloDTO response = _modelosYcomunicacionesService.obtenerPlantillasEnviosModeloSearchHist(request, idModelo);
 

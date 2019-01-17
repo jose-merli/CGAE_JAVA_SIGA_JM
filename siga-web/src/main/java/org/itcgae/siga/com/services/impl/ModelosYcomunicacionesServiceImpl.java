@@ -949,6 +949,20 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
+					
+					if(datosPlantilla.getPorDefecto().equals("Si") || datosPlantilla.getPorDefecto().equals("SI")){
+						ModModeloPlantillaenvioExample example = new ModModeloPlantillaenvioExample();
+						example.createCriteria().andIdmodelocomunicacionEqualTo(Long.valueOf(datosPlantilla.getIdModelo()));
+						List<ModModeloPlantillaenvio> plantillas = modModeloPlantillaenvioMapper.selectByExample(example);
+						for (int i = 0; i < plantillas.size() ; i++) {
+							ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
+							key.setIdmodelocomunicacion(Long.valueOf(plantillas.get(0).getIdmodelocomunicacion()));
+							key.setIdplantillaenvios(Short.valueOf(plantillas.get(0).getIdplantillaenvios()));
+							ModModeloPlantillaenvio plantillaMod = new ModModeloPlantillaenvio();
+							plantillaMod.setPordefecto("No");
+							modModeloPlantillaenvioMapper.updateByPrimaryKey(plantillaMod);
+						}
+					}
 					ModModeloPlantillaenvio plantilla = new ModModeloPlantillaenvio();
 					plantilla.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
 					plantilla.setIdplantillaenvios(Short.valueOf(datosPlantilla.getIdPlantillaEnvios()));

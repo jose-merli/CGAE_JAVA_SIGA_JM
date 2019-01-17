@@ -62,7 +62,7 @@ public interface ConConsultasExtendsMapper {
 	List<ConsultaItem> selectConsultasPlantillas(Short idInstitucion, String idPlantillaEnvios, String idtipoEnvio);
 
 	@ResultType(value = List.class)
-	public List<Map<String, Object>> ejecutarConsulta(@Param(value = "select") Map<String,String> querys);
+	public List<Map<String, Object>> ejecutarConsulta(@Param(value = "query") Map<String,String> querys);
 	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasDisponibles")
 	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
