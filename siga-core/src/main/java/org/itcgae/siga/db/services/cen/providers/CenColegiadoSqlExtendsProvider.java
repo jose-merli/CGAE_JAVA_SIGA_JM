@@ -80,7 +80,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
 				+ "    (grucli.idinstitucion = inst.idinstitucion and col.idpersona = grucli.idpersona and (grucli.fecha_inicio <= SYSDATE and \r\n"
-				+ "        ( grucli.fecha_baja >= SYSDATE OR grucli.fecha_baja IS NULL)))");
+				+ "        ( grucli.fecha_baja > SYSDATE OR grucli.fecha_baja IS NULL)))");
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
 						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion))");

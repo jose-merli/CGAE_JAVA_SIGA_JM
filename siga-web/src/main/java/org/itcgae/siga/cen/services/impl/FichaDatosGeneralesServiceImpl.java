@@ -53,6 +53,7 @@ import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicos;
 import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenSolicmodifexportarfotoMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
@@ -176,13 +177,97 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					gruposPerJuridicaAntiguos.add(gruposPersona.get(i).getIdGrupo());
 					gruposPerJuridicaAnterior.add(gruposPersona.get(i).getIdGrupo());
 				}
-				
+				  
 				// 2. Recorremos las etiquetas 
 				for (ComboEtiquetasItem etiqueta : colegiadoItem.getEtiquetas()) {
 //
 					// 2.1. Es una etiqueta de nueva y no existe registro en ninguna tabla
-					if(etiqueta.getIdGrupo() != "") {
+	if(etiqueta.getIdGrupo() == "") {
 						
+						GenRecursosCatalogos genRecursosCatalogos = new GenRecursosCatalogos();
+						
+						genRecursosCatalogos.setCampotabla("NOMBRE");
+						genRecursosCatalogos.setDescripcion(etiqueta.getLabel());
+						genRecursosCatalogos.setIdlenguaje(usuario.getIdlenguaje());
+					
+						String idRecursoBD = genRecursosCatalogosExtendsMapper.getMaxIdRecurso();
+						String idRecurso = String.valueOf(Integer.valueOf(idRecursoBD) + 1);
+						genRecursosCatalogos.setIdrecurso(idRecurso);
+						
+						// Obtenemos el idGrupo de CenGrupoCliente
+						Short idGrupoBD = cenGruposclienteExtendsMapper.getMaxIdGrupo();
+						Short idGrupo = (short) (idGrupoBD + (short) 1);
+					
+						genRecursosCatalogos.setIdrecursoalias("cen_gruposcliente.nombre." + usuario.getIdinstitucion() + "." + idGrupo);
+						genRecursosCatalogos.setUsumodificacion(usuario.getIdusuario());
+						genRecursosCatalogos.setFechamodificacion(new Date());
+						genRecursosCatalogos.setIdinstitucion(usuario.getIdinstitucion());
+						genRecursosCatalogos.setNombretabla("CEN_GRUPOSCLIENTE");
+					
+						int resultGenRecursosCatalogos = genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogos);
+
+						if (resultGenRecursosCatalogos == 1) {
+										
+							LOGGER.warn("updateLegalPerson() / genRecursosCatalogosExtendsMapper.insert() -> Insertada la descripción en genRecursosCatálogos correctamente");
+
+							// Insertamos en CenGruposCliente
+
+							CenGruposcliente cenGruposcli = new CenGruposcliente();
+
+							cenGruposcli.setIdgrupo(idGrupo);
+							cenGruposcli.setFechamodificacion(new Date());
+							cenGruposcli.setIdinstitucion(usuario.getIdinstitucion());
+							cenGruposcli.setNombre(idRecurso);
+							cenGruposcli.setUsumodificacion(usuario.getIdusuario());
+
+							int resultCenGruposCliente = cenGruposclienteExtendsMapper.insert(cenGruposcli);
+							
+
+							if (resultCenGruposCliente == 1) {
+									
+								LOGGER.warn(
+												"updateLegalPerson() / cenGruposclienteMapper.insert() -> Insertado el id correctamente en la tabla CenGruposCliente");
+
+								CenGruposclienteCliente cenGruposclienteCliente = new CenGruposclienteCliente();
+								
+								DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+
+						  
+								Date fechaInicio = df.parse(etiqueta.getFechaInicio());
+							    Date fechaBaja = df.parse(etiqueta.getFechaBaja());
+							    
+								cenGruposclienteCliente.setFechaBaja(fechaBaja);
+								cenGruposclienteCliente.setFechaInicio(fechaInicio);
+								cenGruposclienteCliente.setFechamodificacion(new Date());
+								cenGruposclienteCliente.setIdgrupo(idGrupo);
+								cenGruposclienteCliente.setIdinstitucion(usuario.getIdinstitucion());							
+								cenGruposclienteCliente.setIdinstitucionGrupo(usuario.getIdinstitucion());
+								cenGruposclienteCliente.setIdpersona(Long.valueOf(etiquetaUpdateDTO.getIdPersona()));
+								cenGruposclienteCliente.setUsumodificacion(usuario.getIdusuario());
+					
+								int resultCenGruposClienteClientes = cenGruposclienteClienteExtendsMapper
+													.insert(cenGruposclienteCliente);
+					
+								if (resultCenGruposClienteClientes == 1) {
+									updateResponseDTO.setStatus(SigaConstants.OK);
+									gruposPerJuridicaPosterior.add(String.valueOf(cenGruposcli.getIdgrupo()));
+									LOGGER.warn("updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insert() -> Insertado correctamente en la tabla CenGruposClienteClientes");
+								} else {
+									updateResponseDTO.setStatus(SigaConstants.KO);
+									LOGGER.warn("updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insert() -> No se ha podido insertar en la tabla CenGruposClienteClientes");
+								}
+
+							} else {
+								updateResponseDTO.setStatus(SigaConstants.KO);
+								LOGGER.warn(
+										"updateLegalPerson() / cenGruposclienteMapper.insert() -> No insertado el id correctamente en la tabla CenGruposCliente");
+						     }
+
+						} else {
+							updateResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.warn("updateLegalPerson() / genRecursosCatalogosExtendsMapper.insert() -> No insertada la descripción en genRecursosCatálogos correctamente");
+						}
+	}else {	
 						// Etiqueta para nueva asociación
 						if(!gruposPerJuridicaAntiguos.contains(etiqueta.getIdGrupo())) {
 							
