@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
-import org.itcgae.siga.DTOs.com.ConsultaPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
@@ -193,9 +192,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			
 			if (null != usuarios && usuarios.size() > 0) {
 				
-				try{
-					
-					
+				try{					
 					//Tabla mod_modelocomunicacion
 					ModModelocomunicacion modelo = modModelocomunicacionMapper.selectByPrimaryKey(Long.valueOf(modeloComunicacion.getIdModeloComunicacion()));
 									
@@ -240,7 +237,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						for(ModModeloPlantilladocumento modPlantilla : listaModPlantilla){
 							modPlantilla.setFechamodificacion(new Date());
 							modPlantilla.setIdmodelocomunicacion(modelo.getIdmodelocomunicacion());
-							modPlantilla.setIdplantilladocumento(null);
+							modPlantilla.setFechaasociacion(new Date());
 							modModeloPlantilladocumentoMapper.insert(modPlantilla);
 						}
 					}
@@ -557,6 +554,13 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					
 					if(plantillaDoc.getIdModeloComunicacion() != null){
 						if(plantillaDoc.getPlantillas() != null && plantillaDoc.getPlantillas().size() > 0){
+							Long idInforme = (long) 0;
+							if(plantillaDoc.getIdInforme()!=null && !"".equals(plantillaDoc.getIdInforme())){
+								LOGGER.debug("El informe ya está asociado");
+							}else{
+								idInforme = modModeloPlantillaDocumentoExtendsMapper.selectMaxInforme(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+								idInforme = idInforme + (long)1;
+							}	
 							
 							for(DocumentoPlantillaItem idPlantillaDoc : plantillaDoc.getPlantillas()){
 								
@@ -575,20 +579,22 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 										modModeloPlantillaDoc.setNombreficherosalida(plantillaDoc.getFicheroSalida());
 										modModeloPlantillaDoc.setSufijo(plantillaDoc.getSufijo());
 										modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
-										modModeloPlantillaDoc.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());										
+										modModeloPlantillaDoc.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());		
+										modModeloPlantillaDoc.setIdinforme(idInforme);
 										modModeloPlantilladocumentoMapper.updateByPrimaryKey(modModeloPlantillaDoc);
 									}else{
-										ModModeloPlantilladocumento modModuloPlantillaDoc = new ModModeloPlantilladocumento();
-										modModuloPlantillaDoc.setFechamodificacion(new Date());
-										modModuloPlantillaDoc.setFormatosalida(plantillaDoc.getFormatoSalida());
-										modModuloPlantillaDoc.setNombreficherosalida(plantillaDoc.getFicheroSalida());
-										modModuloPlantillaDoc.setSufijo(plantillaDoc.getSufijo());
-										modModuloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
-										modModuloPlantillaDoc.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
-										modModuloPlantillaDoc.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
-										modModuloPlantillaDoc.setFechaasociacion(new Date());
+										modModeloPlantillaDoc = new ModModeloPlantilladocumento();
+										modModeloPlantillaDoc.setFechamodificacion(new Date());
+										modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getFormatoSalida());
+										modModeloPlantillaDoc.setNombreficherosalida(plantillaDoc.getFicheroSalida());
+										modModeloPlantillaDoc.setSufijo(plantillaDoc.getSufijo());
+										modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
+										modModeloPlantillaDoc.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
+										modModeloPlantillaDoc.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+										modModeloPlantillaDoc.setFechaasociacion(new Date());
+										modModeloPlantillaDoc.setIdinforme(idInforme);
 										
-										modModeloPlantilladocumentoMapper.insert(modModuloPlantillaDoc);
+										modModeloPlantilladocumentoMapper.insert(modModeloPlantillaDoc);
 									}
 								}		
 								
@@ -600,42 +606,6 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						respuesta.setMessage("Error al guardar la plantilla de documento");
 					}
 					
-					
-					/*if(plantillaDoc.getIdPlantillaDocumento() != null){
-						
-						
-						
-						ModModeloPlantilladocumentoKey modModeloPlantillaDocKey = new ModModeloPlantilladocumentoKey();
-						modModeloPlantillaDocKey.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
-						modModeloPlantillaDocKey.setIdplantilladocumento(Long.parseLong(plantillaDoc.getIdPlantillaDocumento()));
-						
-						ModModeloPlantilladocumento modModeloPlantillaDoc = modModeloPlantilladocumentoMapper.selectByPrimaryKey(modModeloPlantillaDocKey);
-						modModeloPlantillaDoc.setFechamodificacion(new Date());
-						modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getFormatoSalida());
-						modModeloPlantillaDoc.setNombreficherosalida(plantillaDoc.getFicheroSalida());
-						modModeloPlantillaDoc.setSufijo(plantillaDoc.getSufijo());
-						modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
-						
-						modModeloPlantilladocumentoMapper.updateByPrimaryKey(modModeloPlantillaDoc);
-					}else{
-						ModPlantilladocumento modPlantillaDoc = new ModPlantilladocumento();
-						modPlantillaDoc.setFechamodificacion(new Date());
-						modPlantillaDoc.setIdioma(plantillaDoc.getIdioma());
-						modPlantillaDoc.setPlantilla(plantillaDoc.getPlantilla());
-						modPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
-						modPlantilladocumentoMapper.insert(modPlantillaDoc);
-						
-						ModModeloPlantilladocumento modModuloPlantillaDoc = new ModModeloPlantilladocumento();
-						modModuloPlantillaDoc.setFechamodificacion(new Date());
-						modModuloPlantillaDoc.setFormatosalida(plantillaDoc.getFormatoSalida());
-						modModuloPlantillaDoc.setNombreficherosalida(plantillaDoc.getFicheroSalida());
-						modModuloPlantillaDoc.setSufijo(plantillaDoc.getSufijo());
-						modModuloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
-						modModuloPlantillaDoc.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
-						modModuloPlantillaDoc.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
-						
-						modModeloPlantilladocumentoMapper.insert(modModuloPlantillaDoc);
-					}*/
 					respuesta.setCode(200);
 					respuesta.setMessage("Datos plantilla de documento guardados correctamente");
 
@@ -971,8 +941,8 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 
 
 	@Override
-	public Error guardarConsultaPlantilla(HttpServletRequest request, ConsultaPlantillaDTO consultaPlantilla) {
-		LOGGER.info("guardarConsultaPlantilla() -> Entrada al servicio para guardar una consulta de la plantilla");
+	public Error guardarConsultasPlantilla(HttpServletRequest request, ConsultasDTO consultasPlantilla) {
+		LOGGER.info("guardarConsultasPlantilla() -> Entrada al servicio para guardar las consultas de la plantilla");
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -987,19 +957,20 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
+				boolean consultasValidas = false;
 				try{		
 					
 					//Obtenemos las consultas asignadas a la plantilla del documento
-					List<ConsultaItem> listaConsultas = modPlantillaDocumentoConsultaExtendsMapper.selectPlantillaDocConsultas(Short.parseShort(consultaPlantilla.getIdInstitucion()),Long.parseLong(consultaPlantilla.getIdModeloComunicacion()),Long.parseLong(consultaPlantilla.getIdPlantillaDocumento()), false);
-					
-					boolean consultaValida = true;
-					int consultaDatos = 0;
-					int consultaDestinatario = 0;
-					int consultaMultidocumento = 0;
-					int consultaCondicion = 0;
-					
-					if(listaConsultas != null && listaConsultas.size() > 0){
-						for(ConsultaItem consultaItem : listaConsultas){
+					// Comprobamos las consultas
+					if(consultasPlantilla != null){						
+						
+						int consultaDatos = 0;
+						int consultaDestinatario = 0;
+						int consultaMultidocumento = 0;
+						int consultaCondicion = 0;
+						
+						List<ConsultaItem> listaItems = consultasPlantilla.getConsultaItem();
+						for(ConsultaItem consultaItem : listaItems){
 							if(Long.parseLong(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo()){
 								consultaDestinatario++;
 							}else if(Long.parseLong(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo()){
@@ -1010,53 +981,51 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 								consultaDatos++;
 							}
 						}
-					}					
-					
-					// Comprobamos el objetivo de la consulta
-					ConConsultaKey consultaKey = new ConConsultaKey();
-					consultaKey.setIdconsulta(Long.parseLong(consultaPlantilla.getIdConsulta()));
-					consultaKey.setIdinstitucion(Short.parseShort(consultaPlantilla.getIdInstitucion()));
-					ConConsulta conConsulta = conConsultaMapper.selectByPrimaryKey(consultaKey);
-					Long objetivo = conConsulta.getIdobjetivo();
-					
-					if(objetivo == SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo() && consultaDestinatario >=1){
-						consultaValida = false;
-					}else if(objetivo == SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo() && consultaMultidocumento >=1){
-						consultaValida = false;
-					}else if(objetivo == SigaConstants.OBJETIVO.CONDICIONAL.getCodigo() && consultaCondicion >=1){
-						consultaValida = false;
+						
+						consultasValidas = true;
+						
+						if(consultaDestinatario != 1){
+							consultasValidas = false;
+						}
+						if(consultaMultidocumento > 1){
+							consultasValidas = false;
+						}
+						if(consultaCondicion !=1){
+							consultasValidas = false;
+						}
 					}
 					
-					if(consultaValida){
-						if(consultaPlantilla.getIdPlantillaConsulta() != null && !"".equalsIgnoreCase(consultaPlantilla.getIdPlantillaConsulta())){
-							ModPlantilladocConsulta consulta = new ModPlantilladocConsulta();
-							
-							consulta = modPlantilladocConsultaMapper.selectByPrimaryKey(Long.parseLong(consultaPlantilla.getIdPlantillaConsulta()));
-						
-							consulta.setUsumodificacion(usuario.getIdusuario());
-							consulta.setFechamodificacion(new Date());
-							consulta.setIdconsulta(Long.parseLong(consultaPlantilla.getIdConsulta()));						
-							
-							modPlantilladocConsultaMapper.updateByPrimaryKey(consulta);
-						}else{
-							ModPlantilladocConsulta consulta = new ModPlantilladocConsulta();
-							consulta.setIdinstitucion(Short.parseShort(consultaPlantilla.getIdInstitucion()));
-							consulta.setIdmodelocomunicacion(Long.parseLong(consultaPlantilla.getIdModeloComunicacion()));
-							consulta.setIdplantilladocumento(Long.parseLong(consultaPlantilla.getIdPlantillaDocumento()));
-							consulta.setFechabaja(null);
-							consulta.setUsumodificacion(usuario.getIdusuario());
-							consulta.setFechamodificacion(new Date());
-							
-							modPlantilladocConsultaMapper.insert(consulta);
+					if(consultasPlantilla != null && consultasValidas){
+						List<ConsultaItem> listaItems = consultasPlantilla.getConsultaItem();
+						for(ConsultaItem consultaItem : listaItems){
+							if(consultaItem.getIdPlantillaConsulta() != null && !"".equalsIgnoreCase(consultaItem.getIdPlantillaConsulta())){
+								ModPlantilladocConsulta consulta = new ModPlantilladocConsulta();								
+								consulta = modPlantilladocConsultaMapper.selectByPrimaryKey(Long.parseLong(consultaItem.getIdPlantillaConsulta()));							
+								consulta.setUsumodificacion(usuario.getIdusuario());
+								consulta.setFechamodificacion(new Date());
+								consulta.setIdconsulta(Long.parseLong(consultaItem.getIdConsulta()));		
+								
+								modPlantilladocConsultaMapper.updateByPrimaryKey(consulta);
+							}else{
+								ModPlantilladocConsulta consulta = new ModPlantilladocConsulta();
+								consulta.setIdinstitucion(Short.parseShort(consultaItem.getIdInstitucion()));
+								consulta.setIdmodelocomunicacion(Long.parseLong(consultaItem.getIdModeloComunicacion()));
+								consulta.setIdplantilladocumento(Long.parseLong(consultaItem.getIdPlantillaDocumento()));
+								consulta.setFechabaja(null);
+								consulta.setUsumodificacion(usuario.getIdusuario());
+								consulta.setFechamodificacion(new Date());
+								
+								modPlantilladocConsultaMapper.insert(consulta);
+							}
 						}
-						
 						respuesta.setCode(200);
-						respuesta.setDescription("Consulta guardada");
+						respuesta.setDescription("Consultas guardadas");
+						
 					}else{
 						respuesta.setCode(500);
-						respuesta.setDescription("Consulta no válida");
-						respuesta.setMessage("Error al guardar la consulta");
-					}
+						respuesta.setDescription("Consultas no válidas");
+						respuesta.setMessage("Error al guardar las consultas");
+					}					
 				}catch(Exception e){
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
@@ -1065,7 +1034,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			}
 		}
 		
-		LOGGER.info("guardarPlantillaModelo() -> Entrada al servicio para guardar una consulta de la plantilla");
+		LOGGER.info("guardarConsultasPlantilla() -> Entrada al servicio para guardar las consultas de la plantilla");
 		return respuesta;
 	}
 

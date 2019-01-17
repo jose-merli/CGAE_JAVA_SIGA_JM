@@ -22,6 +22,10 @@ public class ConsultaItem {
 	private String modulo;
 	private String objetivo;
 	private String claseComunicacion;
+	
+	private String idPlantillaConsulta;
+	private String idModeloComunicacion;
+	private String idPlantillaDocumento;
 
 	private String sentencia;
 
@@ -183,6 +187,30 @@ public class ConsultaItem {
 
 	public void setSentencia(String sentencia) {
 		this.sentencia = sentencia;
+	}
+
+	public String getIdPlantillaConsulta() {
+		return idPlantillaConsulta;
+	}
+
+	public void setIdPlantillaConsulta(String idPlantillaConsulta) {
+		this.idPlantillaConsulta = idPlantillaConsulta;
+	}
+
+	public String getIdModeloComunicacion() {
+		return idModeloComunicacion;
+	}
+
+	public void setIdModeloComunicacion(String idModeloComunicacion) {
+		this.idModeloComunicacion = idModeloComunicacion;
+	}
+
+	public String getIdPlantillaDocumento() {
+		return idPlantillaDocumento;
+	}
+
+	public void setIdPlantillaDocumento(String idPlantillaDocumento) {
+		this.idPlantillaDocumento = idPlantillaDocumento;
 	}
 	
 

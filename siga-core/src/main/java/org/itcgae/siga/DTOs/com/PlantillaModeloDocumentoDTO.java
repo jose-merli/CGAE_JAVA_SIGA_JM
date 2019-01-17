@@ -16,6 +16,7 @@ public class PlantillaModeloDocumentoDTO {
 	private String datos;
 	private Date fechaAsociacion;
 	private String idioma;
+	private String idInforme;
 	
 	private List<PlantillaDocumentoDTO> plantillasDocumentos = new ArrayList<PlantillaDocumentoDTO>();
 	
@@ -90,6 +91,12 @@ public class PlantillaModeloDocumentoDTO {
 	}
 	public void setPlantillasDocumentos(List<PlantillaDocumentoDTO> plantillasDocumentos) {
 		this.plantillasDocumentos = plantillasDocumentos;
+	}
+	public String getIdInforme() {
+		return idInforme;
+	}
+	public void setIdInforme(String idInforme) {
+		this.idInforme = idInforme;
 	}
 	
 	

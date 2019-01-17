@@ -1,10 +1,7 @@
 package org.itcgae.siga.com.services;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.com.ConsultaPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
@@ -43,7 +40,7 @@ public interface IModelosYcomunicacionesService {
 	public PlantillasModeloDTO obtenerPlantillasEnviosModeloSearch(HttpServletRequest request, String idModelo);
 	public PlantillasModeloDTO obtenerPlantillasEnviosModeloSearchHist(HttpServletRequest request, String idModelo);
 	public Error borrarPlantillaEnviosModelo(HttpServletRequest request, PlantillaModeloBorrarDTO[] plantillas);
-	public Error guardarConsultaPlantilla(HttpServletRequest request, ConsultaPlantillaDTO consultaPlantilla);
+	public Error guardarConsultasPlantilla(HttpServletRequest request, ConsultasDTO consultasPlantilla);
 	public PlantillasDocumentosDTO guardarInformes(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request);
 	public ResponseDocumentoDTO guardarPlantillaDocumento(HttpServletRequest request, DocumentoPlantillaItem documento);

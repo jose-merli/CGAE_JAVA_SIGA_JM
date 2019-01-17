@@ -12,6 +12,7 @@ public class ModModeloPlantillaDocumentoExtendsSqlProvider {
 		sql.SELECT("modeloPlantillaDocumento.SUFIJO");
 		sql.SELECT("modeloPlantillaDocumento.FORMATOSALIDA");
 		sql.SELECT("modeloPlantillaDocumento.NOMBREFICHEROSALIDA");
+		sql.SELECT("modeloPlantillaDocumento.IDINFORME");
 		sql.SELECT("LISTAGG(plantillaDocumento.IDIOMA, ',') WITHIN GROUP (ORDER BY plantillaDocumento.IDIOMA) idioma");
 		sql.SELECT("rec.descripcion AS NOMBREFORMATO");
 		sql.SELECT("rec2.descripcion AS NOMBRESUFIJO");
@@ -29,28 +30,14 @@ public class ModModeloPlantillaDocumentoExtendsSqlProvider {
 		return sql.toString();
 	}
 
-	public String selectPlantillasDocumento(String idModelo, String idLenguaje){
-		SQL sql = new SQL();
+	public String selectMaxInforme(Short idInstitucion, Long idModeloComunicacion){
+		SQL sql = new SQL();		
 		
-		sql.SELECT("PLANTILLA.NOMBRE, PLANTILLA.IDTIPOENVIOS,"
-				+ "(SELECT CAT.DESCRIPCION FROM ENV_PLANTILLASENVIOS PLA LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = PLA.NOMBRE WHERE PLA.IDTIPOENVIOS = PLANTILLA.IDTIPOENVIOS AND CAT.IDLENGUAJE = '"+ idLenguaje +"') AS TIPOENVIO");
-		sql.SELECT("PLANTILLA.IDPLANTILLAENVIOS");
-		sql.FROM("MOD_MODELO_PLANTILLAENVIO MODELO");
-		sql.JOIN("ENV_PLANTILLASENVIOS PLANTILLA ON PLANTILLA.IDPLANTILLAENVIOS = MODELO.IDPLANTILLAENVIOS");
-		sql.WHERE("MODELO.IDMODELOCOMUNICACION = '" + idModelo +"' AND MODELO.FECHABAJA IS NULL");
+		sql.SELECT("MAX(modeloPlantillaDocumento.IDINFORME) AS IDINFORME");
 		
-		return sql.toString();
-	}
-	
-	public String selectPlantillasDocumentoHIST(String idModelo, String idLenguaje){
-		SQL sql = new SQL();
+		sql.FROM("MOD_MODELO_PLANTILLADOCUMENTO modeloPlantillaDocumento");	
 		
-		sql.SELECT("PLANTILLA.NOMBRE, PLANTILLA.IDTIPOENVIOS,"
-				+ "(SELECT CAT.DESCRIPCION FROM ENV_PLANTILLASENVIOS PLA LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = PLA.NOMBRE WHERE PLA.IDTIPOENVIOS = PLANTILLA.IDTIPOENVIOS AND CAT.IDLENGUAJE = '"+ idLenguaje +"') AS TIPOENVIO");
-		sql.SELECT("PLANTILLA.IDPLANTILLAENVIOS");
-		sql.FROM("MOD_MODELO_PLANTILLAENVIO MODELO");
-		sql.JOIN("ENV_PLANTILLASENVIOS PLANTILLA ON PLANTILLA.IDPLANTILLAENVIOS = MODELO.IDPLANTILLAENVIOS");
-		sql.WHERE("MODELO.IDMODELOCOMUNICACION = '" + idModelo +"'");
+		sql.WHERE("modeloPlantillaDocumento.IDMODELOCOMUNICACION = " + idModeloComunicacion);
 		
 		return sql.toString();
 	}

@@ -20,9 +20,12 @@ public interface ModModeloPlantillaDocumentoExtendsMapper {
 		@Result(column = "NOMBREFICHEROSALIDA", property = "nombreFicheroSalida", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRESUFIJO", property = "sufijo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREFORMATO", property = "formatoSalida", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHAASOCIACION", property = "fechaAsociacion", jdbcType = JdbcType.DATE)
+		@Result(column = "FECHAASOCIACION", property = "fechaAsociacion", jdbcType = JdbcType.DATE),
+		@Result(column = "IDINFORME", property = "idInforme", jdbcType = JdbcType.VARCHAR)
 	})
 	List<PlantillaModeloDocumentoDTO> selectInformes(Short idInstitucion, Long idModeloComunicacion, String idLenguaje);
 
+	@SelectProvider(type = ModModeloPlantillaDocumentoExtendsSqlProvider.class, method = "selectMaxInforme")
+	Long selectMaxInforme(Short idInstitucion, Long idModeloComunicacion);
 	
 }

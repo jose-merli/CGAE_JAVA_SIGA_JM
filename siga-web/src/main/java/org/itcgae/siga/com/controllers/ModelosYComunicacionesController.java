@@ -2,7 +2,6 @@ package org.itcgae.siga.com.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.com.ConsultaPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
@@ -157,9 +156,9 @@ public class ModelosYComunicacionesController {
 	}
 	
 	@RequestMapping(value = "/plantilla/consultas/guardar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> guardarConsultas(HttpServletRequest request, @RequestBody ConsultaPlantillaDTO consultaPlantilla) {
+	ResponseEntity<Error> guardarConsultas(HttpServletRequest request, @RequestBody ConsultasDTO consultasPlantilla) {
 		
-		Error response = _modelosYcomunicacionesService.guardarConsultaPlantilla(request, consultaPlantilla);
+		Error response = _modelosYcomunicacionesService.guardarConsultasPlantilla(request, consultasPlantilla);
 		return new ResponseEntity<Error>(response, HttpStatus.OK);
 	}
 	
