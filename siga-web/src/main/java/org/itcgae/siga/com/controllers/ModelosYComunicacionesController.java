@@ -195,8 +195,8 @@ public class ModelosYComunicacionesController {
 
 	}
 
-	@RequestMapping(value = "/detalle/borrarPlantilla",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> borrarPlantilla(HttpServletRequest request, @RequestBody PlantillaModeloBorrarDTO[] plantillas) {
+	@RequestMapping(value = "/detalle/borrarPlantillaEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> borrarPlantillaEnvio(HttpServletRequest request, @RequestBody PlantillaModeloBorrarDTO[] plantillas) {
 
 		Error response = _modelosYcomunicacionesService.borrarPlantillaEnviosModelo(request, plantillas);
 		if(response.getCode() == 200)
@@ -205,10 +205,10 @@ public class ModelosYComunicacionesController {
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/detalle/guardarPlantilla",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> guardarPlantilla(HttpServletRequest request, @RequestBody String idModeloComunicacion, @RequestBody String idPlantillaEnvios) {
+	@RequestMapping(value = "/detalle/guardarPlantillaEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardarPlantillaEnvio(HttpServletRequest request, @RequestBody PlantillaModeloBorrarDTO plantilla) {
 
-		Error response = _modelosYcomunicacionesService.guardarPlantillaEnviosModelo(request, idModeloComunicacion, idPlantillaEnvios);
+		Error response = _modelosYcomunicacionesService.guardarPlantillaEnviosModelo(request, plantilla);
 		if(response.getCode() == 200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else

@@ -422,6 +422,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						}
 						_conConsultaMapper.insert(consulta);
 						respuesta.setMessage(consulta.getIdconsulta().toString());
+						respuesta.setDescription(consulta.getSentencia());
 						respuesta.setCode(200);
 					}else{
 						ConConsultaKey key = new ConConsultaKey();
@@ -476,7 +477,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 					
 				}catch (Exception e) {
 					respuesta.setCode(500);
-					respuesta.setMessage("Error al guardar consulta");
+					respuesta.setMessage("Error al guardar datos generales");
 					respuesta.setDescription(e.getMessage());
 					e.printStackTrace();
 				}
@@ -645,7 +646,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 					respuesta.setMessage("Consulta ejecutada");
 				}catch (Exception e) {
 					respuesta.setCode(500);
-					respuesta.setMessage("Error al guardar consulta");
+					respuesta.setMessage("Error al ejecutar consulta");
 					respuesta.setDescription(e.getMessage());
 					e.printStackTrace();
 				}

@@ -9,6 +9,7 @@ public class PlantillaModeloItem {
 	private String idTipoEnvios;
 	private String tipoEnvio;
 	private Date fechaBaja;
+	private String porDefecto;
 	
 	
 	public Date getFechaBaja() {
@@ -16,6 +17,12 @@ public class PlantillaModeloItem {
 	}
 	public void setFechaBaja(Date fechaBaja) {
 		this.fechaBaja = fechaBaja;
+	}
+	public String getPorDefecto() {
+		return porDefecto;
+	}
+	public void setPorDefecto(String porDefecto) {
+		this.porDefecto = porDefecto;
 	}
 	public String getIdTipoEnvios() {
 		return idTipoEnvios;

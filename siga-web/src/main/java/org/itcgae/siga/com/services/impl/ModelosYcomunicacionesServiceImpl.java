@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
-import org.itcgae.siga.DTOs.com.ConsultasSearch;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
@@ -55,7 +54,6 @@ import org.itcgae.siga.db.services.com.mappers.ModModeloPlantillaEnvioExtendsMap
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocFormatoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocSufijoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
-import org.itcgae.siga.db.services.com.providers.ModModeloPlantillaDocumentoExtendsSqlProvider;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -171,7 +169,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			if (null != usuarios && usuarios.size() > 0) {
 				
 				try{
-					AdmUsuarios usuario = usuarios.get(0);
+					
 					
 					//Tabla mod_modelocomunicacion
 					ModModelocomunicacion modelo = modModelocomunicacionMapper.selectByPrimaryKey(Long.valueOf(modeloComunicacion.getIdModeloComunicacion()));
@@ -285,7 +283,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			if (null != usuarios && usuarios.size() > 0) {
 				
 				try{
-					AdmUsuarios usuario = usuarios.get(0);				
+						
 					
 					for(ModelosComunicacionItem modeloCom : modeloComunicacion){
 						//Tabla mod_modelocomunicacion
@@ -866,7 +864,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	}
 
 	@Override
-	public Error guardarPlantillaEnviosModelo(HttpServletRequest request, String idModelo, String idPlantillaEnvios) {
+	public Error guardarPlantillaEnviosModelo(HttpServletRequest request, PlantillaModeloBorrarDTO datosPlantilla) {
 		LOGGER.info("guardarPlantillaModelo() -> Entrada al servicio para guardar la plantilla del modelo");
 		
 		// Conseguimos información del usuario logeado
@@ -884,8 +882,8 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
 					ModModeloPlantillaenvio plantilla = new ModModeloPlantillaenvio();
-					plantilla.setIdmodelocomunicacion(Long.valueOf(idModelo));
-					plantilla.setIdplantillaenvios(Short.valueOf(idPlantillaEnvios));
+					plantilla.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
+					plantilla.setIdplantillaenvios(Short.valueOf(datosPlantilla.getIdPlantillaEnvios()));
 					plantilla.setUsumodificacion(usuario.getIdusuario());
 					plantilla.setFechamodificacion(new Date());
 					modModeloPlantillaenvioMapper.insert(plantilla);
