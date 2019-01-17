@@ -21,8 +21,9 @@ public interface ModModeloPlantillaEnvioExtendsMapper {
 		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PORDEFECTO", property = "porDefecto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
 	})
-	List<PlantillaModeloItem> getPlantillasModelo(String idModelo, String idLenguaje);
+	List<PlantillaModeloItem> getPlantillasModelo(String idModelo, Short idInstitucion, String idLenguaje);
 	
 	@SelectProvider(type = ModModeloPlantillaEnviosExtendsSqlProvider.class, method = "selectPlantillasModeloHIST")
 	@Results({@Result(column = "NOMBRE", property = "nombrePlantilla", jdbcType = JdbcType.VARCHAR),
@@ -30,6 +31,7 @@ public interface ModModeloPlantillaEnvioExtendsMapper {
 		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PORDEFECTO", property = "porDefecto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
 	})
-	List<PlantillaModeloItem> getPlantillasModeloHist(String idModelo, String idLenguaje);
+	List<PlantillaModeloItem> getPlantillasModeloHist(String idModelo, Short idInstitucion, String idLenguaje);
 }

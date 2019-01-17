@@ -196,6 +196,8 @@ public class EnviosMasivosController {
 		Error response = _enviosMasivosService.borrarDocumento(request, documento);
 		if(response.getCode() == 200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else if (response.getCode() == 400)
+			return new ResponseEntity<Error>(response, HttpStatus.BAD_REQUEST);
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}

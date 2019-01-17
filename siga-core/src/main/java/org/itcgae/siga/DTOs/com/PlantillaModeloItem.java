@@ -1,13 +1,29 @@
 package org.itcgae.siga.DTOs.com;
 
+import java.util.Date;
+
 public class PlantillaModeloItem {
 	
 	private String idPlantillaEnvios;
 	private String nombrePlantilla;
 	private String idTipoEnvios;
 	private String tipoEnvio;
+	private Date fechaBaja;
+	private String porDefecto;
 	
 	
+	public Date getFechaBaja() {
+		return fechaBaja;
+	}
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+	public String getPorDefecto() {
+		return porDefecto;
+	}
+	public void setPorDefecto(String porDefecto) {
+		this.porDefecto = porDefecto;
+	}
 	public String getIdTipoEnvios() {
 		return idTipoEnvios;
 	}

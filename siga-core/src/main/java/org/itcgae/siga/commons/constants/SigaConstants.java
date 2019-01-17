@@ -23,6 +23,8 @@ public class SigaConstants {
 	
 	public static String SUFIJO_MODULO_COM_DUPLICADO = "_Copia";
 	public static int NOMBRE_MAXLENGTH = 100;
+	public static String rutaficherosInformesYcomunicaciones = "/FILERMSA1000/SIGA/ficheros/archivo/";
+	public static String carpetaDocumentosEnvio = "/documentosEnvio/";
 	
 	
 	public enum ERROR_SERVER {
