@@ -20,6 +20,10 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.entities.CenDatoscvExample;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
+import org.itcgae.siga.db.entities.CenTiposcvsubtipo1;
+import org.itcgae.siga.db.entities.CenTiposcvsubtipo1Example;
+import org.itcgae.siga.db.entities.CenTiposcvsubtipo2;
+import org.itcgae.siga.db.entities.CenTiposcvsubtipo2Example;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
@@ -27,11 +31,14 @@ import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudmodificacioncvExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenTiposCVSubtipo1ExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenTiposCVSubtipo2ExtendsMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -59,6 +66,13 @@ public class FichaDatosCurricularesServiceTest {
 	@Mock
 	private CenDatoscvExtendsMapper cenDatoscvExtendsMapper;
 
+	@Mock
+	private CenTiposCVSubtipo1ExtendsMapper cenTiposCVSubtipo1ExtendsMapper;
+
+	@Mock
+	private CenTiposCVSubtipo2ExtendsMapper cenTiposCVSubtipo2ExtendsMapper;
+
+	
 	@InjectMocks
 	private FichaDatosCurricularesServiceImpl fichaDatosCurricularesServiceImpl;
 	
@@ -88,65 +102,64 @@ public class FichaDatosCurricularesServiceTest {
 
 	@Test
 	public void deleteDatosCurricularesTest() throws Exception {
-//		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
-//		List<FichaDatosCurricularesItem> fichaDatosCurricularesItem = testUtils.getListaFichaDatosCurricularesItem();
-//		FichaDatosCurricularesItem fichaCurricularesItem = testUtils.getFichaDatosCurricularesItem();
-//		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados("1");
-//
-//		//		Mockeo de las llamadas a BD
-//		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
-//		
-//		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString(), Mockito.anyBoolean() , Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
-//		
-//		when(cenDatoscvExtendsMapper.updateCurriculo(Mockito.any(CenDatoscv.class))).thenReturn(1);
-//
-//		//	 	Ejecución del método a testear
-//		UpdateResponseDTO response = fichaDatosCurricularesServiceImpl.deleteDatosCurriculares(fichaCurricularesItem, mockreq);
-//		
-//		UpdateResponseDTO responseEsperado = new UpdateResponseDTO();
-//		responseEsperado.setStatus(SigaConstants.OK);
-//		
-//		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
+		FichaDatosCurricularesDTO fichaDatosCurricularesDTO = testUtils.getFichaDatosCurricularesDTO();
+		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados("1");
+
+		//		Mockeo de las llamadas a BD
+		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
+		
+		//when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString(), Mockito.anyBoolean() , Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
+		
+		when(cenDatoscvExtendsMapper.updateCurriculo(Mockito.any(CenDatoscv.class))).thenReturn(1);
+
+		//	 	Ejecución del método a testear
+		UpdateResponseDTO response = fichaDatosCurricularesServiceImpl.deleteDatosCurriculares(fichaDatosCurricularesDTO, mockreq);
+		
+		UpdateResponseDTO responseEsperado = new UpdateResponseDTO();
+		responseEsperado.setStatus(SigaConstants.OK);
+		
+		assertThat(response.getStatus()).isEqualTo(responseEsperado.getStatus()); //Comparar resultado esperado con resultado que trae el TEST
 	}
 	
 	@Test
 	public void deleteDatosCurricularesErrorTest() throws Exception {
-//		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
-//		List<FichaDatosCurricularesItem> fichaDatosCurricularesItem = testUtils.getListaFichaDatosCurricularesItem();
-//		FichaDatosCurricularesItem fichaCurricularesItem = testUtils.getFichaDatosCurricularesItem();
-//		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados("1");
-//
-//		//		Mockeo de las llamadas a BD
-//		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
-//		
-//		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString(), Mockito.anyBoolean() , Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
-//		
-//		when(cenDatoscvExtendsMapper.updateCurriculo(Mockito.any(CenDatoscv.class))).thenReturn(0);
-//
-//		//	 	Ejecución del método a testear
-//		UpdateResponseDTO response = fichaDatosCurricularesServiceImpl.deleteDatosCurriculares(fichaCurricularesItem, mockreq);
-//		
-//		UpdateResponseDTO responseEsperado = new UpdateResponseDTO();
-//		responseEsperado.setStatus(SigaConstants.KO);
-//		
-//		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
+		List<FichaDatosCurricularesItem> fichaDatosCurricularesItem = testUtils.getListaFichaDatosCurricularesItem();
+		FichaDatosCurricularesDTO fichaDatosCurricularesDTO = testUtils.getFichaDatosCurricularesDTO();
+		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados("1");
+		
+		//		Mockeo de las llamadas a BD
+		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
+		
+		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString(), Mockito.anyBoolean() , Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
+		
+		when(cenDatoscvExtendsMapper.updateCurriculo(Mockito.any(CenDatoscv.class))).thenReturn(0);
+
+		//	 	Ejecución del método a testear
+		UpdateResponseDTO response = fichaDatosCurricularesServiceImpl.deleteDatosCurriculares(fichaDatosCurricularesDTO, mockreq);
+		
+		UpdateResponseDTO responseEsperado = new UpdateResponseDTO();
+		responseEsperado.setStatus(SigaConstants.KO);
+		
+		assertThat(response.getStatus()).isEqualTo(responseEsperado.getStatus()); //Comparar resultado esperado con resultado que trae el TEST
 	}
 
 	@Test
 	public void deleteDatosCurriculareNoUserTest() throws Exception {
-//		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
-//		FichaDatosCurricularesItem fichaCurricularesItem = testUtils.getFichaDatosCurricularesItem();
-//
-//		//		Mockeo de las llamadas a BD
-//		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(null);
-//
-//		//	 	Ejecución del método a testear
-//		UpdateResponseDTO response = fichaDatosCurricularesServiceImpl.deleteDatosCurriculares(fichaCurricularesItem, mockreq);
-//		
-//		UpdateResponseDTO responseEsperado = new UpdateResponseDTO();
-//		responseEsperado.setStatus(SigaConstants.KO);
-//		
-//		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
+		FichaDatosCurricularesDTO fichaDatosCurricularesDTO = testUtils.getFichaDatosCurricularesDTO();
+
+		//		Mockeo de las llamadas a BD
+		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(null);
+
+		//	 	Ejecución del método a testear
+		UpdateResponseDTO response = fichaDatosCurricularesServiceImpl.deleteDatosCurriculares(fichaDatosCurricularesDTO, mockreq);
+		
+		UpdateResponseDTO responseEsperado = new UpdateResponseDTO();
+		responseEsperado.setStatus(SigaConstants.KO);
+		
+		assertThat(response.getStatus()).isEqualTo(responseEsperado.getStatus()); //Comparar resultado esperado con resultado que trae el TEST
 	}
 	
 	@Test
@@ -175,7 +188,7 @@ public class FichaDatosCurricularesServiceTest {
 		UpdateResponseDTO responseEsperado = new UpdateResponseDTO();
 		responseEsperado.setStatus(SigaConstants.OK);
 		
-		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+		assertThat(response.getStatus()).isEqualTo(responseEsperado.getStatus()); //Comparar resultado esperado con resultado que trae el TEST
 	}
 	
 	
@@ -201,7 +214,7 @@ public class FichaDatosCurricularesServiceTest {
 		UpdateResponseDTO responseEsperado = new UpdateResponseDTO();
 		responseEsperado.setStatus(SigaConstants.KO);
 		
-		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+		assertThat(response.getStatus()).isEqualTo(responseEsperado.getStatus()); //Comparar resultado esperado con resultado que trae el TEST
 	}
 	
 	
@@ -219,7 +232,7 @@ public class FichaDatosCurricularesServiceTest {
 		UpdateResponseDTO responseEsperado = new UpdateResponseDTO();
 		responseEsperado.setStatus(SigaConstants.KO);
 		
-		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+		assertThat(response.getStatus()).isEqualTo(responseEsperado.getStatus()); //Comparar resultado esperado con resultado que trae el TEST
 	}
 	
 	
@@ -244,23 +257,30 @@ public class FichaDatosCurricularesServiceTest {
 		InsertResponseDTO responseEsperado = new InsertResponseDTO();
 		responseEsperado.setStatus(SigaConstants.OK);
 		
-		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+		assertThat(response.getStatus()).isEqualTo(responseEsperado.getStatus()); //Comparar resultado esperado con resultado que trae el TEST
 	}
 	
 	@Test
 	public void insertDatosCurricularesErrorTest() throws Exception {
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
-		List<FichaDatosCurricularesItem> fichaDatosCurricularesItem = testUtils.getListaFichaDatosCurricularesItem();
 		FichaDatosCurricularesItem fichaCurricularesItem = testUtils.getFichaDatosCurricularesItem();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados("1");
-		List<CenDatoscv> datosCurricularesActivos = cenTestUtils.getListCenDatoscv();
-		
+		List<CenTiposcvsubtipo1> cenSubtipo = cenTestUtils.getListCenTiposcvsubtipo1Simulado();
+		List<CenTiposcvsubtipo2> cenSubtipo2 = cenTestUtils.getListCenTiposcvsubtipo2Simulado();
+		NewIdDTO idCvBD = cenTestUtils.getNewIdDTOSimulado();
+			
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
-		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString() , Mockito.anyBoolean(), Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
+		when(cenTiposCVSubtipo1ExtendsMapper.selectByExample(Mockito.any(CenTiposcvsubtipo1Example.class))).thenReturn(cenSubtipo);
+		when(cenTiposCVSubtipo1ExtendsMapper.selectByExample(Mockito.any(CenTiposcvsubtipo1Example.class))).thenReturn(cenSubtipo);
+		when(cenTiposCVSubtipo2ExtendsMapper.selectByExample(Mockito.any(CenTiposcvsubtipo2Example.class))).thenReturn(cenSubtipo2);
+		when(cenTiposCVSubtipo2ExtendsMapper.selectByExample(Mockito.any(CenTiposcvsubtipo2Example.class))).thenReturn(cenSubtipo2);
+		when(cenDatoscvExtendsMapper.getMaxIdCv(Mockito.anyString(), Mockito.anyString())).thenReturn(idCvBD);
 		when(cenDatoscvExtendsMapper.insertSelective(Mockito.any(CenDatoscv.class))).thenReturn(0);
-		when(cenDatoscvExtendsMapper.selectByExample(Mockito.any(CenDatoscvExample.class))).thenReturn(datosCurricularesActivos);
-		when(cenDatoscvExtendsMapper.updateByPrimaryKey(Mockito.any(CenDatoscv.class))).thenReturn(1);
+
+//		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString() , Mockito.anyBoolean(), Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
+//		when(cenDatoscvExtendsMapper.selectByExample(Mockito.any(CenDatoscvExample.class))).thenReturn(datosCurricularesActivos);
+//		when(cenDatoscvExtendsMapper.updateByPrimaryKey(Mockito.any(CenDatoscv.class))).thenReturn(1);
 
 		//	 	Ejecución del método a testear
 		InsertResponseDTO response = fichaDatosCurricularesServiceImpl.insertDatosCurriculares(fichaCurricularesItem, mockreq);
@@ -268,7 +288,7 @@ public class FichaDatosCurricularesServiceTest {
 		InsertResponseDTO responseEsperado = new InsertResponseDTO();
 		responseEsperado.setStatus(SigaConstants.KO);
 		
-		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+		assertThat(response.getStatus()).isEqualTo(responseEsperado.getStatus()); //Comparar resultado esperado con resultado que trae el TEST
 	}
 	
 	@Test
@@ -312,7 +332,7 @@ public class FichaDatosCurricularesServiceTest {
 		UpdateResponseDTO responseEsperado = new UpdateResponseDTO();
 		responseEsperado.setStatus(SigaConstants.OK);
 		
-		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+		assertThat(response.getStatus()).isEqualTo(responseEsperado.getStatus()); //Comparar resultado esperado con resultado que trae el TEST
 	}
 	
 	@Test
@@ -338,7 +358,7 @@ public class FichaDatosCurricularesServiceTest {
 		UpdateResponseDTO responseEsperado = new UpdateResponseDTO();
 		responseEsperado.setStatus(SigaConstants.KO);
 		
-		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+		assertThat(response.getStatus()).isEqualTo(responseEsperado.getStatus()); //Comparar resultado esperado con resultado que trae el TEST
 	}
 	
 	@Test
@@ -354,7 +374,7 @@ public class FichaDatosCurricularesServiceTest {
 		UpdateResponseDTO responseEsperado = new UpdateResponseDTO();
 		responseEsperado.setStatus(SigaConstants.KO);
 		
-		assertThat(response).isEqualTo(responseEsperado); //Comparar resultado esperado con resultado que trae el TEST
+		assertThat(response.getStatus()).isEqualTo(responseEsperado.getStatus()); //Comparar resultado esperado con resultado que trae el TEST
 	}
 	
 	

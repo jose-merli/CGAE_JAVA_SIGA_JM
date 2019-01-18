@@ -22,5 +22,5 @@ public interface ISolicitudModificacionService {
 			HttpServletRequest request);
 	public UpdateResponseDTO denyGeneralModificationRequest(ArrayList<SolModificacionItem> solModificacionDTO,
 			HttpServletRequest request);
-	public StringDTO verifyPerson(HttpServletRequest request); 
+	public StringDTO verifyPerson(StringDTO nifCif, HttpServletRequest request); 
 }
