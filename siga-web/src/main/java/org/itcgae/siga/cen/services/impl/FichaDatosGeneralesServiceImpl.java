@@ -105,8 +105,8 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	@Autowired
 	private  CenSolicitmodifdatosbasicosExtendsMapper  cenSolicitmodifdatosbasicosMapper;
 
-	@Autowired
-	private CenDatoscolegialesestadoExtendsMapper cenDatoscolegialesestadoMapper;
+//	@Autowired
+//	private CenDatoscolegialesestadoExtendsMapper cenDatoscolegialesestadoMapper;
 
 	@Autowired
 	private CenGruposclienteExtendsMapper cenGruposclienteExtendsMapper;
@@ -138,7 +138,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		LOGGER.info(
 				"updateColegiado() -> Entrada al servicio para actualizar información general de un colegiado");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-		List<CenDatoscolegialesestado> cenDatoscolegialesestado = new ArrayList<CenDatoscolegialesestado>();
+//		List<CenDatoscolegialesestado> cenDatoscolegialesestado = new ArrayList<CenDatoscolegialesestado>();
 		List<ComboEtiquetasItem> gruposPersona = new ArrayList<ComboEtiquetasItem>();
 		EtiquetaUpdateDTO etiquetaUpdateDTO = new EtiquetaUpdateDTO();
 		
@@ -472,27 +472,27 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 									cenColegiadoMapper.updateByExampleSelective(cenColegiado, cenColegiadoExample);
 								}
 					
-						//	4. Actualiza la tabla CEN_DATOSCOLEGIALESESTADO
-					
-					CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new CenDatoscolegialesestadoExample();
-					cenDatoscolegialesestadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
-					cenDatoscolegialesestadoExample.setOrderByClause("FECHAESTADO DESC");
-							// Buscamos por idPersona para ver si el estado es diferente 
-					
-					cenDatoscolegialesestado = cenDatoscolegialesestadoMapper.selectByExample(cenDatoscolegialesestadoExample);
-					
-					if(cenDatoscolegialesestado != null && cenDatoscolegialesestado.size()>0) {
-						if (!cenDatoscolegialesestado.get(0).getIdestado().equals(Short.valueOf(colegiadoItem.getSituacion()))) {
-							CenDatoscolegialesestado cenEstadoColegial = new CenDatoscolegialesestado();
-							cenEstadoColegial.setIdestado(Short.parseShort(colegiadoItem.getSituacion()));
-							cenEstadoColegial.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
-							cenEstadoColegial.setIdinstitucion(Short.parseShort(colegiadoItem.getIdInstitucion()));
-							cenEstadoColegial.setFechamodificacion(new Date());
-							cenEstadoColegial.setUsumodificacion(usuario.getIdusuario());
-							cenEstadoColegial.setFechaestado(new Date());
-							cenDatoscolegialesestadoMapper.insertSelective(cenEstadoColegial);
-						}
-					}
+//						//	4. Actualiza la tabla CEN_DATOSCOLEGIALESESTADO
+//					
+//					CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new CenDatoscolegialesestadoExample();
+//					cenDatoscolegialesestadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
+//					cenDatoscolegialesestadoExample.setOrderByClause("FECHAESTADO DESC");
+//							// Buscamos por idPersona para ver si el estado es diferente 
+//					
+//					cenDatoscolegialesestado = cenDatoscolegialesestadoMapper.selectByExample(cenDatoscolegialesestadoExample);
+//					
+//					if(cenDatoscolegialesestado != null && cenDatoscolegialesestado.size()>0) {
+//						if (!cenDatoscolegialesestado.get(0).getIdestado().equals(Short.valueOf(colegiadoItem.getSituacion()))) {
+//							CenDatoscolegialesestado cenEstadoColegial = new CenDatoscolegialesestado();
+//							cenEstadoColegial.setIdestado(Short.parseShort(colegiadoItem.getSituacion()));
+//							cenEstadoColegial.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+//							cenEstadoColegial.setIdinstitucion(Short.parseShort(colegiadoItem.getIdInstitucion()));
+//							cenEstadoColegial.setFechamodificacion(new Date());
+//							cenEstadoColegial.setUsumodificacion(usuario.getIdusuario());
+//							cenEstadoColegial.setFechaestado(new Date());
+//							cenDatoscolegialesestadoMapper.insertSelective(cenEstadoColegial);
+//						}
+//					}
 					if(!updateResponseDTO.getStatus().equals(SigaConstants.KO)) {
 						updateResponseDTO.setStatus(SigaConstants.OK);
 					}

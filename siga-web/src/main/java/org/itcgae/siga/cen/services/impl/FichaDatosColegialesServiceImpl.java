@@ -17,8 +17,11 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
+import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenDatoscolegialesestadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposseguroExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -41,6 +44,11 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 	@Autowired 
 	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+	
+	@Autowired
+	private CenDatoscolegialesestadoExtendsMapper cenDatoscolegialesestadoMapper;
+
+	
 	@Override
 	public ComboDTO getSocietyTypes(HttpServletRequest request) {
 		// TODO Auto-generated method stub
@@ -189,6 +197,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		LOGGER.info("datosColegialesSearch() -> Entrada al servicio para la búsqueda por filtros de direcciones");
 
 		UpdateResponseDTO response = new UpdateResponseDTO();
+		List<CenDatoscolegialesestado> cenDatoscolegialesestado = new ArrayList<CenDatoscolegialesestado>();
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -244,6 +253,28 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				}else {
 					response.setStatus(SigaConstants.KO);
 				}
+				//	4. Actualiza la tabla CEN_DATOSCOLEGIALESESTADO
+				
+				CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new CenDatoscolegialesestadoExample();
+				cenDatoscolegialesestadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
+				cenDatoscolegialesestadoExample.setOrderByClause("FECHAESTADO DESC");
+						// Buscamos por idPersona para ver si el estado es diferente 
+				
+				cenDatoscolegialesestado = cenDatoscolegialesestadoMapper.selectByExample(cenDatoscolegialesestadoExample);
+				
+				if(cenDatoscolegialesestado != null && cenDatoscolegialesestado.size()>0) {
+					if (!cenDatoscolegialesestado.get(0).getIdestado().equals(Short.valueOf(colegiadoItem.getSituacion()))) {
+						CenDatoscolegialesestado cenEstadoColegial = new CenDatoscolegialesestado();
+						cenEstadoColegial.setIdestado(Short.parseShort(colegiadoItem.getSituacion()));
+						cenEstadoColegial.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+						cenEstadoColegial.setIdinstitucion(Short.parseShort(colegiadoItem.getIdInstitucion()));
+						cenEstadoColegial.setFechamodificacion(new Date());
+						cenEstadoColegial.setUsumodificacion(usuario.getIdusuario());
+						cenEstadoColegial.setFechaestado(new Date());
+						cenDatoscolegialesestadoMapper.insertSelective(cenEstadoColegial);
+					}
+				}
+				
 			} else {
 				LOGGER.warn(
 						"datosColegialesUpdate() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
