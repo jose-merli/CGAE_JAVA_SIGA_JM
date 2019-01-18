@@ -156,9 +156,9 @@ public class ModelosYComunicacionesController {
 	}
 	
 	@RequestMapping(value = "/plantilla/consultas/guardar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> guardarConsultas(HttpServletRequest request, @RequestBody ConsultasDTO consultasPlantilla) {
+	ResponseEntity<Error> guardarConsultas(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		
-		Error response = _modelosYcomunicacionesService.guardarConsultasPlantilla(request, consultasPlantilla);
+		Error response = _modelosYcomunicacionesService.guardarConsultasPlantilla(request, plantillaDoc);
 		return new ResponseEntity<Error>(response, HttpStatus.OK);
 	}
 	

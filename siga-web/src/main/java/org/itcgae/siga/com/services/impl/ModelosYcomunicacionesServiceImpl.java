@@ -955,7 +955,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 
 
 	@Override
-	public Error guardarConsultasPlantilla(HttpServletRequest request, ConsultasDTO consultasPlantilla) {
+	public Error guardarConsultasPlantilla(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		LOGGER.info("guardarConsultasPlantilla() -> Entrada al servicio para guardar las consultas de la plantilla");
 		
 		// Conseguimos información del usuario logeado
@@ -976,14 +976,14 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					
 					//Obtenemos las consultas asignadas a la plantilla del documento
 					// Comprobamos las consultas
-					if(consultasPlantilla != null){						
+					List<ConsultaItem> listaItems = plantillaDoc.getConsultas();
+					if(listaItems != null){						
 						
 						int consultaDatos = 0;
 						int consultaDestinatario = 0;
 						int consultaMultidocumento = 0;
 						int consultaCondicion = 0;
-						
-						List<ConsultaItem> listaItems = consultasPlantilla.getConsultaItem();
+
 						for(ConsultaItem consultaItem : listaItems){
 							if(Long.parseLong(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo()){
 								consultaDestinatario++;
@@ -1009,29 +1009,44 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						}
 					}
 					
-					if(consultasPlantilla != null && consultasValidas){
-						List<ConsultaItem> listaItems = consultasPlantilla.getConsultaItem();
-						for(ConsultaItem consultaItem : listaItems){
-							if(consultaItem.getIdPlantillaConsulta() != null && !"".equalsIgnoreCase(consultaItem.getIdPlantillaConsulta())){
-								ModPlantilladocConsulta consulta = new ModPlantilladocConsulta();								
-								consulta = modPlantilladocConsultaMapper.selectByPrimaryKey(Long.parseLong(consultaItem.getIdPlantillaConsulta()));							
-								consulta.setUsumodificacion(usuario.getIdusuario());
-								consulta.setFechamodificacion(new Date());
-								consulta.setIdconsulta(Long.parseLong(consultaItem.getIdConsulta()));		
+					if(listaItems != null && consultasValidas && plantillaDoc.getIdInforme() != null){
+						// Por cada plantilla asociada hay que guardar sus consultas
+						ModModeloPlantilladocumentoExample modModeloPlantillaExample = new ModModeloPlantilladocumentoExample();
+						modModeloPlantillaExample.createCriteria().andIdinformeEqualTo(Long.parseLong(plantillaDoc.getIdInforme()));
+						List<ModModeloPlantilladocumento> listaPlantillaDoc = modModeloPlantilladocumentoMapper.selectByExample(modModeloPlantillaExample);
+						
+						for(ModModeloPlantilladocumento modPlantilla : listaPlantillaDoc){
+							for(ConsultaItem consultaItem : listaItems){								
+								// Comprobamos si la consulta ya está asignada a la plantilla
+								ModPlantilladocConsultaExample consultaPlantillaExample = new ModPlantilladocConsultaExample();
+								consultaPlantillaExample.createCriteria().andIdconsultaEqualTo(Long.parseLong(consultaItem.getIdConsultaAnterior())).andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion()))
+													.andIdinstitucionEqualTo(Short.parseShort(plantillaDoc.getIdInstitucion())).andIdplantilladocumentoEqualTo(modPlantilla.getIdplantilladocumento());
 								
-								modPlantilladocConsultaMapper.updateByPrimaryKey(consulta);
-							}else{
-								ModPlantilladocConsulta consulta = new ModPlantilladocConsulta();
-								consulta.setIdinstitucion(Short.parseShort(consultaItem.getIdInstitucion()));
-								consulta.setIdmodelocomunicacion(Long.parseLong(consultaItem.getIdModeloComunicacion()));
-								consulta.setIdplantilladocumento(Long.parseLong(consultaItem.getIdPlantillaDocumento()));
-								consulta.setFechabaja(null);
-								consulta.setUsumodificacion(usuario.getIdusuario());
-								consulta.setFechamodificacion(new Date());
+								List<ModPlantilladocConsulta> listaPlantillaModificar = modPlantilladocConsultaMapper.selectByExample(consultaPlantillaExample);
+								ModPlantilladocConsulta consultaPlantillaModificar = null;
+								if(listaPlantillaModificar != null && listaPlantillaModificar.size() == 1){
+									consultaPlantillaModificar = listaPlantillaModificar.get(0);
+								}
 								
-								modPlantilladocConsultaMapper.insert(consulta);
+								if(consultaPlantillaModificar != null){
+									consultaPlantillaModificar.setFechabaja(new Date());										
+									modPlantilladocConsultaMapper.updateByPrimaryKey(consultaPlantillaModificar);
+								}
+
+								consultaPlantillaModificar = new ModPlantilladocConsulta();
+								consultaPlantillaModificar.setIdinstitucion(Short.parseShort(consultaItem.getIdInstitucion()));
+								consultaPlantillaModificar.setIdmodelocomunicacion(Long.parseLong(consultaItem.getIdModeloComunicacion()));
+								consultaPlantillaModificar.setIdplantilladocumento(Long.parseLong(consultaItem.getIdPlantillaDocumento()));
+								consultaPlantillaModificar.setIdconsulta(Long.parseLong(consultaItem.getIdConsulta()));
+								consultaPlantillaModificar.setFechabaja(null);
+								consultaPlantillaModificar.setUsumodificacion(usuario.getIdusuario());
+								consultaPlantillaModificar.setFechamodificacion(new Date());
+								
+								modPlantilladocConsultaMapper.insert(consultaPlantillaModificar);
+
 							}
 						}
+						
 						respuesta.setCode(200);
 						respuesta.setDescription("Consultas guardadas");
 						

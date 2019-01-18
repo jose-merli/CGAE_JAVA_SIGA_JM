@@ -40,7 +40,7 @@ public interface IModelosYcomunicacionesService {
 	public PlantillasModeloDTO obtenerPlantillasEnviosModeloSearch(HttpServletRequest request, String idModelo);
 	public PlantillasModeloDTO obtenerPlantillasEnviosModeloSearchHist(HttpServletRequest request, String idModelo);
 	public Error borrarPlantillaEnviosModelo(HttpServletRequest request, PlantillaModeloBorrarDTO[] plantillas);
-	public Error guardarConsultasPlantilla(HttpServletRequest request, ConsultasDTO consultasPlantilla);
+	public Error guardarConsultasPlantilla(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 	public PlantillasDocumentosDTO guardarInformes(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request);
 	public ResponseDocumentoDTO guardarPlantillaDocumento(HttpServletRequest request, DocumentoPlantillaItem documento);

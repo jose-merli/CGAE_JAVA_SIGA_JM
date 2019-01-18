@@ -24,6 +24,7 @@ public class TarjetaPlantillaDocumentoDTO {
 	
 	private List<DocumentoPlantillaItem> plantillas = new ArrayList<DocumentoPlantillaItem>();
 	private List<Long> sufijos = new ArrayList<Long>();
+	private List<ConsultaItem> consultas = new ArrayList<ConsultaItem>();
 	
 	public String getIdioma() {
 		return idioma;
@@ -132,6 +133,12 @@ public class TarjetaPlantillaDocumentoDTO {
 	}
 	public void setIdInforme(String idInforme) {
 		this.idInforme = idInforme;
+	}
+	public List<ConsultaItem> getConsultas() {
+		return consultas;
+	}
+	public void setConsultas(List<ConsultaItem> consultas) {
+		this.consultas = consultas;
 	}
 	
 	

@@ -5,6 +5,7 @@ import java.util.Date;
 public class ConsultaItem {
 	private String idInstitucion;
 	private String idConsulta;
+	private String idConsultaAnterior;
 	private String nombre;
 	private String generica;
 	private String tipoConsulta;
@@ -211,6 +212,14 @@ public class ConsultaItem {
 
 	public void setIdPlantillaDocumento(String idPlantillaDocumento) {
 		this.idPlantillaDocumento = idPlantillaDocumento;
+	}
+
+	public String getIdConsultaAnterior() {
+		return idConsultaAnterior;
+	}
+
+	public void setIdConsultaAnterior(String idConsultaAnterior) {
+		this.idConsultaAnterior = idConsultaAnterior;
 	}
 	
 
