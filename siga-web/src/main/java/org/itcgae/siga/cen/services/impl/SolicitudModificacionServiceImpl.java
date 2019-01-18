@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.SolModifDatosCurricularesItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
@@ -16,6 +17,11 @@ import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.cen.services.ISearchSolModifDatosBancariosService;
+import org.itcgae.siga.cen.services.ISearchSolModifDatosCurricularesService;
+import org.itcgae.siga.cen.services.ISearchSolModifDatosDireccionesService;
+import org.itcgae.siga.cen.services.ISearchSolModifDatosGeneralesService;
+import org.itcgae.siga.cen.services.ISearchSolModifDatosUseFotoService;
 import org.itcgae.siga.cen.services.ISolicitudModificacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -24,14 +30,18 @@ import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
+import org.itcgae.siga.db.entities.CenHistorico;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
+import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicos;
 import org.itcgae.siga.db.entities.CenSolicitudesmodificacion;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadoSolicitudModifExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicitmodifdatosbasicosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudesmodificacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposModificacionesExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -54,6 +64,9 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 
 	@Autowired
 	private CenSolicitudesmodificacionExtendsMapper cenSolicitudesModificacionExtendsMapper;
+	
+	@Autowired
+	private CenSolicitmodifdatosbasicosExtendsMapper cenSolicitmodifdatosbasicosExtendsMapper;
 
 	@Autowired
 	private CenClienteExtendsMapper cenClienteExtendsMapper;
@@ -63,6 +76,24 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 
 	@Autowired
 	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+	
+	@Autowired
+	private CenHistoricoExtendsMapper cenHistoricoExtendsMapper;
+	
+	@Autowired
+	private ISearchSolModifDatosGeneralesService searchSolModifDatosGenerales;
+	
+	@Autowired
+	private ISearchSolModifDatosDireccionesService searchSolModifDatosDirecciones;
+	
+	@Autowired
+	private ISearchSolModifDatosUseFotoService searchSolModifDatosUseFoto;
+	
+	@Autowired
+	private ISearchSolModifDatosBancariosService searchSolModifDatosBancarios;
+	
+	@Autowired
+	private ISearchSolModifDatosCurricularesService searchSolModifDatosCurriculares;
 
 	@Override
 	public ComboDTO getComboTipoModificacion(HttpServletRequest request) {
@@ -216,10 +247,7 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 					"processGeneralModificationRequest() -> Salida del servicio para actualizar el estado de la solicitud a REALIZADO");
 			i++;
 		}
-		// for(int i = 0 ; solModificacionDTO.size() < i; i++ ) {
-
-		// }
-
+		
 		return updateResponseDTO;
 	}
 
@@ -404,6 +432,173 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 		LOGGER.info(
 				"verifyPerson() -> Salida al servicio para verificar si la persona logueada está en la tabla cen_colegiado");
 		return stringDTO;
+	}
+	
+	
+	@Override
+	public InsertResponseDTO insertAuditoria(SolModificacionItem solModificacionItem,
+			HttpServletRequest request) {
+		LOGGER.info("insertAuditoria() -> Entrada al servicio para insertar un registro en auditoria");
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		try {
+			if (idInstitucion != null) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni)
+						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"insertAuditoria() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = _admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"insertAuditoria() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+				if (usuarios != null && usuarios.size() > 0) {
+
+					AdmUsuarios usuario = usuarios.get(0);
+
+					// Obtenemos la solicitud de modificacion completa
+					CenHistorico record = new CenHistorico();
+					CenSolicitudesmodificacion cenSolicitudModificacion = null;
+					CenSolicitmodifdatosbasicos cenSolicitmodifdatosbasicos = null;
+					
+					String institucion;
+					if (solModificacionItem.getEspecifica().equals("1")) {
+						cenSolicitmodifdatosbasicos = cenSolicitmodifdatosbasicosExtendsMapper.selectByPrimaryKey(Short.parseShort(solModificacionItem.getIdSolicitud()));
+
+						record.setDescripcion(cenSolicitmodifdatosbasicos.getMotivo());
+						record.setIdinstitucion(cenSolicitmodifdatosbasicos.getIdinstitucion());
+						record.setIdpersona(cenSolicitmodifdatosbasicos.getIdpersona());
+						institucion = String.valueOf(cenSolicitmodifdatosbasicos.getIdinstitucion());
+
+					} else {
+						cenSolicitudModificacion = cenSolicitudesModificacionExtendsMapper.selectByPrimaryKey(Long.parseLong(solModificacionItem.getIdSolicitud()));
+
+						record.setDescripcion(cenSolicitudModificacion.getDescripcion());
+						record.setIdinstitucion(cenSolicitudModificacion.getIdinstitucion());
+						record.setIdpersona(cenSolicitudModificacion.getIdpersona());
+						institucion = String.valueOf(cenSolicitudModificacion.getIdinstitucion());
+					}
+					
+					if(cenSolicitudModificacion == null && cenSolicitmodifdatosbasicos == null) {
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						LOGGER.warn("insertAuditoria() / cenHistoricoExtendsMapper.insertSelective() -> "
+								+ insertResponseDTO.getStatus() + " .no se pudo generar la solicitud");
+					} else {
+
+						NewIdDTO idHistorico = cenHistoricoExtendsMapper.selectMaxIDHistoricoByPerson(solModificacionItem.getIdPersona(), institucion);
+
+						record.setIdhistorico(Short.valueOf(idHistorico.getNewId()));
+						record.setFechaefectiva(new Date());
+						record.setFechaentrada(new Date());
+						record.setFechamodificacion(new Date());
+
+						if (solModificacionItem.getIdTipoModificacion().equals("35") || solModificacionItem.getIdTipoModificacion().equals("60")) {
+							// Si el tipo de modificacion es de "Solicitud uso foto" o "Cambio de foto" lo
+							// asignaremos a "Datos Generales"
+							solModificacionItem.setIdTipoModificacion("10");
+						}
+
+						record.setIdtipocambio(Short.valueOf(solModificacionItem.getIdTipoModificacion()));
+						record.setMotivo(solModificacionItem.getMotivo());
+						record.setObservaciones(null);
+						record.setUsumodificacion(usuario.getIdusuario());
+
+						int response = cenHistoricoExtendsMapper.insertSelective(record);
+
+						if (response == 0) {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.warn("insertAuditoria() / cenHistoricoExtendsMapper.insertSelective() -> "
+									+ insertResponseDTO.getStatus() + " .no se pudo generar la solicitud");
+
+						} else {
+							insertResponseDTO.setStatus(SigaConstants.OK);
+						}
+					}
+				}
+			}
+		} catch (Exception e) {
+			insertResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.warn("insertAuditoria() / cenHistoricoExtendsMapper.insertSelective() -> "
+					+ insertResponseDTO.getStatus() + " .no se pudo generar la solicitud");
+		}
+
+		LOGGER.info("insertAuditoria() -> Salida al servicio para insertar un registro en auditoria");
+
+		return insertResponseDTO;
+	}
+	
+	@Override
+	public UpdateResponseDTO processModificationRequest(ArrayList<SolModificacionItem> solModificacionDTO,
+			HttpServletRequest request) {
+		LOGGER.info(
+				"processModificationRequest() -> Entrada al servicio para actualizar el estado de la solicitud a REALIZADO");
+
+		int response = 0;
+		
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		
+		for (SolModificacionItem solModificacionItem : solModificacionDTO) {
+			
+			if(solModificacionItem.getEspecifica().equals("1")) { // ESPECIFICAS
+				switch (solModificacionItem.getIdTipoModificacion()) {
+				case "10":
+					updateResponseDTO = searchSolModifDatosGenerales.processSolModifDatosGenerales(solModificacionItem, request);
+					if(updateResponseDTO.getStatus() == SigaConstants.OK)
+						response ++;
+					break;
+				case "30":
+					updateResponseDTO = searchSolModifDatosDirecciones.processSolModifDatosDirecciones(solModificacionItem, request);
+					if(updateResponseDTO.getStatus() == SigaConstants.OK)
+						response ++;
+					break;
+				case "35":
+					updateResponseDTO = searchSolModifDatosUseFoto.processSolModifDatosUseFoto(solModificacionItem, request);
+					if(updateResponseDTO.getStatus() == SigaConstants.OK)
+						response ++;
+					break;
+				case "40":
+					updateResponseDTO = searchSolModifDatosBancarios.processSolModifDatosBancarios(solModificacionItem, request);
+					if(updateResponseDTO.getStatus() == SigaConstants.OK)
+						response ++;
+					break;
+				case "50":
+					updateResponseDTO = searchSolModifDatosCurriculares.processSolModifDatosCurriculares(fillSolModifDatosCurriculares(solModificacionItem), request);
+					if(updateResponseDTO.getStatus() == SigaConstants.OK)
+						response ++;
+					break;
+				}
+			} else { // GENERALES
+				updateResponseDTO = processGeneralModificationRequest(solModificacionDTO, request);
+			}
+		}
+
+		if (response == 0) {
+			updateResponseDTO.setStatus(SigaConstants.KO);
+			LOGGER.warn(
+					"processModificationRequest() / no se ha actualizado ningun registro");
+		} else {
+			updateResponseDTO.setStatus(SigaConstants.OK);
+		}
+
+		LOGGER.info(
+				"processModificationRequest() -> Salida del servicio para actualizar el estado de la solicitud a REALIZADO");
+		
+		return updateResponseDTO;
+	}
+	
+	private SolModifDatosCurricularesItem fillSolModifDatosCurriculares(SolModificacionItem solModificacionItem) {
+		SolModifDatosCurricularesItem solModifDatosCurriculares = new SolModifDatosCurricularesItem();
+		
+		solModifDatosCurriculares.setIdPersona(solModificacionItem.getIdPersona());
+		solModifDatosCurriculares.setIdSolicitud(solModificacionItem.getIdSolicitud());
+		solModifDatosCurriculares.setMotivo(solModificacionItem.getMotivo());
+		
+		return solModifDatosCurriculares;
 	}
 
 }

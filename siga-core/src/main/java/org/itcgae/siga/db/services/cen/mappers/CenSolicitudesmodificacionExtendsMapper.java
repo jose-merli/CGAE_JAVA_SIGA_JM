@@ -10,7 +10,6 @@ import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.CenSolicitudesmodificacionMapper;
-import org.itcgae.siga.db.services.cen.providers.CenSolicitmodifdatosbasicosSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenSolicitudesmodificacionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -39,4 +38,13 @@ public interface CenSolicitudesmodificacionExtendsMapper extends CenSolicitudesm
 	
 	})
 	NewIdDTO getMaxIdSolicitud(String idInstitucion, String idPersona);
+	
+	
+	@SelectProvider(type = CenSolicitudesmodificacionSqlExtendsProvider.class, method = "searchTipoCambio")
+	@Results({ @Result(column = "IDTIPOCAMBIO", property = "newId", jdbcType = JdbcType.VARCHAR)
+	
+	})
+	NewIdDTO searchTipoCambio(String descripcion, String idLenguaje);
+	
+	
 }

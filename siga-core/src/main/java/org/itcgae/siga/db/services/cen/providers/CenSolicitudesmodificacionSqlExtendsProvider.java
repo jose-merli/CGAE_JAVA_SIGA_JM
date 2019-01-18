@@ -42,4 +42,17 @@ public class CenSolicitudesmodificacionSqlExtendsProvider {
 		
 		return sql.toString();
 	}
+	
+
+	public String searchTipoCambio(String descripcion, String idLenguaje) {
+		SQL sql = new SQL();
+
+		sql.SELECT("T.IDTIPOCAMBIO AS IDTIPOCAMBIO");
+		sql.FROM("GEN_RECURSOS_CATALOGOS R");
+		sql.INNER_JOIN("CEN_TIPOCAMBIO T ON T.DESCRIPCION = R.IDRECURSO");
+		sql.WHERE("IDLENGUAJE = '" + idLenguaje + "'");
+		sql.WHERE("R.DESCRIPCION = '" + descripcion + "'");
+		
+		return sql.toString();
+	}
 }
