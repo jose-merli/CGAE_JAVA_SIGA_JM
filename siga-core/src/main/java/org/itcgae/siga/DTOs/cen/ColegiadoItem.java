@@ -12,6 +12,7 @@ public class ColegiadoItem {
 	private String idPersona;
 	private String noAparecerRedAbogacia;
 	private Boolean searchLoggedUser;
+	private String institucion;
 	private String idInstitucion;
 	private String nif;
 	private String nombre;
@@ -1276,6 +1277,14 @@ public class ColegiadoItem {
 
 	public void setNoAparecerRedAbogacia(String noAparecerRedAbogacia) {
 		this.noAparecerRedAbogacia = noAparecerRedAbogacia;
+	}
+
+	public String getInstitucion() {
+		return institucion;
+	}
+
+	public void setInstitucion(String institucion) {
+		this.institucion = institucion;
 	}
 
 

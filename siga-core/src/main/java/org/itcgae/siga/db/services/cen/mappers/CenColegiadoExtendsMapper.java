@@ -110,7 +110,9 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CORREOELECTRONICO", property = "correo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INSTITUCION", property = "institucion", jdbcType = JdbcType.VARCHAR)
+
 	})
 	List<ColegiadoItem> searchOtherCollegues(String idPersona, String idLenguaje);
 

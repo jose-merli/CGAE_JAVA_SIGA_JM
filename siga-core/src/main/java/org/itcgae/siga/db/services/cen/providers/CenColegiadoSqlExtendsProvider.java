@@ -481,6 +481,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("dir.correoelectronico AS correo");
 		sql.SELECT("dir.telefono1 AS telefono");
 		sql.SELECT("dir.movil AS movil");
+		sql.SELECT("inst.nombre as institucion");
 
 		sql.FROM("cen_colegiado col");
 
@@ -490,6 +491,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.INNER_JOIN(
 				"cen_datoscolegialesestado dat ON dat.idPersona = per.idPersona and dat.idInstitucion = dir.idInstitucion and dat.fechaestado = (select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = dat.idpersona and datcol.idinstitucion = dat.idinstitucion)");
 		sql.INNER_JOIN("cen_estadocolegial est ON est.idEstado = dat.idEstado");
+		sql.INNER_JOIN("cen_institucion inst ON inst.idinstitucion = col.idinstitucion");
 		sql.INNER_JOIN("gen_recursos_catalogos cat ON cat.idRecurso = est.descripcion and cat.idLenguaje = '"
 				+ idLenguaje + "'");
 
