@@ -384,7 +384,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				CenDireccionTipodireccionExample tipoDireccionexample = new CenDireccionTipodireccionExample();
 				tipoDireccionexample.createCriteria()
 						.andIddireccionEqualTo(Long.valueOf(datosDireccionesItem.getIdDireccion()))
-						.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
 				// Consultamos los tipos de direccion de la direccion a actualizar
 				List<CenDireccionTipodireccion> tiposDireccion = cenDireccionTipodireccionMapper
 						.selectByExample(tipoDireccionexample);

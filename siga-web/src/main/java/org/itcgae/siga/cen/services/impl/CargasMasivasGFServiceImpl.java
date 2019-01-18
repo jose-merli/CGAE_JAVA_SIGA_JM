@@ -587,11 +587,14 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 					&& hashtable.get(SigaConstants.C_FECHAINICIO) != "") {
 
 				try {
-					DateFormat df1 = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH); // for parsing input
+					DateFormat df1 = new SimpleDateFormat("dd-MMM-yyyy"); // for parsing input
+					LOGGER.debug("DateFormat:" +df1 );
+					LOGGER.debug("ValorParseado:" + (String) hashtable.get(SigaConstants.C_FECHAINICIO) );
 					cargaMasivaDatosGFVo.setFechaInicio(df1.parse((String) hashtable.get(SigaConstants.C_FECHAINICIO)));
 
 				} catch (ParseException e1) {
-					LOGGER.debug("Error al parsear fecha");
+					LOGGER.debug("Error al parsear fecha: " + e1 );
+					LOGGER.debug("Error al parsear fecha: " + SigaConstants.C_FECHAINICIO + " : " );
 				}
 
 			} else {
@@ -605,11 +608,13 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			if (hashtable.get(SigaConstants.C_FECHAFIN) != null && hashtable.get(SigaConstants.C_FECHAFIN) != "") {
 
 				try {
-					DateFormat df1 = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH); // for parsing input
+					DateFormat df1 = new SimpleDateFormat("dd-MMM-yyyy"); // for parsing input
+					LOGGER.debug("ValorParseado:" + (String) hashtable.get(SigaConstants.C_FECHAFIN) );
 					cargaMasivaDatosGFVo.setFechaFin(df1.parse((String) hashtable.get(SigaConstants.C_FECHAFIN)));
 
 				} catch (ParseException e) {
-					LOGGER.debug("Error al parsear fecha");
+					LOGGER.debug("Error al parsear fecha: " + e );
+					LOGGER.debug("Error al parsear fecha: " + SigaConstants.C_FECHAFIN + " : " );
 				}
 
 			} else {

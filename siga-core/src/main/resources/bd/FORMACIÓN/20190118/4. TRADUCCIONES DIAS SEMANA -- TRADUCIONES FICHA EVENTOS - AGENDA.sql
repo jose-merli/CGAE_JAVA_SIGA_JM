@@ -190,12 +190,12 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.busquedaInscripcion.cabecera','Búsqueda Inscripción','0','1',to_date('23/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.busquedaInscripcion.cabecera','Búsqueda Inscripción#GL','0','4',to_date('23/11/18','DD/MM/RR'),'0','19');
-Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.busquedaInscripcion.cabecera','Cerca Esdeveniments','0','2',to_date('23/11/18/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.busquedaInscripcion.cabecera','Cerca Esdeveniments','0','2',to_date('23/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.busquedaInscripcion.cabecera','Búsqueda Inscripción#EU','0','3',to_date('23/11/18','DD/MM/RR'),'0','19');
 
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.fichaInscripcion.cabecera','Ficha Inscripción','0','1',to_date('23/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.fichaInscripcion.cabecera','Ficha Inscripción#GL','0','4',to_date('23/11/18','DD/MM/RR'),'0','19');
-Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.fichaInscripcion.cabecera','Cerca Esdeveniments','0','2',to_date('23/11/18/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.fichaInscripcion.cabecera','Cerca Esdeveniments','0','2',to_date('23/11/18','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.fichaInscripcion.cabecera','Ficha Inscripción#EU','0','3',to_date('23/11/18','DD/MM/RR'),'0','19');
 
 commit;

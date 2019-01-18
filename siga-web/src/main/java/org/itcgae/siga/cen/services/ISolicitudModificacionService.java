@@ -18,16 +18,17 @@ public interface ISolicitudModificacionService {
 	public ComboDTO getComboEstado(HttpServletRequest request);
 	
 	public SolModificacionDTO searchModificationRequest(int numPagina, SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, HttpServletRequest request);
-	
-	public UpdateResponseDTO processGeneralModificationRequest(ArrayList<SolModificacionItem> solModificacionDTO,HttpServletRequest request);
-	
-	public InsertResponseDTO insertGeneralModificationRequest(SolModificacionItem solModificacionItem,HttpServletRequest request);
-	
-	public UpdateResponseDTO denyGeneralModificationRequest(ArrayList<SolModificacionItem> solModificacionDTO,HttpServletRequest request);
-	
-	public StringDTO verifyPerson(HttpServletRequest request);
-	
+
 	public InsertResponseDTO insertAuditoria(SolModificacionItem solModificacionItem,HttpServletRequest request);
 	
 	public UpdateResponseDTO processModificationRequest(ArrayList<SolModificacionItem> solModificacionDTO,HttpServletRequest request);
+
+	public UpdateResponseDTO processGeneralModificationRequest(ArrayList<SolModificacionItem> solModificacionDTO,
+			HttpServletRequest request);
+	public InsertResponseDTO insertGeneralModificationRequest(SolModificacionItem solModificacionItem,
+			HttpServletRequest request);
+	public UpdateResponseDTO denyGeneralModificationRequest(ArrayList<SolModificacionItem> solModificacionDTO,
+			HttpServletRequest request);
+	public StringDTO verifyPerson(StringDTO nifCif, HttpServletRequest request); 
+
 }

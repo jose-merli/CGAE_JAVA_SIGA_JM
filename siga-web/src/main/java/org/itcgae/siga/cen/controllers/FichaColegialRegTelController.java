@@ -61,4 +61,11 @@ public class FichaColegialRegTelController {
 		return res;
 	}
 	
+	@RequestMapping(value = "fichaColegialRegTel/permisos", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getPermisos(HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		String res = iFichaColegialRegtelService.getPermisoRegTel(request);
+		return new ResponseEntity<String>(res, HttpStatus.OK);
+	}
+	
 }
