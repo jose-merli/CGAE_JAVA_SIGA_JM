@@ -36,3 +36,6 @@ Insert into GEN_MENU
 (IDMENU,ORDEN,TAGWIDTH,IDPARENT,FECHAMODIFICACION,USUMODIFICACION,URI_IMAGEN,IDRECURSO,GEN_MENU_IDMENU,IDPROCESO,IDLENGUAJE,PATH,FECHA_BAJA,IDCLASS) values
 ('1c','30502','80','020',to_date('10/10/18','DD/MM/RR'),'0',null,'menu.censo.busquedaCensoGeneral',null,'1c','1','busquedaCensoGeneral',null,null);
 
+update gen_menu set idparent = '0' where idmenu = '1c';
+ 
+update gen_procesos set descripcion = 'Búsqueda Censo General', idparent = '001' where idproceso = '1c'; 
