@@ -7,10 +7,10 @@
 	<resultMap type="hashmap" id="mapa">
 	</resultMap>
 	<sql id="select">
-		select ${query.selectValue}
+		SELECT ${query.selectValue}
 	</sql>
 	<sql id="from">
-		from ${query.fromValue}
+		FROM ${query.fromValue}
 	</sql>
 	<sql id="innerJoin">
 		INNER JOIN ${query.innerJoinValue}
@@ -22,7 +22,7 @@
 		LEFT JOIN ${query.leftJoinValue}
 	</sql>
 	<sql id="outerJoin">
-		OUTER JOIN ${query.outerJoinValue}
+		OUTER JOIN ${query.outerJoinValue}S
 	</sql>
 	<sql id="where">
 		WHERE ${query.whereValue}

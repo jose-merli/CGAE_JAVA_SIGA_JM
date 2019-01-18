@@ -62,9 +62,9 @@
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table> -->
 		
-		<table schema="USCGAE" tableName="MOD_MODELO_PLANTILLADOCUMENTO" >
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-		</table>
+<!-- 		<table schema="USCGAE" tableName="MOD_MODELO_PLANTILLADOCUMENTO" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 		</table> -->
 		
 <!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOCUMENTO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
@@ -77,9 +77,10 @@
 <!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOC_SUFIJO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table>		 -->
-<!-- 		<table schema="USCGAE" tableName="MOD_MODELO_PLANTILLAENVIO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table> -->
+
+		<table schema="USCGAE" tableName="MOD_MODELO_PLANTILLAENVIO" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>
 		
 <!-- 			<table schema="USCGAE" tableName="ENV_PLANTILLAREMITENTES" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->

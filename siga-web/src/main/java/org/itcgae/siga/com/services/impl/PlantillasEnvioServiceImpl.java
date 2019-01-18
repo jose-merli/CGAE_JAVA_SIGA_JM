@@ -538,6 +538,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					int finSelect = consulta.getSentencia().indexOf("</SELECT>");
 					String finalidad = consulta.getSentencia().substring(inicioSelect, finSelect);
 					finalidad = finalidad.replace("select", "");
+					finalidad = finalidad.replace("distinct", "");
 					finalidadDTO.setFinalidad(finalidad);
 				}
 			}catch(Exception e){

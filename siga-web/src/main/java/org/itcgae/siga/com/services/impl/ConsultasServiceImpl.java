@@ -635,11 +635,19 @@ public class ConsultasServiceImpl implements IConsultasService{
 					Map<String,String> mapa = new HashMap<String,String>();
 					mapa.put("selectValue", obtenerSelect(consulta));
 					mapa.put("fromValue", obtenerFrom(consulta));
+					mapa.put("innerJoinValue", obtenerInnerJoin(consulta));
+					mapa.put("joinValue", obtenerJoin(consulta));
+					mapa.put("leftJoinValue", obtenerLeftJoin(consulta));
+					mapa.put("outerJoinValue", obtenerOuterJoin(consulta));
 					mapa.put("whereValue", obtenerWhere(consulta));
 					mapa.put("orderByValue", obtenerOrderBy(consulta));
 					mapa.put("groupByValue", obtenerGroupBy(consulta));
+					mapa.put("havingValue", obtenerHaving(consulta));
 					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
 					if(result != null){
+						for (Map<String, Object> map : result) {
+							LOGGER.info("datos: " + map);
+						}
 						LOGGER.info("datos: " + result);
 					}
 					respuesta.setCode(200);
@@ -805,6 +813,58 @@ public class ConsultasServiceImpl implements IConsultasService{
 		return from;
 	}
 	
+	public String obtenerJoin(String consulta){
+		String join = "";
+		
+		int inicioJoin = consulta.indexOf("<JOIN>")+6;
+		int finJoin = consulta.indexOf("</JOIN>");
+		if(consulta.indexOf("<JOIN>") != -1){
+			join = consulta.substring(inicioJoin, finJoin);
+			join = join.replace("join", "");
+		}
+
+		return join;
+	}
+	
+	public String obtenerOuterJoin(String consulta){
+		String outerJoin = "";
+		
+		int inicioJoin = consulta.indexOf("<OUTERJOIN>")+11;
+		int finJoin = consulta.indexOf("</OUTERJOIN>");
+		if(consulta.indexOf("<OUTERJOIN>") != -1){
+			outerJoin = consulta.substring(inicioJoin, finJoin);
+			outerJoin = outerJoin.replace("outer join", "");
+		}
+
+		return outerJoin;
+	}
+	
+	public String obtenerInnerJoin(String consulta){
+		String outerJoin = "";
+		
+		int inicioJoin = consulta.indexOf("<INNERJOIN>")+11;
+		int finJoin = consulta.indexOf("</INNERJOIN>");
+		if(consulta.indexOf("<INNERJOIN>") != -1){
+			outerJoin = consulta.substring(inicioJoin, finJoin);
+			outerJoin = outerJoin.replace("INNER JOIN", "");
+		}
+
+		return outerJoin;
+	}
+	
+	public String obtenerLeftJoin(String consulta){
+		String leftJoin = "";
+		
+		int inicioJoin = consulta.indexOf("<LEFTJOIN>")+10;
+		int finJoin = consulta.indexOf("</LEFTJOIN>");
+		if(consulta.indexOf("<LEFTJOIN>") != -1){
+			leftJoin = consulta.substring(inicioJoin, finJoin);
+			leftJoin = leftJoin.replace("left join", "");
+		}
+
+		return leftJoin;
+	}
+	
 	public String obtenerWhere(String consulta){
 		String where = "";
 		
@@ -842,6 +902,17 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 
 		return groupBy;
+	}
+	public String obtenerHaving(String consulta){
+		String having = "";
+
+		if(consulta.indexOf("<HAVING>") != -1){
+			int inicioHaving = consulta.indexOf("<HAVING>")+8;
+			int finHaving = consulta.indexOf("</HAVING>");
+			having = consulta.substring(inicioHaving, finHaving)+" ";
+		}
+
+		return having;
 	}
 	
 }

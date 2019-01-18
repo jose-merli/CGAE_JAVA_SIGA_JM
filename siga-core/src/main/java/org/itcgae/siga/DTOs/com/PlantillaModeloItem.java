@@ -10,8 +10,15 @@ public class PlantillaModeloItem {
 	private String tipoEnvio;
 	private Date fechaBaja;
 	private String porDefecto;
+	private String idInstitucion;
 	
 	
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
 	public Date getFechaBaja() {
 		return fechaBaja;
 	}
