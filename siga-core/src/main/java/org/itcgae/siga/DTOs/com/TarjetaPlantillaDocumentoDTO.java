@@ -11,7 +11,6 @@ public class TarjetaPlantillaDocumentoDTO {
 	private String idClaseComunicacion;
 	private String idioma;
 	private String ficheroSalida;
-	private String sufijo;
 	private String formatoSalida;
 	private String destinatarios;
 	private String condicion;
@@ -23,7 +22,7 @@ public class TarjetaPlantillaDocumentoDTO {
 	private String idInforme;
 	
 	private List<DocumentoPlantillaItem> plantillas = new ArrayList<DocumentoPlantillaItem>();
-	private List<Long> sufijos = new ArrayList<Long>();
+	private List<SufijoItem> sufijos = new ArrayList<SufijoItem>();
 	private List<ConsultaItem> consultas = new ArrayList<ConsultaItem>();
 	
 	public String getIdioma() {
@@ -38,12 +37,7 @@ public class TarjetaPlantillaDocumentoDTO {
 	public void setFicheroSalida(String ficheroSalida) {
 		this.ficheroSalida = ficheroSalida;
 	}
-	public String getSufijo() {
-		return sufijo;
-	}
-	public void setSufijo(String sufijo) {
-		this.sufijo = sufijo;
-	}
+
 	public String getFormatoSalida() {
 		return formatoSalida;
 	}
@@ -122,12 +116,6 @@ public class TarjetaPlantillaDocumentoDTO {
 	public void setPlantillas(List<DocumentoPlantillaItem> plantillas) {
 		this.plantillas = plantillas;
 	}
-	public List<Long> getSufijos() {
-		return sufijos;
-	}
-	public void setSufijos(List<Long> sufijos) {
-		this.sufijos = sufijos;
-	}
 	public String getIdInforme() {
 		return idInforme;
 	}
@@ -139,6 +127,12 @@ public class TarjetaPlantillaDocumentoDTO {
 	}
 	public void setConsultas(List<ConsultaItem> consultas) {
 		this.consultas = consultas;
+	}
+	public List<SufijoItem> getSufijos() {
+		return sufijos;
+	}
+	public void setSufijos(List<SufijoItem> sufijos) {
+		this.sufijos = sufijos;
 	}
 	
 	

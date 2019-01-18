@@ -26,6 +26,7 @@ import org.itcgae.siga.DTOs.com.PlantillaModeloItem;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDTO;
 import org.itcgae.siga.DTOs.com.PlantillasModeloDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
+import org.itcgae.siga.DTOs.com.SufijoItem;
 import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
@@ -53,6 +54,8 @@ import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaKey;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
+import org.itcgae.siga.db.entities.ModRelPlantillaSufijo;
+import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.mappers.ModModeloPerfilesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
@@ -60,6 +63,7 @@ import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
+import org.itcgae.siga.db.mappers.ModRelPlantillaSufijoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
@@ -70,6 +74,7 @@ import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocFormatoExtendsMapp
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocSufijoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModRelPlantillaSufijoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -132,6 +137,12 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	
 	@Autowired
 	private ConConsultaMapper conConsultaMapper;
+	
+	@Autowired
+	private ModRelPlantillaSufijoMapper modRelPlantillaSufijoMapper;
+	
+	@Autowired
+	private ModRelPlantillaSufijoExtendsMapper modRelPlantillaSufijoExtendsMapper;
 	
 	@Override
 	public DatosModelosComunicacionesDTO modeloYComunicacionesSearch(HttpServletRequest request, DatosModelosComunicacionesSearch filtros, boolean historico) {
@@ -375,7 +386,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	}
 
 	@Override
-	public PlantillasDocumentosDTO obtenerInformes(HttpServletRequest request, String idInstitucion, String idModeloComuncacion) {
+	public PlantillasDocumentosDTO obtenerInformes(HttpServletRequest request, String idInstitucion, String idModeloComunicacion) {
 		LOGGER.info("obtenerInformes() -> Entrada al servicio para obtener los informes de un modelo de comunicación");
 		
 		// Conseguimos información del usuario logeado
@@ -384,7 +395,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		PlantillasDocumentosDTO respuesta = new PlantillasDocumentosDTO();
-		List<PlantillaModeloDocumentoDTO> plantillasItem = new ArrayList<PlantillaModeloDocumentoDTO>();
+		List<PlantillaModeloDocumentoDTO> informesItem = new ArrayList<PlantillaModeloDocumentoDTO>();
 		
 		if (null != idInstitucionUser) {
 			
@@ -394,9 +405,39 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
 					AdmUsuarios usuario = usuarios.get(0);
-					plantillasItem = modModeloPlantillaDocumentoExtendsMapper.selectInformes(Short.parseShort(idInstitucion), Long.parseLong(idModeloComuncacion), usuario.getIdlenguaje());			
-					if(plantillasItem != null && plantillasItem.size()> 0){
-						respuesta.setPlantillasModeloDocumentos(plantillasItem);
+					informesItem = modModeloPlantillaDocumentoExtendsMapper.selectInformes(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion), usuario.getIdlenguaje());			
+					if(informesItem != null && informesItem.size()> 0){
+						for(PlantillaModeloDocumentoDTO informeItem : informesItem){
+							String idPlantillaDocumento = "0";
+							if(informeItem.getIdPlantillas() != null){
+								String[] idsPlantillas = informeItem.getIdPlantillas().split(",");
+								if(idsPlantillas[0] != null){
+									//Todas las plantillas tienen asociadas las mismas consultas, con coger una nos vale
+									idPlantillaDocumento = idsPlantillas[0];
+								}
+							}
+							
+							// Recuperamos Sufijo
+							List<SufijoItem> sufijos = modRelPlantillaSufijoExtendsMapper.selectSufijosPlantilla(Long.parseLong(idModeloComunicacion), Long.parseLong(informeItem.getIdInforme()), usuario.getIdlenguaje());
+							informeItem.setSufijos(sufijos);
+							
+							//Recuepramos nombre consultas
+							String destinatarios = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion), Long.parseLong(idPlantillaDocumento), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
+						
+							String multi = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion), Long.parseLong(idPlantillaDocumento), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
+							
+							String condicional = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion), Long.parseLong(idPlantillaDocumento), SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
+							
+							int numDatos = modPlantillaDocumentoConsultaExtendsMapper.selectCountConsultaPorObjetivo(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion), Long.parseLong(idPlantillaDocumento), SigaConstants.OBJETIVO.DATOS.getCodigo());
+														
+							informeItem.setDestinatarios(destinatarios);
+							informeItem.setMultiDocumento(multi);
+							informeItem.setCondicion(condicional);							
+							informeItem.setDatos(numDatos);
+							
+						}
+						
+						respuesta.setPlantillasModeloDocumentos(informesItem);
 					}
 				}catch(Exception e){
 					Error error = new Error();
@@ -577,7 +618,6 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 										modModeloPlantillaDoc.setFechamodificacion(new Date());
 										modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getFormatoSalida());
 										modModeloPlantillaDoc.setNombreficherosalida(plantillaDoc.getFicheroSalida());
-										modModeloPlantillaDoc.setSufijo(plantillaDoc.getSufijo());
 										modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
 										modModeloPlantillaDoc.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());		
 										modModeloPlantillaDoc.setIdinforme(idInforme);
@@ -587,17 +627,42 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 										modModeloPlantillaDoc.setFechamodificacion(new Date());
 										modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getFormatoSalida());
 										modModeloPlantillaDoc.setNombreficherosalida(plantillaDoc.getFicheroSalida());
-										modModeloPlantillaDoc.setSufijo(plantillaDoc.getSufijo());
 										modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
 										modModeloPlantillaDoc.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
 										modModeloPlantillaDoc.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
 										modModeloPlantillaDoc.setFechaasociacion(new Date());
 										modModeloPlantillaDoc.setIdinforme(idInforme);
 										
-										modModeloPlantilladocumentoMapper.insert(modModeloPlantillaDoc);
+										modModeloPlantilladocumentoMapper.insert(modModeloPlantillaDoc);									
 									}
-								}		
+								}
 								
+								
+								//Comprobamos los sufijos guardadados
+								ModRelPlantillaSufijoExample relSufijoPlantillaExample = new ModRelPlantillaSufijoExample();
+								relSufijoPlantillaExample.createCriteria().andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion())).andIdplantilladocumentoEqualTo(modPlantillaDoc.getIdplantilladocumento())
+													.andIdinformeEqualTo(Long.parseLong(plantillaDoc.getIdInforme()));
+								
+								
+								List<ModRelPlantillaSufijo> sufijosGuardados = modRelPlantillaSufijoMapper.selectByExample(relSufijoPlantillaExample);
+								
+								//Borramos los sufijos guardados
+								for(ModRelPlantillaSufijo modSufijo : sufijosGuardados){
+									modRelPlantillaSufijoMapper.deleteByPrimaryKey(modSufijo.getIdplantillasufijo());
+								}
+								
+								//Guardamos los sufijos recibidos
+								if(plantillaDoc.getSufijos() != null){
+									for(SufijoItem sufijo : plantillaDoc.getSufijos()){
+										ModRelPlantillaSufijo relSufijoPlantilla = new ModRelPlantillaSufijo();
+										relSufijoPlantilla.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+										relSufijoPlantilla.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
+										relSufijoPlantilla.setIdsufijo(Short.parseShort(sufijo.getIdSufijo()));
+										relSufijoPlantilla.setOrden(Short.parseShort(sufijo.getOrden()));
+										relSufijoPlantilla.setFechamodificacion(new Date());
+										relSufijoPlantilla.setUsumodificacion(usuario.getIdusuario());										
+									}
+								}								
 							}
 						}
 					}else{
@@ -985,13 +1050,13 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						int consultaCondicion = 0;
 
 						for(ConsultaItem consultaItem : listaItems){
-							if(Long.parseLong(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo()){
+							if(Short.parseShort(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo()){
 								consultaDestinatario++;
-							}else if(Long.parseLong(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo()){
+							}else if(Short.parseShort(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo()){
 								consultaMultidocumento++;
-							}else if(Long.parseLong(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.CONDICIONAL.getCodigo()){
+							}else if(Short.parseShort(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.CONDICIONAL.getCodigo()){
 								consultaCondicion++;
-							}else if(Long.parseLong(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.DATOS.getCodigo()){
+							}else if(Short.parseShort(consultaItem.getIdObjetivo()) == SigaConstants.OBJETIVO.DATOS.getCodigo()){
 								consultaDatos++;
 							}
 						}

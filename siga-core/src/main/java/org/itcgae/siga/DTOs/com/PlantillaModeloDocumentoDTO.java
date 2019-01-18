@@ -13,12 +13,13 @@ public class PlantillaModeloDocumentoDTO {
 	private String destinatarios;
 	private String condicion;
 	private String multiDocumento;
-	private String datos;
+	private int datos;
 	private Date fechaAsociacion;
 	private String idioma;
 	private String idInforme;
-	
+	private String idPlantillas;
 	private List<PlantillaDocumentoDTO> plantillasDocumentos = new ArrayList<PlantillaDocumentoDTO>();
+	private List<SufijoItem> sufijos = new ArrayList<SufijoItem>();
 	
 	public String getNombreFicheroSalida() {
 		return nombreFicheroSalida;
@@ -68,12 +69,6 @@ public class PlantillaModeloDocumentoDTO {
 	public void setMultiDocumento(String multiDocumento) {
 		this.multiDocumento = multiDocumento;
 	}
-	public String getDatos() {
-		return datos;
-	}
-	public void setDatos(String datos) {
-		this.datos = datos;
-	}
 	public Date getFechaAsociacion() {
 		return fechaAsociacion;
 	}
@@ -97,6 +92,24 @@ public class PlantillaModeloDocumentoDTO {
 	}
 	public void setIdInforme(String idInforme) {
 		this.idInforme = idInforme;
+	}
+	public List<SufijoItem> getSufijos() {
+		return sufijos;
+	}
+	public void setSufijos(List<SufijoItem> sufijos) {
+		this.sufijos = sufijos;
+	}
+	public int getDatos() {
+		return datos;
+	}
+	public void setDatos(int datos) {
+		this.datos = datos;
+	}
+	public String getIdPlantillas() {
+		return idPlantillas;
+	}
+	public void setIdPlantillas(String idPlantillas) {
+		this.idPlantillas = idPlantillas;
 	}
 	
 	

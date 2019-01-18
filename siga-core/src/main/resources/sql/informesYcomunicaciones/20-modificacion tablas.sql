@@ -81,4 +81,30 @@ alter table MOD_PLANTILLADOC_CONSULTA
     maxextents unlimited
   );
   
-  alter table mod_modelo_plantilladocumento add IDINFORME number(10);
+  alter table mod_modelo_plantilladocumento add IDINFORME number(10);  
+  
+  
+-- Create table
+create table MOD_REL_PLANTILLA_SUFIJO
+(
+  IDPLANTILLASUFIJO    number(10) not null,
+  IDMODELOCOMUNICACION number(10) not null,
+  IDPLANTILLADOCUMENTO number(10) not null,
+  IDINFORME            number(10) not null,
+  IDSUFIJO             number(2) not null,
+  ORDEN                number(2) not null,
+  USUMODIFICACION      number(5) not null,
+  FECHAMODIFICACION    date not null
+)
+tablespace TS_SIGA
+  storage
+  (
+    initial 128M
+    next 1M
+  );
+-- Create/Recreate primary, unique and foreign key constraints 
+alter table MOD_REL_PLANTILLA_SUFIJO
+  add constraint PK_MOD_REL_PLANTILLASUFIJO primary key (IDPLANTILLASUFIJO);
+
+  
+  ALTER TABLE MOD_MODELO_PLANTILLADOCUMENTO DROP COLUMN SUFIJO;
