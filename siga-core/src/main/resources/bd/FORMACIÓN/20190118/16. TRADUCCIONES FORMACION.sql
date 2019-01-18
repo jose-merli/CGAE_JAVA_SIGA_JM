@@ -1,0 +1,6 @@
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.fichaCursos.cargaMasivaInscripciones.totalesCorrectas','Totales/Correctas','0','1',to_date('02/01/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.fichaCursos.cargaMasivaInscripciones.totalesCorrectas','Totales/Correctas#GL','0','4',to_date('02/01/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.fichaCursos.cargaMasivaInscripciones.totalesCorrectas','Totals/Correctes','0','2',to_date('02/01/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.fichaCursos.cargaMasivaInscripciones.totalesCorrectas','Totales/Correctas#EU','0','3',to_date('02/01/19','DD/MM/RR'),'0','19');
+
+commit;

@@ -33,8 +33,8 @@ public class FichaDatosCurricularesController {
 	}
 	
 	@RequestMapping(value = "/fichaDatosCurriculares/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> deleteDatosCurriculares(@RequestBody FichaDatosCurricularesItem fichaDatosCurricularesItem, HttpServletRequest request) { 
-		UpdateResponseDTO response = fichaDatosCurriculares.deleteDatosCurriculares(fichaDatosCurricularesItem, request);
+	ResponseEntity<UpdateResponseDTO> deleteDatosCurriculares(@RequestBody FichaDatosCurricularesDTO fichaDatosCurricularesDTO, HttpServletRequest request) { 
+		UpdateResponseDTO response = fichaDatosCurriculares.deleteDatosCurriculares(fichaDatosCurricularesDTO, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);

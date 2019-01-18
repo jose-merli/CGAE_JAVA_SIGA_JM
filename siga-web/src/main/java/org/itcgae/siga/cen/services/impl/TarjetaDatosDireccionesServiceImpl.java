@@ -418,8 +418,10 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							// Eliminamos las ya existentes y que se han eliminado en el update
 							LOGGER.info(
 									"updateDirection() / cenDireccionTipodireccionMapper.deleteByExample() -> Entrada a cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
-							// cenDireccionTipodireccionMapper.deleteByPrimaryKey(TipoDireccionkey);
-							LOGGER.info(
+						
+							cenDireccionTipodireccionMapper.deleteByPrimaryKey(TipoDireccionkey);
+					
+							 LOGGER.info(
 									"updateDirection() / cenNocolegiadoExtendsMapper.deleteByExample() -> Salida de cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
 						}
 					}

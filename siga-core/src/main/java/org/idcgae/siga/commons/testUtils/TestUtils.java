@@ -15,7 +15,10 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.util.IOUtils;
+import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
+import org.itcgae.siga.DTOs.cen.TipoCurricularDTO;
+import org.itcgae.siga.DTOs.cen.TipoCurricularItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.commons.utils.TokenGenerationException;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -237,6 +240,15 @@ public class TestUtils {
 		return curriculares;
 	}
 
+	public FichaDatosCurricularesDTO getFichaDatosCurricularesDTO() {
+		FichaDatosCurricularesDTO fichaDatosCurricularesDTO = new FichaDatosCurricularesDTO();
+		List<FichaDatosCurricularesItem> fichaDatosCurricularesItem = new ArrayList<FichaDatosCurricularesItem>();
+		fichaDatosCurricularesItem.add(getFichaDatosCurricularesItem());
+		fichaDatosCurricularesDTO.setFichaDatosCurricularesItem(fichaDatosCurricularesItem);
+
+		return fichaDatosCurricularesDTO;
+	}
+	
 	public GenDiccionario getGenDiccionario() {
 		GenDiccionario genDiccionario = new GenDiccionario();
 

@@ -81,7 +81,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 	}
 
 	@Override
-	public UpdateResponseDTO deleteDatosCurriculares(FichaDatosCurricularesItem fichaDatosCurricularesItem,
+	public UpdateResponseDTO deleteDatosCurriculares(FichaDatosCurricularesDTO fichaDatosCurricularesDTO,
 			HttpServletRequest request) {
 		LOGGER.info("deleteDatosCurriculares() -> Entrada al servicio para actualizar información de direcciones");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -103,6 +103,10 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 
 		if (null != usuarios && usuarios.size() > 0) {
 			usuario = usuarios.get(0);
+			
+			for (FichaDatosCurricularesItem fichaDatosCurricularesItem : fichaDatosCurricularesDTO.getFichaDatosCurricularesItem()) {
+				
+			
 			// for (int i = 0; i < FichaDatosCurricularesItem.length; i++) {
 			LOGGER.info(
 					"deleteDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Entrada a cenDireccionesExtendsMapper para eliminar un curriculum");
@@ -150,14 +154,15 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			LOGGER.info(
 					"deleteDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para eliminar un curriculum");
 
-			updateResponseDTO.setStatus(SigaConstants.OK);
 			if (response == 0) {
 				updateResponseDTO.setStatus(SigaConstants.KO);
 				LOGGER.warn("deleteDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> "
 						+ updateResponseDTO.getStatus() + ". No se pudo eliminar el curriculum");
 
+			}else {
+				updateResponseDTO.setStatus(SigaConstants.OK);
 			}
-			// }
+		 }
 
 		} else {
 			updateResponseDTO.setStatus(SigaConstants.KO);
@@ -165,6 +170,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 					+ updateResponseDTO.getStatus() + ". No existen ningún usuario en base de datos");
 		}
 
+		
 		LOGGER.info("deleteDatosCurriculares() -> Salida del servicio para eliminar un curriculum");
 		return updateResponseDTO;
 	}
@@ -493,12 +499,13 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			LOGGER.info(
 					"insertDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para insertar un curriculum");
 
-			insertResponseDTO.setStatus(SigaConstants.OK);
 			if (response == 0) {
 				insertResponseDTO.setStatus(SigaConstants.KO);
 				LOGGER.warn("insertDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> "
 						+ insertResponseDTO.getStatus() + ". No se pudo eliminar el curriculum");
 
+			}else {
+				insertResponseDTO.setStatus(SigaConstants.OK);
 			}
 			// }
 

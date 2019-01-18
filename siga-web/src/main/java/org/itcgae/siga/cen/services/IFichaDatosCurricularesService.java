@@ -16,7 +16,7 @@ public interface IFichaDatosCurricularesService {
 //	public UpdateResponseDTO deleteDatosCurriculares(FichaDatosCurricularesDTO[] fichaDatosCurricularesDTO,
 //			HttpServletRequest request);
 
-	public UpdateResponseDTO deleteDatosCurriculares(FichaDatosCurricularesItem fichaDatosCurricularesItem,
+	public UpdateResponseDTO deleteDatosCurriculares(FichaDatosCurricularesDTO fichaDatosCurricularesDTO,
 			HttpServletRequest request);
 
 	public UpdateResponseDTO updateDatosCurriculares(FichaDatosCurricularesItem fichaDatosCurricularesItem,
