@@ -23,6 +23,7 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
@@ -55,6 +56,8 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 	@Autowired
 	private  CenNocolegiadoMapper cenNocolegiadoMapper;
 	
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
 	
 	@Override
 	public DocushareDTO searchListDoc(int numPagina, String idPersona, HttpServletRequest request) throws Exception {
@@ -202,5 +205,21 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 			docushareDTO.setDocuShareObjectVO(docus);
 		} 
 		return docushareDTO;
+	}
+	
+	@Override
+	public  String getPermisoRegTel( HttpServletRequest request) throws Exception {
+		String result= null;
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		GenParametrosExample example = new GenParametrosExample();
+		example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andParametroEqualTo("REGTEL");
+		List<GenParametros> config = genParametrosMapper.selectByExample(example);
+		if(config.size() > 0) {
+			result = config.get(0).getValor();
+		}else {
+			result = "0";
+		}
+		return result;
 	}
 }

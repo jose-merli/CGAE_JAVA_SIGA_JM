@@ -361,7 +361,7 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 	}
 
 	@Override
-	public StringDTO verifyPerson(HttpServletRequest request) {
+	public StringDTO verifyPerson(StringDTO nifCif, HttpServletRequest request) {
 		LOGGER.info(
 				"verifyPerson() -> Entrada al servicio para verificar si la persona logueada está en la tabla cen_colegiado");
 
@@ -369,7 +369,15 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		
+		String dni = "";
+		
+		if(nifCif.getValor() == "") {
+			dni = UserTokenUtils.getDniFromJWTToken(token);
+		}else {
+			dni = nifCif.getValor();
+		}
+		
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		if (idInstitucion != null) {

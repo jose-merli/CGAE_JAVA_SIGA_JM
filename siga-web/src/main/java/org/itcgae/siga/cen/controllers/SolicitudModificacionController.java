@@ -73,9 +73,9 @@ public class SolicitudModificacionController {
 	}
 	
 	
-	@RequestMapping(value = "solicitudModificacion/verifyPerson", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<StringDTO> verifyPerson(HttpServletRequest request) { 
-		StringDTO response = solicitudModificacionService.verifyPerson(request);
+	@RequestMapping(value = "solicitudModificacion/verifyPerson", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<StringDTO> verifyPerson(@RequestBody StringDTO nifCif, HttpServletRequest request) { 
+		StringDTO response = solicitudModificacionService.verifyPerson(nifCif, request);
 		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
 	}
 }
