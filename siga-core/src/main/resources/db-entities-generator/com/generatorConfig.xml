@@ -62,6 +62,7 @@
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table> -->
 		
+
 		<table schema="USCGAE" tableName="MOD_MODELO_PLANTILLADOCUMENTO" >
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
 		</table>
@@ -70,10 +71,10 @@
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
 			<generatedKey column="IDPLANTILLASUFIJO" sqlStatement="SELECT SEQ_MOD_REL_PLANTILLA_SUFIJO.NEXTVAL FROM DUAL"/>
 		</table>
-		
-		
-		
-		
+
+<!-- 		<table schema="USCGAE" tableName="MOD_MODELO_PLANTILLADOCUMENTO" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+
 <!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOCUMENTO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 			<generatedKey column="IDPLANTILLADOCUMENTO" sqlStatement="SELECT SEQ_MOD_PLANTILLADOCUMENTO.NEXTVAL FROM DUAL"/> -->
@@ -85,9 +86,10 @@
 <!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOC_SUFIJO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table>		 -->
-<!-- 		<table schema="USCGAE" tableName="MOD_MODELO_PLANTILLAENVIO" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 		</table> -->
+
+		<table schema="USCGAE" tableName="MOD_MODELO_PLANTILLAENVIO" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+		</table>
 		
 <!-- 			<table schema="USCGAE" tableName="ENV_PLANTILLAREMITENTES" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->

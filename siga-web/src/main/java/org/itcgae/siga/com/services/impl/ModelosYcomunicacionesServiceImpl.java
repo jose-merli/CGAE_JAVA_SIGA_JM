@@ -993,6 +993,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 							ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
 							key.setIdmodelocomunicacion(Long.valueOf(plantillas.get(0).getIdmodelocomunicacion()));
 							key.setIdplantillaenvios(Short.valueOf(plantillas.get(0).getIdplantillaenvios()));
+							key.setIdinstitucion(idInstitucion);
 							ModModeloPlantillaenvio plantillaMod = new ModModeloPlantillaenvio();
 							plantillaMod.setPordefecto("No");
 							modModeloPlantillaenvioMapper.updateByPrimaryKey(plantillaMod);
@@ -1001,6 +1002,8 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					ModModeloPlantillaenvio plantilla = new ModModeloPlantillaenvio();
 					plantilla.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
 					plantilla.setIdplantillaenvios(Short.valueOf(datosPlantilla.getIdPlantillaEnvios()));
+					plantilla.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
+					plantilla.setPordefecto(datosPlantilla.getPorDefecto());
 					plantilla.setUsumodificacion(usuario.getIdusuario());
 					plantilla.setFechamodificacion(new Date());
 					modModeloPlantillaenvioMapper.insert(plantilla);
