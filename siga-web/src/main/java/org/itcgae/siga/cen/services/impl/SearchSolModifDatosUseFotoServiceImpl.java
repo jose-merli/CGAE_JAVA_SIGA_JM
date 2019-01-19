@@ -105,12 +105,12 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 		if (null != usuarios && usuarios.size() > 0) {
 		usuario = usuarios.get(0);
 			
-		CenSolicmodifexportarfoto solicitud = new CenSolicmodifexportarfoto();
-		CenSolicmodifexportarfotoExample example = new CenSolicmodifexportarfotoExample();
-		
-		example.createCriteria().andIdpersonaEqualTo(Long.parseLong(solModificacionItem.getIdPersona()))
-		.andIdinstitucionEqualTo(idInstitucion).andIdsolicitudEqualTo(Short.valueOf(solModificacionItem.getIdSolicitud()));
-		
+		//CenSolicmodifexportarfoto solicitud = new CenSolicmodifexportarfoto();
+//		CenSolicmodifexportarfotoExample example = new CenSolicmodifexportarfotoExample();
+//		
+//		example.createCriteria().andIdpersonaEqualTo(Long.parseLong(solModificacionItem.getIdPersona()))
+//		.andIdinstitucionEqualTo(idInstitucion).andIdsolicitudEqualTo(Short.valueOf(solModificacionItem.getIdSolicitud()));
+//		
 		CenSolicmodifexportarfotoDTO lista = cenSolicModifExportarFotoExtendsMapper.selectByPrimaryKeyDTO(Long.valueOf(solModificacionItem.getIdSolicitud()));
 
 

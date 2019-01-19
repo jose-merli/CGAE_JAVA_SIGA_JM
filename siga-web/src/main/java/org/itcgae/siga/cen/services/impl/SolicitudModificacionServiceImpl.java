@@ -467,12 +467,12 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 					CenSolicitmodifdatosbasicos cenSolicitmodifdatosbasicos = null;
 					
 					String institucion;
-					if (solModificacionItem.getEspecifica().equals("1")) {
-						cenSolicitmodifdatosbasicos = cenSolicitmodifdatosbasicosExtendsMapper.selectByPrimaryKey(Short.parseShort(solModificacionItem.getIdSolicitud()));
+					/*if (solModificacionItem.getEspecifica().equals("1")) {
+						cenSolicitmodifdatosbasicos = cenSolicitmodifdatosbasicosExtendsMapper.selectByPrimaryKeyDTO(Long.parseLong(solModificacionItem.getIdSolicitud()));
 
 						record.setDescripcion(cenSolicitmodifdatosbasicos.getMotivo());
-						record.setIdinstitucion(cenSolicitmodifdatosbasicos.getIdinstitucion());
-						record.setIdpersona(cenSolicitmodifdatosbasicos.getIdpersona());
+						record.setIdinstitucion(idInstitucion);
+						record.setIdpersona(Long.valueOf(solModificacionItem.getIdPersona()));
 						institucion = String.valueOf(cenSolicitmodifdatosbasicos.getIdinstitucion());
 
 					} else {
@@ -482,13 +482,13 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 						record.setIdinstitucion(cenSolicitudModificacion.getIdinstitucion());
 						record.setIdpersona(cenSolicitudModificacion.getIdpersona());
 						institucion = String.valueOf(cenSolicitudModificacion.getIdinstitucion());
-					}
+					}*/
+					record.setDescripcion(solModificacionItem.getMotivo());
+					record.setIdinstitucion(idInstitucion);
+					record.setIdpersona(Long.valueOf(solModificacionItem.getIdPersona()));
+					institucion = String.valueOf(idInstitucion);
 					
-					if(cenSolicitudModificacion == null && cenSolicitmodifdatosbasicos == null) {
-						insertResponseDTO.setStatus(SigaConstants.KO);
-						LOGGER.warn("insertAuditoria() / cenHistoricoExtendsMapper.insertSelective() -> "
-								+ insertResponseDTO.getStatus() + " .no se pudo generar la solicitud");
-					} else {
+
 
 						NewIdDTO idHistorico = cenHistoricoExtendsMapper.selectMaxIDHistoricoByPerson(solModificacionItem.getIdPersona(), institucion);
 
@@ -518,7 +518,7 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 						} else {
 							insertResponseDTO.setStatus(SigaConstants.OK);
 						}
-					}
+					
 				}
 			}
 		} catch (Exception e) {
