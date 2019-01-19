@@ -76,6 +76,10 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.busquedaNoColegiados.titulo','Búsqueda de No Colegiados#EU','0','3',to_date('10/03/04','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaClientes.busquedaNoColegiados.titulo','Búsqueda de No Colegiados#GL','0','4',to_date('10/03/04','DD/MM/RR'),'0','19');
 
-COMMIT;
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.fichaColegial.lopd.literal','No se deberá facilitar la información de este colegiado','0','1',to_date('18/01/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.fichaColegial.lopd.literal','No haurà de facilitar la informació d aquest col·legiat#CA','0','2',to_date('18/01/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.fichaColegial.lopd.literal','No se deberá facilitar la información de este colegiado#EU','0','3',to_date('18/01/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.fichaColegial.lopd.literal','No se deberá facilitar la información de este colegiado#GL','0','4',to_date('18/01/19','DD/MM/RR'),'0','19');
+
 
 commit;
