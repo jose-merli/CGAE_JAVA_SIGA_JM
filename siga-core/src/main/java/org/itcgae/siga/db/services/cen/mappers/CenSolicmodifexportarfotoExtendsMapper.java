@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.CenSolicmodifexportarfotoDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
@@ -13,6 +14,7 @@ import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
 import org.itcgae.siga.db.mappers.CenSolicmodifexportarfotoMapper;
+import org.itcgae.siga.db.mappers.CenSolicmodifexportarfotoSqlProvider;
 import org.itcgae.siga.db.services.cen.providers.CenSolicmodifexportarfotoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -65,6 +67,8 @@ public interface CenSolicmodifexportarfotoExtendsMapper extends  CenSolicmodifex
 			@Result(column = "FECHAALTA", property = "fechaalta", jdbcType = JdbcType.TIMESTAMP) })
 	CenSolicmodifexportarfotoDTO selectByPrimaryKeyDTO(Long idsolicitud);
 
-	
+
+	@UpdateProvider(type = CenSolicmodifexportarfotoSqlExtendsProvider.class, method = "updateByPrimaryKeySelectiveDTO")
+	int updateByPrimaryKeySelectiveDTO(CenSolicmodifexportarfotoDTO record);
 	
 }

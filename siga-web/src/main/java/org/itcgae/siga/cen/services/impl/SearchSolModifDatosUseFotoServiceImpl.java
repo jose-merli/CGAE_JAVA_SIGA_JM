@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.CenSolicmodifexportarfotoDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionDTO;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
@@ -110,26 +111,26 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 		example.createCriteria().andIdpersonaEqualTo(Long.parseLong(solModificacionItem.getIdPersona()))
 		.andIdinstitucionEqualTo(idInstitucion).andIdsolicitudEqualTo(Short.valueOf(solModificacionItem.getIdSolicitud()));
 		
-		List<CenSolicmodifexportarfoto> lista = cenSolicModifExportarFotoExtendsMapper.selectByExample(example);
+		CenSolicmodifexportarfotoDTO lista = cenSolicModifExportarFotoExtendsMapper.selectByPrimaryKeyDTO(Long.valueOf(solModificacionItem.getIdSolicitud()));
 
-		solicitud = lista.get(0);
+
 		
 		CenCliente modificacion = new CenCliente();
 		modificacion.setIdinstitucion(idInstitucion);
-		modificacion.setIdpersona(solicitud.getIdpersona());
+		modificacion.setIdpersona(lista.getIdpersona());
 		modificacion.setFechamodificacion(new Date());
 		modificacion.setUsumodificacion(usuario.getIdusuario());
-		modificacion.setExportarfoto(solicitud.getExportarfoto());
+		modificacion.setExportarfoto(lista.getExportarfoto());
 //		modificacion.setid
 		
 		
 		int responseUpdate = cenClienteExtendsMapper.updateByPrimaryKeySelective(modificacion);
 		
 		if(responseUpdate >= 1) {
-		CenSolicmodifexportarfoto record = new CenSolicmodifexportarfoto();
-		record.setIdsolicitud(Short.valueOf(solModificacionItem.getIdSolicitud()));
+		CenSolicmodifexportarfotoDTO record = new CenSolicmodifexportarfotoDTO();
+		record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
 		record.setIdestadosolic((short) 20);
-		int response = cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKeySelective(record);
+		int response = cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKeySelectiveDTO(record);
 		
 		if (response == 0) {
 			updateResponseDTO.setStatus(SigaConstants.KO);
@@ -160,10 +161,10 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 		
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		
-		CenSolicmodifexportarfoto record = new CenSolicmodifexportarfoto();
-		record.setIdsolicitud(Short.valueOf(solModificacionItem.getIdSolicitud()));
+		CenSolicmodifexportarfotoDTO record = new CenSolicmodifexportarfotoDTO();
+		record.setIdsolicitud(Long.valueOf(solModificacionItem.getIdSolicitud()));
 		record.setIdestadosolic((short) 30);
-		int response = cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKeySelective(record);
+		int response = cenSolicModifExportarFotoExtendsMapper.updateByPrimaryKeySelectiveDTO(record);
 		
 		if (response == 0) {
 			updateResponseDTO.setStatus(SigaConstants.KO);
