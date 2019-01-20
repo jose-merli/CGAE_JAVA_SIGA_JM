@@ -10,7 +10,7 @@ public class TarjetaPlantillaDocumentoDTO {
 	private String idInstitucion;
 	private String idClaseComunicacion;
 	private String idioma;
-	private String ficheroSalida;
+	private String nombreFicheroSalida;
 	private String formatoSalida;
 	private String destinatarios;
 	private String condicion;
@@ -30,12 +30,6 @@ public class TarjetaPlantillaDocumentoDTO {
 	}
 	public void setIdioma(String idioma) {
 		this.idioma = idioma;
-	}
-	public String getFicheroSalida() {
-		return ficheroSalida;
-	}
-	public void setFicheroSalida(String ficheroSalida) {
-		this.ficheroSalida = ficheroSalida;
 	}
 
 	public String getFormatoSalida() {
@@ -133,6 +127,12 @@ public class TarjetaPlantillaDocumentoDTO {
 	}
 	public void setSufijos(List<SufijoItem> sufijos) {
 		this.sufijos = sufijos;
+	}
+	public String getNombreFicheroSalida() {
+		return nombreFicheroSalida;
+	}
+	public void setNombreFicheroSalida(String nombreFicheroSalida) {
+		this.nombreFicheroSalida = nombreFicheroSalida;
 	}
 	
 	

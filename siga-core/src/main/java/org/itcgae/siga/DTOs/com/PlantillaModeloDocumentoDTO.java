@@ -18,6 +18,7 @@ public class PlantillaModeloDocumentoDTO {
 	private String idioma;
 	private String idInforme;
 	private String idPlantillas;
+	private String idFormatoSalida;
 	private List<PlantillaDocumentoDTO> plantillasDocumentos = new ArrayList<PlantillaDocumentoDTO>();
 	private List<SufijoItem> sufijos = new ArrayList<SufijoItem>();
 	
@@ -110,6 +111,12 @@ public class PlantillaModeloDocumentoDTO {
 	}
 	public void setIdPlantillas(String idPlantillas) {
 		this.idPlantillas = idPlantillas;
+	}
+	public String getIdFormatoSalida() {
+		return idFormatoSalida;
+	}
+	public void setIdFormatoSalida(String idFormatoSalida) {
+		this.idFormatoSalida = idFormatoSalida;
 	}
 	
 	

@@ -29,20 +29,12 @@ public interface IModelosYcomunicacionesService {
 	public PlantillasDocumentosDTO obtenerInformes(HttpServletRequest request, String idInstitucion, String idModeloComuncacion);
 	public Error guardarPerfilesModelo(HttpServletRequest request, TarjetaPerfilesDTO perfilesDTO);
 
-	public Error guardarModPlantillaDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 	public Error guardarDatosGenerales(HttpServletRequest request, TarjetaModeloConfiguracionDTO datosTarjeta);
-	public ConsultasDTO obtenerConsultasPlantilla(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc, boolean historico);
-	public DocumentosPlantillaDTO obtenerPlantillasInforme(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
-	public ComboDTO obtenerFormatoSalida(HttpServletRequest request);
-	public ComboDTO obtenerSufijos(HttpServletRequest request);
-	public ComboDTO obtenerConsultasDisponibles(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
+	
 	public Error guardarPlantillaEnviosModelo(HttpServletRequest request, PlantillaModeloBorrarDTO plantilla);
 	public PlantillasModeloDTO obtenerPlantillasEnviosModeloSearch(HttpServletRequest request, String idModelo);
 	public PlantillasModeloDTO obtenerPlantillasEnviosModeloSearchHist(HttpServletRequest request, String idModelo);
 	public Error borrarPlantillaEnviosModelo(HttpServletRequest request, PlantillaModeloBorrarDTO[] plantillas);
-	public Error guardarConsultasPlantilla(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
-	public PlantillasDocumentosDTO guardarInformes(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
-	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request);
-	public ResponseDocumentoDTO guardarPlantillaDocumento(HttpServletRequest request, DocumentoPlantillaItem documento);
+	public Error borrarInformes(HttpServletRequest request, String[] idInformes);
 	
 }

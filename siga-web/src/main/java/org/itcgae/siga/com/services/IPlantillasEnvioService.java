@@ -30,5 +30,7 @@ public interface IPlantillasEnvioService {
 	public RemitenteDTO obtenerPersonaYdireccion(HttpServletRequest request, String idPersona);
 	public Error guardarRemitente(HttpServletRequest request, TarjetaRemitenteDTO remitente);
 	public FinalidadConsultaDTO obtenerFinalidad(HttpServletRequest request, String idConsulta);
+
+	public String obtenerFinalidadByIdConsulta(Short idInstitucion, Long idConsulta);
 	
 }

@@ -9,6 +9,7 @@ public class ResponseDocumentoDTO {
 	private String idEnvio;
 	private String idPlantillaDocumento;
 	private String idioma;
+	private String idIdioma;
 	private Error error;
 	
 	
@@ -47,6 +48,12 @@ public class ResponseDocumentoDTO {
 	}
 	public void setIdioma(String idioma) {
 		this.idioma = idioma;
+	}
+	public String getIdIdioma() {
+		return idIdioma;
+	}
+	public void setIdIdioma(String idIdioma) {
+		this.idIdioma = idIdioma;
 	}
 	
 

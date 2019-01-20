@@ -8,11 +8,10 @@ public class ModModeloPlantillaDocumentoExtendsSqlProvider {
 		
 		SQL sql = new SQL();		
 				
-		sql.SELECT("modeloPlantillaDocumento.FECHAASOCIACION");
 		sql.SELECT("modeloPlantillaDocumento.FORMATOSALIDA");
 		sql.SELECT("modeloPlantillaDocumento.NOMBREFICHEROSALIDA");
 		sql.SELECT("modeloPlantillaDocumento.IDINFORME");
-		sql.SELECT("LISTAGG(plantillaDocumento.IDIOMA, ',') WITHIN GROUP (ORDER BY plantillaDocumento.IDIOMA) idioma");
+		sql.SELECT("LISTAGG(C.DESCRIPCION, ',') WITHIN GROUP (ORDER BY C.DESCRIPCION) idioma");
 		sql.SELECT("LISTAGG(plantillaDocumento.Idplantilladocumento, ',') WITHIN GROUP (ORDER BY plantillaDocumento.Idplantilladocumento) idPlantillas");
 		sql.SELECT("rec.descripcion AS NOMBREFORMATO");
 		
@@ -20,9 +19,13 @@ public class ModModeloPlantillaDocumentoExtendsSqlProvider {
 		sql.INNER_JOIN("MOD_PLANTILLADOCUMENTO plantillaDocumento ON modeloPlantillaDocumento.IDPLANTILLADOCUMENTO = plantillaDocumento.IDPLANTILLADOCUMENTO");
 		sql.INNER_JOIN("MOD_PLANTILLADOC_FORMATO formato ON formato.IDFORMATOSALIDA = modeloPlantillaDocumento.FORMATOSALIDA");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON rec.IDRECURSO = formato.NOMBRE AND rec.idlenguaje = '" + idLenguaje + "'");
-		
+		sql.INNER_JOIN("ADM_LENGUAJES lenguajes ON lenguajes.idlenguaje = plantillaDocumento.Idioma");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS C on lenguajes.DESCRIPCION = C.idRecurso");
+				
 		sql.WHERE("modeloPlantillaDocumento.IDMODELOCOMUNICACION = " + idModeloComunicacion);
-		sql.GROUP_BY("modeloPlantillaDocumento.FECHAASOCIACION, modeloPlantillaDocumento.NOMBREFICHEROSALIDA, modeloPlantillaDocumento.FORMATOSALIDA, modeloPlantillaDocumento.IDINFORME, rec.DESCRIPCION");
+		sql.WHERE("C.IDLENGUAJE = '" + idLenguaje + "' AND CODIGOEJIS is not null AND lenguajes.FECHA_BAJA is null");
+		sql.WHERE("modeloPlantillaDocumento.FECHABAJA IS NULL");
+		sql.GROUP_BY("modeloPlantillaDocumento.FORMATOSALIDA, modeloPlantillaDocumento.NOMBREFICHEROSALIDA, modeloPlantillaDocumento.IDINFORME, rec.DESCRIPCION");
 		
 		return sql.toString();
 	}

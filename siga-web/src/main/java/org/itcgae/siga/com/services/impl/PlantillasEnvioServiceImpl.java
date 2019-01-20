@@ -98,7 +98,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			
 			if (null != usuarios && usuarios.size() > 0) {
 
-				comboItems = _conConsultasExtendsMapper.selectConsultasDisponibles(idInstitucion, null);
+				comboItems = _conConsultasExtendsMapper.selectConsultasDisponibles(idInstitucion, null, null);
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
 					element.setLabel("");
@@ -530,15 +530,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			LOGGER.info("obtenerFinalidad() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
-					ConConsultaKey key = new ConConsultaKey();
-					key.setIdconsulta(Long.valueOf(idConsulta));
-					key.setIdinstitucion(idInstitucion);
-					ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
-					int inicioSelect = consulta.getSentencia().indexOf("<SELECT>")+8;
-					int finSelect = consulta.getSentencia().indexOf("</SELECT>");
-					String finalidad = consulta.getSentencia().substring(inicioSelect, finSelect);
-					finalidad = finalidad.replace("select", "");
-					finalidad = finalidad.replace("distinct", "");
+					String finalidad = obtenerFinalidadByIdConsulta(idInstitucion, Long.valueOf(idConsulta));
 					finalidadDTO.setFinalidad(finalidad);
 				}
 			}catch(Exception e){
@@ -617,6 +609,20 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		
 		LOGGER.info("obtenerPersonaYdireccion() -> Salida del servicio para obtener detalles del remitente");
 		return remitente;
+	}
+	
+	@Override
+	public String obtenerFinalidadByIdConsulta(Short idInstitucion, Long idConsulta){
+		ConConsultaKey key = new ConConsultaKey();
+		key.setIdconsulta(Long.valueOf(idConsulta));
+		key.setIdinstitucion(idInstitucion);
+		ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
+		int inicioSelect = consulta.getSentencia().indexOf("<SELECT>")+8;
+		int finSelect = consulta.getSentencia().indexOf("</SELECT>");
+		String finalidad = consulta.getSentencia().substring(inicioSelect, finSelect);
+		finalidad = finalidad.replace("select", "");
+		finalidad = finalidad.replace("distinct", "");
+		return finalidad;
 	}
 
 }

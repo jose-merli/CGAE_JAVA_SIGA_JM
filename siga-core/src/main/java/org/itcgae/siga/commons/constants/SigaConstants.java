@@ -25,6 +25,7 @@ public class SigaConstants {
 	public static int NOMBRE_MAXLENGTH = 100;
 	public static String rutaficherosInformesYcomunicaciones = "/FILERMSA1000/SIGA/ficheros/archivo/";
 	public static String carpetaDocumentosEnvio = "/documentosEnvio/";
+	public static String carpetaPlantillasDocumento = "/plantillaDocumentos/";
 	
 	
 	public enum ERROR_SERVER {

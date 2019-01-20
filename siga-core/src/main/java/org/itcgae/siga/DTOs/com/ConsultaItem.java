@@ -29,6 +29,10 @@ public class ConsultaItem {
 	private String idPlantillaDocumento;
 
 	private String sentencia;
+	
+	private String idPlantillasConsultas;
+	
+	private String finalidad;
 
 	public String getIdInstitucion() {
 		return idInstitucion;
@@ -220,6 +224,22 @@ public class ConsultaItem {
 
 	public void setIdConsultaAnterior(String idConsultaAnterior) {
 		this.idConsultaAnterior = idConsultaAnterior;
+	}
+
+	public String getIdPlantillasConsultas() {
+		return idPlantillasConsultas;
+	}
+
+	public void setIdPlantillasConsultas(String idPlantillasConsultas) {
+		this.idPlantillasConsultas = idPlantillasConsultas;
+	}
+
+	public String getFinalidad() {
+		return finalidad;
+	}
+
+	public void setFinalidad(String finalidad) {
+		this.finalidad = finalidad;
 	}
 	
 

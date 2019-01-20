@@ -126,62 +126,17 @@ public class ModelosYComunicacionesController {
 		return new ResponseEntity<PlantillasDocumentosDTO>(response, HttpStatus.OK);
 	}
 	
-	//TODO
-	@RequestMapping(value = "/detalle/guardarInformes",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<PlantillasDocumentosDTO> guardarInformes(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
+	@RequestMapping(value = "/detalle/informes/borrar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> borrarInformes(HttpServletRequest request, @RequestBody String [] idInformes) {
 		
-		PlantillasDocumentosDTO response = _modelosYcomunicacionesService.guardarInformes(request, plantillaDoc);
-		return new ResponseEntity<PlantillasDocumentosDTO>(response, HttpStatus.OK);
+		Error response = _modelosYcomunicacionesService.borrarInformes(request, idInformes);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/combo/consultas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> obtenerComboConsultas(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
-		
-		ComboDTO response = _modelosYcomunicacionesService.obtenerConsultasDisponibles(request, plantillaDoc);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-	}
 	
-	@RequestMapping(value = "/plantilla/consultas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ConsultasDTO> obtenerConsultas(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
-		
-		ConsultasDTO response = _modelosYcomunicacionesService.obtenerConsultasPlantilla(request, plantillaDoc, false);
-		return new ResponseEntity<ConsultasDTO>(response, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/plantilla/consultas/historico",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ConsultasDTO> obtenerConsultasHistorico(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
-		
-		ConsultasDTO response = _modelosYcomunicacionesService.obtenerConsultasPlantilla(request, plantillaDoc, true);
-		return new ResponseEntity<ConsultasDTO>(response, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/plantilla/consultas/guardar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> guardarConsultas(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
-		
-		Error response = _modelosYcomunicacionesService.guardarConsultasPlantilla(request, plantillaDoc);
-		return new ResponseEntity<Error>(response, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/guardarPlantillaDoc",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> guardarPlantillaDocumento(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
-		
-		Error response = _modelosYcomunicacionesService.guardarModPlantillaDocumento(request, plantillaDoc);
-		return new ResponseEntity<Error>(response, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/plantilla/formatos",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> obtenerFormatoSalida(HttpServletRequest request) {
-		
-		ComboDTO response = _modelosYcomunicacionesService.obtenerFormatoSalida(request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/plantilla/sufijos",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> obtenerSufijos(HttpServletRequest request) {
-		
-		ComboDTO response = _modelosYcomunicacionesService.obtenerSufijos(request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
-	}
 	@RequestMapping(value = "detalle/plantillasEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<PlantillasModeloDTO> obtenerPlantillasEnvio(HttpServletRequest request, @RequestBody String idModelo) {
 		
@@ -224,37 +179,5 @@ public class ModelosYComunicacionesController {
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(value = "/detalle/subirPlantilla",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	ResponseEntity<ResponseDocumentoDTO> uploadFile(MultipartHttpServletRequest request) throws Exception{
-		
-		ResponseDocumentoDTO response = _modelosYcomunicacionesService.uploadFile(request);
-		if(response.getError() == null)
-			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.OK);	
-		else
-			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(value = "/detalle/insertarPlantilla",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ResponseDocumentoDTO> insertarPlantilla(HttpServletRequest request, @RequestBody DocumentoPlantillaItem documento) throws Exception{
-		
-		ResponseDocumentoDTO response = _modelosYcomunicacionesService.guardarPlantillaDocumento(request, documento);
-		if(response.getError() == null)
-			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.OK);	
-		else
-			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	@RequestMapping(value = "/detalle/plantillas",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DocumentosPlantillaDTO> obtenerPlantillasInforme(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) throws Exception{
-		
-		DocumentosPlantillaDTO response = _modelosYcomunicacionesService.obtenerPlantillasInforme(request, plantillaDoc);
-		if(response.getError() == null)
-			return new ResponseEntity<DocumentosPlantillaDTO>(response, HttpStatus.OK);	
-		else
-			return new ResponseEntity<DocumentosPlantillaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	
-	
+	}	
 }

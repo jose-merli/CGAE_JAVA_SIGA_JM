@@ -82,7 +82,7 @@ alter table MOD_PLANTILLADOC_CONSULTA
   );
   
   alter table mod_modelo_plantilladocumento add IDINFORME number(10);  
-  
+   alter table mod_modelo_plantilladocumento add FECHABAJA date;  
   
 -- Create table
 create table MOD_REL_PLANTILLA_SUFIJO

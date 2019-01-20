@@ -16,12 +16,13 @@ import org.springframework.stereotype.Service;
 public interface ModPlantillaDocumentoExtendsMapper {
 	
 	@SelectProvider(type = ModPlantillaDocumentoExtendsSqlProvider.class, method = "selectPlantillasByInforme")
-	@Results({@Result(column = "IDIOMA", property = "idioma", jdbcType = JdbcType.VARCHAR),
+	@Results({@Result(column = "IDIOMA", property = "idIdioma", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PLANTILLA", property = "nombreDocumento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPLANTILLADOCUMENTO", property = "idPlantillaDocumento", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDINFORME", property = "idInforme", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDINFORME", property = "idInforme", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "idioma", jdbcType = JdbcType.VARCHAR)
 	})
-	List<DocumentoPlantillaItem> selectPlantillasByInforme(Long idInforme, Long idModeloComunicacion);
+	List<DocumentoPlantillaItem> selectPlantillasByInforme(Long idInforme, Long idModeloComunicacion, String idLenguaje);
 
 	
 }

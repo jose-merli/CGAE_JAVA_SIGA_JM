@@ -8,6 +8,7 @@ public class DocumentoPlantillaItem {
 	private String nombreDocumento;
 	private String idPlantillaDocumento;
 	private String idioma;
+	private String idIdioma;
 	private String idInforme;
 	private Error error;
 	
@@ -46,6 +47,12 @@ public class DocumentoPlantillaItem {
 	}
 	public void setIdInforme(String idInforme) {
 		this.idInforme = idInforme;
+	}
+	public String getIdIdioma() {
+		return idIdioma;
+	}
+	public void setIdIdioma(String idIdioma) {
+		this.idIdioma = idIdioma;
 	}
 	
 

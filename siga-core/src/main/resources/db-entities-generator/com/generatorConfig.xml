@@ -67,13 +67,10 @@
 			<property name="ignoreQualifiersAtRuntime" value="true"/>
 		</table>
 
-		<table schema="USCGAE" tableName="MOD_REL_PLANTILLA_SUFIJO" >
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-			<generatedKey column="IDPLANTILLASUFIJO" sqlStatement="SELECT SEQ_MOD_REL_PLANTILLA_SUFIJO.NEXTVAL FROM DUAL"/>
-		</table>
-
-<!-- 		<table schema="USCGAE" tableName="MOD_MODELO_PLANTILLADOCUMENTO" > -->
+<!-- 		<table schema="USCGAE" tableName="MOD_REL_PLANTILLA_SUFIJO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			<generatedKey column="IDPLANTILLASUFIJO" sqlStatement="SELECT SEQ_MOD_REL_PLANTILLA_SUFIJO.NEXTVAL FROM DUAL"/> -->
+<!-- 		</table> -->
 
 <!-- 		<table schema="USCGAE" tableName="MOD_PLANTILLADOCUMENTO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
