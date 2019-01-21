@@ -538,7 +538,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 			if (hashtable.get(SigaConstants.C_FECHAFIN) != null
 					&& !hashtable.get(SigaConstants.C_FECHAFIN).toString().equals(""))
 				try {
-					DateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy",Locale.ENGLISH);
+					DateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 
 					cargaMasivaDatosCVItem
 							.setFechaFin(sdf.parse((String) hashtable.get(SigaConstants.C_FECHAFIN)));
@@ -549,7 +549,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 			if (hashtable.get(SigaConstants.C_FECHAINICIO) != null
 					&& !hashtable.get(SigaConstants.C_FECHAINICIO).toString().equals(""))
 				try {
-					DateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy",Locale.ENGLISH);
+					DateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 
 					cargaMasivaDatosCVItem
 							.setFechaInicio(sdf.parse((String) hashtable.get(SigaConstants.C_FECHAINICIO)));

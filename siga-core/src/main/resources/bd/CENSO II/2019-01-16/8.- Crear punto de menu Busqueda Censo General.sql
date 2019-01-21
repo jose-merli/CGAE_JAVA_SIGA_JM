@@ -39,3 +39,7 @@ Insert into GEN_MENU
 update gen_menu set idparent = '0' where idmenu = '1c';
  
 update gen_procesos set descripcion = 'Búsqueda Censo General', idparent = '001' where idproceso = '1c'; 
+
+
+
+update gen_menu set fecha_baja = sysdate where idmenu = '54';
