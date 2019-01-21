@@ -68,6 +68,8 @@ import org.itcgae.siga.db.entities.ForTemacursoCurso;
 import org.itcgae.siga.db.entities.ForTemacursoCursoExample;
 import org.itcgae.siga.db.entities.ForTiposervicioCurso;
 import org.itcgae.siga.db.entities.ForTiposervicioCursoExample;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcion;
 import org.itcgae.siga.db.entities.PysPreciosservicios;
 import org.itcgae.siga.db.entities.PysServicios;
@@ -1692,24 +1694,6 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					}
 				}
 
-				// Insertamos en tabla For_inscripcion_Masiva el fichero que se ha parseado
-				forInscripcionesmasivas.setIdinstitucion(idInstitucion);
-				forInscripcionesmasivas.setNombrefichero(nombreFichero);
-				forInscripcionesmasivas.setFechamodificacion(new Date());
-				forInscripcionesmasivas.setUsumodificacion(Long.valueOf(usuario.getIdusuario()));
-				forInscripcionesmasivas.setIdcurso(Long.valueOf(idCurso));
-				String numLineas = String.valueOf(inscripcionList.size());
-				forInscripcionesmasivas.setNumerolineastotales(Long.valueOf(numLineas));
-				String lineasCorrectas = String.valueOf(inscripcionList.size() - registrosErroneos);
-				forInscripcionesmasivas.setInscripcionescorrectas(Long.valueOf(lineasCorrectas));
-
-				LOGGER.info(
-						"uploadFileExcel() / forInscripcionesmasivasMapper.insert(forInscripcionesmasivas) -> Entrada a forInscripcionesmasivasMapper para insertar el fichero parseado carga masiva de inscripciones");
-
-				int result = forInscripcionesmasivasMapper.insert(forInscripcionesmasivas);
-
-				LOGGER.info(
-						"uploadFileExcel() / forInscripcionesmasivasMapper.insert(forInscripcionesmasivas) -> Salida a forInscripcionesmasivasMapper para insertar el fichero parseado carga masiva de inscripciones");
 
 				// Si no hay errores se insertan las inscripciones nuevas
 				if (registrosErroneos == 0) {
@@ -1730,7 +1714,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							LOGGER.info(
 									"uploadFileExcel() / forInscripcionExtendsMapper.insert(inscripcionInsert) -> Entrada a forInscripcionExtendsMapper para insertar una inscripcion");
 
-							result = forInscripcionExtendsMapper.insert(inscripcionInsert);
+							int result = forInscripcionExtendsMapper.insert(inscripcionInsert);
 
 							LOGGER.info(
 									"uploadFileExcel() / forInscripcionExtendsMapper.insert(inscripcionInsert) -> Salida a forInscripcionExtendsMapper para insertar una inscripcion");
@@ -1768,8 +1752,32 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				// Generamos el fichero de errores
 				byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSPLOGCURSO, datosLog);
 
+				// Insertamos en tabla For_inscripcion_Masiva el fichero que se ha parseado
+				forInscripcionesmasivas.setIdinstitucion(idInstitucion);
+				forInscripcionesmasivas.setNombrefichero(nombreFichero);
+				forInscripcionesmasivas.setFechamodificacion(new Date());
+				forInscripcionesmasivas.setUsumodificacion(Long.valueOf(usuario.getIdusuario()));
+				forInscripcionesmasivas.setIdcurso(Long.valueOf(idCurso));
+				String numLineas = String.valueOf(inscripcionList.size());
+				forInscripcionesmasivas.setNumerolineastotales(Long.valueOf(numLineas));
+				String lineasCorrectas = String.valueOf(inscripcionList.size() - registrosErroneos);
+				forInscripcionesmasivas.setInscripcionescorrectas(Long.valueOf(lineasCorrectas));
+
+	
+				
 				Long idFile = uploadFile(file.getBytes(), forInscripcionesmasivas, false, usuario);
 				Long idLogFile = uploadFile(bytesLog, forInscripcionesmasivas, true, usuario);
+				
+				forInscripcionesmasivas.setIdfichero(idFile);
+				forInscripcionesmasivas.setIdficherolog(idLogFile);
+				LOGGER.info(
+						"uploadFileExcel() / forInscripcionesmasivasMapper.insert(forInscripcionesmasivas) -> Entrada a forInscripcionesmasivasMapper para insertar el fichero parseado carga masiva de inscripciones");
+
+				int result = forInscripcionesmasivasMapper.insert(forInscripcionesmasivas);
+
+				LOGGER.info(
+						"uploadFileExcel() / forInscripcionesmasivasMapper.insert(forInscripcionesmasivas) -> Salida a forInscripcionesmasivasMapper para insertar el fichero parseado carga masiva de inscripciones");
+
 
 			}
 
@@ -2079,24 +2087,21 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		LOGGER.info(dateLog + ":inicio.CargaInscripcionesMasiva.getDirectorioFichero");
 
 		// Extraer propiedad
-		// GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
-		// genPropertiesExampleP.createCriteria().andParametroEqualTo("gen.ficheros.path");
-		// List<GenProperties> genPropertiesPath =
-		// genPropertiesMapper.selectByExample(genPropertiesExampleP);
-		// genPropertiesPath.get(0).getValor()
-		StringBuffer directorioFichero = new StringBuffer("C:\\Users\\DTUser\\Documents\\cargas");
+		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("cen.cargaExcel.ficheros.path");
+		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
+		String pathGF = genPropertiesPath.get(0).getValor();
+		
+		StringBuffer directorioFichero = new StringBuffer(pathGF);
 		directorioFichero.append(idInstitucion);
 		directorioFichero.append(File.separator);
 
-		// Extraer propiedad
-		// GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
-		// genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.cargamasivaGF");
-		// List<GenProperties> genPropertiesDirectorio =
-		// genPropertiesMapper.selectByExample(genPropertiesExampleD);
-		// // genPropertiesDirectorio.get(0).getValor()
-		directorioFichero.append("inscripciones");
+		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
+		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.inscripciones");
+		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
+		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
 
-		LOGGER.info(dateLog + ":fin.CargaMasivaInscripciones.getDirectorioFichero");
+		LOGGER.info(dateLog + ":fin.CargaMasivaDatosGFImpl.getDirectorioFichero");
 		return directorioFichero.toString();
 	}
 
@@ -3638,6 +3643,52 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 		updateResponseDTO.setError(error);
 		return updateResponseDTO;
+	}
+
+	@Override
+	public ResponseEntity<InputStreamResource> generateExcelMasiveInscriptions(CargaMasivaInscripcionesDTO cargaMasivaInscripcionesDTO,
+			HttpServletRequest request) {
+
+		LOGGER.info("downloadOriginalFile() -> Entrada al servicio para generar la plantilla de errores");
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		// Extraer el path
+		if (null != cargaMasivaInscripcionesDTO) {
+			if (null != cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem() && cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().size() > 0) {
+				cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getNombreFichero();
+
+		String path = getDirectorioFichero(idInstitucion);
+		if (cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getNumeroLineasTotales().equals(cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getInscripcionesCorrectas())) {
+			path +=  File.separator +  cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getIdFichero() + "."
+					+ SigaConstants.tipoExcelXls;
+		}else{
+			path +=  File.separator + "log_" + idInstitucion + "_" + cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getIdFicheroLog() + "."
+					+ SigaConstants.tipoExcelXls;
+		}
+		File file = new File(path);
+
+		// Preparar la descarga
+		InputStream fileStream = null;
+		ResponseEntity<InputStreamResource> res = null;
+		try {
+			fileStream = new FileInputStream(file);
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+			headers.setContentLength(file.length());
+			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+		LOGGER.info("downloadOriginalFile() -> Salida del servicio para generar la plantilla de errores");
+
+		return res;
+		}
+	}
+		return null;
 	}
 
 }
