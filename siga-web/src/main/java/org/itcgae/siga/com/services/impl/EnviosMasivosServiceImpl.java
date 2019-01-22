@@ -4,6 +4,7 @@ package org.itcgae.siga.com.services.impl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -889,6 +890,10 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					// creo directorio si no existe
 					aux.mkdirs();
 					File serverFile = new File(pathFichero, fileName);
+					if(serverFile.exists()){
+						LOGGER.error("Ya existe el fichero: " + pathFichero + fileName);
+						throw new FileAlreadyExistsException("El fichero ya existe");
+					}
 					//stream = new BufferedOutputStream(new FileOutputStream(serverFile));
 					//stream.write(file.getBytes());
 					FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
@@ -901,6 +906,13 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					response.setError(error);
 					e.printStackTrace();
 					LOGGER.error("uploadFile() -> Error al buscar el documento de envio en el directorio indicado",e);
+				} catch (FileAlreadyExistsException ex) {
+					Error error = new Error();
+					error.setCode(400);
+					error.setDescription(ex.getMessage());
+					response.setError(error);
+					ex.printStackTrace();
+					LOGGER.error("uploadFile() -> El fichero ya existe en el filesystem",ex);
 				} catch (IOException ioe) {
 					Error error = new Error();
 					error.setCode(500);

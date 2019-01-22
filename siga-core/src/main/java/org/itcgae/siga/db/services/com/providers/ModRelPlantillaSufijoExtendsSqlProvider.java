@@ -18,6 +18,9 @@ public class ModRelPlantillaSufijoExtendsSqlProvider {
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON rec.IDRECURSO = sufijo.NOMBRE AND rec.idlenguaje = '" + idLenguaje+ "'");
 		sql.WHERE("relSufijo.Idmodelocomunicacion = " + idModeloComunicacion + " AND relSufijo.IDINFORME = " + idInforme);
 		
+		sql.GROUP_BY("relSufijo.Idsufijo,rec.DESCRIPCION, relSufijo.orden");
+		sql.ORDER_BY("relSufijo.orden ASC");
+		
 		return sql.toString();
 	}
 

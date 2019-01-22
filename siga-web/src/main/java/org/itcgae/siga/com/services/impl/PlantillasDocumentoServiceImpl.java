@@ -4,6 +4,7 @@ package org.itcgae.siga.com.services.impl;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -472,6 +473,10 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					// creo directorio si no existe
 					aux.mkdirs();
 					File serverFile = new File(pathFichero, fileName);
+					if(serverFile.exists()){
+						LOGGER.error("Ya existe el fichero: " + pathFichero + fileName);
+						throw new FileAlreadyExistsException("El fichero ya existe");
+					}
 					//stream = new BufferedOutputStream(new FileOutputStream(serverFile));
 					//stream.write(file.getBytes());
 					FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
@@ -484,6 +489,13 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					response.setError(error);
 					e.printStackTrace();
 					LOGGER.error("uploadFile() -> Error al buscar la plantilla de documento en el directorio indicado",e);
+				} catch (FileAlreadyExistsException ex) {
+					Error error = new Error();
+					error.setCode(400);
+					error.setDescription(ex.getMessage());
+					response.setError(error);
+					ex.printStackTrace();
+					LOGGER.error("uploadFile() -> El fichero ya existe en el filesystem",ex);
 				} catch (IOException ioe) {
 					Error error = new Error();
 					error.setCode(500);
@@ -806,8 +818,10 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										relSufijoPlantilla.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
 										relSufijoPlantilla.setIdsufijo(Short.parseShort(sufijo.getIdSufijo()));
 										relSufijoPlantilla.setOrden(Short.parseShort(sufijo.getOrden()));
+										relSufijoPlantilla.setIdinforme(Long.parseLong(plantillaDoc.getIdInforme()));
 										relSufijoPlantilla.setFechamodificacion(new Date());
-										relSufijoPlantilla.setUsumodificacion(usuario.getIdusuario());										
+										relSufijoPlantilla.setUsumodificacion(usuario.getIdusuario());	
+										modRelPlantillaSufijoMapper.insertSelective(relSufijoPlantilla);
 									}
 								}								
 							}
