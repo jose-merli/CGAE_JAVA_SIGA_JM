@@ -4,7 +4,7 @@
 
 <mapper namespace= "org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper">
 
-	<resultMap type="hashmap" id="mapa">
+	<resultMap type="map" id="mapa">
 	</resultMap>
 	<sql id="select">
 		SELECT ${query.selectValue}
@@ -22,7 +22,7 @@
 		LEFT JOIN ${query.leftJoinValue}
 	</sql>
 	<sql id="outerJoin">
-		OUTER JOIN ${query.outerJoinValue}S
+		OUTER JOIN ${query.outerJoinValue}
 	</sql>
 	<sql id="where">
 		WHERE ${query.whereValue}
@@ -62,12 +62,11 @@
 	    	<include refid="outerJoin">
 	    	</include>
   		</if>
-  		
-  		<if test="query.wherevalue != '' and query.wherevalue != null">
-	    	<include refid="where">
+ 		<if test="query.whereValue != '' ">
+    		<include refid="where">
 	    	</include>
-    	</if>
-    	
+   		</if>
+
   		<if test="query.orderByValue != '' and query.orderByValue != null">
 	    	<include refid="orderBy">
 	    	</include>
@@ -83,6 +82,5 @@
 	    	</include>
     	</if>
 
-  		
 	</select>
 </mapper>
