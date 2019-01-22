@@ -21,7 +21,6 @@ import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
-import org.itcgae.siga.DTOs.com.PlantillaModeloDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.SufijoItem;
@@ -61,6 +60,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
+@Transactional
 public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoService{
 
 	private Logger LOGGER = Logger.getLogger(PlantillasDocumentoServiceImpl.class);
@@ -753,7 +753,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 									
 									if(modModeloPlantillaDoc != null){
 										modModeloPlantillaDoc.setFechamodificacion(new Date());
-										modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getFormatoSalida());
+										modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getIdFormatoSalida());
 										modModeloPlantillaDoc.setNombreficherosalida(plantillaDoc.getNombreFicheroSalida());
 										modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
 										modModeloPlantillaDoc.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());		
@@ -763,7 +763,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 									}else{
 										modModeloPlantillaDoc = new ModModeloPlantilladocumento();
 										modModeloPlantillaDoc.setFechamodificacion(new Date());
-										modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getFormatoSalida());
+										modModeloPlantillaDoc.setFormatosalida(plantillaDoc.getIdFormatoSalida());
 										modModeloPlantillaDoc.setNombreficherosalida(plantillaDoc.getNombreFicheroSalida());
 										modModeloPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
 										modModeloPlantillaDoc.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());

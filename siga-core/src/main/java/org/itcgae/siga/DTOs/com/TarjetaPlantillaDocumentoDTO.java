@@ -12,6 +12,7 @@ public class TarjetaPlantillaDocumentoDTO {
 	private String idioma;
 	private String nombreFicheroSalida;
 	private String formatoSalida;
+	private String idFormatoSalida;
 	private String destinatarios;
 	private String condicion;
 	private String multiDocumento;
@@ -133,6 +134,12 @@ public class TarjetaPlantillaDocumentoDTO {
 	}
 	public void setNombreFicheroSalida(String nombreFicheroSalida) {
 		this.nombreFicheroSalida = nombreFicheroSalida;
+	}
+	public String getIdFormatoSalida() {
+		return idFormatoSalida;
+	}
+	public void setIdFormatoSalida(String idFormatoSalida) {
+		this.idFormatoSalida = idFormatoSalida;
 	}
 	
 	
