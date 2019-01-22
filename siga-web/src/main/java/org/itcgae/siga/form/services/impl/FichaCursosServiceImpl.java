@@ -2439,114 +2439,131 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 								"autovalidateInscriptionsCourse() / forInscripcionExtendsMapper.selectByExample() -> Salida a forInscripcionExtendsMapper para obtener las inscripciones del fichero seleccionado");
 
 						if (null != inscriptionList && inscriptionList.size() > 0) {
-
-							for (ForInscripcion inscription : inscriptionList) {
-
-								if (inscription.getIdestadoinscripcion() == SigaConstants.INSCRIPCION_PENDIENTE) {
-
-									PysPeticioncomprasuscripcion pysPeticioncomprasuscripcion = new PysPeticioncomprasuscripcion();
-									pysPeticioncomprasuscripcion.setFechamodificacion(new Date());
-									pysPeticioncomprasuscripcion.setIdinstitucion(idInstitucion);
-									pysPeticioncomprasuscripcion.setUsumodificacion(usuario.getIdusuario());
-									pysPeticioncomprasuscripcion.setTipopeticion("A");
-									pysPeticioncomprasuscripcion.setIdestadopeticion(Short.valueOf("20"));
-									NewIdDTO idPeticion = pysPeticioncomprasuscripcionExtendsMapper
-											.selectMaxIdPeticion(idInstitucion);
-									pysPeticioncomprasuscripcion.setIdpeticion(Long.valueOf(idPeticion.getNewId()));
-									pysPeticioncomprasuscripcion.setIdpersona(inscription.getIdpersona());
-									pysPeticioncomprasuscripcion.setFecha(new Date());
-									pysPeticioncomprasuscripcion.setNumOperacion("1");
-
-									LOGGER.info(
-											"autovalidateInscriptionsCourse() / pysPeticioncomprasuscripcionExtendsMapper.insert() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para insertar un precio servicio");
-
-									response = pysPeticioncomprasuscripcionExtendsMapper
-											.insert(pysPeticioncomprasuscripcion);
-
-									LOGGER.info(
-											"autovalidateInscriptionsCourse() / pysPeticioncomprasuscripcionExtendsMapper.insert() -> Salida a pysPeticioncomprasuscripcionExtendsMapper para insertar un precio servicio");
-
-									NewIdDTO idservicio = pysServiciosExtendsMapper
-											.selectIdServicioByIdCurso(idInstitucion, inscription.getIdcurso());
-									NewIdDTO idserviciosinstitucion = pysServiciosinstitucionExtendsMapper
-											.selectIdServicioinstitucionByIdServicio(idInstitucion,
-													Long.valueOf(idservicio.getNewId()));
-
-									PysServiciossolicitados pysServiciossolicitados = new PysServiciossolicitados();
-									pysServiciossolicitados.setFechamodificacion(new Date());
-									pysServiciossolicitados.setIdinstitucion(idInstitucion);
-									pysServiciossolicitados.setUsumodificacion(usuario.getIdusuario());
-									pysServiciossolicitados.setAceptado("A");
-									pysServiciossolicitados
-											.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
-									pysServiciossolicitados.setIdservicio(Long.valueOf(idservicio.getNewId()));
-									pysServiciossolicitados
-											.setIdserviciosinstitucion(Long.valueOf(idserviciosinstitucion.getNewId()));
-									pysServiciossolicitados
-											.setIdpeticion(Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
-									pysServiciossolicitados.setIdpersona(inscription.getIdpersona());
-									pysServiciossolicitados.setCantidad(1);
-									pysServiciossolicitados.setIdformapago(Short.valueOf("10"));
-
-									LOGGER.info(
-											"autovalidateInscriptionsCourse() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para insertar el servicio solicitado");
-
-									response = pysServiciossolicitadosMapper.insert(pysServiciossolicitados);
-
-									LOGGER.info(
-											"autovalidateInscriptionsCourse() / pysServiciossolicitadosMapper.insert() -> Salida a pysServiciossolicitadosMapper para insertar el servicio solicitado");
-
-									PysSuscripcion pysSuscripcion = new PysSuscripcion();
-									pysSuscripcion.setFechamodificacion(new Date());
-									pysSuscripcion.setIdinstitucion(idInstitucion);
-									pysSuscripcion.setUsumodificacion(usuario.getIdusuario());
-									pysSuscripcion.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
-									pysSuscripcion.setIdservicio(Long.valueOf(idservicio.getNewId()));
-									pysSuscripcion
-											.setIdserviciosinstitucion(Long.valueOf(idserviciosinstitucion.getNewId()));
-									pysSuscripcion
-											.setIdpeticion(Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
-									pysSuscripcion.setIdpersona(inscription.getIdpersona());
-									pysSuscripcion.setCantidad(1);
-									pysSuscripcion.setIdformapago(Short.valueOf("10"));
-									pysSuscripcion.setFechasuscripcion(new Date());
-
-									CursoItem curso = forCursoExtendsMapper.searchCourseByIdcurso(
-											inscription.getIdcurso().toString(), idInstitucion,
-											usuario.getIdlenguaje());
-
-									pysSuscripcion.setDescripcion(curso.getNombreCurso());
-									NewIdDTO idSuscripcion = pysSuscripcionExtendsMapper.selectMaxIdSuscripcion(
-											idInstitucion, Long.valueOf(idservicio.getNewId()),
-											Long.valueOf(idserviciosinstitucion.getNewId()));
-									pysSuscripcion.setIdsuscripcion(Long.valueOf(idSuscripcion.getNewId()));
-
-									LOGGER.info(
-											"autovalidateInscriptionsCourse() / pysSuscripcionExtendsMapper.insert() -> Entrada a pysSuscripcionExtendsMapper para insertar la suscripcion a la inscripcion");
-
-									response = pysSuscripcionExtendsMapper.insert(pysSuscripcion);
-
-									LOGGER.info(
-											"autovalidateInscriptionsCourse() / pysSuscripcionExtendsMapper.insert() -> Salida a pysSuscripcionExtendsMapper para insertar la suscripcion a la inscripcion");
-
-									LOGGER.info(
-											"autovalidateInscriptionsCourse() / forInscripcionExtendsMapper.updateByPrimaryKey() -> Entrada a forInscripcionExtendsMapper cambiar el estado a las inscripciones aprobada");
-
-									// Guardamos el idPeticion y actualizamos la inscripcion a aprobada
-									inscription.setFechamodificacion(new Date());
-									inscription.setIdpeticionsuscripcion(Long.valueOf(idPeticion.getNewId()));
-									inscription.setUsumodificacion(usuario.getIdusuario().longValue());
-									inscription.setIdestadoinscripcion(SigaConstants.INSCRIPCION_APROBADA);
-									response = forInscripcionExtendsMapper.updateByPrimaryKey(inscription);
-
-									LOGGER.info(
-											"autovalidateInscriptionsCourse() / forInscripcionExtendsMapper.updateByPrimaryKey() -> Salida a forInscripcionExtendsMapper cambiar el estado a las inscripciones a aprobada");
-
-								} else {
-									error.setDescription(
-											"Las inscripciones no se pueden aprobar porque no estan en estado pendiente.");
-
+							//Primero comprobamos las plazas disponibles del curso
+							CursoItem inscripcionesAprobadas = forInscripcionExtendsMapper.compruebaPlazasAprobadas(fichero.getIdCurso());
+							if (null == inscripcionesAprobadas) {
+								inscripcionesAprobadas = new CursoItem();
+								inscripcionesAprobadas.setInscripciones("0");
+							}
+							ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(fichero.getIdCurso()));
+							Long plazasdisponibles =0L;
+							if (null != cursoEntidad) {
+								if (null != cursoEntidad.getNumeroplazas()) {
+									plazasdisponibles = cursoEntidad.getNumeroplazas() - Long.parseLong(inscripcionesAprobadas.getInscripciones());
 								}
+							}
+							if (plazasdisponibles >= Long.parseLong(fichero.getNumeroLineasTotales())) {
+
+								for (ForInscripcion inscription : inscriptionList) {
+	
+									if (inscription.getIdestadoinscripcion() == SigaConstants.INSCRIPCION_PENDIENTE) {
+	
+										PysPeticioncomprasuscripcion pysPeticioncomprasuscripcion = new PysPeticioncomprasuscripcion();
+										pysPeticioncomprasuscripcion.setFechamodificacion(new Date());
+										pysPeticioncomprasuscripcion.setIdinstitucion(idInstitucion);
+										pysPeticioncomprasuscripcion.setUsumodificacion(usuario.getIdusuario());
+										pysPeticioncomprasuscripcion.setTipopeticion("A");
+										pysPeticioncomprasuscripcion.setIdestadopeticion(Short.valueOf("20"));
+										NewIdDTO idPeticion = pysPeticioncomprasuscripcionExtendsMapper
+												.selectMaxIdPeticion(idInstitucion);
+										pysPeticioncomprasuscripcion.setIdpeticion(Long.valueOf(idPeticion.getNewId()));
+										pysPeticioncomprasuscripcion.setIdpersona(inscription.getIdpersona());
+										pysPeticioncomprasuscripcion.setFecha(new Date());
+										pysPeticioncomprasuscripcion.setNumOperacion("1");
+	
+										LOGGER.info(
+												"autovalidateInscriptionsCourse() / pysPeticioncomprasuscripcionExtendsMapper.insert() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para insertar un precio servicio");
+	
+										response = pysPeticioncomprasuscripcionExtendsMapper
+												.insert(pysPeticioncomprasuscripcion);
+	
+										LOGGER.info(
+												"autovalidateInscriptionsCourse() / pysPeticioncomprasuscripcionExtendsMapper.insert() -> Salida a pysPeticioncomprasuscripcionExtendsMapper para insertar un precio servicio");
+	
+										NewIdDTO idservicio = pysServiciosExtendsMapper
+												.selectIdServicioByIdCurso(idInstitucion, inscription.getIdcurso());
+										NewIdDTO idserviciosinstitucion = pysServiciosinstitucionExtendsMapper
+												.selectIdServicioinstitucionByIdServicio(idInstitucion,
+														Long.valueOf(idservicio.getNewId()));
+	
+										PysServiciossolicitados pysServiciossolicitados = new PysServiciossolicitados();
+										pysServiciossolicitados.setFechamodificacion(new Date());
+										pysServiciossolicitados.setIdinstitucion(idInstitucion);
+										pysServiciossolicitados.setUsumodificacion(usuario.getIdusuario());
+										pysServiciossolicitados.setAceptado("A");
+										pysServiciossolicitados
+												.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
+										pysServiciossolicitados.setIdservicio(Long.valueOf(idservicio.getNewId()));
+										pysServiciossolicitados
+												.setIdserviciosinstitucion(Long.valueOf(idserviciosinstitucion.getNewId()));
+										pysServiciossolicitados
+												.setIdpeticion(Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
+										pysServiciossolicitados.setIdpersona(inscription.getIdpersona());
+										pysServiciossolicitados.setCantidad(1);
+										pysServiciossolicitados.setIdformapago(Short.valueOf("10"));
+	
+										LOGGER.info(
+												"autovalidateInscriptionsCourse() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para insertar el servicio solicitado");
+	
+										response = pysServiciossolicitadosMapper.insert(pysServiciossolicitados);
+	
+										LOGGER.info(
+												"autovalidateInscriptionsCourse() / pysServiciossolicitadosMapper.insert() -> Salida a pysServiciossolicitadosMapper para insertar el servicio solicitado");
+	
+										PysSuscripcion pysSuscripcion = new PysSuscripcion();
+										pysSuscripcion.setFechamodificacion(new Date());
+										pysSuscripcion.setIdinstitucion(idInstitucion);
+										pysSuscripcion.setUsumodificacion(usuario.getIdusuario());
+										pysSuscripcion.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
+										pysSuscripcion.setIdservicio(Long.valueOf(idservicio.getNewId()));
+										pysSuscripcion
+												.setIdserviciosinstitucion(Long.valueOf(idserviciosinstitucion.getNewId()));
+										pysSuscripcion
+												.setIdpeticion(Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
+										pysSuscripcion.setIdpersona(inscription.getIdpersona());
+										pysSuscripcion.setCantidad(1);
+										pysSuscripcion.setIdformapago(Short.valueOf("10"));
+										pysSuscripcion.setFechasuscripcion(new Date());
+	
+										CursoItem curso = forCursoExtendsMapper.searchCourseByIdcurso(
+												inscription.getIdcurso().toString(), idInstitucion,
+												usuario.getIdlenguaje());
+	
+										pysSuscripcion.setDescripcion(curso.getNombreCurso());
+										NewIdDTO idSuscripcion = pysSuscripcionExtendsMapper.selectMaxIdSuscripcion(
+												idInstitucion, Long.valueOf(idservicio.getNewId()),
+												Long.valueOf(idserviciosinstitucion.getNewId()));
+										pysSuscripcion.setIdsuscripcion(Long.valueOf(idSuscripcion.getNewId()));
+	
+										LOGGER.info(
+												"autovalidateInscriptionsCourse() / pysSuscripcionExtendsMapper.insert() -> Entrada a pysSuscripcionExtendsMapper para insertar la suscripcion a la inscripcion");
+	
+										response = pysSuscripcionExtendsMapper.insert(pysSuscripcion);
+	
+										LOGGER.info(
+												"autovalidateInscriptionsCourse() / pysSuscripcionExtendsMapper.insert() -> Salida a pysSuscripcionExtendsMapper para insertar la suscripcion a la inscripcion");
+	
+										LOGGER.info(
+												"autovalidateInscriptionsCourse() / forInscripcionExtendsMapper.updateByPrimaryKey() -> Entrada a forInscripcionExtendsMapper cambiar el estado a las inscripciones aprobada");
+	
+										// Guardamos el idPeticion y actualizamos la inscripcion a aprobada
+										inscription.setFechamodificacion(new Date());
+										inscription.setIdpeticionsuscripcion(Long.valueOf(idPeticion.getNewId()));
+										inscription.setUsumodificacion(usuario.getIdusuario().longValue());
+										inscription.setIdestadoinscripcion(SigaConstants.INSCRIPCION_APROBADA);
+										response = forInscripcionExtendsMapper.updateByPrimaryKey(inscription);
+	
+										LOGGER.info(
+												"autovalidateInscriptionsCourse() / forInscripcionExtendsMapper.updateByPrimaryKey() -> Salida a forInscripcionExtendsMapper cambiar el estado a las inscripciones a aprobada");
+	
+									} else {
+										error.setDescription(
+												"Las inscripciones no se pueden aprobar porque no estÁn en estado pendiente.");
+	
+									}
+								}
+							} else {
+								error.setDescription("No existen plazas disponibles en el curso para validar las inscripciones");
 							}
 						} else {
 							error.setDescription("Fichero con inscripciones erróneas.");
