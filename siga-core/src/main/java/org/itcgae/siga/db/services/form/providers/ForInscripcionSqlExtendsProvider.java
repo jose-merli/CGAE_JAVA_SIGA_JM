@@ -48,7 +48,7 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.LEFT_OUTER_JOIN("FOR_TEMACURSO_CURSO TEMACURSO ON (TEMACURSO.IDCURSO = CURSO.IDCURSO AND TEMACURSO.IDINSTITUCION = CURSO.IDINSTITUCION AND TEMACURSO.FECHABAJA IS NULL)");
 		sql.LEFT_OUTER_JOIN(
 				"FOR_PERSONA_CURSO PERCURSO2 ON PERCURSO2.IDCURSO = CURSO.IDCURSO AND PERCURSO2.TUTOR = '1' AND CURSO.IDINSTITUCION = PERCURSO2.IDINSTITUCION");
-		sql.ORDER_BY("TO_DATE(FECHASOLICITUD) DESC");
+		sql.ORDER_BY("FECHASOLICITUD DESC");
 		
 		if (inscripcionItem.getIdCurso() != null && inscripcionItem.getIdCurso() != "") {
 			sql.WHERE("INSC.IDCURSO = '" + inscripcionItem.getIdCurso() + "'");
@@ -292,6 +292,26 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.WHERE("insc.idinscripcion = '" + idInscripcion + "'");
 		sql.WHERE("insc.idinstitucion = '" + idInstitucion + "'");
 		sql.GROUP_BY("fc.minimoasistencia");
+
+		return sql.toString();
+	}
+	
+	public String compruebaPlazasAprobadas(String idCurso) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("FC.IDCURSO");
+		sql.SELECT("FC.NUMEROPLAZAS");
+		sql.SELECT("FC.NOMBRECURSO");
+		sql.SELECT("NVL(COUNT(IDINSCRIPCION),0) AS INSCRIPCIONES");
+		
+		sql.FROM("FOR_CURSO FC");
+		sql.LEFT_OUTER_JOIN("FOR_INSCRIPCION FI ON FC.IDCURSO = FI.IDCURSO");
+		
+		sql.WHERE("FC.IDCURSO = '" + idCurso + "'");
+		sql.WHERE("FI.IDESTADOINSCRIPCION = 3");
+		
+		sql.GROUP_BY("FC.IDCURSO, FC.NOMBRECURSO, NUMEROPLAZAS");
 
 		return sql.toString();
 	}
