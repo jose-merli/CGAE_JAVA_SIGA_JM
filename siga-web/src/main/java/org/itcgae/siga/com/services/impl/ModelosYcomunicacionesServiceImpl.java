@@ -10,11 +10,13 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
+import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillaModeloDocumentoDTO;
 import org.itcgae.siga.DTOs.com.PlantillaModeloItem;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDTO;
 import org.itcgae.siga.DTOs.com.PlantillasModeloDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.SufijoItem;
 import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
@@ -37,12 +39,15 @@ import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
+import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
+import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
 import org.itcgae.siga.db.mappers.ModModeloPerfilesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
+import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPerfilesExtendsMapper;
@@ -98,6 +103,9 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	
 	@Autowired
 	private ModPlantilladocumentoMapper modPlantilladocumentoMapper;
+	
+	@Autowired
+	private ModPlantillaenvioConsultaMapper modPlantillaenvioConsultaMapper;
 	
 	@Override
 	public DatosModelosComunicacionesDTO modeloYComunicacionesSearch(HttpServletRequest request, DatosModelosComunicacionesSearch filtros, boolean historico) {
@@ -173,8 +181,9 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					
 					modelo.setOrden(null);
 					modelo.setFechabaja(null);
+					modelo.setIdmodelocomunicacion(null);
 					modelo.setFechamodificacion(new Date());
-					modelo.setIdinstitucion(idInstitucion);
+					modelo.setIdinstitucion(Short.parseShort(modeloComunicacion.getIdInstitucion()));
 					
 					modModelocomunicacionMapper.insert(modelo);
 					
@@ -187,7 +196,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					if(listaModPerfiles != null){
 						for(ModModeloPerfiles modPerfil : listaModPerfiles){
 							modPerfil.setFechamodificacion(new Date());
-							modPerfil.setIdinstitucion(idInstitucion);
+							modPerfil.setIdinstitucion(Short.parseShort(modeloComunicacion.getIdInstitucion()));
 							modPerfil.setIdmodelocomunicacion(modelo.getIdmodelocomunicacion());
 							modModeloPerfilesMapper.insert(modPerfil);
 						}
@@ -195,47 +204,72 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					
 					//Tabla mod_modelo_plantilladocumento
 					ModModeloPlantilladocumentoExample examplePlantillaDoc = new ModModeloPlantilladocumentoExample();
-					examplePlantillaDoc.createCriteria().andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion()));
+					examplePlantillaDoc.createCriteria().andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion())).andFechabajaIsNull();
 					
 					List<ModModeloPlantilladocumento> listaModPlantilla = modModeloPlantilladocumentoMapper.selectByExample(examplePlantillaDoc);
 					
 					if(listaModPlantilla != null){
 						for(ModModeloPlantilladocumento modPlantilla : listaModPlantilla){
+							Long idPlantillaDuplicar = modPlantilla.getIdplantilladocumento();
 							modPlantilla.setFechamodificacion(new Date());
 							modPlantilla.setIdmodelocomunicacion(modelo.getIdmodelocomunicacion());
 							modPlantilla.setFechaasociacion(new Date());
-							modModeloPlantilladocumentoMapper.insert(modPlantilla);
+							modModeloPlantilladocumentoMapper.insert(modPlantilla);						
+							
+							
+							//Tabla mod_plantilladoc_consulta
+							ModPlantilladocConsultaExample examplePlantillaConsulta = new ModPlantilladocConsultaExample();
+							examplePlantillaConsulta.createCriteria().andIdinstitucionEqualTo(Short.parseShort(modeloComunicacion.getIdInstitucion())).andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion())).andIdplantilladocumentoEqualTo(idPlantillaDuplicar);
+							
+							List<ModPlantilladocConsulta> listaModPlantillaConsulta = modPlantilladocConsultaMapper.selectByExample(examplePlantillaConsulta);
+							
+							if(listaModPlantillaConsulta != null){
+								for(ModPlantilladocConsulta modPlantillaConsulta : listaModPlantillaConsulta){
+									modPlantillaConsulta.setFechamodificacion(new Date());
+									modPlantillaConsulta.setIdmodelocomunicacion(modPlantilla.getIdmodelocomunicacion());
+									modPlantillaConsulta.setIdinstitucion(Short.parseShort(modeloComunicacion.getIdInstitucion()));
+									modPlantillaConsulta.setIdplantillaconsulta(null);
+									modPlantillaConsulta.setIdplantilladocumento(modPlantilla.getIdplantilladocumento());
+									modPlantilladocConsultaMapper.insert(modPlantillaConsulta);
+								}
+							}
+							
 						}
 					}
 					
+					
+					
 					//Tabla mod_modelo_plantillaenvio
 					ModModeloPlantillaenvioExample examplePlantillaEnvio = new ModModeloPlantillaenvioExample();
-					examplePlantillaEnvio.createCriteria().andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion()));
+					examplePlantillaEnvio.createCriteria().andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion())).andFechabajaIsNull();
 					
 					List<ModModeloPlantillaenvio> listaModPlantillaEnvio = modModeloPlantillaenvioMapper.selectByExample(examplePlantillaEnvio);
 					
 					if(listaModPlantillaEnvio != null){
 						for(ModModeloPlantillaenvio modPlantillaEnvio : listaModPlantillaEnvio){
+							Short idPlantillaEnvioDuplicar = modPlantillaEnvio.getIdplantillaenvios();
 							modPlantillaEnvio.setFechamodificacion(new Date());
 							modPlantillaEnvio.setIdmodelocomunicacion(modelo.getIdmodelocomunicacion());
 							modModeloPlantillaenvioMapper.insert(modPlantillaEnvio);
+							
+
+							//Tabla mod_plantillaenvio_consulta
+							ModPlantillaenvioConsultaExample exampleEnvioConsulta = new ModPlantillaenvioConsultaExample();
+							exampleEnvioConsulta.createCriteria().andIdinstitucionEqualTo(Short.parseShort(modeloComunicacion.getIdInstitucion())).andIdplantillaenviosEqualTo(idPlantillaEnvioDuplicar).andFechabajaIsNull();
+							
+							List<ModPlantillaenvioConsulta> listaModPlantillaEnvioConsulta = modPlantillaenvioConsultaMapper.selectByExample(exampleEnvioConsulta);
+							
+							if(listaModPlantillaEnvioConsulta != null){
+								for(ModPlantillaenvioConsulta modPlantillaEnvioConsulta : listaModPlantillaEnvioConsulta){
+									modPlantillaEnvioConsulta.setFechamodificacion(new Date());
+									modPlantillaEnvioConsulta.setIdinstitucion(Short.parseShort(modeloComunicacion.getIdInstitucion()));
+									modPlantillaEnvioConsulta.setIdplantillaenvios(idPlantillaEnvioDuplicar);
+									modPlantillaenvioConsultaMapper.insert(modPlantillaEnvioConsulta);
+								}
+							}
 						}
-					}
+					}				
 					
-					//Tabla mod_plantilladoc_consulta
-					ModPlantilladocConsultaExample examplePlantillaConsulta = new ModPlantilladocConsultaExample();
-					examplePlantillaConsulta.createCriteria().andIdinstitucionEqualTo(Short.parseShort(modeloComunicacion.getIdInstitucion())).andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion()));
-					
-					List<ModPlantilladocConsulta> listaModPlantillaConsulta = modPlantilladocConsultaMapper.selectByExample(examplePlantillaConsulta);
-					
-					if(listaModPlantillaEnvio != null){
-						for(ModPlantilladocConsulta modPlantillaConsulta : listaModPlantillaConsulta){
-							modPlantillaConsulta.setFechamodificacion(new Date());
-							modPlantillaConsulta.setIdmodelocomunicacion(modelo.getIdmodelocomunicacion());
-							modPlantillaConsulta.setIdinstitucion(idInstitucion);
-							modPlantilladocConsultaMapper.insert(modPlantillaConsulta);
-						}
-					}
 					
 					respuesta.setCode(200);
 					respuesta.setDescription("Datos duplicados correctamente");
@@ -244,6 +278,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
 					respuesta.setMessage("Error");
+					e.printStackTrace();
 				}				
 			}
 		}
@@ -403,7 +438,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	}
 
 	@Override
-	public Error guardarDatosGenerales(HttpServletRequest request, TarjetaModeloConfiguracionDTO datosTarjeta) {
+	public ResponseDataDTO guardarDatosGenerales(HttpServletRequest request, TarjetaModeloConfiguracionDTO datosTarjeta) {
 		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar los datos generales del modelo de comunicación");
 		
 		// Conseguimos información del usuario logeado
@@ -411,18 +446,20 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
-		Error respuesta = new Error();
+		Error error = new Error();
+		ResponseDataDTO respuesta = new ResponseDataDTO();
 		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
+			ModModelocomunicacion modeloCom = new ModModelocomunicacion();
+			
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
 					if(datosTarjeta.getIdModeloComunicacion() != null){
-						ModModelocomunicacion modeloCom = modModelocomunicacionMapper.selectByPrimaryKey(Long.parseLong(datosTarjeta.getIdModeloComunicacion()));
+						modeloCom = modModelocomunicacionMapper.selectByPrimaryKey(Long.parseLong(datosTarjeta.getIdModeloComunicacion()));
 						modeloCom.setDescripcion(datosTarjeta.getDescripcion());
 						modeloCom.setFechabaja(null);
 						modeloCom.setFechamodificacion(new Date());
@@ -436,7 +473,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						
 						modModelocomunicacionMapper.updateByPrimaryKey(modeloCom);
 					}else{
-						ModModelocomunicacion modeloCom = new ModModelocomunicacion();
+						modeloCom = new ModModelocomunicacion();
 						modeloCom.setDescripcion(datosTarjeta.getDescripcion());
 						modeloCom.setFechabaja(null);
 						modeloCom.setFechamodificacion(new Date());
@@ -450,14 +487,14 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						
 						modModelocomunicacionMapper.insert(modeloCom);
 					}
-					respuesta.setCode(200);
-					respuesta.setMessage("Datos generales guardados correctamente");
+					respuesta.setData(String.valueOf(modeloCom.getIdmodelocomunicacion()));
 
 				}
 			}catch(Exception e){
-				respuesta.setCode(500);
-				respuesta.setDescription("Error al guardar datos generales");
-				respuesta.setMessage(e.getMessage());
+				error.setCode(500);
+				error.setDescription("Error al guardar datos generales");
+				error.setMessage(e.getMessage());
+				respuesta.setError(error);
 			}
 		
 		}
@@ -699,7 +736,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 
 
 	@Override
-	public Error borrarInformes(HttpServletRequest request, String[] idInformes) {
+	public Error borrarInformes(HttpServletRequest request, PlantillaDocumentoBorrarDTO[] plantillasDoc) {
 		LOGGER.info("borrarInformes() -> Entrada al servicio para guardar la plantilla del modelo");
 		
 		// Conseguimos información del usuario logeado
@@ -714,16 +751,27 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			if (null != usuarios && usuarios.size() > 0) {
-		
+				AdmUsuarios usuario = usuarios.get(0);
 				try{
-					if(idInformes != null & idInformes.length > 0){
-						for(String idInforme : idInformes){
+					if(plantillasDoc != null & plantillasDoc.length > 0){
+						for(PlantillaDocumentoBorrarDTO plantilla : plantillasDoc){
 							ModModeloPlantilladocumentoExample example = new ModModeloPlantilladocumentoExample();
-							example.createCriteria().andIdinformeEqualTo(Long.parseLong(idInforme));
+							example.createCriteria().andIdinformeEqualTo(Long.parseLong(plantilla.getIdInforme()));
 							List<ModModeloPlantilladocumento> listaPlantillas = modModeloPlantilladocumentoMapper.selectByExample(example);
-							for(ModModeloPlantilladocumento plantilla:listaPlantillas){
-								plantilla.setFechabaja(new Date());
-								modModeloPlantilladocumentoMapper.updateByPrimaryKey(plantilla);
+							for(ModModeloPlantilladocumento plantillaBorrar:listaPlantillas){
+								plantillaBorrar.setFechabaja(new Date());
+								plantillaBorrar.setFechamodificacion(new Date());
+								plantillaBorrar.setUsumodificacion(usuario.getIdusuario());
+								modModeloPlantilladocumentoMapper.updateByPrimaryKey(plantillaBorrar);
+								
+								//También ponemos fecha de baja a las consultas asociadas a esa plantilla
+								ModPlantilladocConsultaExample examplePlantilla = new ModPlantilladocConsultaExample();
+								examplePlantilla.createCriteria().andIdmodelocomunicacionEqualTo(Long.parseLong(plantilla.getIdModeloComunicacion())).andIdplantilladocumentoEqualTo(Long.parseLong(plantilla.getIdPlantillaDocumento())).andIdinstitucionEqualTo(Short.parseShort(plantilla.getIdInstitucion()));
+								List<ModPlantilladocConsulta> listaConsultas = modPlantilladocConsultaMapper.selectByExample(examplePlantilla);
+								for(ModPlantilladocConsulta consultaBorrar :listaConsultas){
+									consultaBorrar.setFechabaja(new Date());
+									modPlantilladocConsultaMapper.updateByPrimaryKey(consultaBorrar);
+								}
 							}
 						}			
 					}
@@ -738,5 +786,5 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		}
 		
 		return respuesta;
-	}		
+	}
 }

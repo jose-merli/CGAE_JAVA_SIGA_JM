@@ -8,9 +8,11 @@ import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
+import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDTO;
 import org.itcgae.siga.DTOs.com.PlantillasModeloDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.TarjetaModeloConfiguracionDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
@@ -78,14 +80,14 @@ public class ModelosYComunicacionesController {
 	
 
 	@RequestMapping(value = "/detalle/datosGenerales",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> guardarDatosGenerales(HttpServletRequest request, @RequestBody TarjetaModeloConfiguracionDTO datosTarjeta) {
+	ResponseEntity<ResponseDataDTO> guardarDatosGenerales(HttpServletRequest request, @RequestBody TarjetaModeloConfiguracionDTO datosTarjeta) {
 		
-		Error respuesta = _modelosYcomunicacionesService.guardarDatosGenerales(request, datosTarjeta);
+		ResponseDataDTO respuesta = _modelosYcomunicacionesService.guardarDatosGenerales(request, datosTarjeta);
 		
-		if(respuesta.getCode()== 200)
-			return new ResponseEntity<Error>(respuesta, HttpStatus.OK);
+		if(respuesta.getError() == null)
+			return new ResponseEntity<ResponseDataDTO>(respuesta, HttpStatus.OK);
 		else
-			return new ResponseEntity<Error>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ResponseDataDTO>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
 		
 	}
 	
@@ -127,9 +129,9 @@ public class ModelosYComunicacionesController {
 	}
 	
 	@RequestMapping(value = "/detalle/informes/borrar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> borrarInformes(HttpServletRequest request, @RequestBody String [] idInformes) {
+	ResponseEntity<Error> borrarInformes(HttpServletRequest request, @RequestBody PlantillaDocumentoBorrarDTO[] plantillasDoc) {
 		
-		Error response = _modelosYcomunicacionesService.borrarInformes(request, idInformes);
+		Error response = _modelosYcomunicacionesService.borrarInformes(request, plantillasDoc);
 		if(response.getCode() == 200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else

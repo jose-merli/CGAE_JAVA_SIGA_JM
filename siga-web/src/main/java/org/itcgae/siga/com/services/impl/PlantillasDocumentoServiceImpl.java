@@ -18,7 +18,9 @@ import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
+import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillaModeloDocumentoDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.SufijoItem;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
@@ -338,7 +340,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					if(listaItems != null && consultasValidas && plantillaDoc.getIdInforme() != null){
 						// Por cada plantilla asociada hay que guardar sus consultas
 						ModModeloPlantilladocumentoExample modModeloPlantillaExample = new ModModeloPlantilladocumentoExample();
-						modModeloPlantillaExample.createCriteria().andIdinformeEqualTo(Long.parseLong(plantillaDoc.getIdInforme()));
+						modModeloPlantillaExample.createCriteria().andIdinformeEqualTo(Long.parseLong(plantillaDoc.getIdInforme())).andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
 						List<ModModeloPlantilladocumento> listaPlantillaDoc = modModeloPlantilladocumentoMapper.selectByExample(modModeloPlantillaExample);
 						
 						for(ModModeloPlantilladocumento modPlantilla : listaPlantillaDoc){
@@ -362,7 +364,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										modPlantilladocConsultaMapper.updateByPrimaryKey(consultaPlantillaModificar);
 										listaConsultasIdAAsociar.add(consultaPlantillaModificar.getIdconsulta());
 									}
-								}else{
+								}else{									
 									consultaPlantillaModificar = new ModPlantilladocConsulta();
 									consultaPlantillaModificar.setIdinstitucion(Short.parseShort(plantillaDoc.getIdInstitucion()));
 									consultaPlantillaModificar.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
@@ -375,10 +377,27 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 									modPlantilladocConsultaMapper.insert(consultaPlantillaModificar);
 									listaConsultasIdAAsociar.add(consultaPlantillaModificar.getIdconsulta());
 								}
+							}
+						}						
 
+						for(ConsultaItem consultaItem : listaItems){
+							// Si la consulta se ha editado, actualizamos la fecha de baja de la consulta anterior
+							if(consultaItem.getIdConsultaAnterior() != null && !consultaItem.getIdConsultaAnterior().equalsIgnoreCase(consultaItem.getIdConsulta())){
+								//Obtenemos la consulta a borrar
+								List<ConsultaItem> listaConsultasBorrar = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.parseShort(plantillaDoc.getIdInstitucion()),Long.parseLong(plantillaDoc.getIdModeloComunicacion()), Long.parseLong(plantillaDoc.getIdInforme()), Long.parseLong(consultaItem.getIdConsultaAnterior()));
+								for(ConsultaItem consultaBorrar: listaConsultasBorrar){
+									ModPlantilladocConsulta consultaEntity = new ModPlantilladocConsulta();
+									consultaEntity.setFechabaja(new Date());
+									consultaEntity.setFechamodificacion(new Date());
+									consultaEntity.setUsumodificacion(usuario.getIdusuario());
+									consultaEntity.setIdplantillaconsulta(Long.parseLong(consultaBorrar.getIdPlantillaConsulta()));							
+									modPlantilladocConsultaMapper.updateByPrimaryKeySelective(consultaEntity);
+								}
 							}
 						}
 						
+						
+						/* Borrar las consultas eliminadas
 						if(listaConsultasAsociadas != null && listaConsultasAsociadas.size() > 0){
 							for(ConsultaItem consultaAsociada : listaConsultasAsociadas){
 								if(listaConsultasIdAAsociar.indexOf(Long.parseLong(consultaAsociada.getIdConsulta())) == -1){
@@ -396,7 +415,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 									}									
 								}
 							}
-						}
+						}*/
 						
 						respuesta.setCode(200);
 						respuesta.setDescription("Consultas guardadas");
@@ -670,7 +689,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	}	
 	
 	@Override
-	public Error guardarModPlantillaDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
+	public ResponseDataDTO guardarModPlantillaDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		LOGGER.info("guardarModPlantillaDocumento() -> Entrada al servicio para guardar los datos de la plantilla de documento");
 		
 		// Conseguimos información del usuario logeado
@@ -678,7 +697,9 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
-		Error respuesta = new Error();
+		ResponseDataDTO respuesta = new ResponseDataDTO();
+		Error error = new Error();
+		Long idInforme = (long) 0;
 		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -694,7 +715,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					if(plantillaDoc.getIdModeloComunicacion() != null){					
 						
 						if(plantillaDoc.getPlantillas() != null && plantillaDoc.getPlantillas().size() > 0){
-							Long idInforme = (long) 0;
+							
 							if(plantillaDoc.getIdInforme()!=null && !"".equals(plantillaDoc.getIdInforme())){
 								LOGGER.debug("El informe ya está asociado");
 								idInforme = Long.parseLong(plantillaDoc.getIdInforme());
@@ -705,6 +726,9 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 								listaPlantillasAsociadas = modModeloPlantilladocumentoMapper.selectByExample(example);								
 							}else{
 								idInforme = modModeloPlantillaDocumentoExtendsMapper.selectMaxInforme(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+								if(idInforme == null){
+									idInforme = (long)0;
+								}
 								idInforme = idInforme + (long)1;
 							}	
 							
@@ -743,7 +767,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										listaPlantillasIdAAsociar.add(modModeloPlantillaDoc.getIdplantilladocumento());										
 										
 										// Si el informe ya tiene asociadas consultas se las asociamos para esta plantilla
-										List<ConsultaItem> listaConsultas = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()), Long.parseLong(plantillaDoc.getIdInforme()), usuario.getIdlenguaje(),false);
+										List<ConsultaItem> listaConsultas = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()), idInforme, usuario.getIdlenguaje(),false);
 										if(listaConsultas != null && listaConsultas.size() > 0){
 											for(ConsultaItem consulta: listaConsultas){
 												ModPlantilladocConsulta plantillaConsulta = new ModPlantilladocConsulta();
@@ -764,7 +788,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 								//Comprobamos los sufijos guardadados
 								ModRelPlantillaSufijoExample relSufijoPlantillaExample = new ModRelPlantillaSufijoExample();
 								relSufijoPlantillaExample.createCriteria().andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion())).andIdplantilladocumentoEqualTo(modPlantillaDoc.getIdplantilladocumento())
-													.andIdinformeEqualTo(Long.parseLong(plantillaDoc.getIdInforme()));
+													.andIdinformeEqualTo(idInforme);
 								
 								
 								List<ModRelPlantillaSufijo> sufijosGuardados = modRelPlantillaSufijoMapper.selectByExample(relSufijoPlantillaExample);
@@ -788,6 +812,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 								}								
 							}
 							
+							/*
 							if(listaPlantillasAsociadas != null && listaPlantillasAsociadas.size() > 0){
 								for(ModModeloPlantilladocumento plantillaAsociada : listaPlantillasAsociadas){
 									if(listaPlantillasIdAAsociar.indexOf(plantillaAsociada.getIdplantilladocumento()) == -1){
@@ -798,27 +823,135 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										modModeloPlantilladocumentoMapper.deleteByPrimaryKey(key);
 									}
 								}
-							}
+							}*/
 						}
-					}else{
-						respuesta.setCode(500);
-						respuesta.setDescription("Error al guardar la plantilla de documento");
-						respuesta.setMessage("Error al guardar la plantilla de documento");
+						respuesta.setData(String.valueOf(idInforme));
+					}else{						
+						error.setCode(500);
+						error.setDescription("Error al guardar la plantilla de documento");
+						error.setMessage("Error al guardar la plantilla de documento");
+						respuesta.setError(error);
 					}
-					
-					respuesta.setCode(200);
-					respuesta.setMessage("Datos plantilla de documento guardados correctamente");
 
 				}
 			}catch(Exception e){
-				respuesta.setCode(500);
-				respuesta.setDescription("Error al guardar datos generales");
-				respuesta.setMessage(e.getMessage());
+				error.setCode(500);
+				error.setDescription("Error al guardar datos generales");
+				error.setMessage(e.getMessage());
 				e.printStackTrace();
+				respuesta.setError(error);
 			}
 		
 		}
 		LOGGER.info("guardarModPlantillaDocumento() -> Salida del servicio para guardar los datos de la plantilla de documento");
+		return respuesta;
+	}
+
+
+	@Override
+	public Error borrarConsultasPlantilla(HttpServletRequest request, PlantillaDocumentoBorrarDTO[] plantillaDoc) {
+		LOGGER.info("borrarConsultasPlantilla() -> Entrada al servicio para borrar las consultas asociadas a un informe");
+
+		Error respuesta = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					for(PlantillaDocumentoBorrarDTO consulta :plantillaDoc){
+						List<ConsultaItem> listaConsultasBorrar = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.parseShort(consulta.getIdInstitucion()),Long.parseLong(consulta.getIdModeloComunicacion()), Long.parseLong(consulta.getIdInforme()), Long.parseLong(consulta.getIdConsulta()));
+						for(ConsultaItem consultaBorrar: listaConsultasBorrar){
+							ModPlantilladocConsulta consultaEntity = new ModPlantilladocConsulta();
+							consultaEntity.setFechabaja(new Date());
+							consultaEntity.setFechamodificacion(new Date());
+							consultaEntity.setUsumodificacion(usuario.getIdusuario());
+							consultaEntity.setIdplantillaconsulta(Long.parseLong(consultaBorrar.getIdPlantillaConsulta()));							
+							modPlantilladocConsultaMapper.updateByPrimaryKeySelective(consultaEntity);
+						}						
+					}
+					
+					respuesta.setCode(200);
+					respuesta.setMessage("Consultas eliminadas correctamente");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error al obtener las plantillas");
+					e.printStackTrace();
+				}
+				
+			}
+		}
+		LOGGER.info("borrarConsultasPlantilla() -> Salida del servicio para borrar las consultas asociadas a un informe");
+		return respuesta;
+	}
+
+
+	@Override
+	public Error borrarPlantillas(HttpServletRequest request, PlantillaDocumentoBorrarDTO[] plantillaDoc) {
+		LOGGER.info("borrarPlantillas() -> Entrada al servicio para borrar las plantillas asociadas a un informe");
+
+		Error respuesta = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+
+					for(PlantillaDocumentoBorrarDTO plantilla :plantillaDoc){
+						if(plantilla.getIdPlantillaDocumento() != null){
+							ModModeloPlantilladocumentoKey key = new ModModeloPlantilladocumentoKey();
+							key.setIdmodelocomunicacion(Long.parseLong(plantilla.getIdModeloComunicacion()));
+							key.setIdplantilladocumento(Long.parseLong(plantilla.getIdPlantillaDocumento()));
+							ModModeloPlantilladocumento plantillaBorrar = modModeloPlantilladocumentoMapper.selectByPrimaryKey(key);
+							if(plantillaBorrar!=null){
+								plantillaBorrar.setFechabaja(new Date());
+								plantillaBorrar.setFechamodificacion(new Date());
+								plantillaBorrar.setUsumodificacion(usuario.getIdusuario());
+								modModeloPlantilladocumentoMapper.updateByPrimaryKey(plantillaBorrar);
+								
+								//También ponemos fecha de baja a las consultas asociadas a esa plantilla
+								ModPlantilladocConsultaExample example = new ModPlantilladocConsultaExample();
+								example.createCriteria().andIdmodelocomunicacionEqualTo(Long.parseLong(plantilla.getIdModeloComunicacion())).andIdplantilladocumentoEqualTo(Long.parseLong(plantilla.getIdPlantillaDocumento())).andIdinstitucionEqualTo(Short.parseShort(plantilla.getIdInstitucion()));
+								List<ModPlantilladocConsulta> listaConsultas = modPlantilladocConsultaMapper.selectByExample(example);
+								for(ModPlantilladocConsulta consultaBorrar :listaConsultas){
+									consultaBorrar.setFechabaja(new Date());
+									modPlantilladocConsultaMapper.updateByPrimaryKey(consultaBorrar);
+								}
+							}							
+						}
+					}
+				
+					
+					respuesta.setCode(200);
+					respuesta.setMessage("Consultas eliminadas correctamente");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error al obtener las plantillas");
+					e.printStackTrace();
+				}
+				
+			}
+		}
+		LOGGER.info("borrarPlantillas() -> Salida del servicio para borrar las plantillas asociadas a un informe");
 		return respuesta;
 	}	
 

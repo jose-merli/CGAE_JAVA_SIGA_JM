@@ -6,6 +6,8 @@ import org.itcgae.siga.DTOs.com.ComboConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
+import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -90,14 +92,24 @@ public class PlantillasDocumentoController {
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/guardar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> guardarPlantillaDocumento(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
+	@RequestMapping(value = "/consultas/borrar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> borrarConsultas(HttpServletRequest request, @RequestBody PlantillaDocumentoBorrarDTO[] plantillaDoc) {
 		
-		Error response = _plantillasDocumentoService.guardarModPlantillaDocumento(request, plantillaDoc);
+		Error response = _plantillasDocumentoService.borrarConsultasPlantilla(request, plantillaDoc);
 		if(response.getCode() == 200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/guardar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ResponseDataDTO> guardarPlantillaDocumento(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		
+		ResponseDataDTO response = _plantillasDocumentoService.guardarModPlantillaDocumento(request, plantillaDoc);
+		if(response.getError() == null)
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}	
 	
 	@RequestMapping(value = "/subirPlantilla",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -128,6 +140,16 @@ public class PlantillasDocumentoController {
 			return new ResponseEntity<DocumentosPlantillaDTO>(response, HttpStatus.OK);	
 		else
 			return new ResponseEntity<DocumentosPlantillaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/borrar",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> borrarPlantillas(HttpServletRequest request, @RequestBody PlantillaDocumentoBorrarDTO[] plantillaDoc) throws Exception{
+		
+		Error response = _plantillasDocumentoService.borrarPlantillas(request, plantillaDoc);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);	
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 }

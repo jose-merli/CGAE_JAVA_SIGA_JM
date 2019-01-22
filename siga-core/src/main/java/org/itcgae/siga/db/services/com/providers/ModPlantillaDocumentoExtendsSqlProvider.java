@@ -18,7 +18,7 @@ public class ModPlantillaDocumentoExtendsSqlProvider {
 		sql.INNER_JOIN("MOD_MODELO_PLANTILLADOCUMENTO modeloPlantillaDocumento ON modeloPlantillaDocumento.IDPLANTILLADOCUMENTO = plantillaDocumento.IDPLANTILLADOCUMENTO AND modeloPlantillaDocumento.IDINFORME = " + idInforme + " AND modeloPlantillaDocumento.IDMODELOCOMUNICACION = " + idModeloComunicacion);
 		sql.INNER_JOIN("ADM_LENGUAJES lenguajes ON lenguajes.idlenguaje = plantillaDocumento.Idioma");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS C on lenguajes.DESCRIPCION = C.idRecurso");
-		sql.WHERE("C.IDLENGUAJE = '" + idLenguaje + "' AND CODIGOEJIS is not null AND lenguajes.FECHA_BAJA is null");
+		sql.WHERE("C.IDLENGUAJE = '" + idLenguaje + "' AND CODIGOEJIS is not null AND lenguajes.FECHA_BAJA is null AND modeloPlantillaDocumento.FECHABAJA IS NULL");
 		
 		return sql.toString();
 	}

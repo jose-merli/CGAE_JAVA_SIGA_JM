@@ -6,6 +6,8 @@ import org.itcgae.siga.DTOs.com.ComboConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
+import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -26,19 +28,21 @@ public interface IPlantillasDocumentoService {
 	//ComboDTO obtenerConsultasDisponibles(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 
 	/**
+	 * Sube una plantilla de documento al fileSystem
+	 * @param request
+	 * @return
+	 */
+	ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request);
+
+	//ComboDTO obtenerConsultasDisponibles(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
+	
+	/**
 	 * Guarda las consultas asociadas a las plantillas de un informe
 	 * @param request
 	 * @param plantillaDoc
 	 * @return
 	 */
 	Error guardarConsultasPlantilla(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
-
-	/**
-	 * Sube una plantilla de documento al fileSystem
-	 * @param request
-	 * @return
-	 */
-	ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request);
 
 	/**
 	 * Guarda una plantilla de documento en bdd
@@ -76,7 +80,7 @@ public interface IPlantillasDocumentoService {
 	 * @param plantillaDoc
 	 * @return
 	 */
-	Error guardarModPlantillaDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
+	ResponseDataDTO guardarModPlantillaDocumento(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 
 	/**
 	 * Obtiene los combos de las consultas posibles seperadas por objetivo
@@ -85,5 +89,21 @@ public interface IPlantillasDocumentoService {
 	 * @return
 	 */
 	ComboConsultasDTO obtenerConsultasDisponibles(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
+
+	/**
+	 * Borra las consultas indicadas
+	 * @param request
+	 * @param plantillaDoc
+	 * @return
+	 */
+	Error borrarConsultasPlantilla(HttpServletRequest request, PlantillaDocumentoBorrarDTO[] plantillaDoc);
+
+	/**
+	 * Elimina las plantillas recibidas
+	 * @param request
+	 * @param plantillaDoc
+	 * @return
+	 */
+	Error borrarPlantillas(HttpServletRequest request, PlantillaDocumentoBorrarDTO[] plantillaDoc);
 	
 }
