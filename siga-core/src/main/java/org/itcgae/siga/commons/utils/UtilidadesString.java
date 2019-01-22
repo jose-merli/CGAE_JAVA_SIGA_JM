@@ -12,12 +12,16 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.db.entities.ScsRetencionesirpf;
+import org.itcgae.siga.commons.constants.SigaConstants;
+
+
 
 
 
@@ -153,5 +157,101 @@ public class UtilidadesString {
 		
 	}
 	
+	public static String prepararPerfiles(List<String> perfiles) {
+		String idPerfiles = "";
+		for (int i = 0; i < perfiles.size(); i++) {
+			String contructPerfil = "";
+			if (perfiles.size() == 1) {
+				contructPerfil += perfiles.get(i);
+			} else {
+				if (i != perfiles.size() - 1) {
+					contructPerfil += perfiles.get(i);
+
+					contructPerfil += ",";
+
+				} else {
+					contructPerfil += perfiles.get(i);
+				}
+			}
+			idPerfiles += contructPerfil;
+		}
+		
+		return idPerfiles;
+	}
+	
+	public static List<String> formateaListaPerfiles(List<String> perfiles){
+		List<String> listaPerfilesFormat = new ArrayList<String>();
+		
+		for (String cadena : perfiles) {
+			cadena = cadena.replace("'", "");
+			listaPerfilesFormat.add(cadena);
+		}
+		
+		return listaPerfilesFormat;
+	}
+	
+    public static Date removeTime(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    }
+    public static Date getDate(String sDate, String format) throws ParseException {
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		if (null != sDate)
+			return sdf.parse(sDate);
+		else
+			return null;
+	}
+
+	public static Date getDate(String sDate, String format, String defaultValue)  {
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		if (null != sDate)
+			try {
+				return sdf.parse(sDate);
+			} catch (ParseException e) {
+				return null;
+			}
+		else
+			return null;
+	}
+	
+	
+	// Los siguientes son los tipos que no pueden repetirse dentro de un cliente
+	public static final Integer[] tiposDireccionUnicos = { 
+			SigaConstants.TIPO_DIRECCION_CENSOWEB, SigaConstants.TIPO_DIRECCION_GUARDIA,
+			SigaConstants.TIPO_DIRECCION_FACTURACION, SigaConstants.TIPO_DIRECCION_TRASPASO_OJ
+			};
+	
+	  
+
+	public static String traduceNota(Double nota) {
+		String notaString = "";
+
+		// Controlamos que la nota no sea null y que sea una nota correcta entre 0 y 10
+		if (nota == null || (nota < 0 || nota > 10)) {
+			return null;
+		} else {
+			if (nota >= 0 && nota < 5)
+				notaString = SigaConstants.NOTA_SUSPENSO;
+
+			if (nota == 5)
+				notaString = SigaConstants.NOTA_APROBADO;
+
+			if (nota == 6)
+				notaString = SigaConstants.NOTA_BIEN;
+
+			if (nota >= 7 && nota < 9)
+				notaString = SigaConstants.NOTA_NOTABLE;
+
+			if (nota >= 9 && nota <= 10)
+				notaString = SigaConstants.NOTA_SOBRESALIENTE;
+		}
+
+		return notaString;
+	}
 
 }

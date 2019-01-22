@@ -1,11 +1,16 @@
 package org.itcgae.siga.cen.services;
 
+import java.text.ParseException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDeleteDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
+import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
+import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.ParametroColegioDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -23,7 +28,7 @@ public interface IBusquedaPerJuridicaService {
 	
 	public DeleteResponseDTO deleteNotCollegiate(BusquedaJuridicaDeleteDTO busquedaJuridicaDeleteDTO, HttpServletRequest request);
 	
-	public ComboDTO getLabelPerson(PersonaJuridicaSearchDTO personaJuridicaSearchDTO,HttpServletRequest request);
-	
+	public ComboEtiquetasDTO getLabelPerson(PersonaJuridicaSearchDTO personaJuridicaSearchDTO,HttpServletRequest request) throws ParseException;
+		
 	public ParametroColegioDTO searchParametroColegio(StringDTO stringDTO, HttpServletRequest request);
 }

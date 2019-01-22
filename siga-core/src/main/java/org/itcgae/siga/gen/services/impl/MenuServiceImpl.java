@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,6 +69,8 @@ import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenMenu;
 import org.itcgae.siga.db.entities.GenMenuExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
@@ -82,6 +83,7 @@ import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.GenMenuMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -145,6 +147,9 @@ public class MenuServiceImpl implements IMenuService {
 	AdmPerfilMapper adminPerfilMapper;
 	
 	@Autowired
+	private GenParametrosMapper genParametrosMapper;
+
+	@Autowired
 	private CenPersonaMapper cenPersonaMapper;
 	
 	@Autowired
@@ -152,7 +157,7 @@ public class MenuServiceImpl implements IMenuService {
 	
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
-	
+
 	@Override
 	public MenuDTO getMenu(HttpServletRequest request) {
 		MenuDTO response = new MenuDTO();
@@ -423,59 +428,14 @@ public class MenuServiceImpl implements IMenuService {
 	}
 
 	@Override
-	public PermisoDTO getPermisos(PermisoRequestItem permisoRequestItem, HttpServletRequest request)  {
+	public PermisoDTO getPermisos(PermisoRequestItem permisoRequestItem, HttpServletRequest request) {
 		PermisoDTO permisoResponse = new PermisoDTO();
 		// Obtener idInstitucion del certificado y idUsuario del certificado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		String institucion = null;
-		try {
-			X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-			String commonName = null;
-			String organizationName = null;
-			String organizationNameNuevo = null;
-			
-			X509Certificate cert = null;
-			if (null != certs && certs.length > 0) {
-				cert = certs[0];
-				try {
-					X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
-
-					if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
-						RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
-						organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
-					}else{
-						RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
-						organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
-					}
-
-
-
-					LOGGER.debug("Common Name: " + commonName);
-					LOGGER.debug("Organization Name: " + organizationName);
-				} catch (NoSuchElementException e) {
-					throw new InvalidClientCerticateException(e);
-				}
-				
-				if (null != organizationNameNuevo) {
-					institucion = organizationNameNuevo.substring(0,
-								4);
-				}else{
-					institucion = organizationName.substring(organizationName.length() - 4,
-						organizationName.length());
-				}
-
-				LOGGER.debug("INSTITUCION: " + institucion);
-
-				
-			}
-		} catch (Exception e) {
-			throw new BadCredentialsException(e.getMessage());
-		}
 
 		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucion));
-		permisoRequestItem.setIdInstitucionCertificado(institucion);
-		List<PermisoEntity> permisosEntity = this.permisosMapper.getProcesosPermisos(permisoRequestItem);
+		List<PermisoEntity> permisosEntity = permisosMapper.getProcesosPermisos(permisoRequestItem);
 
 		if (null != permisosEntity && !permisosEntity.isEmpty()) {
 			List<PermisoItem> items = new ArrayList<PermisoItem>();
@@ -597,6 +557,7 @@ public class MenuServiceImpl implements IMenuService {
 		List<UsuarioLogeadoItem> usuario = this.admUsuariosExtendsMapper.getUsersLog(request);
 		UsuarioLogeadoDTO response = new UsuarioLogeadoDTO();
 		usuario.get(0).setPerfiles(getDescripcion(perfiles, idInstitucion));
+		usuario.get(0).setRutaLogout(getUserRoutLogout(idInstitucion));
 		response.setUsuarioLogeadoItem(usuario);
 
 		for (UsuarioLogeadoItem usuarioLogeadoItem : usuario) {
@@ -845,6 +806,41 @@ public class MenuServiceImpl implements IMenuService {
 		return comboItem;
 	}
 
+	
+	private String getUserRoutLogout(Short institucion) {
+	
+
+		GenParametrosExample example = new GenParametrosExample();
+		example.createCriteria().andIdinstitucionEqualTo(institucion).andParametroEqualTo("PATH_INICIO_SESION");
+		List<GenParametros> parametros = genParametrosMapper.selectByExample(example );
+		if (null != parametros && parametros.size()>0) {
+			String response = parametros.get(0).getValor();
+			return response;
+		}else{
+			example.clear();
+			example.createCriteria().andIdinstitucionEqualTo(Short.valueOf("0")).andParametroEqualTo("PATH_INICIO_SESION");
+			parametros = genParametrosMapper.selectByExample(example );
+			String response = parametros.get(0).getValor();
+			return response;
+		}
+	
+	}	
+
+	@Override
+	public ComboItem getLetrado(HttpServletRequest request) {
+		// Obtenemos si el usuario logeado es colegiado o administrador
+		ComboItem comboItem = new ComboItem();
+
+		LOGGER.debug("Obtenemos atributos del usuario logeado");
+		String token = request.getHeader("Authorization");
+		String letrado =  UserTokenUtils.getLetradoFromJWTToken(token);
+		
+		comboItem.setLabel(letrado);
+		comboItem.setValue(letrado);
+		return comboItem;
+	}
+
+
 	@Override
 	public UpdateResponseDTO setIdiomaUsuario(HttpServletRequest request, String idLenguaje) {
 		LOGGER.info("setIdiomaUsuario() --> Entrada al servicio de cambio de idioma");
@@ -905,6 +901,5 @@ public class MenuServiceImpl implements IMenuService {
 		LOGGER.info("setIdiomaUsuario() --> Salida del servicio de cambio de idioma");
 		return response;
 	}	
-
 
 }

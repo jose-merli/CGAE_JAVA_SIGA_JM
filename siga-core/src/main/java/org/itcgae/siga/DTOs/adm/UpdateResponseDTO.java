@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UpdateResponseDTO   {
   
   private String status = new String();
+  private String id = new String();
   private Error error = null;
 
   
@@ -51,8 +52,24 @@ public class UpdateResponseDTO   {
   }
 
   
+  /**
+   **/
+  public UpdateResponseDTO id(String id) {
+    this.id = id;
+    return this;
+  }
+  
+  @JsonProperty("id")
+  public String getId() {
+	return id;
+  }
+  
+  public void setId(String id) {
+	this.id = id;
+  }
 
-  @Override
+
+@Override
   public boolean equals(java.lang.Object o) {
     if (this == o) {
       return true;
@@ -61,13 +78,14 @@ public class UpdateResponseDTO   {
       return false;
     }
     UpdateResponseDTO updateResponseDTO = (UpdateResponseDTO) o;
-    return Objects.equals(this.status, updateResponseDTO.status) &&
-        Objects.equals(this.error, updateResponseDTO.error);
+    return Objects.equals(this.status.toString(), updateResponseDTO.status.toString()) &&
+    		Objects.equals(this.id.toString(), updateResponseDTO.id.toString()) &&
+        Objects.equals(this.error.getCode(), updateResponseDTO.error.getCode());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(status, error);
+    return Objects.hash(id, status, error);
   }
 
   @Override
@@ -76,6 +94,7 @@ public class UpdateResponseDTO   {
     sb.append("class UpdateResponseDTO {\n");
     
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("}");
     return sb.toString();

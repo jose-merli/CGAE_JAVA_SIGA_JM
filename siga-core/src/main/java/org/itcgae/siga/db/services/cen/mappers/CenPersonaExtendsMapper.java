@@ -15,11 +15,14 @@ import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
+import org.itcgae.siga.db.services.cen.providers.CenClienteSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenPersonaSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -101,6 +104,8 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	@InsertProvider(type = CenPersonaSqlExtendsProvider.class, method = "insertSelectiveForPersonFile")
 	int insertSelectiveForPersonFile(CrearPersonaDTO crearPersonaDTO, AdmUsuarios usuario);
 	
+	@InsertProvider(type = CenPersonaSqlExtendsProvider.class, method = "insertSelectiveForPerson")
+	int insertSelectiveForPerson(CenPersona crearPersonaDTO, AdmUsuarios usuario);
 	
 	
 	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "selectMaxIdPersona")
@@ -110,13 +115,34 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	})
 	List<ComboItem> selectMaxIdPersona();
 	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "selectMaxIdPersona2")
+	@Results({
+		@Result(column = "IDPERSONA", property = "idMax", jdbcType = JdbcType.NUMERIC)
+	})
+	MaxIdDto selectMaxIdPersona2();
+	
 	
 	@UpdateProvider(type = CenPersonaSqlExtendsProvider.class, method = "updatebyExampleDataLegalPerson")
 	int updatebyExampleDataLegalPerson(PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, AdmUsuarios usuario);
 	
-	
-	
 	@InsertProvider(type = CenPersonaSqlExtendsProvider.class, method = "insertSelectiveForNewSociety")
 	int insertSelectiveForNewSociety(SociedadCreateDTO sociedadCreateDTO, AdmUsuarios usuario);
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getIdPersonaWithNif")
+	@Results({
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
+	})
+	Long getIdPersonaWithNif(String personaNif);
+	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getPersonaisColegiadoWithIdPersona")
+	@Results({
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+	})
+	FichaPersonaItem getPersonaisColegiadoWithIdPersona(String idPersona, String idInstitucion);
+	
 	
 }

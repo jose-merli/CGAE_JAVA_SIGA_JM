@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns="urn:fusionadorPersonas.ws.siga.itcgae.org" targetNamespace="urn:fusionadorPersonas.ws.siga.itcgae.org"
+	elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:complexType name="ResponseFusionadorPersonas"/>
+	<xs:complexType name="ErrorType">
+		<xs:sequence>
+			<xs:element ref="error"/>
+			<xs:element name="xmlError" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="numeroPeticion" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Identificador de petición. El formato será:
+				yyyyMMddHHmmssSSS</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:attribute name="publicar" type="xs:boolean">
+		<xs:annotation>
+			<xs:documentation>Indica si se debe publicar el dato o no
+			</xs:documentation>
+		</xs:annotation>
+	</xs:attribute>
+	<xs:element name="versionEsquema" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Indica la versión del xsd con la que se trabaja
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="colegio">
+		<xs:annotation>
+			<xs:documentation>Colegio del que se solicitan los cambios
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="codigoColegio"/>
+				<xs:element name="descripcionColegio" type="xs:string"
+					minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Nombre o descripción del colegio
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="codigoColegio" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Codigo del Colegio según TC del CGPJ
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="datosFusionador">
+		<xs:annotation>
+			<xs:documentation>Datos de la inscripción/Cancelación de la sociedad
+				en el registro mercantil</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="idPersonaDestino" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>id Persona de destino</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			    <xs:element name="idPersonaOrigen" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>id Persona de origen</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="listaDirecciones" type="xs:string" nillable="true">
+					<xs:annotation>
+						<xs:documentation>Listado de direcciones</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="listaDireccionesNoSeleccionadas" type="xs:string" nillable="true">
+					<xs:annotation>
+						<xs:documentation>Listado de direcciones No seleccionadas</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="string20">
+		<xs:annotation>
+			<xs:documentation>Tipo string de longitud máxima de 20
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="error">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="codRetorno" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Código de error</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="descRetorno" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Descripción del error</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="mensajeResponse" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Indica la versión del xsd con la que se trabaja
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>
+

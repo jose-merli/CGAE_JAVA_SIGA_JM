@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.adm.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.adm.MultiidiomaCatalogoSearchDTO;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.GenRecursosCatalogosSqlProvider;
@@ -65,6 +66,25 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 				+ "group by nombretabla,campotabla,idinstitucion)");
 
 			
+		return sql.toString();
+	}
+	
+	public String getMaxIdRecurso() {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDRECURSO)");
+		sql.FROM("GEN_RECURSOS_CATALOGOS");
+		sql.WHERE("NOMBRETABLA = 'CEN_GRUPOSCLIENTE'");
+		
+		return sql.toString();
+	}
+	
+	public String getMaxIdRecursoCatalogo(String idInstitucion, String idLenguaje) {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDRECURSO) AS IDRECURSO");
+		sql.FROM("(select TO_NUMBER(REPLACE(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'null',''),'99999999999') IDRECURSO from gen_recursos_catalogos)");
+		
 		return sql.toString();
 	}
 }

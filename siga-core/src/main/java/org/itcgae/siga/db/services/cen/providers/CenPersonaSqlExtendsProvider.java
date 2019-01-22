@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.mappers.CenPersonaSqlProvider;
 
 public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
@@ -49,7 +50,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT("NVL(CA.DESCRIPCION, DECODE(PER.IDTIPOIDENTIFICACION,20,'SOCIEDAD','NO COLEGIADO')) AS ESTADOCOLEGIAL");
 		//sql.SELECT("CA.DESCRIPCION AS ESTADOCOLEGIAL");
 		sql.SELECT("DECODE(COL.SITUACIONRESIDENTE,'0','NO','1','SI') AS RESIDENTE");
-		sql.SELECT("NVL(DIR.IDPROVINCIA,00)  AS IDPROVINCIA");
+		sql.SELECT("DIR.IDPROVINCIA  AS IDPROVINCIA");
 		sql.SELECT("ACT.IDACTIVIDADPROFESIONAL");
 		
 		sql.FROM("CEN_PERSONA PER");
@@ -276,6 +277,58 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String insertSelectiveForPerson(CenPersona crearPersonaDTO, AdmUsuarios usuario) {
+		SQL sql = new SQL();
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+		
+		sql.INSERT_INTO("CEN_PERSONA");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona)");
+
+		if (!crearPersonaDTO.getNombre().equals("")) {
+			sql.VALUES("NOMBRE", "'" + crearPersonaDTO.getNombre() + "'");
+		}
+		if (!crearPersonaDTO.getApellidos1().equals("")) {
+			sql.VALUES("APELLIDOS1", "'" + crearPersonaDTO.getApellidos1() + "'");
+		}		
+		if (null != crearPersonaDTO.getApellidos2()) {
+			sql.VALUES("APELLIDOS2", "'" + crearPersonaDTO.getApellidos2() + "'");
+		} else {
+			sql.VALUES("APELLIDOS2", "null");
+		}
+		if(crearPersonaDTO.getFechanacimiento() != null) {
+			
+			String fechaNacimiento = dateFormat.format(crearPersonaDTO.getFechanacimiento());
+			sql.VALUES("FECHANACIMIENTO", "(TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY'))");
+//			sql.VALUES("FECHANACIMIENTO", "'" + crearPersonaDTO.getFechanacimiento() + "'");
+		}
+		if (!crearPersonaDTO.getNifcif().equals("")) {
+			sql.VALUES("NIFCIF", "'" + crearPersonaDTO.getNifcif() + "'");
+		} else {
+			sql.VALUES("NIFCIF", "null");
+		}
+		
+		if(!crearPersonaDTO.getIdtipoidentificacion().equals("")) {
+			sql.VALUES("IDTIPOIDENTIFICACION", "'" + crearPersonaDTO.getIdtipoidentificacion() + "'");
+		}
+		if(null != crearPersonaDTO.getSexo()) {
+			sql.VALUES("SEXO", "'" + crearPersonaDTO.getSexo() + "'");
+		}
+		if(null != crearPersonaDTO.getIdestadocivil()) {
+			sql.VALUES("IDESTADOCIVIL", "'" + crearPersonaDTO.getIdestadocivil() + "'");
+		}
+		
+		if(null != crearPersonaDTO.getNaturalde()) {
+			sql.VALUES("NATURALDE", "'" + crearPersonaDTO.getNaturalde() + "'");
+		}
+
+		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
+		sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuario.getIdusuario()) + "'");
+
+		return sql.toString();
+	}
 
 	public String insertSelectiveForPersonFile(CrearPersonaDTO crearPersonaDTO, AdmUsuarios usuario) {
 		SQL sql = new SQL();
@@ -318,6 +371,16 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.FROM("cen_persona");
 		return sql.toString();
 	}
+	
+	public String selectMaxIdPersona2() {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("max(IDPERSONA) +1 AS IDPERSONA");
+		sql.FROM("cen_persona");
+		
+		return sql.toString();
+	}
 
 	public String updatebyExampleDataLegalPerson(
 			PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, AdmUsuarios usuario) {
@@ -344,7 +407,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 	public String insertSelectiveForNewSociety(SociedadCreateDTO sociedadCreateDTO, AdmUsuarios usuario) {
 		SQL sql = new SQL();
-//		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		sql.INSERT_INTO("CEN_PERSONA");
 		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona)");
@@ -364,13 +427,40 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuario.getIdusuario()) + "'");
 		sql.VALUES("IDTIPOIDENTIFICACION", "'20'");
 
-//		if (null != sociedadCreateDTO.getFechaConstitucion()) {
-//			String fechaNacimiento = dateFormat.format(sociedadCreateDTO.getFechaConstitucion());
-//			sql.VALUES("FECHANACIMIENTO", "TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY')");
-//		}
+		if (null != sociedadCreateDTO.getFechaConstitucion()) {
+			String fechaNacimiento = dateFormat.format(sociedadCreateDTO.getFechaConstitucion());
+			sql.VALUES("FECHANACIMIENTO", "TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY')");
+		}
 
 		sql.VALUES("FALLECIDO", "'0'");
 
 		return sql.toString();
 	}
+	
+	public String getPersonaisColegiadoWithIdPersona(String idPersona, String idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("PER.IDPERSONA");
+		sql.SELECT("PER.NOMBRE AS NOMBRE");
+		sql.SELECT("PER.APELLIDOS1 AS APELLIDO1");
+		sql.SELECT("PER.APELLIDOS2 AS APELLIDO2");
+		sql.SELECT("PER.NIFCIF AS NIF"); 
+		sql.FROM("cen_persona per");
+		sql.WHERE("per.IDPERSONA = '" + idPersona + "'");
+
+		return sql.toString();
+		
+	}
+	
+	public String getIdPersonaWithNif(String personaNif) {
+		SQL sql = new SQL();
+
+		sql.SELECT("p.idpersona");
+		sql.FROM("cen_persona p");
+		sql.WHERE("p.nifcif = '" + personaNif + "'");
+
+		return sql.toString();
+	}
+	
+
 }

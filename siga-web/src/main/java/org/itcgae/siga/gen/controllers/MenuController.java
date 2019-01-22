@@ -10,11 +10,14 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ControlRequestItem;
 import org.itcgae.siga.DTOs.gen.EntornoDTO;
+import org.itcgae.siga.DTOs.gen.FusionadorItem;
 import org.itcgae.siga.DTOs.gen.MenuDTO;
 import org.itcgae.siga.DTOs.gen.PermisoDTO;
 import org.itcgae.siga.DTOs.gen.PermisoRequestItem;
 import org.itcgae.siga.DTOs.gen.PermisoUpdateItem;
 import org.itcgae.siga.gen.services.IMenuService;
+import org.itcgae.siga.services.IFusionadorPersonasServerService;
+import org.itcgae.sspp.ws.registroSociedades.GetListaSociedadesResponseDocument;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,14 +34,15 @@ public class MenuController {
 	@Autowired
 	private IMenuService menuService;
     
-	
+	@Autowired
+	private IFusionadorPersonasServerService fusionadorService;
 	
     @RequestMapping(value = "/getEntorno", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<EntornoDTO> getEntorno(HttpServletRequest request) {
     	EntornoDTO response = menuService.getEntorno(request);
     	return new ResponseEntity<EntornoDTO>(response, HttpStatus.OK);
 	}
-	
+    
 	
     @RequestMapping(value = "/menu", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<MenuDTO> getMenu(HttpServletRequest request) {
@@ -90,5 +94,12 @@ public class MenuController {
     	ComboItem response = menuService.getInstitucionActual(request);
        	return new ResponseEntity<ComboItem>(response, HttpStatus.OK);
    	}
+    
+    @RequestMapping(value = "/getLetrado", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   	ResponseEntity<ComboItem> getLetrado(HttpServletRequest request) {
+    	ComboItem response = menuService.getLetrado(request);
+       	return new ResponseEntity<ComboItem>(response, HttpStatus.OK);
+   	}
+
     
 }

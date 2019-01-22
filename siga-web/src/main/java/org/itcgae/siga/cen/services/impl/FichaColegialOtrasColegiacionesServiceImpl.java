@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.cen.ComboColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ComboColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+
 import org.itcgae.siga.cen.services.IFichaColegialOtrasColegiacionesService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -76,6 +77,7 @@ public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegia
 		return colegiadoDTO;
 	}
 
+
 	@Override
 	public ComboColegiadoDTO getLabelColegios(String idPersona, HttpServletRequest request) {
 		LOGGER.info("getLabelColegios() -> Entrada al servicio para la búsqueda de todos los colegios");
@@ -104,3 +106,4 @@ public class FichaColegialOtrasColegiacionesServiceImpl implements IFichaColegia
 	}
 
 }
+

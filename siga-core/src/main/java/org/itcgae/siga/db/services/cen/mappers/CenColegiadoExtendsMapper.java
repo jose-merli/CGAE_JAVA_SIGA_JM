@@ -2,20 +2,31 @@ package org.itcgae.siga.db.services.cen.mappers;
 
 import java.util.List;
 
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.SociedadCreateDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.cen.ComboColegiadoItem;
+
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
+
+import org.itcgae.siga.db.mappers.CenColegiadoSqlProvider;
 import org.itcgae.siga.db.services.cen.providers.CenColegiadoSqlExtendsProvider;
+import org.itcgae.siga.db.services.cen.providers.CenNocolegiadoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
+
 
 @Service
 @Primary
@@ -41,7 +52,7 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "FECHAJURA", property = "fechaJura", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHATITULACION", property = "fechaTitulacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAALTA", property = "fechaAlta", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDTIPOSSERGURO", property = "idTiposSeguro", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDTIPOSSEGURO", property = "idTiposSeguro", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "COMISIONES", property = "comisiones", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PARTIDOJUDICIAL", property = "partidoJudicial", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
@@ -53,24 +64,38 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "TELEFONO1", property = "telefono", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHAPRESENTACION", property = "fechapresentacion", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "FECHAPRESENTACION", property = "fechapresentacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOAPARECERREDABOGACIA", property = "noAparecerRedAbogacia", jdbcType = JdbcType.VARCHAR)
+
 
 	})
 	List<ColegiadoItem> selectColegiados(Short idInstitucion, ColegiadoItem colegiadoItem);
 
+	
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiaciones")
-	@Results({ @Result(column = "FECHAINCORPORACION", property = "incorporacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR) })
+	@Results({ 
+		@Result(column = "FECHAINCORPORACION", property = "incorporacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.DATE),
+		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR)
+	})
 	List<ColegiadoItem> selectColegiaciones(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem);
-
+	
+	
+	@UpdateProvider(type = CenColegiadoSqlExtendsProvider.class, method = "updateColegiado")
+	int updateColegiado(CenColegiado record);
+	
 	@InsertProvider(type = CenColegiadoSqlExtendsProvider.class, method = "insertSelectiveForCreateNewColegiado")
-	int insertSelectiveForCreateNewColegiado(String idInstitucion, AdmUsuarios usuario, CenColegiado cenColegiado);
-
+	int insertSelectiveForCreateNewColegiado(String idInstitucion, AdmUsuarios usuario,CenColegiado cenColegiado);
+	
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "getLabel")
-	@Results({ @Result(column = "IDGRUPO", property = "value", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR) })
+	@Results({ 
+		@Result(column = "IDGRUPO", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		})
+
 	List<ComboItem> getLabel(AdmUsuarios usuario);
 
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "searchOtherCollegues")
@@ -83,13 +108,41 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CORREOELECTRONICO", property = "correo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR) })
+			@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INSTITUCION", property = "institucion", jdbcType = JdbcType.VARCHAR)
+
+	})
 	List<ColegiadoItem> searchOtherCollegues(String idPersona, String idLenguaje);
+
+	
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectDatosColegiales")
+	@Results({
+		@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAINCORPORACION", property = "fechaIncorporacion", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAPRESENTACION", property = "fechaPresentacion", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAJURA", property = "fechaJura", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHATITULACION", property = "fechaTitulacion", jdbcType = JdbcType.DATE),
+		@Result(column = "SITUACIONRESIDENTE", property = "situacionResidente", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "COMUNITARIO", property = "comunitario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR)
+	})
+	List<FichaDatosColegialesItem> selectDatosColegiales(String idPersona, String idInstitucion);
+	
+	
+	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "selectColegiacionesIdPersona")
+	@Results({ 
+		@Result(column = "IDINSTITUCION", property = "valor", jdbcType = JdbcType.VARCHAR),
+	})
+	List<StringDTO> selectColegiacionesIdPersona(Long idPersona);
+
 
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "getLabelColegios")
 	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR)})
 	List<ComboColegiadoItem> getLabelColegios(String idPersona);
+
 
 }

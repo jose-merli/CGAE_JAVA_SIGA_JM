@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="urn:fusionadorPersonas.ws.siga.itcgae.org" targetNamespace="urn:fusionadorPersonas.ws.siga.itcgae.org" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:include schemaLocation="FusionadorPersonas.xsd"/>
+
+  <xs:element name="getFusionadorPersonasRequest">
+    <xs:annotation>
+      <xs:documentation>Parámetro de entrada</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="numeroPeticion"/>
+        <xs:element ref="colegio"/>
+        <xs:element ref="datosFusionador" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="getFusionadorPersonasResponse">
+    <xs:annotation>
+      <xs:documentation>Parámetro de salida</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+      <xs:element ref="versionEsquema" minOccurs="0" maxOccurs="1"/>
+      <xs:element ref="numeroPeticion"/>
+        <xs:element ref="colegio"/>
+         <xs:choice minOccurs="0">
+          <xs:element ref="mensajeResponse" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="errorServidor" type="ErrorType"/>
+        </xs:choice>
+     </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+
+
+
+
+
+
+
+
+
+
+
+
+

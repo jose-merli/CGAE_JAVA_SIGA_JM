@@ -2,38 +2,91 @@ package org.itcgae.siga.services.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
+import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
 import org.apache.xmlbeans.XmlObject;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesSearchDTO;
 import org.itcgae.siga.DTOs.cen.DatosIntegrantesWS;
 import org.itcgae.siga.DTOs.cen.SociedadesBajaDTO;
 import org.itcgae.siga.DTOs.cen.SociedadesEditadasDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ERROR_SERVER;
 import org.itcgae.siga.commons.constants.SigaConstants.ESTADO_CARGAS;
 import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.AdmConfig;
+import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.CargasWs;
 import org.itcgae.siga.db.entities.CargasWsPagina;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
+import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
+import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
+import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
+import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenDireccionesExample;
+import org.itcgae.siga.db.entities.CenDireccionesKey;
+import org.itcgae.siga.db.entities.CenHistorico;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
+import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CfgParamColegios;
 import org.itcgae.siga.db.entities.CfgParamColegiosExample;
 import org.itcgae.siga.db.entities.CmnDatosXml;
+import org.itcgae.siga.db.entities.EcomCenDatos;
+import org.itcgae.siga.db.entities.FcsPagoColegiado;
+import org.itcgae.siga.db.entities.GenRecursosCatalogosKey;
+import org.itcgae.siga.db.entities.GenRecursosKey;
+import org.itcgae.siga.db.entities.ScsCabeceraguardias;
+import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.CargasWsMapper;
 import org.itcgae.siga.db.mappers.CargasWsPaginaMapper;
+import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
+import org.itcgae.siga.db.mappers.CenPaisMapper;
+import org.itcgae.siga.db.mappers.CenPoblacionesMapper;
+import org.itcgae.siga.db.mappers.CenProvinciasMapper;
 import org.itcgae.siga.db.mappers.CfgParamColegiosMapper;
+import org.itcgae.siga.db.mappers.GenRecursosCatalogosMapper;
+import org.itcgae.siga.db.mappers.GenRecursosMapper;
+import org.itcgae.siga.db.services.adm.mappers.CenHistoricoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenDatoscolegialesestadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.GuardarXmlDaoImpl;
+import org.itcgae.siga.db.services.ecom.mappers.EcomCenDatosExtendsMapper;
+import org.itcgae.siga.db.services.fcs.mappers.FcsPagoColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsCabeceraguardiasExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.exception.ValidationException;
+import org.itcgae.siga.ws.fusionadorPersonas.GetFusionadorPersonasRequestDocument;
 import org.itcgae.sspp.ws.registroSociedades.ColegioDocument.Colegio;
 import org.itcgae.sspp.ws.registroSociedades.ContactoDocument.Contacto;
 import org.itcgae.sspp.ws.registroSociedades.ContactoDocument.Contacto.Fax;
@@ -66,8 +119,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class WSCommons {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WSCommons.class);
@@ -76,6 +131,9 @@ public class WSCommons {
 	CfgParamColegiosMapper cfgParamColegiosMapper;
 	@Autowired
 	CenInstitucionMapper cenInstitucionMapper;
+
+	@Autowired
+	AdmConfigMapper admConfigMapper;
 	
 	@Autowired
 	CargasWsPaginaMapper cargasWsPaginaMapper;
@@ -89,7 +147,56 @@ public class WSCommons {
 	CenNocolegiadoExtendsMapper cenNoColegiado;
 	
 	@Autowired
+	private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
+
+	@Autowired
+	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+	
+	@Autowired
+	private CenDatoscolegialesestadoExtendsMapper cenDatosColegialesEstadoExtendsMapper;
+	
+	@Autowired
+	private CenClienteExtendsMapper cenClienteExtendsMapper;
+	
+	@Autowired
+	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
+	
+	@Autowired
+	private CenInstitucionExtendsMapper cenInstitucionExtendsMapper;
+	
+	@Autowired
 	private CenComponentesExtendsMapper cenComponentesExtendsMapper;
+	
+	@Autowired
+	private EcomCenDatosExtendsMapper ecomCenDatosExtendsMapper;
+	
+	@Autowired
+	private CenDireccionTipodireccionMapper cenTipoDireccionMapper;	
+
+	@Autowired
+	private GenRecursosCatalogosMapper genRecursosCatalogosMapper;
+
+	@Autowired
+	private GenRecursosMapper genRecursosMapper;
+	
+	@Autowired
+	private CenHistoricoExtendsMapper cenHistoricoMapper;
+	
+	@Autowired
+	private CenPaisMapper cenPaisMapper;
+	
+	@Autowired
+	private CenPoblacionesMapper cenPoblacionesMapper;
+	
+	@Autowired
+	private CenProvinciasMapper cenProvinciasMapper;
+	
+	@Autowired
+	private FcsPagoColegiadoExtendsMapper fcsPagoColegiadoMapper;
+	
+	@Autowired
+	private ScsCabeceraguardiasExtendsMapper scsCabeceraguardiasMapper;
+	
 
 	
 	private int tamanoPaginacion;
@@ -390,7 +497,7 @@ public class WSCommons {
 			List<SociedadesBajaDTO> sociedadesEnBaja = cenNoColegiado.selectSociedadesEliminadas(idInstitucion,peticion.getFechaDesde().getTime(),peticion.getFechaHasta().getTime());
 			
 			List<SociedadesBajaDTO> sociedadesResult = new ArrayList<>();
-			
+
 			short totalPaginas = 0;
 			if (sociedadesEnBaja.size() == 0) {
 				LOGGER.info("No se ha encontrado ninguna sociedad con los filtros seleccionados");
@@ -413,8 +520,18 @@ public class WSCommons {
 					
 				}else{
 					sociedadesResult.addAll(sociedadesEnBaja);
+					respuesta.setNumTotalPaginas((short)1);
+				}
+				
+				// Se calcula el numero total de paginas
+				totalPaginas = (short) (sociedadesResult.size() / tamanoPaginacion);
+				if (sociedadesResult.size() % tamanoPaginacion > 0) {
+					totalPaginas++;
 				}
 			}
+			
+			
+			
 			if (null != sociedadesResult && sociedadesResult.size()>0) {
 				for (SociedadesBajaDTO sociedadBajaDTO : sociedadesResult) {
 					
@@ -683,8 +800,10 @@ public class WSCommons {
 							
 						}else{
 							sociedadesEditadasResult.addAll(sociedadesEditadasFinal);
+							respuesta.setNumTotalPaginas((short)1);
 						}
 					}
+					
 					try{
 						if (null != sociedadesEditadasResult && sociedadesEditadasResult.size()>0) {
 							
@@ -692,10 +811,8 @@ public class WSCommons {
 
 								RegistroSociedad registro = RegistroSociedad.Factory.newInstance();
 								registro.setSociedadActualizacion(sociedadActualizacion);
-
 								registrosList.add(registro);
 								
-
 							}
 						}
 					}catch(AssertionError e){
@@ -704,7 +821,6 @@ public class WSCommons {
 					
 				}
 				
-			respuesta.setNumTotalPaginas(totalPaginas);
 			if (null != registrosList && registrosList.size()>0) {
 				RegistroSociedad[] registrosReturn = new RegistroSociedad[registrosList.size()];
 				int i = 0;
@@ -740,5 +856,886 @@ public class WSCommons {
 
 		return cenInstitucionMapper.selectByExample(example);
 	}
+	
+	
+	
+	/**
+	 * Combina a 2 personas en una unica teniendo en cuenta las preferencias del usuario
+	 * @param mapping
+	 * @param formulario
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	public String fusionarPersonas(GetFusionadorPersonasRequestDocument peticionEntrada) 
+	{
 
+		//TODO 
+		//MantenimientoDuplicadosForm miForm = (MantenimientoDuplicadosForm) formulario;
+		//SimpleDateFormat formatoFecha = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		
+
+
+		ControlFusionador controlFusionador = null;
+		String idPersonaDestino = peticionEntrada.getGetFusionadorPersonasRequest().getDatosFusionador().getIdPersonaDestino();
+		String idPersonaOrigen = peticionEntrada.getGetFusionadorPersonasRequest().getDatosFusionador().getIdPersonaOrigen();
+		CenPersona beanPersonaDestino, beanPersonaOrigen;
+		HashSet<String> conjuntoColegiosIguales;
+		List<CenDatoscolegialesestado> listaEstadosAinsertar;
+		String idInstitucion;
+
+		//UserTransaction tx = null;
+		GenRecursosKey example = new GenRecursosKey();
+		example.setIdlenguaje("1");
+		
+
+		try {
+			beanPersonaDestino = cenPersonaExtendsMapper.selectByPrimaryKey(Long.valueOf(idPersonaDestino));
+			beanPersonaOrigen = cenPersonaExtendsMapper.selectByPrimaryKey(Long.valueOf(idPersonaOrigen));
+			
+			// Control de fusion de colegiados en el mismo colegio
+			
+			List<StringDTO> listaColegiacionesPersonaOrigen = cenColegiadoExtendsMapper.selectColegiacionesIdPersona(Long.valueOf(idPersonaOrigen));
+			listaColegiacionesPersonaOrigen.addAll(cenNoColegiado.selectColegiacionesIdPersona(Long.valueOf(idPersonaOrigen)));
+			String stInstitucion;
+			StringDTO nombreInstitucion;
+			int intInstitucion;
+			listaEstadosAinsertar = new ArrayList<CenDatoscolegialesestado>();
+			for(int i=0;i<listaColegiacionesPersonaOrigen.size();i++){
+				// para cada colegiacion de la persona origen
+				stInstitucion = listaColegiacionesPersonaOrigen.get(i).getValor();
+				nombreInstitucion = cenInstitucionExtendsMapper.getAbreviaturaInstitucion(stInstitucion);
+				intInstitucion = Integer.parseInt(stInstitucion);
+				// Si se quiere fusionar un colegiado en el mismo colegio, solo lo permitimos al personal de IT o bien si el colegio no esta en produccion
+				CenColegiadoKey keyColegiado = new CenColegiadoKey();
+				keyColegiado.setIdinstitucion(Short.valueOf(stInstitucion));
+				keyColegiado.setIdpersona(Long.parseLong(idPersonaDestino));
+				if (cenColegiadoExtendsMapper.selectByPrimaryKey(keyColegiado) != null ) {
+						// Hay que comprobar el ultimo estado colegial de ambas personas. Si el origen tiene un estado colegial posterior al destino, algo va mal
+						List<ColegiadoItem> estadosColegio;
+						List<EcomCenDatos> actualizacionesColegio;
+						String idUltimoEstadoOrigen = null, idUltimoEstadoDestino = null, idEstadoActualizacionOrigen = null, idEstadoActualizacionDestino = null;
+						Date fechaUltimoEstadoOrigen = null, fechaUltimoEstadoDestino = null, fechaEstadoActualizacionOrigen = null, fechaEstadoActualizacionDestino = null;
+						
+						ColegiadoItem colegiadoItem = new ColegiadoItem();
+						colegiadoItem.setIdPersona(idPersonaOrigen);
+						estadosColegio = cenColegiadoExtendsMapper.selectColegiaciones(Short.valueOf(stInstitucion), "1", colegiadoItem );
+						if (estadosColegio != null && estadosColegio.size() > 0) {
+							ColegiadoItem colegiadoItemRecuperado = estadosColegio.get(0);
+							 
+							idUltimoEstadoOrigen = colegiadoItemRecuperado.getIdEstado();
+							fechaUltimoEstadoOrigen = colegiadoItemRecuperado.getFechaEstado();
+						}
+						colegiadoItem.setIdPersona(idPersonaDestino);
+						estadosColegio = cenColegiadoExtendsMapper.selectColegiaciones(Short.valueOf(stInstitucion), "1", colegiadoItem );
+						if (estadosColegio != null && estadosColegio.size() > 0) {
+							ColegiadoItem colegiadoItemRecuperado = estadosColegio.get(0);
+							idUltimoEstadoDestino = colegiadoItemRecuperado.getIdEstado();
+							fechaUltimoEstadoDestino = colegiadoItemRecuperado.getFechaEstado();;
+						}
+						
+						actualizacionesColegio = ecomCenDatosExtendsMapper.getInfoMantenimientoDuplicados(idPersonaOrigen, Integer.toString(intInstitucion));
+						if (actualizacionesColegio != null & actualizacionesColegio.size()>0){
+							EcomCenDatos ecomCenDatos = actualizacionesColegio.get(0);
+							if (ecomCenDatos.getIdecomcensosituacionejer() != null) {
+								idEstadoActualizacionOrigen = ecomCenDatos.getIdecomcensosituacionejer().toString();
+								fechaEstadoActualizacionOrigen = UtilidadesString.removeTime(ecomCenDatos.getFechamodifrecibida());
+							}
+						}
+						actualizacionesColegio = ecomCenDatosExtendsMapper.getInfoMantenimientoDuplicados(idPersonaDestino, Integer.toString(intInstitucion));
+						if (actualizacionesColegio != null & actualizacionesColegio.size()>0){
+							EcomCenDatos ecomCenDatos = actualizacionesColegio.get(0);
+							if (ecomCenDatos.getIdecomcensosituacionejer() != null) {
+								idEstadoActualizacionDestino = ecomCenDatos.getIdecomcensosituacionejer().toString();
+								fechaEstadoActualizacionDestino = UtilidadesString.removeTime(ecomCenDatos.getFechamodifrecibida());
+							}
+						}
+						
+						// Para cada persona, la fecha final sera la mayor entre la de estado y la de actualizacion por carga
+						if (fechaEstadoActualizacionOrigen != null && fechaEstadoActualizacionOrigen.after(fechaUltimoEstadoOrigen)) {
+							if (idEstadoActualizacionOrigen.equalsIgnoreCase(idUltimoEstadoOrigen)) {
+								fechaUltimoEstadoOrigen = fechaEstadoActualizacionOrigen;
+								
+								CenDatoscolegialesestado estado = new CenDatoscolegialesestado();
+								estado.setFechaestado(fechaEstadoActualizacionOrigen);
+								estado.setIdinstitucion(Short.valueOf(stInstitucion));
+								estado.setIdpersona(Long.valueOf(idPersonaOrigen));
+								estado.setIdestado(Short.valueOf(idEstadoActualizacionOrigen));
+								estado.setFechamodificacion(new Date());
+								estado.setUsumodificacion(-1);
+								listaEstadosAinsertar.add(estado);
+							}
+						}
+						if (fechaEstadoActualizacionDestino != null && fechaEstadoActualizacionDestino.after(fechaUltimoEstadoDestino)) {
+							if (idEstadoActualizacionDestino.equalsIgnoreCase(idUltimoEstadoDestino)) {
+								fechaUltimoEstadoDestino = fechaEstadoActualizacionDestino;
+								
+								CenDatoscolegialesestado estado = new CenDatoscolegialesestado();
+								estado.setFechaestado(fechaEstadoActualizacionDestino);
+								estado.setIdinstitucion(Short.valueOf(stInstitucion));
+								estado.setIdpersona(Long.valueOf(idPersonaOrigen));
+								estado.setIdestado(Short.valueOf(idEstadoActualizacionDestino));
+								estado.setFechamodificacion(new Date());
+								estado.setUsumodificacion(-1);
+								listaEstadosAinsertar.add(estado);
+							} else {
+								
+								return "En el colegio de " + nombreInstitucion.getValor() + ", " + beanPersonaDestino.getNombre() + " (" + beanPersonaDestino.getNifcif() + ") tiene un estado colegial que no se corresponde con la última actuación por Carga de censo. Por favor, revise la carga y/o consulte al Administrador para más información.";
+							}
+						}
+						// Si el destino tiene un estado mas antiguo que el origen, no podemos permitir la fusion.
+						if (idUltimoEstadoOrigen != null && idUltimoEstadoDestino != null && !idUltimoEstadoOrigen.equalsIgnoreCase(idUltimoEstadoDestino)) {
+							if (fechaUltimoEstadoOrigen.after(fechaUltimoEstadoDestino)) {
+								return  "En el colegio de " + nombreInstitucion.getValor() + ", " + beanPersonaOrigen.getNombre() + " (" + beanPersonaOrigen.getNifcif() + ") tiene una fecha de situación colegial posterior al de " + beanPersonaDestino.getNombre() + " (" + beanPersonaDestino.getNifcif() + "). Para evitar cambiar el estado colegial de esta última (destino de la combinación), se ha cancelado la operación. Por favor, modifique los estados colegiales para que el destino de la combinación tenga el último estado colegial.";
+							}
+						}
+					
+				}
+			}
+
+			// semaforo para evitar que se pida la fusion de la misma persona varias veces
+			controlFusionador = ControlFusionador.getControlFusionador(idPersonaOrigen, idPersonaDestino);
+			if (controlFusionador == null) {
+				example.setIdrecurso("messages.error.censo.mantenimientoDuplicados.fusionEnCurso");
+				String mensaje =  genRecursosMapper.selectByPrimaryKey(example ).getDescripcion();
+				
+				return mensaje;
+			}
+			
+			// comprobando que existan las dos personas a fusionar, por si acaso ya no existe alguna (por ejemplo, si se ha fusionado en otro hilo de ejecucion)
+			if (cenPersonaExtendsMapper.selectByPrimaryKey(Long.parseLong(idPersonaOrigen)) == null || cenPersonaExtendsMapper.selectByPrimaryKey(Long.parseLong(idPersonaDestino)) == null) {
+				example.setIdrecurso("messages.error.censo.mantenimientoDuplicados.fusionEnCursoNuevaBusqueda");
+				String mensaje =  genRecursosMapper.selectByPrimaryKey(example ).getDescripcion();
+				
+				return mensaje;
+			}
+
+			//tx = user.getTransactionPesada();
+			//tx.begin();
+			
+			// insertando los estados de actualizacion de origen y destino
+			for (CenDatoscolegialesestado hashEstado : listaEstadosAinsertar) {
+				hashEstado.setObservaciones("Mantenimiento de duplicados: inserción automática de estado colegial por última actualización desde Carga de Censo");
+
+				cenDatosColegialesEstadoExtendsMapper.insert(hashEstado);
+			}
+			
+			// Aunque el proceso de fusion (en PL) ya se encarga de combinar las direcciones, 
+			// tenemos que comprobar las unicidades de direcciones. Para ello, es mejor moverlas ahora y comprobar las unicidades
+			conjuntoColegiosIguales = new HashSet<String>();
+			if (null != peticionEntrada.getGetFusionadorPersonasRequest().getDatosFusionador().getListaDirecciones()) {
+				
+			
+				String[] direcciones = peticionEntrada.getGetFusionadorPersonasRequest().getDatosFusionador().getListaDirecciones().split(",");
+				String[] direccion;
+				if (null != direcciones && direcciones.length > 0) {
+					CenDirecciones beanDireccion = new CenDirecciones();
+	
+					String idInstitucionComun, idDireccionOrigen;
+					
+					
+					//HttpServletRequest preguntarAlUsuario = null;
+					for (int i = 0; i < direcciones.length; i++) {
+						direccion = direcciones[i].split("&&");
+						if (direccion.length > 1) {
+							idInstitucionComun = direccion[0];
+							idDireccionOrigen = direccion[2];
+							
+							
+							
+							// hay que asegurarse que existe el cliente de CGAE
+							if (idInstitucionComun.equalsIgnoreCase(String.valueOf(SigaConstants.InstitucionGeneral))) {
+								CenClienteKey clientekey = new CenClienteKey();
+								clientekey.setIdinstitucion(Short.valueOf(SigaConstants.InstitucionGeneral));
+								clientekey.setIdpersona(Long.valueOf(idPersonaDestino));
+								if (cenClienteExtendsMapper.selectByPrimaryKey(clientekey ) == null) {
+									clientekey.setIdpersona(Long.valueOf(idPersonaOrigen));
+									CenCliente cliente = cenClienteExtendsMapper.selectByPrimaryKey(clientekey );
+									cliente.setIdpersona(Long.valueOf(idPersonaDestino));
+									cenClienteExtendsMapper.insert(cliente);
+								}
+							}
+							
+							CenDireccionesKey direccioneskey = new CenDireccionesKey();
+							direccioneskey.setIddireccion(Long.valueOf(idDireccionOrigen));
+							direccioneskey.setIdinstitucion(Short.valueOf(idInstitucionComun));
+							direccioneskey.setIdpersona(Long.valueOf(idPersonaOrigen));
+							// recuperando el registro original que se va a copiar
+							CenDirecciones direccionConsultada = cenDireccionesExtendsMapper.selectByPrimaryKey(direccioneskey );
+							
+								if (null != direccionConsultada) {
+									
+								
+								// comprobando los tipos
+								CenDireccionTipodireccionExample tipoDireccionexample = new CenDireccionTipodireccionExample();
+								tipoDireccionexample.createCriteria().andIddireccionEqualTo(Long.valueOf(idDireccionOrigen)).andIdinstitucionEqualTo(Short.valueOf(idInstitucionComun)).andIdpersonaEqualTo(Long.valueOf(idPersonaOrigen));
+								List<CenDireccionTipodireccion> tiposDireccion= cenTipoDireccionMapper.selectByExample(tipoDireccionexample);
+								List<String> tiposOriginales = new ArrayList<String>();
+								for (CenDireccionTipodireccion cenDireccionTipodireccion : tiposDireccion) {
+									tiposOriginales.add(cenDireccionTipodireccion.getIdtipodireccion().toString());
+								}		
+								List<String> tiposAinsertar = revisarTiposEnDireccionesExistentes(idInstitucionComun, idPersonaDestino, tiposOriginales);
+								CenDireccionTipodireccion vBeanTipoDir [];
+								if (tiposAinsertar.size() == 0) {
+									direccionConsultada.setFechabaja(new Date());
+									//.put(CenDireccionesBean.C_FECHABAJA, "sysdate");
+									// y dejamos los tipos originales
+									vBeanTipoDir = establecerTipoDireccion(tiposOriginales.toArray(new String[0]));
+								} else {
+									vBeanTipoDir = establecerTipoDireccion(tiposAinsertar.toArray(new String[0]));
+								}
+								
+								// comprobando las preferencias
+								String preferencias = direccionConsultada.getPreferente();
+								preferencias = revisarPreferenciasEnDireccionesExistentes(idInstitucionComun, idPersonaDestino, preferencias);
+								direccionConsultada.setPreferente(preferencias);
+								//hashDireccion.put(CenDireccionesBean.C_PREFERENTE, preferencias); 
+								
+								// insertando en la persona destino
+								direccionConsultada.setIdpersona(Long.valueOf(idPersonaDestino));
+								insertarDireccionConHistorico(direccionConsultada, vBeanTipoDir, "Dirección movida a persona destino antes de fusión", null,"1");
+								
+								// borrando la direccion de origen
+								direccionConsultada.setIdpersona(Long.valueOf(idPersonaOrigen));
+								direccionConsultada.setFechabaja(new Date());
+								cenDireccionesExtendsMapper.updateByPrimaryKey(direccionConsultada);
+								
+								// guardando la institucion en la que se estan tratando direcciones
+								conjuntoColegiosIguales.add(idInstitucionComun);
+							}
+						}
+					}
+				}
+			}
+			if (null != peticionEntrada.getGetFusionadorPersonasRequest().getDatosFusionador().getListaDireccionesNoSeleccionadas()) {
+				
+			// anyadiendo tambien el listado de colegios iguales de los que se ha deseleccionado todas las direcciones
+				String[] direcciones = peticionEntrada.getGetFusionadorPersonasRequest().getDatosFusionador().getListaDireccionesNoSeleccionadas().split(",");
+				if (null != direcciones &&  direcciones.length > 0) {
+					for (int i = 0; i < direcciones.length; i++) {
+						String[] direccion = direcciones[i].split("&&");
+						if (direccion.length > 1) {
+							idInstitucion = direccion[0];
+							conjuntoColegiosIguales.add(idInstitucion);
+						}
+					}
+				}
+			}
+			// borrando todas direcciones de las instituciones (ya se movieron las que fueron seleccionadas en la interfaz)
+			boolean validarTipos = false;
+			List<CenDirecciones> direccionesInstitucion = new ArrayList<CenDirecciones>();
+			for (String idInstitucionCol : conjuntoColegiosIguales) {
+				CenDireccionesExample exampleDirecciones = new CenDireccionesExample();
+				exampleDirecciones.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersonaOrigen)).andIdinstitucionEqualTo(Short.valueOf(idInstitucionCol));
+				direccionesInstitucion = cenDireccionesExtendsMapper.selectByExample(exampleDirecciones );
+				for (CenDirecciones direccionEnCGAE : direccionesInstitucion) {
+					boolean error = deleteDireccionConHistorico(direccionEnCGAE, "Dirección movida a persona destino antes de fusión", validarTipos, null);
+					if (!error) {
+						example.setIdrecurso("messages.error.censo.mantenimientoDuplicados.guardiaMismoDia");
+						String mensaje =  genRecursosMapper.selectByPrimaryKey(example ).getDescripcion();
+						
+						return mensaje;
+					}
+				}
+			}
+			
+			// comprobando datos que no es posible fusionar y hay que arreglar a mano
+			ArrayList<String> listaIdPersonas = new ArrayList<String>();
+			listaIdPersonas.add(idPersonaOrigen);
+			listaIdPersonas.add(idPersonaDestino);
+			List<FcsPagoColegiado> pagos = new ArrayList<FcsPagoColegiado>();
+			List<ScsCabeceraguardias> guardias = new ArrayList<ScsCabeceraguardias>();
+
+			for (String colegio : conjuntoColegiosIguales) {
+				pagos = fcsPagoColegiadoMapper.selectPagosColegiadoDeVariasPersonas(colegio, listaIdPersonas);
+				if (pagos != null && pagos.size() > 0) {
+					//tx.rollback();
+					example.setIdrecurso("messages.error.censo.mantenimientoDuplicados.registroMismoPagoSJCS");
+					String mensaje =  genRecursosMapper.selectByPrimaryKey(example ).getDescripcion();
+					
+					return mensaje ;
+				}
+				 
+				guardias = scsCabeceraguardiasMapper.getCabeceraGuardiasDeVariasPersonas(colegio, listaIdPersonas);
+				if (guardias != null && guardias.size() > 0) {
+					//tx.rollback();
+					example.setIdrecurso("messages.error.censo.mantenimientoDuplicados.guardiaMismoDia");
+					String mensaje =  genRecursosMapper.selectByPrimaryKey(example ).getDescripcion();
+					
+					return mensaje ;
+				}
+			}
+			
+			// ejecutando la fusion y controlando las posibles excepciones
+			String[] resultadoFusion = ejecutarPL_fusion(idPersonaOrigen, idPersonaDestino);
+			if (resultadoFusion[0].equalsIgnoreCase("-1")) { //error controlado: mostrando el error en pantalla
+				//tx.rollback();
+				
+				return "Imposible completar la fusión de las personas con Num. ident. ´"+beanPersonaOrigen.getNifcif()+"´ y ´"+beanPersonaDestino.getNifcif()+"´: " + resultadoFusion[1];
+			} else if (!resultadoFusion[0].equalsIgnoreCase("-1") && !resultadoFusion[0].equalsIgnoreCase("0")) {
+				return "Imposible completar la fusión de las personas con Num. ident. ´"+beanPersonaOrigen.getNifcif()+"´ y ´"+beanPersonaDestino.getNifcif()+"´. Consulte con el Administrador";
+			}
+			
+			//tx.commit();
+			
+			
+			
+			
+		} catch (Exception e) {
+			return "Error en la fusión de las personas. Consulte al administrador";
+		} finally {
+			// ABRIMOS EL SEMAFORO. SE DEBE EJECUTAR SIEMPRE
+ 			if (controlFusionador != null) {
+				controlFusionador.removeControlFusionador();
+			}
+		}
+		String msgSalida = "Fusión completada: se encuentran todos los datos de ´"+beanPersonaDestino.getNombre()+"´ en el registro con Num. ident. ´"+beanPersonaDestino.getNifcif()+"´"; // OJOOO: No se pueden poner comillas dobles ni simples porque fallará la JSP
+		return msgSalida;
+	
+	}
+	private boolean deleteDireccionConHistorico(CenDirecciones direccionEnCGAE, String motivoHis, boolean validarTipos,
+			Object object) {
+		CenHistorico beanHis = new CenHistorico();
+		if(motivoHis != null){
+			//estableciendo los datos del Historico
+			beanHis.setMotivo (motivoHis);
+		}			
+		boolean error = false;
+		try {
+			// Eliminamos la direccion
+
+				
+				CenDireccionesKey key= new CenDireccionesKey();
+				key.setIddireccion(direccionEnCGAE.getIddireccion());
+				key.setIdpersona(direccionEnCGAE.getIdpersona());
+				key.setIdinstitucion(direccionEnCGAE.getIdinstitucion());
+				int deleteDireccion = cenDireccionesExtendsMapper.deleteByPrimaryKey(key);
+
+				if (!(deleteDireccion > 0)) {
+					error = true;
+				}
+				if (!error) {
+					//Se comprueba si se quiere insertar con historico o no
+					if (beanHis != null){					
+						// Insertamos el historico
+						CenHistorico admHis = new CenHistorico();
+						if (insertCompleto(beanHis, direccionEnCGAE, 2, "1")) {
+							return true;
+						}
+					}else{
+							return true;
+						
+					}
+				}
+			
+	
+		}
+		catch (Exception e) {
+			throw e;
+		}
+		return error;
+
+	}
+	private static class ControlFusionador {
+		/**
+		 * Conjunto de personas que se estan fusionando en este momento. Se van metiendo y sacando segun se termina la fusion
+		 */
+		private static HashSet<String> listaPersonasFusionando = new HashSet<String>();
+		public static final String CONTROL_INFORME = "CONTROL_INFORME_FUSIONADOR";
+		
+		/**
+		 * Obtiene un control basado en dos personas a fusionar
+		 * @param idpersona1
+		 * @param idpersona2
+		 * @return
+		 */
+		public static ControlFusionador getControlFusionador(String idpersona1, String idpersona2) {
+			synchronized (listaPersonasFusionando) {
+				if (listaPersonasFusionando.contains(idpersona1) || listaPersonasFusionando.contains(idpersona2)) {
+					return null;
+				} else {
+					return new ControlFusionador(idpersona1, idpersona2);
+				}
+			}
+		}
+		
+		private String personaFusionando1, personaFusionando2;
+		
+		/**
+		 * Constructor privado: solo se puede obtener un control llamando a getControlFusionador(), que busca si las personas ya estan en una fusion
+		 * @param idpersona1
+		 * @param idpersona2
+		 */
+		private ControlFusionador(String idpersona1, String idpersona2)
+		{
+			if (idpersona1 != null) {
+				listaPersonasFusionando.add(idpersona1);
+				personaFusionando1 = idpersona1;
+			}
+			if (idpersona2 != null) {
+				listaPersonasFusionando.add(idpersona2);
+				personaFusionando2 = idpersona2;
+			}
+		}
+		
+		/**
+		 * Da por terminada la fusion controlada por este objeto
+		 */
+		public void removeControlFusionador() {
+			synchronized (listaPersonasFusionando) {
+				listaPersonasFusionando.remove(this.personaFusionando1);
+				listaPersonasFusionando.remove(this.personaFusionando2);
+			}
+		}
+	}
+	
+	/**
+	 * Este metodo comprueba que los tipos de una nueva direccion (pasada como parametro) 
+	 * cumplen con las unicidades de tipos de las direcciones existentes.
+	 * 
+	 * @param dirNueva
+	 */
+	private  ArrayList<String> revisarTiposEnDireccionesExistentes(String idInstitucion, String idPersona, List<String> tiposAinsertar)  
+	{
+		ArrayList<String> tiposValidos = new ArrayList<String>();
+
+		List<Integer> alTiposDireccionUnicos = Arrays.asList(UtilidadesString.tiposDireccionUnicos);
+
+		for (String tipo : tiposAinsertar) {
+			DatosDireccionesSearchDTO datosDireccionesSearchDTO = new DatosDireccionesSearchDTO();
+			datosDireccionesSearchDTO.setIdInstitucion(idInstitucion);
+			datosDireccionesSearchDTO.setIdPersona(idPersona);
+			datosDireccionesSearchDTO.setIdTipo(tipo);
+			datosDireccionesSearchDTO.setHistorico(false);
+			if (!alTiposDireccionUnicos.contains(Integer.valueOf(tipo)) || cenDireccionesExtendsMapper.selectDirecciones(datosDireccionesSearchDTO , idInstitucion) == null) {
+				tiposValidos.add(tipo);
+			}
+		}
+
+		return tiposValidos;
+	}
+	
+	
+	private CenDireccionTipodireccion[] establecerTipoDireccion(String [] tipos){
+		int numTipos = tipos.length;
+		CenDireccionTipodireccion vBeanTipoDir [] = new CenDireccionTipodireccion [numTipos];
+		for (int i=0; i < numTipos; i++) {
+			CenDireccionTipodireccion b = new CenDireccionTipodireccion ();
+			b.setIdtipodireccion(Short.valueOf(tipos[i]));
+			vBeanTipoDir[i] = b;
+		}
+		
+		return vBeanTipoDir;
+	}
+	
+	
+
+	/**
+	 * Este metodo comprueba que los tipos de una nueva direccion (pasada como parametro) 
+	 * cumplen con las unicidades de tipos de las direcciones existentes.
+	 * 
+	 * @param dirNueva
+
+	 */
+	private String revisarPreferenciasEnDireccionesExistentes(String idInstitucion, String idPersona, String preferenciasAinsertar) {
+		StringBuilder preferenciasValidas = new StringBuilder();
+		
+		char preferencia;
+		for (int i = 0; i < preferenciasAinsertar.length(); i++) {
+			preferencia = preferenciasAinsertar.charAt(i);
+			CenDireccionesExample direccionExample = new CenDireccionesExample();
+			direccionExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona)).andFechabajaIsNull().andIdinstitucionaltaEqualTo(Short.valueOf(idInstitucion)).andPreferenteLike(String.valueOf(preferencia));
+			List<CenDirecciones> direcciones = cenDireccionesExtendsMapper.selectByExample(direccionExample );
+			if (direcciones == null || direcciones.size()< 1) {
+				preferenciasValidas.append(preferencia);
+			}
+		}
+		
+		return preferenciasValidas.toString();
+	}
+	
+	
+	/**
+	 * Inserta los datos de una direccion y rellena la tabla de historicos (CEN_HISTORICO)
+	 * @author daniel.campos 10-01-05
+	 * @version 1	 
+	 * @param beanDir datos de la direccion.
+	 * @param beanTipoDir datos el tipo de la direccion.
+	 * @param BeanHis con el motivo y el tipo, para almacenar en el Historico
+	 */
+	private String insertarDireccionConHistorico (CenDirecciones beanDir, CenDireccionTipodireccion beanTipoDir[], String motivoHis,
+			List<Integer> idTipoDireccionAValidarIntegers, String idioma) 
+	{
+		CenHistorico beanHis = new CenHistorico();
+		if(motivoHis != null){
+			//estableciendo los datos del Historico
+			beanHis.setMotivo (motivoHis);
+		}			
+
+		try {
+			// Insertamos la direccion
+			beanDir.setIddireccion(Long.valueOf(cenDireccionesExtendsMapper.selectNewIdDireccion(beanDir.getIdpersona().toString(), beanDir.getIdinstitucion().toString()).get(0).getIdDireccion()));
+			int insertDireccion = cenDireccionesExtendsMapper.insert(beanDir);
+			if (insertDireccion > 0) {
+				
+				boolean error = false;
+				
+				for (int i = 0; i < beanTipoDir.length; i++) {
+					beanTipoDir[i].setIddireccion(beanDir.getIddireccion());
+					beanTipoDir[i].setIdinstitucion(beanDir.getIdinstitucion());
+					beanTipoDir[i].setIdpersona(beanDir.getIdpersona());
+					beanTipoDir[i].setFechamodificacion(new Date());
+					beanTipoDir[i].setUsumodificacion(-1);
+
+					// Insertamos el tipo de direccion
+					int insertTipoDireccion =cenTipoDireccionMapper.insert(beanTipoDir[i]);
+					if (!(insertTipoDireccion > 0)) {
+						error = true;
+					}
+				}
+
+				String validacion = validarRestricciones(beanDir, idTipoDireccionAValidarIntegers);
+				if (!validacion.equals("ok")) {
+					return validacion;
+				}
+				if (!error) {
+					//Se comprueba si se quiere insertar con historico o no
+					if (beanHis != null){					
+						// Insertamos el historico
+						CenHistorico admHis = new CenHistorico();
+						if (insertCompleto(beanHis, beanDir, 1, idioma)) {
+							return "ok";
+						}
+					}else{
+							return "ok";
+						
+					}
+				}
+			}
+			return "ko";
+		}
+		catch (Exception e) {
+			throw e;
+		}
+
+	}
+	
+	private boolean insertCompleto(CenHistorico beanHis, CenDirecciones beanAsociado, int accion, String idioma) {
+
+		CenDirecciones beanDir = (CenDirecciones) beanAsociado;
+
+		
+		
+		String descripcion = "";
+		GenRecursosKey example = new GenRecursosKey();
+		GenRecursosCatalogosKey exampleRecursosCatalogos = new GenRecursosCatalogosKey();
+		if (accion == 1) {
+			example.setIdrecurso("historico.literal.registroNuevo");
+		}else if(accion == 2) {
+			example.setIdrecurso("historico.literal.registroEliminado");
+		}
+	
+		example.setIdlenguaje("1");
+		exampleRecursosCatalogos.setIdlenguaje("1");
+
+		descripcion = genRecursosMapper.selectByPrimaryKey(example ).getDescripcion()     + "\n";
+		beanHis.setIdinstitucion(beanDir.getIdinstitucion());
+		beanHis.setIdpersona(beanDir.getIdpersona());
+		beanHis.setIdtipocambio(Short.valueOf(new Integer(SigaConstants.TIPO_CAMBIO_HISTORICO_DIRECCIONES).toString()));
+
+		// Sustituimos id's por descripciones
+		try {
+
+			//UtilidadesHash.set(hBeanAsociado, CenDireccionesBean.C_IDPAIS, UtilidadesString.getMensajeIdioma(idioma, ((CenPaisBean)paisAdm.selectByPK(hBeanAsociado).get(0)).getNombre()));
+			if (null != cenPaisMapper.selectByPrimaryKey(beanAsociado.getIdpais()) ){
+				exampleRecursosCatalogos.setIdrecurso(cenPaisMapper.selectByPrimaryKey(beanAsociado.getIdpais()).getNombre());
+				
+				descripcion += genRecursosCatalogosMapper.selectByPrimaryKey(exampleRecursosCatalogos ).getDescripcion()     + "\n";
+			}
+
+		}
+		catch (Exception e) {}
+		try {
+
+			//UtilidadesHash.set(hBeanAsociado, CenDireccionesBean.C_IDPOBLACION, UtilidadesString.getMensajeIdioma(idioma, ((CenPoblacionesBean)pobAdm.selectByPK(hBeanAsociado).get(0)).getNombre()));
+			if (null !=  cenPoblacionesMapper.selectByPrimaryKey(beanAsociado.getIdpoblacion())) {
+				descripcion += cenPoblacionesMapper.selectByPrimaryKey(beanAsociado.getIdpoblacion()).getNombre()+ "\n";
+			}
+			
+		}
+		catch (Exception e) {}
+		try {
+
+			//UtilidadesHash.set(hBeanAsociado, CenDireccionesBean.C_IDPROVINCIA, UtilidadesString.getMensajeIdioma(idioma, ((CenProvinciaBean)provAdm.selectByPK(hBeanAsociado).get(0)).getNombre()));
+			if (null !=  cenProvinciasMapper.selectByPrimaryKey(beanAsociado.getIdprovincia())) {
+				descripcion +=  cenProvinciasMapper.selectByPrimaryKey(beanAsociado.getIdprovincia()).getNombre()+ "\n";
+			}
+		} 
+		catch (Exception e) {}
+		try {
+			String p = beanAsociado.getPreferente();
+			if (p != null && !p.equals("")) {
+				String fin = ""; 
+				example.setIdrecurso("censo.preferente.correo");
+				if (p.indexOf(SigaConstants.TIPO_PREFERENTE_CORREO) >= 0)            fin += ", " +  genRecursosMapper.selectByPrimaryKey(example ).getDescripcion();//(idioma, "censo.preferente.correo"); 
+				example.setIdrecurso("censo.preferente.mail");
+				if (p.indexOf(SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO) >= 0) fin += ", " +  genRecursosMapper.selectByPrimaryKey(example ).getDescripcion();
+				example.setIdrecurso("censo.preferente.fax");
+				if (p.indexOf(SigaConstants.TIPO_PREFERENTE_FAX) >= 0)               fin += ", " +  genRecursosMapper.selectByPrimaryKey(example ).getDescripcion();
+				example.setIdrecurso("censo.preferente.sms");
+				if (p.indexOf(SigaConstants.TIPO_PREFERENTE_SMS) >= 0)               fin += ", " +  genRecursosMapper.selectByPrimaryKey(example ).getDescripcion();
+				if (fin.length() > 2)
+					fin = fin.substring(2);
+				//UtilidadesHash.set(hBeanAsociado, CenDireccionesBean.C_PREFERENTE, fin);
+				descripcion +=  fin + "\n";
+			}
+
+		} 
+		catch (Exception e) {}
+		try {
+
+
+			List<StringDTO> tipodireccion = cenDireccionesExtendsMapper.getTiposDireccion(beanDir.getIdinstitucion(),beanDir.getIdpersona(),beanDir.getIddireccion(),"1");
+			
+			String sDirecciones = "";
+			for (StringDTO tipo : tipodireccion) {
+				sDirecciones += ", " + tipo.getValor();
+			}
+			descripcion += (sDirecciones.length() > 2)?sDirecciones.substring(2):sDirecciones;
+		} 
+		catch (Exception e) {}
+		
+
+		
+		
+		//Hay que comprobar la longitud de la descripción que vamos a insertar
+		//porque con la petición R1411_0046 se amplió el campo de la descripción de los datos del cv a 4000.
+//		int numCaract=descripcion.length();
+//		
+//		//Si estamos insertando más de 4000 caracteres hay que truncar el valor de "DESCRIPCION"
+//		if(numCaract > MAX_NUM_CARACTERES_DESCRIPCION)
+//		{
+//			descripcion="";
+//			
+//			descripcion=this.getDescripcionCorta(accion,hBeanAsociado,hBeanAsociadoAnterior,idioma,numCaract);
+//			
+//		}
+		
+		beanHis.setDescripcion(descripcion);
+			
+		if ((beanHis.getFechaefectiva() == null) || (beanHis.getFechaefectiva().equals(""))) 
+			beanHis.setFechaefectiva(new Date());
+		if ((beanHis.getFechaentrada()  == null) || (beanHis.getFechaentrada().equals(""))) 
+			beanHis.setFechaentrada (new Date());
+		beanHis.setFechamodificacion(new Date());
+		beanHis.setUsumodificacion(-1);
+		NewIdDTO newId = cenHistoricoMapper.selectMaxIDHistoricoByPerson(beanHis.getIdpersona().toString(), beanHis.getIdinstitucion().toString());
+		beanHis.setIdhistorico(Short.valueOf(newId.getNewId()));
+		int insertHistorico = cenHistoricoMapper.insert(beanHis);
+		
+		// Insertamos el historico
+		if (insertHistorico > 0 ) {
+			return true;
+		}
+		return false;
+
+		
+		
+	
+	}
+
+	private String validarRestricciones (CenDirecciones beanDir,List<Integer> idTipoDireccionAValidarIntegers )  {
+		
+		try {
+			// 		QUE EXISTA UNA DIRECCION DE CORREO
+			String error = "";
+			
+
+			if (idTipoDireccionAValidarIntegers!=null && idTipoDireccionAValidarIntegers.contains( SigaConstants.TIPO_DIRECCION_FACTURACION) &&
+					cenDireccionesExtendsMapper.getNumDirecciones(beanDir,SigaConstants.TIPO_DIRECCION_FACTURACION).size() < 1) {
+				error = "messages.censo.direcciones.facturacion";
+				return error;
+			}
+
+			
+			
+			
+			StringDTO esLetrado= cenClienteExtendsMapper.getEsLetrado(beanDir.getIdpersona().toString(), beanDir.getIdinstitucion().toString());
+			
+			ColegiadoItem colegiadoItem = new ColegiadoItem();
+			colegiadoItem.setIdPersona(beanDir.getIdpersona().toString());
+			List<ColegiadoItem> colegiaciones = cenColegiadoExtendsMapper.selectColegiaciones(beanDir.getIdinstitucion(), "1", colegiadoItem );// (beanDir.getIdPersona(), beanDir.getIdInstitucion());
+			if ((null == colegiaciones || colegiaciones.size() == 0) && esLetrado.getValor().equals("0")) {
+				// no es colegiado o no tiene estado colegial y ademas no es letrado
+				error = "messages.censo.direcciones.tipoCorreo";
+				return error;
+			}
+			
+			if (idTipoDireccionAValidarIntegers!=null && idTipoDireccionAValidarIntegers.contains( SigaConstants.TIPO_DIRECCION_CENSOWEB) && cenDireccionesExtendsMapper.getNumDirecciones(beanDir, SigaConstants.TIPO_DIRECCION_CENSOWEB).size() < 1) {
+				error = "messages.censo.direcciones.tipoCorreo";
+				return error;
+			}
+			if (idTipoDireccionAValidarIntegers!=null && idTipoDireccionAValidarIntegers.contains( SigaConstants.TIPO_DIRECCION_TRASPASO_OJ) && cenDireccionesExtendsMapper.getNumDirecciones(beanDir, SigaConstants.TIPO_DIRECCION_TRASPASO_OJ).size() < 1) {
+				error = "messages.censo.direcciones.traspaso.required";
+				return error;
+			}
+			
+			
+			Integer estado = Integer.valueOf(colegiaciones.get(0).getIdEstado());
+
+			
+
+			//obtener las colegiaciones del letrado en estado ejerciente
+			List<StringDTO> vInstitucionesEjerciente = cenClienteExtendsMapper.getInstitucionesEjerciente(beanDir.getIdpersona().toString(), beanDir.getIdinstitucion().toString());
+			boolean tieneColegiacionEjerciente = false;
+			if (vInstitucionesEjerciente != null && vInstitucionesEjerciente.size() > 0 ){
+				tieneColegiacionEjerciente = true;
+			}
+
+			// si es letrado y no tiene alguna colegiación ejerciente,
+			// no se comprueba ni la dirección de despacho ni la de guia judicial
+			if (!(esLetrado.getValor().equals("1") && !tieneColegiacionEjerciente)){
+				// SI ES EJERCIENTE O LETRADO QUE EXISTA UNA DIRECCION DE DESPACHO
+				if ((((estado!=null && estado.intValue() == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE) || esLetrado.getValor().equals("1"))) && 
+						idTipoDireccionAValidarIntegers!=null && idTipoDireccionAValidarIntegers.contains( SigaConstants.TIPO_DIRECCION_DESPACHO) && (cenDireccionesExtendsMapper.getNumDirecciones(beanDir, SigaConstants.TIPO_DIRECCION_DESPACHO).size() < 1)) {
+					error =  "messages.censo.direcciones.tipoDespacho";
+					return error;
+				}
+				
+				// SI ES EJERCIENTE O LETRADO QUE EXISTA UNA DIRECCION DE GUIA JUDICIAL
+				if ((((estado!=null && estado.intValue() == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE)) || esLetrado.getValor().equals("1"))&& 
+						idTipoDireccionAValidarIntegers!=null && idTipoDireccionAValidarIntegers.contains( SigaConstants.TIPO_DIRECCION_GUIA) && (cenDireccionesExtendsMapper.getNumDirecciones(beanDir, SigaConstants.TIPO_DIRECCION_GUIA).size() < 1)) {
+					error =  "messages.censo.direcciones.tipoGuia";
+					return error;
+				}
+			}
+
+		}
+		catch (Exception e) {
+			return "Error al validar las restricciones de direcciones";
+			
+		}
+		return "ok";
+
+	}
+	
+	/**
+	 * @param idInstitucion
+	 * @param idPersona
+	 * @param idCuenta
+	 * @param usuario
+	 * @return Codigo y mensaje de error
+	 * @throws ClsExceptions
+	 */
+	private String[] ejecutarPL_fusion (String idPersonaOrigen, String idPersonaDestino) throws Exception {
+		Object[] param_in = new Object[2]; 	//Parametros de entrada del PL
+		String resultado[] = null; //Parametros de salida del PL
+	
+		try {
+			//resultado = new String[2];
+			param_in = new Object[2];
+			param_in[0] = idPersonaOrigen;
+			param_in[1] = idPersonaDestino;
+		        
+			//Ejecucion del PL
+		    resultado = callPLProcedure("{call PKG_SIGA_FUSION_PERSONAS.Fusiona_Personas(?,?,?,?)}", 2, param_in);
+			
+		} catch (Exception e) {
+			resultado[0] = "1"; 	// P_CODRETORNO
+	    	resultado[1] = "ERROR"; // ERROR P_DATOSERROR        	
+		}
+		
+	    return resultado;
+	}
+	
+	/**
+	   * Calls a PL Funtion
+	   * @author CSD
+	   * @param functionDefinition string that defines the function
+	   * @param inParameters input parameters
+	   * @param outParameters number of output parameters
+	   * @return error code, '0' if ok
+	 * @throws NamingException 
+	 * @throws IOException 
+	 * @throws SQLException 
+	   * @throws ClsExceptions  type Exception
+	   */
+	  private  String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters) throws IOException, NamingException, SQLException  {
+	    String result[] = null;
+	    
+	    if (outParameters>0) result= new String[outParameters];
+	    DataSource ds = getOracleDataSource();
+	    Connection con=ds.getConnection();
+	    try{
+	      CallableStatement cs=con.prepareCall(functionDefinition);
+	      int size=inParameters.length;
+	      
+	      //input Parameters
+	      for(int i=0;i<size;i++){
+	    	  
+
+	        cs.setString(i+1,(String)inParameters[i]);
+	      }
+	      //output Parameters
+	      for(int i=0;i<outParameters;i++){
+	        cs.registerOutParameter(i+size+1,Types.VARCHAR);
+	      }
+	      
+			for (int intento = 1; intento <= 2; intento++) {
+				try {
+					cs.execute();
+					break;
+					
+				} catch (SQLTimeoutException tex) {
+					throw tex;
+		
+				} catch (SQLException ex) {
+					if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la segunda vez deberia funcionar)
+						throw ex;
+					}
+				}
+
+			}      
+
+	      for(int i=0;i<outParameters;i++){
+	        result[i]=cs.getString(i+size+1);
+	      }
+	      cs.close();
+	      return result;
+	      
+	    }catch(SQLTimeoutException ex){
+	        return null;
+	    }catch(SQLException ex){
+	    	return null;
+	    }catch(Exception e){
+	    	return null;
+	    }finally{
+	      con.close();
+	      con = null;
+	    }
+	  }
+	  
+
+		/**
+		 * Recupera el datasource con los datos de conexión sacados del fichero de
+		 * configuracion
+		 * 
+		 * @return
+		 * @throws IOException
+		 * @throws NamingException
+		 */
+		private  DataSource getOracleDataSource() throws IOException, NamingException {
+			try {
+				
+				LOGGER.debug("Recuperando datasource {} provisto por el servidor (JNDI)");
+				
+				AdmConfigExample example = new AdmConfigExample();
+				example.createCriteria().andClaveEqualTo("spring.datasource.jndi-name");
+				List<AdmConfig> config = admConfigMapper.selectByExample(example );
+				Context ctx = new InitialContext();
+				return (DataSource) ctx.lookup(config.get(0).getValor());
+			} catch (NamingException e) {
+				throw e;
+			}
+		}
 }

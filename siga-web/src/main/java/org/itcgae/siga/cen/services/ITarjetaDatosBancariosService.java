@@ -23,6 +23,8 @@ import org.itcgae.siga.DTOs.cen.MandatosDownloadDTO;
 import org.itcgae.siga.DTOs.cen.MandatosUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface ITarjetaDatosBancariosService {
@@ -57,6 +59,10 @@ public interface ITarjetaDatosBancariosService {
 	public ComboItem downloadFile(MandatosDownloadDTO mandatosDownloadDTO,HttpServletRequest request, HttpServletResponse response);
 	
 	public ComboItem fileDownloadInformation(MandatosDownloadDTO mandatosDownloadDTO, HttpServletRequest request);
+	
+	public InsertResponseDTO solicitudInsertBanksData(DatosBancariosInsertDTO datosBancariosInsertDTO,HttpServletRequest request) throws Exception;
+	
+	public Integer getLengthCodCountry(String ccountry, HttpServletRequest request); 
 
 
 

@@ -63,7 +63,7 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		sql.INNER_JOIN("CEN_BANCOS BANCO ON BANCO.CODIGO = CUENTA.CBO_CODIGO");
 
 		sql.WHERE("PER.IDPERSONA = '"+datosBancariosSearchDTO.getIdPersona()+"'");
-		sql.WHERE("CUENTA.FECHABAJA is null");
+		//sql.WHERE("CUENTA.FECHABAJA is null");
 		sql.WHERE("CUENTA.IDCUENTA = '"+datosBancariosSearchDTO.getIdCuenta()+"'");
 		sql.WHERE("CUENTA.IDINSTITUCION = '"+idInstitucion+"'");
 		
@@ -96,16 +96,16 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 	
 	public String selectNewIdCuenta(String idPersona) {
 		SQL sql = new SQL();
-		sql.SELECT("MAX(CUENTA.IDCUENTA) + 1 AS IDCUENTA");
+		sql.SELECT("NVL(MAX(CUENTA.IDCUENTA) + 1,1) AS IDCUENTA");
 		sql.FROM("CEN_CUENTASBANCARIAS CUENTA");
-		sql.WHERE("CUENTA.IDPERSONA = '"+idPersona+"'");
+		sql.WHERE("CUENTA.IDPERSONA =" + idPersona);
 		
 		return sql.toString();
 	}
 	
 	public String selectNewIdAnexo(String idPersona,String idCuenta,String idMandato,String institucion) {
 		SQL sql = new SQL();
-		sql.SELECT("MAX(CUENTA.IDANEXO) + 1 AS IDANEXO");
+		sql.SELECT("NVL(MAX(CUENTA.IDANEXO) + 1,1) AS IDANEXO");
 		sql.FROM("CEN_ANEXOS_CUENTASBANCARIAS CUENTA");
 		sql.WHERE("CUENTA.IDPERSONA = '"+idPersona+"'");
 		sql.WHERE("CUENTA.IDMANDATO = '"+idMandato+"'");
@@ -130,7 +130,6 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		SQL sql = new SQL();
 		sql.SELECT("BANCO.NOMBRE AS BANCO");
 		sql.SELECT("BANCO.BIC AS BIC");
-		sql.SELECT("DECODE(BANCO.IDPAIS,'191','1','0') AS BICESPANOL");
 		sql.FROM("CEN_BANCOS BANCO");
 
 		sql.WHERE("BANCO.CODIGO = '"+datosBancariosSearchBancoDTO.getiban()+"'");
@@ -188,6 +187,15 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		sql.WHERE("IDCUENTA = '"+datosBancariosSearchAnexosDTO.getIdCuenta()+"'");
 		sql.WHERE("IDINSTITUCION = '"+datosBancariosSearchAnexosDTO.getIdInstitucion()+"'");
 		sql.ORDER_BY("TIPO DESC,TIPOMANDATO ");
+		
+		return sql.toString();
+	}
+	
+	public String selectMaxId(){
+		SQL sql = new SQL();
+		
+		sql.SELECT("MAX(IDCUENTA) +1 AS IDCUENTA");
+		sql.FROM("CEN_CUENTASBANCARIAS");
 		
 		return sql.toString();
 	}

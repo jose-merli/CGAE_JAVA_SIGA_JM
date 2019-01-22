@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.cen.DatosBancariosSearchAnexosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
 import org.itcgae.siga.DTOs.cen.MandatosItem;
+import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
@@ -95,8 +96,7 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "selectBanks")
 	@Results({
 		@Result(column = "BANCO", property = "banco", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "BIC", property = "bic", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "BICESPANOL", property = "bicEspanol", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "BIC", property = "bic", jdbcType = JdbcType.VARCHAR)
 	})
 	List<BancoBicItem> selectBanks(DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO); 
 
@@ -122,7 +122,11 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 	})
 	List<NewIdDTO> selectNewIdAnexo(String idPersona,String idCuenta,String idMandato, String idInstitucion);
 	
-	
+	@SelectProvider(type = CenCuentasbancariasSqlExtendsProvider.class, method = "selectMaxId")
+	@Results({
+		@Result(column = "IDCUENTA", property = "idMax", jdbcType = JdbcType.VARCHAR),
+	})
+	MaxIdDto selectMaxID();
 	
 
 }

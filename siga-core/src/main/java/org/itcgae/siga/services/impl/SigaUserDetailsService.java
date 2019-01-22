@@ -10,12 +10,10 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
 import org.itcgae.siga.db.entities.AdmRol;
-import org.itcgae.siga.db.entities.AdmRolExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfil;
 import org.itcgae.siga.db.entities.AdmUsuariosEfectivosPerfilExample;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.mappers.AdmRolMapper;
 import org.itcgae.siga.db.mappers.AdmTiposaccesoMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosEfectivosPerfilMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
@@ -69,7 +67,7 @@ public class SigaUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String dni) throws UsernameNotFoundException {
 
-		return new UserCgae(dni, null, null, null,null);
+		return new UserCgae(dni, null, null, null,null,null);
 	}
 
 	public UserDetails loadUserByUsername(UserCgae user) throws UsernameNotFoundException {
@@ -77,6 +75,7 @@ public class SigaUserDetailsService implements UserDetailsService {
 		String dni = user.getDni();
 		String grupo = user.getGrupo();
 		String institucion = user.getInstitucion();
+		String letrado = user.getLetrado();
 		ControlRequestItem controlItem = new ControlRequestItem();
 		HashMap<String, String> response = new HashMap<String, String>();
 
@@ -122,7 +121,12 @@ public class SigaUserDetailsService implements UserDetailsService {
 						exampleUsuarioPerfil.createCriteria().andIdinstitucionEqualTo(Short.valueOf(institucion))
 									.andIdusuarioEqualTo(usuarios.get(0).getIdusuario()).andIdrolEqualTo(roles.get(0).getIdrol()).andFechaBajaIsNull();
 						List<AdmUsuariosEfectivosPerfil> perfiles = admUsuariosEfectivoMapper.selectByExample(exampleUsuarioPerfil);
-						
+						letrado = roles.get(0).getLetrado().toString();
+						if (letrado.equals("0")) {
+							letrado = "N";
+						}else{
+							letrado = "S";
+						}
 						if(null != perfiles && perfiles.size()>0) {
 							/*
 							 * Tratamos todos los grupos del Rol
@@ -151,7 +155,7 @@ public class SigaUserDetailsService implements UserDetailsService {
 					for (PermisoEntity permisoEntity : permisos) {
 						response.put(permisoEntity.getData(), permisoEntity.getDerechoacceso());
 					}
-					return new UserCgae(dni, grupo, institucion, response,idperfiles);
+					return new UserCgae(dni, grupo, institucion, response,idperfiles,letrado);
 				}else {
 					 throw new BadCredentialsException("El usuario no tiene permisos");
 				}	

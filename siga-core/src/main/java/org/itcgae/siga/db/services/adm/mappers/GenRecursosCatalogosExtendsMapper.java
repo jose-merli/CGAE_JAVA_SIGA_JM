@@ -10,9 +10,11 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.adm.MultiidiomaCatalogoItem;
 import org.itcgae.siga.DTOs.adm.MultiidiomaCatalogoSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.GenRecursosCatalogosMapper;
 import org.itcgae.siga.db.services.adm.providers.GenRecursosCatalogosSqlExtendsProvider;
+import org.itcgae.siga.db.services.cen.providers.CenTiposCVSubtipo1SqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -43,4 +45,14 @@ public interface GenRecursosCatalogosExtendsMapper extends GenRecursosCatalogosM
 	
 	@InsertProvider(type = GenRecursosCatalogosSqlExtendsProvider.class, method = "insertSelectiveForCreateLegalPerson")
 	int insertSelectiveForCreateLegalPerson(String idInstitucion, AdmUsuarios usuario, String grupo,String nombreTabla, String campoTabla);
+	
+	@SelectProvider(type = GenRecursosCatalogosSqlExtendsProvider.class, method = "getMaxIdRecurso")
+    String getMaxIdRecurso();
+	
+	
+	@SelectProvider(type = GenRecursosCatalogosSqlExtendsProvider.class, method = "getMaxIdRecursoCatalogo")
+	@Results({ @Result(column = "IDRECURSO", property = "newId", jdbcType = JdbcType.VARCHAR)
+	
+	})
+	NewIdDTO getMaxIdRecursoCatalogo(String idInstitucion, String idLenguaje);
 }

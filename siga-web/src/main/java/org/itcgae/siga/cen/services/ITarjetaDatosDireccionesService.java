@@ -18,7 +18,7 @@ public interface ITarjetaDatosDireccionesService {
 
 	ComboDTO getPais(HttpServletRequest request);
 
-	ComboDTO getPoblacion(HttpServletRequest request, String idProvincia, String filtro);
+    ComboDTO getPoblacion(HttpServletRequest request, String idProvincia, String filtro);
 
 	ComboDTO getTipoDireccion(HttpServletRequest request);
 
@@ -26,7 +26,10 @@ public interface ITarjetaDatosDireccionesService {
 
 	InsertResponseDTO createDirection(DatosDireccionesItem datosDirecciones, HttpServletRequest request);
 
+	UpdateResponseDTO solicitudUpdateDirection(DatosDireccionesItem datosDirecciones, HttpServletRequest request);
+
+	InsertResponseDTO solicitudCreateDirection(DatosDireccionesItem datosDirecciones, HttpServletRequest request);
+
 	
 }
-
 

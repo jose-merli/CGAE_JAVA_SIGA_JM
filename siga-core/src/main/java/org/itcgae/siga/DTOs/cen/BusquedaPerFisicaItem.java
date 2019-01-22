@@ -24,6 +24,8 @@ public class BusquedaPerFisicaItem {
 	private String numeroInstitucion;
 	private String idProvincia;
 	private String idActividadProfesional;
+	private String domicilio;
+	private String fechaEstado;
 	
 	
 	
@@ -370,6 +372,26 @@ public class BusquedaPerFisicaItem {
 	      return "null";
 	    }
 	    return o.toString().replace("\n", "\n    ");
+	}
+
+
+	public String getDomicilio() {
+		return domicilio;
+	}
+
+
+	public void setDomicilio(String domicilio) {
+		this.domicilio = domicilio;
+	}
+
+
+	public String getFechaEstado() {
+		return fechaEstado;
+	}
+
+
+	public void setFechaEstado(String fechaEstado) {
+		this.fechaEstado = fechaEstado;
 	}
 	
 	

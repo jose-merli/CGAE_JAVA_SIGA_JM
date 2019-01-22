@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.cen.CrearPersonaDTO;
 import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.FichaPerSearchDTO;
 import org.itcgae.siga.DTOs.cen.FichaPersonaDTO;
+import org.itcgae.siga.DTOs.cen.FichaPersonaItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface IFichaPersonaService {
@@ -19,5 +20,7 @@ public interface IFichaPersonaService {
 	public ComboDTO createPersonFile(CrearPersonaDTO crearPersonaDTO, HttpServletRequest request);
 	
 	public ComboDTO getIdentificationTypes(HttpServletRequest request);
+	
+	public FichaPersonaItem searchPersona(Long idPersona, HttpServletRequest request);
 
 }

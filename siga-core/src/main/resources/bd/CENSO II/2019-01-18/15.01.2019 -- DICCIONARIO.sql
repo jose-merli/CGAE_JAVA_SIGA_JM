@@ -1,0 +1,10 @@
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaColegiados.datosGeneralesAvanzados.fechaNacimientoDesde','Fecha Nacimiento Desde','0','1',to_date('15/01/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaColegiados.datosGeneralesAvanzados.fechaNacimientoDesde','Fecha Nacimiento Desde#GL','0','4',to_date('15/01/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaColegiados.datosGeneralesAvanzados.fechaNacimientoDesde','Data Naixement Des','0','2',to_date('15/01/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaColegiados.datosGeneralesAvanzados.fechaNacimientoDesde','Fecha Nacimiento Desde#EU','0','3',to_date('15/01/18','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaColegiados.datosGeneralesAvanzados.fechaNacimientoHasta','Fecha Nacimiento Hasta','0','1',to_date('15/01/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaColegiados.datosGeneralesAvanzados.fechaNacimientoHasta','Fecha Nacimiento Hasta#GL','0','4',to_date('15/01/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaColegiados.datosGeneralesAvanzados.fechaNacimientoHasta','Data Naixement Fins','0','2',to_date('15/01/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.busquedaColegiados.datosGeneralesAvanzados.fechaNacimientoHasta','Fecha Nacimiento Hasta#EU','0','3',to_date('15/01/18','DD/MM/RR'),'0','19');
+

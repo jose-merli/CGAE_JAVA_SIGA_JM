@@ -98,6 +98,15 @@ public class TarjetaDatosBancariosController {
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
+	@RequestMapping(value = "busquedaPerJuridica/solicitudInsertBanksData", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> solicitudInsertBanksData(@RequestBody DatosBancariosInsertDTO datosBancariosInsertDTO, HttpServletRequest request) throws Exception { 
+		InsertResponseDTO response = tarjetaDatosBancariosService.solicitudInsertBanksData(datosBancariosInsertDTO, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	
 	@RequestMapping(value = "busquedaPerJuridica/BanksSearch", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<BancoBicDTO> searchBanks( @RequestBody DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO, HttpServletRequest request) { 
 		BancoBicDTO response = tarjetaDatosBancariosService.searchBanks(datosBancariosSearchBancoDTO, request);
@@ -158,6 +167,11 @@ public class TarjetaDatosBancariosController {
 		}
 	
 	 
+	 @RequestMapping(value = "busquedaPerJuridica/getLengthCodCountry", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+		ResponseEntity<Integer> getLengthCodCountry(@RequestBody String ccountry, HttpServletRequest request) { 
+		 int response = tarjetaDatosBancariosService.getLengthCodCountry(ccountry, request);
+			return new ResponseEntity<Integer>(response, HttpStatus.OK);
+		}
 	 
 	 
 //	 @RequestMapping(value = "busquedaPerJuridica/downloadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

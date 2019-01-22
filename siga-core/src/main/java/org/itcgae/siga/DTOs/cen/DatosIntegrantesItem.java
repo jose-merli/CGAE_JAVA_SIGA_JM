@@ -32,8 +32,9 @@ public class DatosIntegrantesItem {
 	private String nombrecolegio;
 	private String descripcionProfesion;
 	private String personaJuridica;	
+
 	private String flagSocio;	
-	
+	private String abogado;
 	
 	/**
 	 *
@@ -71,7 +72,18 @@ public class DatosIntegrantesItem {
 		this.idPersona = idPersona;
 	}
 
+	/**
+	 * 
+	 * 
+	 */
 
+	public String getAbogado() {
+		return abogado;
+	}
+
+	public void setAbogado(String abogado) {
+		this.abogado = abogado;
+	}
 
 	/**
 	 *
