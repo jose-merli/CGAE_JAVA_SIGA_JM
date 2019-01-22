@@ -659,6 +659,8 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
 						key.setIdmodelocomunicacion(Long.valueOf(plantillas[i].getIdModelo()));
 						key.setIdplantillaenvios(Short.valueOf(plantillas[i].getIdPlantillaEnvios()));
+						key.setIdinstitucion(Short.valueOf(plantillas[i].getIdInstitucion()));
+						key.setIdtipoenvios(Short.valueOf(plantillas[i].getIdTipoEnvios()));
 						ModModeloPlantillaenvio plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
 						plantilla.setFechabaja(new Date());
 						plantilla.setFechamodificacion(new Date());
@@ -703,19 +705,17 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						example.createCriteria().andIdmodelocomunicacionEqualTo(Long.valueOf(datosPlantilla.getIdModelo()));
 						List<ModModeloPlantillaenvio> plantillas = modModeloPlantillaenvioMapper.selectByExample(example);
 						for (int i = 0; i < plantillas.size() ; i++) {
-							ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
-							key.setIdmodelocomunicacion(Long.valueOf(plantillas.get(0).getIdmodelocomunicacion()));
-							key.setIdplantillaenvios(Short.valueOf(plantillas.get(0).getIdplantillaenvios()));
-							key.setIdinstitucion(idInstitucion);
-							ModModeloPlantillaenvio plantillaMod = new ModModeloPlantillaenvio();
-							plantillaMod.setPordefecto("No");
-							modModeloPlantillaenvioMapper.updateByPrimaryKey(plantillaMod);
+							plantillas.get(i).setPordefecto("No");
+							plantillas.get(i).setFechamodificacion(new Date());
+							plantillas.get(i).setUsumodificacion(usuario.getIdusuario());
+							modModeloPlantillaenvioMapper.updateByPrimaryKey(plantillas.get(i));
 						}
 					}
 					ModModeloPlantillaenvio plantilla = new ModModeloPlantillaenvio();
 					plantilla.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
 					plantilla.setIdplantillaenvios(Short.valueOf(datosPlantilla.getIdPlantillaEnvios()));
 					plantilla.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
+					plantilla.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
 					plantilla.setPordefecto(datosPlantilla.getPorDefecto());
 					plantilla.setUsumodificacion(usuario.getIdusuario());
 					plantilla.setFechamodificacion(new Date());

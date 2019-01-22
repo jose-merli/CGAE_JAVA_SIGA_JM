@@ -6,7 +6,15 @@ public class PlantillaModeloBorrarDTO {
 	private String idPlantillaEnvios;
 	private String porDefecto;
 	private String idInstitucion;
+	private String idTipoEnvios;
 	
+	
+	public String getIdTipoEnvios() {
+		return idTipoEnvios;
+	}
+	public void setIdTipoEnvios(String idTipoEnvios) {
+		this.idTipoEnvios = idTipoEnvios;
+	}
 	public String getIdInstitucion() {
 		return idInstitucion;
 	}
