@@ -1,13 +1,10 @@
 package org.itcgae.siga.com.services.impl;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
@@ -647,7 +643,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
+				
 				try{
 					Map<String,String> mapa = new HashMap<String,String>();
 					mapa.put("selectValue", obtenerSelect(consulta));
@@ -663,8 +659,12 @@ public class ConsultasServiceImpl implements IConsultasService{
 					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
 					if(result != null){
 						Workbook workBook = crearExcel(mapa.get("selectValue"), result);
-						excel = new File(SigaConstants.rutaExcelConsultaTemp + "/ResultadoConsulta.xlsx");
-						FileOutputStream fileOut = new FileOutputStream(SigaConstants.rutaExcelConsultaTemp + "ResultadoConsulta.xlsx");
+						File aux = new File(SigaConstants.rutaExcelConsultaTemp);
+						// creo directorio si no existe
+						aux.mkdirs();
+						String nombreFichero = SigaConstants.nombreExcelConsulta + new Date().getTime()+".xlsx";
+						excel = new File(SigaConstants.rutaExcelConsultaTemp, nombreFichero);
+						FileOutputStream fileOut = new FileOutputStream(SigaConstants.rutaExcelConsultaTemp + nombreFichero);
 						workBook.write(fileOut);
 				        fileOut.close();
 				        workBook.close();
@@ -934,14 +934,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 		
 		//Creamos el libro de excel
 		Workbook workbook = new XSSFWorkbook();
-		CreationHelper createHelper = workbook.getCreationHelper();
 		Sheet sheet = workbook.createSheet("Query");
 		
 		//Le aplicamos estilos a las cabeceras
 		Font headerFont = workbook.createFont();
 		headerFont.setBold(true);
+		//headerFont.setItalic(true);
 		headerFont.setFontHeightInPoints((short) 14);
-		headerFont.setColor(IndexedColors.RED.getIndex());
+		headerFont.setColor(IndexedColors.BLUE.getIndex());
 		CellStyle headerCellStyle = workbook.createCellStyle();
         headerCellStyle.setFont(headerFont);
         
@@ -952,25 +952,40 @@ public class ConsultasServiceImpl implements IConsultasService{
         String[] columns = select.split(",");
         
         
-        for(int i = 0; i < columns.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            columns[i] = columns[i].replace(",", "");
-            cell.setCellValue(columns[i]);
-            cell.setCellStyle(headerCellStyle);
-        }
+//        for(int i = 0; i < columns.length; i++) {
+//            Cell cell = headerRow.createCell(i);
+//            columns[i] = columns[i].replace(",", "");
+//            cell.setCellValue(columns[i]);
+//            cell.setCellStyle(headerCellStyle);
+//        }
+        
         
         //Recorremos el map y vamos metiendo celdas
+        List<String> columnsKey = new ArrayList<String>();
         int rowNum = 1;
+        int index = 0;
+        for (String value : result.get(0).keySet()) {
+        	Cell cell = headerRow.createCell(index);
+			cell.setCellValue(value);
+			cell.setCellStyle(headerCellStyle);
+			columnsKey.add(value);
+			index++;
+		}
+        
         for (Map<String, Object> map : result) {
         	
         	Row row = sheet.createRow(rowNum++);
         	int cell = 0;
         	
-        	for (String name : map.keySet()) {
-        		Object campo = map.get(name.toString());
-        		row.createCell(cell).setCellValue(campo.toString());
+        	for(int i = 0; i < columnsKey.size(); i++){
+        		Object campo = map.get(columnsKey.get(i).trim());
+        		if(campo == null || campo.toString().trim() == ""){
+        			row.createCell(cell).setCellValue("null");
+        		}else{
+        			row.createCell(cell).setCellValue(campo.toString());
+        		}
         		cell++;
-			}
+        	}
 		}
         
         for(int i = 0; i < columns.length; i++) {
