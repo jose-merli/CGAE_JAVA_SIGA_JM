@@ -15,6 +15,8 @@ public class ForInscripcionesmasivasSqlExtendsProvider extends ForInscripcionesm
 		sql.SELECT("mas.NUMEROLINEASTOTALES");
 		sql.SELECT("mas.INSCRIPCIONESCORRECTAS");
 		sql.SELECT("mas.IDCURSO");
+		sql.SELECT("mas.IDFICHERO");
+		sql.SELECT("mas.IDFICHEROLOG");
 
 		sql.FROM("FOR_INSCRIPCIONESMASIVAS mas");
 
