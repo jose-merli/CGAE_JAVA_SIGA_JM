@@ -10,21 +10,32 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
+import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmContador;
+import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.AgeEvento;
 import org.itcgae.siga.db.entities.AgeEventoExample;
 import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.entities.ForCursoExample;
 import org.itcgae.siga.db.entities.ForEventoCurso;
+import org.itcgae.siga.db.entities.ForTemacursoCurso;
+import org.itcgae.siga.db.entities.ForTiposervicioCurso;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
+import org.itcgae.siga.db.mappers.ForEventoCursoMapper;
+import org.itcgae.siga.db.mappers.ForTemacursoCursoMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.age.mappers.AgeEventoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForEstadocursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForTemacursoExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.ForTiposervicioCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForVisibilidadcursoExtendsMapper;
 import org.itcgae.siga.form.services.IBusquedaCursosService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -50,6 +61,24 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService {
 
 	@Autowired
 	private ForCursoExtendsMapper forCursoExtendsMapper;
+	
+	@Autowired
+	private AdmContadorExtendsMapper admContadorExtendsMapper;
+	
+	@Autowired 
+	private ForTiposervicioCursoExtendsMapper forTiposervicioCursoExtendsMapper;
+	
+	@Autowired
+	private ForTemacursoCursoMapper forTemacursoCursoMapper;
+	
+	@Autowired
+	private ForEventoCursoMapper forEventoCursoMapper;
+	
+	@Autowired
+	private AgeEventoExtendsMapper ageEventoExtendsMapper;
+	
+	@Autowired 
+	private FichaCursosServiceImpl fichaCursosServiceImpl;
 
 	@Autowired
 	AdmUsuariosMapper admUsuariosMapper;
@@ -123,11 +152,6 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService {
 				LOGGER.info(
 						"getEstadosCursos() / forEstadocursolExtendsMapper.distinctEstadoCurso -> Salida de forEstadocursolExtendsMapper para obtener los diferentes estados de un curso");
 
-				// Quitar en un futuro
-				ComboItem comboItem = new ComboItem();
-				comboItem.setLabel("");
-				comboItem.setValue("");
-				comboItems.add(0, comboItem);
 			}
 		}
 
@@ -539,6 +563,173 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService {
 
 		return insertResponseDTO;
 
+	}
+	
+	@Override
+	public InsertResponseDTO duplicateCourse(CursoItem cursoItem, HttpServletRequest request) {
+
+		LOGGER.info("duplicateCourse() -> Entrada al servicio para insertar un curso");
+
+		int response = 2;
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		ForCurso forCursoInsert = new ForCurso();
+		String codigo = null;
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"duplicateCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"duplicateCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+					// Insertamos curso en la tabla For_Curso
+					forCursoInsert.setIdinstitucion(idInstitucion);
+					forCursoInsert.setUsumodificacion(usuario.getIdusuario().longValue());
+					forCursoInsert.setFechamodificacion(new Date());
+					forCursoInsert.setNombrecurso(cursoItem.getNombreCurso());
+					forCursoInsert.setIdvisibilidadcurso(Short.valueOf(cursoItem.getIdVisibilidad()));
+					forCursoInsert.setDescripcion(cursoItem.getDescripcionEstado());
+					forCursoInsert.setFechainscripciondesde(cursoItem.getFechaInscripcionDesdeDate());
+					forCursoInsert.setFechainscripcionhasta(cursoItem.getFechaInscripcionHastaDate());
+					forCursoInsert.setIdestadocurso(Long.parseLong(SigaConstants.ESTADO_CURSO_ABIERTO));
+					if (cursoItem.getPlazasDisponibles() != null) {
+						forCursoInsert.setNumeroplazas(Long.valueOf(cursoItem.getPlazasDisponibles()));
+					}
+					if (cursoItem.getMinimoAsistencia() != null) {
+						forCursoInsert.setMinimoasistencia(Long.valueOf(cursoItem.getMinimoAsistencia()));
+					}
+					forCursoInsert.setFlagarchivado(Short.valueOf("0"));
+					forCursoInsert.setLugar(cursoItem.getLugar());
+					forCursoInsert.setAutovalidacioninscripcion(cursoItem.getAutovalidacionInscripcion().shortValue());
+					forCursoInsert.setEncuestasatisfaccion(cursoItem.getEncuesta());
+					forCursoInsert.setInformacionadicional(cursoItem.getAdicional());
+					forCursoInsert.setDocumentacionadjunta(cursoItem.getAdjunto());
+
+					// Obtenemos el código del curso
+					codigo = getCounterCourse(idInstitucion);
+					forCursoInsert.setCodigocurso(codigo);
+
+					LOGGER.info(
+							"duplicateCourse() / forCursoExtendsMapper.insert(forCursoInsert) -> Entrada a forCursoExtendsMapper para insertar un curso");
+					
+					response = forCursoExtendsMapper.insert(forCursoInsert);
+					
+					LOGGER.info(
+							"duplicateCourse() / forCursoExtendsMapper.insert(forCursoInsert) -> Salida a forCursoExtendsMapper para insertar un curso");
+
+					// Si existe tiposervicio, se guarda en la tabla TipoServicios
+					if (cursoItem.getTipoServicios() != null && cursoItem.getTipoServicios().size() > 0) {
+
+						for (ComboItem servicio : cursoItem.getTipoServicios()) {
+
+							ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
+							forTipoServicioCurso.setFechabaja(null);
+							forTipoServicioCurso.setFechamodificacion(new Date());
+							forTipoServicioCurso.setIdcurso(forCursoInsert.getIdcurso());
+							forTipoServicioCurso.setIdinstitucion(idInstitucion);
+							forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
+							forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+
+							response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
+
+						}
+					}
+
+					// Si existen temas, se guarda en la tabla TemasCurso
+					if (cursoItem.getTemasCombo() != null && cursoItem.getTemasCombo().size() > 0) {
+
+						for (ComboItem tema : cursoItem.getTemasCombo()) {
+
+							ForTemacursoCurso forTemacursoCurso = new ForTemacursoCurso();
+							forTemacursoCurso.setFechabaja(null);
+							forTemacursoCurso.setFechamodificacion(new Date());
+							forTemacursoCurso.setIdinstitucion(idInstitucion);
+							forTemacursoCurso.setIdcurso(forCursoInsert.getIdcurso());
+							forTemacursoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+							forTemacursoCurso.setIdtemacurso(Long.valueOf(tema.getValue()));
+
+							response = forTemacursoCursoMapper.insert(forTemacursoCurso);
+
+						}
+					}	
+				
+				} catch (Exception e) {
+					response = 0;
+				}
+				if (response == 0) {
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+				} else {
+					error.setCode(200);
+
+					error.setDescription("Se ha dado de alta el curso con el código " + codigo + " correctamente. ");
+					insertResponseDTO.setId(Long.toString(forCursoInsert.getIdcurso()));
+					insertResponseDTO.setStatus(codigo);
+					insertResponseDTO.setError(error);
+
+					response = fichaCursosServiceImpl.createServiceCourse(forCursoInsert, usuario, idInstitucion);
+
+					if (response == 0) {
+						error.setCode(400);
+						error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+
+					} else {
+						error.setCode(200);
+						insertResponseDTO.setError(error);
+					}
+				}
+			}
+		}
+		LOGGER.info("saveCourse() -> Salida del servicio para insertar un curso");
+
+		return insertResponseDTO;
+	}
+	
+	private String getCounterCourse(Short idInstitucion) {
+		String contador = "";
+		int response = 2;
+
+		AdmContadorExample admContadorExample = new AdmContadorExample();
+		admContadorExample.createCriteria().andIdmoduloEqualTo(SigaConstants.MODULO_CONTADOR)
+				.andIdinstitucionEqualTo(idInstitucion);
+
+		List<AdmContador> counterList = admContadorExtendsMapper.selectByExample(admContadorExample);
+
+		if (null != counterList && counterList.size() > 0) {
+			AdmContador counter = counterList.get(0);
+
+			Integer longitudContador = counter.getLongitudcontador();
+			String sufijo = counter.getSufijo();
+			Long numContador = counter.getContador();
+
+			counter.setContador(numContador + 1);
+
+			LOGGER.info(
+					"getCounterCourse() / admContadorExtendsMapper.updateByPrimaryKey(counter) -> Entrada a admContadorExtendsMapper para obtener el codigo del curso");
+
+			response = admContadorExtendsMapper.updateByPrimaryKey(counter);
+
+			LOGGER.info(
+					"getCounterCourse() / admContadorExtendsMapper.updateByPrimaryKey(counter) -> Salida a admContadorExtendsMapper para obtener el codigo del curso");
+
+			String formatted = String.format("%0" + longitudContador + "d", numContador);
+
+			contador = formatted + sufijo;
+		}
+
+		return contador;
 	}
 
 }

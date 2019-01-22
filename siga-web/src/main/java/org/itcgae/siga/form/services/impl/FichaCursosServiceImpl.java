@@ -2294,7 +2294,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Transactional
-	private int createServiceCourse(ForCurso cursoItem, AdmUsuarios usuario, Short idInstitucion) {
+	public int createServiceCourse(ForCurso cursoItem, AdmUsuarios usuario, Short idInstitucion) {
 
 		LOGGER.info("createServiceCourse() -> Entrada del servicio que crea los servicios para un curso");
 

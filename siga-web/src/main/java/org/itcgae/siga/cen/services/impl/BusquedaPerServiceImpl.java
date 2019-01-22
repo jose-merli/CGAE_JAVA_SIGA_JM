@@ -93,14 +93,16 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 		LOGGER.info(
 				"getLabelColegios() / cenInstitucionExtendsMapper.getComboInstituciones() -> Salida de cenInstitucionExtendsMapper para busqueda de personas no colegiadas por filtro");
 	
-		if (!comboItems.equals(null) && comboItems.size() > 0) {
-			// añade elemento vacio al principio para el dropdown de parte front
-			ComboItem comboItem = new ComboItem();
-			comboItem.setLabel("");
-			comboItem.setValue("");
-			comboItems.add(0, comboItem);
-			combo.setCombooItems(comboItems);
-		}
+//		if (!comboItems.equals(null) && comboItems.size() > 0) {
+//			// añade elemento vacio al principio para el dropdown de parte front
+//			ComboItem comboItem = new ComboItem();
+//			comboItem.setLabel("");
+//			comboItem.setValue("");
+//			comboItems.add(0, comboItem);
+//			combo.setCombooItems(comboItems);
+//		}
+		
+		combo.setCombooItems(comboItems);
 		
 		LOGGER.info("getLabelColegios() -> Salida del servicio para la búsqueda de todos los colegios");
 		return combo;

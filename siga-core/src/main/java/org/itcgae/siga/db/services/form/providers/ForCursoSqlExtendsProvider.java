@@ -81,7 +81,7 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		}
 		
 		if(cursoItem.getCodigoCurso() != null && cursoItem.getCodigoCurso() != "") {
-			sql.WHERE("CURSO.CODIGOCURSO = '" + cursoItem.getCodigoCurso() + "'");
+			sql.WHERE("CURSO.CODIGOCURSO like '%" + cursoItem.getCodigoCurso() + "%'");
 		}
 		
 		if (cursoItem.getNombreCurso() != null && cursoItem.getNombreCurso() != "") {
@@ -168,6 +168,8 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 			sql.WHERE("TRANSLATE(UPPER( CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2) )),'"+ SigaConstants.AUX_TRANS_TILDES_1 + "','" + SigaConstants.AUX_TRANS_TILDES_2 + "') LIKE TRANSLATE(UPPER('%" + cursoItem.getNombreApellidosFormador()+ "%'),'"+ SigaConstants.AUX_TRANS_TILDES_1 + "','" + SigaConstants.AUX_TRANS_TILDES_2 + "')");
 		}
 		
+		sql.ORDER_BY("CURSO.CODIGOCURSO");
+		
 		return sql.toString();
 	}
 	
@@ -209,8 +211,8 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		sql.SELECT("DECODE(CURSO.IDINSTITUCION,'"+ Short.toString(idInstitucion) +"', CAT1.DESCRIPCION, INSTITUCION.ABREVIATURA) AS VISIBILIDAD");
 		sql.SELECT("CONCAT(CURSO.PRECIODESDE|| ' - ', CURSO.PRECIOHASTA) AS PRECIOCURSO");
 		sql.SELECT("CONCAT(CURSO.FECHAINSCRIPCIONDESDE|| ' - ', CURSO.FECHAINSCRIPCIONHASTA) AS FECHAINSCRIPCION");
-		sql.SELECT("CURSO.FECHAINSCRIPCIONDESDE AS FECHAINSCRIPCIONDESDEDATE");
-		sql.SELECT("CURSO.FECHAINSCRIPCIONHASTA AS FECHAINSCRIPCIONHASTADATE");
+		sql.SELECT("TO_CHAR(CURSO.FECHAINSCRIPCIONDESDE,'DD/MM/YYYY') AS FECHAINSCRIPCIONDESDE");
+		sql.SELECT("TO_CHAR(CURSO.FECHAINSCRIPCIONHASTA,'DD/MM/YYYY') AS FECHAINSCRIPCIONHASTA");
 		sql.SELECT("CONCAT(CURSO.FECHAIMPARTICIONDESDE|| ' - ', CURSO.FECHAIMPARTICIONHASTA ) AS FECHAIMPARTICION");
 		sql.SELECT("TO_CHAR(CURSO.FECHAIMPARTICIONDESDE,'DD/MM/YYYY') AS FECHAIMPARTICIONDESDE");
 		sql.SELECT("TO_CHAR(CURSO.FECHAIMPARTICIONHASTA,'DD/MM/YYYY') AS FECHAIMPARTICIONHASTA");

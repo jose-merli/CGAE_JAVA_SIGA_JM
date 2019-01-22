@@ -87,11 +87,6 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				LOGGER.info(
 						"getEstadosInscripcion() / forEstadoInscripcionExtendsMapper.distinctEstadoInscripcion -> Salida de forEstadoInscripcionExtendsMapper para obtener los diferentes estados de una inscripcion");
 				
-				//TODO Quitar en un futuro
-				ComboItem comboItem = new ComboItem();
-				comboItem.setLabel("");
-				comboItem.setValue("");
-				comboItems.add(0, comboItem);
 			}
 		}
 		

@@ -21,6 +21,8 @@ public interface IBusquedaCursosService {
 	
 	public InsertResponseDTO saveCourses(List<CursoItem> listCursoItem, HttpServletRequest request);
 	
+	public InsertResponseDTO duplicateCourse(CursoItem cursoItem, HttpServletRequest request);
+	
 	public int archivarCursos(List<CursoItem> listCursoItem, HttpServletRequest request);
 	
 	public int desarchivarCursos(List<CursoItem> listCursoItem, HttpServletRequest request);

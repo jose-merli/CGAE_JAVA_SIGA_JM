@@ -20,6 +20,8 @@ import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.form.PreciosCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
@@ -94,5 +96,8 @@ public interface IFichaCursosService {
 	public UpdateResponseDTO releaseCourse(CursoDTO cursoDTO , HttpServletRequest request);
 
 	public UpdateResponseDTO announceCourse(CursoDTO cursoDTO , HttpServletRequest request);
+	
+	public int createServiceCourse(ForCurso cursoItem, AdmUsuarios usuario, Short idInstitucion);
+
 
 }
