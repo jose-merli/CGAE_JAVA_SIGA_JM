@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.ComboConsultasDTO;
+import org.itcgae.siga.DTOs.com.ComboSufijoDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
@@ -350,34 +351,36 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 								ModPlantilladocConsultaExample consultaPlantillaExample = new ModPlantilladocConsultaExample();
 								ModPlantilladocConsulta consultaPlantillaModificar = null;
 								
-								consultaPlantillaExample.createCriteria().andIdconsultaEqualTo(Long.parseLong(consultaItem.getIdConsulta())).andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion()))
-								.andIdinstitucionEqualTo(Short.parseShort(plantillaDoc.getIdInstitucion())).andIdplantilladocumentoEqualTo(modPlantilla.getIdplantilladocumento()).andFechabajaIsNull();
-			
-								List<ModPlantilladocConsulta> listaPlantillaModificar = modPlantilladocConsultaMapper.selectByExample(consultaPlantillaExample);
-								
-								if(listaPlantillaModificar != null && listaPlantillaModificar.size() > 0){
-									if(listaPlantillaModificar != null && listaPlantillaModificar.size() == 1){
-										consultaPlantillaModificar = listaPlantillaModificar.get(0);
-									}
+								if(consultaItem.getIdConsulta() != null && !"".equals(consultaItem.getIdConsulta())){
+									consultaPlantillaExample.createCriteria().andIdconsultaEqualTo(Long.parseLong(consultaItem.getIdConsulta())).andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion()))
+									.andIdinstitucionEqualTo(Short.parseShort(plantillaDoc.getIdInstitucion())).andIdplantilladocumentoEqualTo(modPlantilla.getIdplantilladocumento()).andFechabajaIsNull();
+				
+									List<ModPlantilladocConsulta> listaPlantillaModificar = modPlantilladocConsultaMapper.selectByExample(consultaPlantillaExample);
 									
-									if(consultaPlantillaModificar != null){
-										consultaPlantillaModificar.setFechamodificacion(new Date());										
-										modPlantilladocConsultaMapper.updateByPrimaryKey(consultaPlantillaModificar);
+									if(listaPlantillaModificar != null && listaPlantillaModificar.size() > 0){
+										if(listaPlantillaModificar != null && listaPlantillaModificar.size() == 1){
+											consultaPlantillaModificar = listaPlantillaModificar.get(0);
+										}
+										
+										if(consultaPlantillaModificar != null){
+											consultaPlantillaModificar.setFechamodificacion(new Date());										
+											modPlantilladocConsultaMapper.updateByPrimaryKey(consultaPlantillaModificar);
+											listaConsultasIdAAsociar.add(consultaPlantillaModificar.getIdconsulta());
+										}
+									}else{									
+										consultaPlantillaModificar = new ModPlantilladocConsulta();
+										consultaPlantillaModificar.setIdinstitucion(Short.parseShort(plantillaDoc.getIdInstitucion()));
+										consultaPlantillaModificar.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+										consultaPlantillaModificar.setIdplantilladocumento(modPlantilla.getIdplantilladocumento());
+										consultaPlantillaModificar.setIdconsulta(Long.parseLong(consultaItem.getIdConsulta()));
+										consultaPlantillaModificar.setFechabaja(null);
+										consultaPlantillaModificar.setUsumodificacion(usuario.getIdusuario());
+										consultaPlantillaModificar.setFechamodificacion(new Date());								
+										
+										modPlantilladocConsultaMapper.insert(consultaPlantillaModificar);
 										listaConsultasIdAAsociar.add(consultaPlantillaModificar.getIdconsulta());
 									}
-								}else{									
-									consultaPlantillaModificar = new ModPlantilladocConsulta();
-									consultaPlantillaModificar.setIdinstitucion(Short.parseShort(plantillaDoc.getIdInstitucion()));
-									consultaPlantillaModificar.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
-									consultaPlantillaModificar.setIdplantilladocumento(modPlantilla.getIdplantilladocumento());
-									consultaPlantillaModificar.setIdconsulta(Long.parseLong(consultaItem.getIdConsulta()));
-									consultaPlantillaModificar.setFechabaja(null);
-									consultaPlantillaModificar.setUsumodificacion(usuario.getIdusuario());
-									consultaPlantillaModificar.setFechamodificacion(new Date());								
-									
-									modPlantilladocConsultaMapper.insert(consultaPlantillaModificar);
-									listaConsultasIdAAsociar.add(consultaPlantillaModificar.getIdconsulta());
-								}
+								}								
 							}
 						}						
 
@@ -602,11 +605,11 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	}
 	
 	@Override
-	public ComboDTO obtenerSufijos(HttpServletRequest request) {
+	public ComboSufijoDTO obtenerSufijos(HttpServletRequest request) {
 		LOGGER.info("obtenerSufijos() -> Entrada al servicio para obtener combo sufijos");
 		
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		ComboSufijoDTO comboDTO = new ComboSufijoDTO();
+		List<SufijoItem> comboItems = new ArrayList<SufijoItem>();
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -623,14 +626,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 
 					AdmUsuarios usuario = usuarios.get(0);
 					comboItems = modPlantillaDocSufijoExtendsMapper.selectSufijos(usuario.getIdlenguaje());
-					if(null != comboItems && comboItems.size() > 0) {
-						ComboItem element = new ComboItem();
-						element.setLabel("");
-						element.setValue("");
-						comboItems.add(0, element);
-					}		
-					
-					comboDTO.setCombooItems(comboItems);
+					comboDTO.setSufijos(comboItems);
 					
 				}
 			}
@@ -818,7 +814,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										relSufijoPlantilla.setIdplantilladocumento(modPlantillaDoc.getIdplantilladocumento());
 										relSufijoPlantilla.setIdsufijo(Short.parseShort(sufijo.getIdSufijo()));
 										relSufijoPlantilla.setOrden(Short.parseShort(sufijo.getOrden()));
-										relSufijoPlantilla.setIdinforme(Long.parseLong(plantillaDoc.getIdInforme()));
+										relSufijoPlantilla.setIdinforme(idInforme);
 										relSufijoPlantilla.setFechamodificacion(new Date());
 										relSufijoPlantilla.setUsumodificacion(usuario.getIdusuario());	
 										modRelPlantillaSufijoMapper.insertSelective(relSufijoPlantilla);

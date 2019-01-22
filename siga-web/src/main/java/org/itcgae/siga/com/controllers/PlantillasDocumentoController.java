@@ -3,6 +3,7 @@ package org.itcgae.siga.com.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.ComboConsultasDTO;
+import org.itcgae.siga.DTOs.com.ComboSufijoDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
@@ -53,13 +54,13 @@ public class PlantillasDocumentoController {
 	}
 	
 	@RequestMapping(value = "/combo/sufijos",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> obtenerSufijos(HttpServletRequest request) {
+	ResponseEntity<ComboSufijoDTO> obtenerSufijos(HttpServletRequest request) {
 		
-		ComboDTO response = _plantillasDocumentoService.obtenerSufijos(request);
+		ComboSufijoDTO response = _plantillasDocumentoService.obtenerSufijos(request);
 		if(response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<ComboSufijoDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ComboSufijoDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/consultas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)

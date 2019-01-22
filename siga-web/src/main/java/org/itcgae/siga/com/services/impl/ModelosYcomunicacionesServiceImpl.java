@@ -27,6 +27,11 @@ import org.itcgae.siga.com.services.IModelosYcomunicacionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.EnvEnvios;
+import org.itcgae.siga.db.entities.EnvEnviosExample;
+import org.itcgae.siga.db.entities.EnvPlantillasenvios;
+import org.itcgae.siga.db.entities.EnvPlantillasenviosExample;
+import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.ModModeloPerfiles;
 import org.itcgae.siga.db.entities.ModModeloPerfilesExample;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
@@ -37,10 +42,9 @@ import org.itcgae.siga.db.entities.ModModeloPlantillaenvioKey;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
-import org.itcgae.siga.db.entities.ModPlantilladocumento;
-import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
+import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.ModModeloPerfilesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
@@ -49,6 +53,7 @@ import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPerfilesExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPlantillaDocumentoExtendsMapper;
@@ -106,6 +111,12 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	
 	@Autowired
 	private ModPlantillaenvioConsultaMapper modPlantillaenvioConsultaMapper;
+	
+	@Autowired
+	private EnvPlantillasenviosMapper envPlantillasenviosMapper;
+	
+	@Autowired
+	private EnvPlantillaEnviosExtendsMapper envPlantillaEnviosExtendsMapper;
 	
 	@Override
 	public DatosModelosComunicacionesDTO modeloYComunicacionesSearch(HttpServletRequest request, DatosModelosComunicacionesSearch filtros, boolean historico) {
@@ -165,7 +176,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			
 			if (null != usuarios && usuarios.size() > 0) {
-				
+				AdmUsuarios usuario = usuarios.get(0);
 				try{					
 					//Tabla mod_modelocomunicacion
 					ModModelocomunicacion modelo = modModelocomunicacionMapper.selectByPrimaryKey(Long.valueOf(modeloComunicacion.getIdModeloComunicacion()));
@@ -241,32 +252,46 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					
 					//Tabla mod_modelo_plantillaenvio
 					ModModeloPlantillaenvioExample examplePlantillaEnvio = new ModModeloPlantillaenvioExample();
-					examplePlantillaEnvio.createCriteria().andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion())).andFechabajaIsNull();
+					examplePlantillaEnvio.createCriteria().andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion())).andIdinstitucionEqualTo(Short.parseShort(modeloComunicacion.getIdInstitucion())).andFechabajaIsNull();
 					
 					List<ModModeloPlantillaenvio> listaModPlantillaEnvio = modModeloPlantillaenvioMapper.selectByExample(examplePlantillaEnvio);
 					
 					if(listaModPlantillaEnvio != null){
 						for(ModModeloPlantillaenvio modPlantillaEnvio : listaModPlantillaEnvio){
-							int idPlantillaEnvioDuplicar = modPlantillaEnvio.getIdplantillaenvios();
-							modPlantillaEnvio.setFechamodificacion(new Date());
-							modPlantillaEnvio.setIdmodelocomunicacion(modelo.getIdmodelocomunicacion());
-							modModeloPlantillaenvioMapper.insert(modPlantillaEnvio);
+							int idPlantillaEnvioDuplicar = modPlantillaEnvio.getIdplantillaenvios();							
 							
-
-							//Tabla mod_plantillaenvio_consulta
-							ModPlantillaenvioConsultaExample exampleEnvioConsulta = new ModPlantillaenvioConsultaExample();
-							exampleEnvioConsulta.createCriteria().andIdinstitucionEqualTo(Short.parseShort(modeloComunicacion.getIdInstitucion())).andIdplantillaenviosEqualTo(idPlantillaEnvioDuplicar).andFechabajaIsNull();
-							
-							List<ModPlantillaenvioConsulta> listaModPlantillaEnvioConsulta = modPlantillaenvioConsultaMapper.selectByExample(exampleEnvioConsulta);
-							
-							if(listaModPlantillaEnvioConsulta != null){
-								for(ModPlantillaenvioConsulta modPlantillaEnvioConsulta : listaModPlantillaEnvioConsulta){
-									modPlantillaEnvioConsulta.setFechamodificacion(new Date());
-									modPlantillaEnvioConsulta.setIdinstitucion(Short.parseShort(modeloComunicacion.getIdInstitucion()));
-									modPlantillaEnvioConsulta.setIdplantillaenvios(idPlantillaEnvioDuplicar);
-									modPlantillaenvioConsultaMapper.insert(modPlantillaEnvioConsulta);
+							//Tabla EnvPlantillasenvios
+							EnvPlantillasenviosExample envioExample = new EnvPlantillasenviosExample();
+							envioExample.createCriteria().andIdinstitucionEqualTo(modPlantillaEnvio.getIdinstitucion()).andIdplantillaenviosEqualTo(idPlantillaEnvioDuplicar).andIdtipoenviosEqualTo(modPlantillaEnvio.getIdtipoenvios()).andFechabajaIsNull();
+							List<EnvPlantillasenviosWithBLOBs> listaPlantillasEnvios = envPlantillasenviosMapper.selectByExampleWithBLOBs(envioExample);
+							if(listaPlantillasEnvios != null & listaPlantillasEnvios.size() > 0){
+								for(EnvPlantillasenviosWithBLOBs plantillaEnvio : listaPlantillasEnvios){
+									plantillaEnvio.setIdplantillaenvios(Integer.parseInt(envPlantillaEnviosExtendsMapper.selectMaxIDPlantillas().getNewId()));
+									plantillaEnvio.setUsumodificacion(usuario.getIdusuario());
+									plantillaEnvio.setFechamodificacion(new Date());
+									envPlantillasenviosMapper.insert(plantillaEnvio);
+									
+									modPlantillaEnvio.setIdplantillaenvios(plantillaEnvio.getIdplantillaenvios());
+									modPlantillaEnvio.setFechamodificacion(new Date());
+									modPlantillaEnvio.setIdmodelocomunicacion(modelo.getIdmodelocomunicacion());
+									modModeloPlantillaenvioMapper.insert(modPlantillaEnvio);
+									
+									//Tabla mod_plantillaenvio_consulta
+									ModPlantillaenvioConsultaExample exampleEnvioConsulta = new ModPlantillaenvioConsultaExample();
+									exampleEnvioConsulta.createCriteria().andIdinstitucionEqualTo(modPlantillaEnvio.getIdinstitucion()).andIdplantillaenviosEqualTo(idPlantillaEnvioDuplicar).andIdtipoenviosEqualTo(modPlantillaEnvio.getIdtipoenvios()).andFechabajaIsNull();
+									
+									List<ModPlantillaenvioConsulta> listaModPlantillaEnvioConsulta = modPlantillaenvioConsultaMapper.selectByExample(exampleEnvioConsulta);
+									
+									if(listaModPlantillaEnvioConsulta != null){
+										for(ModPlantillaenvioConsulta modPlantillaEnvioConsulta : listaModPlantillaEnvioConsulta){
+											modPlantillaEnvioConsulta.setFechamodificacion(new Date());
+											modPlantillaEnvioConsulta.setIdinstitucion(Short.parseShort(modeloComunicacion.getIdInstitucion()));
+											modPlantillaEnvioConsulta.setIdplantillaenvios(plantillaEnvio.getIdplantillaenvios());
+											modPlantillaenvioConsultaMapper.insert(modPlantillaEnvioConsulta);
+										}
+									}
 								}
-							}
+							}						
 						}
 					}				
 					

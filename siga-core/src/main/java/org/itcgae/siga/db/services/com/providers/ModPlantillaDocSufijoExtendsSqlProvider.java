@@ -10,6 +10,7 @@ public class ModPlantillaDocSufijoExtendsSqlProvider {
 				
 		sql.SELECT("sufijo.IDSUFIJO");
 		sql.SELECT("rec.DESCRIPCION");
+		sql.SELECT("0 AS ORDEN");
 		
 		sql.FROM("MOD_PLANTILLADOC_SUFIJO sufijo");
 		

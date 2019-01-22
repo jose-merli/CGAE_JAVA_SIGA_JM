@@ -3,6 +3,7 @@ package org.itcgae.siga.com.services;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.ComboConsultasDTO;
+import org.itcgae.siga.DTOs.com.ComboSufijoDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
@@ -65,7 +66,7 @@ public interface IPlantillasDocumentoService {
 	 * @param request
 	 * @return
 	 */
-	ComboDTO obtenerSufijos(HttpServletRequest request);
+	ComboSufijoDTO obtenerSufijos(HttpServletRequest request);
 
 	/**
 	 * Obtiene el combo de formatos de salida
