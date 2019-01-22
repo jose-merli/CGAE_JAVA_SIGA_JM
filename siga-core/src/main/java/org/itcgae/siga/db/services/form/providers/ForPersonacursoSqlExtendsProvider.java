@@ -19,6 +19,22 @@ public class ForPersonacursoSqlExtendsProvider extends ForPersonaCursoSqlProvide
 
 		return sql.toString();
 	}
+	
+	public String getTrainersSession(String idEvento) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("perev.IDPERSONA");
+		sql.SELECT("CONCAT(per.NOMBRE || ' ' || per.APELLIDOS1 || ' ', per.APELLIDOS2) AS nombre");
+		sql.FROM("AGE_PERSONA_EVENTO perev");
+		sql.INNER_JOIN("CEN_PERSONA per ON (per.idpersona = perev.idpersona)");
+		sql.WHERE("perev.fechabaja is null");
+		sql.WHERE("perev.idevento = '" + idEvento + "'");
+		sql.ORDER_BY("nombre");
+
+		return sql.toString();
+
+	}
 
 	public String getTrainersCourse(String idInstitucion, String idCurso, String idLenguaje) {
 

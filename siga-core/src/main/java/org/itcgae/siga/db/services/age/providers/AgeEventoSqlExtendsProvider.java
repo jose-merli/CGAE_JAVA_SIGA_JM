@@ -48,6 +48,7 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		
 		sql.SELECT_DISTINCT("evento.idevento");
 		sql.SELECT("evento.idcalendario");
+		sql.SELECT("evento.idinstitucion");
 		sql.SELECT("evento.titulo");
 		sql.SELECT("evento.fechainicio");
 		sql.SELECT("evento.fechafin");

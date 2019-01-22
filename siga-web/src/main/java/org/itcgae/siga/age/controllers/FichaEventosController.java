@@ -9,6 +9,7 @@ import org.itcgae.siga.DTOs.age.AsistenciaEventoDTO;
 import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
+import org.itcgae.siga.DTOs.form.AgePersonaEventoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -130,6 +131,24 @@ public class FichaEventosController {
 	ResponseEntity<InsertResponseDTO> saveAssistancesCourse(@RequestBody AsistenciaEventoDTO asistenciaEventoDTO, HttpServletRequest request) {
 		InsertResponseDTO response = fichaEventosService.saveAssistancesCourse(asistenciaEventoDTO, request);
 		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaEventos/saveFormadorEvent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> saveFormadorEvent(@RequestBody AgePersonaEventoDTO agePersonaEventoDTO, HttpServletRequest request) {
+		InsertResponseDTO response = fichaEventosService.saveFormadorEvent(agePersonaEventoDTO, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaEventos/getTrainersSession", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<FormadorCursoDTO> getTrainersSession(@RequestParam("idEvento") String idEvento, HttpServletRequest request) {
+		FormadorCursoDTO response = fichaEventosService.getTrainersSession(idEvento, request);
+		return new ResponseEntity<FormadorCursoDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaEventos/updateFormadorEvent", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateFormadorEvent(@RequestBody AgePersonaEventoDTO agePersonaEventoDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = fichaEventosService.updateFormadorEvent(agePersonaEventoDTO, request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	
 }

@@ -46,6 +46,7 @@ public interface AgeEventoExtendsMapper extends AgeEventoMapper{
 	@Results({
 		@Result(column = "IDEVENTO", property = "idEvento", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDCALENDARIO", property = "idCalendario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TITULO", property = "titulo", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
