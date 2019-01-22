@@ -18,7 +18,7 @@ public class ColegiadoItem {
 	private String nombre;
 	private String numColegiado;
 	private String residenteInscrito;
-	private String situacionresidente;
+	private String situacionResidente;
 	private String comunitario;
 	private String correo;
 	private String telefono;
@@ -73,8 +73,6 @@ public class ColegiadoItem {
 	private Date fechapresentacionDate;
 	private Date fechaNacimientoDate;
 	private Date fechaBajaDate;
-	private String publicidad;
-	private String guiaJudicial;
 	private String idTratamiento;
 	private String descripcion;
 	private String observaciones;
@@ -909,25 +907,6 @@ public class ColegiadoItem {
 	}
 	
 	/**
-	 * 
-	 */
-	public String getGuiaJudicial() {
-		return guiaJudicial;
-	}
-
-	public void setGuiaJudicial(String guiaJudicial) {
-		this.guiaJudicial = guiaJudicial;
-	}
-	
-	public String getPublicidad() {
-		return publicidad;
-	}
-
-	public void setPublicidad(String publicidad) {
-		this.publicidad = publicidad;
-	}
-
-	/**
 	 *
 	 */
 	public ColegiadoItem incorporacionDate(Date incorporacionDate){
@@ -979,13 +958,18 @@ public class ColegiadoItem {
 		this.comisiones = comisiones;
 	}
 	
-
-	public String getSituacionresidente() {
-		return situacionresidente;
+	public ColegiadoItem situacionResidente(String situacionResidente){
+		this.situacionResidente = situacionResidente;
+		return this;
 	}
 
-	public void setSituacionresidente(String situacionresidente) {
-		this.situacionresidente = situacionresidente;
+	@JsonProperty("situacionResidente")
+	public String getSituacionResidente() {
+		return situacionResidente;
+	}
+
+	public void setSituacionResidente(String situacionResidente) {
+		this.situacionResidente = situacionResidente;
 	}
 
 	public String getComunitario() {

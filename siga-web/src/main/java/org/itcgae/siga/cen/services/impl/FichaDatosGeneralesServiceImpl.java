@@ -397,7 +397,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						CenGruposclienteClienteExample cenGruposclienteClienteExample = new CenGruposclienteClienteExample();
 						cenGruposclienteClienteExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 								.andIdpersonaEqualTo(Long.valueOf(etiquetaUpdateDTO.getIdPersona()))
-								.andIdinstitucionGrupoEqualTo(idInstitucion)
+								.andIdinstitucionGrupoEqualTo(idInstitucion) 
 								.andIdgrupoEqualTo(Short.valueOf(gruposPerJuridicaAntiguos.get(i)));
 						LOGGER.info(
 								"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.updateByExampleSelective() -> Entrada a cenGruposclienteClienteExtendsMapper para eliminar un grupo relacionado con persona juridica en tabla CEN_GRUPOSCLIENTE_CLIENTE");
@@ -428,8 +428,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					if(colegiadoItem.getIncorporacionDate()!=null) { 
 					cenCliente.setFechaalta(colegiadoItem.getIncorporacionDate());
 					}
-					cenCliente.setPublicidad(colegiadoItem.getPublicidad());
-					cenCliente.setGuiajudicial(colegiadoItem.getGuiaJudicial());
 					cenCliente.setFechamodificacion(new Date());
 					cenCliente.setUsumodificacion(usuario.getIdusuario());
 					cenCliente.setComisiones(colegiadoItem.getComisiones());
@@ -437,9 +435,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					cenCliente.setAsientocontable(colegiadoItem.getAsientoContable());
 					cenCliente.setCaracter("P");
 					cenCliente.setNoaparecerredabogacia(colegiadoItem.getNoAparecerRedAbogacia());
-//					cenCliente.setPublicidad(SigaConstants.DB_FALSE);
-//					cenCliente.setGuiajudicial(SigaConstants.DB_FALSE); 
-					
+	
 					CenClienteExample cenClienteExample = new CenClienteExample();
 					cenClienteExample.createCriteria()
 							.andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
@@ -803,10 +799,10 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						
 						int idCv = Integer.parseInt(idBD.getNewId());
 						solicitud.setIdsolicitud(Short.parseShort(""+ (1 + idCv)));
-						solicitud.setPublicidad(noColegiadoItem.getPublicidad());
+						solicitud.setPublicidad(SigaConstants.DB_FALSE);
 						solicitud.setAbonos("B");
 						solicitud.setCargos("B");
-						solicitud.setGuiajudicial(noColegiadoItem.getGuiaJudicial());
+						solicitud.setGuiajudicial(SigaConstants.DB_FALSE);
 						solicitud.setIdlenguaje(noColegiadoItem.getIdLenguaje());
 						solicitud.setMotivo(noColegiadoItem.getMotivo());
 						solicitud.setIdinstitucion(idInstitucion);
@@ -940,8 +936,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 								cenCliente.setIdinstitucion(usuario.getIdinstitucion());
 								cenCliente.setFechaalta(new Date());
 								cenCliente.setCaracter("P");
-								cenCliente.setPublicidad(SigaConstants.DB_FALSE);
-								cenCliente.setGuiajudicial(SigaConstants.DB_FALSE);
 								cenCliente.setComisiones(noColegiadoItem.getComisiones());
 								cenCliente.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
 								cenCliente.setFechamodificacion(new Date());
