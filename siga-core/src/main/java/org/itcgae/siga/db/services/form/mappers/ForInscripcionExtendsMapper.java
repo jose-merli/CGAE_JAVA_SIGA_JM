@@ -67,6 +67,14 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper{
 	})
 	CursoItem compruebaPlazas(String idCurso);	
 
+	@SelectProvider(type = ForInscripcionSqlExtendsProvider.class, method = "compruebaPlazasAprobadas")
+	@Results({ @Result(column = "IDCURSO", property = "idCurso", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NUMEROPLAZAS", property = "numPlazas", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NOMBRECURSO", property = "nombreCurso", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "INSCRIPCIONES", property = "inscripciones", jdbcType = JdbcType.NUMERIC)
+	})
+	CursoItem compruebaPlazasAprobadas(String idCurso);	
+	
 	@SelectProvider(type = ForInscripcionSqlExtendsProvider.class, method = "searchCourseByIdcurso")
 	@Results({ @Result(column = "IDCURSO", property = "idCurso", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "CODIGOCURSO", property = "codigoCurso", jdbcType = JdbcType.NUMERIC),

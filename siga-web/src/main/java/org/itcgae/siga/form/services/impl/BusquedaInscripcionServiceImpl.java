@@ -2,7 +2,10 @@ package org.itcgae.siga.form.services.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +17,7 @@ import org.itcgae.siga.DTOs.form.InscripcionDTO;
 import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -21,14 +25,25 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.ForCambioinscripcion;
+import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.entities.ForInscripcion;
 import org.itcgae.siga.db.entities.ForInscripcionExample;
+import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcion;
+import org.itcgae.siga.db.entities.PysServiciossolicitados;
+import org.itcgae.siga.db.entities.PysSuscripcion;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.mappers.ForCambioinscripcionMapper;
+import org.itcgae.siga.db.mappers.PysServiciossolicitadosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForEstadoinscripcionExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForInscripcionExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.PysPeticioncomprasuscripcionExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.PysPreciosserviciosExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.PysServiciosExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.PysServiciosinstitucionExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.PysSuscripcionExtendsMapper;
 import org.itcgae.siga.form.services.IBusquedaInscripcionService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +71,28 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 	
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
+	
+	@Autowired
+	private ForCursoExtendsMapper forCursoExtendsMapper;
+	
+	@Autowired
+	private PysServiciosExtendsMapper pysServiciosExtendsMapper;
+
+	@Autowired
+	private PysServiciosinstitucionExtendsMapper pysServiciosinstitucionExtendsMapper;
+
+	@Autowired
+	private PysPreciosserviciosExtendsMapper pysPreciosserviciosExtendsMapper;
+
+	@Autowired
+	private PysPeticioncomprasuscripcionExtendsMapper pysPeticioncomprasuscripcionExtendsMapper;
+
+	@Autowired
+	private PysSuscripcionExtendsMapper pysSuscripcionExtendsMapper;
+
+	@Autowired
+	private PysServiciossolicitadosMapper pysServiciossolicitadosMapper;
+
 	
 	@Override
 	public ComboDTO getEstadosInscripcion(HttpServletRequest request) {
@@ -189,13 +226,23 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 		
 		List<Long> arrayIds = new ArrayList<>();
 		List<String> arrayCursosIds = new ArrayList<>();
+		List<String> arrayCursosIdsConPlazasDisponibles = new ArrayList<>();
 		
 		int resultado = 0;
 		
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		String idInstitucionToString =  String.valueOf(idInstitucion);
+		//Obtenemos el usuario para setear el campo "usumodificiacion"
+		String dniUser = UserTokenUtils.getDniFromJWTToken(token);
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dniUser).andIdinstitucionEqualTo(idInstitucion);
 		
+		LOGGER.info(
+				"updateEstado() / admUsuariosMapper.selectByExample() -> Entrada a admUsuariosMapper para obtener al usuario que está realizando la acción");
+		List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
+		
+		AdmUsuarios usuario = usuarios.get(0);
 		// Obtenemos el tipo de accion que hemos pulsado.
 		// Para ello cogeremos el primer objeto de la lista que nos ha enviado el front
 		Short tipoAccion = listInscripcionItem.get(0).getTipoAccion();
@@ -205,8 +252,9 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 		switch (tipoAccion) {
 		case 0: // 0 --> Aprobar
 			arrayCursosIds = comprobarPlazasDisponibles(listInscripcionItem);
-			if (arrayCursosIds.isEmpty()) {
-				arrayIds = comprobarAccionAprobar(listInscripcionItem, idInstitucionToString);
+			arrayCursosIdsConPlazasDisponibles = cursosConPlazasDisponibles(listInscripcionItem); 
+			if (arrayCursosIds.isEmpty() || !arrayCursosIdsConPlazasDisponibles.isEmpty()) {
+				arrayIds = comprobarAccionAprobar(listInscripcionItem, idInstitucionToString,arrayCursosIdsConPlazasDisponibles,usuario,idInstitucion);
 				idEstadoUpdate = 3L;
 			} else {
 //				arrayCursosIds = formateaListaCursosError(listInscripcionItem, idInstitucionToString);
@@ -237,16 +285,7 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 			ForInscripcion record = new ForInscripcion();
 			record.setIdestadoinscripcion(idEstadoUpdate);
 			
-			//Obtenemos el usuario para setear el campo "usumodificiacion"
-			String dniUser = UserTokenUtils.getDniFromJWTToken(token);
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dniUser).andIdinstitucionEqualTo(idInstitucion);
-			
-			LOGGER.info(
-					"updateEstado() / admUsuariosMapper.selectByExample() -> Entrada a admUsuariosMapper para obtener al usuario que está realizando la acción");
-			List<AdmUsuarios> usuarios = admUsuariosMapper.selectByExample(exampleUsuarios);
-			
-			AdmUsuarios usuario = usuarios.get(0);
+
 			
 			if(usuario == null) {
 				LOGGER.warn(
@@ -272,14 +311,101 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 		return resultado;
 	}
 	
-	public List<Long> comprobarAccionAprobar(List<InscripcionItem> listInscripcionItem, String idInstitucionToString) {
+	public List<Long> comprobarAccionAprobar(List<InscripcionItem> listInscripcionItem, String idInstitucionToString, List<String> arrayCursosIdsConPlazasDisponibles, AdmUsuarios usuario, Short idInstitucion) {
 		// Aprobar inscripción: aprobará la inscripción o inscripciones seleccionadas
 		// que estén en estado Pendiente.  
 		List<Long> arrayIds = new ArrayList<>();
 		for (InscripcionItem inscripcion : listInscripcionItem) {
 
 			// Añadimos a la lista de ids únicamente los ids de las inscripciones que puedan ser aceptadas
-			if (idInstitucionToString.equals(inscripcion.getIdInstitucion()) && (SigaConstants.ESTADO_INSCRIPCION_PENDIENTE.equals(inscripcion.getIdEstadoInscripcion()))) {
+			if ((idInstitucionToString.equals(inscripcion.getIdInstitucion()) && (SigaConstants.ESTADO_INSCRIPCION_PENDIENTE.equals(inscripcion.getIdEstadoInscripcion())))
+				&& arrayCursosIdsConPlazasDisponibles.contains(inscripcion.getIdCurso())) {
+				int response = 0;
+				PysPeticioncomprasuscripcion pysPeticioncomprasuscripcion = new PysPeticioncomprasuscripcion();
+				pysPeticioncomprasuscripcion.setFechamodificacion(new Date());
+				pysPeticioncomprasuscripcion.setIdinstitucion(idInstitucion);
+				pysPeticioncomprasuscripcion.setUsumodificacion(usuario.getIdusuario());
+				pysPeticioncomprasuscripcion.setTipopeticion("A");
+				pysPeticioncomprasuscripcion.setIdestadopeticion(Short.valueOf("20"));
+				NewIdDTO idPeticion = pysPeticioncomprasuscripcionExtendsMapper
+						.selectMaxIdPeticion(idInstitucion);
+				pysPeticioncomprasuscripcion.setIdpeticion(Long.valueOf(idPeticion.getNewId()));
+				pysPeticioncomprasuscripcion.setIdpersona(inscripcion.getIdPersona());
+				pysPeticioncomprasuscripcion.setFecha(new Date());
+				pysPeticioncomprasuscripcion.setNumOperacion("1");
+
+				LOGGER.info(
+						"autovalidateInscriptionsCourse() / pysPeticioncomprasuscripcionExtendsMapper.insert() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para insertar un precio servicio");
+
+				response = pysPeticioncomprasuscripcionExtendsMapper
+						.insert(pysPeticioncomprasuscripcion);
+
+				LOGGER.info(
+						"autovalidateInscriptionsCourse() / pysPeticioncomprasuscripcionExtendsMapper.insert() -> Salida a pysPeticioncomprasuscripcionExtendsMapper para insertar un precio servicio");
+
+				NewIdDTO idservicio = pysServiciosExtendsMapper
+						.selectIdServicioByIdCurso(idInstitucion, Long.valueOf(inscripcion.getIdCurso()));
+				NewIdDTO idserviciosinstitucion = pysServiciosinstitucionExtendsMapper
+						.selectIdServicioinstitucionByIdServicio(idInstitucion,
+								Long.valueOf(idservicio.getNewId()));
+
+				PysServiciossolicitados pysServiciossolicitados = new PysServiciossolicitados();
+				pysServiciossolicitados.setFechamodificacion(new Date());
+				pysServiciossolicitados.setIdinstitucion(idInstitucion);
+				pysServiciossolicitados.setUsumodificacion(usuario.getIdusuario());
+				pysServiciossolicitados.setAceptado("A");
+				pysServiciossolicitados
+						.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
+				pysServiciossolicitados.setIdservicio(Long.valueOf(idservicio.getNewId()));
+				pysServiciossolicitados
+						.setIdserviciosinstitucion(Long.valueOf(idserviciosinstitucion.getNewId()));
+				pysServiciossolicitados
+						.setIdpeticion(Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
+				pysServiciossolicitados.setIdpersona(inscripcion.getIdPersona());
+				pysServiciossolicitados.setCantidad(1);
+				pysServiciossolicitados.setIdformapago(Short.valueOf("10"));
+
+				LOGGER.info(
+						"autovalidateInscriptionsCourse() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para insertar el servicio solicitado");
+
+				response = pysServiciossolicitadosMapper.insert(pysServiciossolicitados);
+
+				LOGGER.info(
+						"autovalidateInscriptionsCourse() / pysServiciossolicitadosMapper.insert() -> Salida a pysServiciossolicitadosMapper para insertar el servicio solicitado");
+
+				PysSuscripcion pysSuscripcion = new PysSuscripcion();
+				pysSuscripcion.setFechamodificacion(new Date());
+				pysSuscripcion.setIdinstitucion(idInstitucion);
+				pysSuscripcion.setUsumodificacion(usuario.getIdusuario());
+				pysSuscripcion.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
+				pysSuscripcion.setIdservicio(Long.valueOf(idservicio.getNewId()));
+				pysSuscripcion
+						.setIdserviciosinstitucion(Long.valueOf(idserviciosinstitucion.getNewId()));
+				pysSuscripcion
+						.setIdpeticion(Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
+				pysSuscripcion.setIdpersona(inscripcion.getIdPersona());
+				pysSuscripcion.setCantidad(1);
+				pysSuscripcion.setIdformapago(Short.valueOf("10"));
+				pysSuscripcion.setFechasuscripcion(new Date());
+
+				CursoItem curso = forCursoExtendsMapper.searchCourseByIdcurso(
+						inscripcion.getIdCurso(), idInstitucion,
+						usuario.getIdlenguaje());
+
+				pysSuscripcion.setDescripcion(curso.getNombreCurso());
+				NewIdDTO idSuscripcion = pysSuscripcionExtendsMapper.selectMaxIdSuscripcion(
+						idInstitucion, Long.valueOf(idservicio.getNewId()),
+						Long.valueOf(idserviciosinstitucion.getNewId()));
+				pysSuscripcion.setIdsuscripcion(Long.valueOf(idSuscripcion.getNewId()));
+
+				LOGGER.info(
+						"autovalidateInscriptionsCourse() / pysSuscripcionExtendsMapper.insert() -> Entrada a pysSuscripcionExtendsMapper para insertar la suscripcion a la inscripcion");
+
+				response = pysSuscripcionExtendsMapper.insert(pysSuscripcion);
+
+				LOGGER.info(
+						"autovalidateInscriptionsCourse() / pysSuscripcionExtendsMapper.insert() -> Salida a pysSuscripcionExtendsMapper para insertar la suscripcion a la inscripcion");
+
 				arrayIds.add(inscripcion.getIdInscripcion());
 			}
 		}
@@ -411,17 +537,84 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 	private List<String> comprobarPlazasDisponibles(List<InscripcionItem> listInscripcionItem) {
 		LOGGER.info("compruebaPlazas() -> Entrada al servicio comprobar si quedan plazas del curso especificado");
 		List<String> arrayCursoIds = new ArrayList<>();
-		
+		//Primero comprobamos el numero de plazas que se intenta aprobar de cada curso
+		HashMap<Integer, Integer> numeroInscripcionesCursos = new HashMap<Integer, Integer>();
+		Collection<String> idCursos = new ArrayList<String>();
 		for (InscripcionItem inscripcionItem : listInscripcionItem) {
-			CursoItem cursoItem = forInscripcionExtendsMapper.compruebaPlazas(inscripcionItem.getIdCurso()); 
-
-			Integer numPlazas = Integer.parseInt(cursoItem.getNumPlazas() == null ? "0" : cursoItem.getNumPlazas());
-			Integer inscripciones = Integer.parseInt(cursoItem.getInscripciones());
 			
-			if(inscripciones >= numPlazas)
-				arrayCursoIds.add(cursoItem.getNombreCurso());
+			
+			if (null != numeroInscripcionesCursos.get(Integer.parseInt(inscripcionItem.getIdCurso())) ) {
+				numeroInscripcionesCursos.put(Integer.parseInt(inscripcionItem.getIdCurso()), numeroInscripcionesCursos.get(Integer.parseInt(inscripcionItem.getIdCurso()))+1);
+			}else{
+				numeroInscripcionesCursos.put(Integer.parseInt(inscripcionItem.getIdCurso()), 1);
+				idCursos.add(inscripcionItem.getIdCurso());
+			}
+			
 		}
+		for (Iterator iterator = idCursos.iterator(); iterator.hasNext();) {
+			String idCurso = (String) iterator.next();
+			
+			//Primero comprobamos las plazas disponibles del curso
+			CursoItem inscripcionesAprobadas = forInscripcionExtendsMapper.compruebaPlazasAprobadas(idCurso);
+			if (null == inscripcionesAprobadas) {
+				inscripcionesAprobadas = new CursoItem();
+				inscripcionesAprobadas.setInscripciones("0");
+			}
+			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(idCurso));
+			Long plazasdisponibles =0L;
+			if (null != cursoEntidad) {
+				if (null != cursoEntidad.getNumeroplazas()) {
+					plazasdisponibles = cursoEntidad.getNumeroplazas() - Long.parseLong(inscripcionesAprobadas.getInscripciones());
+				}
+			}
+			if (plazasdisponibles < numeroInscripcionesCursos.get(Integer.parseInt(idCurso))) {
+				arrayCursoIds.add(idCurso);
+			}
+		}
+
+		return arrayCursoIds;
 		
+	}
+	
+
+	private List<String> cursosConPlazasDisponibles(List<InscripcionItem> listInscripcionItem) {
+		LOGGER.info("compruebaPlazas() -> Entrada al servicio comprobar si quedan plazas del curso especificado");
+		List<String> arrayCursoIds = new ArrayList<>();
+		//Primero comprobamos el numero de plazas que se intenta aprobar de cada curso
+		HashMap<Integer, Integer> numeroInscripcionesCursos = new HashMap<Integer, Integer>();
+		Collection<String> idCursos = new ArrayList<String>();
+		for (InscripcionItem inscripcionItem : listInscripcionItem) {
+			
+			
+			if (null != numeroInscripcionesCursos.get(Integer.parseInt(inscripcionItem.getIdCurso())) ) {
+				numeroInscripcionesCursos.put(Integer.parseInt(inscripcionItem.getIdCurso()), numeroInscripcionesCursos.get(Integer.parseInt(inscripcionItem.getIdCurso()))+1);
+			}else{
+				numeroInscripcionesCursos.put(Integer.parseInt(inscripcionItem.getIdCurso()), 1);
+				idCursos.add(inscripcionItem.getIdCurso());
+			}
+			
+		}
+		for (Iterator iterator = idCursos.iterator(); iterator.hasNext();) {
+			String idCurso = (String) iterator.next();
+			
+			//Primero comprobamos las plazas disponibles del curso
+			CursoItem inscripcionesAprobadas = forInscripcionExtendsMapper.compruebaPlazasAprobadas(idCurso);
+			if (null == inscripcionesAprobadas) {
+				inscripcionesAprobadas = new CursoItem();
+				inscripcionesAprobadas.setInscripciones("0");
+			}
+			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(idCurso));
+			Long plazasdisponibles =0L;
+			if (null != cursoEntidad) {
+				if (null != cursoEntidad.getNumeroplazas()) {
+					plazasdisponibles = cursoEntidad.getNumeroplazas() - Long.parseLong(inscripcionesAprobadas.getInscripciones());
+				}
+			}
+			if (numeroInscripcionesCursos.get(Integer.parseInt(idCurso)) <= plazasdisponibles) {
+				arrayCursoIds.add(idCurso);
+			}
+		}
+
 		return arrayCursoIds;
 		
 	}

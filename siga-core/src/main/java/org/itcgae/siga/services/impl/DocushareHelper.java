@@ -64,6 +64,7 @@ public class DocushareHelper {
 	private short idInstitucion;
 	private DSServer server;
 	private DSSession dssession;
+	private String antPath;
 
 	// Para que coja el idioma español !!! Debería cogerlo desde el bundle de
 	// xmlbeans pero no lo coge
@@ -332,7 +333,7 @@ public class DocushareHelper {
 	 * @throws SIGAServiceException
 	 * @throws Exception
 	 */
-	public List<DocuShareObjectVO> getContenidoCollection(String collection) throws Exception {
+	public List<DocuShareObjectVO> getContenidoCollection(String collection, String antPath) throws Exception {
 
 		if (collection == null || collection.trim().equals("")) {
 			throw new IllegalArgumentException("El nombre de la colección no puede ser nula o vacía");
@@ -376,6 +377,7 @@ public class DocushareHelper {
 							dsObj.setDescription("");
 							dsObj.setSummary("");
 							dsObj.setOriginalFilename("");
+							dsObj.setParent(antPath);
 							listDir.add(dsObj);
 						} else if (dsObject instanceof DSDocument) {
 							DocuShareObjectVO dsObj = new DocuShareObjectVO();
@@ -391,6 +393,7 @@ public class DocushareHelper {
 							if (size > 0) {
 								dsObj.setSizeKB(size / 1024);
 							}
+							dsObj.setParent(antPath);
 							listArch.add(dsObj);
 						}
 					}

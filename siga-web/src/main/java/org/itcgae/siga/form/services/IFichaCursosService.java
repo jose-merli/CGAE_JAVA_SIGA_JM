@@ -63,6 +63,8 @@ public interface IFichaCursosService {
 	
 	public ResponseEntity<InputStreamResource> generateExcelInscriptions(CursoItem cursoItem, HttpServletRequest request);
 
+	public ResponseEntity<InputStreamResource> generateExcelMasiveInscriptions(CargaMasivaInscripcionesDTO cargaMasivaInscripcionesDTO, HttpServletRequest request);
+	
 	public UpdateResponseDTO uploadFileExcel(int idCurso, MultipartHttpServletRequest request) throws IllegalStateException, IOException;
 	
 	public CargaMasivaInscripcionesDTO getMassiveLoadInscriptions(HttpServletRequest request, String idCurso);
