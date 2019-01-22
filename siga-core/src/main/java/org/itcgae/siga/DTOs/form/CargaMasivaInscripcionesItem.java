@@ -17,7 +17,25 @@ public class CargaMasivaInscripcionesItem {
 	private String fechaCarga;
 	private String numeroLineasTotales;
 	private String inscripcionesCorrectas;
+	private Long idFichero;
+	private Long idFicheroLog;
 	
+	public Long getIdFichero() {
+		return idFichero;
+	}
+
+	public void setIdFichero(Long idFichero) {
+		this.idFichero = idFichero;
+	}
+
+	public Long getIdFicheroLog() {
+		return idFicheroLog;
+	}
+
+	public void setIdFicheroLog(Long idFicheroLog) {
+		this.idFicheroLog = idFicheroLog;
+	}
+
 	public String getIdCargaInscripcion() {
 		return idCargaInscripcion;
 	}

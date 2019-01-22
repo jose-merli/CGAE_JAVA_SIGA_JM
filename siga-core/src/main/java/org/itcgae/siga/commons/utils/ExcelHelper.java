@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -16,6 +19,7 @@ import org.apache.poi.hssf.usermodel.DVConstraint;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataValidation;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -66,16 +70,21 @@ public class ExcelHelper {
 						HSSFCell cell = row.getCell(columna);
 						if (cell != null && !cell.toString().trim().equals("")) {
 							String celdaTrim = cell.toString().trim();
-							if (cell.getCellType() == HSSFCell.CELL_TYPE_BLANK) {
+							 if (cell.getCellType() == HSSFCell.CELL_TYPE_BLANK) {
 								dFilaH.put(clave, "");
 							} else if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
 								String valorS = celdaTrim;
 								String valorCelda = null;
+								if (HSSFDateUtil.isCellDateFormatted(cell)) {
+									Date date = cell.getDateCellValue();
+									DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+								    valorCelda = dateFormat.format(date);
+								}
 								// Tratamiento de las fechas que las reconoce como tipo de celda num�rico
-								if (valorS.indexOf("-") != -1 || valorS.indexOf("/") != -1) {
-									valorCelda = celdaTrim;
-	
-								} else {
+//								if (valorS.indexOf("-") != -1 || valorS.indexOf("/") != -1) {
+//									valorCelda = celdaTrim;
+//									HSSFDateUtil.getExcelDate(cell.getDateCellValue());
+								 else {
 									Integer parteEntera = Integer.parseInt(valorS.substring(0, valorS.indexOf(".")));
 									Integer parteDecimal = Integer.parseInt(valorS.substring(valorS.indexOf(".") + 1, valorS.length()));
 									if (parteDecimal == 0)
