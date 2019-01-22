@@ -20,6 +20,8 @@ import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.form.InscripcionItem;
 import org.itcgae.siga.DTOs.form.PreciosCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +63,8 @@ public interface IFichaCursosService {
 	
 	public ResponseEntity<InputStreamResource> generateExcelInscriptions(CursoItem cursoItem, HttpServletRequest request);
 
+	public ResponseEntity<InputStreamResource> generateExcelMasiveInscriptions(CargaMasivaInscripcionesDTO cargaMasivaInscripcionesDTO, HttpServletRequest request);
+	
 	public UpdateResponseDTO uploadFileExcel(int idCurso, MultipartHttpServletRequest request) throws IllegalStateException, IOException;
 	
 	public CargaMasivaInscripcionesDTO getMassiveLoadInscriptions(HttpServletRequest request, String idCurso);
@@ -94,5 +98,8 @@ public interface IFichaCursosService {
 	public UpdateResponseDTO releaseCourse(CursoDTO cursoDTO , HttpServletRequest request);
 
 	public UpdateResponseDTO announceCourse(CursoDTO cursoDTO , HttpServletRequest request);
+	
+	public int createServiceCourse(ForCurso cursoItem, AdmUsuarios usuario, Short idInstitucion);
+
 
 }

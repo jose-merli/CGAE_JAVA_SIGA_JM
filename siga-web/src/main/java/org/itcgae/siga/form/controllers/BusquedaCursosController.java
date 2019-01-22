@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -57,6 +58,12 @@ public class BusquedaCursosController {
 	ResponseEntity<Integer> desarchivarCursos(@RequestBody List<CursoItem> listCursoItem, HttpServletRequest request) {
 		int response = busquedaCursosService.desarchivarCursos(listCursoItem, request);
 		return new ResponseEntity<Integer>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "busquedaCursos/duplicateCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> duplicateCourse(@RequestBody CursoItem cursoItem, HttpServletRequest request) {
+		InsertResponseDTO response = busquedaCursosService.duplicateCourse(cursoItem, request);
+		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 	}
 	
 	

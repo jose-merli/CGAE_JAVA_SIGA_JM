@@ -19,7 +19,7 @@ public class DocuShareObjectVO  {
 	private String summary;
 	private String originalFilename;
 	private String idPersona;
- 
+	private String parent;
 
 
 
@@ -172,6 +172,23 @@ public class DocuShareObjectVO  {
 
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
+	}
+	
+	/**
+	 *
+	 */
+	public DocuShareObjectVO Parent(String parent) {
+		this.parent = parent;
+		return this;
+	}
+
+	@JsonProperty("parent")
+	public String getParent() {
+		return parent;
+	}
+
+	public void setParent(String parent) {
+		this.parent = parent;
 	}
 
 }
