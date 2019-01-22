@@ -43,22 +43,22 @@
 		<include refid="from"></include>
 		
 
-    	<if test="query.innerJoinValue != '' and query.innerJoinValue != null">
+    	<if test="query.innerJoinValue != ''">
 	    	<include refid="innerJoin">
 	    	</include>
     	</if>
     	
-    	<if test="query.joinValue != '' and query.joinValue != null">
+    	<if test="query.joinValue != ''">
     		<include refid="join">
     		</include>
     	</if>
     	
-    	<if test="query.leftJoinValue != '' and query.leftJoinValue != null">
+    	<if test="query.leftJoinValue != ''">
 	    	<include refid="leftJoin">
 	    	</include>
     	</if>
     	
-    	<if test="query.outerJoinValue != '' and query.outerJoinValue != null">
+    	<if test="query.outerJoinValue != '' ">
 	    	<include refid="outerJoin">
 	    	</include>
   		</if>
@@ -67,17 +67,17 @@
 	    	</include>
    		</if>
 
-  		<if test="query.orderByValue != '' and query.orderByValue != null">
+  		<if test="query.orderByValue != ''">
 	    	<include refid="orderBy">
 	    	</include>
   		</if>
   		
-  		<if test="query.groupByValue != '' and query.groupByValue != null">
+  		<if test="query.groupByValue != ''">
 	    	<include refid="groupBy">
 	    	</include>
   		</if>
   		
-  		<if test="query.havingValue != '' and query.havingValue != null">
+  		<if test="query.havingValue != ''">
 	    	<include refid="having">
 	    	</include>
     	</if>

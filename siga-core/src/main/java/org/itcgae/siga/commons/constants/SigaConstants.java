@@ -26,7 +26,8 @@ public class SigaConstants {
 	public static String rutaficherosInformesYcomunicaciones = "/FILERMSA1000/SIGA/ficheros/archivo/";
 	public static String carpetaDocumentosEnvio = "/documentosEnvio/";
 	public static String carpetaPlantillasDocumento = "/plantillaDocumentos/";
-	public static String rutaExcelConsultaTemp= "/FILERMSA1000/SIGA/ficheros/archivo/tempExcel";
+	public static String rutaExcelConsultaTemp= "/FILERMSA1000/SIGA/ficheros/archivo/tempExcel/";
+	public static String nombreExcelConsulta = "ResultadoConsulta";
 	
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(
