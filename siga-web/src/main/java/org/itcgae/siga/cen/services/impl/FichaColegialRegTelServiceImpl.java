@@ -69,7 +69,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		// numero de colegiado o numero de comunitario. 
 		CenColegiadoExample example = new CenColegiadoExample();
-		example.createCriteria().andIdpersonaEqualTo(Long.parseLong(idPersona));
+		example.createCriteria().andIdpersonaEqualTo(Long.parseLong(idPersona)).andIdinstitucionEqualTo(idInstitucion);
 		List<CenColegiado> config= cenColegiadoMapper.selectByExample(example);
 		if(config.get(0).getIdentificadords() == null) {
 			if(config.get(0).getComunitario() == "0" ) {
@@ -85,7 +85,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		//NO COLEGIADO
 //		identificadorDS = "Collection-179";
 		if (identificadorDS != null) {
-			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS);
+			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS,identificadorDS);
 			docushareDTO.setDocuShareObjectVO(docus);
 		}
 		return docushareDTO;
@@ -102,7 +102,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		identificadorDS =  docu.getId();
 		if (identificadorDS != null) {
-			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS);
+			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS, docu.getParent());
 			docushareDTO.setDocuShareObjectVO(docus);
 		} 
 		return docushareDTO;
@@ -165,7 +165,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		//NO COLEGIADO
 //		identificadorDS = "Collection-179";
 		if (identificadorDS != null) {
-			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS);
+			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS,"");
 			docushareDTO.setDocuShareObjectVO(docus);
 		}
 		return docushareDTO;
@@ -201,7 +201,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 				identificadorDS = config.get(0).getIdentificadords();
 			}
 		if (identificadorDS != null) {
-			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS);
+			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS, docu.getParent());
 			docushareDTO.setDocuShareObjectVO(docus);
 		} 
 		return docushareDTO;
