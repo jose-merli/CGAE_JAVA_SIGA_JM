@@ -10,7 +10,7 @@ public class EnviosMasivosItem {
 	private Long idEnvio;
 	private String descripcion;
 	private Date fechaCreacion;
-	private Short idPlantillasEnvio;
+	private int idPlantillasEnvio;
 	private Short idEstado;
 	private Short idTipoEnvio;
 	private Short idPlantilla;
@@ -47,10 +47,11 @@ public class EnviosMasivosItem {
 	public void setFechaCreacion(Date fechaCreacion) {
 		this.fechaCreacion = fechaCreacion;
 	}
-	public Short getIdPlantillasEnvio() {
+
+	public int getIdPlantillasEnvio() {
 		return idPlantillasEnvio;
 	}
-	public void setIdPlantillasEnvio(Short idPlantillasEnvio) {
+	public void setIdPlantillasEnvio(int idPlantillasEnvio) {
 		this.idPlantillasEnvio = idPlantillasEnvio;
 	}
 	public Short getIdEstado() {

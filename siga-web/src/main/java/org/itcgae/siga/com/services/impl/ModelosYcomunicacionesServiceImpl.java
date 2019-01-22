@@ -247,7 +247,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					
 					if(listaModPlantillaEnvio != null){
 						for(ModModeloPlantillaenvio modPlantillaEnvio : listaModPlantillaEnvio){
-							Short idPlantillaEnvioDuplicar = modPlantillaEnvio.getIdplantillaenvios();
+							int idPlantillaEnvioDuplicar = modPlantillaEnvio.getIdplantillaenvios();
 							modPlantillaEnvio.setFechamodificacion(new Date());
 							modPlantillaEnvio.setIdmodelocomunicacion(modelo.getIdmodelocomunicacion());
 							modModeloPlantillaenvioMapper.insert(modPlantillaEnvio);
@@ -658,7 +658,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					for (int i = 0; i < plantillas.length; i++) {
 						ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
 						key.setIdmodelocomunicacion(Long.valueOf(plantillas[i].getIdModelo()));
-						key.setIdplantillaenvios(Short.valueOf(plantillas[i].getIdPlantillaEnvios()));
+						key.setIdplantillaenvios(Integer.parseInt(plantillas[i].getIdPlantillaEnvios()));
 						key.setIdinstitucion(Short.valueOf(plantillas[i].getIdInstitucion()));
 						key.setIdtipoenvios(Short.valueOf(plantillas[i].getIdTipoEnvios()));
 						ModModeloPlantillaenvio plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
@@ -713,7 +713,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					}
 					ModModeloPlantillaenvio plantilla = new ModModeloPlantillaenvio();
 					plantilla.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
-					plantilla.setIdplantillaenvios(Short.valueOf(datosPlantilla.getIdPlantillaEnvios()));
+					plantilla.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
 					plantilla.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
 					plantilla.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
 					plantilla.setPordefecto(datosPlantilla.getPorDefecto());

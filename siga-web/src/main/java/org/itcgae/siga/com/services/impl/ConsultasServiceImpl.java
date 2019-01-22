@@ -1,16 +1,28 @@
 package org.itcgae.siga.com.services.impl;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
@@ -23,6 +35,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IConsultasService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ConConsulta;
@@ -45,6 +58,7 @@ import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 @Transactional
@@ -423,6 +437,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						_conConsultaMapper.insert(consulta);
 						respuesta.setMessage(consulta.getIdconsulta().toString());
 						respuesta.setDescription(consulta.getSentencia());
+						respuesta.setInfoURL(consulta.getIdinstitucion().toString());
 						respuesta.setCode(200);
 					}else{
 						ConConsultaKey key = new ConConsultaKey();
@@ -465,12 +480,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 							}else{
 								_conConsultaMapper.updateByPrimaryKeyWithBLOBs(consulta);
 								respuesta.setCode(200);
-								respuesta.setMessage("Consulta editada");
+								respuesta.setMessage(consulta.getIdconsulta().toString());
+								respuesta.setInfoURL(consulta.getIdinstitucion().toString());
 							}
 						}else{
 							_conConsultaMapper.updateByPrimaryKeyWithBLOBs(consulta);
 							respuesta.setCode(200);
-							respuesta.setMessage("Consulta editada");
+							respuesta.setMessage(consulta.getIdconsulta().toString());
+							respuesta.setInfoURL(consulta.getIdinstitucion().toString());
 						}
 						
 					}
@@ -615,14 +632,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
-	public Error ejecutarConsulta(HttpServletRequest request, String consulta) {
+	public File ejecutarConsulta(HttpServletRequest request, String consulta) {
 		
 		LOGGER.info("ejecutarConsulta() -> Entrada al servicio para ejecutar una consulta");
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		Error respuesta = new Error();
+		File excel = null;
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -645,24 +662,22 @@ public class ConsultasServiceImpl implements IConsultasService{
 					mapa.put("havingValue", obtenerHaving(consulta));
 					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
 					if(result != null){
-						for (Map<String, Object> map : result) {
-							LOGGER.info("datos: " + map);
-						}
-						LOGGER.info("datos: " + result);
+						Workbook workBook = crearExcel(mapa.get("selectValue"), result);
+						excel = new File(SigaConstants.rutaExcelConsultaTemp + "/ResultadoConsulta.xlsx");
+						FileOutputStream fileOut = new FileOutputStream(SigaConstants.rutaExcelConsultaTemp + "ResultadoConsulta.xlsx");
+						workBook.write(fileOut);
+				        fileOut.close();
+				        workBook.close();
 					}
-					respuesta.setCode(200);
-					respuesta.setMessage("Consulta ejecutada");
 				}catch (Exception e) {
-					respuesta.setCode(500);
-					respuesta.setMessage("Error al ejecutar consulta");
-					respuesta.setDescription(e.getMessage());
+					LOGGER.error("ejecutarConsulta() -> Error al ejecutar la consulta: " + e.getMessage());
 					e.printStackTrace();
 				}
 		
 			}
 		}
 		LOGGER.info("ejecutarConsulta() -> Salida del servicio para ejecutar una consulta");
-		return respuesta;
+		return excel;
 	}
 	
 	public boolean comprobarCamposDestinarios (String sentencia){
@@ -731,43 +746,43 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 		
 		if(!sentencia.contains("CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\"")){
-			select+= " CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\"";
+			select+= " CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\", ";
 		}
 		if(!sentencia.contains("CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\"")){
-			select+= " CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\"";
+			select+= " CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\", ";
 		}
 		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
-			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"";	
+			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
 		}
 		if(!sentencia.contains("CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\"")){
-			select+= " CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\"";
+			select+= " CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\", ";
 		}
 		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
-			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"";	
+			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
 		}
 		if(!sentencia.contains("CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\"")){
-			select+= " CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\"";
+			select+= " CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\", ";
 		}
 		if(!sentencia.contains("CEN_DIRECCIONES.MOVIL AS \"MOVIL\"")){
-			select+= " CEN_DIRECCIONES.MOVIL AS \"MOVIL\"";	
+			select+= " CEN_DIRECCIONES.MOVIL AS \"MOVIL\", ";	
 		}
-		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
-			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"";	
+		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ")){
+			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
 		}
-		if(!sentencia.contains("CEN_DIRECCIONES.FAX1 AS \"FAX1\"")){
+		if(!sentencia.contains("CEN_DIRECCIONES.FAX1 AS \"FAX1\", ")){
 			select+= " CEN_DIRECCIONES.FAX1 AS \"FAX1\"";	
 		}
-		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
-			select+= " CEN_DIRECCIONES.FAX2 AS \"FAX2\"";
+		if(!sentencia.contains("CEN_DIRECCIONES.FAX2 AS \"FAX2\"")){
+			select+= " CEN_DIRECCIONES.FAX2 AS \"FAX2\", ";
 		}
 		if(!sentencia.contains("CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\"")){
-			select+= " CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\"";
+			select+= " CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\", ";
 		}
 		if(!sentencia.contains("CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\"")){
-			select+= " CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\"";
+			select+= " CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\", ";
 		}
 		if(!sentencia.contains("CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\"")){
-			select+= " CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\"";
+			select+= " CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\", ";
 		}
 		StringBuffer sentenciaFinal = new StringBuffer(sentencia);
 		sentenciaFinal.insert(indexInicio, select);
@@ -913,6 +928,57 @@ public class ConsultasServiceImpl implements IConsultasService{
 		}
 
 		return having;
+	}
+	
+	public Workbook crearExcel(String select, List<Map<String, Object>> result){
+		
+		//Creamos el libro de excel
+		Workbook workbook = new XSSFWorkbook();
+		CreationHelper createHelper = workbook.getCreationHelper();
+		Sheet sheet = workbook.createSheet("Query");
+		
+		//Le aplicamos estilos a las cabeceras
+		Font headerFont = workbook.createFont();
+		headerFont.setBold(true);
+		headerFont.setFontHeightInPoints((short) 14);
+		headerFont.setColor(IndexedColors.RED.getIndex());
+		CellStyle headerCellStyle = workbook.createCellStyle();
+        headerCellStyle.setFont(headerFont);
+        
+        
+        Row headerRow = sheet.createRow(0);
+        
+        //Obtenemos las columnas de los selects
+        String[] columns = select.split(",");
+        
+        
+        for(int i = 0; i < columns.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            columns[i] = columns[i].replace(",", "");
+            cell.setCellValue(columns[i]);
+            cell.setCellStyle(headerCellStyle);
+        }
+        
+        //Recorremos el map y vamos metiendo celdas
+        int rowNum = 1;
+        for (Map<String, Object> map : result) {
+        	
+        	Row row = sheet.createRow(rowNum++);
+        	int cell = 0;
+        	
+        	for (String name : map.keySet()) {
+        		Object campo = map.get(name.toString());
+        		row.createCell(cell).setCellValue(campo.toString());
+        		cell++;
+			}
+		}
+        
+        for(int i = 0; i < columns.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+        
+        return workbook;
+
 	}
 	
 }
