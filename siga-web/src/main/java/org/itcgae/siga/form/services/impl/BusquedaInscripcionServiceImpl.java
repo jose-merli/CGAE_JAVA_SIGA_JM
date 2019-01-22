@@ -406,6 +406,20 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				LOGGER.info(
 						"autovalidateInscriptionsCourse() / pysSuscripcionExtendsMapper.insert() -> Salida a pysSuscripcionExtendsMapper para insertar la suscripcion a la inscripcion");
 
+				
+				//Entidad que se va a rellenar con los valores a actualizar
+				ForInscripcion record = new ForInscripcion();
+				record.setIdpeticionsuscripcion(Long.valueOf(idPeticion.getNewId()));
+				record.setUsumodificacion(usuario.getIdusuario().longValue()); // seteamos el usuario de modificacion
+				record.setFechamodificacion(new Date()); // seteamos la fecha de modificación
+				
+				ForInscripcionExample example = new ForInscripcionExample();
+				example.createCriteria().andIdinscripcionEqualTo(inscripcion.getIdInscripcion());
+				
+				LOGGER.info(
+						"updateEstado() / forInscripcionExtendsMapper.updateByExampleSelective() -> Entrada a forInscripcionExtendsMapper para invocar a updateByExampleSelective para actualizar inscripciones según los criterios establecidos");
+				response = forInscripcionExtendsMapper.updateByExampleSelective(record, example);
+
 				arrayIds.add(inscripcion.getIdInscripcion());
 			}
 		}
