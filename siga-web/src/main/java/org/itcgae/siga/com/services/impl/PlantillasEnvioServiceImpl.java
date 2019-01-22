@@ -177,7 +177,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 				try {
 					for (int i = 0; i < plantillasEnvio.length; i++) {
 						EnvPlantillasenviosKey plantillaEnvioKey = new EnvPlantillasenviosKey();
-						plantillaEnvioKey.setIdplantillaenvios(Short.valueOf(plantillasEnvio[i].getIdPlantillaEnvios()));
+						plantillaEnvioKey.setIdplantillaenvios(Integer.parseInt(plantillasEnvio[i].getIdPlantillaEnvios()));
 						plantillaEnvioKey.setIdinstitucion(Short.valueOf(plantillasEnvio[i].getIdInstitucion()));
 						EnvPlantillasenvios plantillaEnvios = _envPlantillasenviosMapper.selectByPrimaryKey(plantillaEnvioKey);
 						plantillaEnvios.setFechabaja(new Date());
@@ -221,7 +221,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					AdmUsuarios usuario = usuarios.get(0);
 					if(datosTarjeta.getIdPlantillaEnvios() != null){
 						EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
-						key.setIdplantillaenvios(Short.parseShort(datosTarjeta.getIdPlantillaEnvios()));
+						key.setIdplantillaenvios(Integer.parseInt(datosTarjeta.getIdPlantillaEnvios()));
 						key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 						key.setIdinstitucion(idInstitucion);
 						EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
@@ -236,7 +236,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					}else{
 						EnvPlantillasenviosWithBLOBs plantilla = new EnvPlantillasenviosWithBLOBs();
 						NewIdDTO id = _envPlantillaEnviosExtendsMapper.selectMaxIDPlantillas();
-						plantilla.setIdplantillaenvios(Short.valueOf(id.getNewId()));
+						plantilla.setIdplantillaenvios(Integer.parseInt(id.getNewId()));
 						plantilla.setIdinstitucion(idInstitucion);
 						plantilla.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 						plantilla.setNombre(datosTarjeta.getNombre());
@@ -286,7 +286,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					AdmUsuarios usuario = usuarios.get(0);
 					ModPlantillaenvioConsulta consultaAsoc = new ModPlantillaenvioConsulta();
 					consultaAsoc.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
-					consultaAsoc.setIdplantillaenvios(Short.valueOf(consulta.getIdPlantillaEnvios()));
+					consultaAsoc.setIdplantillaenvios(Integer.parseInt(consulta.getIdPlantillaEnvios()));
 					consultaAsoc.setIdinstitucion(idInstitucion);
 					consultaAsoc.setIdtipoenvios(Short.valueOf(consulta.getIdTipoEnvios()));
 					consultaAsoc.setUsumodificacion(usuario.getIdusuario());
@@ -331,7 +331,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					for (int i = 0; i < consulta.length; i++) {
 						ModPlantillaenvioConsultaKey key = new ModPlantillaenvioConsultaKey();
 						key.setIdconsulta(Long.valueOf(consulta[i].getIdConsulta()));
-						key.setIdplantillaenvios(Short.valueOf(consulta[i].getIdPlantillaEnvios()));
+						key.setIdplantillaenvios(Integer.parseInt(consulta[i].getIdPlantillaEnvios()));
 						ModPlantillaenvioConsulta con = _modPlantillaenvioConsultaMapper.selectByPrimaryKey(key);
 						con.setFechabaja(new Date());
 						con.setUsumodificacion(usuario.getIdusuario());
@@ -376,7 +376,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					AdmUsuarios usuario = usuarios.get(0);
 					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
 					key.setIdinstitucion(idInstitucion);
-					key.setIdplantillaenvios(Short.valueOf(remitente.getIdPlantillaEnvios()));
+					key.setIdplantillaenvios(Integer.parseInt(remitente.getIdPlantillaEnvios()));
 					key.setIdtipoenvios(Short.valueOf(remitente.getIdTipoEnvios()));
 					
 					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
@@ -458,7 +458,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					
 					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
 					key.setIdinstitucion(idInstitucion);
-					key.setIdplantillaenvios(Short.valueOf(datosPlantilla.getIdPlantillaEnvios()));
+					key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
 					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
 					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
 					CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(plantilla.getIdpersona());
