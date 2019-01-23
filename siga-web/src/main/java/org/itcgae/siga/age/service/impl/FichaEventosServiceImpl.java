@@ -467,7 +467,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		}
 		// Si se ha seleccionado los días festivos, se eliminan todos los días que no
 		// son festivos
-		if (eventoItem.getTipoDiasRepeticion().equals("F")) {
+		if (null != eventoItem.getTipoDiasRepeticion()) {
+			if (eventoItem.getTipoDiasRepeticion().equals("F")) {
 			List<Date> eliminar = new ArrayList<Date>();
 			List<String> festivos = ageFestivosExtendsMapper.getFechaFestivos(ageEventoInsert.getIdinstitucion());
 
@@ -487,24 +488,25 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 			// Si se selecciona los días laborales, se eliminan todos los dias que no sean
 			// laborales
-		} else if (eventoItem.getTipoDiasRepeticion().equals("L")) {
-			List<String> festivos = ageFestivosExtendsMapper.getFechaFestivos(ageEventoInsert.getIdinstitucion());
-			List<Date> eliminar = new ArrayList<Date>();
-
-			for (Date fecha : fechas) {
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				String fechaFormateada = sdf.format(fecha);
-				if (festivos.contains(fechaFormateada)) {
-					eliminar.add(fecha);
+			} else if (eventoItem.getTipoDiasRepeticion().equals("L")) {
+				List<String> festivos = ageFestivosExtendsMapper.getFechaFestivos(ageEventoInsert.getIdinstitucion());
+				List<Date> eliminar = new ArrayList<Date>();
+	
+				for (Date fecha : fechas) {
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+					String fechaFormateada = sdf.format(fecha);
+					if (festivos.contains(fechaFormateada)) {
+						eliminar.add(fecha);
+					}
 				}
-			}
-
-			if (!eliminar.isEmpty()) {
-				for (Date fecha : eliminar) {
-					fechas.remove(fecha);
+	
+				if (!eliminar.isEmpty()) {
+					for (Date fecha : eliminar) {
+						fechas.remove(fecha);
+					}
 				}
-			}
-
+	
+			}			
 		}
 
 		if (!fechas.isEmpty()) {
@@ -557,7 +559,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 					forEventoCurso.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
 					forEventoCurso.setIdevento(Long.valueOf(ageEventoInsert.getIdevento()));
 					forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
-					forEventoCurso.setIdinstitucion(eventoItem.getIdInstitucion());
+					forEventoCurso.setIdinstitucion(ageEventoInsert.getIdinstitucion());
 
 					LOGGER.info(
 							"generateEvents() / forEventoCursoMapper.insert(forEventoCurso) -> Entrada a forEventoCursoMapper para insertar la relacion entre evento sesion y el curso");
