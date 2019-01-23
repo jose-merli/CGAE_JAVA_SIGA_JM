@@ -7,7 +7,7 @@ import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 
 public class ModModeloComunicacionExtendsSqlProvider {
 	
-	public String selectModulosComunicacion(DatosModelosComunicacionesSearch filtros, boolean historico){
+	public String selectModelosComunicacion(DatosModelosComunicacionesSearch filtros, boolean historico){
 		
 		SQL sql = new SQL();
 		
@@ -62,6 +62,19 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		}
 		
 		sql.ORDER_BY("IDMODELOCOMUNICACION ASC");
+		
+		return sql.toString();
+	}
+	
+	
+	public String selectModelosComunicacionDialogo(String idClaseComunicacion){
+		SQL sql = new SQL();
+		
+		sql.SELECT("MODELO.IDMODELOCOMUNICACION, MODELO.NOMBRE");
+		sql.FROM("MOD_MODELOCOMUNICACION MODELO");
+		sql.JOIN("MOD_MODELO_PLANTILLAENVIO PLANTILLA ON PLANTILLA.IDMODELOCOMUNICACION = MODELO.IDMODELOCOMUNICACION");
+		sql.WHERE("MODELO.IDCLASECOMUNICACION = '" + idClaseComunicacion + "'");
+		
 		
 		return sql.toString();
 	}

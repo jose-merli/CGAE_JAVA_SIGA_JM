@@ -1,18 +1,12 @@
 package org.itcgae.siga.DTOs.com;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public class ModelosComunicacionItem {
-//	IDMODELOCOMUNICACION NOT NULL NUMBER(10)     
-//	NOMBRE                        VARCHAR2(100)  
-//	ORDEN                         NUMBER(3)      
-//	IDINSTITUCION                 NUMBER(4)      
-//	DESCRIPCION                   VARCHAR2(4000) 
-//	PRESELECCIONAR                VARCHAR2(2)    
-//	IDCLASECOMUNICACION  NOT NULL NUMBER(4)      
-//	FECHABAJA                     DATE           
-//	FECHAMODIFICACION             DATE           
-//	USUMODIFICACION               NUMBER(5)  
 	
 	private String idModeloComunicacion;
 	private String nombre;
@@ -22,16 +16,23 @@ public class ModelosComunicacionItem {
 	private String preseleccionar;
 	private String idClaseComunicacion;
 	private Date fechaBaja;
-	
 	private String visible;
 	private String institucion;
 	private String claseComunicacion;
+	private ComboDTO plantillas;
 	
 	public String getIdModeloComunicacion() {
 		return idModeloComunicacion;
 	}
 	public void setIdModeloComunicacion(String idModeloComunicacion) {
 		this.idModeloComunicacion = idModeloComunicacion;
+	}
+
+	public ComboDTO getPlantillas() {
+		return plantillas;
+	}
+	public void setPlantillas(ComboDTO plantillas) {
+		this.plantillas = plantillas;
 	}
 	public String getNombre() {
 		return nombre;

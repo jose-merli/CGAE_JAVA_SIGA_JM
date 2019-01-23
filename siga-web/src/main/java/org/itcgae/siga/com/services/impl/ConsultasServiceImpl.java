@@ -658,7 +658,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 					mapa.put("havingValue", obtenerHaving(consulta));
 					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
 					if(result != null){
-						Workbook workBook = crearExcel(mapa.get("selectValue"), result);
+						Workbook workBook = crearExcel(result);
 						File aux = new File(SigaConstants.rutaExcelConsultaTemp);
 						// creo directorio si no existe
 						aux.mkdirs();
@@ -813,7 +813,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 		int inicioSelect = consulta.indexOf("<SELECT>")+8;
 		int finSelect = consulta.indexOf("</SELECT>");
 		select = consulta.substring(inicioSelect, finSelect);
-		select = select.replace("select", "");
+		
 		
 		return select;
 	}
@@ -824,7 +824,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 		int inicioFrom = consulta.indexOf("<FROM>")+6;
 		int finFrom = consulta.indexOf("</FROM>");
 		from = consulta.substring(inicioFrom, finFrom);
-		from = from.replace("from", "");
+		
 		return from;
 	}
 	
@@ -887,7 +887,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 			int inicioWhere = consulta.indexOf("<WHERE>")+8;
 			int finWhere = consulta.indexOf("</WHERE>");
 			where = consulta.substring(inicioWhere, finWhere);
-			where = where.replace("where", "");
+			
 		}
 
 		return where;
@@ -930,7 +930,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 		return having;
 	}
 	
-	public Workbook crearExcel(String select, List<Map<String, Object>> result){
+	public Workbook crearExcel(List<Map<String, Object>> result){
 		
 		//Creamos el libro de excel
 		Workbook workbook = new XSSFWorkbook();
@@ -947,18 +947,7 @@ public class ConsultasServiceImpl implements IConsultasService{
         
         
         Row headerRow = sheet.createRow(0);
-        
-        //Obtenemos las columnas de los selects
-        String[] columns = select.split(",");
-        
-        
-//        for(int i = 0; i < columns.length; i++) {
-//            Cell cell = headerRow.createCell(i);
-//            columns[i] = columns[i].replace(",", "");
-//            cell.setCellValue(columns[i]);
-//            cell.setCellStyle(headerCellStyle);
-//        }
-        
+
         
         //Recorremos el map y vamos metiendo celdas
         List<String> columnsKey = new ArrayList<String>();
@@ -988,7 +977,7 @@ public class ConsultasServiceImpl implements IConsultasService{
         	}
 		}
         
-        for(int i = 0; i < columns.length; i++) {
+        for(int i = 0; i < index; i++) {
             sheet.autoSizeColumn(i);
         }
         
