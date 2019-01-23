@@ -490,7 +490,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 				try {
 					// Obtenemos los distintos certificados con los que generaremos las distintas solicitudes
 					ForCertificadoscursoExample certificadosCursoExample = new ForCertificadoscursoExample();
-					certificadosCursoExample.createCriteria().andIdcalificacionEqualTo(Long.parseLong(UtilidadesString.traduceNota(inscripcionItem.getCalificacion())));
+					certificadosCursoExample.createCriteria().andIdcursoEqualTo(Long.valueOf(inscripcionItem.getIdCurso())).andIdcalificacionEqualTo(Long.parseLong(UtilidadesString.traduceNota(inscripcionItem.getCalificacion())));
 					
 					listCertificadosCurso = forCertificadosCursoExtendsMapper.selectByExample(certificadosCursoExample);
 					
