@@ -32,8 +32,8 @@ public class DialogoComunicacionController {
 	}
 	
 	
-	@RequestMapping(value = "/search",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ModelosComunicacionSearch> cargasMasivasSearch(HttpServletRequest request, @RequestBody String[] idClaseComunicacion) {
+	@RequestMapping(value = "/modelosSearch",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ModelosComunicacionSearch> modelosComunicacionSearch(HttpServletRequest request, @RequestBody String[] idClaseComunicacion) {
 		
 		ModelosComunicacionSearch response = _dialogoComunicacionService.obtenerModelos(request, idClaseComunicacion);
 		if(response.getError() == null)
@@ -42,8 +42,8 @@ public class DialogoComunicacionController {
 			return new ResponseEntity<ModelosComunicacionSearch>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/search",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> cargasMasivasSearch(HttpServletRequest request, @RequestBody String idPlantilla) {
+	@RequestMapping(value = "/tiposEnvioModelo",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> obtenertiposEnvioModelo(HttpServletRequest request, @RequestBody String idPlantilla) {
 		
 		ComboDTO response = _dialogoComunicacionService.obtenertipoEnvioPlantilla(request, idPlantilla);
 		if(response.getError() == null)
