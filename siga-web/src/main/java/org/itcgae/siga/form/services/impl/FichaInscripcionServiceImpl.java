@@ -157,6 +157,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 					forInscripcionInsert.setFechamodificacion(new Date());
 					forInscripcionInsert.setFechasolicitud(inscripcionItem.getFechaSolicitudDate());
 					forInscripcionInsert.setIdcurso(Long.parseLong(inscripcionItem.getIdCurso()));
+					forInscripcionInsert.setIdpersona(inscripcionItem.getIdPersona());
 					forInscripcionInsert.setIdestadoinscripcion(Long.parseLong(inscripcionItem.getIdEstadoInscripcion()));	
 					
 					LOGGER.info(
