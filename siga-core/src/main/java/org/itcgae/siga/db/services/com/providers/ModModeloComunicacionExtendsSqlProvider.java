@@ -90,13 +90,13 @@ public class ModModeloComunicacionExtendsSqlProvider {
 	}
 	
 	
-	public String selectTipoEnvioPlantilla(String idPlantilla){
+	public String selectTipoEnvioPlantilla(String idLenguaje, String idPlantilla){
 		
 		SQL sql = new SQL();
-		sql.SELECT("tipo.IDTIPOENVIOS AS VALUE, PLANTILLA.NOMBRE AS LABEL");
-		sql.FROM("ENVTIPOENVIOS tipo");
-		sql.JOIN("ENV_PLANTILLASENVIOS PLANTILLA ON PLANTILLA.IDPLANTILLAENVIOS = MPLANTILLA.IDPLANTILLAENVIOS AND MPLANTILLA.IDINSTITUCION = PLANTILLA.IDINSTITUCION");
-		sql.WHERE("MPLANTILLA.IDMODELOCOMUNICACION = '"+ idPlantilla +"'");
+		sql.SELECT("TIPO.IDTIPOENVIOS AS VALUE, CAT.DESCRIPCION");
+		sql.FROM("ENV_TIPOENVIOS TIPO");
+		sql.JOIN("GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = TIPO.NOMBRE AND CAT.IDLENGUAJE = '" + idLenguaje + "'");
+		sql.WHERE("TIPO.IDTIPOENVIOS = '" + idPlantilla + "'");
 		   
 		return sql.toString();
 	}

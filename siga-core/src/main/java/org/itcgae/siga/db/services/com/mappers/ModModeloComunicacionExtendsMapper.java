@@ -51,5 +51,5 @@ public interface ModModeloComunicacionExtendsMapper {
 	@Results({@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectTipoEnvioPlantilla(String idPlantilla);
+	List<ComboItem> selectTipoEnvioPlantilla(String idLenguaje, String idPlantilla);
 }

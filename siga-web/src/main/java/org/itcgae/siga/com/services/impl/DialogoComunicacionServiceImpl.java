@@ -130,9 +130,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 
 	@Override
-	public ComboDTO obtenertipoEnvioModelo(HttpServletRequest request, String idPlantilla) {
+	public ComboDTO obtenertipoEnvioPlantilla(HttpServletRequest request, String idPlantilla) {
 		
-		LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clases comunicacion");
+		LOGGER.info("obtenertipoEnvioPlantilla() -> Entrada al servicio para obtener tipos de envio de la plantilla ");
 		
 		ComboDTO comboDTO = new ComboDTO();
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
@@ -148,8 +148,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			
 			if (null != usuarios && usuarios.size() > 0) {
-
-				comboItems = _modModeloComunicacionExtendsMapper.selectTipoEnvioPlantilla(idPlantilla);
+				AdmUsuarios usuario = usuarios.get(0);
+				comboItems = _modModeloComunicacionExtendsMapper.selectTipoEnvioPlantilla(usuario.getIdlenguaje(), idPlantilla);
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
 					element.setLabel("");
@@ -162,7 +162,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			}
 		}
 		
-		LOGGER.info("claseComunicacion() -> Salida del servicio para obtener combo clases comunicacion");
+		LOGGER.info("obtenertipoEnvioPlantilla() -> Salida del servicio para obtener tipos de envio de la plantilla ");
 		
 		return comboDTO;
 	}

@@ -21,7 +21,7 @@ public class DialogoComunicacionController {
 	@Autowired
 	IDialogoComunicacionService _dialogoComunicacionService;
 	
-	@RequestMapping(value = "/clasesComunicacion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/clasesComunicacion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboClasesComunicacion(HttpServletRequest request, @RequestBody String rutaClaseComunicacion) {
 		
 		ComboDTO response = _dialogoComunicacionService.obtenerClaseComunicaciones(request, rutaClaseComunicacion);
@@ -45,7 +45,7 @@ public class DialogoComunicacionController {
 	@RequestMapping(value = "/search",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> cargasMasivasSearch(HttpServletRequest request, @RequestBody String idPlantilla) {
 		
-		ComboDTO response = _dialogoComunicacionService.obtenertipoEnvioModelo(request, idPlantilla);
+		ComboDTO response = _dialogoComunicacionService.obtenertipoEnvioPlantilla(request, idPlantilla);
 		if(response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else

@@ -9,6 +9,6 @@ public interface IDialogoComunicacionService {
 	
 	public ComboDTO obtenerClaseComunicaciones(HttpServletRequest request, String rutaClaseComunicacion);
 	public ModelosComunicacionSearch obtenerModelos(HttpServletRequest request, String[] idClaseComunicacion);
-	public ComboDTO obtenertipoEnvioModelo(HttpServletRequest request, String idPlantilla);
+	public ComboDTO obtenertipoEnvioPlantilla(HttpServletRequest request, String idPlantilla);
 	
 }
