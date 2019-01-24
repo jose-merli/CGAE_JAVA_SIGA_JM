@@ -1736,7 +1736,37 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					}
 				}
 
+				// Generamos el fichero de errores
+				byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSPLOGCURSO, datosLog);
 
+				// Insertamos en tabla For_inscripcion_Masiva el fichero que se ha parseado
+				forInscripcionesmasivas.setIdinstitucion(idInstitucion);
+				forInscripcionesmasivas.setNombrefichero(nombreFichero);
+				forInscripcionesmasivas.setFechamodificacion(new Date());
+				forInscripcionesmasivas.setUsumodificacion(Long.valueOf(usuario.getIdusuario()));
+				forInscripcionesmasivas.setIdcurso(Long.valueOf(idCurso));
+				String numLineas = String.valueOf(inscripcionList.size());
+				forInscripcionesmasivas.setNumerolineastotales(Long.valueOf(numLineas));
+				String lineasCorrectas = String.valueOf(inscripcionList.size() - registrosErroneos);
+				forInscripcionesmasivas.setInscripcionescorrectas(Long.valueOf(lineasCorrectas));
+
+	
+				
+				Long idFile = uploadFile(file.getBytes(), forInscripcionesmasivas, false, usuario);
+				Long idLogFile = uploadFile(bytesLog, forInscripcionesmasivas, true, usuario);
+				
+				forInscripcionesmasivas.setIdfichero(idFile);
+				forInscripcionesmasivas.setIdficherolog(idLogFile);
+				LOGGER.info(
+						"uploadFileExcel() / forInscripcionesmasivasMapper.insert(forInscripcionesmasivas) -> Entrada a forInscripcionesmasivasMapper para insertar el fichero parseado carga masiva de inscripciones");
+
+				int result = forInscripcionesmasivasMapper.insert(forInscripcionesmasivas);
+
+				LOGGER.info(
+						"uploadFileExcel() / forInscripcionesmasivasMapper.insert(forInscripcionesmasivas) -> Salida a forInscripcionesmasivasMapper para insertar el fichero parseado carga masiva de inscripciones");
+
+
+				
 				// Si no hay errores se insertan las inscripciones nuevas
 				if (registrosErroneos == 0) {
 
@@ -1752,11 +1782,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							inscripcionInsert.setIdpersona(inscripcion.getIdPersona());
 							inscripcionInsert.setUsumodificacion(usuario.getIdusuario().longValue());
 							inscripcionInsert.setIdcargainscripcion(forInscripcionesmasivas.getIdcargainscripcion());
+							inscripcionInsert.setFechasolicitud(new Date());
 
 							LOGGER.info(
 									"uploadFileExcel() / forInscripcionExtendsMapper.insert(inscripcionInsert) -> Entrada a forInscripcionExtendsMapper para insertar una inscripcion");
 
-							int result = forInscripcionExtendsMapper.insert(inscripcionInsert);
+							result = forInscripcionExtendsMapper.insert(inscripcionInsert);
 
 							LOGGER.info(
 									"uploadFileExcel() / forInscripcionExtendsMapper.insert(inscripcionInsert) -> Salida a forInscripcionExtendsMapper para insertar una inscripcion");
@@ -1790,36 +1821,6 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					error.setCode(400);
 					error.setDescription("Hay errores en las inscripciones subidas");
 				}
-
-				// Generamos el fichero de errores
-				byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSPLOGCURSO, datosLog);
-
-				// Insertamos en tabla For_inscripcion_Masiva el fichero que se ha parseado
-				forInscripcionesmasivas.setIdinstitucion(idInstitucion);
-				forInscripcionesmasivas.setNombrefichero(nombreFichero);
-				forInscripcionesmasivas.setFechamodificacion(new Date());
-				forInscripcionesmasivas.setUsumodificacion(Long.valueOf(usuario.getIdusuario()));
-				forInscripcionesmasivas.setIdcurso(Long.valueOf(idCurso));
-				String numLineas = String.valueOf(inscripcionList.size());
-				forInscripcionesmasivas.setNumerolineastotales(Long.valueOf(numLineas));
-				String lineasCorrectas = String.valueOf(inscripcionList.size() - registrosErroneos);
-				forInscripcionesmasivas.setInscripcionescorrectas(Long.valueOf(lineasCorrectas));
-
-	
-				
-				Long idFile = uploadFile(file.getBytes(), forInscripcionesmasivas, false, usuario);
-				Long idLogFile = uploadFile(bytesLog, forInscripcionesmasivas, true, usuario);
-				
-				forInscripcionesmasivas.setIdfichero(idFile);
-				forInscripcionesmasivas.setIdficherolog(idLogFile);
-				LOGGER.info(
-						"uploadFileExcel() / forInscripcionesmasivasMapper.insert(forInscripcionesmasivas) -> Entrada a forInscripcionesmasivasMapper para insertar el fichero parseado carga masiva de inscripciones");
-
-				int result = forInscripcionesmasivasMapper.insert(forInscripcionesmasivas);
-
-				LOGGER.info(
-						"uploadFileExcel() / forInscripcionesmasivasMapper.insert(forInscripcionesmasivas) -> Salida a forInscripcionesmasivasMapper para insertar el fichero parseado carga masiva de inscripciones");
-
 
 			}
 
@@ -2600,7 +2601,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	
 									} else {
 										error.setDescription(
-												"Las inscripciones no se pueden aprobar porque no estÁn en estado pendiente.");
+												"Las inscripciones no se pueden aprobar porque no están en estado pendiente.");
 	
 									}
 								}
