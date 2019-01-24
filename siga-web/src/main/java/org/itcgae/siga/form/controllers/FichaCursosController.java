@@ -77,7 +77,9 @@ public class FichaCursosController {
 	@RequestMapping(value = "fichaCursos/deleteTrainersCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> deleteTrainersCourse(@RequestBody FormadorCursoDTO formadorCursoDTO, HttpServletRequest request) {
 		UpdateResponseDTO response = fichaCursosService.deleteTrainersCourse(formadorCursoDTO, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		if (response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 	@RequestMapping(value = "fichaCursos/getSessionsCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

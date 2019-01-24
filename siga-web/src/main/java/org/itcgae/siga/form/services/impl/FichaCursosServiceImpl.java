@@ -50,6 +50,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AgeEvento;
 import org.itcgae.siga.db.entities.AgeEventoExample;
+import org.itcgae.siga.db.entities.AgePersonaEvento;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteExample;
 import org.itcgae.siga.db.entities.CenDatoscv;
@@ -314,7 +315,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				AdmUsuarios usuario = usuarios.get(0);
 				LOGGER.info(
 						"getTrainersCourse() / forPersonacursoExtendsMapper.getTrainers(idInstitucion, idCurso) -> Entrada a forPersonacursoExtendsMapper para obtener los formadores de un curso especifico");
-				formadoresCursoItem = forPersonacursoExtendsMapper.getTrainersCourse(idInstitucion.toString(), idCurso,
+				ForCurso curso = forCursoExtendsMapper.selectByPrimaryKey(new Long(idCurso));
+				formadoresCursoItem = forPersonacursoExtendsMapper.getTrainersCourse(curso.getIdinstitucion().toString(), idCurso,
 						usuario.getIdlenguaje());
 				LOGGER.info(
 						"getTrainersCourse() / forPersonacursoExtendsMapper.getTrainers(idInstitucion, idCurso) -> Salida de forPersonacursoExtendsMapper para obtener los formadores de un curso especifico");
@@ -684,6 +686,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
+		updateResponseDTO.setStatus(SigaConstants.OK);
 		int response = 1;
 
 		// Conseguimos información del usuario logeado
@@ -704,40 +707,65 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-
+					Boolean existePersona = Boolean.FALSE;
 					for (FormadorCursoItem formador : formadorCursoDTO.getFormadoresCursoItem()) {
 
-						ForPersonaCursoExample exampleFormador = new ForPersonaCursoExample();
-						exampleFormador.createCriteria().andIdformadorEqualTo(Long.valueOf(formador.getIdFormador()));
-
-						LOGGER.info(
-								"deleteTrainersCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a forPersonacursoExtendsMapper para obtener los formadores de un curso");
-						List<ForPersonaCurso> formadoresList = forPersonacursoExtendsMapper
-								.selectByExample(exampleFormador);
-						LOGGER.info(
-								"deleteTrainersCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida a forPersonacursoExtendsMapper para obtener los formadores de un curso");
-
-						if (null != formadoresList && formadoresList.size() > 0) {
-							ForPersonaCurso formadorDelete = formadoresList.get(0);
-
-							LOGGER.info(
-									"deleteTrainersCourse() / forPersonacursoExtendsMapper.updateByPrimaryKey(notification) -> Entrada a forPersonacursoExtendsMapper para dar de baja a un formador");
-
-							formadorDelete.setFechamodificacion(new Date());
-							formadorDelete.setUsumodificacion(usuario.getIdusuario().longValue());
-							formadorDelete.setFechabaja(new Date());
-							forPersonacursoExtendsMapper.updateByPrimaryKey(formadorDelete);
-
-							LOGGER.info(
-									"deleteTrainersCourse() / forPersonacursoExtendsMapper.updateByPrimaryKey(notification) -> Salida a forPersonacursoExtendsMapper para dar de baja a un formador");
-
+						//Comprobamos que el formador no esté asignado a alguna sesión
+						
+						List<AgePersonaEvento> personaSesion= forPersonacursoExtendsMapper.selectSesionesFormador(formador);
+						if (null != personaSesion && personaSesion.size()>0) {
+							response = 0;
+							error.setCode(400);
+							error.setDescription("Los formadores a eliminar no pueden estar asignados a ninguna sesión");
+							existePersona = Boolean.TRUE;
+							updateResponseDTO.setStatus(SigaConstants.KO);
+							break;
+							
 						}
-					}
+					}	
+						if (!existePersona) {
+						
+							for (FormadorCursoItem formador : formadorCursoDTO.getFormadoresCursoItem()) {
+								ForPersonaCursoExample exampleFormador = new ForPersonaCursoExample();
+								exampleFormador.createCriteria().andIdformadorEqualTo(Long.valueOf(formador.getIdFormador()));
+		
+								
+								LOGGER.info(
+										"deleteTrainersCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a forPersonacursoExtendsMapper para obtener los formadores de un curso");
+								List<ForPersonaCurso> formadoresList = forPersonacursoExtendsMapper
+										.selectByExample(exampleFormador);
+								LOGGER.info(
+										"deleteTrainersCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida a forPersonacursoExtendsMapper para obtener los formadores de un curso");
+		
+								if (null != formadoresList && formadoresList.size() > 0) {
+									ForPersonaCurso formadorDelete = formadoresList.get(0);
+		
+									LOGGER.info(
+											"deleteTrainersCourse() / forPersonacursoExtendsMapper.updateByPrimaryKey(notification) -> Entrada a forPersonacursoExtendsMapper para dar de baja a un formador");
+		
+									formadorDelete.setFechamodificacion(new Date());
+									formadorDelete.setUsumodificacion(usuario.getIdusuario().longValue());
+									formadorDelete.setFechabaja(new Date());
+									forPersonacursoExtendsMapper.updateByPrimaryKey(formadorDelete);
+		
+									LOGGER.info(
+											"deleteTrainersCourse() / forPersonacursoExtendsMapper.updateByPrimaryKey(notification) -> Salida a forPersonacursoExtendsMapper para dar de baja a un formador");
+		
+								}
+							
+							}
+							
+							
+							
+						}	
+			
+					
 
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
 		}
