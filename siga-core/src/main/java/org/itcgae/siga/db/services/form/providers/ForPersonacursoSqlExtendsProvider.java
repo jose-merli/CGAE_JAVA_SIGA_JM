@@ -14,6 +14,7 @@ public class ForPersonacursoSqlExtendsProvider extends ForPersonaCursoSqlProvide
 		sql.FROM("FOR_PERSONA_CURSO cur");
 		sql.INNER_JOIN("CEN_PERSONA per ON (per.idpersona = cur.idpersona)");
 		sql.WHERE("cur.IDCURSO = '" + idCurso + "'");
+		sql.WHERE("cur.FECHABAJA IS NULL");
 		sql.WHERE("cur.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.ORDER_BY("nombre");
 
