@@ -43,6 +43,7 @@ import org.itcgae.siga.cen.services.IFicherosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -51,9 +52,15 @@ import org.itcgae.siga.db.entities.AgeEvento;
 import org.itcgae.siga.db.entities.AgeEventoExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteExample;
+import org.itcgae.siga.db.entities.CenDatoscv;
+import org.itcgae.siga.db.entities.CenDatoscvKey;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenTiposcvsubtipo1;
+import org.itcgae.siga.db.entities.CenTiposcvsubtipo1Example;
+import org.itcgae.siga.db.entities.CenTiposcvsubtipo2;
+import org.itcgae.siga.db.entities.CenTiposcvsubtipo2Example;
 import org.itcgae.siga.db.entities.ForCertificadoscurso;
 import org.itcgae.siga.db.entities.ForCertificadoscursoExample;
 import org.itcgae.siga.db.entities.ForCurso;
@@ -87,6 +94,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeEventoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCalificacionesExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCertificadoscursoExtendsMapper;
@@ -221,6 +229,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Autowired
 	private IFichaInscripcionService fichaInscripcionService;
+	
+	@Autowired
+	private CenDatoscvExtendsMapper cenDatosCvExtendsMapper ;	
+	
+	@Autowired
+	private ForCertificadoscursoExtendsMapper forCertificadosCursoExtendsMapper;
 
 	@Override
 	public void updateEstadoCursoAuto() {
@@ -2941,7 +2955,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							ForInscripcionExample forInscripcionExample = new ForInscripcionExample();
 							forInscripcionExample.createCriteria().andIdcursoEqualTo(cursoItem.getIdCurso())
 									.andIdestadoinscripcionEqualTo(SigaConstants.INSCRIPCION_APROBADA)
-									.andIdinstitucionEqualTo(curso.getIdinstitucion()).andCalificacionIsNotNull();
+									.andIdinstitucionEqualTo(curso.getIdinstitucion()).andIdcalificacionIsNull();
 
 							LOGGER.info(
 									"finishCourse() / forCursoExtendsMapper.selectByExample() -> Entrada a forCursoExtendsMapper para comprobar las calificaciones de los alumnos de un curso");
@@ -2952,10 +2966,14 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							LOGGER.info(
 									"finishCourse() / forCursoExtendsMapper.selectByExample() -> Entrada a forCursoExtendsMapper para comprobar las calificaciones de los alumnos de un curso");
 
-							// Si se ha calificado previamente a todos los alumnos se finaliza el curso y
-							// Se generan los certificados para cada inscripcion
+							
 							if (null != forInscripcionList && forInscripcionList.size() > 0) {
-
+								faltaAlumnos = true;
+								error.setDescription(
+										"No se puede finalizar el curso poque todavía quedan alumnos por calificar");
+							} else {
+								// Si se ha calificado previamente a todos los alumnos se finaliza el curso y
+								// Se generan los certificados para cada inscripcion
 								InscripcionItem inscripcionItem = new InscripcionItem();
 								inscripcionItem.setIdCurso(curso.getIdcurso().toString());
 								inscripcionItem.setIdInstitucion(idInstitucion.toString());
@@ -2976,10 +2994,43 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 								if (null != inscriptionItemList && inscriptionItemList.size() > 0) {
 
 									for (InscripcionItem inscripcion : inscriptionItemList) {
-										InsertResponseDTO responseInsert = fichaInscripcionService
+										List<ForCertificadoscurso> listCertificadosCurso;
+										//Añadimos los certificados si existen para el curso y calificacion
+										ForCertificadoscursoExample certificadosCursoExample = new ForCertificadoscursoExample();
+										certificadosCursoExample.createCriteria().andIdcursoEqualTo(Long.valueOf(inscripcion.getIdCurso())).andIdcalificacionEqualTo(inscripcion.getIdCalificacion());
+										
+										listCertificadosCurso = forCertificadosCursoExtendsMapper.selectByExample(certificadosCursoExample);
+										InsertResponseDTO responseInsert = new InsertResponseDTO();
+										if (null != listCertificadosCurso && listCertificadosCurso.size()>0){
+										 responseInsert = fichaInscripcionService
 												.generarSolicitudCertificados(inscripcion, request);
+										}
+										//añadimos un registro curricular al usuario de la inscripción si la calificación está aprobada
+										if (null != inscripcion.getIdPersona() && (inscripcion.getIdCalificacion() > 1)) {
+											CenDatoscv recordInsert = new CenDatoscv();
+											recordInsert.setFechamodificacion(new Date());
+											recordInsert.setUsumodificacion(usuario.getIdusuario());
+											recordInsert.setIdpersona(inscripcion.getIdPersona());
+											recordInsert.setIdtipocv(Short.parseShort("1")); //Se pone como tipo de dato curricular el titulacion curso
+											recordInsert.setIdinstitucion(Short.parseShort(inscripcion.getIdInstitucion()));
+											recordInsert.setCertificado("1");
+											recordInsert.setFechainicio(curso.getFechaimparticiondesde());
+											recordInsert.setFechafin(curso.getFechaimparticionhasta());
+											recordInsert.setDescripcion(curso.getNombrecurso());
+											recordInsert.setIdinstitucion(idInstitucion);
 
-										if (responseInsert.getError().getCode() == 400) {
+											NewIdDTO idCvBD = cenDatosCvExtendsMapper.getMaxIdCv(String.valueOf(idInstitucion),
+													inscripcion.getIdPersona().toString());
+											if (idCvBD == null) {
+												recordInsert.setIdcv(Short.parseShort("1"));
+											} else {
+												int idCv = Integer.parseInt(idCvBD.getNewId()) + 1;
+												recordInsert.setIdcv(Short.parseShort("" + idCv));
+											}
+											response = cenDatosCvExtendsMapper.insertSelective(recordInsert);
+										}
+										
+										if ((null != listCertificadosCurso && null != responseInsert.getError())&& responseInsert.getError().getCode() == 400) {
 											response = 0;
 											error.setCode(400);
 											error.setDescription(
@@ -2994,6 +3045,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 									}
 								}
 
+								
+								
 								// Generados los certificados finalizamos el curso
 								curso.setIdestadocurso(SigaConstants.FINALIZADO_CURSO);
 								curso.setUsumodificacion(usuario.getIdusuario().longValue());
@@ -3010,11 +3063,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 								numFinishCourse += 1;
 								
 								// Si queda algún alumno por calificar no se puede finalizar el curso
-							} else {
-								faltaAlumnos = true;
-								error.setDescription(
-										"No se puede finalizar el curso poque todavía quedan alumnos por calificar");
-								
+							
 							}
 
 						} else {
