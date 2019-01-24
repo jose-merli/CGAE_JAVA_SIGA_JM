@@ -2,7 +2,7 @@ package org.itcgae.siga.com.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-
+import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +32,24 @@ public class DialogoComunicacionController {
 	}
 	
 	
-//	@RequestMapping(value = "/search",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<EnviosMasivosDTO> cargasMasivasSearch(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody EnviosMasivosSearch filtros) {
-//		
-//		EnviosMasivosDTO response = _comunicacionesService.comunicacionesSearch(request, filtros); 
-//		if(response.getError() == null)
-//			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
-//		else
-//			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-//	}
+	@RequestMapping(value = "/search",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ModelosComunicacionSearch> cargasMasivasSearch(HttpServletRequest request, @RequestBody String[] idClaseComunicacion) {
+		
+		ModelosComunicacionSearch response = _dialogoComunicacionService.obtenerModelos(request, idClaseComunicacion);
+		if(response.getError() == null)
+			return new ResponseEntity<ModelosComunicacionSearch>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ModelosComunicacionSearch>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/search",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> cargasMasivasSearch(HttpServletRequest request, @RequestBody String idPlantilla) {
+		
+		ComboDTO response = _dialogoComunicacionService.obtenertipoEnvioModelo(request, idPlantilla);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }
