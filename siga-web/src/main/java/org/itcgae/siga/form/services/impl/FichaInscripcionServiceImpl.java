@@ -78,9 +78,6 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 	private CenClienteExtendsMapper cenClienteExtendsMapper;
 	
 	@Autowired
-	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
-	
-	@Autowired
 	private PysServiciosExtendsMapper pysServiciosExtendsMapper;
 
 	@Autowired
@@ -150,13 +147,71 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
+					
 					ForCurso curso = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(inscripcionItem.getIdCurso()));
+					
+					// Comprobamos que existe la persona en cen_cliente (idPersona, idInstitucion)
+					CenCliente cenClienteSearch = new CenCliente();
+					cenClienteSearch.setIdpersona(inscripcionItem.getIdPersona());
+					cenClienteSearch.setIdinstitucion(curso.getIdinstitucion());
+					CenCliente cenCliente = cenClienteExtendsMapper.selectByPrimaryKey(cenClienteSearch);
+	
+					if(cenCliente == null) {
+						
+						CenCliente cenClienteInsert = new CenCliente();
+						cenClienteInsert.setIdpersona(inscripcionItem.getIdPersona());
+						cenClienteInsert.setIdinstitucion(curso.getIdinstitucion());
+						cenClienteInsert.setFechaalta(new Date());
+						cenClienteInsert.setCaracter("P");
+						cenClienteInsert.setPublicidad(SigaConstants.DB_FALSE);
+						cenClienteInsert.setGuiajudicial(SigaConstants.DB_FALSE);
+						// Para crear un cliente debemos rellenar comisiones, con que dato?
+						cenClienteInsert.setComisiones("0");
+						cenClienteInsert.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
+						cenClienteInsert.setFechamodificacion(new Date());
+						cenClienteInsert.setUsumodificacion(usuario.getIdusuario());
+						cenClienteInsert.setIdlenguaje(usuario.getIdlenguaje());
+						cenClienteInsert.setExportarfoto(SigaConstants.DB_FALSE);
+
+						LOGGER.info(
+								"saveInscripcion() / cenClienteMapper.insert() -> Entrada a cenClienteMapper para crear un nuevo colegiado");
+						
+						response = cenClienteExtendsMapper.insert(cenClienteInsert);
+						LOGGER.info(
+								"saveInscripcion() / cenClienteMapper.insert() -> Salida a cenClienteMapper para crear un nuevo colegiado");
+						
+						if(response == 1) {
+							CenNocolegiado noColegiadoRecord = new CenNocolegiado();
+
+							noColegiadoRecord.setTipo("0");
+							noColegiadoRecord.setIdpersona(inscripcionItem.getIdPersona());
+							noColegiadoRecord.setIdinstitucion(curso.getIdinstitucion());
+							noColegiadoRecord.setFechamodificacion(new Date());
+							noColegiadoRecord.setUsumodificacion(usuario.getIdusuario());
+							// Para crear un nocoleagiado debemos rellenar campo sociedadsj
+							noColegiadoRecord.setSociedadsj("0");
+
+							LOGGER.info(
+									"saveInscripcion() / cenNocolegiadoExtendsMapper.insert() -> Entrada a cenNocolegiadoExtendsMapper para insertar un no-colegiado");
+							response = cenNocolegiadoExtendsMapper.insert(noColegiadoRecord);
+							LOGGER.info(
+									"saveInscripcion() / cenNocolegiadoExtendsMapper.insert() -> Salida a cenNocolegiadoExtendsMapper para insertar un no-colegiado");
+							
+						} else {
+							error.setCode(400);
+							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+							insertResponseDTO.setStatus(SigaConstants.KO);
+						}
+					
+					}
+					
 					// Insertamos inscripcion en la tabla FOR_INSCRIPCION
 					forInscripcionInsert.setIdinstitucion(curso.getIdinstitucion());
 					forInscripcionInsert.setUsumodificacion(usuario.getIdusuario().longValue());
 					forInscripcionInsert.setFechamodificacion(new Date());
 					forInscripcionInsert.setFechasolicitud(inscripcionItem.getFechaSolicitudDate());
 					forInscripcionInsert.setIdcurso(Long.parseLong(inscripcionItem.getIdCurso()));
+					forInscripcionInsert.setIdpersona(inscripcionItem.getIdPersona());
 					forInscripcionInsert.setIdestadoinscripcion(Long.parseLong(inscripcionItem.getIdEstadoInscripcion()));	
 					
 					LOGGER.info(
@@ -177,9 +232,11 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 							
 						}
 					}
+				
 				} catch (Exception e) {
 					response = 0;
 				}
+				
 				if (response == 0) {
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
