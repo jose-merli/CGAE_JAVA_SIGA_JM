@@ -89,8 +89,9 @@ public interface ForCursoExtendsMapper extends ForCursoMapper {
 			@Result(column = "INFORMACIONADICIONAL", property = "adicional", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DOCUMENTACIONADJUNTA", property = "adjunto", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAFINIMPARTICION", property = "fechaImparticionHasta", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHAINICIOIMPARTICION", property = "fechaImparticionDesde", jdbcType = JdbcType.VARCHAR)
-	
+			@Result(column = "FECHAINICIOIMPARTICION", property = "fechaImparticionDesde", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
+
 	})
 	CursoItem searchCourseByIdcurso(String idCurso, Short idInstitucion, String idLenguaje);
 	

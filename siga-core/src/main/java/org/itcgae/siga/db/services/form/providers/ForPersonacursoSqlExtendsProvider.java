@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.form.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.form.FormadorCursoItem;
 import org.itcgae.siga.db.mappers.ForPersonaCursoSqlProvider;
 
 public class ForPersonacursoSqlExtendsProvider extends ForPersonaCursoSqlProvider {
@@ -14,6 +15,7 @@ public class ForPersonacursoSqlExtendsProvider extends ForPersonaCursoSqlProvide
 		sql.FROM("FOR_PERSONA_CURSO cur");
 		sql.INNER_JOIN("CEN_PERSONA per ON (per.idpersona = cur.idpersona)");
 		sql.WHERE("cur.IDCURSO = '" + idCurso + "'");
+		sql.WHERE("cur.FECHABAJA IS NULL");
 		sql.WHERE("cur.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.ORDER_BY("nombre");
 
@@ -51,6 +53,7 @@ public class ForPersonacursoSqlExtendsProvider extends ForPersonaCursoSqlProvide
 		sql.SELECT("cur.idrol as idrol");
 		sql.SELECT("rec2.descripcion as rol");
 		sql.SELECT("cur.tutor");
+		sql.SELECT("cur.idinstitucion");
 		sql.SELECT("cur.fechabaja");
 		sql.FROM("FOR_PERSONA_CURSO cur");
 		sql.INNER_JOIN("CEN_PERSONA per ON (per.idpersona = cur.idpersona)");
@@ -65,5 +68,20 @@ public class ForPersonacursoSqlExtendsProvider extends ForPersonaCursoSqlProvide
 
 		return sql.toString();
 	}
+	
+	public String selectSesionesFormador(FormadorCursoItem formador) {
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("PERSONA.*");
+		sql.FROM("FOR_CURSO  CURSO");
+		sql.INNER_JOIN(" FOR_EVENTO_CURSO EVENTO ON CURSO.IDCURSO = EVENTO.IDCURSO") ; 
+		sql.INNER_JOIN(" AGE_PERSONA_EVENTO PERSONA ON EVENTO.IDEVENTO = PERSONA.IDEVENTO");
+		sql.WHERE("CURSO.IDCURSO = '" + formador.getIdCurso() + "'");
+		sql.WHERE("CURSO.IDINSTITUCION = '" + formador.getIdInstitucion() + "'");
+		sql.WHERE("PERSONA.IDPERSONA = '" + formador.getIdPersona() + "'");
+		sql.WHERE("PERSONA.FECHABAJA IS NULL");
+		return sql.toString();
+	}
+	
 
 }
