@@ -13,6 +13,7 @@ public class EventoItem {
 	private String titulo;
 	private Date fechaInicio;
 	private Date fechaFin;
+	private Date realEnd;
 	private boolean allDay = false;
 	private String color;
 	private Long tipoAcceso;
@@ -610,6 +611,14 @@ public class EventoItem {
 			return "null";
 		}
 		return o.toString().replace("\n", "\n    ");
+	}
+
+	public Date getRealEnd() {
+		return realEnd;
+	}
+
+	public void setRealEnd(Date realEnd) {
+		this.realEnd = realEnd;
 	}
 	
 }
