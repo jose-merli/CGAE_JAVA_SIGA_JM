@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
@@ -68,6 +69,41 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		LOGGER.info("claseComunicacion() -> Salida del servicio para obtener combo clases comunicacion");
 		
 		return comboDTO;
+	}
+
+
+
+	@Override
+	public ModelosComunicacionSearch obtenerModelos(HttpServletRequest request, String[] idClaseComunicacion) {
+		
+		LOGGER.info("obtenerModelos() -> Entrada al servicio para obtener los modelos de comunicacion");
+		
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ModelosComunicacionSearch modelos = new ModelosComunicacionSearch();
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (usuarios != null && usuarios.size() > 0) {
+
+				
+				
+			}
+		}
+		
+		LOGGER.info("obtenerModelos() -> Salida del servicio para obtener los modelos de comunicacion");
+		
+		return null;
 	}
 	
 }

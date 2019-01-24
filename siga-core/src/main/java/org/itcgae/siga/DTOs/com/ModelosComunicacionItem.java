@@ -1,8 +1,7 @@
 package org.itcgae.siga.DTOs.com;
 
-import java.util.ArrayList;
+
 import java.util.Date;
-import java.util.List;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 

@@ -13,4 +13,6 @@ public class ModClasecomunicacionRutaExtendsSqlProvider {
 	   sql.WHERE("RUTACLASE.RUTA ='" + rutaClaseComunicacion + "'");
 	   return sql.toString();
    }
+   
+
 }

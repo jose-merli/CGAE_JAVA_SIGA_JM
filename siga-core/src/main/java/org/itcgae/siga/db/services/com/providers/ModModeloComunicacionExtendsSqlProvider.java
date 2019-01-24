@@ -66,16 +66,25 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		return sql.toString();
 	}
 	
+		
+	public String selectModelosComunicacionDialogo(String[] idClaseComunicacion){
+	   
+	   SQL sql = new SQL();
+	   
+	   sql.SELECT("MODELO.IDCLASECOMUNICACION, MODELO.IDMODELOCOMUNICACION, MODELO.NOMBRE");
+	   sql.FROM("MOD_MODELOCOMUNICACION MODELO");
+	   sql.WHERE("MODELO.IDCLASECOMUNICACION IN ("+idClaseComunicacion.toString()+")");
+	   
+	   return sql.toString();
+	}
 	
-	public String selectModelosComunicacionDialogo(String idClaseComunicacion){
+	public String selectPlantillaModelo(String idModeloComunicacion){
+		
 		SQL sql = new SQL();
-		
-		sql.SELECT("MODELO.IDMODELOCOMUNICACION, MODELO.NOMBRE");
-		sql.FROM("MOD_MODELOCOMUNICACION MODELO");
-		sql.JOIN("MOD_MODELO_PLANTILLAENVIO PLANTILLA ON PLANTILLA.IDMODELOCOMUNICACION = MODELO.IDMODELOCOMUNICACION");
-		sql.WHERE("MODELO.IDCLASECOMUNICACION = '" + idClaseComunicacion + "'");
-		
-		
+		sql.SELECT("");
+		sql.FROM("");
+		sql.WHERE("");
+		   
 		return sql.toString();
 	}
 
