@@ -1156,7 +1156,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 							if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION) {
 								curso.setFechainscripciondesde(eventoItem.getFechaInicio());
 							} else if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
-								curso.setFechainscripcionhasta(eventoItem.getFechaInicio());
+								curso.setFechainscripcionhasta(eventoItem.getFechaFin());
 							}
 
 							response = forCursoExtendsMapper.updateByPrimaryKey(curso);
