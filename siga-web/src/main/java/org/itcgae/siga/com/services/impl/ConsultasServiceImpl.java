@@ -646,16 +646,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 				
 				try{
 					Map<String,String> mapa = new HashMap<String,String>();
-					mapa.put("selectValue", obtenerSelect(consulta));
-					mapa.put("fromValue", obtenerFrom(consulta));
-					mapa.put("innerJoinValue", obtenerInnerJoin(consulta));
-					mapa.put("joinValue", obtenerJoin(consulta));
-					mapa.put("leftJoinValue", obtenerLeftJoin(consulta));
-					mapa.put("outerJoinValue", obtenerOuterJoin(consulta));
-					mapa.put("whereValue", obtenerWhere(consulta));
-					mapa.put("orderByValue", obtenerOrderBy(consulta));
-					mapa.put("groupByValue", obtenerGroupBy(consulta));
-					mapa.put("havingValue", obtenerHaving(consulta));
+					mapa = obtenerMapaConsulta(consulta);
 					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
 					if(result != null){
 						Workbook workBook = crearExcel(result);
@@ -983,6 +974,23 @@ public class ConsultasServiceImpl implements IConsultasService{
         
         return workbook;
 
+	}
+	
+	@Override
+	public Map<String,String> obtenerMapaConsulta(String consulta){
+		Map<String,String> mapa = new HashMap<String,String>();
+		
+		mapa.put("selectValue", obtenerSelect(consulta));
+		mapa.put("fromValue", obtenerFrom(consulta));
+		mapa.put("innerJoinValue", obtenerInnerJoin(consulta));
+		mapa.put("joinValue", obtenerJoin(consulta));
+		mapa.put("leftJoinValue", obtenerLeftJoin(consulta));
+		mapa.put("outerJoinValue", obtenerOuterJoin(consulta));
+		mapa.put("whereValue", obtenerWhere(consulta));
+		mapa.put("orderByValue", obtenerOrderBy(consulta));
+		mapa.put("groupByValue", obtenerGroupBy(consulta));
+		mapa.put("havingValue", obtenerHaving(consulta));
+		return mapa;
 	}
 	
 }

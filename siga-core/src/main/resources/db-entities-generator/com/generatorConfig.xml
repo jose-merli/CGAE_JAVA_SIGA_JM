@@ -53,7 +53,15 @@
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table> -->
 
-	 		<table schema="USCGAE" tableName="MOD_CLASECOMUNICACION_RUTA" > 
+<!-- 	 		<table schema="USCGAE" tableName="MOD_CLASECOMUNICACION_RUTA" >  -->
+<!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
+<!-- 	 		</table> -->
+
+			<table schema="USCGAE" tableName="MOD_KEYCLASECOMUNICACION" > 
+	 			<property name="ignoreQualifiersAtRuntime" value="true"/> 
+	 		</table>
+	 		
+			<table schema="USCGAE" tableName="MOD_CAMPOSKEY" > 
 	 			<property name="ignoreQualifiersAtRuntime" value="true"/> 
 	 		</table>
 

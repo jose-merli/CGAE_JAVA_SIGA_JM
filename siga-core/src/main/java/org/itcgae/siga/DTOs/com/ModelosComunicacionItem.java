@@ -18,6 +18,8 @@ public class ModelosComunicacionItem {
 	private String visible;
 	private String institucion;
 	private String claseComunicacion;
+	private String idPlantillaEnvio;
+	private String idTipoEnvio;
 	private ComboDTO plantillas;
 	
 	public String getIdModeloComunicacion() {
@@ -92,6 +94,18 @@ public class ModelosComunicacionItem {
 	}
 	public void setClaseComunicacion(String claseComunicacion) {
 		this.claseComunicacion = claseComunicacion;
+	}
+	public String getIdPlantillaEnvio() {
+		return idPlantillaEnvio;
+	}
+	public void setIdPlantillaEnvio(String idPlantillaEnvio) {
+		this.idPlantillaEnvio = idPlantillaEnvio;
+	}
+	public String getIdTipoEnvio() {
+		return idTipoEnvio;
+	}
+	public void setIdTipoEnvio(String idTipoEnvio) {
+		this.idTipoEnvio = idTipoEnvio;
 	}
 	
 	

@@ -42,4 +42,19 @@ public class ModModeloPlantillaDocumentoExtendsSqlProvider {
 		return sql.toString();
 	}
 	
+	public String selectInformesGenerar(Long idModeloComunicacion){
+		SQL sql = new SQL();		
+		
+		sql.SELECT("modPlantilla.IDINFORME");
+		sql.SELECT("LISTAGG(modPlantilla.Idplantilladocumento, ',') WITHIN GROUP (ORDER BY modPlantilla.Idplantilladocumento) Idplantilladocumento");
+		
+		
+		sql.FROM("mod_modelo_plantilladocumento modPlantilla");	
+		
+		sql.WHERE("modPlantilla.IDMODELOCOMUNICACION = " + idModeloComunicacion);
+		sql.GROUP_BY("modPlantilla.IDINFORME");
+		
+		return sql.toString();
+	}
+	
 }

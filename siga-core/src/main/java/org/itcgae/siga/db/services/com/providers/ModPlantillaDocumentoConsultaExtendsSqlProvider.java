@@ -48,15 +48,17 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		return sql.toString();
 	}
 	
-	public String selectConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion, Long idPlantillaDocumento, Short idObjetivo){
+	public String selectConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion, String idPlantillaDocumento, Short idObjetivo){
 		
 		SQL sql = new SQL();		
 		
 		sql.SELECT("con_consulta.DESCRIPCION");
+		sql.SELECT("con_consulta.IDCONSULTA");
+		sql.SELECT("con_consulta.SENTENCIA");
 		
 		sql.FROM("MOD_PLANTILLADOC_CONSULTA plantillaConsulta");	
 		sql.INNER_JOIN("con_consulta ON con_consulta.idconsulta=plantillaConsulta.Idconsulta AND con_consulta.idinstitucion = plantillaConsulta.Idinstitucion");
-		sql.WHERE("plantillaConsulta.IDPLANTILLADOCUMENTO = " + idPlantillaDocumento +" AND plantillaConsulta.IDMODELOCOMUNICACION = " + idModeloComunicacion + " AND plantillaConsulta.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("plantillaConsulta.IDPLANTILLADOCUMENTO IN (" + idPlantillaDocumento +") AND plantillaConsulta.IDMODELOCOMUNICACION = " + idModeloComunicacion + " AND plantillaConsulta.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("con_consulta.idobjetivo = " + idObjetivo);
 		sql.WHERE("plantillaConsulta.FECHABAJA IS NULL");
 		

@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
@@ -429,11 +430,26 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 							informeItem.setSufijos(sufijos);
 							
 							//Recuepramos nombre consultas
-							String destinatarios = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion), Long.parseLong(idPlantillaDocumento), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
-						
-							String multi = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion), Long.parseLong(idPlantillaDocumento), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
+							List<ConsultaItem> consultasItem = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion), idPlantillaDocumento, SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
 							
-							String condicional = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion), Long.parseLong(idPlantillaDocumento), SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
+							String destinatarios = "";
+							if(consultasItem != null && consultasItem.size() > 0 && consultasItem.get(0) != null){
+								destinatarios = consultasItem.get(0).getDescripcion();								
+							}
+							
+							consultasItem = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion), idPlantillaDocumento, SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
+							
+							String multi = "";
+							if(consultasItem != null && consultasItem.size() > 0 && consultasItem.get(0) != null){
+								multi = consultasItem.get(0).getDescripcion();								
+							}
+							
+							consultasItem = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion), idPlantillaDocumento, SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
+							
+							String condicional = "";
+							if(consultasItem != null && consultasItem.size() > 0 && consultasItem.get(0) != null){
+								condicional = consultasItem.get(0).getDescripcion();								
+							}
 							
 							int numDatos = modPlantillaDocumentoConsultaExtendsMapper.selectCountConsultaPorObjetivo(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion), Long.parseLong(idPlantillaDocumento), SigaConstants.OBJETIVO.DATOS.getCodigo());
 														

@@ -31,8 +31,12 @@ public interface ModPlantillaDocumentoConsultaExtendsMapper {
 	})
 	List<ConsultaItem> selectConsultasByInforme(Short idInstitucion, Long idModeloComunicacion, Long idInforme, String idLenguaje, boolean historico);
 
+	@Results({@Result(column = "IDCONSULTA", property = "idConsulta", jdbcType = JdbcType.VARCHAR),
+			  @Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+			  @Result(column = "SENTENCIA", property = "sentencia", jdbcType = JdbcType.VARCHAR)
+	})	
 	@SelectProvider(type = ModPlantillaDocumentoConsultaExtendsSqlProvider.class, method = "selectConsultaPorObjetivo")
-	String selectConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion, Long idPlantillaDocumento, Short idObjetivo);
+	List<ConsultaItem> selectConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion, String idPlantillaDocumento, Short idObjetivo);
 
 	@SelectProvider(type = ModPlantillaDocumentoConsultaExtendsSqlProvider.class, method = "selectCountConsultaPorObjetivo")
 	int selectCountConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion, Long idPlantillaDocumento, Short idObjetivo);

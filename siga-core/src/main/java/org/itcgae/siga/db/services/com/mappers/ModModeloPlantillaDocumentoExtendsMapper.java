@@ -29,4 +29,11 @@ public interface ModModeloPlantillaDocumentoExtendsMapper {
 	@SelectProvider(type = ModModeloPlantillaDocumentoExtendsSqlProvider.class, method = "selectMaxInforme")
 	Long selectMaxInforme(Short idInstitucion, Long idModeloComunicacion);
 	
+	@SelectProvider(type = ModModeloPlantillaDocumentoExtendsSqlProvider.class, method = "selectInformesGenerar")
+	@Results({
+		@Result(column = "IDINFORME", property = "idInforme", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPLANTILLAS", property = "idPlantillas", jdbcType = JdbcType.VARCHAR)
+	})
+	List<PlantillaModeloDocumentoDTO> selectInformesGenerar(Long idModeloComunicacion);
+	
 }

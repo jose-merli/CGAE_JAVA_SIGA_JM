@@ -2,6 +2,7 @@ package org.itcgae.siga.com.services;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,4 +40,6 @@ public interface IConsultasService {
 	public Error guardarConsulta(HttpServletRequest request, ConsultaItem consulta);
 
 	public File ejecutarConsulta(HttpServletRequest request, String consulta);
+
+	public Map<String, String> obtenerMapaConsulta(String consulta);
 }

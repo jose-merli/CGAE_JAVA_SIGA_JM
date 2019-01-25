@@ -2,6 +2,7 @@ package org.itcgae.siga.com.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
@@ -46,6 +47,16 @@ public class DialogoComunicacionController {
 	ResponseEntity<ComboDTO> obtenertiposEnvioModelo(HttpServletRequest request, @RequestBody String idPlantilla) {
 		
 		ComboDTO response = _dialogoComunicacionService.obtenertipoEnvioPlantilla(request, idPlantilla);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/descargar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> descargar(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo) {
+		
+		ComboDTO response = _dialogoComunicacionService.descargarComunicacion(request, dialogo);
 		if(response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
