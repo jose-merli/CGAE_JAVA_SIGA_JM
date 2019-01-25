@@ -7,7 +7,7 @@ import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 
 public class ModModeloComunicacionExtendsSqlProvider {
 	
-	public String selectModulosComunicacion(DatosModelosComunicacionesSearch filtros, boolean historico){
+	public String selectModelosComunicacion(DatosModelosComunicacionesSearch filtros, boolean historico){
 		
 		SQL sql = new SQL();
 		
@@ -63,6 +63,41 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		
 		sql.ORDER_BY("IDMODELOCOMUNICACION ASC");
 		
+		return sql.toString();
+	}
+	
+		
+	public String selectModelosComunicacionDialogo(String[] idClaseComunicacion){
+	   
+	   SQL sql = new SQL();
+	   
+	   sql.SELECT("MODELO.IDCLASECOMUNICACION, MODELO.IDMODELOCOMUNICACION, MODELO.NOMBRE");
+	   sql.FROM("MOD_MODELOCOMUNICACION MODELO");
+	   sql.WHERE("MODELO.IDCLASECOMUNICACION IN ("+idClaseComunicacion.toString()+")");
+	   
+	   return sql.toString();
+	}
+	
+	public String selectPlantillaModelo(String idModeloComunicacion){
+		
+		SQL sql = new SQL();
+		sql.SELECT("MPLANTILLA.IDPLANTILLAENVIOS AS VALUE, PLANTILLA.NOMBRE AS LABEL");
+		sql.FROM("MOD_MODELO_PLANTILLAENVIO MPLANTILLA");
+		sql.JOIN("ENV_PLANTILLASENVIOS PLANTILLA ON PLANTILLA.IDPLANTILLAENVIOS = MPLANTILLA.IDPLANTILLAENVIOS AND MPLANTILLA.IDINSTITUCION = PLANTILLA.IDINSTITUCION");
+		sql.WHERE("MPLANTILLA.IDMODELOCOMUNICACION = '"+ idModeloComunicacion +"'");
+		   
+		return sql.toString();
+	}
+	
+	
+	public String selectTipoEnvioPlantilla(String idLenguaje, String idPlantilla){
+		
+		SQL sql = new SQL();
+		sql.SELECT("TIPO.IDTIPOENVIOS AS VALUE, CAT.DESCRIPCION");
+		sql.FROM("ENV_TIPOENVIOS TIPO");
+		sql.JOIN("GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = TIPO.NOMBRE AND CAT.IDLENGUAJE = '" + idLenguaje + "'");
+		sql.WHERE("TIPO.IDTIPOENVIOS = '" + idPlantilla + "'");
+		   
 		return sql.toString();
 	}
 
