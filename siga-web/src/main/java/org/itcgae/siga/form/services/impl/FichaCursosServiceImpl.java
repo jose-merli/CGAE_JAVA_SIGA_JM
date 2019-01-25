@@ -3322,7 +3322,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					// Comprobamos que el certificado introducido no esta registrado en bbdd
 					ForCertificadoscursoExample forCertificadoscursoExample = new ForCertificadoscursoExample();
 					forCertificadoscursoExample.createCriteria().andFechabajaIsNull().andIdcursoEqualTo(Long.valueOf(certificadoCursoItem.getIdCurso()))
-							.andIdproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdProducto()))
+							.andIdproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdProducto())).andIdtipoproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdTipoProducto())).
+							andIdproductoinstitucionEqualTo(Long.valueOf(certificadoCursoItem.getIdProductoInstitucion()))
 							.andIdcalificacionEqualTo(Long.valueOf(certificadoCursoItem.getIdCalificacion()));
 
 					List<ForCertificadoscurso> certificateList = forCertificadoscursoExtendsMapper
@@ -3405,9 +3406,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 						// Comprobamos que el certificado introducido no esta registrado en bbdd
 						ForCertificadoscursoExample forCertificadoscursoExample = new ForCertificadoscursoExample();
-						forCertificadoscursoExample.createCriteria().andFechabajaIsNull().andIdcertificadocursoEqualTo(
-								Long.valueOf(certificadoCursoItem.getIdCertificadoCurso()));
-
+						forCertificadoscursoExample.createCriteria().andFechabajaIsNull().andIdcertificadocursoEqualTo(Long.valueOf(certificadoCursoItem.getIdCertificadoCurso()));
+						
 						List<ForCertificadoscurso> certificateList = forCertificadoscursoExtendsMapper
 								.selectByExample(forCertificadoscursoExample);
 
@@ -3485,9 +3485,10 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 						// Comprobamos que el certificado introducido no esta registrado en bbdd
 						ForCertificadoscursoExample forCertificadoscursoExample = new ForCertificadoscursoExample();
-						forCertificadoscursoExample.createCriteria().andFechabajaIsNull().andIdcertificadocursoEqualTo(
-								Long.valueOf(certificadoCursoItem.getIdCertificadoCurso()));
-
+						forCertificadoscursoExample.createCriteria().andFechabajaIsNull().andIdcursoEqualTo(Long.valueOf(certificadoCursoItem.getIdCurso()))
+						.andIdproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdProducto())).andIdtipoproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdTipoProducto())).
+						andIdproductoinstitucionEqualTo(Long.valueOf(certificadoCursoItem.getIdProductoInstitucion()))
+						.andIdcalificacionEqualTo(Long.valueOf(certificadoCursoItem.getIdCalificacion()));
 						List<ForCertificadoscurso> certificateList = forCertificadoscursoExtendsMapper
 								.selectByExample(forCertificadoscursoExample);
 

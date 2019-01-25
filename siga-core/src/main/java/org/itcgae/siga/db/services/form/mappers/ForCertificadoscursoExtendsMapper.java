@@ -25,7 +25,9 @@ public interface ForCertificadoscursoExtendsMapper extends ForCertificadoscursoM
 			@Result(column = "IDCALIFICACION", property = "idCalificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PRECIO", property = "precio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CALIFICACION", property = "calificacion", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "NOMBRECERTIFICADO", property = "nombreCertificado", jdbcType = JdbcType.VARCHAR) })
+			@Result(column = "NOMBRECERTIFICADO", property = "nombreCertificado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CLAVE", property = "clave", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR) })
 	List<CertificadoCursoItem> getCertificatesCourse(String idCurso, String idInstitucion, String idLenguaje);
 
 }

@@ -18,6 +18,8 @@ public class ForCertificadoscursoSqlExtendsProvider extends ForCertificadoscurso
 		sql.SELECT("cer.PRECIO");
 		sql.SELECT("cat.DESCRIPCION as CALIFICACION");
 		sql.SELECT("pys.DESCRIPCION AS NOMBRECERTIFICADO");
+		sql.SELECT("CONCAT( CONCAT(pys.idTipoProducto, pys.idProducto), pys.idProductoInstitucion) as value");
+		sql.SELECT("CONCAT( CONCAT(pys.idTipoProducto, pys.idProducto), pys.idProductoInstitucion) as clave");
 
 		sql.FROM("FOR_CERTIFICADOSCURSO cer");
 		sql.INNER_JOIN("FOR_CALIFICACIONES CAL ON CAL.IDCALIFICACION = cer.IDCALIFICACION");
