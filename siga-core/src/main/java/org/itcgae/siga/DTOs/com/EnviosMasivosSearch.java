@@ -6,27 +6,29 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class EnviosMasivosSearch {
 	
-	private String asunto;
+	private String descripcion;
 	private Date fechaCreacion;
 	private Date fechaProgramacion;
-	private String idTipoEnvio;
+	private String idTipoEnvios;
 	private String idEstado;
 	private String idClaseComunicacion;
 	
-	@JsonProperty("asunto")
-	public String getAsunto() {
-		return asunto;
-	}
-	public void setAsunto(String asunto) {
-		this.asunto = asunto;
-	}
+	
+
 	@JsonProperty("fechaCreacion")
 	public Date getFechaCreacion() {
 		return fechaCreacion;
 	}
-	@JsonProperty("fechaCreacion")
 	public void setFechaCreacion(Date fechaCreacion) {
 		this.fechaCreacion = fechaCreacion;
+	}
+	
+	@JsonProperty("descripcion")
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
 	}
 	public Date getFechaProgramacion() {
 		return fechaProgramacion;
@@ -35,12 +37,12 @@ public class EnviosMasivosSearch {
 	public void setFechaProgramacion(Date fechaProgramacion) {
 		this.fechaProgramacion = fechaProgramacion;
 	}
-	@JsonProperty("idTipoEnvio")
-	public String getidTipoEnvio() {
-		return idTipoEnvio;
+	@JsonProperty("idTipoEnvios")
+	public String getidTipoEnvios() {
+		return idTipoEnvios;
 	}
-	public void setidTipoEnvio(String idTipoEnvio) {
-		this.idTipoEnvio = idTipoEnvio;
+	public void setidTipoEnvios(String idTipoEnvios) {
+		this.idTipoEnvios = idTipoEnvios;
 	}
 	@JsonProperty("idEstado")
 	public String getidEstado() {
