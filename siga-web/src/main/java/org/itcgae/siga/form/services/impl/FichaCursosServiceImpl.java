@@ -43,7 +43,6 @@ import org.itcgae.siga.cen.services.IFicherosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -54,14 +53,9 @@ import org.itcgae.siga.db.entities.AgePersonaEvento;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteExample;
 import org.itcgae.siga.db.entities.CenDatoscv;
-import org.itcgae.siga.db.entities.CenDatoscvKey;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenTiposcvsubtipo1;
-import org.itcgae.siga.db.entities.CenTiposcvsubtipo1Example;
-import org.itcgae.siga.db.entities.CenTiposcvsubtipo2;
-import org.itcgae.siga.db.entities.CenTiposcvsubtipo2Example;
 import org.itcgae.siga.db.entities.ForCertificadoscurso;
 import org.itcgae.siga.db.entities.ForCertificadoscursoExample;
 import org.itcgae.siga.db.entities.ForCurso;
@@ -1483,7 +1477,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			LOGGER.info(
 					"getSessionsCourse() / ageEventoExtendsMapper.searchEvent() -> Entrada a ageEventoExtendsMapper para obtener un evento especifico");
 			eventoList = ageEventoExtendsMapper.getSessionsCourse(cursoItem.getIdTipoEvento().toString(),
-					cursoItem.getIdCurso().toString(), idInstitucion.toString());
+					cursoItem.getIdCurso().toString(), cursoItem.getIdInstitucion());
 			LOGGER.info(
 					"getSessionsCourse() / ageEventoExtendsMapper.searchEvent() -> Salida de ageEventoExtendsMapper para obtener un evento especifico");
 
@@ -2216,11 +2210,11 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		if (null != idInstitucion) {
 
 			try {
-
+				ForCurso curso = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(idCurso));
 				LOGGER.info(
 						"getMassiveLoadInscriptions() / forInscripcionExtendsMapper.getCountIncriptions -> Entrada a forInscripcionExtendsMapper para obtener los nombres de las plantillas de inscripciones masivas a un curso");
 				cargaMasivaInscripciones = forInscripcionesmasivasExtendsMapper.getMassiveLoadInscriptions(idCurso,
-						idInstitucion.toString());
+						String.valueOf(curso.getIdinstitucion()));
 				LOGGER.info(
 						"getMassiveLoadInscriptions() / forInscripcionExtendsMapper.getCountIncriptions -> Salida de forInscripcionExtendsMapper para obtener los nombres de las plantillas de inscripciones masivas a un curso");
 
@@ -2503,12 +2497,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	
 										PysPeticioncomprasuscripcion pysPeticioncomprasuscripcion = new PysPeticioncomprasuscripcion();
 										pysPeticioncomprasuscripcion.setFechamodificacion(new Date());
-										pysPeticioncomprasuscripcion.setIdinstitucion(idInstitucion);
+										pysPeticioncomprasuscripcion.setIdinstitucion(inscription.getIdinstitucion());
 										pysPeticioncomprasuscripcion.setUsumodificacion(usuario.getIdusuario());
 										pysPeticioncomprasuscripcion.setTipopeticion("A");
 										pysPeticioncomprasuscripcion.setIdestadopeticion(Short.valueOf("20"));
 										NewIdDTO idPeticion = pysPeticioncomprasuscripcionExtendsMapper
-												.selectMaxIdPeticion(idInstitucion);
+												.selectMaxIdPeticion(inscription.getIdinstitucion());
 										pysPeticioncomprasuscripcion.setIdpeticion(Long.valueOf(idPeticion.getNewId()));
 										pysPeticioncomprasuscripcion.setIdpersona(inscription.getIdpersona());
 										pysPeticioncomprasuscripcion.setFecha(new Date());
@@ -2524,14 +2518,14 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 												"autovalidateInscriptionsCourse() / pysPeticioncomprasuscripcionExtendsMapper.insert() -> Salida a pysPeticioncomprasuscripcionExtendsMapper para insertar un precio servicio");
 	
 										NewIdDTO idservicio = pysServiciosExtendsMapper
-												.selectIdServicioByIdCurso(idInstitucion, inscription.getIdcurso());
+												.selectIdServicioByIdCurso(inscription.getIdinstitucion(), inscription.getIdcurso());
 										NewIdDTO idserviciosinstitucion = pysServiciosinstitucionExtendsMapper
 												.selectIdServicioinstitucionByIdServicio(idInstitucion,
 														Long.valueOf(idservicio.getNewId()));
 	
 										PysServiciossolicitados pysServiciossolicitados = new PysServiciossolicitados();
 										pysServiciossolicitados.setFechamodificacion(new Date());
-										pysServiciossolicitados.setIdinstitucion(idInstitucion);
+										pysServiciossolicitados.setIdinstitucion(inscription.getIdinstitucion());
 										pysServiciossolicitados.setUsumodificacion(usuario.getIdusuario());
 										pysServiciossolicitados.setAceptado("A");
 										pysServiciossolicitados
@@ -2555,7 +2549,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	
 										PysSuscripcion pysSuscripcion = new PysSuscripcion();
 										pysSuscripcion.setFechamodificacion(new Date());
-										pysSuscripcion.setIdinstitucion(idInstitucion);
+										pysSuscripcion.setIdinstitucion(inscription.getIdinstitucion());
 										pysSuscripcion.setUsumodificacion(usuario.getIdusuario());
 										pysSuscripcion.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
 										pysSuscripcion.setIdservicio(Long.valueOf(idservicio.getNewId()));
@@ -2569,12 +2563,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 										pysSuscripcion.setFechasuscripcion(new Date());
 	
 										CursoItem curso = forCursoExtendsMapper.searchCourseByIdcurso(
-												inscription.getIdcurso().toString(), idInstitucion,
+												inscription.getIdcurso().toString(), inscription.getIdinstitucion(),
 												usuario.getIdlenguaje());
 	
 										pysSuscripcion.setDescripcion(curso.getNombreCurso());
 										NewIdDTO idSuscripcion = pysSuscripcionExtendsMapper.selectMaxIdSuscripcion(
-												idInstitucion, Long.valueOf(idservicio.getNewId()),
+												inscription.getIdinstitucion(), Long.valueOf(idservicio.getNewId()),
 												Long.valueOf(idserviciosinstitucion.getNewId()));
 										pysSuscripcion.setIdsuscripcion(Long.valueOf(idSuscripcion.getNewId()));
 	
@@ -3184,7 +3178,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 						LOGGER.info(
 								"getPricesCourse() / pysPreciosserviciosExtendsMapper.selectPricesCourse -> Entrada a pysPreciosserviciosExtendsMapper para obtener los precios de un curso");
 
-						preciosCursoItem = pysPreciosserviciosExtendsMapper.selectPricesCourse(idInstitucion,
+						preciosCursoItem = pysPreciosserviciosExtendsMapper.selectPricesCourse(curso.getIdinstitucion(),
 								curso.getIdservicio(), usuario.getIdlenguaje(), curso.getCodigocurso());
 
 						LOGGER.info(
@@ -3306,8 +3300,10 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				LOGGER.info(
 						"getCertificatesCourse() / forCertificadoscursoExtendsMapper.getCertificatesCourse -> Entrada a forCertificadoscursoExtendsMapper para obtener los certificados de un curso");
 
+				
+				ForCurso curso = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(idCurso));
 				certifcadosCursoItem = forCertificadoscursoExtendsMapper.getCertificatesCourse(idCurso,
-						idInstitucion.toString(), usuario.getIdlenguaje());
+						String.valueOf(curso.getIdinstitucion()), usuario.getIdlenguaje());
 
 				LOGGER.info(
 						"getCertificatesCourse() / forCertificadoscursoExtendsMapper.getCertificatesCourse -> Salida de forCertificadoscursoExtendsMapper para obtener los certificados de un curso");
