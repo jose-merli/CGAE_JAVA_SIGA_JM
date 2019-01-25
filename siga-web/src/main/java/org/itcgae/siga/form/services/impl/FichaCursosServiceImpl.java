@@ -2435,7 +2435,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-
+					
 					for (CargaMasivaInscripcionesItem fichero : cargaMasivaInscripcionesDTO
 							.getCargaMasivaInscripcionesItem()) {
 
@@ -3321,7 +3321,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 					// Comprobamos que el certificado introducido no esta registrado en bbdd
 					ForCertificadoscursoExample forCertificadoscursoExample = new ForCertificadoscursoExample();
-					forCertificadoscursoExample.createCriteria().andFechabajaIsNull()
+					forCertificadoscursoExample.createCriteria().andFechabajaIsNull().andIdcursoEqualTo(Long.valueOf(certificadoCursoItem.getIdCurso()))
 							.andIdproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdProducto()))
 							.andIdcalificacionEqualTo(Long.valueOf(certificadoCursoItem.getIdCalificacion()));
 

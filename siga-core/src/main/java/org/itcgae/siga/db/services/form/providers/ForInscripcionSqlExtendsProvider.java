@@ -28,7 +28,7 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.SELECT("TO_CHAR(CURSO.FECHAIMPARTICIONDESDE,'DD/MM/YYYY') AS FECHAIMPARTICIONDESDE");
 		sql.SELECT("TO_CHAR(CURSO.FECHAIMPARTICIONHASTA,'DD/MM/YYYY') AS FECHAIMPARTICIONHASTA");
 		sql.SELECT("TO_CHAR(INSC.FECHASOLICITUD,'DD/MM/YYYY') AS FECHASOLICITUD");
-		sql.SELECT("case when NVL(CURSO.MINIMOASISTENCIA,0) > DECODE(count (idasistenciaevento),0,-1) then 'NO' else 'SI' end MINIMAASISTENCIA");
+		sql.SELECT("case when NVL(CURSO.MINIMOASISTENCIA,0) > DECODE(count (idasistenciaevento),0,-1, count (idasistenciaevento)) then 'NO' else 'SI' end MINIMAASISTENCIA");
 		sql.SELECT("CAT2.DESCRIPCION AS ESTADOINSCRIPCION");
 		sql.SELECT("INSC.CALIFICACION");
 		sql.SELECT("INSC.IDCALIFICACION");
@@ -38,7 +38,7 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 
 		sql.INNER_JOIN("FOR_CURSO CURSO ON INSC.IDCURSO = CURSO.IDCURSO");
 		sql.LEFT_OUTER_JOIN("for_evento_curso eventocurso on eventocurso.idcurso = CURSO.idcurso");
-		sql.LEFT_OUTER_JOIN("age_asistencia_evento asis on asis.idevento = eventocurso.idevento");
+		sql.LEFT_OUTER_JOIN("age_asistencia_evento asis on (asis.idevento = eventocurso.idevento and asis.idinscripcion = insc.idinscripcion)");
 		sql.INNER_JOIN("FOR_ESTADOCURSO ESTADOCURSO ON CURSO.IDESTADOCURSO = ESTADOCURSO.IDESTADOCURSO");
 		sql.INNER_JOIN(
 				"GEN_RECURSOS_CATALOGOS CAT ON (CAT.IDRECURSO = ESTADOCURSO.DESCRIPCION AND CAT.IDLENGUAJE = '1' )");

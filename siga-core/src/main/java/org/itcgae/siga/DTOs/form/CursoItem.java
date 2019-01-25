@@ -52,6 +52,7 @@ public class CursoItem {
 	private String [] temas;
 	private String numPlazas;
 	private String inscripciones;
+	private Long numeroSesiones;
 	
 	public Long getIdCurso() {
 		return idCurso;
@@ -568,6 +569,12 @@ public class CursoItem {
 				+ idEventoFinInscripcion + ", idTipoEvento=" + idTipoEvento + ", tipoServicios=" + tipoServicios
 				+ ", temasCombo=" + temasCombo + ", temas=" + Arrays.toString(temas) + ", numPlazas=" + numPlazas
 				+ ", inscripciones=" + inscripciones + "]";
+	}
+	public Long getNumeroSesiones() {
+		return numeroSesiones;
+	}
+	public void setNumeroSesiones(Long numeroSesiones) {
+		this.numeroSesiones = numeroSesiones;
 	}
 
 }

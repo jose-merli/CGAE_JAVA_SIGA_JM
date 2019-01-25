@@ -48,7 +48,8 @@ public interface ForCursoExtendsMapper extends ForCursoMapper {
 			@Result(column = "INFORMACIONADICIONAL", property = "adicional", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "DOCUMENTACIONADJUNTA", property = "adjunto", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAFINIMPARTICION", property = "fechaImparticionHasta", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "FECHAINICIOIMPARTICION", property = "fechaImparticionDesde", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "FECHAINICIOIMPARTICION", property = "fechaImparticionDesde", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROSESIONES", property = "numeroSesiones", jdbcType = JdbcType.NUMERIC)
 	
 	})
 	List<CursoItem> selectCursos(Short idInstitucion, CursoItem cursoItem, String idLenguaje);
@@ -90,7 +91,8 @@ public interface ForCursoExtendsMapper extends ForCursoMapper {
 			@Result(column = "DOCUMENTACIONADJUNTA", property = "adjunto", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAFINIMPARTICION", property = "fechaImparticionHasta", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAINICIOIMPARTICION", property = "fechaImparticionDesde", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMEROSESIONES", property = "numeroSesiones", jdbcType = JdbcType.NUMERIC)
 
 	})
 	CursoItem searchCourseByIdcurso(String idCurso, Short idInstitucion, String idLenguaje);
