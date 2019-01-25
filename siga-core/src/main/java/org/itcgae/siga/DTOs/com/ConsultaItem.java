@@ -17,12 +17,15 @@ public class ConsultaItem {
 	private String experta;
 	private String descripcion;
 	private Date fechaBaja;
+
+
 	private String idObjetivo;
 	private String idClase;
 	private String idClaseComunicacion;
 	private String modulo;
 	private String objetivo;
 	private String claseComunicacion;
+	private String region;
 	
 	private String idPlantillaConsulta;
 	private String idModeloComunicacion;
@@ -48,6 +51,14 @@ public class ConsultaItem {
 
 	public void setIdConsulta(String idConsulta) {
 		this.idConsulta = idConsulta;
+	}
+	
+	public String getRegion() {
+		return region;
+	}
+
+	public void setRegion(String region) {
+		this.region = region;
 	}
 
 	public String getNombre() {

@@ -38,8 +38,8 @@ public class EnvEnviosExtendsSqlProvider {
 		//con este campo controlamos que sea de envios Masivos
 		sql.WHERE("ENVIO.ENVIO = 'M'");
 		
-		if(filtros.getAsunto() != null && !filtros.getAsunto().trim().equals("")){
-			sql.WHERE(filtroTextoBusquedas("DESCRIPCION",filtros.getAsunto()));
+		if(filtros.getDescripcion() != null && !filtros.getDescripcion().trim().equals("")){
+			sql.WHERE(filtroTextoBusquedas("ENVIO.DESCRIPCION",filtros.getDescripcion()));
 		}
 		if(filtros.getidEstado() != null && !filtros.getidEstado().trim().equals("")){
 			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getidEstado() +"'");
@@ -65,8 +65,8 @@ public class EnvEnviosExtendsSqlProvider {
 			fechaProgramacion2 += " 23:59:59";
 			sql.WHERE("(ENVIO.FECHAPROGRAMADA >= TO_DATE('" + fechaProgramacion + "', 'DD/MM/YYYY HH24:MI:SS') AND ENVIO.FECHAPROGRAMADA <= TO_DATE('" + fechaProgramacion2 + "', 'DD/MM/YYYY HH24:MI:SS'))");
 		}
-		if(filtros.getidTipoEnvio() != null && !filtros.getidTipoEnvio().trim().equals("")){
-			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getidTipoEnvio() +"'");
+		if(filtros.getidTipoEnvios() != null && !filtros.getidTipoEnvios().trim().equals("")){
+			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getidTipoEnvios() +"'");
 		}
 		
 		
@@ -112,8 +112,8 @@ public class EnvEnviosExtendsSqlProvider {
 		//controlamos con este campo si es 'A' pertenece a comunicaciones
 		sql.WHERE("ENVIO.ENVIO = 'A'");
 		
-		if(filtros.getAsunto() != null && !filtros.getAsunto().trim().equals("")){
-			sql.WHERE(filtroTextoBusquedas("DESCRIPCION",filtros.getAsunto()));
+		if(filtros.getDescripcion() != null && !filtros.getDescripcion().trim().equals("")){
+			sql.WHERE(filtroTextoBusquedas("DESCRIPCION",filtros.getDescripcion()));
 		}
 		if(filtros.getidEstado() != null && !filtros.getidEstado().trim().equals("")){
 			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getidEstado() +"'");
@@ -135,8 +135,8 @@ public class EnvEnviosExtendsSqlProvider {
 			fechaProgramacion2 += " 23:59:59";
 			sql.WHERE("(ENVIO.FECHAPROGRAMADA >= TO_DATE('" + fechaProgramacion + "', 'DD/MM/YYYY HH24:MI:SS') AND ENVIO.FECHAPROGRAMADA <= TO_DATE('" + fechaProgramacion2 + "', 'DD/MM/YYYY HH24:MI:SS'))");
 		}
-		if(filtros.getidTipoEnvio() != null && !filtros.getidTipoEnvio().trim().equals("")){
-			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getidTipoEnvio() +"'");
+		if(filtros.getidTipoEnvios() != null && !filtros.getidTipoEnvios().trim().equals("")){
+			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getidTipoEnvios() +"'");
 		}
 		
 		
