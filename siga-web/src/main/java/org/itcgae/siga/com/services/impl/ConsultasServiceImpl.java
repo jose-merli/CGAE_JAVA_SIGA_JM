@@ -270,13 +270,22 @@ public class ConsultasServiceImpl implements IConsultasService{
 						key.setIdconsulta(Long.valueOf(consultas[i].getIdConsulta()));
 						key.setIdinstitucion(Short.valueOf(consultas[i].getIdInstitucion()));
 						ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
-						String descripcion = "Copia " + i+1 +" - " + consulta.getDescripcion();
+						NewIdDTO id = _conConsultasExtendsMapper.selectMaxIDConsulta();
+						consulta.setIdconsulta(Long.valueOf(id.getNewId()));
+						String descripcion = "Copia " + i+1 +"_" + consulta.getDescripcion();
 						consulta.setIdinstitucion(idInstitucion);
+						if(idInstitucion == 2000){
+							consulta.setGeneral("S");
+						}else{
+							consulta.setGeneral("N");
+						}
 						consulta.setDescripcion(descripcion);
 						consulta.setFechamodificacion(new Date());
 						consulta.setUsumodificacion(usuario.getIdusuario());
 						_conConsultaMapper.insert(consulta);
 					}
+					respuesta.setCode(200);
+					respuesta.setDescription("Consultas duplicadas");
 					 
 				}catch (Exception e) {
 					respuesta.setCode(500);

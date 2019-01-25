@@ -116,7 +116,7 @@ public class ConsultasController {
 	@RequestMapping(value = "/duplicarConsulta", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Error> duplicarConsulta(HttpServletRequest request, @RequestBody ConsultaItem[] consultas) {
 
-		Error response = _consultasService.borrarConsulta(request, consultas);
+		Error response = _consultasService.duplicarConsulta(request, consultas);
 		if (response.getCode() == 200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
