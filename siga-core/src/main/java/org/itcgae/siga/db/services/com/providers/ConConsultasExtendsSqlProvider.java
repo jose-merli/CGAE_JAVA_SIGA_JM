@@ -94,6 +94,7 @@ public class ConConsultasExtendsSqlProvider {
 		if(idObjetivo != null){
 			sql.WHERE("IDOBJETIVO = " + idObjetivo);
 		}
+		sql.ORDER_BY("DESCRIPCION");
 		
 		return sql.toString();
 	}

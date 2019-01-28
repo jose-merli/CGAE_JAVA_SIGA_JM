@@ -113,7 +113,7 @@ public class EnvEnviosExtendsSqlProvider {
 		sql.WHERE("ENVIO.ENVIO = 'A'");
 		
 		if(filtros.getDescripcion() != null && !filtros.getDescripcion().trim().equals("")){
-			sql.WHERE(filtroTextoBusquedas("DESCRIPCION",filtros.getDescripcion()));
+			sql.WHERE(filtroTextoBusquedas("ENVIO.DESCRIPCION",filtros.getDescripcion()));
 		}
 		if(filtros.getidEstado() != null && !filtros.getidEstado().trim().equals("")){
 			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getidEstado() +"'");
