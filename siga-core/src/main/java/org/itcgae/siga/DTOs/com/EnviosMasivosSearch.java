@@ -13,7 +13,6 @@ public class EnviosMasivosSearch {
 	private String idEstado;
 	private String idClaseComunicacion;
 	
-	
 
 	@JsonProperty("fechaCreacion")
 	public Date getFechaCreacion() {

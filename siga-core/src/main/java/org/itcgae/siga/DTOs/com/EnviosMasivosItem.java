@@ -12,7 +12,7 @@ public class EnviosMasivosItem {
 	private Date fechaCreacion;
 	private int idPlantillasEnvio;
 	private Short idEstado;
-	private Short idTipoEnvio;
+	private Short idTipoEnvios;
 	private Short idPlantilla;
 	private String nombrePlantilla;
 	private Date fechaProgramada;
@@ -21,100 +21,113 @@ public class EnviosMasivosItem {
 	private String cuerpo;
 	private String estadoEnvio;
 	private String tipoEnvio;
+	private String idModeloComunicacion;
+	private String idClaseComunicacion;
 	
 	
+	public String getIdClaseComunicacion() {
+		return idClaseComunicacion;
+	}
+	public void setIdClaseComunicacion(String idClaseComunicacion) {
+		this.idClaseComunicacion = idClaseComunicacion;
+	}
 	public Short getIdInstitucion() {
 		return idInstitucion;
-	}
-	public void setIdInstitucion(Short idInstitucion) {
-		this.idInstitucion = idInstitucion;
 	}
 	public Long getIdEnvio() {
 		return idEnvio;
 	}
-	public void setIdEnvio(Long idEnvio) {
-		this.idEnvio = idEnvio;
-	}
 	public String getDescripcion() {
 		return descripcion;
-	}
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
 	}
 	public Date getFechaCreacion() {
 		return fechaCreacion;
 	}
-	public void setFechaCreacion(Date fechaCreacion) {
-		this.fechaCreacion = fechaCreacion;
-	}
-
 	public int getIdPlantillasEnvio() {
 		return idPlantillasEnvio;
-	}
-	public void setIdPlantillasEnvio(int idPlantillasEnvio) {
-		this.idPlantillasEnvio = idPlantillasEnvio;
 	}
 	public Short getIdEstado() {
 		return idEstado;
 	}
-	public void setIdEstado(Short idEstado) {
-		this.idEstado = idEstado;
-	}
-	public Short getIdTipoEnvio() {
-		return idTipoEnvio;
-	}
-	public void setIdTipoEnvio(Short idTipoEnvio) {
-		this.idTipoEnvio = idTipoEnvio;
+	public Short getIdTipoEnvios() {
+		return idTipoEnvios;
 	}
 	public Short getIdPlantilla() {
 		return idPlantilla;
 	}
-	public void setIdPlantilla(Short idPlantilla) {
-		this.idPlantilla = idPlantilla;
+	public String getNombrePlantilla() {
+		return nombrePlantilla;
 	}
 	public Date getFechaProgramada() {
 		return fechaProgramada;
 	}
-	public void setFechaProgramada(Date fechaProgramada) {
-		this.fechaProgramada = fechaProgramada;
-	}
 	public Date getFechaBaja() {
 		return fechaBaja;
-	}
-	public void setFechaBaja(Date fechaBaja) {
-		this.fechaBaja = fechaBaja;
 	}
 	public String getAsunto() {
 		return asunto;
 	}
-	public void setAsunto(String asunto) {
-		this.asunto = asunto;
-	}
 	public String getCuerpo() {
 		return cuerpo;
-	}
-	public void setCuerpo(String cuerpo) {
-		this.cuerpo = cuerpo;
 	}
 	public String getEstadoEnvio() {
 		return estadoEnvio;
 	}
-	public void setEstadoEnvio(String estadoEnvio) {
-		this.estadoEnvio = estadoEnvio;
-	}
 	public String getTipoEnvio() {
 		return tipoEnvio;
 	}
-	public void setTipoEnvio(String tipoEnvio) {
-		this.tipoEnvio = tipoEnvio;
+	public String getIdModeloComunicacion() {
+		return idModeloComunicacion;
 	}
-	public String getNombrePlantilla() {
-		return nombrePlantilla;
+	public void setIdInstitucion(Short idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
+	public void setIdEnvio(Long idEnvio) {
+		this.idEnvio = idEnvio;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+	public void setFechaCreacion(Date fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
+	public void setIdPlantillasEnvio(int idPlantillasEnvio) {
+		this.idPlantillasEnvio = idPlantillasEnvio;
+	}
+	public void setIdEstado(Short idEstado) {
+		this.idEstado = idEstado;
+	}
+	public void setIdTipoEnvios(Short idTipoEnvios) {
+		this.idTipoEnvios = idTipoEnvios;
+	}
+	public void setIdPlantilla(Short idPlantilla) {
+		this.idPlantilla = idPlantilla;
 	}
 	public void setNombrePlantilla(String nombrePlantilla) {
 		this.nombrePlantilla = nombrePlantilla;
 	}
+	public void setFechaProgramada(Date fechaProgramada) {
+		this.fechaProgramada = fechaProgramada;
+	}
+	public void setFechaBaja(Date fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+	public void setAsunto(String asunto) {
+		this.asunto = asunto;
+	}
+	public void setCuerpo(String cuerpo) {
+		this.cuerpo = cuerpo;
+	}
+	public void setEstadoEnvio(String estadoEnvio) {
+		this.estadoEnvio = estadoEnvio;
+	}
+	public void setTipoEnvio(String tipoEnvio) {
+		this.tipoEnvio = tipoEnvio;
+	}
+	public void setIdModeloComunicacion(String idModeloComunicacion) {
+		this.idModeloComunicacion = idModeloComunicacion;
+	}
 	
 	
-
+	
 }
