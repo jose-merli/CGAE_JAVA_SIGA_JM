@@ -43,7 +43,6 @@ import org.itcgae.siga.cen.services.IFicherosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
 import org.itcgae.siga.commons.utils.SIGAServicesHelper;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -53,14 +52,9 @@ import org.itcgae.siga.db.entities.AgeEventoExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteExample;
 import org.itcgae.siga.db.entities.CenDatoscv;
-import org.itcgae.siga.db.entities.CenDatoscvKey;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenTiposcvsubtipo1;
-import org.itcgae.siga.db.entities.CenTiposcvsubtipo1Example;
-import org.itcgae.siga.db.entities.CenTiposcvsubtipo2;
-import org.itcgae.siga.db.entities.CenTiposcvsubtipo2Example;
 import org.itcgae.siga.db.entities.ForCertificadoscurso;
 import org.itcgae.siga.db.entities.ForCertificadoscursoExample;
 import org.itcgae.siga.db.entities.ForCurso;
@@ -1300,6 +1294,104 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 						}
 					}
+					
+					// Si existe idEventoInscripcion se debe guardar la relacion entre el evento y
+					// el curso
+					if (cursoItem.getIdEventoInicioInscripcion() != null) {
+
+						ForEventoCurso forEventoCurso = new ForEventoCurso();
+						forEventoCurso.setFechabaja(null);
+						forEventoCurso.setFechamodificacion(new Date());
+						forEventoCurso.setIdcurso(cursoItem.getIdCurso());
+						forEventoCurso.setIdevento(Long.valueOf(cursoItem.getIdEventoInicioInscripcion()));
+						forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+						forEventoCurso.setIdinstitucion(idInstitucion);
+
+						response = forEventoCursoMapper.insert(forEventoCurso);
+
+						// Se da de alta al evento creado para ese curso
+
+						AgeEventoExample exampleEvento = new AgeEventoExample();
+						exampleEvento.createCriteria()
+								.andIdeventoEqualTo(Long.valueOf(cursoItem.getIdEventoInicioInscripcion()))
+								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andFechabajaIsNotNull();
+
+						LOGGER.info(
+								"saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) -> Entrada a ageEventoExtendsMapper para buscar el evento que debemos dar de alta");
+
+						List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(exampleEvento);
+
+						LOGGER.info(
+								"saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) -> Salida a ageEventoExtendsMapper para buscar el evento que debemos dar de alta");
+
+						if (null != eventoList && eventoList.size() > 0) {
+							AgeEvento evento = eventoList.get(0);
+
+							evento.setFechabaja(null);
+							evento.setFechamodificacion(new Date());
+							evento.setUsumodificacion(usuario.getIdusuario().longValue());
+
+							LOGGER.info(
+									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
+
+							response = ageEventoExtendsMapper.updateByPrimaryKey(evento);
+
+							LOGGER.info(
+									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
+
+						}
+
+					}
+
+					// Si existe idEventoInscripcion se debe guardar la relacion entre el evento y
+					// el curso
+					if (cursoItem.getIdEventoFinInscripcion() != null) {
+
+						ForEventoCurso forEventoCurso = new ForEventoCurso();
+						forEventoCurso.setFechabaja(null);
+						forEventoCurso.setFechamodificacion(new Date());
+						forEventoCurso.setIdcurso(cursoItem.getIdCurso());
+						forEventoCurso.setIdevento(Long.valueOf(cursoItem.getIdEventoFinInscripcion()));
+						forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+						forEventoCurso.setIdinstitucion(idInstitucion);
+
+						response = forEventoCursoMapper.insert(forEventoCurso);
+
+						// Se da de alta al evento creado para ese curso
+
+						AgeEventoExample exampleEvento = new AgeEventoExample();
+						exampleEvento.createCriteria()
+								.andIdeventoEqualTo(Long.valueOf(cursoItem.getIdEventoFinInscripcion()))
+								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andFechabajaIsNotNull();
+
+						LOGGER.info(
+								"saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) -> Entrada a ageEventoExtendsMapper para buscar el evento que debemos dar de alta");
+
+						List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(exampleEvento);
+
+						LOGGER.info(
+								"saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) -> Salida a ageEventoExtendsMapper para buscar el evento que debemos dar de alta");
+
+						if (null != eventoList && eventoList.size() > 0) {
+							AgeEvento evento = eventoList.get(0);
+
+							evento.setFechabaja(null);
+							evento.setFechamodificacion(new Date());
+							evento.setUsumodificacion(usuario.getIdusuario().longValue());
+
+							LOGGER.info(
+									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
+
+							response = ageEventoExtendsMapper.updateByPrimaryKey(evento);
+
+							LOGGER.info(
+									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
+
+						}
+
+					}
+					
+					
 
 				} catch (Exception e) {
 					response = 0;
@@ -2690,12 +2782,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			counter.setContador(numContador + 1);
 
 			LOGGER.info(
-					"updateCourse() / forTemacursoCursoMapper.updateByPrimaryKey(temaCursoBaja) -> Entrada a forTemacursoCursoMapper para dar de baja a un tema de un curso");
+					"getCounterCourse() / forTemacursoCursoMapper.updateByPrimaryKey(temaCursoBaja) -> Entrada a forTemacursoCursoMapper para dar de baja a un tema de un curso");
 
 			response = admContadorExtendsMapper.updateByPrimaryKey(counter);
 
 			LOGGER.info(
-					"updateCourse() / forTemacursoCursoMapper.updateByPrimaryKey(temaCursoBaja) -> Salida a forTemacursoCursoMapper para dar de baja a un tema de un curso");
+					"getCounterCourse() / forTemacursoCursoMapper.updateByPrimaryKey(temaCursoBaja) -> Salida a forTemacursoCursoMapper para dar de baja a un tema de un curso");
 
 			String formatted = String.format("%0" + longitudContador + "d", numContador);
 
