@@ -104,10 +104,10 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 		if (null != idInstitucion) {
 
 			LOGGER.info(
-					"searchCourse() / forCursoExtendsMapper.selectByPrimaryKey() -> Entrada a forCursoExtendsMapper para obtener un curso especifico");
+					"searchCourse() / forCursoExtendsMapper.selectByPrimaryKeyExtends() -> Entrada a forCursoExtendsMapper para obtener un curso especifico");
 			cursoItem = forInscripcionExtendsMapper.searchCourseByIdcurso(idCurso, idInstitucion);
 			LOGGER.info(
-					"searchCourse() / forCursoExtendsMapper.selectByPrimaryKey() -> Salida de forCursoExtendsMapper para obtener un curso especifico");
+					"searchCourse() / forCursoExtendsMapper.selectByPrimaryKeyExtends() -> Salida de forCursoExtendsMapper para obtener un curso especifico");
 		}
 
 		LOGGER.info("searchCourse() -> Salida del servicio para obtener un curso especifico");
@@ -148,10 +148,10 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 				try {
 					
 					LOGGER.info(
-							"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKey(idCurso) -> Entrada a forCursoExtendsMapper para recuperar el curso de la inscripcion");
-					ForCurso curso = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(inscripcionItem.getIdCurso()));
+							"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKeyExtends(idCurso) -> Entrada a forCursoExtendsMapper para recuperar el curso de la inscripcion");
+					ForCurso curso = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(inscripcionItem.getIdCurso()));
 					LOGGER.info(
-							"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKey(idCurso) -> Salida a forCursoExtendsMapper para recuperar el curso de la inscripcion");
+							"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKeyExtends(idCurso) -> Salida a forCursoExtendsMapper para recuperar el curso de la inscripcion");
 					
 					// Comprobamos que existe la persona en cen_cliente (idPersona, idInstitucion)
 					CenCliente cenClienteSearch = new CenCliente();
@@ -196,6 +196,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 							noColegiadoRecord.setUsumodificacion(usuario.getIdusuario());
 							// Para crear un nocoleagiado debemos rellenar campo sociedadsj
 							noColegiadoRecord.setSociedadsj("0");
+							noColegiadoRecord.setSociedadprofesional("0");
 
 							LOGGER.info(
 									"saveInscripcion() / cenNocolegiadoExtendsMapper.insert() -> Entrada a cenNocolegiadoExtendsMapper para insertar un no-colegiado");
@@ -360,7 +361,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 								noColegiadoRecord.setUsumodificacion(usuario.getIdusuario());
 								// Para crear un nocoleagiado debemos rellenar campo sociedadsj
 								noColegiadoRecord.setSociedadsj("0");
-
+								noColegiadoRecord.setSociedadprofesional("0");
 								LOGGER.info(
 										"updateInscripcion() / cenNocolegiadoExtendsMapper.insert() -> Entrada a cenNocolegiadoExtendsMapper para insertar un no-colegiado");
 								cenNocolegiadoExtendsMapper.insert(noColegiadoRecord);
@@ -511,7 +512,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 				record.setUsumodificacion(usuario.getIdusuario());
 				// Para crear un nocoleagiado debemos rellenar campo sociedadsj
 				record.setSociedadsj("0");
-
+				record.setSociedadprofesional("0");
 				LOGGER.info(
 						"guardarPersona() / cenNocolegiadoExtendsMapper.insert() -> Entrada a cenNocolegiadoExtendsMapper para insertar un no colegiado");
 				response = cenNocolegiadoExtendsMapper.insert(record);
@@ -779,7 +780,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 				inscripcionesAprobadas = new CursoItem();
 				inscripcionesAprobadas.setInscripciones("0");
 			}
-			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(idCurso));
+			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(idCurso));
 			Long plazasdisponibles =0L;
 			if (null != cursoEntidad) {
 				if (null != cursoEntidad.getNumeroplazas()) {
