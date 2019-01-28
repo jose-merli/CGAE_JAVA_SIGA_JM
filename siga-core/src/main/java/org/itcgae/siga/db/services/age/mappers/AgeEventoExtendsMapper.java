@@ -61,6 +61,7 @@ public interface AgeEventoExtendsMapper extends AgeEventoMapper{
 		@Result(column = "IDTIPOEVENTO", property = "idTipoEvento", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDCURSO", property = "idCurso", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDTIPOCALENDARIO", property = "idTipoCalendario", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FORMADORES", property = "formadores", jdbcType = JdbcType.VARCHAR),
 	})
 	List<EventoItem> getSessionsCourse(String idTipoEvento, String idCurso, String idInstitucion);
 	
