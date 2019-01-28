@@ -36,7 +36,6 @@ import org.itcgae.siga.db.mappers.PysServiciossolicitadosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCertificadoscursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForInscripcionExtendsMapper;
@@ -148,14 +147,22 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 
 				try {
 					
+					LOGGER.info(
+							"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKey(idCurso) -> Entrada a forCursoExtendsMapper para recuperar el curso de la inscripcion");
 					ForCurso curso = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(inscripcionItem.getIdCurso()));
+					LOGGER.info(
+							"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKey(idCurso) -> Salida a forCursoExtendsMapper para recuperar el curso de la inscripcion");
 					
 					// Comprobamos que existe la persona en cen_cliente (idPersona, idInstitucion)
 					CenCliente cenClienteSearch = new CenCliente();
 					cenClienteSearch.setIdpersona(inscripcionItem.getIdPersona());
 					cenClienteSearch.setIdinstitucion(curso.getIdinstitucion());
+					LOGGER.info(
+							"saveInscripcion() / cenClienteExtendsMapper.selectByPrimaryKey(cenClienteSearch) -> Entrada a cenClienteExtendsMapper para comprobar si existe la persona en cenCliente");
 					CenCliente cenCliente = cenClienteExtendsMapper.selectByPrimaryKey(cenClienteSearch);
-	
+					LOGGER.info(
+							"saveInscripcion() / cenClienteExtendsMapper.selectByPrimaryKey(cenClienteSearch) -> Salida a cenClienteExtendsMapper para comprobar si existe la persona en cenCliente");
+					
 					if(cenCliente == null) {
 						
 						CenCliente cenClienteInsert = new CenCliente();
@@ -175,7 +182,6 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 
 						LOGGER.info(
 								"saveInscripcion() / cenClienteMapper.insert() -> Entrada a cenClienteMapper para crear un nuevo colegiado");
-						
 						response = cenClienteExtendsMapper.insert(cenClienteInsert);
 						LOGGER.info(
 								"saveInscripcion() / cenClienteMapper.insert() -> Salida a cenClienteMapper para crear un nuevo colegiado");
@@ -204,6 +210,9 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 						}
 					
 					}
+					
+					LOGGER.info(
+							"saveInscripcion() / inicio carga insert inscripcion");
 					
 					// Insertamos inscripcion en la tabla FOR_INSCRIPCION
 					forInscripcionInsert.setIdinstitucion(curso.getIdinstitucion());
@@ -235,11 +244,14 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 				
 				} catch (Exception e) {
 					response = 0;
+					LOGGER.info(
+							"saveInscripcion() / Entra excepcion ---> " + e.getMessage());
 				}
 				
 				if (response == 0) {
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				} else {
 					error.setCode(200);
@@ -252,7 +264,10 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 		}
 		
 		if(comboItems.isEmpty()) {
-			comboDTO.getError().description("No se encuentra el idInscripcion");
+			error.setCode(400);
+			error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+			comboDTO.setError(error);
+//			comboDTO.getError().description("No se encuentra el idInscripcion");
 		}
 		
 		LOGGER.info("saveInscripcion() -> Salida del servicio para insertar una inscripcion");
