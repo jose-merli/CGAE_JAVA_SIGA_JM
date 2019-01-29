@@ -1600,12 +1600,26 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 					for (AgePersonaEventoItem agePersonaEventoItem : agePersonaEventoDTO.getPersonaEventoItem()) {
 
+						AgeEventoExample ageEventoExample = new AgeEventoExample();
+						ageEventoExample.createCriteria()
+						.andIdeventoEqualTo(Long.valueOf(agePersonaEventoItem.getIdEvento()));
+						
+						LOGGER.info(
+								"updateFormadorEvent() / ageEventoExtendsMapper.selectByExample(ageEventoExample) -> Entrada a ageEventoExtendsMapper para buscar la sesión");
+
+						List<AgeEvento> ageEventoList = ageEventoExtendsMapper.selectByExample(ageEventoExample);
+
+						LOGGER.info(
+								"updateFormadorEvent() / ageEventoExtendsMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
+
+						AgeEvento evento = ageEventoList.get(0);		
+						
 						AgePersonaEvento agePersonaEvento = new AgePersonaEvento();
 
 						agePersonaEvento.setFechabaja(null);
 						agePersonaEvento.setFechamodificacion(new Date());
 						agePersonaEvento.setIdevento(Long.parseLong(agePersonaEventoItem.getIdEvento()));
-						agePersonaEvento.setIdinstitucion(Short.parseShort(agePersonaEventoItem.getIdInstitucion()));
+						agePersonaEvento.setIdinstitucion(evento.getIdinstitucion());
 						agePersonaEvento.setIdpersona(Long.parseLong(agePersonaEventoItem.getIdPersona()));
 						agePersonaEvento.setUsumodificacion(usuario.getIdusuario().longValue());
 
@@ -1641,7 +1655,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	@Override
 	@Transactional
 	public UpdateResponseDTO updateFormadorEvent(AgePersonaEventoDTO agePersonaEventoDTO, HttpServletRequest request) {
-		LOGGER.info("saveFormadorEvent() ->  Entrada al servicio para asignar uno o varios formadores a una sesión");
+		LOGGER.info("updateFormadorEvent() ->  Entrada al servicio para modificar uno o varios formadores en una sesión");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -1655,10 +1669,10 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"saveFormadorEvent() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateFormadorEvent() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
-					"saveFormadorEvent() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateFormadorEvent() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -1678,19 +1692,19 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 									&& !listPersonaEvento.get(0).getIdEvento().equals(""))) {
 						idEvento = listPersonaEvento.get(0).getIdEvento();
 
-						// Eliminamos Tema
+						// Eliminamos forrmador
 						AgePersonaEventoExample agePersonaEventoExample = new AgePersonaEventoExample();
 						agePersonaEventoExample.createCriteria().andIdeventoEqualTo(Long.parseLong(idEvento))
 								.andFechabajaIsNull();
 
 						LOGGER.info(
-								"updateCourse() / forTemacursoCursoMapper.selectByExample(forTemacursoCursoExample) -> Entrada a forTemacursoCursoMapper para buscar los temas registrados de un curso");
+								"updateFormadorEvent() / agePersonaEventoMapper.selectByExample(forTemacursoCursoExample) -> Entrada a agePersonaEventoMapper para buscar los formadores registrados de una sesión");
 
 						List<AgePersonaEvento> agePersonaEventoAntiguosList = agePersonaEventoMapper
 								.selectByExample(agePersonaEventoExample);
 
 						LOGGER.info(
-								"updateCourse() / forTemacursoCursoMapper.selectByExample(forTemacursoCursoExample) -> Salida a forTemacursoCursoMapper para buscar los temas registrados de un curso");
+								"updateFormadorEvent() / agePersonaEventoMapper.selectByExample(forTemacursoCursoExample) -> Salida a agePersonaEventoMapper para buscar los formadores registrados de una sesión");
 
 						for (AgePersonaEvento agePersonaEventoAntiguos : agePersonaEventoAntiguosList) {
 
@@ -1702,35 +1716,35 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 							example.createCriteria().andIdeventoEqualTo(Long.parseLong(idEvento));
 
 							LOGGER.info(
-									"updateCourse() / forTemacursoCursoMapper.updateByPrimaryKey(temaCursoBaja) -> Entrada a forTemacursoCursoMapper para dar de baja a un tema de un curso");
+									"updateFormadorEvent() / agePersonaEventoMapper.updateByPrimaryKey(agePersonaEventoAntiguos) -> Entrada a agePersonaEventoMapper para dar de baja a un formador de una sesión");
 
 							response = agePersonaEventoMapper.updateByPrimaryKey(agePersonaEventoAntiguos);
 
 							LOGGER.info(
-									"updateCourse() / forTemacursoCursoMapper.updateByPrimaryKey(temaCursoBaja) -> Salida a forTemacursoCursoMapper para dar de baja a un tema de un curso");
+									"updateFormadorEvent() / agePersonaEventoMapper.updateByPrimaryKey(agePersonaEventoAntiguos) -> Salida a agePersonaEventoMapper para dar de baja a un formador de una sesión");
 
 						}
 					} else if (listPersonaEvento.size() > 0) {
 
 						idEvento = listPersonaEvento.get(0).getIdEvento();
 
-						// Eliminamos el tema que no se encuentre en la lista actual
+						// Eliminamos el formador que no se encuentre en la lista actual
 						AgePersonaEventoExample agePersonaEventoExample = new AgePersonaEventoExample();
 						agePersonaEventoExample.createCriteria().andIdeventoEqualTo(Long.parseLong(idEvento))
 								.andFechabajaIsNull();
 
 						LOGGER.info(
-								"updateCourse() / forTemacursoCursoMapper.selectByExample(forTemacursoCursoExample) -> Entrada a forTemacursoCursoMapper para buscar los temas registrados de un curso");
+								"updateFormadorEvent() / agePersonaEventoMapper.selectByExample(agePersonaEventoExample) -> Entrada a agePersonaEventoMapper para buscar los formadores registrados de una sesión");
 
 						List<AgePersonaEvento> agePersonaEventoAntiguosList = agePersonaEventoMapper
 								.selectByExample(agePersonaEventoExample);
 
 						LOGGER.info(
-								"updateCourse() / forTemacursoCursoMapper.selectByExample(forTemacursoCursoExample) -> Salida a forTemacursoCursoMapper para buscar los temas registrados de un curso");
+								"updateFormadorEvent() / agePersonaEventoMapper.selectByExample(agePersonaEventoExample) -> Salida a agePersonaEventoMapper para buscar los formadores registrados de una sesión");
 
 						List<AgePersonaEvento> agePersonaEventoDarBaja = new ArrayList<AgePersonaEvento>();
 
-						// Si hay temas que estan dados de alta, comprobamos que se encuentra en la
+						// Si hay formadores que estan dados de alta, comprobamos que se encuentra en la
 						// modificacion actual
 						if (!agePersonaEventoAntiguosList.isEmpty()) {
 
@@ -1758,52 +1772,66 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 								agePersonaEventoBaja.setFechamodificacion(new Date());
 
 								LOGGER.info(
-										"updateCourse() / forTemacursoCursoMapper.updateByPrimaryKey(temaCursoBaja) -> Entrada a forTemacursoCursoMapper para dar de baja a un tema de un curso");
+										"updateFormadorEvent() / agePersonaEventoMapper.updateByPrimaryKey(agePersonaEventoBaja) -> Entrada a agePersonaEventoMapper para dar de baja a un formador de una sesión");
 
 								response = agePersonaEventoMapper.updateByPrimaryKey(agePersonaEventoBaja);
 
 								LOGGER.info(
-										"updateCourse() / forTemacursoCursoMapper.updateByPrimaryKey(temaCursoBaja) -> Salida a forTemacursoCursoMapper para dar de baja a un tema de un curso");
+										"updateFormadorEvent() / agePersonaEventoMapper.updateByPrimaryKey(agePersonaEventoBaja) -> Salida a agePersonaEventoMapper para dar de baja a un formadore de una sesión");
 							}
 						}
 
-						// Añadimos temas
+						// Añadimos formadores
 						for (AgePersonaEventoItem agePersonaEvento : listPersonaEvento) {
 
-							// Para cada temas comprobamos si ya existe la relacion
+							// Para cada formador comprobamos si ya existe la relacion
 							AgePersonaEventoExample examplePersonaEvento = new AgePersonaEventoExample();
 							examplePersonaEvento.createCriteria()
 									.andIdeventoEqualTo(Long.parseLong(agePersonaEvento.getIdEvento()))
 									.andIdpersonaEqualTo(Long.valueOf(agePersonaEvento.getIdPersona()));
 
 							LOGGER.info(
-									"updateCourse() / forTemacursoCursoMapper.selectByExample(forTemacursoCursoExample) -> Entrada a forTemacursoCursoMapper para buscar los temas registrados de un curso");
+									"updateFormadorEvent() / agePersonaEventoMapper.selectByExample(examplePersonaEvento) -> Entrada a agePersonaEventoMapper para buscar los formadores registrados de una sesión");
 
 							List<AgePersonaEvento> agePersonaEventoList = agePersonaEventoMapper
 									.selectByExample(examplePersonaEvento);
 
 							LOGGER.info(
-									"updateCourse() / forTemacursoCursoMapper.selectByExample(forTemacursoCursoExample) -> Salida a forTemacursoCursoMapper para buscar los temas registrados de un curso");
+									"updateFormadorEvent() / agePersonaEventoMapper.selectByExample(examplePersonaEvento) -> Salida a agePersonaEventoMapper para buscar los formadores registrados de una sesión");
 
 							// Si no existe la creamos
 							if (agePersonaEventoList.isEmpty()) {
+								
+								AgeEventoExample ageEventoExample = new AgeEventoExample();
+								ageEventoExample.createCriteria()
+								.andIdeventoEqualTo(Long.valueOf(agePersonaEvento.getIdEvento()));
+								
+								LOGGER.info(
+										"updateFormadorEvent() / ageEventoExtendsMapper.selectByExample(ageEventoExample) -> Entrada a ageEventoExtendsMapper para buscar la sesión");
+
+								List<AgeEvento> ageEventoList = ageEventoExtendsMapper.selectByExample(ageEventoExample);
+
+								LOGGER.info(
+										"updateFormadorEvent() / ageEventoExtendsMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
+
+								AgeEvento evento = ageEventoList.get(0);								
 
 								AgePersonaEvento agePersonaEventoRecord = new AgePersonaEvento();
 								agePersonaEventoRecord.setFechabaja(null);
 								agePersonaEventoRecord.setFechamodificacion(new Date());
 								agePersonaEventoRecord
-										.setIdinstitucion(Short.parseShort(agePersonaEvento.getIdInstitucion()));
+										.setIdinstitucion(evento.getIdinstitucion());
 								agePersonaEventoRecord.setIdevento(Long.parseLong(agePersonaEvento.getIdEvento()));
 								agePersonaEventoRecord.setUsumodificacion(usuario.getIdusuario().longValue());
 								agePersonaEventoRecord.setIdpersona(Long.valueOf(agePersonaEvento.getIdPersona()));
 
 								LOGGER.info(
-										"updateCourse() / forTemacursoCursoMapper.insert(forTipoServicioCurso) -> Entrada a forTemacursoCursoMapper para insertar un tema de un curso");
+										"updateFormadorEvent() / agePersonaEventoMapper.insert(agePersonaEventoRecord) -> Entrada a agePersonaEventoMapper para insertar un formador de una sesión");
 
 								response = agePersonaEventoMapper.insert(agePersonaEventoRecord);
 
 								LOGGER.info(
-										"updateCourse() / forTemacursoCursoMapper.insert(forTipoServicioCurso) -> Salida a forTemacursoCursoMapper para insertar un tema de un curso");
+										"updateFormadorEvent() / agePersonaEventoMapper.insert(agePersonaEventoRecord) -> Salida a agePersonaEventoMapper para insertar un formador de una sesión");
 
 								// Si existe
 							} else {
@@ -1815,12 +1843,12 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 									recordPersonaEvento.setFechamodificacion(new Date());
 
 									LOGGER.info(
-											"updateCourse() / forTemacursoCursoMapper.updateByPrimaryKey(forTemaCurso) -> Entrada a forTemacursoCursoMapper para dar de alta a un tema de un curso");
+											"updateFormadorEvent() / agePersonaEventoMapper.updateByPrimaryKey(recordPersonaEvento) -> Entrada a agePersonaEventoMapper para dar de alta a un formador de una sesión");
 
 									response = agePersonaEventoMapper.updateByPrimaryKey(recordPersonaEvento);
 
 									LOGGER.info(
-											"updateCourse() / forTemacursoCursoMapper.updateByPrimaryKey(forTemaCurso) -> Salida a forTemacursoCursoMapper para dar de alta a un tema de un curso");
+											"updateFormadorEvent() / agePersonaEventoMapper.updateByPrimaryKey(recordPersonaEvento) -> Salida a agePersonaEventoMapper para dar de alta a un formadore de una sesión");
 								}
 							}
 						}
@@ -1847,7 +1875,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("saveFormadorEvent() -> Salida del servicio para asignar un formador a una sesión");
+		LOGGER.info("updateFormadorEvent() -> Salida del servicio para modificar un formador a una sesión");
 
 		return updateResponseDTO;
 	}
