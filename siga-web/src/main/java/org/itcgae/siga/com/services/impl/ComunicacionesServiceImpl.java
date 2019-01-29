@@ -135,6 +135,8 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 			error.setCode(500);
 			error.setDescription("Internal Server error");
 			error.setMessage(e.getMessage());
+			respuesta.setError(error);
+			e.printStackTrace();
 		}
 		
 		LOGGER.info("detalleDestinatarios() -> Salida del servicio para obtener el detalle de los destinatarios de envio");

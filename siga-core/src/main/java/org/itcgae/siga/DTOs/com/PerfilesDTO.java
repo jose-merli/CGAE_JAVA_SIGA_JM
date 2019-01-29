@@ -8,7 +8,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 public class PerfilesDTO {
 	
 	private List<PerfilDTO> perfiles = new ArrayList<PerfilDTO>();
-	private Error error = new Error();
+	private Error error = null;
 	
 	public Error getError() {
 		return error;
