@@ -1817,8 +1817,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					}
 				}
 
-				// Generamos el fichero de errores
-				byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSPLOGCURSO, datosLog);
+				
 
 				// Insertamos en tabla For_inscripcion_Masiva el fichero que se ha parseado
 				forInscripcionesmasivas.setIdinstitucion(curso.getIdinstitucion());
@@ -1833,11 +1832,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	
 				
-				Long idFile = uploadFile(file.getBytes(), forInscripcionesmasivas, false, usuario);
-				Long idLogFile = uploadFile(bytesLog, forInscripcionesmasivas, true, usuario);
-				
-				forInscripcionesmasivas.setIdfichero(idFile);
-				forInscripcionesmasivas.setIdficherolog(idLogFile);
+
 				LOGGER.info(
 						"uploadFileExcel() / forInscripcionesmasivasMapper.insert(forInscripcionesmasivas) -> Entrada a forInscripcionesmasivasMapper para insertar el fichero parseado carga masiva de inscripciones");
 
@@ -1901,7 +1896,17 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					error.setDescription("Hay errores en las inscripciones subidas");
 				}
 
-
+				// Generamos el fichero de errores
+				byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSPLOGCURSO, datosLog);
+				
+				
+				Long idFile = uploadFile(file.getBytes(), forInscripcionesmasivas, false, usuario);
+				Long idLogFile = uploadFile(bytesLog, forInscripcionesmasivas, true, usuario);
+				ForInscripcionesmasivas record = new ForInscripcionesmasivas();
+				record.setIdfichero(idFile);
+				record.setIdficherolog(idLogFile);
+				record.setIdcargainscripcion(forInscripcionesmasivas.getIdcargainscripcion());
+				forInscripcionesmasivasMapper.updateByPrimaryKeySelective(record);
 			}
 
 		}

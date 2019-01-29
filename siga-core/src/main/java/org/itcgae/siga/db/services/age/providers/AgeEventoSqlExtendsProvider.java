@@ -70,8 +70,8 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 				"AGE_CALENDARIO cal on (evento.idCalendario = cal.idCalendario and evento.idinstitucion = cal.idinstitucion)");
 		sql.INNER_JOIN("AGE_ESTADOEVENTOS ESTADO ON EVENTO.IDESTADOEVENTO = ESTADO.IDESTADOEVENTO");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON (CAT.IDRECURSO = ESTADO.DESCRIPCION AND CAT.IDLENGUAJE = '1' )");
-		sql.INNER_JOIN("AGE_PERSONA_EVENTO PEREVENT ON (evento.idevento = perevent.idevento and PEREVENT.FECHABAJA is null)");
-		sql.INNER_JOIN("CEN_PERSONA PER ON (PEREVENT.IDPERSONA = PER.IDPERSONA)");
+		sql.LEFT_OUTER_JOIN("AGE_PERSONA_EVENTO PEREVENT ON (evento.idevento = perevent.idevento and PEREVENT.FECHABAJA is null)");
+		sql.LEFT_OUTER_JOIN("CEN_PERSONA PER ON (PEREVENT.IDPERSONA = PER.IDPERSONA)");
 		
 		sql.WHERE("evento.FECHABAJA is NULL");
 		sql.WHERE("evento.idinstitucion = '" + idInstitucion + "'");
