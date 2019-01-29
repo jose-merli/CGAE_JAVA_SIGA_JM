@@ -10,10 +10,10 @@ public class EnviosMasivosItem {
 	private Long idEnvio;
 	private String descripcion;
 	private Date fechaCreacion;
-	private int idPlantillasEnvio;
+	private String idPlantillaEnvios;
 	private Short idEstado;
-	private Short idTipoEnvios;
-	private Short idPlantilla;
+	private String idTipoEnvios;
+	private String idPlantilla;
 	private String nombrePlantilla;
 	private Date fechaProgramada;
 	private Date fechaBaja;
@@ -23,14 +23,8 @@ public class EnviosMasivosItem {
 	private String tipoEnvio;
 	private String idModeloComunicacion;
 	private String idClaseComunicacion;
-	
-	
-	public String getIdClaseComunicacion() {
-		return idClaseComunicacion;
-	}
-	public void setIdClaseComunicacion(String idClaseComunicacion) {
-		this.idClaseComunicacion = idClaseComunicacion;
-	}
+	private String modeloComunicacion;
+	private String claseComunicacion;
 	public Short getIdInstitucion() {
 		return idInstitucion;
 	}
@@ -43,16 +37,16 @@ public class EnviosMasivosItem {
 	public Date getFechaCreacion() {
 		return fechaCreacion;
 	}
-	public int getIdPlantillasEnvio() {
-		return idPlantillasEnvio;
+	public String getIdPlantillaEnvios() {
+		return idPlantillaEnvios;
 	}
 	public Short getIdEstado() {
 		return idEstado;
 	}
-	public Short getIdTipoEnvios() {
+	public String getIdTipoEnvios() {
 		return idTipoEnvios;
 	}
-	public Short getIdPlantilla() {
+	public String getIdPlantilla() {
 		return idPlantilla;
 	}
 	public String getNombrePlantilla() {
@@ -79,6 +73,15 @@ public class EnviosMasivosItem {
 	public String getIdModeloComunicacion() {
 		return idModeloComunicacion;
 	}
+	public String getIdClaseComunicacion() {
+		return idClaseComunicacion;
+	}
+	public String getModeloComunicacion() {
+		return modeloComunicacion;
+	}
+	public String getClaseComunicacion() {
+		return claseComunicacion;
+	}
 	public void setIdInstitucion(Short idInstitucion) {
 		this.idInstitucion = idInstitucion;
 	}
@@ -91,16 +94,16 @@ public class EnviosMasivosItem {
 	public void setFechaCreacion(Date fechaCreacion) {
 		this.fechaCreacion = fechaCreacion;
 	}
-	public void setIdPlantillasEnvio(int idPlantillasEnvio) {
-		this.idPlantillasEnvio = idPlantillasEnvio;
+	public void setIdPlantillaEnvios(String idPlantillaEnvios) {
+		this.idPlantillaEnvios = idPlantillaEnvios;
 	}
 	public void setIdEstado(Short idEstado) {
 		this.idEstado = idEstado;
 	}
-	public void setIdTipoEnvios(Short idTipoEnvios) {
+	public void setIdTipoEnvios(String idTipoEnvios) {
 		this.idTipoEnvios = idTipoEnvios;
 	}
-	public void setIdPlantilla(Short idPlantilla) {
+	public void setIdPlantilla(String idPlantilla) {
 		this.idPlantilla = idPlantilla;
 	}
 	public void setNombrePlantilla(String nombrePlantilla) {
@@ -126,6 +129,15 @@ public class EnviosMasivosItem {
 	}
 	public void setIdModeloComunicacion(String idModeloComunicacion) {
 		this.idModeloComunicacion = idModeloComunicacion;
+	}
+	public void setIdClaseComunicacion(String idClaseComunicacion) {
+		this.idClaseComunicacion = idClaseComunicacion;
+	}
+	public void setModeloComunicacion(String modeloComunicacion) {
+		this.modeloComunicacion = modeloComunicacion;
+	}
+	public void setClaseComunicacion(String claseComunicacion) {
+		this.claseComunicacion = claseComunicacion;
 	}
 	
 	
