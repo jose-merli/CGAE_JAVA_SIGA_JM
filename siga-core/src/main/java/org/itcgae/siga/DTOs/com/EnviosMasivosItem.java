@@ -25,6 +25,7 @@ public class EnviosMasivosItem {
 	private String idClaseComunicacion;
 	private String modeloComunicacion;
 	private String claseComunicacion;
+	
 	public Short getIdInstitucion() {
 		return idInstitucion;
 	}
