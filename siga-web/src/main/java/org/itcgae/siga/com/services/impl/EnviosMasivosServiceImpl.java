@@ -293,10 +293,10 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 								envioProgramado.setIdinstitucion(idInstitucion);
 								envioProgramado.setEstado("0");
 								if(enviosProgramadosDto[i].getIdPlantilla() != null){
-									envioProgramado.setIdplantilla(enviosProgramadosDto[i].getIdPlantilla());
+									envioProgramado.setIdplantilla(Short.valueOf(enviosProgramadosDto[i].getIdPlantilla()));
 								}
-								envioProgramado.setIdplantillaenvios(enviosProgramadosDto[i].getIdPlantillasEnvio());
-								envioProgramado.setIdtipoenvios(enviosProgramadosDto[0].getIdTipoEnvio());
+								envioProgramado.setIdplantillaenvios(Integer.parseInt(enviosProgramadosDto[i].getIdPlantillaEnvios()));
+								envioProgramado.setIdtipoenvios(Short.valueOf(enviosProgramadosDto[0].getIdTipoEnvios()));
 								envioProgramado.setNombre(enviosProgramadosDto[0].getDescripcion());
 								envioProgramado.setFechaprogramada(enviosProgramadosDto[i].getFechaProgramada());
 								envioProgramado.setFechamodificacion(new Date());

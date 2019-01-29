@@ -242,10 +242,8 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						plantilla.setIdinstitucion(idInstitucion);
 						plantilla.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 						plantilla.setNombre(datosTarjeta.getNombre());
-						if(datosTarjeta.getIdTipoEnvios().equals("1") || datosTarjeta.getIdTipoEnvios().equals("2")){
-							plantilla.setAsunto(datosTarjeta.getAsunto());
-							plantilla.setCuerpo(datosTarjeta.getCuerpo());
-						}
+						plantilla.setAsunto(datosTarjeta.getAsunto());
+						plantilla.setCuerpo(datosTarjeta.getCuerpo());
 						plantilla.setDescripcion(datosTarjeta.getDescripcion());
 						plantilla.setFechamodificacion(new Date());
 						plantilla.setUsumodificacion(usuario.getIdusuario());
