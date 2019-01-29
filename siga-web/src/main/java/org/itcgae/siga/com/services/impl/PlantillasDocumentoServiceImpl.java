@@ -470,46 +470,50 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				MultipartFile file = request.getFile(itr.next());
 				String fileName = file.getOriginalFilename();
 				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
-				//BufferedOutputStream stream = null;
-				try {
-					File aux = new File(pathFichero);
-					// creo directorio si no existe
-					aux.mkdirs();
-					File serverFile = new File(pathFichero, fileName);
-					if(serverFile.exists()){
-						LOGGER.error("Ya existe el fichero: " + pathFichero + fileName);
-						throw new FileAlreadyExistsException("El fichero ya existe");
+				if(extension.contains("doc") || extension.contains("docx") || extension.contains("xls") || extension.contains("xlsx")){
+					try {
+						File aux = new File(pathFichero);
+						// creo directorio si no existe
+						aux.mkdirs();
+						File serverFile = new File(pathFichero, fileName);
+						if(serverFile.exists()){
+							LOGGER.error("Ya existe el fichero: " + pathFichero + fileName);
+							throw new FileAlreadyExistsException("El fichero ya existe");
+						}
+						FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
+						response.setNombreDocumento(fileName);
+						response.setRutaDocumento(pathFichero + fileName);
+					} catch (FileNotFoundException e) {
+						Error error = new Error();
+						error.setCode(500);
+						error.setDescription(e.getMessage());
+						response.setError(error);
+						e.printStackTrace();
+						LOGGER.error("uploadFile() -> Error al buscar la plantilla de documento en el directorio indicado",e);
+					} catch (FileAlreadyExistsException ex) {
+						Error error = new Error();
+						error.setCode(400);
+						error.setDescription(ex.getMessage());
+						response.setError(error);
+						ex.printStackTrace();
+						LOGGER.error("uploadFile() -> El fichero ya existe en el filesystem",ex);
+					} catch (IOException ioe) {
+						Error error = new Error();
+						error.setCode(500);
+						error.setDescription(ioe.getMessage());
+						response.setError(error);
+						ioe.printStackTrace();
+						LOGGER.error("uploadFile() -> Error al guardar la plantilla de documento en el directorio indicado",ioe);
+					} finally {
+						// close the stream
+						LOGGER.debug("uploadFile() -> Cierre del stream del documento");
+						//stream.close();
 					}
-					//stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-					//stream.write(file.getBytes());
-					FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
-					response.setNombreDocumento(fileName);
-					response.setRutaDocumento(pathFichero + fileName);
-				} catch (FileNotFoundException e) {
-					Error error = new Error();
-					error.setCode(500);
-					error.setDescription(e.getMessage());
-					response.setError(error);
-					e.printStackTrace();
-					LOGGER.error("uploadFile() -> Error al buscar la plantilla de documento en el directorio indicado",e);
-				} catch (FileAlreadyExistsException ex) {
+				}else{
 					Error error = new Error();
 					error.setCode(400);
-					error.setDescription(ex.getMessage());
+					error.setDescription("Formato no permitido o tamaño maximo superado");
 					response.setError(error);
-					ex.printStackTrace();
-					LOGGER.error("uploadFile() -> El fichero ya existe en el filesystem",ex);
-				} catch (IOException ioe) {
-					Error error = new Error();
-					error.setCode(500);
-					error.setDescription(ioe.getMessage());
-					response.setError(error);
-					ioe.printStackTrace();
-					LOGGER.error("uploadFile() -> Error al guardar la plantilla de documento en el directorio indicado",ioe);
-				} finally {
-					// close the stream
-					LOGGER.debug("uploadFile() -> Cierre del stream del documento");
-					//stream.close();
 				}
 			}
 		}
