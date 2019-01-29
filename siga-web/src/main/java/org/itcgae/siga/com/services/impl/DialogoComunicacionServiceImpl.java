@@ -127,7 +127,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		ModelosComunicacionSearch respuesta = new ModelosComunicacionSearch();
-		
+		List<String> clases = new ArrayList<String>();
+		for (String string : idClaseComunicacion) {
+			clases.add(string);
+		}
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -135,7 +138,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			
 			if (usuarios != null && usuarios.size() > 0) {
 				try{
-					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(idClaseComunicacion);
+					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(idInstitucion,idClaseComunicacion);
 					
 					for (ModelosComunicacionItem modelosComunicacionItem : modelos) {
 						ComboDTO comboDTO = new ComboDTO();

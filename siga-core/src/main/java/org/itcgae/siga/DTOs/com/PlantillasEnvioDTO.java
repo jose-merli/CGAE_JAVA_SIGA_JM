@@ -8,7 +8,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 public class PlantillasEnvioDTO {
 	
 	private List<PlantillaEnvioItem> plantillasItem = new ArrayList<PlantillaEnvioItem>();
-	private Error error = new Error();
+	private Error error = null;
 	
 	
 	public List<PlantillaEnvioItem> getPlantillasItem() {
