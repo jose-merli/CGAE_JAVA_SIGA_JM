@@ -34,18 +34,11 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
                 }
 			}
 			
-			DocumentBuilder builder=new DocumentBuilder(doc);
-			
 			for(String clave : claves){
-				while(builder.moveToMergeField(clave))
-				{
-					Object o = dato.get(clave);
-					try {
-						builder.write(o.toString().trim());	
-					} catch (Exception e) {
-						LOGGER.error("GeneracionDocumentosServiceImpl.sustituyeDocumento :: Error al reemplazar el dato con clave: " + clave, e);
-					}
-						
+				Object datosMap = (Object) dato.get(clave);
+				if (datosMap instanceof HashMap) {
+					HashMap htRowDatosInforme = (HashMap) datosMap;
+					doc = sustituyeDatos(doc, htRowDatosInforme);
 				}
 			}
 		} catch (Exception e) {
@@ -64,6 +57,33 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		} catch (Exception e) {
 			LOGGER.error("GeneracionDocumentosServiceImpl.sustituyeRegionDocumento :: Error al sustituir región", e);
 			throw e;
+		}
+		return doc;
+	}
+	
+	@Override
+	public Document sustituyeDatos(Document doc, HashMap<String, Object> dato){
+
+		try {
+			
+			Set<String> claves=dato.keySet();
+			
+			DocumentBuilder builder=new DocumentBuilder(doc);
+			
+			for(String clave : claves){
+				while(builder.moveToMergeField(clave))
+				{
+					Object o = dato.get(clave);
+					try {
+						builder.write(o.toString().trim());	
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+						
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return doc;
 	}

@@ -5,21 +5,23 @@ import java.util.List;
 
 import org.itcgae.siga.DTOs.gen.Error;
 
-public class PerfilesDTO {
+public class KeysDTO {
 	
-	private List<PerfilDTO> perfiles = new ArrayList<PerfilDTO>();
+	private List<KeyItem> keysItem = new ArrayList<KeyItem>();
 	private Error error = null;
 	
+
 	public Error getError() {
 		return error;
 	}
 	public void setError(Error error) {
 		this.error = error;
 	}
-	public List<PerfilDTO> getPerfiles() {
-		return perfiles;
+	public List<KeyItem> getKeysItem() {
+		return keysItem;
 	}
-	public void setPerfiles(List<PerfilDTO> perfiles) {
-		this.perfiles = perfiles;
+	public void setKeysItem(List<KeyItem> keysItem) {
+		this.keysItem = keysItem;
 	}
+	
 }
