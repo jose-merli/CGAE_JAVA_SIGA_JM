@@ -18,7 +18,31 @@ import org.springframework.stereotype.Service;
 @Service
 @Primary
 public interface ForInscripcionExtendsMapper extends ForInscripcionMapper{
+	
+	@SelectProvider(type = ForInscripcionSqlExtendsProvider.class, method = "selectInscripcionByPrimaryKey")
+	@Results({ @Result(column = "IDINSCRIPCION", property = "idInscripcion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "CODIGOCURSO", property = "codigoCurso", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NOMBRECURSO", property = "nombreCurso", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDCURSO", property = "idCurso", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDESTADOCURSO", property = "idEstadoCurso", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDESTADOINSCRIPCION", property = "idEstadoInscripcion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADO", property = "estado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "PRECIOCURSO", property = "precioCurso", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAIMPARTICIONDESDE", property = "fechaImparticionDesdeFormat", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHAIMPARTICIONHASTA", property = "fechaImparticionHastaFormat", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHASOLICITUD", property = "fechaSolicitud", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "ESTADOINSCRIPCION", property = "estadoInscripcion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "MINIMAASISTENCIA", property = "minimaAsistencia", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "CERTIFICADOEMITIDO", property = "certificadoEmitido", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "EMITIRCERTIFICADO", property = "emitirCertificado", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "CALIFICACION", property = "calificacion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDPETICIONSUSCRIPCION", property = "idPeticionSuscripcion", jdbcType = JdbcType.NUMERIC)
 
+	})
+	InscripcionItem selectInscripcionByPrimaryKey(InscripcionItem inscripcionItem);	
+	
 	@SelectProvider(type = ForInscripcionSqlExtendsProvider.class, method = "selectInscripciones")
 	@Results({ @Result(column = "IDINSCRIPCION", property = "idInscripcion", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "CODIGOCURSO", property = "codigoCurso", jdbcType = JdbcType.NUMERIC),
@@ -38,6 +62,7 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper{
 			@Result(column = "CERTIFICADOEMITIDO", property = "certificadoEmitido", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "EMITIRCERTIFICADO", property = "emitirCertificado", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "CALIFICACION", property = "calificacion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "IDCALIFICACION", property = "idCalificacion", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "IDPETICIONSUSCRIPCION", property = "idPeticionSuscripcion", jdbcType = JdbcType.NUMERIC)
 
 	})

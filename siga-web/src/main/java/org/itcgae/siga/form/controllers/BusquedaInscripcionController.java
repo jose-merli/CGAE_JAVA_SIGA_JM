@@ -36,6 +36,12 @@ public class BusquedaInscripcionController {
 		return new ResponseEntity<InscripcionDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "busquedaInscripciones/selectInscripcionByPrimaryKey",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InscripcionItem> selectInscripcionByPrimaryKey(@RequestBody InscripcionItem inscripcionItem, HttpServletRequest request) {
+		InscripcionItem response = busquedaInscripcionService.selectInscripcionByPrimaryKey(inscripcionItem, request);
+		return new ResponseEntity<InscripcionItem>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/busquedaInscripciones/searchPersona",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<FichaPersonaItem> searchPersona(HttpServletRequest request) { 
 		FichaPersonaItem response = busquedaInscripcionService.searchPersona(request);

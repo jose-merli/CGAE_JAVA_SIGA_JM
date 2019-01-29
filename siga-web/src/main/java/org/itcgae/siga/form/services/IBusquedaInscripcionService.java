@@ -15,6 +15,8 @@ public interface IBusquedaInscripcionService {
 	
 	public InscripcionDTO searchInscripcion(InscripcionItem inscripcionItem, HttpServletRequest request);
 	
+	public InscripcionItem selectInscripcionByPrimaryKey(InscripcionItem inscripcionItem, HttpServletRequest request);
+	
 	public ComboDTO getCalificacionesEmitidas(HttpServletRequest request);	
 	
 	public Object updateEstado(List<InscripcionItem> listInscripcionItem, HttpServletRequest request);

@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
@@ -1030,7 +1032,14 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 							CenGruposclienteCliente cenGruposclienteCliente = new CenGruposclienteCliente();
 							cenGruposclienteCliente.setFechamodificacion(new Date());
 							cenGruposclienteCliente.setUsumodificacion(usuario.getIdusuario());
-							cenGruposclienteCliente.setFechaBaja(null); // Ponemos la fecha de baja a null
+							
+							SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+							Date date = new Date();
+							String fecha = dateFormat.format(date);
+							
+							DateFormat format = new SimpleDateFormat("dd/MM/yyyy"); 
+							
+							cenGruposclienteCliente.setFechaBaja(format.parse(fecha)); // Ponemos la fecha de baja a null
 							CenGruposclienteClienteExample cenGruposclienteClienteExample = new CenGruposclienteClienteExample();
 							cenGruposclienteClienteExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 									.andIdpersonaEqualTo(Long.valueOf(etiquetaUpdateDTO.getIdPersona()))

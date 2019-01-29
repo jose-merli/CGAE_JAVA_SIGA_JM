@@ -12,11 +12,12 @@ public class PysProductosinstitucionSqlExtendsProvider extends PysProductosinsti
 
 		sql.SELECT("pys.idTipoProducto");
 		sql.SELECT("pys.idProducto");
-		sql.SELECT("pys.idProducto as value");
+		sql.SELECT("CONCAT( CONCAT(pys.idTipoProducto, pys.idProducto), pys.idProductoInstitucion) as value");
 		sql.SELECT("pys.idProductoInstitucion");
 		sql.SELECT("pys.descripcion");
 		sql.SELECT("pys.descripcion as label");
 		sql.SELECT("pys.valor");
+		sql.SELECT("CONCAT( CONCAT(pys.idTipoProducto, pys.idProducto), pys.idProductoInstitucion) AS CLAVE");
 
 		sql.FROM("PYS_PRODUCTOSINSTITUCION pys");
 		

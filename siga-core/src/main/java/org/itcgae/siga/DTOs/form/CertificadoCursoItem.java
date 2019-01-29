@@ -14,6 +14,7 @@ public class CertificadoCursoItem {
 	private String idCurso;
 	private String nombreCertificado;
 	private String calificacion;
+	private String clave;
 	
 	
 	public String getIdCertificadoCurso() {
@@ -188,6 +189,12 @@ public class CertificadoCursoItem {
 				+ descripcion + ", precio=" + precio + ", idCalificacion=" + idCalificacion + ", value=" + value
 				+ ", label=" + label + ", idCurso=" + idCurso + ", nombreCertificado=" + nombreCertificado
 				+ ", calificacion=" + calificacion + "]";
+	}
+	public String getClave() {
+		return clave;
+	}
+	public void setClave(String clave) {
+		this.clave = clave;
 	}
 	
 	

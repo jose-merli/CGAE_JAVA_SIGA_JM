@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.age.AsistenciaEventoItem;
 import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
+import org.itcgae.siga.DTOs.form.AgePersonaEventoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
 import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -58,4 +59,10 @@ public interface IFichaEventosService {
 	public AsistenciaEventoDTO getEntryListCourse(String idCurso, HttpServletRequest request);
 
 	public InsertResponseDTO saveAssistancesCourse(AsistenciaEventoDTO asistenciaEventoDTO, HttpServletRequest request);
+	
+	public InsertResponseDTO saveFormadorEvent(AgePersonaEventoDTO agePersonaEventoDTO, HttpServletRequest request);
+	
+	public UpdateResponseDTO updateFormadorEvent(AgePersonaEventoDTO agePersonaEventoDTO, HttpServletRequest request);
+	
+	public FormadorCursoDTO getTrainersSession(String idEvento, HttpServletRequest request);
 }

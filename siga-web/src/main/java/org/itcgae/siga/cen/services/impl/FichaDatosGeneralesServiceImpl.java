@@ -9,9 +9,12 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -393,7 +396,14 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						CenGruposclienteCliente cenGruposclienteCliente = new CenGruposclienteCliente();
 						cenGruposclienteCliente.setFechamodificacion(new Date());
 						cenGruposclienteCliente.setUsumodificacion(usuario.getIdusuario());
-						cenGruposclienteCliente.setFechaBaja(null); // Ponemos la fecha de baja a null
+						
+						SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+						Date date = new Date();
+						String fecha = dateFormat.format(date);
+						
+						DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+						
+						cenGruposclienteCliente.setFechaBaja(format.parse(fecha)); // Ponemos la fecha de baja a null
 						CenGruposclienteClienteExample cenGruposclienteClienteExample = new CenGruposclienteClienteExample();
 						cenGruposclienteClienteExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 								.andIdpersonaEqualTo(Long.valueOf(etiquetaUpdateDTO.getIdPersona()))
@@ -509,9 +519,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		}
 		return updateResponseDTO;
 	}
-	
-	
-	
 
 	@Override
 	public ComboEtiquetasDTO getLabelPerson(ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException {
@@ -942,6 +949,8 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 								cenCliente.setUsumodificacion(usuario.getIdusuario());
 								cenCliente.setIdlenguaje(usuario.getIdlenguaje());
 								cenCliente.setExportarfoto(SigaConstants.DB_FALSE);
+								cenCliente.setPublicidad(SigaConstants.DB_FALSE);
+								cenCliente.setGuiajudicial(SigaConstants.DB_FALSE);
 								cenCliente.setNoaparecerredabogacia(noColegiadoItem.getNoAparecerRedAbogacia());
 							//}
 							
