@@ -601,8 +601,10 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				inscripcionesAprobadas = new CursoItem();
 				inscripcionesAprobadas.setInscripciones("0");
 			}
+
 			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(idCurso));
 			Long plazasdisponibles = 0L;
+
 			if (null != cursoEntidad) {
 				if (null != cursoEntidad.getNumeroplazas()) {
 					plazasdisponibles = cursoEntidad.getNumeroplazas()
@@ -644,8 +646,10 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				inscripcionesAprobadas = new CursoItem();
 				inscripcionesAprobadas.setInscripciones("0");
 			}
+
 			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(idCurso));
 			Long plazasdisponibles = 0L;
+
 			if (null != cursoEntidad) {
 				if (null != cursoEntidad.getNumeroplazas()) {
 					plazasdisponibles = cursoEntidad.getNumeroplazas()

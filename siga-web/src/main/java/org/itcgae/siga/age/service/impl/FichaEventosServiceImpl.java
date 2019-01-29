@@ -979,8 +979,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 				record.setLugar(ageFestivos.getLugar());
 				record.setDescripcion(ageFestivos.getDenominacion());
 				record.setRecursos(null);
-				// TODO Revisar que idEstadoEvento e idTipoEvento se debería de poner
-				// record.setIdestadoevento(idestadoevento);
+				record.setIdestadoevento(1L);
 				record.setIdtipoevento(Long.parseLong("9"));
 				record.setFechabaja(null);
 				record.setUsumodificacion((long) 0);
