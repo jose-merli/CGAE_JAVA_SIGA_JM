@@ -23,8 +23,22 @@ public class EnviosMasivosItem {
 	private String tipoEnvio;
 	private String idModeloComunicacion;
 	private String idClaseComunicacion;
+	private String modeloComunicacion;
+	private String claseComunicacion;
 	
 	
+	public String getModeloComunicacion() {
+		return modeloComunicacion;
+	}
+	public String getClaseComunicacion() {
+		return claseComunicacion;
+	}
+	public void setModeloComunicacion(String modeloComunicacion) {
+		this.modeloComunicacion = modeloComunicacion;
+	}
+	public void setClaseComunicacion(String claseComunicacion) {
+		this.claseComunicacion = claseComunicacion;
+	}
 	public String getIdClaseComunicacion() {
 		return idClaseComunicacion;
 	}
