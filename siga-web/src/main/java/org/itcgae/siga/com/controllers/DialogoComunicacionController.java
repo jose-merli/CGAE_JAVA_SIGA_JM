@@ -3,6 +3,7 @@ package org.itcgae.siga.com.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
+import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.itcgae.siga.DTOs.gen.Error;
 
 @RestController
 @RequestMapping(value = "/DialogoComunicacion")
@@ -54,13 +56,23 @@ public class DialogoComunicacionController {
 	}
 	
 	@RequestMapping(value = "/descargar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> descargar(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo) {
+	ResponseEntity<Error> descargar(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo) {
 		
-		ComboDTO response = _dialogoComunicacionService.descargarComunicacion(request, dialogo);
-		if(response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		Error response = _dialogoComunicacionService.descargarComunicacion(request, dialogo);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/keys",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<KeysDTO> obtenertiposKeysClase(HttpServletRequest request, @RequestBody String idClaseComunicacion) {
+		
+		KeysDTO response = _dialogoComunicacionService.obtenerKeysClaseComunicacion(request, idClaseComunicacion);
+		if(response.getError() == null)
+			return new ResponseEntity<KeysDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<KeysDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

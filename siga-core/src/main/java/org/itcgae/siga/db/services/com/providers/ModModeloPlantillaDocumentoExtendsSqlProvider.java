@@ -46,7 +46,7 @@ public class ModModeloPlantillaDocumentoExtendsSqlProvider {
 		SQL sql = new SQL();		
 		
 		sql.SELECT("modPlantilla.IDINFORME");
-		sql.SELECT("LISTAGG(modPlantilla.Idplantilladocumento, ',') WITHIN GROUP (ORDER BY modPlantilla.Idplantilladocumento) Idplantilladocumento");
+		sql.SELECT("LISTAGG(modPlantilla.Idplantilladocumento, ',') WITHIN GROUP (ORDER BY modPlantilla.Idplantilladocumento) idplantillas");
 		
 		
 		sql.FROM("mod_modelo_plantilladocumento modPlantilla");	

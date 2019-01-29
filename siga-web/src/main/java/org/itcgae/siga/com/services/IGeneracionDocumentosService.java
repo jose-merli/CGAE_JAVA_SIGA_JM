@@ -14,6 +14,8 @@ public interface IGeneracionDocumentosService {
 
 	public File grabaDocumento(Document doc, String pathfinal, String nombrefichero) throws Exception;
 
+	public Document sustituyeDatos(Document doc, HashMap<String, Object> dato);
+
 	
 	
 }
