@@ -1,7 +1,6 @@
 package org.itcgae.siga.com.services;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +21,8 @@ public interface IConsultasService {
 	public ComboDTO objetivo(HttpServletRequest request);
 
 	public ComboDTO claseComunicacion(HttpServletRequest request);
+	
+	public ComboDTO claseComunicacionByModulo(String idModulo, HttpServletRequest request);
 
 	/****/
 	//TODO: REVISAR DTO de ENTRADA Y SALIDA

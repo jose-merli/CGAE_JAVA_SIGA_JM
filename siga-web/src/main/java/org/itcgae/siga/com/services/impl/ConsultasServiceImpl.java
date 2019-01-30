@@ -206,6 +206,44 @@ public class ConsultasServiceImpl implements IConsultasService{
 		
 		return comboDTO;
 	}
+	
+	@Override
+	public ComboDTO claseComunicacionByModulo(String idModulo, HttpServletRequest request) {
+		LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo claseComunicacion filtrado por módulo");
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+
+				
+				comboItems = _conClaseComunicacionExtendsMapper.selectTipoClaseComunicacionByModulo(idModulo);
+				if(null != comboItems && comboItems.size() > 0) {
+					ComboItem element = new ComboItem();
+					element.setLabel("");
+					element.setValue("");
+					comboItems.add(0, element);
+				}		
+				
+				comboDTO.setCombooItems(comboItems);
+				
+			}
+		}	
+		
+		LOGGER.info("claseComunicacion() -> Salida del servicio para obtener combo claseComunicacion");
+		
+		return comboDTO;
+	}
 
 	@Override
 	public ConsultasDTO consultasSearch(HttpServletRequest request, ConsultasSearch filtros) {

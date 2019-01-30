@@ -15,5 +15,18 @@ public class ConClaseComunicacionesExtendsSqlProvider {
 		
 		return sql.toString();
 	}
-
+	
+	public String selectClaseComunicacionesByModulo(String idModulo){
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDCLASECOMUNICACION");
+		sql.SELECT("NOMBRE");
+		
+		sql.FROM("MOD_CLASECOMUNICACIONES");
+		
+		sql.WHERE("IDMODULO = '" + idModulo + "'");
+		
+		return sql.toString();
+	}
 }

@@ -519,7 +519,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						modeloCom.setFechabaja(null);
 						modeloCom.setFechamodificacion(new Date());
 						modeloCom.setIdclasecomunicacion(Short.parseShort(datosTarjeta.getIdClaseComunicacion()));
-						modeloCom.setIdinstitucion(Short.parseShort(datosTarjeta.getIdInstitucion()));
+						modeloCom.setIdinstitucion(idInstitucion);
 						modeloCom.setNombre(datosTarjeta.getNombre());
 						modeloCom.setOrden(Short.parseShort(datosTarjeta.getOrden()));
 						modeloCom.setPreseleccionar(datosTarjeta.getPreseleccionar());
