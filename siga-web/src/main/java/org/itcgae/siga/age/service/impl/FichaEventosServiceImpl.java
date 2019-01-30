@@ -298,6 +298,27 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 									forEventoCurso.setIdinstitucion(idInstitucion);
 
 									response = forEventoCursoMapper.insert(forEventoCurso);
+									
+									//comprobamos si la sesión es candidata a ser inicio o fin de impartición de curso
+									
+									
+									ForCurso cursodesde = new ForCurso();
+									cursodesde.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
+									cursodesde.setFechaimparticiondesde(eventoItem.getFechaInicio());
+									ForCurso curso = forCursoExtendsMapper.selectCursoFechaMinMax(cursodesde);
+									
+									if (null == curso) {
+										forCursoExtendsMapper.updateByPrimaryKeySelective(cursodesde);
+									}
+									
+									ForCurso cursohasta = new ForCurso();
+									cursohasta.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
+									cursohasta.setFechaimparticionhasta(eventoItem.getFechaInicio());
+									curso = forCursoExtendsMapper.selectCursoFechaMinMax(cursohasta);
+									if (null == curso) {
+										forCursoExtendsMapper.updateByPrimaryKeySelective(cursohasta);
+									}
+									
 
 								}
 
@@ -1877,6 +1898,47 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		LOGGER.info("updateFormadorEvent() -> Salida del servicio para modificar un formador a una sesión");
 
 		return updateResponseDTO;
+	}
+
+	@Override
+	public void updateEstadoEventoAuto() {
+		LOGGER.info(
+				"updateEstadoCursoAuto()  -> Entrada al servicio para actualizar automáticamente los cursos que correspondan");
+
+		// Este método se encargará de actualizar el estado de los cursos cuando
+		// corresponda de manera automática (Scheduled)
+
+		AgeEvento ageEventoFiltroFechaFin = new AgeEvento();
+
+		LOGGER.info(
+				"updateEstadoCursoAuto() / forCursoExtendsMapper.selectCursosFechaAuto() -> Entrada a forCursoExtendsMapper para obtener un listado con cursos");
+		// FechaInicio = FechaActual --> Se cambiará el estado a "En curso"
+		// Recogemos la lista de cursos cuya fechaInicioImpartición sea igual que la
+		// fecha actual
+		ageEventoFiltroFechaFin.setFechafin(new Date());
+		List<AgeEvento> listEvento = ageEventoExtendsMapper.selectEventoFechaAuto(ageEventoFiltroFechaFin);
+
+		LOGGER.info(
+				"updateEstadoCursoAuto() / forCursoExtendsMapper.selectCursosFechaAuto() -> Entrada a forCursoExtendsMapper para obtener un listado con cursos");
+		// FechaFin = FechaActual-1 --> Se cambiará el estado a "Impartido"
+		// Recogemos la lista de cursos cuya fechaFinImpartición sea menor que la fecha
+		// actual,
+
+
+		// TODO Analizar qué hacer en caso de error (int == 0)
+		int correctoEnCurso = 0;
+		int correctoImpartido = 0;
+
+		LOGGER.info(
+				"updateEstadoCursoAuto() / forCursoExtendsMapper.updateByPrimaryKey() -> Entrada a forCursoExtendsMapper para actualizar el curso");
+		// Recorremos cada lista y haremos el update del estado que corresponda en cada
+		// caso
+		for (AgeEvento evento : listEvento) {
+			evento.setIdestadoevento(Long.parseLong(SigaConstants.EVENTO_CUMPLIDO));
+			evento.setFechamodificacion(new Date());
+			correctoEnCurso = ageEventoExtendsMapper.updateByPrimaryKeySelective(evento);
+		}
+
 	}
 
 }

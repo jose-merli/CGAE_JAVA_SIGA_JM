@@ -142,7 +142,8 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 		String token = request.getHeader("Authorization");
 		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		// Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
 		List<CenPersona> listCenPersona;
 
 		if (letrado.equalsIgnoreCase("S")) {
@@ -153,6 +154,8 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				CenPersona cenPersona = listCenPersona.get(0);
 				inscripcionItem.setIdPersona(cenPersona.getIdpersona());
 			}
+		}else{
+			inscripcionItem.setIdInstitucion(idInstitucion.toString());
 		}
 
 		InscripcionDTO inscripcionDTO = new InscripcionDTO();
@@ -601,13 +604,9 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				inscripcionesAprobadas = new CursoItem();
 				inscripcionesAprobadas.setInscripciones("0");
 			}
-<<<<<<< HEAD
-			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(idCurso));
-			Long plazasdisponibles =0L;
-=======
+
 			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(idCurso));
 			Long plazasdisponibles = 0L;
->>>>>>> [mtubio] Incidencia mostrar formadores por primera vez al crear una sesión y controlar inputs number
 			if (null != cursoEntidad) {
 				if (null != cursoEntidad.getNumeroplazas()) {
 					plazasdisponibles = cursoEntidad.getNumeroplazas()
@@ -649,13 +648,9 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				inscripcionesAprobadas = new CursoItem();
 				inscripcionesAprobadas.setInscripciones("0");
 			}
-<<<<<<< HEAD
 			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(idCurso));
-			Long plazasdisponibles =0L;
-=======
-			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(idCurso));
 			Long plazasdisponibles = 0L;
->>>>>>> [mtubio] Incidencia mostrar formadores por primera vez al crear una sesión y controlar inputs number
+
 			if (null != cursoEntidad) {
 				if (null != cursoEntidad.getNumeroplazas()) {
 					plazasdisponibles = cursoEntidad.getNumeroplazas()
