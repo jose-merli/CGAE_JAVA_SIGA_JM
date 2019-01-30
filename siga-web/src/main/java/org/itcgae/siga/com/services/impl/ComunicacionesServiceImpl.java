@@ -19,6 +19,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDestinatariosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -38,12 +39,14 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	@Autowired
 	private EnvEnviosExtendsMapper _envEnviosExtendsMapper;
 	
-	
 	@Autowired
 	private ConClaseComunicacionExtendsMapper _conClaseComunicacionExtendsMapper;
 	
 	@Autowired
 	private EnvDestinatariosExtendsMapper _envDestinatariosExtendsMapper;
+	
+	@Autowired
+	private ModModeloComunicacionExtendsMapper _modModeloComunicacionExtendsMapper;
 
 
 	/**Realiza la busqueda de comunicaciones **/
@@ -179,6 +182,48 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 		
 		
 		LOGGER.info("claseComunicacion() -> Salida del servicio para obtener combo clases comunicacion");
+		
+		
+		return comboDTO;
+	}
+
+
+
+	@Override
+	public ComboDTO modelosClasesComunicacion(HttpServletRequest request, String[] idsClasesComunicacion) {
+		
+		LOGGER.info("modelosClasesComunicacion() -> Entrada al servicio para obtener combo modelos de comunicacion de las clases comunicacion");
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+
+				comboItems = _modModeloComunicacionExtendsMapper.selectModelosClasesComunicacion(idInstitucion, idsClasesComunicacion);
+				if(null != comboItems && comboItems.size() > 0) {
+					ComboItem element = new ComboItem();
+					element.setLabel("");
+					element.setValue("");
+					comboItems.add(0, element);
+				}		
+				
+				comboDTO.setCombooItems(comboItems);
+				
+			}
+		}
+		
+		
+		LOGGER.info("modelosClasesComunicacion() -> Salida del servicio para obtener combo modelos de comunicacion de las clases comunicacion");
 		
 		
 		return comboDTO;
