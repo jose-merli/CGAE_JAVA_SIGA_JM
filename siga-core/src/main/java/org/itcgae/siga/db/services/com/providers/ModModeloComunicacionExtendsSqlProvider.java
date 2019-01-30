@@ -110,5 +110,26 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		   
 		return sql.toString();
 	}
+	
+	public String selectModelosClasesComunicacion(Short idInstitucion,String[] idsClasesComunicacion){
+		   
+		   SQL sql = new SQL();
+		   
+		   String ids ="";
+		   
+		   for (int i = 0; i < idsClasesComunicacion.length; i++) {   
+			   ids += idsClasesComunicacion[i];
+			   if(idsClasesComunicacion.length -1 != i){
+				   ids+=",";
+			   }
+		   }
+		   
+		   sql.SELECT("MODELO.IDMODELOCOMUNICACION as value, MODELO.NOMBRE as label");
+		   sql.FROM("MOD_MODELOCOMUNICACION MODELO");
+		   sql.WHERE("MODELO.IDCLASECOMUNICACION IN ("+ids+")");
+		   
+		   return sql.toString();
+		}
+	
 
 }

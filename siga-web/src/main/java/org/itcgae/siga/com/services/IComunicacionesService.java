@@ -14,6 +14,9 @@ public interface IComunicacionesService {
 	/**Combos**/
 	public ComboDTO claseComunicacion(HttpServletRequest request);
 	
+	/**Combos**/
+	public ComboDTO modelosClasesComunicacion(HttpServletRequest request, String[] idsClaseComuncicacion);
+	
 	/****/
 	public EnviosMasivosDTO comunicacionesSearch(HttpServletRequest request, EnviosMasivosSearch filtros);
 
