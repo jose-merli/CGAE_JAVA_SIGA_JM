@@ -189,7 +189,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 
 
 
-	@Override
+	/*@Override
 	public ComboDTO modelosClasesComunicacion(HttpServletRequest request, String[] idsClasesComunicacion) {
 		
 		LOGGER.info("modelosClasesComunicacion() -> Entrada al servicio para obtener combo modelos de comunicacion de las clases comunicacion");
@@ -227,7 +227,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 		
 		
 		return comboDTO;
-	}
+	}*/
 
 
 

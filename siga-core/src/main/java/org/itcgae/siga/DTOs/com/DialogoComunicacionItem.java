@@ -6,6 +6,7 @@ import java.util.List;
 public class DialogoComunicacionItem {
 	
 	private String idClaseComunicacion;
+	private String idInstitucion;
 	private List<ModelosComunicacionItem> modelos = new ArrayList<ModelosComunicacionItem>();
 	private List<List<String>> selectedDatos = new ArrayList<List<String>>();
 	
@@ -26,6 +27,12 @@ public class DialogoComunicacionItem {
 	}
 	public void setSelectedDatos(List<List<String>> selectedDatos) {
 		this.selectedDatos = selectedDatos;
+	}
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
 	}
 	
 	

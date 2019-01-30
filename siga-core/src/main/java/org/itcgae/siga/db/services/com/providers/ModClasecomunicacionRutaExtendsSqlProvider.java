@@ -14,5 +14,16 @@ public class ModClasecomunicacionRutaExtendsSqlProvider {
 	   return sql.toString();
    }
    
+   public String selectClaseComunicacionesUnica (String rutaClaseComunicacion){
+	   SQL sql = new SQL();
+	   
+	   sql.SELECT("CLASE.NOMBRE");
+	   sql.SELECT("RUTACLASE.IDCLASECOMUNICACION");
+	   sql.FROM("MOD_CLASECOMUNICACION_RUTA RUTACLASE");
+	   sql.JOIN("MOD_CLASECOMUNICACIONES CLASE ON CLASE.IDCLASECOMUNICACION = RUTACLASE.IDCLASECOMUNICACION");
+	   sql.WHERE("RUTACLASE.RUTA ='" + rutaClaseComunicacion + "'");
+	   return sql.toString();
+   }
+   
 
 }

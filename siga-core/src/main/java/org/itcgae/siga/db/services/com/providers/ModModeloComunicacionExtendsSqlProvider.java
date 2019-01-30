@@ -1,7 +1,6 @@
 package org.itcgae.siga.db.services.com.providers;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
@@ -68,22 +67,13 @@ public class ModModeloComunicacionExtendsSqlProvider {
 	}
 	
 		
-	public String selectModelosComunicacionDialg(Short idInstitucion,String[] idsClasesComunicacion){
+	public String selectModelosComunicacionDialg(String idClaseComunicacion){
 	   
 	   SQL sql = new SQL();
 	   
-	   String ids ="";
-	   
-	   for (int i = 0; i < idsClasesComunicacion.length; i++) {   
-		   ids += idsClasesComunicacion[i];
-		   if(idsClasesComunicacion.length -1 != i){
-			   ids+=",";
-		   }
-	   }
-	   
 	   sql.SELECT("MODELO.IDCLASECOMUNICACION, MODELO.IDMODELOCOMUNICACION, MODELO.NOMBRE");
 	   sql.FROM("MOD_MODELOCOMUNICACION MODELO");
-	   sql.WHERE("MODELO.IDCLASECOMUNICACION IN ("+ids+")");
+	   sql.WHERE("MODELO.IDCLASECOMUNICACION IN ("+idClaseComunicacion.toString()+")");
 	   
 	   return sql.toString();
 	}
@@ -110,26 +100,5 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		   
 		return sql.toString();
 	}
-	
-	public String selectModelosClasesComunicacion(Short idInstitucion,String[] idsClasesComunicacion){
-		   
-		   SQL sql = new SQL();
-		   
-		   String ids ="";
-		   
-		   for (int i = 0; i < idsClasesComunicacion.length; i++) {   
-			   ids += idsClasesComunicacion[i];
-			   if(idsClasesComunicacion.length -1 != i){
-				   ids+=",";
-			   }
-		   }
-		   
-		   sql.SELECT("MODELO.IDMODELOCOMUNICACION as value, MODELO.NOMBRE as label");
-		   sql.FROM("MOD_MODELOCOMUNICACION MODELO");
-		   sql.WHERE("MODELO.IDCLASECOMUNICACION IN ("+ids+")");
-		   
-		   return sql.toString();
-		}
-	
 
 }

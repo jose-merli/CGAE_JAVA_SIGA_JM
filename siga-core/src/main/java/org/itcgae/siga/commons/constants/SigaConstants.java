@@ -35,6 +35,8 @@ public class SigaConstants {
 	public static final String IP_ACCESO_SERVICIO_CARGAS = "IP_ACCESO_SERVICIO_CARGAS";
 	public static final String ACTIVAR_CLIENTE_SERVICIO_CARGAS = "ACTIVAR_CLIENTE_SERVICIO_CARGAS";
 	
+	// DOCUMENTOS
+	
 	public static String SUFIJO_MODULO_COM_DUPLICADO = "_Copia";
 	public static int NOMBRE_MAXLENGTH = 100;
 	public static String rutaficherosInformesYcomunicaciones = "/FILERMSA1000/SIGA/ficheros/archivo/";
@@ -46,7 +48,12 @@ public class SigaConstants {
 	public static String REPLACECHAR_PREFIJO_SUFIJO = "%%";
 	public static String CLAVES_QUERY = "CLAVES";
 	public static String WHERE_VALUE = "whereValue";
-	
+	public static String CAMPO_NOMBRE = "nombre";
+	public static String CAMPO_APELLIDOS = "apellidos";
+	public static String CAMPO_APELLIDO1 = "APELLIDO1";
+	public static String CAMPO_APELLIDO2 = "APELLIDO2";
+	public static String CAMPO_NUM_COLEGIADO = "NCOLEGIADO";
+	public static String CAMPO_IDENTIFICACION = "INDENTIFICACIONENTIDAD";
 
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(
@@ -369,6 +376,69 @@ public class SigaConstants {
 
 		public static OBJETIVO getEnum(Short codigo) {
 			for (OBJETIVO sc : values()) {
+				if (sc.getCodigo().shortValue() == codigo.shortValue()) {
+					return sc;
+				}
+			}
+			return null;
+		}
+	}
+	
+	public static enum SUFIJOS {
+		NOMBRE_COLEGIADO(new Short("1"), "NOMBRE_COLEGIADO"),
+		NUMERO_COLEGIADO(new Short("2"), "NUMERO_COLEGIADO"),
+		IDENTIFICACION(new Short("3"), "IDENTIFICACION");
+		
+		private final Short codigo;
+		private final String descripcion;
+
+		SUFIJOS(Short codigo, String descripcion) {
+			this.codigo = codigo;
+			this.descripcion = descripcion;
+		}
+
+		public Short getCodigo() {
+			return codigo;
+		}
+
+		public String getDescripcion() {
+			return descripcion;
+		}
+
+		public static SUFIJOS getEnum(Short codigo) {
+			for (SUFIJOS sc : values()) {
+				if (sc.getCodigo().shortValue() == codigo.shortValue()) {
+					return sc;
+				}
+			}
+			return null;
+		}
+	}
+	
+	public static enum FORMATO_SALIDA {
+		XLS(new Short("1"), "xls"),
+		DOC(new Short("2"), "doc"),
+		PDF(new Short("3"), "pdf"),
+		PDF_FIRMADO(new Short("4"), "pdf");
+		
+		private final Short codigo;
+		private final String descripcion;
+
+		FORMATO_SALIDA(Short codigo, String descripcion) {
+			this.codigo = codigo;
+			this.descripcion = descripcion;
+		}
+
+		public Short getCodigo() {
+			return codigo;
+		}
+
+		public String getDescripcion() {
+			return descripcion;
+		}
+
+		public static FORMATO_SALIDA getEnum(Short codigo) {
+			for (FORMATO_SALIDA sc : values()) {
 				if (sc.getCodigo().shortValue() == codigo.shortValue()) {
 					return sc;
 				}

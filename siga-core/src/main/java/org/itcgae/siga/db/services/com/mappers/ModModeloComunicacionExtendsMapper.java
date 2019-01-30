@@ -38,13 +38,7 @@ public interface ModModeloComunicacionExtendsMapper {
 		@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ModelosComunicacionItem> selectModelosComunicacionDialogo(Short idInstitucion, String[] idsClasesComunicacion);
-	
-	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "selectModelosClasesComunicacion")
-	@Results({@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR)
-	})
-	List<ComboItem> selectModelosClasesComunicacion(Short idInstitucion, String[] idsClasesComunicacion);
+	List<ModelosComunicacionItem> selectModelosComunicacionDialogo(String idClaseComunicacion);
 	
 	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "selectPlantillaModelo")
 	@Results({@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR),
