@@ -5,7 +5,7 @@ import org.itcgae.siga.db.mappers.ForTiposervicioSqlProvider;
 
 public class ForTiposervicioSqlExtendsProvider extends ForTiposervicioSqlProvider {
 
-	public String getServicesCourse(String idInstitucion) {
+	public String getServicesCourse(String idInstitucion, String idLenguaje) {
 
 		SQL sql = new SQL();
 
@@ -14,6 +14,7 @@ public class ForTiposervicioSqlExtendsProvider extends ForTiposervicioSqlProvide
 		sql.FROM("FOR_TIPOSERVICIO ts");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS cat ON ts.DESCRIPCION = cat.IDRECURSO");
 		sql.WHERE("ts.FECHA_BAJA IS NULL");
+		sql.WHERE("CAT.IDLENGUAJE = '" + idLenguaje + "'");
 		sql.WHERE("ts.idinstitucion ='" + idInstitucion + "'");
 		sql.ORDER_BY("cat.DESCRIPCION");
 
