@@ -106,8 +106,8 @@ public class ModelosYComunicacionesController {
 	}
 	
 	
-	@RequestMapping(value = "/colegiosModelo",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> colegiosPredeterminado(HttpServletRequest request, @RequestBody ModelosComunicacionItem modelo) {
+	@RequestMapping(value = "/colegiosModelo",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> colegiosPredeterminado(HttpServletRequest request) {
 		
 		ComboDTO response = _modelosYcomunicacionesService.colegiosModelo(request);
 		if(response.getError() == null)
