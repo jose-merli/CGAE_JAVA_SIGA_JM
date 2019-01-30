@@ -49,6 +49,12 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.LEFT_OUTER_JOIN("FOR_TEMACURSO_CURSO TEMACURSO ON (TEMACURSO.IDCURSO = CURSO.IDCURSO AND TEMACURSO.IDINSTITUCION = CURSO.IDINSTITUCION AND TEMACURSO.FECHABAJA IS NULL)");
 		sql.LEFT_OUTER_JOIN(
 				"FOR_PERSONA_CURSO PERCURSO2 ON PERCURSO2.IDCURSO = CURSO.IDCURSO AND PERCURSO2.TUTOR = '1' AND CURSO.IDINSTITUCION = PERCURSO2.IDINSTITUCION");
+		sql.LEFT_OUTER_JOIN(
+				"CEN_COLEGIADO COLEGIADO ON (COLEGIADO.IDPERSONA = INSC.IDPERSONA  )");
+
+		if (inscripcionItem.getIdInstitucion() != null && inscripcionItem.getIdInstitucion() != "") {
+			sql.WHERE("(INSC.idinstitucion = '" + inscripcionItem.getIdInstitucion() + "' OR COLEGIADO.IDINSTITUCION = '" + inscripcionItem.getIdInstitucion() + "')");
+		}
 		sql.ORDER_BY("FECHASOLICITUD DESC");
 		
 		if (inscripcionItem.getIdCurso() != null && inscripcionItem.getIdCurso() != "") {

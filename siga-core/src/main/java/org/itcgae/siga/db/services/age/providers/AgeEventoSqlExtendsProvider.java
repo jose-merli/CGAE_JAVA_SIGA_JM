@@ -1,6 +1,10 @@
 package org.itcgae.siga.db.services.age.providers;
 
+import java.text.SimpleDateFormat;
+
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.db.entities.AgeEvento;
+import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.mappers.AgeEventoSqlProvider;
 
 public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
@@ -52,8 +56,8 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		sql.SELECT("evento.titulo");
 		sql.SELECT("evento.fechainicio");
 		sql.SELECT("evento.fechafin");
-		sql.SELECT("concat(evento.fechainicio, ' - ' || to_char(evento.fechainicio,'hh24:mm')) as fechaHoraInicio");
-		sql.SELECT("concat(evento.fechafin, ' - ' || to_char(evento.fechafin,'hh24:mm')) as fechaHoraFin");
+		sql.SELECT("concat(TO_CHAR(evento.fechainicio,'DD/MM/RRRR'), ' - ' || to_char(evento.fechainicio,'hh24:mm')) as fechaHoraInicio");
+		sql.SELECT("concat(TO_CHAR(evento.fechafin,'DD/MM/RRRR'), ' - ' || to_char(evento.fechafin,'hh24:mm')) as fechaHoraFin");
 		sql.SELECT("evento.lugar");
 		sql.SELECT("evento.descripcion");
 		sql.SELECT("evento.recursos");
@@ -62,6 +66,7 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		sql.SELECT("evento.idtipoevento");
 		sql.SELECT("cal.IDTIPOCALENDARIO");
 		sql.SELECT("ec.IDCURSO");
+		sql.SELECT("LISTAGG(CONCAT(PER.NOMBRE ||' ',CONCAT(DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) || ' ',PER.APELLIDOS2)), '; ') WITHIN GROUP (ORDER BY PER.NOMBRE) AS FORMADORES");
 		sql.FROM("AGE_EVENTO evento");
 		sql.INNER_JOIN(
 				"FOR_EVENTO_CURSO ec on (evento.idEvento = ec.idEvento and evento.idinstitucion = ec.idinstitucion)");
@@ -69,12 +74,18 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 				"AGE_CALENDARIO cal on (evento.idCalendario = cal.idCalendario and evento.idinstitucion = cal.idinstitucion)");
 		sql.INNER_JOIN("AGE_ESTADOEVENTOS ESTADO ON EVENTO.IDESTADOEVENTO = ESTADO.IDESTADOEVENTO");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON (CAT.IDRECURSO = ESTADO.DESCRIPCION AND CAT.IDLENGUAJE = '1' )");
-
+		sql.LEFT_OUTER_JOIN("AGE_PERSONA_EVENTO PEREVENT ON (evento.idevento = perevent.idevento and PEREVENT.FECHABAJA is null)");
+		sql.LEFT_OUTER_JOIN("CEN_PERSONA PER ON (PEREVENT.IDPERSONA = PER.IDPERSONA)");
+		
 		sql.WHERE("evento.FECHABAJA is NULL");
 		sql.WHERE("evento.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("ec.idCurso = '" + idCurso + "'");
 		sql.WHERE("evento.idTipoEvento = '" + idTipoEvento + "'");
-		
+
+		sql.GROUP_BY(
+				"evento.idevento, evento.idcalendario, evento.idinstitucion, evento.titulo, evento.fechainicio, evento.fechafin, concat(TO_CHAR(evento.fechainicio,'DD/MM/RRRR'), ' - ' || to_char(evento.fechainicio,'hh24:mm')), concat(TO_CHAR(evento.fechafin,'DD/MM/RRRR'), ' - ' || to_char(evento.fechafin,'hh24:mm')), evento.lugar,  "
+						+ "evento.descripcion, evento.recursos, evento.idestadoevento, cat.descripcion, evento.idtipoevento, cal.IDTIPOCALENDARIO, ec.IDCURSO");
+
 		sql.ORDER_BY("evento.fechainicio");
 
 		return sql.toString();
@@ -116,4 +127,19 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		return sql.toString();
 	}
 
+	
+	public String selectEventoFechaAuto(AgeEvento evento) {
+		SQL sql = new SQL();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+		
+		sql.SELECT_DISTINCT("EVENTO.IDEVENTO");
+		sql.FROM("AGE_EVENTO EVENTO");
+		
+		if(evento.getFechafin() != null) {
+			sql.WHERE("EVENTO.FECHAFIN < TO_DATE('" + dateFormat.format(evento.getFechafin()) + "','dd/MM/RRRR hh24:mi:ss') ");
+		}
+
+		sql.WHERE("EVENTO.IDESTADOEVENTO = 1");
+		return sql.toString();
+	}
 }

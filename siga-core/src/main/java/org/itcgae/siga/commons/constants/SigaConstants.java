@@ -425,7 +425,8 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final long INSCRIPCION_APROBADA = 3; 
 	public static final long INSCRIPCION_RECHAZADA = 2; 
 
-	public static final String EVENTO_PLANIFICADO = "1"; 
+	public static final String EVENTO_PLANIFICADO = "1";
+	public static final String EVENTO_CUMPLIDO = "2"; 
 	public static final String EVENTO_CANCELADO = "3";
 	public static final String EVENTO_SESION = "8";
 	
@@ -518,6 +519,13 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 			,TIPOCVCOD,TIPOCVNOMBRE,C_IDTIPOCV,SUBTIPOCV1COD,SUBTIPOCV1NOMBRE,C_IDTIPOCVSUBTIPO1,SUBTIPOCV2COD,SUBTIPOCV2NOMBRE,C_IDTIPOCVSUBTIPO2,ERRORES);
 
 	
+	//AGENDA
+	
+	public static final long CALENDARIO_GENERAL = 1; 
+	public static final long CALENDARIO_LABORAL = 2;
+	public static final long CALENDARIO_FORMACION = 3; 
+
+
 	
 	
  

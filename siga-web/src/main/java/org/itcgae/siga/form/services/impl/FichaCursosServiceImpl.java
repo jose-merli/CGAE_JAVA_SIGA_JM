@@ -309,7 +309,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				AdmUsuarios usuario = usuarios.get(0);
 				LOGGER.info(
 						"getTrainersCourse() / forPersonacursoExtendsMapper.getTrainers(idInstitucion, idCurso) -> Entrada a forPersonacursoExtendsMapper para obtener los formadores de un curso especifico");
-                ForCurso curso = forCursoExtendsMapper.selectByPrimaryKey(new Long(idCurso));
+                ForCurso curso = forCursoExtendsMapper.selectByPrimaryKeyExtends(new Long(idCurso));
                 formadoresCursoItem = forPersonacursoExtendsMapper.getTrainersCourse(curso.getIdinstitucion().toString(), idCurso,
 						usuario.getIdlenguaje());
 				LOGGER.info(
@@ -1313,6 +1313,104 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 						}
 					}
+					
+					// Si existe idEventoInscripcion se debe guardar la relacion entre el evento y
+					// el curso
+					if (cursoItem.getIdEventoInicioInscripcion() != null) {
+
+						ForEventoCurso forEventoCurso = new ForEventoCurso();
+						forEventoCurso.setFechabaja(null);
+						forEventoCurso.setFechamodificacion(new Date());
+						forEventoCurso.setIdcurso(cursoItem.getIdCurso());
+						forEventoCurso.setIdevento(Long.valueOf(cursoItem.getIdEventoInicioInscripcion()));
+						forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+						forEventoCurso.setIdinstitucion(idInstitucion);
+
+						response = forEventoCursoMapper.insert(forEventoCurso);
+
+						// Se da de alta al evento creado para ese curso
+
+						AgeEventoExample exampleEvento = new AgeEventoExample();
+						exampleEvento.createCriteria()
+								.andIdeventoEqualTo(Long.valueOf(cursoItem.getIdEventoInicioInscripcion()))
+								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andFechabajaIsNotNull();
+
+						LOGGER.info(
+								"saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) -> Entrada a ageEventoExtendsMapper para buscar el evento que debemos dar de alta");
+
+						List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(exampleEvento);
+
+						LOGGER.info(
+								"saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) -> Salida a ageEventoExtendsMapper para buscar el evento que debemos dar de alta");
+
+						if (null != eventoList && eventoList.size() > 0) {
+							AgeEvento evento = eventoList.get(0);
+
+							evento.setFechabaja(null);
+							evento.setFechamodificacion(new Date());
+							evento.setUsumodificacion(usuario.getIdusuario().longValue());
+
+							LOGGER.info(
+									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
+
+							response = ageEventoExtendsMapper.updateByPrimaryKey(evento);
+
+							LOGGER.info(
+									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
+
+						}
+
+					}
+
+					// Si existe idEventoInscripcion se debe guardar la relacion entre el evento y
+					// el curso
+					if (cursoItem.getIdEventoFinInscripcion() != null) {
+
+						ForEventoCurso forEventoCurso = new ForEventoCurso();
+						forEventoCurso.setFechabaja(null);
+						forEventoCurso.setFechamodificacion(new Date());
+						forEventoCurso.setIdcurso(cursoItem.getIdCurso());
+						forEventoCurso.setIdevento(Long.valueOf(cursoItem.getIdEventoFinInscripcion()));
+						forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+						forEventoCurso.setIdinstitucion(idInstitucion);
+
+						response = forEventoCursoMapper.insert(forEventoCurso);
+
+						// Se da de alta al evento creado para ese curso
+
+						AgeEventoExample exampleEvento = new AgeEventoExample();
+						exampleEvento.createCriteria()
+								.andIdeventoEqualTo(Long.valueOf(cursoItem.getIdEventoFinInscripcion()))
+								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andFechabajaIsNotNull();
+
+						LOGGER.info(
+								"saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) -> Entrada a ageEventoExtendsMapper para buscar el evento que debemos dar de alta");
+
+						List<AgeEvento> eventoList = ageEventoExtendsMapper.selectByExample(exampleEvento);
+
+						LOGGER.info(
+								"saveCourse() / ageEventoExtendsMapper.selectByExample(exampleEvento) -> Salida a ageEventoExtendsMapper para buscar el evento que debemos dar de alta");
+
+						if (null != eventoList && eventoList.size() > 0) {
+							AgeEvento evento = eventoList.get(0);
+
+							evento.setFechabaja(null);
+							evento.setFechamodificacion(new Date());
+							evento.setUsumodificacion(usuario.getIdusuario().longValue());
+
+							LOGGER.info(
+									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
+
+							response = ageEventoExtendsMapper.updateByPrimaryKey(evento);
+
+							LOGGER.info(
+									"saveCourse() / ageEventoExtendsMapper.updateByPrimaryKey(evento) -> Entrada a ageEventoExtendsMapper para dar de alta al evento");
+
+						}
+
+					}
+					
+					
 
 				} catch (Exception e) {
 					response = 0;
@@ -1487,16 +1585,26 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 
 		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getTopicsCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getTopicsCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
 			LOGGER.info(
 					"getServicesCourse() / forTiposervicioExtendsMapper.getServiceType -> Entrada a forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según la institucion");
-			comboItems = forTiposervicioExtendsMapper.getServicesCourse(idInstitucion.toString());
+			comboItems = forTiposervicioExtendsMapper.getServicesCourse(idInstitucion.toString(),usuario.getIdlenguaje());
 			LOGGER.info(
 					"getServicesCourse() / forTiposervicioExtendsMapper.getServiceType -> Salida de forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según la institucion");
-
+			}
 		}
 
 		comboDTO.setCombooItems(comboItems);
@@ -1516,16 +1624,27 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 
 		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getTopicsCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getTopicsCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
 
 			LOGGER.info(
 					"getServicesSpecificCourse() / forTiposervicioCursoExtendsMapper.getServicesSpecificCourse -> Entrada a forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según el curso");
-			comboItems = forTiposervicioCursoExtendsMapper.getServicesSpecificCourse(idInstitucion.toString(), idCurso);
+			comboItems = forTiposervicioCursoExtendsMapper.getServicesSpecificCourse(idInstitucion.toString(), idCurso,usuario.getIdlenguaje());
 			LOGGER.info(
 					"getServicesSpecificCourse() / forTiposervicioCursoExtendsMapper.getServicesSpecificCourse -> Salida de forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según el curso");
-
+			}
 		}
 
 		comboDTO.setCombooItems(comboItems);
@@ -1705,7 +1824,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
 					"uploadFileExcel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-			ForCurso curso = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(String.valueOf(idCurso)));
+			ForCurso curso = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(String.valueOf(idCurso)));
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
@@ -1719,8 +1838,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					}
 				}
 
-				// Generamos el fichero de errores
-				byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSPLOGCURSO, datosLog);
+				
 
 				// Insertamos en tabla For_inscripcion_Masiva el fichero que se ha parseado
 				forInscripcionesmasivas.setIdinstitucion(curso.getIdinstitucion());
@@ -1735,11 +1853,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	
 				
-				Long idFile = uploadFile(file.getBytes(), forInscripcionesmasivas, false, usuario);
-				Long idLogFile = uploadFile(bytesLog, forInscripcionesmasivas, true, usuario);
-				
-				forInscripcionesmasivas.setIdfichero(idFile);
-				forInscripcionesmasivas.setIdficherolog(idLogFile);
+
 				LOGGER.info(
 						"uploadFileExcel() / forInscripcionesmasivasMapper.insert(forInscripcionesmasivas) -> Entrada a forInscripcionesmasivasMapper para insertar el fichero parseado carga masiva de inscripciones");
 
@@ -1803,7 +1917,17 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					error.setDescription("Hay errores en las inscripciones subidas");
 				}
 
-
+				// Generamos el fichero de errores
+				byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSPLOGCURSO, datosLog);
+				
+				
+				Long idFile = uploadFile(file.getBytes(), forInscripcionesmasivas, false, usuario);
+				Long idLogFile = uploadFile(bytesLog, forInscripcionesmasivas, true, usuario);
+				ForInscripcionesmasivas record = new ForInscripcionesmasivas();
+				record.setIdfichero(idFile);
+				record.setIdficherolog(idLogFile);
+				record.setIdcargainscripcion(forInscripcionesmasivas.getIdcargainscripcion());
+				forInscripcionesmasivasMapper.updateByPrimaryKeySelective(record);
 			}
 
 		}
@@ -1822,8 +1946,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 		List<InscripcionItem> inscripcionItemList = new ArrayList<InscripcionItem>();
 		InscripcionItem inscripcionItem = null;
-
-		Short idInstitucion = usuario.getIdinstitucion();
+		ForCurso cursoRecibido = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(String.valueOf(idCurso)));
+		Short idInstitucion = cursoRecibido.getIdinstitucion();
 
 		StringBuffer errorLinea = null;
 		String codigoCurso = null;
@@ -1974,6 +2098,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
 							// Para crear un nocoleagiado debemos rellenar campo sociedadsj, con que dato?
 							cenNocolegiado.setSociedadsj("0");
+							cenNocolegiado.setSociedadprofesional("0");
 
 							LOGGER.info(
 									"generateExcelInscriptions() / cenClienteMapper.insert() -> Salida de cenClienteMapper para crear un nuevo colegiado");
@@ -2006,6 +2131,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 								cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
 								// Para crear un nocoleagiado debemos rellenar campo sociedadsj, con que dato?
 								cenNocolegiado.setSociedadsj("0");
+								cenNocolegiado.setSociedadprofesional("0");
 
 								LOGGER.info(
 										"generateExcelInscriptions() / cenNocolegiadoMapper.insert() -> Salida de cenNocolegiadoMapper para crear un nuevo nocolegiado");
@@ -2065,7 +2191,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 			}
 		} catch (Exception e) {
-
+			LOGGER.info(e.getMessage());
 			errorLinea = new StringBuffer();
 			errorLinea.append("Se ha producido un error en BBDD contacte con su administrador");
 		}
@@ -2198,7 +2324,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		if (null != idInstitucion) {
 
 			try {
-				ForCurso curso = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(idCurso));
+				ForCurso curso = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(idCurso));
 				LOGGER.info(
 						"getMassiveLoadInscriptions() / forInscripcionExtendsMapper.getCountIncriptions -> Entrada a forInscripcionExtendsMapper para obtener los nombres de las plantillas de inscripciones masivas a un curso");
 				cargaMasivaInscripciones = forInscripcionesmasivasExtendsMapper.getMassiveLoadInscriptions(idCurso,
@@ -2470,7 +2596,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 								inscripcionesAprobadas = new CursoItem();
 								inscripcionesAprobadas.setInscripciones("0");
 							}
-							ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(fichero.getIdCurso()));
+							ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(fichero.getIdCurso()));
 							Long plazasdisponibles =0L;
 							if (null != cursoEntidad) {
 								if (null != cursoEntidad.getNumeroplazas()) {
@@ -2703,12 +2829,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			counter.setContador(numContador + 1);
 
 			LOGGER.info(
-					"updateCourse() / forTemacursoCursoMapper.updateByPrimaryKey(temaCursoBaja) -> Entrada a forTemacursoCursoMapper para dar de baja a un tema de un curso");
+					"getCounterCourse() / forTemacursoCursoMapper.updateByPrimaryKey(temaCursoBaja) -> Entrada a forTemacursoCursoMapper para dar de baja a un tema de un curso");
 
 			response = admContadorExtendsMapper.updateByPrimaryKey(counter);
 
 			LOGGER.info(
-					"updateCourse() / forTemacursoCursoMapper.updateByPrimaryKey(temaCursoBaja) -> Salida a forTemacursoCursoMapper para dar de baja a un tema de un curso");
+					"getCounterCourse() / forTemacursoCursoMapper.updateByPrimaryKey(temaCursoBaja) -> Salida a forTemacursoCursoMapper para dar de baja a un tema de un curso");
 
 			String formatted = String.format("%0" + longitudContador + "d", numContador);
 
@@ -3289,7 +3415,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 						"getCertificatesCourse() / forCertificadoscursoExtendsMapper.getCertificatesCourse -> Entrada a forCertificadoscursoExtendsMapper para obtener los certificados de un curso");
 
 				
-				ForCurso curso = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(idCurso));
+				ForCurso curso = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(idCurso));
 				certifcadosCursoItem = forCertificadoscursoExtendsMapper.getCertificatesCourse(idCurso,
 						String.valueOf(curso.getIdinstitucion()), usuario.getIdlenguaje());
 

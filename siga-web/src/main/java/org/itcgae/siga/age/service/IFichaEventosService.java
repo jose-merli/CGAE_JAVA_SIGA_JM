@@ -65,4 +65,6 @@ public interface IFichaEventosService {
 	public UpdateResponseDTO updateFormadorEvent(AgePersonaEventoDTO agePersonaEventoDTO, HttpServletRequest request);
 	
 	public FormadorCursoDTO getTrainersSession(String idEvento, HttpServletRequest request);
+	
+	public void  updateEstadoEventoAuto();
 }

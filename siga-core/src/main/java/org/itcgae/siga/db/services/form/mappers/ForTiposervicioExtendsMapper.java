@@ -21,5 +21,5 @@ public interface ForTiposervicioExtendsMapper extends ForTiposervicioMapper{
 		@Result(column = "IDTIPOSERVICIO", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
-	List<ComboItem> getServicesCourse(String idInstitucion);
+	List<ComboItem> getServicesCourse(String idInstitucion, String idLenguaje);
 }
