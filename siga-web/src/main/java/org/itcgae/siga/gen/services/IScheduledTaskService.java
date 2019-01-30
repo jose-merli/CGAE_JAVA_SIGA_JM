@@ -8,4 +8,5 @@ public interface IScheduledTaskService {
 	public void insertarFestivos();
 	
 	public void archivarSancionesRehabilitado();
+	public void  cambiaEventosImpartido();
 }

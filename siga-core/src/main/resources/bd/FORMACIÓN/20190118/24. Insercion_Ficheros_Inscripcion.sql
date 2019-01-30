@@ -173,6 +173,11 @@ Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACI
 Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.busquedaInscripcion.pagada','Pagada#EU','0','3',to_date('05/12/18','DD/MM/RR'),'0','19');
 Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.busquedaInscripcion.pagada','Pagada#GL','0','4',to_date('05/12/18','DD/MM/RR'),'0','19');
 
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.busquedaInscripcion.fechaSolicitud','Fecha Solicitud','0','1',to_date('05/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.busquedaInscripcion.fechaSolicitud','Data Sol·licitud','0','2',to_date('05/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.busquedaInscripcion.fechaSolicitud','Fecha Solicitud#EU','0','3',to_date('05/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('formacion.busquedaInscripcion.fechaSolicitud','Fecha Solicitud#GL','0','4',to_date('05/12/18','DD/MM/RR'),'0','19');
 
+Insert into ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values ('24','cron.pattern.scheduled.ageEvento','0 */10 * ? * *','Periodo de ejecución del cron para la comprobacion de cursos','0 0 1 ? * *','1');
 
 commit;

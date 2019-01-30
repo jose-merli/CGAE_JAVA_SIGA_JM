@@ -142,7 +142,7 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 		String token = request.getHeader("Authorization");
 		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
-//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		List<CenPersona> listCenPersona;
 
 		if (letrado.equalsIgnoreCase("S")) {
@@ -153,6 +153,8 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				CenPersona cenPersona = listCenPersona.get(0);
 				inscripcionItem.setIdPersona(cenPersona.getIdpersona());
 			}
+		}else{
+			inscripcionItem.setIdInstitucion(idInstitucion.toString());
 		}
 		
 		InscripcionDTO inscripcionDTO = new InscripcionDTO();

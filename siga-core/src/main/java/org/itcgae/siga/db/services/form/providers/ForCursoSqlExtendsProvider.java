@@ -186,17 +186,39 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		
 		sql.SELECT_DISTINCT("CURSO.IDCURSO");
 		sql.SELECT("CURSO.IDINSTITUCION");
-		sql.SELECT("TO_DATE(CURSO.FECHAIMPARTICIONDESDE,'dd/MM/YYYY') AS FECHAIMPARTICIONDESDE");
-		sql.SELECT("TO_DATE(CURSO.FECHAIMPARTICIONHASTA,'dd/MM/YYYY') AS FECHAIMPARTICIONHASTA");
+		sql.SELECT("TO_DATE(CURSO.FECHAIMPARTICIONDESDE,'dd/MM/RRRR') AS FECHAIMPARTICIONDESDE");
+		sql.SELECT("TO_DATE(CURSO.FECHAIMPARTICIONHASTA,'dd/MM/RRRR') AS FECHAIMPARTICIONHASTA");
 		
 		sql.FROM("FOR_CURSO CURSO");
 		
 		if(forCurso.getFechaimparticiondesde() != null) {
-			sql.WHERE("CURSO.FECHAIMPARTICIONDESDE = '" + dateFormat.format(forCurso.getFechaimparticiondesde()) + "'");
+			sql.WHERE("TO_DATE(CURSO.FECHAIMPARTICIONDESDE,'dd/MM/RRRR') = TO_DATE('" + dateFormat.format(forCurso.getFechaimparticiondesde()) + "','dd/MM/RRRR') ");
 		}
 		
 		if(forCurso.getFechaimparticionhasta() != null) {
-			sql.WHERE("CURSO.FECHAIMPARTICIONHASTA = '" + dateFormat.format(forCurso.getFechaimparticionhasta()) + "'");
+			sql.WHERE("TO_DATE(CURSO.FECHAIMPARTICIONHASTA,'dd/MM/RRRR') = TO_DATE('" + dateFormat.format(forCurso.getFechaimparticionhasta()) + "','dd/MM/RRRR')");
+		}
+		
+		return sql.toString();
+	}
+	
+	
+	
+	public String selectCursoFechaMinMax(ForCurso forCurso) {
+		SQL sql = new SQL();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/YYYY");
+		
+		sql.SELECT_DISTINCT("CURSO.IDCURSO");
+
+		
+		sql.FROM("FOR_CURSO CURSO");
+		sql.WHERE("CURSO.IDCURSO = '" + forCurso.getIdcurso() + "'");
+		if(forCurso.getFechaimparticiondesde() != null) {
+			sql.WHERE("TO_DATE(CURSO.FECHAIMPARTICIONDESDE,'dd/MM/RRRR') < TO_DATE('" + dateFormat.format(forCurso.getFechaimparticiondesde()) + "','dd/MM/RRRR') ");
+		}
+		
+		if(forCurso.getFechaimparticionhasta() != null) {
+			sql.WHERE("TO_DATE(CURSO.FECHAIMPARTICIONHASTA,'dd/MM/RRRR') > TO_DATE('" + dateFormat.format(forCurso.getFechaimparticionhasta()) + "','dd/MM/RRRR')");
 		}
 		
 		return sql.toString();

@@ -425,7 +425,8 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final long INSCRIPCION_APROBADA = 3; 
 	public static final long INSCRIPCION_RECHAZADA = 2; 
 
-	public static final String EVENTO_PLANIFICADO = "1"; 
+	public static final String EVENTO_PLANIFICADO = "1";
+	public static final String EVENTO_CUMPLIDO = "2"; 
 	public static final String EVENTO_CANCELADO = "3";
 	public static final String EVENTO_SESION = "8";
 	

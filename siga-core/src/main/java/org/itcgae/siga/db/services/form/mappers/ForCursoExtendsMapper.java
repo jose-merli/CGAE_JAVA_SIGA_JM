@@ -63,6 +63,12 @@ public interface ForCursoExtendsMapper extends ForCursoMapper {
 	})
 	List<ForCurso> selectCursosFechaAuto(ForCurso forCurso);
 	
+	@SelectProvider(type = ForCursoSqlExtendsProvider.class, method = "selectCursoFechaMinMax")
+	@Results({ @Result(column = "IDCURSO", property = "idcurso", jdbcType = JdbcType.NUMERIC)
+	})
+	ForCurso selectCursoFechaMinMax(ForCurso forCurso);
+	
+	
 	@SelectProvider(type = ForCursoSqlExtendsProvider.class, method = "searchCourseByIdcurso")
 	@Results({ @Result(column = "IDCURSO", property = "idCurso", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "CODIGOCURSO", property = "codigoCurso", jdbcType = JdbcType.NUMERIC),
