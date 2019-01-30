@@ -612,6 +612,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					envio.setIdplantillaenvios(plantillaEnvio.getIdplantillaenvios());
 					envio.setFechamodificacion(new Date());
 					envio.setUsumodificacion(usuario.getIdusuario());
+					envio.setFecha(new Date());
+					envio.setEnvio("M");
 					Short idEstadoPendiente = 1;
 					envio.setIdestado(idEstadoPendiente);
 					 _envEnviosMapper.insert(envio);
