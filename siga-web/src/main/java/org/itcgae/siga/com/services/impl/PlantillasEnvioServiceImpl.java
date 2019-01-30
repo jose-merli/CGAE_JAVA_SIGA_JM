@@ -486,15 +486,15 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					if(direccion.getTelefono2() != null)
 						direccionItem.setTelefono2(direccion.getTelefono2());
 					if(direccion.getMovil()!= null)
-						direccion.setMovil(direccion.getMovil());
+						direccionItem.setMovil(direccion.getMovil());
 					if(direccion.getFax1() != null)
-						direccion.setFax1(direccion.getFax1());
+						direccionItem.setFax(direccion.getFax1());
 					if(direccion.getFax2() != null)
-						direccion.setFax2(direccion.getFax2());
+						direccionItem.setFax2(direccion.getFax2());
 					if(direccion.getCorreoelectronico() != null)
-						direccion.setCorreoelectronico(direccion.getCorreoelectronico());
+						direccionItem.setCorreoElectronico(direccion.getCorreoelectronico());
 					if(direccion.getPaginaweb() != null)
-						direccion.setPaginaweb(direccion.getPaginaweb());
+						direccionItem.setPaginaWeb(direccion.getPaginaweb());
 					direccionList.add(direccionItem);
 					remitente.setDireccion(direccionList);
 					
