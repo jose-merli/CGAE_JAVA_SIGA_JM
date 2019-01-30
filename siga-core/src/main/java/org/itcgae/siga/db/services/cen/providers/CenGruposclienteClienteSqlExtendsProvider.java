@@ -28,8 +28,11 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", "'" +idUsuario + "'");
 		sql.VALUES("IDINSTITUCION_GRUPO", "'" +idInstitucion+ "'");
-		sql.VALUES("FECHA_BAJA", "TO_DATE('" + etiqueta.getFechaBaja() + "','DD/MM/YYYY')");
-		sql.VALUES("FECHA_INICIO", "TO_DATE('" + etiqueta.getFechaInicio() + "','DD/MM/YYYY')");
+		if(etiqueta.getFechaBaja() != null) {
+			sql.VALUES("FECHA_BAJA", "TO_DATE('" + etiqueta.getFechaBaja() + "','DD/MM/YYYY')");
+		}else {
+			sql.VALUES("FECHA_BAJA", "null");
+		} 		sql.VALUES("FECHA_INICIO", "TO_DATE('" + etiqueta.getFechaInicio() + "','DD/MM/YYYY')");
 		
 		return sql.toString();
 	}
@@ -46,7 +49,7 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		sql.INNER_JOIN("CEN_GRUPOSCLIENTE GRUCLI on cli.idGrupo = GRUCLI.idGrupo");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO AND GENR.idLenguaje = '1'");
 		sql.WHERE("per.idpersona = '"+idPersona+"'");
-		sql.WHERE("cli.FECHA_BAJA > sysdate");
+//		sql.WHERE("cli.FECHA_BAJA > sysdate");
 		sql.WHERE("GRUCLI.idinstitucion = '"+idInstitucion+"'");
 		
 		return sql.toString();
@@ -80,7 +83,11 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		sql.VALUES("IDINSTITUCION_GRUPO", "'" +idInstitucion+ "'");
 //		sql.VALUES("FECHA_BAJA", "'" + etiqueta.getFechaBaja() + "'");
 //		sql.VALUES("FECHA_INICIO", "'" + etiqueta.getFechaInicio() + "'");
-		sql.VALUES("FECHA_BAJA", "TO_DATE('" + etiqueta.getFechaBaja() + "','DD/MM/YYYY')");
+		if(etiqueta.getFechaBaja() != null) {
+			sql.VALUES("FECHA_BAJA", "TO_DATE('" + etiqueta.getFechaBaja() + "','DD/MM/YYYY')");
+		}else {
+			sql.VALUES("FECHA_BAJA", "null");
+		} 
 		sql.VALUES("FECHA_INICIO", "TO_DATE('" + etiqueta.getFechaInicio() + "','DD/MM/YYYY')");
 		
 		return sql.toString();

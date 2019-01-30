@@ -61,7 +61,7 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CORREO", property = "correo", jdbcType = JdbcType.VARCHAR),
-			@Result(column = "TELEFONO1", property = "telefono", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAPRESENTACION", property = "fechapresentacion", jdbcType = JdbcType.VARCHAR),
@@ -78,7 +78,7 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 		@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDESTADO", property = "idEstado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHAESTADO", property = "fechaEstado", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAESTADO", property = "fechaEstadoStr", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OBSERVACIONES", property = "observaciones", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ColegiadoItem> selectColegiaciones(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem);
@@ -107,6 +107,7 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "ESTADOCOLEGIAL", property = "estadoColegial", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CORREOELECTRONICO", property = "correo", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "CORREO", property = "correo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "INSTITUCION", property = "institucion", jdbcType = JdbcType.VARCHAR)

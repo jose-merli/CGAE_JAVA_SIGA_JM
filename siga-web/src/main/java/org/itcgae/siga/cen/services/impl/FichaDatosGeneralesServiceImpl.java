@@ -237,10 +237,13 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 						  
 								Date fechaInicio = df.parse(etiqueta.getFechaInicio());
-							    Date fechaBaja = df.parse(etiqueta.getFechaBaja());
-							    
-								cenGruposclienteCliente.setFechaBaja(fechaBaja);
 								cenGruposclienteCliente.setFechaInicio(fechaInicio);
+							    if(etiqueta.getFechaBaja() != null) {
+								    Date fechaBaja = df.parse(etiqueta.getFechaBaja());
+									cenGruposclienteCliente.setFechaBaja(fechaBaja);
+							    }else {
+									cenGruposclienteCliente.setFechaBaja(null);
+							    }
 								cenGruposclienteCliente.setFechamodificacion(new Date());
 								cenGruposclienteCliente.setIdgrupo(idGrupo);
 								cenGruposclienteCliente.setIdinstitucion(usuario.getIdinstitucion());							
@@ -312,11 +315,15 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 									DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
 									  
-									Date fechaInicio = df.parse(etiqueta.getFechaInicio());
-								    Date fechaBaja = df.parse(etiqueta.getFechaBaja());
-								    
+									Date fechaInicio = df.parse(etiqueta.getFechaInicio());	
 									listarelacionGrupoPersona.get(0).setFechaInicio(fechaInicio);
-									listarelacionGrupoPersona.get(0).setFechaBaja(fechaBaja);
+
+									if(etiqueta.getFechaBaja() != null) {
+									    Date fechaBaja = df.parse(etiqueta.getFechaBaja());
+									    listarelacionGrupoPersona.get(0).setFechaBaja(fechaBaja);
+									}else {
+										  listarelacionGrupoPersona.get(0).setFechaBaja(null);
+									} 								    
 									LOGGER.info(
 											"createLegalPerson() / cenGruposclienteClienteExtendsMapper.updateByExample() -> Entrada a cenGruposclienteClienteExtendsMapper actualizar la relacion grupo-persona jurídica");
 
@@ -521,43 +528,61 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	}
 
 	@Override
-	public ComboEtiquetasDTO getLabelPerson(ColegiadoItem colegiadoItem, HttpServletRequest request) throws ParseException {
-		LOGGER.info("getLabelPerson() -> Entrada al servicio para obtener etiquetas de una persona jurídica");
-		ComboEtiquetasDTO comboEtiquetasDTO = new ComboEtiquetasDTO();
-		List<ComboEtiquetasItem>comboEtiquetasItems = new ArrayList<ComboEtiquetasItem>();
-		
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		LOGGER.info(
-				"getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
-		comboEtiquetasItems = cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica(colegiadoItem.getIdPersona(), String.valueOf(idInstitucion));
-		LOGGER.info(
-				"getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
-		
-		Date date = new Date();
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/mm/yy");
-		String fechaHoy = simpleDateFormat.format(date);
-		
-		for (ComboEtiquetasItem comboEtiquetasItem : comboEtiquetasItems) {
-			Date fechaInicio = simpleDateFormat.parse(comboEtiquetasItem.getFechaInicio());
-		    Date fechaBaja = simpleDateFormat.parse( comboEtiquetasItem.getFechaBaja());
-		    Date fechaActual = simpleDateFormat.parse(fechaHoy);
-		    
-			if(fechaInicio.before(fechaActual) && fechaBaja.after(fechaActual)) {
-				comboEtiquetasItem.setColor("#87CEFA"); 
-			}else if(fechaActual.before(fechaInicio) && fechaBaja.after(fechaInicio)) {
-				comboEtiquetasItem.setColor("#40E0D0");
-			}else if(fechaInicio.before(fechaBaja) && fechaActual.after(fechaBaja)) {
-				comboEtiquetasItem.setColor("#F08080"); 
-			}
-		}
-		
-		comboEtiquetasDTO.setComboEtiquetasItems(comboEtiquetasItems);
-		LOGGER.info("getLabelPerson() -> Salida del servicio para obtener etiquetas de una persona");
-		return comboEtiquetasDTO;
-	}
+    public ComboEtiquetasDTO getLabelPerson(ColegiadoItem colegiadoItem, HttpServletRequest request)
+                        throws ParseException {
+              LOGGER.info("getLabelPerson() -> Entrada al servicio para obtener etiquetas de una persona jurídica");
+              ComboEtiquetasDTO comboEtiquetasDTO = new ComboEtiquetasDTO();
+              List<ComboEtiquetasItem> comboEtiquetasItems = new ArrayList<ComboEtiquetasItem>();
+
+              // Conseguimos información del usuario logeado
+              String token = request.getHeader("Authorization");
+              Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+              LOGGER.info(
+                                  "getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
+              comboEtiquetasItems = cenGruposclienteClienteExtendsMapper
+                                  .selectGruposPersonaJuridica(colegiadoItem.getIdPersona(), String.valueOf(idInstitucion));
+              LOGGER.info(
+                                  "getLabelPerson() / cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica() -> Entrada a cenGruposclienteClienteExtendsMapper para obtener grupos de una persona jurídica");
+
+              Date date = new Date();
+              Date fechaBaja;
+              SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+              String fechaHoy = simpleDateFormat.format(date);
+
+              for (ComboEtiquetasItem comboEtiquetasItem : comboEtiquetasItems) {
+                        Date fechaInicio = simpleDateFormat.parse(comboEtiquetasItem.getFechaInicio());
+
+                        if (comboEtiquetasItem.getFechaBaja() != null) {
+                                  fechaBaja = simpleDateFormat.parse(comboEtiquetasItem.getFechaBaja());
+                        } else {
+                                  fechaBaja = null;
+                        }
+
+                        Date fechaActual = simpleDateFormat.parse(fechaHoy);
+
+                        if (fechaBaja == null) {
+                                  comboEtiquetasItem.setColor("#87CEFA");
+                        } else {
+                                  if (fechaInicio.before(fechaActual)
+                                                       && fechaBaja.after(fechaActual)) {
+                                            comboEtiquetasItem.setColor("#87CEFA");
+                                  } else if (fechaActual.before(fechaInicio) && fechaBaja.after(fechaInicio)) {
+                                            comboEtiquetasItem.setColor("#40E0D0");
+                                  } else if (fechaInicio.before(fechaBaja) && (fechaActual.after(fechaBaja) || fechaActual.compareTo(fechaBaja) == 0) ) {
+                                            comboEtiquetasItem.setColor("#F08080");
+                                  } else {
+                                      comboEtiquetasItem.setColor("#F08080");
+                                  }
+                        }
+              }
+
+    comboEtiquetasDTO.setComboEtiquetasItems(comboEtiquetasItems);
+              LOGGER.info("getLabelPerson() -> Salida del servicio para obtener etiquetas de una persona");
+              return comboEtiquetasDTO;
+    }
+
+
 
 	
 	@Override

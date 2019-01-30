@@ -66,6 +66,7 @@ public class ColegiadoItem {
 	private String fechaBaja;
 
 	private Date fechaEstado;
+	private String fechaEstadoStr;
 	private Date incorporacionDate;
 	private Date fechaJuraDate;
 	private Date fechaAltaDate;
@@ -1146,6 +1147,14 @@ public class ColegiadoItem {
 		this.fechaEstado = fechaEstado;
 	}
 
+	public String getFechaEstadoStr() {
+		return fechaEstadoStr;
+	}
+
+	public void setFechaEstadoStr(String fechaEstadoStr) {
+		this.fechaEstadoStr = fechaEstadoStr;
+	}
+	
 	public String getIdEstado() {
 		return idEstado;
 	}
