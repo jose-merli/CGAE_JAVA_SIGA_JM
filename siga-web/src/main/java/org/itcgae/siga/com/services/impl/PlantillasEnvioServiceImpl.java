@@ -463,6 +463,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
 					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
 					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+
 					if (null != plantilla && null != plantilla.getIdpersona()) {
 						CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(plantilla.getIdpersona());
 						remitente.setIdPersona(persona.getIdpersona().toString());
@@ -484,22 +485,23 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						direccionItem.setIdPais(direccion.getIdpais());
 						direccionItem.setCodigoPostal(direccion.getCodigopostal());
 						if(direccion.getTelefono1()!=null)
-							direccionItem.setTelefono(direccion.getTelefono1());
+						direccionItem.setTelefono(direccion.getTelefono1());
 						if(direccion.getTelefono2() != null)
 							direccionItem.setTelefono2(direccion.getTelefono2());
 						if(direccion.getMovil()!= null)
-							direccion.setMovil(direccion.getMovil());
+							direccionItem.setMovil(direccion.getMovil());
 						if(direccion.getFax1() != null)
-							direccion.setFax1(direccion.getFax1());
+							direccionItem.setFax(direccion.getFax1());
 						if(direccion.getFax2() != null)
-							direccion.setFax2(direccion.getFax2());
+							direccionItem.setFax2(direccion.getFax2());
 						if(direccion.getCorreoelectronico() != null)
-							direccion.setCorreoelectronico(direccion.getCorreoelectronico());
+							direccionItem.setCorreoElectronico(direccion.getCorreoelectronico());
 						if(direccion.getPaginaweb() != null)
-							direccion.setPaginaweb(direccion.getPaginaweb());
+							direccionItem.setPaginaWeb(direccion.getPaginaweb());
 						direccionList.add(direccionItem);
-						remitente.setDireccion(direccionList);
+						remitente.setDireccion(direccionList);	
 					}
+
 				}
 			}catch(Exception e){
 				Error error = new Error();
