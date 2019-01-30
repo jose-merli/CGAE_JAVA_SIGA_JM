@@ -20,4 +20,10 @@ public interface ConClaseComunicacionExtendsMapper {
 		@Result(column = "IDCLASECOMUNICACION", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> selectTipoClaseComunicacion();
+	
+	@SelectProvider(type = ConClaseComunicacionesExtendsSqlProvider.class, method = "selectClaseComunicacionesByModulo")
+	@Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCLASECOMUNICACION", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> selectTipoClaseComunicacionByModulo(String idModulo);
 }

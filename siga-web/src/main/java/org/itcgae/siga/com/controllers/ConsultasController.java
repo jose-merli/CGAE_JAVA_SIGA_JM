@@ -65,6 +65,17 @@ public class ConsultasController {
 		else
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@RequestMapping(value = "/claseComunicacionByModulo",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboClasesComunicacionByModulo(@RequestParam("idModulo") String idModulo, HttpServletRequest request) {
+		
+		ComboDTO response = _consultasService.claseComunicacionByModulo(idModulo, request);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
 
 	@RequestMapping(value = "/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ConsultasDTO> cargasMasivasSearch(@RequestParam("numPagina") int numPagina,

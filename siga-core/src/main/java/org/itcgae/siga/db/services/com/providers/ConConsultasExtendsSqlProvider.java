@@ -55,9 +55,11 @@ public class ConConsultasExtendsSqlProvider {
 		if(filtros.getGenerica() != null && !filtros.getGenerica().trim().equals("")){
 			if(filtros.getGenerica().equals("N")){
 				sql.WHERE("((CONSULTA.GENERAL = 'N' OR CONSULTA.GENERAL = 'n' OR CONSULTA.GENERAL = '0') AND CONSULTA.IDINSTITUCION = '" + idInstitucion +"')");
-			}else{
-				sql.WHERE("((CONSULTA.GENERAL = 'S' OR CONSULTA.GENERAL = 's' OR  CONSULTA.GENERAL = '1') AND (CONSULTA.IDINSTITUCION = '2000' OR CONSULTA.IDINSTITUCION = '" + idInstitucion +"'))");
+			}else if(filtros.getGenerica().equals("S")){
+				sql.WHERE("((CONSULTA.GENERAL = 'S' OR CONSULTA.GENERAL = 's' OR  CONSULTA.GENERAL = '1') AND CONSULTA.IDINSTITUCION = '2000')");
 			}
+		}else {
+			sql.WHERE("(CONSULTA.IDINSTITUCION = '2000' OR CONSULTA.IDINSTITUCION = '" + idInstitucion +"')");
 		}
 		
 		return sql.toString();
