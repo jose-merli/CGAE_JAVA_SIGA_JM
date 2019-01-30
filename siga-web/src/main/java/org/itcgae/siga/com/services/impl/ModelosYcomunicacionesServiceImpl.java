@@ -48,7 +48,6 @@ import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
-import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
@@ -510,7 +509,8 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						modeloCom.setOrden(Short.parseShort(datosTarjeta.getOrden()));
 						modeloCom.setPreseleccionar(datosTarjeta.getPreseleccionar());
 						modeloCom.setUsumodificacion(usuario.getIdusuario());
-						//modeloCom.setVisible(visible);
+						modeloCom.setVisible(Short.parseShort(datosTarjeta.getVisible()));
+						
 						
 						modModelocomunicacionMapper.updateByPrimaryKey(modeloCom);
 					}else{
@@ -524,7 +524,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						modeloCom.setOrden(Short.parseShort(datosTarjeta.getOrden()));
 						modeloCom.setPreseleccionar(datosTarjeta.getPreseleccionar());
 						modeloCom.setUsumodificacion(usuario.getIdusuario());
-						//modeloCom.setVisible(visible);
+						modeloCom.setVisible(Short.parseShort(datosTarjeta.getVisible()));
 						
 						modModelocomunicacionMapper.insert(modeloCom);
 					}

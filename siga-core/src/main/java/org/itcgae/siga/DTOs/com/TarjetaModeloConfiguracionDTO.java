@@ -9,7 +9,14 @@ public class TarjetaModeloConfiguracionDTO {
 	private String nombre;
 	private String descripcion;
 	private String orden;
+	private String visible;
 	
+	public String getVisible() {
+		return visible;
+	}
+	public void setVisible(String visible) {
+		this.visible = visible;
+	}
 	public String getIdModeloComunicacion() {
 		return idModeloComunicacion;
 	}

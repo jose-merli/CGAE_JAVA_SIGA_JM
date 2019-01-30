@@ -46,7 +46,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 			sql.WHERE("modelo.PRESELECCIONAR = '"+filtros.getPreseleccionar()+"'");	
 		}
 		if(filtros.getVisible() != null && !filtros.getVisible().trim().equals("")){
-			sql.WHERE("modelo.VISIBLE = '"+filtros.getIdInstitucion()+"'");	
+			sql.WHERE("modelo.VISIBLE = '"+filtros.getVisible()+"'");	
 		}
 		
 		if(historico){
@@ -73,7 +73,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 	   
 	   sql.SELECT("MODELO.IDCLASECOMUNICACION, MODELO.IDMODELOCOMUNICACION, MODELO.NOMBRE");
 	   sql.FROM("MOD_MODELOCOMUNICACION MODELO");
-	   sql.WHERE("MODELO.IDCLASECOMUNICACION IN ("+idClaseComunicacion.toString()+")");
+	   sql.WHERE("MODELO.IDCLASECOMUNICACION IN (" + idClaseComunicacion + ")");
 	   
 	   return sql.toString();
 	}
@@ -98,6 +98,17 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.JOIN("GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = TIPO.NOMBRE AND CAT.IDLENGUAJE = '" + idLenguaje + "'");
 		sql.WHERE("TIPO.IDTIPOENVIOS = '" + idPlantilla + "'");
 		   
+		return sql.toString();
+	}
+
+	public String selectModelosClasesComunicacion(String idClasesComunicacion){
+		   
+		SQL sql = new SQL();
+	
+		sql.SELECT("MODELO.IDMODELOCOMUNICACION as value, MODELO.NOMBRE as label");
+		sql.FROM("MOD_MODELOCOMUNICACION MODELO");
+		sql.WHERE("MODELO.IDCLASECOMUNICACION IN ("+idClasesComunicacion+")");
+			   
 		return sql.toString();
 	}
 

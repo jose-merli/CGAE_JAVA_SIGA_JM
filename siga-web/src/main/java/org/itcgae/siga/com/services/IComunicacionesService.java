@@ -11,15 +11,10 @@ import org.itcgae.siga.DTOs.gen.Error;
 
 public interface IComunicacionesService {
 
-	/**Combos**/
+	
 	public ComboDTO claseComunicacion(HttpServletRequest request);
-	
-	/**Combos**/
-	/*public ComboDTO modelosClasesComunicacion(HttpServletRequest request, String[] idsClaseComuncicacion);*/
-	
-	/****/
+	public ComboDTO modelosClasesComunicacion(HttpServletRequest request, String idClaseComuncicacion);
 	public EnviosMasivosDTO comunicacionesSearch(HttpServletRequest request, EnviosMasivosSearch filtros);
-
 	public Error reenviar(HttpServletRequest request, EnviosMasivosItem[] envio);
 	public DestinatariosDTO detalleDestinatarios(HttpServletRequest request,String idEnvio);
 	

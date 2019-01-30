@@ -187,10 +187,9 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 		return comboDTO;
 	}
 
+	@Override
+	public ComboDTO modelosClasesComunicacion(HttpServletRequest request, String idClaseComunicacion) {
 
-
-	/*@Override
-	public ComboDTO modelosClasesComunicacion(HttpServletRequest request, String[] idsClasesComunicacion) {
 		
 		LOGGER.info("modelosClasesComunicacion() -> Entrada al servicio para obtener combo modelos de comunicacion de las clases comunicacion");
 		
@@ -209,7 +208,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 			
 			if (null != usuarios && usuarios.size() > 0) {
 
-				comboItems = _modModeloComunicacionExtendsMapper.selectModelosClasesComunicacion(idInstitucion, idsClasesComunicacion);
+				comboItems = _modModeloComunicacionExtendsMapper.selectModelosClasesComunicacion(idClaseComunicacion);
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
 					element.setLabel("");
@@ -222,13 +221,8 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 			}
 		}
 		
-		
 		LOGGER.info("modelosClasesComunicacion() -> Salida del servicio para obtener combo modelos de comunicacion de las clases comunicacion");
-		
-		
 		return comboDTO;
-	}*/
-
-
-
+	}
 }
+

@@ -43,14 +43,14 @@ public class EnvEnviosExtendsSqlProvider {
 		}
 		if(filtros.getidEstado() != null && !filtros.getidEstado().trim().equals("")){
 			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getidEstado() +"'");
-			if(filtros.getidEstado().equals("6")){
-				sql.WHERE("ENVIO.FECHABAJA IS NOT NULL");
-			}else{
-				sql.WHERE("ENVIO.FECHABAJA IS NULL");
-			}
-		}else{
-			sql.WHERE("ENVIO.FECHABAJA IS NULL");
-		}
+//			if(filtros.getidEstado().equals("6")){
+//				sql.WHERE("ENVIO.FECHABAJA IS NOT NULL");
+//			}else{
+//				sql.WHERE("ENVIO.FECHABAJA IS NULL");
+//			}
+		 }//else{
+//			sql.WHERE("ENVIO.FECHABAJA IS NULL");
+//		}
 		if(filtros.getFechaCreacion() != null){
 			String fechaCreacion = dateFormat.format(filtros.getFechaCreacion());
 //			String fechaCreacion2 = dateFormat.format(filtros.getFechaCreacion());
