@@ -181,6 +181,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						EnvPlantillasenviosKey plantillaEnvioKey = new EnvPlantillasenviosKey();
 						plantillaEnvioKey.setIdplantillaenvios(Integer.parseInt(plantillasEnvio[i].getIdPlantillaEnvios()));
 						plantillaEnvioKey.setIdinstitucion(Short.valueOf(plantillasEnvio[i].getIdInstitucion()));
+						plantillaEnvioKey.setIdtipoenvios(Short.valueOf(plantillasEnvio[i].getIdTipoEnvios()));
 						EnvPlantillasenvios plantillaEnvios = _envPlantillasenviosMapper.selectByPrimaryKey(plantillaEnvioKey);
 						plantillaEnvios.setFechabaja(new Date());
 						plantillaEnvios.setFechamodificacion(new Date());
