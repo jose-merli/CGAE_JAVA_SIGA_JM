@@ -9,7 +9,8 @@ public class SolModifSQLUtils {
 
 	private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
 
-	public static String getGeneralRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion) {
+	public static String getGeneralRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguaje, String idInstitucion) {
 
 		SQL consultaGeneral = new SQL();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
@@ -64,10 +65,11 @@ public class SolModifSQLUtils {
 		return consultaGeneral.toString();
 	}
 
-	public static String getBasicDataRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion) {
+	public static String getBasicDataRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguaje, String idInstitucion) {
 
 		SQL consultaDatosBasicos = new SQL();
-		
+
 		consultaDatosBasicos.SELECT("'1' AS especifica");
 		consultaDatosBasicos.SELECT("cen_solicitmodifdatosbasicos.idsolicitud");
 		consultaDatosBasicos.SELECT("cen_solicitmodifdatosbasicos.motivo");
@@ -90,16 +92,14 @@ public class SolModifSQLUtils {
 
 		if (null != solicitudModificacionSearchDTO.getFechaDesde()) {
 			String fechaDesde = dateFormat.format(solicitudModificacionSearchDTO.getFechaDesde());
-			consultaDatosBasicos
-					.WHERE("TO_DATE(cen_solicitmodifdatosbasicos.FECHAALTA,'DD/MM/YYYY') >= TO_DATE('" + fechaDesde
-							+ "', 'DD/MM/YYYY')");
+			consultaDatosBasicos.WHERE("TO_DATE(cen_solicitmodifdatosbasicos.FECHAALTA,'DD/MM/YYYY') >= TO_DATE('"
+					+ fechaDesde + "', 'DD/MM/YYYY')");
 		}
 
 		if (null != solicitudModificacionSearchDTO.getFechaHasta()) {
 			String fechaHasta = dateFormat.format(solicitudModificacionSearchDTO.getFechaHasta());
-			consultaDatosBasicos
-					.WHERE("TO_DATE(cen_solicitmodifdatosbasicos.FECHAALTA,'DD/MM/YYYY') <= TO_DATE('" + fechaHasta
-							+ "', 'DD/MM/YYYY')");
+			consultaDatosBasicos.WHERE("TO_DATE(cen_solicitmodifdatosbasicos.FECHAALTA,'DD/MM/YYYY') <= TO_DATE('"
+					+ fechaHasta + "', 'DD/MM/YYYY')");
 		}
 
 		consultaDatosBasicos.WHERE(
@@ -109,7 +109,8 @@ public class SolModifSQLUtils {
 		return consultaDatosBasicos.toString();
 	}
 
-	public static String getAddressesRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion) {
+	public static String getAddressesRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguaje, String idInstitucion) {
 
 		SQL consultaDatosDirecciones = new SQL();
 
@@ -148,11 +149,12 @@ public class SolModifSQLUtils {
 		consultaDatosDirecciones.WHERE(
 				"cen_solimodidirecciones.idestadosolic = cen_estadosolicitudmodif.idestadosolic AND cen_solimodidirecciones.idinstitucion = "
 						+ idInstitucion);
-		
+
 		return consultaDatosDirecciones.toString();
 	}
 
-	public static String getBancDataRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion) {
+	public static String getBancDataRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguaje, String idInstitucion) {
 
 		SQL consultaDatosBancarios = new SQL();
 
@@ -164,7 +166,8 @@ public class SolModifSQLUtils {
 		consultaDatosBancarios.SELECT("cen_solicmodicuentas.idcuenta AS codigo");
 		consultaDatosBancarios.SELECT("cen_solicmodicuentas.fechaalta");
 		consultaDatosBancarios.SELECT("f_siga_getrecurso(cen_estadosolicitudmodif.descripcion,1) AS estado");
-		consultaDatosBancarios.SELECT("40 AS idtipomodificacion, ( " + getPersonSql("cen_solicmodicuentas") + ") as nombre");
+		consultaDatosBancarios
+				.SELECT("40 AS idtipomodificacion, ( " + getPersonSql("cen_solicmodicuentas") + ") as nombre");
 		consultaDatosBancarios.SELECT("(" + getTypeSql("40") + ") as tipoModificacion");
 		consultaDatosBancarios.SELECT("(" + getNColSql("cen_solicmodicuentas") + ") as numColegiado");
 		consultaDatosBancarios.FROM("cen_solicmodicuentas, cen_estadosolicitudmodif");
@@ -177,24 +180,25 @@ public class SolModifSQLUtils {
 
 		if (null != solicitudModificacionSearchDTO.getFechaDesde()) {
 			String fechaDesde = dateFormat.format(solicitudModificacionSearchDTO.getFechaDesde());
-			consultaDatosBancarios.WHERE(" TO_DATE(cen_solicmodicuentas.FECHAALTA,'DD/MM/YYYY') >= TO_DATE('" + fechaDesde
-					+ "', 'DD/MM/YYYY') ");
+			consultaDatosBancarios.WHERE(" TO_DATE(cen_solicmodicuentas.FECHAALTA,'DD/MM/YYYY') >= TO_DATE('"
+					+ fechaDesde + "', 'DD/MM/YYYY') ");
 		}
 
 		if (null != solicitudModificacionSearchDTO.getFechaHasta()) {
 			String fechaHasta = dateFormat.format(solicitudModificacionSearchDTO.getFechaHasta());
-			consultaDatosBancarios.WHERE(" TO_DATE(cen_solicmodicuentas.FECHAALTA,'DD/MM/YYYY') <= TO_DATE('" + fechaHasta
-					+ "', 'DD/MM/YYYY') ");
+			consultaDatosBancarios.WHERE(" TO_DATE(cen_solicmodicuentas.FECHAALTA,'DD/MM/YYYY') <= TO_DATE('"
+					+ fechaHasta + "', 'DD/MM/YYYY') ");
 		}
 
 		consultaDatosBancarios.WHERE(
 				"cen_solicmodicuentas.idestadosolic = cen_estadosolicitudmodif.idestadosolic AND cen_solicmodicuentas.idinstitucion = "
 						+ idInstitucion);
-		
+
 		return consultaDatosBancarios.toString();
 	}
 
-	public static String getCVRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion) {
+	public static String getCVRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje,
+			String idInstitucion) {
 
 		SQL consultaDatosCV = new SQL();
 
@@ -233,11 +237,12 @@ public class SolModifSQLUtils {
 		consultaDatosCV.WHERE(
 				"cen_solicitudmodificacioncv.idestadosolic = cen_estadosolicitudmodif.idestadosolic AND cen_solicitudmodificacioncv.idinstitucion = "
 						+ idInstitucion + " AND cen_solicitudmodificacioncv.idcv is not null");
-		
+
 		return consultaDatosCV.toString();
 	}
 
-	public static String getDataInvoicingRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion) {
+	public static String getDataInvoicingRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguaje, String idInstitucion) {
 
 		SQL consultaDatosFacturacion = new SQL();
 
@@ -249,10 +254,11 @@ public class SolModifSQLUtils {
 		consultaDatosFacturacion.SELECT("cen_solmodifacturacionservicio.idcuenta AS codigo");
 		consultaDatosFacturacion.SELECT("cen_solmodifacturacionservicio.fechaalta");
 		consultaDatosFacturacion.SELECT("f_siga_getrecurso(cen_estadosolicitudmodif.descripcion,1) AS estado");
-		consultaDatosFacturacion.SELECT(
-				"70 AS idtipomodificacion, ( " + SolModifSQLUtils.getPersonSql("cen_solmodifacturacionservicio") + ") as nombre");
+		consultaDatosFacturacion.SELECT("70 AS idtipomodificacion, ( "
+				+ SolModifSQLUtils.getPersonSql("cen_solmodifacturacionservicio") + ") as nombre");
 		consultaDatosFacturacion.SELECT("(" + SolModifSQLUtils.getTypeSql("70") + ") as tipoModificacion");
-		consultaDatosFacturacion.SELECT("(" + SolModifSQLUtils.getNColSql("cen_solmodifacturacionservicio") + ") as numColegiado");
+		consultaDatosFacturacion
+				.SELECT("(" + SolModifSQLUtils.getNColSql("cen_solmodifacturacionservicio") + ") as numColegiado");
 		consultaDatosFacturacion.FROM("cen_solmodifacturacionservicio, cen_estadosolicitudmodif");
 
 		if (!UtilidadesString.esCadenaVacia(solicitudModificacionSearchDTO.getEstado())) {
@@ -277,11 +283,12 @@ public class SolModifSQLUtils {
 		consultaDatosFacturacion.WHERE(
 				"cen_solmodifacturacionservicio.idestadosolic = cen_estadosolicitudmodif.idestadosolic AND cen_solmodifacturacionservicio.idinstitucion = "
 						+ idInstitucion);
-		
+
 		return consultaDatosFacturacion.toString();
 	}
 
-	public static String getDataFileRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion) {
+	public static String getDataFileRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguaje, String idInstitucion) {
 
 		SQL consultaDatosExpedientes = new SQL();
 
@@ -293,9 +300,11 @@ public class SolModifSQLUtils {
 		consultaDatosExpedientes.SELECT("0 AS codigo");
 		consultaDatosExpedientes.SELECT("exp_solicitudborrado.fechaalta");
 		consultaDatosExpedientes.SELECT("f_siga_getrecurso(cen_estadosolicitudmodif.descripcion,1) AS estado");
-		consultaDatosExpedientes.SELECT("90 AS idtipomodificacion, ( " + SolModifSQLUtils.getPersonSql("exp_solicitudborrado") + ") as nombre");
+		consultaDatosExpedientes.SELECT(
+				"90 AS idtipomodificacion, ( " + SolModifSQLUtils.getPersonSql("exp_solicitudborrado") + ") as nombre");
 		consultaDatosExpedientes.SELECT("(" + SolModifSQLUtils.getTypeSql("90") + ") as tipoModificacion");
-		consultaDatosExpedientes.SELECT("(" + SolModifSQLUtils.getNColSql("exp_solicitudborrado") + " ) as numColegiado");
+		consultaDatosExpedientes
+				.SELECT("(" + SolModifSQLUtils.getNColSql("exp_solicitudborrado") + " ) as numColegiado");
 		consultaDatosExpedientes.FROM("exp_solicitudborrado, cen_estadosolicitudmodif");
 
 		// CONDICIONES solicitudborrado
@@ -306,24 +315,25 @@ public class SolModifSQLUtils {
 
 		if (null != solicitudModificacionSearchDTO.getFechaDesde()) {
 			String fechaDesde = dateFormat.format(solicitudModificacionSearchDTO.getFechaDesde());
-			consultaDatosExpedientes.WHERE(" TO_DATE(exp_solicitudborrado.FECHAALTA,'DD/MM/YYYY') >= TO_DATE('" + fechaDesde
-					+ "', 'DD/MM/YYYY') ");
+			consultaDatosExpedientes.WHERE(" TO_DATE(exp_solicitudborrado.FECHAALTA,'DD/MM/YYYY') >= TO_DATE('"
+					+ fechaDesde + "', 'DD/MM/YYYY') ");
 		}
 
 		if (null != solicitudModificacionSearchDTO.getFechaHasta()) {
 			String fechaHasta = dateFormat.format(solicitudModificacionSearchDTO.getFechaHasta());
-			consultaDatosExpedientes.WHERE(" TO_DATE(exp_solicitudborrado.FECHAALTA,'DD/MM/YYYY') <= TO_DATE('" + fechaHasta
-					+ "', 'DD/MM/YYYY') ");
+			consultaDatosExpedientes.WHERE(" TO_DATE(exp_solicitudborrado.FECHAALTA,'DD/MM/YYYY') <= TO_DATE('"
+					+ fechaHasta + "', 'DD/MM/YYYY') ");
 		}
 
 		consultaDatosExpedientes.WHERE(
 				"exp_solicitudborrado.idestadosolic = cen_estadosolicitudmodif.idestadosolic AND exp_solicitudborrado.idinstitucion = "
 						+ idInstitucion);
-		
+
 		return consultaDatosExpedientes.toString();
 	}
-	
-	public static String getDataPhotoRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion) {
+
+	public static String getDataPhotoRequest(String id, SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguaje, String idInstitucion) {
 
 		SQL consultaDatosFoto = new SQL();
 
@@ -335,9 +345,23 @@ public class SolModifSQLUtils {
 		consultaDatosFoto.SELECT("0 AS codigo");
 		consultaDatosFoto.SELECT("cen_solicmodifexportarfoto.fechaalta");
 		consultaDatosFoto.SELECT("    f_siga_getrecurso(cen_estadosolicitudmodif.descripcion,1) AS estado");
-		consultaDatosFoto
-				.SELECT("35 AS idtipomodificacion, ( " + SolModifSQLUtils.getPersonSql("cen_solicmodifexportarfoto") + ") as nombre");
-		consultaDatosFoto.SELECT("(" + SolModifSQLUtils.getTypeSql("35") + ") as tipoModificacion");
+
+		if (id == "") {
+			consultaDatosFoto.SELECT(id + " AS idtipomodificacion, ( "
+					+ SolModifSQLUtils.getPersonSql("cen_solicmodifexportarfoto") + ") as nombre");
+		} else {
+			consultaDatosFoto.SELECT(id + " AS idtipomodificacion, ( "
+					+ SolModifSQLUtils.getPersonSql("cen_solicmodifexportarfoto") + ") as nombre");
+		}
+
+		if (id == "") {
+			consultaDatosFoto.SELECT("(" + SolModifSQLUtils.getTypeSql(id) + ") as tipoModificacion");
+		} else {
+			consultaDatosFoto
+					.SELECT("(" + SolModifSQLUtils.getTypeSql(id)
+							+ ") as tipoModificacion");
+		}
+
 		consultaDatosFoto.SELECT("(" + SolModifSQLUtils.getNColSql("cen_solicmodifexportarfoto") + ") as numColegiado");
 		consultaDatosFoto.FROM("cen_solicmodifexportarfoto, cen_estadosolicitudmodif");
 
@@ -362,10 +386,10 @@ public class SolModifSQLUtils {
 		consultaDatosFoto.WHERE(
 				"cen_solicmodifexportarfoto.idestadosolic = cen_estadosolicitudmodif.idestadosolic AND cen_solicmodifexportarfoto.idinstitucion = "
 						+ idInstitucion);
-		
+
 		return consultaDatosFoto.toString();
 	}
-	
+
 	private static String getPersonSql(String tableName) {
 		SQL getPersonSql = new SQL();
 		getPersonSql.SELECT("concat(nombre || ' ',concat(apellidos1|| ' ',apellidos2))");

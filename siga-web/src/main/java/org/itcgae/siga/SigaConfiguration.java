@@ -48,6 +48,7 @@ public class SigaConfiguration implements ApplicationListener<ApplicationReadyEv
 			//Para usar mappers de xml
 			PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 			sqlSessionFactory.setMapperLocations(resolver.getResources("classpath:org/itcgae/siga/db/services/com/mappers/MapperConsulta.xml"));
+			config.setCallSettersOnNulls(true);
 			configurationCustomizer.customize(config);
 			sqlSessionFactory.setConfiguration(config);
 			return sqlSessionFactory.getObject();

@@ -150,7 +150,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		ModelosComunicacionSearch respuesta = new ModelosComunicacionSearch();
-		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));

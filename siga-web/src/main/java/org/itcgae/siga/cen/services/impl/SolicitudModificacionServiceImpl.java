@@ -574,6 +574,8 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 				}
 			} else { // GENERALES
 				updateResponseDTO = processGeneralModificationRequest(solModificacionDTO, request);
+				if(updateResponseDTO.getStatus() == SigaConstants.OK)
+					response ++;
 			}
 		}
 

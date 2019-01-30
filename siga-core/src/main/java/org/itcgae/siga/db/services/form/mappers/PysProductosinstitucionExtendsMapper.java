@@ -24,6 +24,7 @@ public interface PysProductosinstitucionExtendsMapper extends PysProductosinstit
 		@Result(column = "IDPRODUCTOINSTITUCION", property = "idProductoInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALOR", property = "precio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CLAVE", property = "clave", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR)
 
 	})

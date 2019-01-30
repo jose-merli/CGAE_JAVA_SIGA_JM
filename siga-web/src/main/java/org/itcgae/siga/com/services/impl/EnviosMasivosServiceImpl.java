@@ -296,8 +296,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 									envioProgramado.setIdplantilla(Short.valueOf(enviosProgramadosDto[i].getIdPlantilla()));
 								}
 								envioProgramado.setIdplantillaenvios(Integer.parseInt(enviosProgramadosDto[i].getIdPlantillaEnvios()));
-								envioProgramado.setIdtipoenvios(Short.valueOf(enviosProgramadosDto[0].getIdTipoEnvios()));
-								envioProgramado.setNombre(enviosProgramadosDto[0].getDescripcion());
+								envioProgramado.setIdtipoenvios(Short.valueOf(enviosProgramadosDto[i].getIdTipoEnvios()));
+								envioProgramado.setNombre(enviosProgramadosDto[i].getDescripcion());
 								envioProgramado.setFechaprogramada(enviosProgramadosDto[i].getFechaProgramada());
 								envioProgramado.setFechamodificacion(new Date());
 								envioProgramado.setUsumodificacion(usuario.getIdusuario());
@@ -612,6 +612,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					envio.setIdplantillaenvios(plantillaEnvio.getIdplantillaenvios());
 					envio.setFechamodificacion(new Date());
 					envio.setUsumodificacion(usuario.getIdusuario());
+					envio.setFecha(new Date());
+					envio.setEnvio("M");
 					Short idEstadoPendiente = 1;
 					envio.setIdestado(idEstadoPendiente);
 					 _envEnviosMapper.insert(envio);

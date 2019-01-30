@@ -8,7 +8,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 public class ModelosComunicacionSearch {
 
 	List<ModelosComunicacionItem> modelosComunicacionItems = new ArrayList<ModelosComunicacionItem>();
-	Error error = new Error();
+	Error error = null;
 	
 	public List<ModelosComunicacionItem> getModelosComunicacionItems() {
 		return modelosComunicacionItems;

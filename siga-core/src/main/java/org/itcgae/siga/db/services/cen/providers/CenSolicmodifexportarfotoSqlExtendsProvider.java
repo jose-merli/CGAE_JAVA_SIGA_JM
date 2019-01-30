@@ -11,10 +11,15 @@ public class CenSolicmodifexportarfotoSqlExtendsProvider {
 	public String searchSolModifDatosUseFoto(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
 			String idLenguaje, String idInstitucion) {
 
+		String id = "";
+		if(solicitudModificacionSearchDTO.getTipoModificacion() != null) {
+			id = solicitudModificacionSearchDTO.getTipoModificacion();
+		}
+		
 		String rdo = "SELECT * FROM ("
 				+ SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
 				+ " ) UNION ( "
-				+ SolModifSQLUtils.getDataPhotoRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+				+ SolModifSQLUtils.getDataPhotoRequest(id, solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
 				+ " ) ORDER BY 6 DESC";
 		return rdo;
 	}

@@ -8,7 +8,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 public class DestinatariosDTO {
 	
 	private List<DestinatarioItem> destinatarios = new ArrayList<DestinatarioItem>();
-	private Error error = new Error();
+	private Error error = null;
 	
 	
 	public List<DestinatarioItem> getDestinatarios() {

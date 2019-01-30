@@ -65,12 +65,14 @@ public interface AgeCalendarioExtendsMapper extends AgeCalendarioMapper{
 	@SelectProvider(type = AgeCalendarioSqlExtendsProvider.class, method = "getCalendarioEventos")
 	@Results({
 		@Result(column = "IDCALENDARIO", property = "idCalendario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCURSO", property = "idCurso", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDEVENTO", property = "idEvento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDESTADOEVENTO", property = "idEstadoEvento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOEVENTO", property = "idTipoEvento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAINICIO", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAFIN", property = "realEnd", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TITULO", property = "titulo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "LUGAR", property = "lugar", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ALLDAY", property = "allDay", jdbcType = JdbcType.VARCHAR),

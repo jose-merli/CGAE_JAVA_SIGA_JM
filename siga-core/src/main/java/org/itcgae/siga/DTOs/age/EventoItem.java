@@ -1,5 +1,6 @@
 package org.itcgae.siga.DTOs.age;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
 
@@ -13,6 +14,7 @@ public class EventoItem {
 	private String titulo;
 	private Date fechaInicio;
 	private Date fechaFin;
+	private Date realEnd;
 	private boolean allDay = false;
 	private String color;
 	private Long tipoAcceso;
@@ -42,7 +44,8 @@ public class EventoItem {
 	private String fechaHoraInicio;
 	private String fechaHoraFin;
 
-		
+	private String formadores;
+	
 	/**
 	 **/
 	public EventoItem idEvento(String idEvento) {
@@ -506,101 +509,240 @@ public class EventoItem {
 	public void setEstadoEvento(String estadoEvento) {
 		this.estadoEvento = estadoEvento;
 	}
+	
+	
 
+	@JsonProperty("formadores")
+	public String getFormadores() {
+		return formadores;
+	}
+
+	public void setFormadores(String formadores) {
+		this.formadores = formadores;
+	}
 
 	@Override
-	public boolean equals(java.lang.Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		EventoItem eventoItem = (EventoItem) o;
-		return Objects.equals(this.idEvento, eventoItem.idEvento)
-				&& Objects.equals(this.idCalendario, eventoItem.idCalendario)
-				&& Objects.equals(this.idInstitucion, eventoItem.idInstitucion)
-				&& Objects.equals(this.titulo, eventoItem.titulo)
-				&& Objects.equals(this.fechaInicio, eventoItem.fechaInicio)
-				&& Objects.equals(this.fechaFin, eventoItem.fechaFin)
-				&& Objects.equals(this.allDay, eventoItem.allDay)
-				&& Objects.equals(this.color, eventoItem.color)
-				&& Objects.equals(this.lugar, eventoItem.lugar)
-				&& Objects.equals(this.descripcion, eventoItem.descripcion)
-				&& Objects.equals(this.recursos, eventoItem.recursos)
-				&& Objects.equals(this.idEstadoEvento, eventoItem.idEstadoEvento)
-				&& Objects.equals(this.idTipoEvento, eventoItem.idTipoEvento)
-				&& Objects.equals(this.usuModificacion, eventoItem.usuModificacion)
-				&& Objects.equals(this.recursos, eventoItem.recursos)
-				&& Objects.equals(this.idEstadoEvento, eventoItem.idEstadoEvento)
-				&& Objects.equals(this.idTipoEvento, eventoItem.idTipoEvento)
-				&& Objects.equals(this.tipoAcceso, eventoItem.tipoAcceso)
-				&& Objects.equals(this.fechaBaja, eventoItem.fechaBaja)
-				&& Objects.equals(this.fechaModificacion, eventoItem.fechaModificacion)
-				&& Objects.equals(this.idTipoCalendario, eventoItem.idTipoCalendario)
-				&& Objects.equals(this.idRepeticionEvento, eventoItem.idRepeticionEvento)
-				&& Objects.equals(this.valoresRepeticion, eventoItem.valoresRepeticion)
-				&& Objects.equals(this.valoresRepeticionString, eventoItem.valoresRepeticionString)
-				&& Objects.equals(this.tipoDiasRepeticion, eventoItem.tipoDiasRepeticion)
-				&& Objects.equals(this.tipoRepeticion, eventoItem.tipoRepeticion)
-				&& Objects.equals(this.fechaInicioRepeticion, eventoItem.fechaInicioRepeticion)
-				&& Objects.equals(this.fechaFinRepeticion, eventoItem.fechaFinRepeticion)
-				&& Objects.equals(this.idPartidoJudicial, eventoItem.idPartidoJudicial)
-				&& Objects.equals(this.idCurso, eventoItem.idCurso)
-				&& Objects.equals(this.fechaHoraFin, eventoItem.fechaHoraFin)
-				&& Objects.equals(this.fechaHoraInicio, eventoItem.fechaHoraInicio)
-				&& Objects.equals(this.estadoEvento, eventoItem.estadoEvento);
-		
+	public String toString() {
+		return "EventoItem [idEvento=" + idEvento + ", idCalendario=" + idCalendario + ", idInstitucion="
+				+ idInstitucion + ", titulo=" + titulo + ", fechaInicio=" + fechaInicio + ", fechaFin=" + fechaFin
+				+ ", realEnd=" + realEnd + ", allDay=" + allDay + ", color=" + color + ", tipoAcceso=" + tipoAcceso
+				+ ", lugar=" + lugar + ", descripcion=" + descripcion + ", recursos=" + recursos + ", idEstadoEvento="
+				+ idEstadoEvento + ", idTipoEvento=" + idTipoEvento + ", fechaBaja=" + fechaBaja + ", usuModificacion="
+				+ usuModificacion + ", fechaModificacion=" + fechaModificacion + ", idTipoCalendario="
+				+ idTipoCalendario + ", idRepeticionEvento=" + idRepeticionEvento + ", valoresRepeticion="
+				+ Arrays.toString(valoresRepeticion) + ", valoresRepeticionString=" + valoresRepeticionString
+				+ ", tipoDiasRepeticion=" + tipoDiasRepeticion + ", tipoRepeticion=" + tipoRepeticion
+				+ ", fechaInicioRepeticion=" + fechaInicioRepeticion + ", fechaFinRepeticion=" + fechaFinRepeticion
+				+ ", idPartidoJudicial=" + idPartidoJudicial + ", idCurso=" + idCurso + ", estadoEvento=" + estadoEvento
+				+ ", fechaHoraInicio=" + fechaHoraInicio + ", fechaHoraFin=" + fechaHoraFin + ", formadores="
+				+ formadores + "]";
 	}
 
 	@Override
 	public int hashCode() {
-
-		return Objects.hash(idEvento, idCalendario, idInstitucion, titulo, fechaInicio, fechaFin, allDay, color, lugar,
-				descripcion, recursos, idEstadoEvento, idTipoEvento, usuModificacion, fechaModificacion, fechaBaja, idTipoCalendario, tipoAcceso,
-				idRepeticionEvento, valoresRepeticion, valoresRepeticionString, tipoDiasRepeticion, tipoRepeticion, fechaInicioRepeticion,
-				fechaFinRepeticion,idPartidoJudicial, idCurso,fechaHoraInicio, fechaHoraFin, estadoEvento);
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (allDay ? 1231 : 1237);
+		result = prime * result + ((color == null) ? 0 : color.hashCode());
+		result = prime * result + ((descripcion == null) ? 0 : descripcion.hashCode());
+		result = prime * result + ((estadoEvento == null) ? 0 : estadoEvento.hashCode());
+		result = prime * result + ((fechaBaja == null) ? 0 : fechaBaja.hashCode());
+		result = prime * result + ((fechaFin == null) ? 0 : fechaFin.hashCode());
+		result = prime * result + ((fechaFinRepeticion == null) ? 0 : fechaFinRepeticion.hashCode());
+		result = prime * result + ((fechaHoraFin == null) ? 0 : fechaHoraFin.hashCode());
+		result = prime * result + ((fechaHoraInicio == null) ? 0 : fechaHoraInicio.hashCode());
+		result = prime * result + ((fechaInicio == null) ? 0 : fechaInicio.hashCode());
+		result = prime * result + ((fechaInicioRepeticion == null) ? 0 : fechaInicioRepeticion.hashCode());
+		result = prime * result + ((fechaModificacion == null) ? 0 : fechaModificacion.hashCode());
+		result = prime * result + ((formadores == null) ? 0 : formadores.hashCode());
+		result = prime * result + ((idCalendario == null) ? 0 : idCalendario.hashCode());
+		result = prime * result + ((idCurso == null) ? 0 : idCurso.hashCode());
+		result = prime * result + ((idEstadoEvento == null) ? 0 : idEstadoEvento.hashCode());
+		result = prime * result + ((idEvento == null) ? 0 : idEvento.hashCode());
+		result = prime * result + ((idInstitucion == null) ? 0 : idInstitucion.hashCode());
+		result = prime * result + ((idPartidoJudicial == null) ? 0 : idPartidoJudicial.hashCode());
+		result = prime * result + ((idRepeticionEvento == null) ? 0 : idRepeticionEvento.hashCode());
+		result = prime * result + ((idTipoCalendario == null) ? 0 : idTipoCalendario.hashCode());
+		result = prime * result + ((idTipoEvento == null) ? 0 : idTipoEvento.hashCode());
+		result = prime * result + ((lugar == null) ? 0 : lugar.hashCode());
+		result = prime * result + ((realEnd == null) ? 0 : realEnd.hashCode());
+		result = prime * result + ((recursos == null) ? 0 : recursos.hashCode());
+		result = prime * result + ((tipoAcceso == null) ? 0 : tipoAcceso.hashCode());
+		result = prime * result + ((tipoDiasRepeticion == null) ? 0 : tipoDiasRepeticion.hashCode());
+		result = prime * result + ((tipoRepeticion == null) ? 0 : tipoRepeticion.hashCode());
+		result = prime * result + ((titulo == null) ? 0 : titulo.hashCode());
+		result = prime * result + ((usuModificacion == null) ? 0 : usuModificacion.hashCode());
+		result = prime * result + Arrays.hashCode(valoresRepeticion);
+		result = prime * result + ((valoresRepeticionString == null) ? 0 : valoresRepeticionString.hashCode());
+		return result;
 	}
-	
+
 	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("class EventoItem {\n");
-
-		sb.append("    idEvento: ").append(toIndentedString(idEvento)).append("\n");
-		sb.append("    idCalendario: ").append(toIndentedString(idCalendario)).append("\n");
-		sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
-		sb.append("    titulo: ").append(toIndentedString(titulo)).append("\n");
-		sb.append("    fechaInicio: ").append(toIndentedString(fechaInicio)).append("\n");
-		sb.append("    fechaFin: ").append(toIndentedString(fechaFin)).append("\n");
-		sb.append("    allDay: ").append(toIndentedString(allDay)).append("\n");
-		sb.append("    color: ").append(toIndentedString(color)).append("\n");
-		sb.append("    lugar: ").append(toIndentedString(lugar)).append("\n");
-		sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
-		sb.append("    recursos: ").append(toIndentedString(recursos)).append("\n");
-		sb.append("    idEstadoEvento: ").append(toIndentedString(idEstadoEvento)).append("\n");
-		sb.append("    idTipoEvento: ").append(toIndentedString(idTipoEvento)).append("\n");
-		sb.append("    usuModificacion: ").append(toIndentedString(usuModificacion)).append("\n");
-		sb.append("    fechaModificacion: ").append(toIndentedString(fechaModificacion)).append("\n");
-		sb.append("    idTipoCalendario: ").append(toIndentedString(idTipoCalendario)).append("\n");
-		sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
-		sb.append("    tipoAcceso: ").append(toIndentedString(tipoAcceso)).append("\n");
-		sb.append("    idRepeticionEvento: ").append(toIndentedString(idRepeticionEvento)).append("\n");
-		sb.append("    valoresRepeticion: ").append(toIndentedString(valoresRepeticion)).append("\n");
-		sb.append("    valoresRepeticionString: ").append(toIndentedString(valoresRepeticionString)).append("\n");
-		sb.append("    tipoDiasRepeticion: ").append(toIndentedString(tipoDiasRepeticion)).append("\n");
-		sb.append("    tipoRepeticion: ").append(toIndentedString(tipoRepeticion)).append("\n");
-		sb.append("    fechaInicioRepeticion: ").append(toIndentedString(fechaInicioRepeticion)).append("\n");
-		sb.append("    fechaFinRepeticion: ").append(toIndentedString(fechaFinRepeticion)).append("\n");
-		sb.append("    idPartidoJudicial: ").append(toIndentedString(idPartidoJudicial)).append("\n");
-		sb.append("    idCurso: ").append(toIndentedString(idCurso)).append("\n");
-		sb.append("    fechaHoraInicio: ").append(toIndentedString(fechaHoraInicio)).append("\n");
-		sb.append("    fechaHoraFin: ").append(toIndentedString(fechaHoraFin)).append("\n");
-		sb.append("    estadoEvento: ").append(toIndentedString(estadoEvento)).append("\n");
-		sb.append("}");
-		return sb.toString();
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		EventoItem other = (EventoItem) obj;
+		if (allDay != other.allDay)
+			return false;
+		if (color == null) {
+			if (other.color != null)
+				return false;
+		} else if (!color.equals(other.color))
+			return false;
+		if (descripcion == null) {
+			if (other.descripcion != null)
+				return false;
+		} else if (!descripcion.equals(other.descripcion))
+			return false;
+		if (estadoEvento == null) {
+			if (other.estadoEvento != null)
+				return false;
+		} else if (!estadoEvento.equals(other.estadoEvento))
+			return false;
+		if (fechaBaja == null) {
+			if (other.fechaBaja != null)
+				return false;
+		} else if (!fechaBaja.equals(other.fechaBaja))
+			return false;
+		if (fechaFin == null) {
+			if (other.fechaFin != null)
+				return false;
+		} else if (!fechaFin.equals(other.fechaFin))
+			return false;
+		if (fechaFinRepeticion == null) {
+			if (other.fechaFinRepeticion != null)
+				return false;
+		} else if (!fechaFinRepeticion.equals(other.fechaFinRepeticion))
+			return false;
+		if (fechaHoraFin == null) {
+			if (other.fechaHoraFin != null)
+				return false;
+		} else if (!fechaHoraFin.equals(other.fechaHoraFin))
+			return false;
+		if (fechaHoraInicio == null) {
+			if (other.fechaHoraInicio != null)
+				return false;
+		} else if (!fechaHoraInicio.equals(other.fechaHoraInicio))
+			return false;
+		if (fechaInicio == null) {
+			if (other.fechaInicio != null)
+				return false;
+		} else if (!fechaInicio.equals(other.fechaInicio))
+			return false;
+		if (fechaInicioRepeticion == null) {
+			if (other.fechaInicioRepeticion != null)
+				return false;
+		} else if (!fechaInicioRepeticion.equals(other.fechaInicioRepeticion))
+			return false;
+		if (fechaModificacion == null) {
+			if (other.fechaModificacion != null)
+				return false;
+		} else if (!fechaModificacion.equals(other.fechaModificacion))
+			return false;
+		if (formadores == null) {
+			if (other.formadores != null)
+				return false;
+		} else if (!formadores.equals(other.formadores))
+			return false;
+		if (idCalendario == null) {
+			if (other.idCalendario != null)
+				return false;
+		} else if (!idCalendario.equals(other.idCalendario))
+			return false;
+		if (idCurso == null) {
+			if (other.idCurso != null)
+				return false;
+		} else if (!idCurso.equals(other.idCurso))
+			return false;
+		if (idEstadoEvento == null) {
+			if (other.idEstadoEvento != null)
+				return false;
+		} else if (!idEstadoEvento.equals(other.idEstadoEvento))
+			return false;
+		if (idEvento == null) {
+			if (other.idEvento != null)
+				return false;
+		} else if (!idEvento.equals(other.idEvento))
+			return false;
+		if (idInstitucion == null) {
+			if (other.idInstitucion != null)
+				return false;
+		} else if (!idInstitucion.equals(other.idInstitucion))
+			return false;
+		if (idPartidoJudicial == null) {
+			if (other.idPartidoJudicial != null)
+				return false;
+		} else if (!idPartidoJudicial.equals(other.idPartidoJudicial))
+			return false;
+		if (idRepeticionEvento == null) {
+			if (other.idRepeticionEvento != null)
+				return false;
+		} else if (!idRepeticionEvento.equals(other.idRepeticionEvento))
+			return false;
+		if (idTipoCalendario == null) {
+			if (other.idTipoCalendario != null)
+				return false;
+		} else if (!idTipoCalendario.equals(other.idTipoCalendario))
+			return false;
+		if (idTipoEvento == null) {
+			if (other.idTipoEvento != null)
+				return false;
+		} else if (!idTipoEvento.equals(other.idTipoEvento))
+			return false;
+		if (lugar == null) {
+			if (other.lugar != null)
+				return false;
+		} else if (!lugar.equals(other.lugar))
+			return false;
+		if (realEnd == null) {
+			if (other.realEnd != null)
+				return false;
+		} else if (!realEnd.equals(other.realEnd))
+			return false;
+		if (recursos == null) {
+			if (other.recursos != null)
+				return false;
+		} else if (!recursos.equals(other.recursos))
+			return false;
+		if (tipoAcceso == null) {
+			if (other.tipoAcceso != null)
+				return false;
+		} else if (!tipoAcceso.equals(other.tipoAcceso))
+			return false;
+		if (tipoDiasRepeticion == null) {
+			if (other.tipoDiasRepeticion != null)
+				return false;
+		} else if (!tipoDiasRepeticion.equals(other.tipoDiasRepeticion))
+			return false;
+		if (tipoRepeticion == null) {
+			if (other.tipoRepeticion != null)
+				return false;
+		} else if (!tipoRepeticion.equals(other.tipoRepeticion))
+			return false;
+		if (titulo == null) {
+			if (other.titulo != null)
+				return false;
+		} else if (!titulo.equals(other.titulo))
+			return false;
+		if (usuModificacion == null) {
+			if (other.usuModificacion != null)
+				return false;
+		} else if (!usuModificacion.equals(other.usuModificacion))
+			return false;
+		if (!Arrays.equals(valoresRepeticion, other.valoresRepeticion))
+			return false;
+		if (valoresRepeticionString == null) {
+			if (other.valoresRepeticionString != null)
+				return false;
+		} else if (!valoresRepeticionString.equals(other.valoresRepeticionString))
+			return false;
+		return true;
 	}
-	
+
 	/**
 	 * Convert the given object to string with each line indented by 4 spaces
 	 * (except the first line).
@@ -610,6 +752,14 @@ public class EventoItem {
 			return "null";
 		}
 		return o.toString().replace("\n", "\n    ");
+	}
+
+	public Date getRealEnd() {
+		return realEnd;
+	}
+
+	public void setRealEnd(Date realEnd) {
+		this.realEnd = realEnd;
 	}
 	
 }

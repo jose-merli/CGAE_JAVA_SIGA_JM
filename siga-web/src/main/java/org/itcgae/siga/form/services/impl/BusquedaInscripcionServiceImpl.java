@@ -574,7 +574,7 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				inscripcionesAprobadas = new CursoItem();
 				inscripcionesAprobadas.setInscripciones("0");
 			}
-			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(idCurso));
+			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(idCurso));
 			Long plazasdisponibles =0L;
 			if (null != cursoEntidad) {
 				if (null != cursoEntidad.getNumeroplazas()) {
@@ -617,7 +617,7 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 				inscripcionesAprobadas = new CursoItem();
 				inscripcionesAprobadas.setInscripciones("0");
 			}
-			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKey(Long.parseLong(idCurso));
+			ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(idCurso));
 			Long plazasdisponibles =0L;
 			if (null != cursoEntidad) {
 				if (null != cursoEntidad.getNumeroplazas()) {
@@ -708,5 +708,28 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 		return isAdministrador;
 	}
 	
+	@Override
+	public InscripcionItem selectInscripcionByPrimaryKey(InscripcionItem inscripcionItem, HttpServletRequest request) {
+
+		LOGGER.info("selectInscripcionByPrimaryKey() -> Entrada al servicio para obtener inscripciones");
+		
+//		String token = request.getHeader("Authorization");
+//		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+//		String dni = UserTokenUtils.getDniFromJWTToken(token);
+////		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+//		List<CenPersona> listCenPersona;
+
+		InscripcionItem inscripcionItemSearch = new InscripcionItem();
+		
+		inscripcionItemSearch = forInscripcionExtendsMapper.selectInscripcionByPrimaryKey(inscripcionItem);
+
+		//TODO comprobar caso de null
+		if (inscripcionItemSearch == null) {
+			LOGGER.warn(
+					"selectInscripcionByPrimaryKey() / forInscripcionExtendsMapper.selectInscripciones() -> No existen inscripciones para el filtro introducido");
+		}
+		
+		return inscripcionItemSearch;
+	}
 	
 }

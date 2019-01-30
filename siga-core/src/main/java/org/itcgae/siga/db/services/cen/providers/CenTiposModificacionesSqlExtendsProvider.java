@@ -37,7 +37,9 @@ public class CenTiposModificacionesSqlExtendsProvider {
 				+ " ) UNION ("
 				+ SolModifSQLUtils.getDataInvoicingRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
 				+ " ) UNION ("
-				+ SolModifSQLUtils.getDataPhotoRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+				+ SolModifSQLUtils.getDataPhotoRequest("35", solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+				+ " ) UNION ("
+				+ SolModifSQLUtils.getDataPhotoRequest("60", solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
 				+ " ) UNION ("
 				+ SolModifSQLUtils.getDataFileRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " )";
 

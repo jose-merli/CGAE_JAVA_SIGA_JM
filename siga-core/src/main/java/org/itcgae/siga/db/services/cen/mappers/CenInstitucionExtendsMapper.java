@@ -82,4 +82,10 @@ public interface CenInstitucionExtendsMapper extends CenInstitucionMapper {
 			})
 	StringDTO getAbreviaturaInstitucion(String stInstitucion);
 	
+	@SelectProvider(type = CenInstitucionSqlExtendsProvider.class, method = "getInstitucionesModelo")
+	@Results({ @Result(column = "IDINSTITUCION", property = "value", jdbcType = JdbcType.VARCHAR),
+		 		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR)
+			})
+	List<ComboItem> comboColegiosModelo(Short idInstitucionUser); 
+	
 }
