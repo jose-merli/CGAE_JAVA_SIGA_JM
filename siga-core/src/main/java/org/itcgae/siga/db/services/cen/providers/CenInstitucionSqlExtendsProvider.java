@@ -400,5 +400,14 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 		return sql.toString();
 	}
 	
+	public String getInstitucionesModelo (Short idinstitucionUser){
+		
+		SQL sql = new SQL();
+		sql.SELECT("IDINSTITUCION, NOMBRE");
+		sql.FROM("cen_institucion");
+		sql.WHERE("idinstitucion = '2000' or idinstitucion = '" + idinstitucionUser + "'");
+		
+		return sql.toString();
+	}
     
 }

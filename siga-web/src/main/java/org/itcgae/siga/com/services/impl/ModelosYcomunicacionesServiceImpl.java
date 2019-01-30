@@ -51,6 +51,7 @@ import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPerfilesExtendsMapper;
@@ -107,9 +108,6 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	private ModRelPlantillaSufijoExtendsMapper modRelPlantillaSufijoExtendsMapper;
 	
 	@Autowired
-	private ModPlantilladocumentoMapper modPlantilladocumentoMapper;
-	
-	@Autowired
 	private ModPlantillaenvioConsultaMapper modPlantillaenvioConsultaMapper;
 	
 	@Autowired
@@ -117,6 +115,9 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	
 	@Autowired
 	private EnvPlantillaEnviosExtendsMapper envPlantillaEnviosExtendsMapper;
+	
+	@Autowired
+	private CenInstitucionExtendsMapper _cenInstitucionExtendsMapper;
 	
 	@Override
 	public DatosModelosComunicacionesDTO modeloYComunicacionesSearch(HttpServletRequest request, DatosModelosComunicacionesSearch filtros, boolean historico) {
@@ -826,5 +827,42 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		}
 		
 		return respuesta;
+	}
+
+
+	@Override
+	public ComboDTO colegiosModelo(HttpServletRequest request) {
+		
+		LOGGER.info("colegiosModelo() -> Entrada al servicio para obtener los colegios");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		if (null != idInstitucionUser) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucionUser));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					comboItems = _cenInstitucionExtendsMapper.getComboInstituciones(idInstitucionUser);
+					comboDTO.setCombooItems(comboItems);
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage("Error al obtener los perfiles");
+					error.description(e.getMessage());
+					e.printStackTrace();
+				}
+			}		
+		}		
+		
+		LOGGER.info("colegiosModelo() -> Salida del servicio para obtener los colegios");
+		return comboDTO;
 	}
 }
