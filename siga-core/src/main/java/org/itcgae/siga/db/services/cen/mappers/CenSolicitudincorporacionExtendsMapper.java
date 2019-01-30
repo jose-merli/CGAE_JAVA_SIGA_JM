@@ -9,6 +9,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.db.services.cen.providers.CenSolicitudincorporacionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,10 @@ public interface CenSolicitudincorporacionExtendsMapper {
 	@SelectProvider(type = CenSolicitudincorporacionSqlExtendsProvider.class, method = "getMaxIdSolicitud")
 	@Results({ @Result(column = "IDSOLICITUD", property = "idMax", jdbcType = JdbcType.NUMERIC)})
 	MaxIdDto getMaxIdRecurso();
+	
+	@SelectProvider(type = CenSolicitudincorporacionSqlExtendsProvider.class, method = "getMaxNColegiado")
+	@Results({ @Result(column = "NCOLEGIADO", property = "valor", jdbcType = JdbcType.VARCHAR)})
+	StringDTO getMaxNColegiado(String idInstitucion); 
 	
 
 }
