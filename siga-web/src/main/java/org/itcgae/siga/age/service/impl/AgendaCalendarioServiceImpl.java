@@ -13,12 +13,17 @@ import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.age.service.IAgendaCalendarioService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.AgeCalendario;
 import org.itcgae.siga.db.entities.AgeCalendarioExample;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeCalendarioExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +38,9 @@ public class AgendaCalendarioServiceImpl implements IAgendaCalendarioService {
 	
 	@Autowired 
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 
 	@Override
 	public CalendarDTO getCalendariosByIdInstitucion(HttpServletRequest request) {
@@ -66,11 +74,38 @@ public class AgendaCalendarioServiceImpl implements IAgendaCalendarioService {
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
 		String perfilesFormat = UtilidadesString.prepararPerfiles(perfiles);
-
-		List<EventoItem> listEventos = ageCalendarioExtendsMapper.getCalendarioEventos(idInstitucion, perfilesFormat, idCalendario);
+		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
+		List<EventoItem> listEventos = null;
+		List<CenPersona> listCenPersona = null;
 		
+
+		if (letrado.equalsIgnoreCase("S")) {
+		
+			AgeCalendario ageCalendario = ageCalendarioExtendsMapper.selectByPrimaryKey(Long.valueOf(idCalendario));
+
+			if(SigaConstants.CALENDARIO_FORMACION == ageCalendario.getIdtipocalendario()) {
+				
+				CenPersonaExample cenPersonaExample = new CenPersonaExample();
+				cenPersonaExample.createCriteria().andNifcifEqualTo(dni);
+				listCenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+				if (!listCenPersona.isEmpty()) {
+					CenPersona cenPersona = listCenPersona.get(0);
+					listEventos = ageCalendarioExtendsMapper.getCalendarioEventosIsColegiado(idInstitucion, perfilesFormat, 
+							idCalendario, cenPersona.getIdpersona());
+				}
+				
+			}else {
+				listEventos = ageCalendarioExtendsMapper.getCalendarioEventos(idInstitucion, perfilesFormat, idCalendario);
+			}
+
+		}else{
+			listEventos = ageCalendarioExtendsMapper.getCalendarioEventos(idInstitucion, perfilesFormat, idCalendario);
+
+		}
+
 		eventoDTO.setEventos(listEventos);
 
 		return eventoDTO;
