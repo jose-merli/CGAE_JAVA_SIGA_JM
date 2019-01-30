@@ -59,7 +59,7 @@ public class ConConsultasExtendsSqlProvider {
 				sql.WHERE("((CONSULTA.GENERAL = 'S' OR CONSULTA.GENERAL = 's' OR  CONSULTA.GENERAL = '1') AND CONSULTA.IDINSTITUCION = '2000')");
 			}
 		}else {
-			sql.WHERE("(CONSULTA.IDINSTITUCION = '2000' OR CONSULTA.IDINSTITUCION = '" + idInstitucion +"')");
+			sql.WHERE("((CONSULTA.IDINSTITUCION = '2000' && UPPER(CONSULTA.GENERAL) = 'S') OR (CONSULTA.IDINSTITUCION = '" + idInstitucion +"' && UPPER(CONSULTA.GENERAL = 'N')))");
 		}
 		
 		return sql.toString();
