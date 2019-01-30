@@ -11,8 +11,10 @@ import org.itcgae.siga.com.documentos.DataMailMergeDataSource;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.springframework.stereotype.Service;
 
+import com.aspose.words.DataSet;
 import com.aspose.words.Document;
 import com.aspose.words.DocumentBuilder;
+import com.aspose.words.MailMergeCleanupOptions;
 
 @Service
 public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosService{
@@ -41,6 +43,11 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 					doc = sustituyeDatos(doc, htRowDatosInforme);
 				}
 			}
+			
+			DataSet data = new DataSet();  
+			doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_CONTAINING_FIELDS | MailMergeCleanupOptions.REMOVE_EMPTY_PARAGRAPHS  | MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS | MailMergeCleanupOptions.REMOVE_UNUSED_FIELDS);
+			doc.getMailMerge().executeWithRegions(data);
+			
 		} catch (Exception e) {
 			LOGGER.error("GeneracionDocumentosServiceImpl.sustituyeDocumento :: Error al sustituir los datos del documento", e);
 			throw e;

@@ -1,6 +1,7 @@
 package org.itcgae.siga.com.services.impl;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,13 +11,19 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.hwpf.model.types.HRESIAbstractType;
+import org.itcgae.siga.DTOs.com.ClaseComunicacionItem;
+import org.itcgae.siga.DTOs.com.ClaseComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
+import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.KeyItem;
 import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
 import org.itcgae.siga.DTOs.com.PlantillaModeloDocumentoDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
+import org.itcgae.siga.DTOs.com.SufijoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -24,9 +31,14 @@ import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.FORMATO_SALIDA;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ModPlantilladocumento;
+import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
+import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModClasecomunicacionRutaExtendsMapper;
@@ -34,6 +46,8 @@ import org.itcgae.siga.db.services.com.mappers.ModKeyclasecomunicacionExtendsMap
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPlantillaDocumentoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModRelPlantillaSufijoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,6 +88,15 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
 	@Autowired
 	private ModKeyclasecomunicacionExtendsMapper _modKeyclasecomunicacionExtendsMapper;
+	
+	@Autowired
+	private ModRelPlantillaSufijoExtendsMapper _modRelPlantillaSufijoExtendsMapper;
+	
+	@Autowired
+	private ModPlantillaDocumentoExtendsMapper _modPlantillaDocumentoExtendsMapper;
+	
+	@Autowired
+	private ModPlantilladocumentoMapper _modPlantilladocumentoMapper;
 	
 
 	@Override
@@ -116,7 +139,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 
 	@Override
-	public ModelosComunicacionSearch obtenerModelos(HttpServletRequest request, String[] idClaseComunicacion) {
+	public ModelosComunicacionSearch obtenerModelos(HttpServletRequest request, String idClaseComunicacion) {
 		
 		LOGGER.info("obtenerModelos() -> Entrada al servicio para obtener los modelos de comunicacion");
 		
@@ -228,10 +251,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				
 				try{
 					listaDocumentos = generarDocumentos(dialogo,usuario);
-					for(Document doc:listaDocumentos){
-						String pathFichero = "C:/FILERMSA1000/prueba/genericoCenso_ES.doc";
-						_generacionDocService.grabaDocumento(doc, pathFichero, new Date().getTime() + ".doc");
-					}
 					error.setCode(200);
 					error.setDescription("Ficheros generados correctamente");
 					error.setMessage("Ficheros generados correctamente");
@@ -248,14 +267,14 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return error;
 	}
 	
-	public List<Document> generarDocumentos(DialogoComunicacionItem dialogo, AdmUsuarios usuario){
+	public List<Document> generarDocumentos(DialogoComunicacionItem dialogo, AdmUsuarios usuario) throws Exception{
 		LOGGER.info("generarDocumentos() -> Entrada al servicio para generar los documentos a comunicar");
 		boolean continua = true;
 		List<Document> listaDocumentos = new ArrayList<Document>();
 		HashMap<String,Object> hDatosGenerales = new HashMap<String, Object>();
-		HashMap<String,Object> hDatosFinal = new HashMap<String, Object>();
-		String pathFichero = "C:/FILERMSA1000/prueba/genericoCenso_ES";
-		
+		HashMap<String,Object> hDatosFinal = new HashMap<String, Object>();	
+		int numFicheros = 0;
+
 		try{
 			if(dialogo != null && dialogo.getModelos() != null && dialogo.getModelos().size() > 0){
 				for(ModelosComunicacionItem modelo :dialogo.getModelos()){
@@ -288,7 +307,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								claves = claves + ")";
 							}
 							
-							for(PlantillaModeloDocumentoDTO plantilla:plantillas){
+							for(PlantillaModeloDocumentoDTO plantilla:plantillas){	
+								
 								LOGGER.debug("Obtenemos la consultas condicional: " + plantilla.getIdPlantillas());
 								List<ConsultaItem> consultasItemCondicional = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(usuario.getIdinstitucion(), Long.parseLong(modelo.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
 
@@ -324,6 +344,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												
 												for(Map<String,Object> dest: result){
 													LOGGER.debug("Guardamos el resultado de la query para cada destinatario");
+													numFicheros = 0;
+													
 													hDatosGenerales = new HashMap<String, Object>();
 													hDatosGenerales.putAll(dest);
 													
@@ -340,9 +362,50 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 															List<Map<String,Object>> resultMulti = ejecutarConsultaConClaves(sentencia, claves);
 															if(resultMulti != null && resultMulti.size() > 0){
 																for(int k = 0;k<resultMulti.size();k++){
+																	
 																	// Por cada registro generamos un documento
-																	Document doc = new Document(pathFichero + ".doc");
-																	//TODO
+																	numFicheros++;
+																	
+																	//Otenemos el nombre del fichero de salida
+																	String nombrePlantilla = "";
+																	String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
+																	String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
+																	String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo, plantilla, hDatosGenerales, usuario, numFicheros);
+																	
+																	
+																	//Obtenemos el nombre de la plantilla
+																	if(plantilla.getIdPlantillas() != null){
+																		ModPlantilladocumentoExample example = new ModPlantilladocumentoExample();
+																		List<Long> idValues = new ArrayList<Long>();
+																		String [] idPlantillas = plantilla.getIdPlantillas().split(",");
+																		
+																		if(idPlantillas != null && idPlantillas.length > 0){																			
+																			for(String idPlantilla :idPlantillas){
+																				idValues.add(Long.parseLong(idPlantilla));
+																			}
+																		}
+																		example.createCriteria().andIdplantilladocumentoIn(idValues).andIdiomaEqualTo(usuario.getIdlenguaje());
+																		List<ModPlantilladocumento> listaPlantilla = _modPlantilladocumentoMapper.selectByExample(example);
+																		
+																		if(listaPlantilla != null && listaPlantilla.size() == 1){
+																			ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
+																			nombrePlantilla = plantillaDoc.getPlantilla();
+																		}else if(listaPlantilla != null && listaPlantilla.size() > 1){
+																			LOGGER.error("Exiten multiples plantillas asociada al informe en el idioma del usuario");
+																			throw new SigaExceptions("Exiten multiples plantillas asociada al informe en el idioma del usuario");
+																		}else{
+																			LOGGER.error("No hay plantilla asociada para el informe en el idioma del usuario");
+																			throw new SigaExceptions("No hay plantilla asociada para el informe en el idioma del usuario");
+																		}
+																	}
+																	
+																	File filePlantilla = new File(pathPlantilla + nombrePlantilla);
+																	if(!filePlantilla.exists()){
+																		throw new SigaExceptions("No existe la plantilla de documento");
+																	}
+																	
+																	Document doc = new Document(pathPlantilla + nombrePlantilla);
+
 																	hDatosGenerales.putAll(resultMulti.get(k));
 																	
 																	// Por cada resultado ejecutamos las consultas de datos
@@ -362,10 +425,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																	}
 																	
 																	hDatosFinal.put("row", hDatosGenerales);
-																	LOGGER.debug("Generamos el documento");
+																	LOGGER.debug("Generamos el documento");																
+																	
 																	doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);
 																	
-																	doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_EMPTY_PARAGRAPHS  | MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS | MailMergeCleanupOptions.REMOVE_UNUSED_FIELDS);
+																	_generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida);
 																	
 																	listaDocumentos.add(doc);
 																
@@ -376,7 +440,45 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 													}else{
 														LOGGER.debug("No hay consulta de multidocumento");
 														
-														Document doc = new Document(pathFichero + ".doc");
+														//Otenemos el nombre del fichero de salida
+														String nombrePlantilla = "";
+														String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
+														String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
+														String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo, plantilla, hDatosGenerales, usuario, numFicheros);
+														
+														
+														//Obtenemos el nombre de la plantilla
+														if(plantilla.getIdPlantillas() != null){
+															ModPlantilladocumentoExample example = new ModPlantilladocumentoExample();
+															List<Long> idValues = new ArrayList<Long>();
+															String [] idPlantillas = plantilla.getIdPlantillas().split(",");
+															
+															if(idPlantillas != null && idPlantillas.length > 0){																			
+																for(String idPlantilla :idPlantillas){
+																	idValues.add(Long.parseLong(idPlantilla));
+																}
+															}
+															example.createCriteria().andIdplantilladocumentoIn(idValues).andIdiomaEqualTo(usuario.getIdlenguaje());
+															List<ModPlantilladocumento> listaPlantilla = _modPlantilladocumentoMapper.selectByExample(example);
+															
+															if(listaPlantilla != null && listaPlantilla.size() == 1){
+																ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
+																nombrePlantilla = plantillaDoc.getPlantilla();
+															}else if(listaPlantilla != null && listaPlantilla.size() > 1){
+																LOGGER.error("Exiten multiples plantillas asociada al informe en el idioma del usuario");
+																throw new SigaExceptions("Exiten multiples plantillas asociada al informe en el idioma del usuario");
+															}else{
+																LOGGER.error("No hay plantilla asociada para el informe en el idioma del usuario");
+																throw new SigaExceptions("No hay plantilla asociada para el informe en el idioma del usuario");
+															}
+														}
+														
+														File filePlantilla = new File(pathPlantilla + nombrePlantilla);
+														if(!filePlantilla.exists()){
+															throw new SigaExceptions("No existe la plantilla de documento");
+														}
+														
+														Document doc = new Document(pathPlantilla + nombrePlantilla);
 														
 														// Por cada resultado ejecutamos las consultas de datos
 														LOGGER.debug("Obtenemos las consultas de datos para la plantilla: " + plantilla.getIdInforme());
@@ -399,7 +501,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														LOGGER.debug("Generamos el documento");
 														doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);
 														
-														doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_EMPTY_PARAGRAPHS | MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS | MailMergeCleanupOptions.REMOVE_UNUSED_FIELDS);
+														_generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida);
 														
 														listaDocumentos.add(doc);
 													}
@@ -425,6 +527,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			}
 		}catch(Exception e){
 			LOGGER.error("Error al generar la documentación",e);
+			throw e;
 		}
 		
 		LOGGER.info("generarDocumentos() -> Entrada al servicio para generar los documentos a comunicar");
@@ -478,6 +581,123 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		LOGGER.info("obtenerKeysClaseComunicacion() -> Salida del servicio para obtener las keys asociadas a una clase de comunicación");
 		
 		return keysDTO;
+	}
+	
+	private String obtenerNombreFicheroSalida(ModelosComunicacionItem modelo, PlantillaModeloDocumentoDTO plantilla, HashMap<String,Object> hDatosGenerales, AdmUsuarios usuario, int numFichero){
+		HashMap<String,Object> hashMapRow = null;
+		String extension = "";
+		String nombreFicheroSalida = plantilla.getNombreFicheroSalida();
+		
+		if(plantilla.getFormatoSalida() != null){
+			FORMATO_SALIDA extensionObject = SigaConstants.FORMATO_SALIDA.getEnum(Short.parseShort(plantilla.getFormatoSalida()));
+			if(extensionObject != null){
+				extension = extensionObject.getDescripcion();
+			}									
+		}
+		
+		// Obtenemos los sufijos del documento
+		String sufijo = "";
+		List<SufijoItem> sufijos = _modRelPlantillaSufijoExtendsMapper.selectSufijosPlantilla(Long.parseLong(modelo.getIdModeloComunicacion()), Long.parseLong(plantilla.getIdInforme()), usuario.getIdlenguaje());
+		
+		if(hDatosGenerales.get("row") != null){
+			hashMapRow = (HashMap<String, Object>) hDatosGenerales.get("row");
+		}
+		
+		for(SufijoItem sufijoItem:sufijos){
+			if(Short.valueOf(sufijoItem.getIdSufijo()).shortValue() == SigaConstants.SUFIJOS.NOMBRE_COLEGIADO.getCodigo().shortValue()){
+				Object nombre = hDatosGenerales.get(SigaConstants.CAMPO_NOMBRE);
+				Object apellidos = hDatosGenerales.get(SigaConstants.CAMPO_APELLIDOS);
+				
+				if(nombre == null){
+					if(hashMapRow != null && hashMapRow.get(SigaConstants.CAMPO_NOMBRE) != null){
+						nombre = hashMapRow.get(SigaConstants.CAMPO_NOMBRE);
+					}else{
+						nombre = SigaConstants.CAMPO_NOMBRE;
+					}					
+				}
+				
+				if(apellidos == null){
+					if(hashMapRow != null && hashMapRow.get(SigaConstants.CAMPO_APELLIDOS) != null){
+						apellidos = hashMapRow.get(SigaConstants.CAMPO_APELLIDOS);
+					}else{
+						apellidos = SigaConstants.CAMPO_APELLIDOS;
+					}
+				}
+				
+				if(!sufijo.equalsIgnoreCase(""))sufijo = sufijo + "_";				
+				sufijo = sufijo + String.valueOf(nombre) + "_" + String.valueOf(apellidos);
+				
+			}else if(Short.valueOf(sufijoItem.getIdSufijo()).shortValue() == SigaConstants.SUFIJOS.NUMERO_COLEGIADO.getCodigo().shortValue()){
+				Object numColegiado = hDatosGenerales.get(SigaConstants.CAMPO_NUM_COLEGIADO);
+				if(numColegiado == null){
+					if(hashMapRow != null && hashMapRow.get(SigaConstants.CAMPO_NUM_COLEGIADO) != null){
+						numColegiado = hashMapRow.get(SigaConstants.CAMPO_NUM_COLEGIADO);
+					}else{
+						numColegiado = SigaConstants.CAMPO_NUM_COLEGIADO;
+					}
+				}
+				if(!sufijo.equalsIgnoreCase(""))sufijo = sufijo + "_";				
+				sufijo = sufijo + String.valueOf(numColegiado);
+				
+			}else if(Short.valueOf(sufijoItem.getIdSufijo()).shortValue() == SigaConstants.SUFIJOS.IDENTIFICACION.getCodigo().shortValue()){
+				Object identificacion = hDatosGenerales.get(SigaConstants.CAMPO_IDENTIFICACION);
+				if(identificacion == null){
+					if(hashMapRow != null && hashMapRow.get(SigaConstants.CAMPO_IDENTIFICACION) != null){
+						identificacion = hashMapRow.get(SigaConstants.CAMPO_IDENTIFICACION);
+					}else{
+						identificacion = SigaConstants.CAMPO_IDENTIFICACION;
+					}
+				}
+				if(!sufijo.equalsIgnoreCase(""))sufijo = sufijo + "_";
+				sufijo = sufijo + String.valueOf(identificacion);
+			}
+		}
+		
+		String numero = "";
+		if(numFichero > 0){
+			numero = "_" + String.valueOf(numFichero) + "_";
+		}
+		
+		nombreFicheroSalida = nombreFicheroSalida + sufijo + numero + "." + extension;
+		
+		return nombreFicheroSalida;
+	}
+
+
+
+	@Override
+	public ClaseComunicacionesDTO obtenerClaseComunicacionesUnica(HttpServletRequest request, String rutaClaseComunicacion) {
+		LOGGER.info("obtenerClaseComunicacionesUnica() -> Entrada al servicio para obtener la clase de comunicacion asociada la ruta indicada");
+		
+		ClaseComunicacionesDTO response = new ClaseComunicacionesDTO();
+		Error error = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					List<ClaseComunicacionItem> clasesComunicaciones = _modClasecomunicacionRutaExtendsMapper.getClaseComunicacionesUnica(rutaClaseComunicacion);
+					response.setClasesComunicaciones(clasesComunicaciones);
+				}catch(Exception e){
+					LOGGER.error("Error al obtener la clase de comunicaciones");
+					error.setCode(500);
+					error.setDescription("Error al obtener la clase de comunicaciones");
+					error.setMessage(e.getMessage());
+					response.setError(error);
+				}					
+			}
+		}
+		
+		LOGGER.info("obtenerClaseComunicacionesUnica() -> Salida del servicio para obtener la clase de comunicacion asociada la ruta indicada");
+		return response;
 	}
 	
 }

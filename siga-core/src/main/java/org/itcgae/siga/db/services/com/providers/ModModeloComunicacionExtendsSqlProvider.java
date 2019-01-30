@@ -67,7 +67,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 	}
 	
 		
-	public String selectModelosComunicacionDialg(String[] idClaseComunicacion){
+	public String selectModelosComunicacionDialg(String idClaseComunicacion){
 	   
 	   SQL sql = new SQL();
 	   

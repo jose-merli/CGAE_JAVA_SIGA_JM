@@ -2,9 +2,11 @@ package org.itcgae.siga.com.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.ClaseComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
 import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +36,19 @@ public class DialogoComunicacionController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/claseComunicacion",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ClaseComunicacionesDTO> obtenerClaseComunicacion(HttpServletRequest request, @RequestBody String rutaClaseComunicacion) {
+		
+		ClaseComunicacionesDTO response = _dialogoComunicacionService.obtenerClaseComunicacionesUnica(request, rutaClaseComunicacion);
+		if(response.getError() == null)
+			return new ResponseEntity<ClaseComunicacionesDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ClaseComunicacionesDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	
 	@RequestMapping(value = "/modelosSearch",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ModelosComunicacionSearch> modelosComunicacionSearch(HttpServletRequest request, @RequestBody String[] idClaseComunicacion) {
+	ResponseEntity<ModelosComunicacionSearch> modelosComunicacionSearch(HttpServletRequest request, @RequestBody String idClaseComunicacion) {
 		
 		ModelosComunicacionSearch response = _dialogoComunicacionService.obtenerModelos(request, idClaseComunicacion);
 		if(response.getError() == null)

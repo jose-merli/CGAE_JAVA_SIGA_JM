@@ -386,7 +386,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 
 						for(ConsultaItem consultaItem : listaItems){
 							// Si la consulta se ha editado, actualizamos la fecha de baja de la consulta anterior
-							if(consultaItem.getIdConsultaAnterior() != null && !consultaItem.getIdConsultaAnterior().equalsIgnoreCase(consultaItem.getIdConsulta())){
+							if(consultaItem.getIdConsultaAnterior() != null && !consultaItem.getIdConsultaAnterior().equalsIgnoreCase("") &&!consultaItem.getIdConsultaAnterior().equalsIgnoreCase(consultaItem.getIdConsulta())){
 								//Obtenemos la consulta a borrar
 								List<ConsultaItem> listaConsultasBorrar = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.parseShort(plantillaDoc.getIdInstitucion()),Long.parseLong(plantillaDoc.getIdModeloComunicacion()), Long.parseLong(plantillaDoc.getIdInforme()), Long.parseLong(consultaItem.getIdConsultaAnterior()));
 								for(ConsultaItem consultaBorrar: listaConsultasBorrar){
