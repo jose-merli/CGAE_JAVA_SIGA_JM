@@ -850,7 +850,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
-					comboItems = _cenInstitucionExtendsMapper.getComboInstituciones(idInstitucionUser);
+					comboItems = _cenInstitucionExtendsMapper.comboColegiosModelo(idInstitucionUser);
 					comboDTO.setCombooItems(comboItems);
 				}catch(Exception e){
 					Error error = new Error();
