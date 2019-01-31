@@ -56,8 +56,8 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		sql.SELECT("evento.titulo");
 		sql.SELECT("evento.fechainicio");
 		sql.SELECT("evento.fechafin");
-		sql.SELECT("concat(TO_CHAR(evento.fechainicio,'DD/MM/RRRR'), ' - ' || to_char(evento.fechainicio,'hh24:mm')) as fechaHoraInicio");
-		sql.SELECT("concat(TO_CHAR(evento.fechafin,'DD/MM/RRRR'), ' - ' || to_char(evento.fechafin,'hh24:mm')) as fechaHoraFin");
+		sql.SELECT("concat(TO_CHAR(evento.fechainicio,'DD/MM/RRRR'), ' - ' || to_char(evento.fechainicio,'hh24:mi')) as fechaHoraInicio");
+		sql.SELECT("concat(TO_CHAR(evento.fechafin,'DD/MM/RRRR'), ' - ' || to_char(evento.fechafin,'hh24:mi')) as fechaHoraFin");
 		sql.SELECT("evento.lugar");
 		sql.SELECT("evento.descripcion");
 		sql.SELECT("evento.recursos");
