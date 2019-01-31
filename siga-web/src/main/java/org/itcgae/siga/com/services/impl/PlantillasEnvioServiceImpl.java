@@ -229,6 +229,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 						key.setIdinstitucion(idInstitucion);
 						EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+						if(null != plantilla){
 						plantilla.setAsunto(datosTarjeta.getAsunto());
 						plantilla.setCuerpo(datosTarjeta.getCuerpo());
 						plantilla.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvios()));
@@ -237,6 +238,21 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						plantilla.setFechamodificacion(new Date());
 						plantilla.setUsumodificacion(usuario.getIdusuario());
 						_envPlantillasenviosMapper.updateByPrimaryKeyWithBLOBs(plantilla);
+						}else{
+							EnvPlantillasenviosWithBLOBs plantillaInsert = new EnvPlantillasenviosWithBLOBs();
+							plantillaInsert.setIdplantillaenvios(Integer.parseInt(datosTarjeta.getIdPlantillaEnvios()));
+							plantillaInsert.setIdinstitucion(idInstitucion);
+							plantillaInsert.setAsunto(datosTarjeta.getAsunto());
+							plantillaInsert.setCuerpo(datosTarjeta.getCuerpo());
+							plantillaInsert.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvios()));
+							plantillaInsert.setNombre(datosTarjeta.getNombre());
+							plantillaInsert.setDescripcion(datosTarjeta.getDescripcion());
+							plantillaInsert.setFechamodificacion(new Date());
+							plantillaInsert.setUsumodificacion(usuario.getIdusuario());
+							_envPlantillasenviosMapper.insert(plantillaInsert);
+							respuesta.setMessage(plantillaInsert.getIdplantillaenvios().toString());
+						
+						}
 					}else{
 						EnvPlantillasenviosWithBLOBs plantilla = new EnvPlantillasenviosWithBLOBs();
 						NewIdDTO id = _envPlantillaEnviosExtendsMapper.selectMaxIDPlantillas();
