@@ -34,14 +34,14 @@ public class PlantillasEnvioController {
 
 	
 	@RequestMapping(value = "/plantillasEnvioSearch",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<PlantillasEnvioDTO> PlantillasEnvioSearch(@RequestParam("numPagina") int numPagina,HttpServletRequest request, @RequestBody PlantillaEnvioSearchItem filtros) {
+	ResponseEntity<PlantillasEnvioDTO> plantillasEnvioSearch(@RequestParam("numPagina") int numPagina,HttpServletRequest request, @RequestBody PlantillaEnvioSearchItem filtros) {
 		
 		PlantillasEnvioDTO respuesta = _plantillasEnvioService.PlantillasEnvioSearch(request, filtros);
 		
 		if(respuesta.getError()!= null)
-			return new ResponseEntity<PlantillasEnvioDTO>(respuesta, HttpStatus.OK);
-		else
 			return new ResponseEntity<PlantillasEnvioDTO>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
+		else
+			return new ResponseEntity<PlantillasEnvioDTO>(respuesta, HttpStatus.OK);
 		
 	}
 	

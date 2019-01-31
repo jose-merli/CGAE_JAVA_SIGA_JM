@@ -149,6 +149,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 				error.setCode(500);
 				error.setMessage(e.getMessage());
 				e.printStackTrace();
+				respuesta.setError(error);
 			}
 		
 		}
@@ -462,42 +463,45 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
 					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
 					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
-					CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(plantilla.getIdpersona());
-					remitente.setIdPersona(persona.getIdpersona().toString());
-					remitente.setNombre(persona.getNombre());
-					remitente.setApellido1(persona.getApellidos1());
-					remitente.setApellido2(persona.getApellidos2());
-					
-					CenDireccionesKey keyDirecciones = new CenDireccionesKey();
-					keyDirecciones.setIddireccion(plantilla.getIddireccion());
-					keyDirecciones.setIdinstitucion(plantilla.getIdinstitucion());
-					keyDirecciones.setIdpersona(plantilla.getIdpersona());
-					CenDirecciones direccion = _cenDireccionesMapper.selectByPrimaryKey(keyDirecciones);
-					List<DatosDireccionesItem> direccionList = new ArrayList<DatosDireccionesItem>();
-					DatosDireccionesItem direccionItem = new DatosDireccionesItem();
-					direccionItem.setIdDireccion(direccion.getIddireccion().toString());
-					direccionItem.setDomicilio(direccion.getDomicilio());
-					direccionItem.setIdPoblacion(direccion.getIdpoblacion().toString());
-					direccionItem.setIdProvincia(direccion.getIdprovincia());
-					direccionItem.setIdPais(direccion.getIdpais());
-					direccionItem.setCodigoPostal(direccion.getCodigopostal());
-					if(direccion.getTelefono1()!=null)
+
+					if (null != plantilla && null != plantilla.getIdpersona()) {
+						CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(plantilla.getIdpersona());
+						remitente.setIdPersona(persona.getIdpersona().toString());
+						remitente.setNombre(persona.getNombre());
+						remitente.setApellido1(persona.getApellidos1());
+						remitente.setApellido2(persona.getApellidos2());
+						
+						CenDireccionesKey keyDirecciones = new CenDireccionesKey();
+						keyDirecciones.setIddireccion(plantilla.getIddireccion());
+						keyDirecciones.setIdinstitucion(plantilla.getIdinstitucion());
+						keyDirecciones.setIdpersona(plantilla.getIdpersona());
+						CenDirecciones direccion = _cenDireccionesMapper.selectByPrimaryKey(keyDirecciones);
+						List<DatosDireccionesItem> direccionList = new ArrayList<DatosDireccionesItem>();
+						DatosDireccionesItem direccionItem = new DatosDireccionesItem();
+						direccionItem.setIdDireccion(direccion.getIddireccion().toString());
+						direccionItem.setDomicilio(direccion.getDomicilio());
+						direccionItem.setIdPoblacion(direccion.getIdpoblacion().toString());
+						direccionItem.setIdProvincia(direccion.getIdprovincia());
+						direccionItem.setIdPais(direccion.getIdpais());
+						direccionItem.setCodigoPostal(direccion.getCodigopostal());
+						if(direccion.getTelefono1()!=null)
 						direccionItem.setTelefono(direccion.getTelefono1());
-					if(direccion.getTelefono2() != null)
-						direccionItem.setTelefono2(direccion.getTelefono2());
-					if(direccion.getMovil()!= null)
-						direccion.setMovil(direccion.getMovil());
-					if(direccion.getFax1() != null)
-						direccion.setFax1(direccion.getFax1());
-					if(direccion.getFax2() != null)
-						direccion.setFax2(direccion.getFax2());
-					if(direccion.getCorreoelectronico() != null)
-						direccion.setCorreoelectronico(direccion.getCorreoelectronico());
-					if(direccion.getPaginaweb() != null)
-						direccion.setPaginaweb(direccion.getPaginaweb());
-					direccionList.add(direccionItem);
-					remitente.setDireccion(direccionList);
-					
+						if(direccion.getTelefono2() != null)
+							direccionItem.setTelefono2(direccion.getTelefono2());
+						if(direccion.getMovil()!= null)
+							direccionItem.setMovil(direccion.getMovil());
+						if(direccion.getFax1() != null)
+							direccionItem.setFax(direccion.getFax1());
+						if(direccion.getFax2() != null)
+							direccionItem.setFax2(direccion.getFax2());
+						if(direccion.getCorreoelectronico() != null)
+							direccionItem.setCorreoElectronico(direccion.getCorreoelectronico());
+						if(direccion.getPaginaweb() != null)
+							direccionItem.setPaginaWeb(direccion.getPaginaweb());
+						direccionList.add(direccionItem);
+						remitente.setDireccion(direccionList);	
+					}
+
 				}
 			}catch(Exception e){
 				Error error = new Error();
