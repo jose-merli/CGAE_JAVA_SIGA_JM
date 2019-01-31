@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.form.CursoDTO;
 import org.itcgae.siga.DTOs.form.CursoItem;
-import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -19,7 +18,6 @@ import org.itcgae.siga.db.entities.AdmContador;
 import org.itcgae.siga.db.entities.AdmContadorExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.AgeEvento;
 import org.itcgae.siga.db.entities.AgeEventoExample;
 import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.entities.ForCursoExample;
@@ -27,11 +25,9 @@ import org.itcgae.siga.db.entities.ForEventoCurso;
 import org.itcgae.siga.db.entities.ForTemacursoCurso;
 import org.itcgae.siga.db.entities.ForTiposervicioCurso;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
-import org.itcgae.siga.db.mappers.ForEventoCursoMapper;
 import org.itcgae.siga.db.mappers.ForTemacursoCursoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.age.mappers.AgeEventoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForEstadocursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForTemacursoExtendsMapper;
@@ -70,12 +66,6 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService {
 	
 	@Autowired
 	private ForTemacursoCursoMapper forTemacursoCursoMapper;
-	
-	@Autowired
-	private ForEventoCursoMapper forEventoCursoMapper;
-	
-	@Autowired
-	private AgeEventoExtendsMapper ageEventoExtendsMapper;
 	
 	@Autowired 
 	private FichaCursosServiceImpl fichaCursosServiceImpl;
@@ -213,6 +203,7 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
 
 		if (null != idInstitucion) {
 			
@@ -230,13 +221,27 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService {
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				
-				LOGGER.info(
-						"searchCurso() / forCursoExtendsMapper.selectCursos() -> Entrada a forCursoExtendsMapper para obtener los cursos");
+				if (letrado.equalsIgnoreCase("S")) {
+					
+					LOGGER.info(
+							"searchCurso() / forCursoExtendsMapper.selectCursosIsColegiado() -> Entrada a forCursoExtendsMapper para obtener los cursos");
+					
+					cursoItemList = forCursoExtendsMapper.selectCursosIsColegiado(idInstitucion, cursoItem, usuario.getIdlenguaje());
+					
+					LOGGER.info(
+							"searchCurso() / forCursoExtendsMapper.selectCursosIsColegiado() -> Entrada a forCursoExtendsMapper para obtener los cursos");
+					
+				}else {
+					LOGGER.info(
+							"searchCurso() / forCursoExtendsMapper.selectCursos() -> Entrada a forCursoExtendsMapper para obtener los cursos");
+					
+					cursoItemList = forCursoExtendsMapper.selectCursos(idInstitucion, cursoItem, usuario.getIdlenguaje());
+					
+					LOGGER.info(
+							"searchCurso() / forCursoExtendsMapper.selectCursos() -> Entrada a forCursoExtendsMapper para obtener los cursos");
+				}
 				
-				cursoItemList = forCursoExtendsMapper.selectCursos(idInstitucion, cursoItem, usuario.getIdlenguaje());
 				
-				LOGGER.info(
-						"searchCurso() / forCursoExtendsMapper.selectCursos() -> Entrada a forCursoExtendsMapper para obtener los cursos");
 				
 				cursoDTO.setCursoItem(cursoItemList);
 

@@ -1,6 +1,10 @@
 package org.itcgae.siga.db.services.age.providers;
 
+import java.text.SimpleDateFormat;
+
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.db.entities.AgeEvento;
+import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.mappers.AgeEventoSqlProvider;
 
 public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
@@ -123,4 +127,19 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		return sql.toString();
 	}
 
+	
+	public String selectEventoFechaAuto(AgeEvento evento) {
+		SQL sql = new SQL();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+		
+		sql.SELECT_DISTINCT("EVENTO.IDEVENTO");
+		sql.FROM("AGE_EVENTO EVENTO");
+		
+		if(evento.getFechafin() != null) {
+			sql.WHERE("EVENTO.FECHAFIN < TO_DATE('" + dateFormat.format(evento.getFechafin()) + "','dd/MM/RRRR hh24:mi:ss') ");
+		}
+
+		sql.WHERE("EVENTO.IDESTADOEVENTO = 1");
+		return sql.toString();
+	}
 }

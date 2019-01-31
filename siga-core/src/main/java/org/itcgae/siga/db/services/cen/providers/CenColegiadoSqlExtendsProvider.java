@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.mappers.CenColegiadoSqlProvider;
@@ -108,14 +109,21 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 
 		if (colegiadoItem.getNombre() != null && colegiadoItem.getNombre() != "") {
-			sql.WHERE("upper(per.nombre) like upper('%" + colegiadoItem.getNombre() + "%')");
+			String columna = "per.nombre";
+			String cadena = colegiadoItem.getNombre();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+//			sql.WHERE("upper(per.nombre) like upper('%" + colegiadoItem.getNombre() + "%')");
 		}
 
 		if (colegiadoItem.getApellidos() != null && colegiadoItem.getApellidos() != "") {
-			sql.WHERE("UPPER(CONCAT(per.apellidos1,per.apellidos2)) LIKE UPPER('%" + colegiadoItem.getApellidos()
-					+ "%')");
+			String columna = "CONCAT(per.apellidos1,per.apellidos2)";
+			String cadena = colegiadoItem.getApellidos().replaceAll("\\s+","");
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			
+//			sql.WHERE("UPPER(CONCAT(per.apellidos1,per.apellidos2)) LIKE UPPER('%" +colegiadoItem.getApellidos().replaceAll("\\s+","")
+//					+ "%')");
 		}
-
+		
 		if (colegiadoItem.getNumColegiado() != null && colegiadoItem.getNumColegiado() != "") {
 			sql.WHERE("col.ncolegiado like '%" + colegiadoItem.getNumColegiado() + "%'");
 		}
@@ -151,7 +159,11 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 
 		if (colegiadoItem.getCorreo() != null && colegiadoItem.getCorreo() != "") {
-			sql.WHERE("upper(dir.correoelectronico) LIKE upper('%" + colegiadoItem.getCorreo() + "%')");
+			String columna = "dir.correoelectronico";
+			String cadena = colegiadoItem.getCorreo();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			
+//			sql.WHERE("upper(dir.correoelectronico) LIKE upper('%" + colegiadoItem.getCorreo() + "%')");
 		}
 
 		if (colegiadoItem.getTelefono() != null && colegiadoItem.getTelefono() != "") {
@@ -380,7 +392,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("cat.descripcion as estadoColegial");
 		sql.SELECT("decode (situacionresidente, 1, 'Si', 0, 'No') as residenteInscrito");
 		sql.SELECT("observaciones");
-		sql.SELECT("colest.fechaestado AS fechaestado");
+		sql.SELECT("TO_CHAR(fechaestado,'DD/MM/YYYY') AS fechaestado");
 		sql.SELECT("colest.idestado AS idEstado");
 
 		sql.FROM("cen_colegiado col");

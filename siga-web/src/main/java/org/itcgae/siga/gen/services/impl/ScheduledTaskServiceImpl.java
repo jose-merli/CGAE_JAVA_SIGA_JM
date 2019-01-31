@@ -50,4 +50,12 @@ public class ScheduledTaskServiceImpl implements IScheduledTaskService {
 		busquedaSancionesService.archivarSancionesRehabilitado();
 		LOGGER.info("ScheduledTaskServiceImpl --> archivarSancionesRehabilitado --> SALE archivarSancionesRehabilitado");
 	}
+	
+	@Scheduled(cron = "${cron.pattern.scheduled.ageEvento}")
+	@Override
+	public void cambiaEventosImpartido() {
+		LOGGER.info("ScheduledTaskServiceImpl --> cambiaCursoEnCurso --> ENTRA updateEstadoCursoAuto");
+		fichaEventosService.updateEstadoEventoAuto();
+		LOGGER.info("ScheduledTaskServiceImpl --> cambiaCursoEnCurso --> SALE updateEstadoCursoAuto");
+	}
 }

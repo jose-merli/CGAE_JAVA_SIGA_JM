@@ -346,15 +346,25 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 		for (ComboEtiquetasItem comboEtiquetasItem : comboEtiquetasItems) {
 			Date fechaInicio = simpleDateFormat.parse(comboEtiquetasItem.getFechaInicio());
 		    Date fechaBaja = simpleDateFormat.parse( comboEtiquetasItem.getFechaBaja());
+		    if (comboEtiquetasItem.getFechaBaja() != null) {
+				fechaBaja = simpleDateFormat.parse(comboEtiquetasItem.getFechaBaja());
+			} else {
+				fechaBaja = null;
+			} 
 		    Date fechaActual = simpleDateFormat.parse(fechaHoy);
 		    
-			if(fechaInicio.before(fechaActual) && fechaBaja.after(fechaActual)) {
-				comboEtiquetasItem.setColor("#87CEFA"); 
-			}else if(fechaActual.before(fechaInicio) && fechaBaja.after(fechaInicio)) {
-				comboEtiquetasItem.setColor("#40E0D0");
-			}else if(fechaInicio.before(fechaBaja) && fechaActual.after(fechaBaja)) {
-				comboEtiquetasItem.setColor("#F08080"); 
-			}
+		    if (fechaBaja == null) {
+				comboEtiquetasItem.setColor("#87CEFA");
+			} else {
+				if (fechaInicio.before(fechaActual)
+						&& (fechaBaja.after(fechaActual) || fechaBaja.compareTo(fechaActual) == 0)) {
+					comboEtiquetasItem.setColor("#87CEFA");
+				} else if (fechaActual.before(fechaInicio) && fechaBaja.after(fechaInicio)) {
+					comboEtiquetasItem.setColor("#40E0D0");
+				} else if (fechaInicio.before(fechaBaja) && fechaActual.after(fechaBaja)) {
+					comboEtiquetasItem.setColor("#F08080");
+				}
+			} 
 		}
 		
 		comboEtiquetasDTO.setComboEtiquetasItems(comboEtiquetasItems);
