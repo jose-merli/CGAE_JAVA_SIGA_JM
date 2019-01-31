@@ -229,21 +229,21 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				AdmUsuarios usuario = usuarios.get(0);
 				comboItems = cenPaisExtendsMapper.selectPais(usuario.getIdlenguaje());
 				if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
+					/*ComboItem element = new ComboItem();
 					element.setLabel("");
 					element.setValue("");
-					comboItems.add(0, element);
+					comboItems.add(0, element);*/
 					
 					// busqueda binaria de España
-//					List<String> listaPaises = comboItems.stream().map(object -> Objects.toString(object.getLabel(), null)).collect(Collectors.toList());
-//					int indexSpain = Collections.binarySearch(listaPaises, "ESPAÑA");
-//					ComboItem elementSpain = new ComboItem();
-//					elementSpain.setLabel(comboItems.get(indexSpain).getLabel());
-//					elementSpain.setValue(comboItems.get(indexSpain).getValue());
-//					comboItems.add(0, elementSpain);
+					List<String> listaPaises = comboItems.stream().map(object -> Objects.toString(object.getLabel(), null)).collect(Collectors.toList());
+					int indexSpain = Collections.binarySearch(listaPaises, "ESPAÑA");
+					ComboItem elementSpain = new ComboItem();
+					elementSpain.setLabel(comboItems.get(indexSpain).getLabel());
+					elementSpain.setValue(comboItems.get(indexSpain).getValue());
+					comboItems.add(0, elementSpain);
 					
 					// eliminamos españa del indice anterior
-//					comboItems.remove(indexSpain+1);
+					comboItems.remove(indexSpain+1);
 					
 				}		
 				
