@@ -1,8 +1,9 @@
 package org.itcgae.siga.DTOs.com;
 
 public class PlantillaDocumentoBorrarDTO {
+	
 	private String idModeloComunicacion;
-	private String idCalseComunicacion;
+	private String idClaseComunicacion;
 	private String idInstitucion;
 	private String idConsulta;
 	private String idPlantillaDocumento;
@@ -14,11 +15,12 @@ public class PlantillaDocumentoBorrarDTO {
 	public void setIdModeloComunicacion(String idModeloComunicacion) {
 		this.idModeloComunicacion = idModeloComunicacion;
 	}
-	public String getIdCalseComunicacion() {
-		return idCalseComunicacion;
+
+	public String getIdClaseComunicacion() {
+		return idClaseComunicacion;
 	}
-	public void setIdCalseComunicacion(String idCalseComunicacion) {
-		this.idCalseComunicacion = idCalseComunicacion;
+	public void setIdClaseComunicacion(String idClaseComunicacion) {
+		this.idClaseComunicacion = idClaseComunicacion;
 	}
 	public String getIdInstitucion() {
 		return idInstitucion;
