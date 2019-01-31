@@ -28,6 +28,7 @@ import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IPlantillasDocumentoService;
 import org.itcgae.siga.com.services.IPlantillasEnvioService;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -43,7 +44,6 @@ import org.itcgae.siga.db.entities.ModRelPlantillaSufijo;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
-import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModRelPlantillaSufijoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
@@ -82,9 +82,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	
 	@Autowired
 	ModPlantilladocConsultaMapper modPlantilladocConsultaMapper;
-	
-	@Autowired
-	ModPlantilladocumentoMapper modPlantilladocumentoMapper;
 	
 	@Autowired
 	ModPlantillaDocumentoExtendsMapper modPlantillaDocumentoExtendsMapper;
@@ -470,12 +467,20 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				MultipartFile file = request.getFile(itr.next());
 				String fileName = file.getOriginalFilename();
 				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+				String nombreFichero = fileName.substring(0, fileName.lastIndexOf("."));
+				
 				if(extension.contains("doc") || extension.contains("docx") || extension.contains("xls") || extension.contains("xlsx")){
 					try {
+						
+						// Obtenemos el idplantilladocumento para concatenarlo con el nombre del fichero
+						NewIdDTO newId = modPlantillaDocumentoExtendsMapper.selectMaxIdPlantillaDocumento();
+						int idNuevaPlantilla = Integer.parseInt(newId.getNewId()) + 1;
+						String newNombreFichero = nombreFichero + "_" + idNuevaPlantilla;
+						
 						File aux = new File(pathFichero);
 						// creo directorio si no existe
 						aux.mkdirs();
-						File serverFile = new File(pathFichero, fileName);
+						File serverFile = new File(pathFichero, newNombreFichero);
 						if(serverFile.exists()){
 							LOGGER.error("Ya existe el fichero: " + pathFichero + fileName);
 							throw new FileAlreadyExistsException("El fichero ya existe");
@@ -550,7 +555,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					modPlantillaDoc.setIdioma(documento.getIdIdioma());
 					modPlantillaDoc.setUsumodificacion(usuario.getIdusuario());
 					modPlantillaDoc.setPlantilla(documento.getNombreDocumento());
-					modPlantilladocumentoMapper.insert(modPlantillaDoc);
+					modPlantillaDocumentoExtendsMapper.insert(modPlantillaDoc);
 					
 					response.setIdioma(documento.getIdioma());
 					response.setNombreDocumento(documento.getNombreDocumento());
@@ -746,7 +751,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 							
 							for(DocumentoPlantillaItem idPlantillaDoc : plantillaDoc.getPlantillas()){
 								
-								ModPlantilladocumento modPlantillaDoc = modPlantilladocumentoMapper.selectByPrimaryKey(Long.parseLong(idPlantillaDoc.getIdPlantillaDocumento()));
+								ModPlantilladocumento modPlantillaDoc = modPlantillaDocumentoExtendsMapper.selectByPrimaryKey(Long.parseLong(idPlantillaDoc.getIdPlantillaDocumento()));
 								
 								if(modPlantillaDoc != null){
 									ModModeloPlantilladocumentoKey modModeloPlantillaDocKey = new ModModeloPlantilladocumentoKey();

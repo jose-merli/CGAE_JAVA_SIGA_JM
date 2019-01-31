@@ -22,4 +22,13 @@ public class ModPlantillaDocumentoExtendsSqlProvider {
 		
 		return sql.toString();
 	}
+	
+	public String selectMaxIdPlantillaDocumento() {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("max(idplantilladocumento) as IDPLANTILLADOCUMENTO");
+		sql.FROM("MOD_PLANTILLADOCUMENTO");
+		return sql.toString();
+	}
 }
