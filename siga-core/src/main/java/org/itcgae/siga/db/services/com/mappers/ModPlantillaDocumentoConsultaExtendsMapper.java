@@ -27,7 +27,8 @@ public interface ModPlantillaDocumentoConsultaExtendsMapper {
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OBJETIVO", property = "objetivo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDOBJETIVO", property = "idObjetivo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDPLANTILLACONSULTA", property = "idPlantillaConsulta", jdbcType = JdbcType.VARCHAR)		 
+		@Result(column = "IDPLANTILLACONSULTA", property = "idPlantillaConsulta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
 	})
 	List<ConsultaItem> selectConsultasByInforme(Short idInstitucion, Long idModeloComunicacion, Long idInforme, String idLenguaje, boolean historico);
 

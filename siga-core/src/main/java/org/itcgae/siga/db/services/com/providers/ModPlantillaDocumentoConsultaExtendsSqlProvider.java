@@ -30,6 +30,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		
 		sql.SELECT("DISTINCT plantilla.idconsulta, consulta.descripcion, consulta.idobjetivo, rec.descripcion AS OBJETIVO");
 		sql.SELECT("LISTAGG(plantilla.idplantillaconsulta, ',') WITHIN GROUP (ORDER BY plantilla.idplantillaconsulta) idplantillaconsulta");
+		sql.SELECT("plantilla.FECHABAJA");
 		
 		sql.FROM("MOD_PLANTILLADOC_CONSULTA plantilla");	
 		sql.INNER_JOIN("CON_CONSULTA consulta ON consulta.IDCONSULTA = plantilla.IDCONSULTA AND consulta.IDINSTITUCION = plantilla.IDINSTITUCION");
