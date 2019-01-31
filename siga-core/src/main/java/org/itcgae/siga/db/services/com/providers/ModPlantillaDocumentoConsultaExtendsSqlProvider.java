@@ -30,7 +30,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		
 		sql.SELECT("DISTINCT plantilla.idconsulta, consulta.descripcion, consulta.idobjetivo, rec.descripcion AS OBJETIVO");
 		sql.SELECT("LISTAGG(plantilla.idplantillaconsulta, ',') WITHIN GROUP (ORDER BY plantilla.idplantillaconsulta) idplantillaconsulta");
-		sql.SELECT("plantilla.FECHABAJA");
+		sql.SELECT("TRUNC(plantilla.FECHABAJA) AS FECHABAJA");
 		
 		sql.FROM("MOD_PLANTILLADOC_CONSULTA plantilla");	
 		sql.INNER_JOIN("CON_CONSULTA consulta ON consulta.IDCONSULTA = plantilla.IDCONSULTA AND consulta.IDINSTITUCION = plantilla.IDINSTITUCION");
@@ -38,7 +38,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		sql.INNER_JOIN("con_objetivo objetivo ON consulta.idobjetivo = objetivo.idobjetivo");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON rec.idrecurso = objetivo.nombre AND rec.idlenguaje = " + idLenguaje);				
 		sql.WHERE("plantilla.IDMODELOCOMUNICACION = " + idModeloComunicacion + " AND modelo.idinforme = " + idInforme + " AND plantilla.IDINSTITUCION = " + idInstitucion);
-		sql.GROUP_BY("plantilla.idconsulta, consulta.descripcion, consulta.idobjetivo, rec.descripcion");
+		sql.GROUP_BY("plantilla.idconsulta, consulta.descripcion, consulta.idobjetivo, rec.descripcion, TRUNC(plantilla.FECHABAJA)");
 		
 		if(!historico){
 			sql.WHERE("consulta.FECHABAJA IS NULL AND plantilla.FECHABAJA IS NULL");
