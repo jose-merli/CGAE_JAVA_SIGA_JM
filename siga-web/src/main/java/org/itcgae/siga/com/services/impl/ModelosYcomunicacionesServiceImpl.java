@@ -797,7 +797,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					if(plantillasDoc != null & plantillasDoc.length > 0){
 						for(PlantillaDocumentoBorrarDTO plantilla : plantillasDoc){
 							ModModeloPlantilladocumentoExample example = new ModModeloPlantilladocumentoExample();
-							example.createCriteria().andIdinformeEqualTo(Long.parseLong(plantilla.getIdInforme()));
+							example.createCriteria().andIdinformeEqualTo(Long.parseLong(plantilla.getIdInforme())).andIdmodelocomunicacionEqualTo(Long.valueOf(plantilla.getIdModeloComunicacion()));
 							List<ModModeloPlantilladocumento> listaPlantillas = modModeloPlantilladocumentoMapper.selectByExample(example);
 							for(ModModeloPlantilladocumento plantillaBorrar:listaPlantillas){
 								plantillaBorrar.setFechabaja(new Date());
@@ -807,7 +807,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 								
 								//También ponemos fecha de baja a las consultas asociadas a esa plantilla
 								ModPlantilladocConsultaExample examplePlantilla = new ModPlantilladocConsultaExample();
-								examplePlantilla.createCriteria().andIdmodelocomunicacionEqualTo(Long.parseLong(plantilla.getIdModeloComunicacion())).andIdplantilladocumentoEqualTo(Long.parseLong(plantilla.getIdPlantillaDocumento())).andIdinstitucionEqualTo(Short.parseShort(plantilla.getIdInstitucion()));
+								examplePlantilla.createCriteria().andIdmodelocomunicacionEqualTo(Long.parseLong(plantilla.getIdModeloComunicacion())).andIdplantilladocumentoEqualTo(plantillaBorrar.getIdplantilladocumento()).andIdinstitucionEqualTo(Short.parseShort(plantilla.getIdInstitucion()));
 								List<ModPlantilladocConsulta> listaConsultas = modPlantilladocConsultaMapper.selectByExample(examplePlantilla);
 								for(ModPlantilladocConsulta consultaBorrar :listaConsultas){
 									consultaBorrar.setFechabaja(new Date());
