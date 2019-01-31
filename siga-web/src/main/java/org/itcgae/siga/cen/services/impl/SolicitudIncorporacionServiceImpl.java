@@ -29,6 +29,7 @@ import org.itcgae.siga.DTOs.cen.MaxIdDto;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionDTO;
 import org.itcgae.siga.DTOs.cen.SolIncorporacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudIncorporacionSearchDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -606,6 +607,12 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						MaxIdDto idSolicitud = _cenSolicitudincorporacionExtendsMapper.getMaxIdRecurso();
 						Long idMax = idSolicitud.getIdMax() +1;
 						SolIncorporacionDTO.setIdSolicitud(Long.toString(idMax));
+						
+						if(SolIncorporacionDTO.getNumColegiado() == null) {
+							StringDTO nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNColegiado(String.valueOf(idInstitucion));
+							SolIncorporacionDTO.setNumColegiado(nColegiado.getValor());
+						}
+						
 						solIncorporacion = mapperDtoToEntity(SolIncorporacionDTO, usuario);
 						solIncorporacion.setIdestado((short)20);
 						insert = _cenSolicitudincorporacionMapper.insert(solIncorporacion);
@@ -882,7 +889,11 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		cliente.setPublicidad(SigaConstants.DB_FALSE);
 		cliente.setGuiajudicial(SigaConstants.DB_FALSE);
 		cliente.setComisiones(SigaConstants.DB_FALSE);
-		cliente.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
+		if(solicitud.getIdtratamiento() != null) {
+			cliente.setIdtratamiento(solicitud.getIdtratamiento()); // 1
+		}else {
+			cliente.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
+		} 
 		cliente.setFechamodificacion(new Date());
 		cliente.setUsumodificacion(usuario.getIdusuario());
 		cliente.setIdlenguaje(usuario.getIdlenguaje());
@@ -1225,8 +1236,11 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		colegiado.setIndtitulacion("1");
 		colegiado.setSituacionejercicio("0");
 		colegiado.setSituacionempresa("0");
-		colegiado.setSituacionresidente("0");
-
+		if(solicitud.getResidente().equals("1")) {
+			colegiado.setSituacionresidente("1");
+		}else {
+			colegiado.setSituacionresidente("0");
+		} 
 		CenColegiadoExample ejemploColegiado = new CenColegiadoExample();
 		ejemploColegiado.createCriteria().andIdpersonaEqualTo(idPersona);
 		

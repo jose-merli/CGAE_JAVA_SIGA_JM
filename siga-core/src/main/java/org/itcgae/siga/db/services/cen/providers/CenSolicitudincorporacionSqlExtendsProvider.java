@@ -85,11 +85,19 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 			sql.WHERE("NUMEROIDENTIFICADOR LIKE '%" + solIncorporacionSearchDTO.getNumeroIdentificacion() +"%'");
 		}
 		if(solIncorporacionSearchDTO.getApellidos()!=null && !solIncorporacionSearchDTO.getApellidos().equals("")){
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("CONCAT(APELLIDO1,APELLIDO2)", solIncorporacionSearchDTO.getApellidos()));
+			String columna = "CONCAT(APELLIDO1,APELLIDO2)";
+			String cadena = solIncorporacionSearchDTO.getApellidos().replaceAll("\\s+","");
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+//			sql.WHERE(UtilidadesString.filtroTextoBusquedas("CONCAT(APELLIDO1,APELLIDO2)", solIncorporacionSearchDTO.getApellidos()));
 		}
 		if(solIncorporacionSearchDTO.getNombre()!= null && !solIncorporacionSearchDTO.getNombre().equals("")){
-			sql.WHERE(UtilidadesString.filtroTextoBusquedas("SOLICITUD.NOMBRE", solIncorporacionSearchDTO.getNombre()));
+			String columna = "SOLICITUD.NOMBRE";
+			String cadena = solIncorporacionSearchDTO.getNombre();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+//			sql.WHERE(UtilidadesString.filtroTextoBusquedas("SOLICITUD.NOMBRE", solIncorporacionSearchDTO.getNombre()));
 		}
+		
+		
 		
 		if(solIncorporacionSearchDTO.getFechaDesde()!=null && !solIncorporacionSearchDTO.getFechaDesde().equals("")){
 			String fechaDesde = dateFormat.format(solIncorporacionSearchDTO.getFechaDesde());
@@ -111,5 +119,12 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		return sql.toString();
 	}
 
+	public String getMaxNColegiado(String idInstitucion){
+		SQL sql = new SQL();
+		sql.SELECT("MAX(NCOLEGIADO + 1) AS NCOLEGIADO");
+		sql.FROM("CEN_SOLICITUDINCORPORACION");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		return sql.toString();
+	} 
 
 }

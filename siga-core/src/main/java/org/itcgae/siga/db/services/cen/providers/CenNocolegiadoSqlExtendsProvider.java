@@ -659,13 +659,24 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if (noColegiadoItem.getNif() != null && noColegiadoItem.getNif() != "") {
 			sql.WHERE("upper(per.nifcif) like upper('%" + noColegiadoItem.getNif() + "%')");
 		}
+//		if (noColegiadoItem.getNombre() != null && noColegiadoItem.getNombre() != "") {
+//			sql.WHERE("upper(per.nombre) like upper('%" + noColegiadoItem.getNombre() + "%')");
+//		}
+//		if (noColegiadoItem.getApellidos() != null && noColegiadoItem.getApellidos() != "") {
+//			sql.WHERE("UPPER(CONCAT(per.apellidos1,per.apellidos2)) LIKE UPPER('%" + noColegiadoItem.getApellidos().replaceAll("\\s+","")
+//					+ "%')");
+//		}
+		
 		if (noColegiadoItem.getNombre() != null && noColegiadoItem.getNombre() != "") {
-			sql.WHERE("upper(per.nombre) like upper('%" + noColegiadoItem.getNombre() + "%')");
+			String columna = "per.nombre";
+			String cadena = noColegiadoItem.getNombre();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 		}
 		if (noColegiadoItem.getApellidos() != null && noColegiadoItem.getApellidos() != "") {
-			sql.WHERE("UPPER(CONCAT(per.apellidos1,per.apellidos2)) LIKE UPPER('%" + noColegiadoItem.getApellidos()
-					+ "%')");
-		}
+			String columna = "CONCAT(per.apellidos1,per.apellidos2)";
+			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","");
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+		}			
 		if (noColegiadoItem.getSexo() != null && noColegiadoItem.getSexo() != "") {
 			sql.WHERE("per.sexo = '" + noColegiadoItem.getSexo() + "'");
 		}
@@ -811,11 +822,19 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			sql.WHERE("upper(per.nifcif) like upper('%" + noColegiadoItem.getNif() + "%')");
 		}
 		if (noColegiadoItem.getNombre() != null && noColegiadoItem.getNombre() != "") {
-			sql.WHERE("upper(per.nombre) like upper('%" + noColegiadoItem.getNombre() + "%')");
+			String columna = "per.nombre";
+			String cadena = noColegiadoItem.getNombre();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			
+//			sql.WHERE("upper(per.nombre) like upper('%" + noColegiadoItem.getNombre() + "%')");
 		}
 		if (noColegiadoItem.getApellidos() != null && noColegiadoItem.getApellidos() != "") {
-			sql.WHERE("UPPER(CONCAT(per.apellidos1,per.apellidos2)) LIKE UPPER('%" + noColegiadoItem.getApellidos()
-					+ "%')");
+			String columna = "CONCAT(per.apellidos1,per.apellidos2)";
+			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","");
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			
+//			sql.WHERE("UPPER(CONCAT(per.apellidos1,per.apellidos2)) LIKE UPPER('%" + noColegiadoItem.getApellidos()
+//					+ "%')");
 		}
 		if (noColegiadoItem.getSexo() != null && noColegiadoItem.getSexo() != "") {
 			sql.WHERE("per.sexo = '" + noColegiadoItem.getSexo() + "'");
@@ -827,7 +846,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			sql.WHERE("per.idestadocivil = '" + noColegiadoItem.getidEstadoCivil() + "'");
 		}
 		if (noColegiadoItem.getCodigoPostal() != null && noColegiadoItem.getCodigoPostal() != "") {
-			sql.WHERE("dir.codigopostal ='" + noColegiadoItem.getCodigoPostal() + "'");
+			String columna = "dir.codigopostal";
+			String cadena = noColegiadoItem.getCodigoPostal();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+//			sql.WHERE("dir.codigopostal ='" + noColegiadoItem.getCodigoPostal() + "'");
 		}
 		if (noColegiadoItem.getIdProvincia() != null && noColegiadoItem.getIdProvincia() != "") {
 			sql.WHERE("dir.idprovincia = '" + noColegiadoItem.getIdProvincia() + "'");

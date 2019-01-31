@@ -528,9 +528,13 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 
 									  
 											Date fechaInicio = df.parse(etiqueta.getFechaInicio());
-										    Date fechaBaja = df.parse(etiqueta.getFechaBaja());
+										    if(etiqueta.getFechaBaja() != null) {
+											    Date fechaBaja = df.parse(etiqueta.getFechaBaja());
+												cenGruposclienteCliente.setFechaBaja(fechaBaja);
+											}else {
+												cenGruposclienteCliente.setFechaBaja(null);
+											} 
 										    
-											cenGruposclienteCliente.setFechaBaja(fechaBaja);
 											cenGruposclienteCliente.setFechaInicio(fechaInicio);
 											cenGruposclienteCliente.setFechamodificacion(new Date());
 											cenGruposclienteCliente.setIdgrupo(idGrupo);
@@ -849,9 +853,12 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 
 						  
 								Date fechaInicio = df.parse(etiqueta.getFechaInicio());
-							    Date fechaBaja = df.parse(etiqueta.getFechaBaja());
-							    
-								cenGruposclienteCliente.setFechaBaja(fechaBaja);
+								if(etiqueta.getFechaBaja() != null) {
+									Date fechaBaja = df.parse(etiqueta.getFechaBaja());
+									cenGruposclienteCliente.setFechaBaja(fechaBaja);
+								}else {
+									cenGruposclienteCliente.setFechaBaja(null);
+								} 
 								cenGruposclienteCliente.setFechaInicio(fechaInicio);
 								cenGruposclienteCliente.setFechamodificacion(new Date());
 								cenGruposclienteCliente.setIdgrupo(idGrupo);
@@ -925,11 +932,15 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 									DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 
 									  
-									Date fechaInicio = df.parse(etiqueta.getFechaInicio());
-								    Date fechaBaja = df.parse(etiqueta.getFechaBaja());
-								    
+									Date fechaInicio = df.parse(etiqueta.getFechaInicio());	
 									listarelacionGrupoPersona.get(0).setFechaInicio(fechaInicio);
-									listarelacionGrupoPersona.get(0).setFechaBaja(fechaBaja);
+									if(etiqueta.getFechaBaja() != null) {
+									    Date fechaBaja = df.parse(etiqueta.getFechaBaja());
+									    listarelacionGrupoPersona.get(0).setFechaBaja(fechaBaja);
+									}else {
+										  listarelacionGrupoPersona.get(0).setFechaBaja(null);
+									} 
+									
 									LOGGER.info(
 											"createLegalPerson() / cenGruposclienteClienteExtendsMapper.updateByExample() -> Entrada a cenGruposclienteClienteExtendsMapper actualizar la relacion grupo-persona jurídica");
 
