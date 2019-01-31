@@ -57,7 +57,13 @@ public interface ConConsultasExtendsMapper {
 		@Result(column = "IDCONSULTA", property = "idConsulta", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOCONSULTA", property = "tipoConsulta", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OBSERVACIONES", property = "descripcion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "nombre", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "DESCRIPCION", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDMODULO", property = "idModulo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDOBJETIVO", property = "idObjetivo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SENTENCIA", property = "sentencia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "GENERAL", property = "generica", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ConsultaItem> selectConsultasPlantillas(Short idInstitucion, String idPlantillaEnvios, String idtipoEnvio);
 

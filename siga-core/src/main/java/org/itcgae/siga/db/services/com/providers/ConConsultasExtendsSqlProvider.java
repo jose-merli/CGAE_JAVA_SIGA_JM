@@ -75,7 +75,8 @@ public class ConConsultasExtendsSqlProvider {
 	
 	public String selectConsultasPlantilla(Short idInstitucion, String idPlantillaEnvios, String idtipoEnvio){
 		SQL sql = new SQL();
-		sql.SELECT("IDINSTITUCION, IDCONSULTA, DESCRIPCION, OBSERVACIONES, TIPOCONSULTA");
+		sql.SELECT("IDINSTITUCION, IDCONSULTA, DESCRIPCION, OBSERVACIONES, TIPOCONSULTA, IDMODULO, (SELECT NOMBRE FROM CON_MODULO WHERE IDMODULO = con_consulta.IDMODULO) AS MODULO");
+		sql.SELECT("IDCLASECOMUNICACION, IDOBJETIVO, SENTENCIA, GENERAL");
 		sql.FROM("con_consulta");
 		sql.WHERE("IDCONSULTA IN (SELECT IDCONSULTA FROM MOD_PLANTILLAENVIO_CONSULTA WHERE IDPLANTILLAENVIOS='"+ idPlantillaEnvios +"' "
 				+ "AND IDTIPOENVIOS ='"+ idtipoEnvio +"' AND IDINSTITUCION='"+ idInstitucion +"' AND FECHABAJA is null) AND IDINSTITUCION = '"+ idInstitucion +"'");
