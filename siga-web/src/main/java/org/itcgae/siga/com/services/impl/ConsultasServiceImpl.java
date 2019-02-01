@@ -164,12 +164,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 				AdmUsuarios usuario = usuarios.get(0);
 				comboItems = _conObjetivoExtendsMapper.selectObjetivos(usuario.getIdlenguaje());
-				if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}		
+						
 				
 				comboDTO.setCombooItems(comboItems);
 				
