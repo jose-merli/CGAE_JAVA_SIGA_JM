@@ -626,6 +626,12 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		key.setIdconsulta(Long.valueOf(idConsulta));
 		key.setIdinstitucion(idInstitucion);
 		ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
+		
+		if(consulta == null) {
+			key.setIdinstitucion(Short.valueOf("2000"));
+			consulta = _conConsultaMapper.selectByPrimaryKey(key);
+		}
+		
 		int inicioSelect = consulta.getSentencia().indexOf("<SELECT>")+8;
 		int finSelect = consulta.getSentencia().indexOf("</SELECT>");
 		String finalidad = consulta.getSentencia().substring(inicioSelect, finSelect);
