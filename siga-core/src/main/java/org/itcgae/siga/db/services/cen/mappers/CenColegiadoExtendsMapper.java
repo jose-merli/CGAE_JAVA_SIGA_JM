@@ -56,6 +56,7 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "COMISIONES", property = "comisiones", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PARTIDOJUDICIAL", property = "partidoJudicial", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NUMCOLEGIADO", property = "numberColegiado", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "ESTADOCOLEGIAL", property = "estadoColegial", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDTRATAMIENTO", property = "idTratamiento", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "RESIDENTEINSCRITO", property = "residenteInscrito", jdbcType = JdbcType.VARCHAR),
