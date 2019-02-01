@@ -244,7 +244,7 @@ public class FichaCursosController {
 	
 	@RequestMapping(value = "fichaCursos/cancelSessionsCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> cancelSessionsCourse(@RequestBody EventoDTO eventoDTO, HttpServletRequest request) {
-		UpdateResponseDTO response = fichaEventosService.deleteEventCalendar(eventoDTO, request);
+		UpdateResponseDTO response = fichaCursosService.cancelSessionsCourse(eventoDTO, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
 	

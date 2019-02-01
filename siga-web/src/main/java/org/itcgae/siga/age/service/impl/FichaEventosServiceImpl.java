@@ -298,19 +298,19 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 									forEventoCurso.setIdinstitucion(idInstitucion);
 
 									response = forEventoCursoMapper.insert(forEventoCurso);
-									
-									//comprobamos si la sesión es candidata a ser inicio o fin de impartición de curso
-									
-									
+
+									// comprobamos si la sesión es candidata a ser inicio o fin de impartición de
+									// curso
+
 									ForCurso cursodesde = new ForCurso();
 									cursodesde.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
 									cursodesde.setFechaimparticiondesde(eventoItem.getFechaInicio());
 									ForCurso curso = forCursoExtendsMapper.selectCursoFechaMinMax(cursodesde);
-									
+
 									if (null == curso) {
 										forCursoExtendsMapper.updateByPrimaryKeySelective(cursodesde);
 									}
-									
+
 									ForCurso cursohasta = new ForCurso();
 									cursohasta.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
 									cursohasta.setFechaimparticionhasta(eventoItem.getFechaInicio());
@@ -318,7 +318,6 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 									if (null == curso) {
 										forCursoExtendsMapper.updateByPrimaryKeySelective(cursohasta);
 									}
-									
 
 								}
 
@@ -1100,7 +1099,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	public UpdateResponseDTO updateEventCalendar(EventoItem eventoItem, HttpServletRequest request) {
 		LOGGER.info("updateEventCalendar() -> Entrada al servicio para modificar los eventos");
 
-		int response = 0;
+		int response = 2;
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 
@@ -1138,20 +1137,35 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 					LOGGER.info(
 							"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para modificar un evento");
 
-					event.setFechamodificacion(new Date());
-					event.setUsumodificacion(usuario.getIdusuario().longValue());
-					event.setTitulo(eventoItem.getTitulo());
-					event.setIdestadoevento(Long.valueOf(eventoItem.getIdEstadoEvento()));
-					event.setFechainicio(eventoItem.getFechaInicio());
-					event.setFechafin(eventoItem.getFechaFin());
-					event.setLugar(eventoItem.getLugar());
-					event.setDescripcion(eventoItem.getDescripcion());
-					event.setRecursos(eventoItem.getRecursos());
-					response = ageEventoExtendsMapper.updateByPrimaryKey(event);
+				
+					if (event.getIdestadoevento() != Long.valueOf(eventoItem.getIdEstadoEvento())) {
 
-					LOGGER.info(
-							"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para modificar un evento");
+						if (event.getIdestadoevento() == Long.valueOf(SigaConstants.EVENTO_CUMPLIDO)
+								&& eventoItem.getIdEstadoEvento().equals(SigaConstants.EVENTO_CANCELADO) 
+								&& event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_SESION) {
 
+							error.setCode(200);
+							error.setDescription("La sesión debe tener estado planificado para poder ser cancelada");
+							
+						}else {
+							event.setIdestadoevento(Long.valueOf(eventoItem.getIdEstadoEvento()));
+							event.setFechamodificacion(new Date());
+							event.setUsumodificacion(usuario.getIdusuario().longValue());
+							event.setTitulo(eventoItem.getTitulo());
+							event.setFechainicio(eventoItem.getFechaInicio());
+							event.setFechafin(eventoItem.getFechaFin());
+							event.setLugar(eventoItem.getLugar());
+							event.setDescripcion(eventoItem.getDescripcion());
+							event.setRecursos(eventoItem.getRecursos());
+							response = ageEventoExtendsMapper.updateByPrimaryKey(event);
+
+							LOGGER.info(
+									"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Salida a ageEventoExtendsMapper para modificar un evento");
+
+						}
+					}
+
+					
 					if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION
 							|| event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
 
@@ -1251,99 +1265,92 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 							LOGGER.info(
 									"deleteEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(eventDelete) -> Entrada a ageEventoExtendsMapper para dar de baja el evento");
 
-							if (eventDelete.getIdtipoevento() == SigaConstants.TIPO_EVENTO_SESION && eventDelete.getIdestadoevento() == 1) {
-							
-								response = 0;
-								error.setCode(400);
-								error.setDescription("Sólo se pueden cancelar sesiones en estado planificado");
-								
-							} else {
-							
-								//Damos de baja al evento
-								eventDelete.setFechamodificacion(new Date());
-								eventDelete.setUsumodificacion(usuario.getIdusuario().longValue());
-								eventDelete.setFechabaja(new Date());
-								ageEventoExtendsMapper.updateByPrimaryKey(eventDelete);
+							// Damos de baja al evento
+							eventDelete.setFechamodificacion(new Date());
+							eventDelete.setUsumodificacion(usuario.getIdusuario().longValue());
+							eventDelete.setFechabaja(new Date());
+							ageEventoExtendsMapper.updateByPrimaryKey(eventDelete);
+
+							LOGGER.info(
+									"deleteEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(eventDelete) -> Salida a ageEventoExtendsMapper para dar de baja el evento");
+
+							// Si los eventos son de curso -- Actualizamos las fechas de incripcion si se
+							// elimina alguno de esos eventos
+							if (eventDelete.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION
+									|| eventDelete.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
+
+								ForCursoExample exampleCurso = new ForCursoExample();
+								exampleCurso.createCriteria().andIdcursoEqualTo(Long.valueOf(event.getIdCurso()))
+										.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 								LOGGER.info(
-										"deleteEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(eventDelete) -> Salida a ageEventoExtendsMapper para dar de baja el evento");
+										"deleteEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Entrada a ageNotificacioneseventoMapper para buscar si existe el evento");
 
-								//Si los eventos son de curso -- Actualizamos las fechas de incripcion si se elimina alguno de esos eventos
-								if (eventDelete.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION
-										|| eventDelete.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
+								List<ForCurso> cursoList = forCursoExtendsMapper.selectByExample(exampleCurso);
 
-									ForCursoExample exampleCurso = new ForCursoExample();
-									exampleCurso.createCriteria()
-											.andIdcursoEqualTo(Long.valueOf(event.getIdCurso()))
-											.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+								LOGGER.info(
+										"deleteEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Salida a ageNotificacioneseventoMapper para buscar si existe el evento");
 
-									LOGGER.info(
-											"deleteEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Entrada a ageNotificacioneseventoMapper para buscar si existe el evento");
-
-									List<ForCurso> cursoList = forCursoExtendsMapper.selectByExample(exampleCurso);
+								if (null != cursoList && cursoList.size() > 0) {
+									ForCurso curso = cursoList.get(0);
 
 									LOGGER.info(
-											"deleteEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Salida a ageNotificacioneseventoMapper para buscar si existe el evento");
+											"deleteEventCalendar() / forCursoExtendsMapper.updateByPrimaryKey(curso) -> Entrada a forCursoExtendsMapper para modificar un curso");
 
-									if (null != cursoList && cursoList.size() > 0) {
-										ForCurso curso = cursoList.get(0);
-
-										LOGGER.info(
-												"deleteEventCalendar() / forCursoExtendsMapper.updateByPrimaryKey(curso) -> Entrada a forCursoExtendsMapper para modificar un curso");
-
-										curso.setFechamodificacion(new Date());
-										curso.setUsumodificacion(usuario.getIdusuario().longValue());
-										if (eventDelete.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION) {
-											curso.setFechainscripciondesde(null);
-										} else if (eventDelete
-												.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
-											curso.setFechainscripcionhasta(null);
-										}
-
-										response = forCursoExtendsMapper.updateByPrimaryKey(curso);
-
-										LOGGER.info(
-												"updateEventCalendar() / forCursoExtendsMapper.updateByPrimaryKey(curso) -> Salida a forCursoExtendsMapper para modificar un curso");
+									curso.setFechamodificacion(new Date());
+									curso.setUsumodificacion(usuario.getIdusuario().longValue());
+									if (eventDelete.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION) {
+										curso.setFechainscripciondesde(null);
+									} else if (eventDelete
+											.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
+										curso.setFechainscripcionhasta(null);
 									}
-								}
-								
-								//Si los eventos son de curso, incluyendo la sesión -- Damos de baja a las relaciones entre el evento y el curso
 
-								if (eventDelete.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION
-										|| eventDelete.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION
-										|| eventDelete.getIdtipoevento() == SigaConstants.TIPO_EVENTO_SESION) {
-
-									ForEventoCursoExample forEventoCursoExample = new ForEventoCursoExample();
-									forEventoCursoExample.createCriteria()
-											.andIdcursoEqualTo(Long.valueOf(event.getIdCurso()))
-											.andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
-											.andIdeventoEqualTo(Long.valueOf(event.getIdEvento()));
+									response = forCursoExtendsMapper.updateByPrimaryKey(curso);
 
 									LOGGER.info(
-											"deleteEventCalendar() / forEventoCursoMapper.selectByExample(exampleCurso) -> Entrada a forEventoCursoMapper para buscar la relacion entre los eventos");
+											"updateEventCalendar() / forCursoExtendsMapper.updateByPrimaryKey(curso) -> Salida a forCursoExtendsMapper para modificar un curso");
+								}
+							}
 
-									List<ForEventoCurso> forEventoCursoList = forEventoCursoMapper.selectByExample(forEventoCursoExample);
+							// Si los eventos son de curso, incluyendo la sesión -- Damos de baja a las
+							// relaciones entre el evento y el curso
+
+							if (eventDelete.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION
+									|| eventDelete.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION
+									|| eventDelete.getIdtipoevento() == SigaConstants.TIPO_EVENTO_SESION) {
+
+								ForEventoCursoExample forEventoCursoExample = new ForEventoCursoExample();
+								forEventoCursoExample.createCriteria()
+										.andIdcursoEqualTo(Long.valueOf(event.getIdCurso()))
+										.andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
+										.andIdeventoEqualTo(Long.valueOf(event.getIdEvento()));
+
+								LOGGER.info(
+										"deleteEventCalendar() / forEventoCursoMapper.selectByExample(exampleCurso) -> Entrada a forEventoCursoMapper para buscar la relacion entre los eventos");
+
+								List<ForEventoCurso> forEventoCursoList = forEventoCursoMapper
+										.selectByExample(forEventoCursoExample);
+
+								LOGGER.info(
+										"deleteEventCalendar() / forEventoCursoMapper.selectByExample(exampleCurso) -> Salida a forEventoCursoMapper para buscar la relacion entre los eventos");
+
+								if (null != forEventoCursoList && forEventoCursoList.size() > 0) {
+									ForEventoCurso forEventoCurso = forEventoCursoList.get(0);
 
 									LOGGER.info(
-											"deleteEventCalendar() / forEventoCursoMapper.selectByExample(exampleCurso) -> Salida a forEventoCursoMapper para buscar la relacion entre los eventos");
+											"deleteEventCalendar() / forEventoCursoMapper.updateByPrimaryKey(forEventoCurso) -> Entrada a forEventoCursoMapper para dar de baja a la relacion de un curso");
 
-									if (null != forEventoCursoList && forEventoCursoList.size() > 0) {
-										ForEventoCurso forEventoCurso = forEventoCursoList.get(0);
+									forEventoCurso.setFechamodificacion(new Date());
+									forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+									forEventoCurso.setFechabaja(new Date());
 
-										LOGGER.info(
-												"deleteEventCalendar() / forEventoCursoMapper.updateByPrimaryKey(forEventoCurso) -> Entrada a forEventoCursoMapper para dar de baja a la relacion de un curso");
+									response = forEventoCursoMapper.updateByPrimaryKey(forEventoCurso);
 
-										forEventoCurso.setFechamodificacion(new Date());
-										forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
-										forEventoCurso.setFechabaja(new Date());
-
-										response = forEventoCursoMapper.updateByPrimaryKey(forEventoCurso);
-
-										LOGGER.info(
-												"deleteEventCalendar() / forEventoCursoMapper.updateByPrimaryKey(forEventoCurso) -> Salida a forEventoCursoMapper para dar de baja a la relacion de un curso");
-									}
+									LOGGER.info(
+											"deleteEventCalendar() / forEventoCursoMapper.updateByPrimaryKey(forEventoCurso) -> Salida a forEventoCursoMapper para dar de baja a la relacion de un curso");
 								}
-							} 
+							}
 						}
 					}
 
@@ -1622,8 +1629,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 						AgeEventoExample ageEventoExample = new AgeEventoExample();
 						ageEventoExample.createCriteria()
-						.andIdeventoEqualTo(Long.valueOf(agePersonaEventoItem.getIdEvento()));
-						
+								.andIdeventoEqualTo(Long.valueOf(agePersonaEventoItem.getIdEvento()));
+
 						LOGGER.info(
 								"updateFormadorEvent() / ageEventoExtendsMapper.selectByExample(ageEventoExample) -> Entrada a ageEventoExtendsMapper para buscar la sesión");
 
@@ -1632,8 +1639,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 						LOGGER.info(
 								"updateFormadorEvent() / ageEventoExtendsMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
 
-						AgeEvento evento = ageEventoList.get(0);		
-						
+						AgeEvento evento = ageEventoList.get(0);
+
 						AgePersonaEvento agePersonaEvento = new AgePersonaEvento();
 
 						agePersonaEvento.setFechabaja(null);
@@ -1675,7 +1682,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	@Override
 	@Transactional
 	public UpdateResponseDTO updateFormadorEvent(AgePersonaEventoDTO agePersonaEventoDTO, HttpServletRequest request) {
-		LOGGER.info("updateFormadorEvent() ->  Entrada al servicio para modificar uno o varios formadores en una sesión");
+		LOGGER.info(
+				"updateFormadorEvent() ->  Entrada al servicio para modificar uno o varios formadores en una sesión");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -1821,26 +1829,26 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 							// Si no existe la creamos
 							if (agePersonaEventoList.isEmpty()) {
-								
+
 								AgeEventoExample ageEventoExample = new AgeEventoExample();
 								ageEventoExample.createCriteria()
-								.andIdeventoEqualTo(Long.valueOf(agePersonaEvento.getIdEvento()));
-								
+										.andIdeventoEqualTo(Long.valueOf(agePersonaEvento.getIdEvento()));
+
 								LOGGER.info(
 										"updateFormadorEvent() / ageEventoExtendsMapper.selectByExample(ageEventoExample) -> Entrada a ageEventoExtendsMapper para buscar la sesión");
 
-								List<AgeEvento> ageEventoList = ageEventoExtendsMapper.selectByExample(ageEventoExample);
+								List<AgeEvento> ageEventoList = ageEventoExtendsMapper
+										.selectByExample(ageEventoExample);
 
 								LOGGER.info(
 										"updateFormadorEvent() / ageEventoExtendsMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
 
-								AgeEvento evento = ageEventoList.get(0);								
+								AgeEvento evento = ageEventoList.get(0);
 
 								AgePersonaEvento agePersonaEventoRecord = new AgePersonaEvento();
 								agePersonaEventoRecord.setFechabaja(null);
 								agePersonaEventoRecord.setFechamodificacion(new Date());
-								agePersonaEventoRecord
-										.setIdinstitucion(evento.getIdinstitucion());
+								agePersonaEventoRecord.setIdinstitucion(evento.getIdinstitucion());
 								agePersonaEventoRecord.setIdevento(Long.parseLong(agePersonaEvento.getIdEvento()));
 								agePersonaEventoRecord.setUsumodificacion(usuario.getIdusuario().longValue());
 								agePersonaEventoRecord.setIdpersona(Long.valueOf(agePersonaEvento.getIdPersona()));
@@ -1923,7 +1931,6 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		// FechaFin = FechaActual-1 --> Se cambiará el estado a "Impartido"
 		// Recogemos la lista de cursos cuya fechaFinImpartición sea menor que la fecha
 		// actual,
-
 
 		// TODO Analizar qué hacer en caso de error (int == 0)
 		int correctoEnCurso = 0;
