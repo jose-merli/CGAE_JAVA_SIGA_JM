@@ -33,6 +33,7 @@ import org.itcgae.siga.db.entities.EnvPlantillasenviosExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.ModModeloPerfiles;
 import org.itcgae.siga.db.entities.ModModeloPerfilesExample;
+import org.itcgae.siga.db.entities.ModModeloPerfilesKey;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumentoExample;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvio;
@@ -574,16 +575,21 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					
 					//añadimos las etiquetas seleccionadas
 					for (int i = 0; i < perfilesDTO.getPerfilesSeleccionados().length; i++) {
-						ModModeloPerfiles perfil = new ModModeloPerfiles();
-						perfil.setIdmodelocomunicacion(Long.valueOf(perfilesDTO.getIdModeloComunicacion()));
-						perfil.setFechamodificacion(new Date());
-						perfil.setIdperfil(perfilesDTO.getPerfilesSeleccionados()[i]);
-						perfil.setUsumodificacion(usuario.getIdusuario());
-						perfil.setIdinstitucion(idInstitucion);
-						modModeloPerfilesMapper.insert(perfil);
+						ModModeloPerfilesKey key = new ModModeloPerfilesKey();
+						key.setIdinstitucion(idInstitucion);
+						key.setIdmodelocomunicacion(Long.valueOf(perfilesDTO.getIdModeloComunicacion()));
+						key.setIdperfil(perfilesDTO.getPerfilesSeleccionados()[i]);
+						ModModeloPerfiles perfil = modModeloPerfilesMapper.selectByPrimaryKey(key);
+						if(perfil == null){
+							perfil = new ModModeloPerfiles();
+							perfil.setIdmodelocomunicacion(Long.valueOf(perfilesDTO.getIdModeloComunicacion()));
+							perfil.setFechamodificacion(new Date());
+							perfil.setIdperfil(perfilesDTO.getPerfilesSeleccionados()[i]);
+							perfil.setUsumodificacion(usuario.getIdusuario());
+							perfil.setIdinstitucion(idInstitucion);
+							modModeloPerfilesMapper.insert(perfil);
+						}
 					}
-					
-					
 					respuesta.setCode(200);
 					respuesta.setDescription("Datos perfiles del modelo guardados correctamente");
 					respuesta.setMessage("Updates correcto");
