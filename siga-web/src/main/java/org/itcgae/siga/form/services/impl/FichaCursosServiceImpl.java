@@ -224,10 +224,10 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Autowired
 	private IFichaInscripcionService fichaInscripcionService;
-	
+
 	@Autowired
-	private CenDatoscvExtendsMapper cenDatosCvExtendsMapper ;	
-	
+	private CenDatoscvExtendsMapper cenDatosCvExtendsMapper;
+
 	@Autowired
 	private ForCertificadoscursoExtendsMapper forCertificadosCursoExtendsMapper;
 
@@ -309,9 +309,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				AdmUsuarios usuario = usuarios.get(0);
 				LOGGER.info(
 						"getTrainersCourse() / forPersonacursoExtendsMapper.getTrainers(idInstitucion, idCurso) -> Entrada a forPersonacursoExtendsMapper para obtener los formadores de un curso especifico");
-                ForCurso curso = forCursoExtendsMapper.selectByPrimaryKeyExtends(new Long(idCurso));
-                formadoresCursoItem = forPersonacursoExtendsMapper.getTrainersCourse(curso.getIdinstitucion().toString(), idCurso,
-						usuario.getIdlenguaje());
+				ForCurso curso = forCursoExtendsMapper.selectByPrimaryKeyExtends(new Long(idCurso));
+				formadoresCursoItem = forPersonacursoExtendsMapper
+						.getTrainersCourse(curso.getIdinstitucion().toString(), idCurso, usuario.getIdlenguaje());
 				LOGGER.info(
 						"getTrainersCourse() / forPersonacursoExtendsMapper.getTrainers(idInstitucion, idCurso) -> Salida de forPersonacursoExtendsMapper para obtener los formadores de un curso especifico");
 
@@ -671,6 +671,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 		return record;
 	}
+
 	@Override
 	@Transactional
 	public UpdateResponseDTO deleteTrainersCourse(FormadorCursoDTO formadorCursoDTO, HttpServletRequest request) {
@@ -703,50 +704,52 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					Boolean existePersona = Boolean.FALSE;
 					for (FormadorCursoItem formador : formadorCursoDTO.getFormadoresCursoItem()) {
 
-						//Comprobamos que el formador no esté asignado a alguna sesión
-						
-						List<AgePersonaEvento> personaSesion= forPersonacursoExtendsMapper.selectSesionesFormador(formador);
-						if (null != personaSesion && personaSesion.size()>0) {
+						// Comprobamos que el formador no esté asignado a alguna sesión
+
+						List<AgePersonaEvento> personaSesion = forPersonacursoExtendsMapper
+								.selectSesionesFormador(formador);
+						if (null != personaSesion && personaSesion.size() > 0) {
 							response = 0;
 							error.setCode(400);
-							error.setDescription("Los formadores a eliminar no pueden estar asignados a ninguna sesión");
+							error.setDescription(
+									"Los formadores a eliminar no pueden estar asignados a ninguna sesión");
 							existePersona = Boolean.TRUE;
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							break;
-							
+
 						}
-					}	
-						if (!existePersona) {
-						
-							for (FormadorCursoItem formador : formadorCursoDTO.getFormadoresCursoItem()) {
-								ForPersonaCursoExample exampleFormador = new ForPersonaCursoExample();
-								exampleFormador.createCriteria().andIdformadorEqualTo(Long.valueOf(formador.getIdFormador()));
-		
-								
+					}
+					if (!existePersona) {
+
+						for (FormadorCursoItem formador : formadorCursoDTO.getFormadoresCursoItem()) {
+							ForPersonaCursoExample exampleFormador = new ForPersonaCursoExample();
+							exampleFormador.createCriteria()
+									.andIdformadorEqualTo(Long.valueOf(formador.getIdFormador()));
+
+							LOGGER.info(
+									"deleteTrainersCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a forPersonacursoExtendsMapper para obtener los formadores de un curso");
+							List<ForPersonaCurso> formadoresList = forPersonacursoExtendsMapper
+									.selectByExample(exampleFormador);
+							LOGGER.info(
+									"deleteTrainersCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida a forPersonacursoExtendsMapper para obtener los formadores de un curso");
+
+							if (null != formadoresList && formadoresList.size() > 0) {
+								ForPersonaCurso formadorDelete = formadoresList.get(0);
+
 								LOGGER.info(
-										"deleteTrainersCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a forPersonacursoExtendsMapper para obtener los formadores de un curso");
-								List<ForPersonaCurso> formadoresList = forPersonacursoExtendsMapper
-										.selectByExample(exampleFormador);
+										"deleteTrainersCourse() / forPersonacursoExtendsMapper.updateByPrimaryKey(notification) -> Entrada a forPersonacursoExtendsMapper para dar de baja a un formador");
+
+								formadorDelete.setFechamodificacion(new Date());
+								formadorDelete.setUsumodificacion(usuario.getIdusuario().longValue());
+								formadorDelete.setFechabaja(new Date());
+								forPersonacursoExtendsMapper.updateByPrimaryKey(formadorDelete);
+
 								LOGGER.info(
-										"deleteTrainersCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida a forPersonacursoExtendsMapper para obtener los formadores de un curso");
-		
-								if (null != formadoresList && formadoresList.size() > 0) {
-									ForPersonaCurso formadorDelete = formadoresList.get(0);
-		
-									LOGGER.info(
-											"deleteTrainersCourse() / forPersonacursoExtendsMapper.updateByPrimaryKey(notification) -> Entrada a forPersonacursoExtendsMapper para dar de baja a un formador");
-		
-									formadorDelete.setFechamodificacion(new Date());
-									formadorDelete.setUsumodificacion(usuario.getIdusuario().longValue());
-									formadorDelete.setFechabaja(new Date());
-									forPersonacursoExtendsMapper.updateByPrimaryKey(formadorDelete);
-		
-									LOGGER.info(
-											"deleteTrainersCourse() / forPersonacursoExtendsMapper.updateByPrimaryKey(notification) -> Salida a forPersonacursoExtendsMapper para dar de baja a un formador");
-								}
-							
+										"deleteTrainersCourse() / forPersonacursoExtendsMapper.updateByPrimaryKey(notification) -> Salida a forPersonacursoExtendsMapper para dar de baja a un formador");
 							}
-						}	
+
+						}
+					}
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
@@ -765,6 +768,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		updateResponseDTO.setError(error);
 		return updateResponseDTO;
 	}
+
 	@Override
 	@Transactional
 	public InsertResponseDTO saveCourse(CursoItem cursoItem, HttpServletRequest request) {
@@ -1313,7 +1317,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 						}
 					}
-					
+
 					// Si existe idEventoInscripcion se debe guardar la relacion entre el evento y
 					// el curso
 					if (cursoItem.getIdEventoInicioInscripcion() != null) {
@@ -1409,8 +1413,6 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 						}
 
 					}
-					
-					
 
 				} catch (Exception e) {
 					response = 0;
@@ -1599,11 +1601,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-			LOGGER.info(
-					"getServicesCourse() / forTiposervicioExtendsMapper.getServiceType -> Entrada a forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según la institucion");
-			comboItems = forTiposervicioExtendsMapper.getServicesCourse(idInstitucion.toString(),usuario.getIdlenguaje());
-			LOGGER.info(
-					"getServicesCourse() / forTiposervicioExtendsMapper.getServiceType -> Salida de forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según la institucion");
+				LOGGER.info(
+						"getServicesCourse() / forTiposervicioExtendsMapper.getServiceType -> Entrada a forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según la institucion");
+				comboItems = forTiposervicioExtendsMapper.getServicesCourse(idInstitucion.toString(),
+						usuario.getIdlenguaje());
+				LOGGER.info(
+						"getServicesCourse() / forTiposervicioExtendsMapper.getServiceType -> Salida de forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según la institucion");
 			}
 		}
 
@@ -1639,11 +1642,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
-			LOGGER.info(
-					"getServicesSpecificCourse() / forTiposervicioCursoExtendsMapper.getServicesSpecificCourse -> Entrada a forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según el curso");
-			comboItems = forTiposervicioCursoExtendsMapper.getServicesSpecificCourse(idInstitucion.toString(), idCurso,usuario.getIdlenguaje());
-			LOGGER.info(
-					"getServicesSpecificCourse() / forTiposervicioCursoExtendsMapper.getServicesSpecificCourse -> Salida de forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según el curso");
+				LOGGER.info(
+						"getServicesSpecificCourse() / forTiposervicioCursoExtendsMapper.getServicesSpecificCourse -> Entrada a forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según el curso");
+				comboItems = forTiposervicioCursoExtendsMapper.getServicesSpecificCourse(idInstitucion.toString(),
+						idCurso, usuario.getIdlenguaje());
+				LOGGER.info(
+						"getServicesSpecificCourse() / forTiposervicioCursoExtendsMapper.getServicesSpecificCourse -> Salida de forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según el curso");
 			}
 		}
 
@@ -1838,8 +1842,6 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					}
 				}
 
-				
-
 				// Insertamos en tabla For_inscripcion_Masiva el fichero que se ha parseado
 				forInscripcionesmasivas.setIdinstitucion(curso.getIdinstitucion());
 				forInscripcionesmasivas.setNombrefichero(nombreFichero);
@@ -1851,9 +1853,6 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				String lineasCorrectas = String.valueOf(inscripcionList.size() - registrosErroneos);
 				forInscripcionesmasivas.setInscripcionescorrectas(Long.valueOf(lineasCorrectas));
 
-	
-				
-
 				LOGGER.info(
 						"uploadFileExcel() / forInscripcionesmasivasMapper.insert(forInscripcionesmasivas) -> Entrada a forInscripcionesmasivasMapper para insertar el fichero parseado carga masiva de inscripciones");
 
@@ -1861,7 +1860,6 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 				LOGGER.info(
 						"uploadFileExcel() / forInscripcionesmasivasMapper.insert(forInscripcionesmasivas) -> Salida a forInscripcionesmasivasMapper para insertar el fichero parseado carga masiva de inscripciones");
-
 
 				// Si no hay errores se insertan las inscripciones nuevas
 				if (registrosErroneos == 0) {
@@ -1919,8 +1917,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 				// Generamos el fichero de errores
 				byte[] bytesLog = ExcelHelper.createExcelBytes(SigaConstants.CAMPOSPLOGCURSO, datosLog);
-				
-				
+
 				Long idFile = uploadFile(file.getBytes(), forInscripcionesmasivas, false, usuario);
 				Long idLogFile = uploadFile(bytesLog, forInscripcionesmasivas, true, usuario);
 				ForInscripcionesmasivas record = new ForInscripcionesmasivas();
@@ -1946,7 +1943,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 		List<InscripcionItem> inscripcionItemList = new ArrayList<InscripcionItem>();
 		InscripcionItem inscripcionItem = null;
-		ForCurso cursoRecibido = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(String.valueOf(idCurso)));
+		ForCurso cursoRecibido = forCursoExtendsMapper
+				.selectByPrimaryKeyExtends(Long.parseLong(String.valueOf(idCurso)));
 		Short idInstitucion = cursoRecibido.getIdinstitucion();
 
 		StringBuffer errorLinea = null;
@@ -2242,7 +2240,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		genPropertiesExampleP.createCriteria().andParametroEqualTo("cen.cargaExcel.ficheros.path");
 		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
 		String pathGF = genPropertiesPath.get(0).getValor();
-		
+
 		StringBuffer directorioFichero = new StringBuffer(pathGF);
 		directorioFichero.append(idInstitucion);
 		directorioFichero.append(File.separator);
@@ -2574,7 +2572,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-					
+
 					for (CargaMasivaInscripcionesItem fichero : cargaMasivaInscripcionesDTO
 							.getCargaMasivaInscripcionesItem()) {
 
@@ -2590,25 +2588,28 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 								"autovalidateInscriptionsCourse() / forInscripcionExtendsMapper.selectByExample() -> Salida a forInscripcionExtendsMapper para obtener las inscripciones del fichero seleccionado");
 
 						if (null != inscriptionList && inscriptionList.size() > 0) {
-							//Primero comprobamos las plazas disponibles del curso
-							CursoItem inscripcionesAprobadas = forInscripcionExtendsMapper.compruebaPlazasAprobadas(fichero.getIdCurso());
+							// Primero comprobamos las plazas disponibles del curso
+							CursoItem inscripcionesAprobadas = forInscripcionExtendsMapper
+									.compruebaPlazasAprobadas(fichero.getIdCurso());
 							if (null == inscripcionesAprobadas) {
 								inscripcionesAprobadas = new CursoItem();
 								inscripcionesAprobadas.setInscripciones("0");
 							}
-							ForCurso cursoEntidad = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(fichero.getIdCurso()));
-							Long plazasdisponibles =0L;
+							ForCurso cursoEntidad = forCursoExtendsMapper
+									.selectByPrimaryKeyExtends(Long.parseLong(fichero.getIdCurso()));
+							Long plazasdisponibles = 0L;
 							if (null != cursoEntidad) {
 								if (null != cursoEntidad.getNumeroplazas()) {
-									plazasdisponibles = cursoEntidad.getNumeroplazas() - Long.parseLong(inscripcionesAprobadas.getInscripciones());
+									plazasdisponibles = cursoEntidad.getNumeroplazas()
+											- Long.parseLong(inscripcionesAprobadas.getInscripciones());
 								}
 							}
 							if (plazasdisponibles >= Long.parseLong(fichero.getNumeroLineasTotales())) {
 
 								for (ForInscripcion inscription : inscriptionList) {
-	
+
 									if (inscription.getIdestadoinscripcion() == SigaConstants.INSCRIPCION_PENDIENTE) {
-	
+
 										PysPeticioncomprasuscripcion pysPeticioncomprasuscripcion = new PysPeticioncomprasuscripcion();
 										pysPeticioncomprasuscripcion.setFechamodificacion(new Date());
 										pysPeticioncomprasuscripcion.setIdinstitucion(inscription.getIdinstitucion());
@@ -2621,22 +2622,22 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 										pysPeticioncomprasuscripcion.setIdpersona(inscription.getIdpersona());
 										pysPeticioncomprasuscripcion.setFecha(new Date());
 										pysPeticioncomprasuscripcion.setNumOperacion("1");
-	
+
 										LOGGER.info(
 												"autovalidateInscriptionsCourse() / pysPeticioncomprasuscripcionExtendsMapper.insert() -> Entrada a pysPeticioncomprasuscripcionExtendsMapper para insertar un precio servicio");
-	
+
 										response = pysPeticioncomprasuscripcionExtendsMapper
 												.insert(pysPeticioncomprasuscripcion);
-	
+
 										LOGGER.info(
 												"autovalidateInscriptionsCourse() / pysPeticioncomprasuscripcionExtendsMapper.insert() -> Salida a pysPeticioncomprasuscripcionExtendsMapper para insertar un precio servicio");
-	
-										NewIdDTO idservicio = pysServiciosExtendsMapper
-												.selectIdServicioByIdCurso(inscription.getIdinstitucion(), inscription.getIdcurso());
+
+										NewIdDTO idservicio = pysServiciosExtendsMapper.selectIdServicioByIdCurso(
+												inscription.getIdinstitucion(), inscription.getIdcurso());
 										NewIdDTO idserviciosinstitucion = pysServiciosinstitucionExtendsMapper
 												.selectIdServicioinstitucionByIdServicio(idInstitucion,
 														Long.valueOf(idservicio.getNewId()));
-	
+
 										PysServiciossolicitados pysServiciossolicitados = new PysServiciossolicitados();
 										pysServiciossolicitados.setFechamodificacion(new Date());
 										pysServiciossolicitados.setIdinstitucion(inscription.getIdinstitucion());
@@ -2645,76 +2646,77 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 										pysServiciossolicitados
 												.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
 										pysServiciossolicitados.setIdservicio(Long.valueOf(idservicio.getNewId()));
-										pysServiciossolicitados
-												.setIdserviciosinstitucion(Long.valueOf(idserviciosinstitucion.getNewId()));
-										pysServiciossolicitados
-												.setIdpeticion(Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
+										pysServiciossolicitados.setIdserviciosinstitucion(
+												Long.valueOf(idserviciosinstitucion.getNewId()));
+										pysServiciossolicitados.setIdpeticion(
+												Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
 										pysServiciossolicitados.setIdpersona(inscription.getIdpersona());
 										pysServiciossolicitados.setCantidad(1);
 										pysServiciossolicitados.setIdformapago(Short.valueOf("10"));
-	
+
 										LOGGER.info(
 												"autovalidateInscriptionsCourse() / pysServiciossolicitadosMapper.insert() -> Entrada a pysServiciossolicitadosMapper para insertar el servicio solicitado");
-	
+
 										response = pysServiciossolicitadosMapper.insert(pysServiciossolicitados);
-	
+
 										LOGGER.info(
 												"autovalidateInscriptionsCourse() / pysServiciossolicitadosMapper.insert() -> Salida a pysServiciossolicitadosMapper para insertar el servicio solicitado");
-	
+
 										PysSuscripcion pysSuscripcion = new PysSuscripcion();
 										pysSuscripcion.setFechamodificacion(new Date());
 										pysSuscripcion.setIdinstitucion(inscription.getIdinstitucion());
 										pysSuscripcion.setUsumodificacion(usuario.getIdusuario());
 										pysSuscripcion.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
 										pysSuscripcion.setIdservicio(Long.valueOf(idservicio.getNewId()));
-										pysSuscripcion
-												.setIdserviciosinstitucion(Long.valueOf(idserviciosinstitucion.getNewId()));
-										pysSuscripcion
-												.setIdpeticion(Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
+										pysSuscripcion.setIdserviciosinstitucion(
+												Long.valueOf(idserviciosinstitucion.getNewId()));
+										pysSuscripcion.setIdpeticion(
+												Long.valueOf(pysPeticioncomprasuscripcion.getIdpeticion()));
 										pysSuscripcion.setIdpersona(inscription.getIdpersona());
 										pysSuscripcion.setCantidad(1);
 										pysSuscripcion.setIdformapago(Short.valueOf("10"));
 										pysSuscripcion.setFechasuscripcion(new Date());
-	
+
 										CursoItem curso = forCursoExtendsMapper.searchCourseByIdcurso(
 												inscription.getIdcurso().toString(), inscription.getIdinstitucion(),
 												usuario.getIdlenguaje());
-	
+
 										pysSuscripcion.setDescripcion(curso.getNombreCurso());
 										NewIdDTO idSuscripcion = pysSuscripcionExtendsMapper.selectMaxIdSuscripcion(
 												inscription.getIdinstitucion(), Long.valueOf(idservicio.getNewId()),
 												Long.valueOf(idserviciosinstitucion.getNewId()));
 										pysSuscripcion.setIdsuscripcion(Long.valueOf(idSuscripcion.getNewId()));
-	
+
 										LOGGER.info(
 												"autovalidateInscriptionsCourse() / pysSuscripcionExtendsMapper.insert() -> Entrada a pysSuscripcionExtendsMapper para insertar la suscripcion a la inscripcion");
-	
+
 										response = pysSuscripcionExtendsMapper.insert(pysSuscripcion);
-	
+
 										LOGGER.info(
 												"autovalidateInscriptionsCourse() / pysSuscripcionExtendsMapper.insert() -> Salida a pysSuscripcionExtendsMapper para insertar la suscripcion a la inscripcion");
-	
+
 										LOGGER.info(
 												"autovalidateInscriptionsCourse() / forInscripcionExtendsMapper.updateByPrimaryKey() -> Entrada a forInscripcionExtendsMapper cambiar el estado a las inscripciones aprobada");
-	
+
 										// Guardamos el idPeticion y actualizamos la inscripcion a aprobada
 										inscription.setFechamodificacion(new Date());
 										inscription.setIdpeticionsuscripcion(Long.valueOf(idPeticion.getNewId()));
 										inscription.setUsumodificacion(usuario.getIdusuario().longValue());
 										inscription.setIdestadoinscripcion(SigaConstants.INSCRIPCION_APROBADA);
 										response = forInscripcionExtendsMapper.updateByPrimaryKey(inscription);
-	
+
 										LOGGER.info(
 												"autovalidateInscriptionsCourse() / forInscripcionExtendsMapper.updateByPrimaryKey() -> Salida a forInscripcionExtendsMapper cambiar el estado a las inscripciones a aprobada");
-	
+
 									} else {
 										error.setDescription(
 												"Las inscripciones no se pueden aprobar porque no están en estado pendiente.");
-	
+
 									}
 								}
 							} else {
-								error.setDescription("No existen plazas disponibles en el curso para validar las inscripciones");
+								error.setDescription(
+										"No existen plazas disponibles en el curso para validar las inscripciones");
 							}
 						} else {
 							error.setDescription("Fichero con inscripciones erróneas.");
@@ -2878,7 +2880,6 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				String estadoFinalizado = String.valueOf(SigaConstants.FINALIZADO_CURSO);
 				String estadoCancelado = String.valueOf(SigaConstants.CANCELADO_CURSO);
 
-
 				try {
 					for (CursoItem cursoItem : cursoDTO.getCursoItem()) {
 						if (cursoItem.getIdEstado() != null && !cursoItem.getIdEstado().equals(estadoFinalizado)
@@ -2994,7 +2995,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 									"cancelCourse() / forCursoExtendsMapper.updateByPrimaryKey() -> Entrada a forCursoExtendsMapper cancelamos el curso");
 
 							numCancelCourse += 1;
-							
+
 						} else {
 							error.setDescription("El curso no se puede cancelar porque ya esta finalizado o cancelado");
 						}
@@ -3006,28 +3007,27 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				}
 			}
 		}
-		
+
 		if (response == 1) {
 			error.setCode(200);
-			
+
 			if (cursoDTO.getCursoItem() != null && cursoDTO.getCursoItem().size() == 1) {
 				error.setDescription("Se ha cancelado el curso correctamente");
 			} else {
-				error.setDescription("Se han cancelado " + numCancelCourse + "/"
-						+ cursoDTO.getCursoItem().size() + " cursos seleccionados");
+				error.setDescription("Se han cancelado " + numCancelCourse + "/" + cursoDTO.getCursoItem().size()
+						+ " cursos seleccionados");
 			}
-			
-		}else if(response == 2) {
-			
+
+		} else if (response == 2) {
+
 			if (cursoDTO.getCursoItem().size() == 1) {
-				error.setDescription(
-						"No se puede cancelar el curso seleccionado porque esta finalizado o cancelado");
-			} else if (cursoDTO.getCursoItem().size() == cursoDTO.getCursoItem().size()-numCancelCourse) {
+				error.setDescription("No se puede cancelar el curso seleccionado porque esta finalizado o cancelado");
+			} else if (cursoDTO.getCursoItem().size() == cursoDTO.getCursoItem().size() - numCancelCourse) {
 				error.setDescription(
 						"No se puede cancelar los cursos seleccionados porque estan finalizados o cancelados");
 			} else {
-				error.setDescription("Se han cancelado " + numCancelCourse + "/"
-						+ cursoDTO.getCursoItem().size() + " cursos selecionados");
+				error.setDescription("Se han cancelado " + numCancelCourse + "/" + cursoDTO.getCursoItem().size()
+						+ " cursos selecionados");
 			}
 		}
 
@@ -3048,7 +3048,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		int numFinishCourse = 0;
 		boolean faltaAlumnos = false;
 		boolean cursoNoImpartido = false;
-		
+
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -3103,7 +3103,6 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							LOGGER.info(
 									"finishCourse() / forCursoExtendsMapper.selectByExample() -> Entrada a forCursoExtendsMapper para comprobar las calificaciones de los alumnos de un curso");
 
-							
 							if (null != forInscripcionList && forInscripcionList.size() > 0) {
 								faltaAlumnos = true;
 								error.setDescription(
@@ -3130,33 +3129,48 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 								// curso
 								if (null != inscriptionItemList && inscriptionItemList.size() > 0) {
 
+									List<ForCertificadoscurso> listCertificadosCurso = null;
+									InsertResponseDTO responseInsert = new InsertResponseDTO();
+
 									for (InscripcionItem inscripcion : inscriptionItemList) {
-										List<ForCertificadoscurso> listCertificadosCurso;
-										//Añadimos los certificados si existen para el curso y calificacion
-										ForCertificadoscursoExample certificadosCursoExample = new ForCertificadoscursoExample();
-										certificadosCursoExample.createCriteria().andIdcursoEqualTo(Long.valueOf(inscripcion.getIdCurso())).andIdcalificacionEqualTo(inscripcion.getIdCalificacion());
-										
-										listCertificadosCurso = forCertificadosCursoExtendsMapper.selectByExample(certificadosCursoExample);
-										InsertResponseDTO responseInsert = new InsertResponseDTO();
-										if (null != listCertificadosCurso && listCertificadosCurso.size()>0){
-										 responseInsert = fichaInscripcionService
-												.generarSolicitudCertificados(inscripcion, request);
+
+										if (inscripcion.getEmitirCertificado() == SigaConstants.EMITIR_CERTIFICADO) {
+											// Añadimos los certificados si existen para el curso y calificacion
+											ForCertificadoscursoExample certificadosCursoExample = new ForCertificadoscursoExample();
+											certificadosCursoExample.createCriteria()
+													.andIdcursoEqualTo(Long.valueOf(inscripcion.getIdCurso()))
+													.andIdcalificacionEqualTo(inscripcion.getIdCalificacion());
+
+											listCertificadosCurso = forCertificadosCursoExtendsMapper
+													.selectByExample(certificadosCursoExample);
+
+											if (null != listCertificadosCurso && listCertificadosCurso.size() > 0) {
+												responseInsert = fichaInscripcionService
+														.generarSolicitudCertificados(inscripcion, request);
+											}
 										}
-										//añadimos un registro curricular al usuario de la inscripción si la calificación está aprobada
-										if (null != inscripcion.getIdPersona() && (inscripcion.getIdCalificacion() > 1)) {
+
+										// añadimos un registro curricular al usuario de la inscripción si la
+										// calificación está aprobada
+										if (null != inscripcion.getIdPersona()
+												&& (inscripcion.getIdCalificacion() > 1)) {
 											CenDatoscv recordInsert = new CenDatoscv();
 											recordInsert.setFechamodificacion(new Date());
 											recordInsert.setUsumodificacion(usuario.getIdusuario());
 											recordInsert.setIdpersona(inscripcion.getIdPersona());
-											recordInsert.setIdtipocv(Short.parseShort("1")); //Se pone como tipo de dato curricular el titulacion curso
-											recordInsert.setIdinstitucion(Short.parseShort(inscripcion.getIdInstitucion()));
+											recordInsert.setIdtipocv(Short.parseShort("1")); // Se pone como tipo de
+																								// dato curricular el
+																								// titulacion curso
+											recordInsert
+													.setIdinstitucion(Short.parseShort(inscripcion.getIdInstitucion()));
 											recordInsert.setCertificado("1");
 											recordInsert.setFechainicio(curso.getFechaimparticiondesde());
 											recordInsert.setFechafin(curso.getFechaimparticionhasta());
 											recordInsert.setDescripcion(curso.getNombrecurso());
 											recordInsert.setIdinstitucion(idInstitucion);
 
-											NewIdDTO idCvBD = cenDatosCvExtendsMapper.getMaxIdCv(String.valueOf(idInstitucion),
+											NewIdDTO idCvBD = cenDatosCvExtendsMapper.getMaxIdCv(
+													String.valueOf(idInstitucion),
 													inscripcion.getIdPersona().toString());
 											if (idCvBD == null) {
 												recordInsert.setIdcv(Short.parseShort("1"));
@@ -3166,8 +3180,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 											}
 											response = cenDatosCvExtendsMapper.insertSelective(recordInsert);
 										}
-										
-										if ((null != listCertificadosCurso && null != responseInsert.getError())&& responseInsert.getError().getCode() == 400) {
+
+										if ((null != listCertificadosCurso && null != responseInsert.getError())
+												&& responseInsert.getError().getCode() == 400) {
 											response = 0;
 											error.setCode(400);
 											error.setDescription(
@@ -3182,8 +3197,6 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 									}
 								}
 
-								
-								
 								// Generados los certificados finalizamos el curso
 								curso.setIdestadocurso(SigaConstants.FINALIZADO_CURSO);
 								curso.setUsumodificacion(usuario.getIdusuario().longValue());
@@ -3198,9 +3211,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 										"finishCourse() / forCursoExtendsMapper.updateByPrimaryKey() -> Entrada a forCursoExtendsMapper para finalizar el curso");
 
 								numFinishCourse += 1;
-								
+
 								// Si queda algún alumno por calificar no se puede finalizar el curso
-							
+
 							}
 
 						} else {
@@ -3220,31 +3233,31 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 		if (response == 1) {
 			error.setCode(200);
-			
+
 			if (cursoDTO.getCursoItem() != null && cursoDTO.getCursoItem().size() == 1) {
 				error.setDescription("Se ha finalizado el curso correctamente");
 			} else {
-				error.setDescription("Se han finalizado " + numFinishCourse + "/"
-						+ cursoDTO.getCursoItem().size() + " cursos seleccionados");
+				error.setDescription("Se han finalizado " + numFinishCourse + "/" + cursoDTO.getCursoItem().size()
+						+ " cursos seleccionados");
 			}
-			
-		}else if(response == 2) {
-			
+
+		} else if (response == 2) {
+
 			if (cursoDTO.getCursoItem().size() == 1) {
-				if(faltaAlumnos) {
+				if (faltaAlumnos) {
 					error.setDescription(
 							"No se puede finalizar el curso seleccionado porque faltan alumnos por calificar");
-				}else if(cursoNoImpartido) {
+				} else if (cursoNoImpartido) {
 					error.setDescription(
 							"No se puede finalizar el curso seleccionado porque no esta impartido o esta finalizado");
 				}
-				
-			} else if (cursoDTO.getCursoItem().size() == cursoDTO.getCursoItem().size()-numFinishCourse) {
+
+			} else if (cursoDTO.getCursoItem().size() == cursoDTO.getCursoItem().size() - numFinishCourse) {
 				error.setDescription(
 						"No se pueden finalizar los cursos seleccionados porque estan finalizados o no estan impartidos");
 			} else {
-				error.setDescription("Se han finalizado " + numFinishCourse + "/"
-						+ cursoDTO.getCursoItem().size() + " cursos selecionados");
+				error.setDescription("Se han finalizado " + numFinishCourse + "/" + cursoDTO.getCursoItem().size()
+						+ " cursos selecionados");
 			}
 		}
 
@@ -3414,7 +3427,6 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				LOGGER.info(
 						"getCertificatesCourse() / forCertificadoscursoExtendsMapper.getCertificatesCourse -> Entrada a forCertificadoscursoExtendsMapper para obtener los certificados de un curso");
 
-				
 				ForCurso curso = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(idCurso));
 				certifcadosCursoItem = forCertificadoscursoExtendsMapper.getCertificatesCourse(idCurso,
 						String.valueOf(curso.getIdinstitucion()), usuario.getIdlenguaje());
@@ -3462,9 +3474,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 					// Comprobamos que el certificado introducido no esta registrado en bbdd
 					ForCertificadoscursoExample forCertificadoscursoExample = new ForCertificadoscursoExample();
-					forCertificadoscursoExample.createCriteria().andFechabajaIsNull().andIdcursoEqualTo(Long.valueOf(certificadoCursoItem.getIdCurso()))
-							.andIdproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdProducto())).andIdtipoproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdTipoProducto())).
-							andIdproductoinstitucionEqualTo(Long.valueOf(certificadoCursoItem.getIdProductoInstitucion()))
+					forCertificadoscursoExample.createCriteria().andFechabajaIsNull()
+							.andIdcursoEqualTo(Long.valueOf(certificadoCursoItem.getIdCurso()))
+							.andIdproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdProducto()))
+							.andIdtipoproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdTipoProducto()))
+							.andIdproductoinstitucionEqualTo(
+									Long.valueOf(certificadoCursoItem.getIdProductoInstitucion()))
 							.andIdcalificacionEqualTo(Long.valueOf(certificadoCursoItem.getIdCalificacion()));
 
 					List<ForCertificadoscurso> certificateList = forCertificadoscursoExtendsMapper
@@ -3547,8 +3562,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 						// Comprobamos que el certificado introducido no esta registrado en bbdd
 						ForCertificadoscursoExample forCertificadoscursoExample = new ForCertificadoscursoExample();
-						forCertificadoscursoExample.createCriteria().andFechabajaIsNull().andIdcertificadocursoEqualTo(Long.valueOf(certificadoCursoItem.getIdCertificadoCurso()));
-						
+						forCertificadoscursoExample.createCriteria().andFechabajaIsNull().andIdcertificadocursoEqualTo(
+								Long.valueOf(certificadoCursoItem.getIdCertificadoCurso()));
+
 						List<ForCertificadoscurso> certificateList = forCertificadoscursoExtendsMapper
 								.selectByExample(forCertificadoscursoExample);
 
@@ -3626,10 +3642,13 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 						// Comprobamos que el certificado introducido no esta registrado en bbdd
 						ForCertificadoscursoExample forCertificadoscursoExample = new ForCertificadoscursoExample();
-						forCertificadoscursoExample.createCriteria().andFechabajaIsNull().andIdcursoEqualTo(Long.valueOf(certificadoCursoItem.getIdCurso()))
-						.andIdproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdProducto())).andIdtipoproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdTipoProducto())).
-						andIdproductoinstitucionEqualTo(Long.valueOf(certificadoCursoItem.getIdProductoInstitucion()))
-						.andIdcalificacionEqualTo(Long.valueOf(certificadoCursoItem.getIdCalificacion()));
+						forCertificadoscursoExample.createCriteria().andFechabajaIsNull()
+								.andIdcursoEqualTo(Long.valueOf(certificadoCursoItem.getIdCurso()))
+								.andIdproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdProducto()))
+								.andIdtipoproductoEqualTo(Long.valueOf(certificadoCursoItem.getIdTipoProducto()))
+								.andIdproductoinstitucionEqualTo(
+										Long.valueOf(certificadoCursoItem.getIdProductoInstitucion()))
+								.andIdcalificacionEqualTo(Long.valueOf(certificadoCursoItem.getIdCalificacion()));
 						List<ForCertificadoscurso> certificateList = forCertificadoscursoExtendsMapper
 								.selectByExample(forCertificadoscursoExample);
 
@@ -3737,12 +3756,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 				if (response == 1) {
 					error.setCode(200);
-					
+
 					error.setDescription("Se han desanunciado " + numReleaseCourse + "/"
 							+ cursoDTO.getCursoItem().size() + " cursos selecionados");
-				}else if(response == 2) {
-					
-					if (cursoDTO.getCursoItem().size() == cursoDTO.getCursoItem().size()-numReleaseCourse) {
+				} else if (response == 2) {
+
+					if (cursoDTO.getCursoItem().size() == cursoDTO.getCursoItem().size() - numReleaseCourse) {
 						error.setDescription(
 								"No se puede desanunciar los cursos seleccionados porque su estado no es anunciado");
 					} else {
@@ -3829,12 +3848,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 				if (response == 1) {
 					error.setCode(200);
-					
-					error.setDescription("Se han anunciado " + numAnnounceCourse + "/"
-							+ cursoDTO.getCursoItem().size() + " cursos selecionados");
-				}else if(response == 2) {
-					
-					if (cursoDTO.getCursoItem().size() == cursoDTO.getCursoItem().size()-numAnnounceCourse) {
+
+					error.setDescription("Se han anunciado " + numAnnounceCourse + "/" + cursoDTO.getCursoItem().size()
+							+ " cursos selecionados");
+				} else if (response == 2) {
+
+					if (cursoDTO.getCursoItem().size() == cursoDTO.getCursoItem().size() - numAnnounceCourse) {
 						error.setDescription(
 								"No se puede anunciar los cursos seleccionados porque su estado no es abierto");
 					} else {
@@ -3852,8 +3871,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	public ResponseEntity<InputStreamResource> generateExcelMasiveInscriptions(CargaMasivaInscripcionesDTO cargaMasivaInscripcionesDTO,
-			HttpServletRequest request) {
+	public ResponseEntity<InputStreamResource> generateExcelMasiveInscriptions(
+			CargaMasivaInscripcionesDTO cargaMasivaInscripcionesDTO, HttpServletRequest request) {
 
 		LOGGER.info("downloadOriginalFile() -> Entrada al servicio para generar la plantilla de errores");
 
@@ -3862,39 +3881,136 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 		// Extraer el path
 		if (null != cargaMasivaInscripcionesDTO) {
-			if (null != cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem() && cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().size() > 0) {
+			if (null != cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem()
+					&& cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().size() > 0) {
 				cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getNombreFichero();
 
-		String path = getDirectorioFichero(idInstitucion);
-		if (cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getNumeroLineasTotales().equals(cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getInscripcionesCorrectas())) {
-			path +=  File.separator +  cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getIdFichero() + "."
-					+ SigaConstants.tipoExcelXls;
-		}else{
-			path +=  File.separator + "log_" + idInstitucion + "_" + cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getIdFicheroLog() + "."
-					+ SigaConstants.tipoExcelXls;
+				String path = getDirectorioFichero(idInstitucion);
+				if (cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getNumeroLineasTotales()
+						.equals(cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0)
+								.getInscripcionesCorrectas())) {
+					path += File.separator
+							+ cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getIdFichero() + "."
+							+ SigaConstants.tipoExcelXls;
+				} else {
+					path += File.separator + "log_" + idInstitucion + "_"
+							+ cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getIdFicheroLog()
+							+ "." + SigaConstants.tipoExcelXls;
+				}
+				File file = new File(path);
+
+				// Preparar la descarga
+				InputStream fileStream = null;
+				ResponseEntity<InputStreamResource> res = null;
+				try {
+					fileStream = new FileInputStream(file);
+					HttpHeaders headers = new HttpHeaders();
+					headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+					headers.setContentLength(file.length());
+					res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers,
+							HttpStatus.OK);
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+
+				LOGGER.info("downloadOriginalFile() -> Salida del servicio para generar la plantilla de errores");
+
+				return res;
+			}
 		}
-		File file = new File(path);
-
-		// Preparar la descarga
-		InputStream fileStream = null;
-		ResponseEntity<InputStreamResource> res = null;
-		try {
-			fileStream = new FileInputStream(file);
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
-
-			headers.setContentLength(file.length());
-			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-
-		LOGGER.info("downloadOriginalFile() -> Salida del servicio para generar la plantilla de errores");
-
-		return res;
-		}
-	}
 		return null;
+	}
+
+	@Override
+	public UpdateResponseDTO cancelSessionsCourse(EventoDTO eventoDTO, HttpServletRequest request) {
+
+		LOGGER.info("cancelSessionsCourse() -> Entrada al servicio para cancelar las sesiones de un curso");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		int numEventos = eventoDTO.getEventos().size();
+		int numEventosCancelados = 0;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"cancelSessionsCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"cancelSessionsCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+					for (EventoItem eventoItem : eventoDTO.getEventos()) {
+						if (eventoItem.getIdEstadoEvento() != null
+								&& eventoItem.getIdEstadoEvento().equals(String.valueOf(SigaConstants.ESTADO_EVENTO_PLANIFICADO))) {
+
+							// Se busca la sesion y la cancelamos
+							AgeEvento sesionCancel = ageEventoExtendsMapper
+									.selectByPrimaryKey(Long.valueOf(eventoItem.getIdEvento()));
+
+								sesionCancel.setIdestadoevento(Long.valueOf(SigaConstants.EVENTO_CANCELADO));
+								sesionCancel.setUsumodificacion(usuario.getIdusuario().longValue());
+								sesionCancel.setFechamodificacion(new Date());
+
+								LOGGER.info(
+										"cancelSessionsCourse() / ageEventoExtendsMapper.updateByPrimaryKey() -> Entrada a forInscripcionExtendsMapper para cancelar las sesiones de un curso");
+
+								ageEventoExtendsMapper.updateByPrimaryKey(sesionCancel);
+
+								LOGGER.info(
+										"cancelSessionsCourse() / ageEventoExtendsMapper.updateByPrimaryKey() -> Salida a forInscripcionExtendsMapper para cancelar las sesiones de un curso");
+
+
+								numEventosCancelados++;
+								
+						} 
+					}
+					
+					
+				} catch (Exception e) {
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+				}
+				
+				if(numEventos == numEventosCancelados) {
+					error.setCode(200);
+					error.setDescription("La sesiones han sido canceladas correctamente");
+				}else if(numEventosCancelados == 0) {
+					if(numEventos == 1) {
+						error.setDescription("No se puede cancelar la sesión porque su estado no es planificado");
+					}else {
+						error.setDescription("No se pueden cancelar las sesiones porque su estado no es planificado");
+
+					}
+					error.setCode(400);
+				}else {
+					error.setCode(200);
+					error.setDescription("Solo se han cancelado las sesiones que tenían estado planificado");
+
+				}
+			}
+		}
+
+		
+		LOGGER.info("cancelSessionsCourse() -> Salida del servicio para cancelar las sesiones de un curso");
+
+		updateResponseDTO.setError(error);
+		return updateResponseDTO;
+
 	}
 
 }

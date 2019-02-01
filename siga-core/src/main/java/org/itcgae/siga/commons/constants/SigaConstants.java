@@ -549,6 +549,8 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static final Integer CURSO_ARCHIVADO = 1;
 
+	public static final long EMITIR_CERTIFICADO = 1;
+	
 	public static final Short DESIGNAR_TUTOR = 0; 
 	public static final Short ASIGNAR_TUTOR = 1; 
 	public static final long ANUNCIADO_CURSO = 1; 
@@ -590,6 +592,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final long TIPO_EVENTO_INICIO_INSCRIPCION = 4;
 	public static final long TIPO_EVENTO_FIN_INSCRIPCION = 5;
 	public static final long TIPO_EVENTO_SESION = 8;
+	public static final long ESTADO_EVENTO_PLANIFICADO = 1;
 	
 	public static final List<String> CAMPOSPLANTILLAEVENTOS = Arrays.asList(NOMBRE);
 	

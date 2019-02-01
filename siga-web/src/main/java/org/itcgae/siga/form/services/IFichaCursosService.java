@@ -100,6 +100,9 @@ public interface IFichaCursosService {
 	public UpdateResponseDTO announceCourse(CursoDTO cursoDTO , HttpServletRequest request);
 	
 	public int createServiceCourse(ForCurso cursoItem, AdmUsuarios usuario, Short idInstitucion);
+	
+	public UpdateResponseDTO cancelSessionsCourse(EventoDTO eventoDTO , HttpServletRequest request);
+
 
 
 }
