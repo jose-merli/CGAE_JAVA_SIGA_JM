@@ -249,6 +249,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						plantilla.setDescripcion(datosTarjeta.getDescripcion());
 						plantilla.setFechamodificacion(new Date());
 						plantilla.setUsumodificacion(usuario.getIdusuario());
+						plantilla.setAntigua("N");
 						_envPlantillasenviosMapper.insert(plantilla);
 						respuesta.setMessage(plantilla.getIdplantillaenvios().toString());
 					}
