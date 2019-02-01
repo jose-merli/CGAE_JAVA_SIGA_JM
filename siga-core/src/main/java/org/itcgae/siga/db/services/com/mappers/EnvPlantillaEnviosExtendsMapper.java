@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.db.entities.EnvPlantillasenvios;
 import org.itcgae.siga.db.services.com.providers.EnvPlantillaEnviosExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,17 @@ public interface EnvPlantillaEnviosExtendsMapper {
 		@Result(column = "IDPLANTILLAENVIOS", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getPlantillas(Short idInstitucion, String idTipoEnvio);
+	
+	@SelectProvider(type = EnvPlantillaEnviosExtendsSqlProvider.class, method = "getPlantillasComunicacion")
+	@Results({@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VALUE", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> getPlantillasComunicacion(Short idInstitucion);
+	
+	@SelectProvider(type = EnvPlantillaEnviosExtendsSqlProvider.class, method = "getTipoEnvioPlantilla")
+	@Results({@Result(column = "DESCRIPCION", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR)
+	})
+	List<PlantillaEnvioItem> getTipoEnvioPlantilla(Short idInstitucion, String idPlantilla, String idLenguaje);
 	
 	@SelectProvider(type = EnvPlantillaEnviosExtendsSqlProvider.class, method = "selectMaxIDPlantillaEnvio")
 	@Results({

@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
+import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillaModeloDocumentoDTO;
 import org.itcgae.siga.DTOs.com.PlantillaModeloItem;
@@ -876,5 +877,77 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		
 		LOGGER.info("colegiosModelo() -> Salida del servicio para obtener los colegios");
 		return comboDTO;
+	}
+
+
+	@Override
+	public ComboDTO obtenerPlantillasComunicacion(HttpServletRequest request) {
+		
+		LOGGER.info("obtenerPlantillasComunicacion() -> Entrada al servicio para obtener las plantillas para añadir a la comunicación");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		
+		if (null != idInstitucionUser) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucionUser));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					comboItems = envPlantillaEnviosExtendsMapper.getPlantillasComunicacion(idInstitucionUser);
+					comboDTO.setCombooItems(comboItems);
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage("Error al obtener los perfiles");
+					error.description(e.getMessage());
+					e.printStackTrace();
+				}
+			}		
+		}		
+		
+		LOGGER.info("obtenerPlantillasComunicacion() -> Salida del servicio para obtener las plantillas para añadir a la comunicación");
+		return comboDTO;
+	}
+
+
+	@Override
+	public PlantillaEnvioItem obtenerTipoEnvioPlantilla(HttpServletRequest request, String idPlantilla) {
+		LOGGER.info("obtenerPlantillasComunicacion() -> Entrada al servicio para obtener el tipo de envio de la plantilla");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
+		PlantillaEnvioItem plantilla = new PlantillaEnvioItem();
+		
+		if (null != idInstitucionUser) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucionUser));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					List<PlantillaEnvioItem> plantillas = envPlantillaEnviosExtendsMapper.getTipoEnvioPlantilla(idInstitucionUser, idPlantilla, usuario.getIdlenguaje());
+					plantilla = plantillas.get(0);
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage("Error al obtener los perfiles");
+					error.description(e.getMessage());
+					e.printStackTrace();
+				}
+			}		
+		}		
+		
+		LOGGER.info("obtenerPlantillasComunicacion() -> Salida del servicio para obtener las plantillas para añadir a la comunicación");
+		return plantilla;
 	}
 }

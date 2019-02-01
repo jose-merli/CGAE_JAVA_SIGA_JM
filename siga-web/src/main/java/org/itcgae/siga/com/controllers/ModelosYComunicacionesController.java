@@ -6,6 +6,7 @@ import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
+import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaModeloBorrarDTO;
 import org.itcgae.siga.DTOs.com.PlantillasDocumentosDTO;
 import org.itcgae.siga.DTOs.com.PlantillasModeloDTO;
@@ -178,6 +179,16 @@ public class ModelosYComunicacionesController {
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/detalle/plantillasComunicacion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboPlantillasComunicacion(HttpServletRequest request) {
+
+		ComboDTO response = _modelosYcomunicacionesService.obtenerPlantillasComunicacion(request);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}	
+	
 	@RequestMapping(value = "/detalle/guardarPlantillaEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<Error> guardarPlantillaEnvio(HttpServletRequest request, @RequestBody PlantillaModeloBorrarDTO plantilla) {
 
@@ -186,5 +197,12 @@ public class ModelosYComunicacionesController {
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}	
+	
+	@RequestMapping(value = "/detalle/tipoEnvioPlantilla",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PlantillaEnvioItem> obtenerTipoEnvioPlantilla(HttpServletRequest request, @RequestBody String idPlantilla) {
+
+		PlantillaEnvioItem response = _modelosYcomunicacionesService.obtenerTipoEnvioPlantilla(request, idPlantilla);
+		return new ResponseEntity<PlantillaEnvioItem>(response, HttpStatus.OK);
 	}	
 }
