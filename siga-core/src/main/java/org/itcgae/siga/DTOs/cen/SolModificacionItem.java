@@ -10,6 +10,7 @@ public class SolModificacionItem {
 
 	private String especifica;
 	private String idSolicitud;
+	private Integer numIdSolicitud;
 	private String motivo;
 	private String idPersona;
 	@JsonFormat(pattern = "dd/MM/yyyy")
@@ -177,5 +178,13 @@ public class SolModificacionItem {
 			return "null";
 		}
 		return o.toString().replace("\n", "\n    ");
+	}
+
+	public Integer getNumIdSolicitud() {
+		return numIdSolicitud;
+	}
+
+	public void setNumIdSolicitud(Integer numIdSolicitud) {
+		this.numIdSolicitud = numIdSolicitud;
 	}
 }
