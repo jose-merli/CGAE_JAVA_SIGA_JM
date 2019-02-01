@@ -17,6 +17,7 @@ public class ColegiadoItem {
 	private String nif;
 	private String nombre;
 	private String numColegiado;
+	private Integer numberColegiado;
 	private String residenteInscrito;
 	private String situacionResidente;
 	private String comunitario;
@@ -1278,6 +1279,14 @@ public class ColegiadoItem {
 
 	public void setInstitucion(String institucion) {
 		this.institucion = institucion;
+	}
+
+	public Integer getNumberColegiado() {
+		return numberColegiado;
+	}
+
+	public void setNumberColegiado(Integer numberColegiado) {
+		this.numberColegiado = numberColegiado;
 	}
 
 
