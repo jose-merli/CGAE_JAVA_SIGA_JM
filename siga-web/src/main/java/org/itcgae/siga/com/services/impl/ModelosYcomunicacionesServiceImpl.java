@@ -761,6 +761,18 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					plantilla.setUsumodificacion(usuario.getIdusuario());
 					plantilla.setFechamodificacion(new Date());
 					modModeloPlantillaenvioMapper.insert(plantilla);
+					
+					//Si llega los ids antiguos es una edición del registro de la tabla por lo tanto borramos la antigua.
+					if(datosPlantilla.getIdAntiguaPlantillaEnvios() != null && datosPlantilla.getIdAntiguaTipoEnvios()!=null){
+						ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
+						key.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
+						key.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
+						key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdAntiguaPlantillaEnvios()));
+						key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdAntiguaTipoEnvios()));
+						
+						modModeloPlantillaenvioMapper.deleteByPrimaryKey(key);
+					}
+					
 					respuesta.setCode(200);
 					respuesta.setDescription("Plantilla guardada");
 				}catch(Exception e){
