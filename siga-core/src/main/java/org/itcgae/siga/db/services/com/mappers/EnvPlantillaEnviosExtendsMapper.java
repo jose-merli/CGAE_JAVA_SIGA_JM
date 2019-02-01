@@ -48,7 +48,8 @@ public interface EnvPlantillaEnviosExtendsMapper {
 	List<ComboItem> getPlantillasComunicacion(Short idInstitucion);
 	
 	@SelectProvider(type = EnvPlantillaEnviosExtendsSqlProvider.class, method = "getTipoEnvioPlantilla")
-	@Results({@Result(column = "DESCRIPCION", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR)
+	@Results({@Result(column = "DESCRIPCION", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "idtipoEnvios", property = "idTipoEnvios", jdbcType = JdbcType.VARCHAR)
 	})
 	List<PlantillaEnvioItem> getTipoEnvioPlantilla(Short idInstitucion, String idPlantilla, String idLenguaje);
 	
