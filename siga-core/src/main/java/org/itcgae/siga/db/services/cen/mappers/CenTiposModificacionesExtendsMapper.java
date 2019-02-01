@@ -28,6 +28,7 @@ public interface CenTiposModificacionesExtendsMapper {
 	@SelectProvider(type = CenTiposModificacionesSqlExtendsProvider.class, method = "searchModificationRequest")
 	@Results({ @Result(column = "ESPECIFICA", property = "especifica", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDSOLICITUD", property = "idSolicitud", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDSOLICITUD", property = "numIdSolicitud", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "MOTIVO", property = "motivo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
