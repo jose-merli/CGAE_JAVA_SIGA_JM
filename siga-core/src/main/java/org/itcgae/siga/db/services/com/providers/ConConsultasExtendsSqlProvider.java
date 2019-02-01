@@ -72,16 +72,40 @@ public class ConConsultasExtendsSqlProvider {
 		sql.FROM("CON_CONSULTA");
 		return sql.toString();
 	}
-	
-	public String selectConsultasPlantilla(Short idInstitucion, String idPlantillaEnvios, String idtipoEnvio){
+
+	public String selectConsultasPlantilla(Short idInstitucion, String idPlantillaEnvios, String idtipoEnvio) {
 		SQL sql = new SQL();
-		sql.SELECT("IDINSTITUCION, IDCONSULTA, DESCRIPCION, OBSERVACIONES, TIPOCONSULTA, IDMODULO, (SELECT NOMBRE FROM CON_MODULO WHERE IDMODULO = con_consulta.IDMODULO) AS MODULO");
-		sql.SELECT("IDCLASECOMUNICACION, IDOBJETIVO, SENTENCIA, GENERAL");
-		sql.FROM("con_consulta");
-		sql.WHERE("IDCONSULTA IN (SELECT IDCONSULTA FROM MOD_PLANTILLAENVIO_CONSULTA WHERE IDPLANTILLAENVIOS='"+ idPlantillaEnvios +"' "
-				+ "AND IDTIPOENVIOS ='"+ idtipoEnvio +"' AND IDINSTITUCION='"+ idInstitucion +"' AND FECHABAJA is null) AND IDINSTITUCION = '"+ idInstitucion +"'");
+		sql.SELECT("cc.IDINSTITUCION");
+		sql.SELECT("cc.IDCONSULTA");
+		sql.SELECT("cc.GENERAL");
+		sql.SELECT("cc.DESCRIPCION");
+		sql.SELECT("cc.OBSERVACIONES");
+		sql.SELECT("cc.TIPOCONSULTA");
+		sql.SELECT("CM.IDMODULO");
+		sql.SELECT("cc.IDCLASECOMUNICACION");
+		sql.SELECT("cc.IDOBJETIVO");
+		sql.SELECT("cc.SENTENCIA");
+
+		sql.FROM("con_consulta cc");
+		sql.LEFT_OUTER_JOIN("con_modulo cm on cc.idmodulo = cm.idmodulo");
+		sql.INNER_JOIN("mod_plantillaenvio_consulta mpc on cc.idconsulta = mpc.idconsulta");
+
+		sql.WHERE("mpc.idplantillaenvios='" + idPlantillaEnvios + "' AND mpc.idtipoenvios ='" + idtipoEnvio
+				+ "' AND mpc.FECHABAJA is null AND (cc.idinstitucion='" + idInstitucion
+				+ "' OR (cc.idinstitucion = '2000' and (UPPER(cc.general) = 'S' or cc.general = '1')))");
 		return sql.toString();
 	}
+	
+	
+//	SELECT , , , , , , , , , 
+//	from con_consulta cc
+//	left outer join con_modulo cm on cc.idmodulo = cm.idmodulo
+//	inner join mod_plantillaenvio_consulta mpc on cc.idconsulta = mpc.idconsulta
+//	where mpc.idplantillaenvios='17' 
+//	and mpc.idtipoenvios = '1' 
+//	and mpc.fechabaja is null
+//	and cc.idinstitucion = '2005' or (cc.idinstitucion = '2000' and (UPPER(cc.general) = 'S' or cc.general = '1'));
+	
 	
 	public String selectConsultasDisponibles(Short idInstitucion, Long idClaseComunicacion, Short idObjetivo){
 		

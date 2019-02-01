@@ -15,7 +15,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 				+ "PLANTILLA.IDTIPOENVIOS AND CAT.IDLENGUAJE = '1') AS TIPOENVIO");
 		sql.FROM("ENV_PLANTILLASENVIOS PLANTILLA");
 		sql.WHERE("PLANTILLA.FECHABAJA is null");
-		sql.WHERE("PLANTILLA.IDINSTITUCION = '"+ idInstitucion +"'");
+		sql.WHERE("PLANTILLA.IDINSTITUCION = '"+ idInstitucion +"' AND ANTIGUA = 'N'");
 		
 
 		if(filtros.getIdTipoEnvios() != null && !filtros.getIdTipoEnvios().trim().equals("")){
@@ -39,11 +39,39 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 		
 		sql.FROM("ENV_PLANTILLASENVIOS");
 		
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "' AND ANTIGUA = 'N'");
 		sql.WHERE("IDTIPOENVIOS = '" + idTipoEnvio + "'");
 		
 		return sql.toString();
 	}
+	
+	public String getPlantillasComunicacion(Short idInstitucion){
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("IDPLANTILLAENVIOS AS VALUE, NOMBRE AS LABEL");
+		
+		sql.FROM("ENV_PLANTILLASENVIOS");
+		
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "' AND ANTIGUA = 'N'");
+		sql.ORDER_BY("NOMBRE");
+		
+		return sql.toString();
+	}
+	
+	public String getTipoEnvioPlantilla (Short idInstitucion, String idPlantilla, String idLenguaje){
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("cat.DESCRIPCION, plantilla.idtipoEnvios");
+		sql.FROM("ENV_PLANTILLASENVIOS plantilla");
+		sql.JOIN("env_tipoenvios tipo on tipo.IDTIPOENVIOS = plantilla.IDTIPOENVIOS");
+		sql.JOIN("GEN_RECURSOS_CATALOGOS cat on cat.IDRECURSO = tipo.NOMBRE and cat.IDLENGUAJE = '" + idLenguaje + "'");
+		sql.WHERE("plantilla.idinstitucion ='"+ idInstitucion +"' and plantilla.IDPLANTILLAENVIOS = '"+ idPlantilla +"'");
+		
+		return sql.toString();
+	}
+	
 	
 	public String selectMaxIDPlantillaEnvio(){
 		

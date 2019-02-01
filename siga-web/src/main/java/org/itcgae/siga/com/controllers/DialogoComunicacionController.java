@@ -6,7 +6,6 @@ import org.itcgae.siga.DTOs.com.ClaseComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
 import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
-import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.springframework.beans.factory.annotation.Autowired;
