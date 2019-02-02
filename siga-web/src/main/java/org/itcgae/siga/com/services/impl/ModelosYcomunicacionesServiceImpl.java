@@ -784,8 +784,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					}
 					
 					//Si llega los ids antiguos es una edición del registro de la tabla por lo tanto borramos la antigua.
-					if(datosPlantilla.getIdAntiguaPlantillaEnvios() != null && !datosPlantilla.getIdAntiguaPlantillaEnvios().equals(datosPlantilla.getIdPlantillaEnvios()) && 
-							datosPlantilla.getIdAntiguaTipoEnvios()!=null && !datosPlantilla.getIdAntiguaTipoEnvios().equals(datosPlantilla.getIdTipoEnvios())){
+					if(datosPlantilla.getIdAntiguaPlantillaEnvios() != null && !datosPlantilla.getIdAntiguaPlantillaEnvios().equals(datosPlantilla.getIdPlantillaEnvios())){
 						key = new ModModeloPlantillaenvioKey();
 						key.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
 						key.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
