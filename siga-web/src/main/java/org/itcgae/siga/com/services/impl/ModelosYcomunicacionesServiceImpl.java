@@ -759,25 +759,42 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 							modModeloPlantillaenvioMapper.updateByPrimaryKey(plantillas.get(i));
 						}
 					}
-					ModModeloPlantillaenvio plantilla = new ModModeloPlantillaenvio();
-					plantilla.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
-					plantilla.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
-					plantilla.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
-					plantilla.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
-					plantilla.setPordefecto(datosPlantilla.getPorDefecto());
-					plantilla.setUsumodificacion(usuario.getIdusuario());
-					plantilla.setFechamodificacion(new Date());
-					modModeloPlantillaenvioMapper.insert(plantilla);
+					ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
+					key.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
+					key.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
+					key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
+					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
+					ModModeloPlantillaenvio plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
+					if(plantilla != null){
+						plantilla.setFechabaja(null);
+						plantilla.setUsumodificacion(usuario.getIdusuario());
+						plantilla.setFechamodificacion(new Date());
+						plantilla.setPordefecto(datosPlantilla.getPorDefecto());
+						modModeloPlantillaenvioMapper.updateByPrimaryKey(plantilla);
+					}else{
+						plantilla = new ModModeloPlantillaenvio();
+						plantilla.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
+						plantilla.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
+						plantilla.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
+						plantilla.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
+						plantilla.setPordefecto(datosPlantilla.getPorDefecto());
+						plantilla.setUsumodificacion(usuario.getIdusuario());
+						plantilla.setFechamodificacion(new Date());
+						modModeloPlantillaenvioMapper.insert(plantilla);
+					}
 					
 					//Si llega los ids antiguos es una edición del registro de la tabla por lo tanto borramos la antigua.
-					if(datosPlantilla.getIdAntiguaPlantillaEnvios() != null && datosPlantilla.getIdAntiguaTipoEnvios()!=null){
-						ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
+					if(datosPlantilla.getIdAntiguaPlantillaEnvios() != null && !datosPlantilla.getIdAntiguaPlantillaEnvios().equals(datosPlantilla.getIdPlantillaEnvios())){
+						key = new ModModeloPlantillaenvioKey();
 						key.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
 						key.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
 						key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdAntiguaPlantillaEnvios()));
 						key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdAntiguaTipoEnvios()));
-						
-						modModeloPlantillaenvioMapper.deleteByPrimaryKey(key);
+						plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
+						plantilla.setFechabaja(new Date());
+						plantilla.setUsumodificacion(usuario.getIdusuario());
+						plantilla.setFechamodificacion(new Date());
+						modModeloPlantillaenvioMapper.updateByPrimaryKey(plantilla);
 					}
 					
 					respuesta.setCode(200);
@@ -942,7 +959,9 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
 					List<PlantillaEnvioItem> plantillas = envPlantillaEnviosExtendsMapper.getTipoEnvioPlantilla(idInstitucionUser, idPlantilla, usuario.getIdlenguaje());
-					plantilla = plantillas.get(0);
+					if(plantillas != null && plantillas.size() > 0){
+						plantilla = plantillas.get(0);
+					}
 				}catch(Exception e){
 					Error error = new Error();
 					error.setCode(500);

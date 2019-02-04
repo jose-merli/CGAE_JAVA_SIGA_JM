@@ -52,6 +52,8 @@ import org.itcgae.siga.db.entities.AgeEventoExample;
 import org.itcgae.siga.db.entities.AgePersonaEvento;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteExample;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
@@ -79,7 +81,9 @@ import org.itcgae.siga.db.entities.PysServiciosinstitucion;
 import org.itcgae.siga.db.entities.PysServiciossolicitados;
 import org.itcgae.siga.db.entities.PysSuscripcion;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
+import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.ForEventoCursoMapper;
 import org.itcgae.siga.db.mappers.ForInscripcionesmasivasMapper;
 import org.itcgae.siga.db.mappers.ForTemacursoCursoMapper;
@@ -230,6 +234,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Autowired
 	private ForCertificadoscursoExtendsMapper forCertificadosCursoExtendsMapper;
+	
+	@Autowired
+	private CenColegiadoMapper cenColegiadoMapper;
+	
+	@Autowired
+	private CenPersonaMapper cenPersonaMapper;
 
 	@Override
 	public void updateEstadoCursoAuto() {
@@ -2045,17 +2055,31 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					Long idPersona = getIdPersonaVerify((String) hashtable.get(SigaConstants.NIF), idInstitucion);
 					inscripcionItem.setIdPersona(idPersona);
 
-					// Si se encuentra debemos comprobar que este en cen_cliente
+					// Si se encuentra debemos comprobar que este en cen_cliente en la institucion a la que pertenece el curso
 					if (inscripcionItem.getIdPersona() != null) {
+						
+						CenPersona cenPersona = cenPersonaMapper.selectByPrimaryKey(idPersona);
 
-						FichaPersonaItem cenPersona = getPersonaVerify(idPersona, idInstitucion);
-						String nombreCompleto = cenPersona.getNombre() + " " + cenPersona.getApellido1() + " "
-								+ cenPersona.getApellido2();
+						String nombreCompleto = cenPersona.getNombre() + " " + cenPersona.getApellidos1();
+						
+						if(cenPersona.getApellidos2() != null) {
+							nombreCompleto += " " + cenPersona.getApellidos2(); 
+						}
 						inscripcionItem.setNombrePersona(nombreCompleto);
-						inscripcionItem.setNifPersona(cenPersona.getNif());
+						inscripcionItem.setNifPersona(cenPersona.getNifcif());
+						
+						//Buscamos la institución del curso al que pertenece
+						LOGGER.info(
+								"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKeyExtends(idCurso) -> Entrada a forCursoExtendsMapper para recuperar el curso de la inscripcion");
+						
+						ForCurso curso = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(inscripcionItem.getIdCurso()));
+						
+						LOGGER.info(
+								"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKeyExtends(idCurso) -> Salida a forCursoExtendsMapper para recuperar el curso de la inscripcion");
+						
 
 						CenClienteExample cenClienteExample = new CenClienteExample();
-						cenClienteExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						cenClienteExample.createCriteria().andIdinstitucionEqualTo(curso.getIdinstitucion())
 								.andIdpersonaEqualTo(inscripcionItem.getIdPersona());
 
 						List<CenCliente> cenClienteList = cenClienteExtendsMapper.selectByExample(cenClienteExample);
@@ -2065,7 +2089,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 							CenCliente cenCliente = new CenCliente();
 							cenCliente.setIdpersona(inscripcionItem.getIdPersona());
-							cenCliente.setIdinstitucion(usuario.getIdinstitucion());
+							cenCliente.setIdinstitucion(curso.getIdinstitucion());
 							cenCliente.setFechaalta(new Date());
 							cenCliente.setCaracter("P");
 							cenCliente.setPublicidad(SigaConstants.DB_FALSE);
@@ -2090,7 +2114,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							// Se pone a cero ya que al ser una persona física no tiene tipo ni sociedad
 							cenNocolegiado.setTipo("0");
 							cenNocolegiado.setIdpersona(inscripcionItem.getIdPersona());
-							cenNocolegiado.setIdinstitucion(idInstitucion);
+							cenNocolegiado.setIdinstitucion(curso.getIdinstitucion());
 							cenNocolegiado.setFechamodificacion(new Date());
 							cenNocolegiado.setFechaBaja(null);
 							cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
@@ -2106,43 +2130,50 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							LOGGER.info(
 									"generateExcelInscriptions() / cenColegiadoExtendsMapper.insert() -> Salida de cenColegiadoExtendsMapper para crear un nuevo colegiado");
 
-							// Si se encuentra comprobamos que este en cen_nocolegiado
+							// Si se encuentra comprobamos que este en cen_colegiado
 						} else {
-							CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
-							cenNocolegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							
+							//Comprobamos que este colegiado en la institucion a la que pertenece el curso
+							CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+							cenColegiadoExample.createCriteria().andIdinstitucionEqualTo(curso.getIdinstitucion())
 									.andIdpersonaEqualTo(inscripcionItem.getIdPersona());
 
-							List<CenNocolegiado> cenNocolegiadoList = cenNocolegiadoMapper
-									.selectByExample(cenNocolegiadoExample);
+							List<CenColegiado> cenColegiadoList = cenColegiadoMapper
+									.selectByExample(cenColegiadoExample);
 
-							// Si no se encuentra debemos añadirlo
-							if (null == cenNocolegiadoList || cenNocolegiadoList.size() == 0) {
+							// Si no es colegiado comprobamos que este en cen_nocolegiado de la misma institucion
+							if (null == cenColegiadoList || cenColegiadoList.size() == 0) {
+								
+								CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
+								cenNocolegiadoExample.createCriteria().andIdinstitucionEqualTo(curso.getIdinstitucion())
+										.andIdpersonaEqualTo(inscripcionItem.getIdPersona());
 
-								CenNocolegiado cenNocolegiado = new CenNocolegiado();
-								// Falta idNoColegiado
-								// Se pone a cero ya que al ser una persona física no tiene tipo ni sociedadsj
-								cenNocolegiado.setTipo("0");
-								cenNocolegiado.setIdpersona(inscripcionItem.getIdPersona());
-								cenNocolegiado.setIdinstitucion(idInstitucion);
-								cenNocolegiado.setFechamodificacion(new Date());
-								cenNocolegiado.setFechaBaja(null);
-								cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
-								// Para crear un nocoleagiado debemos rellenar campo sociedadsj, con que dato?
-								cenNocolegiado.setSociedadsj("0");
-								cenNocolegiado.setSociedadprofesional("0");
+								List<CenNocolegiado> cenNocolegiadoList = cenNocolegiadoMapper
+										.selectByExample(cenNocolegiadoExample);
 
-								LOGGER.info(
-										"generateExcelInscriptions() / cenNocolegiadoMapper.insert() -> Salida de cenNocolegiadoMapper para crear un nuevo nocolegiado");
+								// Si no se encuentra debemos añadirlo como no colegiado a la institución a la que pertenece el curso
+								if (null == cenNocolegiadoList || cenNocolegiadoList.size() == 0) {
 
-								int result = cenNocolegiadoMapper.insert(cenNocolegiado);
+									CenNocolegiado cenNocolegiado = new CenNocolegiado();
+									cenNocolegiado.setTipo("0");
+									cenNocolegiado.setIdpersona(inscripcionItem.getIdPersona());
+									cenNocolegiado.setIdinstitucion(curso.getIdinstitucion());
+									cenNocolegiado.setFechamodificacion(new Date());
+									cenNocolegiado.setFechaBaja(null);
+									cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
+									cenNocolegiado.setSociedadsj("0");
+									//Este campo es obligatorio
+									cenNocolegiado.setSociedadprofesional("0");
 
-								LOGGER.info(
-										"generateExcelInscriptions() / cenNocolegiadoMapper.insert() -> Salida de cenNocolegiadoMapper para crear un nuevo nocolegiado");
+									LOGGER.info(
+											"generateExcelInscriptions() / cenNocolegiadoMapper.insert() -> Salida de cenNocolegiadoMapper para crear un nuevo nocolegiado");
 
-								// Si existe no colegiado lo guardamos en el objeto inscripcion
-							} else {
-								CenNocolegiado cenNocolegiado = cenNocolegiadoList.get(0);
-								inscripcionItem.setIdPersona(idPersona);
+									int result = cenNocolegiadoMapper.insert(cenNocolegiado);
+
+									LOGGER.info(
+											"generateExcelInscriptions() / cenNocolegiadoMapper.insert() -> Salida de cenNocolegiadoMapper para crear un nuevo nocolegiado");
+
+								} 
 							}
 						}
 

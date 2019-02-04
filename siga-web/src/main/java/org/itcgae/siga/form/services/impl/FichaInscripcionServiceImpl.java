@@ -22,7 +22,10 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
+import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
+import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.ForCertificadoscurso;
 import org.itcgae.siga.db.entities.ForCertificadoscursoExample;
 import org.itcgae.siga.db.entities.ForCurso;
@@ -35,6 +38,7 @@ import org.itcgae.siga.db.entities.PysSuscripcion;
 import org.itcgae.siga.db.mappers.PysServiciossolicitadosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCertificadoscursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
@@ -66,6 +70,9 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 	
 	@Autowired
 	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+	
+	@Autowired
+	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 	
 	@Autowired
 	private PysProductossolicitadosExtendsMapper pysProductosSolicitadosExtendsMapper;
@@ -210,6 +217,51 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 							insertResponseDTO.setStatus(SigaConstants.KO);
 						}
 					
+					}else {
+						//Comprobamos que este colegiado
+						CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+						cenColegiadoExample.createCriteria().andIdinstitucionEqualTo(curso.getIdinstitucion())
+								.andIdpersonaEqualTo(inscripcionItem.getIdPersona());
+
+						List<CenColegiado> cenColegiadoList = cenColegiadoExtendsMapper
+								.selectByExample(cenColegiadoExample);
+
+						// Si no es colegiado comprobamos que este en cen_nocolegiado
+						if (null == cenColegiadoList || cenColegiadoList.size() == 0) {
+							
+							CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
+							cenNocolegiadoExample.createCriteria().andIdinstitucionEqualTo(curso.getIdinstitucion())
+									.andIdpersonaEqualTo(inscripcionItem.getIdPersona());
+
+							List<CenNocolegiado> cenNocolegiadoList = cenNocolegiadoExtendsMapper
+									.selectByExample(cenNocolegiadoExample);
+
+							// Si no se encuentra debemos añadirlo
+							if (null == cenNocolegiadoList || cenNocolegiadoList.size() == 0) {
+
+								CenNocolegiado cenNocolegiado = new CenNocolegiado();
+								// Falta idNoColegiado
+								// Se pone a cero ya que al ser una persona física no tiene tipo ni sociedadsj
+								cenNocolegiado.setTipo("0");
+								cenNocolegiado.setIdpersona(inscripcionItem.getIdPersona());
+								cenNocolegiado.setIdinstitucion(curso.getIdinstitucion());
+								cenNocolegiado.setFechamodificacion(new Date());
+								cenNocolegiado.setFechaBaja(null);
+								cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
+								cenNocolegiado.setSociedadsj("0");
+								cenNocolegiado.setSociedadprofesional("0");
+
+								LOGGER.info(
+										"generateExcelInscriptions() / cenNocolegiadoMapper.insert() -> Salida de cenNocolegiadoMapper para crear un nuevo nocolegiado");
+
+								int result = cenNocolegiadoExtendsMapper.insert(cenNocolegiado);
+
+								LOGGER.info(
+										"generateExcelInscriptions() / cenNocolegiadoMapper.insert() -> Salida de cenNocolegiadoMapper para crear un nuevo nocolegiado");
+
+								// Si existe no colegiado lo guardamos en el objeto inscripcion
+							} 
+						}
 					}
 					
 					LOGGER.info(
