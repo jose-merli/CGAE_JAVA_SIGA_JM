@@ -1,10 +1,14 @@
 package org.itcgae.siga.com.services;
 
 import java.io.File;
+import java.text.ParseException;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
+import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
@@ -12,6 +16,7 @@ import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 
 public interface IConsultasService {
 
@@ -40,7 +45,12 @@ public interface IConsultasService {
 
 	public Error guardarConsulta(HttpServletRequest request, ConsultaItem consulta);
 
-	public File ejecutarConsulta(HttpServletRequest request, String consulta);
+	public File ejecutarConsulta(HttpServletRequest request, ConsultaItem consulta);
 
 	public Map<String, String> obtenerMapaConsulta(String consulta);
+
+	public CamposDinamicosDTO obtenerCamposConsulta(HttpServletRequest request, String idClaseComunicacion, String consulta);
+
+	public String procesarEjecutarConsulta(AdmUsuarios usuario, String sentencia, List<CampoDinamicoItem> listaCampos,
+			boolean sustituyeInstitucion) throws ParseException;
 }
