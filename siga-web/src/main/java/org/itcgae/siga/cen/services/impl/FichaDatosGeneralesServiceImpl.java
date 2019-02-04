@@ -565,8 +565,10 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
                                   comboEtiquetasItem.setColor("#87CEFA");
                         } else {
                                   if ((fechaInicio.before(fechaActual)
-                                                       && fechaBaja.after(fechaActual)) || (fechaActual.compareTo(fechaBaja) == 0)) {
+                                                       && fechaBaja.after(fechaActual))) {
                                             comboEtiquetasItem.setColor("#87CEFA");
+                                  }else if(fechaActual.compareTo(fechaBaja) == 0 && fechaActual.compareTo(fechaInicio) == 0){
+                                      comboEtiquetasItem.setColor("#87CEFA");
                                   } else if (fechaActual.before(fechaInicio) && fechaBaja.after(fechaInicio)) {
                                             comboEtiquetasItem.setColor("#40E0D0");
                                   } else if (fechaInicio.before(fechaBaja) && fechaActual.after(fechaBaja)) {
