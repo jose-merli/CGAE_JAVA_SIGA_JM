@@ -663,4 +663,5 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final long CALENDARIO_GENERAL = 1; 
 	public static final long CALENDARIO_LABORAL = 2;
 	public static final long CALENDARIO_FORMACION = 3; 
+
 }
