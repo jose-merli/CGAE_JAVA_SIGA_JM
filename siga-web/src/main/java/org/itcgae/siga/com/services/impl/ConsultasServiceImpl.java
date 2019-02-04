@@ -1727,6 +1727,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 		tipoDatos.add(SigaConstants.ETIQUETATIPOTEXTO);
 		tipoDatos.add(SigaConstants.ETIQUETATIPOFECHA);
 		tipoDatos.add(SigaConstants.ETIQUETATIPOMULTIVALOR);
+		tipoDatos.add(SigaConstants.ETIQUETATIPOENVIO);
 		
 		for (int i=0; i<tipoDatos.size() ;i++)
 		{
@@ -1742,6 +1743,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 						etiqueta=SigaConstants.ETIQUETATIPOTEXTO;
 					else if (tipoDatos.get(i).toString().equals(SigaConstants.ETIQUETATIPOFECHA))
 						etiqueta=SigaConstants.ETIQUETATIPOFECHA;
+					else if (tipoDatos.get(i).toString().equals(SigaConstants.ETIQUETATIPOENVIO))
+						etiqueta=SigaConstants.ETIQUETATIPOENVIO;
 					else
 						etiqueta=SigaConstants.ETIQUETATIPOMULTIVALOR;
 
@@ -1761,120 +1764,125 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 					if (pos_iniEtiqueta>=0)
 					{
+						if(etiqueta.equals(SigaConstants.ETIQUETATIPOENVIO)){
+							// Si es de tipoEnvio reemplazamos el valor
+							sentencia = sentencia.replace(SigaConstants.ETIQUETATIPOENVIO, listaCampos.get(j).getValor());
+							j++;
+						}else{	
+							operador = listaCampos.get(j).getOperacion();
+							
+							//controlando que el operador es "esta vacio"
+							
+							if (!operador.equals(SigaConstants.IS_NULL) && !listaCampos.get(j).getValor().equals("") ) {
+								if (listaCampos.get(j).getTipoDato().equals (SigaConstants.TIPOFECHA)) {
+									iParametroBind++;
+									criteriosDinamicos = "TO_DATE (:@"+iParametroBind+"@:"+", 'YYYY/MM/DD HH24:MI:SS')";								
+									
+									String fecha = listaCampos.get(j).getValor();
+									// This could be MM/dd/yyyy, you original value is ambiguous 
+									SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+									Date dateValue = input.parse(fecha);
 
-						operador = listaCampos.get(j).getOperacion();
-						
-						//controlando que el operador es "esta vacio"
-						
-						if (!operador.equals(SigaConstants.IS_NULL) && !listaCampos.get(j).getValor().equals("") ) {
-							if (listaCampos.get(j).getTipoDato().equals (SigaConstants.TIPOFECHA)) {
-								iParametroBind++;
-								criteriosDinamicos = "TO_DATE (:@"+iParametroBind+"@:"+", 'YYYY/MM/DD HH24:MI:SS')";								
-								
-								String fecha = listaCampos.get(j).getValor();
-								// This could be MM/dd/yyyy, you original value is ambiguous 
-								SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-								Date dateValue = input.parse(fecha);
-
-								SimpleDateFormat output = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-								String nuevoValor = output.format(dateValue);
-								listaCampos.get(j).setValor("'" + nuevoValor + "'");
-								
-								String aux = listaCampos.get(j).getValor();
-								codigosBind.put (new Integer(iParametroBind),aux);
-							}
-							else {
-								iParametroBind++;
-								criteriosDinamicos = ":@"+iParametroBind+"@:";
-								codigosBind.put (new Integer(iParametroBind), "'" + listaCampos.get(j).getValor() + "'");
-								if(operador.equals(SigaConstants.LIKE)){
-									codigosLike.put (new Integer(iParametroBind), listaCampos.get(j).getValor());
+									SimpleDateFormat output = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+									String nuevoValor = output.format(dateValue);
+									listaCampos.get(j).setValor("'" + nuevoValor + "'");
+									
+									String aux = listaCampos.get(j).getValor();
+									codigosBind.put (new Integer(iParametroBind),aux);
+								}
+								else {
+									iParametroBind++;
+									criteriosDinamicos = ":@"+iParametroBind+"@:";
+									codigosBind.put (new Integer(iParametroBind), "'" + listaCampos.get(j).getValor() + "'");
+									if(operador.equals(SigaConstants.LIKE)){
+										codigosLike.put (new Integer(iParametroBind), listaCampos.get(j).getValor());
+									}
 								}
 							}
-						}
-						else {
-							operador = "IS NULL";
-							criteriosDinamicos="";
-						}
-
-						sentenciaAux = sentenciaAux.substring (0, pos_iniEtiqueta) +
-						criteriosDinamicos +
-						sentenciaAux.substring (pos_iniEtiqueta+etiqueta.length());
-						String operadores[] = sentenciaAux.split("%%");
-						String operadorEncontrado = null;
-		 				for (int jta = operadores.length-1; jta >= 0 ; jta--) {
-							String operadorCast = operadores[jta];
-							if(operadoresList.contains(operadorCast)){
-								operadorEncontrado = "%%"+operadorCast+"%%";
-								break;
-								
+							else {
+								operador = "IS NULL";
+								criteriosDinamicos="";
 							}
-								
-						}
-						if(operador.equalsIgnoreCase("IS NULL")){
-							posEtiquetaOperador=sentenciaAux.toUpperCase().lastIndexOf(operadorEncontrado);
-							sentenciaAux1 = sentenciaAux.substring (posEtiquetaOperador,posEtiquetaOperador+operadorEncontrado.length()).replaceAll (operadorEncontrado, " "+operador+" ");
 
-						}else{
-							posEtiquetaOperador=sentenciaAux.toUpperCase().lastIndexOf(operadorEncontrado);
-							sentenciaAux1 = sentenciaAux.substring (posEtiquetaOperador).replaceAll (operadorEncontrado, " "+operador+" ");
+							sentenciaAux = sentenciaAux.substring (0, pos_iniEtiqueta) +
+							criteriosDinamicos +
+							sentenciaAux.substring (pos_iniEtiqueta+etiqueta.length());
+							String operadores[] = sentenciaAux.split("%%");
+							String operadorEncontrado = null;
+			 				for (int jta = operadores.length-1; jta >= 0 ; jta--) {
+								String operadorCast = operadores[jta];
+								if(operadoresList.contains(operadorCast)){
+									operadorEncontrado = "%%"+operadorCast+"%%";
+									break;
+									
+								}
+									
+							}
+							if(operador.equalsIgnoreCase("IS NULL")){
+								posEtiquetaOperador=sentenciaAux.toUpperCase().lastIndexOf(operadorEncontrado);
+								sentenciaAux1 = sentenciaAux.substring (posEtiquetaOperador,posEtiquetaOperador+operadorEncontrado.length()).replaceAll (operadorEncontrado, " "+operador+" ");
 
-						}
-						
-						
-						sentenciaAux = sentenciaAux.substring (0, posEtiquetaOperador) + sentenciaAux1;
-						if (!listaCampos.get(j).getAlias().equals("-1")) {
-							alias = listaCampos.get(j).getAlias();	
-							posAlias = sentenciaAux.lastIndexOf (alias);
-							sentenciaAux2=sentenciaAux.substring (posAlias+alias.length());
-							sentenciaAux=sentenciaAux.substring (0, posAlias) + sentenciaAux2;
-						}
-						String sentenciaAuxFin = sentencia.substring(pos_iniEtiqueta+etiqueta.length());
-						int indiceAnd = sentenciaAuxFin.indexOf("AND");
-						int indexDefecto = sentenciaAuxFin.toUpperCase().indexOf("DEFECTO");
-						int indexNulo = sentenciaAuxFin.toUpperCase().indexOf("NULO");
-						if(indiceAnd>-1){
-							if(indexDefecto>-1 && indexDefecto<indiceAnd )
-								sentenciaAuxFin= sentenciaAuxFin.substring(0,indexDefecto)+" "+sentenciaAuxFin.substring(indiceAnd);
-							else if(indexNulo>-1 && indexNulo<indiceAnd)
-								sentenciaAuxFin= sentenciaAuxFin.substring(0,indexNulo)+" "+sentenciaAuxFin.substring(indiceAnd);
-//							else
-//								sentenciaAuxFin= " "+sentenciaAuxFin.substring(indiceAnd);
-						}
-						else{
-							if(indexDefecto>-1 )
-								sentenciaAuxFin= sentenciaAuxFin.substring(0,indexDefecto);
-							else if(indexNulo>-1)
-								sentenciaAuxFin= sentenciaAuxFin.substring(0,indexNulo);
-							
-						}
-							
-						
-						//La linea siguiente se hace por si hubiera alguna operacino oracle al texto
-						//para eliminar el ultimo parentesis
-						if(operador.equalsIgnoreCase("IS NULL")){
-							int indiceAND = sentenciaAuxFin.indexOf("AND");
-							int indiceParentesis = -1;
-							if(indiceAND>-1){
-								indiceParentesis = sentenciaAuxFin.substring(0,indiceAND).indexOf(")");
-								
 							}else{
-								indiceParentesis = sentenciaAuxFin.indexOf(")");
-								
-								
-							}
+								posEtiquetaOperador=sentenciaAux.toUpperCase().lastIndexOf(operadorEncontrado);
+								sentenciaAux1 = sentenciaAux.substring (posEtiquetaOperador).replaceAll (operadorEncontrado, " "+operador+" ");
 
-							if(indiceParentesis>-1){
-								if(sentenciaAux.indexOf("(") == -1)
-									sentenciaAuxFin = sentenciaAuxFin.replaceFirst("\\)", "");
 							}
-						}
 							
-						
-						sentencia = sentenciaAux+sentenciaAuxFin;
-						pos_ini = pos_iniEtiqueta+sentenciaAux1.length();
+							
+							sentenciaAux = sentenciaAux.substring (0, posEtiquetaOperador) + sentenciaAux1;
+							if (!listaCampos.get(j).getAlias().equals("-1")) {
+								alias = listaCampos.get(j).getAlias();	
+								posAlias = sentenciaAux.lastIndexOf (alias);
+								sentenciaAux2=sentenciaAux.substring (posAlias+alias.length());
+								sentenciaAux=sentenciaAux.substring (0, posAlias) + sentenciaAux2;
+							}
+							String sentenciaAuxFin = sentencia.substring(pos_iniEtiqueta+etiqueta.length());
+							int indiceAnd = sentenciaAuxFin.indexOf("AND");
+							int indexDefecto = sentenciaAuxFin.toUpperCase().indexOf("DEFECTO");
+							int indexNulo = sentenciaAuxFin.toUpperCase().indexOf("NULO");
+							if(indiceAnd>-1){
+								if(indexDefecto>-1 && indexDefecto<indiceAnd )
+									sentenciaAuxFin= sentenciaAuxFin.substring(0,indexDefecto)+" "+sentenciaAuxFin.substring(indiceAnd);
+								else if(indexNulo>-1 && indexNulo<indiceAnd)
+									sentenciaAuxFin= sentenciaAuxFin.substring(0,indexNulo)+" "+sentenciaAuxFin.substring(indiceAnd);
+//								else
+//									sentenciaAuxFin= " "+sentenciaAuxFin.substring(indiceAnd);
+							}
+							else{
+								if(indexDefecto>-1 )
+									sentenciaAuxFin= sentenciaAuxFin.substring(0,indexDefecto);
+								else if(indexNulo>-1)
+									sentenciaAuxFin= sentenciaAuxFin.substring(0,indexNulo);
+								
+							}
+								
+							
+							//La linea siguiente se hace por si hubiera alguna operacino oracle al texto
+							//para eliminar el ultimo parentesis
+							if(operador.equalsIgnoreCase("IS NULL")){
+								int indiceAND = sentenciaAuxFin.indexOf("AND");
+								int indiceParentesis = -1;
+								if(indiceAND>-1){
+									indiceParentesis = sentenciaAuxFin.substring(0,indiceAND).indexOf(")");
+									
+								}else{
+									indiceParentesis = sentenciaAuxFin.indexOf(")");
+									
+									
+								}
 
-						j++;
+								if(indiceParentesis>-1){
+									if(sentenciaAux.indexOf("(") == -1)
+										sentenciaAuxFin = sentenciaAuxFin.replaceFirst("\\)", "");
+								}
+							}
+								
+							
+							sentencia = sentenciaAux+sentenciaAuxFin;
+							pos_ini = pos_iniEtiqueta+sentenciaAux1.length();
+
+							j++;
+						}					
 					}
 					else {
 						continuar=false;
