@@ -90,29 +90,16 @@ public class ConConsultasExtendsSqlProvider {
 		sql.LEFT_OUTER_JOIN("con_modulo cm on cc.idmodulo = cm.idmodulo");
 		sql.INNER_JOIN("mod_plantillaenvio_consulta mpc on cc.idconsulta = mpc.idconsulta");
 
-		sql.WHERE("mpc.idplantillaenvios='" + idPlantillaEnvios + "' AND mpc.idtipoenvios ='" + idtipoEnvio
-				+ "' AND mpc.FECHABAJA is null AND (cc.idinstitucion='" + idInstitucion
-				+ "' OR (cc.idinstitucion = '2000' and (UPPER(cc.general) = 'S' or cc.general = '1')))");
+		sql.WHERE("mpc.idplantillaenvios='" + idPlantillaEnvios + "' AND mpc.idtipoenvios ='" + idtipoEnvio + "' AND mpc.FECHABAJA is null and cc.IDINSTITUCION = '" + idInstitucion + "'");
 		return sql.toString();
 	}
-	
-	
-//	SELECT , , , , , , , , , 
-//	from con_consulta cc
-//	left outer join con_modulo cm on cc.idmodulo = cm.idmodulo
-//	inner join mod_plantillaenvio_consulta mpc on cc.idconsulta = mpc.idconsulta
-//	where mpc.idplantillaenvios='17' 
-//	and mpc.idtipoenvios = '1' 
-//	and mpc.fechabaja is null
-//	and cc.idinstitucion = '2005' or (cc.idinstitucion = '2000' and (UPPER(cc.general) = 'S' or cc.general = '1'));
-	
 	
 	public String selectConsultasDisponibles(Short idInstitucion, Long idClaseComunicacion, Short idObjetivo){
 		
 		SQL sql = new SQL();
 		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION");
 		sql.FROM("CON_CONSULTA");
-		sql.WHERE("IDINSTITUCION = "+ idInstitucion + " AND FECHABAJA IS NULL");
+		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
 		
 		if(idClaseComunicacion != null){
 			sql.WHERE("IDCLASECOMUNICACION = "+ idClaseComunicacion);
@@ -125,7 +112,7 @@ public class ConConsultasExtendsSqlProvider {
 		
 		return sql.toString();
 	}
-
+	
 	public static String filtroTextoBusquedas(String columna, String cadena) {
 	
 		StringBuilder cadenaWhere = new StringBuilder();

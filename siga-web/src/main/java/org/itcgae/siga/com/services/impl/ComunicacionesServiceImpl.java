@@ -168,12 +168,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				comboItems = _conClaseComunicacionExtendsMapper.selectTipoClaseComunicacion();
-				if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}		
+				
 				
 				comboDTO.setCombooItems(comboItems);
 				
@@ -209,12 +204,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				comboItems = _modModeloComunicacionExtendsMapper.selectModelosClasesComunicacion(idClaseComunicacion);
-				if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}		
+					
 				
 				comboDTO.setCombooItems(comboItems);
 				

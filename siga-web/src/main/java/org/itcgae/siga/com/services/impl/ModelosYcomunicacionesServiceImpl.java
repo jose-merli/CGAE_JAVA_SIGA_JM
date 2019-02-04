@@ -33,6 +33,7 @@ import org.itcgae.siga.db.entities.EnvPlantillasenviosExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.ModModeloPerfiles;
 import org.itcgae.siga.db.entities.ModModeloPerfilesExample;
+import org.itcgae.siga.db.entities.ModModeloPerfilesKey;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumentoExample;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvio;
@@ -574,16 +575,21 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					
 					//añadimos las etiquetas seleccionadas
 					for (int i = 0; i < perfilesDTO.getPerfilesSeleccionados().length; i++) {
-						ModModeloPerfiles perfil = new ModModeloPerfiles();
-						perfil.setIdmodelocomunicacion(Long.valueOf(perfilesDTO.getIdModeloComunicacion()));
-						perfil.setFechamodificacion(new Date());
-						perfil.setIdperfil(perfilesDTO.getPerfilesSeleccionados()[i]);
-						perfil.setUsumodificacion(usuario.getIdusuario());
-						perfil.setIdinstitucion(idInstitucion);
-						modModeloPerfilesMapper.insert(perfil);
+						ModModeloPerfilesKey key = new ModModeloPerfilesKey();
+						key.setIdinstitucion(idInstitucion);
+						key.setIdmodelocomunicacion(Long.valueOf(perfilesDTO.getIdModeloComunicacion()));
+						key.setIdperfil(perfilesDTO.getPerfilesSeleccionados()[i]);
+						ModModeloPerfiles perfil = modModeloPerfilesMapper.selectByPrimaryKey(key);
+						if(perfil == null){
+							perfil = new ModModeloPerfiles();
+							perfil.setIdmodelocomunicacion(Long.valueOf(perfilesDTO.getIdModeloComunicacion()));
+							perfil.setFechamodificacion(new Date());
+							perfil.setIdperfil(perfilesDTO.getPerfilesSeleccionados()[i]);
+							perfil.setUsumodificacion(usuario.getIdusuario());
+							perfil.setIdinstitucion(idInstitucion);
+							modModeloPerfilesMapper.insert(perfil);
+						}
 					}
-					
-					
 					respuesta.setCode(200);
 					respuesta.setDescription("Datos perfiles del modelo guardados correctamente");
 					respuesta.setMessage("Updates correcto");
@@ -753,25 +759,42 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 							modModeloPlantillaenvioMapper.updateByPrimaryKey(plantillas.get(i));
 						}
 					}
-					ModModeloPlantillaenvio plantilla = new ModModeloPlantillaenvio();
-					plantilla.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
-					plantilla.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
-					plantilla.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
-					plantilla.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
-					plantilla.setPordefecto(datosPlantilla.getPorDefecto());
-					plantilla.setUsumodificacion(usuario.getIdusuario());
-					plantilla.setFechamodificacion(new Date());
-					modModeloPlantillaenvioMapper.insert(plantilla);
+					ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
+					key.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
+					key.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
+					key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
+					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
+					ModModeloPlantillaenvio plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
+					if(plantilla != null){
+						plantilla.setFechabaja(null);
+						plantilla.setUsumodificacion(usuario.getIdusuario());
+						plantilla.setFechamodificacion(new Date());
+						plantilla.setPordefecto(datosPlantilla.getPorDefecto());
+						modModeloPlantillaenvioMapper.updateByPrimaryKey(plantilla);
+					}else{
+						plantilla = new ModModeloPlantillaenvio();
+						plantilla.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
+						plantilla.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
+						plantilla.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
+						plantilla.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
+						plantilla.setPordefecto(datosPlantilla.getPorDefecto());
+						plantilla.setUsumodificacion(usuario.getIdusuario());
+						plantilla.setFechamodificacion(new Date());
+						modModeloPlantillaenvioMapper.insert(plantilla);
+					}
 					
 					//Si llega los ids antiguos es una edición del registro de la tabla por lo tanto borramos la antigua.
-					if(datosPlantilla.getIdAntiguaPlantillaEnvios() != null && datosPlantilla.getIdAntiguaTipoEnvios()!=null){
-						ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
+					if(datosPlantilla.getIdAntiguaPlantillaEnvios() != null && !datosPlantilla.getIdAntiguaPlantillaEnvios().equals(datosPlantilla.getIdPlantillaEnvios())){
+						key = new ModModeloPlantillaenvioKey();
 						key.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
 						key.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
 						key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdAntiguaPlantillaEnvios()));
 						key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdAntiguaTipoEnvios()));
-						
-						modModeloPlantillaenvioMapper.deleteByPrimaryKey(key);
+						plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
+						plantilla.setFechabaja(new Date());
+						plantilla.setUsumodificacion(usuario.getIdusuario());
+						plantilla.setFechamodificacion(new Date());
+						modModeloPlantillaenvioMapper.updateByPrimaryKey(plantilla);
 					}
 					
 					respuesta.setCode(200);
@@ -936,7 +959,9 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
 					List<PlantillaEnvioItem> plantillas = envPlantillaEnviosExtendsMapper.getTipoEnvioPlantilla(idInstitucionUser, idPlantilla, usuario.getIdlenguaje());
-					plantilla = plantillas.get(0);
+					if(plantillas != null && plantillas.size() > 0){
+						plantilla = plantillas.get(0);
+					}
 				}catch(Exception e){
 					Error error = new Error();
 					error.setCode(500);

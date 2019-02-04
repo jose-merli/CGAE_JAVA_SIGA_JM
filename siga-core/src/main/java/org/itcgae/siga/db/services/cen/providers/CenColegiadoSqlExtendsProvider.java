@@ -175,15 +175,15 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 
 		if (colegiadoItem.getTipoCV() != null && colegiadoItem.getTipoCV() != "") {
-			sql.WHERE("datoscv.idcv = '" + colegiadoItem.getTipoCV() + "'");
+			sql.WHERE("datoscv.idtipocv = '" + colegiadoItem.getTipoCV() + "'");
 		}
 
 		if (colegiadoItem.getSubTipoCV1() != null && colegiadoItem.getSubTipoCV1() != "") {
-			sql.WHERE("subt1.idtipocvsubtipo1 = '" + colegiadoItem.getSubTipoCV1() + "'");
+			sql.WHERE("datoscv.idtipocvsubtipo1 = '" + colegiadoItem.getSubTipoCV1() + "'");
 		}
 		
 		if (colegiadoItem.getSubTipoCV2() != null && colegiadoItem.getSubTipoCV2() != "") {
-			sql.WHERE("subt2.idtipocvsubtipo2 = '" + colegiadoItem.getSubTipoCV2() + "'");
+			sql.WHERE("datoscv.idtipocvsubtipo2 = '" + colegiadoItem.getSubTipoCV2() + "'");
 		}
 
 		if (colegiadoItem.getSituacion() != null && colegiadoItem.getSituacion() != "") {
