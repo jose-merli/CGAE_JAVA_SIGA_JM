@@ -122,7 +122,7 @@ public class SolicitudModificacionServiceTest {
 
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(cenTiposModificacionesExtendsMapper
-				.searchModificationRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)).thenReturn(solModificacionItems);
+				.searchModificationRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion,null)).thenReturn(solModificacionItems);
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
