@@ -29,6 +29,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
+import org.itcgae.siga.com.services.IEnviosService;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.FORMATO_SALIDA;
@@ -97,6 +98,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
 	@Autowired
 	private ModPlantilladocumentoMapper _modPlantilladocumentoMapper;
+	
+	@Autowired
+	private IEnviosService _enviosService;
 	
 
 	@Override
@@ -699,6 +703,43 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		LOGGER.info("obtenerClaseComunicacionesUnica() -> Salida del servicio para obtener la clase de comunicacion asociada la ruta indicada");
 		return response;
+	}
+		
+	public Error enviarTest(HttpServletRequest request){
+		
+		LOGGER.info("enviarTest() -> Entrada al servicio para enviar un SMS");
+		
+		Error error = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					
+					String[] destinatarios = new String[2];
+					destinatarios[0] = "691039553";
+					destinatarios[1] = "622300543";
+					_enviosService.envioSMS(destinatarios, idInstitucion, "asunto", "ESTO ES UNA PRUEBA !", false);
+					
+				}catch(Exception e){
+					LOGGER.error("Error al obtener la clase de comunicaciones");
+					error.setCode(500);
+					error.setDescription("Error al obtener la clase de comunicaciones");
+					error.setMessage(e.getMessage());
+				}					
+			}
+		}
+		
+		LOGGER.info("enviarTest() -> Salida del servicio para enviar un SMS");
+		return error;
 	}
 	
 }

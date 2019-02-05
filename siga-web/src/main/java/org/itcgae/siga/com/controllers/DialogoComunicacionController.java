@@ -85,5 +85,15 @@ public class DialogoComunicacionController {
 		else
 			return new ResponseEntity<KeysDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@RequestMapping(value = "/envioTest",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> enviarSMSTest(HttpServletRequest request) {
+		
+		Error response = _dialogoComunicacionService.enviarTest(request);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 }
