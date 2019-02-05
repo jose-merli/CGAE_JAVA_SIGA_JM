@@ -500,6 +500,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.INNER_JOIN(
 				"cen_direcciones dir ON dir.idpersona = per.idpersona and dir.idInstitucion = col.idInstitucion and dir.fechabaja is null");
 		sql.INNER_JOIN(
+				"cen_direccion_tipodireccion tipodir ON tipodir.idpersona = per.idpersona and tipodir.idInstitucion = col.idInstitucion and dir.iddireccion = tipodir.iddireccion and tipodir.idtipodireccion = '2'");
+		sql.INNER_JOIN(
 				"cen_datoscolegialesestado dat ON dat.idPersona = per.idPersona and dat.idInstitucion = dir.idInstitucion and dat.fechaestado = (select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = dat.idpersona and datcol.idinstitucion = dat.idinstitucion)");
 		sql.INNER_JOIN("cen_estadocolegial est ON est.idEstado = dat.idEstado");
 		sql.INNER_JOIN("cen_institucion inst ON inst.idinstitucion = col.idinstitucion");
