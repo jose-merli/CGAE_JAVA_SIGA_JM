@@ -2,9 +2,14 @@ package org.itcgae.siga.com.services.impl;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -19,11 +24,14 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
+import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.com.KeyItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -32,6 +40,8 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.SigaExceptions;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ConConsulta;
@@ -50,6 +60,8 @@ import org.itcgae.siga.db.services.com.mappers.ConListadoModelosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConListadoPlantillasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConModulosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConObjetivoExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModKeyclasecomunicacionExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,7 +69,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
-@Transactional
 public class ConsultasServiceImpl implements IConsultasService{
 
 	private Logger LOGGER = Logger.getLogger(ConsultasServiceImpl.class);
@@ -91,6 +102,12 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	@Autowired
 	private ModPlantillaenvioConsultaMapper _modPlantillaenvioConsultaMapper;
+	
+	@Autowired
+	private ModKeyclasecomunicacionExtendsMapper _modKeyclasecomunicacionExtendsMapper;
+	
+	@Autowired
+	private EnvTipoEnvioExtendsMapper _envTipoEnvioExtendsMapper;
 
 	
 	@Override
@@ -213,13 +230,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 				
 				comboItems = _conClaseComunicacionExtendsMapper.selectTipoClaseComunicacionByModulo(idModulo);
-				if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}		
-				
+			
 				comboDTO.setCombooItems(comboItems);
 				
 			}
@@ -261,6 +272,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 					error.setCode(500);
 					error.setMessage(e.getMessage());
 					consultasDTO.setError(error);
+					e.printStackTrace();
 				}
 			}
 		}
@@ -269,6 +281,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
+	@Transactional
 	public Error duplicarConsulta(HttpServletRequest request, ConsultaItem[] consultas) {
 		LOGGER.info("duplicarConsulta() -> Entrada al servicio de duplicar consultas");
 
@@ -297,9 +310,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setIdconsulta(Long.valueOf(id.getNewId()));
 						String descripcion = "Copia " + i+1 +"_" + consulta.getDescripcion();
 						consulta.setIdinstitucion(idInstitucion);
-						if(idInstitucion == 2000){
-							consulta.setGeneral("S");
-						}else{
+						if(idInstitucion.shortValue() != SigaConstants.IDINSTITUCION_2000.shortValue()){
 							consulta.setGeneral("N");
 						}
 						consulta.setDescripcion(descripcion);
@@ -323,6 +334,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
+	@Transactional
 	public Error borrarConsulta(HttpServletRequest request, ConsultaItem[] consultas) {
 		LOGGER.info("borrarConsulta() -> Entrada al servicio de borrar consulta");
 
@@ -414,6 +426,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
+	@Transactional
 	public Error guardarDatosGenerales(HttpServletRequest request, ConsultaItem consultaDTO) {
 		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar tarjeta general");
 		// Conseguimos información del usuario logeado
@@ -444,30 +457,38 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setGeneral(consultaDTO.getGenerica());
 						consulta.setFechamodificacion(new Date());
 						consulta.setUsumodificacion(usuario.getIdusuario());
+						String sentencia = "";
 						switch(consultaDTO.getIdObjetivo().toString()){
 							case "1":
 								consulta.setTipoconsulta("E");
-								consulta.setSentencia(insertarSelectDestinatarios()+ "<FROM></FROM>");
+								sentencia = insertarSelectDestinatarios()+ "<FROM></FROM>";
 								break;
 							case "2":
 								consulta.setTipoconsulta("M");
-								consulta.setSentencia("<SELECT></SELECT><FROM></FROM>");
+								sentencia = "<SELECT></SELECT><FROM></FROM>";
 								break;
 							case "3":
 								consulta.setTipoconsulta("W");
-								consulta.setSentencia("<SELECT></SELECT><FROM></FROM>");
+								sentencia = "<SELECT></SELECT><FROM></FROM>";
 								break;
 							case "4":
 								consulta.setTipoconsulta("C");
-								consulta.setSentencia("<SELECT></SELECT><FROM></FROM>");
+								sentencia = "<SELECT></SELECT><FROM></FROM>";
 								break;
 						}
+						
+						
+						//Si tiene clase de comunicación añadimos el where con las claves
+						sentencia = insertarClaves(consulta.getIdclasecomunicacion(), sentencia);
+						consulta.setSentencia(sentencia);
+						
 						_conConsultaMapper.insert(consulta);
 						respuesta.setMessage(consulta.getIdconsulta().toString());
 						respuesta.setDescription(consulta.getSentencia());
 						respuesta.setInfoURL(consulta.getIdinstitucion().toString());
 						respuesta.setCode(200);
 					}else{
+						Long objetivoAnterior = (long)0;
 						ConConsultaKey key = new ConConsultaKey();
 						key.setIdconsulta(Long.parseLong(consultaDTO.getIdConsulta()));
 						key.setIdinstitucion(Short.parseShort(consultaDTO.getIdInstitucion()));
@@ -477,12 +498,17 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setObservaciones(consultaDTO.getDescripcion());
 						consulta.setGeneral(consultaDTO.getGenerica());
 						consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
+						objetivoAnterior = consulta.getIdobjetivo();
 						consulta.setIdobjetivo(Long.valueOf(consultaDTO.getIdObjetivo()));
+						String sentencia = consulta.getSentencia();
 						switch(consultaDTO.getIdObjetivo()){
 						case "1":
 							//Destinarios
 							consulta.setTipoconsulta("E");
-							camposIncorrectos = comprobarCamposDestinarios(consulta.getSentencia());
+							//camposIncorrectos = comprobarCamposDestinarios(consulta.getSentencia());
+							if(objetivoAnterior != Long.valueOf(consultaDTO.getIdObjetivo())){
+								sentencia = insertarSelectDestinatarios(sentencia);
+							}
 							//insertarSelectDestinatarios(consulta.getSentencia());
 							break;
 						case "2":
@@ -501,6 +527,10 @@ public class ConsultasServiceImpl implements IConsultasService{
 							break;
 						}
 						
+						//Si tiene clase de comunicación añadimos el where con las claves
+						sentencia = insertarClaves(consulta.getIdclasecomunicacion(), sentencia);
+						consulta.setSentencia(sentencia);
+						
 						if(consultaDTO.getIdObjetivo().equals("E")){
 							if(!camposIncorrectos){
 								respuesta.setCode(400);
@@ -510,12 +540,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 								respuesta.setCode(200);
 								respuesta.setMessage(consulta.getIdconsulta().toString());
 								respuesta.setInfoURL(consulta.getIdinstitucion().toString());
+								respuesta.setDescription(consulta.getSentencia());
 							}
 						}else{
 							_conConsultaMapper.updateByPrimaryKeyWithBLOBs(consulta);
 							respuesta.setCode(200);
 							respuesta.setMessage(consulta.getIdconsulta().toString());
 							respuesta.setInfoURL(consulta.getIdinstitucion().toString());
+							respuesta.setDescription(consulta.getSentencia());
 						}
 						
 					}
@@ -554,7 +586,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 				try {
 					modeloList = _conListadoModelosExtendsMapper.selectListadoModelos(usuario.getIdinstitucion(),
-							 consulta);
+							 consulta.getIdConsulta());
 					if (modeloList.size() > 0) {
 						conListadoModelosDTO.setListadoModelos(modeloList);
 					}
@@ -563,6 +595,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 					error.setCode(500);
 					error.setMessage(e.getMessage());
 					conListadoModelosDTO.setError(error);
+					e.printStackTrace();
 				}
 			}
 		}
@@ -593,7 +626,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 				try {
 					plantillasList = _conListadoPlantillasExtendsMapper.selectListadoPlantillas(usuario.getIdinstitucion(),
-							usuario.getIdlenguaje(), consulta);
+							usuario.getIdlenguaje(), consulta.getIdConsulta());
 					if (plantillasList.size() > 0) {
 						conListadoPlantillasDTO.setListadoPlantillas(plantillasList);
 					}
@@ -602,6 +635,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 					error.setCode(500);
 					error.setMessage(e.getMessage());
 					conListadoPlantillasDTO.setError(error);
+					e.printStackTrace();
 				}
 			}
 		}
@@ -611,8 +645,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 
 	@Override
+	@Transactional
 	public Error guardarConsulta(HttpServletRequest request, ConsultaItem consultaDTO) {
-		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar tarjeta general");
+		LOGGER.info("guardarConsulta() -> Entrada al servicio para guardar la sentencia de la consulta");
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -627,17 +662,31 @@ public class ConsultasServiceImpl implements IConsultasService{
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
+					boolean etiquetasIncorrectas = false;
 					boolean camposIncorrectos = false;
+					boolean objetivoIncorrecto = false;
 					
 					ConConsultaKey key = new ConConsultaKey();
 					key.setIdconsulta(Long.parseLong(consultaDTO.getIdConsulta()));
 					key.setIdinstitucion(idInstitucion);
-					ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
-					camposIncorrectos = comprobarEtiquetas(consultaDTO.getSentencia());
+					ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);					
+					etiquetasIncorrectas = comprobarEtiquetas(consultaDTO.getSentencia());
 					
-					if(camposIncorrectos){
+					// Comprombamos que en el where se tienen las keys asociadas a la clase
+					camposIncorrectos = comprobarClaves(consultaDTO.getSentencia(), consultaDTO.getIdClaseComunicacion());
+					
+					// Comprobamos que cumple el objetivo
+					objetivoIncorrecto = comprobarObjetivo(consultaDTO.getSentencia(), consultaDTO.getIdObjetivo());
+					
+					if(etiquetasIncorrectas){
 						respuesta.setCode(400);
-						respuesta.setMessage("Campos incorrectos");
+						respuesta.setMessage("Faltan etiquetas");
+					}else if(camposIncorrectos){
+						respuesta.setCode(400);
+						respuesta.setMessage("Faltan claves por rellenar");
+					}else if(objetivoIncorrecto){
+						respuesta.setCode(400);
+						respuesta.setMessage("No cumple con las restricciones del objetivo");
 					}else{
 						consulta.setSentencia(consultaDTO.getSentencia());
 						consulta.setFechamodificacion(new Date());
@@ -655,12 +704,12 @@ public class ConsultasServiceImpl implements IConsultasService{
 			}
 		}
 		
-		LOGGER.info("guardarDatosGenerales() -> Salida del servicio para guardar tarjeta general");
+		LOGGER.info("guardarConsulta() -> Salida del servicio para guardar la sentencia de la consulta");
 		return respuesta;
 	}
 
 	@Override
-	public File ejecutarConsulta(HttpServletRequest request, String consulta) {
+	public File ejecutarConsulta(HttpServletRequest request, ConsultaItem consulta) {
 		
 		LOGGER.info("ejecutarConsulta() -> Entrada al servicio para ejecutar una consulta");
 		// Conseguimos información del usuario logeado
@@ -675,10 +724,15 @@ public class ConsultasServiceImpl implements IConsultasService{
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (null != usuarios && usuarios.size() > 0) {
-				
+				AdmUsuarios usuario = usuarios.get(0);
 				try{
+					
+					//Reemplazamos los campos dinamicos
+					String sentencia = procesarEjecutarConsulta(usuario, consulta.getSentencia(), consulta.getCamposDinamicos(), true);
+					
+					
 					Map<String,String> mapa = new HashMap<String,String>();
-					mapa = obtenerMapaConsulta(consulta);
+					mapa = obtenerMapaConsulta(sentencia);
 					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
 					if(result != null){
 						Workbook workBook = crearExcel(result);
@@ -730,7 +784,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 		if(!sentencia.contains("CEN_DIRECCIONES.FAX2 AS \"FAX2\"")){
 			camposIncorrectos = true;
 		}
-		if(!sentencia.contains("CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\"")){
+		if(!sentencia.contains("CEN_DIRECCIONES.IDPAIS AS \"IDPAIS\"")){
 			camposIncorrectos = true;
 		}
 		if(!sentencia.contains("CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\"")){
@@ -745,89 +799,127 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 	public boolean comprobarEtiquetas(String sentencia){
 		boolean etiquetasInsuficientes = false;
-//		Pattern regexSelect = Pattern.compile("\\bSELECT\\b");
-//		Matcher match = regexSelect.matcher(sentencia);
-//		
-//		if(!match.find()){
-//			etiquetasInsuficientes = true;
-//		}
 		
-		if(!sentencia.contains("<SELECT>") || !sentencia.contains("</SELECT>")){
-			etiquetasInsuficientes = true;
+		if(sentencia != null){
+			if(!sentencia.contains("<SELECT>") || !sentencia.contains("</SELECT>")){
+				etiquetasInsuficientes = true;
+			}
+			if(!sentencia.contains("<FROM>") || !sentencia.contains("</FROM>")){
+				etiquetasInsuficientes = true;
+			}
 		}
-		if(!sentencia.contains("<FROM>") || !sentencia.contains("</FROM>")){
-			etiquetasInsuficientes = true;
-		}
+		
 		return etiquetasInsuficientes;
+	}
+	
+	public boolean comprobarClaves(String sentencia, String idClaseComunicacion){
+		boolean incorrecta = false;
+		
+		List<KeyItem> listaKeys = null;
+		
+		if(idClaseComunicacion != null && !"".equals(idClaseComunicacion)){
+			listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
+			for(KeyItem key : listaKeys){
+				String etiquetaKey = SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + key.getNombre() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO;
+				if(sentencia.indexOf(etiquetaKey) == -1){
+					incorrecta = true;
+				}
+			}
+		}
+		
+		return incorrecta;
+	}
+	
+	public boolean comprobarObjetivo(String sentencia, String idObjetivo){
+		boolean incorrecto = false;
+		
+		if(Long.parseLong(idObjetivo) == SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo().longValue()){
+			incorrecto = comprobarCamposDestinarios(sentencia);
+		}	
+		
+		return incorrecto;
 	}
 	
 	public String insertarSelectDestinatarios (String sentencia){
 		
 		int indexInicio = sentencia.indexOf("<SELECT>")+8;
 		int indexFinal = sentencia.indexOf("</SELECT>");
-		String select = sentencia.substring(indexInicio, indexFinal);
+		String select = "SELECT";
+		
+		select+= " CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\", ";
+		select+= " CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\", ";
+		select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
+		select+= " CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\", ";
+		select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
+		select+= " CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\", ";
+		select+= " CEN_DIRECCIONES.MOVIL AS \"MOVIL\", ";	
+		select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
+		select+= " CEN_DIRECCIONES.FAX1 AS \"FAX1\", ";	
+		select+= " CEN_DIRECCIONES.FAX2 AS \"FAX2\", ";
+		select+= " CEN_DIRECCIONES.IDPAIS AS \"IDPAIS\", ";
+		select+= " CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\", ";
+		select+= " CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\" ";		
 
+		if(indexInicio > -1 && indexFinal > -1){
+			sentencia = sentencia.substring(0, indexInicio) + select + sentencia.substring(indexFinal, sentencia.length());
+		}else{
+			sentencia = "<SELECT>" + select + "</SELECT>" + sentencia;
+		}
 		
-		if(!sentencia.contains("CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\"")){
-			select+= " CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\", ";
-		}
-		if(!sentencia.contains("CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\"")){
-			select+= " CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\", ";
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
-			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\"")){
-			select+= " CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\", ";
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
-			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\"")){
-			select+= " CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\", ";
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.MOVIL AS \"MOVIL\"")){
-			select+= " CEN_DIRECCIONES.MOVIL AS \"MOVIL\", ";	
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ")){
-			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.FAX1 AS \"FAX1\", ")){
-			select+= " CEN_DIRECCIONES.FAX1 AS \"FAX1\"";	
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.FAX2 AS \"FAX2\"")){
-			select+= " CEN_DIRECCIONES.FAX2 AS \"FAX2\", ";
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\"")){
-			select+= " CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\", ";
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\"")){
-			select+= " CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\", ";
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\"")){
-			select+= " CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\", ";
-		}
-		StringBuffer sentenciaFinal = new StringBuffer(sentencia);
-		sentenciaFinal.insert(indexInicio, select);
-		
-		return sentenciaFinal.toString();
+		return sentencia;
 	}
 	
 	public String insertarSelectDestinatarios (){
 
-		return "<SELECT>CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\""
-				+ "CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\""
-				+ "CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\""
-				+ "CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\""
-				+ "CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\""
-				+ "CEN_DIRECCIONES.MOVIL AS \"MOVIL\""
-				+ "CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\""
-				+ "CEN_DIRECCIONES.FAX1 AS \"FAX1\""
-				+ "CEN_DIRECCIONES.FAX2 AS \"FAX2\""
-				+ "CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\""
-				+ "CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\""
-				+ "CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\""
-				+ "</SELECT>";
+		String select = "<SELECT> SELECT ";
+		
+		select+= " CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\", ";
+		select+= " CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\", ";
+		select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
+		select+= " CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\", ";
+		select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
+		select+= " CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\", ";
+		select+= " CEN_DIRECCIONES.MOVIL AS \"MOVIL\", ";	
+		select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
+		select+= " CEN_DIRECCIONES.FAX1 AS \"FAX1\", ";	
+		select+= " CEN_DIRECCIONES.FAX2 AS \"FAX2\", ";
+		select+= " CEN_DIRECCIONES.IDPAIS AS \"IDPAIS\", ";
+		select+= " CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\", ";
+		select+= " CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\" </SELECT>";
+		
+		return select;
+	}
+	
+	public String insertarClaves(Short idClaseComunicaciones, String sentencia){
+		
+		int indexInicio = sentencia.indexOf("<WHERE>")+7;
+		int indexFinal = sentencia.indexOf("</WHERE>");
+		String sentenciaFinal = "";
+		String where = "";		
+		
+		List<KeyItem> listaKeys = null;
+		
+		if(idClaseComunicaciones != null){
+			listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(idClaseComunicaciones);
+			for(int i=0; i < listaKeys.size(); i++){
+				KeyItem key = listaKeys.get(i);
+				if(i !=0){
+					where = where + " AND ";
+				}else{
+					where = "WHERE ";
+				}
+				String etiquetaKey = SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + key.getNombre() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO;
+				where = where + key.getTabla().trim() + "." + key.getNombre() + " = " + etiquetaKey;				
+			}
+		}		
+		
+		if(indexInicio > -1 && indexFinal > -1){
+			sentenciaFinal = sentencia.substring(0, indexInicio) + where + sentencia.substring(indexFinal, sentencia.length());
+		}else{
+			sentenciaFinal = sentencia + "<WHERE>" + where + "</WHERE>";
+		}
+		
+		return sentenciaFinal;
 	}
 	
 	public String obtenerSelect(String consulta){
@@ -953,6 +1045,29 @@ public class ConsultasServiceImpl implements IConsultasService{
 		return having;
 	}
 	
+	public String obtenerUnion(String consulta){
+		String union = "";
+
+		if(consulta.indexOf("<UNION>") != -1){
+			int inicioUnion = consulta.indexOf("<UNION>")+7;
+			int finUnion = consulta.indexOf("</UNION>");
+			union = consulta.substring(inicioUnion, finUnion)+" ";
+		}
+
+		return union;
+	}
+	public String obtenerUnionAll(String consulta){
+		String union = "";
+
+		if(consulta.indexOf("<UNIONALL>") != -1){
+			int inicioUnion = consulta.indexOf("<UNIONALL>")+10;
+			int finUnion = consulta.indexOf("</UNIONALL>");
+			union = consulta.substring(inicioUnion, finUnion)+" ";
+		}
+
+		return union;
+	}
+	
 	public Workbook crearExcel(List<Map<String, Object>> result){
 		
 		//Creamos el libro de excel
@@ -976,33 +1091,35 @@ public class ConsultasServiceImpl implements IConsultasService{
         List<String> columnsKey = new ArrayList<String>();
         int rowNum = 1;
         int index = 0;
-        for (String value : result.get(0).keySet()) {
-        	Cell cell = headerRow.createCell(index);
-			cell.setCellValue(value);
-			cell.setCellStyle(headerCellStyle);
-			columnsKey.add(value);
-			index++;
-		}
-        
-        for (Map<String, Object> map : result) {
-        	
-        	Row row = sheet.createRow(rowNum++);
-        	int cell = 0;
-        	
-        	for(int i = 0; i < columnsKey.size(); i++){
-        		Object campo = map.get(columnsKey.get(i).trim());
-        		if(campo == null || campo.toString().trim() == ""){
-        			row.createCell(cell).setCellValue("null");
-        		}else{
-        			row.createCell(cell).setCellValue(campo.toString());
-        		}
-        		cell++;
-        	}
-		}
-        
-        for(int i = 0; i < index; i++) {
-            sheet.autoSizeColumn(i);
-        }
+        if(result.size() > 0){
+        	for (String value : result.get(0).keySet()) {
+            	Cell cell = headerRow.createCell(index);
+    			cell.setCellValue(value);
+    			cell.setCellStyle(headerCellStyle);
+    			columnsKey.add(value);
+    			index++;
+    		}
+            
+            for (Map<String, Object> map : result) {
+            	
+            	Row row = sheet.createRow(rowNum++);
+            	int cell = 0;
+            	
+            	for(int i = 0; i < columnsKey.size(); i++){
+            		Object campo = map.get(columnsKey.get(i).trim());
+            		if(campo == null || campo.toString().trim() == ""){
+            			row.createCell(cell).setCellValue("null");
+            		}else{
+            			row.createCell(cell).setCellValue(campo.toString());
+            		}
+            		cell++;
+            	}
+    		}
+            
+            for(int i = 0; i < index; i++) {
+                sheet.autoSizeColumn(i);
+            }
+        }        
         
         return workbook;
 
@@ -1022,7 +1139,861 @@ public class ConsultasServiceImpl implements IConsultasService{
 		mapa.put("orderByValue", obtenerOrderBy(consulta));
 		mapa.put("groupByValue", obtenerGroupBy(consulta));
 		mapa.put("havingValue", obtenerHaving(consulta));
+		mapa.put("unionValue", obtenerUnion(consulta));
+		mapa.put("unionAllValue", obtenerUnionAll(consulta));
 		return mapa;
+	}
+	
+	@Override
+	public CamposDinamicosDTO obtenerCamposConsulta(HttpServletRequest request, String idClaseComunicacion, String consulta){		
+		
+		
+		LOGGER.info("obtenerCamposConsulta() -> Entrada al servicio para obtener los parámetros dinámicos de la consulta");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		CamposDinamicosDTO response = new CamposDinamicosDTO();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				
+				
+				List<CampoDinamicoItem> listaCampos = null;
+				try {
+					
+					List<KeyItem> listaKeys = null;
+					
+					if(idClaseComunicacion != null){
+						listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
+					}				
+					
+					listaCampos = obtenerCamposDinamicos(usuario, consulta);
+					response.setCamposDinamicos(listaCampos);
+					
+				} catch (Exception e) {
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage(e.getMessage());
+					response.setError(error);
+					e.printStackTrace();
+				}
+			}			
+			
+		}
+		LOGGER.info("obtenerCamposConsulta() -> Salida del servicio para obtener los parámetros dinámicos de la consulta");
+		return response;
+	}
+	
+	public List<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, String consulta) throws Exception{
+		
+		List<CampoDinamicoItem> listaCamposDinamicos = new ArrayList<CampoDinamicoItem>();
+		CampoDinamicoItem campoDinamico = null;
+		
+		List<String> tipoDatos = new ArrayList<String>();
+		String campo="";
+		String alias="";
+		
+		// Cargamos el vector de tipo de los tipos de datos de los criterios dinamicos
+		tipoDatos.add(SigaConstants.ETIQUETATIPONUMERO);
+		tipoDatos.add(SigaConstants.ETIQUETATIPOTEXTO);
+		tipoDatos.add(SigaConstants.ETIQUETATIPOFECHA);
+		tipoDatos.add(SigaConstants.ETIQUETATIPOMULTIVALOR);
+		
+		
+		String sentencia_aux="";
+		String sentenciaOriginalAux="";
+		
+		boolean continuar=true;
+		List<String> ayuda = new ArrayList<String>();
+		
+		List<String> operadoresList = new ArrayList<String>();
+		operadoresList.add("=");
+		operadoresList.add("!=");
+		operadoresList.add(">");
+		operadoresList.add(">=");
+		operadoresList.add("<");
+		operadoresList.add("<=");
+		operadoresList.add("IS NULL");
+		operadoresList.add("LIKE");
+		operadoresList.add("OPERADOR");
+		
+		String selectExperta = consulta.toUpperCase().replaceAll("\r\n"," ");
+		String selectOriginal = consulta.replaceAll("\r\n"," ");
+		
+		if ((selectExperta.indexOf(SigaConstants.ETIQUETATIPONUMERO))>=0 || (selectExperta.indexOf(SigaConstants.ETIQUETATIPOTEXTO))>=0 || (selectExperta.indexOf(SigaConstants.ETIQUETATIPOFECHA)>=0 ||(selectExperta.indexOf(SigaConstants.ETIQUETATIPOMULTIVALOR))>=0 ) || selectExperta.indexOf(SigaConstants.ETIQUETATIPOENVIO) > 0){
+	  		if (selectExperta.toUpperCase().indexOf("%%IDINSTITUCION%%")>=0){
+	  			selectExperta=selectExperta.toUpperCase().replaceAll("%%IDINSTITUCION%%",String.valueOf(usuario.getIdinstitucion()));
+	  			selectOriginal=selectOriginal.replaceAll("%%IDINSTITUCION%%",String.valueOf(usuario.getIdinstitucion()));	  			
+			}
+		}else{
+			return null;
+		}
+		
+		try{	
+			//Buscamos los criterios dinamicos que pueda haber en la sentencia select construida	 	
+		 	String critCampoSalida=selectExperta;
+		 	sentencia_aux=critCampoSalida;
+		 	sentenciaOriginalAux = selectOriginal;
+		 	continuar=true;
+		 	
+		 	for (int i=0;i<tipoDatos.size();i++){// Para cada tipo de datos
+		 		continuar=true;
+		 		sentencia_aux=critCampoSalida;
+		 		sentenciaOriginalAux = selectOriginal;
+		 		String operadorEncontrado = "";
+		 		while ((continuar)&& (sentencia_aux.length()>0)){
+		 			operadorEncontrado = "";
+		 			//int pos_ini2 =sentencia_aux.lastIndexOf(v_tipoDatos.get(i).toString());
+		 			int pos_ini=sentencia_aux.indexOf(tipoDatos.get(i).toString());
+		 			if (pos_ini>=0){
+		 				campoDinamico = new CampoDinamicoItem();
+		 				
+		 				String sentenciaA=sentencia_aux.substring(0,pos_ini);
+		 				
+		 				String operadores[] = sentenciaA.split("%%");
+		 				for (int j = operadores.length-1; j >= 0 ; j--) {
+							String operador = operadores[j];
+							if(operadoresList.contains(operador)){
+								operadorEncontrado = operador;
+								break;
+								
+							}
+								
+						}
+		 				 
+		 				//--int pos_fin = sentencia_aux.indexOf("AND");
+		 				String sentenciaAyuda=sentencia_aux.substring(pos_ini);
+		 				int pos_fin = sentenciaAyuda.indexOf("AND");
+		 				String sentenciaAyudaOriginal = null;
+		 				if(pos_fin==-1)
+		 					sentenciaAyudaOriginal = sentenciaOriginalAux.substring(pos_ini);
+		 				else
+		 					sentenciaAyudaOriginal = sentenciaOriginalAux.substring(pos_ini,pos_ini+pos_fin);
+		 				
+		 				campo=getAliasMostrar(sentenciaA);
+		 				campoDinamico.setCampo(campo);		 				
+		 				//listaCampos.add(campo);
+		 				
+		 				alias=getAliasCompleto(sentenciaA);
+		 				campoDinamico.setAlias(alias);
+		 				//listaAlias.add(alias);
+		 				
+		 				int posicionValue = sentenciaAyudaOriginal.toUpperCase().indexOf(" DEFECTO ");
+				 		String valorDefecto = null;
+				 		if (posicionValue>=0){
+				 			String valueDefecto = sentenciaAyudaOriginal.substring(posicionValue);
+				 			int inicio=valueDefecto.indexOf("\"");
+				 			String auxiliar =valueDefecto.substring(inicio+1) ;
+							int fin=auxiliar.indexOf("\"");
+							String retorno=null;
+							if(inicio!=-1 && fin!=-1){
+								valorDefecto=auxiliar.substring(0,fin);
+							}
+					    }
+				 		//listaValorDefecto.add(valorDefecto==null?"":valorDefecto);
+				 		campoDinamico.setValorDefecto(valorDefecto==null?"":valorDefecto);
+				 		
+				 		int posicionNulo = sentenciaAyudaOriginal.toUpperCase().indexOf(" NULO ");
+				 		String valorNulo = null;
+				 		if (posicionNulo>=0){
+				 			String valueNulo = sentenciaAyudaOriginal.substring(posicionNulo);
+				 			int inicio=valueNulo.indexOf("\"");
+				 			String auxiliar =valueNulo.substring(inicio+1) ;
+							int fin=auxiliar.indexOf("\"");
+							String retorno=null;
+							if(inicio!=-1 && fin!=-1){
+								valorNulo=auxiliar.substring(0,fin);
+							}
+					    }
+				 		//listaValorNulo.add(valorNulo==null?Boolean.FALSE:valorNulo.toLowerCase().equals("si")?Boolean.TRUE:Boolean.FALSE);
+				 		campoDinamico.setValorNulo(valorNulo==null?Boolean.FALSE:valorNulo.toLowerCase().equals("si")?Boolean.TRUE:Boolean.FALSE);
+				 		
+		 			 if (tipoDatos.get(i).toString().equals(SigaConstants.ETIQUETATIPONUMERO)){	
+		 					 				
+		 				//listaOperaciones.add(operadorEncontrado);
+		 				 campoDinamico.setOperacion(operadorEncontrado);
+		 				 
+		  				//listaValores.add(null);
+		 				campoDinamico.setValores(null);
+		 				
+		  				//tipoCampo.add("N");
+		 				campoDinamico.setTipoDato(SigaConstants.TIPONUMERO);
+		 				
+		  				//ayuda.add("-1");
+		 				campoDinamico.setAyuda("-1");
+		 				
+		 			 }else if(tipoDatos.get(i).toString().equals(SigaConstants.ETIQUETATIPOTEXTO)){		 				
+		 				//listaOperaciones.add(operadorEncontrado);
+		 				 campoDinamico.setOperacion(operadorEncontrado);
+		 				 
+		  				//listaValores.add(null);
+		 				campoDinamico.setValores(null);
+		 				
+		  				//tipoCampo.add("A");
+		 				campoDinamico.setTipoDato(SigaConstants.TIPOTEXTO);
+		 				
+		  				//ayuda.add("-1");
+		 				campoDinamico.setAyuda("-1");
+		 			 }else if (tipoDatos.get(i).toString().equals(SigaConstants.ETIQUETATIPOFECHA)){
+		 				
+		 				//listaOperaciones.add(operadorEncontrado);
+		 				 campoDinamico.setOperacion(operadorEncontrado);
+		 				 
+		  				//listaValores.add(null);
+		 				campoDinamico.setValores(null);
+		 				
+		  				if(operadorEncontrado.equalsIgnoreCase("IS NULL")){
+		  					//tipoCampo.add("X");
+			 				campoDinamico.setTipoDato(SigaConstants.TIPOFECHANULA);
+		  				}
+		  				else{
+		  					//tipoCampo.add("D");
+			 				campoDinamico.setTipoDato(SigaConstants.TIPOFECHA);
+		  				}
+		  				
+		  				//ayuda.add("-1");
+		 				campoDinamico.setAyuda("-1");
+		 				
+		  				if(valorDefecto!=null && valorDefecto.equalsIgnoreCase("sysdate")){
+		  					//listaValorDefecto.add(new Date().toString());
+		  					DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+
+			  				Date today = Calendar.getInstance().getTime();        
+
+			  				String sDate = df.format(today);
+		  				
+		  					campoDinamico.setValorDefecto(sDate);
+		  				}
+		  				
+		 			 }else if (tipoDatos.get(i).toString().equals(SigaConstants.ETIQUETATIPOMULTIVALOR)){
+		 				
+		 				//listaOperaciones.add(operadorEncontrado);
+		 				campoDinamico.setOperacion(operadorEncontrado);
+		 				
+		 				//Obtenemos los resultados de la query multivalor
+
+		 				String selectAyuda = obtenerSelectAyuda(sentenciaAyuda,usuario);
+		 				//ayuda.add(selectAyuda+"%%");
+		 				campoDinamico.setAyuda(selectAyuda+"%%");
+		 				
+		 				if (selectAyuda!=null && !selectAyuda.equals("")){
+		 					List<Map<String, Object>>  valores = _conConsultasExtendsMapper.ejecutarConsultaString(selectAyuda);
+		 					/*RowsContainer rc2 = null;
+		 					rc2 = new RowsContainer();
+		 					rc2.query(selectAyuda);
+		 					listaValores.add(rc2.getAll());
+		 					tipoCampo.add("MV");*/
+		 					
+		 					campoDinamico.setValores(valores);
+		 					campoDinamico.setTipoDato(SigaConstants.TIPOMULTIVALOR);
+		 				}	 				
+		 			
+		 			 }
+		 				
+		 			 	listaCamposDinamicos.add(campoDinamico);
+		 			}else{
+		 				continuar=false;
+		 			}
+		 			
+		 			sentencia_aux=sentencia_aux.substring(pos_ini+tipoDatos.get(i).toString().length());
+		 			sentenciaOriginalAux=sentenciaOriginalAux.substring(pos_ini+tipoDatos.get(i).toString().length());
+		 		}
+		 		
+		 		
+		 	}
+		 	
+		 	if(selectExperta.indexOf(SigaConstants.ETIQUETATIPOENVIO) > 0){
+		 		
+		 		// Si encontramos la etiqueta %%tipoenvio%% añadimos como valor dinamico el combo de tipo de envios
+		 		campoDinamico = new CampoDinamicoItem();
+		 		campoDinamico.setOperacion(null);
+		 		campoDinamico.setTipoDato(SigaConstants.TIPOENVIO);
+		 		campoDinamico.setAlias(SigaConstants.NOMBRETIPOENVIO);
+		 		campoDinamico.setCampo(SigaConstants.NOMBRETIPOENVIO);
+		 		
+		 		List<Map<String, Object>>  valores = _envTipoEnvioExtendsMapper.selectTipoEnviosConsultas(usuario.getIdlenguaje());
+		 		campoDinamico.setValores(valores);
+		 		listaCamposDinamicos.add(campoDinamico);
+		 	}
+		 	
+		 	return listaCamposDinamicos;
+	
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+		
+	
+	protected static String getAliasMostrar(String sentencia) {
+		String operador="";
+		sentencia=sentencia.toUpperCase();
+		int pos_AND=sentencia.lastIndexOf(" AND ");
+		int pos_OR=sentencia.lastIndexOf(" OR ");
+		int pos_WHERE=sentencia.lastIndexOf("WHERE");
+		int posicion=-1;
+		if (pos_AND <0 && pos_OR<0){
+			posicion=sentencia.toUpperCase().lastIndexOf("WHERE");
+			sentencia=sentencia.substring(posicion+"WHERE".length());
+			if (sentencia.toUpperCase().lastIndexOf(" AS ")>=0){// Existe Alias
+				int posAs=sentencia.toUpperCase().lastIndexOf(" AS ");
+				int posEtiquetaOperador=sentencia.toUpperCase().indexOf(SigaConstants.ETIQUETAOPERADOR);
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%!=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%>%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%>=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%<%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%<=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%IS NULL%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%LIKE%%");
+				}
+
+				sentencia=sentencia.substring(posAs+" AS ".length(),posEtiquetaOperador).replaceAll("\"","");
+
+
+
+			}else{// no hay alias
+				int posEtiquetaOperador=sentencia.toUpperCase().indexOf(SigaConstants.ETIQUETAOPERADOR);
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%!=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%>%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%>=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%<%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%<=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%IS NULL%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%LIKE%%");
+				}
+				sentencia=sentencia.substring(0,posEtiquetaOperador);
+
+				if (sentencia.indexOf(".")>=0){
+					sentencia=sentencia.substring(sentencia.indexOf(".")+1);
+				}
+
+
+			}
+
+		}else{ 
+			if ((pos_AND>pos_OR)&& (pos_AND>pos_WHERE)){
+				operador=" AND ";
+				posicion=pos_AND;
+			}else if ((pos_OR>pos_AND)&& (pos_OR>pos_WHERE)){
+				operador=" OR ";
+				posicion=pos_OR;
+			}else if ((pos_WHERE>pos_AND)&& (pos_WHERE>pos_OR)){
+				operador="WHERE";
+				posicion=pos_WHERE;
+			}
+			sentencia=sentencia.substring(posicion+operador.length());
+
+			if (sentencia.toUpperCase().lastIndexOf(" AS ")>=0){// Existe Alias
+				int posAs=sentencia.toUpperCase().lastIndexOf(" AS ");
+				int posEtiquetaOperador=sentencia.toUpperCase().indexOf(SigaConstants.ETIQUETAOPERADOR);
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%!=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%>%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%>=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%<%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%<=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%IS NULL%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%LIKE%%");
+				}
+
+
+				sentencia=sentencia.substring(posAs+" AS ".length(),posEtiquetaOperador).replaceAll("\"","");
+
+
+
+			}else{// no hay alias
+				int posEtiquetaOperador=sentencia.toUpperCase().indexOf(SigaConstants.ETIQUETAOPERADOR);
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%!=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%>%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%>=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%<%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%<=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%IS NULL%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%LIKE%%");
+				}
+
+				sentencia=sentencia.substring(0,posEtiquetaOperador);
+
+				if (sentencia.indexOf(".")>=0){
+					sentencia=sentencia.substring(sentencia.indexOf(".")+1);
+				}
+
+			}
+		}	
+
+		return sentencia;
+	}
+	
+	protected static String getAliasCompleto(String sentencia){
+		String operador="";
+		int pos_AND=sentencia.lastIndexOf(" AND ");
+		int pos_OR=sentencia.lastIndexOf(" OR ");
+		int pos_WHERE=sentencia.lastIndexOf(" WHERE ");
+		int posicion=-1;
+		
+		if (pos_AND <0 && pos_OR<0){
+			posicion=sentencia.toUpperCase().lastIndexOf("WHERE");
+			sentencia=sentencia.substring(posicion+"WHERE".length());
+			if (sentencia.toUpperCase().lastIndexOf(" AS ")>=0){// Existe Alias
+	            int posAs=sentencia.toUpperCase().lastIndexOf(" AS ");
+	            int posEtiquetaOperador=sentencia.toUpperCase().indexOf(SigaConstants.ETIQUETAOPERADOR);
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%!=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%>%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%>=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%<%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%<=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%IS NULL%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%LIKE%%");
+				}
+
+              
+       
+            sentencia=sentencia.substring(posAs,posEtiquetaOperador);
+       
+        
+		  	
+		    }else{// no hay alias
+		  
+		     /*sentencia=sentencia.substring(0,sentencia.toUpperCase().indexOf(ClsConstants.ETIQUETAOPERADOR));
+			
+		     if (sentencia.indexOf(".")>=0){
+		  	  sentencia=sentencia.substring(sentencia.indexOf(".")+1);
+		     }*/
+		    	sentencia="-1";
+		  
+			
+		   }
+		}else{ 
+			if ((pos_AND>pos_OR)&& (pos_AND>pos_WHERE)){
+				operador=" AND ";
+				posicion=pos_AND;
+			  }else if ((pos_OR>pos_AND)&& (pos_OR>pos_WHERE)){
+			  	operador=" OR ";
+			  	posicion=pos_OR;
+			  }else if ((pos_WHERE>pos_AND)&& (pos_WHERE>pos_OR)){
+			  	operador="WHERE";
+			  	posicion=pos_WHERE;
+			  }
+		    sentencia=sentencia.substring(posicion+operador.length());
+			
+			if (sentencia.toUpperCase().lastIndexOf(" AS ")>=0){// Existe Alias
+	            int posAs=sentencia.toUpperCase().lastIndexOf(" AS ");
+	            int posEtiquetaOperador=sentencia.toUpperCase().indexOf(SigaConstants.ETIQUETAOPERADOR);
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%!=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%>%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%>=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%<%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%<=%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%IS NULL%%");
+				}
+				if(posEtiquetaOperador==-1){
+					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%LIKE%%");
+				}
+
+              
+       
+             sentencia=sentencia.substring(posAs,posEtiquetaOperador);
+       
+        
+		  	
+		    }else{
+		    	sentencia="-1";
+		    }
+		  }	
+		
+	 return sentencia;
+	}
+	
+	protected static String obtenerSelectAyuda(String select, AdmUsuarios usuario) throws SigaExceptions {
+		select=select.toUpperCase().replaceAll(SigaConstants.ETIQUETAOPERADOR,"");
+		String select1="";
+		int posCritMulti;
+		String selectCritMulti="";
+		if(select.toUpperCase().indexOf(SigaConstants.ETIQUETATIPOMULTIVALOR)>=0){
+			select1=select.substring(select.toUpperCase().indexOf(SigaConstants.ETIQUETATIPOMULTIVALOR));
+			posCritMulti=SigaConstants.ETIQUETATIPOMULTIVALOR.length();
+			selectCritMulti=select1.substring(posCritMulti);
+		}else{		  
+			selectCritMulti=select;
+		}		
+			
+			if (selectCritMulti.toUpperCase().indexOf("%%")>=0){
+				String selectCritMulti1="";
+				selectCritMulti1=selectCritMulti.toUpperCase();
+			    selectCritMulti1=selectCritMulti1.replaceAll("%%IDIOMA%%",usuario.getIdlenguaje());
+			    selectCritMulti1=selectCritMulti1.replaceAll("@IDIOMA@",usuario.getIdlenguaje());
+			    selectCritMulti1=selectCritMulti1.substring(0,selectCritMulti1.toUpperCase().indexOf("%%"));
+			    
+			    return selectCritMulti1;
+			}else{
+				return selectCritMulti;
+				//eSTO ES QUE YA ESTAN RESUELTOS quitamos la excepcion
+				//throw new SigaExceptions("Error al obtener los valores de l");
+			}    
+			    
+	}
+	
+	@Override
+	public String procesarEjecutarConsulta(AdmUsuarios usuario, String sentencia, List<CampoDinamicoItem> listaCampos, boolean sustituyeInstitucion) throws ParseException{
+		
+		//Variables para crear consulta parametrizada BIND
+		int iParametroBind = 0;
+		Hashtable<Integer,Object> codigosBind = new Hashtable<Integer,Object>();
+		Hashtable<Integer,Object> codigosLike = new Hashtable<Integer,Object>();
+
+		String sentenciaCabecera = "";
+		
+		sentencia = sentencia.toUpperCase();
+
+		//sustituyendo la marca '%%idinstitucion%%' por la institucion actual
+		//cuando no se trate de una consulta experta de facturacion
+		while (sustituyeInstitucion && sentencia.toUpperCase().indexOf ("%%IDINSTITUCION%%") > -1) {
+			iParametroBind++;
+			sentencia = UtilidadesString.replaceFirstIgnoreCase(sentencia,"%%IDINSTITUCION%%", ":@"+iParametroBind+"@:");
+			codigosBind.put (new Integer(iParametroBind), usuario.getIdinstitucion());
+		}
+		
+		//sustituyendo la marca '%%idioma%%' por el idioma del USERBEAN
+		sentencia = sentencia.replaceAll ("%%IDIOMA%%", usuario.getIdlenguaje());
+				
+		List<String> operadoresList = new ArrayList<String>();
+		operadoresList.add("=");
+		operadoresList.add("!=");
+		operadoresList.add(">");
+		operadoresList.add(">=");
+		operadoresList.add("<");
+		operadoresList.add("<=");
+		operadoresList.add("IS NULL");
+		operadoresList.add("LIKE");
+		operadoresList.add("OPERADOR");
+		
+		String criteriosDinamicos = "";
+		String sentenciaAux, sentenciaAux1, sentenciaAux2;
+		String operador = "";
+		String etiqueta = "";
+		int posEtiquetaOperador = 0;
+		int posAlias = 0;
+		boolean continuar = true;
+		int pos_ini = 0;
+		int pos_iniEtiqueta = 0;
+		sentencia=sentencia.replaceAll ("\r\n", " ");
+		int j=0;
+
+		//Por cada tipo de filtro
+		String alias = "";
+		List<String> tipoDatos = new ArrayList<String>();
+
+		tipoDatos.add(SigaConstants.ETIQUETATIPONUMERO);
+		tipoDatos.add(SigaConstants.ETIQUETATIPOTEXTO);
+		tipoDatos.add(SigaConstants.ETIQUETATIPOFECHA);
+		tipoDatos.add(SigaConstants.ETIQUETATIPOMULTIVALOR);
+		tipoDatos.add(SigaConstants.ETIQUETATIPOENVIO);
+		
+		for (int i=0; i<tipoDatos.size() ;i++)
+		{
+			if (listaCampos != null  && j < listaCampos.size() && listaCampos.get(j)!=null)
+			{
+				continuar=true;
+				pos_ini=0;
+
+				while (continuar && pos_ini<=sentencia.length()) {
+					if (tipoDatos.get(i).toString().equals(SigaConstants.ETIQUETATIPONUMERO))
+						etiqueta=SigaConstants.ETIQUETATIPONUMERO;
+					else if (tipoDatos.get(i).toString().equals(SigaConstants.ETIQUETATIPOTEXTO))
+						etiqueta=SigaConstants.ETIQUETATIPOTEXTO;
+					else if (tipoDatos.get(i).toString().equals(SigaConstants.ETIQUETATIPOFECHA))
+						etiqueta=SigaConstants.ETIQUETATIPOFECHA;
+					else if (tipoDatos.get(i).toString().equals(SigaConstants.ETIQUETATIPOENVIO))
+						etiqueta=SigaConstants.ETIQUETATIPOENVIO;
+					else
+						etiqueta=SigaConstants.ETIQUETATIPOMULTIVALOR;
+
+
+					if (etiqueta.equals(SigaConstants.ETIQUETATIPOMULTIVALOR)) {
+						int iMV = sentencia.indexOf(SigaConstants.ETIQUETATIPOMULTIVALOR);
+						if (iMV > -1) {
+							etiqueta = sentencia.substring(iMV, 2+sentencia.indexOf("%%", iMV + SigaConstants.ETIQUETATIPOMULTIVALOR.length()));
+						}
+					} else if (j < listaCampos.size() && listaCampos.get(j)!=null && !listaCampos.get(j).getAyuda().equals("-1")) {
+						//cuando existe select de ayuda porque estamos con la etiqueta multivalor
+						//etiqueta += cDinamicos[j].getHp().replaceAll
+						//(ClsConstants.CONSTANTESUSTITUIRCOMILLAS,"\"");
+					}
+					pos_iniEtiqueta=sentencia.indexOf (etiqueta);	
+					sentenciaAux=sentencia.substring (0, pos_iniEtiqueta+etiqueta.length());
+
+					if (pos_iniEtiqueta>=0)
+					{
+						if(etiqueta.equals(SigaConstants.ETIQUETATIPOENVIO)){
+							// Si es de tipoEnvio reemplazamos el valor
+							sentencia = sentencia.replace(SigaConstants.ETIQUETATIPOENVIO, listaCampos.get(j).getValor());
+							j++;
+						}else{	
+							operador = listaCampos.get(j).getOperacion();
+							
+							//controlando que el operador es "esta vacio"
+							
+							if (!operador.equals(SigaConstants.IS_NULL) && !listaCampos.get(j).getValor().equals("") ) {
+								if (listaCampos.get(j).getTipoDato().equals (SigaConstants.TIPOFECHA)) {
+									iParametroBind++;
+									criteriosDinamicos = "TO_DATE (:@"+iParametroBind+"@:"+", 'YYYY/MM/DD HH24:MI:SS')";								
+									
+									String fecha = listaCampos.get(j).getValor();
+									// This could be MM/dd/yyyy, you original value is ambiguous 
+									SimpleDateFormat input = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+									Date dateValue = input.parse(fecha);
+
+									SimpleDateFormat output = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+									String nuevoValor = output.format(dateValue);
+									listaCampos.get(j).setValor("'" + nuevoValor + "'");
+									
+									String aux = listaCampos.get(j).getValor();
+									codigosBind.put (new Integer(iParametroBind),aux);
+								}
+								else {
+									iParametroBind++;
+									criteriosDinamicos = ":@"+iParametroBind+"@:";
+									codigosBind.put (new Integer(iParametroBind), "'" + listaCampos.get(j).getValor() + "'");
+									if(operador.equals(SigaConstants.LIKE)){
+										codigosLike.put (new Integer(iParametroBind), listaCampos.get(j).getValor());
+									}
+								}
+							}
+							else {
+								operador = "IS NULL";
+								criteriosDinamicos="";
+							}
+
+							sentenciaAux = sentenciaAux.substring (0, pos_iniEtiqueta) +
+							criteriosDinamicos +
+							sentenciaAux.substring (pos_iniEtiqueta+etiqueta.length());
+							String operadores[] = sentenciaAux.split("%%");
+							String operadorEncontrado = null;
+			 				for (int jta = operadores.length-1; jta >= 0 ; jta--) {
+								String operadorCast = operadores[jta];
+								if(operadoresList.contains(operadorCast)){
+									operadorEncontrado = "%%"+operadorCast+"%%";
+									break;
+									
+								}
+									
+							}
+							if(operador.equalsIgnoreCase("IS NULL")){
+								posEtiquetaOperador=sentenciaAux.toUpperCase().lastIndexOf(operadorEncontrado);
+								sentenciaAux1 = sentenciaAux.substring (posEtiquetaOperador,posEtiquetaOperador+operadorEncontrado.length()).replaceAll (operadorEncontrado, " "+operador+" ");
+
+							}else{
+								posEtiquetaOperador=sentenciaAux.toUpperCase().lastIndexOf(operadorEncontrado);
+								sentenciaAux1 = sentenciaAux.substring (posEtiquetaOperador).replaceAll (operadorEncontrado, " "+operador+" ");
+
+							}
+							
+							
+							sentenciaAux = sentenciaAux.substring (0, posEtiquetaOperador) + sentenciaAux1;
+							if (!listaCampos.get(j).getAlias().equals("-1")) {
+								alias = listaCampos.get(j).getAlias();	
+								posAlias = sentenciaAux.lastIndexOf (alias);
+								sentenciaAux2=sentenciaAux.substring (posAlias+alias.length());
+								sentenciaAux=sentenciaAux.substring (0, posAlias) + sentenciaAux2;
+							}
+							String sentenciaAuxFin = sentencia.substring(pos_iniEtiqueta+etiqueta.length());
+							int indiceAnd = sentenciaAuxFin.indexOf("AND");
+							int indexDefecto = sentenciaAuxFin.toUpperCase().indexOf("DEFECTO");
+							int indexNulo = sentenciaAuxFin.toUpperCase().indexOf("NULO");
+							if(indiceAnd>-1){
+								if(indexDefecto>-1 && indexDefecto<indiceAnd )
+									sentenciaAuxFin= sentenciaAuxFin.substring(0,indexDefecto)+" "+sentenciaAuxFin.substring(indiceAnd);
+								else if(indexNulo>-1 && indexNulo<indiceAnd)
+									sentenciaAuxFin= sentenciaAuxFin.substring(0,indexNulo)+" "+sentenciaAuxFin.substring(indiceAnd);
+//								else
+//									sentenciaAuxFin= " "+sentenciaAuxFin.substring(indiceAnd);
+							}
+							else{
+								if(indexDefecto>-1 )
+									sentenciaAuxFin= sentenciaAuxFin.substring(0,indexDefecto);
+								else if(indexNulo>-1)
+									sentenciaAuxFin= sentenciaAuxFin.substring(0,indexNulo);
+								
+							}
+								
+							
+							//La linea siguiente se hace por si hubiera alguna operacino oracle al texto
+							//para eliminar el ultimo parentesis
+							if(operador.equalsIgnoreCase("IS NULL")){
+								int indiceAND = sentenciaAuxFin.indexOf("AND");
+								int indiceParentesis = -1;
+								if(indiceAND>-1){
+									indiceParentesis = sentenciaAuxFin.substring(0,indiceAND).indexOf(")");
+									
+								}else{
+									indiceParentesis = sentenciaAuxFin.indexOf(")");
+									
+									
+								}
+
+								if(indiceParentesis>-1){
+									if(sentenciaAux.indexOf("(") == -1)
+										sentenciaAuxFin = sentenciaAuxFin.replaceFirst("\\)", "");
+								}
+							}
+								
+							
+							sentencia = sentenciaAux+sentenciaAuxFin;
+							pos_ini = pos_iniEtiqueta+sentenciaAux1.length();
+
+							j++;
+						}					
+					}
+					else {
+						continuar=false;
+					}
+				} //while
+			} else {
+				break;
+			}
+
+		} //for
+		
+		// Se ordena las bind variables porque las he dejado desordenadas
+		// busco las ocurrencias de :@x para cambiarlas por :y ordenado
+		String sentenciaAux3= sentencia;
+		int indice=sentenciaAux3.indexOf(":@",0);
+		int contadorOrdenados=0;
+		Hashtable codigosOrdenados = new Hashtable();
+		while (indice!=-1) {
+			String numero=sentenciaAux3.substring(indice+2,sentenciaAux3.indexOf("@:",indice));
+			if(codigosLike.containsKey(new Integer(numero))){
+				sentencia=sentencia.replaceFirst(":@"+numero+"@:","'%"+(String)codigosBind.get(new Integer(numero))+"%'");
+			}else{
+				contadorOrdenados++;
+				codigosOrdenados.put(new Integer(contadorOrdenados),String.valueOf(codigosBind.get(new Integer(numero))));
+				sentencia=sentencia.replaceFirst(":@"+numero+"@:", String.valueOf(codigosBind.get(new Integer(numero))));
+			}
+			indice=sentenciaAux3.indexOf(":@",indice+2);
+		}
+
+		sentencia = UtilidadesString.replaceAllIgnoreCase(sentencia, "@FECHA@", "SYSDATE");
+		sentencia = UtilidadesString.replaceAllIgnoreCase(sentencia, "@IDIOMA@", usuario.getIdlenguaje());
+		
+		// Se intentan sustituir los parametros de las funciones de cen_colegiado
+		sentencia = sustituirParametrosColegiado(sentencia);	
+		
+		return sentencia;
+	}
+	
+	public String sustituirParametrosColegiado(String select) {
+		select = select.replaceAll("@FECHA@","SYSDATE");
+		if ( select.indexOf(SigaConstants.NOMBRETABLA_CEN_CLIENTE)!=-1) {
+			// CONTIENE LA TABLA CEN_CLIENTE. 
+			select = select.replaceAll("@IDPERSONA@",SigaConstants.NOMBRETABLA_CEN_CLIENTE+"."+SigaConstants.C_IDPERSONA);
+			select = select.replaceAll("@IDINSTITUCION@",SigaConstants.NOMBRETABLA_CEN_CLIENTE+"."+SigaConstants.C_IDINSTITUCION);
+		}else if (select.indexOf(SigaConstants.NOMBRETABLA_CEN_COLEGIADO)!=-1 ) {
+			// CONTIENE LA TABLA CEN_COLEGIADO. 
+			select = select.replaceAll("@IDPERSONA@",SigaConstants.NOMBRETABLA_CEN_COLEGIADO+"."+SigaConstants.C_IDPERSONA);
+			select = select.replaceAll("@IDINSTITUCION@",SigaConstants.NOMBRETABLA_CEN_COLEGIADO+"."+SigaConstants.C_IDINSTITUCION);
+		}
+		
+		return select;
 	}
 	
 }

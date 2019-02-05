@@ -49,7 +49,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		return sql.toString();
 	}
 	
-	public String selectConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion, String idPlantillaDocumento, Short idObjetivo){
+	public String selectConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion, String idPlantillaDocumento, Long idObjetivo){
 		
 		SQL sql = new SQL();		
 		
@@ -66,7 +66,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		return sql.toString();
 	}
 	
-	public String selectCountConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion, Long idPlantillaDocumento, Short idObjetivo){
+	public String selectCountConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion, Long idPlantillaDocumento, Long idObjetivo){
 		
 		SQL sql = new SQL();		
 		

@@ -7,35 +7,46 @@
 	<resultMap type="map" id="mapa">
 	</resultMap>
 	<sql id="select">
-		SELECT ${query.selectValue}
+		${query.selectValue}
 	</sql>
 	<sql id="from">
-		FROM ${query.fromValue}
+		${query.fromValue}
 	</sql>
 	<sql id="innerJoin">
-		INNER JOIN ${query.innerJoinValue}
+		${query.innerJoinValue}
 	</sql>
 	<sql id="join">
-		JOIN ${query.joinValue}
+		${query.joinValue}
 	</sql>
 	<sql id="leftJoin">
-		LEFT JOIN ${query.leftJoinValue}
+		${query.leftJoinValue}
 	</sql>
 	<sql id="outerJoin">
-		OUTER JOIN ${query.outerJoinValue}
+		${query.outerJoinValue}
+	</sql>
+	<sql id="union">
+		${query.unionValue}
+	</sql>
+	<sql id="unionAll">
+		${query.unionAllValue}
 	</sql>
 	<sql id="where">
-		WHERE ${query.whereValue}
+		${query.whereValue}
 	</sql>
 	<sql id="orderBy">
-		ORDER BY ${query.orderByValue}
+		${query.orderByValue}
 	</sql>
 	<sql id="groupBy">
-		GROUP BY ${query.groupByValue}
+		${query.groupByValue}
 	</sql>
 	<sql id="having">
-		HAVING ${query.havingValue}
+		${query.havingValue}
 	</sql>
+	
+	<sql id="sentencia">
+		${query}
+	</sql>
+	
 	<select id="ejecutarConsulta" parameterType="hashmap" resultMap="mapa">
 	
 		<include refid="select"></include>
@@ -62,6 +73,14 @@
 	    	<include refid="outerJoin">
 	    	</include>
   		</if>
+  		<if test="query.unionValue != '' ">
+	    	<include refid="union">
+	    	</include>
+  		</if>
+  		<if test="query.unionAllValue != '' ">
+	    	<include refid="unionAll">
+	    	</include>
+  		</if>
  		<if test="query.whereValue != '' ">
     		<include refid="where">
 	    	</include>
@@ -82,5 +101,9 @@
 	    	</include>
     	</if>
 
+	</select>
+	
+	<select id="ejecutarConsultaString" parameterType="hashmap" resultMap="mapa">	
+		<include refid="sentencia"></include>
 	</select>
 </mapper>

@@ -6,13 +6,13 @@ import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
 public class EnvPlantillaEnviosExtendsSqlProvider {
 	
 	
-	public String selectPlantillas(Short idInstitucion, PlantillaEnvioSearchItem filtros){
+	public String selectPlantillas(Short idInstitucion, String idLenguaje, PlantillaEnvioSearchItem filtros){
 		SQL sql = new SQL();
 		
 		sql.SELECT("PLANTILLA.idPlantillaEnvios, PLANTILLA.idTipoEnvios, PLANTILLA.nombre, PLANTILLA.idInstitucion, PLANTILLA.acuseRecibo,PLANTILLA.fechaBaja, PLANTILLA.asunto, PLANTILLA.cuerpo");
 		sql.SELECT("PLANTILLA.idDireccion, PLANTILLA.idPersona, PLANTILLA.DESCRIPCION");
 		sql.SELECT("(SELECT CAT.DESCRIPCION FROM ENV_TIPOENVIOS LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = ENV_TIPOENVIOS.NOMBRE WHERE ENV_TIPOENVIOS.IDTIPOENVIOS = "
-				+ "PLANTILLA.IDTIPOENVIOS AND CAT.IDLENGUAJE = '1') AS TIPOENVIO");
+				+ "PLANTILLA.IDTIPOENVIOS AND CAT.IDLENGUAJE = '" + idLenguaje + "') AS TIPOENVIO");
 		sql.FROM("ENV_PLANTILLASENVIOS PLANTILLA");
 		sql.WHERE("PLANTILLA.FECHABAJA is null");
 		sql.WHERE("PLANTILLA.IDINSTITUCION = '"+ idInstitucion +"' AND ANTIGUA = 'N'");

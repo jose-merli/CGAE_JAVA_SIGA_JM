@@ -157,11 +157,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			
 			if (usuarios != null && usuarios.size() > 0) {
 				try{
+					AdmUsuarios usuario = usuarios.get(0);
 					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(idClaseComunicacion);
 					
 					for (ModelosComunicacionItem modelosComunicacionItem : modelos) {
 						ComboDTO comboDTO = new ComboDTO();
-						List<ComboItem> comboItems = _modModeloComunicacionExtendsMapper.selectPlantillasModelos(modelosComunicacionItem.getIdModeloComunicacion());
+						List<ComboItem> comboItems = _modModeloComunicacionExtendsMapper.selectPlantillasModelos(modelosComunicacionItem.getIdModeloComunicacion(), usuario.getIdinstitucion());
 						if(null != comboItems && comboItems.size() > 0) {
 							ComboItem element = new ComboItem();
 							element.setLabel("");
@@ -177,6 +178,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					error.setCode(500);
 					error.setDescription("Error al obtener los modelos");
 					error.setMessage(e.getMessage());
+					e.printStackTrace();
 				}
 			}
 		}
@@ -281,7 +283,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					LOGGER.debug("Obtenemos las key de la clase de comunicación");
 					String idClaseComunicacion = dialogo.getIdClaseComunicacion();
 					
-					List<KeyItem> listaKey = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Long.parseLong(idClaseComunicacion));
+					List<KeyItem> listaKey = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
 					
 					LOGGER.debug("Obtenemos las plantillas de documento asociadas al modelo");
 					List<PlantillaModeloDocumentoDTO> plantillas = _modModeloPlantillaDocumentoExtendsMapper.selectInformesGenerar(Long.parseLong(modelo.getIdModeloComunicacion()));
@@ -570,7 +572,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			
 			if (null != usuarios && usuarios.size() > 0) {
-				listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Long.parseLong(idClaseComunicacion));
+				listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
 		
 				keysDTO.setKeysItem(listaKeys);
 				
@@ -686,7 +688,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					List<ClaseComunicacionItem> clasesComunicaciones = _modClasecomunicacionRutaExtendsMapper.getClaseComunicacionesUnica(rutaClaseComunicacion);
 					response.setClasesComunicaciones(clasesComunicaciones);
 				}catch(Exception e){
-					LOGGER.error("Error al obtener la clase de comunicaciones");
+					LOGGER.error("Error al obtener la clase de comunicaciones", e);
 					error.setCode(500);
 					error.setDescription("Error al obtener la clase de comunicaciones");
 					error.setMessage(e.getMessage());

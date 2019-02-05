@@ -70,9 +70,12 @@ public interface ConConsultasExtendsMapper {
 	@ResultType(value = List.class)
 	public List<Map<String, Object>> ejecutarConsulta(@Param(value = "query") Map<String,String> querys);
 	
+	@ResultType(value = List.class)
+	public List<Map<String, Object>> ejecutarConsultaString(@Param(value = "query") String query);
+	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasDisponibles")
 	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectConsultasDisponibles(Short IdInstitucion, Long idClaseComunicacion, Short idObjetivo);
+	List<ComboItem> selectConsultasDisponibles(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo);
 }	
