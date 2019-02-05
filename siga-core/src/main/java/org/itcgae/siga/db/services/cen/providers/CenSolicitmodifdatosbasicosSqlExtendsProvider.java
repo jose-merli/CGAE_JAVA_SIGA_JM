@@ -7,10 +7,17 @@ import org.itcgae.siga.db.mappers.CenSolicitmodifdatosbasicosSqlProvider;
 
 public class CenSolicitmodifdatosbasicosSqlExtendsProvider extends CenSolicitmodifdatosbasicosSqlProvider{
 	
-	public String searchSolModifDatosGenerales(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion) {
-		String rdo = "SELECT * FROM (" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) UNION ( "
-				+ SolModifSQLUtils.getBasicDataRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) ORDER BY 6 DESC";
-		return rdo;
+	public String searchSolModifDatosGenerales(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion, Long idPersona) {
+		if (null != idPersona) {
+			String rdo = "SELECT * FROM ((" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) UNION ( "
+					+ SolModifSQLUtils.getBasicDataRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " )) WHERE IDPERSONA = "+ idPersona +"  ORDER BY 6 DESC";
+			return rdo;
+		}else{
+			String rdo = "SELECT * FROM (" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) UNION ( "
+					+ SolModifSQLUtils.getBasicDataRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) ORDER BY 6 DESC";
+			return rdo;
+		}
+
 	}
 	
 	public String getMaxIdSolicitud(String idInstitucion, String idPersona) {

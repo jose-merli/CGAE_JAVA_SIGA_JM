@@ -75,5 +75,5 @@ public interface CenSolicitudmodificacioncvExtendsMapper extends CenSolicitudmod
 		@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR)}) 
 	List<SolModificacionItem> searchSolModifDatosCurriculares(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-			String idLenguage, String idInstitucion);
+			String idLenguage, String idInstitucion, Long idPersona);
 }

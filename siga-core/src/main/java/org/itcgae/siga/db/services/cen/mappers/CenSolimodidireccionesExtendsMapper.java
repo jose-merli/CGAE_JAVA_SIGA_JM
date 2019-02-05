@@ -150,5 +150,5 @@ public interface CenSolimodidireccionesExtendsMapper extends CenSolimodidireccio
 		@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR)}) 
 	List<SolModificacionItem> searchSolModifDatosDirecciones(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-			String idLenguaje, String idInstitucion);
+			String idLenguaje, String idInstitucion, Long idPersona);
 }

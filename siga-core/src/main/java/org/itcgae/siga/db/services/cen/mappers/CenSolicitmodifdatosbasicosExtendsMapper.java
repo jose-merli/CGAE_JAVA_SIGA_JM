@@ -49,7 +49,7 @@ public interface CenSolicitmodifdatosbasicosExtendsMapper extends  CenSolicitmod
 		@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR)}) 
 	List<SolModificacionItem> searchSolModifDatosGenerales(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-			String idLenguaje, String idInstitucion);
+			String idLenguaje, String idInstitucion, Long idPersona);
 	
 	@SelectProvider(type = CenSolicitmodifdatosbasicosSqlExtendsProvider.class, method = "getMaxIdSolicitud")
 	@Results({ @Result(column = "IDSOLICITUD", property = "newId", jdbcType = JdbcType.VARCHAR)

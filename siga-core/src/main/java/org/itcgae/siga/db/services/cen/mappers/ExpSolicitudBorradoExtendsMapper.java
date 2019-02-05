@@ -30,5 +30,5 @@ public interface ExpSolicitudBorradoExtendsMapper extends ExpSolicitudborradoMap
 			@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR) })
 	List<SolModificacionItem> searchSolModifDatosExpedientes(
-			SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion);
+			SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion, Long idPersona);
 }

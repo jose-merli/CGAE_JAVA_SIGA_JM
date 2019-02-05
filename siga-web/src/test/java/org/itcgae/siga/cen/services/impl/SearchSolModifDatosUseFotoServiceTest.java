@@ -57,7 +57,8 @@ public class SearchSolModifDatosUseFotoServiceTest {
 		List<SolModificacionItem> solModificacionItems = cenTestUtils.getListSolModificacionItemSimulado();
 
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
-		when(cenSolicModifExportarFotoExtendsMapper.searchSolModifDatosUseFoto(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)).thenReturn(solModificacionItems);
+		when(cenSolicModifExportarFotoExtendsMapper.searchSolModifDatosUseFoto(solicitudModificacionSearchDTO, idLenguaje, 
+				idInstitucion,null)).thenReturn(solModificacionItems);
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
