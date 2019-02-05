@@ -789,7 +789,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 		if(!sentencia.contains("CEN_DIRECCIONES.FAX2 AS \"FAX2\"")){
 			camposIncorrectos = true;
 		}
-		if(!sentencia.contains("CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\"")){
+		if(!sentencia.contains("CEN_DIRECCIONES.IDPAIS AS \"IDPAIS\"")){
 			camposIncorrectos = true;
 		}
 		if(!sentencia.contains("CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\"")){
@@ -859,9 +859,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 		select+= " CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\", ";
 		select+= " CEN_DIRECCIONES.MOVIL AS \"MOVIL\", ";	
 		select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
-		select+= " CEN_DIRECCIONES.FAX1 AS \"FAX1\"";	
+		select+= " CEN_DIRECCIONES.FAX1 AS \"FAX1\", ";	
 		select+= " CEN_DIRECCIONES.FAX2 AS \"FAX2\", ";
-		select+= " CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\", ";
+		select+= " CEN_DIRECCIONES.IDPAIS AS \"IDPAIS\", ";
 		select+= " CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\", ";
 		select+= " CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\" ";		
 
@@ -876,19 +876,23 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	public String insertarSelectDestinatarios (){
 
-		return "<SELECT>CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\""
-				+ "CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\""
-				+ "CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\""
-				+ "CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\""
-				+ "CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\""
-				+ "CEN_DIRECCIONES.MOVIL AS \"MOVIL\""
-				+ "CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\""
-				+ "CEN_DIRECCIONES.FAX1 AS \"FAX1\""
-				+ "CEN_DIRECCIONES.FAX2 AS \"FAX2\""
-				+ "CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\""
-				+ "CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\""
-				+ "CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\""
-				+ "</SELECT>";
+		String select = "<SELECT> SELECT ";
+		
+		select+= " CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\", ";
+		select+= " CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\", ";
+		select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
+		select+= " CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\", ";
+		select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
+		select+= " CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\", ";
+		select+= " CEN_DIRECCIONES.MOVIL AS \"MOVIL\", ";	
+		select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
+		select+= " CEN_DIRECCIONES.FAX1 AS \"FAX1\", ";	
+		select+= " CEN_DIRECCIONES.FAX2 AS \"FAX2\", ";
+		select+= " CEN_DIRECCIONES.IDPAIS AS \"IDPAIS\", ";
+		select+= " CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\", ";
+		select+= " CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\" </SELECT>";
+		
+		return select;
 	}
 	
 	public String insertarClaves(Short idClaseComunicaciones, String sentencia){
