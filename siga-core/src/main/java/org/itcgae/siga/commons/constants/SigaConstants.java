@@ -75,6 +75,8 @@ public class SigaConstants {
 	public static final String LIKE		= "like";
 	public static final String NOMBRETABLA_CEN_CLIENTE = "CEN_CLIENTE";
 	public static final String NOMBRETABLA_CEN_COLEGIADO = "CEN_COLEGIADO";
+	
+	public static final String ECOS_PREFIJO_ESPANA = "(+34)";
 
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(
