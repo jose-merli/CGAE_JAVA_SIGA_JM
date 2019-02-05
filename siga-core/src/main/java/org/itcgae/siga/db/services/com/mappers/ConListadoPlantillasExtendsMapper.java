@@ -21,7 +21,14 @@ public interface ConListadoPlantillasExtendsMapper {
 		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "ACUSERECIBO", property = "acuseRecibo", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "ACUSERECIBO", property = "acuseRecibo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "ASUNTO", property = "asunto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CUERPO", property = "cuerpo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDDIRECCION", property = "idDireccion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR)
 		})
-	List<PlantillaEnvioItem> selectListadoPlantillas(Short idInstitucion,String idLenguaje,ConsultaItem consulta);
+	List<PlantillaEnvioItem> selectListadoPlantillas(Short idInstitucion,String idLenguaje, String idConsulta);
 }

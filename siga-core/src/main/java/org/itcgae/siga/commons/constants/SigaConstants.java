@@ -374,20 +374,20 @@ public class SigaConstants {
 	}
 	
 	public static enum OBJETIVO {
-		DESTINATARIOS(new Short("1"), "DESTINATARIOS"),
-		MULTIDOCUMENTO(new Short("2"), "MULTIDOCUMENTO"),
-		CONDICIONAL(new Short("3"), "CONDICIONAL"),
-		DATOS(new Short("4"), "DATOS");
+		DESTINATARIOS(new Long("1"), "DESTINATARIOS"),
+		MULTIDOCUMENTO(new Long("2"), "MULTIDOCUMENTO"),
+		CONDICIONAL(new Long("3"), "CONDICIONAL"),
+		DATOS(new Long("4"), "DATOS");
 		
-		private final Short codigo;
+		private final Long codigo;
 		private final String descripcion;
 
-		OBJETIVO(Short codigo, String descripcion) {
+		OBJETIVO(Long codigo, String descripcion) {
 			this.codigo = codigo;
 			this.descripcion = descripcion;
 		}
 
-		public Short getCodigo() {
+		public Long getCodigo() {
 			return codigo;
 		}
 
@@ -397,7 +397,7 @@ public class SigaConstants {
 
 		public static OBJETIVO getEnum(Short codigo) {
 			for (OBJETIVO sc : values()) {
-				if (sc.getCodigo().shortValue() == codigo.shortValue()) {
+				if (sc.getCodigo().longValue() == codigo.longValue()) {
 					return sc;
 				}
 			}

@@ -37,10 +37,10 @@ public interface ModPlantillaDocumentoConsultaExtendsMapper {
 			  @Result(column = "SENTENCIA", property = "sentencia", jdbcType = JdbcType.VARCHAR)
 	})	
 	@SelectProvider(type = ModPlantillaDocumentoConsultaExtendsSqlProvider.class, method = "selectConsultaPorObjetivo")
-	List<ConsultaItem> selectConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion, String idPlantillaDocumento, Short idObjetivo);
+	List<ConsultaItem> selectConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion, String idPlantillaDocumento, Long idObjetivo);
 
 	@SelectProvider(type = ModPlantillaDocumentoConsultaExtendsSqlProvider.class, method = "selectCountConsultaPorObjetivo")
-	int selectCountConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion, Long idPlantillaDocumento, Short idObjetivo);
+	int selectCountConsultaPorObjetivo(Short idInstitucion, Long idModeloComunicacion, Long idPlantillaDocumento, Long idObjetivo);
 
 	
 	@SelectProvider(type = ModPlantillaDocumentoConsultaExtendsSqlProvider.class, method = "selectConsultaByIdConsulta")

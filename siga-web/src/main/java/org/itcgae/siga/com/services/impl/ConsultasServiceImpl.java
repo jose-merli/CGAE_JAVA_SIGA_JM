@@ -235,13 +235,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 				
 				comboItems = _conClaseComunicacionExtendsMapper.selectTipoClaseComunicacionByModulo(idModulo);
-				if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}		
-				
+			
 				comboDTO.setCombooItems(comboItems);
 				
 			}
@@ -283,6 +277,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 					error.setCode(500);
 					error.setMessage(e.getMessage());
 					consultasDTO.setError(error);
+					e.printStackTrace();
 				}
 			}
 		}
@@ -320,9 +315,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setIdconsulta(Long.valueOf(id.getNewId()));
 						String descripcion = "Copia " + i+1 +"_" + consulta.getDescripcion();
 						consulta.setIdinstitucion(idInstitucion);
-						if(idInstitucion == 2000){
-							consulta.setGeneral("S");
-						}else{
+						if(idInstitucion.shortValue() != SigaConstants.IDINSTITUCION_2000.shortValue()){
 							consulta.setGeneral("N");
 						}
 						consulta.setDescripcion(descripcion);
@@ -469,30 +462,38 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setGeneral(consultaDTO.getGenerica());
 						consulta.setFechamodificacion(new Date());
 						consulta.setUsumodificacion(usuario.getIdusuario());
+						String sentencia = "";
 						switch(consultaDTO.getIdObjetivo().toString()){
 							case "1":
 								consulta.setTipoconsulta("E");
-								consulta.setSentencia(insertarSelectDestinatarios()+ "<FROM></FROM>");
+								sentencia = insertarSelectDestinatarios()+ "<FROM></FROM>";
 								break;
 							case "2":
 								consulta.setTipoconsulta("M");
-								consulta.setSentencia("<SELECT></SELECT><FROM></FROM>");
+								sentencia = "<SELECT></SELECT><FROM></FROM>";
 								break;
 							case "3":
 								consulta.setTipoconsulta("W");
-								consulta.setSentencia("<SELECT></SELECT><FROM></FROM>");
+								sentencia = "<SELECT></SELECT><FROM></FROM>";
 								break;
 							case "4":
 								consulta.setTipoconsulta("C");
-								consulta.setSentencia("<SELECT></SELECT><FROM></FROM>");
+								sentencia = "<SELECT></SELECT><FROM></FROM>";
 								break;
 						}
+						
+						
+						//Si tiene clase de comunicación añadimos el where con las claves
+						sentencia = insertarClaves(consulta.getIdclasecomunicacion(), sentencia);
+						consulta.setSentencia(sentencia);
+						
 						_conConsultaMapper.insert(consulta);
 						respuesta.setMessage(consulta.getIdconsulta().toString());
 						respuesta.setDescription(consulta.getSentencia());
 						respuesta.setInfoURL(consulta.getIdinstitucion().toString());
 						respuesta.setCode(200);
 					}else{
+						Long objetivoAnterior = (long)0;
 						ConConsultaKey key = new ConConsultaKey();
 						key.setIdconsulta(Long.parseLong(consultaDTO.getIdConsulta()));
 						key.setIdinstitucion(Short.parseShort(consultaDTO.getIdInstitucion()));
@@ -502,12 +503,17 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setObservaciones(consultaDTO.getDescripcion());
 						consulta.setGeneral(consultaDTO.getGenerica());
 						consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
+						objetivoAnterior = consulta.getIdobjetivo();
 						consulta.setIdobjetivo(Long.valueOf(consultaDTO.getIdObjetivo()));
+						String sentencia = consulta.getSentencia();
 						switch(consultaDTO.getIdObjetivo()){
 						case "1":
 							//Destinarios
 							consulta.setTipoconsulta("E");
-							camposIncorrectos = comprobarCamposDestinarios(consulta.getSentencia());
+							//camposIncorrectos = comprobarCamposDestinarios(consulta.getSentencia());
+							if(objetivoAnterior != Long.valueOf(consultaDTO.getIdObjetivo())){
+								sentencia = insertarSelectDestinatarios(sentencia);
+							}
 							//insertarSelectDestinatarios(consulta.getSentencia());
 							break;
 						case "2":
@@ -526,6 +532,10 @@ public class ConsultasServiceImpl implements IConsultasService{
 							break;
 						}
 						
+						//Si tiene clase de comunicación añadimos el where con las claves
+						sentencia = insertarClaves(consulta.getIdclasecomunicacion(), sentencia);
+						consulta.setSentencia(sentencia);
+						
 						if(consultaDTO.getIdObjetivo().equals("E")){
 							if(!camposIncorrectos){
 								respuesta.setCode(400);
@@ -535,12 +545,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 								respuesta.setCode(200);
 								respuesta.setMessage(consulta.getIdconsulta().toString());
 								respuesta.setInfoURL(consulta.getIdinstitucion().toString());
+								respuesta.setDescription(consulta.getSentencia());
 							}
 						}else{
 							_conConsultaMapper.updateByPrimaryKeyWithBLOBs(consulta);
 							respuesta.setCode(200);
 							respuesta.setMessage(consulta.getIdconsulta().toString());
 							respuesta.setInfoURL(consulta.getIdinstitucion().toString());
+							respuesta.setDescription(consulta.getSentencia());
 						}
 						
 					}
@@ -579,7 +591,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 				try {
 					modeloList = _conListadoModelosExtendsMapper.selectListadoModelos(usuario.getIdinstitucion(),
-							 consulta);
+							 consulta.getIdConsulta());
 					if (modeloList.size() > 0) {
 						conListadoModelosDTO.setListadoModelos(modeloList);
 					}
@@ -588,6 +600,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 					error.setCode(500);
 					error.setMessage(e.getMessage());
 					conListadoModelosDTO.setError(error);
+					e.printStackTrace();
 				}
 			}
 		}
@@ -618,7 +631,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 				try {
 					plantillasList = _conListadoPlantillasExtendsMapper.selectListadoPlantillas(usuario.getIdinstitucion(),
-							usuario.getIdlenguaje(), consulta);
+							usuario.getIdlenguaje(), consulta.getIdConsulta());
 					if (plantillasList.size() > 0) {
 						conListadoPlantillasDTO.setListadoPlantillas(plantillasList);
 					}
@@ -627,6 +640,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 					error.setCode(500);
 					error.setMessage(e.getMessage());
 					conListadoPlantillasDTO.setError(error);
+					e.printStackTrace();
 				}
 			}
 		}
@@ -638,7 +652,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	@Override
 	@Transactional
 	public Error guardarConsulta(HttpServletRequest request, ConsultaItem consultaDTO) {
-		LOGGER.info("guardarDatosGenerales() -> Entrada al servicio para guardar tarjeta general");
+		LOGGER.info("guardarConsulta() -> Entrada al servicio para guardar la sentencia de la consulta");
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -653,17 +667,31 @@ public class ConsultasServiceImpl implements IConsultasService{
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
+					boolean etiquetasIncorrectas = false;
 					boolean camposIncorrectos = false;
+					boolean objetivoIncorrecto = false;
 					
 					ConConsultaKey key = new ConConsultaKey();
 					key.setIdconsulta(Long.parseLong(consultaDTO.getIdConsulta()));
 					key.setIdinstitucion(idInstitucion);
-					ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
-					camposIncorrectos = comprobarEtiquetas(consultaDTO.getSentencia());
+					ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);					
+					etiquetasIncorrectas = comprobarEtiquetas(consultaDTO.getSentencia());
 					
-					if(camposIncorrectos){
+					// Comprombamos que en el where se tienen las keys asociadas a la clase
+					camposIncorrectos = comprobarClaves(consultaDTO.getSentencia(), consultaDTO.getIdClaseComunicacion());
+					
+					// Comprobamos que cumple el objetivo
+					objetivoIncorrecto = comprobarObjetivo(consultaDTO.getSentencia(), consultaDTO.getIdObjetivo());
+					
+					if(etiquetasIncorrectas){
 						respuesta.setCode(400);
-						respuesta.setMessage("Campos incorrectos");
+						respuesta.setMessage("Faltan etiquetas");
+					}else if(camposIncorrectos){
+						respuesta.setCode(400);
+						respuesta.setMessage("Faltan claves por rellenar");
+					}else if(objetivoIncorrecto){
+						respuesta.setCode(400);
+						respuesta.setMessage("No cumple con las restricciones del objetivo");
 					}else{
 						consulta.setSentencia(consultaDTO.getSentencia());
 						consulta.setFechamodificacion(new Date());
@@ -681,7 +709,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 			}
 		}
 		
-		LOGGER.info("guardarDatosGenerales() -> Salida del servicio para guardar tarjeta general");
+		LOGGER.info("guardarConsulta() -> Salida del servicio para guardar la sentencia de la consulta");
 		return respuesta;
 	}
 
@@ -776,76 +804,76 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 	public boolean comprobarEtiquetas(String sentencia){
 		boolean etiquetasInsuficientes = false;
-//		Pattern regexSelect = Pattern.compile("\\bSELECT\\b");
-//		Matcher match = regexSelect.matcher(sentencia);
-//		
-//		if(!match.find()){
-//			etiquetasInsuficientes = true;
-//		}
 		
-		if(!sentencia.contains("<SELECT>") || !sentencia.contains("</SELECT>")){
-			etiquetasInsuficientes = true;
+		if(sentencia != null){
+			if(!sentencia.contains("<SELECT>") || !sentencia.contains("</SELECT>")){
+				etiquetasInsuficientes = true;
+			}
+			if(!sentencia.contains("<FROM>") || !sentencia.contains("</FROM>")){
+				etiquetasInsuficientes = true;
+			}
 		}
-		if(!sentencia.contains("<FROM>") || !sentencia.contains("</FROM>")){
-			etiquetasInsuficientes = true;
-		}
+		
 		return etiquetasInsuficientes;
 	}
 	
-	@Transactional
+	public boolean comprobarClaves(String sentencia, String idClaseComunicacion){
+		boolean incorrecta = false;
+		
+		List<KeyItem> listaKeys = null;
+		
+		if(idClaseComunicacion != null && !"".equals(idClaseComunicacion)){
+			listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
+			for(KeyItem key : listaKeys){
+				String etiquetaKey = SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + key.getNombre() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO;
+				if(sentencia.indexOf(etiquetaKey) == -1){
+					incorrecta = true;
+				}
+			}
+		}
+		
+		return incorrecta;
+	}
+	
+	public boolean comprobarObjetivo(String sentencia, String idObjetivo){
+		boolean incorrecto = false;
+		
+		if(Long.parseLong(idObjetivo) == SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo().longValue()){
+			incorrecto = comprobarCamposDestinarios(sentencia);
+		}	
+		
+		return incorrecto;
+	}
+	
 	public String insertarSelectDestinatarios (String sentencia){
 		
 		int indexInicio = sentencia.indexOf("<SELECT>")+8;
 		int indexFinal = sentencia.indexOf("</SELECT>");
-		String select = sentencia.substring(indexInicio, indexFinal);
+		String select = "SELECT";
+		
+		select+= " CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\", ";
+		select+= " CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\", ";
+		select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
+		select+= " CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\", ";
+		select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
+		select+= " CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\", ";
+		select+= " CEN_DIRECCIONES.MOVIL AS \"MOVIL\", ";	
+		select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
+		select+= " CEN_DIRECCIONES.FAX1 AS \"FAX1\"";	
+		select+= " CEN_DIRECCIONES.FAX2 AS \"FAX2\", ";
+		select+= " CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\", ";
+		select+= " CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\", ";
+		select+= " CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\" ";		
 
+		if(indexInicio > -1 && indexFinal > -1){
+			sentencia = sentencia.substring(0, indexInicio) + select + sentencia.substring(indexFinal, sentencia.length());
+		}else{
+			sentencia = "<SELECT>" + select + "</SELECT>" + sentencia;
+		}
 		
-		if(!sentencia.contains("CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\"")){
-			select+= " CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\", ";
-		}
-		if(!sentencia.contains("CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\"")){
-			select+= " CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\", ";
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
-			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\"")){
-			select+= " CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\", ";
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
-			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\"")){
-			select+= " CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\", ";
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.MOVIL AS \"MOVIL\"")){
-			select+= " CEN_DIRECCIONES.MOVIL AS \"MOVIL\", ";	
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ")){
-			select+= " CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\", ";	
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.FAX1 AS \"FAX1\", ")){
-			select+= " CEN_DIRECCIONES.FAX1 AS \"FAX1\"";	
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.FAX2 AS \"FAX2\"")){
-			select+= " CEN_DIRECCIONES.FAX2 AS \"FAX2\", ";
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\"")){
-			select+= " CEN_DIRECCIONES.IDPAIS AS AS \"IDPAIS\", ";
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\"")){
-			select+= " CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\", ";
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\"")){
-			select+= " CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\", ";
-		}
-		StringBuffer sentenciaFinal = new StringBuffer(sentencia);
-		sentenciaFinal.insert(indexInicio, select);
-		
-		return sentenciaFinal.toString();
+		return sentencia;
 	}
 	
-	@Transactional
 	public String insertarSelectDestinatarios (){
 
 		return "<SELECT>CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\""
@@ -861,6 +889,38 @@ public class ConsultasServiceImpl implements IConsultasService{
 				+ "CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\""
 				+ "CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\""
 				+ "</SELECT>";
+	}
+	
+	public String insertarClaves(Short idClaseComunicaciones, String sentencia){
+		
+		int indexInicio = sentencia.indexOf("<WHERE>")+7;
+		int indexFinal = sentencia.indexOf("</WHERE>");
+		String sentenciaFinal = "";
+		String where = "";		
+		
+		List<KeyItem> listaKeys = null;
+		
+		if(idClaseComunicaciones != null){
+			listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(idClaseComunicaciones);
+			for(int i=0; i < listaKeys.size(); i++){
+				KeyItem key = listaKeys.get(i);
+				if(i !=0){
+					where = where + " AND ";
+				}else{
+					where = "WHERE ";
+				}
+				String etiquetaKey = SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + key.getNombre() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO;
+				where = where + key.getTabla().trim() + "." + key.getNombre() + " = " + etiquetaKey;				
+			}
+		}		
+		
+		if(indexInicio > -1 && indexFinal > -1){
+			sentenciaFinal = sentencia.substring(0, indexInicio) + where + sentencia.substring(indexFinal, sentencia.length());
+		}else{
+			sentenciaFinal = sentencia + "<WHERE>" + where + "</WHERE>";
+		}
+		
+		return sentenciaFinal;
 	}
 	
 	public String obtenerSelect(String consulta){
@@ -1113,7 +1173,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 					List<KeyItem> listaKeys = null;
 					
 					if(idClaseComunicacion != null){
-						listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Long.parseLong(idClaseComunicacion));
+						listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
 					}				
 					
 					listaCampos = obtenerCamposDinamicos(usuario, consulta);
@@ -1124,6 +1184,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 					error.setCode(500);
 					error.setMessage(e.getMessage());
 					response.setError(error);
+					e.printStackTrace();
 				}
 			}			
 			

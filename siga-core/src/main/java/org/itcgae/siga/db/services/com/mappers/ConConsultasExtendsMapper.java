@@ -77,5 +77,5 @@ public interface ConConsultasExtendsMapper {
 	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectConsultasDisponibles(Short IdInstitucion, Long idClaseComunicacion, Short idObjetivo);
+	List<ComboItem> selectConsultasDisponibles(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo);
 }	
