@@ -1225,14 +1225,13 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		colegiado.setUsumodificacion(usuario.getIdusuario());
 		colegiado.setNumsolicitudcolegiacion(solicitud.getIdsolicitud().toString());
 		colegiado.setFechapresentacion(new Date());
-		if (solicitud.getIdtipocolegiacion() == 10) {
+		if (solicitud.getIdtipocolegiacion() == 20) {
 			colegiado.setComunitario("1");
-			colegiado.setNcomunitario(solicitud.getNcolegiado());;
+			colegiado.setNcomunitario(solicitud.getNcolegiado());
 		}else{
 			colegiado.setComunitario("0");
 		}
 		colegiado.setJubilacioncuota("0");
-		
 		colegiado.setIndtitulacion("1");
 		colegiado.setSituacionejercicio("0");
 		colegiado.setSituacionempresa("0");
