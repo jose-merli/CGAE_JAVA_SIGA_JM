@@ -121,8 +121,8 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 
 	public String getMaxNColegiado(String idInstitucion){
 		SQL sql = new SQL();
-		sql.SELECT("MAX(NCOLEGIADO + 1) AS NCOLEGIADO");
-		sql.FROM("CEN_SOLICITUDINCORPORACION");
+		sql.SELECT("NVL(MAX(NCOLEGIADO + 1),0001) AS NCOLEGIADO");
+		sql.FROM("CEN_COLEGIADO");
 		sql.WHERE("IDINSTITUCION = " + idInstitucion);
 		return sql.toString();
 	} 
