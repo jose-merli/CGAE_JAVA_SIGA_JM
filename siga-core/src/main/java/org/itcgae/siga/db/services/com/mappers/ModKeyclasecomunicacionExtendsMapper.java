@@ -21,6 +21,6 @@ public interface ModKeyclasecomunicacionExtendsMapper {
 		@Result(column = "TABLA", property = "tabla", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR)
 	})
-	List<KeyItem> selectKeyClase(Long idClaseComunicacion);
+	List<KeyItem> selectKeyClase(Short idClaseComunicacion);
 	
 }

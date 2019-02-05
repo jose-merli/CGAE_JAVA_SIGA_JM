@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
@@ -159,8 +160,8 @@ public class ConsultasController {
 	}
 
 	@RequestMapping(value = "/ejecutarConsulta", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InputStreamResource> ejecutarConsulta(HttpServletRequest request, @RequestBody String consulta) {
-
+	ResponseEntity<InputStreamResource> ejecutarConsulta(HttpServletRequest request, @RequestBody ConsultaItem consulta) {
+		
 		File file = _consultasService.ejecutarConsulta(request, consulta);
 		HttpHeaders headers = null;
 		InputStreamResource resource = null;
@@ -179,5 +180,14 @@ public class ConsultasController {
 		return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
 
 	}
+	
+	@RequestMapping(value = "/obtenerCamposDinamicos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<CamposDinamicosDTO> obtenerCamposDinamicos(HttpServletRequest request, @RequestBody ConsultaItem consulta) {
+		CamposDinamicosDTO response = _consultasService.obtenerCamposConsulta(request, consulta.getIdClaseComunicacion(), consulta.getSentencia());
+		if (response.getError() == null)
+			return new ResponseEntity<CamposDinamicosDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<CamposDinamicosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}	
 
 }

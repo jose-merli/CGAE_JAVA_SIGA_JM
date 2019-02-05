@@ -78,13 +78,14 @@ public class ModModeloComunicacionExtendsSqlProvider {
 	   return sql.toString();
 	}
 	
-	public String selectPlantillaModelo(String idModeloComunicacion){
+	public String selectPlantillaModelo(String idModeloComunicacion, Short idInstitucion){
 		
 		SQL sql = new SQL();
 		sql.SELECT("MPLANTILLA.IDPLANTILLAENVIOS AS VALUE, PLANTILLA.NOMBRE AS LABEL");
 		sql.FROM("MOD_MODELO_PLANTILLAENVIO MPLANTILLA");
 		sql.JOIN("ENV_PLANTILLASENVIOS PLANTILLA ON PLANTILLA.IDPLANTILLAENVIOS = MPLANTILLA.IDPLANTILLAENVIOS AND MPLANTILLA.IDINSTITUCION = PLANTILLA.IDINSTITUCION");
 		sql.WHERE("MPLANTILLA.IDMODELOCOMUNICACION = '"+ idModeloComunicacion +"'");
+		sql.WHERE("PLANTILLA.IDINSTITUCION = " + idInstitucion);
 		   
 		return sql.toString();
 	}
@@ -96,8 +97,8 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.SELECT("TIPO.IDTIPOENVIOS AS VALUE, CAT.DESCRIPCION");
 		sql.FROM("ENV_TIPOENVIOS TIPO");
 		sql.JOIN("GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = TIPO.NOMBRE AND CAT.IDLENGUAJE = '" + idLenguaje + "'");
-		sql.WHERE("TIPO.IDTIPOENVIOS = '" + idPlantilla + "'");
-		   
+		sql.WHERE("TIPO.IDTIPOENVIOS = '" + idPlantilla + "'");		
+		
 		return sql.toString();
 	}
 

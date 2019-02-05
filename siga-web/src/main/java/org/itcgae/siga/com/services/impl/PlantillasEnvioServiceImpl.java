@@ -138,8 +138,8 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			LOGGER.info("PlantillasEnvioSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
-					
-					plantillasItem = _envPlantillaEnviosExtendsMapper.selectPlantillasEnvios(idInstitucion, filtros);
+					AdmUsuarios usuario = usuarios.get(0);
+					plantillasItem = _envPlantillaEnviosExtendsMapper.selectPlantillasEnvios(idInstitucion, usuario.getIdlenguaje(), filtros);
 					if(plantillasItem != null && plantillasItem.size()> 0){
 						respuesta.setPlantillasItem(plantillasItem);
 					}

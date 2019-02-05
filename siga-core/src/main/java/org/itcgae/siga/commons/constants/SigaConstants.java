@@ -54,6 +54,27 @@ public class SigaConstants {
 	public static String CAMPO_APELLIDO2 = "APELLIDO2";
 	public static String CAMPO_NUM_COLEGIADO = "NCOLEGIADO";
 	public static String CAMPO_IDENTIFICACION = "INDENTIFICACIONENTIDAD";
+	
+	// Para la busqueda de criterios dinamicos de las consultas
+	public static final String TIPONUMERO	= "N";
+	public static final String TIPOTEXTO	= "A";
+	public static final String TIPOFECHA	= "D";
+	public static final String TIPOFECHANULA	= "X";
+	public static final String TIPOMULTIVALOR		= "MV";
+	public static final String TIPOENVIO		= "E";
+	
+	public static final String ETIQUETATIPONUMERO	= "%%NUMERO%%";
+	public static final String ETIQUETATIPOTEXTO	= "%%TEXTO%%";
+	public static final String ETIQUETATIPOFECHA	= "%%FECHA%%";
+	public static final String ETIQUETATIPOMULTIVALOR		= "%%MULTIVALOR@";
+	public static final String ETIQUETATIPOENVIO		= "%%TIPOENVIO%%";
+	public static final String ETIQUETAOPERADOR   	= "%%OPERADOR%%";
+	
+	public static final String NOMBRETIPOENVIO		= "TIPO ENVIO";
+	public static final String IS_NULL		= "is null";
+	public static final String LIKE		= "like";
+	public static final String NOMBRETABLA_CEN_CLIENTE = "CEN_CLIENTE";
+	public static final String NOMBRETABLA_CEN_COLEGIADO = "CEN_COLEGIADO";
 
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(
@@ -353,20 +374,20 @@ public class SigaConstants {
 	}
 	
 	public static enum OBJETIVO {
-		DESTINATARIOS(new Short("1"), "DESTINATARIOS"),
-		MULTIDOCUMENTO(new Short("2"), "MULTIDOCUMENTO"),
-		CONDICIONAL(new Short("3"), "CONDICIONAL"),
-		DATOS(new Short("4"), "DATOS");
+		DESTINATARIOS(new Long("1"), "DESTINATARIOS"),
+		MULTIDOCUMENTO(new Long("2"), "MULTIDOCUMENTO"),
+		CONDICIONAL(new Long("3"), "CONDICIONAL"),
+		DATOS(new Long("4"), "DATOS");
 		
-		private final Short codigo;
+		private final Long codigo;
 		private final String descripcion;
 
-		OBJETIVO(Short codigo, String descripcion) {
+		OBJETIVO(Long codigo, String descripcion) {
 			this.codigo = codigo;
 			this.descripcion = descripcion;
 		}
 
-		public Short getCodigo() {
+		public Long getCodigo() {
 			return codigo;
 		}
 
@@ -376,7 +397,7 @@ public class SigaConstants {
 
 		public static OBJETIVO getEnum(Short codigo) {
 			for (OBJETIVO sc : values()) {
-				if (sc.getCodigo().shortValue() == codigo.shortValue()) {
+				if (sc.getCodigo().longValue() == codigo.longValue()) {
 					return sc;
 				}
 			}
@@ -585,6 +606,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String NOMBREGRUPO = "NOMBREGRUPO";
 	public static final String PERSONANOMBRE = "PERSONANOMBRE";
 	public static final String C_IDPERSONA = "C_IDPERSONA";
+	public static final String C_IDINSTITUCION 		= "IDINSTITUCION";
 	public static final String PERSONANIF = "PERSONANIF";
 	public static final String COLEGIADONUMERO = "COLEGIADONUMERO";
 	public static final Short IDINSTITUCION_2000 = 2000;
@@ -636,16 +658,10 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 			C_FECHAINICIO ,C_FECHAFIN,C_CREDITOS,FECHAVERIFICACION,C_DESCRIPCION
 			,TIPOCVCOD,TIPOCVNOMBRE,C_IDTIPOCV,SUBTIPOCV1COD,SUBTIPOCV1NOMBRE,C_IDTIPOCVSUBTIPO1,SUBTIPOCV2COD,SUBTIPOCV2NOMBRE,C_IDTIPOCVSUBTIPO2,ERRORES);
 
-	
+
 	//AGENDA
-	
 	public static final long CALENDARIO_GENERAL = 1; 
 	public static final long CALENDARIO_LABORAL = 2;
 	public static final long CALENDARIO_FORMACION = 3; 
-
-
-	
-	
- 
 
 }

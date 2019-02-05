@@ -94,7 +94,7 @@ public class ConConsultasExtendsSqlProvider {
 		return sql.toString();
 	}
 	
-	public String selectConsultasDisponibles(Short idInstitucion, Long idClaseComunicacion, Short idObjetivo){
+	public String selectConsultasDisponibles(Short idInstitucion, Long idClaseComunicacion, Long idObjetivo){
 		
 		SQL sql = new SQL();
 		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION");
