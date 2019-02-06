@@ -9,7 +9,7 @@ public class ModelosComunicacionItem {
 	
 	private String idModeloComunicacion;
 	private String nombre;
-	private String orden;
+	private Integer orden;
 	private String idInstitucion;
 	private String descripcion;
 	private String preseleccionar;
@@ -41,10 +41,10 @@ public class ModelosComunicacionItem {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public String getOrden() {
+	public Integer getOrden() {
 		return orden;
 	}
-	public void setOrden(String orden) {
+	public void setOrden(Integer orden) {
 		this.orden = orden;
 	}
 	public String getIdInstitucion() {
