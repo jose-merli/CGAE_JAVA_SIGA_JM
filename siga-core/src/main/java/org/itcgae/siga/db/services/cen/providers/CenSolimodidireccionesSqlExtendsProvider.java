@@ -144,8 +144,6 @@ public class CenSolimodidireccionesSqlExtendsProvider extends CenSolicitudmodifi
 
 		sql.SELECT("MAX(IDSOLICITUD) AS IDSOLICITUD");
 		sql.FROM("CEN_SOLIMODIDIRECCIONES");
-		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
-		sql.WHERE("IDPERSONA = '"+ idPersona +"'");
 		
 		return sql.toString();
 	}

@@ -14,6 +14,7 @@ public class ColegiadoItem {
 	private Boolean searchLoggedUser;
 	private String institucion;
 	private String idInstitucion;
+	private Date fechaEstado;
 	private String nif;
 	private String nombre;
 	private String numColegiado;
@@ -66,7 +67,6 @@ public class ColegiadoItem {
 	private String fechaNacimiento;
 	private String fechaBaja;
 
-	private Date fechaEstado;
 	private String fechaEstadoStr;
 	private Date incorporacionDate;
 	private Date fechaJuraDate;

@@ -25,8 +25,6 @@ public class CenSolicmodicuentasSqlExtendsProvider {
 		SQL sql = new SQL();
 		sql.SELECT("MAX(IDSOLICITUD) AS IDSOLICITUD");
 		sql.FROM("CEN_SOLICMODICUENTAS");
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
-		sql.WHERE("IDPERSONA = '" + idPersona + "'");
 
 		return sql.toString();
 	}
