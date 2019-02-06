@@ -164,7 +164,7 @@ public class EnviosServiceImpl implements IEnviosService{
         		keyProperties.setParametro("mail.smtp.user");
         		property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
         		String user = property.getParametro();
-        		keyProperties.setParametro("mail.smtp.user");
+        		keyProperties.setParametro("mail.smtp.pwd");
         		property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
         		String pwd = property.getParametro();
         		tr.connect(host, user, pwd);
