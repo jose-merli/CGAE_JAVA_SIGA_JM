@@ -2,7 +2,7 @@ package org.itcgae.siga.DTOs.com;
 
 public class PlantillaModeloBorrarDTO {
 	
-	private String idModelo;
+	private String idModeloComunicacion;
 	private String idPlantillaEnvios;
 	private String porDefecto;
 	private String idInstitucion;
@@ -41,17 +41,16 @@ public class PlantillaModeloBorrarDTO {
 	public void setPorDefecto(String porDefecto) {
 		this.porDefecto = porDefecto;
 	}
-	public String getIdModelo() {
-		return idModelo;
+	public String getIdModeloComunicacion() {
+		return idModeloComunicacion;
+	}
+	public void setIdModeloComunicacion(String idModeloComunicacion) {
+		this.idModeloComunicacion = idModeloComunicacion;
 	}
 	public String getIdPlantillaEnvios() {
 		return idPlantillaEnvios;
 	}
-	public void setIdModelo(String idModelo) {
-		this.idModelo = idModelo;
-	}
 	public void setIdPlantillaEnvios(String idPlantillaEnvios) {
 		this.idPlantillaEnvios = idPlantillaEnvios;
 	}
-
 }

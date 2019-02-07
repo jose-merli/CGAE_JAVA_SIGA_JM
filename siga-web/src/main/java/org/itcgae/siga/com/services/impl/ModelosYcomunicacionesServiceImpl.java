@@ -359,6 +359,52 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		LOGGER.info("borrarModeloComunicaciones() -> Salida del servicio para borrar un modelo de comunicación");
 		return respuesta;
 	}
+	
+	@Override
+	public Error rehabilitarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem[] modeloComunicacion) {
+		LOGGER.info("rehabilitarModeloComunicaciones() -> Entrada al servicio para rehabilitar un módulo de comunicación");
+		
+		Error respuesta = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+						
+					for(ModelosComunicacionItem modeloCom : modeloComunicacion){
+						if(modeloCom.getFechaBaja() != null) {
+							// Tabla mod_modelocomunicacion
+							ModModelocomunicacion modelo = modModelocomunicacionMapper.selectByPrimaryKey(Long.parseLong(modeloCom.getIdModeloComunicacion()));
+							modelo.setIdmodelocomunicacion(Long.parseLong(modeloCom.getIdModeloComunicacion()));
+							modelo.setFechabaja(null);
+							modelo.setFechamodificacion(new Date());
+							modelo.setUsumodificacion(usuario.getIdusuario());
+							modModelocomunicacionMapper.updateByPrimaryKey(modelo);
+						}
+					}
+					
+					respuesta.setCode(200);
+					respuesta.setDescription("Registro rehabilitado correctamente");
+					respuesta.setMessage("Update correcto");
+				}catch(Exception e){
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error");
+				}				
+			}
+		}
+		LOGGER.info("rehabilitarModeloComunicaciones() -> Salida del servicio para rehabilitar un modelo de comunicación");
+		return respuesta;
+	}
 
 	@Override
 	public ComboDTO obtenerPerfilesModelo(HttpServletRequest request, String idInstitucion, String idModeloComunicacion) {
@@ -705,7 +751,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 				try{
 					for (int i = 0; i < plantillas.length; i++) {
 						ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
-						key.setIdmodelocomunicacion(Long.valueOf(plantillas[i].getIdModelo()));
+						key.setIdmodelocomunicacion(Long.valueOf(plantillas[i].getIdModeloComunicacion()));
 						key.setIdplantillaenvios(Integer.parseInt(plantillas[i].getIdPlantillaEnvios()));
 						key.setIdinstitucion(Short.valueOf(plantillas[i].getIdInstitucion()));
 						key.setIdtipoenvios(Short.valueOf(plantillas[i].getIdTipoEnvios()));
@@ -730,7 +776,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	}
 
 	@Override
-	public Error guardarPlantillaEnviosModelo(HttpServletRequest request, PlantillaModeloBorrarDTO datosPlantilla) {
+	public Error guardarPlantillaEnviosModelo(HttpServletRequest request, List<PlantillaModeloBorrarDTO> listDatosPlantilla) {
 		LOGGER.info("guardarPlantillaModelo() -> Entrada al servicio para guardar la plantilla del modelo");
 		
 		// Conseguimos información del usuario logeado
@@ -748,57 +794,64 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
 					
-					if(datosPlantilla.getPorDefecto().equals("Si") || datosPlantilla.getPorDefecto().equals("SI")){
-						ModModeloPlantillaenvioExample example = new ModModeloPlantillaenvioExample();
-						example.createCriteria().andIdmodelocomunicacionEqualTo(Long.valueOf(datosPlantilla.getIdModelo()));
-						List<ModModeloPlantillaenvio> plantillas = modModeloPlantillaenvioMapper.selectByExample(example);
-						for (int i = 0; i < plantillas.size() ; i++) {
-							plantillas.get(i).setPordefecto("No");
-							plantillas.get(i).setFechamodificacion(new Date());
-							plantillas.get(i).setUsumodificacion(usuario.getIdusuario());
-							modModeloPlantillaenvioMapper.updateByPrimaryKey(plantillas.get(i));
+					for (PlantillaModeloBorrarDTO datosPlantilla : listDatosPlantilla) {
+						
+						if(datosPlantilla.getPorDefecto().equals("Si") || datosPlantilla.getPorDefecto().equals("SI")){
+							ModModeloPlantillaenvioExample example = new ModModeloPlantillaenvioExample();
+							example.createCriteria().andIdmodelocomunicacionEqualTo(Long.valueOf(datosPlantilla.getIdModeloComunicacion()));
+							List<ModModeloPlantillaenvio> plantillas = modModeloPlantillaenvioMapper.selectByExample(example);
+							for (int i = 0; i < plantillas.size() ; i++) {
+								plantillas.get(i).setPordefecto("No");
+								plantillas.get(i).setFechamodificacion(new Date());
+								plantillas.get(i).setUsumodificacion(usuario.getIdusuario());
+								modModeloPlantillaenvioMapper.updateByPrimaryKey(plantillas.get(i));
+							}
 						}
+						ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
+						if(datosPlantilla.getIdInstitucion() == null) {
+							key.setIdinstitucion(idInstitucion);
+						}else {
+							key.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
+						}
+						key.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModeloComunicacion()));
+						key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
+						key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
+						ModModeloPlantillaenvio plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
+						if(plantilla != null){
+							plantilla.setFechabaja(null);
+							plantilla.setUsumodificacion(usuario.getIdusuario());
+							plantilla.setFechamodificacion(new Date());
+							plantilla.setPordefecto(datosPlantilla.getPorDefecto());
+							modModeloPlantillaenvioMapper.updateByPrimaryKey(plantilla);
+						}else{
+							plantilla = new ModModeloPlantillaenvio();
+							plantilla.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModeloComunicacion()));
+							plantilla.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
+							plantilla.setIdinstitucion(idInstitucion);
+							plantilla.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
+							plantilla.setPordefecto(datosPlantilla.getPorDefecto());
+							plantilla.setUsumodificacion(usuario.getIdusuario());
+							plantilla.setFechamodificacion(new Date());
+							modModeloPlantillaenvioMapper.insert(plantilla);
+						}
+						
+						//Si llega los ids antiguos es una edición del registro de la tabla por lo tanto borramos la antigua.
+						if(datosPlantilla.getIdAntiguaPlantillaEnvios() != null && !datosPlantilla.getIdAntiguaPlantillaEnvios().equals(datosPlantilla.getIdPlantillaEnvios())){
+							key = new ModModeloPlantillaenvioKey();
+							key.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
+							key.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModeloComunicacion()));
+							key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdAntiguaPlantillaEnvios()));
+							key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdAntiguaTipoEnvios()));
+							plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
+							plantilla.setFechabaja(new Date());
+							plantilla.setUsumodificacion(usuario.getIdusuario());
+							plantilla.setFechamodificacion(new Date());
+							modModeloPlantillaenvioMapper.updateByPrimaryKey(plantilla);
+						}
+						
+						respuesta.setCode(200);
+						respuesta.setDescription("Plantilla guardada");
 					}
-					ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
-					key.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
-					key.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
-					key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
-					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
-					ModModeloPlantillaenvio plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
-					if(plantilla != null){
-						plantilla.setFechabaja(null);
-						plantilla.setUsumodificacion(usuario.getIdusuario());
-						plantilla.setFechamodificacion(new Date());
-						plantilla.setPordefecto(datosPlantilla.getPorDefecto());
-						modModeloPlantillaenvioMapper.updateByPrimaryKey(plantilla);
-					}else{
-						plantilla = new ModModeloPlantillaenvio();
-						plantilla.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
-						plantilla.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
-						plantilla.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
-						plantilla.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
-						plantilla.setPordefecto(datosPlantilla.getPorDefecto());
-						plantilla.setUsumodificacion(usuario.getIdusuario());
-						plantilla.setFechamodificacion(new Date());
-						modModeloPlantillaenvioMapper.insert(plantilla);
-					}
-					
-					//Si llega los ids antiguos es una edición del registro de la tabla por lo tanto borramos la antigua.
-					if(datosPlantilla.getIdAntiguaPlantillaEnvios() != null && !datosPlantilla.getIdAntiguaPlantillaEnvios().equals(datosPlantilla.getIdPlantillaEnvios())){
-						key = new ModModeloPlantillaenvioKey();
-						key.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
-						key.setIdmodelocomunicacion(Long.valueOf(datosPlantilla.getIdModelo()));
-						key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdAntiguaPlantillaEnvios()));
-						key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdAntiguaTipoEnvios()));
-						plantilla = modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
-						plantilla.setFechabaja(new Date());
-						plantilla.setUsumodificacion(usuario.getIdusuario());
-						plantilla.setFechamodificacion(new Date());
-						modModeloPlantillaenvioMapper.updateByPrimaryKey(plantilla);
-					}
-					
-					respuesta.setCode(200);
-					respuesta.setDescription("Plantilla guardada");
 				}catch(Exception e){
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());

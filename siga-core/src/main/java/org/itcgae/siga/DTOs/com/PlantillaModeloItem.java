@@ -11,7 +11,7 @@ public class PlantillaModeloItem {
 	private Date fechaBaja;
 	private String porDefecto;
 	private String idInstitucion;
-	
+	private String idModeloComunicacion;
 	
 	public String getIdInstitucion() {
 		return idInstitucion;
@@ -55,6 +55,10 @@ public class PlantillaModeloItem {
 	public void setTipoEnvio(String tipoEnvio) {
 		this.tipoEnvio = tipoEnvio;
 	}
-
-	
+	public String getIdModeloComunicacion() {
+		return idModeloComunicacion;
+	}
+	public void setIdModeloComunicacion(String idModeloComunicacion) {
+		this.idModeloComunicacion = idModeloComunicacion;
+	}
 }

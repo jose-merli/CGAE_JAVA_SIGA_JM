@@ -61,8 +61,12 @@ public class ModModeloComunicacionExtendsSqlProvider {
 			sql.WHERE("modelo.FECHABAJA is NULL");
 		}
 		
-		sql.ORDER_BY("IDMODELOCOMUNICACION ASC");
-		
+		if (historico) {
+			sql.ORDER_BY("modelo.FECHABAJA ASC, IDMODELOCOMUNICACION ASC");
+		} else {
+			sql.ORDER_BY("IDMODELOCOMUNICACION ASC");
+		}
+
 		return sql.toString();
 	}
 	
