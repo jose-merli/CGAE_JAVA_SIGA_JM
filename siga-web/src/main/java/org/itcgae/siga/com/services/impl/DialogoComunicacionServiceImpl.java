@@ -872,5 +872,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		}
 		return consultaEncontrada;		
 	}
+
+
+
+	@Override
+	public Error enviarTest(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

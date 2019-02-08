@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
 import org.itcgae.siga.DTOs.com.TipoEnvioDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 
 public interface IDialogoComunicacionService {
 	
@@ -20,5 +21,5 @@ public interface IDialogoComunicacionService {
 	public ByteResponseDto descargarComunicacion(HttpServletRequest request, DialogoComunicacionItem dialogo);
 	public KeysDTO obtenerKeysClaseComunicacion(HttpServletRequest request, String idClaseComunicacion);
 	public ConsultasDTO obtenerCamposModelo(HttpServletRequest request, DialogoComunicacionItem dialogo);
-	
+	public Error enviarTest(HttpServletRequest request);
 }

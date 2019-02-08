@@ -154,6 +154,16 @@
 	        <artifactId>aspose-words</artifactId>
 	        <version>14.2</version>
 	    </dependency>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mailapi</artifactId>
+			<version>1.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.redabogacia</groupId>
+			<artifactId>ecos</artifactId>
+			<version>1.0.1</version>
+		</dependency>
 	</dependencies>
 	
 
