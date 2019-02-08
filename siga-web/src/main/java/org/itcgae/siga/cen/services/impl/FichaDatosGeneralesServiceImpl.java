@@ -9,9 +9,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -19,7 +17,6 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
@@ -31,6 +28,7 @@ import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -42,8 +40,6 @@ import org.itcgae.siga.db.entities.CenClienteExample;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
-import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
-import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample;
 import org.itcgae.siga.db.entities.CenGruposcliente;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
@@ -54,16 +50,16 @@ import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicos;
 import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
+import org.itcgae.siga.db.entities.ForTemacursoPersona;
+import org.itcgae.siga.db.entities.ForTemacursoPersonaExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
-import org.itcgae.siga.db.mappers.CenSolicmodifexportarfotoMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenDatoscolegialesestadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
@@ -73,6 +69,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitmodifdatosbasicosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicmodifexportarfotoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.ForTemacursoPersonaExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -128,6 +125,9 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 	@Autowired
 	private CenEstadocivilExtendsMapper cenEstadocivilExtendsMapper;
+	
+	@Autowired
+	private ForTemacursoPersonaExtendsMapper forTemaCursoPersonaExtendsMapper;
 
 
 //	@Override
@@ -162,6 +162,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
+				try {
 				// 1. obtener colegiado
 				
 				CenPersona cenPersona = cenPersonaExtendsMapper.selectByPrimaryKey(Long.valueOf(colegiadoItem.getIdPersona()));
@@ -506,6 +507,154 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 //							cenDatoscolegialesestadoMapper.insertSelective(cenEstadoColegial);
 //						}
 //					}
+								
+					// Comenzamos el proceso de guardar los temas en la tabla for_temacurso_persona
+					if (colegiadoItem.getTemasCombo() != null && colegiadoItem.getTemasCombo().size() > 0) {
+
+						// Eliminamos el tema que no se encuentre en la lista actual
+						ForTemacursoPersonaExample forTemacursoPersonaExample = new ForTemacursoPersonaExample();
+						forTemacursoPersonaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdpersonaEqualTo(Long.parseLong(colegiadoItem.getIdPersona())).andFechabajaIsNull();
+
+						LOGGER.info(
+								"updateColegiado() / forTemaCursoPersonaExtendsMapper.selectByExample(forTemacursoPersonaExample) -> Entrada a forTemacursoCursoMapper para buscar los temas registrados de una persona");
+
+						List<ForTemacursoPersona> forTemacursoCursoAntiguosList = forTemaCursoPersonaExtendsMapper
+								.selectByExample(forTemacursoPersonaExample);
+
+						LOGGER.info(
+								"updateColegiado() / forTemaCursoPersonaExtendsMapper.selectByExample(forTemacursoPersonaExample) -> Salida a forTemacursoCursoMapper para buscar los temas registrados de una persona");
+
+						List<ForTemacursoPersona> forTemacursoCursoDarBaja = new ArrayList<ForTemacursoPersona>();
+
+						// Si hay temas que estan dados de alta, comprobamos que se encuentra en la
+						// modificacion actual
+						if (!forTemacursoCursoAntiguosList.isEmpty()) {
+
+							for (ForTemacursoPersona temasAsignadosAntiguos : forTemacursoCursoAntiguosList) {
+								boolean flag = false;
+								for (int i = 0; colegiadoItem.getTemasCombo().size() > i; i++) {
+
+									if (temasAsignadosAntiguos.getIdtemacurso() == Long
+											.valueOf(colegiadoItem.getTemasCombo().get(i).getValue())) {
+										flag = true;
+										i = colegiadoItem.getTemasCombo().size();
+									}
+								}
+
+								// Si no se encuentra en la lista actual la borramos
+								if (!flag) {
+									forTemacursoCursoDarBaja.add(temasAsignadosAntiguos);
+								}
+							}
+
+							for (ForTemacursoPersona temaCursoBaja : forTemacursoCursoDarBaja) {
+
+								temaCursoBaja.setUsumodificacion(usuario.getIdusuario().longValue());
+								temaCursoBaja.setFechabaja(new Date());
+								temaCursoBaja.setFechamodificacion(new Date());
+
+								LOGGER.info(
+										"updateColegiado() / forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(temaCursoBaja) -> Entrada a forTemaCursoPersonaExtendsMapper para dar de baja a un tema de una persona");
+
+								forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(temaCursoBaja);
+
+								LOGGER.info(
+										"updateColegiado() / forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(temaCursoBaja) -> Salida a forTemaCursoPersonaExtendsMapper para dar de baja a un tema de una persona");
+							}
+						}
+
+						// Añadimos temas
+						for (ComboItem tema : colegiadoItem.getTemasCombo()) {
+
+							// Para cada temas comprobamos si ya existe la relacion
+							ForTemacursoPersonaExample forTemacursoExample = new ForTemacursoPersonaExample();
+							forTemacursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andIdpersonaEqualTo(Long.parseLong(colegiadoItem.getIdPersona()))
+									.andIdtemacursoEqualTo(Long.valueOf(tema.getValue()));
+
+							LOGGER.info(
+									"updateColegiado() / forTemaCursoPersonaExtendsMapper.selectByExample(forTemacursoCursoExample) -> Entrada a forTemaCursoPersonaExtendsMapper para buscar los temas registrados de una persona");
+
+							List<ForTemacursoPersona> forTemacursoCursoList = forTemaCursoPersonaExtendsMapper
+									.selectByExample(forTemacursoExample);
+
+							LOGGER.info(
+									"updateColegiado() / forTemaCursoPersonaExtendsMapper.selectByExample(forTemacursoCursoExample) -> Salida a forTemaCursoPersonaExtendsMapper para buscar los temas registrados de una persona");
+
+							// Si no existe la creamos
+							if (forTemacursoCursoList.isEmpty()) {
+
+								ForTemacursoPersona forTemacursoCurso = new ForTemacursoPersona();
+								forTemacursoCurso.setFechabaja(null);
+								forTemacursoCurso.setFechamodificacion(new Date());
+								forTemacursoCurso.setIdinstitucion(idInstitucion);
+								forTemacursoCurso.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+								forTemacursoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+								forTemacursoCurso.setIdtemacurso(Long.valueOf(tema.getValue()));
+
+								LOGGER.info(
+										"updateColegiado() / forTemaCursoPersonaExtendsMapper.insert(forTipoServicioCurso) -> Entrada a forTemaCursoPersonaExtendsMapper para insertar un tema de una persona");
+
+								forTemaCursoPersonaExtendsMapper.insert(forTemacursoCurso);
+
+								LOGGER.info(
+										"updateColegiado() / forTemaCursoPersonaExtendsMapper.insert(forTipoServicioCurso) -> Salida a forTemaCursoPersonaExtendsMapper para insertar un tema de una persona");
+
+								// Si existe
+							} else {
+								// Comprobamos que si fecha de baja esta a null, si no esta la modificamos
+								if (forTemacursoCursoList.get(0).getFechabaja() != null) {
+									ForTemacursoPersona forTemaCurso = forTemacursoCursoList.get(0);
+									forTemaCurso.setFechabaja(null);
+									forTemaCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+									forTemaCurso.setFechamodificacion(new Date());
+
+									LOGGER.info(
+											"updateColegiado() / forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(forTemaCurso) -> Entrada a forTemaCursoPersonaExtendsMapper para dar de alta a un tema de una persona");
+
+									forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(forTemaCurso);
+
+									LOGGER.info(
+											"updateColegiado() / forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(forTemaCurso) -> Salida a forTemaCursoPersonaExtendsMapper para dar de alta a un tema de una persona");
+								}
+							}
+						}
+
+						// Comprobamos si existe algun tema para el curso y les damos de baja
+					} else {
+						// Eliminamos Tema
+						ForTemacursoPersonaExample forTemacursoCursoExample = new ForTemacursoPersonaExample();
+						forTemacursoCursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdpersonaEqualTo(Long.parseLong(colegiadoItem.getIdPersona())).andFechabajaIsNull();
+
+						LOGGER.info(
+								"updateColegiado() / forTemaCursoPersonaExtendsMapper.selectByExample(forTemacursoCursoExample) -> Entrada a forTemaCursoPersonaExtendsMapper para buscar los temas registrados de una persona");
+
+						List<ForTemacursoPersona> forTemacursoCursoAntiguosList = forTemaCursoPersonaExtendsMapper
+								.selectByExample(forTemacursoCursoExample);
+
+						LOGGER.info(
+								"updateColegiado() / forTemaCursoPersonaExtendsMapper.selectByExample(forTemacursoCursoExample) -> Salida a forTemaCursoPersonaExtendsMapper para buscar los temas registrados de una persona");
+
+						for (ForTemacursoPersona temasAsignadosAntiguos : forTemacursoCursoAntiguosList) {
+
+							temasAsignadosAntiguos.setUsumodificacion(usuario.getIdusuario().longValue());
+							temasAsignadosAntiguos.setFechabaja(new Date());
+							temasAsignadosAntiguos.setFechamodificacion(new Date());
+
+							LOGGER.info(
+									"updateColegiado() / forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(temaCursoBaja) -> Entrada a forTemaCursoPersonaExtendsMapper para dar de baja a un tema de una persona");
+
+							forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(temasAsignadosAntiguos);
+
+							LOGGER.info(
+									"updateColegiado() / forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(temaCursoBaja) -> Salida a forTemaCursoPersonaExtendsMapper para dar de baja a un tema de una persona");
+
+						}
+					}
+					
+								
 					if(!updateResponseDTO.getStatus().equals(SigaConstants.KO)) {
 						updateResponseDTO.setStatus(SigaConstants.OK);
 					}
@@ -516,6 +665,13 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						"updateColegiado() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
 								+ dni + " e idInstitucion = " + idInstitucion);
 			}
+     				
+				}catch(Exception e) {
+					updateResponseDTO.setStatus(SigaConstants.KO);
+					LOGGER.warn(
+							"updateColegiado() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+									+ dni + " e idInstitucion = " + idInstitucion);
+				}
 		} else {
 			updateResponseDTO.setStatus(SigaConstants.KO);
 			LOGGER.warn("updateColegiado() -> idInstitucion del token nula");
@@ -1284,5 +1440,32 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 //		return null;
 //	}
 
+	@Override
+	public ComboDTO getTopicsSpecificPerson(HttpServletRequest request, String idPersona) {
+		LOGGER.info("getTopicsSpecificPerson() -> Entrada al servicio para obtener los temas según la persona");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			LOGGER.info(
+					"getTopicsSpecificPerson() / forTemaCursoPersonaExtendsMapper.getTopicsSpecificPerson -> Entrada a forTemaCursoPersonaExtendsMapper para obtener los temas según la persona");
+			comboItems = forTemaCursoPersonaExtendsMapper.getTopicsSpecificPerson(idInstitucion.toString(), idPersona);
+			LOGGER.info(
+					"getTopicsSpecificPerson() / forTemaCursoPersonaExtendsMapper.getTopicsSpecificPerson -> Salida de forTemaCursoPersonaExtendsMapper para obtener los temas según la persona");
+
+		}
+
+		comboDTO.setCombooItems(comboItems);
+
+		LOGGER.info(
+				"getTopicsSpecificPerson() -> Salida del servicio para obtener los temas según la persona");
+
+		return comboDTO;
+	}
 	
 }

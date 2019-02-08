@@ -1,7 +1,10 @@
 package org.itcgae.siga.DTOs.cen;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
+
+import org.itcgae.siga.DTOs.gen.ComboItem;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -80,8 +83,8 @@ public class ColegiadoItem {
 	private String observaciones;
 	private String motivo;
 	private String subtipoCV [];
-	
-	
+	private String [] temas;
+	private List<ComboItem> temasCombo;
 	
 	
 	/**
@@ -1171,7 +1174,7 @@ public class ColegiadoItem {
 	    		fechaBaja, apellidos, fechaIncorporacion, situacion, residencia, inscrito, idProvincia, idPoblacion, codigoPostal, tipoDireccion, sexo, 
 	    		idEstadoCivil, domicilio, tipoCV, subTipoCV1, subTipoCV2, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
 	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion, 
-	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate, observaciones, subtipoCV,
+	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate, observaciones, subtipoCV, temas,
 	    		fechaNacimientoRango);
 	}
 
@@ -1238,6 +1241,7 @@ public class ColegiadoItem {
 	    sb.append("    incorporacionDate: ").append(toIndentedString(incorporacionDate)).append("\n");
 	    sb.append("    observaciones: ").append(toIndentedString(observaciones)).append("\n");
 	    sb.append("    subtipoCV: ").append(toIndentedString(subtipoCV)).append("\n");
+	    sb.append("    temas: ").append(toIndentedString(temas)).append("\n");
 	    sb.append("    fechaNacimientoRango: ").append(toIndentedString(subtipoCV)).append("\n");
 
 	    
@@ -1289,8 +1293,21 @@ public class ColegiadoItem {
 		this.numberColegiado = numberColegiado;
 	}
 
+	public String[] getTemas() {
+		return temas;
+	}
 
-	
+	public void setTemas(String[] temas) {
+		this.temas = temas;
+	}
+
+	public List<ComboItem> getTemasCombo() {
+		return temasCombo;
+	}
+
+	public void setTemasCombo(List<ComboItem> temasCombo) {
+		this.temasCombo = temasCombo;
+	}
 
 }
 
