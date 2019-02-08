@@ -150,9 +150,17 @@ public class CenSolimodidireccionesSqlExtendsProvider extends CenSolicitudmodifi
 		return sql.toString();
 	}
 	
-	public String searchSolModifDatosDirecciones(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion) {
-		String rdo = "SELECT * FROM (" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) UNION ( "
-				+ SolModifSQLUtils.getAddressesRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) ORDER BY 6 DESC";
-		return rdo;
+	public String searchSolModifDatosDirecciones(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje, String idInstitucion, Long idPersona) {
+		
+		if (null != idPersona) {
+			String rdo = "SELECT * FROM ((" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) UNION ( "
+					+ SolModifSQLUtils.getAddressesRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " )) WHERE IDPERSONA = "+ idPersona +"  ORDER BY 6 DESC";
+			return rdo;
+		}else{
+			String rdo = "SELECT * FROM (" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " ) UNION ( "
+					+ SolModifSQLUtils.getAddressesRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " )  ORDER BY 6 DESC";
+			return rdo;
+		}
+
 	}
 }

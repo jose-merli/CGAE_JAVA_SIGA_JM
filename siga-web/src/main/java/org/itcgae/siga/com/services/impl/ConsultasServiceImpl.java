@@ -197,12 +197,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 				
 				comboItems = _conClaseComunicacionExtendsMapper.selectTipoClaseComunicacion();
-				if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}		
+				
 				
 				comboDTO.setCombooItems(comboItems);
 				

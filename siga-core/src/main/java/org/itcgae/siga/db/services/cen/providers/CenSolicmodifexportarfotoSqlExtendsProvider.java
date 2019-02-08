@@ -9,19 +9,27 @@ import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
 public class CenSolicmodifexportarfotoSqlExtendsProvider {
 
 	public String searchSolModifDatosUseFoto(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-			String idLenguaje, String idInstitucion) {
+			String idLenguaje, String idInstitucion, Long idPersona) {
 
 		String id = "";
 		if(solicitudModificacionSearchDTO.getTipoModificacion() != null) {
 			id = solicitudModificacionSearchDTO.getTipoModificacion();
 		}
-		
-		String rdo = "SELECT * FROM ("
-				+ SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
-				+ " ) UNION ( "
-				+ SolModifSQLUtils.getDataPhotoRequest(id, solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
-				+ " ) ORDER BY 6 DESC";
-		return rdo;
+		if (null != idPersona) {
+			String rdo = "SELECT * FROM (("
+					+ SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+					+ " ) UNION ( "
+					+ SolModifSQLUtils.getDataPhotoRequest(id, solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+					+ " )) WHERE IDPERSONA = "+ idPersona +"  ORDER BY 6 DESC";
+			return rdo;
+		}else{
+			String rdo = "SELECT * FROM ("
+					+ SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+					+ " ) UNION ( "
+					+ SolModifSQLUtils.getDataPhotoRequest(id, solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+					+ " ) ORDER BY 6 DESC";
+			return rdo;
+		}
 	}
 
 	public String getMaxIdSolicitud(String idInstitucion, String idPersona) {

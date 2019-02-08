@@ -40,7 +40,7 @@ public interface CenSolicmodifexportarfotoExtendsMapper extends  CenSolicmodifex
                               @Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
                               @Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR) })
           List<SolModificacionItem> searchSolModifDatosUseFoto(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-                              String idLenguaje, String idInstitucion);
+                              String idLenguaje, String idInstitucion, Long idPersona);
 
 	
 	@SelectProvider(type = CenSolicmodifexportarfotoSqlExtendsProvider.class, method = "getMaxIdSolicitud")

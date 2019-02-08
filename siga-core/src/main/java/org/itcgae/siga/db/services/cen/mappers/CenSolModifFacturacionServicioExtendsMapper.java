@@ -30,5 +30,5 @@ public interface CenSolModifFacturacionServicioExtendsMapper extends CenSolmodif
 		@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR)}) 
 	List<SolModificacionItem> searchSolModifDatosFacturacion(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-			String idLenguage, String idInstitucion);
+			String idLenguage, String idInstitucion, Long idPersona);
 }

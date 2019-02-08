@@ -180,4 +180,6 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 
 Insert into ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) values ('24','cron.pattern.scheduled.ageEvento','0 */10 * ? * *','Periodo de ejecución del cron para la comprobacion de cursos','0 0 1 ? * *','1');
 
+
+update cen_gruposcliente_cliente set fecha_inicio = fechamodificacion where fecha_inicio is null;
 commit;

@@ -8,11 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.com.PerfilDTO;
-import org.itcgae.siga.DTOs.com.PerfilesDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.adm.service.IPerfilService;
 import org.itcgae.siga.db.entities.AdmPerfil;
 import org.itcgae.siga.db.entities.AdmPerfilExample;
@@ -110,12 +107,14 @@ public class PerfilServiceImpl implements IPerfilService {
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);			
 			if (null != usuarios && usuarios.size() > 0) {
 				comboItems = admPerfilExtendsMapper.selectListadoPerfiles(idInstitucion);
-				if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}		
+				
+				// Se debe de incluir el placeholder de "Seleccionar" en el combo de perfiles
+//				if(null != comboItems && comboItems.size() > 0) {
+//					ComboItem element = new ComboItem();
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
+//				}		
 				
 				comboDTO.setCombooItems(comboItems);
 			}		

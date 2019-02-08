@@ -175,15 +175,15 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 
 		if (colegiadoItem.getTipoCV() != null && colegiadoItem.getTipoCV() != "") {
-			sql.WHERE("datoscv.idcv = '" + colegiadoItem.getTipoCV() + "'");
+			sql.WHERE("datoscv.idtipocv = '" + colegiadoItem.getTipoCV() + "'");
 		}
 
 		if (colegiadoItem.getSubTipoCV1() != null && colegiadoItem.getSubTipoCV1() != "") {
-			sql.WHERE("subt1.idtipocvsubtipo1 = '" + colegiadoItem.getSubTipoCV1() + "'");
+			sql.WHERE("datoscv.idtipocvsubtipo1 = '" + colegiadoItem.getSubTipoCV1() + "'");
 		}
 		
 		if (colegiadoItem.getSubTipoCV2() != null && colegiadoItem.getSubTipoCV2() != "") {
-			sql.WHERE("subt2.idtipocvsubtipo2 = '" + colegiadoItem.getSubTipoCV2() + "'");
+			sql.WHERE("datoscv.idtipocvsubtipo2 = '" + colegiadoItem.getSubTipoCV2() + "'");
 		}
 
 		if (colegiadoItem.getSituacion() != null && colegiadoItem.getSituacion() != "") {
@@ -499,6 +499,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.INNER_JOIN("cen_persona per ON per.idpersona = col.idpersona");
 		sql.INNER_JOIN(
 				"cen_direcciones dir ON dir.idpersona = per.idpersona and dir.idInstitucion = col.idInstitucion and dir.fechabaja is null");
+		sql.INNER_JOIN(
+				"cen_direccion_tipodireccion tipodir ON tipodir.idpersona = per.idpersona and tipodir.idInstitucion = col.idInstitucion and dir.iddireccion = tipodir.iddireccion and tipodir.idtipodireccion = '2'");
 		sql.INNER_JOIN(
 				"cen_datoscolegialesestado dat ON dat.idPersona = per.idPersona and dat.idInstitucion = dir.idInstitucion and dat.fechaestado = (select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = dat.idpersona and datcol.idinstitucion = dat.idinstitucion)");
 		sql.INNER_JOIN("cen_estadocolegial est ON est.idEstado = dat.idEstado");
