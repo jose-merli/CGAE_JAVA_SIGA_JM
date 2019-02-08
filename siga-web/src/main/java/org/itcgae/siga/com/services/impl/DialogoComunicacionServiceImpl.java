@@ -712,10 +712,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		String nombreFichero = nombreFicheroSalida + sufijo + numero + "." + extension;
 		
 		//Comprobamos si ya existe el fichero con ese nombre
-		File file = new File (pathFicheroSalida + nombreFichero);
+		/*File file = new File (pathFicheroSalida + nombreFichero);
 		if(file.exists()){
 			nombreFichero = nombreFicheroSalida + sufijo + numero + "_" + new Date().getTime() + "." + extension;
-		}
+		}*/
 
 		
 		return nombreFichero;

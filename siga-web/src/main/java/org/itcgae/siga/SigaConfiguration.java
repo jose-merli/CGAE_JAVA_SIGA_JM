@@ -1,9 +1,12 @@
 package org.itcgae.siga;
 
-import javax.servlet.MultipartConfigElement;
+import java.net.URI;
+
+import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.logger.LoggingConfig;
 import org.itcgae.siga.logger.MyBatisLoggerInterceptor;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -15,10 +18,11 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import com.aspose.words.License;
 
 @Configuration
 public class SigaConfiguration implements ApplicationListener<ApplicationReadyEvent>{
@@ -26,9 +30,24 @@ public class SigaConfiguration implements ApplicationListener<ApplicationReadyEv
 	@Autowired
 	private LoggingConfig loggingConfig;
 	
+	@Autowired
+	ServletContext servletContext;
+	
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent arg0) {
 		loggingConfig.initLogback();
+		
+		// Configuramos la licencia del aspose
+		String rutaLicencia = SigaConstants.rutaLicencia;
+		
+		try {
+			URI ruta = servletContext.getResource(rutaLicencia).toURI();
+			License license = new License();
+			license.setLicense(ruta.getPath());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+		
 	}
 	
 	

@@ -139,55 +139,9 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		
 		LOGGER.info("obtenerConsultasPlantilla() -> Salida del servicio para obtener las consultas de una plantilla de documento");
 		return respuesta;
-	}
+	}	
 	
-	
-	/*@Override
-	public ComboDTO obtenerConsultasDisponibles(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
-		LOGGER.info("obtenerConsultasDisponibles() -> Entrada al servicio para obtener las disponibles para la clase y la institucion");
 		
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
-		
-		if (null != idInstitucionUser) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucionUser));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
-			
-			if (null != usuarios && usuarios.size() > 0) {
-				try{
-					Long idClaseComunicacion = null;
-					if(plantillaDoc.getIdClaseComunicacion() != null){
-						idClaseComunicacion = Long.parseLong(plantillaDoc.getIdClaseComunicacion());
-					}
-					comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion);
-					if(null != comboItems && comboItems.size() > 0) {
-						ComboItem element = new ComboItem();
-						element.setLabel("");
-						element.setValue("");
-						comboItems.add(0, element);
-					}		
-					
-					comboDTO.setCombooItems(comboItems);
-				}catch(Exception e){
-					Error error = new Error();
-					error.setCode(500);
-					error.setMessage("Error al obtener los perfiles");
-					error.description(e.getMessage());
-					e.printStackTrace();
-				}
-			}		
-		}		
-		
-		LOGGER.info("obtenerConsultasDisponibles() -> Salida del servicio para obtener las disponibles para la clase y la institucion");
-		return comboDTO;
-	}*/
-	
 	@Override
 	public ComboConsultasDTO obtenerConsultasDisponibles(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		LOGGER.info("obtenerConsultasDisponibles() -> Entrada al servicio para obtener las disponibles para la clase y la institucion");

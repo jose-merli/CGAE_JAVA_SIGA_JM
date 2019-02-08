@@ -46,6 +46,7 @@ public class SigaConstants {
 	public static String rutaExcelConsultaTemp= "/FILERMSA1000/SIGA/ficheros/archivo/tempExcel/";
 	public static String nombreExcelConsulta = "ResultadoConsulta";
 	public static String nombreZip = "DocumentosComunicacion";
+	public static String rutaLicencia = "/WEB-INF/Aspose.Words.lic";
 	
 	public static String REPLACECHAR_PREFIJO_SUFIJO = "%%";
 	public static String CLAVES_QUERY = "CLAVES";

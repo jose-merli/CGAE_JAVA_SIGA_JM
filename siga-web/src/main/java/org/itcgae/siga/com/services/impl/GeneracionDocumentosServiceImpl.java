@@ -26,6 +26,8 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	@Override
 	public Document sustituyeDocumento(Document doc, HashMap<String, Object> dato) throws Exception{
 
+		doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_CONTAINING_FIELDS | MailMergeCleanupOptions.REMOVE_EMPTY_PARAGRAPHS  | MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS | MailMergeCleanupOptions.REMOVE_UNUSED_FIELDS);
+		
 		try {
 			
 			Set<String> claves=dato.keySet();
@@ -45,10 +47,6 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 					doc = sustituyeDatos(doc, htRowDatosInforme);
 				}
 			}
-			
-			DataSet data = new DataSet();  
-			doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_CONTAINING_FIELDS | MailMergeCleanupOptions.REMOVE_EMPTY_PARAGRAPHS  | MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS | MailMergeCleanupOptions.REMOVE_UNUSED_FIELDS);
-			doc.getMailMerge().executeWithRegions(data);
 			
 		} catch (Exception e) {
 			LOGGER.error("GeneracionDocumentosServiceImpl.sustituyeDocumento :: Error al sustituir los datos del documento", e);
@@ -86,7 +84,9 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 					try {
 						if(o != null){
 							builder.write(o.toString().trim());	
-						}						
+						}else{
+							builder.write("");
+						}					
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
