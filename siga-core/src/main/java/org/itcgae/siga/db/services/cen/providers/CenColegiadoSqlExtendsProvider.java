@@ -393,6 +393,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("decode (situacionresidente, 1, 'Si', 0, 'No') as residenteInscrito");
 		sql.SELECT("observaciones");
 		sql.SELECT("TO_CHAR(fechaestado,'DD/MM/YYYY') AS fechaestado");
+		sql.SELECT("fechaestado AS fechaestadodate");
 		sql.SELECT("colest.idestado AS idEstado");
 
 		sql.FROM("cen_colegiado col");
@@ -409,7 +410,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 		// sql1.WHERE("dir.fechabaja is null");
 
-		sql.ORDER_BY("fechaestado desc");
+		sql.ORDER_BY("fechaestadodate desc");
 		// sql.ORDER_BY("per.nombre");
 
 		return sql.toString();

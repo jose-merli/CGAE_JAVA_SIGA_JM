@@ -584,12 +584,8 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 
 			NewIdDTO idSolicitudBD = cenSolicitudmodificacioncvExtendsMapper
 					.getMaxIdSolicitud(String.valueOf(idInstitucion), fichaDatosCurricularesItem.getIdPersona());
-			if (idSolicitudBD == null) {
-				recordUpdate.setIdsolicitud(Long.parseLong("1"));
-			} else {
 				int idSolic = Integer.parseInt(idSolicitudBD.getNewId()) + 1;
 				recordUpdate.setIdsolicitud(Long.parseLong("" + idSolic));
-			}
 
 			// Esto informa la fecha baja de los demás datos curriculares cuando no está
 			// informada la del actual

@@ -766,7 +766,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		LOGGER.info("createDirection() -> Salida del servicio para insertar direcciones ");
 		return insertResponseDTO;
 	}
-
+	
 	@Override
 	public UpdateResponseDTO solicitudUpdateDirection(DatosDireccionesItem datosDireccionesItem,
 			HttpServletRequest request) {
