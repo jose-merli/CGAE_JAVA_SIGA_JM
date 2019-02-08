@@ -458,7 +458,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setObservaciones(consultaDTO.getDescripcion());
 						consulta.setDescripcion(consultaDTO.getNombre());
 						consulta.setIdobjetivo(Long.parseLong(consultaDTO.getIdObjetivo()));
-						consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
+						if(consultaDTO.getIdClaseComunicacion() != null && !"".equals(consultaDTO.getIdClaseComunicacion())){
+							consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
+						}						
 						consulta.setGeneral(consultaDTO.getGenerica());
 						consulta.setFechamodificacion(new Date());
 						consulta.setUsumodificacion(usuario.getIdusuario());
@@ -819,14 +821,16 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	public boolean comprobarClaves(String sentencia, String idClaseComunicacion){
 		boolean incorrecta = false;
-		
+		String sentenciaUpper = sentencia.toUpperCase();
 		List<KeyItem> listaKeys = null;
 		
 		if(idClaseComunicacion != null && !"".equals(idClaseComunicacion)){
 			listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
 			for(KeyItem key : listaKeys){
-				String etiquetaKey = SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + key.getNombre() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO;
-				if(sentencia.indexOf(etiquetaKey) == -1){
+				String nombreKey = key.getNombre().toUpperCase();
+				String etiquetaKey = SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + nombreKey + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO;
+				
+				if(sentenciaUpper.indexOf(etiquetaKey) == -1){
 					incorrecta = true;
 				}
 			}
@@ -1174,11 +1178,11 @@ public class ConsultasServiceImpl implements IConsultasService{
 				List<CampoDinamicoItem> listaCampos = null;
 				try {
 					
-					List<KeyItem> listaKeys = null;
+					/*List<KeyItem> listaKeys = null;
 					
 					if(idClaseComunicacion != null){
 						listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
-					}				
+					}*/		
 					
 					listaCampos = obtenerCamposDinamicos(usuario, consulta);
 					response.setCamposDinamicos(listaCampos);
@@ -1197,9 +1201,10 @@ public class ConsultasServiceImpl implements IConsultasService{
 		return response;
 	}
 	
-	public List<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, String consulta) throws Exception{
+	@Override
+	public ArrayList<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, String consulta) throws Exception{
 		
-		List<CampoDinamicoItem> listaCamposDinamicos = new ArrayList<CampoDinamicoItem>();
+		ArrayList<CampoDinamicoItem> listaCamposDinamicos = new ArrayList<CampoDinamicoItem>();
 		CampoDinamicoItem campoDinamico = null;
 		
 		List<String> tipoDatos = new ArrayList<String>();

@@ -1,5 +1,6 @@
 package org.itcgae.siga;
 
+import javax.servlet.MultipartConfigElement;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -14,6 +15,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -54,6 +56,17 @@ public class SigaConfiguration implements ApplicationListener<ApplicationReadyEv
 			return sqlSessionFactory.getObject();
 		}
 		
+		/*@Bean
+		 public MultipartConfigElement multipartConfigElement() {
+		     return new MultipartConfigElement("");
+		 }
+
+		 @Bean
+		 public MultipartResolver multipartResolver() {
+		     org.springframework.web.multipart.commons.CommonsMultipartResolver multipartResolver = new org.springframework.web.multipart.commons.CommonsMultipartResolver();
+		     multipartResolver.setMaxUploadSize(1000000);
+		     return multipartResolver;
+		 }*/
 		
 		@Bean
 		public ConfigurationCustomizer configurationCustomizer() {
@@ -63,7 +76,8 @@ public class SigaConfiguration implements ApplicationListener<ApplicationReadyEv
 					configuration.addInterceptor(new MyBatisLoggerInterceptor());
 				}
 		    };
-		}
+		}	
+		
 	}
 	
 	@EnableWebMvc

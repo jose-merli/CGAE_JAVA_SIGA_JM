@@ -26,6 +26,13 @@ public interface ModPlantillaDocumentoExtendsMapper extends ModPlantilladocument
 	})
 	List<DocumentoPlantillaItem> selectPlantillasByInforme(Long idInforme, Long idModeloComunicacion, String idLenguaje);
 
+	@SelectProvider(type = ModPlantillaDocumentoExtendsSqlProvider.class, method = "selectPlantillasByModelo")
+	@Results({@Result(column = "IDPLANTILLADOCUMENTO", property = "idPlantillaDocumento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINFORME", property = "idInforme", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "idioma", jdbcType = JdbcType.VARCHAR)
+	})
+	List<DocumentoPlantillaItem> selectPlantillasByModelo(Long idModeloComunicacion, String idLenguaje);
+	
 	@SelectProvider(type = ModPlantillaDocumentoExtendsSqlProvider.class, method = "selectMaxIdPlantillaDocumento")
 	@Results({ @Result(column = "IDPLANTILLADOCUMENTO", property = "newId", jdbcType = JdbcType.VARCHAR)
 	})

@@ -15,7 +15,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		sql.FROM("MOD_PLANTILLADOC_CONSULTA plantilla");	
 		sql.INNER_JOIN("CON_CONSULTA consulta ON consulta.IDCONSULTA = plantilla.IDCONSULTA AND consulta.IDINSTITUCION = plantilla.IDINSTITUCION");
 		
-		sql.WHERE("plantilla.IDMODELOCOMUNICACION = " + idModeloComunicacion + " AND plantilla.IDPLANTILLADOCUMENTO " + idPlantillaDocumento + "AND plantilla.IDINSTITUCION " + idInstitucion);
+		sql.WHERE("plantilla.IDMODELOCOMUNICACION = " + idModeloComunicacion + " AND plantilla.IDPLANTILLADOCUMENTO = " + idPlantillaDocumento + " AND plantilla.IDINSTITUCION = " + idInstitucion);
 				
 		if(!historico){
 			sql.WHERE("plantilla.FECHABAJA IS NULL");

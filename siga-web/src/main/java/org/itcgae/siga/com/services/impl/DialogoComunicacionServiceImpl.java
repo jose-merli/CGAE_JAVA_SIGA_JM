@@ -1,7 +1,9 @@
 package org.itcgae.siga.com.services.impl;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,10 +13,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.apache.poi.hwpf.model.types.HRESIAbstractType;
+import org.itcgae.siga.DTOs.com.ByteResponseDto;
+import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionItem;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
 import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.KeyItem;
@@ -22,8 +27,9 @@ import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
 import org.itcgae.siga.DTOs.com.PlantillaModeloDocumentoDTO;
-import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.SufijoItem;
+import org.itcgae.siga.DTOs.com.TipoEnvioDTO;
+import org.itcgae.siga.DTOs.com.TipoEnvioItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -35,27 +41,32 @@ import org.itcgae.siga.commons.constants.SigaConstants.FORMATO_SALIDA;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ConConsulta;
+import org.itcgae.siga.db.entities.ConConsultaKey;
+import org.itcgae.siga.db.entities.ModModeloPlantillaenvio;
+import org.itcgae.siga.db.entities.ModModeloPlantillaenvioKey;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
-import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
+import org.itcgae.siga.db.mappers.ConConsultaMapper;
+import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModClasecomunicacionRutaExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModKeyclasecomunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPlantillaDocumentoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModPlantillaEnvioConsultaExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModRelPlantillaSufijoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
+import org.itcgae.siga.services.impl.WSCommons;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.aspose.words.DataSet;
 import com.aspose.words.Document;
-import com.aspose.words.MailMergeCleanupOptions;
 
 @Service
 public class DialogoComunicacionServiceImpl implements IDialogoComunicacionService{
@@ -72,6 +83,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	private IGeneracionDocumentosService _generacionDocService;
 	
 	@Autowired
+	private WSCommons _wSCommons;
+	
+	@Autowired
 	private ModClasecomunicacionRutaExtendsMapper _modClasecomunicacionRutaExtendsMapper;
 	
 	@Autowired
@@ -82,6 +96,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
 	@Autowired
 	private ModPlantillaDocumentoConsultaExtendsMapper _modPlantillaDocumentoConsultaExtendsMapper;
+	
+	@Autowired
+	private ModModeloPlantillaenvioMapper _modModeloPlantillaenvioMapper;
 	
 	@Autowired
 	private ConConsultasExtendsMapper _conConsultasExtendsMapper;
@@ -98,6 +115,15 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	@Autowired
 	private ModPlantilladocumentoMapper _modPlantilladocumentoMapper;
 	
+	@Autowired
+	private EnvPlantillaEnviosExtendsMapper _envPlantillaEnviosExtendsMapper;
+	
+	@Autowired
+	private ConConsultaMapper _conConsultaMapper;
+	
+	@Autowired
+	private ModPlantillaEnvioConsultaExtendsMapper _modPlantillaEnvioConsultaExtendsMapper;
+		
 
 	@Override
 	public ComboDTO obtenerClaseComunicaciones(HttpServletRequest request, String rutaClaseComunicacion) {
@@ -170,7 +196,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							comboItems.add(0, element);
 						}		
 						comboDTO.setCombooItems(comboItems);
-						modelosComunicacionItem.setPlantillas(comboDTO);
+						modelosComunicacionItem.setPlantillas(comboItems);
 					}
 					respuesta.setModelosComunicacionItems(modelos);
 				}catch(Exception e){
@@ -191,12 +217,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 
 	@Override
-	public ComboDTO obtenertipoEnvioPlantilla(HttpServletRequest request, String idPlantilla) {
+	public TipoEnvioDTO obtenertipoEnvioPlantilla(HttpServletRequest request, String idPlantilla) {
 		
-		LOGGER.info("obtenertipoEnvioPlantilla() -> Entrada al servicio para obtener tipos de envio de la plantilla ");
+		LOGGER.info("obtenertipoEnvioPlantilla() -> Entrada al servicio para obtener el tipo de envio de la plantilla");
 		
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		TipoEnvioDTO response = new TipoEnvioDTO();
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -209,37 +234,42 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			
 			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
-				comboItems = _modModeloComunicacionExtendsMapper.selectTipoEnvioPlantilla(usuario.getIdlenguaje(), idPlantilla);
-				if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}		
 				
-				comboDTO.setCombooItems(comboItems);
-				
+				try{
+					AdmUsuarios usuario = usuarios.get(0);
+					TipoEnvioItem tipoEnvio = _envPlantillaEnviosExtendsMapper.selectTipoEnvioPlantilla(usuario.getIdlenguaje(), idPlantilla);	
+					response.setTipoEnvio(tipoEnvio);
+				}catch(Exception e){
+					LOGGER.error("Error en obtenertipoEnvioPlantilla :: ", e);
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription("Error al obtener los modelos");
+					error.setMessage(e.getMessage());
+					response.setError(error);
+				}				
 			}
 		}
 		
-		LOGGER.info("obtenertipoEnvioPlantilla() -> Salida del servicio para obtener tipos de envio de la plantilla ");
+		LOGGER.info("obtenertipoEnvioPlantilla() -> Salida del servicio para obtener el tipo de envio de la plantilla");
 		
-		return comboDTO;
+		return response;
 	}
 
 
 
 	@Override
-	public Error descargarComunicacion(HttpServletRequest request, DialogoComunicacionItem dialogo) {
+	public ByteResponseDto descargarComunicacion(HttpServletRequest request, DialogoComunicacionItem dialogo) {
 		LOGGER.info("descargarComunicacion() -> Entrada al servicio para descargar la documentación de la comunicación");
+		
+		byte [] zip = null;
+		ByteResponseDto response = new ByteResponseDto();
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
-		List<Document> listaDocumentos = null;
+		List<DatosDocumentoItem> listaFicheros = null;
 		Error error = new Error();
 		
 		if (null != idInstitucion) {
@@ -251,31 +281,39 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				AdmUsuarios usuario = usuarios.get(0);
 				
 				try{
-					listaDocumentos = generarDocumentos(dialogo,usuario);
-					error.setCode(200);
-					error.setDescription("Ficheros generados correctamente");
-					error.setMessage("Ficheros generados correctamente");
+					listaFicheros = generarDocumentos(dialogo,usuario);
+					
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					
+					zip = WSCommons.zipBytes(listaFicheros);
+					
+					response.setData(zip);
 				}catch(Exception e){
 					LOGGER.error("Error al guardar los documentos",e);
 					error.setCode(500);
 					error.setDescription(e.getMessage());
 					error.setMessage("Error al guardar los documentos");
+					response.setError(error);
 				}			
 			}
 		}
 		
 		LOGGER.info("descargarComunicacion() -> Salida del servicio para descargar la documentación de la comunicación");
-		return error;
+		return response;
 	}
+
 	
-	public List<Document> generarDocumentos(DialogoComunicacionItem dialogo, AdmUsuarios usuario) throws Exception{
+	public List<DatosDocumentoItem> generarDocumentos(DialogoComunicacionItem dialogo, AdmUsuarios usuario) throws Exception{
 		LOGGER.info("generarDocumentos() -> Entrada al servicio para generar los documentos a comunicar");
 		boolean continua = true;
+		
 		List<Document> listaDocumentos = new ArrayList<Document>();
+		List<DatosDocumentoItem> listaFicheros = new ArrayList<DatosDocumentoItem>();
+		
 		HashMap<String,Object> hDatosGenerales = new HashMap<String, Object>();
 		HashMap<String,Object> hDatosFinal = new HashMap<String, Object>();	
 		int numFicheros = 0;
-
+		ArrayList<String> clavesUsuario = null;
 		try{
 			if(dialogo != null && dialogo.getModelos() != null && dialogo.getModelos().size() > 0){
 				for(ModelosComunicacionItem modelo :dialogo.getModelos()){
@@ -292,21 +330,15 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					
 					if(dialogo.getSelectedDatos() != null && dialogo.getSelectedDatos().size() > 0){
 						List<List<String>> listaKeyFiltros = dialogo.getSelectedDatos();
+						
 						for(int i=0; i< listaKeyFiltros.size(); i ++){	
+							List<String> listaStringKey = listaKeyFiltros.get(i);							
+							HashMap<String, String> mapaClave = new HashMap<String, String>();
 							
-							String claves = null;
-							List<String> listaStringKey = listaKeyFiltros.get(i);
-							if(listaStringKey != null && listaStringKey.size() > 0){
-								claves = "(";
-								for(int j = 0; j<listaStringKey.size(); j++){
-									String keyFiltro = listaStringKey.get(j);
-									claves = claves + keyFiltro;
-									if(j!=listaStringKey.size()-1){
-										claves = claves + ", ";
-									}
-								}
-								claves = claves + ")";
-							}
+							for(int j = 0; j < listaKey.size(); j++){
+								KeyItem key = listaKey.get(j);
+								mapaClave.put(key.getNombre(), listaStringKey.get(j));
+							}							
 							
 							for(PlantillaModeloDocumentoDTO plantilla:plantillas){	
 								
@@ -316,7 +348,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								if(consultasItemCondicional != null && consultasItemCondicional.size() > 0){
 									for(ConsultaItem consulta:consultasItemCondicional){
 										String sentencia = consulta.getSentencia();									
-										List<Map<String,Object>> result = ejecutarConsultaConClaves(sentencia, claves);
+										List<Map<String,Object>> result = ejecutarConsultaConClaves(usuario, dialogo, consulta, mapaClave);
 										
 										if(result != null && result.size() > 0){
 											LOGGER.debug("Se cumple la consulta condicional del informe: " + plantilla.getIdInforme());
@@ -338,7 +370,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										for(ConsultaItem consulta:consultasItemDest){
 											String sentencia = consulta.getSentencia();		
 											
-											List<Map<String,Object>> result = ejecutarConsultaConClaves(sentencia, claves);
+											List<Map<String,Object>> result = ejecutarConsultaConClaves(usuario, dialogo, consulta, mapaClave);
 											
 											if(result != null && result.size() > 0){
 												LOGGER.debug("Se han obtenido " + result.size() + " destinatarios");
@@ -360,7 +392,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														for(ConsultaItem consultaMulti:consultasItemMulti){
 															sentencia = consultaMulti.getSentencia();		
 															
-															List<Map<String,Object>> resultMulti = ejecutarConsultaConClaves(sentencia, claves);
+															List<Map<String,Object>> resultMulti = ejecutarConsultaConClaves(usuario, dialogo, consultaMulti, mapaClave);
 															if(resultMulti != null && resultMulti.size() > 0){
 																for(int k = 0;k<resultMulti.size();k++){
 																	
@@ -369,10 +401,15 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																	
 																	//Otenemos el nombre del fichero de salida
 																	String nombrePlantilla = "";
-																	String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
+																	String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaTmp;
 																	String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
-																	String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo, plantilla, hDatosGenerales, usuario, numFicheros);
+																	String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo, plantilla, hDatosGenerales, usuario, numFicheros, pathFicheroSalida);
 																	
+																	//Si no existe el directorio temporal lo creamos
+																	File dir = new File(pathFicheroSalida);
+																	if(!dir.exists()){
+																		dir.mkdir();
+																	}
 																	
 																	//Obtenemos el nombre de la plantilla
 																	if(plantilla.getIdPlantillas() != null){
@@ -416,7 +453,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																	for(ConsultaItem consultaDatos:consultasItemDatos){
 																		sentencia = consultaDatos.getSentencia();		
 																		
-																		List<Map<String,Object>> resultDatos = ejecutarConsultaConClaves(sentencia, claves);
+																		List<Map<String,Object>> resultDatos = ejecutarConsultaConClaves(usuario, dialogo, consultaDatos, mapaClave);
 																		
 																		if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
 																			hDatosFinal.put(consultaDatos.getRegion(), resultDatos);
@@ -430,10 +467,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																	
 																	doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);
 																	
-																	_generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida);
+																	DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida);
 																	
-																	listaDocumentos.add(doc);
-																
+																	listaFicheros.add(docGenerado);
+																	listaDocumentos.add(doc);																
 																}														
 															}
 															
@@ -445,7 +482,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														String nombrePlantilla = "";
 														String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
 														String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
-														String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo, plantilla, hDatosGenerales, usuario, numFicheros);
+														String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo, plantilla, hDatosGenerales, usuario, numFicheros, pathFicheroSalida);
 														
 														
 														//Obtenemos el nombre de la plantilla
@@ -488,7 +525,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														for(ConsultaItem consultaDatos:consultasItemDatos){
 															sentencia = consultaDatos.getSentencia();		
 															
-															List<Map<String,Object>> resultDatos = ejecutarConsultaConClaves(sentencia, claves);
+															List<Map<String,Object>> resultDatos = ejecutarConsultaConClaves(usuario, dialogo, consulta, mapaClave);
 															
 															if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
 																hDatosFinal.put(consultaDatos.getRegion(), resultDatos);
@@ -502,8 +539,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														LOGGER.debug("Generamos el documento");
 														doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);
 														
-														_generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida);
+														DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida);
 														
+														listaFicheros.add(docGenerado);
 														listaDocumentos.add(doc);
 													}
 													
@@ -533,21 +571,33 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		LOGGER.info("generarDocumentos() -> Entrada al servicio para generar los documentos a comunicar");
 		
-		return listaDocumentos;
+		return listaFicheros;
 	}
 	
-	private List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia, String claves){
-		Map<String, String> mapConsulta = _consultasService.obtenerMapaConsulta(sentencia);		
-		// Reemplazamos el where
-		String where = mapConsulta.get(SigaConstants.WHERE_VALUE);
+	private List<Map<String, Object>> ejecutarConsultaConClaves(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ConsultaItem consulta, HashMap<String, String> mapaClave) throws ParseException, SigaExceptions{
 		
-		// Reemplazamos los datos insertados desde pantalla		
+		List<Map<String,Object>> result = null;
+		//Buscamos la consulta con sus parametros dinamicos
 		
-		// Remplazamos el where de la query con las keys
-		where = where.replace(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CLAVES_QUERY + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, claves);
-
-		mapConsulta.put(SigaConstants.WHERE_VALUE, where);
-		List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapConsulta);
+		consulta = findConsultaItem(dialogo.getConsultas(), consulta);
+		
+		if(consulta != null){
+			// Reemplazamos los datos insertados desde pantalla		
+			String sentencia = _consultasService.procesarEjecutarConsulta(usuario, consulta.getSentencia(), consulta.getCamposDinamicos(), true);
+			
+			// Remplazamos las claves de la query
+			for (Map.Entry<String, String> entry : mapaClave.entrySet()) {
+				sentencia = sentencia.replace(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + entry.getKey().toUpperCase() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, entry.getValue());
+			}
+			
+			Map<String, String> mapConsulta = _consultasService.obtenerMapaConsulta(sentencia);		
+			
+			result = _conConsultasExtendsMapper.ejecutarConsulta(mapConsulta);
+		}else{
+			LOGGER.error("No se ha encontrado la consulta");
+			throw new SigaExceptions("No se ha encontrado la consulta");
+		}
+		
 		
 		return result;
 	}
@@ -584,7 +634,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return keysDTO;
 	}
 	
-	private String obtenerNombreFicheroSalida(ModelosComunicacionItem modelo, PlantillaModeloDocumentoDTO plantilla, HashMap<String,Object> hDatosGenerales, AdmUsuarios usuario, int numFichero){
+	private String obtenerNombreFicheroSalida(ModelosComunicacionItem modelo, PlantillaModeloDocumentoDTO plantilla, HashMap<String,Object> hDatosGenerales, AdmUsuarios usuario, int numFichero, String pathFicheroSalida){
 		HashMap<String,Object> hashMapRow = null;
 		String extension = "";
 		String nombreFicheroSalida = plantilla.getNombreFicheroSalida();
@@ -659,9 +709,16 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			numero = "_" + String.valueOf(numFichero) + "_";
 		}
 		
-		nombreFicheroSalida = nombreFicheroSalida + sufijo + numero + "." + extension;
+		String nombreFichero = nombreFicheroSalida + sufijo + numero + "." + extension;
 		
-		return nombreFicheroSalida;
+		//Comprobamos si ya existe el fichero con ese nombre
+		File file = new File (pathFicheroSalida + nombreFichero);
+		if(file.exists()){
+			nombreFichero = nombreFicheroSalida + sufijo + numero + "_" + new Date().getTime() + "." + extension;
+		}
+
+		
+		return nombreFichero;
 	}
 
 
@@ -699,6 +756,121 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		LOGGER.info("obtenerClaseComunicacionesUnica() -> Salida del servicio para obtener la clase de comunicacion asociada la ruta indicada");
 		return response;
+	}
+
+
+
+	@Override
+	public ConsultasDTO obtenerCamposModelo(HttpServletRequest request, DialogoComunicacionItem dialogo) {
+		LOGGER.info("obtenerCamposModelo() -> Entrada al servicio para obtener todos los campos dinamicos de las consultas asociadas a modelo");
+		
+		ConsultasDTO response = new ConsultasDTO();
+		Error error = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				List<ConsultaItem> listaConsultasEjecutar = new ArrayList<ConsultaItem>();
+				try{	
+					if(dialogo.getModelos() != null && dialogo.getModelos().size() > 0){
+						for(ModelosComunicacionItem modelo : dialogo.getModelos()){
+							
+							//Obtenemos las plantillas de documento del modelo
+							
+							List<DocumentoPlantillaItem> listaPlantillas = _modPlantillaDocumentoExtendsMapper.selectPlantillasByModelo(Long.parseLong(modelo.getIdModeloComunicacion()),usuario.getIdlenguaje());
+							if(listaPlantillas != null && listaPlantillas.size() > 0){
+								for(DocumentoPlantillaItem plantilla: listaPlantillas){
+									//Obtenemos las consultas asociadas a las plantillas
+									List<ConsultaItem> listaConsultas = _modPlantillaDocumentoConsultaExtendsMapper.selectPlantillaDocConsultas(idInstitucion, Long.parseLong(modelo.getIdModeloComunicacion()), Long.parseLong(plantilla.getIdPlantillaDocumento()), false);
+									if(listaConsultas != null && listaConsultas.size() > 0){
+										for(ConsultaItem consultaItem: listaConsultas){
+											ConConsultaKey key = new ConConsultaKey();
+											key.setIdconsulta(Long.parseLong(consultaItem.getIdConsulta()));
+											key.setIdinstitucion(idInstitucion);
+											ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
+											if(consulta != null){
+												ArrayList<CampoDinamicoItem> campos = _consultasService.obtenerCamposDinamicos(usuario, consulta.getSentencia());
+												consultaItem.setCamposDinamicos(campos);
+												consultaItem.setSentencia(consulta.getSentencia());
+												listaConsultasEjecutar.add(consultaItem);
+											}
+										}
+									}else{
+										LOGGER.info("La plantilla " + plantilla.getIdPlantillaDocumento() + " de documento no tiene consultas");
+									}
+								}
+							}else{
+								LOGGER.info("El modelo " + modelo.getIdModeloComunicacion() + " no tiene plantillas de documento asignadas");
+							}
+							
+							//Obtenemos las consultas de la plantilla de envio seleccionada
+
+							ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
+							key.setIdinstitucion(idInstitucion);
+							key.setIdmodelocomunicacion(Long.parseLong(modelo.getIdModeloComunicacion()));
+							key.setIdplantillaenvios(Integer.parseInt(modelo.getIdPlantillaEnvio()));
+							key.setIdtipoenvios(Short.parseShort(modelo.getIdTipoEnvio()));
+							ModModeloPlantillaenvio plantillaEnvio = _modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
+							
+							if(plantillaEnvio != null){
+								//Obtenemos las consultas asociadas a la plantilla
+								List<ConsultaItem> listaEnvioConsultas = _modPlantillaEnvioConsultaExtendsMapper.selectPlantillaEnvioConsultas(idInstitucion, plantillaEnvio.getIdplantillaenvios(), plantillaEnvio.getIdtipoenvios());
+								if(listaEnvioConsultas != null && listaEnvioConsultas.size() > 0){
+									for(ConsultaItem consultaEnvioItem : listaEnvioConsultas){			
+										if(consultaEnvioItem != null){
+											ArrayList<CampoDinamicoItem> campos = _consultasService.obtenerCamposDinamicos(usuario, consultaEnvioItem.getSentencia());
+											consultaEnvioItem.setCamposDinamicos(campos);
+											listaConsultasEjecutar.add(consultaEnvioItem);
+										}
+									}
+								}else{
+									LOGGER.info("La plantila de envio " + plantillaEnvio.getIdplantillaenvios() + " no tiene consultas asociadas");
+								}
+							}else{
+								LOGGER.error("Plantilla de envio no encontrada");
+							}
+							
+							response.setConsultaItem(listaConsultasEjecutar);
+						}
+					}else{
+						LOGGER.error("No se ha seleccionado ningún modelo de comunicaicones");
+						error.setCode(500);
+						error.setDescription("No se ha seleccionado ningún modelo de comunicaicones");
+						error.setMessage("No se ha seleccionado ningún modelo de comunicaicones");
+						response.setError(error);
+					}
+					
+				}catch(Exception e){
+					LOGGER.error("Error al obtener la clase de comunicaciones", e);
+					error.setCode(500);
+					error.setDescription("Error al obtener la clase de comunicaciones");
+					error.setMessage(e.getMessage());
+					response.setError(error);
+				}					
+			}
+		}
+		
+		LOGGER.info("obtenerCamposModelo() -> Salida del servicio para obtener todos los campos dinamicos de las consultas asociadas a modelo");
+		return response;
+	}
+	
+	public ConsultaItem findConsultaItem(List<ConsultaItem> listaConsultas, ConsultaItem consulta){
+		ConsultaItem consultaEncontrada = null;
+		for(ConsultaItem consultaItem: listaConsultas){
+			if(consultaEncontrada == null && consultaItem.getIdConsulta().equalsIgnoreCase(consulta.getIdConsulta())){
+				consultaEncontrada = consultaItem;
+			}
+		}
+		return consultaEncontrada;		
 	}
 	
 }

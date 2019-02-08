@@ -2,6 +2,7 @@ package org.itcgae.siga.com.services;
 
 import java.io.File;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,4 +54,6 @@ public interface IConsultasService {
 
 	public String procesarEjecutarConsulta(AdmUsuarios usuario, String sentencia, List<CampoDinamicoItem> listaCampos,
 			boolean sustituyeInstitucion) throws ParseException;
+
+	public ArrayList<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, String consulta) throws Exception;
 }

@@ -2,8 +2,10 @@ package org.itcgae.siga.DTOs.com;
 
 
 import java.util.Date;
+import java.util.List;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 
 public class ModelosComunicacionItem {
 	
@@ -20,7 +22,8 @@ public class ModelosComunicacionItem {
 	private String claseComunicacion;
 	private String idPlantillaEnvio;
 	private String idTipoEnvio;
-	private ComboDTO plantillas;
+	private String tipoEnvio;
+	private List<ComboItem> plantillas;
 	
 	public String getIdModeloComunicacion() {
 		return idModeloComunicacion;
@@ -29,12 +32,6 @@ public class ModelosComunicacionItem {
 		this.idModeloComunicacion = idModeloComunicacion;
 	}
 
-	public ComboDTO getPlantillas() {
-		return plantillas;
-	}
-	public void setPlantillas(ComboDTO plantillas) {
-		this.plantillas = plantillas;
-	}
 	public String getNombre() {
 		return nombre;
 	}
@@ -106,6 +103,18 @@ public class ModelosComunicacionItem {
 	}
 	public void setIdTipoEnvio(String idTipoEnvio) {
 		this.idTipoEnvio = idTipoEnvio;
+	}
+	public String getTipoEnvio() {
+		return tipoEnvio;
+	}
+	public void setTipoEnvio(String tipoEnvio) {
+		this.tipoEnvio = tipoEnvio;
+	}
+	public List<ComboItem> getPlantillas() {
+		return plantillas;
+	}
+	public void setPlantillas(List<ComboItem> plantillas) {
+		this.plantillas = plantillas;
 	}
 	
 	

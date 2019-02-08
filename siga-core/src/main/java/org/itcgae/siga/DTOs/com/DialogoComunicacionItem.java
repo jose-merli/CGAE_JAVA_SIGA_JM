@@ -9,6 +9,7 @@ public class DialogoComunicacionItem {
 	private String idInstitucion;
 	private List<ModelosComunicacionItem> modelos = new ArrayList<ModelosComunicacionItem>();
 	private List<List<String>> selectedDatos = new ArrayList<List<String>>();
+	private List<ConsultaItem> consultas = new ArrayList<ConsultaItem>();
 	
 	public String getIdClaseComunicacion() {
 		return idClaseComunicacion;
@@ -33,6 +34,12 @@ public class DialogoComunicacionItem {
 	}
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
+	}
+	public List<ConsultaItem> getConsultas() {
+		return consultas;
+	}
+	public void setConsultas(List<ConsultaItem> consultas) {
+		this.consultas = consultas;
 	}
 	
 	

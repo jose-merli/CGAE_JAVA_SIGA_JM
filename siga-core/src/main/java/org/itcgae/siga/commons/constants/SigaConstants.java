@@ -42,14 +42,16 @@ public class SigaConstants {
 	public static String rutaficherosInformesYcomunicaciones = "/FILERMSA1000/SIGA/ficheros/archivo/";
 	public static String carpetaDocumentosEnvio = "/documentosEnvio/";
 	public static String carpetaPlantillasDocumento = "/plantillaDocumentos/";
+	public static String carpetaTmp = "/tmp/";
 	public static String rutaExcelConsultaTemp= "/FILERMSA1000/SIGA/ficheros/archivo/tempExcel/";
 	public static String nombreExcelConsulta = "ResultadoConsulta";
+	public static String nombreZip = "DocumentosComunicacion";
 	
 	public static String REPLACECHAR_PREFIJO_SUFIJO = "%%";
 	public static String CLAVES_QUERY = "CLAVES";
 	public static String WHERE_VALUE = "whereValue";
-	public static String CAMPO_NOMBRE = "nombre";
-	public static String CAMPO_APELLIDOS = "apellidos";
+	public static String CAMPO_NOMBRE = "NOMBRE";
+	public static String CAMPO_APELLIDOS = "APELLIDOS";
 	public static String CAMPO_APELLIDO1 = "APELLIDO1";
 	public static String CAMPO_APELLIDO2 = "APELLIDO2";
 	public static String CAMPO_NUM_COLEGIADO = "NCOLEGIADO";

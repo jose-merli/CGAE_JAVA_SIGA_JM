@@ -2,11 +2,13 @@ package org.itcgae.siga.com.services.impl;
 
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.com.documentos.DataMailMergeDataSource;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.springframework.stereotype.Service;
@@ -82,7 +84,9 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				{
 					Object o = dato.get(clave);
 					try {
-						builder.write(o.toString().trim());	
+						if(o != null){
+							builder.write(o.toString().trim());	
+						}						
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -96,9 +100,10 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	}
 	
 	@Override
-	public File grabaDocumento(Document doc, String pathfinal, String nombrefichero) throws Exception{
+	public DatosDocumentoItem grabaDocumento(Document doc, String pathfinal, String nombrefichero) throws Exception{
 		// nombrefichero incluye la extension .doc
 		File archivo = null;
+		DatosDocumentoItem documento = new DatosDocumentoItem();
 		try {
 			doc.save(pathfinal + nombrefichero);
 		} catch (Exception e) {
@@ -107,7 +112,10 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		archivo = new File(pathfinal + nombrefichero);
 		if (!archivo.exists())return null;
 
-		return archivo;
+		documento.setFileName(nombrefichero);
+		documento.setDatos(Files.readAllBytes(archivo.toPath()));
+		
+		return documento;
 	}
 
 }
