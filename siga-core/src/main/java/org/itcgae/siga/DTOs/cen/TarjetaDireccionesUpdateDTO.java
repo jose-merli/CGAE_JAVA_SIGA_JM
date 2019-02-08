@@ -10,6 +10,7 @@ public class TarjetaDireccionesUpdateDTO {
 	
 	private String idDireccion;
 	private String idPersona;
+	private String[] idTipoDireccion;
 	
 	
 	
@@ -52,7 +53,23 @@ public class TarjetaDireccionesUpdateDTO {
 		this.idPersona = idPersona;
 	}
 	
+	/**
+	 *
+	 */
+	public TarjetaDireccionesUpdateDTO idTipoDireccion(String[] idTipoDireccion){
+		this.idTipoDireccion = idTipoDireccion;
+		return this;
+	}
+	
+	@JsonProperty("idTipoDireccion")
+	public String[] getIdTipoDireccion() {
+		return idTipoDireccion;
+	}
 
+	public void setIdTipoDireccion(String[] idTipoDireccion) {
+		this.idTipoDireccion = idTipoDireccion;
+	}
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -63,13 +80,14 @@ public class TarjetaDireccionesUpdateDTO {
 		}
 		TarjetaDireccionesUpdateDTO tarjetaDireccionesUpdateDTO = (TarjetaDireccionesUpdateDTO) o;
 		return Objects.equals(this.idDireccion, tarjetaDireccionesUpdateDTO.idDireccion)
-				&& Objects.equals(this.idPersona, tarjetaDireccionesUpdateDTO.idPersona);
+				&& Objects.equals(this.idPersona, tarjetaDireccionesUpdateDTO.idPersona)
+		&& Objects.equals(this.idTipoDireccion, tarjetaDireccionesUpdateDTO.idTipoDireccion);
 
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(idDireccion, idPersona);
+		return Objects.hash(idDireccion, idPersona, idTipoDireccion);
 	}
 
 	@Override
@@ -79,6 +97,7 @@ public class TarjetaDireccionesUpdateDTO {
 
 		sb.append("    idDireccion: ").append(toIndentedString(idDireccion)).append("\n");
 		sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
+		sb.append("    idTipoDireccion: ").append(toIndentedString(idTipoDireccion)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}
