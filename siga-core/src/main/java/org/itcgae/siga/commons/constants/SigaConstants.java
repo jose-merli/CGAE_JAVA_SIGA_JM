@@ -80,6 +80,12 @@ public class SigaConstants {
 	public static final String NOMBRETABLA_CEN_COLEGIADO = "CEN_COLEGIADO";
 	
 	public static final String ECOS_PREFIJO_ESPANA = "(+34)";
+	public static final String TIPO_ENVIO_CORREOELECTRONICO = "1";
+	public static final String TIPO_ENVIO_CORREO_ORDINARIO = "2";
+	public static final String TIPO_ENVIO_SMS = "4";
+	public static final String TIPO_ENVIO_BUROSMS = "5";
+	public static final String ID_OBJETIVO_DESTINATARIOS ="1";
+	
 
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(
