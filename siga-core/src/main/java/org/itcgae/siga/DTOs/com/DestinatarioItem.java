@@ -7,8 +7,22 @@ public class DestinatarioItem {
 	private String apellidos1;
 	private String apellidos2;
 	private String nombre;
+	private String correoElectronico;
+	private String movil;
 	
 	
+	public String getCorreoElectronico() {
+		return correoElectronico;
+	}
+	public String getMovil() {
+		return movil;
+	}
+	public void setCorreoElectronico(String correoElectronico) {
+		this.correoElectronico = correoElectronico;
+	}
+	public void setMovil(String movil) {
+		this.movil = movil;
+	}
 	public String getIdPersona() {
 		return idPersona;
 	}

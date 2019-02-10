@@ -2,11 +2,9 @@ package org.itcgae.siga.com.services.impl;
 
 import java.io.UnsupportedEncodingException;
 
-import javax.mail.Address;
+
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
-import java.util.Properties;
-import javax.mail.Message;
 
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -20,15 +18,10 @@ import javax.naming.NamingException;
 
 import org.itcgae.siga.com.services.IEnviosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.commons.utils.ReadProperties;
-import org.itcgae.siga.commons.utils.SIGAReferences;
+
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
-import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.EnvEnvios;
-import org.itcgae.siga.db.entities.EnvEnviosgrupocliente;
-import org.itcgae.siga.db.entities.EnvEnviosgrupoclienteExample;
-import org.itcgae.siga.db.entities.EnvPlantillasenvios;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.GenProperties;
@@ -186,7 +179,7 @@ public class EnviosServiceImpl implements IEnviosService{
 	}
 
 	@Override
-	public void envioSMS(String[] destinatarios, Short idInstitucion, String asunto, String texto, boolean esBuroSMS) {
+	public String envioSMS(CenDirecciones remitente, String[] destinatarios, Short idInstitucion, String asunto, String texto, boolean esBuroSMS) {
 		
 		EnviarSMSResponse response = null;
 		String respuesta = null;
@@ -197,7 +190,7 @@ public class EnviosServiceImpl implements IEnviosService{
 		keyProp.setParametro("ecos.url.conexion");
 		GenProperties property = _genPropertiesMapper.selectByPrimaryKey(keyProp);
 		String uriService = property.getValor();
-		
+		String idSolicidudEcos = "";
 		try {
 			
 			LOGGER.debug("EnviosServiceImpl.envioSMS :: Se envia SMS a: " + destinatarios);
@@ -205,10 +198,10 @@ public class EnviosServiceImpl implements IEnviosService{
 			//Instanciamos la peticion
 			SolicitudEnvioSMS request = SolicitudEnvioSMS.Factory.newInstance();
 			
-			//TODO: idcliente ECOS
-			//Usar id ecos de sspp para pruebas 3546347756
-			//id ecos sintra 9525851422
-			request.setIdClienteECOS("9525851422");
+			keyProp.setParametro("ecos.url.conexion");
+			property = _genPropertiesMapper.selectByPrimaryKey(keyProp);
+			String idECOS = property.getValor();
+			request.setIdClienteECOS(idECOS);
 			
 			if (idInstitucion == null) {
 				String error = "Para enviar un correo se debe informar del colegio";
@@ -241,7 +234,7 @@ public class EnviosServiceImpl implements IEnviosService{
 			
 			if(esBuroSMS){
 				//TODO:ver que correos poner
-				//request.setEmail(AppConstants.correoAdministradores);
+				request.setEmail(remitente.getCorreoelectronico());
 			}
 			
 			EnviarSMSResponseDocument responseDoc = EnviarSMSResponseDocument.Factory.newInstance();			
@@ -254,6 +247,8 @@ public class EnviosServiceImpl implements IEnviosService{
 			try {
 				responseDoc = _clientECOS.enviarSMS(uriService, requestDoc);	
 				response = responseDoc.getEnviarSMSResponse();
+				idSolicidudEcos = response.getEnviarSMSResponse().getIdSolicitud();
+				LOGGER.error("El SMS se ha enviado con idSolicitud: "+idSolicidudEcos+"");
 			} catch (Exception e) {
 				LOGGER.error("Error en la comunicacion con ECOS", e);
 				throw new BusinessException("Error en la comunicacion con ECOS", e);
@@ -270,14 +265,10 @@ public class EnviosServiceImpl implements IEnviosService{
 			throw new BusinessException("No se ha enviado el sms", e);			
 		}
 		
+		return idSolicidudEcos;
 		
 	}
 
-	@Override
-	public void envioBuroSMS() {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void envioCorreoOrdinario() {

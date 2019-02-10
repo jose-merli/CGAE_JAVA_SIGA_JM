@@ -49,9 +49,13 @@
 <!-- 		</table> -->
 		
 		 
-			<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" >
-				<property name="ignoreQualifiersAtRuntime" value="true"/>
-			</table>
+<!-- 			<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" > -->
+<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			</table> -->
+			
+				<table schema="USCGAE" tableName="ENV_CONSULTASENVIO" >
+					<property name="ignoreQualifiersAtRuntime" value="true"/>
+				</table>
 
 <!-- 	 		<table schema="USCGAE" tableName="MOD_CLASECOMUNICACION_RUTA" >  -->
 <!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
