@@ -762,37 +762,47 @@ public class ConsultasServiceImpl implements IConsultasService{
 	public boolean comprobarCamposDestinarios (String sentencia){
 		boolean camposIncorrectos = false;
 		
-		if(!sentencia.contains("CEN_CLIENTE.IDINSTITUCION AS \"IDINSTITUCION\"")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("CEN_CLIENTE.IDPERSONA AS \"IDPERSONA\"")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.CODIGOPOSTAL AS \"CODIGOPOSTAL\"")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.CORREOELECTRONICO AS \"CORREOELECTRONICO\"")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.DOMICILIO AS \"DOMICILIO\"")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.MOVIL AS \"MOVIL\"")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.FAX1 AS \"FAX1\"")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.FAX2 AS \"FAX2\"")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.IDPAIS AS \"IDPAIS\"")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.IDPROVINCIA AS \"IDPROVINCIA\"")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("CEN_DIRECCIONES.IDPOBLACION AS \"IDPOBLACION\"")){
+		// Obtenemos el SELECT de la consulta
+		int indexInicio = sentencia.indexOf("<SELECT>")+8;
+		int indexFinal = sentencia.indexOf("</SELECT>");
+		if(indexInicio > -1 && indexFinal > -1){
+			String select = sentencia.substring(indexInicio, indexFinal);
+			
+			if(!select.contains("IDINSTITUCION")){
+				camposIncorrectos = true;
+			}
+			if(!select.contains("IDPERSONA")){
+				camposIncorrectos = true;
+			}
+			if(!select.contains("CODIGOPOSTAL")){
+				camposIncorrectos = true;
+			}
+			if(!select.contains("CORREOELECTRONICO")){
+				camposIncorrectos = true;
+			}
+			if(!select.contains("DOMICILIO")){
+				camposIncorrectos = true;
+			}
+			if(!select.contains("MOVIL")){
+				camposIncorrectos = true;
+			}
+			if(!select.contains("FAX1")){
+				camposIncorrectos = true;
+			}
+			if(!select.contains("FAX2")){
+				camposIncorrectos = true;
+			}
+			if(!select.contains("IDPAIS")){
+				camposIncorrectos = true;
+			}
+			if(!select.contains("IDPROVINCIA")){
+				camposIncorrectos = true;
+			}
+			if(!select.contains("IDPOBLACION")){
+				camposIncorrectos = true;
+			}
+			
+		}else{
 			camposIncorrectos = true;
 		}
 		
@@ -836,7 +846,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	public boolean comprobarObjetivo(String sentencia, String idObjetivo){
 		boolean incorrecto = false;
-		
+		sentencia = sentencia.toUpperCase();
 		if(Long.parseLong(idObjetivo) == SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo().longValue()){
 			incorrecto = comprobarCamposDestinarios(sentencia);
 		}	

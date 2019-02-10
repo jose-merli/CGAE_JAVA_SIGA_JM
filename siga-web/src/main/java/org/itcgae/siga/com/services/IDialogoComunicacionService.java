@@ -8,6 +8,8 @@ import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
 import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
+import org.itcgae.siga.DTOs.com.ResponseDateDTO;
 import org.itcgae.siga.DTOs.com.TipoEnvioDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -22,4 +24,6 @@ public interface IDialogoComunicacionService {
 	public KeysDTO obtenerKeysClaseComunicacion(HttpServletRequest request, String idClaseComunicacion);
 	public ConsultasDTO obtenerCamposModelo(HttpServletRequest request, DialogoComunicacionItem dialogo);
 	public Error enviarTest(HttpServletRequest request);
+	public ResponseDateDTO obtenerFechaProgramada(HttpServletRequest request);
+	public ResponseDataDTO obtenerNumMaximoModelos(HttpServletRequest request);
 }

@@ -26,8 +26,6 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	@Override
 	public Document sustituyeDocumento(Document doc, HashMap<String, Object> dato) throws Exception{
 
-		doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_CONTAINING_FIELDS | MailMergeCleanupOptions.REMOVE_EMPTY_PARAGRAPHS  | MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS | MailMergeCleanupOptions.REMOVE_UNUSED_FIELDS);
-		
 		try {
 			
 			Set<String> claves=dato.keySet();
@@ -74,6 +72,8 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		try {
 			
 			Set<String> claves=dato.keySet();
+			
+			doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_CONTAINING_FIELDS | MailMergeCleanupOptions.REMOVE_EMPTY_PARAGRAPHS  | MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS | MailMergeCleanupOptions.REMOVE_UNUSED_FIELDS);
 			
 			DocumentBuilder builder=new DocumentBuilder(doc);
 			

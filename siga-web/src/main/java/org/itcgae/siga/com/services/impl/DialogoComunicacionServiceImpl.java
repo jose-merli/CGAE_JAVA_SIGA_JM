@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.ByteResponseDto;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionItem;
@@ -27,6 +29,8 @@ import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
 import org.itcgae.siga.DTOs.com.PlantillaModeloDocumentoDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
+import org.itcgae.siga.DTOs.com.ResponseDateDTO;
 import org.itcgae.siga.DTOs.com.SufijoItem;
 import org.itcgae.siga.DTOs.com.TipoEnvioDTO;
 import org.itcgae.siga.DTOs.com.TipoEnvioItem;
@@ -51,6 +55,7 @@ import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModClasecomunicacionRutaExtendsMapper;
@@ -83,7 +88,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	private IGeneracionDocumentosService _generacionDocService;
 	
 	@Autowired
-	private WSCommons _wSCommons;
+	private GenParametrosExtendsMapper _genParametrosExtendsMapper;
 	
 	@Autowired
 	private ModClasecomunicacionRutaExtendsMapper _modClasecomunicacionRutaExtendsMapper;
@@ -281,7 +286,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				AdmUsuarios usuario = usuarios.get(0);
 				
 				try{
-					listaFicheros = generarDocumentos(dialogo,usuario);
+					listaFicheros = generarDocumentos(dialogo,usuario, false);
 					
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					
@@ -303,7 +308,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	}
 
 	
-	public List<DatosDocumentoItem> generarDocumentos(DialogoComunicacionItem dialogo, AdmUsuarios usuario) throws Exception{
+	public List<DatosDocumentoItem> generarDocumentos(DialogoComunicacionItem dialogo, AdmUsuarios usuario, boolean esEnvio) throws Exception{
 		LOGGER.info("generarDocumentos() -> Entrada al servicio para generar los documentos a comunicar");
 		boolean continua = true;
 		
@@ -348,7 +353,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								if(consultasItemCondicional != null && consultasItemCondicional.size() > 0){
 									for(ConsultaItem consulta:consultasItemCondicional){
 										String sentencia = consulta.getSentencia();									
-										List<Map<String,Object>> result = ejecutarConsultaConClaves(usuario, dialogo, consulta, mapaClave);
+										List<Map<String,Object>> result = ejecutarConsultaConClaves(usuario, dialogo, plantilla.getIdPlantillaDocumento(), consulta, mapaClave, esEnvio);
 										
 										if(result != null && result.size() > 0){
 											LOGGER.debug("Se cumple la consulta condicional del informe: " + plantilla.getIdInforme());
@@ -370,13 +375,18 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										for(ConsultaItem consulta:consultasItemDest){
 											String sentencia = consulta.getSentencia();		
 											
-											List<Map<String,Object>> result = ejecutarConsultaConClaves(usuario, dialogo, consulta, mapaClave);
+											List<Map<String,Object>> result = ejecutarConsultaConClaves(usuario, dialogo, plantilla.getIdPlantillaDocumento(),consulta, mapaClave, esEnvio);
 											
 											if(result != null && result.size() > 0){
 												LOGGER.debug("Se han obtenido " + result.size() + " destinatarios");
 												
 												for(Map<String,Object> dest: result){
 													LOGGER.debug("Guardamos el resultado de la query para cada destinatario");
+													if(esEnvio){
+														LOGGER.debug("Generando envio...");
+														// insertamos el envio
+														//idEnvio
+													}
 													numFicheros = 0;
 													
 													hDatosGenerales = new HashMap<String, Object>();
@@ -392,7 +402,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														for(ConsultaItem consultaMulti:consultasItemMulti){
 															sentencia = consultaMulti.getSentencia();		
 															
-															List<Map<String,Object>> resultMulti = ejecutarConsultaConClaves(usuario, dialogo, consultaMulti, mapaClave);
+															List<Map<String,Object>> resultMulti = ejecutarConsultaConClaves(usuario, dialogo, plantilla.getIdPlantillaDocumento(), consultaMulti, mapaClave, esEnvio);
 															if(resultMulti != null && resultMulti.size() > 0){
 																for(int k = 0;k<resultMulti.size();k++){
 																	
@@ -453,7 +463,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																	for(ConsultaItem consultaDatos:consultasItemDatos){
 																		sentencia = consultaDatos.getSentencia();		
 																		
-																		List<Map<String,Object>> resultDatos = ejecutarConsultaConClaves(usuario, dialogo, consultaDatos, mapaClave);
+																		List<Map<String,Object>> resultDatos = ejecutarConsultaConClaves(usuario, dialogo, plantilla.getIdPlantillaDocumento(),consultaDatos, mapaClave, esEnvio);
 																		
 																		if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
 																			hDatosFinal.put(consultaDatos.getRegion(), resultDatos);
@@ -525,7 +535,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														for(ConsultaItem consultaDatos:consultasItemDatos){
 															sentencia = consultaDatos.getSentencia();		
 															
-															List<Map<String,Object>> resultDatos = ejecutarConsultaConClaves(usuario, dialogo, consulta, mapaClave);
+															List<Map<String,Object>> resultDatos = ejecutarConsultaConClaves(usuario, dialogo, plantilla.getIdPlantillaDocumento(), consulta, mapaClave, esEnvio);
 															
 															if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
 																hDatosFinal.put(consultaDatos.getRegion(), resultDatos);
@@ -574,7 +584,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return listaFicheros;
 	}
 	
-	private List<Map<String, Object>> ejecutarConsultaConClaves(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ConsultaItem consulta, HashMap<String, String> mapaClave) throws ParseException, SigaExceptions{
+	private List<Map<String, Object>> ejecutarConsultaConClaves(AdmUsuarios usuario, DialogoComunicacionItem dialogo, String idPlantilla, ConsultaItem consulta, HashMap<String, String> mapaClave, boolean esEnvio) throws ParseException, SigaExceptions{
 		
 		List<Map<String,Object>> result = null;
 		//Buscamos la consulta con sus parametros dinamicos
@@ -588,6 +598,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			// Remplazamos las claves de la query
 			for (Map.Entry<String, String> entry : mapaClave.entrySet()) {
 				sentencia = sentencia.replace(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + entry.getKey().toUpperCase() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, entry.getValue());
+			}
+			
+			if(esEnvio){
+				//Guardamos consulta
+				//sentencia con idplantilla
 			}
 			
 			Map<String, String> mapConsulta = _consultasService.obtenerMapaConsulta(sentencia);		
@@ -879,6 +894,90 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	public Error enviarTest(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+
+
+	@Override
+	public ResponseDateDTO obtenerFechaProgramada(HttpServletRequest request) {
+		LOGGER.info("obtenerFechaProgramada() -> Entrada al servicio para obtener la fecha por defecto del envio programado");
+		
+		ResponseDateDTO response = new ResponseDateDTO();
+		Error error = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					StringDTO desfaseMinutos = _genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.DESFASE_PROGRAMACION_ENVIO_MINUTOS, String.valueOf(idInstitucion));
+					
+					Date fecha = new Date();
+					
+					Calendar calendar = Calendar.getInstance();
+					calendar.setTime(fecha);
+					calendar.add(Calendar.MINUTE, Integer.parseInt(desfaseMinutos.getValor()));
+
+					Date fechaSalida = calendar.getTime();					
+					response.setFecha(fechaSalida);
+					
+				}catch(Exception e){
+					LOGGER.error("Error al obtener la fecha de programación del envio", e);
+					error.setCode(500);
+					error.setDescription("Error al obtener la fecha de programación del envio");
+					error.setMessage(e.getMessage());
+					response.setError(error);
+				}					
+			}
+		}
+		
+		LOGGER.info("obtenerFechaProgramada() -> Salida del servicio para obtener la fecha por defecto del envio programado");
+		return response;
+	}
+
+
+
+	@Override
+	public ResponseDataDTO obtenerNumMaximoModelos(HttpServletRequest request) {
+		LOGGER.info("obtenerNumMaximoModelos() -> Entrada al servicio para obtener el numero maximo de modelos seleccionados");
+		
+		ResponseDataDTO response = new ResponseDataDTO();
+		Error error = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					StringDTO numMaximo = _genParametrosExtendsMapper.selectParametroPorInstitucion(SigaConstants.NUM_MAXIMO_MODELOS_SELECCIONADOS, String.valueOf(idInstitucion));
+					response.setData(numMaximo.getValor());
+					
+				}catch(Exception e){
+					LOGGER.error("Error al obtener el número máximo de modelos", e);
+					error.setCode(500);
+					error.setDescription("Error al obtener el número máximo de modelos");
+					error.setMessage(e.getMessage());
+					response.setError(error);
+				}					
+			}
+		}
+		
+		LOGGER.info("obtenerNumMaximoModelos() -> Salida del servicio para obtener el numero maximo de modelos seleccionados");
+		return response;
 	}
 	
 }

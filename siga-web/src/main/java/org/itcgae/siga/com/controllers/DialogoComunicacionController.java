@@ -17,6 +17,7 @@ import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
 import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
+import org.itcgae.siga.DTOs.com.ResponseDateDTO;
 import org.itcgae.siga.DTOs.com.TipoEnvioDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
@@ -135,6 +136,28 @@ public class DialogoComunicacionController {
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
+	@RequestMapping(value = "/fechaProgramada",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ResponseDateDTO> obtenerFechaProgramada(HttpServletRequest request) {
+		
+		ResponseDateDTO response = _dialogoComunicacionService.obtenerFechaProgramada(request);
+		if(response.getError() == null)
+			return new ResponseEntity<ResponseDateDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ResponseDateDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
+	@RequestMapping(value = "/maxModelos",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ResponseDataDTO> obtenerNumMaximoModelos(HttpServletRequest request) {
+		
+		ResponseDataDTO response = _dialogoComunicacionService.obtenerNumMaximoModelos(request);
+		if(response.getError() == null)
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
 
