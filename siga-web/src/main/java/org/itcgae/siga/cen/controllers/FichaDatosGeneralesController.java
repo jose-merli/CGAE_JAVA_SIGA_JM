@@ -10,14 +10,11 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
-import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 //import org.itcgae.siga.DTOs.cen.FichaDatosColegialesDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
-import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -104,4 +101,9 @@ public class FichaDatosGeneralesController {
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
+	@RequestMapping(value = "fichaCursos/getTopicsSpecificPerson",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getTopicsSpecificCourse(@RequestParam("idPersona") String idPersona, HttpServletRequest request) {
+		ComboDTO response = fichaDatosGenerales.getTopicsSpecificPerson(request, idPersona);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 }

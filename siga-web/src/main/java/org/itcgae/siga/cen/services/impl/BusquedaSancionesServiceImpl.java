@@ -19,10 +19,13 @@ import org.itcgae.siga.cen.services.IBusquedaSancionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSancion;
 import org.itcgae.siga.db.entities.CenSancionExample;
 import org.itcgae.siga.db.entities.CenSancionKey;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSancionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposancionExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -42,6 +45,9 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 	@Autowired
 	private CenSancionExtendsMapper cenSancionExtendsMapper;
+	
+	@Autowired
+	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 
 	@Override
 	public ComboDTO getComboTipoSancion(HttpServletRequest request) {
@@ -142,7 +148,11 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try {
-					Long idPersona = Long.valueOf(busquedaSancionesItem.getIdPersona());
+					
+					
+						Long idPersona = Long.valueOf(busquedaSancionesItem.getIdPersona());
+					
+					
 
 					CenSancion cenSancion = fillCenSancion(usuario, idPersona, busquedaSancionesItem);
 
@@ -213,6 +223,7 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 						}
 
 					}
+					
 					// } else {
 					// insertResponseDTO.setStatus(SigaConstants.KO);
 					// }

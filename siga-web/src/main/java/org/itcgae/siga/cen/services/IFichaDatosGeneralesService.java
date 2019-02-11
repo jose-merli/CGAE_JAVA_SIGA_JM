@@ -10,9 +10,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
-import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -44,12 +42,9 @@ public interface IFichaDatosGeneralesService {
 			throws IllegalStateException, IOException;
 
 //	DatosDireccionesItem partidoJudicialSearch(ColegiadoItem colegiadoItem, HttpServletRequest request);
-
 //	public ColegiadoItem partidoJudicialSearch(ColegiadoItem colegiadoItem, HttpServletRequest request);
-
-
-
-	
 //	public BusquedaJuridicaDTO searchLegalPersons(int numPagina, BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request);
+	
+	public ComboDTO getTopicsSpecificPerson(HttpServletRequest request, String idPersona);
 	
 }
