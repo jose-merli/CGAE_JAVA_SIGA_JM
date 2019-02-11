@@ -97,7 +97,7 @@ public class FichaCursosServiceTest {
 		List<ComboItem> comboItemsSimulados = testUtils.getListComboItemsSimulados();
 		List<ComboItem> rolesTrainers = testUtils.getListComboItemsSimulados();
 
-		when(forRolesExtendsMapper.getRolesTrainers(idInstitucion.toString())).thenReturn(rolesTrainers);
+		when(forRolesExtendsMapper.getRolesTrainers(idInstitucion.toString(),"1")).thenReturn(rolesTrainers);
 		
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
