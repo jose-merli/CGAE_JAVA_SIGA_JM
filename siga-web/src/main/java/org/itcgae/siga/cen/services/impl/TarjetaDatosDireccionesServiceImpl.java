@@ -47,6 +47,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPoblacionesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicitmodifdatosbasicosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolimodidireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTipoDireccionExtendsMapper;
 import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
@@ -65,6 +66,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	@Autowired
 	private CenPoblacionesMapper cenPoblacionesMapper;
 
+	@Autowired
+	private  CenSolicitmodifdatosbasicosExtendsMapper  cenSolicitmodifdatosbasicosMapper;
+	
 	@Autowired
 	private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
 
@@ -938,7 +942,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+		int responseUpdate = 3;
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -951,7 +955,6 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				AdmUsuarios usuario = usuarios.get(0);
 				CenSolimodidirecciones direcciones = new CenSolimodidirecciones();
 
-//				peta aquí
 				NewIdDTO idSolicitudBD = cenSolimodidireccionesExtendsMapper.getMaxIdSolicitud(String.valueOf(idInstitucion),
 						datosDireccionesItem.getIdPersona());
 				if (idSolicitudBD == null) {
@@ -997,7 +1000,15 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
 				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
-				direcciones.setIdestadosolic(Short.parseShort("10"));
+//				direcciones.setIdestadosolic(Short.parseShort("10"));
+				
+				List <ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper.getAutoAceptar(String.valueOf(idInstitucion));
+				
+				if(autoAceptar.get(0).getLabel().equals("S")) {
+					direcciones.setIdestadosolic(Short.parseShort("20"));
+				}else {
+					direcciones.setIdestadosolic(Short.parseShort("10"));
+				}
 				
 				if(datosDireccionesItem.getPoblacionExtranjera()!= "" &&  datosDireccionesItem.getPoblacionExtranjera() != null) {
 					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
@@ -1009,11 +1020,61 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				LOGGER.info(
 						"createDirection() / cenDireccionesExtendsMapper.insert() -> Salida de cenDireccionesExtendsMapper para insertar direcciones");
 
+				if(autoAceptar.get(0).getLabel().equals("S")) {
+					CenDirecciones modificacion = new CenDirecciones();
+					modificacion.setIdinstitucion(idInstitucion);
+					modificacion.setIdpersona(Long.parseLong(datosDireccionesItem.getIdPersona()));
+					modificacion.setFechamodificacion(new Date());
+					modificacion.setUsumodificacion(usuario.getIdusuario());
+					modificacion.setIddireccion(Long.parseLong(datosDireccionesItem.getIdDireccion()));
+					// modificacion.setPreferente(solicitud.getPreferente());
+					modificacion.setCodigopostal(datosDireccionesItem.getCodigoPostal());
+					if (datosDireccionesItem.getTelefono() != null) {
+						modificacion.setTelefono1(datosDireccionesItem.getTelefono());
+					}
+					// modificacion.setTelefono2(solicitud.getTelefono2());
+					if (datosDireccionesItem.getDomicilio() != null) {
+						modificacion.setDomicilio(datosDireccionesItem.getDomicilio());
+					}
+					if (datosDireccionesItem.getMovil() != null) {
+						modificacion.setMovil(datosDireccionesItem.getMovil());
+					}
+					if (datosDireccionesItem.getFax() != null) {
+						modificacion.setFax1(datosDireccionesItem.getFax());
+					}
+					// modificacion.setFax2(solicitud.getFax2());
+					if (datosDireccionesItem.getCorreoElectronico() != null) {
+						modificacion.setCorreoelectronico(datosDireccionesItem.getCorreoElectronico());
+					}
+					if (datosDireccionesItem.getPaginaWeb() != null) {
+						modificacion.setPaginaweb(datosDireccionesItem.getPaginaWeb());
+					}
+					modificacion.setIdpais(datosDireccionesItem.getIdPais());
+					if (datosDireccionesItem.getIdProvincia() != null) {
+						modificacion.setIdprovincia(datosDireccionesItem.getIdProvincia());
+					}
+					if (datosDireccionesItem.getIdPoblacion() != null) {
+						modificacion.setIdpoblacion(datosDireccionesItem.getIdPoblacion());
+					}
+					if (datosDireccionesItem.getPoblacionExtranjera() != null) {
+						modificacion.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
+					}
+					if (datosDireccionesItem.getOtraProvincia() != null) {
+						modificacion.setOtraprovincia(Short.parseShort(datosDireccionesItem.getOtraProvincia()));
+					}
+
+					responseUpdate = cenDireccionesExtendsMapper.updateByPrimaryKeySelective(modificacion);
+				}
+				
 				// comprobacion actualización
 				if (response >= 1) {
-					LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
+					LOGGER.info("createDirection() -> OK. Insert para solicitud direcciones realizado correctamente");
 					insertResponseDTO.setId(idDireccion.toString());
 					insertResponseDTO.setStatus(SigaConstants.OK);
+					if(responseUpdate == 1) {
+						LOGGER.info("createDirection() -> OK. Solicitud de direccion procesada correctamente");
+
+					}
 				} else {
 					LOGGER.info("createDirection() -> KO. InsertSolicitud para direcciones  NO realizado correctamente");
 					insertResponseDTO.setStatus(SigaConstants.KO);

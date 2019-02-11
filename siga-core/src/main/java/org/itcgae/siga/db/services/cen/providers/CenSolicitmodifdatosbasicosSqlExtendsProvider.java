@@ -24,5 +24,15 @@ public class CenSolicitmodifdatosbasicosSqlExtendsProvider extends CenSolicitmod
 		return sql.toString();
 	}
 	
+	public String getAutoAceptar(String idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("VALOR");
+		sql.FROM("gen_parametros");
+		sql.WHERE("PARAMETRO = 'SOLICITUDES_MODIF_CENSO'");
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion +"'");
+		return sql.toString();
+	}
+	
 
 }

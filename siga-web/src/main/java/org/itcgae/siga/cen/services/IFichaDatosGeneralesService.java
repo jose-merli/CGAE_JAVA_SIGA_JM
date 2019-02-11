@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IFichaDatosGeneralesService {
@@ -36,6 +37,8 @@ public interface IFichaDatosGeneralesService {
 			HttpServletRequest request) throws ParseException;
 
 	public InsertResponseDTO solicitudModificacion(NoColegiadoItem noColegiadoItem, HttpServletRequest request);
+
+	public ComboDTO autoAceptar(HttpServletRequest request);
 
 	public InsertResponseDTO solicitudUploadPhotography(MultipartHttpServletRequest request)
 			throws IllegalStateException, IOException;

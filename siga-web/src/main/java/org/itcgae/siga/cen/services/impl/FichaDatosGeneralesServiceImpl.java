@@ -62,6 +62,7 @@ import org.itcgae.siga.db.mappers.CenSolicmodifexportarfotoMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscolegialesestadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
@@ -129,7 +130,9 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	@Autowired
 	private CenEstadocivilExtendsMapper cenEstadocivilExtendsMapper;
 
-
+	@Autowired
+	private CenClienteExtendsMapper cenClienteExtendsMapper;
+	
 //	@Override
 //	public ComboDTO getSocietyTypes(HttpServletRequest request) {
 //		// TODO Auto-generated method stub
@@ -788,8 +791,63 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	}
 	
 	
-	
+//	@Override 
+//	public ComboDTO autoAceptar(NoColegiadoItem noColegiadoItem, HttpServletRequest request) {
+//		LOGGER.info(
+//				"createColegiado() -> Entrada al servicio para actualizar información general de una persona jurídica");
+//		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+//
+//		// Conseguimos información del usuario logeado
+//		String token = request.getHeader("Authorization");
+//		String dni = UserTokenUtils.getDniFromJWTToken(token);
+//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+//		ComboItem autoAceptar = cenSolicitmodifdatosbasicosMapper.getAutoAceptar(String.valueOf(idInstitucion),
+//				noColegiadoItem.getIdPersona());
+//		ComboDTO response = new ComboDTO();
+//		List<ComboItem> combo = new ArrayList<ComboItem>();
+//		
+//		response.setCombooItems(combo);
+//		return autoAceptar;
+//	}
 
+	@Override
+	public ComboDTO autoAceptar(HttpServletRequest request) {
+
+		LOGGER.info("getTratamiento() -> Entrada al servicio para obtener los tipos de tratamiento disponibles");
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getTratamiento() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			AdmUsuarios usuario = usuarios.get(0);
+
+			LOGGER.info(
+					"getTratamiento() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				comboItems = cenSolicitmodifdatosbasicosMapper.getAutoAceptar(String.valueOf(idInstitucion));
+
+				comboDTO.setCombooItems(comboItems);
+
+			}
+
+		}
+		LOGGER.info("getPais() -> Salida del servicio para obtener los tipos de tratamiento disponibles");
+
+		return comboDTO;
+	}
+	
 	@Override
 	public InsertResponseDTO solicitudModificacion(NoColegiadoItem noColegiadoItem, HttpServletRequest request) {
 		LOGGER.info(
@@ -831,6 +889,8 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 //							solicitud.setIdsolicitud(Short.parseShort(""+ (1 + idCv)));
 //						}
 						
+						List <ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper.getAutoAceptar(String.valueOf(idInstitucion));
+						
 						int idCv = Integer.parseInt(idBD.getNewId());
 						solicitud.setIdsolicitud(Short.parseShort(""+ (1 + idCv)));
 						solicitud.setPublicidad(SigaConstants.DB_FALSE);
@@ -843,17 +903,37 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						solicitud.setIdpersona(Long.parseLong(noColegiadoItem.getIdPersona()));
 						solicitud.setFechamodificacion(new Date());
 						solicitud.setUsumodificacion(usuario.getIdusuario());
-						solicitud.setIdestadosolic(Short.parseShort("10"));
 						solicitud.setFechaalta(new Date());
-//					AGREGAR EL RESTO DE CAMPOS PARA LA INSERCIÓN, PREGUNTAR QUE HACER CON LOS CAMPOS QUE NO SON LA FECHA Y TAMPOCO SON NULLABLES.
-						
+						if(autoAceptar.get(0).getLabel().equals("S")) {
+							solicitud.setIdestadosolic(Short.parseShort("20"));
+						}else {
+							solicitud.setIdestadosolic(Short.parseShort("10"));
+						}
 						int responseInsertPersona =  cenSolicitmodifdatosbasicosMapper.insert(solicitud);
+						int responseUpdate = 0;
+						
+						if(autoAceptar.get(0).getLabel().equals("S")) {
+							CenCliente modificacion = new CenCliente();
+							modificacion.setIdinstitucion(idInstitucion);
+							modificacion.setIdlenguaje(solicitud.getIdlenguaje());
+							modificacion.setPublicidad(solicitud.getPublicidad());
+							modificacion.setGuiajudicial(solicitud.getGuiajudicial());
+							modificacion.setIdpersona(solicitud.getIdpersona());
+							modificacion.setFechaactualizacion(new Date());
+							modificacion.setFechamodificacion(new Date());
+							modificacion.setUsumodificacion(usuario.getIdusuario());
+							
+							responseUpdate = cenClienteExtendsMapper.updateByPrimaryKeySelective(modificacion);
+						}
 						LOGGER.info(
 								"createColegiado() / cenSolicitmodifdatosbasicosMapper.insert() -> Salida de cenSolicitmodifdatosbasicosMapper para crear una nueva solicitud");
 						if(responseInsertPersona == 1) {
 							insertResponseDTO.setStatus(SigaConstants.OK);
 							LOGGER.info("createColegiado() Solicitud creada correctamente");
-
+							if(responseUpdate == 1) {
+								LOGGER.info("createColegiado() Solicitud procesada correctamente");
+							}
+							
 						}else {
 							insertResponseDTO.setStatus(SigaConstants.KO);
 							LOGGER.info("createColegiado() La solicitud no ha podido ser creada correctamente");

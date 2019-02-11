@@ -86,7 +86,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicmodicuentasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
-
+import org.itcgae.siga.db.services.cen.mappers.CenSolicitmodifdatosbasicosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.GenFicheroExtendsMapper;
 import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -108,6 +108,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 	@Autowired
 	private CenCuentasbancariasExtendsMapper cenCuentasbancariasExtendsMapper;
 
+	@Autowired
+	private  CenSolicitmodifdatosbasicosExtendsMapper  cenSolicitmodifdatosbasicosMapper;
+	
 	@Autowired
 	private CenSolicmodicuentasExtendsMapper cenSolicmodicuentasExtendsMapper;
 	
@@ -809,7 +812,16 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				cuentaBancaria.setIdinstitucion(idInstitucion);
 				cuentaBancaria.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
 				cuentaBancaria.setTitular(datosBancariosInsertDTO.getTitular());
-				cuentaBancaria.setIdestadosolic(Short.parseShort("10"));
+//				cuentaBancaria.setIdestadosolic(Short.parseShort("10"));
+				
+				List <ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper.getAutoAceptar(String.valueOf(idInstitucion));
+				
+				if(autoAceptar.get(0).getLabel().equals("S")) {
+					cuentaBancaria.setIdestadosolic(Short.parseShort("20"));
+				}else {
+					cuentaBancaria.setIdestadosolic(Short.parseShort("10"));
+				}
+				
 				//Gestionamos los abonos que nos llegan
 				if (null != datosBancariosInsertDTO.getTipoCuenta() && datosBancariosInsertDTO.getTipoCuenta().length>0) {
 
@@ -870,6 +882,25 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				LOGGER.info(
 						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
 		
+				if(autoAceptar.get(0).getLabel().equals("S")) {
+					CenCuentasbancarias modificacion = new CenCuentasbancarias();
+					modificacion.setIdinstitucion(idInstitucion);
+					modificacion.setIdpersona(cuentaBancaria.getIdpersona());
+					modificacion.setUsumodificacion(usuario.getIdusuario());
+					modificacion.setFechamodificacion(new Date());
+					modificacion.setAbonocargo(cuentaBancaria.getAbonocargo());
+					modificacion.setDigitocontrol(cuentaBancaria.getDigitocontrol());
+					modificacion.setAbonosjcs(cuentaBancaria.getAbonosjcs());
+					modificacion.setIban(cuentaBancaria.getIban());
+					modificacion.setIdcuenta(cuentaBancaria.getIdcuenta());
+					modificacion.setCboCodigo(cuentaBancaria.getCboCodigo());
+					modificacion.setCodigosucursal(cuentaBancaria.getCodigosucursal());
+					modificacion.setNumerocuenta(cuentaBancaria.getNumerocuenta());
+					modificacion.setTitular(cuentaBancaria.getTitular());
+					
+					int responseUpdate = cenCuentasbancariasExtendsMapper.updateByPrimaryKeySelective(modificacion);
+					
+				}
 				// comprobacion actualización
 				if(response >= 1) {
 					LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");

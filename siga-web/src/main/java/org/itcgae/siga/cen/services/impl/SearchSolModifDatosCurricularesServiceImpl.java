@@ -126,7 +126,7 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 				recordUpdate.setFechamodificacion(new Date());
 				recordUpdate.setUsumodificacion(usuario.getIdusuario());
 				recordUpdate.setIdpersona(solicitud.getIdpersona());
-				recordUpdate.setIdtipocv(solicitud.getIdcv());
+				recordUpdate.setIdtipocv(solicitud.getIdtipocv());
 
 				if (!UtilidadesString.esCadenaVacia(String.valueOf(solicitud.getIdtipocvsubtipo1()))
 						|| null != solicitud.getIdtipocvsubtipo1()) {
