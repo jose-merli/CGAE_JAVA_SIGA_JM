@@ -63,9 +63,10 @@ public interface ConConsultasExtendsMapper {
 		@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDOBJETIVO", property = "idObjetivo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "SENTENCIA", property = "sentencia", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "GENERAL", property = "generica", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "GENERAL", property = "generica", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OBJETIVO", property = "objetivo", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ConsultaItem> selectConsultasPlantillas(Short idInstitucion, String idPlantillaEnvios, String idtipoEnvio);
+	List<ConsultaItem> selectConsultasPlantillas(Short idInstitucion, String idPlantillaEnvios, String idtipoEnvio, String idLenguaje);
 
 	@ResultType(value = List.class)
 	public List<Map<String, Object>> ejecutarConsulta(@Param(value = "query") Map<String,String> querys);
@@ -78,4 +79,15 @@ public interface ConConsultasExtendsMapper {
 		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> selectConsultasDisponibles(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo);
+	
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasDisponiblesPlantillasEnvio")
+	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> selectConsultasDisPlantilla(Short IdInstitucion);
+	
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectObjetivo")
+	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	String SelectObjetivo(String idObjetivo, String idLenguaje);
 }	

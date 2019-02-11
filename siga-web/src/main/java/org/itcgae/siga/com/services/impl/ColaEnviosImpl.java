@@ -74,7 +74,7 @@ public class ColaEnviosImpl implements IColaEnvios{
 	private CenPersonaMapper _cenPersonaMapper;
 	
 	@Transactional
-	@Scheduled(cron  = "${cron.pattern.scheduled.Envios}") 
+	//@Scheduled(cron  = "${cron.pattern.scheduled.Envios}") 
 	@Override
 	public void execute() {
 
