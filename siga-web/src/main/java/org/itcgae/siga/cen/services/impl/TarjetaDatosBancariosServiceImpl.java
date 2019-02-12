@@ -1431,7 +1431,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				if (tieneSCSJ) {
 					CenCuentasbancariasExample example = new CenCuentasbancariasExample();
 					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(datosBancariosInsertDTO.getIdPersona()))
-							.andIdinstitucionEqualTo(idInstitucion).andAbonosjcsEqualTo("1");
+							.andIdinstitucionEqualTo(idInstitucion).andAbonosjcsEqualTo("1").andIdcuentaNotEqualTo(Short.parseShort(datosBancariosInsertDTO.getIdCuenta())).andFechabajaIsNull();
 					List<CenCuentasbancarias> cuenta = cenCuentasbancariasExtendsMapper.selectByExample(example);
 
 					if (null != cuenta && cuenta.size() > 0) {
