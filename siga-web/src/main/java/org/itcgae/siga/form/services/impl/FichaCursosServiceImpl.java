@@ -2544,6 +2544,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			pysServiciosinstitucion.setIniciofinalponderado("I");
 			pysServiciosinstitucion.setSolicitarbaja("0");
 			pysServiciosinstitucion.setSolicitaralta("0");
+			pysServiciosinstitucion.setIdtipoiva(13); //Se pone el iva general por defecto
 
 			LOGGER.info(
 					"createServiceCourse() / pysServiciosinstitucionExtendsMapper.insert() -> Entrada a pysServiciosinstitucionExtendsMapper para insertar un servicio institucion");
@@ -2566,7 +2567,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			pysPreciosservicios.setValor(valor);
 			pysPreciosservicios.setCriterios("SELECT IDINSTITUCION, IDPERSONA FROM CEN_CLIENTE WHERE IDINSTITUCION = "
 					+ idInstitucion + " AND IDPERSONA = @IDPERSONA@");
-			pysPreciosservicios.setPordefecto("0");
+			pysPreciosservicios.setPordefecto("1");
 			NewIdDTO idPrecioServicio = pysPreciosserviciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion,
 					pysServicios.getIdservicio(), pysServiciosinstitucion.getIdserviciosinstitucion(),
 					SigaConstants.PERIOCIDAD_1MES);
