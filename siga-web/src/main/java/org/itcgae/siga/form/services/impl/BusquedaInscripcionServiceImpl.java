@@ -145,27 +145,42 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		List<CenPersona> listCenPersona;
-
-		if (letrado.equalsIgnoreCase("S")) {
-			CenPersonaExample cenPersonaExample = new CenPersonaExample();
-			cenPersonaExample.createCriteria().andNifcifEqualTo(dni);
-			listCenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
-			if (!listCenPersona.isEmpty()) {
-				CenPersona cenPersona = listCenPersona.get(0);
-				inscripcionItem.setIdPersona(cenPersona.getIdpersona());
-			}
-		}else{
-			inscripcionItem.setIdInstitucion(idInstitucion.toString());
-		}
-
 		InscripcionDTO inscripcionDTO = new InscripcionDTO();
 		List<InscripcionItem> inscripcionItemList = new ArrayList<InscripcionItem>();
 
-		inscripcionItemList = forInscripcionExtendsMapper.selectInscripciones(inscripcionItem);
-		inscripcionDTO.setInscripcionItem(inscripcionItemList);
+		if (null != idInstitucion) {
+		
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			
+			LOGGER.info(
+					"getEstadosInscripcion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			LOGGER.info(
+					"getEstadosInscripcion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-		// TODO comprobar caso de null
-		if (inscripcionItemList.isEmpty()) {
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				if (letrado.equalsIgnoreCase("S")) {
+					CenPersonaExample cenPersonaExample = new CenPersonaExample();
+					cenPersonaExample.createCriteria().andNifcifEqualTo(dni);
+					listCenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+					if (!listCenPersona.isEmpty()) {
+						CenPersona cenPersona = listCenPersona.get(0);
+						inscripcionItem.setIdPersona(cenPersona.getIdpersona());
+					}
+				} else {
+					inscripcionItem.setIdInstitucion(idInstitucion.toString());
+				}
+				inscripcionItemList = forInscripcionExtendsMapper.selectInscripciones(inscripcionItem, usuario.getIdlenguaje());
+				inscripcionDTO.setInscripcionItem(inscripcionItemList);
+			}
+		}
+
+		if (inscripcionItemList.isEmpty() || inscripcionItemList == null) {
 			LOGGER.warn(
 					"searchInscripcion() / forInscripcionExtendsMapper.selectInscripciones() -> No existen inscripciones para el filtro introducido");
 		}
@@ -545,7 +560,7 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 					"updateCalificacion() / forInscripcionExtendsMapper.selectByExample() -> Salida a forInscripcionExtendsMapper para obtener la inscripcion a calificar");
 
 			if (inscripciones != null && !inscripciones.isEmpty()) {
-				
+
 				ForInscripcion forInscripcion = inscripciones.get(0);
 
 				forInscripcion.setUsumodificacion(usuario.getIdusuario().longValue());
@@ -564,7 +579,7 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 						"updateCalificacion() / forInscripcionExtendsMapper.updateByPrimaryKey() -> Entrada a forInscripcionExtendsMapper para modificar la calificación");
 
 				resultado = forInscripcionExtendsMapper.updateByPrimaryKey(forInscripcion);
-				
+
 				LOGGER.info(
 						"updateCalificacion() / forInscripcionExtendsMapper.updateByPrimaryKey() -> Salida a forInscripcionExtendsMapper para modificar la calificación");
 
@@ -574,7 +589,7 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 
 		LOGGER.info(
 				"updateCalificacion() -> Salida al servicio para actualizar el estado correspodiente a las inscripciones");
-		
+
 		return resultado;
 	}
 

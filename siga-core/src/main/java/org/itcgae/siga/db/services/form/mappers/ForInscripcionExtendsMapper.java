@@ -66,7 +66,7 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper{
 			@Result(column = "IDPETICIONSUSCRIPCION", property = "idPeticionSuscripcion", jdbcType = JdbcType.NUMERIC)
 
 	})
-	List<InscripcionItem> selectInscripciones(InscripcionItem inscripcionItem);	
+	List<InscripcionItem> selectInscripciones(InscripcionItem inscripcionItem, String idLenguaje);	
 	
 	@SelectProvider(type = ForInscripcionSqlExtendsProvider.class, method = "getCalificacionesEmitidas")
 	@Results({
@@ -123,8 +123,9 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper{
 			@Result(column = "FECHAIMPARTICIONDESDE", property = "fechaImparticionDesde", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FECHAIMPARTICIONHASTA", property = "fechaImparticionHasta", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "FLAGARCHIVADO", property = "flagArchivado", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "AUTOVALIDACIONINSCRIPCION", property = "autovalidacionInscripcion", jdbcType = JdbcType.NUMERIC)
-	
+			@Result(column = "AUTOVALIDACIONINSCRIPCION", property = "autovalidacionInscripcion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NUMTEMAS", property = "numTemas", jdbcType = JdbcType.VARCHAR)
+
 	})
 	CursoItem searchCourseByIdcurso(String idCurso, Short idInstitucion);
 	

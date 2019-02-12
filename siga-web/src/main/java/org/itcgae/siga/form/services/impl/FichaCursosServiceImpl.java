@@ -3177,7 +3177,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 										"finishCourse() / forInscripcionExtendsMapper.selectInscripciones() -> Entrada a forInscripcionExtendsMapper para buscar las inscripciones a las cuales se generara un certificado");
 
 								List<InscripcionItem> inscriptionItemList = forInscripcionExtendsMapper
-										.selectInscripciones(inscripcionItem);
+										.selectInscripciones(inscripcionItem, usuario.getIdlenguaje());
 
 								LOGGER.info(
 										"finishCourse() / forInscripcionExtendsMapper.selectInscripciones() -> Entrada a forInscripcionExtendsMapper para buscar las inscripciones a las cuales se generara un certificado");
