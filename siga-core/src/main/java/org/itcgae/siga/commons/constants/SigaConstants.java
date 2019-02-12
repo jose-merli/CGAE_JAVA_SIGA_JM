@@ -89,6 +89,15 @@ public class SigaConstants {
 	public static final String TIPO_ENVIO_BUROSMS = "5";
 	public static final String ID_OBJETIVO_DESTINATARIOS ="1";
 	
+	//estados envio
+	public static final Short ENVIO_PENDIENTE_MANUAL = 1;
+	public static final Short ENVIO_PROCESADO = 2;
+	public static final Short ENVIO_PROCESADO_CON_ERRORES = 3;
+	public static final Short ENVIO_PENDIENTE_AUTOMATICO = 4;
+	public static final Short ENVIO_PROCESANDO = 5;
+	public static final Short ENVIO_ARCHIVADO = 6;
+	
+	
 
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(

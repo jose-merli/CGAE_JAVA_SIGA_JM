@@ -102,6 +102,7 @@ public class EnviosServiceImpl implements IEnviosService{
 		    	remitente = _cenDireccionesMapper.selectByPrimaryKey(keyDir);
 		    	
 		    }else{
+		    	LOGGER.error("La plantilla no tiene un remitente");
 		    	throw new BusinessException("La plantilla no tiene un remitente");
 		    }
 		    String from = remitente.getCorreoelectronico();
@@ -170,12 +171,6 @@ public class EnviosServiceImpl implements IEnviosService{
 			e.printStackTrace();
 		}
 
-	}
-
-	@Override
-	public void envioFax() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
