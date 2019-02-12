@@ -2011,4 +2011,16 @@ public class ConsultasServiceImpl implements IConsultasService{
 		return select;
 	}
 	
+	@Override
+	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws ParseException, SigaExceptions{
+		
+		List<Map<String,Object>> result = null;
+
+		Map<String, String> mapConsulta = obtenerMapaConsulta(sentencia);		
+		
+		result = _conConsultasExtendsMapper.ejecutarConsulta(mapConsulta);	
+		
+		return result;
+	}
+	
 }

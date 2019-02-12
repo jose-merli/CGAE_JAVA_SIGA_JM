@@ -37,6 +37,7 @@ public class SigaConstants {
 	public static final String DESFASE_PROGRAMACION_ENVIO_MINUTOS = "DESFASE_PROGRAMACION_ENVIO_MINUTOS";
 	public static final String NUM_MAXIMO_MODELOS_SELECCIONADOS = "dialogo.modelocomunicacion.seleccionMax";
 	public static final String FICHERO_SIGA = "SIGA";
+	public static final String LENGUAJE_DEFECTO = "1";
 	
 	// DOCUMENTOS
 	
