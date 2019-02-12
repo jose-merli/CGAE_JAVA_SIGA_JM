@@ -35,7 +35,8 @@ public class SigaConstants {
 	public static final String IP_ACCESO_SERVICIO_CARGAS = "IP_ACCESO_SERVICIO_CARGAS";
 	public static final String ACTIVAR_CLIENTE_SERVICIO_CARGAS = "ACTIVAR_CLIENTE_SERVICIO_CARGAS";
 	public static final String DESFASE_PROGRAMACION_ENVIO_MINUTOS = "DESFASE_PROGRAMACION_ENVIO_MINUTOS";
-	public static final String NUM_MAXIMO_MODELOS_SELECCIONADOS = "NUM_MAXIMO_MODELOS_SELECCIONADOS";
+	public static final String NUM_MAXIMO_MODELOS_SELECCIONADOS = "dialogo.modelocomunicacion.seleccionMax";
+	public static final String FICHERO_SIGA = "SIGA";
 	
 	// DOCUMENTOS
 	

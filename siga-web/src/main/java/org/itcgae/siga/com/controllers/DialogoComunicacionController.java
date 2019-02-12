@@ -108,6 +108,30 @@ public class DialogoComunicacionController {
 				.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
 	}
 	
+	@RequestMapping(value = "/generarEnvios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> generarEnvios(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo) {
+
+		Error response = _dialogoComunicacionService.generarEnvios(request, dialogo);
+		if (response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
+	@RequestMapping(value = "/generarDocumentosEnvio", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> generarDocumentosEnvio(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo) {
+
+		Error response = _dialogoComunicacionService.generarDocumentosEnvio(request, "283265");
+		if (response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
+	
+	
 	@RequestMapping(value = "/keys",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<KeysDTO> obtenertiposKeysClase(HttpServletRequest request, @RequestBody String idClaseComunicacion) {
 		

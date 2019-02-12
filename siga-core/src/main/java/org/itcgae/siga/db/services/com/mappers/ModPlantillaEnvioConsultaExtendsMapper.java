@@ -19,7 +19,8 @@ public interface ModPlantillaEnvioConsultaExtendsMapper {
 	@Results({@Result(column = "IDCONSULTA", property = "idConsulta", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "SENTENCIA", property = "sentencia", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "SENTENCIA", property = "sentencia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDOBJETIVO", property = "idObjetivo", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ConsultaItem> selectPlantillaEnvioConsultas(Short idInstitucion, Integer idPlantillaEnvios, Short idTipoEnvios);
 	

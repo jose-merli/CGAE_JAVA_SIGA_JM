@@ -26,4 +26,6 @@ public interface IDialogoComunicacionService {
 	public Error enviarTest(HttpServletRequest request);
 	public ResponseDateDTO obtenerFechaProgramada(HttpServletRequest request);
 	public ResponseDataDTO obtenerNumMaximoModelos(HttpServletRequest request);
+	public Error generarEnvios(HttpServletRequest request, DialogoComunicacionItem dialogo);
+	public Error generarDocumentosEnvio(HttpServletRequest request, String idEnvio);
 }

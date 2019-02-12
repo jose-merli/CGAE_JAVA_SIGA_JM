@@ -339,7 +339,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 							// Si la consulta se ha editado, actualizamos la fecha de baja de la consulta anterior
 							if(consultaItem.getIdConsultaAnterior() != null && !consultaItem.getIdConsultaAnterior().equalsIgnoreCase("") &&!consultaItem.getIdConsultaAnterior().equalsIgnoreCase(consultaItem.getIdConsulta())){
 								//Obtenemos la consulta a borrar
-								List<ConsultaItem> listaConsultasBorrar = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.parseShort(plantillaDoc.getIdInstitucion()),Long.parseLong(plantillaDoc.getIdModeloComunicacion()), Long.parseLong(plantillaDoc.getIdInforme()), Long.parseLong(consultaItem.getIdConsultaAnterior()));
+								List<ConsultaItem> listaConsultasBorrar = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.parseShort(plantillaDoc.getIdInstitucion()),Long.parseLong(plantillaDoc.getIdModeloComunicacion()), Long.parseLong(plantillaDoc.getIdInforme()), Long.parseLong(consultaItem.getIdConsultaAnterior()), null);
 								for(ConsultaItem consultaBorrar: listaConsultasBorrar){
 									ModPlantilladocConsulta consultaEntity = new ModPlantilladocConsulta();
 									consultaEntity.setFechabaja(new Date());
@@ -841,7 +841,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
 					for(PlantillaDocumentoBorrarDTO consulta :plantillaDoc){
-						List<ConsultaItem> listaConsultasBorrar = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.parseShort(consulta.getIdInstitucion()),Long.parseLong(consulta.getIdModeloComunicacion()), Long.parseLong(consulta.getIdInforme()), Long.parseLong(consulta.getIdConsulta()));
+						List<ConsultaItem> listaConsultasBorrar = modPlantillaDocumentoConsultaExtendsMapper.selectConsultaByIdConsulta(Short.parseShort(consulta.getIdInstitucion()),Long.parseLong(consulta.getIdModeloComunicacion()), Long.parseLong(consulta.getIdInforme()), Long.parseLong(consulta.getIdConsulta()), null);
 						for(ConsultaItem consultaBorrar: listaConsultasBorrar){
 							ModPlantilladocConsulta consultaEntity = new ModPlantilladocConsulta();
 							consultaEntity.setFechabaja(new Date());
