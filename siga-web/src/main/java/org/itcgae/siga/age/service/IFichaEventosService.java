@@ -66,5 +66,7 @@ public interface IFichaEventosService {
 	
 	public FormadorCursoDTO getTrainersSession(String idEvento, HttpServletRequest request);
 	
-	public void  updateEstadoEventoAuto();
+	public void updateEstadoEventoAuto();
+	
+	public void generateNotificationsAuto();
 }

@@ -70,7 +70,7 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		}
 
 		if (inscripcionItem.getCodigoCurso() != null && inscripcionItem.getCodigoCurso() != "") {
-			sql.WHERE("CURSO.CODIGOCURSO = '" + inscripcionItem.getCodigoCurso() + "'");
+			sql.WHERE("CURSO.CODIGOCURSO like '%" + inscripcionItem.getCodigoCurso() + "%'");
 		}
 
 		if (inscripcionItem.getNombreCurso() != null && inscripcionItem.getNombreCurso() != "") {

@@ -58,4 +58,12 @@ public class ScheduledTaskServiceImpl implements IScheduledTaskService {
 		fichaEventosService.updateEstadoEventoAuto();
 		LOGGER.info("ScheduledTaskServiceImpl --> cambiaCursoEnCurso --> SALE updateEstadoCursoAuto");
 	}
+	
+	@Scheduled(cron = "${cron.pattern.scheduled.envioNotificacionesEventos}")
+	@Override
+	public void generarNotificaciones() {
+		LOGGER.info("ScheduledTaskServiceImpl --> generarNotificaciones --> ENTRA generateNotificationAuto");
+		fichaEventosService.generateNotificationsAuto();
+		LOGGER.info("ScheduledTaskServiceImpl --> generarNotificaciones --> SALE generateNotificationAuto");
+	}
 }
