@@ -26,8 +26,8 @@ public class FichaColegialOtrasColegiacionesController {
 	private IFichaColegialOtrasColegiacionesService iFichaColegialOtrasColegiacionesService;
 	
 	@RequestMapping(value = "fichaColegialOtrasColegiaciones/searchOtherCollegues", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ColegiadoDTO> searchOtherCollegues(@RequestParam("numPagina") int numPagina, @RequestBody String idPersona, HttpServletRequest request) { 
-		ColegiadoDTO response = iFichaColegialOtrasColegiacionesService.searchOtherCollegues(numPagina, idPersona, request);
+	ResponseEntity<ColegiadoDTO> searchOtherCollegues(@RequestParam("numPagina") int numPagina, @RequestBody String nif, HttpServletRequest request) { 
+		ColegiadoDTO response = iFichaColegialOtrasColegiacionesService.searchOtherCollegues(numPagina, nif, request);
 		return new ResponseEntity<ColegiadoDTO >(response, HttpStatus.OK);
 	}
 		@RequestMapping(value = "fichaColegialOtrasColegiaciones/getLabelColegios",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
