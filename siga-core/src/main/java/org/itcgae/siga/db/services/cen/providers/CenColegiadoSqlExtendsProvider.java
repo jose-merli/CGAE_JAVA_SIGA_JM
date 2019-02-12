@@ -487,7 +487,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("per.nifcif AS nif");
 		sql.SELECT("col.ncolegiado AS numeroColegiado");
 		sql.SELECT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2)) AS nombre");
-		sql.SELECT("DECODE (col.situacionresidente, '0', 'SI', 'NO') AS residenteInscrito");
+		sql.SELECT("DECODE (col.situacionresidente,0,'No', 'Sí') AS residenteInscrito");
 		sql.SELECT("cat.descripcion AS estadoColegial");
 		sql.SELECT("TO_CHAR(per.fechanacimiento,'DD/MM/YYYY') AS fechaNacimiento");
 		sql.SELECT("dir.correoelectronico AS correo");

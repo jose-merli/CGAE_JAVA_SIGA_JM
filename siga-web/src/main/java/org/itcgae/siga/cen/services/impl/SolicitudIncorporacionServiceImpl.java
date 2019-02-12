@@ -815,7 +815,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		solIncorporacion.setDigitocontrol(dto.getIban().substring(12, 14));
 		solIncorporacion.setNumerocuenta(dto.getIban().substring(14, 24));
 		solIncorporacion.setIdestado(Short.parseShort(dto.getIdEstado()));
-		solIncorporacion.setIdestadocivil(Short.parseShort(dto.getIdEstadoCivil()));
+		if(dto.getIdEstadoCivil() != null) {
+			solIncorporacion.setIdestadocivil(Short.parseShort(dto.getIdEstadoCivil()));
+		}
 		solIncorporacion.setIdinstitucion(usuario.getIdinstitucion());
 		solIncorporacion.setIdmodalidaddocumentacion(Short.parseShort(dto.getIdModalidadDocumentacion()));
 		solIncorporacion.setIdpais(dto.getIdPais());

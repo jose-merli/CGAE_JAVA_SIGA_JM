@@ -12,6 +12,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
 import org.itcgae.siga.DTOs.cen.SolModificacionItem;
 import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.CenDatoscv;
 import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicos;
@@ -56,6 +57,12 @@ public interface CenSolicitmodifdatosbasicosExtendsMapper extends  CenSolicitmod
 	
 	})
 	NewIdDTO getMaxIdSolicitud(String idInstitucion, String idPersona);
+	
+	@SelectProvider(type = CenSolicitmodifdatosbasicosSqlExtendsProvider.class, method = "getAutoAceptar")
+		@Results({ @Result(column = "VALOR", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VALOR", property = "value", jdbcType = JdbcType.VARCHAR)})
+	List<ComboItem> getAutoAceptar(String idInstitucion);
+	
 	
 	@Select({ "select", "IDSOLICITUD, MOTIVO, PUBLICIDAD, GUIAJUDICIAL, ABONOS, CARGOS, IDINSTITUCION, ",
 		"IDPERSONA, IDLENGUAJE, FECHAMODIFICACION, USUMODIFICACION, IDESTADOSOLIC, FECHAALTA",

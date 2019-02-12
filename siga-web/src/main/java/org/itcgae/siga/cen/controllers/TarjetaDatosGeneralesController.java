@@ -36,12 +36,10 @@ public class TarjetaDatosGeneralesController {
 //	@RequestMapping(value = "/personaJuridica/cargarFotografia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 //    public ResponseEntity<UpdateResponseDTO> loadPhotography(@RequestBody PersonaJuridicaFotoDTO personaJuridicaFotoDTO, HttpServletRequest request, HttpServletResponse response) {
 //		UpdateResponseDTO response1 = tarjetaDatosGeneralesService.loadPhotography(personaJuridicaFotoDTO, request, response);
-//		
 //		if(response1.getStatus().equals(SigaConstants.OK))
 //			return new ResponseEntity<UpdateResponseDTO>(HttpStatus.OK);
 //			else return new ResponseEntity<UpdateResponseDTO>(HttpStatus.FORBIDDEN);
 //    }
-	
 
 	 @RequestMapping(value = "personaJuridica/cargarFotografia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	    public ResponseEntity<ComboItem> loadPhotography(@RequestBody EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request, HttpServletResponse response) {
@@ -49,7 +47,6 @@ public class TarjetaDatosGeneralesController {
 			return new ResponseEntity<ComboItem>(comboItem, HttpStatus.OK);
 	    }
 	
-
 	@RequestMapping(value = "personaJuridica/uploadFotografia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	ResponseEntity<UpdateResponseDTO> uploadPhotography(MultipartHttpServletRequest request) throws IllegalStateException, IOException{
 		UpdateResponseDTO response = tarjetaDatosGeneralesService.uploadPhotography(request);
@@ -64,7 +61,6 @@ public class TarjetaDatosGeneralesController {
 		return new ResponseEntity<PersonaJuridicaDTO >(response, HttpStatus.OK);
 	}
 	
-	
 	@RequestMapping(value = "busquedaPerJuridica/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> createLegalPerson(@RequestBody SociedadCreateDTO sociedadCreateDTO, HttpServletRequest request) throws ParseException  { 
 		InsertResponseDTO response = tarjetaDatosGeneralesService.createLegalPerson(sociedadCreateDTO, request);
@@ -72,7 +68,6 @@ public class TarjetaDatosGeneralesController {
 			return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO >(response, HttpStatus.FORBIDDEN);
 	}
-	
 	
 	@RequestMapping(value = "busquedaPerJuridica/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateLegalPerson(@RequestBody EtiquetaUpdateDTO etiquetaUpdateDTO, HttpServletRequest request) throws ParseException{ 

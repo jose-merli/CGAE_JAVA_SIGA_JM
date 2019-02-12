@@ -5,7 +5,7 @@ import org.itcgae.siga.db.mappers.ForRolesSqlProvider;
 
 public class ForRolesSqlExtendsProvider extends ForRolesSqlProvider{
 
-	public String getRolesTrainers(String idInstitucion) {
+	public String getRolesTrainers(String idInstitucion, String idLenguaje) {
 		
 		SQL sql = new SQL();
 		
@@ -15,6 +15,7 @@ public class ForRolesSqlExtendsProvider extends ForRolesSqlProvider{
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS cat ON rol.DESCRIPCION = cat.IDRECURSO");
 		sql.WHERE("rol.FECHA_BAJA IS NULL");
 		sql.WHERE("rol.idinstitucion ='"+ idInstitucion +"'");
+		sql.WHERE("cat.idlenguaje ='"+ idLenguaje +"'");
 		sql.ORDER_BY("cat.DESCRIPCION");
 		
 		return sql.toString();
