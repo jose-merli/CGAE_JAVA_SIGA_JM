@@ -59,4 +59,10 @@ public class FichaInscripcionController {
 		String response = fichaInscripcionService.compruebaMinimaAsistencia(inscripcionItem, request);
 		return new ResponseEntity<String>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "fichaInscripcion/getPaymentMode",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getPaymentMode(HttpServletRequest request) {
+		ComboDTO response = fichaInscripcionService.getPaymentMode(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 }

@@ -60,7 +60,7 @@ public class FichaDatosCurricularesController {
 	@RequestMapping(value = "/fichaDatosCurriculares/solicitudUpdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> solicitudUpdateDatosCurriculares(@RequestBody FichaDatosCurricularesItem fichaDatosCurricularesItem, HttpServletRequest request) { 
 		UpdateResponseDTO response = fichaDatosCurriculares.solicitudUpdateDatosCurriculares(fichaDatosCurricularesItem, request);
-		if(response.getStatus().equals(SigaConstants.OK))//WORK IN PROGRESS
+		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}

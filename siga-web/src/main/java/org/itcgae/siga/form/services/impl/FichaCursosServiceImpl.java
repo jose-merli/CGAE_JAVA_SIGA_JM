@@ -49,6 +49,10 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AgeEvento;
 import org.itcgae.siga.db.entities.AgeEventoExample;
+import org.itcgae.siga.db.entities.AgeGeneracionnotificaciones;
+import org.itcgae.siga.db.entities.AgeGeneracionnotificacionesExample;
+import org.itcgae.siga.db.entities.AgeNotificacionesevento;
+import org.itcgae.siga.db.entities.AgeNotificacioneseventoExample;
 import org.itcgae.siga.db.entities.AgePersonaEvento;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteExample;
@@ -80,6 +84,7 @@ import org.itcgae.siga.db.entities.PysServicios;
 import org.itcgae.siga.db.entities.PysServiciosinstitucion;
 import org.itcgae.siga.db.entities.PysServiciossolicitados;
 import org.itcgae.siga.db.entities.PysSuscripcion;
+import org.itcgae.siga.db.mappers.AgeGeneracionnotificacionesMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
@@ -92,6 +97,7 @@ import org.itcgae.siga.db.mappers.PysServiciossolicitadosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeEventoExtendsMapper;
+import org.itcgae.siga.db.services.age.mappers.AgeNotificacioneseventoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -159,6 +165,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Autowired
 	private AgeEventoExtendsMapper ageEventoExtendsMapper;
+
+	@Autowired
+	private AgeNotificacioneseventoExtendsMapper ageNotificacioneseventoExtendsMapper;
+
+	@Autowired
+	private AgeGeneracionnotificacionesMapper ageGeneracionnotificacionesMapper;
 
 	@Autowired
 	private ForTiposervicioExtendsMapper forTiposervicioExtendsMapper;
@@ -234,10 +246,10 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Autowired
 	private ForCertificadoscursoExtendsMapper forCertificadosCursoExtendsMapper;
-	
+
 	@Autowired
 	private CenColegiadoMapper cenColegiadoMapper;
-	
+
 	@Autowired
 	private CenPersonaMapper cenPersonaMapper;
 
@@ -345,14 +357,25 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 
 		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getTypeCostTrainers() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getTypeCostTrainers() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
 			LOGGER.info(
 					"getRolesTrainers() / forRolesExtendsMapper.getRolesTrainers -> Entrada a forRolesExtendsMapper para obtener los roles");
-			comboItems = forRolesExtendsMapper.getRolesTrainers(idInstitucion.toString());
+			comboItems = forRolesExtendsMapper.getRolesTrainers(idInstitucion.toString(),usuario.getIdlenguaje());
 			LOGGER.info(
 					"getRolesTrainers() / forRolesExtendsMapper.getRolesTrainers -> Salida de forRolesExtendsMapper para obtener los roles");
+			}
 
 		}
 
@@ -2055,28 +2078,29 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					Long idPersona = getIdPersonaVerify((String) hashtable.get(SigaConstants.NIF), idInstitucion);
 					inscripcionItem.setIdPersona(idPersona);
 
-					// Si se encuentra debemos comprobar que este en cen_cliente en la institucion a la que pertenece el curso
+					// Si se encuentra debemos comprobar que este en cen_cliente en la institucion a
+					// la que pertenece el curso
 					if (inscripcionItem.getIdPersona() != null) {
-						
+
 						CenPersona cenPersona = cenPersonaMapper.selectByPrimaryKey(idPersona);
 
 						String nombreCompleto = cenPersona.getNombre() + " " + cenPersona.getApellidos1();
-						
-						if(cenPersona.getApellidos2() != null) {
-							nombreCompleto += " " + cenPersona.getApellidos2(); 
+
+						if (cenPersona.getApellidos2() != null) {
+							nombreCompleto += " " + cenPersona.getApellidos2();
 						}
 						inscripcionItem.setNombrePersona(nombreCompleto);
 						inscripcionItem.setNifPersona(cenPersona.getNifcif());
-						
-						//Buscamos la institución del curso al que pertenece
+
+						// Buscamos la institución del curso al que pertenece
 						LOGGER.info(
 								"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKeyExtends(idCurso) -> Entrada a forCursoExtendsMapper para recuperar el curso de la inscripcion");
-						
-						ForCurso curso = forCursoExtendsMapper.selectByPrimaryKeyExtends(Long.parseLong(inscripcionItem.getIdCurso()));
-						
+
+						ForCurso curso = forCursoExtendsMapper
+								.selectByPrimaryKeyExtends(Long.parseLong(inscripcionItem.getIdCurso()));
+
 						LOGGER.info(
 								"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKeyExtends(idCurso) -> Salida a forCursoExtendsMapper para recuperar el curso de la inscripcion");
-						
 
 						CenClienteExample cenClienteExample = new CenClienteExample();
 						cenClienteExample.createCriteria().andIdinstitucionEqualTo(curso.getIdinstitucion())
@@ -2132,8 +2156,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 							// Si se encuentra comprobamos que este en cen_colegiado
 						} else {
-							
-							//Comprobamos que este colegiado en la institucion a la que pertenece el curso
+
+							// Comprobamos que este colegiado en la institucion a la que pertenece el curso
 							CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
 							cenColegiadoExample.createCriteria().andIdinstitucionEqualTo(curso.getIdinstitucion())
 									.andIdpersonaEqualTo(inscripcionItem.getIdPersona());
@@ -2141,9 +2165,10 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							List<CenColegiado> cenColegiadoList = cenColegiadoMapper
 									.selectByExample(cenColegiadoExample);
 
-							// Si no es colegiado comprobamos que este en cen_nocolegiado de la misma institucion
+							// Si no es colegiado comprobamos que este en cen_nocolegiado de la misma
+							// institucion
 							if (null == cenColegiadoList || cenColegiadoList.size() == 0) {
-								
+
 								CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
 								cenNocolegiadoExample.createCriteria().andIdinstitucionEqualTo(curso.getIdinstitucion())
 										.andIdpersonaEqualTo(inscripcionItem.getIdPersona());
@@ -2151,7 +2176,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 								List<CenNocolegiado> cenNocolegiadoList = cenNocolegiadoMapper
 										.selectByExample(cenNocolegiadoExample);
 
-								// Si no se encuentra debemos añadirlo como no colegiado a la institución a la que pertenece el curso
+								// Si no se encuentra debemos añadirlo como no colegiado a la institución a la
+								// que pertenece el curso
 								if (null == cenNocolegiadoList || cenNocolegiadoList.size() == 0) {
 
 									CenNocolegiado cenNocolegiado = new CenNocolegiado();
@@ -2162,7 +2188,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 									cenNocolegiado.setFechaBaja(null);
 									cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
 									cenNocolegiado.setSociedadsj("0");
-									//Este campo es obligatorio
+									// Este campo es obligatorio
 									cenNocolegiado.setSociedadprofesional("0");
 
 									LOGGER.info(
@@ -2173,7 +2199,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 									LOGGER.info(
 											"generateExcelInscriptions() / cenNocolegiadoMapper.insert() -> Salida de cenNocolegiadoMapper para crear un nuevo nocolegiado");
 
-								} 
+								}
 							}
 						}
 
@@ -2518,6 +2544,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			pysServiciosinstitucion.setIniciofinalponderado("I");
 			pysServiciosinstitucion.setSolicitarbaja("0");
 			pysServiciosinstitucion.setSolicitaralta("0");
+			pysServiciosinstitucion.setIdtipoiva(13); //Se pone el iva general por defecto
 
 			LOGGER.info(
 					"createServiceCourse() / pysServiciosinstitucionExtendsMapper.insert() -> Entrada a pysServiciosinstitucionExtendsMapper para insertar un servicio institucion");
@@ -2540,7 +2567,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			pysPreciosservicios.setValor(valor);
 			pysPreciosservicios.setCriterios("SELECT IDINSTITUCION, IDPERSONA FROM CEN_CLIENTE WHERE IDINSTITUCION = "
 					+ idInstitucion + " AND IDPERSONA = @IDPERSONA@");
-			pysPreciosservicios.setPordefecto("0");
+			pysPreciosservicios.setPordefecto("1");
 			NewIdDTO idPrecioServicio = pysPreciosserviciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion,
 					pysServicios.getIdservicio(), pysServiciosinstitucion.getIdserviciosinstitucion(),
 					SigaConstants.PERIOCIDAD_1MES);
@@ -3151,7 +3178,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 										"finishCourse() / forInscripcionExtendsMapper.selectInscripciones() -> Entrada a forInscripcionExtendsMapper para buscar las inscripciones a las cuales se generara un certificado");
 
 								List<InscripcionItem> inscriptionItemList = forInscripcionExtendsMapper
-										.selectInscripciones(inscripcionItem);
+										.selectInscripciones(inscripcionItem, usuario.getIdlenguaje());
 
 								LOGGER.info(
 										"finishCourse() / forInscripcionExtendsMapper.selectInscripciones() -> Entrada a forInscripcionExtendsMapper para buscar las inscripciones a las cuales se generara un certificado");
@@ -3967,6 +3994,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 		int numEventos = eventoDTO.getEventos().size();
 		int numEventosCancelados = 0;
+		int response = 2;
 
 		if (null != idInstitucion) {
 
@@ -3986,49 +4014,105 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 				try {
 					for (EventoItem eventoItem : eventoDTO.getEventos()) {
-						if (eventoItem.getIdEstadoEvento() != null
-								&& eventoItem.getIdEstadoEvento().equals(String.valueOf(SigaConstants.ESTADO_EVENTO_PLANIFICADO))) {
+						if (eventoItem.getIdEstadoEvento() != null && eventoItem.getIdEstadoEvento()
+								.equals(String.valueOf(SigaConstants.ESTADO_EVENTO_PLANIFICADO))) {
 
 							// Se busca la sesion y la cancelamos
 							AgeEvento sesionCancel = ageEventoExtendsMapper
 									.selectByPrimaryKey(Long.valueOf(eventoItem.getIdEvento()));
 
-								sesionCancel.setIdestadoevento(Long.valueOf(SigaConstants.EVENTO_CANCELADO));
-								sesionCancel.setUsumodificacion(usuario.getIdusuario().longValue());
-								sesionCancel.setFechamodificacion(new Date());
+							sesionCancel.setIdestadoevento(Long.valueOf(SigaConstants.EVENTO_CANCELADO));
+							sesionCancel.setUsumodificacion(usuario.getIdusuario().longValue());
+							sesionCancel.setFechamodificacion(new Date());
 
-								LOGGER.info(
-										"cancelSessionsCourse() / ageEventoExtendsMapper.updateByPrimaryKey() -> Entrada a forInscripcionExtendsMapper para cancelar las sesiones de un curso");
+							LOGGER.info(
+									"cancelSessionsCourse() / ageEventoExtendsMapper.updateByPrimaryKey() -> Entrada a forInscripcionExtendsMapper para cancelar las sesiones de un curso");
 
-								ageEventoExtendsMapper.updateByPrimaryKey(sesionCancel);
+							response = ageEventoExtendsMapper.updateByPrimaryKey(sesionCancel);
 
-								LOGGER.info(
-										"cancelSessionsCourse() / ageEventoExtendsMapper.updateByPrimaryKey() -> Salida a forInscripcionExtendsMapper para cancelar las sesiones de un curso");
+							LOGGER.info(
+									"cancelSessionsCourse() / ageEventoExtendsMapper.updateByPrimaryKey() -> Salida a forInscripcionExtendsMapper para cancelar las sesiones de un curso");
 
+							// Eliminamos las notificaciones del evento
+							AgeNotificacioneseventoExample ageNotificacioneseventoExample = new AgeNotificacioneseventoExample();
+							ageNotificacioneseventoExample.createCriteria()
+									.andIdeventoEqualTo(sesionCancel.getIdevento())
+									.andIdinstitucionEqualTo(sesionCancel.getIdinstitucion());
 
-								numEventosCancelados++;
-								
-						} 
+							List<AgeNotificacionesevento> ageNotificacioneseventoList = ageNotificacioneseventoExtendsMapper
+									.selectByExample(ageNotificacioneseventoExample);
+
+							if (null != ageNotificacioneseventoList && ageNotificacioneseventoList.size() > 0) {
+
+								for (AgeNotificacionesevento notification : ageNotificacioneseventoList) {
+
+									// Eliminamos notificacion
+									notification.setUsumodificacion(usuario.getIdusuario().longValue());
+									notification.setFechamodificacion(new Date());
+									notification.setFechabaja(new Date());
+
+									LOGGER.info(
+											"saveNotification() / ageNotificacioneseventoExtendsMapper.updateByPrimaryKeySelective(ageGeneracionnotificaciones) -> Entrada a ageNotificacioneseventoExtendsMapper para insertar cuando se generará una notificacion");
+
+									response = ageNotificacioneseventoExtendsMapper.updateByPrimaryKeySelective(notification);
+
+									LOGGER.info(
+											"saveNotification() / ageNotificacioneseventoExtendsMapper.updateByPrimaryKeySelective(ageGeneracionnotificaciones) -> Salida a ageNotificacioneseventoExtendsMapper para insertar cuando se generará una notificacion");
+
+									// Eliminamos la generacion de la notificacion que eliminamos
+									AgeGeneracionnotificacionesExample ageGeneracionnotificacionesExample = new AgeGeneracionnotificacionesExample();
+									ageGeneracionnotificacionesExample.createCriteria()
+											.andIdnotificacioneventoEqualTo(notification.getIdnotificacionevento())
+											.andIdeventoEqualTo(notification.getIdevento());
+
+									List<AgeGeneracionnotificaciones> ageGeneracionnotificacionesList = ageGeneracionnotificacionesMapper
+											.selectByExample(ageGeneracionnotificacionesExample);
+
+									if (null != ageGeneracionnotificacionesList
+											&& ageGeneracionnotificacionesList.size() > 0) {
+
+										AgeGeneracionnotificaciones ageGeneracionnotificacion = ageGeneracionnotificacionesList.get(0);
+
+										ageGeneracionnotificacion
+												.setUsumodificacion(usuario.getIdusuario().longValue());
+										ageGeneracionnotificacion.setFechamodificacion(new Date());
+										ageGeneracionnotificacion.setFechabaja(new Date());
+
+										LOGGER.info(
+												"saveNotification() / ageGeneracionnotificacionesMapper.insert(ageGeneracionnotificaciones) -> Entrada a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
+
+										response = ageGeneracionnotificacionesMapper
+												.updateByPrimaryKeySelective(ageGeneracionnotificacion);
+
+										LOGGER.info(
+												"saveNotification() / ageGeneracionnotificacionesMapper.insert(ageGeneracionnotificaciones) -> Salida a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
+
+									}
+								}
+							}
+
+							numEventosCancelados++;
+
+						}
 					}
-					
-					
+
 				} catch (Exception e) {
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 				}
-				
-				if(numEventos == numEventosCancelados) {
+
+				if (numEventos == numEventosCancelados) {
 					error.setCode(200);
 					error.setDescription("La sesiones han sido canceladas correctamente");
-				}else if(numEventosCancelados == 0) {
-					if(numEventos == 1) {
+				} else if (numEventosCancelados == 0) {
+					if (numEventos == 1) {
 						error.setDescription("No se puede cancelar la sesión porque su estado no es planificado");
-					}else {
+					} else {
 						error.setDescription("No se pueden cancelar las sesiones porque su estado no es planificado");
 
 					}
 					error.setCode(400);
-				}else {
+				} else {
 					error.setCode(200);
 					error.setDescription("Solo se han cancelado las sesiones que tenían estado planificado");
 
@@ -4036,7 +4120,6 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			}
 		}
 
-		
 		LOGGER.info("cancelSessionsCourse() -> Salida del servicio para cancelar las sesiones de un curso");
 
 		updateResponseDTO.setError(error);

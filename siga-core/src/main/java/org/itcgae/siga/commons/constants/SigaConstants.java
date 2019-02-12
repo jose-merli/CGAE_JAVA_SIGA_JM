@@ -669,4 +669,22 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final long CALENDARIO_LABORAL = 2;
 	public static final long CALENDARIO_FORMACION = 3; 
 
+
+	// AVISOS PARA NOTIFICACIONES EN EVENTOS
+	public static final String AVISO_CANCELAR_CURSO = "1";
+	public static final String AVISO_MODIFICAR_CURSO = "2";
+	public static final String AVISO_PLAZAS_DISPONIBLES = "3";
+	public static final String AVISO_CANCELAR_SESION = "4";
+	public static final String AVISO_MODIFICAR_SESION = "5";
+	
+	//NOTIFICACIONES
+	public static final long NOTIFICACION_TIPOCUANDO_ANTES = 1;
+	public static final long NOTIFICACION_TIPOCUANDO_DESPUES = 2;
+	
+	public static final long NOTIFICACION_HORAS = 1;
+	public static final long NOTIFICACION_MINUTOS = 2;
+	public static final long NOTIFICACION_SEGUNDOS = 3;
+	
+
+
 }

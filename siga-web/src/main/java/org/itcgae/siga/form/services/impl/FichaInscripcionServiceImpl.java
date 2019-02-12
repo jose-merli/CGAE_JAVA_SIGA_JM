@@ -43,6 +43,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCertificadoscursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForInscripcionExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.ForModopagoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysPeticioncomprasuscripcionExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysProductossolicitadosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.PysServiciosExtendsMapper;
@@ -98,6 +99,9 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 
 	@Autowired
 	private PysServiciossolicitadosMapper pysServiciossolicitadosMapper;
+	
+	@Autowired
+	private ForModopagoExtendsMapper forModopagoExtendsMapper;
 
 	
 	@Override
@@ -846,6 +850,44 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 
 		return response;
 		
+	}
+
+	@Override
+	public ComboDTO getPaymentMode(HttpServletRequest request) {
+		LOGGER.info("getPaymentMode() -> Entrada al servicio para obtener los modos de pago");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getPaymentMode() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getPaymentMode() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"getPaymentMode() / forModopagoExtendsMapper.getPaymentMode() -> Entrada a forModopagoExtendsMapper para obtener los modos de pago");
+				comboItems = forModopagoExtendsMapper.getPaymentMode(usuario.getIdlenguaje());
+				LOGGER.info(
+						"getPaymentMode() / forModopagoExtendsMapper.getPaymentMode() -> Salida de forModopagoExtendsMapper para obtener los modos de pago");
+
+			}
+		}
+
+		comboDTO.setCombooItems(comboItems);
+
+		LOGGER.info("getPaymentMode() -> Salida del servicio para obtener los modos de pago");
+
+		return comboDTO;
 	}
 	
 	
