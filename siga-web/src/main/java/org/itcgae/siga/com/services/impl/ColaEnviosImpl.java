@@ -255,9 +255,9 @@ public class ColaEnviosImpl implements IColaEnvios {
 		}
 		
 		//reemplazamos en la plantilla
-		for (Map<String, Object> map : resultadosConsultas) {
-			asunto = asunto.replace("%%"+columnsKey.get, newChar)
-		}
+//		for (Map<String, Object> map : resultadosConsultas) {
+//			asunto = asunto.replace("%%"+columnsKey.get, newChar)
+//		}
 		
 		return null;
 	}

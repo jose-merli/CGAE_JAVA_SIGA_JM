@@ -1,4 +1,4 @@
-LOGGER.info("BURO SMS enviado con éxito");package org.itcgae.siga.commons.constants;
+package org.itcgae.siga.commons.constants;
 
 import java.util.Arrays;
 import java.util.List;
