@@ -140,7 +140,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
-					modelosItem = modModeloComunicacionExtendsMapper.selectModelosComunicacion(filtros, historico);	
+					modelosItem = modModeloComunicacionExtendsMapper.selectModelosComunicacion(String.valueOf(idInstitucion), filtros, historico);	
 					if(modelosItem != null && modelosItem.size()> 0){
 						respuesta.setModelosComunicacionItem(modelosItem);
 					}

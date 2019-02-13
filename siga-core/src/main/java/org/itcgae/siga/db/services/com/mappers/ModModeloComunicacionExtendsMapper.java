@@ -30,7 +30,7 @@ public interface ModModeloComunicacionExtendsMapper {
 		@Result(column = "ABREVIATURA", property = "institucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
 	})
-	List<ModelosComunicacionItem> selectModelosComunicacion(DatosModelosComunicacionesSearch filtros, boolean historico);
+	List<ModelosComunicacionItem> selectModelosComunicacion(String idInstitucion, DatosModelosComunicacionesSearch filtros, boolean historico);
 
 	
 	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "selectModelosComunicacionDialg")

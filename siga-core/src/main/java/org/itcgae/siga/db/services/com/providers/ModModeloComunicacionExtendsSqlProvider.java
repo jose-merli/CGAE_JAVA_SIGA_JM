@@ -7,7 +7,7 @@ import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 
 public class ModModeloComunicacionExtendsSqlProvider {
 	
-	public String selectModelosComunicacion(DatosModelosComunicacionesSearch filtros, boolean historico){
+	public String selectModelosComunicacion(String idInstitucion, DatosModelosComunicacionesSearch filtros, boolean historico){
 		
 		SQL sql = new SQL();
 		
@@ -48,6 +48,8 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		if(filtros.getVisible() != null && !filtros.getVisible().trim().equals("")){
 			sql.WHERE("modelo.VISIBLE = '"+filtros.getVisible()+"'");	
 		}
+		
+		sql.WHERE("modelo.IDINSTITUCION = '"+ idInstitucion +"' OR modelo.IDINSTITUCION = '2000'");
 		
 		if(historico){
 			if(filtros.getFechaBaja() != null){
