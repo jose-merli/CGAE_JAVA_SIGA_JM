@@ -24,5 +24,7 @@ ALTER TABLE age_generacionnotificaciones
 ALTER TABLE age_generacionnotificaciones
     ADD CONSTRAINT age_gennot_age_tiponotev_fk FOREIGN KEY ( idtiponotificacionevento )
         REFERENCES age_tiponotificacionevento ( idtiponotificacionevento );
-
-		    
+CREATE SEQUENCE  "SEQ_AGEGENERANOTIFICACIONES"  MINVALUE 0 MAXVALUE 9999999999 INCREMENT BY 1 START WITH 1 NOCACHE  NOORDER  CYCLE;  
+        
+Insert into ADM_CONFIG (ID,CLAVE,VALOR,DESCRIPCION,VALOR_POR_DEFECTO,NECESITA_REINICIO) 
+values (SEQ_ADM_CONFIG.NEXTVAL,'cron.pattern.scheduled.envioNotificacionesEventos','0 * * ? * *','Periodo de ejecución del cron para enviar notificaciones de eventos','0 * * ? * *','1'); 		    
