@@ -49,7 +49,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 			sql.WHERE("modelo.VISIBLE = '"+filtros.getVisible()+"'");	
 		}
 		
-		sql.WHERE("modelo.IDINSTITUCION = '"+ idInstitucion +"' OR modelo.IDINSTITUCION = '2000'");
+		sql.WHERE("(modelo.IDINSTITUCION = '"+ idInstitucion +"' OR modelo.IDINSTITUCION = '2000')");
 		
 		if(historico){
 			if(filtros.getFechaBaja() != null){
