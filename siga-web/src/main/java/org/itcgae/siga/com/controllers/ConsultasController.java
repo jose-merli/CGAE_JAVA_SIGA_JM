@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IConsultasService;
@@ -162,7 +163,9 @@ public class ConsultasController {
 	@RequestMapping(value = "/ejecutarConsulta", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InputStreamResource> ejecutarConsulta(HttpServletRequest request, @RequestBody ConsultaItem consulta) {
 		
-		File file = _consultasService.ejecutarConsulta(request, consulta);
+		ResponseFileDTO response = _consultasService.ejecutarConsulta(request, consulta);
+		File file = response.getFile();
+		
 		HttpHeaders headers = null;
 		InputStreamResource resource = null;
 		try {

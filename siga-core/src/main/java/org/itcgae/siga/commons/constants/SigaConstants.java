@@ -54,6 +54,7 @@ public class SigaConstants {
 	public static String CAMPO_APELLIDO2 = "APELLIDO2";
 	public static String CAMPO_NUM_COLEGIADO = "NCOLEGIADO";
 	public static String CAMPO_IDENTIFICACION = "INDENTIFICACIONENTIDAD";
+	public static String CAMPO_IDINSTITUCION = "IDINSTITUCION";
 	
 	// Para la busqueda de criterios dinamicos de las consultas
 	public static final String TIPONUMERO	= "N";

@@ -14,6 +14,7 @@ import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -45,7 +46,7 @@ public interface IConsultasService {
 
 	public Error guardarConsulta(HttpServletRequest request, ConsultaItem consulta);
 
-	public File ejecutarConsulta(HttpServletRequest request, ConsultaItem consulta);
+	public ResponseFileDTO ejecutarConsulta(HttpServletRequest request, ConsultaItem consulta);
 
 	public Map<String, String> obtenerMapaConsulta(String consulta);
 
