@@ -22,7 +22,7 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 
 		SQL sql = new SQL();
 
-		sql.SELECT("IDSERVICIOSINSTITUCION");
+		sql.SELECT("min(IDSERVICIOSINSTITUCION) as IDSERVICIOSINSTITUCION");
 		sql.FROM("PYS_SERVICIOSINSTITUCION");
 		sql.WHERE("idInstitucion =" + idInstitucion);
 		sql.WHERE("idTipoServicios = 5");
