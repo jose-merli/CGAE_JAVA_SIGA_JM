@@ -7,36 +7,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.PlantillaModeloDocumentoDTO;
-import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.com.services.IEnviosService;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
-import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaExample;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
-import org.itcgae.siga.db.entities.EnvEnvioprogramado;
-import org.itcgae.siga.db.entities.EnvEnvioprogramadoExample;
 import org.itcgae.siga.db.entities.EnvEnvios;
-import org.itcgae.siga.db.entities.EnvEnviosExample;
-import org.itcgae.siga.db.entities.EnvPlantillasenvios;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
@@ -54,25 +44,26 @@ import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvConsultasEnvioExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPlantillaDocumentoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
-import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.aspose.words.Document;
 
+@Service
 public class ColaEnviosImpl implements IColaEnvios {
 	
 	private Logger LOGGER = Logger.getLogger(ColaEnviosImpl.class);
 
-	@Autowired
-	private EnvEnvioprogramadoMapper _envEnvioprogramadoMapper;
 
 	@Autowired
 	private EnvEnviosMapper _envEnviosMapper;
+	
+	@Autowired
+	private EnvEnviosExtendsMapper _envEnviosExtendsMapper;
 
 	@Autowired
 	private EnvPlantillasenviosMapper _envPlantillasenviosMapper;
@@ -120,7 +111,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 	private ModPlantillaDocumentoConsultaExtendsMapper _modPlantillaDocumentoConsultaExtendsMapper;
 	
 
-	@Transactional
+	//@Transactional
 	@Scheduled(cron = "${cron.pattern.scheduled.Envios: 0 * * ? * *}")
 	@Override
 	public void execute() {
@@ -128,67 +119,74 @@ public class ColaEnviosImpl implements IColaEnvios {
 		LOGGER.info("Entrando en listener de cola de envios");
 		EnvEnvios envio = null;
 		try{
-			EnvEnvioprogramadoExample example = new EnvEnvioprogramadoExample();
-			example.createCriteria().andFechaprogramadaLessThanOrEqualTo(new Date());
-			List<EnvEnvioprogramado> enviosProgramados = _envEnvioprogramadoMapper.selectByExample(example);
-
+			List<EnvEnvios> enviosProgramados = _envEnviosExtendsMapper.obtenerEnviosProgramados();
 			if (enviosProgramados != null && enviosProgramados.size() > 0) {
 
-				for (EnvEnvioprogramado envEnvioprogramado : enviosProgramados) {
-					EnvEnviosExample exampleEnvio = new EnvEnviosExample();
-					exampleEnvio.createCriteria().andIdenvioEqualTo(envEnvioprogramado.getIdenvio()).andIdestadoEqualTo(SigaConstants.ENVIO_PENDIENTE_AUTOMATICO);
-					List<EnvEnvios> envioSelected = _envEnviosMapper.selectByExample(exampleEnvio);
-					if (envioSelected != null && envioSelected.size() > 0) {
-						envio = envioSelected.get(0);
-						LOGGER.info("Se ha encontrado envio programado con ID: " + envio.getIdenvio());
-						String idSolicitudEcos;
-						switch (envio.getIdtipoenvios().toString()) {
+				for (EnvEnvios envEnvioprogramado : enviosProgramados) {
+					envio = envEnvioprogramado;
+					LOGGER.info("Se ha encontrado envio programado con ID: " + envio.getIdenvio());
+					String idSolicitudEcos;
+					envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
+					envio.setFechamodificacion(new Date());
+					_envEnviosMapper.updateByPrimaryKey(envio);
+					
+					switch (envio.getIdtipoenvios().toString()) {
 
 						case SigaConstants.TIPO_ENVIO_CORREOELECTRONICO:
 							_enviosService.envioMail(envio);
+							LOGGER.info("SMS enviado con éxito");
+							envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+							envio.setFechamodificacion(new Date());
+							_envEnviosMapper.updateByPrimaryKey(envio);
 							LOGGER.info("mail enviado con éxito");
 							break;
 						case SigaConstants.TIPO_ENVIO_CORREO_ORDINARIO:
 							_enviosService.envioCorreoOrdinario();
+							LOGGER.info("SMS enviado con éxito");
+							envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+							envio.setFechamodificacion(new Date());
+							_envEnviosMapper.updateByPrimaryKey(envio);
 							break;
 						case SigaConstants.TIPO_ENVIO_SMS:
-							//idSolicitudEcos = preparaEnvioSMS(envio, false);
-							
-							
 							//TEST PARA INTEGRACION
-							CenDirecciones remitente = new CenDirecciones();
-							remitente.setCorreoelectronico("bherrero@deloitte.es");
-							String[] numerosDestinatarios = new String[2];
-							numerosDestinatarios[0] = "691038553";
-							numerosDestinatarios[1] = "622300543";
-							_enviosService.envioSMS(remitente, numerosDestinatarios, envio.getIdinstitucion(), "ASUNTO TEST", "CUERPO TEST", false);
+//							CenDirecciones remitente = new CenDirecciones();
+//							remitente.setCorreoelectronico("bherrero@deloitte.es");
+//							String[] numerosDestinatarios = new String[2];
+//							numerosDestinatarios[0] = "691038553";
+//							numerosDestinatarios[1] = "622300543";
+//							_enviosService.envioSMS(remitente, numerosDestinatarios, envio.getIdinstitucion(), "ASUNTO TEST", "CUERPO TEST", false);
+							
+							
+							idSolicitudEcos = preparaEnvioSMS(envio, false);
 							LOGGER.info("SMS enviado con éxito");
-							envio.setIdestado(SigaConstants.ENVIO_ARCHIVADO);
+							envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+							envio.setFechamodificacion(new Date());
 							_envEnviosMapper.updateByPrimaryKey(envio);
 							break;
 						case SigaConstants.TIPO_ENVIO_BUROSMS:
-							//idSolicitudEcos = preparaEnvioSMS(envio, true);
-							
-							
 							//TEST PARA INTEGRACION
-							remitente = new CenDirecciones();
-							remitente.setCorreoelectronico("bherrero@deloitte.es");
-							numerosDestinatarios = new String[2];
-							numerosDestinatarios[0] = "691038553";
-							numerosDestinatarios[1] = "622300543";
-							_enviosService.envioSMS(remitente, numerosDestinatarios, envio.getIdinstitucion(), "ASUNTO TEST", "CUERPO TEST", true);
+//							remitente = new CenDirecciones();
+//							remitente.setCorreoelectronico("bherrero@deloitte.es");
+//							numerosDestinatarios = new String[2];
+//							numerosDestinatarios[0] = "691038553";
+//							numerosDestinatarios[1] = "622300543";
+//							_enviosService.envioSMS(remitente, numerosDestinatarios, envio.getIdinstitucion(), "ASUNTO TEST", "CUERPO TEST", true);
+							
+							
+							idSolicitudEcos = preparaEnvioSMS(envio, true);
 							LOGGER.info("BURO SMS enviado con éxito");
-							envio.setIdestado(SigaConstants.ENVIO_ARCHIVADO);
+							envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+							envio.setFechamodificacion(new Date());
 							_envEnviosMapper.updateByPrimaryKey(envio);
 							break;
 						}
-					}
 				}
 
 			}
 		}catch(Exception e){
 			LOGGER.error("Error al procesar el envío: " + e.getMessage());
 			envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
+			envio.setFechamodificacion(new Date());
 			_envEnviosMapper.updateByPrimaryKey(envio);
 			e.printStackTrace();
 		}
@@ -234,10 +232,10 @@ public class ColaEnviosImpl implements IColaEnvios {
 				int inicioSelect = consulta.getSentencia().indexOf("<SELECT>") + 8;
 				int finSelect = consulta.getSentencia().indexOf("</SELECT>");
 				String selectConEtiquetas = consulta.getSentencia().substring(inicioSelect, finSelect);
-				String aliasIdPersona = obtenerAliasIdPersona(selectConEtiquetas);
-				String aliasIdInstitucion = obtenerAliasIdInstitucion(selectConEtiquetas);
-				String aliasCorreo = obtenerAliasCorreoElectronico(selectConEtiquetas);
-				String aliasMovil = obtenerAliasMovil(selectConEtiquetas);
+				String aliasIdPersona = obtenerAliasIdPersona(selectConEtiquetas.trim());
+				String aliasIdInstitucion = obtenerAliasIdInstitucion(selectConEtiquetas.trim());
+				String aliasCorreo = obtenerAliasCorreoElectronico(selectConEtiquetas.trim());
+				String aliasMovil = obtenerAliasMovil(selectConEtiquetas.trim());
 
 				String query = obtenerCamposConsulta(consulta.getSentencia());
 				List<Map<String, Object>> resultDestinatarios = _conConsultasExtendsMapper.ejecutarConsultaString(query);
@@ -356,6 +354,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 		String[] selects = select.split(",");
 
 		for (String string : selects) {
+			string = string.trim();
 			if (string.indexOf("CEN_CLIENTE.IDPERSONA AS") > 0) {
 				int inicio = string.indexOf("CEN_CLIENTE.IDPERSONA AS") + string.length();
 				idPersona = string.substring(inicio);

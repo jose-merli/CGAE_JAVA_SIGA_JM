@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.com.providers;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
@@ -144,6 +145,19 @@ public class EnvEnviosExtendsSqlProvider {
 		}
 		
 		
+		return sql.toString();
+	}
+	
+	public String selectEnviosProgramados(){
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		String fechaHoy = dateFormat.format(new Date());
+		SQL sql = new SQL();
+		
+		sql.SELECT("ENVIO.*");
+		sql.FROM("ENV_ENVIOPROGRAMADO PROG");
+		sql.JOIN("ENV_ENVIOS ENVIO ON ENVIO.IDENVIO = PROG.IDENVIO");
+		
+		sql.WHERE("ENVIO.IDESTADO = 4 AND ENVIO.FECHAPROGRAMADA <= TO_DATE('" + fechaHoy + "', 'DD/MM/YYYY HH24:MI:SS')");
 		return sql.toString();
 	}
 	
