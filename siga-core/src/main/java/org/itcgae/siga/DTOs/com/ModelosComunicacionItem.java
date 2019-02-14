@@ -20,6 +20,7 @@ public class ModelosComunicacionItem {
 	private String claseComunicacion;
 	private String idPlantillaEnvio;
 	private String idTipoEnvio;
+	private String porDefecto;
 	private ComboDTO plantillas;
 	
 	public String getIdModeloComunicacion() {
@@ -106,6 +107,12 @@ public class ModelosComunicacionItem {
 	}
 	public void setIdTipoEnvio(String idTipoEnvio) {
 		this.idTipoEnvio = idTipoEnvio;
+	}
+	public String getPorDefecto() {
+		return porDefecto;
+	}
+	public void setPorDefecto(String porDefecto) {
+		this.porDefecto = porDefecto;
 	}
 	
 	

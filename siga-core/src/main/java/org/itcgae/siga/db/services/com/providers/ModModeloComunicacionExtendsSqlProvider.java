@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
+import org.itcgae.siga.commons.constants.SigaConstants;
 
 public class ModModeloComunicacionExtendsSqlProvider {
 	
@@ -26,6 +27,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.SELECT("modelo.FECHABAJA");
 		sql.SELECT("clase.NOMBRE AS NOMBRECLASE");
 		sql.SELECT("inst.ABREVIATURA");
+		sql.SELECT("modelo.PORDEFECTO");
 		
 		sql.FROM("MOD_MODELOCOMUNICACION modelo");
 		
@@ -33,7 +35,11 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.INNER_JOIN("CEN_INSTITUCION inst ON inst.IDINSTITUCION = modelo.IDINSTITUCION");
 		
 		if(filtros.getIdInstitucion() != null && !filtros.getIdInstitucion().trim().equals("")){
-			sql.WHERE("modelo.IDINSTITUCION = '"+filtros.getIdInstitucion()+"'");
+			if(filtros.getIdInstitucion().equalsIgnoreCase(SigaConstants.IDINSTITUCION_0)){
+				sql.WHERE("(modelo.IDINSTITUCION = '2000' AND modelo.PORDEFECTO = 'SI')");
+			}else{
+				sql.WHERE("modelo.IDINSTITUCION = '"+filtros.getIdInstitucion()+"'");
+			}			
 		}
 		if(filtros.getIdClaseComunicacion() != null && !filtros.getIdClaseComunicacion().trim().equals("")){
 			sql.WHERE("modelo.IDCLASECOMUNICACION = '"+filtros.getIdClaseComunicacion()+"'");
@@ -49,7 +55,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 			sql.WHERE("modelo.VISIBLE = '"+filtros.getVisible()+"'");	
 		}
 		
-		sql.WHERE("modelo.IDINSTITUCION = '"+ idInstitucion +"' OR modelo.IDINSTITUCION = '2000'");
+		sql.WHERE("(modelo.IDINSTITUCION = '"+ idInstitucion +"' OR (modelo.IDINSTITUCION = '2000' AND modelo.PORDEFECTO = 'SI'))");
 		
 		if(historico){
 			if(filtros.getFechaBaja() != null){

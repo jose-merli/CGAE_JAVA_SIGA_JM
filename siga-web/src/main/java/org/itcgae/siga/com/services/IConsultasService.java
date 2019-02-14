@@ -1,6 +1,5 @@
 package org.itcgae.siga.com.services;
 
-import java.io.File;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
+import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
@@ -34,7 +34,7 @@ public interface IConsultasService {
 	//TODO: REVISAR DTO de ENTRADA Y SALIDA
 	public ConsultasDTO consultasSearch(HttpServletRequest request, ConsultasSearch filtros);
 
-	public Error duplicarConsulta(HttpServletRequest request, ConsultaItem[] consultas);
+	public ConsultaDTO duplicarConsulta(HttpServletRequest request, ConsultaItem consulta);
 
 	public Error borrarConsulta(HttpServletRequest request, ConsultaItem[] consultas);
 
