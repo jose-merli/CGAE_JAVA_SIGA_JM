@@ -40,7 +40,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		}
 		
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
-			sql.WHERE("modelo.NOMBRE LIKE '%"+filtros.getNombre()+"%'");
+			sql.WHERE("lower(modelo.NOMBRE) LIKE lower('%"+filtros.getNombre()+"%')");
 		}
 		if(filtros.getPreseleccionar() != null && !filtros.getPreseleccionar().trim().equals("")){
 			sql.WHERE("modelo.PRESELECCIONAR = '"+filtros.getPreseleccionar()+"'");	
@@ -49,7 +49,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 			sql.WHERE("modelo.VISIBLE = '"+filtros.getVisible()+"'");	
 		}
 		
-		sql.WHERE("modelo.IDINSTITUCION = '"+ idInstitucion +"' OR modelo.IDINSTITUCION = '2000'");
+		sql.WHERE("(modelo.IDINSTITUCION = '"+ idInstitucion +"' OR modelo.IDINSTITUCION = '2000')");
 		
 		if(historico){
 			if(filtros.getFechaBaja() != null){
