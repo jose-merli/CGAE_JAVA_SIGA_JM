@@ -108,6 +108,29 @@ public class ConConsultasExtendsSqlProvider {
 		if(idObjetivo != null){
 			sql.WHERE("IDOBJETIVO = " + idObjetivo);
 		}
+		
+		sql.ORDER_BY("DESCRIPCION");
+		
+		return sql.toString();
+	}
+	
+	public String selectConsultasDisponiblesFiltro(Short idInstitucion, Long idClaseComunicacion, Long idObjetivo, String filtro){
+		
+		SQL sql = new SQL();
+		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION");
+		sql.FROM("CON_CONSULTA");
+		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
+		
+		if(idClaseComunicacion != null){
+			sql.WHERE("IDCLASECOMUNICACION = "+ idClaseComunicacion);
+		}
+		
+		if(idObjetivo != null){
+			sql.WHERE("IDOBJETIVO = " + idObjetivo);
+		}
+		
+		sql.WHERE(filtroTextoBusquedas("DESCRIPCION", filtro));
+		
 		sql.ORDER_BY("DESCRIPCION");
 		
 		return sql.toString();

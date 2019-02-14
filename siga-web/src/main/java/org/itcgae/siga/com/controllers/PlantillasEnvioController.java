@@ -106,9 +106,9 @@ public class PlantillasEnvioController {
 	}
 	
 	@RequestMapping(value = "/consultasDisp",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> obtenerConsultas(HttpServletRequest request) {
+	ResponseEntity<ComboDTO> obtenerConsultas(@RequestParam("filtro") String filtro, HttpServletRequest request) {
 		
-		ComboDTO response = _plantillasEnvioService.getComboConsultas(request);
+		ComboDTO response = _plantillasEnvioService.getComboConsultas(request, filtro);
 		if(response.getError() == null)
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
