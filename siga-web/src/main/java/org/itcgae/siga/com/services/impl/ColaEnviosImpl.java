@@ -28,6 +28,9 @@ import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
+import org.itcgae.siga.db.entities.EnvDocumentos;
+import org.itcgae.siga.db.entities.EnvDocumentosExample;
+import org.itcgae.siga.db.entities.EnvDocumentosKey;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosgrupocliente;
 import org.itcgae.siga.db.entities.EnvEnviosgrupoclienteExample;
@@ -39,6 +42,7 @@ import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenGruposclienteClienteMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
+import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosgrupoclienteMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
@@ -73,6 +77,9 @@ public class ColaEnviosImpl implements IColaEnvios {
 
 	@Autowired
 	private IEnviosService _enviosService;
+	
+	@Autowired
+	private EnvDocumentosMapper _envDocumentosMapper;
 
 	@Autowired
 	private EnvConsultasenvioMapper _envConsultasenvioMapper;
@@ -253,9 +260,17 @@ public class ColaEnviosImpl implements IColaEnvios {
 			String cuerpoFinal = remplazarCamposCuerpo(plantilla.getCuerpo() != null ? plantilla.getCuerpo():"", resultadosConsultas);
 			
 			
-			List<DatosDocumentoItem> documentosEnvio = generarDocumentosEnvio(envio.getIdinstitucion().toString(), envio.getIdenvio().toString());
-			
-
+			//List<DatosDocumentoItem> documentosEnvio = generarDocumentosEnvio(envio.getIdinstitucion().toString(), envio.getIdenvio().toString());
+			List<DatosDocumentoItem> documentosEnvio = new ArrayList<DatosDocumentoItem>();
+			EnvDocumentosExample exampleDoc = new EnvDocumentosExample();
+			exampleDoc.createCriteria().andIdenvioEqualTo(envio.getIdenvio()).andIdinstitucionEqualTo(envio.getIdinstitucion());
+			List<EnvDocumentos> documentos = _envDocumentosMapper.selectByExample(exampleDoc);
+			for (EnvDocumentos documento : documentos) {
+				DatosDocumentoItem doc = new DatosDocumentoItem();
+				doc.setFileName(documento.getDescripcion());
+				doc.setPathDocumento(documento.getPathdocumento());
+				documentosEnvio.add(doc);
+			}
 			// Realizamos el envio por mail
 			_enviosService.envioMail(remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 			

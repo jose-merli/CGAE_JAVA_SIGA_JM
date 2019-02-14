@@ -606,6 +606,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				
 				try{
 					AdmUsuarios usuario = usuarios.get(0);
+					
 					//tabla env_enviosplantillas
 					EnvPlantillasenviosKey PlantillaKey = new EnvPlantillasenviosKey();
 					PlantillaKey.setIdinstitucion(idInstitucion);
@@ -672,15 +673,15 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					}
 					
 					//env_plantilla remitentes
-					EnvPlantillaremitentesExample keyRemitentesExample = new EnvPlantillaremitentesExample();
-					keyRemitentesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdplantillaenviosEqualTo(idPlantillaEnvio).andIdtipoenviosEqualTo(envio.getIdtipoenvios());
-					List<EnvPlantillaremitentes> plantillaRemitentes = _envPlantillaremitentesMapper.selectByExample(keyRemitentesExample);
-					for (EnvPlantillaremitentes envPlantillaremitentes : plantillaRemitentes) {
-						envPlantillaremitentes.setIdplantillaenvios(idPlantillaNuevo);
-						envPlantillaremitentes.setFechamodificacion(new Date());
-						envPlantillaremitentes.setUsumodificacion(usuario.getIdusuario());
-						_envPlantillaremitentesMapper.insert(envPlantillaremitentes);
-					}
+//					EnvPlantillaremitentesExample keyRemitentesExample = new EnvPlantillaremitentesExample();
+//					keyRemitentesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdplantillaenviosEqualTo(idPlantillaEnvio).andIdtipoenviosEqualTo(envio.getIdtipoenvios());
+//					List<EnvPlantillaremitentes> plantillaRemitentes = _envPlantillaremitentesMapper.selectByExample(keyRemitentesExample);
+//					for (EnvPlantillaremitentes envPlantillaremitentes : plantillaRemitentes) {
+//						envPlantillaremitentes.setIdplantillaenvios(idPlantillaNuevo);
+//						envPlantillaremitentes.setFechamodificacion(new Date());
+//						envPlantillaremitentes.setUsumodificacion(usuario.getIdusuario());
+//						_envPlantillaremitentesMapper.insert(envPlantillaremitentes);
+//					}
 					
 					//env_grupocliente
 					EnvEnviosgrupoclienteExample gruposExample = new EnvEnviosgrupoclienteExample();
