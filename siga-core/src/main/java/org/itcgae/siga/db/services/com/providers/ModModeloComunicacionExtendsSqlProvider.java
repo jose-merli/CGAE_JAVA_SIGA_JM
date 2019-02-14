@@ -118,5 +118,16 @@ public class ModModeloComunicacionExtendsSqlProvider {
 			   
 		return sql.toString();
 	}
+	
+	
+	public String comprobarNombreDuplicado(String nombreModelo){
+		
+		SQL sql = new SQL();
+		sql.SELECT("max((nvl(SUBSTR(nombre,LENGTH('" + nombreModelo + "')+1,LENGTH(nombre)),0))+1) as NOMBRE");
+		sql.FROM("mod_modelocomunicacion");
+		sql.WHERE("lower(nombre) like lower('" + nombreModelo + "%')");
+		   
+		return sql.toString();
+	}
 
 }
