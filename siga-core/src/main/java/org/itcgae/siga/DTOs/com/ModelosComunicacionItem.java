@@ -22,8 +22,10 @@ public class ModelosComunicacionItem {
 	private String claseComunicacion;
 	private String idPlantillaEnvio;
 	private String idTipoEnvio;
-	private String tipoEnvio;
-	private List<ComboItem> plantillas;
+
+	private String porDefecto;
+	private ComboDTO plantillas;
+
 	
 	public String getIdModeloComunicacion() {
 		return idModeloComunicacion;
@@ -104,6 +106,7 @@ public class ModelosComunicacionItem {
 	public void setIdTipoEnvio(String idTipoEnvio) {
 		this.idTipoEnvio = idTipoEnvio;
 	}
+<<<<<<< HEAD
 	public String getTipoEnvio() {
 		return tipoEnvio;
 	}
@@ -115,6 +118,13 @@ public class ModelosComunicacionItem {
 	}
 	public void setPlantillas(List<ComboItem> plantillas) {
 		this.plantillas = plantillas;
+=======
+	public String getPorDefecto() {
+		return porDefecto;
+	}
+	public void setPorDefecto(String porDefecto) {
+		this.porDefecto = porDefecto;
+>>>>>>> incidenciasIyC
 	}
 	
 	
