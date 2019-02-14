@@ -40,7 +40,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		}
 		
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
-			sql.WHERE("modelo.NOMBRE LIKE '%"+filtros.getNombre()+"%'");
+			sql.WHERE("lower(modelo.NOMBRE) LIKE lower('%"+filtros.getNombre()+"%')");
 		}
 		if(filtros.getPreseleccionar() != null && !filtros.getPreseleccionar().trim().equals("")){
 			sql.WHERE("modelo.PRESELECCIONAR = '"+filtros.getPreseleccionar()+"'");	

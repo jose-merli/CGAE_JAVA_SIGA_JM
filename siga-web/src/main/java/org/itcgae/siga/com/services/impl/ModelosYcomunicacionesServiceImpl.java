@@ -192,7 +192,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						modelo.setNombre(nuevoNombre);
 					}
 					
-					modelo.setOrden(null);
+//					modelo.setOrden(null);
 					modelo.setFechabaja(null);
 					modelo.setIdmodelocomunicacion(null);
 					modelo.setFechamodificacion(new Date());
