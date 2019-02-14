@@ -28,7 +28,8 @@ public interface ModModeloComunicacionExtendsMapper {
 		@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBRECLASE", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ABREVIATURA", property = "institucion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "PORDEFECTO", property = "porDefecto", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ModelosComunicacionItem> selectModelosComunicacion(String idInstitucion, DatosModelosComunicacionesSearch filtros, boolean historico);
 

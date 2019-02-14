@@ -26,6 +26,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
+import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
@@ -283,11 +284,12 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 	@Override
 	@Transactional
-	public Error duplicarConsulta(HttpServletRequest request, ConsultaItem[] consultas) {
+	public ConsultaDTO duplicarConsulta(HttpServletRequest request, ConsultaItem consulta) {
 		LOGGER.info("duplicarConsulta() -> Entrada al servicio de duplicar consultas");
 
-		Error respuesta = new Error();
-
+		Error error = new Error();
+		ConsultaDTO respuesta = new ConsultaDTO();
+		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -300,32 +302,39 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-				try {
+				try {					
+
+					ConConsultaKey key = new ConConsultaKey();
+					key.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
+					key.setIdinstitucion(Short.valueOf(consulta.getIdInstitucion()));
+					ConConsulta conConsulta = _conConsultaMapper.selectByPrimaryKey(key);
+					NewIdDTO id = _conConsultasExtendsMapper.selectMaxIDConsulta();
+					conConsulta.setIdconsulta(Long.valueOf(id.getNewId()));
 					
-					for (int i = 0; i < consultas.length; i++) {
-						ConConsultaKey key = new ConConsultaKey();
-						key.setIdconsulta(Long.valueOf(consultas[i].getIdConsulta()));
-						key.setIdinstitucion(Short.valueOf(consultas[i].getIdInstitucion()));
-						ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
-						NewIdDTO id = _conConsultasExtendsMapper.selectMaxIDConsulta();
-						consulta.setIdconsulta(Long.valueOf(id.getNewId()));
-						String descripcion = "Copia " + i+1 +"_" + consulta.getDescripcion();
-						consulta.setIdinstitucion(idInstitucion);
-						if(idInstitucion.shortValue() != SigaConstants.IDINSTITUCION_2000.shortValue()){
-							consulta.setGeneral("N");
-						}
-						consulta.setDescripcion(descripcion);
-						consulta.setFechamodificacion(new Date());
-						consulta.setUsumodificacion(usuario.getIdusuario());
-						_conConsultaMapper.insert(consulta);
+					String descripcion = consulta.getNombre() + SigaConstants.SUFIJO_CONSULTA_COM_DUPLICADO;
+					conConsulta.setIdinstitucion(idInstitucion);
+					if(idInstitucion.shortValue() != SigaConstants.IDINSTITUCION_2000.shortValue()){
+						conConsulta.setGeneral("N");
 					}
-					respuesta.setCode(200);
-					respuesta.setDescription("Consultas duplicadas");
+					conConsulta.setDescripcion(descripcion);
+					conConsulta.setFechamodificacion(new Date());
+					conConsulta.setUsumodificacion(usuario.getIdusuario());
+					_conConsultaMapper.insert(conConsulta);
+
+					// Cambiamos la consulta a devolver
+					
+					consulta.setIdConsulta(String.valueOf(conConsulta.getIdconsulta()));
+					consulta.setGenerica(conConsulta.getGeneral());
+					consulta.setIdInstitucion(String.valueOf(conConsulta.getIdinstitucion()));
+					consulta.setNombre(conConsulta.getDescripcion());
+					
+					respuesta.setConsultaItem(consulta);
 					 
 				}catch (Exception e) {
-					respuesta.setCode(500);
-					respuesta.setMessage("Error al duplicar las consultas");
-					respuesta.setDescription(e.getMessage());
+					error.setCode(500);
+					error.setMessage("Error al duplicar las consultas");
+					error.setDescription(e.getMessage());
+					respuesta.setError(error);
 					e.printStackTrace();
 				}
 			}
