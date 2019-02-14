@@ -4,7 +4,15 @@ public class DatosDocumentoItem {
 	
 	private String fileName;
 	private byte [] datos;
+	private String pathDocumento;
 	
+	
+	public String getPathDocumento() {
+		return pathDocumento;
+	}
+	public void setPathDocumento(String pathDocumento) {
+		this.pathDocumento = pathDocumento;
+	}
 	public String getFileName() {
 		return fileName;
 	}

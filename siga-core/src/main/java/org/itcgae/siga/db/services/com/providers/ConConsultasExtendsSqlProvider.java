@@ -122,7 +122,7 @@ public class ConConsultasExtendsSqlProvider {
 		sql.FROM("CON_CONSULTA");
 		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
 		
-		sql.WHERE("IDOBJETIVO IN (1,4)");
+		sql.WHERE("IDOBJETIVO = 4");
 
 		sql.ORDER_BY("DESCRIPCION");
 		
