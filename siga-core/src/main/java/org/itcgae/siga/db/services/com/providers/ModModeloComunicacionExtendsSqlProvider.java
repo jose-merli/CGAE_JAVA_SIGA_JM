@@ -37,6 +37,8 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		if(filtros.getIdInstitucion() != null && !filtros.getIdInstitucion().trim().equals("")){
 			if(filtros.getIdInstitucion().equalsIgnoreCase(SigaConstants.IDINSTITUCION_0)){
 				sql.WHERE("(modelo.IDINSTITUCION = '2000' AND modelo.PORDEFECTO = 'SI')");
+			}else if(filtros.getIdInstitucion().equalsIgnoreCase(String.valueOf(SigaConstants.IDINSTITUCION_2000))){
+				sql.WHERE("(modelo.IDINSTITUCION = '2000' AND modelo.PORDEFECTO = 'NO')");
 			}else{
 				sql.WHERE("modelo.IDINSTITUCION = '"+filtros.getIdInstitucion()+"'");
 			}			
