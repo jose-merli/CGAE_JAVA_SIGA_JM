@@ -396,7 +396,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	}
 
 	@Override
-	public Error enviar(HttpServletRequest request, List<EnvioProgramadoDto> enviosDTO) {
+	public Error enviar(HttpServletRequest request, EnvioProgramadoDto[] enviosDTO) {
 		
 		LOGGER.info("enviar() -> Entrada al servicio para enviar");
 		
@@ -406,7 +406,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+		EnvEnvios envio = null;
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -415,11 +415,11 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
-					for(int i = 0; i <= enviosDTO.size();i++){
+					for(int i = 0; i < enviosDTO.length ;i++){
 						EnvEnviosKey key = new EnvEnviosKey();
-						key.setIdenvio(Long.valueOf(enviosDTO.get(i).getIdEnvio()));
+						key.setIdenvio(Long.valueOf(enviosDTO[i].getIdEnvio()));
 						key.setIdinstitucion(usuario.getIdinstitucion());
-						EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(key);
+						envio = _envEnviosMapper.selectByPrimaryKey(key);
 						switch (envio.getIdtipoenvios().toString()) {
 
 						case SigaConstants.TIPO_ENVIO_CORREOELECTRONICO:
@@ -444,9 +444,13 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					respuesta.setDescription("El envio se ha lanzado correctamente");
 					respuesta.setMessage("Envio lanzado");
 				}catch(Exception e){
+					envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
+					envio.setFechamodificacion(new Date());
+					_envEnviosMapper.updateByPrimaryKey(envio);
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
 					respuesta.setMessage("Error");
+					e.printStackTrace();
 				}
 				
 				
