@@ -569,7 +569,13 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						modeloCom.setFechabaja(null);
 						modeloCom.setFechamodificacion(new Date());
 						modeloCom.setIdclasecomunicacion(Short.parseShort(datosTarjeta.getIdClaseComunicacion()));
-						modeloCom.setIdinstitucion(Short.parseShort(datosTarjeta.getIdInstitucion()));
+						if(datosTarjeta.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)){
+							modeloCom.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
+							modeloCom.setPordefecto(SigaConstants.SI);
+						}else{
+							modeloCom.setIdinstitucion(Short.parseShort(datosTarjeta.getIdInstitucion()));
+							modeloCom.setPordefecto(SigaConstants.NO);
+						}						
 						modeloCom.setNombre(datosTarjeta.getNombre());
 						modeloCom.setOrden(Short.parseShort(datosTarjeta.getOrden()));
 						modeloCom.setPreseleccionar(datosTarjeta.getPreseleccionar());
@@ -584,7 +590,15 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						modeloCom.setFechabaja(null);
 						modeloCom.setFechamodificacion(new Date());
 						modeloCom.setIdclasecomunicacion(Short.parseShort(datosTarjeta.getIdClaseComunicacion()));
-						modeloCom.setIdinstitucion(idInstitucion);
+						
+						if(datosTarjeta.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)){
+							modeloCom.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
+							modeloCom.setPordefecto(SigaConstants.SI);
+						}else{
+							modeloCom.setIdinstitucion(Short.parseShort(datosTarjeta.getIdInstitucion()));
+							modeloCom.setPordefecto(SigaConstants.NO);
+						}
+						
 						modeloCom.setNombre(datosTarjeta.getNombre());
 						modeloCom.setOrden(Short.parseShort(datosTarjeta.getOrden()));
 						modeloCom.setPreseleccionar(datosTarjeta.getPreseleccionar());

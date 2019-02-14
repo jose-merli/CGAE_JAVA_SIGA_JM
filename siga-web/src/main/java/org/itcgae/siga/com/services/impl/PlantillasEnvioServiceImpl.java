@@ -81,7 +81,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	private ConConsultaMapper _conConsultaMapper;
 
 	@Override
-	public ComboDTO getComboConsultas(HttpServletRequest request) {
+	public ComboDTO getComboConsultas(HttpServletRequest request, String filtro) {
 		LOGGER.info("getComboConsultas() -> Entrada al servicio para obtener las consultas disponibles");
 		
 		// Conseguimos información del usuario logeado
@@ -100,7 +100,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			
 			if (null != usuarios && usuarios.size() > 0) {
 
-				comboItems = _conConsultasExtendsMapper.selectConsultasDisponibles(idInstitucion, null, null);
+				comboItems = _conConsultasExtendsMapper.selectConsultasDisponiblesFiltro(idInstitucion, null, null, filtro);
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
 					element.setLabel("");
@@ -237,6 +237,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						plantilla.setFechamodificacion(new Date());
 						plantilla.setUsumodificacion(usuario.getIdusuario());
 						_envPlantillasenviosMapper.updateByPrimaryKeyWithBLOBs(plantilla);
+						respuesta.setMessage(plantilla.getIdplantillaenvios().toString());
 					}else{
 						EnvPlantillasenviosWithBLOBs plantilla = new EnvPlantillasenviosWithBLOBs();
 						NewIdDTO id = _envPlantillaEnviosExtendsMapper.selectMaxIDPlantillas();

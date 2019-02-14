@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
+import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
@@ -127,13 +128,13 @@ public class ConsultasController {
 	}
 
 	@RequestMapping(value = "/duplicarConsulta", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> duplicarConsulta(HttpServletRequest request, @RequestBody ConsultaItem[] consultas) {
+	ResponseEntity<ConsultaDTO> duplicarConsulta(HttpServletRequest request, @RequestBody ConsultaItem consulta) {
 
-		Error response = _consultasService.duplicarConsulta(request, consultas);
-		if (response.getCode() == 200)
-			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		ConsultaDTO response = _consultasService.duplicarConsulta(request, consulta);
+		if (response.getError() == null)
+			return new ResponseEntity<ConsultaDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ConsultaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@RequestMapping(value = "/confGeneral", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

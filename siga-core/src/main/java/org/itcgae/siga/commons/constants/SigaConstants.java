@@ -38,6 +38,7 @@ public class SigaConstants {
 	// DOCUMENTOS
 	
 	public static String SUFIJO_MODULO_COM_DUPLICADO = "_Copia";
+	public static String SUFIJO_CONSULTA_COM_DUPLICADO = "_Copia";
 	public static int NOMBRE_MAXLENGTH = 100;
 	public static String rutaficherosInformesYcomunicaciones = "/FILERMSA1000/SIGA/ficheros/archivo/";
 	public static String carpetaDocumentosEnvio = "/documentosEnvio/";
@@ -58,6 +59,9 @@ public class SigaConstants {
 	public static String CAMPO_NUM_COLEGIADO = "NCOLEGIADO";
 	public static String CAMPO_IDENTIFICACION = "INDENTIFICACIONENTIDAD";
 	public static String CAMPO_IDINSTITUCION = "IDINSTITUCION";
+	public static String IDINSTITUCION_0 = "0";
+	public static String SI = "SI";
+	public static String NO = "NO";
 	
 	// Para la busqueda de criterios dinamicos de las consultas
 	public static final String TIPONUMERO	= "N";
