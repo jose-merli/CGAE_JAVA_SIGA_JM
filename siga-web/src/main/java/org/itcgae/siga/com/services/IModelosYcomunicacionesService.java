@@ -41,4 +41,6 @@ public interface IModelosYcomunicacionesService {
 	
 	public Error rehabilitarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem[] modeloComunicacion);
 	
+	public Boolean comprobarNombreModeloComunicacion(HttpServletRequest request, TarjetaModeloConfiguracionDTO datosTarjeta);
+	
 }

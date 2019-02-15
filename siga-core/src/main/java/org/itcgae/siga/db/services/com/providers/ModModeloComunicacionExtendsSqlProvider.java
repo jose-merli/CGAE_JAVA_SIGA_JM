@@ -37,6 +37,8 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		if(filtros.getIdInstitucion() != null && !filtros.getIdInstitucion().trim().equals("")){
 			if(filtros.getIdInstitucion().equalsIgnoreCase(SigaConstants.IDINSTITUCION_0)){
 				sql.WHERE("(modelo.IDINSTITUCION = '2000' AND modelo.PORDEFECTO = 'SI')");
+			}else if(filtros.getIdInstitucion().equalsIgnoreCase(String.valueOf(SigaConstants.IDINSTITUCION_2000))){
+				sql.WHERE("(modelo.IDINSTITUCION = '2000' AND modelo.PORDEFECTO = 'NO')");
 			}else{
 				sql.WHERE("modelo.IDINSTITUCION = '"+filtros.getIdInstitucion()+"'");
 			}			
@@ -125,6 +127,17 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.FROM("MOD_MODELOCOMUNICACION MODELO");
 		sql.WHERE("MODELO.IDCLASECOMUNICACION IN ("+idClasesComunicacion+")");
 			   
+		return sql.toString();
+	}
+	
+	
+	public String comprobarNombreDuplicado(String nombreModelo){
+		
+		SQL sql = new SQL();
+		sql.SELECT("max((nvl(SUBSTR(nombre,LENGTH('" + nombreModelo + "')+1,LENGTH(nombre)),0))+1) as NOMBRE");
+		sql.FROM("mod_modelocomunicacion");
+		sql.WHERE("lower(nombre) like lower('" + nombreModelo + "%')");
+		   
 		return sql.toString();
 	}
 

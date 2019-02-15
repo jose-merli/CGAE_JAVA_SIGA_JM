@@ -196,7 +196,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							comboItems.add(0, element);
 						}		
 						comboDTO.setCombooItems(comboItems);
-						modelosComunicacionItem.setPlantillas(comboItems);
+						modelosComunicacionItem.setPlantillas(comboDTO);
 					}
 					respuesta.setModelosComunicacionItems(modelos);
 				}catch(Exception e){
