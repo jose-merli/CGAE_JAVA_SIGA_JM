@@ -12,6 +12,7 @@ public class DialogoComunicacionItem {
 	private List<ModelosComunicacionItem> modelos = new ArrayList<ModelosComunicacionItem>();
 	private List<List<String>> selectedDatos = new ArrayList<List<String>>();
 	private List<ConsultaItem> consultas = new ArrayList<ConsultaItem>();
+	private String ruta;
 	
 	public String getIdClaseComunicacion() {
 		return idClaseComunicacion;
@@ -48,6 +49,12 @@ public class DialogoComunicacionItem {
 	}
 	public void setFechaProgramada(Date fechaProgramada) {
 		this.fechaProgramada = fechaProgramada;
+	}
+	public String getRuta() {
+		return ruta;
+	}
+	public void setRuta(String ruta) {
+		this.ruta = ruta;
 	}
 	
 	

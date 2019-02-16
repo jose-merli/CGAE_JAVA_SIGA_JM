@@ -934,7 +934,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 			// Si ya tenía un select introducido le añadimos los daots de direccion
 			if(indexFinal + 9 <= sentencia.length() && sentencia.substring(indexInicio, indexFinal).toUpperCase().indexOf("SELECT") > -1){
 				String selectConsulta = sentencia.substring(indexInicio, indexFinal);
-				sentencia = sentencia.substring(0, indexInicio) + selectConsulta + " AND " + select + sentencia.substring(indexFinal, sentencia.length());
+				sentencia = sentencia.substring(0, indexInicio) + selectConsulta + ", " + select + sentencia.substring(indexFinal, sentencia.length());
 			}else{
 				sentencia = sentencia.substring(0, indexInicio) + " SELECT " + select + sentencia.substring(indexFinal, sentencia.length());
 			}			

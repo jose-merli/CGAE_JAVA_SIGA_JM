@@ -58,6 +58,7 @@ import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModClasecomunicacionRuta;
 import org.itcgae.siga.db.entities.ModClasecomunicacionRutaExample;
+import org.itcgae.siga.db.entities.ModClasecomunicacionesExample;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvio;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvioKey;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
@@ -377,6 +378,22 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 		try{
 			if(dialogo != null && dialogo.getModelos() != null && dialogo.getModelos().size() > 0){
+				
+				//Obtenemos el campo del Sufijo asociado a la ruta de la comunicación
+				ModClasecomunicacionRutaExample exampleSufijo = new ModClasecomunicacionRutaExample();
+				exampleSufijo.createCriteria().andRutaEqualTo(dialogo.getRuta());
+				
+				List<ModClasecomunicacionRuta> listaClaseRuta = _modClasecomunicacionRutaMapper.selectByExample(exampleSufijo);
+				
+				String campoSufijo = "";
+				
+				if(listaClaseRuta != null && listaClaseRuta.size() > 0){
+					ModClasecomunicacionRuta claseRuta = listaClaseRuta.get(0);
+					if(claseRuta != null){
+						campoSufijo = claseRuta.getSufijo();
+					}
+				}
+				
 				generarComunicacion.setFechaProgramada(dialogo.getFechaProgramada());
 				
 				for(ModelosComunicacionItem modelo :dialogo.getModelos()){
@@ -579,7 +596,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																	//Otenemos el nombre del fichero de salida
 																	String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaTmp;
 																	String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
-																	String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo.getIdModeloComunicacion(), plantilla, hDatosGenerales, usuario.getIdlenguaje(), numFicheros, pathFicheroSalida);
 																	
 																	//Si no existe el directorio temporal lo creamos
 																	File dir = new File(pathFicheroSalida);
@@ -592,7 +608,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																	if(!filePlantilla.exists()){
 																		throw new SigaExceptions("No existe la plantilla de documento");
 																	}
-																	
+																																		
 																	Document doc = new Document(pathPlantilla + nombrePlantilla);
 
 																	hDatosGenerales.putAll(resultMulti.get(k));
@@ -631,16 +647,26 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																	
 																	hDatosFinal.put("row", hDatosGenerales);
 																	
+																																	
 																	if(!esEnvio){
 																		LOGGER.debug("Generamos el documento");																
 																		
 																		doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);
 																		
+																		String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo.getIdModeloComunicacion(), plantilla, hDatosGenerales, usuario.getIdlenguaje(), numFicheros, pathFicheroSalida, campoSufijo);
+																		
 																		DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida);
 																		
 																		listaFicheros.add(docGenerado);
 																		listaDocumentos.add(doc);
-																	}																																
+																	}else{
+																		//Cogemos todas las consultas y le metemos el nombre del fichero
+																		if(listaConsultasEnvio != null && listaConsultasEnvio.size() > 0){
+																			for(ConsultaEnvioItem consultaEnvio : listaConsultasEnvio){
+																				consultaEnvio.setSufijo(campoSufijo);
+																			}
+																		}																		
+																	}																															
 																}														
 															}
 															
@@ -651,8 +677,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														//Otenemos el nombre del fichero de salida
 														String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
 														String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
-														String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo.getIdModeloComunicacion(), plantilla, hDatosGenerales, usuario.getIdlenguaje(), numFicheros, pathFicheroSalida);
-														
 														
 														File filePlantilla = new File(pathPlantilla + nombrePlantilla);
 														if(!filePlantilla.exists()){
@@ -697,11 +721,20 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														if(!esEnvio){
 															LOGGER.debug("Generamos el documento");
 															doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);
+														
+															String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo.getIdModeloComunicacion(), plantilla, hDatosGenerales, usuario.getIdlenguaje(), numFicheros, pathFicheroSalida, campoSufijo);
 															
 															DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida);
 															
 															listaFicheros.add(docGenerado);
 															listaDocumentos.add(doc);
+														}else{
+															//Cogemos todas las consultas y le metemos el nombre del fichero
+															if(listaConsultasEnvio != null && listaConsultasEnvio.size() > 0){
+																for(ConsultaEnvioItem consultaEnvio : listaConsultasEnvio){
+																	consultaEnvio.setSufijo(campoSufijo);
+																}
+															}
 														}													
 													}
 													
@@ -811,7 +844,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	}
 	
 	@Override
-	public String obtenerNombreFicheroSalida(String idModeloComunicacion, PlantillaModeloDocumentoDTO plantilla, HashMap<String,Object> hDatosGenerales, String idLenguaje, int numFichero, String pathFicheroSalida){
+	public String obtenerNombreFicheroSalida(String idModeloComunicacion, PlantillaModeloDocumentoDTO plantilla, HashMap<String,Object> hDatosGenerales, String idLenguaje, int numFichero, String pathFicheroSalida, String campoSufijo){
 		HashMap<String,Object> hashMapRow = null;
 		String extension = "";
 		String nombreFicheroSalida = plantilla.getNombreFicheroSalida();
@@ -868,24 +901,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				sufijo = sufijo + String.valueOf(numColegiado);
 				
 			}else if(Short.valueOf(sufijoItem.getIdSufijo()).shortValue() == SigaConstants.SUFIJOS.IDENTIFICACION.getCodigo().shortValue()){
-				
-				// Con la ruta obtenemos el campo para el campo del sufijo
-				ModClasecomunicacionRutaExample example = new ModClasecomunicacionRutaExample();
-				//TODO
-				example.createCriteria().andRutaEqualTo("/busquedaColegiados");				
-				
-				List<ModClasecomunicacionRuta> clasesRuta = _modClasecomunicacionRutaMapper.selectByExample(example);
-				
-				String campoSufijo = "";
-				
-				if(clasesRuta != null && clasesRuta.size() > 0){
-					ModClasecomunicacionRuta claseRuta = clasesRuta.get(0);
-					if(claseRuta != null){
-						campoSufijo = claseRuta.getSufijo();
-					}else{
-						campoSufijo = SigaConstants.CAMPO_IDENTIFICACION;
-					}
-				}else{
+
+				if(campoSufijo == null){
 					campoSufijo = SigaConstants.CAMPO_IDENTIFICACION;
 				}
 				
@@ -1281,6 +1298,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							consultaEnvioEntity.setIdplantilladocumento(consultaEnvio.getIdPlantillaDoc());
 							consultaEnvioEntity.setIdinforme(consultaEnvio.getIdInforme());
 							consultaEnvioEntity.setIdmodelocomunicacion(consultaEnvio.getIdModeloComunicacion());
+							consultaEnvioEntity.setSufijo(consultaEnvio.getSufijo());
 							_envConsultasenvioMapper.insert(consultaEnvioEntity);
 						}
 					}

@@ -30,5 +30,5 @@ public interface IDialogoComunicacionService {
 	public ResponseDateDTO obtenerFechaProgramada(HttpServletRequest request);
 	public ResponseDataDTO obtenerNumMaximoModelos(HttpServletRequest request);
 	public Error generarEnvios(HttpServletRequest request, DialogoComunicacionItem dialogo);
-	public String obtenerNombreFicheroSalida(String idModeloComunicacion, PlantillaModeloDocumentoDTO plantilla, HashMap<String, Object> hDatosGenerales, String idLenguaje, int numFichero, String pathFicheroSalida);
+	public String obtenerNombreFicheroSalida(String idModeloComunicacion, PlantillaModeloDocumentoDTO plantilla, HashMap<String, Object> hDatosGenerales, String idLenguaje, int numFichero, String pathFicheroSalida, String campoSufijo);
 }

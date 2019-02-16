@@ -13,6 +13,8 @@ public class ConsultaEnvioItem {
 	private Long idModeloComunicacion;
 	private Long idInforme;
 	
+	private String sufijo;
+	
 	public Long getIdModeloComunicacion() {
 		return idModeloComunicacion;
 	}
@@ -66,5 +68,11 @@ public class ConsultaEnvioItem {
 	}
 	public void setIdPlantillaDoc(Long idPlantillaDoc) {
 		this.idPlantillaDoc = idPlantillaDoc;
+	}
+	public String getSufijo() {
+		return sufijo;
+	}
+	public void setSufijo(String sufijo) {
+		this.sufijo = sufijo;
 	}
 }

@@ -640,6 +640,9 @@ public class ColaEnviosImpl implements IColaEnvios {
 				if(continua){
 					HashMap<String,Object> hDatosGenerales = new HashMap<String, Object>();
 					HashMap<String,Object> hDatosFinal = new HashMap<String, Object>();
+					
+					String campoSufijo = null;
+					
 					LOGGER.debug("Obtenemos la consulta de destinatario para el envio " + idEnvio + " y plantilla: " + idPlantilla);
 					example = new EnvConsultasenvioExample();
 					example.createCriteria().andIdenvioEqualTo(Long.parseLong(idEnvio)).andIdplantilladocumentoEqualTo(Long.parseLong(idPlantilla)).andIdobjetivoEqualTo(SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
@@ -667,6 +670,11 @@ public class ColaEnviosImpl implements IColaEnvios {
 							// Ejecutamos la consulta
 							Map<String,String> mapa = new HashMap<String,String>();
 							mapa = _consultasService.obtenerMapaConsulta(consultaMulti.getConsulta());
+							
+							if(campoSufijo == null || !"".equalsIgnoreCase(campoSufijo)){
+								campoSufijo = consultaMulti.getSufijo();
+							}
+							
 							List<Map<String,Object>> resultMulti = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
 							
 							int numFicheros = 0;
@@ -684,7 +692,6 @@ public class ColaEnviosImpl implements IColaEnvios {
 									//Otenemos el nombre del fichero de salida
 									String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + idInstitucion + SigaConstants.carpetaTmp;
 									String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + idInstitucion + SigaConstants.carpetaPlantillasDocumento;
-									String nombreFicheroSalida = _dialogoComunicacionService.obtenerNombreFicheroSalida(String.valueOf(consultaMulti.getIdmodelocomunicacion()), plantilla, hDatosGenerales, SigaConstants.LENGUAJE_DEFECTO, numFicheros, pathFicheroSalida);
 									
 									//Si no existe el directorio temporal lo creamos
 									File dir = new File(pathFicheroSalida);
@@ -709,6 +716,10 @@ public class ColaEnviosImpl implements IColaEnvios {
 									
 									for(EnvConsultasenvio consultaDatos:listaConsultasDatos){	
 										
+										if(campoSufijo == null || !"".equalsIgnoreCase(campoSufijo)){
+											campoSufijo = consultaDatos.getSufijo();
+										}
+										
 										String consultaEjecutarDatos = consultaDatos.getConsulta();
 										
 										List<Map<String,Object>> resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);										
@@ -731,6 +742,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 									
 									doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);
 									
+									String nombreFicheroSalida = _dialogoComunicacionService.obtenerNombreFicheroSalida(String.valueOf(consultaMulti.getIdmodelocomunicacion()), plantilla, hDatosGenerales, SigaConstants.LENGUAJE_DEFECTO, numFicheros, pathFicheroSalida, campoSufijo);
+																		
 									DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida);
 									docGenerado.setPathDocumento(pathFicheroSalida);
 									
@@ -748,7 +761,6 @@ public class ColaEnviosImpl implements IColaEnvios {
 						//Otenemos el nombre del fichero de salida
 						String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + idInstitucion + SigaConstants.carpetaTmp;
 						String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + idInstitucion + SigaConstants.carpetaPlantillasDocumento;
-						String nombreFicheroSalida = _dialogoComunicacionService.obtenerNombreFicheroSalida(String.valueOf(idModeloComunicacion), plantilla, hDatosGenerales, SigaConstants.LENGUAJE_DEFECTO, 0, pathFicheroSalida);
 						
 						//Si no existe el directorio temporal lo creamos
 						File dir = new File(pathFicheroSalida);
@@ -775,6 +787,10 @@ public class ColaEnviosImpl implements IColaEnvios {
 							
 							String consultaEjecutarDatos = consultaDatos.getConsulta();
 							
+							if(campoSufijo == null || !"".equalsIgnoreCase(campoSufijo)){
+								campoSufijo = consultaDatos.getSufijo();
+							}
+							
 							List<Map<String,Object>> resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);										
 							
 							//Miramos si la consulta tiene region
@@ -794,6 +810,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 						LOGGER.debug("Generamos el documento");																
 						
 						doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);
+						
+						String nombreFicheroSalida = _dialogoComunicacionService.obtenerNombreFicheroSalida(String.valueOf(idModeloComunicacion), plantilla, hDatosGenerales, SigaConstants.LENGUAJE_DEFECTO, 0, pathFicheroSalida, campoSufijo);
 						
 						DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida);
 						
