@@ -78,6 +78,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 	   sql.SELECT("MODELO.IDCLASECOMUNICACION, MODELO.IDMODELOCOMUNICACION, MODELO.NOMBRE");
 	   sql.FROM("MOD_MODELOCOMUNICACION MODELO");
 	   sql.WHERE("MODELO.IDCLASECOMUNICACION IN (" + idClaseComunicacion + ")");
+	   sql.ORDER_BY("MODELO.ORDEN");
 	   
 	   return sql.toString();
 	}

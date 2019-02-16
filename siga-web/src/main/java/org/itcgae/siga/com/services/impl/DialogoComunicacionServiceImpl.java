@@ -56,6 +56,8 @@ import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.entities.ModClasecomunicacionRuta;
+import org.itcgae.siga.db.entities.ModClasecomunicacionRutaExample;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvio;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvioKey;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
@@ -67,6 +69,7 @@ import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.ModClasecomunicacionRutaMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -166,6 +169,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
 	@Autowired
 	private GenPropertiesMapper _genPropertiesMapper;
+	
+	@Autowired
+	private ModClasecomunicacionRutaMapper _modClasecomunicacionRutaMapper;
 		
 
 	@Override
@@ -862,10 +868,31 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				sufijo = sufijo + String.valueOf(numColegiado);
 				
 			}else if(Short.valueOf(sufijoItem.getIdSufijo()).shortValue() == SigaConstants.SUFIJOS.IDENTIFICACION.getCodigo().shortValue()){
-				Object identificacion = hDatosGenerales.get(SigaConstants.CAMPO_IDENTIFICACION);
+				
+				// Con la ruta obtenemos el campo para el campo del sufijo
+				ModClasecomunicacionRutaExample example = new ModClasecomunicacionRutaExample();
+				//TODO
+				example.createCriteria().andRutaEqualTo("/busquedaColegiados");				
+				
+				List<ModClasecomunicacionRuta> clasesRuta = _modClasecomunicacionRutaMapper.selectByExample(example);
+				
+				String campoSufijo = "";
+				
+				if(clasesRuta != null && clasesRuta.size() > 0){
+					ModClasecomunicacionRuta claseRuta = clasesRuta.get(0);
+					if(claseRuta != null){
+						campoSufijo = claseRuta.getSufijo();
+					}else{
+						campoSufijo = SigaConstants.CAMPO_IDENTIFICACION;
+					}
+				}else{
+					campoSufijo = SigaConstants.CAMPO_IDENTIFICACION;
+				}
+				
+				Object identificacion = hDatosGenerales.get(campoSufijo);
 				if(identificacion == null){
-					if(hashMapRow != null && hashMapRow.get(SigaConstants.CAMPO_IDENTIFICACION) != null){
-						identificacion = hashMapRow.get(SigaConstants.CAMPO_IDENTIFICACION);
+					if(hashMapRow != null && hashMapRow.get(campoSufijo) != null){
+						identificacion = hashMapRow.get(campoSufijo);
 					}else{
 						identificacion = SigaConstants.CAMPO_IDENTIFICACION;
 					}
