@@ -42,6 +42,7 @@ public class SigaConstants {
 	// DOCUMENTOS
 	
 	public static String SUFIJO_MODULO_COM_DUPLICADO = "_Copia";
+	public static String SUFIJO_CONSULTA_COM_DUPLICADO = "_Copia";
 	public static int NOMBRE_MAXLENGTH = 100;
 	public static String rutaficherosInformesYcomunicaciones = "/FILERMSA1000/SIGA/ficheros/archivo/";
 	public static String carpetaDocumentosEnvio = "/documentosEnvio/";
@@ -61,6 +62,10 @@ public class SigaConstants {
 	public static String CAMPO_APELLIDO2 = "APELLIDO2";
 	public static String CAMPO_NUM_COLEGIADO = "NCOLEGIADO";
 	public static String CAMPO_IDENTIFICACION = "INDENTIFICACIONENTIDAD";
+	public static String CAMPO_IDINSTITUCION = "IDINSTITUCION";
+	public static String IDINSTITUCION_0 = "0";
+	public static String SI = "SI";
+	public static String NO = "NO";
 	
 	// Para la busqueda de criterios dinamicos de las consultas
 	public static final String TIPONUMERO	= "N";
@@ -687,5 +692,23 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final long CALENDARIO_GENERAL = 1; 
 	public static final long CALENDARIO_LABORAL = 2;
 	public static final long CALENDARIO_FORMACION = 3; 
+
+
+	// AVISOS PARA NOTIFICACIONES EN EVENTOS
+	public static final String AVISO_CANCELAR_CURSO = "1";
+	public static final String AVISO_MODIFICAR_CURSO = "2";
+	public static final String AVISO_PLAZAS_DISPONIBLES = "3";
+	public static final String AVISO_CANCELAR_SESION = "4";
+	public static final String AVISO_MODIFICAR_SESION = "5";
+	
+	//NOTIFICACIONES
+	public static final long NOTIFICACION_TIPOCUANDO_ANTES = 1;
+	public static final long NOTIFICACION_TIPOCUANDO_DESPUES = 2;
+	
+	public static final long NOTIFICACION_HORAS = 1;
+	public static final long NOTIFICACION_MINUTOS = 2;
+	public static final long NOTIFICACION_SEGUNDOS = 3;
+	
+
 
 }

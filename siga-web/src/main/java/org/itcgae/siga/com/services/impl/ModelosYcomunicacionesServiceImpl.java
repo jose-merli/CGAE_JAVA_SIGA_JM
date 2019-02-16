@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
@@ -40,6 +41,7 @@ import org.itcgae.siga.db.entities.ModModeloPlantillaenvio;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvioExample;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvioKey;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
+import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
@@ -140,7 +142,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
-					modelosItem = modModeloComunicacionExtendsMapper.selectModelosComunicacion(filtros, historico);	
+					modelosItem = modModeloComunicacionExtendsMapper.selectModelosComunicacion(String.valueOf(idInstitucion), filtros, historico);	
 					if(modelosItem != null && modelosItem.size()> 0){
 						respuesta.setModelosComunicacionItem(modelosItem);
 					}
@@ -184,19 +186,34 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					ModModelocomunicacion modelo = modModelocomunicacionMapper.selectByPrimaryKey(Long.valueOf(modeloComunicacion.getIdModeloComunicacion()));
 									
 					modelo.setIdmodelocomunicacion(null);
-					String nuevoNombre = modelo.getNombre() + SigaConstants.SUFIJO_MODULO_COM_DUPLICADO;
-					if(nuevoNombre.length() < SigaConstants.NOMBRE_MAXLENGTH){
-						modelo.setNombre(nuevoNombre);
-					}else{
-						nuevoNombre = nuevoNombre.substring(0,SigaConstants.NOMBRE_MAXLENGTH);
-						modelo.setNombre(nuevoNombre);
-					}
 					
-					modelo.setOrden(null);
+					// Comprobamos el nombre del modelo duplicado
+					// En caso de que no exista ningun duplicado anterior (*_COPIA), ese será su nombre
+					// En caso contrario, se añadira un contador (*_COPIA1)
+					
+					String nuevoNombre = comprobarNombreDuplicado(modelo.getNombre());
+					
+//					String nuevoNombre = modelo.getNombre() + SigaConstants.SUFIJO_MODULO_COM_DUPLICADO;
+//					if(nuevoNombre.length() < SigaConstants.NOMBRE_MAXLENGTH){
+//						modelo.setNombre(nuevoNombre);
+//					}else{
+//						nuevoNombre = nuevoNombre.substring(0,SigaConstants.NOMBRE_MAXLENGTH);
+//						modelo.setNombre(nuevoNombre);
+//					}
+					
+					
+					// Si el modelo de comunicacion tiene marcado el campo "PORDEFECTO" a SI, tendremos que utilizar la institucion actual
+					// Si no está marcado "PORDEFECTO" a SI, al modelo duplicado le pondremos la institucion del modelo original.
+					if(modelo.getPordefecto() == null || modelo.getPordefecto().equalsIgnoreCase("NO"))
+						modelo.setIdinstitucion(Short.parseShort(modeloComunicacion.getIdInstitucion()));
+					else
+						modelo.setIdinstitucion(idInstitucion);
+					
+					modelo.setNombre(nuevoNombre);
 					modelo.setFechabaja(null);
 					modelo.setIdmodelocomunicacion(null);
 					modelo.setFechamodificacion(new Date());
-					modelo.setIdinstitucion(Short.parseShort(modeloComunicacion.getIdInstitucion()));
+					
 					
 					modModelocomunicacionMapper.insert(modelo);
 					
@@ -552,7 +569,13 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						modeloCom.setFechabaja(null);
 						modeloCom.setFechamodificacion(new Date());
 						modeloCom.setIdclasecomunicacion(Short.parseShort(datosTarjeta.getIdClaseComunicacion()));
-						modeloCom.setIdinstitucion(Short.parseShort(datosTarjeta.getIdInstitucion()));
+						if(datosTarjeta.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)){
+							modeloCom.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
+							modeloCom.setPordefecto(SigaConstants.SI);
+						}else{
+							modeloCom.setIdinstitucion(Short.parseShort(datosTarjeta.getIdInstitucion()));
+							modeloCom.setPordefecto(SigaConstants.NO);
+						}						
 						modeloCom.setNombre(datosTarjeta.getNombre());
 						modeloCom.setOrden(Short.parseShort(datosTarjeta.getOrden()));
 						modeloCom.setPreseleccionar(datosTarjeta.getPreseleccionar());
@@ -567,7 +590,15 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						modeloCom.setFechabaja(null);
 						modeloCom.setFechamodificacion(new Date());
 						modeloCom.setIdclasecomunicacion(Short.parseShort(datosTarjeta.getIdClaseComunicacion()));
-						modeloCom.setIdinstitucion(idInstitucion);
+						
+						if(datosTarjeta.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)){
+							modeloCom.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
+							modeloCom.setPordefecto(SigaConstants.SI);
+						}else{
+							modeloCom.setIdinstitucion(Short.parseShort(datosTarjeta.getIdInstitucion()));
+							modeloCom.setPordefecto(SigaConstants.NO);
+						}
+						
 						modeloCom.setNombre(datosTarjeta.getNombre());
 						modeloCom.setOrden(Short.parseShort(datosTarjeta.getOrden()));
 						modeloCom.setPreseleccionar(datosTarjeta.getPreseleccionar());
@@ -1027,5 +1058,43 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		
 		LOGGER.info("obtenerPlantillasComunicacion() -> Salida del servicio para obtener las plantillas para añadir a la comunicación");
 		return plantilla;
+	}
+	
+	
+	@Override
+	public Boolean comprobarNombreModeloComunicacion(HttpServletRequest request, TarjetaModeloConfiguracionDTO datosTarjeta) {
+		LOGGER.info("comprobarNombreModeloComunicacion() -> Entrada al servicio para comprobar si existe un modelo con el nombre introducido");
+		
+		Boolean respuesta = Boolean.FALSE;
+						
+		ModModelocomunicacionExample example = new ModModelocomunicacionExample();
+		example.createCriteria().andNombreEqualTo(datosTarjeta.getNombre());
+		List<ModModelocomunicacion> listModelos = modModelocomunicacionMapper.selectByExample(example);
+		
+		if(listModelos != null && listModelos.size() > 0)
+			respuesta = Boolean.TRUE;
+		
+		LOGGER.info("comprobarNombreModeloComunicacion() -> Salida al servicio para comprobar si existe un modelo con el nombre introducido");
+		return respuesta;
+	}
+	
+	private String comprobarNombreDuplicado(String nombreModelo) {
+		StringDTO nombreFinal = new StringDTO();
+		
+		if(nombreModelo.contains(SigaConstants.SUFIJO_MODULO_COM_DUPLICADO)) {
+			nombreModelo = nombreModelo.split(SigaConstants.SUFIJO_MODULO_COM_DUPLICADO)[0];
+		}
+		
+		// Si no devuelve nada, se llamara *_COPIA
+		// En caso de que devuelva algo, devolverá el numero que deberá de estar despues de copia --> *_COPIA1
+		StringDTO nombre = modModeloComunicacionExtendsMapper.comprobarNombreDuplicado(nombreModelo + SigaConstants.SUFIJO_MODULO_COM_DUPLICADO);
+		
+		if(nombre == null || nombre.getValor().equals(""))
+			nombreFinal.setValor(nombreModelo + SigaConstants.SUFIJO_MODULO_COM_DUPLICADO);
+		else
+			nombreFinal.setValor(nombreModelo + SigaConstants.SUFIJO_MODULO_COM_DUPLICADO + nombre.getValor());
+		
+		return nombreFinal.getValor();
+		
 	}
 }

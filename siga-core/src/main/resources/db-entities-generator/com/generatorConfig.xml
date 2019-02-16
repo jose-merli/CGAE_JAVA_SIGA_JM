@@ -52,14 +52,16 @@
 <!-- 			<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" > -->
 <!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 			</table> -->
+
 			
 <!-- 				<table schema="USCGAE" tableName="ENV_CONSULTASENVIO" > -->
 <!-- 					<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 				</table> -->
 
-	 		<table schema="USCGAE" tableName="MOD_CLASECOMUNICACION_RUTA" > 
-	 			<property name="ignoreQualifiersAtRuntime" value="true"/> 
-	 		</table>
+
+<!-- 	 		<table schema="USCGAE" tableName="MOD_CLASECOMUNICACION_RUTA" >  -->
+<!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
+<!-- 	 		</table> -->
 
 <!-- 			<table schema="USCGAE" tableName="MOD_KEYCLASECOMUNICACION" >  -->
 <!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
@@ -69,10 +71,10 @@
 <!-- 	 			<property name="ignoreQualifiersAtRuntime" value="true"/>  -->
 <!-- 	 		</table> -->
 
-<!-- 		<table schema="USCGAE" tableName="MOD_MODELOCOMUNICACION" > -->
-<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			<generatedKey column="IDMODELOCOMUNICACION" sqlStatement="SELECT SEQ_MOD_MODELOCOMUNICACION.NEXTVAL FROM DUAL"/> -->
-<!-- 		</table> -->
+		<table schema="USCGAE" tableName="MOD_MODELOCOMUNICACION" >
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+			<generatedKey column="IDMODELOCOMUNICACION" sqlStatement="SELECT SEQ_MOD_MODELOCOMUNICACION.NEXTVAL FROM DUAL"/>
+		</table>
 
 		<table schema="USCGAE" tableName="ENV_CONSULTASENVIO" >
 			<property name="ignoreQualifiersAtRuntime" value="true"/>

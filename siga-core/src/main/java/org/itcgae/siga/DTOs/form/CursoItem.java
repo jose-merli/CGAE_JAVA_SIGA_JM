@@ -54,6 +54,9 @@ public class CursoItem {
 	private String inscripciones;
 	private Long numeroSesiones;
 	
+	private String numTemas;
+	
+	
 	public Long getIdCurso() {
 		return idCurso;
 	}
@@ -295,6 +298,19 @@ public class CursoItem {
 	public void setAdjunto(String adjunto) {
 		this.adjunto = adjunto;
 	}
+	public String getNumTemas() {
+		return numTemas;
+	}
+	public void setNumTemas(String numTemas) {
+		this.numTemas = numTemas;
+	}
+	public Long getNumeroSesiones() {
+		return numeroSesiones;
+	}
+	public void setNumeroSesiones(Long numeroSesiones) {
+		this.numeroSesiones = numeroSesiones;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -331,6 +347,8 @@ public class CursoItem {
 		result = prime * result + ((nombreApellidosFormador == null) ? 0 : nombreApellidosFormador.hashCode());
 		result = prime * result + ((nombreCurso == null) ? 0 : nombreCurso.hashCode());
 		result = prime * result + ((numPlazas == null) ? 0 : numPlazas.hashCode());
+		result = prime * result + ((numTemas == null) ? 0 : numTemas.hashCode());
+		result = prime * result + ((numeroSesiones == null) ? 0 : numeroSesiones.hashCode());
 		result = prime * result + ((plazasDisponibles == null) ? 0 : plazasDisponibles.hashCode());
 		result = prime * result + ((precioCurso == null) ? 0 : precioCurso.hashCode());
 		result = prime * result + ((precioDesde == null) ? 0 : precioDesde.hashCode());
@@ -341,6 +359,7 @@ public class CursoItem {
 		result = prime * result + ((visibilidad == null) ? 0 : visibilidad.hashCode());
 		return result;
 	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -510,6 +529,16 @@ public class CursoItem {
 				return false;
 		} else if (!numPlazas.equals(other.numPlazas))
 			return false;
+		if (numTemas == null) {
+			if (other.numTemas != null)
+				return false;
+		} else if (!numTemas.equals(other.numTemas))
+			return false;
+		if (numeroSesiones == null) {
+			if (other.numeroSesiones != null)
+				return false;
+		} else if (!numeroSesiones.equals(other.numeroSesiones))
+			return false;
 		if (plazasDisponibles == null) {
 			if (other.plazasDisponibles != null)
 				return false;
@@ -549,6 +578,7 @@ public class CursoItem {
 			return false;
 		return true;
 	}
+	
 	@Override
 	public String toString() {
 		return "CursoItem [idCurso=" + idCurso + ", visibilidad=" + visibilidad + ", colegio=" + colegio
@@ -568,13 +598,9 @@ public class CursoItem {
 				+ ", idEventoInicioInscripcion=" + idEventoInicioInscripcion + ", idEventoFinInscripcion="
 				+ idEventoFinInscripcion + ", idTipoEvento=" + idTipoEvento + ", tipoServicios=" + tipoServicios
 				+ ", temasCombo=" + temasCombo + ", temas=" + Arrays.toString(temas) + ", numPlazas=" + numPlazas
-				+ ", inscripciones=" + inscripciones + "]";
-	}
-	public Long getNumeroSesiones() {
-		return numeroSesiones;
-	}
-	public void setNumeroSesiones(Long numeroSesiones) {
-		this.numeroSesiones = numeroSesiones;
+				+ ", inscripciones=" + inscripciones + ", numeroSesiones=" + numeroSesiones + ", numTemas=" + numTemas
+				+ "]";
 	}
 
+	
 }

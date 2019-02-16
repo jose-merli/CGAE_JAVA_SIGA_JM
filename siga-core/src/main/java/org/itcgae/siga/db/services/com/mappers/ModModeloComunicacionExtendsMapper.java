@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -28,9 +29,10 @@ public interface ModModeloComunicacionExtendsMapper {
 		@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBRECLASE", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ABREVIATURA", property = "institucion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "PORDEFECTO", property = "porDefecto", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ModelosComunicacionItem> selectModelosComunicacion(DatosModelosComunicacionesSearch filtros, boolean historico);
+	List<ModelosComunicacionItem> selectModelosComunicacion(String idInstitucion, DatosModelosComunicacionesSearch filtros, boolean historico);
 
 	
 	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "selectModelosComunicacionDialg")
@@ -59,4 +61,9 @@ public interface ModModeloComunicacionExtendsMapper {
 		@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> selectTipoEnvioPlantilla(String idLenguaje, String idPlantilla);
+
+	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "comprobarNombreDuplicado")
+	@Results({ @Result(column = "NOMBRE", property = "valor", jdbcType = JdbcType.VARCHAR) 
+	})
+	StringDTO comprobarNombreDuplicado(String nombreModelo);
 }

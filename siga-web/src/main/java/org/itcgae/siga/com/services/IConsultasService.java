@@ -1,6 +1,5 @@
 package org.itcgae.siga.com.services;
 
-import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +9,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
+import org.itcgae.siga.DTOs.com.ConsultaDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultaListadoModelosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaListadoPlantillasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
+import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.utils.SigaExceptions;
@@ -35,7 +36,7 @@ public interface IConsultasService {
 	//TODO: REVISAR DTO de ENTRADA Y SALIDA
 	public ConsultasDTO consultasSearch(HttpServletRequest request, ConsultasSearch filtros);
 
-	public Error duplicarConsulta(HttpServletRequest request, ConsultaItem[] consultas);
+	public ConsultaDTO duplicarConsulta(HttpServletRequest request, ConsultaItem consulta);
 
 	public Error borrarConsulta(HttpServletRequest request, ConsultaItem[] consultas);
 
@@ -47,7 +48,7 @@ public interface IConsultasService {
 
 	public Error guardarConsulta(HttpServletRequest request, ConsultaItem consulta);
 
-	public File ejecutarConsulta(HttpServletRequest request, ConsultaItem consulta);
+	public ResponseFileDTO ejecutarConsulta(HttpServletRequest request, ConsultaItem consulta);
 
 	public Map<String, String> obtenerMapaConsulta(String consulta);
 

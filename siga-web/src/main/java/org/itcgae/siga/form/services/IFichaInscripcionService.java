@@ -23,4 +23,6 @@ public interface IFichaInscripcionService {
 	
 	public String compruebaMinimaAsistencia(InscripcionItem inscripcionItem, HttpServletRequest request);
 	
+	public ComboDTO getPaymentMode(HttpServletRequest request);
+	
 }

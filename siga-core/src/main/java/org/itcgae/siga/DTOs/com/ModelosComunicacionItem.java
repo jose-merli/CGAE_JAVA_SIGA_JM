@@ -1,6 +1,7 @@
 package org.itcgae.siga.DTOs.com;
 
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,8 +23,8 @@ public class ModelosComunicacionItem {
 	private String claseComunicacion;
 	private String idPlantillaEnvio;
 	private String idTipoEnvio;
-	private String tipoEnvio;
-	private List<ComboItem> plantillas;
+	private String porDefecto;
+	private List<ComboItem> plantillas = new ArrayList<ComboItem>();
 	
 	public String getIdModeloComunicacion() {
 		return idModeloComunicacion;
@@ -104,11 +105,11 @@ public class ModelosComunicacionItem {
 	public void setIdTipoEnvio(String idTipoEnvio) {
 		this.idTipoEnvio = idTipoEnvio;
 	}
-	public String getTipoEnvio() {
-		return tipoEnvio;
+	public String getPorDefecto() {
+		return porDefecto;
 	}
-	public void setTipoEnvio(String tipoEnvio) {
-		this.tipoEnvio = tipoEnvio;
+	public void setPorDefecto(String porDefecto) {
+		this.porDefecto = porDefecto;
 	}
 	public List<ComboItem> getPlantillas() {
 		return plantillas;
