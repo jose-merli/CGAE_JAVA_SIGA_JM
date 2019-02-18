@@ -39,10 +39,10 @@ public class CenTiposModificacionesSqlExtendsProvider {
 				+ " ) UNION ("
 				+ SolModifSQLUtils.getDataPhotoRequest("35", solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
 				+ " ) UNION ("
-				+ SolModifSQLUtils.getDataPhotoRequest("60", solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+				+ SolModifSQLUtils.getDataChangeFotoRequest("60", solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
 				+ " ) UNION ("
 				+ SolModifSQLUtils.getDataFileRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion) + " )";
-
+				
 		return consultaEspecifica;
 	}
 
