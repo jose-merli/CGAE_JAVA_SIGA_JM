@@ -11,9 +11,16 @@ public class DestinatarioItem {
 	private String nombre;
 	private String correoElectronico;
 	private String movil;
+	private String domicilio;
 	private ArrayList<ConsultaEnvioItem> listaConsultasEnvio;
 	
 	
+	public String getDomicilio() {
+		return domicilio;
+	}
+	public void setDomicilio(String domicilio) {
+		this.domicilio = domicilio;
+	}
 	public String getCorreoElectronico() {
 		return correoElectronico;
 	}

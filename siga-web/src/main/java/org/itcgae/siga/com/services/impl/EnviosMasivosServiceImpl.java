@@ -28,28 +28,23 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.com.services.IColaEnvios;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.EnvDestinatarios;
-import org.itcgae.siga.db.entities.EnvDestinatariosExample;
 import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.EnvDocumentosExample;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
 import org.itcgae.siga.db.entities.EnvEnvioprogramadoKey;
 import org.itcgae.siga.db.entities.EnvEnvios;
-import org.itcgae.siga.db.entities.EnvEnviosExample;
 import org.itcgae.siga.db.entities.EnvEnviosKey;
 import org.itcgae.siga.db.entities.EnvEnviosgrupocliente;
 import org.itcgae.siga.db.entities.EnvEnviosgrupoclienteExample;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvioExample;
-import org.itcgae.siga.db.entities.EnvPlantillaremitentes;
-import org.itcgae.siga.db.entities.EnvPlantillaremitentesExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
-import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
 import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
@@ -423,11 +418,11 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 						switch (envio.getIdtipoenvios().toString()) {
 
 						case SigaConstants.TIPO_ENVIO_CORREOELECTRONICO:
-							_colaEnvios.preparaEnvioMail(envio);
+							_colaEnvios.preparaCorreo(envio);
 							LOGGER.info("Correo electrónico enviado con éxito");
 							break;
 						case SigaConstants.TIPO_ENVIO_CORREO_ORDINARIO:
-							//_enviosService.envioCorreoOrdinario();
+							_colaEnvios.preparaCorreo(envio);
 							LOGGER.info("Correo ordinario generado con éxito");
 							break;
 						case SigaConstants.TIPO_ENVIO_SMS:

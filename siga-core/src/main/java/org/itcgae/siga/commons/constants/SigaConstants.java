@@ -103,6 +103,11 @@ public class SigaConstants {
 	public static final Short ENVIO_PROCESANDO = 5;
 	public static final Short ENVIO_ARCHIVADO = 6;
 	
+	//tipos envio
+	public static final Short ID_ENVIO_MAIL = 1;
+	public static final Short ID_ENVIO_CORREO_ORDINARIO = 2;
+	public static final Short ID_ENVIO_SMS = 4;
+	public static final Short ID_ENVIO_BURO_SMS = 5;
 	
 
 	public enum ERROR_SERVER {

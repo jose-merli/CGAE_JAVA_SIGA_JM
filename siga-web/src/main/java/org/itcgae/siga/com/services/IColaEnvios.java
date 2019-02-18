@@ -1,11 +1,10 @@
-package org.itcgae.siga.com.services.impl;
+package org.itcgae.siga.com.services;
 
 import org.itcgae.siga.db.entities.EnvEnvios;
 
 public interface IColaEnvios {
 	
 	public void execute();
-	public void preparaEnvioMail(EnvEnvios envio) throws Exception;
+	public void preparaCorreo(EnvEnvios envio) throws Exception;
 	public void preparaEnvioSMS(EnvEnvios envio, boolean isBuroSMS);
-
 }
