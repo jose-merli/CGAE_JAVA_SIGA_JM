@@ -161,11 +161,12 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 
 
 	@Override
-	public Error duplicarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem modeloComunicacion) {
+	public String duplicarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem modeloComunicacion) {
 		
 		LOGGER.info("duplicarModeloComunicaciones() -> Entrada al servicio para duplicar un modelos de comunicación");
 		
 		Error respuesta = new Error();
+		String idDuplicado = "";
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -199,6 +200,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					modelo.setIdinstitucion(Short.parseShort(modeloComunicacion.getIdInstitucion()));
 					
 					modModelocomunicacionMapper.insert(modelo);
+					idDuplicado = String.valueOf(modelo.getIdmodelocomunicacion()==null ? "" : modelo.getIdmodelocomunicacion());
 					
 					//Tabla mod_modelo_perfiles
 					ModModeloPerfilesExample example = new ModModeloPerfilesExample();
@@ -310,7 +312,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			}
 		}
 		LOGGER.info("duplicarModeloComunicaciones() -> Salida del servicio para duplicar el modelo de comunicación");
-		return respuesta;
+		return idDuplicado;
 	}
 
 
@@ -1041,5 +1043,22 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		
 		LOGGER.info("obtenerPlantillasComunicacion() -> Salida del servicio para obtener las plantillas para añadir a la comunicación");
 		return plantilla;
+	}
+	
+	@Override
+	public ModelosComunicacionItem modeloYComunicacionesSearchModelo(HttpServletRequest request, String idModelo) {
+		
+		LOGGER.info("modeloYComunicacionesSearchModelo() -> Entrada al servicio para busqueda de modelos de comunicación");
+		
+		ModelosComunicacionItem modeloComunicacionItem = new ModelosComunicacionItem();
+
+		try {
+			modeloComunicacionItem = modModeloComunicacionExtendsMapper.selectModelo(idModelo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		LOGGER.info("modeloYComunicacionesSearchModelo() -> Salida del servicio para busqueda de modelos de comunicación");
+		return modeloComunicacionItem;
 	}
 }

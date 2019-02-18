@@ -22,7 +22,7 @@ public interface IModelosYcomunicacionesService {
 
 	
 	public DatosModelosComunicacionesDTO modeloYComunicacionesSearch(HttpServletRequest request, DatosModelosComunicacionesSearch filtros, boolean historico);
-	public Error duplicarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem modeloComunicacion);
+	public String duplicarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem modeloComunicacion);
 	public Error borrarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem[] modeloComunicacion);
 	public ComboDTO obtenerPerfilesModelo(HttpServletRequest request, String idInstitucion, String idModeloComunicacion);
 	public ComboDTO colegiosModelo(HttpServletRequest request);
@@ -40,5 +40,6 @@ public interface IModelosYcomunicacionesService {
 	public PlantillaEnvioItem obtenerTipoEnvioPlantilla(HttpServletRequest request, String idPlantilla);
 	
 	public Error rehabilitarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem[] modeloComunicacion);
+	public ModelosComunicacionItem modeloYComunicacionesSearchModelo(HttpServletRequest request, String idModelo);
 	
 }

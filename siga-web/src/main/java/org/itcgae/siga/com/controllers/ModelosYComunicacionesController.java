@@ -46,6 +46,12 @@ public class ModelosYComunicacionesController {
 		return new ResponseEntity<DatosModelosComunicacionesDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/searchModelo", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ModelosComunicacionItem> searchCourse(@RequestBody String idModelo, HttpServletRequest request) {
+		ModelosComunicacionItem response = _modelosYcomunicacionesService.modeloYComunicacionesSearchModelo(request, idModelo);
+		return new ResponseEntity<ModelosComunicacionItem>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/search/historico",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<DatosModelosComunicacionesDTO> modelosComunicacionHistoricoSearch(@RequestParam("numPagina") int numPagina, HttpServletRequest request, @RequestBody DatosModelosComunicacionesSearch filtros) {
 		
@@ -54,14 +60,19 @@ public class ModelosYComunicacionesController {
 	}
 	
 	@RequestMapping(value = "/duplicar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> duplicarModelo(HttpServletRequest request, @RequestBody ModelosComunicacionItem modelo) {
+	ResponseEntity<String> duplicarModelo(HttpServletRequest request, @RequestBody ModelosComunicacionItem modelo) {
 		
-		Error response = _modelosYcomunicacionesService.duplicarModeloComunicaciones(request, modelo);
+		String response = _modelosYcomunicacionesService.duplicarModeloComunicaciones(request, modelo);
 
-		if(response.getCode() == 200)
-			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		if(response != null && !response.equals(""))
+			return new ResponseEntity<String>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<String>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+//		if(response.getCode() == 200)
+//			return new ResponseEntity<Error>(response, HttpStatus.OK);
+//		else
+//			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/borrar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)

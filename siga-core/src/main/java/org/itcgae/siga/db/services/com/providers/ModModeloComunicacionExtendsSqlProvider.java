@@ -127,4 +127,34 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		return sql.toString();
 	}
 
+	public String selectModelo(String idModelo){
+		
+		SQL sql = new SQL();
+						
+		sql.SELECT("modelo.IDMODELOCOMUNICACION");
+		sql.SELECT("modelo.NOMBRE");
+		sql.SELECT("modelo.VISIBLE");
+		sql.SELECT("modelo.ORDEN");
+		sql.SELECT("modelo.IDINSTITUCION");
+		sql.SELECT("modelo.DESCRIPCION");
+		sql.SELECT("modelo.FECHABAJA");
+		sql.SELECT("modelo.PRESELECCIONAR");
+		sql.SELECT("modelo.IDCLASECOMUNICACION");
+		sql.SELECT("modelo.FECHABAJA");
+		sql.SELECT("clase.NOMBRE AS NOMBRECLASE");
+		sql.SELECT("inst.ABREVIATURA");
+		sql.SELECT("modelo.PORDEFECTO");
+		
+		sql.FROM("MOD_MODELOCOMUNICACION modelo");
+		
+		sql.INNER_JOIN("MOD_CLASECOMUNICACIONES clase ON modelo.IDCLASECOMUNICACION = clase.IDCLASECOMUNICACION");
+		sql.INNER_JOIN("CEN_INSTITUCION inst ON inst.IDINSTITUCION = modelo.IDINSTITUCION");
+		
+		sql.WHERE("modelo.IDMODELOCOMUNICACION = '"+ idModelo +"'");
+		sql.WHERE("modelo.FECHABAJA is NULL");
+
+		sql.ORDER_BY("IDMODELOCOMUNICACION ASC");
+
+		return sql.toString();
+	}
 }
