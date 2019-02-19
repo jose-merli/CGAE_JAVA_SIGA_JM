@@ -21,5 +21,5 @@ public interface ForRolesExtendsMapper extends ForRolesMapper{
 		@Result(column = "IDROL", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
-	List<ComboItem> getRolesTrainers(String idInstitucion);
+	List<ComboItem> getRolesTrainers(String idInstitucion, String idLenguaje);
 }

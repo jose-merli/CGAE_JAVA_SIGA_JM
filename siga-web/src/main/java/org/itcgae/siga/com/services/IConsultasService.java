@@ -1,6 +1,7 @@
 package org.itcgae.siga.com.services;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import org.itcgae.siga.DTOs.com.ConsultasSearch;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 
 public interface IConsultasService {
@@ -54,4 +56,8 @@ public interface IConsultasService {
 
 	public String procesarEjecutarConsulta(AdmUsuarios usuario, String sentencia, List<CampoDinamicoItem> listaCampos,
 			boolean sustituyeInstitucion) throws ParseException;
+
+	public ArrayList<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, String consulta) throws Exception;
+
+	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws ParseException, SigaExceptions;
 }

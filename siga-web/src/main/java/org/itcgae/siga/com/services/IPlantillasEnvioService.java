@@ -17,7 +17,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 
 public interface IPlantillasEnvioService {
 	/**Combos**/
-	public ComboDTO getComboConsultas(HttpServletRequest request);
+	public ComboDTO getComboConsultas(HttpServletRequest request, String filtro);
 	
 	/****/
 	public PlantillasEnvioDTO PlantillasEnvioSearch(HttpServletRequest request, PlantillaEnvioSearchItem filtros);

@@ -28,12 +28,11 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
+import org.itcgae.siga.com.services.IColaEnvios;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.EnvDestinatarios;
-import org.itcgae.siga.db.entities.EnvDestinatariosExample;
 import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.EnvDocumentosExample;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
@@ -44,11 +43,8 @@ import org.itcgae.siga.db.entities.EnvEnviosgrupocliente;
 import org.itcgae.siga.db.entities.EnvEnviosgrupoclienteExample;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvioExample;
-import org.itcgae.siga.db.entities.EnvPlantillaremitentes;
-import org.itcgae.siga.db.entities.EnvPlantillaremitentesExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
-import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
 import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
@@ -102,10 +98,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	private EnvHistoricoestadoenvioMapper _envHistoricoestadoenvioMapper;
 	
 	@Autowired
-	private EnvDestinatariosMapper _envDestinatariosMapper;
-	
-	
-	@Autowired
 	private EnvPlantillaEnviosExtendsMapper _envPlantillaEnviosExtendsMapper;
 	
 	@Autowired
@@ -128,6 +120,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	@Autowired
 	private EnvEnviosGrupoClienteExtendsMapper _envEnviosGrupoClienteExtendsMapper;
+	
+	@Autowired
+	private IColaEnvios _colaEnvios;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -396,7 +391,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	}
 
 	@Override
-	public Error enviar(HttpServletRequest request, List<EnvioProgramadoDto> envios) {
+	public Error enviar(HttpServletRequest request, EnvioProgramadoDto[] enviosDTO) {
 		
 		LOGGER.info("enviar() -> Entrada al servicio para enviar");
 		
@@ -406,7 +401,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
+		EnvEnvios envio = null;
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -415,18 +410,42 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
-					for(int i = 0; i <= envios.size();i++){
-						EnvDestinatariosExample example = new EnvDestinatariosExample();
-						example.createCriteria().andIdenvioEqualTo(Long.parseLong(envios.get(i).getIdEnvio())).andIdinstitucionEqualTo(usuario.getIdinstitucion());
-						List<EnvDestinatarios> destinatarios = _envDestinatariosMapper.selectByExample(example);
+					for(int i = 0; i < enviosDTO.length ;i++){
+						EnvEnviosKey key = new EnvEnviosKey();
+						key.setIdenvio(Long.valueOf(enviosDTO[i].getIdEnvio()));
+						key.setIdinstitucion(usuario.getIdinstitucion());
+						envio = _envEnviosMapper.selectByPrimaryKey(key);
+						switch (envio.getIdtipoenvios().toString()) {
+
+						case SigaConstants.TIPO_ENVIO_CORREOELECTRONICO:
+							_colaEnvios.preparaCorreo(envio);
+							LOGGER.info("Correo electrónico enviado con éxito");
+							break;
+						case SigaConstants.TIPO_ENVIO_CORREO_ORDINARIO:
+							_colaEnvios.preparaCorreo(envio);
+							LOGGER.info("Correo ordinario generado con éxito");
+							break;
+						case SigaConstants.TIPO_ENVIO_SMS:
+							_colaEnvios.preparaEnvioSMS(envio, false);
+							LOGGER.info("SMS enviado con éxito");
+							break;
+						case SigaConstants.TIPO_ENVIO_BUROSMS:
+							_colaEnvios.preparaEnvioSMS(envio, true);
+							LOGGER.info("BURO SMS enviado con éxito");
+							break;
+						}
 					}
 					respuesta.setCode(200);
-					respuesta.setDescription("Envios masivos enviados correctamente");
-					respuesta.setMessage("Updates correcto");
+					respuesta.setDescription("El envio se ha lanzado correctamente");
+					respuesta.setMessage("Envio lanzado");
 				}catch(Exception e){
+					envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
+					envio.setFechamodificacion(new Date());
+					_envEnviosMapper.updateByPrimaryKey(envio);
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
 					respuesta.setMessage("Error");
+					e.printStackTrace();
 				}
 				
 				
@@ -586,6 +605,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				
 				try{
 					AdmUsuarios usuario = usuarios.get(0);
+					
 					//tabla env_enviosplantillas
 					EnvPlantillasenviosKey PlantillaKey = new EnvPlantillasenviosKey();
 					PlantillaKey.setIdinstitucion(idInstitucion);
@@ -652,15 +672,15 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					}
 					
 					//env_plantilla remitentes
-					EnvPlantillaremitentesExample keyRemitentesExample = new EnvPlantillaremitentesExample();
-					keyRemitentesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdplantillaenviosEqualTo(idPlantillaEnvio).andIdtipoenviosEqualTo(envio.getIdtipoenvios());
-					List<EnvPlantillaremitentes> plantillaRemitentes = _envPlantillaremitentesMapper.selectByExample(keyRemitentesExample);
-					for (EnvPlantillaremitentes envPlantillaremitentes : plantillaRemitentes) {
-						envPlantillaremitentes.setIdplantillaenvios(idPlantillaNuevo);
-						envPlantillaremitentes.setFechamodificacion(new Date());
-						envPlantillaremitentes.setUsumodificacion(usuario.getIdusuario());
-						_envPlantillaremitentesMapper.insert(envPlantillaremitentes);
-					}
+//					EnvPlantillaremitentesExample keyRemitentesExample = new EnvPlantillaremitentesExample();
+//					keyRemitentesExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdplantillaenviosEqualTo(idPlantillaEnvio).andIdtipoenviosEqualTo(envio.getIdtipoenvios());
+//					List<EnvPlantillaremitentes> plantillaRemitentes = _envPlantillaremitentesMapper.selectByExample(keyRemitentesExample);
+//					for (EnvPlantillaremitentes envPlantillaremitentes : plantillaRemitentes) {
+//						envPlantillaremitentes.setIdplantillaenvios(idPlantillaNuevo);
+//						envPlantillaremitentes.setFechamodificacion(new Date());
+//						envPlantillaremitentes.setUsumodificacion(usuario.getIdusuario());
+//						_envPlantillaremitentesMapper.insert(envPlantillaremitentes);
+//					}
 					
 					//env_grupocliente
 					EnvEnviosgrupoclienteExample gruposExample = new EnvEnviosgrupoclienteExample();

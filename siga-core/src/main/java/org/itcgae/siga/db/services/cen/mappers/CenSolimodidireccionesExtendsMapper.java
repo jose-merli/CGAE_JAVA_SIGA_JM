@@ -124,7 +124,7 @@ public interface CenSolimodidireccionesExtendsMapper extends CenSolimodidireccio
 
 	
 	
-	@SelectProvider(type = CenSolicitudmodificacioncvSqlExtendsProvider.class, method = "getMaxIdSolicitud")
+	@SelectProvider(type = CenSolimodidireccionesSqlExtendsProvider.class, method = "getMaxIdSolicitud")
 	@Results({ @Result(column = "IDSOLICITUD", property = "newId", jdbcType = JdbcType.VARCHAR)
 	
 	})NewIdDTO getMaxIdSolicitud(String idInstitucion, String idPersona);

@@ -16,7 +16,7 @@ public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSq
 		sql.WHERE("idServicio = " + idServicio);
 		sql.WHERE("idserviciosinstitucion = " + idServicioInstitucion);
 		sql.WHERE("IDPERIODICIDAD = " + idPeriocidad );
-		
+		  
 		return sql.toString();
 	}
 	
@@ -24,15 +24,18 @@ public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSq
 
 		SQL sql = new SQL();
 
-		sql.SELECT("pys.DESCRIPCION");
+		sql.SELECT("SERVICIOINST.DESCRIPCION");
 		sql.SELECT("pys.VALOR");
 		sql.SELECT("pys.PORDEFECTO");
 		sql.SELECT("cat.DESCRIPCION as PERIOCIDAD");
-		sql.FROM("PYS_PRECIOSSERVICIOS pys");
+		sql.FROM("PYS_SERVICIOS SERVICIO");
+		sql.INNER_JOIN("PYS_SERVICIOSINSTITUCION SERVICIOINST ON SERVICIOINST.IDSERVICIO = SERVICIO.IDSERVICIO AND SERVICIO.IDTIPOSERVICIOS = SERVICIOINST.IDTIPOSERVICIOS ");
+		sql.INNER_JOIN("PYS_PRECIOSSERVICIOS pys ON PYS.IDSERVICIO = SERVICIO.IDSERVICIO AND SERVICIO.IDTIPOSERVICIOS = PYS.IDTIPOSERVICIOS"
+												+ "	 AND PYS.IDSERVICIOSINSTITUCION = SERVICIOINST.IDSERVICIOSINSTITUCION");
 		sql.INNER_JOIN("PYS_PERIODICIDAD per on per.IDPERIODICIDAD = pys.IDPERIODICIDAD");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS cat ON per.DESCRIPCION = cat.IDRECURSO and idLenguaje = '" + idLenguaje + "'");
 		sql.WHERE("pys.idInstitucion =" + idInstitucion);
-		sql.WHERE("pys.descripcion like '%" + codigoCurso + "%'");
+		sql.WHERE("SERVICIO.descripcion like '%" + codigoCurso + "%'");
 		sql.WHERE("pys.idServicio = " + idServicio);
 		
 		return sql.toString();

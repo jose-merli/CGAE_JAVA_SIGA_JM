@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -76,4 +77,9 @@ public interface ModModeloComunicacionExtendsMapper {
 		@Result(column = "LABEL", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> selectTipoEnvioPlantilla(String idLenguaje, String idPlantilla);
+
+	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "comprobarNombreDuplicado")
+	@Results({ @Result(column = "NOMBRE", property = "valor", jdbcType = JdbcType.VARCHAR) 
+	})
+	StringDTO comprobarNombreDuplicado(String nombreModelo);
 }

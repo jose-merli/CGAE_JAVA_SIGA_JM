@@ -463,7 +463,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 						consulta.setObservaciones(consultaDTO.getDescripcion());
 						consulta.setDescripcion(consultaDTO.getNombre());
 						consulta.setIdobjetivo(Long.parseLong(consultaDTO.getIdObjetivo()));
+
 						if(consultaDTO.getIdClaseComunicacion() != null && !"".equalsIgnoreCase(consultaDTO.getIdClaseComunicacion())){
+
 							consulta.setIdclasecomunicacion(Short.valueOf(consultaDTO.getIdClaseComunicacion()));
 						}						
 						consulta.setGeneral(consultaDTO.getGenerica());
@@ -801,41 +803,57 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	public boolean comprobarCamposDestinarios (String sentencia){
 		boolean camposIncorrectos = false;
-		sentencia = sentencia.toUpperCase();
 		
-		if(!sentencia.contains("IDINSTITUCION")){
+		if(sentencia != null){
+			sentencia = sentencia.toUpperCase();
+
+			// Obtenemos el SELECT de la consulta
+			int indexInicio = sentencia.indexOf("<SELECT>")+8;
+			int indexFinal = sentencia.indexOf("</SELECT>");
+			if(indexInicio > -1 && indexFinal > -1){
+				String select = sentencia.substring(indexInicio, indexFinal);
+				
+				if(!select.contains("IDINSTITUCION")){
+					camposIncorrectos = true;
+				}
+				if(!select.contains("IDPERSONA")){
+					camposIncorrectos = true;
+				}
+				if(!select.contains("CODIGOPOSTAL")){
+					camposIncorrectos = true;
+				}
+				if(!select.contains("CORREOELECTRONICO")){
+					camposIncorrectos = true;
+				}
+				if(!select.contains("DOMICILIO")){
+					camposIncorrectos = true;
+				}
+				if(!select.contains("MOVIL")){
+					camposIncorrectos = true;
+				}
+				if(!select.contains("FAX1")){
+					camposIncorrectos = true;
+				}
+				if(!select.contains("FAX2")){
+					camposIncorrectos = true;
+				}
+				if(!select.contains("IDPAIS")){
+					camposIncorrectos = true;
+				}
+				if(!select.contains("IDPROVINCIA")){
+					camposIncorrectos = true;
+				}
+				if(!select.contains("IDPOBLACION")){
+					camposIncorrectos = true;
+				}
+				
+			}else{
+				camposIncorrectos = true;
+			}
+		}else{
 			camposIncorrectos = true;
 		}
-		if(!sentencia.contains("IDPERSONA")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("CODIGOPOSTAL")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("CORREOELECTRONICO")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("DOMICILIO")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("MOVIL")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("FAX1")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("FAX2")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("IDPAIS")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("IDPROVINCIA")){
-			camposIncorrectos = true;
-		}
-		if(!sentencia.contains("IDPOBLACION")){
-			camposIncorrectos = true;
-		}
+		
 		
 		return camposIncorrectos;
 	}
@@ -857,15 +875,17 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	public boolean comprobarClaves(String sentencia, String idClaseComunicacion){
 		boolean incorrecta = false;
-		
+		String sentenciaUpper = sentencia.toUpperCase();
 		List<KeyItem> listaKeys = null;
 		sentencia = sentencia.toUpperCase();
 		
 		if(idClaseComunicacion != null && !"".equals(idClaseComunicacion)){
 			listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
 			for(KeyItem key : listaKeys){
+
 				String etiquetaKey = SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + key.getNombre().toUpperCase() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO;
 				if(sentencia.indexOf(etiquetaKey) == -1){
+
 					incorrecta = true;
 				}
 			}
@@ -876,7 +896,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	public boolean comprobarObjetivo(String sentencia, String idObjetivo){
 		boolean incorrecto = false;
-		
+		sentencia = sentencia.toUpperCase();
 		if(Long.parseLong(idObjetivo) == SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo().longValue()){
 			incorrecto = comprobarCamposDestinarios(sentencia);
 		}	
@@ -914,7 +934,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 			// Si ya tenía un select introducido le añadimos los daots de direccion
 			if(indexFinal + 9 <= sentencia.length() && sentencia.substring(indexInicio, indexFinal).toUpperCase().indexOf("SELECT") > -1){
 				String selectConsulta = sentencia.substring(indexInicio, indexFinal);
-				sentencia = sentencia.substring(0, indexInicio) + selectConsulta + " AND " + select + sentencia.substring(indexFinal, sentencia.length());
+				sentencia = sentencia.substring(0, indexInicio) + selectConsulta + ", " + select + sentencia.substring(indexFinal, sentencia.length());
 			}else{
 				sentencia = sentencia.substring(0, indexInicio) + " SELECT " + select + sentencia.substring(indexFinal, sentencia.length());
 			}			
@@ -1234,11 +1254,11 @@ public class ConsultasServiceImpl implements IConsultasService{
 				List<CampoDinamicoItem> listaCampos = null;
 				try {
 					
-					List<KeyItem> listaKeys = null;
+					/*List<KeyItem> listaKeys = null;
 					
 					if(idClaseComunicacion != null){
 						listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
-					}				
+					}*/		
 					
 					listaCampos = obtenerCamposDinamicos(usuario, consulta);
 					response.setCamposDinamicos(listaCampos);
@@ -1257,9 +1277,10 @@ public class ConsultasServiceImpl implements IConsultasService{
 		return response;
 	}
 	
-	public List<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, String consulta) throws Exception{
+	@Override
+	public ArrayList<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, String consulta) throws Exception{
 		
-		List<CampoDinamicoItem> listaCamposDinamicos = new ArrayList<CampoDinamicoItem>();
+		ArrayList<CampoDinamicoItem> listaCamposDinamicos = new ArrayList<CampoDinamicoItem>();
 		CampoDinamicoItem campoDinamico = null;
 		
 		List<String> tipoDatos = new ArrayList<String>();
@@ -2059,6 +2080,18 @@ public class ConsultasServiceImpl implements IConsultasService{
 		}
 		
 		return select;
+	}
+	
+	@Override
+	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws ParseException, SigaExceptions{
+		
+		List<Map<String,Object>> result = null;
+
+		Map<String, String> mapConsulta = obtenerMapaConsulta(sentencia);		
+		
+		result = _conConsultasExtendsMapper.ejecutarConsulta(mapConsulta);	
+		
+		return result;
 	}
 	
 }

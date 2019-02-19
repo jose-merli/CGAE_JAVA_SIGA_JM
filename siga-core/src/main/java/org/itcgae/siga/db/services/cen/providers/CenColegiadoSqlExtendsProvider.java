@@ -393,6 +393,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("decode (situacionresidente, 1, 'Si', 0, 'No') as residenteInscrito");
 		sql.SELECT("observaciones");
 		sql.SELECT("TO_CHAR(fechaestado,'DD/MM/YYYY') AS fechaestado");
+		sql.SELECT("fechaestado AS fechaestadodate");
 		sql.SELECT("colest.idestado AS idEstado");
 
 		sql.FROM("cen_colegiado col");
@@ -409,7 +410,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 		// sql1.WHERE("dir.fechabaja is null");
 
-		sql.ORDER_BY("fechaestado desc");
+		sql.ORDER_BY("fechaestadodate desc");
 		// sql.ORDER_BY("per.nombre");
 
 		return sql.toString();
@@ -486,7 +487,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("per.nifcif AS nif");
 		sql.SELECT("col.ncolegiado AS numeroColegiado");
 		sql.SELECT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2)) AS nombre");
-		sql.SELECT("DECODE (col.situacionresidente, '0', 'SI', 'NO') AS residenteInscrito");
+		sql.SELECT("DECODE (col.situacionresidente,0,'No', 'Sí') AS residenteInscrito");
 		sql.SELECT("cat.descripcion AS estadoColegial");
 		sql.SELECT("TO_CHAR(per.fechanacimiento,'DD/MM/YYYY') AS fechaNacimiento");
 		sql.SELECT("dir.correoelectronico AS correo");

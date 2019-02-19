@@ -110,6 +110,14 @@ public class ModelosYComunicacionesController {
 		
 	}
 	
+	@RequestMapping(value = "/detalle/datosGenerales/comprobarNom",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	Boolean comprobarNombreModeloComunicacion(HttpServletRequest request, @RequestBody TarjetaModeloConfiguracionDTO datosTarjeta) {
+		
+		Boolean respuesta = _modelosYcomunicacionesService.comprobarNombreModeloComunicacion(request, datosTarjeta);
+		
+		return respuesta;
+	}
+	
 	@RequestMapping(value = "/detalle/perfiles",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> perfiles(HttpServletRequest request) {
 		

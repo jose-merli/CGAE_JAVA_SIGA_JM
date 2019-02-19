@@ -48,7 +48,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		}
 		
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
-			sql.WHERE("modelo.NOMBRE LIKE '%"+filtros.getNombre()+"%'");
+			sql.WHERE("lower(modelo.NOMBRE) LIKE lower('%"+filtros.getNombre()+"%')");
 		}
 		if(filtros.getPreseleccionar() != null && !filtros.getPreseleccionar().trim().equals("")){
 			sql.WHERE("modelo.PRESELECCIONAR = '"+filtros.getPreseleccionar()+"'");	
@@ -57,7 +57,10 @@ public class ModModeloComunicacionExtendsSqlProvider {
 			sql.WHERE("modelo.VISIBLE = '"+filtros.getVisible()+"'");	
 		}
 		
+
+
 		sql.WHERE("(modelo.IDINSTITUCION = '"+ idInstitucion +"' OR (modelo.IDINSTITUCION = '2000' AND modelo.PORDEFECTO = 'SI'))");
+
 		
 		if(historico){
 			if(filtros.getFechaBaja() != null){
@@ -88,6 +91,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 	   sql.SELECT("MODELO.IDCLASECOMUNICACION, MODELO.IDMODELOCOMUNICACION, MODELO.NOMBRE");
 	   sql.FROM("MOD_MODELOCOMUNICACION MODELO");
 	   sql.WHERE("MODELO.IDCLASECOMUNICACION IN (" + idClaseComunicacion + ")");
+	   sql.ORDER_BY("MODELO.ORDEN");
 	   
 	   return sql.toString();
 	}
@@ -124,6 +128,17 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.FROM("MOD_MODELOCOMUNICACION MODELO");
 		sql.WHERE("MODELO.IDCLASECOMUNICACION IN ("+idClasesComunicacion+")");
 			   
+		return sql.toString();
+	}
+	
+	
+	public String comprobarNombreDuplicado(String nombreModelo){
+		
+		SQL sql = new SQL();
+		sql.SELECT("max((nvl(SUBSTR(nombre,LENGTH('" + nombreModelo + "')+1,LENGTH(nombre)),0))+1) as NOMBRE");
+		sql.FROM("mod_modelocomunicacion");
+		sql.WHERE("lower(nombre) like lower('" + nombreModelo + "%')");
+		   
 		return sql.toString();
 	}
 

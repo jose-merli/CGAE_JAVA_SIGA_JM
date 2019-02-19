@@ -34,6 +34,10 @@ public class SigaConstants {
 	public static String DB_TRUE = "1";
 	public static final String IP_ACCESO_SERVICIO_CARGAS = "IP_ACCESO_SERVICIO_CARGAS";
 	public static final String ACTIVAR_CLIENTE_SERVICIO_CARGAS = "ACTIVAR_CLIENTE_SERVICIO_CARGAS";
+	public static final String DESFASE_PROGRAMACION_ENVIO_MINUTOS = "DESFASE_PROGRAMACION_ENVIO_MINUTOS";
+	public static final String NUM_MAXIMO_MODELOS_SELECCIONADOS = "dialogo.modelocomunicacion.seleccionMax";
+	public static final String FICHERO_SIGA = "SIGA";
+	public static final String LENGUAJE_DEFECTO = "1";
 	
 	// DOCUMENTOS
 	
@@ -43,14 +47,17 @@ public class SigaConstants {
 	public static String rutaficherosInformesYcomunicaciones = "/FILERMSA1000/SIGA/ficheros/archivo/";
 	public static String carpetaDocumentosEnvio = "/documentosEnvio/";
 	public static String carpetaPlantillasDocumento = "/plantillaDocumentos/";
+	public static String carpetaTmp = "/tmp/";
 	public static String rutaExcelConsultaTemp= "/FILERMSA1000/SIGA/ficheros/archivo/tempExcel/";
 	public static String nombreExcelConsulta = "ResultadoConsulta";
+	public static String nombreZip = "DocumentosComunicacion";
+	public static String rutaLicencia = "/WEB-INF/Aspose.Words.lic";
 	
 	public static String REPLACECHAR_PREFIJO_SUFIJO = "%%";
 	public static String CLAVES_QUERY = "CLAVES";
 	public static String WHERE_VALUE = "whereValue";
-	public static String CAMPO_NOMBRE = "nombre";
-	public static String CAMPO_APELLIDOS = "apellidos";
+	public static String CAMPO_NOMBRE = "NOMBRE";
+	public static String CAMPO_APELLIDOS = "APELLIDOS";
 	public static String CAMPO_APELLIDO1 = "APELLIDO1";
 	public static String CAMPO_APELLIDO2 = "APELLIDO2";
 	public static String CAMPO_NUM_COLEGIADO = "NCOLEGIADO";
@@ -82,6 +89,26 @@ public class SigaConstants {
 	public static final String NOMBRETABLA_CEN_COLEGIADO = "CEN_COLEGIADO";
 	
 	public static final String ECOS_PREFIJO_ESPANA = "(+34)";
+	public static final String TIPO_ENVIO_CORREOELECTRONICO = "1";
+	public static final String TIPO_ENVIO_CORREO_ORDINARIO = "2";
+	public static final String TIPO_ENVIO_SMS = "4";
+	public static final String TIPO_ENVIO_BUROSMS = "5";
+	public static final String ID_OBJETIVO_DESTINATARIOS ="1";
+	
+	//estados envio
+	public static final Short ENVIO_PENDIENTE_MANUAL = 1;
+	public static final Short ENVIO_PROCESADO = 2;
+	public static final Short ENVIO_PROCESADO_CON_ERRORES = 3;
+	public static final Short ENVIO_PENDIENTE_AUTOMATICO = 4;
+	public static final Short ENVIO_PROCESANDO = 5;
+	public static final Short ENVIO_ARCHIVADO = 6;
+	
+	//tipos envio
+	public static final Short ID_ENVIO_MAIL = 1;
+	public static final Short ID_ENVIO_CORREO_ORDINARIO = 2;
+	public static final Short ID_ENVIO_SMS = 4;
+	public static final Short ID_ENVIO_BURO_SMS = 5;
+	
 
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(
@@ -670,5 +697,23 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final long CALENDARIO_GENERAL = 1; 
 	public static final long CALENDARIO_LABORAL = 2;
 	public static final long CALENDARIO_FORMACION = 3; 
+
+
+	// AVISOS PARA NOTIFICACIONES EN EVENTOS
+	public static final String AVISO_CANCELAR_CURSO = "1";
+	public static final String AVISO_MODIFICAR_CURSO = "2";
+	public static final String AVISO_PLAZAS_DISPONIBLES = "3";
+	public static final String AVISO_CANCELAR_SESION = "4";
+	public static final String AVISO_MODIFICAR_SESION = "5";
+	
+	//NOTIFICACIONES
+	public static final long NOTIFICACION_TIPOCUANDO_ANTES = 1;
+	public static final long NOTIFICACION_TIPOCUANDO_DESPUES = 2;
+	
+	public static final long NOTIFICACION_HORAS = 1;
+	public static final long NOTIFICACION_MINUTOS = 2;
+	public static final long NOTIFICACION_SEGUNDOS = 3;
+	
+
 
 }

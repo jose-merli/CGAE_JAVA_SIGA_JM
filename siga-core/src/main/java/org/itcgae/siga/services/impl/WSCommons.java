@@ -30,6 +30,7 @@ import org.itcgae.siga.DTOs.cen.DatosIntegrantesWS;
 import org.itcgae.siga.DTOs.cen.SociedadesBajaDTO;
 import org.itcgae.siga.DTOs.cen.SociedadesEditadasDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.ERROR_SERVER;
@@ -458,6 +459,23 @@ public class WSCommons {
 		}
 		zos.close();
 		return baos.toByteArray();
+	}
+	
+	public static byte[] zipBytes(List<DatosDocumentoItem> ficheros) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ZipOutputStream zos = new ZipOutputStream(baos);
+
+		for (DatosDocumentoItem fichero : ficheros) {
+			ZipEntry entry = new ZipEntry(fichero.getFileName());
+			entry.setSize(fichero.getDatos().length);
+			zos.putNextEntry(entry);
+			zos.write(fichero.getDatos());
+			zos.closeEntry();
+		}
+		zos.close();
+
+		return baos.toByteArray();
+
 	}
 
 	

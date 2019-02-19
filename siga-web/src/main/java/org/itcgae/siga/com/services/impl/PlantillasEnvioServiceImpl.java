@@ -81,7 +81,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	private ConConsultaMapper _conConsultaMapper;
 
 	@Override
-	public ComboDTO getComboConsultas(HttpServletRequest request) {
+	public ComboDTO getComboConsultas(HttpServletRequest request, String filtro) {
 		LOGGER.info("getComboConsultas() -> Entrada al servicio para obtener las consultas disponibles");
 		
 		// Conseguimos información del usuario logeado
@@ -100,7 +100,8 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			
 			if (null != usuarios && usuarios.size() > 0) {
 
-				comboItems = _conConsultasExtendsMapper.selectConsultasDisponibles(idInstitucion, null, null);
+				comboItems = _conConsultasExtendsMapper.selectConsultasDisponiblesFiltro(idInstitucion, null, null, filtro);
+
 				if(null != comboItems && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
 					element.setLabel("");
@@ -237,6 +238,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						plantilla.setFechamodificacion(new Date());
 						plantilla.setUsumodificacion(usuario.getIdusuario());
 						_envPlantillasenviosMapper.updateByPrimaryKeyWithBLOBs(plantilla);
+						respuesta.setMessage(plantilla.getIdplantillaenvios().toString());
 					}else{
 						EnvPlantillasenviosWithBLOBs plantilla = new EnvPlantillasenviosWithBLOBs();
 						NewIdDTO id = _envPlantillaEnviosExtendsMapper.selectMaxIDPlantillas();
@@ -423,7 +425,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			LOGGER.info("detalleConsultas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
-					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(idInstitucion, consulta.getIdPlantillaEnvios(), consulta.getIdTipoEnvios());
+					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(idInstitucion, consulta.getIdPlantillaEnvios(), consulta.getIdTipoEnvios(), usuarios.get(0).getIdlenguaje());
 					if(consultaItems != null && consultaItems.size()>0){
 						respuesta.setConsultaItem(consultaItems);
 					}
@@ -537,7 +539,23 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					String finalidad = obtenerFinalidadByIdConsulta(idInstitucion, Long.valueOf(idConsulta));
-					finalidadDTO.setFinalidad(finalidad);
+					ConConsultaKey key = new ConConsultaKey();
+					key.setIdconsulta(Long.valueOf(idConsulta));
+					key.setIdinstitucion(idInstitucion);
+					ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
+					if(consulta == null){
+						Short institucionGeneral = 2000;
+						key.setIdinstitucion(institucionGeneral);
+						consulta = _conConsultaMapper.selectByPrimaryKey(key);
+						String objetivo = _conConsultasExtendsMapper.SelectObjetivo(consulta.getIdobjetivo().toString(), usuarios.get(0).getIdlenguaje());
+						finalidadDTO.setFinalidad(finalidad);
+						finalidadDTO.setObjetivo(objetivo);
+					}else{
+						String objetivo = _conConsultasExtendsMapper.SelectObjetivo(consulta.getIdobjetivo().toString(), usuarios.get(0).getIdlenguaje());
+						finalidadDTO.setFinalidad(finalidad);
+						finalidadDTO.setObjetivo(objetivo);
+					}
+
 				}
 			}catch(Exception e){
 				Error error = new Error();

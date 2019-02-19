@@ -58,4 +58,21 @@ public class ModModeloPlantillaDocumentoExtendsSqlProvider {
 		return sql.toString();
 	}
 	
+	public String selectPlantillaGenerar(Long idModeloComunicacion, Long idPlantillaDocumento){
+		SQL sql = new SQL();		
+		
+		sql.SELECT("modPlantilla.IDINFORME");
+		sql.SELECT("LISTAGG(modPlantilla.Idplantilladocumento, ',') WITHIN GROUP (ORDER BY modPlantilla.Idplantilladocumento) idplantillas");
+		sql.SELECT("modPlantilla.NOMBREFICHEROSALIDA");
+		sql.SELECT("modPlantilla.FORMATOSALIDA");
+		
+		sql.FROM("mod_modelo_plantilladocumento modPlantilla");	
+		
+		sql.WHERE("modPlantilla.IDMODELOCOMUNICACION = " + idModeloComunicacion + " AND modPlantilla.FECHABAJA IS NULL");
+		sql.WHERE("modPlantilla.Idplantilladocumento = " + idPlantillaDocumento);
+		sql.GROUP_BY("modPlantilla.IDINFORME,modPlantilla.NOMBREFICHEROSALIDA, modPlantilla.FORMATOSALIDA");
+		
+		return sql.toString();
+	}
+	
 }

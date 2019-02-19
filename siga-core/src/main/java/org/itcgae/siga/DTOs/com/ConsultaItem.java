@@ -31,6 +31,8 @@ public class ConsultaItem {
 	private String idPlantillaConsulta;
 	private String idModeloComunicacion;
 	private String idPlantillaDocumento;
+	private String idPlantillaEnvios;
+	private String idTipoEnvios;
 
 	private String sentencia;
 	
@@ -262,6 +264,22 @@ public class ConsultaItem {
 
 	public void setCamposDinamicos(ArrayList<CampoDinamicoItem> camposDinamicos) {
 		this.camposDinamicos = camposDinamicos;
+	}
+
+	public String getIdPlantillaEnvios() {
+		return idPlantillaEnvios;
+	}
+
+	public void setIdPlantillaEnvios(String idPlantillaEnvios) {
+		this.idPlantillaEnvios = idPlantillaEnvios;
+	}
+
+	public String getIdTipoEnvios() {
+		return idTipoEnvios;
+	}
+
+	public void setIdTipoEnvios(String idTipoEnvios) {
+		this.idTipoEnvios = idTipoEnvios;
 	}
 	
 
