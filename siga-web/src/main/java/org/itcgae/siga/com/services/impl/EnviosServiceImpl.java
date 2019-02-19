@@ -198,7 +198,7 @@ public class EnviosServiceImpl implements IEnviosService{
 			//Instanciamos la peticion
 			SolicitudEnvioSMS request = SolicitudEnvioSMS.Factory.newInstance();
 			
-			keyProp.setParametro("ecos.url.conexion");
+			keyProp.setParametro("ecos.sms.idecos");
 			property = _genPropertiesMapper.selectByPrimaryKey(keyProp);
 			String idECOS = property.getValor();
 			request.setIdClienteECOS(idECOS);

@@ -5,7 +5,7 @@
 	  <context id="DB2Tables" targetRuntime="MyBatis3">
 	
 		<jdbcConnection 
-			connectionURL="jdbc:oracle:thin:@//10.75.29.133:1521/cgae" 
+			connectionURL="jdbc:oracle:thin:@//vmcgaeap004.cloud.es.deloitte.com:1521/cgae" 
 			driverClass="oracle.jdbc.OracleDriver"
 			userId="uscgae"
 			password="uscgae" />
@@ -49,9 +49,9 @@
 <!-- 		</table> -->
 		
 		 
-<!-- 			<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" > -->
-<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 			</table> -->
+			<table schema="USCGAE" tableName="ENV_PLANTILLASENVIOS" >
+				<property name="ignoreQualifiersAtRuntime" value="true"/>
+			</table>
 
 			
 <!-- 				<table schema="USCGAE" tableName="ENV_CONSULTASENVIO" > -->
@@ -76,10 +76,10 @@
 <!-- 			<generatedKey column="IDMODELOCOMUNICACION" sqlStatement="SELECT SEQ_MOD_MODELOCOMUNICACION.NEXTVAL FROM DUAL"/> -->
 <!-- 		</table> -->
 
-		<table schema="USCGAE" tableName="ENV_CONSULTASENVIO" >
-			<property name="ignoreQualifiersAtRuntime" value="true"/>
-			<generatedKey column="IDCONSULTAENVIO" sqlStatement="SELECT SEQ_ENV_CONSULTASENVIO.NEXTVAL FROM DUAL"/>
-		</table>
+<!-- 		<table schema="USCGAE" tableName="ENV_CONSULTASENVIO" > -->
+<!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 			<generatedKey column="IDCONSULTAENVIO" sqlStatement="SELECT SEQ_ENV_CONSULTASENVIO.NEXTVAL FROM DUAL"/> -->
+<!-- 		</table> -->
 
 
 <!-- 		<table schema="USCGAE" tableName="MOD_MODELO_PERFILES" > -->

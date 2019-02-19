@@ -1103,8 +1103,6 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
-		PlantillaEnvioItem plantilla = new PlantillaEnvioItem();
-		ModelosComunicacionItem modeloComunicacionItem = null;
 		
 		if (null != idInstitucionUser) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
