@@ -58,6 +58,7 @@ import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModClasecomunicacionRuta;
 import org.itcgae.siga.db.entities.ModClasecomunicacionRutaExample;
+import org.itcgae.siga.db.entities.ModClasecomunicaciones;
 import org.itcgae.siga.db.entities.ModClasecomunicacionesExample;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvio;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvioKey;
@@ -71,6 +72,7 @@ import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ModClasecomunicacionRutaMapper;
+import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -173,6 +175,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
 	@Autowired
 	private ModClasecomunicacionRutaMapper _modClasecomunicacionRutaMapper;
+	
+	@Autowired
+	private ModClasecomunicacionesMapper _modClasecomunicacionesMapper;
 		
 
 	@Override
@@ -379,19 +384,14 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		try{
 			if(dialogo != null && dialogo.getModelos() != null && dialogo.getModelos().size() > 0){
 				
-				//Obtenemos el campo del Sufijo asociado a la ruta de la comunicación
-				ModClasecomunicacionRutaExample exampleSufijo = new ModClasecomunicacionRutaExample();
-				exampleSufijo.createCriteria().andRutaEqualTo(dialogo.getRuta());
+				//Obtenemos el campo del Sufijo asociado a la clase de la comunicación
 				
-				List<ModClasecomunicacionRuta> listaClaseRuta = _modClasecomunicacionRutaMapper.selectByExample(exampleSufijo);
+				ModClasecomunicaciones modClase = _modClasecomunicacionesMapper.selectByPrimaryKey(Short.parseShort(dialogo.getIdClaseComunicacion()));
 				
 				String campoSufijo = "";
 				
-				if(listaClaseRuta != null && listaClaseRuta.size() > 0){
-					ModClasecomunicacionRuta claseRuta = listaClaseRuta.get(0);
-					if(claseRuta != null){
-						campoSufijo = claseRuta.getSufijo();
-					}
+				if(modClase != null){
+					campoSufijo = modClase.getSufijo();
 				}
 				
 				generarComunicacion.setFechaProgramada(dialogo.getFechaProgramada());
