@@ -6,6 +6,7 @@ public class TarjetaRemitenteDTO {
 	private String idDireccion;
 	private String idPlantillaEnvios;
 	private String idTipoEnvios;
+	private String descripcion;
 	
 	public String getIdPersona() {
 		return idPersona;
@@ -30,6 +31,13 @@ public class TarjetaRemitenteDTO {
 	}
 	public void setIdTipoEnvios(String idTipoEnvios) {
 		this.idTipoEnvios = idTipoEnvios;
+	}
+	
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
 	}
 	
 }

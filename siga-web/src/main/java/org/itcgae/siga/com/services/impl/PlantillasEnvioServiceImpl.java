@@ -387,6 +387,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
 					plantilla.setIddireccion(Long.valueOf(remitente.getIdDireccion()));
 					plantilla.setIdpersona(Long.valueOf(remitente.getIdPersona()));
+					plantilla.setDescripcionRemitente(remitente.getDescripcion());
 					plantilla.setFechamodificacion(new Date());
 					plantilla.setUsumodificacion(usuario.getIdusuario());
 					_envPlantillasenviosMapper.updateByPrimaryKey(plantilla);
@@ -473,6 +474,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						remitente.setNombre(persona.getNombre());
 						remitente.setApellido1(persona.getApellidos1());
 						remitente.setApellido2(persona.getApellidos2());
+						remitente.setDescripcion(plantilla.getDescripcionRemitente());
 						
 						CenDireccionesKey keyDirecciones = new CenDireccionesKey();
 						keyDirecciones.setIddireccion(plantilla.getIddireccion());
