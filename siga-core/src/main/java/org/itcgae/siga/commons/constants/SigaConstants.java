@@ -88,12 +88,13 @@ public class SigaConstants {
 	public static final String NOMBRETABLA_CEN_CLIENTE = "CEN_CLIENTE";
 	public static final String NOMBRETABLA_CEN_COLEGIADO = "CEN_COLEGIADO";
 	
+	public static final String ALIASIDPERSONA = "IDPERSONA";
+	public static final String ALIASCORREO = "CORREOELECTRONICO";
+	public static final String ALIASDOMICILIO = "DOMICILIO";
+	public static final String ALIASMOVIL = "MOVIL";
+	
 	public static final String ECOS_PREFIJO_ESPANA = "(+34)";
-	public static final String TIPO_ENVIO_CORREOELECTRONICO = "1";
-	public static final String TIPO_ENVIO_CORREO_ORDINARIO = "2";
-	public static final String TIPO_ENVIO_SMS = "4";
-	public static final String TIPO_ENVIO_BUROSMS = "5";
-	public static final String ID_OBJETIVO_DESTINATARIOS ="1";
+	public static final long ID_OBJETIVO_DESTINATARIOS = 1;
 	
 	//estados envio
 	public static final Short ENVIO_PENDIENTE_MANUAL = 1;
@@ -104,10 +105,10 @@ public class SigaConstants {
 	public static final Short ENVIO_ARCHIVADO = 6;
 	
 	//tipos envio
-	public static final Short ID_ENVIO_MAIL = 1;
-	public static final Short ID_ENVIO_CORREO_ORDINARIO = 2;
-	public static final Short ID_ENVIO_SMS = 4;
-	public static final Short ID_ENVIO_BURO_SMS = 5;
+	public static final String ID_ENVIO_MAIL = "1";
+	public static final String ID_ENVIO_CORREO_ORDINARIO = "2";
+	public static final String ID_ENVIO_SMS = "4";
+	public static final String ID_ENVIO_BURO_SMS = "5";
 	
 
 	public enum ERROR_SERVER {

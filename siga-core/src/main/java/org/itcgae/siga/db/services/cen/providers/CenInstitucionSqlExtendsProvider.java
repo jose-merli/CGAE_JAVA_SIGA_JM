@@ -403,7 +403,7 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 	public String getInstitucionesModelo (Short idinstitucionUser){
 		
 		SQL sql = new SQL();
-		sql.SELECT("IDINSTITUCION, NOMBRE");
+		sql.SELECT("IDINSTITUCION, ABREVIATURA");
 		sql.FROM("cen_institucion");
 		sql.WHERE("idinstitucion = '2000' or idinstitucion = '" + idinstitucionUser + "'");
 		

@@ -415,23 +415,26 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 						key.setIdenvio(Long.valueOf(enviosDTO[i].getIdEnvio()));
 						key.setIdinstitucion(usuario.getIdinstitucion());
 						envio = _envEnviosMapper.selectByPrimaryKey(key);
+
 						switch (envio.getIdtipoenvios().toString()) {
 
-						case SigaConstants.TIPO_ENVIO_CORREOELECTRONICO:
+						case SigaConstants.ID_ENVIO_MAIL :
 							_colaEnvios.preparaCorreo(envio);
 							LOGGER.info("Correo electrónico enviado con éxito");
 							break;
-						case SigaConstants.TIPO_ENVIO_CORREO_ORDINARIO:
+						case SigaConstants.ID_ENVIO_CORREO_ORDINARIO:
 							_colaEnvios.preparaCorreo(envio);
 							LOGGER.info("Correo ordinario generado con éxito");
 							break;
-						case SigaConstants.TIPO_ENVIO_SMS:
+						case SigaConstants.ID_ENVIO_SMS:
 							_colaEnvios.preparaEnvioSMS(envio, false);
 							LOGGER.info("SMS enviado con éxito");
 							break;
-						case SigaConstants.TIPO_ENVIO_BUROSMS:
+						case SigaConstants.ID_ENVIO_BURO_SMS:
 							_colaEnvios.preparaEnvioSMS(envio, true);
 							LOGGER.info("BURO SMS enviado con éxito");
+							break;
+						default:
 							break;
 						}
 					}

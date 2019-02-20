@@ -31,7 +31,6 @@ import org.itcgae.siga.db.entities.EnvConsultasenvio;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
 import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.EnvDocumentosExample;
-import org.itcgae.siga.db.entities.EnvDocumentosKey;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosgrupocliente;
 import org.itcgae.siga.db.entities.EnvEnviosgrupoclienteExample;
@@ -138,15 +137,15 @@ public class ColaEnviosImpl implements IColaEnvios {
 					
 					switch (envio.getIdtipoenvios().toString()) {
 
-						case SigaConstants.TIPO_ENVIO_CORREOELECTRONICO:
+						case SigaConstants.ID_ENVIO_MAIL:
 							preparaCorreo(envio);
 							LOGGER.info("Correo electrónico enviado con éxito");
 							break;
-						case SigaConstants.TIPO_ENVIO_CORREO_ORDINARIO:
+						case SigaConstants.ID_ENVIO_CORREO_ORDINARIO:
 							preparaCorreo(envio);
 							LOGGER.info("Correo ordinario generado con éxito");
 							break;
-						case SigaConstants.TIPO_ENVIO_SMS:
+						case SigaConstants.ID_ENVIO_SMS:
 							//TEST PARA INTEGRACION
 //							CenDirecciones remitente = new CenDirecciones();
 //							remitente.setCorreoelectronico("bherrero@deloitte.es");
@@ -157,7 +156,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 							preparaEnvioSMS(envio, false);
 							LOGGER.info("SMS enviado con éxito");
 							break;
-						case SigaConstants.TIPO_ENVIO_BUROSMS:
+						case SigaConstants.ID_ENVIO_BURO_SMS:
 							//TEST PARA INTEGRACION
 //							remitente = new CenDirecciones();
 //							remitente.setCorreoelectronico("bherrero@deloitte.es");
@@ -272,7 +271,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 				documentosEnvio.add(doc);
 			}
 			
-			if(envio.getIdtipoenvios() == SigaConstants.ID_ENVIO_MAIL){
+			if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
 				_enviosService.envioMail(remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 			}else{
 				//Añadimos los informes al envio para que puedan ser descargados.
@@ -314,12 +313,16 @@ public class ColaEnviosImpl implements IColaEnvios {
 					int finSelect = consulta.getConsulta().indexOf("</SELECT>");
 					
 					//Obtenemos alias del Select para recuperar valores mas tarde
-					String selectConEtiquetas = consulta.getConsulta().substring(inicioSelect, finSelect);
-					String aliasIdPersona = obtenerAliasIdPersona(selectConEtiquetas.trim());
+//					String selectConEtiquetas = consulta.getConsulta().substring(inicioSelect, finSelect);
+//					String aliasIdPersona = obtenerAliasIdPersona(selectConEtiquetas.trim());
 					//String aliasIdInstitucion = obtenerAliasIdInstitucion(selectConEtiquetas.trim());
-					String aliasCorreo = obtenerAliasCorreoElectronico(selectConEtiquetas.trim());
-					String aliasMovil = obtenerAliasMovil(selectConEtiquetas.trim());
-					String aliasDomicilio = obtenerAliasDomicilio(selectConEtiquetas.trim());
+//					String aliasCorreo = obtenerAliasCorreoElectronico(selectConEtiquetas.trim());
+//					String aliasMovil = obtenerAliasMovil(selectConEtiquetas.trim());
+//					String aliasDomicilio = obtenerAliasDomicilio(selectConEtiquetas.trim());
+					String aliasIdPersona = SigaConstants.ALIASIDPERSONA;
+					String aliasCorreo = SigaConstants.ALIASCORREO;
+					String aliasMovil = SigaConstants.ALIASMOVIL;
+					String aliasDomicilio = SigaConstants.ALIASDOMICILIO;
 					
 					Map<String,String> camposQuery =_consultasService.obtenerMapaConsulta(consulta.getConsulta());
 					List<Map<String, Object>> resultDestinatarios = _conConsultasExtendsMapper.ejecutarConsulta(camposQuery);
@@ -351,7 +354,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 					//Generamos los informes para adjuntarlos al envio
 					List<DatosDocumentoItem> documentosEnvio = generarDocumentosEnvio(envio.getIdinstitucion().toString(), envio.getIdenvio().toString());
 					
-					if(envio.getIdtipoenvios() == SigaConstants.ID_ENVIO_MAIL){
+					if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
 						_enviosService.envioMail(remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 					}else{
 						//Añadimos los informes al envio para que puedan ser descargados.
@@ -408,7 +411,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 
 		// obtenemos las consultas de destinatarios asociadas a la plantilla de documento
 		EnvConsultasenvioExample consultaPlantillaExample = new EnvConsultasenvioExample();
-		consultaPlantillaExample.createCriteria().andIdenvioEqualTo(envio.getIdenvio()).andIdobjetivoEqualTo(Long.valueOf(SigaConstants.ID_OBJETIVO_DESTINATARIOS))
+		consultaPlantillaExample.createCriteria().andIdenvioEqualTo(envio.getIdenvio()).andIdobjetivoEqualTo(SigaConstants.ID_OBJETIVO_DESTINATARIOS)
 		.andIdinstitucionEqualTo(envio.getIdinstitucion());
 		List<EnvConsultasenvio> consultasAsociadasDestinatarios = _envConsultasenvioMapper.selectByExampleWithBLOBs(consultaPlantillaExample);
 
