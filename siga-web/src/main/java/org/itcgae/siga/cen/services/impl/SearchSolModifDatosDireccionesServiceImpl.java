@@ -16,11 +16,14 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicos;
 import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicosExample;
 import org.itcgae.siga.db.entities.CenSolicmodicuentas;
 import org.itcgae.siga.db.entities.CenSolimodidirecciones;
 import org.itcgae.siga.db.entities.CenSolimodidireccionesExample;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolimodidireccionesExtendsMapper;
@@ -36,6 +39,10 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 	@Autowired
 	private AdmUsuariosExtendsMapper _admUsuariosExtendsMapper;
 
+
+	@Autowired
+	private CenPersonaMapper cenPersonaMapper;
+	
 	@Autowired
 	private CenSolimodidireccionesExtendsMapper cenSoliModiDireccionesExtendsMapper;
 
@@ -54,7 +61,7 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		SolModificacionDTO solModificacionDTO = new SolModificacionDTO();
-
+		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -67,12 +74,31 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 			if (usuarios != null && usuarios.size() > 0) {
 
 				AdmUsuarios usuario = usuarios.get(0);
-				LOGGER.info(
-						"searchSolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.searchSolModifDatosDirecciones() -> Entrada a cenSoliModiDireccionesExtendsMapper para obtener los resultados de la búsqueda");
-				List<SolModificacionItem> solModificacionItems = cenSoliModiDireccionesExtendsMapper
-						.searchSolModifDatosDirecciones(solicitudModificacionSearchDTO, usuario.getIdlenguaje(),
-								String.valueOf(idInstitucion));
-				solModificacionDTO.setSolModificacionItems(solModificacionItems);
+				if (letrado.equalsIgnoreCase("S")) {
+					CenPersonaExample example = new CenPersonaExample();
+					example.createCriteria().andNifcifEqualTo(usuario.getNif());
+					List<CenPersona> cenPersona = cenPersonaMapper.selectByExample(example );
+					if (null != cenPersona && cenPersona.size()>0) {
+
+
+						LOGGER.info(
+								"searchSolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.searchSolModifDatosDirecciones() -> Entrada a cenSoliModiDireccionesExtendsMapper para obtener los resultados de la búsqueda");
+						List<SolModificacionItem> solModificacionItems = cenSoliModiDireccionesExtendsMapper
+								.searchSolModifDatosDirecciones(solicitudModificacionSearchDTO, usuario.getIdlenguaje(),
+										String.valueOf(idInstitucion),cenPersona.get(0).getIdpersona());
+						solModificacionDTO.setSolModificacionItems(solModificacionItems);
+					}
+
+				}else{
+
+
+					LOGGER.info(
+							"searchSolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.searchSolModifDatosDirecciones() -> Entrada a cenSoliModiDireccionesExtendsMapper para obtener los resultados de la búsqueda");
+					List<SolModificacionItem> solModificacionItems = cenSoliModiDireccionesExtendsMapper
+							.searchSolModifDatosDirecciones(solicitudModificacionSearchDTO, usuario.getIdlenguaje(),
+									String.valueOf(idInstitucion),null);
+					solModificacionDTO.setSolModificacionItems(solModificacionItems);
+				}
 
 			}
 		}

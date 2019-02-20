@@ -20,11 +20,16 @@ public interface ConListadoModelosExtendsMapper {
 	@SelectProvider(type = ConListadoModelosExtendsSqlProvider.class, method = "selectListadoModelos")
 	@Results({@Result(column = "IDMODELOCOMUNICACION", property = "idModeloComunicacion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ORDEN", property = "orden", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PRESELECCIONAR", property = "preseleccionar", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.NUMERIC)
+		@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "NOMBRECLASE", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ABREVIATURA", property = "institucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
 				})
-	List<ModelosComunicacionItem> selectListadoModelos(Short idInstitucion,ConsultaItem consulta);
+	
+	List<ModelosComunicacionItem> selectListadoModelos(Short idInstitucion,String idConsulta);
 }

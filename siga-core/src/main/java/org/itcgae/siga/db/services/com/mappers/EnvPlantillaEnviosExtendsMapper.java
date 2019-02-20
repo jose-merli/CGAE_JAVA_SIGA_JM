@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
+import org.itcgae.siga.DTOs.com.TipoEnvioItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.EnvPlantillasenvios;
@@ -33,7 +34,7 @@ public interface EnvPlantillaEnviosExtendsMapper {
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR)
 		})
-	List<PlantillaEnvioItem> selectPlantillasEnvios(Short idInstitucion, PlantillaEnvioSearchItem filtros);
+	List<PlantillaEnvioItem> selectPlantillasEnvios(Short idInstitucion, String idLenguaje, PlantillaEnvioSearchItem filtros);
 	
 	@SelectProvider(type = EnvPlantillaEnviosExtendsSqlProvider.class, method = "getPlantillas")
 	@Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
@@ -58,5 +59,11 @@ public interface EnvPlantillaEnviosExtendsMapper {
 		@Result(column = "IDMAX", property = "newId", jdbcType = JdbcType.VARCHAR)
 	})
 	NewIdDTO selectMaxIDPlantillas();
+	
+	@SelectProvider(type = EnvPlantillaEnviosExtendsSqlProvider.class, method = "selectTipoEnvioPlantilla")
+	@Results({@Result(column = "DESCRIPCION", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "idtipoEnvios", property = "idTipoEnvio", jdbcType = JdbcType.VARCHAR)
+	})
+	TipoEnvioItem selectTipoEnvioPlantilla(String lenguaje, String idPlantilla);
 
 }

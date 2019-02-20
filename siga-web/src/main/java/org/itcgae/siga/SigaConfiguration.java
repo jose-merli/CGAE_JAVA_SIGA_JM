@@ -1,8 +1,12 @@
 package org.itcgae.siga;
 
+import java.net.URI;
+
+import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.logger.LoggingConfig;
 import org.itcgae.siga.logger.MyBatisLoggerInterceptor;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -18,15 +22,32 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.aspose.words.License;
+
 @Configuration
 public class SigaConfiguration implements ApplicationListener<ApplicationReadyEvent>{
 
 	@Autowired
 	private LoggingConfig loggingConfig;
 	
+	@Autowired
+	ServletContext servletContext;
+	
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent arg0) {
 		loggingConfig.initLogback();
+		
+		// Configuramos la licencia del aspose
+		String rutaLicencia = SigaConstants.rutaLicencia;
+		
+		try {
+			URI ruta = servletContext.getResource(rutaLicencia).toURI();
+			License license = new License();
+			license.setLicense(ruta.getPath());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+		
 	}
 	
 	
@@ -54,6 +75,17 @@ public class SigaConfiguration implements ApplicationListener<ApplicationReadyEv
 			return sqlSessionFactory.getObject();
 		}
 		
+		/*@Bean
+		 public MultipartConfigElement multipartConfigElement() {
+		     return new MultipartConfigElement("");
+		 }
+
+		 @Bean
+		 public MultipartResolver multipartResolver() {
+		     org.springframework.web.multipart.commons.CommonsMultipartResolver multipartResolver = new org.springframework.web.multipart.commons.CommonsMultipartResolver();
+		     multipartResolver.setMaxUploadSize(1000000);
+		     return multipartResolver;
+		 }*/
 		
 		@Bean
 		public ConfigurationCustomizer configurationCustomizer() {
@@ -63,7 +95,8 @@ public class SigaConfiguration implements ApplicationListener<ApplicationReadyEv
 					configuration.addInterceptor(new MyBatisLoggerInterceptor());
 				}
 		    };
-		}
+		}	
+		
 	}
 	
 	@EnableWebMvc

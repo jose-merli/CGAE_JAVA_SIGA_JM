@@ -56,7 +56,8 @@ public class SearchSolModifDatosGeneralesServiceTest {
 		List<SolModificacionItem> solModificacionItems = cenTestUtils.getListSolModificacionItemSimulado();
 
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
-		when(cenSolicitModifDatosBasicosExtendsMapper.searchSolModifDatosGenerales(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)).thenReturn(solModificacionItems);
+		when(cenSolicitModifDatosBasicosExtendsMapper.searchSolModifDatosGenerales(solicitudModificacionSearchDTO, idLenguaje,
+				idInstitucion,null)).thenReturn(solModificacionItems);
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 

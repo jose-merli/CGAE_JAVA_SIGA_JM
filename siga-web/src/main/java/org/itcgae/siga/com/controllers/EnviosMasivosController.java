@@ -81,9 +81,9 @@ public class EnviosMasivosController {
 	}
 	
 	@RequestMapping(value = "/enviar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> enviar(HttpServletRequest request, @RequestBody List<EnvioProgramadoDto> envios) {
+	ResponseEntity<Error> enviar(HttpServletRequest request, @RequestBody EnvioProgramadoDto[] envios) {
 		
-		Error response = _enviosMasivosService.enviar(request, envios) ;
+		Error response = _enviosMasivosService.enviar(request, envios);
 		if(response.getCode() == 200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else
