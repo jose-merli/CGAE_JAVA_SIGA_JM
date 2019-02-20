@@ -440,8 +440,8 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 							throw new FileAlreadyExistsException("El fichero ya existe");
 						}
 						FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
-						response.setNombreDocumento(fileName);
-						response.setRutaDocumento(pathFichero + fileName);
+						response.setNombreDocumento(newNombreFichero);
+						response.setRutaDocumento(pathFichero + newNombreFichero);
 					} catch (FileNotFoundException e) {
 						Error error = new Error();
 						error.setCode(500);

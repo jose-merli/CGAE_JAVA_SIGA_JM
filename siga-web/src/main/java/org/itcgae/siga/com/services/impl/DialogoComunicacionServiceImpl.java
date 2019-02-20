@@ -647,15 +647,29 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																	
 																	hDatosFinal.put("row", hDatosGenerales);
 																	
+																	//Obtenemos el sufijo del fichero para el caso de que se haya seleccionado el sufijo de entidad
+																	String campoSufijoReplaced = "";
+																	if(campoSufijo != null && !"".equals(campoSufijo)) {
+																		campoSufijoReplaced = reemplazarSufijo(hDatosGenerales, mapaClave, campoSufijo);
+																	}
 																																	
 																	if(!esEnvio){
 																		LOGGER.debug("Generamos el documento");																
 																		
 																		doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);
 																		
-																		String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo.getIdModeloComunicacion(), plantilla, hDatosGenerales, usuario.getIdlenguaje(), numFicheros, pathFicheroSalida, campoSufijo);
+																		String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo.getIdModeloComunicacion(), plantilla, hDatosGenerales, usuario.getIdlenguaje(), numFicheros, pathFicheroSalida, campoSufijoReplaced);
 																		
-																		DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida);
+																		boolean firmado = false;
+																		
+																		if(plantilla.getFormatoSalida() != null){
+																			FORMATO_SALIDA extensionObject = SigaConstants.FORMATO_SALIDA.getEnum(Short.parseShort(plantilla.getFormatoSalida()));			
+																			if(extensionObject.getCodigo().shortValue() == FORMATO_SALIDA.PDF_FIRMADO.getCodigo().shortValue()){
+																				firmado = true;
+																			}
+																		}
+																		
+																		DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida, firmado);
 																		
 																		listaFicheros.add(docGenerado);
 																		listaDocumentos.add(doc);
@@ -663,7 +677,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																		//Cogemos todas las consultas y le metemos el nombre del fichero
 																		if(listaConsultasEnvio != null && listaConsultasEnvio.size() > 0){
 																			for(ConsultaEnvioItem consultaEnvio : listaConsultasEnvio){
-																				consultaEnvio.setSufijo(campoSufijo);
+																				consultaEnvio.setSufijo(campoSufijoReplaced);
 																			}
 																		}																		
 																	}																															
@@ -718,13 +732,28 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														
 														hDatosFinal.put("row", hDatosGenerales);
 														
+														//Obtenemos el sufijo del fichero para el caso de que se haya seleccionado el sufijo de entidad
+														String campoSufijoReplaced = "";
+														if(campoSufijo != null && !"".equals(campoSufijo)) {
+															campoSufijoReplaced = reemplazarSufijo(hDatosGenerales, mapaClave, campoSufijo);
+														}
+														
 														if(!esEnvio){
 															LOGGER.debug("Generamos el documento");
-															doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);
-														
-															String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo.getIdModeloComunicacion(), plantilla, hDatosGenerales, usuario.getIdlenguaje(), numFicheros, pathFicheroSalida, campoSufijo);
+															doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);														
+																													
+															String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo.getIdModeloComunicacion(), plantilla, hDatosGenerales, usuario.getIdlenguaje(), numFicheros, pathFicheroSalida, campoSufijoReplaced);
 															
-															DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida);
+															boolean firmado = false;
+															
+															if(plantilla.getFormatoSalida() != null){
+																FORMATO_SALIDA extensionObject = SigaConstants.FORMATO_SALIDA.getEnum(Short.parseShort(plantilla.getFormatoSalida()));			
+																if(extensionObject.getCodigo().shortValue() == FORMATO_SALIDA.PDF_FIRMADO.getCodigo().shortValue()){
+																	firmado = true;
+																}
+															}
+															
+															DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida, firmado);
 															
 															listaFicheros.add(docGenerado);
 															listaDocumentos.add(doc);
@@ -732,7 +761,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 															//Cogemos todas las consultas y le metemos el nombre del fichero
 															if(listaConsultasEnvio != null && listaConsultasEnvio.size() > 0){
 																for(ConsultaEnvioItem consultaEnvio : listaConsultasEnvio){
-																	consultaEnvio.setSufijo(campoSufijo);
+																	consultaEnvio.setSufijo(campoSufijoReplaced);
 																}
 															}
 														}													
@@ -789,6 +818,43 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return generarComunicacion;
 	}
 	
+	private String reemplazarSufijo(HashMap<String, Object> hDatosGenerales, HashMap<String, String> mapaClave, String campoSufijo) {
+		HashMap<String,Object> hashMapRow = null;
+		
+		if(hDatosGenerales.get("row") != null){
+			hashMapRow = (HashMap<String, Object>) hDatosGenerales.get("row");
+		}
+		
+		String sufijo = "";
+		if(campoSufijo != null) {
+			String campos[] = campoSufijo.split(",");
+			if(campos.length > 0) {
+				for(String campo: campos) {
+					Object identificacion = hDatosGenerales.get(campo);
+					if(identificacion == null){
+						if(hashMapRow != null && hashMapRow.get(campo) != null){
+							identificacion = hashMapRow.get(campo);
+						}else{
+							if(mapaClave != null && mapaClave.get(campo) != null) {
+								identificacion = mapaClave.get(campo);
+							}else {
+								identificacion = SigaConstants.CAMPO_IDENTIFICACION;
+							}
+						}
+					}
+					if(!sufijo.equalsIgnoreCase(""))sufijo = sufijo + "_";				
+					sufijo = sufijo + String.valueOf(identificacion);
+				}
+			}else {
+				sufijo = SigaConstants.CAMPO_IDENTIFICACION;
+			}
+			
+		}
+		return sufijo;
+	}
+
+
+
 	private String reemplazarConsultaConClaves(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ConsultaItem consulta, HashMap<String, String> mapaClave, boolean esEnvio) throws ParseException, SigaExceptions{
 		
 		String sentencia = null;
@@ -902,20 +968,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				
 			}else if(Short.valueOf(sufijoItem.getIdSufijo()).shortValue() == SigaConstants.SUFIJOS.IDENTIFICACION.getCodigo().shortValue()){
 
-				if(campoSufijo == null){
-					campoSufijo = SigaConstants.CAMPO_IDENTIFICACION;
-				}
-				
-				Object identificacion = hDatosGenerales.get(campoSufijo);
-				if(identificacion == null){
-					if(hashMapRow != null && hashMapRow.get(campoSufijo) != null){
-						identificacion = hashMapRow.get(campoSufijo);
-					}else{
-						identificacion = SigaConstants.CAMPO_IDENTIFICACION;
-					}
-				}
-				if(!sufijo.equalsIgnoreCase(""))sufijo = sufijo + "_";
-				sufijo = sufijo + String.valueOf(identificacion);
+				if(!sufijo.equalsIgnoreCase(""))sufijo = sufijo + "_";				
+				sufijo = sufijo + String.valueOf(campoSufijo);
 			}
 		}
 		

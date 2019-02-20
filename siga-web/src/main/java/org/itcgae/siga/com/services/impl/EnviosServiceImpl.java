@@ -33,10 +33,13 @@ import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosgrupocliente;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +68,9 @@ public class EnviosServiceImpl implements IEnviosService{
 	
 	@Autowired	
 	GenPropertiesMapper _genPropertiesMapper;
+	
+	@Autowired	
+	GenParametrosMapper _genParametrosMapper;
 	
 	
 	@Autowired
@@ -185,10 +191,13 @@ public class EnviosServiceImpl implements IEnviosService{
 		String respuesta = null;
 		
 		
-		GenPropertiesKey keyProp = new GenPropertiesKey();
-		keyProp.setFichero("SIGA");
-		keyProp.setParametro("ecos.url.conexion");
-		GenProperties property = _genPropertiesMapper.selectByPrimaryKey(keyProp);
+		GenParametrosKey keyParam = new GenParametrosKey();
+		
+		keyParam.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
+		keyParam.setModulo(SigaConstants.MODULO_ENV);
+		keyParam.setParametro(SigaConstants.SMS_URL_SERVICE);
+		
+		GenParametros property = _genParametrosMapper.selectByPrimaryKey(keyParam);
 		String uriService = property.getValor();
 		String idSolicidudEcos = "";
 		try {
@@ -198,8 +207,8 @@ public class EnviosServiceImpl implements IEnviosService{
 			//Instanciamos la peticion
 			SolicitudEnvioSMS request = SolicitudEnvioSMS.Factory.newInstance();
 			
-			keyProp.setParametro("ecos.url.conexion");
-			property = _genPropertiesMapper.selectByPrimaryKey(keyProp);
+			keyParam.setParametro(SigaConstants.SMS_CLIENTE_ECOS);
+			property = _genParametrosMapper.selectByPrimaryKey(keyParam);
 			String idECOS = property.getValor();
 			request.setIdClienteECOS(idECOS);
 			

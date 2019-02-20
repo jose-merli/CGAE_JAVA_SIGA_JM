@@ -1,6 +1,5 @@
 package org.itcgae.siga.com.services;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,7 +13,7 @@ public interface IGeneracionDocumentosService {
 
 	public Document sustituyeRegionDocumento(Document doc, String region, List dato) throws Exception;
 
-	public DatosDocumentoItem grabaDocumento(Document doc, String pathfinal, String nombrefichero) throws Exception;
+	public DatosDocumentoItem grabaDocumento(Document doc, String pathfinal, String nombrefichero, boolean firmado) throws Exception;
 
 	public Document sustituyeDatos(Document doc, HashMap<String, Object> dato);
 

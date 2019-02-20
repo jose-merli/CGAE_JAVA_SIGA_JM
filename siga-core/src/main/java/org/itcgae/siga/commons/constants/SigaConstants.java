@@ -109,6 +109,23 @@ public class SigaConstants {
 	public static final Short ID_ENVIO_SMS = 4;
 	public static final Short ID_ENVIO_BURO_SMS = 5;
 	
+	//PFD
+	public static final String FIRMA_OK="FIRMA_OK";
+	public static final String SOLICITUD_DOCUMENTO_OK = "SOLICITUD_DOCUMENTO_OK";
+	public static final String SOLICITUD_DOCUMENTO_KO = "SOLICITUD_DOCUMENTO_KO";
+	public static final String URL_HTTP_NO_ENCONTRADA = "URL_HTTP_NO_ENCONTRADA";
+	public static final String PFD_URLWS = "PFD_URLWS";
+	public static final String PFD_FIRMA_VISIBLE = "PFD_FIRMA_VISIBLE";
+	public static final String PFD_FIRMA_RAZON = "PFD_FIRMA_RAZON";
+	public static final String PFD_FIRMA_LOCATION = "PFD_FIRMA_LOCATION";
+	public static final String PFD_IDCLIENTE = "PFD_IDCLIENTE";
+	public static final String SMS_URL_SERVICE = "SMS_URL_SERVICE";
+	public static final String SMS_CLIENTE_ECOS = "SMS_CLIENTE_ECOS";
+
+	public static final String MODULO_SCS = "SCS";
+	public static final String MODULO_ADM = "ADM";
+	public static final String MODULO_ENV = "ENV";
+	
 
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(

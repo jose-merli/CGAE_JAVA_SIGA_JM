@@ -7,10 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.com.documentos.DataMailMergeDataSource;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
+import org.itcgae.siga.com.services.IPFDService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aspose.words.DataSet;
@@ -22,6 +25,9 @@ import com.aspose.words.MailMergeCleanupOptions;
 public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosService{
 
 	private Logger LOGGER = Logger.getLogger(GeneracionDocumentosServiceImpl.class);
+	
+	@Autowired
+	private IPFDService pfdService;
 	
 	@Override
 	public Document sustituyeDocumento(Document doc, HashMap<String, Object> dato) throws Exception{
@@ -100,20 +106,31 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	}
 	
 	@Override
-	public DatosDocumentoItem grabaDocumento(Document doc, String pathfinal, String nombrefichero) throws Exception{
+	public DatosDocumentoItem grabaDocumento(Document doc, String pathfinal, String nombrefichero, boolean firmado) throws Exception{
 		// nombrefichero incluye la extension .doc
 		File archivo = null;
 		DatosDocumentoItem documento = new DatosDocumentoItem();
 		try {
 			doc.save(pathfinal + nombrefichero);
+			archivo = new File(pathfinal + nombrefichero);
+			if (!archivo.exists())return null;
+
+			byte[] byteArray = null;
+			
+			if(firmado){
+				String docFirmado = pfdService.firmarPDF(archivo);
+				byteArray = Base64.decodeBase64(docFirmado.getBytes());
+			}else {
+				byteArray = Files.readAllBytes(archivo.toPath());
+			}			
+			
+			documento.setFileName(nombrefichero);
+			documento.setDatos(byteArray);
+			
 		} catch (Exception e) {
 			throw e;
 		}
-		archivo = new File(pathfinal + nombrefichero);
-		if (!archivo.exists())return null;
-
-		documento.setFileName(nombrefichero);
-		documento.setDatos(Files.readAllBytes(archivo.toPath()));
+		
 		
 		return documento;
 	}
