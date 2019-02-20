@@ -195,7 +195,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				for (ComboEtiquetasItem etiqueta : colegiadoItem.getEtiquetas()) {
 //
 					// 2.1. Es una etiqueta de nueva y no existe registro en ninguna tabla
-	if(etiqueta.getIdGrupo() == "") {
+					if(etiqueta.getIdGrupo() == "") {
 						
 						GenRecursosCatalogos genRecursosCatalogos = new GenRecursosCatalogos();
 						
@@ -283,7 +283,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							LOGGER.warn("updateLegalPerson() / genRecursosCatalogosExtendsMapper.insert() -> No insertada la descripción en genRecursosCatálogos correctamente");
 						}
-	}else {	
+					}else {	
 						// Etiqueta para nueva asociación
 						if(!gruposPerJuridicaAntiguos.contains(etiqueta.getIdGrupo())) {
 							
@@ -301,7 +301,10 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 								LOGGER.info(
 										"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
-
+								SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+								Date date = new Date();
+								String fecha = dateFormat.format(date);
+								etiqueta.setFechaInicio(fecha);
 								int response = cenGruposclienteClienteExtendsMapper.insertSelectiveForUpdateLegalPerson(
 									etiqueta, etiquetaUpdateDTO.getIdPersona(), String.valueOf(idInstitucion), 
 										String.valueOf(usuario.getIdusuario()));
@@ -420,7 +423,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						
 						DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 						
-						cenGruposclienteCliente.setFechaBaja(format.parse(fecha)); // Ponemos la fecha de baja a null
+						cenGruposclienteCliente.setFechaBaja(format.parse(fecha)); // Ponemos la fecha de baja a no null
 						CenGruposclienteClienteExample cenGruposclienteClienteExample = new CenGruposclienteClienteExample();
 						cenGruposclienteClienteExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 								.andIdpersonaEqualTo(Long.valueOf(etiquetaUpdateDTO.getIdPersona()))
@@ -428,8 +431,8 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 								.andIdgrupoEqualTo(Short.valueOf(gruposPerJuridicaAntiguos.get(i)));
 						LOGGER.info(
 								"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.updateByExampleSelective() -> Entrada a cenGruposclienteClienteExtendsMapper para eliminar un grupo relacionado con persona juridica en tabla CEN_GRUPOSCLIENTE_CLIENTE");
-						int eliminadoGrupo = cenGruposclienteClienteExtendsMapper
-								.updateByExample(cenGruposclienteCliente, cenGruposclienteClienteExample);
+						int eliminadoGrupo = cenGruposclienteClienteExtendsMapper.deleteByExample(cenGruposclienteClienteExample);
+//								.updateByExample(cenGruposclienteCliente, cenGruposclienteClienteExample);
 						LOGGER.info(
 							"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.updateByExampleSelective() -> Salida de cenGruposclienteClienteExtendsMapper para eliminar un grupo relacionado con persona juridica en tabla CEN_GRUPOSCLIENTE_CLIENTE");
 
