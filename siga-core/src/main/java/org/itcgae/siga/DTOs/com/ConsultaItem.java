@@ -1,5 +1,6 @@
 package org.itcgae.siga.DTOs.com;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class ConsultaItem {
@@ -30,12 +31,16 @@ public class ConsultaItem {
 	private String idPlantillaConsulta;
 	private String idModeloComunicacion;
 	private String idPlantillaDocumento;
+	private String idPlantillaEnvios;
+	private String idTipoEnvios;
 
 	private String sentencia;
 	
 	private String idPlantillasConsultas;
 	
 	private String finalidad;
+	
+	private ArrayList<CampoDinamicoItem> camposDinamicos = new ArrayList<CampoDinamicoItem>();
 
 	public String getIdInstitucion() {
 		return idInstitucion;
@@ -251,6 +256,30 @@ public class ConsultaItem {
 
 	public void setFinalidad(String finalidad) {
 		this.finalidad = finalidad;
+	}
+
+	public ArrayList<CampoDinamicoItem> getCamposDinamicos() {
+		return camposDinamicos;
+	}
+
+	public void setCamposDinamicos(ArrayList<CampoDinamicoItem> camposDinamicos) {
+		this.camposDinamicos = camposDinamicos;
+	}
+
+	public String getIdPlantillaEnvios() {
+		return idPlantillaEnvios;
+	}
+
+	public void setIdPlantillaEnvios(String idPlantillaEnvios) {
+		this.idPlantillaEnvios = idPlantillaEnvios;
+	}
+
+	public String getIdTipoEnvios() {
+		return idTipoEnvios;
+	}
+
+	public void setIdTipoEnvios(String idTipoEnvios) {
+		this.idTipoEnvios = idTipoEnvios;
 	}
 	
 

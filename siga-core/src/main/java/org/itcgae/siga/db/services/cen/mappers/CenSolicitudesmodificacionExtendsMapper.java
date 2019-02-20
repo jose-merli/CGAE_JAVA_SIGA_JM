@@ -31,7 +31,7 @@ public interface CenSolicitudesmodificacionExtendsMapper extends CenSolicitudesm
 			@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR) })
 	List<SolModificacionItem> searchSolModif(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-			String idLenguage, String idInstitucion);
+			String idLenguage, String idInstitucion, Long idPersona);
 	
 	@SelectProvider(type = CenSolicitudesmodificacionSqlExtendsProvider.class, method = "getMaxIdSolicitud")
 	@Results({ @Result(column = "IDSOLICITUD", property = "newId", jdbcType = JdbcType.VARCHAR)

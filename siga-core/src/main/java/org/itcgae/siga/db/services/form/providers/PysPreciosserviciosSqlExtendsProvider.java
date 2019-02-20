@@ -16,7 +16,7 @@ public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSq
 		sql.WHERE("idServicio = " + idServicio);
 		sql.WHERE("idserviciosinstitucion = " + idServicioInstitucion);
 		sql.WHERE("IDPERIODICIDAD = " + idPeriocidad );
-		
+		  
 		return sql.toString();
 	}
 	

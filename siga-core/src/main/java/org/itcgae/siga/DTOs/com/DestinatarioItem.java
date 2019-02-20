@@ -1,5 +1,7 @@
 package org.itcgae.siga.DTOs.com;
 
+import java.util.ArrayList;
+
 public class DestinatarioItem {
 	
 	private String idPersona;
@@ -7,8 +9,30 @@ public class DestinatarioItem {
 	private String apellidos1;
 	private String apellidos2;
 	private String nombre;
+	private String correoElectronico;
+	private String movil;
+	private String domicilio;
+	private ArrayList<ConsultaEnvioItem> listaConsultasEnvio;
 	
 	
+	public String getDomicilio() {
+		return domicilio;
+	}
+	public void setDomicilio(String domicilio) {
+		this.domicilio = domicilio;
+	}
+	public String getCorreoElectronico() {
+		return correoElectronico;
+	}
+	public String getMovil() {
+		return movil;
+	}
+	public void setCorreoElectronico(String correoElectronico) {
+		this.correoElectronico = correoElectronico;
+	}
+	public void setMovil(String movil) {
+		this.movil = movil;
+	}
 	public String getIdPersona() {
 		return idPersona;
 	}
@@ -38,5 +62,11 @@ public class DestinatarioItem {
 	}
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+	public ArrayList<ConsultaEnvioItem> getListaConsultasEnvio() {
+		return listaConsultasEnvio;
+	}
+	public void setListaConsultasEnvio(ArrayList<ConsultaEnvioItem> listaConsultasEnvio) {
+		this.listaConsultasEnvio = listaConsultasEnvio;
 	}
 }

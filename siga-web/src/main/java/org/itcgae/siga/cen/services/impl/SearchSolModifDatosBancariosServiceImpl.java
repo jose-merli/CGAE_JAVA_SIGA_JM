@@ -16,10 +16,13 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicos;
 import org.itcgae.siga.db.entities.CenSolicitmodifdatosbasicosExample;
 import org.itcgae.siga.db.entities.CenSolicmodicuentas;
 import org.itcgae.siga.db.entities.CenSolicmodicuentasExample;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicmodicuentasExtendsMapper;
@@ -34,6 +37,9 @@ public class SearchSolModifDatosBancariosServiceImpl implements ISearchSolModifD
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private CenPersonaMapper cenPersonaMapper;
 	
 	@Autowired
 	private CenSolicmodicuentasExtendsMapper cenSolicModiCuentasExtendsMapper;
@@ -52,7 +58,7 @@ public class SearchSolModifDatosBancariosServiceImpl implements ISearchSolModifD
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		SolModificacionDTO solModificacionDTO = new SolModificacionDTO();
-
+		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -65,10 +71,26 @@ public class SearchSolModifDatosBancariosServiceImpl implements ISearchSolModifD
 			if (usuarios != null && usuarios.size() > 0) {
 
 				AdmUsuarios usuario = usuarios.get(0);
-				LOGGER.info(
-						"searchSolModifDatosBancarios() / cenSolicModiCuentasExtendsMapper.searchSolModifDatosBancarios() -> Entrada a cenSoliModiDireccionesExtendsMapper para obtener los resultados de la búsqueda");
-				List<SolModificacionItem> solModificacionItems = cenSolicModiCuentasExtendsMapper.searchSolModifDatosBancarios(solicitudModificacionSearchDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion));
-				solModificacionDTO.setSolModificacionItems(solModificacionItems);
+				
+
+				
+				if (letrado.equalsIgnoreCase("S")) {
+					CenPersonaExample example = new CenPersonaExample();
+					example.createCriteria().andNifcifEqualTo(usuario.getNif());
+					List<CenPersona> cenPersona = cenPersonaMapper.selectByExample(example );
+					if (null != cenPersona && cenPersona.size()>0) {
+						LOGGER.info(
+								"searchSolModifDatosBancarios() / cenSolicModiCuentasExtendsMapper.searchSolModifDatosBancarios() -> Entrada a cenSoliModiDireccionesExtendsMapper para obtener los resultados de la búsqueda");
+						List<SolModificacionItem> solModificacionItems = cenSolicModiCuentasExtendsMapper.searchSolModifDatosBancarios(solicitudModificacionSearchDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion),cenPersona.get(0).getIdpersona());
+						solModificacionDTO.setSolModificacionItems(solModificacionItems);					
+						}
+
+				}else{
+					LOGGER.info(
+							"searchSolModifDatosBancarios() / cenSolicModiCuentasExtendsMapper.searchSolModifDatosBancarios() -> Entrada a cenSoliModiDireccionesExtendsMapper para obtener los resultados de la búsqueda");
+					List<SolModificacionItem> solModificacionItems = cenSolicModiCuentasExtendsMapper.searchSolModifDatosBancarios(solicitudModificacionSearchDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion),null);
+					solModificacionDTO.setSolModificacionItems(solModificacionItems);				
+					}
 			}
 		}
 		LOGGER.info(

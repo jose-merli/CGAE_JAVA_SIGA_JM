@@ -38,4 +38,13 @@ public interface ModModeloPlantillaDocumentoExtendsMapper {
 	})
 	List<PlantillaModeloDocumentoDTO> selectInformesGenerar(Long idModeloComunicacion);
 	
+	@SelectProvider(type = ModModeloPlantillaDocumentoExtendsSqlProvider.class, method = "selectPlantillaGenerar")
+	@Results({
+		@Result(column = "IDINFORME", property = "idInforme", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPLANTILLAS", property = "idPlantillas", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREFICHEROSALIDA", property = "nombreFicheroSalida", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FORMATOSALIDA", property = "formatoSalida", jdbcType = JdbcType.VARCHAR)	
+	})
+	List<PlantillaModeloDocumentoDTO> selectPlantillaGenerar(Long idModeloComunicacion, Long idPlantillaDocumento);
+	
 }

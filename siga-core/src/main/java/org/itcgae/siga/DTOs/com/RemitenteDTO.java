@@ -16,8 +16,15 @@ public class RemitenteDTO {
 	private String descripcion;
 	private List<DatosDireccionesItem> direccion;
 	private Error error;
+	private String correoElectronico;
 	
 	
+	public String getCorreoElectronico() {
+		return correoElectronico;
+	}
+	public void setCorreoElectronico(String correoElectronico) {
+		this.correoElectronico = correoElectronico;
+	}
 	public String getIdPlantillaEnvios() {
 		return idPlantillaEnvios;
 	}

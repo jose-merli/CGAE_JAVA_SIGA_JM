@@ -39,5 +39,5 @@ public interface CenTiposModificacionesExtendsMapper {
 		@Result(column = "TIPOMODIFICACION", property = "tipoModificacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMCOLEGIADO", property = "numColegiado", jdbcType = JdbcType.VARCHAR)}) 
 	List<SolModificacionItem> searchModificationRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-			String idLenguage, String idInstitucion);
+			String idLenguage, String idInstitucion, Long idPersona);
 }
