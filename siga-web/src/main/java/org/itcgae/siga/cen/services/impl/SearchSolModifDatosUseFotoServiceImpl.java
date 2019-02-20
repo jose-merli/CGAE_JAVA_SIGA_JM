@@ -17,10 +17,13 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicmodifexportarfoto;
 import org.itcgae.siga.db.entities.CenSolicmodifexportarfotoExample;
 import org.itcgae.siga.db.entities.CenSolimodidirecciones;
 import org.itcgae.siga.db.entities.CenSolimodidireccionesExample;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicmodifexportarfotoExtendsMapper;
@@ -40,6 +43,9 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 	private CenSolicmodifexportarfotoExtendsMapper cenSolicModifExportarFotoExtendsMapper;
 	
 	@Autowired
+	private CenPersonaMapper cenPersonaMapper;
+	
+	@Autowired
 	private CenClienteExtendsMapper cenClienteExtendsMapper;
 	
 	@Override
@@ -53,7 +59,7 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		SolModificacionDTO solModificacionDTO = new SolModificacionDTO();
-
+		String letrado = UserTokenUtils.getLetradoFromJWTToken(token);
 		if (idInstitucion != null) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -66,12 +72,30 @@ public class SearchSolModifDatosUseFotoServiceImpl implements ISearchSolModifDat
 			if (usuarios != null && usuarios.size() > 0) {
 
 				AdmUsuarios usuario = usuarios.get(0);
-				LOGGER.info(
-						"searchSolModifDatosUseFoto() / cenSolicModifExportarFotoExtendsMapper.searchSolModifDatosUseFoto() -> Entrada a cenSolicModifExportarFotoExtendsMapper para obtener los datos de la foto");
-				//solicitudModificacionSearchDTO.setIdInstitucion(idInstitucion.toString());
-				List<SolModificacionItem> solModificacionItems = cenSolicModifExportarFotoExtendsMapper.searchSolModifDatosUseFoto(solicitudModificacionSearchDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion));
-				solModificacionDTO.setSolModificacionItems(solModificacionItems);
-
+				if (letrado.equalsIgnoreCase("S")) {
+					CenPersonaExample example = new CenPersonaExample();
+					example.createCriteria().andNifcifEqualTo(usuario.getNif());
+					List<CenPersona> cenPersona = cenPersonaMapper.selectByExample(example );
+					if (null != cenPersona && cenPersona.size()>0) {
+	
+	
+						LOGGER.info(
+								"searchSolModifDatosUseFoto() / cenSolicModifExportarFotoExtendsMapper.searchSolModifDatosUseFoto() -> Entrada a cenSolicModifExportarFotoExtendsMapper para obtener los datos de la foto");
+						//solicitudModificacionSearchDTO.setIdInstitucion(idInstitucion.toString());
+						List<SolModificacionItem> solModificacionItems = cenSolicModifExportarFotoExtendsMapper.searchSolModifDatosUseFoto(solicitudModificacionSearchDTO, usuario.getIdlenguaje(), 
+								String.valueOf(idInstitucion),cenPersona.get(0).getIdpersona());
+						solModificacionDTO.setSolModificacionItems(solModificacionItems);
+					}
+	
+				}else{
+	
+					LOGGER.info(
+							"searchSolModifDatosUseFoto() / cenSolicModifExportarFotoExtendsMapper.searchSolModifDatosUseFoto() -> Entrada a cenSolicModifExportarFotoExtendsMapper para obtener los datos de la foto");
+					//solicitudModificacionSearchDTO.setIdInstitucion(idInstitucion.toString());
+					List<SolModificacionItem> solModificacionItems = cenSolicModifExportarFotoExtendsMapper.searchSolModifDatosUseFoto(solicitudModificacionSearchDTO, usuario.getIdlenguaje(), String.valueOf(idInstitucion),null);
+					solModificacionDTO.setSolModificacionItems(solModificacionItems);
+	
+				}
 			}
 		}
 

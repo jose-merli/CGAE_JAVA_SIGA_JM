@@ -25,11 +25,18 @@ public class CenSolicitudesmodificacionSqlExtendsProvider {
 //	}
 	
 	public String searchSolModif(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-			String idLenguaje, String idInstitucion) {
+			String idLenguaje, String idInstitucion,Long idPersona) {
 
-		String rdo = "SELECT * FROM (" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
-				+ " ) ORDER BY 6 DESC";
-		return rdo;
+		if (null != idPersona) {
+			String rdo = "SELECT * FROM ((" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+			+ " )) WHERE IDPERSONA = "+ idPersona +"  ORDER BY 6 DESC";
+			return rdo;
+		}else{
+			String rdo = "SELECT * FROM (" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+			+ " )  ORDER BY 6 DESC";
+			return rdo;
+		}
+		
 	}
 	
 	public String getMaxIdSolicitud(String idInstitucion, String idPersona) {
@@ -37,8 +44,8 @@ public class CenSolicitudesmodificacionSqlExtendsProvider {
 
 		sql.SELECT("MAX(IDSOLICITUD) AS IDSOLICITUD");
 		sql.FROM("CEN_SOLICITUDESMODIFICACION");
-		sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
-		sql.WHERE("IDPERSONA = '"+ idPersona +"'");
+		//sql.WHERE("IDINSTITUCION = '"+idInstitucion+"'");
+		//sql.WHERE("IDPERSONA = '"+ idPersona +"'");
 		
 		return sql.toString();
 	}

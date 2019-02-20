@@ -1,7 +1,8 @@
 package org.itcgae.siga.com.services;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
@@ -30,12 +31,16 @@ public interface IModelosYcomunicacionesService {
 
 	public ResponseDataDTO guardarDatosGenerales(HttpServletRequest request, TarjetaModeloConfiguracionDTO datosTarjeta);
 	
-	public Error guardarPlantillaEnviosModelo(HttpServletRequest request, PlantillaModeloBorrarDTO plantilla);
+	public Error guardarPlantillaEnviosModelo(HttpServletRequest request, List<PlantillaModeloBorrarDTO> plantilla);
 	public PlantillasModeloDTO obtenerPlantillasEnviosModeloSearch(HttpServletRequest request, String idModelo);
 	public PlantillasModeloDTO obtenerPlantillasEnviosModeloSearchHist(HttpServletRequest request, String idModelo);
 	public Error borrarPlantillaEnviosModelo(HttpServletRequest request, PlantillaModeloBorrarDTO[] plantillas);
 	public Error borrarInformes(HttpServletRequest request, PlantillaDocumentoBorrarDTO[] plantillasDoc);
 	public ComboDTO obtenerPlantillasComunicacion(HttpServletRequest request);
 	public PlantillaEnvioItem obtenerTipoEnvioPlantilla(HttpServletRequest request, String idPlantilla);
+	
+	public Error rehabilitarModeloComunicaciones(HttpServletRequest request, ModelosComunicacionItem[] modeloComunicacion);
+	
+	public Boolean comprobarNombreModeloComunicacion(HttpServletRequest request, TarjetaModeloConfiguracionDTO datosTarjeta);
 	
 }

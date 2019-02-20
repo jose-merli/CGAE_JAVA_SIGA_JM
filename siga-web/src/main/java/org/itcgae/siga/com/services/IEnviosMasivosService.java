@@ -27,7 +27,7 @@ public interface IEnviosMasivosService {
 	public EnviosMasivosDTO enviosMasivosSearch(HttpServletRequest request, EnviosMasivosSearch filtros);
 	public Error programarEnvio (HttpServletRequest request, EnviosMasivosItem[] envioProgramarDto);
 	public Error cancelarEnvios (HttpServletRequest request, EnvioProgramadoDto[] enviosProgramadosDto);
-	public Error enviar(HttpServletRequest request, List<EnvioProgramadoDto> envios);
+	public Error enviar(HttpServletRequest request, EnvioProgramadoDto[] envios);
 	public Error guardarConfiguracion(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta);
 	public Error duplicarEnvio(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta);
 	public Error guardarEtiquetasEnvio(HttpServletRequest request, TarjetaEtiquetasDTO etiquetasDTO);

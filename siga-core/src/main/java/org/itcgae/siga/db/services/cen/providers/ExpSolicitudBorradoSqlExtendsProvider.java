@@ -6,11 +6,11 @@ import org.itcgae.siga.commons.utils.SolModifSQLUtils;
 public class ExpSolicitudBorradoSqlExtendsProvider {
 
 	public String searchSolModifDatosExpedientes(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-			String idLenguaje, String idInstitucion) {
+			String idLenguaje, String idInstitucion, Long idPersona) {
 
-		String rdo = "SELECT * FROM (" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+		String rdo = "SELECT * FROM ((" + SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
 				+ " ) UNION ( " + SolModifSQLUtils.getDataFileRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
-				+ " ) ORDER BY 6 DESC";
+				+ " )) WHERE IDPERSONA = "+ idPersona +"  ORDER BY 6 DESC";
 		return rdo;
 	}
 }

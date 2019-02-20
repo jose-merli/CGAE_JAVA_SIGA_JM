@@ -4,7 +4,7 @@ import org.apache.ibatis.jdbc.SQL;
 
 public class ModKeyclasecomunicacionExtendsSqlProvider {
 	
-	public String selectKeyClase(Long idClaseComunicacion){
+	public String selectKeyClase(Short idClaseComunicacion){
 		
 		SQL sql = new SQL();		
 				

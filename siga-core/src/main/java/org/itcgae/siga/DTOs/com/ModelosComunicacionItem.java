@@ -1,15 +1,18 @@
 package org.itcgae.siga.DTOs.com;
 
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 
 public class ModelosComunicacionItem {
 	
 	private String idModeloComunicacion;
 	private String nombre;
-	private String orden;
+	private Integer orden;
 	private String idInstitucion;
 	private String descripcion;
 	private String preseleccionar;
@@ -20,7 +23,8 @@ public class ModelosComunicacionItem {
 	private String claseComunicacion;
 	private String idPlantillaEnvio;
 	private String idTipoEnvio;
-	private ComboDTO plantillas;
+	private String porDefecto;
+	private List<ComboItem> plantillas = new ArrayList<ComboItem>();
 	
 	public String getIdModeloComunicacion() {
 		return idModeloComunicacion;
@@ -29,22 +33,16 @@ public class ModelosComunicacionItem {
 		this.idModeloComunicacion = idModeloComunicacion;
 	}
 
-	public ComboDTO getPlantillas() {
-		return plantillas;
-	}
-	public void setPlantillas(ComboDTO plantillas) {
-		this.plantillas = plantillas;
-	}
 	public String getNombre() {
 		return nombre;
 	}
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public String getOrden() {
+	public Integer getOrden() {
 		return orden;
 	}
-	public void setOrden(String orden) {
+	public void setOrden(Integer orden) {
 		this.orden = orden;
 	}
 	public String getIdInstitucion() {
@@ -106,6 +104,18 @@ public class ModelosComunicacionItem {
 	}
 	public void setIdTipoEnvio(String idTipoEnvio) {
 		this.idTipoEnvio = idTipoEnvio;
+	}
+	public String getPorDefecto() {
+		return porDefecto;
+	}
+	public void setPorDefecto(String porDefecto) {
+		this.porDefecto = porDefecto;
+	}
+	public List<ComboItem> getPlantillas() {
+		return plantillas;
+	}
+	public void setPlantillas(List<ComboItem> plantillas) {
+		this.plantillas = plantillas;
 	}
 	
 	

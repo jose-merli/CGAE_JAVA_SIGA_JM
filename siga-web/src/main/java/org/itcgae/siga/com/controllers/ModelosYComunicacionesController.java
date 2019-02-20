@@ -1,5 +1,7 @@
 package org.itcgae.siga.com.controllers;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesDTO;
@@ -73,6 +75,17 @@ public class ModelosYComunicacionesController {
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/rehabilitar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> rehabilitarModelo(HttpServletRequest request, @RequestBody ModelosComunicacionItem[] modelo) {
+		
+		Error response = _modelosYcomunicacionesService.rehabilitarModeloComunicaciones(request, modelo);
+
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 
 	@RequestMapping(value = "/detalle/datosGenerales",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ResponseDataDTO> guardarDatosGenerales(HttpServletRequest request, @RequestBody TarjetaModeloConfiguracionDTO datosTarjeta) {
@@ -84,6 +97,14 @@ public class ModelosYComunicacionesController {
 		else
 			return new ResponseEntity<ResponseDataDTO>(respuesta, HttpStatus.INTERNAL_SERVER_ERROR);
 		
+	}
+	
+	@RequestMapping(value = "/detalle/datosGenerales/comprobarNom",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	Boolean comprobarNombreModeloComunicacion(HttpServletRequest request, @RequestBody TarjetaModeloConfiguracionDTO datosTarjeta) {
+		
+		Boolean respuesta = _modelosYcomunicacionesService.comprobarNombreModeloComunicacion(request, datosTarjeta);
+		
+		return respuesta;
 	}
 	
 	@RequestMapping(value = "/detalle/perfiles",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
@@ -190,9 +211,9 @@ public class ModelosYComunicacionesController {
 	}	
 	
 	@RequestMapping(value = "/detalle/guardarPlantillaEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> guardarPlantillaEnvio(HttpServletRequest request, @RequestBody PlantillaModeloBorrarDTO plantilla) {
+	ResponseEntity<Error> guardarPlantillaEnvio(HttpServletRequest request, @RequestBody List<PlantillaModeloBorrarDTO> listPlantilla) {
 
-		Error response = _modelosYcomunicacionesService.guardarPlantillaEnviosModelo(request, plantilla);
+		Error response = _modelosYcomunicacionesService.guardarPlantillaEnviosModelo(request, listPlantilla);
 		if(response.getCode() == 200)
 			return new ResponseEntity<Error>(response, HttpStatus.OK);
 		else

@@ -254,4 +254,47 @@ public class UtilidadesString {
 		return notaString;
 	}
 
+	public static String replaceFirstIgnoreCase (String texto, String clave, String valor)
+    {
+    	if(texto!=null && clave!=null && valor!=null){
+	    	String t = texto.toUpperCase();
+	    	int ini = t.indexOf(clave.toUpperCase());
+	    	if (ini < 0) 
+	    		return texto;
+	    	
+	    	t = texto.substring(0, ini) + valor + texto.substring(ini + clave.length());
+	    	return t;
+    	}else{
+    		LOGGER.info("replaceFirstIgnoreCase Devolvemos espacio");
+    		return "";
+    	}
+    }
+	
+	private static int replaceFirstIgnoreCase (String texto[], String clave, String valor, int posIni)
+    {
+    	if (texto==null || texto.length < 0 ||clave ==null||valor ==null){ 
+    		LOGGER.info("replaceFirstIgnoreCase retornamos menos 1");
+    		return -1;
+    	}
+    	
+    	String t = texto[0].toUpperCase();
+    	int ini = t.indexOf(clave.toUpperCase(), posIni);
+    	if (ini < 0) 
+    		return -1;
+    	
+    	t = texto[0].substring(0, ini) + valor + texto[0].substring(ini + clave.length());
+    	texto[0] = t;
+    	return ini + valor.length();
+    }
+	
+	public static String replaceAllIgnoreCase (String texto, String clave, String valor) 
+    {
+		String t[] = {texto}; 
+    	int i = 0;
+		while(true){
+			i = UtilidadesString.replaceFirstIgnoreCase(t, clave, valor, i);
+    		if (i < 0) 
+    			return t[0];
+    	} 
+    }
 }

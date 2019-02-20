@@ -1,14 +1,18 @@
 package org.itcgae.siga.DTOs.com;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class DialogoComunicacionItem {
 	
 	private String idClaseComunicacion;
 	private String idInstitucion;
+	private Date fechaProgramada;
 	private List<ModelosComunicacionItem> modelos = new ArrayList<ModelosComunicacionItem>();
 	private List<List<String>> selectedDatos = new ArrayList<List<String>>();
+	private List<ConsultaItem> consultas = new ArrayList<ConsultaItem>();
+	private String ruta;
 	
 	public String getIdClaseComunicacion() {
 		return idClaseComunicacion;
@@ -33,6 +37,24 @@ public class DialogoComunicacionItem {
 	}
 	public void setIdInstitucion(String idInstitucion) {
 		this.idInstitucion = idInstitucion;
+	}
+	public List<ConsultaItem> getConsultas() {
+		return consultas;
+	}
+	public void setConsultas(List<ConsultaItem> consultas) {
+		this.consultas = consultas;
+	}
+	public Date getFechaProgramada() {
+		return fechaProgramada;
+	}
+	public void setFechaProgramada(Date fechaProgramada) {
+		this.fechaProgramada = fechaProgramada;
+	}
+	public String getRuta() {
+		return ruta;
+	}
+	public void setRuta(String ruta) {
+		this.ruta = ruta;
 	}
 	
 	

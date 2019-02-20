@@ -17,12 +17,21 @@ public class CenTiposModificacionesSqlExtendsProvider {
 	}
 
 	public String searchModificationRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
-			String idLenguaje, String idInstitucion) {
-		String rdo = "SELECT * FROM ("
-				+ SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
-				+ " ) UNION ( " + getSpecificRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
-				+ " ) ORDER BY 6 DESC";
-		return rdo;
+			String idLenguaje, String idInstitucion,Long idPersona) {
+
+		if (null != idPersona) {
+			String rdo = "SELECT * FROM (("
+					+ SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+					+ " ) UNION ( " + getSpecificRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+					+ " )) WHERE IDPERSONA = "+ idPersona +"  ORDER BY 6 DESC";
+			return rdo;
+		}else{
+			String rdo = "SELECT * FROM ("
+					+ SolModifSQLUtils.getGeneralRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+					+ " ) UNION ( " + getSpecificRequest(solicitudModificacionSearchDTO, idLenguaje, idInstitucion)
+					+ " ) ORDER BY 6 DESC";
+			return rdo;
+		}
 	}
 
 	private String getSpecificRequest(SolicitudModificacionSearchDTO solicitudModificacionSearchDTO, String idLenguaje,

@@ -34,26 +34,81 @@ public class SigaConstants {
 	public static String DB_TRUE = "1";
 	public static final String IP_ACCESO_SERVICIO_CARGAS = "IP_ACCESO_SERVICIO_CARGAS";
 	public static final String ACTIVAR_CLIENTE_SERVICIO_CARGAS = "ACTIVAR_CLIENTE_SERVICIO_CARGAS";
+	public static final String DESFASE_PROGRAMACION_ENVIO_MINUTOS = "DESFASE_PROGRAMACION_ENVIO_MINUTOS";
+	public static final String NUM_MAXIMO_MODELOS_SELECCIONADOS = "dialogo.modelocomunicacion.seleccionMax";
+	public static final String FICHERO_SIGA = "SIGA";
+	public static final String LENGUAJE_DEFECTO = "1";
 	
 	// DOCUMENTOS
 	
 	public static String SUFIJO_MODULO_COM_DUPLICADO = "_Copia";
+	public static String SUFIJO_CONSULTA_COM_DUPLICADO = "_Copia";
 	public static int NOMBRE_MAXLENGTH = 100;
 	public static String rutaficherosInformesYcomunicaciones = "/FILERMSA1000/SIGA/ficheros/archivo/";
 	public static String carpetaDocumentosEnvio = "/documentosEnvio/";
 	public static String carpetaPlantillasDocumento = "/plantillaDocumentos/";
+	public static String carpetaTmp = "/tmp/";
 	public static String rutaExcelConsultaTemp= "/FILERMSA1000/SIGA/ficheros/archivo/tempExcel/";
 	public static String nombreExcelConsulta = "ResultadoConsulta";
+	public static String nombreZip = "DocumentosComunicacion";
+	public static String rutaLicencia = "/WEB-INF/Aspose.Words.lic";
 	
 	public static String REPLACECHAR_PREFIJO_SUFIJO = "%%";
 	public static String CLAVES_QUERY = "CLAVES";
 	public static String WHERE_VALUE = "whereValue";
-	public static String CAMPO_NOMBRE = "nombre";
-	public static String CAMPO_APELLIDOS = "apellidos";
+	public static String CAMPO_NOMBRE = "NOMBRE";
+	public static String CAMPO_APELLIDOS = "APELLIDOS";
 	public static String CAMPO_APELLIDO1 = "APELLIDO1";
 	public static String CAMPO_APELLIDO2 = "APELLIDO2";
 	public static String CAMPO_NUM_COLEGIADO = "NCOLEGIADO";
 	public static String CAMPO_IDENTIFICACION = "INDENTIFICACIONENTIDAD";
+	public static String CAMPO_IDINSTITUCION = "IDINSTITUCION";
+	public static String IDINSTITUCION_0 = "0";
+	public static String SI = "SI";
+	public static String NO = "NO";
+	
+	// Para la busqueda de criterios dinamicos de las consultas
+	public static final String TIPONUMERO	= "N";
+	public static final String TIPOTEXTO	= "A";
+	public static final String TIPOFECHA	= "D";
+	public static final String TIPOFECHANULA	= "X";
+	public static final String TIPOMULTIVALOR		= "MV";
+	public static final String TIPOENVIO		= "E";
+	
+	public static final String ETIQUETATIPONUMERO	= "%%NUMERO%%";
+	public static final String ETIQUETATIPOTEXTO	= "%%TEXTO%%";
+	public static final String ETIQUETATIPOFECHA	= "%%FECHA%%";
+	public static final String ETIQUETATIPOMULTIVALOR		= "%%MULTIVALOR@";
+	public static final String ETIQUETATIPOENVIO		= "%%TIPOENVIO%%";
+	public static final String ETIQUETAOPERADOR   	= "%%OPERADOR%%";
+	
+	public static final String NOMBRETIPOENVIO		= "TIPO ENVIO";
+	public static final String IS_NULL		= "is null";
+	public static final String LIKE		= "like";
+	public static final String NOMBRETABLA_CEN_CLIENTE = "CEN_CLIENTE";
+	public static final String NOMBRETABLA_CEN_COLEGIADO = "CEN_COLEGIADO";
+	
+	public static final String ECOS_PREFIJO_ESPANA = "(+34)";
+	public static final String TIPO_ENVIO_CORREOELECTRONICO = "1";
+	public static final String TIPO_ENVIO_CORREO_ORDINARIO = "2";
+	public static final String TIPO_ENVIO_SMS = "4";
+	public static final String TIPO_ENVIO_BUROSMS = "5";
+	public static final String ID_OBJETIVO_DESTINATARIOS ="1";
+	
+	//estados envio
+	public static final Short ENVIO_PENDIENTE_MANUAL = 1;
+	public static final Short ENVIO_PROCESADO = 2;
+	public static final Short ENVIO_PROCESADO_CON_ERRORES = 3;
+	public static final Short ENVIO_PENDIENTE_AUTOMATICO = 4;
+	public static final Short ENVIO_PROCESANDO = 5;
+	public static final Short ENVIO_ARCHIVADO = 6;
+	
+	//tipos envio
+	public static final Short ID_ENVIO_MAIL = 1;
+	public static final Short ID_ENVIO_CORREO_ORDINARIO = 2;
+	public static final Short ID_ENVIO_SMS = 4;
+	public static final Short ID_ENVIO_BURO_SMS = 5;
+	
 
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(
@@ -353,20 +408,20 @@ public class SigaConstants {
 	}
 	
 	public static enum OBJETIVO {
-		DESTINATARIOS(new Short("1"), "DESTINATARIOS"),
-		MULTIDOCUMENTO(new Short("2"), "MULTIDOCUMENTO"),
-		CONDICIONAL(new Short("3"), "CONDICIONAL"),
-		DATOS(new Short("4"), "DATOS");
+		DESTINATARIOS(new Long("1"), "DESTINATARIOS"),
+		MULTIDOCUMENTO(new Long("2"), "MULTIDOCUMENTO"),
+		CONDICIONAL(new Long("3"), "CONDICIONAL"),
+		DATOS(new Long("4"), "DATOS");
 		
-		private final Short codigo;
+		private final Long codigo;
 		private final String descripcion;
 
-		OBJETIVO(Short codigo, String descripcion) {
+		OBJETIVO(Long codigo, String descripcion) {
 			this.codigo = codigo;
 			this.descripcion = descripcion;
 		}
 
-		public Short getCodigo() {
+		public Long getCodigo() {
 			return codigo;
 		}
 
@@ -376,7 +431,7 @@ public class SigaConstants {
 
 		public static OBJETIVO getEnum(Short codigo) {
 			for (OBJETIVO sc : values()) {
-				if (sc.getCodigo().shortValue() == codigo.shortValue()) {
+				if (sc.getCodigo().longValue() == codigo.longValue()) {
 					return sc;
 				}
 			}
@@ -585,6 +640,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String NOMBREGRUPO = "NOMBREGRUPO";
 	public static final String PERSONANOMBRE = "PERSONANOMBRE";
 	public static final String C_IDPERSONA = "C_IDPERSONA";
+	public static final String C_IDINSTITUCION 		= "IDINSTITUCION";
 	public static final String PERSONANIF = "PERSONANIF";
 	public static final String COLEGIADONUMERO = "COLEGIADONUMERO";
 	public static final Short IDINSTITUCION_2000 = 2000;
@@ -636,14 +692,14 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 			C_FECHAINICIO ,C_FECHAFIN,C_CREDITOS,FECHAVERIFICACION,C_DESCRIPCION
 			,TIPOCVCOD,TIPOCVNOMBRE,C_IDTIPOCV,SUBTIPOCV1COD,SUBTIPOCV1NOMBRE,C_IDTIPOCVSUBTIPO1,SUBTIPOCV2COD,SUBTIPOCV2NOMBRE,C_IDTIPOCVSUBTIPO2,ERRORES);
 
-	
+
 	//AGENDA
-	
 	public static final long CALENDARIO_GENERAL = 1; 
 	public static final long CALENDARIO_LABORAL = 2;
 	public static final long CALENDARIO_FORMACION = 3; 
 
-	//
+
+	// AVISOS PARA NOTIFICACIONES EN EVENTOS
 	public static final String AVISO_CANCELAR_CURSO = "1";
 	public static final String AVISO_MODIFICAR_CURSO = "2";
 	public static final String AVISO_PLAZAS_DISPONIBLES = "3";
@@ -659,6 +715,5 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final long NOTIFICACION_SEGUNDOS = 3;
 	
 
- 
 
 }

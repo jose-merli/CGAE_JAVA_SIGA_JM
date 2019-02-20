@@ -23,6 +23,21 @@ public class ModPlantillaDocumentoExtendsSqlProvider {
 		return sql.toString();
 	}
 	
+	public String selectPlantillasByModelo(Long idModeloComunicacion, String idLenguaje){
+		
+		SQL sql = new SQL();		
+				
+		sql.SELECT("plantillaDocumento.IDPLANTILLADOCUMENTO");
+		sql.SELECT("plantillaDocumento.PLANTILLA");
+		sql.SELECT("modeloPlantillaDocumento.IDINFORME");
+		
+		sql.FROM("MOD_PLANTILLADOCUMENTO plantillaDocumento");	
+		sql.INNER_JOIN("MOD_MODELO_PLANTILLADOCUMENTO modeloPlantillaDocumento ON modeloPlantillaDocumento.IDPLANTILLADOCUMENTO = plantillaDocumento.IDPLANTILLADOCUMENTO AND modeloPlantillaDocumento.IDMODELOCOMUNICACION = " + idModeloComunicacion);
+		sql.WHERE("plantillaDocumento.idioma = '" + idLenguaje + "' AND modeloPlantillaDocumento.FECHABAJA IS NULL");
+		
+		return sql.toString();
+	}
+	
 	public String selectMaxIdPlantillaDocumento() {
 
 		SQL sql = new SQL();
