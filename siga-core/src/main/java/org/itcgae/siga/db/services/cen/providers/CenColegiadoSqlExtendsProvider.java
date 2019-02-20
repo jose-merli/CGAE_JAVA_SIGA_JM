@@ -125,7 +125,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 		
 		if (colegiadoItem.getNumColegiado() != null && colegiadoItem.getNumColegiado() != "") {
-			sql.WHERE("col.ncolegiado like '%" + colegiadoItem.getNumColegiado() + "%'");
+			sql.WHERE("col.ncolegiado = '" + colegiadoItem.getNumColegiado() + "'");
 		}
 
 		if (colegiadoItem.getSexo() != null && colegiadoItem.getSexo() != "") {

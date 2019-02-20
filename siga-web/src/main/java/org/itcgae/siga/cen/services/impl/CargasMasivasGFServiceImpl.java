@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 
@@ -157,7 +156,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		datosHashtable.put(SigaConstants.GENERAL, "1/0");
 		datosHashtable.put(SigaConstants.ACCION, "A/B");
 		datosHashtable.put(SigaConstants.C_FECHAINICIO, "dd/MM/yyyy");
-		datosHashtable.put(SigaConstants.C_FECHAFIN, "dd/MM/yyyy");
+//		datosHashtable.put(SigaConstants.C_FECHAFIN, "dd/MM/yyyy");
 		datosVector.add(datosHashtable);
 
 		// 1.1 Se rellena la segunda fila
@@ -168,7 +167,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		datosHashtable.put(SigaConstants.GENERAL, "Requerido. 1 si es general, 0 si es propio del ICA");
 		datosHashtable.put(SigaConstants.ACCION, "Requerido");
 		datosHashtable.put(SigaConstants.C_FECHAINICIO, "Requerido si accion es A");
-		datosHashtable.put(SigaConstants.C_FECHAFIN, "Requerido si accion es A");
+//		datosHashtable.put(SigaConstants.C_FECHAFIN, "Opcional");
 		datosVector.add(datosHashtable);
 
 		// 2. Crea el fichero excel
@@ -604,25 +603,26 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 					errorLinea.append("Fecha inicio es campo obligatorio. ");
 				}
 			}
-
-			if (hashtable.get(SigaConstants.C_FECHAFIN) != null && hashtable.get(SigaConstants.C_FECHAFIN) != "") {
-
-				try {
-					DateFormat df1 = new SimpleDateFormat("dd-MM-yyyy"); // for parsing input
-					LOGGER.debug("ValorParseado:" + (String) hashtable.get(SigaConstants.C_FECHAFIN) );
-					cargaMasivaDatosGFVo.setFechaFin(df1.parse((String) hashtable.get(SigaConstants.C_FECHAFIN)));
-
-				} catch (ParseException e) {
-					LOGGER.debug("Error al parsear fecha: " + e );
-					LOGGER.debug("Error al parsear fecha: " + SigaConstants.C_FECHAFIN + " : " );
-				}
-
-			} else {
-				if (!hashtable.get(SigaConstants.ACCION).equals("B")) {
-					LOGGER.debug("Fecha fin es campo obligatorio");
-					errorLinea.append("Fecha fin es campo obligatorio. ");
-				}
-			}
+			// Se indica que este campo desaparece
+//			if (hashtable.get(SigaConstants.C_FECHAFIN) != null && hashtable.get(SigaConstants.C_FECHAFIN) != "") {
+//
+//				try {
+//					DateFormat df1 = new SimpleDateFormat("dd-MM-yyyy"); // for parsing input
+//					LOGGER.debug("ValorParseado:" + (String) hashtable.get(SigaConstants.C_FECHAFIN) );
+//					cargaMasivaDatosGFVo.setFechaFin(df1.parse((String) hashtable.get(SigaConstants.C_FECHAFIN)));
+//
+//				} catch (ParseException e) {
+//					LOGGER.debug("Error al parsear fecha: " + e );
+//					LOGGER.debug("Error al parsear fecha: " + SigaConstants.C_FECHAFIN + " : " );
+//				}
+//
+//			} else {
+// 
+//				if (!hashtable.get(SigaConstants.ACCION).equals("B")) {
+//					LOGGER.debug("Fecha fin es campo obligatorio");
+//					errorLinea.append("Fecha fin es campo obligatorio. ");
+//				}
+//			}
 
 			if (!noEncontradoGrupoFijo) {
 				// Se comprueba si el colegiado ya tiene asignada la etiqueta

@@ -593,14 +593,12 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String C_FECHAFIN = "C_FECHAFIN";
 	
 	public static final List<String> CAMPOSEJEMPLOGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, 
-			C_IDGRUPO, GENERAL, ACCION, C_FECHAINICIO,
-			C_FECHAFIN);
+			C_IDGRUPO, GENERAL, ACCION, C_FECHAINICIO);
 
 	
 	public static final List<String> CAMPOSLOGGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, 
 			PERSONANOMBRE, C_IDPERSONA, C_IDGRUPO, 
-			GENERAL, NOMBREGRUPO, ACCION, C_FECHAINICIO,
-			C_FECHAFIN, ERRORES);
+			GENERAL, NOMBREGRUPO, ACCION, C_FECHAINICIO, ERRORES);
 
 	public static final String tipoExcelXls = "xls";
 	public static final String tipoExcelXlsx = "xlsx";
