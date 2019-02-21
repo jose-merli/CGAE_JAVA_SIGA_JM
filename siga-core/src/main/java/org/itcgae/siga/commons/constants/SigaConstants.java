@@ -44,11 +44,12 @@ public class SigaConstants {
 	public static String SUFIJO_MODULO_COM_DUPLICADO = "_Copia";
 	public static String SUFIJO_CONSULTA_COM_DUPLICADO = "_Copia";
 	public static int NOMBRE_MAXLENGTH = 100;
-	public static String rutaficherosInformesYcomunicaciones = "/FILERMSA1000/SIGA/ficheros/archivo/";
+	public static String rutaficherosInformesYcomunicaciones = "/Datos/SIGA/ficheros/comunicaciones/";
+	public static String rutaExcelConsultaTemp= "/Datos/SIGA/ficheros/temporal/";
 	public static String carpetaDocumentosEnvio = "/documentosEnvio/";
 	public static String carpetaPlantillasDocumento = "/plantillaDocumentos/";
 	public static String carpetaTmp = "/tmp/";
-	public static String rutaExcelConsultaTemp= "/FILERMSA1000/SIGA/ficheros/archivo/tempExcel/";
+	
 	public static String nombreExcelConsulta = "ResultadoConsulta";
 	public static String nombreZip = "DocumentosComunicacion";
 	public static String rutaLicencia = "/WEB-INF/Aspose.Words.lic";
