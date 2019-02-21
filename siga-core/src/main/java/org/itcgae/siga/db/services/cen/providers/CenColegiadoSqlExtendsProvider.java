@@ -68,9 +68,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT(
 				"concat( decode(col.situacionresidente,0,'No', 'Sí')  || ' / ',decode(col.comunitario,0,'No', 'Sí')) as residenteInscrito");
 		sql.SELECT("TO_CHAR(per.fechanacimiento,'DD/MM/YYYY') AS fechanacimiento");
-		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
-		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
-
+		
 		sql1.SELECT("partidojudicial.nombre");
 		sql1.FROM("cen_partidojudicial partidojudicial");
 		sql1.INNER_JOIN("cen_poblaciones pob on pob.idpartido = partidojudicial.idpartido");
@@ -86,7 +84,9 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		sql.SELECT_DISTINCT("(" + sql1 + ") as partidoJudicial");
 
-		sql.SELECT_DISTINCT("dir.movil as movil");
+		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,2,dir.correoelectronico,'') AS correo");
+		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,2,dir.telefono1,'') AS telefono");
+		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,2,dir.movil,'') as movil");
 		sql.FROM("cen_colegiado col");
 
 		sql.INNER_JOIN("cen_persona per on col.idpersona = per.idpersona");
@@ -157,7 +157,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		if (colegiadoItem.getTipoDireccion() != null && colegiadoItem.getTipoDireccion() != "") {
 			sql.WHERE("tipodir.idtipodireccion = "+ colegiadoItem.getTipoDireccion());
 		}else {
-			sql.WHERE("tipodir.idtipodireccion = 2");
+			sql.WHERE("(tipodir.idtipodireccion = 2 OR 2 NOT IN (SELECT idtipodireccion FROM CEN_DIRECCION_TIPODIRECCION TIPODIR2 "
+					+ "WHERE TIPODIR.IDPERSONA = TIPODIR2.IDPERSONA  AND TIPODIR.IDINSTITUCION = TIPODIR2.IDINSTITUCION ))");
 		}
 
 		if (colegiadoItem.getIdEstadoCivil() != null && colegiadoItem.getIdEstadoCivil() != "") {
