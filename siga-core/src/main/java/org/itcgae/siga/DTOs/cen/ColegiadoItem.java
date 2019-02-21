@@ -86,6 +86,8 @@ public class ColegiadoItem {
 	private String [] temas;
 	private List<ComboItem> temasCombo;
 	
+	private String [] colegio;
+	
 	
 	/**
 	 *
@@ -1309,5 +1311,12 @@ public class ColegiadoItem {
 		this.temasCombo = temasCombo;
 	}
 
+	public String[] getColegio() {
+		return colegio;
+	}
+
+	public void setColegio(String[] colegio) {
+		this.colegio = colegio;
+	}
 }
 

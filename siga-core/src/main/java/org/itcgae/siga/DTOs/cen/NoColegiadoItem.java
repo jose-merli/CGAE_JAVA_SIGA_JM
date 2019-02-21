@@ -55,6 +55,8 @@ public class NoColegiadoItem {
 	private String tipoCV;
 	private String subTipoCV1;
 	private String subTipoCV2;
+	
+	private String [] colegio;
 
 	/**
 	 *
@@ -1072,5 +1074,11 @@ public class NoColegiadoItem {
 		this.noAparecerRedAbogacia = noAparecerRedAbogacia;
 	}
 
-	
+	public String[] getColegio() {
+		return colegio;
+	}
+
+	public void setColegio(String[] colegio) {
+		this.colegio = colegio;
+	}
 }

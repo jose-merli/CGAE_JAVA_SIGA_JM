@@ -17,6 +17,21 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		SQL sql1 = new SQL();
 		SQL sql2 = new SQL();
 
+		// En el caso de que venga de la pantalla de busqueda colegiados/no colegiados, tendremos que preparar el filtro de instituciones
+		String instituciones = "";
+		if(colegiadoItem.getColegio() != null && colegiadoItem.getColegio().length > 0) {
+			if (colegiadoItem.getColegio().length > 1) {
+				for (String string : colegiadoItem.getColegio()) {
+					instituciones += "'" + string + "'";
+					instituciones += ",";
+				}
+				instituciones = instituciones.substring(0, instituciones.length() - 1);
+			} else if (colegiadoItem.getColegio().length == 1) {
+				instituciones = "'" + colegiadoItem.getColegio()[0] + "'";
+			}
+		}
+		
+		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		sql.SELECT_DISTINCT("col.idpersona");
@@ -98,10 +113,13 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt2 ON ( subt2.idTipoCV = datosCV.idTipoCV and subt2.idInstitucion = col.idInstitucion )");
 		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = col.idInstitucion )");
 
-		if (idInstitucion != Short.parseShort("2000")) {
-			sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
+		if(!instituciones.equals("")) {
+			sql.WHERE("COL.IDINSTITUCION IN (" + instituciones + ")");
+		} else {
+			if (idInstitucion != Short.parseShort("2000")) {
+				sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
+			}
 		}
-
 		sql.WHERE("per.idtipoidentificacion not in '20'");
 
 		if (colegiadoItem.getNif() != null && colegiadoItem.getNif() != "") {
