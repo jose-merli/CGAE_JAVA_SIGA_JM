@@ -1300,7 +1300,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						envio.setImprimiretiquetas("N");
 						envio.setIdplantillaenvios(modeloEnvio.getIdPlantillaEnvio());
 						
-						Short estadoNuevo = 1;
+						Short estadoNuevo = 4;
 						envio.setIdestado(estadoNuevo);
 						envio.setIdtipoenvios(modeloEnvio.getIdTipoEnvio());
 						envio.setFechamodificacion(new Date());
@@ -1322,7 +1322,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							historico.setFechamodificacion(new Date());
 							historico.setFechaestado(new Date());
 							historico.setUsumodificacion(usuario.getIdusuario());
-							Short idEstado = 1;
+							Short idEstado = 4;
 							historico.setIdestado(idEstado);
 							_envHistoricoestadoenvioMapper.insert(historico);
 							
