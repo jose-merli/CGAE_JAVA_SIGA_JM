@@ -15,6 +15,7 @@ import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
 import org.itcgae.siga.DTOs.com.KeysDTO;
+import org.itcgae.siga.DTOs.com.ModeloDialogoItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.ResponseDateDTO;
@@ -63,9 +64,9 @@ public class DialogoComunicacionController {
 	
 	
 	@RequestMapping(value = "/modelosSearch",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ModelosComunicacionSearch> modelosComunicacionSearch(HttpServletRequest request, @RequestBody String idClaseComunicacion) {
+	ResponseEntity<ModelosComunicacionSearch> modelosComunicacionSearch(HttpServletRequest request, @RequestBody ModeloDialogoItem modeloDTO) {
 		
-		ModelosComunicacionSearch response = _dialogoComunicacionService.obtenerModelos(request, idClaseComunicacion);
+		ModelosComunicacionSearch response = _dialogoComunicacionService.obtenerModelos(request, modeloDTO);
 		if(response.getError() == null)
 			return new ResponseEntity<ModelosComunicacionSearch>(response, HttpStatus.OK);
 		else

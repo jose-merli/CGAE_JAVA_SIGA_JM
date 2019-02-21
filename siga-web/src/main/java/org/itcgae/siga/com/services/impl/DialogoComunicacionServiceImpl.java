@@ -27,6 +27,7 @@ import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.GenerarComunicacionItem;
 import org.itcgae.siga.DTOs.com.KeyItem;
 import org.itcgae.siga.DTOs.com.KeysDTO;
+import org.itcgae.siga.DTOs.com.ModeloDialogoItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionSearch;
 import org.itcgae.siga.DTOs.com.ModelosEnvioItem;
@@ -220,7 +221,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 
 	@Override
-	public ModelosComunicacionSearch obtenerModelos(HttpServletRequest request, String idClaseComunicacion) {
+	public ModelosComunicacionSearch obtenerModelos(HttpServletRequest request, ModeloDialogoItem modeloDTO) {
 		
 		LOGGER.info("obtenerModelos() -> Entrada al servicio para obtener los modelos de comunicacion");
 		
@@ -239,7 +240,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if (usuarios != null && usuarios.size() > 0) {
 				try{
 					AdmUsuarios usuario = usuarios.get(0);
-					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(idClaseComunicacion);
+					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(modeloDTO.getIdClaseComunicacion(), modeloDTO.getIdModulo());
 					
 					for (ModelosComunicacionItem modelosComunicacionItem : modelos) {
 						ComboDTO comboDTO = new ComboDTO();

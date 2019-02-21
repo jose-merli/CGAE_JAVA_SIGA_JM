@@ -84,13 +84,14 @@ public class ModModeloComunicacionExtendsSqlProvider {
 	}
 	
 		
-	public String selectModelosComunicacionDialg(String idClaseComunicacion){
+	public String selectModelosComunicacionDialg(String idClaseComunicacion, String idModulo){
 	   
 	   SQL sql = new SQL();
 	   
 	   sql.SELECT("MODELO.IDCLASECOMUNICACION, MODELO.IDMODELOCOMUNICACION, MODELO.NOMBRE");
 	   sql.FROM("MOD_MODELOCOMUNICACION MODELO");
-	   sql.WHERE("MODELO.IDCLASECOMUNICACION IN (" + idClaseComunicacion + ")");
+	   sql.JOIN("MOD_CLASECOMUNICACIONES CLASE ON CLASE.IDCLASECOMUNICACION = MODELO.IDCLASECOMUNICACION");
+	   sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND CLASE.IDMODULO = " + idModulo);
 	   sql.ORDER_BY("MODELO.ORDEN");
 	   
 	   return sql.toString();
@@ -103,7 +104,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.FROM("MOD_MODELO_PLANTILLAENVIO MPLANTILLA");
 		sql.JOIN("ENV_PLANTILLASENVIOS PLANTILLA ON PLANTILLA.IDPLANTILLAENVIOS = MPLANTILLA.IDPLANTILLAENVIOS AND MPLANTILLA.IDINSTITUCION = PLANTILLA.IDINSTITUCION");
 		sql.WHERE("MPLANTILLA.IDMODELOCOMUNICACION = '"+ idModeloComunicacion +"'");
-		sql.WHERE("PLANTILLA.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("PLANTILLA.IDINSTITUCION = " + idInstitucion + " AND MPLANTILLA.FECHABAJA IS NULL");
 		   
 		return sql.toString();
 	}
