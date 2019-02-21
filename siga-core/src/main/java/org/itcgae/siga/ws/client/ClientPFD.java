@@ -1,12 +1,9 @@
 package org.itcgae.siga.ws.client;
 
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-
 import org.apache.log4j.Logger;
+import org.itcgae.siga.ws.config.PFDClient;
+import org.itcgae.siga.ws.config.WebServiceClientConfigPFD;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.pfd.ws.service.FirmaCorporativaPDFDocument;
@@ -23,20 +20,22 @@ public class ClientPFD extends DefaultClientWs{
 	public FirmaCorporativaPDFResponseDocument firmarPDF(String uriService, FirmaCorporativaPDFDocument request) throws Exception{
 		LOGGER.debug("Llamada a pfd firmarPDF");
 		FirmaCorporativaPDFResponseDocument response = null;
-		
+		AnnotationConfigApplicationContext context = null;
 		try{
 			LOGGER.info("La url de la PFD es: " + uriService);
-			configConnection(uriService);
-			response = (FirmaCorporativaPDFResponseDocument) webServiceTemplate.marshalSendAndReceive(uriService, request);
 
-		} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException | CertificateException
-				| IOException e) {
-			LOGGER.error("Error al enviar a firma un documento", e);
+			context = new AnnotationConfigApplicationContext(WebServiceClientConfigPFD.class);
+			PFDClient client = context.getBean(PFDClient.class);
 			
-			throw e;
+			response = client.firmarPDF(uriService, request);
+
 		} catch (Exception e){
 			LOGGER.error("Error al enviar a firma un documento", e);
 			throw e;
+		}finally {
+			if(context != null) {
+				context.close();
+			}
 		}
 		
 		return response;
@@ -46,14 +45,23 @@ public class ClientPFD extends DefaultClientWs{
 		
 		LOGGER.debug("Llamada a obtener un documento firmado");
 		ObtenerDocumentoResponseDocument response = null;
+		AnnotationConfigApplicationContext context = null;
 		
 		try{
 			LOGGER.info("La url de la PFD es: " + uriService);
-			response = (ObtenerDocumentoResponseDocument) webServiceTemplate.marshalSendAndReceive(uriService, request);
+			context = new AnnotationConfigApplicationContext(WebServiceClientConfigPFD.class);
+			PFDClient client = context.getBean(PFDClient.class);
+			
+			response = client.obtenerDocumento(uriService, request);
 		}catch (Exception e){
 			LOGGER.error("Error al obtener un documento firmado", e);
 	
+		}finally {
+			if(context != null) {
+				context.close();
+			}
 		}
+		
 		return response;
 	}
 

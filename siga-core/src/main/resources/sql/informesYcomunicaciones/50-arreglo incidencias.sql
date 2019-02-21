@@ -11,7 +11,7 @@ Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACI
 values ('administracion.parametro.pfd.firma.location', 'Location del sello de la firma de la PFD#GL', 0, 4, sysdate, 0, 0);
 
 INSERT INTO GEN_PARAMETROS (modulo, parametro, valor, fechamodificacion, usumodificacion, idinstitucion, idrecurso, fecha_baja) 
-values('GEN', 'PFD_FIRMA_LOCATION', 'Consejo General de la Abogacía Española', sysdate, 0, '2000', 'administracion.parametro.pfd.firma.location', null);
+values('GEN', 'PFD_FIRMA_LOCATION', 'Consejo General de la Abogacía Española', sysdate, 0, '0', 'administracion.parametro.pfd.firma.location', null);
 
 Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD)
 values ('administracion.parametro.pfd.firma.razon', 'Razón del sello de la firma de la PFD', 0, 1, sysdate, 0, 0);
@@ -26,7 +26,7 @@ Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACI
 values ('administracion.parametro.pfd.firma.razon', 'Razón del sello de la firma de la PFD#GL', 0, 4, sysdate, 0, 0);
 
 INSERT INTO GEN_PARAMETROS (modulo, parametro, valor, fechamodificacion, usumodificacion, idinstitucion, idrecurso, fecha_baja) 
-values('GEN', 'PFD_FIRMA_RAZON', 'Documento firmado', sysdate, 0, '2000', 'administracion.parametro.pfd.firma.razon', null);
+values('GEN', 'PFD_FIRMA_RAZON', 'Documento firmado', sysdate, 0, '0', 'administracion.parametro.pfd.firma.razon', null);
 
 Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD)
 values ('administracion.parametro.pfd.firma.razon', 'Indica si la firma es visible en el documento firmado', 0, 1, sysdate, 0, 0);
@@ -41,7 +41,7 @@ Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACI
 values ('administracion.parametro.pfd.firma.visible', 'Indica si la firma es visible en el documento firmado#GL', 0, 4, sysdate, 0, 0);
 
 INSERT INTO GEN_PARAMETROS (modulo, parametro, valor, fechamodificacion, usumodificacion, idinstitucion, idrecurso, fecha_baja) 
-values('GEN', 'PFD_FIRMA_VISIBLE', '1', sysdate, 0, '2000', 'administracion.parametro.pfd.firma.visible', null);
+values('GEN', 'PFD_FIRMA_VISIBLE', '1', sysdate, 0, '0', 'administracion.parametro.pfd.firma.visible', null);
 
 Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD)
 values ('administracion.parametro.pfd.idCliente', 'Identificador cliente de la pfd', 0, 1, sysdate, 0, 0);
@@ -56,7 +56,26 @@ Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACI
 values ('administracion.parametro.pfd.idCliente', 'Identificador cliente de la pfd#GL', 0, 4, sysdate, 0, 0);
 
 INSERT INTO GEN_PARAMETROS (modulo, parametro, valor, fechamodificacion, usumodificacion, idinstitucion, idrecurso, fecha_baja) 
-values('GEN', 'PFD_IDCLIENTE', '1', sysdate, 0, '2000', 'administracion.parametro.pfd.idCliente', null);
+values('GEN', 'PFD_IDCLIENTE', '1001', sysdate, 0, '0', 'administracion.parametro.pfd.idCliente', null);
+
+Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD)
+values ('administracion.parametro.pfd.url', 'Url del servicio de la pfd', 0, 1, sysdate, 0, 0);
+
+Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD)
+values ('administracion.parametro.pfd.url', 'Url del servicio de la pfd#CA', 0, 2, sysdate, 0, 0);
+
+Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD)
+values ('administracion.parametro.pfd.url', 'Url del servicio de la pfd#EU', 0, 3, sysdate, 0, 0);
+
+Insert into GEN_RECURSOS (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD)
+values ('administracion.parametro.pfd.url', 'Url del servicio de la pfd#GL', 0, 4, sysdate, 0, 0);
+
+INSERT INTO GEN_PARAMETROS (modulo, parametro, valor, fechamodificacion, usumodificacion, idinstitucion, idrecurso, fecha_baja) 
+values('GEN', 'PFD_URLWS', 'http://10.60.3.117:7019/plataformafirma2/PFDService', sysdate, 0, '0', 'administracion.parametro.pfd.url', null);
+
+
+
+
 
 insert into mod_plantilladoc_formato (idformatosalida, nombre, fechamodificacion, usumodificacion)
 values (3, null, sysdate, 0);

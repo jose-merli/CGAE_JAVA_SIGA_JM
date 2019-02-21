@@ -12,13 +12,13 @@ import service.serviciosecos.EnviarSMSResponseDocument;
 public class ECOSClient extends WebServiceGatewaySupport {
 	
 	
-    public EnviarSMSResponseDocument enviarSMS(EnviarSMSDocument request) throws URISyntaxException {
+    public EnviarSMSResponseDocument enviarSMS(String uriService, EnviarSMSDocument request) throws URISyntaxException {
    	 
 //    	
 //        ActionCallback callback = new ActionCallback(
 //                new URI("https://demo.redabogacia.org/ecos/wsecos/services/ServiciosECOSService.service"));
 
-        return (EnviarSMSResponseDocument) getWebServiceTemplate().marshalSendAndReceive(request);
+        return (EnviarSMSResponseDocument) getWebServiceTemplate().marshalSendAndReceive(uriService, request);
     }
 	
 	

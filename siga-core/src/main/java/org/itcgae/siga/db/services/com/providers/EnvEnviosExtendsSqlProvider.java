@@ -157,7 +157,7 @@ public class EnvEnviosExtendsSqlProvider {
 		sql.FROM("ENV_ENVIOPROGRAMADO PROG");
 		sql.JOIN("ENV_ENVIOS ENVIO ON ENVIO.IDENVIO = PROG.IDENVIO");
 		
-		sql.WHERE("ENVIO.IDESTADO = 4 AND ENVIO.FECHAPROGRAMADA <= TO_DATE('" + fechaHoy + "', 'DD/MM/YYYY HH24:MI:SS')");
+		sql.WHERE("ENVIO.IDESTADO = 1 AND ENVIO.CSV='1' AND ENVIO.FECHAPROGRAMADA <= TO_DATE('" + fechaHoy + "', 'DD/MM/YYYY HH24:MI:SS')");
 		return sql.toString();
 	}
 	

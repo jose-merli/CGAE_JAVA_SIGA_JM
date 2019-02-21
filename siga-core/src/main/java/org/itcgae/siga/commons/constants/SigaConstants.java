@@ -126,6 +126,7 @@ public class SigaConstants {
 	public static final String MODULO_SCS = "SCS";
 	public static final String MODULO_ADM = "ADM";
 	public static final String MODULO_ENV = "ENV";
+	public static final String MODULO_GEN = "GEN";
 	
 
 	public enum ERROR_SERVER {

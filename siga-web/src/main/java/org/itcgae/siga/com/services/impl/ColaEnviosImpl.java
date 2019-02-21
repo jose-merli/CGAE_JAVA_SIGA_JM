@@ -173,7 +173,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 
 			}
 		}catch(Exception e){
-			LOGGER.error("Error al procesar el envío: " + e.getMessage());
+			LOGGER.error("Error al procesar el envío", e);
 			envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
 			envio.setFechamodificacion(new Date());
 			_envEnviosMapper.updateByPrimaryKey(envio);
@@ -355,6 +355,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 					//Generamos los informes para adjuntarlos al envio
 					List<DatosDocumentoItem> documentosEnvio = generarDocumentosEnvio(envio.getIdinstitucion().toString(), envio.getIdenvio().toString());
 					
+					LOGGER.debug("Procedemos al envio del email: tipo " + envio.getIdtipoenvios() + "--" + envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL));
+					
 					if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
 						_enviosService.envioMail(remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 					}else{
@@ -425,11 +427,15 @@ public class ColaEnviosImpl implements IColaEnvios {
 				
 				//Obtenemos alias del Select para recuperar valores mas tarde
 				String selectConEtiquetas = consulta.getConsulta().substring(inicioSelect, finSelect);
-				String aliasIdPersona = obtenerAliasIdPersona(selectConEtiquetas.trim());
-				//String aliasIdInstitucion = obtenerAliasIdInstitucion(selectConEtiquetas.trim());
-				String aliasCorreo = obtenerAliasCorreoElectronico(selectConEtiquetas.trim());
-				String aliasMovil = obtenerAliasMovil(selectConEtiquetas.trim());
-				String aliasDomicilio = obtenerAliasDomicilio(selectConEtiquetas.trim());
+//				String aliasIdPersona = obtenerAliasIdPersona(selectConEtiquetas.trim());
+//				//String aliasIdInstitucion = obtenerAliasIdInstitucion(selectConEtiquetas.trim());
+//				String aliasCorreo = obtenerAliasCorreoElectronico(selectConEtiquetas.trim());
+//				String aliasMovil = obtenerAliasMovil(selectConEtiquetas.trim());
+//				String aliasDomicilio = obtenerAliasDomicilio(selectConEtiquetas.trim());
+				String aliasIdPersona = SigaConstants.ALIASIDPERSONA;
+				String aliasCorreo = SigaConstants.ALIASCORREO;
+				String aliasMovil = SigaConstants.ALIASMOVIL;
+				String aliasDomicilio = SigaConstants.ALIASDOMICILIO;
 				
 				Map<String,String> camposQuery =_consultasService.obtenerMapaConsulta(consulta.getConsulta());
 				List<Map<String, Object>> resultDestinatarios = _conConsultasExtendsMapper.ejecutarConsulta(camposQuery);
@@ -461,7 +467,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 					List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(query);
 					resultadosConsultas.addAll(result);
 				}
-				String asuntoFinal = remplazarCamposAsunto(plantilla.getAsunto(), resultadosConsultas);
+				String asuntoFinal = "";//remplazarCamposAsunto(plantilla.getAsunto(), resultadosConsultas);
 				String cuerpoFinal = remplazarCamposCuerpo(plantilla.getCuerpo(), resultadosConsultas);
 				// Realizamos el envio por SMS
 				idSolicitudEcos = _enviosService.envioSMS(remitente, numerosDestinatarios, envio.getIdinstitucion(), asuntoFinal, cuerpoFinal, isBuroSMS);
@@ -826,7 +832,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 									}
 									
 									DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida, firmado);
-									docGenerado.setPathDocumento(pathFicheroSalida);
+									docGenerado.setPathDocumento(pathFicheroSalida + nombreFicheroSalida);
 									
 									listaFicheros.add(docGenerado);
 																															
@@ -904,6 +910,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 						}
 						
 						DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida,firmado);
+						docGenerado.setPathDocumento(pathFicheroSalida + nombreFicheroSalida);
 						
 						listaFicheros.add(docGenerado);
 					}					

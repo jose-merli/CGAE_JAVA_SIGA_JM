@@ -55,8 +55,8 @@ public class PFDServiceImpl implements IPFDService {
 
 		GenParametrosKey keyParam = new GenParametrosKey();
 
-		keyParam.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
-		keyParam.setModulo(SigaConstants.MODULO_ADM);
+		keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
+		keyParam.setModulo(SigaConstants.MODULO_GEN);
 		keyParam.setParametro(SigaConstants.PFD_FIRMA_LOCATION);
 		
 		GenParametros param = _genParametrosMapper.selectByPrimaryKey(keyParam);
@@ -65,8 +65,8 @@ public class PFDServiceImpl implements IPFDService {
 		
 		keyParam = new GenParametrosKey();
 
-		keyParam.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
-		keyParam.setModulo(SigaConstants.MODULO_ADM);		
+		keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
+		keyParam.setModulo(SigaConstants.MODULO_GEN);		
 		keyParam.setParametro(SigaConstants.PFD_FIRMA_VISIBLE);
 		
 		param = _genParametrosMapper.selectByPrimaryKey(keyParam);
@@ -75,8 +75,8 @@ public class PFDServiceImpl implements IPFDService {
 		
 		keyParam = new GenParametrosKey();
 
-		keyParam.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
-		keyParam.setModulo(SigaConstants.MODULO_ADM);
+		keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
+		keyParam.setModulo(SigaConstants.MODULO_GEN);
 		keyParam.setParametro(SigaConstants.PFD_IDCLIENTE);
 		
 		param = _genParametrosMapper.selectByPrimaryKey(keyParam);
@@ -84,8 +84,8 @@ public class PFDServiceImpl implements IPFDService {
 		
 		keyParam = new GenParametrosKey();
 
-		keyParam.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
-		keyParam.setModulo(SigaConstants.MODULO_ADM);		
+		keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
+		keyParam.setModulo(SigaConstants.MODULO_GEN);		
 		keyParam.setParametro(SigaConstants.PFD_FIRMA_RAZON);		
 
 		param = _genParametrosMapper.selectByPrimaryKey(keyParam);
@@ -133,8 +133,8 @@ public class PFDServiceImpl implements IPFDService {
 				
 				keyParam = new GenParametrosKey();
 
-				keyParam.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
-				keyParam.setModulo(SigaConstants.MODULO_SCS);
+				keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
+				keyParam.setModulo(SigaConstants.MODULO_GEN);
 				keyParam.setParametro(SigaConstants.PFD_URLWS);
 				
 				param = _genParametrosMapper.selectByPrimaryKey(keyParam);
@@ -172,11 +172,14 @@ public class PFDServiceImpl implements IPFDService {
 		SolicitudDocumentoTO solicitud = SolicitudDocumentoTO.Factory.newInstance();
 		String documentoBase64 = "";
 		
-		GenPropertiesKey keyProp = new GenPropertiesKey();
-		keyProp.setFichero("SIGA");
-		keyProp.setParametro("pfd.idCliente");
-		GenProperties property = _genPropertiesMapper.selectByPrimaryKey(keyProp);
-		String idClientePFD = property.getValor();
+		GenParametrosKey keyParam = new GenParametrosKey();
+
+		keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
+		keyParam.setModulo(SigaConstants.MODULO_GEN);
+		keyParam.setParametro(SigaConstants.PFD_IDCLIENTE);
+		GenParametros param = _genParametrosMapper.selectByPrimaryKey(keyParam);
+		
+		String idClientePFD = param.getValor();
 		
 		solicitud.setIdAppCliente(idClientePFD);
 		solicitud.setIdValidacion(csv);
@@ -191,13 +194,13 @@ public class PFDServiceImpl implements IPFDService {
 		ObtenerDocumentoResponseDocument response = null;
 		
 		try {
-			GenParametrosKey keyParam = new GenParametrosKey();
+			keyParam = new GenParametrosKey();
 
-			keyParam.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
-			keyParam.setModulo(SigaConstants.MODULO_SCS);
+			keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
+			keyParam.setModulo(SigaConstants.MODULO_GEN);
 			keyParam.setParametro(SigaConstants.PFD_URLWS);
 			
-			GenParametros param = _genParametrosMapper.selectByPrimaryKey(keyParam);
+			param = _genParametrosMapper.selectByPrimaryKey(keyParam);
 			String uriService = param.getValor();
 			
 			response = clientPFD.obtenerDocumento(uriService, requestDoc);

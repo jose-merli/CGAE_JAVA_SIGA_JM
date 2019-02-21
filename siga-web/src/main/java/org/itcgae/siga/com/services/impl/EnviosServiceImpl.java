@@ -78,21 +78,32 @@ public class EnviosServiceImpl implements IEnviosService{
 	
 	
 	@Override
-	public void envioMail(RemitenteDTO remitente, List<DestinatarioItem> destinatarios, String asuntoFinal, String cuerpoFinal, List<DatosDocumentoItem> documentosEnvio, boolean envioMasivo) {
+	public void envioMail(RemitenteDTO remitente, List<DestinatarioItem> destinatarios, String asuntoFinal, String cuerpoFinal, List<DatosDocumentoItem> documentosEnvio, boolean envioMasivo) throws Exception {
 		
         Transport tr = null;
 		try {
 			// OBTENCIÓN DE SERVIDOR DE CORREO
+			
+			LOGGER.debug("Configuramos el envio de correo");
 			Context ctx = new InitialContext();
 		    GenPropertiesKey keyProperties = new GenPropertiesKey();
 		    keyProperties.setFichero("SIGA");
 		    keyProperties.setParametro("mail.smtp.sesion");
 		    GenProperties property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
-		    String smtpSesion = property.getParametro();
+		    String smtpSesion = property.getValor();
 		    if(smtpSesion==null || smtpSesion.equals(""))
 		    	smtpSesion = "CorreoSIGA";
+		    
+		    LOGGER.debug("Obtenemos la sesion del correo");		    
+		    
 		    Session sesion = (Session)javax.rmi.PortableRemoteObject.narrow(ctx.lookup(smtpSesion), Session.class);
 		    ctx.close();
+		    
+		    if(sesion != null) {
+		    	LOGGER.debug("Sesion de correo obtenida");	
+		    }else {
+		    	LOGGER.debug("Sesion de correo nula");	
+		    }
 		    
 		    tr = sesion.getTransport("smtp");
 
@@ -100,24 +111,29 @@ public class EnviosServiceImpl implements IEnviosService{
 		    sesion.getProperties().put("mail.smtp.auth", "true");
 		    keyProperties.setParametro("mail.smtp.port");
 		    property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
-		    sesion.getProperties().put("mail.smtp.port", property.getParametro());
+		    sesion.getProperties().put("mail.smtp.port", property.getValor());
 		    
+		    LOGGER.debug("Obtenemos el remitente");
 		    
 		    //Remitente
 		    String from = remitente.getCorreoElectronico();
 		    String descFrom = remitente.getApellido1() + " " + remitente.getApellido2();
+
 		    
-		    
-		    //Obtenemos destinatarios
-		    if(envioMasivo){
-		    	//si viene desde envios masivos buscamos por las etiquetas de envio
-			    EnvEnviosgrupocliente etiquetasEnvio = new EnvEnviosgrupocliente();
-			    
+		    if(destinatarios != null) {
+		    	LOGGER.debug("Longitud de destinatarios: " + destinatarios.size());
+		    }else {
+		    	LOGGER.debug("No hay destinatarios");
 		    }
+		    
 		    
 		    for (DestinatarioItem destinatario : destinatarios) {
 		    	
 		    	String sTo = destinatario.getCorreoElectronico();
+
+		    	LOGGER.debug("Enviamos el email a: " + sTo);
+		    	LOGGER.debug("Enviamos desde: " + from);
+		    	
 			    //Se crea un nuevo Mensaje.
 			    MimeMessage mensaje = new MimeMessage(sesion);
 	    	    mensaje.setFrom(new InternetAddress(from,descFrom));
@@ -125,27 +141,29 @@ public class EnviosServiceImpl implements IEnviosService{
 	    	    mensaje.addRecipient(MimeMessage.RecipientType.TO,toInternetAddress);
 	    	    
 	    	    
-	    	    //ASUNTO
-	    	    String sAsunto = asuntoFinal;
-	    	    mensaje.setSubject(sAsunto,"ISO-8859-1");
-	    	    mensaje.setHeader("Content-Type","text/html; charset=\"ISO-8859-1\"");
-	    	    
-	    	    //CUERPO
-	    	    String sCuerpo = cuerpoFinal == null ? "": cuerpoFinal;
-	    	    
-	    	    MimeMultipart mixedMultipart = new MimeMultipart("mixed");
-	    	    MimeBodyPart mixedBodyPart = new MimeBodyPart();
-	    	    
-	    	    MimeMultipart relatedMultipart = new MimeMultipart("related");
-	    	    MimeBodyPart relatedBodyPart = new MimeBodyPart();
+	    	  //ASUNTO
+                String sAsunto = asuntoFinal;
+                mensaje.setSubject(sAsunto,"ISO-8859-1");
+                mensaje.setHeader("Content-Type","text/html; charset=\"ISO-8859-1\"");
+                
+                //CUERPO
+                String sCuerpo = cuerpoFinal == null ? "": cuerpoFinal;
+                
+                MimeMultipart mixedMultipart = new MimeMultipart("mixed");
+                MimeBodyPart mixedBodyPart = new MimeBodyPart();
+                
+                MimeMultipart relatedMultipart = new MimeMultipart("related");
+                //MimeBodyPart relatedBodyPart = new MimeBodyPart();
 
-	    	    //alternative message
-	    	    BodyPart messageBodyPart = new MimeBodyPart();
-	    		messageBodyPart.setContent(relatedBodyPart, "text/html");
+                //alternative message
+                BodyPart messageBodyPart = new MimeBodyPart();
+                      messageBodyPart.setContent(sCuerpo, "text/html");
+                      relatedMultipart.addBodyPart(messageBodyPart);
+                      
+                mixedBodyPart.setContent(relatedMultipart);
+                
+                mixedMultipart.addBodyPart(mixedBodyPart);
 
-	    	    mixedBodyPart.setContent(relatedMultipart);
-	    	    
-	    	    mixedMultipart.addBodyPart(mixedBodyPart);
 	    	    
 	    	    //Adjuntamos los informes adjuntos.
 	    	    for (DatosDocumentoItem informe : documentosEnvio) {
@@ -160,26 +178,32 @@ public class EnviosServiceImpl implements IEnviosService{
 	    	    //Asociamos todo el contenido al mensaje
 	    	    mensaje.setContent(mixedMultipart);
 	    	    
-			    if(tr == null){
-	        		tr = sesion.getTransport("smtp");
-	        		keyProperties.setParametro("mail.smtp.host");
-	        		property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
-	        		String host =property.getParametro();
-	        		keyProperties.setParametro("mail.smtp.user");
-	        		property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
-	        		String user = property.getParametro();
-	        		keyProperties.setParametro("mail.smtp.pwd");
-	        		property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
-	        		String pwd = property.getParametro();
-	        		tr.connect(host, user, pwd);
-	        		tr.sendMessage(mensaje, mensaje.getAllRecipients());
+	    	    LOGGER.debug("Enviando...");
+	    	    
+			    if(tr == null){			    	
+	        		tr = sesion.getTransport("smtp");	        		
 			    }
+			    
+			    keyProperties.setParametro("mail.smtp.host");
+        		property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
+        		String host =property.getValor();
+        		keyProperties.setParametro("mail.smtp.user");
+        		property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
+        		String user = property.getValor();
+        		keyProperties.setParametro("mail.smtp.pwd");
+        		property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
+        		String pwd = property.getValor();
+        		tr.connect(host, user, pwd);
+        		tr.sendMessage(mensaje, mensaje.getAllRecipients());
+        		LOGGER.debug("Enviado");
+        		
 			}
 
 		    
 		    
-		} catch (NamingException | UnsupportedEncodingException | MessagingException e) {
-			e.printStackTrace();
+		} catch(Exception e) {
+			LOGGER.error("Error al enviar el email", e);
+			throw e;
 		}
 
 	}
@@ -193,7 +217,7 @@ public class EnviosServiceImpl implements IEnviosService{
 		
 		GenParametrosKey keyParam = new GenParametrosKey();
 		
-		keyParam.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
+		keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
 		keyParam.setModulo(SigaConstants.MODULO_ENV);
 		keyParam.setParametro(SigaConstants.SMS_URL_SERVICE);
 		
