@@ -640,6 +640,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
 		sql.SELECT_DISTINCT("dir.movil");
 		sql.SELECT_DISTINCT("TO_CHAR(nocol.fecha_baja, 'DD/MM/YYYY') AS fechaBaja");
+		sql.SELECT("inst.abreviatura as colegioResultado");
 		sql.FROM("cen_nocolegiado nocol");
 
 		sql.INNER_JOIN("cen_persona per on nocol.idpersona = per.idpersona");

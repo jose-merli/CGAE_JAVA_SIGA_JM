@@ -55,6 +55,7 @@ public class NoColegiadoItem {
 	private String tipoCV;
 	private String subTipoCV1;
 	private String subTipoCV2;
+	private String colegioResultado;
 	
 	private String [] colegio;
 
@@ -1080,5 +1081,13 @@ public class NoColegiadoItem {
 
 	public void setColegio(String[] colegio) {
 		this.colegio = colegio;
+	}
+
+	public String getColegioResultado() {
+		return colegioResultado;
+	}
+
+	public void setColegioResultado(String colegioResultado) {
+		this.colegioResultado = colegioResultado;
 	}
 }

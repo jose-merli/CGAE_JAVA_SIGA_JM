@@ -86,6 +86,10 @@ public class ColegiadoItem {
 	private String [] temas;
 	private List<ComboItem> temasCombo;
 	
+	// Nombre del colegio que se mostrará como resultado en la tabla de busqueda
+	private String colegioResultado;
+	
+	// Filtro de colegios de la pantalla de busqueda
 	private String [] colegio;
 	
 	
@@ -1317,6 +1321,14 @@ public class ColegiadoItem {
 
 	public void setColegio(String[] colegio) {
 		this.colegio = colegio;
+	}
+
+	public String getColegioResultado() {
+		return colegioResultado;
+	}
+
+	public void setColegioResultado(String colegioResultado) {
+		this.colegioResultado = colegioResultado;
 	}
 }
 
