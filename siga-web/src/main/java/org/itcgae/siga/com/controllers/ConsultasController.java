@@ -165,24 +165,31 @@ public class ConsultasController {
 	ResponseEntity<InputStreamResource> ejecutarConsulta(HttpServletRequest request, @RequestBody ConsultaItem consulta) {
 		
 		ResponseFileDTO response = _consultasService.ejecutarConsulta(request, consulta);
-		File file = response.getFile();
-		
+
+		File file = response.getFile();		
 		HttpHeaders headers = null;
 		InputStreamResource resource = null;
-		try {
-			resource = new InputStreamResource(new FileInputStream(file));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		
 		headers = new HttpHeaders();
 		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
 		headers.add("Pragma", "no-cache");
 		headers.add("Expires", "0");
-		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"");
-		System.out.println("The length of the file is : "+file.length());
-		  
-		return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
-
+		
+		if(response.isResultados()){
+			try {
+				resource = new InputStreamResource(new FileInputStream(file));
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"");
+			headers.add(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
+			System.out.println("The length of the file is : "+file.length());
+			return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.OK);
+		}else{
+			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"SinArchivo\"");
+			System.out.println("No se ha generado el fichero");
+			return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.NO_CONTENT);
+		}
 	}
 	
 	@RequestMapping(value = "/obtenerCamposDinamicos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
