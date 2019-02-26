@@ -110,14 +110,14 @@ public class EnviosMasivosController {
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
-	@RequestMapping(value = "/detalle/duplicarEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> duplicarEnvio(HttpServletRequest request, @RequestBody TarjetaConfiguracionDto datosTarjeta) {
+	@RequestMapping(value = "/duplicarEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EnviosMasivosDTO> duplicarEnvio(HttpServletRequest request, @RequestBody TarjetaConfiguracionDto datosTarjeta) {
 		
-		Error response = _enviosMasivosService.duplicarEnvio(request, datosTarjeta);
-		if(response.getCode() == 200)
-			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		EnviosMasivosDTO response = _enviosMasivosService.duplicarEnvio(request, datosTarjeta);
+		if(response.getError() == null)
+			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<EnviosMasivosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/detalle/plantillas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)

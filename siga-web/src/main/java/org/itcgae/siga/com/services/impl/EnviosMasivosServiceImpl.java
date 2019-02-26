@@ -74,7 +74,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 
-
 @Service
 @Transactional
 public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
@@ -599,11 +598,13 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 
 	@Override
 	@Transactional
-	public Error duplicarEnvio(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta) {
+	public EnviosMasivosDTO duplicarEnvio(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta) {
 		
 		LOGGER.info("duplicarEnvio() -> Entrada al servicio para duplicar envío");
 		
-		Error respuesta = new Error();
+		Error error = new Error();
+		EnviosMasivosDTO respuesta = new EnviosMasivosDTO();
+		EnviosMasivosItem envioMasivoItem = new EnviosMasivosItem();
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -723,14 +724,23 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 						_envEnviosgrupoclienteMapper.insert(envEnviosgrupocliente);
 					}
 					
-					respuesta.setCode(200);
-					respuesta.setDescription("Datos configuracion de envio guardados correctamente");
-					respuesta.setMessage("Updates correcto");
+					
+					List<EnviosMasivosItem> listaEnvioDuplicado = _envEnviosExtendsMapper.selectEnviosMasivosById(idInstitucion, usuario.getIdlenguaje(), String.valueOf(idEnvioNuevo));
+					
+					if(listaEnvioDuplicado != null && listaEnvioDuplicado.size() == 1) {
+						respuesta.setEnviosMasivosItem(listaEnvioDuplicado);
+						
+						LOGGER.debug("Duplicado correctamente");
+					}else {
+						LOGGER.debug("No se ha encontrado el envio duplicado");
+					}					
+					
 				}catch(Exception e){
 					LOGGER.error("Error al duplicar el envío", e);
-					respuesta.setCode(500);
-					respuesta.setDescription(e.getMessage());
-					respuesta.setMessage("Error");
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					error.setMessage("Error");
+					respuesta.setError(error);
 				}
 				
 				
