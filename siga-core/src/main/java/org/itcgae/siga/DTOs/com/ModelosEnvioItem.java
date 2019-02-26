@@ -7,6 +7,7 @@ public class ModelosEnvioItem {
 	private List<List<ConsultaEnvioItem>> listaConsultas;	
 	private Integer idPlantillaEnvio;	
 	private Short idTipoEnvio;	
+	private Long idModeloComunicacion;
 	
 	public List<List<ConsultaEnvioItem>> getListaConsultas() {
 		return listaConsultas;
@@ -25,6 +26,12 @@ public class ModelosEnvioItem {
 	}
 	public void setIdTipoEnvio(Short idTipoEnvio) {
 		this.idTipoEnvio = idTipoEnvio;
+	}
+	public Long getIdModeloComunicacion() {
+		return idModeloComunicacion;
+	}
+	public void setIdModeloComunicacion(Long idModeloComunicacion) {
+		this.idModeloComunicacion = idModeloComunicacion;
 	}
 	
 }

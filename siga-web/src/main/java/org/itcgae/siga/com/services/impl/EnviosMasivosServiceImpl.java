@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.com.ConsultaEnvioItem;
 import org.itcgae.siga.DTOs.com.DocumentoEnvioItem;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
@@ -22,6 +23,7 @@ import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
+import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -29,10 +31,13 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IColaEnvios;
+import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.EnvConsultasenvio;
+import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
 import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.EnvDocumentosExample;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
@@ -45,6 +50,7 @@ import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvioExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
+import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
 import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
@@ -122,7 +128,11 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	private EnvEnviosGrupoClienteExtendsMapper _envEnviosGrupoClienteExtendsMapper;
 	
 	@Autowired
+	private EnvConsultasenvioMapper _envConsultasenvioMapper;
+	
+	@Autowired
 	private IColaEnvios _colaEnvios;
+
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -588,6 +598,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	}
 
 	@Override
+	@Transactional
 	public Error duplicarEnvio(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta) {
 		
 		LOGGER.info("duplicarEnvio() -> Entrada al servicio para duplicar envío");
@@ -646,9 +657,25 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					EnvEnvioprogramado programado = _envEnvioprogramadoMapper.selectByPrimaryKey(progKey);
 					if(programado != null){
 						programado.setIdenvio(idEnvioNuevo);
-						programado.setIdplantillaenvios(idPlantillaNuevo);
+						programado.setIdplantillaenvios(plantillaEnvio.getIdplantillaenvios());
 						_envEnvioprogramadoMapper.insert(programado);
+						
+						// Si es programada comprobamos las consultas asociadas al envio y las duplicamos
+						EnvConsultasenvioExample example = new EnvConsultasenvioExample();
+						example.createCriteria().andIdenvioEqualTo(Long.parseLong(datosTarjeta.getIdEnvio())).andIdinstitucionEqualTo(idInstitucion);
+						
+						List<EnvConsultasenvio> listaConsultasEnvio = _envConsultasenvioMapper.selectByExampleWithBLOBs(example);
+						
+						if(listaConsultasEnvio != null && listaConsultasEnvio.size() > 0) {
+							for(EnvConsultasenvio consultaEnvio: listaConsultasEnvio){
+								// Duplicamos las consultas del envio
+								consultaEnvio.setIdenvio(envio.getIdenvio());
+								_envConsultasenvioMapper.insert(consultaEnvio);
+							}	
+						}					
+						
 					}
+					
 					//tabla env_documentos
 					EnvDocumentosExample docExample = new EnvDocumentosExample();
 					docExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
@@ -700,6 +727,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 					respuesta.setDescription("Datos configuracion de envio guardados correctamente");
 					respuesta.setMessage("Updates correcto");
 				}catch(Exception e){
+					LOGGER.error("Error al duplicar el envío", e);
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
 					respuesta.setMessage("Error");

@@ -1,12 +1,14 @@
 package org.itcgae.siga.com.services;
 
 import java.util.HashMap;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.ByteResponseDto;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionesDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
 import org.itcgae.siga.DTOs.com.KeysDTO;
 import org.itcgae.siga.DTOs.com.ModeloDialogoItem;
@@ -32,4 +34,5 @@ public interface IDialogoComunicacionService {
 	public ResponseDataDTO obtenerNumMaximoModelos(HttpServletRequest request);
 	public Error generarEnvios(HttpServletRequest request, DialogoComunicacionItem dialogo);
 	public String obtenerNombreFicheroSalida(String idModeloComunicacion, PlantillaModeloDocumentoDTO plantilla, HashMap<String, Object> hDatosGenerales, String idLenguaje, int numFichero, String pathFicheroSalida, String campoSufijo);
+	public List<DatosDocumentoItem> generarDocumentosEnvio(String idInstitucion, String idEnvio) throws Exception;
 }

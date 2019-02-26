@@ -14,7 +14,21 @@ public class ConsultaEnvioItem {
 	private Long idInforme;
 	
 	private String sufijo;
+	private String pathFichero;
+	private String nombreFichero;
 	
+	public String getPathFichero() {
+		return pathFichero;
+	}
+	public void setPathFichero(String pathFichero) {
+		this.pathFichero = pathFichero;
+	}
+	public String getNombreFichero() {
+		return nombreFichero;
+	}
+	public void setNombreFichero(String nombreFichero) {
+		this.nombreFichero = nombreFichero;
+	}
 	public Long getIdModeloComunicacion() {
 		return idModeloComunicacion;
 	}

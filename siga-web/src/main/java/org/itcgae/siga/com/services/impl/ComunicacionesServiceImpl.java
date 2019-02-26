@@ -1,20 +1,25 @@
 package org.itcgae.siga.com.services.impl;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
+import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
+import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IComunicacionesService;
+import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -47,7 +52,9 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	
 	@Autowired
 	private ModModeloComunicacionExtendsMapper _modModeloComunicacionExtendsMapper;
-
+	
+	@Autowired
+	private IDialogoComunicacionService _dialogoComunicacionService;
 
 	/**Realiza la busqueda de comunicaciones **/
 	@Override
@@ -213,6 +220,63 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 		
 		LOGGER.info("modelosClasesComunicacion() -> Salida del servicio para obtener combo modelos de comunicacion de las clases comunicacion");
 		return comboDTO;
+	}
+	
+	@Override
+	public ResponseFileDTO descargarDocumento(HttpServletRequest request, ResponseDocumentoDTO documentoDTO) {		
+		LOGGER.info("descargarDocumento() -> Entrada al servicio para descargar un documento");
+		
+		Error error = new Error();
+		ResponseFileDTO respuesta = new ResponseFileDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					String pathFichero = documentoDTO.getRutaDocumento();
+					String nombreFichero = documentoDTO.getNombreDocumento();
+					String idEnvio = documentoDTO.getIdEnvio();
+					
+					File file = new File(pathFichero + nombreFichero);
+					
+					if(!file.exists()) {
+						file = null;
+						
+						List<DatosDocumentoItem> listaDocumentos = _dialogoComunicacionService.generarDocumentosEnvio(String.valueOf(idInstitucion), idEnvio);
+						
+						for(DatosDocumentoItem documento: listaDocumentos) {
+							if(file == null && nombreFichero != null && nombreFichero.equalsIgnoreCase(documento.getFileName())){
+								file = new File(documento.getPathDocumento());
+								if(file != null && !file.exists()) {
+									file = null;
+								}
+							}
+							
+						}
+					}
+					respuesta.setFile(file);
+
+				}catch(Exception e){
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					error.setMessage("Error al borrar el documento");
+					respuesta.setError(error);
+					LOGGER.error("borrarDocumento() -> Error al borrar el documento " + e.getMessage());
+				}
+				
+				
+			}
+		}
+		LOGGER.info("descargarDocumento() -> Salida del servicio para descargar un documento");
+		return respuesta;
 	}
 }
 

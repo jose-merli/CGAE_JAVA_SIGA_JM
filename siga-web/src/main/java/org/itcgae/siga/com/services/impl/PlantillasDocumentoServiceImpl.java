@@ -3,17 +3,21 @@ package org.itcgae.siga.com.services.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.itcgae.siga.DTOs.com.ComboConsultasDTO;
 import org.itcgae.siga.DTOs.com.ComboSufijoDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
@@ -23,6 +27,7 @@ import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
+import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.com.SufijoItem;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -285,7 +290,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 						if(consultaMultidocumento > 1){
 							consultasValidas = false;
 						}
-						if(consultaCondicion !=1){
+						if(consultaCondicion > 1){
 							consultasValidas = false;
 						}
 					}
@@ -927,5 +932,70 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		LOGGER.info("borrarPlantillas() -> Salida del servicio para borrar las plantillas asociadas a un informe");
 		return respuesta;
 	}	
+	
+	/*@Override
+	public ResponseFileDTO descargarPlantilla(HttpServletRequest request, DocumentoPlantillaItem plantillaDoc) {
+		
+		LOGGER.info("descargarPlantilla() -> Entrada al servicio para descargar la plantilla de documento");
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ResponseFileDTO response = new ResponseFileDTO();
+		Error error = new Error();
+		File excel = null;
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					
+					// Obtenemos el idPlantillaDocumento
+					
+					String idPlantillaDoc = plantillaDoc.getIdPlantillaDocumento();
+					String idModeloComunicacion = plantillaDoc.getIdModeloComunicacion();
+					
+					// Obtenemos el nombre del fichero
+					ModPlantilladocumento plantilla = new ModPlantilladocumento();
+					ModModeloPlantilladocumentoKey key = new ModModeloPlantilladocumentoKey();
+					key.setIdplantilladocumento(Long.parseLong(idPlantillaDoc));
+					key.setIdmodelocomunicacion(Long.parseLong(idModeloComunicacion));
+					
+					ModModeloPlantilladocumento modModeloPlantillaDoc = modModeloPlantilladocumentoMapper.selectByPrimaryKey(key);
+					
+					
+					Map<String,String> mapa = new HashMap<String,String>();
+					mapa = obtenerMapaConsulta(sentencia);
+					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
+					if(result != null){
+						Workbook workBook = crearExcel(result);
+						File aux = new File(SigaConstants.rutaExcelConsultaTemp);
+						// creo directorio si no existe
+						aux.mkdirs();
+						String nombreFichero = SigaConstants.nombreExcelConsulta + new Date().getTime()+".xlsx";
+						excel = new File(SigaConstants.rutaExcelConsultaTemp, nombreFichero);
+						FileOutputStream fileOut = new FileOutputStream(SigaConstants.rutaExcelConsultaTemp + nombreFichero);
+						workBook.write(fileOut);
+				        fileOut.close();
+				        workBook.close();
+				        response.setFile(excel);
+					}
+				}catch (Exception e) {
+					LOGGER.error("ejecutarConsulta() -> Error al ejecutar la consulta: " + e.getMessage());
+					e.printStackTrace();
+					error.setCode(500);
+					error.setDescription(e.getCause().toString());
+					error.setMessage("Error al ejecutar la consulta");
+				}
+		
+			}
+		}
+		LOGGER.info("descargarPlantilla() -> Salida del servicio para descargar la plantilla de documento");
+		return response;
+	}*/
 
 }
