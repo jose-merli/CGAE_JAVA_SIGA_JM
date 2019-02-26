@@ -770,11 +770,11 @@ public class ConsultasServiceImpl implements IConsultasService{
 					//Reemplazamos los campos dinamicos
 					String sentencia = procesarEjecutarConsulta(usuario, consulta.getSentencia(), consulta.getCamposDinamicos(), true);
 					
-					
 					Map<String,String> mapa = new HashMap<String,String>();
 					mapa = obtenerMapaConsulta(sentencia);
 					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
-					if(result != null){
+					
+					if(result != null && result.size() > 0){
 						Workbook workBook = crearExcel(result);
 						File aux = new File(SigaConstants.rutaExcelConsultaTemp);
 						// creo directorio si no existe
@@ -786,6 +786,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 				        fileOut.close();
 				        workBook.close();
 				        response.setFile(excel);
+				        response.setResultados(true);
+					}else{
+						response.setResultados(false);
 					}
 				}catch (Exception e) {
 					LOGGER.error("ejecutarConsulta() -> Error al ejecutar la consulta: " + e.getMessage());
