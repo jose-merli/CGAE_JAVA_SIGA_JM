@@ -13,7 +13,6 @@ import org.itcgae.siga.DTOs.cen.BusquedaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.DesasociarPersonaDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
-import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.cen.PerJuridicaDatosRegistralesUpdateDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaActividadDTO;
@@ -29,7 +28,6 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
-import org.itcgae.siga.db.services.cen.providers.CenColegiadoSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenNocolegiadoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -208,7 +206,8 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 		@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "fechaBaja", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOAPARECERREDABOGACIA", property = "noAparecerRedAbogacia", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "NOAPARECERREDABOGACIA", property = "noAparecerRedAbogacia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "COLEGIORESULTADO", property = "colegioResultado", jdbcType = JdbcType.VARCHAR)
 	})
 	List<NoColegiadoItem> selectNoColegiados(Short idInstitucion, NoColegiadoItem noColegiadoItem);
 	
