@@ -399,11 +399,6 @@ public class ColaEnviosImpl implements IColaEnvios {
 				
 				//Obtenemos alias del Select para recuperar valores mas tarde
 				String selectConEtiquetas = consulta.getConsulta().substring(inicioSelect, finSelect);
-//				String aliasIdPersona = obtenerAliasIdPersona(selectConEtiquetas.trim());
-//				//String aliasIdInstitucion = obtenerAliasIdInstitucion(selectConEtiquetas.trim());
-//				String aliasCorreo = obtenerAliasCorreoElectronico(selectConEtiquetas.trim());
-//				String aliasMovil = obtenerAliasMovil(selectConEtiquetas.trim());
-//				String aliasDomicilio = obtenerAliasDomicilio(selectConEtiquetas.trim());
 				String aliasIdPersona = SigaConstants.ALIASIDPERSONA;
 				String aliasCorreo = SigaConstants.ALIASCORREO;
 				String aliasMovil = SigaConstants.ALIASMOVIL;
@@ -494,115 +489,6 @@ public class ColaEnviosImpl implements IColaEnvios {
 		return cuerpo;
 	}
 
-	private String obtenerAliasIdInstitucion(String select) {
-
-		String idInstitucion = "";
-
-		select = select.toUpperCase();
-		String[] selects = select.split(",");
-		String alias = "CEN_CLIENTE.IDINSTITUCION";
-		for (String string : selects) {
-			string = string.trim();
-			if (string.indexOf(alias) > -1) {
-				int inicio = string.indexOf(alias) + alias.length();
-				idInstitucion = string.substring(inicio);
-				idInstitucion = idInstitucion.replace("\"", "");
-				idInstitucion = idInstitucion.replace("\"", "");
-				idInstitucion = idInstitucion.replace("AS", "");
-				idInstitucion = idInstitucion.trim();
-			}
-		}
-
-		return idInstitucion;
-	}
-
-	private String obtenerAliasIdPersona(String select) {
-
-		String idPersona = "";
-
-		select = select.toUpperCase();
-		String[] selects = select.split(",");
-		String alias = "CEN_CLIENTE.IDPERSONA";
-		for (String string : selects) {
-			string = string.trim();
-			if (string.indexOf(alias) > -1) {
-				int inicio = string.indexOf(alias) + alias.length();
-				idPersona = string.substring(inicio);
-				idPersona = idPersona.replace("AS", "");
-				idPersona = idPersona.replace("\"", "");
-				idPersona = idPersona.replace("\"", "");
-				idPersona = idPersona.trim();
-			}
-		}
-
-		return idPersona;
-	}
-
-	private String obtenerAliasCorreoElectronico(String select) {
-
-		String correo = "";
-
-		select = select.toUpperCase();
-		String[] selects = select.split(",");
-		String alias = "CEN_DIRECCIONES.CORREOELECTRONICO";
-		for (String string : selects) {
-			string = string.trim();
-			if (string.indexOf(alias) > -1) {
-				int inicio = string.indexOf(alias) + alias.length();
-				correo = string.substring(inicio);
-				correo = correo.replace("\"", "");
-				correo = correo.replace("\"", "");
-				correo = correo.replace("AS", "");
-				correo = correo.replace("AS", "");
-			}
-		}
-
-		return correo;
-	}
-
-	private String obtenerAliasMovil(String select) {
-
-		String movil = "";
-
-		select = select.toUpperCase();
-		String[] selects = select.split(",");
-		String alias = "CEN_DIRECCIONES.MOVIL";
-		for (String string : selects) {
-			string = string.trim();
-			if (string.indexOf(alias) > -1) {
-				int inicio = string.indexOf(alias) + alias.length();
-				movil = string.substring(inicio);
-				movil = movil.replace("\"", "");
-				movil = movil.replace("\"", "");
-				movil = movil.replace("AS", "");
-				movil = movil.trim();
-			}
-		}
-
-		return movil;
-	}
-	
-	private String obtenerAliasDomicilio(String select) {
-
-		String domicilio = "";
-
-		select = select.toUpperCase();
-		String[] selects = select.split(",");
-		String alias = "CEN_DIRECCIONES.DOMICILIO";
-		for (String string : selects) {
-			string = string.trim();
-			if (string.indexOf(alias) > -1) {
-				int inicio = string.indexOf(alias) + alias.length();
-				domicilio = string.substring(inicio);
-				domicilio = domicilio.replace("\"", "");
-				domicilio = domicilio.replace("\"", "");
-				domicilio = domicilio.replace("AS", "");
-				domicilio = domicilio.trim();
-			}
-		}
-
-		return domicilio;
-	}
 
 	private DestinatarioItem obtenerDestinatario(Map<String, Object> registro, String idPersonaAlias, String correoElectronicoAlias, String movilAlias, String domicilioAlias) {
 

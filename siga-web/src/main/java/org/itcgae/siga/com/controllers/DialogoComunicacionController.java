@@ -140,16 +140,6 @@ public class DialogoComunicacionController {
 			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	@RequestMapping(value = "/envioTest",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<Error> enviarSMSTest(HttpServletRequest request) {
-		
-		Error response = _dialogoComunicacionService.enviarTest(request);
-		if(response.getCode() == 200)
-			return new ResponseEntity<Error>(response, HttpStatus.OK);
-		else
-			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-
-	}
 	
 	@RequestMapping(value = "/fechaProgramada",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ResponseDateDTO> obtenerFechaProgramada(HttpServletRequest request) {

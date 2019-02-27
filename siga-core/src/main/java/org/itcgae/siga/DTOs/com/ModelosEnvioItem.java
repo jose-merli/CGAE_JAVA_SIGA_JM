@@ -4,16 +4,17 @@ import java.util.List;
 
 public class ModelosEnvioItem {
 	
-	private List<List<ConsultaEnvioItem>> listaConsultas;	
+	private List<DatosEnvioDTO> listaDatosEnvio;	
 	private Integer idPlantillaEnvio;	
 	private Short idTipoEnvio;	
 	private Long idModeloComunicacion;
 	
-	public List<List<ConsultaEnvioItem>> getListaConsultas() {
-		return listaConsultas;
+
+	public List<DatosEnvioDTO> getListaDatosEnvio() {
+		return listaDatosEnvio;
 	}
-	public void setListaConsultas(List<List<ConsultaEnvioItem>> listaConsultas) {
-		this.listaConsultas = listaConsultas;
+	public void setListaDatosEnvio(List<DatosEnvioDTO> listaDatosEnvio) {
+		this.listaDatosEnvio = listaDatosEnvio;
 	}
 	public Integer getIdPlantillaEnvio() {
 		return idPlantillaEnvio;

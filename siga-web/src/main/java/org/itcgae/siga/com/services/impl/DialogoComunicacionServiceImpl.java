@@ -22,6 +22,8 @@ import org.itcgae.siga.DTOs.com.ConsultaEnvioItem;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
+import org.itcgae.siga.DTOs.com.DatosEnvioDTO;
+import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
 import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.GenerarComunicacionItem;
@@ -49,10 +51,12 @@ import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
+import org.itcgae.siga.db.entities.EnvDestinatarios;
 import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
 import org.itcgae.siga.db.entities.EnvEnvios;
@@ -68,8 +72,10 @@ import org.itcgae.siga.db.entities.ModModeloPlantillaenvioKey;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
+import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
 import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
@@ -178,13 +184,16 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	private GenPropertiesMapper _genPropertiesMapper;
 	
 	@Autowired
-	private ModClasecomunicacionRutaMapper _modClasecomunicacionRutaMapper;
-	
-	@Autowired
 	private ModClasecomunicacionesMapper _modClasecomunicacionesMapper;
 	
 	@Autowired
 	private EnvDocumentosMapper _envDocumentosMapper;
+	
+	@Autowired
+	private CenPersonaMapper _cenPersonaMapper;
+	
+	@Autowired
+	private EnvDestinatariosMapper _envDestinatariosMapper;
 		
 
 	@Override
@@ -381,8 +390,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		GenerarComunicacionItem generarComunicacion = new GenerarComunicacionItem();
 		List<Document> listaDocumentos = new ArrayList<Document>();
 		List<DatosDocumentoItem> listaFicheros = new ArrayList<DatosDocumentoItem>();
-		List<List<ConsultaEnvioItem>> listaConsultas = new ArrayList<List<ConsultaEnvioItem>>();
+		List<DatosEnvioDTO> listaConsultasYDestinatario = new ArrayList<DatosEnvioDTO>();
 		List<ModelosEnvioItem> listaModelosEnvio = new ArrayList<ModelosEnvioItem>();
+		DestinatarioItem destinatario = new DestinatarioItem();
 		
 		HashMap<String,Object> hDatosGenerales = new HashMap<String, Object>();
 		HashMap<String,Object> hDatosFinal = new HashMap<String, Object>();	
@@ -779,6 +789,28 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														}													
 													}
 													
+													//Obtenemos los campos del destinatario
+													Object idPersona = dest.get(SigaConstants.ALIASIDPERSONA.trim());
+													Object correo = dest.get(SigaConstants.ALIASCORREO.trim());
+													Object movil = dest.get(SigaConstants.ALIASMOVIL.trim());
+													Object domicilio = dest.get(SigaConstants.ALIASDOMICILIO.trim());
+													
+													CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.valueOf(idPersona.toString()));
+													destinatario.setIdPersona(idPersona.toString());
+													destinatario.setNombre(persona.getNombre());
+													destinatario.setApellidos1(persona.getApellidos1());
+													destinatario.setApellidos2(persona.getApellidos2());
+													destinatario.setNIFCIF(persona.getNifcif());
+													if(domicilio != null){
+														destinatario.setDomicilio(domicilio.toString());
+													}
+													if(correo != null){
+														destinatario.setCorreoElectronico(correo.toString());
+													}
+													if(movil != null){
+														destinatario.setMovil(movil.toString());
+													}
+													
 												}	
 											}else{
 												LOGGER.info("La consulta de destinatarios no ha devuelto resultados");
@@ -796,14 +828,17 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							
 							// Por cada key seleccionada
 							if(esEnvio){
-								listaConsultas.add(listaConsultasEnvio);
+								DatosEnvioDTO dato = new DatosEnvioDTO();
+								dato.setConsultas(listaConsultasEnvio);
+								dato.setDestinatario(destinatario);
+								listaConsultasYDestinatario.add(dato);
 							}
 						}
 					}	
 					
 					// Por cada modelo
 					
-					modeloEnvioItem.setListaConsultas(listaConsultas);
+					modeloEnvioItem.setListaDatosEnvio(listaConsultasYDestinatario);
 					if(modelo.getIdPlantillaEnvio() != null){
 						modeloEnvioItem.setIdPlantillaEnvio(Integer.parseInt(modelo.getIdPlantillaEnvio()));
 					}
@@ -1148,16 +1183,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return consultaEncontrada;		
 	}
 
-
-
-	@Override
-	public Error enviarTest(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-
 	@Override
 	public ResponseDateDTO obtenerFechaProgramada(HttpServletRequest request) {
 		LOGGER.info("obtenerFechaProgramada() -> Entrada al servicio para obtener la fecha por defecto del envio programado");
@@ -1293,8 +1318,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		if(generarComunicacion != null && generarComunicacion.getListaModelosEnvio() != null && generarComunicacion.getListaModelosEnvio().size() > 0){
 			// Por cada modelo y por cada destinatario se genera un envio
 			for(ModelosEnvioItem modeloEnvio : generarComunicacion.getListaModelosEnvio()){
-				if(modeloEnvio != null && modeloEnvio.getListaConsultas() != null){
-					for(List<ConsultaEnvioItem> listaConsultasEnvio : modeloEnvio.getListaConsultas()){
+				if(modeloEnvio != null && modeloEnvio.getListaDatosEnvio() != null){
+					for(DatosEnvioDTO listaConsultasEnvio : modeloEnvio.getListaDatosEnvio()){
 						
 						// Insertamos nuevo envio
 						EnvEnvios envio = new EnvEnvios();
@@ -1349,7 +1374,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						
 						List<String> nombresFicheros = new ArrayList<String>();
 						
-						for(ConsultaEnvioItem consultaEnvio: listaConsultasEnvio){
+						for(ConsultaEnvioItem consultaEnvio: listaConsultasEnvio.getConsultas()){
 							// Insertamos las consultas del envio
 							EnvConsultasenvio consultaEnvioEntity = new EnvConsultasenvio();
 							consultaEnvioEntity.setConsulta(consultaEnvio.getConsulta());
@@ -1379,7 +1404,24 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								documento.setPathdocumento(consultaEnvio.getPathFichero());
 								_envDocumentosMapper.insert(documento);
 								nombresFicheros.add(consultaEnvio.getNombreFichero());
-							}							
+							}
+							
+							//INSERTAMOS  DESTINATARIO
+							EnvDestinatarios destinatario = new EnvDestinatarios();
+							DestinatarioItem dest = listaConsultasEnvio.getDestinatario();
+							destinatario.setIdinstitucion(idInstitucion);
+							destinatario.setIdenvio(envio.getIdenvio());
+							destinatario.setIdpersona(Long.valueOf(dest.getIdPersona()));
+							destinatario.setNombre(dest.getNombre());
+							destinatario.setApellidos1(dest.getApellidos1());
+							destinatario.setApellidos2(dest.getApellidos2());
+							destinatario.setCorreoelectronico(dest.getCorreoElectronico());
+							destinatario.setNifcif(dest.getNIFCIF());
+							destinatario.setMovil(dest.getMovil());
+							destinatario.setFechamodificacion(new Date());
+							destinatario.setUsumodificacion(usuario.getIdusuario());
+							_envDestinatariosMapper.insert(destinatario);
+							
 						}
 					}
 				}							
