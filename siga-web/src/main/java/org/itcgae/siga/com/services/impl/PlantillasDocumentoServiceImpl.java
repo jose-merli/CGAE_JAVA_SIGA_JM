@@ -708,6 +708,18 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 								idInforme = idInforme + (long)1;
 							}	
 							
+							//Comprobamos los sufijos guardadados al informe
+							ModRelPlantillaSufijoExample relSufijoPlantillaExample = new ModRelPlantillaSufijoExample();
+							relSufijoPlantillaExample.createCriteria().andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion())).andIdinformeEqualTo(idInforme);
+							
+							
+							List<ModRelPlantillaSufijo> sufijosGuardados = modRelPlantillaSufijoMapper.selectByExample(relSufijoPlantillaExample);
+							
+							//Borramos los sufijos guardados
+							for(ModRelPlantillaSufijo modSufijo : sufijosGuardados){
+								modRelPlantillaSufijoMapper.deleteByPrimaryKey(modSufijo.getIdplantillasufijo());
+							}
+							
 							for(DocumentoPlantillaItem idPlantillaDoc : plantillaDoc.getPlantillas()){
 								
 								ModPlantilladocumento modPlantillaDoc = modPlantillaDocumentoExtendsMapper.selectByPrimaryKey(Long.parseLong(idPlantillaDoc.getIdPlantillaDocumento()));
@@ -758,21 +770,9 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 											}
 										}
 									}
-								}
+								}				
 								
 								
-								//Comprobamos los sufijos guardadados
-								ModRelPlantillaSufijoExample relSufijoPlantillaExample = new ModRelPlantillaSufijoExample();
-								relSufijoPlantillaExample.createCriteria().andIdmodelocomunicacionEqualTo(Long.parseLong(plantillaDoc.getIdModeloComunicacion())).andIdplantilladocumentoEqualTo(modPlantillaDoc.getIdplantilladocumento())
-													.andIdinformeEqualTo(idInforme);
-								
-								
-								List<ModRelPlantillaSufijo> sufijosGuardados = modRelPlantillaSufijoMapper.selectByExample(relSufijoPlantillaExample);
-								
-								//Borramos los sufijos guardados
-								for(ModRelPlantillaSufijo modSufijo : sufijosGuardados){
-									modRelPlantillaSufijoMapper.deleteByPrimaryKey(modSufijo.getIdplantillasufijo());
-								}
 								
 								//Guardamos los sufijos recibidos
 								if(plantillaDoc.getSufijos() != null){

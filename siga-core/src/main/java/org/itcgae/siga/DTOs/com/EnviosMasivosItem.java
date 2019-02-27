@@ -25,6 +25,7 @@ public class EnviosMasivosItem {
           private String idClaseComunicacion;
           private String modeloComunicacion;
           private String claseComunicacion;
+          private String csv;
           
           public Short getIdInstitucion() {
                     return idInstitucion;
@@ -140,6 +141,12 @@ public class EnviosMasivosItem {
           public void setClaseComunicacion(String claseComunicacion) {
                     this.claseComunicacion = claseComunicacion;
           }
+		public String getCsv() {
+			return csv;
+		}
+		public void setCsv(String csv) {
+			this.csv = csv;
+		}
           
           
           

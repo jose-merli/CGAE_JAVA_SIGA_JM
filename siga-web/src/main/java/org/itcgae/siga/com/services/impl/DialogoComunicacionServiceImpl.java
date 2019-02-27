@@ -517,15 +517,17 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														//Guardamos la consulta condicional
 														ConsultaEnvioItem consultaEnvio= new ConsultaEnvioItem();
 														
-														consultaEnvio.setIdConsulta(idConsultaEjecutarCondicional);
-														consultaEnvio.setConsulta(consultaEjecutarCondicional);
-														consultaEnvio.setIdInstitucion(usuario.getIdinstitucion());
-														consultaEnvio.setIdObjetivo(SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
-														consultaEnvio.setUsuModificacion(Short.parseShort(String.valueOf(usuario.getIdusuario())));
-														consultaEnvio.setIdPlantillaDoc(idPlantillaGenerar);
-														consultaEnvio.setIdInforme(Long.parseLong(plantilla.getIdInforme()));
-														consultaEnvio.setIdModeloComunicacion(Long.parseLong(modelo.getIdModeloComunicacion()));
-														listaConsultasEnvio.add(consultaEnvio);
+														if(idConsultaEjecutarCondicional != null) {
+															consultaEnvio.setIdConsulta(idConsultaEjecutarCondicional);
+															consultaEnvio.setConsulta(consultaEjecutarCondicional);
+															consultaEnvio.setIdInstitucion(usuario.getIdinstitucion());
+															consultaEnvio.setIdObjetivo(SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
+															consultaEnvio.setUsuModificacion(Short.parseShort(String.valueOf(usuario.getIdusuario())));
+															consultaEnvio.setIdPlantillaDoc(idPlantillaGenerar);
+															consultaEnvio.setIdInforme(Long.parseLong(plantilla.getIdInforme()));
+															consultaEnvio.setIdModeloComunicacion(Long.parseLong(modelo.getIdModeloComunicacion()));
+															listaConsultasEnvio.add(consultaEnvio);
+														}														
 														
 														//Guardamos la consulta de destinatarios
 														

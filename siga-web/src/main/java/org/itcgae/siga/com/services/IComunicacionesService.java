@@ -20,5 +20,6 @@ public interface IComunicacionesService {
 	public Error reenviar(HttpServletRequest request, EnviosMasivosItem[] envio);
 	public DestinatariosDTO detalleDestinatarios(HttpServletRequest request,String idEnvio);
 	public ResponseFileDTO descargarDocumento(HttpServletRequest request, ResponseDocumentoDTO documentoDTO);
+	public String descargarCertificado(HttpServletRequest request, String idEnvio);
 	
 }

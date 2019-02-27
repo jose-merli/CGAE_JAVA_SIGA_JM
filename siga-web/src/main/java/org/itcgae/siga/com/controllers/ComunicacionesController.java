@@ -1,8 +1,10 @@
 package org.itcgae.siga.com.controllers;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Base64;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,6 +17,7 @@ import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IComunicacionesService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -109,5 +112,34 @@ public class ComunicacionesController {
 		System.out.println("The length of the file is : "+file.length());
 		  
 		return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+    }
+	
+	@RequestMapping(value="/detalle/descargarCertificado", method=RequestMethod.POST, produces=MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<InputStreamResource> obtenerCertificado(HttpServletRequest request, @RequestBody String idEnvio){
+            
+		HttpHeaders headers = null;
+		InputStreamResource resource = null;                
+		
+		try{
+			String docBase64 = _comunicacionesService.descargarCertificado(request, idEnvio);
+			
+			byte[] decodedValue = Base64.getDecoder().decode(docBase64);
+			
+			ByteArrayInputStream byteArray = new ByteArrayInputStream(decodedValue);
+			resource = new InputStreamResource(byteArray);	
+			
+		}catch(Exception e){
+    		e.printStackTrace();
+		}
+		
+		headers = new HttpHeaders();
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Expires", "0");
+		 
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + SigaConstants.NOMBRE_FICHERO_BUROSMS + "\"");
+		headers.add(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
+		
+		return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.OK);
     }
 }

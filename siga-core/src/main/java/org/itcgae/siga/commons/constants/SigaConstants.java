@@ -123,6 +123,7 @@ public class SigaConstants {
 	public static final String PFD_IDCLIENTE = "PFD_IDCLIENTE";
 	public static final String SMS_URL_SERVICE = "SMS_URL_SERVICE";
 	public static final String SMS_CLIENTE_ECOS = "SMS_CLIENTE_ECOS";
+	public static final String NOMBRE_FICHERO_BUROSMS = "Justificante_BUROSMS.pdf";
 
 	public static final String MODULO_SCS = "SCS";
 	public static final String MODULO_ADM = "ADM";

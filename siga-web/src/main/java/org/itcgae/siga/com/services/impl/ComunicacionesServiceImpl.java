@@ -1,7 +1,9 @@
 package org.itcgae.siga.com.services.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +22,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IComunicacionesService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
+import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -55,6 +58,9 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	
 	@Autowired
 	private IDialogoComunicacionService _dialogoComunicacionService;
+	
+	@Autowired
+	private IPFDService pfdService;
 
 	/**Realiza la busqueda de comunicaciones **/
 	@Override
@@ -277,6 +283,45 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 		}
 		LOGGER.info("descargarDocumento() -> Salida del servicio para descargar un documento");
 		return respuesta;
+	}
+
+
+
+	@Override
+	public String descargarCertificado(HttpServletRequest request, String csv) {
+		LOGGER.info("descargarCertificado() -> Entrada al servicio para descargar el certificado del buroSMS del envio");
+		
+		Error error = new Error();
+		ResponseFileDTO respuesta = new ResponseFileDTO();
+		String fileBase64 = "";
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					fileBase64 = pfdService.obtenerDocumentoFirmado(csv);
+
+				}catch(Exception e){
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					error.setMessage("Error al borrar el documento");
+					respuesta.setError(error);
+					LOGGER.error("borrarDocumento() -> Error al borrar el documento " + e.getMessage());
+				}
+				
+				
+			}
+		}
+		LOGGER.info("descargarCertificado() -> Salida del servicio para descargar el certificado del buroSMS del envio");
+		return fileBase64;
 	}
 }
 
