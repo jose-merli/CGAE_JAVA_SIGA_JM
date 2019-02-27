@@ -91,9 +91,9 @@ public class ClientAlterMutua {
 	        public void doWithMessage(WebServiceMessage message) {
 	            try {
 	                SoapMessage soapMessage = (SoapMessage)message;
-	                ((SoapMessage)message).setSoapAction("http://www.altermutua.com/WSSIGA/GetEstadoColegiado");
+	                ((SoapMessage)message).setSoapAction("https://preproduccion.altermutua.com/WSSIGATEST/GetEstadoColegiado");
 	                SoapHeader header = soapMessage.getSoapHeader();
-	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"http://www.altermutua.com/WSSIGA\" "
+	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"https://preproduccion.altermutua.com/WSSIGATEST\" "
 	                		+ "soapenv:actor=\"http://schemas.xmlsoap.org/soap/actor/next\" soapenv:mustUnderstand=\"0\">\n"
 	                		+ "<wss:Usuario>" + user + "</wss:Usuario>\n"
 	                		+ "<wss:Clave>" + pass + "</wss:Clave>\n"
@@ -149,9 +149,9 @@ public class ClientAlterMutua {
 	        public void doWithMessage(WebServiceMessage message) {
 	            try {
 	                SoapMessage soapMessage = (SoapMessage)message;
-	                ((SoapMessage)message).setSoapAction("http://www.altermutua.com/WSSIGA/GetEstadoSolicitud");
+	                ((SoapMessage)message).setSoapAction("https://preproduccion.altermutua.com/WSSIGATEST/GetEstadoSolicitud");
 	                SoapHeader header = soapMessage.getSoapHeader();
-	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"http://www.altermutua.com/WSSIGA\" "
+	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"https://preproduccion.altermutua.com/WSSIGATEST\" "
 	                		+ "soapenv:actor=\"http://schemas.xmlsoap.org/soap/actor/next\" soapenv:mustUnderstand=\"0\">\n"
 	                		+ "<wss:Usuario>" + user + "</wss:Usuario>\n"
 	                		+ "<wss:Clave>" + pass + "</wss:Clave>\n"
@@ -210,9 +210,9 @@ public class ClientAlterMutua {
 	        public void doWithMessage(WebServiceMessage message) {
 	            try {
 	                SoapMessage soapMessage = (SoapMessage)message;
-	                ((SoapMessage)message).setSoapAction("http://www.altermutua.com/WSSIGA/GetPropuestas");
+	                ((SoapMessage)message).setSoapAction("https://preproduccion.altermutua.com/WSSIGATEST/GetPropuestas");
 	                SoapHeader header = soapMessage.getSoapHeader();
-	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"http://www.altermutua.com/WSSIGA\" "
+	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"https://preproduccion.altermutua.com/WSSIGATEST\" "
 	                		+ "soapenv:actor=\"http://schemas.xmlsoap.org/soap/actor/next\" soapenv:mustUnderstand=\"0\">\n"
 	                		+ "<wss:Usuario>" + user + "</wss:Usuario>\n"
 	                		+ "<wss:Clave>" + pass + "</wss:Clave>\n"
@@ -266,9 +266,9 @@ public class ClientAlterMutua {
 	        public void doWithMessage(WebServiceMessage message) {
 	            try {
 	                SoapMessage soapMessage = (SoapMessage)message;
-	                ((SoapMessage)message).setSoapAction("http://www.altermutua.com/WSSIGA/GetTarifaSolicitud");
+	                ((SoapMessage)message).setSoapAction("https://preproduccion.altermutua.com/WSSIGATEST/GetTarifaSolicitud");
 	                SoapHeader header = soapMessage.getSoapHeader();
-	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"http://www.altermutua.com/WSSIGA\" "
+	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"https://preproduccion.altermutua.com/WSSIGATEST\" "
 	                		+ "soapenv:actor=\"http://schemas.xmlsoap.org/soap/actor/next\" soapenv:mustUnderstand=\"0\">\n"
 	                		+ "<wss:Usuario>" + user + "</wss:Usuario>\n"
 	                		+ "<wss:Clave>" + pass + "</wss:Clave>\n"
@@ -321,9 +321,9 @@ public class ClientAlterMutua {
 	        public void doWithMessage(WebServiceMessage message) {
 	            try {
 	                SoapMessage soapMessage = (SoapMessage)message;
-	                ((SoapMessage)message).setSoapAction("http://www.altermutua.com/WSSIGA/SetSolicitudAlter");
+	                ((SoapMessage)message).setSoapAction("https://preproduccion.altermutua.com/WSSIGATEST/SetSolicitudAlter");
 	                SoapHeader header = soapMessage.getSoapHeader();
-	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"http://www.altermutua.com/WSSIGA\" "
+	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"https://preproduccion.altermutua.com/WSSIGATEST\" "
 	                		+ "soapenv:actor=\"http://schemas.xmlsoap.org/soap/actor/next\" soapenv:mustUnderstand=\"0\">\n"
 	                		+ "<wss:Usuario>" + user + "</wss:Usuario>\n"
 	                		+ "<wss:Clave>" + pass + "</wss:Clave>\n"
