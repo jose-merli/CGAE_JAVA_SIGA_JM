@@ -81,7 +81,7 @@ public interface CenComponentesExtendsMapper extends CenComponentesMapper {
 			@Result(column = "DESCRIPCIONPROFESION", property = "descripcionProfesion", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "PERSONAJURIDICA", property = "personaJuridica", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDPROVINCIA", property = "idProvincia", jdbcType = JdbcType.VARCHAR) ,
-			@Result(column = "FLAG_SOCIO", property = "flagSocion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FLAG_SOCIO", property = "flagSocio", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CEN_CLIENTE_IDINSTITUCION", property = "colegio", jdbcType = JdbcType.VARCHAR)})
 	List<DatosIntegrantesItem> selectIntegrantes(DatosIntegrantesSearchDTO integrantes, String idInstitucion);
 	
