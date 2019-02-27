@@ -2,8 +2,6 @@ package org.itcgae.siga.DTOs.com;
 
 import java.util.Date;
 
-
-
 public class EnviosMasivosItem {
           
           private Short idInstitucion;
@@ -26,6 +24,7 @@ public class EnviosMasivosItem {
           private String modeloComunicacion;
           private String claseComunicacion;
           private String csv;
+          private String destinatario;
           
           public Short getIdInstitucion() {
                     return idInstitucion;
@@ -147,7 +146,12 @@ public class EnviosMasivosItem {
 		public void setCsv(String csv) {
 			this.csv = csv;
 		}
-          
+        public void setDestinatario(String destinatario) {
+		    this.destinatario = destinatario;
+        }
+        public String getDestinatario() {
+            return destinatario;
+        }
           
           
 }

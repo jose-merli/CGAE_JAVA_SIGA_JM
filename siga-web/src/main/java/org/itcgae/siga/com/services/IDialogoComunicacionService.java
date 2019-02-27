@@ -29,7 +29,6 @@ public interface IDialogoComunicacionService {
 	public ByteResponseDto descargarComunicacion(HttpServletRequest request, DialogoComunicacionItem dialogo);
 	public KeysDTO obtenerKeysClaseComunicacion(HttpServletRequest request, String idClaseComunicacion);
 	public ConsultasDTO obtenerCamposModelo(HttpServletRequest request, DialogoComunicacionItem dialogo);
-	public Error enviarTest(HttpServletRequest request);
 	public ResponseDateDTO obtenerFechaProgramada(HttpServletRequest request);
 	public ResponseDataDTO obtenerNumMaximoModelos(HttpServletRequest request);
 	public Error generarEnvios(HttpServletRequest request, DialogoComunicacionItem dialogo);
