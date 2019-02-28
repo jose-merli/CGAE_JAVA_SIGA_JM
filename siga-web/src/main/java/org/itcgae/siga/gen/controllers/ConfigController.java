@@ -4,6 +4,7 @@ package org.itcgae.siga.gen.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UsuarioDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.DiccionarioDTO;
 import org.itcgae.siga.gen.services.IDiccionarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,15 @@ public class ConfigController {
     	response = diccionarioService.getUsuario(request);
     	return new ResponseEntity<UsuarioDTO>(response, HttpStatus.OK);
 
+	}
+    
+    @RequestMapping(value = "/recuperarApiKey",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ResponseDataDTO> recuperarApiKey(HttpServletRequest request) {		
+		ResponseDataDTO response = diccionarioService.obtenerTinyApiKey(request);
+		if(response.getError() == null)
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ResponseDataDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
     
 }

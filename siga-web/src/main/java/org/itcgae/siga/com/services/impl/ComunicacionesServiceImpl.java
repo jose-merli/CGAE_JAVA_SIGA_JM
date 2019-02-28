@@ -1,9 +1,7 @@
 package org.itcgae.siga.com.services.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,10 +24,10 @@ import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
-import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDestinatariosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,7 +58,8 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	private IDialogoComunicacionService _dialogoComunicacionService;
 	
 	@Autowired
-	private IPFDService pfdService;
+	private IPFDService pfdService;	
+	
 
 	/**Realiza la busqueda de comunicaciones **/
 	@Override
@@ -323,5 +322,6 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 		LOGGER.info("descargarCertificado() -> Salida del servicio para descargar el certificado del buroSMS del envio");
 		return fileBase64;
 	}
+	
 }
 

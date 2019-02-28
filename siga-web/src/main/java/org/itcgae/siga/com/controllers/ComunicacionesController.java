@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -141,5 +142,5 @@ public class ComunicacionesController {
 		headers.add(HttpHeaders.CONTENT_TYPE, "application/octet-stream");
 		
 		return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.OK);
-    }
+    }	
 }
