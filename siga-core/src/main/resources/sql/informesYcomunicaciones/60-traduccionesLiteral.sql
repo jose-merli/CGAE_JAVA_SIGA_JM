@@ -1,0 +1,4 @@
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('enviosMasivos.literal.certificado','Descargar justificante de recepción BUROSMS','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('enviosMasivos.literal.certificado','Descargar justificante de recepción BUROSMS#GL','0','4',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('enviosMasivos.literal.certificado','Descargar justificante de recepción BUROSMS#CAT','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('enviosMasivos.literal.certificado','Descargar justificante de recepción BUROSMS#EU','0','3',sysdate,'0','19');
