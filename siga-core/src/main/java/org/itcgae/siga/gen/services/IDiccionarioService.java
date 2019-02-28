@@ -3,6 +3,7 @@ package org.itcgae.siga.gen.services;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.UsuarioDTO;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.DiccionarioDTO;
 
 public interface IDiccionarioService {
@@ -12,5 +13,6 @@ public interface IDiccionarioService {
 
 	public  UsuarioDTO getUsuario(HttpServletRequest request);
 
+	public ResponseDataDTO obtenerTinyApiKey(HttpServletRequest request);
 
 }

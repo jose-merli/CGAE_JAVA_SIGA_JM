@@ -6,10 +6,14 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.UsuarioDTO;
 import org.itcgae.siga.DTOs.adm.UsuarioItem;
+import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.gen.DiccionarioDTO;
 import org.itcgae.siga.DTOs.gen.DiccionarioItem;
+import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmLenguajes;
 import org.itcgae.siga.db.entities.AdmLenguajesExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -18,17 +22,19 @@ import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
-import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioExample;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.mappers.AdmLenguajesMapper;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.gen.services.IDiccionarioService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -39,6 +45,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DiccionarioServiceImpl implements IDiccionarioService {
 
+	private Logger LOGGER = Logger.getLogger(DiccionarioServiceImpl.class);
 	
 	@Autowired
 	AdmLenguajesMapper lenguajesMapper;
@@ -59,6 +66,9 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 	
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
+	
+	@Autowired
+	private GenPropertiesMapper _genPropertiesMapper;
 	
 	@Override
 	public DiccionarioDTO getDiccionario(String lenguaje,HttpServletRequest request) {
@@ -226,6 +236,46 @@ public class DiccionarioServiceImpl implements IDiccionarioService {
 		usuarioItem.add(usuarioResponse);
 		response.setUsuarioItem(usuarioItem);
 		
+		return response;
+	}
+	
+	@Override
+	public ResponseDataDTO obtenerTinyApiKey(HttpServletRequest request) {
+		LOGGER.info("obtenerTinyApiKey() -> Entrada al servicio para obtener la apiKey del editor de html");
+		
+		ResponseDataDTO response = new ResponseDataDTO();
+		Error error = new Error();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					GenPropertiesKey key = new GenPropertiesKey();
+					key.setFichero(SigaConstants.FICHERO_SIGA);
+					key.setParametro(SigaConstants.TINY_APIKEY);
+					
+					GenProperties numMaximo = _genPropertiesMapper.selectByPrimaryKey(key);
+					response.setData(numMaximo.getValor());
+					
+				}catch(Exception e){
+					LOGGER.error("Error al obtener la apikey del editor", e);
+					error.setCode(500);
+					error.setDescription("Error al obtener la apikey del editor");
+					error.setMessage(e.getMessage());
+					response.setError(error);
+				}					
+			}
+		}
+		
+		LOGGER.info("obtenerTinyApiKey() -> Salida del servicio para obtener la apiKey del editor de html");
 		return response;
 	}
 
