@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
+import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
@@ -35,5 +36,6 @@ public interface IEnviosMasivosService {
 	public DocumentosEnvioDTO obtenerDocumentosEnvio(HttpServletRequest request, String idEnvio);
 	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request) throws IOException;
 	public Error borrarDocumento(HttpServletRequest request, ResponseDocumentoDTO[] documentoDTO);
+	public PlantillaEnvioItem obtenerAsuntoYcuerpo (HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta);
 
 }

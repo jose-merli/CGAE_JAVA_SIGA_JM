@@ -4,19 +4,6 @@ import java.util.Date;
 
 public class PlantillaEnvioItem {
 
-//	IDTIPOENVIOS      NOT NULL NUMBER(2)     
-//	IDPLANTILLAENVIOS NOT NULL NUMBER(3)     
-//	NOMBRE            NOT NULL VARCHAR2(100) 
-//	IDINSTITUCION     NOT NULL NUMBER(4)     
-//	FECHAMODIFICACION NOT NULL DATE          
-//	USUMODIFICACION   NOT NULL NUMBER(5)     
-//	ACUSERECIBO                VARCHAR2(1)   
-//	FECHABAJA                  DATE          
-//	ASUNTO                     CLOB          
-//	CUERPO                     CLOB          
-//	IDDIRECCION                NUMBER(10)    
-//	IDPERSONA                  NUMBER(10) 
-	
 	private String idTipoEnvios;
 	private String idPlantillaEnvios;
 	private String nombre;

@@ -22,6 +22,7 @@ import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
+import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
@@ -487,61 +488,45 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
-					int update = 0;
-					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
-					key.setIdplantillaenvios(Integer.parseInt(datosTarjeta.getIdPlantillaEnvios()));
-					key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
-					key.setIdinstitucion(idInstitucion);
-					EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);
-					plantilla.setAsunto(datosTarjeta.getAsunto());
-					plantilla.setCuerpo(datosTarjeta.getCuerpo());
-					update = _envPlantillasenviosMapper.updateByPrimaryKeyWithBLOBs(plantilla);
-					
-					if(update > 0){
-						if(datosTarjeta.getIdEnvio() == null){
-							EnvEnvios envio = new EnvEnvios();
-							envio.setIdinstitucion(idInstitucion);
-							envio.setDescripcion(datosTarjeta.getDescripcion());
-							envio.setFecha(new Date());
-							envio.setGenerardocumento("N");
-							envio.setImprimiretiquetas("N");
-							envio.setIdplantillaenvios(Integer.parseInt(datosTarjeta.getIdPlantillaEnvios()));
-							Short estadoNuevo = 1;
-							envio.setIdestado(estadoNuevo);
-							envio.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
-							envio.setFechamodificacion(new Date());
-							envio.setUsumodificacion(usuario.getIdusuario());
-							envio.setEnvio("M");
-							int insert = _envEnviosMapper.insert(envio);
-							if(insert >0){
-								EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
-								//NewIdDTO idDTO = _envHistoricoEstadoExtendsMapper.selectMaxIDHistorico();
-								//historico.setIdhistorico(Short.parseShort(idDTO.getNewId()));
-								historico.setIdenvio(envio.getIdenvio());
-								historico.setIdinstitucion(usuario.getIdinstitucion());
-								historico.setFechamodificacion(new Date());
-								historico.setFechaestado(new Date());
-								historico.setUsumodificacion(usuario.getIdusuario());
-								Short idEstado = 1;
-								historico.setIdestado(idEstado);
-								_envHistoricoestadoenvioMapper.insert(historico);
-							}
-							respuesta.setCode(200);
-							respuesta.setDescription(envio.getIdenvio().toString());
-							SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss"); 
-							respuesta.setMessage(dateFormat.format(envio.getFecha()));
-						}else{
-							EnvEnvios envio = new EnvEnvios();
-							envio.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
-							envio.setDescripcion(datosTarjeta.getDescripcion());
-							_envEnviosMapper.updateByPrimaryKey(envio);
-							respuesta.setCode(200);
-							respuesta.setDescription(envio.getIdenvio().toString());
+
+					if(datosTarjeta.getIdEnvio() == null){
+						EnvEnvios envio = new EnvEnvios();
+						envio.setIdinstitucion(idInstitucion);
+						envio.setDescripcion(datosTarjeta.getDescripcion());
+						envio.setFecha(new Date());
+						envio.setGenerardocumento("N");
+						envio.setImprimiretiquetas("N");
+						envio.setIdplantillaenvios(Integer.parseInt(datosTarjeta.getIdPlantillaEnvios()));
+						Short estadoNuevo = 1;
+						envio.setIdestado(estadoNuevo);
+						envio.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
+						envio.setFechamodificacion(new Date());
+						envio.setUsumodificacion(usuario.getIdusuario());
+						envio.setEnvio("M");
+						int insert = _envEnviosMapper.insert(envio);
+						if(insert >0){
+							EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
+							historico.setIdenvio(envio.getIdenvio());
+							historico.setIdinstitucion(usuario.getIdinstitucion());
+							historico.setFechamodificacion(new Date());
+							historico.setFechaestado(new Date());
+							historico.setUsumodificacion(usuario.getIdusuario());
+							Short idEstado = 1;
+							historico.setIdestado(idEstado);
+							_envHistoricoestadoenvioMapper.insert(historico);
 						}
-						
+						respuesta.setCode(200);
+						respuesta.setDescription(envio.getIdenvio().toString());
+						SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss"); 
+						respuesta.setMessage(dateFormat.format(envio.getFecha()));
+					}else{
+						EnvEnvios envio = new EnvEnvios();
+						envio.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
+						envio.setDescripcion(datosTarjeta.getDescripcion());
+						_envEnviosMapper.updateByPrimaryKey(envio);
+						respuesta.setCode(200);
+						respuesta.setDescription(envio.getIdenvio().toString());
 					}
-					
-					
 				}catch(Exception e){
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
@@ -1089,6 +1074,41 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 		}
 		LOGGER.info("borrarDocumento() -> Salida del servicio para borrar un documento");
 		return respuesta;
+	}
+
+	@Override
+	public PlantillaEnvioItem obtenerAsuntoYcuerpo(HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta) {
+		
+		LOGGER.info("ObtenerAsuntoYcuerpo() -> Entrada al servicio para obtener el asunto y el cuerpo de la plantilla");
+
+		PlantillaEnvioItem plantilla = new PlantillaEnvioItem();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				
+				EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
+				key.setIdinstitucion(idInstitucion);
+				key.setIdplantillaenvios(Integer.parseInt(datosTarjeta.getIdPlantillaEnvios()));
+				key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
+				EnvPlantillasenviosWithBLOBs plant = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+				plantilla.setCuerpo(plant.getCuerpo());
+				plantilla.setAsunto(plant.getAsunto());
+				
+			}
+		}
+		
+		LOGGER.info("ObtenerAsuntoYcuerpo() -> Salida del servicio para obtener el asunto y el cuerpo de la plantillas");
+		
+		return plantilla;
 	}
 	
 }

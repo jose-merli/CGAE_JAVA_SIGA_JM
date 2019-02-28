@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
 import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
+import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
@@ -128,6 +129,13 @@ public class EnviosMasivosController {
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/detallePlantilla",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PlantillaEnvioItem> obtenerAsuntoYCuerpo(HttpServletRequest request, @RequestBody TarjetaConfiguracionDto datosTarjeta) {
+		
+		PlantillaEnvioItem response = _enviosMasivosService.obtenerAsuntoYcuerpo(request, datosTarjeta);
+		return new ResponseEntity<PlantillaEnvioItem>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/detalle/documentosEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
