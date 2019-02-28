@@ -1317,118 +1317,123 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	private void insertarConsultasEnvio(AdmUsuarios usuario, Short idInstitucion, GenerarComunicacionItem generarComunicacion){
 		// Hay que generar un envio por cada modelo y cada destinatario
 		
-		if(generarComunicacion != null && generarComunicacion.getListaModelosEnvio() != null && generarComunicacion.getListaModelosEnvio().size() > 0){
-			// Por cada modelo y por cada destinatario se genera un envio
-			for(ModelosEnvioItem modeloEnvio : generarComunicacion.getListaModelosEnvio()){
-				if(modeloEnvio != null && modeloEnvio.getListaDatosEnvio() != null){
-					for(DatosEnvioDTO listaConsultasEnvio : modeloEnvio.getListaDatosEnvio()){
-						
-						// Insertamos nuevo envio
-						EnvEnvios envio = new EnvEnvios();
-						envio.setIdinstitucion(idInstitucion);
-						envio.setDescripcion("TMP");
-						envio.setFecha(new Date());
-						envio.setGenerardocumento("N");
-						envio.setImprimiretiquetas("N");
-						envio.setIdplantillaenvios(modeloEnvio.getIdPlantillaEnvio());
-						
-						Short estadoNuevo = 4;
-						envio.setIdestado(estadoNuevo);
-						envio.setIdtipoenvios(modeloEnvio.getIdTipoEnvio());
-						envio.setFechamodificacion(new Date());
-						envio.setUsumodificacion(usuario.getIdusuario());
-						envio.setEnvio("A");
-						envio.setFechaprogramada(generarComunicacion.getFechaProgramada());
-						envio.setIdmodelocomunicacion(modeloEnvio.getIdModeloComunicacion());
-						int insert = _envEnviosMapper.insert(envio);
-						
-						// Actualizamos el envio para ponerle la descripcion
-						CenInstitucion institucion = _cenInstitucion.selectByPrimaryKey(idInstitucion);
-						String descripcion = envio.getIdenvio() + "--" +institucion.getAbreviatura();
-						envio.setDescripcion(descripcion);
-						_envEnviosMapper.updateByPrimaryKey(envio);					
-						
-						if(insert >0){						
+		try {
+			if(generarComunicacion != null && generarComunicacion.getListaModelosEnvio() != null && generarComunicacion.getListaModelosEnvio().size() > 0){
+				// Por cada modelo y por cada destinatario se genera un envio
+				for(ModelosEnvioItem modeloEnvio : generarComunicacion.getListaModelosEnvio()){
+					if(modeloEnvio != null && modeloEnvio.getListaDatosEnvio() != null){
+						for(DatosEnvioDTO listaConsultasEnvio : modeloEnvio.getListaDatosEnvio()){
 							
-							EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
-							historico.setIdenvio(envio.getIdenvio());
-							historico.setIdinstitucion(usuario.getIdinstitucion());
-							historico.setFechamodificacion(new Date());
-							historico.setFechaestado(new Date());
-							historico.setUsumodificacion(usuario.getIdusuario());
-							Short idEstado = 4;
-							historico.setIdestado(idEstado);
-							_envHistoricoestadoenvioMapper.insert(historico);
+							// Insertamos nuevo envio
+							EnvEnvios envio = new EnvEnvios();
+							envio.setIdinstitucion(idInstitucion);
+							envio.setDescripcion("TMP");
+							envio.setFecha(new Date());
+							envio.setGenerardocumento("N");
+							envio.setImprimiretiquetas("N");
+							envio.setIdplantillaenvios(modeloEnvio.getIdPlantillaEnvio());
 							
-							//Insertamos el envio programado
-							EnvEnvioprogramado envioProgramado = new EnvEnvioprogramado();
-							envioProgramado.setIdenvio(envio.getIdenvio());
-							envioProgramado.setIdinstitucion(idInstitucion);
-							envioProgramado.setEstado("0");
-							envioProgramado.setIdplantillaenvios(modeloEnvio.getIdPlantillaEnvio());
-							envioProgramado.setIdtipoenvios(modeloEnvio.getIdTipoEnvio());
-							envioProgramado.setNombre(descripcion);
-							envioProgramado.setFechaprogramada(generarComunicacion.getFechaProgramada());
-							envioProgramado.setFechamodificacion(new Date());
-							envioProgramado.setUsumodificacion(usuario.getIdusuario());								
-							_envEnvioprogramadoMapper.insert(envioProgramado);
-						}
-						
-						List<String> nombresFicheros = new ArrayList<String>();
-						
-						for(ConsultaEnvioItem consultaEnvio: listaConsultasEnvio.getConsultas()){
-							// Insertamos las consultas del envio
-							EnvConsultasenvio consultaEnvioEntity = new EnvConsultasenvio();
-							consultaEnvioEntity.setConsulta(consultaEnvio.getConsulta());
-							consultaEnvioEntity.setFechamodificacion(new Date());
-							consultaEnvioEntity.setIdconsulta(consultaEnvio.getIdConsulta());
-							consultaEnvioEntity.setIdenvio(envio.getIdenvio());
-							consultaEnvioEntity.setIdinstitucion(consultaEnvio.getIdInstitucion());
-							consultaEnvioEntity.setIdobjetivo(consultaEnvio.getIdObjetivo());
-							consultaEnvioEntity.setUsumodificacion(consultaEnvio.getUsuModificacion());
-							consultaEnvioEntity.setIdplantilladocumento(consultaEnvio.getIdPlantillaDoc());
-							consultaEnvioEntity.setIdinforme(consultaEnvio.getIdInforme());
-							consultaEnvioEntity.setIdmodelocomunicacion(consultaEnvio.getIdModeloComunicacion());
-							consultaEnvioEntity.setSufijo(consultaEnvio.getSufijo());
-							_envConsultasenvioMapper.insert(consultaEnvioEntity);
+							Short estadoNuevo = 4;
+							envio.setIdestado(estadoNuevo);
+							envio.setIdtipoenvios(modeloEnvio.getIdTipoEnvio());
+							envio.setFechamodificacion(new Date());
+							envio.setUsumodificacion(usuario.getIdusuario());
+							envio.setEnvio("A");
+							envio.setFechaprogramada(generarComunicacion.getFechaProgramada());
+							envio.setIdmodelocomunicacion(modeloEnvio.getIdModeloComunicacion());
+							int insert = _envEnviosMapper.insert(envio);
 							
+							// Actualizamos el envio para ponerle la descripcion
+							CenInstitucion institucion = _cenInstitucion.selectByPrimaryKey(idInstitucion);
+							String descripcion = envio.getIdenvio() + "--" +institucion.getAbreviatura();
+							envio.setDescripcion(descripcion);
+							_envEnviosMapper.updateByPrimaryKey(envio);					
 							
-							//Insertamos los documentos asociados al envio
-							
-							// Si ya se ha insertado lo omitimos
-							if(!nombresFicheros.contains(consultaEnvio.getNombreFichero())) {
-								EnvDocumentos documento = new EnvDocumentos();
-								documento.setIdenvio(envio.getIdenvio());
-								documento.setIdinstitucion(usuario.getIdinstitucion());
-								documento.setFechamodificacion(new Date());
-								documento.setUsumodificacion(usuario.getIdusuario());
-								documento.setDescripcion(consultaEnvio.getNombreFichero());
-								documento.setPathdocumento(consultaEnvio.getPathFichero());
-								_envDocumentosMapper.insert(documento);
-								nombresFicheros.add(consultaEnvio.getNombreFichero());
+							if(insert >0){						
+								
+								EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
+								historico.setIdenvio(envio.getIdenvio());
+								historico.setIdinstitucion(usuario.getIdinstitucion());
+								historico.setFechamodificacion(new Date());
+								historico.setFechaestado(new Date());
+								historico.setUsumodificacion(usuario.getIdusuario());
+								Short idEstado = 4;
+								historico.setIdestado(idEstado);
+								_envHistoricoestadoenvioMapper.insert(historico);
+								
+								//Insertamos el envio programado
+								EnvEnvioprogramado envioProgramado = new EnvEnvioprogramado();
+								envioProgramado.setIdenvio(envio.getIdenvio());
+								envioProgramado.setIdinstitucion(idInstitucion);
+								envioProgramado.setEstado("0");
+								envioProgramado.setIdplantillaenvios(modeloEnvio.getIdPlantillaEnvio());
+								envioProgramado.setIdtipoenvios(modeloEnvio.getIdTipoEnvio());
+								envioProgramado.setNombre(descripcion);
+								envioProgramado.setFechaprogramada(generarComunicacion.getFechaProgramada());
+								envioProgramado.setFechamodificacion(new Date());
+								envioProgramado.setUsumodificacion(usuario.getIdusuario());								
+								_envEnvioprogramadoMapper.insert(envioProgramado);
+								
+								//INSERTAMOS  DESTINATARIO
+								EnvDestinatarios destinatario = new EnvDestinatarios();
+								DestinatarioItem dest = listaConsultasEnvio.getDestinatario();
+								destinatario.setIdinstitucion(idInstitucion);
+								destinatario.setIdenvio(envio.getIdenvio());
+								destinatario.setIdpersona(Long.valueOf(dest.getIdPersona()));
+								destinatario.setNombre(dest.getNombre());
+								destinatario.setApellidos1(dest.getApellidos1());
+								destinatario.setApellidos2(dest.getApellidos2());
+								destinatario.setCorreoelectronico(dest.getCorreoElectronico());
+								destinatario.setNifcif(dest.getNIFCIF());
+								destinatario.setMovil(dest.getMovil());
+								destinatario.setFechamodificacion(new Date());
+								destinatario.setUsumodificacion(usuario.getIdusuario());
+								destinatario.setTipodestinatario(SigaConstants.TIPO_CEN_PERSONA);
+								_envDestinatariosMapper.insert(destinatario);
 							}
 							
-							//INSERTAMOS  DESTINATARIO
-							EnvDestinatarios destinatario = new EnvDestinatarios();
-							DestinatarioItem dest = listaConsultasEnvio.getDestinatario();
-							destinatario.setIdinstitucion(idInstitucion);
-							destinatario.setIdenvio(envio.getIdenvio());
-							destinatario.setIdpersona(Long.valueOf(dest.getIdPersona()));
-							destinatario.setNombre(dest.getNombre());
-							destinatario.setApellidos1(dest.getApellidos1());
-							destinatario.setApellidos2(dest.getApellidos2());
-							destinatario.setCorreoelectronico(dest.getCorreoElectronico());
-							destinatario.setNifcif(dest.getNIFCIF());
-							destinatario.setMovil(dest.getMovil());
-							destinatario.setFechamodificacion(new Date());
-							destinatario.setUsumodificacion(usuario.getIdusuario());
-							_envDestinatariosMapper.insert(destinatario);
+							List<String> nombresFicheros = new ArrayList<String>();
 							
+							for(ConsultaEnvioItem consultaEnvio: listaConsultasEnvio.getConsultas()){
+								// Insertamos las consultas del envio
+								EnvConsultasenvio consultaEnvioEntity = new EnvConsultasenvio();
+								consultaEnvioEntity.setConsulta(consultaEnvio.getConsulta());
+								consultaEnvioEntity.setFechamodificacion(new Date());
+								consultaEnvioEntity.setIdconsulta(consultaEnvio.getIdConsulta());
+								consultaEnvioEntity.setIdenvio(envio.getIdenvio());
+								consultaEnvioEntity.setIdinstitucion(consultaEnvio.getIdInstitucion());
+								consultaEnvioEntity.setIdobjetivo(consultaEnvio.getIdObjetivo());
+								consultaEnvioEntity.setUsumodificacion(consultaEnvio.getUsuModificacion());
+								consultaEnvioEntity.setIdplantilladocumento(consultaEnvio.getIdPlantillaDoc());
+								consultaEnvioEntity.setIdinforme(consultaEnvio.getIdInforme());
+								consultaEnvioEntity.setIdmodelocomunicacion(consultaEnvio.getIdModeloComunicacion());
+								consultaEnvioEntity.setSufijo(consultaEnvio.getSufijo());
+								_envConsultasenvioMapper.insert(consultaEnvioEntity);
+								
+								
+								//Insertamos los documentos asociados al envio
+								
+								// Si ya se ha insertado lo omitimos
+								if(!nombresFicheros.contains(consultaEnvio.getNombreFichero())) {
+									EnvDocumentos documento = new EnvDocumentos();
+									documento.setIdenvio(envio.getIdenvio());
+									documento.setIdinstitucion(usuario.getIdinstitucion());
+									documento.setFechamodificacion(new Date());
+									documento.setUsumodificacion(usuario.getIdusuario());
+									documento.setDescripcion(consultaEnvio.getNombreFichero());
+									documento.setPathdocumento(consultaEnvio.getPathFichero());
+									_envDocumentosMapper.insert(documento);
+									nombresFicheros.add(consultaEnvio.getNombreFichero());
+								}							
+							}
 						}
-					}
-				}							
-			}						
-		}	
+					}							
+				}						
+			}	
+		}catch(Exception e) {
+			LOGGER.error("Error al generar el envío", e);
+			throw e;
+		}
 	}	
 	
 	@Override

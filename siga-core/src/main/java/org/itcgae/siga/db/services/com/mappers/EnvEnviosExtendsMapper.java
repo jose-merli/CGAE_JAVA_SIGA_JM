@@ -65,7 +65,7 @@ public interface EnvEnviosExtendsMapper {
                 @Result(column = "IDGRUPO", property = "idGrupo", jdbcType = JdbcType.VARCHAR),
                 @Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
                 @Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR),
-                @Result(column = "CSV", property = "csv", jdbcType = JdbcType.VARCHAR)
+                @Result(column = "CSV", property = "csv", jdbcType = JdbcType.VARCHAR),
                 @Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR),
                 @Result(column = "DESTINATARIO", property = "destinatario", jdbcType = JdbcType.VARCHAR)
       })

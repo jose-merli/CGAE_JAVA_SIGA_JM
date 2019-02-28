@@ -130,6 +130,8 @@ public class SigaConstants {
 	public static final String MODULO_ENV = "ENV";
 	public static final String MODULO_GEN = "GEN";
 	
+	public static final String TIPO_CEN_PERSONA = "CEN_PERSONA";
+	
 
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(
