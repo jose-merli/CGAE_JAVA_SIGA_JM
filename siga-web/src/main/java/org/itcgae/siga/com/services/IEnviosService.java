@@ -9,9 +9,7 @@ import org.itcgae.siga.db.entities.CenDirecciones;
 
 public interface IEnviosService {
 	
-	//public void envioMail(EnvEnvios envio);
-	public String envioSMS(CenDirecciones remitente, String[] destinatarios, Short idInstitucion, String asunto, String texto, boolean esBuroSMS);
-	public void envioCorreoOrdinario();
+	public String envioSMS(CenDirecciones remitente, String[] destinatarios, Short idInstitucion, String texto, boolean esBuroSMS);
 	public void envioMail(RemitenteDTO remitente, List<DestinatarioItem> destinatarios, String asuntoFinal, String cuerpoFinal, List<DatosDocumentoItem> documentosEnvio, boolean envioMasivo) throws Exception;
 
 }

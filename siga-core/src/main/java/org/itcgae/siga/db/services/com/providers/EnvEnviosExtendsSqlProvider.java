@@ -69,7 +69,7 @@ public class EnvEnviosExtendsSqlProvider {
 		if(filtros.getidTipoEnvios() != null && !filtros.getidTipoEnvios().trim().equals("")){
 			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getidTipoEnvios() +"'");
 		}
-		
+		sql.ORDER_BY("ENVIO.FECHA");
 		
 		return sql.toString();
 	}
@@ -145,7 +145,7 @@ public class EnvEnviosExtendsSqlProvider {
 		if(filtros.getidTipoEnvios() != null && !filtros.getidTipoEnvios().trim().equals("")){
 			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getidTipoEnvios() +"'");
 		}
-		
+		sql.ORDER_BY("ENVIO.FECHA");
 		
 		return sql.toString();
 	}

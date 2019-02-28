@@ -209,7 +209,7 @@ public class EnviosServiceImpl implements IEnviosService{
 	}
 
 	@Override
-	public String envioSMS(CenDirecciones remitente, String[] destinatarios, Short idInstitucion, String asunto, String texto, boolean esBuroSMS) {
+	public String envioSMS(CenDirecciones remitente, String[] destinatarios, Short idInstitucion, String texto, boolean esBuroSMS) {
 		
 		EnviarSMSResponse response = null;
 		String respuesta = null;
@@ -298,13 +298,6 @@ public class EnviosServiceImpl implements IEnviosService{
 		}
 		
 		return idSolicidudEcos;
-		
-	}
-
-
-	@Override
-	public void envioCorreoOrdinario() {
-		// TODO Auto-generated method stub
 		
 	}
 
