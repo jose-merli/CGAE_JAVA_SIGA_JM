@@ -520,9 +520,14 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 						SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss"); 
 						respuesta.setMessage(dateFormat.format(envio.getFecha()));
 					}else{
-						EnvEnvios envio = new EnvEnvios();
+						EnvEnviosKey key = new EnvEnviosKey();
+						key.setIdenvio(Long.valueOf(datosTarjeta.getIdEnvio()));
+						key.setIdinstitucion(idInstitucion);
+						EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(key);
 						envio.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
 						envio.setDescripcion(datosTarjeta.getDescripcion());
+						envio.setFechamodificacion(new Date());
+						envio.setUsumodificacion(usuario.getIdusuario());
 						_envEnviosMapper.updateByPrimaryKey(envio);
 						respuesta.setCode(200);
 						respuesta.setDescription(envio.getIdenvio().toString());
