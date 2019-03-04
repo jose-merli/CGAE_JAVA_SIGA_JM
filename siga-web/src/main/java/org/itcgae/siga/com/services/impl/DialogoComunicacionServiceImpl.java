@@ -798,6 +798,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 													Object domicilio = dest.get(SigaConstants.ALIASDOMICILIO.trim());
 													
 													CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.valueOf(idPersona.toString()));
+													destinatario = new DestinatarioItem();
 													destinatario.setIdPersona(idPersona.toString());
 													destinatario.setNombre(persona.getNombre());
 													destinatario.setApellidos1(persona.getApellidos1());
