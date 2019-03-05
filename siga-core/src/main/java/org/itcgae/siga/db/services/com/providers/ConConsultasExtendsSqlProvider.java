@@ -90,16 +90,16 @@ public class ConConsultasExtendsSqlProvider {
 
 		sql.FROM("con_consulta cc");
 		sql.LEFT_OUTER_JOIN("con_modulo cm on cc.idmodulo = cm.idmodulo");
-		sql.INNER_JOIN("mod_plantillaenvio_consulta mpc on cc.idconsulta = mpc.idconsulta");
+		sql.INNER_JOIN("mod_plantillaenvio_consulta mpc on cc.idconsulta = mpc.idconsulta and mpc.idinstitucion_consulta = cc.idInstitucion");
 
-		sql.WHERE("mpc.idplantillaenvios='" + idPlantillaEnvios + "' AND mpc.idtipoenvios ='" + idtipoEnvio + "' AND mpc.FECHABAJA is null and cc.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("mpc.idplantillaenvios='" + idPlantillaEnvios + "' AND mpc.idtipoenvios ='" + idtipoEnvio + "' AND mpc.FECHABAJA is null and mpc.IDINSTITUCION = '" + idInstitucion + "'");
 		return sql.toString();
 	}
 	
 	public String selectConsultasDisponibles(Short idInstitucion, Long idClaseComunicacion, Long idObjetivo){
 		
 		SQL sql = new SQL();
-		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION");
+		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION");
 		sql.FROM("CON_CONSULTA");
 		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
 		
@@ -119,7 +119,7 @@ public class ConConsultasExtendsSqlProvider {
 	public String selectConsultasDisponiblesFiltro(Short idInstitucion, Long idClaseComunicacion, Long idObjetivo, String filtro){
 		
 		SQL sql = new SQL();
-		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION");
+		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION");
 		sql.FROM("CON_CONSULTA");
 		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
 		
@@ -141,7 +141,7 @@ public class ConConsultasExtendsSqlProvider {
 	public String selectConsultasDisponiblesPlantillasEnvio(Short idInstitucion){
 		
 		SQL sql = new SQL();
-		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION");
+		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION");
 		sql.FROM("CON_CONSULTA");
 		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
 		

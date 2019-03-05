@@ -32,6 +32,7 @@ import org.itcgae.siga.DTOs.com.SufijoItem;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IPlantillasDocumentoService;
@@ -157,7 +158,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		ComboConsultasDTO comboConsultasDTO = new ComboConsultasDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		List<ComboItemConsulta> comboItems = new ArrayList<ComboItemConsulta>();
 		
 		if (null != idInstitucionUser) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -175,7 +176,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion, SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
 					
 					if(null != comboItems && comboItems.size() > 0) {
-						ComboItem element = new ComboItem();
+						ComboItemConsulta element = new ComboItemConsulta();
 						element.setLabel("");
 						element.setValue("");
 						comboItems.add(0, element);
@@ -188,7 +189,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion, SigaConstants.OBJETIVO.DATOS.getCodigo());
 					
 					if(null != comboItems && comboItems.size() > 0) {
-						ComboItem element = new ComboItem();
+						ComboItemConsulta element = new ComboItemConsulta();
 						element.setLabel("");
 						element.setValue("");
 						comboItems.add(0, element);
@@ -201,7 +202,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion, SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
 					
 					if(null != comboItems && comboItems.size() > 0) {
-						ComboItem element = new ComboItem();
+						ComboItemConsulta element = new ComboItemConsulta();
 						element.setLabel("");
 						element.setValue("");
 						comboItems.add(0, element);
@@ -214,7 +215,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion, SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
 					
 					if(null != comboItems && comboItems.size() > 0) {
-						ComboItem element = new ComboItem();
+						ComboItemConsulta element = new ComboItemConsulta();
 						element.setLabel("");
 						element.setValue("");
 						comboItems.add(0, element);
@@ -259,7 +260,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				try{		
 					
 					//Obtenemos las consultas asignadas al informe
-					List<ConsultaItem> listaConsultasAsociadas = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()), Long.parseLong(plantillaDoc.getIdInforme()), usuario.getIdlenguaje(), false);
+					//List<ConsultaItem> listaConsultasAsociadas = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()), Long.parseLong(plantillaDoc.getIdInforme()), usuario.getIdlenguaje(), false);
 					
 					// Comprobamos las consultas a guardar
 					List<ConsultaItem> listaItems = plantillaDoc.getConsultas();
@@ -319,7 +320,8 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										}
 										
 										if(consultaPlantillaModificar != null){
-											consultaPlantillaModificar.setFechamodificacion(new Date());										
+											consultaPlantillaModificar.setFechamodificacion(new Date());			
+											consultaPlantillaModificar.setIdinstitucionConsulta(Short.parseShort(consultaItem.getIdInstitucion()));
 											modPlantilladocConsultaMapper.updateByPrimaryKey(consultaPlantillaModificar);
 											listaConsultasIdAAsociar.add(consultaPlantillaModificar.getIdconsulta());
 										}
@@ -332,6 +334,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										consultaPlantillaModificar.setFechabaja(null);
 										consultaPlantillaModificar.setUsumodificacion(usuario.getIdusuario());
 										consultaPlantillaModificar.setFechamodificacion(new Date());								
+										consultaPlantillaModificar.setIdinstitucionConsulta(Short.parseShort(consultaItem.getIdInstitucion()));
 										
 										modPlantilladocConsultaMapper.insert(consultaPlantillaModificar);
 										listaConsultasIdAAsociar.add(consultaPlantillaModificar.getIdconsulta());
@@ -766,6 +769,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 												plantillaConsulta.setIdinstitucion(Short.parseShort(plantillaDoc.getIdInstitucion()));
 												plantillaConsulta.setIdconsulta(Long.parseLong(consulta.getIdConsulta()));
 												plantillaConsulta.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+												plantillaConsulta.setIdinstitucionConsulta(Short.parseShort(consulta.getIdInstitucion()));
 												modPlantilladocConsultaMapper.insert(plantillaConsulta);
 											}
 										}

@@ -2,6 +2,7 @@ package org.itcgae.siga.com.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDatosConsultaDTO;
@@ -106,13 +107,13 @@ public class PlantillasEnvioController {
 	}
 	
 	@RequestMapping(value = "/consultasDisp",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> obtenerConsultas(@RequestParam("filtro") String filtro, HttpServletRequest request) {
+	ResponseEntity<ComboConsultaInstitucionDTO> obtenerConsultas(@RequestParam("filtro") String filtro, HttpServletRequest request) {
 		
-		ComboDTO response = _plantillasEnvioService.getComboConsultas(request, filtro);
+		ComboConsultaInstitucionDTO response = _plantillasEnvioService.getComboConsultas(request, filtro);
 		if(response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<ComboConsultaInstitucionDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ComboConsultaInstitucionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/detalleRemitente",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)

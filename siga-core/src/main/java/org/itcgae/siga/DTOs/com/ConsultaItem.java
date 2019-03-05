@@ -39,6 +39,7 @@ public class ConsultaItem {
 	private String idPlantillasConsultas;
 	
 	private String finalidad;
+	private String idInstitucionConsulta;
 	
 	private ArrayList<CampoDinamicoItem> camposDinamicos = new ArrayList<CampoDinamicoItem>();
 
@@ -280,6 +281,14 @@ public class ConsultaItem {
 
 	public void setIdTipoEnvios(String idTipoEnvios) {
 		this.idTipoEnvios = idTipoEnvios;
+	}
+
+	public String getIdInstitucionConsulta() {
+		return idInstitucionConsulta;
+	}
+
+	public void setIdInstitucionConsulta(String idInstitucionConsulta) {
+		this.idInstitucionConsulta = idInstitucionConsulta;
 	}
 	
 

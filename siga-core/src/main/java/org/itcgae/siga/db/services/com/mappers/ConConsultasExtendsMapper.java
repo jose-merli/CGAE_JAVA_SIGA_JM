@@ -13,6 +13,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.services.com.providers.ConConsultasExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -75,15 +76,17 @@ public interface ConConsultasExtendsMapper {
 	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasDisponibles")
 	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectConsultasDisponibles(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo);
+	List<ComboItemConsulta> selectConsultasDisponibles(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo);
 	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasDisponiblesPlantillasEnvio")
 	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectConsultasDisPlantilla(Short IdInstitucion);
+	List<ComboItemConsulta> selectConsultasDisPlantilla(Short IdInstitucion);
 	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectObjetivo")
 	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
@@ -92,8 +95,9 @@ public interface ConConsultasExtendsMapper {
 
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasDisponiblesFiltro")
 	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectConsultasDisponiblesFiltro(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo, String filtro);
+	List<ComboItemConsulta> selectConsultasDisponiblesFiltro(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo, String filtro);
 
 }	

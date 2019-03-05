@@ -212,6 +212,32 @@ public interface CenNocolegiadoExtendsMapper extends CenNocolegiadoMapper{
 	})
 	List<NoColegiadoItem> selectNoColegiados(Short idInstitucion, NoColegiadoItem noColegiadoItem);
 	
+	
+	@SelectProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "selectNoColegiadosByIdPersona")
+	@Results({
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIFCIF", property = "nif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SOLONOMBRE", property = "soloNombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDESTADOCIVIL", property = "idEstadoCivil", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOIDENTIFICACION", property = "idTipoIdentificacion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "NATURALDE", property = "naturalDe", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDLENGUAJE", property = "idLenguaje", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ASIENTOCONTABLE", property = "asientoContable", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTRATAMIENTO", property = "idTratamiento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHANACIMIENTO", property = "fechaNacimiento", jdbcType = JdbcType.DATE),
+		@Result(column = "CORREO", property = "correo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "COMISIONES", property = "comisiones", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TELEFONO", property = "telefono", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "fechaBaja", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOAPARECERREDABOGACIA", property = "noAparecerRedAbogacia", jdbcType = JdbcType.VARCHAR)
+	})
+	List<NoColegiadoItem> selectNoColegiadosByIdPersona(Short idInstitucion, String idPersona);
+	
 	@SelectProvider(type = CenNocolegiadoSqlExtendsProvider.class, method = "searchHistoricNoColegiado")
 	@Results({
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),

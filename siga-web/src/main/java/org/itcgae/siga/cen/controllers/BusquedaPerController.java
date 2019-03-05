@@ -6,6 +6,7 @@ import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoGeneralDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.IBusquedaPerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,13 @@ public class BusquedaPerController {
 		BusquedaPerFisicaDTO response = busquedaPerService.searchPerFisica(numPagina, busquedaPerJuridicaSearchDTO, request);
 		return new ResponseEntity<BusquedaPerFisicaDTO>(response, HttpStatus.OK);
 	} 
+	
+	@RequestMapping(value = "busquedaPer", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ColegiadoGeneralDTO> searchPerFisica(HttpServletRequest request, @RequestBody String idPersona) { 
+		ColegiadoGeneralDTO response = busquedaPerService.searchPerByIdPersona(idPersona, request);
+		return new ResponseEntity<ColegiadoGeneralDTO>(response, HttpStatus.OK);
+	}
+	
 	//
 	
 }
