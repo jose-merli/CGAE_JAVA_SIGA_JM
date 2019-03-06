@@ -770,11 +770,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 					//Reemplazamos los campos dinamicos
 					String sentencia = procesarEjecutarConsulta(usuario, consulta.getSentencia(), consulta.getCamposDinamicos(), true);
 					
-					//Map<String,String> mapa = new HashMap<String,String>();
-					//mapa = obtenerMapaConsulta(sentencia);
-					sentencia = quitarEtiquetas(sentencia.toUpperCase());
-					//List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
-					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+					Map<String,String> mapa = new HashMap<String,String>();
+					mapa = obtenerMapaConsulta(sentencia);
+					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
 					
 					if(result != null && result.size() > 0){
 						Workbook workBook = crearExcel(result);
@@ -806,36 +804,6 @@ public class ConsultasServiceImpl implements IConsultasService{
 		return response;
 	}
 	
-	private String quitarEtiquetas(String sentencia) {
-		
-		sentencia = sentencia.replaceAll("<SELECT>", " ");
-		sentencia = sentencia.replaceAll("</SELECT>", " ");
-		sentencia = sentencia.replaceAll("<FROM>", " ");
-		sentencia = sentencia.replaceAll("</FROM>", " ");
-		sentencia = sentencia.replaceAll("<JOIN>", " ");
-		sentencia = sentencia.replaceAll("</JOIN>", " ");
-		sentencia = sentencia.replaceAll("<OUTERJOIN>", " ");
-		sentencia = sentencia.replaceAll("</OUTERJOIN>", " ");
-		sentencia = sentencia.replaceAll("<INNERJOIN>", " ");
-		sentencia = sentencia.replaceAll("</INNERJOIN>", " ");
-		sentencia = sentencia.replaceAll("<LEFTJOIN>", " ");
-		sentencia = sentencia.replaceAll("</LEFTJOIN>", " ");
-		sentencia = sentencia.replaceAll("<WHERE>", " ");
-		sentencia = sentencia.replaceAll("</WHERE>", " ");
-		sentencia = sentencia.replaceAll("<ORDERBY>", " ");
-		sentencia = sentencia.replaceAll("</ORDERBY>", " ");
-		sentencia = sentencia.replaceAll("<GROUPBY>", " ");
-		sentencia = sentencia.replaceAll("</GROUPBY>", " ");
-		sentencia = sentencia.replaceAll("<HAVING>", " ");
-		sentencia = sentencia.replaceAll("</HAVING>", " ");
-		sentencia = sentencia.replaceAll("<UNION>", " ");
-		sentencia = sentencia.replaceAll("<UNION>", " ");
-		sentencia = sentencia.replaceAll("<UNIONALL>", " ");
-		sentencia = sentencia.replaceAll("</UNIONALL>", " ");
-		
-		return sentencia;
-	}
-
 	public boolean comprobarCamposDestinarios (String sentencia){
 		boolean camposIncorrectos = false;
 		
