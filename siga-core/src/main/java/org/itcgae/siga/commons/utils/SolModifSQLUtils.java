@@ -332,6 +332,65 @@ public class SolModifSQLUtils {
 		return consultaDatosExpedientes.toString();
 	}
 
+	public static String getDataChangeFotoRequest(String id, SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
+			String idLenguaje, String idInstitucion) {
+
+		SQL consultaDatosFoto = new SQL();
+
+		consultaDatosFoto.SELECT("'1' AS especifica");
+		consultaDatosFoto.SELECT("cen_solicmodifcambiarfoto.idsolicitud");
+		consultaDatosFoto.SELECT("cen_solicmodifcambiarfoto.motivo");
+		consultaDatosFoto.SELECT("cen_solicmodifcambiarfoto.idpersona");
+//		consultaDatosFoto.SELECT("cen_solicmodifcambiarfoto.fotografia");
+		consultaDatosFoto.SELECT("cen_solicmodifcambiarfoto.idinstitucion");
+		consultaDatosFoto.SELECT("0 AS codigo");
+		consultaDatosFoto.SELECT("cen_solicmodifcambiarfoto.fechaalta");
+		consultaDatosFoto.SELECT("    f_siga_getrecurso(cen_estadosolicitudmodif.descripcion,1) AS estado");
+
+		if (id == "") {
+			consultaDatosFoto.SELECT(id + " AS idtipomodificacion, ( "
+					+ SolModifSQLUtils.getPersonSql("cen_solicmodifcambiarfoto") + ") as nombre");
+		} else {
+			consultaDatosFoto.SELECT(id + " AS idtipomodificacion, ( "
+					+ SolModifSQLUtils.getPersonSql("cen_solicmodifcambiarfoto") + ") as nombre");
+		}
+
+		if (id == "") {
+			consultaDatosFoto.SELECT("(" + SolModifSQLUtils.getTypeSql(id) + ") as tipoModificacion");
+		} else {
+			consultaDatosFoto
+					.SELECT("(" + SolModifSQLUtils.getTypeSql(id)
+							+ ") as tipoModificacion");
+		}
+
+		consultaDatosFoto.SELECT("(" + SolModifSQLUtils.getNColSql("cen_solicmodifcambiarfoto") + ") as numColegiado");
+		consultaDatosFoto.FROM("cen_solicmodifcambiarfoto, cen_estadosolicitudmodif");
+
+		// CONDICIONES solicmodifexportarfoto
+		if (!UtilidadesString.esCadenaVacia(solicitudModificacionSearchDTO.getEstado())) {
+			consultaDatosFoto
+					.WHERE("cen_estadosolicitudmodif.idestadosolic = " + solicitudModificacionSearchDTO.getEstado());
+		}
+
+		if (null != solicitudModificacionSearchDTO.getFechaDesde()) {
+			String fechaDesde = dateFormat.format(solicitudModificacionSearchDTO.getFechaDesde());
+			consultaDatosFoto.WHERE(" TO_DATE(cen_solicmodifcambiarfoto.FECHAALTA,'DD/MM/YYYY') >= TO_DATE('"
+					+ fechaDesde + "', 'DD/MM/YYYY') ");
+		}
+
+		if (null != solicitudModificacionSearchDTO.getFechaHasta()) {
+			String fechaHasta = dateFormat.format(solicitudModificacionSearchDTO.getFechaHasta());
+			consultaDatosFoto.WHERE(" TO_DATE(cen_solicmodifcambiarfoto.FECHAALTA,'DD/MM/YYYY') <= TO_DATE('"
+					+ fechaHasta + "', 'DD/MM/YYYY') ");
+		}
+
+		consultaDatosFoto.WHERE(
+				"cen_solicmodifcambiarfoto.idestadosolic = cen_estadosolicitudmodif.idestadosolic AND cen_solicmodifcambiarfoto.idinstitucion = "
+						+ idInstitucion);
+
+		return consultaDatosFoto.toString();
+	}
+	
 	public static String getDataPhotoRequest(String id, SolicitudModificacionSearchDTO solicitudModificacionSearchDTO,
 			String idLenguaje, String idInstitucion) {
 

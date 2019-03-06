@@ -70,12 +70,6 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 				comboItems = cenEstadocivilExtendsMapper.distinctCivilStatus(usuario.getIdlenguaje());
 				LOGGER.info(
 						"getCivilStatus() / cenEstadocivilExtendsMapper.distinctCivilStatus() -> Salida de cenEstadocivilExtendsMapper para obtener los diferentes tipos de estados civiles");
-				
-				ComboItem comboItem = new ComboItem();
-				comboItem.setLabel("");
-				comboItem.setValue("");
-				comboItems.add(0, comboItem);
-				
 			}
 		}
 		
@@ -159,13 +153,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 						"getCVCategory() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Entrada a cenTiposcvExtendsMapper para obtener los diferentes tipos de categorías curriculares");
 				comboItems = cenTiposcvExtendsMapper.selectCategoriaCV(usuario.getIdlenguaje());
 				LOGGER.info(
-						"getCVCategory() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Salida de cenTiposcvExtendsMapper para obtener los diferentes tipos de categorías curriculares");
-				
-				ComboItem comboItem = new ComboItem();
-				comboItem.setLabel("");
-				comboItem.setValue("");
-				comboItems.add(0, comboItem);
-				
+						"getCVCategory() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Salida de cenTiposcvExtendsMapper para obtener los diferentes tipos de categorías curriculares");				
 			}
 		}
 		
@@ -227,6 +215,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
 		if (null != idInstitucion) {
 			if(null !=colegiadoItem.getSearchLoggedUser() && colegiadoItem.getSearchLoggedUser()) {
 				colegiadoItem.setNif(dni);

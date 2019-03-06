@@ -82,6 +82,13 @@ public interface CenSolicitudincorporacionExtendsMapper {
 	@SelectProvider(type = CenSolicitudincorporacionSqlExtendsProvider.class, method = "getMaxNColegiado")
 	@Results({ @Result(column = "NCOLEGIADO", property = "valor", jdbcType = JdbcType.VARCHAR)})
 	StringDTO getMaxNColegiado(String idInstitucion); 
-	
 
+	@SelectProvider(type = CenSolicitudincorporacionSqlExtendsProvider.class, method = "getMaxNComunitario")
+	@Results({ @Result(column = "NCOMUNITARIO", property = "valor", jdbcType = JdbcType.VARCHAR)})
+	StringDTO getMaxNComunitario(String idInstitucion); 
+	
+	@SelectProvider(type = CenSolicitudincorporacionSqlExtendsProvider.class, method = "getMaxNColegiadoComunitario")
+	@Results({ @Result(column = "NCOLEGIADO", property = "valor", jdbcType = JdbcType.VARCHAR)})
+	StringDTO getMaxNColegiadoComunitario(String idInstitucion); 
+	
 }

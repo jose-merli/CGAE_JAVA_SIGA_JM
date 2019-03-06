@@ -37,11 +37,11 @@ import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoKey;
 import org.itcgae.siga.db.entities.CenPoblaciones;
-import org.itcgae.siga.db.entities.CenPoblacionesExample;
 import org.itcgae.siga.db.entities.CenSolimodidirecciones;
-import org.itcgae.siga.db.entities.CenTipodireccionExample;
-import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.CenPoblacionesMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionTipodireccionExtendsMapper;
@@ -98,6 +98,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	@Autowired
 	private CenPoblacionesExtendsMapper cenPoblacionesExtendsMapper;
 
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
+	
 	@Override
 	public DatosDireccionesDTO datosDireccionesSearch(int numPagina,
 			DatosDireccionesSearchDTO datosDireccionesSearchDTO, HttpServletRequest request) {
@@ -1125,7 +1128,23 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					}
 
 					responseUpdate = cenDireccionesExtendsMapper.updateByPrimaryKeySelective(modificacion);
+					error.setCode(200);
+					error.setDescription("Su petición ha sido aceptada automáticamente. Puede ver ya los datos actualizados");
+				}else {
+					GenParametrosExample ejemploParam = new GenParametrosExample();
+					List<GenParametros> xDias = new ArrayList<GenParametros>();
+					ejemploParam.createCriteria().andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION").andIdinstitucionEqualTo(idInstitucion);
+					xDias= genParametrosMapper.selectByExample(ejemploParam);
+					error.setCode(200);
+					if(xDias.size() == 0) {
+						GenParametrosExample ejemploParam2 = new GenParametrosExample();
+						ejemploParam2.createCriteria().andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION").andIdinstitucionEqualTo((short)2000);
+						xDias= genParametrosMapper.selectByExample(ejemploParam2);
+					}
+					error.setDescription("Su petición ha sido registrada y será revisada en los próximos "+xDias.get(0).getValor()+" días. Puede comprobar el estado de su petición en el menú Solicitudes de modificación");
 				}
+				
+				insertResponseDTO.setError(error);
 				
 				// comprobacion actualización
 				if (response >= 1) {

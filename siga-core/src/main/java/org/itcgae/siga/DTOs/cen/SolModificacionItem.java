@@ -13,6 +13,7 @@ public class SolModificacionItem {
 	private Integer numIdSolicitud;
 	private String motivo;
 	private String idPersona;
+	private String fotografia;
 	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaAlta;
 	private String estado;
@@ -186,5 +187,13 @@ public class SolModificacionItem {
 
 	public void setNumIdSolicitud(Integer numIdSolicitud) {
 		this.numIdSolicitud = numIdSolicitud;
+	}
+
+	public String getFotografia() {
+		return fotografia;
+	}
+
+	public void setFotografia(String fotografia) {
+		this.fotografia = fotografia;
 	}
 }
