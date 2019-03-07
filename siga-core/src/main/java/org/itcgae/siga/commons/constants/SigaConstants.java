@@ -109,6 +109,9 @@ public class SigaConstants {
 	public static final Short ID_ENVIO_SMS = 4;
 	public static final Short ID_ENVIO_BURO_SMS = 5;
 	
+	public static final String MODULO_CENSO = "CEN";
+	public static final String PARAMETRO_CONTADOR_UNICO = "CONTADOR_UNICO_NCOLEGIADO_NCOMUNIT";
+	
 
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(
