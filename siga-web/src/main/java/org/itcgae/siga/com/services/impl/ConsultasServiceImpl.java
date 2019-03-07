@@ -774,30 +774,43 @@ public class ConsultasServiceImpl implements IConsultasService{
 //					mapa = obtenerMapaConsulta(sentencia);
 					
 					sentencia = quitarEtiquetas(sentencia.toUpperCase());
-					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+					
+					if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+							|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+							|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+						
+						LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+						error.setCode(400);
+						error.setDescription("Consulta no permitida");
+						error.setMessage("Consulta no permitida");
+						response.setError(error);
+					}else {
+						List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
 
-					if(result != null && result.size() > 0){
-						Workbook workBook = crearExcel(result);
-						File aux = new File(SigaConstants.rutaExcelConsultaTemp);
-						// creo directorio si no existe
-						aux.mkdirs();
-						String nombreFichero = SigaConstants.nombreExcelConsulta + new Date().getTime()+".xlsx";
-						excel = new File(SigaConstants.rutaExcelConsultaTemp, nombreFichero);
-						FileOutputStream fileOut = new FileOutputStream(SigaConstants.rutaExcelConsultaTemp + nombreFichero);
-						workBook.write(fileOut);
-				        fileOut.close();
-				        workBook.close();
-				        response.setFile(excel);
-				        response.setResultados(true);
-					}else{
-						response.setResultados(false);
-					}
+						if(result != null && result.size() > 0){
+							Workbook workBook = crearExcel(result);
+							File aux = new File(SigaConstants.rutaExcelConsultaTemp);
+							// creo directorio si no existe
+							aux.mkdirs();
+							String nombreFichero = SigaConstants.nombreExcelConsulta + new Date().getTime()+".xlsx";
+							excel = new File(SigaConstants.rutaExcelConsultaTemp, nombreFichero);
+							FileOutputStream fileOut = new FileOutputStream(SigaConstants.rutaExcelConsultaTemp + nombreFichero);
+							workBook.write(fileOut);
+					        fileOut.close();
+					        workBook.close();
+					        response.setFile(excel);
+					        response.setResultados(true);
+						}else{
+							response.setResultados(false);
+						}
+					}					
 				}catch (Exception e) {
 					LOGGER.error("ejecutarConsulta() -> Error al ejecutar la consulta: " + e.getMessage());
 					e.printStackTrace();
 					error.setCode(500);
 					error.setDescription(e.getCause().toString());
 					error.setMessage("Error al ejecutar la consulta");
+					response.setError(error);
 				}
 		
 			}

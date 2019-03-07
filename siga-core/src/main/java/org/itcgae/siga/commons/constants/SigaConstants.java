@@ -133,6 +133,13 @@ public class SigaConstants {
 	
 	public static final String TIPO_CEN_PERSONA = "CEN_PERSONA";
 	
+	public static final String SENTENCIA_UPDATE = "UPDATE";
+	public static final String SENTENCIA_DELETE = "DELETE";
+	public static final String SENTENCIA_DROP = "DROP";
+	public static final String SENTENCIA_INSERT = "INSERT";
+	public static final String SENTENCIA_CREATE = "CREATE";
+	public static final String SENTENCIA_ALTER = "ALTER";
+	
 
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(
