@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
+import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -106,5 +107,15 @@ public interface IPlantillasDocumentoService {
 	 * @return
 	 */
 	Error borrarPlantillas(HttpServletRequest request, PlantillaDocumentoBorrarDTO[] plantillaDoc);
+
+	/**
+	 * Descarga la plantilla de documento
+	 * @param request
+	 * @param plantillaDoc
+	 * @return
+	 */
+	ResponseFileDTO descargarPlantilla(HttpServletRequest request, DocumentoPlantillaItem plantillaDoc);
+
+	ConsultasDTO obtenerConsultasById(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 	
 }

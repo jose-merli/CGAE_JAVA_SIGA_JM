@@ -22,6 +22,7 @@ import org.itcgae.siga.DTOs.com.ComboConsultasDTO;
 import org.itcgae.siga.DTOs.com.ComboSufijoDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
@@ -50,6 +51,7 @@ import org.itcgae.siga.db.entities.ModRelPlantillaSufijo;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
+import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModRelPlantillaSufijoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
@@ -88,6 +90,9 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	
 	@Autowired
 	ModPlantilladocConsultaMapper modPlantilladocConsultaMapper;
+	
+	@Autowired
+	ModPlantilladocumentoMapper modPlantilladocumentoMapper;
 	
 	@Autowired
 	ModPlantillaDocumentoExtendsMapper modPlantillaDocumentoExtendsMapper;
@@ -937,7 +942,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		return respuesta;
 	}	
 	
-	/*@Override
+	@Override
 	public ResponseFileDTO descargarPlantilla(HttpServletRequest request, DocumentoPlantillaItem plantillaDoc) {
 		
 		LOGGER.info("descargarPlantilla() -> Entrada al servicio para descargar la plantilla de documento");
@@ -947,7 +952,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		ResponseFileDTO response = new ResponseFileDTO();
 		Error error = new Error();
-		File excel = null;
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -958,35 +962,26 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
 					
-					// Obtenemos el idPlantillaDocumento
+					// Obtenemos el idPlantillaDocumento					
+					String idPlantillaDoc = plantillaDoc.getIdPlantillaDocumento();		
 					
-					String idPlantillaDoc = plantillaDoc.getIdPlantillaDocumento();
-					String idModeloComunicacion = plantillaDoc.getIdModeloComunicacion();
-					
-					// Obtenemos el nombre del fichero
-					ModPlantilladocumento plantilla = new ModPlantilladocumento();
-					ModModeloPlantilladocumentoKey key = new ModModeloPlantilladocumentoKey();
-					key.setIdplantilladocumento(Long.parseLong(idPlantillaDoc));
-					key.setIdmodelocomunicacion(Long.parseLong(idModeloComunicacion));
-					
-					ModModeloPlantilladocumento modModeloPlantillaDoc = modModeloPlantilladocumentoMapper.selectByPrimaryKey(key);
-					
-					
-					Map<String,String> mapa = new HashMap<String,String>();
-					mapa = obtenerMapaConsulta(sentencia);
-					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
-					if(result != null){
-						Workbook workBook = crearExcel(result);
-						File aux = new File(SigaConstants.rutaExcelConsultaTemp);
-						// creo directorio si no existe
-						aux.mkdirs();
-						String nombreFichero = SigaConstants.nombreExcelConsulta + new Date().getTime()+".xlsx";
-						excel = new File(SigaConstants.rutaExcelConsultaTemp, nombreFichero);
-						FileOutputStream fileOut = new FileOutputStream(SigaConstants.rutaExcelConsultaTemp + nombreFichero);
-						workBook.write(fileOut);
-				        fileOut.close();
-				        workBook.close();
-				        response.setFile(excel);
+					ModPlantilladocumento plantillaDocumento = modPlantilladocumentoMapper.selectByPrimaryKey(Long.parseLong(idPlantillaDoc));
+					if(plantillaDocumento != null){
+						// Obtenemos el nombre del fichero
+						String nombrePlantilla = plantillaDocumento.getPlantilla();
+
+						String pathFichero = SigaConstants.rutaficherosInformesYcomunicaciones + String.valueOf(idInstitucion) + SigaConstants.carpetaPlantillasDocumento;						
+						
+						File file = new File(pathFichero + nombrePlantilla);
+						
+						if(!file.exists()) {
+							error.setCode(404);
+							error.setDescription("Fichero no encontrado");
+							error.setMessage("Fichero no encontrado");
+							response.setError(error);
+							LOGGER.debug("Plantilla no encontrada: " + idPlantillaDoc + " para la institucion " + idInstitucion);
+						}
+						response.setFile(file);
 					}
 				}catch (Exception e) {
 					LOGGER.error("ejecutarConsulta() -> Error al ejecutar la consulta: " + e.getMessage());
@@ -1000,6 +995,49 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		}
 		LOGGER.info("descargarPlantilla() -> Salida del servicio para descargar la plantilla de documento");
 		return response;
-	}*/
+	}
+	
+	@Override
+	public ConsultasDTO obtenerConsultasById(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		LOGGER.info("obtenerConsultasById() -> Entrada al servicio para obtener las consultas de una plantilla de documento");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ConsultasDTO respuesta = new ConsultasDTO();
+		List<ConsultaItem> listaConsultaItem = new ArrayList<ConsultaItem>();
+		
+		if (null != idInstitucionUser) {
+			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucionUser));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					listaConsultaItem = conConsultasExtendsMapper.selectConsultasById(Short.parseShort(plantillaDoc.getIdInstitucion()), usuario.getIdlenguaje(), plantillaDoc.getIdConsulta());	
+					if(listaConsultaItem != null && listaConsultaItem.size()> 0){
+						for(ConsultaItem consulta :listaConsultaItem){
+							String finalidad = plantillasEnvioService.obtenerFinalidadByIdConsulta(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(consulta.getIdConsulta()));
+							consulta.setFinalidad(finalidad);
+						}
+						respuesta.setConsultaItem(listaConsultaItem);
+					}					
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage("Error al obtener los perfiles");
+					error.description(e.getMessage());
+					e.printStackTrace();
+				}				
+			}
+		}
+		
+		
+		LOGGER.info("obtenerConsultasById() -> Salida del servicio para obtener las consultas de una plantilla de documento");
+		return respuesta;
+	}	
 
 }

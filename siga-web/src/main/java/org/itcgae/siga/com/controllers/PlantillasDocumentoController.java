@@ -1,5 +1,9 @@
 package org.itcgae.siga.com.controllers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.com.ComboConsultasDTO;
@@ -10,11 +14,14 @@ import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
 import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
+import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IPlantillasDocumentoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -152,5 +159,40 @@ public class PlantillasDocumentoController {
 		else
 			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	@RequestMapping(value = "/descargarPlantilla",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InputStreamResource> descargarPlantilla(HttpServletRequest request, @RequestBody DocumentoPlantillaItem plantillaDoc) throws Exception{
+		
+		HttpHeaders headers = null;
+		File file = null;
+		InputStreamResource resource = null;                
+		
+		try{
+			ResponseFileDTO documento = _plantillasDocumentoService.descargarPlantilla(request, plantillaDoc);
+			file = documento.getFile();
+			resource = new InputStreamResource(new FileInputStream(file));                  
+		}catch(FileNotFoundException e){
+			e.printStackTrace();    
+		}	  
+		headers = new HttpHeaders();
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Expires", "0");
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + plantillaDoc.getNombreDocumento() + "\"");
+		System.out.println("The length of the file is : "+file.length());
+		  
+		return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+	}
+	
+	@RequestMapping(value = "/consulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ConsultasDTO> obtenerConsultaById(HttpServletRequest request, @RequestBody TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		
+		ConsultasDTO response = _plantillasDocumentoService.obtenerConsultasById(request, plantillaDoc);
+		if(response.getError() == null)
+			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	
 }

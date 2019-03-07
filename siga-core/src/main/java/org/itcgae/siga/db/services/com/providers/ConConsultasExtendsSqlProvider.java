@@ -172,4 +172,27 @@ public class ConConsultasExtendsSqlProvider {
 		return cadenaWhere.toString();
 		
 	} 
+	
+	public String selectConsultasById(Short idInstitucion, String idLenguaje, String idConsulta){
+		
+		SQL sql = new SQL();
+		sql.SELECT("cc.IDINSTITUCION");
+		sql.SELECT("cc.IDCONSULTA");
+		sql.SELECT("cc.GENERAL");
+		sql.SELECT("cc.DESCRIPCION");
+		sql.SELECT("cc.OBSERVACIONES");
+		sql.SELECT("cc.TIPOCONSULTA");
+		sql.SELECT("CM.IDMODULO");
+		sql.SELECT("cc.IDCLASECOMUNICACION");
+		sql.SELECT("cc.IDOBJETIVO");
+		sql.SELECT("cc.SENTENCIA");
+		sql.SELECT("(SELECT REC.DESCRIPCION FROM CON_OBJETIVO OBJETIVO JOIN GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = OBJETIVO.NOMBRE AND REC.IDLENGUAJE = '"+idLenguaje+""
+					+ "' WHERE OBJETIVO.IDOBJETIVO = cc.IDOBJETIVO) AS OBJETIVO");
+
+		sql.FROM("con_consulta cc");
+		sql.LEFT_OUTER_JOIN("con_modulo cm on cc.idmodulo = cm.idmodulo");
+
+		sql.WHERE("cc.IDINSTITUCION = '" + idInstitucion + "' AND cc.IDCONSULTA = " + idConsulta);
+		return sql.toString();
+	}
 }
