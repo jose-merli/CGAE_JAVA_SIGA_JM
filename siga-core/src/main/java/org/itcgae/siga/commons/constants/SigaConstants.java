@@ -713,5 +713,29 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final long NOTIFICACION_SEGUNDOS = 3;
 	
 
-
+	//SOLICITUD INCORPORACION
+	public static final String  TIPO_DIR_RESIDENCIA = "1";
+	public static final String  TIPO_DIR_DESPACHO = "2";
+	public static final String  TIPO_DIR_CENSOWEB = "3";
+	public static final String  TIPO_DIR_PUBLICA = "4";
+	public static final String  TIPO_DIR_GUIAJUDICIAL = "5";
+	public static final String  TIPO_DIR_GUARDIA = "6";
+	public static final String  TIPO_DIR_REVISTA = "7";
+	public static final String  TIPO_DIR_FACTURACION = "8";
+	public static final String  TIPO_DIR_TRASPASO = "9";
+	public static final String  TIPO_DIR_PREFERENTE_EMAIL = "10";
+	public static final String  TIPO_DIR_PREFERENTE_CORREO = "11";
+	public static final String  TIPO_DIR_PREFERENTE_SMS = "12";
+	public static final String  TIPO_DIR_PREFERENTE_FAX = "13";
+	
+	public static final String  DIR_PREFERENTE_EMAIL = "E";
+	public static final String  DIR_PREFERENTE_CORREO = "C";
+	public static final String  DIR_PREFERENTE_SMS = "S";
+	public static final String  DIR_PREFERENTE_FAX = "F";
+	
+	public static final short  REINCORPORACION_EJERCIENTE = 10;
+	public static final short  REINCORPORACION_NO_EJERCIENTE = 20;
+	public static final short  INCORPORACION_EJERCIENTE = 30;
+	public static final short  INCORPORACION_NO_EJERCIENTE = 40;
+	
 }

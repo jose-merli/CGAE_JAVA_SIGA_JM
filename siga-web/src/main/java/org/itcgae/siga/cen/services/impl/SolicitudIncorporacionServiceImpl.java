@@ -935,6 +935,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		direccion.setMovil(solicitud.getMovil());
 		direccion.setUsumodificacion(usuario.getIdusuario());
 		
+		//Añadimos las preferencias de direccion obligatorias
+		direccion.setPreferente("ECS");
+		
 		_cenDireccionesMapper.insert(direccion);
 		
 		CenDireccionTipodireccion tipoDireccion =  new CenDireccionTipodireccion();
@@ -944,18 +947,24 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		tipoDireccion.setIdpersona(idPersona);
 		tipoDireccion.setUsumodificacion(usuario.getIdusuario());
 		
-		//Traspaso a OOJ
-		tipoDireccion.setIdtipodireccion(Short.valueOf("9"));
+		//Añadimos los tipo de direcciones obligatorios
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_TRASPASO));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_FACTURACION));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_CENSOWEB));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUIAJUDICIAL));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUARDIA));
 		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
 		
-		//Despacho
-		tipoDireccion.setIdtipodireccion(Short.valueOf("2"));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		if(solicitud.getIdtiposolicitud() == SigaConstants.INCORPORACION_EJERCIENTE ||
+				solicitud.getIdtiposolicitud() == SigaConstants.REINCORPORACION_EJERCIENTE) {
+			tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_DESPACHO));
+			cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		}
 		
-		//CensoWeb
-		tipoDireccion.setIdtipodireccion(Short.valueOf("3"));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
-	
 		return direccion.getIddireccion();
 		
 	}
