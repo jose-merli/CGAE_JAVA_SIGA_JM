@@ -68,9 +68,13 @@ public interface AgeCalendarioExtendsMapper extends AgeCalendarioMapper{
 		@Result(column = "IDCURSO", property = "idCurso", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDEVENTO", property = "idEvento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDESTADOEVENTO", property = "idEstadoEvento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ESTADOEVENTO", property = "estadoEvento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOEVENTO", property = "idTipoEvento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOEVENTO", property = "tipoEvento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOCALENDARIO", property = "tipoCalendario", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAINICIOSTRING", property = "fechaInicioString", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAFIN", property = "realEnd", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TITULO", property = "titulo", jdbcType = JdbcType.VARCHAR),
@@ -85,7 +89,7 @@ public interface AgeCalendarioExtendsMapper extends AgeCalendarioMapper{
 		@Result(column = "TIPOREPETICION", property = "tipoRepeticion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALORESREPETICION", property = "valoresRepeticionString", jdbcType = JdbcType.VARCHAR),
 	})
-	List<EventoItem> getCalendarioEventos(Short idInstitucion, String perfiles, String idCalendario);
+	List<EventoItem> getCalendarioEventos(Short idInstitucion, String perfiles, String idCalendario, String idLenguaje);
 	
 	@SelectProvider(type = AgeCalendarioSqlExtendsProvider.class, method = "getCalendarioEventosIsColegiado")
 	@Results({
@@ -110,6 +114,6 @@ public interface AgeCalendarioExtendsMapper extends AgeCalendarioMapper{
 		@Result(column = "TIPOREPETICION", property = "tipoRepeticion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALORESREPETICION", property = "valoresRepeticionString", jdbcType = JdbcType.VARCHAR),
 	})
-	List<EventoItem> getCalendarioEventosIsColegiado(Short idInstitucion, String perfiles, String idCalendario, Long idPersona);
+	List<EventoItem> getCalendarioEventosIsColegiado(Short idInstitucion, String perfiles, String idCalendario, Long idPersona, String idLenguaje);
 	
 }

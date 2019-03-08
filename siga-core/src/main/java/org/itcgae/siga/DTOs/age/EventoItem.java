@@ -2,7 +2,6 @@ package org.itcgae.siga.DTOs.age;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -45,6 +44,11 @@ public class EventoItem {
 	private String fechaHoraFin;
 
 	private String formadores;
+	
+	private String tipoCalendario;
+	private String tipoEvento;
+	private String fechaInicioString;
+	
 	
 	/**
 	 **/
@@ -520,6 +524,54 @@ public class EventoItem {
 	public void setFormadores(String formadores) {
 		this.formadores = formadores;
 	}
+	
+	/**
+	 **/
+	public EventoItem tipoCalendario(String tipoCalendario) {
+		this.tipoCalendario = tipoCalendario;
+		return this;
+	}
+
+	@JsonProperty("tipoCalendario")
+	public String getTipoCalendario() {
+		return tipoCalendario;
+	}
+
+	public void setTipoCalendario(String tipoCalendario) {
+		this.tipoCalendario = tipoCalendario;
+	}
+	
+	/**
+	 **/
+	public EventoItem tipoEvento(String tipoEvento) {
+		this.tipoEvento = tipoEvento;
+		return this;
+	}
+
+	@JsonProperty("tipoEvento")
+	public String getTipoEvento() {
+		return tipoEvento;
+	}
+
+	public void setTipoEvento(String tipoEvento) {
+		this.tipoEvento = tipoEvento;
+	}
+	
+	/**
+	 **/
+	public EventoItem fechaInicioString(String fechaInicioString) {
+		this.fechaInicioString = fechaInicioString;
+		return this;
+	}
+
+	@JsonProperty("fechaInicioString")
+	public String getFechaInicioString() {
+		return fechaInicioString;
+	}
+
+	public void setFechaInicioString(String fechaInicioString) {
+		this.fechaInicioString = fechaInicioString;
+	}
 
 	@Override
 	public String toString() {
@@ -535,7 +587,7 @@ public class EventoItem {
 				+ ", fechaInicioRepeticion=" + fechaInicioRepeticion + ", fechaFinRepeticion=" + fechaFinRepeticion
 				+ ", idPartidoJudicial=" + idPartidoJudicial + ", idCurso=" + idCurso + ", estadoEvento=" + estadoEvento
 				+ ", fechaHoraInicio=" + fechaHoraInicio + ", fechaHoraFin=" + fechaHoraFin + ", formadores="
-				+ formadores + "]";
+				+ formadores + " , tipoCalendario=" + tipoCalendario + " , tipoEvento=" + tipoEvento + " , fechaInicioString=" + fechaInicioString + "]";
 	}
 
 	@Override
@@ -572,6 +624,9 @@ public class EventoItem {
 		result = prime * result + ((tipoRepeticion == null) ? 0 : tipoRepeticion.hashCode());
 		result = prime * result + ((titulo == null) ? 0 : titulo.hashCode());
 		result = prime * result + ((usuModificacion == null) ? 0 : usuModificacion.hashCode());
+		result = prime * result + ((tipoCalendario == null) ? 0 : tipoCalendario.hashCode());
+		result = prime * result + ((tipoEvento == null) ? 0 : tipoEvento.hashCode());
+		result = prime * result + ((fechaInicioString == null) ? 0 : fechaInicioString.hashCode());
 		result = prime * result + Arrays.hashCode(valoresRepeticion);
 		result = prime * result + ((valoresRepeticionString == null) ? 0 : valoresRepeticionString.hashCode());
 		return result;
@@ -732,6 +787,21 @@ public class EventoItem {
 			if (other.usuModificacion != null)
 				return false;
 		} else if (!usuModificacion.equals(other.usuModificacion))
+			return false;
+		if (tipoCalendario == null) {
+			if (other.tipoCalendario != null)
+				return false;
+		} else if (!tipoCalendario.equals(other.tipoCalendario))
+			return false;
+		if (tipoEvento == null) {
+			if (other.tipoEvento != null)
+				return false;
+		} else if (!tipoEvento.equals(other.tipoEvento))
+			return false;
+		if (fechaInicioString == null) {
+			if (other.fechaInicioString != null)
+				return false;
+		} else if (!fechaInicioString.equals(other.fechaInicioString))
 			return false;
 		if (!Arrays.equals(valoresRepeticion, other.valoresRepeticion))
 			return false;

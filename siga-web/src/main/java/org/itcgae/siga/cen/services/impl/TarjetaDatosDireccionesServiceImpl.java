@@ -506,6 +506,10 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
 				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
+				
+				if(direcciones.getFechabaja() != null) {
+					direcciones.setFechabaja(null);
+				}
 
 				String preferentes = "";
 				for (String s : tipoPrefentes) {
@@ -1430,6 +1434,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
 				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
+				direcciones.setFechabaja(new Date());
 
 				if (datosDireccionesItem.getPoblacionExtranjera() != ""
 						&& datosDireccionesItem.getPoblacionExtranjera() != null) {

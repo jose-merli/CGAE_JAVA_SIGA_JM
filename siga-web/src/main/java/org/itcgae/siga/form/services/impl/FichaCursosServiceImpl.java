@@ -370,11 +370,11 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-			LOGGER.info(
-					"getRolesTrainers() / forRolesExtendsMapper.getRolesTrainers -> Entrada a forRolesExtendsMapper para obtener los roles");
-			comboItems = forRolesExtendsMapper.getRolesTrainers(idInstitucion.toString(),usuario.getIdlenguaje());
-			LOGGER.info(
-					"getRolesTrainers() / forRolesExtendsMapper.getRolesTrainers -> Salida de forRolesExtendsMapper para obtener los roles");
+				LOGGER.info(
+						"getRolesTrainers() / forRolesExtendsMapper.getRolesTrainers -> Entrada a forRolesExtendsMapper para obtener los roles");
+				comboItems = forRolesExtendsMapper.getRolesTrainers(idInstitucion.toString(), usuario.getIdlenguaje());
+				LOGGER.info(
+						"getRolesTrainers() / forRolesExtendsMapper.getRolesTrainers -> Salida de forRolesExtendsMapper para obtener los roles");
 			}
 
 		}
@@ -1592,17 +1592,31 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		EventoDTO eventoDTO = new EventoDTO();
 
 		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		if (null != idInstitucion) {
 
-			LOGGER.info(
-					"getSessionsCourse() / ageEventoExtendsMapper.searchEvent() -> Entrada a ageEventoExtendsMapper para obtener un evento especifico");
-			eventoList = ageEventoExtendsMapper.getSessionsCourse(cursoItem.getIdTipoEvento().toString(),
-					cursoItem.getIdCurso().toString(), cursoItem.getIdInstitucion());
-			LOGGER.info(
-					"getSessionsCourse() / ageEventoExtendsMapper.searchEvent() -> Salida de ageEventoExtendsMapper para obtener un evento especifico");
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
+			LOGGER.info(
+					"searchCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"searchCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				LOGGER.info(
+						"getSessionsCourse() / ageEventoExtendsMapper.searchEvent() -> Entrada a ageEventoExtendsMapper para obtener un evento especifico");
+				eventoList = ageEventoExtendsMapper.getSessionsCourse(cursoItem.getIdTipoEvento().toString(),
+						cursoItem.getIdCurso().toString(), cursoItem.getIdInstitucion(), usuario.getIdlenguaje());
+				LOGGER.info(
+						"getSessionsCourse() / ageEventoExtendsMapper.searchEvent() -> Salida de ageEventoExtendsMapper para obtener un evento especifico");
+			
+			}
 		}
 
 		LOGGER.info("getSessionsCourse() -> Salida del servicio para obtener un evento especifico");
@@ -2544,7 +2558,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			pysServiciosinstitucion.setIniciofinalponderado("I");
 			pysServiciosinstitucion.setSolicitarbaja("0");
 			pysServiciosinstitucion.setSolicitaralta("0");
-			pysServiciosinstitucion.setIdtipoiva(13); //Se pone el iva general por defecto
+			pysServiciosinstitucion.setIdtipoiva(13); // Se pone el iva general por defecto
 
 			LOGGER.info(
 					"createServiceCourse() / pysServiciosinstitucionExtendsMapper.insert() -> Entrada a pysServiciosinstitucionExtendsMapper para insertar un servicio institucion");
@@ -2984,7 +2998,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							// Se buscan las sesiones que estan en estado Planificada y las cancelaremos
 							List<EventoItem> sessionsList = ageEventoExtendsMapper.getSessionsCourseByState(
 									SigaConstants.EVENTO_SESION, cursoItem.getIdCurso().toString(),
-									idInstitucion.toString(), SigaConstants.EVENTO_PLANIFICADO);
+									idInstitucion.toString(), SigaConstants.EVENTO_PLANIFICADO, usuario.getIdlenguaje());
 
 							// Si existen cambios el estado a cancelada
 							if (null != sessionsList && sessionsList.size() > 0) {
@@ -4054,7 +4068,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 									LOGGER.info(
 											"saveNotification() / ageNotificacioneseventoExtendsMapper.updateByPrimaryKeySelective(ageGeneracionnotificaciones) -> Entrada a ageNotificacioneseventoExtendsMapper para insertar cuando se generará una notificacion");
 
-									response = ageNotificacioneseventoExtendsMapper.updateByPrimaryKeySelective(notification);
+									response = ageNotificacioneseventoExtendsMapper
+											.updateByPrimaryKeySelective(notification);
 
 									LOGGER.info(
 											"saveNotification() / ageNotificacioneseventoExtendsMapper.updateByPrimaryKeySelective(ageGeneracionnotificaciones) -> Salida a ageNotificacioneseventoExtendsMapper para insertar cuando se generará una notificacion");
@@ -4071,7 +4086,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 									if (null != ageGeneracionnotificacionesList
 											&& ageGeneracionnotificacionesList.size() > 0) {
 
-										AgeGeneracionnotificaciones ageGeneracionnotificacion = ageGeneracionnotificacionesList.get(0);
+										AgeGeneracionnotificaciones ageGeneracionnotificacion = ageGeneracionnotificacionesList
+												.get(0);
 
 										ageGeneracionnotificacion
 												.setUsumodificacion(usuario.getIdusuario().longValue());
