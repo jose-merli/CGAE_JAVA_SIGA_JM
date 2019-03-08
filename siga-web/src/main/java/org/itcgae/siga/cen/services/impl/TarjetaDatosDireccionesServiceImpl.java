@@ -722,7 +722,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
 				cenColegiadoExample.createCriteria()
 						.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()))
-						.andIdinstitucionEqualTo(Short.valueOf(datosDireccionesItem.getIdInstitucion()));
+						.andIdinstitucionEqualTo(idInstitucion);
 
 				List<CenColegiado> cenColegiadoList = cenColegiadoExtendsMapper.selectByExample(cenColegiadoExample);
 
