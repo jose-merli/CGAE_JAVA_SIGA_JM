@@ -10,6 +10,8 @@ public class TarjetaModeloConfiguracionDTO {
 	private String descripcion;
 	private String orden;
 	private String visible;
+	private String idPlantillaEnvio;
+	private String idTipoEnvio;
 	
 	public String getVisible() {
 		return visible;
@@ -58,6 +60,18 @@ public class TarjetaModeloConfiguracionDTO {
 	}
 	public void setOrden(String orden) {
 		this.orden = orden;
+	}
+	public String getIdPlantillaEnvio() {
+		return idPlantillaEnvio;
+	}
+	public void setIdPlantillaEnvio(String idPlantillaEnvio) {
+		this.idPlantillaEnvio = idPlantillaEnvio;
+	}
+	public String getIdTipoEnvio() {
+		return idTipoEnvio;
+	}
+	public void setIdTipoEnvio(String idTipoEnvio) {
+		this.idTipoEnvio = idTipoEnvio;
 	}
 	
 	

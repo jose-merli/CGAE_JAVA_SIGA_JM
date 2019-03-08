@@ -280,7 +280,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		sql2.SELECT("*");
 		sql2.FROM("(" + sql + ")");
-		sql2.WHERE("rownum < 5000");
+		//sql2.WHERE("rownum < 5000");
 
 		return sql2.toString();
 	}

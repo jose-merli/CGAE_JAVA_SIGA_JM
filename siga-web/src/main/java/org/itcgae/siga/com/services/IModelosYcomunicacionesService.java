@@ -43,5 +43,6 @@ public interface IModelosYcomunicacionesService {
 	public ModelosComunicacionItem modeloYComunicacionesSearchModelo(HttpServletRequest request, String idModelo);
 	
 	public Boolean comprobarNombreModeloComunicacion(HttpServletRequest request, TarjetaModeloConfiguracionDTO datosTarjeta);
+	public PlantillasModeloDTO obtenerPlantillaPorDefecto(HttpServletRequest request, String idModelo);
 	
 }

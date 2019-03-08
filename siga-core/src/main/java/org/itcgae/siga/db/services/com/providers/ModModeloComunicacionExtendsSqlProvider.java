@@ -2,13 +2,16 @@ package org.itcgae.siga.db.services.com.providers;
 
 import java.text.SimpleDateFormat;
 
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.jdbc.SQL;
+import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.commons.constants.SigaConstants;
 
 public class ModModeloComunicacionExtendsSqlProvider {
 	
-	public String selectModelosComunicacion(String idInstitucion, DatosModelosComunicacionesSearch filtros, boolean historico){
+	public String selectModelosComunicacion(String idInstitucion, DatosModelosComunicacionesSearch filtros, String idLenguaje, boolean historico){
 		
 		SQL sql = new SQL();
 		
@@ -28,6 +31,9 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.SELECT("clase.NOMBRE AS NOMBRECLASE");
 		sql.SELECT("inst.ABREVIATURA");
 		sql.SELECT("modelo.PORDEFECTO");
+		sql.SELECT("modelo.IDPLANTILLAENVIOS");
+		sql.SELECT("modelo.IDTIPOENVIOS");
+		sql.SELECT("(SELECT CAT.DESCRIPCION FROM ENV_TIPOENVIOS PLA LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = PLA.NOMBRE WHERE PLA.IDTIPOENVIOS = modelo.IDTIPOENVIOS AND CAT.IDLENGUAJE = '"+ idLenguaje +"') AS TIPOENVIO");
 		
 		sql.FROM("MOD_MODELOCOMUNICACION modelo");
 		
@@ -84,11 +90,15 @@ public class ModModeloComunicacionExtendsSqlProvider {
 	}
 	
 		
-	public String selectModelosComunicacionDialg(String idClaseComunicacion, String idModulo){
+	public String selectModelosComunicacionDialg(String idClaseComunicacion, String idModulo, String idLenguaje){
 	   
 	   SQL sql = new SQL();
 	   
 	   sql.SELECT("MODELO.IDCLASECOMUNICACION, MODELO.IDMODELOCOMUNICACION, MODELO.NOMBRE");
+	   sql.SELECT("MODELO.IDPLANTILLAENVIOS");
+	   sql.SELECT("MODELO.IDTIPOENVIOS");
+	   sql.SELECT("(SELECT CAT.DESCRIPCION FROM ENV_TIPOENVIOS PLA LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = PLA.NOMBRE WHERE PLA.IDTIPOENVIOS = MODELO.IDTIPOENVIOS AND CAT.IDLENGUAJE = '"+ idLenguaje +"') AS TIPOENVIO");
+		
 	   sql.FROM("MOD_MODELOCOMUNICACION MODELO");
 	   sql.JOIN("MOD_CLASECOMUNICACIONES CLASE ON CLASE.IDCLASECOMUNICACION = MODELO.IDCLASECOMUNICACION");
 	   sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND CLASE.IDMODULO = " + idModulo);
@@ -143,7 +153,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		return sql.toString();
 	}
 
-	public String selectModelo(String idModelo){
+	public String selectModelo(String idModelo, String idLenguaje){
 		
 		SQL sql = new SQL();
 						
@@ -160,6 +170,9 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.SELECT("clase.NOMBRE AS NOMBRECLASE");
 		sql.SELECT("inst.ABREVIATURA");
 		sql.SELECT("modelo.PORDEFECTO");
+		sql.SELECT("modelo.IDPLANTILLAENVIOS");
+		sql.SELECT("modelo.IDTIPOENVIOS");
+		sql.SELECT("(SELECT CAT.DESCRIPCION FROM ENV_TIPOENVIOS PLA LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = PLA.NOMBRE WHERE PLA.IDTIPOENVIOS = modelo.IDTIPOENVIOS AND CAT.IDLENGUAJE = '"+ idLenguaje +"') AS TIPOENVIO");
 		
 		sql.FROM("MOD_MODELOCOMUNICACION modelo");
 		
@@ -170,6 +183,20 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.WHERE("modelo.FECHABAJA is NULL");
 
 		sql.ORDER_BY("IDMODELOCOMUNICACION ASC");
+
+		return sql.toString();
+	}
+	
+	public String selectPlantillaPorDefecto(String idModelo, Short idInstitucion, String idLenguaje){
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("PLANTILLA.NOMBRE, PLANTILLA.IDTIPOENVIOS, MODELO.IDINSTITUCION,"
+				+ "(SELECT CAT.DESCRIPCION FROM ENV_TIPOENVIOS PLA LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = PLA.NOMBRE WHERE PLA.IDTIPOENVIOS = PLANTILLA.IDTIPOENVIOS AND CAT.IDLENGUAJE = '"+ idLenguaje +"') AS TIPOENVIO");
+		sql.SELECT("PLANTILLA.IDPLANTILLAENVIOS");
+		sql.FROM("MOD_MODELO_PLANTILLAENVIO MODELO");
+		sql.JOIN("ENV_PLANTILLASENVIOS PLANTILLA ON PLANTILLA.IDPLANTILLAENVIOS = MODELO.IDPLANTILLAENVIOS AND PLANTILLA.IDINSTITUCION = '"+ idInstitucion +"' AND MODELO.IDTIPOENVIOS = PLANTILLA.IDTIPOENVIOS");
+		sql.WHERE("MODELO.IDMODELOCOMUNICACION = '" + idModelo +"'");
 
 		return sql.toString();
 	}
