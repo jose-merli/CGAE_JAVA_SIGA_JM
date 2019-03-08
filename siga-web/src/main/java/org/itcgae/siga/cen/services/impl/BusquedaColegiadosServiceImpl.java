@@ -219,7 +219,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		if (null != idInstitucion) {
 			if(null !=colegiadoItem.getSearchLoggedUser() && colegiadoItem.getSearchLoggedUser()) {
 				colegiadoItem.setNif(dni);
-//				colegiadoItem.setNif("29002353C");
+
 
 			}
 			colegiadoItemList = cenColegiadoExtendsMapper.selectColegiados(idInstitucion, colegiadoItem);

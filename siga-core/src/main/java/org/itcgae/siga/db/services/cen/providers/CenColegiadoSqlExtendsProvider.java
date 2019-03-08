@@ -144,7 +144,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 		
 		if (colegiadoItem.getNumColegiado() != null && colegiadoItem.getNumColegiado() != "") {
-			sql.WHERE("col.ncolegiado = '" + colegiadoItem.getNumColegiado() + "'");
+			sql.WHERE("(col.ncolegiado = '" + colegiadoItem.getNumColegiado() + "' OR COL.NCOMUNITARIO = '" + colegiadoItem.getNumColegiado() + "')");
 		}
 
 		if (colegiadoItem.getSexo() != null && colegiadoItem.getSexo() != "") {
