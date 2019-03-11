@@ -3,7 +3,7 @@ package org.itcgae.siga.DTOs.cen;
 public class EstadoSolicitudDTO {
 	
 	private long idSolicitud;
-	
+	private String identificador;
 	private boolean duplicado;
 
 
@@ -22,6 +22,14 @@ public class EstadoSolicitudDTO {
 
 	public void setDuplicado(boolean duplicado) {
 		this.duplicado = duplicado;
+	}
+
+	public String getIdentificador() {
+		return identificador;
+	}
+
+	public void setIdentificador(String identificador) {
+		this.identificador = identificador;
 	}
 
 

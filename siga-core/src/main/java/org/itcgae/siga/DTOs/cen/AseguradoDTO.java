@@ -25,9 +25,14 @@ public class AseguradoDTO {
 	private String cp;
 	private String pais;
 	private String provincia;
+	private String idProvincia;
+	private String idPais;
+	private String idPoblacion;
 	private String poblacion;
 	private String tipoDireccion;
 	private String iban;
+	private String bic;
+	private String sucursal;
 	
 	
 	public String getNombre() {
@@ -175,6 +180,36 @@ public class AseguradoDTO {
 	}
 	public void setIban(String iban) {
 		this.iban = iban;
+	}
+	public String getBic() {
+		return bic;
+	}
+	public void setBic(String bic) {
+		this.bic = bic;
+	}
+	public String getSucursal() {
+		return sucursal;
+	}
+	public void setSucursal(String sucursal) {
+		this.sucursal = sucursal;
+	}
+	public String getIdPoblacion() {
+		return idPoblacion;
+	}
+	public void setIdPoblacion(String idPoblacion) {
+		this.idPoblacion = idPoblacion;
+	}
+	public String getIdPais() {
+		return idPais;
+	}
+	public void setIdPais(String idPais) {
+		this.idPais = idPais;
+	}
+	public String getIdProvincia() {
+		return idProvincia;
+	}
+	public void setIdProvincia(String idProvincia) {
+		this.idProvincia = idProvincia;
 	}
 	
 	
