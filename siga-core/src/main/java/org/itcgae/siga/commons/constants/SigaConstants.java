@@ -631,7 +631,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final long TIPO_EVENTO_SESION = 8;
 	public static final long ESTADO_EVENTO_PLANIFICADO = 1;
 	
-	public static final List<String> CAMPOSPLANTILLAEVENTOS = Arrays.asList(NOMBRE);
+	public static final List<String> CAMPOSPLANTILLAEVENTOS = Arrays.asList(NIF, NOMBRE, ASISTENCIA);
 	
 	//CARGA MASIVA GF
 	

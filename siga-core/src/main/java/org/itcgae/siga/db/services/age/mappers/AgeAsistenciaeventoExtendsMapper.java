@@ -28,6 +28,7 @@ public interface AgeAsistenciaeventoExtendsMapper extends AgeAsistenciaEventoMap
 		@Result(column = "IDCURSO", property = "idCurso", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREPERSONA", property = "nombrePersona", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIF", property = "nif", jdbcType = JdbcType.VARCHAR)
 
 	})
 	List<AsistenciaEventoItem> getEntryListCourse(String idLenguaje);

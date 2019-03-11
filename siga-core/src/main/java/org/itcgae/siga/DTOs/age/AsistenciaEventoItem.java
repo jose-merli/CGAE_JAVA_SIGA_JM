@@ -18,6 +18,8 @@ public class AsistenciaEventoItem {
 	private Date fechaModificacion;
 	private String idPersona; 
 	private String nombrePersona;
+	private String nif;
+	private String errores;
 
 	/**
 	 **/
@@ -204,7 +206,40 @@ public class AsistenciaEventoItem {
 	public void setNombrePersona(String nombrePersona) {
 		this.nombrePersona = nombrePersona;
 	}
+	
+	/**
+	 **/
+	public AsistenciaEventoItem nif(String nif) {
+		this.nif = nif;
+		return this;
+	}
 
+	@JsonProperty("nif")
+	public String getNif() {
+		return nif;
+	}
+
+	public void setNif(String nif) {
+		this.nif = nif;
+	}
+
+	/**
+	 * 
+	**/
+	public AsistenciaEventoItem errores(String errores) {
+		this.errores = errores;
+		return this;
+	}
+
+	@JsonProperty("errores")
+	public String getErrores() {
+		return errores;
+	}
+
+	public void setErrores(String errores) {
+		this.errores = errores;
+	}
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
@@ -224,13 +259,15 @@ public class AsistenciaEventoItem {
 				&& Objects.equals(this.idCurso, asistenciaEventoItem.idCurso)
 				&& Objects.equals(this.idEvento, asistenciaEventoItem.idEvento)
 				&& Objects.equals(this.idPersona, asistenciaEventoItem.idPersona)
-				&& Objects.equals(this.nombrePersona, asistenciaEventoItem.nombrePersona);
+				&& Objects.equals(this.nombrePersona, asistenciaEventoItem.nombrePersona)
+				&& Objects.equals(this.nif, asistenciaEventoItem.nif)
+				&& Objects.equals(this.errores, asistenciaEventoItem.errores);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(idAsistenciaEvento, idInstitucion, idInscripcion, usuModificacion, fechaModificacion, fechaBaja, asistencia, idEvento,
-				idCurso, idPersona, nombrePersona);
+				idCurso, idPersona, nombrePersona, nif, errores);
 	}
 
 	@Override
@@ -249,6 +286,9 @@ public class AsistenciaEventoItem {
 		sb.append("    idCurso: ").append(toIndentedString(idCurso)).append("\n");
 		sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 		sb.append("    nombrePersona: ").append(toIndentedString(nombrePersona)).append("\n");
+		sb.append("    nif: ").append(toIndentedString(nif)).append("\n");
+		sb.append("    errores: ").append(toIndentedString(errores)).append("\n");
+		
 		sb.append("}");
 		return sb.toString();
 	}

@@ -3,6 +3,7 @@ package org.itcgae.siga.age.service.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -59,12 +60,16 @@ import org.itcgae.siga.db.entities.AgeRepeticionevento;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.CenPartidojudicial;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenPoblaciones;
 import org.itcgae.siga.db.entities.CenPoblacionesExample;
 import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.entities.ForCursoExample;
 import org.itcgae.siga.db.entities.ForEventoCurso;
 import org.itcgae.siga.db.entities.ForEventoCursoExample;
+import org.itcgae.siga.db.entities.ForInscripcion;
+import org.itcgae.siga.db.entities.ForInscripcionExample;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioExample;
 import org.itcgae.siga.db.mappers.AgeGeneracionnotificacionesMapper;
@@ -84,8 +89,10 @@ import org.itcgae.siga.db.services.age.mappers.AgeRepeticionEventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeTipoeventosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.CenInfluenciaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPoblacionesExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
+import org.itcgae.siga.db.services.form.mappers.ForInscripcionExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForPersonacursoExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -101,6 +108,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
 public class FichaEventosServiceImpl implements IFichaEventosService {
@@ -163,6 +172,12 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 	@Autowired
 	private AgeGeneracionnotificacionesMapper ageGeneracionnotificacionesMapper;
+
+	@Autowired
+	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
+
+	@Autowired
+	private ForInscripcionExtendsMapper forInscripcionExtendsMapper;
 
 	@Value("${url.rapis}")
 	private String urlRapis;
@@ -796,10 +811,16 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 		// 1. Se definen las columnas que conforman la plantilla
 
+		String[] comboAsistencia = new String[2];
+		comboAsistencia[0] = "Sí";
+		comboAsistencia[1] = "No";
+
 		// 1.1 Se rellena las filas con los asistentes al curso
 		for (AsistenciaEventoItem asist : asistenciasEventoItem) {
 			datosHashtable = new Hashtable<String, Object>();
+			datosHashtable.put(SigaConstants.NIF, asist.getNif());
 			datosHashtable.put(SigaConstants.NOMBRE, asist.getNombrePersona());
+			datosHashtable.put(SigaConstants.ASISTENCIA, comboAsistencia);
 			datosVector.add(datosHashtable);
 		}
 
@@ -1701,7 +1722,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-				
+
 				LOGGER.info(
 						"searchEvent() / ageEventoExtendsMapper.searchEvent() -> Entrada a ageEventoExtendsMapper para obtener un evento especifico");
 				eventoItem = ageEventoExtendsMapper.searchEvent(cursoItem.getIdTipoEvento(),
@@ -2238,6 +2259,257 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 		LOGGER.info(
 				"generateNotificationAuto()  -> Salida del servicio para enviar aviso de los eventos que correspondan");
+	}
+
+	@Override
+	public UpdateResponseDTO uploadFileExcel(int idEvento, MultipartHttpServletRequest request)
+			throws IllegalStateException, IOException {
+
+		LOGGER.info("uploadFile() -> Entrada al servicio para guardar un archivo");
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+
+		// Controlar errores
+		Error error = new Error();
+		String errores = "";
+
+		// Coger archivo del request
+		LOGGER.debug("uploadFile() -> Coger archivo del request");
+		Iterator<String> itr = request.getFileNames();
+		MultipartFile file = request.getFile(itr.next());
+
+		// Extraer la información del excel
+		LOGGER.debug("uploadFile() -> Extraer los datos del archivo");
+		Vector<Hashtable<String, Object>> datos = ExcelHelper.parseExcelFile(file.getBytes());
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		int registrosErroneos = 0;
+		int response = 0;
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"uploadFileExcel() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"uploadFileExcel() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+					// Parseamos las asistencias introducidas en el excel
+					List<AsistenciaEventoItem> asistenciasList = parseExcelFile(datos, usuario, idEvento);
+
+					// Buscamos si existe algun error en las inscripciones del excel
+					for (AsistenciaEventoItem asistencia : asistenciasList) {
+						if (!asistencia.getErrores().isEmpty()) {
+							registrosErroneos++;
+						}
+					}
+
+					// // Si no hay errores se insertan las inscripciones nuevas
+					if (registrosErroneos == 0) {
+
+						for (AsistenciaEventoItem asistencia : asistenciasList) {
+							// Comprobamos si esta resgistrado
+
+							AgeAsistenciaEventoExample ageAsistenciaEventoExample = new AgeAsistenciaEventoExample();
+							ageAsistenciaEventoExample.createCriteria()
+									.andIdinscripcionEqualTo(Long.valueOf(asistencia.getIdInscripcion()))
+									.andIdeventoEqualTo(Long.valueOf(asistencia.getIdEvento()))
+									.andIdinstitucionEqualTo(idInstitucion);
+
+							List<AgeAsistenciaEvento> asistenciasRegistradasList = ageAsistenciaeventoExtendsMapper
+									.selectByExample(ageAsistenciaEventoExample);
+
+							// Si no esta registrado lo guardamos
+							if (null == asistenciasRegistradasList || asistenciasRegistradasList.size() == 0) {
+
+								AgeAsistenciaEvento ageAsistenciaEvento = new AgeAsistenciaEvento();
+								ageAsistenciaEvento.setFechabaja(null);
+								ageAsistenciaEvento.setFechamodificacion(new Date());
+								ageAsistenciaEvento.setIdinstitucion(idInstitucion);
+								ageAsistenciaEvento.setUsumodificacion(usuario.getIdusuario().longValue());
+								ageAsistenciaEvento.setIdevento(Long.valueOf(asistencia.getIdEvento()));
+								ageAsistenciaEvento.setIdinscripcion(Long.valueOf(asistencia.getIdInscripcion()));
+								ageAsistenciaEvento.setAsistencia(Short.valueOf(asistencia.getAsistencia()));
+
+								response = ageAsistenciaeventoExtendsMapper.insert(ageAsistenciaEvento);
+
+								// Si esta registrado lo actualizamos
+							} else {
+
+								AgeAsistenciaEvento asistenciaUpdate = asistenciasRegistradasList.get(0);
+
+								asistenciaUpdate.setFechamodificacion(new Date());
+								asistenciaUpdate.setUsumodificacion(usuario.getIdusuario().longValue());
+								asistenciaUpdate.setAsistencia(Short.valueOf(asistencia.getAsistencia()));
+
+								response = ageAsistenciaeventoExtendsMapper.updateByPrimaryKey(asistenciaUpdate);
+
+							}
+						}
+
+						updateResponseDTO.setStatus(SigaConstants.OK);
+
+					} else {
+
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setDescription("El fichero tiene registros erróneos");
+					}
+					
+				} catch (Exception e) {
+					LOGGER.info(e.getMessage());
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+				}
+			}
+
+		}
+
+		LOGGER.info("uploadFile() -> Salida al servicio para subir un archivo");
+
+		updateResponseDTO.setError(error);
+		return updateResponseDTO;
+	}
+
+	@Transactional
+	public List<AsistenciaEventoItem> parseExcelFile(Vector<Hashtable<String, Object>> datos, AdmUsuarios usuario,
+			int idEvento) throws BusinessException {
+
+		List<AsistenciaEventoItem> asistenciasItemList = new ArrayList<AsistenciaEventoItem>();
+		AsistenciaEventoItem asistenciaItem = null;
+		AgeEvento eventoRecibido = ageEventoExtendsMapper.selectByPrimaryKey(Long.parseLong(String.valueOf(idEvento)));
+		Short idInstitucion = eventoRecibido.getIdinstitucion();
+
+		StringBuffer errorLinea = null;
+		Long idPersona = null;
+		Long idCurso = null;
+
+		try {
+			// Por cada línea del excell
+			for (Hashtable<String, Object> hashtable : datos) {
+
+				asistenciaItem = new AsistenciaEventoItem();
+				asistenciaItem.setIdInstitucion(idInstitucion);
+				errorLinea = new StringBuffer();
+
+				// Comprobacion si el codigo curso esta introducido es correcto
+				if ((hashtable.get(SigaConstants.NIF) != null
+						&& !hashtable.get(SigaConstants.NIF).toString().equals(""))) {
+
+					CenPersonaExample cenPersonaExample = new CenPersonaExample();
+					cenPersonaExample.createCriteria().andNifcifEqualTo(hashtable.get(SigaConstants.NIF).toString());
+
+					LOGGER.info(
+							"parseExcelFile() / cenPersonaExtendsMapper.selectByExample(cenPersonaExample) -> Entrada a cenPersonaExtendsMapper para buscar el asistente a la sesión");
+
+					List<CenPersona> cenPersonaList = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+
+					LOGGER.info(
+							"parseExcelFile() / cenPersonaExtendsMapper.selectByExample(cenPersonaExample) -> Salida a cenPersonaExtendsMapper para buscar el asistente a la sesión");
+
+					if (null != cenPersonaList && cenPersonaList.size() > 0) {
+						CenPersona persona = cenPersonaList.get(0);
+						idPersona = persona.getIdpersona();
+
+						// Buscamos a la persona en la lista de inscritos aprobados si se encuentra lo
+						// guardamos en el
+						// objeto asistencia
+
+						// Buscamos el idCurso al que pertenece el evento
+
+						ForEventoCursoExample forEventoCursoExample = new ForEventoCursoExample();
+						forEventoCursoExample.createCriteria().andFechabajaIsNull()
+								.andIdeventoEqualTo(Long.parseLong(String.valueOf(idEvento)))
+								.andIdinstitucionEqualTo(idInstitucion);
+
+						LOGGER.info(
+								"parseExcelFile() / forEventoCursoMapper.selectByExample(forEventoCursoExample) -> Entrada a forEventoCursoMapper para buscar el curso a la que pertenece la sesión");
+
+						List<ForEventoCurso> forEventoCursoList = forEventoCursoMapper
+								.selectByExample(forEventoCursoExample);
+
+						LOGGER.info(
+								"parseExcelFile() / forEventoCursoMapper.selectByExample(forEventoCursoExample) -> Salida a forEventoCursoMapper para buscar el curso a la que pertenece la sesión");
+
+						if (null != forEventoCursoList && forEventoCursoList.size() > 0) {
+							ForEventoCurso forEventoCurso = forEventoCursoList.get(0);
+							idCurso = forEventoCurso.getIdcurso();
+
+							// Buscamos si se encuentra en la lista de inscritos aceptados
+
+							ForInscripcionExample forInscripcionExample = new ForInscripcionExample();
+							forInscripcionExample.createCriteria().andFechabajaIsNull().andIdcursoEqualTo(idCurso)
+									.andIdinstitucionEqualTo(idInstitucion).andIdpersonaEqualTo(idPersona)
+									.andIdestadoinscripcionEqualTo(SigaConstants.INSCRIPCION_APROBADA);
+
+							LOGGER.info(
+									"parseExcelFile() / forInscripcionExtendsMapper.selectByExample(forEventoCursoExample) -> Entrada a forInscripcionExtendsMapper para buscar si se encuentra inscrito en la sesión");
+
+							List<ForInscripcion> forInscripcionList = forInscripcionExtendsMapper
+									.selectByExample(forInscripcionExample);
+
+							LOGGER.info(
+									"parseExcelFile() / forInscripcionExtendsMapper.selectByExample(forEventoCursoExample) -> Salida a forInscripcionExtendsMapper para buscar si se encuentra inscrito en la sesión");
+
+							if (null != forEventoCursoList && forEventoCursoList.size() > 0) {
+								ForInscripcion inscripcion = forInscripcionList.get(0);
+
+								asistenciaItem.setNif(hashtable.get(SigaConstants.NIF).toString());
+								asistenciaItem.setIdEvento(String.valueOf(idEvento));
+								asistenciaItem.setIdInscripcion(String.valueOf(inscripcion.getIdinscripcion()));
+
+								// Obtenemos la asistencia de la persona inscrita
+								if ((hashtable.get(SigaConstants.ASISTENCIA) != null
+										&& !hashtable.get(SigaConstants.ASISTENCIA).toString().equals(""))) {
+
+									if (hashtable.get(SigaConstants.ASISTENCIA).equals("Sí")) {
+										asistenciaItem.setAsistencia("1");
+									} else if (hashtable.get(SigaConstants.ASISTENCIA).equals("No")) {
+										asistenciaItem.setAsistencia("0");
+									} else {
+										asistenciaItem.setAsistencia("Error");
+										errorLinea.append("Asistencia errónea.");
+									}
+
+								} else {
+									asistenciaItem.setAsistencia("0");
+								}
+
+							} else {
+								asistenciaItem.setNif("Error");
+								errorLinea.append("La persona no se encuentra inscrita en el curso.");
+							}
+						}
+					} else {
+						errorLinea.append("O el nif es erróneo o la persona no esta registrada en bbdd.");
+						asistenciaItem.setNif("Error");
+					}
+					// Si el campo esta vacio indicamos que este campo de ser introducido
+				} else {
+					errorLinea.append("Es obligatorio introducir el nif de la persona inscrita a la sesión.");
+					asistenciaItem.setNif("Error");
+				}
+
+				asistenciaItem.setErrores(errorLinea.toString());
+				asistenciasItemList.add(asistenciaItem);
+
+			}
+		} catch (Exception e) {
+			LOGGER.info(e.getMessage());
+			errorLinea = new StringBuffer();
+			errorLinea.append("Se ha producido un error en BBDD contacte con su administrador");
+		}
+
+		return asistenciasItemList;
+
 	}
 
 }
