@@ -1,13 +1,13 @@
 package org.itcgae.siga.cen.controllers;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
-import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
-import org.itcgae.siga.DTOs.cen.FichaDatosColegialesDTO;
 //import org.itcgae.siga.DTOs.cen.FichaDatosColegialesDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.IFichaDatosColegialesService;
@@ -50,6 +50,30 @@ public class FichaDatosColegialesController {
 	@RequestMapping(value = "/fichaDatosColegiales/datosColegialesUpdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> searchColegialesData(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) { 
 		UpdateResponseDTO response = fichaDatosColegiales.datosColegialesUpdate(colegiadoItem, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+
+	@RequestMapping(value = "/fichaDatosColegiales/datosColegialesInsertEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> datosColegialesInsertEstado(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) { 
+		InsertResponseDTO response = fichaDatosColegiales.datosColegialesInsertEstado(colegiadoItem, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+			else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "/fichaDatosColegiales/datosColegialesUpdateEstados", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> datosColegialesUpdateEstados(@RequestBody List<ColegiadoItem> listColegiadoItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = fichaDatosColegiales.datosColegialesUpdateEstados(listColegiadoItem, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+			else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "/fichaDatosColegiales/datosColegialesDeleteEstado", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> datosColegialesDeleteEstado(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) { 
+		UpdateResponseDTO response = fichaDatosColegiales.datosColegialesDeleteEstado(colegiadoItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 			else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);

@@ -1,7 +1,5 @@
 package org.itcgae.siga.db.services.cen.providers;
 
-import java.awt.List;
-
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.mappers.CenDireccionTipodireccionSqlProvider;
 

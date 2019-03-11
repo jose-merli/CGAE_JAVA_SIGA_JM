@@ -27,6 +27,7 @@ import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
@@ -40,7 +41,6 @@ import org.itcgae.siga.db.entities.CenPoblaciones;
 import org.itcgae.siga.db.entities.CenSolimodidirecciones;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
-import org.itcgae.siga.db.mappers.CenPoblacionesMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
@@ -66,11 +66,8 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
 	@Autowired
-	private CenPoblacionesMapper cenPoblacionesMapper;
+	private CenSolicitmodifdatosbasicosExtendsMapper cenSolicitmodifdatosbasicosMapper;
 
-	@Autowired
-	private  CenSolicitmodifdatosbasicosExtendsMapper  cenSolicitmodifdatosbasicosMapper;
-	
 	@Autowired
 	private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
 
@@ -100,7 +97,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 	@Autowired
 	private GenParametrosMapper genParametrosMapper;
-	
+
 	@Override
 	public DatosDireccionesDTO datosDireccionesSearch(int numPagina,
 			DatosDireccionesSearchDTO datosDireccionesSearchDTO, HttpServletRequest request) {
@@ -132,10 +129,33 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						"datosDireccionesSearch() / cenDireccionesExtendsMapper.selectDirecciones() -> Salida de cenCuentasbancariasExtendsMapper para busqueda de direcciones");
 
 				if (null != datosDireccionesItem && datosDireccionesItem.size() > 0) {
+					String[] tiposDirecciones = null;
+					List<String> tiposDireccionesList = null;
 					for (DatosDireccionesItem datosDireccionItem : datosDireccionesItem) {
 						if (!UtilidadesString.esCadenaVacia(datosDireccionItem.getIdTipoDireccionList())) {
-							datosDireccionItem
-									.setIdTipoDireccion(datosDireccionItem.getIdTipoDireccionList().split(";"));
+							tiposDirecciones = datosDireccionItem.getIdTipoDireccionList().split(";");
+							tiposDireccionesList = new ArrayList<String>(Arrays.asList(tiposDirecciones));
+							// indicar en el combo los tipos de direcciones preferentes
+							if (datosDireccionItem.getPreferente() != ""
+									&& datosDireccionItem.getPreferente() != null) {
+								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_EMAIL)) {
+									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL);
+								}
+								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_CORREO)) {
+									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_CORREO);
+								}
+								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_SMS)) {
+									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_SMS);
+								}
+								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_FAX)) {
+									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_FAX);
+								}
+							}
+
+							tiposDirecciones = new String[tiposDireccionesList.size()];
+							tiposDireccionesList.toArray(tiposDirecciones);
+							datosDireccionItem.setIdTipoDireccion(tiposDirecciones);
+
 						}
 					}
 				}
@@ -359,29 +379,209 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
-				// Comprobamos si contiene algún tipo de dirección único
-				String[] rdo = new String[datosDireccionesItem.getIdTipoDireccion().length];
-				boolean despacho = false;
+				// Comprobamos si la persona es colegiado o no, ya que la obligatoriedad solo
+				// vale para los colegiados
+				CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+				cenColegiadoExample.createCriteria()
+						.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()))
+						.andIdinstitucionEqualTo(Short.valueOf(datosDireccionesItem.getIdInstitucion()));
 
+				List<CenColegiado> cenColegiadoList = cenColegiadoExtendsMapper.selectByExample(cenColegiadoExample);
+
+				// Comprobamos si contiene algún tipo de dirección único
+				List<String> rdo = new ArrayList<String>();
+				List<String> allRdo = new ArrayList<String>();
+				List<String> tipoPrefentes = new ArrayList<String>();
+
+				// Guardamos los tipos de direcciones para separar de los preferentes y no
+				// preferentes
 				for (int i = 0; i < datosDireccionesItem.getIdTipoDireccion().length; i++) {
-					if (datosDireccionesItem.getIdTipoDireccion()[i].equals("3")
-							|| datosDireccionesItem.getIdTipoDireccion()[i].equals("9")
-							|| datosDireccionesItem.getIdTipoDireccion()[i].equals("8")
-							|| datosDireccionesItem.getIdTipoDireccion()[i].equals("6")) {
-						rdo[i] = datosDireccionesItem.getIdTipoDireccion()[i];
+					if (datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_CENSOWEB)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_GUARDIA)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_GUIAJUDICIAL)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_TRASPASO)
+							|| datosDireccionesItem.getIdTipoDireccion()[i]
+									.equals(SigaConstants.TIPO_DIR_FACTURACION)) {
+						rdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
+						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					}
-//					} else if (datosDireccionesItem.getIdTipoDireccion()[i].equals("2")) { // Comprobar si la persona
-//																							// tiene más de 1 despacho
-//						despacho = true;
-//						rdo[i] = datosDireccionesItem.getIdTipoDireccion()[i];
-//					}
+
+					if (datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL)) {
+						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_EMAIL);
+					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
+							.equals(SigaConstants.TIPO_DIR_PREFERENTE_CORREO)) {
+						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_CORREO);
+					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
+							.equals(SigaConstants.TIPO_DIR_PREFERENTE_SMS)) {
+						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_SMS);
+					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
+							.equals(SigaConstants.TIPO_DIR_PREFERENTE_FAX)) {
+						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_FAX);
+					}
+
+					if (datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_REVISTA)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_RESIDENCIA)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_DESPACHO)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_PUBLICA)) {
+						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
+					}
 				}
 
-				List<CenDireccionTipodireccion> cenDireccionTipodireccionList = cenDireccionTipodireccionMapper.select(
-						datosDireccionesItem.getIdPersona(), String.valueOf(usuario.getIdinstitucion()), rdo,
-						datosDireccionesItem.getIdDireccion());
+				String[] array = new String[rdo.size()];
+				array = rdo.toArray(array);
+				String[] allArray = new String[allRdo.size()];
+				allArray = allRdo.toArray(allArray);
+				datosDireccionesItem.setIdTipoDireccion(allArray);
+				List<CenDireccionTipodireccion> cenDireccionTipodireccionList = new ArrayList<CenDireccionTipodireccion>();
 
-				if (cenDireccionTipodireccionList.isEmpty()) {
+				// Si es colegiado se realiza las restricciones
+				if (null != cenColegiadoList && cenColegiadoList.size() > 0) {
+
+					// Eliminamos de la dirección guardada el tipo de direccion de la nueva
+					// dirección
+					if (!rdo.isEmpty())
+
+						cenDireccionTipodireccionList = cenDireccionTipodireccionMapper.select(
+								datosDireccionesItem.getIdPersona(), String.valueOf(usuario.getIdinstitucion()), array,
+								datosDireccionesItem.getIdDireccion());
+					{
+						for (CenDireccionTipodireccion tipoDir : cenDireccionTipodireccionList) {
+
+							CenDireccionTipodireccionExample cenDireccionTipodireccionExample = new CenDireccionTipodireccionExample();
+							cenDireccionTipodireccionExample.createCriteria()
+									.andIddireccionEqualTo(tipoDir.getIddireccion())
+									.andIdpersonaEqualTo(tipoDir.getIdpersona())
+									.andIdinstitucionEqualTo(tipoDir.getIdinstitucion())
+									.andIdtipodireccionEqualTo(tipoDir.getIdtipodireccion());
+
+							cenDireccionTipodireccionMapper.deleteByExample(cenDireccionTipodireccionExample);
+						}
+					}
+
+					// Eliminamos la direcciones prefente
+					for (String p : tipoPrefentes) {
+
+						if (p != SigaConstants.DIR_PREFERENTE_FAX) {
+							CenDireccionesExample cenDireccionesPreferenteExample = new CenDireccionesExample();
+							cenDireccionesPreferenteExample.createCriteria()
+									.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()))
+									.andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
+									.andPreferenteLike("%" + p + "%")
+									.andIddireccionNotEqualTo(Long.valueOf(datosDireccionesItem.getIdDireccion()));
+
+							List<CenDirecciones> cenDireccionesList = cenDireccionesExtendsMapper
+									.selectByExample(cenDireccionesPreferenteExample);
+							String preferentes = "";
+
+							for (CenDirecciones cenDireccion : cenDireccionesList) {
+								cenDireccion.setUsumodificacion(usuario.getIdusuario());
+								cenDireccion.setFechamodificacion(new Date());
+								for (String s : tipoPrefentes) {
+									preferentes = cenDireccion.getPreferente().replaceAll(s, "");
+								}
+								cenDireccion.setPreferente(preferentes);
+								cenDireccionesExtendsMapper.updateByPrimaryKey(cenDireccion);
+							}
+						}
+					}
+				}
+
+				// Consultamos la dirección a actualizar
+				CenDireccionesKey key = new CenDireccionesKey();
+				key.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
+				key.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+				key.setIdinstitucion(Short.valueOf(idInstitucion));
+				CenDirecciones direcciones = cenDireccionesExtendsMapper.selectByPrimaryKey(key);
+
+				direcciones.setFechamodificacion(new Date());
+				direcciones.setUsumodificacion(usuario.getIdusuario());
+				direcciones.setCodigopostal(datosDireccionesItem.getCodigoPostal());
+				direcciones.setCorreoelectronico(datosDireccionesItem.getCorreoElectronico());
+				direcciones.setDomicilio(datosDireccionesItem.getDomicilio());
+				direcciones.setFax1(datosDireccionesItem.getFax());
+				direcciones.setIdpais(datosDireccionesItem.getIdPais());
+				direcciones.setIdpoblacion(datosDireccionesItem.getIdPoblacion());
+				direcciones.setIdprovincia(datosDireccionesItem.getIdProvincia());
+				direcciones.setMovil(datosDireccionesItem.getMovil());
+				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
+				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
+				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
+				
+				if(direcciones.getFechabaja() != null) {
+					direcciones.setFechabaja(null);
+				}
+
+				String preferentes = "";
+				for (String s : tipoPrefentes) {
+					preferentes += s;
+					direcciones.setPreferente(preferentes);
+				}
+
+				if (datosDireccionesItem.getPoblacionExtranjera() != ""
+						&& datosDireccionesItem.getPoblacionExtranjera() != null) {
+					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
+				}
+
+				CenDireccionTipodireccionExample tipoDireccionexample = new CenDireccionTipodireccionExample();
+				tipoDireccionexample.createCriteria()
+						.andIddireccionEqualTo(Long.valueOf(datosDireccionesItem.getIdDireccion()))
+						.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()))
+						.andIdinstitucionEqualTo(idInstitucion);
+				// Consultamos los tipos de direccion de la direccion a actualizar
+				List<CenDireccionTipodireccion> tiposDireccion = cenDireccionTipodireccionMapper
+						.selectByExample(tipoDireccionexample);
+
+				if (null != datosDireccionesItem.getIdTipoDireccion()
+						&& datosDireccionesItem.getIdTipoDireccion().length > 0) {
+					List<String> idTiposDireccionTotal = new ArrayList<String>();
+					List<String> idTiposDireccionFront = new ArrayList<String>();
+					idTiposDireccionFront.addAll(Arrays.asList(datosDireccionesItem.getIdTipoDireccion()));
+					if (null != tiposDireccion && tiposDireccion.size() > 0) {
+						for (CenDireccionTipodireccion cenDireccionTipodireccion : tiposDireccion) {
+							idTiposDireccionTotal.add(cenDireccionTipodireccion.getIdtipodireccion().toString());
+						}
+					}
+
+					for (String uso : datosDireccionesItem.getIdTipoDireccion()) {
+						if (idTiposDireccionTotal.contains(uso)) {
+							idTiposDireccionTotal.remove(uso);
+							idTiposDireccionFront.remove(uso);
+						}
+					}
+					// Procesamos los distintos tipos de direccion que nos viene en la tabla
+					if (null != idTiposDireccionTotal && idTiposDireccionTotal.size() > 0) {
+						for (String idTipoDireccionBorrar : idTiposDireccionTotal) {
+							CenDireccionTipodireccionKey TipoDireccionkey = new CenDireccionTipodireccionKey();
+							TipoDireccionkey.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
+							TipoDireccionkey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+							TipoDireccionkey.setIdinstitucion(Short.valueOf(idInstitucion));
+							TipoDireccionkey.setIdtipodireccion(Short.valueOf(idTipoDireccionBorrar));
+							// Eliminamos las ya existentes y que se han eliminado en el update
+							LOGGER.info(
+									"updateDirection() / cenDireccionTipodireccionMapper.deleteByExample() -> Entrada a cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
+
+							cenDireccionTipodireccionMapper.deleteByPrimaryKey(TipoDireccionkey);
+
+							LOGGER.info(
+									"updateDirection() / cenNocolegiadoExtendsMapper.deleteByExample() -> Salida de cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
+						}
+					}
+					if (null != idTiposDireccionFront && idTiposDireccionFront.size() > 0) {
+						for (String idTipoDireccionInsertar : idTiposDireccionFront) {
+							CenDireccionTipodireccion TipoDireccionrecord = new CenDireccionTipodireccion();
+							TipoDireccionrecord.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
+							TipoDireccionrecord.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+							TipoDireccionrecord.setIdinstitucion(Short.valueOf(idInstitucion));
+							TipoDireccionrecord.setIdtipodireccion(Short.valueOf(idTipoDireccionInsertar));
+							TipoDireccionrecord.setFechamodificacion(new Date());
+							TipoDireccionrecord.setUsumodificacion(usuario.getIdusuario());
+							LOGGER.info(
+									"updateDirection() / cenDireccionTipodireccionMapper.insert() -> Entrada a cenDireccionTipodireccionMapper para insertar tiposdedirecciones");
+							cenDireccionTipodireccionMapper.insert(TipoDireccionrecord);
+							LOGGER.info(
+									"updateDirection() / cenNocolegiadoExtendsMapper.insert() -> Salida de cenDireccionTipodireccionMapper para insertar tiposdedirecciones");
+						}
+					}
 
 					// datos para auditoria
 					CenDireccionesExample cenDireccionesExample = new CenDireccionesExample();
@@ -392,103 +592,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					listCenDireccionesAnterior = cenDireccionesExtendsMapper.selectByExample(cenDireccionesExample);
 					cenDireccionesAnterior = listCenDireccionesAnterior.get(0);
 
-					// Consultamos la dirección a actualizar
-					CenDireccionesKey key = new CenDireccionesKey();
-					key.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
-					key.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-					key.setIdinstitucion(Short.valueOf(idInstitucion));
-					CenDirecciones direcciones = cenDireccionesExtendsMapper.selectByPrimaryKey(key);
-
-					direcciones.setFechamodificacion(new Date());
-					direcciones.setUsumodificacion(usuario.getIdusuario());
-					direcciones.setCodigopostal(datosDireccionesItem.getCodigoPostal());
-					direcciones.setCorreoelectronico(datosDireccionesItem.getCorreoElectronico());
-					direcciones.setDomicilio(datosDireccionesItem.getDomicilio());
-					direcciones.setFax1(datosDireccionesItem.getFax());
-					direcciones.setIdpais(datosDireccionesItem.getIdPais());
-					direcciones.setIdpoblacion(datosDireccionesItem.getIdPoblacion());
-					direcciones.setIdprovincia(datosDireccionesItem.getIdProvincia());
-					direcciones.setMovil(datosDireccionesItem.getMovil());
-					direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
-					direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
-					direcciones.setTelefono1(datosDireccionesItem.getTelefono());
-					if (datosDireccionesItem.getPoblacionExtranjera() != ""
-							&& datosDireccionesItem.getPoblacionExtranjera() != null) {
-						direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
-					}
-
-					CenDireccionTipodireccionExample tipoDireccionexample = new CenDireccionTipodireccionExample();
-					tipoDireccionexample.createCriteria()
-							.andIddireccionEqualTo(Long.valueOf(datosDireccionesItem.getIdDireccion()))
-							.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()))
-							.andIdinstitucionEqualTo(idInstitucion);
-					// Consultamos los tipos de direccion de la direccion a actualizar
-					List<CenDireccionTipodireccion> tiposDireccion = cenDireccionTipodireccionMapper
-							.selectByExample(tipoDireccionexample);
-
-					// Gestionamos los abonos que nos llegan
-					if (null != datosDireccionesItem.getIdTipoDireccion()
-							&& datosDireccionesItem.getIdTipoDireccion().length > 0) {
-						List<String> idTiposDireccionTotal = new ArrayList<String>();
-						List<String> idTiposDireccionFront = new ArrayList<String>();
-						idTiposDireccionFront.addAll(Arrays.asList(datosDireccionesItem.getIdTipoDireccion()));
-						if (null != tiposDireccion && tiposDireccion.size() > 0) {
-							for (CenDireccionTipodireccion cenDireccionTipodireccion : tiposDireccion) {
-								idTiposDireccionTotal.add(cenDireccionTipodireccion.getIdtipodireccion().toString());
-							}
-						}
-
-						for (String uso : datosDireccionesItem.getIdTipoDireccion()) {
-							if (idTiposDireccionTotal.contains(uso)) {
-								idTiposDireccionTotal.remove(uso);
-								idTiposDireccionFront.remove(uso);
-							}
-						}
-						// Procesamos los distintos tipos de direccion que nos viene en la tabla
-						if (null != idTiposDireccionTotal && idTiposDireccionTotal.size() > 0) {
-							for (String idTipoDireccionBorrar : idTiposDireccionTotal) {
-								CenDireccionTipodireccionKey TipoDireccionkey = new CenDireccionTipodireccionKey();
-								TipoDireccionkey.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
-								TipoDireccionkey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-								TipoDireccionkey.setIdinstitucion(Short.valueOf(idInstitucion));
-								TipoDireccionkey.setIdtipodireccion(Short.valueOf(idTipoDireccionBorrar));
-								// Eliminamos las ya existentes y que se han eliminado en el update
-								LOGGER.info(
-										"updateDirection() / cenDireccionTipodireccionMapper.deleteByExample() -> Entrada a cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
-
-								cenDireccionTipodireccionMapper.deleteByPrimaryKey(TipoDireccionkey);
-
-								LOGGER.info(
-										"updateDirection() / cenNocolegiadoExtendsMapper.deleteByExample() -> Salida de cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
-							}
-						}
-						if (null != idTiposDireccionFront && idTiposDireccionFront.size() > 0) {
-							for (String idTipoDireccionInsertar : idTiposDireccionFront) {
-								CenDireccionTipodireccion TipoDireccionrecord = new CenDireccionTipodireccion();
-								TipoDireccionrecord.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
-								TipoDireccionrecord.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-								TipoDireccionrecord.setIdinstitucion(Short.valueOf(idInstitucion));
-								TipoDireccionrecord.setIdtipodireccion(Short.valueOf(idTipoDireccionInsertar));
-								TipoDireccionrecord.setFechamodificacion(new Date());
-								TipoDireccionrecord.setUsumodificacion(usuario.getIdusuario());
-								LOGGER.info(
-										"updateDirection() / cenDireccionTipodireccionMapper.insert() -> Entrada a cenDireccionTipodireccionMapper para insertar tiposdedirecciones");
-								cenDireccionTipodireccionMapper.insert(TipoDireccionrecord);
-								LOGGER.info(
-										"updateDirection() / cenNocolegiadoExtendsMapper.insert() -> Salida de cenDireccionTipodireccionMapper para insertar tiposdedirecciones");
-							}
-						}
-
-					} else {
-
-						// Eliminamos los tipos de dirección
-
-						LOGGER.info(
-								"updateDirection() / cenDireccionTipodireccionMapper.deleteByExample() -> Entrada a cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
-						// cenDireccionTipodireccionMapper.deleteByExample(tipoDireccionexample);
-						LOGGER.info(
-								"updateDirection() / cenNocolegiadoExtendsMapper.deleteByExample() -> Salida de cenDireccionTipodireccionMapper para eliminar tiposdedirecciones");
-					}
+					// } else {
+					//
+					// }
 
 					// Actualizamos la direccion
 					LOGGER.info(
@@ -611,155 +717,246 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
+				// Comprobamos si la persona es colegiado o no, ya que la obligatoriedad solo
+				// vale para los colegiados
+				CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+				cenColegiadoExample.createCriteria()
+						.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()))
+						.andIdinstitucionEqualTo(idInstitucion);
+
+				List<CenColegiado> cenColegiadoList = cenColegiadoExtendsMapper.selectByExample(cenColegiadoExample);
+
+				List<String> rdo = new ArrayList<String>();
+				List<String> allRdo = new ArrayList<String>();
+				List<String> tipoPrefentes = new ArrayList<String>();
+
 				// Comprobamos si contiene algún tipo de dirección único
-				String[] rdo = new String[datosDireccionesItem.getIdTipoDireccion().length];
 				for (int i = 0; i < datosDireccionesItem.getIdTipoDireccion().length; i++) {
-					if (datosDireccionesItem.getIdTipoDireccion()[i].equals("3")
-							|| datosDireccionesItem.getIdTipoDireccion()[i].equals("9")
-							|| datosDireccionesItem.getIdTipoDireccion()[i].equals("8")
-							|| datosDireccionesItem.getIdTipoDireccion()[i].equals("6")) {
-						rdo[i] = datosDireccionesItem.getIdTipoDireccion()[i];
+					if (datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_CENSOWEB)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_GUARDIA)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_GUIAJUDICIAL)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_TRASPASO)
+							|| datosDireccionesItem.getIdTipoDireccion()[i]
+									.equals(SigaConstants.TIPO_DIR_FACTURACION)) {
+						rdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
+						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
+					}
+
+					if (datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL)) {
+						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_EMAIL);
+					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
+							.equals(SigaConstants.TIPO_DIR_PREFERENTE_CORREO)) {
+						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_CORREO);
+					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
+							.equals(SigaConstants.TIPO_DIR_PREFERENTE_SMS)) {
+						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_SMS);
+					} else if (datosDireccionesItem.getIdTipoDireccion()[i]
+							.equals(SigaConstants.TIPO_DIR_PREFERENTE_FAX)) {
+						tipoPrefentes.add(SigaConstants.DIR_PREFERENTE_FAX);
+					}
+
+					if (datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_REVISTA)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_RESIDENCIA)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_DESPACHO)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_PUBLICA)) {
+						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					}
 				}
 
-				List<CenDireccionTipodireccion> cenDireccionTipodireccion = cenDireccionTipodireccionMapper.select(
-						datosDireccionesItem.getIdPersona(), String.valueOf(usuario.getIdinstitucion()), rdo, "");
+				String[] array = new String[rdo.size()];
+				array = rdo.toArray(array);
+				String[] allArray = new String[allRdo.size()];
+				allArray = allRdo.toArray(allArray);
+				datosDireccionesItem.setIdTipoDireccion(allArray);
+				List<CenDireccionTipodireccion> cenDireccionTipodireccionList = new ArrayList<CenDireccionTipodireccion>();
 
-				if (cenDireccionTipodireccion.isEmpty()) {
+				// Si es colegiado se realiza las restricciones
+				if (null != cenColegiadoList && cenColegiadoList.size() > 0) {
 
-					// Obtenemos el nuevo idDireccion
-					List<DatosDireccionesItem> newIdDireccion = cenDireccionesExtendsMapper
-							.selectNewIdDireccion(datosDireccionesItem.getIdPersona(), idInstitucion.toString());
-					if (null != newIdDireccion && newIdDireccion.size() > 0) {
-						if (null != newIdDireccion.get(0)) {
-							idDireccion = Long.valueOf(newIdDireccion.get(0).getIdDireccion());
+					// Eliminamos de la dirección guardada el tipo de direccion de la nueva
+					// dirección
+					if (!rdo.isEmpty())
+
+						cenDireccionTipodireccionList = cenDireccionTipodireccionMapper.select(
+								datosDireccionesItem.getIdPersona(), String.valueOf(usuario.getIdinstitucion()), array,
+								datosDireccionesItem.getIdDireccion());
+					{
+						for (CenDireccionTipodireccion tipoDir : cenDireccionTipodireccionList) {
+
+							CenDireccionTipodireccionExample cenDireccionTipodireccionExample = new CenDireccionTipodireccionExample();
+							cenDireccionTipodireccionExample.createCriteria()
+									.andIddireccionEqualTo(tipoDir.getIddireccion())
+									.andIdpersonaEqualTo(tipoDir.getIdpersona())
+									.andIdinstitucionEqualTo(tipoDir.getIdinstitucion())
+									.andIdtipodireccionEqualTo(tipoDir.getIdtipodireccion());
+
+							cenDireccionTipodireccionMapper.deleteByExample(cenDireccionTipodireccionExample);
 						}
-
-					}
-					// Rellenamos la entidad con la informacion a insertar
-					CenDirecciones direcciones = new CenDirecciones();
-
-					direcciones.setIddireccion(idDireccion);
-					direcciones.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-					direcciones.setIdinstitucion(Short.valueOf(idInstitucion));
-					direcciones.setFechamodificacion(new Date());
-					direcciones.setUsumodificacion(usuario.getIdusuario());
-					direcciones.setCodigopostal(datosDireccionesItem.getCodigoPostal());
-					direcciones.setCorreoelectronico(datosDireccionesItem.getCorreoElectronico());
-					direcciones.setDomicilio(datosDireccionesItem.getDomicilio());
-					direcciones.setFax1(datosDireccionesItem.getFax());
-					direcciones.setIdpais(datosDireccionesItem.getIdPais());
-					direcciones.setIdpoblacion(datosDireccionesItem.getIdPoblacion());
-					direcciones.setIdprovincia(datosDireccionesItem.getIdProvincia());
-					direcciones.setMovil(datosDireccionesItem.getMovil());
-					direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
-					direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
-					direcciones.setTelefono1(datosDireccionesItem.getTelefono());
-					if (datosDireccionesItem.getPoblacionExtranjera() != ""
-							&& datosDireccionesItem.getPoblacionExtranjera() != null) {
-						direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
-					}
-					LOGGER.info(
-							"createDirection() / cenDireccionesExtendsMapper.insert() -> Entrada a cenDireccionesExtendsMapper para insertar direcciones");
-					response = cenDireccionesExtendsMapper.insert(direcciones);
-					LOGGER.info(
-							"createDirection() / cenDireccionesExtendsMapper.insert() -> Salida de cenDireccionesExtendsMapper para insertar direcciones");
-
-					// Gestionamos los abonos que nos llegan
-					if (null != datosDireccionesItem.getIdTipoDireccion()
-							&& datosDireccionesItem.getIdTipoDireccion().length > 0) {
-
-						List<String> idTiposDireccionFront = new ArrayList<String>();
-						idTiposDireccionFront.addAll(Arrays.asList(datosDireccionesItem.getIdTipoDireccion()));
-
-						for (String idTipoDireccionInsertar : datosDireccionesItem.getIdTipoDireccion()) {
-							CenDireccionTipodireccion TipoDireccionrecord = new CenDireccionTipodireccion();
-							TipoDireccionrecord.setIddireccion(idDireccion);
-							TipoDireccionrecord.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-							TipoDireccionrecord.setIdinstitucion(Short.valueOf(idInstitucion));
-							TipoDireccionrecord.setIdtipodireccion(Short.valueOf(idTipoDireccionInsertar));
-							TipoDireccionrecord.setFechamodificacion(new Date());
-							TipoDireccionrecord.setUsumodificacion(usuario.getIdusuario());
-							LOGGER.info(
-									"createDirection() / cenDireccionTipodireccionMapper.insert() -> Entrada a cenDireccionTipodireccionMapper para insertar los tipos de direcciones");
-							cenDireccionTipodireccionMapper.insert(TipoDireccionrecord);
-							LOGGER.info(
-									"createDirection() / cenDireccionTipodireccionMapper.insert() -> Salida de cenDireccionTipodireccionMapper para insertar los tipos de direcciones");
-						}
-
 					}
 
-					// comprobacion actualización
-					if (response >= 1) {
+					// Eliminamos la direcciones prefente
+					for (String p : tipoPrefentes) {
 
-						if (datosDireccionesItem.isEsColegiado()) {
+						if (p != SigaConstants.DIR_PREFERENTE_FAX) {
+							CenDireccionesExample cenDireccionesPreferenteExample = new CenDireccionesExample();
+							cenDireccionesPreferenteExample.createCriteria()
+									.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()))
+									.andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
+									.andPreferenteLike("%" + p + "%")
+									.andIddireccionNotEqualTo(Long.valueOf(datosDireccionesItem.getIdDireccion()));
 
-							// Actualizamos la tabla cen_colegiados para mandar a sociedades
-							CenColegiadoKey colegiadokey = new CenColegiadoKey();
-							colegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
-							colegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-							CenColegiado colegiado = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadokey);
+							List<CenDirecciones> cenDireccionesList = cenDireccionesExtendsMapper
+									.selectByExample(cenDireccionesPreferenteExample);
+							String preferentes = "";
 
-							colegiado.setFechamodificacion(new Date());
-							colegiado.setUsumodificacion(usuario.getIdusuario());
-
-							LOGGER.info(
-									"updateDirection() / cenColegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenColegiadoExtendsMapper para actualizar el Colegiado");
-							cenColegiadoExtendsMapper.updateByPrimaryKey(colegiado);
-							LOGGER.info(
-									"updateDirection() / cenColegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenColegiadoExtendsMapper para actualizar el Colegiado");
-
-							LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
-							insertResponseDTO.setId(idDireccion.toString());
-							insertResponseDTO.setStatus(SigaConstants.OK);
-
-						} else {
-							// Actualizamos la tabla cen_nocolegiados para mandar a sociedades
-							CenNocolegiadoKey noColegiadokey = new CenNocolegiadoKey();
-							noColegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
-							noColegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-							CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(noColegiadokey);
-
-							noColegiado.setFechamodificacion(new Date());
-							noColegiado.setUsumodificacion(usuario.getIdusuario());
-
-							LOGGER.info(
-									"updateDirection() / cenNocolegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar el noColegiado");
-							cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
-							LOGGER.info(
-									"updateDirection() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar el noColegiado");
-
-							LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
-							insertResponseDTO.setId(idDireccion.toString());
-							insertResponseDTO.setStatus(SigaConstants.OK);
+							for (CenDirecciones cenDireccion : cenDireccionesList) {
+								cenDireccion.setUsumodificacion(usuario.getIdusuario());
+								cenDireccion.setFechamodificacion(new Date());
+								for (String s : tipoPrefentes) {
+									preferentes = cenDireccion.getPreferente().replaceAll(s, "");
+								}
+								cenDireccion.setPreferente(preferentes);
+								cenDireccionesExtendsMapper.updateByPrimaryKey(cenDireccion);
+							}
 						}
+					}
+				}
 
-						// AUDITORIA
+				// Luego creamos la nueva direccion, obtenemos el nuevo idDireccion
+				List<DatosDireccionesItem> newIdDireccion = cenDireccionesExtendsMapper
+						.selectNewIdDireccion(datosDireccionesItem.getIdPersona(), idInstitucion.toString());
+				if (null != newIdDireccion && newIdDireccion.size() > 0) {
+					if (null != newIdDireccion.get(0)) {
+						idDireccion = Long.valueOf(newIdDireccion.get(0).getIdDireccion());
+					}
 
-						CenDirecciones cenDireccionesPosterior = new CenDirecciones();
+				}
 
-						CenDireccionesKey key = new CenDireccionesKey();
-						key.setIdinstitucion(idInstitucion);
-						key.setIddireccion(idDireccion);
-						key.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-						cenDireccionesPosterior = cenDireccionesExtendsMapper.selectByPrimaryKey(key);
+				// Rellenamos la entidad con la informacion a insertar
+				CenDirecciones direcciones = new CenDirecciones();
 
-						auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(null, cenDireccionesPosterior,
-								"INSERT", request, datosDireccionesItem.getMotivo());
+				direcciones.setIddireccion(idDireccion);
+				direcciones.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+				direcciones.setIdinstitucion(Short.valueOf(idInstitucion));
+				direcciones.setFechamodificacion(new Date());
+				direcciones.setUsumodificacion(usuario.getIdusuario());
+				direcciones.setCodigopostal(datosDireccionesItem.getCodigoPostal());
+				direcciones.setCorreoelectronico(datosDireccionesItem.getCorreoElectronico());
+				direcciones.setDomicilio(datosDireccionesItem.getDomicilio());
+				direcciones.setFax1(datosDireccionesItem.getFax());
+				direcciones.setIdpais(datosDireccionesItem.getIdPais());
+				direcciones.setIdpoblacion(datosDireccionesItem.getIdPoblacion());
+				direcciones.setIdprovincia(datosDireccionesItem.getIdProvincia());
+				direcciones.setMovil(datosDireccionesItem.getMovil());
+				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
+				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
+				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
+
+				String preferentes = "";
+				for (String s : tipoPrefentes) {
+					preferentes += s;
+					direcciones.setPreferente(preferentes);
+				}
+
+				if (datosDireccionesItem.getPoblacionExtranjera() != ""
+						&& datosDireccionesItem.getPoblacionExtranjera() != null) {
+					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
+				}
+
+				LOGGER.info(
+						"createDirection() / cenDireccionesExtendsMapper.insert() -> Entrada a cenDireccionesExtendsMapper para insertar direcciones");
+				response = cenDireccionesExtendsMapper.insert(direcciones);
+				LOGGER.info(
+						"createDirection() / cenDireccionesExtendsMapper.insert() -> Salida de cenDireccionesExtendsMapper para insertar direcciones");
+
+				if (null != datosDireccionesItem.getIdTipoDireccion()
+						&& datosDireccionesItem.getIdTipoDireccion().length > 0) {
+
+					List<String> idTiposDireccionFront = new ArrayList<String>();
+					idTiposDireccionFront.addAll(Arrays.asList(datosDireccionesItem.getIdTipoDireccion()));
+
+					for (String idTipoDireccionInsertar : datosDireccionesItem.getIdTipoDireccion()) {
+						CenDireccionTipodireccion TipoDireccionrecord = new CenDireccionTipodireccion();
+						TipoDireccionrecord.setIddireccion(idDireccion);
+						TipoDireccionrecord.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						TipoDireccionrecord.setIdinstitucion(Short.valueOf(idInstitucion));
+						TipoDireccionrecord.setIdtipodireccion(Short.valueOf(idTipoDireccionInsertar));
+						TipoDireccionrecord.setFechamodificacion(new Date());
+						TipoDireccionrecord.setUsumodificacion(usuario.getIdusuario());
+						LOGGER.info(
+								"createDirection() / cenDireccionTipodireccionMapper.insert() -> Entrada a cenDireccionTipodireccionMapper para insertar los tipos de direcciones");
+						cenDireccionTipodireccionMapper.insert(TipoDireccionrecord);
+						LOGGER.info(
+								"createDirection() / cenDireccionTipodireccionMapper.insert() -> Salida de cenDireccionTipodireccionMapper para insertar los tipos de direcciones");
+					}
+
+				}
+
+				// comprobacion actualización
+				if (response >= 1) {
+
+					if (datosDireccionesItem.isEsColegiado()) {
+
+						// Actualizamos la tabla cen_colegiados para mandar a sociedades
+						CenColegiadoKey colegiadokey = new CenColegiadoKey();
+						colegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
+						colegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						CenColegiado colegiado = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadokey);
+
+						colegiado.setFechamodificacion(new Date());
+						colegiado.setUsumodificacion(usuario.getIdusuario());
+
+						LOGGER.info(
+								"updateDirection() / cenColegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenColegiadoExtendsMapper para actualizar el Colegiado");
+						cenColegiadoExtendsMapper.updateByPrimaryKey(colegiado);
+						LOGGER.info(
+								"updateDirection() / cenColegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenColegiadoExtendsMapper para actualizar el Colegiado");
+
+						LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
+						insertResponseDTO.setId(idDireccion.toString());
+						insertResponseDTO.setStatus(SigaConstants.OK);
+
 					} else {
-						LOGGER.info("createDirection() -> KO. Insert para direcciones  NO realizado correctamente");
-						insertResponseDTO.setStatus(SigaConstants.KO);
-						error.setMessage("Error al insertar la cuenta Bancaria");
-						insertResponseDTO.setError(error);
-						return insertResponseDTO;
+						// Actualizamos la tabla cen_nocolegiados para mandar a sociedades
+						CenNocolegiadoKey noColegiadokey = new CenNocolegiadoKey();
+						noColegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
+						noColegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(noColegiadokey);
+
+						noColegiado.setFechamodificacion(new Date());
+						noColegiado.setUsumodificacion(usuario.getIdusuario());
+
+						LOGGER.info(
+								"updateDirection() / cenNocolegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar el noColegiado");
+						cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
+						LOGGER.info(
+								"updateDirection() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar el noColegiado");
+
+						LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
+						insertResponseDTO.setId(idDireccion.toString());
+						insertResponseDTO.setStatus(SigaConstants.OK);
 					}
+
+					// AUDITORIA
+
+					CenDirecciones cenDireccionesPosterior = new CenDirecciones();
+
+					CenDireccionesKey key = new CenDireccionesKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setIddireccion(idDireccion);
+					key.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+					cenDireccionesPosterior = cenDireccionesExtendsMapper.selectByPrimaryKey(key);
+
+					auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(null, cenDireccionesPosterior,
+							"INSERT", request, datosDireccionesItem.getMotivo());
 				} else {
 					LOGGER.info("createDirection() -> KO. Insert para direcciones  NO realizado correctamente");
 					insertResponseDTO.setStatus(SigaConstants.KO);
-					error.setMessage("Ya existe una cuenta asociada a este tipo de dirección");
+					error.setMessage("Error al insertar la dirección");
 					insertResponseDTO.setError(error);
 					return insertResponseDTO;
 				}
+
 			} else {
 				LOGGER.warn(
 						"createDirection() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -773,7 +970,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		LOGGER.info("createDirection() -> Salida del servicio para insertar direcciones ");
 		return insertResponseDTO;
 	}
-	
+
 	@Override
 	public UpdateResponseDTO solicitudUpdateDirection(DatosDireccionesItem datosDireccionesItem,
 			HttpServletRequest request) {
@@ -1017,8 +1214,8 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				AdmUsuarios usuario = usuarios.get(0);
 				CenSolimodidirecciones direcciones = new CenSolimodidirecciones();
 
-				NewIdDTO idSolicitudBD = cenSolimodidireccionesExtendsMapper.getMaxIdSolicitud(String.valueOf(idInstitucion),
-						datosDireccionesItem.getIdPersona());
+				NewIdDTO idSolicitudBD = cenSolimodidireccionesExtendsMapper
+						.getMaxIdSolicitud(String.valueOf(idInstitucion), datosDireccionesItem.getIdPersona());
 				if (idSolicitudBD == null) {
 					direcciones.setIdsolicitud(Long.parseLong("1"));
 				} else {
@@ -1064,17 +1261,19 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
 				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
-//				direcciones.setIdestadosolic(Short.parseShort("10"));
-				
-				List <ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper.getAutoAceptar(String.valueOf(idInstitucion));
-				
-				if(autoAceptar.get(0).getLabel().equals("S")) {
+				// direcciones.setIdestadosolic(Short.parseShort("10"));
+
+				List<ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper
+						.getAutoAceptar(String.valueOf(idInstitucion));
+
+				if (autoAceptar.get(0).getLabel().equals("S")) {
 					direcciones.setIdestadosolic(Short.parseShort("20"));
-				}else {
+				} else {
 					direcciones.setIdestadosolic(Short.parseShort("10"));
 				}
-				
-				if(datosDireccionesItem.getPoblacionExtranjera()!= "" &&  datosDireccionesItem.getPoblacionExtranjera() != null) {
+
+				if (datosDireccionesItem.getPoblacionExtranjera() != ""
+						&& datosDireccionesItem.getPoblacionExtranjera() != null) {
 					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
 				}
 
@@ -1084,7 +1283,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				LOGGER.info(
 						"createDirection() / cenDireccionesExtendsMapper.insert() -> Salida de cenDireccionesExtendsMapper para insertar direcciones");
 
-				if(autoAceptar.get(0).getLabel().equals("S")) {
+				if (autoAceptar.get(0).getLabel().equals("S")) {
 					CenDirecciones modificacion = new CenDirecciones();
 					modificacion.setIdinstitucion(idInstitucion);
 					modificacion.setIdpersona(Long.parseLong(datosDireccionesItem.getIdPersona()));
@@ -1129,29 +1328,35 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 					responseUpdate = cenDireccionesExtendsMapper.updateByPrimaryKeySelective(modificacion);
 					error.setCode(200);
-					error.setDescription("Su petición ha sido aceptada automáticamente. Puede ver ya los datos actualizados");
-				}else {
+					error.setDescription(
+							"Su petición ha sido aceptada automáticamente. Puede ver ya los datos actualizados");
+				} else {
 					GenParametrosExample ejemploParam = new GenParametrosExample();
 					List<GenParametros> xDias = new ArrayList<GenParametros>();
-					ejemploParam.createCriteria().andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION").andIdinstitucionEqualTo(idInstitucion);
-					xDias= genParametrosMapper.selectByExample(ejemploParam);
+					ejemploParam.createCriteria().andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION")
+							.andIdinstitucionEqualTo(idInstitucion);
+					xDias = genParametrosMapper.selectByExample(ejemploParam);
 					error.setCode(200);
-					if(xDias.size() == 0) {
+					if (xDias.size() == 0) {
 						GenParametrosExample ejemploParam2 = new GenParametrosExample();
-						ejemploParam2.createCriteria().andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION").andIdinstitucionEqualTo((short)2000);
-						xDias= genParametrosMapper.selectByExample(ejemploParam2);
+						ejemploParam2.createCriteria()
+								.andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION")
+								.andIdinstitucionEqualTo((short) 2000);
+						xDias = genParametrosMapper.selectByExample(ejemploParam2);
 					}
-					error.setDescription("Su petición ha sido registrada y será revisada en los próximos "+xDias.get(0).getValor()+" días. Puede comprobar el estado de su petición en el menú Solicitudes de modificación");
+					error.setDescription("Su petición ha sido registrada y será revisada en los próximos "
+							+ xDias.get(0).getValor()
+							+ " días. Puede comprobar el estado de su petición en el menú Solicitudes de modificación");
 				}
-				
+
 				insertResponseDTO.setError(error);
-				
+
 				// comprobacion actualización
 				if (response >= 1) {
 					LOGGER.info("createDirection() -> OK. Insert para solicitud direcciones realizado correctamente");
 					insertResponseDTO.setId(idDireccion.toString());
 					insertResponseDTO.setStatus(SigaConstants.OK);
-					if(responseUpdate == 1) {
+					if (responseUpdate == 1) {
 						LOGGER.info("createDirection() -> OK. Solicitud de direccion procesada correctamente");
 
 					}
@@ -1164,6 +1369,95 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					return insertResponseDTO;
 				}
 
+			} else {
+				LOGGER.warn(
+						"createDirection() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+
+		} else {
+			LOGGER.warn("createDirection() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("createDirection() -> Salida del servicio para insertar direcciones ");
+		return insertResponseDTO;
+	}
+
+	@Override
+	public InsertResponseDTO duplicateDirection(DatosDireccionesItem datosDireccionesItem, HttpServletRequest request) {
+		LOGGER.info("duplicateDirection() -> Entrada al servicio para duplicar direcciones");
+		int response = 0;
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"duplicateDirection() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"duplicateDirection() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+			Long idDireccion = new Long(1);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				// Obtenemos el nuevo idDireccion
+				List<DatosDireccionesItem> newIdDireccion = cenDireccionesExtendsMapper
+						.selectNewIdDireccion(datosDireccionesItem.getIdPersona(), idInstitucion.toString());
+				if (null != newIdDireccion && newIdDireccion.size() > 0) {
+					if (null != newIdDireccion.get(0)) {
+						idDireccion = Long.valueOf(newIdDireccion.get(0).getIdDireccion());
+					}
+
+				}
+				// Rellenamos la entidad con la direccion a duplicar
+				CenDirecciones direcciones = new CenDirecciones();
+
+				direcciones.setIddireccion(idDireccion);
+				direcciones.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+				direcciones.setIdinstitucion(Short.valueOf(idInstitucion));
+				direcciones.setFechamodificacion(new Date());
+				direcciones.setUsumodificacion(usuario.getIdusuario());
+				direcciones.setCodigopostal(datosDireccionesItem.getCodigoPostal());
+				direcciones.setCorreoelectronico(datosDireccionesItem.getCorreoElectronico());
+				direcciones.setDomicilio(datosDireccionesItem.getDomicilio());
+				direcciones.setFax1(datosDireccionesItem.getFax());
+				direcciones.setIdpais(datosDireccionesItem.getIdPais());
+				direcciones.setIdpoblacion(datosDireccionesItem.getIdPoblacion());
+				direcciones.setIdprovincia(datosDireccionesItem.getIdProvincia());
+				direcciones.setMovil(datosDireccionesItem.getMovil());
+				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
+				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
+				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
+				direcciones.setFechabaja(new Date());
+
+				if (datosDireccionesItem.getPoblacionExtranjera() != ""
+						&& datosDireccionesItem.getPoblacionExtranjera() != null) {
+					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
+				}
+
+				LOGGER.info(
+						"duplicateDirection() / cenDireccionesExtendsMapper.insert() -> Entrada a cenDireccionesExtendsMapper para duplicar direcciones");
+				response = cenDireccionesExtendsMapper.insert(direcciones);
+				LOGGER.info(
+						"duplicateDirection() / cenDireccionesExtendsMapper.insert() -> Salida de cenDireccionesExtendsMapper para duplicar direcciones");
+
+				if(response == 0) {
+					LOGGER.info("duplicateDirection() -> KO. Duplicar direccion  NO realizado correctamente");
+					insertResponseDTO.setStatus(SigaConstants.KO);
+					error.setMessage("Error al duplicar la direccion");
+					insertResponseDTO.setError(error);
+					return insertResponseDTO;
+				}else {
+					insertResponseDTO.setStatus(SigaConstants.OK);
+					insertResponseDTO.setId(idDireccion.toString());
+						LOGGER.info("createDirection() -> OK. Solicitud de direccion procesada correctamente");
+				}
 			} else {
 				LOGGER.warn(
 						"createDirection() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "

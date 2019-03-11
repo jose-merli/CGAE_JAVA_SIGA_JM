@@ -45,8 +45,6 @@ public class TarjetaDatosDireccionesController {
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
-
-	
 	@RequestMapping(value = "tarjetaDirecciones/pais", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getPais(HttpServletRequest request) { 
 		ComboDTO response = tarjetaDatosDireccionesService.getPais(request);
@@ -65,7 +63,6 @@ public class TarjetaDatosDireccionesController {
 		return new ResponseEntity<ComboDTO >(response, HttpStatus.OK);
 	}
 
-
 	@RequestMapping(value = "tarjetaDirecciones/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateDirection(@RequestBody DatosDireccionesItem datosDirecciones, HttpServletRequest request) { 
 		UpdateResponseDTO response = tarjetaDatosDireccionesService.updateDirection(datosDirecciones, request);
@@ -77,6 +74,14 @@ public class TarjetaDatosDireccionesController {
 	@RequestMapping(value = "tarjetaDirecciones/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> createDirection(@RequestBody DatosDireccionesItem datosDirecciones, HttpServletRequest request) { 
 		InsertResponseDTO response = tarjetaDatosDireccionesService.createDirection(datosDirecciones, request);
+		if(response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);
+	}
+	
+	@RequestMapping(value = "tarjetaDirecciones/duplicate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> duplicateDirection(@RequestBody DatosDireccionesItem datosDireccionesItem, HttpServletRequest request) { 
+		InsertResponseDTO response = tarjetaDatosDireccionesService.duplicateDirection(datosDireccionesItem, request);
 		if(response.getStatus().equals(SigaConstants.OK))
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.FORBIDDEN);

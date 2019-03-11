@@ -1,7 +1,10 @@
 package org.itcgae.siga.cen.services;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
@@ -23,6 +26,14 @@ public interface IFichaDatosColegialesService {
 	public UpdateResponseDTO datosColegialesUpdate(ColegiadoItem colegiadoItem,
 			HttpServletRequest request);
 
+	public InsertResponseDTO datosColegialesInsertEstado(ColegiadoItem colegiadoItem,
+			HttpServletRequest request);
+	
+	public UpdateResponseDTO datosColegialesUpdateEstados(List<ColegiadoItem> listColegiadoItem,
+			HttpServletRequest request);
+	
+	public UpdateResponseDTO datosColegialesDeleteEstado(ColegiadoItem colegiadoItem,
+			HttpServletRequest request);
 	
 //	public BusquedaJuridicaDTO searchLegalPersons(int numPagina, BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request);
 	

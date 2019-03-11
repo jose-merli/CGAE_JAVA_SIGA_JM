@@ -691,6 +691,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		LOGGER.info("aprobarSolicitud() -> Entrada al servicio para aprobar una solicitud");
 		
 		Long idDireccion;
+		Long idDireccion2;
 		Long idPersona;
 		Short idBancario;
 		int insertColegiado;
@@ -722,6 +723,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					idPersona = insertarDatosPersonales(solIncorporacion, usuario);
 					insertCliente = insertarDatosCliente(solIncorporacion, usuario, idPersona);
 					idDireccion = insertarDatosDireccion(solIncorporacion, usuario, idPersona);
+					idDireccion2 = insertarDatosDireccion2(solIncorporacion, usuario, idPersona);
 					insertColegiado = insertarDatosColegiado(solIncorporacion, usuario, idPersona);
 					idBancario = insertarDatosBancarios(solIncorporacion, usuario, idPersona);
 					solIncorporacion.setIdestado((short)50);
@@ -751,6 +753,13 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						if(idDireccion != null){
 							CenDireccionesKey keys = new CenDireccionesKey();
 							keys.setIddireccion(idDireccion);
+							keys.setIdinstitucion(usuario.getIdinstitucion());
+							keys.setIdpersona(idPersona);
+							_cenDireccionesMapper.deleteByPrimaryKey(keys);
+						}
+						if(idDireccion2 != null){
+							CenDireccionesKey keys = new CenDireccionesKey();
+							keys.setIddireccion(idDireccion2);
 							keys.setIdinstitucion(usuario.getIdinstitucion());
 							keys.setIdpersona(idPersona);
 							_cenDireccionesMapper.deleteByPrimaryKey(keys);
@@ -961,6 +970,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		CenDirecciones direccion = new CenDirecciones();
 		
+		//Creamos la direccion con los tipos de direccion oblogatorios
 		 List<DatosDireccionesItem> direccionID = _cenDireccionesMapper.selectNewIdDireccion(idPersona.toString(),usuario.getIdinstitucion().toString());
 		
 		direccion.setIddireccion(Long.valueOf(direccionID.get(0).getIdDireccion()));
@@ -980,6 +990,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		direccion.setMovil(solicitud.getMovil());
 		direccion.setUsumodificacion(usuario.getIdusuario());
 		
+		//Añadimos las preferencias de direccion obligatorias
+		direccion.setPreferente("ECS");
+		
 		_cenDireccionesMapper.insert(direccion);
 		
 		CenDireccionTipodireccion tipoDireccion =  new CenDireccionTipodireccion();
@@ -989,18 +1002,67 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		tipoDireccion.setIdpersona(idPersona);
 		tipoDireccion.setUsumodificacion(usuario.getIdusuario());
 		
-		//Traspaso a OOJ
-		tipoDireccion.setIdtipodireccion(Short.valueOf("9"));
+		//Añadimos los tipo de direcciones obligatorios
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_TRASPASO));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_FACTURACION));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_CENSOWEB));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUIAJUDICIAL));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUARDIA));
 		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
 		
-		//Despacho
-		tipoDireccion.setIdtipodireccion(Short.valueOf("2"));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		if(solicitud.getIdtiposolicitud() == SigaConstants.INCORPORACION_EJERCIENTE ||
+				solicitud.getIdtiposolicitud() == SigaConstants.REINCORPORACION_EJERCIENTE) {
+			tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_DESPACHO));
+			cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		}
 		
-		//CensoWeb
-		tipoDireccion.setIdtipodireccion(Short.valueOf("3"));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		return direccion.getIddireccion();
+		
+	}
 	
+	private Long insertarDatosDireccion2 (CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
+		
+		CenDirecciones direccion = new CenDirecciones();
+		
+		//Creamos la direccion con los tipos de direccion oblogatorios
+		 List<DatosDireccionesItem> direccionID = _cenDireccionesMapper.selectNewIdDireccion(idPersona.toString(),usuario.getIdinstitucion().toString());
+		
+		direccion.setIddireccion(Long.valueOf(direccionID.get(0).getIdDireccion()));
+		direccion.setFechamodificacion(new Date());
+		direccion.setIdinstitucion(usuario.getIdinstitucion());
+		direccion.setIdpersona(idPersona);
+		direccion.setUsumodificacion(usuario.getIdusuario());
+		
+		//Añadimos las preferencias de direccion no obligatorias
+		direccion.setPreferente("F");
+		
+		_cenDireccionesMapper.insert(direccion);
+		
+		CenDireccionTipodireccion tipoDireccion =  new CenDireccionTipodireccion();
+		tipoDireccion.setFechamodificacion(new Date());
+		tipoDireccion.setIddireccion(direccion.getIddireccion());
+		tipoDireccion.setIdinstitucion(usuario.getIdinstitucion());
+		tipoDireccion.setIdpersona(idPersona);
+		tipoDireccion.setUsumodificacion(usuario.getIdusuario());
+		
+		//Añadimos los tipo de direcciones obligatorios
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PUBLICA));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion);
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_RESIDENCIA));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion);
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_REVISTA));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion);
+		
+		if(solicitud.getIdtiposolicitud() != SigaConstants.INCORPORACION_EJERCIENTE &&
+				solicitud.getIdtiposolicitud() != SigaConstants.REINCORPORACION_EJERCIENTE) {
+			tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_DESPACHO));
+			cenDireccionTipoDireccionMapper.insert(tipoDireccion);
+		}
+		
 		return direccion.getIddireccion();
 		
 	}

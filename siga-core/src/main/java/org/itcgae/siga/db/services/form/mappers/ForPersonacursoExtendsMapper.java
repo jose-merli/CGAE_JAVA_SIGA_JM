@@ -23,14 +23,15 @@ public interface ForPersonacursoExtendsMapper extends ForPersonaCursoMapper{
 	@Results({
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBRE", property = "nombreCompleto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ROL", property = "rol", jdbcType = JdbcType.VARCHAR)
 	})
-	List<FormadorCursoItem> getTrainersLabels(String idInstitucion, String idCurso);
+	List<FormadorCursoItem> getTrainersLabels(String idInstitucion, String idCurso, String idLenguaje);
 	
 
 	@SelectProvider(type = ForPersonacursoSqlExtendsProvider.class, method = "getTrainersSession")
 	@Results({
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
-		@Result(column = "NOMBRE", property = "nombreCompleto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombreCompleto", jdbcType = JdbcType.VARCHAR)
 	})
 	List<FormadorCursoItem> getTrainersSession(String idEvento);
 	
