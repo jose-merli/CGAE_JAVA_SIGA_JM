@@ -194,6 +194,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 		LOGGER.info("deleteBanksData() -> Entrada al servicio para eliminar cuentas bancarias");
 		int response = 0;
+		Error error = new Error();
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 
 		// Conseguimos información del usuario logeado
@@ -213,30 +214,56 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
-				// información a modificar
-				CenCuentasbancarias cuentaBancaria = new CenCuentasbancarias();
-				cuentaBancaria.setFechabaja(new Date());
-				cuentaBancaria.setFechamodificacion(new Date());
-				cuentaBancaria.setUsumodificacion(usuario.getIdusuario());
-
 				// filtrado para sentencia sql
 				List<Short> idCuentasDelete = new ArrayList<Short>();
 				for (int i = 0; i < datosBancariosDeleteDTO.getIdCuentas().length; i++) {
-					idCuentasDelete.add(Short.valueOf(datosBancariosDeleteDTO.getIdCuentas()[i]));
+					
+					// información a modificar
+					CenCuentasbancarias cuentaBancaria = new CenCuentasbancarias();
+					cuentaBancaria.setFechabaja(new Date());
+					cuentaBancaria.setFechamodificacion(new Date());
+					cuentaBancaria.setUsumodificacion(usuario.getIdusuario());
+				
+					CenCuentasbancariasExample cenCuentasbancariasDelete = new CenCuentasbancariasExample();
+					cenCuentasbancariasDelete.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdpersonaEqualTo(Long.valueOf(datosBancariosDeleteDTO.getIdPersona()))
+							.andIdcuentaEqualTo(Short.valueOf(datosBancariosDeleteDTO.getIdCuentas()[i]));
+
+					LOGGER.info(
+							"deleteBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para eliminar cuentas bancarias");
+					response = cenCuentasbancariasExtendsMapper.updateByExampleSelective(cuentaBancaria,
+							cenCuentasbancariasDelete);
+					LOGGER.info(
+							"deleteBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para eliminar cuentas bancarias");
+
+					// Este proceso se encarga de actualizar las cosas pendientes asociadas a la
+					// cuenta de la persona
+					String[] resultado;
+					try {
+						resultado = ejecutarPL_Revision_Cuenta("" + idInstitucion.toString(),
+								"" + datosBancariosDeleteDTO.getIdPersona(), "" + datosBancariosDeleteDTO.getIdCuentas()[i],
+								"" + usuario.getIdusuario().toString());
+						
+						if (resultado == null || !resultado[0].equals("0")) {
+
+							deleteResponseDTO.setStatus(SigaConstants.KO);
+							error.setMessage(
+									"Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado[0]);
+							deleteResponseDTO.setError(error);
+							return deleteResponseDTO;
+
+						}
+					} catch (Exception e) {
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+						error.setMessage(
+								"Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA");
+						deleteResponseDTO.setError(error);
+						return deleteResponseDTO;
+					}
+					
+
 				}
-
-				CenCuentasbancariasExample cenCuentasbancariasDelete = new CenCuentasbancariasExample();
-				cenCuentasbancariasDelete.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andIdpersonaEqualTo(Long.valueOf(datosBancariosDeleteDTO.getIdPersona()))
-						.andIdcuentaIn(idCuentasDelete);
-
-				LOGGER.info(
-						"deleteBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para eliminar cuentas bancarias");
-				response = cenCuentasbancariasExtendsMapper.updateByExampleSelective(cuentaBancaria,
-						cenCuentasbancariasDelete);
-				LOGGER.info(
-						"deleteBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para eliminar cuentas bancarias");
-
+				
 			} else {
 				LOGGER.warn(
 						"deleteBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
