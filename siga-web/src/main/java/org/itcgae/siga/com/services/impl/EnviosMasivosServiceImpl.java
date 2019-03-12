@@ -15,7 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.com.ConsultaEnvioItem;
+import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
+import org.itcgae.siga.DTOs.com.ConsultaItem;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DocumentoEnvioItem;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
@@ -24,15 +26,14 @@ import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
-import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IColaEnvios;
-import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -61,6 +62,8 @@ import org.itcgae.siga.db.mappers.EnvPlantillaremitentesMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvDestConsultaEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDocumentosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosGrupoClienteExtendsMapper;
@@ -132,7 +135,12 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	@Autowired
 	private IColaEnvios _colaEnvios;
+	
+	@Autowired
+	private ConConsultasExtendsMapper _conConsultasExtendsMapper;
 
+	@Autowired
+	private EnvDestConsultaEnvioExtendsMapper _envDestConsultaEnvioExtendsMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -1115,5 +1123,66 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 		
 		return plantilla;
 	}
-	
+
+	@Override
+	public ComboConsultaInstitucionDTO obtenerconsultasDestinatarios(HttpServletRequest request) {
+		LOGGER.info("obtenerconsultasDestinatarios() -> Entrada al servicio para obtener consultas de desinatario del envio");
+		
+		ComboConsultaInstitucionDTO response = new ComboConsultaInstitucionDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				long idObjetivo = 1;
+				List<ComboItemConsulta> consultas = _conConsultasExtendsMapper.selectConsultasDisponibles(idInstitucion, null, idObjetivo);
+				response.setConsultas(consultas);
+			}
+		}
+		
+		LOGGER.info("obtenerconsultasDestinatarios() -> Salida del servicio para obtener consultas de desinatario del envio");
+		return response;
+	}
+
+	@Override
+	public ConsultasDTO consultasDestAsociadas(HttpServletRequest request, String idEnvio) {
+		LOGGER.info("consultasDestEnvio() -> Entrada al servicio para obtener consultas de asociadas desinatario del envio");
+		
+		ConsultasDTO response = new ConsultasDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try {
+					List<ConsultaItem> consultaItem = _envDestConsultaEnvioExtendsMapper.selectConsultasDestEnvio(idInstitucion, idEnvio);
+					response.setConsultaItem(consultaItem);
+				}catch(Exception e) {
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage("Error al obtener consultas asociadas al envio");
+					response.setError(error);
+				}
+				
+			}
+		}
+		
+		LOGGER.info("consultasDestEnvio() -> Salida del servicio para obtener consultas de asociadas desinatario del envio");
+		return response;
+	}
+		
 }
