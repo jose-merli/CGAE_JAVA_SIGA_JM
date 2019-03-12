@@ -34,7 +34,7 @@ public interface IPlantillasDocumentoService {
 	 * @param request
 	 * @return
 	 */
-	ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request);
+	ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request, String idClaseComunicacion);
 
 	//ComboDTO obtenerConsultasDisponibles(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 	

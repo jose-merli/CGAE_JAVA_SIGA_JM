@@ -51,6 +51,8 @@ import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvioExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
 import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
@@ -59,6 +61,7 @@ import org.itcgae.siga.db.mappers.EnvEnviosgrupoclienteMapper;
 import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillaremitentesMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDocumentosExtendsMapper;
@@ -133,6 +136,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	@Autowired
 	private IColaEnvios _colaEnvios;
 
+	@Autowired
+	private GenPropertiesMapper _genPropertiesMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -921,12 +926,19 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			if (null != usuarios && usuarios.size() > 0) {
-				
+			if (null != usuarios && usuarios.size() > 0) {				
 				
 				// crear path para almacenar el fichero
 				
-				String pathFichero = SigaConstants.rutaficherosInformesYcomunicaciones + String.valueOf(idInstitucion) + SigaConstants.carpetaDocumentosEnvio;
+				GenPropertiesKey key = new GenPropertiesKey();
+				key.setFichero(SigaConstants.FICHERO_SIGA);
+				key.setParametro(SigaConstants.parametroRutaPlantillas);
+				
+				GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+				
+				String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + SigaConstants.carpetaDocumentosEnvio + SigaConstants.pathSeparator + String.valueOf(idInstitucion) + SigaConstants.pathSeparator;
+				
+				String pathFichero = rutaPlantilla;
 				
 				// 1. Coger archivo del request
 				LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
@@ -936,7 +948,11 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
 				//BufferedOutputStream stream = null;
 				try {
-					File aux = new File(pathFichero);
+					File aux = new File(rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + SigaConstants.carpetaDocumentosEnvio + SigaConstants.pathSeparator);
+					// creo directorio si no existe
+					aux.mkdirs();
+					
+					aux = new File(pathFichero);
 					// creo directorio si no existe
 					aux.mkdirs();
 					File serverFile = new File(pathFichero, fileName);

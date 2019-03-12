@@ -41,6 +41,9 @@ import org.itcgae.siga.com.services.IPlantillasEnvioService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.entities.ModClasecomunicaciones;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumentoExample;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumentoKey;
@@ -49,6 +52,8 @@ import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijo;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
@@ -109,6 +114,12 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	@Autowired
 	ModModeloPlantillaDocumentoExtendsMapper modModeloPlantillaDocumentoExtendsMapper;
 	
+	@Autowired
+	private GenPropertiesMapper _genPropertiesMapper;
+	
+	@Autowired
+	private ModClasecomunicacionesMapper _modClasecomunicacionesMapper;
+	
 	@Override
 	public ConsultasDTO obtenerConsultasPlantilla(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc, boolean historico) {
 		LOGGER.info("obtenerConsultasPlantilla() -> Entrada al servicio para obtener las consultas de una plantilla de documento");
@@ -129,6 +140,11 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
+					
+					if(plantillaDoc.getIdInstitucion() != null && plantillaDoc.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)) {
+						plantillaDoc.setIdInstitucion(String.valueOf(SigaConstants.IDINSTITUCION_2000));
+					}
+					
 					listaConsultaItem = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()), Long.parseLong(plantillaDoc.getIdInforme()), usuario.getIdlenguaje(), historico);			
 					if(listaConsultaItem != null && listaConsultaItem.size()> 0){
 						for(ConsultaItem consulta :listaConsultaItem){
@@ -175,6 +191,10 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					Long idClaseComunicacion = null;
 					if(plantillaDoc.getIdClaseComunicacion() != null){
 						idClaseComunicacion = Long.parseLong(plantillaDoc.getIdClaseComunicacion());
+					}
+					
+					if(plantillaDoc.getIdInstitucion() != null && plantillaDoc.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)) {
+						plantillaDoc.setIdInstitucion(String.valueOf(SigaConstants.IDINSTITUCION_2000));
 					}
 					
 					LOGGER.debug("Obtenemos las consultas CONDICIONAL");
@@ -246,6 +266,10 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	@Override
 	public Error guardarConsultasPlantilla(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		LOGGER.info("guardarConsultasPlantilla() -> Entrada al servicio para guardar las consultas de la plantilla");
+		
+		if(plantillaDoc != null && plantillaDoc.getIdInstitucion() != null && plantillaDoc.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)) {
+			plantillaDoc.setIdInstitucion(String.valueOf(SigaConstants.IDINSTITUCION_2000));
+		}
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -408,7 +432,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 
 
 	@Override
-	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request) {
+	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request, String idClaseComunicacion) {
 		LOGGER.info("uploadFile() -> Entrada al servicio para subir una plantilla de documento");
 		
 		ResponseDocumentoDTO response = new ResponseDocumentoDTO();
@@ -417,6 +441,8 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ModClasecomunicaciones modClase = null;
+		String rutaPlantillaClase = "";
 		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -424,10 +450,29 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			if (null != usuarios && usuarios.size() > 0) {
 				
+				// OBtenemos la ruta de las plantillas
+				if(idClaseComunicacion != null) {
+					modClase = _modClasecomunicacionesMapper.selectByPrimaryKey(Short.parseShort(idClaseComunicacion));
+					if(modClase != null) {
+						rutaPlantillaClase = modClase.getRutaplantilla();
+					}					
+				}
 				
-				// crear path para almacenar el fichero				
-				String pathFichero = SigaConstants.rutaficherosInformesYcomunicaciones + String.valueOf(idInstitucion) + SigaConstants.carpetaPlantillasDocumento;
+				if(rutaPlantillaClase == null || "".equals(rutaPlantillaClase)) {
+					rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+				}
 				
+				// crear path para almacenar el fichero		
+				GenPropertiesKey key = new GenPropertiesKey();
+				key.setFichero(SigaConstants.FICHERO_SIGA);
+				key.setParametro(SigaConstants.parametroRutaPlantillas);
+				
+				GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+				
+				String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator + String.valueOf(idInstitucion) + SigaConstants.pathSeparator;
+				
+				String pathFichero = rutaPlantilla;
+			
 				// 1. Coger archivo del request
 				LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
 				Iterator<String> itr = request.getFileNames();
@@ -952,6 +997,8 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		ResponseFileDTO response = new ResponseFileDTO();
 		Error error = new Error();
+		ModClasecomunicaciones modClase = null;
+		String rutaPlantillaClase = "";
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -967,10 +1014,34 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					
 					ModPlantilladocumento plantillaDocumento = modPlantilladocumentoMapper.selectByPrimaryKey(Long.parseLong(idPlantillaDoc));
 					if(plantillaDocumento != null){
+						
+
+						// OBtenemos la ruta de las plantillas
+						if(plantillaDoc.getIdClaseComunicacion() != null) {
+							modClase = _modClasecomunicacionesMapper.selectByPrimaryKey(Short.parseShort(plantillaDoc.getIdClaseComunicacion()));
+							if(modClase != null) {
+								rutaPlantillaClase = modClase.getRutaplantilla();
+							}					
+						}
+						
+						if("".equals(rutaPlantillaClase)) {
+							rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+						}
+						
+						
 						// Obtenemos el nombre del fichero
 						String nombrePlantilla = plantillaDocumento.getPlantilla();
 
-						String pathFichero = SigaConstants.rutaficherosInformesYcomunicaciones + String.valueOf(idInstitucion) + SigaConstants.carpetaPlantillasDocumento;						
+						GenPropertiesKey key = new GenPropertiesKey();
+						key.setFichero(SigaConstants.FICHERO_SIGA);
+						key.setParametro(SigaConstants.parametroRutaPlantillas);
+						
+						GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+						
+						String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator + String.valueOf(idInstitucion) + SigaConstants.pathSeparator;
+						
+						String pathFichero = rutaPlantilla;				
+		
 						
 						File file = new File(pathFichero + nombrePlantilla);
 						

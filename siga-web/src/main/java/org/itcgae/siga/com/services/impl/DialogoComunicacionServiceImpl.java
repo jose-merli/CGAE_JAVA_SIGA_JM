@@ -60,6 +60,7 @@ import org.itcgae.siga.db.entities.EnvDestinatarios;
 import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
 import org.itcgae.siga.db.entities.EnvEnvios;
+import org.itcgae.siga.db.entities.EnvEnviosExample;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
@@ -91,6 +92,7 @@ import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvConsultasEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModClasecomunicacionRutaExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModClasecomunicacionesExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModKeyclasecomunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPlantillaDocumentoExtendsMapper;
@@ -193,9 +195,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	private CenPersonaMapper _cenPersonaMapper;
 	
 	@Autowired
-	private EnvDestinatariosMapper _envDestinatariosMapper;
-		
+	private EnvDestinatariosMapper _envDestinatariosMapper;		
 
+	@Autowired
+	private ModClasecomunicacionesExtendsMapper _modClasecomunicacionesExtendsMapper;
+	
 	@Override
 	public ComboDTO obtenerClaseComunicaciones(HttpServletRequest request, String rutaClaseComunicacion) {
 		LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clases comunicacion");
@@ -397,18 +401,28 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		HashMap<String,Object> hDatosGenerales = new HashMap<String, Object>();
 		HashMap<String,Object> hDatosFinal = new HashMap<String, Object>();	
 		int numFicheros = 0;
+		
+		String rutaPlantillaClase = "";
+		ModClasecomunicaciones modClase = null;
 
 		try{
 			if(dialogo != null && dialogo.getModelos() != null && dialogo.getModelos().size() > 0){
 				
 				//Obtenemos el campo del Sufijo asociado a la clase de la comunicación
 				
-				ModClasecomunicaciones modClase = _modClasecomunicacionesMapper.selectByPrimaryKey(Short.parseShort(dialogo.getIdClaseComunicacion()));
+				if(dialogo.getIdClaseComunicacion() != null) {
+					modClase = _modClasecomunicacionesMapper.selectByPrimaryKey(Short.parseShort(dialogo.getIdClaseComunicacion()));
+				}
 				
 				String campoSufijo = "";
 				
 				if(modClase != null){
 					campoSufijo = modClase.getSufijo();
+					rutaPlantillaClase = modClase.getRutaplantilla();
+				}
+				
+				if(rutaPlantillaClase == null || "".equals(rutaPlantillaClase)) {
+					rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
 				}
 				
 				generarComunicacion.setFechaProgramada(dialogo.getFechaProgramada());
@@ -613,13 +627,32 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																	numFicheros++;
 																	
 																	//Otenemos el nombre del fichero de salida
-																	String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaTmp;
-																	String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
+																	
+																	//Obtenemos la ruta temporal
+																	GenPropertiesKey key = new GenPropertiesKey();
+																	key.setFichero(SigaConstants.FICHERO_SIGA);
+																	key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+																	
+																	GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
+																	
+																	String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + dialogo.getIdInstitucion() + SigaConstants.pathSeparator + SigaConstants.carpetaTmp + SigaConstants.pathSeparator;
+																	
+																	key = new GenPropertiesKey();
+																	key.setFichero(SigaConstants.FICHERO_SIGA);
+																	key.setParametro(SigaConstants.parametroRutaPlantillas);
+																	
+																	GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+																	
+																	String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator + dialogo.getIdInstitucion() + SigaConstants.pathSeparator;
+																	
+																	
+																	String pathFicheroSalida = rutaTmp;
+																	String pathPlantilla = rutaPlantilla;
 																	
 																	//Si no existe el directorio temporal lo creamos
 																	File dir = new File(pathFicheroSalida);
 																	if(!dir.exists()){
-																		dir.mkdir();
+																		dir.mkdirs();
 																	}	
 																	
 																	
@@ -710,9 +743,31 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 													}else{
 														LOGGER.debug("No hay consulta de multidocumento");
 														
-														//Otenemos el nombre del fichero de salida
-														String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
-														String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
+														GenPropertiesKey key = new GenPropertiesKey();
+														key.setFichero(SigaConstants.FICHERO_SIGA);
+														key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+														
+														GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
+														
+														String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + dialogo.getIdInstitucion() + SigaConstants.pathSeparator + SigaConstants.carpetaTmp + SigaConstants.pathSeparator;
+														
+														key = new GenPropertiesKey();
+														key.setFichero(SigaConstants.FICHERO_SIGA);
+														key.setParametro(SigaConstants.parametroRutaPlantillas);
+														
+														GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+														
+														String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator + dialogo.getIdInstitucion() + SigaConstants.pathSeparator;
+														
+														
+														String pathFicheroSalida = rutaTmp;
+														String pathPlantilla = rutaPlantilla;
+														
+														//Si no existe el directorio temporal lo creamos
+														File dir = new File(pathFicheroSalida);
+														if(!dir.exists()){
+															dir.mkdirs();
+														}
 														
 														File filePlantilla = new File(pathPlantilla + nombrePlantilla);
 														if(!filePlantilla.exists()){
@@ -1435,6 +1490,29 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		List<String> listaIdPlantilla = _envConsultasEnvioExtendsMapper.selectPlantillasByEnvio(idInstitucion, idEnvio);
 		List<DatosDocumentoItem> listaFicheros = new ArrayList<DatosDocumentoItem>();
 		Long idModeloComunicacion = null;
+		String directorioPlantillaClase = "";
+		
+		//Obtenemos la clase de comunicacion del modelo (si tiene)	
+		EnvEnviosExample envioExample = new EnvEnviosExample();
+		envioExample.createCriteria().andIdenvioEqualTo(Long.parseLong(idEnvio)).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		
+		List<EnvEnvios> envios = _envEnviosMapper.selectByExample(envioExample);
+		
+		if(envios!=null && envios.size()>0) {
+			EnvEnvios envio = envios.get(0);
+			Long idModeloComunicacionEnvio = envio.getIdmodelocomunicacion();
+			if(idModeloComunicacionEnvio != null) {
+				List<ClaseComunicacionItem> modClaseItem = _modClasecomunicacionesExtendsMapper.selectClaseComunicacionModulo(String.valueOf(idModeloComunicacionEnvio));
+				if(modClaseItem != null && modClaseItem.size() > 0) {
+					ClaseComunicacionItem claseItem = modClaseItem.get(0);
+					directorioPlantillaClase = claseItem.getRutaPlantilla();
+				}
+			}
+		}
+		
+		if(directorioPlantillaClase == null || "".equals(directorioPlantillaClase)) {
+			directorioPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+		}
 		
 		if(listaIdPlantilla != null && listaIdPlantilla.size() > 0){
 			for(String idPlantilla : listaIdPlantilla){
@@ -1473,8 +1551,19 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				if(listaConsultas != null && listaConsultas.size() > 0){
 					for(EnvConsultasenvio consulta: listaConsultas){
 						Map<String,String> mapa = new HashMap<String,String>();
-						mapa = _consultasService.obtenerMapaConsulta(consulta.getConsulta());
-						List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
+						List<Map<String, Object>> result = null;
+						String sentencia = consulta.getConsulta();
+						
+						sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
+						
+						if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+								|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+								|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+							
+							LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+						}else {
+							result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+						}
 						
 						if(result != null && result.size() > 0){
 							continua = true;
@@ -1500,13 +1589,23 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					for(EnvConsultasenvio consultaDest: listaConsultasDest){
 						idModeloComunicacion = consultaDest.getIdmodelocomunicacion();
 						// Ejecutamos la consulta
-						Map<String,String> mapa = new HashMap<String,String>();
-						mapa = _consultasService.obtenerMapaConsulta(consultaDest.getConsulta());
-						List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
-						if(result != null && result.size() > 0){
-							for(Map<String,Object> dest : result){
-								hDatosGenerales.putAll(dest);
-							}							
+						
+						String sentencia = consultaDest.getConsulta();
+						
+						sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
+						
+						if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+								|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+								|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+							
+							LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+						}else {
+							List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+							if(result != null && result.size() > 0){
+								for(Map<String,Object> dest : result){
+									hDatosGenerales.putAll(dest);
+								}							
+							}
 						}
 						
 					}
@@ -1517,16 +1616,27 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					List<EnvConsultasenvio> listaConsultasMulti = _envConsultasenvioMapper.selectByExampleWithBLOBs(example);
 					if(listaConsultasMulti != null && listaConsultasMulti.size() > 0){
 						for(EnvConsultasenvio consultaMulti: listaConsultasMulti){
+							List<Map<String,Object>> resultMulti = null;
+							
 							// Ejecutamos la consulta
-							Map<String,String> mapa = new HashMap<String,String>();
-							mapa = _consultasService.obtenerMapaConsulta(consultaMulti.getConsulta());
 							
 							if(campoSufijo == null || !"".equalsIgnoreCase(campoSufijo)){
 								campoSufijo = consultaMulti.getSufijo();
 							}
 							
-							List<Map<String,Object>> resultMulti = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
+							String sentencia = consultaMulti.getConsulta();
 							
+							sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
+							
+							if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+									|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+									|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+								
+								LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+							}else {
+								resultMulti = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+							}
+														
 							int numFicheros = 0;
 							if(resultMulti != null && resultMulti.size() > 0){
 								for(int k = 0;k<resultMulti.size();k++){
@@ -1540,13 +1650,30 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									PlantillaModeloDocumentoDTO plantilla = plantillas.get(0);
 									
 									//Otenemos el nombre del fichero de salida
-									String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + idInstitucion + SigaConstants.carpetaTmp;
-									String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + idInstitucion + SigaConstants.carpetaPlantillasDocumento;
+									GenPropertiesKey key = new GenPropertiesKey();
+									key.setFichero(SigaConstants.FICHERO_SIGA);
+									key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+									
+									GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
+									
+									String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator + SigaConstants.carpetaTmp + SigaConstants.pathSeparator;
+									
+									key = new GenPropertiesKey();
+									key.setFichero(SigaConstants.FICHERO_SIGA);
+									key.setParametro(SigaConstants.parametroRutaPlantillas);
+									
+									GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+									
+									String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + directorioPlantillaClase + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator;
+									
+									
+									String pathFicheroSalida = rutaTmp;
+									String pathPlantilla = rutaPlantilla;
 									
 									//Si no existe el directorio temporal lo creamos
 									File dir = new File(pathFicheroSalida);
 									if(!dir.exists()){
-										dir.mkdir();
+										dir.mkdirs();
 									}	
 									
 									
@@ -1617,14 +1744,30 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						List<PlantillaModeloDocumentoDTO> plantillas = _modModeloPlantillaDocumentoExtendsMapper.selectPlantillaGenerar(idModeloComunicacion, Long.parseLong(idPlantilla));
 						PlantillaModeloDocumentoDTO plantilla = plantillas.get(0);
 						
-						//Otenemos el nombre del fichero de salida
-						String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + idInstitucion + SigaConstants.carpetaTmp;
-						String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + idInstitucion + SigaConstants.carpetaPlantillasDocumento;
+						GenPropertiesKey key = new GenPropertiesKey();
+						key.setFichero(SigaConstants.FICHERO_SIGA);
+						key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+						
+						GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
+						
+						String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator + SigaConstants.carpetaTmp + SigaConstants.pathSeparator;
+						
+						key = new GenPropertiesKey();
+						key.setFichero(SigaConstants.FICHERO_SIGA);
+						key.setParametro(SigaConstants.parametroRutaPlantillas);
+						
+						GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+						
+						String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + directorioPlantillaClase + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator;
+						
+						
+						String pathFicheroSalida = rutaTmp;
+						String pathPlantilla = rutaPlantilla;
 						
 						//Si no existe el directorio temporal lo creamos
 						File dir = new File(pathFicheroSalida);
 						if(!dir.exists()){
-							dir.mkdir();
+							dir.mkdirs();
 						}	
 						
 						

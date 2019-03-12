@@ -17,6 +17,8 @@ public interface IBusquedaPerService {
 	
 	public BusquedaPerFisicaDTO searchPerFisica(int numPagina, BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, HttpServletRequest request);
 	
-	public ColegiadoGeneralDTO searchPerByIdPersona(String persona, HttpServletRequest request);	
+	public ColegiadoGeneralDTO searchPerByIdPersona(String persona, HttpServletRequest request);
+
+	public ColegiadoGeneralDTO searchPerByIdPersonaIdInstitucion(String idPersona, String idInstitucionPersona, HttpServletRequest request);	
 	
 }

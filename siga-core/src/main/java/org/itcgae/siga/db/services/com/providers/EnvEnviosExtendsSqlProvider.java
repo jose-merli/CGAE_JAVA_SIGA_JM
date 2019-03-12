@@ -42,8 +42,8 @@ public class EnvEnviosExtendsSqlProvider {
 		if(filtros.getDescripcion() != null && !filtros.getDescripcion().trim().equals("")){
 			sql.WHERE(filtroTextoBusquedas("ENVIO.DESCRIPCION",filtros.getDescripcion()));
 		}
-		if(filtros.getidEstado() != null && !filtros.getidEstado().trim().equals("")){
-			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getidEstado() +"'");
+		if(filtros.getIdEstado() != null && !filtros.getIdEstado().trim().equals("")){
+			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getIdEstado() +"'");
 //			if(filtros.getidEstado().equals("6")){
 //				sql.WHERE("ENVIO.FECHABAJA IS NOT NULL");
 //			}else{
@@ -66,8 +66,8 @@ public class EnvEnviosExtendsSqlProvider {
 			fechaProgramacion2 += " 23:59:59";
 			sql.WHERE("(ENVIO.FECHAPROGRAMADA >= TO_DATE('" + fechaProgramacion + "', 'DD/MM/YYYY HH24:MI:SS') AND ENVIO.FECHAPROGRAMADA <= TO_DATE('" + fechaProgramacion2 + "', 'DD/MM/YYYY HH24:MI:SS'))");
 		}
-		if(filtros.getidTipoEnvios() != null && !filtros.getidTipoEnvios().trim().equals("")){
-			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getidTipoEnvios() +"'");
+		if(filtros.getIdTipoEnvios() != null && !filtros.getIdTipoEnvios().trim().equals("")){
+			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() +"'");
 		}
 		sql.ORDER_BY("ENVIO.FECHA");
 		
@@ -107,11 +107,13 @@ public class EnvEnviosExtendsSqlProvider {
 		sql.SELECT("(SELECT CAT.DESCRIPCION FROM ENV_ESTADOENVIO ESTADO LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = ESTADO.NOMBRE WHERE ESTADO.IDESTADO = ENVIO.IDESTADO AND CAT.IDLENGUAJE = '"+ idLenguaje +"') AS ESTADOENVIO");
 		sql.SELECT("ENVIO.IDMODELOCOMUNICACION, CLASE.IDCLASECOMUNICACION");
 		sql.SELECT("CLASE.NOMBRE AS NOMBRECLASE, (SELECT NOMBRE FROM MOD_MODELOCOMUNICACION WHERE IDMODELOCOMUNICACION = ENVIO.IDMODELOCOMUNICACION) AS NOMBREMODELO");
-		sql.SELECT("(SELECT DEST.NOMBRE || ' ' ||DEST.APELLIDOS1 || ' ' || DEST.APELLIDOS2 FROM ENV_DESTINATARIOS DEST WHERE DEST.IDENVIO = ENVIO.IDENVIO) AS DESTINATARIO");
+		sql.SELECT("(DEST.NOMBRE || ' ' ||DEST.APELLIDOS1 || ' ' || DEST.APELLIDOS2) AS DESTINATARIO");
 		
 		sql.FROM("ENV_ENVIOS ENVIO");
 		sql.JOIN("ENV_PLANTILLASENVIOS PLANTILLA ON PLANTILLA.IDINSTITUCION = '" + idInstitucion + "' AND PLANTILLA.IDPLANTILLAENVIOS = ENVIO.IDPLANTILLAENVIOS AND PLANTILLA.IDTIPOENVIOS = ENVIO.IDTIPOENVIOS");
-		sql.JOIN("MOD_CLASECOMUNICACIONES CLASE ON CLASE.IDCLASECOMUNICACION = (SELECT IDCLASECOMUNICACION FROM MOD_MODELOCOMUNICACION WHERE IDMODELOCOMUNICACION = MODELO.IDMODELOCOMUNICACION)");
+		sql.JOIN("MOD_CLASECOMUNICACIONES CLASE ON CLASE.IDCLASECOMUNICACION = (SELECT IDCLASECOMUNICACION FROM MOD_MODELOCOMUNICACION WHERE IDMODELOCOMUNICACION = ENVIO.IDMODELOCOMUNICACION)");
+		sql.JOIN("ENV_DESTINATARIOS DEST ON DEST.IDENVIO = ENVIO.IDENVIO");
+		sql.LEFT_OUTER_JOIN("CEN_COLEGIADO COLEGIADO ON COLEGIADO.IDPERSONA = DEST.IDPERSONA AND COLEGIADO.IDINSTITUCION = ENVIO.IDINSTITUCION");
 		
 		sql.WHERE("ENVIO.IDINSTITUCION = '" + idInstitucion +"'");
 		//controlamos con este campo si es 'A' pertenece a comunicaciones
@@ -120,8 +122,8 @@ public class EnvEnviosExtendsSqlProvider {
 		if(filtros.getDescripcion() != null && !filtros.getDescripcion().trim().equals("")){
 			sql.WHERE(filtroTextoBusquedas("ENVIO.DESCRIPCION",filtros.getDescripcion()));
 		}
-		if(filtros.getidEstado() != null && !filtros.getidEstado().trim().equals("")){
-			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getidEstado() +"'");
+		if(filtros.getIdEstado() != null && !filtros.getIdEstado().trim().equals("")){
+			sql.WHERE("ENVIO.IDESTADO = '" + filtros.getIdEstado() +"'");
 		}
 		if(filtros.getIdClaseComunicacion() != null && !filtros.getIdClaseComunicacion().trim().equals("")){
 			sql.WHERE("CLASE.IDCLASECOMUNICACION = '" + filtros.getIdClaseComunicacion() +"'");
@@ -140,8 +142,37 @@ public class EnvEnviosExtendsSqlProvider {
 			fechaProgramacion2 += " 23:59:59";
 			sql.WHERE("(ENVIO.FECHAPROGRAMADA >= TO_DATE('" + fechaProgramacion + "', 'DD/MM/YYYY HH24:MI:SS') AND ENVIO.FECHAPROGRAMADA <= TO_DATE('" + fechaProgramacion2 + "', 'DD/MM/YYYY HH24:MI:SS'))");
 		}
-		if(filtros.getidTipoEnvios() != null && !filtros.getidTipoEnvios().trim().equals("")){
-			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getidTipoEnvios() +"'");
+		if(filtros.getIdTipoEnvios() != null && !filtros.getIdTipoEnvios().trim().equals("")){
+			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() +"'");
+		}
+		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
+			sql.WHERE("DEST.NOMBRE LIKE '%" + filtros.getNombre() +"%'");
+		}
+		
+		if(filtros.getApellidos() != null && !filtros.getApellidos().trim().equals("")){
+			String[] apellidos = filtros.getApellidos().split(" ");
+			String whereApellidos = "";
+			for(int i=0; i< apellidos.length; i++) {
+				String apellidoBuscar = apellidos[i];
+				if(i!=0) {
+					whereApellidos = whereApellidos + " OR ";
+				}
+				whereApellidos = whereApellidos + "DEST.APELLIDOS1 LIKE '%" + apellidoBuscar +"%' OR DEST.APELLIDOS2 LIKE '%" + apellidoBuscar + "%' ";
+			}
+			
+			sql.WHERE("(" + whereApellidos + ")");
+		}		
+		
+		if(filtros.getNif() != null && !filtros.getNif().trim().equals("")){
+			sql.WHERE("DEST.NIFCIF LIKE '%" + filtros.getNif() +"%'");
+		}
+		
+		if(filtros.getNumColegiado() != null && !filtros.getNumColegiado().trim().equals("")){
+			sql.WHERE("COLEGIADO.NCOLEGIADO LIKE '%" + filtros.getNumColegiado() +"%'");
+		}
+		
+		if(filtros.getIdInstitucion() != null && !filtros.getIdInstitucion().trim().equals("")){
+			sql.WHERE("DEST.IDINSTITUCION = '" + filtros.getIdInstitucion() +"'");
 		}
 		sql.ORDER_BY("ENVIO.FECHA");
 		

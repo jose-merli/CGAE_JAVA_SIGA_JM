@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.websocket.server.PathParam;
+import javax.ws.rs.QueryParam;
 
 import org.itcgae.siga.DTOs.com.ComboConsultasDTO;
 import org.itcgae.siga.DTOs.com.ComboSufijoDTO;
@@ -25,6 +27,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -121,9 +124,9 @@ public class PlantillasDocumentoController {
 	}	
 	
 	@RequestMapping(value = "/subirPlantilla",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	ResponseEntity<ResponseDocumentoDTO> uploadFile(MultipartHttpServletRequest request) throws Exception{
+	ResponseEntity<ResponseDocumentoDTO> uploadFile(MultipartHttpServletRequest request, @QueryParam("idClaseComunicacion") String idClaseComunicacion) throws Exception{
 		
-		ResponseDocumentoDTO response = _plantillasDocumentoService.uploadFile(request);
+		ResponseDocumentoDTO response = _plantillasDocumentoService.uploadFile(request, idClaseComunicacion);
 		if(response.getError() == null)
 			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.OK);	
 		else

@@ -217,9 +217,19 @@ public class ColaEnviosImpl implements IColaEnvios {
 			// Las ejecutamos y obtenemos los resultados
 			List<Map<String, Object>> resultadosConsultas = new ArrayList<Map<String, Object>>();
 			for (EnvConsultasenvio consultaDatos : consultasDatosPlantilla) {
-				Map<String,String> query =_consultasService.obtenerMapaConsulta(consultaDatos.getConsulta());
-				List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(query);
-				resultadosConsultas.addAll(result);
+				String sentencia = consultaDatos.getConsulta();
+				
+				sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
+				
+				if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+						|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+						|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+					
+					LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+				}else {
+					List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+					resultadosConsultas.addAll(result);
+				}
 			}
 			String asuntoFinal = remplazarCamposAsunto(plantilla.getAsunto() != null ? plantilla.getAsunto():"", resultadosConsultas);
 			String cuerpoFinal = remplazarCamposCuerpo(plantilla.getCuerpo() != null ? plantilla.getCuerpo():"", resultadosConsultas);
@@ -315,10 +325,21 @@ public class ColaEnviosImpl implements IColaEnvios {
 		
 				// Las ejecutamos y obtenemos los resultados
 				List<Map<String, Object>> resultadosConsultas = new ArrayList<Map<String, Object>>();
-				for (EnvConsultasenvio consultaDatos : consultasDatosPlantilla) {
-					Map<String,String> query =_consultasService.obtenerMapaConsulta(consultaDatos.getConsulta());
-					List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(query);
-					resultadosConsultas.addAll(result);
+				for (EnvConsultasenvio consultaDatos : consultasDatosPlantilla) {					
+					
+					String sentencia = consultaDatos.getConsulta();
+					
+					sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
+					
+					if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+							|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+							|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+						
+						LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+					}else {
+						List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+						resultadosConsultas.addAll(result);
+					}
 				}
 				String asuntoFinal = remplazarCamposAsunto(plantilla.getAsunto() != null ? plantilla.getAsunto():"", resultadosConsultas);
 				String cuerpoFinal = remplazarCamposCuerpo(plantilla.getCuerpo() != null ? plantilla.getCuerpo():"", resultadosConsultas);
@@ -442,10 +463,19 @@ public class ColaEnviosImpl implements IColaEnvios {
 	
 			// Las ejecutamos y obtenemos los resultados
 			List<Map<String, Object>> resultadosConsultas = new ArrayList<Map<String, Object>>();
-			for (EnvConsultasenvio consultaDatos : consultasDatosPlantilla) {
-				Map<String,String> query =_consultasService.obtenerMapaConsulta(consultaDatos.getConsulta());
-				List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(query);
-				resultadosConsultas.addAll(result);
+			for (EnvConsultasenvio consultaDatos : consultasDatosPlantilla) {				
+				String sentencia = consultaDatos.getConsulta();				
+				sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
+				
+				if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+						|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+						|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+					
+					LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+				}else {
+					List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+					resultadosConsultas.addAll(result);
+				}				
 			}
 			String cuerpoFinal = remplazarCamposCuerpo(plantilla.getCuerpo(), resultadosConsultas);
 			// Realizamos el envio por SMS

@@ -48,11 +48,14 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -111,6 +114,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 	@Autowired
 	private EnvTipoEnvioExtendsMapper _envTipoEnvioExtendsMapper;
 
+	@Autowired
+	private GenPropertiesMapper _genPropertiesMapper;
 	
 	@Override
 	public ComboDTO modulo(HttpServletRequest request) {
@@ -789,12 +794,22 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 						if(result != null && result.size() > 0){
 							Workbook workBook = crearExcel(result);
-							File aux = new File(SigaConstants.rutaExcelConsultaTemp);
+							
+							//Obtenemos la ruta temporal
+							GenPropertiesKey key = new GenPropertiesKey();
+							key.setFichero(SigaConstants.FICHERO_SIGA);
+							key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+							
+							GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
+							
+							String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator + SigaConstants.carpetaTmp;
+							
+							File aux = new File(rutaTmp);
 							// creo directorio si no existe
 							aux.mkdirs();
 							String nombreFichero = SigaConstants.nombreExcelConsulta + new Date().getTime()+".xlsx";
-							excel = new File(SigaConstants.rutaExcelConsultaTemp, nombreFichero);
-							FileOutputStream fileOut = new FileOutputStream(SigaConstants.rutaExcelConsultaTemp + nombreFichero);
+							excel = new File(rutaTmp, nombreFichero);
+							FileOutputStream fileOut = new FileOutputStream(rutaTmp + SigaConstants.pathSeparator + nombreFichero);
 							workBook.write(fileOut);
 					        fileOut.close();
 					        workBook.close();
@@ -819,8 +834,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 		return response;
 	}
 	
-	
-	private String quitarEtiquetas(String sentencia) {
+	@Override
+	public String quitarEtiquetas(String sentencia) {
 		
 		sentencia = sentencia.replaceAll("<SELECT>", " ");
 		sentencia = sentencia.replaceAll("</SELECT>", " ");
@@ -838,6 +853,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 		sentencia = sentencia.replaceAll("</WHERE>", " ");
 		sentencia = sentencia.replaceAll("<ORDERBY>", " ");
 		sentencia = sentencia.replaceAll("</ORDERBY>", " ");
+		sentencia = sentencia.replaceAll("<ORDER BY>", " ");
+		sentencia = sentencia.replaceAll("</ORDER BY>", " ");
 		sentencia = sentencia.replaceAll("<GROUPBY>", " ");
 		sentencia = sentencia.replaceAll("</GROUPBY>", " ");
 		sentencia = sentencia.replaceAll("<HAVING>", " ");
@@ -2135,10 +2152,17 @@ public class ConsultasServiceImpl implements IConsultasService{
 	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws ParseException, SigaExceptions{
 		
 		List<Map<String,Object>> result = null;
-
-		Map<String, String> mapConsulta = obtenerMapaConsulta(sentencia);		
 		
-		result = _conConsultasExtendsMapper.ejecutarConsulta(mapConsulta);	
+		sentencia = quitarEtiquetas(sentencia.toUpperCase());
+		
+		if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+				|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+				|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+			
+			LOGGER.error("ejecutarConsultaConClaves() -> Consulta no permitida: " + sentencia);
+		}else {
+			result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+		}
 		
 		return result;
 	}

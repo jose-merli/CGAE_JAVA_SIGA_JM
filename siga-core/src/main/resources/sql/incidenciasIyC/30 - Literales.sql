@@ -1,0 +1,29 @@
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.destinatario','Destinatario','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.destinatario','Destinatario#GL','0','4',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.destinatario','Destinatario#CAT','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.destinatario','Destinatario#EU','0','3',sysdate,'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.claseComunicacion','Clases de comunicaciones','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.claseComunicacion','Clases de comunicaciones#GL','0','4',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.claseComunicacion','Clases de comunicaciones#CAT','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.claseComunicacion','Clases de comunicaciones#EU','0','3',sysdate,'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.fechaCreacion','Fecha creación','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.fechaCreacion','Fecha creación#GL','0','4',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.fechaCreacion','Fecha creación#CAT','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.fechaCreacion','Fecha creación#EU','0','3',sysdate,'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.fechaProgramada','Fecha programación','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.fechaProgramada','Fecha programación#GL','0','4',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.fechaProgramada','Fecha programación#CAT','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.fechaProgramada','Fecha programación#EU','0','3',sysdate,'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.tipoEnvio','Tipo envío','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.tipoEnvio','Tipo envío#GL','0','4',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.tipoEnvio','Tipo envío#CAT','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.tipoEnvio','Tipo envío#EU','0','3',sysdate,'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.estadoEnvio','Estado','0','1',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.estadoEnvio','Estado#GL','0','4',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.estadoEnvio','Estado#CAT','0','2',sysdate,'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('informesycomunicaciones.comunicaciones.busqueda.estadoEnvio','Estado#EU','0','3',sysdate,'0','19');

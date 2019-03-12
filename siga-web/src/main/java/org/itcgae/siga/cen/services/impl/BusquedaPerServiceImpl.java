@@ -557,5 +557,50 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 		
 		return personaEncontrada;
 	}
+	
+	@Override
+	public ColegiadoGeneralDTO searchPerByIdPersonaIdInstitucion(String idPersona, String idInstitucionPersona, HttpServletRequest request) {
+		
+		LOGGER.info("searchPerByIdPersonaIdInstitucion() -> Entrada del servicio para la búsqueda de persona por idPersona e idInstitucion");
+		
+		ColegiadoGeneralDTO personaEncontrada = new ColegiadoGeneralDTO();
+		Error error = new Error();
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				// Buscamos a la persona como colegiado
+				List<ColegiadoItem> colegiado = cenColegiadoExtendsMapper.selectColegiadosByIdPersona(Short.parseShort(idInstitucionPersona), idPersona);
+				
+				if(colegiado != null && colegiado.size() > 0) {
+					// Persona encontrada
+					personaEncontrada.setColegiadoItem(colegiado);
+				}else {
+					List<NoColegiadoItem> noColegiado = cenNocolegiadoExtendsMapper.selectNoColegiadosByIdPersona(Short.parseShort(idInstitucionPersona), idPersona);
+					if(noColegiado != null && noColegiado.size() > 0) {
+						personaEncontrada.setNoColegiadoItem(noColegiado);
+					}else {
+						error.setCode(404);
+						error.setDescription("Persona no encontrada");
+						error.setMessage("Persona no encontrada");
+						personaEncontrada.error(error);
+					}
+				}
+			}
+		}
+		
+		LOGGER.info("searchPerByIdPersonaIdInstitucion() -> Salida del servicio para la búsqueda de persona por idPersona e idInstitucion");
+		
+		return personaEncontrada;
+	}
 
 }
