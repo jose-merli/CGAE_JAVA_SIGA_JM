@@ -255,9 +255,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if (usuarios != null && usuarios.size() > 0) {
 				try{
 					AdmUsuarios usuario = usuarios.get(0);
-					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(modeloDTO.getIdClaseComunicacion(), modeloDTO.getIdModulo());
+					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(modeloDTO.getIdClaseComunicacion(), modeloDTO.getIdModulo(), usuario.getIdlenguaje());
 					
-					for (ModelosComunicacionItem modelosComunicacionItem : modelos) {
+					/*for (ModelosComunicacionItem modelosComunicacionItem : modelos) {
 						ComboDTO comboDTO = new ComboDTO();
 						List<ComboItem> comboItems = _modModeloComunicacionExtendsMapper.selectPlantillasModelos(modelosComunicacionItem.getIdModeloComunicacion(), usuario.getIdinstitucion());
 						if(null != comboItems && comboItems.size() > 0) {
@@ -268,7 +268,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						}		
 						comboDTO.setCombooItems(comboItems);
 						modelosComunicacionItem.setPlantillas(comboItems);
-					}
+					}*/
 					respuesta.setModelosComunicacionItems(modelos);
 				}catch(Exception e){
 					Error error = new Error();
@@ -1108,7 +1108,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										for(ConsultaItem consultaItem: listaConsultas){
 											ConConsultaKey key = new ConConsultaKey();
 											key.setIdconsulta(Long.parseLong(consultaItem.getIdConsulta()));
-											key.setIdinstitucion(idInstitucion);
+											key.setIdinstitucion(Short.parseShort(consultaItem.getIdInstitucion()));
 											ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
 											if(consulta != null){
 												ArrayList<CampoDinamicoItem> campos = _consultasService.obtenerCamposDinamicos(usuario, consulta.getSentencia());
@@ -1126,17 +1126,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							}
 							
 							//Obtenemos las consultas de la plantilla de envio seleccionada
-
-							ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
-							key.setIdinstitucion(idInstitucion);
-							key.setIdmodelocomunicacion(Long.parseLong(modelo.getIdModeloComunicacion()));
-							key.setIdplantillaenvios(Integer.parseInt(modelo.getIdPlantillaEnvio()));
-							key.setIdtipoenvios(Short.parseShort(modelo.getIdTipoEnvio()));
-							ModModeloPlantillaenvio plantillaEnvio = _modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
 							
-							if(plantillaEnvio != null){
+							if(modelo.getIdPlantillaEnvio() != null && modelo.getIdTipoEnvio() != null){
 								//Obtenemos las consultas asociadas a la plantilla
-								List<ConsultaItem> listaEnvioConsultas = _modPlantillaEnvioConsultaExtendsMapper.selectPlantillaEnvioConsultas(idInstitucion, plantillaEnvio.getIdplantillaenvios(), plantillaEnvio.getIdtipoenvios());
+								List<ConsultaItem> listaEnvioConsultas = _modPlantillaEnvioConsultaExtendsMapper.selectPlantillaEnvioConsultas(idInstitucion, Integer.parseInt(modelo.getIdPlantillaEnvio()), Short.parseShort(modelo.getIdTipoEnvio()));
 								if(listaEnvioConsultas != null && listaEnvioConsultas.size() > 0){
 									for(ConsultaItem consultaEnvioItem : listaEnvioConsultas){			
 										if(consultaEnvioItem != null){
@@ -1146,7 +1139,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										}
 									}
 								}else{
-									LOGGER.info("La plantila de envio " + plantillaEnvio.getIdplantillaenvios() + " no tiene consultas asociadas");
+									LOGGER.info("La plantila de envio " + modelo.getIdPlantillaEnvio() + " no tiene consultas asociadas");
 								}
 							}else{
 								LOGGER.error("Plantilla de envio no encontrada");

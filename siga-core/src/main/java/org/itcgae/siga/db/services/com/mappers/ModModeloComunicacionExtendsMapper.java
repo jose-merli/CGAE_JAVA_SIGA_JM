@@ -9,8 +9,10 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
+import org.itcgae.siga.DTOs.com.PlantillaModeloItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.services.com.providers.ModModeloComunicacionExtendsSqlProvider;
+import org.itcgae.siga.db.services.com.providers.ModModeloPlantillaEnviosExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -30,9 +32,12 @@ public interface ModModeloComunicacionExtendsMapper {
 		@Result(column = "NOMBRECLASE", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ABREVIATURA", property = "institucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
-		@Result(column = "PORDEFECTO", property = "porDefecto", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "PORDEFECTO", property = "porDefecto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ModelosComunicacionItem> selectModelosComunicacion(String idInstitucion, DatosModelosComunicacionesSearch filtros, boolean historico);
+	List<ModelosComunicacionItem> selectModelosComunicacion(String idInstitucion, DatosModelosComunicacionesSearch filtros, String idLenguaje, boolean historico);
 	
 	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "selectModelo")
 	@Results({@Result(column = "IDMODELOCOMUNICACION", property = "idModeloComunicacion", jdbcType = JdbcType.NUMERIC),
@@ -46,17 +51,23 @@ public interface ModModeloComunicacionExtendsMapper {
 		@Result(column = "NOMBRECLASE", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ABREVIATURA", property = "institucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
-		@Result(column = "PORDEFECTO", property = "porDefecto", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "PORDEFECTO", property = "porDefecto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR)
 	})
-	ModelosComunicacionItem selectModelo(String idModelo);
+	ModelosComunicacionItem selectModelo(String idModelo, String idLenguaje);
 
 	
 	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "selectModelosComunicacionDialg")
 	@Results({@Result(column = "IDMODELOCOMUNICACION", property = "idModeloComunicacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ModelosComunicacionItem> selectModelosComunicacionDialogo(String idClaseComunicacion, String idModulo);
+	List<ModelosComunicacionItem> selectModelosComunicacionDialogo(String idClaseComunicacion, String idModulo, String idLenguaje);
 
 	
 	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "selectModelosClasesComunicacion")
@@ -82,4 +93,13 @@ public interface ModModeloComunicacionExtendsMapper {
 	@Results({ @Result(column = "NOMBRE", property = "valor", jdbcType = JdbcType.VARCHAR) 
 	})
 	StringDTO comprobarNombreDuplicado(String nombreModelo);
+
+	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "selectPlantillaPorDefecto")
+	@Results({@Result(column = "NOMBRE", property = "nombrePlantilla", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPLANTILLAENVIOS", property = "idPlantillaEnvios", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
+	})
+	List<PlantillaModeloItem> selectPlantillaPorDefecto(String idModelo, Short idInstitucion, String idLenguaje);
 }

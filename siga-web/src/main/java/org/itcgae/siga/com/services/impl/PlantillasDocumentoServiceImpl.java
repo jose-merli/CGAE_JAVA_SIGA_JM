@@ -442,7 +442,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 						// Obtenemos el idplantilladocumento para concatenarlo con el nombre del fichero
 						NewIdDTO newId = modPlantillaDocumentoExtendsMapper.selectMaxIdPlantillaDocumento();
 						int idNuevaPlantilla = Integer.parseInt(newId.getNewId()) + 1;
-						String newNombreFichero = nombreFichero + "_" + idNuevaPlantilla;
+						String newNombreFichero = nombreFichero + "_" + idNuevaPlantilla + extension;
 						
 						File aux = new File(pathFichero);
 						// creo directorio si no existe

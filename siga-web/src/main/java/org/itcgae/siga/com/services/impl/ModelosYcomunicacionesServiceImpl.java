@@ -141,8 +141,9 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
 			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
 				try{
-					modelosItem = modModeloComunicacionExtendsMapper.selectModelosComunicacion(String.valueOf(idInstitucion), filtros, historico);	
+					modelosItem = modModeloComunicacionExtendsMapper.selectModelosComunicacion(String.valueOf(idInstitucion), filtros, usuario.getIdlenguaje(), historico);	
 					if(modelosItem != null && modelosItem.size()> 0){
 						respuesta.setModelosComunicacionItem(modelosItem);
 					}
@@ -272,7 +273,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					
 					
 					//Tabla mod_modelo_plantillaenvio
-					ModModeloPlantillaenvioExample examplePlantillaEnvio = new ModModeloPlantillaenvioExample();
+					/*ModModeloPlantillaenvioExample examplePlantillaEnvio = new ModModeloPlantillaenvioExample();
 					examplePlantillaEnvio.createCriteria().andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion())).andIdinstitucionEqualTo(Short.parseShort(modeloComunicacion.getIdInstitucion())).andFechabajaIsNull();
 					
 					List<ModModeloPlantillaenvio> listaModPlantillaEnvio = modModeloPlantillaenvioMapper.selectByExample(examplePlantillaEnvio);
@@ -314,7 +315,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 								}
 							}						
 						}
-					}				
+					}*/			
 					
 					
 					respuesta.setCode(200);
@@ -584,6 +585,12 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						modeloCom.setUsumodificacion(usuario.getIdusuario());
 						modeloCom.setVisible(Short.parseShort(datosTarjeta.getVisible()));
 						
+						if(datosTarjeta.getIdPlantillaEnvio() != null) {
+							modeloCom.setIdplantillaenvios(Long.parseLong(datosTarjeta.getIdPlantillaEnvio()));
+						}
+						if(datosTarjeta.getIdTipoEnvio() != null) {
+							modeloCom.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+						}
 						
 						modModelocomunicacionMapper.updateByPrimaryKey(modeloCom);
 					}else{
@@ -606,6 +613,13 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						modeloCom.setPreseleccionar(datosTarjeta.getPreseleccionar());
 						modeloCom.setUsumodificacion(usuario.getIdusuario());
 						modeloCom.setVisible(Short.parseShort(datosTarjeta.getVisible()));
+						
+						if(datosTarjeta.getIdPlantillaEnvio() != null) {
+							modeloCom.setIdplantillaenvios(Long.parseLong(datosTarjeta.getIdPlantillaEnvio()));
+						}
+						if(datosTarjeta.getIdTipoEnvio() != null) {
+							modeloCom.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+						}						
 						
 						modModelocomunicacionMapper.insert(modeloCom);
 					}
@@ -1084,7 +1098,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 				
 				 modeloComunicacionItem = new ModelosComunicacionItem();
 				try {
-					modeloComunicacionItem = modModeloComunicacionExtendsMapper.selectModelo(idModelo);
+					modeloComunicacionItem = modModeloComunicacionExtendsMapper.selectModelo(idModelo, usuario.getIdlenguaje());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1144,5 +1158,43 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		
 		return nombreFinal.getValor();
 
+	}
+
+
+	@Override
+	public PlantillasModeloDTO obtenerPlantillaPorDefecto(HttpServletRequest request, String idModelo) {
+		LOGGER.info("obtenerPlantillaPorDefecto() -> Entrada al servicio para obtener la plantilla por defecto del modelo");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		PlantillasModeloDTO respuesta = new PlantillasModeloDTO();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					List<PlantillaModeloItem> plantillas = modModeloComunicacionExtendsMapper.selectPlantillaPorDefecto(idModelo, idInstitucion, usuario.getIdlenguaje());
+					if(plantillas != null && plantillas.size() > 0){
+						respuesta.setPlantillas(plantillas);
+					}
+					
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					error.setMessage("Error");
+					respuesta.setError(error);
+				}
+			}
+		}
+		
+		LOGGER.info("obtenerPlantillaPorDefecto() -> Salida del servicio para obtener la plantilla por defecto del modelo");
+		return respuesta;
 	}
 }
