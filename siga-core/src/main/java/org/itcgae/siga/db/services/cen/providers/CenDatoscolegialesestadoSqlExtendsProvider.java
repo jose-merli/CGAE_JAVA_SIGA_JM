@@ -45,6 +45,10 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 			sql.SET("IDESTADO = " + record.getIdestado());
 		}
 		
+		if(record.getSituacionresidente() != null && !record.getSituacionresidente().equals("")) {
+			sql.SET("SITUACIONRESIDENTE = " + record.getSituacionresidente());
+		}
+		
 		if (record.getObservaciones() != null && !record.getObservaciones().equals("")) {
 			sql.SET("OBSERVACIONES = '" + record.getObservaciones() + "'");
 		}
