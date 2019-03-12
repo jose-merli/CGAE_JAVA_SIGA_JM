@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-	<classPathEntry location="C:\ojdbc6.jar" />
+	<classPathEntry location="/home/johndoe/Downloads/ojdbc6.jar"/>
 	  <context id="DB2Tables" targetRuntime="MyBatis3">
 	
 		<jdbcConnection 
@@ -116,9 +116,14 @@
 <!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 			</table> -->
 		
-				<table schema="USCGAE" tableName="ENV_ENVIOPROGRAMADO" >
+<!-- 				<table schema="USCGAE" tableName="ENV_ENVIOPROGRAMADO" > -->
+<!-- 					<property name="ignoreQualifiersAtRuntime" value="true"/> -->
+<!-- 				</table> -->
+
+				<table schema="USCGAE" tableName="ENV_DEST_CONSULTA_ENVIO" > 
 					<property name="ignoreQualifiersAtRuntime" value="true"/>
-				</table>
+ 				</table> 
+
 
 <!-- 			<table schema="USCGAE" tableName="ENV_DESTINATARIOS" > -->
 <!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->

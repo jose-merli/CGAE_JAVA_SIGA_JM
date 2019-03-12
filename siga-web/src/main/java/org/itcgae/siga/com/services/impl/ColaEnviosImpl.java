@@ -96,7 +96,6 @@ public class ColaEnviosImpl implements IColaEnvios {
 	@Autowired
 	private EnvDestinatariosMapper _envDestinatariosMapper;
 	
-
 	//@Transactional
 	@Scheduled(cron = "${cron.pattern.scheduled.Envios: 0 * * ? * *}")
 	@Override
@@ -205,6 +204,12 @@ public class ColaEnviosImpl implements IColaEnvios {
 					}
 				}
 			}
+			
+			//TODO: cambiar los destinatarios a listas de correo dinamicas tablas: env_listacorreoenvio y env_listacorreoconsulta.
+			
+			
+			
+			
 			LOGGER.info("Destinatarios encontrados: " + destinatarios.size());
 			
 			// Obtenemos las consultas asociadas de datos a la plantilla de envio.

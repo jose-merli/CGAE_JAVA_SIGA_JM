@@ -3,10 +3,10 @@ package org.itcgae.siga.com.controllers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
@@ -231,6 +231,16 @@ public class EnviosMasivosController {
 		  
 		return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
     }
+	
+	@RequestMapping(value = "/detalle/ConsultasEnvAsociadas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ConsultasDTO> obtenerConsultasAsociadas(HttpServletRequest request, @RequestBody String idEnvio) {
+		
+		ConsultasDTO response = _enviosMasivosService.consultasDestAsociadas(request, idEnvio);
+		if(response.getError() == null)
+			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 
 
 }

@@ -1,10 +1,11 @@
 package org.itcgae.siga.com.services;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
@@ -37,5 +38,6 @@ public interface IEnviosMasivosService {
 	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request) throws IOException;
 	public Error borrarDocumento(HttpServletRequest request, ResponseDocumentoDTO[] documentoDTO);
 	public PlantillaEnvioItem obtenerAsuntoYcuerpo (HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta);
-
+	public ComboConsultaInstitucionDTO obtenerconsultasDestinatarios(HttpServletRequest request);
+	public ConsultasDTO consultasDestAsociadas(HttpServletRequest request, String idEnvio);
 }
