@@ -91,9 +91,9 @@ public class ClientAlterMutua {
 	        public void doWithMessage(WebServiceMessage message) {
 	            try {
 	                SoapMessage soapMessage = (SoapMessage)message;
-	                ((SoapMessage)message).setSoapAction("https://preproduccion.altermutua.com/WSSIGATEST/GetEstadoColegiado");
+	                ((SoapMessage)message).setSoapAction("https://www.altermutua.com/WSSIGA/GetEstadoColegiado");
 	                SoapHeader header = soapMessage.getSoapHeader();
-	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"https://preproduccion.altermutua.com/WSSIGATEST\" "
+	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"https://www.altermutua.com/WSSIGA\" "
 	                		+ "soapenv:actor=\"http://schemas.xmlsoap.org/soap/actor/next\" soapenv:mustUnderstand=\"0\">\n"
 	                		+ "<wss:Usuario>" + user + "</wss:Usuario>\n"
 	                		+ "<wss:Clave>" + pass + "</wss:Clave>\n"
@@ -268,7 +268,7 @@ public class ClientAlterMutua {
 	                SoapMessage soapMessage = (SoapMessage)message;
 	                ((SoapMessage)message).setSoapAction("https://www.altermutua.com/WSSIGA/GetTarifaSolicitud");
 	                SoapHeader header = soapMessage.getSoapHeader();
-	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"https://preproduccion.altermutua.com/WSSIGATEST\" "
+	                StringSource headerSource = new StringSource("<wss:Credenciales xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:wss=\"https://www.altermutua.com/WSSIGA\" "
 	                		+ "soapenv:actor=\"http://schemas.xmlsoap.org/soap/actor/next\" soapenv:mustUnderstand=\"0\">\n"
 	                		+ "<wss:Usuario>" + user + "</wss:Usuario>\n"
 	                		+ "<wss:Clave>" + pass + "</wss:Clave>\n"
