@@ -185,7 +185,7 @@ public class FichaEventosServiceTest {
 		String idCurso = "1";
 		List<FormadorCursoItem> formadoresCursoItem = forTestUtils.getListFormadoresCursoItem();
 
-		when(forPersonacursoExtendsMapper.getTrainersLabels(idInstitucion.toString(), idCurso)).thenReturn(formadoresCursoItem);
+		when(forPersonacursoExtendsMapper.getTrainersLabels(idInstitucion.toString(), idCurso, "1")).thenReturn(formadoresCursoItem);
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 

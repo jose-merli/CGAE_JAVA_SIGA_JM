@@ -1,6 +1,7 @@
 package org.itcgae.siga.age.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
@@ -21,6 +22,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IFichaEventosService {
 	
@@ -69,4 +71,7 @@ public interface IFichaEventosService {
 	public void updateEstadoEventoAuto();
 	
 	public void generateNotificationsAuto();
+	
+	public UpdateResponseDTO uploadFileExcel(int idEvento, MultipartHttpServletRequest request) throws IllegalStateException, IOException;
+
 }

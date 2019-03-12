@@ -6,14 +6,17 @@ import org.itcgae.siga.db.mappers.ForPersonaCursoSqlProvider;
 
 public class ForPersonacursoSqlExtendsProvider extends ForPersonaCursoSqlProvider {
 
-	public String getTrainersLabels(String idInstitucion, String idCurso) {
+	public String getTrainersLabels(String idInstitucion, String idCurso, String idLenguaje) {
 
 		SQL sql = new SQL();
 
 		sql.SELECT_DISTINCT("cur.IDPERSONA");
 		sql.SELECT("CONCAT(per.NOMBRE || ' ' || per.APELLIDOS1 || ' ', per.APELLIDOS2) AS nombre");
+		sql.SELECT("rec.descripcion as rol");
 		sql.FROM("FOR_PERSONA_CURSO cur");
 		sql.INNER_JOIN("CEN_PERSONA per ON (per.idpersona = cur.idpersona)");
+		sql.LEFT_OUTER_JOIN("FOR_ROLES rol ON (rol.idrol = cur.idrol)");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rol.DESCRIPCION = rec.IDRECURSO AND rec.IDLENGUAJE = '" + idLenguaje + "')");
 		sql.WHERE("cur.IDCURSO = '" + idCurso + "'");
 		sql.WHERE("cur.FECHABAJA IS NULL");
 		sql.WHERE("cur.IDINSTITUCION = '" + idInstitucion + "'");
@@ -60,7 +63,7 @@ public class ForPersonacursoSqlExtendsProvider extends ForPersonaCursoSqlProvide
 		sql.INNER_JOIN("FOR_TIPOCOSTE tip ON (tip.idtipocoste = cur.idtipocoste)");
 		sql.LEFT_OUTER_JOIN("FOR_ROLES rol ON (rol.idrol = cur.idrol)");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tip.DESCRIPCION AND rec.IDLENGUAJE = '" + idLenguaje + "')");
-		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS rec2 ON rol.DESCRIPCION = rec2.IDRECURSO");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS rec2 ON (rol.DESCRIPCION = rec2.IDRECURSO AND rec2.IDLENGUAJE = '" + idLenguaje + "')");
 		sql.WHERE("cur.IDCURSO = '" + idCurso + "'");
 		sql.WHERE("cur.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("cur.FECHABAJA IS NULL");

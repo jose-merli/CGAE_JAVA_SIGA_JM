@@ -1,5 +1,7 @@
 package org.itcgae.siga.age.controllers;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,6 +17,7 @@ import org.itcgae.siga.DTOs.form.FormadorCursoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.age.service.IAgendaCalendarioService;
 import org.itcgae.siga.age.service.IFichaEventosService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @RestController
 public class FichaEventosController {
@@ -149,6 +153,14 @@ public class FichaEventosController {
 	ResponseEntity<UpdateResponseDTO> updateFormadorEvent(@RequestBody AgePersonaEventoDTO agePersonaEventoDTO, HttpServletRequest request) {
 		UpdateResponseDTO response = fichaEventosService.updateFormadorEvent(agePersonaEventoDTO, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaEventos/uploadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	ResponseEntity<UpdateResponseDTO> uploadFile(@RequestParam("idEvento") int idEvento, MultipartHttpServletRequest request) throws IllegalStateException, IOException{
+		UpdateResponseDTO response = fichaEventosService.uploadFileExcel(idEvento, request);
+		if (response.getStatus().equals(SigaConstants.OK))
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
 }

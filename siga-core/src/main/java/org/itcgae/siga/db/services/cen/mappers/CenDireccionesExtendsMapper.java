@@ -1,6 +1,5 @@
 package org.itcgae.siga.db.services.cen.mappers;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 import org.apache.ibatis.annotations.InsertProvider;
@@ -107,7 +106,9 @@ public interface CenDireccionesExtendsMapper extends CenDireccionesMapper {
 		@Result(column = "IDEXTERNOPROVINCIA", property = "idExternoProvincia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREPROVINCIA", property = "nombreProvincia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.VARCHAR),
-        @Result(column = "POBLACIONEXTRANJERA", property = "poblacionExtranjera", jdbcType = JdbcType.VARCHAR)
+        @Result(column = "POBLACIONEXTRANJERA", property = "poblacionExtranjera", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "PREFERENTE", property = "preferente", jdbcType = JdbcType.VARCHAR),
+        @Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR)
 
 	})
 	List<DatosDireccionesItem> selectDirecciones(DatosDireccionesSearchDTO datosDireccionesSearchDTO,	String idInstitucion);

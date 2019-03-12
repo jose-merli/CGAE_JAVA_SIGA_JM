@@ -16,6 +16,7 @@ public class AgeAsistenciaeventoSqlExtendsProvider extends  AgeAsistenciaEventoS
 		sql.SELECT("inscripcion.idpersona");
 		sql.SELECT("CONCAT(per.NOMBRE || ' ' || per.APELLIDOS1 || ' ', per.APELLIDOS2) AS nombrePersona");
 		sql.SELECT("nvl(asis.asistencia,0) as asistencia");
+		sql.SELECT("per.nifcif as nif");
 		sql.FROM("FOR_CURSO curso");
 		sql.INNER_JOIN("FOR_INSCRIPCION inscripcion on curso.idcurso = inscripcion.idcurso");
 		sql.INNER_JOIN("CEN_PERSONA per ON (per.idpersona = inscripcion.idpersona)");

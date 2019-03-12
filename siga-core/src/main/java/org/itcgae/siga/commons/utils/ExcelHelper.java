@@ -31,6 +31,7 @@ import org.apache.poi.ss.usermodel.DataValidationConstraint;
 import org.apache.poi.ss.usermodel.DataValidationHelper;
 import org.apache.poi.ss.util.CellRangeAddressList;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.exception.BusinessException;
 
 /**
@@ -299,13 +300,29 @@ public class ExcelHelper {
 						// Creamos las columnas
 						numeroColumnaDatos = 0;
 						Hashtable<String, Object> datosCol = datos.get(f);
-
+						int firstRow = 0;
+						int firstCol = 0;
+						int lastRow = 0;
+						int lastCol = 0;
+						
 						for (int i = 0; i < orderList.size(); i++) {
 							String key = orderList.get(i);
 							Object valor = datosCol.get(key);
 
 							HSSFCell hssfCell = hssfRow.createCell(numeroColumnaDatos);
 
+							if(key == SigaConstants.FORMA_PAGO) {
+								firstRow = 1;
+								firstCol = 1;
+								lastRow = 1;
+								lastCol = 1;
+							}else if(key == SigaConstants.ASISTENCIA) {
+								firstRow = 1;
+								firstCol = 2;
+								lastRow = datos.size();
+								lastCol = 2;
+							}
+							
 							if ((valor != null) && (!valor.toString().isEmpty())) {
 								// Si es un n�mero lo alineamos a la derecha y definimos la celda como num�rica
 								if ((valor instanceof Double) || (valor instanceof Integer)) {
@@ -315,7 +332,7 @@ public class ExcelHelper {
 								}else if(valor instanceof String []) {
 									DataValidationHelper dvHelper = hssfSheet.getDataValidationHelper();
 									 DVConstraint dvConstraint = DVConstraint.createExplicitListConstraint((String []) valor);
-									  CellRangeAddressList addressList = new CellRangeAddressList(1, 1, 1, 1);            
+									  CellRangeAddressList addressList = new CellRangeAddressList(firstRow, lastRow, firstCol,  lastCol);            
 									  DataValidation validation = dvHelper.createValidation(
 									    dvConstraint, addressList);
 									  validation.setSuppressDropDownArrow(false);

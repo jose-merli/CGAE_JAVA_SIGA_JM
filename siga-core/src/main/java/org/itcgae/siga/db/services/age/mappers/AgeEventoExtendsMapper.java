@@ -9,10 +9,8 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AgeEvento;
-import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.mappers.AgeEventoMapper;
 import org.itcgae.siga.db.services.age.providers.AgeEventoSqlExtendsProvider;
-import org.itcgae.siga.db.services.form.providers.ForCursoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +30,8 @@ public interface AgeEventoExtendsMapper extends AgeEventoMapper{
 	@Results({
 		@Result(column = "IDEVENTO", property = "idEvento", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDCALENDARIO", property = "idCalendario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOCALENDARIO", property = "tipoCalendario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOEVENTO", property = "tipoEvento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TITULO", property = "titulo", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
@@ -43,7 +43,7 @@ public interface AgeEventoExtendsMapper extends AgeEventoMapper{
 		@Result(column = "IDTIPOEVENTO", property = "idTipoEvento", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDTIPOCALENDARIO", property = "idTipoCalendario", jdbcType = JdbcType.NUMERIC),
 	})
-	EventoItem searchEvent(String idTipoEvento, String idCurso, String idInstitucion);
+	EventoItem searchEvent(String idTipoEvento, String idCurso, String idInstitucion, String idLenguaje);
 	
 	@SelectProvider(type = AgeEventoSqlExtendsProvider.class, method = "getSessionsCourse")
 	@Results({
@@ -54,6 +54,7 @@ public interface AgeEventoExtendsMapper extends AgeEventoMapper{
 		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAHORAINICIO", property = "fechaHoraInicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAINICIOSTRING", property = "fechaInicioString", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAHORAFIN", property = "fechaHoraFin", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "LUGAR", property = "lugar", jdbcType = JdbcType.NUMERIC),
@@ -66,7 +67,7 @@ public interface AgeEventoExtendsMapper extends AgeEventoMapper{
 		@Result(column = "IDTIPOCALENDARIO", property = "idTipoCalendario", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "FORMADORES", property = "formadores", jdbcType = JdbcType.VARCHAR),
 	})
-	List<EventoItem> getSessionsCourse(String idTipoEvento, String idCurso, String idInstitucion);
+	List<EventoItem> getSessionsCourse(String idTipoEvento, String idCurso, String idInstitucion, String idLenguaje);
 	
 	@SelectProvider(type = AgeEventoSqlExtendsProvider.class, method = "getSessionsCourseByState")
 	@Results({
@@ -86,7 +87,7 @@ public interface AgeEventoExtendsMapper extends AgeEventoMapper{
 		@Result(column = "IDTIPOEVENTO", property = "idTipoEvento", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDTIPOCALENDARIO", property = "idTipoCalendario", jdbcType = JdbcType.NUMERIC),
 	})
-	List<EventoItem> getSessionsCourseByState(String idTipoEvento, String idCurso, String idInstitucion, String idEstado);
+	List<EventoItem> getSessionsCourseByState(String idTipoEvento, String idCurso, String idInstitucion, String idEstado, String idLenguaje);
 	
 	
 	@SelectProvider(type = AgeEventoSqlExtendsProvider.class, method = "selectEventoFechaAuto")

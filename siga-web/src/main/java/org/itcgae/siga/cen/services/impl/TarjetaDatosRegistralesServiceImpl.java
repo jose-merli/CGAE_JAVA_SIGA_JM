@@ -140,12 +140,6 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 
 				AdmUsuarios usuario = usuarios.get(0);
 				comboItems = cenActividadprofesionalExtendsMapper.selectProfesionalActivities(usuario.getIdlenguaje());
-				if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}		
 				
 				comboDTO.setCombooItems(comboItems);
 				

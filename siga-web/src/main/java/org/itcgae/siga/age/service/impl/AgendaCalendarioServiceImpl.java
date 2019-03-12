@@ -81,31 +81,43 @@ public class AgendaCalendarioServiceImpl implements IAgendaCalendarioService {
 		List<EventoItem> listEventos = null;
 		List<CenPersona> listCenPersona = null;
 		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getCalendars() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getCalendars() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
-		if (letrado.equalsIgnoreCase("S")) {
-		
-			AgeCalendario ageCalendario = ageCalendarioExtendsMapper.selectByPrimaryKey(Long.valueOf(idCalendario));
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
 
-			if(SigaConstants.CALENDARIO_FORMACION == ageCalendario.getIdtipocalendario()) {
-				
-				CenPersonaExample cenPersonaExample = new CenPersonaExample();
-				cenPersonaExample.createCriteria().andNifcifEqualTo(dni);
-				listCenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
-				if (!listCenPersona.isEmpty()) {
-					CenPersona cenPersona = listCenPersona.get(0);
-					listEventos = ageCalendarioExtendsMapper.getCalendarioEventosIsColegiado(idInstitucion, perfilesFormat, 
-							idCalendario, cenPersona.getIdpersona());
+				if (letrado.equalsIgnoreCase("S")) {
+					
+					AgeCalendario ageCalendario = ageCalendarioExtendsMapper.selectByPrimaryKey(Long.valueOf(idCalendario));
+
+					if(SigaConstants.CALENDARIO_FORMACION == ageCalendario.getIdtipocalendario()) {
+						
+						CenPersonaExample cenPersonaExample = new CenPersonaExample();
+						cenPersonaExample.createCriteria().andNifcifEqualTo(dni);
+						listCenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+						if (!listCenPersona.isEmpty()) {
+							CenPersona cenPersona = listCenPersona.get(0);
+							listEventos = ageCalendarioExtendsMapper.getCalendarioEventosIsColegiado(idInstitucion, perfilesFormat, 
+									idCalendario, cenPersona.getIdpersona(), usuario.getIdlenguaje());
+						}
+						
+					}else {
+						listEventos = ageCalendarioExtendsMapper.getCalendarioEventos(idInstitucion, perfilesFormat, idCalendario, usuario.getIdlenguaje());
+					}
+
+				}else{
+					listEventos = ageCalendarioExtendsMapper.getCalendarioEventos(idInstitucion, perfilesFormat, idCalendario, usuario.getIdlenguaje());
+
 				}
-				
-			}else {
-				listEventos = ageCalendarioExtendsMapper.getCalendarioEventos(idInstitucion, perfilesFormat, idCalendario);
 			}
-
-		}else{
-			listEventos = ageCalendarioExtendsMapper.getCalendarioEventos(idInstitucion, perfilesFormat, idCalendario);
-
 		}
-
 		eventoDTO.setEventos(listEventos);
 
 		return eventoDTO;

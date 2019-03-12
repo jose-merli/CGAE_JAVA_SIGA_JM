@@ -1,5 +1,8 @@
 package org.itcgae.siga.db.services.cen.providers;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
 import org.itcgae.siga.db.mappers.CenDatoscolegialesestadoSqlProvider;
@@ -29,6 +32,45 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 		if (cenDatoscolegialesestado.getObservaciones() != null) {
 			sql.VALUES("OBSERVACIONES", "'" +cenDatoscolegialesestado.getObservaciones() +"'");
 		}
+		return sql.toString();
+	}
+	
+	public String updateEstadoColegial(CenDatoscolegialesestado record) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+		SQL sql = new SQL();
+		sql.UPDATE("CEN_DATOSCOLEGIALESESTADO");
+		
+		if (record.getIdestado() != null) {
+			sql.SET("IDESTADO = " + record.getIdestado());
+		}
+		
+		if (record.getObservaciones() != null && !record.getObservaciones().equals("")) {
+			sql.SET("OBSERVACIONES = '" + record.getObservaciones() + "'");
+		}
+		
+		sql.SET("FECHAMODIFICACION = TO_DATE('" + dateFormat.format(new Date()) + "', 'dd/MM/RRRR')");
+		sql.SET("USUMODIFICACION = " + record.getUsumodificacion());
+		
+		sql.WHERE("IDINSTITUCION = " + record.getIdinstitucion() + "");
+		sql.WHERE("IDPERSONA = " + record.getIdpersona() + "");
+		sql.WHERE("TO_DATE(FECHAESTADO, 'dd/MM/RRRR') = TO_DATE('"+ dateFormat.format(record.getFechaestado()) + "', 'dd/MM/RRRR')");
+		
+
+		return sql.toString();
+	}
+	
+	public String deleteEstadoColegial(CenDatoscolegialesestado record) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+		SQL sql = new SQL();
+		sql.DELETE_FROM("CEN_DATOSCOLEGIALESESTADO");
+		
+		sql.WHERE("IDINSTITUCION = " + record.getIdinstitucion() + "");
+		sql.WHERE("IDPERSONA = " + record.getIdpersona() + "");
+		sql.WHERE("TO_DATE(FECHAESTADO, 'dd/MM/RRRR') = TO_DATE('"+ dateFormat.format(record.getFechaestado()) + "', 'dd/MM/RRRR')");
+		
+
 		return sql.toString();
 	}
 	
