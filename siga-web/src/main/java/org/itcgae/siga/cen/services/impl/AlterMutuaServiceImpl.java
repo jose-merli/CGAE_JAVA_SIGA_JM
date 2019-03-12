@@ -101,7 +101,7 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					
 					CenSolicitudalterExample solAlterExample = new CenSolicitudalterExample();
 					solAlterExample.createCriteria().andNombreEqualTo(solIncorporacion.getNombre()).andDomicilioEqualTo(solIncorporacion.getDomicilio())
-						.andCodigopostalEqualTo(solIncorporacion.getCodigopostal()).andMovilEqualTo(solIncorporacion.getMovil());
+						.andCodigopostalEqualTo(solIncorporacion.getCodigopostal());
 					
 					List<CenSolicitudalter> solAlter = _cenSolicitudalterMapper.selectByExample(solAlterExample);
 					if(solAlter.size() > 0){
@@ -231,12 +231,13 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					cal.setTime(PropuestasDTO.getFechaNacimiento());
 					requestBody.setDtFechaNacimiento(cal);
 				}
-				if(PropuestasDTO.getSexo().equals("H")){
-					requestBody.setIntSexo(1);
-				}else if (PropuestasDTO.getSexo().equals("M")){
-					requestBody.setIntSexo(2);
+				if(PropuestasDTO.getSexo() != null) {
+					if(PropuestasDTO.getSexo().equals("H")){
+						requestBody.setIntSexo(1);
+					}else if (PropuestasDTO.getSexo().equals("M")){
+						requestBody.setIntSexo(2);
+					}
 				}
-				
 				requestBody.setIntTipoPropuesta(PropuestasDTO.getTipoPropuesta());
 				request.setGetPropuestas(requestBody);
 				
