@@ -2531,7 +2531,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			pysServicios.setIdinstitucion(idInstitucion);
 			pysServicios.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
 			pysServicios.setUsumodificacion(usuario.getIdusuario());
-			pysServicios.setDescripcion(cursoItem.getCodigocurso());
+			pysServicios.setDescripcion(cursoItem.getNombrecurso());
 			NewIdDTO idServicio = pysServiciosExtendsMapper.selectMaxIdServicio(idInstitucion);
 			pysServicios.setIdservicio(Long.valueOf(idServicio.getNewId()));
 
@@ -2548,7 +2548,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			pysServiciosinstitucion.setIdinstitucion(idInstitucion);
 			pysServiciosinstitucion.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
 			pysServiciosinstitucion.setUsumodificacion(usuario.getIdusuario());
-			pysServiciosinstitucion.setDescripcion(cursoItem.getCodigocurso());
+			pysServiciosinstitucion.setDescripcion(cursoItem.getNombrecurso());
 			pysServiciosinstitucion.setAutomatico("0");
 			pysServiciosinstitucion.setIdservicio(pysServicios.getIdservicio());
 			NewIdDTO idServicioInstitucion = pysServiciosinstitucionExtendsMapper
@@ -2573,7 +2573,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			pysPreciosservicios.setIdinstitucion(idInstitucion);
 			pysPreciosservicios.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
 			pysPreciosservicios.setUsumodificacion(usuario.getIdusuario());
-			pysPreciosservicios.setDescripcion(cursoItem.getCodigocurso());
+			pysPreciosservicios.setDescripcion(cursoItem.getNombrecurso());
 			pysPreciosservicios.setIdservicio(pysServicios.getIdservicio());
 			pysPreciosservicios.setIdserviciosinstitucion(pysServiciosinstitucion.getIdserviciosinstitucion());
 			pysPreciosservicios.setIdperiodicidad(SigaConstants.PERIOCIDAD_1MES);
@@ -3378,7 +3378,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 								"getPricesCourse() / pysPreciosserviciosExtendsMapper.selectPricesCourse -> Entrada a pysPreciosserviciosExtendsMapper para obtener los precios de un curso");
 
 						preciosCursoItem = pysPreciosserviciosExtendsMapper.selectPricesCourse(curso.getIdinstitucion(),
-								curso.getIdservicio(), usuario.getIdlenguaje(), curso.getCodigocurso());
+								curso.getIdservicio(), usuario.getIdlenguaje(), curso.getNombrecurso());
 
 						LOGGER.info(
 								"getPricesCourse() / pysPreciosserviciosExtendsMapper.selectPricesCourse -> Salida de pysPreciosserviciosExtendsMapper para obtener los precios de un curso");
