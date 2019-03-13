@@ -642,7 +642,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							datosColegiales.setUsumodificacion(usuario.getIdusuario());
 
 							datosColegiales.setIdestado(Short.valueOf(colegiadoItem.getIdEstado()));
-							datosColegiales.setSituacionresidente(colegiadoItem.getSituacionResidente());
+							datosColegiales.setSituacionresidente(colegiadoItem.getSituacionResidente().equalsIgnoreCase("si") ? "1" : "0" );
 
 							LOGGER.info(
 									"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para actualizar el estado colegial");
