@@ -95,7 +95,6 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		}
 		
 		// si el dni no está en los filtros, buscamos por nombre y apellidos si los puso
-		if(UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
 			if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNombre())) {
 				sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.NOMBRE", busquedaPerFisicaSearchDTO.getNombre()));
 			}
@@ -109,10 +108,9 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 				sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.APELLIDOS2",
 						busquedaPerFisicaSearchDTO.getSegundoApellido()));
 			}
-		}
 
 		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNumeroColegiado())) {
-			sql.WHERE(" (COL.NCOLEGIADO = '" + busquedaPerFisicaSearchDTO.getNumeroColegiado() + "' OR COL.COMUNITARIO = '" + busquedaPerFisicaSearchDTO.getNumeroColegiado() + "')");
+			sql.WHERE(" (COL.NCOLEGIADO = '" + busquedaPerFisicaSearchDTO.getNumeroColegiado() + "' OR COL.NCOMUNITARIO = '" + busquedaPerFisicaSearchDTO.getNumeroColegiado() + "')");
 		}
 		
 		if (null != busquedaPerFisicaSearchDTO.getIdInstitucion()

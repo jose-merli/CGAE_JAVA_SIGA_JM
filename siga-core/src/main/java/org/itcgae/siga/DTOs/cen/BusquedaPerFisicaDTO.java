@@ -13,6 +13,7 @@ public class BusquedaPerFisicaDTO {
 	
 	private List<BusquedaPerFisicaItem> busquedaFisicaItems = new ArrayList<BusquedaPerFisicaItem>();
 	private Error error = null;
+	private Boolean onlyNif = false;
 	
 	
 	/**
@@ -98,5 +99,15 @@ public class BusquedaPerFisicaDTO {
 	      return "null";
 	    }
 	    return o.toString().replace("\n", "\n    ");
+	}
+
+
+	public Boolean getOnlyNif() {
+		return onlyNif;
+	}
+
+
+	public void setOnlyNif(Boolean onlyNif) {
+		this.onlyNif = onlyNif;
 	}
 }
