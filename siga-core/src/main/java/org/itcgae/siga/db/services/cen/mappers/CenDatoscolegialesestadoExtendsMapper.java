@@ -1,5 +1,7 @@
 package org.itcgae.siga.db.services.cen.mappers;
 
+import java.util.Date;
+
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
@@ -17,7 +19,7 @@ public interface CenDatoscolegialesestadoExtendsMapper extends CenDatoscolegiale
 	int insertColegiado(CenDatoscolegialesestado cenDatoscolegialesestado);
 	
 	@UpdateProvider(type = CenDatoscolegialesestadoSqlExtendsProvider.class, method = "updateEstadoColegial")
-	int updateEstadoColegial(CenDatoscolegialesestado record);
+	int updateEstadoColegial(CenDatoscolegialesestado record, Date fechaEstadoNueva);
 	
 	@UpdateProvider(type = CenDatoscolegialesestadoSqlExtendsProvider.class, method = "deleteEstadoColegial")
 	int deleteEstadoColegial(CenDatoscolegialesestado record);

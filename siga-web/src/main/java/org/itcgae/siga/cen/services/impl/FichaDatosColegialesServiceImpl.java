@@ -344,8 +344,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new CenDatoscolegialesestadoExample();
 					cenDatoscolegialesestadoExample.createCriteria()
 							.andIdinstitucionEqualTo(Short.valueOf(colegiadoItem.getIdInstitucion()))
-							.andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona()))
-							.andFechaestadoGreaterThanOrEqualTo(colegiadoItem.getFechaEstado());
+							.andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona()));
 
 					List<CenDatoscolegialesestado> cenDatoscolegialesestadosList = cenDatoscolegialesestadoExtendsMapper
 							.selectByExample(cenDatoscolegialesestadoExample);
@@ -375,7 +374,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						// Paso de ejerciente a no ejerciente
 						if (cenDatoscolegialesestadoBBDD.getIdestado() == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE
 								&& Integer.parseInt(
-										colegiadoItem.getIdEstado()) != SigaConstants.ESTADO_COLEGIAL_EJERCIENTE) {
+										colegiadoItem.getSituacion()) != SigaConstants.ESTADO_COLEGIAL_EJERCIENTE) {
 
 							// Obtenemos las direcciones que tenemos que que añadir
 							addTipoDirecciones = compruebaTipoDireccion(cenTipoDireccionesList, false);
@@ -385,7 +384,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						} else if (cenDatoscolegialesestadoBBDD
 								.getIdestado() != SigaConstants.ESTADO_COLEGIAL_EJERCIENTE
 								&& Integer.parseInt(
-										colegiadoItem.getIdEstado()) == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE) {
+										colegiadoItem.getSituacion()) == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE) {
 
 							// Obtenemos las direcciones que tenemos que que añadir
 							addTipoDirecciones = compruebaTipoDireccion(cenTipoDireccionesList, true);
@@ -493,6 +492,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		boolean existeDummy = false;
+		Date fechaEstadoNueva = null;
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -566,9 +566,9 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 												cenDireccionesList);
 
 										// Paso de no ejerciente a ejerciente
-									} else if (Integer.parseInt(colegiadoItem
-													.getIdEstado()) == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE
-													&& cenDatoscolegialesestadoBBDD
+									} else if (Integer.parseInt(
+											colegiadoItem.getIdEstado()) == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE
+											&& cenDatoscolegialesestadoBBDD
 													.getIdestado() != SigaConstants.ESTADO_COLEGIAL_EJERCIENTE) {
 
 										// Obtenemos las direcciones que tenemos que que añadir
@@ -642,11 +642,16 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							datosColegiales.setUsumodificacion(usuario.getIdusuario());
 
 							datosColegiales.setIdestado(Short.valueOf(colegiadoItem.getIdEstado()));
-							datosColegiales.setSituacionresidente(colegiadoItem.getSituacionResidente().equalsIgnoreCase("si") ? "1" : "0" );
+							
+							fechaEstadoNueva = colegiadoItem.getFechaEstadoNueva();
 
+							if (colegiadoItem.getSituacionResidente() != null) {
+								datosColegiales.setSituacionresidente(
+										colegiadoItem.getSituacionResidente().equalsIgnoreCase("si") ? "1" : "0");
+							}
 							LOGGER.info(
 									"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para actualizar el estado colegial");
-							resultado += cenDatoscolegialesestadoExtendsMapper.updateEstadoColegial(datosColegiales);
+							resultado += cenDatoscolegialesestadoExtendsMapper.updateEstadoColegial(datosColegiales, fechaEstadoNueva);
 							LOGGER.info(
 									"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para para actualizar el estado colegial");
 
@@ -794,7 +799,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						CenDatoscolegialesestado cenDatoscolegialesestadoBBDD = null;
 
 						// Obtenemos el estado colegial que tiene el colegiado guardado en bbdd
-						if(cenDatoscolegialesestadosList.size() > 1) {
+						if (cenDatoscolegialesestadosList.size() > 1) {
 							cenDatoscolegialesestadoBBDD = cenDatoscolegialesestadosList.get(1);
 						}
 
@@ -817,7 +822,9 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 								.selectByExample(cenDireccionesExample);
 
 						// Paso de ejerciente a no ejerciente
-						if (cenDatoscolegialesestadoBBDD != null && cenDatoscolegialesestadoBBDD.getIdestado() != SigaConstants.ESTADO_COLEGIAL_EJERCIENTE
+						if (cenDatoscolegialesestadoBBDD != null
+								&& cenDatoscolegialesestadoBBDD
+										.getIdestado() != SigaConstants.ESTADO_COLEGIAL_EJERCIENTE
 								&& Integer.parseInt(
 										colegiadoItem.getIdEstado()) == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE) {
 
@@ -826,8 +833,9 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							addTipoDireccionesPreferentes = compruebaTipoDireccionPreferente(cenDireccionesList);
 
 							// Paso de no ejerciente a ejerciente
-						} else if (cenDatoscolegialesestadoBBDD != null && cenDatoscolegialesestadoBBDD
-								.getIdestado() == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE
+						} else if (cenDatoscolegialesestadoBBDD != null
+								&& cenDatoscolegialesestadoBBDD
+										.getIdestado() == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE
 								&& Integer.parseInt(
 										colegiadoItem.getIdEstado()) != SigaConstants.ESTADO_COLEGIAL_EJERCIENTE) {
 
