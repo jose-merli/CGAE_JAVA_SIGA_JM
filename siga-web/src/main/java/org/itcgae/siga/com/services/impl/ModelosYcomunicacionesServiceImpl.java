@@ -239,6 +239,8 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					
 					if(rutaPlantillaClase == null || "".equals(rutaPlantillaClase)) {
 						rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+					}else {
+						rutaPlantillaClase = rutaPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, String.valueOf(idInstitucion));
 					}
 					
 //					String nuevoNombre = modelo.getNombre() + SigaConstants.SUFIJO_MODULO_COM_DUPLICADO;
@@ -342,7 +344,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 								
 								GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
 								
-								String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator + String.valueOf(idInstitucionModelo) + SigaConstants.pathSeparator;
+								String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator;
 								String rutaPlantillaDestino = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator + String.valueOf(modelo.getIdinstitucion()) + SigaConstants.pathSeparator;
 								
 								ModPlantilladocumentoExample examplePlantilla = new ModPlantilladocumentoExample();

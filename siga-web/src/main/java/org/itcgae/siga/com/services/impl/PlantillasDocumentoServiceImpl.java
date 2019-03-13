@@ -460,7 +460,10 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				
 				if(rutaPlantillaClase == null || "".equals(rutaPlantillaClase)) {
 					rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+				}else {
+					rutaPlantillaClase = rutaPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, String.valueOf(idInstitucion));
 				}
+				
 				
 				// crear path para almacenar el fichero		
 				GenPropertiesKey key = new GenPropertiesKey();
@@ -469,7 +472,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				
 				GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
 				
-				String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator + String.valueOf(idInstitucion) + SigaConstants.pathSeparator;
+				String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator;
 				
 				String pathFichero = rutaPlantilla;
 			
@@ -1026,6 +1029,8 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 						
 						if("".equals(rutaPlantillaClase)) {
 							rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+						}else {
+							rutaPlantillaClase = rutaPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, String.valueOf(idInstitucion));
 						}
 						
 						
@@ -1038,7 +1043,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 						
 						GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
 						
-						String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator + String.valueOf(idInstitucion) + SigaConstants.pathSeparator;
+						String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator;
 						
 						String pathFichero = rutaPlantilla;				
 		

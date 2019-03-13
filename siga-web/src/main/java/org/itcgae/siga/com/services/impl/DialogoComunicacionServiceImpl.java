@@ -423,6 +423,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				
 				if(rutaPlantillaClase == null || "".equals(rutaPlantillaClase)) {
 					rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+				}else {
+					rutaPlantillaClase = rutaPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, String.valueOf(usuario.getIdinstitucion()));
 				}
 				
 				generarComunicacion.setFechaProgramada(dialogo.getFechaProgramada());
@@ -643,7 +645,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																	
 																	GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
 																	
-																	String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator + dialogo.getIdInstitucion() + SigaConstants.pathSeparator;
+																	String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator;
 																	
 																	
 																	String pathFicheroSalida = rutaTmp;
@@ -757,7 +759,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														
 														GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
 														
-														String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator + dialogo.getIdInstitucion() + SigaConstants.pathSeparator;
+														String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator;
 														
 														
 														String pathFicheroSalida = rutaTmp;

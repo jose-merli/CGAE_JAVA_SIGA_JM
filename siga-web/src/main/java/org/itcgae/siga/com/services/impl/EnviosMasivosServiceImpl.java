@@ -144,6 +144,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 
 	@Autowired
 	private EnvDestConsultaEnvioExtendsMapper _envDestConsultaEnvioExtendsMapper;
+	
 	@Autowired
 	private GenPropertiesMapper _genPropertiesMapper;
 
