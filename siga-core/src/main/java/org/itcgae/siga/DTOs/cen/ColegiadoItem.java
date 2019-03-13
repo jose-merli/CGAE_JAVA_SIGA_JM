@@ -71,6 +71,7 @@ public class ColegiadoItem {
 	private String fechaBaja;
 
 	private String fechaEstadoStr;
+	private Date fechaEstadoNueva;
 	private Date incorporacionDate;
 	private Date fechaJuraDate;
 	private Date fechaAltaDate;
@@ -1173,6 +1174,13 @@ public class ColegiadoItem {
 		this.idEstado = idEstado;
 	}
 	
+	public Date getFechaEstadoNueva() {
+		return fechaEstadoNueva;
+	}
+
+	public void setFechaEstadoNueva(Date fechaEstadoNueva) {
+		this.fechaEstadoNueva = fechaEstadoNueva;
+	}
 
 	@Override
 	public int hashCode() {
@@ -1181,7 +1189,7 @@ public class ColegiadoItem {
 	    		idEstadoCivil, domicilio, tipoCV, subTipoCV1, subTipoCV2, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
 	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion, 
 	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate, observaciones, subtipoCV, temas,
-	    		fechaNacimientoRango);
+	    		fechaNacimientoRango, fechaEstadoNueva);
 	}
 
 
@@ -1248,7 +1256,7 @@ public class ColegiadoItem {
 	    sb.append("    observaciones: ").append(toIndentedString(observaciones)).append("\n");
 	    sb.append("    subtipoCV: ").append(toIndentedString(subtipoCV)).append("\n");
 	    sb.append("    temas: ").append(toIndentedString(temas)).append("\n");
-	    sb.append("    fechaNacimientoRango: ").append(toIndentedString(subtipoCV)).append("\n");
+	    sb.append("    fechaEstadoNueva: ").append(toIndentedString(fechaEstadoNueva)).append("\n");
 
 	    
 		
