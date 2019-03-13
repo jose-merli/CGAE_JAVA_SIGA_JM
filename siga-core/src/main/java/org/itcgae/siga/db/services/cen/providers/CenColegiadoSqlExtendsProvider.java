@@ -514,7 +514,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT("dir.correoelectronico AS correo");
 		sql.SELECT("dir.telefono1 AS telefono");
 		sql.SELECT("dir.movil AS movil");
-		sql.SELECT("inst.nombre as institucion");
+		sql.SELECT("inst.abreviatura as institucion");
 
 		sql.FROM("cen_colegiado col");
 
@@ -568,7 +568,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		SQL sql = new SQL();
 
 		sql.SELECT("distinct col.IDINSTITUCION AS idInstitucion");
-		sql.SELECT("inst.NOMBRE as nombre");
+		sql.SELECT("inst.abreviatura as nombre");
 		sql.SELECT("col.NCOLEGIADO as nColegiado");
 		sql.FROM("CEN_COLEGIADO col");
 		sql.INNER_JOIN("CEN_INSTITUCION inst ON inst.idInstitucion = col.idInstitucion");

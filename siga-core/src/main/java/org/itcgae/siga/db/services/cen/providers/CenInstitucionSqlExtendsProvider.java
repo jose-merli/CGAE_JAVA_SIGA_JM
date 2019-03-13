@@ -16,7 +16,7 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 	public String getComboInstituciones() {
 		SQL sql = new SQL();
 		sql.SELECT("IDINSTITUCION");
-		sql.SELECT("NOMBRE");
+		sql.SELECT("ABREVIATURA as NOMBRE");
 		sql.FROM("CEN_INSTITUCION");
 		sql.ORDER_BY("NOMBRE");
 		return sql.toString();
