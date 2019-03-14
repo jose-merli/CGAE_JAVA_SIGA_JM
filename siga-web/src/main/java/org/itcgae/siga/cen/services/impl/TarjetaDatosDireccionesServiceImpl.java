@@ -135,27 +135,63 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						if (!UtilidadesString.esCadenaVacia(datosDireccionItem.getIdTipoDireccionList())) {
 							tiposDirecciones = datosDireccionItem.getIdTipoDireccionList().split(";");
 							tiposDireccionesList = new ArrayList<String>(Arrays.asList(tiposDirecciones));
+							String tipoDireccionDesc = datosDireccionItem.getTipoDireccion();
 							// indicar en el combo los tipos de direcciones preferentes
 							if (datosDireccionItem.getPreferente() != ""
 									&& datosDireccionItem.getPreferente() != null) {
 								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_EMAIL)) {
 									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL);
+									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Email");
 								}
 								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_CORREO)) {
 									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_CORREO);
+									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Correo");
 								}
 								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_SMS)) {
 									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_SMS);
+									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente SMS/BuroSMS");
 								}
 								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_FAX)) {
 									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_FAX);
+									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Fax");
 								}
 							}
-
+							datosDireccionItem.setTipoDireccion(tipoDireccionDesc);
 							tiposDirecciones = new String[tiposDireccionesList.size()];
 							tiposDireccionesList.toArray(tiposDirecciones);
 							datosDireccionItem.setIdTipoDireccion(tiposDirecciones);
 
+						}else{
+
+							String tipoDireccionDesc = new String("");
+							tiposDireccionesList = new ArrayList<String>();
+							// indicar en el combo los tipos de direcciones preferentes
+							if (datosDireccionItem.getPreferente() != ""
+									&& datosDireccionItem.getPreferente() != null) {
+								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_EMAIL)) {
+									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_EMAIL);
+									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Email");
+								}
+								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_CORREO)) {
+									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_CORREO);
+									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Correo");
+								}
+								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_SMS)) {
+									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_SMS);
+									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente SMS/BuroSMS");
+								}
+								if (datosDireccionItem.getPreferente().contains(SigaConstants.DIR_PREFERENTE_FAX)) {
+									tiposDireccionesList.add(SigaConstants.TIPO_DIR_PREFERENTE_FAX);
+									tipoDireccionDesc = tipoDireccionDesc.concat(";" + "Preferente Fax");
+								}
+								tipoDireccionDesc = tipoDireccionDesc.substring(1);
+							}
+							datosDireccionItem.setTipoDireccion(tipoDireccionDesc);
+							tiposDirecciones = new String[tiposDireccionesList.size()];
+							tiposDireccionesList.toArray(tiposDirecciones);
+							datosDireccionItem.setIdTipoDireccion(tiposDirecciones);
+
+						
 						}
 					}
 				}
@@ -669,16 +705,105 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						updateResponseDTO.setError(error);
 						return updateResponseDTO;
 					}
+					
+				}else{
+					
+					// datos para auditoria
+					CenDireccionesExample cenDireccionesExample = new CenDireccionesExample();
+					cenDireccionesExample.createCriteria()
+							.andIddireccionEqualTo(Long.valueOf(datosDireccionesItem.getIdDireccion()))
+							.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()))
+							.andIdinstitucionEqualTo(idInstitucion);
+					listCenDireccionesAnterior = cenDireccionesExtendsMapper.selectByExample(cenDireccionesExample);
+					cenDireccionesAnterior = listCenDireccionesAnterior.get(0);
 
-				} else {
+					// } else {
+					//
+					// }
+
+					// Actualizamos la direccion
 					LOGGER.info(
-							"updateDirection() -> KO. Update para actualizar direcciones  NO realizado correctamente");
-					updateResponseDTO.setStatus(SigaConstants.KO);
-					error.setMessage(
-							"No se puede actualizar la dirección con tipo CensoWeb, Traspaso, Facturación o Guardia, dado que, son tipos dirección únicos");
-					updateResponseDTO.setError(error);
-					return updateResponseDTO;
+							"updateDirection() / cenDireccionesExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenDireccionesExtendsMapper para actualizar direcciones");
+					response = cenDireccionesExtendsMapper.updateByPrimaryKeySelective(direcciones);
+					LOGGER.info(
+							"updateDirection() / cenDireccionesExtendsMapper.updateByExampleSelective() -> Salida de cenDireccionesExtendsMapper para actualizar direcciones ");
+
+					// comprobacion actualización
+					if (response >= 1) {
+
+						if (datosDireccionesItem.isEsColegiado()) {
+
+							// Actualizamos la tabla cen_colegiados para mandar a sociedades
+							CenColegiadoKey colegiadokey = new CenColegiadoKey();
+							colegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
+							colegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+							CenColegiado colegiado = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadokey);
+
+							colegiado.setFechamodificacion(new Date());
+							colegiado.setUsumodificacion(usuario.getIdusuario());
+
+							LOGGER.info(
+									"updateDirection() / cenColegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenColegiadoExtendsMapper para actualizar el Colegiado");
+							cenColegiadoExtendsMapper.updateByPrimaryKey(colegiado);
+							LOGGER.info(
+									"updateDirection() / cenColegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenColegiadoExtendsMapper para actualizar el Colegiado");
+
+							LOGGER.info(
+									"updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
+							updateResponseDTO.setStatus(SigaConstants.OK);
+
+						} else {
+
+							// Actualizamos la tabla cen_nocolegiados para mandar a sociedades
+							CenNocolegiadoKey noColegiadokey = new CenNocolegiadoKey();
+							noColegiadokey.setIdinstitucion(Short.valueOf(idInstitucion));
+							noColegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+							CenNocolegiado noColegiado = cenNocolegiadoExtendsMapper.selectByPrimaryKey(noColegiadokey);
+
+							noColegiado.setFechamodificacion(new Date());
+							noColegiado.setUsumodificacion(usuario.getIdusuario());
+
+							LOGGER.info(
+									"updateDirection() / cenNocolegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenNocolegiadoExtendsMapper para actualizar el noColegiado");
+							cenNocolegiadoExtendsMapper.updateByPrimaryKey(noColegiado);
+							LOGGER.info(
+									"updateDirection() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para actualizar el noColegiado");
+
+							LOGGER.info(
+									"updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
+							updateResponseDTO.setStatus(SigaConstants.OK);
+						}
+
+						// AUDITORIA
+
+						CenDirecciones cenDireccionesPosterior = new CenDirecciones();
+						CenDireccionesKey keyDireccionesPosterior = new CenDireccionesKey();
+						keyDireccionesPosterior.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
+						keyDireccionesPosterior.setIdinstitucion(idInstitucion);
+						keyDireccionesPosterior.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						cenDireccionesPosterior = cenDireccionesExtendsMapper
+								.selectByPrimaryKey(keyDireccionesPosterior);
+
+						auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(cenDireccionesAnterior,
+								cenDireccionesPosterior, "UPDATE", request, datosDireccionesItem.getMotivo());
+					} else {
+						LOGGER.info(
+								"updateDirection() -> KO. Update para actualizar direcciones  NO realizado correctamente");
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setMessage("Error al actualizar la direccion");
+						updateResponseDTO.setError(error);
+						return updateResponseDTO;
+					}
 				}
+//				} else {
+//					LOGGER.info(
+//							"updateDirection() -> KO. Update para actualizar direcciones  NO realizado correctamente");
+//					updateResponseDTO.setStatus(SigaConstants.KO);
+//					error.setMessage(
+//							"No se puede actualizar la dirección con tipo CensoWeb, Traspaso, Facturación o Guardia, dado que, son tipos dirección únicos");
+//					updateResponseDTO.setError(error);
+//					return updateResponseDTO;
+//				}
 			} else {
 				LOGGER.warn(
 						"updateDirection() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -688,7 +813,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		} else {
 			LOGGER.warn("updateDirection() -> idInstitucion del token nula");
 		}
-
+		updateResponseDTO.setStatus(SigaConstants.OK);
 		LOGGER.info("updateDirection() -> Salida del servicio para actualizar direcciones ");
 		return updateResponseDTO;
 	}
@@ -802,8 +927,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							cenDireccionesPreferenteExample.createCriteria()
 									.andIdpersonaEqualTo(Long.valueOf(datosDireccionesItem.getIdPersona()))
 									.andIdinstitucionEqualTo(Short.valueOf(idInstitucion))
-									.andPreferenteLike("%" + p + "%")
-									.andIddireccionNotEqualTo(Long.valueOf(datosDireccionesItem.getIdDireccion()));
+									.andPreferenteLike("%" + p + "%");
 
 							List<CenDirecciones> cenDireccionesList = cenDireccionesExtendsMapper
 									.selectByExample(cenDireccionesPreferenteExample);
