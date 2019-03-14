@@ -96,4 +96,23 @@ public interface AgeEventoExtendsMapper extends AgeEventoMapper{
 			@Result(column = "FECHAFIN", property = "fechafin", jdbcType = JdbcType.VARCHAR)
 	})
 	List<AgeEvento> selectEventoFechaAuto(AgeEvento ageEvento);
+	
+	@SelectProvider(type = AgeEventoSqlExtendsProvider.class, method = "searchEventByIdEvento")
+	@Results({
+		@Result(column = "IDEVENTO", property = "idEvento", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDCALENDARIO", property = "idCalendario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOCALENDARIO", property = "tipoCalendario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOEVENTO", property = "tipoEvento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TITULO", property = "titulo", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHAINICIO", property = "fechaInicio", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "FECHAFIN", property = "fechaFin", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "LUGAR", property = "lugar", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "RECURSOS", property = "recursos", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDESTADOEVENTO", property = "idEstadoEvento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTIPOEVENTO", property = "idTipoEvento", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "IDTIPOCALENDARIO", property = "idTipoCalendario", jdbcType = JdbcType.NUMERIC),
+	})
+	EventoItem searchEventByIdEvento(String idEvento, String idInstitucion, String idLenguaje);
 }

@@ -74,4 +74,6 @@ public interface IFichaEventosService {
 	
 	public UpdateResponseDTO uploadFileExcel(int idEvento, MultipartHttpServletRequest request) throws IllegalStateException, IOException;
 
+	public EventoItem searchEventByIdEvento(String idEvento, HttpServletRequest request);
+
 }
