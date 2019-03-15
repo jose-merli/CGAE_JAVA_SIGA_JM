@@ -17,8 +17,12 @@ public class MandatosUpdateDTO {
 	private Date fechaUsoDate;
 	private Date firmaFechaDate;
 	private String descripcion;
-	
-
+//	private String identifProducto;
+	private String identif;
+//	private String tipoIdServicio;
+	private String tipoId;
+	private String referencia;
+//	private String referenciaServicio;
 	
 	
 	/**
@@ -219,6 +223,29 @@ public class MandatosUpdateDTO {
 	    }
 	    return o.toString().replace("\n", "\n    ");
 	}
-	
-	
+
+	public String getIdentif() {
+		return identif;
+	}
+
+	public void setIdentif(String identif) {
+		this.identif = identif;
+	}
+
+	public String getTipoId() {
+		return tipoId;
+	}
+
+	public void setTipoId(String tipoId) {
+		this.tipoId = tipoId;
+	}
+
+	public String getReferencia() {
+		return referencia;
+	}
+
+	public void setReferencia(String referencia) {
+		this.referencia = referencia;
+	}
+
 }
