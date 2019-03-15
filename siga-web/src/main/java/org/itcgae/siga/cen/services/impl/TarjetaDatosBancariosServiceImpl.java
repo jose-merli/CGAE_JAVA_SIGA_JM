@@ -557,7 +557,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				if (tieneSCSJ) {
 					CenCuentasbancariasExample example = new CenCuentasbancariasExample();
 					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(datosBancariosInsertDTO.getIdPersona()))
-							.andIdinstitucionEqualTo(idInstitucion).andAbonosjcsEqualTo("1");
+							.andIdinstitucionEqualTo(idInstitucion).andAbonosjcsEqualTo("1").andFechabajaIsNull();
 					List<CenCuentasbancarias> cuenta = cenCuentasbancariasExtendsMapper.selectByExample(example);
 
 					if (null != cuenta && !cuenta.isEmpty()) {
@@ -574,7 +574,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				LOGGER.info(
 						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
 
-				// comprobacion actualización
+				// comprobacion actualización 
 				if (response >= 1) {
 					LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
 					insertResponseDTO.setStatus(SigaConstants.OK);
@@ -1197,6 +1197,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				CenMandatosCuentasbancarias record = new CenMandatosCuentasbancarias();
 				record.setFechamodificacion(new Date());
 				record.setUsumodificacion(usuario.getIdusuario());
+				record.setDeudorTipoid(Short.parseShort(mandatosUpdateDTO.getTipoId()));
+				record.setDeudorId(mandatosUpdateDTO.getIdentif());
+				record.setRefmandatosepa(mandatosUpdateDTO.getReferencia());
 				record.setIdmandato(Short.valueOf(mandatosUpdateDTO.getIdMandato()));
 				record.setIdcuenta(Short.valueOf(mandatosUpdateDTO.getIdCuenta()));
 				record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));
