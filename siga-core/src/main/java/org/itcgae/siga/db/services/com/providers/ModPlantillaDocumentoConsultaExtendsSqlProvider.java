@@ -42,7 +42,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		
 		sql.FROM("MOD_PLANTILLADOC_CONSULTA plantilla");	
 		sql.INNER_JOIN("CON_CONSULTA consulta ON consulta.IDCONSULTA = plantilla.IDCONSULTA AND consulta.IDINSTITUCION = plantilla.IDINSTITUCION_CONSULTA");
-		sql.INNER_JOIN("(select * from mod_modelo_plantilladocumento where rownum=1 AND mod_modelo_plantilladocumento.idmodelocomunicacion = " + idModeloComunicacion +" AND mod_modelo_plantilladocumento.idinforme = " + idInforme + " order by idplantilladocumento desc) modelo ON modelo.idmodelocomunicacion = plantilla.idmodelocomunicacion AND modelo.idplantilladocumento = plantilla.idplantilladocumento");
+		sql.INNER_JOIN("(select * from mod_modelo_plantilladocumento where rownum=1 AND mod_modelo_plantilladocumento.idmodelocomunicacion = " + idModeloComunicacion +" AND mod_modelo_plantilladocumento.idinforme = " + idInforme + " AND mod_modelo_plantilladocumento.fechabaja is null order by idplantilladocumento asc) modelo ON modelo.idmodelocomunicacion = plantilla.idmodelocomunicacion AND modelo.idplantilladocumento = plantilla.idplantilladocumento");
 		sql.INNER_JOIN("con_objetivo objetivo ON consulta.idobjetivo = objetivo.idobjetivo");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON rec.idrecurso = objetivo.nombre AND rec.idlenguaje = " + idLenguaje);				
 		sql.LEFT_OUTER_JOIN("con_modulo modulo on consulta.idmodulo = modulo.idmodulo");

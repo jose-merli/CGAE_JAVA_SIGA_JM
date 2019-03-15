@@ -314,7 +314,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 						
 						consultasValidas = true;
 						
-						if(consultaDestinatario != 1){
+						if(consultaDestinatario != 1 && !SigaConstants.ID_CLASE_CONSULTA_GENERICA.equals(plantillaDoc.getIdClaseComunicacion())){
 							consultasValidas = false;
 						}
 						if(consultaMultidocumento > 1){

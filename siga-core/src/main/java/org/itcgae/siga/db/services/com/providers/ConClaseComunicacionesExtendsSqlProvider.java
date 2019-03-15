@@ -25,7 +25,7 @@ public class ConClaseComunicacionesExtendsSqlProvider {
 		
 		sql.FROM("MOD_CLASECOMUNICACIONES");
 		
-		sql.WHERE("IDMODULO = '" + idModulo + "'");
+		sql.WHERE("IDMODULO = '" + idModulo + "' OR IDMODULO IS NULL");
 		
 		return sql.toString();
 	}

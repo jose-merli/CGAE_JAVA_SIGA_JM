@@ -90,7 +90,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 	}
 	
 		
-	public String selectModelosComunicacionDialg(String idClaseComunicacion, String idModulo, String idLenguaje){
+	public String selectModelosComunicacionDialg(String idInstitucion, String idClaseComunicacion, String idModulo, String idLenguaje, String idConsulta){
 	   
 	   SQL sql = new SQL();
 	   
@@ -101,7 +101,13 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		
 	   sql.FROM("MOD_MODELOCOMUNICACION MODELO");
 	   sql.JOIN("MOD_CLASECOMUNICACIONES CLASE ON CLASE.IDCLASECOMUNICACION = MODELO.IDCLASECOMUNICACION");
-	   sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND CLASE.IDMODULO = " + idModulo);
+	      
+	   sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND (CLASE.IDMODULO = " + idModulo + " OR CLASE.IDMODULO IS NULL)");
+	   
+	   if(idConsulta != null) {
+		   sql.WHERE("MODELO.IDMODELOCOMUNICACION IN (SELECT IDMODELOCOMUNICACION FROM MOD_PLANTILLADOC_CONSULTA WHERE IDINSTITUCION='"+idInstitucion+"' AND IDCONSULTA='"+idConsulta+"' AND FECHABAJA IS NULL)");
+	   }
+	   
 	   sql.ORDER_BY("MODELO.ORDEN");
 	   
 	   return sql.toString();

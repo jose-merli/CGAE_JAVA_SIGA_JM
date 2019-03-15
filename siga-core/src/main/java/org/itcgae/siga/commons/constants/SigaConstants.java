@@ -145,6 +145,8 @@ public class SigaConstants {
 	public static final String SENTENCIA_CREATE = "CREATE";
 	public static final String SENTENCIA_ALTER = "ALTER";
 	
+	public static final String ID_CLASE_CONSULTA_GENERICA = "5";
+	
 
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(

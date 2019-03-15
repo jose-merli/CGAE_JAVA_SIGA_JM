@@ -86,7 +86,9 @@ public class DialogoComunicacionController {
 	@RequestMapping(value = "/descargar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InputStreamResource> descargar(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo) {
 		
-		ByteResponseDto response = _dialogoComunicacionService.descargarComunicacion(request, dialogo);
+		ByteResponseDto response = null;
+		
+		response = _dialogoComunicacionService.descargarComunicacion(request, dialogo);
 		
 		byte[] zip = null;
 		
