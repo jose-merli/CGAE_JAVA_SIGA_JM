@@ -144,5 +144,4 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 			@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR)})
 	List<ComboColegiadoItem> getLabelColegios(String idPersona);
 
-
 }

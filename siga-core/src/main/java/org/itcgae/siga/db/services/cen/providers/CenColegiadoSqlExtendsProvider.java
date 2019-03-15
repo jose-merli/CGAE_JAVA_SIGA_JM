@@ -575,4 +575,5 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.WHERE("col.IDPERSONA = '" + idPersona + "'");
 		return sql.toString();
 	}
+	
 }

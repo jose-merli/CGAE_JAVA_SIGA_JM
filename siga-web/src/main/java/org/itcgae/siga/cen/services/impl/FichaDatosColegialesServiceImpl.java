@@ -11,6 +11,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IFichaDatosColegialesService;
@@ -18,6 +19,7 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenColegiado;
+import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
@@ -29,6 +31,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscolegialesestadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionTipodireccionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicitudincorporacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposseguroExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -60,6 +63,9 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 	@Autowired
 	private CenDireccionTipodireccionExtendsMapper cenDireccionTipodireccionExtendsMapper;
+	
+	@Autowired
+	private CenSolicitudincorporacionExtendsMapper _cenSolicitudincorporacionExtendsMapper;
 
 	@Override
 	public ComboDTO getSocietyTypes(HttpServletRequest request) {
@@ -655,6 +661,22 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							LOGGER.info(
 									"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para para actualizar el estado colegial");
 
+							CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+							cenColegiadoExample.createCriteria()
+							.andIdpersonaEqualTo(idPersonaColegial);
+							
+							List<CenColegiado> cenColegiadoList = cenColegiadoExtendsMapper.selectByExample(cenColegiadoExample);
+							
+							if(cenColegiadoList.size() == 0 && cenColegiadoList != null) {
+								CenColegiado cenColegiado = cenColegiadoList.get(0);
+								
+								cenColegiado.setNcolegiado(colegiadoItem.getNumColegiado());
+								cenColegiado.setUsumodificacion(usuario.getIdusuario());
+								cenColegiado.setFechamodificacion(new Date());
+								
+								cenColegiadoExtendsMapper.updateByPrimaryKey(cenColegiado);
+							}
+							
 						} else {
 							existeDummy = true;
 						}
@@ -929,6 +951,40 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		LOGGER.info(
 				"datosColegialesUpdateEstados() -> Salida del servicio para eliminar el estado colegial de un colegial determinado");
 		return response;
+	}
+
+	@Override
+	public StringDTO getNumColegiado(HttpServletRequest request) {
+		
+		LOGGER.info("getNumColegiado() -> Entrada al servicio para obtener los tipos de tratamiento disponibles");
+		StringDTO nColegiado = new StringDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			
+			LOGGER.info(
+					"getTratamiento() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			LOGGER.info(
+					"getTratamiento() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNColegiado(String.valueOf(idInstitucion));
+
+			}
+
+		}
+		LOGGER.info("getNumColegiado() -> Salida del servicio para obtener los tipos de tratamiento disponibles");
+
+		return nColegiado;
 	}
 
 }

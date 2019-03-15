@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 //import org.itcgae.siga.DTOs.cen.FichaDatosColegialesDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.IFichaDatosColegialesService;
@@ -79,4 +80,9 @@ public class FichaDatosColegialesController {
 			else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
+	@RequestMapping(value = "/fichaDatosColegiales/getNumColegiado",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<StringDTO> getNumColegiado(HttpServletRequest request) {
+		StringDTO response = fichaDatosColegiales.getNumColegiado(request);
+		return new ResponseEntity<StringDTO>(response, HttpStatus.OK);
+	}
 }

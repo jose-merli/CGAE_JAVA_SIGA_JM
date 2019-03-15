@@ -8,6 +8,7 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface IFichaDatosColegialesService {
@@ -34,6 +35,8 @@ public interface IFichaDatosColegialesService {
 	
 	public UpdateResponseDTO datosColegialesDeleteEstado(ColegiadoItem colegiadoItem,
 			HttpServletRequest request);
+	
+	public StringDTO getNumColegiado(HttpServletRequest request);
 	
 //	public BusquedaJuridicaDTO searchLegalPersons(int numPagina, BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request);
 	
