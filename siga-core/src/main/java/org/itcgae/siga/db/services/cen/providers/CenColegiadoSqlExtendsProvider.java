@@ -88,6 +88,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,2,dir.correoelectronico,'') AS correo");
 		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,2,dir.telefono1,'') AS telefono");
 		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,2,dir.movil,'') as movil");
+		sql.SELECT_DISTINCT("ROW_NUMBER() OVER(PARTITION BY col.idpersona ORDER BY col.idpersona) AS RN");
 		sql.FROM("cen_colegiado col");
 
 		sql.INNER_JOIN("cen_persona per on col.idpersona = per.idpersona");
@@ -300,7 +301,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		sql2.SELECT("*");
 		sql2.FROM("(" + sql + ")");
-		sql2.WHERE("rownum < 5000");
+		sql2.WHERE("RN = 1 and rownum < 5000");
 
 		return sql2.toString();
 	}

@@ -77,6 +77,10 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 		@Result(column = "TIPOPAGOSERVICIO", property = "tipoPagoServicio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDMANDATOSERVICIO", property = "idMandatoServicio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "REFERENCIAPRODUCTO", property = "referenciaProducto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOIDPRODUCTO", property = "tipoIdProducto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDENTIFSERVICIO", property = "identifServicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOIDSERVICIO", property = "tipoIdServicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDENTIFPRODUCTO", property = "identifProducto", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESQUEMAPRODUCTO", property = "esquemaProducto", jdbcType = JdbcType.DATE),
 		@Result(column = "IDMANDATOPRODUCTO", property = "idMandatoProducto", jdbcType = JdbcType.DATE),
 	})
