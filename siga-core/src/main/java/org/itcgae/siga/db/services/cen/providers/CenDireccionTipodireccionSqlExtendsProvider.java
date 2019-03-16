@@ -17,7 +17,7 @@ public class CenDireccionTipodireccionSqlExtendsProvider extends CenDireccionTip
 		sql.FROM("CEN_DIRECCION_TIPODIRECCION tipoDir");
 		sql.INNER_JOIN("CEN_DIRECCIONES dir on dir.idPersona = tipoDir.idPersona and dir.idDireccion = tipoDir.idDireccion and dir.idInstitucion = tipoDir.idInstitucion");
 		
-		if(idDireccion != "") {
+		if(idDireccion != "" && idDireccion != null) {
 			sql.WHERE("tipoDir.idPersona = "+ idPersona +" and tipoDir.idInstitucion =" +idInstitucion + " and tipoDir.idTipoDireccion IN ( " + String.join(",", idTipoDireccion) + " ) and dir.fechaBaja is null and tipoDir.idDireccion != "+ idDireccion);
 		}else {
 			sql.WHERE("tipoDir.idPersona = "+ idPersona +" and tipoDir.idInstitucion =" +idInstitucion + " and tipoDir.idTipoDireccion IN ( " + String.join(",", idTipoDireccion) + " ) and dir.fechaBaja is null");
