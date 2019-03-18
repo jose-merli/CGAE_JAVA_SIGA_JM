@@ -14,6 +14,7 @@ public class EnvDestinatariosExtendsSqlProvider {
 		sql.SELECT("APELLIDOS1");
 		sql.SELECT("APELLIDOS2");
 		sql.SELECT("NOMBRE");
+		sql.SELECT("DOMICILIO, MOVIL, CORREOELECTRONICO, NOMBRE || ' ' || APELLIDOS1 || ' '|| APELLIDOS2 AS NOMBRECOMPLETO");
 		sql.FROM("ENV_DESTINATARIOS");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion +"'");
 		sql.WHERE("IDENVIO = '" + idEnvio +"'");

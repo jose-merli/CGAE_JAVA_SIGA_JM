@@ -6,9 +6,12 @@ import java.io.FileNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.DestinatarioIndvEnvioMasivoItem;
+import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
@@ -295,6 +298,43 @@ public class EnviosMasivosController {
 			return new ResponseEntity<DestinatariosDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<DestinatariosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "detalle/asociarDestinatariosIndv",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> asociarDestinatarioIndv(HttpServletRequest request, @RequestBody DestinatarioIndvEnvioMasivoItem destinatario) {
+		
+		Error response = _enviosMasivosService.asociarDestinatario(request, destinatario);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "detalle/desAsociarDestinatarioIndv",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> desAsociarDestinatario(HttpServletRequest request, @RequestBody DestinatarioIndvEnvioMasivoItem[] destinatarios) {
+		
+		Error response = _enviosMasivosService.desAsociarDestinatarios(request, destinatarios);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else if (response.getCode() == 400)
+			return new ResponseEntity<Error>(response, HttpStatus.BAD_REQUEST);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "detalle/direccionesDestinatarioIndv",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DatosDireccionesDTO> obtenerDireccionesDisp(HttpServletRequest request, @RequestBody String idPersona) {
+		
+		DatosDireccionesDTO response = _enviosMasivosService.obtenerDireccionesDisp(request, idPersona);
+		if(response.getError() == null)
+			return new ResponseEntity<DatosDireccionesDTO>(response, HttpStatus.OK);
+		else{
+			if(response.getError().getCode() == 400)
+				return new ResponseEntity<DatosDireccionesDTO>(response, HttpStatus.BAD_REQUEST);
+			else
+				return new ResponseEntity<DatosDireccionesDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+			
 	}
 	
 }
