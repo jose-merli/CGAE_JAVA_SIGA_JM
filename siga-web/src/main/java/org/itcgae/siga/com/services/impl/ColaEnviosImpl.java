@@ -224,13 +224,13 @@ public class ColaEnviosImpl implements IColaEnvios {
 			//obtenemos los destinatarios por consultas de destinatarios
 			List<ConsultaItem> consultaItem = _envDestConsultaEnvioExtendsMapper.selectConsultasDestEnvio(envio.getIdinstitucion(), envio.getIdenvio().toString());
 			for (ConsultaItem consulta : consultaItem) {
-				String sentenciaFinal = prepararConsulta(consulta.getSentencia(), envio.getIdtipoenvios());
+				String sentenciaFinal = prepararConsulta(consulta.getSentencia(), envio.getIdtipoenvios(), envio.getIdinstitucion());
 				List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentenciaFinal);
 				if(result != null && result.size() > 0){
 					
 					for (Map<String, Object> map : result) {
 						Object campo = map.get("CORREOELECTRONICO");
-	            		if(campo == null || campo.toString().trim() == ""){
+	            		if(campo != null){
 	            			DestinatarioItem destinatario = new DestinatarioItem();
 	            			destinatario.setCorreoElectronico(campo.toString());
 	            			destinatarios.add(destinatario);
@@ -436,10 +436,10 @@ public class ColaEnviosImpl implements IColaEnvios {
 					if(direcciones != null && direcciones.size() > 0){
 						boolean añadido = false;
 						for (CenDirecciones dir : direcciones) {
-							if(dir.getCorreoelectronico() != null){
+							if(dir.getMovil() != null){
 								if(!añadido){
 									DestinatarioItem destinatario = new DestinatarioItem();
-									destinatario.setCorreoElectronico(dir.getCorreoelectronico());
+									destinatario.setMovil(dir.getMovil());
 									destinatarios.add(destinatario);
 									añadido = true;
 								}
@@ -454,21 +454,23 @@ public class ColaEnviosImpl implements IColaEnvios {
 			example.createCriteria().andIdenvioEqualTo(envio.getIdenvio()).andIdinstitucionEqualTo(envio.getIdinstitucion());
 			List<EnvDestinatarios> destIndv = _envDestinatariosMapper.selectByExample(example);
 			for (EnvDestinatarios destinatario : destIndv) {
-				DestinatarioItem dest = new DestinatarioItem();
-				dest.setCorreoElectronico(destinatario.getCorreoelectronico());
-				destinatarios.add(dest);
+				if(destinatario.getMovil()!=null){
+					DestinatarioItem dest = new DestinatarioItem();
+					dest.setMovil(destinatario.getMovil());
+					destinatarios.add(dest);
+				}
 			}
 			
 			//obtenemos los destinatarios por consultas de destinatarios
 			List<ConsultaItem> consultaItem = _envDestConsultaEnvioExtendsMapper.selectConsultasDestEnvio(envio.getIdinstitucion(), envio.getIdenvio().toString());
 			for (ConsultaItem consulta : consultaItem) {
-				String sentenciaFinal = prepararConsulta(consulta.getSentencia(), envio.getIdtipoenvios());
+				String sentenciaFinal = prepararConsulta(consulta.getSentencia(), envio.getIdtipoenvios(), envio.getIdinstitucion());
 				List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentenciaFinal);
 				if(result != null && result.size() > 0){
 					
 					for (Map<String, Object> map : result) {
 						Object campo = map.get("MOVIL");
-	            		if(campo == null || campo.toString().trim() == ""){
+	            		if(campo != null){
 	            			DestinatarioItem destinatario = new DestinatarioItem();
 	            			destinatario.setMovil(campo.toString());
 	            			destinatarios.add(destinatario);
@@ -477,8 +479,13 @@ public class ColaEnviosImpl implements IColaEnvios {
 				}
 			}
 			
-			
 			LOGGER.info("Destinatarios encontrados: " + destinatarios.size());
+			numerosDestinatarios = new String[destinatarios.size()];
+			
+			// Obtenemos los numeros de los destinatarios.
+			for (int x = 0; x < numerosDestinatarios.length; x++) {
+				numerosDestinatarios[x] = destinatarios.get(x).getMovil();
+			}
 			
 		}else{
 			EnvDestinatariosExample exampleDest = new EnvDestinatariosExample();
@@ -611,7 +618,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 
 	}
 	
-	private String prepararConsulta(String sentencia, Short idtipoEnvios){
+	private String prepararConsulta(String sentencia, Short idtipoEnvios, Short idInstitucion){
 		
 		sentencia = sentencia.replaceAll("<SELECT>", " ");
 		sentencia = sentencia.replaceAll("</SELECT>", " ");
@@ -641,7 +648,11 @@ public class ColaEnviosImpl implements IColaEnvios {
 		sentencia = sentencia.replaceAll("</UNIONALL>", " ");
 		
 		if(sentencia.toUpperCase().contains("%%IDTIPOENVIOS%%")){
-			sentencia.toUpperCase().replaceAll("%%IDTIPOENVIOS%%", idtipoEnvios.toString());
+			sentencia = sentencia.toUpperCase().replaceAll("%%IDTIPOENVIOS%%", idtipoEnvios.toString());
+		}
+		
+		if(sentencia.toUpperCase().contains("%%IDINSTITUCION%%")){
+			sentencia = sentencia.toUpperCase().replaceAll("%%IDINSTITUCION%%", idInstitucion.toString());
 		}
 		
 		return sentencia;
