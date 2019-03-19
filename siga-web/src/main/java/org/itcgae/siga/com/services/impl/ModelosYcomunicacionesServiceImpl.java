@@ -1,5 +1,9 @@
 package org.itcgae.siga.com.services.impl;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +36,9 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.entities.ModClasecomunicaciones;
 import org.itcgae.siga.db.entities.ModModeloPerfiles;
 import org.itcgae.siga.db.entities.ModModeloPerfilesExample;
 import org.itcgae.siga.db.entities.ModModeloPerfilesKey;
@@ -44,15 +51,23 @@ import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
+import org.itcgae.siga.db.entities.ModPlantilladocumento;
+import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
+import org.itcgae.siga.db.entities.ModRelPlantillaSufijo;
+import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPerfilesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
+import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
+import org.itcgae.siga.db.mappers.ModRelPlantillaSufijoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
@@ -120,7 +135,19 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	private EnvPlantillaEnviosExtendsMapper envPlantillaEnviosExtendsMapper;
 	
 	@Autowired
+	private ModPlantilladocumentoMapper modPlantilladocumentoMapper;
+	
+	@Autowired
 	private CenInstitucionExtendsMapper _cenInstitucionExtendsMapper;
+	
+	@Autowired
+	private ModClasecomunicacionesMapper _modClasecomunicacionesMapper;
+	
+	@Autowired
+	private GenPropertiesMapper _genPropertiesMapper;
+	
+	@Autowired
+	private ModRelPlantillaSufijoMapper modRelPlantillaSufijoMapper;
 	
 	@Override
 	public DatosModelosComunicacionesDTO modeloYComunicacionesSearch(HttpServletRequest request, DatosModelosComunicacionesSearch filtros, boolean historico) {
@@ -141,8 +168,9 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
 			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
 				try{
-					modelosItem = modModeloComunicacionExtendsMapper.selectModelosComunicacion(String.valueOf(idInstitucion), filtros, historico);	
+					modelosItem = modModeloComunicacionExtendsMapper.selectModelosComunicacion(String.valueOf(idInstitucion), filtros, usuario.getIdlenguaje(), historico);	
 					if(modelosItem != null && modelosItem.size()> 0){
 						respuesta.setModelosComunicacionItem(modelosItem);
 					}
@@ -179,6 +207,8 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			ModClasecomunicaciones modClase = null;
+			String rutaPlantillaClase = "";
 			
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -193,6 +223,25 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					// En caso contrario, se añadira un contador (*_COPIA1)
 					
 					String nuevoNombre = comprobarNombreDuplicado(modelo.getNombre());
+					Short idInstitucionModelo = Short.parseShort(modeloComunicacion.getIdInstitucion());
+					
+					if(idInstitucionModelo != null && String.valueOf(idInstitucionModelo).equals(SigaConstants.IDINSTITUCION_0)) {
+						idInstitucionModelo = SigaConstants.IDINSTITUCION_2000;
+					}
+					
+					// OBtenemos la ruta de las plantillas
+					if(modelo.getIdclasecomunicacion() != null) {
+						modClase = _modClasecomunicacionesMapper.selectByPrimaryKey(modelo.getIdclasecomunicacion());
+						if(modClase != null) {
+							rutaPlantillaClase = modClase.getRutaplantilla();
+						}					
+					}
+					
+					if(rutaPlantillaClase == null || "".equals(rutaPlantillaClase)) {
+						rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+					}else {
+						rutaPlantillaClase = rutaPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, String.valueOf(idInstitucion));
+					}
 					
 //					String nuevoNombre = modelo.getNombre() + SigaConstants.SUFIJO_MODULO_COM_DUPLICADO;
 //					if(nuevoNombre.length() < SigaConstants.NOMBRE_MAXLENGTH){
@@ -206,9 +255,14 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					// Si el modelo de comunicacion tiene marcado el campo "PORDEFECTO" a SI, tendremos que utilizar la institucion actual
 					// Si no está marcado "PORDEFECTO" a SI, al modelo duplicado le pondremos la institucion del modelo original.
 					if(modelo.getPordefecto() == null || modelo.getPordefecto().equalsIgnoreCase("NO"))
-						modelo.setIdinstitucion(Short.parseShort(modeloComunicacion.getIdInstitucion()));
-					else
+						modelo.setIdinstitucion(idInstitucionModelo);
+					else {
 						modelo.setIdinstitucion(idInstitucion);
+						if(idInstitucion != SigaConstants.IDINSTITUCION_2000) {
+							modelo.setPordefecto("NO");
+						}
+					}
+						
 					
 					modelo.setNombre(nuevoNombre);
 					modelo.setFechabaja(null);
@@ -221,14 +275,14 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 					
 					//Tabla mod_modelo_perfiles
 					ModModeloPerfilesExample example = new ModModeloPerfilesExample();
-					example.createCriteria().andIdinstitucionEqualTo(Short.parseShort(modeloComunicacion.getIdInstitucion())).andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion()));
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucionModelo).andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion()));
 					
 					List<ModModeloPerfiles> listaModPerfiles = modModeloPerfilesMapper.selectByExample(example);
 					
 					if(listaModPerfiles != null){
 						for(ModModeloPerfiles modPerfil : listaModPerfiles){
 							modPerfil.setFechamodificacion(new Date());
-							modPerfil.setIdinstitucion(Short.parseShort(modeloComunicacion.getIdInstitucion()));
+							modPerfil.setIdinstitucion(modelo.getIdinstitucion());
 							modPerfil.setIdmodelocomunicacion(modelo.getIdmodelocomunicacion());
 							modModeloPerfilesMapper.insert(modPerfil);
 						}
@@ -248,10 +302,25 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 							modPlantilla.setFechaasociacion(new Date());
 							modModeloPlantilladocumentoMapper.insert(modPlantilla);						
 							
+							//Duplicamos los sufijos
+							ModRelPlantillaSufijoExample relSufijoExample = new ModRelPlantillaSufijoExample();
+							relSufijoExample.createCriteria().andIdplantilladocumentoEqualTo(idPlantillaDuplicar).andIdinformeEqualTo(modPlantilla.getIdinforme());
+							List<ModRelPlantillaSufijo> listaSufijos = modRelPlantillaSufijoMapper.selectByExample(relSufijoExample);
+							if(listaSufijos != null && listaSufijos.size() > 0) {
+								for(ModRelPlantillaSufijo sufijo : listaSufijos) {
+									sufijo.setIdplantillasufijo(null);
+									sufijo.setIdplantilladocumento(modPlantilla.getIdplantilladocumento());
+									sufijo.setIdmodelocomunicacion(modelo.getIdmodelocomunicacion());
+									sufijo.setFechamodificacion(new Date());
+									sufijo.setUsumodificacion(usuario.getIdusuario());
+									modRelPlantillaSufijoMapper.insert(sufijo);
+								}
+							}						
+							
 							
 							//Tabla mod_plantilladoc_consulta
 							ModPlantilladocConsultaExample examplePlantillaConsulta = new ModPlantilladocConsultaExample();
-							examplePlantillaConsulta.createCriteria().andIdinstitucionEqualTo(Short.parseShort(modeloComunicacion.getIdInstitucion())).andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion())).andIdplantilladocumentoEqualTo(idPlantillaDuplicar);
+							examplePlantillaConsulta.createCriteria().andIdinstitucionEqualTo(idInstitucionModelo).andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion())).andIdplantilladocumentoEqualTo(idPlantillaDuplicar);
 							
 							List<ModPlantilladocConsulta> listaModPlantillaConsulta = modPlantilladocConsultaMapper.selectByExample(examplePlantillaConsulta);
 							
@@ -259,20 +328,46 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 								for(ModPlantilladocConsulta modPlantillaConsulta : listaModPlantillaConsulta){
 									modPlantillaConsulta.setFechamodificacion(new Date());
 									modPlantillaConsulta.setIdmodelocomunicacion(modPlantilla.getIdmodelocomunicacion());
-									modPlantillaConsulta.setIdinstitucion(Short.parseShort(modeloComunicacion.getIdInstitucion()));
+									modPlantillaConsulta.setIdinstitucion(modelo.getIdinstitucion());
 									modPlantillaConsulta.setIdplantillaconsulta(null);
 									modPlantillaConsulta.setIdplantilladocumento(modPlantilla.getIdplantilladocumento());
 									modPlantilladocConsultaMapper.insert(modPlantillaConsulta);
 								}
 							}
 							
+							//Duplicamos la plantilla fisicamente si la institucion es del general
+							if(idInstitucionModelo != modelo.getIdinstitucion()) {
+								
+								GenPropertiesKey key = new GenPropertiesKey();
+								key.setFichero(SigaConstants.FICHERO_SIGA);
+								key.setParametro(SigaConstants.parametroRutaPlantillas);
+								
+								GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+								
+								String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator;
+								String rutaPlantillaDestino = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator + String.valueOf(modelo.getIdinstitucion()) + SigaConstants.pathSeparator;
+								
+								ModPlantilladocumentoExample examplePlantilla = new ModPlantilladocumentoExample();
+								examplePlantilla.createCriteria().andIdplantilladocumentoEqualTo(modPlantilla.getIdplantilladocumento());
+								List<ModPlantilladocumento> listaPlantillasDoc = modPlantilladocumentoMapper.selectByExample(examplePlantilla);
+								if(listaPlantillasDoc != null && listaPlantillasDoc.size() > 0) {
+									for(ModPlantilladocumento plantillaDoc : listaPlantillasDoc) {
+										File ficheroCopiar = new File(rutaPlantilla + plantillaDoc.getPlantilla());
+										File ficheroDestino = new File(rutaPlantillaDestino + plantillaDoc.getPlantilla());
+										if(ficheroCopiar.exists()) {
+											Files.copy(Paths.get(ficheroCopiar.getAbsolutePath()), Paths.get(ficheroDestino.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+										}										
+									}
+								}
+								
+							}
+							
 						}
-					}
-					
+					}			
 					
 					
 					//Tabla mod_modelo_plantillaenvio
-					ModModeloPlantillaenvioExample examplePlantillaEnvio = new ModModeloPlantillaenvioExample();
+					/*ModModeloPlantillaenvioExample examplePlantillaEnvio = new ModModeloPlantillaenvioExample();
 					examplePlantillaEnvio.createCriteria().andIdmodelocomunicacionEqualTo(Long.valueOf(modeloComunicacion.getIdModeloComunicacion())).andIdinstitucionEqualTo(Short.parseShort(modeloComunicacion.getIdInstitucion())).andFechabajaIsNull();
 					
 					List<ModModeloPlantillaenvio> listaModPlantillaEnvio = modModeloPlantillaenvioMapper.selectByExample(examplePlantillaEnvio);
@@ -314,7 +409,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 								}
 							}						
 						}
-					}				
+					}*/			
 					
 					
 					respuesta.setCode(200);
@@ -444,6 +539,11 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
+					
+					if(idInstitucion != null && idInstitucion.equals(SigaConstants.IDINSTITUCION_0)) {
+						idInstitucion = String.valueOf(SigaConstants.IDINSTITUCION_2000);
+					}
+					
 					comboItems = modModeloPerfilesExtendsMapper.selectPerfilesModelo(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion));
 					comboDTO.setCombooItems(comboItems);
 				}catch(Exception e){
@@ -470,7 +570,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		PlantillasDocumentosDTO respuesta = new PlantillasDocumentosDTO();
-		List<PlantillaModeloDocumentoDTO> informesItem = new ArrayList<PlantillaModeloDocumentoDTO>();
+		List<PlantillaModeloDocumentoDTO> informesItem = new ArrayList<PlantillaModeloDocumentoDTO>();		
 		
 		if (null != idInstitucionUser) {
 			
@@ -480,6 +580,11 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
 					AdmUsuarios usuario = usuarios.get(0);
+					
+					if(idInstitucion != null && idInstitucion.equals(SigaConstants.IDINSTITUCION_0)) {
+						idInstitucion = String.valueOf(SigaConstants.IDINSTITUCION_2000);
+					}
+					
 					informesItem = modModeloPlantillaDocumentoExtendsMapper.selectInformes(Short.parseShort(idInstitucion), Long.parseLong(idModeloComunicacion), usuario.getIdlenguaje());			
 					if(informesItem != null && informesItem.size()> 0){
 						for(PlantillaModeloDocumentoDTO informeItem : informesItem){
@@ -584,6 +689,12 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						modeloCom.setUsumodificacion(usuario.getIdusuario());
 						modeloCom.setVisible(Short.parseShort(datosTarjeta.getVisible()));
 						
+						if(datosTarjeta.getIdPlantillaEnvio() != null) {
+							modeloCom.setIdplantillaenvios(Long.parseLong(datosTarjeta.getIdPlantillaEnvio()));
+						}
+						if(datosTarjeta.getIdTipoEnvio() != null) {
+							modeloCom.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+						}
 						
 						modModelocomunicacionMapper.updateByPrimaryKey(modeloCom);
 					}else{
@@ -606,6 +717,13 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						modeloCom.setPreseleccionar(datosTarjeta.getPreseleccionar());
 						modeloCom.setUsumodificacion(usuario.getIdusuario());
 						modeloCom.setVisible(Short.parseShort(datosTarjeta.getVisible()));
+						
+						if(datosTarjeta.getIdPlantillaEnvio() != null) {
+							modeloCom.setIdplantillaenvios(Long.parseLong(datosTarjeta.getIdPlantillaEnvio()));
+						}
+						if(datosTarjeta.getIdTipoEnvio() != null) {
+							modeloCom.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvio()));
+						}						
 						
 						modModelocomunicacionMapper.insert(modeloCom);
 					}
@@ -1084,7 +1202,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 				
 				 modeloComunicacionItem = new ModelosComunicacionItem();
 				try {
-					modeloComunicacionItem = modModeloComunicacionExtendsMapper.selectModelo(idModelo);
+					modeloComunicacionItem = modModeloComunicacionExtendsMapper.selectModelo(idModelo, usuario.getIdlenguaje());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -1144,5 +1262,43 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 		
 		return nombreFinal.getValor();
 
+	}
+
+
+	@Override
+	public PlantillasModeloDTO obtenerPlantillaPorDefecto(HttpServletRequest request, String idModelo) {
+		LOGGER.info("obtenerPlantillaPorDefecto() -> Entrada al servicio para obtener la plantilla por defecto del modelo");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		PlantillasModeloDTO respuesta = new PlantillasModeloDTO();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					List<PlantillaModeloItem> plantillas = modModeloComunicacionExtendsMapper.selectPlantillaPorDefecto(idModelo, idInstitucion, usuario.getIdlenguaje());
+					if(plantillas != null && plantillas.size() > 0){
+						respuesta.setPlantillas(plantillas);
+					}
+					
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription(e.getMessage());
+					error.setMessage("Error");
+					respuesta.setError(error);
+				}
+			}
+		}
+		
+		LOGGER.info("obtenerPlantillaPorDefecto() -> Salida del servicio para obtener la plantilla por defecto del modelo");
+		return respuesta;
 	}
 }

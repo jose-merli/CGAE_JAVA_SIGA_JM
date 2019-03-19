@@ -24,6 +24,7 @@ public class ModelosComunicacionItem {
 	private String idPlantillaEnvio;
 	private String idTipoEnvio;
 	private String porDefecto;
+	private String tipoEnvio;
 	private List<ComboItem> plantillas = new ArrayList<ComboItem>();
 	
 	public String getIdModeloComunicacion() {
@@ -116,6 +117,12 @@ public class ModelosComunicacionItem {
 	}
 	public void setPlantillas(List<ComboItem> plantillas) {
 		this.plantillas = plantillas;
+	}
+	public String getTipoEnvio() {
+		return tipoEnvio;
+	}
+	public void setTipoEnvio(String tipoEnvio) {
+		this.tipoEnvio = tipoEnvio;
 	}
 	
 	

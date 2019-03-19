@@ -15,7 +15,15 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTOs.com.ConsultaEnvioItem;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
+import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
+import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
+import org.itcgae.siga.DTOs.com.ConsultaItem;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.DestinatarioIndvEnvioMasivoItem;
+import org.itcgae.siga.DTOs.com.DestinatarioItem;
+import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.DocumentoEnvioItem;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
@@ -24,21 +32,28 @@ import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.EnviosMasivosSearch;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.ResponseDocumentoDTO;
-import org.itcgae.siga.DTOs.com.ResponseFileDTO;
 import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IColaEnvios;
-import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenDireccionesExample;
+import org.itcgae.siga.db.entities.CenDireccionesKey;
+import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
+import org.itcgae.siga.db.entities.EnvDestConsultaEnvio;
+import org.itcgae.siga.db.entities.EnvDestConsultaEnvioKey;
+import org.itcgae.siga.db.entities.EnvDestinatarios;
+import org.itcgae.siga.db.entities.EnvDestinatariosKey;
 import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.EnvDocumentosExample;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
@@ -51,16 +66,25 @@ import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvioExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.mappers.CenDireccionesMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
+import org.itcgae.siga.db.mappers.EnvDestConsultaEnvioMapper;
+import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
 import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosgrupoclienteMapper;
 import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
-import org.itcgae.siga.db.mappers.EnvPlantillaremitentesMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvDestConsultaEnvioExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvDestinatariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDocumentosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosGrupoClienteExtendsMapper;
@@ -116,9 +140,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	private EnvDocumentosMapper _envDocumentosMapper;
 	
 	@Autowired
-	private EnvPlantillaremitentesMapper _envPlantillaremitentesMapper;
-	
-	@Autowired
 	private EnvEnviosgrupoclienteMapper _envEnviosgrupoclienteMapper;
 	
 	@Autowired
@@ -132,7 +153,30 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	@Autowired
 	private IColaEnvios _colaEnvios;
+	
+	@Autowired
+	private ConConsultasExtendsMapper _conConsultasExtendsMapper;
 
+	@Autowired
+	private EnvDestConsultaEnvioExtendsMapper _envDestConsultaEnvioExtendsMapper;
+	
+	@Autowired
+	private GenPropertiesMapper _genPropertiesMapper;
+	
+	@Autowired
+	private EnvDestConsultaEnvioMapper _envDestConsultaEnvioMapper;
+	
+	@Autowired
+	private EnvDestinatariosExtendsMapper _envDestinatariosExtendsMapper;
+	
+	@Autowired
+	private EnvDestinatariosMapper _envDestinatariosMapper;
+	
+	@Autowired
+	private CenPersonaMapper _cenPersonaMapper;
+	
+	@Autowired 
+	private CenDireccionesMapper _cenDireccionesMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -921,12 +965,19 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			if (null != usuarios && usuarios.size() > 0) {
-				
+			if (null != usuarios && usuarios.size() > 0) {				
 				
 				// crear path para almacenar el fichero
 				
-				String pathFichero = SigaConstants.rutaficherosInformesYcomunicaciones + String.valueOf(idInstitucion) + SigaConstants.carpetaDocumentosEnvio;
+				GenPropertiesKey key = new GenPropertiesKey();
+				key.setFichero(SigaConstants.FICHERO_SIGA);
+				key.setParametro(SigaConstants.parametroRutaPlantillas);
+				
+				GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+				
+				String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + SigaConstants.carpetaDocumentosEnvio + SigaConstants.pathSeparator + String.valueOf(idInstitucion) + SigaConstants.pathSeparator;
+				
+				String pathFichero = rutaPlantilla;
 				
 				// 1. Coger archivo del request
 				LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
@@ -936,7 +987,11 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
 				//BufferedOutputStream stream = null;
 				try {
-					File aux = new File(pathFichero);
+					File aux = new File(rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + SigaConstants.carpetaDocumentosEnvio + SigaConstants.pathSeparator);
+					// creo directorio si no existe
+					aux.mkdirs();
+					
+					aux = new File(pathFichero);
 					// creo directorio si no existe
 					aux.mkdirs();
 					File serverFile = new File(pathFichero, fileName);
@@ -1115,5 +1170,404 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 		
 		return plantilla;
 	}
+
+	@Override
+	public ComboConsultaInstitucionDTO obtenerconsultasDestinatarios(HttpServletRequest request) {
+		LOGGER.info("obtenerconsultasDestinatarios() -> Entrada al servicio para obtener consultas de desinatario del envio");
+		
+		ComboConsultaInstitucionDTO response = new ComboConsultaInstitucionDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				long idObjetivo = 1;
+				List<ComboItemConsulta> consultas = _conConsultasExtendsMapper.selectConsultasDisponibles(idInstitucion, null, idObjetivo);
+				response.setConsultas(consultas);
+			}
+		}
+		
+		LOGGER.info("obtenerconsultasDestinatarios() -> Salida del servicio para obtener consultas de desinatario del envio");
+		return response;
+	}
+
+	@Override
+	public ConsultasDTO consultasDestAsociadas(HttpServletRequest request, String idEnvio) {
+		LOGGER.info("consultasDestEnvio() -> Entrada al servicio para obtener consultas de asociadas desinatario del envio");
+		
+		ConsultasDTO response = new ConsultasDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try {
+					List<ConsultaItem> consultaItem = _envDestConsultaEnvioExtendsMapper.selectConsultasDestEnvio(idInstitucion, idEnvio);
+					response.setConsultaItem(consultaItem);
+				}catch(Exception e) {
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage("Error al obtener consultas asociadas al envio");
+					response.setError(error);
+				}
+				
+			}
+		}
+		
+		LOGGER.info("consultasDestEnvio() -> Salida del servicio para obtener consultas de asociadas desinatario del envio");
+		return response;
+	}
+
+	@Override
+	public Error asociarConsulta(HttpServletRequest request, ConsultaDestinatarioItem consulta) {
+		LOGGER.info("asociarConsulta() -> Entrada al servicio para asociar consulta de destinatario de envio");
+		
+		Error response = new Error();
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					EnvDestConsultaEnvioKey key = new EnvDestConsultaEnvioKey();
+					key.setIdconsulta(Long.parseLong(consulta.getIdConsulta()));
+					key.setIdenvio(Long.parseLong(consulta.getIdEnvio()));
+					EnvDestConsultaEnvio consultaEntity = _envDestConsultaEnvioMapper.selectByPrimaryKey(key);
+					if(consultaEntity == null){
+						consultaEntity = new EnvDestConsultaEnvio();
+						consultaEntity.setIdconsulta(Long.parseLong(consulta.getIdConsulta()));
+						consultaEntity.setIdenvio(Long.parseLong(consulta.getIdEnvio()));
+						consultaEntity.setIdinstitucion(idInstitucion);
+						consultaEntity.setIdinstitucionConsulta(Short.parseShort(consulta.getIdInstitucion()));
+						consultaEntity.setUsumodificacion(usuarios.get(0).getIdusuario());
+						consultaEntity.setFechamodificacion(new Date());
+						_envDestConsultaEnvioMapper.insert(consultaEntity);
+						response.setCode(200);
+						response.setDescription("Consulta asociada");
+					}else{
+						if(consultaEntity.getFechabaja() != null){
+							consultaEntity.setFechabaja(null);
+							consultaEntity.setUsumodificacion(usuarios.get(0).getIdusuario());
+							consultaEntity.setFechamodificacion(new Date());
+							_envDestConsultaEnvioMapper.updateByPrimaryKey(consultaEntity);
+						}else{
+							response.setCode(400);
+							response.setDescription("La consulta ya ha sido asociada");
+						}
+					}
+					
+					
+				}catch(Exception e){
+					response.setCode(500);
+					response.setDescription("Error al asociar la consulta");
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		LOGGER.info("asociarConsulta() -> Salida del servicio para asociar consulta de destinatario de envio");
+		return response;
+	}
+
+	@Override
+	public Error desAsociarConsulta(HttpServletRequest request, ConsultaDestinatarioItem[] consultas) {
+		LOGGER.info("desAsociarConsulta() -> Entrada al servicio para asociar consulta de destinatario de envio");
+		
+		Error response = new Error();
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					for (ConsultaDestinatarioItem consulta : consultas) {
+						EnvDestConsultaEnvioKey key = new EnvDestConsultaEnvioKey();
+						key.setIdconsulta(Long.parseLong(consulta.getIdConsulta()));
+						key.setIdenvio(Long.parseLong(consulta.getIdEnvio()));
+						EnvDestConsultaEnvio consultaEntity = _envDestConsultaEnvioMapper.selectByPrimaryKey(key);
+						consultaEntity.setFechabaja(new Date());
+						consultaEntity.setUsumodificacion(usuarios.get(0).getIdusuario());
+						consultaEntity.setFechamodificacion(new Date());
+						_envDestConsultaEnvioMapper.updateByPrimaryKey(consultaEntity);
+						response.setCode(200);
+						response.setDescription("Consulta asociada");
+					}
+				}catch(Exception e){
+					response.setCode(500);
+					response.setDescription("Error al des asociar la consulta");
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		LOGGER.info("desAsociarConsulta() -> Salida del servicio para desasociar consulta de destinatario de envio");
+		return response;
+	}
 	
+	@Override
+	public ComboConsultaInstitucionDTO getComboConsultas(HttpServletRequest request, String filtro) {
+		LOGGER.info("getComboConsultas() -> Entrada al servicio para obtener las consultas disponibles");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ComboConsultaInstitucionDTO comboDTO = new ComboConsultaInstitucionDTO();
+		List<ComboItemConsulta> comboItems = new ArrayList<ComboItemConsulta>();
+		
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+
+				long idObjetivoDest = 1;
+				comboItems = _conConsultasExtendsMapper.selectConsultasDisponiblesFiltro(idInstitucion, null, idObjetivoDest, filtro);
+
+				if(null != comboItems && comboItems.size() > 0) {
+					ComboItemConsulta element = new ComboItemConsulta();
+					element.setLabel("");
+					element.setValue("");
+					comboItems.add(0, element);
+				}		
+				
+				comboDTO.setConsultas(comboItems);
+				
+			}
+		}
+		
+		LOGGER.info("getComboConsultas() -> Salida del servicio para obtener las consultas disponibles");
+		return comboDTO;
+	}
+
+	@Override
+	public DestinatariosDTO obtenerDestinatariosIndv(HttpServletRequest request, String idEnvio) {
+		LOGGER.info("obtenerDestinatariosIndv() -> Entrada al servicio para obtener los destinatarios individuales de envio");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DestinatariosDTO response = new DestinatariosDTO();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					List<DestinatarioItem> destinatarios = _envDestinatariosExtendsMapper.selectDestinatarios(idInstitucion, idEnvio);
+					if(destinatarios != null && destinatarios.size() >0){
+						response.setDestinatarios(destinatarios);
+					}
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription("Error al obtener destinatarios indivuales");
+					response.setError(error);
+					e.printStackTrace();
+				}
+				
+			}
+		}
+		
+		LOGGER.info("obtenerDestinatariosIndv() -> Salida del servicio para obtener los destinatarios individuales de envio");
+		return response;
+	}
+
+	@Override
+	public Error asociarDestinatario(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem destinatario) {
+		LOGGER.info("asociarDestinatario() -> Entrada al servicio para asociar un destinatario individual");
+		
+		Error response = new Error();
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.parseLong(destinatario.getIdPersona()));
+					CenDireccionesKey key = new CenDireccionesKey();
+					key.setIddireccion(Long.parseLong(destinatario.getIdDireccion()));
+					key.setIdpersona(Long.parseLong(destinatario.getIdPersona()));
+					key.setIdinstitucion(idInstitucion);
+					CenDirecciones dir = _cenDireccionesMapper.selectByPrimaryKey(key);
+					EnvDestinatarios dest = new EnvDestinatarios();
+					dest.setApellidos1(persona.getApellidos1());
+					dest.setApellidos2(persona.getApellidos2());
+					dest.setCodigopostal(dir.getCodigopostal());
+					dest.setCorreoelectronico(dir.getCorreoelectronico());
+					dest.setDomicilio(dir.getDomicilio());
+					dest.setFax1(dir.getFax1());
+					dest.setFax2(dir.getFax2());
+					dest.setFechamodificacion(new Date());
+					dest.setIdenvio(Long.parseLong(destinatario.getIdEnvio()));
+					dest.setIdinstitucion(idInstitucion);
+					dest.setIdpais(dir.getIdpais());
+					dest.setIdpersona(persona.getIdpersona());
+					dest.setIdpoblacion(dir.getIdpoblacion());
+					dest.setIdprovincia(dir.getIdprovincia());
+					dest.setMovil(dir.getMovil());
+					dest.setNifcif(persona.getNifcif());
+					dest.setNombre(persona.getNombre());
+					dest.setPoblacionextranjera(dir.getPoblacionextranjera());
+					dest.setUsumodificacion(usuarios.get(0).getIdusuario());
+					dest.setTipodestinatario("CEN_PERSONA");
+					_envDestinatariosMapper.insert(dest);
+					response.setCode(200);
+					response.setDescription("Destinatario asociado con éxito");
+				}catch(Exception e){
+					response.code(500);
+					response.setDescription("Error al asociar destinatario");
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		LOGGER.info("asociarDestinatario() -> Salida del servicio para asociar un destinatario individual");
+		return response;
+	}
+
+	@Override
+	public Error desAsociarDestinatarios(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem[] destinatarios) {
+		LOGGER.info("desAsociarDestinatarios() -> Entrada al servicio para des asociar un destinatario individual");
+		
+		Error response = new Error();
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					for (DestinatarioIndvEnvioMasivoItem destinatario : destinatarios) {
+						EnvDestinatariosKey key = new EnvDestinatariosKey();
+						key.setIdenvio(Long.parseLong(destinatario.getIdEnvio()));
+						key.setIdinstitucion(idInstitucion);
+						key.setIdpersona(Long.parseLong(destinatario.getIdPersona()));
+						_envDestinatariosMapper.deleteByPrimaryKey(key);
+					}
+					response.setCode(200);
+					response.setDescription("Destinatarios eliminados con éxito");
+				}catch(Exception e){					
+					response.setCode(500);
+					response.setDescription("Error al eliminar los destinatarios");
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		LOGGER.info("desAsociarDestinatarios() -> Salida del servicio para des asociar un destinatario individual");
+		return response;
+	}
+
+	@Override
+	public DatosDireccionesDTO obtenerDireccionesDisp(HttpServletRequest request, String idPersona) {
+		LOGGER.info("obtenerDireccionesDisp() -> Entrada al servicio para obtener direcciones");
+		
+		DatosDireccionesDTO response = new DatosDireccionesDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				
+				try{
+					CenDireccionesExample example = new CenDireccionesExample();
+					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona)).andIdinstitucionEqualTo(idInstitucion);
+					List<CenDirecciones> direcciones = _cenDireccionesMapper.selectByExample(example);
+					if(direcciones != null && direcciones.size() > 0){
+						List<DatosDireccionesItem> direccionesList = new ArrayList<DatosDireccionesItem>();
+						for (CenDirecciones item : direcciones) {
+							DatosDireccionesItem direccion = new DatosDireccionesItem();
+							direccion.setIdPersona(item.getIdpersona().toString());
+							if(item.getIdinstitucion() != null){
+								direccion.setIdInstitucion(item.getIdinstitucion().toString());
+							}
+							if(item.getIddireccion() != null){
+								direccion.setIdDireccion(item.getIddireccion().toString());	
+							}
+							direccion.setDomicilio(item.getDomicilio());
+							direccion.setIdPoblacion(item.getIdpoblacion());
+							direccion.setIdProvincia(item.getIdprovincia());
+							direccion.setIdPais(item.getIdpais());
+							direccion.setCodigoPostal(item.getCodigopostal());
+							direccion.setTelefono(item.getTelefono1());
+							direccion.setTelefono2(item.getTelefono2());
+							direccion.setMovil(item.getMovil());
+							direccion.setFax(item.getFax1());
+							direccion.setFax2(item.getFax2());
+							direccion.setCorreoElectronico(item.getCorreoelectronico());
+							direccion.setPaginaWeb(item.getPaginaweb());
+							direccionesList.add(direccion);
+						}
+						response.setDatosDireccionesItem(direccionesList);
+					}else{
+						Error error = new Error();
+						error.setCode(400);
+						error.setDescription("No existen direcciones disponibles");
+						response.setError(error);
+					}
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription("Error al obtener direcciones de destinatario");
+					response.setError(error);
+					e.printStackTrace();
+				}
+				
+			}
+		}
+		
+		LOGGER.info("obtenerDireccionesDisp() -> Salida al servicio para obtener direcciones");
+		return response;
+	}
+		
 }

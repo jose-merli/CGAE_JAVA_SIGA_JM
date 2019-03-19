@@ -48,12 +48,21 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
+import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
+import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
+import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
+import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
@@ -110,6 +119,18 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	@Autowired
 	private EnvTipoEnvioExtendsMapper _envTipoEnvioExtendsMapper;
+
+	@Autowired
+	private GenPropertiesMapper _genPropertiesMapper;
+	
+	@Autowired
+	private ModModelocomunicacionMapper _modModelocomunicacionMapper;
+	
+	@Autowired
+	private ModModeloPlantilladocumentoMapper _modModeloPlantilladocumentoMapper;
+	
+	@Autowired
+	private ModPlantilladocumentoMapper _modPlantilladocumentoMapper;
 
 	
 	@Override
@@ -496,11 +517,62 @@ public class ConsultasServiceImpl implements IConsultasService{
 						sentencia = insertarClaves(consulta.getIdclasecomunicacion(), sentencia);
 						consulta.setSentencia(sentencia);
 						
-						_conConsultaMapper.insert(consulta);
+						_conConsultaMapper.insert(consulta);											
+						
+						//Creamos el modelo de comunicación con la clase Consultas genericas para generacion de excel o informe
+						
+						ModModelocomunicacion modeloCom = new ModModelocomunicacion();
+						modeloCom.setDescripcion(consultaDTO.getNombre());
+						modeloCom.setFechamodificacion(new Date());
+						modeloCom.setIdclasecomunicacion(Short.parseShort(SigaConstants.ID_CLASE_CONSULTA_GENERICA));
+						modeloCom.setIdinstitucion(idInstitucion);
+						modeloCom.setNombre(consultaDTO.getNombre());
+						modeloCom.setPordefecto("NO");
+						modeloCom.setPreseleccionar("SI");
+						modeloCom.setUsumodificacion(usuario.getIdusuario());
+						modeloCom.setVisible((short)1);
+						_modModelocomunicacionMapper.insert(modeloCom);
+						
+						
+						//Creamos la plantilla de documento para geenración de excel
+						ModPlantilladocumento plantilla = new ModPlantilladocumento();
+						plantilla.setFechamodificacion(new Date());
+						plantilla.setIdioma(SigaConstants.LENGUAJE_DEFECTO);
+						plantilla.setPlantilla(SigaConstants.nombreExcelConsulta);
+						plantilla.setUsumodificacion(Integer.parseInt(usuario.getIdlenguaje()));
+						_modPlantilladocumentoMapper.insert(plantilla);
+						
+						//Creamos la relación con la plantilla de documento para generación de excel
+						ModModeloPlantilladocumento plantillaDoc = new ModModeloPlantilladocumento();
+						plantillaDoc.setFechaasociacion(new Date());
+						plantillaDoc.setFechamodificacion(new Date());
+						plantillaDoc.setFormatosalida(String.valueOf(SigaConstants.FORMATO_SALIDA.XLS.getCodigo()));
+						plantillaDoc.setIdinforme((long)1);
+						plantillaDoc.setIdmodelocomunicacion(modeloCom.getIdmodelocomunicacion());
+						plantillaDoc.setNombreficherosalida(SigaConstants.nombreExcelConsulta);
+						plantillaDoc.setUsumodificacion(usuario.getIdusuario());
+						plantillaDoc.setIdplantilladocumento(plantilla.getIdplantilladocumento());	
+						plantillaDoc.setGeneracionexcel(Short.parseShort(SigaConstants.DB_TRUE));
+						_modModeloPlantilladocumentoMapper.insert(plantillaDoc);
+						
+						//Asociamos la consulta a la plantilla de documento
+						
+						ModPlantilladocConsulta plantillaConsulta = new ModPlantilladocConsulta();
+						plantillaConsulta.setFechamodificacion(new Date());
+						plantillaConsulta.setIdconsulta(consulta.getIdconsulta());
+						plantillaConsulta.setIdinstitucion(idInstitucion);
+						plantillaConsulta.setIdinstitucionConsulta(idInstitucion);
+						plantillaConsulta.setIdmodelocomunicacion(modeloCom.getIdmodelocomunicacion());
+						plantillaConsulta.setIdplantilladocumento(plantilla.getIdplantilladocumento());
+						plantillaConsulta.setUsumodificacion(usuario.getIdusuario());
+						_modPlantilladocConsultaMapper.insert(plantillaConsulta);
+						
+						
 						respuesta.setMessage(consulta.getIdconsulta().toString());
 						respuesta.setDescription(consulta.getSentencia());
 						respuesta.setInfoURL(consulta.getIdinstitucion().toString());
 						respuesta.setCode(200);
+						
 					}else{
 						Long objetivoAnterior = (long)0;
 						Short claseAnterior = (short)0;
@@ -601,7 +673,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(consulta.getIdInstitucion()));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (null != usuarios && usuarios.size() > 0) {
@@ -641,7 +713,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(consulta.getIdInstitucion()));
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(idInstitucion);
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (null != usuarios && usuarios.size() > 0) {
@@ -770,38 +842,96 @@ public class ConsultasServiceImpl implements IConsultasService{
 					//Reemplazamos los campos dinamicos
 					String sentencia = procesarEjecutarConsulta(usuario, consulta.getSentencia(), consulta.getCamposDinamicos(), true);
 					
-					Map<String,String> mapa = new HashMap<String,String>();
-					mapa = obtenerMapaConsulta(sentencia);
-					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
+//					Map<String,String> mapa = new HashMap<String,String>();
+//					mapa = obtenerMapaConsulta(sentencia);
 					
-					if(result != null && result.size() > 0){
-						Workbook workBook = crearExcel(result);
-						File aux = new File(SigaConstants.rutaExcelConsultaTemp);
-						// creo directorio si no existe
-						aux.mkdirs();
-						String nombreFichero = SigaConstants.nombreExcelConsulta + new Date().getTime()+".xlsx";
-						excel = new File(SigaConstants.rutaExcelConsultaTemp, nombreFichero);
-						FileOutputStream fileOut = new FileOutputStream(SigaConstants.rutaExcelConsultaTemp + nombreFichero);
-						workBook.write(fileOut);
-				        fileOut.close();
-				        workBook.close();
-				        response.setFile(excel);
-				        response.setResultados(true);
-					}else{
-						response.setResultados(false);
-					}
+					sentencia = quitarEtiquetas(sentencia.toUpperCase());
+					
+					if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+							|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+							|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+						
+						LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+						error.setCode(400);
+						error.setDescription("Consulta no permitida");
+						error.setMessage("Consulta no permitida");
+						response.setError(error);
+					}else {
+						List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+
+						if(result != null && result.size() > 0){
+							Workbook workBook = crearExcel(result);
+							
+							//Obtenemos la ruta temporal
+							GenPropertiesKey key = new GenPropertiesKey();
+							key.setFichero(SigaConstants.FICHERO_SIGA);
+							key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+							
+							GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
+							
+							String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator + SigaConstants.carpetaTmp;
+							
+							File aux = new File(rutaTmp);
+							// creo directorio si no existe
+							aux.mkdirs();
+							String nombreFichero = SigaConstants.nombreExcelConsulta + new Date().getTime()+".xlsx";
+							excel = new File(rutaTmp, nombreFichero);
+							FileOutputStream fileOut = new FileOutputStream(rutaTmp + SigaConstants.pathSeparator + nombreFichero);
+							workBook.write(fileOut);
+					        fileOut.close();
+					        workBook.close();
+					        response.setFile(excel);
+					        response.setResultados(true);
+						}else{
+							response.setResultados(false);
+						}
+					}					
 				}catch (Exception e) {
 					LOGGER.error("ejecutarConsulta() -> Error al ejecutar la consulta: " + e.getMessage());
 					e.printStackTrace();
 					error.setCode(500);
 					error.setDescription(e.getCause().toString());
 					error.setMessage("Error al ejecutar la consulta");
+					response.setError(error);
 				}
 		
 			}
 		}
 		LOGGER.info("ejecutarConsulta() -> Salida del servicio para ejecutar una consulta");
 		return response;
+	}
+	
+	@Override
+	public String quitarEtiquetas(String sentencia) {
+		
+		sentencia = sentencia.replaceAll("<SELECT>", " ");
+		sentencia = sentencia.replaceAll("</SELECT>", " ");
+		sentencia = sentencia.replaceAll("<FROM>", " ");
+		sentencia = sentencia.replaceAll("</FROM>", " ");
+		sentencia = sentencia.replaceAll("<JOIN>", " ");
+		sentencia = sentencia.replaceAll("</JOIN>", " ");
+		sentencia = sentencia.replaceAll("<OUTERJOIN>", " ");
+		sentencia = sentencia.replaceAll("</OUTERJOIN>", " ");
+		sentencia = sentencia.replaceAll("<INNERJOIN>", " ");
+		sentencia = sentencia.replaceAll("</INNERJOIN>", " ");
+		sentencia = sentencia.replaceAll("<LEFTJOIN>", " ");
+		sentencia = sentencia.replaceAll("</LEFTJOIN>", " ");
+		sentencia = sentencia.replaceAll("<WHERE>", " ");
+		sentencia = sentencia.replaceAll("</WHERE>", " ");
+		sentencia = sentencia.replaceAll("<ORDERBY>", " ");
+		sentencia = sentencia.replaceAll("</ORDERBY>", " ");
+		sentencia = sentencia.replaceAll("<ORDER BY>", " ");
+		sentencia = sentencia.replaceAll("</ORDER BY>", " ");
+		sentencia = sentencia.replaceAll("<GROUPBY>", " ");
+		sentencia = sentencia.replaceAll("</GROUPBY>", " ");
+		sentencia = sentencia.replaceAll("<HAVING>", " ");
+		sentencia = sentencia.replaceAll("</HAVING>", " ");
+		sentencia = sentencia.replaceAll("<UNION>", " ");
+		sentencia = sentencia.replaceAll("<UNION>", " ");
+		sentencia = sentencia.replaceAll("<UNIONALL>", " ");
+		sentencia = sentencia.replaceAll("</UNIONALL>", " ");
+		
+		return sentencia;
 	}
 	
 	public boolean comprobarCamposDestinarios (String sentencia){
@@ -2089,10 +2219,17 @@ public class ConsultasServiceImpl implements IConsultasService{
 	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws ParseException, SigaExceptions{
 		
 		List<Map<String,Object>> result = null;
-
-		Map<String, String> mapConsulta = obtenerMapaConsulta(sentencia);		
 		
-		result = _conConsultasExtendsMapper.ejecutarConsulta(mapConsulta);	
+		sentencia = quitarEtiquetas(sentencia.toUpperCase());
+		
+		if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+				|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+				|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+			
+			LOGGER.error("ejecutarConsultaConClaves() -> Consulta no permitida: " + sentencia);
+		}else {
+			result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+		}
 		
 		return result;
 	}

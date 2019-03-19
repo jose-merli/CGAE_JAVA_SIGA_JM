@@ -14,8 +14,12 @@ import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoGeneralDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.cen.services.IBusquedaPerService;
 import org.itcgae.siga.cen.services.IInstitucionesService;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -26,7 +30,9 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.ws.client.ClientCENSO;
@@ -58,6 +64,12 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
+	
+	@Autowired
+	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
+	
+	@Autowired
+	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
 	
 	@Autowired
 	private AdmConfigMapper admConfigMapper;
@@ -511,6 +523,96 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 			}
 		} else
 			return null;
+	}
+
+	@Override
+	public ColegiadoGeneralDTO searchPerByIdPersona(String idPersona, HttpServletRequest request) {
+		
+		LOGGER.info("searchPerByIdPersona() -> Entrada del servicio para la búsqueda de persona por idPersona");
+		
+		ColegiadoGeneralDTO personaEncontrada = new ColegiadoGeneralDTO();
+		Error error = new Error();
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				// Buscamos a la persona como colegiado
+				List<ColegiadoItem> colegiado = cenColegiadoExtendsMapper.selectColegiadosByIdPersona(idInstitucion, idPersona);
+				
+				if(colegiado != null && colegiado.size() > 0) {
+					// Persona encontrada
+					personaEncontrada.setColegiadoItem(colegiado);
+				}else {
+					List<NoColegiadoItem> noColegiado = cenNocolegiadoExtendsMapper.selectNoColegiadosByIdPersona(idInstitucion, idPersona);
+					if(noColegiado != null && noColegiado.size() > 0) {
+						personaEncontrada.setNoColegiadoItem(noColegiado);
+					}else {
+						error.setCode(404);
+						error.setDescription("Persona no encontrada");
+						error.setMessage("Persona no encontrada");
+						personaEncontrada.error(error);
+					}
+				}
+			}
+		}
+		
+		LOGGER.info("searchPerByIdPersona() -> Salida del servicio para la búsqueda de persona por idPersona");
+		
+		return personaEncontrada;
+	}
+	
+	@Override
+	public ColegiadoGeneralDTO searchPerByIdPersonaIdInstitucion(String idPersona, String idInstitucionPersona, HttpServletRequest request) {
+		
+		LOGGER.info("searchPerByIdPersonaIdInstitucion() -> Entrada del servicio para la búsqueda de persona por idPersona e idInstitucion");
+		
+		ColegiadoGeneralDTO personaEncontrada = new ColegiadoGeneralDTO();
+		Error error = new Error();
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				// Buscamos a la persona como colegiado
+				List<ColegiadoItem> colegiado = cenColegiadoExtendsMapper.selectColegiadosByIdPersona(Short.parseShort(idInstitucionPersona), idPersona);
+				
+				if(colegiado != null && colegiado.size() > 0) {
+					// Persona encontrada
+					personaEncontrada.setColegiadoItem(colegiado);
+				}else {
+					List<NoColegiadoItem> noColegiado = cenNocolegiadoExtendsMapper.selectNoColegiadosByIdPersona(Short.parseShort(idInstitucionPersona), idPersona);
+					if(noColegiado != null && noColegiado.size() > 0) {
+						personaEncontrada.setNoColegiadoItem(noColegiado);
+					}else {
+						error.setCode(404);
+						error.setDescription("Persona no encontrada");
+						error.setMessage("Persona no encontrada");
+						personaEncontrada.error(error);
+					}
+				}
+			}
+		}
+		
+		LOGGER.info("searchPerByIdPersonaIdInstitucion() -> Salida del servicio para la búsqueda de persona por idPersona e idInstitucion");
+		
+		return personaEncontrada;
 	}
 
 }

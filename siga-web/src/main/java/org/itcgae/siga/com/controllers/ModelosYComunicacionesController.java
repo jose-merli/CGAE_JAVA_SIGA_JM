@@ -236,5 +236,15 @@ public class ModelosYComunicacionesController {
 
 		PlantillaEnvioItem response = _modelosYcomunicacionesService.obtenerTipoEnvioPlantilla(request, idPlantilla);
 		return new ResponseEntity<PlantillaEnvioItem>(response, HttpStatus.OK);
-	}	
+	}
+	
+	@RequestMapping(value = "/detalle/plantillaDefecto",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<PlantillasModeloDTO> obtenerPlantillaPorDefecto(HttpServletRequest request, @RequestBody String idModelo) {
+
+		PlantillasModeloDTO response = _modelosYcomunicacionesService.obtenerPlantillaPorDefecto(request, idModelo);
+		if(response.getError() == null)
+			return new ResponseEntity<PlantillasModeloDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<PlantillasModeloDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }

@@ -60,6 +60,7 @@ import org.itcgae.siga.db.entities.EnvDestinatarios;
 import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
 import org.itcgae.siga.db.entities.EnvEnvios;
+import org.itcgae.siga.db.entities.EnvEnviosExample;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
@@ -91,6 +92,7 @@ import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvConsultasEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModClasecomunicacionRutaExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModClasecomunicacionesExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModKeyclasecomunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModModeloPlantillaDocumentoExtendsMapper;
@@ -193,9 +195,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	private CenPersonaMapper _cenPersonaMapper;
 	
 	@Autowired
-	private EnvDestinatariosMapper _envDestinatariosMapper;
-		
+	private EnvDestinatariosMapper _envDestinatariosMapper;		
 
+	@Autowired
+	private ModClasecomunicacionesExtendsMapper _modClasecomunicacionesExtendsMapper;
+	
 	@Override
 	public ComboDTO obtenerClaseComunicaciones(HttpServletRequest request, String rutaClaseComunicacion) {
 		LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clases comunicacion");
@@ -255,9 +259,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if (usuarios != null && usuarios.size() > 0) {
 				try{
 					AdmUsuarios usuario = usuarios.get(0);
-					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(modeloDTO.getIdClaseComunicacion(), modeloDTO.getIdModulo());
+					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(String.valueOf(idInstitucion), modeloDTO.getIdClaseComunicacion(), modeloDTO.getIdModulo(), usuario.getIdlenguaje(), modeloDTO.getIdConsulta());
 					
-					for (ModelosComunicacionItem modelosComunicacionItem : modelos) {
+					/*for (ModelosComunicacionItem modelosComunicacionItem : modelos) {
 						ComboDTO comboDTO = new ComboDTO();
 						List<ComboItem> comboItems = _modModeloComunicacionExtendsMapper.selectPlantillasModelos(modelosComunicacionItem.getIdModeloComunicacion(), usuario.getIdinstitucion());
 						if(null != comboItems && comboItems.size() > 0) {
@@ -268,7 +272,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						}		
 						comboDTO.setCombooItems(comboItems);
 						modelosComunicacionItem.setPlantillas(comboItems);
-					}
+					}*/
 					respuesta.setModelosComunicacionItems(modelos);
 				}catch(Exception e){
 					Error error = new Error();
@@ -394,21 +398,36 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		List<ModelosEnvioItem> listaModelosEnvio = new ArrayList<ModelosEnvioItem>();
 		DestinatarioItem destinatario = new DestinatarioItem();
 		
-		HashMap<String,Object> hDatosGenerales = new HashMap<String, Object>();
+		HashMap<String,Object> hDatosGenerales = new HashMap<String, Object>();		
 		HashMap<String,Object> hDatosFinal = new HashMap<String, Object>();	
+		
+		List<List<Map<String,Object>>> listaDatosExcel = new ArrayList<List<Map<String,Object>>>();
+		
 		int numFicheros = 0;
+		
+		String rutaPlantillaClase = "";
+		ModClasecomunicaciones modClase = null;
 
 		try{
 			if(dialogo != null && dialogo.getModelos() != null && dialogo.getModelos().size() > 0){
 				
 				//Obtenemos el campo del Sufijo asociado a la clase de la comunicación
 				
-				ModClasecomunicaciones modClase = _modClasecomunicacionesMapper.selectByPrimaryKey(Short.parseShort(dialogo.getIdClaseComunicacion()));
+				if(dialogo.getIdClaseComunicacion() != null) {
+					modClase = _modClasecomunicacionesMapper.selectByPrimaryKey(Short.parseShort(dialogo.getIdClaseComunicacion()));
+				}
 				
 				String campoSufijo = "";
 				
 				if(modClase != null){
 					campoSufijo = modClase.getSufijo();
+					rutaPlantillaClase = modClase.getRutaplantilla();
+				}
+				
+				if(rutaPlantillaClase == null || "".equals(rutaPlantillaClase)) {
+					rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+				}else {
+					rutaPlantillaClase = rutaPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, String.valueOf(usuario.getIdinstitucion()));
 				}
 				
 				generarComunicacion.setFechaProgramada(dialogo.getFechaProgramada());
@@ -434,17 +453,28 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					Long idConsultaEjecutarCondicional = null;
 					// Por cada conjunto de valores key se generan los documentos
 					
-					if(dialogo.getSelectedDatos() != null && dialogo.getSelectedDatos().size() > 0){
-						List<List<String>> listaKeyFiltros = dialogo.getSelectedDatos();
+					List<List<String>> listaKeyFiltros = dialogo.getSelectedDatos();					
 						
+					boolean ejecutarConsulta = false;
+					
+					if(dialogo.getIdClaseComunicacion().equals(SigaConstants.ID_CLASE_CONSULTA_GENERICA)  && (listaKeyFiltros == null || listaKeyFiltros.size() == 0)) {
+						listaKeyFiltros = new ArrayList<List<String>>();
+						List<String> listaVacia = new ArrayList<String>();
+						listaKeyFiltros.add(listaVacia);
+						ejecutarConsulta = true;
+					}
+					
+					if((listaKeyFiltros != null && listaKeyFiltros.size() > 0) || ejecutarConsulta){
 						for(int i=0; i< listaKeyFiltros.size(); i ++){	
 							List<String> listaStringKey = listaKeyFiltros.get(i);							
 							HashMap<String, String> mapaClave = new HashMap<String, String>();
-							
-							for(int j = 0; j < listaKey.size(); j++){
-								KeyItem key = listaKey.get(j);
-								mapaClave.put(key.getNombre(), listaStringKey.get(j));
-							}					
+							if(!ejecutarConsulta) {
+								for(int j = 0; j < listaKey.size(); j++){
+									KeyItem key = listaKey.get(j);
+									mapaClave.put(key.getNombre(), listaStringKey.get(j));
+								}
+							}
+												
 							
 							// Nuevo envio = nueva lista de consultas
 							
@@ -453,6 +483,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							for(PlantillaModeloDocumentoDTO plantilla:plantillas){								
 								String nombrePlantilla = "";
 								Long idPlantillaGenerar = null;
+								boolean esExcel = false;
 								//Obtenemos el nombre de la plantilla
 								if(plantilla.getIdPlantillas() != null){
 									ModPlantilladocumentoExample example = new ModPlantilladocumentoExample();
@@ -464,6 +495,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 											idValues.add(Long.parseLong(idPlantilla));
 										}
 									}
+									
+									if(plantilla.getFormatoSalida() != null && Short.parseShort(plantilla.getFormatoSalida()) == SigaConstants.FORMATO_SALIDA.XLS.getCodigo()) {
+										esExcel = true;
+									}
+									
 									example.createCriteria().andIdplantilladocumentoIn(idValues).andIdiomaEqualTo(usuario.getIdlenguaje());
 									List<ModPlantilladocumento> listaPlantilla = _modPlantilladocumentoMapper.selectByExample(example);
 									
@@ -613,13 +649,32 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																	numFicheros++;
 																	
 																	//Otenemos el nombre del fichero de salida
-																	String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaTmp;
-																	String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
+																	
+																	//Obtenemos la ruta temporal
+																	GenPropertiesKey key = new GenPropertiesKey();
+																	key.setFichero(SigaConstants.FICHERO_SIGA);
+																	key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+																	
+																	GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
+																	
+																	String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + dialogo.getIdInstitucion() + SigaConstants.pathSeparator + SigaConstants.carpetaTmp + SigaConstants.pathSeparator;
+																	
+																	key = new GenPropertiesKey();
+																	key.setFichero(SigaConstants.FICHERO_SIGA);
+																	key.setParametro(SigaConstants.parametroRutaPlantillas);
+																	
+																	GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+																	
+																	String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator;
+																	
+																	
+																	String pathFicheroSalida = rutaTmp;
+																	String pathPlantilla = rutaPlantilla;
 																	
 																	//Si no existe el directorio temporal lo creamos
 																	File dir = new File(pathFicheroSalida);
 																	if(!dir.exists()){
-																		dir.mkdir();
+																		dir.mkdirs();
 																	}	
 																	
 																	
@@ -662,6 +717,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																		}else{
 																			hDatosGenerales.putAll(resultDatos.get(0));
 																		}
+																		
+																		if(esExcel) {
+																			listaDatosExcel.add(resultDatos);
+																		}
 																	}
 																	
 																	hDatosFinal.put("row", hDatosGenerales);
@@ -676,20 +735,25 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																																																		
 																	if(!esEnvio){
 																		LOGGER.debug("Generamos el documento");																
+																		DatosDocumentoItem docGenerado = null;
 																		
-																		doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);
-																		
-																		
-																		boolean firmado = false;
-																		
-																		if(plantilla.getFormatoSalida() != null){
-																			FORMATO_SALIDA extensionObject = SigaConstants.FORMATO_SALIDA.getEnum(Short.parseShort(plantilla.getFormatoSalida()));			
-																			if(extensionObject.getCodigo().shortValue() == FORMATO_SALIDA.PDF_FIRMADO.getCodigo().shortValue()){
-																				firmado = true;
+																		if(esExcel) {
+																			docGenerado = _generacionDocService.generarExcel(pathPlantilla + nombrePlantilla, pathFicheroSalida, nombreFicheroSalida, listaDatosExcel);
+																		}else {
+																			doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);																			
+																			
+																			boolean firmado = false;
+																			
+																			if(plantilla.getFormatoSalida() != null){
+																				FORMATO_SALIDA extensionObject = SigaConstants.FORMATO_SALIDA.getEnum(Short.parseShort(plantilla.getFormatoSalida()));			
+																				if(extensionObject.getCodigo().shortValue() == FORMATO_SALIDA.PDF_FIRMADO.getCodigo().shortValue()){
+																					firmado = true;
+																				}
 																			}
+																			
+																			docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida, firmado);
 																		}
 																		
-																		DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida, firmado);
 																		
 																		listaFicheros.add(docGenerado);
 																		listaDocumentos.add(doc);
@@ -710,9 +774,31 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 													}else{
 														LOGGER.debug("No hay consulta de multidocumento");
 														
-														//Otenemos el nombre del fichero de salida
-														String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
-														String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + dialogo.getIdInstitucion() + SigaConstants.carpetaPlantillasDocumento;
+														GenPropertiesKey key = new GenPropertiesKey();
+														key.setFichero(SigaConstants.FICHERO_SIGA);
+														key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+														
+														GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
+														
+														String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + dialogo.getIdInstitucion() + SigaConstants.pathSeparator + SigaConstants.carpetaTmp + SigaConstants.pathSeparator;
+														
+														key = new GenPropertiesKey();
+														key.setFichero(SigaConstants.FICHERO_SIGA);
+														key.setParametro(SigaConstants.parametroRutaPlantillas);
+														
+														GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+														
+														String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator;
+														
+														
+														String pathFicheroSalida = rutaTmp;
+														String pathPlantilla = rutaPlantilla;
+														
+														//Si no existe el directorio temporal lo creamos
+														File dir = new File(pathFicheroSalida);
+														if(!dir.exists()){
+															dir.mkdirs();
+														}
 														
 														File filePlantilla = new File(pathPlantilla + nombrePlantilla);
 														if(!filePlantilla.exists()){
@@ -750,6 +836,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 															}else{
 																hDatosGenerales.putAll(resultDatos.get(0));
 															}
+															
+															if(esExcel) {
+																listaDatosExcel.add(resultDatos);
+															}
 														}
 														
 														hDatosFinal.put("row", hDatosGenerales);
@@ -766,18 +856,24 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														
 														if(!esEnvio){
 															LOGGER.debug("Generamos el documento");
-															doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);														
+															DatosDocumentoItem docGenerado = null;
 															
-															boolean firmado = false;
-															
-															if(plantilla.getFormatoSalida() != null){
-																FORMATO_SALIDA extensionObject = SigaConstants.FORMATO_SALIDA.getEnum(Short.parseShort(plantilla.getFormatoSalida()));			
-																if(extensionObject.getCodigo().shortValue() == FORMATO_SALIDA.PDF_FIRMADO.getCodigo().shortValue()){
-																	firmado = true;
+															if(esExcel) {
+																docGenerado = _generacionDocService.generarExcel(pathPlantilla + nombrePlantilla, pathFicheroSalida, nombreFicheroSalida, listaDatosExcel);
+															}else {
+																doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);														
+																
+																boolean firmado = false;
+																
+																if(plantilla.getFormatoSalida() != null){
+																	FORMATO_SALIDA extensionObject = SigaConstants.FORMATO_SALIDA.getEnum(Short.parseShort(plantilla.getFormatoSalida()));			
+																	if(extensionObject.getCodigo().shortValue() == FORMATO_SALIDA.PDF_FIRMADO.getCodigo().shortValue()){
+																		firmado = true;
+																	}
 																}
-															}
-															
-															DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida, firmado);
+																
+																docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida, firmado);
+															}															
 															
 															listaFicheros.add(docGenerado);
 															listaDocumentos.add(doc);
@@ -819,8 +915,96 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												LOGGER.info("La consulta de destinatarios no ha devuelto resultados");
 											}											
 										}										
-									}else{
-										LOGGER.error("No hay consulta de destinatario para el informe: " + plantilla.getIdInforme());
+									}else{										
+										if(ejecutarConsulta) {
+											// Por cada resultado ejecutamos las consultas de datos
+											LOGGER.debug("Obtenemos las consultas de datos para la plantilla: " + plantilla.getIdInforme());
+											List<ConsultaItem> consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(usuario.getIdinstitucion(), Long.parseLong(modelo.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DATOS.getCodigo());
+											
+											for(ConsultaItem consultaDatos:consultasItemDatos){															
+												String consultaEjecutarDatos = reemplazarConsultaConClaves(usuario, dialogo, consultaDatos, mapaClave, esEnvio);
+												
+												List<Map<String,Object>> resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
+												
+												if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
+													hDatosFinal.put(consultaDatos.getRegion(), resultDatos);
+												}else{
+													hDatosGenerales.putAll(resultDatos.get(0));
+												}
+												
+												listaDatosExcel.add(resultDatos);
+											}
+											
+											hDatosFinal.put("row", hDatosGenerales);
+											
+											String campoSufijoReplaced = "";
+											if(campoSufijo != null && !"".equals(campoSufijo)) {
+												campoSufijoReplaced = reemplazarSufijo(hDatosGenerales, mapaClave, campoSufijo);
+											}											
+											
+											//Obtenemos la ruta temporal
+											GenPropertiesKey key = new GenPropertiesKey();
+											key.setFichero(SigaConstants.FICHERO_SIGA);
+											key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+											
+											GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
+											
+											String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + dialogo.getIdInstitucion() + SigaConstants.pathSeparator + SigaConstants.carpetaTmp + SigaConstants.pathSeparator;
+											
+											key = new GenPropertiesKey();
+											key.setFichero(SigaConstants.FICHERO_SIGA);
+											key.setParametro(SigaConstants.parametroRutaPlantillas);
+											
+											GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+											
+											String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator;
+											
+											
+											String pathFicheroSalida = rutaTmp;
+											String pathPlantilla = rutaPlantilla;
+											
+											//Si no existe el directorio temporal lo creamos
+											File dir = new File(pathFicheroSalida);
+											if(!dir.exists()){
+												dir.mkdirs();
+											}	
+											
+											
+											/*File filePlantilla = new File(pathPlantilla + nombrePlantilla);
+											if(!filePlantilla.exists()){
+												throw new SigaExceptions("No existe la plantilla de documento");
+											}*/
+											
+
+											String nombreFicheroSalida = obtenerNombreFicheroSalida(modelo.getIdModeloComunicacion(), plantilla, hDatosGenerales, usuario.getIdlenguaje(), numFicheros, pathFicheroSalida, campoSufijoReplaced);
+											
+											DatosDocumentoItem docGenerado = null;
+											
+											if(esExcel) {
+												 docGenerado = _generacionDocService.generarExcel(pathPlantilla + nombrePlantilla, pathFicheroSalida, nombreFicheroSalida, listaDatosExcel);
+											}else {
+												Document doc = new Document(pathPlantilla + nombrePlantilla);
+												
+												doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);														
+												
+												boolean firmado = false;
+												
+												if(plantilla.getFormatoSalida() != null){
+													FORMATO_SALIDA extensionObject = SigaConstants.FORMATO_SALIDA.getEnum(Short.parseShort(plantilla.getFormatoSalida()));			
+													if(extensionObject.getCodigo().shortValue() == FORMATO_SALIDA.PDF_FIRMADO.getCodigo().shortValue()){
+														firmado = true;
+													}
+												}
+												
+												docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida, firmado);
+											}	
+											
+											
+											listaFicheros.add(docGenerado);
+											
+										}else {
+											LOGGER.error("No hay consulta de destinatario para el informe: " + plantilla.getIdInforme());
+										}
 									}
 								}else{
 									LOGGER.debug("No se ejecuta la generación del informe: " + plantilla.getIdInforme());
@@ -918,9 +1102,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			sentencia = _consultasService.procesarEjecutarConsulta(usuario, consulta.getSentencia(), consulta.getCamposDinamicos(), true);
 			
 			// Remplazamos las claves de la query
-			for (Map.Entry<String, String> entry : mapaClave.entrySet()) {
-				sentencia = sentencia.replace(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + entry.getKey().toUpperCase() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, entry.getValue());
-			}
+			if(mapaClave != null && mapaClave.size() > 0) {
+				for (Map.Entry<String, String> entry : mapaClave.entrySet()) {
+					sentencia = sentencia.replace(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + entry.getKey().toUpperCase() + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, entry.getValue());
+				}
+			}			
 			
 		}else{
 			LOGGER.error("No se ha encontrado la consulta");
@@ -1108,7 +1294,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										for(ConsultaItem consultaItem: listaConsultas){
 											ConConsultaKey key = new ConConsultaKey();
 											key.setIdconsulta(Long.parseLong(consultaItem.getIdConsulta()));
-											key.setIdinstitucion(idInstitucion);
+											key.setIdinstitucion(Short.parseShort(consultaItem.getIdInstitucion()));
 											ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
 											if(consulta != null){
 												ArrayList<CampoDinamicoItem> campos = _consultasService.obtenerCamposDinamicos(usuario, consulta.getSentencia());
@@ -1126,17 +1312,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							}
 							
 							//Obtenemos las consultas de la plantilla de envio seleccionada
-
-							ModModeloPlantillaenvioKey key = new ModModeloPlantillaenvioKey();
-							key.setIdinstitucion(idInstitucion);
-							key.setIdmodelocomunicacion(Long.parseLong(modelo.getIdModeloComunicacion()));
-							key.setIdplantillaenvios(Integer.parseInt(modelo.getIdPlantillaEnvio()));
-							key.setIdtipoenvios(Short.parseShort(modelo.getIdTipoEnvio()));
-							ModModeloPlantillaenvio plantillaEnvio = _modModeloPlantillaenvioMapper.selectByPrimaryKey(key);
 							
-							if(plantillaEnvio != null){
+							if(modelo.getIdPlantillaEnvio() != null && modelo.getIdTipoEnvio() != null){
 								//Obtenemos las consultas asociadas a la plantilla
-								List<ConsultaItem> listaEnvioConsultas = _modPlantillaEnvioConsultaExtendsMapper.selectPlantillaEnvioConsultas(idInstitucion, plantillaEnvio.getIdplantillaenvios(), plantillaEnvio.getIdtipoenvios());
+								List<ConsultaItem> listaEnvioConsultas = _modPlantillaEnvioConsultaExtendsMapper.selectPlantillaEnvioConsultas(idInstitucion, Integer.parseInt(modelo.getIdPlantillaEnvio()), Short.parseShort(modelo.getIdTipoEnvio()));
 								if(listaEnvioConsultas != null && listaEnvioConsultas.size() > 0){
 									for(ConsultaItem consultaEnvioItem : listaEnvioConsultas){			
 										if(consultaEnvioItem != null){
@@ -1146,7 +1325,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										}
 									}
 								}else{
-									LOGGER.info("La plantila de envio " + plantillaEnvio.getIdplantillaenvios() + " no tiene consultas asociadas");
+									LOGGER.info("La plantila de envio " + modelo.getIdPlantillaEnvio() + " no tiene consultas asociadas");
 								}
 							}else{
 								LOGGER.error("Plantilla de envio no encontrada");
@@ -1442,6 +1621,33 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		List<String> listaIdPlantilla = _envConsultasEnvioExtendsMapper.selectPlantillasByEnvio(idInstitucion, idEnvio);
 		List<DatosDocumentoItem> listaFicheros = new ArrayList<DatosDocumentoItem>();
 		Long idModeloComunicacion = null;
+		String directorioPlantillaClase = "";
+		boolean esExcel = false;
+		List<List<Map<String,Object>>> listaDatosExcel = new ArrayList<List<Map<String,Object>>>();
+		
+		//Obtenemos la clase de comunicacion del modelo (si tiene)	
+		EnvEnviosExample envioExample = new EnvEnviosExample();
+		envioExample.createCriteria().andIdenvioEqualTo(Long.parseLong(idEnvio)).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		
+		List<EnvEnvios> envios = _envEnviosMapper.selectByExample(envioExample);
+		
+		if(envios!=null && envios.size()>0) {
+			EnvEnvios envio = envios.get(0);
+			Long idModeloComunicacionEnvio = envio.getIdmodelocomunicacion();
+			if(idModeloComunicacionEnvio != null) {
+				List<ClaseComunicacionItem> modClaseItem = _modClasecomunicacionesExtendsMapper.selectClaseComunicacionModulo(String.valueOf(idModeloComunicacionEnvio));
+				if(modClaseItem != null && modClaseItem.size() > 0) {
+					ClaseComunicacionItem claseItem = modClaseItem.get(0);
+					directorioPlantillaClase = claseItem.getRutaPlantilla();					
+				}
+			}
+		}
+		
+		if(directorioPlantillaClase == null || "".equals(directorioPlantillaClase)) {
+			directorioPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+		}
+		
+		directorioPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, idInstitucion);
 		
 		if(listaIdPlantilla != null && listaIdPlantilla.size() > 0){
 			for(String idPlantilla : listaIdPlantilla){
@@ -1480,8 +1686,19 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				if(listaConsultas != null && listaConsultas.size() > 0){
 					for(EnvConsultasenvio consulta: listaConsultas){
 						Map<String,String> mapa = new HashMap<String,String>();
-						mapa = _consultasService.obtenerMapaConsulta(consulta.getConsulta());
-						List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
+						List<Map<String, Object>> result = null;
+						String sentencia = consulta.getConsulta();
+						
+						sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
+						
+						if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+								|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+								|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+							
+							LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+						}else {
+							result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+						}
 						
 						if(result != null && result.size() > 0){
 							continua = true;
@@ -1507,13 +1724,23 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					for(EnvConsultasenvio consultaDest: listaConsultasDest){
 						idModeloComunicacion = consultaDest.getIdmodelocomunicacion();
 						// Ejecutamos la consulta
-						Map<String,String> mapa = new HashMap<String,String>();
-						mapa = _consultasService.obtenerMapaConsulta(consultaDest.getConsulta());
-						List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
-						if(result != null && result.size() > 0){
-							for(Map<String,Object> dest : result){
-								hDatosGenerales.putAll(dest);
-							}							
+						
+						String sentencia = consultaDest.getConsulta();
+						
+						sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
+						
+						if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+								|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+								|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+							
+							LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+						}else {
+							List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+							if(result != null && result.size() > 0){
+								for(Map<String,Object> dest : result){
+									hDatosGenerales.putAll(dest);
+								}							
+							}
 						}
 						
 					}
@@ -1524,16 +1751,27 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					List<EnvConsultasenvio> listaConsultasMulti = _envConsultasenvioMapper.selectByExampleWithBLOBs(example);
 					if(listaConsultasMulti != null && listaConsultasMulti.size() > 0){
 						for(EnvConsultasenvio consultaMulti: listaConsultasMulti){
+							List<Map<String,Object>> resultMulti = null;
+							
 							// Ejecutamos la consulta
-							Map<String,String> mapa = new HashMap<String,String>();
-							mapa = _consultasService.obtenerMapaConsulta(consultaMulti.getConsulta());
 							
 							if(campoSufijo == null || !"".equalsIgnoreCase(campoSufijo)){
 								campoSufijo = consultaMulti.getSufijo();
 							}
 							
-							List<Map<String,Object>> resultMulti = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
+							String sentencia = consultaMulti.getConsulta();
 							
+							sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
+							
+							if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+									|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+									|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+								
+								LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+							}else {
+								resultMulti = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+							}
+														
 							int numFicheros = 0;
 							if(resultMulti != null && resultMulti.size() > 0){
 								for(int k = 0;k<resultMulti.size();k++){
@@ -1546,23 +1784,42 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									List<PlantillaModeloDocumentoDTO> plantillas = _modModeloPlantillaDocumentoExtendsMapper.selectPlantillaGenerar(consultaMulti.getIdmodelocomunicacion(), consultaMulti.getIdplantilladocumento());
 									PlantillaModeloDocumentoDTO plantilla = plantillas.get(0);
 									
+									if(plantilla.getFormatoSalida() != null && Short.parseShort(plantilla.getFormatoSalida()) == SigaConstants.FORMATO_SALIDA.XLS.getCodigo()) {
+										esExcel = true;
+									}
+									
 									//Otenemos el nombre del fichero de salida
-									String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + idInstitucion + SigaConstants.carpetaTmp;
-									String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + idInstitucion + SigaConstants.carpetaPlantillasDocumento;
+									GenPropertiesKey key = new GenPropertiesKey();
+									key.setFichero(SigaConstants.FICHERO_SIGA);
+									key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+									
+									GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
+									
+									String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator + SigaConstants.carpetaTmp + SigaConstants.pathSeparator;
+									
+									key = new GenPropertiesKey();
+									key.setFichero(SigaConstants.FICHERO_SIGA);
+									key.setParametro(SigaConstants.parametroRutaPlantillas);
+									
+									GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+									
+									String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + directorioPlantillaClase + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator;
+									
+									
+									String pathFicheroSalida = rutaTmp;
+									String pathPlantilla = rutaPlantilla;
 									
 									//Si no existe el directorio temporal lo creamos
 									File dir = new File(pathFicheroSalida);
 									if(!dir.exists()){
-										dir.mkdir();
+										dir.mkdirs();
 									}	
 									
 									
 									File filePlantilla = new File(pathPlantilla + nombrePlantilla);
 									if(!filePlantilla.exists()){
 										throw new SigaExceptions("No existe la plantilla de documento");
-									}
-									
-									Document doc = new Document(pathPlantilla + nombrePlantilla);
+									}								
 
 									
 									// Por cada resultado ejecutamos las consultas de datos
@@ -1591,26 +1848,39 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										}else{
 											hDatosGenerales.putAll(resultDatos.get(0));
 										}
-									}
-									
-									hDatosFinal.put("row", hDatosGenerales);									
-
-									LOGGER.debug("Generamos el documento");																
-									
-									doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);
-									
-									String nombreFicheroSalida = obtenerNombreFicheroSalida(String.valueOf(consultaMulti.getIdmodelocomunicacion()), plantilla, hDatosGenerales, SigaConstants.LENGUAJE_DEFECTO, numFicheros, pathFicheroSalida, campoSufijo);
-																
-									boolean firmado = false;
-									
-									if(plantilla.getFormatoSalida() != null){
-										FORMATO_SALIDA extensionObject = SigaConstants.FORMATO_SALIDA.getEnum(Short.parseShort(plantilla.getFormatoSalida()));			
-										if(extensionObject.getCodigo().shortValue() == FORMATO_SALIDA.PDF_FIRMADO.getCodigo().shortValue()){
-											firmado = true;
+										
+										if(esExcel) {
+											listaDatosExcel.add(resultDatos);
 										}
 									}
 									
-									DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida, firmado);
+									hDatosFinal.put("row", hDatosGenerales);								
+
+									
+									String nombreFicheroSalida = obtenerNombreFicheroSalida(String.valueOf(consultaMulti.getIdmodelocomunicacion()), plantilla, hDatosGenerales, SigaConstants.LENGUAJE_DEFECTO, numFicheros, pathFicheroSalida, campoSufijo);
+																
+									DatosDocumentoItem docGenerado = null;
+									
+									
+									if(esExcel) {
+										 docGenerado = _generacionDocService.generarExcel(pathPlantilla + nombrePlantilla, pathFicheroSalida, nombreFicheroSalida, listaDatosExcel);
+									}else {
+										Document doc = new Document(pathPlantilla + nombrePlantilla);
+										
+										doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);														
+										
+										boolean firmado = false;
+										
+										if(plantilla.getFormatoSalida() != null){
+											FORMATO_SALIDA extensionObject = SigaConstants.FORMATO_SALIDA.getEnum(Short.parseShort(plantilla.getFormatoSalida()));			
+											if(extensionObject.getCodigo().shortValue() == FORMATO_SALIDA.PDF_FIRMADO.getCodigo().shortValue()){
+												firmado = true;
+											}
+										}
+										
+										docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida, firmado);
+									}
+									
 									docGenerado.setPathDocumento(pathFicheroSalida + nombreFicheroSalida);
 									
 									listaFicheros.add(docGenerado);
@@ -1624,14 +1894,34 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						List<PlantillaModeloDocumentoDTO> plantillas = _modModeloPlantillaDocumentoExtendsMapper.selectPlantillaGenerar(idModeloComunicacion, Long.parseLong(idPlantilla));
 						PlantillaModeloDocumentoDTO plantilla = plantillas.get(0);
 						
-						//Otenemos el nombre del fichero de salida
-						String pathFicheroSalida = SigaConstants.rutaficherosInformesYcomunicaciones + idInstitucion + SigaConstants.carpetaTmp;
-						String pathPlantilla = SigaConstants.rutaficherosInformesYcomunicaciones + idInstitucion + SigaConstants.carpetaPlantillasDocumento;
+						if(plantilla.getFormatoSalida() != null && Short.parseShort(plantilla.getFormatoSalida()) == SigaConstants.FORMATO_SALIDA.XLS.getCodigo()) {
+							esExcel = true;
+						}
+						
+						GenPropertiesKey key = new GenPropertiesKey();
+						key.setFichero(SigaConstants.FICHERO_SIGA);
+						key.setParametro(SigaConstants.parametroRutaSalidaInformes);
+						
+						GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
+						
+						String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator + SigaConstants.carpetaTmp + SigaConstants.pathSeparator;
+						
+						key = new GenPropertiesKey();
+						key.setFichero(SigaConstants.FICHERO_SIGA);
+						key.setParametro(SigaConstants.parametroRutaPlantillas);
+						
+						GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+						
+						String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + directorioPlantillaClase + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator;
+						
+						
+						String pathFicheroSalida = rutaTmp;
+						String pathPlantilla = rutaPlantilla;
 						
 						//Si no existe el directorio temporal lo creamos
 						File dir = new File(pathFicheroSalida);
 						if(!dir.exists()){
-							dir.mkdir();
+							dir.mkdirs();
 						}	
 						
 						
@@ -1639,8 +1929,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						if(!filePlantilla.exists()){
 							throw new SigaExceptions("No existe la plantilla de documento");
 						}
-						
-						Document doc = new Document(pathPlantilla + nombrePlantilla);
 
 						
 						// Por cada resultado ejecutamos las consultas de datos
@@ -1669,26 +1957,40 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							}else{
 								hDatosGenerales.putAll(resultDatos.get(0));
 							}
-						}
-						
-						hDatosFinal.put("row", hDatosGenerales);									
-
-						LOGGER.debug("Generamos el documento");																
-						
-						doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);
-						
-						String nombreFicheroSalida = obtenerNombreFicheroSalida(String.valueOf(idModeloComunicacion), plantilla, hDatosGenerales, SigaConstants.LENGUAJE_DEFECTO, 0, pathFicheroSalida, campoSufijo);
-						
-						boolean firmado = false;
-						
-						if(plantilla.getFormatoSalida() != null){
-							FORMATO_SALIDA extensionObject = SigaConstants.FORMATO_SALIDA.getEnum(Short.parseShort(plantilla.getFormatoSalida()));			
-							if(extensionObject.getCodigo().shortValue() == FORMATO_SALIDA.PDF_FIRMADO.getCodigo().shortValue()){
-								firmado = true;
+							
+							if(esExcel) {
+								listaDatosExcel.add(resultDatos);
 							}
 						}
 						
-						DatosDocumentoItem docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida,firmado);
+						hDatosFinal.put("row", hDatosGenerales);									
+						
+						String nombreFicheroSalida = obtenerNombreFicheroSalida(String.valueOf(idModeloComunicacion), plantilla, hDatosGenerales, SigaConstants.LENGUAJE_DEFECTO, 0, pathFicheroSalida, campoSufijo);
+						
+						DatosDocumentoItem docGenerado = null;
+						
+						if(esExcel) {
+							 docGenerado = _generacionDocService.generarExcel(pathPlantilla + nombrePlantilla, pathFicheroSalida, nombreFicheroSalida, listaDatosExcel);
+						}else {
+							Document doc = new Document(pathPlantilla + nombrePlantilla);
+							
+							doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);														
+							
+							boolean firmado = false;
+							
+							if(plantilla.getFormatoSalida() != null){
+								FORMATO_SALIDA extensionObject = SigaConstants.FORMATO_SALIDA.getEnum(Short.parseShort(plantilla.getFormatoSalida()));			
+								if(extensionObject.getCodigo().shortValue() == FORMATO_SALIDA.PDF_FIRMADO.getCodigo().shortValue()){
+									firmado = true;
+								}
+							}
+							
+							docGenerado = _generacionDocService.grabaDocumento(doc, pathFicheroSalida, nombreFicheroSalida, firmado);
+						}
+						
+						
+						
+						
 						docGenerado.setPathDocumento(pathFicheroSalida + nombreFicheroSalida);
 						
 						listaFicheros.add(docGenerado);

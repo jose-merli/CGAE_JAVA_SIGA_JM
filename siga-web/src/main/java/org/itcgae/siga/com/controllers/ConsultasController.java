@@ -186,9 +186,15 @@ public class ConsultasController {
 			System.out.println("The length of the file is : "+file.length());
 			return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.OK);
 		}else{
-			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"SinArchivo\"");
-			System.out.println("No se ha generado el fichero");
-			return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.NO_CONTENT);
+			if(response.getError() != null && response.getError().getCode() == 400) {
+				headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"SinArchivo\"");
+				System.out.println("Consulta no permitida");
+				return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.BAD_REQUEST);
+			}else{
+				headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"SinArchivo\"");
+				System.out.println("No se ha generado el fichero");
+				return new ResponseEntity<InputStreamResource>(resource,headers, HttpStatus.NO_CONTENT);
+			}			
 		}
 	}
 	

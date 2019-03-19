@@ -13,6 +13,7 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.services.com.providers.ConConsultasExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
@@ -66,6 +67,23 @@ public interface ConConsultasExtendsMapper {
 		@Result(column = "OBJETIVO", property = "objetivo", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ConsultaItem> selectConsultasPlantillas(Short idInstitucion, String idPlantillaEnvios, String idtipoEnvio, String idLenguaje);
+	
+	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasById")
+	@Results({
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCONSULTA", property = "idConsulta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOCONSULTA", property = "tipoConsulta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OBSERVACIONES", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDMODULO", property = "idModulo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDOBJETIVO", property = "idObjetivo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SENTENCIA", property = "sentencia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "GENERAL", property = "generica", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "OBJETIVO", property = "objetivo", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ConsultaItem> selectConsultasById(Short idInstitucion, String idLenguaje, String idConsulta);
 
 	@ResultType(value = List.class)
 	public List<Map<String, Object>> ejecutarConsulta(@Param(value = "query") Map<String,String> querys);
@@ -75,15 +93,17 @@ public interface ConConsultasExtendsMapper {
 	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasDisponibles")
 	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectConsultasDisponibles(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo);
+	List<ComboItemConsulta> selectConsultasDisponibles(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo);
 	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasDisponiblesPlantillasEnvio")
 	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectConsultasDisPlantilla(Short IdInstitucion);
+	List<ComboItemConsulta> selectConsultasDisPlantilla(Short IdInstitucion);
 	
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectObjetivo")
 	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
@@ -92,8 +112,9 @@ public interface ConConsultasExtendsMapper {
 
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectConsultasDisponiblesFiltro")
 	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDCONSULTA", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectConsultasDisponiblesFiltro(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo, String filtro);
+	List<ComboItemConsulta> selectConsultasDisponiblesFiltro(Short IdInstitucion, Long idClaseComunicacion, Long idObjetivo, String filtro);
 
 }	

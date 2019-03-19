@@ -11,6 +11,7 @@ public class DocumentoPlantillaItem {
 	private String idIdioma;
 	private String idInforme;
 	private String idModeloComunicacion;
+	private String idClaseComunicacion;
 	private Error error;
 	
 	public String getRutaDocumento() {
@@ -60,6 +61,12 @@ public class DocumentoPlantillaItem {
 	}
 	public void setIdModeloComunicacion(String idModeloComunicacion) {
 		this.idModeloComunicacion = idModeloComunicacion;
+	}
+	public String getIdClaseComunicacion() {
+		return idClaseComunicacion;
+	}
+	public void setIdClaseComunicacion(String idClaseComunicacion) {
+		this.idClaseComunicacion = idClaseComunicacion;
 	}
 	
 

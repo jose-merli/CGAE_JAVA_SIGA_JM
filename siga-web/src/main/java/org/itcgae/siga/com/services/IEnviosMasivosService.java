@@ -1,10 +1,15 @@
 package org.itcgae.siga.com.services;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
+import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
+import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.DestinatarioIndvEnvioMasivoItem;
+import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
@@ -37,5 +42,14 @@ public interface IEnviosMasivosService {
 	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request) throws IOException;
 	public Error borrarDocumento(HttpServletRequest request, ResponseDocumentoDTO[] documentoDTO);
 	public PlantillaEnvioItem obtenerAsuntoYcuerpo (HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta);
-
+	public ComboConsultaInstitucionDTO obtenerconsultasDestinatarios(HttpServletRequest request);
+	public ConsultasDTO consultasDestAsociadas(HttpServletRequest request, String idEnvio);
+	public Error asociarConsulta (HttpServletRequest request, ConsultaDestinatarioItem consulta);
+	public Error desAsociarConsulta(HttpServletRequest request, ConsultaDestinatarioItem[] consulta);
+	public ComboConsultaInstitucionDTO getComboConsultas(HttpServletRequest request, String filtro);
+	public DestinatariosDTO obtenerDestinatariosIndv(HttpServletRequest request, String idEnvio);
+	public Error asociarDestinatario(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem destinatario);
+	public Error desAsociarDestinatarios(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem[] destinatario);
+	public DatosDireccionesDTO obtenerDireccionesDisp(HttpServletRequest request, String idPersona);
 }
+

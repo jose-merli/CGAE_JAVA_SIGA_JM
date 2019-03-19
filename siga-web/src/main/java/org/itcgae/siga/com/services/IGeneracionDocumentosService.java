@@ -2,6 +2,7 @@ package org.itcgae.siga.com.services;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 
@@ -17,6 +18,7 @@ public interface IGeneracionDocumentosService {
 
 	public Document sustituyeDatos(Document doc, HashMap<String, Object> dato);
 
+	public DatosDocumentoItem generarExcel(String string, String pathFicheroSalida, String nombreFicheroSalida,	List<List<Map<String, Object>>> listaDatosExcel) throws Exception;
 	
 	
 }

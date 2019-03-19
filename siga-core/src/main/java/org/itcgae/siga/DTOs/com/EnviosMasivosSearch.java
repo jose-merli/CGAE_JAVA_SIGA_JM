@@ -12,51 +12,91 @@ public class EnviosMasivosSearch {
 	private String idTipoEnvios;
 	private String idEstado;
 	private String idClaseComunicacion;
+	private String nombre;
+	private String apellidos1;
+	private String apellidos2;
+	private String apellidos;
+	private String numColegiado;
+	private String idInstitucion;
+	private String nif;
 	
-
-	@JsonProperty("fechaCreacion")
-	public Date getFechaCreacion() {
-		return fechaCreacion;
-	}
-	public void setFechaCreacion(Date fechaCreacion) {
-		this.fechaCreacion = fechaCreacion;
-	}
-	
-	@JsonProperty("descripcion")
 	public String getDescripcion() {
 		return descripcion;
 	}
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
 	}
+	public Date getFechaCreacion() {
+		return fechaCreacion;
+	}
+	public void setFechaCreacion(Date fechaCreacion) {
+		this.fechaCreacion = fechaCreacion;
+	}
 	public Date getFechaProgramacion() {
 		return fechaProgramacion;
 	}
-	@JsonProperty("fechaProgramacion")
 	public void setFechaProgramacion(Date fechaProgramacion) {
 		this.fechaProgramacion = fechaProgramacion;
 	}
-	@JsonProperty("idTipoEnvios")
-	public String getidTipoEnvios() {
+	public String getIdTipoEnvios() {
 		return idTipoEnvios;
 	}
-	public void setidTipoEnvios(String idTipoEnvios) {
+	public void setIdTipoEnvios(String idTipoEnvios) {
 		this.idTipoEnvios = idTipoEnvios;
 	}
-	@JsonProperty("idEstado")
-	public String getidEstado() {
+	public String getIdEstado() {
 		return idEstado;
 	}
-	public void setidEstado(String idEstado) {
+	public void setIdEstado(String idEstado) {
 		this.idEstado = idEstado;
 	}
-	
-	@JsonProperty("idClaseComunicacion")
 	public String getIdClaseComunicacion() {
 		return idClaseComunicacion;
 	}
 	public void setIdClaseComunicacion(String idClaseComunicacion) {
 		this.idClaseComunicacion = idClaseComunicacion;
+	}
+	public String getNombre() {
+		return nombre;
+	}
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+	public String getApellidos1() {
+		return apellidos1;
+	}
+	public void setApellidos1(String apellidos1) {
+		this.apellidos1 = apellidos1;
+	}
+	public String getApellidos2() {
+		return apellidos2;
+	}
+	public void setApellidos2(String apellidos2) {
+		this.apellidos2 = apellidos2;
+	}
+	public String getNumColegiado() {
+		return numColegiado;
+	}
+	public void setNumColegiado(String numColegiado) {
+		this.numColegiado = numColegiado;
+	}
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
+	public String getNif() {
+		return nif;
+	}
+	public void setNif(String nif) {
+		this.nif = nif;
+	}
+	public String getApellidos() {
+		return apellidos;
+	}
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
 	}
 	
 	

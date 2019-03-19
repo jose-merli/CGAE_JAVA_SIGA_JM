@@ -45,11 +45,16 @@ public class SigaConstants {
 	public static String SUFIJO_MODULO_COM_DUPLICADO = "_Copia";
 	public static String SUFIJO_CONSULTA_COM_DUPLICADO = "_Copia";
 	public static int NOMBRE_MAXLENGTH = 100;
-	public static String rutaficherosInformesYcomunicaciones = "/Datos/SIGA/ficheros/comunicaciones/";
+	/*public static String rutaficherosInformesYcomunicaciones = "/Datos/SIGA/ficheros/comunicaciones/";
 	public static String rutaExcelConsultaTemp= "/Datos/SIGA/ficheros/temporal/";
 	public static String carpetaDocumentosEnvio = "/documentosEnvio/";
-	public static String carpetaPlantillasDocumento = "/plantillaDocumentos/";
-	public static String carpetaTmp = "/tmp/";
+	public static String carpetaPlantillasDocumento = "/plantillaDocumentos/";*/
+	public static String carpetaDocumentosEnvio = "documentosEnvio";
+	public static String carpetaTmp = "temp";
+	public static String parametroRutaPlantillas = "informes.directorioFisicoPlantillaInformesJava";
+	public static String parametroRutaSalidaInformes = "informes.directorioFisicoSalidaInformesJava";
+	public static String rutaPlantillaSinClase = "plantillasSinClase";
+	public static String pathSeparator = "/";
 	
 	public static String nombreExcelConsulta = "ResultadoConsulta";
 	public static String nombreZip = "DocumentosComunicacion";
@@ -132,6 +137,15 @@ public class SigaConstants {
 	public static final String MODULO_GEN = "GEN";
 	
 	public static final String TIPO_CEN_PERSONA = "CEN_PERSONA";
+	
+	public static final String SENTENCIA_UPDATE = "UPDATE";
+	public static final String SENTENCIA_DELETE = "DELETE";
+	public static final String SENTENCIA_DROP = "DROP";
+	public static final String SENTENCIA_INSERT = "INSERT";
+	public static final String SENTENCIA_CREATE = "CREATE";
+	public static final String SENTENCIA_ALTER = "ALTER";
+	
+	public static final String ID_CLASE_CONSULTA_GENERICA = "5";
 	
 	public static final String MODULO_CENSO = "CEN";
 	public static final String PARAMETRO_CONTADOR_UNICO = "CONTADOR_UNICO_NCOLEGIADO_NCOMUNIT";
@@ -666,7 +680,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String GENERAL = "GENERAL";
 	public static final String NOMBREGRUPO = "NOMBREGRUPO";
 	public static final String PERSONANOMBRE = "PERSONANOMBRE";
-	public static final String C_IDPERSONA = "C_IDPERSONA";
+	public static final String C_IDPERSONA = "IDPERSONA";
 	public static final String C_IDINSTITUCION 		= "IDINSTITUCION";
 	public static final String PERSONANIF = "PERSONANIF";
 	public static final String COLEGIADONUMERO = "COLEGIADONUMERO";

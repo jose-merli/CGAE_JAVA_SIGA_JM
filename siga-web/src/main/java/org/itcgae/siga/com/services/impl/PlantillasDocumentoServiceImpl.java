@@ -22,6 +22,7 @@ import org.itcgae.siga.DTOs.com.ComboConsultasDTO;
 import org.itcgae.siga.DTOs.com.ComboSufijoDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DocumentoPlantillaItem;
 import org.itcgae.siga.DTOs.com.DocumentosPlantillaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDocumentoBorrarDTO;
@@ -32,6 +33,7 @@ import org.itcgae.siga.DTOs.com.SufijoItem;
 import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IPlantillasDocumentoService;
@@ -39,6 +41,11 @@ import org.itcgae.siga.com.services.IPlantillasEnvioService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ConConsulta;
+import org.itcgae.siga.db.entities.ConConsultaKey;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.entities.ModClasecomunicaciones;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumentoExample;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumentoKey;
@@ -47,8 +54,12 @@ import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijo;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample;
+import org.itcgae.siga.db.mappers.ConConsultaMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
+import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModRelPlantillaSufijoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
@@ -89,6 +100,9 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	ModPlantilladocConsultaMapper modPlantilladocConsultaMapper;
 	
 	@Autowired
+	ModPlantilladocumentoMapper modPlantilladocumentoMapper;
+	
+	@Autowired
 	ModPlantillaDocumentoExtendsMapper modPlantillaDocumentoExtendsMapper;
 	
 	@Autowired
@@ -102,6 +116,15 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	
 	@Autowired
 	ModModeloPlantillaDocumentoExtendsMapper modModeloPlantillaDocumentoExtendsMapper;
+	
+	@Autowired
+	private GenPropertiesMapper _genPropertiesMapper;
+	
+	@Autowired
+	private ModClasecomunicacionesMapper _modClasecomunicacionesMapper;
+	
+	@Autowired
+	private ConConsultaMapper _conConsultaMapper;
 	
 	@Override
 	public ConsultasDTO obtenerConsultasPlantilla(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc, boolean historico) {
@@ -123,9 +146,25 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
+					
+					if(plantillaDoc.getIdInstitucion() != null && plantillaDoc.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)) {
+						plantillaDoc.setIdInstitucion(String.valueOf(SigaConstants.IDINSTITUCION_2000));
+					}
+					
 					listaConsultaItem = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()), Long.parseLong(plantillaDoc.getIdInforme()), usuario.getIdlenguaje(), historico);			
 					if(listaConsultaItem != null && listaConsultaItem.size()> 0){
 						for(ConsultaItem consulta :listaConsultaItem){
+							
+							//Obtenemos la sentencia
+							ConConsultaKey key = new ConConsultaKey();
+							key.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
+							key.setIdinstitucion(Short.valueOf(consulta.getIdInstitucion()));
+							ConConsulta consultaEntity = _conConsultaMapper.selectByPrimaryKey(key);
+							
+							if(consultaEntity != null) {
+								consulta.setSentencia(consultaEntity.getSentencia());
+							}
+							
 							String finalidad = plantillasEnvioService.obtenerFinalidadByIdConsulta(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(consulta.getIdConsulta()));
 							consulta.setFinalidad(finalidad);
 						}
@@ -157,7 +196,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
 		ComboConsultasDTO comboConsultasDTO = new ComboConsultasDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		List<ComboItemConsulta> comboItems = new ArrayList<ComboItemConsulta>();
 		
 		if (null != idInstitucionUser) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -171,11 +210,15 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 						idClaseComunicacion = Long.parseLong(plantillaDoc.getIdClaseComunicacion());
 					}
 					
+					if(plantillaDoc.getIdInstitucion() != null && plantillaDoc.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)) {
+						plantillaDoc.setIdInstitucion(String.valueOf(SigaConstants.IDINSTITUCION_2000));
+					}
+					
 					LOGGER.debug("Obtenemos las consultas CONDICIONAL");
 					comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion, SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
 					
 					if(null != comboItems && comboItems.size() > 0) {
-						ComboItem element = new ComboItem();
+						ComboItemConsulta element = new ComboItemConsulta();
 						element.setLabel("");
 						element.setValue("");
 						comboItems.add(0, element);
@@ -188,7 +231,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion, SigaConstants.OBJETIVO.DATOS.getCodigo());
 					
 					if(null != comboItems && comboItems.size() > 0) {
-						ComboItem element = new ComboItem();
+						ComboItemConsulta element = new ComboItemConsulta();
 						element.setLabel("");
 						element.setValue("");
 						comboItems.add(0, element);
@@ -201,7 +244,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion, SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
 					
 					if(null != comboItems && comboItems.size() > 0) {
-						ComboItem element = new ComboItem();
+						ComboItemConsulta element = new ComboItemConsulta();
 						element.setLabel("");
 						element.setValue("");
 						comboItems.add(0, element);
@@ -214,7 +257,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					comboItems = conConsultasExtendsMapper.selectConsultasDisponibles(Short.parseShort(plantillaDoc.getIdInstitucion()), idClaseComunicacion, SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
 					
 					if(null != comboItems && comboItems.size() > 0) {
-						ComboItem element = new ComboItem();
+						ComboItemConsulta element = new ComboItemConsulta();
 						element.setLabel("");
 						element.setValue("");
 						comboItems.add(0, element);
@@ -241,6 +284,10 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	public Error guardarConsultasPlantilla(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
 		LOGGER.info("guardarConsultasPlantilla() -> Entrada al servicio para guardar las consultas de la plantilla");
 		
+		if(plantillaDoc != null && plantillaDoc.getIdInstitucion() != null && plantillaDoc.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)) {
+			plantillaDoc.setIdInstitucion(String.valueOf(SigaConstants.IDINSTITUCION_2000));
+		}
+		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -259,7 +306,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				try{		
 					
 					//Obtenemos las consultas asignadas al informe
-					List<ConsultaItem> listaConsultasAsociadas = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()), Long.parseLong(plantillaDoc.getIdInforme()), usuario.getIdlenguaje(), false);
+					//List<ConsultaItem> listaConsultasAsociadas = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()), Long.parseLong(plantillaDoc.getIdInforme()), usuario.getIdlenguaje(), false);
 					
 					// Comprobamos las consultas a guardar
 					List<ConsultaItem> listaItems = plantillaDoc.getConsultas();
@@ -284,7 +331,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 						
 						consultasValidas = true;
 						
-						if(consultaDestinatario != 1){
+						if(consultaDestinatario != 1 && !SigaConstants.ID_CLASE_CONSULTA_GENERICA.equals(plantillaDoc.getIdClaseComunicacion())){
 							consultasValidas = false;
 						}
 						if(consultaMultidocumento > 1){
@@ -319,7 +366,9 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										}
 										
 										if(consultaPlantillaModificar != null){
-											consultaPlantillaModificar.setFechamodificacion(new Date());										
+											consultaPlantillaModificar.setFechamodificacion(new Date());			
+											consultaPlantillaModificar.setIdinstitucionConsulta(Short.parseShort(consultaItem.getIdInstitucion()));
+											consultaPlantillaModificar.setRegion(consultaItem.getRegion());
 											modPlantilladocConsultaMapper.updateByPrimaryKey(consultaPlantillaModificar);
 											listaConsultasIdAAsociar.add(consultaPlantillaModificar.getIdconsulta());
 										}
@@ -332,6 +381,8 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										consultaPlantillaModificar.setFechabaja(null);
 										consultaPlantillaModificar.setUsumodificacion(usuario.getIdusuario());
 										consultaPlantillaModificar.setFechamodificacion(new Date());								
+										consultaPlantillaModificar.setIdinstitucionConsulta(Short.parseShort(consultaItem.getIdInstitucion()));
+										consultaPlantillaModificar.setRegion(consultaItem.getRegion());
 										
 										modPlantilladocConsultaMapper.insert(consultaPlantillaModificar);
 										listaConsultasIdAAsociar.add(consultaPlantillaModificar.getIdconsulta());
@@ -400,7 +451,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 
 
 	@Override
-	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request) {
+	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request, String idClaseComunicacion) {
 		LOGGER.info("uploadFile() -> Entrada al servicio para subir una plantilla de documento");
 		
 		ResponseDocumentoDTO response = new ResponseDocumentoDTO();
@@ -409,6 +460,8 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ModClasecomunicaciones modClase = null;
+		String rutaPlantillaClase = "";
 		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -416,10 +469,32 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			if (null != usuarios && usuarios.size() > 0) {
 				
+				// OBtenemos la ruta de las plantillas
+				if(idClaseComunicacion != null) {
+					modClase = _modClasecomunicacionesMapper.selectByPrimaryKey(Short.parseShort(idClaseComunicacion));
+					if(modClase != null) {
+						rutaPlantillaClase = modClase.getRutaplantilla();
+					}					
+				}
 				
-				// crear path para almacenar el fichero				
-				String pathFichero = SigaConstants.rutaficherosInformesYcomunicaciones + String.valueOf(idInstitucion) + SigaConstants.carpetaPlantillasDocumento;
+				if(rutaPlantillaClase == null || "".equals(rutaPlantillaClase)) {
+					rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+				}else {
+					rutaPlantillaClase = rutaPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, String.valueOf(idInstitucion));
+				}
 				
+				
+				// crear path para almacenar el fichero		
+				GenPropertiesKey key = new GenPropertiesKey();
+				key.setFichero(SigaConstants.FICHERO_SIGA);
+				key.setParametro(SigaConstants.parametroRutaPlantillas);
+				
+				GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+				
+				String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator;
+				
+				String pathFichero = rutaPlantilla;
+			
 				// 1. Coger archivo del request
 				LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
 				Iterator<String> itr = request.getFileNames();
@@ -434,7 +509,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 						// Obtenemos el idplantilladocumento para concatenarlo con el nombre del fichero
 						NewIdDTO newId = modPlantillaDocumentoExtendsMapper.selectMaxIdPlantillaDocumento();
 						int idNuevaPlantilla = Integer.parseInt(newId.getNewId()) + 1;
-						String newNombreFichero = nombreFichero + "_" + idNuevaPlantilla;
+						String newNombreFichero = nombreFichero + "_" + idNuevaPlantilla + extension;
 						
 						File aux = new File(pathFichero);
 						// creo directorio si no existe
@@ -758,6 +833,16 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										List<ConsultaItem> listaConsultas = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()), idInforme, usuario.getIdlenguaje(),false);
 										if(listaConsultas != null && listaConsultas.size() > 0){
 											for(ConsultaItem consulta: listaConsultas){
+												//Obtenemos la sentencia
+												ConConsultaKey key = new ConConsultaKey();
+												key.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
+												key.setIdinstitucion(Short.valueOf(consulta.getIdInstitucion()));
+												ConConsulta consultaEntity = _conConsultaMapper.selectByPrimaryKey(key);
+												
+												if(consultaEntity != null) {
+													consulta.setSentencia(consultaEntity.getSentencia());
+												}
+												
 												ModPlantilladocConsulta plantillaConsulta = new ModPlantilladocConsulta();
 												plantillaConsulta.setIdplantilladocumento(modModeloPlantillaDoc.getIdplantilladocumento());
 												plantillaConsulta.setFechabaja(null);
@@ -766,6 +851,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 												plantillaConsulta.setIdinstitucion(Short.parseShort(plantillaDoc.getIdInstitucion()));
 												plantillaConsulta.setIdconsulta(Long.parseLong(consulta.getIdConsulta()));
 												plantillaConsulta.setIdmodelocomunicacion(Long.parseLong(plantillaDoc.getIdModeloComunicacion()));
+												plantillaConsulta.setIdinstitucionConsulta(Short.parseShort(consulta.getIdInstitucion()));
 												modPlantilladocConsultaMapper.insert(plantillaConsulta);
 											}
 										}
@@ -933,7 +1019,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		return respuesta;
 	}	
 	
-	/*@Override
+	@Override
 	public ResponseFileDTO descargarPlantilla(HttpServletRequest request, DocumentoPlantillaItem plantillaDoc) {
 		
 		LOGGER.info("descargarPlantilla() -> Entrada al servicio para descargar la plantilla de documento");
@@ -943,7 +1029,8 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		ResponseFileDTO response = new ResponseFileDTO();
 		Error error = new Error();
-		File excel = null;
+		ModClasecomunicaciones modClase = null;
+		String rutaPlantillaClase = "";
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -954,35 +1041,52 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 				AdmUsuarios usuario = usuarios.get(0);
 				try{
 					
-					// Obtenemos el idPlantillaDocumento
+					// Obtenemos el idPlantillaDocumento					
+					String idPlantillaDoc = plantillaDoc.getIdPlantillaDocumento();		
 					
-					String idPlantillaDoc = plantillaDoc.getIdPlantillaDocumento();
-					String idModeloComunicacion = plantillaDoc.getIdModeloComunicacion();
-					
-					// Obtenemos el nombre del fichero
-					ModPlantilladocumento plantilla = new ModPlantilladocumento();
-					ModModeloPlantilladocumentoKey key = new ModModeloPlantilladocumentoKey();
-					key.setIdplantilladocumento(Long.parseLong(idPlantillaDoc));
-					key.setIdmodelocomunicacion(Long.parseLong(idModeloComunicacion));
-					
-					ModModeloPlantilladocumento modModeloPlantillaDoc = modModeloPlantilladocumentoMapper.selectByPrimaryKey(key);
-					
-					
-					Map<String,String> mapa = new HashMap<String,String>();
-					mapa = obtenerMapaConsulta(sentencia);
-					List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsulta(mapa);
-					if(result != null){
-						Workbook workBook = crearExcel(result);
-						File aux = new File(SigaConstants.rutaExcelConsultaTemp);
-						// creo directorio si no existe
-						aux.mkdirs();
-						String nombreFichero = SigaConstants.nombreExcelConsulta + new Date().getTime()+".xlsx";
-						excel = new File(SigaConstants.rutaExcelConsultaTemp, nombreFichero);
-						FileOutputStream fileOut = new FileOutputStream(SigaConstants.rutaExcelConsultaTemp + nombreFichero);
-						workBook.write(fileOut);
-				        fileOut.close();
-				        workBook.close();
-				        response.setFile(excel);
+					ModPlantilladocumento plantillaDocumento = modPlantilladocumentoMapper.selectByPrimaryKey(Long.parseLong(idPlantillaDoc));
+					if(plantillaDocumento != null){
+						
+
+						// OBtenemos la ruta de las plantillas
+						if(plantillaDoc.getIdClaseComunicacion() != null) {
+							modClase = _modClasecomunicacionesMapper.selectByPrimaryKey(Short.parseShort(plantillaDoc.getIdClaseComunicacion()));
+							if(modClase != null) {
+								rutaPlantillaClase = modClase.getRutaplantilla();
+							}					
+						}
+						
+						if("".equals(rutaPlantillaClase)) {
+							rutaPlantillaClase = SigaConstants.rutaPlantillaSinClase;
+						}else {
+							rutaPlantillaClase = rutaPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, String.valueOf(idInstitucion));
+						}
+						
+						
+						// Obtenemos el nombre del fichero
+						String nombrePlantilla = plantillaDocumento.getPlantilla();
+
+						GenPropertiesKey key = new GenPropertiesKey();
+						key.setFichero(SigaConstants.FICHERO_SIGA);
+						key.setParametro(SigaConstants.parametroRutaPlantillas);
+						
+						GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
+						
+						String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + rutaPlantillaClase + SigaConstants.pathSeparator;
+						
+						String pathFichero = rutaPlantilla;				
+		
+						
+						File file = new File(pathFichero + nombrePlantilla);
+						
+						if(!file.exists()) {
+							error.setCode(404);
+							error.setDescription("Fichero no encontrado");
+							error.setMessage("Fichero no encontrado");
+							response.setError(error);
+							LOGGER.debug("Plantilla no encontrada: " + idPlantillaDoc + " para la institucion " + idInstitucion);
+						}
+						response.setFile(file);
 					}
 				}catch (Exception e) {
 					LOGGER.error("ejecutarConsulta() -> Error al ejecutar la consulta: " + e.getMessage());
@@ -996,6 +1100,49 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 		}
 		LOGGER.info("descargarPlantilla() -> Salida del servicio para descargar la plantilla de documento");
 		return response;
-	}*/
+	}
+	
+	@Override
+	public ConsultasDTO obtenerConsultasById(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc) {
+		LOGGER.info("obtenerConsultasById() -> Entrada al servicio para obtener las consultas de una plantilla de documento");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucionUser = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		ConsultasDTO respuesta = new ConsultasDTO();
+		List<ConsultaItem> listaConsultaItem = new ArrayList<ConsultaItem>();
+		
+		if (null != idInstitucionUser) {
+			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucionUser));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);	
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					listaConsultaItem = conConsultasExtendsMapper.selectConsultasById(Short.parseShort(plantillaDoc.getIdInstitucion()), usuario.getIdlenguaje(), plantillaDoc.getIdConsulta());	
+					if(listaConsultaItem != null && listaConsultaItem.size()> 0){
+						for(ConsultaItem consulta :listaConsultaItem){
+							String finalidad = plantillasEnvioService.obtenerFinalidadByIdConsulta(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(consulta.getIdConsulta()));
+							consulta.setFinalidad(finalidad);
+						}
+						respuesta.setConsultaItem(listaConsultaItem);
+					}					
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setMessage("Error al obtener los perfiles");
+					error.description(e.getMessage());
+					e.printStackTrace();
+				}				
+			}
+		}
+		
+		
+		LOGGER.info("obtenerConsultasById() -> Salida del servicio para obtener las consultas de una plantilla de documento");
+		return respuesta;
+	}	
 
 }

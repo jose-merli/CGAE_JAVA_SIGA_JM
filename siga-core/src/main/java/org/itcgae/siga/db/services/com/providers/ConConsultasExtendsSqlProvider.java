@@ -90,16 +90,16 @@ public class ConConsultasExtendsSqlProvider {
 
 		sql.FROM("con_consulta cc");
 		sql.LEFT_OUTER_JOIN("con_modulo cm on cc.idmodulo = cm.idmodulo");
-		sql.INNER_JOIN("mod_plantillaenvio_consulta mpc on cc.idconsulta = mpc.idconsulta");
+		sql.INNER_JOIN("mod_plantillaenvio_consulta mpc on cc.idconsulta = mpc.idconsulta and mpc.idinstitucion_consulta = cc.idInstitucion");
 
-		sql.WHERE("mpc.idplantillaenvios='" + idPlantillaEnvios + "' AND mpc.idtipoenvios ='" + idtipoEnvio + "' AND mpc.FECHABAJA is null and cc.IDINSTITUCION = '" + idInstitucion + "'");
+		sql.WHERE("mpc.idplantillaenvios='" + idPlantillaEnvios + "' AND mpc.idtipoenvios ='" + idtipoEnvio + "' AND mpc.FECHABAJA is null and mpc.IDINSTITUCION = '" + idInstitucion + "'");
 		return sql.toString();
 	}
 	
 	public String selectConsultasDisponibles(Short idInstitucion, Long idClaseComunicacion, Long idObjetivo){
 		
 		SQL sql = new SQL();
-		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION");
+		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION");
 		sql.FROM("CON_CONSULTA");
 		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
 		
@@ -119,7 +119,7 @@ public class ConConsultasExtendsSqlProvider {
 	public String selectConsultasDisponiblesFiltro(Short idInstitucion, Long idClaseComunicacion, Long idObjetivo, String filtro){
 		
 		SQL sql = new SQL();
-		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION");
+		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION");
 		sql.FROM("CON_CONSULTA");
 		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
 		
@@ -141,7 +141,7 @@ public class ConConsultasExtendsSqlProvider {
 	public String selectConsultasDisponiblesPlantillasEnvio(Short idInstitucion){
 		
 		SQL sql = new SQL();
-		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION");
+		sql.SELECT_DISTINCT("IDCONSULTA, DESCRIPCION, IDINSTITUCION");
 		sql.FROM("CON_CONSULTA");
 		sql.WHERE("(IDINSTITUCION = "+ idInstitucion + " OR (IDINSTITUCION = '2000' AND (UPPER(GENERAL) = 'S' OR GENERAL = '1'))) AND FECHABAJA IS NULL");
 		
@@ -172,4 +172,27 @@ public class ConConsultasExtendsSqlProvider {
 		return cadenaWhere.toString();
 		
 	} 
+	
+	public String selectConsultasById(Short idInstitucion, String idLenguaje, String idConsulta){
+		
+		SQL sql = new SQL();
+		sql.SELECT("cc.IDINSTITUCION");
+		sql.SELECT("cc.IDCONSULTA");
+		sql.SELECT("cc.GENERAL");
+		sql.SELECT("cc.DESCRIPCION");
+		sql.SELECT("cc.OBSERVACIONES");
+		sql.SELECT("cc.TIPOCONSULTA");
+		sql.SELECT("CM.IDMODULO");
+		sql.SELECT("cc.IDCLASECOMUNICACION");
+		sql.SELECT("cc.IDOBJETIVO");
+		sql.SELECT("cc.SENTENCIA");
+		sql.SELECT("(SELECT REC.DESCRIPCION FROM CON_OBJETIVO OBJETIVO JOIN GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO = OBJETIVO.NOMBRE AND REC.IDLENGUAJE = '"+idLenguaje+""
+					+ "' WHERE OBJETIVO.IDOBJETIVO = cc.IDOBJETIVO) AS OBJETIVO");
+
+		sql.FROM("con_consulta cc");
+		sql.LEFT_OUTER_JOIN("con_modulo cm on cc.idmodulo = cm.idmodulo");
+
+		sql.WHERE("cc.IDINSTITUCION = '" + idInstitucion + "' AND cc.IDCONSULTA = " + idConsulta);
+		return sql.toString();
+	}
 }

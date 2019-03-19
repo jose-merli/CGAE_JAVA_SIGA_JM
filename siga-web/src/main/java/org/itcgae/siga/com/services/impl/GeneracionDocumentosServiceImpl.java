@@ -1,18 +1,36 @@
 package org.itcgae.siga.com.services.impl;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.com.documentos.DataMailMergeDataSource;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.itcgae.siga.com.services.IPFDService;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -131,6 +149,118 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			throw e;
 		}
 		
+		
+		return documento;
+	}
+
+	@Override
+	public DatosDocumentoItem generarExcel(String pathPlantilla, String pathFicheroSalida, String nombreFicheroSalida, List<List<Map<String, Object>>> listaDatosExcel) throws Exception {
+		DatosDocumentoItem documento = new DatosDocumentoItem();
+		boolean hayPlantilla = false;
+		
+		if(listaDatosExcel != null) {
+			
+			Workbook workbook = null;
+			
+			//Creamos el libro de excel			
+			// si existe la plantilla la cogemos, si no, generamos el excel desde cero
+			
+			File plantilla = new File(pathPlantilla);
+			
+			if(plantilla.exists()) {
+				FileInputStream inputStream;
+				try {
+					inputStream = new FileInputStream(new File(pathPlantilla));
+					workbook = new XSSFWorkbook(inputStream);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					throw e;
+				}
+				
+				hayPlantilla = true;
+			}else {
+				workbook = new XSSFWorkbook();
+			}
+			
+			for(int i = 0; i< listaDatosExcel.size(); i++){
+				
+				// Cada lista de listaDatosExcel se crea en una hoja
+				List<Map<String, Object>> registrosHoja = listaDatosExcel.get(i);
+				Sheet sheet = null;
+				
+				if(!hayPlantilla) {
+					//Creamos la hoja
+					sheet = workbook.createSheet("Consulta " + i);
+				}else {
+					sheet = workbook.getSheetAt(i);
+				}
+				
+				int rowNum = 1;
+		        int index = 0;
+		        CellStyle headerCellStyle = null;
+		        
+		        List<String> columnsKey = new ArrayList<String>();				        
+	        	for (String value : registrosHoja.get(0).keySet()) {
+	    			columnsKey.add(value);
+	    		}
+	        	
+				if(!hayPlantilla) {
+					//Le aplicamos estilos a las cabeceras
+					Font headerFont = workbook.createFont();
+					headerFont.setBold(true);
+					//headerFont.setItalic(true);
+					headerFont.setFontHeightInPoints((short) 14);
+					headerFont.setColor(IndexedColors.BLUE.getIndex());
+					headerCellStyle = workbook.createCellStyle();
+			        headerCellStyle.setFont(headerFont);	
+			        
+			        Row headerRow = sheet.createRow(0);
+			        
+			        for(String value : columnsKey) {
+			        	Cell cell = headerRow.createCell(index);
+		    			cell.setCellValue(value);
+		    			cell.setCellStyle(headerCellStyle);
+		    			index++;
+			        }
+				}
+				
+				for (Map<String, Object> map : registrosHoja) {
+	            	
+	            	Row row = sheet.createRow(rowNum++);
+	            	int cell = 0;
+	            	
+	            	for(int j = 0; j < columnsKey.size(); j++){
+	            		Object campo = map.get(columnsKey.get(j).trim());
+	            		if(campo == null || campo.toString().trim() == ""){
+	            			row.createCell(cell).setCellValue("null");
+	            		}else{
+	            			row.createCell(cell).setCellValue(campo.toString());
+	            		}
+	            		cell++;
+	            	}
+	    		}
+	            
+	            for(int j = 0; j < index; j++) {
+	                sheet.autoSizeColumn(j);
+	            }
+			}
+			
+			String nombreFicheroSalidaAux = nombreFicheroSalida;
+			String ficheroSalida = pathFicheroSalida + nombreFicheroSalidaAux;
+			FileOutputStream fileOut = new FileOutputStream(ficheroSalida);
+			
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			
+			workbook.write(bos);
+	        fileOut.close();
+	        workbook.close();		
+
+	        documento.setDatos(bos.toByteArray());
+	        documento.setFileName(nombreFicheroSalidaAux);
+	        documento.setPathDocumento(pathFicheroSalida);
+	        bos.close();
+		}
 		
 		return documento;
 	}

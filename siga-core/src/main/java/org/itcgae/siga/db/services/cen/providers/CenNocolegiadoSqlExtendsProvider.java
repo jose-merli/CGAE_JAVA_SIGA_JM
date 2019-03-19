@@ -966,4 +966,62 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 	
 		return sql.toString();
 	}
+	
+	public String selectNoColegiadosByIdPersona(Short idInstitucion, String idPersona) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("nocol.idpersona");
+		sql.SELECT_DISTINCT("nocol.idinstitucion");
+		sql.SELECT_DISTINCT("per.nifcif");
+		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ',per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("per.nombre as solonombre");
+		sql.SELECT_DISTINCT("per.apellidos1");
+		sql.SELECT_DISTINCT("per.apellidos2");
+		sql.SELECT_DISTINCT("per.sexo");
+		sql.SELECT_DISTINCT("per.idestadocivil");
+		sql.SELECT_DISTINCT("per.idtipoidentificacion");
+		sql.SELECT_DISTINCT("cli.NOAPARECERREDABOGACIA");
+		sql.SELECT_DISTINCT("per.naturalde");
+		sql.SELECT_DISTINCT("cli.idlenguaje");
+		sql.SELECT_DISTINCT("cli.asientocontable");
+		sql.SELECT_DISTINCT("cli.idtratamiento");
+		sql.SELECT_DISTINCT("cli.comisiones");
+		sql.SELECT_DISTINCT("cli.publicidad");
+		sql.SELECT_DISTINCT("cli.guiajudicial");
+		sql.SELECT_DISTINCT("per.fechanacimiento");
+		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
+		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
+		sql.SELECT_DISTINCT("dir.movil");
+		sql.SELECT_DISTINCT("TO_CHAR(nocol.fecha_baja, 'DD/MM/YYYY') AS fechaBaja");
+		sql.FROM("cen_nocolegiado nocol");
+
+		sql.INNER_JOIN("cen_persona per on nocol.idpersona = per.idpersona");
+		sql.INNER_JOIN(
+				"cen_cliente cli on (nocol.idpersona = cli.idpersona and nocol.idinstitucion = cli.idinstitucion)");
+		sql.INNER_JOIN("cen_institucion inst on nocol.idinstitucion = inst.idinstitucion");
+
+		sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
+				+ "    (grucli.idinstitucion = inst.idinstitucion and nocol.idpersona = grucli.idpersona and (grucli.fecha_inicio <= SYSDATE and \r\n"
+				+ "        ( grucli.fecha_baja >= SYSDATE OR grucli.fecha_baja IS NULL)))");
+		sql.LEFT_OUTER_JOIN(
+				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
+		
+		sql.LEFT_OUTER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIR ON (CLI.IDPERSONA = TIPODIR.IDPERSONA AND"  
+                + " DIR.IDDIRECCION = TIPODIR.IDDIRECCION AND CLI.IDINSTITUCION = TIPODIR.IDINSTITUCION AND "
+                + " INST.IDINSTITUCION = DIR.IDINSTITUCION)"); 
+		sql.LEFT_OUTER_JOIN("cen_datosCV datosCV ON ( datosCV.idInstitucion = nocol.idInstitucion and datosCV.idPersona = per.idPersona )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcv cenTipoCV ON ( cenTipoCV.idTipoCV = datosCV.idTipoCV )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt2 ON ( subt2.idTipoCV = datosCV.idTipoCV and subt2.idInstitucion = nocol.idInstitucion )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = nocol.idInstitucion )");
+
+		if(idInstitucion != null) {
+			sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
+		}
+		sql.WHERE("per.idtipoidentificacion not in '20'");
+
+		sql.WHERE("per.idPersona = '" + idPersona + "'");
+			
+		return sql.toString();
+	}
 }

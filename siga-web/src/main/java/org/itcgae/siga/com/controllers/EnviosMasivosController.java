@@ -3,10 +3,16 @@ package org.itcgae.siga.com.controllers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
+import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
+import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
+import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.DestinatarioIndvEnvioMasivoItem;
+import org.itcgae.siga.DTOs.com.DestinatarioItem;
+import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
@@ -231,6 +237,104 @@ public class EnviosMasivosController {
 		  
 		return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
     }
-
-
+	
+	@RequestMapping(value = "/detalle/consultasDest",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboConsultaInstitucionDTO> obtenerConsultasDest(HttpServletRequest request) {
+		
+		ComboConsultaInstitucionDTO response = _enviosMasivosService.obtenerconsultasDestinatarios(request);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboConsultaInstitucionDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboConsultaInstitucionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/ConsultasEnvAsociadas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ConsultasDTO> obtenerConsultasAsociadas(HttpServletRequest request, @RequestBody String idEnvio) {
+		
+		ConsultasDTO response = _enviosMasivosService.consultasDestAsociadas(request, idEnvio);
+		if(response.getError() == null)
+			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/asociarConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardarConsultaDest(HttpServletRequest request, @RequestBody ConsultaDestinatarioItem consulta) {
+		
+		Error response = _enviosMasivosService.asociarConsulta(request, consulta);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else if (response.getCode() == 400)
+			return new ResponseEntity<Error>(response, HttpStatus.BAD_REQUEST);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/detalle/desAsociarConsulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> desAsociarConsulta(HttpServletRequest request, @RequestBody ConsultaDestinatarioItem[] consulta) {
+		
+		Error response = _enviosMasivosService.desAsociarConsulta(request, consulta);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "detalle/consultasDestinatariosDisp",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboConsultaInstitucionDTO> obtenerConsultas(@RequestParam("filtro") String filtro, HttpServletRequest request) {
+		
+		ComboConsultaInstitucionDTO response = _enviosMasivosService.getComboConsultas(request, filtro);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboConsultaInstitucionDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboConsultaInstitucionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "detalle/destinatariosIndv",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DestinatariosDTO> obtenerDestinatariosIndv(HttpServletRequest request, @RequestBody String idEnvio) {
+		
+		DestinatariosDTO response = _enviosMasivosService.obtenerDestinatariosIndv(request, idEnvio);
+		if(response.getError() == null)
+			return new ResponseEntity<DestinatariosDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<DestinatariosDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "detalle/asociarDestinatariosIndv",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> asociarDestinatarioIndv(HttpServletRequest request, @RequestBody DestinatarioIndvEnvioMasivoItem destinatario) {
+		
+		Error response = _enviosMasivosService.asociarDestinatario(request, destinatario);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "detalle/desAsociarDestinatarioIndv",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> desAsociarDestinatario(HttpServletRequest request, @RequestBody DestinatarioIndvEnvioMasivoItem[] destinatarios) {
+		
+		Error response = _enviosMasivosService.desAsociarDestinatarios(request, destinatarios);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else if (response.getCode() == 400)
+			return new ResponseEntity<Error>(response, HttpStatus.BAD_REQUEST);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "detalle/direccionesDestinatarioIndv",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<DatosDireccionesDTO> obtenerDireccionesDisp(HttpServletRequest request, @RequestBody String idPersona) {
+		
+		DatosDireccionesDTO response = _enviosMasivosService.obtenerDireccionesDisp(request, idPersona);
+		if(response.getError() == null)
+			return new ResponseEntity<DatosDireccionesDTO>(response, HttpStatus.OK);
+		else{
+			if(response.getError().getCode() == 400)
+				return new ResponseEntity<DatosDireccionesDTO>(response, HttpStatus.BAD_REQUEST);
+			else
+				return new ResponseEntity<DatosDireccionesDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+			
+	}
+	
 }

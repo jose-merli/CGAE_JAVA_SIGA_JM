@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
+import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
@@ -21,6 +22,7 @@ import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaRemitenteDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IPlantillasEnvioService;
@@ -81,7 +83,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	private ConConsultaMapper _conConsultaMapper;
 
 	@Override
-	public ComboDTO getComboConsultas(HttpServletRequest request, String filtro) {
+	public ComboConsultaInstitucionDTO getComboConsultas(HttpServletRequest request, String filtro) {
 		LOGGER.info("getComboConsultas() -> Entrada al servicio para obtener las consultas disponibles");
 		
 		// Conseguimos información del usuario logeado
@@ -89,8 +91,8 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		ComboConsultaInstitucionDTO comboDTO = new ComboConsultaInstitucionDTO();
+		List<ComboItemConsulta> comboItems = new ArrayList<ComboItemConsulta>();
 		
 		
 		if (null != idInstitucion) {
@@ -103,13 +105,13 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 				comboItems = _conConsultasExtendsMapper.selectConsultasDisponiblesFiltro(idInstitucion, null, null, filtro);
 
 				if(null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
+					ComboItemConsulta element = new ComboItemConsulta();
 					element.setLabel("");
 					element.setValue("");
 					comboItems.add(0, element);
 				}		
 				
-				comboDTO.setCombooItems(comboItems);
+				comboDTO.setConsultas(comboItems);
 				
 			}
 		}
@@ -293,6 +295,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					consultaAsoc.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
 					consultaAsoc.setIdplantillaenvios(Integer.parseInt(consulta.getIdPlantillaEnvios()));
 					consultaAsoc.setIdinstitucion(idInstitucion);
+					consultaAsoc.setIdinstitucionConsulta(Short.valueOf(consulta.getIdInstitucion()));
 					consultaAsoc.setIdtipoenvios(Short.valueOf(consulta.getIdTipoEnvios()));
 					consultaAsoc.setUsumodificacion(usuario.getIdusuario());
 					consultaAsoc.setFechamodificacion(new Date());
