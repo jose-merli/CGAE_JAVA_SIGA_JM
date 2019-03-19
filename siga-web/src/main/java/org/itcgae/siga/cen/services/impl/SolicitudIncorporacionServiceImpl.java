@@ -730,7 +730,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					solIncorporacion.setFechamodificacion(new Date());
 					solIncorporacion.setUsumodificacion(usuario.getIdusuario());
 					solIncorporacion.setFechaalta(new Date());
-					solIncorporacion.setFechaestado(new Date());
+					//solIncorporacion.setFechaestado(new Date());
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				
 					if(idPersona != null && idDireccion!= null && insertCliente == 1 && idBancario != null && insertColegiado == 1 && updateSolicitud == 1){
@@ -1327,7 +1327,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		CenColegiado colegiado = new CenColegiado();
 		
 		colegiado.setIdpersona(idPersona);
-		colegiado.setFechaincorporacion(new Date());
+		colegiado.setFechaincorporacion(solicitud.getFechaestadocolegial());
 		colegiado.setFechamodificacion(new Date());
 		colegiado.setIdinstitucion(usuario.getIdinstitucion());
 		
@@ -1400,7 +1400,11 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				}else{
 					datosColegiales.setIdestado(Short.valueOf("10"));
 				}
-
+				if(solicitud.getResidente().equals("1")) {
+					datosColegiales.setSituacionresidente("1");
+				}else {
+					datosColegiales.setSituacionresidente("0");
+				} 
 				datosColegiales.setIdinstitucion(usuario.getIdinstitucion());
 				datosColegiales.setIdpersona(idPersona);
 				datosColegiales.setUsumodificacion(usuario.getIdusuario());
