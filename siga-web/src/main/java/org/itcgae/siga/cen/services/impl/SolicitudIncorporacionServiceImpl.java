@@ -59,14 +59,16 @@ import org.itcgae.siga.db.entities.CenPaisExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenSolicitudincorporacion;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
-import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.mappers.CenCuentasbancariasMapper;
 import org.itcgae.siga.db.mappers.CenDatoscolegialesestadoMapper;
 import org.itcgae.siga.db.mappers.CenDireccionTipodireccionMapper;
 import org.itcgae.siga.db.mappers.CenSolicitudincorporacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenBancosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
@@ -162,6 +164,10 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 	
 	@Autowired
 	private CenDireccionTipodireccionMapper cenDireccionTipoDireccionMapper;
+	
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
+	
 	@Override
 	public ComboDTO getTipoSolicitud(HttpServletRequest request) {
 		LOGGER.info("getTipoSolicitud() -> Entrada al servicio para cargar el tipo de solicitud");
@@ -298,12 +304,24 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					"numColegiadoSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			
 			if(usuarios != null && usuarios.size()>0){
+				// 10 --> No Inscrito/Español
+				// 20 --> Inscrito/Comunitario
+				String tipoColegiacion = solIncorporacionItem.getIdTipoColegiacion();		
 				CenColegiadoExample exampleColegiado = new CenColegiadoExample();
-				exampleColegiado.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andNcolegiadoEqualTo(solIncorporacionItem.getNumColegiado());
-
-				List<CenColegiado> resultados =  _cenColegiadoMapper.selectByExample(exampleColegiado);
-				if(resultados.size() > 0) {
-					solIncorporacionResult.setNumColegiado(resultados.get(0).getNcolegiado());
+				
+				if(solIncorporacionItem.getNumColegiado() != null && !solIncorporacionItem.getNumColegiado().equals("")) {
+					if(tipoColegiacion.equals("10")) {
+						exampleColegiado.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andNcolegiadoEqualTo(solIncorporacionItem.getNumColegiado());
+					}else {
+						exampleColegiado.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).andNcomunitarioEqualTo(solIncorporacionItem.getNumColegiado());
+					}
+					
+					List<CenColegiado> resultados = _cenColegiadoMapper.selectByExample(exampleColegiado);
+					if(resultados.size() > 0) {
+						solIncorporacionResult.setNumColegiado(resultados.get(0).getNcolegiado());
+					}else {
+						solIncorporacionResult.setNumColegiado("disponible");
+					}
 				}else {
 					solIncorporacionResult.setNumColegiado("disponible");
 				}
@@ -608,10 +626,37 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						Long idMax = idSolicitud.getIdMax() +1;
 						SolIncorporacionDTO.setIdSolicitud(Long.toString(idMax));
 						
-						if(SolIncorporacionDTO.getNumColegiado() == null) {
-							StringDTO nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNColegiado(String.valueOf(idInstitucion));
-							SolIncorporacionDTO.setNumColegiado(nColegiado.getValor());
-						}
+						
+						//TODO esta funcionalidad se pasa a "Aprobar la solicitud"
+//						if(SolIncorporacionDTO.getNumColegiado() == null) {
+//							// Comprobamos si para la institucion tiene un contador unico
+//							GenParametrosKey key = new GenParametrosKey();
+//							key.setIdinstitucion(idInstitucion);
+//							key.setModulo(SigaConstants.MODULO_CENSO);
+//							key.setParametro(SigaConstants.PARAMETRO_CONTADOR_UNICO);
+//							GenParametros genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
+//							
+//							String contadorUnico = genParametro == null || genParametro.getValor() == null ? "0" : genParametro.getValor();
+//
+//							StringDTO nColegiado = new StringDTO();
+//							if (contadorUnico.equals("1")) {
+//								nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNColegiadoComunitario(String.valueOf(idInstitucion));
+//							} else {
+//								// 10 --> No Inscrito/Español
+//								// 20 --> Inscrito/Comunitario
+//								String tipoColegiacion = SolIncorporacionDTO.getIdTipoColegiacion();
+//								
+//								if(tipoColegiacion.equals("10")) {
+//									nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNColegiado(String.valueOf(idInstitucion));
+//								}else if(tipoColegiacion.equals("20")) {
+//									nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNComunitario(String.valueOf(idInstitucion));
+//								}
+//							}
+//							
+//							SolIncorporacionDTO.setNumColegiado(nColegiado.getValor());
+//						}else {
+//							// Comprobamos que el ncolegiado es correcto
+//						}
 						
 						solIncorporacion = mapperDtoToEntity(SolIncorporacionDTO, usuario);
 						solIncorporacion.setIdestado((short)20);
@@ -646,6 +691,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		LOGGER.info("aprobarSolicitud() -> Entrada al servicio para aprobar una solicitud");
 		
 		Long idDireccion;
+		Long idDireccion2;
 		Long idPersona;
 		Short idBancario;
 		int insertColegiado;
@@ -677,6 +723,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					idPersona = insertarDatosPersonales(solIncorporacion, usuario);
 					insertCliente = insertarDatosCliente(solIncorporacion, usuario, idPersona);
 					idDireccion = insertarDatosDireccion(solIncorporacion, usuario, idPersona);
+					idDireccion2 = insertarDatosDireccion2(solIncorporacion, usuario, idPersona);
 					insertColegiado = insertarDatosColegiado(solIncorporacion, usuario, idPersona);
 					idBancario = insertarDatosBancarios(solIncorporacion, usuario, idPersona);
 					solIncorporacion.setIdestado((short)50);
@@ -706,6 +753,13 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						if(idDireccion != null){
 							CenDireccionesKey keys = new CenDireccionesKey();
 							keys.setIddireccion(idDireccion);
+							keys.setIdinstitucion(usuario.getIdinstitucion());
+							keys.setIdpersona(idPersona);
+							_cenDireccionesMapper.deleteByPrimaryKey(keys);
+						}
+						if(idDireccion2 != null){
+							CenDireccionesKey keys = new CenDireccionesKey();
+							keys.setIddireccion(idDireccion2);
 							keys.setIdinstitucion(usuario.getIdinstitucion());
 							keys.setIdpersona(idPersona);
 							_cenDireccionesMapper.deleteByPrimaryKey(keys);
@@ -916,6 +970,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		CenDirecciones direccion = new CenDirecciones();
 		
+		//Creamos la direccion con los tipos de direccion oblogatorios
 		 List<DatosDireccionesItem> direccionID = _cenDireccionesMapper.selectNewIdDireccion(idPersona.toString(),usuario.getIdinstitucion().toString());
 		
 		direccion.setIddireccion(Long.valueOf(direccionID.get(0).getIdDireccion()));
@@ -935,6 +990,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		direccion.setMovil(solicitud.getMovil());
 		direccion.setUsumodificacion(usuario.getIdusuario());
 		
+		//Añadimos las preferencias de direccion obligatorias
+		direccion.setPreferente("ECS");
+		
 		_cenDireccionesMapper.insert(direccion);
 		
 		CenDireccionTipodireccion tipoDireccion =  new CenDireccionTipodireccion();
@@ -944,18 +1002,67 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		tipoDireccion.setIdpersona(idPersona);
 		tipoDireccion.setUsumodificacion(usuario.getIdusuario());
 		
-		//Traspaso a OOJ
-		tipoDireccion.setIdtipodireccion(Short.valueOf("9"));
+		//Añadimos los tipo de direcciones obligatorios
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_TRASPASO));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_FACTURACION));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_CENSOWEB));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUIAJUDICIAL));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_GUARDIA));
 		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
 		
-		//Despacho
-		tipoDireccion.setIdtipodireccion(Short.valueOf("2"));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		if(solicitud.getIdtiposolicitud() == SigaConstants.INCORPORACION_EJERCIENTE ||
+				solicitud.getIdtiposolicitud() == SigaConstants.REINCORPORACION_EJERCIENTE) {
+			tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_DESPACHO));
+			cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		}
 		
-		//CensoWeb
-		tipoDireccion.setIdtipodireccion(Short.valueOf("3"));
-		cenDireccionTipoDireccionMapper.insert(tipoDireccion );
+		return direccion.getIddireccion();
+		
+	}
 	
+	private Long insertarDatosDireccion2 (CenSolicitudincorporacion solicitud, AdmUsuarios usuario, Long idPersona){
+		
+		CenDirecciones direccion = new CenDirecciones();
+		
+		//Creamos la direccion con los tipos de direccion oblogatorios
+		 List<DatosDireccionesItem> direccionID = _cenDireccionesMapper.selectNewIdDireccion(idPersona.toString(),usuario.getIdinstitucion().toString());
+		
+		direccion.setIddireccion(Long.valueOf(direccionID.get(0).getIdDireccion()));
+		direccion.setFechamodificacion(new Date());
+		direccion.setIdinstitucion(usuario.getIdinstitucion());
+		direccion.setIdpersona(idPersona);
+		direccion.setUsumodificacion(usuario.getIdusuario());
+		
+		//Añadimos las preferencias de direccion no obligatorias
+		direccion.setPreferente("F");
+		
+		_cenDireccionesMapper.insert(direccion);
+		
+		CenDireccionTipodireccion tipoDireccion =  new CenDireccionTipodireccion();
+		tipoDireccion.setFechamodificacion(new Date());
+		tipoDireccion.setIddireccion(direccion.getIddireccion());
+		tipoDireccion.setIdinstitucion(usuario.getIdinstitucion());
+		tipoDireccion.setIdpersona(idPersona);
+		tipoDireccion.setUsumodificacion(usuario.getIdusuario());
+		
+		//Añadimos los tipo de direcciones obligatorios
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_PUBLICA));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion);
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_RESIDENCIA));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion);
+		tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_REVISTA));
+		cenDireccionTipoDireccionMapper.insert(tipoDireccion);
+		
+		if(solicitud.getIdtiposolicitud() != SigaConstants.INCORPORACION_EJERCIENTE &&
+				solicitud.getIdtiposolicitud() != SigaConstants.REINCORPORACION_EJERCIENTE) {
+			tipoDireccion.setIdtipodireccion(Short.valueOf(SigaConstants.TIPO_DIR_DESPACHO));
+			cenDireccionTipoDireccionMapper.insert(tipoDireccion);
+		}
+		
 		return direccion.getIddireccion();
 		
 	}
@@ -1223,7 +1330,38 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		colegiado.setFechaincorporacion(new Date());
 		colegiado.setFechamodificacion(new Date());
 		colegiado.setIdinstitucion(usuario.getIdinstitucion());
-		colegiado.setNcolegiado(solicitud.getNcolegiado());
+		
+		if(solicitud.getNcolegiado() == null) {
+			// Comprobamos si para la institucion tiene un contador unico
+			GenParametrosKey key = new GenParametrosKey();
+			key.setIdinstitucion(solicitud.getIdinstitucion());
+			key.setModulo(SigaConstants.MODULO_CENSO);
+			key.setParametro(SigaConstants.PARAMETRO_CONTADOR_UNICO);
+			GenParametros genParametro = genParametrosExtendsMapper.selectByPrimaryKey(key);
+			
+			String contadorUnico = genParametro == null || genParametro.getValor() == null ? "0" : genParametro.getValor();
+
+			StringDTO nColegiado = new StringDTO();
+			if (contadorUnico.equals("1")) {
+				nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNColegiadoComunitario(String.valueOf(solicitud.getIdinstitucion()));
+			} else {
+				// 10 --> No Inscrito/Español
+				// 20 --> Inscrito/Comunitario
+				short tipoColegiacion = solicitud.getIdtipocolegiacion();
+				
+				if(tipoColegiacion == 10) {
+					nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNColegiado(String.valueOf(solicitud.getIdinstitucion()));
+				}else if(tipoColegiacion == 20) {
+					nColegiado = _cenSolicitudincorporacionExtendsMapper.getMaxNComunitario(String.valueOf(solicitud.getIdinstitucion()));
+				}
+			}
+			
+			colegiado.setNcolegiado(nColegiado.getValor());
+			solicitud.setNcolegiado(nColegiado.getValor());
+
+		}
+		
+		
 		colegiado.setUsumodificacion(usuario.getIdusuario());
 		colegiado.setNumsolicitudcolegiacion(solicitud.getIdsolicitud().toString());
 		colegiado.setFechapresentacion(new Date());
@@ -1243,7 +1381,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			colegiado.setSituacionresidente("0");
 		} 
 		CenColegiadoExample ejemploColegiado = new CenColegiadoExample();
-		ejemploColegiado.createCriteria().andIdpersonaEqualTo(idPersona);
+		ejemploColegiado.createCriteria().andIdpersonaEqualTo(idPersona).andIdinstitucionEqualTo(solicitud.getIdinstitucion());
 		
 		List <CenColegiado> listaColegiados = _cenColegiadoMapper.selectByExample(ejemploColegiado);
 		if(listaColegiados.isEmpty()) {

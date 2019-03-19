@@ -147,6 +147,9 @@ public class SigaConstants {
 	
 	public static final String ID_CLASE_CONSULTA_GENERICA = "5";
 	
+	public static final String MODULO_CENSO = "CEN";
+	public static final String PARAMETRO_CONTADOR_UNICO = "CONTADOR_UNICO_NCOLEGIADO_NCOMUNIT";
+	
 
 	public enum ERROR_SERVER {
 		XML_NO_VALIDO(null), CLI_NOAUTORIZADO(
@@ -666,7 +669,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final long TIPO_EVENTO_SESION = 8;
 	public static final long ESTADO_EVENTO_PLANIFICADO = 1;
 	
-	public static final List<String> CAMPOSPLANTILLAEVENTOS = Arrays.asList(NOMBRE);
+	public static final List<String> CAMPOSPLANTILLAEVENTOS = Arrays.asList(NIF, NOMBRE, ASISTENCIA);
 	
 	//CARGA MASIVA GF
 	
@@ -687,14 +690,12 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String C_FECHAFIN = "C_FECHAFIN";
 	
 	public static final List<String> CAMPOSEJEMPLOGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, 
-			C_IDGRUPO, GENERAL, ACCION, C_FECHAINICIO,
-			C_FECHAFIN);
+			C_IDGRUPO, GENERAL, ACCION, C_FECHAINICIO);
 
 	
 	public static final List<String> CAMPOSLOGGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, 
 			PERSONANOMBRE, C_IDPERSONA, C_IDGRUPO, 
-			GENERAL, NOMBREGRUPO, ACCION, C_FECHAINICIO,
-			C_FECHAFIN, ERRORES);
+			GENERAL, NOMBREGRUPO, ACCION, C_FECHAINICIO, ERRORES);
 
 	public static final String tipoExcelXls = "xls";
 	public static final String tipoExcelXlsx = "xlsx";
@@ -753,5 +754,29 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final long NOTIFICACION_SEGUNDOS = 3;
 	
 
-
+	//SOLICITUD INCORPORACION
+	public static final String  TIPO_DIR_RESIDENCIA = "1";
+	public static final String  TIPO_DIR_DESPACHO = "2";
+	public static final String  TIPO_DIR_CENSOWEB = "3";
+	public static final String  TIPO_DIR_PUBLICA = "4";
+	public static final String  TIPO_DIR_GUIAJUDICIAL = "5";
+	public static final String  TIPO_DIR_GUARDIA = "6";
+	public static final String  TIPO_DIR_REVISTA = "7";
+	public static final String  TIPO_DIR_FACTURACION = "8";
+	public static final String  TIPO_DIR_TRASPASO = "9";
+	public static final String  TIPO_DIR_PREFERENTE_EMAIL = "10";
+	public static final String  TIPO_DIR_PREFERENTE_CORREO = "11";
+	public static final String  TIPO_DIR_PREFERENTE_SMS = "12";
+	public static final String  TIPO_DIR_PREFERENTE_FAX = "13";
+	
+	public static final String  DIR_PREFERENTE_EMAIL = "E";
+	public static final String  DIR_PREFERENTE_CORREO = "C";
+	public static final String  DIR_PREFERENTE_SMS = "S";
+	public static final String  DIR_PREFERENTE_FAX = "F";
+	
+	public static final short  REINCORPORACION_EJERCIENTE = 10;
+	public static final short  REINCORPORACION_NO_EJERCIENTE = 20;
+	public static final short  INCORPORACION_EJERCIENTE = 30;
+	public static final short  INCORPORACION_NO_EJERCIENTE = 40;
+	
 }

@@ -25,6 +25,8 @@ public interface ITarjetaDatosDireccionesService {
 	UpdateResponseDTO updateDirection(DatosDireccionesItem datosDirecciones, HttpServletRequest request);
 
 	InsertResponseDTO createDirection(DatosDireccionesItem datosDirecciones, HttpServletRequest request);
+	
+	InsertResponseDTO duplicateDirection(DatosDireccionesItem datosDirecciones, HttpServletRequest request);
 
 	UpdateResponseDTO solicitudUpdateDirection(DatosDireccionesItem datosDirecciones, HttpServletRequest request);
 

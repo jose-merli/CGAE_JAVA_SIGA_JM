@@ -123,13 +123,6 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		LOGGER.info(
 				"getProvinces() / cenProvinciasExtendsMapper.selectDistinctProvinces() -> Salida de cenProvinciasExtendsMapper para obtener listado de provincias ");
 
-		if (null != comboItems && comboItems.size() > 0) {
-			ComboItem element = new ComboItem();
-			element.setLabel("");
-			element.setValue("");
-			comboItems.add(0, element);
-		}
-
 		comboDTO.setCombooItems(comboItems);
 
 		LOGGER.info("getProvinces() -> Salida al servicio para búsqueda de las provincias");
@@ -166,12 +159,6 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 				LOGGER.info(
 						"getCargos() / cenCargoExtendsMapper.getCargos() -> Salida de cenCargoExtendsMapper para obtener listado de cargos ");
 
-				if (null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
-				}
 			}
 
 		}

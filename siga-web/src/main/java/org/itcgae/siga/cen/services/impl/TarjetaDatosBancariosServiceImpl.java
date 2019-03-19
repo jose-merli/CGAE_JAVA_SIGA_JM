@@ -13,7 +13,6 @@ import java.sql.SQLTimeoutException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Formatter;
 import java.util.Iterator;
 import java.util.List;
 
@@ -65,28 +64,28 @@ import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenMandatosCuentasbancarias;
 import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasExample;
 import org.itcgae.siga.db.entities.CenMandatosCuentasbancariasKey;
-import org.itcgae.siga.db.entities.CenSolicmodicuentas;
 import org.itcgae.siga.db.entities.CenPais;
 import org.itcgae.siga.db.entities.CenPaisExample;
 import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenPersonaExample;
-
+import org.itcgae.siga.db.entities.CenSolicmodicuentas;
 import org.itcgae.siga.db.entities.GenFichero;
 import org.itcgae.siga.db.entities.GenFicheroKey;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenRecursos;
 import org.itcgae.siga.db.entities.GenRecursosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.CenAnexosCuentasbancariasMapper;
-import org.itcgae.siga.db.mappers.CenBancosMapper;
 import org.itcgae.siga.db.mappers.CenMandatosCuentasbancariasMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenBancosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenSolicmodicuentasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitmodifdatosbasicosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenSolicmodicuentasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.GenFicheroExtendsMapper;
 import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -105,6 +104,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
+	
 	@Autowired
 	private CenCuentasbancariasExtendsMapper cenCuentasbancariasExtendsMapper;
 
@@ -192,6 +194,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 		LOGGER.info("deleteBanksData() -> Entrada al servicio para eliminar cuentas bancarias");
 		int response = 0;
+		Error error = new Error();
 		DeleteResponseDTO deleteResponseDTO = new DeleteResponseDTO();
 
 		// Conseguimos información del usuario logeado
@@ -211,30 +214,56 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
-				// información a modificar
-				CenCuentasbancarias cuentaBancaria = new CenCuentasbancarias();
-				cuentaBancaria.setFechabaja(new Date());
-				cuentaBancaria.setFechamodificacion(new Date());
-				cuentaBancaria.setUsumodificacion(usuario.getIdusuario());
-
 				// filtrado para sentencia sql
 				List<Short> idCuentasDelete = new ArrayList<Short>();
 				for (int i = 0; i < datosBancariosDeleteDTO.getIdCuentas().length; i++) {
-					idCuentasDelete.add(Short.valueOf(datosBancariosDeleteDTO.getIdCuentas()[i]));
+					
+					// información a modificar
+					CenCuentasbancarias cuentaBancaria = new CenCuentasbancarias();
+					cuentaBancaria.setFechabaja(new Date());
+					cuentaBancaria.setFechamodificacion(new Date());
+					cuentaBancaria.setUsumodificacion(usuario.getIdusuario());
+				
+					CenCuentasbancariasExample cenCuentasbancariasDelete = new CenCuentasbancariasExample();
+					cenCuentasbancariasDelete.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdpersonaEqualTo(Long.valueOf(datosBancariosDeleteDTO.getIdPersona()))
+							.andIdcuentaEqualTo(Short.valueOf(datosBancariosDeleteDTO.getIdCuentas()[i]));
+
+					LOGGER.info(
+							"deleteBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para eliminar cuentas bancarias");
+					response = cenCuentasbancariasExtendsMapper.updateByExampleSelective(cuentaBancaria,
+							cenCuentasbancariasDelete);
+					LOGGER.info(
+							"deleteBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para eliminar cuentas bancarias");
+
+					// Este proceso se encarga de actualizar las cosas pendientes asociadas a la
+					// cuenta de la persona
+					String[] resultado;
+					try {
+						resultado = ejecutarPL_Revision_Cuenta("" + idInstitucion.toString(),
+								"" + datosBancariosDeleteDTO.getIdPersona(), "" + datosBancariosDeleteDTO.getIdCuentas()[i],
+								"" + usuario.getIdusuario().toString());
+						
+						if (resultado == null || !resultado[0].equals("0")) {
+
+							deleteResponseDTO.setStatus(SigaConstants.KO);
+							error.setMessage(
+									"Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado[0]);
+							deleteResponseDTO.setError(error);
+							return deleteResponseDTO;
+
+						}
+					} catch (Exception e) {
+						deleteResponseDTO.setStatus(SigaConstants.KO);
+						error.setMessage(
+								"Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA");
+						deleteResponseDTO.setError(error);
+						return deleteResponseDTO;
+					}
+					
+
 				}
-
-				CenCuentasbancariasExample cenCuentasbancariasDelete = new CenCuentasbancariasExample();
-				cenCuentasbancariasDelete.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-						.andIdpersonaEqualTo(Long.valueOf(datosBancariosDeleteDTO.getIdPersona()))
-						.andIdcuentaIn(idCuentasDelete);
-
-				LOGGER.info(
-						"deleteBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Entrada a cenNocolegiadoExtendsMapper para eliminar cuentas bancarias");
-				response = cenCuentasbancariasExtendsMapper.updateByExampleSelective(cuentaBancaria,
-						cenCuentasbancariasDelete);
-				LOGGER.info(
-						"deleteBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para eliminar cuentas bancarias");
-
+				
 			} else {
 				LOGGER.warn(
 						"deleteBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -528,7 +557,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				if (tieneSCSJ) {
 					CenCuentasbancariasExample example = new CenCuentasbancariasExample();
 					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(datosBancariosInsertDTO.getIdPersona()))
-							.andIdinstitucionEqualTo(idInstitucion).andAbonosjcsEqualTo("1");
+							.andIdinstitucionEqualTo(idInstitucion).andAbonosjcsEqualTo("1").andFechabajaIsNull();
 					List<CenCuentasbancarias> cuenta = cenCuentasbancariasExtendsMapper.selectByExample(example);
 
 					if (null != cuenta && !cuenta.isEmpty()) {
@@ -545,7 +574,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				LOGGER.info(
 						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
 
-				// comprobacion actualización
+				// comprobacion actualización 
 				if (response >= 1) {
 					LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
 					insertResponseDTO.setStatus(SigaConstants.OK);
@@ -900,7 +929,23 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					
 					int responseUpdate = cenCuentasbancariasExtendsMapper.updateByPrimaryKeySelective(modificacion);
 					
+					error.setCode(200);
+					error.setDescription("Su petición ha sido aceptada automáticamente. Puede ver ya los datos actualizados");
+				}else {
+					GenParametrosExample ejemploParam = new GenParametrosExample();
+					List<GenParametros> xDias = new ArrayList<GenParametros>();
+					ejemploParam.createCriteria().andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION").andIdinstitucionEqualTo(idInstitucion);
+					xDias = genParametrosMapper.selectByExample(ejemploParam);
+					error.setCode(200);
+					if(xDias.size() == 0) {
+						GenParametrosExample ejemploParam2 = new GenParametrosExample();
+						ejemploParam2.createCriteria().andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION").andIdinstitucionEqualTo((short)2000);
+						xDias= genParametrosMapper.selectByExample(ejemploParam2);
+					}
+					error.setDescription("Su petición ha sido registrada y será revisada en los próximos "+xDias.get(0).getValor()+" días. Puede comprobar el estado de su petición en el menú Solicitudes de modificación");
 				}
+				
+				insertResponseDTO.setError(error);
 				// comprobacion actualización
 				if(response >= 1) {
 					LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
@@ -1152,6 +1197,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				CenMandatosCuentasbancarias record = new CenMandatosCuentasbancarias();
 				record.setFechamodificacion(new Date());
 				record.setUsumodificacion(usuario.getIdusuario());
+				record.setDeudorTipoid(Short.parseShort(mandatosUpdateDTO.getTipoId()));
+				record.setDeudorId(mandatosUpdateDTO.getIdentif());
+				record.setRefmandatosepa(mandatosUpdateDTO.getReferencia());
 				record.setIdmandato(Short.valueOf(mandatosUpdateDTO.getIdMandato()));
 				record.setIdcuenta(Short.valueOf(mandatosUpdateDTO.getIdCuenta()));
 				record.setIdpersona(Long.valueOf(mandatosUpdateDTO.getIdPersona()));

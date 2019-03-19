@@ -801,7 +801,7 @@ public class MenuServiceImpl implements IMenuService {
 		
 		cenInstitucion = institucionMapper.selectByPrimaryKey(institucion);
 		
-		comboItem.setLabel(cenInstitucion.getNombre());
+		comboItem.setLabel(cenInstitucion.getAbreviatura());
 		comboItem.setValue(String.valueOf(cenInstitucion.getIdinstitucion()));
 		return comboItem;
 	}

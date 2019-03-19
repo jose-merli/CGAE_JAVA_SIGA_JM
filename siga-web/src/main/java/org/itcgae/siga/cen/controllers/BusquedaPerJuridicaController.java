@@ -76,8 +76,6 @@ public class BusquedaPerJuridicaController {
 		else return new ResponseEntity<DeleteResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
-	
-	
 	@RequestMapping(value = "busquedaPerJuridica/parametroColegio", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ParametroColegioDTO> searchParametroColegio(@RequestBody StringDTO stringDTO, HttpServletRequest request) { 
 		ParametroColegioDTO response = busquedaPerJuridicaService.searchParametroColegio(stringDTO, request);

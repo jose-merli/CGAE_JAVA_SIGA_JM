@@ -277,6 +277,18 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				LOGGER.info(
 						"searchPerFisica() / cenPersonaExtendsMapper.searchPerFisica() -> Entrada a cenPersonaExtendsMapper para obtener lista de personas físicas");
 				busquedaPerFisicaItems = cenPersonaExtendsMapper.searchPerFisica(busquedaPerFisicaSearchDTO, idLenguaje, String.valueOf(idInstitucion));
+				
+				if(busquedaPerFisicaItems.size() == 0 || null == busquedaPerFisicaItems) {
+					BusquedaPerFisicaSearchDTO segundaBusqueda = new BusquedaPerFisicaSearchDTO();
+					segundaBusqueda.setNif(busquedaPerFisicaSearchDTO.getNif());
+					busquedaPerFisicaItems = cenPersonaExtendsMapper.searchPerFisica(segundaBusqueda, idLenguaje, String.valueOf(idInstitucion));
+					if(busquedaPerFisicaItems.size() > 0) {
+						busquedaPerFisicaDTO.setOnlyNif(true);
+					}else {
+						busquedaPerFisicaDTO.setOnlyNif(false);
+					}
+				}
+				
 				LOGGER.info(
 						"searchPerFisica() / cenPersonaExtendsMapper.searchPerFisica() -> Salida de cenPersonaExtendsMapper para obtener lista de personas físicas");
 

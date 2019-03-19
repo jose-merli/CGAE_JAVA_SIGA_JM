@@ -39,6 +39,7 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 		@Result(column = "BIC", property = "bic", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHAFIRMASERVICIOS", property = "fechaFirmaServicios", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHAFIRMAPRODUCTOS", property = "fechaFirmaProductos", jdbcType = JdbcType.DATE)
 	})
 	List<DatosBancariosItem> selectCuentasBancarias(DatosBancariosSearchDTO datosBancarios, String idInstitucion);
@@ -57,6 +58,7 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 		@Result(column = "BIC", property = "bic", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CUENTACONTABLE", property = "cuentaContable", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "BANCO", property = "banco", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAMODIFICACION", property = "fechaModificacion", jdbcType = JdbcType.DATE),
 		@Result(column = "NIFTITULAR", property = "nifTitular", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
 
@@ -75,6 +77,10 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 		@Result(column = "TIPOPAGOSERVICIO", property = "tipoPagoServicio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDMANDATOSERVICIO", property = "idMandatoServicio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "REFERENCIAPRODUCTO", property = "referenciaProducto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOIDPRODUCTO", property = "tipoIdProducto", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDENTIFSERVICIO", property = "identifServicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOIDSERVICIO", property = "tipoIdServicio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDENTIFPRODUCTO", property = "identifProducto", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ESQUEMAPRODUCTO", property = "esquemaProducto", jdbcType = JdbcType.DATE),
 		@Result(column = "IDMANDATOPRODUCTO", property = "idMandatoProducto", jdbcType = JdbcType.DATE),
 	})

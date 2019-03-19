@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesSearchDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.IFichaDatosCurricularesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -20,12 +21,14 @@ import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDatoscv;
-import org.itcgae.siga.db.entities.CenDatoscvExample;
 import org.itcgae.siga.db.entities.CenSolicitudmodificacioncv;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo1;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo1Example;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo2;
 import org.itcgae.siga.db.entities.CenTiposcvsubtipo2Example;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitmodifdatosbasicosExtendsMapper;
@@ -46,6 +49,9 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 	@Autowired
 	private CenDatoscvExtendsMapper cenDatoscvExtendsMapper;
 
+	@Autowired
+	private GenParametrosMapper genParametrosMapper;
+	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
@@ -71,7 +77,6 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		if (null != idInstitucion) {
@@ -547,7 +552,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 		LOGGER.info(
 				"updateDatosCurriculares() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
+		Error error = new Error();
 		if (null != usuarios && usuarios.size() > 0) {
 			usuario = usuarios.get(0);
 			LOGGER.info(
@@ -641,7 +646,23 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 							if(responseSolicitud == 1) {
 								LOGGER.info("updateDatosCurriculares() -> Salida del servicio para actualizar un curriculum");
 							}
-			}
+							error.setCode(200);
+							error.setDescription("Su petición ha sido aceptada automáticamente. Puede ver ya los datos actualizados");
+						}else {
+							GenParametrosExample ejemploParam = new GenParametrosExample();
+							List<GenParametros> xDias = new ArrayList<GenParametros>();
+							ejemploParam.createCriteria().andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION").andIdinstitucionEqualTo(idInstitucion);
+							xDias= genParametrosMapper.selectByExample(ejemploParam);
+							error.setCode(200);
+							if(xDias.size() == 0) {
+								GenParametrosExample ejemploParam2 = new GenParametrosExample();
+								ejemploParam2.createCriteria().andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION").andIdinstitucionEqualTo((short)2000);
+								xDias= genParametrosMapper.selectByExample(ejemploParam2);
+							}
+							error.setDescription("Su petición ha sido registrada y será revisada en los próximos "+xDias.get(0).getValor()+" días. Puede comprobar el estado de su petición en el menú Solicitudes de modificación");
+						}
+						
+						updateResponseDTO.setError(error);
 			
 			LOGGER.info(
 					"updateDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para actualizar un curriculum");

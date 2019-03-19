@@ -15,6 +15,8 @@ public class DatosBancariosItem {
 	private String titular;
 	private String iban;
 	private String ibanFormateado;
+	@JsonFormat(pattern = "dd-MM-yyyy")
+	private Date fechaModificacion;
 	private String uso;
 	private String bic;
 	@JsonFormat(pattern = "dd-MM-yyyy")
@@ -337,6 +339,16 @@ public class DatosBancariosItem {
 	      return "null";
 	    }
 	    return o.toString().replace("\n", "\n    ");
+	}
+
+
+	public Date getFechaModificacion() {
+		return fechaModificacion;
+	}
+
+
+	public void setFechaModificacion(Date fechaModificacion) {
+		this.fechaModificacion = fechaModificacion;
 	}
 	
 	

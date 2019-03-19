@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.db.entities.AgeEvento;
-import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.mappers.AgeEventoSqlProvider;
 
 public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
@@ -20,7 +19,7 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		return sql.toString();
 	}
 	
-	public String searchEvent(String idTipoEvento, String idCurso, String idInstitucion) {
+	public String searchEvent(String idTipoEvento, String idCurso, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 		
 		sql.SELECT_DISTINCT("evento.idevento");
@@ -34,11 +33,15 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		sql.SELECT("evento.idestadoevento");
 		sql.SELECT("evento.idtipoevento");
 		sql.SELECT("cal.IDTIPOCALENDARIO");
+		sql.SELECT("CAL.DESCRIPCION AS TIPOCALENDARIO");
+		sql.SELECT("REC.DESCRIPCION AS TIPOEVENTO");
 		sql.FROM("AGE_EVENTO evento");
 		sql.INNER_JOIN(
 				"FOR_EVENTO_CURSO ec on (evento.idEvento = ec.idEvento and evento.idinstitucion = ec.idinstitucion)");
 		sql.INNER_JOIN(
 				"AGE_CALENDARIO cal on (evento.idCalendario = cal.idCalendario and evento.idinstitucion = cal.idinstitucion)");
+		sql.INNER_JOIN("AGE_TIPOEVENTOS TIPOEVENTOS ON TIPOEVENTOS.IDTIPOEVENTO = evento.IDTIPOEVENTO");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOEVENTOS.DESCRIPCION AND rec.IDLENGUAJE = '" + idLenguaje +"')");
 		sql.WHERE("evento.FECHABAJA is NULL");
 		sql.WHERE("evento.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("ec.idCurso = '" + idCurso + "'");
@@ -47,7 +50,7 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		return sql.toString();
 	}
 	
-	public String getSessionsCourse(String idTipoEvento, String idCurso, String idInstitucion) {
+	public String getSessionsCourse(String idTipoEvento, String idCurso, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 		
 		sql.SELECT_DISTINCT("evento.idevento");
@@ -65,6 +68,9 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		sql.SELECT("cat.descripcion as estadoEvento");
 		sql.SELECT("evento.idtipoevento");
 		sql.SELECT("cal.IDTIPOCALENDARIO");
+		sql.SELECT("cal.DESCRIPCION AS TIPOCALENDARIO");
+		sql.SELECT("REC.DESCRIPCION AS TIPOEVENTO");
+		sql.SELECT("TO_CHAR(EVENTO.FECHAINICIO,'DD/MM/YYYY') AS FECHAINICIOSTRING");
 		sql.SELECT("ec.IDCURSO");
 		sql.SELECT("LISTAGG(CONCAT(PER.NOMBRE ||' ',CONCAT(DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) || ' ',PER.APELLIDOS2)), '; ') WITHIN GROUP (ORDER BY PER.NOMBRE) AS FORMADORES");
 		sql.FROM("AGE_EVENTO evento");
@@ -73,9 +79,11 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		sql.INNER_JOIN(
 				"AGE_CALENDARIO cal on (evento.idCalendario = cal.idCalendario and evento.idinstitucion = cal.idinstitucion)");
 		sql.INNER_JOIN("AGE_ESTADOEVENTOS ESTADO ON EVENTO.IDESTADOEVENTO = ESTADO.IDESTADOEVENTO");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON (CAT.IDRECURSO = ESTADO.DESCRIPCION AND CAT.IDLENGUAJE = '1' )");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON (CAT.IDRECURSO = ESTADO.DESCRIPCION AND CAT.IDLENGUAJE = '" + idLenguaje + "' )");
 		sql.LEFT_OUTER_JOIN("AGE_PERSONA_EVENTO PEREVENT ON (evento.idevento = perevent.idevento and PEREVENT.FECHABAJA is null)");
 		sql.LEFT_OUTER_JOIN("CEN_PERSONA PER ON (PEREVENT.IDPERSONA = PER.IDPERSONA)");
+		sql.INNER_JOIN("AGE_TIPOEVENTOS TIPOEVENTOS ON TIPOEVENTOS.IDTIPOEVENTO = evento.IDTIPOEVENTO");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOEVENTOS.DESCRIPCION AND rec.IDLENGUAJE = '" + idLenguaje +"')");
 		
 		sql.WHERE("evento.FECHABAJA is NULL");
 		sql.WHERE("evento.idinstitucion = '" + idInstitucion + "'");
@@ -84,7 +92,8 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 
 		sql.GROUP_BY(
 				"evento.idevento, evento.idcalendario, evento.idinstitucion, evento.titulo, evento.fechainicio, evento.fechafin, concat(TO_CHAR(evento.fechainicio,'DD/MM/RRRR'), ' - ' || to_char(evento.fechainicio,'hh24:mm')), concat(TO_CHAR(evento.fechafin,'DD/MM/RRRR'), ' - ' || to_char(evento.fechafin,'hh24:mm')), evento.lugar,  "
-						+ "evento.descripcion, evento.recursos, evento.idestadoevento, cat.descripcion, evento.idtipoevento, cal.IDTIPOCALENDARIO, ec.IDCURSO");
+						+ "evento.descripcion, evento.recursos, evento.idestadoevento, cat.descripcion, evento.idtipoevento, cal.IDTIPOCALENDARIO, ec.IDCURSO,"
+						+ "cal.DESCRIPCION, REC.DESCRIPCION");
 
 		sql.ORDER_BY("evento.fechainicio");
 

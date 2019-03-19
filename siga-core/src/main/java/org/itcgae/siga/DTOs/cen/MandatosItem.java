@@ -18,9 +18,11 @@ public class MandatosItem {
 	private String esquemaServicio;
 	private String tipoPagoServicio;
 	private String idMandatoServicio;
+	private String tipoIdProducto;
+	private String tipoIdServicio;
+	private String identifServicio;
+	private String identifProducto;
 	
-	
-
 	/**
 	 *
 	 */
@@ -262,6 +264,46 @@ public class MandatosItem {
 	      return "null";
 	    }
 	    return o.toString().replace("\n", "\n    ");
+	}
+
+
+	public String getTipoIdProducto() {
+		return tipoIdProducto;
+	}
+
+
+	public void setTipoIdProducto(String tipoIdProducto) {
+		this.tipoIdProducto = tipoIdProducto;
+	}
+
+
+	public String getTipoIdServicio() {
+		return tipoIdServicio;
+	}
+
+
+	public void setTipoIdServicio(String tipoIdServicio) {
+		this.tipoIdServicio = tipoIdServicio;
+	}
+
+
+	public String getIdentifServicio() {
+		return identifServicio;
+	}
+
+
+	public void setIdentifServicio(String identifServicio) {
+		this.identifServicio = identifServicio;
+	}
+
+
+	public String getIdentifProducto() {
+		return identifProducto;
+	}
+
+
+	public void setIdentifProducto(String identifProducto) {
+		this.identifProducto = identifProducto;
 	}
 	
 	

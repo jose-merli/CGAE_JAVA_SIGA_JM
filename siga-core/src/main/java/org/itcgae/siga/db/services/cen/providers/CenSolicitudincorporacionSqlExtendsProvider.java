@@ -127,4 +127,21 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		return sql.toString();
 	} 
 
+	public String getMaxNComunitario(String idInstitucion){
+		SQL sql = new SQL();
+		sql.SELECT("NVL(MAX(NCOMUNITARIO + 1),0001) AS NCOMUNITARIO");
+		sql.FROM("CEN_COLEGIADO");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		return sql.toString();
+	} 
+	
+	public String getMaxNColegiadoComunitario(String idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("NVL(CASE WHEN max(to_number(ncolegiado)) >= max(to_number(ncomunitario)) THEN max(to_number(ncolegiado))+1 ELSE max(to_number(ncomunitario))+1 END, 0001) as NCOLEGIADO");
+		sql.FROM("CEN_COLEGIADO");
+		sql.WHERE("IDINSTITUCION = " + idInstitucion);
+		
+		return sql.toString();
+	}
+	
 }
