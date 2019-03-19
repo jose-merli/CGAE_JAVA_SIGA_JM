@@ -577,4 +577,99 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		return sql.toString();
 	}
 	
+	public String selectColegiadosByIdPersona(Short idInstitucion, String idPersona) {
+
+		SQL sql = new SQL();
+		SQL sql1 = new SQL();
+
+		sql.SELECT_DISTINCT("col.idpersona");
+		sql.SELECT_DISTINCT("col.idinstitucion");
+		sql.SELECT_DISTINCT("per.nifcif");
+		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("per.nombre as solonombre");
+		sql.SELECT_DISTINCT("per.apellidos1");
+		sql.SELECT_DISTINCT("per.apellidos2");
+		sql.SELECT_DISTINCT("per.sexo");
+		sql.SELECT_DISTINCT("per.idestadocivil");
+		sql.SELECT_DISTINCT("cli.noaparecerredabogacia");
+
+		sql.SELECT_DISTINCT("per.idtipoidentificacion");
+		sql.SELECT_DISTINCT("per.naturalde");
+		sql.SELECT("TO_CHAR(cli.fechaalta,'DD/MM/YYYY') AS fechaalta");
+		sql.SELECT_DISTINCT("cli.idlenguaje");
+		sql.SELECT_DISTINCT("cli.asientocontable");
+		sql.SELECT_DISTINCT("col.nmutualista");
+		sql.SELECT("TO_CHAR(col.fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
+		sql.SELECT("TO_CHAR(col.fechajura,'DD/MM/YYYY') AS fechajura");
+		sql.SELECT("TO_CHAR(col.fechatitulacion,'DD/MM/YYYY') AS fechatitulacion");
+		sql.SELECT("TO_CHAR(col.fechapresentacion,'DD/MM/YYYY') AS fechapresentacion");
+		sql.SELECT_DISTINCT("TO_CHAR(col.idtiposseguro) AS idTiposSeguro");
+
+		sql.SELECT_DISTINCT("cli.comisiones");
+		sql.SELECT_DISTINCT("cli.idtratamiento");
+		sql.SELECT_DISTINCT("decode(col.comunitario,0, col.ncolegiado,col.ncomunitario) as numcolegiado");
+		sql.SELECT_DISTINCT("colest.idestado as situacion");
+		sql.SELECT_DISTINCT("cat.descripcion as estadoColegial");
+		sql.SELECT_DISTINCT("col.situacionresidente as situacionresidente");
+		sql.SELECT_DISTINCT("col.comunitario as comunitario");
+
+		sql.SELECT_DISTINCT(
+				"concat( decode(col.situacionresidente,0,'No', 'Sí')  || ' / ',decode(col.comunitario,0,'No', 'Sí')) as residenteInscrito");
+		sql.SELECT("TO_CHAR(per.fechanacimiento,'DD/MM/YYYY') AS fechanacimiento");
+		sql.SELECT_DISTINCT("dir.correoelectronico AS correo");
+		sql.SELECT_DISTINCT("dir.telefono1 AS telefono");
+
+		sql1.SELECT("partidojudicial.nombre");
+		sql1.FROM("cen_partidojudicial partidojudicial");
+		sql1.INNER_JOIN("cen_poblaciones pob on pob.idpartido = partidojudicial.idpartido");
+		sql1.INNER_JOIN("cen_direcciones direcciones on pob.idpoblacion = direcciones.idpoblacion");
+		sql1.INNER_JOIN(
+				"CEN_DIRECCION_TIPODIRECCION tipodireccion ON (tipodireccion.IDDIRECCION = direcciones.IDDIRECCION AND"
+						+ " tipodireccion.IDPERSONA = direcciones.IDPERSONA AND  tipodireccion.IDINSTITUCION = direcciones.IDINSTITUCION)");
+
+		sql1.WHERE("tipodireccion.idtipodireccion = '2'");
+		sql1.WHERE("direcciones.idpersona = dir.idpersona");
+		sql1.WHERE("direcciones.idinstitucion = dir.idinstitucion");
+		sql1.WHERE("direcciones.iddireccion = dir.iddireccion");
+
+		sql.SELECT_DISTINCT("(" + sql1 + ") as partidoJudicial");
+
+		sql.SELECT_DISTINCT("dir.movil as movil");
+		sql.FROM("cen_colegiado col");
+
+		sql.INNER_JOIN("cen_persona per on col.idpersona = per.idpersona");
+		sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and col.idinstitucion = cli.idinstitucion)");
+		sql.INNER_JOIN("cen_institucion inst on col.idinstitucion = inst.idinstitucion");
+
+		sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
+				+ "    (grucli.idinstitucion = inst.idinstitucion and col.idpersona = grucli.idpersona and (grucli.fecha_inicio <= SYSDATE and \r\n"
+				+ "        ( grucli.fecha_baja > SYSDATE OR grucli.fecha_baja IS NULL)))");
+		sql.INNER_JOIN(
+				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
+						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion))");
+		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
+		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '1')");
+		sql.INNER_JOIN(
+				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
+
+		sql.LEFT_OUTER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIR ON (CLI.IDPERSONA = TIPODIR.IDPERSONA AND"  
+	                + " DIR.IDDIRECCION = TIPODIR.IDDIRECCION AND CLI.IDINSTITUCION = TIPODIR.IDINSTITUCION AND "
+	                + " INST.IDINSTITUCION = DIR.IDINSTITUCION)"); 
+		sql.LEFT_OUTER_JOIN(
+				"cen_datosCV datosCV ON ( datosCV.idInstitucion = col.idInstitucion and datosCV.idPersona = per.idPersona )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcv cenTipoCV ON ( cenTipoCV.idTipoCV = datosCV.idTipoCV )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt2 ON ( subt2.idTipoCV = datosCV.idTipoCV and subt2.idInstitucion = col.idInstitucion )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = col.idInstitucion )");
+
+		if (idInstitucion != Short.parseShort("2000")) {
+			sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
+		}
+
+		sql.WHERE("per.idtipoidentificacion not in '20'");
+
+		sql.WHERE("per.idpersona = '" + idPersona + "'");
+
+		return sql.toString();
+	}
+	
 }
