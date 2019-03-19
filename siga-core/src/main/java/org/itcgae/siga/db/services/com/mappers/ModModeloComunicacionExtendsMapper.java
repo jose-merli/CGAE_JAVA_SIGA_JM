@@ -67,7 +67,7 @@ public interface ModModeloComunicacionExtendsMapper {
 		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOENVIO", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ModelosComunicacionItem> selectModelosComunicacionDialogo(String idInstitucion, String idClaseComunicacion, String idModulo, String idLenguaje, String idConsulta);
+	List<ModelosComunicacionItem> selectModelosComunicacionDialogo(String idInstitucion, String idClaseComunicacion, String idModulo, String idLenguaje, String idConsulta, List<String> perfiles);
 
 	
 	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "selectModelosClasesComunicacion")

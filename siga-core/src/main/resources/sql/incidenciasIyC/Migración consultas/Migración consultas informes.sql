@@ -79,7 +79,7 @@ BEGIN
     
      END LOOP;
      
-    --COMMIT;
+    COMMIT;
     DBMS_OUTPUT.PUT_LINE('Script informe --> modelo acaba: '|| to_char(sysdate, 'DD-MM-YYYY HH24:MI:SS'));
     DBMS_OUTPUT.PUT_LINE(' Se han actualizado ' || contador || ' filas.');
     EXCEPTION

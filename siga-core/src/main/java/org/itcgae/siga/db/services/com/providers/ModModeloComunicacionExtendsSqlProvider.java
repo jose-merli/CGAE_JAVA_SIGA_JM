@@ -1,6 +1,7 @@
 package org.itcgae.siga.db.services.com.providers;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
@@ -90,10 +91,10 @@ public class ModModeloComunicacionExtendsSqlProvider {
 	}
 	
 		
-	public String selectModelosComunicacionDialg(String idInstitucion, String idClaseComunicacion, String idModulo, String idLenguaje, String idConsulta){
+	public String selectModelosComunicacionDialg(String idInstitucion, String idClaseComunicacion, String idModulo, String idLenguaje, String idConsulta, List<String> perfiles){
 	   
-	   SQL sql = new SQL();
-	   
+		SQL sql = new SQL();
+		   
 	   sql.SELECT("MODELO.IDCLASECOMUNICACION, MODELO.IDMODELOCOMUNICACION, MODELO.NOMBRE");
 	   sql.SELECT("MODELO.IDPLANTILLAENVIOS");
 	   sql.SELECT("MODELO.IDTIPOENVIOS");
@@ -101,11 +102,16 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		
 	   sql.FROM("MOD_MODELOCOMUNICACION MODELO");
 	   sql.JOIN("MOD_CLASECOMUNICACIONES CLASE ON CLASE.IDCLASECOMUNICACION = MODELO.IDCLASECOMUNICACION");
+	   sql.JOIN("MOD_MODELO_PERFILES PERFILES ON PERFILES.IDMODELOCOMUNICACION = MODELO.IDMODELOCOMUNICACION AND PERFILES.IDINSTITUCION = MODELO.IDINSTITUCION");
 	      
 	   sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND (CLASE.IDMODULO = " + idModulo + " OR CLASE.IDMODULO IS NULL)");
 	   
 	   if(idConsulta != null) {
 		   sql.WHERE("MODELO.IDMODELOCOMUNICACION IN (SELECT IDMODELOCOMUNICACION FROM MOD_PLANTILLADOC_CONSULTA WHERE IDINSTITUCION='"+idInstitucion+"' AND IDCONSULTA='"+idConsulta+"' AND FECHABAJA IS NULL)");
+	   }
+	   
+	   if(perfiles != null && perfiles.size() > 0){
+		   sql.WHERE("PERFILES.IDPERFIL IN (" + String.join(",", perfiles) + ")");
 	   }
 	   
 	   sql.ORDER_BY("MODELO.ORDEN");

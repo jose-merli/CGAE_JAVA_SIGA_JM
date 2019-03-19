@@ -68,6 +68,7 @@ import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.mappers.ModRelPlantillaSufijoMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
@@ -90,7 +91,9 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
-
+	
+	@Autowired
+	private AdmPerfilExtendsMapper admPerfilExtendsMapper;
 	
 	@Autowired
 	private ModModeloComunicacionExtendsMapper modModeloComunicacionExtendsMapper;
@@ -726,7 +729,24 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 						}						
 						
 						modModelocomunicacionMapper.insert(modeloCom);
+						
+						
+						// Si es nuevo por defecto a de tener todos los perfiles						
+						List<ComboItem> comboItems = admPerfilExtendsMapper.selectListadoPerfiles(idInstitucion);						
+						if(comboItems != null && comboItems.size() > 0) {
+							for(ComboItem item: comboItems) {
+								ModModeloPerfiles perfil = new ModModeloPerfiles();
+								perfil.setIdmodelocomunicacion(Long.valueOf(modeloCom.getIdmodelocomunicacion()));
+								perfil.setFechamodificacion(new Date());
+								perfil.setIdperfil(item.getValue());
+								perfil.setUsumodificacion(usuario.getIdusuario());
+								perfil.setIdinstitucion(idInstitucion);
+								modModeloPerfilesMapper.insert(perfil);
+							}
+						}
+						
 					}
+					
 					respuesta.setData(String.valueOf(modeloCom.getIdmodelocomunicacion()));
 
 				}

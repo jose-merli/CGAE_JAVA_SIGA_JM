@@ -50,6 +50,7 @@ import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.entities.ModModeloPerfiles;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
@@ -59,11 +60,13 @@ import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
 import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.mappers.ModModeloPerfilesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConClaseComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
@@ -86,6 +89,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
+	
+	@Autowired
+	private AdmPerfilExtendsMapper admPerfilExtendsMapper;
 	
 	@Autowired
 	private ConObjetivoExtendsMapper _conObjetivoExtendsMapper;
@@ -131,6 +137,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	@Autowired
 	private ModPlantilladocumentoMapper _modPlantilladocumentoMapper;
+	
+	@Autowired
+	private ModModeloPerfilesMapper modModeloPerfilesMapper;
 
 	
 	@Override
@@ -566,6 +575,21 @@ public class ConsultasServiceImpl implements IConsultasService{
 						plantillaConsulta.setIdplantilladocumento(plantilla.getIdplantilladocumento());
 						plantillaConsulta.setUsumodificacion(usuario.getIdusuario());
 						_modPlantilladocConsultaMapper.insert(plantillaConsulta);
+						
+						//Le añadimos al modelo todos los perfiles
+						List<ComboItem> comboItems = admPerfilExtendsMapper.selectListadoPerfiles(idInstitucion);
+						
+						if(comboItems != null && comboItems.size() > 0) {
+							for(ComboItem item: comboItems) {
+								ModModeloPerfiles perfil = new ModModeloPerfiles();
+								perfil.setIdmodelocomunicacion(Long.valueOf(modeloCom.getIdmodelocomunicacion()));
+								perfil.setFechamodificacion(new Date());
+								perfil.setIdperfil(item.getValue());
+								perfil.setUsumodificacion(usuario.getIdusuario());
+								perfil.setIdinstitucion(idInstitucion);
+								modModeloPerfilesMapper.insert(perfil);
+							}
+						}
 						
 						
 						respuesta.setMessage(consulta.getIdconsulta().toString());
