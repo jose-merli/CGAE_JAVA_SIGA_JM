@@ -4,9 +4,11 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.DestinatarioIndvEnvioMasivoItem;
 import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
@@ -46,4 +48,8 @@ public interface IEnviosMasivosService {
 	public Error desAsociarConsulta(HttpServletRequest request, ConsultaDestinatarioItem[] consulta);
 	public ComboConsultaInstitucionDTO getComboConsultas(HttpServletRequest request, String filtro);
 	public DestinatariosDTO obtenerDestinatariosIndv(HttpServletRequest request, String idEnvio);
+	public Error asociarDestinatario(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem destinatario);
+	public Error desAsociarDestinatarios(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem[] destinatario);
+	public DatosDireccionesDTO obtenerDireccionesDisp(HttpServletRequest request, String idPersona);
 }
+

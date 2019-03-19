@@ -12,6 +12,7 @@ public class DestinatarioItem {
 	private String correoElectronico;
 	private String movil;
 	private String domicilio;
+	private String nombreCompleto;
 	private ArrayList<ConsultaEnvioItem> listaConsultasEnvio;
 	
 	
@@ -20,6 +21,12 @@ public class DestinatarioItem {
 	}
 	public void setDomicilio(String domicilio) {
 		this.domicilio = domicilio;
+	}
+	public String getNombreCompleto() {
+		return nombreCompleto;
+	}
+	public void setNombreCompleto(String nombreCompleto) {
+		this.nombreCompleto = nombreCompleto;
 	}
 	public String getCorreoElectronico() {
 		return correoElectronico;

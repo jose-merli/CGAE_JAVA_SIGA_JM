@@ -15,10 +15,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
+import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.DestinatarioIndvEnvioMasivoItem;
+import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.DocumentoEnvioItem;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
@@ -40,10 +44,16 @@ import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenDireccionesExample;
+import org.itcgae.siga.db.entities.CenDireccionesKey;
+import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
 import org.itcgae.siga.db.entities.EnvDestConsultaEnvio;
 import org.itcgae.siga.db.entities.EnvDestConsultaEnvioKey;
+import org.itcgae.siga.db.entities.EnvDestinatarios;
+import org.itcgae.siga.db.entities.EnvDestinatariosKey;
 import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.db.entities.EnvDocumentosExample;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
@@ -58,8 +68,11 @@ import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
+import org.itcgae.siga.db.mappers.CenDireccionesMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
 import org.itcgae.siga.db.mappers.EnvDestConsultaEnvioMapper;
+import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
 import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
@@ -71,6 +84,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDestConsultaEnvioExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvDestinatariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDocumentosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosGrupoClienteExtendsMapper;
@@ -124,7 +138,6 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	@Autowired
 	private EnvDocumentosMapper _envDocumentosMapper;
-
 	
 	@Autowired
 	private EnvEnviosgrupoclienteMapper _envEnviosgrupoclienteMapper;
@@ -152,6 +165,18 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 	
 	@Autowired
 	private EnvDestConsultaEnvioMapper _envDestConsultaEnvioMapper;
+	
+	@Autowired
+	private EnvDestinatariosExtendsMapper _envDestinatariosExtendsMapper;
+	
+	@Autowired
+	private EnvDestinatariosMapper _envDestinatariosMapper;
+	
+	@Autowired
+	private CenPersonaMapper _cenPersonaMapper;
+	
+	@Autowired 
+	private CenDireccionesMapper _cenDireccionesMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -1346,8 +1371,203 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService{
 
 	@Override
 	public DestinatariosDTO obtenerDestinatariosIndv(HttpServletRequest request, String idEnvio) {
-		// TODO Auto-generated method stub
-		return null;
+		LOGGER.info("obtenerDestinatariosIndv() -> Entrada al servicio para obtener los destinatarios individuales de envio");
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		DestinatariosDTO response = new DestinatariosDTO();
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					List<DestinatarioItem> destinatarios = _envDestinatariosExtendsMapper.selectDestinatarios(idInstitucion, idEnvio);
+					if(destinatarios != null && destinatarios.size() >0){
+						response.setDestinatarios(destinatarios);
+					}
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription("Error al obtener destinatarios indivuales");
+					response.setError(error);
+					e.printStackTrace();
+				}
+				
+			}
+		}
+		
+		LOGGER.info("obtenerDestinatariosIndv() -> Salida del servicio para obtener los destinatarios individuales de envio");
+		return response;
+	}
+
+	@Override
+	public Error asociarDestinatario(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem destinatario) {
+		LOGGER.info("asociarDestinatario() -> Entrada al servicio para asociar un destinatario individual");
+		
+		Error response = new Error();
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.parseLong(destinatario.getIdPersona()));
+					CenDireccionesKey key = new CenDireccionesKey();
+					key.setIddireccion(Long.parseLong(destinatario.getIdDireccion()));
+					key.setIdpersona(Long.parseLong(destinatario.getIdPersona()));
+					key.setIdinstitucion(idInstitucion);
+					CenDirecciones dir = _cenDireccionesMapper.selectByPrimaryKey(key);
+					EnvDestinatarios dest = new EnvDestinatarios();
+					dest.setApellidos1(persona.getApellidos1());
+					dest.setApellidos2(persona.getApellidos2());
+					dest.setCodigopostal(dir.getCodigopostal());
+					dest.setCorreoelectronico(dir.getCorreoelectronico());
+					dest.setDomicilio(dir.getDomicilio());
+					dest.setFax1(dir.getFax1());
+					dest.setFax2(dir.getFax2());
+					dest.setFechamodificacion(new Date());
+					dest.setIdenvio(Long.parseLong(destinatario.getIdEnvio()));
+					dest.setIdinstitucion(idInstitucion);
+					dest.setIdpais(dir.getIdpais());
+					dest.setIdpersona(persona.getIdpersona());
+					dest.setIdpoblacion(dir.getIdpoblacion());
+					dest.setIdprovincia(dir.getIdprovincia());
+					dest.setMovil(dir.getMovil());
+					dest.setNifcif(persona.getNifcif());
+					dest.setNombre(persona.getNombre());
+					dest.setPoblacionextranjera(dir.getPoblacionextranjera());
+					dest.setUsumodificacion(usuarios.get(0).getIdusuario());
+					dest.setTipodestinatario("CEN_PERSONA");
+					_envDestinatariosMapper.insert(dest);
+					response.setCode(200);
+					response.setDescription("Destinatario asociado con éxito");
+				}catch(Exception e){
+					response.code(500);
+					response.setDescription("Error al asociar destinatario");
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		LOGGER.info("asociarDestinatario() -> Salida del servicio para asociar un destinatario individual");
+		return response;
+	}
+
+	@Override
+	public Error desAsociarDestinatarios(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem[] destinatarios) {
+		LOGGER.info("desAsociarDestinatarios() -> Entrada al servicio para des asociar un destinatario individual");
+		
+		Error response = new Error();
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				try{
+					for (DestinatarioIndvEnvioMasivoItem destinatario : destinatarios) {
+						EnvDestinatariosKey key = new EnvDestinatariosKey();
+						key.setIdenvio(Long.parseLong(destinatario.getIdEnvio()));
+						key.setIdinstitucion(idInstitucion);
+						key.setIdpersona(Long.parseLong(destinatario.getIdPersona()));
+						_envDestinatariosMapper.deleteByPrimaryKey(key);
+					}
+					response.setCode(200);
+					response.setDescription("Destinatarios eliminados con éxito");
+				}catch(Exception e){					
+					response.setCode(500);
+					response.setDescription("Error al eliminar los destinatarios");
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		LOGGER.info("desAsociarDestinatarios() -> Salida del servicio para des asociar un destinatario individual");
+		return response;
+	}
+
+	@Override
+	public DatosDireccionesDTO obtenerDireccionesDisp(HttpServletRequest request, String idPersona) {
+		LOGGER.info("obtenerDireccionesDisp() -> Entrada al servicio para obtener direcciones");
+		
+		DatosDireccionesDTO response = new DatosDireccionesDTO();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				
+				try{
+					CenDireccionesExample example = new CenDireccionesExample();
+					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona)).andIdinstitucionEqualTo(idInstitucion);
+					List<CenDirecciones> direcciones = _cenDireccionesMapper.selectByExample(example);
+					if(direcciones != null && direcciones.size() > 0){
+						List<DatosDireccionesItem> direccionesList = new ArrayList<DatosDireccionesItem>();
+						for (CenDirecciones item : direcciones) {
+							DatosDireccionesItem direccion = new DatosDireccionesItem();
+							direccion.setIdPersona(item.getIdpersona().toString());
+							if(item.getIdinstitucion() != null){
+								direccion.setIdInstitucion(item.getIdinstitucion().toString());
+							}
+							if(item.getIddireccion() != null){
+								direccion.setIdDireccion(item.getIddireccion().toString());	
+							}
+							direccion.setDomicilio(item.getDomicilio());
+							direccion.setIdPoblacion(item.getIdpoblacion());
+							direccion.setIdProvincia(item.getIdprovincia());
+							direccion.setIdPais(item.getIdpais());
+							direccion.setCodigoPostal(item.getCodigopostal());
+							direccion.setTelefono(item.getTelefono1());
+							direccion.setTelefono2(item.getTelefono2());
+							direccion.setMovil(item.getMovil());
+							direccion.setFax(item.getFax1());
+							direccion.setFax2(item.getFax2());
+							direccion.setCorreoElectronico(item.getCorreoelectronico());
+							direccion.setPaginaWeb(item.getPaginaweb());
+							direccionesList.add(direccion);
+						}
+						response.setDatosDireccionesItem(direccionesList);
+					}else{
+						Error error = new Error();
+						error.setCode(400);
+						error.setDescription("No existen direcciones disponibles");
+						response.setError(error);
+					}
+				}catch(Exception e){
+					Error error = new Error();
+					error.setCode(500);
+					error.setDescription("Error al obtener direcciones de destinatario");
+					response.setError(error);
+					e.printStackTrace();
+				}
+				
+			}
+		}
+		
+		LOGGER.info("obtenerDireccionesDisp() -> Salida al servicio para obtener direcciones");
+		return response;
 	}
 		
 }
