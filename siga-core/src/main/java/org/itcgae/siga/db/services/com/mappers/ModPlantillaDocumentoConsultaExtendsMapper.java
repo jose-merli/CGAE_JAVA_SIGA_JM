@@ -33,11 +33,11 @@ public interface ModPlantillaDocumentoConsultaExtendsMapper {
 		@Result(column = "MODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDOBJETIVO", property = "idObjetivo", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "SENTENCIA", property = "sentencia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "GENERAL", property = "generica", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "OBJETIVO", property = "objetivo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
-		@Result(column = "IDPLANTILLACONSULTA", property = "idPlantillaConsulta", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDPLANTILLACONSULTA", property = "idPlantillaConsulta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "REGION", property = "region", jdbcType = JdbcType.VARCHAR)
 	})	
 	List<ConsultaItem> selectConsultasByInforme(Short idInstitucion, Long idModeloComunicacion, Long idInforme, String idLenguaje, boolean historico);
 

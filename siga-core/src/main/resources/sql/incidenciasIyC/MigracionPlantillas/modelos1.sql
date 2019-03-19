@@ -5,7 +5,7 @@ SET SERVEROUTPUT ON;
 DECLARE
 
 mod_visible NUMBER(1):=0;
-idInstitucion NUMBER(4):=0;
+idInstitucionModelo NUMBER(4):=0;
 idclasecomunicacion NUMBER(4):=0;
 idModelo NUMBER(4):=0;
 idPlantillaDocumento NUMBER(4):=0;
@@ -13,7 +13,9 @@ sufijoIdioma varchar2(20):= '';
 idIdioma NUMBER(1):= 0;
 formatoSalida varchar2(2) := '';
 contador NUMBER(4) := 0;
-
+idconsulta NUMBER(10) := 0;
+idPlantillaConsulta NUMBER(10):=0;
+porDefecto varchar2(10) := '';
 
 CURSOR cursorInformes IS
                     select *
@@ -31,8 +33,8 @@ BEGIN
         IF informe.visible = 'S' THEN mod_visible := 1;
         ELSE mod_visible:=0;
         END IF;
-        IF informe.idinstitucion = 0 THEN idInstitucion:= 2000;
-        ELSE idInstitucion := informe.idinstitucion;
+        IF informe.idInstitucion = 0 THEN idInstitucionModelo:= 2000;
+        ELSE idInstitucionModelo := informe.idInstitucion;
         END IF;
         IF informe.IDTIPOINFORME = 'CENSO' THEN idclasecomunicacion := 1;
         ELSIF informe.IDTIPOINFORME = 'SANC' THEN idclasecomunicacion := 2;
@@ -40,16 +42,20 @@ BEGIN
         ELSIF informe.IDTIPOINFORME = 'ASEPA' THEN idclasecomunicacion := 4;
         END IF;
         
+        IF informe.idInstitucion = 2000 THEN porDefecto:= 'SI';
+        ELSE porDefecto := 'NO';
+        END IF;
+        
         --INSERTAMOS EN MOD_MODELOCOMUNICACION LOS DATOS DE ADM_INFORME
         idModelo:= SEQ_MOD_MODELOCOMUNICACION.nextval;
         INSERT INTO MOD_MODELOCOMUNICACION (IDMODELOCOMUNICACION,NOMBRE,ORDEN,IDINSTITUCION,DESCRIPCION,PRESELECCIONAR,IDCLASECOMUNICACION,FECHABAJA,FECHAMODIFICACION,USUMODIFICACION,VISIBLE,PORDEFECTO)
-        VALUES(idModelo, informe.nombrefisico, informe.orden, idInstitucion, informe.descripcion, 'SI', idclasecomunicacion, null, sysdate, 0, mod_visible, null);
+        VALUES(idModelo, informe.nombrefisico, informe.orden, idInstitucionModelo, informe.descripcion, 'SI', idclasecomunicacion, null, sysdate, 0, mod_visible, porDefecto);
         
         --INSERTAMOS EN MOD_PLANTILLADOCUMENTO LOS DATOS DEL INFORME ADM_INFORME Y MOD_MODELOCOMUNCACION
         idPlantillaDocumento := SEQ_MOD_PLANTILLADOCUMENTO.nextval;
         
-        IF idInstitucion = 2026 OR idInstitucion = 2030 OR idInstitucion = 2041 OR idInstitucion = 2047 OR idInstitucion = 2048 OR idInstitucion = 2057 OR idInstitucion = 2059
-        OR idInstitucion = 2061 OR idInstitucion = 2072 OR idInstitucion = 2075 OR idInstitucion = 2079 OR idInstitucion = 3001 THEN sufijoIdioma := '_CA'; idIdioma := 2;
+        IF idInstitucionModelo = 2026 OR idInstitucionModelo = 2030 OR idInstitucionModelo = 2041 OR idInstitucionModelo = 2047 OR idInstitucionModelo = 2048 OR idInstitucionModelo = 2057 OR idInstitucionModelo = 2059
+        OR idInstitucionModelo = 2061 OR idInstitucionModelo = 2072 OR idInstitucionModelo = 2075 OR idInstitucionModelo = 2079 OR idInstitucionModelo = 3001 THEN sufijoIdioma := '_CA'; idIdioma := 2;
         ELSE sufijoIdioma := '_ES'; idIdioma := 1;
         END IF;
         
@@ -63,11 +69,26 @@ BEGIN
         
         INSERT INTO MOD_MODELO_PLANTILLADOCUMENTO (IDPLANTILLADOCUMENTO, IDMODELOCOMUNICACION, IDINFORME, NOMBREFICHEROSALIDA, FORMATOSALIDA)
         VALUES (idPlantillaDocumento, idModelo, 1, informe.NOMBRESALIDA, formatoSalida);
+        
+        IF informe.IDTIPOINFORME = 'CENSO' THEN
+            INSERT INTO MOD_PLANTILLADOC_CONSULTA (FECHAMODIFICACION,USUMODIFICACION,IDCONSULTA,IDPLANTILLADOCUMENTO,IDMODELOCOMUNICACION,IDINSTITUCION,FECHABAJA,IDPLANTILLACONSULTA,REGION,IDINSTITUCION_CONSULTA)
+            SELECT SYSDATE, 0, con.IDCONSULTA, idPlantillaDocumento,idModelo, idInstitucionModelo, null, SEQ_MOD_PLANTILLADOCCONSULTA.nextval,null, con.idinstitucion FROM CON_CONSULTA con WHERE con.descripcion in ('MIGRACION CENSO: INFORMACIÓN GENERAL', 'MIGRACION CENSO: INFORMACIÓN GENERAL + DATOS DEL COLEGIADO', 'MIGRACION CENSO: DATOS ESTADO COLEGIAL', 'MIGRACION CENSO: LISTADO ESTADOS COLEGIAL', 'MIGRACION CENSO: DATOS GENERALES + DATOS NO COLEGIADO', 'MIGRACION CENSO: CAMPOS COMPONENTES','MIGRACION CENSO: INFORMACIÓN GENERAL LETRADO','MIGRACION CENSO: INFORMACIÓN CUENTAS BANCARIAS - ABONO','MIGRACION CENSO: INFORMACIÓN CUENTAS BANCARIAS - CARGO','MIGRACION CENSO:INFORMACIÓN CUENTAS BANCARIAS - SJCS','MIGRACION CENSO: RECUPERAR FECHA ACTUAL','MIGRACION CENSO: RECUPERAR ID DIRECCIÓN PREFERENTE','MIGRACION CENSO: RECUPERAR DIRECCIÓN PREFERENTE','MIGRACION CENSO: RECUPERAR ID DIRECCIÓN RESIDENCIA','MIGRACION CENSO: RECUPERAR TIPOS Y SUBTIPOS DE CVS ASOCIADOS A UNA INSTITUCION','MIGRACION CENSO: RECUPERAR CVS','MIGRACION CENSO: CONSULTA DESTINATARIOS');     
+        ELSIF informe.IDTIPOINFORME = 'SANC' THEN 
+            INSERT INTO MOD_PLANTILLADOC_CONSULTA (FECHAMODIFICACION,USUMODIFICACION,IDCONSULTA,IDPLANTILLADOCUMENTO,IDMODELOCOMUNICACION,IDINSTITUCION,FECHABAJA,IDPLANTILLACONSULTA,REGION,IDINSTITUCION_CONSULTA)
+            SELECT SYSDATE, 0, con.IDCONSULTA, idPlantillaDocumento,idModelo, idInstitucionModelo, null, SEQ_MOD_PLANTILLADOCCONSULTA.nextval,null, con.idinstitucion FROM CON_CONSULTA con WHERE con.descripcion in ('MIGRACION SANCIONES: SANCIONES','MIGRACION SANCIONES: CONSULTA DESTINATARIOS');     
+        ELSIF informe.IDTIPOINFORME = 'OSEPA' THEN 
+            INSERT INTO MOD_PLANTILLADOC_CONSULTA (FECHAMODIFICACION,USUMODIFICACION,IDCONSULTA,IDPLANTILLADOCUMENTO,IDMODELOCOMUNICACION,IDINSTITUCION,FECHABAJA,IDPLANTILLACONSULTA,REGION,IDINSTITUCION_CONSULTA)
+            SELECT SYSDATE, 0, con.IDCONSULTA, idPlantillaDocumento,idModelo, idInstitucionModelo, null, SEQ_MOD_PLANTILLADOCCONSULTA.nextval,null, con.idinstitucion FROM CON_CONSULTA con WHERE con.descripcion in ('MIGRACION ORDEN MANDATOS: ORDEN MANDATOS','MIGRACION ORDEN MANDATOS: CONSULTA DESTINATARIOS');     
+        ELSIF informe.IDTIPOINFORME = 'ASEPA' THEN
+            INSERT INTO MOD_PLANTILLADOC_CONSULTA (FECHAMODIFICACION,USUMODIFICACION,IDCONSULTA,IDPLANTILLADOCUMENTO,IDMODELOCOMUNICACION,IDINSTITUCION,FECHABAJA,IDPLANTILLACONSULTA,REGION,IDINSTITUCION_CONSULTA)
+            SELECT SYSDATE, 0, con.IDCONSULTA, idPlantillaDocumento,idModelo, idInstitucionModelo, null,SEQ_MOD_PLANTILLADOCCONSULTA.nextval,null, con.idinstitucion FROM CON_CONSULTA con WHERE con.descripcion in ('MIGRACION ANEXOS MANDATOS: ANEXOS MANDATOS','MIGRACION ANEXOS MANDATOS: CONSULTA DESTINATARIOS');     
+        END IF;
+        
         contador := contador +1;
     
      END LOOP;
      
-    COMMIT;
+    --COMMIT;
     DBMS_OUTPUT.PUT_LINE('Script informe --> modelo acaba: '|| to_char(sysdate, 'DD-MM-YYYY HH24:MI:SS'));
     DBMS_OUTPUT.PUT_LINE(' Se han actualizado ' || contador || ' filas.');
 END;

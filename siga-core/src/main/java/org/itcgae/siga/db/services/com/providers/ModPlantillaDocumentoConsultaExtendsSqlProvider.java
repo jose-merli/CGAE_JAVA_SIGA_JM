@@ -29,12 +29,11 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		
 		SQL sql = new SQL();		
 		
-		sql.SELECT("DISTINCT plantilla.idconsulta, consulta.descripcion, consulta.idobjetivo, rec.descripcion AS OBJETIVO, consulta.idInstitucion, consulta.GENERAL");
+		sql.SELECT("DISTINCT plantilla.idconsulta, consulta.descripcion, consulta.idobjetivo, rec.descripcion AS OBJETIVO, consulta.idInstitucion, consulta.GENERAL, plantilla.REGION");
 		sql.SELECT("consulta.OBSERVACIONES");
 		sql.SELECT("consulta.TIPOCONSULTA");
 		sql.SELECT("modulo.IDMODULO");
 		sql.SELECT("consulta.IDCLASECOMUNICACION");
-		sql.SELECT("to_char(consulta.SENTENCIA) AS SENTENCIA");
 		
 		sql.SELECT("LISTAGG(plantilla.idplantillaconsulta, ',') WITHIN GROUP (ORDER BY plantilla.idplantillaconsulta) idplantillaconsulta");
 		sql.SELECT("TRUNC(plantilla.FECHABAJA) AS FECHABAJA");		
@@ -47,7 +46,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON rec.idrecurso = objetivo.nombre AND rec.idlenguaje = " + idLenguaje);				
 		sql.LEFT_OUTER_JOIN("con_modulo modulo on consulta.idmodulo = modulo.idmodulo");
 		sql.WHERE("plantilla.IDMODELOCOMUNICACION = " + idModeloComunicacion + " AND modelo.idinforme = " + idInforme + " AND plantilla.IDINSTITUCION = " + idInstitucion);
-		sql.GROUP_BY("plantilla.idconsulta, consulta.descripcion, consulta.idobjetivo, consulta.idInstitucion, rec.descripcion, TRUNC(plantilla.FECHABAJA), consulta.GENERAL, consulta.OBSERVACIONES, consulta.TIPOCONSULTA, modulo.IDMODULO, consulta.IDCLASECOMUNICACION, to_char(consulta.SENTENCIA)");
+		sql.GROUP_BY("plantilla.idconsulta, consulta.descripcion, consulta.idobjetivo, consulta.idInstitucion, rec.descripcion, TRUNC(plantilla.FECHABAJA), consulta.GENERAL, consulta.OBSERVACIONES, consulta.TIPOCONSULTA, modulo.IDMODULO, consulta.IDCLASECOMUNICACION, plantilla.REGION");
 		
 		if(!historico){
 			sql.WHERE("consulta.FECHABAJA IS NULL AND plantilla.FECHABAJA IS NULL");

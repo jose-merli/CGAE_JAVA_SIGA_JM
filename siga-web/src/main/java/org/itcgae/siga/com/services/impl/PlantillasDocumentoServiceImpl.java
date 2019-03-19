@@ -41,6 +41,8 @@ import org.itcgae.siga.com.services.IPlantillasEnvioService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ConConsulta;
+import org.itcgae.siga.db.entities.ConConsultaKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModClasecomunicaciones;
@@ -52,6 +54,7 @@ import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijo;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample;
+import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantilladocumentoMapper;
@@ -120,6 +123,9 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 	@Autowired
 	private ModClasecomunicacionesMapper _modClasecomunicacionesMapper;
 	
+	@Autowired
+	private ConConsultaMapper _conConsultaMapper;
+	
 	@Override
 	public ConsultasDTO obtenerConsultasPlantilla(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc, boolean historico) {
 		LOGGER.info("obtenerConsultasPlantilla() -> Entrada al servicio para obtener las consultas de una plantilla de documento");
@@ -148,6 +154,17 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 					listaConsultaItem = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()), Long.parseLong(plantillaDoc.getIdInforme()), usuario.getIdlenguaje(), historico);			
 					if(listaConsultaItem != null && listaConsultaItem.size()> 0){
 						for(ConsultaItem consulta :listaConsultaItem){
+							
+							//Obtenemos la sentencia
+							ConConsultaKey key = new ConConsultaKey();
+							key.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
+							key.setIdinstitucion(Short.valueOf(consulta.getIdInstitucion()));
+							ConConsulta consultaEntity = _conConsultaMapper.selectByPrimaryKey(key);
+							
+							if(consultaEntity != null) {
+								consulta.setSentencia(consultaEntity.getSentencia());
+							}
+							
 							String finalidad = plantillasEnvioService.obtenerFinalidadByIdConsulta(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(consulta.getIdConsulta()));
 							consulta.setFinalidad(finalidad);
 						}
@@ -351,6 +368,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										if(consultaPlantillaModificar != null){
 											consultaPlantillaModificar.setFechamodificacion(new Date());			
 											consultaPlantillaModificar.setIdinstitucionConsulta(Short.parseShort(consultaItem.getIdInstitucion()));
+											consultaPlantillaModificar.setRegion(consultaItem.getRegion());
 											modPlantilladocConsultaMapper.updateByPrimaryKey(consultaPlantillaModificar);
 											listaConsultasIdAAsociar.add(consultaPlantillaModificar.getIdconsulta());
 										}
@@ -364,6 +382,7 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										consultaPlantillaModificar.setUsumodificacion(usuario.getIdusuario());
 										consultaPlantillaModificar.setFechamodificacion(new Date());								
 										consultaPlantillaModificar.setIdinstitucionConsulta(Short.parseShort(consultaItem.getIdInstitucion()));
+										consultaPlantillaModificar.setRegion(consultaItem.getRegion());
 										
 										modPlantilladocConsultaMapper.insert(consultaPlantillaModificar);
 										listaConsultasIdAAsociar.add(consultaPlantillaModificar.getIdconsulta());
@@ -814,6 +833,16 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 										List<ConsultaItem> listaConsultas = modPlantillaDocumentoConsultaExtendsMapper.selectConsultasByInforme(Short.parseShort(plantillaDoc.getIdInstitucion()), Long.parseLong(plantillaDoc.getIdModeloComunicacion()), idInforme, usuario.getIdlenguaje(),false);
 										if(listaConsultas != null && listaConsultas.size() > 0){
 											for(ConsultaItem consulta: listaConsultas){
+												//Obtenemos la sentencia
+												ConConsultaKey key = new ConConsultaKey();
+												key.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
+												key.setIdinstitucion(Short.valueOf(consulta.getIdInstitucion()));
+												ConConsulta consultaEntity = _conConsultaMapper.selectByPrimaryKey(key);
+												
+												if(consultaEntity != null) {
+													consulta.setSentencia(consultaEntity.getSentencia());
+												}
+												
 												ModPlantilladocConsulta plantillaConsulta = new ModPlantilladocConsulta();
 												plantillaConsulta.setIdplantilladocumento(modModeloPlantillaDoc.getIdplantilladocumento());
 												plantillaConsulta.setFechabaja(null);
