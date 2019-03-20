@@ -23,7 +23,6 @@ import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.entities.ForCursoExample;
 import org.itcgae.siga.db.entities.ForEventoCurso;
 import org.itcgae.siga.db.entities.ForTemacursoCurso;
-import org.itcgae.siga.db.entities.ForTiposervicioCurso;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.mappers.ForTemacursoCursoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
@@ -622,6 +621,8 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService {
 					forCursoInsert.setInformacionadicional(cursoItem.getAdicional());
 					forCursoInsert.setDocumentacionadjunta(cursoItem.getAdjunto());
 
+					forCursoInsert.setIdtiposervicio(cursoItem.getTipoServicios() == null ? null : Long.parseLong(cursoItem.getTipoServicios()));
+					
 					// Obtenemos el código del curso
 					codigo = getCounterCourse(idInstitucion);
 					forCursoInsert.setCodigocurso(codigo);
@@ -635,22 +636,22 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService {
 							"duplicateCourse() / forCursoExtendsMapper.insert(forCursoInsert) -> Salida a forCursoExtendsMapper para insertar un curso");
 
 					// Si existe tiposervicio, se guarda en la tabla TipoServicios
-					if (cursoItem.getTipoServicios() != null && cursoItem.getTipoServicios().size() > 0) {
-
-						for (ComboItem servicio : cursoItem.getTipoServicios()) {
-
-							ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
-							forTipoServicioCurso.setFechabaja(null);
-							forTipoServicioCurso.setFechamodificacion(new Date());
-							forTipoServicioCurso.setIdcurso(forCursoInsert.getIdcurso());
-							forTipoServicioCurso.setIdinstitucion(idInstitucion);
-							forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
-							forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
-
-							response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
-
-						}
-					}
+//					if (cursoItem.getTipoServicios() != null && cursoItem.getTipoServicios().size() > 0) {
+//
+//						for (ComboItem servicio : cursoItem.getTipoServicios()) {
+//
+//							ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
+//							forTipoServicioCurso.setFechabaja(null);
+//							forTipoServicioCurso.setFechamodificacion(new Date());
+//							forTipoServicioCurso.setIdcurso(forCursoInsert.getIdcurso());
+//							forTipoServicioCurso.setIdinstitucion(idInstitucion);
+//							forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
+//							forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+//
+//							response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
+//
+//						}
+//					}
 
 					// Si existen temas, se guarda en la tabla TemasCurso
 					if (cursoItem.getTemasCombo() != null && cursoItem.getTemasCombo().size() > 0) {

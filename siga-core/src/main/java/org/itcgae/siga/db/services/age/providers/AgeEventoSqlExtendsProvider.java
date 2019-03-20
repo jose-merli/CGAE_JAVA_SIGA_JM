@@ -151,4 +151,31 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		sql.WHERE("EVENTO.IDESTADOEVENTO = 1");
 		return sql.toString();
 	}
+	
+	public String searchEventByIdEvento(String idEvento, String idInstitucion, String idLenguaje) {
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("evento.idevento");
+		sql.SELECT("evento.idcalendario");
+		sql.SELECT("evento.titulo");
+		sql.SELECT("evento.fechainicio");
+		sql.SELECT("evento.fechafin");
+		sql.SELECT("evento.lugar");
+		sql.SELECT("evento.descripcion");
+		sql.SELECT("evento.recursos");
+		sql.SELECT("evento.idestadoevento");
+		sql.SELECT("evento.idtipoevento");
+		sql.SELECT("cal.IDTIPOCALENDARIO");
+		sql.SELECT("CAL.DESCRIPCION AS TIPOCALENDARIO");
+		sql.SELECT("REC.DESCRIPCION AS TIPOEVENTO");
+		sql.FROM("AGE_EVENTO evento");
+		sql.INNER_JOIN(
+				"AGE_CALENDARIO cal on (evento.idCalendario = cal.idCalendario and evento.idinstitucion = cal.idinstitucion)");
+		sql.INNER_JOIN("AGE_TIPOEVENTOS TIPOEVENTOS ON TIPOEVENTOS.IDTIPOEVENTO = evento.IDTIPOEVENTO");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOEVENTOS.DESCRIPCION AND rec.IDLENGUAJE = '" + idLenguaje +"')");
+		sql.WHERE("evento.idinstitucion = '" + idInstitucion + "'");
+		sql.WHERE("evento.idevento = '" + idEvento + "'");
+
+		return sql.toString();
+	}
 }
