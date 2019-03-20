@@ -163,4 +163,10 @@ public class FichaEventosController {
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
+	@RequestMapping(value = "fichaEventos/searchEventByIdEvento",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EventoItem> searchEventByIdEvento(@RequestParam("idEvento") String idEvento, HttpServletRequest request) {
+		EventoItem response = fichaEventosService.searchEventByIdEvento(idEvento, request);
+		return new ResponseEntity<EventoItem>(response, HttpStatus.OK);
+	}
+	
 }

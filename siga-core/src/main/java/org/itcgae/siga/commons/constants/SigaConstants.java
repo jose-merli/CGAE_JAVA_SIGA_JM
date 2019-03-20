@@ -751,7 +751,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static final long NOTIFICACION_HORAS = 1;
 	public static final long NOTIFICACION_MINUTOS = 2;
-	public static final long NOTIFICACION_SEGUNDOS = 3;
+	public static final long NOTIFICACION_DIAS = 3;
 	
 
 	//SOLICITUD INCORPORACION

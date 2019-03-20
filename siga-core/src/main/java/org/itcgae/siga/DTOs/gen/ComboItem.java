@@ -14,6 +14,7 @@ public class ComboItem   {
   
   private String label = null;
   private String value = null;
+  private String subValue = null;
 
   
   /**
@@ -48,6 +49,21 @@ public class ComboItem   {
   public void setValue(String value) {
     this.value = value;
   }
+  
+  /**
+   **/
+  public ComboItem subValue(String subValue) {
+    this.subValue = subValue;
+    return this;
+  }
+  
+  @JsonProperty("subValue")
+  public String getSubValue() {
+    return subValue;
+  }
+  public void setSubValue(String subValue) {
+    this.subValue = subValue;
+  }
 
   
 
@@ -61,7 +77,8 @@ public class ComboItem   {
     }
     ComboItem comboItem = (ComboItem) o;
     return Objects.equals(this.label, comboItem.label) &&
-        Objects.equals(this.value, comboItem.value);
+    		 Objects.equals(this.value, comboItem.value) &&
+        Objects.equals(this.subValue, comboItem.subValue);
   }
 
   @Override
@@ -75,7 +92,8 @@ public class ComboItem   {
     sb.append("class ComboItem {\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    value: ").append(toIndentedString(value)).append("\n");
-    
+    sb.append("    subValue: ").append(toIndentedString(subValue)).append("\n");
+
     sb.append("}");
     return sb.toString();
   }

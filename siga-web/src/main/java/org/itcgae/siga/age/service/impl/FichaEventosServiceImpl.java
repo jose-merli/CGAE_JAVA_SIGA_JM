@@ -1255,8 +1255,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 					}
 
-					if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION
-							|| event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
+					if ((event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION
+							|| event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) && event.getFechabaja() == null) {
 
 						ForCursoExample exampleCurso = new ForCursoExample();
 						exampleCurso.createCriteria().andIdcursoEqualTo(Long.valueOf(eventoItem.getIdCurso()))
@@ -1386,8 +1386,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 				calendar.add(Calendar.HOUR, -valor.intValue());
 			} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_MINUTOS) {
 				calendar.add(Calendar.MINUTE, -valor.intValue());
-			} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_SEGUNDOS) {
-				calendar.add(Calendar.SECOND, -valor.intValue());
+			} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_DIAS) {
+				calendar.add(Calendar.DAY_OF_YEAR, -valor.intValue());
 			}
 
 		} else if (ageNotificacionEventoInsert.getIdtipocuando() == SigaConstants.NOTIFICACION_TIPOCUANDO_DESPUES) {
@@ -1396,8 +1396,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 				calendar.add(Calendar.HOUR, valor.intValue());
 			} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_MINUTOS) {
 				calendar.add(Calendar.MINUTE, valor.intValue());
-			} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_SEGUNDOS) {
-				calendar.add(Calendar.SECOND, valor.intValue());
+			} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_DIAS) {
+				calendar.add(Calendar.DAY_OF_YEAR, valor.intValue());
 			}
 		}
 
@@ -1715,10 +1715,10 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			LOGGER.info(
-					"saveAssistancesCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchEvent() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			LOGGER.info(
-					"saveAssistancesCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchEvent() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -2510,6 +2510,47 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 		return asistenciasItemList;
 
+	}
+
+	@Override
+	public EventoItem searchEventByIdEvento(String idEvento, HttpServletRequest request) {
+		LOGGER.info("searchEventByIdEvento() -> Entrada al servicio para obtener un evento especifico");
+
+		EventoItem eventoItem = new EventoItem();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			
+			LOGGER.info(
+					"searchEventByIdEvento() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			LOGGER.info(
+					"searchEventByIdEvento() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				LOGGER.info(
+						"searchEventByIdEvento() / ageEventoExtendsMapper.searchEventByIdEvento() -> Entrada a ageEventoExtendsMapper para obtener un evento especifico");
+				
+				eventoItem = ageEventoExtendsMapper.searchEventByIdEvento(idEvento, idInstitucion.toString(), usuario.getIdlenguaje());
+				
+				LOGGER.info(
+						"searchEvent() / ageEventoExtendsMapper.searchEventByIdEvento() -> Salida de ageEventoExtendsMapper para obtener un evento especifico");
+			}
+		}
+
+		LOGGER.info("searchEventByIdEvento() -> Salida del servicio para obtener un evento especifico");
+		
+		return eventoItem;
 	}
 
 }

@@ -242,6 +242,7 @@ public class DatosNotificacionesServiceTest {
 		NotificacionEventoItem notificacionEventoItem = ageTestUtils.getNotificacionEventoItem();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
 		List<AgeNotificacionesevento> notificationList = ageTestUtils.getListAgeNotificacionesevento();
+		NotificacionEventoDTO notificacionEventoDTO = ageTestUtils.getNotificacionEventoDTOSimulado();
 
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 
@@ -251,7 +252,7 @@ public class DatosNotificacionesServiceTest {
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		UpdateResponseDTO updateResponseDTOResultado = datosNotificacionesServiceImpl.updateNotification(notificacionEventoItem, mockreq);
+		UpdateResponseDTO updateResponseDTOResultado = datosNotificacionesServiceImpl.updateNotification(notificacionEventoDTO, mockreq);
 
 		UpdateResponseDTO updateResponseDTOEsperado = new UpdateResponseDTO();
 		Error error = new Error();
@@ -267,6 +268,7 @@ public class DatosNotificacionesServiceTest {
 
 		String idLenguaje = "1";
 		NotificacionEventoItem notificacionEventoItem = ageTestUtils.getNotificacionEventoItem();
+		NotificacionEventoDTO notificacionEventoDTO = ageTestUtils.getNotificacionEventoDTOSimulado();
 		List<AdmUsuarios> usuarios = testUtils.getListUsuariosSimulados(idLenguaje);
 		List<AgeNotificacionesevento> notificationList = ageTestUtils.getListAgeNotificacionesevento();
 
@@ -278,7 +280,7 @@ public class DatosNotificacionesServiceTest {
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 
-		UpdateResponseDTO updateResponseDTOResultado = datosNotificacionesServiceImpl.updateNotification(notificacionEventoItem, mockreq);
+		UpdateResponseDTO updateResponseDTOResultado = datosNotificacionesServiceImpl.updateNotification(notificacionEventoDTO, mockreq);
 
 		UpdateResponseDTO updateResponseDTOEsperado = new UpdateResponseDTO();
 		Error error = new Error();

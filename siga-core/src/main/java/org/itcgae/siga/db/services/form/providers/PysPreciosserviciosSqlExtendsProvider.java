@@ -35,7 +35,7 @@ public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSq
 		sql.INNER_JOIN("PYS_PERIODICIDAD per on per.IDPERIODICIDAD = pys.IDPERIODICIDAD");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS cat ON per.DESCRIPCION = cat.IDRECURSO and idLenguaje = '" + idLenguaje + "'");
 		sql.WHERE("pys.idInstitucion =" + idInstitucion);
-		sql.WHERE("SERVICIO.descripcion like '%" + codigoCurso + "%'");
+		sql.WHERE("SERVICIOINST.descripcion like '%" + codigoCurso + "%'");
 		sql.WHERE("pys.idServicio = " + idServicio);
 		
 		return sql.toString();

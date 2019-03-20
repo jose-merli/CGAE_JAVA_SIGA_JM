@@ -21,7 +21,7 @@ public class PysServiciosSqlExtendsProvider extends PysServiciosSqlProvider {
 
 		SQL sql = new SQL();
 
-		sql.SELECT("IDSERVICIO");
+		sql.SELECT("IDTIPOSERVICIO as IDSERVICIO");
 		sql.FROM("FOR_CURSO");
 		sql.WHERE("idInstitucion =" + idInstitucion);
 		sql.WHERE("idCurso =" + idCurso);
@@ -29,4 +29,16 @@ public class PysServiciosSqlExtendsProvider extends PysServiciosSqlProvider {
 		return sql.toString();
 	}
 
+	public String getServicesCourse(String idInstitucion, String idLenguaje) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("ts.idservicio as IDTIPOSERVICIO");
+		sql.SELECT("ts.DESCRIPCION");
+		sql.FROM("PYS_SERVICIOS ts");
+		sql.WHERE("ts.IDTIPOSERVICIOS = 5");
+		sql.WHERE("ts.idinstitucion ='" + idInstitucion + "'");
+		sql.ORDER_BY("TS.DESCRIPCION");
+		return sql.toString();
+	}
 }

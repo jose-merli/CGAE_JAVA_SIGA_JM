@@ -47,7 +47,7 @@ public class CursoItem {
 	private String idTipoEvento;
 	
 
-	private List<ComboItem> tipoServicios;
+	private String tipoServicios;
 	private List<ComboItem> temasCombo;
 	private String [] temas;
 	private String numPlazas;
@@ -261,10 +261,10 @@ public class CursoItem {
 	public void setIdTipoEvento(String idTipoEvento) {
 		this.idTipoEvento = idTipoEvento;
 	}	
-	public List<ComboItem> getTipoServicios() {
+	public String getTipoServicios() {
 		return tipoServicios;
 	}
-	public void setTipoServicios(List<ComboItem> tipoServicios) {
+	public void setTipoServicios(String tipoServicios) {
 		this.tipoServicios = tipoServicios;
 	}
 	

@@ -74,8 +74,6 @@ import org.itcgae.siga.db.entities.ForPersonaCurso;
 import org.itcgae.siga.db.entities.ForPersonaCursoExample;
 import org.itcgae.siga.db.entities.ForTemacursoCurso;
 import org.itcgae.siga.db.entities.ForTemacursoCursoExample;
-import org.itcgae.siga.db.entities.ForTiposervicioCurso;
-import org.itcgae.siga.db.entities.ForTiposervicioCursoExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcion;
@@ -855,6 +853,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					forCursoInsert.setInformacionadicional(cursoItem.getAdicional());
 					forCursoInsert.setDocumentacionadjunta(cursoItem.getAdjunto());
 
+					forCursoInsert.setIdtiposervicio(cursoItem.getTipoServicios() == null ? null : Long.parseLong(cursoItem.getTipoServicios()));
+					
 					// Obtenemos el código del curso
 					codigo = getCounterCourse(idInstitucion);
 					forCursoInsert.setCodigocurso(codigo);
@@ -866,22 +866,22 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							"saveCourse() / forCursoExtendsMapper.insert(forCursoInsert) -> Salida a forCursoExtendsMapper para insertar un curso");
 
 					// Si existe tiposervicio, se guarda en la tabla TipoServicios
-					if (cursoItem.getTipoServicios() != null && cursoItem.getTipoServicios().size() > 0) {
-
-						for (ComboItem servicio : cursoItem.getTipoServicios()) {
-
-							ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
-							forTipoServicioCurso.setFechabaja(null);
-							forTipoServicioCurso.setFechamodificacion(new Date());
-							forTipoServicioCurso.setIdcurso(forCursoInsert.getIdcurso());
-							forTipoServicioCurso.setIdinstitucion(idInstitucion);
-							forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
-							forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
-
-							response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
-
-						}
-					}
+//					if (cursoItem.getTipoServicios() != null && cursoItem.getTipoServicios().size() > 0) {
+//
+//						for (ComboItem servicio : cursoItem.getTipoServicios()) {
+//
+//							ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
+//							forTipoServicioCurso.setFechabaja(null);
+//							forTipoServicioCurso.setFechamodificacion(new Date());
+//							forTipoServicioCurso.setIdcurso(forCursoInsert.getIdcurso());
+//							forTipoServicioCurso.setIdinstitucion(idInstitucion);
+//							forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
+//							forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+//
+//							response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
+//
+//						}
+//					}
 
 					// Si existen temas, se guarda en la tabla TemasCurso
 					if (cursoItem.getTemasCombo() != null && cursoItem.getTemasCombo().size() > 0) {
@@ -1063,148 +1063,153 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					LOGGER.info(
 							"updateCourse() / forCursoExtendsMapper.updateByPrimaryKey(event) -> Salida a forCursoExtendsMapper para modificar un evento");
 
-					if (cursoItem.getTipoServicios() != null && cursoItem.getTipoServicios().size() > 0) {
-
-						// Eliminamos Servicio que no se encuentre en la lista actual
-						ForTiposervicioCursoExample forTiposerviciocursoExample = new ForTiposervicioCursoExample();
-						forTiposerviciocursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdcursoEqualTo(cursoItem.getIdCurso()).andFechabajaIsNull();
-
-						LOGGER.info(
-								"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Entrada a forTiposervicioCursoExtendsMapper para buscar los servicios de un curso");
-
-						List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList = forTiposervicioCursoExtendsMapper
-								.selectByExample(forTiposerviciocursoExample);
-
-						LOGGER.info(
-								"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Salida a forTiposervicioCursoExtendsMapper para buscar los servicios de un curso");
-
-						List<ForTiposervicioCurso> forTipoServicioCursoDarBaja = new ArrayList<ForTiposervicioCurso>();
-
-						// Si hay temas que estan dados de alta, comprobamos que se encuentra en la
-						// modificacion actual
-						if (!forTipoServicioCursoAntiguosList.isEmpty()) {
-
-							for (ForTiposervicioCurso servicioAsignadosAntiguos : forTipoServicioCursoAntiguosList) {
-								boolean flag = false;
-								for (int i = 0; cursoItem.getTipoServicios().size() > i; i++) {
-
-									if (servicioAsignadosAntiguos.getIdttiposervicio() == Long
-											.valueOf(cursoItem.getTipoServicios().get(i).getValue())) {
-										flag = true;
-										i = cursoItem.getTemasCombo().size();
-									}
-
-									forTipoServicioCursoDarBaja.add(servicioAsignadosAntiguos);
-								}
-
-								// Si no se encuentra en la lista actual la borramos
-								if (!flag) {
-									forTipoServicioCursoDarBaja.add(servicioAsignadosAntiguos);
-								}
-							}
-
-							for (ForTiposervicioCurso servicioCursoBaja : forTipoServicioCursoDarBaja) {
-
-								servicioCursoBaja.setUsumodificacion(usuario.getIdusuario().longValue());
-								servicioCursoBaja.setFechabaja(new Date());
-								servicioCursoBaja.setFechamodificacion(new Date());
-
-								LOGGER.info(
-										"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) -> Entrada a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de un curso");
-
-								response = forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja);
-
-								LOGGER.info(
-										"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) -> Salida a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de un curso");
-							}
-						}
-
-						// Añadimos Servicio
-						for (ComboItem servicio : cursoItem.getTipoServicios()) {
-
-							// Para cada servicio comprobamos si ya existe la relacion
-							ForTiposervicioCursoExample forTiposervicioCursoExample = new ForTiposervicioCursoExample();
-							forTiposervicioCursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-									.andIdcursoEqualTo(cursoItem.getIdCurso())
-									.andIdttiposervicioEqualTo(Long.valueOf(servicio.getValue()));
-
-							LOGGER.info(
-									"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Entrada a forTiposervicioCursoExtendsMapper para buscar los servicios de un curso");
-
-							List<ForTiposervicioCurso> forTipoServicioCursoList = forTiposervicioCursoExtendsMapper
-									.selectByExample(forTiposervicioCursoExample);
-
-							LOGGER.info(
-									"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Salida a forTiposervicioCursoExtendsMapper para buscar los servicios de un curso");
-
-							// Si no existe la creamos
-							if (forTipoServicioCursoList.isEmpty()) {
-
-								ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
-								forTipoServicioCurso.setFechabaja(null);
-								forTipoServicioCurso.setFechamodificacion(new Date());
-								forTipoServicioCurso.setIdcurso(cursoItem.getIdCurso());
-								forTipoServicioCurso.setIdinstitucion(idInstitucion);
-								forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
-								forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
-
-								LOGGER.info(
-										"updateCourse() / forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso) -> Entrada a forTiposervicioCursoExtendsMapper para insertar un servicio de un curso");
-
-								response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
-
-								LOGGER.info(
-										"updateCourse() / forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso) -> Salida a forTiposervicioCursoExtendsMapper para insertar un servicio de un curso");
-
-								// Si existe cambiamos el servicio a null
-							} else {
-								forTipoServicioCursoList.get(0).setFechabaja(null);
-								forTipoServicioCursoList.get(0).setUsumodificacion(usuario.getIdusuario().longValue());
-								forTipoServicioCursoList.get(0).setFechamodificacion(new Date());
-
-								LOGGER.info(
-										"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoAlta) -> Entrada a forTiposervicioCursoExtendsMapper para dar de alta a un servicio de un curso");
-
-								response = forTiposervicioCursoExtendsMapper
-										.updateByPrimaryKey(forTipoServicioCursoList.get(0));
-
-								LOGGER.info(
-										"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoAlta) -> Salida a forTiposervicioCursoExtendsMapper para dar de alta a un servicio de un curso");
-							}
-						}
-
-						// Comprobamos si existe algun servicio para el curso y les damos de baja
-					} else {
-						// Eliminamos Servicio
-						ForTiposervicioCursoExample forTiposerviciocursoExample = new ForTiposervicioCursoExample();
-						forTiposerviciocursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdcursoEqualTo(cursoItem.getIdCurso()).andFechabajaIsNull();
-
-						LOGGER.info(
-								"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Entrada a forTiposervicioCursoExtendsMapper para buscar los servicios registrados de un curso");
-
-						List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList = forTiposervicioCursoExtendsMapper
-								.selectByExample(forTiposerviciocursoExample);
-
-						LOGGER.info(
-								"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Salida a forTiposervicioCursoExtendsMapper para buscar los servicios registrados de un curso");
-
-						for (ForTiposervicioCurso servicioAsignadosAntiguos : forTipoServicioCursoAntiguosList) {
-
-							servicioAsignadosAntiguos.setUsumodificacion(usuario.getIdusuario().longValue());
-							servicioAsignadosAntiguos.setFechabaja(new Date());
-							servicioAsignadosAntiguos.setFechamodificacion(new Date());
-
-							LOGGER.info(
-									"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) -> Entrada a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de un curso");
-
-							response = forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioAsignadosAntiguos);
-
-							LOGGER.info(
-									"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) -> Salida a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de un curso");
-						}
-					}
+					// Se ha cambiado el tipoServicio de autocomplete (array) a dropDown (string)
+					
+					
+					
+					
+//					if (cursoItem.getTipoServicios() != null && cursoItem.getTipoServicios().size() > 0) {
+//
+//						// Eliminamos Servicio que no se encuentre en la lista actual
+//						ForTiposervicioCursoExample forTiposerviciocursoExample = new ForTiposervicioCursoExample();
+//						forTiposerviciocursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+//								.andIdcursoEqualTo(cursoItem.getIdCurso()).andFechabajaIsNull();
+//
+//						LOGGER.info(
+//								"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Entrada a forTiposervicioCursoExtendsMapper para buscar los servicios de un curso");
+//
+//						List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList = forTiposervicioCursoExtendsMapper
+//								.selectByExample(forTiposerviciocursoExample);
+//
+//						LOGGER.info(
+//								"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Salida a forTiposervicioCursoExtendsMapper para buscar los servicios de un curso");
+//
+//						List<ForTiposervicioCurso> forTipoServicioCursoDarBaja = new ArrayList<ForTiposervicioCurso>();
+//
+//						// Si hay temas que estan dados de alta, comprobamos que se encuentra en la
+//						// modificacion actual
+//						if (!forTipoServicioCursoAntiguosList.isEmpty()) {
+//
+//							for (ForTiposervicioCurso servicioAsignadosAntiguos : forTipoServicioCursoAntiguosList) {
+//								boolean flag = false;
+//								for (int i = 0; cursoItem.getTipoServicios().size() > i; i++) {
+//
+//									if (servicioAsignadosAntiguos.getIdttiposervicio() == Long
+//											.valueOf(cursoItem.getTipoServicios().get(i).getValue())) {
+//										flag = true;
+//										i = cursoItem.getTemasCombo().size();
+//									}
+//
+//									forTipoServicioCursoDarBaja.add(servicioAsignadosAntiguos);
+//								}
+//
+//								// Si no se encuentra en la lista actual la borramos
+//								if (!flag) {
+//									forTipoServicioCursoDarBaja.add(servicioAsignadosAntiguos);
+//								}
+//							}
+//
+//							for (ForTiposervicioCurso servicioCursoBaja : forTipoServicioCursoDarBaja) {
+//
+//								servicioCursoBaja.setUsumodificacion(usuario.getIdusuario().longValue());
+//								servicioCursoBaja.setFechabaja(new Date());
+//								servicioCursoBaja.setFechamodificacion(new Date());
+//
+//								LOGGER.info(
+//										"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) -> Entrada a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de un curso");
+//
+//								response = forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja);
+//
+//								LOGGER.info(
+//										"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) -> Salida a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de un curso");
+//							}
+//						}
+//
+//						// Añadimos Servicio
+//						for (ComboItem servicio : cursoItem.getTipoServicios()) {
+//
+//							// Para cada servicio comprobamos si ya existe la relacion
+//							ForTiposervicioCursoExample forTiposervicioCursoExample = new ForTiposervicioCursoExample();
+//							forTiposervicioCursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+//									.andIdcursoEqualTo(cursoItem.getIdCurso())
+//									.andIdttiposervicioEqualTo(Long.valueOf(servicio.getValue()));
+//
+//							LOGGER.info(
+//									"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Entrada a forTiposervicioCursoExtendsMapper para buscar los servicios de un curso");
+//
+//							List<ForTiposervicioCurso> forTipoServicioCursoList = forTiposervicioCursoExtendsMapper
+//									.selectByExample(forTiposervicioCursoExample);
+//
+//							LOGGER.info(
+//									"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Salida a forTiposervicioCursoExtendsMapper para buscar los servicios de un curso");
+//
+//							// Si no existe la creamos
+//							if (forTipoServicioCursoList.isEmpty()) {
+//
+//								ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
+//								forTipoServicioCurso.setFechabaja(null);
+//								forTipoServicioCurso.setFechamodificacion(new Date());
+//								forTipoServicioCurso.setIdcurso(cursoItem.getIdCurso());
+//								forTipoServicioCurso.setIdinstitucion(idInstitucion);
+//								forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
+//								forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+//
+//								LOGGER.info(
+//										"updateCourse() / forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso) -> Entrada a forTiposervicioCursoExtendsMapper para insertar un servicio de un curso");
+//
+//								response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
+//
+//								LOGGER.info(
+//										"updateCourse() / forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso) -> Salida a forTiposervicioCursoExtendsMapper para insertar un servicio de un curso");
+//
+//								// Si existe cambiamos el servicio a null
+//							} else {
+//								forTipoServicioCursoList.get(0).setFechabaja(null);
+//								forTipoServicioCursoList.get(0).setUsumodificacion(usuario.getIdusuario().longValue());
+//								forTipoServicioCursoList.get(0).setFechamodificacion(new Date());
+//
+//								LOGGER.info(
+//										"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoAlta) -> Entrada a forTiposervicioCursoExtendsMapper para dar de alta a un servicio de un curso");
+//
+//								response = forTiposervicioCursoExtendsMapper
+//										.updateByPrimaryKey(forTipoServicioCursoList.get(0));
+//
+//								LOGGER.info(
+//										"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoAlta) -> Salida a forTiposervicioCursoExtendsMapper para dar de alta a un servicio de un curso");
+//							}
+//						}
+//
+//						// Comprobamos si existe algun servicio para el curso y les damos de baja
+//					} else {
+//						// Eliminamos Servicio
+//						ForTiposervicioCursoExample forTiposerviciocursoExample = new ForTiposervicioCursoExample();
+//						forTiposerviciocursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+//								.andIdcursoEqualTo(cursoItem.getIdCurso()).andFechabajaIsNull();
+//
+//						LOGGER.info(
+//								"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Entrada a forTiposervicioCursoExtendsMapper para buscar los servicios registrados de un curso");
+//
+//						List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList = forTiposervicioCursoExtendsMapper
+//								.selectByExample(forTiposerviciocursoExample);
+//
+//						LOGGER.info(
+//								"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Salida a forTiposervicioCursoExtendsMapper para buscar los servicios registrados de un curso");
+//
+//						for (ForTiposervicioCurso servicioAsignadosAntiguos : forTipoServicioCursoAntiguosList) {
+//
+//							servicioAsignadosAntiguos.setUsumodificacion(usuario.getIdusuario().longValue());
+//							servicioAsignadosAntiguos.setFechabaja(new Date());
+//							servicioAsignadosAntiguos.setFechamodificacion(new Date());
+//
+//							LOGGER.info(
+//									"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) -> Entrada a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de un curso");
+//
+//							response = forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioAsignadosAntiguos);
+//
+//							LOGGER.info(
+//									"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) -> Salida a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de un curso");
+//						}
+//					}
 
 					if (cursoItem.getTemasCombo() != null && cursoItem.getTemasCombo().size() > 0) {
 
@@ -1650,7 +1655,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				AdmUsuarios usuario = usuarios.get(0);
 				LOGGER.info(
 						"getServicesCourse() / forTiposervicioExtendsMapper.getServiceType -> Entrada a forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según la institucion");
-				comboItems = forTiposervicioExtendsMapper.getServicesCourse(idInstitucion.toString(),
+				comboItems = pysServiciosExtendsMapper.getServicesCourse(idInstitucion.toString(),
 						usuario.getIdlenguaje());
 				LOGGER.info(
 						"getServicesCourse() / forTiposervicioExtendsMapper.getServiceType -> Salida de forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según la institucion");
@@ -2526,19 +2531,19 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		int response = 1;
 		try {
 
-			PysServicios pysServicios = new PysServicios();
-			pysServicios.setFechamodificacion(new Date());
-			pysServicios.setIdinstitucion(idInstitucion);
-			pysServicios.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
-			pysServicios.setUsumodificacion(usuario.getIdusuario());
-			pysServicios.setDescripcion(cursoItem.getNombrecurso());
-			NewIdDTO idServicio = pysServiciosExtendsMapper.selectMaxIdServicio(idInstitucion);
-			pysServicios.setIdservicio(Long.valueOf(idServicio.getNewId()));
-
-			LOGGER.info(
-					"createServiceCourse() / pysServiciosMapper.insert() -> Entrada a pysServiciosMapper para insertar un servicio");
-
-			response = pysServiciosExtendsMapper.insert(pysServicios);
+//			PysServicios pysServicios = new PysServicios();
+//			pysServicios.setFechamodificacion(new Date());
+//			pysServicios.setIdinstitucion(idInstitucion);
+//			pysServicios.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
+//			pysServicios.setUsumodificacion(usuario.getIdusuario());
+//			pysServicios.setDescripcion(cursoItem.getNombrecurso());
+//			NewIdDTO idServicio = pysServiciosExtendsMapper.selectMaxIdServicio(idInstitucion);
+//			pysServicios.setIdservicio(Long.valueOf(idServicio.getNewId()));
+//
+//			LOGGER.info(
+//					"createServiceCourse() / pysServiciosMapper.insert() -> Entrada a pysServiciosMapper para insertar un servicio");
+//
+//			response = pysServiciosExtendsMapper.insert(pysServicios);
 
 			LOGGER.info(
 					"createServiceCourse() / pysServiciosMapper.insert() -> Salida a pysServiciosMapper para insertar un servicio");
@@ -2550,9 +2555,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			pysServiciosinstitucion.setUsumodificacion(usuario.getIdusuario());
 			pysServiciosinstitucion.setDescripcion(cursoItem.getNombrecurso());
 			pysServiciosinstitucion.setAutomatico("0");
-			pysServiciosinstitucion.setIdservicio(pysServicios.getIdservicio());
+			pysServiciosinstitucion.setIdservicio(cursoItem.getIdtiposervicio());
 			NewIdDTO idServicioInstitucion = pysServiciosinstitucionExtendsMapper
-					.selectMaxIdServicioinstitucion(idInstitucion, pysServicios.getIdservicio());
+					.selectMaxIdServicioinstitucion(idInstitucion, cursoItem.getIdtiposervicio());
 			pysServiciosinstitucion.setIdserviciosinstitucion(Long.valueOf(idServicioInstitucion.getNewId()));
 			pysServiciosinstitucion.setMomentocargo("P");
 			pysServiciosinstitucion.setIniciofinalponderado("I");
@@ -2574,7 +2579,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			pysPreciosservicios.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
 			pysPreciosservicios.setUsumodificacion(usuario.getIdusuario());
 			pysPreciosservicios.setDescripcion(cursoItem.getNombrecurso());
-			pysPreciosservicios.setIdservicio(pysServicios.getIdservicio());
+			pysPreciosservicios.setIdservicio(cursoItem.getIdtiposervicio());
 			pysPreciosservicios.setIdserviciosinstitucion(pysServiciosinstitucion.getIdserviciosinstitucion());
 			pysPreciosservicios.setIdperiodicidad(SigaConstants.PERIOCIDAD_1MES);
 			BigDecimal valor = new BigDecimal("0");
@@ -2583,7 +2588,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					+ idInstitucion + " AND IDPERSONA = @IDPERSONA@");
 			pysPreciosservicios.setPordefecto("1");
 			NewIdDTO idPrecioServicio = pysPreciosserviciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion,
-					pysServicios.getIdservicio(), pysServiciosinstitucion.getIdserviciosinstitucion(),
+					cursoItem.getIdtiposervicio(), pysServiciosinstitucion.getIdserviciosinstitucion(),
 					SigaConstants.PERIOCIDAD_1MES);
 			pysPreciosservicios.setIdpreciosservicios(Short.valueOf(idPrecioServicio.getNewId()));
 
@@ -2595,7 +2600,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			LOGGER.info(
 					"createServiceCourse() / pysPreciosserviciosExtendsMapper.insert() -> Salida a pysPreciosserviciosExtendsMapper para insertar un precio servicio");
 
-			cursoItem.setIdservicio(Long.valueOf(idServicio.getNewId()));
+			cursoItem.setIdservicio(Long.valueOf(pysServiciosinstitucion.getIdserviciosinstitucion()));
 
 			LOGGER.info(
 					"createServiceCourse() / forCursoExtendsMapper.insert() -> Entrada a forCursoExtendsMapper para guardar idServicio creado al curso correspondiente");
@@ -2707,8 +2712,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 										NewIdDTO idservicio = pysServiciosExtendsMapper.selectIdServicioByIdCurso(
 												inscription.getIdinstitucion(), inscription.getIdcurso());
 										NewIdDTO idserviciosinstitucion = pysServiciosinstitucionExtendsMapper
-												.selectIdServicioinstitucionByIdServicio(idInstitucion,
-														Long.valueOf(idservicio.getNewId()));
+												.selectIdServicioinstitucionByIdServicio(idInstitucion, Long.valueOf(inscription.getIdcurso()));
 
 										PysServiciossolicitados pysServiciossolicitados = new PysServiciossolicitados();
 										pysServiciossolicitados.setFechamodificacion(new Date());
@@ -3378,7 +3382,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 								"getPricesCourse() / pysPreciosserviciosExtendsMapper.selectPricesCourse -> Entrada a pysPreciosserviciosExtendsMapper para obtener los precios de un curso");
 
 						preciosCursoItem = pysPreciosserviciosExtendsMapper.selectPricesCourse(curso.getIdinstitucion(),
-								curso.getIdservicio(), usuario.getIdlenguaje(), curso.getNombrecurso());
+								curso.getIdtiposervicio(), usuario.getIdlenguaje(), curso.getNombrecurso());
 
 						LOGGER.info(
 								"getPricesCourse() / pysPreciosserviciosExtendsMapper.selectPricesCourse -> Salida de pysPreciosserviciosExtendsMapper para obtener los precios de un curso");

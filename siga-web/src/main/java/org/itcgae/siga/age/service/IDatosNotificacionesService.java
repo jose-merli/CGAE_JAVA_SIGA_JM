@@ -27,7 +27,7 @@ public interface IDatosNotificacionesService {
 	
 	public ComboDTO getTypeSend (String idPlantillaEnvio, String idTipoEnvio, HttpServletRequest request);
 	
-	public UpdateResponseDTO updateNotification(NotificacionEventoItem notificacionItem, HttpServletRequest request);
+	public UpdateResponseDTO updateNotification(NotificacionEventoDTO notificacionEventoDTO, HttpServletRequest request);
 	
 	public NotificacionEventoDTO getCalendarNotifications(String idCalendario, HttpServletRequest request);
 	
@@ -38,4 +38,7 @@ public interface IDatosNotificacionesService {
 	public int checkGenerationDateNotification(AgeNotificacionesevento notification, AdmUsuarios usuario);
 	
 	public Date generateNotificationDate(AgeNotificacionesevento ageNotificacionEventoInsert);
+	
+	public ComboDTO getPlantillas(HttpServletRequest request);
+
 }
