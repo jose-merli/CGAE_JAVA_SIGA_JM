@@ -19,5 +19,19 @@ public class EnvPlantillasenviosSqlExtendsProvider extends  EnvPlantillasenviosS
 		
 		return sql.toString();
 	}
+	
+	public String getPlantillas(String idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT_DISTINCT("IDPLANTILLAENVIOS");
+		sql.SELECT("NOMBRE");
+		sql.SELECT("IDTIPOENVIOS");
+		sql.FROM("ENV_PLANTILLASENVIOS");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "'");
+		sql.ORDER_BY("NOMBRE");
+		
+		return sql.toString();
+	}
 
 }
