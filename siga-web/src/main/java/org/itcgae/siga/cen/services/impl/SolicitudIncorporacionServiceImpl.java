@@ -1389,7 +1389,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 			
 			if (resultado == 1) {
 				CenDatoscolegialesestado datosColegiales = new CenDatoscolegialesestado();
-				datosColegiales.setFechaestado(new Date());
+				datosColegiales.setFechaestado(solicitud.getFechaestado());
 				datosColegiales.setFechamodificacion(new Date());
 				if (null != solicitud.getIdtiposolicitud()) {
 					if (solicitud.getIdtiposolicitud() == 10 || solicitud.getIdtiposolicitud() == 30 ) {
