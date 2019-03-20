@@ -744,8 +744,7 @@ public class FichaInscripcionServiceImpl implements IFichaInscripcionService {
 		NewIdDTO idservicio = pysServiciosExtendsMapper
 				.selectIdServicioByIdCurso(idInstitucion, Long.valueOf(inscripcion.getIdCurso()));
 		NewIdDTO idserviciosinstitucion = pysServiciosinstitucionExtendsMapper
-				.selectIdServicioinstitucionByIdServicio(idInstitucion,
-						Long.valueOf(idservicio.getNewId()));
+				.selectIdServicioinstitucionByIdServicio(idInstitucion, Long.valueOf(inscripcion.getIdCurso()));
 
 		PysServiciossolicitados pysServiciossolicitados = new PysServiciossolicitados();
 		pysServiciossolicitados.setFechamodificacion(new Date());

@@ -17,18 +17,31 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 		
 		return sql.toString();
 	}
+//	
+//	public String selectIdServicioinstitucionByIdServicio(Short idInstitucion, Long idServicio) {
+//
+//		SQL sql = new SQL();
+//
+//		sql.SELECT("min(IDSERVICIOSINSTITUCION) as IDSERVICIOSINSTITUCION");
+//		sql.FROM("PYS_SERVICIOSINSTITUCION");
+//		sql.WHERE("idInstitucion =" + idInstitucion);
+//		sql.WHERE("idTipoServicios = 5");
+//		sql.WHERE("idservicio =" + idServicio);
+//		
+//		return sql.toString();
+//	}
 	
-	public String selectIdServicioinstitucionByIdServicio(Short idInstitucion, Long idServicio) {
+	public String selectIdServicioinstitucionByIdServicio(Short idInstitucion, Long idCurso) {
 
 		SQL sql = new SQL();
 
-		sql.SELECT("min(IDSERVICIOSINSTITUCION) as IDSERVICIOSINSTITUCION");
-		sql.FROM("PYS_SERVICIOSINSTITUCION");
+		sql.SELECT("IDSERVICIO");
+		sql.FROM("FOR_CURSO");
 		sql.WHERE("idInstitucion =" + idInstitucion);
-		sql.WHERE("idTipoServicios = 5");
-		sql.WHERE("idservicio =" + idServicio);
+		sql.WHERE("idCurso =" + idCurso);
 		
 		return sql.toString();
 	}
+
 
 }

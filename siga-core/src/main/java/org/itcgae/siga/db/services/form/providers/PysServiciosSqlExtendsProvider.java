@@ -21,7 +21,7 @@ public class PysServiciosSqlExtendsProvider extends PysServiciosSqlProvider {
 
 		SQL sql = new SQL();
 
-		sql.SELECT("IDSERVICIO");
+		sql.SELECT("IDTIPOSERVICIO");
 		sql.FROM("FOR_CURSO");
 		sql.WHERE("idInstitucion =" + idInstitucion);
 		sql.WHERE("idCurso =" + idCurso);

@@ -2526,19 +2526,19 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		int response = 1;
 		try {
 
-			PysServicios pysServicios = new PysServicios();
-			pysServicios.setFechamodificacion(new Date());
-			pysServicios.setIdinstitucion(idInstitucion);
-			pysServicios.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
-			pysServicios.setUsumodificacion(usuario.getIdusuario());
-			pysServicios.setDescripcion(cursoItem.getNombrecurso());
-			NewIdDTO idServicio = pysServiciosExtendsMapper.selectMaxIdServicio(idInstitucion);
-			pysServicios.setIdservicio(Long.valueOf(idServicio.getNewId()));
-
-			LOGGER.info(
-					"createServiceCourse() / pysServiciosMapper.insert() -> Entrada a pysServiciosMapper para insertar un servicio");
-
-			response = pysServiciosExtendsMapper.insert(pysServicios);
+//			PysServicios pysServicios = new PysServicios();
+//			pysServicios.setFechamodificacion(new Date());
+//			pysServicios.setIdinstitucion(idInstitucion);
+//			pysServicios.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
+//			pysServicios.setUsumodificacion(usuario.getIdusuario());
+//			pysServicios.setDescripcion(cursoItem.getNombrecurso());
+//			NewIdDTO idServicio = pysServiciosExtendsMapper.selectMaxIdServicio(idInstitucion);
+//			pysServicios.setIdservicio(Long.valueOf(idServicio.getNewId()));
+//
+//			LOGGER.info(
+//					"createServiceCourse() / pysServiciosMapper.insert() -> Entrada a pysServiciosMapper para insertar un servicio");
+//
+//			response = pysServiciosExtendsMapper.insert(pysServicios);
 
 			LOGGER.info(
 					"createServiceCourse() / pysServiciosMapper.insert() -> Salida a pysServiciosMapper para insertar un servicio");
@@ -2550,9 +2550,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			pysServiciosinstitucion.setUsumodificacion(usuario.getIdusuario());
 			pysServiciosinstitucion.setDescripcion(cursoItem.getNombrecurso());
 			pysServiciosinstitucion.setAutomatico("0");
-			pysServiciosinstitucion.setIdservicio(pysServicios.getIdservicio());
+			pysServiciosinstitucion.setIdservicio(cursoItem.getIdtiposervicio());
 			NewIdDTO idServicioInstitucion = pysServiciosinstitucionExtendsMapper
-					.selectMaxIdServicioinstitucion(idInstitucion, pysServicios.getIdservicio());
+					.selectMaxIdServicioinstitucion(idInstitucion, cursoItem.getIdtiposervicio());
 			pysServiciosinstitucion.setIdserviciosinstitucion(Long.valueOf(idServicioInstitucion.getNewId()));
 			pysServiciosinstitucion.setMomentocargo("P");
 			pysServiciosinstitucion.setIniciofinalponderado("I");
@@ -2574,7 +2574,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			pysPreciosservicios.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
 			pysPreciosservicios.setUsumodificacion(usuario.getIdusuario());
 			pysPreciosservicios.setDescripcion(cursoItem.getNombrecurso());
-			pysPreciosservicios.setIdservicio(pysServicios.getIdservicio());
+			pysPreciosservicios.setIdservicio(cursoItem.getIdtiposervicio());
 			pysPreciosservicios.setIdserviciosinstitucion(pysServiciosinstitucion.getIdserviciosinstitucion());
 			pysPreciosservicios.setIdperiodicidad(SigaConstants.PERIOCIDAD_1MES);
 			BigDecimal valor = new BigDecimal("0");
@@ -2583,7 +2583,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					+ idInstitucion + " AND IDPERSONA = @IDPERSONA@");
 			pysPreciosservicios.setPordefecto("1");
 			NewIdDTO idPrecioServicio = pysPreciosserviciosExtendsMapper.selectMaxIdPrecioServicio(idInstitucion,
-					pysServicios.getIdservicio(), pysServiciosinstitucion.getIdserviciosinstitucion(),
+					cursoItem.getIdtiposervicio(), pysServiciosinstitucion.getIdserviciosinstitucion(),
 					SigaConstants.PERIOCIDAD_1MES);
 			pysPreciosservicios.setIdpreciosservicios(Short.valueOf(idPrecioServicio.getNewId()));
 
@@ -2595,7 +2595,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			LOGGER.info(
 					"createServiceCourse() / pysPreciosserviciosExtendsMapper.insert() -> Salida a pysPreciosserviciosExtendsMapper para insertar un precio servicio");
 
-			cursoItem.setIdservicio(Long.valueOf(idServicio.getNewId()));
+			cursoItem.setIdservicio(Long.valueOf(pysServiciosinstitucion.getIdserviciosinstitucion()));
 
 			LOGGER.info(
 					"createServiceCourse() / forCursoExtendsMapper.insert() -> Entrada a forCursoExtendsMapper para guardar idServicio creado al curso correspondiente");
@@ -2707,8 +2707,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 										NewIdDTO idservicio = pysServiciosExtendsMapper.selectIdServicioByIdCurso(
 												inscription.getIdinstitucion(), inscription.getIdcurso());
 										NewIdDTO idserviciosinstitucion = pysServiciosinstitucionExtendsMapper
-												.selectIdServicioinstitucionByIdServicio(idInstitucion,
-														Long.valueOf(idservicio.getNewId()));
+												.selectIdServicioinstitucionByIdServicio(idInstitucion, Long.valueOf(inscription.getIdcurso()));
 
 										PysServiciossolicitados pysServiciossolicitados = new PysServiciossolicitados();
 										pysServiciossolicitados.setFechamodificacion(new Date());
