@@ -3382,7 +3382,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 								"getPricesCourse() / pysPreciosserviciosExtendsMapper.selectPricesCourse -> Entrada a pysPreciosserviciosExtendsMapper para obtener los precios de un curso");
 
 						preciosCursoItem = pysPreciosserviciosExtendsMapper.selectPricesCourse(curso.getIdinstitucion(),
-								curso.getIdservicio(), usuario.getIdlenguaje(), curso.getNombrecurso());
+								curso.getIdtiposervicio(), usuario.getIdlenguaje(), curso.getNombrecurso());
 
 						LOGGER.info(
 								"getPricesCourse() / pysPreciosserviciosExtendsMapper.selectPricesCourse -> Salida de pysPreciosserviciosExtendsMapper para obtener los precios de un curso");

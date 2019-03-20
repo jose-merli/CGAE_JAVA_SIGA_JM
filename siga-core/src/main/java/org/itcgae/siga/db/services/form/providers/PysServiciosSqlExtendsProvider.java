@@ -33,7 +33,7 @@ public class PysServiciosSqlExtendsProvider extends PysServiciosSqlProvider {
 
 		SQL sql = new SQL();
 
-		sql.SELECT_DISTINCT("ts.idservicio");
+		sql.SELECT_DISTINCT("ts.idservicio as IDTIPOSERVICIO");
 		sql.SELECT("ts.DESCRIPCION");
 		sql.FROM("PYS_SERVICIOS ts");
 		sql.WHERE("ts.IDTIPOSERVICIOS = 5");
