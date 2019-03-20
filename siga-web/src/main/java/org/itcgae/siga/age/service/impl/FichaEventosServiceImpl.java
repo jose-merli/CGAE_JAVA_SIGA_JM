@@ -1386,8 +1386,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 				calendar.add(Calendar.HOUR, -valor.intValue());
 			} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_MINUTOS) {
 				calendar.add(Calendar.MINUTE, -valor.intValue());
-			} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_SEGUNDOS) {
-				calendar.add(Calendar.SECOND, -valor.intValue());
+			} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_DIAS) {
+				calendar.add(Calendar.DAY_OF_YEAR, -valor.intValue());
 			}
 
 		} else if (ageNotificacionEventoInsert.getIdtipocuando() == SigaConstants.NOTIFICACION_TIPOCUANDO_DESPUES) {
@@ -1396,8 +1396,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 				calendar.add(Calendar.HOUR, valor.intValue());
 			} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_MINUTOS) {
 				calendar.add(Calendar.MINUTE, valor.intValue());
-			} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_SEGUNDOS) {
-				calendar.add(Calendar.SECOND, valor.intValue());
+			} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_DIAS) {
+				calendar.add(Calendar.DAY_OF_YEAR, valor.intValue());
 			}
 		}
 

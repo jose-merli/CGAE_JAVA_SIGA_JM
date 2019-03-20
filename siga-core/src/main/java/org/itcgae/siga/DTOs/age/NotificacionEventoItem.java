@@ -24,7 +24,8 @@ public class NotificacionEventoItem {
 	private String tipoEnvio;
 	private String idTipoEnvio;
 	private String nombreTipoNotificacion;
-	
+	private String descripcionMedida;
+	private String descripcionAntes;
 	
 	/**
 	 **/
@@ -298,6 +299,40 @@ public class NotificacionEventoItem {
 	/**
 	 * 
 	 **/
+	public NotificacionEventoItem descripcionMedida(String descripcionMedida) {
+		this.descripcionMedida = descripcionMedida;
+		return this;
+	}
+
+	@JsonProperty("descripcionMedida")
+	public String getDescripcionMedida() {
+		return descripcionMedida;
+	}
+
+	public void setDescripcionMedida(String descripcionMedida) {
+		this.descripcionMedida = descripcionMedida;
+	}
+	
+	/**
+	 * 
+	 **/
+	public NotificacionEventoItem descripcionAntes(String descripcionAntes) {
+		this.descripcionAntes = descripcionAntes;
+		return this;
+	}
+
+	@JsonProperty("descripcionAntes")
+	public String getDescripcionAntes() {
+		return descripcionAntes;
+	}
+
+	public void setDescripcionAntes(String descripcionAntes) {
+		this.descripcionAntes = descripcionAntes;
+	}
+	
+	/**
+	 * 
+	 **/
 	public NotificacionEventoItem 	nombreTipoNotificacion(String nombreTipoNotificacion) {
 		this.nombreTipoNotificacion = nombreTipoNotificacion;
 		return this;
@@ -337,13 +372,15 @@ public class NotificacionEventoItem {
 				&& Objects.equals(this.idTipoCuando, notificacionItem.idTipoCuando)
 				&& Objects.equals(this.tipoEnvio, notificacionItem.tipoEnvio)
 				&& Objects.equals(this.idTipoEnvio, notificacionItem.idTipoEnvio)
-				&& Objects.equals(this.nombreTipoNotificacion, notificacionItem.nombreTipoNotificacion);
+				&& Objects.equals(this.nombreTipoNotificacion, notificacionItem.nombreTipoNotificacion)
+				&& Objects.equals(this.descripcionMedida, notificacionItem.descripcionMedida)
+				&& Objects.equals(this.descripcionAntes, notificacionItem.descripcionAntes);
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(idNotificacion, idTipoNotificacion, idCalendario, idInstitucion, idUnidadMedida, usuModificacion, fechaModificacion, fechaBaja,
-				idEvento, idPlantilla, nombrePlantilla, cuando, idTipoCuando, tipoEnvio, idTipoEnvio, nombreTipoNotificacion);
+				idEvento, idPlantilla, nombrePlantilla, cuando, idTipoCuando, tipoEnvio, idTipoEnvio, nombreTipoNotificacion, descripcionMedida, descripcionAntes);
 	}
 
 	@Override
@@ -368,6 +405,8 @@ public class NotificacionEventoItem {
 		sb.append("    tipoEnvio: ").append(toIndentedString(tipoEnvio)).append("\n");
 		sb.append("    idTipoEnvio: ").append(toIndentedString(idTipoEnvio)).append("\n");
 		sb.append("    nombreTipoNotificacion: ").append(toIndentedString(nombreTipoNotificacion)).append("\n");
+		sb.append("    descripcionMedida: ").append(toIndentedString(descripcionMedida)).append("\n");
+		sb.append("    descripcionAntes: ").append(toIndentedString(descripcionAntes)).append("\n");
 		sb.append("}");
 		return sb.toString();
 	}

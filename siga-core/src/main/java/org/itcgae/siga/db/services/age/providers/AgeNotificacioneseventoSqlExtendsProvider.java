@@ -96,6 +96,8 @@ public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificaciones
 		sql.SELECT("noti.IDTIPOCUANDO");
 		sql.SELECT("rec3.DESCRIPCION as nombretiponotificacion");
 		sql.SELECT("noti.IDNOTIFICACIONEVENTO");
+		sql.SELECT("rec4.DESCRIPCION as DESCRIPCIONMEDIDA");
+		sql.SELECT("rec2.DESCRIPCION as DESCRIPCIONANTES");
 		sql.FROM("AGE_NOTIFICACIONESEVENTO noti");
 		sql.INNER_JOIN(
 				"ENV_PLANTILLASENVIOS plantilla on (noti.idplantilla = plantilla.idplantillaenvios and noti.idinstitucion = plantilla.idinstitucion)");
@@ -137,6 +139,8 @@ public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificaciones
 		sql.SELECT("rec3.DESCRIPCION as nombretiponotificacion");
 		sql.SELECT("noti.IDNOTIFICACIONEVENTO");
 		sql.SELECT("noti.fechabaja");
+		sql.SELECT("rec4.DESCRIPCION as DESCRIPCIONMEDIDA");
+		sql.SELECT("rec2.DESCRIPCION as DESCRIPCIONANTES");
 		sql.FROM("AGE_NOTIFICACIONESEVENTO noti");
 		sql.INNER_JOIN(
 				"ENV_PLANTILLASENVIOS plantilla on (noti.idplantilla = plantilla.idplantillaenvios and noti.idinstitucion = plantilla.idinstitucion)");

@@ -39,6 +39,7 @@ import org.itcgae.siga.db.services.age.mappers.EnvTipoenviosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DatosNotificacionesServiceImpl implements IDatosNotificacionesService {
@@ -194,10 +195,9 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 	@Override
 	public InsertResponseDTO saveNotification(NotificacionEventoItem notificacionEventoItem,
 			HttpServletRequest request) {
-		
-		LOGGER.info(
-				"saveNotification() -> Entrada al servicio para guardar una notificaciones de un evento");
-		
+
+		LOGGER.info("saveNotification() -> Entrada al servicio para guardar una notificaciones de un evento");
+
 		int response = 0;
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -278,10 +278,9 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 				}
 			}
 		}
-		
-		LOGGER.info(
-				"saveNotification() -> Salida del servicio para guardar una notificaciones de un evento");
-		
+
+		LOGGER.info("saveNotification() -> Salida del servicio para guardar una notificaciones de un evento");
+
 		insertResponseDTO.setError(error);
 		return insertResponseDTO;
 	}
@@ -309,8 +308,8 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 					calendar.add(Calendar.HOUR, -valor.intValue());
 				} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_MINUTOS) {
 					calendar.add(Calendar.MINUTE, -valor.intValue());
-				} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_SEGUNDOS) {
-					calendar.add(Calendar.SECOND, -valor.intValue());
+				} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_DIAS) {
+					calendar.add(Calendar.DAY_OF_YEAR, -valor.intValue());
 				}
 
 			} else if (ageNotificacionEventoInsert.getIdtipocuando() == SigaConstants.NOTIFICACION_TIPOCUANDO_DESPUES) {
@@ -319,8 +318,8 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 					calendar.add(Calendar.HOUR, valor.intValue());
 				} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_MINUTOS) {
 					calendar.add(Calendar.MINUTE, valor.intValue());
-				} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_SEGUNDOS) {
-					calendar.add(Calendar.SECOND, valor.intValue());
+				} else if (ageNotificacionEventoInsert.getIdunidadmedida() == SigaConstants.NOTIFICACION_DIAS) {
+					calendar.add(Calendar.DAY_OF_YEAR, valor.intValue());
 				}
 			}
 		}
@@ -405,8 +404,10 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 		return comboDTO;
 	}
 
+	@Transactional
 	@Override
-	public UpdateResponseDTO updateNotification(NotificacionEventoItem notificacionUpdate, HttpServletRequest request) {
+	public UpdateResponseDTO updateNotification(NotificacionEventoDTO notificacionEventoDTO,
+			HttpServletRequest request) {
 
 		LOGGER.info("updateNotification() -> Entrada al servicio para modificar las notificaciones de eventos");
 
@@ -431,46 +432,53 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
-				AgeNotificacioneseventoExample exampleNotificacion = new AgeNotificacioneseventoExample();
-				exampleNotificacion.createCriteria()
-						.andIdnotificacioneventoEqualTo(Long.valueOf(notificacionUpdate.getIdNotificacion()))
-						.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				try {
+					for (NotificacionEventoItem notificacionUpdate : notificacionEventoDTO
+							.getEventNotificationItems()) {
 
-				LOGGER.info(
-						"updateNotification() / ageNotificacioneseventoMapper.selectByExample(exampleNotificacion) -> Entrada a ageNotificacioneseventoMapper para buscar si existe la notificacion");
+						AgeNotificacioneseventoExample exampleNotificacion = new AgeNotificacioneseventoExample();
+						exampleNotificacion.createCriteria()
+								.andIdnotificacioneventoEqualTo(Long.valueOf(notificacionUpdate.getIdNotificacion()))
+								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-				List<AgeNotificacionesevento> notificationList = ageNotificacioneseventoExtendsMapper
-						.selectByExample(exampleNotificacion);
+						LOGGER.info(
+								"updateNotification() / ageNotificacioneseventoMapper.selectByExample(exampleNotificacion) -> Entrada a ageNotificacioneseventoMapper para buscar si existe la notificacion");
 
-				LOGGER.info(
-						"updateNotification() / ageNotificacioneseventoMapper.selectByExample(exampleNotificacion) -> Salida a ageNotificacioneseventoMapper para buscar si existe la notificacion");
+						List<AgeNotificacionesevento> notificationList = ageNotificacioneseventoExtendsMapper
+								.selectByExample(exampleNotificacion);
 
-				if (null != notificationList && notificationList.size() > 0) {
-					AgeNotificacionesevento notification = notificationList.get(0);
+						LOGGER.info(
+								"updateNotification() / ageNotificacioneseventoMapper.selectByExample(exampleNotificacion) -> Salida a ageNotificacioneseventoMapper para buscar si existe la notificacion");
 
-					LOGGER.info(
-							"updateNotification() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Entrada a ageCalendarioExtendsMapper para modificar la notificacion");
+						if (null != notificationList && notificationList.size() > 0) {
+							AgeNotificacionesevento notification = notificationList.get(0);
 
-					notification.setFechamodificacion(new Date());
-					notification.setUsumodificacion(usuario.getIdusuario().longValue());
-					notification.setIdplantilla(Long.valueOf(notificacionUpdate.getIdPlantilla()));
-					notification.setIdtiponotificacionevento(Long.valueOf(notificacionUpdate.getIdTipoNotificacion()));
-					notification.setCuando(Long.valueOf(notificacionUpdate.getCuando()));
-					notification.setIdtipocuando(Long.valueOf(notificacionUpdate.getIdTipoCuando()));
-					notification.setIdunidadmedida(Long.valueOf(notificacionUpdate.getIdUnidadMedida()));
-					response = ageNotificacioneseventoExtendsMapper.updateByPrimaryKey(notification);
+							LOGGER.info(
+									"updateNotification() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Entrada a ageCalendarioExtendsMapper para modificar la notificacion");
 
-					LOGGER.info(
-							"updateNotification() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Salida a ageCalendarioExtendsMapper para modificar la notificacion");
+							notification.setFechamodificacion(new Date());
+							notification.setUsumodificacion(usuario.getIdusuario().longValue());
+							notification.setIdplantilla(Long.valueOf(notificacionUpdate.getIdPlantilla()));
+							notification.setIdtipoenvios(Long.valueOf(notificacionUpdate.getIdTipoEnvio()));
+							notification.setIdtiponotificacionevento(
+									Long.valueOf(notificacionUpdate.getIdTipoNotificacion()));
+							notification.setCuando(Long.valueOf(notificacionUpdate.getCuando()));
+							notification.setIdtipocuando(Long.valueOf(notificacionUpdate.getIdTipoCuando()));
+							notification.setIdunidadmedida(Long.valueOf(notificacionUpdate.getIdUnidadMedida()));
+							response = ageNotificacioneseventoExtendsMapper.updateByPrimaryKey(notification);
 
-					
-					response = checkGenerationDateNotification(notification, usuario);
-				}
+							LOGGER.info(
+									"updateNotification() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Salida a ageCalendarioExtendsMapper para modificar la notificacion");
 
-				if (response == 0) {
+							response = checkGenerationDateNotification(notification, usuario);
+						}
+					}
+				} catch (Exception e) {
 					error.setCode(400);
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-				} else {
+				}
+
+				if (response != 0) {
 					error.setCode(200);
 				}
 			}
@@ -484,40 +492,39 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 	@Override
 	public int checkGenerationDateNotification(AgeNotificacionesevento notification, AdmUsuarios usuario) {
-		
+
 		int response = 2;
 		AgeGeneracionnotificacionesExample ageGeneracionnotificacionesExample = new AgeGeneracionnotificacionesExample();
-		ageGeneracionnotificacionesExample.createCriteria()
-		.andIdeventoEqualTo(notification.getIdevento())
-		.andIdnotificacioneventoEqualTo(notification.getIdnotificacionevento())
-		.andIdinstitucionEqualTo(notification.getIdinstitucion());
-		
+		ageGeneracionnotificacionesExample.createCriteria().andIdeventoEqualTo(notification.getIdevento())
+				.andIdnotificacioneventoEqualTo(notification.getIdnotificacionevento())
+				.andIdinstitucionEqualTo(notification.getIdinstitucion());
+
 		LOGGER.info(
 				"checkGenerationDateNotification() / ageGeneracionnotificacionesMapper.selectByPrimaryKey() -> Entrada a ageGeneracionnotificacionesMapper para obtener la generacion de las notificaciones de un evento");
 
-		List<AgeGeneracionnotificaciones> ageGeneracionnotificacionesList = ageGeneracionnotificacionesMapper.selectByExample(ageGeneracionnotificacionesExample);
+		List<AgeGeneracionnotificaciones> ageGeneracionnotificacionesList = ageGeneracionnotificacionesMapper
+				.selectByExample(ageGeneracionnotificacionesExample);
 
 		LOGGER.info(
 				"checkGenerationDateNotification() / ageGeneracionnotificacionesMapper.selectByPrimaryKey() -> Salida a ageGeneracionnotificacionesMapper para obtener la generacion de las notificaciones de un evento");
-		
+
 		if (null != ageGeneracionnotificacionesList && ageGeneracionnotificacionesList.size() > 0) {
 			AgeGeneracionnotificaciones ageGeneracionNotificacion = ageGeneracionnotificacionesList.get(0);
 			Date fechaGeneracionNotificacion = generateNotificationDate(notification);
-			
-			if(ageGeneracionNotificacion.getFechageneracionnotificacion() != fechaGeneracionNotificacion) {
-				
+
+			if (ageGeneracionNotificacion.getFechageneracionnotificacion() != fechaGeneracionNotificacion) {
+
 				ageGeneracionNotificacion.setFechageneracionnotificacion(fechaGeneracionNotificacion);
 				ageGeneracionNotificacion.setFechamodificacion(new Date());
 				ageGeneracionNotificacion.setUsumodificacion(usuario.getIdusuario().longValue());
-				
+
 				response = ageGeneracionnotificacionesMapper.updateByPrimaryKeySelective(ageGeneracionNotificacion);
 			}
 		}
-		
-		
+
 		return response;
 	}
-	
+
 	@Override
 	public NotificacionEventoDTO getCalendarNotifications(String idCalendario, HttpServletRequest request) {
 		LOGGER.info(
@@ -658,18 +665,20 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 						LOGGER.info(
 								"deleteNotification() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Salida a ageCalendarioExtendsMapper para dar de baja a notificacion");
 
-						//Eliminamos la generacion de la notificacion que eliminamos
+						// Eliminamos la generacion de la notificacion que eliminamos
 						AgeGeneracionnotificacionesExample ageGeneracionnotificacionesExample = new AgeGeneracionnotificacionesExample();
 						ageGeneracionnotificacionesExample.createCriteria()
-						.andIdnotificacioneventoEqualTo(notification.getIdnotificacionevento())
-						.andIdeventoEqualTo(notification.getIdevento());
-						
-						List<AgeGeneracionnotificaciones> ageGeneracionnotificacionesList = ageGeneracionnotificacionesMapper.selectByExample(ageGeneracionnotificacionesExample);  
-					
+								.andIdnotificacioneventoEqualTo(notification.getIdnotificacionevento())
+								.andIdeventoEqualTo(notification.getIdevento());
+
+						List<AgeGeneracionnotificaciones> ageGeneracionnotificacionesList = ageGeneracionnotificacionesMapper
+								.selectByExample(ageGeneracionnotificacionesExample);
+
 						if (null != ageGeneracionnotificacionesList && ageGeneracionnotificacionesList.size() > 0) {
-							
-							AgeGeneracionnotificaciones ageGeneracionnotificacion = ageGeneracionnotificacionesList.get(0);
-							
+
+							AgeGeneracionnotificaciones ageGeneracionnotificacion = ageGeneracionnotificacionesList
+									.get(0);
+
 							ageGeneracionnotificacion.setUsumodificacion(usuario.getIdusuario().longValue());
 							ageGeneracionnotificacion.setFechamodificacion(new Date());
 							ageGeneracionnotificacion.setFechabaja(new Date());
@@ -677,13 +686,14 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 							LOGGER.info(
 									"deleteNotification() / ageGeneracionnotificacionesMapper.updateByPrimaryKeySelective(ageGeneracionnotificaciones) -> Entrada a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
 
-							response = ageGeneracionnotificacionesMapper.updateByPrimaryKeySelective(ageGeneracionnotificacion);
-							
+							response = ageGeneracionnotificacionesMapper
+									.updateByPrimaryKeySelective(ageGeneracionnotificacion);
+
 							LOGGER.info(
 									"deleteNotification() / ageGeneracionnotificacionesMapper.updateByPrimaryKeySelective(ageGeneracionnotificaciones) -> Salida a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
 
 						}
-						
+
 						if (response == 0) {
 							error.setCode(400);
 							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
@@ -700,6 +710,55 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 		updateResponseDTO.setError(error);
 		return updateResponseDTO;
+	}
+
+	@Override
+	public ComboDTO getPlantillas(HttpServletRequest request) {
+		LOGGER.info(
+				"getPlantillas() -> Entrada al servicio para obtener las plantillas de las notificaciones de eventos");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getPlantillas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getPlantillas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+
+				LOGGER.info(
+						"getPlantillas() / envPlantillasenviosExtendsMapper.getPlantillas() -> Entrada a envPlantillasenviosExtendsMapper para obtener las plantillas de notificaciones");
+
+				comboItems = envPlantillasenviosExtendsMapper.getPlantillas(idInstitucion.toString());
+
+				LOGGER.info(
+						"getPlantillas() / envPlantillasenviosExtendsMapper.getPlantillas() -> Salida de envPlantillasenviosExtendsMapper para obtener las plantillas de notificaciones");
+
+			}
+		}
+
+		comboDTO.setCombooItems(comboItems);
+
+		LOGGER.info(
+				"getPlantillas() -> Salida del servicio para obtener las plantillas de las notificaciones de eventos");
+
+		return comboDTO;
 	}
 
 }

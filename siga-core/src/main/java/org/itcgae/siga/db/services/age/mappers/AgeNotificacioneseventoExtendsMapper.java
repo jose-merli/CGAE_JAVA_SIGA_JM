@@ -67,6 +67,8 @@ public interface AgeNotificacioneseventoExtendsMapper extends AgeNotificacionese
 		@Result(column = "IDUNIDADMEDIDA", property = "idUnidadMedida", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCIONCUANDO", property = "descripcionCuando", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCIONMEDIDA", property = "descripcionMedida", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCIONANTES", property = "descripcionAntes", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOCUANDO", property = "idTipoCuando", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBRETIPONOTIFICACION", property = "nombreTipoNotificacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDNOTIFICACIONEVENTO", property = "idNotificacion", jdbcType = JdbcType.VARCHAR)
@@ -86,6 +88,8 @@ public interface AgeNotificacioneseventoExtendsMapper extends AgeNotificacionese
 		@Result(column = "IDUNIDADMEDIDA", property = "idUnidadMedida", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "IDTIPOENVIOS", property = "idTipoEnvios", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "DESCRIPCIONCUANDO", property = "descripcionCuando", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCIONMEDIDA", property = "descripcionMedida", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCIONANTES", property = "descripcionAntes", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOCUANDO", property = "idTipoCuando", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBRETIPONOTIFICACION", property = "nombreTipoNotificacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDNOTIFICACIONEVENTO", property = "idNotificacion", jdbcType = JdbcType.VARCHAR),
