@@ -17,6 +17,7 @@ public class ModModeloPerfilesExtendsSqlProvider {
 		
 		sql.WHERE("modeloPerfil.IDINSTITUCION = " + idInstitucion);
 		sql.WHERE("modeloPerfil.IDMODELOCOMUNICACION = " + idModeloComunicacion);
+		sql.ORDER_BY("admPerfil.DESCRIPCION ASC");
 		
 		return sql.toString();
 	}
