@@ -1655,7 +1655,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				AdmUsuarios usuario = usuarios.get(0);
 				LOGGER.info(
 						"getServicesCourse() / forTiposervicioExtendsMapper.getServiceType -> Entrada a forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según la institucion");
-				comboItems = forTiposervicioExtendsMapper.getServicesCourse(idInstitucion.toString(),
+				comboItems = pysServiciosExtendsMapper.getServicesCourse(idInstitucion.toString(),
 						usuario.getIdlenguaje());
 				LOGGER.info(
 						"getServicesCourse() / forTiposervicioExtendsMapper.getServiceType -> Salida de forTiposervicioExtendsMapper para obtener los tipo de servicio de un curso según la institucion");
