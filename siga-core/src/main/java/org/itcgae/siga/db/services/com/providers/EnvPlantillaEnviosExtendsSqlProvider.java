@@ -39,7 +39,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 		
 		sql.FROM("ENV_PLANTILLASENVIOS");
 		
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "' AND ANTIGUA = 'N'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "' AND ANTIGUA = 'N' AND FECHABAJA is NULL");
 		sql.WHERE("IDTIPOENVIOS = '" + idTipoEnvio + "'");
 		
 		return sql.toString();
@@ -53,7 +53,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 		
 		sql.FROM("ENV_PLANTILLASENVIOS");
 		
-		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "' AND ANTIGUA = 'N'");
+		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "' AND ANTIGUA = 'N' AND FECHABAJA is NULL");
 		sql.ORDER_BY("NOMBRE");
 		
 		return sql.toString();
