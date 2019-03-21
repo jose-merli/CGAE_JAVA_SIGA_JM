@@ -85,4 +85,10 @@ public class FichaCalendarioController {
 		UpdateResponseDTO response = datosNotificacionesService.deleteNotification(notificacionDTO, request);
 		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "fichaCalendario/getNotificationTypeCalendarTraining",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getNotificationTypeCalendarTraining(HttpServletRequest request) {
+		ComboDTO response = datosNotificacionesService.getNotificationTypeCalendarTraining(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 }

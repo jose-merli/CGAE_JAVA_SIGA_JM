@@ -21,6 +21,8 @@ public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificaciones
 		sql.SELECT("noti.IDTIPOCUANDO");
 		sql.SELECT("rec3.DESCRIPCION as nombretiponotificacion");
 		sql.SELECT("noti.IDNOTIFICACIONEVENTO");
+		sql.SELECT("rec4.DESCRIPCION as DESCRIPCIONMEDIDA");
+		sql.SELECT("rec2.DESCRIPCION as DESCRIPCIONANTES");
 		sql.FROM("AGE_NOTIFICACIONESEVENTO noti");
 		sql.INNER_JOIN(
 				"ENV_PLANTILLASENVIOS plantilla on (noti.idplantilla = plantilla.idplantillaenvios and noti.idinstitucion = plantilla.idinstitucion)");
@@ -40,11 +42,13 @@ public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificaciones
 		sql.WHERE("noti.FECHABAJA is NULL");
 		sql.WHERE("noti.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("noti.idcalendario = '" + idCalendario + "'");
+		sql.ORDER_BY("noti.IDTIPONOTIFICACIONEVENTO");
+
 
 		return sql.toString();
 	}
 	
-	public String getHistoricCalendarNotifications(String idCalendario, String idInstitucion) {
+	public String getHistoricCalendarNotifications(String idCalendario, String idInstitucion, String idLenguaje) {
 		SQL sql = new SQL();
 
 		sql.SELECT_DISTINCT("noti.idevento");
@@ -61,21 +65,29 @@ public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificaciones
 		sql.SELECT("tiponotificacion.DESCRIPCION as nombretiponotificacion");
 		sql.SELECT("noti.IDNOTIFICACIONEVENTO");
 		sql.SELECT("noti.fechabaja");
+		sql.SELECT("rec3.DESCRIPCION as nombretiponotificacion");
+		sql.SELECT("rec4.DESCRIPCION as DESCRIPCIONMEDIDA");
+		sql.SELECT("rec2.DESCRIPCION as DESCRIPCIONANTES");
 		sql.FROM("AGE_NOTIFICACIONESEVENTO noti");
 		sql.INNER_JOIN(
 				"ENV_PLANTILLASENVIOS plantilla on (noti.idplantilla = plantilla.idplantillaenvios and noti.idinstitucion = plantilla.idinstitucion)");
 		sql.INNER_JOIN(
 				"ENV_TIPOENVIOS tipo on (plantilla.IDTIPOENVIOS = tipo.IDTIPOENVIOS) and noti.IDTIPOENVIOS = plantilla.IDTIPOENVIOS");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tipo.NOMBRE AND rec.IDLENGUAJE = '1') ");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tipo.NOMBRE AND rec.IDLENGUAJE = '" +idLenguaje + "') ");
 		sql.INNER_JOIN("AGE_UNIDADMEDIDA uni on (uni.IDUNIDADMEDIDA = noti.IDUNIDADMEDIDA)");
 		sql.INNER_JOIN("AGE_TIPOCUANDO tipocuando on (noti.IDTIPOCUANDO = tipocuando.IDTIPOCUANDO)");
 		sql.INNER_JOIN(
 				"AGE_TIPONOTIFICACIONEVENTO  tiponotificacion ON (tiponotificacion.IDTIPONOTIFICACIONEVENTO = noti.IDTIPONOTIFICACIONEVENTO)");
 		sql.INNER_JOIN(
-				"GEN_RECURSOS_CATALOGOS rec2 ON (rec2.IDRECURSO = tipocuando.DESCRIPCION AND rec2.IDLENGUAJE = '1')");
+				"GEN_RECURSOS_CATALOGOS rec2 ON (rec2.IDRECURSO = tipocuando.DESCRIPCION AND rec2.IDLENGUAJE = '" +idLenguaje + "')");
+		sql.INNER_JOIN(
+				"GEN_RECURSOS_CATALOGOS rec3 ON (rec3.IDRECURSO = tiponotificacion.DESCRIPCION AND rec3.IDLENGUAJE = '"+idLenguaje+"')");
+		sql.INNER_JOIN(
+				"GEN_RECURSOS_CATALOGOS rec4 ON (rec4.IDRECURSO = uni.DESCRIPCION AND rec4.IDLENGUAJE = '"+idLenguaje+"')");
+	
 		sql.WHERE("noti.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("noti.idcalendario = '" + idCalendario + "'");
-		sql.ORDER_BY("noti.fechabaja");
+		sql.ORDER_BY("noti.IDTIPONOTIFICACIONEVENTO");
 
 		return sql.toString();
 	}
@@ -118,6 +130,7 @@ public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificaciones
 		sql.WHERE("noti.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("noti.idevento = '" + idEvento + "'");
 		sql.WHERE("noti.idcalendario is NULL");
+		sql.ORDER_BY("noti.IDTIPONOTIFICACIONEVENTO");
 
 		return sql.toString();
 	}
@@ -157,9 +170,11 @@ public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificaciones
 				"GEN_RECURSOS_CATALOGOS rec3 ON (rec3.IDRECURSO = tiponotificacion.DESCRIPCION AND rec3.IDLENGUAJE = '"+idLenguaje+"')");
 		sql.INNER_JOIN(
 				"GEN_RECURSOS_CATALOGOS rec4 ON (rec4.IDRECURSO = uni.DESCRIPCION AND rec4.IDLENGUAJE = '"+idLenguaje+"')");
+		
 		sql.WHERE("noti.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("noti.idevento = '" + idEvento + "'");
 		sql.WHERE("noti.idcalendario is NULL");
+		sql.ORDER_BY("noti.IDTIPONOTIFICACIONEVENTO");
 
 		return sql.toString();
 	}

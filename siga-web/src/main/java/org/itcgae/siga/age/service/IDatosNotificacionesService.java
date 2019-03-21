@@ -40,5 +40,8 @@ public interface IDatosNotificacionesService {
 	public Date generateNotificationDate(AgeNotificacionesevento ageNotificacionEventoInsert);
 	
 	public ComboDTO getPlantillas(HttpServletRequest request);
+	
+	public ComboDTO getNotificationTypeCalendarTraining(HttpServletRequest request);
+
 
 }

@@ -629,11 +629,43 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		LOGGER.info(
 				"generateNotificationsEvents() / ageEventoExtendsMapper.selectMaxEvent() -> Salida a ageEventoExtendsMapper para obtener idEvento del evento insertado");
 		String idEvento = eventos.get(0).getValue();
-
 		AgeNotificacioneseventoExample exampleCalendarNotification = new AgeNotificacioneseventoExample();
-		exampleCalendarNotification.createCriteria().andIdcalendarioEqualTo(Long.valueOf(idCalendario))
-				.andIdinstitucionEqualTo(idInstitucion);
 
+		//Comprobamos que tipo de evento es para vincular las notificaciones
+		if(eventoItem.getIdTipoCalendario().equals(String.valueOf(SigaConstants.CALENDARIO_LABORAL)) ||
+				eventoItem.getIdTipoCalendario().equals(String.valueOf(SigaConstants.CALENDARIO_GENERAL))) {
+			
+			exampleCalendarNotification.createCriteria().andIdcalendarioEqualTo(Long.valueOf(idCalendario))
+			.andIdinstitucionEqualTo(idInstitucion);
+			
+		}else if(eventoItem.getIdTipoCalendario().equals(String.valueOf(SigaConstants.CALENDARIO_FORMACION))
+				&& eventoItem.getIdTipoEvento().equals(String.valueOf(SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION))){
+			
+			exampleCalendarNotification.createCriteria().andIdcalendarioEqualTo(Long.valueOf(idCalendario))
+			.andIdtiponotificacioneventoEqualTo(SigaConstants.TIPO_NOTIFICACION_FININSCRIPCION)
+			.andIdinstitucionEqualTo(idInstitucion);
+			
+		}else if(eventoItem.getIdTipoCalendario().equals(String.valueOf(SigaConstants.CALENDARIO_FORMACION))
+				&& eventoItem.getIdTipoEvento().equals(String.valueOf(SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION))) {
+			
+			exampleCalendarNotification.createCriteria().andIdcalendarioEqualTo(Long.valueOf(idCalendario))
+			.andIdtiponotificacioneventoEqualTo(SigaConstants.TIPO_NOTIFICACION_INICIOINSCRIPCION)
+			.andIdinstitucionEqualTo(idInstitucion);
+			
+		}else if(eventoItem.getIdTipoCalendario().equals(String.valueOf(SigaConstants.CALENDARIO_FORMACION))
+				&& eventoItem.getIdTipoEvento().equals(String.valueOf(SigaConstants.TIPO_EVENTO_SESION))) {
+			
+			exampleCalendarNotification.createCriteria().andIdcalendarioEqualTo(Long.valueOf(idCalendario))
+			.andIdtiponotificacioneventoEqualTo(SigaConstants.TIPO_NOTIFICACION_SESION)
+			.andIdinstitucionEqualTo(idInstitucion);
+			
+		}else {
+			
+			exampleCalendarNotification.createCriteria().andIdcalendarioEqualTo(Long.valueOf(idCalendario))
+			.andIdinstitucionEqualTo(idInstitucion);
+		}
+
+	
 		// Obtenemos las notificaciones del calendario al que pertenece el evento
 		LOGGER.info(
 				"generateNotificationsEvents() / ageEventoExtendsMapper.selectByExample(exampleEvent) -> Entrada a ageNotificacioneseventoMapper para buscar si existe el evento");
