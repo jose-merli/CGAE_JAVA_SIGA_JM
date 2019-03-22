@@ -62,7 +62,6 @@ public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificaciones
 		sql.SELECT("noti.cuando || ' ' || uni.DESCRIPCION || ' ' || rec2.DESCRIPCION as descripcioncuando");
 		sql.SELECT("noti.cuando");
 		sql.SELECT("noti.IDTIPOCUANDO");
-		sql.SELECT("tiponotificacion.DESCRIPCION as nombretiponotificacion");
 		sql.SELECT("noti.IDNOTIFICACIONEVENTO");
 		sql.SELECT("noti.fechabaja");
 		sql.SELECT("rec3.DESCRIPCION as nombretiponotificacion");
