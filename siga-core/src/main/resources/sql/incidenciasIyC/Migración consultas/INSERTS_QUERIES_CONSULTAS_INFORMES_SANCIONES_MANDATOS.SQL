@@ -230,6 +230,7 @@ INSERT INTO CON_CONSULTA
 	   to_clob('<SELECT>Select Per.Nombre As \"nombre\",
 	       Trim(Per.Apellidos1 || '' '' || Per.Apellidos2) As \"apellidos\",
 	       Col.Ncolegiado As \"numcol\",
+		   Col.Idpersona As "IDPERSONA",
 	       --ini obligatorio por ser consulta destinatarios
 	       Cen_Direcciones.Domicilio As \"DOMICILIO\",
 	       Cen_Direcciones.Codigopostal As \"CODIGOPOSTAL\",
@@ -299,6 +300,7 @@ INSERT INTO CON_CONSULTA
 	   to_clob('<SELECT>Select Per.Nombre As \"nombre\",
 	       Trim(Per.Apellidos1 || '' '' || Per.Apellidos2) As \"apellidos\",
 	       Col.Ncolegiado As \"numcol\",
+		   Col.Idpersona As "IDPERSONA",
 	       --ini obligatorio por ser consulta destinatarios
 	       Cen_Direcciones.Domicilio As \"DOMICILIO\",
 	       Cen_Direcciones.Codigopostal As \"CODIGOPOSTAL\",
@@ -365,6 +367,7 @@ INSERT INTO CON_CONSULTA
 	   to_clob('<SELECT>Select Per.Nombre As \"nombre\",
 	       Trim(Per.Apellidos1 || '' '' || Per.Apellidos2) As \"apellidos\",
 	       Col.Ncolegiado As \"numcol\",
+		   Col.Idpersona As "IDPERSONA",
 	       --ini obligatorio por ser consulta destinatarios
 	       Cen_Direcciones.Domicilio As \"DOMICILIO\",
 	       Cen_Direcciones.Codigopostal As \"CODIGOPOSTAL\",
