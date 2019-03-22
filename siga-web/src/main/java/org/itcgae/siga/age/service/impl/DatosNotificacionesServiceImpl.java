@@ -238,7 +238,10 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 				ageNotificacionEventoInsert
 						.setIdunidadmedida(Long.parseLong(notificacionEventoItem.getIdUnidadMedida()));
 				ageNotificacionEventoInsert.setIdplantilla(Long.valueOf(notificacionEventoItem.getIdPlantilla()));
-				ageNotificacionEventoInsert.setIdtipoenvios(Long.parseLong(notificacionEventoItem.getIdTipoEnvio()));
+				if (notificacionEventoItem.getIdTipoEnvio() != null) {
+					ageNotificacionEventoInsert
+							.setIdtipoenvios(Long.parseLong(notificacionEventoItem.getIdTipoEnvio()));
+				}
 				ageNotificacionEventoInsert.setFechabaja(null);
 
 				LOGGER.info(
@@ -463,7 +466,11 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 							notification.setFechamodificacion(new Date());
 							notification.setUsumodificacion(usuario.getIdusuario().longValue());
 							notification.setIdplantilla(Long.valueOf(notificacionUpdate.getIdPlantilla()));
-							notification.setIdtipoenvios(Long.valueOf(notificacionUpdate.getIdTipoEnvio()));
+							if (notificacionUpdate.getIdTipoEnvio() != null) {
+								notification.setIdtipoenvios(Long.valueOf(notificacionUpdate.getIdTipoEnvio()));
+							}else {
+								notification.setIdtipoenvios(null);
+							}
 							notification.setIdtiponotificacionevento(
 									Long.valueOf(notificacionUpdate.getIdTipoNotificacion()));
 							notification.setCuando(Long.valueOf(notificacionUpdate.getCuando()));

@@ -24,11 +24,11 @@ public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificaciones
 		sql.SELECT("rec4.DESCRIPCION as DESCRIPCIONMEDIDA");
 		sql.SELECT("rec2.DESCRIPCION as DESCRIPCIONANTES");
 		sql.FROM("AGE_NOTIFICACIONESEVENTO noti");
-		sql.INNER_JOIN(
-				"ENV_PLANTILLASENVIOS plantilla on (noti.idplantilla = plantilla.idplantillaenvios and noti.idinstitucion = plantilla.idinstitucion)");
-		sql.INNER_JOIN(
-				"ENV_TIPOENVIOS tipo on (plantilla.IDTIPOENVIOS = tipo.IDTIPOENVIOS) and noti.IDTIPOENVIOS = plantilla.IDTIPOENVIOS");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tipo.NOMBRE AND rec.IDLENGUAJE = '"+idLenguaje+"') ");
+		sql.LEFT_OUTER_JOIN(
+				"ENV_PLANTILLASENVIOS plantilla on (noti.idplantilla = plantilla.idplantillaenvios and noti.idinstitucion = plantilla.idinstitucion and noti.IDTIPOENVIOS = plantilla.IDTIPOENVIOS)");
+		sql.LEFT_OUTER_JOIN(
+				"ENV_TIPOENVIOS tipo on (plantilla.IDTIPOENVIOS = tipo.IDTIPOENVIOS)");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tipo.NOMBRE AND rec.IDLENGUAJE = '"+idLenguaje+"') ");
 		sql.INNER_JOIN("AGE_UNIDADMEDIDA uni on (uni.IDUNIDADMEDIDA = noti.IDUNIDADMEDIDA)");
 		sql.INNER_JOIN("AGE_TIPOCUANDO tipocuando on (noti.IDTIPOCUANDO = tipocuando.IDTIPOCUANDO)");
 		sql.INNER_JOIN(
@@ -69,11 +69,11 @@ public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificaciones
 		sql.SELECT("rec4.DESCRIPCION as DESCRIPCIONMEDIDA");
 		sql.SELECT("rec2.DESCRIPCION as DESCRIPCIONANTES");
 		sql.FROM("AGE_NOTIFICACIONESEVENTO noti");
-		sql.INNER_JOIN(
-				"ENV_PLANTILLASENVIOS plantilla on (noti.idplantilla = plantilla.idplantillaenvios and noti.idinstitucion = plantilla.idinstitucion)");
-		sql.INNER_JOIN(
-				"ENV_TIPOENVIOS tipo on (plantilla.IDTIPOENVIOS = tipo.IDTIPOENVIOS) and noti.IDTIPOENVIOS = plantilla.IDTIPOENVIOS");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tipo.NOMBRE AND rec.IDLENGUAJE = '" +idLenguaje + "') ");
+		sql.LEFT_OUTER_JOIN(
+				"ENV_PLANTILLASENVIOS plantilla on (noti.idplantilla = plantilla.idplantillaenvios and noti.idinstitucion = plantilla.idinstitucion and noti.IDTIPOENVIOS = plantilla.IDTIPOENVIOS)");
+		sql.LEFT_OUTER_JOIN(
+				"ENV_TIPOENVIOS tipo on (plantilla.IDTIPOENVIOS = tipo.IDTIPOENVIOS)");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tipo.NOMBRE AND rec.IDLENGUAJE = '" +idLenguaje + "') ");
 		sql.INNER_JOIN("AGE_UNIDADMEDIDA uni on (uni.IDUNIDADMEDIDA = noti.IDUNIDADMEDIDA)");
 		sql.INNER_JOIN("AGE_TIPOCUANDO tipocuando on (noti.IDTIPOCUANDO = tipocuando.IDTIPOCUANDO)");
 		sql.INNER_JOIN(
@@ -111,11 +111,11 @@ public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificaciones
 		sql.SELECT("rec4.DESCRIPCION as DESCRIPCIONMEDIDA");
 		sql.SELECT("rec2.DESCRIPCION as DESCRIPCIONANTES");
 		sql.FROM("AGE_NOTIFICACIONESEVENTO noti");
-		sql.INNER_JOIN(
-				"ENV_PLANTILLASENVIOS plantilla on (noti.idplantilla = plantilla.idplantillaenvios and noti.idinstitucion = plantilla.idinstitucion)");
-		sql.INNER_JOIN(
-				"ENV_TIPOENVIOS tipo on (plantilla.IDTIPOENVIOS = tipo.IDTIPOENVIOS) and noti.IDTIPOENVIOS = plantilla.IDTIPOENVIOS");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tipo.NOMBRE AND rec.IDLENGUAJE = '"+idLenguaje+"') ");
+		sql.LEFT_OUTER_JOIN(
+				"ENV_PLANTILLASENVIOS plantilla on (noti.idplantilla = plantilla.idplantillaenvios and noti.idinstitucion = plantilla.idinstitucion and noti.IDTIPOENVIOS = plantilla.IDTIPOENVIOS)");
+		sql.LEFT_OUTER_JOIN(
+				"ENV_TIPOENVIOS tipo on (plantilla.IDTIPOENVIOS = tipo.IDTIPOENVIOS)");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tipo.NOMBRE AND rec.IDLENGUAJE = '"+idLenguaje+"') ");
 		sql.INNER_JOIN("AGE_UNIDADMEDIDA uni on (uni.IDUNIDADMEDIDA = noti.IDUNIDADMEDIDA)");
 		sql.INNER_JOIN("AGE_TIPOCUANDO tipocuando on (noti.IDTIPOCUANDO = tipocuando.IDTIPOCUANDO)");
 		sql.INNER_JOIN(
@@ -155,11 +155,11 @@ public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificaciones
 		sql.SELECT("rec4.DESCRIPCION as DESCRIPCIONMEDIDA");
 		sql.SELECT("rec2.DESCRIPCION as DESCRIPCIONANTES");
 		sql.FROM("AGE_NOTIFICACIONESEVENTO noti");
-		sql.INNER_JOIN(
-				"ENV_PLANTILLASENVIOS plantilla on (noti.idplantilla = plantilla.idplantillaenvios and noti.idinstitucion = plantilla.idinstitucion)");
-		sql.INNER_JOIN(
-				"ENV_TIPOENVIOS tipo on (plantilla.IDTIPOENVIOS = tipo.IDTIPOENVIOS) and noti.IDTIPOENVIOS = plantilla.IDTIPOENVIOS");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tipo.NOMBRE AND rec.IDLENGUAJE = '"+idLenguaje+"') ");
+		sql.LEFT_OUTER_JOIN(
+				"ENV_PLANTILLASENVIOS plantilla on (noti.idplantilla = plantilla.idplantillaenvios and noti.idinstitucion = plantilla.idinstitucion and noti.IDTIPOENVIOS = plantilla.IDTIPOENVIOS)");
+		sql.LEFT_OUTER_JOIN(
+				"ENV_TIPOENVIOS tipo on (plantilla.IDTIPOENVIOS = tipo.IDTIPOENVIOS)");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tipo.NOMBRE AND rec.IDLENGUAJE = '"+idLenguaje+"') ");
 		sql.INNER_JOIN("AGE_UNIDADMEDIDA uni on (uni.IDUNIDADMEDIDA = noti.IDUNIDADMEDIDA)");
 		sql.INNER_JOIN("AGE_TIPOCUANDO tipocuando on (noti.IDTIPOCUANDO = tipocuando.IDTIPOCUANDO)");
 		sql.INNER_JOIN(

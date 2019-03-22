@@ -13,7 +13,7 @@ public class EnvTipoenviosSqlExtendsProvider extends EnvTipoenviosSqlProvider {
 		sql.SELECT("rec.DESCRIPCION");
 		sql.FROM("ENV_TIPOENVIOS tipo");
 		sql.INNER_JOIN("ENV_PLANTILLASENVIOS plantilla on (tipo.idtipoenvios = plantilla.idtipoenvios)");
-		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tipo.NOMBRE AND rec.IDLENGUAJE = '"
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tipo.NOMBRE AND rec.IDLENGUAJE = '"
 				+ idLenguaje + "')");
 		sql.WHERE("plantilla.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("plantilla.idplantillaenvios = '" + idPlantillaEnvio + "'");
