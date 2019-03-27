@@ -279,13 +279,15 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				busquedaPerFisicaItems = cenPersonaExtendsMapper.searchPerFisica(busquedaPerFisicaSearchDTO, idLenguaje, String.valueOf(idInstitucion));
 				
 				if(busquedaPerFisicaItems.size() == 0 || null == busquedaPerFisicaItems) {
-					BusquedaPerFisicaSearchDTO segundaBusqueda = new BusquedaPerFisicaSearchDTO();
-					segundaBusqueda.setNif(busquedaPerFisicaSearchDTO.getNif());
-					busquedaPerFisicaItems = cenPersonaExtendsMapper.searchPerFisica(segundaBusqueda, idLenguaje, String.valueOf(idInstitucion));
-					if(busquedaPerFisicaItems.size() > 0) {
-						busquedaPerFisicaDTO.setOnlyNif(true);
-					}else {
-						busquedaPerFisicaDTO.setOnlyNif(false);
+					if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
+						BusquedaPerFisicaSearchDTO segundaBusqueda = new BusquedaPerFisicaSearchDTO();
+						segundaBusqueda.setNif(busquedaPerFisicaSearchDTO.getNif());
+						busquedaPerFisicaItems = cenPersonaExtendsMapper.searchPerFisica(segundaBusqueda, idLenguaje, String.valueOf(idInstitucion));
+						if(busquedaPerFisicaItems.size() > 0) {
+							busquedaPerFisicaDTO.setOnlyNif(true);
+						}else {
+							busquedaPerFisicaDTO.setOnlyNif(false);
+						}
 					}
 				}
 				
