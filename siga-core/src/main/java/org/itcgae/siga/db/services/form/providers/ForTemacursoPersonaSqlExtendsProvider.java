@@ -5,7 +5,7 @@ import org.itcgae.siga.db.mappers.ForTemacursoSqlProvider;
 
 public class ForTemacursoPersonaSqlExtendsProvider extends ForTemacursoSqlProvider {
 	
-	public String getTopicsSpecificPerson(String idInstitucion, String idPersona) {
+	public String getTopicsSpecificPerson(String idInstitucion, String idPersona, String idLenguaje) {
 
 		SQL sql = new SQL();
 		
@@ -17,6 +17,7 @@ public class ForTemacursoPersonaSqlExtendsProvider extends ForTemacursoSqlProvid
 		sql.WHERE("tc.FECHABAJA IS NULL");
 		sql.WHERE("tm.idinstitucion ='" + idInstitucion + "'");
 		sql.WHERE("tm.FECHABAJA IS NULL");
+		sql.WHERE("cat.idlenguaje ='" + idLenguaje + "'");
 		sql.ORDER_BY("cat.DESCRIPCION");
 
 		return sql.toString();

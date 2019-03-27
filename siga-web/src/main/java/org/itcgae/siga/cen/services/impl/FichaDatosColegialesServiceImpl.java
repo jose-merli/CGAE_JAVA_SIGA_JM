@@ -241,7 +241,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				if (colegiadoItem.getNumColegiado() != null) {
 					colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
 				}
-				if (colegiadoItem.getIdTiposSeguro() != null) {
+				if (colegiadoItem.getIdTiposSeguro() != null && colegiadoItem.getIdTiposSeguro() != "") {
 					colegiado.setIdtiposseguro(Short.parseShort(colegiadoItem.getIdTiposSeguro()));
 				}
 				if (colegiadoItem.getSituacionResidente() != null) {

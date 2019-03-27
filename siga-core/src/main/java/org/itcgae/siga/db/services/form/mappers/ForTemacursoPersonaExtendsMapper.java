@@ -21,5 +21,5 @@ public interface ForTemacursoPersonaExtendsMapper extends ForTemacursoPersonaMap
 		@Result(column = "IDTEMACURSO", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
-	List<ComboItem> getTopicsSpecificPerson(String idInstitucion, String idCurso);
+	List<ComboItem> getTopicsSpecificPerson(String idInstitucion, String idCurso, String idLenguaje);
 }

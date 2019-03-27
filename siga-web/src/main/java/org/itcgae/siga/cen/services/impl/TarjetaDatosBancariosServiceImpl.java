@@ -844,9 +844,12 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 //				cuentaBancaria.setIdestadosolic(Short.parseShort("10"));
 				
 				List <ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper.getAutoAceptar(String.valueOf(idInstitucion));
-				
-				if(autoAceptar.get(0).getLabel().equals("S")) {
-					cuentaBancaria.setIdestadosolic(Short.parseShort("20"));
+				if(autoAceptar.size() > 0) {
+					if(autoAceptar.get(0).getLabel().equals("S")) {
+						cuentaBancaria.setIdestadosolic(Short.parseShort("20"));
+					}else {
+						cuentaBancaria.setIdestadosolic(Short.parseShort("10"));
+					}
 				}else {
 					cuentaBancaria.setIdestadosolic(Short.parseShort("10"));
 				}
@@ -888,20 +891,24 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				cuentaBancaria.setNumerocuenta(datosBancariosInsertDTO.getIban().substring(14, 24));			
 
 				
+				
 				//Si se ha marcado el check abono SJCS se comprueba si existe otra cuenta que ya es abono SJCS
-				if(tieneSCSJ){
+				if (tieneSCSJ) {
 					CenCuentasbancariasExample example = new CenCuentasbancariasExample();
-					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(datosBancariosInsertDTO.getIdPersona())).andIdinstitucionEqualTo(idInstitucion).andAbonosjcsEqualTo("1");
-					List<CenCuentasbancarias> cuenta = cenCuentasbancariasExtendsMapper.selectByExample(example );
-					
-					
-					//if (cuentasAdm.existeCuentaAbonoSJCS(beanCuentas.getIdPersona(), beanCuentas.getIdInstitucion(), beanCuentas.getIdCuenta())) {
-					if (null != cuenta && !cuenta.isEmpty()) {
-						insertResponseDTO.setStatus(SigaConstants.KO);
-						error.setMessage("messages.censo.existeAbonoSJCS");
-						insertResponseDTO.setError(error);
-						return insertResponseDTO;
+					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(datosBancariosInsertDTO.getIdPersona()))
+							.andIdinstitucionEqualTo(idInstitucion).andAbonosjcsEqualTo("1").andIdcuentaNotEqualTo(Short.parseShort(datosBancariosInsertDTO.getIdCuenta())).andFechabajaIsNull();
+					List<CenCuentasbancarias> cuenta = cenCuentasbancariasExtendsMapper.selectByExample(example);
+
+					if (null != cuenta && cuenta.size() > 0) {
+						if (!cuenta.get(0).getIdcuenta().equals(Short.valueOf(datosBancariosInsertDTO.getIdCuenta()))) {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							error.setMessage("messages.censo.existeAbonoSJCS");
+							insertResponseDTO.setError(error);
+							return insertResponseDTO;
+						}
+
 					}
+
 				}
 				
 				
@@ -910,27 +917,40 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				response = cenSolicmodicuentasExtendsMapper.insertSelective(cuentaBancaria);
 				LOGGER.info(
 						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
-		
-				if(autoAceptar.get(0).getLabel().equals("S")) {
-					CenCuentasbancarias modificacion = new CenCuentasbancarias();
-					modificacion.setIdinstitucion(idInstitucion);
-					modificacion.setIdpersona(cuentaBancaria.getIdpersona());
-					modificacion.setUsumodificacion(usuario.getIdusuario());
-					modificacion.setFechamodificacion(new Date());
-					modificacion.setAbonocargo(cuentaBancaria.getAbonocargo());
-					modificacion.setDigitocontrol(cuentaBancaria.getDigitocontrol());
-					modificacion.setAbonosjcs(cuentaBancaria.getAbonosjcs());
-					modificacion.setIban(cuentaBancaria.getIban());
-					modificacion.setIdcuenta(cuentaBancaria.getIdcuenta());
-					modificacion.setCboCodigo(cuentaBancaria.getCboCodigo());
-					modificacion.setCodigosucursal(cuentaBancaria.getCodigosucursal());
-					modificacion.setNumerocuenta(cuentaBancaria.getNumerocuenta());
-					modificacion.setTitular(cuentaBancaria.getTitular());
-					
-					int responseUpdate = cenCuentasbancariasExtendsMapper.updateByPrimaryKeySelective(modificacion);
-					
-					error.setCode(200);
-					error.setDescription("Su petición ha sido aceptada automáticamente. Puede ver ya los datos actualizados");
+				if(autoAceptar.size() > 0) {
+					if(autoAceptar.get(0).getLabel().equals("S")) {
+						CenCuentasbancarias modificacion = new CenCuentasbancarias();
+						modificacion.setIdinstitucion(idInstitucion);
+						modificacion.setIdpersona(cuentaBancaria.getIdpersona());
+						modificacion.setUsumodificacion(usuario.getIdusuario());
+						modificacion.setFechamodificacion(new Date());
+						modificacion.setAbonocargo(cuentaBancaria.getAbonocargo());
+						modificacion.setDigitocontrol(cuentaBancaria.getDigitocontrol());
+						modificacion.setAbonosjcs(cuentaBancaria.getAbonosjcs());
+						modificacion.setIban(cuentaBancaria.getIban());
+						modificacion.setIdcuenta(cuentaBancaria.getIdcuenta());
+						modificacion.setCboCodigo(cuentaBancaria.getCboCodigo());
+						modificacion.setCodigosucursal(cuentaBancaria.getCodigosucursal());
+						modificacion.setNumerocuenta(cuentaBancaria.getNumerocuenta());
+						modificacion.setTitular(cuentaBancaria.getTitular());
+						
+						int responseUpdate = cenCuentasbancariasExtendsMapper.updateByPrimaryKeySelective(modificacion);
+						
+						error.setCode(200);
+						error.setDescription("Su petición ha sido aceptada automáticamente. Puede ver ya los datos actualizados");
+					}else {
+						GenParametrosExample ejemploParam = new GenParametrosExample();
+						List<GenParametros> xDias = new ArrayList<GenParametros>();
+						ejemploParam.createCriteria().andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION").andIdinstitucionEqualTo(idInstitucion);
+						xDias = genParametrosMapper.selectByExample(ejemploParam);
+						error.setCode(200);
+						if(xDias.size() == 0) {
+							GenParametrosExample ejemploParam2 = new GenParametrosExample();
+							ejemploParam2.createCriteria().andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION").andIdinstitucionEqualTo((short)2000);
+							xDias= genParametrosMapper.selectByExample(ejemploParam2);
+						}
+						error.setDescription("Su petición ha sido registrada y será revisada en los próximos "+xDias.get(0).getValor()+" días. Puede comprobar el estado de su petición en el menú Solicitudes de modificación");
+					}
 				}else {
 					GenParametrosExample ejemploParam = new GenParametrosExample();
 					List<GenParametros> xDias = new ArrayList<GenParametros>();
@@ -943,8 +963,8 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						xDias= genParametrosMapper.selectByExample(ejemploParam2);
 					}
 					error.setDescription("Su petición ha sido registrada y será revisada en los próximos "+xDias.get(0).getValor()+" días. Puede comprobar el estado de su petición en el menú Solicitudes de modificación");
+
 				}
-				
 				insertResponseDTO.setError(error);
 				// comprobacion actualización
 				if(response >= 1) {
