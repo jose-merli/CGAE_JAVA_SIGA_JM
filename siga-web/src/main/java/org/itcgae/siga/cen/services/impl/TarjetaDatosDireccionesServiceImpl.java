@@ -553,8 +553,10 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					direcciones.setPreferente(preferentes);
 				}
 
-				if (datosDireccionesItem.getPoblacionExtranjera() != ""
-						&& datosDireccionesItem.getPoblacionExtranjera() != null) {
+				if (datosDireccionesItem.getIdProvincia() != ""
+						&& datosDireccionesItem.getIdProvincia() != null) {
+					direcciones.setPoblacionextranjera(null);
+				}else {
 					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
 				}
 

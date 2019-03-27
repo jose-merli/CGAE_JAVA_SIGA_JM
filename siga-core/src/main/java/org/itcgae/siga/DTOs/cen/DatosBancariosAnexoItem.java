@@ -17,6 +17,7 @@ public class DatosBancariosAnexoItem {
 	private String fechaUso;
 	private String firmaFecha;
 	private String firmaLugar;
+	private String idFicheroFirma;
 	
 		
 
@@ -179,7 +180,24 @@ public class DatosBancariosAnexoItem {
 	public void setFirmaLugar(String firmaLugar) {
 		this.firmaLugar = firmaLugar;
 	}
+	/**
+	 *
+	 */
+	public DatosBancariosAnexoItem idFicheroFirma(String idFicheroFirma){
+		this.idFicheroFirma = idFicheroFirma;
+		return this;
+	}
 	
+	
+	@JsonProperty("idFicheroFirma")
+	public String getIdFicheroFirma() {
+		return idFicheroFirma;
+	}
+	
+	
+	public void setIdFicheroFirma(String idFicheroFirma) {
+		this.idFicheroFirma = idFicheroFirma;
+	}
 	
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -199,12 +217,14 @@ public class DatosBancariosAnexoItem {
 	    		Objects.equals(this.descripcion, personaJuridicaSearchDTO.descripcion) &&
 	    		Objects.equals(this.tipoMandato, personaJuridicaSearchDTO.tipoMandato) &&
 	    		Objects.equals(this.firmaLugar, personaJuridicaSearchDTO.firmaLugar) &&
-	    		Objects.equals(this.firmaFecha, personaJuridicaSearchDTO.firmaFecha);
+	    		Objects.equals(this.firmaFecha, personaJuridicaSearchDTO.firmaFecha) &&
+	    		Objects.equals(this.idFicheroFirma, personaJuridicaSearchDTO.idFicheroFirma);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona, idAnexo,idCuenta,idMandato,descripcion,tipoMandato,fechaUso,tipo,firmaLugar,firmaFecha);
+	    return Objects.hash(idPersona, idAnexo,idCuenta,idMandato,descripcion,tipoMandato,fechaUso,tipo,firmaLugar,
+	    		firmaFecha, idFicheroFirma);
 	}
 
 	
@@ -223,6 +243,7 @@ public class DatosBancariosAnexoItem {
 	    sb.append("    tipo: ").append(toIndentedString(tipo)).append("\n");
 	    sb.append("    firmaFecha: ").append(toIndentedString(firmaFecha)).append("\n");
 	    sb.append("    firmaLugar: ").append(toIndentedString(firmaLugar)).append("\n");
+	    sb.append("    idFicheroFirma: ").append(toIndentedString(idFicheroFirma)).append("\n");
 
 
 	    sb.append("}");

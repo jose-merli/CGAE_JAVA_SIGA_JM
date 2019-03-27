@@ -152,6 +152,7 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		sql.SELECT("TO_CHAR(FECHAUSO,'DD/MM/YYYY') AS FECHAUSO") ;
 		sql.SELECT("TO_CHAR(FIRMAFECHA,'DD/MM/YYYY')AS FIRMAFECHA");
 		sql.SELECT("FIRMALUGAR");
+		sql.SELECT("IDFICHEROFIRMA");
 		sql.FROM("( SELECT\r\n" + 
 				" MANDATO.IDMANDATO\r\n" + 
 				" ,NULL AS IDANEXO\r\n" + 
@@ -163,6 +164,7 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 				" ,FECHAUSO\r\n" + 
 				" ,FIRMA_FECHA AS FIRMAFECHA\r\n" + 
 				" ,FIRMA_LUGAR AS FIRMALUGAR\r\n" + 
+				" ,IDFICHEROFIRMA\r\n" + 
 				" ,MANDATO.IDINSTITUCION\r\n" + 
 				" FROM CEN_PERSONA PER\r\n" + 
 				"INNER JOIN CEN_MANDATOS_CUENTASBANCARIAS MANDATO ON (PER.IDPERSONA = MANDATO.IDPERSONA)\r\n" + 
@@ -180,6 +182,7 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 				" ,ANEXO.FECHACREACION AS FECHAUSO\r\n" + 
 				" ,ANEXO.FIRMA_FECHA AS FIRMAFECHA\r\n" + 
 				" ,ANEXO.FIRMA_LUGAR AS FIRMALUGAR\r\n" + 
+				" ,ANEXO.IDFICHEROFIRMA\r\n" + 
 				" ,MANDATO.IDINSTITUCION\r\n" + 
 				" FROM CEN_PERSONA PER\r\n" + 
 				"INNER JOIN CEN_MANDATOS_CUENTASBANCARIAS MANDATO ON (PER.IDPERSONA = MANDATO.IDPERSONA)\r\n" + 

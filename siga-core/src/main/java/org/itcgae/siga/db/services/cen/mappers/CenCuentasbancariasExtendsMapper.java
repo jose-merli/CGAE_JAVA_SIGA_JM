@@ -118,6 +118,7 @@ public interface CenCuentasbancariasExtendsMapper extends CenCuentasbancariasMap
 		@Result(column = "FECHAUSO", property = "fechaUso", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FIRMAFECHA", property = "firmaFecha", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FIRMALUGAR", property = "firmaLugar", jdbcType = JdbcType.DATE),
+		@Result(column = "IDFICHEROFIRMA", property = "idFicheroFirma", jdbcType = JdbcType.VARCHAR),
 
 	})
 	List<DatosBancariosAnexoItem> selectAnexos(DatosBancariosSearchAnexosDTO datosBancariosAnexos);

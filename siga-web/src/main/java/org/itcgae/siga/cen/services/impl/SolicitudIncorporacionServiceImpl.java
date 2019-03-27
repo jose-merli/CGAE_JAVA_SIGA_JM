@@ -878,6 +878,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		solIncorporacion.setDomicilio(dto.getDomicilio());
 		solIncorporacion.setIdpoblacion(dto.getIdPoblacion());
 		solIncorporacion.setIdprovincia(dto.getIdProvincia());
+		solIncorporacion.setPoblacionextranjera(dto.getPoblacionExtranjera());
 		solIncorporacion.setIdtipocolegiacion(Short.parseShort(dto.getTipoColegiacion()));
 		solIncorporacion.setIdtipoidentificacion(Short.parseShort(dto.getIdTipoIdentificacion()));
 		solIncorporacion.setIdtiposolicitud(Short.parseShort(dto.getIdTipo()));

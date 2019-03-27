@@ -355,9 +355,9 @@ public class CenDireccionesSqlProvider {
 		if (record.getIddireccionalta() != null) {
 			sql.SET("IDDIRECCIONALTA = #{iddireccionalta,jdbcType=DECIMAL}");
 		}
-		if (record.getPoblacionextranjera() != null) {
-			sql.SET("POBLACIONEXTRANJERA = #{poblacionextranjera,jdbcType=VARCHAR}");
-		}
+		
+		sql.SET("POBLACIONEXTRANJERA = #{poblacionextranjera,jdbcType=VARCHAR}");
+		
 		if (record.getOtraprovincia() != null) {
 			sql.SET("OTRAPROVINCIA = #{otraprovincia,jdbcType=DECIMAL}");
 		}

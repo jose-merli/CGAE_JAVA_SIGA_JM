@@ -59,6 +59,7 @@ public class SolIncorporacionItem {
 	private String numeroCuenta;
 	private String banco;
 	private String idInstitucion;
+	private String poblacionExtranjera;
 	
 	
 	public String getIdTratamiento() {
@@ -387,6 +388,13 @@ public class SolIncorporacionItem {
 		this.idInstitucion = idInstitucion;
 	}
 	
+	public String getPoblacionExtranjera() {
+		return poblacionExtranjera;
+	}
+	public void setPoblacionExtranjera(String poblacionExtranjera) {
+		this.poblacionExtranjera = poblacionExtranjera;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -444,6 +452,8 @@ public class SolIncorporacionItem {
 		result = prime * result + ((tipoSolicitud == null) ? 0 : tipoSolicitud.hashCode());
 		result = prime * result + ((titular == null) ? 0 : titular.hashCode());
 		result = prime * result + ((tratamiento == null) ? 0 : tratamiento.hashCode());
+		result = prime * result + ((poblacionExtranjera == null) ? 0 : poblacionExtranjera.hashCode());
+
 		return result;
 	}
 	
@@ -723,6 +733,11 @@ public class SolIncorporacionItem {
 				return false;
 		} else if (!tratamiento.equals(other.tratamiento))
 			return false;
+		if (poblacionExtranjera == null) {
+			if (other.poblacionExtranjera != null)
+				return false;
+		} else if (!poblacionExtranjera.equals(other.poblacionExtranjera))
+			return false;
 		return true;
 	}
 	
@@ -747,7 +762,7 @@ public class SolIncorporacionItem {
 				+ ", nombreProvincia=" + nombreProvincia + ", titular=" + titular + ", iban=" + iban + ", abonoCargo="
 				+ abonoCargo + ", abonoJCS=" + abonoJCS + ", cboCodigo=" + cboCodigo + ", codigoSucursal="
 				+ codigoSucursal + ", digitoControl=" + digitoControl + ", numeroCuenta=" + numeroCuenta + ", banco="
-				+ banco + ", idInstitucion=" + idInstitucion + "]";
+				+ banco + ", idInstitucion=" + idInstitucion + ", poblacionExtranjera=" + poblacionExtranjera + "]";
 	}
 	
 	
