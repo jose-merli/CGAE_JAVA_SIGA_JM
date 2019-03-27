@@ -35,7 +35,7 @@ public class PysServiciosinstitucionSqlExtendsProvider extends PysServiciosinsti
 
 		SQL sql = new SQL();
 
-		sql.SELECT("IDSERVICIO");
+		sql.SELECT("IDSERVICIO as IDSERVICIOSINSTITUCION");
 		sql.FROM("FOR_CURSO");
 		sql.WHERE("idInstitucion =" + idInstitucion);
 		sql.WHERE("idCurso =" + idCurso);

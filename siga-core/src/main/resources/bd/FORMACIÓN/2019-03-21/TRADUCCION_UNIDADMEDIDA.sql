@@ -1,0 +1,22 @@
+UPDATE GEN_RECURSOS_CATALOGOS SET DESCRIPCION = 'Dies' WHERE IDRECURSO = 
+(select rec.idrecurso from AGE_UNIDADMEDIDA unidad
+INNER JOIN GEN_RECURSOS_CATALOGOS rec ON rec.IDRECURSO = unidad.DESCRIPCION AND rec.IDLENGUAJE = '1'
+where rec.descripcion = 'Segundos') and IDLENGUAJE = '2';
+
+UPDATE GEN_RECURSOS_CATALOGOS SET DESCRIPCION = 'Días#EU' WHERE IDRECURSO = 
+(select rec.idrecurso from AGE_UNIDADMEDIDA unidad
+INNER JOIN GEN_RECURSOS_CATALOGOS rec ON rec.IDRECURSO = unidad.DESCRIPCION AND rec.IDLENGUAJE = '1'
+where rec.descripcion = 'Segundos') and IDLENGUAJE = '3';
+
+UPDATE GEN_RECURSOS_CATALOGOS SET DESCRIPCION = 'Días#GL' WHERE IDRECURSO = 
+(select rec.idrecurso from AGE_UNIDADMEDIDA unidad
+INNER JOIN GEN_RECURSOS_CATALOGOS rec ON rec.IDRECURSO = unidad.DESCRIPCION AND rec.IDLENGUAJE = '1'
+where rec.descripcion = 'Segundos') and IDLENGUAJE = '4';
+
+UPDATE GEN_RECURSOS_CATALOGOS SET DESCRIPCION = 'Días' WHERE IDRECURSO = 
+(select rec.idrecurso from AGE_UNIDADMEDIDA unidad
+INNER JOIN GEN_RECURSOS_CATALOGOS rec ON rec.IDRECURSO = unidad.DESCRIPCION AND rec.IDLENGUAJE = '1'
+where rec.descripcion = 'Segundos') and IDLENGUAJE = '1';
+
+
+commit;

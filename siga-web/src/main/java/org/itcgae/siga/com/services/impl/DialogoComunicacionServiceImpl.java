@@ -684,7 +684,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																		throw new SigaExceptions("No existe la plantilla de documento");
 																	}
 																																		
-																	Document doc = new Document(pathPlantilla + nombrePlantilla);
+																	Document doc = null;
 
 																	hDatosGenerales.putAll(resultMulti.get(k));
 																	
@@ -741,6 +741,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																		if(esExcel) {
 																			docGenerado = _generacionDocService.generarExcel(pathPlantilla + nombrePlantilla, pathFicheroSalida, nombreFicheroSalida, listaDatosExcel);
 																		}else {
+																			doc = new Document(pathPlantilla + nombrePlantilla);
+																			
 																			doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);																			
 																			
 																			boolean firmado = false;
@@ -804,9 +806,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 														File filePlantilla = new File(pathPlantilla + nombrePlantilla);
 														if(!filePlantilla.exists()){
 															throw new SigaExceptions("No existe la plantilla de documento");
-														}
+														}		
 														
-														Document doc = new Document(pathPlantilla + nombrePlantilla);
+														Document doc = null;
 														
 														// Por cada resultado ejecutamos las consultas de datos
 														LOGGER.debug("Obtenemos las consultas de datos para la plantilla: " + plantilla.getIdInforme());
@@ -862,6 +864,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 															if(esExcel) {
 																docGenerado = _generacionDocService.generarExcel(pathPlantilla + nombrePlantilla, pathFicheroSalida, nombreFicheroSalida, listaDatosExcel);
 															}else {
+																doc = new Document(pathPlantilla + nombrePlantilla);
+																
 																doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);														
 																
 																boolean firmado = false;
@@ -883,6 +887,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 															if(listaConsultasEnvio != null && listaConsultasEnvio.size() > 0){
 																for(ConsultaEnvioItem consultaEnvio : listaConsultasEnvio){
 																	consultaEnvio.setSufijo(campoSufijoReplaced);
+																	consultaEnvio.setPathFichero(pathFicheroSalida);
+																	consultaEnvio.setNombreFichero(nombreFicheroSalida);
 																}
 															}
 														}													
@@ -1648,7 +1654,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			directorioPlantillaClase = SigaConstants.rutaPlantillaSinClase;
 		}
 		
-		directorioPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, idInstitucion);
+		directorioPlantillaClase = directorioPlantillaClase.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO + SigaConstants.CAMPO_IDINSTITUCION + SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, idInstitucion);
 		
 		if(listaIdPlantilla != null && listaIdPlantilla.size() > 0){
 			for(String idPlantilla : listaIdPlantilla){
@@ -1804,7 +1810,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									
 									GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
 									
-									String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + directorioPlantillaClase + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator;
+									String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + directorioPlantillaClase + SigaConstants.pathSeparator;
 									
 									
 									String pathFicheroSalida = rutaTmp;
@@ -1913,7 +1919,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						
 						GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
 						
-						String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + directorioPlantillaClase + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator;
+						String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator + directorioPlantillaClase + SigaConstants.pathSeparator;
 						
 						
 						String pathFicheroSalida = rutaTmp;

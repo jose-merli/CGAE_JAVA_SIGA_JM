@@ -30,7 +30,9 @@ public interface AgeNotificacioneseventoExtendsMapper extends AgeNotificacionese
 		@Result(column = "DESCRIPCIONCUANDO", property = "descripcionCuando", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOCUANDO", property = "idTipoCuando", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBRETIPONOTIFICACION", property = "nombreTipoNotificacion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "IDNOTIFICACIONEVENTO", property = "idNotificacion", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "IDNOTIFICACIONEVENTO", property = "idNotificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCIONMEDIDA", property = "descripcionMedida", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCIONANTES", property = "descripcionAntes", jdbcType = JdbcType.VARCHAR),
 		
 	})
 	List<NotificacionEventoItem> getCalendarNotifications(String idCalendario, String idInstitucion, String idLenguaje);
@@ -50,7 +52,9 @@ public interface AgeNotificacioneseventoExtendsMapper extends AgeNotificacionese
 		@Result(column = "IDTIPOCUANDO", property = "idTipoCuando", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBRETIPONOTIFICACION", property = "nombreTipoNotificacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDNOTIFICACIONEVENTO", property = "idNotificacion", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCIONMEDIDA", property = "descripcionMedida", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCIONANTES", property = "descripcionAntes", jdbcType = JdbcType.VARCHAR)
 		
 	})
 	List<NotificacionEventoItem> getHistoricCalendarNotifications(String idCalendario, String idInstitucion, String idLenguaje);

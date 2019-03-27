@@ -238,7 +238,10 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 				ageNotificacionEventoInsert
 						.setIdunidadmedida(Long.parseLong(notificacionEventoItem.getIdUnidadMedida()));
 				ageNotificacionEventoInsert.setIdplantilla(Long.valueOf(notificacionEventoItem.getIdPlantilla()));
-				ageNotificacionEventoInsert.setIdtipoenvios(Long.parseLong(notificacionEventoItem.getIdTipoEnvio()));
+				if (notificacionEventoItem.getIdTipoEnvio() != null) {
+					ageNotificacionEventoInsert
+							.setIdtipoenvios(Long.parseLong(notificacionEventoItem.getIdTipoEnvio()));
+				}
 				ageNotificacionEventoInsert.setFechabaja(null);
 
 				LOGGER.info(
@@ -248,27 +251,31 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 						"saveNotification() / ageNotificacioneseventoMapper.insert(ageNotificacionEventoInsert) -> Salida a ageNotificacioneseventoMapper para insertar una notificacion");
 
 				// Debemos guardar cuando se generará la notificación
+				if (notificacionEventoItem.getIdEvento() != null) {
+					AgeGeneracionnotificaciones ageGeneracionnotificaciones = new AgeGeneracionnotificaciones();
+					ageGeneracionnotificaciones.setUsumodificacion(usuario.getIdusuario().longValue());
+					ageGeneracionnotificaciones.setFechamodificacion(new Date());
+					ageGeneracionnotificaciones.setIdinstitucion(idInstitucion);
+					ageGeneracionnotificaciones
+							.setIdtiponotificacionevento(ageNotificacionEventoInsert.getIdtiponotificacionevento());
 
-				AgeGeneracionnotificaciones ageGeneracionnotificaciones = new AgeGeneracionnotificaciones();
-				ageGeneracionnotificaciones.setUsumodificacion(usuario.getIdusuario().longValue());
-				ageGeneracionnotificaciones.setFechamodificacion(new Date());
-				ageGeneracionnotificaciones.setIdinstitucion(idInstitucion);
-				ageGeneracionnotificaciones
-						.setIdtiponotificacionevento(ageNotificacionEventoInsert.getIdtiponotificacionevento());
-				ageGeneracionnotificaciones.setIdevento(ageNotificacionEventoInsert.getIdevento());
-				ageGeneracionnotificaciones
-						.setIdnotificacionevento(ageNotificacionEventoInsert.getIdnotificacionevento());
+					ageGeneracionnotificaciones.setIdevento(ageNotificacionEventoInsert.getIdevento());
 
-				Date fechaGeneracionNotificacion = generateNotificationDate(ageNotificacionEventoInsert);
-				ageGeneracionnotificaciones.setFechageneracionnotificacion(fechaGeneracionNotificacion);
+					ageGeneracionnotificaciones
+							.setIdnotificacionevento(ageNotificacionEventoInsert.getIdnotificacionevento());
 
-				LOGGER.info(
-						"saveNotification() / ageGeneracionnotificacionesMapper.insert(ageGeneracionnotificaciones) -> Entrada a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
+					Date fechaGeneracionNotificacion = generateNotificationDate(ageNotificacionEventoInsert);
+					ageGeneracionnotificaciones.setFechageneracionnotificacion(fechaGeneracionNotificacion);
 
-				response = ageGeneracionnotificacionesMapper.insert(ageGeneracionnotificaciones);
+					LOGGER.info(
+							"saveNotification() / ageGeneracionnotificacionesMapper.insert(ageGeneracionnotificaciones) -> Entrada a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
 
-				LOGGER.info(
-						"saveNotification() / ageGeneracionnotificacionesMapper.insert(ageGeneracionnotificaciones) -> Salida a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
+					response = ageGeneracionnotificacionesMapper.insert(ageGeneracionnotificaciones);
+
+					LOGGER.info(
+							"saveNotification() / ageGeneracionnotificacionesMapper.insert(ageGeneracionnotificaciones) -> Salida a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
+
+				}
 
 				if (response == 0) {
 					error.setCode(400);
@@ -459,7 +466,11 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 							notification.setFechamodificacion(new Date());
 							notification.setUsumodificacion(usuario.getIdusuario().longValue());
 							notification.setIdplantilla(Long.valueOf(notificacionUpdate.getIdPlantilla()));
-							notification.setIdtipoenvios(Long.valueOf(notificacionUpdate.getIdTipoEnvio()));
+							if (notificacionUpdate.getIdTipoEnvio() != null) {
+								notification.setIdtipoenvios(Long.valueOf(notificacionUpdate.getIdTipoEnvio()));
+							}else {
+								notification.setIdtipoenvios(null);
+							}
 							notification.setIdtiponotificacionevento(
 									Long.valueOf(notificacionUpdate.getIdTipoNotificacion()));
 							notification.setCuando(Long.valueOf(notificacionUpdate.getCuando()));
@@ -470,7 +481,9 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 							LOGGER.info(
 									"updateNotification() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Salida a ageCalendarioExtendsMapper para modificar la notificacion");
 
-							response = checkGenerationDateNotification(notification, usuario);
+							if (notification.getIdevento() != null) {
+								response = checkGenerationDateNotification(notification, usuario);
+							}
 						}
 					}
 				} catch (Exception e) {
@@ -665,33 +678,35 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 						LOGGER.info(
 								"deleteNotification() / ageNotificacioneseventoMapper.updateByPrimaryKey(notification) -> Salida a ageCalendarioExtendsMapper para dar de baja a notificacion");
 
-						// Eliminamos la generacion de la notificacion que eliminamos
-						AgeGeneracionnotificacionesExample ageGeneracionnotificacionesExample = new AgeGeneracionnotificacionesExample();
-						ageGeneracionnotificacionesExample.createCriteria()
-								.andIdnotificacioneventoEqualTo(notification.getIdnotificacionevento())
-								.andIdeventoEqualTo(notification.getIdevento());
+						if (notification.getIdevento() != null) {
+							// Eliminamos la generacion de la notificacion que eliminamos
+							AgeGeneracionnotificacionesExample ageGeneracionnotificacionesExample = new AgeGeneracionnotificacionesExample();
+							ageGeneracionnotificacionesExample.createCriteria()
+									.andIdnotificacioneventoEqualTo(notification.getIdnotificacionevento())
+									.andIdeventoEqualTo(notification.getIdevento());
 
-						List<AgeGeneracionnotificaciones> ageGeneracionnotificacionesList = ageGeneracionnotificacionesMapper
-								.selectByExample(ageGeneracionnotificacionesExample);
+							List<AgeGeneracionnotificaciones> ageGeneracionnotificacionesList = ageGeneracionnotificacionesMapper
+									.selectByExample(ageGeneracionnotificacionesExample);
 
-						if (null != ageGeneracionnotificacionesList && ageGeneracionnotificacionesList.size() > 0) {
+							if (null != ageGeneracionnotificacionesList && ageGeneracionnotificacionesList.size() > 0) {
 
-							AgeGeneracionnotificaciones ageGeneracionnotificacion = ageGeneracionnotificacionesList
-									.get(0);
+								AgeGeneracionnotificaciones ageGeneracionnotificacion = ageGeneracionnotificacionesList
+										.get(0);
 
-							ageGeneracionnotificacion.setUsumodificacion(usuario.getIdusuario().longValue());
-							ageGeneracionnotificacion.setFechamodificacion(new Date());
-							ageGeneracionnotificacion.setFechabaja(new Date());
+								ageGeneracionnotificacion.setUsumodificacion(usuario.getIdusuario().longValue());
+								ageGeneracionnotificacion.setFechamodificacion(new Date());
+								ageGeneracionnotificacion.setFechabaja(new Date());
 
-							LOGGER.info(
-									"deleteNotification() / ageGeneracionnotificacionesMapper.updateByPrimaryKeySelective(ageGeneracionnotificaciones) -> Entrada a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
+								LOGGER.info(
+										"deleteNotification() / ageGeneracionnotificacionesMapper.updateByPrimaryKeySelective(ageGeneracionnotificaciones) -> Entrada a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
 
-							response = ageGeneracionnotificacionesMapper
-									.updateByPrimaryKeySelective(ageGeneracionnotificacion);
+								response = ageGeneracionnotificacionesMapper
+										.updateByPrimaryKeySelective(ageGeneracionnotificacion);
 
-							LOGGER.info(
-									"deleteNotification() / ageGeneracionnotificacionesMapper.updateByPrimaryKeySelective(ageGeneracionnotificaciones) -> Salida a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
+								LOGGER.info(
+										"deleteNotification() / ageGeneracionnotificacionesMapper.updateByPrimaryKeySelective(ageGeneracionnotificaciones) -> Salida a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
 
+							}
 						}
 
 						if (response == 0) {
@@ -757,6 +772,55 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 		LOGGER.info(
 				"getPlantillas() -> Salida del servicio para obtener las plantillas de las notificaciones de eventos");
+
+		return comboDTO;
+	}
+
+	@Override
+	public ComboDTO getNotificationTypeCalendarTraining(HttpServletRequest request) {
+		LOGGER.info(
+				"getNotificationTypeCalendarTraining() -> Entrada al servicio para obtener los tipos de notificaciones de eventos");
+
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getNotificationTypeCalendarTraining() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getNotificationTypeCalendarTraining() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+
+				LOGGER.info(
+						"getNotificationTypeCalendarTraining() / ageTiponotificacioneventoExtendsMapper.getNotificationTypeCalendarTraining() -> Entrada a ageTipocalendarioExtendsMapper para obtener los diferentes tipos de notificaciones");
+
+				comboItems = ageTiponotificacioneventoExtendsMapper
+						.getNotificationTypeCalendarTraining(usuario.getIdlenguaje());
+
+				LOGGER.info(
+						"getNotificationTypeCalendarTraining() / ageTiponotificacioneventoExtendsMapper.getNotificationTypeCalendarTraining() -> Salida de ageTipocalendarioExtendsMapper para obtener los diferentes tipos de notificaciones");
+
+			}
+		}
+
+		comboDTO.setCombooItems(comboItems);
+
+		LOGGER.info("getTypeNotifications() -> Salida del servicio para obtener notificaciones de eventos");
 
 		return comboDTO;
 	}

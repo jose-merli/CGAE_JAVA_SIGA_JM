@@ -779,4 +779,9 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final short  INCORPORACION_EJERCIENTE = 30;
 	public static final short  INCORPORACION_NO_EJERCIENTE = 40;
 	
+	public static final long  TIPO_NOTIFICACION_INICIOINSCRIPCION = 3;
+	public static final long  TIPO_NOTIFICACION_FININSCRIPCION = 4;
+	public static final long  TIPO_NOTIFICACION_SESION = 7;
+
+	
 }

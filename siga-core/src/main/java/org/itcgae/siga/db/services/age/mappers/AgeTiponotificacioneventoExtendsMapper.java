@@ -23,4 +23,11 @@ public interface AgeTiponotificacioneventoExtendsMapper extends AgeTiponotificac
 	})
 	List<ComboItem> getTypeNotifications(String idLenguaje);
 	
+	@SelectProvider(type = AgeTiponotificacioneventoSqlExtendsProvider.class, method = "getNotificationTypeCalendarTraining")
+	@Results({
+		@Result(column = "IDTIPONOTIFICACIONEVENTO", property = "value", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+	})
+	List<ComboItem> getNotificationTypeCalendarTraining(String idLenguaje);
+	
 }
