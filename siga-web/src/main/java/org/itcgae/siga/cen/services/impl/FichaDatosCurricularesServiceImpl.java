@@ -584,9 +584,12 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			// }
 
 			List <ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper.getAutoAceptar(String.valueOf(idInstitucion));
-	
-			if(autoAceptar.get(0).getLabel().equals("S")) {
-				recordUpdate.setIdestadosolic(Short.parseShort("20"));
+			if(autoAceptar.size() > 0) {
+				if(autoAceptar.get(0).getLabel().equals("S")) {
+					recordUpdate.setIdestadosolic(Short.parseShort("20"));
+				}else {
+					recordUpdate.setIdestadosolic(Short.parseShort("10"));
+				}
 			}else {
 				recordUpdate.setIdestadosolic(Short.parseShort("10"));
 			}
@@ -609,7 +612,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 				
 
 			response = cenSolicitudmodificacioncvExtendsMapper.solicitudUpdateCurriculo(recordUpdate);
-		
+		if(autoAceptar.size() > 0) {
 			if(autoAceptar.get(0).getLabel().equals("S")) {
 							CenDatoscv Actualizar = new CenDatoscv();
 //							Actualizar.setFechabaja(new Date());
@@ -661,8 +664,22 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 							}
 							error.setDescription("Su petición ha sido registrada y será revisada en los próximos "+xDias.get(0).getValor()+" días. Puede comprobar el estado de su petición en el menú Solicitudes de modificación");
 						}
+		}else {
+			GenParametrosExample ejemploParam = new GenParametrosExample();
+			List<GenParametros> xDias = new ArrayList<GenParametros>();
+			ejemploParam.createCriteria().andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION").andIdinstitucionEqualTo(idInstitucion);
+			xDias= genParametrosMapper.selectByExample(ejemploParam);
+			error.setCode(200);
+			if(xDias.size() == 0) {
+				GenParametrosExample ejemploParam2 = new GenParametrosExample();
+				ejemploParam2.createCriteria().andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION").andIdinstitucionEqualTo((short)2000);
+				xDias= genParametrosMapper.selectByExample(ejemploParam2);
+			}
+			error.setDescription("Su petición ha sido registrada y será revisada en los próximos "+xDias.get(0).getValor()+" días. Puede comprobar el estado de su petición en el menú Solicitudes de modificación");
+
+		}
 						
-						updateResponseDTO.setError(error);
+			updateResponseDTO.setError(error);
 			
 			LOGGER.info(
 					"updateDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para actualizar un curriculum");
