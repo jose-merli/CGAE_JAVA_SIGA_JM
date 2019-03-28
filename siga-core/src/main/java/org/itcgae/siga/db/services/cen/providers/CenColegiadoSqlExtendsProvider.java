@@ -96,7 +96,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.INNER_JOIN("cen_institucion inst on col.idinstitucion = inst.idinstitucion");
 
 		sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
-				+ "    (grucli.idinstitucion = inst.idinstitucion and col.idpersona = grucli.idpersona and (grucli.fecha_inicio <= SYSDATE and \r\n"
+				+ "    (grucli.idinstitucion = inst.idinstitucion and col.idpersona = grucli.idpersona and ((grucli.fecha_inicio <= SYSDATE OR grucli.fecha_inicio IS NULL ) and \r\n"
 				+ "        ( grucli.fecha_baja > SYSDATE OR grucli.fecha_baja IS NULL)))");
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
@@ -642,7 +642,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.INNER_JOIN("cen_institucion inst on col.idinstitucion = inst.idinstitucion");
 
 		sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
-				+ "    (grucli.idinstitucion = inst.idinstitucion and col.idpersona = grucli.idpersona and (grucli.fecha_inicio <= SYSDATE and \r\n"
+				+ "    (grucli.idinstitucion = inst.idinstitucion and col.idpersona = grucli.idpersona and ((grucli.fecha_inicio <= SYSDATE OR grucli.fecha_inicio IS NULL ) and \r\n"
 				+ "        ( grucli.fecha_baja > SYSDATE OR grucli.fecha_baja IS NULL)))");
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
