@@ -42,7 +42,7 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		
 		sql.SELECT("cli.idgrupo");
 		sql.SELECT("GENR.descripcion");
-		sql.SELECT("TO_CHAR(cli.fecha_inicio, 'dd/MM/yyyy') as FECHA_INICIO");
+		sql.SELECT("NVL(TO_CHAR(cli.fecha_inicio, 'dd/MM/yyyy'),TO_CHAR(TO_DATE('01/01/1980','DD/MM/YYYY'),'DD/MM/YYYY')) as FECHA_INICIO");
 		sql.SELECT("TO_CHAR(cli.fecha_baja, 'dd/MM/yyyy') as FECHA_BAJA");
 		sql.FROM("CEN_GRUPOSCLIENTE_CLIENTE cli");
 		sql.INNER_JOIN("cen_persona per on cli.idpersona = per.idpersona ");

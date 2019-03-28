@@ -88,11 +88,17 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,2,dir.correoelectronico,'') AS correo");
 		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,2,dir.telefono1,'') AS telefono");
 		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,2,dir.movil,'') as movil");
-		sql.SELECT_DISTINCT("ROW_NUMBER() OVER(PARTITION BY col.idpersona ORDER BY col.idpersona) AS RN");
+		sql.SELECT_DISTINCT("ROW_NUMBER() OVER(PARTITION BY concat(col.idpersona,col.idinstitucion) ORDER BY col.idpersona) AS RN");
 		sql.FROM("cen_colegiado col");
 
 		sql.INNER_JOIN("cen_persona per on col.idpersona = per.idpersona");
-		sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and col.idinstitucion = cli.idinstitucion)");
+			if (idInstitucion != Short.parseShort("2000")) {
+				sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and col.idinstitucion = cli.idinstitucion)");
+			}else{
+				sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and cli.idinstitucion =  '"+ idInstitucion + "')");
+			}
+
+		
 		sql.INNER_JOIN("cen_institucion inst on col.idinstitucion = inst.idinstitucion");
 
 		sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
@@ -103,7 +109,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion))");
 		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
 		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '1')");
-		sql.INNER_JOIN(
+		sql.LEFT_OUTER_JOIN(
 				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
 
 		sql.LEFT_OUTER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIR ON (CLI.IDPERSONA = TIPODIR.IDPERSONA AND"  
@@ -159,8 +165,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		if (colegiadoItem.getTipoDireccion() != null && colegiadoItem.getTipoDireccion() != "") {
 			sql.WHERE("tipodir.idtipodireccion = "+ colegiadoItem.getTipoDireccion());
 		}else {
-			sql.WHERE("(tipodir.idtipodireccion = 2 OR 2 NOT IN (SELECT idtipodireccion FROM CEN_DIRECCION_TIPODIRECCION TIPODIR2 "
-					+ "WHERE TIPODIR.IDPERSONA = TIPODIR2.IDPERSONA  AND TIPODIR.IDINSTITUCION = TIPODIR2.IDINSTITUCION ))");
+			/*sql.WHERE("(tipodir.idtipodireccion = 2 OR 2 NOT IN (SELECT idtipodireccion FROM CEN_DIRECCION_TIPODIRECCION TIPODIR2 "
+					+ "WHERE TIPODIR.IDPERSONA = TIPODIR2.IDPERSONA  AND TIPODIR.IDINSTITUCION = TIPODIR2.IDINSTITUCION ))");*/
 		}
 
 		if (colegiadoItem.getIdEstadoCivil() != null && colegiadoItem.getIdEstadoCivil() != "") {
@@ -242,8 +248,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 				String fechaIncorporacionDesde = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
 				String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
 
-				sql.WHERE("(TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') >= TO_DATE('" + fechaIncorporacionDesde
-						+ "','DD/MM/YYYY') " + " and ( TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') <= TO_DATE('"
+				sql.WHERE("(col.fechaincorporacion >= TO_DATE('" + fechaIncorporacionDesde
+						+ "','DD/MM/YYYY') " + " and ( col.fechaincorporacion <= TO_DATE('"
 						+ fechaIncorporacionHasta + "','DD/MM/YYYY')))");
 
 			} else if (colegiadoItem.getFechaIncorporacion()[0] != null
@@ -251,7 +257,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 				String fechaIncorporacionDesde = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
 
-				sql.WHERE("(TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') >= TO_DATE('" + fechaIncorporacionDesde
+				sql.WHERE("(col.fechaincorporacion >= TO_DATE('" + fechaIncorporacionDesde
 						+ "','DD/MM/YYYY'))");
 
 			} else if (colegiadoItem.getFechaIncorporacion()[0] == null
@@ -259,7 +265,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 				String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
 
-				sql.WHERE("( TO_DATE(col.fechaincorporacion,'DD/MM/RRRR') <= TO_DATE('" + fechaIncorporacionHasta
+				sql.WHERE("( col.fechaincorporacion <= TO_DATE('" + fechaIncorporacionHasta
 						+ "','DD/MM/YYYY'))");
 			}
 		}
@@ -297,7 +303,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			}
 		}
 
-		sql.ORDER_BY("NOMBRE");
+		sql.ORDER_BY("NOMBRE,CORREO,TELEFONO");
 
 		sql2.SELECT("*");
 		sql2.FROM("(" + sql + ")");
@@ -649,7 +655,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion))");
 		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
 		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '1')");
-		sql.INNER_JOIN(
+		sql.LEFT_OUTER_JOIN(
 				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
 
 		sql.LEFT_OUTER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIR ON (CLI.IDPERSONA = TIPODIR.IDPERSONA AND"  
