@@ -1362,8 +1362,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 							if (insertNoColegiado == 1) {
 								insertResponseDTO.setStatus(SigaConstants.OK);
-								List<ComboItem> idper = cenPersonaExtendsMapper.selectMaxIdPersona();
-								insertResponseDTO.setId(idper.get(0).getLabel());
+								insertResponseDTO.setId(idPersona.toString());
 								LOGGER.warn(
 										"createColegiado() / cenNocolegiadoExtendsMapper.insertSelectiveForCreateLegalPerson() -> Se ha insertado correctamente la persona en CEN_NOCOLEGIADO");
 							}
