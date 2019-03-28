@@ -717,18 +717,20 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 				// Este proceso se encarga de actualizar las cosas pendientes asociadas a la
 				// cuenta de la persona
-				String[] resultado1 = ejecutarPL_Revision_Cuenta("" + idInstitucion.toString(),
-						"" + datosBancariosInsertDTO.getIdPersona(), "" + idCuenta.toString(),
-						"" + usuario.getIdusuario().toString());
-				if (resultado1 == null || !resultado1[0].equals("0")) {
-
-					insertResponseDTO.setStatus(SigaConstants.KO);
-					error.setMessage(
-							"Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado[1]);
-					insertResponseDTO.setError(error);
-					return insertResponseDTO;
-
-				}
+				if(null == datosBancariosInsertDTO.getNoRevisarServicios()) {
+					String[] resultado1 = ejecutarPL_Revision_Cuenta("" + idInstitucion.toString(),
+							"" + datosBancariosInsertDTO.getIdPersona(), "" + idCuenta.toString(),
+							"" + usuario.getIdusuario().toString());
+					if (resultado1 == null || !resultado1[0].equals("0")) {
+	
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						error.setMessage(
+								"Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado[1]);
+						insertResponseDTO.setError(error);
+						return insertResponseDTO;
+	
+					}
+				
 
 				// Comprueba si va a lanzar el proceso que asocia las suscripciones activas con
 				// forma de pago en metalico a la nueva cuenta bancaria
@@ -746,7 +748,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						return insertResponseDTO;
 					}
 				}
-
+}
 			} else {
 				LOGGER.warn(
 						"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -1099,19 +1101,22 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				}
 				
 				// Este proceso se encarga de actualizar las cosas pendientes asociadas a la cuenta de la persona 
-				String[] resultado1 = ejecutarPL_Revision_Cuenta(
-					""+idInstitucion.toString(),
-					  ""+datosBancariosInsertDTO.getIdPersona(),
-					  ""+idCuenta.toString(),
-					  ""+ usuario.getIdusuario().toString());
-				if (resultado1 == null || !resultado1[0].equals("0")) {
+				if( null == datosBancariosInsertDTO.getNoRevisarServicios()) {
 
-					insertResponseDTO.setStatus(SigaConstants.KO);
-					error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado[1]);
-					insertResponseDTO.setError(error);
-					return insertResponseDTO;
-
-				}
+					String[] resultado1 = ejecutarPL_Revision_Cuenta(
+						""+idInstitucion.toString(),
+						  ""+datosBancariosInsertDTO.getIdPersona(),
+						  ""+idCuenta.toString(),
+						  ""+ usuario.getIdusuario().toString());
+					if (resultado1 == null || !resultado1[0].equals("0")) {
+	
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado[1]);
+						insertResponseDTO.setError(error);
+						return insertResponseDTO;
+	
+					}
+				
 				
 				// Comprueba si va a lanzar el proceso que asocia las suscripciones activas con forma de pago en metalico a la nueva cuenta bancaria
 				if (datosBancariosInsertDTO.getRevisionCuentas()) { 
@@ -1128,7 +1133,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						return insertResponseDTO;
 					}
 				}		
-				
+				}
 			} else {
 				LOGGER.warn(
 						"insertBanksData() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -1671,6 +1676,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					return updateResponseDTO;
 				}
 
+				if(null == datosBancariosInsertDTO.getNoRevisarServicios()) {
 				// Este proceso se encarga de actualizar las cosas pendientes asociadas a la
 				// cuenta de la persona
 				String[] resultado1 = ejecutarPL_Revision_Cuenta("" + idInstitucion.toString(),
@@ -1701,6 +1707,8 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						updateResponseDTO.setError(error);
 						return updateResponseDTO;
 					}
+				}
+				
 				}
 
 			} else {

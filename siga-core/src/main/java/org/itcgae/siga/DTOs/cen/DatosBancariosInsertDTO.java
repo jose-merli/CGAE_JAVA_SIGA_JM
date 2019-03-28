@@ -19,7 +19,7 @@ public class DatosBancariosInsertDTO {
 	private String nifTitular;
 	private String bic;
 	private String banco;
-
+	private Boolean noRevisarServicios;
 	/**
 	 */
 	public DatosBancariosInsertDTO idPersona(String idPersona) {
@@ -272,6 +272,14 @@ public class DatosBancariosInsertDTO {
 			return "null";
 		}
 		return o.toString().replace("\n", "\n    ");
+	}
+
+	public Boolean getNoRevisarServicios() {
+		return noRevisarServicios;
+	}
+
+	public void setNoRevisarServicios(Boolean noRevisarServicios) {
+		this.noRevisarServicios = noRevisarServicios;
 	}
 
 }
