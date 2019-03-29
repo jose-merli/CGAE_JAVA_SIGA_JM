@@ -110,6 +110,29 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 	}
 
 	@Override
+	public ComboDTO getLabelColegiosCol(String idInstitucion,HttpServletRequest request) {
+		LOGGER.info("getLabelColegios() -> Entrada al servicio para la búsqueda de todos los colegios");
+	
+		ComboDTO combo = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		LOGGER.info(
+				"getLabelColegios() / cenInstitucionExtendsMapper.getComboInstituciones() -> Entrada a cenInstitucionExtendsMapper para busqueda de personas no colegiadas por filtro");
+		comboItems = cenInstitucionExtendsMapper.getComboInstitucionesCol(idInstitucion);
+		LOGGER.info(
+				"getLabelColegios() / cenInstitucionExtendsMapper.getComboInstituciones() -> Salida de cenInstitucionExtendsMapper para busqueda de personas no colegiadas por filtro");
+	
+		
+		combo.setCombooItems(comboItems);
+		
+		LOGGER.info("getLabelColegios() -> Salida del servicio para la búsqueda de todos los colegios");
+		return combo;
+
+	}
+
+	
+	
+	@Override
 	public BusquedaPerJuridicaDTO searchPerJuridica(int numPagina, BusquedaPerJuridicaSearchDTO busquedaPerJuridicaSearchDTO, HttpServletRequest request) {
 		LOGGER.info(
 				"searchJuridica() -> Entrada al servicio para la búsqueda por filtros de personas jurídicas");

@@ -125,7 +125,13 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			sql.WHERE("COL.IDINSTITUCION IN (" + instituciones + ")");
 		} else {
 			if (idInstitucion != Short.parseShort("2000")) {
-				sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
+				if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100") ) {
+					sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
+				}
+				else{
+					sql.WHERE("inst.cen_inst_IDINSTITUCION = '" + idInstitucion + "'");
+				}
+				
 			}
 		}
 		sql.WHERE("per.idtipoidentificacion not in '20'");

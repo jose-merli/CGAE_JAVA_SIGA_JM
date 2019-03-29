@@ -75,7 +75,7 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 			}
 			if (record.getFechamodificacion() != null) {
 				String fechaF = dateFormat.format(record.getFechamodificacion());
-				sql.SET("FECHAMODIFICACION = '" + fechaF + "'");
+				sql.SET("FECHAMODIFICACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
 			}							
 			if (record.getUsumodificacion() != null) {
 				sql.SET("USUMODIFICACION =  '"+record.getUsumodificacion() +"'");

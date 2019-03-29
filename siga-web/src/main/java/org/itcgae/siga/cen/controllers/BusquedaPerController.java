@@ -33,6 +33,12 @@ public class BusquedaPerController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/busquedaCol/colegio",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getLabelColegiosCol(String idInstitucion,HttpServletRequest request) {
+		ComboDTO response = busquedaPerService.getLabelColegiosCol(idInstitucion,request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "busquedaPerJuridica/searchJuridica", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<BusquedaPerJuridicaDTO> searchJuridica(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaPerJuridicaSearchDTO busquedaPerJuridicaSearchDTO, HttpServletRequest request) { 
 		BusquedaPerJuridicaDTO response = busquedaPerService.searchPerJuridica(numPagina, busquedaPerJuridicaSearchDTO, request);

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample.Criteria;
 import org.itcgae.siga.db.entities.CenInstitucionExample.Criterion;
@@ -23,7 +24,34 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 	}
 	
 	
-	
+	public String getComboInstitucionesCol(String idInstitucion) {
+		
+		
+		if (idInstitucion.equals(SigaConstants.IDINSTITUCION_2000.toString())) {
+			SQL sql = new SQL();
+			sql.SELECT("IDINSTITUCION");
+			sql.SELECT("ABREVIATURA as NOMBRE");
+			sql.FROM("CEN_INSTITUCION");
+			sql.ORDER_BY("NOMBRE");
+			return sql.toString();
+		}else if(Long.parseLong(idInstitucion) > 2100){
+			SQL sql = new SQL();
+			sql.SELECT("IDINSTITUCION");
+			sql.SELECT("ABREVIATURA as NOMBRE");
+			sql.FROM("CEN_INSTITUCION");
+			sql.WHERE("CEN_INST_IDINSTITUCION = '" + idInstitucion  + "'");
+			sql.ORDER_BY("NOMBRE");
+			return sql.toString();
+		}else{
+			SQL sql = new SQL();
+			sql.SELECT("IDINSTITUCION");
+			sql.SELECT("ABREVIATURA as NOMBRE");
+			sql.FROM("CEN_INSTITUCION");
+			sql.WHERE("IDINSTITUCION = '" + idInstitucion  + "'");
+			sql.ORDER_BY("NOMBRE");
+			return sql.toString();
+		}
+	}
 	
 	
 	/**

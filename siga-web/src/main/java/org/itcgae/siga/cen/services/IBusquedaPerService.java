@@ -13,6 +13,8 @@ public interface IBusquedaPerService {
 	
 	public ComboDTO getLabelColegios( HttpServletRequest request);
 	
+	public ComboDTO getLabelColegiosCol(String idInstitucion, HttpServletRequest request);
+	
 	public BusquedaPerJuridicaDTO searchPerJuridica(int numPagina, BusquedaPerJuridicaSearchDTO busquedaPerJuridicaSearchDTO, HttpServletRequest request);
 	
 	public BusquedaPerFisicaDTO searchPerFisica(int numPagina, BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, HttpServletRequest request);
