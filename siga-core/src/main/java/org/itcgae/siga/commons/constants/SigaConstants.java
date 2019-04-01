@@ -782,6 +782,10 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final long  TIPO_NOTIFICACION_INICIOINSCRIPCION = 3;
 	public static final long  TIPO_NOTIFICACION_FININSCRIPCION = 4;
 	public static final long  TIPO_NOTIFICACION_SESION = 7;
-
 	
+	public static final String  CENSO_WS_SITUACION_EJERCIENTE = "EJERCIENTE";
+	public static final String  CENSO_WS_SITUACION_NOEJERCIENTE = "NOEJERCIENTE";
+	public static final String  CENSO_WS_SITUACION_BAJACOLEGIO = "BAJACOLEGIO";
+	public static final String  CENSO_WS_SITUACION_INSCRITO = "INSCRITO";
+
 }

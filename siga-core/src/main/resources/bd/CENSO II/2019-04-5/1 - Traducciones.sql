@@ -1,0 +1,5 @@
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.alterMutua.literal.datosBancariosObligatorios','Para aprobar una solicitud debe rellenar los datos bancarios','0','1',to_date('20/06/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.alterMutua.literal.datosBancariosObligatorios','Per aprovar una sol·licitud d''emplenar les dades bancàries','0','2',to_date('20/06/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.alterMutua.literal.datosBancariosObligatorios','Para aprobar una solicitud debe rellenar los datos bancarios#EU','0','3',to_date('20/06/12','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('censo.alterMutua.literal.datosBancariosObligatorios','Para aprobar una solicitud debe rellenar los datos bancarios#GL','0','4',to_date('20/06/12','DD/MM/RR'),'0','19');
+
