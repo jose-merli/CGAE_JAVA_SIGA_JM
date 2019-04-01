@@ -433,9 +433,9 @@ public class MenuServiceImpl implements IMenuService {
 		// Obtener idInstitucion del certificado y idUsuario del certificado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+		String idInstitucionCert = validaInstitucionCertificado(request);
 		permisoRequestItem.setIdInstitucion(String.valueOf(idInstitucion));
-		List<PermisoEntity> permisosEntity = permisosMapper.getProcesosPermisos(permisoRequestItem);
+		List<PermisoEntity> permisosEntity = permisosMapper.getProcesosPermisos(permisoRequestItem,idInstitucionCert);
 
 		if (null != permisosEntity && !permisosEntity.isEmpty()) {
 			List<PermisoItem> items = new ArrayList<PermisoItem>();
@@ -901,5 +901,54 @@ public class MenuServiceImpl implements IMenuService {
 		LOGGER.info("setIdiomaUsuario() --> Salida del servicio de cambio de idioma");
 		return response;
 	}	
+	
+
+
+	private String validaInstitucionCertificado(HttpServletRequest request) {
+		String idInstitucion = null;
+		try{
+		X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+		String organizationName = null;
+		String organizationNameNuevo = null;
+		X509Certificate cert = null;
+		
+		try {
+			cert = certs[0];
+			X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
+
+
+			if (x500name.getAttributeTypes()[7].getId().equals("1.3.6.1.4.1.16533.30.3")) {
+				RDN institucionnuevo = x500name.getRDNs(x500name.getAttributeTypes()[7])[0];
+				organizationNameNuevo = IETFUtils.valueToString(institucionnuevo.getFirst().getValue());
+			}else{
+				RDN institucionRdn = x500name.getRDNs(BCStyle.O)[0];
+				organizationName = IETFUtils.valueToString(institucionRdn.getFirst().getValue());
+			}
+			
+		} catch (CertificateEncodingException e) {
+			throw new InvalidClientCerticateException(e);
+		}
+
+
+		
+		if (null != organizationNameNuevo) {
+			idInstitucion = organizationNameNuevo.substring(0,
+						4);
+		}else{
+			idInstitucion = organizationName.substring(organizationName.length() - 4,
+				organizationName.length());
+		}
+		if (!UtilidadesString.esCadenaVacia(idInstitucion)) {
+			if (!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
+				throw new BadCredentialsException("Certificado no validado para CGAE");
+			}
+		}
+
+		} catch (Exception e) {
+			throw new BadCredentialsException(e.getMessage());
+		}
+
+		return idInstitucion;
+	}
 
 }
