@@ -409,8 +409,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 								"updateColegiado() / cenPersonaExtendsMapper.updateByExampleSelective() -> Entrada a cenPersonaExtendsMapper para actualizar información de colegiado en CEN_PERSONA");
 
 						CenPersonaExample dniRepetido = new CenPersonaExample();
-						dniRepetido.createCriteria().andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona()))
-								.andNifcifNotEqualTo(colegiadoItem.getNif());
+						dniRepetido.createCriteria().andNifcifEqualTo(colegiadoItem.getNif());
 						List<CenPersona> busqueda = cenPersonaExtendsMapper.selectByExample(dniRepetido);
 						if (busqueda.isEmpty()) {
 							cenPersonaExtendsMapper.updateByExampleSelective(cenPersona, cenPersonaExample1);
@@ -418,7 +417,11 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							Error error = new Error();
 							// Ya existe un usuario con este número de identificación
-							error.setMessage("gratuita.personaJG.literal.numDocumentoExistente");
+							if(colegiadoItem.getColegiado() == false || colegiadoItem.getColegiado() == null) {
+								error.setMessage("censo.fichaColegial.datosGenerales.literal.numDocumentoExistente.noColegiado");
+							}else {
+								error.setMessage("censo.fichaColegial.datosGenerales.literal.numDocumentoExistente.colegiado");
+							}
 							updateResponseDTO.setError(error);
 						}
 						LOGGER.info(
