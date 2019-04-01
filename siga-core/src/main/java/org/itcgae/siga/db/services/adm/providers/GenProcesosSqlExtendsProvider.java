@@ -9,7 +9,7 @@ public class GenProcesosSqlExtendsProvider extends AdmContadorSqlProvider{
 
 	
 	
-	public String getProcesosPermisos(PermisoRequestItem request){
+	public String getProcesosPermisos(PermisoRequestItem request,String idInstitucionCert){
 		SQL sql = new SQL();
 
 		sql.SELECT_DISTINCT("PROC.IDPROCESO AS ID");
@@ -21,7 +21,7 @@ public class GenProcesosSqlExtendsProvider extends AdmContadorSqlProvider{
 		
 		sql.LEFT_OUTER_JOIN("ADM_TIPOSACCESO ACCESO ON (PROC.IDPROCESO = ACCESO.IDPROCESO AND IDINSTITUCION = '"+ request.getIdInstitucion() + "'   and acceso.idperfil = '" + request.getIdGrupo() + "')");
 		// || !request.getIdInstitucionCertificado().equals(SigaConstants.InstitucionGeneral)
-		  if (!request.getIdInstitucion().equals(SigaConstants.InstitucionGeneral)) {
+		  if (!idInstitucionCert.equals(SigaConstants.InstitucionGeneral)) {
 	        	sql.WHERE(" UPPER(PROC.DESCRIPCION) not like UPPER('%hidden%')");
 			}
 		sql.ORDER_BY("PARENT DESC, TEXT ASC");
