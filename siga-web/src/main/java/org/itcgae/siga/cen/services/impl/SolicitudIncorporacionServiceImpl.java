@@ -863,11 +863,13 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		solIncorporacion.setFechamodificacion(new Date());
 		solIncorporacion.setFechanacimiento(dto.getFechaNacimiento());
 		solIncorporacion.setFechasolicitud(dto.getFechaSolicitud());
-		solIncorporacion.setIban(dto.getIban());
-		solIncorporacion.setCboCodigo(dto.getIban().substring(4, 8));
-		solIncorporacion.setCodigosucursal(dto.getIban().substring(8, 12));
-		solIncorporacion.setDigitocontrol(dto.getIban().substring(12, 14));
-		solIncorporacion.setNumerocuenta(dto.getIban().substring(14, 24));
+		if(dto.getIban() != null) {
+			solIncorporacion.setIban(dto.getIban());	
+			solIncorporacion.setCboCodigo(dto.getIban().substring(4, 8));
+			solIncorporacion.setCodigosucursal(dto.getIban().substring(8, 12));
+			solIncorporacion.setDigitocontrol(dto.getIban().substring(12, 14));
+			solIncorporacion.setNumerocuenta(dto.getIban().substring(14, 24));
+		}
 		solIncorporacion.setIdestado(Short.parseShort(dto.getIdEstado()));
 		if(dto.getIdEstadoCivil() != null) {
 			solIncorporacion.setIdestadocivil(Short.parseShort(dto.getIdEstadoCivil()));
