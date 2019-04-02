@@ -444,7 +444,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							CenGruposclienteClienteExample cenGruposclienteClienteExample = new CenGruposclienteClienteExample();
 							cenGruposclienteClienteExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 									.andIdpersonaEqualTo(Long.valueOf(etiquetaUpdateDTO.getIdPersona()))
-									.andIdinstitucionGrupoEqualTo(idInstitucion)
 									.andIdgrupoEqualTo(Short.valueOf(gruposPerJuridicaAntiguos.get(i)));
 							LOGGER.info(
 									"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.updateByExampleSelective() -> Entrada a cenGruposclienteClienteExtendsMapper para eliminar un grupo relacionado con persona juridica en tabla CEN_GRUPOSCLIENTE_CLIENTE");

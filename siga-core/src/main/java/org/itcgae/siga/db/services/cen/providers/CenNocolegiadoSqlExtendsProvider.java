@@ -602,18 +602,18 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		SQL sql = new SQL();
 
 		// En el caso de que venga de la pantalla de busqueda colegiados/no colegiados, tendremos que preparar el filtro de instituciones
-		String instituciones = "";
-		if (noColegiadoItem.getColegio() != null && noColegiadoItem.getColegio().length > 0) {
-			if (noColegiadoItem.getColegio().length > 1) {
-				for (String string : noColegiadoItem.getColegio()) {
-					instituciones += "'" + string + "'";
-					instituciones += ",";
-				}
-				instituciones = instituciones.substring(0, instituciones.length() - 1);
-			} else if (noColegiadoItem.getColegio().length == 1) {
-				instituciones = "'" + noColegiadoItem.getColegio()[0] + "'";
-			}
-		}
+//		String instituciones = "";
+//		if (noColegiadoItem.getColegio() != null && noColegiadoItem.getColegio().length > 0) {
+//			if (noColegiadoItem.getColegio().length > 1) {
+//				for (String string : noColegiadoItem.getColegio()) {
+//					instituciones += "'" + string + "'";
+//					instituciones += ",";
+//				}
+//				instituciones = instituciones.substring(0, instituciones.length() - 1);
+//			} else if (noColegiadoItem.getColegio().length == 1) {
+//				instituciones = "'" + noColegiadoItem.getColegio()[0] + "'";
+//			}
+//		}
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
@@ -663,14 +663,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = nocol.idInstitucion )");
 
 		
-		if(!instituciones.equals("")) {
-			sql.WHERE("NOCOL.IDINSTITUCION IN (" + instituciones + ")");
-		} else {
-			if (idInstitucion != Short.parseShort("2000")) {
-				sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
-			}
-		}
-		
+		sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("per.idtipoidentificacion not in '20'");
 
 		if(!noColegiadoItem.isHistorico()) {
