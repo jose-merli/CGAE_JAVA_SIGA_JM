@@ -409,7 +409,8 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 								"updateColegiado() / cenPersonaExtendsMapper.updateByExampleSelective() -> Entrada a cenPersonaExtendsMapper para actualizar información de colegiado en CEN_PERSONA");
 
 						CenPersonaExample dniRepetido = new CenPersonaExample();
-						dniRepetido.createCriteria().andNifcifEqualTo(colegiadoItem.getNif());
+						dniRepetido.createCriteria().andNifcifEqualTo(colegiadoItem.getNif())
+						.andIdpersonaNotEqualTo(Long.valueOf(colegiadoItem.getIdPersona()));
 						List<CenPersona> busqueda = cenPersonaExtendsMapper.selectByExample(dniRepetido);
 						if (busqueda.isEmpty()) {
 							cenPersonaExtendsMapper.updateByExampleSelective(cenPersona, cenPersonaExample1);
