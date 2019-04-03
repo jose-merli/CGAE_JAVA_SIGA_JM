@@ -718,7 +718,6 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				try{
 					AdmUsuarios usuario = usuarios.get(0);
 					solIncorporacion = _cenSolicitudincorporacionMapper.selectByPrimaryKey(idSolicitud);
-					
 					//insertamos datos personales
 					idPersona = insertarDatosPersonales(solIncorporacion, usuario);
 					insertCliente = insertarDatosCliente(solIncorporacion, usuario, idPersona);
@@ -730,6 +729,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					solIncorporacion.setFechamodificacion(new Date());
 					solIncorporacion.setUsumodificacion(usuario.getIdusuario());
 					solIncorporacion.setFechaalta(new Date());
+					solIncorporacion.setFechaestadosolicitud(new Date());
 					//solIncorporacion.setFechaestado(new Date());
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				
@@ -816,6 +816,8 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					solicitud.setFechamodificacion(new Date());
 					solicitud.setFechaestado(new Date());
 					solicitud.setUsumodificacion(usuario.getIdusuario());
+					solicitud.setFechaestadosolicitud(new Date());
+
 					update = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solicitud);
 					if(update ==1){
 						response.setId(Long.toString(idSolicitud));
@@ -863,11 +865,14 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		solIncorporacion.setFechamodificacion(new Date());
 		solIncorporacion.setFechanacimiento(dto.getFechaNacimiento());
 		solIncorporacion.setFechasolicitud(dto.getFechaSolicitud());
-		solIncorporacion.setIban(dto.getIban());
-		solIncorporacion.setCboCodigo(dto.getIban().substring(4, 8));
-		solIncorporacion.setCodigosucursal(dto.getIban().substring(8, 12));
-		solIncorporacion.setDigitocontrol(dto.getIban().substring(12, 14));
-		solIncorporacion.setNumerocuenta(dto.getIban().substring(14, 24));
+		solIncorporacion.setFechaestadosolicitud(dto.getFechaEstadoSolicitud());
+		if(dto.getIban() != null) {
+			solIncorporacion.setIban(dto.getIban());	
+			solIncorporacion.setCboCodigo(dto.getIban().substring(4, 8));
+			solIncorporacion.setCodigosucursal(dto.getIban().substring(8, 12));
+			solIncorporacion.setDigitocontrol(dto.getIban().substring(12, 14));
+			solIncorporacion.setNumerocuenta(dto.getIban().substring(14, 24));
+		}
 		solIncorporacion.setIdestado(Short.parseShort(dto.getIdEstado()));
 		if(dto.getIdEstadoCivil() != null) {
 			solIncorporacion.setIdestadocivil(Short.parseShort(dto.getIdEstadoCivil()));
@@ -1155,10 +1160,8 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				record.setNombre("BANCO EXTRANJERO");
 			} else {
 				record.setCodigo(solicitud.getIban().substring(4, 8));
-				record.setNombre(solicitud.getBanco());
 			}
 
-			record.setBic(solicitud.getBic());
 			record.setFechamodificacion(new Date());
 
 			CenPaisExample cenPaisExample = new CenPaisExample();

@@ -15,15 +15,15 @@ public class DatosBancariosItem {
 	private String titular;
 	private String iban;
 	private String ibanFormateado;
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaModificacion;
 	private String uso;
 	private String bic;
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaFirmaServicios;
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaFirmaProductos;
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaBaja;
 	private String nifTitular;
 	private String banco;
