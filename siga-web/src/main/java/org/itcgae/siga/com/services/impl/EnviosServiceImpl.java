@@ -111,7 +111,10 @@ public class EnviosServiceImpl implements IEnviosService{
 		    sesion.getProperties().put("mail.smtp.auth", "true");
 		    keyProperties.setParametro("mail.smtp.port");
 		    property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
-		    sesion.getProperties().put("mail.smtp.port", property.getValor());
+		    String portSt = property.getValor();
+		    if (portSt != null && !portSt.trim().equals("")) {
+		    	sesion.getProperties().put("mail.smtp.port", portSt);
+		    }
 		    
 		    LOGGER.debug("Obtenemos el remitente");
 		    
@@ -193,7 +196,13 @@ public class EnviosServiceImpl implements IEnviosService{
         		keyProperties.setParametro("mail.smtp.pwd");
         		property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
         		String pwd = property.getValor();
-        		tr.connect(host, user, pwd);
+        		
+        		if (portSt != null && !portSt.trim().equals("")) {
+        			tr.connect(host, Integer.parseInt(portSt), user, pwd);	
+        		} else {
+        			tr.connect(host, user, pwd);
+        		}
+        		
         		tr.sendMessage(mensaje, mensaje.getAllRecipients());
         		LOGGER.debug("Enviado");
         		
