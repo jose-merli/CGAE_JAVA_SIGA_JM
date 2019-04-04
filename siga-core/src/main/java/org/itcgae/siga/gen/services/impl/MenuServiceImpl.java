@@ -938,11 +938,6 @@ public class MenuServiceImpl implements IMenuService {
 			idInstitucion = organizationName.substring(organizationName.length() - 4,
 				organizationName.length());
 		}
-		if (!UtilidadesString.esCadenaVacia(idInstitucion)) {
-			if (!idInstitucion.equals(SigaConstants.InstitucionGeneral)) {
-				throw new BadCredentialsException("Certificado no validado para CGAE");
-			}
-		}
 
 		} catch (Exception e) {
 			throw new BadCredentialsException(e.getMessage());

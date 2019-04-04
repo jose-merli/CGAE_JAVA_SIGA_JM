@@ -1561,22 +1561,24 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								envioProgramado.setUsumodificacion(usuario.getIdusuario());								
 								_envEnvioprogramadoMapper.insert(envioProgramado);
 								
-								//INSERTAMOS  DESTINATARIO
-								EnvDestinatarios destinatario = new EnvDestinatarios();
-								DestinatarioItem dest = listaConsultasEnvio.getDestinatario();
-								destinatario.setIdinstitucion(idInstitucion);
-								destinatario.setIdenvio(envio.getIdenvio());
-								destinatario.setIdpersona(Long.valueOf(dest.getIdPersona()));
-								destinatario.setNombre(dest.getNombre());
-								destinatario.setApellidos1(dest.getApellidos1());
-								destinatario.setApellidos2(dest.getApellidos2());
-								destinatario.setCorreoelectronico(dest.getCorreoElectronico());
-								destinatario.setNifcif(dest.getNIFCIF());
-								destinatario.setMovil(dest.getMovil());
-								destinatario.setFechamodificacion(new Date());
-								destinatario.setUsumodificacion(usuario.getIdusuario());
-								destinatario.setTipodestinatario(SigaConstants.TIPO_CEN_PERSONA);
-								_envDestinatariosMapper.insert(destinatario);
+								if (null != listaConsultasEnvio.getDestinatario().getIdPersona()) {
+									//INSERTAMOS  DESTINATARIO
+									EnvDestinatarios destinatario = new EnvDestinatarios();
+									DestinatarioItem dest = listaConsultasEnvio.getDestinatario();
+									destinatario.setIdinstitucion(idInstitucion);
+									destinatario.setIdenvio(envio.getIdenvio());
+									destinatario.setIdpersona(Long.valueOf(dest.getIdPersona()));
+									destinatario.setNombre(dest.getNombre());
+									destinatario.setApellidos1(dest.getApellidos1());
+									destinatario.setApellidos2(dest.getApellidos2());
+									destinatario.setCorreoelectronico(dest.getCorreoElectronico());
+									destinatario.setNifcif(dest.getNIFCIF());
+									destinatario.setMovil(dest.getMovil());
+									destinatario.setFechamodificacion(new Date());
+									destinatario.setUsumodificacion(usuario.getIdusuario());
+									destinatario.setTipodestinatario(SigaConstants.TIPO_CEN_PERSONA);
+									_envDestinatariosMapper.insert(destinatario);
+								}
 							}
 							
 							List<String> nombresFicheros = new ArrayList<String>();
