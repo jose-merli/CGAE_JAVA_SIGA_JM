@@ -15,7 +15,7 @@ public class CenGruposclienteSqlExtendsProvider extends CenGruposclienteSqlProvi
 		sql.SELECT("GENR.DESCRIPCION");
 		sql.FROM(" cen_gruposcliente GRUCLI");
 		sql.INNER_JOIN("  GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO");
-		sql.WHERE(" GRUCLI.IDINSTITUCION = '"+ usuario.getIdinstitucion()  + "'");
+		sql.WHERE(" GRUCLI.IDINSTITUCION in ('2000', '"+ usuario.getIdinstitucion()  + "')");
 		sql.WHERE(" GENR.IDLENGUAJE = '"+ usuario.getIdlenguaje()+ "'");
 		sql.ORDER_BY("GENR.DESCRIPCION");
 		return sql.toString();
