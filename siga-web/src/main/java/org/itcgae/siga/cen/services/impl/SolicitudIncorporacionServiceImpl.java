@@ -739,6 +739,15 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						response.setError(null);
 						LOGGER.warn("aprobarSolicitud() / cenSolicitudincorporacionMapper.insert() -> " + solIncorporacion.getIdsolicitud()
 										+ " .Insertado el id correctamente en la tabla Cen_SolicitudIncorporacion");
+						
+//						Object[] paramMandatos = new Object[5];
+//						paramMandatos[0] = idPersona.toString();
+//						paramMandatos[1] = usuario.getIdinstitucion().toString();
+//						paramMandatos[2] = new Long(10).toString();
+//						paramMandatos[3] = idDireccion.toString();
+//						paramMandatos[4] = usuario.getIdusuario().toString();
+//						String resultado[] = new String[2];
+//						resultado = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2, paramMandatos);
 					}else{
 						LOGGER.error("aprobarSolicitud() --> Borramos los registros al no poder aprobar la solicitud");
 						if(insertColegiado == 0) {
