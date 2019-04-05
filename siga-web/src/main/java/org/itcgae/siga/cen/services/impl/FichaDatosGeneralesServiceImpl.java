@@ -43,6 +43,7 @@ import org.itcgae.siga.db.entities.CenColegiadoExample;
 import org.itcgae.siga.db.entities.CenGruposcliente;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
+import org.itcgae.siga.db.entities.CenGruposclienteExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.CenNocolegiadoKey;
@@ -314,10 +315,31 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 									Date date = new Date();
 									String fecha = dateFormat.format(date);
 									etiqueta.setFechaInicio(fecha);
-									int response = cenGruposclienteClienteExtendsMapper
-											.insertSelectiveForUpdateLegalPerson(etiqueta,
-													etiquetaUpdateDTO.getIdPersona(), String.valueOf(idInstitucion),
-													String.valueOf(usuario.getIdusuario()));
+
+									CenGruposclienteExample cenGruposclienteExample = new CenGruposclienteExample();
+									cenGruposclienteExample.createCriteria()
+											.andIdgrupoEqualTo(Short.valueOf(etiqueta.getIdGrupo()))
+											.andIdinstitucionEqualTo(idInstitucion);
+
+									List<CenGruposcliente> cenGruposcliente = cenGruposclienteExtendsMapper
+											.selectByExample(cenGruposclienteExample);
+
+									int response = 0;
+
+									if (cenGruposcliente != null && cenGruposcliente.size() > 0) {
+										response = cenGruposclienteClienteExtendsMapper
+												.insertSelectiveForUpdateLegalPerson(etiqueta,
+														etiquetaUpdateDTO.getIdPersona(), String.valueOf(idInstitucion), String.valueOf(idInstitucion),
+														String.valueOf(usuario.getIdusuario()));
+									} else {
+										response = cenGruposclienteClienteExtendsMapper
+												.insertSelectiveForUpdateLegalPerson(etiqueta,
+														etiquetaUpdateDTO.getIdPersona(),
+														String.valueOf(SigaConstants.IDINSTITUCION_2000),
+														String.valueOf(idInstitucion),
+														String.valueOf(usuario.getIdusuario()));
+									}
+
 									LOGGER.info(
 											"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
 
@@ -410,7 +432,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 						CenPersonaExample dniRepetido = new CenPersonaExample();
 						dniRepetido.createCriteria().andNifcifEqualTo(colegiadoItem.getNif())
-						.andIdpersonaNotEqualTo(Long.valueOf(colegiadoItem.getIdPersona()));
+								.andIdpersonaNotEqualTo(Long.valueOf(colegiadoItem.getIdPersona()));
 						List<CenPersona> busqueda = cenPersonaExtendsMapper.selectByExample(dniRepetido);
 						if (busqueda.isEmpty()) {
 							cenPersonaExtendsMapper.updateByExampleSelective(cenPersona, cenPersonaExample1);
@@ -418,10 +440,12 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							Error error = new Error();
 							// Ya existe un usuario con este número de identificación
-							if(colegiadoItem.getColegiado() == false || colegiadoItem.getColegiado() == null) {
-								error.setMessage("censo.fichaColegial.datosGenerales.literal.numDocumentoExistente.noColegiado");
-							}else {
-								error.setMessage("censo.fichaColegial.datosGenerales.literal.numDocumentoExistente.colegiado");
+							if (colegiadoItem.getColegiado() == false || colegiadoItem.getColegiado() == null) {
+								error.setMessage(
+										"censo.fichaColegial.datosGenerales.literal.numDocumentoExistente.noColegiado");
+							} else {
+								error.setMessage(
+										"censo.fichaColegial.datosGenerales.literal.numDocumentoExistente.colegiado");
 							}
 							updateResponseDTO.setError(error);
 						}
@@ -441,14 +465,36 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 							cenGruposclienteCliente.setFechaBaja(format.parse(fecha)); // Ponemos la fecha de baja a no
 																						// null
+							
+							CenGruposclienteExample cenGruposclienteExample = new CenGruposclienteExample();
+							cenGruposclienteExample.createCriteria()
+									.andIdgrupoEqualTo(Short.valueOf(gruposPerJuridicaAntiguos.get(i)))
+									.andIdinstitucionEqualTo(idInstitucion);
+
+							List<CenGruposcliente> cenGruposcliente = cenGruposclienteExtendsMapper
+									.selectByExample(cenGruposclienteExample);
+
+							int response = 0;
+							short idInstitucionEtiqueta = 0;
+
+							if (cenGruposcliente != null && cenGruposcliente.size() > 0) {
+								idInstitucionEtiqueta = idInstitucion;
+							} else {
+								idInstitucionEtiqueta = SigaConstants.IDINSTITUCION_2000;
+							}
+							
 							CenGruposclienteClienteExample cenGruposclienteClienteExample = new CenGruposclienteClienteExample();
 							cenGruposclienteClienteExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andIdinstitucionGrupoEqualTo(idInstitucionEtiqueta)
 									.andIdpersonaEqualTo(Long.valueOf(etiquetaUpdateDTO.getIdPersona()))
 									.andIdgrupoEqualTo(Short.valueOf(gruposPerJuridicaAntiguos.get(i)));
+							
 							LOGGER.info(
 									"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.updateByExampleSelective() -> Entrada a cenGruposclienteClienteExtendsMapper para eliminar un grupo relacionado con persona juridica en tabla CEN_GRUPOSCLIENTE_CLIENTE");
+						
 							int eliminadoGrupo = cenGruposclienteClienteExtendsMapper
 									.deleteByExample(cenGruposclienteClienteExample);
+							
 							// .updateByExample(cenGruposclienteCliente, cenGruposclienteClienteExample);
 							LOGGER.info(
 									"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.updateByExampleSelective() -> Salida de cenGruposclienteClienteExtendsMapper para eliminar un grupo relacionado con persona juridica en tabla CEN_GRUPOSCLIENTE_CLIENTE");
@@ -1655,13 +1701,14 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		if (null != usuarios && usuarios.size() > 0) {
 			AdmUsuarios usuario = usuarios.get(0);
 			if (null != idInstitucion) {
-	
+
 				LOGGER.info(
 						"getTopicsSpecificPerson() / forTemaCursoPersonaExtendsMapper.getTopicsSpecificPerson -> Entrada a forTemaCursoPersonaExtendsMapper para obtener los temas según la persona");
-				comboItems = forTemaCursoPersonaExtendsMapper.getTopicsSpecificPerson(idInstitucion.toString(), idPersona, usuario.getIdlenguaje());
+				comboItems = forTemaCursoPersonaExtendsMapper.getTopicsSpecificPerson(idInstitucion.toString(),
+						idPersona, usuario.getIdlenguaje());
 				LOGGER.info(
 						"getTopicsSpecificPerson() / forTemaCursoPersonaExtendsMapper.getTopicsSpecificPerson -> Salida de forTemaCursoPersonaExtendsMapper para obtener los temas según la persona");
-	
+
 			}
 		}
 		comboDTO.setCombooItems(comboItems);

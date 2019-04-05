@@ -70,7 +70,7 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 	
 	//public String insertSelectiveForUpdateLegalPerson(EtiquetaUpdateDTO etiquetaUpdateDTO, String idInstitucion, String grupo, String idUsuario) {
 
-	public String insertSelectiveForUpdateLegalPerson(ComboEtiquetasItem etiqueta, String idPersona, String idInstitucion, String idUsuario) {
+	public String insertSelectiveForUpdateLegalPerson(ComboEtiquetasItem etiqueta, String idPersona, String idInstitucionEtiqueta, String idInstitucion, String idUsuario) {
 
 		SQL sql = new SQL();
 
@@ -80,7 +80,7 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		sql.VALUES("IDGRUPO", "'" + etiqueta.getIdGrupo() + "'");
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", "'" +idUsuario + "'");
-		sql.VALUES("IDINSTITUCION_GRUPO", "'" +idInstitucion+ "'");
+		sql.VALUES("IDINSTITUCION_GRUPO", "'" +idInstitucionEtiqueta+ "'");
 //		sql.VALUES("FECHA_BAJA", "'" + etiqueta.getFechaBaja() + "'");
 //		sql.VALUES("FECHA_INICIO", "'" + etiqueta.getFechaInicio() + "'");
 		if(etiqueta.getFechaBaja() != null) {
