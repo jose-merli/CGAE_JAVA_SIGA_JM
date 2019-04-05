@@ -739,7 +739,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 						response.setError(null);
 						LOGGER.warn("aprobarSolicitud() / cenSolicitudincorporacionMapper.insert() -> " + solIncorporacion.getIdsolicitud()
 										+ " .Insertado el id correctamente en la tabla Cen_SolicitudIncorporacion");
-						
+//						
 //						Object[] paramMandatos = new Object[5];
 //						paramMandatos[0] = idPersona.toString();
 //						paramMandatos[1] = usuario.getIdinstitucion().toString();
@@ -969,7 +969,10 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		cliente.setUsumodificacion(usuario.getIdusuario());
 		cliente.setIdlenguaje(usuario.getIdlenguaje());
 		cliente.setExportarfoto(SigaConstants.DB_FALSE);
-		
+		//cliente.setLetrado("1");
+		//cliente.setNoenviarrevista("0");
+		//cliente.setNoaparecerredabogacia("0");
+		cliente.setFechacarga(new Date());
 		CenClienteExample ejemploCliente = new CenClienteExample();
 		ejemploCliente.createCriteria().andIdpersonaEqualTo(idPersona).andIdinstitucionEqualTo(usuario.getIdinstitucion());
 		
