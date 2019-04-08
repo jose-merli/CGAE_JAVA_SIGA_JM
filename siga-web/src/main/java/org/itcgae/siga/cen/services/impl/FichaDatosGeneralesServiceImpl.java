@@ -485,7 +485,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							
 							CenGruposclienteClienteExample cenGruposclienteClienteExample = new CenGruposclienteClienteExample();
 							cenGruposclienteClienteExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-									.andIdinstitucionGrupoEqualTo(idInstitucionEtiqueta)
 									.andIdpersonaEqualTo(Long.valueOf(etiquetaUpdateDTO.getIdPersona()))
 									.andIdgrupoEqualTo(Short.valueOf(gruposPerJuridicaAntiguos.get(i)));
 							
