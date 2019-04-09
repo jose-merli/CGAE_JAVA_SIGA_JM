@@ -38,6 +38,12 @@ public class BusquedaSancionesController {
 		return new ResponseEntity<BusquedaSancionesDTO >(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "busquedaSanciones/searchBusquedaSancionesBBDD", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<BusquedaSancionesDTO> searchBusquedaSancionesBBDD(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaSancionesSearchDTO busquedaSancionesSearchDTO, HttpServletRequest request) { 
+		BusquedaSancionesDTO response = busquedaSancionesService.searchBusquedaSancionesBBDD(numPagina, busquedaSancionesSearchDTO, request);
+		return new ResponseEntity<BusquedaSancionesDTO >(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "busquedaSanciones/insertSanction", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> insertSanction(@RequestBody BusquedaSancionesItem busquedaSancionesItem, HttpServletRequest request) throws Exception { 
 		InsertResponseDTO response = busquedaSancionesService.insertSanction(busquedaSancionesItem, request);

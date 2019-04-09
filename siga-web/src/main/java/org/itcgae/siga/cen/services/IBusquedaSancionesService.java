@@ -14,6 +14,8 @@ public interface IBusquedaSancionesService {
 	
 	BusquedaSancionesDTO searchBusquedaSanciones(int numPagina, BusquedaSancionesSearchDTO busquedaSancionesSearchDTO, HttpServletRequest request);
 
+	BusquedaSancionesDTO searchBusquedaSancionesBBDD(int numPagina, BusquedaSancionesSearchDTO busquedaSancionesSearchDTO, HttpServletRequest request);
+
 	InsertResponseDTO insertSanction(BusquedaSancionesItem busquedaSancionesItem, HttpServletRequest request);
 
 	UpdateResponseDTO updateSanction(BusquedaSancionesItem busquedaSancionesItem, HttpServletRequest request);
