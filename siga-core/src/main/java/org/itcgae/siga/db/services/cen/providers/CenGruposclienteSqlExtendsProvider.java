@@ -11,12 +11,13 @@ public class CenGruposclienteSqlExtendsProvider extends CenGruposclienteSqlProvi
 	public String getLabel(AdmUsuarios usuario) {
 		SQL sql = new SQL();
 		
-		sql.SELECT("distinct GRUCLI.IDGRUPO");
+		sql.SELECT("distinct MAX(GRUCLI.IDGRUPO) AS IDGRUPO");
 		sql.SELECT("GENR.DESCRIPCION");
 		sql.FROM(" cen_gruposcliente GRUCLI");
 		sql.INNER_JOIN("  GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO");
-		sql.WHERE(" GRUCLI.IDINSTITUCION = '"+ usuario.getIdinstitucion()  + "'");
+		sql.WHERE(" GRUCLI.IDINSTITUCION in ('2000', '"+ usuario.getIdinstitucion()  + "')");
 		sql.WHERE(" GENR.IDLENGUAJE = '"+ usuario.getIdlenguaje()+ "'");
+		sql.GROUP_BY("GENR.DESCRIPCION");
 		sql.ORDER_BY("GENR.DESCRIPCION");
 		return sql.toString();
 	}

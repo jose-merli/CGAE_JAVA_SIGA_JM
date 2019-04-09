@@ -47,7 +47,7 @@ public interface CenGruposclienteClienteExtendsMapper extends CenGruposclienteCl
 	
 
 	@InsertProvider(type = CenGruposclienteClienteSqlExtendsProvider.class, method = "insertSelectiveForUpdateLegalPerson")
-	int insertSelectiveForUpdateLegalPerson(ComboEtiquetasItem etiqueta, String idPersona, String idInstitucion, String idUsuario);
+	int insertSelectiveForUpdateLegalPerson(ComboEtiquetasItem etiqueta, String idPersona, String idInstitucionEtiqueta, String idInstitucion, String idUsuario);
 	
 	@UpdateProvider(type = CenGruposclienteClienteSqlExtendsProvider.class, method = "updateByExample")
 	int updateByExample(@Param("record") CenGruposclienteCliente record,

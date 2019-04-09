@@ -173,15 +173,15 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 			
 			sqlPlazasDispo.SELECT("COUNT (IDINSCRIPCION)");
 			sqlPlazasDispo.FROM("FOR_INSCRIPCION INSCRIPCION");
-			sqlPlazasDispo.WHERE("INSCRIPCION.IDCURSO = CURSO.IDCURSO AND INSCRIPCION.IDESTADOINSCRIPCION = 1");
+			sqlPlazasDispo.WHERE("INSCRIPCION.IDCURSO = CURSO.IDCURSO AND INSCRIPCION.IDESTADOINSCRIPCION = 3");
 			
 			
 			if(SigaConstants.PLAZAS_DISPO_SI.equals(cursoItem.getPlazasDisponibles())) {
-				sql.WHERE("CURSO.NUMEROPLAZAS > " +"("+ sqlPlazasDispo +")");
+				sql.WHERE("nvl(CURSO.NUMEROPLAZAS,0) > " +"nvl(("+ sqlPlazasDispo +"),0)");
 			}
 			
 			if(SigaConstants.PLAZAS_DISPO_NO.equals(cursoItem.getPlazasDisponibles())) {
-				sql.WHERE("CURSO.NUMEROPLAZAS < " +"("+ sqlPlazasDispo +")");
+				sql.WHERE("nvl(CURSO.NUMEROPLAZAS,0) <= " +"nvl(("+ sqlPlazasDispo +"),0)");
 			}
 			
 		}
@@ -196,7 +196,7 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 				+ "MAX.FECHAINICIO,CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) ,CURSO.FLAGARCHIVADO, CURSO.LUGAR, "
 				+ "CURSO.NUMEROPLAZAS , CURSO.AUTOVALIDACIONINSCRIPCION, CURSO.MINIMOASISTENCIA, CURSO.ENCUESTASATISFACCION,CURSO.INFORMACIONADICIONAL,"
 				+ " CURSO.DOCUMENTACIONADJUNTA, CURSO.INFORMACIONADICIONAL, CURSO.IDTIPOSERVICIO");
-		sql.ORDER_BY("CURSO.CODIGOCURSO");
+		sql.ORDER_BY("CURSO.CODIGOCURSO DESC");
 		
 		return sql.toString();
 	}
@@ -365,15 +365,15 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 			
 			sqlPlazasDispo.SELECT("COUNT (IDINSCRIPCION)");
 			sqlPlazasDispo.FROM("FOR_INSCRIPCION INSCRIPCION");
-			sqlPlazasDispo.WHERE("INSCRIPCION.IDCURSO = CURSO.IDCURSO AND INSCRIPCION.IDESTADOINSCRIPCION = 1");
+			sqlPlazasDispo.WHERE("INSCRIPCION.IDCURSO = CURSO.IDCURSO AND INSCRIPCION.IDESTADOINSCRIPCION = 3");
 			
 			
 			if(SigaConstants.PLAZAS_DISPO_SI.equals(cursoItem.getPlazasDisponibles())) {
-				sql.WHERE("CURSO.NUMEROPLAZAS > " +"("+ sqlPlazasDispo +")");
+				sql.WHERE("nvl(CURSO.NUMEROPLAZAS,0) > " +"nvl(("+ sqlPlazasDispo +"),0)");
 			}
 			
 			if(SigaConstants.PLAZAS_DISPO_NO.equals(cursoItem.getPlazasDisponibles())) {
-				sql.WHERE("CURSO.NUMEROPLAZAS < " +"("+ sqlPlazasDispo +")");
+				sql.WHERE("nvl(CURSO.NUMEROPLAZAS,0) <= " +"nvl(("+ sqlPlazasDispo +"),0)");
 			}
 			
 		}
@@ -388,7 +388,7 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 				+ "MAX.FECHAINICIO,CONCAT(PER.NOMBRE ||' ',CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2)) ,CURSO.FLAGARCHIVADO, CURSO.LUGAR, "
 				+ "CURSO.NUMEROPLAZAS , CURSO.AUTOVALIDACIONINSCRIPCION, CURSO.MINIMOASISTENCIA, CURSO.ENCUESTASATISFACCION,CURSO.INFORMACIONADICIONAL,"
 				+ " CURSO.DOCUMENTACIONADJUNTA, CURSO.INFORMACIONADICIONAL, CURSO.IDTIPOSERVICIO");
-		sql.ORDER_BY("CURSO.CODIGOCURSO");
+		sql.ORDER_BY("CURSO.CODIGOCURSO DESC");
 		
 		return sql.toString();
 	}

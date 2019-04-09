@@ -2867,15 +2867,27 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 
 		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getTopicsCourse() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getTopicsCourse() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
 
 			LOGGER.info(
 					"getTopicsSpecificCourse() / forTemacursoExtendsMapper.getTopicsSpecificCourse -> Entrada a forTemacursoExtendsMapper para obtener los temas de un curso según el curso");
-			comboItems = forTemacursoExtendsMapper.getTopicsSpecificCourse(idInstitucion.toString(), idCurso);
+			comboItems = forTemacursoExtendsMapper.getTopicsSpecificCourse(usuario.getIdlenguaje(),idInstitucion.toString(), idCurso);
 			LOGGER.info(
 					"getTopicsSpecificCourse() / forTemacursoExtendsMapper.getTopicsSpecificCourse -> Salida de forTemacursoExtendsMapper para obtener los temas de un curso según el curso");
+			}
 
 		}
 

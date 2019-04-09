@@ -181,6 +181,9 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 									busquedaSancionesItem.setNombre(nombreCompleto);
 
+									busquedaSancionesItem.setNif(busquedaSancionesSearchDTO.getNif());
+									busquedaSancionesItem.setTexto(sancionesColegiados.getDescripcion());
+
 									busquedaSancionesItem
 											.setColegio(sancionesColegiados.getColegio().getDescripcionColegio());
 									busquedaSancionesItem
@@ -196,30 +199,34 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 												.format(sancionesColegiados.getFechaInicio().getTime());
 										busquedaSancionesItem.setFechaDesde(fechaDesde);
 									}
-									
+
 									if (sancionesColegiados.getFechaFin() != null) {
 										String fechaHasta = format.format(sancionesColegiados.getFechaFin().getTime());
 										busquedaSancionesItem.setFechaHasta(fechaHasta);
 									}
-									
+
 									if (sancionesColegiados.getFechaRehabilitacion() != null) {
 										String fechaRehabilitado = format
 												.format(sancionesColegiados.getFechaRehabilitacion().getTime());
 										busquedaSancionesItem.setFechaRehabilitado(fechaRehabilitado);
-										busquedaSancionesItem.setRehabilitado(SigaConstants.SI);
+										
+										if(sancionesColegiados.getFechaRehabilitacion().after(new Date())) {
+											busquedaSancionesItem.setRehabilitado(SigaConstants.SI);
+										}else {
+											busquedaSancionesItem.setRehabilitado(SigaConstants.NO);
+										}
 									}else {
 										busquedaSancionesItem.setRehabilitado(SigaConstants.NO);
 									}
-									
+
 									if (sancionesColegiados.getFechaFirmeza() != null) {
 										String fechaFirmeza = format
 												.format(sancionesColegiados.getFechaFirmeza().getTime());
 										busquedaSancionesItem.setFechaFirmeza(fechaFirmeza);
-										busquedaSancionesItem.setFirmeza(SigaConstants.SI);
-									}else {
-										busquedaSancionesItem.setFirmeza(SigaConstants.NO);
 									}
 									
+									busquedaSancionesItem.setFirmeza(SigaConstants.SI);
+
 									busquedaSancionesItems.add(busquedaSancionesItem);
 
 								}
@@ -611,6 +618,8 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 									} else {
 										updateResponseDTO.setStatus(SigaConstants.OK);
 									}
+								}else {
+									updateResponseDTO.setStatus(SigaConstants.OK);
 								}
 							} else {
 								updateResponseDTO.setStatus(SigaConstants.OK);
@@ -680,6 +689,65 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 			}
 		} else
 			return null;
+	}
+
+	@Override
+	public BusquedaSancionesDTO searchBusquedaSancionesBBDD(int numPagina,
+			BusquedaSancionesSearchDTO busquedaSancionesSearchDTO, HttpServletRequest request) {
+		LOGGER.info(
+				"searchBusquedaSanciones() -> Entrada al servicio para la búsqueda por filtros de sanciones en bbdd");
+
+		List<BusquedaSancionesItem> busquedaSancionesItems = new ArrayList<BusquedaSancionesItem>();
+		BusquedaSancionesDTO busquedaSancionesDTO = new BusquedaSancionesDTO();
+		String idLenguaje = null;
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"searchBusquedaSanciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"searchBusquedaSanciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				idLenguaje = usuario.getIdlenguaje();
+
+				try {
+
+					LOGGER.info(
+							"searchBusquedaSanciones() / cenTiposancionExtendsMapper.searchBusquedaSanciones() -> Entrada a cenTiposancionExtendsMapper para busqueda de sanciones por filtro");
+
+					busquedaSancionesItems = cenTiposancionExtendsMapper.searchBusquedaSanciones(
+							busquedaSancionesSearchDTO, idLenguaje, String.valueOf(idInstitucion));
+
+					busquedaSancionesDTO.setBusquedaSancionesItem(busquedaSancionesItems);
+
+					LOGGER.info(
+							"searchBusquedaSanciones() / cenTiposancionExtendsMapper.searchBusquedaSanciones() -> Salida de cenTiposancionExtendsMapper para busqueda de sanciones por filtro");
+
+				} catch (Exception e) {
+					LOGGER.error("Error en la llamada a busqueda de sanciones.", e);
+				}
+
+			} else {
+				LOGGER.warn(
+						"searchBusquedaSanciones() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("searchBusquedaSanciones() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info(
+				"searchBusquedaSanciones() -> Salida del servicio para la búsqueda por filtros de sanciones en bbdd");
+		return busquedaSancionesDTO;
 	}
 
 }

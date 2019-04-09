@@ -179,7 +179,7 @@ public class FichaDatosGeneralesServiceTest {
 		when(cenGruposclienteClienteExtendsMapper.selectByExample(Mockito.any(CenGruposclienteClienteExample.class))).thenReturn(listarelacionGrupoPersona); 
 		when(cenGruposclienteClienteExtendsMapper.updateByExample(Mockito.any(CenGruposclienteCliente.class), Mockito.any(CenGruposclienteClienteExample.class))).thenReturn(0); 
 		when(cenPersonaExtendsMapper.updateByExampleSelective(Mockito.any(CenPersona.class), Mockito.any(CenPersonaExample.class))).thenReturn(1); 
-		when(cenGruposclienteClienteExtendsMapper.insertSelectiveForUpdateLegalPerson(Mockito.any(ComboEtiquetasItem.class),Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(1); 
+		when(cenGruposclienteClienteExtendsMapper.insertSelectiveForUpdateLegalPerson(Mockito.any(ComboEtiquetasItem.class),Mockito.anyString(),Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(1); 
 		when(cenGruposclienteClienteExtendsMapper.updateByExample(Mockito.any(CenGruposclienteCliente.class), Mockito.any(CenGruposclienteClienteExample.class))).thenReturn(0); 
 		when(cenClienteMapper.selectByPrimaryKey(Mockito.any(CenClienteKey.class))).thenReturn(cliente); 
 		when(cenNocolegiadoMapper.updateByExampleSelective(Mockito.any(CenNocolegiado.class), Mockito.any(CenNocolegiadoExample.class))).thenReturn(1); 
@@ -306,7 +306,7 @@ public class FichaDatosGeneralesServiceTest {
 		when(cenPersonaExtendsMapper.selectByPrimaryKey(Mockito.anyLong())).thenReturn(persona); 
 		when(cenGruposclienteClienteExtendsMapper.selectGruposPersonaJuridica(Mockito.anyString(), Mockito.anyString())).thenReturn(gruposPersona); 
 		when(cenGruposclienteClienteExtendsMapper.selectByExample(Mockito.any(CenGruposclienteClienteExample.class))).thenReturn(listarelacionGrupoPersona); 
-		when(cenGruposclienteClienteExtendsMapper.insertSelectiveForUpdateLegalPerson(Mockito.any(ComboEtiquetasItem.class),Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(0); 
+		when(cenGruposclienteClienteExtendsMapper.insertSelectiveForUpdateLegalPerson(Mockito.any(ComboEtiquetasItem.class),Mockito.anyString(),Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(0); 
 		when(cenGruposclienteClienteExtendsMapper.updateByExample(Mockito.any(CenGruposclienteCliente.class), Mockito.any(CenGruposclienteClienteExample.class))).thenReturn(0); 
 		when(cenPersonaExtendsMapper.updateByExampleSelective(Mockito.any(CenPersona.class), Mockito.any(CenPersonaExample.class))).thenReturn(0); 
 		when(cenGruposclienteClienteExtendsMapper.updateByExample(Mockito.any(CenGruposclienteCliente.class), Mockito.any(CenGruposclienteClienteExample.class))).thenReturn(0); 
