@@ -129,8 +129,10 @@ public class BusquedaCursoServiceTest {
 		// AdmUsuariosExample (Mockito.any(AdmUsuariosExample.class)) dentro del
 		// servicio "busquedaCursosServiceImpl", devolverá lo que le estamos poniendo en
 		// el thenReturn
+		Short idInstitucion = new Short("2000");
+		
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
-		when(forTemacursoExtendsMapper.distinctTemaCurso(idLenguaje)).thenReturn(comboItemsSimulados);
+		when(forTemacursoExtendsMapper.distinctTemaCurso(idInstitucion,idLenguaje)).thenReturn(comboItemsSimulados);
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 

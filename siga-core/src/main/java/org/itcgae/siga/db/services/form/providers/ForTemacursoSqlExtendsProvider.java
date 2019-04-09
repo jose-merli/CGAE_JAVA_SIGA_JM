@@ -5,7 +5,7 @@ import org.itcgae.siga.db.mappers.ForTemacursoSqlProvider;
 
 public class ForTemacursoSqlExtendsProvider extends ForTemacursoSqlProvider {
 
-	public String distinctTemaCurso(String idLenguaje) {
+	public String distinctTemaCurso(Short idInstitucion, String idLenguaje) {
 
 		SQL sql = new SQL();
 
@@ -16,6 +16,7 @@ public class ForTemacursoSqlExtendsProvider extends ForTemacursoSqlProvider {
 		sql.WHERE("CAT.IDLENGUAJE = '" + idLenguaje + "'");
 		sql.WHERE("TC.FECHABAJA IS NULL");
 		sql.WHERE("CAT.NOMBRETABLA = 'FOR_TEMACURSO'");
+		sql.WHERE("tc.idinstitucion ='" + idInstitucion + "'");
 		sql.ORDER_BY("CAT.DESCRIPCION");
 
 		return sql.toString();
@@ -40,7 +41,7 @@ public class ForTemacursoSqlExtendsProvider extends ForTemacursoSqlProvider {
 
 	}
 	
-	public String getTopicsSpecificCourse(String idInstitucion, String idCurso) {
+	public String getTopicsSpecificCourse(String idLenguaje,String idInstitucion, String idCurso) {
 
 		SQL sql = new SQL();
 		
@@ -52,6 +53,7 @@ public class ForTemacursoSqlExtendsProvider extends ForTemacursoSqlProvider {
 		sql.WHERE("tc.FECHABAJA IS NULL");
 		sql.WHERE("tm.idinstitucion ='" + idInstitucion + "'");
 		sql.WHERE("tm.FECHABAJA IS NULL");
+		sql.WHERE("CAT.IDLENGUAJE = '" + idLenguaje + "'");
 		sql.ORDER_BY("cat.DESCRIPCION");
 
 		return sql.toString();

@@ -21,7 +21,7 @@ public interface ForTemacursoExtendsMapper extends ForTemacursoMapper{
 		@Result(column = "IDTEMACURSO", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
-	List<ComboItem> distinctTemaCurso(String idLenguaje);
+	List<ComboItem> distinctTemaCurso(Short idInstitucion,String idLenguaje);
 	
 	@SelectProvider(type = ForTemacursoSqlExtendsProvider.class, method = "getTopicsCourse")
 	@Results({
@@ -35,5 +35,5 @@ public interface ForTemacursoExtendsMapper extends ForTemacursoMapper{
 		@Result(column = "IDTEMACURSO", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
-	List<ComboItem> getTopicsSpecificCourse(String idInstitucion, String idCurso);
+	List<ComboItem> getTopicsSpecificCourse(String idLenguaje,String idInstitucion, String idCurso);
 }

@@ -55,7 +55,31 @@ values ((select max(codigo) +1 from GEN_CATALOGOS_MULTIIDIOMA),'FOR_ROLES','DESC
 
 
 
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripciones.aprobadas','inscripciones aprobadas','0','1',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripciones.aprobadas','inscripcions aprovades','0','2',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripciones.aprobadas','inscripciones aprobadas#EU','0','3',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripciones.aprobadas','inscripciones aprobadas#GL','0','4',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripciones.canceladas','inscripciones canceladas','0','1',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripciones.canceladas','inscripció cancel·lades','0','2',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripciones.canceladas','inscripciones canceladas#EU','0','3',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripciones.canceladas','inscripciones canceladas#GL','0','4',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripciones.rechazadas','inscripciones rechazadas','0','1',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripciones.rechazadas','inscripció rebutjades','0','2',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripciones.rechazadas','inscripciones rechazadas#EU','0','3',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripciones.rechazadas','inscripciones rechazadas#GL','0','4',to_date('13/12/18','DD/MM/RR'),'0','19');
 
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripcion.aprobada','inscripción aprobada','0','1',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripcion.aprobada','inscripció aprovada','0','2',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripcion.aprobada','inscripción aprobada#EU','0','3',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripcion.aprobada','inscripción aprobada#GL','0','4',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripcion.cancelada','inscripción cancelada','0','1',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripcion.cancelada','inscripció cancel·lada','0','2',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripcion.cancelada','inscripción cancelada#EU','0','3',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripcion.cancelada','inscripción cancelada#GL','0','4',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripcion.rechazada','inscripción rechazada','0','1',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripcion.rechazada','inscripció rebutjada','0','2',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripcion.rechazada','inscripción rechazada#EU','0','3',to_date('13/12/18','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('form.busquedaInscripciones.mensaje.inscripcion.rechazada','inscripción rechazada#GL','0','4',to_date('13/12/18','DD/MM/RR'),'0','19');
 
 
 

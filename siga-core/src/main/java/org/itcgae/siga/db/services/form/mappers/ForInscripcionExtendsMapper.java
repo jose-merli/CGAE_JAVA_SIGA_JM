@@ -38,7 +38,10 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper{
 			@Result(column = "CERTIFICADOEMITIDO", property = "certificadoEmitido", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "EMITIRCERTIFICADO", property = "emitirCertificado", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "CALIFICACION", property = "calificacion", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "IDPETICIONSUSCRIPCION", property = "idPeticionSuscripcion", jdbcType = JdbcType.NUMERIC)
+			@Result(column = "IDPETICIONSUSCRIPCION", property = "idPeticionSuscripcion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDENTIFICACION", property = "identificacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR)
 
 	})
 	InscripcionItem selectInscripcionByPrimaryKey(InscripcionItem inscripcionItem);	
@@ -63,7 +66,10 @@ public interface ForInscripcionExtendsMapper extends ForInscripcionMapper{
 			@Result(column = "EMITIRCERTIFICADO", property = "emitirCertificado", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "CALIFICACION", property = "calificacion", jdbcType = JdbcType.NUMERIC),
 			@Result(column = "IDCALIFICACION", property = "idCalificacion", jdbcType = JdbcType.NUMERIC),
-			@Result(column = "IDPETICIONSUSCRIPCION", property = "idPeticionSuscripcion", jdbcType = JdbcType.NUMERIC)
+			@Result(column = "IDPETICIONSUSCRIPCION", property = "idPeticionSuscripcion", jdbcType = JdbcType.NUMERIC),
+			@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "IDENTIFICACION", property = "identificacion", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "APELLIDOS", property = "apellidos", jdbcType = JdbcType.VARCHAR)
 
 	})
 	List<InscripcionItem> selectInscripciones(InscripcionItem inscripcionItem, String idLenguaje);	

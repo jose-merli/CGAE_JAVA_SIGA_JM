@@ -70,7 +70,34 @@ public class InscripcionItem {
 	private String fechaInscripcionHastaFormat;
 	private String fechaImparticionDesdeFormat;
 	private String fechaImparticionHastaFormat;
+	private String nombre;
+	private String apellidos;
+	private String identificacion;
 	
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public String getApellidos() {
+		return apellidos;
+	}
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
+
+	public String getIdentificacion() {
+		return identificacion;
+	}
+
+	public void setIdentificacion(String identificacion) {
+		this.identificacion = identificacion;
+	}
+
 	private String errores;
 
 	public Long getIdInscripcion() {
