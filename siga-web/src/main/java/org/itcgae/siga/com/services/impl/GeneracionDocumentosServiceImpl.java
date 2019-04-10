@@ -201,9 +201,12 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		        CellStyle headerCellStyle = null;
 		        
 		        List<String> columnsKey = new ArrayList<String>();				        
-	        	for (String value : registrosHoja.get(0).keySet()) {
-	    			columnsKey.add(value);
-	    		}
+	        	
+		        if(registrosHoja != null && registrosHoja.size() > 0) {
+		        	for (String value : registrosHoja.get(0).keySet()) {
+		    			columnsKey.add(value);
+		    		}
+		        }		        
 	        	
 				if(!hayPlantilla) {
 					//Le aplicamos estilos a las cabeceras

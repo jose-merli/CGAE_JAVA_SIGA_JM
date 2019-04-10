@@ -1150,16 +1150,29 @@ public class ConsultasServiceImpl implements IConsultasService{
 			}
 		}		
 		
+
 		if(indexInicio > -1 && indexFinal > -1){
 			if(indexFinal + 8 <= sentencia.length() && sentencia.substring(indexInicio, indexFinal).toUpperCase().indexOf("WHERE") > -1){
 				String whereConsulta = sentencia.substring(indexInicio, indexFinal);
-				sentenciaFinal = sentencia.substring(0, indexInicio) + whereConsulta + " AND " + where + sentencia.substring(indexFinal, sentencia.length());
+				if(!"".equalsIgnoreCase(where)) {
+					sentenciaFinal = sentencia.substring(0, indexInicio) + whereConsulta + " AND " + where + sentencia.substring(indexFinal, sentencia.length());
+				}else {
+					sentenciaFinal = sentencia.substring(0, indexInicio) + whereConsulta + sentencia.substring(indexFinal, sentencia.length());
+				}				
 			}else{
-				sentenciaFinal = sentencia.substring(0, indexInicio) + " WHERE " + where + sentencia.substring(indexFinal, sentencia.length());
+				if(!"".equalsIgnoreCase(where)) {
+					sentenciaFinal = sentencia.substring(0, indexInicio) + " WHERE " + where + sentencia.substring(indexFinal, sentencia.length());
+				}else {
+					sentenciaFinal = sentencia.substring(0, indexInicio) + sentencia.substring(indexFinal, sentencia.length());
+				}				
 			}
 		}else{
-			sentenciaFinal = sentencia + "<WHERE>" + " WHERE " + where + "</WHERE>";
+			if(!"".equalsIgnoreCase(where)) {
+				sentenciaFinal = sentencia + "<WHERE>" + " WHERE " + where + "</WHERE>";
+			}			
 		}
+
+		
 		
 		return sentenciaFinal;
 	}
