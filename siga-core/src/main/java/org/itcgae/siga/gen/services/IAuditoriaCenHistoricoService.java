@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenCuentasbancarias;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenNocolegiado;
@@ -21,5 +22,10 @@ public interface IAuditoriaCenHistoricoService {
 	public void manageAuditoriaDatosDirecciones(CenDirecciones cenDireccionesAnterior, CenDirecciones cenDireccionesPosterior, String accion, HttpServletRequest request, String motivo);
 	
 	public void manageAuditoriaDatosCuentasBancarias(CenCuentasbancarias cenCuentasbancariasAnterior, CenCuentasbancarias cenCuentasbancariasPosterior, String accion, HttpServletRequest request, String motivo);
+
+	public void manageAuditoriaDatosColegiales(CenColegiado cenColegiadoAnterior,
+			CenColegiado cenColegiadoPosterior, String string, HttpServletRequest request, String motivo);
+
+	public void manageAuditoriaDatosGeneralesColegiado(List<String> gruposPerJuridicaPosterior,			List<String> gruposPerJuridicaAnterior, CenPersona cenPersona, CenPersona cenPersonaPosterior,			CenColegiado cenColegiadoAnterior, CenColegiado cenColegiadoPosterior, CenCliente cenCliente,			CenCliente cenClientePosterior, String string, HttpServletRequest request, String motivo);
 }
 
