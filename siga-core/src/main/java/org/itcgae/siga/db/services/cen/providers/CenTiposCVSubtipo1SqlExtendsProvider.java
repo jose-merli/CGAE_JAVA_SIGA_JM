@@ -15,19 +15,21 @@ public class CenTiposCVSubtipo1SqlExtendsProvider extends CenTiposcvsubtipo1SqlP
 		sql.SELECT("tiposCVSubt1.IDTIPOCVSUBTIPO1 as IDTIPOCVSUBTIPO1");
 		sql.SELECT("tiposCVSubt1.CODIGOEXT as CODIGOEXTERNO");
 		sql.SELECT("catalogos.DESCRIPCION as DESCRIPCION");
-		
+		sql.SELECT("tiposCVSubt1.IDINSTITUCION AS IDINSTITUCION");
 		sql.FROM("CEN_TIPOSCVSUBTIPO1 tiposCVSubt1");
 
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS catalogos on catalogos.IDRECURSO = tiposCVSubt1.DESCRIPCION");
 		sql.INNER_JOIN("CEN_TIPOSCV cenTiposCv on cenTiposCv.IDTIPOCV = tiposCVSubt1.IDTIPOCV");
 		
-		sql.WHERE("tiposCVSubt1.IDINSTITUCION ='" + idInstitucion + "'");
+		sql.WHERE("tiposCVSubt1.IDINSTITUCION in('2000', '" + idInstitucion + "')");
 		sql.WHERE("catalogos.IDLENGUAJE = '" + idLenguaje + "'");
 		sql.WHERE("tiposCVSubt1.FECHA_BAJA IS NULL");
 		
 		if (!UtilidadesString.esCadenaVacia(tipoCurricularItem.getTipoCategoriaCurricular())) {
 			sql.WHERE("tiposCVSubt1.IDTIPOCV = '" + tipoCurricularItem.getTipoCategoriaCurricular() + "'");
 		}
+
+        sql.ORDER_BY("tiposCVSubt1.CODIGOEXT ASC");
 
 		return sql.toString();
 	}
@@ -78,20 +80,21 @@ public class CenTiposCVSubtipo1SqlExtendsProvider extends CenTiposcvsubtipo1SqlP
 		sql.SELECT("tiposCVSubt1.CODIGOEXT as CODIGOEXTERNO");
 		sql.SELECT("tiposCVSubt1.FECHA_BAJA as FECHABAJA");
 		sql.SELECT("catalogos.DESCRIPCION as DESCRIPCION");
+		sql.SELECT("tiposCVSubt1.IDINSTITUCION AS IDINSTITUCION");
 
 		sql.FROM("CEN_TIPOSCVSUBTIPO1 tiposCVSubt1");
 
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS catalogos on catalogos.IDRECURSO = tiposCVSubt1.DESCRIPCION");
 		sql.INNER_JOIN("CEN_TIPOSCV cenTiposCv on cenTiposCv.IDTIPOCV = tiposCVSubt1.IDTIPOCV");
 		
-		sql.WHERE("tiposCVSubt1.IDINSTITUCION ='" + idInstitucion + "'");
+		sql.WHERE("tiposCVSubt1.IDINSTITUCION in ('2000','" + idInstitucion + "')");
 		sql.WHERE("catalogos.IDLENGUAJE = '" + idLenguaje + "'");
 
 		if (!UtilidadesString.esCadenaVacia(tipoCurricularItem.getTipoCategoriaCurricular())) {
 			sql.WHERE("tiposCVSubt1.IDTIPOCV = '" + tipoCurricularItem.getTipoCategoriaCurricular() + "'");
 		}
 
-        sql.ORDER_BY("catalogos.DESCRIPCION ASC " );
+        sql.ORDER_BY("tiposCVSubt1.CODIGOEXT ASC");
 
 		return sql.toString();
 	}
