@@ -536,7 +536,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 						modeloCom.setIdclasecomunicacion(Short.parseShort(SigaConstants.ID_CLASE_CONSULTA_GENERICA));
 						modeloCom.setIdinstitucion(idInstitucion);
 						modeloCom.setNombre(consultaDTO.getNombre());
-						modeloCom.setPordefecto("NO");
+//						modeloCom.setPordefecto("SI");
+						if(consultaDTO.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)){
+							modeloCom.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
+							modeloCom.setPordefecto(SigaConstants.SI);
+						}else{
+							modeloCom.setIdinstitucion(Short.parseShort(consultaDTO.getIdInstitucion()));
+							modeloCom.setPordefecto(SigaConstants.NO);
+						}		
 						modeloCom.setPreseleccionar("SI");
 						modeloCom.setUsumodificacion(usuario.getIdusuario());
 						modeloCom.setVisible((short)1);
@@ -602,9 +609,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 						Short claseAnterior = (short)0;
 						ConConsultaKey key = new ConConsultaKey();
 						key.setIdconsulta(Long.parseLong(consultaDTO.getIdConsulta()));
-						key.setIdinstitucion(Short.parseShort(consultaDTO.getIdInstitucion()));
+						key.setIdinstitucion(idInstitucion);
 						ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
-						consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
+						if(consultaDTO.getIdModulo() != null) consulta.setIdmodulo(Short.valueOf(consultaDTO.getIdModulo()));
 						consulta.setDescripcion(consultaDTO.getNombre());
 						consulta.setObservaciones(consultaDTO.getDescripcion());
 						consulta.setGeneral(consultaDTO.getGenerica());

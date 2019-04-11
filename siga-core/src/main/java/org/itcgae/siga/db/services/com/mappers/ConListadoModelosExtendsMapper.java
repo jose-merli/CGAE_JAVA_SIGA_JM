@@ -28,6 +28,7 @@ public interface ConListadoModelosExtendsMapper {
 		@Result(column = "IDCLASECOMUNICACION", property = "idClaseComunicacion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBRECLASE", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "ABREVIATURA", property = "institucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "GENERACIONEXCEL", property = "generacionExcel", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
 				})
 	

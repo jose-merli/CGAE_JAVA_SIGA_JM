@@ -687,7 +687,7 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 							modeloCom.setPordefecto(SigaConstants.NO);
 						}						
 						modeloCom.setNombre(datosTarjeta.getNombre());
-						modeloCom.setOrden(Short.parseShort(datosTarjeta.getOrden()));
+						if(datosTarjeta.getOrden() != null) modeloCom.setOrden(Short.parseShort(datosTarjeta.getOrden()));
 						modeloCom.setPreseleccionar(datosTarjeta.getPreseleccionar());
 						modeloCom.setUsumodificacion(usuario.getIdusuario());
 						modeloCom.setVisible(Short.parseShort(datosTarjeta.getVisible()));

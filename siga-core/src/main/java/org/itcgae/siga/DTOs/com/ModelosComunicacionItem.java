@@ -25,6 +25,8 @@ public class ModelosComunicacionItem {
 	private String idTipoEnvio;
 	private String porDefecto;
 	private String tipoEnvio;
+	private String generacionExcel;
+	
 	private List<ComboItem> plantillas = new ArrayList<ComboItem>();
 	
 	public String getIdModeloComunicacion() {
@@ -123,6 +125,12 @@ public class ModelosComunicacionItem {
 	}
 	public void setTipoEnvio(String tipoEnvio) {
 		this.tipoEnvio = tipoEnvio;
+	}
+	public String getGeneracionExcel() {
+		return generacionExcel;
+	}
+	public void setGeneracionExcel(String generacionExcel) {
+		this.generacionExcel = generacionExcel;
 	}
 	
 	
