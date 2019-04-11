@@ -177,7 +177,7 @@ public class BusquedaCursosServiceImpl implements IBusquedaCursosService {
 				AdmUsuarios usuario = usuarios.get(0);
 				LOGGER.info(
 						"getTemasCursos() / forTemacursoExtendsMapper.distinctTemaCurso() -> Entrada a forTemacursoExtendsMapper para obtener los diferentes temas para un curso");
-				comboItems = forTemacursoExtendsMapper.distinctTemaCurso(usuario.getIdlenguaje());
+				comboItems = forTemacursoExtendsMapper.distinctTemaCurso(idInstitucion,usuario.getIdlenguaje());
 				LOGGER.info(
 						"getTemasCursos() / forTemacursoExtendsMapper.distinctTemaCurso() -> Salida de forTemacursoExtendsMapper para obtener los diferentes temas para un curso");
 

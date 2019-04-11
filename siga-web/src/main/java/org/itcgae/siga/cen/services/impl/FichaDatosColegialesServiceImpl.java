@@ -1,10 +1,20 @@
 package org.itcgae.siga.cen.services.impl;
 
+import java.io.IOException;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.SQLTimeoutException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -16,16 +26,27 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IFichaDatosColegialesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
+import org.itcgae.siga.db.entities.AdmConfig;
+import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
+import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesExample;
+import org.itcgae.siga.db.entities.CenNocolegiado;
+import org.itcgae.siga.db.entities.CenNocolegiadoKey;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscolegialesestadoExtendsMapper;
@@ -34,6 +55,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudincorporacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposseguroExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
+import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,6 +88,13 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 	
 	@Autowired
 	private CenSolicitudincorporacionExtendsMapper _cenSolicitudincorporacionExtendsMapper;
+	
+	@Autowired
+	private AdmConfigMapper admConfigMapper;
+	
+	@Autowired
+	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
+	
 
 	@Override
 	public ComboDTO getSocietyTypes(HttpServletRequest request) {
@@ -234,6 +263,10 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				LOGGER.info(
 						"datosColegialesUpdate() / CenColegiadoExtendsMapper.selectDirecciones() -> Entrada a CenColegiadoExtendsMapper para busqueda de Colegiados");
 
+				CenColegiadoKey colegiadoKey = new CenColegiadoKey();
+				colegiadoKey.setIdinstitucion(idInstitucion);
+				colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+				CenColegiado cenColegiadoAnterior = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadoKey );
 				CenColegiado colegiado = new CenColegiado();
 				colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
 				colegiado.setIdinstitucion(idInstitucion);
@@ -267,36 +300,43 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				LOGGER.info(
 						"datosColegialesUpdate() / CenColegiadoExtendsMapper.selectDirecciones() -> Salida de CenColegiadoExtendsMapper para actualización de Colegiados");
 
+				// Llamamos al PL para mantener los colegiados
+				Object[] paramMandatos = new Object[5];
+				paramMandatos[0] = colegiado.getIdpersona().toString();
+				paramMandatos[1] = usuario.getIdinstitucion().toString();
+				paramMandatos[2] = new Long(30).toString();
+				paramMandatos[3] = null;
+				paramMandatos[4] = usuario.getIdusuario().toString();
+				String resultadoPl[] = new String[2];
+				try {
+					resultadoPl = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2, paramMandatos);
+				} catch (IOException | NamingException | SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				if (responseUpdate >= 1) {
+					
+					
+					//Añadimos auditoria
+					if (!UtilidadesString.esCadenaVacia(colegiadoItem.getMotivo())) {
+
+
+						colegiadoKey.setIdinstitucion(idInstitucion);
+						colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+						CenColegiado cenColegiadoPosterior = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadoKey );
+						// AUDITORIA => actualizamos cen_historico si todo es correcto
+						auditoriaCenHistoricoService.manageAuditoriaDatosColegiales(
+								cenColegiadoAnterior, cenColegiadoPosterior, "UPDATE", request, colegiadoItem.getMotivo());
+					}
+					
 					response.setStatus(SigaConstants.OK);
+					
+					
 				} else {
 					response.setStatus(SigaConstants.KO);
 				}
-				// 4. Actualiza la tabla CEN_DATOSCOLEGIALESESTADO
-
-				// CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new
-				// CenDatoscolegialesestadoExample();
-				// cenDatoscolegialesestadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
-				// cenDatoscolegialesestadoExample.setOrderByClause("FECHAESTADO DESC");
-				// // Buscamos por idPersona para ver si el estado es diferente
-				//
-				// cenDatoscolegialesestado =
-				// cenDatoscolegialesestadoMapper.selectByExample(cenDatoscolegialesestadoExample);
-				//
-				// if(cenDatoscolegialesestado != null && cenDatoscolegialesestado.size()>0) {
-				// if
-				// (!cenDatoscolegialesestado.get(0).getIdestado().equals(Short.valueOf(colegiadoItem.getSituacion())))
-				// {
-				// CenDatoscolegialesestado cenEstadoColegial = new CenDatoscolegialesestado();
-				// cenEstadoColegial.setIdestado(Short.parseShort(colegiadoItem.getSituacion()));
-				// cenEstadoColegial.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
-				// cenEstadoColegial.setIdinstitucion(Short.parseShort(colegiadoItem.getIdInstitucion()));
-				// cenEstadoColegial.setFechamodificacion(new Date());
-				// cenEstadoColegial.setUsumodificacion(usuario.getIdusuario());
-				// cenEstadoColegial.setFechaestado(new Date());
-				// cenDatoscolegialesestadoMapper.insertSelective(cenEstadoColegial);
-				// }
-				// }
+				
 
 			} else {
 				LOGGER.warn(
@@ -458,6 +498,22 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					datosColegiales.setObservaciones(colegiadoItem.getObservaciones());
 					datosColegiales.setSituacionresidente(colegiadoItem.getSituacionResidente());
 					int resultado = cenDatoscolegialesestadoExtendsMapper.insert(datosColegiales);
+					
+					// Llamamos al PL para mantener los colegiados
+					Object[] paramMandatos = new Object[5];
+					paramMandatos[0] = datosColegiales.getIdpersona().toString();
+					paramMandatos[1] = usuario.getIdinstitucion().toString();
+					paramMandatos[2] = new Long(30).toString();
+					paramMandatos[3] = null;
+					paramMandatos[4] = usuario.getIdusuario().toString();
+					String resultadoPl[] = new String[2];
+					try {
+						resultadoPl = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2, paramMandatos);
+					} catch (IOException | NamingException | SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 
 					if (resultado == 1) {
 						response.setStatus(SigaConstants.OK);
@@ -661,11 +717,28 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							LOGGER.info(
 									"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para para actualizar el estado colegial");
 
+							// Llamamos al PL para mantener los colegiados
+							Object[] paramMandatos = new Object[5];
+							paramMandatos[0] = datosColegiales.getIdpersona().toString();
+							paramMandatos[1] = usuario.getIdinstitucion().toString();
+							paramMandatos[2] = new Long(30).toString();
+							paramMandatos[3] = null;
+							paramMandatos[4] = usuario.getIdusuario().toString();
+							String resultadoPl[] = new String[2];
+							try {
+								resultadoPl = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2, paramMandatos);
+							} catch (IOException | NamingException | SQLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
 							CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
 							cenColegiadoExample.createCriteria()
 							.andIdpersonaEqualTo(idPersonaColegial);
 							
 							List<CenColegiado> cenColegiadoList = cenColegiadoExtendsMapper.selectByExample(cenColegiadoExample);
+							
+							
 							
 							if(cenColegiadoList.size() == 0 && cenColegiadoList != null) {
 								CenColegiado cenColegiado = cenColegiadoList.get(0);
@@ -926,7 +999,21 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					resultado = cenDatoscolegialesestadoExtendsMapper.deleteEstadoColegial(estadoColegial);
 					LOGGER.info(
 							"datosColegialesDeleteEstado() / cenDatoscolegialesestadoMapper.deleteByPrimaryKey() -> Entrada a cenDatoscolegialesestadoMapper para eliminar el estado colegial");
-
+					// Llamamos al PL para mantener los colegiados
+					Object[] paramMandatos = new Object[5];
+					paramMandatos[0] = estadoColegial.getIdpersona().toString();
+					paramMandatos[1] = usuario.getIdinstitucion().toString();
+					paramMandatos[2] = new Long(30).toString();
+					paramMandatos[3] = null;
+					paramMandatos[4] = usuario.getIdusuario().toString();
+					String resultadoPl[] = new String[2];
+					try {
+						resultadoPl = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2, paramMandatos);
+					} catch (IOException | NamingException | SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
 					if (resultado == 1) {
 						response.setStatus(SigaConstants.OK);
 					} else {
@@ -986,5 +1073,96 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 		return nColegiado;
 	}
+	
+
+	/**
+	   * Calls a PL Funtion
+	   * @author CSD
+	   * @param functionDefinition string that defines the function
+	   * @param inParameters input parameters
+	   * @param outParameters number of output parameters
+	   * @return error code, '0' if ok
+	 * @throws NamingException 
+	 * @throws IOException 
+	 * @throws SQLException 
+	   * @throws ClsExceptions  type Exception
+	   */
+	  private  String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters) throws IOException, NamingException, SQLException  {
+	    String result[] = null;
+	    
+	    if (outParameters>0) result= new String[outParameters];
+	    DataSource ds = getOracleDataSource();
+	    Connection con=ds.getConnection();
+	    try{
+	      CallableStatement cs=con.prepareCall(functionDefinition);
+	      int size=inParameters.length;
+	      
+	      //input Parameters
+	      for(int i=0;i<size;i++){
+	    	  
+
+	        cs.setString(i+1,(String)inParameters[i]);
+	      }
+	      //output Parameters
+	      for(int i=0;i<outParameters;i++){
+	        cs.registerOutParameter(i+size+1,Types.VARCHAR);
+	      }
+	      
+			for (int intento = 1; intento <= 2; intento++) {
+				try {
+					cs.execute();
+					break;
+					
+				} catch (SQLTimeoutException tex) {
+					throw tex;
+		
+				} catch (SQLException ex) {
+					if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la segunda vez deberia funcionar)
+						throw ex;
+					}
+				}
+
+			}      
+
+	      for(int i=0;i<outParameters;i++){
+	        result[i]=cs.getString(i+size+1);
+	      }
+	      cs.close();
+	      return result;
+	      
+	    }catch(SQLTimeoutException ex){
+	        return null;
+	    }catch(SQLException ex){
+	    	return null;
+	    }catch(Exception e){
+	    	return null;
+	    }finally{
+	      con.close();
+	      con = null;
+	    }
+	  }
+	  
+	  /**
+		 * Recupera el datasource con los datos de conexión sacados del fichero de
+		 * configuracion
+		 * 
+		 * @return
+		 * @throws IOException
+		 * @throws NamingException
+		 */
+		private  DataSource getOracleDataSource() throws IOException, NamingException {
+			try {
+				
+				LOGGER.debug("Recuperando datasource {} provisto por el servidor (JNDI)");
+				
+				AdmConfigExample example = new AdmConfigExample();
+				example.createCriteria().andClaveEqualTo("spring.datasource.jndi-name");
+				List<AdmConfig> config = admConfigMapper.selectByExample(example );
+				Context ctx = new InitialContext();
+				return (DataSource) ctx.lookup(config.get(0).getValor());
+			} catch (NamingException e) {
+				throw e;
+			}
+		}
 
 }
