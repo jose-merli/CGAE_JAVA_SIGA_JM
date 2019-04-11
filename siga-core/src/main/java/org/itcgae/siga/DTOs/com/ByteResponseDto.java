@@ -6,6 +6,7 @@ public class ByteResponseDto {
 	
 	private Error error;
 	private byte [] data;
+	private String nombre;
 	
 	public Error getError() {
 		return error;
@@ -18,6 +19,12 @@ public class ByteResponseDto {
 	}
 	public void setData(byte[] data) {
 		this.data = data;
+	}
+	public String getNombre() {
+		return nombre;
+	}
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
 }

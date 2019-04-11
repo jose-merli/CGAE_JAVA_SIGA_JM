@@ -363,8 +363,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					listaFicheros = generarComunicacion.getListaDocumentos();
 					
 					if(listaFicheros != null){
-						zip = WSCommons.zipBytes(listaFicheros);
-						response.setData(zip);
+//						if(listaFicheros.size() > 1) {
+							zip = WSCommons.zipBytes(listaFicheros);
+							response.setData(zip);
+//						}else {
+//							response.setNombre(listaFicheros.get(0).getFileName().toString());
+//							response.setData(listaFicheros.get(0).getDatos());
+//						}
 					}else{
 						LOGGER.debug("No se han obtenido documentos");
 						error.setCode(500);
