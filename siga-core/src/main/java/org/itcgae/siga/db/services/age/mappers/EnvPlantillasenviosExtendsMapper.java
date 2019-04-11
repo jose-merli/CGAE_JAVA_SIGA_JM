@@ -6,10 +6,9 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTOs.age.ComboPlantillasItem;
 import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
-import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
-import org.itcgae.siga.db.services.age.providers.AgeUnidadMedidaSqlExtendsProvider;
 import org.itcgae.siga.db.services.age.providers.EnvPlantillasenviosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -33,6 +32,6 @@ public interface EnvPlantillasenviosExtendsMapper extends EnvPlantillasenviosMap
 		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOENVIOS", property = "subValue", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> getPlantillas(String idInstitucion);
+	List<ComboPlantillasItem> getPlantillas(String idInstitucion);
 	
 }

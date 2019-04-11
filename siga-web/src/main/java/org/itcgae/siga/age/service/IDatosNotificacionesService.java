@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.ComboPlantillaEnvioDTO;
+import org.itcgae.siga.DTOs.age.ComboPlantillasDTO;
 import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -39,7 +40,7 @@ public interface IDatosNotificacionesService {
 	
 	public Date generateNotificationDate(AgeNotificacionesevento ageNotificacionEventoInsert);
 	
-	public ComboDTO getPlantillas(HttpServletRequest request);
+	public ComboPlantillasDTO getPlantillas(HttpServletRequest request);
 	
 	public ComboDTO getNotificationTypeCalendarTraining(HttpServletRequest request);
 

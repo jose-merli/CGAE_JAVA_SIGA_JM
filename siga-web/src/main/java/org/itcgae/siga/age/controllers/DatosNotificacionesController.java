@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.ComboPlantillaEnvioDTO;
+import org.itcgae.siga.DTOs.age.ComboPlantillasDTO;
 import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -68,9 +69,9 @@ public class DatosNotificacionesController {
 	}
 	
 	@RequestMapping(value = "datosNotificaciones/getPlantillas", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getPlantillas(HttpServletRequest request) {
-		ComboDTO response = datosNotificacionesService.getPlantillas(request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	ResponseEntity<ComboPlantillasDTO> getPlantillas(HttpServletRequest request) {
+		ComboPlantillasDTO response = datosNotificacionesService.getPlantillas(request);
+		return new ResponseEntity<ComboPlantillasDTO>(response, HttpStatus.OK);
 	}
 	
 	

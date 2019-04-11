@@ -12,6 +12,8 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.ComboPlantillaEnvioDTO;
 import org.itcgae.siga.DTOs.age.ComboPlantillaEnvioItem;
+import org.itcgae.siga.DTOs.age.ComboPlantillasDTO;
+import org.itcgae.siga.DTOs.age.ComboPlantillasItem;
 import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -27,7 +29,6 @@ import org.itcgae.siga.db.entities.AgeGeneracionnotificacionesExample;
 import org.itcgae.siga.db.entities.AgeNotificacionesevento;
 import org.itcgae.siga.db.entities.AgeNotificacioneseventoExample;
 import org.itcgae.siga.db.mappers.AgeGeneracionnotificacionesMapper;
-import org.itcgae.siga.db.mappers.AgeNotificacioneseventoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeEventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeNotificacioneseventoExtendsMapper;
@@ -728,12 +729,12 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 	}
 
 	@Override
-	public ComboDTO getPlantillas(HttpServletRequest request) {
+	public ComboPlantillasDTO getPlantillas(HttpServletRequest request) {
 		LOGGER.info(
 				"getPlantillas() -> Entrada al servicio para obtener las plantillas de las notificaciones de eventos");
 
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		ComboPlantillasDTO comboPlantillasDTO = new ComboPlantillasDTO();
+		List<ComboPlantillasItem> comboPlantillasItem = new ArrayList<ComboPlantillasItem>();
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -760,7 +761,7 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 				LOGGER.info(
 						"getPlantillas() / envPlantillasenviosExtendsMapper.getPlantillas() -> Entrada a envPlantillasenviosExtendsMapper para obtener las plantillas de notificaciones");
 
-				comboItems = envPlantillasenviosExtendsMapper.getPlantillas(idInstitucion.toString());
+				comboPlantillasItem = envPlantillasenviosExtendsMapper.getPlantillas(idInstitucion.toString());
 
 				LOGGER.info(
 						"getPlantillas() / envPlantillasenviosExtendsMapper.getPlantillas() -> Salida de envPlantillasenviosExtendsMapper para obtener las plantillas de notificaciones");
@@ -768,12 +769,12 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 			}
 		}
 
-		comboDTO.setCombooItems(comboItems);
+		comboPlantillasDTO.setComboPlantillasItems(comboPlantillasItem);
 
 		LOGGER.info(
 				"getPlantillas() -> Salida del servicio para obtener las plantillas de las notificaciones de eventos");
 
-		return comboDTO;
+		return comboPlantillasDTO;
 	}
 
 	@Override
