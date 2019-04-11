@@ -1922,6 +1922,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							ForInscripcion inscripcionInsert = new ForInscripcion();
 							inscripcionInsert.setFechabaja(null);
 							inscripcionInsert.setFechamodificacion(new Date());
+							inscripcionInsert.setFechasolicitud(new Date());
 							inscripcionInsert.setIdcurso(Long.valueOf(inscripcion.getIdCurso()));
 							inscripcionInsert.setIdestadoinscripcion(SigaConstants.INSCRIPCION_PENDIENTE);
 							inscripcionInsert.setIdinstitucion(curso.getIdinstitucion());
