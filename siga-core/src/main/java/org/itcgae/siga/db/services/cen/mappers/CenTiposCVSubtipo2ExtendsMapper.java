@@ -20,6 +20,8 @@ public interface CenTiposCVSubtipo2ExtendsMapper extends CenTiposcvsubtipo2Mappe
 		@Result(column = "IDTIPOCVSUBTIPO2", property = "idTipoCvSubtipo2", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CODIGOEXTERNO", property = "codigoExterno", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
+
 	})
 	List<SubtipoCurricularItem> searchSubtipoCurricular(SubtipoCurricularItem subtipoCurricularItem, String idLenguaje, String idInstitucion);
 

@@ -26,18 +26,26 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IFichaDatosColegialesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenCliente;
+import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
+import org.itcgae.siga.db.entities.CenCuentasbancariasKey;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestado;
 import org.itcgae.siga.db.entities.CenDatoscolegialesestadoExample;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesExample;
+import org.itcgae.siga.db.entities.CenNocolegiado;
+import org.itcgae.siga.db.entities.CenNocolegiadoKey;
+import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
@@ -47,6 +55,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudincorporacionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposseguroExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
+import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,6 +91,9 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 	
 	@Autowired
 	private AdmConfigMapper admConfigMapper;
+	
+	@Autowired
+	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
 	
 
 	@Override
@@ -251,6 +263,10 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				LOGGER.info(
 						"datosColegialesUpdate() / CenColegiadoExtendsMapper.selectDirecciones() -> Entrada a CenColegiadoExtendsMapper para busqueda de Colegiados");
 
+				CenColegiadoKey colegiadoKey = new CenColegiadoKey();
+				colegiadoKey.setIdinstitucion(idInstitucion);
+				colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+				CenColegiado cenColegiadoAnterior = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadoKey );
 				CenColegiado colegiado = new CenColegiado();
 				colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
 				colegiado.setIdinstitucion(idInstitucion);
@@ -300,35 +316,27 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				}
 				
 				if (responseUpdate >= 1) {
+					
+					
+					//Añadimos auditoria
+					if (!UtilidadesString.esCadenaVacia(colegiadoItem.getMotivo())) {
+
+
+						colegiadoKey.setIdinstitucion(idInstitucion);
+						colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+						CenColegiado cenColegiadoPosterior = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadoKey );
+						// AUDITORIA => actualizamos cen_historico si todo es correcto
+						auditoriaCenHistoricoService.manageAuditoriaDatosColegiales(
+								cenColegiadoAnterior, cenColegiadoPosterior, "UPDATE", request, colegiadoItem.getMotivo());
+					}
+					
 					response.setStatus(SigaConstants.OK);
+					
+					
 				} else {
 					response.setStatus(SigaConstants.KO);
 				}
-				// 4. Actualiza la tabla CEN_DATOSCOLEGIALESESTADO
-
-				// CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new
-				// CenDatoscolegialesestadoExample();
-				// cenDatoscolegialesestadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
-				// cenDatoscolegialesestadoExample.setOrderByClause("FECHAESTADO DESC");
-				// // Buscamos por idPersona para ver si el estado es diferente
-				//
-				// cenDatoscolegialesestado =
-				// cenDatoscolegialesestadoMapper.selectByExample(cenDatoscolegialesestadoExample);
-				//
-				// if(cenDatoscolegialesestado != null && cenDatoscolegialesestado.size()>0) {
-				// if
-				// (!cenDatoscolegialesestado.get(0).getIdestado().equals(Short.valueOf(colegiadoItem.getSituacion())))
-				// {
-				// CenDatoscolegialesestado cenEstadoColegial = new CenDatoscolegialesestado();
-				// cenEstadoColegial.setIdestado(Short.parseShort(colegiadoItem.getSituacion()));
-				// cenEstadoColegial.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
-				// cenEstadoColegial.setIdinstitucion(Short.parseShort(colegiadoItem.getIdInstitucion()));
-				// cenEstadoColegial.setFechamodificacion(new Date());
-				// cenEstadoColegial.setUsumodificacion(usuario.getIdusuario());
-				// cenEstadoColegial.setFechaestado(new Date());
-				// cenDatoscolegialesestadoMapper.insertSelective(cenEstadoColegial);
-				// }
-				// }
+				
 
 			} else {
 				LOGGER.warn(

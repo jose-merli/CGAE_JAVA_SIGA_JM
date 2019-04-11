@@ -721,7 +721,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																		if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
 																			hDatosFinal.put(consultaDatos.getRegion(), resultDatos);
 																		}else{
-																			hDatosGenerales.putAll(resultDatos.get(0));
+																			if(resultDatos != null && resultDatos.size() > 0) {
+																				hDatosGenerales.putAll(resultDatos.get(0));
+																			}
 																		}
 																		
 																		if(esExcel) {
@@ -842,7 +844,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 															if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
 																hDatosFinal.put(consultaDatos.getRegion(), resultDatos);
 															}else{
-																hDatosGenerales.putAll(resultDatos.get(0));
+																if(resultDatos != null && resultDatos.size() > 0) {
+																	hDatosGenerales.putAll(resultDatos.get(0));
+																}
 															}
 															
 															if(esExcel) {
@@ -941,7 +945,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
 													hDatosFinal.put(consultaDatos.getRegion(), resultDatos);
 												}else{
-													hDatosGenerales.putAll(resultDatos.get(0));
+													if(resultDatos != null && resultDatos.size() > 0) {
+														hDatosGenerales.putAll(resultDatos.get(0));
+													}													
 												}
 												
 												listaDatosExcel.add(resultDatos);
@@ -1860,7 +1866,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										if(consultaConRegion.getRegion()!= null && !consultaConRegion.getRegion().equalsIgnoreCase("")){
 											hDatosFinal.put(consultaConRegion.getRegion(), resultDatos);
 										}else{
-											hDatosGenerales.putAll(resultDatos.get(0));
+											if(resultDatos != null && resultDatos.size() > 0) {
+												hDatosGenerales.putAll(resultDatos.get(0));
+											}
 										}
 										
 										if(esExcel) {
@@ -1969,7 +1977,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							if(consultaConRegion.getRegion()!= null && !consultaConRegion.getRegion().equalsIgnoreCase("")){
 								hDatosFinal.put(consultaConRegion.getRegion(), resultDatos);
 							}else{
-								hDatosGenerales.putAll(resultDatos.get(0));
+								if(resultDatos != null && resultDatos.size() > 0) {
+									hDatosGenerales.putAll(resultDatos.get(0));
+								}
 							}
 							
 							if(esExcel) {

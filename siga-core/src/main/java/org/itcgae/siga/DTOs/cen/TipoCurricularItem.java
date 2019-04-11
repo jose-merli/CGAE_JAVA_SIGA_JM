@@ -13,6 +13,8 @@ public class TipoCurricularItem {
 	private String tipoCategoriaCurricular;
 	private String codigoExterno;
 	private String descripcion;
+	private String idInstitucion; 
+	
 	 @JsonFormat(pattern = "dd-MM-yyyy")
 	  private Date fechaBaja = null;
 	
@@ -63,6 +65,14 @@ public class TipoCurricularItem {
 		this.fechaBaja = fechaBaja;
 	}
 	
+	@JsonProperty("idInstitucion")
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -77,12 +87,13 @@ public class TipoCurricularItem {
 	    		Objects.equals(this.tipoCategoriaCurricular, tipoCurricularItem.tipoCategoriaCurricular) &&
 	    		Objects.equals(this.codigoExterno, tipoCurricularItem.codigoExterno) &&
 	    		Objects.equals(this.descripcion, tipoCurricularItem.descripcion) &&
-	    		Objects.equals(this.fechaBaja, tipoCurricularItem.fechaBaja);
+	    		Objects.equals(this.fechaBaja, tipoCurricularItem.fechaBaja) &&
+	    		Objects.equals(this.idInstitucion, tipoCurricularItem.idInstitucion);
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(tipoCategoriaCurricular, codigoExterno, descripcion, fechaBaja);
+	    return Objects.hash(tipoCategoriaCurricular, codigoExterno, descripcion, fechaBaja, idInstitucion);
 	}
 
 	
@@ -97,6 +108,7 @@ public class TipoCurricularItem {
 	    sb.append("    codigoExterno: ").append(toIndentedString(codigoExterno)).append("\n");
 	    sb.append("    descripcion: ").append(toIndentedString(descripcion)).append("\n");
 	    sb.append("    fechaBaja: ").append(toIndentedString(fechaBaja)).append("\n");
+	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}

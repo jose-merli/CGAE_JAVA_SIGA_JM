@@ -33,6 +33,7 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.IFichaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
@@ -40,6 +41,7 @@ import org.itcgae.siga.db.entities.CenClienteExample;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.entities.CenColegiadoExample;
+import org.itcgae.siga.db.entities.CenColegiadoKey;
 import org.itcgae.siga.db.entities.CenGruposcliente;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
@@ -75,6 +77,7 @@ import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitmodifdatosbasicosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTratamientoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForTemacursoPersonaExtendsMapper;
+import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -139,6 +142,11 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 	@Autowired
 	private CenClienteExtendsMapper cenClienteExtendsMapper;
+	
+
+	@Autowired
+	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
+
 
 	// @Override
 	// public ComboDTO getSocietyTypes(HttpServletRequest request) {
@@ -176,6 +184,12 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 				try {
 					// 1. obtener colegiado
 
+					CenColegiado cenColegiadoAnterior = new CenColegiado();
+					CenColegiadoKey cencolegiadoKey = new CenColegiadoKey();
+					cencolegiadoKey.setIdpersona(Long.valueOf(colegiadoItem.getIdPersona()));
+					cencolegiadoKey.setIdinstitucion(idInstitucion);
+					cenColegiadoAnterior = cenColegiadoMapper.selectByPrimaryKey(cencolegiadoKey);
+					
 					CenPersona cenPersona = cenPersonaExtendsMapper
 							.selectByPrimaryKey(Long.valueOf(colegiadoItem.getIdPersona()));
 
@@ -739,6 +753,38 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						}
 
 						if (!updateResponseDTO.getStatus().equals(SigaConstants.KO)) {
+							
+							
+							if (!UtilidadesString.esCadenaVacia(colegiadoItem.getMotivo())) {
+								if (null != colegiadoItem.getColegiado() && colegiadoItem.getColegiado()) {
+									Long idPersonaCreada = Long.valueOf(colegiadoItem.getIdPersona());
+									// obtenemos registro cen_persona creado
+									CenPersona cenPersonaPosterior = new CenPersona();
+									cenPersonaPosterior = cenPersonaExtendsMapper.selectByPrimaryKey(idPersonaCreada);
+									// obtenemos registro cen_nocolegiado creado
+									CenColegiado cenColegiadoPosterior = new CenColegiado();
+									cencolegiadoKey = new CenColegiadoKey();
+									cencolegiadoKey.setIdpersona(idPersonaCreada);
+									cencolegiadoKey.setIdinstitucion(idInstitucion);
+									cenColegiadoPosterior = cenColegiadoMapper.selectByPrimaryKey(cencolegiadoKey);
+									// obtenemos registro cen_cliente creado
+									CenCliente cenClientePosterior = new CenCliente();
+									CenClienteKey cenClienteKey = new CenClienteKey();
+									cenClienteKey.setIdpersona(idPersonaCreada);
+									cenClienteKey.setIdinstitucion(idInstitucion);
+									cenClientePosterior = cenClienteMapper.selectByPrimaryKey(cenClienteKey);
+									// obtenemos las etiquetas creadas
+									//List<String> gruposPerJuridicaNuevos = Arrays.asList(sociedadCreateDTO.getGrupos());
+									// llamada a auditoria
+									auditoriaCenHistoricoService.manageAuditoriaDatosGeneralesColegiado(gruposPerJuridicaPosterior,
+											gruposPerJuridicaAnterior, cenPersona, cenPersonaPosterior,
+											cenColegiadoAnterior, cenColegiadoPosterior, cenCliente,
+											cenClientePosterior, "UPDATE", request, colegiadoItem.getMotivo());
+
+								}
+							}
+							
+							
 							updateResponseDTO.setStatus(SigaConstants.OK);
 						}
 

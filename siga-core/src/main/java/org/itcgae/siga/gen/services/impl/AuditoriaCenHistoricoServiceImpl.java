@@ -620,6 +620,79 @@ public class AuditoriaCenHistoricoServiceImpl implements IAuditoriaCenHistoricoS
 		}
 		
 	}
+
+
+	@Override
+	public void manageAuditoriaDatosColegiales(CenColegiado cenColegiadoAnterior,
+			CenColegiado cenColegiadoPosterior, String accion, HttpServletRequest request, String motivo) {
+		// TODO Auto-generated method stub
+		switch (accion) {
+		case "UPDATE":
+			// auditoria para cen_colegiado
+			insertaCenHistorico(cenColegiadoAnterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_COLEGIALES, getDescripcionCenColegiado(cenColegiadoAnterior, cenColegiadoPosterior, accion), request, motivo);
+			break;
+		case "INSERT":
+			break;
+		case "DELETE":
+			// para pasar de nocolegiado -> colegiado || borrar sociedad (NO SE HACE)
+			break;
+		default:
+			break;
+		}
+	}
+
+
+	@Override
+	public void manageAuditoriaDatosGeneralesColegiado(List<String> gruposPerJuridicaNuevos,
+			List<String> gruposPerJuridicaAntiguos, CenPersona cenPersona, CenPersona cenPersonaPosterior,
+			CenColegiado cenColegiadoAnterior, CenColegiado cenColegiadoPosterior, CenCliente cenCliente,
+			CenCliente cenClientePosterior, String accion, HttpServletRequest request, String motivo) {
+		
+		switch (accion) {
+		case "UPDATE":
+			// auditoria para cen_persona
+			insertaCenHistorico(cenPersonaPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES, getDescripcionCenPersona(cenPersona, cenPersonaPosterior, accion), request, motivo);
+			// auditoria para cen_colegiado
+			//insertaCenHistorico(cenColegiadoPosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_COLEGIALES, getDescripcionCenColegiado(cenColegiadoAnterior, cenColegiadoPosterior, accion), request, motivo);
+			// auditoria para cen_cliente
+			insertaCenHistorico(cenClientePosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES, getDescripcionCliente(cenCliente, cenClientePosterior, accion), request, motivo);
+			// si se añadieron nuevos grupos o se borraron 
+			boolean mismosGrupos = false;
+			int contador = 0;
+			// comprueba que la actualización no contiene los mismos grupos
+			if(!gruposPerJuridicaNuevos.isEmpty() && !gruposPerJuridicaAntiguos.isEmpty()) {
+				if(gruposPerJuridicaNuevos.size() == gruposPerJuridicaAntiguos.size()) {
+					for (String nuevoGrupo : gruposPerJuridicaNuevos) {
+						if(gruposPerJuridicaAntiguos.contains(nuevoGrupo)) {
+							contador++;
+						}
+					}
+					
+					if(contador == gruposPerJuridicaNuevos.size())
+						mismosGrupos = true;
+				}
+			}
+			// auditoria para etiquetas
+			if(!mismosGrupos) {
+				insertaCenHistorico(cenClientePosterior.getIdpersona(), SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES,  getDescripcionGrupos(gruposPerJuridicaAntiguos, gruposPerJuridicaNuevos, accion, request), request, motivo);
+			}
+			
+			break;
+		case "INSERT":
+			
+			break;
+		case "DELETE":
+			// para pasar de nocolegiado -> colegiado || borrar sociedad (NO SE HACE)
+			break;
+		default:
+			break;
+		}
+		
+	
+		
+		
+		
+	}
 	
 	
 	
