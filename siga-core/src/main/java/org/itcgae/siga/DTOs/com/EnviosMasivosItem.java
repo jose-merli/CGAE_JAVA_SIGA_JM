@@ -25,6 +25,7 @@ public class EnviosMasivosItem {
           private String claseComunicacion;
           private String csv;
           private String destinatario;
+          private int numDestinatarios;
           
           public Short getIdInstitucion() {
                     return idInstitucion;
@@ -152,6 +153,12 @@ public class EnviosMasivosItem {
         public String getDestinatario() {
             return destinatario;
         }
+		public int getNumDestinatarios() {
+			return numDestinatarios;
+		}
+		public void setNumDestinatarios(int numDestinatarios) {
+			this.numDestinatarios = numDestinatarios;
+		}
           
           
 }

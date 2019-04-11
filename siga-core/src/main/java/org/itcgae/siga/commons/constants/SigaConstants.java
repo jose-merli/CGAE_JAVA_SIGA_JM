@@ -117,6 +117,14 @@ public class SigaConstants {
 	public static final String ID_ENVIO_SMS = "4";
 	public static final String ID_ENVIO_BURO_SMS = "5";
 	
+	// Tipo Campos envio
+	public static final String ID_CAMPO_ASUNTO = "1";
+	public static final String ID_CAMPO_CUERPO = "2";
+	public static final String ID_CAMPO_TEXTO_SMS = "1";
+	public static final String ID_TIPO_CAMPO_EMAIL = "E";
+	public static final String ID_TIPO_CAMPO_SMS = "S";
+	
+	
 	//PFD
 	public static final String FIRMA_OK="FIRMA_OK";
 	public static final String SOLICITUD_DOCUMENTO_OK = "SOLICITUD_DOCUMENTO_OK";

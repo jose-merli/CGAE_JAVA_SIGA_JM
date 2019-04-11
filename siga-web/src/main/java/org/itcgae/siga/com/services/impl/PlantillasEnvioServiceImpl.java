@@ -488,7 +488,11 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 						DatosDireccionesItem direccionItem = new DatosDireccionesItem();
 						direccionItem.setIdDireccion(direccion.getIddireccion().toString());
 						direccionItem.setDomicilio(direccion.getDomicilio());
-						direccionItem.setIdPoblacion(direccion.getIdpoblacion().toString());
+						
+						if(direccion.getIdpoblacion() != null) {
+							direccionItem.setIdPoblacion(direccion.getIdpoblacion().toString());
+						}	
+						
 						direccionItem.setIdProvincia(direccion.getIdprovincia());
 						direccionItem.setIdPais(direccion.getIdpais());
 						direccionItem.setCodigoPostal(direccion.getCodigopostal());

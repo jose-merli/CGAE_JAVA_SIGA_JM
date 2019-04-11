@@ -47,6 +47,9 @@ import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.EnvCamposenvios;
+import org.itcgae.siga.db.entities.EnvCamposenviosExample;
+import org.itcgae.siga.db.entities.EnvCamposenviosKey;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
 import org.itcgae.siga.db.entities.EnvDestConsultaEnvio;
@@ -70,6 +73,7 @@ import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
+import org.itcgae.siga.db.mappers.EnvCamposenviosMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
 import org.itcgae.siga.db.mappers.EnvDestConsultaEnvioMapper;
 import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
@@ -175,6 +179,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 	@Autowired
 	private CenDireccionesMapper _cenDireccionesMapper;
+	
+	@Autowired
+	private EnvCamposenviosMapper _envCamposenviosMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -275,6 +282,15 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					enviosItemList = _envEnviosExtendsMapper.selectEnviosMasivosSearch(usuario.getIdinstitucion(),
 							usuario.getIdlenguaje(), filtros);
 					if (enviosItemList.size() > 0) {
+						for(EnviosMasivosItem envioMasivo : enviosItemList) {
+							TarjetaConfiguracionDto datosTarjeta = new TarjetaConfiguracionDto();
+							datosTarjeta.setIdEnvio(String.valueOf(envioMasivo.getIdEnvio()));
+							datosTarjeta.setIdTipoEnvios(envioMasivo.getIdTipoEnvios());
+							datosTarjeta.setIdPlantillaEnvios(envioMasivo.getIdPlantillaEnvios());
+							PlantillaEnvioItem envioAsuntoCuerpo = obtenerAsuntoYcuerpoEnvio(usuario, datosTarjeta);
+							envioMasivo.setAsunto(envioAsuntoCuerpo.getAsunto());
+							envioMasivo.setCuerpo(envioAsuntoCuerpo.getCuerpo());
+						}
 						enviosMasivos.setEnviosMasivosItem(enviosItemList);
 					}
 				} catch (Exception e) {
@@ -554,6 +570,51 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							historico.setIdestado(idEstado);
 							_envHistoricoestadoenvioMapper.insert(historico);
 						}
+						
+						if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())){
+							//Insertamos el nuevo asunto y cuerpo del envio
+							
+							EnvCamposenvios envCamposEnvio = new EnvCamposenvios();
+							envCamposEnvio.setFechamodificacion(new Date());
+							envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
+							envCamposEnvio.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
+							envCamposEnvio.setIdenvio(envio.getIdenvio());
+							envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
+							envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
+							envCamposEnvio.setValor(datosTarjeta.getAsunto());							
+							
+							_envCamposenviosMapper.insert(envCamposEnvio);
+							
+							envCamposEnvio = new EnvCamposenvios();
+							envCamposEnvio.setFechamodificacion(new Date());
+							envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
+							envCamposEnvio.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));
+							envCamposEnvio.setIdenvio(envio.getIdenvio());
+							envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
+							envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
+							envCamposEnvio.setValor(datosTarjeta.getCuerpo());	
+							
+							_envCamposenviosMapper.insert(envCamposEnvio);
+							
+						}else if(SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios()) 
+								|| SigaConstants.ID_ENVIO_BURO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
+							
+							//Insertamos el cuerpo del sms
+							
+							EnvCamposenvios envCamposEnvio = new EnvCamposenvios();
+							envCamposEnvio.setFechamodificacion(new Date());
+							envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
+							envCamposEnvio.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_TEXTO_SMS));
+							envCamposEnvio.setIdenvio(envio.getIdenvio());
+							envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
+							envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_SMS);
+							envCamposEnvio.setValor(datosTarjeta.getCuerpo());							
+							
+							_envCamposenviosMapper.insert(envCamposEnvio);
+							
+						}				
+						
+						
 						respuesta.setCode(200);
 						respuesta.setDescription(envio.getIdenvio().toString());
 						SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
@@ -568,6 +629,53 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						envio.setFechamodificacion(new Date());
 						envio.setUsumodificacion(usuario.getIdusuario());
 						_envEnviosMapper.updateByPrimaryKey(envio);
+						
+						if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())){
+							
+							//Actualizamos el nuevo asunto y cuerpo del envio
+							
+							EnvCamposenvios envCamposEnvio = new EnvCamposenvios();
+							envCamposEnvio.setFechamodificacion(new Date());
+							envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
+							envCamposEnvio.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
+							envCamposEnvio.setIdenvio(envio.getIdenvio());
+							envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
+							envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
+							envCamposEnvio.setValor(datosTarjeta.getAsunto());				
+
+							
+							_envCamposenviosMapper.updateByPrimaryKeyWithBLOBs(envCamposEnvio);
+							
+							envCamposEnvio = new EnvCamposenvios();
+							envCamposEnvio.setFechamodificacion(new Date());
+							envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
+							envCamposEnvio.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));
+							envCamposEnvio.setIdenvio(envio.getIdenvio());
+							envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
+							envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
+							envCamposEnvio.setValor(datosTarjeta.getCuerpo());	
+							
+							_envCamposenviosMapper.updateByPrimaryKeyWithBLOBs(envCamposEnvio);
+							
+						}else if(SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios()) 
+								|| SigaConstants.ID_ENVIO_BURO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
+							
+							//Actualizamos el cuerpo del sms
+							
+							EnvCamposenvios envCamposEnvio = new EnvCamposenvios();
+							envCamposEnvio.setFechamodificacion(new Date());
+							envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
+							envCamposEnvio.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_TEXTO_SMS));
+							envCamposEnvio.setIdenvio(envio.getIdenvio());
+							envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
+							envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_SMS);
+							envCamposEnvio.setValor(datosTarjeta.getCuerpo());							
+							
+							_envCamposenviosMapper.updateByPrimaryKeyWithBLOBs(envCamposEnvio);
+							
+						}
+						
+						
 						respuesta.setCode(200);
 						respuesta.setDescription(envio.getIdenvio().toString());
 					}
@@ -651,15 +759,10 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					PlantillaKey.setIdinstitucion(idInstitucion);
 					PlantillaKey.setIdplantillaenvios(Integer.parseInt(datosTarjeta.getIdPlantillaEnvios()));
 					PlantillaKey.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvios()));
+					
 					EnvPlantillasenviosWithBLOBs plantillaEnvio = _envPlantillasenviosMapper
 							.selectByPrimaryKey(PlantillaKey);
-					NewIdDTO idPlantilla = _envPlantillaEnviosExtendsMapper.selectMaxIDPlantillas();
-					int idPlantillaEnvio = plantillaEnvio.getIdplantillaenvios();
-					int idPlantillaNuevo = Short.valueOf(idPlantilla.getNewId());
-					plantillaEnvio.setIdplantillaenvios(idPlantillaNuevo);
-					plantillaEnvio.setFechamodificacion(new Date());
-					plantillaEnvio.setUsumodificacion(usuario.getIdusuario());
-					_envPlantillasenviosMapper.insert(plantillaEnvio);
+
 
 					// tabla env_envios
 					EnvEnviosKey keyEnvio = new EnvEnviosKey();
@@ -676,6 +779,50 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					envio.setIdestado(idEstadoPendiente);
 					_envEnviosMapper.insert(envio);
 					Long idEnvioNuevo = envio.getIdenvio();
+					
+					//Duplicar asunto y cuerpo del envio duplicado
+					
+					if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
+						EnvCamposenviosKey key = new EnvCamposenviosKey();
+						key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
+						key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
+						key.setIdinstitucion(usuario.getIdinstitucion());
+						key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
+						
+						EnvCamposenvios envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
+						envCampos.setIdenvio(idEnvioNuevo);
+						envCampos.setFechamodificacion(new Date());
+						
+						_envCamposenviosMapper.insert(envCampos);
+						
+						key = new EnvCamposenviosKey();
+						key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));
+						key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
+						key.setIdinstitucion(usuario.getIdinstitucion());
+						key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
+						
+						envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
+						envCampos.setIdenvio(idEnvioNuevo);
+						envCampos.setFechamodificacion(new Date());
+						
+						_envCamposenviosMapper.insert(envCampos);
+						
+					}else if(SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
+							|| SigaConstants.ID_ENVIO_BURO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
+						
+						EnvCamposenviosKey key = new EnvCamposenviosKey();
+						key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_TEXTO_SMS));
+						key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
+						key.setIdinstitucion(usuario.getIdinstitucion());
+						key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_SMS);
+						
+						EnvCamposenvios envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
+						
+						envCampos.setIdenvio(idEnvioNuevo);
+						envCampos.setFechamodificacion(new Date());
+						
+						_envCamposenviosMapper.insert(envCampos);
+					}
 
 					// tabla env_envioProgramado
 					EnvEnvioprogramadoKey progKey = new EnvEnvioprogramadoKey();
@@ -760,6 +907,17 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							idInstitucion, usuario.getIdlenguaje(), String.valueOf(idEnvioNuevo));
 
 					if (listaEnvioDuplicado != null && listaEnvioDuplicado.size() == 1) {
+						
+						EnviosMasivosItem envioMasivo = listaEnvioDuplicado.get(0);
+						TarjetaConfiguracionDto datosTarjetaDuplicado = new TarjetaConfiguracionDto();
+						datosTarjetaDuplicado.setIdEnvio(String.valueOf(envioMasivo.getIdEnvio()));
+						datosTarjetaDuplicado.setIdTipoEnvios(envioMasivo.getIdTipoEnvios());
+						datosTarjetaDuplicado.setIdPlantillaEnvios(envioMasivo.getIdPlantillaEnvios());
+						PlantillaEnvioItem envioAsuntoCuerpo = obtenerAsuntoYcuerpoEnvio(usuario, datosTarjetaDuplicado);
+						envioMasivo.setAsunto(envioAsuntoCuerpo.getAsunto());
+						envioMasivo.setCuerpo(envioAsuntoCuerpo.getCuerpo());
+
+						
 						respuesta.setEnviosMasivosItem(listaEnvioDuplicado);
 
 						LOGGER.debug("Duplicado correctamente");
@@ -1149,21 +1307,91 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			if (null != usuarios && usuarios.size() > 0) {
+			if (null != usuarios && usuarios.size() > 0) {				
+				AdmUsuarios usuario = usuarios.get(0);
+				
 
 				EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
 				key.setIdinstitucion(idInstitucion);
 				key.setIdplantillaenvios(Integer.parseInt(datosTarjeta.getIdPlantillaEnvios()));
 				key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 				EnvPlantillasenviosWithBLOBs plant = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+				
 				plantilla.setCuerpo(plant.getCuerpo());
-				plantilla.setAsunto(plant.getAsunto());
+				plantilla.setAsunto(plant.getAsunto());		
 
 			}
 		}
 
 		LOGGER.info(
 				"ObtenerAsuntoYcuerpo() -> Salida del servicio para obtener el asunto y el cuerpo de la plantillas");
+
+		return plantilla;
+	}
+	
+	private PlantillaEnvioItem obtenerAsuntoYcuerpoEnvio(AdmUsuarios usuario, TarjetaConfiguracionDto datosTarjeta) {
+
+		LOGGER.info("ObtenerAsuntoYcuerpoEnvio() -> Entrada al servicio para obtener el asunto y el cuerpo del envio");
+
+		PlantillaEnvioItem plantilla = new PlantillaEnvioItem();
+			
+		if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
+			EnvCamposenviosKey key = new EnvCamposenviosKey();
+			key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
+			key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
+			
+			EnvCamposenvios envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
+			
+			if(envCampos != null) {
+				plantilla.setAsunto(envCampos.getValor());
+			}						
+			
+			key = new EnvCamposenviosKey();
+			key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));
+			key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
+			
+			envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
+			
+			if(envCampos != null) {
+				plantilla.setCuerpo(envCampos.getValor());
+			}
+			
+		}else if(SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
+				|| SigaConstants.ID_ENVIO_BURO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
+			
+			EnvCamposenviosKey key = new EnvCamposenviosKey();
+			key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_TEXTO_SMS));
+			key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_SMS);
+			
+			EnvCamposenvios envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
+			
+			if(envCampos != null) {
+				plantilla.setCuerpo(envCampos.getValor());
+			}
+		}				
+
+		
+		if (plantilla.getAsunto() == null && plantilla.getCuerpo() == null){
+
+			EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
+			key.setIdinstitucion(usuario.getIdinstitucion());
+			key.setIdplantillaenvios(Integer.parseInt(datosTarjeta.getIdPlantillaEnvios()));
+			key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
+			EnvPlantillasenviosWithBLOBs plant = _envPlantillasenviosMapper.selectByPrimaryKey(key);
+			
+			plantilla.setCuerpo(plant.getCuerpo());
+			plantilla.setAsunto(plant.getAsunto());
+		}			
+
+
+		LOGGER.info(
+				"ObtenerAsuntoYcuerpoEnvio() -> Salida del servicio para obtener el asunto y el cuerpo del envío");
 
 		return plantilla;
 	}
@@ -1573,7 +1801,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 				try {
 					CenDireccionesExample example = new CenDireccionesExample();
 					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona))
-							.andIdinstitucionEqualTo(idInstitucion);
+							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
 					List<CenDirecciones> direcciones = _cenDireccionesMapper.selectByExample(example);
 					if (direcciones != null && direcciones.size() > 0) {
 						List<DatosDireccionesItem> direccionesList = new ArrayList<DatosDireccionesItem>();

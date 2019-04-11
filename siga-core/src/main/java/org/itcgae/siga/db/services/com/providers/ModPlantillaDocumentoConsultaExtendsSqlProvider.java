@@ -65,6 +65,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		sql.SELECT("con_consulta.IDCONSULTA");
 		sql.SELECT("con_consulta.SENTENCIA");
 		sql.SELECT("con_consulta.IDINSTITUCION");
+		sql.SELECT("plantillaConsulta.REGION");
 		
 		sql.FROM("MOD_PLANTILLADOC_CONSULTA plantillaConsulta");	
 		sql.INNER_JOIN("con_consulta ON con_consulta.idconsulta=plantillaConsulta.Idconsulta AND con_consulta.idinstitucion = plantillaConsulta.Idinstitucion_consulta");
