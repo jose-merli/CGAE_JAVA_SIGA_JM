@@ -449,7 +449,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 								.andIdpersonaNotEqualTo(Long.valueOf(colegiadoItem.getIdPersona()));
 						List<CenPersona> busqueda = cenPersonaExtendsMapper.selectByExample(dniRepetido);
 						if (busqueda.isEmpty()) {
-							cenPersonaExtendsMapper.updateByExampleSelective(cenPersona, cenPersonaExample1);
+							cenPersonaExtendsMapper.updateByExample(cenPersona, cenPersonaExample1);
 						} else {
 							updateResponseDTO.setStatus(SigaConstants.KO);
 							Error error = new Error();

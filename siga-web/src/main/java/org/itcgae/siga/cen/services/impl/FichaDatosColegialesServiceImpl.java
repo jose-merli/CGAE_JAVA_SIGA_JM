@@ -278,7 +278,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					colegiado.setIdtiposseguro(Short.parseShort(colegiadoItem.getIdTiposSeguro()));
 				}
 				if (colegiadoItem.getSituacionResidente() != null) {
-					colegiado.setSituacionresidente(colegiadoItem.getSituacionResidente());
+					colegiado.setSituacionresidente(colegiadoItem.getSituacionResidente().equalsIgnoreCase("si") ? "1" : "0");
 				}
 				if (colegiadoItem.getComunitario() != null) {
 					colegiado.setComunitario(colegiadoItem.getComunitario());
@@ -653,7 +653,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 									CenDirecciones direccionCensoWeb = null;
 									for (CenDirecciones cenDireccion : cenDireccionesList) {
-										if (cenDireccion.getIddireccion() == tipoCensoWeb.getIddireccion()) {
+										if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
 											direccionCensoWeb = cenDireccion;
 										}
 									}

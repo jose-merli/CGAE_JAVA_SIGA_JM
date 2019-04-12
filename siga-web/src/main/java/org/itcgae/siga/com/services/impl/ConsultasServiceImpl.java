@@ -526,6 +526,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						sentencia = insertarClaves(consulta.getIdclasecomunicacion(), sentencia);
 						consulta.setSentencia(sentencia);
 						
+//						INSERTAMOS LA CONSULTA
 						_conConsultaMapper.insert(consulta);											
 						
 						//Creamos el modelo de comunicación con la clase Consultas genericas para generacion de excel o informe
@@ -541,12 +542,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 							modeloCom.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
 							modeloCom.setPordefecto(SigaConstants.SI);
 						}else{
-							modeloCom.setIdinstitucion(Short.parseShort(consultaDTO.getIdInstitucion()));
+							modeloCom.setIdinstitucion(idInstitucion);
 							modeloCom.setPordefecto(SigaConstants.NO);
 						}		
 						modeloCom.setPreseleccionar("SI");
 						modeloCom.setUsumodificacion(usuario.getIdusuario());
 						modeloCom.setVisible((short)1);
+//						
+//						SE INSERTA EL MODELO DE COMUNICACIÓN POR DEFECTO
 						_modModelocomunicacionMapper.insert(modeloCom);
 						
 						
