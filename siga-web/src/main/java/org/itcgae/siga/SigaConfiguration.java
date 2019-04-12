@@ -1,12 +1,16 @@
 package org.itcgae.siga;
 
 import java.net.URI;
+import java.util.List;
 
+import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.logger.LoggingConfig;
 import org.itcgae.siga.logger.MyBatisLoggerInterceptor;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -14,6 +18,7 @@ import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +26,9 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 
 import com.aspose.words.License;
 
@@ -32,6 +40,10 @@ public class SigaConfiguration implements ApplicationListener<ApplicationReadyEv
 	
 	@Autowired
 	ServletContext servletContext;
+	
+	@Autowired
+	static
+	private GenPropertiesMapper genPropertiesMapper;
 	
 	@Override
 	public void onApplicationEvent(ApplicationReadyEvent arg0) {
@@ -86,6 +98,15 @@ public class SigaConfiguration implements ApplicationListener<ApplicationReadyEv
 		     multipartResolver.setMaxUploadSize(1000000);
 		     return multipartResolver;
 		 }*/
+		
+        @Bean
+        public MultipartConfigElement multipartConfigElement() {
+            MultipartConfigFactory factory = new MultipartConfigFactory();
+            factory.setMaxFileSize(Long.valueOf(SigaConstants.PARAMETRO_GENERAL.MAX_FILE_SIZE.getValor()));
+            factory.setMaxRequestSize(Long.valueOf(SigaConstants.PARAMETRO_GENERAL.MAX_FILE_SIZE.getValor()));
+            return factory.createMultipartConfig();
+        }
+
 		
 		@Bean
 		public ConfigurationCustomizer configurationCustomizer() {

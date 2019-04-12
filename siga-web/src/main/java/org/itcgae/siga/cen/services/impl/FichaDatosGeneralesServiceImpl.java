@@ -1421,8 +1421,11 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						cenCliente.setIdlenguaje(usuario.getIdlenguaje());
 						cenCliente.setExportarfoto(SigaConstants.DB_FALSE);
 						cenCliente.setPublicidad(SigaConstants.DB_FALSE);
+						cenCliente.setLetrado(SigaConstants.DB_FALSE);
+						cenCliente.setNoenviarrevista(SigaConstants.DB_FALSE);
 						cenCliente.setGuiajudicial(SigaConstants.DB_FALSE);
 						cenCliente.setNoaparecerredabogacia(noColegiadoItem.getNoAparecerRedAbogacia());
+						
 						// }
 
 						LOGGER.info(
@@ -1448,7 +1451,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							EtiquetaUpdateDTO cenNocolegiado = new EtiquetaUpdateDTO();
 
 							// Se pone a cero ya que al ser una persona física no tiene tipo ni sociedadsj
-							cenNocolegiado.setTipo("0");
+							cenNocolegiado.setTipo("1");
 							cenNocolegiado.setIdPersona(idPersona.toString());
 							cenNocolegiado.setAnotaciones(noColegiadoItem.getAnotaciones());
 							int insertNoColegiado = cenNocolegiadoMapper.insertSelectiveForCreateLegalPerson(

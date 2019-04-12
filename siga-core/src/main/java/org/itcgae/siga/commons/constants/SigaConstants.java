@@ -26,7 +26,8 @@ public class SigaConstants {
 
 	public static Integer CODE_200 = 200; 
 	public static Integer CODE_400 = 400; 
-
+	
+	public static String MAX_SIZE_FILE = "10485760";
 	public static String InstitucionGeneral = "2000";
 	public static String Personal = "Personal";
 
@@ -809,5 +810,24 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String  CENSO_WS_SITUACION_NOEJERCIENTE = "NOEJERCIENTE";
 	public static final String  CENSO_WS_SITUACION_BAJACOLEGIO = "BAJACOLEGIO";
 	public static final String  CENSO_WS_SITUACION_INSCRITO = "INSCRITO";
+	
+	public static enum PARAMETRO_GENERAL { 
+		MAX_FILE_SIZE("10485760")
+		;
+				
+				private String valor = null;
+				
+				private PARAMETRO_GENERAL(String valor) {
+					this.valor = valor;
+				}
+				
+				public final String getValor() {
+					return this.valor;
+				}
+				
+				public void setValor(String valor){
+					this.valor = valor;
+				}		
+			} 
 
 }

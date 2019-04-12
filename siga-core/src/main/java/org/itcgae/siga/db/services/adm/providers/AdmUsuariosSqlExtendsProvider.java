@@ -42,12 +42,15 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 		sql.LEFT_OUTER_JOIN("ADM_ROL ROL ON UE.IDROL=ROL.IDROL ");
 		
 		// comprobacion campo rol del body para aplicar filtro
+//		if(null != usuarioRequestDTO.getRol() && !usuarioRequestDTO.getRol().equalsIgnoreCase("")){
+//			sql.WHERE("exists (select 1 from ADM_PERFIL_ROL ROL,"
+//					+ " ADM_USUARIO_EFECTIVO UEF where ROL.IDINSTITUCION = USUARIOS.IDINSTITUCION"
+//					+ " and ROL.IDROL = UEF.IDROL"
+//					+ " and UEF.IDINSTITUCION = ROL.IDINSTITUCION"
+//					+ " and UEF.IDUSUARIO = USUARIOS.IDUSUARIO and ROL.IDROL = '" + usuarioRequestDTO.getRol() + "')");		
+//		}
 		if(null != usuarioRequestDTO.getRol() && !usuarioRequestDTO.getRol().equalsIgnoreCase("")){
-			sql.WHERE("exists (select 1 from ADM_PERFIL_ROL ROL,"
-					+ " ADM_USUARIO_EFECTIVO UEF where ROL.IDINSTITUCION = USUARIOS.IDINSTITUCION"
-					+ " and ROL.IDROL = UEF.IDROL"
-					+ " and UEF.IDINSTITUCION = ROL.IDINSTITUCION"
-					+ " and UEF.IDUSUARIO = USUARIOS.IDUSUARIO and ROL.IDROL = '" + usuarioRequestDTO.getRol() + "')");		
+			sql.WHERE("ROL.IDROL = '" + usuarioRequestDTO.getRol() + "'");		
 		}
 		//comprobacion campo grupo del body para aplicar filtro
 		if(null != usuarioRequestDTO.getGrupo() && !usuarioRequestDTO.getGrupo().equalsIgnoreCase("")){
