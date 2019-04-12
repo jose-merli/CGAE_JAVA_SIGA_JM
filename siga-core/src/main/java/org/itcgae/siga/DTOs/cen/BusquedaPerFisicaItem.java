@@ -19,14 +19,17 @@ public class BusquedaPerFisicaItem {
 	private String numeroColegiado;
 	private String residente;
 	private String situacion;
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Date fechaNacimiento;
 	private String numeroInstitucion;
 	private String idProvincia;
 	private String idActividadProfesional;
 	private String domicilio;
 	private String fechaEstado;
-	
+	private String  sexo;
+	private String idEstadoCivil;
+	private String idTratamiento;
+	private String naturalDe;
 	
 	
 
@@ -305,7 +308,94 @@ public class BusquedaPerFisicaItem {
 	public void setIdActividadProfesional(String idActividadProfesional) {
 		this.idActividadProfesional = idActividadProfesional;
 	}
+	
+	public String getDomicilio() {
+		return domicilio;
+	}
 
+
+	public void setDomicilio(String domicilio) {
+		this.domicilio = domicilio;
+	}
+
+
+	public String getFechaEstado() {
+		return fechaEstado;
+	}
+
+
+	public void setFechaEstado(String fechaEstado) {
+		this.fechaEstado = fechaEstado;
+	}
+	
+
+	/**
+	 *
+	 */
+	public BusquedaPerFisicaItem sexo(String sexo){
+		this.sexo = sexo;
+		return this;
+	}
+
+	@JsonProperty("sexo")
+	public String getSexo() {
+		return sexo;
+	}
+	
+	public void setSexo(String sexo) {
+		this.sexo = sexo;
+	}
+	
+	/**
+	 *
+	 */
+	public BusquedaPerFisicaItem idEstadoCivil(String idEstadoCivil){
+		this.idEstadoCivil = idEstadoCivil;
+		return this;
+	}
+
+	@JsonProperty("idEstadoCivil")
+	public String getIdEstadoCivil() {
+		return idEstadoCivil;
+	}
+	
+	public void setIdEstadoCivil(String idEstadoCivil) {
+		this.idEstadoCivil = idEstadoCivil;
+	}
+	
+	/**
+	 *
+	 */
+	public BusquedaPerFisicaItem idTratamiento(String idTratamiento){
+		this.idTratamiento = idTratamiento;
+		return this;
+	}
+
+	@JsonProperty("idTratamiento")
+	public String getIdTratamiento() {
+		return idTratamiento;
+	}
+	
+	public void setIdTratamiento(String idTratamiento) {
+		this.idTratamiento = idTratamiento;
+	}
+	
+	/**
+	 *
+	 */
+	public BusquedaPerFisicaItem naturalDe(String naturalDe){
+		this.naturalDe = naturalDe;
+		return this;
+	}
+
+	@JsonProperty("naturalDe")
+	public String getNaturalDe() {
+		return naturalDe;
+	}
+	
+	public void setNaturalDe(String naturalDe) {
+		this.naturalDe = naturalDe;
+	}
 	 
 	
 	@Override
@@ -330,13 +420,19 @@ public class BusquedaPerFisicaItem {
 	    		Objects.equals(this.fechaNacimiento, busquedaFisicaItem.fechaNacimiento) &&
 	    		Objects.equals(this.numeroInstitucion, busquedaFisicaItem.numeroInstitucion) &&
 	    		Objects.equals(this.idProvincia, busquedaFisicaItem.idProvincia) &&
-	    		Objects.equals(this.idActividadProfesional, busquedaFisicaItem.idActividadProfesional);
+	    		Objects.equals(this.idActividadProfesional, busquedaFisicaItem.idActividadProfesional) &&
+	    		Objects.equals(this.sexo, busquedaFisicaItem.sexo) &&
+	    		Objects.equals(this.idEstadoCivil, busquedaFisicaItem.idEstadoCivil) &&
+	    		Objects.equals(this.idTratamiento, busquedaFisicaItem.idTratamiento) &&
+	    	    Objects.equals(this.naturalDe, busquedaFisicaItem.naturalDe);
 	}
  
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(colegio, idPersona, nif, nombre, apellidos, primerApellido, segundoApellido, numeroColegiado, residente, situacion, fechaNacimiento, numeroInstitucion, idProvincia, idActividadProfesional);
+	    return Objects.hash(colegio, idPersona, nif, nombre, apellidos, primerApellido, segundoApellido, numeroColegiado, residente, 
+	    		situacion, fechaNacimiento, numeroInstitucion, idProvincia, idActividadProfesional, sexo, 
+	    		idEstadoCivil,idTratamiento, naturalDe);
 	}
 
 	
@@ -359,6 +455,10 @@ public class BusquedaPerFisicaItem {
 	    sb.append("    numeroInstitucion: ").append(toIndentedString(numeroInstitucion)).append("\n");
 	    sb.append("    idProvincia: ").append(toIndentedString(idProvincia)).append("\n");
 	    sb.append("    idActividadProfesional: ").append(toIndentedString(idActividadProfesional)).append("\n");
+	    sb.append("    sexo: ").append(toIndentedString(sexo)).append("\n");
+	    sb.append("    idEstadoCivil: ").append(toIndentedString(idEstadoCivil)).append("\n");
+	    sb.append("    idTratamiento: ").append(toIndentedString(idTratamiento)).append("\n");
+	    sb.append("    naturalDe: ").append(toIndentedString(naturalDe)).append("\n");
 	    sb.append("}");
 	    return sb.toString();
 	}
@@ -374,27 +474,5 @@ public class BusquedaPerFisicaItem {
 	    return o.toString().replace("\n", "\n    ");
 	}
 
-
-	public String getDomicilio() {
-		return domicilio;
-	}
-
-
-	public void setDomicilio(String domicilio) {
-		this.domicilio = domicilio;
-	}
-
-
-	public String getFechaEstado() {
-		return fechaEstado;
-	}
-
-
-	public void setFechaEstado(String fechaEstado) {
-		this.fechaEstado = fechaEstado;
-	}
-	
-	
-	
 	
 }
