@@ -1137,7 +1137,13 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 				LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
 				Iterator<String> itr = request.getFileNames();
 				MultipartFile file = request.getFile(itr.next());
-				String fileName = file.getOriginalFilename();
+				Date fecha = new Date();
+				
+				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy.hh.mm.ss");
+				String fechaFormateada = sdf.format(fecha);
+				
+				
+				String fileName = fechaFormateada + "_"+ file.getOriginalFilename();
 				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
 				// BufferedOutputStream stream = null;
 				try {
