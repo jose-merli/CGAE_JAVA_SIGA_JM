@@ -2,7 +2,13 @@ package org.itcgae.siga.com.services.impl;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -21,6 +27,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.mail.internet.MimePart;
 
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.RemitenteDTO;
@@ -41,6 +48,7 @@ import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -67,6 +75,9 @@ public class EnviosServiceImpl implements IEnviosService{
 	CenDireccionesMapper _cenDireccionesMapper;
 	
 	@Autowired	
+	CenClienteExtendsMapper _cenClienteExtendsMapper;
+	
+	@Autowired	
 	GenPropertiesMapper _genPropertiesMapper;
 	
 	@Autowired	
@@ -78,7 +89,7 @@ public class EnviosServiceImpl implements IEnviosService{
 	
 	
 	@Override
-	public void envioMail(RemitenteDTO remitente, List<DestinatarioItem> destinatarios, String asuntoFinal, String cuerpoFinal, List<DatosDocumentoItem> documentosEnvio, boolean envioMasivo) throws Exception {
+	public void envioMail(String idInstitucion, String idEnvio, RemitenteDTO remitente, List<DestinatarioItem> destinatarios, String asuntoFinal, String cuerpoFinal, List<DatosDocumentoItem> documentosEnvio, boolean envioMasivo) throws Exception {
 		
         Transport tr = null;
 		try {
@@ -147,13 +158,18 @@ public class EnviosServiceImpl implements IEnviosService{
 	    	    mensaje.addRecipient(MimeMessage.RecipientType.TO,toInternetAddress);
 	    	    
 	    	    
-	    	  //ASUNTO
-                String sAsunto = asuntoFinal;
+	    	    //ASUNTO   
+                String sAsunto = sustituirEtiquetas(idInstitucion, asuntoFinal, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, idEnvio);
+	    	    sAsunto = sustituirEtiquetas(idInstitucion, asuntoFinal, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, idEnvio);
+	    	    
                 mensaje.setSubject(sAsunto,"ISO-8859-1");
                 mensaje.setHeader("Content-Type","text/html; charset=\"ISO-8859-1\"");
                 
                 //CUERPO
                 String sCuerpo = cuerpoFinal == null ? "": cuerpoFinal;
+                sCuerpo = sustituirEtiquetas(idInstitucion, sCuerpo, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, idEnvio);
+                sCuerpo = sustituirEtiquetas(idInstitucion, sCuerpo, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, idEnvio);
+                
                 
                 MimeMultipart mixedMultipart = new MimeMultipart("mixed");
                 MimeBodyPart mixedBodyPart = new MimeBodyPart();
@@ -201,11 +217,13 @@ public class EnviosServiceImpl implements IEnviosService{
         		property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
         		String pwd = property.getValor();
         		
-        		if (portSt != null && !portSt.trim().equals("")) {
-        			tr.connect(host, Integer.parseInt(portSt), user, pwd);	
-        		} else {
-        			tr.connect(host, user, pwd);
-        		}
+        		if(!tr.isConnected()) {
+        			if (portSt != null && !portSt.trim().equals("")) {
+            			tr.connect(host, Integer.parseInt(portSt), user, pwd);	
+            		} else {
+            			tr.connect(host, user, pwd);
+            		}
+        		}        		
         		
         		tr.sendMessage(mensaje, mensaje.getAllRecipients());
         		LOGGER.debug("Enviado");
@@ -312,6 +330,67 @@ public class EnviosServiceImpl implements IEnviosService{
 		
 		return idSolicidudEcos;
 		
+	}
+	
+	private String sustituirEtiquetas(String idInstitucion, String sArchivo, DestinatarioItem destinatario, String marcaInicioFin, String idEnvio){
+		String etiqueta = SigaConstants.ETIQUETA_DEST_NOMBRE;
+
+		Pattern pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+		Matcher matcher = pattern.matcher(sArchivo);
+		sArchivo = matcher.replaceAll(destinatario.getNombre());
+		
+		etiqueta = SigaConstants.ETIQUETA_DEST_APELLIDO1;
+		pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+		matcher = pattern.matcher(sArchivo);
+		sArchivo = matcher.replaceAll(destinatario.getApellidos1());
+		
+		etiqueta = SigaConstants.ETIQUETA_DEST_APELLIDO2;
+		pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+		matcher = pattern.matcher(sArchivo);
+		sArchivo = matcher.replaceAll(destinatario.getApellidos2());
+		
+		etiqueta = SigaConstants.ETIQUETA_DEST_CIFNIF;
+		pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+		matcher = pattern.matcher(sArchivo);
+		sArchivo = matcher.replaceAll(destinatario.getNIFCIF());
+		
+		
+		//Obtenemos el tratamiento del destinatario
+		etiqueta = SigaConstants.ETIQUETA_DEST_TRATAMIENTO;
+		pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+		matcher = pattern.matcher(sArchivo);
+		sArchivo = matcher.replaceAll(getTratamientoDestinatario(idInstitucion, destinatario));
+		
+		
+		etiqueta = SigaConstants.ETIQUETA_FECHAACTUAL;
+		pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+		Date date = Calendar.getInstance().getTime();  
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
+		String strDate = dateFormat.format(date); 
+		matcher = pattern.matcher(sArchivo);		
+		sArchivo = matcher.replaceAll(strDate);
+		
+		etiqueta = SigaConstants.ETIQUETA_IDENVIO;
+		pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+		matcher = pattern.matcher(sArchivo);
+		sArchivo = matcher.replaceAll(idEnvio);
+		
+		return sArchivo;
+	}
+	
+	private String getTratamientoDestinatario(String idInstitucion, DestinatarioItem destinatario) {
+		String tratamiento = "";
+		int idIdioma = 1;
+		
+		if(destinatario.getTratamiento() == null){
+			List<StringDTO> result = _cenClienteExtendsMapper.getTratamiento(idInstitucion, destinatario.getIdPersona(), idIdioma);			
+			if(result != null && result.size() > 0 && result.get(0) != null) {
+				tratamiento = result.get(0).getValor();
+				destinatario.setTratamiento(tratamiento);
+			}
+		}		
+		
+		return destinatario.getTratamiento();
 	}
 
 }

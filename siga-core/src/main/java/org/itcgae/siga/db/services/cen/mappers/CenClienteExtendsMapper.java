@@ -44,5 +44,12 @@ public interface CenClienteExtendsMapper extends CenClienteMapper{
 	
 	List<StringDTO> getInstitucionesEjerciente(String idPersona, String idInstitucion);
 	
+	@SelectProvider(type = CenClienteSqlExtendsProvider.class, method = "getTratamiento")
+	@Results({
+		@Result(column = "TRATAMIENTO", property = "valor", jdbcType = JdbcType.NUMERIC),
+	})
+	
+	List<StringDTO> getTratamiento(String idInstitucion, String idPersona, int idIdioma);
+	
 
 }

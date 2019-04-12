@@ -245,5 +245,18 @@ public class EnvEnviosExtendsSqlProvider {
 		return sql.toString();
 	}
 	
+	public String selectEnviosByIdPlantilla(Short idInstitucion, String idPlantillaEnvio) {
+
+		SQL sql = new SQL();
+				
+		sql.SELECT("ENVIO.IDENVIO");
+		sql.FROM("ENV_ENVIOS ENVIO");
+		
+		
+		sql.WHERE("ENVIO.IDINSTITUCION = '" + idInstitucion +"' AND ENVIO.IDPLANTILLAENVIOS = " + idPlantillaEnvio);
+		
+		return sql.toString();
+	}
+	
 
 }

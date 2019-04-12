@@ -526,6 +526,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						sentencia = insertarClaves(consulta.getIdclasecomunicacion(), sentencia);
 						consulta.setSentencia(sentencia);
 						
+//						INSERTAMOS LA CONSULTA
 						_conConsultaMapper.insert(consulta);											
 						
 						//Creamos el modelo de comunicación con la clase Consultas genericas para generacion de excel o informe
@@ -541,12 +542,14 @@ public class ConsultasServiceImpl implements IConsultasService{
 							modeloCom.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
 							modeloCom.setPordefecto(SigaConstants.SI);
 						}else{
-							modeloCom.setIdinstitucion(Short.parseShort(consultaDTO.getIdInstitucion()));
+							modeloCom.setIdinstitucion(idInstitucion);
 							modeloCom.setPordefecto(SigaConstants.NO);
 						}		
 						modeloCom.setPreseleccionar("SI");
 						modeloCom.setUsumodificacion(usuario.getIdusuario());
 						modeloCom.setVisible((short)1);
+//						
+//						SE INSERTA EL MODELO DE COMUNICACIÓN POR DEFECTO
 						_modModelocomunicacionMapper.insert(modeloCom);
 						
 						
@@ -2265,6 +2268,12 @@ public class ConsultasServiceImpl implements IConsultasService{
 		List<Map<String,Object>> result = null;
 		
 		sentencia = quitarEtiquetas(sentencia.toUpperCase());
+		boolean contieneCP = false;
+		
+		if(sentencia != null && sentencia.contains(SigaConstants.CAMPO_CPPUNTO)) {
+			sentencia = sentencia.replaceAll(SigaConstants.CAMPO_CPPUNTO, SigaConstants.CAMPO_CP);
+			contieneCP = true;
+		}
 		
 		if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
 				|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
@@ -2273,6 +2282,16 @@ public class ConsultasServiceImpl implements IConsultasService{
 			LOGGER.error("ejecutarConsultaConClaves() -> Consulta no permitida: " + sentencia);
 		}else {
 			result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+		}
+		
+		if(contieneCP && result != null && result.size() > 0) {
+			for(Map<String,Object> mapaResult : result) {
+				if(mapaResult != null) {
+					Object valor = mapaResult.get(SigaConstants.CAMPO_CP);
+					mapaResult.put(SigaConstants.CAMPO_CPPUNTO, valor);
+					mapaResult.remove(SigaConstants.CAMPO_CP);
+				}
+			}
 		}
 		
 		return result;

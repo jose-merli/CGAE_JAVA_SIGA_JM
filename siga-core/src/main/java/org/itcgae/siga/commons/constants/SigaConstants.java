@@ -70,6 +70,8 @@ public class SigaConstants {
 	public static String CAMPO_NUM_COLEGIADO = "NCOLEGIADO";
 	public static String CAMPO_IDENTIFICACION = "INDENTIFICACIONENTIDAD";
 	public static String CAMPO_IDINSTITUCION = "IDINSTITUCION";
+	public static String CAMPO_CP = "CP";
+	public static String CAMPO_CPPUNTO = "C.P.";
 	public static String IDINSTITUCION_0 = "0";
 	public static String SI = "SI";
 	public static String NO = "NO";
@@ -124,6 +126,18 @@ public class SigaConstants {
 	public static final String ID_TIPO_CAMPO_EMAIL = "E";
 	public static final String ID_TIPO_CAMPO_SMS = "S";
 	
+	// Etiquetas para envios
+	public static final String ETIQUETA_DEST_TRATAMIENTO = "TRATAMIENTO";
+	public static final String ETIQUETA_DEST_NOMBRE = "NOMBRE";
+	public static final String ETIQUETA_DEST_APELLIDO1 = "APELLIDO1";
+	public static final String ETIQUETA_DEST_APELLIDO2 = "APELLIDO2";
+	public static final String ETIQUETA_DEST_CIFNIF = "CIFNIF";
+
+	public static final String ETIQUETA_IDENVIO = "IDENVIO";
+	public static final String ETIQUETA_FECHAACTUAL = "FECHAACTUAL";
+
+	public static final String MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO = "%%";
+	public static final String MARCAS_ETIQUETAS_REEMPLAZO_TEXTO = "##";
 	
 	//PFD
 	public static final String FIRMA_OK="FIRMA_OK";
