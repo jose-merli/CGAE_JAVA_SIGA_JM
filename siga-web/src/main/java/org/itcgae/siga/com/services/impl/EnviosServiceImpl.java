@@ -120,8 +120,11 @@ public class EnviosServiceImpl implements IEnviosService{
 		    
 		    //Remitente
 		    String from = remitente.getCorreoElectronico();
-		    String descFrom = remitente.getApellido1() + " " + remitente.getApellido2();
+		    String descFrom = remitente.getApellido1();
 
+		    if(remitente.getApellido2() != null && !"".equalsIgnoreCase(remitente.getApellido2())) {
+		    	descFrom = descFrom + " " + remitente.getApellido2();
+		    }
 		    
 		    if(destinatarios != null) {
 		    	LOGGER.debug("Longitud de destinatarios: " + destinatarios.size());
@@ -172,6 +175,7 @@ public class EnviosServiceImpl implements IEnviosService{
 	    	    for (DatosDocumentoItem informe : documentosEnvio) {
 	    	    	File file = new File(informe.getPathDocumento());
 	    	    	DataSource ds = new FileDataSource(file);
+	    	    	messageBodyPart = new MimeBodyPart();
 	    	    	messageBodyPart.setDataHandler(new DataHandler(ds));
 	    	    	messageBodyPart.setFileName(informe.getFileName());
 	    	    	messageBodyPart.setDisposition(MimePart.ATTACHMENT);

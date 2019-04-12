@@ -23,6 +23,9 @@ import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.EnvCamposenvios;
+import org.itcgae.siga.db.entities.EnvCamposenviosKey;
+import org.itcgae.siga.db.entities.EnvCamposenviosExample;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
 import org.itcgae.siga.db.entities.EnvDestinatarios;
@@ -37,6 +40,7 @@ import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenGruposclienteClienteMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
+import org.itcgae.siga.db.mappers.EnvCamposenviosMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
 import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
 import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
@@ -100,6 +104,9 @@ public class ColaEnviosImpl implements IColaEnvios {
 	
 	@Autowired
 	private EnvDestConsultaEnvioExtendsMapper _envDestConsultaEnvioExtendsMapper;
+	
+	@Autowired
+	private EnvCamposenviosMapper _envCamposenviosMapper;
 	
 	//@Transactional
 	@Scheduled(cron = "${cron.pattern.scheduled.Envios: 0 * * ? * *}")
@@ -265,9 +272,35 @@ public class ColaEnviosImpl implements IColaEnvios {
 					List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
 					resultadosConsultas.addAll(result);
 				}
+			}			
+			
+			// Obtenemos el asunto y el cuerpo del envio
+			
+			String asuntoEnvio = plantilla.getAsunto() != null ? plantilla.getAsunto():"";
+			String cuerpoEnvio = plantilla.getCuerpo() != null ? plantilla.getCuerpo():"";
+					
+			EnvCamposenviosKey key = new EnvCamposenviosKey();
+			key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
+			key.setIdenvio(envio.getIdenvio());
+			key.setIdinstitucion(envio.getIdinstitucion());
+			key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);		
+			
+			EnvCamposenvios envCampo = _envCamposenviosMapper.selectByPrimaryKey(key);
+			
+			if(envCampo != null && envCampo.getValor() != null) {
+				asuntoEnvio = envCampo.getValor();
+			}			
+
+			key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));		
+			
+			envCampo = _envCamposenviosMapper.selectByPrimaryKey(key);
+			
+			if(envCampo != null && envCampo.getValor() != null) {
+				cuerpoEnvio = envCampo.getValor();
 			}
-			String asuntoFinal = remplazarCamposAsunto(plantilla.getAsunto() != null ? plantilla.getAsunto():"", resultadosConsultas);
-			String cuerpoFinal = remplazarCamposCuerpo(plantilla.getCuerpo() != null ? plantilla.getCuerpo():"", resultadosConsultas);
+			
+			String asuntoFinal = remplazarCamposAsunto(asuntoEnvio, resultadosConsultas);
+			String cuerpoFinal = remplazarCamposCuerpo(cuerpoEnvio, resultadosConsultas);
 			
 			//Generamos los informes para adjuntarlos al envio
 			List<DatosDocumentoItem> documentosEnvio = new ArrayList<DatosDocumentoItem>();
@@ -353,8 +386,34 @@ public class ColaEnviosImpl implements IColaEnvios {
 						resultadosConsultas.addAll(result);
 					}
 				}
-				String asuntoFinal = remplazarCamposAsunto(plantilla.getAsunto() != null ? plantilla.getAsunto():"", resultadosConsultas);
-				String cuerpoFinal = remplazarCamposCuerpo(plantilla.getCuerpo() != null ? plantilla.getCuerpo():"", resultadosConsultas);
+				
+				// Obtenemos el asunto y el cuerpo del envio
+				
+				String asuntoEnvio = plantilla.getAsunto() != null ? plantilla.getAsunto():"";
+				String cuerpoEnvio = plantilla.getCuerpo() != null ? plantilla.getCuerpo():"";
+						
+				EnvCamposenviosKey key = new EnvCamposenviosKey();
+				key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
+				key.setIdenvio(envio.getIdenvio());
+				key.setIdinstitucion(envio.getIdinstitucion());
+				key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);		
+				
+				EnvCamposenvios envCampo = _envCamposenviosMapper.selectByPrimaryKey(key);
+				
+				if(envCampo != null && envCampo.getValor() != null) {
+					asuntoEnvio = envCampo.getValor();
+				}			
+
+				key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));		
+				
+				envCampo = _envCamposenviosMapper.selectByPrimaryKey(key);
+				
+				if(envCampo != null && envCampo.getValor() != null) {
+					cuerpoEnvio = envCampo.getValor();
+				}
+				
+				String asuntoFinal = remplazarCamposAsunto(asuntoEnvio, resultadosConsultas);
+				String cuerpoFinal = remplazarCamposCuerpo(cuerpoEnvio, resultadosConsultas);
 				
 				//Generamos los informes para adjuntarlos al envio
 				List<DatosDocumentoItem> documentosEnvio = _dialogoComunicacionService.generarDocumentosEnvio(envio.getIdinstitucion().toString(), envio.getIdenvio().toString());
