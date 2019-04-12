@@ -14,6 +14,7 @@ public class DestinatarioItem {
 	private String domicilio;
 	private String nombreCompleto;
 	private ArrayList<ConsultaEnvioItem> listaConsultasEnvio;
+	private String tratamiento;
 	
 	
 	public String getDomicilio() {
@@ -75,5 +76,11 @@ public class DestinatarioItem {
 	}
 	public void setListaConsultasEnvio(ArrayList<ConsultaEnvioItem> listaConsultasEnvio) {
 		this.listaConsultasEnvio = listaConsultasEnvio;
+	}
+	public String getTratamiento() {
+		return tratamiento;
+	}
+	public void setTratamiento(String tratamiento) {
+		this.tratamiento = tratamiento;
 	}
 }

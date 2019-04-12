@@ -68,6 +68,15 @@ public class CenClienteSqlExtendsProvider extends CenClienteSqlProvider {
 		return sql.toString();
 	}
 	
-	
+	public String getTratamiento(String idInstitucion, String idPersona, int idIdioma) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("f_siga_getrecurso (t.DESCRIPCION, " + idIdioma + ") as TRATAMIENTO");
+		sql.FROM(" cen_cliente c, cen_persona p, cen_tratamiento t");
+		sql.WHERE("c.idpersona = '"+ idPersona  + "'");
+		sql.WHERE("c.idinstitucion = " + idInstitucion + " AND c.idpersona = p.idpersona AND c.idtratamiento = t.idtratamiento");
+		
+		return sql.toString();
+	}
 	
 }

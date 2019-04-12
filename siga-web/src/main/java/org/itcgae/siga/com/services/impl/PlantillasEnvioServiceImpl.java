@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
+import org.itcgae.siga.DTOs.com.EnviosMasivosItem;
 import org.itcgae.siga.DTOs.com.FinalidadConsultaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaDatosConsultaDTO;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
@@ -46,6 +47,7 @@ import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +68,9 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	
 	@Autowired
 	private EnvPlantillasenviosMapper _envPlantillasenviosMapper;
+	
+	@Autowired
+	private EnvEnviosExtendsMapper _envEnviosExtendsMapper;
 	
 	@Autowired
 	private ModPlantillaenvioConsultaMapper _modPlantillaenvioConsultaMapper;
@@ -181,19 +186,37 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 				try {
+					boolean borrar = true;
+					// Comprobamos si se pueden borrar todas las plantillas
 					for (int i = 0; i < plantillasEnvio.length; i++) {
-						EnvPlantillasenviosKey plantillaEnvioKey = new EnvPlantillasenviosKey();
-						plantillaEnvioKey.setIdplantillaenvios(Integer.parseInt(plantillasEnvio[i].getIdPlantillaEnvios()));
-						plantillaEnvioKey.setIdinstitucion(Short.valueOf(plantillasEnvio[i].getIdInstitucion()));
-						plantillaEnvioKey.setIdtipoenvios(Short.valueOf(plantillasEnvio[i].getIdTipoEnvios()));
-						EnvPlantillasenvios plantillaEnvios = _envPlantillasenviosMapper.selectByPrimaryKey(plantillaEnvioKey);
-						plantillaEnvios.setFechabaja(new Date());
-						plantillaEnvios.setFechamodificacion(new Date());
-						plantillaEnvios.setUsumodificacion(usuario.getIdusuario());
-						_envPlantillasenviosMapper.updateByPrimaryKey(plantillaEnvios);
+						PlantillaEnvioItem plantilla = plantillasEnvio[i];
+						if(borrar){
+							List<EnviosMasivosItem> listaEnvios = _envEnviosExtendsMapper.selectEnviosByIdPlantilla(idInstitucion, plantilla.getIdPlantillaEnvios());
+							if(listaEnvios != null && listaEnvios.size() > 0) {
+								borrar = false;
+							}
+						}						
 					}
-					respuesta.setCode(200);
-					respuesta.setDescription("Plantillas de envío borradas");
+					
+					if(borrar) {
+						for (int i = 0; i < plantillasEnvio.length; i++) {
+							EnvPlantillasenviosKey plantillaEnvioKey = new EnvPlantillasenviosKey();
+							plantillaEnvioKey.setIdplantillaenvios(Integer.parseInt(plantillasEnvio[i].getIdPlantillaEnvios()));
+							plantillaEnvioKey.setIdinstitucion(Short.valueOf(plantillasEnvio[i].getIdInstitucion()));
+							plantillaEnvioKey.setIdtipoenvios(Short.valueOf(plantillasEnvio[i].getIdTipoEnvios()));
+							EnvPlantillasenvios plantillaEnvios = _envPlantillasenviosMapper.selectByPrimaryKey(plantillaEnvioKey);
+							plantillaEnvios.setFechabaja(new Date());
+							plantillaEnvios.setFechamodificacion(new Date());
+							plantillaEnvios.setUsumodificacion(usuario.getIdusuario());
+							_envPlantillasenviosMapper.updateByPrimaryKey(plantillaEnvios);
+						}
+						respuesta.setCode(200);
+						respuesta.setDescription("Plantillas de envío borradas");
+					}else{
+						respuesta.setCode(400);
+						respuesta.setMessage("No se puede borrar las plantillas");
+					}
+					
 				} catch (Exception e) {
 					respuesta.setCode(500);
 					respuesta.setMessage("Error al borrar consulta");
@@ -604,7 +627,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					remitente.setApellido2(persona.getApellidos2());
 					
 					CenDireccionesExample example = new CenDireccionesExample();
-					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona)).andIdinstitucionEqualTo(idInstitucion);
+					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona)).andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
 					List<CenDirecciones> direcciones = _cenDireccionesMapper.selectByExample(example);
 					if(direcciones != null && direcciones.size() > 0){
 						List<DatosDireccionesItem> direccionesList = new ArrayList<DatosDireccionesItem>();

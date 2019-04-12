@@ -178,7 +178,11 @@ public class ColaEnviosImpl implements IColaEnvios {
 		RemitenteDTO remitentedto = new RemitenteDTO();
 		remitentedto.setNombre(personaRemitente.getNombre());
 		remitentedto.setApellido1(personaRemitente.getApellidos1());
-		remitentedto.setApellido2(personaRemitente.getApellidos2());
+		
+		if(personaRemitente.getApellidos2() != null) {
+			remitentedto.setApellido2(personaRemitente.getApellidos2());
+		}
+		
 		remitentedto.setCorreoElectronico(remitente.getCorreoelectronico());
 		
 		//Obtenemos los destinatarios dependendiendo del tipo de envio.
@@ -197,6 +201,10 @@ public class ColaEnviosImpl implements IColaEnvios {
 				etiqueta.createCriteria().andIdgrupoEqualTo(envEnviosgrupocliente.getIdgrupo()).andIdinstitucionEqualTo(envio.getIdinstitucion());
 				List<CenGruposclienteCliente> personas = _cenGruposclienteClienteMapper.selectByExample(etiqueta);
 				for (CenGruposclienteCliente persona : personas) {
+					
+					//Obtenemos la persona
+					CenPersona cenPersona = _cenPersonaMapper.selectByPrimaryKey(persona.getIdpersona());
+					
 					//Buscamos las direcciones de esa persona
 					CenDireccionesExample exampleDir = new CenDireccionesExample();
 					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion());
@@ -209,6 +217,11 @@ public class ColaEnviosImpl implements IColaEnvios {
 								if(!añadido){
 									DestinatarioItem destinatario = new DestinatarioItem();
 									destinatario.setCorreoElectronico(dir.getCorreoelectronico());
+									destinatario.setNombre(cenPersona.getNombre());
+									destinatario.setApellidos1(cenPersona.getApellidos1());
+									destinatario.setApellidos2(cenPersona.getApellidos2());
+									destinatario.setNIFCIF(cenPersona.getNifcif());
+									destinatario.setIdPersona(String.valueOf(persona.getIdpersona()));
 									destinatarios.add(destinatario);
 									añadido = true;
 								}
@@ -225,6 +238,11 @@ public class ColaEnviosImpl implements IColaEnvios {
 			for (EnvDestinatarios destinatario : destIndv) {
 				DestinatarioItem dest = new DestinatarioItem();
 				dest.setCorreoElectronico(destinatario.getCorreoelectronico());
+				dest.setNombre(destinatario.getNombre());
+				dest.setApellidos1(destinatario.getApellidos1());
+				dest.setApellidos2(destinatario.getApellidos2());
+				dest.setNIFCIF(destinatario.getNifcif());
+				dest.setIdPersona(String.valueOf(destinatario.getIdpersona()));
 				destinatarios.add(dest);
 			}
 			
@@ -240,6 +258,22 @@ public class ColaEnviosImpl implements IColaEnvios {
 	            		if(campo != null){
 	            			DestinatarioItem destinatario = new DestinatarioItem();
 	            			destinatario.setCorreoElectronico(campo.toString());
+	            			
+	            			campo = map.get("NOMBRE");
+	            			destinatario.setNombre(campo!=null? String.valueOf(campo):"");
+	            			
+	            			campo = map.get("APELLIDOS1");
+	            			destinatario.setApellidos1(campo!=null? String.valueOf(campo):"");
+	            			
+	            			campo = map.get("APLLEIDOS2");
+	            			destinatario.setApellidos2(campo!=null? String.valueOf(campo):"");
+	            			
+	            			campo = map.get("NIFCIF");
+	            			destinatario.setNIFCIF(campo!=null? String.valueOf(campo):"");
+	            			
+	            			campo = map.get("IDPERSONA");
+	            			destinatario.setIdPersona(campo!=null? String.valueOf(campo):"");
+
 	            			destinatarios.add(destinatario);
 	            		}
 					}
@@ -315,7 +349,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 			}
 			
 			if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
-				_enviosService.envioMail(remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
+				_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 			}else{
 				//Añadimos los informes al envio para que puedan ser descargados.
 				for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {
@@ -421,7 +455,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 				LOGGER.debug("Procedemos al envio del email: tipo " + envio.getIdtipoenvios() + "--" + envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL));
 				
 				if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
-					_enviosService.envioMail(remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
+					_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 				}else{
 					//Añadimos los informes al envio para que puedan ser descargados.
 					for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {

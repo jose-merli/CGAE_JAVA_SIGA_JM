@@ -118,5 +118,10 @@ public interface EnvEnviosExtendsMapper {
                 @Result(column = "ESTADOENVIO", property = "estadoEnvio", jdbcType = JdbcType.VARCHAR)
       })
       List<EnviosMasivosItem> selectEnviosMasivosById(Short idInstitucion, String idLenguaje, String idEnvio);
+      
+      @SelectProvider(type = EnvEnviosExtendsSqlProvider.class, method = "selectEnviosByIdPlantilla")
+      @Results({@Result(column = "IDENVIO", property = "idEnvio", jdbcType = JdbcType.NUMERIC)
+      })
+      List<EnviosMasivosItem> selectEnviosByIdPlantilla(Short idInstitucion, String idPlantillaEnvio);
 
 }
