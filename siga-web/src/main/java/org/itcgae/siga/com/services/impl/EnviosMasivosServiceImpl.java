@@ -893,7 +893,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					// }
 
 					// env_grupocliente
-					EnvEnviosgrupoclienteExample gruposExample = new EnvEnviosgrupoclienteExample();
+					/*EnvEnviosgrupoclienteExample gruposExample = new EnvEnviosgrupoclienteExample();
 					gruposExample.createCriteria().andIdenvioEqualTo(idEnvio);
 					List<EnvEnviosgrupocliente> grupos = _envEnviosgrupoclienteMapper.selectByExample(gruposExample);
 					for (EnvEnviosgrupocliente envEnviosgrupocliente : grupos) {
@@ -901,7 +901,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						envEnviosgrupocliente.setFechamodificacion(new Date());
 						envEnviosgrupocliente.setUsumodificacion(usuario.getIdusuario());
 						_envEnviosgrupoclienteMapper.insert(envEnviosgrupocliente);
-					}
+					}*/
 
 					List<EnviosMasivosItem> listaEnvioDuplicado = _envEnviosExtendsMapper.selectEnviosMasivosById(
 							idInstitucion, usuario.getIdlenguaje(), String.valueOf(idEnvioNuevo));
