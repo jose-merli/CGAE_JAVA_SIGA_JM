@@ -121,9 +121,18 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		ResponseEntity<InputStreamResource> res = null;
 		try {
 			fileStream = new FileInputStream(file);
+			String extension = file.getName().substring(file.getName().length()-3);
 			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.parseMediaType(MediaType.APPLICATION_PDF_VALUE)); 
-    
+			headers.setContentType(MediaType.parseMediaType(MediaType.APPLICATION_OCTET_STREAM_VALUE)); 
+//			if (null != extension) {
+//				if (extension.equals("pdf")) {
+//					headers.setContentType(MediaType.parseMediaType(MediaType.APPLICATION_PDF_VALUE)); 
+//				}else{
+//					headers.setContentType(MediaType.parseMediaType(MediaType.APPLICATION_XML_VALUE)); 
+//				}
+//			}else{
+//			headers.setContentType(MediaType.parseMediaType(MediaType.APPLICATION_PDF_VALUE)); 
+//			}
 			headers.setContentLength(file.length());
 			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
 		} catch (FileNotFoundException e) {
