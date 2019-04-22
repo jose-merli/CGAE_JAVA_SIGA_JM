@@ -4,9 +4,14 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,6 +31,8 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.mail.internet.MimePart;
+import javax.mail.internet.PreencodedMimeBodyPart;
+import javax.mail.util.ByteArrayDataSource;
 
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
@@ -38,6 +45,9 @@ import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosgrupocliente;
+import org.itcgae.siga.db.entities.EnvImagenplantilla;
+import org.itcgae.siga.db.entities.EnvImagenplantillaExample;
+import org.itcgae.siga.db.entities.EnvImagenplantillaKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.GenParametros;
@@ -45,6 +55,7 @@ import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
+import org.itcgae.siga.db.mappers.EnvImagenplantillaMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
@@ -82,6 +93,9 @@ public class EnviosServiceImpl implements IEnviosService{
 	
 	@Autowired	
 	GenParametrosMapper _genParametrosMapper;
+	
+	@Autowired
+	EnvImagenplantillaMapper _envImagenplantillaMapper;
 	
 	
 	@Autowired
@@ -177,6 +191,62 @@ public class EnviosServiceImpl implements IEnviosService{
                 MimeMultipart relatedMultipart = new MimeMultipart("related");
                 //MimeBodyPart relatedBodyPart = new MimeBodyPart();
 
+                //Buscamos las imagenes antiguas
+                /*EnvImagenplantillaExample imagenExample = new EnvImagenplantillaExample();
+                imagenExample.createCriteria().andIdinstitucionEqualTo(envio.getIdinstitucion()).andIdplantillaenviosEqualTo(envio.getIdplantillaenvios()).andIdtipoenviosEqualTo(envio.getIdtipoenvios());
+                
+                List<EnvImagenplantilla> lImagenes = _envImagenplantillaMapper.selectByExample(imagenExample);
+                
+                if(lImagenes != null && lImagenes.size() > 0) {
+                	for(EnvImagenplantilla imagenPlantilla:lImagenes){    	
+                		imagenPlantilla.get
+    	    	    	EnvImagenPlantillaBean imagenPlantillaBean = imagenPlantilla.getImagenPlantillaBean();
+    	    	    	if(imagenPlantillaBean.isEmbebed()){
+    	    	    		if(sCuerpo.indexOf(imagenPlantillaBean.getImagenSrcEmbebida("/"))!=-1){
+    			    	    	addCIDToMultipart(relatedMultipart,imagenPlantillaBean.getPathImagen(null,File.separator),imagenPlantilla.getNombre());
+    		    	    	}
+    	    	    	}
+    	    	    }
+                }*/
+                
+                
+                //Buscamos todas las imagenes para adjuntarlas
+	    	    Pattern imgRegExp  = Pattern.compile( "<img[^>]+src\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>" );
+	    	    Map<String, String> inlineImage = new HashMap<String, String>();
+	    	    final Matcher matcher = imgRegExp.matcher( sCuerpo );
+	    	    int i = 0;
+	    	    while ( matcher.find() ) {
+	    	       String src = matcher.group();
+	    	       if ( sCuerpo.indexOf( src ) != -1 ) {
+	    	          String srcToken = "src=\"";
+	    	          int x = src.indexOf( srcToken );
+	    	          int y = src.indexOf( "\"", x + srcToken.length() );
+	    	          String srcText = src.substring( x + srcToken.length(), y );
+	    	          String cid = "image" + i;
+	    	          String newSrc = src.replace( srcText, "cid:" + cid );
+	    	          inlineImage.put( cid, srcText.split( "," )[1] );
+	    	          sCuerpo = sCuerpo.replace( src, newSrc );
+	    	          i++;
+	    	          
+	    	          LOGGER.debug(" CID " + cid + " Image data :: " + srcText.split( "," )[1]);
+	    	          MimeBodyPart imagen = addAttachment(cid,srcText.split( "," )[1]);
+	  	    		  imagen.setDisposition(MimePart.INLINE);
+	  	    		  mixedMultipart.addBodyPart(imagen);
+	    			
+	    	       }
+	    	    }
+	    	    
+	    	    Iterator<Entry<String, String>> it = inlineImage.entrySet().iterator();
+	    	    while ( it.hasNext() ) {
+	    	       Entry<String, String> pairs = it.next();
+	    	       PreencodedMimeBodyPart pmp = new PreencodedMimeBodyPart( "base64" );
+	    	       pmp.setHeader( "Content-ID", "<" + pairs.getKey() + ">" );
+	    	       pmp.setDisposition( MimeBodyPart.INLINE );
+	    	       pmp.setText( pairs.getValue() );
+	    	       mixedMultipart.addBodyPart( pmp );
+	    	    }
+	    	    
+	    	    
                 //alternative message
                 BodyPart messageBodyPart = new MimeBodyPart();
                       messageBodyPart.setContent(sCuerpo, "text/html");
@@ -392,5 +462,102 @@ public class EnviosServiceImpl implements IEnviosService{
 		
 		return destinatario.getTratamiento();
 	}
+	
+	private MimeBodyPart addAttachment(final String fileName, final String fileContent) throws MessagingException {
+
+	    if (fileName == null || fileContent == null) {
+	        return null;
+	    }
+
+	    LOGGER.debug("addAttachment()");
+
+	    MimeBodyPart filePart = new MimeBodyPart();
+
+	    String data = fileContent;
+	    byte[] imgBytes = Base64.getDecoder().decode(data);
+	    DataSource ds;
+	    ds = new ByteArrayDataSource(imgBytes, "image/*");
+
+	    // "image/*"
+	    filePart.setDataHandler(new DataHandler(ds));
+	    filePart.setFileName(fileName);
+
+	    LOGGER.debug("addAttachment success !");
+
+	    return filePart;
+
+	}
+	
+	
+	/**
+	* Añade al mensaje un cid:name utilizado para guardar las imagenes referenciadas en el HTML de la forma <img src=cid:name />
+	* @param cidname identificador que se le da a la imagen. suele ser un string generado aleatoriamente.
+	* @param pathname ruta del fichero que almacena la imagen
+	* @throws Exception excepcion levantada en caso de error
+	*/
+	/*
+	public void addCIDToMultipart(MimeMultipart multipart,String pathname,String cidname) throws Exception
+	{
+		DataSource fds = new FileDataSource(pathname);
+		BodyPart messageBodyPart = new MimeBodyPart();
+		messageBodyPart.setDataHandler(new DataHandler(fds));
+		messageBodyPart.setHeader("Content-ID","<"+cidname+">");
+		multipart.addBodyPart(messageBodyPart);
+	}
+	
+	public String getPathImagen(EnvImagenplantilla imagen, String directorioImagen,String separador){
+   		StringBuffer sPathImagen = null;
+   		if(directorioImagen==null)
+   			sPathImagen = new StringBuffer(getDirectorioImagen(separador));
+   		else
+   			sPathImagen = new StringBuffer(directorioImagen);
+
+   		sPathImagen.append(separador);
+   		sPathImagen.append(imagen.getNombre());
+   		sPathImagen.append(".");
+   		sPathImagen.append(imagen.getTipoarchivo());
+   		
+   		return  sPathImagen.toString();  	
+	}
+	
+	public String getDirectorioImagen(EnvImagenplantilla imagen, String separador){
+   		StringBuffer sDirectorioImagen = new StringBuffer(getPathImagenes());
+   		sDirectorioImagen.append(getCarpetaImagen(imagen, separador));
+   		return  sDirectorioImagen.toString();  		
+   		
+   	}
+	public String getCarpetaImagen(EnvImagenplantilla imagen, String separador){
+//		StringBuffer sDirectorioImagen = new StringBuffer( );
+//   		sDirectorioImagen.append(File.separator);
+//   		sDirectorioImagen.append(imagenPlantilla.getIdInstitucion());
+//   		sDirectorioImagen.append(File.separator);
+//   		sDirectorioImagen.append(imagenPlantilla.getIdTipoEnvios());
+//   		sDirectorioImagen.append(File.separator);
+//   		sDirectorioImagen.append(imagenPlantilla.getIdPlantillaEnvios());
+		StringBuffer sDirectorioImagen = new StringBuffer( );
+		
+		
+		ReadProperties rp= new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
+		String carpetaEnvios = rp.returnProperty("general.path.imagenes.envios");
+		sDirectorioImagen.append(carpetaEnvios);
+		sDirectorioImagen.append(separador);
+		sDirectorioImagen.append(imagen.getIdinstitucion());
+		sDirectorioImagen.append(separador);
+		sDirectorioImagen.append(imagen.getIdtipoenvios());
+		sDirectorioImagen.append(separador);
+		sDirectorioImagen.append(imagen.getIdplantillaenvios());
+   		return  sDirectorioImagen.toString();		
+		
+	}
+	
+	public String getPathImagenes()
+	{
+		ReadProperties rp= new ReadProperties(SIGAReferences.RESOURCE_FILES.SIGA);
+		String pathImagenes = rp.returnProperty("general.path.imagenes");
+		
+		return pathImagenes;
+	}
+	*/
+   	
 
 }
