@@ -109,9 +109,12 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 						requestBody.setIntIdSolicitud(Math.toIntExact(solicitud.getIdsolicitudalter()));
 						requestBody.setBolDuplicado(estadosolicitudDTO.isDuplicado());
 						request.setGetEstadoSolicitud(requestBody);
-						
+						LOGGER.info("solicitud.getIdsolicitudalter() --> " + solicitud.getIdsolicitudalter());
+						LOGGER.info("estadosolicitudDTO.isDuplicado() --> " + estadosolicitudDTO.isDuplicado());
 						WSRespuesta WSresponse = _clientAlterMutua.getEstadoSolicitud(request, uriService);
-						
+						LOGGER.info("responseWS.getIdentificador() --> " + WSresponse.getIdentificador());
+						LOGGER.info("responseWS.getMensaje() --> " + WSresponse.getMensaje());
+						LOGGER.info("responseWS.getError() --> " + WSresponse.getError());
 						if(WSresponse != null){
 							responseDTO.setDocumento(WSresponse.getDocumento());
 							responseDTO.setError(WSresponse.getError());
@@ -184,8 +187,13 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 				requestBody.setIntTipoIdentificador(estadoColegiadoDTO.getTipoIdentificador());
 				requestBody.setStrIdentificador(estadoColegiadoDTO.getIdentificador());
 				request.setGetEstadoColegiado(requestBody);
-				
+				LOGGER.info("estadoColegiadoDTO.getTipoIdentificador() --> " + estadoColegiadoDTO.getTipoIdentificador());
+				LOGGER.info("estadoColegiadoDTO.getIdentificador() --> " + estadoColegiadoDTO.getIdentificador());
 				WSRespuesta responseWS = _clientAlterMutua.getEstadoColegiado(request, uriService);
+				LOGGER.info("responseWS.getIdentificador() --> " + responseWS.getIdentificador());
+				LOGGER.info("responseWS.getMensaje() --> " + responseWS.getMensaje());
+				LOGGER.info("responseWS.getError() --> " + responseWS.getError());
+
 				
 				if(responseWS != null){
 					responseDTO.setError(responseWS.getError());
@@ -241,8 +249,14 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 				requestBody.setIntTipoPropuesta(PropuestasDTO.getTipoPropuesta());
 				request.setGetPropuestas(requestBody);
 				
+				LOGGER.info("requestBody.setStrIdentificador --> " + requestBody.getStrIdentificador());
+				LOGGER.info("requestBody.setIntTipoIdentificador --> " + requestBody.getIntTipoIdentificador());
+				LOGGER.info("requestBody.setIntSexo --> " + requestBody.getIntSexo());
 				responseWS = _clientAlterMutua.getPropuestas(request, uriService);
-				
+				LOGGER.info("responseWS.getIdentificador() --> " + responseWS.getIdentificador());
+				LOGGER.info("responseWS.getMensaje() --> " + responseWS.getMensaje());
+				LOGGER.info("responseWS.getError() --> " + responseWS.getError());
+
 				if(responseWS != null){
 					
 					response.setIdentificador(responseWS.getIdentificador());
@@ -624,7 +638,9 @@ public class AlterMutuaServiceImpl implements IAlterMutuaService{
 					request.setSetSolicitudAlter(requestBody);
 					
 					WSRespuesta responseWS = _clientAlterMutua.setSolicitudAlter(request, uriService);
-					
+					LOGGER.info("responseWS.getIdentificador() --> " + responseWS.getIdentificador());
+					LOGGER.info("responseWS.getMensaje() --> " + responseWS.getMensaje());
+					LOGGER.info("responseWS.getError() --> " + responseWS.getError());
 					if(responseWS != null){
 						responseDTO.setIdentificador(responseWS.getIdentificador());
 						if(responseDTO.getIdentificador() > 0){

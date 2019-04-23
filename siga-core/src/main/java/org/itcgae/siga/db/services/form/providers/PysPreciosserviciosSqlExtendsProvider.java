@@ -9,7 +9,7 @@ public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSq
 
 		SQL sql = new SQL();
 
-		sql.SELECT("NVL(max(IDPRECIOSSERVICIOS) +1, 0) AS IDPRECIOSERVICIO");
+		sql.SELECT("NVL(max(IDPRECIOSSERVICIOS) +1, 1) AS IDPRECIOSERVICIO");
 		sql.FROM("PYS_PRECIOSSERVICIOS");
 		sql.WHERE("idInstitucion =" + idInstitucion);
 		sql.WHERE("idTipoServicios = 5");

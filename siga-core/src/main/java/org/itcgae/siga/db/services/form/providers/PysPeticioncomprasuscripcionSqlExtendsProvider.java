@@ -9,7 +9,7 @@ public class PysPeticioncomprasuscripcionSqlExtendsProvider extends PysPeticionc
 
 		SQL sql = new SQL();
 
-		sql.SELECT("NVL(max(IDPETICION) +1, 0) AS IDPETICION");
+		sql.SELECT("NVL(max(IDPETICION) +1, 1) AS IDPETICION");
 		sql.FROM("PYS_PETICIONCOMPRASUSCRIPCION");
 		sql.WHERE("idInstitucion =" + idInstitucion);
 		

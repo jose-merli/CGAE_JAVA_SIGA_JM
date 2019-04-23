@@ -9,7 +9,7 @@ public class PysSuscripcionSqlExtendsProvider extends PysSuscripcionSqlProvider 
 
 		SQL sql = new SQL();
 
-		sql.SELECT("NVL(max(IDSUSCRIPCION) +1, 0) AS IDSUSCRIPCION");
+		sql.SELECT("NVL(max(IDSUSCRIPCION) +1, 1) AS IDSUSCRIPCION");
 		sql.FROM("PYS_SUSCRIPCION");
 		sql.WHERE("idInstitucion =" + idInstitucion);
 		sql.WHERE("idTipoServicios = 5");
