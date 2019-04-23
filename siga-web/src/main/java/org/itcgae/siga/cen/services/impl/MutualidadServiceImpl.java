@@ -123,6 +123,8 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			response.setPDF(responseWS.getPDF());
 			response.setValorRespuesta(responseWS.getValorRespuesta());
 			} catch (Exception e) {
+				LOGGER.info("error estado solicitud --> " + e.getMessage());
+				LOGGER.info("error2 estado solicitud --> " + e.getStackTrace());
 				e.printStackTrace();
 			}
 			
@@ -172,6 +174,8 @@ public class MutualidadServiceImpl implements IMutualidadService{
 				response.setPDF(responseWS.getPDF());
 				response.setValorRespuesta(responseWS.getValorRespuesta());
 			} catch (Exception e) {
+				LOGGER.info("error estado mutualista --> " + e.getMessage());
+				LOGGER.info("error2 estado mutualista --> " + e.getStackTrace());
 				e.printStackTrace();
 			}
 			
