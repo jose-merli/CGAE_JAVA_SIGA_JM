@@ -72,7 +72,7 @@ public class CenClienteSqlExtendsProvider extends CenClienteSqlProvider {
 		SQL sql = new SQL();
 		
 		sql.SELECT("f_siga_getrecurso (t.DESCRIPCION, " + idIdioma + ") as TRATAMIENTO");
-		sql.FROM(" cen_cliente c, cen_persona p, cen_tratamiento t");
+		sql.FROM("cen_cliente c, cen_persona p, cen_tratamiento t");
 		sql.WHERE("c.idpersona = '"+ idPersona  + "'");
 		sql.WHERE("c.idinstitucion = " + idInstitucion + " AND c.idpersona = p.idpersona AND c.idtratamiento = t.idtratamiento");
 		
