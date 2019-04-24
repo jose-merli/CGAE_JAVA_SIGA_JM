@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.xerox.docushare.DSClass;
 import com.xerox.docushare.DSContentElement;
 import com.xerox.docushare.DSException;
 import com.xerox.docushare.DSFactory;
@@ -37,6 +38,8 @@ import com.xerox.docushare.DSSession;
 import com.xerox.docushare.FileContentElement;
 import com.xerox.docushare.object.DSCollection;
 import com.xerox.docushare.object.DSDocument;
+import com.xerox.docushare.property.DSLinkDesc;
+import com.xerox.docushare.property.DSProperties;
 
 @Service
 public class DocushareHelper {
@@ -488,6 +491,80 @@ public class DocushareHelper {
 		}
 		return file;
 
+	}
+	/**
+	 * 
+	 * @param collectionTitle Nombre de la carpeta o collecion que se quiere crear
+	 * @return
+	 * @throws SIGAServiceException 
+	 * @throws SIGAException
+	 * @throws ClsExceptions
+	 */
+	public String createCollectionNoColegiado(String collectionTitle, String collectionSummary) throws Exception {
+		return createCollection(ID_DOCUSHARE_NOCOLEGIADO, collectionTitle, collectionSummary);
+	}	
+
+	/**
+	 * 
+	 * @param collectionTitle Nombre de la carpeta o collecion que se quiere crear
+	 * @param collectionSummary Descripcion de la carpeta o collecion que se quiere crear
+	 * @return
+	 * @throws SIGAServiceException 
+	 * @throws SIGAException
+	 * @throws ClsExceptions
+	 */
+	public String createCollectionCenso(String collectionTitle, String collectionSummary) throws Exception {
+		return createCollection(ID_DOCUSHARE_CENSO, collectionTitle, collectionSummary);
+	}
+	
+
+
+	
+	/**
+	 * 
+	 * @param collectionTitle Nombre de la carpeta o collecion que se quiere crear
+	 * @param collectionSummary Descripcion de la carpeta o collecion que se quiere crear
+	 * @return
+	 * @throws SIGAException
+	 * @throws ClsExceptions
+	 */
+	private String createCollection(String ID_DOCUSHARE, String collectionTitle, String collectionSummary) throws Exception{
+
+	
+		String identificadorDS = null;				
+		createSession();
+		
+		try {
+			
+
+			
+			GenParametrosExample example = new GenParametrosExample();
+			example.createCriteria().andParametroEqualTo(ID_DOCUSHARE).andIdinstitucionEqualTo(this.idInstitucion);
+			List<GenParametros> config = genParametrosMapper.selectByExample(example);
+			
+			String idExpedientes = config.get(0).getValor();
+			log.debug("ID_DOCUSHARE=" + idExpedientes + " para el colegio " + this.idInstitucion);
+			
+			DSCollection dsCollectionParent = (DSCollection) dssession.getObject(new DSHandle(idExpedientes));			
+
+			DSClass collectionClass = dssession.getDSClass(DSCollection.classname);
+			DSProperties collectionPrototype = collectionClass.createPrototype();
+			collectionPrototype.setPropValue(DSCollection.title, collectionTitle);
+			collectionPrototype.setPropValue(DSCollection.summary, collectionSummary);
+
+			DSHandle dsHandle = dssession.createObject(collectionPrototype, DSLinkDesc.containment, dsCollectionParent, null, null);
+			identificadorDS = dsHandle.toString();
+		
+		} catch (Exception e) {
+			//"expedientes.docushare.error.crearColeccion"
+			String mensaje = String.format("Se ha producido un error al crear la collection para el colegio %s e ID_DOCUSHARE = '%s'", this.idInstitucion, ID_DOCUSHARE);
+			log.error(mensaje, e);
+			
+		} finally {
+			close();
+		}
+
+		return identificadorDS;
 	}
 
 }
