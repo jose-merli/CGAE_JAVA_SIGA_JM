@@ -5,6 +5,7 @@ public class DatosBeneficiarioMutualidadDTO {
 	private String idPoliza;
 	private String textoOtros;
 	private int idTipoBeneficiario;
+	private String beneficiario;
 	
 	
 	public String getIdPoliza() {
@@ -24,6 +25,12 @@ public class DatosBeneficiarioMutualidadDTO {
 	}
 	public void setIdTipoBeneficiario(int idTipoBeneficiario) {
 		this.idTipoBeneficiario = idTipoBeneficiario;
+	}
+	public String getBeneficiario() {
+		return beneficiario;
+	}
+	public void setBeneficiario(String beneficiario) {
+		this.beneficiario = beneficiario;
 	}
 	
 	

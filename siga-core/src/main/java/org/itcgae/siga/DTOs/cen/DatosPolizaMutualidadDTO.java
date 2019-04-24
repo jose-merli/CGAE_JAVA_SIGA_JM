@@ -8,9 +8,11 @@ public class DatosPolizaMutualidadDTO {
 	private int formaPago;
 	private int idMutualista;
 	private Calendar fEfecto;
-	private int opcionesCobertura;
+	private String opcionesCobertura;
 	private String textoOtros;
-	
+	private String cuotaMensual;
+	private String capitalObjetivo;
+	private int idCobertura;
 	
 	
 	public int getFormaPago() {
@@ -31,10 +33,10 @@ public class DatosPolizaMutualidadDTO {
 	public void setfEfecto(Calendar fEfecto) {
 		this.fEfecto = fEfecto;
 	}
-	public int getOpcionesCobertura() {
+	public String getOpcionesCobertura() {
 		return opcionesCobertura;
 	}
-	public void setOpcionesCobertura(int opcionesCobertura) {
+	public void setOpcionesCobertura(String opcionesCobertura) {
 		this.opcionesCobertura = opcionesCobertura;
 	}
 	public String getTextoOtros() {
@@ -42,6 +44,24 @@ public class DatosPolizaMutualidadDTO {
 	}
 	public void setTextoOtros(String textoOtros) {
 		this.textoOtros = textoOtros;
+	}
+	public String getCuotaMensual() {
+		return cuotaMensual;
+	}
+	public void setCuotaMensual(String cuotaMensual) {
+		this.cuotaMensual = cuotaMensual;
+	}
+	public String getCapitalObjetivo() {
+		return capitalObjetivo;
+	}
+	public void setCapitalObjetivo(String capitalObjetivo) {
+		this.capitalObjetivo = capitalObjetivo;
+	}
+	public int getIdCobertura() {
+		return idCobertura;
+	}
+	public void setIdCobertura(int idCobertura) {
+		this.idCobertura = idCobertura;
 	}
 	
 	

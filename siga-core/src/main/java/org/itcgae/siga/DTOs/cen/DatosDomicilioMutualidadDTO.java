@@ -14,9 +14,12 @@ public class DatosDomicilioMutualidadDTO {
 	private String movil;
 	private String num;
 	private String pais;
+	private String idPais;
 	private String piso;
 	private String poblacion;
 	private String provincia;
+	private String idPoblacion;
+	private String idProvincia;
 	private String telefono;
 	private int tipoDireccion;
 	private int tipoDomicilio;
@@ -139,6 +142,23 @@ public class DatosDomicilioMutualidadDTO {
 	public void setTipoVia(String tipoVia) {
 		this.tipoVia = tipoVia;
 	}
-	
+	public String getIdPoblacion() {
+		return idPoblacion;
+	}
+	public void setIdPoblacion(String idPoblacion) {
+		this.idPoblacion = idPoblacion;
+	}
+	public String getIdProvincia() {
+		return idProvincia;
+	}
+	public void setIdProvincia(String idProvincia) {
+		this.idProvincia = idProvincia;
+	}
+	public String getIdPais() {
+		return idPais;
+	}
+	public void setIdPais(String idPais) {
+		this.idPais = idPais;
+	}
 
 }

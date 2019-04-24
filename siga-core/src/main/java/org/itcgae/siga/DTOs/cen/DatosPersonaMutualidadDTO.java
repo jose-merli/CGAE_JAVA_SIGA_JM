@@ -8,7 +8,8 @@ public class DatosPersonaMutualidadDTO {
 
 	private String apellido1;
 	private String apellido2;
-	private int asistenciaSanitaria;
+	private String asistenciaSanitaria;
+	private int idAsistenciaSanitaria;
 	private String[] edadesHijos;
 	private String colegio;
 	private int ejerciente;
@@ -73,10 +74,10 @@ public class DatosPersonaMutualidadDTO {
 	public void setEjerciente(int ejerciente) {
 		this.ejerciente = ejerciente;
 	}
-	public int getAsistenciaSanitaria() {
+	public String getAsistenciaSanitaria() {
 		return asistenciaSanitaria;
 	}
-	public void setAsistenciaSanitaria(int asistenciaSanitaria) {
+	public void setAsistenciaSanitaria(String asistenciaSanitaria) {
 		this.asistenciaSanitaria = asistenciaSanitaria;
 	}
 
@@ -158,6 +159,12 @@ public class DatosPersonaMutualidadDTO {
 	}
 	public void setTipoIdentificacion(String tipoIdentificacion) {
 		this.tipoIdentificacion = tipoIdentificacion;
+	}
+	public int getIdAsistenciaSanitaria() {
+		return idAsistenciaSanitaria;
+	}
+	public void setIdAsistenciaSanitaria(int idAsistenciaSanitaria) {
+		this.idAsistenciaSanitaria = idAsistenciaSanitaria;
 	}
 	
 }

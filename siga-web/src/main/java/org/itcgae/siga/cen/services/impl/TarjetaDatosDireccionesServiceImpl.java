@@ -84,11 +84,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	@Autowired
 	private CenDireccionesExtendsMapper cenDireccionesExtendsMapper;
 
-	
 	@Autowired
 	private AdmConfigMapper admConfigMapper;
-	
-	
+
 	@Autowired
 	private CenPaisExtendsMapper cenPaisExtendsMapper;
 
@@ -179,7 +177,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							tiposDireccionesList.toArray(tiposDirecciones);
 							datosDireccionItem.setIdTipoDireccion(tiposDirecciones);
 
-						}else{
+						} else {
 
 							String tipoDireccionDesc = new String("");
 							tiposDireccionesList = new ArrayList<String>();
@@ -209,7 +207,6 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							tiposDireccionesList.toArray(tiposDirecciones);
 							datosDireccionItem.setIdTipoDireccion(tiposDirecciones);
 
-						
 						}
 					}
 				}
@@ -278,12 +275,13 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				paramMandatos[4] = usuario.getIdusuario().toString();
 				String resultado[] = new String[2];
 				try {
-					resultado = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2, paramMandatos);
+					resultado = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
+							paramMandatos);
 				} catch (IOException | NamingException | SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+
 				updateResponseDTO.setStatus(SigaConstants.OK);
 				if (response == 0) {
 					updateResponseDTO.setStatus(SigaConstants.KO);
@@ -545,9 +543,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							for (CenDirecciones cenDireccion : cenDireccionesList) {
 								cenDireccion.setUsumodificacion(usuario.getIdusuario());
 								cenDireccion.setFechamodificacion(new Date());
-								for (String s : tipoPrefentes) {
-									preferentes = cenDireccion.getPreferente().replaceAll(s, "");
-								}
+								preferentes = cenDireccion.getPreferente().replaceAll(p, "");
 								cenDireccion.setPreferente(preferentes);
 								cenDireccionesExtendsMapper.updateByPrimaryKey(cenDireccion);
 							}
@@ -575,21 +571,19 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setOtraprovincia(Short.valueOf(datosDireccionesItem.getOtraProvincia()));
 				direcciones.setPaginaweb(datosDireccionesItem.getPaginaWeb());
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
-				
-				if(direcciones.getFechabaja() != null) {
+
+				if (direcciones.getFechabaja() != null) {
 					direcciones.setFechabaja(null);
 				}
 
 				String preferentes = "";
 				for (String s : tipoPrefentes) {
 					preferentes += s;
-					direcciones.setPreferente(preferentes);
 				}
-
-				if (datosDireccionesItem.getIdProvincia() != ""
-						&& datosDireccionesItem.getIdProvincia() != null) {
+				direcciones.setPreferente(preferentes);
+				if (datosDireccionesItem.getIdProvincia() != "" && datosDireccionesItem.getIdProvincia() != null) {
 					direcciones.setPoblacionextranjera(null);
-				}else {
+				} else {
 					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
 				}
 
@@ -705,7 +699,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							paramMandatos[4] = usuario.getIdusuario().toString();
 							String resultado[] = new String[2];
 							try {
-								resultado = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2, paramMandatos);
+								resultado = callPLProcedure(
+										"{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
+										paramMandatos);
 							} catch (IOException | NamingException | SQLException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -755,9 +751,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						updateResponseDTO.setError(error);
 						return updateResponseDTO;
 					}
-					
-				}else{
-					
+
+				} else {
+
 					// datos para auditoria
 					CenDireccionesExample cenDireccionesExample = new CenDireccionesExample();
 					cenDireccionesExample.createCriteria()
@@ -845,15 +841,17 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						return updateResponseDTO;
 					}
 				}
-//				} else {
-//					LOGGER.info(
-//							"updateDirection() -> KO. Update para actualizar direcciones  NO realizado correctamente");
-//					updateResponseDTO.setStatus(SigaConstants.KO);
-//					error.setMessage(
-//							"No se puede actualizar la dirección con tipo CensoWeb, Traspaso, Facturación o Guardia, dado que, son tipos dirección únicos");
-//					updateResponseDTO.setError(error);
-//					return updateResponseDTO;
-//				}
+				// } else {
+				// LOGGER.info(
+				// "updateDirection() -> KO. Update para actualizar direcciones NO realizado
+				// correctamente");
+				// updateResponseDTO.setStatus(SigaConstants.KO);
+				// error.setMessage(
+				// "No se puede actualizar la dirección con tipo CensoWeb, Traspaso, Facturación
+				// o Guardia, dado que, son tipos dirección únicos");
+				// updateResponseDTO.setError(error);
+				// return updateResponseDTO;
+				// }
 			} else {
 				LOGGER.warn(
 						"updateDirection() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
@@ -1095,12 +1093,13 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						paramMandatos[4] = usuario.getIdusuario().toString();
 						String resultado[] = new String[2];
 						try {
-							resultado = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2, paramMandatos);
+							resultado = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}",
+									2, paramMandatos);
 						} catch (IOException | NamingException | SQLException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						
+
 						LOGGER.info("createDirection() -> OK. Insert para direcciones realizado correctamente");
 						insertResponseDTO.setId(idDireccion.toString());
 						insertResponseDTO.setStatus(SigaConstants.OK);
@@ -1138,10 +1137,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 
 					auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(null, cenDireccionesPosterior,
 							"INSERT", request, datosDireccionesItem.getMotivo());
-					
-					
-					
-					
+
 				} else {
 					LOGGER.info("createDirection() -> KO. Insert para direcciones  NO realizado correctamente");
 					insertResponseDTO.setStatus(SigaConstants.KO);
@@ -1640,13 +1636,13 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				LOGGER.info(
 						"duplicateDirection() / cenDireccionesExtendsMapper.insert() -> Salida de cenDireccionesExtendsMapper para duplicar direcciones");
 
-				if(response == 0) {
+				if (response == 0) {
 					LOGGER.info("duplicateDirection() -> KO. Duplicar direccion  NO realizado correctamente");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 					error.setMessage("Error al duplicar la direccion");
 					insertResponseDTO.setError(error);
 					return insertResponseDTO;
-				}else {
+				} else {
 					// Llamamos al PL para mantener los colegiados
 					Object[] paramMandatos = new Object[5];
 					paramMandatos[0] = datosDireccionesItem.getIdPersona().toString();
@@ -1656,15 +1652,16 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					paramMandatos[4] = usuario.getIdusuario().toString();
 					String resultado[] = new String[2];
 					try {
-						resultado = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2, paramMandatos);
+						resultado = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
+								paramMandatos);
 					} catch (IOException | NamingException | SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
+
 					insertResponseDTO.setStatus(SigaConstants.OK);
 					insertResponseDTO.setId(idDireccion.toString());
-						LOGGER.info("createDirection() -> OK. Solicitud de direccion procesada correctamente");
+					LOGGER.info("createDirection() -> OK. Solicitud de direccion procesada correctamente");
 				}
 			} else {
 				LOGGER.warn(
@@ -1679,95 +1676,102 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		LOGGER.info("createDirection() -> Salida del servicio para insertar direcciones ");
 		return insertResponseDTO;
 	}
-	
-	/**
-	   * Calls a PL Funtion
-	   * @author CSD
-	   * @param functionDefinition string that defines the function
-	   * @param inParameters input parameters
-	   * @param outParameters number of output parameters
-	   * @return error code, '0' if ok
-	 * @throws NamingException 
-	 * @throws IOException 
-	 * @throws SQLException 
-	   * @throws ClsExceptions  type Exception
-	   */
-	  private  String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters) throws IOException, NamingException, SQLException  {
-	    String result[] = null;
-	    
-	    if (outParameters>0) result= new String[outParameters];
-	    DataSource ds = getOracleDataSource();
-	    Connection con=ds.getConnection();
-	    try{
-	      CallableStatement cs=con.prepareCall(functionDefinition);
-	      int size=inParameters.length;
-	      
-	      //input Parameters
-	      for(int i=0;i<size;i++){
-	    	  
 
-	        cs.setString(i+1,(String)inParameters[i]);
-	      }
-	      //output Parameters
-	      for(int i=0;i<outParameters;i++){
-	        cs.registerOutParameter(i+size+1,Types.VARCHAR);
-	      }
-	      
+	/**
+	 * Calls a PL Funtion
+	 * 
+	 * @author CSD
+	 * @param functionDefinition
+	 *            string that defines the function
+	 * @param inParameters
+	 *            input parameters
+	 * @param outParameters
+	 *            number of output parameters
+	 * @return error code, '0' if ok
+	 * @throws NamingException
+	 * @throws IOException
+	 * @throws SQLException
+	 * @throws ClsExceptions
+	 *             type Exception
+	 */
+	private String[] callPLProcedure(String functionDefinition, int outParameters, Object[] inParameters)
+			throws IOException, NamingException, SQLException {
+		String result[] = null;
+
+		if (outParameters > 0)
+			result = new String[outParameters];
+		DataSource ds = getOracleDataSource();
+		Connection con = ds.getConnection();
+		try {
+			CallableStatement cs = con.prepareCall(functionDefinition);
+			int size = inParameters.length;
+
+			// input Parameters
+			for (int i = 0; i < size; i++) {
+
+				cs.setString(i + 1, (String) inParameters[i]);
+			}
+			// output Parameters
+			for (int i = 0; i < outParameters; i++) {
+				cs.registerOutParameter(i + size + 1, Types.VARCHAR);
+			}
+
 			for (int intento = 1; intento <= 2; intento++) {
 				try {
 					cs.execute();
 					break;
-					
+
 				} catch (SQLTimeoutException tex) {
 					throw tex;
-		
+
 				} catch (SQLException ex) {
-					if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la segunda vez deberia funcionar)
+					if (ex.getErrorCode() != 4068 || intento == 2) { // JPT: 4068 es un error de descompilado (la
+																		// segunda vez deberia funcionar)
 						throw ex;
 					}
 				}
 
-			}      
-
-	      for(int i=0;i<outParameters;i++){
-	        result[i]=cs.getString(i+size+1);
-	      }
-	      cs.close();
-	      return result;
-	      
-	    }catch(SQLTimeoutException ex){
-	        return null;
-	    }catch(SQLException ex){
-	    	return null;
-	    }catch(Exception e){
-	    	return null;
-	    }finally{
-	      con.close();
-	      con = null;
-	    }
-	  }
-	  
-	  /**
-		 * Recupera el datasource con los datos de conexión sacados del fichero de
-		 * configuracion
-		 * 
-		 * @return
-		 * @throws IOException
-		 * @throws NamingException
-		 */
-		private  DataSource getOracleDataSource() throws IOException, NamingException {
-			try {
-				
-				LOGGER.debug("Recuperando datasource {} provisto por el servidor (JNDI)");
-				
-				AdmConfigExample example = new AdmConfigExample();
-				example.createCriteria().andClaveEqualTo("spring.datasource.jndi-name");
-				List<AdmConfig> config = admConfigMapper.selectByExample(example );
-				Context ctx = new InitialContext();
-				return (DataSource) ctx.lookup(config.get(0).getValor());
-			} catch (NamingException e) {
-				throw e;
 			}
+
+			for (int i = 0; i < outParameters; i++) {
+				result[i] = cs.getString(i + size + 1);
+			}
+			cs.close();
+			return result;
+
+		} catch (SQLTimeoutException ex) {
+			return null;
+		} catch (SQLException ex) {
+			return null;
+		} catch (Exception e) {
+			return null;
+		} finally {
+			con.close();
+			con = null;
 		}
-			
+	}
+
+	/**
+	 * Recupera el datasource con los datos de conexión sacados del fichero de
+	 * configuracion
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws NamingException
+	 */
+	private DataSource getOracleDataSource() throws IOException, NamingException {
+		try {
+
+			LOGGER.debug("Recuperando datasource {} provisto por el servidor (JNDI)");
+
+			AdmConfigExample example = new AdmConfigExample();
+			example.createCriteria().andClaveEqualTo("spring.datasource.jndi-name");
+			List<AdmConfig> config = admConfigMapper.selectByExample(example);
+			Context ctx = new InitialContext();
+			return (DataSource) ctx.lookup(config.get(0).getValor());
+		} catch (NamingException e) {
+			throw e;
+		}
+	}
+
 }

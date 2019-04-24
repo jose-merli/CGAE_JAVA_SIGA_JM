@@ -9,7 +9,15 @@ public class DatosBancariosMutualidadDTO {
 	private String nCuenta;
 	private String swift;
 	private String oficina;
+	private String titular;
+	private String periodicidad;
 	
+	public String getPeriodicidad() {
+		return periodicidad;
+	}
+	public void setPeriodicidad(String periodicidad) {
+		this.periodicidad = periodicidad;
+	}
 	public String getEntidad() {
 		return entidad;
 	}
@@ -45,6 +53,12 @@ public class DatosBancariosMutualidadDTO {
 	}
 	public void setOficina(String oficina) {
 		this.oficina = oficina;
+	}
+	public String getTitular() {
+		return titular;
+	}
+	public void setTitular(String titular) {
+		this.titular = titular;
 	}
 
 	

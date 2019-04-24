@@ -408,7 +408,7 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			}
 			
 			persona.setEjerciente(rellenarEjerciente(solicitud.getDatosPersona().getEjerciente()));
-			persona.setAsistenciaSanitaria(solicitud.getDatosPersona().getAsistenciaSanitaria());
+			persona.setAsistenciaSanitaria(solicitud.getDatosPersona().getIdAsistenciaSanitaria());
 			persona.setEstadoCivil(parseaEstadoCivil(solicitud.getDatosPersona().getEstadoCivil()));
 			persona.setColegio(institucion.getAbreviatura());
 			Calendar cal = Calendar.getInstance();
@@ -533,7 +533,6 @@ public class MutualidadServiceImpl implements IMutualidadService{
 					solicitudMutualidad.setEdadhijo5(Short.parseShort(edades[4]));
 					solicitudMutualidad.setEdadhijo6(Short.parseShort(edades[5]));
 				}
-				solicitudMutualidad.setAsistenciasanitaria(String.valueOf(solicitud.getDatosPersona().getAsistenciaSanitaria()));
 				solicitudMutualidad.setCodigopostal(solicitud.getDatosDireccion().getCp());
 				solicitudMutualidad.setDomicilio(solicitud.getDatosDireccion().getDireccion());
 				solicitudMutualidad.setCorreoelectronico(solicitud.getDatosDireccion().getEmail());
@@ -549,8 +548,6 @@ public class MutualidadServiceImpl implements IMutualidadService{
 				solicitudMutualidad.setSwift(solicitud.getDatosBancarios().getSwift());
 				solicitudMutualidad.setApellido1(solicitud.getDatosPersona().getApellido1());
 				solicitudMutualidad.setApellido2(solicitud.getDatosPersona().getApellido2());
-				solicitudMutualidad.setPeriodicidadpago(String.valueOf(solicitud.getDatosPoliza().getFormaPago()));
-				solicitudMutualidad.setCobertura(String.valueOf(solicitud.getDatosPoliza().getOpcionesCobertura()));
 				solicitudMutualidad.setFechasolicitud(new Date());
 				solicitudMutualidad.setIdtratamiento(Short.parseShort(solicitud.getDatosPersona().getIdTratamiento()));
 				solicitudMutualidad.setIdinstitucion(idInstitucion);
@@ -560,6 +557,24 @@ public class MutualidadServiceImpl implements IMutualidadService{
 				solicitudMutualidad.setUsumodificacion(usuario.getIdusuario());
 				solicitudMutualidad.setIdtipoidentificacion(Short.parseShort(solicitud.getDatosPersona().getTipoIdentificacion()));
 				solicitudMutualidad.setFechaestado(new Date());
+				
+				solicitudMutualidad.setIdprovincia(solicitud.getDatosDireccion().getIdProvincia());
+				solicitudMutualidad.setIdpoblacion(solicitud.getDatosDireccion().getIdPoblacion());
+				solicitudMutualidad.setIdpais(solicitud.getDatosDireccion().getIdPais());
+				solicitudMutualidad.setIdestadocivil(Short.parseShort(solicitud.getDatosPersona().getEstadoCivil()));
+				solicitudMutualidad.setTitular(solicitud.getDatosBancarios().getTitular());
+				solicitudMutualidad.setCodigosucursal(solicitud.getDatosBancarios().getOficina());
+				solicitudMutualidad.setIdbeneficiario(String.valueOf(solicitud.getDatosBeneficiario().getIdTipoBeneficiario()));
+				solicitudMutualidad.setIdperiodicidadpago(String.valueOf(solicitud.getDatosPoliza().getFormaPago()));
+				solicitudMutualidad.setCuotacobertura(solicitud.getDatosPoliza().getCuotaMensual());
+				solicitudMutualidad.setCboCodigo(solicitud.getDatosBancarios().getEntidad());
+				solicitudMutualidad.setCapitalcobertura(solicitud.getDatosPoliza().getCapitalObjetivo());
+				solicitudMutualidad.setIdasistenciasanitaria(String.valueOf(solicitud.getDatosPersona().getIdAsistenciaSanitaria()));
+				solicitudMutualidad.setAsistenciasanitaria(solicitud.getDatosPersona().getAsistenciaSanitaria());
+				solicitudMutualidad.setPeriodicidadpago(solicitud.getDatosBancarios().getPeriodicidad());
+				solicitudMutualidad.setIdcobertura(String.valueOf(solicitud.getDatosPoliza().getIdCobertura()));
+				solicitudMutualidad.setCobertura(String.valueOf(solicitud.getDatosPoliza().getOpcionesCobertura()));
+				solicitudMutualidad.setBeneficiario(String.valueOf(solicitud.getDatosBeneficiario().getBeneficiario()));
 				cenSolicitudmutualidadMapper.insert(solicitudMutualidad);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -608,7 +623,7 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			}
 			
 			persona.setEjerciente(rellenarEjerciente(solicitud.getDatosPersona().getEjerciente()));
-			persona.setAsistenciaSanitaria(solicitud.getDatosPersona().getAsistenciaSanitaria());
+			persona.setAsistenciaSanitaria(solicitud.getDatosPersona().getIdAsistenciaSanitaria());
 			persona.setEstadoCivil(parseaEstadoCivil(solicitud.getDatosPersona().getEstadoCivil()));
 			persona.setColegio(institucion.getAbreviatura());
 			Calendar cal = Calendar.getInstance();
@@ -708,7 +723,7 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			IntegracionDatosPoliza datosPoliza = IntegracionDatosPoliza.Factory.newInstance();
 			datosPoliza.setFormaPago(solicitud.getDatosPoliza().getFormaPago());
 			datosPoliza.setTextoOtros(solicitud.getDatosPoliza().getTextoOtros());
-			datosPoliza.setOpcionesCobertura(solicitud.getDatosPoliza().getOpcionesCobertura());
+			datosPoliza.setOpcionesCobertura(solicitud.getDatosPoliza().getIdCobertura());
 			
 			
 			IntegracionSolicitudEstados datosSolicitudEstado = IntegracionSolicitudEstados.Factory.newInstance();
@@ -762,7 +777,6 @@ public class MutualidadServiceImpl implements IMutualidadService{
 					solicitudMutualidad.setEdadhijo5(Short.parseShort(edades[4]));
 					solicitudMutualidad.setEdadhijo6(Short.parseShort(edades[5]));
 				}
-				solicitudMutualidad.setAsistenciasanitaria(String.valueOf(solicitud.getDatosPersona().getAsistenciaSanitaria()));
 				solicitudMutualidad.setCodigopostal(solicitud.getDatosDireccion().getCp());
 				solicitudMutualidad.setDomicilio(solicitud.getDatosDireccion().getDireccion());
 				solicitudMutualidad.setCorreoelectronico(solicitud.getDatosDireccion().getEmail());
@@ -771,15 +785,14 @@ public class MutualidadServiceImpl implements IMutualidadService{
 				solicitudMutualidad.setPoblacion(solicitud.getDatosDireccion().getPoblacion());
 				solicitudMutualidad.setProvincia(solicitud.getDatosDireccion().getProvincia());
 				solicitudMutualidad.setTelefono1(solicitud.getDatosDireccion().getTelefono());
-						
 				solicitudMutualidad.setDigitocontrol(solicitud.getDatosBancarios().getDc());
 				solicitudMutualidad.setIban(solicitud.getDatosBancarios().getIban());
 				solicitudMutualidad.setNumerocuenta(solicitud.getDatosBancarios().getnCuenta());
+				
 				solicitudMutualidad.setSwift(solicitud.getDatosBancarios().getSwift());
 				solicitudMutualidad.setApellido1(solicitud.getDatosPersona().getApellido1());
 				solicitudMutualidad.setApellido2(solicitud.getDatosPersona().getApellido2());
-				solicitudMutualidad.setPeriodicidadpago(String.valueOf(solicitud.getDatosPoliza().getFormaPago()));
-				solicitudMutualidad.setCobertura(String.valueOf(solicitud.getDatosPoliza().getOpcionesCobertura()));
+			
 				solicitudMutualidad.setFechasolicitud(new Date());
 				solicitudMutualidad.setIdtratamiento(Short.parseShort(solicitud.getDatosPersona().getIdTratamiento()));
 				solicitudMutualidad.setIdinstitucion(idInstitucion);
@@ -789,6 +802,25 @@ public class MutualidadServiceImpl implements IMutualidadService{
 				solicitudMutualidad.setUsumodificacion(usuario.getIdusuario());
 				solicitudMutualidad.setIdtipoidentificacion(Short.parseShort(solicitud.getDatosPersona().getTipoIdentificacion()));
 				solicitudMutualidad.setFechaestado(new Date());
+				
+				solicitudMutualidad.setIdprovincia(solicitud.getDatosDireccion().getIdProvincia());
+				solicitudMutualidad.setIdpoblacion(solicitud.getDatosDireccion().getIdPoblacion());
+				solicitudMutualidad.setIdpais(solicitud.getDatosDireccion().getIdPais());
+				solicitudMutualidad.setIdestadocivil(Short.parseShort(solicitud.getDatosPersona().getEstadoCivil()));
+				solicitudMutualidad.setTitular(solicitud.getDatosBancarios().getTitular());
+				solicitudMutualidad.setCodigosucursal(solicitud.getDatosBancarios().getOficina());
+				solicitudMutualidad.setIdbeneficiario(String.valueOf(solicitud.getDatosBeneficiario().getIdTipoBeneficiario()));
+				solicitudMutualidad.setIdperiodicidadpago(String.valueOf(solicitud.getDatosPoliza().getFormaPago()));
+				solicitudMutualidad.setCuotacobertura(solicitud.getDatosPoliza().getCuotaMensual());
+				solicitudMutualidad.setCboCodigo(solicitud.getDatosBancarios().getEntidad());
+				solicitudMutualidad.setCapitalcobertura(solicitud.getDatosPoliza().getCapitalObjetivo());
+				solicitudMutualidad.setIdasistenciasanitaria(String.valueOf(solicitud.getDatosPersona().getIdAsistenciaSanitaria()));
+				solicitudMutualidad.setAsistenciasanitaria(solicitud.getDatosPersona().getAsistenciaSanitaria());
+				solicitudMutualidad.setPeriodicidadpago(solicitud.getDatosBancarios().getPeriodicidad());
+				solicitudMutualidad.setIdcobertura(String.valueOf(solicitud.getDatosPoliza().getIdCobertura()));
+				solicitudMutualidad.setCobertura(String.valueOf(solicitud.getDatosPoliza().getOpcionesCobertura()));
+				solicitudMutualidad.setBeneficiario(String.valueOf(solicitud.getDatosBeneficiario().getBeneficiario()));
+
 				cenSolicitudmutualidadMapper.insert(solicitudMutualidad);
 			} catch (Exception e) {
 				e.printStackTrace();
