@@ -411,6 +411,144 @@ public class EnviosServiceImpl implements IEnviosService{
 		
 	}
 	
+	@Override
+	public void envioMailLetrado(String idInstitucion, String idEnvio, RemitenteDTO remitente,
+			List<DestinatarioItem> destinatarios, boolean envioMasivo) throws Exception {
+
+		Transport tr = null;
+		try {
+			// OBTENCIÓN DE SERVIDOR DE CORREO
+
+			LOGGER.debug("Configuramos el envio de correo");
+			Context ctx = new InitialContext();
+			GenPropertiesKey keyProperties = new GenPropertiesKey();
+			keyProperties.setFichero("SIGA");
+			keyProperties.setParametro("mail.smtp.sesion");
+			GenProperties property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
+			String smtpSesion = property.getValor();
+			if (smtpSesion == null || smtpSesion.equals(""))
+				smtpSesion = "CorreoSIGA";
+
+			LOGGER.debug("Obtenemos la sesion del correo");
+
+			Session sesion = (Session) javax.rmi.PortableRemoteObject.narrow(ctx.lookup(smtpSesion), Session.class);
+			ctx.close();
+
+			if (sesion != null) {
+				LOGGER.debug("Sesion de correo obtenida");
+			} else {
+				LOGGER.debug("Sesion de correo nula");
+			}
+
+			tr = sesion.getTransport("smtp");
+
+			// RGG autenticar SMTP
+			sesion.getProperties().put("mail.smtp.auth", "true");
+			keyProperties.setParametro("mail.smtp.port");
+			property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
+			String portSt = property.getValor();
+			if (portSt != null && !portSt.trim().equals("")) {
+				sesion.getProperties().put("mail.smtp.port", portSt);
+			}
+
+			LOGGER.debug("Obtenemos el remitente");
+
+			// Remitente
+			String from = remitente.getCorreoElectronico();
+			String descFrom = "";
+
+			if (remitente.getDescripcion() != null) {
+				descFrom = remitente.getDescripcion();
+			} else {
+				descFrom = remitente.getNombre() + " " + remitente.getApellido1();
+				if (remitente.getApellido2() != null && !"".equalsIgnoreCase(remitente.getApellido2())) {
+					descFrom = descFrom + " " + remitente.getApellido2();
+				}
+			}
+
+			if (destinatarios != null) {
+				LOGGER.debug("Longitud de destinatarios: " + destinatarios.size());
+			} else {
+				LOGGER.debug("No hay destinatarios");
+			}
+
+			for (DestinatarioItem destinatario : destinatarios) {
+
+				String sTo = destinatario.getCorreoElectronico();
+
+				LOGGER.debug("Enviamos el email a: " + sTo);
+				LOGGER.debug("Enviamos desde: " + from);
+
+				// Se crea un nuevo Mensaje.
+				MimeMessage mensaje = new MimeMessage(sesion);
+				mensaje.setFrom(new InternetAddress(from, descFrom));
+				InternetAddress toInternetAddress = new InternetAddress(sTo);
+				mensaje.addRecipient(MimeMessage.RecipientType.TO, toInternetAddress);
+
+				// ASUNTO
+				String sAsunto = "Documentación disponible";
+
+				mensaje.setSubject(sAsunto, "ISO-8859-1");
+				mensaje.setHeader("Content-Type", "text/html; charset=\"ISO-8859-1\"");
+
+				// CUERPO
+				String sCuerpo = "Estimado/a " + destinatario.getNombre()
+						+ ",\n Tiene documentación nueva generada. Entre en su ficha y descargue dicha documentación";
+
+				MimeMultipart mixedMultipart = new MimeMultipart("mixed");
+				MimeBodyPart mixedBodyPart = new MimeBodyPart();
+
+				MimeMultipart relatedMultipart = new MimeMultipart("related");
+				// MimeBodyPart relatedBodyPart = new MimeBodyPart();
+
+				// alternative message
+				BodyPart messageBodyPart = new MimeBodyPart();
+				messageBodyPart.setContent(sCuerpo, "text/html");
+				relatedMultipart.addBodyPart(messageBodyPart);
+
+				mixedBodyPart.setContent(relatedMultipart);
+
+				mixedMultipart.addBodyPart(mixedBodyPart);
+
+				// Asociamos todo el contenido al mensaje
+				mensaje.setContent(mixedMultipart);
+
+				LOGGER.debug("Enviando...");
+
+				if (tr == null) {
+					tr = sesion.getTransport("smtp");
+				}
+
+				keyProperties.setParametro("mail.smtp.host");
+				property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
+				String host = property.getValor();
+				keyProperties.setParametro("mail.smtp.user");
+				property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
+				String user = property.getValor();
+				keyProperties.setParametro("mail.smtp.pwd");
+				property = _genPropertiesMapper.selectByPrimaryKey(keyProperties);
+				String pwd = property.getValor();
+
+				if (!tr.isConnected()) {
+					if (portSt != null && !portSt.trim().equals("")) {
+						tr.connect(host, Integer.parseInt(portSt), user, pwd);
+					} else {
+						tr.connect(host, user, pwd);
+					}
+				}
+
+				tr.sendMessage(mensaje, mensaje.getAllRecipients());
+				LOGGER.debug("Enviado");
+
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Error al enviar el email", e);
+			throw e;
+		}
+
+	}
+	
 	private String sustituirEtiquetas(String idInstitucion, String sArchivo, DestinatarioItem destinatario, String marcaInicioFin, String idEnvio){
 		String etiqueta = SigaConstants.ETIQUETA_DEST_NOMBRE;
 

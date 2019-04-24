@@ -131,6 +131,10 @@ public class ColaEnviosImpl implements IColaEnvios {
 							preparaCorreo(envio);
 							LOGGER.info("Correo electrónico enviado con éxito");
 							break;
+						case SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO:
+							preparaCorreo(envio);
+							LOGGER.info("Documentación letrado enviado con éxito");
+							break;
 						case SigaConstants.ID_ENVIO_CORREO_ORDINARIO:
 							preparaCorreo(envio);
 							LOGGER.info("Correo ordinario generado con éxito");

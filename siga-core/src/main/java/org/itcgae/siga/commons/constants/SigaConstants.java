@@ -121,6 +121,7 @@ public class SigaConstants {
 	public static final String ID_ENVIO_CORREO_ORDINARIO = "2";
 	public static final String ID_ENVIO_SMS = "4";
 	public static final String ID_ENVIO_BURO_SMS = "5";
+	public static final String ID_ENVIO_DOCUMENTACION_LETRADO = "7";
 	
 	// Tipo Campos envio
 	public static final String ID_CAMPO_ASUNTO = "1";

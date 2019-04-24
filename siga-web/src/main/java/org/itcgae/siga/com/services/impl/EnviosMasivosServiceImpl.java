@@ -488,6 +488,10 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							_colaEnvios.preparaCorreo(envio);
 							LOGGER.info("Correo electrónico enviado con éxito");
 							break;
+						case SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO:
+							_colaEnvios.preparaCorreo(envio);
+							LOGGER.info("Documentación letrado enviado con éxito");
+							break;
 						case SigaConstants.ID_ENVIO_CORREO_ORDINARIO:
 							_colaEnvios.preparaCorreo(envio);
 							LOGGER.info("Correo ordinario generado con éxito");
