@@ -86,6 +86,7 @@ public class ColegiadoItem {
 	private String subtipoCV [];
 	private String [] temas;
 	private List<ComboItem> temasCombo;
+	private String identificadords;
 	
 	// Nombre del colegio que se mostrará como resultado en la tabla de busqueda
 	private String colegioResultado;
@@ -1102,6 +1103,23 @@ public class ColegiadoItem {
 		this.fechapresentacionDate = fechapresentacionDate;
 	}
 	
+	/**
+	 *
+	 */
+	
+	public ColegiadoItem identificadords(String identificadords){
+		this.identificadords = identificadords;
+		return this;
+	}
+	
+	@JsonProperty("identificadords")
+	public String getIdentificadords() {
+		return identificadords;
+	}
+	
+	public void setIdentificadords(String identificadords) {
+		this.identificadords = identificadords;
+	}
 	
 
 	public ColegiadoItem idTratamiento(String idTratamiento){
@@ -1189,7 +1207,7 @@ public class ColegiadoItem {
 	    		idEstadoCivil, domicilio, tipoCV, subTipoCV1, subTipoCV2, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
 	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion, 
 	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate, observaciones, subtipoCV, temas,
-	    		fechaNacimientoRango, fechaEstadoNueva);
+	    		fechaNacimientoRango, fechaEstadoNueva, identificadords);
 	}
 
 
@@ -1257,7 +1275,7 @@ public class ColegiadoItem {
 	    sb.append("    subtipoCV: ").append(toIndentedString(subtipoCV)).append("\n");
 	    sb.append("    temas: ").append(toIndentedString(temas)).append("\n");
 	    sb.append("    fechaEstadoNueva: ").append(toIndentedString(fechaEstadoNueva)).append("\n");
-
+	    sb.append("    identificadords: ").append(toIndentedString(identificadords)).append("\n");
 	    
 		
 	    sb.append("}");

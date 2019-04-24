@@ -17,6 +17,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -297,4 +299,37 @@ public class UtilidadesString {
     			return t[0];
     	} 
     }
+	
+	public static String isNifNie(String nif) {
+		String tipo;
+		if(nif.length() != 9){
+			return null;
+		}else{
+			// si es NIE, eliminar la x,y,z inicial para tratarlo como nif
+			if (nif.toUpperCase().startsWith("X") || nif.toUpperCase().startsWith("Y") || nif.toUpperCase().startsWith("Z")){
+				nif = nif.substring(1);
+				tipo = "NIE";
+			}else{
+				tipo = "NIF";
+			}
+		}
+	
+		Pattern nifPattern = Pattern.compile("(\\d{1,8})([TRWAGMYFPDXBNJZSQVHLCKEtrwagmyfpdxbnjzsqvhlcke])");
+		Matcher m = nifPattern.matcher(nif);
+		if (m.matches()) {
+			String letra = m.group(2);
+			// Extraer letra del NIF
+			String letras = "TRWAGMYFPDXBNJZSQVHLCKE";
+			int dni = Integer.parseInt(m.group(1));
+			dni = dni % 23;
+			String reference = letras.substring(dni, dni + 1);
+
+			if (reference.equalsIgnoreCase(letra)) {
+				return tipo;
+			} else {
+				return tipo;
+			}
+		} else
+			return null;
+	}
 }

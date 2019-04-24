@@ -68,4 +68,17 @@ public class FichaColegialRegTelController {
 		return new ResponseEntity<String>(res, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "fichaColegialRegTel/insertCollection", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<String> insertCollection(@RequestBody String idPersona,HttpServletRequest request) throws Exception { 
+		String response = iFichaColegialRegtelService.insertCollection(idPersona, request);
+		return new ResponseEntity<String>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaColegialRegTel/insertCollectionNoCol", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<String> insertCollectionNoCol(@RequestBody String idPersona,HttpServletRequest request) throws Exception { 
+		String response = iFichaColegialRegtelService.insertCollectionNoCol(idPersona, request);
+		return new ResponseEntity<String>(response, HttpStatus.OK);
+	}
+	
+	
 }

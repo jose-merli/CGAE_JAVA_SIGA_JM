@@ -36,6 +36,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		sql.SELECT_DISTINCT("col.idpersona");
 		sql.SELECT_DISTINCT("col.idinstitucion");
+		sql.SELECT_DISTINCT("col.identificadords");
 		sql.SELECT_DISTINCT("per.nifcif");
 		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2) ) AS nombre");
 		sql.SELECT_DISTINCT("per.nombre as solonombre");

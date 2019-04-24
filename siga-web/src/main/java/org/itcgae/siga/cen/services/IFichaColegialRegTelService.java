@@ -1,11 +1,7 @@
 package org.itcgae.siga.cen.services;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
-import org.itcgae.siga.DTOs.cen.CargaMasivaItem;
 import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
 import org.itcgae.siga.DTOs.cen.DocushareDTO;
 import org.springframework.core.io.InputStreamResource;
@@ -23,6 +19,10 @@ public interface IFichaColegialRegTelService {
 	
 	public ResponseEntity<InputStreamResource> downloadDoc(DocuShareObjectVO cargaMasivaItem, HttpServletRequest request) throws Exception;
 
-	public String getPermisoRegTel( HttpServletRequest request) throws Exception;
+	public String getPermisoRegTel(HttpServletRequest request) throws Exception;
 	
+	public String insertCollection(String idPersona, HttpServletRequest request) throws Exception;
+	
+	public String insertCollectionNoCol(String idPersona, HttpServletRequest request) throws Exception;
+
 }
