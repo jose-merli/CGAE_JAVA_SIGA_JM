@@ -118,4 +118,12 @@ public interface IPlantillasDocumentoService {
 
 	ConsultasDTO obtenerConsultasById(HttpServletRequest request, TarjetaPlantillaDocumentoDTO plantillaDoc);
 	
+	/**
+	 * Obtiene el tamaño de los ficheros permitido
+	 * @param request
+	 * @return
+	 */
+	ComboDTO obtenerSizeFichero(HttpServletRequest request);
+	
+	
 }

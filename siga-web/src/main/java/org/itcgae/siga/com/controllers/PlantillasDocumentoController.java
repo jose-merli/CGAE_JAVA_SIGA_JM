@@ -197,5 +197,14 @@ public class PlantillasDocumentoController {
 			return new ResponseEntity<ConsultasDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/consulta/sizeFichero",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> obtenerSizeFichero(HttpServletRequest request) {
+		
+		ComboDTO response = _plantillasDocumentoService.obtenerSizeFichero(request);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 	
 }
