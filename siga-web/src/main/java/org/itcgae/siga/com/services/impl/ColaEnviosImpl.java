@@ -642,7 +642,27 @@ public class ColaEnviosImpl implements IColaEnvios {
 				resultadosConsultas.addAll(result);
 			}				
 		}
-		String cuerpoFinal = remplazarCamposCuerpo(plantilla.getCuerpo(), resultadosConsultas);
+//		String cuerpoFinal = remplazarCamposCuerpo(plantilla.getCuerpo(), resultadosConsultas);
+
+		String cuerpoEnvio = plantilla.getCuerpo() != null ? plantilla.getCuerpo():"";
+		
+		EnvCamposenviosKey key = new EnvCamposenviosKey();
+			key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO)); // No estoy seguro si es 1 o 2 para sms comprobar en tabla
+
+			key.setIdenvio(envio.getIdenvio());
+			key.setIdinstitucion(envio.getIdinstitucion());
+			key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_SMS);
+			//Crear constante con valor 'S'
+		
+			EnvCamposenvios envCampo = _envCamposenviosMapper.selectByPrimaryKey(key);
+				if(envCampo != null && envCampo.getValor() != null) {
+					cuerpoEnvio = envCampo.getValor();
+				}else{
+					cuerpoEnvio = plantilla.getCuerpo();
+				}
+				
+		String cuerpoFinal = remplazarCamposCuerpo(cuerpoEnvio, resultadosConsultas); 
+		
 		// Realizamos el envio por SMS
 		idSolicitudEcos = _enviosService.envioSMS(remitente, numerosDestinatarios, envio.getIdinstitucion(), cuerpoFinal, isBuroSMS);
 		envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
