@@ -145,11 +145,18 @@ public class EnviosServiceImpl implements IEnviosService{
 		    
 		    //Remitente
 		    String from = remitente.getCorreoElectronico();
-		    String descFrom = remitente.getApellido1();
+		    String descFrom = "";
 
-		    if(remitente.getApellido2() != null && !"".equalsIgnoreCase(remitente.getApellido2())) {
-		    	descFrom = descFrom + " " + remitente.getApellido2();
+		    if(remitente.getDescripcion()!=null) {
+		    	descFrom = remitente.getDescripcion();
+		    }else {
+		    	descFrom = remitente.getNombre() + " " + remitente.getApellido1();
+		    	if(remitente.getApellido2() != null && !"".equalsIgnoreCase(remitente.getApellido2())) {
+			    	descFrom = descFrom + " " + remitente.getApellido2();
+			    }
 		    }
+
+		    
 		    
 		    if(destinatarios != null) {
 		    	LOGGER.debug("Longitud de destinatarios: " + destinatarios.size());

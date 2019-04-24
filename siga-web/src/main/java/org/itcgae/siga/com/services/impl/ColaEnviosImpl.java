@@ -201,10 +201,11 @@ public class ColaEnviosImpl implements IColaEnvios {
 				etiqueta.createCriteria().andIdgrupoEqualTo(envEnviosgrupocliente.getIdgrupo()).andIdinstitucionEqualTo(envio.getIdinstitucion());
 				List<CenGruposclienteCliente> personas = _cenGruposclienteClienteMapper.selectByExample(etiqueta);
 				for (CenGruposclienteCliente persona : personas) {
-					
+
 					//Obtenemos la persona
 					CenPersona cenPersona = _cenPersonaMapper.selectByPrimaryKey(persona.getIdpersona());
-					
+					LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + cenPersona.toString());
+
 					//Buscamos las direcciones de esa persona
 					CenDireccionesExample exampleDir = new CenDireccionesExample();
 					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion());
@@ -224,6 +225,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 									destinatario.setIdPersona(String.valueOf(persona.getIdpersona()));
 									destinatarios.add(destinatario);
 									añadido = true;
+									LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + destinatarios.toString());
 								}
 							}
 						}

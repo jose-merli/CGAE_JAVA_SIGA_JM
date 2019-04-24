@@ -1,11 +1,17 @@
 package org.itcgae.siga.ws.config;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.net.ssl.SSLContext;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,18 +81,26 @@ public class WebServiceClientConfig extends WsConfigurerAdapter {
 	
 
 	    @Bean
-	    public MutualidadClient webServiceTemplateMutualidad() throws SOAPException {
+	    public MutualidadClient webServiceTemplateMutualidad() throws SOAPException, KeyManagementException, NoSuchAlgorithmException {
 	        MutualidadClient client = new MutualidadClient();
 	        //request.setId(id);
 	    	WebServiceTemplate webServiceTemplate = new WebServiceTemplate();
+			SSLContext sslContext = SSLContexts.custom().useProtocol("TLSv1.1").build();
+			CloseableHttpClient httpClient = HttpClients.custom().setSSLContext(sslContext).addInterceptorFirst(new 
+			HttpComponentsMessageSender.RemoveSoapHeadersInterceptor()).build();
+			HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender(httpClient);
 	    	MessageFactory msgFactory = MessageFactory.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL);
 	    	SaajSoapMessageFactory newSoapMessageFactory = new SaajSoapMessageFactory(msgFactory);
 	    	webServiceTemplate.setMessageFactory(newSoapMessageFactory);
 	    	webServiceTemplate.setDefaultUri("https://www.mutualidadabogacia.net/IntegracionColegiosDesarrollo/Integracion_Metodos.svc");
 	    	webServiceTemplate.setMarshaller(new XmlBeansMarshaller());
 	    	webServiceTemplate.setUnmarshaller(new XmlBeansMarshaller());
+	    	webServiceTemplate.setMessageSender(messageSender);
 	    	client.setWebServiceTemplate(webServiceTemplate);
 	        return client;
 	    }
+	    
+	    
+
 
 }

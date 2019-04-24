@@ -109,14 +109,22 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			request.setEstadoSolicitud(requestBody);
 			
 			try {
+			LOGGER.info("estadoSolicitud.getIdSolicitud() --> " + estadoSolicitud.getIdSolicitud());
+			LOGGER.info("estadoSolicitud.setQuiereCertificado() --> " + estadoSolicitud.isDuplicado());
 			IntegracionSolicitudRespuesta responseWS = _clientMutualidad.getEstadoSolicitud(request, uriService);
-			
+			LOGGER.info("responseWS.getIdSolicitud() --> " + responseWS.getIdSolicitud());
+			LOGGER.info("responseWS.getIdSolicitudRespuesta() --> " + String.valueOf(responseWS.getIdSolicitudRespuesta()));
+			LOGGER.info("responseWS.getNMutualista() --> " + responseWS.getNMutualista());
+			LOGGER.info("responseWS.getPDF --> " + responseWS.getPDF() );
+			LOGGER.info("responseWS.getValorRespuesta --> " + responseWS.getValorRespuesta());
 			response.setIdSolicitud(responseWS.getIdSolicitud());
 			response.setIdSolicitudRespuesta(String.valueOf(responseWS.getIdSolicitudRespuesta()));
 			response.setNMutualista(responseWS.getNMutualista());
 			response.setPDF(responseWS.getPDF());
 			response.setValorRespuesta(responseWS.getValorRespuesta());
 			} catch (Exception e) {
+				LOGGER.info("error estado solicitud --> " + e.getMessage());
+				LOGGER.info("error2 estado solicitud --> " + e.getStackTrace());
 				e.printStackTrace();
 			}
 			
@@ -151,13 +159,23 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			request.setEstadoMutualista(requestBody);
 			
 			try {
+				LOGGER.info("request.getNif() --> " + requestBody.getNIF());
+				
 				IntegracionSolicitudRespuesta responseWS = _clientMutualidad.getEstadoMutualista(request, uriService);
+
+				LOGGER.info("responseWS.getIdSolicitud() --> " + responseWS.getIdSolicitud());
+				LOGGER.info("responseWS.getIdSolicitudRespuesta() --> " + String.valueOf(responseWS.getIdSolicitudRespuesta()));
+				LOGGER.info("responseWS.getNMutualista() --> " + responseWS.getNMutualista());
+				LOGGER.info("responseWS.getPDF --> " + responseWS.getPDF() );
+				LOGGER.info("responseWS.getValorRespuesta --> " + responseWS.getValorRespuesta());
 				response.setIdSolicitud(responseWS.getIdSolicitud());
 				response.setIdSolicitudRespuesta(String.valueOf(responseWS.getIdSolicitudRespuesta()));
 				response.setNMutualista(responseWS.getNMutualista());
 				response.setPDF(responseWS.getPDF());
 				response.setValorRespuesta(responseWS.getValorRespuesta());
 			} catch (Exception e) {
+				LOGGER.info("error estado mutualista --> " + e.getMessage());
+				LOGGER.info("error2 estado mutualista --> " + e.getStackTrace());
 				e.printStackTrace();
 			}
 			
@@ -480,6 +498,11 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			
 			try {
 				IntegracionSolicitudRespuesta responseWS = _clientMutualidad.MGASolicitudPolizaAccuGratuitos(request, uriService);
+				LOGGER.info("responseWS.getIdSolicitud() --> " + responseWS.getIdSolicitud());
+				LOGGER.info("responseWS.getIdSolicitudRespuesta() --> " + String.valueOf(responseWS.getIdSolicitudRespuesta()));
+				LOGGER.info("responseWS.getNMutualista() --> " + responseWS.getNMutualista());
+				LOGGER.info("responseWS.getPDF --> " + responseWS.getPDF() );
+				LOGGER.info("responseWS.getValorRespuesta --> " + responseWS.getValorRespuesta());
 				response.setIdSolicitud(responseWS.getIdSolicitud());
 				response.setIdSolicitudRespuesta(String.valueOf(responseWS.getIdSolicitudRespuesta()));
 				response.setNMutualista(responseWS.getNMutualista());
@@ -702,6 +725,11 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			request.setMGASolicitudPolizaProfesional(requestBody); 
 			try {
 				IntegracionSolicitudRespuesta responseWS = _clientMutualidad.MGASolicitudPolizaProfesional(request, uriService);
+				LOGGER.info("responseWS.getIdSolicitud() --> " + responseWS.getIdSolicitud());
+				LOGGER.info("responseWS.getIdSolicitudRespuesta() --> " + String.valueOf(responseWS.getIdSolicitudRespuesta()));
+				LOGGER.info("responseWS.getNMutualista() --> " + responseWS.getNMutualista());
+				LOGGER.info("responseWS.getPDF --> " + responseWS.getPDF() );
+				LOGGER.info("responseWS.getValorRespuesta --> " + responseWS.getValorRespuesta());
 				response.setIdSolicitud(responseWS.getIdSolicitud());
 				response.setIdSolicitudRespuesta(String.valueOf(responseWS.getIdSolicitudRespuesta()));
 				response.setNMutualista(responseWS.getNMutualista());
@@ -796,7 +824,9 @@ public class MutualidadServiceImpl implements IMutualidadService{
 			request.setObtenerCuotaYCapObjetivo(obtenerCuota);
 			try {
 				IntegracionCuotaYCapitalObjetivoJubilacion responseWS = _clientMutualidad.ObtenerCuotaYCapObjetivo(request, uriService);
-				
+				LOGGER.info("responseWS.getCapitalObjetivo() --> " + responseWS.getCapitalObjetivo());
+				LOGGER.info("responseWS.getCuota()--> " + responseWS.getCuota());
+
 				cuotaCapitalResponse.setCapitalObjetivo(responseWS.getCapitalObjetivo());
 				cuotaCapitalResponse.setCuota(responseWS.getCuota());
 			} catch (Exception e) {
