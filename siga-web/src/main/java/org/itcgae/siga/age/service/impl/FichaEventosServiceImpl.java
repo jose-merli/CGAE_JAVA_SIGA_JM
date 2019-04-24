@@ -2240,8 +2240,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 	@Override
 	public void generateNotificationsAuto() {
-		LOGGER.info(
-				"generateNotificationAuto()  -> Entrada al servicio para enviar aviso de los eventos que correspondan");
+//		LOGGER.info(
+//				"generateNotificationAuto()  -> Entrada al servicio para enviar aviso de los eventos que correspondan");
 
 		// Este método se encargará de enviar los avisos del comienzo de un evento
 		// cuando
@@ -2254,27 +2254,27 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		ageGeneracionnotificacionesExample.createCriteria().andFechabajaIsNull()
 				.andFechageneracionnotificacionLessThanOrEqualTo(new Date());
 
-		LOGGER.info(
-				"generateNotificationAuto() / ageGeneracionnotificacionesMapper.selectByExample() -> Entrada a ageGeneracionnotificacionesMapper para obtener un listado de las notificaciones que debemos generar");
+//		LOGGER.info(
+//				"generateNotificationAuto() / ageGeneracionnotificacionesMapper.selectByExample() -> Entrada a ageGeneracionnotificacionesMapper para obtener un listado de las notificaciones que debemos generar");
 
 		List<AgeGeneracionnotificaciones> ageGeneracionnotificacionesList = ageGeneracionnotificacionesMapper
 				.selectByExample(ageGeneracionnotificacionesExample);
 
-		LOGGER.info(
-				"generateNotificationAuto() / ageGeneracionnotificacionesMapper.selectByExample() -> Salida a ageGeneracionnotificacionesMapper para obtener un listado un listado de las notificaciones que debemos generar");
+//		LOGGER.info(
+//				"generateNotificationAuto() / ageGeneracionnotificacionesMapper.selectByExample() -> Salida a ageGeneracionnotificacionesMapper para obtener un listado un listado de las notificaciones que debemos generar");
 
 		if (null != ageGeneracionnotificacionesList && ageGeneracionnotificacionesList.size() > 0) {
 			for (AgeGeneracionnotificaciones ageGeneracion : ageGeneracionnotificacionesList) {
 
-				LOGGER.info(
-						"generateNotificationAuto() / ageNotificacioneseventoExtendsMapper.selectByPrimaryKey() -> Entrada a ageNotificacioneseventoExtendsMapper para obtener la notificacion que debemos generar");
+//				LOGGER.info(
+//						"generateNotificationAuto() / ageNotificacioneseventoExtendsMapper.selectByPrimaryKey() -> Entrada a ageNotificacioneseventoExtendsMapper para obtener la notificacion que debemos generar");
 
 				// Obtenemos la notificación que tenemos que generar
 				AgeNotificacionesevento notification = ageNotificacioneseventoExtendsMapper
 						.selectByPrimaryKey(ageGeneracion.getIdnotificacionevento());
 
-				LOGGER.info(
-						"generateNotificationAuto() / ageNotificacioneseventoExtendsMapper.selectByPrimaryKey() -> Salida a ageNotificacioneseventoExtendsMapper para obtener la notificacion que debemos generar");
+//				LOGGER.info(
+//						"generateNotificationAuto() / ageNotificacioneseventoExtendsMapper.selectByPrimaryKey() -> Salida a ageNotificacioneseventoExtendsMapper para obtener la notificacion que debemos generar");
 
 				if (notification != null) {
 
@@ -2289,8 +2289,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 			}
 		}
 
-		LOGGER.info(
-				"generateNotificationAuto()  -> Salida del servicio para enviar aviso de los eventos que correspondan");
+//		LOGGER.info(
+//				"generateNotificationAuto()  -> Salida del servicio para enviar aviso de los eventos que correspondan");
 	}
 
 	@Override

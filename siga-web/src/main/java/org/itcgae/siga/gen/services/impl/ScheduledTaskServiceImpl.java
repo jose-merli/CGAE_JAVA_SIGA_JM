@@ -62,8 +62,8 @@ public class ScheduledTaskServiceImpl implements IScheduledTaskService {
 	@Scheduled(cron = "${cron.pattern.scheduled.envioNotificacionesEventos}")
 	@Override
 	public void generarNotificaciones() {
-		LOGGER.info("ScheduledTaskServiceImpl --> generarNotificaciones --> ENTRA generateNotificationAuto");
+	//	LOGGER.info("ScheduledTaskServiceImpl --> generarNotificaciones --> ENTRA generateNotificationAuto");
 		fichaEventosService.generateNotificationsAuto();
-		LOGGER.info("ScheduledTaskServiceImpl --> generarNotificaciones --> SALE generateNotificationAuto");
+		//LOGGER.info("ScheduledTaskServiceImpl --> generarNotificaciones --> SALE generateNotificationAuto");
 	}
 }
