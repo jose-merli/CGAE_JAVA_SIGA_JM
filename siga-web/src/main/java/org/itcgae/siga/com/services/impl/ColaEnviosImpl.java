@@ -182,8 +182,11 @@ public class ColaEnviosImpl implements IColaEnvios {
 		if(personaRemitente.getApellidos2() != null) {
 			remitentedto.setApellido2(personaRemitente.getApellidos2());
 		}
-		
-		remitentedto.setCorreoElectronico(remitente.getCorreoelectronico());
+		if(remitente != null) {
+			remitentedto.setCorreoElectronico(remitente.getCorreoelectronico());
+		}else {
+			remitentedto.setCorreoElectronico("");
+		}
 		
 		//Obtenemos los destinatarios dependendiendo del tipo de envio.
 		boolean envioMasivo = envio.getEnvio().contains("M") ? true : false;

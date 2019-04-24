@@ -14,6 +14,7 @@ import org.itcgae.siga.cen.services.IBusquedaColegiadosService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocivilExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenEstadocolegialExtendsMapper;
@@ -35,6 +36,9 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 	
 	@Autowired
 	private CenEstadocolegialExtendsMapper cenEstadocolegialExtendsMapper;
+	
+	@Autowired
+	private CenClienteExtendsMapper cenClienteExtendsMapper;
 	
 	@Autowired
 	private CenTiposcvExtendsMapper cenTiposcvExtendsMapper;
@@ -210,6 +214,8 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 		LOGGER.info("searchColegiado() -> Entrada al servicio para obtener colegiados");
 
 		ColegiadoDTO colegiadosDTO = new ColegiadoDTO();
+		
+		
 		List<ColegiadoItem> colegiadoItemList = new ArrayList<ColegiadoItem>();
 
 		String token = request.getHeader("Authorization");

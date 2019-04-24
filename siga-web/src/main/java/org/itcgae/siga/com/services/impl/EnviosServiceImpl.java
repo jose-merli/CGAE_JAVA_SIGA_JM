@@ -231,7 +231,8 @@ public class EnviosServiceImpl implements IEnviosService{
 	    	          String srcText = src.substring( x + srcToken.length(), y );
 	    	          String cid = "image" + i;
 	    	          String newSrc = src.replace( srcText, "cid:" + cid );
-	    	          inlineImage.put( cid, srcText.split( "," )[1] );
+	    	          if(srcText.contains("data:image")) {
+		    	          inlineImage.put( cid, srcText.split( "," )[1] );
 	    	          sCuerpo = sCuerpo.replace( src, newSrc );
 	    	          i++;
 	    	          
@@ -239,6 +240,7 @@ public class EnviosServiceImpl implements IEnviosService{
 	    	          MimeBodyPart imagen = addAttachment(cid,srcText.split( "," )[1]);
 	  	    		  imagen.setDisposition(MimePart.INLINE);
 	  	    		  mixedMultipart.addBodyPart(imagen);
+	    	          }
 	    			
 	    	       }
 	    	    }
