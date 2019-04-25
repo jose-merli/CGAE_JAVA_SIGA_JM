@@ -61,7 +61,7 @@ public class ForPersonacursoSqlExtendsProvider extends ForPersonaCursoSqlProvide
 		sql.FROM("FOR_PERSONA_CURSO cur");
 		sql.INNER_JOIN("CEN_PERSONA per ON (per.idpersona = cur.idpersona)");
 		sql.INNER_JOIN("FOR_TIPOCOSTE tip ON (tip.idtipocoste = cur.idtipocoste)");
-		sql.LEFT_OUTER_JOIN("FOR_ROLES rol ON (rol.idrol = cur.idrol)");
+		sql.LEFT_OUTER_JOIN("FOR_ROLES rol ON (rol.idrol = cur.idrol and cur.idinstitucion = rol.idinstitucion)");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = tip.DESCRIPCION AND rec.IDLENGUAJE = '" + idLenguaje + "')");
 		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS rec2 ON (rol.DESCRIPCION = rec2.IDRECURSO AND rec2.IDLENGUAJE = '" + idLenguaje + "')");
 		sql.WHERE("cur.IDCURSO = '" + idCurso + "'");
