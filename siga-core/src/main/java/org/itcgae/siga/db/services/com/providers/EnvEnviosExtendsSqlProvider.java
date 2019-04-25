@@ -152,7 +152,7 @@ public class EnvEnviosExtendsSqlProvider {
 			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() +"'");
 		}
 		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("")){
-			sql.WHERE("DEST.NOMBRE LIKE '%" + filtros.getNombre() +"%'");
+			sql.WHERE(filtroTextoBusquedas("DEST.NOMBRE",filtros.getNombre()));
 		}
 		
 		if(filtros.getApellidos() != null && !filtros.getApellidos().trim().equals("")){
@@ -163,14 +163,18 @@ public class EnvEnviosExtendsSqlProvider {
 				if(i!=0) {
 					whereApellidos = whereApellidos + " OR ";
 				}
-				whereApellidos = whereApellidos + "DEST.APELLIDOS1 LIKE '%" + apellidoBuscar +"%' OR DEST.APELLIDOS2 LIKE '%" + apellidoBuscar + "%' ";
+				whereApellidos = whereApellidos
+						+ "TRANSLATE(LOWER(DEST.APELLIDOS1),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') LIKE "
+						+ "TRANSLATE(LOWER('%" + apellidoBuscar + "%'),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') OR "
+						+ "TRANSLATE(LOWER(DEST.APELLIDOS2),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz') LIKE "
+						+ "TRANSLATE(LOWER('%" + apellidoBuscar + "%'),'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž','AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz')";
 			}
 			
 			sql.WHERE("(" + whereApellidos + ")");
 		}		
 		
 		if(filtros.getNif() != null && !filtros.getNif().trim().equals("")){
-			sql.WHERE("DEST.NIFCIF LIKE '%" + filtros.getNif() +"%'");
+			sql.WHERE(filtroTextoBusquedas("DEST.NIFCIF", filtros.getNif()));
 		}
 		
 		if(filtros.getNumColegiado() != null && !filtros.getNumColegiado().trim().equals("")){
@@ -184,6 +188,7 @@ public class EnvEnviosExtendsSqlProvider {
 		
 		return sql.toString();
 	}
+	
 	
 	public String selectEnviosProgramados(){
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
