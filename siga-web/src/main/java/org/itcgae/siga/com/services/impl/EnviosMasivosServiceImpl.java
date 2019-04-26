@@ -634,7 +634,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						envio.setUsumodificacion(usuario.getIdusuario());
 						_envEnviosMapper.updateByPrimaryKey(envio);
 						
-						if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())){
+						if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios()) || SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())){
 							
 							//Actualizamos el nuevo asunto y cuerpo del envio
 							
