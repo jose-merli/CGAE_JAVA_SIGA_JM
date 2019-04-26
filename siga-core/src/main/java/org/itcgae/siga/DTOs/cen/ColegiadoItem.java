@@ -87,10 +87,11 @@ public class ColegiadoItem {
 	private String [] temas;
 	private List<ComboItem> temasCombo;
 	private String identificadords;
+	private Boolean cambioEstado;
+
 	
 	// Nombre del colegio que se mostrará como resultado en la tabla de busqueda
 	private String colegioResultado;
-	
 	// Filtro de colegios de la pantalla de busqueda
 	private String [] colegio;
 	
@@ -1199,6 +1200,8 @@ public class ColegiadoItem {
 	public void setFechaEstadoNueva(Date fechaEstadoNueva) {
 		this.fechaEstadoNueva = fechaEstadoNueva;
 	}
+	
+	
 
 	@Override
 	public int hashCode() {
@@ -1207,9 +1210,8 @@ public class ColegiadoItem {
 	    		idEstadoCivil, domicilio, tipoCV, subTipoCV1, subTipoCV2, idgrupo, denominacion, soloNombre, apellidos1, apellidos2,idTipoIdentificacion, naturalDe, idLenguaje,
 	    		asientoContable, nMutualista, idTiposSeguro, partidoJudicial, comisiones, incorporacion, fechaJura, fechaTitulacion, fechapresentacion, 
 	    		idTratamiento, incorporacionDate, fechaJuraDate, fechaAltaDate, fechaTitulacionDate, fechapresentacionDate, fechaNacimientoDate, fechaBajaDate, observaciones, subtipoCV, temas,
-	    		fechaNacimientoRango, fechaEstadoNueva, identificadords);
+	    		fechaNacimientoRango, fechaEstadoNueva, identificadords, cambioEstado);
 	}
-
 
 	@Override
 	public String toString() {
@@ -1276,7 +1278,8 @@ public class ColegiadoItem {
 	    sb.append("    temas: ").append(toIndentedString(temas)).append("\n");
 	    sb.append("    fechaEstadoNueva: ").append(toIndentedString(fechaEstadoNueva)).append("\n");
 	    sb.append("    identificadords: ").append(toIndentedString(identificadords)).append("\n");
-	    
+	    sb.append("    cambioEstado: ").append(toIndentedString(cambioEstado)).append("\n");
+
 		
 	    sb.append("}");
 	    return sb.toString();
@@ -1356,5 +1359,14 @@ public class ColegiadoItem {
 	public void setColegioResultado(String colegioResultado) {
 		this.colegioResultado = colegioResultado;
 	}
+
+	public Boolean getCambioEstado() {
+		return cambioEstado;
+	}
+
+	public void setCambioEstado(Boolean cambioEstado) {
+		this.cambioEstado = cambioEstado;
+	}
+	
 }
 
