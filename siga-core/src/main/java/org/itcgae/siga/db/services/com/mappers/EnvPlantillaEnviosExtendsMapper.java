@@ -64,6 +64,6 @@ public interface EnvPlantillaEnviosExtendsMapper {
 	@Results({@Result(column = "DESCRIPCION", property = "tipoEnvio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "idtipoEnvios", property = "idTipoEnvio", jdbcType = JdbcType.VARCHAR)
 	})
-	TipoEnvioItem selectTipoEnvioPlantilla(String lenguaje, String idPlantilla);
+	TipoEnvioItem selectTipoEnvioPlantilla(Short idInstitucion, String lenguaje, String idPlantilla);
 
 }

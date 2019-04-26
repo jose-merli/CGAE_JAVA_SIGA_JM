@@ -274,7 +274,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 	            			campo = map.get("APELLIDOS1");
 	            			destinatario.setApellidos1(campo!=null? String.valueOf(campo):"");
 	            			
-	            			campo = map.get("APLLEIDOS2");
+	            			campo = map.get("APELLIDOS2");
 	            			destinatario.setApellidos2(campo!=null? String.valueOf(campo):"");
 	            			
 	            			campo = map.get("NIFCIF");
@@ -360,6 +360,9 @@ public class ColaEnviosImpl implements IColaEnvios {
 			if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
 				_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 			}else{
+				if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO)){
+					_enviosService.envioMailLetrado(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, envioMasivo);
+				}
 				//Añadimos los informes al envio para que puedan ser descargados.
 				for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {
 					EnvDocumentos documento = new EnvDocumentos();
@@ -466,6 +469,9 @@ public class ColaEnviosImpl implements IColaEnvios {
 				if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
 					_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 				}else{
+					if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO)){
+						_enviosService.envioMailLetrado(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, envioMasivo);
+					}
 					//Añadimos los informes al envio para que puedan ser descargados.
 					for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {
 						EnvDocumentos documento = new EnvDocumentos();

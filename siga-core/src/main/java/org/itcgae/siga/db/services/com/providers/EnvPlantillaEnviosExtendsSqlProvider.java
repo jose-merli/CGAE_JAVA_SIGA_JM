@@ -91,7 +91,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 		
 	} 
 	
-	public String selectTipoEnvioPlantilla(String idLenguaje, String idPlantilla){
+	public String selectTipoEnvioPlantilla(Short idInstitucion, String idLenguaje, String idPlantilla){
 		
 		SQL sql = new SQL();
 		
@@ -101,7 +101,7 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 		sql.FROM("ENV_PLANTILLASENVIOS PLANTILLA");
 		sql.INNER_JOIN("ENV_TIPOENVIOS TIPO ON PLANTILLA.Idtipoenvios = TIPO.Idtipoenvios");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = TIPO.NOMBRE AND CAT.IDLENGUAJE = '" + idLenguaje + "'");
-		sql.WHERE("PLANTILLA.ANTIGUA = 'N' AND PLANTILLA.Idplantillaenvios = " + idPlantilla);
+		sql.WHERE("PLANTILLA.ANTIGUA = 'N' AND PLANTILLA.Idplantillaenvios = " + idPlantilla +" AND PLANTILLA.idinstitucion = "+ idInstitucion);
 		
 		return sql.toString();
 	}

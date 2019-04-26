@@ -313,7 +313,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				
 				try{
 					AdmUsuarios usuario = usuarios.get(0);
-					TipoEnvioItem tipoEnvio = _envPlantillaEnviosExtendsMapper.selectTipoEnvioPlantilla(usuario.getIdlenguaje(), idPlantilla);	
+					TipoEnvioItem tipoEnvio = _envPlantillaEnviosExtendsMapper.selectTipoEnvioPlantilla(idInstitucion, usuario.getIdlenguaje(), idPlantilla);	
 					response.setTipoEnvio(tipoEnvio);
 				}catch(Exception e){
 					LOGGER.error("Error en obtenertipoEnvioPlantilla :: ", e);
