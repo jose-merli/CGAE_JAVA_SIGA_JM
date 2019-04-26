@@ -361,7 +361,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 				_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 			}else{
 				if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO)){
-					_enviosService.envioMailLetrado(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, envioMasivo);
+					_enviosService.envioMailLetrado(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, envioMasivo);
 				}
 				//Añadimos los informes al envio para que puedan ser descargados.
 				for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {
@@ -470,7 +470,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 					_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 				}else{
 					if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO)){
-						_enviosService.envioMailLetrado(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, envioMasivo);
+						_enviosService.envioMailLetrado(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, envioMasivo);
 					}
 					//Añadimos los informes al envio para que puedan ser descargados.
 					for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {

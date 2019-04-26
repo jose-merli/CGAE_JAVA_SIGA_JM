@@ -1,7 +1,6 @@
 package org.itcgae.siga.com.services.impl;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
@@ -29,7 +28,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.mail.internet.MimePart;
 import javax.mail.internet.PreencodedMimeBodyPart;
 import javax.mail.util.ByteArrayDataSource;
@@ -42,14 +40,6 @@ import org.itcgae.siga.com.services.IEnviosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 
 import org.itcgae.siga.db.entities.CenDirecciones;
-import org.itcgae.siga.db.entities.CenDireccionesKey;
-import org.itcgae.siga.db.entities.EnvEnvios;
-import org.itcgae.siga.db.entities.EnvEnviosgrupocliente;
-import org.itcgae.siga.db.entities.EnvImagenplantilla;
-import org.itcgae.siga.db.entities.EnvImagenplantillaExample;
-import org.itcgae.siga.db.entities.EnvImagenplantillaKey;
-import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
-import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
@@ -413,7 +403,7 @@ public class EnviosServiceImpl implements IEnviosService{
 	
 	@Override
 	public void envioMailLetrado(String idInstitucion, String idEnvio, RemitenteDTO remitente,
-			List<DestinatarioItem> destinatarios, boolean envioMasivo) throws Exception {
+			List<DestinatarioItem> destinatarios, String asuntoFinal, String cuerpoFinal, boolean envioMasivo) throws Exception {
 
 		Transport tr = null;
 		try {
@@ -485,15 +475,17 @@ public class EnviosServiceImpl implements IEnviosService{
 				InternetAddress toInternetAddress = new InternetAddress(sTo);
 				mensaje.addRecipient(MimeMessage.RecipientType.TO, toInternetAddress);
 
-				// ASUNTO
-				String sAsunto = "Documentación disponible";
-
-				mensaje.setSubject(sAsunto, "ISO-8859-1");
-				mensaje.setHeader("Content-Type", "text/html; charset=\"ISO-8859-1\"");
-
-				// CUERPO
-				String sCuerpo = "Estimado/a " + destinatario.getNombre()
-						+ ",\n Tiene documentación nueva generada. Entre en su ficha y descargue dicha documentación";
+	    	    //ASUNTO   
+                String sAsunto = sustituirEtiquetas(idInstitucion, asuntoFinal, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, idEnvio);
+	    	    sAsunto = sustituirEtiquetas(idInstitucion, asuntoFinal, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, idEnvio);
+	    	    
+                mensaje.setSubject(sAsunto,"ISO-8859-1");
+                mensaje.setHeader("Content-Type","text/html; charset=\"ISO-8859-1\"");
+                
+                //CUERPO
+                String sCuerpo = cuerpoFinal == null ? "": cuerpoFinal;
+                sCuerpo = sustituirEtiquetas(idInstitucion, sCuerpo, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO_ANTIGUO, idEnvio);
+                sCuerpo = sustituirEtiquetas(idInstitucion, sCuerpo, destinatario, SigaConstants.MARCAS_ETIQUETAS_REEMPLAZO_TEXTO, idEnvio);
 
 				MimeMultipart mixedMultipart = new MimeMultipart("mixed");
 				MimeBodyPart mixedBodyPart = new MimeBodyPart();
