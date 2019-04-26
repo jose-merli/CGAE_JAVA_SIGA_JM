@@ -34,8 +34,6 @@ import org.itcgae.siga.com.services.IModelosYcomunicacionesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.EnvPlantillasenviosExample;
-import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModClasecomunicaciones;
@@ -53,11 +51,8 @@ import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
-import org.itcgae.siga.db.entities.ModPlantillaenvioConsulta;
-import org.itcgae.siga.db.entities.ModPlantillaenvioConsultaExample;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijo;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample;
-import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPerfilesMapper;
@@ -66,7 +61,6 @@ import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocConsultaMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
-import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.mappers.ModRelPlantillaSufijoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmPerfilExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -128,11 +122,6 @@ public class ModelosYcomunicacionesServiceImpl implements IModelosYcomunicacione
 	@Autowired
 	private ModRelPlantillaSufijoExtendsMapper modRelPlantillaSufijoExtendsMapper;
 	
-	@Autowired
-	private ModPlantillaenvioConsultaMapper modPlantillaenvioConsultaMapper;
-	
-	@Autowired
-	private EnvPlantillasenviosMapper envPlantillasenviosMapper;
 	
 	@Autowired
 	private EnvPlantillaEnviosExtendsMapper envPlantillaEnviosExtendsMapper;

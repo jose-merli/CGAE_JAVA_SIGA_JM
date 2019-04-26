@@ -575,7 +575,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							_envHistoricoestadoenvioMapper.insert(historico);
 						}
 						
-						if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())){
+						if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios()) || SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())){
 							//Insertamos el nuevo asunto y cuerpo del envio
 							
 							EnvCamposenvios envCamposEnvio = new EnvCamposenvios();

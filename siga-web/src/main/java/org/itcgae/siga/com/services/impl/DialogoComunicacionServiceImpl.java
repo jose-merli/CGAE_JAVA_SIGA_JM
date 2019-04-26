@@ -70,6 +70,7 @@ import org.itcgae.siga.db.entities.ModClasecomunicaciones;
 import org.itcgae.siga.db.entities.ModClasecomunicacionesExample;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvio;
 import org.itcgae.siga.db.entities.ModModeloPlantillaenvioKey;
+import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
@@ -85,6 +86,7 @@ import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.ModClasecomunicacionRutaMapper;
 import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
+import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.mappers.ModPlantilladocumentoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
@@ -130,6 +132,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	
 	@Autowired
 	private ModModeloComunicacionExtendsMapper _modModeloComunicacionExtendsMapper;
+	
+	@Autowired
+	private ModModelocomunicacionMapper _modModeloComunicacionMapper;
 	
 	@Autowired
 	private ModModeloPlantillaDocumentoExtendsMapper _modModeloPlantillaDocumentoExtendsMapper;
@@ -1543,7 +1548,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							
 							// Actualizamos el envio para ponerle la descripcion
 							CenInstitucion institucion = _cenInstitucion.selectByPrimaryKey(idInstitucion);
-							String descripcion = envio.getIdenvio() + "--" +institucion.getAbreviatura();
+							ModModelocomunicacion modelo =  _modModeloComunicacionMapper.selectByPrimaryKey(modeloEnvio.getIdModeloComunicacion());
+							String descripcion = envio.getIdenvio() + "--" + modelo.getNombre();
 							envio.setDescripcion(descripcion);
 							_envEnviosMapper.updateByPrimaryKey(envio);					
 							
