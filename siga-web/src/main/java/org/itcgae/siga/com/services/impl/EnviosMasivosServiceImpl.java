@@ -1345,7 +1345,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 		PlantillaEnvioItem plantilla = new PlantillaEnvioItem();
 			
-		if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
+		if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios()) || SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
 			EnvCamposenviosKey key = new EnvCamposenviosKey();
 			key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
 			key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
