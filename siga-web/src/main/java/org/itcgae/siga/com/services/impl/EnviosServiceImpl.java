@@ -223,13 +223,13 @@ public class EnviosServiceImpl implements IEnviosService{
 	    	          String newSrc = src.replace( srcText, "cid:" + cid );
 	    	          if(srcText.contains("data:image")) {
 		    	          inlineImage.put( cid, srcText.split( "," )[1] );
-	    	          sCuerpo = sCuerpo.replace( src, newSrc );
-	    	          i++;
+		    	          sCuerpo = sCuerpo.replace( src, newSrc );
+		    	          i++;
 	    	          
-	    	          LOGGER.debug(" CID " + cid + " Image data :: " + srcText.split( "," )[1]);
-	    	          MimeBodyPart imagen = addAttachment(cid,srcText.split( "," )[1]);
-	  	    		  imagen.setDisposition(MimePart.INLINE);
-	  	    		  mixedMultipart.addBodyPart(imagen);
+		    	          LOGGER.debug(" CID " + cid + " Image data :: " + srcText.split( "," )[1]);
+		    	          MimeBodyPart imagen = addAttachment(cid,srcText.split( "," )[1]);
+		    	          imagen.setDisposition(MimePart.INLINE);
+		    	          mixedMultipart.addBodyPart(imagen);
 	    	          }
 	    			
 	    	       }
@@ -388,7 +388,12 @@ public class EnviosServiceImpl implements IEnviosService{
 			
 			if (response.getEnviarSMSResponse() !=null){
 				respuesta = response.getEnviarSMSResponse().getResultado();
-				LOGGER.info("La respuesta de ECOS al enviar ha sido: "+ respuesta);
+				if(respuesta.indexOf(SigaConstants.KO) > -1) {
+					LOGGER.error("No se ha enviado el sms: " + respuesta);
+					throw new BusinessException("No se ha enviado el sms", respuesta);	
+				}else {
+					LOGGER.info("La respuesta de ECOS al enviar ha sido: "+ respuesta);
+				}				
 			}
 			
 			

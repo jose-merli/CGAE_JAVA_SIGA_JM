@@ -50,6 +50,7 @@ import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDestConsultaEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
+import org.itcgae.siga.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -215,9 +216,17 @@ public class ColaEnviosImpl implements IColaEnvios {
 
 					//Buscamos las direcciones de esa persona
 					CenDireccionesExample exampleDir = new CenDireccionesExample();
-					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion());
+					
+					//Obtenemos la direccion preferente de la persona
+					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike(SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO);
 					List<CenDirecciones> direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
-					//Si la persona tiene mas de una direccion obtenemos todas hasta que encontremos una con correo electrónico
+					
+					if(direcciones == null || direcciones.size() == 0){
+						exampleDir = new CenDireccionesExample();
+						exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull();
+						direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
+					}
+					
 					if(direcciones != null && direcciones.size() > 0){
 						boolean añadido = false;
 						for (CenDirecciones dir : direcciones) {
@@ -536,11 +545,18 @@ public class ColaEnviosImpl implements IColaEnvios {
 				etiqueta.createCriteria().andIdgrupoEqualTo(envEnviosgrupocliente.getIdgrupo()).andIdinstitucionEqualTo(envio.getIdinstitucion());
 				List<CenGruposclienteCliente> personas = _cenGruposclienteClienteMapper.selectByExample(etiqueta);
 				for (CenGruposclienteCliente persona : personas) {
-					//Buscamos las direcciones de esa persona
+					//Buscamos las direcciones de esa persona, primero la preferente
 					CenDireccionesExample exampleDir = new CenDireccionesExample();
-					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion());
+					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike(SigaConstants.TIPO_PREFERENTE_SMS);
 					List<CenDirecciones> direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
-					//Si la persona tiene mas de una direccion obtenemos todas hasta que encontremos una con correo electrónico
+					
+					if(direcciones == null || direcciones.size() == 0) {
+						exampleDir = new CenDireccionesExample();
+						exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull();
+						direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
+					}
+					
+					//Si la persona tiene mas de una direccion obtenemos todas hasta que encontremos una con movil
 					if(direcciones != null && direcciones.size() > 0){
 						boolean añadido = false;
 						for (CenDirecciones dir : direcciones) {
@@ -654,28 +670,46 @@ public class ColaEnviosImpl implements IColaEnvios {
 		}
 //		String cuerpoFinal = remplazarCamposCuerpo(plantilla.getCuerpo(), resultadosConsultas);
 
-		String cuerpoEnvio = plantilla.getCuerpo() != null ? plantilla.getCuerpo():"";
+		String cuerpoEnvio = "";
 		
 		EnvCamposenviosKey key = new EnvCamposenviosKey();
-			key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO)); // No estoy seguro si es 1 o 2 para sms comprobar en tabla
+		key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_TEXTO_SMS));
 
-			key.setIdenvio(envio.getIdenvio());
-			key.setIdinstitucion(envio.getIdinstitucion());
-			key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_SMS);
-			//Crear constante con valor 'S'
+		key.setIdenvio(envio.getIdenvio());
+		key.setIdinstitucion(envio.getIdinstitucion());
+		key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_SMS);
 		
-			EnvCamposenvios envCampo = _envCamposenviosMapper.selectByPrimaryKey(key);
-				if(envCampo != null && envCampo.getValor() != null) {
-					cuerpoEnvio = envCampo.getValor();
-				}else{
-					cuerpoEnvio = plantilla.getCuerpo();
-				}
+		EnvCamposenvios envCampo = _envCamposenviosMapper.selectByPrimaryKey(key);
+		if(envCampo != null && envCampo.getValor() != null) {
+			cuerpoEnvio = envCampo.getValor();
+		}else{
+			cuerpoEnvio = plantilla.getCuerpo();
+		}
 				
 		String cuerpoFinal = remplazarCamposCuerpo(cuerpoEnvio, resultadosConsultas); 
 		
-		// Realizamos el envio por SMS
-		idSolicitudEcos = _enviosService.envioSMS(remitente, numerosDestinatarios, envio.getIdinstitucion(), cuerpoFinal, isBuroSMS);
-		envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+		// Realizamos el envio por SMS para cada destiantario
+		boolean hayError = false;
+		
+		for(String numDestiantario: numerosDestinatarios) {
+			String[] dest = new String[1];
+			dest[0] = numDestiantario;
+			
+			try {
+				idSolicitudEcos = _enviosService.envioSMS(remitente, dest, envio.getIdinstitucion(), cuerpoFinal, isBuroSMS);			
+			}catch(Exception e) {
+				hayError = true;
+				LOGGER.error("Error al enviar el sms al destinatario: " + numDestiantario, e);
+				throw new BusinessException("Error al enviar el sms al destinatario: " + numDestiantario, e);
+			}
+		}
+		
+		if(hayError) {
+			envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);			
+		}else{
+			envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+		}
+		
 		envio.setFechamodificacion(new Date());
 		envio.setIdsolicitudecos(idSolicitudEcos);
 		_envEnviosMapper.updateByPrimaryKey(envio);

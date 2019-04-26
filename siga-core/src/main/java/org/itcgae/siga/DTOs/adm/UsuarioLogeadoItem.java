@@ -1,9 +1,7 @@
 package org.itcgae.siga.DTOs.adm;
 
-import java.util.Date;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JavaClientCodegen", date = "2018-03-15T12:50:09.033+01:00")
@@ -17,7 +15,7 @@ public class UsuarioLogeadoItem {
 	private String idioma  = null;
 	private String perfiles  = null;
 	private String rutaLogout  = null;
-	
+	private String idPerfiles = null;
 
 	public String getRutaLogout() {
 		return rutaLogout;
@@ -205,6 +203,16 @@ public class UsuarioLogeadoItem {
 	      return "null";
 	    }
 	    return o.toString().replace("\n", "\n    ");
+	}
+
+
+	public String getIdPerfiles() {
+		return idPerfiles;
+	}
+
+
+	public void setIdPerfiles(String idPerfiles) {
+		this.idPerfiles = idPerfiles;
 	}
 	
 	

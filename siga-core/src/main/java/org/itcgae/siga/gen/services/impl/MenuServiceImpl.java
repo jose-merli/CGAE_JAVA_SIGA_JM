@@ -558,6 +558,7 @@ public class MenuServiceImpl implements IMenuService {
 		UsuarioLogeadoDTO response = new UsuarioLogeadoDTO();
 		usuario.get(0).setPerfiles(getDescripcion(perfiles, idInstitucion));
 		usuario.get(0).setRutaLogout(getUserRoutLogout(idInstitucion));
+		usuario.get(0).setIdPerfiles(perfiles.toString());
 		response.setUsuarioLogeadoItem(usuario);
 
 		for (UsuarioLogeadoItem usuarioLogeadoItem : usuario) {
