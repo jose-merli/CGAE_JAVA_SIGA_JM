@@ -10,4 +10,7 @@ Insert into GEN_RECURSOS_CATALOGOS (IDRECURSO,DESCRIPCION,IDLENGUAJE,FECHAMODIFI
 
 Insert into CEN_TIPODIRECCION (IDTIPODIRECCION,DESCRIPCION,USUMODIFICACION,FECHAMODIFICACION) values (14,(SELECT MAX(IDRECURSO) IDRECURSO FROM ((select TO_NUMBER(REPLACE(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'null',''),'99999999999') IDRECURSO from gen_recursos_catalogos  ))),0,sysdate);
 
+
+update gen_menu set path = 'documentacionSolicitudes' where idmenu = '17';
+
 commit;

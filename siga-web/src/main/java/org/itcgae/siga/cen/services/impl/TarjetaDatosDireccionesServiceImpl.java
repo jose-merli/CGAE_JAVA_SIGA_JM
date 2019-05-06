@@ -732,17 +732,18 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						}
 
 						// AUDITORIA
-
-						CenDirecciones cenDireccionesPosterior = new CenDirecciones();
-						CenDireccionesKey keyDireccionesPosterior = new CenDireccionesKey();
-						keyDireccionesPosterior.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
-						keyDireccionesPosterior.setIdinstitucion(idInstitucion);
-						keyDireccionesPosterior.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-						cenDireccionesPosterior = cenDireccionesExtendsMapper
-								.selectByPrimaryKey(keyDireccionesPosterior);
-
-						auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(cenDireccionesAnterior,
-								cenDireccionesPosterior, "UPDATE", request, datosDireccionesItem.getMotivo());
+						if (!UtilidadesString.esCadenaVacia(datosDireccionesItem.getMotivo())) {
+							CenDirecciones cenDireccionesPosterior = new CenDirecciones();
+							CenDireccionesKey keyDireccionesPosterior = new CenDireccionesKey();
+							keyDireccionesPosterior.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
+							keyDireccionesPosterior.setIdinstitucion(idInstitucion);
+							keyDireccionesPosterior.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+							cenDireccionesPosterior = cenDireccionesExtendsMapper
+									.selectByPrimaryKey(keyDireccionesPosterior);
+	
+							auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(cenDireccionesAnterior,
+									cenDireccionesPosterior, "UPDATE", request, datosDireccionesItem.getMotivo());
+						}
 					} else {
 						LOGGER.info(
 								"updateDirection() -> KO. Update para actualizar direcciones  NO realizado correctamente");
@@ -821,17 +822,18 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 						}
 
 						// AUDITORIA
-
-						CenDirecciones cenDireccionesPosterior = new CenDirecciones();
-						CenDireccionesKey keyDireccionesPosterior = new CenDireccionesKey();
-						keyDireccionesPosterior.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
-						keyDireccionesPosterior.setIdinstitucion(idInstitucion);
-						keyDireccionesPosterior.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-						cenDireccionesPosterior = cenDireccionesExtendsMapper
-								.selectByPrimaryKey(keyDireccionesPosterior);
-
-						auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(cenDireccionesAnterior,
-								cenDireccionesPosterior, "UPDATE", request, datosDireccionesItem.getMotivo());
+						if (!UtilidadesString.esCadenaVacia(datosDireccionesItem.getMotivo())) {
+							CenDirecciones cenDireccionesPosterior = new CenDirecciones();
+							CenDireccionesKey keyDireccionesPosterior = new CenDireccionesKey();
+							keyDireccionesPosterior.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
+							keyDireccionesPosterior.setIdinstitucion(idInstitucion);
+							keyDireccionesPosterior.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+							cenDireccionesPosterior = cenDireccionesExtendsMapper
+									.selectByPrimaryKey(keyDireccionesPosterior);
+	
+							auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(cenDireccionesAnterior,
+									cenDireccionesPosterior, "UPDATE", request, datosDireccionesItem.getMotivo());
+						}
 					} else {
 						LOGGER.info(
 								"updateDirection() -> KO. Update para actualizar direcciones  NO realizado correctamente");
@@ -1127,17 +1129,18 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					}
 
 					// AUDITORIA
-
-					CenDirecciones cenDireccionesPosterior = new CenDirecciones();
-
-					CenDireccionesKey key = new CenDireccionesKey();
-					key.setIdinstitucion(idInstitucion);
-					key.setIddireccion(idDireccion);
-					key.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-					cenDireccionesPosterior = cenDireccionesExtendsMapper.selectByPrimaryKey(key);
-
-					auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(null, cenDireccionesPosterior,
-							"INSERT", request, datosDireccionesItem.getMotivo());
+					if (!UtilidadesString.esCadenaVacia(datosDireccionesItem.getMotivo())) {
+						CenDirecciones cenDireccionesPosterior = new CenDirecciones();
+	
+						CenDireccionesKey key = new CenDireccionesKey();
+						key.setIdinstitucion(idInstitucion);
+						key.setIddireccion(idDireccion);
+						key.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						cenDireccionesPosterior = cenDireccionesExtendsMapper.selectByPrimaryKey(key);
+	
+						auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(null, cenDireccionesPosterior,
+								"INSERT", request, datosDireccionesItem.getMotivo());
+					}
 
 				} else {
 					LOGGER.info("createDirection() -> KO. Insert para direcciones  NO realizado correctamente");
@@ -1347,16 +1350,17 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					}
 
 					// AUDITORIA
-
-					CenDirecciones cenDireccionesPosterior = new CenDirecciones();
-					CenDireccionesKey keyDireccionesPosterior = new CenDireccionesKey();
-					keyDireccionesPosterior.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
-					keyDireccionesPosterior.setIdinstitucion(idInstitucion);
-					keyDireccionesPosterior.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
-					cenDireccionesPosterior = cenDireccionesExtendsMapper.selectByPrimaryKey(keyDireccionesPosterior);
-
-					auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(cenDireccionesAnterior,
-							cenDireccionesPosterior, "UPDATE", request, datosDireccionesItem.getMotivo());
+					if (!UtilidadesString.esCadenaVacia(datosDireccionesItem.getMotivo())) {
+						CenDirecciones cenDireccionesPosterior = new CenDirecciones();
+						CenDireccionesKey keyDireccionesPosterior = new CenDireccionesKey();
+						keyDireccionesPosterior.setIddireccion(Long.valueOf(datosDireccionesItem.getIdDireccion()));
+						keyDireccionesPosterior.setIdinstitucion(idInstitucion);
+						keyDireccionesPosterior.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
+						cenDireccionesPosterior = cenDireccionesExtendsMapper.selectByPrimaryKey(keyDireccionesPosterior);
+	
+						auditoriaCenHistoricoService.manageAuditoriaDatosDirecciones(cenDireccionesAnterior,
+								cenDireccionesPosterior, "UPDATE", request, datosDireccionesItem.getMotivo());
+					}
 				} else {
 					LOGGER.info(
 							"updateDirection() -> KO. Update para actualizar direcciones  NO realizado correctamente");
