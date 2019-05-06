@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ComboTiposCVDTO;
 import org.itcgae.siga.DTOs.cen.TipoCurricularDTO;
 import org.itcgae.siga.DTOs.cen.TipoCurricularItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -17,6 +18,6 @@ public interface ITipoCurricularService {
 	public DeleteResponseDTO deleteTipoCurricular(TipoCurricularDTO tipoCurricularDTO, HttpServletRequest request);
 	public TipoCurricularDTO getHistory(TipoCurricularItem tipoCurricularItem, HttpServletRequest request);
 	
-	public ComboDTO getCurricularTypeCombo(String idTipoCV, HttpServletRequest request);
+	public ComboTiposCVDTO getCurricularTypeCombo(String idTipoCV, boolean historico, HttpServletRequest request);
 
 }

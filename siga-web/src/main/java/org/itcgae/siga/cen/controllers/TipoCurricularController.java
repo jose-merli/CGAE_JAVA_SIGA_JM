@@ -2,13 +2,10 @@ package org.itcgae.siga.cen.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.itcgae.siga.DTOs.adm.CatalogoMaestroDTO;
-import org.itcgae.siga.DTOs.adm.CatalogoRequestDTO;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDeleteDTO;
-import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.cen.ComboTiposCVDTO;
 import org.itcgae.siga.DTOs.cen.TipoCurricularDTO;
 import org.itcgae.siga.DTOs.cen.TipoCurricularItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -37,9 +34,10 @@ public class TipoCurricularController {
 	}
 	
 	@RequestMapping(value = "tipoCurricular/getCurricularTypeCombo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getCurricularTypeCombo(@RequestParam("idTipoCV") String idTipoCV, HttpServletRequest request) {
-		ComboDTO response = tipoCurricularService.getCurricularTypeCombo(idTipoCV, request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	ResponseEntity<ComboTiposCVDTO> getCurricularTypeCombo(@RequestParam("idTipoCV") String idTipoCV, 
+			@RequestParam("historico") boolean historico, HttpServletRequest request) {
+		ComboTiposCVDTO response = tipoCurricularService.getCurricularTypeCombo(idTipoCV, historico, request);
+		return new ResponseEntity<ComboTiposCVDTO>(response, HttpStatus.OK);
 	}	
 	
 	@RequestMapping(value = "tipoCurricular/searchTipoCurricular", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

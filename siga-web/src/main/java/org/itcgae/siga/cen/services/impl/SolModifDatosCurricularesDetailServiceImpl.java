@@ -118,8 +118,8 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 					if (cenDatoscv.getIdtipocvsubtipo1() != null) {
 						// Buscar tipo curricular
 						CenTiposcvsubtipo1Key key = new CenTiposcvsubtipo1Key();
-						key.setIdinstitucion(idInstitucion);
-						key.setIdtipocv(Short.valueOf(cenDatoscv.getIdcv()));
+						key.setIdinstitucion(Short.valueOf(cenDatoscv.getIdinstitucionSubt1()));
+						key.setIdtipocv(Short.valueOf(cenDatoscv.getIdtipocv()));
 						key.setIdtipocvsubtipo1(Short.valueOf(cenDatoscv.getIdtipocvsubtipo1()));
 
 						LOGGER.info(
@@ -151,8 +151,8 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 					if(cenDatoscv.getIdtipocvsubtipo2() != null) {
 						// Buscar subtipo
 						CenTiposcvsubtipo2Key keySC = new CenTiposcvsubtipo2Key();
-						keySC.setIdinstitucion(idInstitucion);
-						keySC.setIdtipocv(Short.valueOf(cenDatoscv.getIdcv()));
+						keySC.setIdinstitucion(Short.valueOf(cenDatoscv.getIdinstitucionSubt2()));
+						keySC.setIdtipocv(Short.valueOf(cenDatoscv.getIdtipocv()));
 						keySC.setIdtipocvsubtipo2(Short.valueOf(cenDatoscv.getIdtipocvsubtipo2()));
 
 						CenTiposcvsubtipo2 cenTiposcvsubtipo2 = cenTiposCVSubtipo2ExtendsMapper.selectByPrimaryKey(keySC);
@@ -259,7 +259,7 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 						"searchDatosCurricularesDetail() / cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey() -> Entrada a cenTiposcvExtendsMapper para obtener el campo descripcion del tipo curricular");
 
 				CenTiposcvsubtipo1Key cenTiposcvsubtipo1Key = new CenTiposcvsubtipo1Key();
-				cenTiposcvsubtipo1Key.setIdinstitucion(idInstitucion);
+				cenTiposcvsubtipo1Key.setIdinstitucion(cenSolicitudmodificacioncv.getIdinstitucionSubt1());
 				cenTiposcvsubtipo1Key.setIdtipocv(cenSolicitudmodificacioncv.getIdtipocv());
 				cenTiposcvsubtipo1Key.setIdtipocvsubtipo1(cenSolicitudmodificacioncv.getIdtipocvsubtipo1());
 
@@ -289,9 +289,9 @@ public class SolModifDatosCurricularesDetailServiceImpl implements ISolModifDato
 						"searchDatosCurricularesDetail() / cenTiposCVSubtipo1ExtendsMapper.selectByPrimaryKey() -> Entrada a cenTiposcvExtendsMapper para obtener el campo descripcion del subtipo curricular");
 
 				CenTiposcvsubtipo2Key cenTiposcvsubtipo2Key = new CenTiposcvsubtipo2Key();
-				cenTiposcvsubtipo2Key.setIdinstitucion(idInstitucion);
+				cenTiposcvsubtipo2Key.setIdinstitucion(cenSolicitudmodificacioncv.getIdinstitucionSubt2());
 				cenTiposcvsubtipo2Key.setIdtipocv(cenSolicitudmodificacioncv.getIdtipocv());
-				cenTiposcvsubtipo2Key.setIdtipocvsubtipo2(cenSolicitudmodificacioncv.getIdtipocvsubtipo1());
+				cenTiposcvsubtipo2Key.setIdtipocvsubtipo2(cenSolicitudmodificacioncv.getIdtipocvsubtipo2());
 
 				CenTiposcvsubtipo2 cenTiposcvsubtipo2 = cenTiposCVSubtipo2ExtendsMapper
 						.selectByPrimaryKey(cenTiposcvsubtipo2Key);

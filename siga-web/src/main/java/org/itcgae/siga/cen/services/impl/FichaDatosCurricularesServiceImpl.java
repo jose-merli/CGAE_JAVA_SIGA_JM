@@ -133,35 +133,34 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			recordUpdate.setIdcv(Short.parseShort(fichaDatosCurricularesItem.getIdCv()));
 			// recordUpdate.setIdpersona(Long.valueOf(fichaDatosCurricularesDTO[i].getIdPersona()));
 
-			recordUpdate.setFechainicio(fichaDatosCurricularesItem.getFechaDesdeDate());
-			recordUpdate.setCertificado(fichaDatosCurricularesItem.getCertificado());
-			recordUpdate.setFechamovimiento(fichaDatosCurricularesItem.getFechaMovimientoDate());
-			recordUpdate.setDescripcion(fichaDatosCurricularesItem.getDescripcion());
-			recordUpdate.setIdinstitucion(idInstitucion);
+//			recordUpdate.setFechainicio(fichaDatosCurricularesItem.getFechaDesdeDate());
+//			recordUpdate.setCertificado(fichaDatosCurricularesItem.getCertificado());
+//			recordUpdate.setFechamovimiento(fichaDatosCurricularesItem.getFechaMovimientoDate());
+//			recordUpdate.setDescripcion(fichaDatosCurricularesItem.getDescripcion());
+//			recordUpdate.setIdinstitucion(idInstitucion);
 
-			recordUpdate.setIdpersona(Long.parseLong(fichaDatosCurricularesItem.getIdPersona()));
-			recordUpdate.setIdtipocv(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()));
+//			recordUpdate.setIdpersona(Long.parseLong(fichaDatosCurricularesItem.getIdPersona()));
+//			recordUpdate.setIdtipocv(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()));
 
-			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()
-					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()) {
-				recordUpdate.setIdtipocvsubtipo1(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()));
-			} else {
-				recordUpdate.setIdtipocvsubtipo1(null);
-			}
-			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()
-					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()) {
-				recordUpdate.setIdtipocvsubtipo2(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo2()));
-			} else {
-				recordUpdate.setIdtipocvsubtipo2(null);
-			}
-			if (null != fichaDatosCurricularesItem.getCreditos() && "" != fichaDatosCurricularesItem.getCreditos()) {
-				recordUpdate.setCreditos(Long.parseLong(fichaDatosCurricularesItem.getCreditos()));
-			} else {
-				recordUpdate.setCreditos(null);
-			}
+//			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()
+//					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()) {
+//				recordUpdate.setIdtipocvsubtipo1(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()));
+//			} else {
+//				recordUpdate.setIdtipocvsubtipo1(null);
+//			}
+//			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()
+//					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()) {
+//				recordUpdate.setIdtipocvsubtipo2(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo2()));
+//			} else {
+//				recordUpdate.setIdtipocvsubtipo2(null);
+//			}
+//			if (null != fichaDatosCurricularesItem.getCreditos() && "" != fichaDatosCurricularesItem.getCreditos()) {
+//				recordUpdate.setCreditos(Long.parseLong(fichaDatosCurricularesItem.getCreditos()));
+//			} else {
+//				recordUpdate.setCreditos(null);
+//			}
 
-			response = cenDatoscvExtendsMapper.updateCurriculo(recordUpdate);
-
+			response = cenDatoscvExtendsMapper.updateByPrimaryKeySelective(recordUpdate);
 			LOGGER.info(
 					"deleteDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para eliminar un curriculum");
 
@@ -222,69 +221,73 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()
 					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()) {
 				recordUpdate.setIdtipocvsubtipo1(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()));
-
-				CenTiposcvsubtipo1Example cenTiposcvsubtipo1Example = new CenTiposcvsubtipo1Example();
-				cenTiposcvsubtipo1Example.createCriteria()
-						.andIdtipocvEqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()))
-						.andIdtipocvsubtipo1EqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()))
-						.andIdinstitucionEqualTo(idInstitucion);
-
-				List<CenTiposcvsubtipo1> listCensubtipos1 = cenTiposCVSubtipo1ExtendsMapper
-						.selectByExample(cenTiposcvsubtipo1Example);
-
-				if (null != listCensubtipos1 && listCensubtipos1.size() > 0) {
-					recordUpdate.setIdinstitucionSubt1(listCensubtipos1.get(0).getIdinstitucion());
-				} else {
-
-					cenTiposcvsubtipo1Example = new CenTiposcvsubtipo1Example();
-					cenTiposcvsubtipo1Example.createCriteria()
-							.andIdtipocvEqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()))
-							.andIdtipocvsubtipo1EqualTo(
-									Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()))
-							.andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_2000);
-
-					listCensubtipos1 = cenTiposCVSubtipo1ExtendsMapper.selectByExample(cenTiposcvsubtipo1Example);
-
-					if (null != listCensubtipos1 && listCensubtipos1.size() > 0) {
-						recordUpdate.setIdinstitucionSubt1(listCensubtipos1.get(0).getIdinstitucion());
-					}
-				}
+				recordUpdate.setIdinstitucionSubt1(Short.valueOf(fichaDatosCurricularesItem.getIdInsTipoCvSubtipo1()));
+//				CenTiposcvsubtipo1Example cenTiposcvsubtipo1Example = new CenTiposcvsubtipo1Example();
+//				cenTiposcvsubtipo1Example.createCriteria()
+//						.andIdtipocvEqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()))
+//						.andIdtipocvsubtipo1EqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()))
+//						.andIdinstitucionEqualTo(idInstitucion);
+//
+//				List<CenTiposcvsubtipo1> listCensubtipos1 = cenTiposCVSubtipo1ExtendsMapper
+//						.selectByExample(cenTiposcvsubtipo1Example);
+//
+//				if (null != listCensubtipos1 && listCensubtipos1.size() > 0) {
+//					recordUpdate.setIdinstitucionSubt1(listCensubtipos1.get(0).getIdinstitucion());
+//				} else {
+//
+//					cenTiposcvsubtipo1Example = new CenTiposcvsubtipo1Example();
+//					cenTiposcvsubtipo1Example.createCriteria()
+//							.andIdtipocvEqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()))
+//							.andIdtipocvsubtipo1EqualTo(
+//									Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()))
+//							.andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_2000);
+//
+//					listCensubtipos1 = cenTiposCVSubtipo1ExtendsMapper.selectByExample(cenTiposcvsubtipo1Example);
+//
+//					if (null != listCensubtipos1 && listCensubtipos1.size() > 0) {
+//						recordUpdate.setIdinstitucionSubt1(listCensubtipos1.get(0).getIdinstitucion());
+//					}
+//				}
 
 			} else {
 				recordUpdate.setIdtipocvsubtipo1(null);
+				recordUpdate.setIdinstitucionSubt1(null);
 			}
 			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()
 					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()) {
 				recordUpdate.setIdtipocvsubtipo2(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo2()));
+				recordUpdate.setIdinstitucionSubt2(Short.valueOf(fichaDatosCurricularesItem.getIdInsTipoCvSubtipo2()));
 
-				CenTiposcvsubtipo2Example cenTiposcvsubtipo2Example = new CenTiposcvsubtipo2Example();
-				cenTiposcvsubtipo2Example.createCriteria()
-						.andIdtipocvEqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()))
-						.andIdtipocvsubtipo2EqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo2()))
-						.andIdinstitucionEqualTo(idInstitucion);
-
-				List<CenTiposcvsubtipo2> listCensubtipos2 = cenTiposCVSubtipo2ExtendsMapper
-						.selectByExample(cenTiposcvsubtipo2Example);
-
-				if (null != listCensubtipos2 && listCensubtipos2.size() > 0) {
-					recordUpdate.setIdinstitucionSubt2(listCensubtipos2.get(0).getIdinstitucion());
-				} else {
-					cenTiposcvsubtipo2Example = new CenTiposcvsubtipo2Example();
-					cenTiposcvsubtipo2Example.createCriteria()
-							.andIdtipocvEqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()))
-							.andIdtipocvsubtipo2EqualTo(
-									Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo2()))
-							.andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_2000);
-
-					listCensubtipos2 = cenTiposCVSubtipo2ExtendsMapper.selectByExample(cenTiposcvsubtipo2Example);
-
-					if (null != listCensubtipos2 && listCensubtipos2.size() > 0) {
-						recordUpdate.setIdinstitucionSubt2(listCensubtipos2.get(0).getIdinstitucion());
-					}
-				}
+//				CenTiposcvsubtipo2Example cenTiposcvsubtipo2Example = new CenTiposcvsubtipo2Example();
+//				cenTiposcvsubtipo2Example.createCriteria()
+//						.andIdtipocvEqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()))
+//						.andIdtipocvsubtipo2EqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo2()))
+//						.andIdinstitucionEqualTo(idInstitucion);
+//
+//				List<CenTiposcvsubtipo2> listCensubtipos2 = cenTiposCVSubtipo2ExtendsMapper
+//						.selectByExample(cenTiposcvsubtipo2Example);
+//
+//				if (null != listCensubtipos2 && listCensubtipos2.size() > 0) {
+//					recordUpdate.setIdinstitucionSubt2(listCensubtipos2.get(0).getIdinstitucion());
+//				} else {
+//					cenTiposcvsubtipo2Example = new CenTiposcvsubtipo2Example();
+//					cenTiposcvsubtipo2Example.createCriteria()
+//							.andIdtipocvEqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()))
+//							.andIdtipocvsubtipo2EqualTo(
+//									Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo2()))
+//							.andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_2000);
+//
+//					listCensubtipos2 = cenTiposCVSubtipo2ExtendsMapper.selectByExample(cenTiposcvsubtipo2Example);
+//
+//					if (null != listCensubtipos2 && listCensubtipos2.size() > 0) {
+//						recordUpdate.setIdinstitucionSubt2(listCensubtipos2.get(0).getIdinstitucion());
+//					}
+//				}
 
 			} else {
 				recordUpdate.setIdtipocvsubtipo2(null);
+				recordUpdate.setIdinstitucionSubt2(null);
+
 			}
 			if (null != fichaDatosCurricularesItem.getCreditos() && "" != fichaDatosCurricularesItem.getCreditos()) {
 				recordUpdate.setCreditos(Long.parseLong(fichaDatosCurricularesItem.getCreditos()));
@@ -399,7 +402,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 				cenTiposcvsubtipo1Example.createCriteria()
 						.andIdtipocvEqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()))
 						.andIdtipocvsubtipo1EqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()))
-						.andIdinstitucionEqualTo(idInstitucion);
+						.andIdinstitucionEqualTo(Short.valueOf(fichaDatosCurricularesItem.getIdInsTipoCvSubtipo1()));
 
 				List<CenTiposcvsubtipo1> listCensubtipos1 = cenTiposCVSubtipo1ExtendsMapper
 						.selectByExample(cenTiposcvsubtipo1Example);
@@ -413,7 +416,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 							.andIdtipocvEqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()))
 							.andIdtipocvsubtipo1EqualTo(
 									Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()))
-							.andIdinstitucionEqualTo(SigaConstants.IDINSTITUCION_2000);
+							.andIdinstitucionEqualTo(Short.valueOf(fichaDatosCurricularesItem.getIdInsTipoCvSubtipo1()));
 
 					listCensubtipos1 = cenTiposCVSubtipo1ExtendsMapper.selectByExample(cenTiposcvsubtipo1Example);
 
@@ -424,6 +427,8 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 
 			} else {
 				recordInsert.setIdtipocvsubtipo1(null);
+				recordInsert.setIdinstitucionSubt1(null);
+
 			}
 			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()
 					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()) {
@@ -433,7 +438,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 				cenTiposcvsubtipo2Example.createCriteria()
 						.andIdtipocvEqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCv()))
 						.andIdtipocvsubtipo2EqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo2()))
-						.andIdinstitucionEqualTo(idInstitucion);
+						.andIdinstitucionEqualTo(Short.parseShort(fichaDatosCurricularesItem.getIdInsTipoCvSubtipo2()));
 
 				List<CenTiposcvsubtipo2> listCensubtipos2 = cenTiposCVSubtipo2ExtendsMapper
 						.selectByExample(cenTiposcvsubtipo2Example);
@@ -457,6 +462,8 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 
 			} else {
 				recordInsert.setIdtipocvsubtipo2(null);
+				recordInsert.setIdinstitucionSubt2(null);
+
 			}
 			if (null != fichaDatosCurricularesItem.getCreditos() && "" != fichaDatosCurricularesItem.getCreditos()) {
 				recordInsert.setCreditos(Long.parseLong(fichaDatosCurricularesItem.getCreditos()));
@@ -567,14 +574,21 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()
 					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo1()) {
 				recordUpdate.setIdtipocvsubtipo1(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo1()));
+				recordUpdate.setIdinstitucionSubt1(Short.parseShort(fichaDatosCurricularesItem.getIdInsTipoCvSubtipo1()));
+
 			} else {
 				recordUpdate.setIdtipocvsubtipo1(null);
+				recordUpdate.setIdinstitucionSubt1(null);
 			}
 			if ("" != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()
 					&& null != fichaDatosCurricularesItem.getIdTipoCvSubtipo2()) {
 				recordUpdate.setIdtipocvsubtipo2(Short.parseShort(fichaDatosCurricularesItem.getIdTipoCvSubtipo2()));
+				recordUpdate.setIdinstitucionSubt2(Short.parseShort(fichaDatosCurricularesItem.getIdInsTipoCvSubtipo2()));
+
 			} else {
 				recordUpdate.setIdtipocvsubtipo2(null);
+				recordUpdate.setIdinstitucionSubt2(null);
+
 			}
 			if (null != fichaDatosCurricularesItem.getDescripcion()
 					&& "" != fichaDatosCurricularesItem.getDescripcion()) {
@@ -598,7 +612,6 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			recordUpdate.setFechaalta(fichaDatosCurricularesItem.getFechaDesdeDate());
 			recordUpdate.setFechafin(fichaDatosCurricularesItem.getFechaHastaDate());
 			recordUpdate.setDescripcion(fichaDatosCurricularesItem.getDescripcion());
-			recordUpdate.setIdinstitucion(idInstitucion);
 			recordUpdate.setIdinstitucion(idInstitucion);
 			recordUpdate.setFechainicio(fichaDatosCurricularesItem.getFechaDesdeDate());
 			recordUpdate.setFechafin(fichaDatosCurricularesItem.getFechaHastaDate());

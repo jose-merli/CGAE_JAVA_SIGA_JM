@@ -39,10 +39,9 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 	@Autowired
 	private AdmUsuariosExtendsMapper _admUsuariosExtendsMapper;
 
-
 	@Autowired
 	private CenPersonaMapper cenPersonaMapper;
-	
+
 	@Autowired
 	private CenSolimodidireccionesExtendsMapper cenSoliModiDireccionesExtendsMapper;
 
@@ -77,26 +76,24 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 				if (letrado.equalsIgnoreCase("S")) {
 					CenPersonaExample example = new CenPersonaExample();
 					example.createCriteria().andNifcifEqualTo(usuario.getNif());
-					List<CenPersona> cenPersona = cenPersonaMapper.selectByExample(example );
-					if (null != cenPersona && cenPersona.size()>0) {
-
+					List<CenPersona> cenPersona = cenPersonaMapper.selectByExample(example);
+					if (null != cenPersona && cenPersona.size() > 0) {
 
 						LOGGER.info(
 								"searchSolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.searchSolModifDatosDirecciones() -> Entrada a cenSoliModiDireccionesExtendsMapper para obtener los resultados de la búsqueda");
 						List<SolModificacionItem> solModificacionItems = cenSoliModiDireccionesExtendsMapper
 								.searchSolModifDatosDirecciones(solicitudModificacionSearchDTO, usuario.getIdlenguaje(),
-										String.valueOf(idInstitucion),cenPersona.get(0).getIdpersona());
+										String.valueOf(idInstitucion), cenPersona.get(0).getIdpersona());
 						solModificacionDTO.setSolModificacionItems(solModificacionItems);
 					}
 
-				}else{
-
+				} else {
 
 					LOGGER.info(
 							"searchSolModifDatosDirecciones() / cenSoliModiDireccionesExtendsMapper.searchSolModifDatosDirecciones() -> Entrada a cenSoliModiDireccionesExtendsMapper para obtener los resultados de la búsqueda");
 					List<SolModificacionItem> solModificacionItems = cenSoliModiDireccionesExtendsMapper
 							.searchSolModifDatosDirecciones(solicitudModificacionSearchDTO, usuario.getIdlenguaje(),
-									String.valueOf(idInstitucion),null);
+									String.valueOf(idInstitucion), null);
 					solModificacionDTO.setSolModificacionItems(solModificacionItems);
 				}
 
@@ -152,41 +149,19 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 			modificacion.setIddireccion(solicitud.getIddireccion());
 			// modificacion.setPreferente(solicitud.getPreferente());
 			modificacion.setCodigopostal(solicitud.getCodigopostal());
-			if (solicitud.getTelefono1() != null) {
-				modificacion.setTelefono1(solicitud.getTelefono1());
-			}
-			// modificacion.setTelefono2(solicitud.getTelefono2());
-			if (solicitud.getDomicilio() != null) {
-				modificacion.setDomicilio(solicitud.getDomicilio());
-			}
-			if (solicitud.getMovil() != null) {
-				modificacion.setMovil(solicitud.getMovil());
-			}
-			if (solicitud.getFax1() != null) {
-				modificacion.setFax1(solicitud.getFax1());
-			}
-			// modificacion.setFax2(solicitud.getFax2());
-			if (solicitud.getCorreoelectronico() != null) {
-				modificacion.setCorreoelectronico(solicitud.getCorreoelectronico());
-			}
-			if (solicitud.getPaginaweb() != null) {
-				modificacion.setPaginaweb(solicitud.getPaginaweb());
-			}
+			modificacion.setTelefono1(solicitud.getTelefono1());
+			modificacion.setDomicilio(solicitud.getDomicilio());
+			modificacion.setMovil(solicitud.getMovil());
+			modificacion.setFax1(solicitud.getFax1());
+			modificacion.setCorreoelectronico(solicitud.getCorreoelectronico());
+			modificacion.setPaginaweb(solicitud.getPaginaweb());
 			modificacion.setIdpais(solicitud.getIdpais());
-			if (solicitud.getIdprovincia() != null) {
-				modificacion.setIdprovincia(solicitud.getIdprovincia());
-			}
-			if (solicitud.getIdpoblacion() != null) {
-				modificacion.setIdpoblacion(solicitud.getIdpoblacion());
-			}
-			if (solicitud.getPoblacionextranjera() != null) {
-				modificacion.setPoblacionextranjera(solicitud.getPoblacionextranjera());
-			}
-			if (solicitud.getOtraprovincia() != null) {
-				modificacion.setOtraprovincia(solicitud.getOtraprovincia());
-			}
+			modificacion.setIdprovincia(solicitud.getIdprovincia());
+			modificacion.setIdpoblacion(solicitud.getIdpoblacion());
+			modificacion.setPoblacionextranjera(solicitud.getPoblacionextranjera());
+			modificacion.setOtraprovincia(solicitud.getOtraprovincia());
 
-			int responseUpdate = cenDireccionesExtendsMapper.updateByPrimaryKeySelective(modificacion);
+			int responseUpdate = cenDireccionesExtendsMapper.updateByPrimaryKey(modificacion);
 
 			if (responseUpdate >= 1) {
 				updateResponseDTO.setStatus(SigaConstants.OK);
@@ -205,7 +180,7 @@ public class SearchSolModifDatosDireccionesServiceImpl implements ISearchSolModi
 				} else {
 					updateResponseDTO.setStatus(SigaConstants.OK);
 				}
-			}else {
+			} else {
 				updateResponseDTO.setStatus(SigaConstants.KO);
 			}
 

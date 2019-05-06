@@ -25,6 +25,8 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 		sql.SELECT("DATOS.IDCV");
 		sql.SELECT("DATOS.IDTIPOCVSUBTIPO1");
 		sql.SELECT("DATOS.IDTIPOCVSUBTIPO2");
+		sql.SELECT("DATOS.IDINSTITUCION_SUBT1");
+		sql.SELECT("DATOS.IDINSTITUCION_SUBT2");
 		sql.SELECT("DATOS.IDINSTITUCION");
 		sql.SELECT("DATOS.IDPERSONA");
 		sql.SELECT("DATOS.CREDITOS");
@@ -107,9 +109,11 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 				sql1.WHERE("IDTIPOCVSUBTIPO1 ='"+ record.getIdtipocvsubtipo1() +"'");
 				sql1.WHERE("IDTIPOCV ='"+ record.getIdtipocv() +"'");
 				sql1.WHERE("ROWNUM = 1");
-				sql.SET("IDINSTITUCION_SUBT1 = ("+sql1 + ")");
+				sql.SET("IDINSTITUCION_SUBT1 = ("+ record.getIdinstitucionSubt1() + ")");
 			}else{
 				sql.SET("IDTIPOCVSUBTIPO1 = "+record.getIdtipocvsubtipo1() + "");
+				sql.SET("IDINSTITUCION_SUBT1 = "+record.getIdinstitucionSubt1() + "");
+
 			}
 			
 			if (record.getIdtipocvsubtipo2() != null) {
@@ -118,9 +122,11 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 				sql2.WHERE("IDTIPOCVSUBTIPO2 ='"+ record.getIdtipocvsubtipo2() +"'");
 				sql2.WHERE("IDTIPOCV ='"+ record.getIdtipocv() +"'");
 				sql2.WHERE("ROWNUM = 1");
-				sql.SET("IDINSTITUCION_SUBT2 = ("+sql2 + ")");
+				sql.SET("IDINSTITUCION_SUBT2 = ("+ record.getIdinstitucionSubt2() + ")");
 			}else{
 				sql.SET("IDTIPOCVSUBTIPO2 = "+ record.getIdtipocvsubtipo2() + "");
+				sql.SET("IDINSTITUCION_SUBT2 = "+record.getIdinstitucionSubt2() + "");
+
 		}
 			
 //				sql.SET("IDTIPOCVSUBTIPO1 = '"+record.getIdtipocvsubtipo1() + "'");

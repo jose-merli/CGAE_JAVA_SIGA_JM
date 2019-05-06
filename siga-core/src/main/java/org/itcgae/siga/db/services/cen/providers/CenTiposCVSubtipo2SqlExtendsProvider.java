@@ -29,7 +29,7 @@ public class CenTiposCVSubtipo2SqlExtendsProvider extends CenTiposcvsubtipo2SqlP
 		if (!UtilidadesString.esCadenaVacia(subtipoCurricularItem.getTipoCategoriaCurricular())) {
 			sql.WHERE("tiposCVSubt2.IDTIPOCV = '" + subtipoCurricularItem.getTipoCategoriaCurricular() + "'");
 		}
-		
+
 		sql.ORDER_BY("tiposCVSubt2.CODIGOEXT ASC");
 
 		return sql.toString();
@@ -43,6 +43,7 @@ public class CenTiposCVSubtipo2SqlExtendsProvider extends CenTiposcvsubtipo2SqlP
 		sql.SELECT("tiposCVSubt2.IDTIPOCVSUBTIPO2 as IDTIPOCVSUBTIPO2");
 		sql.SELECT("tiposCVSubt2.CODIGOEXT as CODIGOEXTERNO");
 		sql.SELECT("catalogos.DESCRIPCION as DESCRIPCION");
+		sql.SELECT("tiposCVSubt2.IDINSTITUCION as IDINSTITUCION");
 
 		sql.FROM("CEN_TIPOSCVSUBTIPO2 tiposCVSubt2");
 
@@ -65,13 +66,15 @@ public class CenTiposCVSubtipo2SqlExtendsProvider extends CenTiposcvsubtipo2SqlP
 		return sql.toString();
 	}
 
-	public String searchCurricularSubtypeCombo(String idTipoCV, String idLenguaje, String idInstitucion) {
+	public String searchCurricularSubtypeCombo(String idTipoCV, boolean historico, String idLenguaje,
+			String idInstitucion) {
 		SQL sql = new SQL();
 
 		sql.SELECT("DISTINCT tiposCVSubt2.IDTIPOCV as IDTIPOCV");
 		sql.SELECT("tiposCVSubt2.IDTIPOCVSUBTIPO2 as IDTIPOCVSUBTIPO2");
 		sql.SELECT("tiposCVSubt2.CODIGOEXT as CODIGOEXTERNO");
 		sql.SELECT("catalogos.DESCRIPCION as DESCRIPCION");
+		sql.SELECT("tiposCVSubt2.IDINSTITUCION as IDINSTITUCION");
 
 		sql.FROM("CEN_TIPOSCVSUBTIPO2 tiposCVSubt2");
 
@@ -79,12 +82,16 @@ public class CenTiposCVSubtipo2SqlExtendsProvider extends CenTiposcvsubtipo2SqlP
 
 		sql.WHERE("tiposCVSubt2.IDINSTITUCION in ('2000', '" + idInstitucion + "')");
 		sql.WHERE("catalogos.IDLENGUAJE = '" + idLenguaje + "'");
-		sql.WHERE("tiposCVSubt2.FECHA_BAJA IS NULL");
+
+		if (!historico) {
+			sql.WHERE("tiposCVSubt2.FECHA_BAJA IS NULL");
+
+		}
 
 		if (idTipoCV != null) {
 			sql.WHERE("tiposCVSubt2.IDTIPOCV= '" + idTipoCV + "'");
 		}
-		
+
 		sql.ORDER_BY("tiposCVSubt2.IDTIPOCVSUBTIPO2");
 
 		return sql.toString();

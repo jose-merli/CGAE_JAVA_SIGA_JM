@@ -29,6 +29,8 @@ public class FichaDatosCurricularesItem {
 	private String motivo;
 	private String certificado;
 	private String isLetrado;
+	private String idInsTipoCvSubtipo1;
+	private String idInsTipoCvSubtipo2;
 	
 	/**
 	 */
@@ -272,17 +274,6 @@ public class FichaDatosCurricularesItem {
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	public FichaDatosCurricularesItem descripcion(String descripcion){
 		this.descripcion = descripcion;
 		return this;
@@ -384,6 +375,33 @@ public class FichaDatosCurricularesItem {
 		this.idTipoCvSubtipo2 = idTipoCvSubtipo2;
 	}
 
+	public FichaDatosCurricularesItem idInsTipoCvSubtipo1(String idInsTipoCvSubtipo1){
+		this.idInsTipoCvSubtipo1 = idInsTipoCvSubtipo1;
+		return this;
+	}
+	
+	@JsonProperty("idInsTipoCvSubtipo1")
+	public String getIdInsTipoCvSubtipo1() {
+		return idInsTipoCvSubtipo1;
+	}
+
+	public void setIdInsTipoCvSubtipo1(String idInsTipoCvSubtipo1) {
+		this.idInsTipoCvSubtipo1 = idInsTipoCvSubtipo1;
+	}
+
+	public FichaDatosCurricularesItem idInsTipoCvSubtipo2(String idInsTipoCvSubtipo2){
+		this.idInsTipoCvSubtipo2 = idInsTipoCvSubtipo2;
+		return this;
+	}
+	
+	@JsonProperty("idInsTipoCvSubtipo2")
+	public String getIdInsTipoCvSubtipo2() {
+		return idInsTipoCvSubtipo2;
+	}
+
+	public void setIdInsTipoCvSubtipo2(String idInsTipoCvSubtipo2) {
+		this.idInsTipoCvSubtipo2 = idInsTipoCvSubtipo2;
+	}
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -406,13 +424,16 @@ public class FichaDatosCurricularesItem {
 	    Objects.equals(this.idTipoCvSubtipo2, fichaDatosCurricularesItem.idTipoCvSubtipo2) &&
 	    Objects.equals(this.idInstitucion, fichaDatosCurricularesItem.idInstitucion)&&
 	    Objects.equals(this.fechaMovimiento, fichaDatosCurricularesItem.fechaMovimiento)&&
-	    Objects.equals(this.certificado, fichaDatosCurricularesItem.certificado);
+	    Objects.equals(this.certificado, fichaDatosCurricularesItem.certificado) &&
+	    Objects.equals(this.idInsTipoCvSubtipo1, fichaDatosCurricularesItem.idInsTipoCvSubtipo1) &&
+	    Objects.equals(this.idInsTipoCvSubtipo2, fichaDatosCurricularesItem.idInsTipoCvSubtipo2);
 
 	}
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(idPersona, fechaBaja, fechaDesde, fechaHasta, descripcion, categoriaCurricular, tipoSubtipo, idTipoCv, idTipoCvSubtipo1, idTipoCvSubtipo2, idInstitucion);
+	    return Objects.hash(idPersona, fechaBaja, fechaDesde, fechaHasta, descripcion, categoriaCurricular,
+	    		tipoSubtipo, idTipoCv, idTipoCvSubtipo1, idTipoCvSubtipo2, idInstitucion, idInsTipoCvSubtipo1, idInsTipoCvSubtipo2);
 	}
 
 	
@@ -431,6 +452,8 @@ public class FichaDatosCurricularesItem {
 	    sb.append("    idTipoCvSubtipo1: ").append(toIndentedString(idTipoCvSubtipo1)).append("\n");
 	    sb.append("    idTipoCvSubtipo2: ").append(toIndentedString(idTipoCvSubtipo2)).append("\n");
 	    sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
+	    sb.append("    idInsTipoCvSubtipo1: ").append(toIndentedString(idInsTipoCvSubtipo1)).append("\n");
+	    sb.append("    idInsTipoCvSubtipo2: ").append(toIndentedString(idInsTipoCvSubtipo2)).append("\n");
 
 
 

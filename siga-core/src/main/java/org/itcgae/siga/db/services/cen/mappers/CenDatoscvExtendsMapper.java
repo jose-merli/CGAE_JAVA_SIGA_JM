@@ -37,6 +37,8 @@ public interface CenDatoscvExtendsMapper extends CenDatoscvMapper {
 		@Result(column = "IDTIPOCV", property = "idTipoCv", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOCVSUBTIPO1", property = "idTipoCvSubtipo1", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDTIPOCVSUBTIPO2", property = "idTipoCvSubtipo2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION_SUBT1", property = "idInsTipoCvSubtipo1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION_SUBT2", property = "idInsTipoCvSubtipo2", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CREDITOS", property = "creditos", jdbcType = JdbcType.VARCHAR)

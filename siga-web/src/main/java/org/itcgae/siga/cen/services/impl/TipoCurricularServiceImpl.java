@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ComboTipoCVItem;
+import org.itcgae.siga.DTOs.cen.ComboTiposCVDTO;
 import org.itcgae.siga.DTOs.cen.TipoCurricularDTO;
 import org.itcgae.siga.DTOs.cen.TipoCurricularItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -456,12 +458,12 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 	}
 	
 	@Override
-	public ComboDTO getCurricularTypeCombo (String idTipoCV, HttpServletRequest request) {
+	public ComboTiposCVDTO getCurricularTypeCombo (String idTipoCV, boolean historico, HttpServletRequest request) {
 		
 		LOGGER.info("getCurricularTypeCombo() -> Entrada al servicio para obtener los tipos curriculares");
 		
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		ComboTiposCVDTO comboDTO = new ComboTiposCVDTO();
+		List<ComboTipoCVItem> comboItems = new ArrayList<ComboTipoCVItem>();
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -483,7 +485,7 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 				LOGGER.info(
 						"getCurricularTypeCombo() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Entrada a cenTiposcvExtendsMapper para obtener los diferentes tipos curriculares");
 				
-				comboItems = cenTiposCVSubtipo1ExtendsMapper.searchCurricularTypeCombo(idTipoCV, usuario.getIdlenguaje(), idInstitucion.toString());
+				comboItems = cenTiposCVSubtipo1ExtendsMapper.searchCurricularTypeCombo(idTipoCV, historico, usuario.getIdlenguaje(), idInstitucion.toString());
 				
 				LOGGER.info(
 						"getCurricularTypeCombo() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Salida de cenTiposcvExtendsMapper para obtener los diferentes tipos curriculares");
@@ -491,7 +493,7 @@ public class TipoCurricularServiceImpl implements ITipoCurricularService {
 			}
 		}
 		
-		comboDTO.setCombooItems(comboItems);
+		comboDTO.setComboTipoCVItem(comboItems);
 		
 		LOGGER.info("getCurricularTypeCombo() -> Salida del servicio para obtener los tipos curriculares");
 		

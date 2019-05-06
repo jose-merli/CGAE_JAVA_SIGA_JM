@@ -155,12 +155,14 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 				if (!UtilidadesString.esCadenaVacia(String.valueOf(solicitud.getIdtipocvsubtipo1()))
 						|| null != solicitud.getIdtipocvsubtipo1()) {
 					recordUpdate.setIdtipocvsubtipo1(solicitud.getIdtipocvsubtipo1());
+					recordUpdate.setIdinstitucionSubt1(solicitud.getIdinstitucionSubt1());
 				} else {
 					recordUpdate.setIdtipocvsubtipo1(null);
 				}
 				if (!UtilidadesString.esCadenaVacia(String.valueOf(solicitud.getIdtipocvsubtipo2()))
 						|| null != solicitud.getIdtipocvsubtipo2()) {
 					recordUpdate.setIdtipocvsubtipo2(solicitud.getIdtipocvsubtipo2());
+					recordUpdate.setIdinstitucionSubt2(solicitud.getIdinstitucionSubt2());
 				} else {
 					recordUpdate.setIdtipocvsubtipo2(null);
 				}
@@ -178,23 +180,23 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 				if (recordUpdate.getFechafin() == null) {
 					CenDatoscvExample example1 = new CenDatoscvExample();
 					Long idPers = solicitud.getIdpersona();
-					example.createCriteria().andIdpersonaEqualTo(idPers).andIdinstitucionEqualTo(idInstitucion)
+					example1.createCriteria().andIdpersonaEqualTo(idPers).andIdinstitucionEqualTo(idInstitucion)
 							.andFechafinIsNull();
 					List<CenDatoscv> datosCurricularesActivos = cenDatoscvExtendsMapper.selectByExample(example1);
 
-					if (datosCurricularesActivos != null && datosCurricularesActivos.size() != 0) {
-						for (CenDatoscv dato : datosCurricularesActivos) {
-							CenDatoscv Actualizar = new CenDatoscv();
-							Actualizar = dato;
-							Actualizar.setFechabaja(new Date());
-							Actualizar.setFechafin(new Date());
-							Actualizar.setFechamodificacion(new Date());
-							Actualizar.setUsumodificacion(usuario.getIdusuario());
-							responseSolicitud = cenDatoscvExtendsMapper.updateByPrimaryKey(Actualizar);
-							// update by primarykey
-						}
-
-					}
+//					if (datosCurricularesActivos != null && datosCurricularesActivos.size() != 0) {
+//						for (CenDatoscv dato : datosCurricularesActivos) {
+//							CenDatoscv Actualizar = new CenDatoscv();
+//							Actualizar = dato;
+//							Actualizar.setFechabaja(new Date());
+//							Actualizar.setFechafin(new Date());
+//							Actualizar.setFechamodificacion(new Date());
+//							Actualizar.setUsumodificacion(usuario.getIdusuario());
+//							responseSolicitud = cenDatoscvExtendsMapper.updateByPrimaryKey(Actualizar);
+//							// update by primarykey
+//						}
+//
+//					}
 
 				}
 				responseSolicitud = cenDatoscvExtendsMapper.updateCurriculo(recordUpdate);
@@ -208,11 +210,14 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 
 				if (solicitud.getIdtipocvsubtipo1().equals("") && null != solicitud.getIdtipocvsubtipo1()) {
 					recordInsert.setIdtipocvsubtipo1(solicitud.getIdtipocvsubtipo1());
+					recordInsert.setIdinstitucionSubt1(solicitud.getIdinstitucionSubt1());
 				} else {
 					recordInsert.setIdtipocvsubtipo1(null);
 				}
 				if (solicitud.getIdtipocvsubtipo2().equals("") && null != solicitud.getIdtipocvsubtipo2()) {
 					recordInsert.setIdtipocvsubtipo2(solicitud.getIdtipocvsubtipo2());
+					recordInsert.setIdinstitucionSubt2(solicitud.getIdinstitucionSubt2());
+
 				} else {
 					recordInsert.setIdtipocvsubtipo2(null);
 				}
@@ -239,18 +244,18 @@ public class SearchSolModifDatosCurricularesServiceImpl implements ISearchSolMod
 							.andFechafinIsNull();
 					List<CenDatoscv> datosCurricularesActivos = cenDatoscvExtendsMapper.selectByExample(example2);
 
-					if (datosCurricularesActivos != null && datosCurricularesActivos.size() != 0) {
-						for (CenDatoscv dato : datosCurricularesActivos) {
-							CenDatoscv Actualizar = new CenDatoscv();
-							Actualizar = dato;
-							Actualizar.setFechabaja(new Date());
-							Actualizar.setFechafin(new Date());
-							Actualizar.setFechamodificacion(new Date());
-							Actualizar.setUsumodificacion(usuario.getIdusuario());
-							responseSolicitud = cenDatoscvExtendsMapper.updateByPrimaryKey(Actualizar);
-						}
-
-					}
+//					if (datosCurricularesActivos != null && datosCurricularesActivos.size() != 0) {
+//						for (CenDatoscv dato : datosCurricularesActivos) {
+//							CenDatoscv Actualizar = new CenDatoscv();
+//							Actualizar = dato;
+//							Actualizar.setFechabaja(new Date());
+//							Actualizar.setFechafin(new Date());
+//							Actualizar.setFechamodificacion(new Date());
+//							Actualizar.setUsumodificacion(usuario.getIdusuario());
+//							responseSolicitud = cenDatoscvExtendsMapper.updateByPrimaryKey(Actualizar);
+//						}
+//
+//					}
 
 				}
 

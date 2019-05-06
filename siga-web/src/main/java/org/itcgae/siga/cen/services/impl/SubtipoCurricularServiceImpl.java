@@ -10,10 +10,10 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ComboSubtipoCVItem;
+import org.itcgae.siga.DTOs.cen.ComboSubtiposCVDTO;
 import org.itcgae.siga.DTOs.cen.SubtipoCurricularDTO;
 import org.itcgae.siga.DTOs.cen.SubtipoCurricularItem;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ISubtipoCurricularService;
 import org.itcgae.siga.commons.constants.SigaConstants;
@@ -415,12 +415,12 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 	}
 	
 	@Override
-	public ComboDTO getCurricularSubtypeCombo (String idTipoCV, HttpServletRequest request) {
+	public ComboSubtiposCVDTO getCurricularSubtypeCombo (String idTipoCV, boolean historico, HttpServletRequest request) {
 		
 		LOGGER.info("getCurricularSubtypeCombo() -> Entrada al servicio para obtener los tipos curriculares");
 		
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		ComboSubtiposCVDTO comboDTO = new ComboSubtiposCVDTO();
+		List<ComboSubtipoCVItem> comboItems = new ArrayList<ComboSubtipoCVItem>();
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -445,7 +445,7 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 				LOGGER.info(
 						"getCurricularSubtypeCombo() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Entrada a cenTiposcvExtendsMapper para obtener los diferentes tipos curriculares");
 				
-				comboItems = cenTiposCVSubtipo2ExtendsMapper.searchCurricularSubtypeCombo(idTipoCV, usuario.getIdlenguaje(), idInstitucion.toString());
+				comboItems = cenTiposCVSubtipo2ExtendsMapper.searchCurricularSubtypeCombo(idTipoCV, historico, usuario.getIdlenguaje(), idInstitucion.toString());
 				
 				LOGGER.info(
 						"getCurricularSubtypeCombo() / cenTiposcvExtendsMapper.selectCategoriaCV() -> Salida de cenTiposcvExtendsMapper para obtener los diferentes tipos curriculares");
@@ -453,7 +453,7 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 			}
 		}
 		
-		comboDTO.setCombooItems(comboItems);
+		comboDTO.setComboSubtipoCVItem(comboItems);
 		
 		LOGGER.info("getCurricularSubtypeCombo() -> Salida del servicio para obtener los tipos curriculares");
 		

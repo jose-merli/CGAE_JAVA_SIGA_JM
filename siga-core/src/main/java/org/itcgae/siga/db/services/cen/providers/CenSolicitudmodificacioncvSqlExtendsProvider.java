@@ -117,9 +117,10 @@ public class CenSolicitudmodificacioncvSqlExtendsProvider extends CenSolicitudmo
 				sql1.WHERE("IDTIPOCVSUBTIPO1 ='"+ record.getIdtipocvsubtipo1() +"'");
 				sql1.WHERE("IDTIPOCV ='"+ record.getIdtipocv() +"'");
 				sql1.WHERE("ROWNUM = 1");
-				sql.VALUES("IDINSTITUCION_SUBT1 ","("+sql1 + ")");
+				sql.VALUES("IDINSTITUCION_SUBT1 ","("+ record.getIdinstitucionSubt1() + ")");
 			}else{
 				sql.SET("IDTIPOCVSUBTIPO1 = "+record.getIdtipocvsubtipo1() + "");
+				sql.SET("IDINSTITUCION_SUBT1 = "+record.getIdinstitucionSubt1() + "");
 			}
 			
 			if (record.getIdtipocvsubtipo2() != null) {
@@ -128,9 +129,12 @@ public class CenSolicitudmodificacioncvSqlExtendsProvider extends CenSolicitudmo
 				sql2.WHERE("IDTIPOCVSUBTIPO2 ='"+ record.getIdtipocvsubtipo2() +"'");
 				sql2.WHERE("IDTIPOCV ='"+ record.getIdtipocv() +"'");
 				sql2.WHERE("ROWNUM = 1");
-				sql.VALUES("IDINSTITUCION_SUBT2 "," ("+sql2 + ")");
+				sql.VALUES("IDINSTITUCION_SUBT2 "," ("+ record.getIdinstitucionSubt2() + ")");
+				
 			}else{
 				sql.VALUES("IDTIPOCVSUBTIPO2 "," "+ record.getIdtipocvsubtipo2() + "");
+				sql.SET("IDINSTITUCION_SUBT2 = "+record.getIdinstitucionSubt2() + "");
+
 		}
 			sql.VALUES("IDINSTITUCION ","'"+record.getIdinstitucion()+"'");
 			sql.VALUES("IDPERSONA "," '" + record.getIdpersona() +"'");

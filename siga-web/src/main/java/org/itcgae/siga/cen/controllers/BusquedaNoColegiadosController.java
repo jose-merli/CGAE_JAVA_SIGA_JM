@@ -3,6 +3,8 @@ package org.itcgae.siga.cen.controllers;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
+import org.itcgae.siga.DTOs.cen.ComboSubtiposCVDTO;
+import org.itcgae.siga.DTOs.cen.ComboTiposCVDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -105,14 +107,14 @@ public class BusquedaNoColegiadosController {
 	}
 	
 	@RequestMapping(value = "busquedaNoColegiados/getCurricularTypeCombo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getCurricularTypeCombo(@RequestParam("idTipoCV") String idTipoCV, HttpServletRequest request) { 
-		ComboDTO response = tipoCurricularService.getCurricularTypeCombo(idTipoCV, request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	ResponseEntity<ComboTiposCVDTO> getCurricularTypeCombo(@RequestParam("idTipoCV") String idTipoCV, HttpServletRequest request) { 
+		ComboTiposCVDTO response = tipoCurricularService.getCurricularTypeCombo(idTipoCV, false, request);
+		return new ResponseEntity<ComboTiposCVDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "busquedaNoColegiados/getCurricularSubtypeCombo", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getCurricularSubtypeCombo(@RequestParam("idTipoCV") String idTipoCV, HttpServletRequest request) { 
-		ComboDTO response = subtipoCurricularService.getCurricularSubtypeCombo(idTipoCV, request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	ResponseEntity<ComboSubtiposCVDTO> getCurricularSubtypeCombo(@RequestParam("idTipoCV") String idTipoCV, HttpServletRequest request) { 
+		ComboSubtiposCVDTO response = subtipoCurricularService.getCurricularSubtypeCombo(idTipoCV, false, request);
+		return new ResponseEntity<ComboSubtiposCVDTO>(response, HttpStatus.OK);
 	}
 }
