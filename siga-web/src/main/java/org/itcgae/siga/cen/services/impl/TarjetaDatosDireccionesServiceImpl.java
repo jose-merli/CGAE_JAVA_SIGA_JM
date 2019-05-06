@@ -467,8 +467,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_GUARDIA)
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_GUIAJUDICIAL)
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_TRASPASO)
-							|| datosDireccionesItem.getIdTipoDireccion()[i]
-									.equals(SigaConstants.TIPO_DIR_FACTURACION)) {
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_FACTURACION)) {
 						rdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					}
@@ -489,7 +488,8 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					if (datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_REVISTA)
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_RESIDENCIA)
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_DESPACHO)
-							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_PUBLICA)) {
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_PUBLICA)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_FORMACION)) {
 						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					}
 				}
@@ -931,7 +931,8 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 					if (datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_REVISTA)
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_RESIDENCIA)
 							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_DESPACHO)
-							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_PUBLICA)) {
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_PUBLICA)
+							|| datosDireccionesItem.getIdTipoDireccion()[i].equals(SigaConstants.TIPO_DIR_FORMACION)) {
 						allRdo.add(datosDireccionesItem.getIdTipoDireccion()[i]);
 					}
 				}

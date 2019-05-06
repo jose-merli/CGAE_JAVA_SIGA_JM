@@ -2,6 +2,7 @@ package org.itcgae.siga.db.services.com.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 
 public class EnvPlantillaEnviosExtendsSqlProvider {
 	
@@ -106,6 +107,27 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 		return sql.toString();
 	}
 	
-	
+	public String selectPlantillaIdPlantilla(Short idInstitucion,  PlantillaEnvioSearchItem filtros,String idPlantilla){
+		SQL sql = new SQL();
+		
+		sql.SELECT("PLANTILLA.idPlantillaEnvios, PLANTILLA.idTipoEnvios, PLANTILLA.nombre, PLANTILLA.idInstitucion, PLANTILLA.acuseRecibo,PLANTILLA.fechaBaja, PLANTILLA.asunto, PLANTILLA.cuerpo");
+		sql.SELECT("PLANTILLA.idDireccion, PLANTILLA.idPersona, PLANTILLA.DESCRIPCION");
+		sql.FROM("ENV_PLANTILLASENVIOS PLANTILLA");
+		sql.WHERE("PLANTILLA.FECHABAJA is null");
+		sql.WHERE("PLANTILLA.IDINSTITUCION = '"+ idInstitucion +"'");
+		
+
+		if(filtros.getIdTipoEnvios() != null && !filtros.getIdTipoEnvios().trim().equals("")){
+			sql.WHERE("IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() +"'");
+		}
+		if(filtros.getNombre() != null && !filtros.getNombre().trim().equals("") ){
+			sql.WHERE(filtroTextoBusquedas("NOMBRE", filtros.getNombre()));
+		}
+		if(!UtilidadesString.esCadenaVacia(idPlantilla)){
+			sql.WHERE("idPlantillaEnvios = '" + idPlantilla +"'");
+		}
+		
+		return sql.toString();
+	}
 
 }

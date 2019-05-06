@@ -139,6 +139,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Autowired
 	private ForCursoExtendsMapper forCursoExtendsMapper;
+	
+	@Autowired
+	private ForEventoCursoMapper forEventoCursoMapper;
+
+	@Autowired
+	private AgeEventoExtendsMapper ageEventoExtendsMapper;
 
 	@Autowired
 	private ForPersonacursoExtendsMapper forPersonacursoExtendsMapper;
@@ -157,12 +163,6 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Autowired
 	private CenClienteMapper cenClienteMapper;
-
-	@Autowired
-	private ForEventoCursoMapper forEventoCursoMapper;
-
-	@Autowired
-	private AgeEventoExtendsMapper ageEventoExtendsMapper;
 
 	@Autowired
 	private AgeNotificacioneseventoExtendsMapper ageNotificacioneseventoExtendsMapper;
@@ -3978,7 +3978,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				if (cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getNumeroLineasTotales()
 						.equals(cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0)
 								.getInscripcionesCorrectas())) {
-					path += File.separator
+					path += File.separator + idInstitucion + "_"
 							+ cargaMasivaInscripcionesDTO.getCargaMasivaInscripcionesItem().get(0).getIdFichero() + "."
 							+ SigaConstants.tipoExcelXls;
 				} else {

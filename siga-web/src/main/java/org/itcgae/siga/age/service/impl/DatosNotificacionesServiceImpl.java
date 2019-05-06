@@ -16,6 +16,7 @@ import org.itcgae.siga.DTOs.age.ComboPlantillasDTO;
 import org.itcgae.siga.DTOs.age.ComboPlantillasItem;
 import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
+import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -28,7 +29,18 @@ import org.itcgae.siga.db.entities.AgeGeneracionnotificaciones;
 import org.itcgae.siga.db.entities.AgeGeneracionnotificacionesExample;
 import org.itcgae.siga.db.entities.AgeNotificacionesevento;
 import org.itcgae.siga.db.entities.AgeNotificacioneseventoExample;
+import org.itcgae.siga.db.entities.CenInstitucion;
+import org.itcgae.siga.db.entities.EnvDestinatarios;
+import org.itcgae.siga.db.entities.EnvEnvioprogramado;
+import org.itcgae.siga.db.entities.EnvEnvioprogramadoKey;
+import org.itcgae.siga.db.entities.EnvEnvios;
+import org.itcgae.siga.db.entities.EnvEnviosKey;
+import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
+import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.mappers.AgeGeneracionnotificacionesMapper;
+import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
+import org.itcgae.siga.db.mappers.EnvEnviosMapper;
+import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeEventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeNotificacioneseventoExtendsMapper;
@@ -37,6 +49,7 @@ import org.itcgae.siga.db.services.age.mappers.AgeTiponotificacioneventoExtendsM
 import org.itcgae.siga.db.services.age.mappers.AgeUnidadmedidaExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.EnvPlantillasenviosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.EnvTipoenviosExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,6 +86,15 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 	@Autowired
 	private AgeEventoExtendsMapper ageEventoExtendsMapper;
+	
+	@Autowired
+	private EnvEnviosMapper _envEnviosMapper;
+
+	@Autowired
+	private EnvEnvioprogramadoMapper _envEnvioprogramadoMapper;
+
+	@Autowired
+	private EnvHistoricoestadoenvioMapper _envHistoricoestadoenvioMapper;
 
 	@Override
 	public ComboDTO getTypeNotifications(HttpServletRequest request) {
@@ -268,6 +290,10 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 					Date fechaGeneracionNotificacion = generateNotificationDate(ageNotificacionEventoInsert);
 					ageGeneracionnotificaciones.setFechageneracionnotificacion(fechaGeneracionNotificacion);
 
+					//Generamos el envío programado
+					
+//					Long idEnvio = generarEnvioProgramado(notificacionEventoItem,fechaGeneracionNotificacion);
+//					ageGeneracionnotificaciones.setIdenvio(idEnvio);
 					LOGGER.info(
 							"saveNotification() / ageGeneracionnotificacionesMapper.insert(ageGeneracionnotificaciones) -> Entrada a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
 
@@ -291,6 +317,63 @@ public class DatosNotificacionesServiceImpl implements IDatosNotificacionesServi
 
 		insertResponseDTO.setError(error);
 		return insertResponseDTO;
+	}
+
+	private Long generarEnvioProgramado(NotificacionEventoItem notificacionEventoItem, Date fechaGeneracionNotificacion) {
+		
+		// Insertamos nuevo envio
+		EnvEnvios envio = new EnvEnvios();
+		envio.setIdinstitucion(notificacionEventoItem.getIdInstitucion());
+		envio.setDescripcion("TMP");
+		envio.setFecha(new Date());
+		envio.setGenerardocumento("N");
+		envio.setImprimiretiquetas("N");
+		envio.setIdplantillaenvios(Integer.parseInt(notificacionEventoItem.getIdPlantilla().toString()));
+		
+		Short estadoNuevo = 4;
+		envio.setIdestado(estadoNuevo);
+		envio.setIdtipoenvios(Short.parseShort(notificacionEventoItem.getIdTipoEnvio()));
+		envio.setFechamodificacion(new Date());
+		envio.setUsumodificacion(Integer.parseInt(notificacionEventoItem.getUsuModificacion().toString()));
+		envio.setEnvio("A");
+		envio.setFechaprogramada(fechaGeneracionNotificacion);
+		//envio.setIdmodelocomunicacion(modeloEnvio.getIdModeloComunicacion());
+		int insert = _envEnviosMapper.insert(envio);
+		
+		// Actualizamos el envio para ponerle la descripcion
+//		CenInstitucion institucion = _cenInstitucion.selectByPrimaryKey(idInstitucion);
+//		ModModelocomunicacion modelo =  _modModeloComunicacionMapper.selectByPrimaryKey(modeloEnvio.getIdModeloComunicacion());
+//		String descripcion = envio.getIdenvio() + "--" + modelo.getNombre();
+//		envio.setDescripcion(descripcion);
+//		_envEnviosMapper.updateByPrimaryKey(envio);					
+		
+		if(insert >0){						
+			
+			EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
+			historico.setIdenvio(envio.getIdenvio());
+			historico.setIdinstitucion(notificacionEventoItem.getIdInstitucion());
+			historico.setFechamodificacion(new Date());
+			historico.setFechaestado(new Date());
+			historico.setUsumodificacion(Integer.parseInt(notificacionEventoItem.getUsuModificacion().toString()));
+			Short idEstado = 4;
+			historico.setIdestado(idEstado);
+			_envHistoricoestadoenvioMapper.insert(historico);
+			
+			//Insertamos el envio programado
+			EnvEnvioprogramado envioProgramado = new EnvEnvioprogramado();
+			envioProgramado.setIdenvio(envio.getIdenvio());
+			envioProgramado.setIdinstitucion(notificacionEventoItem.getIdInstitucion());
+			envioProgramado.setEstado("0");
+			envioProgramado.setIdplantillaenvios(envio.getIdplantillaenvios());
+			envioProgramado.setIdtipoenvios(envio.getIdtipoenvios());
+			envioProgramado.setNombre(envio.getDescripcion());
+			envioProgramado.setFechaprogramada(envio.getFechaprogramada());
+			envioProgramado.setFechamodificacion(new Date());
+			envioProgramado.setUsumodificacion(Integer.parseInt(notificacionEventoItem.getUsuModificacion().toString()));								
+			_envEnvioprogramadoMapper.insert(envioProgramado);
+			
+		}
+		return envio.getIdenvio();
 	}
 
 	@Override

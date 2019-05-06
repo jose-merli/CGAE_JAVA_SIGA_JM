@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.db.entities.EnvDestinatarios;
 import org.itcgae.siga.db.mappers.AgeNotificacioneseventoMapper;
 import org.itcgae.siga.db.services.age.providers.AgeNotificacioneseventoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -101,4 +103,80 @@ public interface AgeNotificacioneseventoExtendsMapper extends AgeNotificacionese
 		
 	})
 	List<NotificacionEventoItem> getHistoricEventNotifications(String idEvento, String idInstitucion, String idLenguaje);
+
+	@SelectProvider(type = AgeNotificacioneseventoSqlExtendsProvider.class, method = "selectDestinatariosInscripcion")
+	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
+		@Result(column = "IDENVIO", property = "idenvio", jdbcType = JdbcType.DECIMAL, id = true),
+		@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.DECIMAL, id = true),
+		@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
+		@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "DOMICILIO", property = "domicilio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGOPOSTAL", property = "codigopostal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FAX1", property = "fax1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FAX2", property = "fax2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CORREOELECTRONICO", property = "correoelectronico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPAIS", property = "idpais", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPROVINCIA", property = "idprovincia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPOBLACION", property = "idpoblacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIFCIF", property = "nifcif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "POBLACIONEXTRANJERA", property = "poblacionextranjera", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPODESTINATARIO", property = "tipodestinatario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ORIGENDESTINATARIO", property = "origendestinatario", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "IDESTADO", property = "idestado", jdbcType = JdbcType.DECIMAL) })
+	List<EnvDestinatarios> selectDestinatariosInscripcion(Long idcurso, Short idInstitucion, String idEnvio, String usumodificacion );
+	
+	@SelectProvider(type = AgeNotificacioneseventoSqlExtendsProvider.class, method = "selectDestinatariosCurso")
+	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
+		@Result(column = "IDENVIO", property = "idenvio", jdbcType = JdbcType.DECIMAL, id = true),
+		@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.DECIMAL, id = true),
+		@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
+		@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "DOMICILIO", property = "domicilio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGOPOSTAL", property = "codigopostal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FAX1", property = "fax1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FAX2", property = "fax2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CORREOELECTRONICO", property = "correoelectronico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPAIS", property = "idpais", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPROVINCIA", property = "idprovincia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPOBLACION", property = "idpoblacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIFCIF", property = "nifcif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "POBLACIONEXTRANJERA", property = "poblacionextranjera", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPODESTINATARIO", property = "tipodestinatario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ORIGENDESTINATARIO", property = "origendestinatario", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "IDESTADO", property = "idestado", jdbcType = JdbcType.DECIMAL) })
+	List<EnvDestinatarios> selectDestinatariosCurso(Long idcurso, Short idInstitucion, String idEnvio, String usumodificacion);
+	
+	@SelectProvider(type = AgeNotificacioneseventoSqlExtendsProvider.class, method = "selectDestinatariosSesion")
+	@Results({ @Result(column = "IDINSTITUCION", property = "idinstitucion", jdbcType = JdbcType.DECIMAL, id = true),
+		@Result(column = "IDENVIO", property = "idenvio", jdbcType = JdbcType.DECIMAL, id = true),
+		@Result(column = "IDPERSONA", property = "idpersona", jdbcType = JdbcType.DECIMAL, id = true),
+		@Result(column = "FECHAMODIFICACION", property = "fechamodificacion", jdbcType = JdbcType.TIMESTAMP),
+		@Result(column = "USUMODIFICACION", property = "usumodificacion", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "DOMICILIO", property = "domicilio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGOPOSTAL", property = "codigopostal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FAX1", property = "fax1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FAX2", property = "fax2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CORREOELECTRONICO", property = "correoelectronico", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPAIS", property = "idpais", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPROVINCIA", property = "idprovincia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPOBLACION", property = "idpoblacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellidos1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellidos2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NIFCIF", property = "nifcif", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "POBLACIONEXTRANJERA", property = "poblacionextranjera", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "MOVIL", property = "movil", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPODESTINATARIO", property = "tipodestinatario", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "ORIGENDESTINATARIO", property = "origendestinatario", jdbcType = JdbcType.DECIMAL),
+		@Result(column = "IDESTADO", property = "idestado", jdbcType = JdbcType.DECIMAL) })
+	List<EnvDestinatarios> selectDestinatariosSesion(Long idevento,Long idcurso,Short idInstitucion, String idEnvio, String usumodificacion);
 }
+
