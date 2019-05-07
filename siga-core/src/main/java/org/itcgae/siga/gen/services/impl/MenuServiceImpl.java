@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -752,6 +753,10 @@ public class MenuServiceImpl implements IMenuService {
 		String organizationName = null;
 		String organizationNameNuevo = null;
 		X509Certificate cert = null;
+		
+		if (certs == null) {
+			LOGGER.error("No se está recibiendo el certificado desde el apache. Revisa que tengas el apache activo y el check de la consola de weblogic para recibir el certificado");
+		}
 		try {
 			cert = certs[0];
 			X500Name x500name = new JcaX509CertificateHolder(cert).getSubject();
