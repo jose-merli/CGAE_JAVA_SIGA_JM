@@ -54,6 +54,7 @@ import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
+import org.itcgae.siga.db.entities.EnvCamposenvios;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
 import org.itcgae.siga.db.entities.EnvDestinatarios;
@@ -76,6 +77,7 @@ import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
 import org.itcgae.siga.db.mappers.CenInstitucionMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
+import org.itcgae.siga.db.mappers.EnvCamposenviosMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
 import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
 import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
@@ -184,6 +186,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	@Autowired
 	private EnvHistoricoestadoenvioMapper _envHistoricoestadoenvioMapper;
 	
+	@Autowired
+	private EnvCamposenviosMapper _envCamposenviosMapper;
+
 	@Autowired
 	private CenInstitucionMapper _cenInstitucion;
 	
@@ -1577,6 +1582,30 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								envioProgramado.setFechamodificacion(new Date());
 								envioProgramado.setUsumodificacion(usuario.getIdusuario());								
 								_envEnvioprogramadoMapper.insert(envioProgramado);
+								
+								
+								//Insertamos el nuevo asunto y cuerpo del envio
+								EnvCamposenvios envCamposEnvio = new EnvCamposenvios();
+								envCamposEnvio.setFechamodificacion(new Date());
+								envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
+								envCamposEnvio.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
+								envCamposEnvio.setIdenvio(envio.getIdenvio());
+								envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
+								envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
+//								envCamposEnvio.setValor(datosTarjeta.getAsunto());							
+								
+								_envCamposenviosMapper.insert(envCamposEnvio);
+								
+								envCamposEnvio = new EnvCamposenvios();
+								envCamposEnvio.setFechamodificacion(new Date());
+								envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
+								envCamposEnvio.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));
+								envCamposEnvio.setIdenvio(envio.getIdenvio());
+								envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
+								envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
+//								envCamposEnvio.setValor(datosTarjeta.getCuerpo());	
+								
+								_envCamposenviosMapper.insert(envCamposEnvio);
 								
 								if (null != listaConsultasEnvio.getDestinatario().getIdPersona()) {
 									//INSERTAMOS  DESTINATARIO

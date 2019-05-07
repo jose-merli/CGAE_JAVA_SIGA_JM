@@ -213,7 +213,7 @@ public class SigaConstants {
 	public static final int TIPO_DIRECCION_FACTURACION  = 8;
 	public static final int TIPO_DIRECCION_TRASPASO_OJ  = 9;
 	public static final int TIPO_DIRECCION_PUBLICA		= 4;
-	
+	public static final int TIPO_DIRECCION_FORMACION    = 14;
 	
 	// Estados colegiales
 	public static final int ESTADO_COLEGIAL_SINEJERCER 		= 10;
@@ -796,6 +796,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String  TIPO_DIR_PREFERENTE_CORREO = "11";
 	public static final String  TIPO_DIR_PREFERENTE_SMS = "12";
 	public static final String  TIPO_DIR_PREFERENTE_FAX = "13";
+	public static final String  TIPO_DIR_FORMACION = "14";
 	
 	public static final String  DIR_PREFERENTE_EMAIL = "E";
 	public static final String  DIR_PREFERENTE_CORREO = "C";

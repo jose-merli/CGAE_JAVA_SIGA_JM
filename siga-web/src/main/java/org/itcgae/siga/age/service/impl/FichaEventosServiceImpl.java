@@ -28,6 +28,11 @@ import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.age.FestivosItem;
 import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
+import org.itcgae.siga.DTOs.com.DestinatarioItem;
+import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
+import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
+import org.itcgae.siga.DTOs.com.RemitenteDTO;
 import org.itcgae.siga.DTOs.form.AgePersonaEventoDTO;
 import org.itcgae.siga.DTOs.form.AgePersonaEventoItem;
 import org.itcgae.siga.DTOs.form.CursoItem;
@@ -39,8 +44,10 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.FestivosDTO;
 import org.itcgae.siga.DTOs.gen.ListOfResult;
 import org.itcgae.siga.age.service.IFichaEventosService;
+import org.itcgae.siga.com.services.impl.EnviosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AgeAsistenciaEvento;
@@ -57,6 +64,8 @@ import org.itcgae.siga.db.entities.AgeNotificacioneseventoExample;
 import org.itcgae.siga.db.entities.AgePersonaEvento;
 import org.itcgae.siga.db.entities.AgePersonaEventoExample;
 import org.itcgae.siga.db.entities.AgeRepeticionevento;
+import org.itcgae.siga.db.entities.CenDirecciones;
+import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenInstitucionExample;
 import org.itcgae.siga.db.entities.CenPartidojudicial;
@@ -64,6 +73,14 @@ import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenPoblaciones;
 import org.itcgae.siga.db.entities.CenPoblacionesExample;
+import org.itcgae.siga.db.entities.EnvDestinatarios;
+import org.itcgae.siga.db.entities.EnvEnvioprogramado;
+import org.itcgae.siga.db.entities.EnvEnvioprogramadoKey;
+import org.itcgae.siga.db.entities.EnvEnvios;
+import org.itcgae.siga.db.entities.EnvEnviosKey;
+import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
+import org.itcgae.siga.db.entities.EnvPlantillasenvios;
+import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.entities.ForCursoExample;
 import org.itcgae.siga.db.entities.ForEventoCurso;
@@ -74,6 +91,13 @@ import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioExample;
 import org.itcgae.siga.db.mappers.AgeGeneracionnotificacionesMapper;
 import org.itcgae.siga.db.mappers.AgePersonaEventoMapper;
+import org.itcgae.siga.db.mappers.CenDireccionesMapper;
+import org.itcgae.siga.db.mappers.CenPersonaMapper;
+import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
+import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
+import org.itcgae.siga.db.mappers.EnvEnviosMapper;
+import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
+import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.ForEventoCursoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenPartidojudicialExtendsMapper;
@@ -88,9 +112,11 @@ import org.itcgae.siga.db.services.age.mappers.AgeNotificacioneseventoExtendsMap
 import org.itcgae.siga.db.services.age.mappers.AgeRepeticionEventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeTipoeventosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.CenInfluenciaExtendsMapper;
+import org.itcgae.siga.db.services.age.mappers.EnvPlantillasenviosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPoblacionesExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForCursoExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForInscripcionExtendsMapper;
 import org.itcgae.siga.db.services.form.mappers.ForPersonacursoExtendsMapper;
@@ -122,6 +148,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
+	@Autowired
+	private EnviosServiceImpl envioService;
+	
 	@Autowired
 	private AgeEventoExtendsMapper ageEventoExtendsMapper;
 
@@ -178,12 +207,34 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 	@Autowired
 	private ForInscripcionExtendsMapper forInscripcionExtendsMapper;
+	
+	@Autowired
+	private EnvPlantillaEnviosExtendsMapper plantillaEnvioMapper;
 
 	@Value("${url.rapis}")
 	private String urlRapis;
 
 	@Autowired
 	private CenInfluenciaExtendsMapper cenInfluenciaExtendsMapper;
+
+	@Autowired
+	private EnvEnviosMapper _envEnviosMapper;
+
+	@Autowired
+	private EnvEnvioprogramadoMapper _envEnvioprogramadoMapper;
+
+	@Autowired
+	private EnvHistoricoestadoenvioMapper _envHistoricoestadoenvioMapper;
+	
+	@Autowired
+	private EnvDestinatariosMapper _envDestinatariosMapper;
+	
+	@Autowired
+	private CenDireccionesMapper cenDireccionesMapper;
+	
+	@Autowired
+	private CenPersonaMapper cenPersonaMapper;
+
 
 	@Override
 	@Transactional
@@ -736,7 +787,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 					Date fechaGeneracionNotificacion = generateNotificationDate(noti, eventoItem);
 					ageGeneracionnotificaciones.setFechageneracionnotificacion(fechaGeneracionNotificacion);
-
+					//Long idEnvio = generarEnvioProgramado(noti,fechaGeneracionNotificacion);
+					//ageGeneracionnotificaciones.setIdenvio(idEnvio);
+					
 					LOGGER.info(
 							"saveNotification() / ageGeneracionnotificacionesMapper.insert(ageGeneracionnotificaciones) -> Entrada a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
 
@@ -1645,7 +1698,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 												.setUsumodificacion(usuario.getIdusuario().longValue());
 										ageGeneracionnotificacion.setFechamodificacion(new Date());
 										ageGeneracionnotificacion.setFechabaja(new Date());
-
+										
 										LOGGER.info(
 												"saveNotification() / ageGeneracionnotificacionesMapper.insert(ageGeneracionnotificaciones) -> Entrada a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
 
@@ -2310,19 +2363,268 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 				if (notification != null) {
 
 					Long idPlantilla = notification.getIdplantilla();
-					Long idTipoEnvios = notification.getIdtipoenvios();
+					
 
+					List<PlantillaEnvioItem> plantilla = plantillaEnvioMapper.selectPlantillaIdPlantilla(notification.getIdinstitucion(),new PlantillaEnvioSearchItem(),idPlantilla.toString() );
+					if (plantilla != null && plantilla.size() >0) {
+						
+						
+						Long idTipoEnvios = notification.getIdtipoenvios();
+						//Obtenemos los datos del curso a partir del evento
+						ForEventoCursoExample exampleEventoCurso = new ForEventoCursoExample();
+						exampleEventoCurso.createCriteria().andIdeventoEqualTo(notification.getIdevento());
+						List<ForEventoCurso> eventoCurso =forEventoCursoMapper.selectByExample(exampleEventoCurso );
+						List<EnvDestinatarios> destinatarios = new ArrayList<EnvDestinatarios>();
+						
+						if ((null != plantilla.get(0).getIdDireccion()) && (null != plantilla.get(0).getIdPersona())) {
+							
+						
+						CenDireccionesKey direccionesKey = new CenDireccionesKey();
+						direccionesKey.setIddireccion(Long.valueOf(plantilla.get(0).getIdDireccion()));
+						direccionesKey.setIdinstitucion(eventoCurso.get(0).getIdinstitucion());
+						direccionesKey.setIdpersona(Long.valueOf(plantilla.get(0).getIdPersona()));
+						
+						//Obtenemos el remitente de la plantilla
+						CenDirecciones remitente = cenDireccionesMapper.selectByPrimaryKey(direccionesKey);
+						
+						CenPersona persona = cenPersonaMapper.selectByPrimaryKey(remitente.getIdpersona());
+						RemitenteDTO remitenteMail = persona2remitente(remitente,plantilla.get(0),persona);
+						
+						
+						if (null != eventoCurso && eventoCurso.size()>0) {
+							 
+
+							Long idEnvio = generarEnvio(notification);
+							EnvEnviosKey keyEnvio = new EnvEnviosKey();
+							keyEnvio.setIdenvio(idEnvio);
+							keyEnvio.setIdinstitucion(eventoCurso.get(0).getIdinstitucion());
+							EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio );
+							
+							if (notification.getIdtiponotificacionevento().equals(SigaConstants.TIPO_NOTIFICACION_INICIOINSCRIPCION) || notification.getIdtiponotificacionevento().equals(SigaConstants.TIPO_NOTIFICACION_FININSCRIPCION)) {
+								//OBTENEMOS LOS DESTINATARIOS
+								destinatarios = ageNotificacioneseventoExtendsMapper.selectDestinatariosInscripcion(eventoCurso.get(0).getIdcurso(), eventoCurso.get(0).getIdinstitucion(), idEnvio.toString(), "1");
+								
+								
+							}else if (notification.getIdtiponotificacionevento().equals(SigaConstants.TIPO_NOTIFICACION_FININSCRIPCION)) {
+								//OBTENEMOS LOS DESTINATARIOS
+								destinatarios = ageNotificacioneseventoExtendsMapper.selectDestinatariosCurso(eventoCurso.get(0).getIdcurso(), eventoCurso.get(0).getIdinstitucion(), idEnvio.toString(), "1");
+								
+							}else if (notification.getIdtiponotificacionevento().equals(SigaConstants.TIPO_NOTIFICACION_SESION)) {
+								//OBTENEMOS LOS DESTINATARIOS
+								destinatarios = ageNotificacioneseventoExtendsMapper.selectDestinatariosSesion(eventoCurso.get(0).getIdevento(), eventoCurso.get(0).getIdcurso(),eventoCurso.get(0).getIdinstitucion(), idEnvio.toString(), "1");
+								
+							}
+							if (null != destinatarios && destinatarios.size()>0) {
+								List<String> destinatariosMoviles = new ArrayList<String>();
+								List<DestinatarioItem> destinatariosMail = new ArrayList<DestinatarioItem>();
+								//Insertamos los destinatarios del envío
+								for (Iterator iterator = destinatarios.iterator(); iterator.hasNext();) {
+									EnvDestinatarios envDestinatarios = (EnvDestinatarios) iterator.next();
+									_envDestinatariosMapper.insert(envDestinatarios);
+									//Preparamos destinatarios para SMS
+									if (!UtilidadesString.esCadenaVacia(envDestinatarios.getMovil())) {
+										destinatariosMoviles.add(envDestinatarios.getMovil());
+									}
+									if (!UtilidadesString.esCadenaVacia(envDestinatarios.getCorreoelectronico())) {
+										DestinatarioItem destItem = new DestinatarioItem();
+										destItem = envDestinatarios2DestinatarioItem(envDestinatarios);
+										destinatariosMail.add(destItem);
+									}
+									//Preparamos destinatarios para Mail
+								}
+								
+								
+								try{
+										LOGGER.info("Listener envios => Se ha encontrado envio programado con ID: " + envio.getIdenvio());
+	
+											
+											switch (envio.getIdtipoenvios().toString()) {
+	
+												case SigaConstants.ID_ENVIO_MAIL:
+													if (null != destinatariosMoviles && destinatariosMoviles.size()>0) {
+														envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
+														envio.setFechamodificacion(new Date());
+														_envEnviosMapper.updateByPrimaryKey(envio);
+														envioService.envioMail(eventoCurso.get(0).getIdinstitucion().toString(), idEnvio.toString(), remitenteMail, destinatariosMail, plantilla.get(0).getAsunto(), plantilla.get(0).getCuerpo(), null, false);
+														envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+														envio.setFechamodificacion(new Date());
+														_envEnviosMapper.updateByPrimaryKey(envio);
+														LOGGER.info("Correo electrónico enviado con éxito");
+													}else{
+														LOGGER.info("No existen destinatarios disponibles");
+													}
+													break;
+												case SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO:
+													if (null != destinatariosMoviles && destinatariosMoviles.size()>0) {
+														envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
+														envio.setFechamodificacion(new Date());
+														_envEnviosMapper.updateByPrimaryKey(envio);
+														envioService.envioMail(eventoCurso.get(0).getIdinstitucion().toString(), idEnvio.toString(), remitenteMail, destinatariosMail, plantilla.get(0).getAsunto(), plantilla.get(0).getCuerpo(), null, false);
+														envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+														envio.setFechamodificacion(new Date());
+														_envEnviosMapper.updateByPrimaryKey(envio);
+														LOGGER.info("Documentación letrado enviado con éxito");
+													}else{
+														LOGGER.info("No existen destinatarios disponibles");
+													}
+													break;
+												case SigaConstants.ID_ENVIO_CORREO_ORDINARIO:
+													if (null != destinatariosMoviles && destinatariosMoviles.size()>0) {
+														envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
+														envio.setFechamodificacion(new Date());
+														_envEnviosMapper.updateByPrimaryKey(envio);
+														envioService.envioMail(eventoCurso.get(0).getIdinstitucion().toString(), idEnvio.toString(), remitenteMail, destinatariosMail, plantilla.get(0).getAsunto(), plantilla.get(0).getCuerpo(), null, false);
+														envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+														envio.setFechamodificacion(new Date());
+														_envEnviosMapper.updateByPrimaryKey(envio);
+														LOGGER.info("Correo ordinario generado con éxito");
+													}else{
+														LOGGER.info("No existen destinatarios disponibles");
+													}
+													break;
+												case SigaConstants.ID_ENVIO_SMS:
+													if (null != destinatariosMoviles && destinatariosMoviles.size()>0) {
+														String[] moviles = new String[destinatariosMoviles.size()];
+														
+														int i = 0;
+														for (Iterator iterator = destinatariosMoviles.iterator(); iterator
+																.hasNext();) {
+															String destinatarioItem = (String) iterator
+																	.next();
+															moviles[i] = new String();
+															moviles[i] = destinatarioItem;
+															i++;
+														}
+														envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
+														envio.setFechamodificacion(new Date());
+														_envEnviosMapper.updateByPrimaryKey(envio);
+														envioService.envioSMS(remitente, moviles, eventoCurso.get(0).getIdinstitucion(), plantilla.get(0).getCuerpo(), false);
+														envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+														envio.setFechamodificacion(new Date());
+														_envEnviosMapper.updateByPrimaryKey(envio);
+														LOGGER.info("SMS enviado con éxito");
+													}else{
+														LOGGER.info("No existen destinatarios disponibles");
+													}
+														
+													break;
+												case SigaConstants.ID_ENVIO_BURO_SMS:
+													if (null != destinatariosMoviles && destinatariosMoviles.size()>0) {
+														String[] moviles = new String[destinatariosMoviles.size()];
+														
+														int i = 0;
+														for (Iterator iterator = destinatariosMoviles.iterator(); iterator
+																.hasNext();) {
+															String destinatarioItem = (String) iterator
+																	.next();
+															moviles[i] = new String();
+															moviles[i] = destinatarioItem;
+															i++;
+														}
+														envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
+														envio.setFechamodificacion(new Date());
+														_envEnviosMapper.updateByPrimaryKey(envio);
+														envioService.envioSMS(remitente, moviles, eventoCurso.get(0).getIdinstitucion(), plantilla.get(0).getCuerpo(), true);
+														envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+														envio.setFechamodificacion(new Date());
+														_envEnviosMapper.updateByPrimaryKey(envio);
+														LOGGER.info("BURO SMS enviado con éxito");
+													}else{
+														LOGGER.info("No existen destinatarios disponibles");
+													}
+													break;
+												}
+										
+							
+								}catch(Exception e){
+									LOGGER.error("Error al procesar el envío", e);
+									envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
+									envio.setFechamodificacion(new Date());
+									_envEnviosMapper.updateByPrimaryKey(envio);
+									e.printStackTrace();
+								}
+								
+							}
+							
+							//buscamos los destinatarios
+							
+						}
+						LOGGER.info("El remitente no es una persona válida");
+						}
+					
+					}
+					
 					// Enviar la notificacion que corresponde
 					// Cuando se envie se debe indicar en la tabla Generacionnotificaciones en la
 					// columna flagenviado que fue enviado
 				}
-
 			}
 		}
+
+	}
+
+		private RemitenteDTO persona2remitente(CenDirecciones remitente, PlantillaEnvioItem plantilla, CenPersona persona) {
+			
+			RemitenteDTO remitenteReturn = new RemitenteDTO();
+			
+			remitenteReturn.setApellido1(persona.getApellidos1());
+			remitenteReturn.setApellido2(persona.getApellidos2());
+			remitenteReturn.setCorreoElectronico(remitente.getCorreoelectronico());
+			remitenteReturn.setIdPersona(plantilla.getIdPersona());
+			remitenteReturn.setIdPlantillaEnvios(plantilla.getIdPlantillaEnvios());
+			remitenteReturn.setIdTipoEnvios(plantilla.getIdTipoEnvios());
+			remitenteReturn.setNombre(persona.getNombre());
+
+		// TODO Auto-generated method stub
+		return remitenteReturn;
+	}
+
+		private DestinatarioItem envDestinatarios2DestinatarioItem(EnvDestinatarios envDestinatarios) {
+		// TODO Auto-generated method stub
+			DestinatarioItem returnDestinatario = new DestinatarioItem();
+			
+			returnDestinatario.setApellidos1(envDestinatarios.getApellidos1());
+			returnDestinatario.setApellidos2(envDestinatarios.getApellidos2());
+			returnDestinatario.setCorreoElectronico(envDestinatarios.getCorreoelectronico());
+			returnDestinatario.setDomicilio(envDestinatarios.getDomicilio());
+			returnDestinatario.setIdPersona(envDestinatarios.getIdpersona().toString());
+			//returnDestinatario.setListaConsultasEnvio(listaConsultasEnvio);
+			returnDestinatario.setMovil(envDestinatarios.getMovil());
+			returnDestinatario.setNIFCIF(envDestinatarios.getNifcif());
+			returnDestinatario.setNombre(envDestinatarios.getNombre());
+
+			
+		return returnDestinatario;
+	}
+		
 
 
 //		LOGGER.info(
 //				"generateNotificationAuto()  -> Salida del servicio para enviar aviso de los eventos que correspondan");
+	
+
+	private Long generarEnvio(AgeNotificacionesevento notification) {
+		
+		// Insertamos nuevo envio
+		EnvEnvios envio = new EnvEnvios();
+		envio.setIdinstitucion(notification.getIdinstitucion());
+		envio.setDescripcion("TMP");
+		envio.setFecha(new Date());
+		envio.setGenerardocumento("N");
+		envio.setImprimiretiquetas("N");
+		envio.setIdplantillaenvios(Integer.parseInt(notification.getIdplantilla().toString()));
+		
+		Short estadoNuevo = 4;
+		envio.setIdestado(estadoNuevo);
+		envio.setIdtipoenvios(Short.parseShort(notification.getIdtipoenvios().toString()));
+		envio.setFechamodificacion(new Date());
+		envio.setUsumodificacion(Integer.parseInt(notification.getUsumodificacion().toString()));
+		envio.setEnvio("A");
+		//envio.setFechaprogramada(fechageneracionnotificacion);
+		//envio.setIdmodelocomunicacion(modeloEnvio.getIdModeloComunicacion());
+		int insert = _envEnviosMapper.insert(envio);
+		
+		return envio.getIdenvio();
 	}
 
 	@Override
@@ -2616,6 +2918,63 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		LOGGER.info("searchEventByIdEvento() -> Salida del servicio para obtener un evento especifico");
 
 		return eventoItem;
+	}
+	
+private Long generarEnvioProgramado(AgeNotificacionesevento noti, Date fechaGeneracionNotificacion) {
+		
+		// Insertamos nuevo envio
+		EnvEnvios envio = new EnvEnvios();
+		envio.setIdinstitucion(noti.getIdinstitucion());
+		envio.setDescripcion("TMP");
+		envio.setFecha(new Date());
+		envio.setGenerardocumento("N");
+		envio.setImprimiretiquetas("N");
+		envio.setIdplantillaenvios(Integer.parseInt(noti.getIdplantilla().toString()));
+		
+		Short estadoNuevo = 4;
+		envio.setIdestado(estadoNuevo);
+		envio.setIdtipoenvios(Short.parseShort(noti.getIdtipoenvios().toString()));
+		envio.setFechamodificacion(new Date());
+		envio.setUsumodificacion(Integer.parseInt(noti.getUsumodificacion().toString()));
+		envio.setEnvio("A");
+		envio.setFechaprogramada(fechaGeneracionNotificacion);
+		//envio.setIdmodelocomunicacion(modeloEnvio.getIdModeloComunicacion());
+		int insert = _envEnviosMapper.insert(envio);
+		
+		// Actualizamos el envio para ponerle la descripcion
+//		CenInstitucion institucion = _cenInstitucion.selectByPrimaryKey(idInstitucion);
+//		ModModelocomunicacion modelo =  _modModeloComunicacionMapper.selectByPrimaryKey(modeloEnvio.getIdModeloComunicacion());
+//		String descripcion = envio.getIdenvio() + "--" + modelo.getNombre();
+//		envio.setDescripcion(descripcion);
+//		_envEnviosMapper.updateByPrimaryKey(envio);					
+		
+		if(insert >0){						
+			
+			EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
+			historico.setIdenvio(envio.getIdenvio());
+			historico.setIdinstitucion(noti.getIdinstitucion());
+			historico.setFechamodificacion(new Date());
+			historico.setFechaestado(new Date());
+			historico.setUsumodificacion(Integer.parseInt(noti.getUsumodificacion().toString()));
+			Short idEstado = 4;
+			historico.setIdestado(idEstado);
+			_envHistoricoestadoenvioMapper.insert(historico);
+			
+			//Insertamos el envio programado
+			EnvEnvioprogramado envioProgramado = new EnvEnvioprogramado();
+			envioProgramado.setIdenvio(envio.getIdenvio());
+			envioProgramado.setIdinstitucion(noti.getIdinstitucion());
+			envioProgramado.setEstado("0");
+			envioProgramado.setIdplantillaenvios(envio.getIdplantillaenvios());
+			envioProgramado.setIdtipoenvios(envio.getIdtipoenvios());
+			envioProgramado.setNombre(envio.getDescripcion());
+			envioProgramado.setFechaprogramada(envio.getFechaprogramada());
+			envioProgramado.setFechamodificacion(new Date());
+			envioProgramado.setUsumodificacion(Integer.parseInt(noti.getUsumodificacion().toString()));								
+			_envEnvioprogramadoMapper.insert(envioProgramado);
+			
+		}
+		return envio.getIdenvio();
 	}
 
 }

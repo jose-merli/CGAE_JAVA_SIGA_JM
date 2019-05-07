@@ -445,7 +445,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 						CenDirecciones direccionCensoWeb = null;
 						for (CenDirecciones cenDireccion : cenDireccionesList) {
-							if (cenDireccion.getIddireccion() == tipoCensoWeb.getIddireccion()) {
+							if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
 								direccionCensoWeb = cenDireccion;
 							}
 						}
@@ -1017,7 +1017,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 						CenDirecciones direccionCensoWeb = null;
 						for (CenDirecciones cenDireccion : cenDireccionesList) {
-							if (cenDireccion.getIddireccion() == tipoCensoWeb.getIddireccion()) {
+							if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
 								direccionCensoWeb = cenDireccion;
 							}
 						}

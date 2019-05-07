@@ -32,6 +32,7 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ITarjetaDatosGeneralesService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.SigaExceptions;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenCliente;
@@ -719,30 +720,30 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 
 		// AUDITORIA => actualizamos cen_historico si todo es correcto
 		if (insertResponseDTO.getStatus().equals(SigaConstants.OK)) {
-
-			Long idPersonaCreada = Long.valueOf(insertResponseDTO.getId());
-			// obtenemos registro cen_persona creado
-			CenPersona cenPersonaPosterior = new CenPersona();
-			cenPersonaPosterior = cenPersonaExtendsMapper.selectByPrimaryKey(idPersonaCreada);
-			// obtenemos registro cen_nocolegiado creado
-			CenNocolegiado cenNocolegiadoPosterior = new CenNocolegiado();
-			CenNocolegiadoKey cenNocolegiadoKey = new CenNocolegiadoKey();
-			cenNocolegiadoKey.setIdpersona(idPersonaCreada);
-			cenNocolegiadoKey.setIdinstitucion(idInstitucion);
-			cenNocolegiadoPosterior = cenNocolegiadoExtendsMapper.selectByPrimaryKey(cenNocolegiadoKey);
-			// obtenemos registro cen_cliente creado
-			CenCliente cenClientePosterior = new CenCliente();
-			CenClienteKey cenClienteKey = new CenClienteKey();
-			cenClienteKey.setIdpersona(idPersonaCreada);
-			cenClienteKey.setIdinstitucion(idInstitucion);
-			cenClientePosterior = cenClienteMapper.selectByPrimaryKey(cenClienteKey);
-			// obtenemos las etiquetas creadas
-			//List<String> gruposPerJuridicaNuevos = Arrays.asList(sociedadCreateDTO.getGrupos());
-			// llamada a auditoria
-			auditoriaCenHistoricoService.manageAuditoriaDatosGenerales(gruposPerJuridicaNuevos, null, null,
-					cenPersonaPosterior, null, cenNocolegiadoPosterior, null, cenClientePosterior, "INSERT", request,
-					sociedadCreateDTO.getMotivo());
-			
+			if (!UtilidadesString.esCadenaVacia(sociedadCreateDTO.getMotivo())) {
+				Long idPersonaCreada = Long.valueOf(insertResponseDTO.getId());
+				// obtenemos registro cen_persona creado
+				CenPersona cenPersonaPosterior = new CenPersona();
+				cenPersonaPosterior = cenPersonaExtendsMapper.selectByPrimaryKey(idPersonaCreada);
+				// obtenemos registro cen_nocolegiado creado
+				CenNocolegiado cenNocolegiadoPosterior = new CenNocolegiado();
+				CenNocolegiadoKey cenNocolegiadoKey = new CenNocolegiadoKey();
+				cenNocolegiadoKey.setIdpersona(idPersonaCreada);
+				cenNocolegiadoKey.setIdinstitucion(idInstitucion);
+				cenNocolegiadoPosterior = cenNocolegiadoExtendsMapper.selectByPrimaryKey(cenNocolegiadoKey);
+				// obtenemos registro cen_cliente creado
+				CenCliente cenClientePosterior = new CenCliente();
+				CenClienteKey cenClienteKey = new CenClienteKey();
+				cenClienteKey.setIdpersona(idPersonaCreada);
+				cenClienteKey.setIdinstitucion(idInstitucion);
+				cenClientePosterior = cenClienteMapper.selectByPrimaryKey(cenClienteKey);
+				// obtenemos las etiquetas creadas
+				//List<String> gruposPerJuridicaNuevos = Arrays.asList(sociedadCreateDTO.getGrupos());
+				// llamada a auditoria
+				auditoriaCenHistoricoService.manageAuditoriaDatosGenerales(gruposPerJuridicaNuevos, null, null,
+						cenPersonaPosterior, null, cenNocolegiadoPosterior, null, cenClientePosterior, "INSERT", request,
+						sociedadCreateDTO.getMotivo());
+			}
 			insertResponseDTO.setId(idPersona);
 		}
 
@@ -1115,12 +1116,13 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 						// si todo ha funcionado correctamente, la respuesta será OK
 						if (!updateResponseDTO.getStatus().equals(SigaConstants.KO)) {
 							updateResponseDTO.setStatus(SigaConstants.OK);
-	
+							if (!UtilidadesString.esCadenaVacia(etiquetaUpdateDTO.getMotivo())) {
 							// AUDITORIA => actualizamos cen_historico si todo es correcto
 							auditoriaCenHistoricoService.manageAuditoriaDatosGenerales(gruposPerJuridicaPosterior,
 									gruposPerJuridicaAnterior, cenPersonaAnterior, cenPersonaPosterior,
 									cenNocolegiadoAnterior, cenNocolegiadoPosterior, cenClienteAnterior,
 									cenClientePosterior, "UPDATE", request, etiquetaUpdateDTO.getMotivo());
+							}
 	
 						}
 				}

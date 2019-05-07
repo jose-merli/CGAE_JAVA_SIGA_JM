@@ -564,7 +564,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 			if (hashtable.get(SigaConstants.FECHAVERIFICACION) != null
 					&& !hashtable.get(SigaConstants.FECHAVERIFICACION).toString().equals(""))
 				try {
-					DateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy", Locale.ENGLISH);
+					DateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
 
 					cargaMasivaDatosCVItem.setFechaVerificacion(
 							sdf.parse((String) hashtable.get(SigaConstants.FECHAVERIFICACION)));
