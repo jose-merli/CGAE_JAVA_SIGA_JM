@@ -49,6 +49,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ITarjetaDatosBancariosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -72,12 +73,15 @@ import org.itcgae.siga.db.entities.GenFichero;
 import org.itcgae.siga.db.entities.GenFicheroKey;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
+import org.itcgae.siga.db.entities.GenProperties;
+import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.GenRecursos;
 import org.itcgae.siga.db.entities.GenRecursosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.CenAnexosCuentasbancariasMapper;
 import org.itcgae.siga.db.mappers.CenMandatosCuentasbancariasMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
+import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenBancosExtendsMapper;
@@ -121,6 +125,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 	@Autowired
 	private CenMandatosCuentasbancariasMapper cenMandatosCuentasbancariasMapper;
+
+	@Autowired
+	private GenPropertiesMapper genPropertiesMapper;
 
 	@Autowired
 	private CenAnexosCuentasbancariasMapper cenAnexosCuentasbancariasMapper;
@@ -576,22 +583,24 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 				// comprobacion actualización 
 				if (response >= 1) {
-					LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
-					insertResponseDTO.setStatus(SigaConstants.OK);
-					insertResponseDTO.setId(idCuenta.toString());
-
-					// AUDITORIA si se creó una cuenta bancaria correctamente
-					CenCuentasbancarias cenCuentasbancariasPosterior = new CenCuentasbancarias();
-					CenCuentasbancariasKey cenCuentasbancariasKey = new CenCuentasbancariasKey();
-					cenCuentasbancariasKey.setIdcuenta(idCuenta);
-					cenCuentasbancariasKey.setIdinstitucion(idInstitucion);
-					cenCuentasbancariasKey.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
-
-					cenCuentasbancariasPosterior = cenCuentasbancariasExtendsMapper
-							.selectByPrimaryKey(cenCuentasbancariasKey);
-
-					auditoriaCenHistoricoService.manageAuditoriaDatosCuentasBancarias(null,
-							cenCuentasbancariasPosterior, "INSERT", request, datosBancariosInsertDTO.getMotivo());
+					if (!UtilidadesString.esCadenaVacia(datosBancariosInsertDTO.getMotivo())) {
+						LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
+						insertResponseDTO.setStatus(SigaConstants.OK);
+						insertResponseDTO.setId(idCuenta.toString());
+	
+						// AUDITORIA si se creó una cuenta bancaria correctamente
+						CenCuentasbancarias cenCuentasbancariasPosterior = new CenCuentasbancarias();
+						CenCuentasbancariasKey cenCuentasbancariasKey = new CenCuentasbancariasKey();
+						cenCuentasbancariasKey.setIdcuenta(idCuenta);
+						cenCuentasbancariasKey.setIdinstitucion(idInstitucion);
+						cenCuentasbancariasKey.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+	
+						cenCuentasbancariasPosterior = cenCuentasbancariasExtendsMapper
+								.selectByPrimaryKey(cenCuentasbancariasKey);
+	
+						auditoriaCenHistoricoService.manageAuditoriaDatosCuentasBancarias(null,
+								cenCuentasbancariasPosterior, "INSERT", request, datosBancariosInsertDTO.getMotivo());
+					}
 
 				} else {
 					LOGGER.info("insertBanksData() -> KO. Insert para cuentas bancarias  NO realizado correctamente");
@@ -970,21 +979,22 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				insertResponseDTO.setError(error);
 				// comprobacion actualización
 				if(response >= 1) {
-					LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
-					insertResponseDTO.setStatus(SigaConstants.OK);
-					insertResponseDTO.setId(idCuenta.toString());
-					
-					// AUDITORIA si se creó una cuenta bancaria correctamente
-					CenCuentasbancarias cenCuentasbancariasPosterior = new CenCuentasbancarias();
-					CenCuentasbancariasKey cenCuentasbancariasKey = new CenCuentasbancariasKey();
-					cenCuentasbancariasKey.setIdcuenta(idCuenta);
-					cenCuentasbancariasKey.setIdinstitucion(idInstitucion);
-					cenCuentasbancariasKey.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
-					
-					cenCuentasbancariasPosterior = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(cenCuentasbancariasKey);
-					
-					auditoriaCenHistoricoService.manageAuditoriaDatosCuentasBancarias(null, cenCuentasbancariasPosterior, "INSERT", request, datosBancariosInsertDTO.getMotivo());
-					
+					if (!UtilidadesString.esCadenaVacia(datosBancariosInsertDTO.getMotivo())) {
+						LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
+						insertResponseDTO.setStatus(SigaConstants.OK);
+						insertResponseDTO.setId(idCuenta.toString());
+						
+						// AUDITORIA si se creó una cuenta bancaria correctamente
+						CenCuentasbancarias cenCuentasbancariasPosterior = new CenCuentasbancarias();
+						CenCuentasbancariasKey cenCuentasbancariasKey = new CenCuentasbancariasKey();
+						cenCuentasbancariasKey.setIdcuenta(idCuenta);
+						cenCuentasbancariasKey.setIdinstitucion(idInstitucion);
+						cenCuentasbancariasKey.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+						
+						cenCuentasbancariasPosterior = cenCuentasbancariasExtendsMapper.selectByPrimaryKey(cenCuentasbancariasKey);
+						
+						auditoriaCenHistoricoService.manageAuditoriaDatosCuentasBancarias(null, cenCuentasbancariasPosterior, "INSERT", request, datosBancariosInsertDTO.getMotivo());
+					}
 				}
 				else {
 					LOGGER.info("insertBanksData() -> KO. Insert para cuentas bancarias  NO realizado correctamente");
@@ -1526,21 +1536,23 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 				// comprobacion actualización
 				if (response >= 1) {
-					LOGGER.info("updateBanksData() -> OK. Update para cuentas bancarias realizado correctamente");
-					updateResponseDTO.setStatus(SigaConstants.OK);
-
-					// AUDITORIA si la actualización se ha realizado bien
-
-					CenCuentasbancariasKey cenCuentasbancariasKeyPosterior = new CenCuentasbancariasKey();
-					cenCuentasbancariasKeyPosterior.setIdcuenta(Short.valueOf(datosBancariosInsertDTO.getIdCuenta()));
-					cenCuentasbancariasKeyPosterior.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
-					cenCuentasbancariasKeyPosterior.setIdinstitucion(Short.valueOf(idInstitucion));
-
-					cenCuentasbancariasPosterior = cenCuentasbancariasExtendsMapper
-							.selectByPrimaryKey(cenCuentasbancariasKeyPosterior);
-
-					auditoriaCenHistoricoService.manageAuditoriaDatosCuentasBancarias(cenCuentasbancariasAnterior,
-							cenCuentasbancariasPosterior, "UPDATE", request, datosBancariosInsertDTO.getMotivo());
+					if (!UtilidadesString.esCadenaVacia(datosBancariosInsertDTO.getMotivo())) {
+						LOGGER.info("updateBanksData() -> OK. Update para cuentas bancarias realizado correctamente");
+						updateResponseDTO.setStatus(SigaConstants.OK);
+	
+						// AUDITORIA si la actualización se ha realizado bien
+	
+						CenCuentasbancariasKey cenCuentasbancariasKeyPosterior = new CenCuentasbancariasKey();
+						cenCuentasbancariasKeyPosterior.setIdcuenta(Short.valueOf(datosBancariosInsertDTO.getIdCuenta()));
+						cenCuentasbancariasKeyPosterior.setIdpersona(Long.valueOf(datosBancariosInsertDTO.getIdPersona()));
+						cenCuentasbancariasKeyPosterior.setIdinstitucion(Short.valueOf(idInstitucion));
+	
+						cenCuentasbancariasPosterior = cenCuentasbancariasExtendsMapper
+								.selectByPrimaryKey(cenCuentasbancariasKeyPosterior);
+	
+						auditoriaCenHistoricoService.manageAuditoriaDatosCuentasBancarias(cenCuentasbancariasAnterior,
+								cenCuentasbancariasPosterior, "UPDATE", request, datosBancariosInsertDTO.getMotivo());
+					}
 
 				} else {
 					LOGGER.info("updateBanksData() -> KO. Update para cuentas bancarias  NO realizado correctamente");
@@ -2003,8 +2015,16 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
+
+
+		// Extraer propiedad
+		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("gen.ficheros.path");
+		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
+		String pathGF = genPropertiesPath.get(0).getValor();
+
 		// crear path para almacenar el fichero
-		String pathFichero = "/FILERMSA1000/SIGA/ficheros/archivo/" + String.valueOf(idInstitucion) + "/mandatos/";
+		String pathFichero = pathGF + String.valueOf(idInstitucion) + "/mandatos/";
 		// String pathFichero = "C://IISIGA/anexos/";
 		String fileNewName = idPersona + idCuenta + idMandato;
 

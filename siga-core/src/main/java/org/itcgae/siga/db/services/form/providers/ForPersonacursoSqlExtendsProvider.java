@@ -15,7 +15,7 @@ public class ForPersonacursoSqlExtendsProvider extends ForPersonaCursoSqlProvide
 		sql.SELECT("rec.descripcion as rol");
 		sql.FROM("FOR_PERSONA_CURSO cur");
 		sql.INNER_JOIN("CEN_PERSONA per ON (per.idpersona = cur.idpersona)");
-		sql.LEFT_OUTER_JOIN("FOR_ROLES rol ON (rol.idrol = cur.idrol)");
+		sql.LEFT_OUTER_JOIN("FOR_ROLES rol ON (rol.idrol = cur.idrol  and cur.idinstitucion = rol.idinstitucion)");
 		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rol.DESCRIPCION = rec.IDRECURSO AND rec.IDLENGUAJE = '" + idLenguaje + "')");
 		sql.WHERE("cur.IDCURSO = '" + idCurso + "'");
 		sql.WHERE("cur.FECHABAJA IS NULL");
@@ -71,7 +71,7 @@ public class ForPersonacursoSqlExtendsProvider extends ForPersonaCursoSqlProvide
 
 		return sql.toString();
 	}
-	
+	  
 	public String selectSesionesFormador(FormadorCursoItem formador) {
 		SQL sql = new SQL();
 		

@@ -1,6 +1,9 @@
 package org.itcgae.siga.db.services.age.providers;
 
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTOs.cen.SolicitudModificacionSearchDTO;
+import org.itcgae.siga.commons.utils.SolModifSQLUtils;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.mappers.AgeNotificacioneseventoSqlProvider;
 
 public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificacioneseventoSqlProvider {
@@ -177,5 +180,241 @@ public class AgeNotificacioneseventoSqlExtendsProvider extends AgeNotificaciones
 
 		return sql.toString();
 	}
+	
+	
+	public String selectDestinatariosSesion(Long idEvento,Long idCurso,Short idInstitucion, String idEnvio, String usumodificacion) {
+		String rdo = "SELECT * FROM ("
+				+ getInscritosCurso(idCurso,idInstitucion, idEnvio, usumodificacion)
+				+ " ) UNION ( "
+				+ getFormadoresSesion(idEvento,idInstitucion, idEnvio, usumodificacion)
+				+ " ) ";
+		return rdo;
+	}
+	
+	public String selectDestinatariosCurso(Long idCurso,Short idInstitucion, String idEnvio, String usumodificacion) {
+		String rdo = "SELECT * FROM ("
+				+ getInscritosCurso(idCurso,idInstitucion, idEnvio, usumodificacion)
+				+ " ) UNION ( "
+				+ getFormadoresCurso(idCurso,idInstitucion, idEnvio, usumodificacion)
+				+ " ) ";
+		return rdo;
+	}
+	
+	public String selectDestinatariosInscripcion(Long idCurso,Short idInstitucion, String idEnvio, String usumodificacion) {
+
+		String rdo = "SELECT * FROM ("
+				+ getInteresadosTemasCurso(idCurso,idInstitucion, idEnvio, usumodificacion)
+				+ " ) UNION ( "
+				+ getFormadoresCurso(idCurso,idInstitucion, idEnvio, usumodificacion)
+				+ " ) ";
+		return rdo;
+		
+	}
+	
+	private String getFormadoresCurso(Long idCurso, Short idInstitucion, String idEnvio, String usumodificacion) {
+
+		SQL consultaDatosInscripcion = new SQL();
+
+		
+		
+		consultaDatosInscripcion.SELECT( idEnvio + " AS IDENVIO");
+		consultaDatosInscripcion.SELECT("FORMADOR.IDPERSONA");
+		consultaDatosInscripcion.SELECT("CURSO.IDINSTITUCION");
+		consultaDatosInscripcion.SELECT("SYSDATE AS FECHAMODIFICACION");
+		consultaDatosInscripcion.SELECT("'1' AS USUMODIFICACION");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.DOMICILIO");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.CODIGOPOSTAL");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.FAX1");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.FAX2");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.CORREOELECTRONICO");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.IDPAIS");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.IDPROVINCIA");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.IDPOBLACION");
+		consultaDatosInscripcion.SELECT("PERSONA.NOMBRE");
+		consultaDatosInscripcion.SELECT("PERSONA.APELLIDOS1");
+		consultaDatosInscripcion.SELECT("PERSONA.APELLIDOS2");
+		consultaDatosInscripcion.SELECT("PERSONA.NIFCIF");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.POBLACIONEXTRANJERA");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.MOVIL");
+		consultaDatosInscripcion.SELECT("'CEN_PERSONA' AS TIPODESTINATARIO");
+		consultaDatosInscripcion.SELECT("'0' AS ORIGENDESTINATARIO");
+		consultaDatosInscripcion.SELECT("NULL AS IDESTADO");
+		
+		
+		consultaDatosInscripcion.FROM("FOR_CURSO CURSO");
+		
+		consultaDatosInscripcion.INNER_JOIN(
+				"FOR_PERSONA_CURSO FORMADOR ON FORMADOR.IDCURSO = CURSO.IDCURSO AND FORMADOR.FECHABAJA IS NULL");
+		 
+		consultaDatosInscripcion.INNER_JOIN( "CEN_PERSONA PERSONA ON PERSONA.IDPERSONA = FORMADOR.IDPERSONA");
+				
+		
+		consultaDatosInscripcion.INNER_JOIN("CEN_DIRECCIONES DIRECCIONES ON DIRECCIONES.IDPERSONA  = PERSONA.IDPERSONA "
+										 + "	AND DIRECCIONES.IDINSTITUCION = CURSO.IDINSTITUCION");
+			
+				
+		consultaDatosInscripcion.INNER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIRECCION ON DIRECCIONES.IDPERSONA  = TIPODIRECCION.IDPERSONA AND "
+				+ "DIRECCIONES.IDINSTITUCION = TIPODIRECCION.IDINSTITUCION AND DIRECCIONES.IDDIRECCION = TIPODIRECCION.IDDIRECCION AND TIPODIRECCION.IDTIPODIRECCION = 14");				
+
+		consultaDatosInscripcion.WHERE("CURSO.IDCURSO = '" + idCurso + "'");
+
+		return consultaDatosInscripcion.toString();
+	}
+
+	private String getFormadoresSesion(Long idEvento, Short idInstitucion, String idEnvio, String usumodificacion) {
+
+		SQL consultaDatosInscripcion = new SQL();
+
+		
+		
+		consultaDatosInscripcion.SELECT( idEnvio + " AS IDENVIO");
+		consultaDatosInscripcion.SELECT("PERSONAEVENTO.IDPERSONA");
+		consultaDatosInscripcion.SELECT("CURSO.IDINSTITUCION");
+		consultaDatosInscripcion.SELECT("SYSDATE AS FECHAMODIFICACION");
+		consultaDatosInscripcion.SELECT("'1' AS USUMODIFICACION");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.DOMICILIO");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.CODIGOPOSTAL");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.FAX1");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.FAX2");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.CORREOELECTRONICO");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.IDPAIS");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.IDPROVINCIA");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.IDPOBLACION");
+		consultaDatosInscripcion.SELECT("PERSONA.NOMBRE");
+		consultaDatosInscripcion.SELECT("PERSONA.APELLIDOS1");
+		consultaDatosInscripcion.SELECT("PERSONA.APELLIDOS2");
+		consultaDatosInscripcion.SELECT("PERSONA.NIFCIF");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.POBLACIONEXTRANJERA");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.MOVIL");
+		consultaDatosInscripcion.SELECT("'CEN_PERSONA' AS TIPODESTINATARIO");
+		consultaDatosInscripcion.SELECT("'0' AS ORIGENDESTINATARIO");
+		consultaDatosInscripcion.SELECT("NULL AS IDESTADO");
+		
+		
+		consultaDatosInscripcion.FROM("AGE_EVENTO EVENTO");
+		
+		consultaDatosInscripcion.INNER_JOIN(
+				"AGE_PERSONA_EVENTO PERSONAEVENTO ON EVENTO.IDEVENTO = PERSONAEVENTO.IDEVENTO AND PERSONAEVENTO.FECHABAJA IS NULL");
+	
+		consultaDatosInscripcion.INNER_JOIN( "CEN_PERSONA PERSONA ON PERSONA.IDPERSONA = PERSONAEVENTO.IDPERSONA");
+				
+		
+		consultaDatosInscripcion.INNER_JOIN("CEN_DIRECCIONES DIRECCIONES ON DIRECCIONES.IDPERSONA  = PERSONA.IDPERSONA "
+										 + "	AND DIRECCIONES.IDINSTITUCION = CURSO.IDINSTITUCION");
+				
+		consultaDatosInscripcion.INNER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIRECCION ON DIRECCIONES.IDPERSONA  = TIPODIRECCION.IDPERSONA AND "
+				+ "DIRECCIONES.IDINSTITUCION = TIPODIRECCION.IDINSTITUCION AND DIRECCIONES.IDDIRECCION = TIPODIRECCION.IDDIRECCION AND TIPODIRECCION.IDTIPODIRECCION = 14");				
+
+		consultaDatosInscripcion.WHERE("EVENTO.IDEVENTO = '" + idEvento + "'");
+
+		return consultaDatosInscripcion.toString();
+	}
+
+	private String getInscritosCurso(Long idCurso, Short idInstitucion, String idEnvio, String usumodificacion) {
+
+		SQL consultaDatosInscripcion = new SQL();
+
+		
+		
+		consultaDatosInscripcion.SELECT( idEnvio + " AS IDENVIO");
+		consultaDatosInscripcion.SELECT("INSCRIPCION.IDPERSONA");
+		consultaDatosInscripcion.SELECT("CURSO.IDINSTITUCION");
+		consultaDatosInscripcion.SELECT("SYSDATE AS FECHAMODIFICACION");
+		consultaDatosInscripcion.SELECT("'1' AS USUMODIFICACION");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.DOMICILIO");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.CODIGOPOSTAL");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.FAX1");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.FAX2");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.CORREOELECTRONICO");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.IDPAIS");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.IDPROVINCIA");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.IDPOBLACION");
+		consultaDatosInscripcion.SELECT("PERSONA.NOMBRE");
+		consultaDatosInscripcion.SELECT("PERSONA.APELLIDOS1");
+		consultaDatosInscripcion.SELECT("PERSONA.APELLIDOS2");
+		consultaDatosInscripcion.SELECT("PERSONA.NIFCIF");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.POBLACIONEXTRANJERA");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.MOVIL");
+		consultaDatosInscripcion.SELECT("'CEN_PERSONA' AS TIPODESTINATARIO");
+		consultaDatosInscripcion.SELECT("'0' AS ORIGENDESTINATARIO");
+		consultaDatosInscripcion.SELECT("NULL AS IDESTADO");
+		
+		
+		consultaDatosInscripcion.FROM("FOR_CURSO CURSO");
+		
+		consultaDatosInscripcion.INNER_JOIN(
+				"FOR_INSCRIPCION INSCRIPCION ON CURSO.IDCURSO = INSCRIPCION.IDCURSO AND INSCRIPCION.IDESTADOINSCRIPCION = 3");
+	
+		consultaDatosInscripcion.INNER_JOIN( "CEN_PERSONA PERSONA ON PERSONA.IDPERSONA = INSCRIPCION.IDPERSONA");
+				
+		
+		consultaDatosInscripcion.INNER_JOIN("CEN_DIRECCIONES DIRECCIONES ON DIRECCIONES.IDPERSONA  = PERSONA.IDPERSONA "
+										 + "	AND DIRECCIONES.IDINSTITUCION = CURSO.IDINSTITUCION");
+
+				
+		consultaDatosInscripcion.INNER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIRECCION ON DIRECCIONES.IDPERSONA  = TIPODIRECCION.IDPERSONA AND "
+				+ "DIRECCIONES.IDINSTITUCION = TIPODIRECCION.IDINSTITUCION AND DIRECCIONES.IDDIRECCION = TIPODIRECCION.IDDIRECCION AND TIPODIRECCION.IDTIPODIRECCION = 14");				
+
+		consultaDatosInscripcion.WHERE("CURSO.IDCURSO = '" + idCurso + "'");
+
+		return consultaDatosInscripcion.toString();
+	}
+
+	
+
+	private String getInteresadosTemasCurso(Long idCurso, Short idInstitucion, String idEnvio,
+			String usumodificacion) {
+
+		SQL consultaDatosInscripcion = new SQL();
+
+		
+		
+		consultaDatosInscripcion.SELECT( idEnvio + " AS IDENVIO");
+		consultaDatosInscripcion.SELECT("TEMA.IDPERSONA");
+		consultaDatosInscripcion.SELECT("CURSO.IDINSTITUCION");
+		consultaDatosInscripcion.SELECT("SYSDATE AS FECHAMODIFICACION");
+		consultaDatosInscripcion.SELECT("'1' AS USUMODIFICACION");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.DOMICILIO");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.CODIGOPOSTAL");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.FAX1");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.FAX2");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.CORREOELECTRONICO");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.IDPAIS");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.IDPROVINCIA");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.IDPOBLACION");
+		consultaDatosInscripcion.SELECT("PERSONA.NOMBRE");
+		consultaDatosInscripcion.SELECT("PERSONA.APELLIDOS1");
+		consultaDatosInscripcion.SELECT("PERSONA.APELLIDOS2");
+		consultaDatosInscripcion.SELECT("PERSONA.NIFCIF");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.POBLACIONEXTRANJERA");
+		consultaDatosInscripcion.SELECT("DIRECCIONES.MOVIL");
+		consultaDatosInscripcion.SELECT("'CEN_PERSONA' AS TIPODESTINATARIO");
+		consultaDatosInscripcion.SELECT("'0' AS ORIGENDESTINATARIO");
+		consultaDatosInscripcion.SELECT("NULL AS IDESTADO");
+		
+		
+		consultaDatosInscripcion.FROM("FOR_CURSO CURSO");
+		
+		consultaDatosInscripcion.INNER_JOIN(
+				"FOR_TEMACURSO_CURSO TEMACURSO ON TEMACURSO.IDCURSO = CURSO.IDCURSO");
+		consultaDatosInscripcion.INNER_JOIN(
+				"FOR_TEMACURSO_PERSONA TEMA ON TEMA.IDTEMACURSO = TEMACURSO.IDTEMACURSO AND TEMA.IDINSTITUCION = CURSO.IDINSTITUCION");
+		consultaDatosInscripcion.INNER_JOIN( "CEN_PERSONA PERSONA ON PERSONA.IDPERSONA = TEMA.IDPERSONA");
+				
+		
+		consultaDatosInscripcion.INNER_JOIN("CEN_DIRECCIONES DIRECCIONES ON DIRECCIONES.IDPERSONA  = PERSONA.IDPERSONA "
+										 + "	AND DIRECCIONES.IDINSTITUCION = CURSO.IDINSTITUCION");
+			
+				
+		consultaDatosInscripcion.INNER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIRECCION ON DIRECCIONES.IDPERSONA  = TIPODIRECCION.IDPERSONA AND "
+				+ "DIRECCIONES.IDINSTITUCION = TIPODIRECCION.IDINSTITUCION AND DIRECCIONES.IDDIRECCION = TIPODIRECCION.IDDIRECCION AND TIPODIRECCION.IDTIPODIRECCION = 14");				
+
+		consultaDatosInscripcion.WHERE("CURSO.IDCURSO = '" + idCurso + "'");
+
+		return consultaDatosInscripcion.toString();
+	}
+
+	
+	
 	
 }

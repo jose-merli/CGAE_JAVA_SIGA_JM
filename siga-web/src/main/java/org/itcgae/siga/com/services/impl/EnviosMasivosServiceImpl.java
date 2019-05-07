@@ -1,11 +1,13 @@
 package org.itcgae.siga.com.services.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -37,9 +39,9 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IColaEnvios;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
+import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -48,13 +50,14 @@ import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.EnvCamposenvios;
-import org.itcgae.siga.db.entities.EnvCamposenviosExample;
 import org.itcgae.siga.db.entities.EnvCamposenviosKey;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
 import org.itcgae.siga.db.entities.EnvDestConsultaEnvio;
 import org.itcgae.siga.db.entities.EnvDestConsultaEnvioKey;
 import org.itcgae.siga.db.entities.EnvDestinatarios;
+import org.itcgae.siga.db.entities.EnvDestinatariosBurosms;
+import org.itcgae.siga.db.entities.EnvDestinatariosBurosmsExample;
 import org.itcgae.siga.db.entities.EnvDestinatariosExample;
 import org.itcgae.siga.db.entities.EnvDestinatariosKey;
 import org.itcgae.siga.db.entities.EnvDocumentos;
@@ -69,6 +72,8 @@ import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvioExample;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
@@ -76,6 +81,7 @@ import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.EnvCamposenviosMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
 import org.itcgae.siga.db.mappers.EnvDestConsultaEnvioMapper;
+import org.itcgae.siga.db.mappers.EnvDestinatariosBurosmsMapper;
 import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
 import org.itcgae.siga.db.mappers.EnvDocumentosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
@@ -83,6 +89,7 @@ import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosgrupoclienteMapper;
 import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
+import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
@@ -96,11 +103,17 @@ import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
+import org.itcgae.siga.ws.client.ClientECOS;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import service.serviciosecos.ConsultarEstadoMensajeDocument;
+import service.serviciosecos.ConsultarEstadoMensajeResponseDocument;
+import service.serviciosecos.SolicitudConsultaEstadoMensaje;
 
 @Service
 @Transactional
@@ -182,6 +195,18 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	
 	@Autowired
 	private EnvCamposenviosMapper _envCamposenviosMapper;
+	
+	@Autowired
+	private EnvDestinatariosBurosmsMapper envDestinatariosBurosmsMapper;
+	
+	@Autowired
+	private GenParametrosMapper _genParametrosMapper;
+	
+	@Autowired
+	private ClientECOS _clientECOS;
+	
+	@Autowired
+	private IPFDService pfdService;	
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -1858,6 +1883,82 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 		LOGGER.info("obtenerDireccionesDisp() -> Salida al servicio para obtener direcciones");
 		return response;
+	}
+
+	@Override
+	public InputStreamResource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Short idDocumento) {
+		
+		LOGGER.debug("Comprobando si es un envío burosms para recuperar el pdf para iddocumento " + idDocumento);
+		InputStreamResource inputStreamResource = null;
+		
+		if (idInstitucion != null && idEnvio != null && idDocumento != null) {
+			try {
+				EnvDestinatariosBurosmsExample envDestinatariosBurosmsExample = new EnvDestinatariosBurosmsExample();
+				envDestinatariosBurosmsExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdenvioEqualTo(idEnvio).andIddocumentoEqualTo(idDocumento);
+				List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms = envDestinatariosBurosmsMapper.selectByExample(envDestinatariosBurosmsExample);
+				if (listEnvDestinatariosBurosms != null && listEnvDestinatariosBurosms.size() == 1) {//solo puede haber uno
+					EnvDestinatariosBurosms envDestinatariosBurosms = listEnvDestinatariosBurosms.get(0);
+					if (envDestinatariosBurosms != null) {
+						if (envDestinatariosBurosms.getIdsolicitudecos() != null) {
+							LOGGER.debug("Comprobamos si ya tenemos el csv para el iddocumento = " + idDocumento);
+							String csv = null;
+							if (envDestinatariosBurosms.getCsv() == null) {
+								GenParametrosKey keyParam = new GenParametrosKey();
+								
+								keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
+								keyParam.setModulo(SigaConstants.MODULO_ENV);
+								keyParam.setParametro(SigaConstants.SMS_URL_SERVICE);
+								
+								GenParametros property = _genParametrosMapper.selectByPrimaryKey(keyParam);
+								String uriService = property.getValor();
+								keyParam.setParametro(SigaConstants.SMS_CLIENTE_ECOS);
+								property = _genParametrosMapper.selectByPrimaryKey(keyParam);
+								String idECOS = property.getValor();
+								
+								ConsultarEstadoMensajeDocument consultarEstadoMensajeDocument = ConsultarEstadoMensajeDocument.Factory.newInstance();
+								SolicitudConsultaEstadoMensaje solicitudConsultaEstadoMensaje = consultarEstadoMensajeDocument.addNewConsultarEstadoMensaje().addNewConsultarEstadoMensajeRequest();
+								solicitudConsultaEstadoMensaje.setIdClienteECOS(idECOS);
+								solicitudConsultaEstadoMensaje.setIdColegio(idInstitucion.toString());
+								solicitudConsultaEstadoMensaje.setIdSolicitudEnvio(envDestinatariosBurosms.getIdsolicitudecos());
+								
+								ConsultarEstadoMensajeResponseDocument consultarEstadoMensajeResponseDocument = _clientECOS.consultaEstadoMensaje(uriService, consultarEstadoMensajeDocument);
+								if (consultarEstadoMensajeResponseDocument != null) {
+									if (consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse() != null) {
+										if (consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse().getConsultarEstadoMensajeResponse() != null) {
+											if (consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse().getConsultarEstadoMensajeResponse().getInfoResultado() != null) {
+												if (consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse().getConsultarEstadoMensajeResponse().getInfoResultado().getCSV() != null) {
+													envDestinatariosBurosms.setCsv(consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse().getConsultarEstadoMensajeResponse().getInfoResultado().getCSV());
+													//TODO ACTUALIZAR PARA LA SIGUIENTE DESCARGA
+													envDestinatariosBurosms.setUsumodificacion(1);
+													envDestinatariosBurosms.setFechamodificacion(new Date());
+													envDestinatariosBurosmsMapper.updateByPrimaryKey(envDestinatariosBurosms);
+												}
+											}	
+										}
+									}
+								}
+							}
+							
+							if (envDestinatariosBurosms.getCsv() != null) {
+								String fileBase64 = pfdService.obtenerDocumentoFirmado(csv);
+								byte[] decodedValue = Base64.getDecoder().decode(fileBase64);
+								
+								ByteArrayInputStream byteArray = new ByteArrayInputStream(decodedValue);
+								inputStreamResource = new InputStreamResource(byteArray);
+							}
+						} else {
+							LOGGER.debug("El Idsolicitudecos es nulo para el iddocumento = " + idDocumento);
+						}
+
+					}
+				}
+
+			} catch (Exception e) {
+				LOGGER.error(e);
+			}
+			
+		}
+		return inputStreamResource;
 	}
 
 }

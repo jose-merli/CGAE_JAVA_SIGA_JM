@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
@@ -25,6 +26,7 @@ import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
+import org.itcgae.siga.com.services.impl.EnviosMasivosServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -41,6 +43,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @RestController
 @RequestMapping(value = "/enviosMasivos")
 public class EnviosMasivosController {
+	
+	private Logger LOGGER = Logger.getLogger(EnviosMasivosController.class);
 	
 	@Autowired
 	IEnviosMasivosService _enviosMasivosService;
@@ -221,23 +225,45 @@ public class EnviosMasivosController {
             
 		HttpHeaders headers = null;
 		File file = null;
-		InputStreamResource resource = null;                
-		file = new File(documentoDTO.getRutaDocumento());
-		try{
-			resource = new InputStreamResource(new FileInputStream(file));                  
-		}catch(FileNotFoundException e){
-    		e.printStackTrace();    
-		}	  
+		InputStreamResource resource = null;  
+		
+		if (documentoDTO.getIdDocumento() != null) {
+			//busco si es un destintario de burosms
+			resource = buroSMS(documentoDTO);
+		}
+		
+		if (resource == null) {
+			file = new File(documentoDTO.getRutaDocumento());
+			try{
+				resource = new InputStreamResource(new FileInputStream(file));                  
+			}catch(FileNotFoundException e){
+	    		LOGGER.error("Error al recuperar el fichero ", e);
+			}
+		}
+		
+		
+			  
 		headers = new HttpHeaders();
 		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
 		headers.add("Pragma", "no-cache");
 		headers.add("Expires", "0");
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentoDTO.getNombreDocumento() + "\"");
-		System.out.println("The length of the file is : "+file.length());
+//		System.out.println("The length of the file is : "+file.length());
 		  
 		return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
     }
 	
+	private InputStreamResource buroSMS(ResponseDocumentoDTO documentoDTO) {
+		InputStreamResource inputStreamResource = null;
+		if (documentoDTO.getIdInstitucion() != null && documentoDTO.getIdEnvio() != null && !documentoDTO.getIdEnvio().trim().equals("") 
+				&& documentoDTO.getIdDocumento() != null) {
+			inputStreamResource = _enviosMasivosService.recuperaPdfBuroSMS(documentoDTO.getIdInstitucion(), Long.parseLong(documentoDTO.getIdEnvio()), documentoDTO.getIdDocumento());
+		}
+		
+		return inputStreamResource;
+	}
+
+
 	@RequestMapping(value = "/detalle/consultasDest",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboConsultaInstitucionDTO> obtenerConsultasDest(HttpServletRequest request) {
 		

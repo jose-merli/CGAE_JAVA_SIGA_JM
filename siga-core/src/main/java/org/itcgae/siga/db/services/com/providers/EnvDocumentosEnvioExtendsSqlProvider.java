@@ -10,8 +10,11 @@ public class EnvDocumentosEnvioExtendsSqlProvider {
 		
 		sql.SELECT("IDENVIO");
 		sql.SELECT("IDDOCUMENTO");
+		sql.SELECT("IDINSTITUCION");
+		
 		sql.SELECT("DESCRIPCION AS NOMBREDOCUMENTO");
 		sql.SELECT("PATHDOCUMENTO");
+		
 		
 		sql.FROM("ENV_DOCUMENTOS");
 		

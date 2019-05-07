@@ -6,6 +6,7 @@ public class DocumentoEnvioItem {
 	private String idDocumento;
 	private String nombreDocumento;
 	private String pathDocumento;
+	private Short idInstitucion;
 	
 	
 	public String getIdEnvio() {
@@ -31,6 +32,12 @@ public class DocumentoEnvioItem {
 	}
 	public void setPathDocumento(String pathDocumento) {
 		this.pathDocumento = pathDocumento;
+	}
+	public Short getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(Short idInstitucion) {
+		this.idInstitucion = idInstitucion;
 	}
 	
 	

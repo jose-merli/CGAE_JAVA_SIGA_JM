@@ -10,6 +10,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.stereotype.Component;
 import org.springframework.ws.client.core.WebServiceTemplate;
 
+import service.serviciosecos.ConsultarEstadoMensajeDocument;
+import service.serviciosecos.ConsultarEstadoMensajeResponseDocument;
 import service.serviciosecos.EnviarSMSDocument;
 import service.serviciosecos.EnviarSMSResponseDocument;
 
@@ -34,6 +36,30 @@ public class ClientECOS extends DefaultClientWs{
 			
 			LOGGER.debug("Llamada a ECOS");
 			response = client.enviarSMS(uriService, request);
+			LOGGER.debug("Respuesta de ECOS recibida");
+			
+		}catch (Exception e) {
+			LOGGER.error("Error al enviar SMS por ECOS", e);
+		}finally {
+			if(context != null) {
+				context.close();
+			}
+		}
+		
+		
+		return response;
+	}
+	
+	public ConsultarEstadoMensajeResponseDocument consultaEstadoMensaje (String uriService, ConsultarEstadoMensajeDocument request) throws URISyntaxException{
+		AnnotationConfigApplicationContext context = null;
+		ConsultarEstadoMensajeResponseDocument response = null;
+		try {
+			LOGGER.debug("Configuramos llamada a ECOS");
+			context = new AnnotationConfigApplicationContext(WebServiceClientConfigECOS.class);
+			ECOSClient client = context.getBean(ECOSClient.class);
+			
+			LOGGER.debug("Llamada a ECOS");
+			response = client.consultaEstadoMensaje(uriService, request);
 			LOGGER.debug("Respuesta de ECOS recibida");
 			
 		}catch (Exception e) {

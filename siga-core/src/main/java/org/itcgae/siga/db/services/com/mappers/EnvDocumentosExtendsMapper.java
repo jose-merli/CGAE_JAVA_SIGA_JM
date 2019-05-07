@@ -18,6 +18,7 @@ public interface EnvDocumentosExtendsMapper {
 	@SelectProvider(type = EnvDocumentosEnvioExtendsSqlProvider.class, method = "selectDocumentosEnvio")
 	@Results({@Result(column = "IDENVIO", property = "idEnvio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDDOCUMENTO", property = "idDocumento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
 		@Result(column = "NOMBREDOCUMENTO", property = "nombreDocumento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "PATHDOCUMENTO", property = "pathDocumento", jdbcType = JdbcType.VARCHAR)
 	})
