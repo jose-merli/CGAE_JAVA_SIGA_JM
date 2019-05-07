@@ -686,4 +686,283 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		return sql.toString();
 	}
 	
+	public String selectColegiadosCensoGeneral(Short idInstitucion, ColegiadoItem colegiadoItem) {
+
+		SQL sql = new SQL();
+		SQL sql1 = new SQL();
+		SQL sql2 = new SQL();
+		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+		sql.SELECT_DISTINCT("col.idpersona");
+		sql.SELECT_DISTINCT("col.idinstitucion");
+		sql.SELECT_DISTINCT("col.identificadords");
+		sql.SELECT_DISTINCT("per.nifcif");
+		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("per.nombre as solonombre");
+		sql.SELECT_DISTINCT("per.apellidos1");
+		sql.SELECT_DISTINCT("per.apellidos2");
+		sql.SELECT_DISTINCT("per.sexo");
+		sql.SELECT_DISTINCT("per.idestadocivil");
+		sql.SELECT_DISTINCT("cli.noaparecerredabogacia");
+
+		sql.SELECT_DISTINCT("per.idtipoidentificacion");
+		sql.SELECT_DISTINCT("per.naturalde");
+		sql.SELECT("TO_CHAR(cli.fechaalta,'DD/MM/YYYY') AS fechaalta");
+		sql.SELECT_DISTINCT("cli.idlenguaje");
+		sql.SELECT_DISTINCT("cli.asientocontable");
+		sql.SELECT_DISTINCT("col.nmutualista");
+		sql.SELECT("TO_CHAR(col.fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
+		sql.SELECT("TO_CHAR(col.fechajura,'DD/MM/YYYY') AS fechajura");
+		sql.SELECT("TO_CHAR(col.fechatitulacion,'DD/MM/YYYY') AS fechatitulacion");
+		sql.SELECT("TO_CHAR(col.fechapresentacion,'DD/MM/YYYY') AS fechapresentacion");
+		sql.SELECT_DISTINCT("TO_CHAR(col.idtiposseguro) AS idTiposSeguro");
+
+		sql.SELECT_DISTINCT("cli.comisiones");
+		sql.SELECT_DISTINCT("cli.idtratamiento");
+		sql.SELECT_DISTINCT("nvl(decode(nvl(col.comunitario,0),0, col.ncolegiado, col.ncomunitario), col.ncolegiado) as numcolegiado");
+		sql.SELECT_DISTINCT("colest.idestado as situacion");
+		sql.SELECT_DISTINCT("cat.descripcion as estadoColegial");
+		sql.SELECT_DISTINCT("col.situacionresidente as situacionresidente");
+		sql.SELECT_DISTINCT("col.comunitario as comunitario");
+
+		sql.SELECT_DISTINCT(
+				"concat( decode(col.situacionresidente,0,'No', 'Sí')  || ' / ',decode(col.comunitario,0,'No', 'Sí')) as residenteInscrito");
+		sql.SELECT("TO_CHAR(per.fechanacimiento,'DD/MM/YYYY') AS fechanacimiento");
+		sql.SELECT("inst.abreviatura as colegioResultado");
+		
+		sql1.SELECT("partidojudicial.nombre");		
+		sql1.FROM("cen_partidojudicial partidojudicial");
+		sql1.INNER_JOIN("cen_poblaciones pob on pob.idpartido = partidojudicial.idpartido");
+		sql1.INNER_JOIN("cen_direcciones direcciones on pob.idpoblacion = direcciones.idpoblacion");
+		sql1.INNER_JOIN(
+				"CEN_DIRECCION_TIPODIRECCION tipodireccion ON (tipodireccion.IDDIRECCION = direcciones.IDDIRECCION AND"
+						+ " tipodireccion.IDPERSONA = direcciones.IDPERSONA AND  tipodireccion.IDINSTITUCION = direcciones.IDINSTITUCION)");
+
+		sql1.WHERE("tipodireccion.idtipodireccion = '2'");
+		sql1.WHERE("direcciones.idpersona = dir.idpersona");
+		sql1.WHERE("direcciones.idinstitucion = dir.idinstitucion");
+		sql1.WHERE("direcciones.iddireccion = dir.iddireccion");
+
+		sql.SELECT_DISTINCT("(" + sql1 + ") as partidoJudicial");
+
+		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,2,dir.correoelectronico,'') AS correo");
+		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,2,dir.telefono1,'') AS telefono");
+		sql.SELECT_DISTINCT("decode(TIPODIR.idtipodireccion ,2,dir.movil,'') as movil");
+		sql.SELECT_DISTINCT("ROW_NUMBER() OVER(PARTITION BY concat(col.idpersona,col.idinstitucion) ORDER BY col.idpersona) AS RN");
+		sql.FROM("cen_colegiado col");
+
+		sql.INNER_JOIN("cen_persona per on col.idpersona = per.idpersona");
+		sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and cli.idinstitucion =  '"+ idInstitucion + "')");
+		
+		sql.INNER_JOIN("cen_institucion inst on col.idinstitucion = inst.idinstitucion");
+
+		sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
+				+ "    ((grucli.idinstitucion = inst.idinstitucion or grucli.idinstitucion = '2000') and col.idpersona = grucli.idpersona and ((grucli.fecha_inicio <= SYSDATE OR grucli.fecha_inicio IS NULL ) and \r\n"
+				+ "        ( grucli.fecha_baja > SYSDATE OR grucli.fecha_baja IS NULL)))");
+		sql.INNER_JOIN(
+				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
+						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion))");
+		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
+		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '1')");
+		sql.LEFT_OUTER_JOIN(
+				"cen_direcciones dir on (cli.idpersona = dir.idpersona and cli.idinstitucion = dir.idinstitucion and inst.idinstitucion = dir.idinstitucion and dir.fechabaja is null)");
+
+		sql.LEFT_OUTER_JOIN("CEN_DIRECCION_TIPODIRECCION TIPODIR ON (CLI.IDPERSONA = TIPODIR.IDPERSONA AND"  
+	                + " DIR.IDDIRECCION = TIPODIR.IDDIRECCION AND CLI.IDINSTITUCION = TIPODIR.IDINSTITUCION AND "
+	                + " INST.IDINSTITUCION = DIR.IDINSTITUCION)"); 
+		sql.LEFT_OUTER_JOIN(
+				"cen_datosCV datosCV ON ( datosCV.idInstitucion = col.idInstitucion and datosCV.idPersona = per.idPersona )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcv cenTipoCV ON ( cenTipoCV.idTipoCV = datosCV.idTipoCV )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt2 ON ( subt2.idTipoCV = datosCV.idTipoCV and subt2.idInstitucion = col.idInstitucion )");
+		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = col.idInstitucion )");
+
+		if (idInstitucion != null) {
+			sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion +"'");
+		}
+		
+		sql.WHERE("per.idtipoidentificacion not in '20'");
+
+		if (colegiadoItem.getNif() != null && colegiadoItem.getNif() != "") {
+			sql.WHERE("upper(per.nifcif) like upper('%" + colegiadoItem.getNif() + "%')");
+		}
+
+		if (colegiadoItem.getNombre() != null && colegiadoItem.getNombre() != "") {
+			String columna = "per.nombre";
+			String cadena = colegiadoItem.getNombre();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+//			sql.WHERE("upper(per.nombre) like upper('%" + colegiadoItem.getNombre() + "%')");
+		}
+
+		if (colegiadoItem.getApellidos() != null && colegiadoItem.getApellidos() != "") {
+			String columna = "CONCAT(per.apellidos1,per.apellidos2)";
+			String cadena = colegiadoItem.getApellidos().replaceAll("\\s+","");
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			
+//			sql.WHERE("UPPER(CONCAT(per.apellidos1,per.apellidos2)) LIKE UPPER('%" +colegiadoItem.getApellidos().replaceAll("\\s+","")
+//					+ "%')");
+		}
+		
+		if (colegiadoItem.getNumColegiado() != null && colegiadoItem.getNumColegiado() != "") {
+			sql.WHERE("(col.ncolegiado = '" + colegiadoItem.getNumColegiado() + "' OR COL.NCOMUNITARIO = '" + colegiadoItem.getNumColegiado() + "')");
+		}
+
+		if (colegiadoItem.getSexo() != null && colegiadoItem.getSexo() != "") {
+			sql.WHERE("per.sexo = '" + colegiadoItem.getSexo() + "'");
+		}
+
+		if (colegiadoItem.getCodigoPostal() != null && colegiadoItem.getCodigoPostal() != "") {
+			sql.WHERE("dir.codigopostal ='" + colegiadoItem.getCodigoPostal() + "'");
+		}
+
+		if (colegiadoItem.getTipoDireccion() != null && colegiadoItem.getTipoDireccion() != "") {
+			sql.WHERE("tipodir.idtipodireccion = "+ colegiadoItem.getTipoDireccion());
+		}else {
+			/*sql.WHERE("(tipodir.idtipodireccion = 2 OR 2 NOT IN (SELECT idtipodireccion FROM CEN_DIRECCION_TIPODIRECCION TIPODIR2 "
+					+ "WHERE TIPODIR.IDPERSONA = TIPODIR2.IDPERSONA  AND TIPODIR.IDINSTITUCION = TIPODIR2.IDINSTITUCION ))");*/
+		}
+
+		if (colegiadoItem.getIdEstadoCivil() != null && colegiadoItem.getIdEstadoCivil() != "") {
+			sql.WHERE("per.idestadocivil = '" + colegiadoItem.getIdEstadoCivil() + "'");
+		}
+
+		if (colegiadoItem.getIdProvincia() != null && colegiadoItem.getIdProvincia() != "") {
+			sql.WHERE("dir.idprovincia = '" + colegiadoItem.getIdProvincia() + "'");
+		}
+
+		if (colegiadoItem.getIdPoblacion() != null && colegiadoItem.getIdPoblacion() != "") {
+			sql.WHERE("dir.idpoblacion = '" + colegiadoItem.getIdPoblacion() + "'");
+		}
+
+		if (colegiadoItem.getDomicilio() != null && colegiadoItem.getDomicilio() != "") {
+			sql.WHERE("(dir.domicilio) like upper('" + colegiadoItem.getDomicilio() + "')");
+		}
+
+		if (colegiadoItem.getCorreo() != null && colegiadoItem.getCorreo() != "") {
+			String columna = "dir.correoelectronico";
+			String cadena = colegiadoItem.getCorreo();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			
+//			sql.WHERE("upper(dir.correoelectronico) LIKE upper('%" + colegiadoItem.getCorreo() + "%')");
+		}
+
+		if (colegiadoItem.getTelefono() != null && colegiadoItem.getTelefono() != "") {
+			sql.WHERE("dir.telefono1 like '%" + colegiadoItem.getTelefono() + "%'");
+		}
+
+		if (colegiadoItem.getMovil() != null && colegiadoItem.getMovil() != "") {
+			sql.WHERE("dir.movil like '%" + colegiadoItem.getMovil() + "%'");
+		}
+
+		if (colegiadoItem.getTipoCV() != null && colegiadoItem.getTipoCV() != "") {
+			sql.WHERE("datoscv.idtipocv = '" + colegiadoItem.getTipoCV() + "'");
+		}
+
+		if (colegiadoItem.getSubTipoCV1() != null && colegiadoItem.getSubTipoCV1() != "") {
+			sql.WHERE("datoscv.idtipocvsubtipo1 = '" + colegiadoItem.getSubTipoCV1() + "'");
+		}
+		
+		if (colegiadoItem.getSubTipoCV2() != null && colegiadoItem.getSubTipoCV2() != "") {
+			sql.WHERE("datoscv.idtipocvsubtipo2 = '" + colegiadoItem.getSubTipoCV2() + "'");
+		}
+
+		if (colegiadoItem.getSituacion() != null && colegiadoItem.getSituacion() != "") {
+			sql.WHERE("colest.idestado ='" + colegiadoItem.getSituacion() + "'");
+		}
+
+		if (colegiadoItem.getResidencia() != null && colegiadoItem.getResidencia() != "") {
+			sql.WHERE("col.situacionresidente ='" + colegiadoItem.getResidencia() + "'");
+		}
+
+		if (colegiadoItem.getInscrito() != null && colegiadoItem.getInscrito() != "") {
+			sql.WHERE("col.comunitario ='" + colegiadoItem.getInscrito() + "'");
+		}
+
+		if (colegiadoItem.getIdgrupo() != null && colegiadoItem.getIdgrupo().length > 0) {
+
+			String etiquetas = "";
+
+			for (int i = 0; colegiadoItem.getIdgrupo().length > i; i++) {
+
+				if (i == colegiadoItem.getIdgrupo().length - 1) {
+					etiquetas += "'" + colegiadoItem.getIdgrupo()[i] + "'";
+				} else {
+					etiquetas += "'" + colegiadoItem.getIdgrupo()[i] + "',";
+				}
+			}
+
+			sql.WHERE("grucli.IDGRUPO IN (" + etiquetas + ")");
+		}
+
+		if (colegiadoItem.getFechaIncorporacion() != null && colegiadoItem.getFechaIncorporacion().length != 0) {
+
+			if (colegiadoItem.getFechaIncorporacion()[0] != null && colegiadoItem.getFechaIncorporacion()[1] != null) {
+
+				String fechaIncorporacionDesde = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
+				String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
+
+				sql.WHERE("(col.fechaincorporacion >= TO_DATE('" + fechaIncorporacionDesde
+						+ "','DD/MM/YYYY') " + " and ( col.fechaincorporacion <= TO_DATE('"
+						+ fechaIncorporacionHasta + "','DD/MM/YYYY')))");
+
+			} else if (colegiadoItem.getFechaIncorporacion()[0] != null
+					&& colegiadoItem.getFechaIncorporacion()[1] == null) {
+
+				String fechaIncorporacionDesde = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
+
+				sql.WHERE("(col.fechaincorporacion >= TO_DATE('" + fechaIncorporacionDesde
+						+ "','DD/MM/YYYY'))");
+
+			} else if (colegiadoItem.getFechaIncorporacion()[0] == null
+					&& colegiadoItem.getFechaIncorporacion()[1] != null) {
+
+				String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
+
+				sql.WHERE("( col.fechaincorporacion <= TO_DATE('" + fechaIncorporacionHasta
+						+ "','DD/MM/YYYY'))");
+			}
+		}
+
+		if (colegiadoItem.getEstadoColegial() != null && colegiadoItem.getEstadoColegial() != "") {
+			sql.WHERE("cat.descripcion like '" + colegiadoItem.getEstadoColegial() + "'");
+		}
+		
+		if (colegiadoItem.getFechaNacimientoRango() != null && colegiadoItem.getFechaNacimientoRango().length != 0) {
+
+			if (colegiadoItem.getFechaNacimientoRango()[0] != null && colegiadoItem.getFechaNacimientoRango()[1] != null) {
+
+				String getFechaNacimientoDesde = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[0]);
+				String getFechaNacimientoHasta = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[1]);
+
+				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
+						+ "','DD/MM/YYYY') " + " and ( per.fechanacimiento <= TO_DATE('"
+						+ getFechaNacimientoHasta + "','DD/MM/YYYY')))");
+
+			} else if (colegiadoItem.getFechaNacimientoRango()[0] != null
+					&& colegiadoItem.getFechaNacimientoRango()[1] == null) {
+
+				String getFechaNacimientoDesde = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[0]);
+
+				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
+						+ "','DD/MM/YYYY'))");
+
+			} else if (colegiadoItem.getFechaNacimientoRango()[0] == null
+					&& colegiadoItem.getFechaNacimientoRango()[1] != null) {
+
+				String getFechaNacimientoHasta = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[1]);
+
+				sql.WHERE("( per.fechanacimiento <= TO_DATE('" + getFechaNacimientoHasta
+						+ "','DD/MM/YYYY'))");
+			}
+		}
+
+		sql.ORDER_BY("NOMBRE,CORREO,TELEFONO");
+
+		sql2.SELECT("*");
+		sql2.FROM("(" + sql + ")");
+		sql2.WHERE("RN = 1 and rownum < 5000");
+
+		return sql2.toString();
+	}
+	
 }
