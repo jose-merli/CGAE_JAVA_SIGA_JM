@@ -237,7 +237,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 					CenDireccionesExample exampleDir = new CenDireccionesExample();
 					
 					//Obtenemos la direccion preferente de la persona
-					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike(SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO);
+					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike("%" + SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO + "%");
 					List<CenDirecciones> direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
 					
 					if(direcciones == null || direcciones.size() == 0){
@@ -569,7 +569,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 				for (CenGruposclienteCliente persona : personas) {
 					//Buscamos las direcciones de esa persona, primero la preferente
 					CenDireccionesExample exampleDir = new CenDireccionesExample();
-					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike(SigaConstants.TIPO_PREFERENTE_SMS);
+					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike("%" + SigaConstants.TIPO_PREFERENTE_SMS + "%");
 					List<CenDirecciones> direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
 					
 					if(direcciones == null || direcciones.size() == 0) {

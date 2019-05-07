@@ -2332,8 +2332,12 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		// fechaGeneracionNotificacion sea igual o menor que la
 		// fecha actual y que no este dado de baja
 		AgeGeneracionnotificacionesExample ageGeneracionnotificacionesExample = new AgeGeneracionnotificacionesExample();
+		List<Long> values= new ArrayList<Long>();
+		values.add(3L);
+		values.add(4L);
+		values.add(7L);
 		ageGeneracionnotificacionesExample.createCriteria().andFechabajaIsNull()
-				.andFechageneracionnotificacionLessThanOrEqualTo(new Date());
+				.andFechageneracionnotificacionLessThanOrEqualTo(new Date()).andIdtiponotificacioneventoIn(values);
 
 //		LOGGER.info(
 //				"generateNotificationAuto() / ageGeneracionnotificacionesMapper.selectByExample() -> Entrada a ageGeneracionnotificacionesMapper para obtener un listado de las notificaciones que debemos generar");
@@ -2544,12 +2548,27 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 									e.printStackTrace();
 								}
 								
+							}else{
+								// No tenemos destinatarios
+								// Actualizamos la notificacon para marcarla como procesada
+								notification.setFechabaja(new Date());
+								ageNotificacioneseventoExtendsMapper.updateByPrimaryKey(notification);
+								ageGeneracion.setFechabaja(new Date());
+								ageGeneracionnotificacionesMapper.updateByPrimaryKey(ageGeneracion);
 							}
+							
+							
 							
 							//buscamos los destinatarios
 							
 						}
 						LOGGER.info("El remitente no es una persona válida");
+						}else{
+							//Actualizamos la notificacon para marcarla como procesada
+							notification.setFechabaja(new Date());
+							ageNotificacioneseventoExtendsMapper.updateByPrimaryKey(notification);
+							ageGeneracion.setFechabaja(new Date());
+							ageGeneracionnotificacionesMapper.updateByPrimaryKey(ageGeneracion);
 						}
 					
 					}

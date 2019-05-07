@@ -40,7 +40,10 @@ import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
 import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesExample;
+import org.itcgae.siga.db.entities.GenDiccionario;
+import org.itcgae.siga.db.entities.GenDiccionarioExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.mappers.GenDiccionarioMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscolegialesestadoExtendsMapper;
@@ -91,6 +94,9 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 	@Autowired
 	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
+	
+	@Autowired
+	private GenDiccionarioMapper genDiccionarioMapper;
 
 	@Override
 	public ComboDTO getSocietyTypes(HttpServletRequest request) {
@@ -532,13 +538,27 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						if (resultadoPlTurno[0].equals("0")) {
 							response.setStatus(SigaConstants.OK);
 							org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
-							error.setMessage(resultadoPlTurno[1]);
+							GenDiccionarioExample example = new GenDiccionarioExample();
+							example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1]).andIdlenguajeEqualTo(usuario.getIdlenguaje());
+							List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example );
+							if (null != diccionario && diccionario.size()>0) {
+								error.setMessage(diccionario.get(0).getDescripcion());
+							}else{
+								error.setMessage(resultadoPlTurno[1]);
+							}
 							response.setError(error);
 						} else {
 							response.setStatus(SigaConstants.KO);
 							resultado = 0;
 							org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
-							error.setMessage(resultadoPlTurno[1]);
+							GenDiccionarioExample example = new GenDiccionarioExample();
+							example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1]).andIdlenguajeEqualTo(usuario.getIdlenguaje());
+							List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example );
+							if (null != diccionario && diccionario.size()>0) {
+								error.setMessage(diccionario.get(0).getDescripcion());
+							}else{
+								error.setMessage(resultadoPlTurno[1]);
+							}
 							response.setError(error);
 							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 						}
@@ -806,13 +826,29 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							if (resultadoPlTurno[0].equals("0")) {
 								response.setStatus(SigaConstants.OK);
 								org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
-								error.setMessage(resultadoPlTurno[1]);
+								GenDiccionarioExample example = new GenDiccionarioExample();
+								example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1]).andIdlenguajeEqualTo(usuario.getIdlenguaje());
+								List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example );
+								if (null != diccionario && diccionario.size()>0) {
+									error.setMessage(diccionario.get(0).getDescripcion());
+								}else{
+									error.setMessage(resultadoPlTurno[1]);
+								}
+								
 								response.setError(error);
 							} else {
 								response.setStatus(SigaConstants.KO);
 								resultado = 0;
 								org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
-								error.setMessage(resultadoPlTurno[1]);
+								GenDiccionarioExample example = new GenDiccionarioExample();
+								example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1]).andIdlenguajeEqualTo(usuario.getIdlenguaje());
+								List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example );
+								if (null != diccionario && diccionario.size()>0) {
+									error.setMessage(diccionario.get(0).getDescripcion());
+								}else{
+									error.setMessage(resultadoPlTurno[1]);
+								}
+								
 								response.setError(error);
 								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 							}
@@ -1100,13 +1136,28 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						if (resultadoPlTurno[0].equals("0")) {
 							response.setStatus(SigaConstants.OK);
 							org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
-							error.setMessage(resultadoPlTurno[1]);
+							
+							GenDiccionarioExample example = new GenDiccionarioExample();
+							example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1]).andIdlenguajeEqualTo(usuario.getIdlenguaje());
+							List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example );
+							if (null != diccionario && diccionario.size()>0) {
+								error.setMessage(diccionario.get(0).getDescripcion());
+							}else{
+								error.setMessage(resultadoPlTurno[1]);
+							}
 							response.setError(error);
 						} else {
 							response.setStatus(SigaConstants.KO);
 							resultado = 0;
 							org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
-							error.setMessage(resultadoPlTurno[1]);
+							GenDiccionarioExample example = new GenDiccionarioExample();
+							example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1]).andIdlenguajeEqualTo(usuario.getIdlenguaje());
+							List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example );
+							if (null != diccionario && diccionario.size()>0) {
+								error.setMessage(diccionario.get(0).getDescripcion());
+							}else{
+								error.setMessage(resultadoPlTurno[1]);
+							}
 							response.setError(error);
 							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 						}

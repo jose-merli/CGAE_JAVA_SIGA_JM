@@ -1410,20 +1410,20 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						// if (!comboItems.isEmpty()) {
 
 						cenCliente.setIdpersona(idPersona);
-						// cenCliente.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
 						cenCliente.setIdinstitucion(usuario.getIdinstitucion());
 						cenCliente.setFechaalta(new Date());
 						cenCliente.setCaracter("P");
 						cenCliente.setComisiones(noColegiadoItem.getComisiones());
-						cenCliente.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
 						cenCliente.setFechamodificacion(new Date());
 						cenCliente.setUsumodificacion(usuario.getIdusuario());
-						cenCliente.setIdlenguaje(usuario.getIdlenguaje());
+						cenCliente.setIdlenguaje(noColegiadoItem.getIdLenguaje());
 						cenCliente.setExportarfoto(SigaConstants.DB_FALSE);
 						cenCliente.setPublicidad(SigaConstants.DB_FALSE);
 						cenCliente.setLetrado(SigaConstants.DB_FALSE);
 						cenCliente.setNoenviarrevista(SigaConstants.DB_FALSE);
 						cenCliente.setGuiajudicial(SigaConstants.DB_FALSE);
+						cenCliente.setIdtratamiento(Short.parseShort(noColegiadoItem.getidTratamiento()));
+						cenCliente.setAsientocontable(noColegiadoItem.getAsientoContable());
 						cenCliente.setNoaparecerredabogacia(noColegiadoItem.getNoAparecerRedAbogacia());
 						
 						// }
@@ -1496,14 +1496,26 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 												// 2.1.1. Si no existe registro en CEN_GRUPOSCLIENTE_CLIENTE se inserta
 												if (listarelacionGrupoPersona.isEmpty()) {
+													
+													int response = 0;
+													
 													LOGGER.info(
 															"createLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
+													if (cenGruposcliente != null && cenGruposcliente.size() > 0) {
+														response = cenGruposclienteClienteExtendsMapper
+																.insertSelectiveForUpdateLegalPerson(etiqueta,
+																		insertResponseDTO.getId(), String.valueOf(idInstitucion), String.valueOf(idInstitucion),
+																		String.valueOf(usuario.getIdusuario()));
+													} else {
+														response = cenGruposclienteClienteExtendsMapper
+																.insertSelectiveForUpdateLegalPerson(etiqueta,
+																		insertResponseDTO.getId(),
+																		String.valueOf(SigaConstants.IDINSTITUCION_2000),
+																		String.valueOf(idInstitucion),
+																		String.valueOf(usuario.getIdusuario()));
+													}
 
-													int response = cenGruposclienteClienteExtendsMapper
-															.insertSelectiveForCreateLegalPerson(etiqueta,
-																	String.valueOf(idInstitucion),
-																	etiqueta.getIdGrupo(),
-																	String.valueOf(usuario.getIdusuario()));
+													
 													LOGGER.info(
 															"createLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
 
@@ -1517,104 +1529,80 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 														gruposPerJuridicaNuevos.add(etiqueta.getIdGrupo());
 													}
 												}
-												// 2.1.2. Si existe registro en CEN_GRUPOSCLIENTE_CLIENTE se actualiza
-												// su fecha
-												// de baja
-												else {
-
-													listarelacionGrupoPersona.get(0).setFechaBaja(null);
-													LOGGER.info(
-															"createLegalPerson() / cenGruposclienteClienteExtendsMapper.updateByExample() -> Entrada a cenGruposclienteClienteExtendsMapper actualizar la relacion grupo-persona jurídica");
-
-													int response = cenGruposclienteClienteExtendsMapper.updateByExample(
-															listarelacionGrupoPersona.get(0), relacionGrupoPersona);
-													LOGGER.info(
-															"createLegalPerson() / cenGruposclienteClienteExtendsMapper.updateByExample() -> Salida de cenGruposclienteClienteExtendsMapper actualizar la relacion grupo-persona jurídica");
-
-													if (response == 0) {
-														insertResponseDTO.setStatus(SigaConstants.KO);
-														LOGGER.warn(
-																"createLegalPerson() / cenGruposclienteClienteExtendsMapper.updateByExample() -> No se pudo actualizar la fecha de baja del grupo = "
-																		+ etiqueta.getIdGrupo()
-																		+ " en tabla CEN_GRUPOSCLIENTE_CLIENTE");
-													} else {
-														gruposPerJuridicaNuevos.add(etiqueta.getIdGrupo());
-													}
-
-												}
+	
 
 											}
-											// 2.2 no existen registros => solo insertar en: tabla CEN_GRUPOSCLIENTE ,
-											// GEN_RECURSOS_CATALOGOS y CEN_GRUPOSCLIENTE_CLIENTE
-											else {
-												int response1 = 0;
-												int response2 = 0;
-												int response3 = 0;
-												// 1.2.1 insertar en GEN_RECURSOS_CATALOGOS para generar recurso
-												String nombreTabla = "CEN_GRUPOSCLIENTE";
-												String campoTabla = "NOMBRE";
-												LOGGER.info(
-														"createLegalPerson() / genRecursosCatalogosExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a genRecursosCatalogosExtendsMapper para crear recurso de una persona juridica");
-												response1 = genRecursosCatalogosExtendsMapper
-														.insertSelectiveForCreateLegalPerson(
-																String.valueOf(idInstitucion), usuario,
-																etiqueta.getIdGrupo(), nombreTabla, campoTabla);
-												LOGGER.info(
-														"createLegalPerson() / genRecursosCatalogosExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de genRecursosCatalogosExtendsMapper para crear recurso de una persona juridica");
-
-												if (response1 == 1) {
-
-													// 2.2.2 insertar en CEN_GRUPOSCLIENTE para generar el grupo
-													LOGGER.info(
-															"createLegalPerson() / cenGruposclienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenGruposclienteExtendsMapper para crear grupo de una persona jurídica");
-
-													response2 = cenGruposclienteExtendsMapper
-															.insertSelectiveForCreateLegalPerson(
-																	String.valueOf(idInstitucion), usuario);
-													LOGGER.info(
-															"createLegalPerson() / cenGruposclienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenGruposclienteExtendsMapper para crear grupo de una persona jurídica");
-
-													if (response2 == 1) {
-														// 2.2.3 insertar en CEN_GRUPOSCLIENTE_CLIENTE para relacionar
-														// grupos-usuarios
-														LOGGER.info(
-																"createLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
-
-														response3 = cenGruposclienteClienteExtendsMapper
-																.insertSelectiveForCreateLegalPerson(etiqueta,
-																		String.valueOf(idInstitucion), "",
-																		String.valueOf(usuario.getIdusuario()));
-														LOGGER.info(
-																"createLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
-
-														if (response3 == 0) {
-															insertResponseDTO.setStatus(SigaConstants.KO);
-															LOGGER.warn(
-																	"createLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> No se pudo insertar el grupo = "
-																			+ etiqueta.getIdGrupo()
-																			+ " en tabla CEN_GRUPOSCLIENTE_CLIENTE");
-
-														} else {
-															gruposPerJuridicaNuevos.add(etiqueta.getIdGrupo());
-														}
-													} else {
-														insertResponseDTO.setStatus(SigaConstants.KO);
-														LOGGER.warn(
-																"createLegalPerson() / cenGruposclienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> No se pudo insertar el grupo = "
-																		+ etiqueta.getIdGrupo()
-																		+ " en tabla CEN_GRUPOSCLIENTE");
-													}
-												} else {
-													insertResponseDTO.setStatus(SigaConstants.KO);
-													LOGGER.warn(
-															"createLegalPerson() / genRecursosCatalogosExtendsMapper.insertSelectiveForCreateLegalPerson() -> No se pudo insertar el grupo = "
-																	+ etiqueta.getIdGrupo()
-																	+ " en tabla GEN_RECURSOS_CATALOGOS");
-												}
-											}
+											
 										}
 									}
 								}
+								
+								//Temas 
+								
+								if (noColegiadoItem.getTemasCombo() != null && noColegiadoItem.getTemasCombo().size() > 0) {
+
+									// Añadimos temas
+									for (ComboItem tema : noColegiadoItem.getTemasCombo()) {
+
+										// Para cada temas comprobamos si ya existe la relacion
+										ForTemacursoPersonaExample forTemacursoExample = new ForTemacursoPersonaExample();
+										forTemacursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+												.andIdpersonaEqualTo(Long.parseLong(noColegiadoItem.getIdPersona()))
+												.andIdtemacursoEqualTo(Long.valueOf(tema.getValue()));
+
+										LOGGER.info(
+												"updateColegiado() / forTemaCursoPersonaExtendsMapper.selectByExample(forTemacursoCursoExample) -> Entrada a forTemaCursoPersonaExtendsMapper para buscar los temas registrados de una persona");
+
+										List<ForTemacursoPersona> forTemacursoCursoList = forTemaCursoPersonaExtendsMapper
+												.selectByExample(forTemacursoExample);
+
+										LOGGER.info(
+												"updateColegiado() / forTemaCursoPersonaExtendsMapper.selectByExample(forTemacursoCursoExample) -> Salida a forTemaCursoPersonaExtendsMapper para buscar los temas registrados de una persona");
+
+										// Si no existe la creamos
+										if (forTemacursoCursoList.isEmpty()) {
+
+											ForTemacursoPersona forTemacursoCurso = new ForTemacursoPersona();
+											forTemacursoCurso.setFechabaja(null);
+											forTemacursoCurso.setFechamodificacion(new Date());
+											forTemacursoCurso.setIdinstitucion(idInstitucion);
+											forTemacursoCurso.setIdpersona(Long.parseLong(noColegiadoItem.getIdPersona()));
+											forTemacursoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+											forTemacursoCurso.setIdtemacurso(Long.valueOf(tema.getValue()));
+
+											LOGGER.info(
+													"updateColegiado() / forTemaCursoPersonaExtendsMapper.insert(forTipoServicioCurso) -> Entrada a forTemaCursoPersonaExtendsMapper para insertar un tema de una persona");
+
+											forTemaCursoPersonaExtendsMapper.insert(forTemacursoCurso);
+
+											LOGGER.info(
+													"updateColegiado() / forTemaCursoPersonaExtendsMapper.insert(forTipoServicioCurso) -> Salida a forTemaCursoPersonaExtendsMapper para insertar un tema de una persona");
+
+											// Si existe
+										} else {
+											// Comprobamos que si fecha de baja esta a null, si no esta la modificamos
+											if (forTemacursoCursoList.get(0).getFechabaja() != null) {
+												ForTemacursoPersona forTemaCurso = forTemacursoCursoList.get(0);
+												forTemaCurso.setFechabaja(null);
+												forTemaCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+												forTemaCurso.setFechamodificacion(new Date());
+
+												LOGGER.info(
+														"updateColegiado() / forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(forTemaCurso) -> Entrada a forTemaCursoPersonaExtendsMapper para dar de alta a un tema de una persona");
+
+												forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(forTemaCurso);
+
+												LOGGER.info(
+														"updateColegiado() / forTemaCursoPersonaExtendsMapper.updateByPrimaryKey(forTemaCurso) -> Salida a forTemaCursoPersonaExtendsMapper para dar de alta a un tema de una persona");
+											}
+										}
+									}
+
+									// Comprobamos si existe algun tema para el curso y les damos de baja
+								}
+								
+								
+								
 
 							} else {
 								insertResponseDTO.setStatus(SigaConstants.KO);
