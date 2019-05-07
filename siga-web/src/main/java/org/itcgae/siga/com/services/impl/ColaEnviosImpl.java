@@ -179,19 +179,31 @@ public class ColaEnviosImpl implements IColaEnvios {
 		CenDirecciones remitente = _cenDireccionesMapper.selectByPrimaryKey(keyDireccion);
 		
 		CenPersona personaRemitente = _cenPersonaMapper.selectByPrimaryKey(plantilla.getIdpersona());
-		
 		RemitenteDTO remitentedto = new RemitenteDTO();
-		remitentedto.setNombre(personaRemitente.getNombre());
-		remitentedto.setApellido1(personaRemitente.getApellidos1());
-		
-		if(personaRemitente.getApellidos2() != null) {
-			remitentedto.setApellido2(personaRemitente.getApellidos2());
-		}
-		if(remitente != null) {
-			remitentedto.setCorreoElectronico(remitente.getCorreoelectronico());
+
+		if(plantilla.getDescripcionRemitente() != null && plantilla.getDescripcionRemitente() != "") {
+			remitentedto.setNombre(plantilla.getDescripcionRemitente());
+			remitentedto.setApellido1("");
+			
+			if(remitente != null) {
+				remitentedto.setCorreoElectronico(remitente.getCorreoelectronico());
+			}else {
+				remitentedto.setCorreoElectronico("");
+			}
 		}else {
-			remitentedto.setCorreoElectronico("");
+			remitentedto.setNombre(personaRemitente.getNombre());
+			remitentedto.setApellido1(personaRemitente.getApellidos1());
+			
+			if(personaRemitente.getApellidos2() != null) {
+				remitentedto.setApellido2(personaRemitente.getApellidos2());
+			}
+			if(remitente != null) {
+				remitentedto.setCorreoElectronico(remitente.getCorreoelectronico());
+			}else {
+				remitentedto.setCorreoElectronico("");
+			}
 		}
+
 		
 		//Obtenemos los destinatarios dependendiendo del tipo de envio.
 		boolean envioMasivo = envio.getEnvio().contains("M") ? true : false;
