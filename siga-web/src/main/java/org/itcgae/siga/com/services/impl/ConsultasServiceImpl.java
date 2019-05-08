@@ -2080,7 +2080,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						if (iMV > -1) {
 							etiqueta = sentencia.substring(iMV, 2+sentencia.indexOf("%%", iMV + SigaConstants.ETIQUETATIPOMULTIVALOR.length()));
 						}
-					} else if (j < listaCampos.size() && listaCampos.get(j)!=null && !listaCampos.get(j).getAyuda().equals("-1")) {
+					} else if (j < listaCampos.size() && listaCampos.get(j)!=null && listaCampos.get(j).getAyuda() != null && !listaCampos.get(j).getAyuda().equals("-1")) {
 						//cuando existe select de ayuda porque estamos con la etiqueta multivalor
 						//etiqueta += cDinamicos[j].getHp().replaceAll
 						//(ClsConstants.CONSTANTESUSTITUIRCOMILLAS,"\"");
