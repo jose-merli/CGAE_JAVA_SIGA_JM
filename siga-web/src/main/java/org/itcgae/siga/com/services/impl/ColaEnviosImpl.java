@@ -777,16 +777,14 @@ public class ColaEnviosImpl implements IColaEnvios {
 	private void addDestBuroSMS(boolean isBuroSMS, List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms, Long idenvio,
 			Short idinstitucion, Long idpersona, String numMovil) {
 		
-		if (isBuroSMS) {
-			EnvDestinatariosBurosms envDestinatariosBurosms = new EnvDestinatariosBurosms();
-			envDestinatariosBurosms.setIdenvio(idenvio);
-			envDestinatariosBurosms.setIdpersona(idpersona);
-			envDestinatariosBurosms.setIdinstitucion(idinstitucion);
-			envDestinatariosBurosms.setMovil(numMovil);									
-			envDestinatariosBurosms.setFechamodificacion(new Date());
-			envDestinatariosBurosms.setUsumodificacion(1);
-			listEnvDestinatariosBurosms.add(envDestinatariosBurosms);
-		}
+		EnvDestinatariosBurosms envDestinatariosBurosms = new EnvDestinatariosBurosms();
+		envDestinatariosBurosms.setIdenvio(idenvio);
+		envDestinatariosBurosms.setIdpersona(idpersona);
+		envDestinatariosBurosms.setIdinstitucion(idinstitucion);
+		envDestinatariosBurosms.setMovil(numMovil);									
+		envDestinatariosBurosms.setFechamodificacion(new Date());
+		envDestinatariosBurosms.setUsumodificacion(1);
+		listEnvDestinatariosBurosms.add(envDestinatariosBurosms);
 	}
 
 	private String remplazarCamposAsunto(String asunto, List<Map<String, Object>> resultadosConsultas) {
