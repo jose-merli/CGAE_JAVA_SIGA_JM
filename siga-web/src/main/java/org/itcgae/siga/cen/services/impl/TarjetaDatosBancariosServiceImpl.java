@@ -579,9 +579,11 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				response = cenCuentasbancariasExtendsMapper.insertSelective(cuentaBancaria);
 				LOGGER.info(
 						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
-
+				insertResponseDTO.setStatus(SigaConstants.OK);
+				insertResponseDTO.setId(idCuenta.toString());
 				// comprobacion actualización 
 				if (response >= 1) {
+
 					if (!UtilidadesString.esCadenaVacia(datosBancariosInsertDTO.getMotivo())) {
 						LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
 						insertResponseDTO.setStatus(SigaConstants.OK);
@@ -768,6 +770,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		}
 
 		LOGGER.info("insertBanksData() -> Salida del servicio para insertar cuentas bancarias ");
+		insertResponseDTO.setStatus(SigaConstants.OK);
 		return insertResponseDTO;
 	}
 
@@ -978,10 +981,11 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				insertResponseDTO.setError(error);
 				// comprobacion actualización
 				if(response >= 1) {
+					insertResponseDTO.setStatus(SigaConstants.OK);
+					insertResponseDTO.setId(idCuenta.toString());
 					if (!UtilidadesString.esCadenaVacia(datosBancariosInsertDTO.getMotivo())) {
 						LOGGER.info("insertBanksData() -> OK. Insert para cuentas bancarias realizado correctamente");
-						insertResponseDTO.setStatus(SigaConstants.OK);
-						insertResponseDTO.setId(idCuenta.toString());
+
 						
 						// AUDITORIA si se creó una cuenta bancaria correctamente
 						CenCuentasbancarias cenCuentasbancariasPosterior = new CenCuentasbancarias();
@@ -1535,9 +1539,10 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 				// comprobacion actualización
 				if (response >= 1) {
+					updateResponseDTO.setStatus(SigaConstants.OK);
 					if (!UtilidadesString.esCadenaVacia(datosBancariosInsertDTO.getMotivo())) {
 						LOGGER.info("updateBanksData() -> OK. Update para cuentas bancarias realizado correctamente");
-						updateResponseDTO.setStatus(SigaConstants.OK);
+
 	
 						// AUDITORIA si la actualización se ha realizado bien
 	

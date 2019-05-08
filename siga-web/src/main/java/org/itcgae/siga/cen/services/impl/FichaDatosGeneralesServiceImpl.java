@@ -1218,98 +1218,108 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 				if (!insertResponseDTO.getStatus().equals(SigaConstants.KO)) {
 
-					// 1 crear registro en tabla CEN_SOLICITMODIFDATOSBASICOS
-					LOGGER.info(
-							"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForNewSociety() -> Entrada a cenPersonaExtendsMapper para crear una nueva persona");
-
-					CenSolicitmodifdatosbasicos solicitud = new CenSolicitmodifdatosbasicos();
-
-					NewIdDTO idBD = cenSolicitmodifdatosbasicosMapper.getMaxIdSolicitud(String.valueOf(idInstitucion),
-							noColegiadoItem.getIdPersona());
-					// if (idBD == null) {
-					// solicitud.setIdsolicitud(Short.parseShort("1"));
-					// } else {
-					// int idCv = Integer.parseInt(idBD.getNewId());
-					// solicitud.setIdsolicitud(Short.parseShort(""+ (1 + idCv)));
-					// }
-
-					List<ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper
-							.getAutoAceptar(String.valueOf(idInstitucion));
-
-					int idCv = Integer.parseInt(idBD.getNewId());
-					solicitud.setIdsolicitud(Short.parseShort("" + (1 + idCv)));
-					solicitud.setPublicidad(SigaConstants.DB_FALSE);
-					solicitud.setAbonos("B");
-					solicitud.setCargos("B");
-					solicitud.setGuiajudicial(SigaConstants.DB_FALSE);
-					solicitud.setIdlenguaje(noColegiadoItem.getIdLenguaje());
-					solicitud.setMotivo(noColegiadoItem.getMotivo());
-					solicitud.setIdinstitucion(idInstitucion);
-					solicitud.setIdpersona(Long.parseLong(noColegiadoItem.getIdPersona()));
-					solicitud.setFechamodificacion(new Date());
-					solicitud.setUsumodificacion(usuario.getIdusuario());
-					solicitud.setFechaalta(new Date());
-					if (autoAceptar.size() > 0) {
-						if (autoAceptar.get(0).getLabel().equals("S")) {
-							solicitud.setIdestadosolic(Short.parseShort("20"));
+					// Comprobamos si se debe generar la solicitud de modificacion de datos basicos del lenguaje
+					
+					CenClienteKey key = new CenClienteKey();
+					key.setIdinstitucion(idInstitucion);
+					key.setIdpersona(Long.parseLong(noColegiadoItem.getIdPersona()));
+					CenCliente cliente = cenClienteExtendsMapper.selectByPrimaryKey(key );
+					if (!noColegiadoItem.getIdLenguaje().equals(cliente.getIdlenguaje())) {
+							
+						
+						// 1 crear registro en tabla CEN_SOLICITMODIFDATOSBASICOS
+						LOGGER.info(
+								"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForNewSociety() -> Entrada a cenPersonaExtendsMapper para crear una nueva persona");
+	
+						CenSolicitmodifdatosbasicos solicitud = new CenSolicitmodifdatosbasicos();
+	
+						NewIdDTO idBD = cenSolicitmodifdatosbasicosMapper.getMaxIdSolicitud(String.valueOf(idInstitucion),
+								noColegiadoItem.getIdPersona());
+						// if (idBD == null) {
+						// solicitud.setIdsolicitud(Short.parseShort("1"));
+						// } else {
+						// int idCv = Integer.parseInt(idBD.getNewId());
+						// solicitud.setIdsolicitud(Short.parseShort(""+ (1 + idCv)));
+						// }
+	
+						List<ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper
+								.getAutoAceptar(String.valueOf(idInstitucion));
+	
+						int idCv = Integer.parseInt(idBD.getNewId());
+						solicitud.setIdsolicitud(Short.parseShort("" + (1 + idCv)));
+						solicitud.setPublicidad(SigaConstants.DB_FALSE);
+						solicitud.setAbonos("B");
+						solicitud.setCargos("B");
+						solicitud.setGuiajudicial(SigaConstants.DB_FALSE);
+						solicitud.setIdlenguaje(noColegiadoItem.getIdLenguaje());
+						solicitud.setMotivo(noColegiadoItem.getMotivo());
+						solicitud.setIdinstitucion(idInstitucion);
+						solicitud.setIdpersona(Long.parseLong(noColegiadoItem.getIdPersona()));
+						solicitud.setFechamodificacion(new Date());
+						solicitud.setUsumodificacion(usuario.getIdusuario());
+						solicitud.setFechaalta(new Date());
+						if (autoAceptar.size() > 0) {
+							if (autoAceptar.get(0).getLabel().equals("S")) {
+								solicitud.setIdestadosolic(Short.parseShort("20"));
+							} else {
+								solicitud.setIdestadosolic(Short.parseShort("10"));
+							}
 						} else {
 							solicitud.setIdestadosolic(Short.parseShort("10"));
 						}
-					} else {
-						solicitud.setIdestadosolic(Short.parseShort("10"));
-					}
-					int responseInsertPersona = cenSolicitmodifdatosbasicosMapper.insert(solicitud);
-					int responseUpdate = 0;
-
-					if (autoAceptar.get(0).getLabel().equals("S")) {
-						CenCliente modificacion = new CenCliente();
-						modificacion.setIdinstitucion(idInstitucion);
-						modificacion.setIdlenguaje(solicitud.getIdlenguaje());
-						modificacion.setPublicidad(solicitud.getPublicidad());
-						modificacion.setGuiajudicial(solicitud.getGuiajudicial());
-						modificacion.setIdpersona(solicitud.getIdpersona());
-						modificacion.setFechaactualizacion(new Date());
-						modificacion.setFechamodificacion(new Date());
-						modificacion.setUsumodificacion(usuario.getIdusuario());
-
-						responseUpdate = cenClienteExtendsMapper.updateByPrimaryKeySelective(modificacion);
-						error.setCode(200);
-						error.setDescription(
-								"Su petición ha sido aceptada automáticamente. Puede ver ya los datos actualizados");
-					} else {
-						GenParametrosExample ejemploParam = new GenParametrosExample();
-						List<GenParametros> xDias = new ArrayList<GenParametros>();
-						ejemploParam.createCriteria()
-								.andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION")
-								.andIdinstitucionEqualTo(idInstitucion);
-						xDias = genParametrosMapper.selectByExample(ejemploParam);
-						error.setCode(200);
-						if (xDias.size() == 0) {
-							GenParametrosExample ejemploParam2 = new GenParametrosExample();
-							ejemploParam2.createCriteria()
+						int responseInsertPersona = cenSolicitmodifdatosbasicosMapper.insert(solicitud);
+						int responseUpdate = 0;
+	
+						if (autoAceptar.get(0).getLabel().equals("S")) {
+							CenCliente modificacion = new CenCliente();
+							modificacion.setIdinstitucion(idInstitucion);
+							modificacion.setIdlenguaje(solicitud.getIdlenguaje());
+							modificacion.setPublicidad(solicitud.getPublicidad());
+							modificacion.setGuiajudicial(solicitud.getGuiajudicial());
+							modificacion.setIdpersona(solicitud.getIdpersona());
+							modificacion.setFechaactualizacion(new Date());
+							modificacion.setFechamodificacion(new Date());
+							modificacion.setUsumodificacion(usuario.getIdusuario());
+	
+							responseUpdate = cenClienteExtendsMapper.updateByPrimaryKeySelective(modificacion);
+							error.setCode(200);
+							error.setDescription(
+									"Su petición ha sido aceptada automáticamente. Puede ver ya los datos actualizados");
+						} else {
+							GenParametrosExample ejemploParam = new GenParametrosExample();
+							List<GenParametros> xDias = new ArrayList<GenParametros>();
+							ejemploParam.createCriteria()
 									.andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION")
-									.andIdinstitucionEqualTo((short) 2000);
-							xDias = genParametrosMapper.selectByExample(ejemploParam2);
+									.andIdinstitucionEqualTo(idInstitucion);
+							xDias = genParametrosMapper.selectByExample(ejemploParam);
+							error.setCode(200);
+							if (xDias.size() == 0) {
+								GenParametrosExample ejemploParam2 = new GenParametrosExample();
+								ejemploParam2.createCriteria()
+										.andParametroEqualTo("PLAZO_EN_DIAS_APROBACION_SOLICITUD_MODIFICACION")
+										.andIdinstitucionEqualTo((short) 2000);
+								xDias = genParametrosMapper.selectByExample(ejemploParam2);
+							}
+							error.setDescription("Su petición ha sido registrada y será revisada en los próximos "
+									+ xDias.get(0).getValor()
+									+ " días. Puede comprobar el estado de su petición en el menú Solicitudes de modificación");
 						}
-						error.setDescription("Su petición ha sido registrada y será revisada en los próximos "
-								+ xDias.get(0).getValor()
-								+ " días. Puede comprobar el estado de su petición en el menú Solicitudes de modificación");
-					}
-
-					insertResponseDTO.setError(error);
-					LOGGER.info(
-							"createColegiado() / cenSolicitmodifdatosbasicosMapper.insert() -> Salida de cenSolicitmodifdatosbasicosMapper para crear una nueva solicitud");
-					if (responseInsertPersona == 1) {
-						insertResponseDTO.setStatus(SigaConstants.OK);
-						LOGGER.info("createColegiado() Solicitud creada correctamente");
-						if (responseUpdate == 1) {
-							LOGGER.info("createColegiado() Solicitud procesada correctamente");
+	
+						insertResponseDTO.setError(error);
+						LOGGER.info(
+								"createColegiado() / cenSolicitmodifdatosbasicosMapper.insert() -> Salida de cenSolicitmodifdatosbasicosMapper para crear una nueva solicitud");
+						if (responseInsertPersona == 1) {
+							insertResponseDTO.setStatus(SigaConstants.OK);
+							LOGGER.info("createColegiado() Solicitud creada correctamente");
+							if (responseUpdate == 1) {
+								LOGGER.info("createColegiado() Solicitud procesada correctamente");
+							}
+	
+						} else {
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							LOGGER.info("createColegiado() La solicitud no ha podido ser creada correctamente");
 						}
-
-					} else {
-						insertResponseDTO.setStatus(SigaConstants.KO);
-						LOGGER.info("createColegiado() La solicitud no ha podido ser creada correctamente");
-					}
+				}
 				}
 
 			} else {
@@ -1388,6 +1398,30 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					ultimoInsert = cenPersonaExtendsMapper.insertSelectiveForPerson(crearPersonaDTO, usuario);
 					LOGGER.info(
 							"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenPersonaExtendsMapper para crear una nueva persona");
+				}else{
+					CenPersona persona = personas.get(0);
+					persona.setApellidos1(noColegiadoItem.getApellidos1());
+					persona.setApellidos2(noColegiadoItem.getApellidos2());
+					persona.setNombre(noColegiadoItem.getNombre());
+					persona
+							.setIdtipoidentificacion(Short.parseShort(noColegiadoItem.getIdTipoIdentificacion()));
+					persona.setFechanacimiento(noColegiadoItem.getFechaNacimientoDate());
+					if (noColegiadoItem.getSexo() != null) {
+						persona.setSexo(noColegiadoItem.getSexo());
+					}
+					if (noColegiadoItem.getNaturalDe() != null) {
+						persona.setNaturalde(noColegiadoItem.getNaturalDe());
+
+					}
+					if (noColegiadoItem.getidEstadoCivil() != null) {
+
+						persona.setIdestadocivil(Short.parseShort(noColegiadoItem.getidEstadoCivil()));
+					}
+					ultimoInsert = cenPersonaExtendsMapper.updateByPrimaryKey(persona);
+					LOGGER.info(
+							"createColegiado() / cenPersonaExtendsMapper.insertSelectiveForCreateLegalPerson() -> Salida de cenPersonaExtendsMapper para crear una nueva persona");
+
+
 				}
 				if (ultimoInsert == 1 || (null != personas && personas.size() > 0)) {
 					List<ComboItem> comboItems = new ArrayList<ComboItem>();
@@ -1398,6 +1432,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
 						idPersona = Long.valueOf(comboItems.get(0).getValue());
 					}
+					noColegiadoItem.setIdPersona(String.valueOf(idPersona));
 					CenClienteKey key = new CenClienteKey();
 					key.setIdinstitucion(usuario.getIdinstitucion());
 					key.setIdpersona(idPersona);
@@ -1488,7 +1523,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 												List<CenGruposclienteCliente> listarelacionGrupoPersona = new ArrayList<CenGruposclienteCliente>();
 												CenGruposclienteClienteExample relacionGrupoPersona = new CenGruposclienteClienteExample();
 												relacionGrupoPersona.createCriteria()
-														.andIdpersonaEqualTo(Long.valueOf(insertResponseDTO.getId()))
+														.andIdpersonaEqualTo(Long.valueOf(noColegiadoItem.getIdPersona()))
 														.andIdgrupoEqualTo(Short.valueOf(etiqueta.getIdGrupo()))
 														.andIdinstitucionEqualTo(idInstitucion);
 												listarelacionGrupoPersona = cenGruposclienteClienteExtendsMapper
@@ -1498,18 +1533,22 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 												if (listarelacionGrupoPersona.isEmpty()) {
 													
 													int response = 0;
-													
+													SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy",
+															Locale.getDefault());
+													Date date = new Date();
+													String fecha = dateFormat.format(date);
+													etiqueta.setFechaInicio(fecha);
 													LOGGER.info(
 															"createLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
 													if (cenGruposcliente != null && cenGruposcliente.size() > 0) {
 														response = cenGruposclienteClienteExtendsMapper
 																.insertSelectiveForUpdateLegalPerson(etiqueta,
-																		insertResponseDTO.getId(), String.valueOf(idInstitucion), String.valueOf(idInstitucion),
+																		noColegiadoItem.getIdPersona(), String.valueOf(idInstitucion), String.valueOf(idInstitucion),
 																		String.valueOf(usuario.getIdusuario()));
 													} else {
 														response = cenGruposclienteClienteExtendsMapper
 																.insertSelectiveForUpdateLegalPerson(etiqueta,
-																		insertResponseDTO.getId(),
+																		noColegiadoItem.getIdPersona(),
 																		String.valueOf(SigaConstants.IDINSTITUCION_2000),
 																		String.valueOf(idInstitucion),
 																		String.valueOf(usuario.getIdusuario()));
