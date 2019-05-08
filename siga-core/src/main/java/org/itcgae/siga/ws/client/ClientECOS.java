@@ -35,6 +35,7 @@ public class ClientECOS extends DefaultClientWs{
 			ECOSClient client = context.getBean(ECOSClient.class);
 			
 			LOGGER.debug("Llamada a ECOS a la url:" + uriService);
+			LOGGER.debug(request);
 			response = client.enviarSMS(uriService, request);
 			LOGGER.debug("Respuesta de ECOS recibida " + response);
 			
@@ -59,6 +60,7 @@ public class ClientECOS extends DefaultClientWs{
 			ECOSClient client = context.getBean(ECOSClient.class);
 			
 			LOGGER.debug("Llamada a ECOS a la url:" + uriService);
+			LOGGER.debug(request);
 			response = client.consultaEstadoMensaje(uriService, request);
 			LOGGER.debug("Respuesta de ECOS recibida " + response);
 			

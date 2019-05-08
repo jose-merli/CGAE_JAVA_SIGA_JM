@@ -26,7 +26,7 @@ public class ClientPFD extends DefaultClientWs{
 
 			context = new AnnotationConfigApplicationContext(WebServiceClientConfigPFD.class);
 			PFDClient client = context.getBean(PFDClient.class);
-			
+			LOGGER.debug(request);
 			response = client.firmarPDF(uriService, request);
 			LOGGER.debug(response);
 		} catch (Exception e){
@@ -51,7 +51,7 @@ public class ClientPFD extends DefaultClientWs{
 			LOGGER.info("La url de la PFD es: " + uriService);
 			context = new AnnotationConfigApplicationContext(WebServiceClientConfigPFD.class);
 			PFDClient client = context.getBean(PFDClient.class);
-			
+			LOGGER.debug(request);
 			response = client.obtenerDocumento(uriService, request);
 			LOGGER.debug(response);
 		}catch (Exception e){
