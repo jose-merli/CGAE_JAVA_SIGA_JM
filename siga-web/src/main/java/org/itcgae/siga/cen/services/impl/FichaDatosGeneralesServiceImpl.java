@@ -1319,6 +1319,8 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							insertResponseDTO.setStatus(SigaConstants.KO);
 							LOGGER.info("createColegiado() La solicitud no ha podido ser creada correctamente");
 						}
+				}else{
+					insertResponseDTO.setStatus(SigaConstants.OK);
 				}
 				}
 
