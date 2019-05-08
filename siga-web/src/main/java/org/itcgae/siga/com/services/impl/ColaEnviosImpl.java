@@ -17,6 +17,7 @@ import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.com.services.IEnviosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.FORMATO_SALIDA;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
@@ -765,8 +766,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 		EnvDocumentos envDocumentos = new EnvDocumentos();
 		envDocumentos.setIdenvio(idenvio);
 		envDocumentos.setIdinstitucion(idinstitucion);
-		envDocumentos.setDescripcion(movil);
-		envDocumentos.setPathdocumento(movil);
+		envDocumentos.setDescripcion(movil + "." + FORMATO_SALIDA.PDF.getDescripcion());
+		envDocumentos.setPathdocumento(movil + "." + FORMATO_SALIDA.PDF.getDescripcion());
 		envDocumentos.setUsumodificacion(1);
 		envDocumentos.setFechamodificacion(new Date());
 		envDocumentosMapper.insert(envDocumentos);

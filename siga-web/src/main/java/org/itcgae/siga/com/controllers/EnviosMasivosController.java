@@ -12,7 +12,6 @@ import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DestinatarioIndvEnvioMasivoItem;
-import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.DestinatariosDTO;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
@@ -26,9 +25,9 @@ import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
-import org.itcgae.siga.com.services.impl.EnviosMasivosServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -221,21 +220,26 @@ public class EnviosMasivosController {
 	}
 	
 	@RequestMapping(value="/detalle/descargarDocumento", method=RequestMethod.POST, produces=MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<InputStreamResource> obtenerAdjunto(@RequestBody ResponseDocumentoDTO documentoDTO){
+    public ResponseEntity<Resource> obtenerAdjunto(@RequestBody ResponseDocumentoDTO documentoDTO) throws Exception{
             
 		HttpHeaders headers = null;
 		File file = null;
-		InputStreamResource resource = null;  
+		Resource resource = null;  
+		long contentLength = -1;
 		
 		if (documentoDTO.getIdDocumento() != null) {
 			//busco si es un destintario de burosms
 			resource = buroSMS(documentoDTO);
+			if (resource != null) {
+				contentLength = resource.contentLength();
+			}
 		}
 		
 		if (resource == null) {
 			file = new File(documentoDTO.getRutaDocumento());
 			try{
-				resource = new InputStreamResource(new FileInputStream(file));                  
+				resource = new InputStreamResource(new FileInputStream(file)); 
+				contentLength = file.length();
 			}catch(FileNotFoundException e){
 	    		LOGGER.error("Error al recuperar el fichero ", e);
 			}
@@ -250,11 +254,11 @@ public class EnviosMasivosController {
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentoDTO.getNombreDocumento() + "\"");
 //		System.out.println("The length of the file is : "+file.length());
 		  
-		return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+		return ResponseEntity.ok().headers(headers).contentLength(contentLength).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
     }
 	
-	private InputStreamResource buroSMS(ResponseDocumentoDTO documentoDTO) {
-		InputStreamResource inputStreamResource = null;
+	private Resource buroSMS(ResponseDocumentoDTO documentoDTO) {
+		Resource inputStreamResource = null;
 		if (documentoDTO.getIdInstitucion() != null && documentoDTO.getIdEnvio() != null && !documentoDTO.getIdEnvio().trim().equals("") 
 				&& documentoDTO.getIdDocumento() != null) {
 			inputStreamResource = _enviosMasivosService.recuperaPdfBuroSMS(documentoDTO.getIdInstitucion(), Long.parseLong(documentoDTO.getIdEnvio()), documentoDTO.getIdDocumento());

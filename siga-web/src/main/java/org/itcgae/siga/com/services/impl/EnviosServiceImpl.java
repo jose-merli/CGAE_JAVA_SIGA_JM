@@ -366,6 +366,10 @@ public class EnviosServiceImpl implements IEnviosService{
 			request.setIsSMSCertificado(esBuroSMS);
 			
 			if(esBuroSMS){
+				if (remitente == null || remitente.getCorreoelectronico() == null) {
+					LOGGER.error("El remitente o su correo electrónico es nulo");
+					throw new BusinessException("El remitente o su correo electrónico es nulo");
+				}
 				request.setEmail(remitente.getCorreoelectronico());
 			}
 			

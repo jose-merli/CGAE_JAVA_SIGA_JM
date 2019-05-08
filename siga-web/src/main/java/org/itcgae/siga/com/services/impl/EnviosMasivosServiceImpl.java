@@ -105,7 +105,8 @@ import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.ws.client.ClientECOS;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -883,15 +884,17 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					}
 
 					// tabla env_documentos
-					EnvDocumentosExample docExample = new EnvDocumentosExample();
-					docExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
-					List<EnvDocumentos> documentos = _envDocumentosMapper.selectByExample(docExample);
-					for (EnvDocumentos documento : documentos) {
-						// el id documento se debería de calcular con secuencia en bdd
-						documento.setIdenvio(idEnvioNuevo);
-						documento.setFechamodificacion(new Date());
-						documento.setUsumodificacion(usuario.getIdusuario());
-						_envDocumentosMapper.insert(documento);
+					if (!SigaConstants.ID_ENVIO_BURO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
+						EnvDocumentosExample docExample = new EnvDocumentosExample();
+						docExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
+						List<EnvDocumentos> documentos = _envDocumentosMapper.selectByExample(docExample);
+						for (EnvDocumentos documento : documentos) {
+							// el id documento se debería de calcular con secuencia en bdd
+							documento.setIdenvio(idEnvioNuevo);
+							documento.setFechamodificacion(new Date());
+							documento.setUsumodificacion(usuario.getIdusuario());
+							_envDocumentosMapper.insert(documento);
+						}
 					}
 
 					// tabla env_historicoestadoenvio
@@ -1886,10 +1889,10 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	}
 
 	@Override
-	public InputStreamResource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Short idDocumento) {
+	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Short idDocumento) {
 		
 		LOGGER.debug("Comprobando si es un envío burosms para recuperar el pdf para iddocumento " + idDocumento);
-		InputStreamResource inputStreamResource = null;
+		Resource inputStreamResource = null;
 		
 		if (idInstitucion != null && idEnvio != null && idDocumento != null) {
 			try {
@@ -1940,11 +1943,10 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							}
 							
 							if (envDestinatariosBurosms.getCsv() != null) {
-								String fileBase64 = pfdService.obtenerDocumentoFirmado(csv);
+								String fileBase64 = pfdService.obtenerDocumentoFirmado(envDestinatariosBurosms.getCsv());
 								byte[] decodedValue = Base64.getDecoder().decode(fileBase64);
 								
-								ByteArrayInputStream byteArray = new ByteArrayInputStream(decodedValue);
-								inputStreamResource = new InputStreamResource(byteArray);
+								inputStreamResource = new ByteArrayResource(decodedValue);
 							}
 						} else {
 							LOGGER.debug("El Idsolicitudecos es nulo para el iddocumento = " + idDocumento);

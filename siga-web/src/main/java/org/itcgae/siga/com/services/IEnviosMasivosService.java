@@ -21,7 +21,7 @@ import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface IEnviosMasivosService {
@@ -52,6 +52,6 @@ public interface IEnviosMasivosService {
 	public Error asociarDestinatario(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem destinatario);
 	public Error desAsociarDestinatarios(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem[] destinatario);
 	public DatosDireccionesDTO obtenerDireccionesDisp(HttpServletRequest request, String idPersona);
-	public InputStreamResource recuperaPdfBuroSMS(Short idInstitucion, Long parseInt, Short idDocumento);
+	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long parseInt, Short idDocumento);
 }
 
