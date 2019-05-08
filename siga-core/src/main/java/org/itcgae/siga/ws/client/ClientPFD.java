@@ -28,7 +28,7 @@ public class ClientPFD extends DefaultClientWs{
 			PFDClient client = context.getBean(PFDClient.class);
 			
 			response = client.firmarPDF(uriService, request);
-
+			LOGGER.debug(response);
 		} catch (Exception e){
 			LOGGER.error("Error al enviar a firma un documento", e);
 			throw e;
@@ -53,6 +53,7 @@ public class ClientPFD extends DefaultClientWs{
 			PFDClient client = context.getBean(PFDClient.class);
 			
 			response = client.obtenerDocumento(uriService, request);
+			LOGGER.debug(response);
 		}catch (Exception e){
 			LOGGER.error("Error al obtener un documento firmado", e);
 	

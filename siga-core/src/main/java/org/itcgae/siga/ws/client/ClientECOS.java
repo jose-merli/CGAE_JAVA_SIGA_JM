@@ -34,9 +34,9 @@ public class ClientECOS extends DefaultClientWs{
 			context = new AnnotationConfigApplicationContext(WebServiceClientConfigECOS.class);
 			ECOSClient client = context.getBean(ECOSClient.class);
 			
-			LOGGER.debug("Llamada a ECOS");
+			LOGGER.debug("Llamada a ECOS a la url:" + uriService);
 			response = client.enviarSMS(uriService, request);
-			LOGGER.debug("Respuesta de ECOS recibida");
+			LOGGER.debug("Respuesta de ECOS recibida " + response);
 			
 		}catch (Exception e) {
 			LOGGER.error("Error al enviar SMS por ECOS", e);
@@ -58,9 +58,9 @@ public class ClientECOS extends DefaultClientWs{
 			context = new AnnotationConfigApplicationContext(WebServiceClientConfigECOS.class);
 			ECOSClient client = context.getBean(ECOSClient.class);
 			
-			LOGGER.debug("Llamada a ECOS");
+			LOGGER.debug("Llamada a ECOS a la url:" + uriService);
 			response = client.consultaEstadoMensaje(uriService, request);
-			LOGGER.debug("Respuesta de ECOS recibida");
+			LOGGER.debug("Respuesta de ECOS recibida " + response);
 			
 		}catch (Exception e) {
 			LOGGER.error("Error al enviar SMS por ECOS", e);

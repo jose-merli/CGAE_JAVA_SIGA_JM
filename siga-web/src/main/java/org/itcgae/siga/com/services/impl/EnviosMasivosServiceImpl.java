@@ -1926,6 +1926,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 								
 								ConsultarEstadoMensajeResponseDocument consultarEstadoMensajeResponseDocument = _clientECOS.consultaEstadoMensaje(uriService, consultarEstadoMensajeDocument);
 								if (consultarEstadoMensajeResponseDocument != null) {
+									LOGGER.debug(consultarEstadoMensajeResponseDocument.xmlText());
 									if (consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse() != null) {
 										if (consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse().getConsultarEstadoMensajeResponse() != null) {
 											if (consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse().getConsultarEstadoMensajeResponse().getInfoResultado() != null) {

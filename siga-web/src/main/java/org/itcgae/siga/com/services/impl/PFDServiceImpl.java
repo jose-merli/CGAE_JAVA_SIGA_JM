@@ -207,6 +207,7 @@ public class PFDServiceImpl implements IPFDService {
 			if(response != null){
 				ObtenerDocumentoResponse responseDoc = response.getObtenerDocumentoResponse();
 				String resultado = responseDoc.getObtenerDocumentoResponse().getResultado();
+				LOGGER.debug(responseDoc.xmlText());
 				if(SigaConstants.SOLICITUD_DOCUMENTO_OK.equalsIgnoreCase(resultado)){
 					LOGGER.debug("Documento encontrado en la PFD");
 					documentoBase64 = responseDoc.getObtenerDocumentoResponse().getDocumento().getFirmab64();
