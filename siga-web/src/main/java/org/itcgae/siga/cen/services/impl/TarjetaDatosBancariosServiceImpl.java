@@ -100,7 +100,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 @Service
-@Transactional(rollbackFor = Exception.class)
 public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosService {
 
 	private Logger LOGGER = Logger.getLogger(TarjetaDatosBancariosServiceImpl.class);

@@ -12,6 +12,10 @@ import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.NoColegiadoDTO;
+import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.cen.services.IBusquedaCensoGeneralService;
 import org.itcgae.siga.cen.services.IInstitucionesService;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -21,7 +25,10 @@ import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
+import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.ws.client.ClientCENSO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,7 +51,6 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 
 	private Logger LOGGER = Logger.getLogger(BusquedaCensoGeneralServiceImpl.class);
 
-	
 	@Autowired
 	private AdmConfigMapper admConfigMapper;
 
@@ -56,6 +62,12 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 	
 	@Autowired
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
+	
+	@Autowired
+	private CenNocolegiadoExtendsMapper cenNocolegiadoExtendsMapper;
+	
+	@Autowired
+	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 	
 
 	@Override
@@ -358,6 +370,73 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 			}
 		} else
 			return null;
+	}
+
+	@Override
+	public NoColegiadoDTO searchCliente(NoColegiadoItem noColegiadoItem, HttpServletRequest request) {
+
+		LOGGER.info("searchCliente() -> Entrada al servicio para obtener no colegiados");
+
+		NoColegiadoDTO noColegiadosDTO = new NoColegiadoDTO();
+		List<NoColegiadoItem> noColegiadoItemList = new ArrayList<NoColegiadoItem>();
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		if (null != idInstitucion) {
+
+			noColegiadoItemList = cenNocolegiadoExtendsMapper.selectCliente(idInstitucion, noColegiadoItem);
+			noColegiadosDTO.setNoColegiadoItem(noColegiadoItemList);
+
+			if (noColegiadoItemList == null || noColegiadoItemList.size() == 0) {
+
+				LOGGER.warn(
+						"searchCliente() / cenNocolegiadoExtendsMapper.searchNoColegiado() -> No existen no colegiados con las condiciones recibidas en la Institucion = "
+								+ idInstitucion);
+			}
+
+		} else {
+			LOGGER.warn("searchCliente() -> idInstitucion del token nula");
+		}
+
+		return noColegiadosDTO;
+	}
+
+	@Override
+	public ColegiadoDTO searchColegiado(ColegiadoItem colegiadoItem, HttpServletRequest request) {
+		LOGGER.info("searchColegiado() -> Entrada al servicio para obtener colegiados");
+
+		ColegiadoDTO colegiadosDTO = new ColegiadoDTO();
+		
+		
+		List<ColegiadoItem> colegiadoItemList = new ArrayList<ColegiadoItem>();
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			if(null !=colegiadoItem.getSearchLoggedUser() && colegiadoItem.getSearchLoggedUser()) {
+				colegiadoItem.setNif(dni);
+
+
+			}
+			colegiadoItemList = cenColegiadoExtendsMapper.selectColegiadosCensoGeneral(idInstitucion, colegiadoItem);
+			colegiadosDTO.setColegiadoItem(colegiadoItemList);
+
+			if (colegiadoItemList == null || colegiadoItemList.size() == 0) {
+
+				LOGGER.warn(
+						"searchColegiado() / cenColegiadoExtendsMapper.searchColegiado() -> No existen colegiados con las condiciones recibidas en la Institucion = "
+								+ idInstitucion);
+			}
+
+		} else {
+			LOGGER.warn("searchColegiado() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("searchColegiado() -> Salida al servicio para obtener colegiados");
+
+		return colegiadosDTO;
 	}
 
 }

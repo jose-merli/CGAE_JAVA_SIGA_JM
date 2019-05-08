@@ -2,6 +2,9 @@ package org.itcgae.siga.DTOs.cen;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+
+import org.itcgae.siga.DTOs.gen.ComboItem;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -56,7 +59,28 @@ public class NoColegiadoItem {
 	private String subTipoCV1;
 	private String subTipoCV2;
 	private String colegioResultado;
+	private String [] temas;
+	private List<ComboItem> temasCombo;
+
 	
+
+
+	public String[] getTemas() {
+		return temas;
+	}
+
+	public void setTemas(String[] temas) {
+		this.temas = temas;
+	}
+
+	public List<ComboItem> getTemasCombo() {
+		return temasCombo;
+	}
+
+	public void setTemasCombo(List<ComboItem> temasCombo) {
+		this.temasCombo = temasCombo;
+	}
+
 	private String [] colegio;
 
 	/**

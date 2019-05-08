@@ -4,6 +4,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
+import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.NoColegiadoDTO;
+import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.cen.services.IBusquedaCensoGeneralService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +33,17 @@ public class BusquedaCensoGeneralController {
 		return new ResponseEntity<BusquedaPerFisicaDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "busquedaCensoGeneral/searchCliente",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<NoColegiadoDTO> searchCliente(@RequestBody NoColegiadoItem noColegiadoItem, HttpServletRequest request) {
+		NoColegiadoDTO response = busquedaCensoGeneralService.searchCliente(noColegiadoItem, request);
+		return new ResponseEntity<NoColegiadoDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "busquedaCensoGeneral/searchColegiado",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ColegiadoDTO> searchColegiado(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) {
+		ColegiadoDTO response = busquedaCensoGeneralService.searchColegiado(colegiadoItem, request);
+		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
+	}
 
 	
 }
