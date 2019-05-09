@@ -9,8 +9,7 @@ import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDeleteDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
-import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
-import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
+import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
 import org.itcgae.siga.DTOs.cen.ParametroColegioDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -42,9 +41,9 @@ public class BusquedaPerJuridicaController {
 	
 	
 	@RequestMapping(value = "/busquedaPerJuridica/etiquetas",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getLabel( HttpServletRequest request) {
-		ComboDTO response = busquedaPerJuridicaService.getLabel(request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	ResponseEntity<ComboInstitucionDTO> getLabel( HttpServletRequest request) {
+		ComboInstitucionDTO response = busquedaPerJuridicaService.getLabel(request);
+		return new ResponseEntity<ComboInstitucionDTO>(response, HttpStatus.OK);
 	}
 	
 					

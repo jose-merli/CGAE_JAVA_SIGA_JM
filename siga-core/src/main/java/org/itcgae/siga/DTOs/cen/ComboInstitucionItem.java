@@ -3,7 +3,7 @@ package org.itcgae.siga.DTOs.cen;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ComboSubtipoCVItem {
+public class ComboInstitucionItem {
 
 	private String label = null;
 	private String value = null;
@@ -44,10 +44,10 @@ public class ComboSubtipoCVItem {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		ComboSubtipoCVItem comboSubtipoCVItem = (ComboSubtipoCVItem) o;
-		return Objects.equals(this.label, comboSubtipoCVItem.label)
-				&& Objects.equals(this.value, comboSubtipoCVItem.value)
-				&& Objects.equals(this.idInstitucion, comboSubtipoCVItem.idInstitucion);
+		ComboInstitucionItem comboInstitucionItem = (ComboInstitucionItem) o;
+		return Objects.equals(this.label, comboInstitucionItem.label)
+				&& Objects.equals(this.value, comboInstitucionItem.value)
+				&& Objects.equals(this.idInstitucion, comboInstitucionItem.idInstitucion);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class ComboSubtipoCVItem {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("class ComboSubtipoCVItem {\n");
+		sb.append("class ComboInstitucionItem {\n");
 		sb.append("    label: ").append(toIndentedString(label)).append("\n");
 		sb.append("    value: ").append(toIndentedString(value)).append("\n");
 		sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");

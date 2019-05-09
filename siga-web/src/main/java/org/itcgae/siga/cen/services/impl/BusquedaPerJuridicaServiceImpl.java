@@ -16,6 +16,8 @@ import org.itcgae.siga.DTOs.cen.BusquedaJuridicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
+import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
+import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.DTOs.cen.ParametroColegioDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -26,12 +28,8 @@ import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenGruposclienteCliente;
-import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.entities.CenNocolegiado;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
-import org.itcgae.siga.db.entities.CenPersona;
-import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
@@ -120,10 +118,10 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 
 	
 	@Override
-	public ComboDTO getLabel(HttpServletRequest request) {
+	public ComboInstitucionDTO getLabel(HttpServletRequest request) {
 		LOGGER.info("getLabel() -> Entrada al servicio para obtener los de grupos de clientes");
-		List<ComboItem> comboItem = new ArrayList<ComboItem>();
-		ComboDTO comboDTO = new ComboDTO();
+		List<ComboInstitucionItem> comboItem = new ArrayList<ComboInstitucionItem>();
+		ComboInstitucionDTO comboInstitucionDTO = new ComboInstitucionDTO();
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -145,7 +143,7 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 				LOGGER.info("getLabel() / cenGruposclienteExtendsMapper.getLabel() -> Entrada a cenGruposclienteExtendsMapper para obtener lista de tipos de colegios");
 				comboItem = cenGruposclienteExtendsMapper.getLabel(usuario);
 				LOGGER.info("getLabel() / cenGruposclienteExtendsMapper.getLabel() -> Salida de cenGruposclienteExtendsMapper para obtener lista de tipos de colegios");
-				comboDTO.setCombooItems(comboItem);
+				comboInstitucionDTO.setComboInstitucionItem(comboItem);
 			}
 			else {
 				LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);
@@ -156,7 +154,7 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 		}
 		
 		LOGGER.info("getLabel() -> Salida del servicio para obtener los de grupos de clientes");
-		return comboDTO;
+		return comboInstitucionDTO;
 	}
 	
 	@Override

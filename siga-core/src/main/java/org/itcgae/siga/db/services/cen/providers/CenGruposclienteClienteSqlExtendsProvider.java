@@ -27,7 +27,7 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", "'" +idUsuario + "'");
-		sql.VALUES("IDINSTITUCION_GRUPO", "'" +idInstitucion+ "'");
+		sql.VALUES("IDINSTITUCION_GRUPO", "'" + etiqueta.getIdInstitucion() + "'");
 		if(etiqueta.getFechaBaja() != null) {
 			sql.VALUES("FECHA_BAJA", "TO_DATE('" + etiqueta.getFechaBaja() + "','DD/MM/YYYY')");
 		}else {
@@ -44,6 +44,7 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		sql.SELECT("GENR.descripcion");
 		sql.SELECT("NVL(TO_CHAR(cli.fecha_inicio, 'dd/MM/yyyy'),TO_CHAR(TO_DATE('01/01/1980','DD/MM/YYYY'),'DD/MM/YYYY')) as FECHA_INICIO");
 		sql.SELECT("TO_CHAR(cli.fecha_baja, 'dd/MM/yyyy') as FECHA_BAJA");
+		sql.SELECT("cli.IDINSTITUCION_GRUPO as IDINSTITUCION");
 		sql.FROM("CEN_GRUPOSCLIENTE_CLIENTE cli");
 		sql.INNER_JOIN("cen_persona per on cli.idpersona = per.idpersona ");
 		sql.INNER_JOIN("CEN_GRUPOSCLIENTE GRUCLI on cli.idGrupo = GRUCLI.idGrupo and cli.idinstitucion_grupo = grucli.idinstitucion");

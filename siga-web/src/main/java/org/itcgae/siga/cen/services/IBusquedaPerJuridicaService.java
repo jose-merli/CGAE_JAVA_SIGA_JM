@@ -10,6 +10,7 @@ import org.itcgae.siga.DTOs.cen.BusquedaJuridicaDeleteDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaJuridicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
+import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.ParametroColegioDTO;
 import org.itcgae.siga.DTOs.cen.PersonaJuridicaSearchDTO;
@@ -20,7 +21,7 @@ public interface IBusquedaPerJuridicaService {
 	
 	public ComboDTO getSocietyTypes(HttpServletRequest request);
 	
-	public ComboDTO getLabel( HttpServletRequest request);
+	public ComboInstitucionDTO getLabel( HttpServletRequest request);
 	
 	public BusquedaJuridicaDTO searchLegalPersons(int numPagina, BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request);
 	

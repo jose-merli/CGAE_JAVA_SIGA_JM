@@ -44,10 +44,10 @@ public class ComboTipoCVItem {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		ComboTipoCVItem comboColegiadoItem = (ComboTipoCVItem) o;
-		return Objects.equals(this.label, comboColegiadoItem.label)
-				&& Objects.equals(this.value, comboColegiadoItem.value)
-				&& Objects.equals(this.idInstitucion, comboColegiadoItem.idInstitucion);
+		ComboTipoCVItem comboTipoCVItem = (ComboTipoCVItem) o;
+		return Objects.equals(this.label, comboTipoCVItem.label)
+				&& Objects.equals(this.value, comboTipoCVItem.value)
+				&& Objects.equals(this.idInstitucion, comboTipoCVItem.idInstitucion);
 	}
 
 	@Override

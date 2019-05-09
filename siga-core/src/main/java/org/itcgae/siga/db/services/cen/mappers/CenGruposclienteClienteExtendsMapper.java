@@ -32,7 +32,8 @@ public interface CenGruposclienteClienteExtendsMapper extends CenGruposclienteCl
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDGRUPO", property = "idGrupo", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHA_INICIO", property = "fechaInicio", jdbcType = JdbcType.DATE),
-		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE)
+		@Result(column = "FECHA_BAJA", property = "fechaBaja", jdbcType = JdbcType.DATE),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.DATE)
 	})
 
 	//List<ComboItem> selectGruposPersonaJuridica(String idPersona, String idInstitucion);
