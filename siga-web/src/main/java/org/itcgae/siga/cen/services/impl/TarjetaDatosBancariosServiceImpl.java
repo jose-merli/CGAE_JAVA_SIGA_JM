@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -246,10 +247,18 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					// cuenta de la persona
 					String[] resultado;
 					try {
+						LOGGER.info(
+								"updateBanksData() -> OK. Llamada al PL PROCESO_REVISION_CUENTA con los siguientes parámetros: idInstitucion = " + idInstitucion +" "
+										+ "idpersona = " + datosBancariosDeleteDTO.getIdPersona() +" idCuenta = "+ datosBancariosDeleteDTO.getIdCuentas()[i] +"" );
 						resultado = ejecutarPL_Revision_Cuenta("" + idInstitucion.toString(),
 								"" + datosBancariosDeleteDTO.getIdPersona(), "" + datosBancariosDeleteDTO.getIdCuentas()[i],
 								"" + usuario.getIdusuario().toString());
-						
+						if (resultado != null && resultado.length > 0){
+						LOGGER.info(
+								"updateBanksData() -> Salida de la llamada al PL PROCESO_REVISION_CUENTA con los siguientes resultados: estado = " + resultado[0] +" "
+										+ "mensaje = " + resultado[1] );
+						}
+					
 						if (resultado == null || !resultado[0].equals("0")) {
 
 							deleteResponseDTO.setStatus(SigaConstants.KO);
@@ -267,7 +276,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						return deleteResponseDTO;
 					}
 					
-
+					
 				}
 				
 			} else {
@@ -708,56 +717,31 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 							}
 							return insertResponseDTO;
 						}
-					}
+						
+						if(null == datosBancariosInsertDTO.getNoRevisarServicios()) {
+							LOGGER.info(
+									"InsertBanksData() -> OK. Llamada al PL PROCESO_ALTA_CUENTA_CARGOS con los siguientes parámetros: idInstitucion = " + idInstitucion +" "
+											+ "idpersona = " + datosBancariosInsertDTO.getIdPersona() +" idCuenta = "+ datosBancariosInsertDTO.getIdCuenta() +"" );
+							// Este proceso asocia las suscripciones activas con forma de pago en metalico a
+							// la nueva cuenta bancaria
+							String[] resultado1 = ejecutarPL_AltaCuentaCargos("" + idInstitucion.toString(),
+									"" + datosBancariosInsertDTO.getIdPersona(), "" + idCuenta.toString(),
+									"" + usuario.getIdusuario().toString());
+							if (resultado1 != null && resultado1.length > 0){
+							LOGGER.info(
+									"InsertBanksData() -> Salida de la llamada al PL PROCESO_ALTA_CUENTA_CARGOS con los siguientes resultados: estado = " + resultado1[0] +" "
+											+ "mensaje = " + resultado1[1] );
+							}
+							if (resultado1 == null || !resultado1[0].equals("0")) {
+								insertResponseDTO.setStatus(SigaConstants.KO);
+								error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_ALTA_CUENTA_CARGOS"
+										+ resultado[1]);
+								insertResponseDTO.setError(error);
+								return insertResponseDTO;
+							}
+						}
 				}
 
-				// Se comprueba si se deben revisar las cuentas y se ejecutan los scripts que se
-				// encargan de ello
-
-				// Lanzamos el proceso de revision de suscripciones del letrado
-				String resultado[] = ejecutarPL_RevisionSuscripcionesLetrado("" + idInstitucion.toString(),
-						"" + datosBancariosInsertDTO.getIdPersona(), "", "" + usuario.getIdusuario().toString());
-				if ((resultado == null) || (!resultado[0].equals("0"))) {
-					insertResponseDTO.setStatus(SigaConstants.KO);
-					error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO"
-							+ resultado[1]);
-					insertResponseDTO.setError(error);
-					return insertResponseDTO;
-				}
-
-				// Este proceso se encarga de actualizar las cosas pendientes asociadas a la
-				// cuenta de la persona
-				if(null == datosBancariosInsertDTO.getNoRevisarServicios()) {
-					String[] resultado1 = ejecutarPL_Revision_Cuenta("" + idInstitucion.toString(),
-							"" + datosBancariosInsertDTO.getIdPersona(), "" + idCuenta.toString(),
-							"" + usuario.getIdusuario().toString());
-					if (resultado1 == null || !resultado1[0].equals("0")) {
-	
-						insertResponseDTO.setStatus(SigaConstants.KO);
-						error.setMessage(
-								"Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado[1]);
-						insertResponseDTO.setError(error);
-						return insertResponseDTO;
-	
-					}
-				
-
-				// Comprueba si va a lanzar el proceso que asocia las suscripciones activas con
-				// forma de pago en metalico a la nueva cuenta bancaria
-				if (datosBancariosInsertDTO.getRevisionCuentas()) {
-					// Este proceso asocia las suscripciones activas con forma de pago en metalico a
-					// la nueva cuenta bancaria
-					resultado1 = ejecutarPL_AltaCuentaCargos("" + idInstitucion.toString(),
-							"" + datosBancariosInsertDTO.getIdPersona(), "" + idCuenta.toString(),
-							"" + usuario.getIdusuario().toString());
-					if (resultado1 == null || !resultado1[0].equals("0")) {
-						insertResponseDTO.setStatus(SigaConstants.KO);
-						error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_ALTA_CUENTA_CARGOS"
-								+ resultado[1]);
-						insertResponseDTO.setError(error);
-						return insertResponseDTO;
-					}
-				}
 }
 			} else {
 				LOGGER.warn(
@@ -1678,54 +1662,99 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 					}
 				}
 
-				// Se comprueba si se deben revisar las cuentas y se ejecutan los scripts que se
-				// encargan de ello
-
-				// Lanzamos el proceso de revision de suscripciones del letrado
-				String resultado[] = ejecutarPL_RevisionSuscripcionesLetrado("" + idInstitucion.toString(),
-						"" + datosBancariosInsertDTO.getIdPersona(), "", "" + usuario.getIdusuario().toString());
-				if ((resultado == null) || (!resultado[0].equals("0"))) {
-					updateResponseDTO.setStatus(SigaConstants.KO);
-					error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO"
-							+ resultado[1]);
-					updateResponseDTO.setError(error);
-					return updateResponseDTO;
+				
+				
+				
+				// Comprobamos el PL que se debe ejecutar
+				
+				//Añadimos los tipos de cuenta que tenía antes para hacer las validaciones
+				List<String> tiposCuenta = new ArrayList<String>();
+				List<String> tiposCuentaNuevos = Arrays.asList(datosBancariosInsertDTO.getTipoCuenta());
+				if (null != cenCuentasbancariasAnterior.getAbonosjcs() && cenCuentasbancariasAnterior.getAbonosjcs().equals("1")) {
+					tiposCuenta.add("S");
 				}
-
-				if(null == datosBancariosInsertDTO.getNoRevisarServicios()) {
-				// Este proceso se encarga de actualizar las cosas pendientes asociadas a la
-				// cuenta de la persona
-				String[] resultado1 = ejecutarPL_Revision_Cuenta("" + idInstitucion.toString(),
-						"" + datosBancariosInsertDTO.getIdPersona(), "" + datosBancariosInsertDTO.getIdCuenta(),
-						"" + usuario.getIdusuario().toString());
-				if (resultado1 == null || !resultado1[0].equals("0")) {
-
-					updateResponseDTO.setStatus(SigaConstants.KO);
-					error.setMessage(
-							"Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado[1]);
-					updateResponseDTO.setError(error);
-					return updateResponseDTO;
-
-				}
-
-				// Comprueba si va a lanzar el proceso que asocia las suscripciones activas con
-				// forma de pago en metalico a la nueva cuenta bancaria
-				if (datosBancariosInsertDTO.getRevisionCuentas()) {
-					// Este proceso asocia las suscripciones activas con forma de pago en metalico a
-					// la nueva cuenta bancaria
-					resultado1 = ejecutarPL_AltaCuentaCargos("" + idInstitucion.toString(),
-							"" + datosBancariosInsertDTO.getIdPersona(), "" + datosBancariosInsertDTO.getIdCuenta(),
-							"" + usuario.getIdusuario().toString());
-					if (resultado1 == null || !resultado1[0].equals("0")) {
-						updateResponseDTO.setStatus(SigaConstants.KO);
-						error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_ALTA_CUENTA_CARGOS"
-								+ resultado[1]);
-						updateResponseDTO.setError(error);
-						return updateResponseDTO;
+				if (null != cenCuentasbancariasAnterior.getAbonocargo()) {
+					if (cenCuentasbancariasAnterior.getAbonocargo().equals("C")) {
+						tiposCuenta.add( cenCuentasbancariasAnterior.getAbonocargo());
+					}else if (cenCuentasbancariasAnterior.getAbonocargo().equals("A")) {
+						tiposCuenta.add( cenCuentasbancariasAnterior.getAbonocargo());
+					}else{
+						tiposCuenta.add("C");
+						tiposCuenta.add("A");
 					}
 				}
 				
+				
+				if (tiposCuenta.size() == 3 && tiposCuenta.size() == tiposCuentaNuevos.size()) {
+					//No debemos hacer nada porque no se han tocado los tipos
+				}else{
+					Boolean registrosEliminados = Boolean.FALSE;
+					for (Iterator iterator = tiposCuenta.iterator(); iterator.hasNext();) {
+						String tipoC = (String) iterator.next();
+						if (!tiposCuentaNuevos.contains(tipoC)) {
+							registrosEliminados = Boolean.TRUE;
+						}
+					}
+					
+					//Se ha eliminado uno de los tipos por lo que llamamos a revision de cuentas
+					if (registrosEliminados) {
+						LOGGER.info(
+								"updateBanksData() -> OK. Llamada al PL PROCESO_REVISION_CUENTA con los siguientes parámetros: idInstitucion = " + idInstitucion +" "
+										+ "idpersona = " + datosBancariosInsertDTO.getIdPersona() +" idCuenta = "+ datosBancariosInsertDTO.getIdCuenta() +"" );
+					String[] resultado1 = ejecutarPL_Revision_Cuenta("" + idInstitucion.toString(),
+							"" + datosBancariosInsertDTO.getIdPersona(), "" + datosBancariosInsertDTO.getIdCuenta(),
+							"" + usuario.getIdusuario().toString());
+					if (resultado1 != null && resultado1.length > 0){
+					LOGGER.info(
+							"updateBanksData() -> Salida de la llamada al PL PROCESO_REVISION_CUENTA con los siguientes resultados: estado = " + resultado1[0] +" "
+									+ "mensaje = " + resultado1[1] );
+					}
+				
+					if (resultado1 == null || !resultado1[0].equals("0")) {
+						LOGGER.info(
+								"updateBanksData() -> KO. ERROR EN LA LLAMADA AL PL DE PROCESO_REVISION_CUENTA");
+						updateResponseDTO.setStatus(SigaConstants.KO);
+						error.setMessage(
+								"Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_CUENTA" + resultado1[1]);
+						updateResponseDTO.setError(error);
+						return updateResponseDTO;
+
+					}
+
+					}
+					if (!tiposCuenta.contains("C") && tieneCargo) {
+						if(null == datosBancariosInsertDTO.getNoRevisarServicios()) {
+							// Este proceso se encarga de actualizar las cosas pendientes asociadas a la
+							// cuenta de la persona
+								
+							// Comprueba si va a lanzar el proceso que asocia las suscripciones activas con
+							// forma de pago en metalico a la nueva cuenta bancaria
+								LOGGER.info(
+										"updateBanksData() -> OK. Llamada al PL PROCESO_ALTA_CUENTA_CARGOS con los siguientes parámetros: idInstitucion = " + idInstitucion +" "
+												+ "idpersona = " + datosBancariosInsertDTO.getIdPersona() +" idCuenta = "+ datosBancariosInsertDTO.getIdCuenta() +"" );
+								// Este proceso asocia las suscripciones activas con forma de pago en metalico a
+								// la nueva cuenta bancaria
+								String [] resultado1 = ejecutarPL_AltaCuentaCargos("" + idInstitucion.toString(),
+										"" + datosBancariosInsertDTO.getIdPersona(), "" + datosBancariosInsertDTO.getIdCuenta(),
+										"" + usuario.getIdusuario().toString());
+								if (resultado1 != null && resultado1.length > 0){
+								LOGGER.info(
+										"updateBanksData() -> Salida de la llamada al PL PROCESO_ALTA_CUENTA_CARGOS con los siguientes resultados: estado = " + resultado1[0] +" "
+												+ "mensaje = " + resultado1[1] );
+								}
+								if (resultado1 == null || !resultado1[0].equals("0")) {
+									updateResponseDTO.setStatus(SigaConstants.KO);
+									error.setMessage("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_ALTA_CUENTA_CARGOS"
+											+ resultado1[1]);
+									updateResponseDTO.setError(error);
+									return updateResponseDTO;
+								}
+							
+							
+							}
+					}
 				}
+				
 
 			} else {
 				LOGGER.warn(
