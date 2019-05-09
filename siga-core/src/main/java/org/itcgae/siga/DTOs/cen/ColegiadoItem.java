@@ -48,7 +48,7 @@ public class ColegiadoItem {
 	private String tipoCV;
 	private String subTipoCV1;
 	private String subTipoCV2;
-	private String  idgrupo [];
+	private ComboInstitucionItem idgrupo [];
 	private String  denominacion;
 	private ComboEtiquetasItem[] etiquetas;
 	private String soloNombre;
@@ -715,18 +715,18 @@ public class ColegiadoItem {
 	 *
 	 */
 
-	public ColegiadoItem idgrupo(String[] idgrupo ){
+	public ColegiadoItem idgrupo(ComboInstitucionItem[] idgrupo ){
 	
 		this.idgrupo = idgrupo;
 		return this;
 	}
 
 	@JsonProperty("idgrupo")
-	public String [] getIdgrupo() {
+	public ComboInstitucionItem [] getIdgrupo() {
 		return idgrupo;
 	}
 	
-	public void setIdgrupo(String[] idgrupo) {
+	public void setIdgrupo(ComboInstitucionItem[] idgrupo) {
 		this.idgrupo = idgrupo;
 	}
 	

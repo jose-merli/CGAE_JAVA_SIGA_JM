@@ -28,7 +28,7 @@ public class NoColegiadoItem {
 	private String tipoDireccion;
 	private String apellidos;
 	private ComboEtiquetasItem[] etiquetas;
-	private String[] idGrupo;
+	private ComboInstitucionItem[] idGrupo;
 	private String sexo;
 	private String estadoCivil;
 	private String idEstadoCivil;
@@ -463,17 +463,17 @@ public class NoColegiadoItem {
 	/**
 	 *
 	 */
-	public NoColegiadoItem idGrupo(String[] idGrupo) {
+	public NoColegiadoItem idGrupo(ComboInstitucionItem[] idGrupo) {
 		this.idGrupo = idGrupo;
 		return this;
 	}
 
 	@JsonProperty("idgrupo")
-	public String[] getIdGrupo() {
+	public ComboInstitucionItem[] getIdGrupo() {
 		return idGrupo;
 	}
 
-	public void setIdGrupo(String[] idGrupo) {
+	public void setIdGrupo(ComboInstitucionItem[] idGrupo) {
 		this.idGrupo = idGrupo;
 	}
 

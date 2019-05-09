@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
 import org.itcgae.siga.DTOs.cen.ComboSubtiposCVDTO;
 import org.itcgae.siga.DTOs.cen.ComboTiposCVDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -79,9 +80,9 @@ public class BusquedaColegiadosController {
 	}
 	
 	@RequestMapping(value = "/busquedaColegiado/etiquetas",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> getLabel( HttpServletRequest request) {
-		ComboDTO response = busquedaColegiadosService.getLabel(request);
-		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	ResponseEntity<ComboInstitucionDTO> getLabel( HttpServletRequest request) {
+		ComboInstitucionDTO response = busquedaColegiadosService.getLabel(request);
+		return new ResponseEntity<ComboInstitucionDTO>(response, HttpStatus.OK);
 	}
 		
 	@RequestMapping(value = "/busquedaColegiado/searchColegiado",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)

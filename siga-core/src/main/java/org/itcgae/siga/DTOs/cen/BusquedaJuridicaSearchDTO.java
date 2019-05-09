@@ -16,7 +16,7 @@ public class BusquedaJuridicaSearchDTO {
 	private Date fechaConstitucion;
 	private Date fechaAlta;
 	private String integrante;
-	private String [] grupos;
+	private ComboInstitucionItem [] grupos;
 	private boolean sociedadesProfesionales;
 	private String abreviatura;
 	
@@ -144,19 +144,19 @@ public class BusquedaJuridicaSearchDTO {
 	/**
 	 *
 	 */
-	public BusquedaJuridicaSearchDTO grupos(String[] grupos){
+	public BusquedaJuridicaSearchDTO grupos(ComboInstitucionItem[] grupos){
 		this.grupos = grupos;
 		return this;
 	}
 	
 	
 	@JsonProperty("grupos")
-	public String[] getGrupos() {
+	public ComboInstitucionItem[] getGrupos() {
 		return grupos;
 	}
 	
 	
-	public void setGrupos(String[] grupos) {
+	public void setGrupos(ComboInstitucionItem[] grupos) {
 		this.grupos = grupos;
 	}
 	

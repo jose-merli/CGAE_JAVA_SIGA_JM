@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.ColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
+import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.IBusquedaColegiadosService;
@@ -169,10 +171,10 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 	}
 	
 	@Override
-	public ComboDTO getLabel(HttpServletRequest request) {
+	public ComboInstitucionDTO getLabel(HttpServletRequest request) {
 		LOGGER.info("getLabel() -> Entrada al servicio para obtener los de grupos de clientes");
-		List<ComboItem> comboItem = new ArrayList<ComboItem>();
-		ComboDTO comboDTO = new ComboDTO();
+		List<ComboInstitucionItem> comboItem = new ArrayList<ComboInstitucionItem>();
+		ComboInstitucionDTO comboDTO = new ComboInstitucionDTO();
 		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -194,7 +196,7 @@ public class BusquedaColegiadosServiceImpl implements IBusquedaColegiadosService
 				LOGGER.info("getLabel() / cenGruposclienteExtendsMapper.getLabel() -> Entrada a cenGruposclienteExtendsMapper para obtener lista de tipos de colegios");
 				comboItem = cenColegiadoExtendsMapper.getLabel(usuario);
 				LOGGER.info("getLabel() / cenGruposclienteExtendsMapper.getLabel() -> Salida de cenGruposclienteExtendsMapper para obtener lista de tipos de colegios");
-				comboDTO.setCombooItems(comboItem);
+				comboDTO.setComboInstitucionItem(comboItem);
 			}
 			else {
 				LOGGER.warn("getLabel() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = " + dni + " e idInstitucion = " + idInstitucion);

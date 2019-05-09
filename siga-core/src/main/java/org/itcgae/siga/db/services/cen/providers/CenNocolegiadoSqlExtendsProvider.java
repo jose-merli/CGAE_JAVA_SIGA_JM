@@ -27,16 +27,6 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		String grupos = "";
 
-		if (busquedaJuridicaSearchDTO.getGrupos().length > 1) {
-			for (String string : busquedaJuridicaSearchDTO.getGrupos()) {
-				grupos += string;
-				grupos += ",";
-			}
-			grupos = grupos.substring(0, grupos.length() - 1);
-		} else if (busquedaJuridicaSearchDTO.getGrupos().length == 1) {
-			grupos = busquedaJuridicaSearchDTO.getGrupos()[0];
-		}
-
 		sql2.SELECT(" DISTINCT COL.IDPERSONA AS IDPERSONA");
 		sql2.SELECT("PER.NIFCIF AS NIF");
 		sql2.SELECT("PER.NOMBRE  AS DENOMINACION");
@@ -73,8 +63,25 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 		}
 
-		if (!grupos.equalsIgnoreCase("")) {
-			sql2.WHERE("GRUPOS_CLIENTE.IDGRUPO IN (" + grupos + ")");
+		if (busquedaJuridicaSearchDTO.getGrupos() != null && busquedaJuridicaSearchDTO.getGrupos().length > 0) {
+			String etiquetas = "";
+
+			for (int i = 0; busquedaJuridicaSearchDTO.getGrupos().length > i; i++) {
+
+				if (i == busquedaJuridicaSearchDTO.getGrupos().length - 1) {
+					etiquetas += "( GRUPOS_CLIENTE.IDGRUPO ='" + busquedaJuridicaSearchDTO.getGrupos()[i].getValue()
+							+ "' and GRUPOS_CLIENTE.IDINSTITUCION_GRUPO = '"
+							+ busquedaJuridicaSearchDTO.getGrupos()[i].getIdInstitucion() + "')";
+				} else {
+					etiquetas += "( GRUPOS_CLIENTE.IDGRUPO ='" + busquedaJuridicaSearchDTO.getGrupos()[i].getValue()
+							+ "' and GRUPOS_CLIENTE.IDINSTITUCION_GRUPO = '"
+							+ busquedaJuridicaSearchDTO.getGrupos()[i].getIdInstitucion() + "') or";
+
+				}
+			}
+
+			sql2.WHERE("(" + etiquetas + ")");
+
 		}
 
 		if (null != busquedaJuridicaSearchDTO.getFechaConstitucion()
@@ -137,16 +144,16 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		String grupos = "";
 		
 		
-		if(busquedaJuridicaSearchDTO.getGrupos().length > 1) {
-			for (String string : busquedaJuridicaSearchDTO.getGrupos()) {
-				grupos += string;
-				grupos += ",";
-			}
-			grupos = grupos.substring(0,grupos.length()-1);
-		}
-		else if(busquedaJuridicaSearchDTO.getGrupos().length == 1){
-			grupos = busquedaJuridicaSearchDTO.getGrupos()[0];
-		}
+//		if(busquedaJuridicaSearchDTO.getGrupos().length > 1) {
+//			for (String string : busquedaJuridicaSearchDTO.getGrupos()) {
+//				grupos += string;
+//				grupos += ",";
+//			}
+//			grupos = grupos.substring(0,grupos.length()-1);
+//		}
+//		else if(busquedaJuridicaSearchDTO.getGrupos().length == 1){
+//			grupos = busquedaJuridicaSearchDTO.getGrupos()[0];
+//		}
 		
 
 		sql2.SELECT("DISTINCT COL.IDPERSONA AS IDPERSONA");
@@ -189,8 +196,25 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 		}
 		
-		if(!grupos.equalsIgnoreCase("")) {
-			sql2.WHERE("GRUPOS_CLIENTE.IDGRUPO IN ("+ grupos +")");
+		if (busquedaJuridicaSearchDTO.getGrupos() != null && busquedaJuridicaSearchDTO.getGrupos().length > 0) {
+			String etiquetas = "";
+
+			for (int i = 0; busquedaJuridicaSearchDTO.getGrupos().length > i; i++) {
+
+				if (i == busquedaJuridicaSearchDTO.getGrupos().length - 1) {
+					etiquetas += "( GRUPOS_CLIENTE.IDGRUPO ='" + busquedaJuridicaSearchDTO.getGrupos()[i].getValue()
+							+ "' and GRUPOS_CLIENTE.IDINSTITUCION_GRUPO = '"
+							+ busquedaJuridicaSearchDTO.getGrupos()[i].getIdInstitucion() + "')";
+				} else {
+					etiquetas += "( GRUPOS_CLIENTE.IDGRUPO ='" + busquedaJuridicaSearchDTO.getGrupos()[i].getValue()
+							+ "' and GRUPOS_CLIENTE.IDINSTITUCION_GRUPO = '"
+							+ busquedaJuridicaSearchDTO.getGrupos()[i].getIdInstitucion() + "') or";
+
+				}
+			}
+
+			sql2.WHERE("(" + etiquetas + ")");
+
 		}
 		
 		if(null != busquedaJuridicaSearchDTO.getFechaConstitucion() && !busquedaJuridicaSearchDTO.getFechaConstitucion().equals("")) {
@@ -723,18 +747,20 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		}
 		if (noColegiadoItem.getIdGrupo() != null && noColegiadoItem.getIdGrupo().length > 0) {
 
-			String etiquetas = "";
-
+		String etiquetas = "";
+			
 			for (int i = 0; noColegiadoItem.getIdGrupo().length > i; i++) {
 
 				if (i == noColegiadoItem.getIdGrupo().length - 1) {
-					etiquetas += "'" + noColegiadoItem.getIdGrupo()[i] + "'";
+					etiquetas += "( grucli.IDGRUPO ='" + noColegiadoItem.getIdGrupo()[i].getValue() + "' and grucli.IDINSTITUCION_GRUPO = '" + noColegiadoItem.getIdGrupo()[i].getIdInstitucion() + "')";
 				} else {
-					etiquetas += "'" + noColegiadoItem.getIdGrupo()[i] + "',";
+					etiquetas += "( grucli.IDGRUPO ='" + noColegiadoItem.getIdGrupo()[i].getValue() + "' and grucli.IDINSTITUCION_GRUPO = '" + noColegiadoItem.getIdGrupo()[i].getIdInstitucion() + "') or";
+
 				}
 			}
+			
 
-			sql.WHERE("grucli.IDGRUPO IN (" + etiquetas + ")");
+			sql.WHERE("(" + etiquetas + ")");
 		}
 		
 		if (noColegiadoItem.getTipoCV() != null && noColegiadoItem.getTipoCV() != "") {
@@ -886,17 +912,18 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if (noColegiadoItem.getIdGrupo() != null && noColegiadoItem.getIdGrupo().length > 0) {
 
 			String etiquetas = "";
-
+			
 			for (int i = 0; noColegiadoItem.getIdGrupo().length > i; i++) {
 
 				if (i == noColegiadoItem.getIdGrupo().length - 1) {
-					etiquetas += "'" + noColegiadoItem.getIdGrupo()[i] + "'";
+					etiquetas += "( grucli.IDGRUPO ='" + noColegiadoItem.getIdGrupo()[i].getValue() + "' and grucli.IDINSTITUCION_GRUPO = '" + noColegiadoItem.getIdGrupo()[i].getIdInstitucion() + "')";
 				} else {
-					etiquetas += "'" + noColegiadoItem.getIdGrupo()[i] + "',";
+					etiquetas += "( grucli.IDGRUPO ='" + noColegiadoItem.getIdGrupo()[i].getValue() + "' and grucli.IDINSTITUCION_GRUPO = '" + noColegiadoItem.getIdGrupo()[i].getIdInstitucion() + "') or";
+
 				}
 			}
 
-			sql.WHERE("grucli.IDGRUPO IN (" + etiquetas + ")");
+			sql.WHERE("(" + etiquetas + ")");
 		}
 		
 		if (noColegiadoItem.getIdcv() != null && noColegiadoItem.getIdcv() != "") {

@@ -130,7 +130,7 @@ public class BusquedaColegiadosServiceTest {
 
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 
-		when(cenColegiadoExtendsMapper.getLabel(usuarios.get(0))).thenReturn(cvCategory);
+//		when(cenColegiadoExtendsMapper.getLabel(usuarios.get(0))).thenReturn(cvCategory);
 		
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 

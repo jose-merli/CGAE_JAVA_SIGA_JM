@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenColegiado;
@@ -235,17 +236,18 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		if (colegiadoItem.getIdgrupo() != null && colegiadoItem.getIdgrupo().length > 0) {
 
 			String etiquetas = "";
-
+					
 			for (int i = 0; colegiadoItem.getIdgrupo().length > i; i++) {
 
 				if (i == colegiadoItem.getIdgrupo().length - 1) {
-					etiquetas += "'" + colegiadoItem.getIdgrupo()[i] + "'";
+					etiquetas += "( grucli.IDGRUPO ='" + colegiadoItem.getIdgrupo()[i].getValue() + "' and grucli.IDINSTITUCION_GRUPO = '" + colegiadoItem.getIdgrupo()[i].getIdInstitucion() + "')";
 				} else {
-					etiquetas += "'" + colegiadoItem.getIdgrupo()[i] + "',";
+					etiquetas += "( grucli.IDGRUPO ='" + colegiadoItem.getIdgrupo()[i].getValue() + "' and grucli.IDINSTITUCION_GRUPO = '" + colegiadoItem.getIdgrupo()[i].getIdInstitucion() + "') or";
+
 				}
 			}
 
-			sql.WHERE("grucli.IDGRUPO IN (" + etiquetas + ")");
+			sql.WHERE("(" + etiquetas + ")");
 		}
 
 		if (colegiadoItem.getFechaIncorporacion() != null && colegiadoItem.getFechaIncorporacion().length != 0) {
@@ -506,11 +508,12 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		SQL sql = new SQL();
 		sql.SELECT("distinct MAX(GRUCLI.IDGRUPO) AS IDGRUPO");
 		sql.SELECT("GENR.DESCRIPCION");
+		sql.SELECT("GRUCLI.IDINSTITUCION");
 		sql.FROM("cen_gruposcliente GRUCLI");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO");
 		sql.WHERE("GRUCLI.IDINSTITUCION in ('2000', '" + usuario.getIdinstitucion() + "')");
 		sql.WHERE("GENR.IDLENGUAJE = '" + usuario.getIdlenguaje() + "'");
-		sql.GROUP_BY("GENR.DESCRIPCION");
+		sql.GROUP_BY("GENR.DESCRIPCION, GRUCLI.IDINSTITUCION");
 		sql.ORDER_BY("GENR.DESCRIPCION");
 
 		return sql.toString();

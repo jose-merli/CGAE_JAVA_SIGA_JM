@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboColegiadoItem;
+import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -130,10 +131,12 @@ public interface CenColegiadoExtendsMapper extends CenColegiadoMapper {
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "getLabel")
 	@Results({ 
 		@Result(column = "IDGRUPO", property = "value", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR)
+
 		})
 
-	List<ComboItem> getLabel(AdmUsuarios usuario);
+	List<ComboInstitucionItem> getLabel(AdmUsuarios usuario);
 
 	@SelectProvider(type = CenColegiadoSqlExtendsProvider.class, method = "searchOtherCollegues")
 	@Results({ @Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.NUMERIC),
