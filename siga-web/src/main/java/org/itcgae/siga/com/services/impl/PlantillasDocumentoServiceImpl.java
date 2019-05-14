@@ -170,11 +170,6 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 							if (consultaEntity != null) {
 								consulta.setSentencia(consultaEntity.getSentencia());
 							}
-
-							String finalidad = plantillasEnvioService.obtenerFinalidadByIdConsulta(
-									Short.parseShort(plantillaDoc.getIdInstitucion()),
-									Long.parseLong(consulta.getIdConsulta()));
-							consulta.setFinalidad(finalidad);
 						}
 						respuesta.setConsultaItem(listaConsultaItem);
 					}

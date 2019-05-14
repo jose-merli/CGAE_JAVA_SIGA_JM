@@ -245,11 +245,6 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	            	
 	            	Row row = sheet.createRow(rowNum++);
 	            	int cell = 0;
-	            	try {
-	            		Hashtable tabla = (Hashtable) map;
-	            	}catch(Exception e) {
-	            		LOGGER.error(e,e);
-	            	}
 	            	
 	            	CellStyle cellStyle = workbook.createCellStyle();
 	            	for(int j = 0; j < columnsKey.size(); j++){
