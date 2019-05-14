@@ -316,6 +316,8 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							paramMandatos);
 				} catch (IOException | NamingException | SQLException e) {
 					// TODO Auto-generated catch block
+					LOGGER.error(
+							"Error Datos Colegiales",e);
 					e.printStackTrace();
 				}
 
@@ -396,6 +398,8 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							.selectByExample(cenDatoscolegialesestadoExample);
 
 					if (null != cenDatoscolegialesestadosList && cenDatoscolegialesestadosList.size() > 0) {
+						LOGGER.info(
+								"datosColegialesInsertEstado() / Recorremos los estados colegiales");
 						// Obtenemos el estado colegial que tiene el colegiado guardado en bbdd
 						CenDatoscolegialesestado cenDatoscolegialesestadoBBDD = cenDatoscolegialesestadosList.get(0);
 
@@ -467,7 +471,8 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 								cenDireccionTipodireccion.setUsumodificacion(usuario.getIdusuario());
 								cenDireccionTipodireccion.setIddireccion(direccionCensoWeb.getIddireccion());
 								cenDireccionTipodireccion.setIdtipodireccion(tipo);
-
+								LOGGER.info(
+										"datosColegialesInsertEstado() / cenDireccionTipodireccionExtendsMapper.insert -> Entrada a insertar direcciones");
 								cenDireccionTipodireccionExtendsMapper.insert(cenDireccionTipodireccion);
 
 							}
@@ -486,7 +491,8 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							direccionCensoWeb.setPreferente(addPref);
 							direccionCensoWeb.setUsumodificacion(usuario.getIdusuario());
 							direccionCensoWeb.setFechamodificacion(new Date());
-
+							LOGGER.info(
+									"datosColegialesInsertEstado() / cenDireccionTipodireccionExtendsMapper.update -> Entrada a actualizar direcciones");
 							int response3 = cenDireccionesExtendsMapper.updateByPrimaryKey(direccionCensoWeb);
 						}
 					}
@@ -511,10 +517,18 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					paramMandatos[4] = usuario.getIdusuario().toString();
 					String resultadoPl[] = new String[2];
 					try {
+						LOGGER.info(
+								"datosColegialesInsertEstado() / llamada PL actualizar datos letrado");
 						resultadoPl = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
 								paramMandatos);
+						
+						LOGGER.info(
+								"datosColegialesInsertEstado() / salida PL actualizar datos letrado");
 					} catch (IOException | NamingException | SQLException e) {
 						// TODO Auto-generated catch block
+						LOGGER.error(
+								"Error Datos Colegiales",e);
+
 						e.printStackTrace();
 					}
 
@@ -527,11 +541,18 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						paramTurno[2] = usuario.getIdusuario().toString();
 						String resultadoPlTurno[] = new String[2];
 						try {
+							LOGGER.info(
+									"datosColegialesInsertEstado() / llamada PL actualizar cambio estado colegial");
 							resultadoPlTurno = callPLProcedure(
 									"{call Pkg_Siga_Cambio_Colegiacion.Revision_Cambio_Estadocolegial(?,?,?,?,?)}", 2,
 									paramTurno);
+							
+							LOGGER.info(
+									"datosColegialesInsertEstado() / salida PL actualizar cambio estado colegial");
 						} catch (IOException | NamingException | SQLException e) {
 							// TODO Auto-generated catch block
+							LOGGER.error(
+									"Error Datos Colegiales",e);
 							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 							e.printStackTrace();
 						}
@@ -566,6 +587,8 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						response.setStatus(SigaConstants.KO);
 					}
 				} catch (Exception e) {
+					LOGGER.error(
+							"Error Datos Colegiales",e);
 					LOGGER.warn(e.getMessage());
 					response.setStatus(SigaConstants.KO);
 				}
@@ -718,7 +741,8 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 											cenDireccionTipodireccion
 													.setIddireccion(direccionCensoWeb.getIddireccion());
 											cenDireccionTipodireccion.setIdtipodireccion(tipo);
-
+											LOGGER.info(
+													"datosColegialesUpdateEstados() / cenDireccionTipodireccionExtendsMapper.insert -> Entrada a insertar la direccion");
 											cenDireccionTipodireccionExtendsMapper.insert(cenDireccionTipodireccion);
 
 										}
@@ -738,7 +762,8 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 										direccionCensoWeb.setPreferente(addPref);
 										direccionCensoWeb.setUsumodificacion(usuario.getIdusuario());
 										direccionCensoWeb.setFechamodificacion(new Date());
-
+										LOGGER.info(
+												"datosColegialesUpdateEstados() / cenDireccionTipodireccionExtendsMapper.updateByPrimaryKey -> Entrada a actualizar la direccion");
 										cenDireccionesExtendsMapper.updateByPrimaryKey(direccionCensoWeb);
 									}
 								}
@@ -776,11 +801,17 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							paramMandatos[4] = usuario.getIdusuario().toString();
 							String resultadoPl[] = new String[2];
 							try {
+								LOGGER.info(
+										"datosColegialesUpdateEstados() / Llamada al pl de actualizar letrado");
 								resultadoPl = callPLProcedure(
 										"{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
 										paramMandatos);
+								LOGGER.info(
+										"datosColegialesUpdateEstados() / salida al pl de actualizar letrado");
 							} catch (IOException | NamingException | SQLException e) {
 								// TODO Auto-generated catch block
+								LOGGER.error(
+										"Error Datos Colegiales",e);
 								e.printStackTrace();
 							}
 
@@ -815,11 +846,18 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							paramTurno[2] = usuario.getIdusuario().toString();
 							String resultadoPlTurno[] = new String[2];
 							try {
+								LOGGER.info(
+										"datosColegialesUpdateEstados() / Llamada al pl de Revision_Cambio_Estadocolegial");
 								resultadoPlTurno = callPLProcedure(
 										"{call Pkg_Siga_Cambio_Colegiacion.Revision_Cambio_Estadocolegial(?,?,?,?,?)}",
 										2, paramTurno);
+								
+								LOGGER.info(
+										"datosColegialesUpdateEstados() / Llamada al pl de Revision_Cambio_Estadocolegial");
 							} catch (IOException | NamingException | SQLException e) {
 								// TODO Auto-generated catch block
+								LOGGER.error(
+										"Error Datos Colegiales",e);
 								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 								e.printStackTrace();
 							}
@@ -860,6 +898,8 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						response.setStatus(SigaConstants.KO);
 					}
 				} catch (Exception e) {
+					LOGGER.error(
+							"Error Datos Colegiales",e);
 					LOGGER.warn(e.getMessage());
 					response.setStatus(SigaConstants.KO);
 				}

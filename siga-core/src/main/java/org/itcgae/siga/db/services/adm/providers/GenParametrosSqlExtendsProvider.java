@@ -169,4 +169,15 @@ public class GenParametrosSqlExtendsProvider extends GenParametrosSqlProvider{
 		return sql.toString();
 	}
 	
+	public String getParameterFunction(int numPagina, ParametroRequestDTO parametroRequestDTO){
+        SQL sql = new SQL();
+        SQL sql1 = new SQL();
+        
+
+        sql.SELECT("F_SIGA_GETPARAMETROGENERAL('" + parametroRequestDTO.getModulo()  +"' , '" + parametroRequestDTO.getParametrosGenerales()  +"','"+ parametroRequestDTO.getIdInstitucion() +"') AS VALOR");
+        sql.FROM("DUAL");
+		
+		return sql.toString();
+	}
+	
 }
