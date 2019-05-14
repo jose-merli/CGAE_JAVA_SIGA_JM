@@ -2571,6 +2571,12 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 							ageGeneracionnotificacionesMapper.updateByPrimaryKey(ageGeneracion);
 						}
 					
+					}else{
+						//Actualizamos la notificacon para marcarla como procesada
+						notification.setFechabaja(new Date());
+						ageNotificacioneseventoExtendsMapper.updateByPrimaryKey(notification);
+						ageGeneracion.setFechabaja(new Date());
+						ageGeneracionnotificacionesMapper.updateByPrimaryKey(ageGeneracion);
 					}
 					
 					// Enviar la notificacion que corresponde

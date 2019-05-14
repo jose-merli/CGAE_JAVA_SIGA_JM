@@ -83,4 +83,13 @@ public interface GenParametrosExtendsMapper extends GenParametrosMapper{
 	@UpdateProvider(type = GenParametrosSqlExtendsProvider.class, method = "updateByExampleFechaBaja")
 	int updateByExampleFechaBaja(GenParametros genParametros);
 	
+	
+	@SelectProvider(type = GenParametrosSqlExtendsProvider.class, method = "getParameterFunction")
+	@Results({
+		@Result(column = "VALOR", property = "valor", jdbcType = JdbcType.VARCHAR)	
+	})
+	StringDTO getParameterFunction(int numPagina, ParametroRequestDTO parametroRequestDTO);
+	
+	
+	
 }
