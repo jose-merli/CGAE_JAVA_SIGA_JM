@@ -261,7 +261,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 							} else {
 								Cell celda = row.createCell(cell);	
 								celda.setCellType(Cell.CELL_TYPE_STRING);
-								cellStyle.setAlignment(CellStyle.ALIGN_RIGHT);
+								cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
 								XSSFRichTextString textCell = new XSSFRichTextString(campo.toString());
 								celda.setCellValue(textCell);
 								celda.setCellStyle(cellStyle);
