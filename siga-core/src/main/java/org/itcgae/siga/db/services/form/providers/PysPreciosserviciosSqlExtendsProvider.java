@@ -24,7 +24,7 @@ public class PysPreciosserviciosSqlExtendsProvider extends PysPreciosserviciosSq
 
 		SQL sql = new SQL();
 
-		sql.SELECT("SERVICIOINST.DESCRIPCION");
+		sql.SELECT("pys.DESCRIPCION");
 		sql.SELECT("pys.VALOR");
 		sql.SELECT("pys.PORDEFECTO");
 		sql.SELECT("cat.DESCRIPCION as PERIOCIDAD");

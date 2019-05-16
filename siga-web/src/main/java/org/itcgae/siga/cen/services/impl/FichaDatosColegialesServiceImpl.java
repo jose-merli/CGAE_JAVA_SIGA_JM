@@ -303,23 +303,6 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				LOGGER.info(
 						"datosColegialesUpdate() / CenColegiadoExtendsMapper.selectDirecciones() -> Salida de CenColegiadoExtendsMapper para actualización de Colegiados");
 
-				// Llamamos al PL para mantener los colegiados
-				Object[] paramMandatos = new Object[5];
-				paramMandatos[0] = colegiado.getIdpersona().toString();
-				paramMandatos[1] = usuario.getIdinstitucion().toString();
-				paramMandatos[2] = new Long(30).toString();
-				paramMandatos[3] = null;
-				paramMandatos[4] = usuario.getIdusuario().toString();
-				String resultadoPl[] = new String[2];
-				try {
-					resultadoPl = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
-							paramMandatos);
-				} catch (IOException | NamingException | SQLException e) {
-					// TODO Auto-generated catch block
-					LOGGER.error(
-							"Error Datos Colegiales",e);
-					e.printStackTrace();
-				}
 
 				if (responseUpdate >= 1) {
 
@@ -641,8 +624,9 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					int resultado = 0;
 					Short idInstitucionColegial = Short.valueOf(listColegiadoItem.get(0).getIdInstitucion());
 					Long idPersonaColegial = Long.valueOf(listColegiadoItem.get(0).getIdPersona());
+					int i = 0;
 					for (ColegiadoItem colegiadoItem : listColegiadoItem) {
-
+						Boolean ejecutarPL = Boolean.FALSE;
 						// Hacemos esta comprobación para obviar el primer registro en el caso de que
 						// sea el dummy cuando queremos hacer update+insert
 						if (colegiadoItem.getFechaEstado() != null) {
@@ -651,7 +635,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							List<String> addTipoDireccionesPreferentes = null;
 
 							// Si solamente es modificar
-							if (!existeDummy && colegiadoItem.getIdPersona() != null) {
+							if (!existeDummy && colegiadoItem.getIdPersona() != null && i == 0) {
 								// Comprobamos que sea cambio de ejerciente a no ejerciente
 								CenDatoscolegialesestadoExample cenDatoscolegialesestadoExample = new CenDatoscolegialesestadoExample();
 								cenDatoscolegialesestadoExample.createCriteria()
@@ -767,6 +751,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 										cenDireccionesExtendsMapper.updateByPrimaryKey(direccionCensoWeb);
 									}
 								}
+								ejecutarPL = Boolean.TRUE;
 
 							}
 
@@ -792,29 +777,37 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							LOGGER.info(
 									"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para para actualizar el estado colegial");
 
-							// Llamamos al PL para mantener los colegiados
-							Object[] paramMandatos = new Object[5];
-							paramMandatos[0] = datosColegiales.getIdpersona().toString();
-							paramMandatos[1] = usuario.getIdinstitucion().toString();
-							paramMandatos[2] = new Long(30).toString();
-							paramMandatos[3] = null;
-							paramMandatos[4] = usuario.getIdusuario().toString();
-							String resultadoPl[] = new String[2];
-							try {
-								LOGGER.info(
-										"datosColegialesUpdateEstados() / Llamada al pl de actualizar letrado");
-								resultadoPl = callPLProcedure(
-										"{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
-										paramMandatos);
-								LOGGER.info(
-										"datosColegialesUpdateEstados() / salida al pl de actualizar letrado");
-							} catch (IOException | NamingException | SQLException e) {
-								// TODO Auto-generated catch block
-								LOGGER.error(
-										"Error Datos Colegiales",e);
-								e.printStackTrace();
-							}
+							
+							
+							if (ejecutarPL) {
 
+								// Llamamos al PL para mantener los colegiados
+								Object[] paramMandatos = new Object[5];
+								paramMandatos[0] = listColegiadoItem.get(0).getIdPersona().toString();
+								paramMandatos[1] = usuario.getIdinstitucion().toString();
+								paramMandatos[2] = new Long(30).toString();
+								paramMandatos[3] = null;
+								paramMandatos[4] = usuario.getIdusuario().toString();
+								String resultadoPl[] = new String[2];
+								try {
+									LOGGER.info(
+											"datosColegialesUpdateEstados() / Llamada al pl de actualizar letrado");
+									resultadoPl = callPLProcedure(
+											"{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
+											paramMandatos);
+									LOGGER.info(
+											"datosColegialesUpdateEstados() / salida al pl de actualizar letrado");
+								} catch (IOException | NamingException | SQLException e) {
+									// TODO Auto-generated catch block
+									LOGGER.error(
+											"Error Datos Colegiales",e);
+									e.printStackTrace();
+								}
+
+								
+							}
+							
+							
 							CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
 							cenColegiadoExample.createCriteria().andIdpersonaEqualTo(idPersonaColegial);
 
@@ -834,11 +827,13 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						} else {
 							existeDummy = true;
 						}
+						i++;
 					}
 					if (resultado > 0) {
 						if (listColegiadoItem.get(0).getCambioEstado() != null
 								&& listColegiadoItem.get(0).getCambioEstado()) {
 
+							
 							// Llamamos al PL para mantener los colegiados
 							Object[] paramTurno = new Object[3];
 							paramTurno[0] = usuario.getIdinstitucion().toString();
@@ -853,7 +848,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 										2, paramTurno);
 								
 								LOGGER.info(
-										"datosColegialesUpdateEstados() / Llamada al pl de Revision_Cambio_Estadocolegial");
+										"datosColegialesUpdateEstados() / Salida al pl de Revision_Cambio_Estadocolegial");
 							} catch (IOException | NamingException | SQLException e) {
 								// TODO Auto-generated catch block
 								LOGGER.error(
@@ -1148,8 +1143,12 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					paramMandatos[4] = usuario.getIdusuario().toString();
 					String resultadoPl[] = new String[2];
 					try {
+						LOGGER.info(
+								"datosColegialesInsertEstado() / llamada PL actualizar datos letrado");
 						resultadoPl = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
 								paramMandatos);
+						LOGGER.info(
+								"datosColegialesInsertEstado() / salida PL actualizar datos letrado");
 					} catch (IOException | NamingException | SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -1165,9 +1164,13 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						paramTurno[2] = usuario.getIdusuario().toString();
 						String resultadoPlTurno[] = new String[2];
 						try {
+							LOGGER.info(
+									"datosColegialesInsertEstado() / llamada PL Revision_Cambio_Estadocolegial");
 							resultadoPlTurno = callPLProcedure(
 									"{call Pkg_Siga_Cambio_Colegiacion.Revision_Cambio_Estadocolegial(?,?,?,?,?)}", 2,
 									paramTurno);
+							LOGGER.info(
+									"datosColegialesInsertEstado() / salida PL Revision_Cambio_Estadocolegial");
 						} catch (IOException | NamingException | SQLException e) {
 							// TODO Auto-generated catch block
 							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
