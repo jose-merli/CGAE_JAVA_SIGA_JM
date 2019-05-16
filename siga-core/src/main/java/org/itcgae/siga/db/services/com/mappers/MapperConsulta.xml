@@ -103,7 +103,7 @@
 
 	</select>
 	
-	<select id="ejecutarConsultaString" parameterType="hashmap" resultMap="mapa">	
+	<select id="ejecutarConsultaString" parameterType="hashmap" resultType="java.util.LinkedHashMap">	
 		<include refid="sentencia"></include>
 	</select>
 </mapper>

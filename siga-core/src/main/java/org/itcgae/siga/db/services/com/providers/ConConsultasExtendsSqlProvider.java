@@ -1,12 +1,14 @@
 package org.itcgae.siga.db.services.com.providers;
 
 
+import java.util.List;
+
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
 
 public class ConConsultasExtendsSqlProvider {
 	
-	public String selectConsultas(Short idInstitucion, String idLenguaje,ConsultasSearch filtros){
+	public String selectConsultas(Short idInstitucion, String idLenguaje, List<String> perfiles, ConsultasSearch filtros){
 			
 		SQL sql = new SQL();
 				
@@ -31,6 +33,22 @@ public class ConConsultasExtendsSqlProvider {
 		sql.SELECT("CONSULTA.IDCLASECOMUNICACION");
 		sql.SELECT("(SELECT CLASE.NOMBRE  FROM MOD_CLASECOMUNICACIONES CLASE WHERE CLASE.IDCLASECOMUNICACION=CONSULTA.IDCLASECOMUNICACION) AS NOMBRECLASE");
 		sql.FROM("CON_CONSULTA CONSULTA");
+		
+		String condicionPermisos = " EXISTS (SELECT 1 FROM MOD_PLANTILLADOC_CONSULTA PC"
+				+ " JOIN MOD_MODELO_PLANTILLADOCUMENTO MD ON MD.IDPLANTILLADOCUMENTO = PC.IDPLANTILLADOCUMENTO"
+				+ " JOIN MOD_MODELO_PERFILES MP ON MP.IDMODELOCOMUNICACION = MD.IDMODELOCOMUNICACION"
+				+ " WHERE PC.IDCONSULTA = CONSULTA.IDCONSULTA AND PC.IDINSTITUCION_CONSULTA = CONSULTA.IDINSTITUCION";
+		
+		if (perfiles != null && perfiles.size() > 0) {
+			condicionPermisos += " AND MP.IDPERFIL IN ('SIN_PERFIL'";//METEMOS SIN_PEFIL PARA QUE AL MENOS HAYA UNO Y NO PETE
+			for (String perfil : perfiles) {
+				condicionPermisos += ", " + perfil;
+			}
+			condicionPermisos += " )";
+		}
+		condicionPermisos += ")";
+		
+		sql.WHERE(condicionPermisos);
 		
 	
 		if(filtros.getIdClaseComunicacion() != null && !filtros.getIdClaseComunicacion().trim().equals("")){
