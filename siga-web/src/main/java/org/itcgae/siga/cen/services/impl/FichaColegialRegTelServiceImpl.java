@@ -4,14 +4,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
 import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
 import org.itcgae.siga.DTOs.cen.DocushareDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.cen.services.IFichaColegialRegTelService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
@@ -30,6 +33,7 @@ import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.DocushareHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +64,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 	private CenNocolegiadoMapper cenNocolegiadoMapper;
 
 	@Autowired
-	private GenParametrosMapper genParametrosMapper;
+	private GenParametrosExtendsMapper genParametrosMapper;
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -229,7 +233,18 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		GenParametrosExample example = new GenParametrosExample();
 		example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andParametroEqualTo("REGTEL");
-		List<GenParametros> config = genParametrosMapper.selectByExample(example);
+		List<GenParametros> config = new ArrayList<GenParametros>();
+		GenParametros param = new GenParametros();
+		ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
+		parametroRequestDTO.setIdInstitucion(String.valueOf(idInstitucion));
+		parametroRequestDTO.setModulo("GEN");
+		parametroRequestDTO.setParametrosGenerales("REGTEL");
+		StringDTO paramRequest = genParametrosMapper.getParameterFunction(0, parametroRequestDTO );
+		param.setParametro("REGTEL");
+		param.setValor(paramRequest.getValor());
+		config.add(param);
+		
+		
 		if (config.size() > 0) {
 			result = config.get(0).getValor();
 		} else {

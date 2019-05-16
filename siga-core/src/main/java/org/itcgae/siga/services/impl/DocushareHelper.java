@@ -8,9 +8,12 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
+import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
 import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.commons.utils.ReadProperties;
 import org.itcgae.siga.commons.utils.SIGAReferences;
 import org.itcgae.siga.db.entities.GenParametros;
@@ -19,6 +22,7 @@ import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +51,7 @@ public class DocushareHelper {
 	private static Logger log = LoggerFactory.getLogger(DocushareHelper.class);
 
 	@Autowired
-	private GenParametrosMapper genParametrosMapper;
+	private GenParametrosExtendsMapper genParametrosMapper;
 	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
 	private static boolean MODO_DEBUG_LOCAL = false;
@@ -93,9 +97,19 @@ public class DocushareHelper {
 			listaParametros.add(DOCUSHARE_USER);
 			listaParametros.add(DOCUSHARE_PASSWORD);
 
-			GenParametrosExample example = new GenParametrosExample();
-			example.createCriteria().andParametroIn(listaParametros).andIdinstitucionEqualTo(this.idInstitucion);
-			List<GenParametros> config = genParametrosMapper.selectByExample(example);
+			List<GenParametros> config = new ArrayList<GenParametros>();
+			for (Iterator iterator = listaParametros.iterator(); iterator.hasNext();) {
+				String parametro = (String) iterator.next();
+				GenParametros param = new GenParametros();
+				ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
+				parametroRequestDTO.setIdInstitucion(String.valueOf(this.idInstitucion));
+				parametroRequestDTO.setModulo("GEN");
+				parametroRequestDTO.setParametrosGenerales(parametro);
+				StringDTO paramRequest = genParametrosMapper.getParameterFunction(0, parametroRequestDTO );
+				param.setParametro(parametro);
+				param.setValor(paramRequest.getValor());
+				config.add(param);
+			}
 
 			if (config != null && config.size() > 0) {
 				for (int i = 0; i < config.size(); i++) {
@@ -178,13 +192,26 @@ public class DocushareHelper {
 			// GenParametrosService genParametrosService = (GenParametrosService)
 			// BusinessManager.getInstance()
 			// .getService(GenParametrosService.class);
+			
+			
 			List<String> listaParametros = new ArrayList<>();
 			listaParametros.add(pathRecibido);
+			
+			List<GenParametros> config = new ArrayList<GenParametros>();
+			for (Iterator iterator = listaParametros.iterator(); iterator.hasNext();) {
+				String parametro = (String) iterator.next();
+				GenParametros param = new GenParametros();
+				ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
+				parametroRequestDTO.setIdInstitucion(String.valueOf(this.idInstitucion));
+				parametroRequestDTO.setModulo("GEN");
+				parametroRequestDTO.setParametrosGenerales(parametro);
+				StringDTO paramRequest = genParametrosMapper.getParameterFunction(0, parametroRequestDTO );
+				param.setParametro(parametro);
+				param.setValor(paramRequest.getValor());
+				config.add(param);
+			}
 
-			GenParametrosExample example = new GenParametrosExample();
-			example.createCriteria().andParametroEqualTo(pathRecibido).andIdinstitucionEqualTo(this.idInstitucion);
-			List<GenParametros> config = genParametrosMapper.selectByExample(example);
-
+			
 			String path = config.get(0).getValor();
 
 			if (path != null) {
@@ -537,10 +564,17 @@ public class DocushareHelper {
 		try {
 			
 
-			
-			GenParametrosExample example = new GenParametrosExample();
-			example.createCriteria().andParametroEqualTo(ID_DOCUSHARE).andIdinstitucionEqualTo(this.idInstitucion);
-			List<GenParametros> config = genParametrosMapper.selectByExample(example);
+			List<GenParametros> config = new ArrayList<GenParametros>();
+				GenParametros param = new GenParametros();
+				ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
+				parametroRequestDTO.setIdInstitucion(String.valueOf(this.idInstitucion));
+				parametroRequestDTO.setModulo("GEN");
+				parametroRequestDTO.setParametrosGenerales(ID_DOCUSHARE);
+				StringDTO paramRequest = genParametrosMapper.getParameterFunction(0, parametroRequestDTO );
+				param.setParametro(ID_DOCUSHARE);
+				param.setValor(paramRequest.getValor());
+				config.add(param);
+
 			
 			String idExpedientes = config.get(0).getValor();
 			log.debug("ID_DOCUSHARE=" + idExpedientes + " para el colegio " + this.idInstitucion);

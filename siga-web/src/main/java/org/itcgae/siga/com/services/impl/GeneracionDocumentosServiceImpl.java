@@ -6,10 +6,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +26,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.com.documentos.DataMailMergeDataSource;
@@ -154,7 +158,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	}
 
 	@Override
-	public DatosDocumentoItem generarExcel(String pathPlantilla, String pathFicheroSalida, String nombreFicheroSalida, List<List<Map<String, Object>>> listaDatosExcel) throws Exception {
+	public DatosDocumentoItem generarExcel(String pathPlantilla, String pathFicheroSalida, String nombreFicheroSalida, List<List<Map<String, Object>>> listaDatosExcel, ArrayList<String> nombresConsultasDatos) throws Exception {
 		DatosDocumentoItem documento = new DatosDocumentoItem();
 		boolean hayPlantilla = false;
 		
@@ -191,7 +195,16 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				
 				if(!hayPlantilla) {
 					//Creamos la hoja
-					sheet = workbook.createSheet("Consulta " + i);
+					String nombreHoja = "Consulta " + i;
+					try {
+						if(nombresConsultasDatos != null && nombresConsultasDatos.size() > 0 && nombresConsultasDatos.get(i) != null) {
+							nombreHoja = nombresConsultasDatos.get(i);
+							if(nombreHoja.length() > 30)nombreHoja = nombreHoja.substring(0, 27) + "...";
+						}
+					}catch(Exception e) {
+						LOGGER.error("Error al obtener el nombre de la consulta");
+					}
+					sheet = workbook.createSheet(nombreHoja);
 				}else {
 					sheet = workbook.getSheetAt(i);
 				}
@@ -233,12 +246,26 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	            	Row row = sheet.createRow(rowNum++);
 	            	int cell = 0;
 	            	
+	            	CellStyle cellStyle = workbook.createCellStyle();
 	            	for(int j = 0; j < columnsKey.size(); j++){
 	            		Object campo = map.get(columnsKey.get(j).trim());
 	            		if(campo == null || campo.toString().trim() == ""){
-	            			row.createCell(cell).setCellValue("null");
+	            			row.createCell(cell).setCellValue("");
 	            		}else{
-	            			row.createCell(cell).setCellValue(campo.toString());
+	            			if ((campo instanceof Double) || (campo instanceof Integer) || (campo instanceof BigDecimal)) {
+	            				Cell celda = row.createCell(cell);
+								celda.setCellType(Cell.CELL_TYPE_NUMERIC);
+								celda.setCellValue(Double.parseDouble(campo.toString()));
+								cellStyle.setAlignment(CellStyle.ALIGN_RIGHT);	    		    			
+	    		    			celda.setCellStyle(cellStyle);
+							} else {
+								Cell celda = row.createCell(cell);	
+								celda.setCellType(Cell.CELL_TYPE_STRING);
+								cellStyle.setAlignment(CellStyle.ALIGN_RIGHT);
+								XSSFRichTextString textCell = new XSSFRichTextString(campo.toString());
+								celda.setCellValue(textCell);
+								celda.setCellStyle(cellStyle);
+							}            			
 	            		}
 	            		cell++;
 	            	}
