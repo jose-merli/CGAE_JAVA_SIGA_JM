@@ -45,7 +45,7 @@ public interface AgeCalendarioExtendsMapper extends AgeCalendarioMapper{
 		@Result(column = "COLOR", property = "color", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOACCESO", property = "tipoAcceso", jdbcType = JdbcType.NUMERIC),
 	})
-	List<CalendarItem> getCalendariosPermisos(Short idInstitucion, String perfiles);
+	List<CalendarItem> getCalendariosPermisos(Short idInstitucion, String perfiles, String idLenguaje);
 	
 	@SelectProvider(type = AgeCalendarioSqlExtendsProvider.class, method = "getCalendarioPermiso")
 	@Results({
