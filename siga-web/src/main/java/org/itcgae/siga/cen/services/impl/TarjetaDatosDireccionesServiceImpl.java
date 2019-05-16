@@ -22,10 +22,12 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesSearchDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.cen.TarjetaDireccionesUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
@@ -56,6 +58,7 @@ import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionTipodireccionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDireccionesExtendsMapper;
@@ -112,7 +115,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 	private CenPoblacionesExtendsMapper cenPoblacionesExtendsMapper;
 
 	@Autowired
-	private GenParametrosMapper genParametrosMapper;
+	private GenParametrosExtendsMapper genParametrosMapper;
 
 	@Override
 	public DatosDireccionesDTO datosDireccionesSearch(int numPagina,
@@ -1457,15 +1460,33 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				direcciones.setTelefono1(datosDireccionesItem.getTelefono());
 				// direcciones.setIdestadosolic(Short.parseShort("10"));
 
-				List<ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper
-						.getAutoAceptar(String.valueOf(idInstitucion));
-
-				if (autoAceptar.get(0).getLabel().equals("S")) {
+//				List<ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper
+//						.getAutoAceptar(String.valueOf(idInstitucion));
+				
+				List<GenParametros> autoAceptar = new ArrayList<GenParametros>();
+				
+				GenParametros param = new GenParametros();
+				ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
+				parametroRequestDTO.setIdInstitucion(String.valueOf(idInstitucion));
+				parametroRequestDTO.setModulo("CEN");
+				parametroRequestDTO.setParametrosGenerales("SOLICITUDES_MODIF_CENSO");
+				StringDTO paramRequest = genParametrosMapper.getParameterFunction(0, parametroRequestDTO );
+				param.setParametro("SOLICITUDES_MODIF_CENSO");
+				param.setValor(paramRequest.getValor());
+				autoAceptar.add(param);
+				
+				if(autoAceptar.size() == 0) {
+					GenParametros combo = new GenParametros();
+					combo.setValor("N");
+					autoAceptar.add(combo);
+				}
+				
+				if (autoAceptar.get(0).getValor().equals("S")) {
 					direcciones.setIdestadosolic(Short.parseShort("20"));
 				} else {
 					direcciones.setIdestadosolic(Short.parseShort("10"));
 				}
-
+				
 				if (datosDireccionesItem.getPoblacionExtranjera() != ""
 						&& datosDireccionesItem.getPoblacionExtranjera() != null) {
 					direcciones.setPoblacionextranjera(datosDireccionesItem.getPoblacionExtranjera());
@@ -1477,7 +1498,7 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 				LOGGER.info(
 						"createDirection() / cenDireccionesExtendsMapper.insert() -> Salida de cenDireccionesExtendsMapper para insertar direcciones");
 
-				if (autoAceptar.get(0).getLabel().equals("S")) {
+				if (autoAceptar.get(0).getValor().equals("S")) {
 					CenDirecciones modificacion = new CenDirecciones();
 					modificacion.setIdinstitucion(idInstitucion);
 					modificacion.setIdpersona(Long.parseLong(datosDireccionesItem.getIdPersona()));

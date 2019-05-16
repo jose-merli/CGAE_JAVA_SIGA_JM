@@ -8,10 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesDTO;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesItem;
 import org.itcgae.siga.DTOs.cen.FichaDatosCurricularesSearchDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
@@ -30,6 +32,7 @@ import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitmodifdatosbasicosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenSolicitudmodificacioncvExtendsMapper;
@@ -50,7 +53,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 	private CenDatoscvExtendsMapper cenDatoscvExtendsMapper;
 
 	@Autowired
-	private GenParametrosMapper genParametrosMapper;
+	private GenParametrosExtendsMapper genParametrosMapper;
 	
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -597,9 +600,25 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			// if(null != fichaDatosCurricularesItem.getIdTipoCv()){
 			// }
 
-			List <ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper.getAutoAceptar(String.valueOf(idInstitucion));
-			if(autoAceptar.size() > 0) {
-				if(autoAceptar.get(0).getLabel().equals("S")) {
+			List<GenParametros> autoAceptar = new ArrayList<GenParametros>();
+			
+			GenParametros param = new GenParametros();
+			ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
+			parametroRequestDTO.setIdInstitucion(String.valueOf(idInstitucion));
+			parametroRequestDTO.setModulo("CEN");
+			parametroRequestDTO.setParametrosGenerales("SOLICITUDES_MODIF_CENSO");
+			StringDTO paramRequest = genParametrosMapper.getParameterFunction(0, parametroRequestDTO );
+			param.setParametro("SOLICITUDES_MODIF_CENSO");
+			param.setValor(paramRequest.getValor());
+			autoAceptar.add(param);
+			
+			if(autoAceptar.size() == 0) {
+				GenParametros combo = new GenParametros();
+				combo.setValor("N");
+				autoAceptar.add(combo);
+			}
+						if(autoAceptar.size() > 0) {
+				if(autoAceptar.get(0).getValor().equals("S")) {
 					recordUpdate.setIdestadosolic(Short.parseShort("20"));
 				}else {
 					recordUpdate.setIdestadosolic(Short.parseShort("10"));
@@ -626,7 +645,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 
 			response = cenSolicitudmodificacioncvExtendsMapper.solicitudUpdateCurriculo(recordUpdate);
 		if(autoAceptar.size() > 0) {
-			if(autoAceptar.get(0).getLabel().equals("S")) {
+			if(autoAceptar.get(0).getValor().equals("S")) {
 							CenDatoscv Actualizar = new CenDatoscv();
 //							Actualizar.setFechabaja(new Date());
 							Actualizar.setFechafin(new Date());

@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasDTO;
@@ -27,6 +28,7 @@ import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.cen.EtiquetaUpdateDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -65,6 +67,7 @@ import org.itcgae.siga.db.mappers.CenSolicmodifcambiarfotoMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
@@ -93,7 +96,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 	private CenPersonaExtendsMapper cenPersonaExtendsMapper;
 
 	@Autowired
-	private GenParametrosMapper genParametrosMapper;
+	private GenParametrosExtendsMapper genParametrosMapper;
 
 	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
@@ -965,10 +968,39 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					solicitud.setIdinstitucion(idInstitucion);
 					solicitud.setIdpersona(Long.valueOf(idPersona));
 
-					List<ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper
-							.getAutoAceptar(String.valueOf(idInstitucion));
+//					List<ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper
+//							.getAutoAceptar(String.valueOf(idInstitucion));
+//					
+
+//					GenParametrosExample example = new GenParametrosExample();
+//					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andParametroEqualTo("SOLICITUDES_MODIF_CENSO");
+					List<GenParametros> autoAceptar = new ArrayList<GenParametros>();
+					
+					GenParametros param = new GenParametros();
+					ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
+					parametroRequestDTO.setIdInstitucion(String.valueOf(idInstitucion));
+					parametroRequestDTO.setModulo("CEN");
+					parametroRequestDTO.setParametrosGenerales("SOLICITUDES_MODIF_CENSO");
+					StringDTO paramRequest = genParametrosMapper.getParameterFunction(0, parametroRequestDTO );
+					param.setParametro("SOLICITUDES_MODIF_CENSO");
+					param.setValor(paramRequest.getValor());
+					autoAceptar.add(param);
+					
+//					if (config.size() > 0) {
+//						result = config.get(0).getValor();
+//					} else {
+//						result = "0";
+//					}
+//					return result;
+					
+					if(autoAceptar.size() == 0) {
+						GenParametros combo = new GenParametros();
+						combo.setValor("N");
+						autoAceptar.add(combo);
+					}
+					
 					if (autoAceptar.size() > 0) {
-						if (autoAceptar.get(0).getLabel().equals("S")) {
+						if (autoAceptar.get(0).getValor().equals("S")) {
 							solicitud.setIdestadosolic(Short.parseShort("20"));
 						} else {
 							solicitud.setIdestadosolic(Short.parseShort("10"));
@@ -984,7 +1016,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					LOGGER.info(
 							"loadPhotography() / cenClienteMapper.updateByExample() -> Salida de cenSolicmodifcambiarfoto actualizar el nombre de la fotografía de una persona jurídica");
 					if (autoAceptar.size() > 0) {
-						if (autoAceptar.get(0).getLabel().equals("S")) {
+						if (autoAceptar.get(0).getValor().equals("S")) {
 							CenClienteExample cenClienteExample = new CenClienteExample();
 							cenClienteExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona))
 									.andIdinstitucionEqualTo(idInstitucion);
@@ -1117,7 +1149,31 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					"getTratamiento() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
-
+				List<GenParametros> autoAceptar = new ArrayList<GenParametros>();
+				
+				GenParametros param = new GenParametros();
+				ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
+				parametroRequestDTO.setIdInstitucion(String.valueOf(idInstitucion));
+				parametroRequestDTO.setModulo("CEN");
+				parametroRequestDTO.setParametrosGenerales("SOLICITUDES_MODIF_CENSO");
+				StringDTO paramRequest = genParametrosMapper.getParameterFunction(0, parametroRequestDTO );
+				param.setParametro("SOLICITUDES_MODIF_CENSO");
+				param.setValor(paramRequest.getValor());
+				autoAceptar.add(param);
+				
+				if(autoAceptar.size() == 0) {
+					GenParametros combo = new GenParametros();
+					combo.setValor("N");
+					autoAceptar.add(combo);
+					ComboItem result = new ComboItem();
+					result.setValue(combo.getValor());
+					comboItems.add(result);
+					}else {
+						ComboItem result = new ComboItem();
+						result.setValue(param.getValor());
+						comboItems.add(result);
+				}
+				
 				comboItems = cenSolicitmodifdatosbasicosMapper.getAutoAceptar(String.valueOf(idInstitucion));
 
 				comboDTO.setCombooItems(comboItems);
@@ -1180,9 +1236,36 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						// solicitud.setIdsolicitud(Short.parseShort(""+ (1 + idCv)));
 						// }
 
-						List<ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper
-								.getAutoAceptar(String.valueOf(idInstitucion));
+//						List<ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper
+//								.getAutoAceptar(String.valueOf(idInstitucion));
 
+//						GenParametrosExample example = new GenParametrosExample();
+//						example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andParametroEqualTo("SOLICITUDES_MODIF_CENSO");
+						List<GenParametros> autoAceptar = new ArrayList<GenParametros>();
+						
+						GenParametros param = new GenParametros();
+						ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
+						parametroRequestDTO.setIdInstitucion(String.valueOf(idInstitucion));
+						parametroRequestDTO.setModulo("CEN");
+						parametroRequestDTO.setParametrosGenerales("SOLICITUDES_MODIF_CENSO");
+						StringDTO paramRequest = genParametrosMapper.getParameterFunction(0, parametroRequestDTO );
+						param.setParametro("REGTEL");
+						param.setValor(paramRequest.getValor());
+						autoAceptar.add(param);
+						
+//						if (config.size() > 0) {
+//							result = config.get(0).getValor();
+//						} else {
+//							result = "0";
+//						}
+//						return result;
+						
+						if(autoAceptar.size() == 0) {
+							GenParametros combo = new GenParametros();
+							combo.setValor("N");
+							autoAceptar.add(combo);
+						}
+						
 						int idCv = Integer.parseInt(idBD.getNewId());
 						solicitud.setIdsolicitud(Short.parseShort("" + (1 + idCv)));
 						solicitud.setPublicidad(SigaConstants.DB_FALSE);
@@ -1197,7 +1280,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						solicitud.setUsumodificacion(usuario.getIdusuario());
 						solicitud.setFechaalta(new Date());
 						if (autoAceptar.size() > 0) {
-							if (autoAceptar.get(0).getLabel().equals("S")) {
+							if (autoAceptar.get(0).getValor().equals("S")) {
 								solicitud.setIdestadosolic(Short.parseShort("20"));
 							} else {
 								solicitud.setIdestadosolic(Short.parseShort("10"));
@@ -1208,7 +1291,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						int responseInsertPersona = cenSolicitmodifdatosbasicosMapper.insert(solicitud);
 						int responseUpdate = 0;
 
-						if (autoAceptar.get(0).getLabel().equals("S")) {
+						if (autoAceptar.get(0).getValor().equals("S")) {
 							CenCliente modificacion = new CenCliente();
 							modificacion.setIdinstitucion(idInstitucion);
 							modificacion.setIdlenguaje(solicitud.getIdlenguaje());

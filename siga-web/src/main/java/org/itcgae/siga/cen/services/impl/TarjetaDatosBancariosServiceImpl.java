@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.adm.DeleteResponseDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
+import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicDTO;
 import org.itcgae.siga.DTOs.cen.BancoBicItem;
@@ -44,6 +45,7 @@ import org.itcgae.siga.DTOs.cen.MandatosDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDownloadDTO;
 import org.itcgae.siga.DTOs.cen.MandatosItem;
 import org.itcgae.siga.DTOs.cen.MandatosUpdateDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -85,6 +87,7 @@ import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenBancosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCuentasbancariasExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPaisExtendsMapper;
@@ -109,7 +112,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
 	@Autowired
-	private GenParametrosMapper genParametrosMapper;
+	private GenParametrosExtendsMapper genParametrosMapper;
 	
 	@Autowired
 	private CenCuentasbancariasExtendsMapper cenCuentasbancariasExtendsMapper;
@@ -840,9 +843,26 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				cuentaBancaria.setTitular(datosBancariosInsertDTO.getTitular());
 //				cuentaBancaria.setIdestadosolic(Short.parseShort("10"));
 				
-				List <ComboItem> autoAceptar = cenSolicitmodifdatosbasicosMapper.getAutoAceptar(String.valueOf(idInstitucion));
+				List<GenParametros> autoAceptar = new ArrayList<GenParametros>();
+				
+				GenParametros param = new GenParametros();
+				ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
+				parametroRequestDTO.setIdInstitucion(String.valueOf(idInstitucion));
+				parametroRequestDTO.setModulo("CEN");
+				parametroRequestDTO.setParametrosGenerales("SOLICITUDES_MODIF_CENSO");
+				StringDTO paramRequest = genParametrosMapper.getParameterFunction(0, parametroRequestDTO );
+				param.setParametro("SOLICITUDES_MODIF_CENSO");
+				param.setValor(paramRequest.getValor());
+				autoAceptar.add(param);
+				
+				if(autoAceptar.size() == 0) {
+					GenParametros combo = new GenParametros();
+					combo.setValor("N");
+					autoAceptar.add(combo);
+				}
+				
 				if(autoAceptar.size() > 0) {
-					if(autoAceptar.get(0).getLabel().equals("S")) {
+					if(autoAceptar.get(0).getValor().equals("S")) {
 						cuentaBancaria.setIdestadosolic(Short.parseShort("20"));
 					}else {
 						cuentaBancaria.setIdestadosolic(Short.parseShort("10"));
@@ -915,7 +935,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				LOGGER.info(
 						"insertBanksData() / cenNocolegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenNocolegiadoExtendsMapper para insertar cuentas bancarias");
 				if(autoAceptar.size() > 0) {
-					if(autoAceptar.get(0).getLabel().equals("S")) {
+					if(autoAceptar.get(0).getValor().equals("S")) {
 						CenCuentasbancarias modificacion = new CenCuentasbancarias();
 						modificacion.setIdinstitucion(idInstitucion);
 						modificacion.setIdpersona(cuentaBancaria.getIdpersona());
