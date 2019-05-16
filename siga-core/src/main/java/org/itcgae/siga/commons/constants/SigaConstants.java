@@ -703,19 +703,19 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	
 	public static final String ALTA = "A";
 	public static final String BAJA = "B";
-	public static final String C_IDGRUPO = "C_IDGRUPO";
+	public static final String C_IDGRUPO = "IDGRUPO";
 	public static final String ACCION = "ACCION";
 	public static final String GENERAL = "GENERAL";
 	public static final String NOMBREGRUPO = "NOMBREGRUPO";
 	public static final String PERSONANOMBRE = "PERSONANOMBRE";
 	public static final String C_IDPERSONA = "IDPERSONA";
 	public static final String C_IDINSTITUCION 		= "IDINSTITUCION";
-	public static final String PERSONANIF = "PERSONANIF";
+	public static final String PERSONANIF = "PERSONANIFCIF";
 	public static final String COLEGIADONUMERO = "COLEGIADONUMERO";
 	public static final Short IDINSTITUCION_2000 = 2000;
 	public static final String TIPO_CARGA = "GF";
-	public static final String C_FECHAINICIO = "C_FECHAINICIO";
-	public static final String C_FECHAFIN = "C_FECHAFIN";
+	public static final String C_FECHAINICIO = "FECHAINICIO";
+	public static final String C_FECHAFIN = "FECHAFIN";
 	
 	public static final List<String> CAMPOSEJEMPLOGF = Arrays.asList(COLEGIADONUMERO, PERSONANIF, 
 			C_IDGRUPO, GENERAL, ACCION, C_FECHAINICIO);
@@ -739,9 +739,9 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	//CARGA MASIVA CV
 
 	public static final String C_IDTIPOCV = "IDTIPOCV";
-    public static final String C_CREDITOS = "C_CREDITOS";
-    public static final String C_IDTIPOCVSUBTIPO1 = "C_IDTIPOCVSUBTIPO1";
-    public static final String C_IDTIPOCVSUBTIPO2 = "C_IDTIPOCVSUBTIPO2";
+    public static final String C_CREDITOS = "CREDITOS";
+    public static final String C_IDTIPOCVSUBTIPO1 = "IDTIPOCVSUBTIPO1";
+    public static final String C_IDTIPOCVSUBTIPO2 = "IDTIPOCVSUBTIPO2";
 	public static final String TIPOCVCOD = "TIPOCVCOD";
 	public static final String SUBTIPOCV1COD = "SUBTIPOCV1COD";
 	public static final String SUBTIPOCV2COD = "SUBTIPOCV2COD";
@@ -749,7 +749,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String SUBTIPOCV1NOMBRE = "SUBTIPOCV1NOMBRE";
 	public static final String SUBTIPOCV2NOMBRE = "SUBTIPOCV2NOMBRE";
 	public static final String FECHAVERIFICACION = "FECHAVERIFICACION";
-    public static final String C_DESCRIPCION = "C_DESCRIPCION";
+    public static final String C_DESCRIPCION = "DESCRIPCION";
 
     public static final String nombreFicheroEjemploCV = "PlantillaMasivaDatosCV";
     

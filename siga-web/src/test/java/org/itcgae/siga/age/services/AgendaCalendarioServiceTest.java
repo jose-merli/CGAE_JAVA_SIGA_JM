@@ -51,7 +51,7 @@ public class AgendaCalendarioServiceTest {
 		List<CalendarItem> listAgeCalendarioSimulado = ageTestUtils.getListaCalendariosSimulados();
 
 		
-		when(ageCalendarioExtendsMapper.getCalendariosPermisos(Mockito.anyShort(), Mockito.anyString())).thenReturn(listAgeCalendarioSimulado);
+		when(ageCalendarioExtendsMapper.getCalendariosPermisos(Mockito.anyShort(), Mockito.anyString(),  Mockito.anyString())).thenReturn(listAgeCalendarioSimulado);
 
 		MockHttpServletRequest mockreq = testUtils.getRequestWithGeneralAuthentication();
 

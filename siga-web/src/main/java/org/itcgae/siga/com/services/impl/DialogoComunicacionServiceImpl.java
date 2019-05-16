@@ -706,11 +706,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																	// Por cada resultado ejecutamos las consultas de datos
 																	LOGGER.debug("Obtenemos las consultas de datos para la plantilla: " + plantilla.getIdInforme());
 																	List<ConsultaItem> consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(usuario.getIdinstitucion(), Long.parseLong(modelo.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DATOS.getCodigo());
-
+																	ArrayList<String> nombresConsultasDatos = new ArrayList<String>();	
+																	
 																	for(ConsultaItem consultaDatos:consultasItemDatos){																			
 																		
 																		String consultaEjecutarDatos = reemplazarConsultaConClaves(usuario, dialogo, consultaDatos, mapaClave, esEnvio);
-																		
+																		String nombreConsulta = consultaDatos.getDescripcion();
 																		if(esEnvio){
 																			//Guardamos la consulta datos																			
 																			ConsultaEnvioItem consultaEnvio = new ConsultaEnvioItem();
@@ -738,6 +739,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																		
 																		if(esExcel) {
 																			listaDatosExcel.add(resultDatos);
+																			nombresConsultasDatos.add(nombreConsulta);
 																		}
 																	}
 																	
@@ -756,7 +758,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 																		DatosDocumentoItem docGenerado = null;
 																		
 																		if(esExcel) {
-																			docGenerado = _generacionDocService.generarExcel(pathPlantilla + nombrePlantilla, pathFicheroSalida, nombreFicheroSalida, listaDatosExcel, null);
+																			docGenerado = _generacionDocService.generarExcel(pathPlantilla + nombrePlantilla, pathFicheroSalida, nombreFicheroSalida, listaDatosExcel, nombresConsultasDatos);
 																		}else {
 																			doc = new Document(pathPlantilla + nombrePlantilla);
 																			
@@ -883,7 +885,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 															DatosDocumentoItem docGenerado = null;
 															
 															if(esExcel) {
-																docGenerado = _generacionDocService.generarExcel(pathPlantilla + nombrePlantilla, pathFicheroSalida, nombreFicheroSalida, listaDatosExcel, null);
+																docGenerado = _generacionDocService.generarExcel(pathPlantilla + nombrePlantilla, pathFicheroSalida, nombreFicheroSalida, listaDatosExcel, nombresConsultasDatos);
 															}else {
 																doc = new Document(pathPlantilla + nombrePlantilla);
 																
@@ -953,7 +955,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 											
 											for(ConsultaItem consultaDatos:consultasItemDatos){															
 												String consultaEjecutarDatos = reemplazarConsultaConClaves(usuario, dialogo, consultaDatos, mapaClave, esEnvio);
-												String normbreConsulta = consultaDatos.getNombre();
+												String normbreConsulta = consultaDatos.getDescripcion();
 												
 												List<Map<String,Object>> resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
 												

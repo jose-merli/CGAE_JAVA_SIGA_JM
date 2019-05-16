@@ -284,6 +284,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<String> listaPerfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -295,7 +296,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 				try {
 					consultasList = _conConsultasExtendsMapper.selectConsultasSearch(usuario.getIdinstitucion(),
-							usuario.getIdlenguaje(), filtros);
+							usuario.getIdlenguaje(), listaPerfiles, filtros);
 					if (consultasList.size() > 0) {
 						consultasDTO.setConsultaItem(consultasList);
 					}

@@ -31,13 +31,13 @@ public class AgeCalendarioSqlExtendsProvider extends AgeCalendarioSqlProvider {
 		return sql.toString();
 	}
 
-	public String getCalendariosPermisos(Short idInstitucion, String perfiles) {
+	public String getCalendariosPermisos(Short idInstitucion, String perfiles, String idLenguaje) {
 
 		SQL sql = new SQL();
 
 		sql.SELECT("AGE.IDCALENDARIO");
 		sql.SELECT("AGE.IDINSTITUCION");
-		sql.SELECT("AGE.DESCRIPCION");
+		sql.SELECT("REC.DESCRIPCION");
 		sql.SELECT("AGE.USUMODIFICACION");
 		sql.SELECT("AGE.FECHAMODIFICACION");
 		sql.SELECT("AGE.FECHABAJA");
@@ -50,11 +50,14 @@ public class AgeCalendarioSqlExtendsProvider extends AgeCalendarioSqlProvider {
 		sql.LEFT_OUTER_JOIN(
 				"AGE_PERMISOSCALENDARIO AGE_PER ON AGE.IDCALENDARIO = AGE_PER.IDCALENDARIO AND AGE_PER.IDPERFIL IN ("
 						+ perfiles + ")");
-
+		
+		sql.INNER_JOIN("AGE_TIPOCALENDARIO TIPOCALENDAR ON TIPOCALENDAR.IDTIPOCALENDARIO = AGE.IDTIPOCALENDARIO");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOCALENDAR.DESCRIPCION AND rec.IDLENGUAJE = '" + idLenguaje +"')");
+		
 		sql.WHERE("AGE.IDINSTITUCION = '" + String.valueOf(idInstitucion) + "'");
 
 		sql.GROUP_BY(
-				"AGE.IDCALENDARIO, AGE.IDINSTITUCION, AGE.DESCRIPCION, AGE.USUMODIFICACION, AGE.FECHAMODIFICACION, AGE.FECHABAJA, AGE.IDTIPOCALENDARIO, AGE.COLOR");
+				"AGE.IDCALENDARIO, AGE.IDINSTITUCION, REC.DESCRIPCION, AGE.USUMODIFICACION, AGE.FECHAMODIFICACION, AGE.FECHABAJA, AGE.IDTIPOCALENDARIO, AGE.COLOR");
 
 		SQL sql2 = new SQL();
 		sql2.SELECT("*");

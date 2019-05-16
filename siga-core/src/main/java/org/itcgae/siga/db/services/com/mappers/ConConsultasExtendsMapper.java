@@ -12,7 +12,6 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasSearch;
-import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.ComboItemConsulta;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.services.com.providers.ConConsultasExtendsSqlProvider;
@@ -43,7 +42,7 @@ public interface ConConsultasExtendsMapper {
 			@Result(column = "NOMBREOBJETIVO", property = "objetivo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBREMODULO", property = "modulo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "NOMBRECLASE", property = "claseComunicacion", jdbcType = JdbcType.VARCHAR) })
-	List<ConsultaItem> selectConsultasSearch(Short idInstitucion, String idLenguaje, ConsultasSearch filtros);
+	List<ConsultaItem> selectConsultasSearch(Short idInstitucion, String idLenguaje, List<String> perfiles, ConsultasSearch filtros);
 
 	@SelectProvider(type = ConConsultasExtendsSqlProvider.class, method = "selectMaxIdConsulta")
 	@Results({

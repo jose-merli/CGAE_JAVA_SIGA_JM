@@ -231,7 +231,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 							cenDatosCV.setCertificado("1");
 							cenDatosCV.setCreditos(cargaMasivaDatosCVItem.getCreditos());
 							cenDatosCV.setDescripcion(cargaMasivaDatosCVItem.getDescripcion());
-							cenDatosCV.setFechabaja(cargaMasivaDatosCVItem.getFechaFin());
+							cenDatosCV.setFechafin(cargaMasivaDatosCVItem.getFechaFin());
 							cenDatosCV.setFechainicio(cargaMasivaDatosCVItem.getFechaInicio());
 							cenDatosCV.setFechamodificacion(new Date());
 							cenDatosCV.setFechamovimiento(cargaMasivaDatosCVItem.getFechaVerificacion());
