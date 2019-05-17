@@ -95,14 +95,23 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.FROM("cen_colegiado col");
 
 		sql.INNER_JOIN("cen_persona per on col.idpersona = per.idpersona");
-			if (idInstitucion != Short.parseShort("2000")) {
+		sql.INNER_JOIN("cen_institucion inst on col.idinstitucion = inst.idinstitucion");
+
+			
+		if (idInstitucion != Short.parseShort("2000") && idInstitucion != Short.parseShort("3500")) {
+			if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100") ) {
 				sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and col.idinstitucion = cli.idinstitucion)");
-			}else{
-				sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and cli.idinstitucion =  '"+ idInstitucion + "')");
 			}
+			else{
+				sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and inst.cen_inst_IDINSTITUCION  =  cli.idinstitucion)");
+
+			}
+			
+		}else {
+			sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and cli.idinstitucion =  '"+ idInstitucion + "')");
+		}
 
 		
-		sql.INNER_JOIN("cen_institucion inst on col.idinstitucion = inst.idinstitucion");
 		if (colegiadoItem.getIdgrupo() != null && colegiadoItem.getIdgrupo().length > 0) {
 		sql.LEFT_OUTER_JOIN("cen_gruposcliente_cliente grucli on \r\n"
 				+ "    ((grucli.idinstitucion = inst.idinstitucion or grucli.idinstitucion = '2000') and col.idpersona = grucli.idpersona and ((grucli.fecha_inicio <= SYSDATE OR grucli.fecha_inicio IS NULL ) and \r\n"
@@ -132,12 +141,13 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		if(!instituciones.equals("")) {
 			sql.WHERE("COL.IDINSTITUCION IN (" + instituciones + ")");
 		} else {
-			if (idInstitucion != Short.parseShort("2000")) {
+			if (idInstitucion != Short.parseShort("2000") && idInstitucion != Short.parseShort("3500")) {
 				if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100") ) {
 					sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
 				}
 				else{
-					sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
+                    sql.WHERE("inst.cen_inst_IDINSTITUCION = '" + idInstitucion + "'");
+
 				}
 				
 			}
@@ -329,6 +339,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql3.WHERE("RN = 1");
 
 		return sql3.toString();
+		
 	}
 
 	public String updateColegiado(CenColegiado record) {
