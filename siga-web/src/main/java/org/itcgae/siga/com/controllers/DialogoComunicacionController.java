@@ -91,24 +91,28 @@ public class DialogoComunicacionController {
 		response = _dialogoComunicacionService.descargarComunicacion(request, dialogo);
 		
 		byte[] zip = null;
-		
-		zip = response.getData();
+		if(response.getData() != null) {
 			
-		InputStream targetStream = new ByteArrayInputStream(zip);		
-
-		InputStreamResource resource = new InputStreamResource(targetStream);
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.parseMediaType("application/zip"));
-		headers.add("Access-Control-Allow-Headers", "Content-Type");
-		headers.add("Access-Control-Expose-Headers","Content-Disposition");
-		headers.add("Content-Disposition", "filename=" + SigaConstants.nombreZip + ".zip");
-		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-		headers.add("Pragma", "no-cache");
-		headers.add("Expires", "0");
-		
-		return ResponseEntity.ok().headers(headers).contentLength(zip.length)
-				.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+			zip = response.getData();
+				
+			InputStream targetStream = new ByteArrayInputStream(zip);		
+	
+			InputStreamResource resource = new InputStreamResource(targetStream);
+	
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.parseMediaType("application/zip"));
+			headers.add("Access-Control-Allow-Headers", "Content-Type");
+			headers.add("Access-Control-Expose-Headers","Content-Disposition");
+			headers.add("Content-Disposition", "filename=" + SigaConstants.nombreZip + ".zip");
+			headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+			headers.add("Pragma", "no-cache");
+			headers.add("Expires", "0");
+			
+			return ResponseEntity.ok().headers(headers).contentLength(zip.length)
+					.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+		}else {
+			return null;
+		}
 	}
 	
 	@RequestMapping(value = "/generarEnvios", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
