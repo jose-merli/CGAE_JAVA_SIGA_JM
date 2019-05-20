@@ -29,6 +29,8 @@ public interface CenDatoscvExtendsMapper extends CenDatoscvMapper {
 	@Results({ 
 		@Result(column = "FECHADESDE", property = "fechaDesde", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHAHASTA", property = "fechaHasta", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DATEFECHAINICIO", property = "dateFechaInicio", jdbcType = JdbcType.DATE),
+		@Result(column = "DATEFECHAFIN", property = "dateFechaFin", jdbcType = JdbcType.DATE),
 		@Result(column = "FECHAMOVIMIENTO", property = "fechaMovimiento", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCION", property = "descripcion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CATEGORIACURRICULAR", property = "categoriaCurricular", jdbcType = JdbcType.VARCHAR),
