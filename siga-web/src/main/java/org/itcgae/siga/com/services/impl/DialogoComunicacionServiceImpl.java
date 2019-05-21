@@ -1073,7 +1073,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}	
 				
 				generarComunicacion.setListaModelosEnvio(listaModelosEnvio);
-				generarComunicacion.setListaDocumentos(listaFicheros);
+				if(listaFicheros.get(0) != null) {
+					generarComunicacion.setListaDocumentos(listaFicheros);
+				}
 				
 			}else{
 				LOGGER.error("No hay modelos seleccionados");
