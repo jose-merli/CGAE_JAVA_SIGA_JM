@@ -162,7 +162,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		DatosDocumentoItem documento = new DatosDocumentoItem();
 		boolean hayPlantilla = false;
 		
-		if(listaDatosExcel != null) {
+		if(listaDatosExcel != null && listaDatosExcel.size() >= 1) {
 			
 			Workbook workbook = null;
 			
@@ -290,6 +290,8 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	        documento.setFileName(nombreFicheroSalidaAux);
 	        documento.setPathDocumento(pathFicheroSalida);
 	        bos.close();
+		}else {
+			documento = null;
 		}
 		
 		return documento;
