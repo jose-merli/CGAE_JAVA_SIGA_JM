@@ -65,7 +65,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("nvl(decode(nvl(col.comunitario,0),0, col.ncolegiado, col.ncomunitario), col.ncolegiado) as numcolegiado");
 		sql.SELECT_DISTINCT("colest.idestado as situacion");
 		sql.SELECT_DISTINCT("cat.descripcion as estadoColegial");
-		sql.SELECT_DISTINCT("col.situacionresidente as situacionresidente");
+		sql.SELECT_DISTINCT("colest.situacionresidente as situacionresidente");
 		sql.SELECT_DISTINCT("col.comunitario as comunitario");
 
 		sql.SELECT_DISTINCT(
@@ -119,7 +119,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 		sql.INNER_JOIN(
 				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
-						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion))");
+						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion"
+						+ " and datcol.fechaestado < sysdate))");
 		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
 		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '1')");
 		sql.LEFT_OUTER_JOIN(
@@ -988,5 +989,41 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		return sql2.toString();
 	}
-	
+	public String selectColegiacionActual(Short idInstitucion, String idLenguaje, ColegiadoItem colegiadoItem) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("TO_CHAR(fechaincorporacion,'DD/MM/YYYY') AS fechaincorporacion");
+		sql.SELECT("cat.descripcion as estadoColegial");
+		sql.SELECT("decode (col.situacionresidente, 1, 'Si', 0, 'No') as residenteInscrito");
+		sql.SELECT("decode (colest.situacionresidente, 1, 'Si', 0, 'No') as situacionResidente");
+		sql.SELECT("observaciones");
+		sql.SELECT("TO_CHAR(fechaestado,'DD/MM/YYYY') AS fechaestado");
+		sql.SELECT("fechaestado AS fechaestadodate");
+		sql.SELECT("colest.idestado AS idEstado");
+
+		sql.FROM("cen_colegiado col");
+//		sql.INNER_JOIN(
+//				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion )");		
+		sql.INNER_JOIN(
+				"CEN_DATOSCOLEGIALESESTADO colest on (col.idpersona = colest.idpersona and col.idinstitucion = colest.idinstitucion  and colest.fechaestado = (\r\n"
+						+ "                                            select max(datcol.fechaestado) from CEN_DATOSCOLEGIALESESTADO datcol where datcol.idpersona = colest.idpersona and datcol.idinstitucion = colest.idinstitucion"
+						+ " and datcol.fechaestado < sysdate))");
+		
+		sql.INNER_JOIN("cen_estadocolegial estcol on (colest.idestado = estcol.idestado)");
+		sql.INNER_JOIN("gen_recursos_catalogos cat on (estcol.descripcion = cat.idrecurso and cat.idlenguaje = '"
+				+ idLenguaje + "')");
+
+		sql.WHERE("col.idpersona = '" + colegiadoItem.getIdPersona() + "'");
+
+		if (idInstitucion != Short.parseShort("2000")) {
+			sql.WHERE("colest.idinstitucion = '" + idInstitucion + "'");
+		}
+		// sql1.WHERE("dir.fechabaja is null");
+
+		sql.ORDER_BY("fechaestadodate desc");
+		// sql.ORDER_BY("per.nombre");
+
+		return sql.toString();
+	}
 }

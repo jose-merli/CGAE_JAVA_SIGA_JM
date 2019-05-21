@@ -44,7 +44,7 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 		if (!historico) {
 			sql.WHERE("DATOS.FECHABAJA is null");
 		}
-		
+		sql.ORDER_BY("FECHAINICIO desc");
 		return sql.toString();
 	}
 	

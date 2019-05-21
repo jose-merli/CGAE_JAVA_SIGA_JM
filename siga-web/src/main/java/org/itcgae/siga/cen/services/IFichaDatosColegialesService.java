@@ -37,6 +37,9 @@ public interface IFichaDatosColegialesService {
 			HttpServletRequest request);
 	
 	public StringDTO getNumColegiado(HttpServletRequest request);
+
+	public ColegiadoDTO datosColegialesSearchActual(int numPagina, ColegiadoItem colegiadoItem,
+			HttpServletRequest request);
 	
 //	public BusquedaJuridicaDTO searchLegalPersons(int numPagina, BusquedaJuridicaSearchDTO busquedaJuridicaSearchDTO, HttpServletRequest request);
 	

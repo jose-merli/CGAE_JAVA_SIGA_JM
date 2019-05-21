@@ -16,8 +16,8 @@ public interface IAuditoriaCenHistoricoService {
 
 	public void insertaCenHistorico(Long idPersona, SigaConstants.CEN_TIPOCAMBIO tipoCambio, String descripcion, HttpServletRequest request, String motivo);
 	
-	public void manageAuditoriaDatosGenerales(List<String> gruposPerJuridicaNuevos, List<String> gruposPerJuridicaAntiguos, CenPersona cenPersonaAnterior, CenPersona cenPersonaPosterior, CenNocolegiado cenNocolegiadoAnterior, 
-			CenNocolegiado cenNocolegiadoPosterior, CenCliente cenClienteAnterior, CenCliente cenClientePosterior, String accion, HttpServletRequest request, String motivo);
+	public void manageAuditoriaDatosGenerales(List<String[]> gruposPerJuridicaNuevos, List<String[]> gruposPerJuridicaAntiguos, CenPersona cenPersonaAnterior, CenPersona cenPersonaPosterior, CenNocolegiado cenNocolegiadoAnterior, 
+			CenNocolegiado cenNocolegiadoPosterior, CenCliente cenClienteAnterior, CenCliente cenClientePosterior, String accion, HttpServletRequest request, String motivo,  boolean cambioEtiquetas);
 	
 	public void manageAuditoriaDatosDirecciones(CenDirecciones cenDireccionesAnterior, CenDirecciones cenDireccionesPosterior, String accion, HttpServletRequest request, String motivo);
 	
@@ -26,6 +26,8 @@ public interface IAuditoriaCenHistoricoService {
 	public void manageAuditoriaDatosColegiales(CenColegiado cenColegiadoAnterior,
 			CenColegiado cenColegiadoPosterior, String string, HttpServletRequest request, String motivo);
 
-	public void manageAuditoriaDatosGeneralesColegiado(List<String> gruposPerJuridicaPosterior,			List<String> gruposPerJuridicaAnterior, CenPersona cenPersona, CenPersona cenPersonaPosterior,			CenColegiado cenColegiadoAnterior, CenColegiado cenColegiadoPosterior, CenCliente cenCliente,			CenCliente cenClientePosterior, String string, HttpServletRequest request, String motivo);
+	public void manageAuditoriaDatosGeneralesColegiado(List<String[]> gruposPerJuridicaPosterior, List<String[]> gruposPerJuridicaAnterior, 
+			CenPersona cenPersona, CenPersona cenPersonaPosterior,	CenColegiado cenColegiadoAnterior, CenColegiado cenColegiadoPosterior, 
+			CenCliente cenCliente, CenCliente cenClientePosterior, String string, HttpServletRequest request, String motivo, boolean cambioEtiquetas);
 }
 

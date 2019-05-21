@@ -71,8 +71,8 @@ public class EnvEnviosExtendsSqlProvider {
 		}
 		if(filtros.getIdTipoEnvios() != null && !filtros.getIdTipoEnvios().trim().equals("")){
 			sql.WHERE("ENVIO.IDTIPOENVIOS = '" + filtros.getIdTipoEnvios() +"'");
-		}
-		sql.ORDER_BY("ENVIO.FECHA");
+		} 
+		sql.ORDER_BY("ENVIO.FECHA DESC");
 		
 		return sql.toString();
 	}
@@ -202,6 +202,7 @@ public class EnvEnviosExtendsSqlProvider {
 		sql.JOIN("ENV_ENVIOS ENVIO ON ENVIO.IDENVIO = PROG.IDENVIO");
 		
 		sql.WHERE("ENVIO.IDESTADO = 4 AND (ENVIO.ENVIO = 'A' OR ENVIO.ENVIO = 'M') AND ENVIO.FECHAPROGRAMADA <= TO_DATE('" + fechaHoy + "', 'DD/MM/YYYY HH24:MI:SS')");
+		sql.ORDER_BY("ENVIO.FECHA DESC");
 		return sql.toString();
 	}
 	

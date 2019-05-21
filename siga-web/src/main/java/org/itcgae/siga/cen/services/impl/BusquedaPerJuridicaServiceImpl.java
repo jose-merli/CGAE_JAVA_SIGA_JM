@@ -352,15 +352,15 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 		    Date fechaActual = simpleDateFormat.parse(fechaHoy);
 		    
 		    if (fechaBaja == null) {
-				comboEtiquetasItem.setColor("#87CEFA");
+				comboEtiquetasItem.setColor("#024eff");
 			} else {
 				if (fechaInicio.before(fechaActual)
 						&& (fechaBaja.after(fechaActual) || fechaBaja.compareTo(fechaActual) == 0)) {
-					comboEtiquetasItem.setColor("#87CEFA");
+					comboEtiquetasItem.setColor("#024eff");
 				} else if (fechaActual.before(fechaInicio) && fechaBaja.after(fechaInicio)) {
 					comboEtiquetasItem.setColor("#40E0D0");
 				} else if (fechaInicio.before(fechaBaja) && fechaActual.after(fechaBaja)) {
-					comboEtiquetasItem.setColor("#F08080");
+					comboEtiquetasItem.setColor("#f70000");
 				}
 			} 
 		}

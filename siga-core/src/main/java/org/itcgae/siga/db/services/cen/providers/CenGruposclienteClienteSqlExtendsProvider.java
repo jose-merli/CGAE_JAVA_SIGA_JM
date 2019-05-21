@@ -52,7 +52,7 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		sql.WHERE("per.idpersona = '"+idPersona+"'");
 //		sql.WHERE("cli.FECHA_BAJA > sysdate");
 		sql.WHERE("cli.idinstitucion = '"+idInstitucion+"'");
-		
+		sql.ORDER_BY("GENR.descripcion");
 		return sql.toString();
 	}
 	

@@ -1358,5 +1358,53 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 			throw e;
 		}
 	}
+	
+
+	@Override
+	public ColegiadoDTO datosColegialesSearchActual(int numPagina, ColegiadoItem colegiadoItem, HttpServletRequest request) {
+
+		LOGGER.info("datosColegialesSearch() -> Entrada al servicio para la búsqueda por filtros de direcciones");
+
+		List<ColegiadoItem> colegiadoListItem = new ArrayList<ColegiadoItem>();
+		ColegiadoDTO datosColegialesDTO = new ColegiadoDTO();
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"datosColegialesSearch() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"datosColegialesSearch() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				// if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				LOGGER.info(
+						"datosColegialesSearch() / CenColegiadoExtendsMapper.selectDirecciones() -> Entrada a CenColegiadoExtendsMapper para busqueda de Colegiados");
+				colegiadoListItem = cenColegiadoExtendsMapper.selectColegiacionActual(idInstitucion,
+						usuario.getIdlenguaje(), colegiadoItem);
+				LOGGER.info(
+						"datosColegialesSearch() / CenColegiadoExtendsMapper.selectDirecciones() -> Salida de CenColegiadoExtendsMapper para busqueda de Colegiados");
+
+				datosColegialesDTO.setColegiadoItem(colegiadoListItem);
+			} else {
+				LOGGER.warn(
+						"datosColegialesSearch() / admUsuariosExtendsMapper.selectByExample() -> No existen usuarios en tabla admUsuarios para dni = "
+								+ dni + " e idInstitucion = " + idInstitucion);
+			}
+		} else {
+			LOGGER.warn("datosColegialesSearch() -> idInstitucion del token nula");
+		}
+
+		LOGGER.info("datosColegialesSearch() -> Salida del servicio para la búsqueda por filtros de Colegiados");
+		return datosColegialesDTO;
+	}
+
 
 }

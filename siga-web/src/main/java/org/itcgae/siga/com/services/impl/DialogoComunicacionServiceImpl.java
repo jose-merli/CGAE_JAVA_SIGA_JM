@@ -371,15 +371,14 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					generarComunicacion = generarComunicacion(dialogo,usuario, false);
 					
 					listaFicheros = generarComunicacion.getListaDocumentos();
-					
 					if(listaFicheros != null){
-//						if(listaFicheros.size() > 1) {
+						if(listaFicheros.size() > 0) {
 							zip = WSCommons.zipBytes(listaFicheros);
 							response.setData(zip);
-//						}else {
+						}else {
 //							response.setNombre(listaFicheros.get(0).getFileName().toString());
 //							response.setData(listaFicheros.get(0).getDatos());
-//						}
+						}
 					}else{
 						LOGGER.debug("No se han obtenido documentos");
 						error.setCode(500);
@@ -1074,7 +1073,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}	
 				
 				generarComunicacion.setListaModelosEnvio(listaModelosEnvio);
-				generarComunicacion.setListaDocumentos(listaFicheros);
+				if(listaFicheros.get(0) != null) {
+					generarComunicacion.setListaDocumentos(listaFicheros);
+				}
 				
 			}else{
 				LOGGER.error("No hay modelos seleccionados");
