@@ -48,6 +48,12 @@ public class FichaDatosColegialesController {
 		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/fichaDatosColegiales/datosColegialesSearchActual", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ColegiadoDTO> searchColegialesDataActuak(@RequestParam("numPagina") int numPagina, @RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) { 
+		ColegiadoDTO response = fichaDatosColegiales.datosColegialesSearchActual(numPagina, colegiadoItem, request);
+		return new ResponseEntity<ColegiadoDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/fichaDatosColegiales/datosColegialesUpdate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> searchColegialesData(@RequestBody ColegiadoItem colegiadoItem, HttpServletRequest request) { 
 		UpdateResponseDTO response = fichaDatosColegiales.datosColegialesUpdate(colegiadoItem, request);
