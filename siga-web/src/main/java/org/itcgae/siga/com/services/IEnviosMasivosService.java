@@ -40,7 +40,7 @@ public interface IEnviosMasivosService {
 	public Error guardarEtiquetasEnvio(HttpServletRequest request, TarjetaEtiquetasDTO etiquetasDTO);
 	public Error guardarDocumentoEnvio(HttpServletRequest request, ResponseDocumentoDTO documentoDTO);
 	public DocumentosEnvioDTO obtenerDocumentosEnvio(HttpServletRequest request, String idEnvio);
-	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request) throws IOException;
+	public ResponseDocumentoDTO uploadFile(Long idEnvio, MultipartHttpServletRequest request) throws IOException;
 	public Error borrarDocumento(HttpServletRequest request, ResponseDocumentoDTO[] documentoDTO);
 	public PlantillaEnvioItem obtenerAsuntoYcuerpo (HttpServletRequest request, TarjetaConfiguracionDto datosTarjeta);
 	public ComboConsultaInstitucionDTO obtenerconsultasDestinatarios(HttpServletRequest request);
@@ -53,5 +53,6 @@ public interface IEnviosMasivosService {
 	public Error desAsociarDestinatarios(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem[] destinatario);
 	public DatosDireccionesDTO obtenerDireccionesDisp(HttpServletRequest request, String idPersona);
 	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long parseInt, Short idDocumento);
+	public String getPathFicheroEnvioMasivo(Short idInstitucion, Long idEnvio);
 }
 

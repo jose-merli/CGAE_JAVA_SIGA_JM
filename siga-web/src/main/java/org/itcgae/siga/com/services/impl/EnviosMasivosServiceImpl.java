@@ -1,13 +1,16 @@
 package org.itcgae.siga.com.services.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +46,7 @@ import org.itcgae.siga.com.services.IColaEnvios;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.GEN_PARAMETROS;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
@@ -74,8 +78,6 @@ import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.EnvCamposenviosMapper;
@@ -102,6 +104,7 @@ import org.itcgae.siga.db.services.com.mappers.EnvEnviosGrupoClienteExtendsMappe
 import org.itcgae.siga.db.services.com.mappers.EnvEstadoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
+import org.itcgae.siga.exception.BusinessException;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.ws.client.ClientECOS;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -889,6 +892,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						docExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
 						List<EnvDocumentos> documentos = _envDocumentosMapper.selectByExample(docExample);
 						for (EnvDocumentos documento : documentos) {
+							copiaDocumentosEnvioDuplicado(idInstitucion, idEnvio, idEnvioNuevo, documento.getPathdocumento());
 							// el id documento se debería de calcular con secuencia en bdd
 							documento.setIdenvio(idEnvioNuevo);
 							documento.setFechamodificacion(new Date());
@@ -969,6 +973,31 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 		}
 		LOGGER.info("duplicarEnvio() -> Salida del servicio para duplicar el envío");
 		return respuesta;
+	}
+
+	private void copiaDocumentosEnvioDuplicado(Short idInstitucion, Long idEnvioOld, Long idEnvioNuevo, String nombreDocumento) {
+		LOGGER.debug("Duplicando envío. Documento para duplicar: " + nombreDocumento);
+		String pathAntiguo = getPathFicheroEnvioMasivo(idInstitucion, idEnvioOld);
+		LOGGER.debug("Path antiguo: " + pathAntiguo);
+		
+		String pathNuevo = getPathFicheroEnvioMasivo(idInstitucion, idEnvioNuevo);
+		LOGGER.debug("Path nuevo: " + pathNuevo);
+		
+		try { 
+			File fileOrigen = new File(pathAntiguo, nombreDocumento);
+			File fileDestino = new File(pathNuevo, nombreDocumento);
+			
+			if (fileOrigen.exists()) {
+				fileDestino.mkdirs();
+				Files.copy(Paths.get(fileOrigen.getAbsolutePath()), Paths.get(fileDestino.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+			}
+			
+		} catch (Exception e) {
+			LOGGER.error("Error al copiar el fichero origen al destino " + nombreDocumento, e);
+		}
+		
+		
+		
 	}
 
 	@Override
@@ -1135,7 +1164,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	}
 
 	@Override
-	public ResponseDocumentoDTO uploadFile(MultipartHttpServletRequest request) throws IOException {
+	public ResponseDocumentoDTO uploadFile(Long idEnvio, MultipartHttpServletRequest request) throws IOException {
 		LOGGER.info("uploadFile() -> Entrada al servicio para subir un documento de envio");
 
 		ResponseDocumentoDTO response = new ResponseDocumentoDTO();
@@ -1151,19 +1180,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			if (null != usuarios && usuarios.size() > 0) {
 
-				// crear path para almacenar el fichero
-
-				GenPropertiesKey key = new GenPropertiesKey();
-				key.setFichero(SigaConstants.FICHERO_SIGA);
-				key.setParametro(SigaConstants.parametroRutaPlantillas);
-
-				GenProperties rutaFicherosPlantilla = _genPropertiesMapper.selectByPrimaryKey(key);
-
-				String rutaPlantilla = rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator
-						+ SigaConstants.carpetaDocumentosEnvio + SigaConstants.pathSeparator
-						+ String.valueOf(idInstitucion) + SigaConstants.pathSeparator;
-
-				String pathFichero = rutaPlantilla;
+				String pathFichero = getPathFicheroEnvioMasivo(idInstitucion, idEnvio);
 
 				// 1. Coger archivo del request
 				LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
@@ -1171,7 +1188,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 				MultipartFile file = request.getFile(itr.next());
 				Date fecha = new Date();
 				
-				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy.hh.mm.ss");
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
 				String fechaFormateada = sdf.format(fecha);
 				
 				
@@ -1179,15 +1196,10 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
 				// BufferedOutputStream stream = null;
 				try {
-					File aux = new File(rutaFicherosPlantilla.getValor() + SigaConstants.pathSeparator
-							+ SigaConstants.carpetaDocumentosEnvio + SigaConstants.pathSeparator);
-					// creo directorio si no existe
-					aux.mkdirs();
-
-					aux = new File(pathFichero);
-					// creo directorio si no existe
-					aux.mkdirs();
-					File serverFile = new File(pathFichero, fileName);
+					
+					File serverFile = new File(pathFichero);
+					serverFile.mkdirs();
+					serverFile = new File(serverFile, fileName);
 					if (serverFile.exists()) {
 						LOGGER.error("Ya existe el fichero: " + pathFichero + fileName);
 						throw new FileAlreadyExistsException("El fichero ya existe");
@@ -1196,7 +1208,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					// stream.write(file.getBytes());
 					FileUtils.writeByteArrayToFile(serverFile, file.getBytes());
 					response.setNombreDocumento(fileName);
-					response.setRutaDocumento(pathFichero + fileName);
+					response.setRutaDocumento(fileName);
 				} catch (FileNotFoundException e) {
 					Error error = new Error();
 					error.setCode(500);
@@ -1229,6 +1241,48 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 		LOGGER.info("uploadFile() -> Salida del servicio para subir un documento de envio");
 		return response;
+	}
+
+	@Override
+	public String getPathFicheroEnvioMasivo(Short idInstitucion, Long idEnvio) {
+		String pathFichero = null;
+		
+		GenParametrosKey genParametrosKey = new GenParametrosKey();
+		genParametrosKey.setIdinstitucion(SigaConstants.IDINSTITUCION_0_SHORT);
+		genParametrosKey.setModulo(SigaConstants.MODULO_ENV);
+		genParametrosKey.setParametro(GEN_PARAMETROS.PATH_DOCUMENTOSADJUNTOS.name());
+		
+		GenParametros genParametros = _genParametrosMapper.selectByPrimaryKey(genParametrosKey);
+		
+		if (genParametros == null || genParametros.getValor() == null || genParametros.getValor().trim().equals("")) {
+			String error = "La ruta de ficheros de plantilla no está configurada correctamente";
+			LOGGER.error(error);
+			throw new BusinessException(error);
+		}
+		
+		//recuperamos el idenvio para construir la ruta a partir de la fecha de creación
+		EnvEnviosKey envEnviosKey = new EnvEnviosKey();
+		envEnviosKey.setIdinstitucion(idInstitucion);
+		envEnviosKey.setIdenvio(idEnvio);
+		EnvEnvios envEnvios = _envEnviosMapper.selectByPrimaryKey(envEnviosKey);
+		
+		if (envEnvios == null) {
+			String error = "No se ha encontrado el envío con idEnvio = " + idEnvio + " para la institución " + idInstitucion;
+			LOGGER.error(error);
+			throw new BusinessException(error);
+		}
+		
+		Calendar cal = Calendar.getInstance();
+		//seteamos la fecha de creación del envío
+		cal.setTime(envEnvios.getFecha());
+		
+		pathFichero = genParametros.getValor().trim()
+				+ SigaConstants.pathSeparator + String.valueOf(idInstitucion)
+				+ SigaConstants.pathSeparator + cal.get(Calendar.YEAR)
+				+ SigaConstants.pathSeparator + (cal.get(Calendar.MONTH)+1)
+				+ SigaConstants.pathSeparator + idEnvio;
+		
+		return pathFichero;
 	}
 
 	@Override
@@ -1295,7 +1349,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 				try {
 					boolean noBorrado = false;
 					for (int i = 0; i < documentoDTO.length; i++) {
-						File fichero = new File(documentoDTO[i].getRutaDocumento());
+						String filePath = getPathFicheroEnvioMasivo(idInstitucion, Long.valueOf(documentoDTO[i].getIdEnvio()));
+						File fichero = new File(filePath, documentoDTO[i].getRutaDocumento());
 						if (fichero.exists()) {
 							fichero.delete();
 							EnvDocumentosExample example = new EnvDocumentosExample();

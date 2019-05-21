@@ -20,6 +20,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IComunicacionesService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
+import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
@@ -59,6 +60,9 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 	
 	@Autowired
 	private IPFDService pfdService;	
+	
+	@Autowired
+	private IEnviosMasivosService _enviosMasivosService;
 	
 
 	/**Realiza la busqueda de comunicaciones **/
@@ -246,11 +250,11 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 			
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
-					String pathFichero = documentoDTO.getRutaDocumento();
+					String filePath = _enviosMasivosService.getPathFicheroEnvioMasivo(documentoDTO.getIdInstitucion(), Long.valueOf(documentoDTO.getIdEnvio()));
 					String nombreFichero = documentoDTO.getNombreDocumento();
 					String idEnvio = documentoDTO.getIdEnvio();
 					
-					File file = new File(pathFichero + nombreFichero);
+					File file = new File(filePath, nombreFichero);
 					
 					if(!file.exists()) {
 						file = null;

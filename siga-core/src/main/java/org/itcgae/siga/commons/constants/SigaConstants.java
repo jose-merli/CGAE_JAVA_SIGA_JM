@@ -76,6 +76,7 @@ public class SigaConstants {
 	public static String CAMPO_CP = "CP";
 	public static String CAMPO_CPPUNTO = "C.P.";
 	public static String IDINSTITUCION_0 = "0";
+	public static Short IDINSTITUCION_0_SHORT = Short.valueOf(IDINSTITUCION_0);
 	public static String SI = "SI";
 	public static String NO = "NO";
 	
@@ -834,6 +835,10 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 				public void setValor(String valor){
 					this.valor = valor;
 				}		
-			} 
+			}
+	
+	public static enum GEN_PARAMETROS {
+		PATH_DOCUMENTOSADJUNTOS
+	}
 
 }

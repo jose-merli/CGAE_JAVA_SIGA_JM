@@ -1,5 +1,6 @@
 package org.itcgae.siga.com.services.impl;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import org.itcgae.siga.DTOs.com.RemitenteDTO;
 import org.itcgae.siga.com.services.IColaEnvios;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
+import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.com.services.IEnviosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.FORMATO_SALIDA;
@@ -116,6 +118,9 @@ public class ColaEnviosImpl implements IColaEnvios {
 	
 	@Autowired
 	private EnvDocumentosMapper envDocumentosMapper;
+	
+	@Autowired
+	private IEnviosMasivosService _enviosMasivosService;
 	
 	//@Transactional
 	@Scheduled(cron = "${cron.pattern.scheduled.Envios: 0 * * ? * *}")
@@ -382,6 +387,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 			for (EnvDocumentos documento : documentos) {
 				DatosDocumentoItem doc = new DatosDocumentoItem();
 				doc.setFileName(documento.getDescripcion());
+				String path = _enviosMasivosService.getPathFicheroEnvioMasivo(envio.getIdinstitucion(), envio.getIdenvio());
+				doc.setDocumentoFile(new File(path, documento.getPathdocumento()));
 				doc.setPathDocumento(documento.getPathdocumento());
 				documentosEnvio.add(doc);
 			}

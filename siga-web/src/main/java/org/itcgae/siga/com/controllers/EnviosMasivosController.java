@@ -188,9 +188,9 @@ public class EnviosMasivosController {
 	}
 	
 	@RequestMapping(value = "/detalle/subirDocumento",  method=RequestMethod.POST, produces=MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	ResponseEntity<ResponseDocumentoDTO> uploadFile(MultipartHttpServletRequest request) throws Exception{
+	ResponseEntity<ResponseDocumentoDTO> uploadFile(@RequestParam("idEnvio") Long idEnvio, MultipartHttpServletRequest request) throws Exception{
 		
-		ResponseDocumentoDTO response = _enviosMasivosService.uploadFile(request);
+		ResponseDocumentoDTO response = _enviosMasivosService.uploadFile(idEnvio, request);
 		if(response.getError() == null)
 			return new ResponseEntity<ResponseDocumentoDTO>(response, HttpStatus.OK);
 		else
@@ -236,7 +236,8 @@ public class EnviosMasivosController {
 		}
 		
 		if (resource == null) {
-			file = new File(documentoDTO.getRutaDocumento());
+			String filePath = _enviosMasivosService.getPathFicheroEnvioMasivo(documentoDTO.getIdInstitucion(), Long.valueOf(documentoDTO.getIdEnvio()));
+			file = new File(filePath, documentoDTO.getRutaDocumento());
 			try{
 				resource = new InputStreamResource(new FileInputStream(file)); 
 				contentLength = file.length();

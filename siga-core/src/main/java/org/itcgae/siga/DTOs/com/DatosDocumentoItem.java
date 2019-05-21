@@ -1,10 +1,13 @@
 package org.itcgae.siga.DTOs.com;
 
+import java.io.File;
+
 public class DatosDocumentoItem {
 	
 	private String fileName;
 	private byte [] datos;
 	private String pathDocumento;
+	private File documentoFile;
 	
 	
 	public String getPathDocumento() {
@@ -24,6 +27,12 @@ public class DatosDocumentoItem {
 	}
 	public void setDatos(byte[] datos) {
 		this.datos = datos;
-	}	
+	}
+	public File getDocumentoFile() {
+		return documentoFile;
+	}
+	public void setDocumentoFile(File documentoFile) {
+		this.documentoFile = documentoFile;
+	}
 
 }

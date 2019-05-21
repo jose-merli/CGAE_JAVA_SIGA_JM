@@ -258,7 +258,17 @@ public class EnviosServiceImpl implements IEnviosService{
 	    	    
 	    	    //Adjuntamos los informes adjuntos.
 	    	    for (DatosDocumentoItem informe : documentosEnvio) {
-	    	    	File file = new File(informe.getPathDocumento());
+	    	    	File file = informe.getDocumentoFile();
+	    	    	
+	    	    	if (file == null) { 
+	    	    		String error = "El fichero del envío " + idEnvio + " para el colegio " + idInstitucion + " es nulo";
+	    	    		LOGGER.error(error);
+	    	    		throw new BusinessException(error);
+	    	    	} else if (!file.exists()) {
+	    	    		String error = "El fichero del envío " + idEnvio + " para el colegio " + idInstitucion + " es no existe " + file.getAbsolutePath();
+	    	    		LOGGER.error(error);
+	    	    		throw new BusinessException(error);
+	    	    	}
 	    	    	DataSource ds = new FileDataSource(file);
 	    	    	messageBodyPart = new MimeBodyPart();
 	    	    	messageBodyPart.setDataHandler(new DataHandler(ds));
@@ -357,6 +367,7 @@ public class EnviosServiceImpl implements IEnviosService{
 			}	
 			
 			//Fijamos los destinatarios
+			//debe ser una lista de tamañao 1 pq el texto es o puede ser para esa persona por las etiquetas
 			request.setListaTOsArray(destinatarios);
 			
 			request.setTexto(texto);
