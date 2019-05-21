@@ -75,6 +75,32 @@ public class CenGruposclienteSqlExtendsProvider extends CenGruposclienteSqlProvi
 		return sql.toString();
 	}
 	
+	public String selectDescripcionGruposColegiados(List<String[]> grupos, AdmUsuarios usuario, String idInstitucion) {
+		
+		// preparar grupos en sentencia IN
+		String gruposIN = "";
+		for(int i=0;i< grupos.size(); i++) {
+			
+			if (i == grupos.size() - 1) {
+				gruposIN += "( grucli.IDGRUPO ='" + grupos.get(i)[0] + "' and grucli.IDINSTITUCION = '" + grupos.get(i)[1] + "')";
+			} else {
+				gruposIN += "( grucli.IDGRUPO ='" + grupos.get(i)[0] + "' and grucli.IDINSTITUCION = '" + grupos.get(i)[1] + "') or";
+
+			}
+
+		}
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("CAT.DESCRIPCION");
+		sql.FROM("CEN_GRUPOSCLIENTE grucli");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON grucli.NOMBRE = CAT.IDRECURSO");
+		sql.WHERE("CAT.IDLENGUAJE = '" + usuario.getIdlenguaje() + "'");
+		sql.WHERE("(" + gruposIN +  ")");
+		
+		return sql.toString();
+	}
+	
 	public String getMaxIdGrupo() {
 		SQL sql = new SQL();
 

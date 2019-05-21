@@ -54,6 +54,12 @@ public interface CenGruposclienteExtendsMapper extends CenGruposclienteMapper{
 	})
 	List<StringDTO> selectDescripcionGrupos(List<String> grupos, AdmUsuarios usuario, String idInstitucion);
 	
+	@SelectProvider(type = CenGruposclienteSqlExtendsProvider.class, method = "selectDescripcionGruposColegiados")
+	@Results({
+		@Result(column = "DESCRIPCION", property = "valor", jdbcType = JdbcType.VARCHAR)
+	})
+	List<StringDTO> selectDescripcionGruposColegiados(List<String[]> grupos, AdmUsuarios usuario, String idInstitucion);
+	
 	
 	@SelectProvider(type = CenGruposclienteSqlExtendsProvider.class, method = "getMaxIdGrupo")
     Short getMaxIdGrupo();

@@ -388,12 +388,14 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 
 		List<CenGruposcliente> cenGruposcliente = new ArrayList<CenGruposcliente>();
 		List<String> gruposPerJuridicaNuevos = new ArrayList<String>();
+		List<String[]> gruposPerJuridicaNuevosAudit = new ArrayList<String[]>();
 
 		CenPersonaExample example = new CenPersonaExample();
 		example.createCriteria().andNifcifEqualTo(sociedadCreateDTO.getNif());
 		List<CenPersona> personas = cenPersonaExtendsMapper.selectByExample(example);
 
 		String idPersona = "";
+		boolean cambioEtiquetas = false;
 
 		if (null != personas && !(personas.size() > 0)) {
 
@@ -550,6 +552,13 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 											if (resultCenGruposClienteClientes == 1) {
 												insertResponseDTO.setStatus(SigaConstants.OK);
 												gruposPerJuridicaNuevos.add(String.valueOf(cenGruposcli.getIdgrupo()));
+												
+												String[] a = {
+														cenGruposcli.getIdgrupo().toString(),
+														cenGruposcli.getIdinstitucion().toString()
+												};
+												gruposPerJuridicaNuevosAudit.add(a);
+												
 												LOGGER.warn(
 														"createLegalPerson() / cenGruposclienteClienteExtendsMapper.insert() -> Insertado correctamente en la tabla CenGruposClienteClientes");
 											} else {
@@ -582,7 +591,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 									// 2.1 existen registros => solo insertar/actualizar fecha_baja en tabla
 									// CEN_GRUPOSCLIENTE_CLIENTE
 									if (null != cenGruposcliente && cenGruposcliente.size() > 0) {
-
+										 cambioEtiquetas = true;
 										List<CenGruposclienteCliente> listarelacionGrupoPersona = new ArrayList<CenGruposclienteCliente>();
 										CenGruposclienteClienteExample relacionGrupoPersona = new CenGruposclienteClienteExample();
 										relacionGrupoPersona.createCriteria()
@@ -653,6 +662,8 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 										int response1 = 0;
 										int response2 = 0;
 										int response3 = 0;
+										 cambioEtiquetas = true;
+
 										// 1.2.1 insertar en GEN_RECURSOS_CATALOGOS para generar recurso
 										String nombreTabla = "CEN_GRUPOSCLIENTE";
 										String campoTabla = "NOMBRE";
@@ -760,9 +771,9 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 				// List<String> gruposPerJuridicaNuevos =
 				// Arrays.asList(sociedadCreateDTO.getGrupos());
 				// llamada a auditoria
-				auditoriaCenHistoricoService.manageAuditoriaDatosGenerales(gruposPerJuridicaNuevos, null, null,
+				auditoriaCenHistoricoService.manageAuditoriaDatosGenerales(gruposPerJuridicaNuevosAudit, null, null,
 						cenPersonaPosterior, null, cenNocolegiadoPosterior, null, cenClientePosterior, "INSERT",
-						request, sociedadCreateDTO.getMotivo());
+						request, sociedadCreateDTO.getMotivo(), cambioEtiquetas);
 			}
 			insertResponseDTO.setId(idPersona);
 		}
@@ -794,6 +805,8 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		boolean cambioEtiquetas = false;
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -812,8 +825,10 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 						etiquetaUpdateDTO.getIdPersona(), String.valueOf(usuario.getIdinstitucion()));
 
 				List<String[]> gruposPerJuridicaAntiguos = new ArrayList<String[]>();
-				List<String> gruposPerJuridicaAnterior = new ArrayList<String>();
+				List<String[]> gruposPerJuridicaAnterior = new ArrayList<String[]>();
 				List<String> gruposPerJuridicaPosterior = new ArrayList<String>();
+				List<String[]> gruposPerJuridicaPosteriorAudit = new ArrayList<String[]>();
+
 
 				for (int i = 0; i < gruposPersonaJuridica.size(); i++) {
 
@@ -821,10 +836,19 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 							gruposPersonaJuridica.get(i).getIdInstitucion() };
 
 					gruposPerJuridicaAntiguos.add(a);
+					gruposPerJuridicaAnterior.add(a);
+
 				}
 
 				// 2. Recorremos las etiquetas
 				for (ComboEtiquetasItem etiqueta : etiquetaUpdateDTO.getEtiquetas()) {
+					
+					String[] a = {
+							etiqueta.getIdGrupo(),
+							etiqueta.getIdInstitucion()
+					};
+					gruposPerJuridicaPosteriorAudit.add(a);
+					
 
 					// 2.1. Es una etiqueta de nueva y no existe registro en ninguna tabla
 					if (etiqueta.getIdGrupo() == "") {
@@ -936,7 +960,6 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 
 						// Etiqueta para nueva asociación
 						if (!encontrado) {
-
 							// Buscamos si esa etiqueta ya existe en la tabla de relaciones
 							List<CenGruposclienteCliente> listarelacionGrupoPersona = new ArrayList<CenGruposclienteCliente>();
 							CenGruposclienteClienteExample relacionGrupoPersona = new CenGruposclienteClienteExample();
@@ -951,6 +974,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 
 							// Si no existe --> creamos un nuevo registro
 							if (listarelacionGrupoPersona.isEmpty()) {
+								 cambioEtiquetas = true;
 
 								LOGGER.info(
 										"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
@@ -992,7 +1016,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 
 				// Eliminamos etiquetas
 				for (String[] etiquetaEliminar : gruposPerJuridicaAntiguos) {
-
+					 cambioEtiquetas = true;
 					CenGruposclienteClienteExample cenGruposclienteClienteExample = new CenGruposclienteClienteExample();
 					cenGruposclienteClienteExample.createCriteria()
 					.andIdinstitucionEqualTo(idInstitucion)
@@ -1089,10 +1113,10 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 					updateResponseDTO.setStatus(SigaConstants.OK);
 					if (!UtilidadesString.esCadenaVacia(etiquetaUpdateDTO.getMotivo())) {
 						// AUDITORIA => actualizamos cen_historico si todo es correcto
-						auditoriaCenHistoricoService.manageAuditoriaDatosGenerales(gruposPerJuridicaPosterior,
+						auditoriaCenHistoricoService.manageAuditoriaDatosGenerales(gruposPerJuridicaPosteriorAudit,
 								gruposPerJuridicaAnterior, cenPersonaAnterior, cenPersonaPosterior,
 								cenNocolegiadoAnterior, cenNocolegiadoPosterior, cenClienteAnterior,
-								cenClientePosterior, "UPDATE", request, etiquetaUpdateDTO.getMotivo());
+								cenClientePosterior, "UPDATE", request, etiquetaUpdateDTO.getMotivo(), cambioEtiquetas);
 					}
 
 				}

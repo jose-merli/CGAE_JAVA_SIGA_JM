@@ -169,6 +169,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		boolean cambioEtiquetas = false;
 
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -193,6 +194,9 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 					CenPersona cenPersona = cenPersonaExtendsMapper
 							.selectByPrimaryKey(Long.valueOf(colegiadoItem.getIdPersona()));
+					
+					CenPersona cenPersonaAnterior = cenPersonaExtendsMapper
+							.selectByPrimaryKey(Long.valueOf(colegiadoItem.getIdPersona()));
 
 					etiquetaUpdateDTO.setIdPersona(colegiadoItem.getIdPersona());
 
@@ -201,8 +205,10 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							etiquetaUpdateDTO.getIdPersona(), String.valueOf(usuario.getIdinstitucion()));
 
 					List<String[]> gruposPerJuridicaAntiguos = new  ArrayList<String[]>();
-					List<String> gruposPerJuridicaAnterior = new ArrayList<String>();
+					List<String[]> gruposPerJuridicaAnterior = new ArrayList<String[]>();
 					List<String> gruposPerJuridicaPosterior = new ArrayList<String>();
+					List<String[]> gruposPerJuridicaPosteriorAudit = new ArrayList<String[]>();
+
 
 					for (int i = 0; i < gruposPersona.size(); i++) {
 						
@@ -212,11 +218,17 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						};
 						
 						gruposPerJuridicaAntiguos.add(a);
+						gruposPerJuridicaAnterior.add(a);
 					}
 
 					// 2. Recorremos las etiquetas
 					for (ComboEtiquetasItem etiqueta : colegiadoItem.getEtiquetas()) {
-						//
+						String[] a = {
+								etiqueta.getIdGrupo(),
+								etiqueta.getIdInstitucion()
+						};
+						gruposPerJuridicaPosteriorAudit.add(a);
+						
 						// 2.1. Es una etiqueta de nueva y no existe registro en ninguna tabla
 						if (etiqueta.getIdGrupo() == "") {
 
@@ -292,6 +304,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 									if (resultCenGruposClienteClientes == 1) {
 										updateResponseDTO.setStatus(SigaConstants.OK);
 										gruposPerJuridicaPosterior.add(String.valueOf(cenGruposcli.getIdgrupo()));
+										
 										LOGGER.warn(
 												"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insert() -> Insertado correctamente en la tabla CenGruposClienteClientes");
 									} else {
@@ -327,7 +340,6 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 							
 							// Etiqueta para nueva asociación
 							if (!encontrado) {
-
 								// Buscamos si esa etiqueta ya existe en la tabla de relaciones
 								List<CenGruposclienteCliente> listarelacionGrupoPersona = new ArrayList<CenGruposclienteCliente>();
 								CenGruposclienteClienteExample relacionGrupoPersona = new CenGruposclienteClienteExample();
@@ -341,6 +353,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 								// Si no existe --> creamos un nuevo registro
 								if (listarelacionGrupoPersona.isEmpty()) {
+									cambioEtiquetas = true;
 
 									LOGGER.info(
 											"updateLegalPerson() / cenGruposclienteClienteExtendsMapper.insertSelectiveForCreateLegalPerson() -> Entrada a cenGruposclienteClienteExtendsMapper para crear relacion grupo-persona jurídica");
@@ -385,7 +398,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					
 					//Eliminamos etiquetas
 					 for (String [] etiquetaEliminar : gruposPerJuridicaAntiguos) {
-
+						 cambioEtiquetas = true;
 							CenGruposclienteClienteExample cenGruposclienteClienteExample = new CenGruposclienteClienteExample();
 							cenGruposclienteClienteExample.createCriteria()
 							.andIdinstitucionEqualTo(idInstitucion)
@@ -470,6 +483,9 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 
 						CenCliente cenCliente = new CenCliente();
 						cenCliente = cenClienteMapper.selectByPrimaryKey(key);
+						
+						CenCliente cenClienteAnterior = cenClienteMapper.selectByPrimaryKey(key);
+						
 						// Por ahora no tenemos cuenta contable, se queda pendiente
 						// cenCliente.setAsientocontable(colegiadoItem.getCuentaContable());
 						cenCliente.setIdlenguaje(colegiadoItem.getIdLenguaje());
@@ -696,7 +712,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 						if (!updateResponseDTO.getStatus().equals(SigaConstants.KO)) {
 
 							if (!UtilidadesString.esCadenaVacia(colegiadoItem.getMotivo())) {
-								if (null != colegiadoItem.getColegiado() && colegiadoItem.getColegiado()) {
+//								if (null != colegiadoItem.getColegiado() && colegiadoItem.getColegiado()) {
 									Long idPersonaCreada = Long.valueOf(colegiadoItem.getIdPersona());
 									// obtenemos registro cen_persona creado
 									CenPersona cenPersonaPosterior = new CenPersona();
@@ -718,12 +734,12 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 									// Arrays.asList(sociedadCreateDTO.getGrupos());
 									// llamada a auditoria
 									auditoriaCenHistoricoService.manageAuditoriaDatosGeneralesColegiado(
-											gruposPerJuridicaPosterior, gruposPerJuridicaAnterior, cenPersona,
+											gruposPerJuridicaPosteriorAudit, gruposPerJuridicaAnterior, cenPersonaAnterior,
 											cenPersonaPosterior, cenColegiadoAnterior, cenColegiadoPosterior,
-											cenCliente, cenClientePosterior, "UPDATE", request,
-											colegiadoItem.getMotivo());
+											cenClienteAnterior, cenClientePosterior, "UPDATE", request,
+											colegiadoItem.getMotivo(), cambioEtiquetas);
 
-								}
+//								}
 							}
 
 							updateResponseDTO.setStatus(SigaConstants.OK);
