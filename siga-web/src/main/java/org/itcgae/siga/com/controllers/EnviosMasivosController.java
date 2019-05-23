@@ -239,6 +239,10 @@ public class EnviosMasivosController {
 			String filePath = _enviosMasivosService.getPathFicheroEnvioMasivo(documentoDTO.getIdInstitucion(), Long.valueOf(documentoDTO.getIdEnvio()));
 			file = new File(filePath, documentoDTO.getRutaDocumento());
 			try{
+				if (file != null && !file.exists()) {
+					//si no lo encontramos para descargar es pq es del siga antiguo y se guardaba con este nombre
+					file = new File(filePath, documentoDTO.getIdInstitucion() + "_" + documentoDTO.getIdEnvio() + "_" + documentoDTO.getIdDocumento());
+				}
 				resource = new InputStreamResource(new FileInputStream(file)); 
 				contentLength = file.length();
 			}catch(FileNotFoundException e){
