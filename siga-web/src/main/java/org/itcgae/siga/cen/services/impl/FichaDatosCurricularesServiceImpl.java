@@ -77,15 +77,24 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 				"searchDatosCurriculares() / admUsuariosExtendsMapper.selectByExample() -> Entrada a searchDatosCurriculares");
 		FichaDatosCurricularesDTO fichaDatosCurricularesDTO = new FichaDatosCurricularesDTO();
 		List<FichaDatosCurricularesItem> fichaDatosCurricularesItem = new ArrayList<FichaDatosCurricularesItem>();
-
+		AdmUsuarios usuario = new AdmUsuarios();
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+		LOGGER.info(
+				"deleteDatosCurriculares() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		LOGGER.info(
+				"deleteDatosCurriculares() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+		usuario = usuarios.get(0);
 		if (null != idInstitucion) {
 			fichaDatosCurricularesItem = cenDatoscvExtendsMapper.searchDatosCurriculares(
 					fichaDatosCurricularesSearchDTO.getIdPersona(), fichaDatosCurricularesSearchDTO.getHistorico(),
-					String.valueOf(idInstitucion));
+					String.valueOf(idInstitucion),usuario.getIdlenguaje());
 			fichaDatosCurricularesDTO.setFichaDatosCurricularesItem(fichaDatosCurricularesItem);
 
 		}
@@ -102,6 +111,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 		AdmUsuarios usuario = new AdmUsuarios();
 		int response = 0;
 
+
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -112,6 +122,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 		LOGGER.info(
 				"deleteDatosCurriculares() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		
 		LOGGER.info(
 				"deleteDatosCurriculares() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
