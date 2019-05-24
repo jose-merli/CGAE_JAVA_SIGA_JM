@@ -131,12 +131,16 @@ public class AuditoriaCenHistoricoServiceImpl implements IAuditoriaCenHistoricoS
 						motivo);
 			}
 
-			// auditoria para cen_nocolegiado
 			cenNoColegiadoDescripcion = getDescripcionCenNoColegiado(cenNocolegiadoAnterior, cenNocolegiadoPosterior,
 					accion);
-			insertaCenHistorico(cenNocolegiadoPosterior.getIdpersona(),
-					SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_COLEGIALES, cenNoColegiadoDescripcion, request,
-					motivo);
+
+			// auditoria para cen_nocolegiado
+			if (cenNoColegiadoDescripcion != null) {
+
+				insertaCenHistorico(cenNocolegiadoPosterior.getIdpersona(),
+						SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_COLEGIALES, cenNoColegiadoDescripcion, request,
+						motivo);
+			}
 
 			// auditoria para cen_cliente
 			cenClienteDescripcion = getDescripcionCliente(cenClienteAnterior, cenClientePosterior, accion);
@@ -200,8 +204,8 @@ public class AuditoriaCenHistoricoServiceImpl implements IAuditoriaCenHistoricoS
 			// auditoria para etiquetas
 			if (null != gruposPerJuridicaNuevos && !gruposPerJuridicaNuevos.isEmpty()) {
 				insertaCenHistorico(cenClientePosterior.getIdpersona(),
-						SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES,
-						getDescripcionGruposColegiado(gruposPerJuridicaAntiguos, gruposPerJuridicaNuevos, accion, request),
+						SigaConstants.CEN_TIPOCAMBIO.MODIFICACION_DATOS_GENERALES, getDescripcionGruposColegiado(
+								gruposPerJuridicaAntiguos, gruposPerJuridicaNuevos, accion, request),
 						request, motivo);
 			}
 
@@ -408,23 +412,38 @@ public class AuditoriaCenHistoricoServiceImpl implements IAuditoriaCenHistoricoS
 	private String getDescripcionCenNoColegiado(CenNocolegiado cenNoColegiadoAnterior,
 			CenNocolegiado cenNoColegiadoPosterior, String accion) {
 		StringBuffer sb = new StringBuffer();
-
+		String descripcion = null;
+		
 		switch (accion) {
 		case "UPDATE":
-			getDescripcionNocolegiado(sb, cenNoColegiadoAnterior, "REGISTRO ANTERIOR");
-			getDescripcionNocolegiado(sb, cenNoColegiadoPosterior, "REGISTRO ACTUAL");
+
+			if ((cenNoColegiadoAnterior.getAnotaciones() != null && cenNoColegiadoPosterior.getAnotaciones() != null
+					&& !cenNoColegiadoAnterior.getAnotaciones().equals(cenNoColegiadoPosterior.getAnotaciones()))
+					|| (cenNoColegiadoAnterior.getAnotaciones() != null && cenNoColegiadoPosterior.getAnotaciones() == null)
+					|| (cenNoColegiadoPosterior.getAnotaciones() != null && cenNoColegiadoAnterior.getAnotaciones() == null)) {
+
+				getDescripcionNocolegiado(sb, cenNoColegiadoAnterior, "REGISTRO ANTERIOR");
+				getDescripcionNocolegiado(sb, cenNoColegiadoPosterior, "REGISTRO ACTUAL");
+				
+				descripcion = sb.toString();
+			}else {
+				descripcion = null;
+			}
+			
 			break;
 		case "INSERT":
 			getDescripcionNocolegiado(sb, cenNoColegiadoPosterior, "REGISTRO NUEVO");
+			descripcion = sb.toString();
 			break;
 		case "DELETE":
 			getDescripcionNocolegiado(sb, cenNoColegiadoPosterior, "REGISTRO ELIMINADO");
+			descripcion = sb.toString();
 			break;
 		default:
 			break;
 		}
 
-		return sb.toString();
+		return descripcion;
 	}
 
 	private void getDescripcionNocolegiado(StringBuffer sb, CenNocolegiado cenNocolegiado, String cabecera) {

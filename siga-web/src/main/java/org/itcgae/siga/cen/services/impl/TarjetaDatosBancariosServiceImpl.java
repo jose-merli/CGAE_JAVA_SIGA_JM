@@ -2126,10 +2126,10 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			Iterator<String> itr = request.getFileNames();
 			MultipartFile file = request.getFile(itr.next());
 			String fileName = file.getOriginalFilename();
-			String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+			String extension = fileName.substring(fileName.lastIndexOf(".")+1, fileName.length());
 
 			String fileNewNameNoExtension = fileNewName;
-			fileNewName += extension;
+			fileNewName += "." + extension;
 			BufferedOutputStream stream = null;
 			// 2. Guardar el archivo
 			LOGGER.debug("uploadFile() -> Guardar el documento de cuenta bancaria");
@@ -2280,7 +2280,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 		if (null != genFichero) {
 			String pathAbsolute = genFichero.getDirectorio();
-			pathAbsolute += genFichero.getExtension();
+			pathAbsolute += "." + genFichero.getExtension();
 
 			// File file = new File("C://IISIGA/anexos/2006002472110.pdf");
 			File file = new File(pathAbsolute);

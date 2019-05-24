@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
@@ -29,8 +30,8 @@ public interface IEnviosMasivosService {
 	public ComboDTO estadoEnvios(HttpServletRequest request);
 	public ComboDTO tipoEnvio(HttpServletRequest request);
 	public ComboDTO nombrePlantillas(HttpServletRequest request, String idTipoEnvio);
-	public ComboDTO obtenerEtiquetas(HttpServletRequest request);
-	public ComboDTO obtenerEtiquetasEnvio(HttpServletRequest request, String idEnvio);
+	public ComboInstitucionDTO obtenerEtiquetas(HttpServletRequest request);
+	public ComboInstitucionDTO obtenerEtiquetasEnvio(HttpServletRequest request, String idEnvio);
 	public EnviosMasivosDTO enviosMasivosSearch(HttpServletRequest request, EnviosMasivosSearch filtros);
 	public Error programarEnvio (HttpServletRequest request, EnviosMasivosItem[] envioProgramarDto);
 	public Error cancelarEnvios (HttpServletRequest request, EnvioProgramadoDto[] enviosProgramadosDto);

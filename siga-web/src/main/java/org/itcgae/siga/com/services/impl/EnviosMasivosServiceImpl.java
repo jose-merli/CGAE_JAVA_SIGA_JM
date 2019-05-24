@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
+import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesItem;
 import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
@@ -94,7 +96,7 @@ import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteClienteExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenGruposclienteExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDestConsultaEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDestinatariosExtendsMapper;
@@ -162,7 +164,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	private EnvEnviosgrupoclienteMapper _envEnviosgrupoclienteMapper;
 
 	@Autowired
-	private CenGruposclienteClienteExtendsMapper _cenGruposclienteClienteExtendsMapper;
+	private CenGruposclienteExtendsMapper _cenGruposclienteExtendsMapper;
 
 	@Autowired
 	private EnvEnviosGrupoClienteExtendsMapper _envEnviosGrupoClienteExtendsMapper;
@@ -196,21 +198,21 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 	@Autowired
 	private CenDireccionesMapper _cenDireccionesMapper;
-	
+
 	@Autowired
 	private EnvCamposenviosMapper _envCamposenviosMapper;
-	
+
 	@Autowired
 	private EnvDestinatariosBurosmsMapper envDestinatariosBurosmsMapper;
-	
+
 	@Autowired
 	private GenParametrosMapper _genParametrosMapper;
-	
+
 	@Autowired
 	private ClientECOS _clientECOS;
-	
+
 	@Autowired
-	private IPFDService pfdService;	
+	private IPFDService pfdService;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -311,7 +313,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					enviosItemList = _envEnviosExtendsMapper.selectEnviosMasivosSearch(usuario.getIdinstitucion(),
 							usuario.getIdlenguaje(), filtros);
 					if (enviosItemList.size() > 0) {
-						for(EnviosMasivosItem envioMasivo : enviosItemList) {
+						for (EnviosMasivosItem envioMasivo : enviosItemList) {
 							TarjetaConfiguracionDto datosTarjeta = new TarjetaConfiguracionDto();
 							datosTarjeta.setIdEnvio(String.valueOf(envioMasivo.getIdEnvio()));
 							datosTarjeta.setIdTipoEnvios(envioMasivo.getIdTipoEnvios());
@@ -603,10 +605,12 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							historico.setIdestado(idEstado);
 							_envHistoricoestadoenvioMapper.insert(historico);
 						}
-						
-						if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios()) || SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())){
-							//Insertamos el nuevo asunto y cuerpo del envio
-							
+
+						if (SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
+								|| SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO
+										.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
+							// Insertamos el nuevo asunto y cuerpo del envio
+
 							EnvCamposenvios envCamposEnvio = new EnvCamposenvios();
 							envCamposEnvio.setFechamodificacion(new Date());
 							envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
@@ -614,10 +618,10 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							envCamposEnvio.setIdenvio(envio.getIdenvio());
 							envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
 							envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
-							envCamposEnvio.setValor(datosTarjeta.getAsunto());							
-							
+							envCamposEnvio.setValor(datosTarjeta.getAsunto());
+
 							_envCamposenviosMapper.insert(envCamposEnvio);
-							
+
 							envCamposEnvio = new EnvCamposenvios();
 							envCamposEnvio.setFechamodificacion(new Date());
 							envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
@@ -625,15 +629,15 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							envCamposEnvio.setIdenvio(envio.getIdenvio());
 							envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
 							envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
-							envCamposEnvio.setValor(datosTarjeta.getCuerpo());	
-							
+							envCamposEnvio.setValor(datosTarjeta.getCuerpo());
+
 							_envCamposenviosMapper.insert(envCamposEnvio);
-							
-						}else if(SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios()) 
+
+						} else if (SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
 								|| SigaConstants.ID_ENVIO_BURO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
-							
-							//Insertamos el cuerpo del sms
-							
+
+							// Insertamos el cuerpo del sms
+
 							EnvCamposenvios envCamposEnvio = new EnvCamposenvios();
 							envCamposEnvio.setFechamodificacion(new Date());
 							envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
@@ -641,13 +645,12 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							envCamposEnvio.setIdenvio(envio.getIdenvio());
 							envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
 							envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_SMS);
-							envCamposEnvio.setValor(datosTarjeta.getCuerpo());							
-							
+							envCamposEnvio.setValor(datosTarjeta.getCuerpo());
+
 							_envCamposenviosMapper.insert(envCamposEnvio);
-							
-						}				
-						
-						
+
+						}
+
 						respuesta.setCode(200);
 						respuesta.setDescription(envio.getIdenvio().toString());
 						SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
@@ -662,11 +665,13 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						envio.setFechamodificacion(new Date());
 						envio.setUsumodificacion(usuario.getIdusuario());
 						_envEnviosMapper.updateByPrimaryKey(envio);
-						
-						if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios()) || SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())){
-							
-							//Actualizamos el nuevo asunto y cuerpo del envio
-							
+
+						if (SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
+								|| SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO
+										.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
+
+							// Actualizamos el nuevo asunto y cuerpo del envio
+
 							EnvCamposenvios envCamposEnvio = new EnvCamposenvios();
 							envCamposEnvio.setFechamodificacion(new Date());
 							envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
@@ -674,11 +679,10 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							envCamposEnvio.setIdenvio(envio.getIdenvio());
 							envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
 							envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
-							envCamposEnvio.setValor(datosTarjeta.getAsunto());				
+							envCamposEnvio.setValor(datosTarjeta.getAsunto());
 
-							
 							_envCamposenviosMapper.updateByPrimaryKeyWithBLOBs(envCamposEnvio);
-							
+
 							envCamposEnvio = new EnvCamposenvios();
 							envCamposEnvio.setFechamodificacion(new Date());
 							envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
@@ -686,15 +690,15 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							envCamposEnvio.setIdenvio(envio.getIdenvio());
 							envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
 							envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
-							envCamposEnvio.setValor(datosTarjeta.getCuerpo());	
-							
+							envCamposEnvio.setValor(datosTarjeta.getCuerpo());
+
 							_envCamposenviosMapper.updateByPrimaryKeyWithBLOBs(envCamposEnvio);
-							
-						}else if(SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios()) 
+
+						} else if (SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
 								|| SigaConstants.ID_ENVIO_BURO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
-							
-							//Actualizamos el cuerpo del sms
-							
+
+							// Actualizamos el cuerpo del sms
+
 							EnvCamposenvios envCamposEnvio = new EnvCamposenvios();
 							envCamposEnvio.setFechamodificacion(new Date());
 							envCamposEnvio.setUsumodificacion(usuario.getIdusuario());
@@ -702,13 +706,12 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							envCamposEnvio.setIdenvio(envio.getIdenvio());
 							envCamposEnvio.setIdinstitucion(usuario.getIdinstitucion());
 							envCamposEnvio.setTipocampo(SigaConstants.ID_TIPO_CAMPO_SMS);
-							envCamposEnvio.setValor(datosTarjeta.getCuerpo());							
-							
+							envCamposEnvio.setValor(datosTarjeta.getCuerpo());
+
 							_envCamposenviosMapper.updateByPrimaryKeyWithBLOBs(envCamposEnvio);
-							
+
 						}
-						
-						
+
 						respuesta.setCode(200);
 						respuesta.setDescription(envio.getIdenvio().toString());
 					}
@@ -792,10 +795,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					PlantillaKey.setIdinstitucion(idInstitucion);
 					PlantillaKey.setIdplantillaenvios(Integer.parseInt(datosTarjeta.getIdPlantillaEnvios()));
 					PlantillaKey.setIdtipoenvios(Short.valueOf(datosTarjeta.getIdTipoEnvios()));
-					
+
 					EnvPlantillasenviosWithBLOBs plantillaEnvio = _envPlantillasenviosMapper
 							.selectByPrimaryKey(PlantillaKey);
-
 
 					// tabla env_envios
 					EnvEnviosKey keyEnvio = new EnvEnviosKey();
@@ -812,48 +814,48 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					envio.setIdestado(idEstadoPendiente);
 					_envEnviosMapper.insert(envio);
 					Long idEnvioNuevo = envio.getIdenvio();
-					
-					//Duplicar asunto y cuerpo del envio duplicado
-					
-					if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
+
+					// Duplicar asunto y cuerpo del envio duplicado
+
+					if (SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
 						EnvCamposenviosKey key = new EnvCamposenviosKey();
 						key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
 						key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
 						key.setIdinstitucion(usuario.getIdinstitucion());
 						key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
-						
+
 						EnvCamposenvios envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
 						envCampos.setIdenvio(idEnvioNuevo);
 						envCampos.setFechamodificacion(new Date());
-						
+
 						_envCamposenviosMapper.insert(envCampos);
-						
+
 						key = new EnvCamposenviosKey();
 						key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));
 						key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
 						key.setIdinstitucion(usuario.getIdinstitucion());
 						key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
-						
+
 						envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
 						envCampos.setIdenvio(idEnvioNuevo);
 						envCampos.setFechamodificacion(new Date());
-						
+
 						_envCamposenviosMapper.insert(envCampos);
-						
-					}else if(SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
+
+					} else if (SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
 							|| SigaConstants.ID_ENVIO_BURO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
-						
+
 						EnvCamposenviosKey key = new EnvCamposenviosKey();
 						key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_TEXTO_SMS));
 						key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
 						key.setIdinstitucion(usuario.getIdinstitucion());
 						key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_SMS);
-						
+
 						EnvCamposenvios envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
-						
+
 						envCampos.setIdenvio(idEnvioNuevo);
 						envCampos.setFechamodificacion(new Date());
-						
+
 						_envCamposenviosMapper.insert(envCampos);
 					}
 
@@ -892,7 +894,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						docExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
 						List<EnvDocumentos> documentos = _envDocumentosMapper.selectByExample(docExample);
 						for (EnvDocumentos documento : documentos) {
-							copiaDocumentosEnvioDuplicado(idInstitucion, idEnvio, idEnvioNuevo, documento.getPathdocumento());
+							copiaDocumentosEnvioDuplicado(idInstitucion, idEnvio, idEnvioNuevo,
+									documento.getPathdocumento());
 							// el id documento se debería de calcular con secuencia en bdd
 							documento.setIdenvio(idEnvioNuevo);
 							documento.setFechamodificacion(new Date());
@@ -929,31 +932,34 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					// }
 
 					// env_grupocliente
-					/*EnvEnviosgrupoclienteExample gruposExample = new EnvEnviosgrupoclienteExample();
-					gruposExample.createCriteria().andIdenvioEqualTo(idEnvio);
-					List<EnvEnviosgrupocliente> grupos = _envEnviosgrupoclienteMapper.selectByExample(gruposExample);
-					for (EnvEnviosgrupocliente envEnviosgrupocliente : grupos) {
-						envEnviosgrupocliente.setIdenvio(idEnvioNuevo);
-						envEnviosgrupocliente.setFechamodificacion(new Date());
-						envEnviosgrupocliente.setUsumodificacion(usuario.getIdusuario());
-						_envEnviosgrupoclienteMapper.insert(envEnviosgrupocliente);
-					}*/
+					/*
+					 * EnvEnviosgrupoclienteExample gruposExample = new
+					 * EnvEnviosgrupoclienteExample();
+					 * gruposExample.createCriteria().andIdenvioEqualTo(idEnvio);
+					 * List<EnvEnviosgrupocliente> grupos =
+					 * _envEnviosgrupoclienteMapper.selectByExample(gruposExample); for
+					 * (EnvEnviosgrupocliente envEnviosgrupocliente : grupos) {
+					 * envEnviosgrupocliente.setIdenvio(idEnvioNuevo);
+					 * envEnviosgrupocliente.setFechamodificacion(new Date());
+					 * envEnviosgrupocliente.setUsumodificacion(usuario.getIdusuario());
+					 * _envEnviosgrupoclienteMapper.insert(envEnviosgrupocliente); }
+					 */
 
 					List<EnviosMasivosItem> listaEnvioDuplicado = _envEnviosExtendsMapper.selectEnviosMasivosById(
 							idInstitucion, usuario.getIdlenguaje(), String.valueOf(idEnvioNuevo));
 
 					if (listaEnvioDuplicado != null && listaEnvioDuplicado.size() == 1) {
-						
+
 						EnviosMasivosItem envioMasivo = listaEnvioDuplicado.get(0);
 						TarjetaConfiguracionDto datosTarjetaDuplicado = new TarjetaConfiguracionDto();
 						datosTarjetaDuplicado.setIdEnvio(String.valueOf(envioMasivo.getIdEnvio()));
 						datosTarjetaDuplicado.setIdTipoEnvios(envioMasivo.getIdTipoEnvios());
 						datosTarjetaDuplicado.setIdPlantillaEnvios(envioMasivo.getIdPlantillaEnvios());
-						PlantillaEnvioItem envioAsuntoCuerpo = obtenerAsuntoYcuerpoEnvio(usuario, datosTarjetaDuplicado);
+						PlantillaEnvioItem envioAsuntoCuerpo = obtenerAsuntoYcuerpoEnvio(usuario,
+								datosTarjetaDuplicado);
 						envioMasivo.setAsunto(envioAsuntoCuerpo.getAsunto());
 						envioMasivo.setCuerpo(envioAsuntoCuerpo.getCuerpo());
 
-						
 						respuesta.setEnviosMasivosItem(listaEnvioDuplicado);
 
 						LOGGER.debug("Duplicado correctamente");
@@ -975,29 +981,29 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 		return respuesta;
 	}
 
-	private void copiaDocumentosEnvioDuplicado(Short idInstitucion, Long idEnvioOld, Long idEnvioNuevo, String nombreDocumento) {
+	private void copiaDocumentosEnvioDuplicado(Short idInstitucion, Long idEnvioOld, Long idEnvioNuevo,
+			String nombreDocumento) {
 		LOGGER.debug("Duplicando envío. Documento para duplicar: " + nombreDocumento);
 		String pathAntiguo = getPathFicheroEnvioMasivo(idInstitucion, idEnvioOld);
 		LOGGER.debug("Path antiguo: " + pathAntiguo);
-		
+
 		String pathNuevo = getPathFicheroEnvioMasivo(idInstitucion, idEnvioNuevo);
 		LOGGER.debug("Path nuevo: " + pathNuevo);
-		
-		try { 
+
+		try {
 			File fileOrigen = new File(pathAntiguo, nombreDocumento);
 			File fileDestino = new File(pathNuevo, nombreDocumento);
-			
+
 			if (fileOrigen.exists()) {
 				fileDestino.mkdirs();
-				Files.copy(Paths.get(fileOrigen.getAbsolutePath()), Paths.get(fileDestino.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
+				Files.copy(Paths.get(fileOrigen.getAbsolutePath()), Paths.get(fileDestino.getAbsolutePath()),
+						StandardCopyOption.REPLACE_EXISTING);
 			}
-			
+
 		} catch (Exception e) {
 			LOGGER.error("Error al copiar el fichero origen al destino " + nombreDocumento, e);
 		}
-		
-		
-		
+
 	}
 
 	@Override
@@ -1044,12 +1050,12 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	}
 
 	@Override
-	public ComboDTO obtenerEtiquetas(HttpServletRequest request) {
+	public ComboInstitucionDTO obtenerEtiquetas(HttpServletRequest request) {
 
 		LOGGER.info("obtenerEtiquetas() -> Entrada al servicio para obtener combo etiquetas");
 
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		ComboInstitucionDTO comboDTO = new ComboInstitucionDTO();
+		List<ComboInstitucionItem> comboItems = new ArrayList<ComboInstitucionItem>();
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1064,9 +1070,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				AdmUsuarios usuario = usuarios.get(0);
-				comboItems = _cenGruposclienteClienteExtendsMapper.selectGruposEtiquetas(usuario.getIdlenguaje(),
-						idInstitucion.toString());
-				comboDTO.setCombooItems(comboItems);
+				comboItems = _cenGruposclienteExtendsMapper.getLabel(usuario);
+
+				comboDTO.setComboInstitucionItem(comboItems);
 
 			}
 		}
@@ -1077,12 +1083,12 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	}
 
 	@Override
-	public ComboDTO obtenerEtiquetasEnvio(HttpServletRequest request, String idEnvio) {
+	public ComboInstitucionDTO obtenerEtiquetasEnvio(HttpServletRequest request, String idEnvio) {
 
 		LOGGER.info("obtenerEtiquetasEnvio() -> Entrada al servicio para obtener las etiquetas de un envio");
 
-		ComboDTO comboDTO = new ComboDTO();
-		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+		ComboInstitucionDTO comboDTO = new ComboInstitucionDTO();
+		List<ComboInstitucionItem> comboItems = new ArrayList<ComboInstitucionItem>();
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -1099,7 +1105,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 				AdmUsuarios usuario = usuarios.get(0);
 				comboItems = _envEnviosGrupoClienteExtendsMapper.getGruposEnvio(idEnvio, usuario.getIdlenguaje(),
 						idInstitucion);
-				comboDTO.setCombooItems(comboItems);
+				comboDTO.setComboInstitucionItem(comboItems);
 
 			}
 		}
@@ -1134,18 +1140,38 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					for (int i = 0; i < etiquetasDTO.getEtiquetasNoSeleccionadas().length; i++) {
 						EnvEnviosgrupoclienteExample example = new EnvEnviosgrupoclienteExample();
 						example.createCriteria().andIdenvioEqualTo(Long.valueOf(etiquetasDTO.getIdEnvio()))
-								.andIdgrupoEqualTo(Short.valueOf(etiquetasDTO.getEtiquetasNoSeleccionadas()[i]));
+								.andIdgrupoEqualTo(
+										Short.valueOf(etiquetasDTO.getEtiquetasNoSeleccionadas()[i].getValue()))
+								.andIdinstitucionEqualTo(idInstitucion).andIdinstitucionGrupoEqualTo(Short
+										.valueOf(etiquetasDTO.getEtiquetasNoSeleccionadas()[i].getIdInstitucion()));
 						_envEnviosgrupoclienteMapper.deleteByExample(example);
 					}
 
 					// añadimos las etiquetas seleccionadas
 					for (int i = 0; i < etiquetasDTO.getEtiquetasSeleccionadas().length; i++) {
-						EnvEnviosgrupocliente etiqueta = new EnvEnviosgrupocliente();
-						etiqueta.setIdenvio(Long.valueOf(etiquetasDTO.getIdEnvio()));
-						etiqueta.setFechamodificacion(new Date());
-						etiqueta.setIdgrupo(Short.valueOf(etiquetasDTO.getEtiquetasSeleccionadas()[i]));
-						etiqueta.setUsumodificacion(usuario.getIdusuario());
-						_envEnviosgrupoclienteMapper.insert(etiqueta);
+
+						EnvEnviosgrupoclienteExample example = new EnvEnviosgrupoclienteExample();
+						example.createCriteria().andIdenvioEqualTo(Long.valueOf(etiquetasDTO.getIdEnvio()))
+								.andIdgrupoEqualTo(
+										Short.valueOf(etiquetasDTO.getEtiquetasNoSeleccionadas()[i].getValue()))
+								.andIdinstitucionEqualTo(idInstitucion).andIdinstitucionGrupoEqualTo(Short
+										.valueOf(etiquetasDTO.getEtiquetasNoSeleccionadas()[i].getIdInstitucion()));
+
+						List<EnvEnviosgrupocliente> listEnv = _envEnviosgrupoclienteMapper.selectByExample(example);
+
+						if (listEnv.size() == 0) {
+							
+							EnvEnviosgrupocliente etiqueta = new EnvEnviosgrupocliente();
+							etiqueta.setIdenvio(Long.valueOf(etiquetasDTO.getIdEnvio()));
+							etiqueta.setFechamodificacion(new Date());
+							etiqueta.setIdgrupo(Short.valueOf(etiquetasDTO.getEtiquetasSeleccionadas()[i].getValue()));
+							etiqueta.setIdinstitucion(idInstitucion);
+							etiqueta.setIdinstitucionGrupo(
+									Short.valueOf(etiquetasDTO.getEtiquetasSeleccionadas()[i].getIdInstitucion()));
+							etiqueta.setUsumodificacion(usuario.getIdusuario());
+							_envEnviosgrupoclienteMapper.insert(etiqueta);
+						}
+
 					}
 
 					respuesta.setCode(200);
@@ -1187,16 +1213,15 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 				Iterator<String> itr = request.getFileNames();
 				MultipartFile file = request.getFile(itr.next());
 				Date fecha = new Date();
-				
+
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
 				String fechaFormateada = sdf.format(fecha);
-				
-				
-				String fileName = fechaFormateada + "_"+ file.getOriginalFilename();
+
+				String fileName = fechaFormateada + "_" + file.getOriginalFilename();
 				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
 				// BufferedOutputStream stream = null;
 				try {
-					
+
 					File serverFile = new File(pathFichero);
 					serverFile.mkdirs();
 					serverFile = new File(serverFile, fileName);
@@ -1246,42 +1271,42 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	@Override
 	public String getPathFicheroEnvioMasivo(Short idInstitucion, Long idEnvio) {
 		String pathFichero = null;
-		
+
 		GenParametrosKey genParametrosKey = new GenParametrosKey();
 		genParametrosKey.setIdinstitucion(SigaConstants.IDINSTITUCION_0_SHORT);
 		genParametrosKey.setModulo(SigaConstants.MODULO_ENV);
 		genParametrosKey.setParametro(GEN_PARAMETROS.PATH_DOCUMENTOSADJUNTOS.name());
-		
+
 		GenParametros genParametros = _genParametrosMapper.selectByPrimaryKey(genParametrosKey);
-		
+
 		if (genParametros == null || genParametros.getValor() == null || genParametros.getValor().trim().equals("")) {
 			String error = "La ruta de ficheros de plantilla no está configurada correctamente";
 			LOGGER.error(error);
 			throw new BusinessException(error);
 		}
-		
-		//recuperamos el idenvio para construir la ruta a partir de la fecha de creación
+
+		// recuperamos el idenvio para construir la ruta a partir de la fecha de
+		// creación
 		EnvEnviosKey envEnviosKey = new EnvEnviosKey();
 		envEnviosKey.setIdinstitucion(idInstitucion);
 		envEnviosKey.setIdenvio(idEnvio);
 		EnvEnvios envEnvios = _envEnviosMapper.selectByPrimaryKey(envEnviosKey);
-		
+
 		if (envEnvios == null) {
-			String error = "No se ha encontrado el envío con idEnvio = " + idEnvio + " para la institución " + idInstitucion;
+			String error = "No se ha encontrado el envío con idEnvio = " + idEnvio + " para la institución "
+					+ idInstitucion;
 			LOGGER.error(error);
 			throw new BusinessException(error);
 		}
-		
+
 		Calendar cal = Calendar.getInstance();
-		//seteamos la fecha de creación del envío
+		// seteamos la fecha de creación del envío
 		cal.setTime(envEnvios.getFecha());
-		
-		pathFichero = genParametros.getValor().trim()
-				+ SigaConstants.pathSeparator + String.valueOf(idInstitucion)
-				+ SigaConstants.pathSeparator + cal.get(Calendar.YEAR)
-				+ SigaConstants.pathSeparator + (cal.get(Calendar.MONTH)+1)
-				+ SigaConstants.pathSeparator + idEnvio;
-		
+
+		pathFichero = genParametros.getValor().trim() + SigaConstants.pathSeparator + String.valueOf(idInstitucion)
+				+ SigaConstants.pathSeparator + cal.get(Calendar.YEAR) + SigaConstants.pathSeparator
+				+ (cal.get(Calendar.MONTH) + 1) + SigaConstants.pathSeparator + idEnvio;
+
 		return pathFichero;
 	}
 
@@ -1349,7 +1374,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 				try {
 					boolean noBorrado = false;
 					for (int i = 0; i < documentoDTO.length; i++) {
-						String filePath = getPathFicheroEnvioMasivo(idInstitucion, Long.valueOf(documentoDTO[i].getIdEnvio()));
+						String filePath = getPathFicheroEnvioMasivo(idInstitucion,
+								Long.valueOf(documentoDTO[i].getIdEnvio()));
 						File fichero = new File(filePath, documentoDTO[i].getRutaDocumento());
 						if (fichero.exists()) {
 							fichero.delete();
@@ -1400,18 +1426,17 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
-			if (null != usuarios && usuarios.size() > 0) {				
+			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
-				
 
 				EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
 				key.setIdinstitucion(idInstitucion);
 				key.setIdplantillaenvios(Integer.parseInt(datosTarjeta.getIdPlantillaEnvios()));
 				key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 				EnvPlantillasenviosWithBLOBs plant = _envPlantillasenviosMapper.selectByPrimaryKey(key);
-				
+
 				plantilla.setCuerpo(plant.getCuerpo());
-				plantilla.setAsunto(plant.getAsunto());		
+				plantilla.setAsunto(plant.getAsunto());
 
 			}
 		}
@@ -1421,70 +1446,68 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 		return plantilla;
 	}
-	
+
 	private PlantillaEnvioItem obtenerAsuntoYcuerpoEnvio(AdmUsuarios usuario, TarjetaConfiguracionDto datosTarjeta) {
 
 		LOGGER.info("ObtenerAsuntoYcuerpoEnvio() -> Entrada al servicio para obtener el asunto y el cuerpo del envio");
 
 		PlantillaEnvioItem plantilla = new PlantillaEnvioItem();
-			
-		if(SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios()) || SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
+
+		if (SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
+				|| SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
 			EnvCamposenviosKey key = new EnvCamposenviosKey();
 			key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
 			key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
 			key.setIdinstitucion(usuario.getIdinstitucion());
 			key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
-			
+
 			EnvCamposenvios envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
-			
-			if(envCampos != null) {
+
+			if (envCampos != null) {
 				plantilla.setAsunto(envCampos.getValor());
-			}						
-			
+			}
+
 			key = new EnvCamposenviosKey();
 			key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));
 			key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
 			key.setIdinstitucion(usuario.getIdinstitucion());
 			key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
-			
+
 			envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
-			
-			if(envCampos != null) {
+
+			if (envCampos != null) {
 				plantilla.setCuerpo(envCampos.getValor());
 			}
-			
-		}else if(SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
+
+		} else if (SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
 				|| SigaConstants.ID_ENVIO_BURO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
-			
+
 			EnvCamposenviosKey key = new EnvCamposenviosKey();
 			key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_TEXTO_SMS));
 			key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
 			key.setIdinstitucion(usuario.getIdinstitucion());
 			key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_SMS);
-			
+
 			EnvCamposenvios envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
-			
-			if(envCampos != null) {
+
+			if (envCampos != null) {
 				plantilla.setCuerpo(envCampos.getValor());
 			}
-		}				
+		}
 
-		
-		if (plantilla.getAsunto() == null && plantilla.getCuerpo() == null){
+		if (plantilla.getAsunto() == null && plantilla.getCuerpo() == null) {
 
 			EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
 			key.setIdinstitucion(usuario.getIdinstitucion());
 			key.setIdplantillaenvios(Integer.parseInt(datosTarjeta.getIdPlantillaEnvios()));
 			key.setIdtipoenvios(Short.parseShort(datosTarjeta.getIdTipoEnvios()));
 			EnvPlantillasenviosWithBLOBs plant = _envPlantillasenviosMapper.selectByPrimaryKey(key);
-			
+
 			plantilla.setCuerpo(plant.getCuerpo());
 			plantilla.setAsunto(plant.getAsunto());
-		}			
+		}
 
-
-		LOGGER.info(
-				"ObtenerAsuntoYcuerpoEnvio() -> Salida del servicio para obtener el asunto y el cuerpo del envío");
+		LOGGER.info("ObtenerAsuntoYcuerpoEnvio() -> Salida del servicio para obtener el asunto y el cuerpo del envío");
 
 		return plantilla;
 	}
@@ -1945,16 +1968,19 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 	@Override
 	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long idEnvio, Short idDocumento) {
-		
+
 		LOGGER.debug("Comprobando si es un envío burosms para recuperar el pdf para iddocumento " + idDocumento);
 		Resource inputStreamResource = null;
-		
+
 		if (idInstitucion != null && idEnvio != null && idDocumento != null) {
 			try {
 				EnvDestinatariosBurosmsExample envDestinatariosBurosmsExample = new EnvDestinatariosBurosmsExample();
-				envDestinatariosBurosmsExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdenvioEqualTo(idEnvio).andIddocumentoEqualTo(idDocumento);
-				List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms = envDestinatariosBurosmsMapper.selectByExample(envDestinatariosBurosmsExample);
-				if (listEnvDestinatariosBurosms != null && listEnvDestinatariosBurosms.size() == 1) {//solo puede haber uno
+				envDestinatariosBurosmsExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+						.andIdenvioEqualTo(idEnvio).andIddocumentoEqualTo(idDocumento);
+				List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms = envDestinatariosBurosmsMapper
+						.selectByExample(envDestinatariosBurosmsExample);
+				if (listEnvDestinatariosBurosms != null && listEnvDestinatariosBurosms.size() == 1) {// solo puede haber
+																										// uno
 					EnvDestinatariosBurosms envDestinatariosBurosms = listEnvDestinatariosBurosms.get(0);
 					if (envDestinatariosBurosms != null) {
 						if (envDestinatariosBurosms.getIdsolicitudecos() != null) {
@@ -1962,46 +1988,63 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							String csv = null;
 							if (envDestinatariosBurosms.getCsv() == null) {
 								GenParametrosKey keyParam = new GenParametrosKey();
-								
+
 								keyParam.setIdinstitucion(Short.parseShort(SigaConstants.IDINSTITUCION_0));
 								keyParam.setModulo(SigaConstants.MODULO_ENV);
 								keyParam.setParametro(SigaConstants.SMS_URL_SERVICE);
-								
+
 								GenParametros property = _genParametrosMapper.selectByPrimaryKey(keyParam);
 								String uriService = property.getValor();
 								keyParam.setParametro(SigaConstants.SMS_CLIENTE_ECOS);
 								property = _genParametrosMapper.selectByPrimaryKey(keyParam);
 								String idECOS = property.getValor();
-								
-								ConsultarEstadoMensajeDocument consultarEstadoMensajeDocument = ConsultarEstadoMensajeDocument.Factory.newInstance();
-								SolicitudConsultaEstadoMensaje solicitudConsultaEstadoMensaje = consultarEstadoMensajeDocument.addNewConsultarEstadoMensaje().addNewConsultarEstadoMensajeRequest();
+
+								ConsultarEstadoMensajeDocument consultarEstadoMensajeDocument = ConsultarEstadoMensajeDocument.Factory
+										.newInstance();
+								SolicitudConsultaEstadoMensaje solicitudConsultaEstadoMensaje = consultarEstadoMensajeDocument
+										.addNewConsultarEstadoMensaje().addNewConsultarEstadoMensajeRequest();
 								solicitudConsultaEstadoMensaje.setIdClienteECOS(idECOS);
 								solicitudConsultaEstadoMensaje.setIdColegio(idInstitucion.toString());
-								solicitudConsultaEstadoMensaje.setIdSolicitudEnvio(envDestinatariosBurosms.getIdsolicitudecos());
-								
-								ConsultarEstadoMensajeResponseDocument consultarEstadoMensajeResponseDocument = _clientECOS.consultaEstadoMensaje(uriService, consultarEstadoMensajeDocument);
+								solicitudConsultaEstadoMensaje
+										.setIdSolicitudEnvio(envDestinatariosBurosms.getIdsolicitudecos());
+
+								ConsultarEstadoMensajeResponseDocument consultarEstadoMensajeResponseDocument = _clientECOS
+										.consultaEstadoMensaje(uriService, consultarEstadoMensajeDocument);
 								if (consultarEstadoMensajeResponseDocument != null) {
 									LOGGER.debug(consultarEstadoMensajeResponseDocument.xmlText());
-									if (consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse() != null) {
-										if (consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse().getConsultarEstadoMensajeResponse() != null) {
-											if (consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse().getConsultarEstadoMensajeResponse().getInfoResultado() != null) {
-												if (consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse().getConsultarEstadoMensajeResponse().getInfoResultado().getCSV() != null) {
-													envDestinatariosBurosms.setCsv(consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse().getConsultarEstadoMensajeResponse().getInfoResultado().getCSV());
-													//TODO ACTUALIZAR PARA LA SIGUIENTE DESCARGA
+									if (consultarEstadoMensajeResponseDocument
+											.getConsultarEstadoMensajeResponse() != null) {
+										if (consultarEstadoMensajeResponseDocument.getConsultarEstadoMensajeResponse()
+												.getConsultarEstadoMensajeResponse() != null) {
+											if (consultarEstadoMensajeResponseDocument
+													.getConsultarEstadoMensajeResponse()
+													.getConsultarEstadoMensajeResponse().getInfoResultado() != null) {
+												if (consultarEstadoMensajeResponseDocument
+														.getConsultarEstadoMensajeResponse()
+														.getConsultarEstadoMensajeResponse().getInfoResultado()
+														.getCSV() != null) {
+													envDestinatariosBurosms
+															.setCsv(consultarEstadoMensajeResponseDocument
+																	.getConsultarEstadoMensajeResponse()
+																	.getConsultarEstadoMensajeResponse()
+																	.getInfoResultado().getCSV());
+													// TODO ACTUALIZAR PARA LA SIGUIENTE DESCARGA
 													envDestinatariosBurosms.setUsumodificacion(1);
 													envDestinatariosBurosms.setFechamodificacion(new Date());
-													envDestinatariosBurosmsMapper.updateByPrimaryKey(envDestinatariosBurosms);
+													envDestinatariosBurosmsMapper
+															.updateByPrimaryKey(envDestinatariosBurosms);
 												}
-											}	
+											}
 										}
 									}
 								}
 							}
-							
+
 							if (envDestinatariosBurosms.getCsv() != null) {
-								String fileBase64 = pfdService.obtenerDocumentoFirmado(envDestinatariosBurosms.getCsv());
+								String fileBase64 = pfdService
+										.obtenerDocumentoFirmado(envDestinatariosBurosms.getCsv());
 								byte[] decodedValue = Base64.getDecoder().decode(fileBase64);
-								
+
 								inputStreamResource = new ByteArrayResource(decodedValue);
 							}
 						} else {
@@ -2014,7 +2057,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			} catch (Exception e) {
 				LOGGER.error(e);
 			}
-			
+
 		}
 		return inputStreamResource;
 	}

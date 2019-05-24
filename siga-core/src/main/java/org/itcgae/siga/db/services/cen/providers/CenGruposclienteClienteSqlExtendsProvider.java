@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.ComboEtiquetasItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.CenGruposclienteCliente;
 import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.mappers.CenGruposclienteClienteSqlProvider;
@@ -64,8 +65,15 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		sql.SELECT("GENR.descripcion");
 		sql.FROM("CEN_GRUPOSCLIENTE GRUCLI");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO AND GENR.idLenguaje = '"+idlenguaje+"'");
-		sql.WHERE("GRUCLI.idinstitucion = '"+idInstitucion+"'");
+		
+		if(idInstitucion == SigaConstants.IDINSTITUCION_2000.toString()) {
+			sql.WHERE("GRUCLI.idinstitucion = '" + idInstitucion + "'");
+		}else {
+			sql.WHERE("GRUCLI.idinstitucion in ('"+idInstitucion+"','" + SigaConstants.IDINSTITUCION_2000 + "')");
+		}
+		
 		sql.ORDER_BY("GENR.descripcion");
+		
 		return sql.toString();
 	}
 	
