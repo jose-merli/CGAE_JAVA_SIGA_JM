@@ -186,7 +186,7 @@ public class EnvEnviosExtendsSqlProvider {
 		if(filtros.getIdInstitucion() != null && !filtros.getIdInstitucion().trim().equals("")){
 			sql.WHERE("DEST.IDINSTITUCION = '" + filtros.getIdInstitucion() +"'");
 		}
-		sql.ORDER_BY("ENVIO.FECHA");
+		sql.ORDER_BY("ENVIO.FECHA DESC");
 		
 		return sql.toString();
 	}

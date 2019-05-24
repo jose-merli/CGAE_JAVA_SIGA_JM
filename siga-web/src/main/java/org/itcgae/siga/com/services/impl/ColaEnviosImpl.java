@@ -394,6 +394,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 			}
 			
 			if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
+				destinatarios = limpiaCorreosDuplicados(destinatarios);
 				_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 			}else{
 				if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO)){
@@ -537,6 +538,24 @@ public class ColaEnviosImpl implements IColaEnvios {
 		envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
 		envio.setFechamodificacion(new Date());
 		_envEnviosMapper.updateByPrimaryKey(envio);
+	}
+
+	private List<DestinatarioItem> limpiaCorreosDuplicados(List<DestinatarioItem> destinatarios) {
+		List<DestinatarioItem> destinatariosCopia = new ArrayList<DestinatarioItem>();
+		Map<String, Boolean> mapaCorreos = new HashMap<String, Boolean>();
+		if (destinatarios != null) {
+			for (DestinatarioItem destinatarioItem : destinatarios) {
+				if (destinatarioItem != null && destinatarioItem.getCorreoElectronico() != null && !destinatarioItem.getCorreoElectronico().trim().equals("")) {
+					String correo = destinatarioItem.getCorreoElectronico().trim().toUpperCase();
+					if (!mapaCorreos.containsKey(correo)) {
+						destinatariosCopia.add(destinatarioItem);
+						mapaCorreos.put(correo, true);
+					}
+				}
+			}
+		}
+		
+		return destinatariosCopia;
 	}
 
 	public void preparaEnvioSMS(EnvEnvios envio, boolean isBuroSMS) {
@@ -890,6 +909,11 @@ public class ColaEnviosImpl implements IColaEnvios {
 		if(sentencia.toUpperCase().contains("%%IDTIPOENVIOS%%")){
 			sentencia = sentencia.toUpperCase().replaceAll("%%IDTIPOENVIOS%%", idtipoEnvios.toString());
 		}
+		
+		if(sentencia.toUpperCase().contains("%%TIPOENVIO%%")){
+			sentencia = sentencia.toUpperCase().replaceAll("%%TIPOENVIO%%", idtipoEnvios.toString());
+		}
+		
 		
 		if(sentencia.toUpperCase().contains("%%IDINSTITUCION%%")){
 			sentencia = sentencia.toUpperCase().replaceAll("%%IDINSTITUCION%%", idInstitucion.toString());

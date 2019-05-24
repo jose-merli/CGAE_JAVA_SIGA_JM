@@ -1217,7 +1217,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
 				String fechaFormateada = sdf.format(fecha);
 
-				String fileName = fechaFormateada + "_" + file.getOriginalFilename();
+				String fileName = fechaFormateada + "_" + file.getOriginalFilename();				
+
 				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
 				// BufferedOutputStream stream = null;
 				try {

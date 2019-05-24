@@ -74,7 +74,6 @@ public class SigaConstants {
 	public static String CAMPO_IDENTIFICACION = "INDENTIFICACIONENTIDAD";
 	public static String CAMPO_IDINSTITUCION = "IDINSTITUCION";
 	public static String CAMPO_CP = "CP";
-	public static String CAMPO_CPPUNTO = "C.P.";
 	public static String IDINSTITUCION_0 = "0";
 	public static Short IDINSTITUCION_0_SHORT = Short.valueOf(IDINSTITUCION_0);
 	public static String SI = "SI";

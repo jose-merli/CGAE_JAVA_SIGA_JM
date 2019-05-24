@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -84,6 +85,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ConsultasServiceImpl implements IConsultasService{
+	
+	private static final String CARACTER_REEMPLAZO_PUNTOS = "####";
 
 	private Logger LOGGER = Logger.getLogger(ConsultasServiceImpl.class);
 
@@ -2269,12 +2272,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 		List<Map<String,Object>> result = null;
 		
 		sentencia = quitarEtiquetas(sentencia.toUpperCase());
-		boolean contieneCP = false;
+		sentencia = quitaPuntosAlias(sentencia);
 		
-		if(sentencia != null && sentencia.contains(SigaConstants.CAMPO_CPPUNTO)) {
-			sentencia = sentencia.replaceAll(SigaConstants.CAMPO_CPPUNTO, SigaConstants.CAMPO_CP);
-			contieneCP = true;
-		}
+		boolean contienePuntosAlias = sentencia.indexOf(CARACTER_REEMPLAZO_PUNTOS) > -1;
 		
 		if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
 				|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
@@ -2285,17 +2285,46 @@ public class ConsultasServiceImpl implements IConsultasService{
 			result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
 		}
 		
-		if(contieneCP && result != null && result.size() > 0) {
+		if(contienePuntosAlias && result != null && result.size() > 0) {
+			List<Map<String,Object>> resultCopia = new ArrayList<Map<String,Object>>();
 			for(Map<String,Object> mapaResult : result) {
-				if(mapaResult != null) {
-					Object valor = mapaResult.get(SigaConstants.CAMPO_CP);
-					mapaResult.put(SigaConstants.CAMPO_CPPUNTO, valor);
-					mapaResult.remove(SigaConstants.CAMPO_CP);
+				Map<String,Object> mapaResultCopia = new LinkedHashMap<String, Object>();
+				for (String key : mapaResult.keySet()) {
+					Object obj = mapaResult.get(key);
+					mapaResultCopia.put(key.replaceAll(CARACTER_REEMPLAZO_PUNTOS, "."), obj);
 				}
+				resultCopia.add(mapaResultCopia);
 			}
+			return resultCopia;
 		}
 		
 		return result;
+	}
+	
+	public static void main(String[] args) {
+		String query = "select nombbre as \"nombre\", codigo as \"C.P.\" from tal where pascual";
+		ConsultasServiceImpl consultasServiceImpl = new ConsultasServiceImpl();
+		
+		consultasServiceImpl.quitaPuntosAlias(query);
+		query = "select nombbre as \"nombre\", codigo as \"CP\" from tal where pascual";
+		consultasServiceImpl.quitaPuntosAlias(query);
+	}
+	
+	private String quitaPuntosAlias(String query) {
+		
+		int fromIndex = 0;
+		int toIndex = 0;
+		if (query != null) {
+			while ((fromIndex = query.indexOf("\"", fromIndex)) > -1) {
+				toIndex = query.indexOf("\"", fromIndex+1);
+				String alias = query.substring(fromIndex+1, toIndex);
+				alias = alias.replaceAll("\\.", CARACTER_REEMPLAZO_PUNTOS);	
+				query = query.substring(0, fromIndex+1) + alias + query.substring(toIndex);
+				fromIndex = query.indexOf("\"", fromIndex + alias.length() + 1) + 1;
+			}
+		}
+		return query;
+		
 	}
 	
 }
