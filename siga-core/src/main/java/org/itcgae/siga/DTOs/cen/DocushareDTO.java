@@ -1,6 +1,8 @@
 package org.itcgae.siga.DTOs.cen;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,7 +44,9 @@ public class DocushareDTO {
 		this.error = error;
 	}
 	
-	
+	public void sort() {
+		Collections.sort(docuShareObjectVOItem);
+	}
 	
 	@Override
 	public boolean equals(java.lang.Object o) {
