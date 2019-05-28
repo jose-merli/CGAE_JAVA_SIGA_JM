@@ -78,7 +78,6 @@ import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
 import org.itcgae.siga.db.entities.PysPeticioncomprasuscripcion;
 import org.itcgae.siga.db.entities.PysPreciosservicios;
-import org.itcgae.siga.db.entities.PysServicios;
 import org.itcgae.siga.db.entities.PysServiciosinstitucion;
 import org.itcgae.siga.db.entities.PysServiciossolicitados;
 import org.itcgae.siga.db.entities.PysSuscripcion;
@@ -523,6 +522,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		int responseCenPersona = 1;
 		int responseForPersonaCurso = 1;
 		int responseCenCliente = 1;
+		int responseCenNoColegiado = 1;
 		int responseTutor = 1;
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -586,6 +586,16 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					CenCliente recordCliente = new CenCliente();
 					recordCliente = rellenarInsertCenCliente(usuario, idPersona, idInstitucion);
 					responseCenCliente = cenClienteMapper.insertSelective(recordCliente);
+					
+					//Lo añadimos en cen_nocolegiado
+					CenNocolegiado recordNoColegido = new CenNocolegiado();
+					recordNoColegido.setIdinstitucion(usuario.getIdinstitucion());
+					recordNoColegido.setIdpersona(idPersona);
+					recordNoColegido.setTipo("1");
+					recordNoColegido.setFechamodificacion(new Date());
+					recordNoColegido.setUsumodificacion(usuario.getIdusuario());
+					recordNoColegido.setSociedadsj("0");
+					responseCenNoColegiado = cenNocolegiadoMapper.insertSelective(recordNoColegido);
 
 					// Si esta registrado en la tabla cen_persona obtenemos su idPersona
 				} else {
@@ -601,7 +611,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 
 					// Añadimos al formador
-				} else {
+				} else if (responseCenNoColegiado == 0) {
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+
+					// Añadimos al formador
+				}else {
 					// Si es tutor, buscamos si existe otro formador asignado como formador y se lo
 					// desasignamos porque
 					// solamente puede existir un formador
