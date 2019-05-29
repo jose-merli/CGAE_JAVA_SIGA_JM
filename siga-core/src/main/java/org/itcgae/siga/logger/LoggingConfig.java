@@ -24,6 +24,10 @@ public class LoggingConfig {
 	@Value("${log4j.siga.web.file:siga-web.log}")
 	private String sigaWebFile;
 	
+	@Value("${log4j.siga.web.path:siga-web%i.log}")
+	private String sigaWebFilePattern;
+	
+	
 	@Value("${log4j.siga.web.bck.number:5}")
 	private String sigaWebBckNumber;
 	
@@ -58,6 +62,7 @@ public class LoggingConfig {
 		logEncoder.setContext(logCtx);
 		logEncoder.setPattern(loggingPattern);
 		logEncoder.start();
+		
 
 		// Appender file
 		RollingFileAppender<ILoggingEvent> logFileAppender = new RollingFileAppender<ILoggingEvent>();
@@ -71,9 +76,9 @@ public class LoggingConfig {
 		FixedWindowRollingPolicy logFilePolicy = new FixedWindowRollingPolicy();
 		logFilePolicy.setContext(logCtx);
 		logFilePolicy.setParent(logFileAppender);
-		logFilePolicy.setFileNamePattern(sigaWebFile + "%i");
+		logFilePolicy.setFileNamePattern(sigaWebFilePattern);
 		logFilePolicy.setMinIndex(1);
-		logFilePolicy.setMinIndex(Integer.parseInt(sigaWebBckNumber));
+		logFilePolicy.setMaxIndex(Integer.parseInt(sigaWebBckNumber));
 		logFilePolicy.start();
 
 		// Triger Policy
@@ -81,6 +86,7 @@ public class LoggingConfig {
 		sizeBasedPolicy.setMaxFileSize(FileSize.valueOf(sigaWebMaxSize));
 		sizeBasedPolicy.setContext(logCtx);
 		sizeBasedPolicy.start();
+		
 
 		// Policies appender file
 		logFileAppender.setRollingPolicy(logFilePolicy);
@@ -92,6 +98,8 @@ public class LoggingConfig {
 		logApplication.setLevel(Level.toLevel(sigaLevelLog));
 		logApplication.setAdditive(false);
 		logApplication.addAppender(logFileAppender);
+		
+//		logApplication.addAppender(logConsoleAppender);
 
 		//Logger de springframework
 		Logger logSpring = logCtx.getLogger("org.springframework");
