@@ -83,7 +83,7 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 		SQL sql = new SQL();
 
 		sql.SELECT("MAX(IDRECURSO) AS IDRECURSO");
-		sql.FROM("(select TO_NUMBER(REPLACE(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'null',''),'99999999999') IDRECURSO from gen_recursos_catalogos)");
+		sql.FROM("(select TO_NUMBER(REPLACE(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'null',''),'99999999999999') IDRECURSO from gen_recursos_catalogos)");
 		
 		return sql.toString();
 	}

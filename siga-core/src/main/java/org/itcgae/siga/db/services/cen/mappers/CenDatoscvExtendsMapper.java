@@ -46,7 +46,7 @@ public interface CenDatoscvExtendsMapper extends CenDatoscvMapper {
 		@Result(column = "CREDITOS", property = "creditos", jdbcType = JdbcType.VARCHAR)
 
 	})
-	List<FichaDatosCurricularesItem> searchDatosCurriculares(String idPersona, boolean historico, String idInstitucion);
+	List<FichaDatosCurricularesItem> searchDatosCurriculares(String idPersona, boolean historico, String idInstitucion, String idLenguaje);
 	
 	@UpdateProvider(type = CenDatoscvSqlExtendsProvider.class, method = "updateCurriculo")
 	int updateCurriculo(CenDatoscv record);

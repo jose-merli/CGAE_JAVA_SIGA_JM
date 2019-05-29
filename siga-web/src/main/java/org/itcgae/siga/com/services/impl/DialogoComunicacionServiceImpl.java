@@ -1934,7 +1934,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										Document doc = new Document(pathPlantilla + nombrePlantilla);
 										
 										doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);														
-										
+//										EN CASO DE DEVOLVER FALSO ESTE DOC NO HAY DATOS, A TENER EN CUENTA PARA MENSAJE DE ERROR
 										boolean firmado = false;
 										
 										if(plantilla.getFormatoSalida() != null){

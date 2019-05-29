@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
 import org.itcgae.siga.DTOs.cen.DatosDireccionesDTO;
 import org.itcgae.siga.DTOs.com.ComboConsultaInstitucionDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
@@ -158,23 +159,23 @@ public class EnviosMasivosController {
 	}
 	
 	@RequestMapping(value = "/detalle/etiquetas",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> obtenerEtiquetas(HttpServletRequest request) {
+	ResponseEntity<ComboInstitucionDTO> obtenerEtiquetas(HttpServletRequest request) {
 		
-		ComboDTO response = _enviosMasivosService.obtenerEtiquetas(request);
+		ComboInstitucionDTO response = _enviosMasivosService.obtenerEtiquetas(request);
 		if(response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<ComboInstitucionDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ComboInstitucionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/detalle/etiquetasEnvio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> obtenerEtiquetasEnvio(HttpServletRequest request, @RequestBody String idEnvio) {
+	ResponseEntity<ComboInstitucionDTO> obtenerEtiquetasEnvio(HttpServletRequest request, @RequestBody String idEnvio) {
 		
-		ComboDTO response = _enviosMasivosService.obtenerEtiquetasEnvio(request, idEnvio);
+		ComboInstitucionDTO response = _enviosMasivosService.obtenerEtiquetasEnvio(request, idEnvio);
 		if(response.getError() == null)
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+			return new ResponseEntity<ComboInstitucionDTO>(response, HttpStatus.OK);
 		else
-			return new ResponseEntity<ComboDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ComboInstitucionDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "/detalle/guardarEtiquetas",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)

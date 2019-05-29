@@ -8,13 +8,14 @@ public class EnvEnviosGrupoClienteExtendsSqlProvider {
 		
 		SQL sql = new SQL();
 		
-		sql.SELECT("cli.IDGRUPO");
+		sql.SELECT_DISTINCT("GRUCLI.IDGRUPO");
 		sql.SELECT("GENR.DESCRIPCION");
+		sql.SELECT("GRUCLI.IDINSTITUCION_GRUPO as IDINSTITUCION");
 		sql.FROM("env_enviosgrupocliente grucli");
-		sql.INNER_JOIN("cen_gruposcliente cli on cli.IDGRUPO = grucli.IDGRUPO");
+		sql.INNER_JOIN("cen_gruposcliente cli on cli.IDGRUPO = grucli.IDGRUPO and grucli.IDINSTITUCION_GRUPO = cli.IDINSTITUCION");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on cli.NOMBRE = GENR.IDRECURSO AND GENR.idLenguaje = '" + idLenguaje + "'");
 		
-		sql.WHERE("grucli.IDENVIO = '" + idEnvio +"' AND GENR.IDINSTITUCION = '" + IdInstitucion + "'");
+		sql.WHERE("grucli.IDENVIO = '" + idEnvio +"' AND GRUCLI.IDINSTITUCION = '" + IdInstitucion + "'");
 		
 		return sql.toString();
 	}

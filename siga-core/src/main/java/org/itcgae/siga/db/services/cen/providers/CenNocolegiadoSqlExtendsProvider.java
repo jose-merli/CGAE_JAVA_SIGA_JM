@@ -694,7 +694,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		
 		sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("per.idtipoidentificacion not in '20'");
-		sql.WHERE("dir.fechamodificacion = (select max(fechamodificacion) from cen_direcciones dir2 where dir2.idpersona = dir.idpersona and dir2.idinstitucion = dir.idinstitucion and dir2.idinstitucion = dir.idinstitucion and dir.fechabaja is null )");
+		sql.WHERE("(dir.fechamodificacion = (select max(fechamodificacion) from cen_direcciones dir2 where dir2.idpersona = dir.idpersona and dir2.idinstitucion = dir.idinstitucion and dir2.idinstitucion = dir.idinstitucion and dir.fechabaja is null ) or dir.fechamodificacion is null)");
 		
 		if(!noColegiadoItem.isHistorico()) {
 			sql.WHERE("NOCOL.FECHA_BAJA is NULL");

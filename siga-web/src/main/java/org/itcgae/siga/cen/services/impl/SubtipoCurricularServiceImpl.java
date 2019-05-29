@@ -1,6 +1,7 @@
 package org.itcgae.siga.cen.services.impl;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -165,6 +166,8 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 					if (genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo) == 1) {
 						record.setDescripcion(genRecursosCatalogo.getIdrecurso());
 					}
+					insertarRestoIdiomas(genRecursosCatalogo);
+					
 				}
 
 				record.setFechamodificacion(new Date());
@@ -204,6 +207,70 @@ public class SubtipoCurricularServiceImpl implements ISubtipoCurricularService {
 		}
 
 		return insertResponseDTO;
+	}
+
+	private void insertarRestoIdiomas(GenRecursosCatalogos genRecursosCatalogo) {
+		// TODO Auto-generated method stub
+		String idLenguaje = genRecursosCatalogo.getIdlenguaje();
+		String descripcion = genRecursosCatalogo.getDescripcion();
+		switch (idLenguaje) {
+		case "1":
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#CA"));
+			genRecursosCatalogo.setIdlenguaje("2");
+			genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
+
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#EU"));
+			genRecursosCatalogo.setIdlenguaje("3");
+			genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
+			
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#GL"));
+			genRecursosCatalogo.setIdlenguaje("4");
+			genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
+			break;
+		case "2":
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#ES"));
+			genRecursosCatalogo.setIdlenguaje("1");
+			genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
+
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#EU"));
+			genRecursosCatalogo.setIdlenguaje("3");
+			genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
+			
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#GL"));
+			genRecursosCatalogo.setIdlenguaje("4");
+			genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
+			break;
+		case "3":
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#CA"));
+			genRecursosCatalogo.setIdlenguaje("2");
+			genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
+
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#ES"));
+			genRecursosCatalogo.setIdlenguaje("1");
+			genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
+			
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#GL"));
+			genRecursosCatalogo.setIdlenguaje("4");
+			genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
+			break;
+		case "4":
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#CA"));
+			genRecursosCatalogo.setIdlenguaje("2");
+			genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
+
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#EU"));
+			genRecursosCatalogo.setIdlenguaje("3");
+			genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
+			
+			genRecursosCatalogo.setDescripcion(descripcion.concat("#ES"));
+			genRecursosCatalogo.setIdlenguaje("1");
+			genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
+			break;
+	
+		}
+		
+		
+		
 	}
 
 	@Override

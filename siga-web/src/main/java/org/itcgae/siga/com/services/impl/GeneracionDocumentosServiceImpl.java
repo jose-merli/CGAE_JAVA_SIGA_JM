@@ -98,6 +98,8 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			
 			DocumentBuilder builder=new DocumentBuilder(doc);
 			
+			if(claves.size() != 0) {
+				
 			for(String clave : claves){
 				while(builder.moveToMergeField(clave))
 				{
@@ -114,6 +116,9 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 						
 				}
 			}
+			}else {
+				doc = null;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -126,6 +131,8 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		File archivo = null;
 		DatosDocumentoItem documento = new DatosDocumentoItem();
 		try {
+			if(doc != null) {
+				
 			doc.save(pathfinal + nombrefichero);
 			archivo = new File(pathfinal + nombrefichero);
 			if (!archivo.exists())return null;
@@ -141,6 +148,9 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			
 			documento.setFileName(nombrefichero);
 			documento.setDatos(byteArray);
+			}else {
+				documento = null;
+			}
 			
 		} catch (Exception e) {
 			throw e;
@@ -156,7 +166,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		boolean hayPlantilla = false;
 		
 		if(listaDatosExcel != null && listaDatosExcel.size() >= 1) {
-			
+			if(listaDatosExcel.get(0).size() >= 1) {
 			Workbook workbook = null;
 			
 			//Creamos el libro de excel			
@@ -288,6 +298,9 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	        documento.setFileName(nombreFicheroSalidaAux);
 	        documento.setPathDocumento(pathFicheroSalida);
 	        bos.close();
+		}else {
+			documento = null;
+		}
 		}else {
 			documento = null;
 		}

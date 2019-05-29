@@ -18,13 +18,20 @@ import org.itcgae.siga.DTOs.cen.NoColegiadoDTO;
 import org.itcgae.siga.DTOs.cen.NoColegiadoItem;
 import org.itcgae.siga.cen.services.IBusquedaCensoGeneralService;
 import org.itcgae.siga.cen.services.IInstitucionesService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
+import org.itcgae.siga.db.entities.AdmUsuarios;
+import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenInstitucion;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
+import org.itcgae.siga.db.entities.GenRecursos;
+import org.itcgae.siga.db.entities.GenRecursosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
+import org.itcgae.siga.db.mappers.GenRecursosMapper;
+import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenColegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenNocolegiadoExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -56,6 +63,9 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 
 	@Autowired
 	private ClientCENSO clientCENSO;
+	
+	@Autowired
+	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
 
 	@Autowired
 	private IInstitucionesService institucionesService;
@@ -69,7 +79,9 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 	@Autowired
 	private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 	
-
+	@Autowired
+	private GenRecursosMapper genRecursosMapper;
+	
 	@Override
 	public BusquedaPerFisicaDTO search(int numPagina, BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO,
 			HttpServletRequest request) {
@@ -77,12 +89,29 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 			Colegiado colegiado = null;
 			BusquedaPerFisicaDTO busquedaPerFisicaDTO = new BusquedaPerFisicaDTO();
 			List<BusquedaPerFisicaItem> busquedaPerFisicaItems = new ArrayList<BusquedaPerFisicaItem>();
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+			String idLenguaje = null;
 		try {
+			
 			AdmConfigExample example = new AdmConfigExample();
 			example.createCriteria().andClaveEqualTo("url.ws.censo");
 			List<AdmConfig> config = admConfigMapper.selectByExample(example );
 			
 			if (null != config && config.size()>0) {
+				
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				LOGGER.info(
+						"searchOtherCollegues() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+				LOGGER.info(
+						"searchOtherCollegues() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+
+				AdmUsuarios usuario = usuarios.get(0);
+				idLenguaje = usuario.getIdlenguaje();
 				if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
 					
 					//Busqueda por nif
@@ -170,7 +199,39 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 										
 									}
 									busquedaPerFisica.setNumeroColegiado(colegiadoColegiacion.getNumColegiado());
-									busquedaPerFisica.setSituacion(colegiadoColegiacion.getSituacion().getSituacionEjerProfesional().toString());
+									
+									GenRecursosExample recursosExample = new GenRecursosExample();
+									switch ( colegiadoColegiacion.getSituacion().getSituacionEjerProfesional().toString()) {
+									case SigaConstants.CENSO_WS_SITUACION_BAJACOLEGIO:
+										recursosExample.createCriteria().andIdrecursoEqualTo("censo.ws.situacionejerciente.BAJA_COLEGIAL").andIdlenguajeEqualTo(idLenguaje);
+										List<GenRecursos> recurso = genRecursosMapper.selectByExample(recursosExample );
+										busquedaPerFisica.setSituacion(recurso.get(0).getDescripcion());
+										break;
+									case SigaConstants.CENSO_WS_SITUACION_EJERCIENTE:
+										
+										recursosExample.createCriteria().andIdrecursoEqualTo("censo.ws.situacionejerciente.EJERCIENTE").andIdlenguajeEqualTo(idLenguaje);
+										recurso = genRecursosMapper.selectByExample(recursosExample );
+										busquedaPerFisica.setSituacion(recurso.get(0).getDescripcion());
+										break;
+									case SigaConstants.CENSO_WS_SITUACION_INSCRITO:
+										
+										recursosExample.createCriteria().andIdrecursoEqualTo("censo.ws.situacionejerciente.INSCRITO").andIdlenguajeEqualTo(idLenguaje);
+										recurso = genRecursosMapper.selectByExample(recursosExample );
+										busquedaPerFisica.setSituacion(recurso.get(0).getDescripcion());
+										break;
+									case SigaConstants.CENSO_WS_SITUACION_NOEJERCIENTE:
+										
+										recursosExample.createCriteria().andIdrecursoEqualTo("censo.ws.situacionejerciente.NO_EJERCIENTE").andIdlenguajeEqualTo(idLenguaje);
+										recurso = genRecursosMapper.selectByExample(recursosExample );
+										busquedaPerFisica.setSituacion(recurso.get(0).getDescripcion());
+										break;
+									}
+									
+									
+									
+									
+									
+									//busquedaPerFisica.setSituacion(colegiadoColegiacion.getSituacion().getSituacionEjerProfesional().toString());
 									
 									SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy");
 									String fechaEstado = format1.format(colegiadoColegiacion.getSituacion().getFechaSituacion().getTime());     
@@ -178,7 +239,7 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 									if (null != colegiado.getColegiacionArray()[0].getColegio()) {
 										List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiadoColegiacion.getColegio().getCodigoColegio());
 										if (null != instituciones && instituciones.size()>0) {
-											busquedaPerFisica.setColegio(instituciones.get(0).getNombre());
+											busquedaPerFisica.setColegio(instituciones.get(0).getAbreviatura());
 											busquedaPerFisica.setNumeroInstitucion(instituciones.get(0).getIdinstitucion().toString());
 										}
 									}
@@ -296,7 +357,34 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 									busquedaPerFisica.setNumeroColegiado(colegiadoName2.getNumColegiado());
 									if (null != colegiadoName2.getSituacion()) {
 										if (null != colegiadoName2.getSituacion().getSituacionEjerProfesional()) {
-											busquedaPerFisica.setSituacion(colegiadoName[i].getColegiacionArray()[0].getSituacion().getSituacionEjerProfesional().toString());
+											GenRecursosExample recursosExample = new GenRecursosExample();
+											switch ( colegiadoName2.getSituacion().getSituacionEjerProfesional().toString()) {
+											case SigaConstants.CENSO_WS_SITUACION_BAJACOLEGIO:
+												recursosExample.createCriteria().andIdrecursoEqualTo("censo.ws.situacionejerciente.BAJA_COLEGIAL").andIdlenguajeEqualTo(idLenguaje);
+												List<GenRecursos> recurso = genRecursosMapper.selectByExample(recursosExample );
+												busquedaPerFisica.setSituacion(recurso.get(0).getDescripcion());
+												break;
+											case SigaConstants.CENSO_WS_SITUACION_EJERCIENTE:
+												
+												recursosExample.createCriteria().andIdrecursoEqualTo("censo.ws.situacionejerciente.EJERCIENTE").andIdlenguajeEqualTo(idLenguaje);
+												recurso = genRecursosMapper.selectByExample(recursosExample );
+												busquedaPerFisica.setSituacion(recurso.get(0).getDescripcion());
+												break;
+											case SigaConstants.CENSO_WS_SITUACION_INSCRITO:
+												
+												recursosExample.createCriteria().andIdrecursoEqualTo("censo.ws.situacionejerciente.INSCRITO").andIdlenguajeEqualTo(idLenguaje);
+												recurso = genRecursosMapper.selectByExample(recursosExample );
+												busquedaPerFisica.setSituacion(recurso.get(0).getDescripcion());
+												break;
+											case SigaConstants.CENSO_WS_SITUACION_NOEJERCIENTE:
+												
+												recursosExample.createCriteria().andIdrecursoEqualTo("censo.ws.situacionejerciente.NO_EJERCIENTE").andIdlenguajeEqualTo(idLenguaje);
+												recurso = genRecursosMapper.selectByExample(recursosExample );
+												busquedaPerFisica.setSituacion(recurso.get(0).getDescripcion());
+												break;
+											}
+										
+											//busquedaPerFisica.setSituacion(colegiadoName2.getSituacion().getSituacionEjerProfesional().toString());
 											SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy");
 											String fechaEstado = format1.format(colegiadoName2.getSituacion().getFechaSituacion().getTime());     
 											busquedaPerFisica.setFechaEstado(fechaEstado);
@@ -306,7 +394,7 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 									if (null != colegiadoName2.getColegio()) {
 										List<CenInstitucion> instituciones = institucionesService.getidInstitucionByCodExterno(colegiadoName2.getColegio().getCodigoColegio());
 										if (null != instituciones && instituciones.size()>0) {
-											busquedaPerFisica.setColegio(instituciones.get(0).getNombre());
+											busquedaPerFisica.setColegio(instituciones.get(0).getAbreviatura());
 											busquedaPerFisica.setNumeroInstitucion(instituciones.get(0).getIdinstitucion().toString());
 										}
 									}

@@ -91,7 +91,7 @@ public class FichaDatosCurricularesServiceTest {
 		//		Mockeo de las llamadas a BD
 //		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		
-		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString(), Mockito.anyBoolean() , Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
+		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString(), Mockito.anyBoolean() , Mockito.anyString(),Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
 		
 		//	 	Ejecución del método a testear
 		FichaDatosCurricularesDTO response = fichaDatosCurricularesServiceImpl.searchDatosCurriculares(busqueda, mockreq);
@@ -132,7 +132,7 @@ public class FichaDatosCurricularesServiceTest {
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		
-		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString(), Mockito.anyBoolean() , Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
+		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString(), Mockito.anyBoolean() , Mockito.anyString(),Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
 		
 		when(cenDatoscvExtendsMapper.updateCurriculo(Mockito.any(CenDatoscv.class))).thenReturn(0);
 
@@ -173,7 +173,7 @@ public class FichaDatosCurricularesServiceTest {
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		
-		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString() , Mockito.anyBoolean(), Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
+		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString() , Mockito.anyBoolean(), Mockito.anyString(),Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
 		
 		when(cenDatoscvExtendsMapper.updateCurriculo(Mockito.any(CenDatoscv.class))).thenReturn(1);
 
@@ -203,7 +203,7 @@ public class FichaDatosCurricularesServiceTest {
 		
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
-		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString(), Mockito.anyBoolean() , Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
+		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString(), Mockito.anyBoolean() , Mockito.anyString(),Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
 		when(cenDatoscvExtendsMapper.updateCurriculo(Mockito.any(CenDatoscv.class))).thenReturn(0);
 		when(cenDatoscvExtendsMapper.selectByExample(Mockito.any(CenDatoscvExample.class))).thenReturn(datosCurricularesActivos);
 		when(cenDatoscvExtendsMapper.updateByPrimaryKey(Mockito.any(CenDatoscv.class))).thenReturn(1);
@@ -246,7 +246,7 @@ public class FichaDatosCurricularesServiceTest {
 		
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
-		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString() , Mockito.anyBoolean(), Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
+		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString() , Mockito.anyBoolean(), Mockito.anyString(),Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
 		when(cenDatoscvExtendsMapper.insertSelective(Mockito.any(CenDatoscv.class))).thenReturn(1);
 		when(cenDatoscvExtendsMapper.selectByExample(Mockito.any(CenDatoscvExample.class))).thenReturn(datosCurricularesActivos);
 		when(cenDatoscvExtendsMapper.updateByPrimaryKey(Mockito.any(CenDatoscv.class))).thenReturn(1);
@@ -320,7 +320,7 @@ public class FichaDatosCurricularesServiceTest {
 		idSolicitudBD.setNewId("1");
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
-		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString() , Mockito.anyBoolean(), Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
+		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString() , Mockito.anyBoolean(), Mockito.anyString(),Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
 		when(cenSolicitudmodificacioncvExtendsMapper.solicitudUpdateCurriculo(Mockito.any(CenSolicitudmodificacioncv.class))).thenReturn(1);
 		when(cenSolicitudmodificacioncvExtendsMapper.getMaxIdSolicitud(Mockito.anyString(), Mockito.anyString())).thenReturn(idSolicitudBD);
 		when(cenDatoscvExtendsMapper.selectByExample(Mockito.any(CenDatoscvExample.class))).thenReturn(datosCurricularesActivos);
@@ -345,7 +345,7 @@ public class FichaDatosCurricularesServiceTest {
 		NewIdDTO idSolicitudBD = null;
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
-		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString() , Mockito.anyBoolean(), Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
+		when(cenDatoscvExtendsMapper.searchDatosCurriculares(Mockito.anyString() , Mockito.anyBoolean(), Mockito.anyString(),Mockito.anyString())).thenReturn(fichaDatosCurricularesItem);
 		when(cenSolicitudmodificacioncvExtendsMapper.solicitudUpdateCurriculo(Mockito.any(CenSolicitudmodificacioncv.class))).thenReturn(0);
 		when(cenSolicitudmodificacioncvExtendsMapper.getMaxIdSolicitud(Mockito.anyString(), Mockito.anyString())).thenReturn(idSolicitudBD);
 		when(cenDatoscvExtendsMapper.selectByExample(Mockito.any(CenDatoscvExample.class))).thenReturn(datosCurricularesActivos);

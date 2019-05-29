@@ -1,10 +1,12 @@
 package org.itcgae.siga.DTOs.com;
 
+import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
+
 public class TarjetaEtiquetasDTO {
 	
 	private String idEnvio;
-	private String[] etiquetasSeleccionadas;
-	private String[] etiquetasNoSeleccionadas;
+	private ComboInstitucionItem[] etiquetasSeleccionadas;
+	private ComboInstitucionItem[] etiquetasNoSeleccionadas;
 	
 	
 	public String getIdEnvio() {
@@ -13,16 +15,16 @@ public class TarjetaEtiquetasDTO {
 	public void setIdEnvio(String idEnvio) {
 		this.idEnvio = idEnvio;
 	}
-	public String[] getEtiquetasSeleccionadas() {
+	public ComboInstitucionItem[] getEtiquetasSeleccionadas() {
 		return etiquetasSeleccionadas;
 	}
-	public void setEtiquetasSeleccionadas(String[] etiquetasSeleccionadas) {
+	public void setEtiquetasSeleccionadas(ComboInstitucionItem[] etiquetasSeleccionadas) {
 		this.etiquetasSeleccionadas = etiquetasSeleccionadas;
 	}
-	public String[] getEtiquetasNoSeleccionadas() {
+	public ComboInstitucionItem[] getEtiquetasNoSeleccionadas() {
 		return etiquetasNoSeleccionadas;
 	}
-	public void setEtiquetasNoSeleccionadas(String[] etiquetasNoSeleccionadas) {
+	public void setEtiquetasNoSeleccionadas(ComboInstitucionItem[] etiquetasNoSeleccionadas) {
 		this.etiquetasNoSeleccionadas = etiquetasNoSeleccionadas;
 	}
 	
