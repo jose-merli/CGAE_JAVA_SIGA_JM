@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTOs.cen.ColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenColegiado;
@@ -802,8 +803,19 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo2 subt2 ON ( subt2.idTipoCV = datosCV.idTipoCV and subt2.idInstitucion = col.idInstitucion )");
 		sql.LEFT_OUTER_JOIN("cen_tiposcvsubtipo1 subt1 ON ( subt1.idTipoCV = datosCV.idTipoCV and subt1.idInstitucion = col.idInstitucion )");
 
-		if (idInstitucion != null) {
-			sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion +"'");
+		if(idInstitucion != null && (idInstitucion.equals(SigaConstants.IDINSTITUCION_2000) 
+				|| idInstitucion.equals(SigaConstants.IDINSTITUCION_3500))) {
+			sql.WHERE("COL.IDINSTITUCION = '" + colegiadoItem.getIdInstitucion() +"'");
+		} else {
+			//Colegio
+			if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100")) {
+				sql.WHERE("COL.IDINSTITUCION = '" + idInstitucion + "'");
+			//Consejo
+			} else {
+				sql.WHERE("inst.cen_inst_IDINSTITUCION = '" + idInstitucion + "'");
+
+			}
+				
 		}
 		
 		sql.WHERE("per.idtipoidentificacion not in '20'");
