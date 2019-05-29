@@ -1093,6 +1093,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		boolean tieneCargo = false;
 		boolean tieneSCSJ = false;
 		boolean tieneAbono = false;
+		if (null == solicitud.getAbonocargo() || (solicitud.getAbonocargo().equals("T") || solicitud.getAbonocargo().equals("C"))) {
+			tieneCargo =  true;
+		}
 		cuenta.setIdcuenta((short)(personaID.getIdMax()+0));
 		cuenta.setAbonocargo(solicitud.getAbonocargo());
 		cuenta.setAbonosjcs(solicitud.getAbonosjcs());
@@ -1206,7 +1209,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		if (tieneCargo) {
 			Object[] paramMandatos = new Object[4];
 			paramMandatos[0] = usuario.getIdinstitucion().toString();
-			paramMandatos[1] = idPersona;
+			paramMandatos[1] = idPersona.toString();
 			paramMandatos[2] = cuenta.getIdcuenta().toString();
 			paramMandatos[3] = usuario.getIdusuario().toString();
 			
