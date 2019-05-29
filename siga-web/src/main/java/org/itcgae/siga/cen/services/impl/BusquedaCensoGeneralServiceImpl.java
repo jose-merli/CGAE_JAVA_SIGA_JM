@@ -280,26 +280,48 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 						colegiadoRequest.setApellido2(busquedaPerFisicaSearchDTO.getSegundoApellido());
 					}
 					
-					com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest.Colegiado colegiadoSearch =com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest.Colegiado.Factory.newInstance();
 					if (null != busquedaPerFisicaSearchDTO.getNumeroColegiado()  && null != busquedaPerFisicaSearchDTO.getIdInstitucion()) {
+						List<com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado> colegiadosName = new ArrayList<com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado>();
+						com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest.Colegiado colegiadoSearch =com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest.Colegiado.Factory.newInstance();
 						colegiadoSearch.setNumColegiado(busquedaPerFisicaSearchDTO.getNumeroColegiado());
-						ColegioType colegio = ColegioType.Factory.newInstance();
-						List<CenInstitucion> instituciones = institucionesService.getCodExternoByidInstitucion(busquedaPerFisicaSearchDTO.getIdInstitucion()[0]);
-						colegio.setCodigoColegio(instituciones.get(0).getCodigoext());
-						colegiadoSearch.setColegio(colegio );
-						if(!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNumeroColegiado())) {
-							colegiadoSearch.setNumColegiado(busquedaPerFisicaSearchDTO.getNumeroColegiado());
+						
+						for (String id : busquedaPerFisicaSearchDTO.getIdInstitucion()) {
+							com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado[] colegiadoInstitucionName = null;
+							ColegioType colegio = ColegioType.Factory.newInstance();
+							List<CenInstitucion> instituciones = institucionesService.getCodExternoByidInstitucion(id);
+							colegio.setCodigoColegio(instituciones.get(0).getCodigoext());
+							colegiadoSearch.setColegio(colegio );
+							if(!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNumeroColegiado())) {
+								colegiadoSearch.setNumColegiado(busquedaPerFisicaSearchDTO.getNumeroColegiado());
+							}
+							colegiadoRequest.setColegiado(colegiadoSearch);
+							
+							BusquedaColegiadoRequestDocument colegiadoRequestDocument = BusquedaColegiadoRequestDocument.Factory.newInstance();
+							colegiadoRequestDocument.setBusquedaColegiadoRequest(colegiadoRequest);
+							BusquedaColegiadoResponseDocument busquedaColegiadoResponseDocument = null;
+
+							busquedaColegiadoResponseDocument = clientCENSO.busquedaColegiadoSinIdentificacion(colegiadoRequestDocument,config.get(0).getValor());
+							BusquedaColegiadoResponse colegiadoResponse = busquedaColegiadoResponseDocument.getBusquedaColegiadoResponse();
+							colegiadoInstitucionName = colegiadoResponse.getColegiadoArray();
+							for(int i=0; i < colegiadoInstitucionName.length; i++) {
+								colegiadosName.add((com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado) colegiadoInstitucionName[i]);
+							}
 						}
-						colegiadoRequest.setColegiado(colegiadoSearch);
+						
+						colegiadoName =  colegiadosName.toArray(new com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado[0]);
+						
+						
+					}else {
+						BusquedaColegiadoRequestDocument colegiadoRequestDocument = BusquedaColegiadoRequestDocument.Factory.newInstance();
+						colegiadoRequestDocument.setBusquedaColegiadoRequest(colegiadoRequest);
+						BusquedaColegiadoResponseDocument busquedaColegiadoResponseDocument = null;
+
+						busquedaColegiadoResponseDocument = clientCENSO.busquedaColegiadoSinIdentificacion(colegiadoRequestDocument,config.get(0).getValor());
+						BusquedaColegiadoResponse colegiadoResponse = busquedaColegiadoResponseDocument.getBusquedaColegiadoResponse();
+						colegiadoName = colegiadoResponse.getColegiadoArray();
 					}
 
-					BusquedaColegiadoRequestDocument colegiadoRequestDocument = BusquedaColegiadoRequestDocument.Factory.newInstance();
-					colegiadoRequestDocument.setBusquedaColegiadoRequest(colegiadoRequest);
-					BusquedaColegiadoResponseDocument busquedaColegiadoResponseDocument = null;
-
-					busquedaColegiadoResponseDocument = clientCENSO.busquedaColegiadoSinIdentificacion(colegiadoRequestDocument,config.get(0).getValor());
-					BusquedaColegiadoResponse colegiadoResponse = busquedaColegiadoResponseDocument.getBusquedaColegiadoResponse();
-					colegiadoName = colegiadoResponse.getColegiadoArray();
+					
 					
 					if (null != colegiadoName && colegiadoName.length>0) {
 						//validamos si nos viene filtro por institucion

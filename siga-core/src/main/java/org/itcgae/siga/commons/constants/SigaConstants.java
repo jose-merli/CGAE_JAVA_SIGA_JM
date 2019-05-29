@@ -713,6 +713,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String PERSONANIF = "PERSONANIFCIF";
 	public static final String COLEGIADONUMERO = "COLEGIADONUMERO";
 	public static final Short IDINSTITUCION_2000 = 2000;
+	public static final Short IDINSTITUCION_3500 = 3500;
 	public static final String TIPO_CARGA = "GF";
 	public static final String C_FECHAINICIO = "FECHAINICIO";
 	public static final String C_FECHAFIN = "FECHAFIN";
