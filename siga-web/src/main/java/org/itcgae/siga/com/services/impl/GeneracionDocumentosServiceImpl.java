@@ -4,15 +4,11 @@ package org.itcgae.siga.com.services.impl;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.math.BigDecimal;
 import java.nio.file.Files;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,12 +29,9 @@ import org.itcgae.siga.com.documentos.DataMailMergeDataSource;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.db.entities.GenProperties;
-import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.aspose.words.DataSet;
 import com.aspose.words.Document;
 import com.aspose.words.DocumentBuilder;
 import com.aspose.words.MailMergeCleanupOptions;
@@ -252,14 +245,19 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 	            		if(campo == null || campo.toString().trim() == ""){
 	            			row.createCell(cell).setCellValue("");
 	            		}else{
-	            			if ((campo instanceof Double) || (campo instanceof Integer) || (campo instanceof BigDecimal)) {
-	            				Cell celda = row.createCell(cell);
+	            			Cell celda = row.createCell(cell);
+	            			if (campo instanceof Number) {
 								celda.setCellType(Cell.CELL_TYPE_NUMERIC);
 								celda.setCellValue(Double.parseDouble(campo.toString()));
 								cellStyle.setAlignment(CellStyle.ALIGN_RIGHT);	    		    			
 	    		    			celda.setCellStyle(cellStyle);
+	            			} else if (campo instanceof Date) {
+	            				celda.setCellType(Cell.CELL_TYPE_STRING);
+	            				cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
+								XSSFRichTextString textCell = new XSSFRichTextString(SigaConstants.DATE_FORMAT_MIN_SEC.format(campo));
+								celda.setCellValue(textCell);
+								celda.setCellStyle(cellStyle);
 							} else {
-								Cell celda = row.createCell(cell);	
 								celda.setCellType(Cell.CELL_TYPE_STRING);
 								cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
 								XSSFRichTextString textCell = new XSSFRichTextString(campo.toString());
