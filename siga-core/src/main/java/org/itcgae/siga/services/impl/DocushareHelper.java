@@ -45,7 +45,6 @@ import com.xerox.docushare.object.DSDocument;
 import com.xerox.docushare.property.DSLinkDesc;
 import com.xerox.docushare.property.DSProperties;
 
-@Service
 public class DocushareHelper {
 
 	private static Logger log = LoggerFactory.getLogger(DocushareHelper.class);
@@ -69,9 +68,15 @@ public class DocushareHelper {
 	private static String ID_DOCUSHARE_NOCOLEGIADO = "ID_DOCUSHARE_NOCOLEGIADO";
 	private static String PATH_DOCUSHARE_DEBUG = "/ds";
 	private short idInstitucion;
+	
 	private DSServer server;
 	private DSSession dssession;
 	private String antPath;
+	
+	public DocushareHelper(short idInstitucion) {
+		super();
+		this.idInstitucion = idInstitucion;
+	}
 
 	// Para que coja el idioma español !!! Debería cogerlo desde el bundle de
 	// xmlbeans pero no lo coge
