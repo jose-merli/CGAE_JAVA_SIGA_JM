@@ -1180,7 +1180,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		LOGGER.info("obtenerKeysClaseComunicacion() -> Salida del servicio para obtener las keys asociadas a una clase de comunicación");
 		
-		
 		return keysDTO;
 	}
 	

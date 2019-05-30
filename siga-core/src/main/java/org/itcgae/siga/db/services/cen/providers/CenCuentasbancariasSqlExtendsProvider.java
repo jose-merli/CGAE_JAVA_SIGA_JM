@@ -148,7 +148,6 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		sql.SELECT("IDCUENTA");
 		sql.SELECT("DESCRIPCION");
 		sql.SELECT("TIPOMANDATO");
-		sql.SELECT("IDINSTITUCION");
 		sql.SELECT("TIPO");
 		sql.SELECT("TO_CHAR(FECHAUSO,'DD/MM/YYYY') AS FECHAUSO") ;
 		sql.SELECT("TO_CHAR(FIRMAFECHA,'DD/MM/YYYY')AS FIRMAFECHA");
