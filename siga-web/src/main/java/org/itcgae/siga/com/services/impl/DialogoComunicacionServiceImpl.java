@@ -290,7 +290,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					error.setCode(500);
 					error.setDescription("Error al obtener los modelos");
 					error.setMessage(e.getMessage());
-					e.printStackTrace();
+					LOGGER.error(e);
 				}
 			}
 		}
@@ -1320,8 +1320,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					if(dialogo.getModelos() != null && dialogo.getModelos().size() > 0){
 						for(ModelosComunicacionItem modelo : dialogo.getModelos()){
 							
-							//Obtenemos las plantillas de documento del modelo
-							
+							//Obtenemos las plantillas de documento del modelo							
 							List<DocumentoPlantillaItem> listaPlantillas = _modPlantillaDocumentoExtendsMapper.selectPlantillasByModelo(Long.parseLong(modelo.getIdModeloComunicacion()),usuario.getIdlenguaje());
 							if(listaPlantillas != null && listaPlantillas.size() > 0){
 								for(DocumentoPlantillaItem plantilla: listaPlantillas){
@@ -1368,7 +1367,16 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								LOGGER.error("Plantilla de envio no encontrada");
 							}
 							
-							response.setConsultaItem(listaConsultasEjecutar);
+							if (listaConsultasEjecutar != null && listaConsultasEjecutar.size() > 0) {
+								response.setConsultaItem(listaConsultasEjecutar);
+							} else {
+								LOGGER.error("No se ha encontrado ninguna consulta para ejecutar. Ver los modelos selecionados si tienen plantillas y si las plantillas tienen documentos asociados");
+								error.setCode(500);
+								String mensaje = "No se ha encontrado ninguna consulta para ejecutar. Compruebe que los modelos seleccionados tienen plantillas y que las plantillas tienen documentos asociados.";
+								error.setDescription(mensaje);
+								error.setMessage(mensaje);
+								response.setError(error);
+							}
 						}
 					}else{
 						LOGGER.error("No se ha seleccionado ningún modelo de comunicaicones");
