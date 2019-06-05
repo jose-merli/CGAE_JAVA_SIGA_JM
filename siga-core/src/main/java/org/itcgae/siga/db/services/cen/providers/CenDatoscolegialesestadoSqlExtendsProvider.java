@@ -13,7 +13,7 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 		SQL sql = new SQL();
 		sql.INSERT_INTO("CEN_DATOSCOLEGIALESESTADO");
 
-		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona)");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona  where idpersona like '" + cenDatoscolegialesestado.getIdinstitucion() + "' || '%'  )");
 
 		sql.VALUES("IDINSTITUCION", "'" + cenDatoscolegialesestado.getIdinstitucion() + "'");
 

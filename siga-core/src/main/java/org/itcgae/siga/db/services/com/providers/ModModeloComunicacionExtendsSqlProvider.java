@@ -126,7 +126,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		}
 		
 		sql.WHERE("MODELO.VISIBLE = '1'");
-		sql.ORDER_BY("MODELO.ORDEN");
+		sql.ORDER_BY("MODELO.NOMBRE ASC");
 
 		return sql.toString();
 	}

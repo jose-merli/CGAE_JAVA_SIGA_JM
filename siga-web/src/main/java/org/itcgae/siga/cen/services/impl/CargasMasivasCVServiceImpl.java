@@ -477,7 +477,8 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 								
 								List<CenColegiado> cenColegiado = cenColegiadoExtendsMapper.selectByExample(cenColegiadoExample);
 								
-								if(cenColegiado.isEmpty()) {
+								if(cenColegiado.isEmpty()) {							
+									
 									errorLinea.append("El número de colegiado no coincide con la persona introducida. ");
 								}
 							 }
@@ -490,8 +491,21 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 					CenColegiadoExample exampleColegiado = new CenColegiadoExample();
 					exampleColegiado.createCriteria().andNcolegiadoEqualTo(cargaMasivaDatosCVItem.getColegiadoNumero()).andIdinstitucionEqualTo(idInstitucion);
 					List<CenColegiado> colegiado = cenColegiadoExtendsMapper.selectByExample(exampleColegiado );
+					
 					if (null != colegiado && colegiado.size()>0) {
 						cargaMasivaDatosCVItem.setIdPersona(colegiado.get(0).getIdpersona());
+						
+					//Si no es un colegiado comprobamos que sea un colegiado inscrito
+					}else {
+						CenColegiadoExample exampleColegiadoInscrito = new CenColegiadoExample();
+						exampleColegiadoInscrito.createCriteria().
+						andNcomunitarioEqualTo(cargaMasivaDatosCVItem.getColegiadoNumero()).andIdinstitucionEqualTo(idInstitucion);
+						List<CenColegiado> colegiadoInscrito = cenColegiadoExtendsMapper.selectByExample(exampleColegiadoInscrito);
+						
+						if (null != colegiadoInscrito && colegiadoInscrito.size()>0) {
+							cargaMasivaDatosCVItem.setIdPersona(colegiadoInscrito.get(0).getIdpersona());
+						}
+						
 					}
 				}
 				if (cargaMasivaDatosCVItem.getIdPersona() != null) {
@@ -576,38 +590,41 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 					&& !hashtable.get(SigaConstants.TIPOCVCOD).toString().equals("")) {
  
 				try{
-					Short tipocvCod = new Short(String.valueOf(hashtable.get(SigaConstants.TIPOCVCOD)));
+					String tipocvCod = String.valueOf(hashtable.get(SigaConstants.TIPOCVCOD));
 
-					if (!tipoCvHashtable.containsKey(Short.toString(tipocvCod))) {
+					if (!tipoCvHashtable.containsKey(tipocvCod)) {
 						tipoCVVo = new SubtiposCVItem();
 	
 						// Llamada a método para obtener idtipocv
 						CenTiposcvExample cenTiposCVExample = new CenTiposcvExample();
-						cenTiposCVExample.createCriteria().andIdtipocvEqualTo(tipocvCod);
+						cenTiposCVExample.createCriteria().andCodigoextEqualTo(tipocvCod);
 						List<CenTiposcv> tiposCV = cenTiposcvMapper.selectByExample(cenTiposCVExample);
 	
 						if (tiposCV != null && tiposCV.size() > 0) {
 							tipoCVVo.setIdtipocv(tiposCV.get(0).getIdtipocv());
-	
+							
 							genRecursosCatalogosKey.setIdrecurso(tiposCV.get(0).getDescripcion());
 	
 							GenRecursosCatalogos genRecursosCatalogos = genRecursosCatalogosMapper
 									.selectByPrimaryKey(genRecursosCatalogosKey);
 	
 							tipoCVVo.setTipocvDescripcion(genRecursosCatalogos.getDescripcion());
+							tipoCVVo.setTipocvCodigoExt(tipocvCod);
 						}
 					} else {
-						tipoCVVo = tipoCvHashtable.get(Short.toString(tipocvCod));
+						tipoCVVo = tipoCvHashtable.get(tipocvCod);
 					}
-					tipoCvHashtable.put(Short.toString(tipocvCod), tipoCVVo);
+					tipoCvHashtable.put(tipocvCod, tipoCVVo);
 					if (tipoCVVo.getTipocvDescripcion() != null) {
 						cargaMasivaDatosCVItem.setTipoCVNombre(tipoCVVo.getTipocvDescripcion());
 						cargaMasivaDatosCVItem.setIdTipoCV(tipoCVVo.getIdTipocv());
+						cargaMasivaDatosCVItem.setTipoCVCOD(tipocvCod);
 					} else {
 						cargaMasivaDatosCVItem.setTipoCVNombre("Error");
 						errorLinea.append("No se ha encontrado el tipo CV. ");
 					}
 					cargaMasivaDatosCVItem.setTipoCVCOD(tipocvCod);
+					
 				} catch (Exception e1) {
 					errorLinea.append("TIPOCVCOD mal introducido. ");
 				}
@@ -641,8 +658,8 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 						CenTiposcvsubtipo1Example cenTiposcvsubtipo1Example1 = new CenTiposcvsubtipo1Example();
 						cenTiposcvsubtipo1Example1.createCriteria()
-								.andIdtipocvsubtipo1EqualTo(Short.valueOf(subtipocv1Cod))
-								.andIdinstitucionEqualTo(idInstitucion)
+								.andCodigoextEqualTo(subtipocv1Cod)
+								.andIdinstitucionIn(idInstituciones)
 								.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
 						
 						//ORDERNAR
@@ -651,11 +668,25 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 						tiposcvsubtipo1s = cenTiposcvsubtipo1Mapper.selectByExample(cenTiposcvsubtipo1Example1);
 
 						if (tiposcvsubtipo1s != null && tiposcvsubtipo1s.size() > 0) {
-							subtipoCV1Vo.setSubTipo1IdTipo(tiposcvsubtipo1s.get(0).getIdtipocvsubtipo1());
-							subtipoCV1Vo.setSubTipo1IdInstitucion(tiposcvsubtipo1s.get(0).getIdinstitucion());
+							CenTiposcvsubtipo1 subCV1Select = new CenTiposcvsubtipo1();
+							//Si existen dos subtipos con el mismo codigo externo en la institucion logeada como en la general 
+							//nos quedamos con el subtipo propio
+							if(tiposcvsubtipo1s.size() > 1) {
+								for (CenTiposcvsubtipo1 subCV1 : tiposcvsubtipo1s) {
+									if(subCV1.getIdinstitucion() == idInstitucion) {
+										subCV1Select = subCV1;
+									}
+								}
+							}else {
+								subCV1Select = tiposcvsubtipo1s.get(0);
+							}
+							
+							subtipoCV1Vo.setSubTipo1IdTipo(subCV1Select.getIdtipocvsubtipo1());
+							subtipoCV1Vo.setSubTipo1IdInstitucion(subCV1Select.getIdinstitucion());
+							subtipoCV1Vo.setSubTipo1CodigoExt(subtipocv1Cod);
 
 							genRecursosCatalogosKey.setIdlenguaje(usuario.getIdlenguaje());
-							genRecursosCatalogosKey.setIdrecurso(tiposcvsubtipo1s.get(0).getDescripcion());
+							genRecursosCatalogosKey.setIdrecurso(subCV1Select.getDescripcion());
 
 							GenRecursosCatalogos genRecursosCatalogos = genRecursosCatalogosMapper
 									.selectByPrimaryKey(genRecursosCatalogosKey);
@@ -670,6 +701,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 					if (subtipoCV1Vo.getSubTipo1Descripcion() != null) {
 						cargaMasivaDatosCVItem.setSubTipoCV1Nombre(subtipoCV1Vo.getSubTipo1Descripcion());
 						cargaMasivaDatosCVItem.setIdTipoCVSubtipo1(subtipoCV1Vo.getSubTipo1IdTipo());
+						cargaMasivaDatosCVItem.setSubtipoCV1COD(subtipocv1Cod);
 						cargaMasivaDatosCVItem.setIdinstitucionSubt1(subtipoCV1Vo.getSubTipo1IdInstitucion());
 
 					} else {
@@ -691,8 +723,8 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 
 							CenTiposcvsubtipo2Example cenTiposcvsubtipo2Example = new CenTiposcvsubtipo2Example();
 							cenTiposcvsubtipo2Example.createCriteria()
-									.andIdtipocvsubtipo2EqualTo(Short.valueOf(subtipocv2Cod))
-									.andIdinstitucionEqualTo(idInstitucion)
+									.andCodigoextEqualTo(subtipocv2Cod)
+									.andIdinstitucionIn(idInstituciones)
 									.andIdtipocvEqualTo(cargaMasivaDatosCVItem.getIdTipoCV());
 							
 							//ORDERNAR
@@ -702,11 +734,26 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 									.selectByExample(cenTiposcvsubtipo2Example);
 
 							if (tiposcvsubtipo2s != null && tiposcvsubtipo2s.size() > 0) {
-								subtipoCV2Vo.setSubTipo2IdTipo(tiposcvsubtipo2s.get(0).getIdtipocvsubtipo2());
-								subtipoCV2Vo.setSubTipo2IdInstitucion(tiposcvsubtipo2s.get(0).getIdinstitucion());
+								
+								CenTiposcvsubtipo2 subCV2Select = new CenTiposcvsubtipo2();
+								//Si existen dos subtipos con el mismo codigo externo en la institucion logeada como en la general 
+								//nos quedamos con el subtipo propio
+								if(tiposcvsubtipo1s.size() > 1) {
+									for (CenTiposcvsubtipo2 subCV2 : tiposcvsubtipo2s) {
+										if(subCV2.getIdinstitucion() == idInstitucion) {
+											subCV2Select = subCV2;
+										}
+									}
+								}else {
+									subCV2Select = tiposcvsubtipo2s.get(0);
+								}
+								
+								subtipoCV2Vo.setSubTipo2IdTipo(subCV2Select.getIdtipocvsubtipo2());
+								subtipoCV2Vo.setSubTipo2IdInstitucion(subCV2Select.getIdinstitucion());
+								subtipoCV2Vo.setSubTipo2CodigoExt(subtipocv2Cod);
 
 								genRecursosCatalogosKey.setIdlenguaje(usuario.getIdlenguaje());
-								genRecursosCatalogosKey.setIdrecurso(tiposcvsubtipo2s.get(0).getDescripcion());
+								genRecursosCatalogosKey.setIdrecurso(subCV2Select.getDescripcion());
 
 								GenRecursosCatalogos genRecursosCatalogos = genRecursosCatalogosMapper
 										.selectByPrimaryKey(genRecursosCatalogosKey);
@@ -717,10 +764,12 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 							subtipoCV2Vo = subtipo2CvHashtable.get(subtipocv2Cod);
 						}
 						subtipo2CvHashtable.put(subtipocv2Cod, subtipoCV2Vo);
+						
 						if (subtipoCV2Vo.getSubTipo2Descripcion() != null) {
 							cargaMasivaDatosCVItem.setSubtipoCV2Nombre(subtipoCV2Vo.getSubTipo2Descripcion());
 							cargaMasivaDatosCVItem.setIdTipoCVSubtipo2(subtipoCV2Vo.getSubTipo2IdTipo());
 							cargaMasivaDatosCVItem.setIdinstitucionSubt2(subtipoCV2Vo.getSubTipo2IdInstitucion());
+							cargaMasivaDatosCVItem.setSubtipoCV2COD(subtipocv2Cod);
 
 						} else {
 							cargaMasivaDatosCVItem.setSubtipoCV2Nombre("Error");

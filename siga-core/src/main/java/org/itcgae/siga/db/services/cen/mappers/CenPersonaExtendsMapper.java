@@ -117,13 +117,13 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 		@Result(column = "IDPERSONA1", property = "value", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDPERSONA2", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectMaxIdPersona();
+	List<ComboItem> selectMaxIdPersona(String idInstitucion);
 	
 	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "selectMaxIdPersona2")
 	@Results({
 		@Result(column = "IDPERSONA", property = "idMax", jdbcType = JdbcType.NUMERIC)
 	})
-	MaxIdDto selectMaxIdPersona2();
+	MaxIdDto selectMaxIdPersona2(String idinstitucion);
 	
 	
 	@UpdateProvider(type = CenPersonaSqlExtendsProvider.class, method = "updatebyExampleDataLegalPerson")

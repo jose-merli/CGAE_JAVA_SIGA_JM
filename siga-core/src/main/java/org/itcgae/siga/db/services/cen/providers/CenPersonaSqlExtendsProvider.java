@@ -245,7 +245,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		SQL sql = new SQL();
 
 		sql.INSERT_INTO("CEN_PERSONA");
-		sql.VALUES("IDPERSONA", "(Select max(idpersona) +1 from cen_persona)");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona) +1 from cen_persona where idpersona like '" + usuario.getIdinstitucion() + "' || '%' )");
 		sql.VALUES("NOMBRE", "'" + etiquetaUpdateDTO.getDenominacion() + "'");
 		// sql.VALUES("APELLIDOS1", "");
 		// sql.VALUES("APELLIDOS2", "");
@@ -290,7 +290,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 		
 		sql.INSERT_INTO("CEN_PERSONA");
-		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona)");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona where idpersona like '" + usuario.getIdinstitucion() + "' || '%' )");
 
 		if (!crearPersonaDTO.getNombre().equals("")) {
 			sql.VALUES("NOMBRE", "'" + crearPersonaDTO.getNombre() + "'");
@@ -339,7 +339,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		SQL sql = new SQL();
 
 		sql.INSERT_INTO("CEN_PERSONA");
-		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona)");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona where idpersona like '" + usuario.getIdinstitucion() + "' || '%' )");
 
 		if (!crearPersonaDTO.getNombre().equals("")) {
 			sql.VALUES("NOMBRE", "'" + crearPersonaDTO.getNombre() + "'");
@@ -367,25 +367,29 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		return sql.toString();
 	}
 
-	public String selectMaxIdPersona() {
+	public String selectMaxIdPersona(String idInstitucion) {
 
 		SQL sql = new SQL();
 
 		sql.SELECT("max(idpersona) as IDPERSONA1");
 		sql.SELECT("max(idpersona) as IDPERSONA2");
 		sql.FROM("cen_persona");
+		sql.WHERE("idpersona like '" + idInstitucion + "' || '%' ");
 		return sql.toString();
 	}
 	
-	public String selectMaxIdPersona2() {
+	public String selectMaxIdPersona2(String idinstitucion) {
 
 		SQL sql = new SQL();
 
 		sql.SELECT("max(IDPERSONA) +1 AS IDPERSONA");
 		sql.FROM("cen_persona");
+		sql.WHERE("idpersona like '" + idinstitucion + "' || '%' ");
 		
 		return sql.toString();
 	}
+
+
 
 	public String updatebyExampleDataLegalPerson(
 			PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, AdmUsuarios usuario) {
@@ -415,7 +419,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		sql.INSERT_INTO("CEN_PERSONA");
-		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona)");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona where idpersona like '" + usuario.getIdinstitucion() + "' || '%' )");
 
 		if (!sociedadCreateDTO.getDenominacion().equals("")) {
 			sql.VALUES("NOMBRE", "'" + sociedadCreateDTO.getDenominacion() + "'");
