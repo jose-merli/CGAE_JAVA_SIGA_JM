@@ -18,7 +18,7 @@ public class DatosBancariosAnexoItem {
 	private String firmaFecha;
 	private String firmaLugar;
 	private String idFicheroFirma;
-	
+    private String idInstitucion;
 		
 
 	/**
@@ -199,6 +199,26 @@ public class DatosBancariosAnexoItem {
 		this.idFicheroFirma = idFicheroFirma;
 	}
 	
+    /**
+    *
+    */
+   public DatosBancariosAnexoItem idInstitucion(String idInstitucion){
+       this.idInstitucion = idInstitucion;
+       return this;
+   }
+   
+   
+   @JsonProperty("idInstitucion")
+   public String getIdInstitucion() {
+       return idInstitucion;
+   }
+   
+   
+   public void setIdInstitucion(String idInstitucion) {
+       this.idInstitucion = idInstitucion;
+   }
+
+	
 	@Override
 	public boolean equals(java.lang.Object o) {
 	    if (this == o) {
@@ -218,13 +238,15 @@ public class DatosBancariosAnexoItem {
 	    		Objects.equals(this.tipoMandato, personaJuridicaSearchDTO.tipoMandato) &&
 	    		Objects.equals(this.firmaLugar, personaJuridicaSearchDTO.firmaLugar) &&
 	    		Objects.equals(this.firmaFecha, personaJuridicaSearchDTO.firmaFecha) &&
-	    		Objects.equals(this.idFicheroFirma, personaJuridicaSearchDTO.idFicheroFirma);
+                Objects.equals(this.idFicheroFirma, personaJuridicaSearchDTO.idFicheroFirma) &&
+                Objects.equals(this.idInstitucion, personaJuridicaSearchDTO.idInstitucion);
+
 	}
 	
 	@Override
 	public int hashCode() {
 	    return Objects.hash(idPersona, idAnexo,idCuenta,idMandato,descripcion,tipoMandato,fechaUso,tipo,firmaLugar,
-	    		firmaFecha, idFicheroFirma);
+                firmaFecha, idFicheroFirma, idInstitucion);
 	}
 
 	
@@ -244,6 +266,7 @@ public class DatosBancariosAnexoItem {
 	    sb.append("    firmaFecha: ").append(toIndentedString(firmaFecha)).append("\n");
 	    sb.append("    firmaLugar: ").append(toIndentedString(firmaLugar)).append("\n");
 	    sb.append("    idFicheroFirma: ").append(toIndentedString(idFicheroFirma)).append("\n");
+        sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
 
 
 	    sb.append("}");

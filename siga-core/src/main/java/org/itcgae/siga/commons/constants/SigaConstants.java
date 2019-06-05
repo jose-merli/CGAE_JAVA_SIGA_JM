@@ -1,7 +1,11 @@
 package org.itcgae.siga.commons.constants;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -538,8 +542,8 @@ public class SigaConstants {
 	}
 	
 	public static enum FORMATO_SALIDA {
-		XLS(new Short("1"), "xls"),
-		DOC(new Short("2"), "doc"),
+		XLS(new Short("1"), "xlsx"),
+		DOC(new Short("2"), "docx"),
 		PDF(new Short("3"), "pdf"),
 		PDF_FIRMADO(new Short("4"), "pdf");
 		
@@ -713,6 +717,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String PERSONANIF = "PERSONANIFCIF";
 	public static final String COLEGIADONUMERO = "COLEGIADONUMERO";
 	public static final Short IDINSTITUCION_2000 = 2000;
+	public static final Short IDINSTITUCION_3500 = 3500;
 	public static final String TIPO_CARGA = "GF";
 	public static final String C_FECHAINICIO = "FECHAINICIO";
 	public static final String C_FECHAFIN = "FECHAFIN";
@@ -839,5 +844,10 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static enum GEN_PARAMETROS {
 		PATH_DOCUMENTOSADJUNTOS
 	}
+	
+	public static String DATEST_FORMAT_MIN_SEC = "dd/MM/yyyy HH:mm";
 
+	public static DateFormat DATE_FORMAT_MIN_SEC = new SimpleDateFormat(DATEST_FORMAT_MIN_SEC);
+	
+	
 }

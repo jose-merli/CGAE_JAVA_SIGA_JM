@@ -36,6 +36,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.cen.services.ISolicitudIncorporacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmConfig;
 import org.itcgae.siga.db.entities.AdmConfigExample;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -693,7 +694,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		Long idDireccion;
 		Long idDireccion2;
 		Long idPersona;
-		Short idBancario;
+		Short idBancario = 0;
 		int insertColegiado;
 		int insertCliente;
 		int updateSolicitud = 0;
@@ -724,7 +725,10 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					idDireccion = insertarDatosDireccion(solIncorporacion, usuario, idPersona);
 //					idDireccion2 = insertarDatosDireccion2(solIncorporacion, usuario, idPersona);
 					insertColegiado = insertarDatosColegiado(solIncorporacion, usuario, idPersona);
-					idBancario = insertarDatosBancarios(solIncorporacion, usuario, idPersona);
+					if (!UtilidadesString.esCadenaVacia(solIncorporacion.getIban())) {
+						idBancario = insertarDatosBancarios(solIncorporacion, usuario, idPersona);
+					}
+					
 					solIncorporacion.setIdestado((short)50);
 					solIncorporacion.setFechamodificacion(new Date());
 					solIncorporacion.setUsumodificacion(usuario.getIdusuario());
@@ -733,7 +737,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					//solIncorporacion.setFechaestado(new Date());
 					updateSolicitud = _cenSolicitudincorporacionMapper.updateByPrimaryKey(solIncorporacion);
 				
-					if(idPersona != null && idDireccion!= null && insertCliente == 1 && idBancario != null && insertColegiado == 1 && updateSolicitud == 1){
+					if(idPersona != null && idDireccion!= null && insertCliente == 1  && insertColegiado == 1 && updateSolicitud == 1){
 						response.setId(Long.toString(solIncorporacion.getIdsolicitud()));
 						response.setStatus(SigaConstants.OK);
 						response.setError(null);
@@ -773,7 +777,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 //							keys.setIdpersona(idPersona);
 //							_cenDireccionesMapper.deleteByPrimaryKey(keys);
 //						}
-						if(idBancario != null){
+						if(idBancario == 1){
 							CenCuentasbancariasKey keys = new CenCuentasbancariasKey();
 							keys.setIdcuenta(idBancario);
 							keys.setIdinstitucion(usuario.getIdinstitucion());
@@ -919,7 +923,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		
 		CenPersona datosPersonales = new CenPersona();
 		
-		MaxIdDto personaID = _cenPersonaExtendsMapper.selectMaxIdPersona2();
+		MaxIdDto personaID = _cenPersonaExtendsMapper.selectMaxIdPersona2(usuario.getIdinstitucion().toString());
 		
 		
 		datosPersonales.setIdpersona(personaID.getIdMax());
@@ -1093,6 +1097,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		boolean tieneCargo = false;
 		boolean tieneSCSJ = false;
 		boolean tieneAbono = false;
+		if (null == solicitud.getAbonocargo() || (solicitud.getAbonocargo().equals("T") || solicitud.getAbonocargo().equals("C"))) {
+			tieneCargo =  true;
+		}
 		cuenta.setIdcuenta((short)(personaID.getIdMax()+0));
 		cuenta.setAbonocargo(solicitud.getAbonocargo());
 		cuenta.setAbonosjcs(solicitud.getAbonosjcs());
@@ -1206,7 +1213,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		if (tieneCargo) {
 			Object[] paramMandatos = new Object[4];
 			paramMandatos[0] = usuario.getIdinstitucion().toString();
-			paramMandatos[1] = idPersona;
+			paramMandatos[1] = idPersona.toString();
 			paramMandatos[2] = cuenta.getIdcuenta().toString();
 			paramMandatos[3] = usuario.getIdusuario().toString();
 			

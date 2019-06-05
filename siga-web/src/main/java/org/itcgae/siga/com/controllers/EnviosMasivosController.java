@@ -359,9 +359,9 @@ public class EnviosMasivosController {
 	}
 	
 	@RequestMapping(value = "detalle/direccionesDestinatarioIndv",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<DatosDireccionesDTO> obtenerDireccionesDisp(HttpServletRequest request, @RequestBody String idPersona) {
+	ResponseEntity<DatosDireccionesDTO> obtenerDireccionesDisp(HttpServletRequest request, @RequestBody String nif) {
 		
-		DatosDireccionesDTO response = _enviosMasivosService.obtenerDireccionesDisp(request, idPersona);
+		DatosDireccionesDTO response = _enviosMasivosService.obtenerDireccionesDisp(request, nif);
 		if(response.getError() == null)
 			return new ResponseEntity<DatosDireccionesDTO>(response, HttpStatus.OK);
 		else{

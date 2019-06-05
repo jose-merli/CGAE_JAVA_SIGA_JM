@@ -52,7 +52,7 @@ public class CenSolimodidireccionesSqlExtendsProvider extends CenSolicitudmodifi
 
 		sql.INSERT_INTO("CEN_NOCOLEGIADO");
 
-		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona)");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona where idpersona like '" + idInstitucion + "' || '%')");
 		sql.VALUES("IDINSTITUCION", "'" + idInstitucion + "'");
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuario.getIdusuario()) + "'");

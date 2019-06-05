@@ -13,6 +13,8 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -2302,27 +2304,36 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 	
 	public static void main(String[] args) {
-		String query = "select nombbre as \"nombre\", codigo as \"C.P.\" from tal where pascual";
+		String query = "select nombbre as \"nombre\", codigo	as \"C.P.\" as cod, 'FECHA\"' || SYSDATE     AS  \"FECHA..HOY\","
+				+ "'otro campo'\nas \"otro.y\", '= \" as \"t..al\", \"pepe\" as juan from tal where pascual";
 		ConsultasServiceImpl consultasServiceImpl = new ConsultasServiceImpl();
 		
-		consultasServiceImpl.quitaPuntosAlias(query);
-		query = "select nombbre as \"nombre\", codigo as \"CP\" from tal where pascual";
-		consultasServiceImpl.quitaPuntosAlias(query);
+		consultasServiceImpl.quitaPuntosAlias(query.toUpperCase());
+//		query = "select nombbre as \"nombre\", codigo as \"CP\" from tal where pascual";
+//		consultasServiceImpl.quitaPuntosAlias(query.toUpperCase());
 	}
 	
 	private String quitaPuntosAlias(String query) {
 		
-		int fromIndex = 0;
+		String patternStr = "\\s+AS\\s+\"";
+	    Pattern pattern = Pattern.compile(patternStr);
+	    String query1 = "";
+	    String query2 = query;
+	    LOGGER.debug(query);
 		int toIndex = 0;
-		if (query != null) {
-			while ((fromIndex = query.indexOf("\"", fromIndex)) > -1) {
-				toIndex = query.indexOf("\"", fromIndex+1);
-				String alias = query.substring(fromIndex+1, toIndex);
+		if (query2 != null) {
+			Matcher matcher = pattern.matcher(query2);
+			while (matcher.find()) {
+				toIndex = query2.indexOf("\"", matcher.end()+1);
+				String alias = query2.substring(matcher.end(), toIndex);
 				alias = alias.replaceAll("\\.", CARACTER_REEMPLAZO_PUNTOS);	
-				query = query.substring(0, fromIndex+1) + alias + query.substring(toIndex);
-				fromIndex = query.indexOf("\"", fromIndex + alias.length() + 1) + 1;
+				query1 += query2.substring(0, matcher.end()) + alias;
+				query2 = query2.substring(toIndex);
+				matcher = pattern.matcher(query2);
 			}
+			query = query1 + query2;
 		}
+		LOGGER.debug(query);
 		return query;
 		
 	}

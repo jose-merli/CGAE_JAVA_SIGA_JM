@@ -31,7 +31,6 @@ import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;
 import org.itcgae.siga.db.mappers.CenNocolegiadoMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
-import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -44,8 +43,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.colegiados.info.redabogacia.ColegiadoRequestDocument.ColegiadoRequest;
-
 @Service
 public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelService {
 
@@ -53,7 +50,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 
 	@Autowired
 	private DocushareHelper docushareHelper;
-
+	
 	@Autowired
 	private CenColegiadoMapper cenColegiadoMapper;
 
@@ -81,6 +78,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		CenColegiadoExample example = new CenColegiadoExample();
 		example.createCriteria().andIdpersonaEqualTo(Long.parseLong(idPersona)).andIdinstitucionEqualTo(idInstitucion);
 		List<CenColegiado> config = cenColegiadoMapper.selectByExample(example);
+		
 		if (config.get(0).getIdentificadords() == null) {
 			if (config.get(0).getComunitario() == "0") {
 				valorColegiadoDocu = config.get(0).getNcolegiado();
@@ -89,13 +87,12 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 			}
 			identificadorDS = docushareHelper.buscaCollectionCenso(valorColegiadoDocu, idInstitucion);
 		} else {
-			docushareHelper.setIdInstitucion(idInstitucion);
 			identificadorDS = config.get(0).getIdentificadords();
 		}
 		// NO COLEGIADO
 		// identificadorDS = "Collection-179";
 		if (identificadorDS != null) {
-			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS, identificadorDS);
+			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(idInstitucion, identificadorDS, identificadorDS);
 			docushareDTO.setDocuShareObjectVO(docus);
 		}
 		return docushareDTO;
@@ -112,7 +109,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		identificadorDS = docu.getId();
 		if (identificadorDS != null) {
-			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS, docu.getParent());
+			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(idInstitucion, identificadorDS, docu.getParent());
 			docushareDTO.setDocuShareObjectVO(docus);
 		}
 		return docushareDTO;
@@ -124,7 +121,11 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		File file = null;
 		String identificadorDS = null;
 		identificadorDS = docushareObjectVO.getId();
-		file = docushareHelper.getDocument(identificadorDS);
+		
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		file = docushareHelper.getDocument(idInstitucion, identificadorDS);
 		// Se convierte el fichero en array de bytes para enviarlo al front
 
 		InputStream fileStream = null;
@@ -146,8 +147,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 			headers.setContentLength(file.length());
 			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 		return res;
 	}
@@ -168,6 +168,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		CenNocolegiadoExample example = new CenNocolegiadoExample();
 		example.createCriteria().andIdpersonaEqualTo(Long.parseLong(idPersona));
 		List<CenNocolegiado> config = cenNocolegiadoMapper.selectByExample(example);
+		
 		if (config.get(0).getIdentificadords() == null) {
 			if (configPersona.get(0).getIdtipoidentificacion() == 10) {
 				valorNoColegiadoDocu = "NIF " + configPersona.get(0).getNifcif();
@@ -176,15 +177,14 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 			} else {
 				valorNoColegiadoDocu = "NIE " + configPersona.get(0).getNifcif();
 			}
-			identificadorDS = docushareHelper.buscaCollectionNoColegiado(valorNoColegiadoDocu);
+			identificadorDS = docushareHelper.buscaCollectionNoColegiado(valorNoColegiadoDocu, idInstitucion);
 		} else {
-			docushareHelper.setIdInstitucion(idInstitucion);
 			identificadorDS = config.get(0).getIdentificadords();
 		}
 		// NO COLEGIADO
 		// identificadorDS = "Collection-179";
 		if (identificadorDS != null) {
-			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS, "");
+			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(idInstitucion, identificadorDS, "");
 			docushareDTO.setDocuShareObjectVO(docus);
 		}
 		return docushareDTO;
@@ -206,6 +206,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		CenNocolegiadoExample example = new CenNocolegiadoExample();
 		example.createCriteria().andIdpersonaEqualTo(Long.parseLong(docu.getIdPersona()));
 		List<CenNocolegiado> config = cenNocolegiadoMapper.selectByExample(example);
+		
 		if (config.get(0).getIdentificadords() == null) {
 			if (configPersona.get(0).getIdtipoidentificacion() == 10) {
 				valorNoColegiadoDocu = "NIF " + configPersona.get(0).getNifcif();
@@ -214,13 +215,12 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 			} else {
 				valorNoColegiadoDocu = "NIE " + configPersona.get(0).getNifcif();
 			}
-			identificadorDS = docushareHelper.buscaCollectionNoColegiado(valorNoColegiadoDocu);
+			identificadorDS = docushareHelper.buscaCollectionNoColegiado(valorNoColegiadoDocu, idInstitucion);
 		} else {
-			docushareHelper.setIdInstitucion(idInstitucion);
 			identificadorDS = config.get(0).getIdentificadords();
 		}
 		if (identificadorDS != null) {
-			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(identificadorDS, docu.getParent());
+			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(idInstitucion, identificadorDS, docu.getParent());
 			docushareDTO.setDocuShareObjectVO(docus);
 		}
 		return docushareDTO;
@@ -321,8 +321,8 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 						} else {
 							title = cenColegiado.getNcolegiado();
 						}
-
-						idDS = docushareHelper.createCollectionCenso(title, description);
+						
+						idDS = docushareHelper.createCollectionCenso(idInstitucion, title, description);
 
 						cenColegiado.setIdentificadords(idDS);
 						cenColegiado.setFechamodificacion(new Date());
@@ -435,7 +435,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 
 						CenNocolegiado cenNoColegiado = noColegiados.get(0);
 						
-						idDS = docushareHelper.createCollectionNoColegiado(title, description);
+						idDS = docushareHelper.createCollectionNoColegiado(idInstitucion, title, description);
 
 						cenNoColegiado.setIdentificadords(idDS);
 						cenNoColegiado.setFechamodificacion(new Date());

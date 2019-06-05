@@ -22,6 +22,8 @@ public static void uploadFichero(String pathDirectorio,String nombreFichero,byte
 	try {
 		if(!file.exists())
 			file.createNewFile();
+		
+		SIGAHelper.addPerm777(file);
 		theBAOS = new FileOutputStream(file);
 		theBAOS.write(bytesFichero);
 			theBAOS.flush();

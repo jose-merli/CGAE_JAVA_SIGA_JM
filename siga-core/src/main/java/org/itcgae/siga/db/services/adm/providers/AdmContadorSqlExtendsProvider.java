@@ -69,13 +69,14 @@ public class AdmContadorSqlExtendsProvider extends AdmContadorSqlProvider{
 			sql.WHERE("IDMODULO = ('" + contadorRequestDTO.getIdModulo() + "')");
 		}
 		if (null != contadorRequestDTO.getIdContador() && contadorRequestDTO.getIdContador()!= "") {
-			sql.WHERE("IDCONTADOR = ('" + contadorRequestDTO.getIdContador() + "')");
+            sql.WHERE("UPPER(IDCONTADOR) like UPPER('%" + contadorRequestDTO.getIdContador() + "%')");
+
 		}
 		if (null != contadorRequestDTO.getDescripcion() && contadorRequestDTO.getDescripcion()!= "") {
-			sql.WHERE("DESCRIPCION = ('" + contadorRequestDTO.getDescripcion() + "')");
+            sql.WHERE("UPPER(DESCRIPCION) like UPPER('%" + contadorRequestDTO.getDescripcion() + "%')");
 		}
 		if (null != contadorRequestDTO.getNombre() && contadorRequestDTO.getNombre()!= "") {
-			sql.WHERE("NOMBRE = ('" + contadorRequestDTO.getNombre() + "')");
+            sql.WHERE("UPPER(NOMBRE) like UPPER('%" + contadorRequestDTO.getNombre() + "%')");
 		}			
 		sql.ORDER_BY("NOMBRE ASC");
 		return sql.toString();
