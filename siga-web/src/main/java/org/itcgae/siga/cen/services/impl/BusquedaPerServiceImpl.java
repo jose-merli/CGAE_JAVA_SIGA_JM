@@ -320,7 +320,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				busquedaPerFisicaDTO.setBusquedaFisicaItems(busquedaPerFisicaItems); 
 								
 				// 2. Si no encontramos registros en BD local, buscamos en la aplicación de Censo
-				if (null == busquedaPerFisicaItems || busquedaPerFisicaItems.size() == 0) {
+				if (!busquedaPerFisicaSearchDTO.getAddDestinatarioIndv() && (null == busquedaPerFisicaItems || busquedaPerFisicaItems.size() == 0)) {
 					if (null != busquedaPerFisicaSearchDTO.getNif()  && !busquedaPerFisicaSearchDTO.getNif().equals("")) {
 						Colegiado colegiado = buscarColegiado(busquedaPerFisicaSearchDTO.getNif());
 						if (null != colegiado) {

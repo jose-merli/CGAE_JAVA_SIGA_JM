@@ -13,6 +13,7 @@ public class BusquedaPerFisicaSearchDTO {
 	private String primerApellido;
 	private String segundoApellido;
 	private String numeroColegiado;
+	private boolean addDestinatarioIndv;
 	
 	
 
@@ -126,7 +127,22 @@ public class BusquedaPerFisicaSearchDTO {
 	public void setNumeroColegiado(String numeroColegiado) {
 		this.numeroColegiado = numeroColegiado;
 	}
+	/**
+	 *
+	 */
+	public BusquedaPerFisicaSearchDTO addDestinatarioIndv(boolean  addDestinatarioIndv){
+		this.addDestinatarioIndv = addDestinatarioIndv;
+		return this;
+	}
+	@JsonProperty("addDestinatarioIndv")
+	public boolean getAddDestinatarioIndv() {
+		return addDestinatarioIndv;
+	}
 
+
+	public void setAddDestinatarioIndv(boolean addDestinatarioIndv) {
+		this.addDestinatarioIndv = addDestinatarioIndv;
+	}
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -143,14 +159,15 @@ public class BusquedaPerFisicaSearchDTO {
 	    		Objects.equals(this.nombre, busquedaFisicaSearchDTO.nombre)&&
 	    		Objects.equals(this.primerApellido, busquedaFisicaSearchDTO.primerApellido)&&
 	    		Objects.equals(this.segundoApellido, busquedaFisicaSearchDTO.segundoApellido)&&
-	    		Objects.equals(this.numeroColegiado, busquedaFisicaSearchDTO.numeroColegiado);
+	    		Objects.equals(this.numeroColegiado, busquedaFisicaSearchDTO.numeroColegiado)&&
+	    		Objects.equals(this.addDestinatarioIndv, busquedaFisicaSearchDTO.addDestinatarioIndv);
 	}
 	
 	
 
 	@Override
 	public int hashCode() {
-	    return Objects.hash(nif, idInstitucion, nombre, primerApellido, segundoApellido, numeroColegiado);
+	    return Objects.hash(nif, idInstitucion, nombre, primerApellido, segundoApellido, numeroColegiado, addDestinatarioIndv);
 	}
 
 	
@@ -165,7 +182,8 @@ public class BusquedaPerFisicaSearchDTO {
 	    sb.append("    primerApellido: ").append(toIndentedString(primerApellido)).append("\n");
 	    sb.append("    segundoApellido: ").append(toIndentedString(segundoApellido)).append("\n");
 	    sb.append("    numColegiado: ").append(toIndentedString(numeroColegiado)).append("\n");
-	    
+	    sb.append("    addDestinatarioIndv: ").append(toIndentedString(addDestinatarioIndv)).append("\n");
+
 	    sb.append("}");
 	    return sb.toString();
 	}

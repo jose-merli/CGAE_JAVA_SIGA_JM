@@ -590,7 +590,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 		sql.INSERT_INTO("CEN_NOCOLEGIADO");
 
-		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona)");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona where idpersona like '" + idInstitucion + "' || '%')");
 		sql.VALUES("IDINSTITUCION", "'" + idInstitucion + "'");
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuario.getIdusuario()) + "'");
@@ -693,7 +693,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		}
 		
 		sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
-		sql.WHERE("per.idtipoidentificacion not in '20'");
+		//sql.WHERE("per.idtipoidentificacion not in '20'");
 		sql.WHERE("(dir.fechamodificacion = (select max(fechamodificacion) from cen_direcciones dir2 where dir2.idpersona = dir.idpersona and dir2.idinstitucion = dir.idinstitucion and dir2.idinstitucion = dir.idinstitucion and dir.fechabaja is null ) or dir.fechamodificacion is null)");
 		
 		if(!noColegiadoItem.isHistorico()) {
@@ -895,7 +895,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		}
 		
 		sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
-		sql.WHERE("per.idtipoidentificacion not in '20'");
+		//sql.WHERE("per.idtipoidentificacion not in '20'");
 		sql.WHERE("dir.fechamodificacion = (select max(fechamodificacion) from cen_direcciones dir2 where dir2.idpersona = dir.idpersona and dir2.idinstitucion = dir.idinstitucion and dir2.idinstitucion = dir.idinstitucion and dir.fechabaja is null )");
 		if (noColegiadoItem.getNif() != null && noColegiadoItem.getNif() != "") {
 			sql.WHERE("upper(per.nifcif) like upper('%" + noColegiadoItem.getNif() + "%')");
@@ -1085,7 +1085,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if(idInstitucion != null) {
 			sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
 		}
-		sql.WHERE("per.idtipoidentificacion not in '20'");
+		//sql.WHERE("per.idtipoidentificacion not in '20'");
 
 		sql.WHERE("per.idPersona = '" + idPersona + "'");
 			

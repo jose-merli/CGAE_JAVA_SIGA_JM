@@ -329,7 +329,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 				if (responseCenPersona == 1) {
 					// 2.2. Insertar en cen_cliente
 
-					comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+					comboItems = cenPersonaExtendsMapper.selectMaxIdPersona(usuario.getIdinstitucion().toString());
 					String maxIdPersona = comboItems.get(0).getValue();
 
 					tarjetaIntegrantesCreateDTO.setIdPersonaIntegrante(maxIdPersona);

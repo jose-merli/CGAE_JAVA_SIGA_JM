@@ -52,7 +52,7 @@ public interface IEnviosMasivosService {
 	public DestinatariosDTO obtenerDestinatariosIndv(HttpServletRequest request, String idEnvio);
 	public Error asociarDestinatario(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem destinatario);
 	public Error desAsociarDestinatarios(HttpServletRequest request, DestinatarioIndvEnvioMasivoItem[] destinatario);
-	public DatosDireccionesDTO obtenerDireccionesDisp(HttpServletRequest request, String idPersona);
+	public DatosDireccionesDTO obtenerDireccionesDisp(HttpServletRequest request, String nif);
 	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long parseInt, Short idDocumento);
 	public String getPathFicheroEnvioMasivo(Short idInstitucion, Long idEnvio);
 }

@@ -658,7 +658,7 @@ public class FichaDatosGeneralesServiceTest {
 	
 		when(cenPersonaExtendsMapper.insertSelectiveForPerson(Mockito.any(CenPersona.class), Mockito.any(AdmUsuarios.class))).thenReturn(1); 
 	
-		when(cenPersonaExtendsMapper.selectMaxIdPersona()).thenReturn(combo); 
+		when(cenPersonaExtendsMapper.selectMaxIdPersona("2005")).thenReturn(combo); 
 
 		when(cenClienteMapper.insert(Mockito.any(CenCliente.class))).thenReturn(1); 
 
@@ -704,7 +704,7 @@ public class FichaDatosGeneralesServiceTest {
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(cenPersonaExtendsMapper.insertSelectiveForPerson(Mockito.any(CenPersona.class), Mockito.any(AdmUsuarios.class))).thenReturn(1); 
-		when(cenPersonaExtendsMapper.selectMaxIdPersona()).thenReturn(combo); 
+		when(cenPersonaExtendsMapper.selectMaxIdPersona("2005")).thenReturn(combo); 
 		when(cenClienteMapper.insert(Mockito.any(CenCliente.class))).thenReturn(1); 
 		when(cenNocolegiadoMapper.insertSelectiveForCreateLegalPerson(Mockito.anyString(), Mockito.any(AdmUsuarios.class), Mockito.any(EtiquetaUpdateDTO.class))).thenReturn(0); 
 		when(cenGruposclienteExtendsMapper.selectDistinctGruposClientes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(listaGruposPersona); 
@@ -738,7 +738,7 @@ public class FichaDatosGeneralesServiceTest {
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(cenPersonaExtendsMapper.insertSelectiveForPerson(Mockito.any(CenPersona.class), Mockito.any(AdmUsuarios.class))).thenReturn(1); 
-		when(cenPersonaExtendsMapper.selectMaxIdPersona()).thenReturn(combo); 
+		when(cenPersonaExtendsMapper.selectMaxIdPersona("2005")).thenReturn(combo); 
 		when(cenClienteMapper.insert(Mockito.any(CenCliente.class))).thenReturn(1); 
 		when(cenNocolegiadoMapper.insertSelectiveForCreateLegalPerson(Mockito.anyString(), Mockito.any(AdmUsuarios.class), Mockito.any(EtiquetaUpdateDTO.class))).thenReturn(1); 
 		when(cenGruposclienteExtendsMapper.selectDistinctGruposClientes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(listaGruposPersona); 
@@ -773,7 +773,7 @@ public class FichaDatosGeneralesServiceTest {
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(cenPersonaExtendsMapper.insertSelectiveForPerson(Mockito.any(CenPersona.class), Mockito.any(AdmUsuarios.class))).thenReturn(1); 
-		when(cenPersonaExtendsMapper.selectMaxIdPersona()).thenReturn(combo); 
+		when(cenPersonaExtendsMapper.selectMaxIdPersona("2005")).thenReturn(combo); 
 		when(cenClienteMapper.insert(Mockito.any(CenCliente.class))).thenReturn(1); 
 		when(cenNocolegiadoMapper.insertSelectiveForCreateLegalPerson(Mockito.anyString(), Mockito.any(AdmUsuarios.class), Mockito.any(EtiquetaUpdateDTO.class))).thenReturn(1); 
 		when(cenGruposclienteExtendsMapper.selectDistinctGruposClientes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(listaGruposPersona); 
@@ -805,7 +805,7 @@ public class FichaDatosGeneralesServiceTest {
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(cenPersonaExtendsMapper.insertSelectiveForPerson(Mockito.any(CenPersona.class), Mockito.any(AdmUsuarios.class))).thenReturn(1); 
-		when(cenPersonaExtendsMapper.selectMaxIdPersona()).thenReturn(combo); 
+		when(cenPersonaExtendsMapper.selectMaxIdPersona("2005")).thenReturn(combo); 
 		when(cenClienteMapper.insert(Mockito.any(CenCliente.class))).thenReturn(1); 
 		when(cenNocolegiadoMapper.insertSelectiveForCreateLegalPerson(Mockito.anyString(), Mockito.any(AdmUsuarios.class), Mockito.any(EtiquetaUpdateDTO.class))).thenReturn(1); 
 		when(cenGruposclienteExtendsMapper.selectDistinctGruposClientes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(listaGruposPersona); 
@@ -837,7 +837,7 @@ public class FichaDatosGeneralesServiceTest {
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(cenPersonaExtendsMapper.insertSelectiveForPerson(Mockito.any(CenPersona.class), Mockito.any(AdmUsuarios.class))).thenReturn(1); 
-		when(cenPersonaExtendsMapper.selectMaxIdPersona()).thenReturn(combo); 
+		when(cenPersonaExtendsMapper.selectMaxIdPersona("2005")).thenReturn(combo); 
 		when(cenClienteMapper.insert(Mockito.any(CenCliente.class))).thenReturn(1); 
 		when(cenNocolegiadoMapper.insertSelectiveForCreateLegalPerson(Mockito.anyString(), Mockito.any(AdmUsuarios.class), Mockito.any(EtiquetaUpdateDTO.class))).thenReturn(1); 
 		when(cenGruposclienteExtendsMapper.selectDistinctGruposClientes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(listaGruposPersona); 
@@ -869,7 +869,7 @@ public class FichaDatosGeneralesServiceTest {
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(cenPersonaExtendsMapper.insertSelectiveForPerson(Mockito.any(CenPersona.class), Mockito.any(AdmUsuarios.class))).thenReturn(1); 
-		when(cenPersonaExtendsMapper.selectMaxIdPersona()).thenReturn(combo); 
+		when(cenPersonaExtendsMapper.selectMaxIdPersona("2005")).thenReturn(combo); 
 		when(cenClienteMapper.insert(Mockito.any(CenCliente.class))).thenReturn(1); 
 		when(cenNocolegiadoMapper.insertSelectiveForCreateLegalPerson(Mockito.anyString(), Mockito.any(AdmUsuarios.class), Mockito.any(EtiquetaUpdateDTO.class))).thenReturn(1); 
 		when(cenGruposclienteExtendsMapper.selectDistinctGruposClientes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(listaGruposPersona); 
@@ -963,7 +963,7 @@ public class FichaDatosGeneralesServiceTest {
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(cenPersonaExtendsMapper.insertSelectiveForPerson(Mockito.any(CenPersona.class), Mockito.any(AdmUsuarios.class))).thenReturn(1); 
-		when(cenPersonaExtendsMapper.selectMaxIdPersona()).thenReturn(combo); 
+		when(cenPersonaExtendsMapper.selectMaxIdPersona("2005")).thenReturn(combo); 
 		when(cenClienteMapper.insert(Mockito.any(CenCliente.class))).thenReturn(0); 
 
 //		Ejecución del método a testear
@@ -990,7 +990,7 @@ public class FichaDatosGeneralesServiceTest {
 		//		Mockeo de las llamadas a BD
 		when(admUsuariosExtendsMapper.selectByExample(Mockito.any(AdmUsuariosExample.class))).thenReturn(usuarios);
 		when(cenPersonaExtendsMapper.insertSelectiveForPerson(Mockito.any(CenPersona.class), Mockito.any(AdmUsuarios.class))).thenReturn(1); 
-		when(cenPersonaExtendsMapper.selectMaxIdPersona()).thenReturn(combo); 
+		when(cenPersonaExtendsMapper.selectMaxIdPersona("2005")).thenReturn(combo); 
 		when(cenClienteMapper.insert(Mockito.any(CenCliente.class))).thenReturn(1); 
 		when(cenNocolegiadoMapper.insertSelectiveForCreateLegalPerson(Mockito.anyString(), Mockito.any(AdmUsuarios.class), Mockito.any(EtiquetaUpdateDTO.class))).thenReturn(1); 
 		when(cenGruposclienteExtendsMapper.selectDistinctGruposClientes(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).thenReturn(listaGruposPersona); 

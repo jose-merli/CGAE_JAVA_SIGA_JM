@@ -202,7 +202,7 @@ public class FichaCursosServiceTest {
 
 		when(forPersonacursoExtendsMapper.selectByExample(Mockito.any(ForPersonaCursoExample.class))).thenReturn(trainersList);
 
-		when(cenPersonaExtendsMapper.selectMaxIdPersona()).thenReturn(comoboItems);
+		when(cenPersonaExtendsMapper.selectMaxIdPersona("2005")).thenReturn(comoboItems);
 
 		when(cenPersonaExtendsMapper.insert(Mockito.any(CenPersona.class))).thenReturn(1);
 
@@ -241,7 +241,7 @@ public class FichaCursosServiceTest {
 
 		when(forPersonacursoExtendsMapper.selectByExample(Mockito.any(ForPersonaCursoExample.class))).thenReturn(trainersList);
 
-		when(cenPersonaExtendsMapper.selectMaxIdPersona()).thenReturn(comoboItems);
+		when(cenPersonaExtendsMapper.selectMaxIdPersona("2005")).thenReturn(comoboItems);
 
 		when(cenPersonaExtendsMapper.insert(Mockito.any(CenPersona.class))).thenReturn(1);
 
@@ -280,7 +280,7 @@ public class FichaCursosServiceTest {
 
 		when(forPersonacursoExtendsMapper.selectByExample(Mockito.any(ForPersonaCursoExample.class))).thenReturn(trainersList);
 
-		when(cenPersonaExtendsMapper.selectMaxIdPersona()).thenReturn(comoboItems);
+		when(cenPersonaExtendsMapper.selectMaxIdPersona("2005")).thenReturn(comoboItems);
 
 		when(cenPersonaExtendsMapper.insert(Mockito.any(CenPersona.class))).thenThrow(Exception.class);
 

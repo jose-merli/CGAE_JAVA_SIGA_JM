@@ -11,7 +11,7 @@ public class CargaMasivaDatosCVItem {
 	private Date fechaFin;
 	private Long creditos;
 	private Date fechaVerificacion;
-	private Short tipoCVCOD;
+	private String tipoCVCOD;
 	private String subtipoCV1COD;
 	private String subtipoCV2COD;
 	private String personaNombre;
@@ -64,10 +64,10 @@ public class CargaMasivaDatosCVItem {
 	public void setFechaVerificacion(Date fechaVerificacion) {
 		this.fechaVerificacion = fechaVerificacion;
 	}
-	public Short getTipoCVCOD() {
+	public String getTipoCVCOD() {
 		return tipoCVCOD;
 	}
-	public void setTipoCVCOD(Short tipoCVCOD) {
+	public void setTipoCVCOD(String tipoCVCOD) {
 		this.tipoCVCOD = tipoCVCOD;
 	}
 	public String getSubtipoCV1COD() {
