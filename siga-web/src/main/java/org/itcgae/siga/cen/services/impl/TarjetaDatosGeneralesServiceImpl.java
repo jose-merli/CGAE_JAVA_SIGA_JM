@@ -1135,7 +1135,7 @@ public class TarjetaDatosGeneralesServiceImpl implements ITarjetaDatosGeneralesS
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 
 		// selecciona max de idpersona
-		comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+		comboItems = cenPersonaExtendsMapper.selectMaxIdPersona(usuario.getIdinstitucion().toString());
 
 		if (!comboItems.isEmpty()) {
 			record.setIdpersona(Long.valueOf(comboItems.get(0).getValue()));

@@ -17,7 +17,7 @@ public class CenGruposclienteClienteSqlExtendsProvider extends CenGruposclienteC
 		SQL sql = new SQL();
 		
 		sql.INSERT_INTO("CEN_GRUPOSCLIENTE_CLIENTE");
-		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona)");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona  where idpersona like '" + idInstitucion + "' || '%' )");
 		sql.VALUES("IDINSTITUCION", idInstitucion);
 		if(!grupo.equals("")) {
 			sql.VALUES("IDGRUPO", "'" +grupo + "'");

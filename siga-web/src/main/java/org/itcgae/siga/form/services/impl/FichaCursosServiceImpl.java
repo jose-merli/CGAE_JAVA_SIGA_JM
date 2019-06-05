@@ -554,7 +554,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 						CenPersona nuevaPersona = new CenPersona();
 						List<ComboItem> comboItems = new ArrayList<ComboItem>();
-						comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+						comboItems = cenPersonaExtendsMapper.selectMaxIdPersona(usuario.getIdinstitucion().toString());
 						idPersona = Long.valueOf(comboItems.get(0).getValue()) + 1;
 
 						nuevaPersona.setApellidos1(formadorCursoItem.getApellidos());
