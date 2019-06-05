@@ -4,14 +4,17 @@ import org.apache.ibatis.jdbc.SQL;
 
 public class ConClaseComunicacionesExtendsSqlProvider {
 	
-	public String selectClaseComunicaciones (){
+	public String selectClaseComunicaciones (String idLenguaje){
 		
 		SQL sql = new SQL();
 		
 		sql.SELECT("IDCLASECOMUNICACION");
-		sql.SELECT("NOMBRE");
+		sql.SELECT("CAT.DESCRIPCION");
 		
-		sql.FROM("MOD_CLASECOMUNICACIONES");
+		sql.FROM("MOD_CLASECOMUNICACIONES COM");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON COM.DESCRIPCION = CAT.IDRECURSO");
+		sql.WHERE("CAT.IDLENGUAJE = '" + idLenguaje + "'");
+		sql.ORDER_BY("CAT.DESCRIPCION");
 		
 		return sql.toString();
 	}

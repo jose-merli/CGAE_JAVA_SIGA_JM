@@ -29,10 +29,14 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IPlantillasEnvioService;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenDireccionTipodireccion;
+import org.itcgae.siga.db.entities.CenDireccionTipodireccionExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenTipodireccion;
+import org.itcgae.siga.db.entities.CenTipodireccionExample;
 import org.itcgae.siga.db.entities.ConConsulta;
 import org.itcgae.siga.db.entities.ConConsultaKey;
 import org.itcgae.siga.db.entities.EnvPlantillasenvios;
@@ -46,6 +50,8 @@ import org.itcgae.siga.db.mappers.ConConsultaMapper;
 import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.ModPlantillaenvioConsultaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenDireccionTipodireccionExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenTipoDireccionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvPlantillaEnviosExtendsMapper;
@@ -86,6 +92,12 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 	
 	@Autowired
 	private ConConsultaMapper _conConsultaMapper;
+	
+	@Autowired
+	private CenDireccionTipodireccionExtendsMapper _cenDireccionTipodireccionExtendsMapper;
+	
+	@Autowired
+	private CenTipoDireccionExtendsMapper _cenTipoDireccionExtendsMapper;
 
 	@Override
 	public ComboConsultaInstitucionDTO getComboConsultas(HttpServletRequest request, String filtro) {
@@ -533,6 +545,22 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 							direccionItem.setCorreoElectronico(direccion.getCorreoelectronico());
 						if(direccion.getPaginaweb() != null)
 							direccionItem.setPaginaWeb(direccion.getPaginaweb());
+						
+						CenDireccionTipodireccionExample cenDireccionTipodireccionExample = new CenDireccionTipodireccionExample();
+						cenDireccionTipodireccionExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(direccion.getIdpersona())).andIddireccionEqualTo(Long.valueOf(direccion.getIddireccion())).andIdinstitucionEqualTo(Short.valueOf(direccion.getIdinstitucion()));
+						List<CenDireccionTipodireccion> cenDireccionTipodireccion = _cenDireccionTipodireccionExtendsMapper.selectByExample(cenDireccionTipodireccionExample);
+						
+						
+						if(!cenDireccionTipodireccion.isEmpty() && cenDireccionTipodireccion.size() > 0) {
+							String [] idTipoDireccion = new String[cenDireccionTipodireccion.size()];
+							
+							for (int i = 0; i < cenDireccionTipodireccion.size(); i++) {
+								idTipoDireccion[i] = String.valueOf(cenDireccionTipodireccion.get(i).getIdtipodireccion());
+							}
+							
+							direccionItem.setIdTipoDireccion(idTipoDireccion);
+						}
+					
 						direccionList.add(direccionItem);
 						remitente.setDireccion(direccionList);	
 					}
@@ -651,6 +679,22 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 							direccion.setFax2(item.getFax2());
 							direccion.setCorreoElectronico(item.getCorreoelectronico());
 							direccion.setPaginaWeb(item.getPaginaweb());
+							
+							CenDireccionTipodireccionExample cenDireccionTipodireccionExample = new CenDireccionTipodireccionExample();
+							cenDireccionTipodireccionExample.createCriteria().andIdpersonaEqualTo(item.getIdpersona()).andIddireccionEqualTo(item.getIddireccion()).andIdinstitucionEqualTo(item.getIdinstitucion());
+							List<CenDireccionTipodireccion> cenDireccionTipodireccion = _cenDireccionTipodireccionExtendsMapper.selectByExample(cenDireccionTipodireccionExample);
+						
+							if(!cenDireccionTipodireccion.isEmpty() && cenDireccionTipodireccion.size() > 0) {
+								String [] idTipoDireccion = new String[cenDireccionTipodireccion.size()];
+								
+								for (int i = 0; i < cenDireccionTipodireccion.size(); i++) {
+									idTipoDireccion[i] = String.valueOf(cenDireccionTipodireccion.get(i).getIdtipodireccion());
+								}
+								
+								direccion.setIdTipoDireccion(idTipoDireccion);
+							}
+							
+					
 							direccionesList.add(direccion);
 						}
 						remitente.setDireccion(direccionesList);
