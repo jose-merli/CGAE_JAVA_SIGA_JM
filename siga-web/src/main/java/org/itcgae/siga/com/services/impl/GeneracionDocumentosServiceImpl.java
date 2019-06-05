@@ -155,6 +155,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			
 			documento.setFileName(nombrefichero);
 			documento.setDatos(byteArray);
+			documento.setPathDocumento(pathfinal + nombrefichero);
 			}else {
 				documento = null;
 			}

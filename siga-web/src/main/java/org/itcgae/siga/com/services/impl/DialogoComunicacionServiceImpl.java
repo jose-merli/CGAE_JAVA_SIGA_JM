@@ -1,7 +1,11 @@
 package org.itcgae.siga.com.services.impl;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -11,7 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.ByteResponseDto;
@@ -65,12 +71,7 @@ import org.itcgae.siga.db.entities.EnvEnviosExample;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesKey;
-import org.itcgae.siga.db.entities.ModClasecomunicacionRuta;
-import org.itcgae.siga.db.entities.ModClasecomunicacionRutaExample;
 import org.itcgae.siga.db.entities.ModClasecomunicaciones;
-import org.itcgae.siga.db.entities.ModClasecomunicacionesExample;
-import org.itcgae.siga.db.entities.ModModeloPlantillaenvio;
-import org.itcgae.siga.db.entities.ModModeloPlantillaenvioKey;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
 import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
@@ -85,7 +86,6 @@ import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
-import org.itcgae.siga.db.mappers.ModClasecomunicacionRutaMapper;
 import org.itcgae.siga.db.mappers.ModClasecomunicacionesMapper;
 import org.itcgae.siga.db.mappers.ModModeloPlantillaenvioMapper;
 import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
@@ -341,10 +341,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return response;
 	}
 
-
-
+	
 	@Override
-	public ByteResponseDto descargarComunicacion(HttpServletRequest request, DialogoComunicacionItem dialogo) {
+	public ComboItem obtenerNombre(HttpServletRequest request, DialogoComunicacionItem dialogo, HttpServletResponse resp) {
 		LOGGER.info("descargarComunicacion() -> Entrada al servicio para descargar la documentación de la comunicación");
 		
 		byte [] zip = null;
@@ -358,7 +357,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		List<DatosDocumentoItem> listaFicheros = null;
 		GenerarComunicacionItem generarComunicacion = new GenerarComunicacionItem();
 		Error error = new Error();
-		
+
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -371,13 +370,111 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					generarComunicacion = generarComunicacion(dialogo,usuario, false);
 					
 					listaFicheros = generarComunicacion.getListaDocumentos();
-					if(listaFicheros != null){
-						if(listaFicheros.size() > 0) {
-							zip = WSCommons.zipBytes(listaFicheros);
-							response.setData(zip);
+					if(listaFicheros != null && listaFicheros.size() > 0){
+						if(listaFicheros.size() == 1) {
+							response.setNombre(listaFicheros.get(0).getFileName());
+						}else {
+							response.setNombre(null);
+
+						}
+					}else{
+						response.setNombre(null);
+					}				
+					
+				}catch(Exception e){
+					response.setNombre(null);
+				}			
+			}
+		}
+		
+		LOGGER.info("descargarComunicacion() -> Salida del servicio para descargar la documentación de la comunicación");
+		if(response.getNombre() != null) {
+			ComboItem combo = new ComboItem();
+			combo.setLabel(response.getNombre());
+			return combo;
+		}else {
+			return null;
+		}
+	}
+
+
+	@Override
+	public ByteResponseDto descargarComunicacion(HttpServletRequest request, DialogoComunicacionItem dialogo, HttpServletResponse resp) {
+		LOGGER.info("descargarComunicacion() -> Entrada al servicio para descargar la documentación de la comunicación");
+		
+		byte [] zip = null;
+		ByteResponseDto response = new ByteResponseDto();
+		
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		List<DatosDocumentoItem> listaFicheros = null;
+		GenerarComunicacionItem generarComunicacion = new GenerarComunicacionItem();
+		Error error = new Error();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				
+				try{
+					generarComunicacion = generarComunicacion(dialogo,usuario, false);
+					
+					listaFicheros = generarComunicacion.getListaDocumentos();
+					if(listaFicheros != null && listaFicheros.size() > 0){
+						if(listaFicheros.size() == 1) {
+//							listaFicheros.get(0)
+//							response.setData(baos.);
+							
+							String path = listaFicheros.get(0).getPathDocumento() + listaFicheros.get(0).getFileName();
+//							path += File.separator + idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
+							File file = new File(path);
+
+							// Preparar la descarga
+							FileInputStream fis = null;
+							try {
+								fis = new FileInputStream(file);
+								IOUtils.copy(fis, resp.getOutputStream());
+//								response.setData(listaFicheros.get(0).getDatos());
+								response.setNombre(listaFicheros.get(0).getFileName());
+							} catch (FileNotFoundException e) {
+								LOGGER.error("No se ha encontrado el fichero");
+								error.setCode(500);
+								error.setDescription("No se han obtenido documentos");
+								error.setMessage("No se han obtenido documentos");
+								response.setError(error);
+							} catch (IOException e1) {
+								LOGGER.error(
+										"No se han podido escribir los datos binarios de la imagen en la respuesta HttpServletResponse",
+										e1);
+								error.setCode(500);
+								error.setDescription("No se han obtenido documentos");
+								error.setMessage("No se han obtenido documentos");
+								response.setError(error);
+							} finally {
+								if (null != fis)
+									try {
+										fis.close();
+									} catch (IOException e) {
+										LOGGER.error("No se ha cerrado el archivo correctamente", e);
+										error.setCode(500);
+										error.setDescription("No se han obtenido documentos");
+										error.setMessage("No se han obtenido documentos");
+										response.setError(error);
+									}
+							}
+						
 						}else {
 //							response.setNombre(listaFicheros.get(0).getFileName().toString());
 //							response.setData(listaFicheros.get(0).getDatos());
+							zip = WSCommons.zipBytes(listaFicheros);
+							response.setData(zip);
 						}
 					}else{
 						LOGGER.debug("No se han obtenido documentos");
