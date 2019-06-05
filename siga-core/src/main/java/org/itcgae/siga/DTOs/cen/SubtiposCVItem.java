@@ -6,6 +6,7 @@ public class SubtiposCVItem {
 	Short subTipo2IdInstitucion;
 	
 	Short idtipocv;
+	String tipocvCodigoExt;
 	String tipocvDescripcion;
 	
 	Short subTipo1IdTipo;
@@ -226,5 +227,17 @@ public class SubtiposCVItem {
 	 */
 	public void setTipocvDescripcion(String tipocvDescripcion) {
 		this.tipocvDescripcion = tipocvDescripcion;
+	}
+	/**
+	 * @return the tipocvCodigoExt
+	 */
+	public String getTipocvCodigoExt() {
+		return tipocvCodigoExt;
+	}
+	/**
+	 * @param tipocvCodigoExt the tipocvCodigoExt to set
+	 */
+	public void setTipocvCodigoExt(String tipocvCodigoExt) {
+		this.tipocvCodigoExt = tipocvCodigoExt;
 	}
 }

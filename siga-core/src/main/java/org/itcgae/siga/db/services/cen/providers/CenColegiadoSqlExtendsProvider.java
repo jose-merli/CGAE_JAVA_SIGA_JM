@@ -610,7 +610,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		sql.SELECT("distinct col.IDINSTITUCION AS idInstitucion");
 		sql.SELECT("inst.abreviatura as nombre");
-		sql.SELECT("col.NCOLEGIADO as nColegiado");
+		sql.SELECT("nvl(decode(nvl(col.comunitario,0),0, col.ncolegiado, col.ncomunitario), col.ncolegiado) as nColegiado");
 		sql.FROM("CEN_COLEGIADO col");
 		sql.INNER_JOIN("CEN_INSTITUCION inst ON inst.idInstitucion = col.idInstitucion");
 		sql.WHERE("col.IDPERSONA = '" + idPersona + "'");

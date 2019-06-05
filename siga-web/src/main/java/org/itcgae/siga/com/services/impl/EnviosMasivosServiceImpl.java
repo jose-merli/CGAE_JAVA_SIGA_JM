@@ -55,6 +55,7 @@ import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.EnvCamposenvios;
 import org.itcgae.siga.db.entities.EnvCamposenviosKey;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
@@ -1160,7 +1161,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						List<EnvEnviosgrupocliente> listEnv = _envEnviosgrupoclienteMapper.selectByExample(example);
 
 						if (listEnv.size() == 0) {
-							
+
 							EnvEnviosgrupocliente etiqueta = new EnvEnviosgrupocliente();
 							etiqueta.setIdenvio(Long.valueOf(etiquetasDTO.getIdEnvio()));
 							etiqueta.setFechamodificacion(new Date());
@@ -1217,7 +1218,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
 				String fechaFormateada = sdf.format(fecha);
 
-				String fileName = fechaFormateada + "_" + file.getOriginalFilename();				
+				String fileName = fechaFormateada + "_" + file.getOriginalFilename();
 
 				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
 				// BufferedOutputStream stream = null;
@@ -1898,7 +1899,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 	}
 
 	@Override
-	public DatosDireccionesDTO obtenerDireccionesDisp(HttpServletRequest request, String idPersona) {
+	public DatosDireccionesDTO obtenerDireccionesDisp(HttpServletRequest request, String nif) {
 		LOGGER.info("obtenerDireccionesDisp() -> Entrada al servicio para obtener direcciones");
 
 		DatosDireccionesDTO response = new DatosDireccionesDTO();
@@ -1916,42 +1917,59 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
-					CenDireccionesExample example = new CenDireccionesExample();
-					example.createCriteria().andIdpersonaEqualTo(Long.valueOf(idPersona))
-							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
-					List<CenDirecciones> direcciones = _cenDireccionesMapper.selectByExample(example);
-					if (direcciones != null && direcciones.size() > 0) {
-						List<DatosDireccionesItem> direccionesList = new ArrayList<DatosDireccionesItem>();
-						for (CenDirecciones item : direcciones) {
-							DatosDireccionesItem direccion = new DatosDireccionesItem();
-							direccion.setIdPersona(item.getIdpersona().toString());
-							if (item.getIdinstitucion() != null) {
-								direccion.setIdInstitucion(item.getIdinstitucion().toString());
+
+					CenPersonaExample examplePersona = new CenPersonaExample();
+					examplePersona.createCriteria().andNifcifEqualTo(nif);
+
+					List<CenPersona> personas = _cenPersonaMapper.selectByExample(examplePersona);
+
+					if (null != personas && personas.size() > 0) {
+						CenPersona destinatario = personas.get(0);
+						
+						CenDireccionesExample example = new CenDireccionesExample();
+						example.createCriteria().andIdpersonaEqualTo(destinatario.getIdpersona())
+								.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
+						
+						List<CenDirecciones> direcciones = _cenDireccionesMapper.selectByExample(example);
+						if (direcciones != null && direcciones.size() > 0) {
+							List<DatosDireccionesItem> direccionesList = new ArrayList<DatosDireccionesItem>();
+							for (CenDirecciones item : direcciones) {
+								DatosDireccionesItem direccion = new DatosDireccionesItem();
+								direccion.setIdPersona(item.getIdpersona().toString());
+								if (item.getIdinstitucion() != null) {
+									direccion.setIdInstitucion(item.getIdinstitucion().toString());
+								}
+								if (item.getIddireccion() != null) {
+									direccion.setIdDireccion(item.getIddireccion().toString());
+								}
+								direccion.setDomicilio(item.getDomicilio());
+								direccion.setIdPoblacion(item.getIdpoblacion());
+								direccion.setIdProvincia(item.getIdprovincia());
+								direccion.setIdPais(item.getIdpais());
+								direccion.setCodigoPostal(item.getCodigopostal());
+								direccion.setTelefono(item.getTelefono1());
+								direccion.setTelefono2(item.getTelefono2());
+								direccion.setMovil(item.getMovil());
+								direccion.setFax(item.getFax1());
+								direccion.setFax2(item.getFax2());
+								direccion.setCorreoElectronico(item.getCorreoelectronico());
+								direccion.setPaginaWeb(item.getPaginaweb());
+								direccionesList.add(direccion);
 							}
-							if (item.getIddireccion() != null) {
-								direccion.setIdDireccion(item.getIddireccion().toString());
-							}
-							direccion.setDomicilio(item.getDomicilio());
-							direccion.setIdPoblacion(item.getIdpoblacion());
-							direccion.setIdProvincia(item.getIdprovincia());
-							direccion.setIdPais(item.getIdpais());
-							direccion.setCodigoPostal(item.getCodigopostal());
-							direccion.setTelefono(item.getTelefono1());
-							direccion.setTelefono2(item.getTelefono2());
-							direccion.setMovil(item.getMovil());
-							direccion.setFax(item.getFax1());
-							direccion.setFax2(item.getFax2());
-							direccion.setCorreoElectronico(item.getCorreoelectronico());
-							direccion.setPaginaWeb(item.getPaginaweb());
-							direccionesList.add(direccion);
+							response.setDatosDireccionesItem(direccionesList);
+						} else {
+							Error error = new Error();
+							error.setCode(400);
+							error.setDescription("No existen direcciones disponibles");
+							response.setError(error);
 						}
-						response.setDatosDireccionesItem(direccionesList);
-					} else {
+					}else {
 						Error error = new Error();
 						error.setCode(400);
-						error.setDescription("No existen direcciones disponibles");
+						error.setDescription("No existe persona");
 						response.setError(error);
 					}
+
 				} catch (Exception e) {
 					Error error = new Error();
 					error.setCode(500);
