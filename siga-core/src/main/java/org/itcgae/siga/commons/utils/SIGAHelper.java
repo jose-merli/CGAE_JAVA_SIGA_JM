@@ -29,12 +29,13 @@ public class SIGAHelper {
 			perms.add(PosixFilePermission.OTHERS_WRITE);
 			perms.add(PosixFilePermission.OTHERS_EXECUTE);
 			try {
-				Files.setPosixFilePermissions(file.toPath(), perms);
+				
 				File parentFile = file.getParentFile();
 				if (parentFile != null && parentFile.exists()) {
 					LOGGER.debug("Cambiando los permisos del padre: " + parentFile.getAbsolutePath());
 					addPerm777(parentFile);
 				}
+				Files.setPosixFilePermissions(file.toPath(), perms);
 			} catch (Exception e) {
 				LOGGER.warn("Error al cambiar los permisos del fichero " + file.getAbsolutePath(), e);
 			}
