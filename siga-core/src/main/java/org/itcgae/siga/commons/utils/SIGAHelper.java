@@ -36,4 +36,40 @@ public class SIGAHelper {
 				
 		}
 	}
+	
+	
+	public static String quitarEtiquetas(String sentencia) {	
+		if (sentencia != null) {
+			sentencia = sentencia.replaceAll("<SELECT>", " ");
+			sentencia = sentencia.replaceAll("</SELECT>", " ");
+			sentencia = sentencia.replaceAll("<FROM>", " ");
+			sentencia = sentencia.replaceAll("</FROM>", " ");
+			sentencia = sentencia.replaceAll("<JOIN>", " ");
+			sentencia = sentencia.replaceAll("</JOIN>", " ");
+			sentencia = sentencia.replaceAll("<OUTERJOIN>", " ");
+			sentencia = sentencia.replaceAll("</OUTERJOIN>", " ");
+			sentencia = sentencia.replaceAll("<INNERJOIN>", " ");
+			sentencia = sentencia.replaceAll("</INNERJOIN>", " ");
+			sentencia = sentencia.replaceAll("<LEFTJOIN>", " ");
+			sentencia = sentencia.replaceAll("</LEFTJOIN>", " ");
+			sentencia = sentencia.replaceAll("<WHERE>", " ");
+			sentencia = sentencia.replaceAll("</WHERE>", " ");
+			sentencia = sentencia.replaceAll("<ORDERBY>", " ");
+			sentencia = sentencia.replaceAll("</ORDERBY>", " ");
+			sentencia = sentencia.replaceAll("<ORDER BY>", " ");
+			sentencia = sentencia.replaceAll("</ORDER BY>", " ");
+			sentencia = sentencia.replaceAll("<GROUPBY>", " ");
+			sentencia = sentencia.replaceAll("</GROUPBY>", " ");
+			sentencia = sentencia.replaceAll("<GROUP BY>", " ");
+			sentencia = sentencia.replaceAll("</GROUP BY>", " ");
+			sentencia = sentencia.replaceAll("<HAVING>", " ");
+			sentencia = sentencia.replaceAll("</HAVING>", " ");
+			sentencia = sentencia.replaceAll("<UNION>", " ");
+			sentencia = sentencia.replaceAll("<UNION>", " ");
+			sentencia = sentencia.replaceAll("<UNIONALL>", " ");
+			sentencia = sentencia.replaceAll("</UNIONALL>", " ");
+		}
+		
+		return sentencia;
+	}
 }

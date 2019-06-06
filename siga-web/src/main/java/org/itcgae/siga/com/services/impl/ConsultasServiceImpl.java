@@ -45,6 +45,7 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.commons.utils.SigaExceptions;
 import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -943,35 +944,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	@Override
 	public String quitarEtiquetas(String sentencia) {
-		
-		sentencia = sentencia.replaceAll("<SELECT>", " ");
-		sentencia = sentencia.replaceAll("</SELECT>", " ");
-		sentencia = sentencia.replaceAll("<FROM>", " ");
-		sentencia = sentencia.replaceAll("</FROM>", " ");
-		sentencia = sentencia.replaceAll("<JOIN>", " ");
-		sentencia = sentencia.replaceAll("</JOIN>", " ");
-		sentencia = sentencia.replaceAll("<OUTERJOIN>", " ");
-		sentencia = sentencia.replaceAll("</OUTERJOIN>", " ");
-		sentencia = sentencia.replaceAll("<INNERJOIN>", " ");
-		sentencia = sentencia.replaceAll("</INNERJOIN>", " ");
-		sentencia = sentencia.replaceAll("<LEFTJOIN>", " ");
-		sentencia = sentencia.replaceAll("</LEFTJOIN>", " ");
-		sentencia = sentencia.replaceAll("<WHERE>", " ");
-		sentencia = sentencia.replaceAll("</WHERE>", " ");
-		sentencia = sentencia.replaceAll("<ORDERBY>", " ");
-		sentencia = sentencia.replaceAll("</ORDERBY>", " ");
-		sentencia = sentencia.replaceAll("<ORDER BY>", " ");
-		sentencia = sentencia.replaceAll("</ORDER BY>", " ");
-		sentencia = sentencia.replaceAll("<GROUPBY>", " ");
-		sentencia = sentencia.replaceAll("</GROUPBY>", " ");
-		sentencia = sentencia.replaceAll("<HAVING>", " ");
-		sentencia = sentencia.replaceAll("</HAVING>", " ");
-		sentencia = sentencia.replaceAll("<UNION>", " ");
-		sentencia = sentencia.replaceAll("<UNION>", " ");
-		sentencia = sentencia.replaceAll("<UNIONALL>", " ");
-		sentencia = sentencia.replaceAll("</UNIONALL>", " ");
-		
-		return sentencia;
+		return SIGAHelper.quitarEtiquetas(sentencia);
 	}
 	
 	public boolean comprobarCamposDestinarios (String sentencia){
