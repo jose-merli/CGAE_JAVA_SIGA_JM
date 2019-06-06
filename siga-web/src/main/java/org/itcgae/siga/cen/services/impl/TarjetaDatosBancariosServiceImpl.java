@@ -41,6 +41,7 @@ import org.itcgae.siga.DTOs.cen.DatosBancariosItem;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchAnexosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
+import org.itcgae.siga.DTOs.cen.FicheroDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDownloadDTO;
 import org.itcgae.siga.DTOs.cen.MandatosItem;
@@ -83,7 +84,6 @@ import org.itcgae.siga.db.entities.GenRecursosExample;
 import org.itcgae.siga.db.mappers.AdmConfigMapper;
 import org.itcgae.siga.db.mappers.CenAnexosCuentasbancariasMapper;
 import org.itcgae.siga.db.mappers.CenMandatosCuentasbancariasMapper;
-import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.mappers.GenRecursosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -99,7 +99,6 @@ import org.itcgae.siga.gen.services.IAuditoriaCenHistoricoService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -2228,14 +2227,15 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 	}
 
 	@Override
-	public ComboItem downloadFile(MandatosDownloadDTO mandatosDownloadDTO, HttpServletRequest request,
+	public FicheroDTO downloadFile(MandatosDownloadDTO mandatosDownloadDTO, HttpServletRequest request,
 			HttpServletResponse response) {
 
 		CenMandatosCuentasbancarias cenMandatosCuentasbancarias = new CenMandatosCuentasbancarias();
 		CenAnexosCuentasbancarias cenAnexosCuentasbancarias = new CenAnexosCuentasbancarias();
 		GenFichero genFichero = new GenFichero();
 		Long idFichero = null;
-		ComboItem comboItem = new ComboItem();
+		FicheroDTO ficheroDTO = new FicheroDTO();
+		byte[] documento = null; 
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -2277,18 +2277,23 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 		genFicheroKey.setIdfichero(idFichero);
 		genFicheroKey.setIdinstitucion(idInstitucion);
 		genFichero = genFicheroExtendsMapper.selectByPrimaryKey(genFicheroKey);
+		String filename = "";
 
 		if (null != genFichero) {
 			String pathAbsolute = genFichero.getDirectorio();
 			pathAbsolute += "." + genFichero.getExtension();
 
 			// File file = new File("C://IISIGA/anexos/2006002472110.pdf");
+			
+			String [] path = pathAbsolute.split("/");
+			filename = path[path.length - 1]; 
 			File file = new File(pathAbsolute);
 			FileInputStream fis = null;
+
 			try {
 				fis = new FileInputStream(file);
-				IOUtils.copy(fis, response.getOutputStream());
-
+				documento = IOUtils.toByteArray(fis);
+				//documento = doc;
 			} catch (FileNotFoundException e) {
 				LOGGER.error("No se ha encontrado el fichero", e);
 
@@ -2304,7 +2309,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 						LOGGER.error("No se ha cerrado el archivo correctamente", e);
 					}
 			}
-			return comboItem;
+			ficheroDTO.setFile(documento);
+			ficheroDTO.setFileName(filename);
+			return ficheroDTO;
 
 		} else {
 			return null;
