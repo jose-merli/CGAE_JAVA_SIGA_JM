@@ -507,7 +507,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		CenCliente record = new CenCliente();
 
 		record.setIdpersona(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()));
-		record.setIdinstitucion(Short.valueOf(tarjetaIntegrantesCreateDTO.getIdInstitucionIntegrante()));
+		record.setIdinstitucion(Short.valueOf(tarjetaIntegrantesCreateDTO.getColegio()));
 		record.setFechaalta(new Date());
 		record.setCaracter("P");
 		record.setPublicidad(SigaConstants.DB_FALSE);
