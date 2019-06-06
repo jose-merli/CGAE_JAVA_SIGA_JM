@@ -1466,7 +1466,7 @@ public class FichaDatosGeneralesServiceImpl implements IFichaDatosGeneralesServi
 					if (null != personas && personas.size() > 0) {
 						idPersona = personas.get(0).getIdpersona();
 					} else {
-						comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+						comboItems = cenPersonaExtendsMapper.selectMaxIdPersona(usuario.getIdinstitucion().toString());
 						idPersona = Long.valueOf(comboItems.get(0).getValue());
 					}
 					noColegiadoItem.setIdPersona(String.valueOf(idPersona));

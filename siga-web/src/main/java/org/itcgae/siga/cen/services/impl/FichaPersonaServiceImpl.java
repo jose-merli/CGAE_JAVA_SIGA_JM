@@ -252,7 +252,7 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			//int response = cenPersonaExtendsMapper.insertSelectiveForPersonFile(crearPersonaDTO, usuario);
 			
 			
-			comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+			comboItems = cenPersonaExtendsMapper.selectMaxIdPersona(usuario.getIdinstitucion().toString());
 			Long nuevoIdPersona = Long.valueOf(comboItems.get(0).getValue()) + 1; 
 			CenPersona record = new CenPersona();
 			record.setApellidos1(crearPersonaDTO.getApellido1());
@@ -272,7 +272,7 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			cenPersonaExtendsMapper.insert(record);
 			
 			// obtenemos su idpersona
-			comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
+			comboItems = cenPersonaExtendsMapper.selectMaxIdPersona(usuario.getIdinstitucion().toString());
 
 			//comboItems = cenPersonaExtendsMapper.selectMaxIdPersona();
 			String maxIdPersona = comboItems.get(0).getValue();

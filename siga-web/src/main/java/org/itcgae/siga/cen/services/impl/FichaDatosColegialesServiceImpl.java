@@ -1090,43 +1090,44 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 								tipoCensoWeb = cenTipoDireccion;
 							}
 						}
-
-						CenDirecciones direccionCensoWeb = null;
-						for (CenDirecciones cenDireccion : cenDireccionesList) {
-							if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
-								direccionCensoWeb = cenDireccion;
+						if (null != tipoCensoWeb) {
+							CenDirecciones direccionCensoWeb = null;
+							for (CenDirecciones cenDireccion : cenDireccionesList) {
+								if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
+									direccionCensoWeb = cenDireccion;
+								}
 							}
-						}
-
-						// Si hay que añadir algun tipo de direccion lo añadimos
-						if (null != addTipoDirecciones && addTipoDirecciones.size() > 0) {
-
-							for (Short tipo : addTipoDirecciones) {
-								CenDireccionTipodireccion cenDireccionTipodireccion = new CenDireccionTipodireccion();
-								cenDireccionTipodireccion.setFechamodificacion(new Date());
-								cenDireccionTipodireccion.setIdinstitucion(direccionCensoWeb.getIdinstitucion());
-								cenDireccionTipodireccion.setIdpersona(Long.valueOf(colegiadoItem.getIdPersona()));
-								cenDireccionTipodireccion.setUsumodificacion(usuario.getIdusuario());
-								cenDireccionTipodireccion.setIddireccion(direccionCensoWeb.getIddireccion());
-								cenDireccionTipodireccion.setIdtipodireccion(tipo);
-
-								cenDireccionTipodireccionExtendsMapper.insert(cenDireccionTipodireccion);
-
+	
+							// Si hay que añadir algun tipo de direccion lo añadimos
+							if (null != addTipoDirecciones && addTipoDirecciones.size() > 0) {
+	
+								for (Short tipo : addTipoDirecciones) {
+									CenDireccionTipodireccion cenDireccionTipodireccion = new CenDireccionTipodireccion();
+									cenDireccionTipodireccion.setFechamodificacion(new Date());
+									cenDireccionTipodireccion.setIdinstitucion(direccionCensoWeb.getIdinstitucion());
+									cenDireccionTipodireccion.setIdpersona(Long.valueOf(colegiadoItem.getIdPersona()));
+									cenDireccionTipodireccion.setUsumodificacion(usuario.getIdusuario());
+									cenDireccionTipodireccion.setIddireccion(direccionCensoWeb.getIddireccion());
+									cenDireccionTipodireccion.setIdtipodireccion(tipo);
+	
+									cenDireccionTipodireccionExtendsMapper.insert(cenDireccionTipodireccion);
+	
+								}
 							}
-						}
-
-						// Si hay que añadir algun tipo de direccion lo añadimos
-						if (null != addTipoDireccionesPreferentes && addTipoDireccionesPreferentes.size() > 0) {
-							String addPref = direccionCensoWeb.getPreferente();
-							for (String tipoPreferente : addTipoDireccionesPreferentes) {
-								addPref += tipoPreferente;
+	
+							// Si hay que añadir algun tipo de direccion lo añadimos
+							if (null != addTipoDireccionesPreferentes && addTipoDireccionesPreferentes.size() > 0) {
+								String addPref = direccionCensoWeb.getPreferente();
+								for (String tipoPreferente : addTipoDireccionesPreferentes) {
+									addPref += tipoPreferente;
+								}
+	
+								direccionCensoWeb.setPreferente(addPref);
+								direccionCensoWeb.setUsumodificacion(usuario.getIdusuario());
+								direccionCensoWeb.setFechamodificacion(new Date());
+	
+								cenDireccionesExtendsMapper.updateByPrimaryKey(direccionCensoWeb);
 							}
-
-							direccionCensoWeb.setPreferente(addPref);
-							direccionCensoWeb.setUsumodificacion(usuario.getIdusuario());
-							direccionCensoWeb.setFechamodificacion(new Date());
-
-							cenDireccionesExtendsMapper.updateByPrimaryKey(direccionCensoWeb);
 						}
 					}
 

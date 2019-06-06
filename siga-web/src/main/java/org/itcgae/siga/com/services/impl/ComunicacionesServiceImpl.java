@@ -180,10 +180,11 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			AdmUsuarios usuario = usuarios.get(0);
 			
 			if (null != usuarios && usuarios.size() > 0) {
 
-				comboItems = _conClaseComunicacionExtendsMapper.selectTipoClaseComunicacion();
+				comboItems = _conClaseComunicacionExtendsMapper.selectTipoClaseComunicacion(usuario.getIdlenguaje());
 				
 				
 				comboDTO.setCombooItems(comboItems);

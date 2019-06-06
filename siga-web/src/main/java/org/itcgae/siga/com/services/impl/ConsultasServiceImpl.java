@@ -231,9 +231,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			
 			if (null != usuarios && usuarios.size() > 0) {
-
+				AdmUsuarios usuario = usuarios.get(0);
 				
-				comboItems = _conClaseComunicacionExtendsMapper.selectTipoClaseComunicacion();
+				comboItems = _conClaseComunicacionExtendsMapper.selectTipoClaseComunicacion(usuario.getIdlenguaje());
 				
 				
 				comboDTO.setCombooItems(comboItems);

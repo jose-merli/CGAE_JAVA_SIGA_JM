@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.itcgae.siga.DTOs.com.ByteResponseDto;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
@@ -21,6 +22,7 @@ import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.ResponseDateDTO;
 import org.itcgae.siga.DTOs.com.TipoEnvioDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,11 +86,11 @@ public class DialogoComunicacionController {
 	}
 	
 	@RequestMapping(value = "/descargar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InputStreamResource> descargar(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo) {
+	ResponseEntity<InputStreamResource> descargar(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo, HttpServletResponse resp) {
 		
 		ByteResponseDto response = null;
 		
-		response = _dialogoComunicacionService.descargarComunicacion(request, dialogo);
+		response = _dialogoComunicacionService.descargarComunicacion(request, dialogo, resp);
 		
 		byte[] zip = null;
 		if(response.getData() != null) {
@@ -110,6 +112,20 @@ public class DialogoComunicacionController {
 			
 			return ResponseEntity.ok().headers(headers).contentLength(zip.length)
 					.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+		}else {
+			return null;
+		}
+	}
+	
+	@RequestMapping(value = "/nombredoc",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboItem> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo, HttpServletResponse resp) {
+		
+		ComboItem combo = new ComboItem();
+		
+		combo = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
+		
+		if(combo != null) {
+			return new ResponseEntity<ComboItem>(combo, HttpStatus.OK);
 		}else {
 			return null;
 		}

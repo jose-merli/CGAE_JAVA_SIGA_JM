@@ -33,7 +33,7 @@ public class ModPlantillaDocumentoExtendsSqlProvider {
 		
 		sql.FROM("MOD_PLANTILLADOCUMENTO plantillaDocumento");	
 		sql.INNER_JOIN("MOD_MODELO_PLANTILLADOCUMENTO modeloPlantillaDocumento ON modeloPlantillaDocumento.IDPLANTILLADOCUMENTO = plantillaDocumento.IDPLANTILLADOCUMENTO AND modeloPlantillaDocumento.IDMODELOCOMUNICACION = " + idModeloComunicacion);
-		sql.WHERE("plantillaDocumento.idioma = '" + idLenguaje + "' AND modeloPlantillaDocumento.FECHABAJA IS NULL");
+		sql.WHERE("(plantillaDocumento.idioma = '" + idLenguaje + "' or modeloPlantillaDocumento.Generacionexcel = 1) AND modeloPlantillaDocumento.FECHABAJA IS NULL");
 		
 		return sql.toString();
 	}

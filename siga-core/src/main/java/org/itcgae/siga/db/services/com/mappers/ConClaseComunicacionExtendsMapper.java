@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service;
 public interface ConClaseComunicacionExtendsMapper {
 
 	@SelectProvider(type = ConClaseComunicacionesExtendsSqlProvider.class, method = "selectClaseComunicaciones")
-	@Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+	@Results({@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDCLASECOMUNICACION", property = "value", jdbcType = JdbcType.VARCHAR)
 	})
-	List<ComboItem> selectTipoClaseComunicacion();
+	List<ComboItem> selectTipoClaseComunicacion(String idLenguaje);
 	
 	@SelectProvider(type = ConClaseComunicacionesExtendsSqlProvider.class, method = "selectClaseComunicacionesByModulo")
 	@Results({@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),

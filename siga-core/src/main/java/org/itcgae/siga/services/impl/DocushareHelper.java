@@ -6,24 +6,17 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
 import org.itcgae.siga.DTOs.adm.ParametroRequestDTO;
 import org.itcgae.siga.DTOs.cen.DocuShareObjectVO;
 import org.itcgae.siga.DTOs.cen.StringDTO;
-import org.itcgae.siga.commons.utils.ReadProperties;
-import org.itcgae.siga.commons.utils.SIGAReferences;
 import org.itcgae.siga.db.entities.GenParametros;
-import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.entities.GenProperties;
 import org.itcgae.siga.db.entities.GenPropertiesExample;
-import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
-import org.itcgae.siga.security.UserTokenUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +38,7 @@ import com.xerox.docushare.object.DSDocument;
 import com.xerox.docushare.property.DSLinkDesc;
 import com.xerox.docushare.property.DSProperties;
 
+@Service
 public class DocushareHelper {
 
 	private static Logger log = LoggerFactory.getLogger(DocushareHelper.class);
@@ -53,6 +47,7 @@ public class DocushareHelper {
 	private GenParametrosExtendsMapper genParametrosMapper;
 	@Autowired
 	private GenPropertiesMapper genPropertiesMapper;
+	
 	private static boolean MODO_DEBUG_LOCAL = false;
 	private static String DOCUSHARE_HOST = "DOCUSHARE_HOST";
 	private static String DOCUSHARE_PORT = "DOCUSHARE_PORT";
@@ -67,24 +62,12 @@ public class DocushareHelper {
 	private static String ID_DOCUSHARE_CENSO = "ID_DOCUSHARE_CENSO";
 	private static String ID_DOCUSHARE_NOCOLEGIADO = "ID_DOCUSHARE_NOCOLEGIADO";
 	private static String PATH_DOCUSHARE_DEBUG = "/ds";
-	private short idInstitucion;
 	
 	private DSServer server;
 	private DSSession dssession;
 	private String antPath;
 	
-	public DocushareHelper(short idInstitucion) {
-		super();
-		this.idInstitucion = idInstitucion;
-	}
-
-	// Para que coja el idioma español !!! Debería cogerlo desde el bundle de
-	// xmlbeans pero no lo coge
-	public void setIdInstitucion(short idInstitucion) {
-		this.idInstitucion = idInstitucion;
-	}
-
-	private void createSession() throws Exception {
+	private void createSession(short idinstitucion) throws Exception {
 
 		String datosConexion = null;
 		try {
@@ -107,7 +90,7 @@ public class DocushareHelper {
 				String parametro = (String) iterator.next();
 				GenParametros param = new GenParametros();
 				ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
-				parametroRequestDTO.setIdInstitucion(String.valueOf(this.idInstitucion));
+				parametroRequestDTO.setIdInstitucion(String.valueOf(idinstitucion));
 				parametroRequestDTO.setModulo("GEN");
 				parametroRequestDTO.setParametrosGenerales(parametro);
 				StringDTO paramRequest = genParametrosMapper.getParameterFunction(0, parametroRequestDTO );
@@ -141,7 +124,7 @@ public class DocushareHelper {
 
 				datosConexion = String.format(
 						"Parámetros de conexión docushare del colegio %s: HOST:'%s', PORT:'%s', DOMAIN:'%s', USER:'%s', PASSWORD:'%s'",
-						this.idInstitucion, host, port, domain, user, password);
+						idinstitucion, host, port, domain, user, password);
 
 				log.info(datosConexion);
 
@@ -151,16 +134,16 @@ public class DocushareHelper {
 				} catch (Exception e) {
 					String error = String.format(
 							"El parámetro %s no está configurado correctamente para el colegio %s. Comprobar que es un número válido.",
-							DOCUSHARE_PORT, this.idInstitucion);
+							DOCUSHARE_PORT, idinstitucion);
 					log.error(error);
 				}
 				String msg = "HOST: " + host + "PORT: " + iPort;
 
 				log.info(msg);
 				server = DSFactory.createServer(host, iPort);
-				log.info("Creado server con Docushare correctamente para el colegio " + this.idInstitucion);
+				log.info("Creado server con Docushare correctamente para el colegio " + idinstitucion);
 				dssession = server.createSession(domain, user, password);
-				log.info("Creada session con Docushare correctamente para el colegio " + this.idInstitucion);
+				log.info("Creada session con Docushare correctamente para el colegio " + idinstitucion);
 
 			}
 
@@ -185,13 +168,13 @@ public class DocushareHelper {
 	 * @return
 	 * @throws Exception
 	 */
-	private String buscaCollection(String pathRecibido, String title) throws Exception {
+	private String buscaCollection(short idinstitucion, String pathRecibido, String title) throws Exception {
 		if (MODO_DEBUG_LOCAL) {
 			return buscaCollectionMODO_DEBUG_LOCAL(PATH_DOCUSHARE_DEBUG, title);
 		}
 		String idColl = null;
 
-		createSession();
+		createSession(idinstitucion);
 
 		try {
 			// GenParametrosService genParametrosService = (GenParametrosService)
@@ -207,7 +190,7 @@ public class DocushareHelper {
 				String parametro = (String) iterator.next();
 				GenParametros param = new GenParametros();
 				ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
-				parametroRequestDTO.setIdInstitucion(String.valueOf(this.idInstitucion));
+				parametroRequestDTO.setIdInstitucion(String.valueOf(idinstitucion));
 				parametroRequestDTO.setModulo("GEN");
 				parametroRequestDTO.setParametrosGenerales(parametro);
 				StringDTO paramRequest = genParametrosMapper.getParameterFunction(0, parametroRequestDTO );
@@ -234,23 +217,22 @@ public class DocushareHelper {
 		} catch (Exception e) {
 			String mensaje = String.format(
 					"Se ha producido un error al buscar la collection para el colegio %s, pathRecibido = '%s' y title = '%s'",
-					this.idInstitucion, pathRecibido, title);
+					idinstitucion, pathRecibido, title);
 			log.error(mensaje, e);
 
 		} finally {
-			close();
+			close(idinstitucion);
 		}
 
 		return idColl;
 	}
 
 	public String buscaCollectionCenso(String title, short idInstitucion) throws Exception {
-		this.idInstitucion = idInstitucion;
-		return buscaCollection(PATH_DOCUSHARE_CENSO, title);
+		return buscaCollection(idInstitucion, PATH_DOCUSHARE_CENSO, title);
 	}
 
-	public String buscaCollectionNoColegiado(String title) throws Exception {
-		return buscaCollection(PATH_DOCUSHARE_NOCOLEGIADO, title);
+	public String buscaCollectionNoColegiado(String title, short idinstitucion) throws Exception {
+		return buscaCollection(idinstitucion, PATH_DOCUSHARE_NOCOLEGIADO, title);
 	}
 
 	private String buscaCollectionMODO_DEBUG_LOCAL(String parent, String title) {
@@ -281,7 +263,7 @@ public class DocushareHelper {
 	 * @return
 	 * @throws SIGAServiceException
 	 */
-	private List<DocuShareObjectVO> getContenidoCollectionMODO_DEBUG_LOCAL(String identificadorDS) throws Exception {
+	private List<DocuShareObjectVO> getContenidoCollectionMODO_DEBUG_LOCAL(short idinstitucion, String identificadorDS) throws Exception {
 		List<DocuShareObjectVO> datos = new ArrayList<DocuShareObjectVO>();
 		try {
 			File file = new File(identificadorDS);
@@ -332,7 +314,7 @@ public class DocushareHelper {
 		} catch (Exception e) {
 			String mensaje = String.format(
 					"Se ha producido un error al obtener el contenido de la coleccion con identificadorDS = '%s' para el colegio %s",
-					identificadorDS, this.idInstitucion);
+					identificadorDS, idinstitucion);
 			log.error(mensaje, e);
 
 		}
@@ -345,16 +327,16 @@ public class DocushareHelper {
 	 * 
 	 * @throws DSException
 	 */
-	private void close() throws Exception {
-		log.info("Cerrando conexión con Docushare para el colegio " + this.idInstitucion + "...");
+	private void close(short idinstitucion) throws Exception {
+		log.info("Cerrando conexión con Docushare para el colegio " + idinstitucion + "...");
 		try {
 			if (server != null) {
 				server.close();
-				log.debug("Conexión cerrada con Docushare para el colegio " + this.idInstitucion);
+				log.debug("Conexión cerrada con Docushare para el colegio " + idinstitucion);
 			}
 		} catch (Exception e) {
 			String mensaje = String.format("Se ha producido un error al cerrar la conexión para el colegio %s",
-					this.idInstitucion);
+					idinstitucion);
 			log.error(mensaje, e);
 
 		}
@@ -368,31 +350,31 @@ public class DocushareHelper {
 	 * @throws SIGAServiceException
 	 * @throws Exception
 	 */
-	public List<DocuShareObjectVO> getContenidoCollection(String collection, String antPath) throws Exception {
+	public List<DocuShareObjectVO> getContenidoCollection(short idinstitucion, String collection, String antPath) throws Exception {
 
 		if (collection == null || collection.trim().equals("")) {
 			throw new IllegalArgumentException("El nombre de la colección no puede ser nula o vacía");
 		}
 		if (MODO_DEBUG_LOCAL) {
-			return getContenidoCollectionMODO_DEBUG_LOCAL(collection);
+			return getContenidoCollectionMODO_DEBUG_LOCAL(idinstitucion, collection);
 		}
 
 		List<DocuShareObjectVO> list = new ArrayList<DocuShareObjectVO>();
 
 		try {
-			createSession();
-			log.debug("Recuperando contenido collection " + collection + " del colegio " + this.idInstitucion);
+			createSession(idinstitucion);
+			log.debug("Recuperando contenido collection " + collection + " del colegio " + idinstitucion);
 
 			DSHandle dsHandle = new DSHandle(collection);
 			DSCollection dsCollectionParent = (DSCollection) dssession.getObject(dsHandle);
 
 			if (dsCollectionParent != null) {
 				log.debug("Se ha encontrado la collection " + dsCollectionParent.getHandle() + " para el colegio "
-						+ this.idInstitucion);
+						+ idinstitucion);
 				DSObjectIterator it = dsCollectionParent.children(null);
 				if (it != null) {
 					log.debug("Número de hijos de la collection " + collection + ": "
-							+ dsCollectionParent.getChildCount() + " del colegio " + this.idInstitucion);
+							+ dsCollectionParent.getChildCount() + " del colegio " + idinstitucion);
 					List<DocuShareObjectVO> listDir = new ArrayList<DocuShareObjectVO>();
 					List<DocuShareObjectVO> listArch = new ArrayList<DocuShareObjectVO>();
 
@@ -401,7 +383,7 @@ public class DocushareHelper {
 					while (it.hasNext()) {
 						dsObject = it.nextObject();
 						log.debug("Encontrado hijo \"" + dsObject.getHandle() + "\" dentro de la collection "
-								+ collection + " del colegio " + this.idInstitucion);
+								+ collection + " del colegio " + idinstitucion);
 
 						if (dsObject instanceof DSCollection) {
 							DocuShareObjectVO dsObj = new DocuShareObjectVO();
@@ -448,11 +430,11 @@ public class DocushareHelper {
 		} catch (Exception e) {
 			String mensaje = String.format(
 					"Se ha producido un error al obtener el contenido de la coleccion con identificadorDS = '%s' para el colegio %s",
-					collection, this.idInstitucion);
+					collection, idinstitucion);
 			log.error(mensaje, e);
 			throw new Exception(mensaje, e);
 		} finally {
-			close();
+			close(idinstitucion);
 		}
 
 		return list;
@@ -465,7 +447,7 @@ public class DocushareHelper {
 	 * @return
 	 * @throws Exception
 	 */
-	public File getDocument(String title) throws Exception {
+	public File getDocument(short idinstitucion, String title) throws Exception {
 
 		if (MODO_DEBUG_LOCAL) {
 			return getDocumentMODO_DEBUG_LOCAL(title);
@@ -483,7 +465,7 @@ public class DocushareHelper {
 		File file = null;
 
 		try {
-			createSession();
+			createSession(idinstitucion);
 
 			DSDocument dsDocument = (DSDocument) dssession.getObject(new DSHandle(title));
 
@@ -515,11 +497,11 @@ public class DocushareHelper {
 			// "message.docushare.error.obtenerDocumento"
 			String mensaje = String.format(
 					"Se ha producido un error al obtener el documento con identificador = '%s' para el colegio %s",
-					title, this.idInstitucion);
+					title, idinstitucion);
 			log.error(mensaje, e);
 
 		} finally {
-			close();
+			close(idinstitucion);
 		}
 		return file;
 
@@ -532,8 +514,8 @@ public class DocushareHelper {
 	 * @throws SIGAException
 	 * @throws ClsExceptions
 	 */
-	public String createCollectionNoColegiado(String collectionTitle, String collectionSummary) throws Exception {
-		return createCollection(ID_DOCUSHARE_NOCOLEGIADO, collectionTitle, collectionSummary);
+	public String createCollectionNoColegiado(short idinstitucion, String collectionTitle, String collectionSummary) throws Exception {
+		return createCollection(idinstitucion, ID_DOCUSHARE_NOCOLEGIADO, collectionTitle, collectionSummary);
 	}	
 
 	/**
@@ -545,8 +527,8 @@ public class DocushareHelper {
 	 * @throws SIGAException
 	 * @throws ClsExceptions
 	 */
-	public String createCollectionCenso(String collectionTitle, String collectionSummary) throws Exception {
-		return createCollection(ID_DOCUSHARE_CENSO, collectionTitle, collectionSummary);
+	public String createCollectionCenso(short idinstitucion, String collectionTitle, String collectionSummary) throws Exception {
+		return createCollection(idinstitucion, ID_DOCUSHARE_CENSO, collectionTitle, collectionSummary);
 	}
 	
 
@@ -560,11 +542,11 @@ public class DocushareHelper {
 	 * @throws SIGAException
 	 * @throws ClsExceptions
 	 */
-	private String createCollection(String ID_DOCUSHARE, String collectionTitle, String collectionSummary) throws Exception{
+	private String createCollection(short idinstitucion, String ID_DOCUSHARE, String collectionTitle, String collectionSummary) throws Exception{
 
 	
 		String identificadorDS = null;				
-		createSession();
+		createSession(idinstitucion);
 		
 		try {
 			
@@ -572,7 +554,7 @@ public class DocushareHelper {
 			List<GenParametros> config = new ArrayList<GenParametros>();
 				GenParametros param = new GenParametros();
 				ParametroRequestDTO parametroRequestDTO = new ParametroRequestDTO();
-				parametroRequestDTO.setIdInstitucion(String.valueOf(this.idInstitucion));
+				parametroRequestDTO.setIdInstitucion(String.valueOf(idinstitucion));
 				parametroRequestDTO.setModulo("GEN");
 				parametroRequestDTO.setParametrosGenerales(ID_DOCUSHARE);
 				StringDTO paramRequest = genParametrosMapper.getParameterFunction(0, parametroRequestDTO );
@@ -582,7 +564,7 @@ public class DocushareHelper {
 
 			
 			String idExpedientes = config.get(0).getValor();
-			log.debug("ID_DOCUSHARE=" + idExpedientes + " para el colegio " + this.idInstitucion);
+			log.debug("ID_DOCUSHARE=" + idExpedientes + " para el colegio " + idinstitucion);
 			
 			DSCollection dsCollectionParent = (DSCollection) dssession.getObject(new DSHandle(idExpedientes));			
 
@@ -596,11 +578,11 @@ public class DocushareHelper {
 		
 		} catch (Exception e) {
 			//"expedientes.docushare.error.crearColeccion"
-			String mensaje = String.format("Se ha producido un error al crear la collection para el colegio %s e ID_DOCUSHARE = '%s'", this.idInstitucion, ID_DOCUSHARE);
+			String mensaje = String.format("Se ha producido un error al crear la collection para el colegio %s e ID_DOCUSHARE = '%s'", idinstitucion, ID_DOCUSHARE);
 			log.error(mensaje, e);
 			
 		} finally {
-			close();
+			close(idinstitucion);
 		}
 
 		return identificadorDS;
