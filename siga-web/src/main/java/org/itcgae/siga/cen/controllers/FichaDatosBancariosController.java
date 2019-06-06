@@ -18,6 +18,7 @@ import org.itcgae.siga.DTOs.cen.DatosBancariosInsertDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchAnexosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
+import org.itcgae.siga.DTOs.cen.FicheroDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDownloadDTO;
 import org.itcgae.siga.DTOs.cen.MandatosUpdateDTO;
@@ -26,6 +27,7 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.cen.services.ITarjetaDatosBancariosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -142,10 +144,12 @@ public class FichaDatosBancariosController {
 		else return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.FORBIDDEN);
 	}
 	
-	@RequestMapping(value = "fichaDatosBancarios/downloadFile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	    public ResponseEntity<ComboItem> downloadFile(@RequestBody MandatosDownloadDTO mandatosDownloadDTO, HttpServletRequest request, HttpServletResponse response) {
-		 	ComboItem comboItem = tarjetaDatosBancariosService.downloadFile(mandatosDownloadDTO,request,response);
-			return new ResponseEntity<ComboItem>(comboItem, HttpStatus.OK);
+	@RequestMapping(value = "fichaDatosBancarios/downloadFile", method = RequestMethod.POST, produces = { MediaType.APPLICATION_JSON_VALUE, "application/vnd.openxmlformats-officedocument.wordprocessingml.document" })
+	    public ResponseEntity<byte[]> downloadFile(@RequestBody MandatosDownloadDTO mandatosDownloadDTO, HttpServletRequest request, HttpServletResponse response) {
+		 	FicheroDTO ficheroDTO = tarjetaDatosBancariosService.downloadFile(mandatosDownloadDTO,request,response);
+			HttpHeaders respuestaHeader = new HttpHeaders();
+            respuestaHeader.add("content-disposition", "attachment; filename= " + ficheroDTO.getFileName()); 
+			return new ResponseEntity<byte[]>(ficheroDTO.getFile(),respuestaHeader, HttpStatus.OK);
 	    }
 	 
 	 
