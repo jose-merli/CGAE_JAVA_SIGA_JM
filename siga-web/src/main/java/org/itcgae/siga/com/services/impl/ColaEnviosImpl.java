@@ -20,6 +20,7 @@ import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.com.services.IEnviosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.constants.SigaConstants.FORMATO_SALIDA;
+import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
@@ -879,32 +880,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 	
 	private String prepararConsulta(String sentencia, Short idtipoEnvios, Short idInstitucion){
 		
-		sentencia = sentencia.replaceAll("<SELECT>", " ");
-		sentencia = sentencia.replaceAll("</SELECT>", " ");
-		sentencia = sentencia.replaceAll("<FROM>", " ");
-		sentencia = sentencia.replaceAll("</FROM>", " ");
-		sentencia = sentencia.replaceAll("<JOIN>", " ");
-		sentencia = sentencia.replaceAll("</JOIN>", " ");
-		sentencia = sentencia.replaceAll("<OUTERJOIN>", " ");
-		sentencia = sentencia.replaceAll("</OUTERJOIN>", " ");
-		sentencia = sentencia.replaceAll("<INNERJOIN>", " ");
-		sentencia = sentencia.replaceAll("</INNERJOIN>", " ");
-		sentencia = sentencia.replaceAll("<LEFTJOIN>", " ");
-		sentencia = sentencia.replaceAll("</LEFTJOIN>", " ");
-		sentencia = sentencia.replaceAll("<WHERE>", " ");
-		sentencia = sentencia.replaceAll("</WHERE>", " ");
-		sentencia = sentencia.replaceAll("<ORDERBY>", " ");
-		sentencia = sentencia.replaceAll("</ORDERBY>", " ");
-		sentencia = sentencia.replaceAll("<ORDER BY>", " ");
-		sentencia = sentencia.replaceAll("</ORDER BY>", " ");
-		sentencia = sentencia.replaceAll("<GROUPBY>", " ");
-		sentencia = sentencia.replaceAll("</GROUPBY>", " ");
-		sentencia = sentencia.replaceAll("<HAVING>", " ");
-		sentencia = sentencia.replaceAll("</HAVING>", " ");
-		sentencia = sentencia.replaceAll("<UNION>", " ");
-		sentencia = sentencia.replaceAll("<UNION>", " ");
-		sentencia = sentencia.replaceAll("<UNIONALL>", " ");
-		sentencia = sentencia.replaceAll("</UNIONALL>", " ");
+		sentencia = SIGAHelper.quitarEtiquetas(sentencia);
 		
 		if(sentencia.toUpperCase().contains("%%IDTIPOENVIOS%%")){
 			sentencia = sentencia.toUpperCase().replaceAll("%%IDTIPOENVIOS%%", idtipoEnvios.toString());

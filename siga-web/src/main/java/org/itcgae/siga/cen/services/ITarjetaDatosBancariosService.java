@@ -18,13 +18,12 @@ import org.itcgae.siga.DTOs.cen.DatosBancariosInsertDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchAnexosDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchBancoDTO;
 import org.itcgae.siga.DTOs.cen.DatosBancariosSearchDTO;
+import org.itcgae.siga.DTOs.cen.FicheroDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDTO;
 import org.itcgae.siga.DTOs.cen.MandatosDownloadDTO;
 import org.itcgae.siga.DTOs.cen.MandatosUpdateDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 public interface ITarjetaDatosBancariosService {
@@ -56,7 +55,7 @@ public interface ITarjetaDatosBancariosService {
 	
 	public UpdateResponseDTO uploadFile(MultipartHttpServletRequest request) throws IOException;
 	
-	public ComboItem downloadFile(MandatosDownloadDTO mandatosDownloadDTO,HttpServletRequest request, HttpServletResponse response);
+	public FicheroDTO downloadFile(MandatosDownloadDTO mandatosDownloadDTO,HttpServletRequest request, HttpServletResponse response);
 	
 	public ComboItem fileDownloadInformation(MandatosDownloadDTO mandatosDownloadDTO, HttpServletRequest request);
 	
