@@ -241,7 +241,8 @@ public class EnviosServiceImpl implements IEnviosService{
 	    	       PreencodedMimeBodyPart pmp = new PreencodedMimeBodyPart( "base64" );
 	    	       pmp.setHeader( "Content-ID", "<" + pairs.getKey() + ">" );
 	    	       pmp.setDisposition( MimeBodyPart.INLINE );
-	    	       pmp.setText( pairs.getValue() );
+//	    	       pmp.setText( pairs.getValue());
+	    	       pmp.setContent( pairs.getValue(), "image/png" );
 	    	       mixedMultipart.addBodyPart( pmp );
 	    	    }
 	    	    
