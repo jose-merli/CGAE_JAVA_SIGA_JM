@@ -292,6 +292,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			
 			workbook.write(bos);
+			workbook.write(fileOut);
 	        fileOut.close();
 	        workbook.close();		
 
