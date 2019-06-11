@@ -2090,10 +2090,10 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 									SimpleDateFormat output = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 									String nuevoValor = output.format(dateValue);
-									listaCampos.get(j).setValor("'" + nuevoValor + "'");
+//									listaCampos.get(j).setValor("'" + nuevoValor + "'");
 									
-									String aux = listaCampos.get(j).getValor();
-									codigosBind.put (new Integer(iParametroBind),aux);
+//									String aux = listaCampos.get(j).getValor();
+									codigosBind.put (new Integer(iParametroBind),"'" + nuevoValor + "'");
 								}
 								else {
 									iParametroBind++;
@@ -2246,33 +2246,38 @@ public class ConsultasServiceImpl implements IConsultasService{
 		
 		List<Map<String,Object>> result = null;
 		
-		sentencia = quitarEtiquetas(sentencia.toUpperCase());
-		sentencia = quitaPuntosAlias(sentencia);
+		try {
 		
-		boolean contienePuntosAlias = sentencia.indexOf(CARACTER_REEMPLAZO_PUNTOS) > -1;
-		
-		if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
-				|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
-				|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+			sentencia = quitarEtiquetas(sentencia.toUpperCase());
+			sentencia = quitaPuntosAlias(sentencia);
 			
-			LOGGER.error("ejecutarConsultaConClaves() -> Consulta no permitida: " + sentencia);
-		}else {
-			result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
-		}
-		
-		if(contienePuntosAlias && result != null && result.size() > 0) {
-			List<Map<String,Object>> resultCopia = new ArrayList<Map<String,Object>>();
-			for(Map<String,Object> mapaResult : result) {
-				Map<String,Object> mapaResultCopia = new LinkedHashMap<String, Object>();
-				for (String key : mapaResult.keySet()) {
-					Object obj = mapaResult.get(key);
-					mapaResultCopia.put(key.replaceAll(CARACTER_REEMPLAZO_PUNTOS, "."), obj);
-				}
-				resultCopia.add(mapaResultCopia);
+			boolean contienePuntosAlias = sentencia.indexOf(CARACTER_REEMPLAZO_PUNTOS) > -1;
+			
+			if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+					|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+					|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+				
+				LOGGER.error("ejecutarConsultaConClaves() -> Consulta no permitida: " + sentencia);
+			}else {
+				result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
 			}
-			return resultCopia;
+			
+			if(contienePuntosAlias && result != null && result.size() > 0) {
+				List<Map<String,Object>> resultCopia = new ArrayList<Map<String,Object>>();
+				for(Map<String,Object> mapaResult : result) {
+					Map<String,Object> mapaResultCopia = new LinkedHashMap<String, Object>();
+					for (String key : mapaResult.keySet()) {
+						Object obj = mapaResult.get(key);
+						mapaResultCopia.put(key.replaceAll(CARACTER_REEMPLAZO_PUNTOS, "."), obj);
+					}
+					resultCopia.add(mapaResultCopia);
+				}
+				return resultCopia;
+			}
+		} catch (Exception e) {
+			LOGGER.error(e);
+			throw e;
 		}
-		
 		return result;
 	}
 	
