@@ -1,7 +1,11 @@
 package org.itcgae.siga.com.services.impl;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+
 import java.io.File;
 import java.io.FileOutputStream;
+import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -80,8 +84,10 @@ import org.itcgae.siga.db.services.com.mappers.ConModulosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConObjetivoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModKeyclasecomunicacionExtendsMapper;
+import org.itcgae.siga.exception.BusinessSQLException;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -2275,8 +2281,12 @@ public class ConsultasServiceImpl implements IConsultasService{
 				return resultCopia;
 			}
 		} catch (Exception e) {
-			LOGGER.error(e);
-			throw e;
+			LOGGER.error("Error al ejecutar la consulta", e);
+			if((e instanceof DataAccessException) && e.getCause() != null) {
+				throw new BusinessSQLException(e.getCause().getMessage(), e);
+			}else {
+				throw e;
+			}		
 		}
 		return result;
 	}

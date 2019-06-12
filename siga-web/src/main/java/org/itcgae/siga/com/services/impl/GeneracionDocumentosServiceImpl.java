@@ -29,6 +29,7 @@ import org.itcgae.siga.com.documentos.DataMailMergeDataSource;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -69,7 +70,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			
 		} catch (Exception e) {
 			LOGGER.error("GeneracionDocumentosServiceImpl.sustituyeDocumento :: Error al sustituir los datos del documento", e);
-			throw e;
+			throw new BusinessException("Error al reemplazar los datos en el documento", e);
 		}
 		return doc;
 	}
@@ -154,7 +155,9 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			}
 			
 		} catch (Exception e) {
-			throw e;
+			String mensaje = "Error al guardar el documento: " + pathfinal + nombrefichero;
+			LOGGER.error(mensaje);
+			throw new BusinessException(mensaje,e);
 		}
 		
 		
