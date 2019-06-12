@@ -45,6 +45,7 @@ public class SIGAHelper {
 	
 	public static String quitarEtiquetas(String sentencia) {	
 		if (sentencia != null) {
+			sentencia = sentencia.toUpperCase();
 			sentencia = sentencia.replaceAll("<SELECT>", " ");
 			sentencia = sentencia.replaceAll("</SELECT>", " ");
 			sentencia = sentencia.replaceAll("<FROM>", " ");
