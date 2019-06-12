@@ -124,10 +124,10 @@ public class DialogoComunicacionController {
 		
 		combo = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
 		
-		if(combo != null) {
+		if(combo == null || combo.getValue().equals("200")) {
 			return new ResponseEntity<ComboItem>(combo, HttpStatus.OK);
 		}else {
-			return null;
+			return new ResponseEntity<ComboItem>(combo, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
