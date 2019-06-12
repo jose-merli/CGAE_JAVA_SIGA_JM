@@ -181,8 +181,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 					inputStream = new FileInputStream(new File(pathPlantilla));
 					workbook = new XSSFWorkbook(inputStream);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOGGER.error(e);
 					throw e;
 				}
 				
@@ -200,14 +199,12 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				if(!hayPlantilla) {
 					//Creamos la hoja
 					String nombreHoja = "Consulta " + i;
-					try {
-						if(nombresConsultasDatos != null && nombresConsultasDatos.size() > 0 && nombresConsultasDatos.get(i) != null) {
-							nombreHoja = nombresConsultasDatos.get(i);
-							if(nombreHoja.length() > 30)nombreHoja = nombreHoja.substring(0, 27) + "...";
-						}
-					}catch(Exception e) {
-						LOGGER.error("Error al obtener el nombre de la consulta");
+					if(nombresConsultasDatos != null && nombresConsultasDatos.size() > i && nombresConsultasDatos.get(i) != null) {
+						nombreHoja = nombresConsultasDatos.get(i);
 					}
+					nombreHoja = getNombreConsulta(workbook, nombreHoja);
+					
+					
 					sheet = workbook.createSheet(nombreHoja);
 				}else {
 					sheet = workbook.getSheetAt(i);
@@ -308,6 +305,41 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		}
 		
 		return documento;
+	}
+	
+	public static void main(String[] args) {
+		String nombreHoja = "adfadf :a asd//fad? : ,;;";
+		String[] invalidCharsRegex = new String[]{"/", "\\", "*", "[", "]", ":", "?"};
+		for (String s : invalidCharsRegex) {
+			nombreHoja = nombreHoja.replace(s, "");
+		}
+		System.out.println(nombreHoja);
+	}
+
+	private String getNombreConsulta(Workbook workbook, String nombreHoja) {
+		
+		String[] invalidCharsRegex = new String[]{"/", "\\", "*", "[", "]", ":", "?"};
+		
+		if (nombreHoja != null) {
+			for (String s : invalidCharsRegex) {
+				nombreHoja = nombreHoja.replace(s, "");
+			}
+			
+			if (nombreHoja.length() > 30) {
+				nombreHoja = nombreHoja.substring(0, 27) + "...";
+			}
+			if (workbook != null) {
+				int i = 2;
+				while (workbook.getSheet(nombreHoja) != null) {
+					nombreHoja = nombreHoja.substring(0, 26) + " " + (i++);
+				}
+			}
+		}
+				
+		
+		
+		return nombreHoja;
+		
 	}
 
 }
