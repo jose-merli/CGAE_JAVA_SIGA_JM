@@ -206,80 +206,22 @@ public class EnviosServiceImpl implements IEnviosService{
     	    	    }
                 }*/
                 
+                adjuntaImagenBase64(mixedMultipart, sCuerpo);
                 
-                //Buscamos todas las imagenes para adjuntarlas
-	    	    Pattern imgRegExp  = Pattern.compile( "<img[^>]+src\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>" );
-	    	    Map<String, String> inlineImage = new HashMap<String, String>();
-	    	    final Matcher matcher = imgRegExp.matcher( sCuerpo );
-	    	    int i = 0;
-	    	    while ( matcher.find() ) {
-	    	       String src = matcher.group();
-	    	       if ( sCuerpo.indexOf( src ) != -1 ) {
-	    	          String srcToken = "src=\"";
-	    	          int x = src.indexOf( srcToken );
-	    	          int y = src.indexOf( "\"", x + srcToken.length() );
-	    	          String srcText = src.substring( x + srcToken.length(), y );
-	    	          String cid = "image" + i;
-	    	          String newSrc = src.replace( srcText, "cid:" + cid );
-	    	          if(srcText.contains("data:image")) {
-		    	          inlineImage.put( cid, srcText.split( "," )[1] );
-		    	          sCuerpo = sCuerpo.replace( src, newSrc );
-		    	          i++;
-	    	          
-		    	          LOGGER.debug(" CID " + cid + " Image data :: " + srcText.split( "," )[1]);
-		    	          MimeBodyPart imagen = addAttachment(cid,srcText.split( "," )[1]);
-		    	          imagen.setDisposition(MimePart.INLINE);
-		    	          mixedMultipart.addBodyPart(imagen);
-	    	          }
-	    			
-	    	       }
-	    	    }
-	    	    
-	    	    Iterator<Entry<String, String>> it = inlineImage.entrySet().iterator();
-	    	    while ( it.hasNext() ) {
-	    	       Entry<String, String> pairs = it.next();
-	    	       PreencodedMimeBodyPart pmp = new PreencodedMimeBodyPart( "base64" );
-	    	       pmp.setHeader( "Content-ID", "<" + pairs.getKey() + ">" );
-	    	       pmp.setDisposition( MimeBodyPart.INLINE );
-//	    	       pmp.setText( pairs.getValue());
-	    	       pmp.setContent( pairs.getValue(), "image/png" );
-	    	       mixedMultipart.addBodyPart( pmp );
-	    	    }
-	    	    
+                adjuntaDocumentos(mixedMultipart, documentosEnvio, idEnvio, idInstitucion);
 	    	    
                 //alternative message
                 BodyPart messageBodyPart = new MimeBodyPart();
-                      messageBodyPart.setContent(sCuerpo, "text/html");
-                      relatedMultipart.addBodyPart(messageBodyPart);
+                messageBodyPart.setContent(sCuerpo, "text/html");
+                relatedMultipart.addBodyPart(messageBodyPart);	
                       
                 mixedBodyPart.setContent(relatedMultipart);
-                
                 mixedMultipart.addBodyPart(mixedBodyPart);
-
 	    	    
-	    	    //Adjuntamos los informes adjuntos.
-	    	    for (DatosDocumentoItem informe : documentosEnvio) {
-	    	    	File file = informe.getDocumentoFile();
-	    	    	
-	    	    	if (file == null) { 
-	    	    		String error = "El fichero del envío " + idEnvio + " para el colegio " + idInstitucion + " es nulo";
-	    	    		LOGGER.error(error);
-	    	    		throw new BusinessException(error);
-	    	    	} else if (!file.exists()) {
-	    	    		String error = "El fichero del envío " + idEnvio + " para el colegio " + idInstitucion + " es no existe " + file.getAbsolutePath();
-	    	    		LOGGER.error(error);
-	    	    		throw new BusinessException(error);
-	    	    	}
-	    	    	DataSource ds = new FileDataSource(file);
-	    	    	messageBodyPart = new MimeBodyPart();
-	    	    	messageBodyPart.setDataHandler(new DataHandler(ds));
-	    	    	messageBodyPart.setFileName(informe.getFileName());
-	    	    	messageBodyPart.setDisposition(MimePart.ATTACHMENT);
-	    	    	mixedMultipart.addBodyPart(messageBodyPart);
-				}
 	    	    
 	    	    //Asociamos todo el contenido al mensaje
 	    	    mensaje.setContent(mixedMultipart);
+	    	    mensaje.setSentDate(new Date());
 	    	    
 	    	    LOGGER.debug("Enviando...");
 	    	    
@@ -317,6 +259,71 @@ public class EnviosServiceImpl implements IEnviosService{
 			throw e;
 		}
 
+	}
+
+	private void adjuntaDocumentos(MimeMultipart mixedMultipart, List<DatosDocumentoItem> documentosEnvio, String idEnvio, String idInstitucion) throws MessagingException {
+		//Adjuntamos los informes adjuntos.
+	    for (DatosDocumentoItem informe : documentosEnvio) {
+	    	File file = informe.getDocumentoFile();
+	    	
+	    	if (file == null) { 
+	    		String error = "El fichero del envío " + idEnvio + " para el colegio " + idInstitucion + " es nulo";
+	    		LOGGER.error(error);
+	    		throw new BusinessException(error);
+	    	} else if (!file.exists()) {
+	    		String error = "El fichero del envío " + idEnvio + " para el colegio " + idInstitucion + " es no existe " + file.getAbsolutePath();
+	    		LOGGER.error(error);
+	    		throw new BusinessException(error);
+	    	}
+	    	DataSource ds = new FileDataSource(file);
+	    	BodyPart messageBodyPart = new MimeBodyPart();
+	    	messageBodyPart.setDataHandler(new DataHandler(ds));
+	    	messageBodyPart.setFileName(informe.getFileName());
+	    	messageBodyPart.setDisposition(MimePart.ATTACHMENT);
+	    	mixedMultipart.addBodyPart(messageBodyPart);
+		}
+	}
+
+	private void adjuntaImagenBase64(MimeMultipart mixedMultipart, String sCuerpo) throws MessagingException {
+		//Buscamos todas las imagenes para adjuntarlas
+	    Pattern imgRegExp  = Pattern.compile( "<img[^>]+src\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>" );
+	    Map<String, String> inlineImage = new HashMap<String, String>();
+	    final Matcher matcher = imgRegExp.matcher( sCuerpo );
+	    int i = 0;
+	    while ( matcher.find() ) {
+	       String src = matcher.group();
+	       if ( sCuerpo.indexOf( src ) != -1 ) {
+	          String srcToken = "src=\"";
+	          int x = src.indexOf( srcToken );
+	          int y = src.indexOf( "\"", x + srcToken.length() );
+	          String srcText = src.substring( x + srcToken.length(), y );
+	          String cid = "image" + i;
+	          String newSrc = src.replace( srcText, "cid:" + cid );
+	          if(srcText.contains("data:image")) {
+    	          inlineImage.put( cid, srcText.split( "," )[1] );
+    	          sCuerpo = sCuerpo.replace( src, newSrc );
+    	          i++;
+	          
+    	          LOGGER.debug(" CID " + cid + " Image data :: " + srcText.split( "," )[1]);
+    	          MimeBodyPart imagen = addAttachment(cid,srcText.split( "," )[1]);
+    	          imagen.setDisposition(MimePart.INLINE);
+    	          mixedMultipart.addBodyPart(imagen);
+	          }
+			
+	       }
+	    }
+	    
+	    Iterator<Entry<String, String>> it = inlineImage.entrySet().iterator();
+	    while ( it.hasNext() ) {
+	       Entry<String, String> pairs = it.next();
+	       PreencodedMimeBodyPart pmp = new PreencodedMimeBodyPart( "base64" );
+	       pmp.setHeader( "Content-ID", "<" + pairs.getKey() + ">" );
+	       pmp.setDisposition( MimeBodyPart.INLINE );
+//	       pmp.setText( pairs.getValue());
+	       pmp.setContent( pairs.getValue(), "image/png" );
+	       mixedMultipart.addBodyPart( pmp );
+	    }
+		
 	}
 
 	@Override
