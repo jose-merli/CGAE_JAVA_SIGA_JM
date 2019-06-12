@@ -763,7 +763,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							datosColegiales.setFechaestado(colegiadoItem.getFechaEstado());
 							datosColegiales.setIdinstitucion(idInstitucionColegial);
 							datosColegiales.setIdpersona(idPersonaColegial);
-							datosColegiales.setObservaciones(colegiadoItem.getObservaciones());
+							datosColegiales.setObservaciones(colegiadoItem.getObservaciones().replace("'", "''"));
 							datosColegiales.setFechamodificacion(new Date());
 							datosColegiales.setUsumodificacion(usuario.getIdusuario());
 
