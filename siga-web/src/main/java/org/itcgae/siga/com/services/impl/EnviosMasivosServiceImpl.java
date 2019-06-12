@@ -830,11 +830,14 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
 
 						EnvCamposenvios envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
-						envCampos.setIdenvio(idEnvioNuevo);
-						envCampos.setFechamodificacion(new Date());
+						
+						if(envCampos != null) {
+							envCampos.setIdenvio(idEnvioNuevo);
+							envCampos.setFechamodificacion(new Date());
 
-						_envCamposenviosMapper.insert(envCampos);
-
+							_envCamposenviosMapper.insert(envCampos);
+						}
+					
 						key = new EnvCamposenviosKey();
 						key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));
 						key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
@@ -842,10 +845,14 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
 
 						envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
-						envCampos.setIdenvio(idEnvioNuevo);
-						envCampos.setFechamodificacion(new Date());
+						
+						if(envCampos != null) {
+							envCampos.setIdenvio(idEnvioNuevo);
+							envCampos.setFechamodificacion(new Date());
 
-						_envCamposenviosMapper.insert(envCampos);
+							_envCamposenviosMapper.insert(envCampos);
+						}
+					
 
 					} else if (SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
 							|| SigaConstants.ID_ENVIO_BURO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
