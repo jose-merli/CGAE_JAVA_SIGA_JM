@@ -105,6 +105,7 @@ import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoExtendsMappe
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaEnvioConsultaExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModRelPlantillaSufijoExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
+import org.itcgae.siga.exception.BusinessSQLException;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.itcgae.siga.services.impl.WSCommons;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -729,6 +730,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					List<Map<String, Object>> result;
 					try {
 						result = _consultasService.ejecutarConsultaConClaves(consultaEjecutarCondicional);
+					} catch (BusinessSQLException e) {
+						LOGGER.error(e);
+						throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(), e);
 					} catch (Exception e) {
 						LOGGER.error(e);
 						throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
@@ -761,6 +765,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						List<Map<String, Object>> result;
 						try {
 							result = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDestinatarios);
+						} catch (BusinessSQLException e) {
+							LOGGER.error(e);
+							throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(), e);
 						} catch (Exception e) {
 							LOGGER.warn("Error al ejejcutar la consulta" + e);
 							throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
@@ -817,9 +824,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										List<Map<String, Object>> resultMulti;
 										try {
 											resultMulti = _consultasService.ejecutarConsultaConClaves(consultaEjecutarMulti);
+										} catch (BusinessSQLException e) {
+											LOGGER.error(e);
+											throw new BusinessException("Error al ejecutar la consulta " + consultaMulti.getDescripcion() + " " + e.getMessage(), e);
 										} catch (Exception e) {
 											LOGGER.error(e);
-											throw new BusinessException("Error al ejecutar la consulta " + consultaMulti.getNombre(), e);
+											throw new BusinessException("Error al ejecutar la consulta " + consultaMulti.getDescripcion(), e);
 										}
 										
 										if(resultMulti != null && resultMulti.size() > 0){
@@ -842,7 +852,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												
 												
 												File filePlantilla = new File(rutaPlantilla + nombrePlantilla);
-												existePlantilla(filePlantilla);
 																													
 												Document doc = null;
 
@@ -865,9 +874,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 													List<Map<String, Object>> resultDatos;
 													try {
 														resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
+													} catch (BusinessSQLException e) {
+														LOGGER.error(e);
+														throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getDescripcion() + " " + e.getMessage(), e);
 													} catch (Exception e) {
 														LOGGER.error(e);
-														throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getNombre(), e);
+														throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getDescripcion(), e);
 													}
 													
 													if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
@@ -906,6 +918,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 															throw new BusinessException("No se ha podido generar el fichero Excel", e);
 														}
 													}else {
+														existePlantilla(filePlantilla);
+														
 														try {
 															doc = new Document(rutaPlantilla + nombrePlantilla);
 														
@@ -984,6 +998,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										List<Map<String, Object>> resultDatos;
 										try {
 											resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
+										} catch (BusinessSQLException e) {
+											LOGGER.error(e);
+											throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(), e);
 										} catch (Exception e) {
 											LOGGER.error(e);
 											throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
@@ -1027,6 +1044,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 												throw new BusinessException("No se ha podido generar el fichero Excel", e);
 											}
 										}else {
+											existePlantilla(filePlantilla);
 											try {
 												doc = new Document(rutaPlantilla + nombrePlantilla);
 												
@@ -1085,9 +1103,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							List<Map<String, Object>> resultDatos;
 							try {
 								resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
+							} catch (BusinessSQLException e) {
+								LOGGER.error(e);
+								throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getDescripcion() + " " + e.getMessage(), e);
 							} catch (Exception e) {
 								LOGGER.error(e);
-								throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getNombre(), e);
+								throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getDescripcion(), e);
 							}
 							
 							if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
@@ -1126,7 +1147,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						
 						File filePlantilla = new File(rutaPlantilla + nombrePlantilla);
 
-						existePlantilla(filePlantilla);	
+						//existePlantilla(filePlantilla);	
 
 						String nombreFicheroSalida = obtenerNombreFicheroSalida(modelosComunicacionItem.getIdModeloComunicacion(), plantilla, hDatosGenerales, usuario.getIdlenguaje(), numFicheros, rutaTmp, campoSufijoReplaced);
 						
@@ -1140,7 +1161,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								throw new BusinessException("No se ha podido generar el fichero Excel", e);
 							}
 						}else {
+							existePlantilla(filePlantilla);
 							try {
+								
 								Document doc = new Document(rutaPlantilla + nombrePlantilla);
 								
 								doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);														
@@ -1981,8 +2004,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									
 									
 									File filePlantilla = new File(rutaTmp + nombrePlantilla);
-									existePlantilla(filePlantilla);							
-
 									
 									// Por cada resultado ejecutamos las consultas de datos
 									LOGGER.debug("Obtenemos las consultas de datos para la plantilla: " + plantilla.getIdInforme());
@@ -2001,6 +2022,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										
 										try {
 											resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
+										}catch (BusinessSQLException e) {
+											LOGGER.error(e);
+											throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getIdconsulta() + " " + e.getMessage(), e);
 										}catch (Exception e) {
 											LOGGER.error(e);
 											throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getIdconsulta() + "para el envío: " + idEnvio, e);
@@ -2035,6 +2059,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										 docGenerado = _generacionDocService.generarExcel(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, listaDatosExcel, null);
 										 
 									}else {
+										existePlantilla(filePlantilla);	
 										Document doc = new Document(rutaPlantilla + nombrePlantilla);
 										
 										doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);														
@@ -2082,8 +2107,6 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						
 						
 						File filePlantilla = new File(rutaPlantilla + nombrePlantilla);
-						existePlantilla(filePlantilla);
-
 						
 						// Por cada resultado ejecutamos las consultas de datos
 						LOGGER.debug("Obtenemos las consultas de datos para la plantilla: " + plantilla.getIdInforme());
@@ -2103,6 +2126,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							
 							try {
 								resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);	
+							}catch (BusinessSQLException e) {
+								LOGGER.error(e);
+								throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getIdconsulta() + " " + e.getMessage(), e);
 							}catch(Exception e) {
 								String mensaje = "Error al ejecutar la consulta: " + consultaDatos.getIdconsulta() + " para el envío: " + idEnvio;
 								LOGGER.error(mensaje);
@@ -2136,6 +2162,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						if(esExcel) {
 							 docGenerado = _generacionDocService.generarExcel(rutaPlantilla + nombrePlantilla, rutaTmp, nombreFicheroSalida, listaDatosExcel, null);
 						}else {
+							existePlantilla(filePlantilla);
+							
 							Document doc = new Document(rutaPlantilla + nombrePlantilla);
 							
 							doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);														
