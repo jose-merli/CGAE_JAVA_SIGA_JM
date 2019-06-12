@@ -380,9 +380,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					}else{
 						response.setNombre(null);
 					}				
-					
+					error.setCode(200);
+
 				}catch(Exception e){
-					response.setNombre(null);
+					ComboItem combo = new ComboItem();
+					combo.setLabel(e.getMessage());
+					combo.setValue("500");
+					return combo;
 				}			
 			}
 		}
@@ -391,6 +395,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		if(response.getNombre() != null) {
 			ComboItem combo = new ComboItem();
 			combo.setLabel(response.getNombre());
+			combo.setValue("200");
 			return combo;
 		}else {
 			return null;
@@ -487,8 +492,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}catch(Exception e){
 					LOGGER.error("Error al guardar los documentos",e);
 					error.setCode(500);
-					error.setDescription(e.getMessage());
-					error.setMessage("Error al guardar los documentos");
+					error.setDescription("Error");
+					error.setMessage(e.getMessage());
 					response.setError(error);
 				}			
 			}
@@ -661,8 +666,14 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 										for(ConsultaItem consulta:consultasItemDest){	
 																						
 											String consultaEjecutarDestinatarios = reemplazarConsultaConClaves(usuario, dialogo, consulta, mapaClave, esEnvio);
+											List<Map<String,Object>> result = null;
+											
+											try {
+												result = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDestinatarios);
 
-											List<Map<String,Object>> result = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDestinatarios);
+											}catch(Exception e) {
+												
+											}
 											
 											if(result != null && result.size() > 0){
 												LOGGER.debug("Se han obtenido " + result.size() + " destinatarios");
@@ -1052,8 +1063,16 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 											for(ConsultaItem consultaDatos:consultasItemDatos){															
 												String consultaEjecutarDatos = reemplazarConsultaConClaves(usuario, dialogo, consultaDatos, mapaClave, esEnvio);
 												String normbreConsulta = consultaDatos.getDescripcion();
+												List<Map<String,Object>> resultDatos = null;
+												String errorMessage = null;
 												
-												List<Map<String,Object>> resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
+												try {
+													resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
+												}catch(Exception e) {
+													errorMessage = e.getMessage();
+													throw new Exception(errorMessage);
+
+												}
 												
 												if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
 													hDatosFinal.put(consultaDatos.getRegion(), resultDatos);

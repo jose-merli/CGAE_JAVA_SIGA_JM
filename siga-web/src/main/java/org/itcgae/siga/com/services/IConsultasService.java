@@ -59,7 +59,7 @@ public interface IConsultasService {
 
 	public ArrayList<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, String consulta) throws Exception;
 
-	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws ParseException, SigaExceptions;
+	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws ParseException, SigaExceptions, Exception;
 
 	public String quitarEtiquetas(String sentencia);
 }
