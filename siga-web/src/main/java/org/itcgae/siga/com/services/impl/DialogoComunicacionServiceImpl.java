@@ -396,7 +396,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				file = new File(path);
 			
 			}else {
-				file = new File(getRutaFicheroSalida(idInstitucion), "Documentos.zip");
+				file = new File(getRutaFicheroSalida(idInstitucion));
+				file.mkdirs();
+				file = new File(file, "Documentos.zip");
 				file = WSCommons.zipBytes(listaFicheros, file);
 			}
 		}
