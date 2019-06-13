@@ -1,6 +1,8 @@
 package org.itcgae.siga.services.impl;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -461,7 +463,7 @@ public class WSCommons {
 		return baos.toByteArray();
 	}
 	
-	public static byte[] zipBytes(List<DatosDocumentoItem> ficheros) throws IOException {
+	public static File zipBytes(List<DatosDocumentoItem> ficheros, File fileZip) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ZipOutputStream zos = new ZipOutputStream(baos);
 		List<String> listaNombreFicherosZip = new ArrayList<String>();
@@ -492,8 +494,14 @@ public class WSCommons {
 			zos.closeEntry();
 		}
 		zos.close();
+		
+		FileOutputStream fos = new FileOutputStream(fileZip);
+		fos.write(baos.toByteArray());
+		fos.flush();
+		fos.close();
+		
 
-		return baos.toByteArray();
+		return fileZip;
 
 	}
 

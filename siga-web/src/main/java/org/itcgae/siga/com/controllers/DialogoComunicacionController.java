@@ -1,6 +1,5 @@
 package org.itcgae.siga.com.controllers;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,10 +8,8 @@ import java.io.InputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.itcgae.siga.DTOs.com.ByteResponseDto;
-import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.com.ClaseComunicacionesDTO;
-import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
 import org.itcgae.siga.DTOs.com.KeysDTO;
@@ -22,9 +19,11 @@ import org.itcgae.siga.DTOs.com.ResponseDataDTO;
 import org.itcgae.siga.DTOs.com.ResponseDateDTO;
 import org.itcgae.siga.DTOs.com.TipoEnvioDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.FileInfoDTO;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -35,11 +34,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.itcgae.siga.DTOs.gen.Error;
 
 @RestController
 @RequestMapping(value = "/dialogoComunicacion")
 public class DialogoComunicacionController {
+	
+	private static final Logger LOGGER = Logger.getLogger(DialogoComunicacionController.class);	
 	
 	@Autowired
 	IDialogoComunicacionService _dialogoComunicacionService;
@@ -86,48 +86,56 @@ public class DialogoComunicacionController {
 	}
 	
 	@RequestMapping(value = "/descargar",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InputStreamResource> descargar(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo, HttpServletResponse resp) {
+	ResponseEntity<InputStreamResource> descargar(@RequestBody FileInfoDTO fileInfoDTO) {
 		
-		ByteResponseDto response = null;
 		
-		response = _dialogoComunicacionService.descargarComunicacion(request, dialogo, resp);
-		
-		byte[] zip = null;
-		if(response.getData() != null) {
-			
-			zip = response.getData();
-				
-			InputStream targetStream = new ByteArrayInputStream(zip);		
-	
-			InputStreamResource resource = new InputStreamResource(targetStream);
-	
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.parseMediaType("application/zip"));
-			headers.add("Access-Control-Allow-Headers", "Content-Type");
-			headers.add("Access-Control-Expose-Headers","Content-Disposition");
-			headers.add("Content-Disposition", "filename=" + SigaConstants.nombreZip + ".zip");
-			headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-			headers.add("Pragma", "no-cache");
-			headers.add("Expires", "0");
-			
-			return ResponseEntity.ok().headers(headers).contentLength(zip.length)
-					.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
-		}else {
-			return null;
+		if(fileInfoDTO == null || fileInfoDTO.getFilePath() == null || fileInfoDTO.getName() == null) {
+			throw new BusinessException("Falta información para recuperar el fichero");
 		}
+			
+			
+		File file = new File(fileInfoDTO.getFilePath());
+		if (file == null || !file.exists()) {
+			throw new BusinessException("El fichero no existe");
+		}
+		
+		InputStream targetStream;
+		try {
+			targetStream = new FileInputStream(file);
+		} catch (FileNotFoundException e) {
+			LOGGER.error(e);
+			throw new BusinessException("Fichero no encontrado", e);
+		}		
+
+		InputStreamResource resource = new InputStreamResource(targetStream);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.parseMediaType("application/zip"));
+		headers.add("Access-Control-Allow-Headers", "Content-Type");
+		headers.add("Access-Control-Expose-Headers","Content-Disposition");
+		headers.add("Content-Disposition", "filename=" + SigaConstants.nombreZip + ".zip");
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Expires", "0");
+		
+		file.delete();
+		
+		return ResponseEntity.ok().headers(headers).contentLength(file.length())
+				.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
 	}
 	
 	@RequestMapping(value = "/nombredoc",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboItem> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo, HttpServletResponse resp) {
+	ResponseEntity<FileInfoDTO> obtenerNombre(HttpServletRequest request, @RequestBody DialogoComunicacionItem dialogo, HttpServletResponse resp) {
 		
-		ComboItem combo = new ComboItem();
+		File file = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
+		FileInfoDTO fileInfoDTO = new FileInfoDTO();
 		
-		combo = _dialogoComunicacionService.obtenerNombre(request, dialogo, resp);
-		
-		if(combo == null || combo.getValue().equals("200")) {
-			return new ResponseEntity<ComboItem>(combo, HttpStatus.OK);
+		if(file != null) {
+			fileInfoDTO.setFilePath(file.getAbsolutePath());
+			fileInfoDTO.setName(file.getName());
+			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.OK);
 		}else {
-			return new ResponseEntity<ComboItem>(combo, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	

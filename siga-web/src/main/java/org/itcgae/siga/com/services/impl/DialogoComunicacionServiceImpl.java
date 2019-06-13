@@ -345,164 +345,68 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 	
 	@Override
-	public ComboItem obtenerNombre(HttpServletRequest request, DialogoComunicacionItem dialogo, HttpServletResponse resp) {
+	public File obtenerNombre(HttpServletRequest request, DialogoComunicacionItem dialogo, HttpServletResponse resp) {
 		LOGGER.info("descargarComunicacion() -> Entrada al servicio para descargar la documentación de la comunicación");
 		
-		byte [] zip = null;
-		ByteResponseDto response = new ByteResponseDto();
+		File file = null;
 		
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		List<DatosDocumentoItem> listaFicheros = null;
-		GenerarComunicacionItem generarComunicacion = new GenerarComunicacionItem();
-		Error error = new Error();
-
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+		try {
 			
-			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
+			// Conseguimos información del usuario logeado
+			String token = request.getHeader("Authorization");
+			String dni = UserTokenUtils.getDniFromJWTToken(token);
+			Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+			
+			List<DatosDocumentoItem> listaFicheros = null;
+			GenerarComunicacionItem generarComunicacion = new GenerarComunicacionItem();
+			Error error = new Error();
+	
+			if (null != idInstitucion) {
+				AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+				exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+				List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 				
-				try{
+				if (null != usuarios && usuarios.size() > 0) {
+					AdmUsuarios usuario = usuarios.get(0);
 					generarComunicacion = generarComunicacion(dialogo,usuario, false);
-					
 					listaFicheros = generarComunicacion.getListaDocumentos();
-					if(listaFicheros != null && listaFicheros.size() > 0){
-						if(listaFicheros.size() == 1) {
-							response.setNombre(listaFicheros.get(0).getFileName());
-						}else {
-							response.setNombre(null);
-
-						}
-					}else{
-						response.setNombre(null);
-					}				
-					
-				}catch(Exception e){
-					response.setNombre(null);
-				}			
+					file = getFicheroDescarga(usuario.getIdinstitucion().toString(), listaFicheros);
+				}
 			}
+		} catch (BusinessException e) {
+			LOGGER.error(e);
+			throw e;
+		} catch (Exception e) {
+			LOGGER.error(e);
+			throw new BusinessException("Error interno de la aplicación", e);
 		}
 		
-		LOGGER.info("descargarComunicacion() -> Salida del servicio para descargar la documentación de la comunicación");
-		if(response.getNombre() != null) {
-			ComboItem combo = new ComboItem();
-			combo.setLabel(response.getNombre());
-			return combo;
-		}else {
-			return null;
-		}
+		return file;
+		
 	}
 
 
-	@Override
-	public ByteResponseDto descargarComunicacion(HttpServletRequest request, DialogoComunicacionItem dialogo, HttpServletResponse resp) {
-		LOGGER.info("descargarComunicacion() -> Entrada al servicio para descargar la documentación de la comunicación");
+	private File getFicheroDescarga(String idInstitucion, List<DatosDocumentoItem> listaFicheros) throws IOException {
+		File file = null;
 		
-		byte [] zip = null;
-		ByteResponseDto response = new ByteResponseDto();
-		
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-		
-		List<DatosDocumentoItem> listaFicheros = null;
-		GenerarComunicacionItem generarComunicacion = new GenerarComunicacionItem();
-		Error error = new Error();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-		if (null != idInstitucion) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			
-			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
+		if(listaFicheros != null && listaFicheros.size() > 0){
+			if(listaFicheros.size() == 1) {
 				
-				try{
-					generarComunicacion = generarComunicacion(dialogo,usuario, false);
-					
-					listaFicheros = generarComunicacion.getListaDocumentos();
-					if(listaFicheros != null && listaFicheros.size() > 0){
-						if(listaFicheros.size() == 1) {
-//							listaFicheros.get(0)
-//							response.setData(baos.);
-							
-							String path = listaFicheros.get(0).getPathDocumento() + listaFicheros.get(0).getFileName();
-//							path += File.separator + idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
-							File file = new File(path);
-
-							// Preparar la descarga
-							FileInputStream fis = null;
-							try {
-								fis = new FileInputStream(file);
-								IOUtils.copy(fis, resp.getOutputStream());
-//								response.setData(listaFicheros.get(0).getDatos());
-								response.setNombre(listaFicheros.get(0).getFileName());
-							} catch (FileNotFoundException e) {
-								LOGGER.error("No se ha encontrado el fichero", e);
-								error.setCode(500);
-								error.setDescription("No se han obtenido documentos");
-								error.setMessage("No se han obtenido documentos");
-								response.setError(error);
-							} catch (IOException e1) {
-								LOGGER.error(
-										"No se han podido escribir los datos binarios de la imagen en la respuesta HttpServletResponse",
-										e1);
-								error.setCode(500);
-								error.setDescription("No se han obtenido documentos");
-								error.setMessage("No se han obtenido documentos");
-								response.setError(error);
-							} finally {
-								if (null != fis)
-									try {
-										fis.close();
-									} catch (IOException e) {
-										LOGGER.error("No se ha cerrado el archivo correctamente", e);
-										error.setCode(500);
-										error.setDescription("No se han obtenido documentos");
-										error.setMessage("No se han obtenido documentos");
-										response.setError(error);
-									}
-							}
-						
-						}else {
-//							response.setNombre(listaFicheros.get(0).getFileName().toString());
-//							response.setData(listaFicheros.get(0).getDatos());
-							zip = WSCommons.zipBytes(listaFicheros);
-							response.setData(zip);
-						}
-					}else{
-						LOGGER.debug("No se han obtenido documentos");
-						error.setCode(500);
-						error.setDescription("No se han obtenido documentos");
-						error.setMessage("No se han obtenido documentos");
-						response.setError(error);
-					}		
-					
-				} catch (BusinessException e) {
-					LOGGER.error(e);
-					throw e;
-				}catch(Exception e){
-					LOGGER.error("Error al guardar los documentos",e);
-					error.setCode(500);
-					error.setDescription(e.getMessage());
-					error.setMessage("Error al guardar los documentos");
-					response.setError(error);
-				}			
+				String path = listaFicheros.get(0).getPathDocumento() + listaFicheros.get(0).getFileName();
+				file = new File(path);
+			
+			}else {
+				file = new File(getRutaFicheroSalida(idInstitucion), "Documentos.zip");
+				file = WSCommons.zipBytes(listaFicheros, file);
 			}
 		}
 		
-		LOGGER.info("descargarComunicacion() -> Salida del servicio para descargar la documentación de la comunicación");
-		return response;
+		return file;
 	}
 
+
+
+	
 	
 	private GenerarComunicacionItem generarComunicacion(DialogoComunicacionItem dialogo, AdmUsuarios usuario, boolean esEnvio) throws Exception{
 		LOGGER.info("generarComunicacion() -> Entrada al servicio para generar los documentos a comunicar");
@@ -659,7 +563,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		HashMap<String,Object> hDatosGenerales = new HashMap<String, Object>();		
 		HashMap<String,Object> hDatosFinal = new HashMap<String, Object>();	
 		
-		List<List<Map<String,Object>>> listaDatosExcel = new ArrayList<List<Map<String,Object>>>();
+		
 		List<Document> listaDocumentos = new ArrayList<Document>();
 		
 		
@@ -674,7 +578,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			throw new BusinessException(mensaje);
 		}
 		
-		for(PlantillaModeloDocumentoDTO plantilla:plantillas){								
+		for(PlantillaModeloDocumentoDTO plantilla:plantillas){
+			List<List<Map<String,Object>>> listaDatosExcel = new ArrayList<List<Map<String,Object>>>();
 			String nombrePlantilla = "";
 			Long idPlantillaGenerar = null;
 			boolean esExcel = false;
@@ -2221,7 +2126,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		GenProperties rutaFicherosSalida = _genPropertiesMapper.selectByPrimaryKey(key);
 		
-		String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator + SigaConstants.carpetaTmp + SigaConstants.pathSeparator;
+		String rutaTmp = rutaFicherosSalida.getValor() + SigaConstants.pathSeparator + idInstitucion + SigaConstants.pathSeparator + SigaConstants.carpetaTmp + SigaConstants.pathSeparator + System.currentTimeMillis() + SigaConstants.pathSeparator;
 		
 		return rutaTmp;
 	}
