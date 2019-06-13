@@ -54,7 +54,7 @@ public class GenRecursosCatalogosSqlExtendsProvider extends GenRecursosCatalogos
 	
 		sql.INSERT_INTO("GEN_RECURSOS_CATALOGOS");		
 		sql.VALUES("IDRECURSO", "(SELECT MAX(IDRECURSO) + 1 FROM GEN_RECURSOS_CATALOGOS WHERE NOMBRETABLA = 'CEN_GRUPOSCLIENTE')");
-		sql.VALUES("DESCRIPCION", "'"+ grupo + "'");
+		sql.VALUES("DESCRIPCION", "'"+ grupo.replace("'", "''") + "'");
 		sql.VALUES("IDLENGUAJE", "'"+ usuario.getIdlenguaje() + "'");
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", "'"+ String.valueOf(usuario.getIdusuario()) + "'");

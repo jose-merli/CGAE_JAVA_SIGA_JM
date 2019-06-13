@@ -98,7 +98,7 @@ public class GenTablasMaestrasSqlExtendProvider {
         }
         
         sql.UPDATE("GEN_RECURSOS_CATALOGOS");
-        sql.SET("DESCRIPCION = '" + catalogo.getDescripcion() + "'");
+        sql.SET("DESCRIPCION = '" + catalogo.getDescripcion().replace("'", "''") + "'");
         sql.WHERE( " IDRECURSO = ("+sql2+")" );
 //        sql.WHERE( " IDRECURSO = ( SELECT DESCRIPCION FROM " + tablaMaestra.getIdtablamaestra() + 
 //        		" WHERE DESCRIPCION = '" + catalogo.getIdRegistro() + "' AND IDINSTITUCION = '" + catalogo.getIdInstitucion() + "')" );
@@ -200,7 +200,7 @@ public class GenTablasMaestrasSqlExtendProvider {
         	sql.VALUES("IDINSTITUCION", "null"); 
         }
         //sql.VALUES("IDINSTITUCION",  "'" +catalogo.getIdInstitucion()+"'");
-        sql.VALUES("DESCRIPCION",  "'" +catalogo.getDescripcion()+"'");
+        sql.VALUES("DESCRIPCION",  "'" +catalogo.getDescripcion().replace("'", "''") +"'");
         sql.VALUES("IDLENGUAJE", "'" + catalogo.getIdLenguaje()+"'");
         sql.VALUES("FECHAMODIFICACION", "SYSDATE");
         sql.VALUES("NOMBRETABLA",  "'" +tablaMaestra.getIdtablamaestra()+"'");
