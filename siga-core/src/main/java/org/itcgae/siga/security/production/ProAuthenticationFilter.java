@@ -108,9 +108,9 @@ public class ProAuthenticationFilter extends AbstractAuthenticationProcessingFil
 			Authentication auth) throws IOException, ServletException {
 		response.addHeader("Access-Control-Allow-Headers",
 				"Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, "
-						+ "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+						+ "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Content-Disposition");
 		response.addHeader("Access-Control-Expose-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
-                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"); 
+                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Content-Disposition"); 
 		try {
 			if (auth.getClass().equals(UserAuthenticationToken.class)) {
 				response.addHeader(tokenHeaderAuthKey, UserTokenUtils.generateToken((UserAuthenticationToken) auth));
