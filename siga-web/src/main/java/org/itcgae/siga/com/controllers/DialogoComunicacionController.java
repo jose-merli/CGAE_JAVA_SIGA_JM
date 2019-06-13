@@ -118,7 +118,6 @@ public class DialogoComunicacionController {
 		headers.add("Pragma", "no-cache");
 		headers.add("Expires", "0");
 		
-		file.delete();
 		
 		return ResponseEntity.ok().headers(headers).contentLength(file.length())
 				.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
