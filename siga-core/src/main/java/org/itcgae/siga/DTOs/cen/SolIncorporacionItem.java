@@ -65,6 +65,7 @@ public class SolIncorporacionItem {
 	private String numerocuenta;
 	private String idPersona;
 	private String bic;
+	private String nombreBanco;
 	private Date fechaEstadoSolicitud;
 	
 	
@@ -437,6 +438,13 @@ public class SolIncorporacionItem {
 	public void setFechaEstadoSolicitud(Date fechaEstadoSolicitud) {
 		this.fechaEstadoSolicitud = fechaEstadoSolicitud;
 	}
+	public String getNombreBanco() {
+		return nombreBanco;
+	}
+	public void setNombreBanco(String nombreBanco) {
+		this.nombreBanco = nombreBanco;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -502,6 +510,8 @@ public class SolIncorporacionItem {
 		result = prime * result + ((tipoSolicitud == null) ? 0 : tipoSolicitud.hashCode());
 		result = prime * result + ((titular == null) ? 0 : titular.hashCode());
 		result = prime * result + ((tratamiento == null) ? 0 : tratamiento.hashCode());
+		result = prime * result + ((nombreBanco == null) ? 0 : nombreBanco.hashCode());
+
 		return result;
 	}
 	@Override
@@ -818,6 +828,11 @@ public class SolIncorporacionItem {
 				return false;
 		} else if (!tratamiento.equals(other.tratamiento))
 			return false;
+		if (nombreBanco == null) {
+			if (other.nombreBanco != null)
+				return false;
+		} else if (!nombreBanco.equals(other.nombreBanco))
+			return false;
 		return true;
 	}
 	@Override
@@ -843,7 +858,7 @@ public class SolIncorporacionItem {
 				+ numeroCuenta + ", banco=" + banco + ", idInstitucion=" + idInstitucion + ", poblacionExtranjera="
 				+ poblacionExtranjera + ", abonocargo=" + abonocargo + ", abonosjcs=" + abonosjcs + ", numerocuenta="
 				+ numerocuenta + ", idPersona=" + idPersona + ", bic=" + bic + ", fechaEstadoSolicitud="
-				+ fechaEstadoSolicitud + "]";
+				+ fechaEstadoSolicitud + " + , nombreBanco=" + nombreBanco + "]";
 	}
 	
 	

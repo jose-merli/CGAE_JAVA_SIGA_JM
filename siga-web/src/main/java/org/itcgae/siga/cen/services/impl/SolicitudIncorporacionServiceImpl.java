@@ -879,13 +879,21 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		solIncorporacion.setFechanacimiento(dto.getFechaNacimiento());
 		solIncorporacion.setFechasolicitud(dto.getFechaSolicitud());
 		solIncorporacion.setFechaestadosolicitud(dto.getFechaEstadoSolicitud());
+		
+		solIncorporacion.setIban(dto.getIban());	
+		solIncorporacion.setNombrebanco(dto.getBanco());
+		solIncorporacion.setBic(dto.getBic());
+		
 		if(dto.getIban() != null) {
-			solIncorporacion.setIban(dto.getIban());	
-			solIncorporacion.setCboCodigo(dto.getIban().substring(4, 8));
-			solIncorporacion.setCodigosucursal(dto.getIban().substring(8, 12));
-			solIncorporacion.setDigitocontrol(dto.getIban().substring(12, 14));
-			solIncorporacion.setNumerocuenta(dto.getIban().substring(14, 24));
+			if (dto.getIban().substring(0, 2).equals("ES")) {
+				
+				solIncorporacion.setCboCodigo(dto.getIban().substring(4, 8));
+				solIncorporacion.setCodigosucursal(dto.getIban().substring(8, 12));
+				solIncorporacion.setDigitocontrol(dto.getIban().substring(12, 14));
+				solIncorporacion.setNumerocuenta(dto.getIban().substring(14, 24));
+			}
 		}
+		
 		solIncorporacion.setIdestado(Short.parseShort(dto.getIdEstado()));
 		if(dto.getIdEstadoCivil() != null) {
 			solIncorporacion.setIdestadocivil(Short.parseShort(dto.getIdEstadoCivil()));
@@ -1104,15 +1112,20 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		cuenta.setAbonocargo(solicitud.getAbonocargo());
 		cuenta.setAbonosjcs(solicitud.getAbonosjcs());
 		cuenta.setFechamodificacion(new Date());
-		cuenta.setIban(solicitud.getIban());
 		cuenta.setIdinstitucion(usuario.getIdinstitucion());
 		cuenta.setIdpersona(idPersona);
 		cuenta.setNumerocuenta(solicitud.getNumerocuenta());
 		cuenta.setTitular(solicitud.getTitular());
-		cuenta.setCboCodigo(solicitud.getIban().substring(4, 8));
-		cuenta.setCodigosucursal(solicitud.getIban().substring(8, 12));
-		cuenta.setDigitocontrol(solicitud.getIban().substring(12, 14));
-		cuenta.setNumerocuenta(solicitud.getIban().substring(14, 24));
+		
+		cuenta.setIban(solicitud.getIban());
+
+		if (cuenta.getIban().substring(0, 2).equals("ES")) {
+			cuenta.setCboCodigo(solicitud.getIban().substring(4, 8));
+			cuenta.setCodigosucursal(solicitud.getIban().substring(8, 12));
+			cuenta.setDigitocontrol(solicitud.getIban().substring(12, 14));
+			cuenta.setNumerocuenta(solicitud.getIban().substring(14, 24));
+		}
+
 		cuenta.setUsumodificacion(usuario.getIdusuario());
 		
 		List<CenCuentasbancarias> cuentaBancaria = null;
@@ -1138,25 +1151,28 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		datosBancariosSearchDTO.setIdInstitucion(solicitud.getIdinstitucion().toString());
 //		datosBancariosSearchDTO.setIdPersona(solicitud.getIdpersona());
 		
-		List<DatosBancariosItem> datosBancariosItem = new ArrayList<DatosBancariosItem>();
-		datosBancariosItem = cenCuentasbancariasExtendsMapper.selectCuentasBancarias(datosBancariosSearchDTO,
-				solicitud.getIdinstitucion().toString());
+//		List<DatosBancariosItem> datosBancariosItem = new ArrayList<DatosBancariosItem>();
+//		datosBancariosItem = cenCuentasbancariasExtendsMapper.selectCuentasBancarias(datosBancariosSearchDTO,
+//				solicitud.getIdinstitucion().toString());
+//
+//		List<BancoBicItem> bancoBicItem = new ArrayList<BancoBicItem>();
 
-		List<BancoBicItem> bancoBicItem = new ArrayList<BancoBicItem>();
-
-		DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO = new DatosBancariosSearchBancoDTO();
-		datosBancariosSearchBancoDTO.setiban(solicitud.getIban().substring(4, 8));
-		bancoBicItem = cenCuentasbancariasExtendsMapper.selectBanks(datosBancariosSearchBancoDTO);
-		
+//		DatosBancariosSearchBancoDTO datosBancariosSearchBancoDTO = new DatosBancariosSearchBancoDTO();
+//		datosBancariosSearchBancoDTO.setiban(solicitud.getIban().substring(4, 8));
+//		bancoBicItem = cenCuentasbancariasExtendsMapper.selectBanks(datosBancariosSearchBancoDTO);
+//		
 		// Comprobamos que el código está en cen_bancos, si está se pone sin más en
 		// cbo_codigo, sino se coge el máx del código
+		List<CenBancos> cenBancos = null;
+		
 		CenBancosExample cenBancosExample = new CenBancosExample();
-		cenBancosExample.createCriteria().andBicEqualTo(bancoBicItem.get(0).getBic())
-				.andCodigoEqualTo(solicitud.getIban().substring(4, 8));
-		List<CenBancos> cenBancos = cenBancosExtendsMapper.selectByExample(cenBancosExample);
+		cenBancosExample.createCriteria().andBicEqualTo(solicitud.getBic())
+		.andNombreEqualTo(solicitud.getNombrebanco());
+		cenBancos = cenBancosExtendsMapper.selectByExample(cenBancosExample);
+		
 
 		if (null != cenBancos && !cenBancos.isEmpty()) {
-//			cuentaBancaria.setCboCodigo(cenBancos.get(0).getCodigo()); // Tanto si es ext o esp tiene cod en
+			cuenta.setCboCodigo(cenBancos.get(0).getCodigo()); // Tanto si es ext o esp tiene cod en
 																		// cenBancos
 		} else {
 			// insertar en cen_bancos
@@ -1179,8 +1195,10 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 				record.setNombre("BANCO EXTRANJERO");
 			} else {
 				record.setCodigo(solicitud.getIban().substring(4, 8));
+				record.setNombre(solicitud.getNombrebanco());
 			}
 
+			record.setBic(solicitud.getBic());
 			record.setFechamodificacion(new Date());
 
 			CenPaisExample cenPaisExample = new CenPaisExample();
@@ -1195,13 +1213,9 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 
 			int res = cenBancosExtendsMapper.insert(record);
 
-//			if (res == 0) {
-//				insertResponseDTO.setStatus(SigaConstants.KO);
-//				error.setMessage("Error al insertar en CEN_BANCOS");
-//				insertResponseDTO.setError(error);
-//			} else {
-//				cuentaBancaria.setCboCodigo(record.getCodigo());
-//			}
+			if (res != 0) {
+				cuenta.setCboCodigo(record.getCodigo());
+			}
 		}
 		
 		LOGGER.info(

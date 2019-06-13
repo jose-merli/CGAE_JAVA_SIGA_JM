@@ -60,6 +60,8 @@ public class CenSolicitudincorporacionSqlExtendsProvider {
 		sql.SELECT("PROVINCIAS.NOMBRE AS NOMBREPROVINCIA");
 		sql.SELECT("TITULAR");
 		sql.SELECT("IBAN");
+		sql.SELECT("BIC");
+		sql.SELECT("NOMBREBANCO");
 		sql.SELECT("ABONOCARGO");
 		sql.SELECT("ABONOSJCS");
 		sql.SELECT("CBO_CODIGO");

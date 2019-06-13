@@ -135,7 +135,7 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 		sql.INSERT_INTO("ADM_USUARIOS");
 		sql.VALUES("IDUSUARIO", ("(select MAX(IDUSUARIO)  + 1 from ADM_USUARIOS  where IDINSTITUCION = " + "'"
 				+ usuarioCreateDTO.getIdInstitucion() + "' )")); // Realmente este idInstitucion se coge del variable session
-		sql.VALUES("DESCRIPCION", "'" + usuarioCreateDTO.getNombreApellidos() + "'");
+		sql.VALUES("DESCRIPCION", "'" + usuarioCreateDTO.getNombreApellidos().replace("'", "''") + "'");
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
 		sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuarioModificacion)+"'");
 		sql.VALUES("IDINSTITUCION", "'" + usuarioCreateDTO.getIdInstitucion() + "'");
