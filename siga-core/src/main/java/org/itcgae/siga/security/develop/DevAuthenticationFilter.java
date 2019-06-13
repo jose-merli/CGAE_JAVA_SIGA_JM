@@ -61,10 +61,10 @@ public class DevAuthenticationFilter extends AbstractAuthenticationProcessingFil
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication auth) throws IOException, ServletException {
 		response.addHeader("Access-Control-Allow-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
-                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Content-Disposition");
+                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 
 		response.addHeader("Access-Control-Expose-Headers", "Authorization, Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
-                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers, Content-Disposition"); 
+                "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"); 
 		
 		try {
 			if (auth.getClass().equals(UserAuthenticationToken.class)) {
