@@ -246,7 +246,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 		sql.INSERT_INTO("CEN_PERSONA");
 		sql.VALUES("IDPERSONA", "(Select max(idpersona) +1 from cen_persona where idpersona like '" + usuario.getIdinstitucion() + "' || '%' )");
-		sql.VALUES("NOMBRE", "'" + etiquetaUpdateDTO.getDenominacion() + "'");
+		sql.VALUES("NOMBRE", "'" + etiquetaUpdateDTO.getDenominacion().replace("'", "''") + "'");
 		// sql.VALUES("APELLIDOS1", "");
 		// sql.VALUES("APELLIDOS2", "");
 		sql.VALUES("NIFCIF", "'" + etiquetaUpdateDTO.getNif() + "'");
@@ -293,13 +293,13 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona where idpersona like '" + usuario.getIdinstitucion() + "' || '%' )");
 
 		if (!crearPersonaDTO.getNombre().equals("")) {
-			sql.VALUES("NOMBRE", "'" + crearPersonaDTO.getNombre() + "'");
+			sql.VALUES("NOMBRE", "'" + crearPersonaDTO.getNombre().replace("'", "''") + "'");
 		}
 		if (!crearPersonaDTO.getApellidos1().equals("")) {
-			sql.VALUES("APELLIDOS1", "'" + crearPersonaDTO.getApellidos1() + "'");
+			sql.VALUES("APELLIDOS1", "'" + crearPersonaDTO.getApellidos1().replace("'", "''") + "'");
 		}		
 		if (null != crearPersonaDTO.getApellidos2()) {
-			sql.VALUES("APELLIDOS2", "'" + crearPersonaDTO.getApellidos2() + "'");
+			sql.VALUES("APELLIDOS2", "'" + crearPersonaDTO.getApellidos2().replace("'", "''") + "'");
 		} else {
 			sql.VALUES("APELLIDOS2", "null");
 		}
@@ -326,7 +326,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		}
 		
 		if(null != crearPersonaDTO.getNaturalde()) {
-			sql.VALUES("NATURALDE", "'" + crearPersonaDTO.getNaturalde() + "'");
+			sql.VALUES("NATURALDE", "'" + crearPersonaDTO.getNaturalde().replace("'", "''") + "'");
 		}
 
 		sql.VALUES("FECHAMODIFICACION", "SYSDATE");
@@ -342,13 +342,13 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona where idpersona like '" + usuario.getIdinstitucion() + "' || '%' )");
 
 		if (!crearPersonaDTO.getNombre().equals("")) {
-			sql.VALUES("NOMBRE", "'" + crearPersonaDTO.getNombre() + "'");
+			sql.VALUES("NOMBRE", "'" + crearPersonaDTO.getNombre().replace("'", "''") + "'");
 		}
 		if (!crearPersonaDTO.getApellido1().equals("")) {
-			sql.VALUES("APELLIDOS1", "'" + crearPersonaDTO.getApellido1() + "'");
+			sql.VALUES("APELLIDOS1", "'" + crearPersonaDTO.getApellido1().replace("'", "''") + "'");
 		}
 		if (!crearPersonaDTO.getApellido2().equals("")) {
-			sql.VALUES("APELLIDOS2", "'" + crearPersonaDTO.getApellido2() + "'");
+			sql.VALUES("APELLIDOS2", "'" + crearPersonaDTO.getApellido2().replace("'", "''") + "'");
 		} else {
 			sql.VALUES("APELLIDOS2", "null");
 		}
@@ -422,10 +422,10 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona where idpersona like '" + usuario.getIdinstitucion() + "' || '%' )");
 
 		if (!sociedadCreateDTO.getDenominacion().equals("")) {
-			sql.VALUES("NOMBRE", "'" + sociedadCreateDTO.getDenominacion() + "'");
+			sql.VALUES("NOMBRE", "'" + sociedadCreateDTO.getDenominacion().replace("'", "''") + "'");
 		}
 		if (!sociedadCreateDTO.getAbreviatura().equals("")) {
-			sql.VALUES("APELLIDOS1", "'" + sociedadCreateDTO.getAbreviatura() + "'");
+			sql.VALUES("APELLIDOS1", "'" + sociedadCreateDTO.getAbreviatura().replace("'", "''") + "'");
 		}
 
 		if (!sociedadCreateDTO.getNif().equals("")) {

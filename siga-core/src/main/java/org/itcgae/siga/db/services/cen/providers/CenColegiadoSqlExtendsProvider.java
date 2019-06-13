@@ -517,7 +517,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.VALUES("FECHADEONTOLOGIA", "'" + cenColegiado.getFechadeontologia() + "'");
 		sql.VALUES("FECHAMOVIMIENTO", "'" + cenColegiado.getFechamovimiento() + "'");
 		sql.VALUES("IDTIPOSSEGURO", "'" + String.valueOf(cenColegiado.getIdtiposseguro()) + "'");
-		sql.VALUES("CUENTACONTABLESJCS", "'" + String.valueOf(cenColegiado.getCuentacontablesjcs()) + "'");
+		sql.VALUES("CUENTACONTABLESJCS", "'" + String.valueOf(cenColegiado.getCuentacontablesjcs()).replace("'", "''") + "'");
 		sql.VALUES("IDENTIFICADORDS", "'" + String.valueOf(cenColegiado.getIdentificadords()) + "'");
 		sql.VALUES("NMUTUALISTA", "'" + String.valueOf(cenColegiado.getNmutualista()) + "'");
 		sql.VALUES("NUMSOLICITUDCOLEGIACION", "'" + String.valueOf(cenColegiado.getNumsolicitudcolegiacion()) + "'");

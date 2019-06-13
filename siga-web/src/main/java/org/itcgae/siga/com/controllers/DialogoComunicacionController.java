@@ -102,16 +102,17 @@ public class DialogoComunicacionController {
 			InputStreamResource resource = new InputStreamResource(targetStream);
 	
 			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.parseMediaType("application/zip"));
-			headers.add("Access-Control-Allow-Headers", "Content-Type");
-			headers.add("Access-Control-Expose-Headers","Content-Disposition");
-			headers.add("Content-Disposition", "filename=" + SigaConstants.nombreZip + ".zip");
+			
+			headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=img.jpg");
 			headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
 			headers.add("Pragma", "no-cache");
-			headers.add("Expires", "0");
+			headers.add("Expires", "100000000");
+			headers.add("Content-Type", "application/octet-stream; charset=UTF-8");
+			//headers.add("Content-Disposition", "filename=\"" + SigaConstants.nombreZip + ".zip\"");
+			resp.setContentType("application/octet-stream");
+			resp.setHeader("Content-Disposition", "attachment; filename=\"" + SigaConstants.nombreZip + ".zip\"");
 			
-			return ResponseEntity.ok().headers(headers).contentLength(zip.length)
-					.contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+			return ResponseEntity.ok().headers(headers).contentLength(zip.length).body(resource);
 		}else {
 			return null;
 		}

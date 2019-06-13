@@ -303,7 +303,7 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 						colegiadoRequest.setApellido2(busquedaPerFisicaSearchDTO.getSegundoApellido());
 					}
 
-					if (null != busquedaPerFisicaSearchDTO.getNumeroColegiado()
+					if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNumeroColegiado())
 							&& null != busquedaPerFisicaSearchDTO.getIdInstitucion()) {
 						List<com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado> colegiadosName = new ArrayList<com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado>();
 						com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest.Colegiado colegiadoSearch = com.colegiados.info.redabogacia.BusquedaColegiadoRequestDocument.BusquedaColegiadoRequest.Colegiado.Factory

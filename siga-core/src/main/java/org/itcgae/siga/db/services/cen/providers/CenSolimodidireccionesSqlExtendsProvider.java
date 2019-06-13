@@ -59,7 +59,7 @@ public class CenSolimodidireccionesSqlExtendsProvider extends CenSolicitudmodifi
 		sql.VALUES("SOCIEDADSJ", "'0'");
 		sql.VALUES("TIPO", "'" + etiquetaUpdateDTO.getTipo() + "'");
 		if (null != etiquetaUpdateDTO.getAnotaciones() && !etiquetaUpdateDTO.getAnotaciones().equals("")) {
-			sql.VALUES("ANOTACIONES", "'" + etiquetaUpdateDTO.getAnotaciones() + "'");
+			sql.VALUES("ANOTACIONES", "'" + etiquetaUpdateDTO.getAnotaciones().replace("'", "''") + "'");
 		}	
 		
 		sql.VALUES("SOCIEDADPROFESIONAL", "'0'");
@@ -82,7 +82,7 @@ public class CenSolimodidireccionesSqlExtendsProvider extends CenSolicitudmodifi
 	
 			sql.VALUES("IDSOLICITUD", ""+record.getIdsolicitud());
 			
-			sql.VALUES("MOTIVO", "'"+record.getMotivo()+"'");
+			sql.VALUES("MOTIVO", "'"+record.getMotivo().replace("'", "''")+"'");
 			
 			sql.VALUES("IDESTADOSOLIC", "10");
 			if (record.getFechainicio() != null) {				
@@ -97,7 +97,7 @@ public class CenSolimodidireccionesSqlExtendsProvider extends CenSolicitudmodifi
 				sql.VALUES("FECHAFIN","null");
 			}
 			if (record.getDescripcion() != null) {
-				sql.VALUES("DESCRIPCION"," '"+ record.getDescripcion() +"'");
+				sql.VALUES("DESCRIPCION"," '"+ record.getDescripcion().replace("'", "''") +"'");
 			}else {
 				sql.VALUES("DESCRIPCION","null");
 			}

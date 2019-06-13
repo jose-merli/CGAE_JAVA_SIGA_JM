@@ -159,7 +159,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		}
  		
 		if(!tarjetaIntegrantesUpdateDTO.getCargo().equals("")) {
-			sql.SET("CARGO = '" + tarjetaIntegrantesUpdateDTO.getCargo() + "'");
+			sql.SET("CARGO = '" + tarjetaIntegrantesUpdateDTO.getCargo().replace("'", "''") + "'");
 		}
 	
 		if(!tarjetaIntegrantesUpdateDTO.getIdCargo().equals("")) {
@@ -219,7 +219,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		sql.VALUES("IDCOMPONENTE", "'" + tarjetaIntegrantesCreateDTO.getIdComponente() + "'");
 		
 		if(!tarjetaIntegrantesCreateDTO.getCargo().equals("")) {
-	        sql.VALUES("CARGO", "'" + tarjetaIntegrantesCreateDTO.getCargo() + "'");
+	        sql.VALUES("CARGO", "'" + tarjetaIntegrantesCreateDTO.getCargo().replace("'", "''") + "'");
 		}
 		
 		if(null != tarjetaIntegrantesCreateDTO.getFechaCargo()) {

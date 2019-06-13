@@ -65,6 +65,7 @@ import org.itcgae.siga.db.entities.EnvCamposenviosKey;
 import org.itcgae.siga.db.entities.EnvConsultasenvio;
 import org.itcgae.siga.db.entities.EnvConsultasenvioExample;
 import org.itcgae.siga.db.entities.EnvDestConsultaEnvio;
+import org.itcgae.siga.db.entities.EnvDestConsultaEnvioExample;
 import org.itcgae.siga.db.entities.EnvDestConsultaEnvioKey;
 import org.itcgae.siga.db.entities.EnvDestinatarios;
 import org.itcgae.siga.db.entities.EnvDestinatariosBurosms;
@@ -916,6 +917,53 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						}
 					}
 
+					
+					
+					// env_grupocliente
+					
+					  EnvEnviosgrupoclienteExample gruposExample = new  EnvEnviosgrupoclienteExample();
+					  gruposExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
+					  List<EnvEnviosgrupocliente> grupos =
+					  _envEnviosgrupoclienteMapper.selectByExample(gruposExample); 
+					  for (EnvEnviosgrupocliente envEnviosgrupocliente : grupos) {
+						  envEnviosgrupocliente.setIdenvio(idEnvioNuevo);
+						  envEnviosgrupocliente.setFechamodificacion(new Date());
+						  envEnviosgrupocliente.setUsumodificacion(usuario.getIdusuario());
+						  _envEnviosgrupoclienteMapper.insert(envEnviosgrupocliente); 
+					  }
+					 
+					
+					  
+						// env_destinatarios
+						
+					  EnvDestinatariosExample destinatariosExample = new  EnvDestinatariosExample();
+					  destinatariosExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
+					  List<EnvDestinatarios> destinatarios =
+					  _envDestinatariosMapper.selectByExample(destinatariosExample); 
+					  for (EnvDestinatarios destinatario : destinatarios) {
+						  destinatario.setIdenvio(idEnvioNuevo);
+						  destinatario.setFechamodificacion(new Date());
+						  destinatario.setUsumodificacion(usuario.getIdusuario());
+						  _envDestinatariosMapper.insert(destinatario); 
+					  }
+					  
+					// env_consultasDestinatarios
+						
+					  EnvDestConsultaEnvioExample destConsultaEnvioExample = new  EnvDestConsultaEnvioExample();
+					  destConsultaEnvioExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
+					  List<EnvDestConsultaEnvio> destConsultaEnvios =
+					  _envDestConsultaEnvioMapper.selectByExample(destConsultaEnvioExample); 
+					  for (EnvDestConsultaEnvio destConsultaEnvio : destConsultaEnvios) {
+						  destConsultaEnvio.setIdenvio(idEnvioNuevo);
+						  destConsultaEnvio.setFechamodificacion(new Date());
+						  destConsultaEnvio.setUsumodificacion(usuario.getIdusuario());
+						  _envDestConsultaEnvioMapper.insert(destConsultaEnvio); 
+					  }
+					  
+					  
+					 
+					
+					
 					// tabla env_historicoestadoenvio
 					EnvHistoricoestadoenvioExample histExample = new EnvHistoricoestadoenvioExample();
 					histExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);

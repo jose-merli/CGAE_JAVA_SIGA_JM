@@ -534,11 +534,11 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		
  		if(null != cursoItem.getNombreCurso()) {
-			sql.SET("NOMBRECURSO ='" + cursoItem.getNombreCurso() + "'");
+			sql.SET("NOMBRECURSO ='" + cursoItem.getNombreCurso().replace("'", "''") + "'");
 		}
  		
  		if(null != cursoItem.getDescripcionEstado()) {
-			sql.SET("DESCRIPCION ='" + cursoItem.getDescripcionEstado() + "'");
+			sql.SET("DESCRIPCION ='" + cursoItem.getDescripcionEstado().replace("'", "''") + "'");
 		}
 
  		if(null != cursoItem.getFechaImparticionDesdeDate()) {
@@ -574,7 +574,7 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		}
 		
 		if(cursoItem.getAdicional() != null) {
-			sql.SET("INFORMACIONADICIONAL = '" + cursoItem.getAdicional() + "'");
+			sql.SET("INFORMACIONADICIONAL = '" + cursoItem.getAdicional().replace("'", "''") + "'");
 		}
 		
 		if(cursoItem.getAdjunto() != null) {
