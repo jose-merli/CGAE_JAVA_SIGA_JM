@@ -30,7 +30,7 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 			sql.VALUES("USUMODIFICACION", "'" + cenDatoscolegialesestado.getUsumodificacion() + "'");
 		}
 		if (cenDatoscolegialesestado.getObservaciones() != null) {
-			sql.VALUES("OBSERVACIONES", "'" + cenDatoscolegialesestado.getObservaciones() + "'");
+			sql.VALUES("OBSERVACIONES", "'" + cenDatoscolegialesestado.getObservaciones().replace("'", "''") + "'");
 		}
 		return sql.toString();
 	}
@@ -50,7 +50,7 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 		}
 
 		if (record.getObservaciones() != null && !record.getObservaciones().equals("")) {
-			sql.SET("OBSERVACIONES = '" + record.getObservaciones() + "'");
+			sql.SET("OBSERVACIONES = '" + record.getObservaciones().replace("'", "''") + "'");
 		}
 
 		sql.SET("FECHAMODIFICACION = TO_DATE('" + dateFormat.format(new Date()) + "', 'dd/MM/RRRR')");

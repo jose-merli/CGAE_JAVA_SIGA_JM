@@ -340,7 +340,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.VALUES("SOCIEDADSJ", "'0'");
 		sql.VALUES("TIPO", "'" + etiquetaUpdateDTO.getTipo() + "'");
 		if (null != etiquetaUpdateDTO.getAnotaciones() && !etiquetaUpdateDTO.getAnotaciones().equals("")) {
-			sql.VALUES("ANOTACIONES", "'" + etiquetaUpdateDTO.getAnotaciones() + "'");
+			sql.VALUES("ANOTACIONES", "'" + etiquetaUpdateDTO.getAnotaciones().replace("'", "''") + "'");
 		}	
 		
 		// sql.VALUES("PREFIJO_NUMREG", "");
@@ -430,10 +430,10 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		sql.UPDATE("cen_nocolegiado");
-			sql.SET("RESENA = '" + perJuridicaDatosRegistralesUpdateDTO.getResena() + "'");
-			sql.SET("OBJETOSOCIAL = '" + perJuridicaDatosRegistralesUpdateDTO.getObjetoSocial() + "'");
+			sql.SET("RESENA = '" + perJuridicaDatosRegistralesUpdateDTO.getResena().replace("'", "''") + "'");
+			sql.SET("OBJETOSOCIAL = '" + perJuridicaDatosRegistralesUpdateDTO.getObjetoSocial().replace("'", "''") + "'");
 			sql.SET("NOPOLIZA = '" + perJuridicaDatosRegistralesUpdateDTO.getNumeroPoliza() + "'");
-			sql.SET("COMPANIASEG = '" + perJuridicaDatosRegistralesUpdateDTO.getCompaniaAseg() + "'");
+			sql.SET("COMPANIASEG = '" + perJuridicaDatosRegistralesUpdateDTO.getCompaniaAseg().replace("'", "''") + "'");
 			
 		if(null != perJuridicaDatosRegistralesUpdateDTO.getFechaFin()) {
 			String fechaF = dateFormat.format(perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
@@ -599,7 +599,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.VALUES("SOCIEDADSJ", "'0'");
 		sql.VALUES("TIPO", "'" + sociedadCreateDTO.getTipo() + "'");
 		if (null != sociedadCreateDTO.getAnotaciones() && !sociedadCreateDTO.getAnotaciones().equals("")) {
-			sql.VALUES("ANOTACIONES", "'" + sociedadCreateDTO.getAnotaciones() + "'");
+			sql.VALUES("ANOTACIONES", "'" + sociedadCreateDTO.getAnotaciones().replace("'", "''") + "'");
 		}
 
 		// sql.VALUES("PREFIJO_NUMREG", "");

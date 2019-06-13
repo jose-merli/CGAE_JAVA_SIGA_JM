@@ -2106,7 +2106,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			}
 
 			// crear path para almacenar el fichero
-			String pathFichero = pathGF + String.valueOf(idInstitucion) + "/mandatos/" + idPersona + "/";
+			String pathFichero = pathGF + String.valueOf(idInstitucion) + "/mandatos/" + idPersona;
 			String fileNewName = idInstitucion + "_" + newIdFichero;
 
 			// No hay que indicar que tipo de mandato es el fichero, solo la institucion y
@@ -2168,7 +2168,7 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 			genFichero.setDescripcion(genRecursos.get(0).getDescripcion());
 			// unimos el path + nombre del fichero (sin extension)
-			String directorio = pathFichero + fileNewNameNoExtension;
+			String directorio = pathFichero;
 			genFichero.setDirectorio(directorio);
 			responseGenFichero = genFicheroExtendsMapper.insertSelective(genFichero);
 			if (responseGenFichero == 1) {
@@ -2281,12 +2281,13 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 
 		if (null != genFichero) {
 			String pathAbsolute = genFichero.getDirectorio();
-			pathAbsolute += "." + genFichero.getExtension();
 
 			// File file = new File("C://IISIGA/anexos/2006002472110.pdf");
 			
-			String [] path = pathAbsolute.split("/");
-			filename = path[path.length - 1]; 
+//			String [] path = pathAbsolute.split("/");
+			filename = idInstitucion + "_" + idFichero + "." + genFichero.getExtension() ;
+			pathAbsolute += "/" + filename;
+
 			File file = new File(pathAbsolute);
 			FileInputStream fis = null;
 
