@@ -64,6 +64,8 @@ public interface CenSolicitudincorporacionExtendsMapper {
 			@Result(column = "NOMBREPROVINCIA", property = "nombreProvincia", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "TITULAR", property = "titular", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IBAN", property = "iban", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "BIC", property = "bic", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "NOMBREBANCO", property = "nombreBanco", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ABONOCARGO", property = "abonoCargo", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "ABONOSJCS", property = "abonoJCS", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "CBO_CODIGO", property = "cboCodigo", jdbcType = JdbcType.VARCHAR),
