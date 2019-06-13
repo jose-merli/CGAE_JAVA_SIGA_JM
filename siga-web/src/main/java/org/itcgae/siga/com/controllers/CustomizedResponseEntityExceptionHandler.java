@@ -42,7 +42,7 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 	public final ResponseEntity<ErrorDetail> handleAllExceptions(Exception ex, WebRequest request) {
 		LOGGER.error("ExceptionHandler Exception :: " + ex.getMessage(), ex);
 		ErrorDetail error = new ErrorDetail();
-		error.setMessage(ex.getMessage());
+		error.setMessage("Error interno de la aplicación");
 		error.setDescription(printStackTraceToString(ex));
 		return new ResponseEntity<ErrorDetail>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
