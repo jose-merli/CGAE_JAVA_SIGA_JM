@@ -907,10 +907,10 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 											resultDatos = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDatos);
 										} catch (BusinessSQLException e) {
 											LOGGER.error(e);
-											throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(), e);
+											throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getDescripcion() + " " + e.getMessage(), e);
 										} catch (Exception e) {
 											LOGGER.error(e);
-											throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
+											throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getDescripcion(), e);
 										}
 										
 										if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
