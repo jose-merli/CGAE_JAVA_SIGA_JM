@@ -537,7 +537,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			}	
 			
 			generarComunicacion.setListaModelosEnvio(listaModelosEnvio);
-			if(listaFicheros.get(0) != null) {
+			if(listaFicheros != null && listaFicheros.size() > 0 && listaFicheros.get(0) != null) {
 				generarComunicacion.setListaDocumentos(listaFicheros);
 			}
 			
