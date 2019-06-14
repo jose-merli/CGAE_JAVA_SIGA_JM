@@ -1833,7 +1833,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 					posEtiquetaOperador=sentencia.toUpperCase().indexOf("%%LIKE%%");
 				}
 
-				sentencia=sentencia.substring(0,posEtiquetaOperador);
+				if (posEtiquetaOperador > -1) {
+					sentencia=sentencia.substring(0,posEtiquetaOperador);
+				}
 
 				if (sentencia.indexOf(".")>=0){
 					sentencia=sentencia.substring(sentencia.indexOf(".")+1);
