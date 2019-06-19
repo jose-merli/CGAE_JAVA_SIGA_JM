@@ -108,6 +108,7 @@ public interface CenComponentesExtendsMapper extends CenComponentesMapper {
 		@Result(column = "ABREVIATURA", property = "abreviatura", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHACONSTITUCION", property = "fechaConstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPO", property = "tipo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TIPOSOCIEDAD", property = "tipoSociedad", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMEROINTEGRANTES", property = "numeroIntegrantes", jdbcType = JdbcType.VARCHAR)
 	})
 	List<BusquedaJuridicaItem> searchSocieties(String idPersona, String idLenguaje, String idInstitucion);

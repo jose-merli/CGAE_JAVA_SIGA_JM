@@ -85,6 +85,7 @@ import org.itcgae.siga.db.services.com.mappers.ConModulosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConObjetivoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModKeyclasecomunicacionExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
 import org.itcgae.siga.exception.BusinessSQLException;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -153,6 +154,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 	
 	@Autowired
 	private ModModeloPerfilesMapper modModeloPerfilesMapper;
+
+	@Autowired
+	private ModPlantillaDocumentoConsultaExtendsMapper _modPlantillaDocumentoConsultaExtendsMapper;
 
 	
 	@Override
@@ -591,8 +595,20 @@ public class ConsultasServiceImpl implements IConsultasService{
 						plantilla.setFechamodificacion(new Date());
 						plantilla.setIdioma(SigaConstants.LENGUAJE_DEFECTO);
 						plantilla.setPlantilla(SigaConstants.nombreExcelConsulta);
-						plantilla.setUsumodificacion(Integer.parseInt(usuario.getIdlenguaje()));
+						plantilla.setUsumodificacion(usuario.getIdusuario());
 						_modPlantilladocumentoMapper.insert(plantilla);
+						
+						//Creamos la plantilla en el resto de idiomas
+						
+
+						plantilla.setIdioma("2");
+						_modPlantillaDocumentoConsultaExtendsMapper.insertModPlantillaDocumento(plantilla);
+						
+						plantilla.setIdioma("3");
+						_modPlantillaDocumentoConsultaExtendsMapper.insertModPlantillaDocumento(plantilla);
+						
+						plantilla.setIdioma("4");
+						_modPlantillaDocumentoConsultaExtendsMapper.insertModPlantillaDocumento(plantilla);
 						
 						//Creamos la relación con la plantilla de documento para generación de excel
 						ModModeloPlantilladocumento plantillaDoc = new ModModeloPlantilladocumento();

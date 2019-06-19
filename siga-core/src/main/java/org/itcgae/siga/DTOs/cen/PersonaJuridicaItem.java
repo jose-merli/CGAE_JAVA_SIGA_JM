@@ -25,8 +25,17 @@ public class PersonaJuridicaItem {
 	private String sociedadProfesional;
 	private String idLenguajeSociedad;
 	private String cuentaContable;
+	private String tipoSociedad;
 
 	
+
+	public String getTipoSociedad() {
+		return tipoSociedad;
+	}
+
+	public void setTipoSociedad(String tipoSociedad) {
+		this.tipoSociedad = tipoSociedad;
+	}
 
 	/**
 	 */
