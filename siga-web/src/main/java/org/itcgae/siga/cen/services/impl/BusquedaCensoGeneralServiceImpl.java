@@ -200,8 +200,18 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 
 									busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido()
 											.concat(busquedaPerFisica.getSegundoApellido()));
-									busquedaPerFisica
-											.setNif(colegiado.getDatosPersonales().getIdentificacion().getNIF());
+									
+									if(null != colegiado.getDatosPersonales().getIdentificacion().getNIF()) {
+										busquedaPerFisica
+										.setNif(colegiado.getDatosPersonales().getIdentificacion().getNIF());
+									}else if(null != colegiado.getDatosPersonales().getIdentificacion().getNIE()){
+										busquedaPerFisica
+										.setNif(colegiado.getDatosPersonales().getIdentificacion().getNIE());
+									}else if(null != colegiado.getDatosPersonales().getIdentificacion().getPasaporte()){
+										busquedaPerFisica
+										.setNif(colegiado.getDatosPersonales().getIdentificacion().getPasaporte());
+									}
+									
 									busquedaPerFisica.setNombre(colegiado.getDatosPersonales().getNombre());
 									if (null != colegiadoColegiacion.getResidente()) {
 										if (colegiadoColegiacion.getResidente().toString().equals("1")) {

@@ -68,6 +68,8 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				}
 			}
 			
+			doc.getMailMerge().deleteFields();
+
 		} catch (Exception e) {
 			LOGGER.error("GeneracionDocumentosServiceImpl.sustituyeDocumento :: Error al sustituir los datos del documento", e);
 			throw new BusinessException("Error al reemplazar los datos en el documento", e);
@@ -96,9 +98,8 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			Set<String> claves=dato.keySet();
 			
 			doc.getMailMerge().setCleanupOptions(MailMergeCleanupOptions.REMOVE_CONTAINING_FIELDS | MailMergeCleanupOptions.REMOVE_EMPTY_PARAGRAPHS  | MailMergeCleanupOptions.REMOVE_UNUSED_REGIONS | MailMergeCleanupOptions.REMOVE_UNUSED_FIELDS);
-			
 			DocumentBuilder builder=new DocumentBuilder(doc);
-			
+	
 			if(claves.size() != 0) {
 				
 			for(String clave : claves){
@@ -109,7 +110,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 						if(o != null){
 							builder.write(o.toString().trim());	
 						}else{
-							builder.write("");
+							builder.write(" ");
 						}					
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -117,12 +118,14 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 						
 				}
 			}
+
 			}else {
 				doc = null;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		return doc;
 	}
 	

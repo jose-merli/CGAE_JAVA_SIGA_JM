@@ -31,6 +31,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.aspectj.weaver.ast.And;
 import org.itcgae.siga.DTOs.com.CampoDinamicoItem;
 import org.itcgae.siga.DTOs.com.CamposDinamicosDTO;
 import org.itcgae.siga.DTOs.com.ConsultaDTO;
@@ -344,9 +345,10 @@ public class ConsultasServiceImpl implements IConsultasService{
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
+				
 				try {					
-
+					AdmUsuarios usuario = usuarios.get(0);
+					String idConsulta = consulta.getIdConsulta();
 					ConConsultaKey key = new ConConsultaKey();
 					key.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
 					key.setIdinstitucion(Short.valueOf(consulta.getIdInstitucion()));
@@ -372,7 +374,25 @@ public class ConsultasServiceImpl implements IConsultasService{
 					consulta.setNombre(conConsulta.getDescripcion());
 					
 					respuesta.setConsultaItem(consulta);
-					 
+					
+					ModPlantilladocConsultaExample example = new ModPlantilladocConsultaExample();
+					example.createCriteria()
+					.andIdconsultaEqualTo(Long.valueOf(idConsulta))
+					.andIdinstitucionEqualTo(Short.valueOf(consulta.getIdInstitucion()))
+					.andFechabajaIsNull();
+					List<ModPlantilladocConsulta> modPlantilladocConsulta = _modPlantilladocConsultaMapper.selectByExample(example);
+				
+					if (null != modPlantilladocConsulta && modPlantilladocConsulta.size() > 0) {
+
+						for(ModPlantilladocConsulta mod: modPlantilladocConsulta) {
+							mod.setIdinstitucionConsulta(Short.valueOf(consulta.getIdInstitucion()));
+							mod.setFechamodificacion(new Date());
+							mod.setUsumodificacion(usuario.getIdusuario());
+							mod.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
+							_modPlantilladocConsultaMapper.insert(mod);
+						}
+					}
+				
 				}catch (Exception e) {
 					error.setCode(500);
 					error.setMessage("Error al duplicar las consultas");
