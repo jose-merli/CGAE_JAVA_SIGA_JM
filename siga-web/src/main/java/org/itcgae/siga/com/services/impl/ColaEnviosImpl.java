@@ -56,6 +56,7 @@ import org.itcgae.siga.db.services.com.mappers.ConConsultasExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvDestConsultaEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvEnviosExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
+import org.itcgae.siga.exception.BusinessSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -185,6 +186,21 @@ public class ColaEnviosImpl implements IColaEnvios {
 		keyPlantilla.setIdtipoenvios(envio.getIdtipoenvios());
 		EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(keyPlantilla);
 
+		if(plantilla == null) {
+			LOGGER.error("No se ha encontrado la plantilla de envio asociada al envío: " + envio.getIdenvio() + " idInstitucion: " + envio.getIdinstitucion());
+			throw new BusinessException("No se ha encontrado la plantilla de envio asociada al envío: " + envio.getIdenvio() + " idInstitucion: " + envio.getIdinstitucion());
+		}
+		
+		if(plantilla.getIdpersona() == null) {
+			LOGGER.error("No se ha encontrado remitente para el envío: " + envio.getIdenvio() + " idInstitucion: " + envio.getIdinstitucion());
+			throw new BusinessException("No se ha encontrado remitente para el envío: " + envio.getIdenvio()+ " idInstitucion: " + envio.getIdinstitucion());
+		}
+		
+		if(plantilla.getIddireccion() == null) {
+			LOGGER.error("No tiene dirección asociada: " + envio.getIdenvio()+ " idInstitucion: " + envio.getIdinstitucion());
+			throw new BusinessException("No tiene dirección asociada: " + envio.getIdenvio()+ " idInstitucion: " + envio.getIdinstitucion());
+		}
+		
 		// obtenemos la direccion del remitente de la plantilla
 		CenDireccionesKey keyDireccion = new CenDireccionesKey();
 		keyDireccion.setIddireccion(plantilla.getIddireccion());
@@ -192,18 +208,19 @@ public class ColaEnviosImpl implements IColaEnvios {
 		keyDireccion.setIdinstitucion(envio.getIdinstitucion());
 		CenDirecciones remitente = _cenDireccionesMapper.selectByPrimaryKey(keyDireccion);
 		
+		if(remitente == null) {
+			LOGGER.error("No se ha encontrado remitente para el envío: " + envio.getIdenvio() + " idInstitucion: " + envio.getIdinstitucion());
+			throw new BusinessException("No se ha encontrado remitente para el envío: " + envio.getIdenvio()+ " idInstitucion: " + envio.getIdinstitucion());
+		}
+		
 		CenPersona personaRemitente = _cenPersonaMapper.selectByPrimaryKey(plantilla.getIdpersona());
 		RemitenteDTO remitentedto = new RemitenteDTO();
 
 		if(plantilla.getDescripcionRemitente() != null && plantilla.getDescripcionRemitente() != "") {
 			remitentedto.setNombre(plantilla.getDescripcionRemitente());
 			remitentedto.setApellido1("");
+			remitentedto.setCorreoElectronico(remitente.getCorreoelectronico());
 			
-			if(remitente != null) {
-				remitentedto.setCorreoElectronico(remitente.getCorreoelectronico());
-			}else {
-				remitentedto.setCorreoElectronico("");
-			}
 		}else {
 			remitentedto.setNombre(personaRemitente.getNombre());
 			remitentedto.setApellido1(personaRemitente.getApellidos1());
@@ -211,11 +228,8 @@ public class ColaEnviosImpl implements IColaEnvios {
 			if(personaRemitente.getApellidos2() != null) {
 				remitentedto.setApellido2(personaRemitente.getApellidos2());
 			}
-			if(remitente != null) {
-				remitentedto.setCorreoElectronico(remitente.getCorreoelectronico());
-			}else {
-				remitentedto.setCorreoElectronico("");
-			}
+			
+			remitentedto.setCorreoElectronico(remitente.getCorreoelectronico());			
 		}
 
 		
@@ -230,50 +244,68 @@ public class ColaEnviosImpl implements IColaEnvios {
 			List<EnvEnviosgrupocliente> etiquetasEnvio = _envEnviosgrupoclienteMapper.selectByExample(exampleEtiquetas);
 			
 			List<DestinatarioItem> destinatarios = new ArrayList<DestinatarioItem>();
+			
+			LOGGER.debug("Inicio obtención de destinatarios por etiquetas para el idEnvio: " + envio.getIdenvio());
+			
 			for (EnvEnviosgrupocliente envEnviosgrupocliente : etiquetasEnvio) {
 				CenGruposclienteClienteExample etiqueta = new CenGruposclienteClienteExample();
 				etiqueta.createCriteria().andIdgrupoEqualTo(envEnviosgrupocliente.getIdgrupo()).andIdinstitucionEqualTo(envio.getIdinstitucion());
 				List<CenGruposclienteCliente> personas = _cenGruposclienteClienteMapper.selectByExample(etiqueta);
+				
 				for (CenGruposclienteCliente persona : personas) {
 
 					//Obtenemos la persona
 					CenPersona cenPersona = _cenPersonaMapper.selectByPrimaryKey(persona.getIdpersona());
-					LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + cenPersona.toString());
-
-					//Buscamos las direcciones de esa persona
-					CenDireccionesExample exampleDir = new CenDireccionesExample();
 					
-					//Obtenemos la direccion preferente de la persona
-					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike("%" + SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO + "%");
-					List<CenDirecciones> direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
-					
-					if(direcciones == null || direcciones.size() == 0){
-						exampleDir = new CenDireccionesExample();
-						exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull();
-						direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
-					}
-					
-					if(direcciones != null && direcciones.size() > 0){
-						boolean añadido = false;
-						for (CenDirecciones dir : direcciones) {
-							if(dir.getCorreoelectronico() != null){
-								if(!añadido){
-									DestinatarioItem destinatario = new DestinatarioItem();
-									destinatario.setCorreoElectronico(dir.getCorreoelectronico());
-									destinatario.setNombre(cenPersona.getNombre());
-									destinatario.setApellidos1(cenPersona.getApellidos1());
-									destinatario.setApellidos2(cenPersona.getApellidos2());
-									destinatario.setNIFCIF(cenPersona.getNifcif());
-									destinatario.setIdPersona(String.valueOf(persona.getIdpersona()));
-									destinatarios.add(destinatario);
-									añadido = true;
-									LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + destinatarios.toString());
+					if(cenPersona != null) {
+						LOGGER.debug("Se va a realizar el envío por etiquetas a la persona : " + cenPersona.toString());
+						
+						//Buscamos las direcciones de esa persona
+						CenDireccionesExample exampleDir = new CenDireccionesExample();
+						
+						//Obtenemos la direccion preferente de la persona
+						exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike("%" + SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO + "%");
+						List<CenDirecciones> direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
+						
+						if(direcciones == null || direcciones.size() == 0){
+							LOGGER.debug("No se ha encontrado dirección preferente para el idPersona: " + persona.getIdpersona());							
+							exampleDir = new CenDireccionesExample();
+							exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull();
+							direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
+						}
+						
+						if(direcciones != null && direcciones.size() > 0){
+							boolean añadido = false;
+							for (CenDirecciones dir : direcciones) {
+								if(dir.getCorreoelectronico() != null){
+									if(!añadido){
+										DestinatarioItem destinatario = new DestinatarioItem();
+										destinatario.setCorreoElectronico(dir.getCorreoelectronico());
+										destinatario.setNombre(cenPersona.getNombre());
+										destinatario.setApellidos1(cenPersona.getApellidos1());
+										destinatario.setApellidos2(cenPersona.getApellidos2());
+										destinatario.setNIFCIF(cenPersona.getNifcif());
+										destinatario.setIdPersona(String.valueOf(persona.getIdpersona()));
+										destinatarios.add(destinatario);
+										añadido = true;
+										LOGGER.debug("Destinario encontrado para el envío: " + envio.getIdenvio() + " Destinatario: " + destinatarios.toString());
+									}
 								}
 							}
+							if(!añadido) {
+								LOGGER.warn("No existen direcciones para el idPersona: " + persona.getIdpersona() + " con correo electrónico");	
+							}
+						}else {
+							LOGGER.warn("No existen direcciones para el idPersona: " + persona.getIdpersona());	
 						}
-					}
+					}else {						
+						LOGGER.warn("No se ha encontrado la persona: " + persona.getIdpersona() + "para el envío: " + envio.getIdenvio());
+					}				
 				}
 			}
+			LOGGER.debug("Fin de obtención por etiquetas para el idEnvio: " + envio.getIdenvio());
+			
+			LOGGER.debug("Inicio obtención de destinatarios individuales para el idEnvio: " + envio.getIdenvio());
 			
 			//Obtenemos destinatarios individuales.
 			EnvDestinatariosExample example = new EnvDestinatariosExample();
@@ -288,8 +320,13 @@ public class ColaEnviosImpl implements IColaEnvios {
 				dest.setNIFCIF(destinatario.getNifcif());
 				dest.setIdPersona(String.valueOf(destinatario.getIdpersona()));
 				destinatarios.add(dest);
+				
+				LOGGER.debug("Destinario encontrado para el envío: " + envio.getIdenvio() + " Destinatario: " + dest.toString());				
 			}
 			
+			LOGGER.debug("Fin de obtención de destinatarios individuales para el idEnvio: " + envio.getIdenvio());
+			
+			LOGGER.debug("Inicio de obtención de destinatarios por consulta para el idEnvio: " + envio.getIdenvio());
 			//obtenemos los destinatarios por consultas de destinatarios
 			List<ConsultaItem> consultaItem = _envDestConsultaEnvioExtendsMapper.selectConsultasDestEnvio(envio.getIdinstitucion(), envio.getIdenvio().toString());
 			for (ConsultaItem consulta : consultaItem) {
@@ -319,10 +356,18 @@ public class ColaEnviosImpl implements IColaEnvios {
 	            			destinatario.setIdPersona(campo!=null? String.valueOf(campo):"");
 
 	            			destinatarios.add(destinatario);
+	            		}else {
+	            			if(map.get("IDPERSONA") != null) {
+	            				LOGGER.warn("No se ha encontrado correo eléctronico para el idPersona " + map.get("IDPERSONA"));
+	            			}else {
+	            				LOGGER.warn("No se ha encontrado correo eléctronico");
+	            			}	            			
 	            		}
 					}
 				}
 			}
+			
+			LOGGER.debug("Fin de obtención de destinatarios por consulta para el idEnvio: " + envio.getIdenvio());
 			
 			
 			LOGGER.info("Destinatarios encontrados: " + destinatarios.size());
@@ -336,21 +381,32 @@ public class ColaEnviosImpl implements IColaEnvios {
 	
 			// Las ejecutamos y obtenemos los resultados
 			List<Map<String, Object>> resultadosConsultas = new ArrayList<Map<String, Object>>();
-			for (EnvConsultasenvio consultaDatos : consultasDatosPlantilla) {
-				String sentencia = consultaDatos.getConsulta();
-				
-				sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
-				
-				if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
-						|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
-						|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+			
+			if(consultasDatosPlantilla != null && consultasDatosPlantilla.size() > 0) {
+				for (EnvConsultasenvio consultaDatos : consultasDatosPlantilla) {
+					String sentencia = consultaDatos.getConsulta();
 					
-					LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
-				}else {
-					List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
-					resultadosConsultas.addAll(result);
-				}
-			}			
+					sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
+					
+					if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+							|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+							|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+						
+						LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+					}else {
+						try {
+							List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+							resultadosConsultas.addAll(result);
+						}catch (Exception e) {
+							LOGGER.error(e);
+							throw new BusinessException("Error al ejecutar la consulta " + sentencia, e);
+						}						
+					}
+				}				
+			}else {
+				LOGGER.info("La plantilla no tiene consulta de datos asociadas para el envío: " + envio.getIdenvio());
+			}
+					
 			
 			// Obtenemos el asunto y el cuerpo del envio
 			
@@ -466,8 +522,13 @@ public class ColaEnviosImpl implements IColaEnvios {
 						
 						LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
 					}else {
-						List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
-						resultadosConsultas.addAll(result);
+						try {
+							List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+							resultadosConsultas.addAll(result);
+						}catch (Exception e) {
+							LOGGER.error(e);
+							throw new BusinessException("Error al ejecutar la consulta " + sentencia, e);
+						}						
 					}
 				}
 				
@@ -569,6 +630,21 @@ public class ColaEnviosImpl implements IColaEnvios {
 		keyPlantilla.setIdtipoenvios(envio.getIdtipoenvios());
 		EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(keyPlantilla);
 
+		if(plantilla == null) {
+			LOGGER.error("No se ha encontrado la plantilla de envio asociada al envío: " + envio.getIdenvio() + " idInstitucion: " + envio.getIdinstitucion());
+			throw new BusinessException("No se ha encontrado la plantilla de envio asociada al envío: " + envio.getIdenvio() + " idInstitucion: " + envio.getIdinstitucion());
+		}
+		
+		if(plantilla.getIdpersona() == null) {
+			LOGGER.error("No se ha encontrado remitente para el envío: " + envio.getIdenvio() + " idInstitucion: " + envio.getIdinstitucion());
+			throw new BusinessException("No se ha encontrado remitente para el envío: " + envio.getIdenvio()+ " idInstitucion: " + envio.getIdinstitucion());
+		}
+		
+		if(plantilla.getIddireccion() == null) {
+			LOGGER.error("No tiene dirección asociada: " + envio.getIdenvio()+ " idInstitucion: " + envio.getIdinstitucion());
+			throw new BusinessException("No tiene dirección asociada: " + envio.getIdenvio()+ " idInstitucion: " + envio.getIdinstitucion());
+		}
+		
 		// obtenemos la direccion del remitente de la plantilla
 		CenDireccionesKey keyDireccion = new CenDireccionesKey();
 		keyDireccion.setIddireccion(plantilla.getIddireccion());
@@ -583,6 +659,9 @@ public class ColaEnviosImpl implements IColaEnvios {
 		
 		if(envioMasivo){
 			//Obtenemos destinatarios de las etiquetas de envio
+			
+			LOGGER.debug("Inicio obtención de destinatarios por etiquetas para el idEnvio: " + envio.getIdenvio());
+			
 			EnvEnviosgrupoclienteExample exampleEtiquetas = new EnvEnviosgrupoclienteExample();
 			exampleEtiquetas.createCriteria().andIdenvioEqualTo(envio.getIdenvio());
 			List<EnvEnviosgrupocliente> etiquetasEnvio = _envEnviosgrupoclienteMapper.selectByExample(exampleEtiquetas);
@@ -625,6 +704,10 @@ public class ColaEnviosImpl implements IColaEnvios {
 				}
 			}
 			
+			LOGGER.debug("Fin obtención de destinatarios por etiquetas para el idEnvio: " + envio.getIdenvio());
+			
+			
+			LOGGER.debug("Inicio obtención de destinatarios individuales para el idEnvio: " + envio.getIdenvio());
 			//Obtenemos destinatarios individuales.
 			EnvDestinatariosExample example = new EnvDestinatariosExample();
 			example.createCriteria().andIdenvioEqualTo(envio.getIdenvio()).andIdinstitucionEqualTo(envio.getIdinstitucion());
@@ -636,14 +719,28 @@ public class ColaEnviosImpl implements IColaEnvios {
 					destinatarios.add(dest);
 					
 					addDestBuroSMS(isBuroSMS, listEnvDestinatariosBurosms, envio.getIdenvio(), envio.getIdinstitucion(), destinatario.getIdpersona(), destinatario.getMovil());
+				}else {
+					LOGGER.info("El destinatario: " + destinatario.getIdpersona() + " para el envío " + envio.getIdenvio() + " no tiene teléfono móvil");
 				}
 			}
 			
+			LOGGER.debug("Fin obtención de destinatarios individuales para el idEnvio: " + envio.getIdenvio());
+			
+			LOGGER.debug("Inicio obtención de destinatarios por consulta para el idEnvio: " + envio.getIdenvio());
 			//obtenemos los destinatarios por consultas de destinatarios
 			List<ConsultaItem> consultaItem = _envDestConsultaEnvioExtendsMapper.selectConsultasDestEnvio(envio.getIdinstitucion(), envio.getIdenvio().toString());
 			for (ConsultaItem consulta : consultaItem) {
 				String sentenciaFinal = prepararConsulta(consulta.getSentencia(), envio.getIdtipoenvios(), envio.getIdinstitucion());
-				List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentenciaFinal);
+				List<Map<String,Object>> result = null;
+				
+				try {
+					result = _conConsultasExtendsMapper.ejecutarConsultaString(sentenciaFinal);
+				}catch (Exception e) {
+					LOGGER.error(e);
+					throw new BusinessException("Error al ejecutar la consulta " + sentenciaFinal, e);
+				}			
+				
+				
 				if(result != null && result.size() > 0){
 					
 					for (Map<String, Object> map : result) {
@@ -666,8 +763,11 @@ public class ColaEnviosImpl implements IColaEnvios {
 	            			
 	            		}
 					}
+				}else {
+					LOGGER.warn("Fin obtención de destinatarios por consulta para el idEnvio: " + envio.getIdenvio());
 				}
 			}
+			LOGGER.debug("Fin obtención de destinatarios por consulta para el idEnvio: " + envio.getIdenvio());
 			
 			LOGGER.info("Destinatarios encontrados: " + destinatarios.size());
 			
