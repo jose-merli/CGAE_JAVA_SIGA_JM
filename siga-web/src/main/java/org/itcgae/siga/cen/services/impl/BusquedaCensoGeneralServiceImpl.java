@@ -140,19 +140,19 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 							for (ColegiacionType colegiadoColegiacion : colegiado.getColegiacionArray()) {
 								Boolean encontrado = Boolean.TRUE;
 								if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNombre())) {
-									if (!busquedaPerFisicaSearchDTO.getNombre()
+									if (!busquedaPerFisicaSearchDTO.getNombre().toUpperCase()
 											.equals(colegiado.getDatosPersonales().getNombre())) {
 										encontrado = Boolean.FALSE;
 									}
 								}
 								if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getPrimerApellido())) {
-									if (!busquedaPerFisicaSearchDTO.getPrimerApellido()
+									if (!busquedaPerFisicaSearchDTO.getPrimerApellido().toUpperCase()
 											.equals(colegiado.getDatosPersonales().getApellido1())) {
 										encontrado = Boolean.FALSE;
 									}
 								}
 								if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getSegundoApellido())) {
-									if (!busquedaPerFisicaSearchDTO.getSegundoApellido()
+									if (!busquedaPerFisicaSearchDTO.getSegundoApellido().toUpperCase()
 											.equals(colegiado.getDatosPersonales().getApellido2())) {
 										encontrado = Boolean.FALSE;
 									}
@@ -198,8 +198,7 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 										busquedaPerFisica.setSegundoApellido("");
 									}
 
-									busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido()
-											.concat(busquedaPerFisica.getSegundoApellido()));
+									busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido() + " " + busquedaPerFisica.getSegundoApellido());
 									busquedaPerFisica
 											.setNif(colegiado.getDatosPersonales().getIdentificacion().getNIF());
 									busquedaPerFisica.setNombre(colegiado.getDatosPersonales().getNombre());
@@ -387,8 +386,8 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 										busquedaPerFisica.setSegundoApellido("");
 									}
 
-									busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido()
-											.concat(busquedaPerFisica.getSegundoApellido()));
+									busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido() + " " + 											
+											busquedaPerFisica.getSegundoApellido());
 
 									if (colegiadoName[i].getDatosPersonales().getIdentificacion().getNIF() != null) {
 										busquedaPerFisica.setNif(
