@@ -205,7 +205,7 @@ public class EnviosServiceImpl implements IEnviosService{
     	    	    }
                 }*/
                 
-                adjuntaImagenBase64(mixedMultipart, sCuerpo);
+                sCuerpo = adjuntaImagenBase64(mixedMultipart, sCuerpo);
                 
                 adjuntaDocumentos(mixedMultipart, documentosEnvio, idEnvio, idInstitucion);
 	    	    
@@ -299,7 +299,7 @@ public class EnviosServiceImpl implements IEnviosService{
         return fileName;
     }
 
-	private void adjuntaImagenBase64(MimeMultipart mixedMultipart, String sCuerpo) throws MessagingException {
+	private String adjuntaImagenBase64(MimeMultipart mixedMultipart, String sCuerpo) throws MessagingException {
 		//Buscamos todas las imagenes para adjuntarlas
 	    Pattern imgRegExp  = Pattern.compile( "<img[^>]+src\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>" );
 	    Map<String, String> inlineImage = new HashMap<String, String>();
@@ -338,6 +338,8 @@ public class EnviosServiceImpl implements IEnviosService{
 	       pmp.setContent( pairs.getValue(), "image/png" );
 	       mixedMultipart.addBodyPart( pmp );
 	    }
+	    
+	    return sCuerpo;
 		
 	}
 
