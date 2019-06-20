@@ -1,6 +1,7 @@
 package org.itcgae.siga.com.services.impl;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
@@ -19,26 +20,26 @@ import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
-
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.mail.internet.MimePart;
+import javax.mail.internet.MimeUtility;
 import javax.mail.internet.PreencodedMimeBodyPart;
 import javax.mail.util.ByteArrayDataSource;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 
+import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.RemitenteDTO;
 import org.itcgae.siga.com.services.IEnviosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
-
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
@@ -51,18 +52,16 @@ import org.itcgae.siga.db.mappers.GenParametrosMapper;
 import org.itcgae.siga.db.mappers.GenPropertiesMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.exception.BusinessException;
+import org.itcgae.siga.ws.client.ClientECOS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ecos.ws.solicitarenvio.SolicitudEnvioSMS;
 
-import org.apache.log4j.Logger;
-
-import service.serviciosecos.EnviarSMSDocument.EnviarSMS;
 import service.serviciosecos.EnviarSMSDocument;
+import service.serviciosecos.EnviarSMSDocument.EnviarSMS;
 import service.serviciosecos.EnviarSMSResponseDocument;
 import service.serviciosecos.EnviarSMSResponseDocument.EnviarSMSResponse;
-import org.itcgae.siga.ws.client.ClientECOS;
 
 @Component
 public class EnviosServiceImpl implements IEnviosService{
@@ -261,7 +260,7 @@ public class EnviosServiceImpl implements IEnviosService{
 
 	}
 
-	private void adjuntaDocumentos(MimeMultipart mixedMultipart, List<DatosDocumentoItem> documentosEnvio, String idEnvio, String idInstitucion) throws MessagingException {
+	private void adjuntaDocumentos(MimeMultipart mixedMultipart, List<DatosDocumentoItem> documentosEnvio, String idEnvio, String idInstitucion) throws MessagingException, UnsupportedEncodingException {
 		//Adjuntamos los informes adjuntos.
 	    for (DatosDocumentoItem informe : documentosEnvio) {
 	    	File file = informe.getDocumentoFile();
@@ -278,11 +277,27 @@ public class EnviosServiceImpl implements IEnviosService{
 	    	DataSource ds = new FileDataSource(file);
 	    	BodyPart messageBodyPart = new MimeBodyPart();
 	    	messageBodyPart.setDataHandler(new DataHandler(ds));
-	    	messageBodyPart.setFileName(informe.getFileName());
+	    	messageBodyPart.setFileName(truncarFileName(MimeUtility.encodeText((informe.getFileName()))));
 	    	messageBodyPart.setDisposition(MimePart.ATTACHMENT);
 	    	mixedMultipart.addBodyPart(messageBodyPart);
 		}
 	}
+	
+	private static String truncarFileName(String fileName) {
+        int MAX_LENGTH_FILE_NAME = 60;
+        if (fileName != null && fileName.length() > MAX_LENGTH_FILE_NAME) {
+            int puntoExtension = fileName.lastIndexOf(".");
+            if (puntoExtension < 0) {
+                puntoExtension = fileName.length();
+            }
+            String extension = fileName.substring(puntoExtension);
+            extension = "..." + extension;
+            String name = fileName.substring(0, puntoExtension);
+            int recorta = MAX_LENGTH_FILE_NAME - extension.length();
+            fileName = name.substring(0, recorta) + extension;
+        }
+        return fileName;
+    }
 
 	private void adjuntaImagenBase64(MimeMultipart mixedMultipart, String sCuerpo) throws MessagingException {
 		//Buscamos todas las imagenes para adjuntarlas
