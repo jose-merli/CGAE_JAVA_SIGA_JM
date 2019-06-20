@@ -7,16 +7,13 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.PosixFilePermission;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -549,13 +546,13 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					respuesta.setDescription("El envio se ha lanzado correctamente");
 					respuesta.setMessage("Envio lanzado");
 				} catch (Exception e) {
+					LOGGER.error(e);
 					envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
 					envio.setFechamodificacion(new Date());
 					_envEnviosMapper.updateByPrimaryKey(envio);
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
 					respuesta.setMessage("Error");
-					e.printStackTrace();
 				}
 
 			}
@@ -1273,15 +1270,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 				LOGGER.debug("uploadFile() -> Coger documento de cuenta bancaria del request");
 				Iterator<String> itr = request.getFileNames();
 				MultipartFile file = request.getFile(itr.next());
-				Date fecha = new Date();
 
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-				String fechaFormateada = sdf.format(fecha);
+				String fileName = file.getOriginalFilename();
 
-				String fileName = fechaFormateada + "_" + file.getOriginalFilename();
-
-				String extension = fileName.substring(fileName.lastIndexOf("."), fileName.length());
-				// BufferedOutputStream stream = null;
 				try {
 
 					File serverFile = new File(pathFichero);
@@ -1411,6 +1402,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					respuesta.setDescription("Datos configuracion de envio guardados correctamente");
 					respuesta.setMessage("Updates correcto");
 				} catch (Exception e) {
+					LOGGER.error(e);
 					respuesta.setCode(500);
 					respuesta.setDescription(e.getMessage());
 					respuesta.setMessage("Error al insertar documento");
