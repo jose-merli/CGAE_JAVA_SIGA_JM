@@ -176,6 +176,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 		
 	}
 
+	@Override
 	public void preparaCorreo(EnvEnvios envio) throws Exception {
 		
 		// Obtenemos la plantilla de envio
@@ -184,6 +185,24 @@ public class ColaEnviosImpl implements IColaEnvios {
 		keyPlantilla.setIdplantillaenvios(envio.getIdplantillaenvios());
 		keyPlantilla.setIdtipoenvios(envio.getIdtipoenvios());
 		EnvPlantillasenviosWithBLOBs plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(keyPlantilla);
+		
+		if (plantilla == null || plantilla.getIdplantillaenvios() == null) {
+			String mensaje = "No se ha encontrado la plantilla de envío en el sistema";
+			LOGGER.error(mensaje);
+			throw new BusinessException(mensaje);
+		}
+		
+		if (plantilla.getIdpersona() == null) {
+			String mensaje = "La plantilla de envío no tiene un remitente asociado";
+			LOGGER.error(mensaje);
+			throw new BusinessException(mensaje);
+		}
+		
+		if (plantilla.getIddireccion() == null) {
+			String mensaje = "La plantilla de envío no tiene una dirección de envío asociada";
+			LOGGER.error(mensaje);
+			throw new BusinessException(mensaje);
+		}
 
 		// obtenemos la direccion del remitente de la plantilla
 		CenDireccionesKey keyDireccion = new CenDireccionesKey();
@@ -192,17 +211,33 @@ public class ColaEnviosImpl implements IColaEnvios {
 		keyDireccion.setIdinstitucion(envio.getIdinstitucion());
 		CenDirecciones remitente = _cenDireccionesMapper.selectByPrimaryKey(keyDireccion);
 		
+		if (remitente == null) {
+			String mensaje = "No se ha encontrado la dirección del remitente";
+			LOGGER.error(mensaje);
+			throw new BusinessException(mensaje);
+		}
+		
+		if (remitente.getFechabaja() != null) {
+			String mensaje = "La dirección del remitente se encuentra de baja en el sistema.";
+			LOGGER.error(mensaje);
+			throw new BusinessException(mensaje);
+		}
+		
+		if (remitente.getCorreoelectronico() == null || remitente.getCorreoelectronico().trim().equals("")) {
+			String mensaje = "La dirección del remitente no tiene una dirección de correo válida";
+			LOGGER.error(mensaje);
+			throw new BusinessException(mensaje);
+		}
+		
 		CenPersona personaRemitente = _cenPersonaMapper.selectByPrimaryKey(plantilla.getIdpersona());
 		RemitenteDTO remitentedto = new RemitenteDTO();
 
-		if(plantilla.getDescripcionRemitente() != null && plantilla.getDescripcionRemitente() != "") {
+		if(plantilla.getDescripcionRemitente() != null && !plantilla.getDescripcionRemitente().trim().equals("")) {
 			remitentedto.setNombre(plantilla.getDescripcionRemitente());
 			remitentedto.setApellido1("");
 			
 			if(remitente != null) {
 				remitentedto.setCorreoElectronico(remitente.getCorreoelectronico());
-			}else {
-				remitentedto.setCorreoElectronico("");
 			}
 		}else {
 			remitentedto.setNombre(personaRemitente.getNombre());
@@ -213,8 +248,6 @@ public class ColaEnviosImpl implements IColaEnvios {
 			}
 			if(remitente != null) {
 				remitentedto.setCorreoElectronico(remitente.getCorreoelectronico());
-			}else {
-				remitentedto.setCorreoElectronico("");
 			}
 		}
 
@@ -224,182 +257,32 @@ public class ColaEnviosImpl implements IColaEnvios {
 		
 		if(envioMasivo){
 			
-			//Obtenemos destinatarios de las etiquetas de envio
-			EnvEnviosgrupoclienteExample exampleEtiquetas = new EnvEnviosgrupoclienteExample();
-			exampleEtiquetas.createCriteria().andIdenvioEqualTo(envio.getIdenvio());
-			List<EnvEnviosgrupocliente> etiquetasEnvio = _envEnviosgrupoclienteMapper.selectByExample(exampleEtiquetas);
-			
 			List<DestinatarioItem> destinatarios = new ArrayList<DestinatarioItem>();
-			for (EnvEnviosgrupocliente envEnviosgrupocliente : etiquetasEnvio) {
-				CenGruposclienteClienteExample etiqueta = new CenGruposclienteClienteExample();
-				etiqueta.createCriteria().andIdgrupoEqualTo(envEnviosgrupocliente.getIdgrupo()).andIdinstitucionEqualTo(envio.getIdinstitucion());
-				List<CenGruposclienteCliente> personas = _cenGruposclienteClienteMapper.selectByExample(etiqueta);
-				for (CenGruposclienteCliente persona : personas) {
-
-					//Obtenemos la persona
-					CenPersona cenPersona = _cenPersonaMapper.selectByPrimaryKey(persona.getIdpersona());
-					LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + cenPersona.toString());
-
-					//Buscamos las direcciones de esa persona
-					CenDireccionesExample exampleDir = new CenDireccionesExample();
-					
-					//Obtenemos la direccion preferente de la persona
-					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike("%" + SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO + "%");
-					List<CenDirecciones> direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
-					
-					if(direcciones == null || direcciones.size() == 0){
-						exampleDir = new CenDireccionesExample();
-						exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull();
-						direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
-					}
-					
-					if(direcciones != null && direcciones.size() > 0){
-						boolean añadido = false;
-						for (CenDirecciones dir : direcciones) {
-							if(dir.getCorreoelectronico() != null){
-								if(!añadido){
-									DestinatarioItem destinatario = new DestinatarioItem();
-									destinatario.setCorreoElectronico(dir.getCorreoelectronico());
-									destinatario.setNombre(cenPersona.getNombre());
-									destinatario.setApellidos1(cenPersona.getApellidos1());
-									destinatario.setApellidos2(cenPersona.getApellidos2());
-									destinatario.setNIFCIF(cenPersona.getNifcif());
-									destinatario.setIdPersona(String.valueOf(persona.getIdpersona()));
-									destinatarios.add(destinatario);
-									añadido = true;
-									LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + destinatarios.toString());
-								}
-							}
-						}
-					}
-				}
-			}
-			
+			//Obtenemos destinatarios de las etiquetas de envio
+			addDestintatariosEtiquetas(envio, destinatarios);
 			//Obtenemos destinatarios individuales.
-			EnvDestinatariosExample example = new EnvDestinatariosExample();
-			example.createCriteria().andIdenvioEqualTo(envio.getIdenvio()).andIdinstitucionEqualTo(envio.getIdinstitucion());
-			List<EnvDestinatarios> destIndv = _envDestinatariosMapper.selectByExample(example);
-			for (EnvDestinatarios destinatario : destIndv) {
-				DestinatarioItem dest = new DestinatarioItem();
-				dest.setCorreoElectronico(destinatario.getCorreoelectronico());
-				dest.setNombre(destinatario.getNombre());
-				dest.setApellidos1(destinatario.getApellidos1());
-				dest.setApellidos2(destinatario.getApellidos2());
-				dest.setNIFCIF(destinatario.getNifcif());
-				dest.setIdPersona(String.valueOf(destinatario.getIdpersona()));
-				destinatarios.add(dest);
-			}
-			
+			addDestinatariosIndividuales(envio.getIdinstitucion(), envio.getIdenvio(), destinatarios);
 			//obtenemos los destinatarios por consultas de destinatarios
-			List<ConsultaItem> consultaItem = _envDestConsultaEnvioExtendsMapper.selectConsultasDestEnvio(envio.getIdinstitucion(), envio.getIdenvio().toString());
-			for (ConsultaItem consulta : consultaItem) {
-				String sentenciaFinal = prepararConsulta(consulta.getSentencia(), envio.getIdtipoenvios(), envio.getIdinstitucion());
-				List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentenciaFinal);
-				if(result != null && result.size() > 0){
-					
-					for (Map<String, Object> map : result) {
-						Object campo = map.get("CORREOELECTRONICO");
-	            		if(campo != null){
-	            			DestinatarioItem destinatario = new DestinatarioItem();
-	            			destinatario.setCorreoElectronico(campo.toString());
-	            			
-	            			campo = map.get("NOMBRE");
-	            			destinatario.setNombre(campo!=null? String.valueOf(campo):"");
-	            			
-	            			campo = map.get("APELLIDOS1");
-	            			destinatario.setApellidos1(campo!=null? String.valueOf(campo):"");
-	            			
-	            			campo = map.get("APELLIDOS2");
-	            			destinatario.setApellidos2(campo!=null? String.valueOf(campo):"");
-	            			
-	            			campo = map.get("NIFCIF");
-	            			destinatario.setNIFCIF(campo!=null? String.valueOf(campo):"");
-	            			
-	            			campo = map.get("IDPERSONA");
-	            			destinatario.setIdPersona(campo!=null? String.valueOf(campo):"");
-
-	            			destinatarios.add(destinatario);
-	            		}
-					}
-				}
-			}
+			addDestinatariosConsultas(envio, destinatarios);
 			
 			
-			LOGGER.info("Destinatarios encontrados: " + destinatarios.size());
-			
-			// Obtenemos las consultas asociadas de datos a la plantilla de envio.
-			EnvConsultasenvioExample exampleConsulta = new EnvConsultasenvioExample();
-			Long objetivoDatos = new Long(4);
-			exampleConsulta.createCriteria().andIdinstitucionEqualTo(envio.getIdinstitucion()).andIdenvioEqualTo(envio.getIdenvio()).andFechabajaIsNull().andIdobjetivoEqualTo(objetivoDatos);
-
-			List<EnvConsultasenvio> consultasDatosPlantilla = _envConsultasenvioMapper.selectByExampleWithBLOBs(exampleConsulta);
-	
-			// Las ejecutamos y obtenemos los resultados
 			List<Map<String, Object>> resultadosConsultas = new ArrayList<Map<String, Object>>();
-			for (EnvConsultasenvio consultaDatos : consultasDatosPlantilla) {
-				String sentencia = consultaDatos.getConsulta();
-				
-				sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
-				
-				if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
-						|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
-						|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
-					
-					LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
-				}else {
-					List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
-					resultadosConsultas.addAll(result);
-				}
-			}			
+			addResultadoConsultaDatosPlantillaEnvio(envio, resultadosConsultas);
 			
-			// Obtenemos el asunto y el cuerpo del envio
-			
-			String asuntoEnvio = plantilla.getAsunto() != null ? plantilla.getAsunto():"";
-			String cuerpoEnvio = plantilla.getCuerpo() != null ? plantilla.getCuerpo():"";
-					
-			EnvCamposenviosKey key = new EnvCamposenviosKey();
-			key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
-			key.setIdenvio(envio.getIdenvio());
-			key.setIdinstitucion(envio.getIdinstitucion());
-			key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);		
-			
-			EnvCamposenvios envCampo = _envCamposenviosMapper.selectByPrimaryKey(key);
-			
-			if(envCampo != null && envCampo.getValor() != null) {
-				asuntoEnvio = envCampo.getValor();
-			}			
-
-			key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));		
-			
-			envCampo = _envCamposenviosMapper.selectByPrimaryKey(key);
-			
-			if(envCampo != null && envCampo.getValor() != null) {
-				cuerpoEnvio = envCampo.getValor();
-			}
-			
-			String asuntoFinal = remplazarCamposAsunto(asuntoEnvio, resultadosConsultas);
-			String cuerpoFinal = remplazarCamposCuerpo(cuerpoEnvio, resultadosConsultas);
+			String asuntoFinal = getAsuntoFinal(envio, resultadosConsultas, plantilla.getAsunto());
+			String cuerpoFinal = getCuerpoFinal(envio, resultadosConsultas, plantilla.getCuerpo());
 			
 			//Generamos los informes para adjuntarlos al envio
 			List<DatosDocumentoItem> documentosEnvio = new ArrayList<DatosDocumentoItem>();
-			EnvDocumentosExample exampleDoc = new EnvDocumentosExample();
-			exampleDoc.createCriteria().andIdenvioEqualTo(envio.getIdenvio()).andIdinstitucionEqualTo(envio.getIdinstitucion());
-			List<EnvDocumentos> documentos = _envDocumentosMapper.selectByExample(exampleDoc);
-			for (EnvDocumentos documento : documentos) {
-				DatosDocumentoItem doc = new DatosDocumentoItem();
-				doc.setFileName(documento.getDescripcion());
-				String path = _enviosMasivosService.getPathFicheroEnvioMasivo(envio.getIdinstitucion(), envio.getIdenvio());
-				doc.setDocumentoFile(new File(path, documento.getPathdocumento()));
-				doc.setPathDocumento(documento.getPathdocumento());
-				documentosEnvio.add(doc);
-			}
+			addDocumentosAdjuntos(envio, documentosEnvio);
+			
 			
 			if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
-				destinatarios = limpiaCorreosDuplicados(destinatarios);
 				_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 			}else{
-				if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO)){
-					_enviosService.envioMailLetrado(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, envioMasivo);
+				
+				if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO)){					
+					_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, null, envioMasivo);
 				}
 				//Añadimos los informes al envio para que puedan ser descargados.
 				for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {
@@ -445,59 +328,14 @@ public class ColaEnviosImpl implements IColaEnvios {
 				
 				LOGGER.info("Destinatarios encontrados: " + destinatarios.size());
 				
-				// Obtenemos las consultas asociadas a la plantilla de envio.
-				EnvConsultasenvioExample exampleConsulta = new EnvConsultasenvioExample();
-				Long objetivoDatos = new Long(4);
-				exampleConsulta.createCriteria().andIdinstitucionEqualTo(envio.getIdinstitucion()).andIdenvioEqualTo(envio.getIdenvio()).andFechabajaIsNull().andIdobjetivoEqualTo(objetivoDatos);
-	
-				List<EnvConsultasenvio> consultasDatosPlantilla = _envConsultasenvioMapper.selectByExampleWithBLOBs(exampleConsulta);
-		
-				// Las ejecutamos y obtenemos los resultados
 				List<Map<String, Object>> resultadosConsultas = new ArrayList<Map<String, Object>>();
-				for (EnvConsultasenvio consultaDatos : consultasDatosPlantilla) {					
-					
-					String sentencia = consultaDatos.getConsulta();
-					
-					sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
-					
-					if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
-							|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
-							|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
-						
-						LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
-					}else {
-						List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
-						resultadosConsultas.addAll(result);
-					}
-				}
+				// Obtenemos las consultas asociadas a la plantilla de envio.
+				addResultadoConsultaDatosPlantillaEnvio(envio, resultadosConsultas);				
+				
 				
 				// Obtenemos el asunto y el cuerpo del envio
-				
-				String asuntoEnvio = plantilla.getAsunto() != null ? plantilla.getAsunto():"";
-				String cuerpoEnvio = plantilla.getCuerpo() != null ? plantilla.getCuerpo():"";
-						
-				EnvCamposenviosKey key = new EnvCamposenviosKey();
-				key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_ASUNTO));
-				key.setIdenvio(envio.getIdenvio());
-				key.setIdinstitucion(envio.getIdinstitucion());
-				key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);		
-				
-				EnvCamposenvios envCampo = _envCamposenviosMapper.selectByPrimaryKey(key);
-				
-				if(envCampo != null && envCampo.getValor() != null) {
-					asuntoEnvio = envCampo.getValor();
-				}			
-
-				key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));		
-				
-				envCampo = _envCamposenviosMapper.selectByPrimaryKey(key);
-				
-				if(envCampo != null && envCampo.getValor() != null) {
-					cuerpoEnvio = envCampo.getValor();
-				}
-				
-				String asuntoFinal = remplazarCamposAsunto(asuntoEnvio, resultadosConsultas);
-				String cuerpoFinal = remplazarCamposCuerpo(cuerpoEnvio, resultadosConsultas);
+				String asuntoFinal = getAsuntoFinal(envio, resultadosConsultas, plantilla.getAsunto());
+				String cuerpoFinal = getCuerpoFinal(envio, resultadosConsultas, plantilla.getCuerpo());
 				
 				//Generamos los informes para adjuntarlos al envio
 				List<DatosDocumentoItem> documentosEnvio = _dialogoComunicacionService.generarDocumentosEnvio(envio.getIdinstitucion().toString(), envio.getIdenvio().toString());
@@ -508,7 +346,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 					_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 				}else{
 					if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO)){
-						_enviosService.envioMailLetrado(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, envioMasivo);
+						_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, null, envioMasivo);
 					}
 					//Añadimos los informes al envio para que puedan ser descargados.
 					for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {
@@ -541,23 +379,203 @@ public class ColaEnviosImpl implements IColaEnvios {
 		_envEnviosMapper.updateByPrimaryKey(envio);
 	}
 
-	private List<DestinatarioItem> limpiaCorreosDuplicados(List<DestinatarioItem> destinatarios) {
-		List<DestinatarioItem> destinatariosCopia = new ArrayList<DestinatarioItem>();
-		Map<String, Boolean> mapaCorreos = new HashMap<String, Boolean>();
-		if (destinatarios != null) {
-			for (DestinatarioItem destinatarioItem : destinatarios) {
-				if (destinatarioItem != null && destinatarioItem.getCorreoElectronico() != null && !destinatarioItem.getCorreoElectronico().trim().equals("")) {
-					String correo = destinatarioItem.getCorreoElectronico().trim().toUpperCase();
-					if (!mapaCorreos.containsKey(correo)) {
-						destinatariosCopia.add(destinatarioItem);
-						mapaCorreos.put(correo, true);
+	private String getAsuntoFinal(EnvEnvios envio, List<Map<String,Object>> resultadosConsultas, String asunto) {
+		return getAsuntoCuerpoFinal(envio, resultadosConsultas, asunto, SigaConstants.ID_CAMPO_ASUNTO);
+	}
+
+	private String getAsuntoCuerpoFinal(EnvEnvios envio, List<Map<String, Object>> resultadosConsultas, String asunto,	String idCampoAsunto) {
+		LOGGER.debug("Obtenemos el asunto final (inicio): " + asunto);
+		if (asunto == null) {
+			asunto = "";
+		}
+
+		EnvCamposenviosKey key = new EnvCamposenviosKey();
+		key.setIdcampo(Short.parseShort(idCampoAsunto));
+		key.setIdenvio(envio.getIdenvio());
+		key.setIdinstitucion(envio.getIdinstitucion());
+		key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
+
+		EnvCamposenvios envCampo = _envCamposenviosMapper.selectByPrimaryKey(key);
+
+		if (envCampo != null && envCampo.getValor() != null) {
+			asunto = envCampo.getValor();
+		}
+
+		asunto = remplazarCamposAsunto(asunto, resultadosConsultas);
+		LOGGER.debug("Obtenemos el asunto final (fin): " + asunto);
+		return asunto;
+	}
+
+	private String getCuerpoFinal(EnvEnvios envio, List<Map<String, Object>> resultadosConsultas, String cuerpo) {
+		return getAsuntoCuerpoFinal(envio, resultadosConsultas, cuerpo, SigaConstants.ID_CAMPO_CUERPO);
+
+	}
+
+	private void addDocumentosAdjuntos(EnvEnvios envio, List<DatosDocumentoItem> documentosEnvio) {
+		EnvDocumentosExample exampleDoc = new EnvDocumentosExample();
+		exampleDoc.createCriteria().andIdenvioEqualTo(envio.getIdenvio()).andIdinstitucionEqualTo(envio.getIdinstitucion());
+		List<EnvDocumentos> documentos = _envDocumentosMapper.selectByExample(exampleDoc);
+		
+		if (documentos != null) {
+			for (EnvDocumentos documento : documentos) {
+				DatosDocumentoItem doc = new DatosDocumentoItem();
+				doc.setFileName(documento.getDescripcion());
+				String path = _enviosMasivosService.getPathFicheroEnvioMasivo(envio.getIdinstitucion(), envio.getIdenvio());
+				File file = new File(path, documento.getPathdocumento());
+				doc.setDocumentoFile(file);
+				doc.setPathDocumento(documento.getPathdocumento());
+				documentosEnvio.add(doc);
+			}
+		}
+	}
+
+	private void addResultadoConsultaDatosPlantillaEnvio(EnvEnvios envio, List<Map<String, Object>> resultadosConsultas) {
+		
+		// Obtenemos las consultas asociadas de datos a la plantilla de envio.
+		EnvConsultasenvioExample exampleConsulta = new EnvConsultasenvioExample();
+		Long objetivoDatos = new Long(4);
+		exampleConsulta.createCriteria().andIdinstitucionEqualTo(envio.getIdinstitucion()).andIdenvioEqualTo(envio.getIdenvio()).andFechabajaIsNull().andIdobjetivoEqualTo(objetivoDatos);
+
+		List<EnvConsultasenvio> consultasDatosPlantilla = _envConsultasenvioMapper.selectByExampleWithBLOBs(exampleConsulta);
+
+		// Las ejecutamos y obtenemos los resultados
+		
+		for (EnvConsultasenvio consultaDatos : consultasDatosPlantilla) {
+			String sentencia = consultaDatos.getConsulta();
+			
+			sentencia = _consultasService.quitarEtiquetas(sentencia.toUpperCase());
+			
+			if(sentencia != null && (sentencia.contains(SigaConstants.SENTENCIA_ALTER) || sentencia.contains(SigaConstants.SENTENCIA_CREATE)
+					|| sentencia.contains(SigaConstants.SENTENCIA_DELETE) || sentencia.contains(SigaConstants.SENTENCIA_DROP)
+					|| sentencia.contains(SigaConstants.SENTENCIA_INSERT) || sentencia.contains(SigaConstants.SENTENCIA_UPDATE))){
+				
+				LOGGER.error("ejecutarConsulta() -> Consulta no permitida: " + sentencia);
+			}else {
+				List<Map<String, Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentencia);
+				resultadosConsultas.addAll(result);
+			}
+		}
+		
+	}
+
+	private void addDestintatariosEtiquetas(EnvEnvios envio, List<DestinatarioItem> destinatarios) {
+		EnvEnviosgrupoclienteExample exampleEtiquetas = new EnvEnviosgrupoclienteExample();
+		exampleEtiquetas.createCriteria().andIdenvioEqualTo(envio.getIdenvio());
+		List<EnvEnviosgrupocliente> etiquetasEnvio = _envEnviosgrupoclienteMapper.selectByExample(exampleEtiquetas);
+		
+		
+		for (EnvEnviosgrupocliente envEnviosgrupocliente : etiquetasEnvio) {
+			CenGruposclienteClienteExample etiqueta = new CenGruposclienteClienteExample();
+			etiqueta.createCriteria().andIdgrupoEqualTo(envEnviosgrupocliente.getIdgrupo()).andIdinstitucionEqualTo(envio.getIdinstitucion());
+			List<CenGruposclienteCliente> personas = _cenGruposclienteClienteMapper.selectByExample(etiqueta);
+			for (CenGruposclienteCliente persona : personas) {
+
+				//Obtenemos la persona
+				CenPersona cenPersona = _cenPersonaMapper.selectByPrimaryKey(persona.getIdpersona());
+				LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + cenPersona.toString());
+
+				//Buscamos las direcciones de esa persona
+				CenDireccionesExample exampleDir = new CenDireccionesExample();
+				
+				//Obtenemos la direccion preferente de la persona
+				exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike("%" + SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO + "%");
+				List<CenDirecciones> direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
+				
+				if(direcciones == null || direcciones.size() == 0){
+					exampleDir = new CenDireccionesExample();
+					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull();
+					direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
+				}
+				
+				if(direcciones != null && direcciones.size() > 0){
+					boolean añadido = false;
+					for (CenDirecciones dir : direcciones) {
+						if(dir.getCorreoelectronico() != null){
+							if(!añadido){
+								DestinatarioItem destinatario = new DestinatarioItem();
+								destinatario.setCorreoElectronico(dir.getCorreoelectronico());
+								destinatario.setNombre(cenPersona.getNombre());
+								destinatario.setApellidos1(cenPersona.getApellidos1());
+								destinatario.setApellidos2(cenPersona.getApellidos2());
+								destinatario.setNIFCIF(cenPersona.getNifcif());
+								destinatario.setIdPersona(String.valueOf(persona.getIdpersona()));
+								destinatarios.add(destinatario);
+								añadido = true;
+								LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + destinatarios.toString());
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void addDestinatariosConsultas(EnvEnvios envio, List<DestinatarioItem> destinatarios) {
+				
+		List<ConsultaItem> consultaItem = _envDestConsultaEnvioExtendsMapper.selectConsultasDestEnvio(envio.getIdinstitucion(), envio.getIdenvio().toString());
+		if (consultaItem != null) {
+			for (ConsultaItem consulta : consultaItem) {
+				String sentenciaFinal = prepararConsulta(consulta.getSentencia(), envio.getIdtipoenvios(), envio.getIdinstitucion());
+				List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentenciaFinal);
+				if(result != null && result.size() > 0){
+					
+					for (Map<String, Object> map : result) {
+						Object campo = map.get("CORREOELECTRONICO");
+	            		if(campo != null){
+	            			DestinatarioItem destinatario = new DestinatarioItem();
+	            			destinatario.setCorreoElectronico(campo.toString());
+	            			
+	            			campo = map.get("NOMBRE");
+	            			destinatario.setNombre(campo!=null? String.valueOf(campo):"");
+	            			
+	            			campo = map.get("APELLIDOS1");
+	            			destinatario.setApellidos1(campo!=null? String.valueOf(campo):"");
+	            			
+	            			campo = map.get("APELLIDOS2");
+	            			destinatario.setApellidos2(campo!=null? String.valueOf(campo):"");
+	            			
+	            			campo = map.get("NIFCIF");
+	            			destinatario.setNIFCIF(campo!=null? String.valueOf(campo):"");
+	            			
+	            			campo = map.get("IDPERSONA");
+	            			destinatario.setIdPersona(campo!=null? String.valueOf(campo):"");
+	
+	            			destinatarios.add(destinatario);
+	            		}
 					}
 				}
 			}
 		}
 		
-		return destinatariosCopia;
+		
+		LOGGER.info("Destinatarios encontrados: " + destinatarios.size());
+		
+		
+		
 	}
+
+	private void addDestinatariosIndividuales(Short idinstitucion, Long idenvio, List<DestinatarioItem> destinatarios) {
+		if (idenvio != null && idinstitucion != null) {
+			LOGGER.debug("Buscamos los destinatarios individuales para el idinstitucion " + idinstitucion + " e idenvio = " + idenvio);
+			EnvDestinatariosExample example = new EnvDestinatariosExample();
+			example.createCriteria().andIdenvioEqualTo(idenvio).andIdinstitucionEqualTo(idinstitucion);
+			List<EnvDestinatarios> destIndv = _envDestinatariosMapper.selectByExample(example);
+			if (destIndv != null) {
+				for (EnvDestinatarios destinatario : destIndv) {
+					DestinatarioItem dest = new DestinatarioItem();
+					dest.setCorreoElectronico(destinatario.getCorreoelectronico());
+					dest.setNombre(destinatario.getNombre());
+					dest.setApellidos1(destinatario.getApellidos1());
+					dest.setApellidos2(destinatario.getApellidos2());
+					dest.setNIFCIF(destinatario.getNifcif());
+					dest.setIdPersona(String.valueOf(destinatario.getIdpersona()));
+					destinatarios.add(dest);
+				}
+			}
+		}
+	}
+
+	
 
 	public void preparaEnvioSMS(EnvEnvios envio, boolean isBuroSMS) {
 
