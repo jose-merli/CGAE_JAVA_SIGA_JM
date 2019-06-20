@@ -35,6 +35,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql2.SELECT("COL.SOCIEDADPROFESIONAL AS SOCIEDADPROFESIONAL");
 		sql2.SELECT("CA.DESCRIPCION AS TIPO");
 		sql2.SELECT("COL.FECHA_BAJA AS FECHA_BAJA");
+		sql2.SELECT("TIPOSOCIEDAD.LETRACIF AS TIPOSOCIEDAD");
 
 		sql2.SELECT("NVL(COUNT(COM.IDPERSONA),0) AS NUMEROINTEGRANTES");
 		sql2.SELECT("F_SIGA_GETINTEGRANTES(COL.IDINSTITUCION,COL.IDPERSONA)  AS NOMBRESINTEGRANTES");
@@ -111,6 +112,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql2.GROUP_BY("COL.TIPO");
 		sql2.GROUP_BY("CA.DESCRIPCION");
 		sql2.GROUP_BY("COL.FECHA_BAJA");
+		sql2.GROUP_BY("TIPOSOCIEDAD.LETRACIF");
+
 
 		// meter subconsulta de objeto sql2 en objeto sql
 		sql.SELECT("CONSULTA.*");
@@ -162,6 +165,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql2.SELECT("DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) AS ABREVIATURA");
 		sql2.SELECT("TO_CHAR(PER.FECHANACIMIENTO, 'DD/MM/YYYY') AS FECHACONSTITUCION");
 		sql2.SELECT("COL.SOCIEDADPROFESIONAL AS SOCIEDADPROFESIONAL");
+		sql2.SELECT("TIPOSOCIEDAD.LETRACIF AS TIPOSOCIEDAD");
 		// sql2.SELECT("(select descripcion from GEN_RECURSOS where idrecurso =
 		// 'censo.busquedaClientesAvanzada.literal.Sociedad' and idlenguaje = '"+
 		// idLenguaje+ "') AS TIPO");
@@ -246,6 +250,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql2.GROUP_BY("COL.TIPO");
 		sql2.GROUP_BY("CA.DESCRIPCION");
 		sql2.GROUP_BY("COL.FECHA_BAJA");
+		sql2.GROUP_BY("TIPOSOCIEDAD.LETRACIF");
 
 		// meter subconsulta de objeto sql2 en objeto sql
 		sql.SELECT("CONSULTA.*");
@@ -283,6 +288,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT("TO_CHAR(CLIENTESOCIEDAD.FECHAALTA,'DD/MM/YYYY') AS FECHAALTA");
 		sql.SELECT("COL.SOCIEDADPROFESIONAL AS SOCIEDADPROFESIONAL");
 		sql.SELECT("TIPOSOCIEDAD.LETRACIF  AS TIPO");
+		sql.SELECT("TIPOSOCIEDAD.LETRACIF  AS TIPOSOCIEDAD");
 		sql.SELECT("TO_CHAR(COL.FECHA_BAJA,'DD/MM/YYYY') AS FECHA_BAJA");
 		sql.SELECT("NVL(COUNT(DISTINCT PER2.IDPERSONA),0) AS NUMEROINTEGRANTES");
 		sql.SELECT(
@@ -458,7 +464,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			sql.SET("ID_DATOS_REG = '" + perJuridicaDatosRegistralesUpdateDTO.getIdDatosRegistro() + "'");
 		}
 		if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp())) {
-			sql.SET("PREFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp() + "'");
+			sql.SET("PREFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp().replace("'", "''") + "'");
 		}else {
 			sql.SET("PREFIJO_NUMSSPP = " + perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp());
 		}
@@ -468,7 +474,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			sql.SET("CONTADOR_NUMSSPP = " + perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp());
 		}
 		if(null!=perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp() && !perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp().equals("")) {
-			sql.SET("SUFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp() + "'");
+			sql.SET("SUFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp().replace("'", "''") + "'");
 		}else {
 			sql.SET("SUFIJO_NUMSSPP = " + perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp());
 		}

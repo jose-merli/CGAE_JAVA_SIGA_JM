@@ -17,6 +17,16 @@ public class BusquedaJuridicaItem {
 	//@JsonFormat(pattern = "dd-MM-yyyy")
 	private String fechaConstitucion;
 	private String tipo;
+	private String tipoSociedad;
+	public String getTipoSociedad() {
+		return tipoSociedad;
+	}
+
+
+	public void setTipoSociedad(String tipoSociedad) {
+		this.tipoSociedad = tipoSociedad;
+	}
+
 	private String numeroIntegrantes;
 	private String nombresIntegrantes;
 	@JsonFormat(pattern = "dd-MM-yyyy")
