@@ -2373,7 +2373,12 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 			comboItem.setLabel(genFichero.getExtension());
 			String ruta = genFichero.getDirectorio();
 			String[] division = ruta.split("/");
-			String nombreArchivo = division[division.length - 1];
+			String nombreArchivo;
+			if(genFichero.getIdfichero() != null) {
+				nombreArchivo = genFichero.getIdinstitucion() + "_" + genFichero.getIdfichero();
+			}else {
+				nombreArchivo = division[division.length - 1];
+			}
 			if (nombreArchivo.contains("/")) {
 				nombreArchivo = nombreArchivo.replace("/", "");
 			}

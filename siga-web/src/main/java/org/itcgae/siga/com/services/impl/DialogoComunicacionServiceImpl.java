@@ -751,7 +751,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								}
 								
 								//Obtenemos los campos del destinatario
-								destinatario = obtenerDatosDestinatario(dest);
+								obtenerDatosDestinatario(destinatario,dest);
 								
 							}	
 						}else{
@@ -1288,7 +1288,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								Short idEstado = 4;
 								historico.setIdestado(idEstado);
 								_envHistoricoestadoenvioMapper.insert(historico);
-								
+								 
 								//Insertamos el envio programado
 								EnvEnvioprogramado envioProgramado = new EnvEnvioprogramado();
 								envioProgramado.setIdenvio(envio.getIdenvio());
@@ -1828,8 +1828,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return rutaPlantilla;
 	}
 	
-	private DestinatarioItem obtenerDatosDestinatario(Map<String,Object> dest) {
-		DestinatarioItem destinatario = new DestinatarioItem();
+	private DestinatarioItem obtenerDatosDestinatario(DestinatarioItem destinatario, Map<String,Object> dest) {
+		
 		
 		Object idPersona = dest.get(SigaConstants.ALIASIDPERSONA.trim());
 		Object correo = dest.get(SigaConstants.ALIASCORREO.trim());
@@ -1837,7 +1837,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		Object domicilio = dest.get(SigaConstants.ALIASDOMICILIO.trim());
 		
 		CenPersona persona = _cenPersonaMapper.selectByPrimaryKey(Long.valueOf(idPersona.toString()));
-		destinatario = new DestinatarioItem();
+		
 		destinatario.setIdPersona(idPersona.toString());
 		destinatario.setNombre(persona.getNombre());
 		destinatario.setApellidos1(persona.getApellidos1());
