@@ -29,6 +29,7 @@ import org.itcgae.siga.com.documentos.DataMailMergeDataSource;
 import org.itcgae.siga.com.services.IGeneracionDocumentosService;
 import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.EnvDocumentos;
 import org.itcgae.siga.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -153,6 +154,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 			documento.setFileName(nombrefichero);
 			documento.setDatos(byteArray);
 			documento.setPathDocumento(pathfinal);
+			documento.setDocumentoFile(new File(pathfinal + nombrefichero));
 			}else {
 				documento = null;
 			}
