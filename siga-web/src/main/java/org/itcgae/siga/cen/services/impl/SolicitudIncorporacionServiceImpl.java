@@ -884,7 +884,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		solIncorporacion.setNombrebanco(dto.getBanco());
 		solIncorporacion.setBic(dto.getBic());
 		
-		if(dto.getIban() != null) {
+		if(dto.getIban() != null && dto.getIban() != "") {
 			if (dto.getIban().substring(0, 2).equals("ES")) {
 				
 				solIncorporacion.setCboCodigo(dto.getIban().substring(4, 8));

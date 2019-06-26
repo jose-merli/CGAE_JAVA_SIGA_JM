@@ -653,7 +653,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("nocol.idpersona");
 		sql.SELECT_DISTINCT("nocol.idinstitucion");
 		sql.SELECT_DISTINCT("per.nifcif");
-		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ',per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("concat(concat(per.apellidos1 || ' ', concat(per.apellidos2 , ', ')), per.nombre || ' ') AS nombre");
 		sql.SELECT_DISTINCT("per.nombre as solonombre");
 		sql.SELECT_DISTINCT("per.apellidos1");
 		sql.SELECT_DISTINCT("per.apellidos2");
@@ -855,7 +855,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("nocol.idpersona");
 		sql.SELECT_DISTINCT("nocol.idinstitucion");
 		sql.SELECT_DISTINCT("per.nifcif");
-		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ',per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("concat(concat(per.apellidos1 || ' ', concat(per.apellidos2 , ', ')), per.nombre || ' ') AS nombre");
 		sql.SELECT_DISTINCT("per.nombre as solonombre");
 		sql.SELECT_DISTINCT("per.apellidos1");
 		sql.SELECT_DISTINCT("per.apellidos2");
@@ -1047,7 +1047,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("nocol.idpersona");
 		sql.SELECT_DISTINCT("nocol.idinstitucion");
 		sql.SELECT_DISTINCT("per.nifcif");
-		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ',per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("concat(concat(per.apellidos1 || ' ', concat(per.apellidos2 , ', ')), per.nombre || ' ') AS nombre");
 		sql.SELECT_DISTINCT("per.nombre as solonombre");
 		sql.SELECT_DISTINCT("per.apellidos1");
 		sql.SELECT_DISTINCT("per.apellidos2");

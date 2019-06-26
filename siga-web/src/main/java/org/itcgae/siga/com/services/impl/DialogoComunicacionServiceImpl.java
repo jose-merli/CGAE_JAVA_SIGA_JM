@@ -607,7 +607,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				
 				if(listaPlantilla != null && listaPlantilla.size() == 1){
 					ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
-					nombrePlantilla = plantillaDoc.getPlantilla();
+					nombrePlantilla = modelosComunicacionItem.getNombre();
 					idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
 				}else if(listaPlantilla != null && listaPlantilla.size() > 1){
 					LOGGER.error("Exiten multiples plantillas asociada al informe en el idioma del usuario");
@@ -1939,8 +1939,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			campoSufijoReplaced = reemplazarSufijo(hDatosGenerales, mapaClave, campoSufijo);
 		}
 		
+		plantilla.setNombreFicheroSalida(nombrePlantilla);
 		String nombreFicheroSalida = obtenerNombreFicheroSalida(modelosComunicacionItem.getIdModeloComunicacion(), plantilla, hDatosGenerales, usuario.getIdlenguaje(), numFicheros, rutaTmp, campoSufijoReplaced);
-																																			
+		
+
+		
 		if(!esEnvio){
 			LOGGER.debug("Generamos el documento");																
 			DatosDocumentoItem docGenerado = null;

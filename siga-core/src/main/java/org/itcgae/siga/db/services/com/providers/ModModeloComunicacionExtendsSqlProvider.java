@@ -112,8 +112,17 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.JOIN(
 				"MOD_MODELO_PERFILES PERFILES ON PERFILES.IDMODELOCOMUNICACION = MODELO.IDMODELOCOMUNICACION AND PERFILES.IDINSTITUCION = MODELO.IDINSTITUCION");
 
-		sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND (CLASE.IDMODULO = " + idModulo
-				+ " OR CLASE.IDMODULO IS NULL) AND MODELO.FECHABAJA IS NULL AND MODELO.IDINSTITUCION = "+idInstitucion);
+		if(idInstitucion.equals(SigaConstants.IDINSTITUCION_2000.toString())) {
+			sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND (CLASE.IDMODULO = " + idModulo
+					+ " OR CLASE.IDMODULO IS NULL) AND MODELO.FECHABAJA IS NULL AND MODELO.IDINSTITUCION = "+idInstitucion);
+			sql.WHERE("MODELO.VISIBLE = '1'");
+
+		}else {
+						
+			sql.WHERE("(MODELO.IDINSTITUCION = " + idInstitucion + " AND MODELO.VISIBLE = '1') or (MODELO.IDINSTITUCION = " + SigaConstants.IDINSTITUCION_2000 + " AND MODELO.VISIBLE = '1' and modelo.pordefecto = 'SI')");
+
+
+		}
 
 		if (idConsulta != null) {
 			sql.WHERE(
@@ -125,7 +134,6 @@ public class ModModeloComunicacionExtendsSqlProvider {
 			sql.WHERE("PERFILES.IDPERFIL IN (" + String.join(",", perfiles) + ")");
 		}
 		
-		sql.WHERE("MODELO.VISIBLE = '1'");
 		sql.ORDER_BY("MODELO.NOMBRE ASC");
 
 		return sql.toString();
