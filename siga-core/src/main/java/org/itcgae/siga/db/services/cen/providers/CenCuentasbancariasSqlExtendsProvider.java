@@ -39,7 +39,7 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		}
 		
 		sql.WHERE("CUENTA.IDINSTITUCION = '"+idInstitucion+"'");
-		sql.ORDER_BY("CUENTA.FECHAMODIFICACION ASC");
+		sql.ORDER_BY("CUENTA.FECHAMODIFICACION DESC");
 		return sql.toString();
 	}
 	
@@ -68,7 +68,7 @@ public class CenCuentasbancariasSqlExtendsProvider extends CenGruposclienteClien
 		//sql.WHERE("CUENTA.FECHABAJA is null");
 		sql.WHERE("CUENTA.IDCUENTA = '"+datosBancariosSearchDTO.getIdCuenta()+"'");
 		sql.WHERE("CUENTA.IDINSTITUCION = '"+idInstitucion+"'");
-		sql.ORDER_BY("CUENTA.FECHAMODIFICACION ASC");
+		sql.ORDER_BY("CUENTA.FECHAMODIFICACION DESC");
 
 		return sql.toString();
 	}
