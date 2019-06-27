@@ -13,6 +13,7 @@ public class DialogoComunicacionItem {
 	private List<List<String>> selectedDatos = new ArrayList<List<String>>();
 	private List<ConsultaItem> consultas = new ArrayList<ConsultaItem>();
 	private String ruta;
+	private boolean comunicar;
 	
 	public String getIdClaseComunicacion() {
 		return idClaseComunicacion;
@@ -55,6 +56,12 @@ public class DialogoComunicacionItem {
 	}
 	public void setRuta(String ruta) {
 		this.ruta = ruta;
+	}
+	public boolean isComunicar() {
+		return comunicar;
+	}
+	public void setComunicar(boolean comunicar) {
+		this.comunicar = comunicar;
 	}
 	
 	
