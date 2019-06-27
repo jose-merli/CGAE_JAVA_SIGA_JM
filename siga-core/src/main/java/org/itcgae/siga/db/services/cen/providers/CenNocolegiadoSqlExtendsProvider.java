@@ -119,6 +119,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT("CONSULTA.*");
 		sql.FROM("(" + sql2 + ") consulta");
 
+		
 		if (!UtilidadesString.esCadenaVacia(busquedaJuridicaSearchDTO.getDenominacion())) {
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.DENOMINACION",
 					busquedaJuridicaSearchDTO.getDenominacion()));
@@ -653,7 +654,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("nocol.idpersona");
 		sql.SELECT_DISTINCT("nocol.idinstitucion");
 		sql.SELECT_DISTINCT("per.nifcif");
-		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ',per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("concat(concat(per.apellidos1 || ' ', concat(per.apellidos2 , ', ')), per.nombre || ' ') AS nombre");
 		sql.SELECT_DISTINCT("per.nombre as solonombre");
 		sql.SELECT_DISTINCT("per.apellidos1");
 		sql.SELECT_DISTINCT("per.apellidos2");
@@ -723,7 +724,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 		}
 		if (noColegiadoItem.getApellidos() != null && noColegiadoItem.getApellidos() != "") {
-			String columna = "CONCAT(per.apellidos1,per.apellidos2)";
+			String columna = "REPLACE(CONCAT(per.apellidos1,per.apellidos2), ' ', '')";
 			String cadena = noColegiadoItem.getApellidos().replaceAll("\\s+","");
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 		}			
@@ -820,7 +821,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		
 		sql2.SELECT("CONSULTA.*, ROW_NUMBER() OVER(PARTITION BY concat(CONSULTA.idpersona,CONSULTA.idinstitucion) ORDER BY CONSULTA.idpersona) AS RN");
 		sql2.FROM("(" + sql + ") CONSULTA");
-		sql2.WHERE("rownum < 5000");
+//		sql2.WHERE("rownum < 5000");
 		
 		sql3.SELECT("*");
 		sql3.FROM("(" + sql2 + ")");
@@ -855,7 +856,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("nocol.idpersona");
 		sql.SELECT_DISTINCT("nocol.idinstitucion");
 		sql.SELECT_DISTINCT("per.nifcif");
-		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ',per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("concat(concat(per.apellidos1 || ' ', concat(per.apellidos2 , ', ')), per.nombre || ' ') AS nombre");
 		sql.SELECT_DISTINCT("per.nombre as solonombre");
 		sql.SELECT_DISTINCT("per.apellidos1");
 		sql.SELECT_DISTINCT("per.apellidos2");
@@ -1017,7 +1018,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		
 		sql2.SELECT("CONSULTA.*, ROW_NUMBER() OVER(PARTITION BY concat(CONSULTA.idpersona,CONSULTA.idinstitucion) ORDER BY CONSULTA.idpersona) AS RN");
 		sql2.FROM("(" + sql + ") CONSULTA");
-		sql2.WHERE("rownum < 5000");
+//		sql2.WHERE("rownum < 5000");
 		
 		sql3.SELECT("*");
 		sql3.FROM("(" + sql2 + ")");
@@ -1047,7 +1048,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		sql.SELECT_DISTINCT("nocol.idpersona");
 		sql.SELECT_DISTINCT("nocol.idinstitucion");
 		sql.SELECT_DISTINCT("per.nifcif");
-		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ',per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("concat(concat(per.apellidos1 || ' ', concat(per.apellidos2 , ', ')), per.nombre || ' ') AS nombre");
 		sql.SELECT_DISTINCT("per.nombre as solonombre");
 		sql.SELECT_DISTINCT("per.apellidos1");
 		sql.SELECT_DISTINCT("per.apellidos2");

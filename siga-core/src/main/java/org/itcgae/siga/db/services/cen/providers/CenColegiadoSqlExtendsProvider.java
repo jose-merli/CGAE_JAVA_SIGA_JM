@@ -41,7 +41,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("col.idinstitucion");
 		sql.SELECT_DISTINCT("col.identificadords");
 		sql.SELECT_DISTINCT("per.nifcif");
-		sql.SELECT_DISTINCT("concat(per.nombre || ' ',concat(per.apellidos1 || ' ', per.apellidos2) ) AS nombre");
+		sql.SELECT_DISTINCT("concat(concat(per.apellidos1 || ' ', concat(per.apellidos2 , ', ')), per.nombre || ' ') AS nombre");
 		sql.SELECT_DISTINCT("per.nombre as solonombre");
 		sql.SELECT_DISTINCT("per.apellidos1");
 		sql.SELECT_DISTINCT("per.apellidos2");
@@ -168,8 +168,10 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 
 		if (colegiadoItem.getApellidos() != null && colegiadoItem.getApellidos() != "") {
-			String columna = "CONCAT(per.apellidos1,per.apellidos2)";
+			
+			String columna = "REPLACE(CONCAT(per.apellidos1,per.apellidos2), ' ', '')";
 			String cadena = colegiadoItem.getApellidos().replaceAll("\\s+","");
+			
 			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
 			
 //			sql.WHERE("UPPER(CONCAT(per.apellidos1,per.apellidos2)) LIKE UPPER('%" +colegiadoItem.getApellidos().replaceAll("\\s+","")
@@ -334,7 +336,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		sql2.SELECT("CONSULTA.*, ROW_NUMBER() OVER(PARTITION BY concat(CONSULTA.idpersona,CONSULTA.idinstitucion) ORDER BY CONSULTA.idpersona) AS RN");
 		sql2.FROM("(" + sql + ") CONSULTA");
-		sql2.WHERE("rownum < 5000");
+//		sql2.WHERE("rownum < 5000");
 		
 		sql3.SELECT("*");
 		sql3.FROM("(" + sql2 + ")");

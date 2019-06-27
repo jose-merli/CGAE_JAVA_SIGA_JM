@@ -276,7 +276,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 		List<BusquedaPerFisicaItem> busquedaPerFisicaItems = new ArrayList<BusquedaPerFisicaItem>();
 		BusquedaPerFisicaDTO busquedaPerFisicaDTO = new BusquedaPerFisicaDTO();
 		String idLenguaje = null;
-
+		
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -295,6 +295,11 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				AdmUsuarios usuario = usuarios.get(0);
 				idLenguaje = usuario.getIdlenguaje();
 
+				
+				if(busquedaPerFisicaSearchDTO.getNif() != null && busquedaPerFisicaSearchDTO.getNif() != "") {
+					String nifPer = busquedaPerFisicaSearchDTO.getNif().toUpperCase();
+					busquedaPerFisicaSearchDTO.setNif(nifPer);
+				}
 				
 				// 1. Buscamos colegiados dentro de nuestro colegio
 				LOGGER.info(
@@ -510,6 +515,8 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				colegiadoResponseDocument = clientCENSO.busquedaColegiadoConIdentificacion(colegiadoRequestDocument,config.get(0).getValor());
 				ColegiadoResponse colegiadoResponse = colegiadoResponseDocument.getColegiadoResponse();
 				colegiado = colegiadoResponse.getColegiado();
+				
+				
 			}
 		} catch (Exception e){
 			LOGGER.error("Error en la llamada a busqueda de colegiados.", e);
