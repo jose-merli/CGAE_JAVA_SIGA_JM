@@ -28,7 +28,6 @@ import org.itcgae.siga.DTOs.age.EventoItem;
 import org.itcgae.siga.DTOs.age.FestivosItem;
 import org.itcgae.siga.DTOs.age.NotificacionEventoDTO;
 import org.itcgae.siga.DTOs.age.NotificacionEventoItem;
-import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioItem;
 import org.itcgae.siga.DTOs.com.PlantillaEnvioSearchItem;
@@ -56,6 +55,8 @@ import org.itcgae.siga.db.entities.AgeCalendario;
 import org.itcgae.siga.db.entities.AgeCalendarioExample;
 import org.itcgae.siga.db.entities.AgeEvento;
 import org.itcgae.siga.db.entities.AgeEventoExample;
+import org.itcgae.siga.db.entities.AgeEventonotificacion;
+import org.itcgae.siga.db.entities.AgeEventonotificacionExample;
 import org.itcgae.siga.db.entities.AgeFestivos;
 import org.itcgae.siga.db.entities.AgeGeneracionnotificaciones;
 import org.itcgae.siga.db.entities.AgeGeneracionnotificacionesExample;
@@ -64,6 +65,7 @@ import org.itcgae.siga.db.entities.AgeNotificacioneseventoExample;
 import org.itcgae.siga.db.entities.AgePersonaEvento;
 import org.itcgae.siga.db.entities.AgePersonaEventoExample;
 import org.itcgae.siga.db.entities.AgeRepeticionevento;
+import org.itcgae.siga.db.entities.AgeRepeticioneventoExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
 import org.itcgae.siga.db.entities.CenInstitucion;
@@ -75,12 +77,9 @@ import org.itcgae.siga.db.entities.CenPoblaciones;
 import org.itcgae.siga.db.entities.CenPoblacionesExample;
 import org.itcgae.siga.db.entities.EnvDestinatarios;
 import org.itcgae.siga.db.entities.EnvEnvioprogramado;
-import org.itcgae.siga.db.entities.EnvEnvioprogramadoKey;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosKey;
 import org.itcgae.siga.db.entities.EnvHistoricoestadoenvio;
-import org.itcgae.siga.db.entities.EnvPlantillasenvios;
-import org.itcgae.siga.db.entities.EnvPlantillasenviosKey;
 import org.itcgae.siga.db.entities.ForCurso;
 import org.itcgae.siga.db.entities.ForCursoExample;
 import org.itcgae.siga.db.entities.ForEventoCurso;
@@ -89,6 +88,7 @@ import org.itcgae.siga.db.entities.ForInscripcion;
 import org.itcgae.siga.db.entities.ForInscripcionExample;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioExample;
+import org.itcgae.siga.db.mappers.AgeEventonotificacionMapper;
 import org.itcgae.siga.db.mappers.AgeGeneracionnotificacionesMapper;
 import org.itcgae.siga.db.mappers.AgePersonaEventoMapper;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
@@ -97,7 +97,6 @@ import org.itcgae.siga.db.mappers.EnvDestinatariosMapper;
 import org.itcgae.siga.db.mappers.EnvEnvioprogramadoMapper;
 import org.itcgae.siga.db.mappers.EnvEnviosMapper;
 import org.itcgae.siga.db.mappers.EnvHistoricoestadoenvioMapper;
-import org.itcgae.siga.db.mappers.EnvPlantillasenviosMapper;
 import org.itcgae.siga.db.mappers.ForEventoCursoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.CenPartidojudicialExtendsMapper;
@@ -112,7 +111,6 @@ import org.itcgae.siga.db.services.age.mappers.AgeNotificacioneseventoExtendsMap
 import org.itcgae.siga.db.services.age.mappers.AgeRepeticionEventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeTipoeventosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.CenInfluenciaExtendsMapper;
-import org.itcgae.siga.db.services.age.mappers.EnvPlantillasenviosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPoblacionesExtendsMapper;
@@ -150,7 +148,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 	@Autowired
 	private EnviosServiceImpl envioService;
-	
+
 	@Autowired
 	private AgeEventoExtendsMapper ageEventoExtendsMapper;
 
@@ -207,7 +205,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 	@Autowired
 	private ForInscripcionExtendsMapper forInscripcionExtendsMapper;
-	
+
 	@Autowired
 	private EnvPlantillaEnviosExtendsMapper plantillaEnvioMapper;
 
@@ -225,16 +223,15 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 	@Autowired
 	private EnvHistoricoestadoenvioMapper _envHistoricoestadoenvioMapper;
-	
+
 	@Autowired
 	private EnvDestinatariosMapper _envDestinatariosMapper;
-	
+
 	@Autowired
 	private CenDireccionesMapper cenDireccionesMapper;
-	
+
 	@Autowired
 	private CenPersonaMapper cenPersonaMapper;
-
 
 	@Override
 	@Transactional
@@ -265,7 +262,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 					AdmUsuarios usuario = usuarios.get(0);
 					// Si existen datos de repeticion, se inserta en la tabla los datos
 					if (eventoItem.getFechaInicioRepeticion() != null && eventoItem.getFechaFinRepeticion() != null
-							&& eventoItem.getValoresRepeticion().length != 0) {
+							&& eventoItem.getValoresRepeticion() != null && eventoItem.getValoresRepeticion().length != 0) {
 						AgeRepeticionevento ageRepeticionEvento = new AgeRepeticionevento();
 						ageRepeticionEvento.setIdinstitucion(idInstitucion);
 						ageRepeticionEvento.setFechainicio(eventoItem.getFechaInicioRepeticion());
@@ -400,18 +397,16 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 										// Modificamos la fecha de inicio de inscripcion en el curso
 									} else if (Long.valueOf(eventoItem
 											.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION) {
-										
+
 										ForCurso curso = new ForCurso();
 										curso.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
 										curso.setFechainscripciondesde(eventoItem.getFechaInicio());
 
 										forCursoExtendsMapper.updateByPrimaryKeySelective(curso);
 
-										
-
 									} else if (Long.valueOf(eventoItem
 											.getIdTipoEvento()) == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
-										
+
 										ForCurso curso = new ForCurso();
 										curso.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
 										curso.setFechainscripcionhasta(eventoItem.getFechaInicio());
@@ -649,6 +644,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 			for (Iterator<Date> iterator = fechas.iterator(); iterator.hasNext();) {
 				// Generamos los nuevos eventos a partir del evento original
 				ageEventoInsert.setIdevento(null);
+
+				// No guardamos los valores de repetición de los eventos hijos
+				ageEventoInsert.setIdrepeticionevento(null);
 				Date fechaEventInsert = (Date) iterator.next();
 				Calendar fechaCalendarInsert = Calendar.getInstance();
 				fechaCalendarInsert.setTime(fechaEventInsert);
@@ -677,7 +675,25 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 					ForEventoCurso forEventoCurso = new ForEventoCurso();
 					forEventoCurso.setFechabaja(null);
 					forEventoCurso.setFechamodificacion(new Date());
-					forEventoCurso.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
+					
+					if(eventoItem.getIdCurso() != null) {
+						forEventoCurso.setIdcurso(Long.valueOf(eventoItem.getIdCurso()));
+
+					}else {
+						
+						ForEventoCursoExample forEventoCursoExample = new ForEventoCursoExample();
+						forEventoCursoExample.createCriteria()
+						.andIdeventoEqualTo(Long.valueOf(eventoItem.getIdEventoOriginal()));
+						
+						List<ForEventoCurso> listEventos = forEventoCursoMapper.selectByExample(forEventoCursoExample);
+						
+						if (null != listEventos && listEventos.size() > 0) {
+							Long idCurso = listEventos.get(0).getIdcurso();
+							forEventoCurso.setIdcurso(idCurso);	
+							
+						}
+					}
+					
 					forEventoCurso.setIdevento(Long.valueOf(ageEventoInsert.getIdevento()));
 					forEventoCurso.setUsumodificacion(usuario.getIdusuario().longValue());
 					forEventoCurso.setIdinstitucion(ageEventoInsert.getIdinstitucion());
@@ -787,9 +803,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 					Date fechaGeneracionNotificacion = generateNotificationDate(noti, eventoItem);
 					ageGeneracionnotificaciones.setFechageneracionnotificacion(fechaGeneracionNotificacion);
-					//Long idEnvio = generarEnvioProgramado(noti,fechaGeneracionNotificacion);
-					//ageGeneracionnotificaciones.setIdenvio(idEnvio);
-					
+					// Long idEnvio = generarEnvioProgramado(noti,fechaGeneracionNotificacion);
+					// ageGeneracionnotificaciones.setIdenvio(idEnvio);
+
 					LOGGER.info(
 							"saveNotification() / ageGeneracionnotificacionesMapper.insert(ageGeneracionnotificaciones) -> Entrada a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
 
@@ -1292,6 +1308,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		int response = 2;
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
+		String idRepeticionEvento = null;
+		boolean cambioRepeticion = false;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -1327,6 +1345,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 					LOGGER.info(
 							"updateEventCalendar() / ageEventoExtendsMapper.updateByPrimaryKey(event) -> Entrada a ageEventoExtendsMapper para modificar un evento");
 
+					// 1. SE GUARDA LAS MODIFICACIONES DEL EVENTO
 					if (event.getIdestadoevento() != Long.valueOf(eventoItem.getIdEstadoEvento())) {
 
 						if (event.getIdestadoevento() == Long.valueOf(SigaConstants.EVENTO_CUMPLIDO)
@@ -1337,6 +1356,18 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 							error.setDescription("La sesión debe tener estado planificado para poder ser cancelada");
 
 						} else {
+
+							// Se comprueba si hay un cambio en la fecha del evento, por si tiene datos de
+							// repeticion cambiar
+							// los eventos hijos que tenga
+							if (!eventoItem.getFechaInicio().equals(event.getFechainicio())) {
+								cambioRepeticion = true;
+							}
+
+							if (!eventoItem.getFechaFin().equals(event.getFechafin())) {
+								cambioRepeticion = true;
+							}
+
 							event.setIdestadoevento(Long.valueOf(eventoItem.getIdEstadoEvento()));
 							event.setFechamodificacion(new Date());
 							event.setUsumodificacion(usuario.getIdusuario().longValue());
@@ -1354,6 +1385,25 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 						}
 					} else {
 
+						// Se comprueba si hay un cambio en la fecha del evento, por si tiene datos de
+						// repeticion cambiar
+						// los eventos hijos que tenga
+						if (!eventoItem.getFechaInicio().equals(event.getFechainicio())) {
+							cambioRepeticion = true;
+						}
+
+						if (!eventoItem.getFechaFin().equals(event.getFechafin())) {
+							cambioRepeticion = true;
+						}
+
+						// Si un evento hijo modifica su fecha de inicio/fin se desvincula del padre
+						if (cambioRepeticion) {
+							if (event.getIdeventooriginal() != null) {
+								event.setIdeventooriginal(null);
+							}
+						}
+
+						// Se guardan los datos modificados del evento
 						event.setIdestadoevento(Long.valueOf(eventoItem.getIdEstadoEvento()));
 						event.setFechamodificacion(new Date());
 						event.setUsumodificacion(usuario.getIdusuario().longValue());
@@ -1367,51 +1417,251 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 					}
 
+					// 2. SI ES UN EVENTO TIPO INSCRIPCION SE EDITA EN EL CURSO EL NUEVO CAMBIO DE
+					// LAS FECHAS DE INICIO Y FIN DE INSCRIPCION
 					if ((event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION
 							|| event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION)
 							&& event.getFechabaja() == null) {
 
-						ForCursoExample exampleCurso = new ForCursoExample();
-						exampleCurso.createCriteria().andIdcursoEqualTo(Long.valueOf(eventoItem.getIdCurso()))
+						ForEventoCursoExample forEventoCursoExample = new ForEventoCursoExample();
+						forEventoCursoExample.createCriteria()
+								.andIdeventoEqualTo(Long.valueOf(eventoItem.getIdEvento()))
 								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 						LOGGER.info(
 								"updateEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Entrada a ageNotificacioneseventoMapper para buscar si existe el evento");
 
-						List<ForCurso> cursoList = forCursoExtendsMapper.selectByExample(exampleCurso);
+						List<ForEventoCurso> cursoEventoList = forEventoCursoMapper
+								.selectByExample(forEventoCursoExample);
 
 						LOGGER.info(
 								"updateEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Salida a ageNotificacioneseventoMapper para buscar si existe el evento");
 
-						if (null != cursoList && cursoList.size() > 0) {
-							ForCurso curso = cursoList.get(0);
+						if (null != cursoEventoList && cursoEventoList.size() > 0) {
+							ForEventoCurso forEventoCurso = cursoEventoList.get(0);
+							eventoItem.setIdCurso(forEventoCurso.getIdcurso().toString());
+
+							ForCursoExample exampleCurso = new ForCursoExample();
+							exampleCurso.createCriteria().andIdcursoEqualTo(forEventoCurso.getIdcurso())
+									.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 							LOGGER.info(
-									"updateEventCalendar() / forCursoExtendsMapper.updateByPrimaryKey(curso) -> Entrada a forCursoExtendsMapper para modificar un curso");
+									"updateEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Entrada a ageNotificacioneseventoMapper para buscar si existe el evento");
 
-							curso.setFechamodificacion(new Date());
-							curso.setUsumodificacion(usuario.getIdusuario().longValue());
-							if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION) {
-								curso.setFechainscripciondesde(eventoItem.getFechaInicio());
-							} else if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
-								curso.setFechainscripcionhasta(eventoItem.getFechaFin());
+							List<ForCurso> cursoList = forCursoExtendsMapper.selectByExample(exampleCurso);
+
+							LOGGER.info(
+									"updateEventCalendar() / forCursoExtendsMapper.selectByExample(exampleCurso) -> Salida a ageNotificacioneseventoMapper para buscar si existe el evento");
+
+							if (null != cursoList && cursoList.size() > 0) {
+								ForCurso curso = cursoList.get(0);
+
+								LOGGER.info(
+										"updateEventCalendar() / forCursoExtendsMapper.updateByPrimaryKey(curso) -> Entrada a forCursoExtendsMapper para modificar un curso");
+
+								curso.setFechamodificacion(new Date());
+								curso.setUsumodificacion(usuario.getIdusuario().longValue());
+								if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_INICIO_INSCRIPCION) {
+									curso.setFechainscripciondesde(eventoItem.getFechaInicio());
+								} else if (event.getIdtipoevento() == SigaConstants.TIPO_EVENTO_FIN_INSCRIPCION) {
+									curso.setFechainscripcionhasta(eventoItem.getFechaFin());
+								}
+
+								response = forCursoExtendsMapper.updateByPrimaryKey(curso);
+
+								LOGGER.info(
+										"updateEventCalendar() / forCursoExtendsMapper.updateByPrimaryKey(curso) -> Salida a forCursoExtendsMapper para modificar un curso");
 							}
-
-							response = forCursoExtendsMapper.updateByPrimaryKey(curso);
-
-							LOGGER.info(
-									"updateEventCalendar() / forCursoExtendsMapper.updateByPrimaryKey(curso) -> Salida a forCursoExtendsMapper para modificar un curso");
-						}
-
-						if (response == 0) {
-							error.setCode(400);
-							error.setDescription(
-									"Error al modificar la fecha de generación de las notificaciones del evento");
-						} else {
-							error.setCode(200);
-							response = checkGenerationDateNotificationEvent(eventoItem, usuario, idInstitucion);
 						}
 					}
+
+					// 3.COMPROBAMOS SI TIENE VALORES DE REPETICION
+					if (eventoItem.getFechaInicioRepeticion() != null && eventoItem.getFechaFinRepeticion() != null
+							&& eventoItem.getValoresRepeticion().length != 0) {
+
+						// Comprobamos q ageRepticion existe
+						if (eventoItem.getIdRepeticionEvento() != null) {
+
+							AgeRepeticioneventoExample ageRepeticioneventoExample = new AgeRepeticioneventoExample();
+							ageRepeticioneventoExample.createCriteria()
+									.andIdrepeticioneventoEqualTo(Long.valueOf(eventoItem.getIdRepeticionEvento()))
+									.andIdinstitucionEqualTo(idInstitucion);
+
+							LOGGER.info(
+									"updateEventCalendar() / ageRepeticionEventoExtendsMapper.selectByExample(exampleCurso) -> Entrada a ageRepeticionEventoExtendsMapper para buscar si existe la repeticion");
+
+							List<AgeRepeticionevento> ageRepeticionList = ageRepeticionEventoExtendsMapper
+									.selectByExample(ageRepeticioneventoExample);
+
+							LOGGER.info(
+									"updateEventCalendar() / ageRepeticionEventoExtendsMapper.selectByExample(exampleCurso) -> Salida a ageRepeticionEventoExtendsMapper para buscar si existe la repeticion");
+
+							// Si existe modificamos su ageRepeticion
+							if (null != ageRepeticionList && ageRepeticionList.size() > 0) {
+								AgeRepeticionevento rep = ageRepeticionList.get(0);
+								idRepeticionEvento = rep.getIdrepeticionevento().toString();
+
+								if (!rep.getFechainicio().equals(eventoItem.getFechaInicioRepeticion())) {
+									cambioRepeticion = true;
+									rep.setFechainicio(eventoItem.getFechaInicioRepeticion());
+								}
+
+								if (!rep.getFechafin().equals(eventoItem.getFechaFinRepeticion())) {
+									cambioRepeticion = true;
+									rep.setFechafin(eventoItem.getFechaFinRepeticion());
+								}
+
+								if (eventoItem.getValoresRepeticion() != null && rep.getValoresrepeticion() != null) {
+
+									String valoresrepeticion = Arrays.toString(eventoItem.getValoresRepeticion());
+									String valoresrepeticionRep = rep.getValoresrepeticion();
+
+									if (!valoresrepeticion.equals(valoresrepeticionRep)) {
+										cambioRepeticion = true;
+										if (eventoItem.getValoresRepeticion().length != 0) {
+											rep.setValoresrepeticion(valoresrepeticion);
+										} else {
+											rep.setValoresrepeticion(null);
+										}
+									}
+								}
+
+								if (!rep.getTiporepeticion().equals(eventoItem.getTipoRepeticion())) {
+									cambioRepeticion = true;
+									rep.setTiporepeticion(eventoItem.getTipoRepeticion());
+								}
+
+								if (rep.getTipodiasrepeticion() != null && eventoItem.getTipoDiasRepeticion() != null
+										&& !rep.getTipodiasrepeticion().equals(eventoItem.getTipoDiasRepeticion())) {
+									cambioRepeticion = true;
+									rep.setTipodiasrepeticion(eventoItem.getTipoDiasRepeticion());
+								}
+
+								if (cambioRepeticion) {
+
+									rep.setFechabaja(null);
+									rep.setUsumodificacion(usuario.getIdusuario().longValue());
+									rep.setFechamodificacion(new Date());
+
+									LOGGER.info(
+											"updateEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Entrada a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
+									response = ageRepeticionEventoExtendsMapper.updateByPrimaryKey(rep);
+
+									LOGGER.info(
+											"updateEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Salida a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
+
+								}
+
+								// Si no existe se lo creamos
+							}
+						} else {
+							AgeRepeticionevento ageRepeticionEvento = new AgeRepeticionevento();
+							ageRepeticionEvento.setIdinstitucion(idInstitucion);
+							ageRepeticionEvento.setFechainicio(eventoItem.getFechaInicioRepeticion());
+							ageRepeticionEvento.setFechafin(eventoItem.getFechaFinRepeticion());
+							ageRepeticionEvento.setFechabaja(null);
+							ageRepeticionEvento.setUsumodificacion(usuario.getIdusuario().longValue());
+							ageRepeticionEvento.setFechamodificacion(new Date());
+							if (eventoItem.getValoresRepeticion().length != 0) {
+								String valoresrepeticion = Arrays.toString(eventoItem.getValoresRepeticion());
+								ageRepeticionEvento.setValoresrepeticion(valoresrepeticion);
+							} else {
+								ageRepeticionEvento.setValoresrepeticion(null);
+							}
+							ageRepeticionEvento.setTiporepeticion(eventoItem.getTipoRepeticion());
+							ageRepeticionEvento.setTipodiasrepeticion(eventoItem.getTipoDiasRepeticion());
+
+							LOGGER.info(
+									"updateEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Entrada a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
+							response = ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento);
+							LOGGER.info(
+									"updateEventCalendar() / ageRepeticionEventoExtendsMapper.insert(ageRepeticionEvento) -> Salida a ageRepeticionEventoExtendsMapper para insertar los datos de repeticion del evento");
+
+							LOGGER.info(
+									"updateEventCalendar() / ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent() -> Entrada a ageRepeticionEventoExtendsMapper para obtener idRepeticionEvento de los datos de repeticion insertados");
+							List<ComboItem> repeticionEventoInserted = ageRepeticionEventoExtendsMapper
+									.selectMaxRepetitionEvent();
+							LOGGER.info(
+									"updateEventCalendar() / ageRepeticionEventoExtendsMapper.selectMaxRepetitionEvent() -> Salida a ageRepeticionEventoExtendsMapper para obtener idRepeticionEvento de los datos de repeticion insertados");
+							idRepeticionEvento = repeticionEventoInserted.get(0).getValue();
+
+							// Se guarda el evento creado
+							LOGGER.info(
+									"updateEventCalendar() / ageEventoMapper.insert(ageEventoInsert) -> Entrada a ageEventoMapper para insertar un evento");
+							event.setIdrepeticionevento(Long.valueOf(idRepeticionEvento));
+							response = ageEventoExtendsMapper.updateByPrimaryKey(event);
+							LOGGER.info(
+									"updateEventCalendar() / ageEventoMapper.insert(ageEventoInsert) -> Salida a ageEventoMapper para insertar un evento");
+
+							cambioRepeticion = true;
+						}
+
+						// Si existe cambios, se eliminan los antiguos y se crean los eventos nuevos con
+						// los nuevos datos
+						if (idRepeticionEvento != null && cambioRepeticion) {
+
+							AgeEventoExample ageEventoExample = new AgeEventoExample();
+							ageEventoExample.createCriteria().andIdeventooriginalEqualTo(event.getIdevento())
+									.andIdeventoNotEqualTo(event.getIdevento());
+
+							List<AgeEvento> eventosDelete = ageEventoExtendsMapper.selectByExample(ageEventoExample);
+
+							if (null != eventosDelete && eventosDelete.size() > 0) {
+
+								try {
+
+									for (AgeEvento eventoDelete : eventosDelete) {
+
+										AgeNotificacioneseventoExample ageNotificacioneseventoExample = new AgeNotificacioneseventoExample();
+										ageNotificacioneseventoExample.createCriteria()
+												.andIdeventoEqualTo(eventoDelete.getIdevento());
+
+										List<AgeNotificacionesevento> notificacionesDelete = ageNotificacioneseventoExtendsMapper
+												.selectByExample(ageNotificacioneseventoExample);
+
+										if (null != notificacionesDelete && notificacionesDelete.size() > 0) {
+
+											for (AgeNotificacionesevento notificaionDelete : notificacionesDelete) {
+												notificaionDelete.setFechabaja(new Date());
+												notificaionDelete.setFechamodificacion(new Date());
+												notificaionDelete
+														.setUsumodificacion(usuario.getIdusuario().longValue());
+												ageNotificacioneseventoExtendsMapper
+														.updateByPrimaryKey(notificaionDelete);
+											}
+
+											eventoDelete.setFechabaja(new Date());
+											eventoDelete.setFechamodificacion(new Date());
+											eventoDelete.setUsumodificacion(usuario.getIdusuario().longValue());
+											ageEventoExtendsMapper.updateByPrimaryKey(eventoDelete);
+
+										} else {
+											eventoDelete.setFechabaja(new Date());
+											eventoDelete.setFechamodificacion(new Date());
+											eventoDelete.setUsumodificacion(usuario.getIdusuario().longValue());
+											ageEventoExtendsMapper.updateByPrimaryKey(eventoDelete);
+										}
+
+									}
+								} catch (Exception e) {
+									error.setCode(400);
+									error.setDescription(
+											"Se ha producido un error en BBDD contacte con su administrador");
+								}
+
+							}
+
+							response = generateEvents(eventoItem.getIdCalendario(), eventoItem, event, usuario);
+
+							if (response == 0) {
+								error.setCode(400);
+								error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+							} else {
+								error.setCode(200);
+							}
+						}
+					}
+
 				}
 
 				if (response == 0) {
@@ -1427,6 +1677,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 		updateResponseDTO.setError(error);
 		return updateResponseDTO;
+
 	}
 
 	public int checkGenerationDateNotificationEvent(EventoItem evento, AdmUsuarios usuario, Short idInstitucion) {
@@ -1698,7 +1949,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 												.setUsumodificacion(usuario.getIdusuario().longValue());
 										ageGeneracionnotificacion.setFechamodificacion(new Date());
 										ageGeneracionnotificacion.setFechabaja(new Date());
-										
+
 										LOGGER.info(
 												"saveNotification() / ageGeneracionnotificacionesMapper.insert(ageGeneracionnotificaciones) -> Entrada a ageGeneracionnotificacionesMapper para insertar cuando se generará una notificacion");
 
@@ -2321,8 +2572,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 	@Override
 	public void generateNotificationsAuto() {
-//		LOGGER.info(
-//				"generateNotificationAuto()  -> Entrada al servicio para enviar aviso de los eventos que correspondan");
+		// LOGGER.info(
+		// "generateNotificationAuto() -> Entrada al servicio para enviar aviso de los
+		// eventos que correspondan");
 
 		// Este método se encargará de enviar los avisos del comienzo de un evento
 		// cuando
@@ -2332,253 +2584,275 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		// fechaGeneracionNotificacion sea igual o menor que la
 		// fecha actual y que no este dado de baja
 		AgeGeneracionnotificacionesExample ageGeneracionnotificacionesExample = new AgeGeneracionnotificacionesExample();
-		List<Long> values= new ArrayList<Long>();
+		List<Long> values = new ArrayList<Long>();
 		values.add(3L);
 		values.add(4L);
 		values.add(7L);
 		ageGeneracionnotificacionesExample.createCriteria().andFechabajaIsNull()
 				.andFechageneracionnotificacionLessThanOrEqualTo(new Date()).andIdtiponotificacioneventoIn(values);
 
-//		LOGGER.info(
-//				"generateNotificationAuto() / ageGeneracionnotificacionesMapper.selectByExample() -> Entrada a ageGeneracionnotificacionesMapper para obtener un listado de las notificaciones que debemos generar");
+		// LOGGER.info(
+		// "generateNotificationAuto() /
+		// ageGeneracionnotificacionesMapper.selectByExample() -> Entrada a
+		// ageGeneracionnotificacionesMapper para obtener un listado de las
+		// notificaciones que debemos generar");
 
 		List<AgeGeneracionnotificaciones> ageGeneracionnotificacionesList = ageGeneracionnotificacionesMapper
 				.selectByExample(ageGeneracionnotificacionesExample);
 
-//		LOGGER.info(
-//				"generateNotificationAuto() / ageGeneracionnotificacionesMapper.selectByExample() -> Salida a ageGeneracionnotificacionesMapper para obtener un listado un listado de las notificaciones que debemos generar");
-
+		// LOGGER.info(
+		// "generateNotificationAuto() /
+		// ageGeneracionnotificacionesMapper.selectByExample() -> Salida a
+		// ageGeneracionnotificacionesMapper para obtener un listado un listado de las
+		// notificaciones que debemos generar");
 
 		if (null != ageGeneracionnotificacionesList && ageGeneracionnotificacionesList.size() > 0) {
 			for (AgeGeneracionnotificaciones ageGeneracion : ageGeneracionnotificacionesList) {
 
-
-//				LOGGER.info(
-//						"generateNotificationAuto() / ageNotificacioneseventoExtendsMapper.selectByPrimaryKey() -> Entrada a ageNotificacioneseventoExtendsMapper para obtener la notificacion que debemos generar");
+				// LOGGER.info(
+				// "generateNotificationAuto() /
+				// ageNotificacioneseventoExtendsMapper.selectByPrimaryKey() -> Entrada a
+				// ageNotificacioneseventoExtendsMapper para obtener la notificacion que debemos
+				// generar");
 
 				// Obtenemos la notificación que tenemos que generar
 				AgeNotificacionesevento notification = ageNotificacioneseventoExtendsMapper
 						.selectByPrimaryKey(ageGeneracion.getIdnotificacionevento());
 
-//				LOGGER.info(
-//						"generateNotificationAuto() / ageNotificacioneseventoExtendsMapper.selectByPrimaryKey() -> Salida a ageNotificacioneseventoExtendsMapper para obtener la notificacion que debemos generar");
-
+				// LOGGER.info(
+				// "generateNotificationAuto() /
+				// ageNotificacioneseventoExtendsMapper.selectByPrimaryKey() -> Salida a
+				// ageNotificacioneseventoExtendsMapper para obtener la notificacion que debemos
+				// generar");
 
 				if (notification != null) {
 
 					Long idPlantilla = notification.getIdplantilla();
-					
 
-					List<PlantillaEnvioItem> plantilla = plantillaEnvioMapper.selectPlantillaIdPlantilla(notification.getIdinstitucion(),new PlantillaEnvioSearchItem(),idPlantilla.toString() );
-					if (plantilla != null && plantilla.size() >0) {
-						
-						
+					List<PlantillaEnvioItem> plantilla = plantillaEnvioMapper.selectPlantillaIdPlantilla(
+							notification.getIdinstitucion(), new PlantillaEnvioSearchItem(), idPlantilla.toString());
+					if (plantilla != null && plantilla.size() > 0) {
+
 						Long idTipoEnvios = notification.getIdtipoenvios();
-						//Obtenemos los datos del curso a partir del evento
+						// Obtenemos los datos del curso a partir del evento
 						ForEventoCursoExample exampleEventoCurso = new ForEventoCursoExample();
 						exampleEventoCurso.createCriteria().andIdeventoEqualTo(notification.getIdevento());
-						List<ForEventoCurso> eventoCurso =forEventoCursoMapper.selectByExample(exampleEventoCurso );
+						List<ForEventoCurso> eventoCurso = forEventoCursoMapper.selectByExample(exampleEventoCurso);
 						List<EnvDestinatarios> destinatarios = new ArrayList<EnvDestinatarios>();
-						
-						if ((null != plantilla.get(0).getIdDireccion()) && (null != plantilla.get(0).getIdPersona())) {
-							
-						
-						CenDireccionesKey direccionesKey = new CenDireccionesKey();
-						direccionesKey.setIddireccion(Long.valueOf(plantilla.get(0).getIdDireccion()));
-						direccionesKey.setIdinstitucion(eventoCurso.get(0).getIdinstitucion());
-						direccionesKey.setIdpersona(Long.valueOf(plantilla.get(0).getIdPersona()));
-						
-						//Obtenemos el remitente de la plantilla
-						CenDirecciones remitente = cenDireccionesMapper.selectByPrimaryKey(direccionesKey);
-						
-						CenPersona persona = cenPersonaMapper.selectByPrimaryKey(remitente.getIdpersona());
-						RemitenteDTO remitenteMail = persona2remitente(remitente,plantilla.get(0),persona);
-						
-						
-						if (null != eventoCurso && eventoCurso.size()>0) {
-							 
 
-							Long idEnvio = generarEnvio(notification);
-							EnvEnviosKey keyEnvio = new EnvEnviosKey();
-							keyEnvio.setIdenvio(idEnvio);
-							keyEnvio.setIdinstitucion(eventoCurso.get(0).getIdinstitucion());
-							EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio );
-							
-							if (notification.getIdtiponotificacionevento().equals(SigaConstants.TIPO_NOTIFICACION_INICIOINSCRIPCION) || notification.getIdtiponotificacionevento().equals(SigaConstants.TIPO_NOTIFICACION_FININSCRIPCION)) {
-								//OBTENEMOS LOS DESTINATARIOS
-								destinatarios = ageNotificacioneseventoExtendsMapper.selectDestinatariosInscripcion(eventoCurso.get(0).getIdcurso(), eventoCurso.get(0).getIdinstitucion(), idEnvio.toString(), "1");
-								
-								
-							}else if (notification.getIdtiponotificacionevento().equals(SigaConstants.TIPO_NOTIFICACION_FININSCRIPCION)) {
-								//OBTENEMOS LOS DESTINATARIOS
-								destinatarios = ageNotificacioneseventoExtendsMapper.selectDestinatariosCurso(eventoCurso.get(0).getIdcurso(), eventoCurso.get(0).getIdinstitucion(), idEnvio.toString(), "1");
-								
-							}else if (notification.getIdtiponotificacionevento().equals(SigaConstants.TIPO_NOTIFICACION_SESION)) {
-								//OBTENEMOS LOS DESTINATARIOS
-								destinatarios = ageNotificacioneseventoExtendsMapper.selectDestinatariosSesion(eventoCurso.get(0).getIdevento(), eventoCurso.get(0).getIdcurso(),eventoCurso.get(0).getIdinstitucion(), idEnvio.toString(), "1");
-								
-							}
-							if (null != destinatarios && destinatarios.size()>0) {
-								List<String> destinatariosMoviles = new ArrayList<String>();
-								List<DestinatarioItem> destinatariosMail = new ArrayList<DestinatarioItem>();
-								//Insertamos los destinatarios del envío
-								for (Iterator iterator = destinatarios.iterator(); iterator.hasNext();) {
-									EnvDestinatarios envDestinatarios = (EnvDestinatarios) iterator.next();
-									_envDestinatariosMapper.insert(envDestinatarios);
-									//Preparamos destinatarios para SMS
-									if (!UtilidadesString.esCadenaVacia(envDestinatarios.getMovil())) {
-										destinatariosMoviles.add(envDestinatarios.getMovil());
-									}
-									if (!UtilidadesString.esCadenaVacia(envDestinatarios.getCorreoelectronico())) {
-										DestinatarioItem destItem = new DestinatarioItem();
-										destItem = envDestinatarios2DestinatarioItem(envDestinatarios);
-										destinatariosMail.add(destItem);
-									}
-									//Preparamos destinatarios para Mail
+						if ((null != plantilla.get(0).getIdDireccion()) && (null != plantilla.get(0).getIdPersona())) {
+
+							CenDireccionesKey direccionesKey = new CenDireccionesKey();
+							direccionesKey.setIddireccion(Long.valueOf(plantilla.get(0).getIdDireccion()));
+							direccionesKey.setIdinstitucion(eventoCurso.get(0).getIdinstitucion());
+							direccionesKey.setIdpersona(Long.valueOf(plantilla.get(0).getIdPersona()));
+
+							// Obtenemos el remitente de la plantilla
+							CenDirecciones remitente = cenDireccionesMapper.selectByPrimaryKey(direccionesKey);
+
+							CenPersona persona = cenPersonaMapper.selectByPrimaryKey(remitente.getIdpersona());
+							RemitenteDTO remitenteMail = persona2remitente(remitente, plantilla.get(0), persona);
+
+							if (null != eventoCurso && eventoCurso.size() > 0) {
+
+								Long idEnvio = generarEnvio(notification);
+								EnvEnviosKey keyEnvio = new EnvEnviosKey();
+								keyEnvio.setIdenvio(idEnvio);
+								keyEnvio.setIdinstitucion(eventoCurso.get(0).getIdinstitucion());
+								EnvEnvios envio = _envEnviosMapper.selectByPrimaryKey(keyEnvio);
+
+								if (notification.getIdtiponotificacionevento()
+										.equals(SigaConstants.TIPO_NOTIFICACION_INICIOINSCRIPCION)
+										|| notification.getIdtiponotificacionevento()
+												.equals(SigaConstants.TIPO_NOTIFICACION_FININSCRIPCION)) {
+									// OBTENEMOS LOS DESTINATARIOS
+									destinatarios = ageNotificacioneseventoExtendsMapper.selectDestinatariosInscripcion(
+											eventoCurso.get(0).getIdcurso(), eventoCurso.get(0).getIdinstitucion(),
+											idEnvio.toString(), "1");
+
+								} else if (notification.getIdtiponotificacionevento()
+										.equals(SigaConstants.TIPO_NOTIFICACION_FININSCRIPCION)) {
+									// OBTENEMOS LOS DESTINATARIOS
+									destinatarios = ageNotificacioneseventoExtendsMapper.selectDestinatariosCurso(
+											eventoCurso.get(0).getIdcurso(), eventoCurso.get(0).getIdinstitucion(),
+											idEnvio.toString(), "1");
+
+								} else if (notification.getIdtiponotificacionevento()
+										.equals(SigaConstants.TIPO_NOTIFICACION_SESION)) {
+									// OBTENEMOS LOS DESTINATARIOS
+									destinatarios = ageNotificacioneseventoExtendsMapper.selectDestinatariosSesion(
+											eventoCurso.get(0).getIdevento(), eventoCurso.get(0).getIdcurso(),
+											eventoCurso.get(0).getIdinstitucion(), idEnvio.toString(), "1");
+
 								}
-								
-								
-								try{
-										LOGGER.info("Listener envios => Se ha encontrado envio programado con ID: " + envio.getIdenvio());
-	
-											
-											switch (envio.getIdtipoenvios().toString()) {
-	
-												case SigaConstants.ID_ENVIO_MAIL:
-													if (null != destinatariosMoviles && destinatariosMoviles.size()>0) {
-														envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
-														envio.setFechamodificacion(new Date());
-														_envEnviosMapper.updateByPrimaryKey(envio);
-														envioService.envioMail(eventoCurso.get(0).getIdinstitucion().toString(), idEnvio.toString(), remitenteMail, destinatariosMail, plantilla.get(0).getAsunto(), plantilla.get(0).getCuerpo(), null, false);
-														envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
-														envio.setFechamodificacion(new Date());
-														_envEnviosMapper.updateByPrimaryKey(envio);
-														LOGGER.info("Correo electrónico enviado con éxito");
-													}else{
-														LOGGER.info("No existen destinatarios disponibles");
-													}
-													break;
-												case SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO:
-													if (null != destinatariosMoviles && destinatariosMoviles.size()>0) {
-														envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
-														envio.setFechamodificacion(new Date());
-														_envEnviosMapper.updateByPrimaryKey(envio);
-														envioService.envioMail(eventoCurso.get(0).getIdinstitucion().toString(), idEnvio.toString(), remitenteMail, destinatariosMail, plantilla.get(0).getAsunto(), plantilla.get(0).getCuerpo(), null, false);
-														envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
-														envio.setFechamodificacion(new Date());
-														_envEnviosMapper.updateByPrimaryKey(envio);
-														LOGGER.info("Documentación letrado enviado con éxito");
-													}else{
-														LOGGER.info("No existen destinatarios disponibles");
-													}
-													break;
-												case SigaConstants.ID_ENVIO_CORREO_ORDINARIO:
-													if (null != destinatariosMoviles && destinatariosMoviles.size()>0) {
-														envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
-														envio.setFechamodificacion(new Date());
-														_envEnviosMapper.updateByPrimaryKey(envio);
-														envioService.envioMail(eventoCurso.get(0).getIdinstitucion().toString(), idEnvio.toString(), remitenteMail, destinatariosMail, plantilla.get(0).getAsunto(), plantilla.get(0).getCuerpo(), null, false);
-														envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
-														envio.setFechamodificacion(new Date());
-														_envEnviosMapper.updateByPrimaryKey(envio);
-														LOGGER.info("Correo ordinario generado con éxito");
-													}else{
-														LOGGER.info("No existen destinatarios disponibles");
-													}
-													break;
-												case SigaConstants.ID_ENVIO_SMS:
-													if (null != destinatariosMoviles && destinatariosMoviles.size()>0) {
-														String[] moviles = new String[destinatariosMoviles.size()];
-														
-														int i = 0;
-														for (Iterator iterator = destinatariosMoviles.iterator(); iterator
-																.hasNext();) {
-															String destinatarioItem = (String) iterator
-																	.next();
-															moviles[i] = new String();
-															moviles[i] = destinatarioItem;
-															i++;
-														}
-														envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
-														envio.setFechamodificacion(new Date());
-														_envEnviosMapper.updateByPrimaryKey(envio);
-														envioService.envioSMS(remitente, moviles, eventoCurso.get(0).getIdinstitucion(), plantilla.get(0).getCuerpo(), false);
-														envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
-														envio.setFechamodificacion(new Date());
-														_envEnviosMapper.updateByPrimaryKey(envio);
-														LOGGER.info("SMS enviado con éxito");
-													}else{
-														LOGGER.info("No existen destinatarios disponibles");
-													}
-														
-													break;
-												case SigaConstants.ID_ENVIO_BURO_SMS:
-													if (null != destinatariosMoviles && destinatariosMoviles.size()>0) {
-														String[] moviles = new String[destinatariosMoviles.size()];
-														
-														int i = 0;
-														for (Iterator iterator = destinatariosMoviles.iterator(); iterator
-																.hasNext();) {
-															String destinatarioItem = (String) iterator
-																	.next();
-															moviles[i] = new String();
-															moviles[i] = destinatarioItem;
-															i++;
-														}
-														envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
-														envio.setFechamodificacion(new Date());
-														_envEnviosMapper.updateByPrimaryKey(envio);
-														envioService.envioSMS(remitente, moviles, eventoCurso.get(0).getIdinstitucion(), plantilla.get(0).getCuerpo(), true);
-														envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
-														envio.setFechamodificacion(new Date());
-														_envEnviosMapper.updateByPrimaryKey(envio);
-														LOGGER.info("BURO SMS enviado con éxito");
-													}else{
-														LOGGER.info("No existen destinatarios disponibles");
-													}
-													break;
+								if (null != destinatarios && destinatarios.size() > 0) {
+									List<String> destinatariosMoviles = new ArrayList<String>();
+									List<DestinatarioItem> destinatariosMail = new ArrayList<DestinatarioItem>();
+									// Insertamos los destinatarios del envío
+									for (Iterator iterator = destinatarios.iterator(); iterator.hasNext();) {
+										EnvDestinatarios envDestinatarios = (EnvDestinatarios) iterator.next();
+										_envDestinatariosMapper.insert(envDestinatarios);
+										// Preparamos destinatarios para SMS
+										if (!UtilidadesString.esCadenaVacia(envDestinatarios.getMovil())) {
+											destinatariosMoviles.add(envDestinatarios.getMovil());
+										}
+										if (!UtilidadesString.esCadenaVacia(envDestinatarios.getCorreoelectronico())) {
+											DestinatarioItem destItem = new DestinatarioItem();
+											destItem = envDestinatarios2DestinatarioItem(envDestinatarios);
+											destinatariosMail.add(destItem);
+										}
+										// Preparamos destinatarios para Mail
+									}
+
+									try {
+										LOGGER.info("Listener envios => Se ha encontrado envio programado con ID: "
+												+ envio.getIdenvio());
+
+										switch (envio.getIdtipoenvios().toString()) {
+
+										case SigaConstants.ID_ENVIO_MAIL:
+											if (null != destinatariosMoviles && destinatariosMoviles.size() > 0) {
+												envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
+												envio.setFechamodificacion(new Date());
+												_envEnviosMapper.updateByPrimaryKey(envio);
+												envioService.envioMail(eventoCurso.get(0).getIdinstitucion().toString(),
+														idEnvio.toString(), remitenteMail, destinatariosMail,
+														plantilla.get(0).getAsunto(), plantilla.get(0).getCuerpo(),
+														null, false);
+												envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+												envio.setFechamodificacion(new Date());
+												_envEnviosMapper.updateByPrimaryKey(envio);
+												LOGGER.info("Correo electrónico enviado con éxito");
+											} else {
+												LOGGER.info("No existen destinatarios disponibles");
+											}
+											break;
+										case SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO:
+											if (null != destinatariosMoviles && destinatariosMoviles.size() > 0) {
+												envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
+												envio.setFechamodificacion(new Date());
+												_envEnviosMapper.updateByPrimaryKey(envio);
+												envioService.envioMail(eventoCurso.get(0).getIdinstitucion().toString(),
+														idEnvio.toString(), remitenteMail, destinatariosMail,
+														plantilla.get(0).getAsunto(), plantilla.get(0).getCuerpo(),
+														null, false);
+												envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+												envio.setFechamodificacion(new Date());
+												_envEnviosMapper.updateByPrimaryKey(envio);
+												LOGGER.info("Documentación letrado enviado con éxito");
+											} else {
+												LOGGER.info("No existen destinatarios disponibles");
+											}
+											break;
+										case SigaConstants.ID_ENVIO_CORREO_ORDINARIO:
+											if (null != destinatariosMoviles && destinatariosMoviles.size() > 0) {
+												envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
+												envio.setFechamodificacion(new Date());
+												_envEnviosMapper.updateByPrimaryKey(envio);
+												envioService.envioMail(eventoCurso.get(0).getIdinstitucion().toString(),
+														idEnvio.toString(), remitenteMail, destinatariosMail,
+														plantilla.get(0).getAsunto(), plantilla.get(0).getCuerpo(),
+														null, false);
+												envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+												envio.setFechamodificacion(new Date());
+												_envEnviosMapper.updateByPrimaryKey(envio);
+												LOGGER.info("Correo ordinario generado con éxito");
+											} else {
+												LOGGER.info("No existen destinatarios disponibles");
+											}
+											break;
+										case SigaConstants.ID_ENVIO_SMS:
+											if (null != destinatariosMoviles && destinatariosMoviles.size() > 0) {
+												String[] moviles = new String[destinatariosMoviles.size()];
+
+												int i = 0;
+												for (Iterator iterator = destinatariosMoviles.iterator(); iterator
+														.hasNext();) {
+													String destinatarioItem = (String) iterator.next();
+													moviles[i] = new String();
+													moviles[i] = destinatarioItem;
+													i++;
 												}
-										
-							
-								}catch(Exception e){
-									LOGGER.error("Error al procesar el envío", e);
-									envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
-									envio.setFechamodificacion(new Date());
-									_envEnviosMapper.updateByPrimaryKey(envio);
-									e.printStackTrace();
+												envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
+												envio.setFechamodificacion(new Date());
+												_envEnviosMapper.updateByPrimaryKey(envio);
+												envioService.envioSMS(remitente, moviles,
+														eventoCurso.get(0).getIdinstitucion(),
+														plantilla.get(0).getCuerpo(), false);
+												envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+												envio.setFechamodificacion(new Date());
+												_envEnviosMapper.updateByPrimaryKey(envio);
+												LOGGER.info("SMS enviado con éxito");
+											} else {
+												LOGGER.info("No existen destinatarios disponibles");
+											}
+
+											break;
+										case SigaConstants.ID_ENVIO_BURO_SMS:
+											if (null != destinatariosMoviles && destinatariosMoviles.size() > 0) {
+												String[] moviles = new String[destinatariosMoviles.size()];
+
+												int i = 0;
+												for (Iterator iterator = destinatariosMoviles.iterator(); iterator
+														.hasNext();) {
+													String destinatarioItem = (String) iterator.next();
+													moviles[i] = new String();
+													moviles[i] = destinatarioItem;
+													i++;
+												}
+												envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
+												envio.setFechamodificacion(new Date());
+												_envEnviosMapper.updateByPrimaryKey(envio);
+												envioService.envioSMS(remitente, moviles,
+														eventoCurso.get(0).getIdinstitucion(),
+														plantilla.get(0).getCuerpo(), true);
+												envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+												envio.setFechamodificacion(new Date());
+												_envEnviosMapper.updateByPrimaryKey(envio);
+												LOGGER.info("BURO SMS enviado con éxito");
+											} else {
+												LOGGER.info("No existen destinatarios disponibles");
+											}
+											break;
+										}
+
+									} catch (Exception e) {
+										LOGGER.error("Error al procesar el envío", e);
+										envio.setIdestado(SigaConstants.ENVIO_PROCESADO_CON_ERRORES);
+										envio.setFechamodificacion(new Date());
+										_envEnviosMapper.updateByPrimaryKey(envio);
+										e.printStackTrace();
+									}
+
+								} else {
+									// No tenemos destinatarios
+									// Actualizamos la notificacon para marcarla como procesada
+									notification.setFechabaja(new Date());
+									ageNotificacioneseventoExtendsMapper.updateByPrimaryKey(notification);
+									ageGeneracion.setFechabaja(new Date());
+									ageGeneracionnotificacionesMapper.updateByPrimaryKey(ageGeneracion);
 								}
-								
-							}else{
-								// No tenemos destinatarios
-								// Actualizamos la notificacon para marcarla como procesada
-								notification.setFechabaja(new Date());
-								ageNotificacioneseventoExtendsMapper.updateByPrimaryKey(notification);
-								ageGeneracion.setFechabaja(new Date());
-								ageGeneracionnotificacionesMapper.updateByPrimaryKey(ageGeneracion);
+
+								// buscamos los destinatarios
+
 							}
-							
-							
-							
-							//buscamos los destinatarios
-							
-						}
-						LOGGER.info("El remitente no es una persona válida");
-						}else{
-							//Actualizamos la notificacon para marcarla como procesada
+							LOGGER.info("El remitente no es una persona válida");
+						} else {
+							// Actualizamos la notificacon para marcarla como procesada
 							notification.setFechabaja(new Date());
 							ageNotificacioneseventoExtendsMapper.updateByPrimaryKey(notification);
 							ageGeneracion.setFechabaja(new Date());
 							ageGeneracionnotificacionesMapper.updateByPrimaryKey(ageGeneracion);
 						}
-					
-					}else{
-						//Actualizamos la notificacon para marcarla como procesada
+
+					} else {
+						// Actualizamos la notificacon para marcarla como procesada
 						notification.setFechabaja(new Date());
 						ageNotificacioneseventoExtendsMapper.updateByPrimaryKey(notification);
 						ageGeneracion.setFechabaja(new Date());
 						ageGeneracionnotificacionesMapper.updateByPrimaryKey(ageGeneracion);
 					}
-					
+
 					// Enviar la notificacion que corresponde
 					// Cuando se envie se debe indicar en la tabla Generacionnotificaciones en la
 					// columna flagenviado que fue enviado
@@ -2588,48 +2862,45 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 	}
 
-		private RemitenteDTO persona2remitente(CenDirecciones remitente, PlantillaEnvioItem plantilla, CenPersona persona) {
-			
-			RemitenteDTO remitenteReturn = new RemitenteDTO();
-			
-			remitenteReturn.setApellido1(persona.getApellidos1());
-			remitenteReturn.setApellido2(persona.getApellidos2());
-			remitenteReturn.setCorreoElectronico(remitente.getCorreoelectronico());
-			remitenteReturn.setIdPersona(plantilla.getIdPersona());
-			remitenteReturn.setIdPlantillaEnvios(plantilla.getIdPlantillaEnvios());
-			remitenteReturn.setIdTipoEnvios(plantilla.getIdTipoEnvios());
-			remitenteReturn.setNombre(persona.getNombre());
+	private RemitenteDTO persona2remitente(CenDirecciones remitente, PlantillaEnvioItem plantilla, CenPersona persona) {
+
+		RemitenteDTO remitenteReturn = new RemitenteDTO();
+
+		remitenteReturn.setApellido1(persona.getApellidos1());
+		remitenteReturn.setApellido2(persona.getApellidos2());
+		remitenteReturn.setCorreoElectronico(remitente.getCorreoelectronico());
+		remitenteReturn.setIdPersona(plantilla.getIdPersona());
+		remitenteReturn.setIdPlantillaEnvios(plantilla.getIdPlantillaEnvios());
+		remitenteReturn.setIdTipoEnvios(plantilla.getIdTipoEnvios());
+		remitenteReturn.setNombre(persona.getNombre());
 
 		// TODO Auto-generated method stub
 		return remitenteReturn;
 	}
 
-		private DestinatarioItem envDestinatarios2DestinatarioItem(EnvDestinatarios envDestinatarios) {
+	private DestinatarioItem envDestinatarios2DestinatarioItem(EnvDestinatarios envDestinatarios) {
 		// TODO Auto-generated method stub
-			DestinatarioItem returnDestinatario = new DestinatarioItem();
-			
-			returnDestinatario.setApellidos1(envDestinatarios.getApellidos1());
-			returnDestinatario.setApellidos2(envDestinatarios.getApellidos2());
-			returnDestinatario.setCorreoElectronico(envDestinatarios.getCorreoelectronico());
-			returnDestinatario.setDomicilio(envDestinatarios.getDomicilio());
-			returnDestinatario.setIdPersona(envDestinatarios.getIdpersona().toString());
-			//returnDestinatario.setListaConsultasEnvio(listaConsultasEnvio);
-			returnDestinatario.setMovil(envDestinatarios.getMovil());
-			returnDestinatario.setNIFCIF(envDestinatarios.getNifcif());
-			returnDestinatario.setNombre(envDestinatarios.getNombre());
+		DestinatarioItem returnDestinatario = new DestinatarioItem();
 
-			
+		returnDestinatario.setApellidos1(envDestinatarios.getApellidos1());
+		returnDestinatario.setApellidos2(envDestinatarios.getApellidos2());
+		returnDestinatario.setCorreoElectronico(envDestinatarios.getCorreoelectronico());
+		returnDestinatario.setDomicilio(envDestinatarios.getDomicilio());
+		returnDestinatario.setIdPersona(envDestinatarios.getIdpersona().toString());
+		// returnDestinatario.setListaConsultasEnvio(listaConsultasEnvio);
+		returnDestinatario.setMovil(envDestinatarios.getMovil());
+		returnDestinatario.setNIFCIF(envDestinatarios.getNifcif());
+		returnDestinatario.setNombre(envDestinatarios.getNombre());
+
 		return returnDestinatario;
 	}
-		
 
-
-//		LOGGER.info(
-//				"generateNotificationAuto()  -> Salida del servicio para enviar aviso de los eventos que correspondan");
-	
+	// LOGGER.info(
+	// "generateNotificationAuto() -> Salida del servicio para enviar aviso de los
+	// eventos que correspondan");
 
 	private Long generarEnvio(AgeNotificacionesevento notification) {
-		
+
 		// Insertamos nuevo envio
 		EnvEnvios envio = new EnvEnvios();
 		envio.setIdinstitucion(notification.getIdinstitucion());
@@ -2638,17 +2909,17 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 		envio.setGenerardocumento("N");
 		envio.setImprimiretiquetas("N");
 		envio.setIdplantillaenvios(Integer.parseInt(notification.getIdplantilla().toString()));
-		
+
 		Short estadoNuevo = 4;
 		envio.setIdestado(estadoNuevo);
 		envio.setIdtipoenvios(Short.parseShort(notification.getIdtipoenvios().toString()));
 		envio.setFechamodificacion(new Date());
 		envio.setUsumodificacion(Integer.parseInt(notification.getUsumodificacion().toString()));
 		envio.setEnvio("A");
-		//envio.setFechaprogramada(fechageneracionnotificacion);
-		//envio.setIdmodelocomunicacion(modeloEnvio.getIdModeloComunicacion());
+		// envio.setFechaprogramada(fechageneracionnotificacion);
+		// envio.setIdmodelocomunicacion(modeloEnvio.getIdModeloComunicacion());
 		int insert = _envEnviosMapper.insert(envio);
-		
+
 		return envio.getIdenvio();
 	}
 
@@ -2944,9 +3215,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 		return eventoItem;
 	}
-	
-private Long generarEnvioProgramado(AgeNotificacionesevento noti, Date fechaGeneracionNotificacion) {
-		
+
+	private Long generarEnvioProgramado(AgeNotificacionesevento noti, Date fechaGeneracionNotificacion) {
+
 		// Insertamos nuevo envio
 		EnvEnvios envio = new EnvEnvios();
 		envio.setIdinstitucion(noti.getIdinstitucion());
@@ -2955,7 +3226,7 @@ private Long generarEnvioProgramado(AgeNotificacionesevento noti, Date fechaGene
 		envio.setGenerardocumento("N");
 		envio.setImprimiretiquetas("N");
 		envio.setIdplantillaenvios(Integer.parseInt(noti.getIdplantilla().toString()));
-		
+
 		Short estadoNuevo = 4;
 		envio.setIdestado(estadoNuevo);
 		envio.setIdtipoenvios(Short.parseShort(noti.getIdtipoenvios().toString()));
@@ -2963,18 +3234,20 @@ private Long generarEnvioProgramado(AgeNotificacionesevento noti, Date fechaGene
 		envio.setUsumodificacion(Integer.parseInt(noti.getUsumodificacion().toString()));
 		envio.setEnvio("A");
 		envio.setFechaprogramada(fechaGeneracionNotificacion);
-		//envio.setIdmodelocomunicacion(modeloEnvio.getIdModeloComunicacion());
+		// envio.setIdmodelocomunicacion(modeloEnvio.getIdModeloComunicacion());
 		int insert = _envEnviosMapper.insert(envio);
-		
+
 		// Actualizamos el envio para ponerle la descripcion
-//		CenInstitucion institucion = _cenInstitucion.selectByPrimaryKey(idInstitucion);
-//		ModModelocomunicacion modelo =  _modModeloComunicacionMapper.selectByPrimaryKey(modeloEnvio.getIdModeloComunicacion());
-//		String descripcion = envio.getIdenvio() + "--" + modelo.getNombre();
-//		envio.setDescripcion(descripcion);
-//		_envEnviosMapper.updateByPrimaryKey(envio);					
-		
-		if(insert >0){						
-			
+		// CenInstitucion institucion =
+		// _cenInstitucion.selectByPrimaryKey(idInstitucion);
+		// ModModelocomunicacion modelo =
+		// _modModeloComunicacionMapper.selectByPrimaryKey(modeloEnvio.getIdModeloComunicacion());
+		// String descripcion = envio.getIdenvio() + "--" + modelo.getNombre();
+		// envio.setDescripcion(descripcion);
+		// _envEnviosMapper.updateByPrimaryKey(envio);
+
+		if (insert > 0) {
+
 			EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
 			historico.setIdenvio(envio.getIdenvio());
 			historico.setIdinstitucion(noti.getIdinstitucion());
@@ -2984,8 +3257,8 @@ private Long generarEnvioProgramado(AgeNotificacionesevento noti, Date fechaGene
 			Short idEstado = 4;
 			historico.setIdestado(idEstado);
 			_envHistoricoestadoenvioMapper.insert(historico);
-			
-			//Insertamos el envio programado
+
+			// Insertamos el envio programado
 			EnvEnvioprogramado envioProgramado = new EnvEnvioprogramado();
 			envioProgramado.setIdenvio(envio.getIdenvio());
 			envioProgramado.setIdinstitucion(noti.getIdinstitucion());
@@ -2995,11 +3268,44 @@ private Long generarEnvioProgramado(AgeNotificacionesevento noti, Date fechaGene
 			envioProgramado.setNombre(envio.getDescripcion());
 			envioProgramado.setFechaprogramada(envio.getFechaprogramada());
 			envioProgramado.setFechamodificacion(new Date());
-			envioProgramado.setUsumodificacion(Integer.parseInt(noti.getUsumodificacion().toString()));								
+			envioProgramado.setUsumodificacion(Integer.parseInt(noti.getUsumodificacion().toString()));
 			_envEnvioprogramadoMapper.insert(envioProgramado);
-			
+
 		}
 		return envio.getIdenvio();
+	}
+
+	@Override
+	public EventoDTO getRepeteadEvents(String idEvento, HttpServletRequest request) {
+		LOGGER.info("getRepeteadEvents() -> Entrada al servicio para los eventos de un determinado calendario");
+
+		EventoDTO eventoDTO = new EventoDTO();
+
+		String token = request.getHeader("Authorization");
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		List<EventoItem> listEventos = null;
+
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			LOGGER.info(
+					"getCalendars() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			LOGGER.info(
+					"getCalendars() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				listEventos = ageEventoExtendsMapper.getRepeteadEvents(idEvento, idInstitucion.toString(),
+						usuario.getIdlenguaje());
+			}
+		}
+
+		eventoDTO.setEventos(listEventos);
+		LOGGER.info("getRepeteadEvents() -> Salida del servicio para los eventos de un determinado calendario");
+
+		return eventoDTO;
 	}
 
 }

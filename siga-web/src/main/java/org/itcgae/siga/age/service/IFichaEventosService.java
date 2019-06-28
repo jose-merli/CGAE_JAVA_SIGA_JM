@@ -76,4 +76,6 @@ public interface IFichaEventosService {
 
 	public EventoItem searchEventByIdEvento(String idEvento, HttpServletRequest request);
 
+	public EventoDTO getRepeteadEvents(String idEvento, HttpServletRequest request);
+
 }

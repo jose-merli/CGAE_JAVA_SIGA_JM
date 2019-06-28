@@ -73,6 +73,15 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		sql.SELECT("TO_CHAR(EVENTO.FECHAINICIO,'DD/MM/YYYY') AS FECHAINICIOSTRING");
 		sql.SELECT("ec.IDCURSO");
 		sql.SELECT("LISTAGG(CONCAT(PER.NOMBRE ||' ',CONCAT(DECODE(PER.APELLIDOS1,'#NA','',PER.APELLIDOS1) || ' ',PER.APELLIDOS2)), '; ') WITHIN GROUP (ORDER BY PER.NOMBRE) AS FORMADORES");
+		
+		sql.SELECT("REP.FECHAFIN AS FECHAFINREPETICION");
+		sql.SELECT("REP.FECHAINICIO AS FECHAINICIOREPETICION");
+		sql.SELECT("REP.TIPODIASREPETICION");
+		sql.SELECT("REP.TIPOREPETICION");
+		sql.SELECT("REP.VALORESREPETICION");
+		sql.SELECT("EVENTO.IDEVENTOORIGINAL");
+		sql.SELECT("EVENTO.IDREPETICIONEVENTO");
+				
 		sql.FROM("AGE_EVENTO evento");
 		sql.INNER_JOIN(
 				"FOR_EVENTO_CURSO ec on (evento.idEvento = ec.idEvento and evento.idinstitucion = ec.idinstitucion)");
@@ -84,7 +93,8 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		sql.LEFT_OUTER_JOIN("CEN_PERSONA PER ON (PEREVENT.IDPERSONA = PER.IDPERSONA)");
 		sql.INNER_JOIN("AGE_TIPOEVENTOS TIPOEVENTOS ON TIPOEVENTOS.IDTIPOEVENTO = evento.IDTIPOEVENTO");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOEVENTOS.DESCRIPCION AND rec.IDLENGUAJE = '" + idLenguaje +"')");
-		
+		sql.LEFT_OUTER_JOIN("AGE_REPETICIONEVENTO REP ON REP.IDREPETICIONEVENTO = EVENTO.IDREPETICIONEVENTO");
+
 		sql.WHERE("evento.FECHABAJA is NULL");
 		sql.WHERE("evento.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("ec.idCurso = '" + idCurso + "'");
@@ -93,7 +103,8 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		sql.GROUP_BY(
 				"evento.idevento, evento.idcalendario, evento.idinstitucion, evento.titulo, evento.fechainicio, evento.fechafin, concat(TO_CHAR(evento.fechainicio,'DD/MM/RRRR'), ' - ' || to_char(evento.fechainicio,'hh24:mm')), concat(TO_CHAR(evento.fechafin,'DD/MM/RRRR'), ' - ' || to_char(evento.fechafin,'hh24:mm')), evento.lugar,  "
 						+ "evento.descripcion, evento.recursos, evento.idestadoevento, cat.descripcion, evento.idtipoevento, cal.IDTIPOCALENDARIO, ec.IDCURSO,"
-						+ "cal.DESCRIPCION, REC.DESCRIPCION");
+						+ "cal.DESCRIPCION, REC.DESCRIPCION, REP.FECHAFIN, REP.FECHAINICIO, REP.TIPODIASREPETICION, REP.TIPOREPETICION,"
+						+ "REP.VALORESREPETICION, EVENTO.IDEVENTOORIGINAL, EVENTO.IDREPETICIONEVENTO");
 
 		sql.ORDER_BY("evento.fechainicio");
 
@@ -175,6 +186,35 @@ public class AgeEventoSqlExtendsProvider extends  AgeEventoSqlProvider{
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOEVENTOS.DESCRIPCION AND rec.IDLENGUAJE = '" + idLenguaje +"')");
 		sql.WHERE("evento.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("evento.idevento = '" + idEvento + "'");
+
+		return sql.toString();
+	}
+	
+	public String getRepeteadEvents(String idEvento, String idInstitucion, String idLenguaje) {
+		SQL sql = new SQL();
+		
+		sql.SELECT_DISTINCT("evento.idevento");
+		sql.SELECT("evento.idcalendario");
+		sql.SELECT("evento.titulo");
+		sql.SELECT("evento.fechainicio");
+		sql.SELECT("evento.fechafin");
+		sql.SELECT("evento.lugar");
+		sql.SELECT("evento.descripcion");
+		sql.SELECT("evento.recursos");
+		sql.SELECT("evento.idestadoevento");
+		sql.SELECT("evento.idtipoevento");
+		sql.SELECT("cal.IDTIPOCALENDARIO");
+		sql.SELECT("CAL.DESCRIPCION AS TIPOCALENDARIO");
+		sql.SELECT("REC.DESCRIPCION AS TIPOEVENTO");
+		sql.SELECT("evento.idEventoOriginal");
+
+		sql.FROM("AGE_EVENTO evento");
+		sql.INNER_JOIN(
+				"AGE_CALENDARIO cal on (evento.idCalendario = cal.idCalendario and evento.idinstitucion = cal.idinstitucion)");
+		sql.INNER_JOIN("AGE_TIPOEVENTOS TIPOEVENTOS ON TIPOEVENTOS.IDTIPOEVENTO = evento.IDTIPOEVENTO");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = TIPOEVENTOS.DESCRIPCION AND rec.IDLENGUAJE = '" + idLenguaje +"')");
+		sql.WHERE("evento.idinstitucion = '" + idInstitucion + "'");
+		sql.WHERE("evento.idEventoOriginal = '" + idEvento + "'");
 
 		return sql.toString();
 	}
