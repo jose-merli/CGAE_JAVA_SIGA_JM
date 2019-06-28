@@ -118,8 +118,9 @@ public class ModModeloComunicacionExtendsSqlProvider {
 			sql.WHERE("MODELO.VISIBLE = '1'");
 
 		}else {
-						
-			sql.WHERE("(MODELO.IDINSTITUCION = " + idInstitucion + " AND MODELO.VISIBLE = '1') or (MODELO.IDINSTITUCION = " + SigaConstants.IDINSTITUCION_2000 + " AND MODELO.VISIBLE = '1' and modelo.pordefecto = 'SI')");
+			sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND (CLASE.IDMODULO = " + idModulo
+					+ " OR CLASE.IDMODULO IS NULL) AND MODELO.FECHABAJA IS NULL ");	
+			sql.WHERE("((MODELO.IDINSTITUCION = " + idInstitucion + " AND MODELO.VISIBLE = '1') or (MODELO.IDINSTITUCION = " + SigaConstants.IDINSTITUCION_2000 + " AND MODELO.VISIBLE = '1' and modelo.pordefecto = 'SI'))");
 
 
 		}

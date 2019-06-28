@@ -384,7 +384,6 @@ public class ColaEnviosImpl implements IColaEnvios {
 	}
 
 	private String getAsuntoCuerpoFinal(EnvEnvios envio, List<Map<String, Object>> resultadosConsultas, String asunto,	String idCampoAsunto) {
-		LOGGER.debug("Obtenemos el asunto final (inicio): " + asunto);
 		if (asunto == null) {
 			asunto = "";
 		}
@@ -402,7 +401,6 @@ public class ColaEnviosImpl implements IColaEnvios {
 		}
 
 		asunto = remplazarCamposAsunto(asunto, resultadosConsultas);
-		LOGGER.debug("Obtenemos el asunto final (fin): " + asunto);
 		return asunto;
 	}
 

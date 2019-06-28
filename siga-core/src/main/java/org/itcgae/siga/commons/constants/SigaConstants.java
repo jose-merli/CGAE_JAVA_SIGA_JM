@@ -849,5 +849,7 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 
 	public static DateFormat DATE_FORMAT_MIN_SEC = new SimpleDateFormat(DATEST_FORMAT_MIN_SEC);
 	
+	public static String[] columnsExcelLogEnvios = new String[]{"ENVIO", "DESCRIPCION", "FECHA CREACION", "REMITENTE", "NIF/CIF", "NOMBRE", "APELLIDO 1", "APELLIDO 2", "FAX 1", "FAX 2", "MOVIL", "CORREO ELECTRONICO", "DOMICILIO", "PROVINCIA", "POBLACION", "PAIS", "MENSAJE", "DOCUMENTOS"};
+	
 	
 }

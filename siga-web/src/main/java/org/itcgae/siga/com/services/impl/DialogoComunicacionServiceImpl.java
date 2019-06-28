@@ -502,7 +502,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								KeyItem key = listaKey.get(j);
 								mapaClave.put(key.getNombre(), listaStringKey.get(j));
 							}
+							if (dialogo.isComunicar() && modelosComunicacionItem.getIdTipoEnvio() != null) {
+								mapaClave.put(SigaConstants.ETIQUETATIPOENVIO.replaceAll(SigaConstants.REPLACECHAR_PREFIJO_SUFIJO, ""), modelosComunicacionItem.getIdTipoEnvio());
+							}
 						}
+						
+						
 											
 						
 						// Nuevo envio = nueva lista de consultas
@@ -607,7 +612,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				
 				if(listaPlantilla != null && listaPlantilla.size() == 1){
 					ModPlantilladocumento plantillaDoc = listaPlantilla.get(0);
-					nombrePlantilla = modelosComunicacionItem.getNombre();
+					nombrePlantilla = plantillaDoc.getPlantilla();
 					idPlantillaGenerar = plantillaDoc.getIdplantilladocumento();
 				}else if(listaPlantilla != null && listaPlantilla.size() > 1){
 					LOGGER.error("Exiten multiples plantillas asociada al informe en el idioma del usuario");
@@ -1035,7 +1040,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 											key.setIdinstitucion(Short.parseShort(consultaItem.getIdInstitucion()));
 											ConConsulta consulta = _conConsultaMapper.selectByPrimaryKey(key);
 											if(consulta != null){
-												ArrayList<CampoDinamicoItem> campos = _consultasService.obtenerCamposDinamicos(usuario, consulta.getSentencia());
+												ArrayList<CampoDinamicoItem> campos = _consultasService.obtenerCamposDinamicos(usuario, dialogo.isComunicar(), consulta.getSentencia());
 												consultaItem.setCamposDinamicos(campos);
 												consultaItem.setSentencia(consulta.getSentencia());
 												listaConsultasEjecutar.add(consultaItem);
@@ -1057,7 +1062,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								if(listaEnvioConsultas != null && listaEnvioConsultas.size() > 0){
 									for(ConsultaItem consultaEnvioItem : listaEnvioConsultas){			
 										if(consultaEnvioItem != null){
-											ArrayList<CampoDinamicoItem> campos = _consultasService.obtenerCamposDinamicos(usuario, consultaEnvioItem.getSentencia());
+											ArrayList<CampoDinamicoItem> campos = _consultasService.obtenerCamposDinamicos(usuario, dialogo.isComunicar(), consultaEnvioItem.getSentencia());
 											consultaEnvioItem.setCamposDinamicos(campos);
 											listaConsultasEjecutar.add(consultaEnvioItem);
 										}
@@ -1939,7 +1944,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			campoSufijoReplaced = reemplazarSufijo(hDatosGenerales, mapaClave, campoSufijo);
 		}
 		
-		plantilla.setNombreFicheroSalida(nombrePlantilla);
+		//plantilla.setNombreFicheroSalida(nombrePlantilla);
 		String nombreFicheroSalida = obtenerNombreFicheroSalida(modelosComunicacionItem.getIdModeloComunicacion(), plantilla, hDatosGenerales, usuario.getIdlenguaje(), numFicheros, rutaTmp, campoSufijoReplaced);
 		
 

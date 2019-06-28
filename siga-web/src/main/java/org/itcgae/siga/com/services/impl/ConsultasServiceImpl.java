@@ -1461,7 +1461,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						listaKeys = _modKeyclasecomunicacionExtendsMapper.selectKeyClase(Short.parseShort(idClaseComunicacion));
 					}*/		
 					
-					listaCampos = obtenerCamposDinamicos(usuario, consulta);
+					listaCampos = obtenerCamposDinamicos(usuario, false, consulta);
 					response.setCamposDinamicos(listaCampos);
 					
 				} catch (Exception e) {
@@ -1479,7 +1479,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 	}
 	
 	@Override
-	public ArrayList<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, String consulta) throws Exception{
+	public ArrayList<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, boolean comunicar, String consulta) throws Exception{
 		
 		ArrayList<CampoDinamicoItem> listaCamposDinamicos = new ArrayList<CampoDinamicoItem>();
 		CampoDinamicoItem campoDinamico = null;
@@ -1697,7 +1697,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 		 		
 		 	}
 		 	
-		 	if(selectExperta.indexOf(SigaConstants.ETIQUETATIPOENVIO) > 0){
+		 	if(!comunicar && selectExperta.indexOf(SigaConstants.ETIQUETATIPOENVIO) > 0){
 		 		
 		 		// Si encontramos la etiqueta %%tipoenvio%% añadimos como valor dinamico el combo de tipo de envios
 		 		campoDinamico = new CampoDinamicoItem();

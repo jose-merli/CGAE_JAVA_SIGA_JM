@@ -69,7 +69,9 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				}
 			}
 			
-			doc.getMailMerge().deleteFields();
+			if (doc != null && doc.getMailMerge() != null) {
+				doc.getMailMerge().deleteFields();	
+			}
 
 		} catch (Exception e) {
 			LOGGER.error("GeneracionDocumentosServiceImpl.sustituyeDocumento :: Error al sustituir los datos del documento", e);
@@ -78,12 +80,13 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		return doc;
 	}
 	
-	@Override
-	public Document sustituyeRegionDocumento(Document doc, String region, List dato) throws Exception{
+	private Document sustituyeRegionDocumento(Document doc, String region, List dato) throws Exception{
 		DataMailMergeDataSource dataMerge = new DataMailMergeDataSource(region, dato);
 
 		try {
-			doc.getMailMerge().executeWithRegions(dataMerge);
+			if (doc != null && doc.getMailMerge() != null) {
+				doc.getMailMerge().executeWithRegions(dataMerge);
+			}
 		} catch (Exception e) {
 			LOGGER.error("GeneracionDocumentosServiceImpl.sustituyeRegionDocumento :: Error al sustituir región", e);
 			throw e;
@@ -91,8 +94,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		return doc;
 	}
 	
-	@Override
-	public Document sustituyeDatos(Document doc, HashMap<String, Object> dato){
+	private Document sustituyeDatos(Document doc, HashMap<String, Object> dato){
 
 		try {
 			
@@ -124,7 +126,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				doc = null;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.error(e);
 		}
 		
 		return doc;
@@ -251,39 +253,42 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 				}
 				
 				for (Map<String, Object> map : registrosHoja) {
+					
+					if (map != null) {
 	            	
-	            	Row row = sheet.createRow(rowNum++);
-	            	int cell = 0;
-	            	
-	            	CellStyle cellStyle = workbook.createCellStyle();
-	            	for(int j = 0; j < columnsKey.size(); j++){
-	            		Object campo = map.get(columnsKey.get(j).trim());
-	            		if(campo == null || campo.toString().trim() == ""){
-	            			row.createCell(cell).setCellValue("");
-	            		}else{
-	            			Cell celda = row.createCell(cell);
-	            			if (campo instanceof Number) {
-								celda.setCellType(Cell.CELL_TYPE_NUMERIC);
-								celda.setCellValue(Double.parseDouble(campo.toString()));
-								cellStyle.setAlignment(CellStyle.ALIGN_RIGHT);	    		    			
-	    		    			celda.setCellStyle(cellStyle);
-	            			} else if (campo instanceof Date) {
-	            				celda.setCellType(Cell.CELL_TYPE_STRING);
-	            				cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
-								XSSFRichTextString textCell = new XSSFRichTextString(SigaConstants.DATE_FORMAT_MIN_SEC.format(campo));
-								celda.setCellValue(textCell);
-								celda.setCellStyle(cellStyle);
-							} else {
-								celda.setCellType(Cell.CELL_TYPE_STRING);
-								cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
-								XSSFRichTextString textCell = new XSSFRichTextString(campo.toString());
-								celda.setCellValue(textCell);
-								celda.setCellStyle(cellStyle);
-							}            			
-	            		}
-	            		cell++;
-	            	}
-	    		}
+		            	Row row = sheet.createRow(rowNum++);
+		            	int cell = 0;
+		            	
+		            	CellStyle cellStyle = workbook.createCellStyle();
+		            	for(int j = 0; j < columnsKey.size(); j++){
+		            		Object campo = map.get(columnsKey.get(j).trim());
+		            		if(campo == null || campo.toString().trim() == ""){
+		            			row.createCell(cell).setCellValue("");
+		            		}else{
+		            			Cell celda = row.createCell(cell);
+		            			if (campo instanceof Number) {
+									celda.setCellType(Cell.CELL_TYPE_NUMERIC);
+									celda.setCellValue(Double.parseDouble(campo.toString()));
+									cellStyle.setAlignment(CellStyle.ALIGN_RIGHT);	    		    			
+		    		    			celda.setCellStyle(cellStyle);
+		            			} else if (campo instanceof Date) {
+		            				celda.setCellType(Cell.CELL_TYPE_STRING);
+		            				cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
+									XSSFRichTextString textCell = new XSSFRichTextString(SigaConstants.DATE_FORMAT_MIN_SEC.format(campo));
+									celda.setCellValue(textCell);
+									celda.setCellStyle(cellStyle);
+								} else {
+									celda.setCellType(Cell.CELL_TYPE_STRING);
+									cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
+									XSSFRichTextString textCell = new XSSFRichTextString(campo.toString());
+									celda.setCellValue(textCell);
+									celda.setCellStyle(cellStyle);
+								}            			
+		            		}
+		            		cell++;
+		            	}
+		    		}
+				}
 	            
 	            for(int j = 0; j < index; j++) {
 	                sheet.autoSizeColumn(j);
