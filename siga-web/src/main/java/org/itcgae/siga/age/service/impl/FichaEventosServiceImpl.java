@@ -1089,7 +1089,12 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 				for (GenDiccionario rc : repetirCada) {
 					ComboItem item = new ComboItem();
 					item.setLabel(rc.getDescripcion());
-					item.setValue(String.valueOf(rc.getDescripcion().charAt(0)));
+					
+					if(rc.getIdrecurso().equals("fichaEventos.datosRepeticion.repetirCada.dia")) {
+						item.setValue("D");
+					}else if(rc.getIdrecurso().equals("fichaEventos.datosRepeticion.repetirCada.semana")){
+						item.setValue("S");
+					}
 
 					comboItems.add(item);
 				}
