@@ -251,7 +251,7 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 			
 			if (null != usuarios && usuarios.size() > 0) {
 				try{
-					String filePath = _enviosMasivosService.getPathFicheroEnvioMasivo(documentoDTO.getIdInstitucion(), Long.valueOf(documentoDTO.getIdEnvio()));
+					String filePath = _enviosMasivosService.getPathFicheroEnvioMasivo(idInstitucion, Long.valueOf(documentoDTO.getIdEnvio()));
 					String nombreFichero = documentoDTO.getNombreDocumento();
 					String idEnvio = documentoDTO.getIdEnvio();
 					
