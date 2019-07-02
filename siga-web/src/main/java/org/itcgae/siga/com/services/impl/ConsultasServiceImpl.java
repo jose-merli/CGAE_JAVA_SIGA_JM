@@ -594,7 +594,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						ModPlantilladocumento plantilla = new ModPlantilladocumento();
 						plantilla.setFechamodificacion(new Date());
 						plantilla.setIdioma(SigaConstants.LENGUAJE_DEFECTO);
-						plantilla.setPlantilla(SigaConstants.nombreExcelConsulta);
+						plantilla.setPlantilla(modeloCom.getNombre());
 						plantilla.setUsumodificacion(usuario.getIdusuario());
 						_modPlantilladocumentoMapper.insert(plantilla);
 						
@@ -617,7 +617,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						plantillaDoc.setFormatosalida(String.valueOf(SigaConstants.FORMATO_SALIDA.XLS.getCodigo()));
 						plantillaDoc.setIdinforme((long)1);
 						plantillaDoc.setIdmodelocomunicacion(modeloCom.getIdmodelocomunicacion());
-						plantillaDoc.setNombreficherosalida(SigaConstants.nombreExcelConsulta);
+						plantillaDoc.setNombreficherosalida(modeloCom.getNombre());
 						plantillaDoc.setUsumodificacion(usuario.getIdusuario());
 						plantillaDoc.setIdplantilladocumento(plantilla.getIdplantilladocumento());	
 						plantillaDoc.setGeneracionexcel(Short.parseShort(SigaConstants.DB_TRUE));
