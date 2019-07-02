@@ -35,6 +35,7 @@ public class EventoItem {
 	private String tipoRepeticion;
 	private Date fechaInicioRepeticion;
 	private Date fechaFinRepeticion;
+	private String idEventoOriginal;
 
 	private Long idPartidoJudicial;
 	private String idCurso;
@@ -572,6 +573,22 @@ public class EventoItem {
 	public void setFechaInicioString(String fechaInicioString) {
 		this.fechaInicioString = fechaInicioString;
 	}
+	
+	/**
+	 **/
+	public EventoItem idEventoOriginal(String idEventoOriginal) {
+		this.idEventoOriginal = idEventoOriginal;
+		return this;
+	}
+
+	@JsonProperty("idEventoOriginal")
+	public String getIdEventoOriginal() {
+		return idEventoOriginal;
+	}
+
+	public void setIdEventoOriginal(String idEventoOriginal) {
+		this.idEventoOriginal = idEventoOriginal;
+	}
 
 	@Override
 	public String toString() {
@@ -587,7 +604,8 @@ public class EventoItem {
 				+ ", fechaInicioRepeticion=" + fechaInicioRepeticion + ", fechaFinRepeticion=" + fechaFinRepeticion
 				+ ", idPartidoJudicial=" + idPartidoJudicial + ", idCurso=" + idCurso + ", estadoEvento=" + estadoEvento
 				+ ", fechaHoraInicio=" + fechaHoraInicio + ", fechaHoraFin=" + fechaHoraFin + ", formadores="
-				+ formadores + " , tipoCalendario=" + tipoCalendario + " , tipoEvento=" + tipoEvento + " , fechaInicioString=" + fechaInicioString + "]";
+				+ formadores + " , tipoCalendario=" + tipoCalendario + " , tipoEvento=" + tipoEvento + " , fechaInicioString=" + fechaInicioString 
+				+ " , idEventoOriginal=" + idEventoOriginal + "]";
 	}
 
 	@Override
@@ -629,6 +647,7 @@ public class EventoItem {
 		result = prime * result + ((fechaInicioString == null) ? 0 : fechaInicioString.hashCode());
 		result = prime * result + Arrays.hashCode(valoresRepeticion);
 		result = prime * result + ((valoresRepeticionString == null) ? 0 : valoresRepeticionString.hashCode());
+		result = prime * result + ((idEventoOriginal == null) ? 0 : idEventoOriginal.hashCode());
 		return result;
 	}
 
@@ -809,6 +828,11 @@ public class EventoItem {
 			if (other.valoresRepeticionString != null)
 				return false;
 		} else if (!valoresRepeticionString.equals(other.valoresRepeticionString))
+			return false;
+		if (idEventoOriginal == null) {
+			if (other.idEventoOriginal != null)
+				return false;
+		} else if (!idEventoOriginal.equals(other.idEventoOriginal))
 			return false;
 		return true;
 	}

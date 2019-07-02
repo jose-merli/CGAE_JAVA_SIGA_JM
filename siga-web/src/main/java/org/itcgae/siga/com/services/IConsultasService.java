@@ -57,7 +57,7 @@ public interface IConsultasService {
 	public String procesarEjecutarConsulta(AdmUsuarios usuario, String sentencia, List<CampoDinamicoItem> listaCampos,
 			boolean sustituyeInstitucion) throws ParseException;
 
-	public ArrayList<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, String consulta) throws Exception;
+	public ArrayList<CampoDinamicoItem> obtenerCamposDinamicos(AdmUsuarios usuario, boolean comunicar, String consulta) throws Exception;
 
 	public List<Map<String, Object>> ejecutarConsultaConClaves(String sentencia) throws ParseException, SigaExceptions, Exception;
 

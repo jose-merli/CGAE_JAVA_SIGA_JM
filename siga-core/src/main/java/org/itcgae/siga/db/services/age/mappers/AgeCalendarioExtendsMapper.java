@@ -88,6 +88,9 @@ public interface AgeCalendarioExtendsMapper extends AgeCalendarioMapper{
 		@Result(column = "TIPODIASREPETICION", property = "tipoDiasRepeticion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOREPETICION", property = "tipoRepeticion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALORESREPETICION", property = "valoresRepeticionString", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDEVENTOORIGINAL", property = "idEventoOriginal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDREPETICIONEVENTO", property = "idRepeticionEvento", jdbcType = JdbcType.VARCHAR),
+
 	})
 	List<EventoItem> getCalendarioEventos(Short idInstitucion, String perfiles, String idCalendario, String idLenguaje);
 	
@@ -113,6 +116,8 @@ public interface AgeCalendarioExtendsMapper extends AgeCalendarioMapper{
 		@Result(column = "TIPODIASREPETICION", property = "tipoDiasRepeticion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TIPOREPETICION", property = "tipoRepeticion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALORESREPETICION", property = "valoresRepeticionString", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDEVENTOORIGINAL", property = "idEventoOriginal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDREPETICIONEVENTO", property = "idRepeticionEvento", jdbcType = JdbcType.VARCHAR),
 	})
 	List<EventoItem> getCalendarioEventosIsColegiado(Short idInstitucion, String perfiles, String idCalendario, Long idPersona, String idLenguaje);
 	

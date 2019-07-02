@@ -169,4 +169,9 @@ public class FichaEventosController {
 		return new ResponseEntity<EventoItem>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "fichaEventos/getRepeteadEvents",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<EventoDTO> getRepeteadEvents(@RequestParam("idEvento") String idEvento, HttpServletRequest request) {
+		EventoDTO response = fichaEventosService.getRepeteadEvents(idEvento, request);
+		return new ResponseEntity<EventoDTO>(response, HttpStatus.OK);
+	}
 }

@@ -86,12 +86,17 @@ public class ExcelHelper {
 //									valorCelda = celdaTrim;
 //									HSSFDateUtil.getExcelDate(cell.getDateCellValue());
 								 else {
-									Integer parteEntera = Integer.parseInt(valorS.substring(0, valorS.indexOf(".")));
-									Integer parteDecimal = Integer.parseInt(valorS.substring(valorS.indexOf(".") + 1, valorS.length()));
-									if (parteDecimal == 0)
-										valorCelda = parteEntera.toString();
-									else
+									if(!clave.equals(SigaConstants.NIF)) {
+										Integer parteEntera = Integer.parseInt(valorS.substring(0, valorS.indexOf(".")));
+										Integer parteDecimal = Integer.parseInt(valorS.substring(valorS.indexOf(".") + 1, valorS.length()));
+										if (parteDecimal == 0)
+											valorCelda = parteEntera.toString();
+										else
+											valorCelda = celdaTrim;
+									}else {
 										valorCelda = celdaTrim;
+									}
+								
 								}
 								dFilaH.put(clave, valorCelda == null ? "" : valorCelda);
 								tieneAlgunaCeldaValue = true;

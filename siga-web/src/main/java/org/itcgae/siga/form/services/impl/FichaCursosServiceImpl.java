@@ -138,7 +138,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Autowired
 	private ForCursoExtendsMapper forCursoExtendsMapper;
-	
+
 	@Autowired
 	private ForEventoCursoMapper forEventoCursoMapper;
 
@@ -586,8 +586,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					CenCliente recordCliente = new CenCliente();
 					recordCliente = rellenarInsertCenCliente(usuario, idPersona, idInstitucion);
 					responseCenCliente = cenClienteMapper.insertSelective(recordCliente);
-					
-					//Lo añadimos en cen_nocolegiado
+
+					// Lo añadimos en cen_nocolegiado
 					CenNocolegiado recordNoColegido = new CenNocolegiado();
 					recordNoColegido.setIdinstitucion(usuario.getIdinstitucion());
 					recordNoColegido.setIdpersona(idPersona);
@@ -616,7 +616,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 
 					// Añadimos al formador
-				}else {
+				} else {
 					// Si es tutor, buscamos si existe otro formador asignado como formador y se lo
 					// desasignamos porque
 					// solamente puede existir un formador
@@ -868,8 +868,9 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 					forCursoInsert.setInformacionadicional(cursoItem.getAdicional());
 					forCursoInsert.setDocumentacionadjunta(cursoItem.getAdjunto());
 
-					forCursoInsert.setIdtiposervicio(cursoItem.getTipoServicios() == null ? null : Long.parseLong(cursoItem.getTipoServicios()));
-					
+					forCursoInsert.setIdtiposervicio(
+							cursoItem.getTipoServicios() == null ? null : Long.parseLong(cursoItem.getTipoServicios()));
+
 					// Obtenemos el código del curso
 					codigo = getCounterCourse(idInstitucion);
 					forCursoInsert.setCodigocurso(codigo);
@@ -881,22 +882,23 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							"saveCourse() / forCursoExtendsMapper.insert(forCursoInsert) -> Salida a forCursoExtendsMapper para insertar un curso");
 
 					// Si existe tiposervicio, se guarda en la tabla TipoServicios
-//					if (cursoItem.getTipoServicios() != null && cursoItem.getTipoServicios().size() > 0) {
-//
-//						for (ComboItem servicio : cursoItem.getTipoServicios()) {
-//
-//							ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
-//							forTipoServicioCurso.setFechabaja(null);
-//							forTipoServicioCurso.setFechamodificacion(new Date());
-//							forTipoServicioCurso.setIdcurso(forCursoInsert.getIdcurso());
-//							forTipoServicioCurso.setIdinstitucion(idInstitucion);
-//							forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
-//							forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
-//
-//							response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
-//
-//						}
-//					}
+					// if (cursoItem.getTipoServicios() != null &&
+					// cursoItem.getTipoServicios().size() > 0) {
+					//
+					// for (ComboItem servicio : cursoItem.getTipoServicios()) {
+					//
+					// ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
+					// forTipoServicioCurso.setFechabaja(null);
+					// forTipoServicioCurso.setFechamodificacion(new Date());
+					// forTipoServicioCurso.setIdcurso(forCursoInsert.getIdcurso());
+					// forTipoServicioCurso.setIdinstitucion(idInstitucion);
+					// forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
+					// forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+					//
+					// response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
+					//
+					// }
+					// }
 
 					// Si existen temas, se guarda en la tabla TemasCurso
 					if (cursoItem.getTemasCombo() != null && cursoItem.getTemasCombo().size() > 0) {
@@ -1079,152 +1081,201 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							"updateCourse() / forCursoExtendsMapper.updateByPrimaryKey(event) -> Salida a forCursoExtendsMapper para modificar un evento");
 
 					// Se ha cambiado el tipoServicio de autocomplete (array) a dropDown (string)
-					
-					
-					
-					
-//					if (cursoItem.getTipoServicios() != null && cursoItem.getTipoServicios().size() > 0) {
-//
-//						// Eliminamos Servicio que no se encuentre en la lista actual
-//						ForTiposervicioCursoExample forTiposerviciocursoExample = new ForTiposervicioCursoExample();
-//						forTiposerviciocursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-//								.andIdcursoEqualTo(cursoItem.getIdCurso()).andFechabajaIsNull();
-//
-//						LOGGER.info(
-//								"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Entrada a forTiposervicioCursoExtendsMapper para buscar los servicios de un curso");
-//
-//						List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList = forTiposervicioCursoExtendsMapper
-//								.selectByExample(forTiposerviciocursoExample);
-//
-//						LOGGER.info(
-//								"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Salida a forTiposervicioCursoExtendsMapper para buscar los servicios de un curso");
-//
-//						List<ForTiposervicioCurso> forTipoServicioCursoDarBaja = new ArrayList<ForTiposervicioCurso>();
-//
-//						// Si hay temas que estan dados de alta, comprobamos que se encuentra en la
-//						// modificacion actual
-//						if (!forTipoServicioCursoAntiguosList.isEmpty()) {
-//
-//							for (ForTiposervicioCurso servicioAsignadosAntiguos : forTipoServicioCursoAntiguosList) {
-//								boolean flag = false;
-//								for (int i = 0; cursoItem.getTipoServicios().size() > i; i++) {
-//
-//									if (servicioAsignadosAntiguos.getIdttiposervicio() == Long
-//											.valueOf(cursoItem.getTipoServicios().get(i).getValue())) {
-//										flag = true;
-//										i = cursoItem.getTemasCombo().size();
-//									}
-//
-//									forTipoServicioCursoDarBaja.add(servicioAsignadosAntiguos);
-//								}
-//
-//								// Si no se encuentra en la lista actual la borramos
-//								if (!flag) {
-//									forTipoServicioCursoDarBaja.add(servicioAsignadosAntiguos);
-//								}
-//							}
-//
-//							for (ForTiposervicioCurso servicioCursoBaja : forTipoServicioCursoDarBaja) {
-//
-//								servicioCursoBaja.setUsumodificacion(usuario.getIdusuario().longValue());
-//								servicioCursoBaja.setFechabaja(new Date());
-//								servicioCursoBaja.setFechamodificacion(new Date());
-//
-//								LOGGER.info(
-//										"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) -> Entrada a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de un curso");
-//
-//								response = forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja);
-//
-//								LOGGER.info(
-//										"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) -> Salida a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de un curso");
-//							}
-//						}
-//
-//						// Añadimos Servicio
-//						for (ComboItem servicio : cursoItem.getTipoServicios()) {
-//
-//							// Para cada servicio comprobamos si ya existe la relacion
-//							ForTiposervicioCursoExample forTiposervicioCursoExample = new ForTiposervicioCursoExample();
-//							forTiposervicioCursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-//									.andIdcursoEqualTo(cursoItem.getIdCurso())
-//									.andIdttiposervicioEqualTo(Long.valueOf(servicio.getValue()));
-//
-//							LOGGER.info(
-//									"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Entrada a forTiposervicioCursoExtendsMapper para buscar los servicios de un curso");
-//
-//							List<ForTiposervicioCurso> forTipoServicioCursoList = forTiposervicioCursoExtendsMapper
-//									.selectByExample(forTiposervicioCursoExample);
-//
-//							LOGGER.info(
-//									"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Salida a forTiposervicioCursoExtendsMapper para buscar los servicios de un curso");
-//
-//							// Si no existe la creamos
-//							if (forTipoServicioCursoList.isEmpty()) {
-//
-//								ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
-//								forTipoServicioCurso.setFechabaja(null);
-//								forTipoServicioCurso.setFechamodificacion(new Date());
-//								forTipoServicioCurso.setIdcurso(cursoItem.getIdCurso());
-//								forTipoServicioCurso.setIdinstitucion(idInstitucion);
-//								forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
-//								forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
-//
-//								LOGGER.info(
-//										"updateCourse() / forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso) -> Entrada a forTiposervicioCursoExtendsMapper para insertar un servicio de un curso");
-//
-//								response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
-//
-//								LOGGER.info(
-//										"updateCourse() / forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso) -> Salida a forTiposervicioCursoExtendsMapper para insertar un servicio de un curso");
-//
-//								// Si existe cambiamos el servicio a null
-//							} else {
-//								forTipoServicioCursoList.get(0).setFechabaja(null);
-//								forTipoServicioCursoList.get(0).setUsumodificacion(usuario.getIdusuario().longValue());
-//								forTipoServicioCursoList.get(0).setFechamodificacion(new Date());
-//
-//								LOGGER.info(
-//										"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoAlta) -> Entrada a forTiposervicioCursoExtendsMapper para dar de alta a un servicio de un curso");
-//
-//								response = forTiposervicioCursoExtendsMapper
-//										.updateByPrimaryKey(forTipoServicioCursoList.get(0));
-//
-//								LOGGER.info(
-//										"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoAlta) -> Salida a forTiposervicioCursoExtendsMapper para dar de alta a un servicio de un curso");
-//							}
-//						}
-//
-//						// Comprobamos si existe algun servicio para el curso y les damos de baja
-//					} else {
-//						// Eliminamos Servicio
-//						ForTiposervicioCursoExample forTiposerviciocursoExample = new ForTiposervicioCursoExample();
-//						forTiposerviciocursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-//								.andIdcursoEqualTo(cursoItem.getIdCurso()).andFechabajaIsNull();
-//
-//						LOGGER.info(
-//								"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Entrada a forTiposervicioCursoExtendsMapper para buscar los servicios registrados de un curso");
-//
-//						List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList = forTiposervicioCursoExtendsMapper
-//								.selectByExample(forTiposerviciocursoExample);
-//
-//						LOGGER.info(
-//								"updateCourse() / forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample) -> Salida a forTiposervicioCursoExtendsMapper para buscar los servicios registrados de un curso");
-//
-//						for (ForTiposervicioCurso servicioAsignadosAntiguos : forTipoServicioCursoAntiguosList) {
-//
-//							servicioAsignadosAntiguos.setUsumodificacion(usuario.getIdusuario().longValue());
-//							servicioAsignadosAntiguos.setFechabaja(new Date());
-//							servicioAsignadosAntiguos.setFechamodificacion(new Date());
-//
-//							LOGGER.info(
-//									"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) -> Entrada a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de un curso");
-//
-//							response = forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioAsignadosAntiguos);
-//
-//							LOGGER.info(
-//									"updateCourse() / forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) -> Salida a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de un curso");
-//						}
-//					}
+
+					// if (cursoItem.getTipoServicios() != null &&
+					// cursoItem.getTipoServicios().size() > 0) {
+					//
+					// // Eliminamos Servicio que no se encuentre en la lista actual
+					// ForTiposervicioCursoExample forTiposerviciocursoExample = new
+					// ForTiposervicioCursoExample();
+					// forTiposerviciocursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					// .andIdcursoEqualTo(cursoItem.getIdCurso()).andFechabajaIsNull();
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample)
+					// -> Entrada a forTiposervicioCursoExtendsMapper para buscar los servicios de
+					// un curso");
+					//
+					// List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList =
+					// forTiposervicioCursoExtendsMapper
+					// .selectByExample(forTiposerviciocursoExample);
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample)
+					// -> Salida a forTiposervicioCursoExtendsMapper para buscar los servicios de un
+					// curso");
+					//
+					// List<ForTiposervicioCurso> forTipoServicioCursoDarBaja = new
+					// ArrayList<ForTiposervicioCurso>();
+					//
+					// // Si hay temas que estan dados de alta, comprobamos que se encuentra en la
+					// // modificacion actual
+					// if (!forTipoServicioCursoAntiguosList.isEmpty()) {
+					//
+					// for (ForTiposervicioCurso servicioAsignadosAntiguos :
+					// forTipoServicioCursoAntiguosList) {
+					// boolean flag = false;
+					// for (int i = 0; cursoItem.getTipoServicios().size() > i; i++) {
+					//
+					// if (servicioAsignadosAntiguos.getIdttiposervicio() == Long
+					// .valueOf(cursoItem.getTipoServicios().get(i).getValue())) {
+					// flag = true;
+					// i = cursoItem.getTemasCombo().size();
+					// }
+					//
+					// forTipoServicioCursoDarBaja.add(servicioAsignadosAntiguos);
+					// }
+					//
+					// // Si no se encuentra en la lista actual la borramos
+					// if (!flag) {
+					// forTipoServicioCursoDarBaja.add(servicioAsignadosAntiguos);
+					// }
+					// }
+					//
+					// for (ForTiposervicioCurso servicioCursoBaja : forTipoServicioCursoDarBaja) {
+					//
+					// servicioCursoBaja.setUsumodificacion(usuario.getIdusuario().longValue());
+					// servicioCursoBaja.setFechabaja(new Date());
+					// servicioCursoBaja.setFechamodificacion(new Date());
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) ->
+					// Entrada a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de
+					// un curso");
+					//
+					// response =
+					// forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja);
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) ->
+					// Salida a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de
+					// un curso");
+					// }
+					// }
+					//
+					// // Añadimos Servicio
+					// for (ComboItem servicio : cursoItem.getTipoServicios()) {
+					//
+					// // Para cada servicio comprobamos si ya existe la relacion
+					// ForTiposervicioCursoExample forTiposervicioCursoExample = new
+					// ForTiposervicioCursoExample();
+					// forTiposervicioCursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					// .andIdcursoEqualTo(cursoItem.getIdCurso())
+					// .andIdttiposervicioEqualTo(Long.valueOf(servicio.getValue()));
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample)
+					// -> Entrada a forTiposervicioCursoExtendsMapper para buscar los servicios de
+					// un curso");
+					//
+					// List<ForTiposervicioCurso> forTipoServicioCursoList =
+					// forTiposervicioCursoExtendsMapper
+					// .selectByExample(forTiposervicioCursoExample);
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample)
+					// -> Salida a forTiposervicioCursoExtendsMapper para buscar los servicios de un
+					// curso");
+					//
+					// // Si no existe la creamos
+					// if (forTipoServicioCursoList.isEmpty()) {
+					//
+					// ForTiposervicioCurso forTipoServicioCurso = new ForTiposervicioCurso();
+					// forTipoServicioCurso.setFechabaja(null);
+					// forTipoServicioCurso.setFechamodificacion(new Date());
+					// forTipoServicioCurso.setIdcurso(cursoItem.getIdCurso());
+					// forTipoServicioCurso.setIdinstitucion(idInstitucion);
+					// forTipoServicioCurso.setIdttiposervicio(Long.valueOf(servicio.getValue()));
+					// forTipoServicioCurso.setUsumodificacion(usuario.getIdusuario().longValue());
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso) -> Entrada a
+					// forTiposervicioCursoExtendsMapper para insertar un servicio de un curso");
+					//
+					// response = forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso);
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.insert(forTipoServicioCurso) -> Salida a
+					// forTiposervicioCursoExtendsMapper para insertar un servicio de un curso");
+					//
+					// // Si existe cambiamos el servicio a null
+					// } else {
+					// forTipoServicioCursoList.get(0).setFechabaja(null);
+					// forTipoServicioCursoList.get(0).setUsumodificacion(usuario.getIdusuario().longValue());
+					// forTipoServicioCursoList.get(0).setFechamodificacion(new Date());
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoAlta) ->
+					// Entrada a forTiposervicioCursoExtendsMapper para dar de alta a un servicio de
+					// un curso");
+					//
+					// response = forTiposervicioCursoExtendsMapper
+					// .updateByPrimaryKey(forTipoServicioCursoList.get(0));
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoAlta) ->
+					// Salida a forTiposervicioCursoExtendsMapper para dar de alta a un servicio de
+					// un curso");
+					// }
+					// }
+					//
+					// // Comprobamos si existe algun servicio para el curso y les damos de baja
+					// } else {
+					// // Eliminamos Servicio
+					// ForTiposervicioCursoExample forTiposerviciocursoExample = new
+					// ForTiposervicioCursoExample();
+					// forTiposerviciocursoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+					// .andIdcursoEqualTo(cursoItem.getIdCurso()).andFechabajaIsNull();
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample)
+					// -> Entrada a forTiposervicioCursoExtendsMapper para buscar los servicios
+					// registrados de un curso");
+					//
+					// List<ForTiposervicioCurso> forTipoServicioCursoAntiguosList =
+					// forTiposervicioCursoExtendsMapper
+					// .selectByExample(forTiposerviciocursoExample);
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.selectByExample(forTiposervicioCursoExample)
+					// -> Salida a forTiposervicioCursoExtendsMapper para buscar los servicios
+					// registrados de un curso");
+					//
+					// for (ForTiposervicioCurso servicioAsignadosAntiguos :
+					// forTipoServicioCursoAntiguosList) {
+					//
+					// servicioAsignadosAntiguos.setUsumodificacion(usuario.getIdusuario().longValue());
+					// servicioAsignadosAntiguos.setFechabaja(new Date());
+					// servicioAsignadosAntiguos.setFechamodificacion(new Date());
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) ->
+					// Entrada a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de
+					// un curso");
+					//
+					// response =
+					// forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioAsignadosAntiguos);
+					//
+					// LOGGER.info(
+					// "updateCourse() /
+					// forTiposervicioCursoExtendsMapper.updateByPrimaryKey(servicioCursoBaja) ->
+					// Salida a forTiposervicioCursoExtendsMapper para dar de baja a un servicio de
+					// un curso");
+					// }
+					// }
 
 					if (cursoItem.getTemasCombo() != null && cursoItem.getTemasCombo().size() > 0) {
 
@@ -1635,7 +1686,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 						cursoItem.getIdCurso().toString(), cursoItem.getIdInstitucion(), usuario.getIdlenguaje());
 				LOGGER.info(
 						"getSessionsCourse() / ageEventoExtendsMapper.searchEvent() -> Salida de ageEventoExtendsMapper para obtener un evento especifico");
-			
+
 			}
 		}
 
@@ -2127,113 +2178,117 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 						inscripcionItem.setNombrePersona(nombreCompleto);
 						inscripcionItem.setNifPersona(cenPersona.getNifcif());
 
-						// Buscamos la institución del curso al que pertenece
-						LOGGER.info(
-								"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKeyExtends(idCurso) -> Entrada a forCursoExtendsMapper para recuperar el curso de la inscripcion");
+						if (inscripcionItem.getIdCurso() != null) {
+							// Buscamos la institución del curso al que pertenece
+							LOGGER.info(
+									"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKeyExtends(idCurso) -> Entrada a forCursoExtendsMapper para recuperar el curso de la inscripcion");
 
-						ForCurso curso = forCursoExtendsMapper
-								.selectByPrimaryKeyExtends(Long.parseLong(inscripcionItem.getIdCurso()));
-
-						LOGGER.info(
-								"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKeyExtends(idCurso) -> Salida a forCursoExtendsMapper para recuperar el curso de la inscripcion");
-
-						CenClienteExample cenClienteExample = new CenClienteExample();
-						cenClienteExample.createCriteria().andIdinstitucionEqualTo(curso.getIdinstitucion())
-								.andIdpersonaEqualTo(inscripcionItem.getIdPersona());
-
-						List<CenCliente> cenClienteList = cenClienteExtendsMapper.selectByExample(cenClienteExample);
-
-						// Si no se encuentra debemos añadirlo
-						if (null == cenClienteList || cenClienteList.size() == 0) {
-
-							CenCliente cenCliente = new CenCliente();
-							cenCliente.setIdpersona(inscripcionItem.getIdPersona());
-							cenCliente.setIdinstitucion(curso.getIdinstitucion());
-							cenCliente.setFechaalta(new Date());
-							cenCliente.setCaracter("P");
-							cenCliente.setPublicidad(SigaConstants.DB_FALSE);
-							cenCliente.setGuiajudicial(SigaConstants.DB_FALSE);
-							// Para crear un cliente debemos rellenar comisiones, con que dato?
-							cenCliente.setComisiones("0");
-							cenCliente.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
-							cenCliente.setFechamodificacion(new Date());
-							cenCliente.setUsumodificacion(usuario.getIdusuario());
-							cenCliente.setIdlenguaje(usuario.getIdlenguaje());
-							cenCliente.setExportarfoto(SigaConstants.DB_FALSE);
+							ForCurso curso = forCursoExtendsMapper
+									.selectByPrimaryKeyExtends(Long.parseLong(inscripcionItem.getIdCurso()));
 
 							LOGGER.info(
-									"generateExcelInscriptions() / cenClienteMapper.insert() -> Entrada a cenClienteMapper para crear un nuevo colegiado");
+									"saveInscripcion() / forCursoExtendsMapper.selectByPrimaryKeyExtends(idCurso) -> Salida a forCursoExtendsMapper para recuperar el curso de la inscripcion");
 
-							int responseCenCliente = 0;
-							responseCenCliente = cenClienteMapper.insert(cenCliente);
-
-							// Además debemos insertar en cen_nocolegiado
-							CenNocolegiado cenNocolegiado = new CenNocolegiado();
-
-							// Se pone a cero ya que al ser una persona física no tiene tipo ni sociedad
-							cenNocolegiado.setTipo("0");
-							cenNocolegiado.setIdpersona(inscripcionItem.getIdPersona());
-							cenNocolegiado.setIdinstitucion(curso.getIdinstitucion());
-							cenNocolegiado.setFechamodificacion(new Date());
-							cenNocolegiado.setFechaBaja(null);
-							cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
-							// Para crear un nocoleagiado debemos rellenar campo sociedadsj, con que dato?
-							cenNocolegiado.setSociedadsj("0");
-							cenNocolegiado.setSociedadprofesional("0");
-
-							LOGGER.info(
-									"generateExcelInscriptions() / cenClienteMapper.insert() -> Salida de cenClienteMapper para crear un nuevo colegiado");
-
-							cenNocolegiadoMapper.insert(cenNocolegiado);
-
-							LOGGER.info(
-									"generateExcelInscriptions() / cenColegiadoExtendsMapper.insert() -> Salida de cenColegiadoExtendsMapper para crear un nuevo colegiado");
-
-							// Si se encuentra comprobamos que este en cen_colegiado
-						} else {
-
-							// Comprobamos que este colegiado en la institucion a la que pertenece el curso
-							CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
-							cenColegiadoExample.createCriteria().andIdinstitucionEqualTo(curso.getIdinstitucion())
+							CenClienteExample cenClienteExample = new CenClienteExample();
+							cenClienteExample.createCriteria().andIdinstitucionEqualTo(curso.getIdinstitucion())
 									.andIdpersonaEqualTo(inscripcionItem.getIdPersona());
 
-							List<CenColegiado> cenColegiadoList = cenColegiadoMapper
-									.selectByExample(cenColegiadoExample);
+							List<CenCliente> cenClienteList = cenClienteExtendsMapper
+									.selectByExample(cenClienteExample);
 
-							// Si no es colegiado comprobamos que este en cen_nocolegiado de la misma
-							// institucion
-							if (null == cenColegiadoList || cenColegiadoList.size() == 0) {
+							// Si no se encuentra debemos añadirlo
+							if (null == cenClienteList || cenClienteList.size() == 0) {
 
-								CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
-								cenNocolegiadoExample.createCriteria().andIdinstitucionEqualTo(curso.getIdinstitucion())
+								CenCliente cenCliente = new CenCliente();
+								cenCliente.setIdpersona(inscripcionItem.getIdPersona());
+								cenCliente.setIdinstitucion(curso.getIdinstitucion());
+								cenCliente.setFechaalta(new Date());
+								cenCliente.setCaracter("P");
+								cenCliente.setPublicidad(SigaConstants.DB_FALSE);
+								cenCliente.setGuiajudicial(SigaConstants.DB_FALSE);
+								// Para crear un cliente debemos rellenar comisiones, con que dato?
+								cenCliente.setComisiones("0");
+								cenCliente.setIdtratamiento(Short.valueOf(SigaConstants.DB_TRUE)); // 1
+								cenCliente.setFechamodificacion(new Date());
+								cenCliente.setUsumodificacion(usuario.getIdusuario());
+								cenCliente.setIdlenguaje(usuario.getIdlenguaje());
+								cenCliente.setExportarfoto(SigaConstants.DB_FALSE);
+
+								LOGGER.info(
+										"generateExcelInscriptions() / cenClienteMapper.insert() -> Entrada a cenClienteMapper para crear un nuevo colegiado");
+
+								int responseCenCliente = 0;
+								responseCenCliente = cenClienteMapper.insert(cenCliente);
+
+								// Además debemos insertar en cen_nocolegiado
+								CenNocolegiado cenNocolegiado = new CenNocolegiado();
+
+								// Se pone a cero ya que al ser una persona física no tiene tipo ni sociedad
+								cenNocolegiado.setTipo("0");
+								cenNocolegiado.setIdpersona(inscripcionItem.getIdPersona());
+								cenNocolegiado.setIdinstitucion(curso.getIdinstitucion());
+								cenNocolegiado.setFechamodificacion(new Date());
+								cenNocolegiado.setFechaBaja(null);
+								cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
+								// Para crear un nocoleagiado debemos rellenar campo sociedadsj, con que dato?
+								cenNocolegiado.setSociedadsj("0");
+								cenNocolegiado.setSociedadprofesional("0");
+
+								LOGGER.info(
+										"generateExcelInscriptions() / cenClienteMapper.insert() -> Salida de cenClienteMapper para crear un nuevo colegiado");
+
+								cenNocolegiadoMapper.insert(cenNocolegiado);
+
+								LOGGER.info(
+										"generateExcelInscriptions() / cenColegiadoExtendsMapper.insert() -> Salida de cenColegiadoExtendsMapper para crear un nuevo colegiado");
+
+								// Si se encuentra comprobamos que este en cen_colegiado
+							} else {
+
+								// Comprobamos que este colegiado en la institucion a la que pertenece el curso
+								CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
+								cenColegiadoExample.createCriteria().andIdinstitucionEqualTo(curso.getIdinstitucion())
 										.andIdpersonaEqualTo(inscripcionItem.getIdPersona());
 
-								List<CenNocolegiado> cenNocolegiadoList = cenNocolegiadoMapper
-										.selectByExample(cenNocolegiadoExample);
+								List<CenColegiado> cenColegiadoList = cenColegiadoMapper
+										.selectByExample(cenColegiadoExample);
 
-								// Si no se encuentra debemos añadirlo como no colegiado a la institución a la
-								// que pertenece el curso
-								if (null == cenNocolegiadoList || cenNocolegiadoList.size() == 0) {
+								// Si no es colegiado comprobamos que este en cen_nocolegiado de la misma
+								// institucion
+								if (null == cenColegiadoList || cenColegiadoList.size() == 0) {
 
-									CenNocolegiado cenNocolegiado = new CenNocolegiado();
-									cenNocolegiado.setTipo("0");
-									cenNocolegiado.setIdpersona(inscripcionItem.getIdPersona());
-									cenNocolegiado.setIdinstitucion(curso.getIdinstitucion());
-									cenNocolegiado.setFechamodificacion(new Date());
-									cenNocolegiado.setFechaBaja(null);
-									cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
-									cenNocolegiado.setSociedadsj("0");
-									// Este campo es obligatorio
-									cenNocolegiado.setSociedadprofesional("0");
+									CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
+									cenNocolegiadoExample.createCriteria()
+											.andIdinstitucionEqualTo(curso.getIdinstitucion())
+											.andIdpersonaEqualTo(inscripcionItem.getIdPersona());
 
-									LOGGER.info(
-											"generateExcelInscriptions() / cenNocolegiadoMapper.insert() -> Salida de cenNocolegiadoMapper para crear un nuevo nocolegiado");
+									List<CenNocolegiado> cenNocolegiadoList = cenNocolegiadoMapper
+											.selectByExample(cenNocolegiadoExample);
 
-									int result = cenNocolegiadoMapper.insert(cenNocolegiado);
+									// Si no se encuentra debemos añadirlo como no colegiado a la institución a la
+									// que pertenece el curso
+									if (null == cenNocolegiadoList || cenNocolegiadoList.size() == 0) {
 
-									LOGGER.info(
-											"generateExcelInscriptions() / cenNocolegiadoMapper.insert() -> Salida de cenNocolegiadoMapper para crear un nuevo nocolegiado");
+										CenNocolegiado cenNocolegiado = new CenNocolegiado();
+										cenNocolegiado.setTipo("0");
+										cenNocolegiado.setIdpersona(inscripcionItem.getIdPersona());
+										cenNocolegiado.setIdinstitucion(curso.getIdinstitucion());
+										cenNocolegiado.setFechamodificacion(new Date());
+										cenNocolegiado.setFechaBaja(null);
+										cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
+										cenNocolegiado.setSociedadsj("0");
+										// Este campo es obligatorio
+										cenNocolegiado.setSociedadprofesional("0");
 
+										LOGGER.info(
+												"generateExcelInscriptions() / cenNocolegiadoMapper.insert() -> Salida de cenNocolegiadoMapper para crear un nuevo nocolegiado");
+
+										int result = cenNocolegiadoMapper.insert(cenNocolegiado);
+
+										LOGGER.info(
+												"generateExcelInscriptions() / cenNocolegiadoMapper.insert() -> Salida de cenNocolegiadoMapper para crear un nuevo nocolegiado");
+
+									}
 								}
 							}
 						}
@@ -2547,19 +2602,21 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		int response = 1;
 		try {
 
-//			PysServicios pysServicios = new PysServicios();
-//			pysServicios.setFechamodificacion(new Date());
-//			pysServicios.setIdinstitucion(idInstitucion);
-//			pysServicios.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
-//			pysServicios.setUsumodificacion(usuario.getIdusuario());
-//			pysServicios.setDescripcion(cursoItem.getNombrecurso());
-//			NewIdDTO idServicio = pysServiciosExtendsMapper.selectMaxIdServicio(idInstitucion);
-//			pysServicios.setIdservicio(Long.valueOf(idServicio.getNewId()));
-//
-//			LOGGER.info(
-//					"createServiceCourse() / pysServiciosMapper.insert() -> Entrada a pysServiciosMapper para insertar un servicio");
-//
-//			response = pysServiciosExtendsMapper.insert(pysServicios);
+			// PysServicios pysServicios = new PysServicios();
+			// pysServicios.setFechamodificacion(new Date());
+			// pysServicios.setIdinstitucion(idInstitucion);
+			// pysServicios.setIdtiposervicios(SigaConstants.ID_TIPO_SERVICIOS_FORMACION);
+			// pysServicios.setUsumodificacion(usuario.getIdusuario());
+			// pysServicios.setDescripcion(cursoItem.getNombrecurso());
+			// NewIdDTO idServicio =
+			// pysServiciosExtendsMapper.selectMaxIdServicio(idInstitucion);
+			// pysServicios.setIdservicio(Long.valueOf(idServicio.getNewId()));
+			//
+			// LOGGER.info(
+			// "createServiceCourse() / pysServiciosMapper.insert() -> Entrada a
+			// pysServiciosMapper para insertar un servicio");
+			//
+			// response = pysServiciosExtendsMapper.insert(pysServicios);
 
 			LOGGER.info(
 					"createServiceCourse() / pysServiciosMapper.insert() -> Salida a pysServiciosMapper para insertar un servicio");
@@ -2728,7 +2785,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 										NewIdDTO idservicio = pysServiciosExtendsMapper.selectIdServicioByIdCurso(
 												inscription.getIdinstitucion(), inscription.getIdcurso());
 										NewIdDTO idserviciosinstitucion = pysServiciosinstitucionExtendsMapper
-												.selectIdServicioinstitucionByIdServicio(idInstitucion, Long.valueOf(inscription.getIdcurso()));
+												.selectIdServicioinstitucionByIdServicio(idInstitucion,
+														Long.valueOf(inscription.getIdcurso()));
 
 										PysServiciossolicitados pysServiciossolicitados = new PysServiciossolicitados();
 										pysServiciossolicitados.setFechamodificacion(new Date());
@@ -2898,11 +2956,12 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
-			LOGGER.info(
-					"getTopicsSpecificCourse() / forTemacursoExtendsMapper.getTopicsSpecificCourse -> Entrada a forTemacursoExtendsMapper para obtener los temas de un curso según el curso");
-			comboItems = forTemacursoExtendsMapper.getTopicsSpecificCourse(usuario.getIdlenguaje(),idInstitucion.toString(), idCurso);
-			LOGGER.info(
-					"getTopicsSpecificCourse() / forTemacursoExtendsMapper.getTopicsSpecificCourse -> Salida de forTemacursoExtendsMapper para obtener los temas de un curso según el curso");
+				LOGGER.info(
+						"getTopicsSpecificCourse() / forTemacursoExtendsMapper.getTopicsSpecificCourse -> Entrada a forTemacursoExtendsMapper para obtener los temas de un curso según el curso");
+				comboItems = forTemacursoExtendsMapper.getTopicsSpecificCourse(usuario.getIdlenguaje(),
+						idInstitucion.toString(), idCurso);
+				LOGGER.info(
+						"getTopicsSpecificCourse() / forTemacursoExtendsMapper.getTopicsSpecificCourse -> Salida de forTemacursoExtendsMapper para obtener los temas de un curso según el curso");
 			}
 
 		}
@@ -3030,7 +3089,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							// Se buscan las sesiones que estan en estado Planificada y las cancelaremos
 							List<EventoItem> sessionsList = ageEventoExtendsMapper.getSessionsCourseByState(
 									SigaConstants.EVENTO_SESION, cursoItem.getIdCurso().toString(),
-									idInstitucion.toString(), SigaConstants.EVENTO_PLANIFICADO, usuario.getIdlenguaje());
+									idInstitucion.toString(), SigaConstants.EVENTO_PLANIFICADO,
+									usuario.getIdlenguaje());
 
 							// Si existen cambios el estado a cancelada
 							if (null != sessionsList && sessionsList.size() > 0) {
