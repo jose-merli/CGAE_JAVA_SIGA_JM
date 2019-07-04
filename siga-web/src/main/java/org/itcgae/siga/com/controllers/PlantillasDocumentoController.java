@@ -21,6 +21,7 @@ import org.itcgae.siga.DTOs.com.TarjetaPlantillaDocumentoDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.com.services.IPlantillasDocumentoService;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -173,7 +174,11 @@ public class PlantillasDocumentoController {
 		try{
 			ResponseFileDTO documento = _plantillasDocumentoService.descargarPlantilla(request, plantillaDoc);
 			file = documento.getFile();
-			resource = new InputStreamResource(new FileInputStream(file));                  
+			if(file != null) {
+			resource = new InputStreamResource(new FileInputStream(file));
+			}else {
+//				return ResponseEntity.status(SigaCon);
+			}
 		}catch(FileNotFoundException e){
 			e.printStackTrace();    
 		}	  
@@ -182,9 +187,12 @@ public class PlantillasDocumentoController {
 		headers.add("Pragma", "no-cache");
 		headers.add("Expires", "0");
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + plantillaDoc.getNombreDocumento() + "\"");
-		System.out.println("The length of the file is : "+file.length());
-		  
-		return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+		if(file != null) {
+			System.out.println("The length of the file is : "+file.length());
+			return ResponseEntity.ok().headers(headers).contentLength(file.length()).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+		}else {
+			return null;
+		}
 	}
 	
 	@RequestMapping(value = "/consulta",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
