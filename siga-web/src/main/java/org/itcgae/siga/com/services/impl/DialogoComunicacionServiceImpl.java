@@ -1985,9 +1985,12 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}
 			}
 			
-			
-			listaFicheros.add(docGenerado);
-			listaDocumentos.add(doc);
+			if (docGenerado != null) {
+				listaFicheros.add(docGenerado);
+			}
+			if (doc != null) {
+				listaDocumentos.add(doc);
+			}
 		}else{
 			//Cogemos todas las consultas y le metemos el nombre del fichero
 			if(listaConsultasEnvio != null && listaConsultasEnvio.size() > 0){
