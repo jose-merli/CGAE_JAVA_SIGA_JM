@@ -682,34 +682,41 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 							colegiadokey.setIdpersona(Long.valueOf(datosDireccionesItem.getIdPersona()));
 							CenColegiado colegiado = cenColegiadoExtendsMapper.selectByPrimaryKey(colegiadokey);
 
-							colegiado.setFechamodificacion(new Date());
-							colegiado.setUsumodificacion(usuario.getIdusuario());
+							//Debemos realizar la comprobación de si encuentra al colegiado, porque
+							//lo ejecutamos en la institución 2000 no encuentra al colegiado porque es colegiado pero en otro colegio
+						
+							if(colegiado != null) {
+								
+								colegiado.setFechamodificacion(new Date());
+								colegiado.setUsumodificacion(usuario.getIdusuario());
 
-							LOGGER.info(
-									"updateDirection() / cenColegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenColegiadoExtendsMapper para actualizar el Colegiado");
-							cenColegiadoExtendsMapper.updateByPrimaryKey(colegiado);
-							LOGGER.info(
-									"updateDirection() / cenColegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenColegiadoExtendsMapper para actualizar el Colegiado");
+								LOGGER.info(
+										"updateDirection() / cenColegiadoExtendsMapper.updateByPrimaryKeySelective() -> Entrada a cenColegiadoExtendsMapper para actualizar el Colegiado");
+								cenColegiadoExtendsMapper.updateByPrimaryKey(colegiado);
+								LOGGER.info(
+										"updateDirection() / cenColegiadoExtendsMapper.updateByExampleSelective() -> Salida de cenColegiadoExtendsMapper para actualizar el Colegiado");
 
-							LOGGER.info(
-									"updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
-							// Llamamos al PL para mantener los colegiados
-							Object[] paramMandatos = new Object[5];
-							paramMandatos[0] = datosDireccionesItem.getIdPersona().toString();
-							paramMandatos[1] = usuario.getIdinstitucion().toString();
-							paramMandatos[2] = new Long(30).toString();
-							paramMandatos[3] = datosDireccionesItem.getIdDireccion().toString();
-							paramMandatos[4] = usuario.getIdusuario().toString();
-							String resultado[] = new String[2];
-							try {
-								resultado = callPLProcedure(
-										"{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
-										paramMandatos);
-							} catch (IOException | NamingException | SQLException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+								LOGGER.info(
+										"updateDirection() -> OK. Update para actualizar direcciones realizado correctamente");
+								// Llamamos al PL para mantener los colegiados
+								Object[] paramMandatos = new Object[5];
+								paramMandatos[0] = datosDireccionesItem.getIdPersona().toString();
+								paramMandatos[1] = usuario.getIdinstitucion().toString();
+								paramMandatos[2] = new Long(30).toString();
+								paramMandatos[3] = datosDireccionesItem.getIdDireccion().toString();
+								paramMandatos[4] = usuario.getIdusuario().toString();
+								String resultado[] = new String[2];
+								try {
+									resultado = callPLProcedure(
+											"{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
+											paramMandatos);
+								} catch (IOException | NamingException | SQLException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+
 							}
-
+							
 							updateResponseDTO.setStatus(SigaConstants.OK);
 
 						} else {

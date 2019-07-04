@@ -276,18 +276,41 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 						datos.add(datosHashtable);
 
 						if (cargaMasivaDatosGFVo.getAccion().equalsIgnoreCase(SigaConstants.ALTA)) {
+							int result = 0;
+							
+							CenGruposclienteClienteKey key = new CenGruposclienteClienteKey();
+							key.setIdgrupo(cargaMasivaDatosGFVo.getIdGrupo());
+							key.setIdpersona(cargaMasivaDatosGFVo.getIdPersona());
+							key.setIdinstitucion(cargaMasivaDatosGFVo.getIdInstitucion());
+							key.setIdinstitucionGrupo(cargaMasivaDatosGFVo.getIdInstitucionGrupo());
 
-							CenGruposclienteCliente cenGruposclienteCliente = new CenGruposclienteCliente();
-							cenGruposclienteCliente.setIdpersona(cargaMasivaDatosGFVo.getIdPersona());
-							cenGruposclienteCliente.setIdinstitucion(cargaMasivaDatosGFVo.getIdInstitucion());
-							cenGruposclienteCliente.setIdgrupo(cargaMasivaDatosGFVo.getIdGrupo());
-							cenGruposclienteCliente.setIdinstitucionGrupo(cargaMasivaDatosGFVo.getIdInstitucionGrupo());
-							cenGruposclienteCliente.setFechamodificacion(new Date());
-							cenGruposclienteCliente.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
-							cenGruposclienteCliente.setFechaInicio(cargaMasivaDatosGFVo.getFechaInicio());
-							cenGruposclienteCliente.setFechaBaja(cargaMasivaDatosGFVo.getFechaFin());
+							
+							CenGruposclienteCliente cgcc = cenGruposclienteClienteMapper.selectByPrimaryKey(key);
 
-							int result = cenGruposclienteClienteMapper.insert(cenGruposclienteCliente);
+							if(cgcc == null) {
+							
+								CenGruposclienteCliente cenGruposclienteCliente = new CenGruposclienteCliente();
+								cenGruposclienteCliente.setIdpersona(cargaMasivaDatosGFVo.getIdPersona());
+								cenGruposclienteCliente.setIdinstitucion(cargaMasivaDatosGFVo.getIdInstitucion());
+								cenGruposclienteCliente.setIdgrupo(cargaMasivaDatosGFVo.getIdGrupo());
+								cenGruposclienteCliente.setIdinstitucionGrupo(cargaMasivaDatosGFVo.getIdInstitucionGrupo());
+								cenGruposclienteCliente.setFechamodificacion(new Date());
+								cenGruposclienteCliente.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
+								cenGruposclienteCliente.setFechaInicio(cargaMasivaDatosGFVo.getFechaInicio());
+								cenGruposclienteCliente.setFechaBaja(cargaMasivaDatosGFVo.getFechaFin());
+
+								result = cenGruposclienteClienteMapper.insert(cenGruposclienteCliente);
+						
+							}else {
+								
+								cgcc.setFechamodificacion(new Date());
+								cgcc.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
+								cgcc.setFechaInicio(cargaMasivaDatosGFVo.getFechaInicio());
+								cgcc.setFechaBaja(cargaMasivaDatosGFVo.getFechaFin());
+
+								result = cenGruposclienteClienteMapper.updateByPrimaryKey(cgcc);
+							}
+							
 
 							if (result == 0) {
 								errores += "Error al insertar una fila";
@@ -305,6 +328,7 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 									.setIdinstitucionGrupo(cargaMasivaDatosGFVo.getIdInstitucionGrupo());
 							cenGruposclienteClienteBaja.setFechamodificacion(new Date());
 							cenGruposclienteClienteBaja.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
+							cenGruposclienteClienteBaja.setFechaInicio(cargaMasivaDatosGFVo.getFechaInicio());
 							cenGruposclienteClienteBaja.setFechaBaja(new Date());
 
 							int result = cenGruposclienteClienteMapper.updateByPrimaryKeySelective(cenGruposclienteClienteBaja);
@@ -639,8 +663,26 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 						CenGruposclienteCliente cenGruposclienteCliente = cenGruposclienteClienteMapper
 								.selectByPrimaryKey(cenGruposclienteClienteKey);
 						if (cenGruposclienteCliente != null) {
-							LOGGER.debug("process.usuario.ya.asignado");
-							errorLinea.append("Usuario ya asignado a ese grupo fijo. ");
+							Date fechaActual = new Date();
+							
+							if(cenGruposclienteCliente.getFechaBaja() == null) {
+								
+								LOGGER.debug("process.usuario.ya.asignado");
+								errorLinea.append("Usuario ya asignado a ese grupo fijo. ");
+								
+							}else if((cenGruposclienteCliente.getFechaInicio().before(fechaActual) && cenGruposclienteCliente.getFechaBaja().after(fechaActual)) 
+									|| (cenGruposclienteCliente.getFechaInicio().before(fechaActual) && cenGruposclienteCliente.getFechaBaja().after(fechaActual))
+									|| (fechaActual.compareTo(cenGruposclienteCliente.getFechaBaja()) == 0 && fechaActual.compareTo(cenGruposclienteCliente.getFechaInicio()) == 0)) {
+							
+								LOGGER.debug("process.usuario.ya.asignado");
+								errorLinea.append("Usuario ya asignado a ese grupo fijo. ");
+								
+							}else {
+								cargaMasivaDatosGFVo.setIdGrupo(cenGruposclienteCliente.getIdgrupo());
+								cargaMasivaDatosGFVo.setIdInstitucionGrupo(cenGruposclienteCliente.getIdinstitucion());
+								cargaMasivaDatosGFVo.setNombreGrupo(cenGruposCliente.getNombre());
+							}
+						
 						}
 					} else if (cargaMasivaDatosGFVo.getAccion().equalsIgnoreCase(SigaConstants.BAJA)) {
 						/**
