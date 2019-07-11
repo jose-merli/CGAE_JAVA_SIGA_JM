@@ -5,6 +5,7 @@ public class ModeloDialogoItem {
 	private String idModulo;
 	private String idClaseComunicacion;
 	private String idConsulta;
+	private String idInstitucion;
 	
 	public String getIdModulo() {
 		return idModulo;
@@ -24,6 +25,10 @@ public class ModeloDialogoItem {
 	public void setIdConsulta(String idConsulta) {
 		this.idConsulta = idConsulta;
 	}
-	
-	
+	public String getIdInstitucion() {
+		return idInstitucion;
+	}
+	public void setIdInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}	
 }

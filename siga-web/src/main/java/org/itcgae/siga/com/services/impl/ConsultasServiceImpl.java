@@ -763,7 +763,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-					modeloList = _conListadoModelosExtendsMapper.selectListadoModelos(usuario.getIdinstitucion(),
+					modeloList = _conListadoModelosExtendsMapper.selectListadoModelos(Short.valueOf(consulta.getIdInstitucion()),
 							 consulta.getIdConsulta());
 					if (modeloList.size() > 0) {
 						conListadoModelosDTO.setListadoModelos(modeloList);

@@ -272,7 +272,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if (usuarios != null && usuarios.size() > 0) {
 				try{
 					AdmUsuarios usuario = usuarios.get(0);
-					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(String.valueOf(idInstitucion), modeloDTO.getIdClaseComunicacion(), modeloDTO.getIdModulo(), usuario.getIdlenguaje(), modeloDTO.getIdConsulta(), perfiles);
+					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(modeloDTO.getIdInstitucion(), modeloDTO.getIdClaseComunicacion(), modeloDTO.getIdModulo(), usuario.getIdlenguaje(), modeloDTO.getIdConsulta(), perfiles);
 					
 					/*for (ModelosComunicacionItem modelosComunicacionItem : modelos) {
 						ComboDTO comboDTO = new ComboDTO();
@@ -370,7 +370,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					AdmUsuarios usuario = usuarios.get(0);
 					generarComunicacion = generarComunicacion(dialogo,usuario, false);
 					listaFicheros = generarComunicacion.getListaDocumentos();
-					file = getFicheroDescarga(usuario.getIdinstitucion().toString(), listaFicheros);
+					file = getFicheroDescarga(dialogo.getIdInstitucion(), listaFicheros);
 				}
 			}
 		} catch (BusinessException e) {
@@ -477,7 +477,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				// Obtenemos la plantilla de envio seleccionada en el modelo
 				List<ConsultaItem> listaConsultasPlantillaEnvio = null;
 				if(modelosComunicacionItem.getIdPlantillaEnvio() != null && modelosComunicacionItem.getIdTipoEnvio()!=null){
-					listaConsultasPlantillaEnvio = _modPlantillaEnvioConsultaExtendsMapper.selectPlantillaEnvioConsultas(usuario.getIdinstitucion(), Integer.parseInt(modelosComunicacionItem.getIdPlantillaEnvio()), Short.parseShort(modelosComunicacionItem.getIdTipoEnvio()));
+					listaConsultasPlantillaEnvio = _modPlantillaEnvioConsultaExtendsMapper.selectPlantillaEnvioConsultas(Short.valueOf(dialogo.getIdInstitucion()), Integer.parseInt(modelosComunicacionItem.getIdPlantillaEnvio()), Short.parseShort(modelosComunicacionItem.getIdTipoEnvio()));
 				}
 				
 				// Por cada conjunto de valores key se generan los documentos
@@ -624,7 +624,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			}
 			
 			LOGGER.debug("Obtenemos las consultas condicional: " + plantilla.getIdPlantillas());
-			List<ConsultaItem> consultasItemCondicional = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(usuario.getIdinstitucion(), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
+			List<ConsultaItem> consultasItemCondicional = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
 
 			if(consultasItemCondicional != null && consultasItemCondicional.size() > 0){
 				
@@ -1032,7 +1032,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							if(listaPlantillas != null && listaPlantillas.size() > 0){
 								for(DocumentoPlantillaItem plantilla: listaPlantillas){
 									//Obtenemos las consultas asociadas a las plantillas
-									List<ConsultaItem> listaConsultas = _modPlantillaDocumentoConsultaExtendsMapper.selectPlantillaDocConsultas(idInstitucion, Long.parseLong(modelo.getIdModeloComunicacion()), Long.parseLong(plantilla.getIdPlantillaDocumento()), false);
+									List<ConsultaItem> listaConsultas = _modPlantillaDocumentoConsultaExtendsMapper.selectPlantillaDocConsultas(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelo.getIdModeloComunicacion()), Long.parseLong(plantilla.getIdPlantillaDocumento()), false);
 									if(listaConsultas != null && listaConsultas.size() > 0){
 										for(ConsultaItem consultaItem: listaConsultas){
 											ConConsultaKey key = new ConConsultaKey();
@@ -1899,7 +1899,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		// Por cada resultado ejecutamos las consultas de datos
 		LOGGER.debug("Obtenemos las consultas de datos para la plantilla: " + plantilla.getIdInforme());
-		List<ConsultaItem> consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(usuario.getIdinstitucion(), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DATOS.getCodigo());
+		List<ConsultaItem> consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DATOS.getCodigo());
 		ArrayList<String> nombresConsultasDatos = new ArrayList<String>();	
 		
 		for(ConsultaItem consultaDatos:consultasItemDatos){																			
