@@ -5,7 +5,7 @@ import org.itcgae.siga.db.mappers.ForInscripcionesmasivasSqlProvider;
 
 public class ForInscripcionesmasivasSqlExtendsProvider extends ForInscripcionesmasivasSqlProvider {
 
-	public String getMassiveLoadInscriptions(String idCurso, String idInstitucion) {
+	public String getMassiveLoadInscriptions(String idCurso, String idInstitucion, boolean historico) {
 
 		SQL sql = new SQL();
 
@@ -17,11 +17,16 @@ public class ForInscripcionesmasivasSqlExtendsProvider extends ForInscripcionesm
 		sql.SELECT("mas.IDCURSO");
 		sql.SELECT("mas.IDFICHERO");
 		sql.SELECT("mas.IDFICHEROLOG");
+		sql.SELECT("mas.FECHABAJA");
 
 		sql.FROM("FOR_INSCRIPCIONESMASIVAS mas");
 
 		sql.WHERE("mas.IDINSTITUCION = '" + idInstitucion + "'");
 		sql.WHERE("mas.idCurso = '" + idCurso + "'");
+		
+		if(!historico) {
+			sql.WHERE("mas.FECHABAJA is null");
+		}
 
 
 		return sql.toString();

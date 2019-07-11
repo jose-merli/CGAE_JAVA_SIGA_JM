@@ -67,7 +67,7 @@ public interface IFichaCursosService {
 	
 	public UpdateResponseDTO uploadFileExcel(int idCurso, MultipartHttpServletRequest request) throws IllegalStateException, IOException;
 	
-	public CargaMasivaInscripcionesDTO getMassiveLoadInscriptions(HttpServletRequest request, String idCurso);
+	public CargaMasivaInscripcionesDTO getMassiveLoadInscriptions(HttpServletRequest request, String idCurso, boolean historico);
 
 	public UpdateResponseDTO deleteInscriptionsCourse(CargaMasivaInscripcionesDTO cargaMasivaInscripcionesDTO, HttpServletRequest request);
 	

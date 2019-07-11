@@ -154,7 +154,14 @@ public class FichaCursosController {
 	
 	@RequestMapping(value = "fichaCursos/getMassiveLoadInscriptions",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<CargaMasivaInscripcionesDTO> getMassiveLoadInscriptions(@RequestParam("idCurso") String idCurso, HttpServletRequest request) {
-		CargaMasivaInscripcionesDTO response = fichaCursosService.getMassiveLoadInscriptions(request, idCurso);
+		CargaMasivaInscripcionesDTO response = fichaCursosService.getMassiveLoadInscriptions(request, idCurso, false);
+		return new ResponseEntity<CargaMasivaInscripcionesDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "fichaCursos/getHistoricMassiveLoadInscriptions",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<CargaMasivaInscripcionesDTO> getHistoricMassiveLoadInscriptions(@RequestParam("idCurso") String idCurso, HttpServletRequest request) {
+	
+		CargaMasivaInscripcionesDTO response = fichaCursosService.getMassiveLoadInscriptions(request, idCurso, true);
 		return new ResponseEntity<CargaMasivaInscripcionesDTO>(response, HttpStatus.OK);
 	}
 	

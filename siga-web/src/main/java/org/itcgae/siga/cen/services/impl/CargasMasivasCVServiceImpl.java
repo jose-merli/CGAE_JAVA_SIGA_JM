@@ -953,6 +953,30 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 		LOGGER.info(dateLog + ":fin.CargaMasivaDatosCVImpl.getDirectorioFichero");
 		return directorioFichero.toString();
 	}
+	
+	private String getDirectorioFicheroSigaClassique(Short idInstitucion) {
+		Date dateLog = new Date();
+		LOGGER.info(dateLog + ":inicio.CargaMasivaDatosCVImpl.getDirectorioFicheroSigaClassique");
+
+		// Extraer propiedad
+		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("gen.ficheros.path");
+		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
+		String pathCV = genPropertiesPath.get(0).getValor(); 
+		
+		StringBuffer directorioFichero = new StringBuffer(pathCV);
+		directorioFichero.append(idInstitucion);
+		directorioFichero.append(File.separator);
+
+		// Extraer propiedad
+		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
+		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.cargamasivaCV");
+		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
+		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
+
+		LOGGER.info(dateLog + ":fin.CargaMasivaDatosCVImpl.getDirectorioFicheroSigaClassique");
+		return directorioFichero.toString();
+	}
 
 	@Override
 	public CargaMasivaDTO searchCV(CargaMasivaItem cargaMasivaItem, HttpServletRequest request) {
@@ -1009,7 +1033,30 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 			headers.setContentLength(file.length());
 			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			
+			LOGGER.warn("downloadOriginalFile() -> No encuentra el fichero original en la ruta SigaNovo");
+
+			//Si no encuentra el fichero buscamos en la ruta de siga classique
+			String pathClassique = getDirectorioFicheroSigaClassique(idInstitucion);
+			pathClassique += File.separator + idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
+
+			File fileClassique = new File(pathClassique);
+			
+			// Preparar la descarga
+			InputStream fileStreamClassique = null;
+
+			try {
+				fileStreamClassique = new FileInputStream(fileClassique);
+				HttpHeaders headersClassique = new HttpHeaders();
+				headersClassique.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+				headersClassique.setContentLength(fileClassique.length());
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStreamClassique), headersClassique, HttpStatus.OK);
+			
+			} catch (FileNotFoundException eClassique) {
+				LOGGER.warn("downloadOriginalFile() -> No encuentra el fichero original en la ruta SigaClassique");
+
+			}
 		}
 
 		LOGGER.info("downloadOriginalFile() -> Salida del servicio para generar la plantilla original");
@@ -1021,7 +1068,7 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 	public ResponseEntity<InputStreamResource> downloadLogFile(CargaMasivaItem cargaMasivaItem,
 			HttpServletRequest request) throws SigaExceptions {
 
-		LOGGER.info("downloadOriginalFile() -> Entrada al servicio para generar la plantilla de errores");
+		LOGGER.info("downloadLogFile() -> Entrada al servicio para generar la plantilla de errores");
 
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -1044,10 +1091,32 @@ private CenColegiadoExtendsMapper cenColegiadoExtendsMapper;
 			headers.setContentLength(file.length());
 			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			LOGGER.warn("downloadLogFile() -> No encuentra el fichero original en la ruta SigaNovo");
+
+			//Si no encuentra el fichero buscamos en la ruta de siga classique
+			String pathClassique = getDirectorioFicheroSigaClassique(idInstitucion);
+			pathClassique += File.separator +"log_" + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "."
+					+ SigaConstants.tipoExcelXls;
+			
+			File fileClassique = new File(pathClassique);
+			
+			// Preparar la descarga
+			InputStream fileStreamClassique = null;
+
+			try {
+				fileStreamClassique = new FileInputStream(fileClassique);
+				HttpHeaders headersClassique = new HttpHeaders();
+				headersClassique.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+				headersClassique.setContentLength(fileClassique.length());
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStreamClassique), headersClassique, HttpStatus.OK);
+			
+			} catch (FileNotFoundException eClassique) {
+				LOGGER.warn("downloadLogFile() -> No encuentra el fichero original en la ruta SigaClassique");
+			}
 		}
 
-		LOGGER.info("downloadOriginalFile() -> Salida del servicio para generar la plantilla de errores");
+		LOGGER.info("downloadLogFile() -> Salida del servicio para generar la plantilla de errores");
 
 		return res;
 	}
