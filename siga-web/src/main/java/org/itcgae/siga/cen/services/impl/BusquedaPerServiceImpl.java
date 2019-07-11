@@ -342,7 +342,11 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 							}
 
 							busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido().concat(busquedaPerFisica.getSegundoApellido()));
-							busquedaPerFisica.setNif(colegiado.getDatosPersonales().getIdentificacion().getNIF());
+							if (null !=colegiado.getDatosPersonales().getIdentificacion().getNIF()) {
+								busquedaPerFisica.setNif(colegiado.getDatosPersonales().getIdentificacion().getNIF());
+							}else{
+								busquedaPerFisica.setNif(colegiado.getDatosPersonales().getIdentificacion().getNIE());
+							}
 							busquedaPerFisica.setNombre(colegiado.getDatosPersonales().getNombre());
 							
 							if (null != colegiado.getColegiacionArray() && colegiado.getColegiacionArray().length>0) {
@@ -397,7 +401,12 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 								}
 
 								busquedaPerFisica.setApellidos(busquedaPerFisica.getPrimerApellido().concat(busquedaPerFisica.getSegundoApellido()));
-								busquedaPerFisica.setNif(colegiado[i].getDatosPersonales().getIdentificacion().getNIF());
+								if (null !=colegiado[i].getDatosPersonales().getIdentificacion().getNIF()) {
+									busquedaPerFisica.setNif(colegiado[i].getDatosPersonales().getIdentificacion().getNIF());
+								}else{
+									busquedaPerFisica.setNif(colegiado[i].getDatosPersonales().getIdentificacion().getNIE());
+								}
+								
 								busquedaPerFisica.setNombre(colegiado[i].getDatosPersonales().getNombre());
 								
 								if (null != colegiado[i].getColegiacionArray() && colegiado[i].getColegiacionArray().length>0) {
@@ -440,7 +449,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 		LOGGER.info(
 				"searchPerFisica() -> Salida del servicio para la búsqueda de personas físicas");
 		return busquedaPerFisicaDTO;
-	}
+	}  
 
 	private com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado[] buscarColegiadoSinDocumentacion(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO) {
 		
