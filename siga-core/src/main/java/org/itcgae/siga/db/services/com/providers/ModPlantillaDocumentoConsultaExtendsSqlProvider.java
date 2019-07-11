@@ -69,7 +69,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		
 		sql.FROM("MOD_PLANTILLADOC_CONSULTA plantillaConsulta");	
 		sql.INNER_JOIN("con_consulta ON con_consulta.idconsulta=plantillaConsulta.Idconsulta AND con_consulta.idinstitucion = plantillaConsulta.Idinstitucion_consulta");
-		sql.WHERE("plantillaConsulta.IDPLANTILLADOCUMENTO IN (" + idPlantillaDocumento +") AND plantillaConsulta.IDMODELOCOMUNICACION = " + idModeloComunicacion + " AND plantillaConsulta.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("plantillaConsulta.IDPLANTILLADOCUMENTO IN (" + idPlantillaDocumento +") AND plantillaConsulta.IDMODELOCOMUNICACION = " + idModeloComunicacion + " AND plantillaConsulta.IDINSTITUCION_CONSULTA = " + idInstitucion);
 		sql.WHERE("con_consulta.idobjetivo = " + idObjetivo);
 		sql.WHERE("plantillaConsulta.FECHABAJA IS NULL");
 		

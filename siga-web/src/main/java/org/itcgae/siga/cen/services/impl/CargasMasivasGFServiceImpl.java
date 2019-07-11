@@ -8,6 +8,9 @@ import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -933,6 +936,28 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 		LOGGER.info(dateLog + ":fin.CargaMasivaDatosGFImpl.getDirectorioFichero");
 		return directorioFichero.toString();
 	}
+	
+	private String getDirectorioFicheroSigaClassique(Short idInstitucion) {
+		Date dateLog = new Date();
+		LOGGER.info(dateLog + ":inicio.CargaMasivaDatosGFImpl.getDirectorioFicheroSigaClassique");
+		
+		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
+		genPropertiesExampleP.createCriteria().andParametroEqualTo("gen.ficheros.path");
+		List<GenProperties> genPropertiesPath = genPropertiesMapper.selectByExample(genPropertiesExampleP);
+		String pathGF = genPropertiesPath.get(0).getValor();
+
+		StringBuffer directorioFichero = new StringBuffer(pathGF);
+		directorioFichero.append(idInstitucion);
+		directorioFichero.append(File.separator);
+
+		GenPropertiesExample genPropertiesExampleD = new GenPropertiesExample();
+		genPropertiesExampleD.createCriteria().andParametroEqualTo("scs.ficheros.cargamasivaGF");
+		List<GenProperties> genPropertiesDirectorio = genPropertiesMapper.selectByExample(genPropertiesExampleD);
+		directorioFichero.append(genPropertiesDirectorio.get(0).getValor());
+
+		LOGGER.info(dateLog + ":fin.CargaMasivaDatosGFImpl.getDirectorioFicheroSigaClassique");
+		return directorioFichero.toString();
+	}
 
 	@Override
 	public ResponseEntity<InputStreamResource> downloadOriginalFile(CargaMasivaItem cargaMasivaItem,
@@ -961,8 +986,30 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			headers.setContentLength(file.length());
 			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.warn("downloadOriginalFile() -> No encuentra el fichero original en la ruta SigaNovo");
+
+			//Si no encuentra el fichero buscamos en la ruta de siga classique
+			String pathClassique = getDirectorioFicheroSigaClassique(idInstitucion);
+			pathClassique += File.separator + idInstitucion + "_" + cargaMasivaItem.getIdFichero() + "." + SigaConstants.tipoExcelXls;
+
+			File fileClassique = new File(pathClassique);
+			
+			// Preparar la descarga
+			InputStream fileStreamClassique = null;
+
+			try {
+				
+				fileStreamClassique = new FileInputStream(fileClassique);
+				HttpHeaders headersClassique = new HttpHeaders();
+				headersClassique.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+				headersClassique.setContentLength(fileClassique.length());
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStreamClassique), headersClassique, HttpStatus.OK);
+			
+			} catch (FileNotFoundException eClassique) {
+				LOGGER.warn("downloadOriginalFile() -> No encuentra el fichero original en la ruta SigaClassique");
+
+			}
 		}
 
 		LOGGER.info(
@@ -999,8 +1046,29 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 			headers.setContentLength(file.length());
 			res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStream), headers, HttpStatus.OK);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.warn("downloadLogFile() -> No encuentra el fichero original en la ruta SigaNovo");
+
+			//Si no encuentra el fichero buscamos en la ruta de siga classique
+			String pathClassique = getDirectorioFicheroSigaClassique(idInstitucion);
+			pathClassique += File.separator + idInstitucion + "_" + cargaMasivaItem.getIdFicheroLog() + "."
+					+ SigaConstants.tipoExcelXls;
+			
+			File fileClassique = new File(pathClassique);
+			
+			// Preparar la descarga
+			InputStream fileStreamClassique = null;
+
+			try {
+				fileStreamClassique = new FileInputStream(fileClassique);
+				HttpHeaders headersClassique = new HttpHeaders();
+				headersClassique.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+
+				headersClassique.setContentLength(fileClassique.length());
+				res = new ResponseEntity<InputStreamResource>(new InputStreamResource(fileStreamClassique), headersClassique, HttpStatus.OK);
+			
+			} catch (FileNotFoundException eClassique) {
+				LOGGER.warn("downloadLogFile() -> No encuentra el fichero original en la ruta SigaClassique");
+			}
 		}
 
 		LOGGER.info("downloadLogFile() -> Salida del servicio para descargar la plantilla errores Excel Etiquetas");
