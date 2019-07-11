@@ -51,6 +51,7 @@ import org.itcgae.siga.db.entities.ModModeloPlantilladocumentoKey;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
+import org.itcgae.siga.db.entities.ModPlantilladocumentoKey;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijo;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample;
 import org.itcgae.siga.db.mappers.ConConsultaMapper;
@@ -851,8 +852,12 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 
 							for (DocumentoPlantillaItem idPlantillaDoc : plantillaDoc.getPlantillas()) {
 
+								ModPlantilladocumentoKey modeloPlantillaKey = new ModPlantilladocumentoKey();
+								
+								modeloPlantillaKey.setIdioma(idPlantillaDoc.getIdIdioma());
+								modeloPlantillaKey.setIdplantilladocumento(Long.parseLong(idPlantillaDoc.getIdPlantillaDocumento()));
 								ModPlantilladocumento modPlantillaDoc = modPlantillaDocumentoExtendsMapper
-										.selectByPrimaryKey(Long.parseLong(idPlantillaDoc.getIdPlantillaDocumento()));
+										.selectByPrimaryKey(modeloPlantillaKey);
 
 								if (modPlantillaDoc != null) {
 									ModModeloPlantilladocumentoKey modModeloPlantillaDocKey = new ModModeloPlantilladocumentoKey();
@@ -1127,9 +1132,17 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 
 					// Obtenemos el idPlantillaDocumento
 					String idPlantillaDoc = plantillaDoc.getIdPlantillaDocumento();
-
+					ModPlantilladocumentoKey modeloPlantillaKey = new ModPlantilladocumentoKey();
+					
+					modeloPlantillaKey.setIdioma(plantillaDoc.getIdIdioma());
+					modeloPlantillaKey.setIdplantilladocumento(Long.parseLong(idPlantillaDoc));
+//					ModPlantilladocumento modPlantillaDoc = modPlantillaDocumentoExtendsMapper
+//							.selectByPrimaryKey(modeloPlantillaKey);
+					
+					
 					ModPlantilladocumento plantillaDocumento = modPlantilladocumentoMapper
-							.selectByPrimaryKey(Long.parseLong(idPlantillaDoc));
+							.selectByPrimaryKey(modeloPlantillaKey);
+					
 					if (plantillaDocumento != null) {
 
 						// OBtenemos la ruta de las plantillas

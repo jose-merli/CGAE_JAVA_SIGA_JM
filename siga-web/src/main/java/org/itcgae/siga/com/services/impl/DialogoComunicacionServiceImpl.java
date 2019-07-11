@@ -368,7 +368,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
-					generarComunicacion = generarComunicacion(dialogo,usuario, false);
+					generarComunicacion = generarComunicacion(request, dialogo,usuario, false);
 					listaFicheros = generarComunicacion.getListaDocumentos();
 					file = getFicheroDescarga(usuario.getIdinstitucion().toString(), listaFicheros);
 				}
@@ -410,7 +410,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 	
 	
-	private GenerarComunicacionItem generarComunicacion(DialogoComunicacionItem dialogo, AdmUsuarios usuario, boolean esEnvio) throws Exception{
+	private GenerarComunicacionItem generarComunicacion(HttpServletRequest request, DialogoComunicacionItem dialogo, AdmUsuarios usuario, boolean esEnvio) throws Exception{
 		LOGGER.info("generarComunicacion() -> Entrada al servicio para generar los documentos a comunicar");
 		
 		GenerarComunicacionItem generarComunicacion = new GenerarComunicacionItem();
@@ -514,7 +514,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						
 						List<ConsultaEnvioItem> listaConsultasEnvio = new ArrayList<ConsultaEnvioItem>();
 						
-						ejecutaPlantillas(modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatario);
+						ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatario);
 												
 									
 						// Por cada key seleccionada
@@ -559,9 +559,19 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return generarComunicacion;
 	}
 	
-	private void ejecutaPlantillas(ModelosComunicacionItem modelosComunicacionItem, DialogoComunicacionItem dialogo,
+	private void ejecutaPlantillas(HttpServletRequest request, ModelosComunicacionItem modelosComunicacionItem, DialogoComunicacionItem dialogo,
 			AdmUsuarios usuario, HashMap<String, String> mapaClave, boolean esEnvio, List<ConsultaEnvioItem> listaConsultasEnvio, List<ConsultaItem> listaConsultasPlantillaEnvio, String rutaPlantillaClase, String campoSufijo, List<DatosDocumentoItem> listaFicheros, boolean ejecutarConsulta, DestinatarioItem destinatario) throws Exception {
 
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
+		
+		ModelosComunicacionSearch respuesta = new ModelosComunicacionSearch();
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
 		boolean continua = true;
 		Long idConsultaEjecutarCondicional = null;
 		String consultaEjecutarCondicional = "";
@@ -573,7 +583,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		List<Document> listaDocumentos = new ArrayList<Document>();	
 		
 		LOGGER.debug("Obtenemos las plantillas de documento asociadas al modelo " + modelosComunicacionItem.getIdModeloComunicacion());
-		List<PlantillaModeloDocumentoDTO> plantillas = _modModeloPlantillaDocumentoExtendsMapper.selectInformesGenerar(Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+		List<PlantillaModeloDocumentoDTO> plantillas = _modModeloPlantillaDocumentoExtendsMapper.selectInformesGenerar(Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), usuario.getIdlenguaje());
 		
 		
 		if (plantillas == null || plantillas.size() == 0) {
@@ -1225,7 +1235,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				AdmUsuarios usuario = usuarios.get(0);
 				
 				try{
-					generarComunicacion = generarComunicacion(dialogo,usuario, true);					
+					generarComunicacion = generarComunicacion(request, dialogo,usuario, true);					
 					
 					// Insertamos las consultas para los envios
 					insertarConsultasEnvio(usuario, idInstitucion, generarComunicacion);

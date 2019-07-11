@@ -42,7 +42,7 @@ public class ModModeloPlantillaDocumentoExtendsSqlProvider {
 		return sql.toString();
 	}
 	
-	public String selectInformesGenerar(Long idModeloComunicacion){
+	public String selectInformesGenerar(Long idModeloComunicacion, String idLenguaje){
 		SQL sql = new SQL();		
 		
 		sql.SELECT("modPlantilla.IDINFORME");
@@ -51,7 +51,7 @@ public class ModModeloPlantillaDocumentoExtendsSqlProvider {
 		sql.SELECT("modPlantilla.FORMATOSALIDA");
 		
 		sql.FROM("mod_modelo_plantilladocumento modPlantilla");	
-		
+		sql.INNER_JOIN("mod_plantilladocumento ON mod_plantilladocumento.idplantilladocumento = modPlantilla.idplantilladocumento AND mod_plantilladocumento.idioma = '"+idLenguaje+"'");
 		sql.WHERE("modPlantilla.IDMODELOCOMUNICACION = " + idModeloComunicacion + " AND modPlantilla.FECHABAJA IS NULL");
 		sql.GROUP_BY("modPlantilla.IDINFORME,modPlantilla.NOMBREFICHEROSALIDA, modPlantilla.FORMATOSALIDA");
 		
