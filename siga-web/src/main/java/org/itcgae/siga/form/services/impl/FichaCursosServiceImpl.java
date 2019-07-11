@@ -54,6 +54,8 @@ import org.itcgae.siga.db.entities.AgeGeneracionnotificacionesExample;
 import org.itcgae.siga.db.entities.AgeNotificacionesevento;
 import org.itcgae.siga.db.entities.AgeNotificacioneseventoExample;
 import org.itcgae.siga.db.entities.AgePersonaEvento;
+import org.itcgae.siga.db.entities.CenCargamasiva;
+import org.itcgae.siga.db.entities.CenCargamasivaExample;
 import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteExample;
 import org.itcgae.siga.db.entities.CenColegiado;
@@ -70,6 +72,7 @@ import org.itcgae.siga.db.entities.ForEventoCurso;
 import org.itcgae.siga.db.entities.ForInscripcion;
 import org.itcgae.siga.db.entities.ForInscripcionExample;
 import org.itcgae.siga.db.entities.ForInscripcionesmasivas;
+import org.itcgae.siga.db.entities.ForInscripcionesmasivasExample;
 import org.itcgae.siga.db.entities.ForPersonaCurso;
 import org.itcgae.siga.db.entities.ForPersonaCursoExample;
 import org.itcgae.siga.db.entities.ForTemacursoCurso;
@@ -95,6 +98,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmContadorExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeEventoExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeNotificacioneseventoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenCargaMasivaExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenClienteExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenDatoscvExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -249,6 +253,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 
 	@Autowired
 	private CenPersonaMapper cenPersonaMapper;
+	
 
 	@Override
 	public void updateEstadoCursoAuto() {
@@ -2453,7 +2458,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 	}
 
 	@Override
-	public CargaMasivaInscripcionesDTO getMassiveLoadInscriptions(HttpServletRequest request, String idCurso) {
+	public CargaMasivaInscripcionesDTO getMassiveLoadInscriptions(HttpServletRequest request, String idCurso, boolean historico) {
 
 		LOGGER.info(
 				"getMassiveLoadInscriptions() -> Entrada al servicio para obtener los nombres de las plantillas de inscripciones masivas a un curso");
@@ -2473,7 +2478,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 				LOGGER.info(
 						"getMassiveLoadInscriptions() / forInscripcionExtendsMapper.getCountIncriptions -> Entrada a forInscripcionExtendsMapper para obtener los nombres de las plantillas de inscripciones masivas a un curso");
 				cargaMasivaInscripciones = forInscripcionesmasivasExtendsMapper.getMassiveLoadInscriptions(idCurso,
-						String.valueOf(curso.getIdinstitucion()));
+						String.valueOf(curso.getIdinstitucion()), historico);
 				LOGGER.info(
 						"getMassiveLoadInscriptions() / forInscripcionExtendsMapper.getCountIncriptions -> Salida de forInscripcionExtendsMapper para obtener los nombres de las plantillas de inscripciones masivas a un curso");
 
@@ -2514,7 +2519,8 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+		boolean deleteInscripcion = false;
+		
 		if (null != idInstitucion) {
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -2559,6 +2565,7 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 									inscription.setIdestadoinscripcion(SigaConstants.INSCRIPCION_CANCELADA);
 									response = forInscripcionExtendsMapper.updateByPrimaryKey(inscription);
 
+									deleteInscripcion = true;
 									LOGGER.info(
 											"deleteInscriptionsCourse() / forInscripcionExtendsMapper.updateByPrimaryKey() -> Salida a forInscripcionExtendsMapper cambiar el estado a las inscripciones a cancelado");
 									// Si no estan en estado pendiente no se pueden cancelar
@@ -2570,6 +2577,29 @@ public class FichaCursosServiceImpl implements IFichaCursosService {
 							// Si no hay es que el fichero tiene inscripciones erróneas
 						} else {
 							error.setDescription("Fichero con inscripciones erróneas.");
+						}
+						
+						if(deleteInscripcion) {
+							
+							//Probar cuando nos indiquen que como quieren que mostremos ficheros eliminados
+							ForInscripcionesmasivasExample forInscripcionesmasivasExample = new ForInscripcionesmasivasExample();
+							forInscripcionesmasivasExample.createCriteria()
+									.andIdcargainscripcionEqualTo(Long.valueOf(fichero.getIdCargaInscripcion()))
+									.andIdinstitucionEqualTo(idInstitucion);
+
+							LOGGER.info(
+									"deleteInscriptionsCourse() / cenCargaMasivaExtendsMapper.selectByExample() -> Entrada a cenCargaMasivaExtendsMapper para obtener el fichero seleccionado");
+							List<ForInscripcionesmasivas> cargaMasivaList = forInscripcionesmasivasExtendsMapper.selectByExample(forInscripcionesmasivasExample);
+							LOGGER.info(
+									"deleteInscriptionsCourse() / cenCargaMasivaExtendsMapper.selectByExample() -> Salida a cenCargaMasivaExtendsMapper para obtener el fichero seleccionado");
+
+							if (null != cargaMasivaList && cargaMasivaList.size() > 0) {
+								ForInscripcionesmasivas ficheroDelete = cargaMasivaList.get(0);
+								ficheroDelete.setFechabaja(new Date());
+								
+								forInscripcionesmasivasExtendsMapper.updateByPrimaryKey(ficheroDelete);
+							}
+
 						}
 					}
 

@@ -469,29 +469,31 @@ public class WSCommons {
 		List<String> listaNombreFicherosZip = new ArrayList<String>();
 
 		for (DatosDocumentoItem fichero : ficheros) {
-			String nombreFichero = fichero.getFileName();
-			
-			if(listaNombreFicherosZip.contains(nombreFichero)) {
-				// Quitamos la extension
-				int indice = nombreFichero.lastIndexOf(".");
-				if(indice > -1) {
-					String extension = nombreFichero.substring(indice, nombreFichero.length());
-					String nombreSinExtension = nombreFichero.substring(0, nombreFichero.lastIndexOf("."));
-					
-					//Le añadimos un timestamp
-					nombreFichero = nombreSinExtension + "_" + System.currentTimeMillis() + extension;
-				}else {
-					nombreFichero = nombreFichero + "_" + System.currentTimeMillis();
-				}				
+			if (fichero != null && fichero.getFileName() != null) {
+				String nombreFichero = fichero.getFileName();
+				
+				if(listaNombreFicherosZip.contains(nombreFichero)) {
+					// Quitamos la extension
+					int indice = nombreFichero.lastIndexOf(".");
+					if(indice > -1) {
+						String extension = nombreFichero.substring(indice, nombreFichero.length());
+						String nombreSinExtension = nombreFichero.substring(0, nombreFichero.lastIndexOf("."));
+						
+						//Le añadimos un timestamp
+						nombreFichero = nombreSinExtension + "_" + System.currentTimeMillis() + extension;
+					}else {
+						nombreFichero = nombreFichero + "_" + System.currentTimeMillis();
+					}				
+				}
+				
+				ZipEntry entry = new ZipEntry(nombreFichero);
+				listaNombreFicherosZip.add(nombreFichero);
+				
+				entry.setSize(fichero.getDatos().length);
+				zos.putNextEntry(entry);
+				zos.write(fichero.getDatos());
+				zos.closeEntry();
 			}
-			
-			ZipEntry entry = new ZipEntry(nombreFichero);
-			listaNombreFicherosZip.add(nombreFichero);
-			
-			entry.setSize(fichero.getDatos().length);
-			zos.putNextEntry(entry);
-			zos.write(fichero.getDatos());
-			zos.closeEntry();
 		}
 		zos.close();
 		

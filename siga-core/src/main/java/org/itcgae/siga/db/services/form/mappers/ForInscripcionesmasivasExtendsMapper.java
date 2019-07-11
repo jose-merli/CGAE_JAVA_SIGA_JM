@@ -25,7 +25,9 @@ public interface ForInscripcionesmasivasExtendsMapper extends ForInscripcionesma
 			@Result(column = "IDCURSO", property = "idCurso", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDFICHERO", property = "idFichero", jdbcType = JdbcType.VARCHAR),
 			@Result(column = "IDFICHEROLOG", property = "idFicheroLog", jdbcType = JdbcType.VARCHAR),
+			@Result(column = "FECHABAJA", property = "fechaBaja", jdbcType = JdbcType.VARCHAR),
+
 	})
-	List<CargaMasivaInscripcionesItem> getMassiveLoadInscriptions(String idCurso, String idInstitucion);	
+	List<CargaMasivaInscripcionesItem> getMassiveLoadInscriptions(String idCurso, String idInstitucion, boolean historico);	
 
 }
