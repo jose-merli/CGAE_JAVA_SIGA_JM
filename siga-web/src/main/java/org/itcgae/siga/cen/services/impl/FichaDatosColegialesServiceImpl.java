@@ -278,6 +278,8 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				}
 				if (colegiadoItem.getIdTiposSeguro() != null && colegiadoItem.getIdTiposSeguro() != "") {
 					colegiado.setIdtiposseguro(Short.parseShort(colegiadoItem.getIdTiposSeguro()));
+				}else {
+					colegiado.setIdtiposseguro(null);
 				}
 				if (colegiadoItem.getSituacionResidente() != null) {
 					colegiado.setSituacionresidente(
