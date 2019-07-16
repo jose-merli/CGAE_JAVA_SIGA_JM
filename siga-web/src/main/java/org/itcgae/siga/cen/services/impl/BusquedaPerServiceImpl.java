@@ -168,7 +168,9 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				if(busquedaJuridicaItems.size() == 0) {
 					
 					CenPersonaExample cenPersonaExample = new CenPersonaExample();
-					cenPersonaExample.createCriteria().andNifcifEqualTo(busquedaPerJuridicaSearchDTO.getNif());
+					cenPersonaExample.createCriteria()
+					.andIdtipoidentificacionNotEqualTo(Short.valueOf("20"))
+					.andNifcifEqualTo(busquedaPerJuridicaSearchDTO.getNif());
 
 					List<CenPersona> listPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
 
@@ -418,7 +420,9 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 							// Buscamos si se encuentra en nuestra bbdd
 						} else {
 							CenPersonaExample cenPersonaExample = new CenPersonaExample();
-							cenPersonaExample.createCriteria().andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
+							cenPersonaExample.createCriteria()
+							.andIdtipoidentificacionEqualTo(Short.valueOf("20"))
+							.andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
 
 							List<CenPersona> listPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
 
