@@ -424,9 +424,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		} else {
 			sql.SET("FECHAMOVIMIENTO = " + record.getFechamovimiento() + "");
 		}
-		if (record.getIdtiposseguro() != null) {
-			sql.SET("IDTIPOSSEGURO = " + record.getIdtiposseguro() + "");
-		}
+		sql.SET("IDTIPOSSEGURO = " + record.getIdtiposseguro() + "");
 		if (record.getCuentacontablesjcs() != null) {
 			sql.SET("CUENTACONTABLESJCS = " + record.getCuentacontablesjcs() + "");
 		}

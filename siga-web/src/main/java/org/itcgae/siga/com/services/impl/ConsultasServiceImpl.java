@@ -62,6 +62,7 @@ import org.itcgae.siga.db.entities.GenPropertiesKey;
 import org.itcgae.siga.db.entities.ModModeloPerfiles;
 import org.itcgae.siga.db.entities.ModModeloPlantilladocumento;
 import org.itcgae.siga.db.entities.ModModelocomunicacion;
+import org.itcgae.siga.db.entities.ModModelocomunicacionExample;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
@@ -573,7 +574,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						ModModelocomunicacion modeloCom = new ModModelocomunicacion();
 						modeloCom.setDescripcion(consultaDTO.getNombre());
 						modeloCom.setFechamodificacion(new Date());
-						modeloCom.setIdclasecomunicacion(Short.parseShort(SigaConstants.ID_CLASE_CONSULTA_GENERICA));
+						modeloCom.setIdclasecomunicacion(Short.parseShort(consultaDTO.getIdClaseComunicacion()));
 						modeloCom.setIdinstitucion(idInstitucion);
 						modeloCom.setNombre(consultaDTO.getNombre());
 //						modeloCom.setPordefecto("SI");
@@ -742,6 +743,26 @@ public class ConsultasServiceImpl implements IConsultasService{
 							respuesta.setDescription(consulta.getSentencia());
 						}
 						
+						// Actualizamos el idClaseComunicacion de la tabla modModeloComunicacion
+						
+//						if(resultado == 1) {
+							
+//							ModPlantilladocConsultaExample modPlantilladocConsultaExample = new ModPlantilladocConsultaExample();
+//							modPlantilladocConsultaExample.createCriteria().andIdconsultaEqualTo(consulta.getIdconsulta()).andIdinstitucionEqualTo(consulta.getIdinstitucion());
+//							List<ModPlantilladocConsulta> modPlantilladocConsulta = _modPlantilladocConsultaMapper.selectByExample(modPlantilladocConsultaExample);
+//							
+//							if(!modPlantilladocConsulta.isEmpty() && modPlantilladocConsulta.size() > 0) {
+//								ModModelocomunicacion modModelocomunicacion = _modModelocomunicacionMapper.selectByPrimaryKey(modPlantilladocConsulta.get(0).getIdmodelocomunicacion());
+//								
+//								if(modModelocomunicacion != null) {
+//									modModelocomunicacion.setIdclasecomunicacion(consulta.getIdclasecomunicacion());
+//									
+//									_modModelocomunicacionMapper.updateByPrimaryKey(modModelocomunicacion);
+//								}
+//							}
+							
+							
+//						}
 					}
 					
 				}catch (Exception e) {
