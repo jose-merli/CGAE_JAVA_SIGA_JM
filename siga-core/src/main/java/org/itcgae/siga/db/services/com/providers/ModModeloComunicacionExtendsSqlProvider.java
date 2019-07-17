@@ -85,9 +85,9 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		}
 
 		if (historico) {
-			sql.ORDER_BY("modelo.FECHABAJA ASC, IDMODELOCOMUNICACION ASC");
+			sql.ORDER_BY("modelo.FECHABAJA ASC, modelo.ORDEN ASC");
 		} else {
-			sql.ORDER_BY("IDMODELOCOMUNICACION ASC");
+			sql.ORDER_BY("modelo.ORDEN ASC");
 		}
 
 		return sql.toString();
@@ -103,6 +103,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.SELECT("MODELO.IDTIPOENVIOS");
 		sql.SELECT("MODELO.VISIBLE");
 		sql.SELECT("MODELO.PRESELECCIONAR");
+		sql.SELECT("MODELO.ORDEN");
 		sql.SELECT(
 				"(SELECT CAT.DESCRIPCION FROM ENV_TIPOENVIOS PLA LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = PLA.NOMBRE WHERE PLA.IDTIPOENVIOS = MODELO.IDTIPOENVIOS AND CAT.IDLENGUAJE = '"
 						+ idLenguaje + "') AS TIPOENVIO");
@@ -127,7 +128,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 
 		if (idConsulta != null) {
 			sql.WHERE(
-					"MODELO.IDMODELOCOMUNICACION IN (SELECT IDMODELOCOMUNICACION FROM MOD_PLANTILLADOC_CONSULTA WHERE IDINSTITUCION='"
+					"MODELO.IDMODELOCOMUNICACION IN (SELECT IDMODELOCOMUNICACION FROM MOD_PLANTILLADOC_CONSULTA WHERE IDINSTITUCION_CONSULTA='"
 							+ idInstitucion + "' AND IDCONSULTA='" + idConsulta + "' AND FECHABAJA IS NULL)");
 		}
 
@@ -135,7 +136,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 			sql.WHERE("PERFILES.IDPERFIL IN (" + String.join(",", perfiles) + ")");
 		}
 		
-		sql.ORDER_BY("MODELO.NOMBRE ASC");
+		sql.ORDER_BY("MODELO.ORDEN ASC");
 
 		return sql.toString();
 	}

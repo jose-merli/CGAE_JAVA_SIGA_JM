@@ -19,6 +19,7 @@ public class CargaMasivaInscripcionesItem {
 	private String inscripcionesCorrectas;
 	private Long idFichero;
 	private Long idFicheroLog;
+	private String fechaBaja;
 	
 	public Long getIdFichero() {
 		return idFichero;
@@ -92,6 +93,15 @@ public class CargaMasivaInscripcionesItem {
 		this.inscripcionesCorrectas = inscripcionesCorrectas;
 	}
 	
+	
+	public String getFechaBaja() {
+		return fechaBaja;
+	}
+
+	public void setFechaBaja(String fechaBaja) {
+		this.fechaBaja = fechaBaja;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -103,6 +113,8 @@ public class CargaMasivaInscripcionesItem {
 		result = prime * result + ((nombreFichero == null) ? 0 : nombreFichero.hashCode());
 		result = prime * result + ((inscripcionesCorrectas == null) ? 0 : inscripcionesCorrectas.hashCode());
 		result = prime * result + ((numeroLineasTotales == null) ? 0 : numeroLineasTotales.hashCode());
+		result = prime * result + ((fechaBaja == null) ? 0 : fechaBaja.hashCode());
+
 		return result;
 	}
 	@Override
@@ -149,6 +161,11 @@ public class CargaMasivaInscripcionesItem {
 				return false;
 		} else if (!numeroLineasTotales.equals(other.numeroLineasTotales))
 			return false;
+		if (fechaBaja == null) {
+			if (other.fechaBaja != null)
+				return false;
+		} else if (!fechaBaja.equals(other.fechaBaja))
+			return false;
 		return true;
 	}
 	
@@ -157,7 +174,7 @@ public class CargaMasivaInscripcionesItem {
 		return "CargaMasivaInscripcionesItem [idCargaInscripcion=" + idCargaInscripcion + ", nombreFichero=" + nombreFichero
 				+ ", idCurso=" + idCurso + ", idInstitucion=" + idInstitucion + ", fechaCarga=" + fechaCarga
 				+ ", numeroLineasTotales=" + numeroLineasTotales + ", inscripcionesCorrectas=" + inscripcionesCorrectas
-				+ "]";
+				+ ", fechaBaja=" + fechaBaja + "]";
 	}
 
 	

@@ -727,6 +727,15 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 					insertColegiado = insertarDatosColegiado(solIncorporacion, usuario, idPersona);
 					if (!UtilidadesString.esCadenaVacia(solIncorporacion.getIban())) {
 						idBancario = insertarDatosBancarios(solIncorporacion, usuario, idPersona);
+					}else {
+						// Lanzamos el proceso de revision de suscripciones del letrado 
+						String resultado[] = ejecutarPL_RevisionSuscripcionesLetrado(""+usuario.getIdinstitucion().toString(),
+																								  ""+idPersona.toString(),
+																								  "",
+																								  ""+ usuario.getIdusuario().toString());
+						if ((resultado == null) || (!resultado[0].equals("0"))){
+							LOGGER.error("Error al ejecutar el PL PKG_SERVICIOS_AUTOMATICOS.PROCESO_REVISION_LETRADO"+resultado[1]);
+						}
 					}
 					
 					solIncorporacion.setIdestado((short)50);

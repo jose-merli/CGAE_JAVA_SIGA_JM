@@ -56,6 +56,8 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.CenDireccionesExample;
 import org.itcgae.siga.db.entities.CenDireccionesKey;
+import org.itcgae.siga.db.entities.CenGruposclienteCliente;
+import org.itcgae.siga.db.entities.CenGruposclienteClienteExample;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.EnvCamposenvios;
@@ -85,6 +87,7 @@ import org.itcgae.siga.db.entities.EnvPlantillasenviosWithBLOBs;
 import org.itcgae.siga.db.entities.GenParametros;
 import org.itcgae.siga.db.entities.GenParametrosKey;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
+import org.itcgae.siga.db.mappers.CenGruposclienteClienteMapper;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
 import org.itcgae.siga.db.mappers.EnvCamposenviosMapper;
 import org.itcgae.siga.db.mappers.EnvConsultasenvioMapper;
@@ -217,6 +220,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 	@Autowired
 	private IPFDService pfdService;
+
+	@Autowired
+	private CenGruposclienteClienteMapper _cenGruposclienteClienteMapper;
 
 	@Override
 	public ComboDTO estadoEnvios(HttpServletRequest request) {
@@ -829,14 +835,14 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
 
 						EnvCamposenvios envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
-						
-						if(envCampos != null) {
+
+						if (envCampos != null) {
 							envCampos.setIdenvio(idEnvioNuevo);
 							envCampos.setFechamodificacion(new Date());
 
 							_envCamposenviosMapper.insert(envCampos);
 						}
-					
+
 						key = new EnvCamposenviosKey();
 						key.setIdcampo(Short.parseShort(SigaConstants.ID_CAMPO_CUERPO));
 						key.setIdenvio(Long.parseLong(datosTarjeta.getIdEnvio()));
@@ -844,14 +850,13 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						key.setTipocampo(SigaConstants.ID_TIPO_CAMPO_EMAIL);
 
 						envCampos = _envCamposenviosMapper.selectByPrimaryKey(key);
-						
-						if(envCampos != null) {
+
+						if (envCampos != null) {
 							envCampos.setIdenvio(idEnvioNuevo);
 							envCampos.setFechamodificacion(new Date());
 
 							_envCamposenviosMapper.insert(envCampos);
 						}
-					
 
 					} else if (SigaConstants.ID_ENVIO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
 							|| SigaConstants.ID_ENVIO_BURO_SMS.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())) {
@@ -915,53 +920,46 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						}
 					}
 
-					
-					
 					// env_grupocliente
-					
-					  EnvEnviosgrupoclienteExample gruposExample = new  EnvEnviosgrupoclienteExample();
-					  gruposExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
-					  List<EnvEnviosgrupocliente> grupos =
-					  _envEnviosgrupoclienteMapper.selectByExample(gruposExample); 
-					  for (EnvEnviosgrupocliente envEnviosgrupocliente : grupos) {
-						  envEnviosgrupocliente.setIdenvio(idEnvioNuevo);
-						  envEnviosgrupocliente.setFechamodificacion(new Date());
-						  envEnviosgrupocliente.setUsumodificacion(usuario.getIdusuario());
-						  _envEnviosgrupoclienteMapper.insert(envEnviosgrupocliente); 
-					  }
-					 
-					
-					  
-						// env_destinatarios
-						
-					  EnvDestinatariosExample destinatariosExample = new  EnvDestinatariosExample();
-					  destinatariosExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
-					  List<EnvDestinatarios> destinatarios =
-					  _envDestinatariosMapper.selectByExample(destinatariosExample); 
-					  for (EnvDestinatarios destinatario : destinatarios) {
-						  destinatario.setIdenvio(idEnvioNuevo);
-						  destinatario.setFechamodificacion(new Date());
-						  destinatario.setUsumodificacion(usuario.getIdusuario());
-						  _envDestinatariosMapper.insert(destinatario); 
-					  }
-					  
+
+					EnvEnviosgrupoclienteExample gruposExample = new EnvEnviosgrupoclienteExample();
+					gruposExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
+					List<EnvEnviosgrupocliente> grupos = _envEnviosgrupoclienteMapper.selectByExample(gruposExample);
+					for (EnvEnviosgrupocliente envEnviosgrupocliente : grupos) {
+						envEnviosgrupocliente.setIdenvio(idEnvioNuevo);
+						envEnviosgrupocliente.setFechamodificacion(new Date());
+						envEnviosgrupocliente.setUsumodificacion(usuario.getIdusuario());
+						_envEnviosgrupoclienteMapper.insert(envEnviosgrupocliente);
+					}
+
+					// env_destinatarios
+
+					EnvDestinatariosExample destinatariosExample = new EnvDestinatariosExample();
+					destinatariosExample.createCriteria().andIdenvioEqualTo(idEnvio)
+							.andIdinstitucionEqualTo(idInstitucion);
+					List<EnvDestinatarios> destinatarios = _envDestinatariosMapper
+							.selectByExample(destinatariosExample);
+					for (EnvDestinatarios destinatario : destinatarios) {
+						destinatario.setIdenvio(idEnvioNuevo);
+						destinatario.setFechamodificacion(new Date());
+						destinatario.setUsumodificacion(usuario.getIdusuario());
+						_envDestinatariosMapper.insert(destinatario);
+					}
+
 					// env_consultasDestinatarios
-						
-					  EnvDestConsultaEnvioExample destConsultaEnvioExample = new  EnvDestConsultaEnvioExample();
-					  destConsultaEnvioExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
-					  List<EnvDestConsultaEnvio> destConsultaEnvios =
-					  _envDestConsultaEnvioMapper.selectByExample(destConsultaEnvioExample); 
-					  for (EnvDestConsultaEnvio destConsultaEnvio : destConsultaEnvios) {
-						  destConsultaEnvio.setIdenvio(idEnvioNuevo);
-						  destConsultaEnvio.setFechamodificacion(new Date());
-						  destConsultaEnvio.setUsumodificacion(usuario.getIdusuario());
-						  _envDestConsultaEnvioMapper.insert(destConsultaEnvio); 
-					  }
-					  
-					  
-					 
-					
-					
+
+					EnvDestConsultaEnvioExample destConsultaEnvioExample = new EnvDestConsultaEnvioExample();
+					destConsultaEnvioExample.createCriteria().andIdenvioEqualTo(idEnvio)
+							.andIdinstitucionEqualTo(idInstitucion);
+					List<EnvDestConsultaEnvio> destConsultaEnvios = _envDestConsultaEnvioMapper
+							.selectByExample(destConsultaEnvioExample);
+					for (EnvDestConsultaEnvio destConsultaEnvio : destConsultaEnvios) {
+						destConsultaEnvio.setIdenvio(idEnvioNuevo);
+						destConsultaEnvio.setFechamodificacion(new Date());
+						destConsultaEnvio.setUsumodificacion(usuario.getIdusuario());
+						_envDestConsultaEnvioMapper.insert(destConsultaEnvio);
+					}
+
 					// tabla env_historicoestadoenvio
 					EnvHistoricoestadoenvioExample histExample = new EnvHistoricoestadoenvioExample();
 					histExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
@@ -1212,9 +1210,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						EnvEnviosgrupoclienteExample example = new EnvEnviosgrupoclienteExample();
 						example.createCriteria().andIdenvioEqualTo(Long.valueOf(etiquetasDTO.getIdEnvio()))
 								.andIdgrupoEqualTo(
-										Short.valueOf(etiquetasDTO.getEtiquetasNoSeleccionadas()[i].getValue()))
+										Short.valueOf(etiquetasDTO.getEtiquetasSeleccionadas()[i].getValue()))
 								.andIdinstitucionEqualTo(idInstitucion).andIdinstitucionGrupoEqualTo(Short
-										.valueOf(etiquetasDTO.getEtiquetasNoSeleccionadas()[i].getIdInstitucion()));
+										.valueOf(etiquetasDTO.getEtiquetasSeleccionadas()[i].getIdInstitucion()));
 
 						List<EnvEnviosgrupocliente> listEnv = _envEnviosgrupoclienteMapper.selectByExample(example);
 
@@ -1231,7 +1229,126 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							_envEnviosgrupoclienteMapper.insert(etiqueta);
 						}
 
-					}
+						// INICIO INVENTO
+
+						CenGruposclienteClienteExample etiqueta = new CenGruposclienteClienteExample();
+						etiqueta.createCriteria()
+								.andIdgrupoEqualTo(
+										Short.parseShort(etiquetasDTO.getEtiquetasSeleccionadas()[i].getValue()))
+								.andIdinstitucionEqualTo(Short
+										.parseShort(etiquetasDTO.getEtiquetasSeleccionadas()[i].getIdInstitucion()));
+						List<CenGruposclienteCliente> personas = _cenGruposclienteClienteMapper
+								.selectByExample(etiqueta);
+						for (CenGruposclienteCliente persona : personas) {
+
+							// Obtenemos la persona
+							CenPersona cenPersona = _cenPersonaMapper.selectByPrimaryKey(persona.getIdpersona());
+
+							// Buscamos las direcciones de esa persona
+							CenDireccionesExample exampleDir = new CenDireccionesExample();
+
+							// Obtenemos la direccion preferente de la persona
+							exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona())
+									.andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull()
+									.andPreferenteLike("%" + SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO + "%");
+							List<CenDirecciones> direcciones = _cenDireccionesMapper.selectByExample(exampleDir);
+
+							if (direcciones == null || direcciones.size() == 0) {
+								exampleDir = new CenDireccionesExample();
+								exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona())
+										.andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull();
+								direcciones = _cenDireccionesMapper.selectByExample(exampleDir);
+							}
+
+							EnvDestinatariosExample ejemplo = new EnvDestinatariosExample();
+							ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andIdenvioEqualTo(Long.parseLong(etiquetasDTO.getIdEnvio()));
+							List<EnvDestinatarios> destinatariosExistentes = _envDestinatariosMapper
+									.selectByExample(ejemplo);
+
+							LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + cenPersona.getNifcif() + "  IDGRUPO = " + etiquetasDTO.getEtiquetasSeleccionadas()[i].getValue());
+							if (destinatariosExistentes.size() > 0 && direcciones.size() > 0) {
+								try {
+									CenPersona personaTag = _cenPersonaMapper
+											.selectByPrimaryKey(cenPersona.getIdpersona());
+									CenDireccionesKey key = new CenDireccionesKey();
+									key.setIddireccion(direcciones.get(0).getIddireccion());
+									key.setIdpersona(cenPersona.getIdpersona());
+									key.setIdinstitucion(idInstitucion);
+									CenDirecciones dir = _cenDireccionesMapper.selectByPrimaryKey(key);
+									EnvDestinatarios dest = new EnvDestinatarios();
+									dest.setApellidos1(personaTag.getApellidos1());
+									dest.setApellidos2(personaTag.getApellidos2());
+									if(dir != null) {
+									if(dir.getCodigopostal() != null) dest.setCodigopostal(dir.getCodigopostal());
+									dest.setCorreoelectronico(dir.getCorreoelectronico());
+									dest.setDomicilio(dir.getDomicilio());
+									dest.setFax1(dir.getFax1());
+									dest.setFax2(dir.getFax2());
+									dest.setFechamodificacion(new Date());
+									dest.setIdenvio(Long.parseLong(etiquetasDTO.getIdEnvio()));
+									dest.setIdinstitucion(idInstitucion);
+									dest.setIdpais(dir.getIdpais());
+									dest.setIdpersona(personaTag.getIdpersona());
+									dest.setIdpoblacion(dir.getIdpoblacion());
+									dest.setIdprovincia(dir.getIdprovincia());
+									dest.setMovil(dir.getMovil());
+									dest.setNifcif(personaTag.getNifcif());
+									dest.setNombre(personaTag.getNombre());
+									dest.setPoblacionextranjera(dir.getPoblacionextranjera());
+									dest.setUsumodificacion(usuarios.get(0).getIdusuario());
+									dest.setTipodestinatario("CEN_PERSONA");
+									_envDestinatariosMapper.updateByExample(dest, ejemplo);
+									respuesta.setCode(200);
+									respuesta.setDescription("Destinatario asociado con éxito");
+									}
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							} else if( direcciones.size() > 0){
+								try {
+									CenPersona personaTag = _cenPersonaMapper
+											.selectByPrimaryKey(cenPersona.getIdpersona());
+									CenDireccionesKey key = new CenDireccionesKey();
+									key.setIddireccion(direcciones.get(0).getIddireccion());
+									key.setIdpersona(cenPersona.getIdpersona());
+									key.setIdinstitucion(idInstitucion);
+									CenDirecciones dir = _cenDireccionesMapper.selectByPrimaryKey(key);
+									EnvDestinatarios dest = new EnvDestinatarios();
+									dest.setApellidos1(personaTag.getApellidos1());
+									dest.setApellidos2(personaTag.getApellidos2());
+									if(dir != null) {
+									if(dir.getCodigopostal() != null) dest.setCodigopostal(dir.getCodigopostal());
+									dest.setCorreoelectronico(dir.getCorreoelectronico());
+									dest.setDomicilio(dir.getDomicilio());
+									dest.setFax1(dir.getFax1());
+									dest.setFax2(dir.getFax2());
+									dest.setFechamodificacion(new Date());
+									dest.setIdenvio(Long.parseLong(etiquetasDTO.getIdEnvio()));
+									dest.setIdinstitucion(idInstitucion);
+									dest.setIdpais(dir.getIdpais());
+									dest.setIdpersona(personaTag.getIdpersona());
+									dest.setIdpoblacion(dir.getIdpoblacion());
+									dest.setIdprovincia(dir.getIdprovincia());
+									dest.setMovil(dir.getMovil());
+									dest.setNifcif(personaTag.getNifcif());
+									dest.setNombre(personaTag.getNombre());
+									dest.setPoblacionextranjera(dir.getPoblacionextranjera());
+									dest.setUsumodificacion(usuarios.get(0).getIdusuario());
+									dest.setTipodestinatario("CEN_PERSONA");
+									_envDestinatariosMapper.insert(dest);
+									respuesta.setDescription("Destinatario asociado con éxito");
+									}
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							}else {
+								LOGGER.info("La persona no tenía dirección válida");
+							}
+						}
+
+					} // FIN Bucle ya existente
+					// FIN INVENTO
 
 					respuesta.setCode(200);
 					respuesta.setDescription("Datos etiquetas de envio guardados correctamente");
@@ -1278,9 +1395,9 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 					File serverFile = new File(pathFichero);
 					serverFile.mkdirs();
-					
+
 					SIGAHelper.addPerm777(serverFile);
-					
+
 					serverFile = new File(serverFile, fileName);
 					if (serverFile.exists()) {
 						LOGGER.error("Ya existe el fichero: " + pathFichero + fileName);
@@ -2015,11 +2132,11 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 					if (null != personas && personas.size() > 0) {
 						CenPersona destinatario = personas.get(0);
-						
+
 						CenDireccionesExample example = new CenDireccionesExample();
 						example.createCriteria().andIdpersonaEqualTo(destinatario.getIdpersona())
 								.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
-						
+
 						List<CenDirecciones> direcciones = _cenDireccionesMapper.selectByExample(example);
 						if (direcciones != null && direcciones.size() > 0) {
 							List<DatosDireccionesItem> direccionesList = new ArrayList<DatosDireccionesItem>();
@@ -2053,7 +2170,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							error.setDescription("No existen direcciones disponibles");
 							response.setError(error);
 						}
-					}else {
+					} else {
 						Error error = new Error();
 						error.setCode(400);
 						error.setDescription("No existe persona");

@@ -272,7 +272,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if (usuarios != null && usuarios.size() > 0) {
 				try{
 					AdmUsuarios usuario = usuarios.get(0);
-					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(String.valueOf(idInstitucion), modeloDTO.getIdClaseComunicacion(), modeloDTO.getIdModulo(), usuario.getIdlenguaje(), modeloDTO.getIdConsulta(), perfiles);
+					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(modeloDTO.getIdInstitucion(), modeloDTO.getIdClaseComunicacion(), modeloDTO.getIdModulo(), usuario.getIdlenguaje(), modeloDTO.getIdConsulta(), perfiles);
 					
 					/*for (ModelosComunicacionItem modelosComunicacionItem : modelos) {
 						ComboDTO comboDTO = new ComboDTO();
@@ -368,9 +368,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
-					generarComunicacion = generarComunicacion(dialogo,usuario, false);
+					generarComunicacion = generarComunicacion(request, dialogo,usuario, false);
 					listaFicheros = generarComunicacion.getListaDocumentos();
-					file = getFicheroDescarga(usuario.getIdinstitucion().toString(), listaFicheros);
+					file = getFicheroDescarga(dialogo.getIdInstitucion(), listaFicheros);
 				}
 			}
 		} catch (BusinessException e) {
@@ -410,7 +410,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 
 	
 	
-	private GenerarComunicacionItem generarComunicacion(DialogoComunicacionItem dialogo, AdmUsuarios usuario, boolean esEnvio) throws Exception{
+	private GenerarComunicacionItem generarComunicacion(HttpServletRequest request, DialogoComunicacionItem dialogo, AdmUsuarios usuario, boolean esEnvio) throws Exception{
 		LOGGER.info("generarComunicacion() -> Entrada al servicio para generar los documentos a comunicar");
 		
 		GenerarComunicacionItem generarComunicacion = new GenerarComunicacionItem();
@@ -477,7 +477,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				// Obtenemos la plantilla de envio seleccionada en el modelo
 				List<ConsultaItem> listaConsultasPlantillaEnvio = null;
 				if(modelosComunicacionItem.getIdPlantillaEnvio() != null && modelosComunicacionItem.getIdTipoEnvio()!=null){
-					listaConsultasPlantillaEnvio = _modPlantillaEnvioConsultaExtendsMapper.selectPlantillaEnvioConsultas(usuario.getIdinstitucion(), Integer.parseInt(modelosComunicacionItem.getIdPlantillaEnvio()), Short.parseShort(modelosComunicacionItem.getIdTipoEnvio()));
+					listaConsultasPlantillaEnvio = _modPlantillaEnvioConsultaExtendsMapper.selectPlantillaEnvioConsultas(Short.valueOf(dialogo.getIdInstitucion()), Integer.parseInt(modelosComunicacionItem.getIdPlantillaEnvio()), Short.parseShort(modelosComunicacionItem.getIdTipoEnvio()));
 				}
 				
 				// Por cada conjunto de valores key se generan los documentos
@@ -514,7 +514,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						
 						List<ConsultaEnvioItem> listaConsultasEnvio = new ArrayList<ConsultaEnvioItem>();
 						
-						ejecutaPlantillas(modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatario);
+						ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatario);
 												
 									
 						// Por cada key seleccionada
@@ -559,9 +559,19 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return generarComunicacion;
 	}
 	
-	private void ejecutaPlantillas(ModelosComunicacionItem modelosComunicacionItem, DialogoComunicacionItem dialogo,
+	private void ejecutaPlantillas(HttpServletRequest request, ModelosComunicacionItem modelosComunicacionItem, DialogoComunicacionItem dialogo,
 			AdmUsuarios usuario, HashMap<String, String> mapaClave, boolean esEnvio, List<ConsultaEnvioItem> listaConsultasEnvio, List<ConsultaItem> listaConsultasPlantillaEnvio, String rutaPlantillaClase, String campoSufijo, List<DatosDocumentoItem> listaFicheros, boolean ejecutarConsulta, DestinatarioItem destinatario) throws Exception {
 
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
+		
+		ModelosComunicacionSearch respuesta = new ModelosComunicacionSearch();
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
 		boolean continua = true;
 		Long idConsultaEjecutarCondicional = null;
 		String consultaEjecutarCondicional = "";
@@ -573,7 +583,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		List<Document> listaDocumentos = new ArrayList<Document>();	
 		
 		LOGGER.debug("Obtenemos las plantillas de documento asociadas al modelo " + modelosComunicacionItem.getIdModeloComunicacion());
-		List<PlantillaModeloDocumentoDTO> plantillas = _modModeloPlantillaDocumentoExtendsMapper.selectInformesGenerar(Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+		List<PlantillaModeloDocumentoDTO> plantillas = _modModeloPlantillaDocumentoExtendsMapper.selectInformesGenerar(Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), usuario.getIdlenguaje());
 		
 		
 		if (plantillas == null || plantillas.size() == 0) {
@@ -624,7 +634,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			}
 			
 			LOGGER.debug("Obtenemos las consultas condicional: " + plantilla.getIdPlantillas());
-			List<ConsultaItem> consultasItemCondicional = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(usuario.getIdinstitucion(), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
+			List<ConsultaItem> consultasItemCondicional = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.CONDICIONAL.getCodigo());
 
 			if(consultasItemCondicional != null && consultasItemCondicional.size() > 0){
 				
@@ -1032,7 +1042,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							if(listaPlantillas != null && listaPlantillas.size() > 0){
 								for(DocumentoPlantillaItem plantilla: listaPlantillas){
 									//Obtenemos las consultas asociadas a las plantillas
-									List<ConsultaItem> listaConsultas = _modPlantillaDocumentoConsultaExtendsMapper.selectPlantillaDocConsultas(idInstitucion, Long.parseLong(modelo.getIdModeloComunicacion()), Long.parseLong(plantilla.getIdPlantillaDocumento()), false);
+									List<ConsultaItem> listaConsultas = _modPlantillaDocumentoConsultaExtendsMapper.selectPlantillaDocConsultas(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelo.getIdModeloComunicacion()), Long.parseLong(plantilla.getIdPlantillaDocumento()), false);
 									if(listaConsultas != null && listaConsultas.size() > 0){
 										for(ConsultaItem consultaItem: listaConsultas){
 											ConConsultaKey key = new ConConsultaKey();
@@ -1225,7 +1235,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				AdmUsuarios usuario = usuarios.get(0);
 				
 				try{
-					generarComunicacion = generarComunicacion(dialogo,usuario, true);					
+					generarComunicacion = generarComunicacion(request, dialogo,usuario, true);					
 					
 					// Insertamos las consultas para los envios
 					insertarConsultasEnvio(usuario, idInstitucion, generarComunicacion);
@@ -1899,7 +1909,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		// Por cada resultado ejecutamos las consultas de datos
 		LOGGER.debug("Obtenemos las consultas de datos para la plantilla: " + plantilla.getIdInforme());
-		List<ConsultaItem> consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(usuario.getIdinstitucion(), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DATOS.getCodigo());
+		List<ConsultaItem> consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DATOS.getCodigo());
 		ArrayList<String> nombresConsultasDatos = new ArrayList<String>();	
 		
 		for(ConsultaItem consultaDatos:consultasItemDatos){																			
