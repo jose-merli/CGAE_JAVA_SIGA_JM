@@ -48,6 +48,7 @@ import org.itcgae.siga.com.services.IColaEnvios;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.com.services.IPFDService;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.ENVIOS_MASIVOS_LOG_EXTENSION;
 import org.itcgae.siga.commons.constants.SigaConstants.GEN_PARAMETROS;
 import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.db.entities.AdmUsuarios;
@@ -1327,7 +1328,37 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 		LOGGER.info("uploadFile() -> Salida del servicio para subir un documento de envio");
 		return response;
 	}
+	
+	@Override
+	public File getPathFicheroLOGEnvioMasivo(Short idInstitucion, Long idEnvio) {
+		String path = getPathFicheroEnvioMasivo(idInstitucion, idEnvio);
+		File file = getFileLog(path, ENVIOS_MASIVOS_LOG_EXTENSION.xlsx);
+        return file;
+	}
 
+	private File getFileLog(String path, ENVIOS_MASIVOS_LOG_EXTENSION extension) {
+		File file = new File(path); 
+        file.mkdirs();
+		SIGAHelper.addPerm777(file);
+		file = new File(file, SigaConstants.ENVIOS_MASIVOS_LOG_NOMBRE_FICHERO + "." + extension);
+		LOGGER.info("Path de fichero de log de envíos masivos: " + file.getAbsolutePath());
+		return file;
+	}
+
+	@Override
+	public File[] getFicherosLOGEnvioMasivo(Short idInstitucion, Long idEnvio) {
+		String path = getPathFicheroEnvioMasivo(idInstitucion, idEnvio);
+		File[] files = new File[ENVIOS_MASIVOS_LOG_EXTENSION.values().length];
+		
+		for (int i = 0;  i <  ENVIOS_MASIVOS_LOG_EXTENSION.values().length; i++) {
+			ENVIOS_MASIVOS_LOG_EXTENSION extension = ENVIOS_MASIVOS_LOG_EXTENSION.values()[i];
+			File file = getFileLog(path, extension);
+			files[i] = file;
+		}
+		
+        return files;
+	}
+	
 	@Override
 	public String getPathFicheroEnvioMasivo(Short idInstitucion, Long idEnvio) {
 		String pathFichero = null;
