@@ -7,10 +7,11 @@ public class CenEstadoSolicitudModifSqlExtendsProvider {
 	public String getEstado(String idLenguage) {
 		SQL sql = new SQL();
 		sql.SELECT("est.IDESTADOSOLIC AS VALUE");
-		sql.SELECT("cat.DESCRIPCION AS LABEL");
+		sql.SELECT("INITCAP(cat.DESCRIPCION) AS LABEL");
 		sql.FROM("CEN_ESTADOSOLICITUDMODIF est");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS cat on cat.idRecurso = est.descripcion");
 		sql.WHERE("cat.IDLENGUAJE ='"+ idLenguage + "'");
+		sql.ORDER_BY("LABEL");
 		return sql.toString();
 	}
 }

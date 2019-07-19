@@ -3,6 +3,8 @@ package org.itcgae.siga.cen.services.impl;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -90,6 +92,7 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 					GenRecursosCatalogosExample exampleRecursos = new GenRecursosCatalogosExample();
 					exampleRecursos.createCriteria().andIdrecursoEqualTo(scsMaestroretenciones.getDescripcion())
 							.andIdlenguajeEqualTo(usuario.getIdlenguaje());
+					
 					LOGGER.info(
 							"getRetentionTypes() / genRecursosCatalogosMapper.selectByExample() -> Entrada a genRecursosCatalogosMapper para obtener obtener la descripción de las retenciones");
 					List<GenRecursosCatalogos> recursos = genRecursosCatalogosMapper.selectByExample(exampleRecursos);
@@ -111,7 +114,18 @@ public class TarjetaDatosRetencionesServiceImpl implements ITarjetaDatosRetencio
 				maestroRetencionItem.setPorcentajeRetencion("");
 				maestroRetencionItem.setValue("");
 				retencionesItemList.add(0, maestroRetencionItem);
+				
+				 Collections.sort(retencionesItemList, new Comparator<Object>() {
+			            @Override
+			            public int compare(Object item1, Object item2) {
+			                //use instanceof to verify the references are indeed of the type in question
+			                return ((MaestroRetencionItem)item1).getLabel()
+			                        .compareTo(((MaestroRetencionItem)item2).getLabel());
+			            }
+			        }); 
 				response.setMaestroRetencionItem(retencionesItemList);
+				
+				
 			} else {
 				response.getError().setDescription("No se han encontrado datos en ScsMaestroRetenciones.");
 			}
