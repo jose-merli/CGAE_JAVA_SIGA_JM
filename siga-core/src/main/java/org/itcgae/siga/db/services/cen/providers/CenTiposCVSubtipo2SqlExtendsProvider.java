@@ -73,7 +73,7 @@ public class CenTiposCVSubtipo2SqlExtendsProvider extends CenTiposcvsubtipo2SqlP
 		sql.SELECT("DISTINCT tiposCVSubt2.IDTIPOCV as IDTIPOCV");
 		sql.SELECT("tiposCVSubt2.IDTIPOCVSUBTIPO2 as IDTIPOCVSUBTIPO2");
 		sql.SELECT("tiposCVSubt2.CODIGOEXT as CODIGOEXTERNO");
-		sql.SELECT("catalogos.DESCRIPCION as DESCRIPCION");
+		sql.SELECT("INITCAP(catalogos.DESCRIPCION) as DESCRIPCION");
 		sql.SELECT("tiposCVSubt2.IDINSTITUCION as IDINSTITUCION");
 
 		sql.FROM("CEN_TIPOSCVSUBTIPO2 tiposCVSubt2");
@@ -92,7 +92,7 @@ public class CenTiposCVSubtipo2SqlExtendsProvider extends CenTiposcvsubtipo2SqlP
 			sql.WHERE("tiposCVSubt2.IDTIPOCV= '" + idTipoCV + "'");
 		}
 
-		sql.ORDER_BY("tiposCVSubt2.IDTIPOCVSUBTIPO2");
+		sql.ORDER_BY("DESCRIPCION");
 
 		return sql.toString();
 	}
