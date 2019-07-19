@@ -51,6 +51,7 @@ import org.itcgae.siga.db.entities.ModModeloPlantilladocumentoKey;
 import org.itcgae.siga.db.entities.ModPlantilladocConsulta;
 import org.itcgae.siga.db.entities.ModPlantilladocConsultaExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumento;
+import org.itcgae.siga.db.entities.ModPlantilladocumentoExample;
 import org.itcgae.siga.db.entities.ModPlantilladocumentoKey;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijo;
 import org.itcgae.siga.db.entities.ModRelPlantillaSufijoExample;
@@ -1132,19 +1133,23 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 
 					// Obtenemos el idPlantillaDocumento
 					String idPlantillaDoc = plantillaDoc.getIdPlantillaDocumento();
-					ModPlantilladocumentoKey modeloPlantillaKey = new ModPlantilladocumentoKey();
-					
-					modeloPlantillaKey.setIdioma(plantillaDoc.getIdIdioma());
-					modeloPlantillaKey.setIdplantilladocumento(Long.parseLong(idPlantillaDoc));
+					ModPlantilladocumentoExample modeloPlantillaKey = new ModPlantilladocumentoExample();
+					modeloPlantillaKey.createCriteria()
+					.andIdplantilladocumentoEqualTo(Long.parseLong(idPlantillaDoc))
+					.andIdiomaEqualTo(plantillaDoc.getIdIdioma());
+//					modeloPlantillaKey.setIdioma(plantillaDoc.getIdIdioma());
+//					modeloPlantillaKey.setIdplantilladocumento(Long.parseLong(idPlantillaDoc));
 //					ModPlantilladocumento modPlantillaDoc = modPlantillaDocumentoExtendsMapper
 //							.selectByPrimaryKey(modeloPlantillaKey);
 					
 					
-					ModPlantilladocumento plantillaDocumento = modPlantilladocumentoMapper
-							.selectByPrimaryKey(modeloPlantillaKey);
+					List<ModPlantilladocumento> plantillaDocumentoList = modPlantilladocumentoMapper
+							.selectByExample(modeloPlantillaKey);
 					
-					if (plantillaDocumento != null) {
+					if (plantillaDocumentoList != null  && plantillaDocumentoList.size() > 0 ) {
 
+						ModPlantilladocumento plantillaDocumento = plantillaDocumentoList.get(0);
+						
 						// OBtenemos la ruta de las plantillas
 						if (plantillaDoc.getIdClaseComunicacion() != null) {
 							modClase = _modClasecomunicacionesMapper

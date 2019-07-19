@@ -22,9 +22,9 @@ public class DataMailMergeDataSource implements IMailMergeDataSource{
      * @param nombreRegion 
      * @param lista: Vector de Hashtable con la información
      */
-    public DataMailMergeDataSource(String nombreRegion, List lista)
+    public DataMailMergeDataSource(String nombreRegion, List dato)
     {
-        this.lista = lista;
+        this.lista = dato;
         // When the data source is initialized, it must be positioned before the first record.
         mRecordIndex= -1;
         region = nombreRegion;
@@ -39,15 +39,15 @@ public class DataMailMergeDataSource implements IMailMergeDataSource{
     public boolean getValue(String fieldName,  Object[] fieldValue)
     {
     	HashMap registro = (HashMap)lista.get(mRecordIndex);
-    	if (registro.containsKey(fieldName)) {
-            fieldValue[0] = (String)registro.get(fieldName);
+    	if (registro.containsKey(fieldName) && registro.get(fieldName) != null) {
+            fieldValue[0] = registro.get(fieldName).toString();
             return true;
         }
         else
         {
             // A field with this name was not found,
             // return false to the Aspose.Words mail merge engine.
-            fieldValue[0] = null;
+            fieldValue[0] = "";
             return false;
         }
     }

@@ -50,7 +50,8 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 		
 		SQL sql = new SQL();
 		
-		sql.SELECT("IDPLANTILLAENVIOS AS VALUE, NOMBRE AS LABEL");
+		sql.SELECT("IDPLANTILLAENVIOS AS VALUE");
+		sql.SELECT("INITCAP(NOMBRE) AS LABEL");
 		
 		sql.FROM("ENV_PLANTILLASENVIOS");
 		

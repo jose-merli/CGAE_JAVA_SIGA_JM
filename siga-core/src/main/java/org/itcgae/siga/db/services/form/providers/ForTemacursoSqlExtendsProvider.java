@@ -10,14 +10,14 @@ public class ForTemacursoSqlExtendsProvider extends ForTemacursoSqlProvider {
 		SQL sql = new SQL();
 
 		sql.SELECT_DISTINCT("TC.IDTEMACURSO");
-		sql.SELECT("CAT.DESCRIPCION");
+		sql.SELECT("INITCAP(CAT.DESCRIPCION) AS DESCRIPCION");
 		sql.FROM("FOR_TEMACURSO TC");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON TC.DESCRIPCION = CAT.IDRECURSO");
 		sql.WHERE("CAT.IDLENGUAJE = '" + idLenguaje + "'");
 		sql.WHERE("TC.FECHABAJA IS NULL");
 		sql.WHERE("CAT.NOMBRETABLA = 'FOR_TEMACURSO'");
 		sql.WHERE("tc.idinstitucion ='" + idInstitucion + "'");
-		sql.ORDER_BY("CAT.DESCRIPCION");
+		sql.ORDER_BY("DESCRIPCION");
 
 		return sql.toString();
 

@@ -11,11 +11,11 @@ public class AgeEstadoeventosSqlExtendsProvider extends  AgeEstadoeventosSqlProv
 		SQL sql = new SQL();
 
 		sql.SELECT("estadoeventos.IDESTADOEVENTO");
-		sql.SELECT("rec.DESCRIPCION");
+		sql.SELECT("INITCAP(rec.DESCRIPCION) AS DESCRIPCION");
 		sql.FROM("AGE_ESTADOEVENTOS estadoeventos");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS rec ON (rec.IDRECURSO = estadoeventos.DESCRIPCION AND rec.IDLENGUAJE = '"
 				+ idLenguaje + "')");
-		sql.ORDER_BY("estadoeventos.IDESTADOEVENTO");
+		sql.ORDER_BY("DESCRIPCION");
 		
 		return sql.toString();
 		
