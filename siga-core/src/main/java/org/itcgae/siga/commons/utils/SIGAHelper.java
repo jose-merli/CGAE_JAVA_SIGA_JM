@@ -37,7 +37,7 @@ public class SIGAHelper {
 				}
 				Files.setPosixFilePermissions(file.toPath(), perms);
 			} catch (Exception e) {
-				LOGGER.warn("Error al cambiar los permisos del fichero " + file.getAbsolutePath(), e);
+				LOGGER.warn("Error al cambiar los permisos del fichero " + file.getAbsolutePath());
 			}
 			
 		}
