@@ -3,7 +3,6 @@ package org.itcgae.siga.commons.constants;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -845,11 +844,20 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 		PATH_DOCUMENTOSADJUNTOS
 	}
 	
-	public static String DATEST_FORMAT_MIN_SEC = "dd/MM/yyyy HH:mm";
+	public static String DATEST_FORMAT_MIN = "dd/MM/yyyy HH:mm";
+	public static String DATEST_FORMAT_MIN_SEC = "dd/MM/yyyy HH:mm:ss";
 
-	public static DateFormat DATE_FORMAT_MIN_SEC = new SimpleDateFormat(DATEST_FORMAT_MIN_SEC);
+	public static DateFormat DATE_FORMAT_MIN = new SimpleDateFormat(DATEST_FORMAT_MIN);
 	
-	public static String[] columnsExcelLogEnvios = new String[]{"ENVIO", "DESCRIPCION", "FECHA CREACION", "REMITENTE", "NIF/CIF", "NOMBRE", "APELLIDO 1", "APELLIDO 2", "FAX 1", "FAX 2", "MOVIL", "CORREO ELECTRONICO", "DOMICILIO", "PROVINCIA", "POBLACION", "PAIS", "MENSAJE", "DOCUMENTOS"};
+	public static String[] columnsExcelLogEnvios = new String[]{"ENVIO", "DESCRIPCION", "FECHA ENVÍO", "REMITENTE", "CORREO REMITENTE", "NIF/CIF", "NOMBRE", "APELLIDO 1", "APELLIDO 2", "MOVIL", "CORREO ELECTRONICO", "MENSAJE", "DOCUMENTOS"};
+
+	public static String ENVIOS_MASIVOS_LOG_NOMBRE_FICHERO = "informeEnvio.log";
+	public static enum ENVIOS_MASIVOS_LOG_EXTENSION {
+		xls,
+		xlsx
+	}
 	
+	public static String EXPRESION_REGULAR_MAIL = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,10}$";
+	public static String EXPRESION_REGULAR_MOVIL = "(\\+34|0034|34|\\(\\+34\\)|\\(0034\\)|34)?[ -]*(6|7)[ -]*([0-9][ -]*){8}";
 	
 }
