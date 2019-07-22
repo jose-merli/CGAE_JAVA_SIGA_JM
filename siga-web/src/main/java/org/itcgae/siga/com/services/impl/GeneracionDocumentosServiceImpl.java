@@ -144,7 +144,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		DatosDocumentoItem documento = new DatosDocumentoItem();
 		try {
 			if (doc != null) {
-
+				doc.removeMacros();
 				doc.save(pathfinal + nombrefichero);
 				archivo = new File(pathfinal + nombrefichero);
 				if (!archivo.exists())
