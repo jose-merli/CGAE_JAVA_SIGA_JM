@@ -355,15 +355,13 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			// sql.SET("FECHAPRESENTACION = "+record.getFechapresentacion()+"");
 			String fechaF = dateFormat.format(record.getFechapresentacion());
 			sql.SET("FECHAPRESENTACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-		} else {
-			sql.SET("FECHAPRESENTACION = " + record.getFechapresentacion() + "");
 		}
+		
 		if (record.getFechaincorporacion() != null) {
 			String fechaF = dateFormat.format(record.getFechaincorporacion());
 			sql.SET("FECHAINCORPORACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-		} else {
-			sql.SET("FECHAINCORPORACION = " + record.getFechaincorporacion() + "");
 		}
+
 		if (record.getIndtitulacion() != null) {
 			sql.SET("INDTITULACION = " + record.getIndtitulacion() + "");
 		}
