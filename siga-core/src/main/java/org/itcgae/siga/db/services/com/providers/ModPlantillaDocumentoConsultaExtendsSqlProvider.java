@@ -16,7 +16,7 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		sql.FROM("MOD_PLANTILLADOC_CONSULTA plantilla");	
 		sql.INNER_JOIN("CON_CONSULTA consulta ON consulta.IDCONSULTA = plantilla.IDCONSULTA AND consulta.IDINSTITUCION = plantilla.IDINSTITUCION_CONSULTA");
 		
-		sql.WHERE("plantilla.IDMODELOCOMUNICACION = " + idModeloComunicacion + " AND plantilla.IDPLANTILLADOCUMENTO = " + idPlantillaDocumento + " AND plantilla.IDINSTITUCION = " + idInstitucion);
+		sql.WHERE("plantilla.IDMODELOCOMUNICACION = " + idModeloComunicacion + " AND plantilla.IDPLANTILLADOCUMENTO = " + idPlantillaDocumento);// + " AND plantilla.IDINSTITUCION = " + idInstitucion);
 				
 		if(!historico){
 			sql.WHERE("plantilla.FECHABAJA IS NULL");
@@ -67,9 +67,9 @@ public class ModPlantillaDocumentoConsultaExtendsSqlProvider {
 		sql.SELECT("con_consulta.IDINSTITUCION");
 		sql.SELECT("plantillaConsulta.REGION");
 		
-		sql.FROM(" MOD_PLANTILLADOC_CONSULTA plantillaConsulta");	
-		sql.INNER_JOIN(" con_consulta ON con_consulta.idconsulta=plantillaConsulta.Idconsulta AND con_consulta.idinstitucion = plantillaConsulta.Idinstitucion_consulta");
-		sql.WHERE(" plantillaConsulta.IDPLANTILLADOCUMENTO IN (" + idPlantillaDocumento +") AND plantillaConsulta.IDMODELOCOMUNICACION = " + idModeloComunicacion);// + " AND plantillaConsulta.IDINSTITUCION = " + idInstitucion);
+		sql.FROM("MOD_PLANTILLADOC_CONSULTA plantillaConsulta");	
+		sql.INNER_JOIN("con_consulta ON con_consulta.idconsulta=plantillaConsulta.Idconsulta AND con_consulta.idinstitucion = plantillaConsulta.Idinstitucion_consulta");
+		sql.WHERE("plantillaConsulta.IDPLANTILLADOCUMENTO IN (" + idPlantillaDocumento +") AND plantillaConsulta.IDMODELOCOMUNICACION = " + idModeloComunicacion);// + " AND plantillaConsulta.IDINSTITUCION_CONSULTA = " + idInstitucion);
 		sql.WHERE("con_consulta.idobjetivo = " + idObjetivo);
 		sql.WHERE("plantillaConsulta.FECHABAJA IS NULL");
 		

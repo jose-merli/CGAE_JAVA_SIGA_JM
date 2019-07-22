@@ -249,7 +249,7 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		SQL sql = new SQL();
 
 		sql.SELECT_DISTINCT("CAL.IDCALIFICACION");
-		sql.SELECT("CAT.DESCRIPCION");
+		sql.SELECT("INITCAP(CAT.DESCRIPCION) AS DESCRIPCION");
 
 		sql.FROM("FOR_CALIFICACIONES CAL");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS CAT ON CAL.DESCRIPCION = CAT.IDRECURSO");
@@ -258,7 +258,7 @@ public class ForInscripcionSqlExtendsProvider extends ForInscripcionSqlProvider 
 		sql.WHERE("CAL.FECHABAJA IS NULL");
 		sql.WHERE("CAT.NOMBRETABLA = 'FOR_CALIFICACIONES'");
 
-		sql.ORDER_BY("CAT.DESCRIPCION");
+		sql.ORDER_BY("DESCRIPCION");
 
 		return sql.toString();
 	}

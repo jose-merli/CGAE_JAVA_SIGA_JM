@@ -13,6 +13,7 @@ import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.RemitenteDTO;
+import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.com.services.IColaEnvios;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
@@ -494,10 +495,10 @@ public class ColaEnviosImpl implements IColaEnvios {
 							if(!añadido){
 								destinatario = new DestinatarioItem();
 								añadido = true;
-								LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + destinatarios.toString());
+//								LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + destinatarios.toString());
 							}
 						}
-						
+
 						if((SigaConstants.ID_ENVIO_SMS.equals(envio.getIdtipoenvios()) || SigaConstants.ID_ENVIO_BURO_SMS.equals(envio.getIdtipoenvios())) && dir.getMovil() != null) {
 							if(!añadido){
 								destinatario = new DestinatarioItem();
@@ -517,8 +518,101 @@ public class ColaEnviosImpl implements IColaEnvios {
 							destinatarios.add(destinatario);
 						}
 						
+						insertaEnvDestinatarios(envio, dir, persona);
 					}
 				}
+			}
+		}
+	}
+	
+	protected void insertaEnvDestinatarios(EnvEnvios etiquetasDTO, CenDirecciones direccion, CenGruposclienteCliente cenPersona) {
+		
+		EnvDestinatariosExample ejemplo = new EnvDestinatariosExample();
+		ejemplo.createCriteria().andIdinstitucionEqualTo(cenPersona.getIdinstitucion())
+				.andIdenvioEqualTo(etiquetasDTO.getIdenvio())
+				.andIdpersonaEqualTo(cenPersona.getIdpersona());
+		List<EnvDestinatarios> destinatariosExistentes = _envDestinatariosMapper
+				.selectByExample(ejemplo);
+
+//		LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + cenPersona.getNifcif() + "  IDGRUPO = " + etiquetasDTO.getEtiquetasSeleccionadas()[i].getValue());
+		if (destinatariosExistentes.size() > 0) {
+			try {
+				CenPersona personaTag = _cenPersonaMapper
+						.selectByPrimaryKey(cenPersona.getIdpersona());
+				CenDireccionesKey key = new CenDireccionesKey();
+				key.setIddireccion(direccion.getIddireccion());
+				key.setIdpersona(cenPersona.getIdpersona());
+				key.setIdinstitucion(cenPersona.getIdinstitucion());
+				CenDirecciones dir = _cenDireccionesMapper.selectByPrimaryKey(key);
+				EnvDestinatarios dest = new EnvDestinatarios();
+				dest.setApellidos1(personaTag.getApellidos1());
+				dest.setApellidos2(personaTag.getApellidos2());
+				if(dir != null) {
+				if(dir.getCodigopostal() != null) dest.setCodigopostal(dir.getCodigopostal());
+				dest.setCorreoelectronico(dir.getCorreoelectronico());
+				dest.setDomicilio(dir.getDomicilio());
+				dest.setFax1(dir.getFax1());
+				dest.setFax2(dir.getFax2());
+				dest.setFechamodificacion(new Date());
+				dest.setIdenvio(etiquetasDTO.getIdenvio());
+				dest.setIdinstitucion(cenPersona.getIdinstitucion());
+				dest.setOrigendestinatario(Short.parseShort("1"));
+				dest.setIdpais(dir.getIdpais());
+				dest.setIdpersona(personaTag.getIdpersona());
+				dest.setIdpoblacion(dir.getIdpoblacion());
+				dest.setIdprovincia(dir.getIdprovincia());
+				dest.setMovil(dir.getMovil());
+				dest.setNifcif(personaTag.getNifcif());
+				dest.setNombre(personaTag.getNombre());
+				dest.setPoblacionextranjera(dir.getPoblacionextranjera());
+				dest.setUsumodificacion(2);
+				dest.setTipodestinatario("CEN_PERSONA");
+				_envDestinatariosMapper.updateByExample(dest, ejemplo);
+//				LOGGER.info("PRUEBA ENVIOS ETIQUETAS UPDATE");
+//				respuesta.setCode(200);
+//				respuesta.setDescription("Destinatario asociado con éxito");
+				}
+			} catch (Exception e) {
+				LOGGER.error(e);
+			}
+		} else {
+			try {
+				CenPersona personaTag = _cenPersonaMapper
+						.selectByPrimaryKey(cenPersona.getIdpersona());
+				CenDireccionesKey key = new CenDireccionesKey();
+				key.setIddireccion(direccion.getIddireccion());
+				key.setIdpersona(cenPersona.getIdpersona());
+				key.setIdinstitucion(cenPersona.getIdinstitucion());
+				CenDirecciones dir = _cenDireccionesMapper.selectByPrimaryKey(key);
+				EnvDestinatarios dest = new EnvDestinatarios();
+				dest.setApellidos1(personaTag.getApellidos1());
+				dest.setApellidos2(personaTag.getApellidos2());
+				if(dir != null) {
+				if(dir.getCodigopostal() != null) dest.setCodigopostal(dir.getCodigopostal());
+				dest.setCorreoelectronico(dir.getCorreoelectronico());
+				dest.setDomicilio(dir.getDomicilio());
+				dest.setFax1(dir.getFax1());
+				dest.setFax2(dir.getFax2());
+				dest.setFechamodificacion(new Date());
+				dest.setIdenvio(etiquetasDTO.getIdenvio());
+				dest.setIdinstitucion(cenPersona.getIdinstitucion());
+				dest.setOrigendestinatario(Short.parseShort("1"));
+				dest.setIdpais(dir.getIdpais());
+				dest.setIdpersona(personaTag.getIdpersona());
+				dest.setIdpoblacion(dir.getIdpoblacion());
+				dest.setIdprovincia(dir.getIdprovincia());
+				dest.setMovil(dir.getMovil());
+				dest.setNifcif(personaTag.getNifcif());
+				dest.setNombre(personaTag.getNombre());
+				dest.setPoblacionextranjera(dir.getPoblacionextranjera());
+				dest.setUsumodificacion(2);
+				dest.setTipodestinatario("CEN_PERSONA");
+//				LOGGER.info("PRUEBA ENVIOS ETIQUETAS INSERT");
+				_envDestinatariosMapper.insert(dest);
+//				respuesta.setDescription("Destinatario asociado con éxito");
+				}
+			} catch (Exception e) {
+				LOGGER.error(e);
 			}
 		}
 	}
@@ -560,9 +654,6 @@ public class ColaEnviosImpl implements IColaEnvios {
             			campo = map.get("IDPERSONA");
             			destinatario.setIdPersona(campo!=null? String.valueOf(campo):"");
             			
-            			
-            			
-            			
             			Long idPersona = null;
             			if (destinatario.getIdPersona() != null && !destinatario.getIdPersona().trim().equals("")) {
             				idPersona = Long.parseLong(destinatario.getIdPersona());
@@ -582,6 +673,22 @@ public class ColaEnviosImpl implements IColaEnvios {
             			
             			//si la consulta tiene movil idpersona e idinstitucion se añade		            			
             			addDestBuroSMS(isBuroSMS, listEnvDestinatariosBurosms, envio.getIdenvio(), envio.getIdinstitucion(), idPersona, destinatario.getMovil());
+
+	    				//Obtenemos la persona
+	    				CenPersona cenPersona = _cenPersonaMapper.selectByPrimaryKey(Long.parseLong(String.valueOf(map.get("IDPERSONA"))));
+	    				
+	    					//Creamos la persona con CenGruposclienteCliente que es como lo va a uar insertaEnvDestinatarios().
+	    				CenGruposclienteCliente persona = new CenGruposclienteCliente();
+	    				persona.setIdpersona(cenPersona.getIdpersona());
+	    				persona.setIdinstitucion(Short.parseShort(String.valueOf(map.get("IDINSTITUCION"))));
+	    				
+	    				//Buscamos las direcciones de esa persona
+	    				CenDireccionesExample exampleDir = new CenDireccionesExample();
+	    				
+	    				//Obtenemos la direccion preferente de la persona
+	    				exampleDir.createCriteria().andIdpersonaEqualTo(Long.parseLong(String.valueOf(map.get("IDPERSONA")))).andIdinstitucionEqualTo(Short.parseShort(String.valueOf(map.get("IDINSTITUCION")))).andFechabajaIsNull().andPreferenteLike("%" + SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO + "%");
+	    				List<CenDirecciones> direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
+	    				if(direcciones.size() > 0) insertaEnvDestinatarios(envio, direcciones.get(0), persona);
 					}
 				}
 			}

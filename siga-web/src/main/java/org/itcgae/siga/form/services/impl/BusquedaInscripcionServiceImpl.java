@@ -3,6 +3,7 @@ package org.itcgae.siga.form.services.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -219,15 +220,20 @@ public class BusquedaInscripcionServiceImpl implements IBusquedaInscripcionServi
 						"getCalificacionesEmitidas() / forEstadoInscripcionExtendsMapper.getCalificacionesEmitidas -> Salida de forEstadoInscripcionExtendsMapper para obtener las diferentes calificaciones");
 
 				// TODO Quitar en un futuro
-				ComboItem comboItem = new ComboItem();
-				comboItem.setLabel("Todos");
-				comboItem.setValue("-1");
-				comboItems.add(0, comboItem);
-
+				
 				ComboItem comboItem1 = new ComboItem();
 				comboItem1.setLabel("Sin calificación");
 				comboItem1.setValue("-2");
-				comboItems.add(0, comboItem1);
+				comboItems.add(comboItem1);
+				
+				ComboItem comboItem = new ComboItem();
+				comboItem.setLabel("Todos");
+				comboItem.setValue("-1");
+				comboItems.add(comboItem);
+
+				
+				
+				
 			}
 		}
 

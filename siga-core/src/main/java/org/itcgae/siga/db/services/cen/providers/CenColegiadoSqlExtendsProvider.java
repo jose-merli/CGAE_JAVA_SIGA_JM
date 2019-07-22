@@ -355,15 +355,13 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			// sql.SET("FECHAPRESENTACION = "+record.getFechapresentacion()+"");
 			String fechaF = dateFormat.format(record.getFechapresentacion());
 			sql.SET("FECHAPRESENTACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-		} else {
-			sql.SET("FECHAPRESENTACION = " + record.getFechapresentacion() + "");
 		}
+		
 		if (record.getFechaincorporacion() != null) {
 			String fechaF = dateFormat.format(record.getFechaincorporacion());
 			sql.SET("FECHAINCORPORACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-		} else {
-			sql.SET("FECHAINCORPORACION = " + record.getFechaincorporacion() + "");
 		}
+
 		if (record.getIndtitulacion() != null) {
 			sql.SET("INDTITULACION = " + record.getIndtitulacion() + "");
 		}
@@ -530,14 +528,14 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 		SQL sql = new SQL();
 		sql.SELECT("distinct MAX(GRUCLI.IDGRUPO) AS IDGRUPO");
-		sql.SELECT("GENR.DESCRIPCION");
+		sql.SELECT("INITCAP(GENR.DESCRIPCION) as DESCRIPCION");
 		sql.SELECT("GRUCLI.IDINSTITUCION");
 		sql.FROM("cen_gruposcliente GRUCLI");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS GENR on GRUCLI.NOMBRE = GENR.IDRECURSO");
 		sql.WHERE("GRUCLI.IDINSTITUCION in ('2000', '" + usuario.getIdinstitucion() + "')");
 		sql.WHERE("GENR.IDLENGUAJE = '" + usuario.getIdlenguaje() + "'");
 		sql.GROUP_BY("GENR.DESCRIPCION, GRUCLI.IDINSTITUCION");
-		sql.ORDER_BY("GENR.DESCRIPCION");
+		sql.ORDER_BY("DESCRIPCION");
 
 		return sql.toString();
 	}

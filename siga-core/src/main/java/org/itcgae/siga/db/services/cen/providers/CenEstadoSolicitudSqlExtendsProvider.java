@@ -9,8 +9,9 @@ public class CenEstadoSolicitudSqlExtendsProvider {
 		SQL sql = new SQL();
 		
 		sql.SELECT("E.IDESTADO AS VALUE");
-		sql.SELECT("F_SIGA_GETRECURSO(DESCRIPCION," + idLenguage +") AS LABEL");
+		sql.SELECT("INITCAP(F_SIGA_GETRECURSO(DESCRIPCION," + idLenguage +")) AS LABEL");
 		sql.FROM("CEN_ESTADOSOLICITUD E");
+		sql.ORDER_BY("LABEL");
 		
 		return sql.toString();
 	}
