@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
@@ -14,6 +15,7 @@ import org.itcgae.siga.DTOs.com.ConsultaDestinatarioItem;
 import org.itcgae.siga.DTOs.com.ConsultasDTO;
 import org.itcgae.siga.DTOs.com.DestinatarioIndvEnvioMasivoItem;
 import org.itcgae.siga.DTOs.com.DestinatariosDTO;
+import org.itcgae.siga.DTOs.com.DialogoComunicacionItem;
 import org.itcgae.siga.DTOs.com.DocumentosEnvioDTO;
 import org.itcgae.siga.DTOs.com.EnvioProgramadoDto;
 import org.itcgae.siga.DTOs.com.EnviosMasivosDTO;
@@ -25,7 +27,9 @@ import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.FileInfoDTO;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
+import org.itcgae.siga.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -259,6 +263,69 @@ public class EnviosMasivosController {
 		headers.add("Expires", "0");
 		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + documentoDTO.getNombreDocumento() + "\"");
 //		System.out.println("The length of the file is : "+file.length());
+		  
+		return ResponseEntity.ok().headers(headers).contentLength(contentLength).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
+    }
+	
+	@RequestMapping(value = "/detalle/nombreFicheroLog",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<FileInfoDTO> nombreFicheroLog(@RequestBody ResponseDocumentoDTO documentoDTO) {
+		
+		FileInfoDTO fileInfoDTO = new FileInfoDTO();
+		
+		File file = null;
+		
+		File[] files = _enviosMasivosService.getFicherosLOGEnvioMasivo(documentoDTO.getIdInstitucion(), Long.valueOf(documentoDTO.getIdEnvio()));
+		if (files != null) {
+			for (int i = 0; i < files.length; i++) {
+				if (files[i] != null && files[i].exists()) {
+					file = files[i];
+				}
+			}
+		}
+		
+		if (file == null || !file.exists()) {
+			throw new BusinessException("El fichero de log no existe");
+		}
+		
+		if(file != null) {
+			fileInfoDTO.setFilePath(file.getAbsolutePath());
+			fileInfoDTO.setName(file.getName());
+			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.OK);
+		}else {
+			return new ResponseEntity<FileInfoDTO>(fileInfoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value="/detalle/descargarLog", method=RequestMethod.POST, produces=MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<Resource> descargarLog(@RequestBody ResponseDocumentoDTO documentoDTO) throws Exception{
+            
+		HttpHeaders headers = null;
+		File file = null;
+		Resource resource = null;  
+		long contentLength = -1;
+		
+		
+		File[] files = _enviosMasivosService.getFicherosLOGEnvioMasivo(documentoDTO.getIdInstitucion(), Long.valueOf(documentoDTO.getIdEnvio()));
+		if (files != null) {
+			for (int i = 0; i < files.length; i++) {
+				if (files[i] != null && files[i].exists()) {
+					file = files[i];
+				}
+			}
+		}
+		
+		if (file == null || !file.exists()) {
+			throw new BusinessException("El fichero de log no existe");
+		}
+		resource = new InputStreamResource(new FileInputStream(file)); 
+		contentLength = file.length();
+		
+			  
+		headers = new HttpHeaders();
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Expires", "0");
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"");
 		  
 		return ResponseEntity.ok().headers(headers).contentLength(contentLength).contentType(MediaType.parseMediaType("application/octet-stream")).body(resource);
     }

@@ -274,7 +274,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		            			} else if (campo instanceof Date) {
 		            				celda.setCellType(Cell.CELL_TYPE_STRING);
 		            				cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
-									XSSFRichTextString textCell = new XSSFRichTextString(SigaConstants.DATE_FORMAT_MIN_SEC.format(campo));
+									XSSFRichTextString textCell = new XSSFRichTextString(SigaConstants.DATE_FORMAT_MIN.format(campo));
 									celda.setCellValue(textCell);
 									celda.setCellStyle(cellStyle);
 								} else {

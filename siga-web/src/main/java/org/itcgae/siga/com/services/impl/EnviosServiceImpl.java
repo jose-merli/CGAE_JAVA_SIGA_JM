@@ -1,6 +1,7 @@
 package org.itcgae.siga.com.services.impl;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -36,11 +37,14 @@ import javax.mail.internet.PreencodedMimeBodyPart;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.itcgae.siga.DTOs.cen.StringDTO;
@@ -50,8 +54,6 @@ import org.itcgae.siga.DTOs.com.RemitenteDTO;
 import org.itcgae.siga.com.services.IEnviosMasivosService;
 import org.itcgae.siga.com.services.IEnviosService;
 import org.itcgae.siga.commons.constants.SigaConstants;
-import org.itcgae.siga.commons.constants.SigaConstants.FORMATO_SALIDA;
-import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.itcgae.siga.db.entities.CenDirecciones;
 import org.itcgae.siga.db.entities.EnvEnvios;
 import org.itcgae.siga.db.entities.EnvEnviosKey;
@@ -194,8 +196,6 @@ public class EnviosServiceImpl implements IEnviosService{
 	            prop.put("mail.smtp.pwd", pwd);
 	            prop.put("mail.smtp.auth", "true");
 	            
-//	            Session sesion = Session.getInstance(prop); 
-	            
 	            Session sesion = Session.getInstance(prop,
 	                    new javax.mail.Authenticator() {
 	                       protected PasswordAuthentication getPasswordAuthentication() {
@@ -204,23 +204,29 @@ public class EnviosServiceImpl implements IEnviosService{
 	                       }
 	                    });
 	            
-	            
-	            
-//	            tr = sesion.getTransport("smtp");
+	            String documentosAdjuntos = null;
                 
                 
-                for (DestinatarioItem destinatario : destinatarios) {
+	            for (DestinatarioItem destinatario : destinatarios) {
                     try {
                     
                         String sTo = destinatario.getCorreoElectronico();
                         
                         if (from == null || from.trim().equals("")) {
-                            throw new BusinessException("No existe email de remitente");
+                            throw new BusinessException("ERROR: El remitente no tiene dirección de correo electrónico");
                         }
                         
                         if (sTo == null || sTo.trim().equals("")) {
-                            throw new BusinessException("El destinatario no tiene correo electrónico");
+                        	throw new BusinessException("ERROR: El destinatario no tiene dirección de correo electrónico");
                         }
+                        
+                      //TODO
+                        
+                        //public static final 
+                       Pattern EXPRESION_REGULAR_PATTERN_MAIL = Pattern.compile(SigaConstants.EXPRESION_REGULAR_MAIL, Pattern.CASE_INSENSITIVE);
+                       if (!EXPRESION_REGULAR_PATTERN_MAIL.matcher(sTo).matches()) {
+                    	   throw new BusinessException("ERROR: El destinatario no tiene dirección de correo electrónico válida");
+                       }
         
                         LOGGER.debug("Enviamos el email a: " + sTo);
                         LOGGER.debug("Enviamos desde: " + from);
@@ -271,7 +277,7 @@ public class EnviosServiceImpl implements IEnviosService{
                         
                         sCuerpo = adjuntaImagenBase64(mixedMultipart, sCuerpo);
                         
-                        adjuntaDocumentos(mixedMultipart, documentosEnvio, idEnvio, idInstitucion);
+                        documentosAdjuntos = adjuntaDocumentos(mixedMultipart, documentosEnvio, idEnvio, idInstitucion);
                         
                         //alternative message
                         BodyPart messageBodyPart = new MimeBodyPart();
@@ -292,29 +298,17 @@ public class EnviosServiceImpl implements IEnviosService{
                         Transport.send(mensaje, mensaje.getAllRecipients());
                         LOGGER.debug("Enviado");
                         
-                        insertaExcelRow(envEnvio, sheet, destinatario, "OK");
+                        insertaExcelRow(envEnvio, sheet, from, descFrom, documentosAdjuntos, destinatario, "OK");
                     } catch (BusinessException e) {
                         LOGGER.warn(e);
-                        insertaExcelRow(envEnvio, sheet, destinatario, e.getMessage());
+                        insertaExcelRow(envEnvio, sheet, from, descFrom, documentosAdjuntos, destinatario, e.getMessage());
                     } catch(Exception e) {
                         LOGGER.error("Error al enviar el email", e);
-                        insertaExcelRow(envEnvio, sheet, destinatario, "KO");
+                        insertaExcelRow(envEnvio, sheet, from, descFrom, documentosAdjuntos, destinatario, "ERROR");
                     }
                 }
                 
-                if (sheet != null) {
-                    String path = _enviosMasivosService.getPathFicheroEnvioMasivo(envEnvio.getIdinstitucion(), envEnvio.getIdenvio());
-                    File file = new File(path, "log");
-                    file.mkdirs();
-                    SIGAHelper.addPerm777(file);
-                    file = new File(file, envEnvio.getIdenvio() + "." + FORMATO_SALIDA.XLS.getDescripcion());
-                    
-                    FileOutputStream fileOut = new FileOutputStream(file);
-                    sheet.getWorkbook().write(fileOut);
-                    fileOut.close();
-                    sheet.getWorkbook().close();
-                    
-                }
+                writeCloseLogFile(envEnvio.getIdinstitucion(), envEnvio.getIdenvio(), sheet);
                 
             }
 
@@ -327,9 +321,45 @@ public class EnviosServiceImpl implements IEnviosService{
 
     }
 
-    private void insertaExcelRow(EnvEnvios envEnvio, Sheet sheet, DestinatarioItem destinatario, String mensaje) {
+    private void writeCloseLogFile(Short idinstitucion, Long idenvio, Sheet sheet) {
+    	if (sheet != null) {
+    		
+    		try {
+    		
+	    		for(int i = 0; i < SigaConstants.columnsExcelLogEnvios.length; i++) {
+	                sheet.autoSizeColumn(i);
+	            }
+	    		
+	            File file = _enviosMasivosService.getPathFicheroLOGEnvioMasivo(idinstitucion, idenvio);
+	            
+	            FileOutputStream fileOut = new FileOutputStream(file);
+	            
+	            LOGGER.debug("Cerrando fichero... " + file.getAbsoluteFile());
+				
+	            sheet.getWorkbook().write(fileOut);
+	            fileOut.flush();
+	            fileOut.close();
+	            sheet.getWorkbook().close();
+	            
+	            LOGGER.debug("Fichero creado... " + file.getAbsoluteFile());
+            
+			} catch (Exception e) {
+				LOGGER.error(e);
+			}
+    	}
+	}
+
+	private void insertaExcelRow(EnvEnvios envEnvio, Sheet sheet, String from, String descFrom, String documentosAdjuntos, DestinatarioItem destinatarioItem, String mensaje) {
+		
         if (sheet != null) {
             Row row = sheet.createRow(sheet.getLastRowNum()+1);
+            
+            
+            CellStyle cellStyle = sheet.getWorkbook().createCellStyle();
+    	    CreationHelper createHelper = sheet.getWorkbook().getCreationHelper();
+    	    short dateFormat = createHelper.createDataFormat().getFormat(SigaConstants.DATEST_FORMAT_MIN_SEC);
+    	    cellStyle.setDataFormat(dateFormat);
+    	    
             
             for(int i = 0; i < SigaConstants.columnsExcelLogEnvios.length; i++) {
                 Cell cell = row.createCell(i);
@@ -340,53 +370,41 @@ public class EnviosServiceImpl implements IEnviosService{
                 case 1://DESCRIPCION
                     cell.setCellValue(envEnvio.getDescripcion());
                     break;
-                case 2://FECHA CREACION
-                    rellenaCelda(sheet.getWorkbook(), cell, envEnvio.getFecha());
+                case 2://FECHA ENVÍO
+                    cell.setCellValue(Calendar.getInstance());
+            	    cell.setCellStyle(cellStyle);
                     break;
                 case 3://REMITENTE
-//                    cell.setCellValue(.getFecha());TODO
+                    cell.setCellValue(descFrom);
                     break;
-                case 4://NIF/CIF
-                    cell.setCellValue(destinatario.getNIFCIF());
+                case 4://CORREO REMITENTE
+                	cell.setCellValue(from);
+                	break;
+                case 5://NIF/CIF
+                    cell.setCellValue(destinatarioItem.getNIFCIF());
                     break;
-                case 5://NOMBRE
-                    cell.setCellValue(destinatario.getNombre());
+                case 6://NOMBRE
+                    cell.setCellValue(destinatarioItem.getNombre());
                     break;
-                case 6://APELLIDO 1
-                    cell.setCellValue(destinatario.getApellidos1());
+                case 7://APELLIDO 1
+                    cell.setCellValue(destinatarioItem.getApellidos1());
                     break;
-                case 7://APELLIDO 2
-                    cell.setCellValue(destinatario.getApellidos2());
+                case 8://APELLIDO 2
+                    cell.setCellValue(destinatarioItem.getApellidos2());
                     break;
-                case 8://FAX 1
-//                    cell.setCellValue(destinatario.getFax1());//TODO
+                case 9://MOVIL
+                    cell.setCellValue(destinatarioItem.getMovil());
                     break;
-                case 9://FAX 2
-//                    cell.setCellValue(destinatario.getFax2());//TODO
+                case 10://CORREO ELECTRONICO
+                    cell.setCellValue(destinatarioItem.getCorreoElectronico());
                     break;
-                case 10://MOVIL
-                    cell.setCellValue(destinatario.getMovil());
-                    break;
-                case 11://CORREO ELECTRONICO
-                    cell.setCellValue(destinatario.getCorreoElectronico());
-                    break;
-                case 12://DOMICILIO
-                    cell.setCellValue(destinatario.getDomicilio());
-                    break;
-                case 13://PROVINCIA
-//                    cell.setCellValue(destinatario.getProvincia());
-                    break;
-                case 14://POBLACION    
-//                    cell.setCellValue(destinatario.getPoblacion());
-                    break;
-                case 15://PAIS    
-//                    cell.setCellValue(destinatario.getPais());
-                    break;
-                case 16://MENSAJE    
+                case 11://MENSAJE    
                     cell.setCellValue(mensaje);
                     break;
-                case 17://DOCUMENTOS
-//                    cell.setCellValue(documentos);
+                case 12://DOCUMENTOS
+                	if (documentosAdjuntos != null) {
+                		cell.setCellValue(documentosAdjuntos);	
+                	}
                     break;
                 default:
                     break;
@@ -408,7 +426,7 @@ public class EnviosServiceImpl implements IEnviosService{
         } else if (campo instanceof Date) {
             celda.setCellType(Cell.CELL_TYPE_STRING);
             cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
-            XSSFRichTextString textCell = new XSSFRichTextString(SigaConstants.DATE_FORMAT_MIN_SEC.format(campo));
+            XSSFRichTextString textCell = new XSSFRichTextString(SigaConstants.DATE_FORMAT_MIN.format(campo));
             celda.setCellValue(textCell);
             celda.setCellStyle(cellStyle);
         } else {
@@ -420,20 +438,31 @@ public class EnviosServiceImpl implements IEnviosService{
         }
     }
 
-    private Sheet creaLogExcel(EnvEnvios envEnvio) throws IOException {
+    private Sheet creaLogExcel(EnvEnvios envEnvio) throws IOException, InvalidFormatException {
         Sheet sheet = null;
         if (envEnvio != null) {
-            Workbook workbook = new XSSFWorkbook();
-            sheet = workbook.createSheet();
-            Row headerRow = sheet.createRow(0);
-            
-            int index = 0;
-            
-            for(String value : SigaConstants.columnsExcelLogEnvios) {
-                Cell cell = headerRow.createCell(index++);
-                cell.setCellValue(value);
-//                cell.setCellStyle(headerCellStyle);
-            }
+        	Workbook workbook = null;
+        	File file = _enviosMasivosService.getPathFicheroLOGEnvioMasivo(envEnvio.getIdinstitucion(), envEnvio.getIdenvio());
+        	
+        	if (file != null && file.exists()) {
+        		LOGGER.info("El fichero de log ya existe por tanto cargamos el excel: " + file.getAbsolutePath());
+        		FileInputStream fip = new FileInputStream(file);
+        		workbook = WorkbookFactory.create(fip);
+        		sheet = workbook.getSheetAt(0);
+        	} else {
+        		LOGGER.info("Creamos un nuevo excel para el log");
+        		workbook = new XSSFWorkbook();
+        		sheet = workbook.createSheet();
+                Row headerRow = sheet.createRow(0);
+                
+                int index = 0;
+                
+                for(String value : SigaConstants.columnsExcelLogEnvios) {
+                    Cell cell = headerRow.createCell(index++);
+                    cell.setCellValue(value);
+//                    cell.setCellStyle(headerCellStyle);
+                }
+        	}
             
         }
         return sheet;
@@ -459,8 +488,10 @@ public class EnviosServiceImpl implements IEnviosService{
         return destinatariosCopia;
     }
 
-    private void adjuntaDocumentos(MimeMultipart mixedMultipart, List<DatosDocumentoItem> documentosEnvio, String idEnvio, String idInstitucion) throws MessagingException, IOException {
+    private String adjuntaDocumentos(MimeMultipart mixedMultipart, List<DatosDocumentoItem> documentosEnvio, String idEnvio, String idInstitucion) throws MessagingException, IOException {
+    	String listaDocumentos = null;
         if (documentosEnvio != null) {
+        	listaDocumentos = "";
             //Adjuntamos los informes adjuntos.
             for (DatosDocumentoItem informe : documentosEnvio) {
                 File file = informe.getDocumentoFile();
@@ -478,14 +509,22 @@ public class EnviosServiceImpl implements IEnviosService{
                 BodyPart messageBodyPart = new MimeBodyPart();
                 
                 messageBodyPart.setDataHandler(new DataHandler(ds));
-                messageBodyPart.setFileName(truncarFileName(MimeUtility.encodeText(informe.getFileName())));
+                String fileName = truncarFileName(MimeUtility.encodeText(informe.getFileName()));
+                messageBodyPart.setFileName(fileName);
                 messageBodyPart.setDisposition(MimePart.ATTACHMENT);
 //                mimeBodyPart.attachFile(file);
                 mixedMultipart.addBodyPart(messageBodyPart);
+                
+                if (listaDocumentos.length() == 0) {
+                	listaDocumentos = informe.getFileName();
+                } else {
+                	listaDocumentos += ", " + informe.getFileName();
+                }
             }
             
-//            System.setProperty("mail.mime.encodeparameters", "false");
+            
         }
+        return listaDocumentos;
     }
 
     private static String truncarFileName(String fileName) {
@@ -573,7 +612,7 @@ public class EnviosServiceImpl implements IEnviosService{
     }
 
     @Override
-    public String envioSMS(CenDirecciones remitente, String[] destinatarios, Short idInstitucion, String texto, boolean esBuroSMS) {
+    public String envioSMS(CenDirecciones remitente, List<DestinatarioItem> listEnvDestinatarios, EnvEnvios envEnvio, String texto, boolean esBuroSMS) {
         
         EnviarSMSResponse response = null;
         String respuesta = null;
@@ -588,9 +627,19 @@ public class EnviosServiceImpl implements IEnviosService{
         GenParametros property = _genParametrosMapper.selectByPrimaryKey(keyParam);
         String uriService = property.getValor();
         String idSolicidudEcos = "";
+        List<DestinatarioItem> listCorrectos = null;
+        
+        Sheet sheet = null;
+        
+        String from = null;
+        String descFrom = null;
+        
+        
         try {
             
-            LOGGER.debug("EnviosServiceImpl.envioSMS :: Se envia SMS a: " + destinatarios);
+//            LOGGER.debug("EnviosServiceImpl.envioSMS :: Se envia SMS a: " + destinatarios);
+        	
+        	sheet = creaLogExcel(envEnvio);
             
             //Instanciamos la peticion
             SolicitudEnvioSMS request = SolicitudEnvioSMS.Factory.newInstance();
@@ -600,35 +649,18 @@ public class EnviosServiceImpl implements IEnviosService{
             String idECOS = property.getValor();
             request.setIdClienteECOS(idECOS);
             
-            if (idInstitucion == null) {
-                String error = "Para enviar un correo se debe informar del colegio";
+            if (envEnvio == null || envEnvio.getIdinstitucion() == null || envEnvio.getIdenvio() == null) {
+                String error = "Para enviar un correo se debe informar del envEnvio";
                 LOGGER.error(error);
                 throw new BusinessException(error);
             }
             
-            request.setIdColegio(idInstitucion.toString());    
+            request.setIdColegio(envEnvio.getIdinstitucion().toString());    
             
-            if(destinatarios == null || destinatarios.length == 0){
+            if(listEnvDestinatarios == null || listEnvDestinatarios.size() == 0){
                 LOGGER.error("El destinatario no puede ser nulo para enviar un sms");
                 throw new BusinessException("El destinatario no puede ser nulo para enviar un sms");
             }
-            
-            //Si no viene el prefijo se lo añadimos
-            for(int i = 0; i< destinatarios.length; i++){
-                if(destinatarios[i].length() == 9){
-                    destinatarios[i] =  SigaConstants.ECOS_PREFIJO_ESPANA + destinatarios[i];
-                }
-            }    
-            
-            //Fijamos los destinatarios
-            //debe ser una lista de tamañao 1 pq el texto es o puede ser para esa persona por las etiquetas
-            request.setListaTOsArray(destinatarios);
-            
-            request.setTexto(texto);
-            request.setIsProgramado(false);
-            
-            //Si es BuroSMS
-            request.setIsSMSCertificado(esBuroSMS);
             
             if(esBuroSMS){
                 if (remitente == null || remitente.getCorreoelectronico() == null) {
@@ -638,6 +670,42 @@ public class EnviosServiceImpl implements IEnviosService{
                 request.setEmail(remitente.getCorreoelectronico());
             }
             
+            from = request.getEmail();
+            descFrom = request.getEmail();
+            
+            int num = 0;
+            listCorrectos = new ArrayList<DestinatarioItem>();
+            //Si no viene el prefijo se lo añadimos
+            for(int i = listEnvDestinatarios.size()-1; i >= 0; i--) {
+            	if (listEnvDestinatarios.get(i).getMovil() == null) {
+            		insertaExcelRow(envEnvio, sheet, from, descFrom, null, listEnvDestinatarios.get(i), "No tiene móvil informado");
+            		listEnvDestinatarios.remove(i);
+            		break;
+            	}     	
+                if(listEnvDestinatarios.get(i).getMovil().length() == 9){
+                    listEnvDestinatarios.get(i).setMovil(SigaConstants.ECOS_PREFIJO_ESPANA + listEnvDestinatarios.get(i).getMovil());
+                }
+                
+              //TODO
+                
+                //public static final 
+               if (!listEnvDestinatarios.get(i).getMovil().matches(SigaConstants.EXPRESION_REGULAR_MOVIL)) {
+            	   insertaExcelRow(envEnvio, sheet, from, descFrom, null, listEnvDestinatarios.get(i), "Número de móvil no es válido");
+            	   listEnvDestinatarios.remove(i);
+               } else {
+            	   
+            	   listCorrectos.add(listEnvDestinatarios.get(i));
+               }
+            }    
+            
+            request.setTexto(texto);
+            request.setIsProgramado(false);
+            
+            //Si es BuroSMS
+            request.setIsSMSCertificado(esBuroSMS);
+            
+            
+            
             EnviarSMSResponseDocument responseDoc = EnviarSMSResponseDocument.Factory.newInstance();            
             EnviarSMS sms = EnviarSMS.Factory.newInstance();
             sms.setEnviarSMSRequest(request);
@@ -645,30 +713,57 @@ public class EnviosServiceImpl implements IEnviosService{
             EnviarSMSDocument requestDoc = EnviarSMSDocument.Factory.newInstance();
             requestDoc.setEnviarSMS(sms);
             
-            try {
-                responseDoc = _clientECOS.enviarSMS(uriService, requestDoc);    
-                response = responseDoc.getEnviarSMSResponse();
-                idSolicidudEcos = response.getEnviarSMSResponse().getIdSolicitud();
-                LOGGER.error("El SMS se ha enviado con idSolicitud: "+idSolicidudEcos+"");
-            } catch (Exception e) {
-                LOGGER.error("Error en la comunicacion con ECOS", e);
-                throw new BusinessException("Error en la comunicacion con ECOS", e);
+            if (listCorrectos != null && listCorrectos.size() > 0) {
+            	
+            	String[] listaTOs = new String[listCorrectos.size()];
+            	for(int i = 0; i < listCorrectos.size(); i++){
+            		listaTOs[i] = listEnvDestinatarios.get(i).getMovil();
+            	}
+            	request.setListaTOsArray(listaTOs);
+            	
+	            try {
+	                responseDoc = _clientECOS.enviarSMS(uriService, requestDoc);    
+	                response = responseDoc.getEnviarSMSResponse();
+	                idSolicidudEcos = response.getEnviarSMSResponse().getIdSolicitud();
+	                LOGGER.error("El SMS se ha enviado con idSolicitud: "+idSolicidudEcos+"");
+	            } catch (Exception e) {
+	                LOGGER.error("Error en la comunicacion con ECOS", e);
+	                throw new BusinessException("Error en la comunicacion con ECOS", e);
+	            }
+	            
+	            if (response.getEnviarSMSResponse() !=null){
+	                respuesta = response.getEnviarSMSResponse().getResultado();
+	                if(respuesta.indexOf(SigaConstants.KO) > -1) {
+	                    LOGGER.error("No se ha enviado el sms: " + respuesta);
+	                    throw new BusinessException("No se ha enviado el sms", respuesta);    
+	                }else {
+	                    LOGGER.info("La respuesta de ECOS al enviar ha sido: "+ respuesta);
+	                }                
+	            }
+	            
+	            for(int i = 0; i < listCorrectos.size(); i++){
+	            	insertaExcelRow(envEnvio, sheet, from, descFrom, null, listCorrectos.get(i), "OK");//TODO REVISAR LA DESCRIPCIÓN DEL REMITENTE
+	            }
             }
             
-            if (response.getEnviarSMSResponse() !=null){
-                respuesta = response.getEnviarSMSResponse().getResultado();
-                if(respuesta.indexOf(SigaConstants.KO) > -1) {
-                    LOGGER.error("No se ha enviado el sms: " + respuesta);
-                    throw new BusinessException("No se ha enviado el sms", respuesta);    
-                }else {
-                    LOGGER.info("La respuesta de ECOS al enviar ha sido: "+ respuesta);
-                }                
-            }
-            
-            
-        }catch (Exception e) {
+        } catch (Exception e) {
+        	String mensaje = "ERROR";
+        	if (e instanceof BusinessException) {
+        		mensaje = e.getMessage();
+        	}
+        	if (listCorrectos != null && listCorrectos.size() > 0) {
+        		for(int i = 0; i < listCorrectos.size(); i++){
+                	insertaExcelRow(envEnvio, sheet, from, descFrom, null, listCorrectos.get(i), mensaje);//TODO REVISAR LA DESCRIPCIÓN DEL REMITENTE
+                }	
+        	} else if (listEnvDestinatarios != null) {
+        		for(int i = 0; i < listEnvDestinatarios.size(); i++){
+                	insertaExcelRow(envEnvio, sheet, from, descFrom, null, listEnvDestinatarios.get(i), mensaje);//TODO REVISAR LA DESCRIPCIÓN DEL REMITENTE
+                }
+        	}
             LOGGER.error("No se ha enviado el sms", e);
-            throw new BusinessException("No se ha enviado el sms", e);            
+//            throw new BusinessException("No se ha enviado el sms", e);            
+        } finally {
+        	writeCloseLogFile(envEnvio.getIdinstitucion(), envEnvio.getIdenvio(), sheet);
         }
         
         return idSolicidudEcos;
@@ -676,142 +771,7 @@ public class EnviosServiceImpl implements IEnviosService{
     }
     
 		  
-																						   
-																														
-
-					  
-	   
-									  
-        
-												   
-									  
-														   
-									
-												  
-																				   
-										   
-												   
-							  
-
-												  
-
-																										   
-			   
-
-						
-											  
 		   
-										  
-	
-
-									
-
-						 
-														
-												
-																	 
-									   
-													 
-														 
-	
-
-										  
-
-			   
-												  
-						
-
-											
-										  
-		   
-																	  
-																							 
-														  
-	 
-	
-
-							   
-																	   
-		   
-										 
-	
-
-														
-
-													 
-
-												
-											
-
-								
-												  
-														 
-																 
-																		  
-
-					 
-																																							   
-																																		  
-		  
-														 
-																					  
-				
-						
-																	   
-																																					
-																																			
-
-															  
-													
-
-																  
-														 
-
-						  
-												  
-													 
-												  
-
-											   
-
-											  
-
-											 
-									   
-
-								
-
-					 
-									  
-	 
-
-												 
-																	  
-									  
-												 
-																	  
-									  
-												
-																	  
-									 
-
-							
-													   
-															
-			 
-								  
-	  
-	 
-
-														
-							
-
-	
-
-						 
-											   
-		   
-   
 
   
  
