@@ -94,7 +94,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 	@Autowired
 	private IAuditoriaCenHistoricoService auditoriaCenHistoricoService;
-	
+
 	@Autowired
 	private GenDiccionarioMapper genDiccionarioMapper;
 
@@ -278,13 +278,16 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				}
 				if (colegiadoItem.getIdTiposSeguro() != null && colegiadoItem.getIdTiposSeguro() != "") {
 					colegiado.setIdtiposseguro(Short.parseShort(colegiadoItem.getIdTiposSeguro()));
-				}else {
+				} else {
 					colegiado.setIdtiposseguro(null);
 				}
 				if (colegiadoItem.getSituacionResidente() != null) {
 					colegiado.setSituacionresidente(
 							colegiadoItem.getSituacionResidente().equalsIgnoreCase("si") ? "1" : "0");
+				} else {
+					colegiado.setSituacionresidente("0");
 				}
+
 				if (colegiadoItem.getComunitario() != null) {
 					colegiado.setComunitario(colegiadoItem.getComunitario());
 				}
@@ -304,7 +307,6 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				int responseUpdate = cenColegiadoExtendsMapper.updateColegiado(colegiado);
 				LOGGER.info(
 						"datosColegialesUpdate() / CenColegiadoExtendsMapper.selectDirecciones() -> Salida de CenColegiadoExtendsMapper para actualización de Colegiados");
-
 
 				if (responseUpdate >= 1) {
 
@@ -382,199 +384,245 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					List<CenDatoscolegialesestado> cenDatoscolegialesestadosList = cenDatoscolegialesestadoExtendsMapper
 							.selectByExample(cenDatoscolegialesestadoExample);
 
-					if (null != cenDatoscolegialesestadosList && cenDatoscolegialesestadosList.size() > 0) {
-						LOGGER.info(
-								"datosColegialesInsertEstado() / Recorremos los estados colegiales");
-						// Obtenemos el estado colegial que tiene el colegiado guardado en bbdd
-						CenDatoscolegialesestado cenDatoscolegialesestadoBBDD = cenDatoscolegialesestadosList.get(0);
+					// ACTUALIZAMOS CEN_COLEGIADO
+					CenColegiadoKey colegiadoKey = new CenColegiadoKey();
+					colegiadoKey.setIdinstitucion(idInstitucion);
+					colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+					CenColegiado colegiado = new CenColegiado();
+					colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+					colegiado.setIdinstitucion(idInstitucion);
+					colegiado.setUsumodificacion(usuario.getIdusuario());
+					if (colegiadoItem.getNumColegiado() != null) {
+						colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
+					}
+					if (colegiadoItem.getIdTiposSeguro() != null && colegiadoItem.getIdTiposSeguro() != "") {
+						colegiado.setIdtiposseguro(Short.parseShort(colegiadoItem.getIdTiposSeguro()));
+					} else {
+						colegiado.setIdtiposseguro(null);
+					}
+					if (colegiadoItem.getSituacionResidente() != null) {
+						colegiado.setSituacionresidente(
+								colegiadoItem.getSituacionResidente());
+					} else {
+						colegiado.setSituacionresidente("0");
+					}
 
-						// Obtenemos los tipos de direcciones que tiene el colegiado
-						CenDireccionTipodireccionExample cenDireccionTipodireccionExample = new CenDireccionTipodireccionExample();
-						cenDireccionTipodireccionExample.createCriteria()
-								.andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona()))
-								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+					if (colegiadoItem.getComunitario() != null) {
+						colegiado.setComunitario(colegiadoItem.getComunitario());
+					}
+					if (colegiadoItem.getnMutualista() != null && colegiadoItem.getnMutualista() != "") {
+						colegiado.setNmutualista(colegiadoItem.getnMutualista());
+					} else {
+						colegiado.setNmutualista(null);
+					}
 
-						List<CenDireccionTipodireccion> cenTipoDireccionesList = cenDireccionTipodireccionExtendsMapper
-								.selectByExample(cenDireccionTipodireccionExample);
+					colegiado.setFechaincorporacion(colegiadoItem.getIncorporacionDate());
+					colegiado.setFechatitulacion(colegiadoItem.getFechaTitulacionDate());
+					colegiado.setFechapresentacion(colegiadoItem.getFechapresentacionDate());
+					colegiado.setFechajura(colegiadoItem.getFechaJuraDate());
 
-						// Obtenemos las direcciones que tiene el colegiado
-						CenDireccionesExample cenDireccionesExample = new CenDireccionesExample();
-						cenDireccionesExample.createCriteria()
-								.andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona()))
-								.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+					colegiado.setFechamodificacion(new Date());
 
-						List<CenDirecciones> cenDireccionesList = cenDireccionesExtendsMapper
-								.selectByExample(cenDireccionesExample);
+					int responseUpdate = cenColegiadoExtendsMapper.updateColegiado(colegiado);
+					
+					if (responseUpdate >= 1) {
+						// ACTUALIZAMOS CEN_DATOSCOLEGIALESESTADO
 
-						// Paso de ejerciente a no ejerciente
-						if (cenDatoscolegialesestadoBBDD.getIdestado() == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE
-								&& Integer.parseInt(
-										colegiadoItem.getSituacion()) != SigaConstants.ESTADO_COLEGIAL_EJERCIENTE) {
+						if (null != cenDatoscolegialesestadosList && cenDatoscolegialesestadosList.size() > 0) {
+							LOGGER.info("datosColegialesInsertEstado() / Recorremos los estados colegiales");
+							// Obtenemos el estado colegial que tiene el colegiado guardado en bbdd
+							CenDatoscolegialesestado cenDatoscolegialesestadoBBDD = cenDatoscolegialesestadosList
+									.get(0);
 
-							// Obtenemos las direcciones que tenemos que que añadir
-							addTipoDirecciones = compruebaTipoDireccion(cenTipoDireccionesList, false);
-							addTipoDireccionesPreferentes = compruebaTipoDireccionPreferente(cenDireccionesList);
+							// Obtenemos los tipos de direcciones que tiene el colegiado
+							CenDireccionTipodireccionExample cenDireccionTipodireccionExample = new CenDireccionTipodireccionExample();
+							cenDireccionTipodireccionExample.createCriteria()
+									.andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona()))
+									.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-							// Paso de no ejerciente a ejerciente
-						} else if (cenDatoscolegialesestadoBBDD
-								.getIdestado() != SigaConstants.ESTADO_COLEGIAL_EJERCIENTE
-								&& Integer.parseInt(
-										colegiadoItem.getSituacion()) == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE) {
+							List<CenDireccionTipodireccion> cenTipoDireccionesList = cenDireccionTipodireccionExtendsMapper
+									.selectByExample(cenDireccionTipodireccionExample);
 
-							// Obtenemos las direcciones que tenemos que que añadir
-							addTipoDirecciones = compruebaTipoDireccion(cenTipoDireccionesList, true);
-							addTipoDireccionesPreferentes = compruebaTipoDireccionPreferente(cenDireccionesList);
+							// Obtenemos las direcciones que tiene el colegiado
+							CenDireccionesExample cenDireccionesExample = new CenDireccionesExample();
+							cenDireccionesExample.createCriteria()
+									.andIdpersonaEqualTo(Long.valueOf(colegiadoItem.getIdPersona()))
+									.andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
-						}
+							List<CenDirecciones> cenDireccionesList = cenDireccionesExtendsMapper
+									.selectByExample(cenDireccionesExample);
 
-						CenDireccionTipodireccion tipoCensoWeb = null;
+							// Paso de ejerciente a no ejerciente
+							if (cenDatoscolegialesestadoBBDD.getIdestado() == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE
+									&& Integer.parseInt(
+											colegiadoItem.getSituacion()) != SigaConstants.ESTADO_COLEGIAL_EJERCIENTE) {
 
-						// Lo añadimos automaticamente a la dirección donde se encuentre CensoWeb
-						// Buscamos la dirección que tenga tipoCenso
-						for (CenDireccionTipodireccion cenTipoDireccion : cenTipoDireccionesList) {
-							if (cenTipoDireccion.getIdtipodireccion() == Short
-									.valueOf(SigaConstants.TIPO_DIR_CENSOWEB)) {
-								tipoCensoWeb = cenTipoDireccion;
+								// Obtenemos las direcciones que tenemos que que añadir
+								addTipoDirecciones = compruebaTipoDireccion(cenTipoDireccionesList, false);
+								addTipoDireccionesPreferentes = compruebaTipoDireccionPreferente(cenDireccionesList);
+
+								// Paso de no ejerciente a ejerciente
+							} else if (cenDatoscolegialesestadoBBDD
+									.getIdestado() != SigaConstants.ESTADO_COLEGIAL_EJERCIENTE
+									&& Integer.parseInt(
+											colegiadoItem.getSituacion()) == SigaConstants.ESTADO_COLEGIAL_EJERCIENTE) {
+
+								// Obtenemos las direcciones que tenemos que que añadir
+								addTipoDirecciones = compruebaTipoDireccion(cenTipoDireccionesList, true);
+								addTipoDireccionesPreferentes = compruebaTipoDireccionPreferente(cenDireccionesList);
+
 							}
-						}
-						if (null != tipoCensoWeb) {
-							CenDirecciones direccionCensoWeb = null;
-							for (CenDirecciones cenDireccion : cenDireccionesList) {
-								if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
-									direccionCensoWeb = cenDireccion;
+
+							CenDireccionTipodireccion tipoCensoWeb = null;
+
+							// Lo añadimos automaticamente a la dirección donde se encuentre CensoWeb
+							// Buscamos la dirección que tenga tipoCenso
+							for (CenDireccionTipodireccion cenTipoDireccion : cenTipoDireccionesList) {
+								if (cenTipoDireccion.getIdtipodireccion() == Short
+										.valueOf(SigaConstants.TIPO_DIR_CENSOWEB)) {
+									tipoCensoWeb = cenTipoDireccion;
 								}
 							}
-	
-							// Si hay que añadir algun tipo de direccion lo añadimos
-							if (null != addTipoDirecciones && addTipoDirecciones.size() > 0) {
-	
-								for (Short tipo : addTipoDirecciones) {
-									CenDireccionTipodireccion cenDireccionTipodireccion = new CenDireccionTipodireccion();
-									cenDireccionTipodireccion.setFechamodificacion(new Date());
-									cenDireccionTipodireccion.setIdinstitucion(direccionCensoWeb.getIdinstitucion());
-									cenDireccionTipodireccion.setIdpersona(Long.valueOf(colegiadoItem.getIdPersona()));
-									cenDireccionTipodireccion.setUsumodificacion(usuario.getIdusuario());
-									cenDireccionTipodireccion.setIddireccion(direccionCensoWeb.getIddireccion());
-									cenDireccionTipodireccion.setIdtipodireccion(tipo);
+							if (null != tipoCensoWeb) {
+								CenDirecciones direccionCensoWeb = null;
+								for (CenDirecciones cenDireccion : cenDireccionesList) {
+									if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
+										direccionCensoWeb = cenDireccion;
+									}
+								}
+
+								// Si hay que añadir algun tipo de direccion lo añadimos
+								if (null != addTipoDirecciones && addTipoDirecciones.size() > 0) {
+
+									for (Short tipo : addTipoDirecciones) {
+										CenDireccionTipodireccion cenDireccionTipodireccion = new CenDireccionTipodireccion();
+										cenDireccionTipodireccion.setFechamodificacion(new Date());
+										cenDireccionTipodireccion
+												.setIdinstitucion(direccionCensoWeb.getIdinstitucion());
+										cenDireccionTipodireccion
+												.setIdpersona(Long.valueOf(colegiadoItem.getIdPersona()));
+										cenDireccionTipodireccion.setUsumodificacion(usuario.getIdusuario());
+										cenDireccionTipodireccion.setIddireccion(direccionCensoWeb.getIddireccion());
+										cenDireccionTipodireccion.setIdtipodireccion(tipo);
+										LOGGER.info(
+												"datosColegialesInsertEstado() / cenDireccionTipodireccionExtendsMapper.insert -> Entrada a insertar direcciones");
+										cenDireccionTipodireccionExtendsMapper.insert(cenDireccionTipodireccion);
+
+									}
+								}
+
+								// Si hay que añadir algun tipo de direccion lo añadimos
+								if (null != addTipoDireccionesPreferentes && addTipoDireccionesPreferentes.size() > 0) {
+									String addPref = direccionCensoWeb.getPreferente();
+									if (addPref == null) {
+										addPref = "";
+									}
+									for (String tipoPreferente : addTipoDireccionesPreferentes) {
+										addPref += tipoPreferente;
+									}
+
+									direccionCensoWeb.setPreferente(addPref);
+									direccionCensoWeb.setUsumodificacion(usuario.getIdusuario());
+									direccionCensoWeb.setFechamodificacion(new Date());
 									LOGGER.info(
-											"datosColegialesInsertEstado() / cenDireccionTipodireccionExtendsMapper.insert -> Entrada a insertar direcciones");
-									cenDireccionTipodireccionExtendsMapper.insert(cenDireccionTipodireccion);
-	
+											"datosColegialesInsertEstado() / cenDireccionTipodireccionExtendsMapper.update -> Entrada a actualizar direcciones");
+									int response3 = cenDireccionesExtendsMapper.updateByPrimaryKey(direccionCensoWeb);
 								}
-							}
-	
-							// Si hay que añadir algun tipo de direccion lo añadimos
-							if (null != addTipoDireccionesPreferentes && addTipoDireccionesPreferentes.size() > 0) {
-								String addPref = direccionCensoWeb.getPreferente();
-								if (addPref == null) {
-									addPref = "";
-								}
-								for (String tipoPreferente : addTipoDireccionesPreferentes) {
-									addPref += tipoPreferente;
-								}
-	
-								direccionCensoWeb.setPreferente(addPref);
-								direccionCensoWeb.setUsumodificacion(usuario.getIdusuario());
-								direccionCensoWeb.setFechamodificacion(new Date());
-								LOGGER.info(
-										"datosColegialesInsertEstado() / cenDireccionTipodireccionExtendsMapper.update -> Entrada a actualizar direcciones");
-								int response3 = cenDireccionesExtendsMapper.updateByPrimaryKey(direccionCensoWeb);
 							}
 						}
-					}
 
-					datosColegiales.setFechaestado(colegiadoItem.getFechaEstado());
-					datosColegiales.setFechamodificacion(new Date());
-					datosColegiales.setIdestado(Short.valueOf(colegiadoItem.getSituacion()));
+						datosColegiales.setFechaestado(colegiadoItem.getFechaEstado());
+						datosColegiales.setFechamodificacion(new Date());
+						datosColegiales.setIdestado(Short.valueOf(colegiadoItem.getSituacion()));
 
-					datosColegiales.setIdinstitucion(Short.valueOf(colegiadoItem.getIdInstitucion()));
-					datosColegiales.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
-					datosColegiales.setUsumodificacion(usuario.getIdusuario());
-					datosColegiales.setObservaciones(colegiadoItem.getObservaciones());
-					datosColegiales.setSituacionresidente(colegiadoItem.getSituacionResidente());
-					int resultado = cenDatoscolegialesestadoExtendsMapper.insert(datosColegiales);
+						datosColegiales.setIdinstitucion(Short.valueOf(colegiadoItem.getIdInstitucion()));
+						datosColegiales.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+						datosColegiales.setUsumodificacion(usuario.getIdusuario());
+						datosColegiales.setObservaciones(colegiadoItem.getObservaciones());
+						datosColegiales.setSituacionresidente(colegiadoItem.getSituacionResidente());
+						int resultado = cenDatoscolegialesestadoExtendsMapper.insert(datosColegiales);
 
-					// Llamamos al PL para mantener los colegiados
-					Object[] paramMandatos = new Object[5];
-					paramMandatos[0] = datosColegiales.getIdpersona().toString();
-					paramMandatos[1] = usuario.getIdinstitucion().toString();
-					paramMandatos[2] = new Long(30).toString();
-					paramMandatos[3] = null;
-					paramMandatos[4] = usuario.getIdusuario().toString();
-					String resultadoPl[] = new String[2];
-					try {
-						LOGGER.info(
-								"datosColegialesInsertEstado() / llamada PL actualizar datos letrado");
-						resultadoPl = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
-								paramMandatos);
-						
-						LOGGER.info(
-								"datosColegialesInsertEstado() / salida PL actualizar datos letrado");
-					} catch (IOException | NamingException | SQLException e) {
-						// TODO Auto-generated catch block
-						LOGGER.error(
-								"Error Datos Colegiales",e);
-
-						e.printStackTrace();
-					}
-
-					if (resultado == 1) {
-						response.setStatus(SigaConstants.OK);
 						// Llamamos al PL para mantener los colegiados
-						Object[] paramTurno = new Object[3];
-						paramTurno[0] = usuario.getIdinstitucion().toString();
-						paramTurno[1] = datosColegiales.getIdpersona().toString();
-						paramTurno[2] = usuario.getIdusuario().toString();
-						String resultadoPlTurno[] = new String[2];
+						Object[] paramMandatos = new Object[5];
+						paramMandatos[0] = datosColegiales.getIdpersona().toString();
+						paramMandatos[1] = usuario.getIdinstitucion().toString();
+						paramMandatos[2] = new Long(30).toString();
+						paramMandatos[3] = null;
+						paramMandatos[4] = usuario.getIdusuario().toString();
+						String resultadoPl[] = new String[2];
 						try {
-							LOGGER.info(
-									"datosColegialesInsertEstado() / llamada PL actualizar cambio estado colegial");
-							resultadoPlTurno = callPLProcedure(
-									"{call Pkg_Siga_Cambio_Colegiacion.Revision_Cambio_Estadocolegial(?,?,?,?,?)}", 2,
-									paramTurno);
-							
-							LOGGER.info(
-									"datosColegialesInsertEstado() / salida PL actualizar cambio estado colegial");
+							LOGGER.info("datosColegialesInsertEstado() / llamada PL actualizar datos letrado");
+							resultadoPl = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}",
+									2, paramMandatos);
+
+							LOGGER.info("datosColegialesInsertEstado() / salida PL actualizar datos letrado");
 						} catch (IOException | NamingException | SQLException e) {
 							// TODO Auto-generated catch block
-							LOGGER.error(
-									"Error Datos Colegiales",e);
-							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+							LOGGER.error("Error Datos Colegiales", e);
+
 							e.printStackTrace();
 						}
-						if (resultadoPlTurno[0].equals("0")) {
+
+						if (resultado == 1) {
 							response.setStatus(SigaConstants.OK);
-							org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
-							GenDiccionarioExample example = new GenDiccionarioExample();
-							example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1]).andIdlenguajeEqualTo(usuario.getIdlenguaje());
-							List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example );
-							if (null != diccionario && diccionario.size()>0) {
-								error.setMessage(diccionario.get(0).getDescripcion());
-							}else{
-								error.setMessage(resultadoPlTurno[1]);
+							// Llamamos al PL para mantener los colegiados
+							Object[] paramTurno = new Object[3];
+							paramTurno[0] = usuario.getIdinstitucion().toString();
+							paramTurno[1] = datosColegiales.getIdpersona().toString();
+							paramTurno[2] = usuario.getIdusuario().toString();
+							String resultadoPlTurno[] = new String[2];
+							try {
+								LOGGER.info(
+										"datosColegialesInsertEstado() / llamada PL actualizar cambio estado colegial");
+								resultadoPlTurno = callPLProcedure(
+										"{call Pkg_Siga_Cambio_Colegiacion.Revision_Cambio_Estadocolegial(?,?,?,?,?)}",
+										2, paramTurno);
+
+								LOGGER.info(
+										"datosColegialesInsertEstado() / salida PL actualizar cambio estado colegial");
+							} catch (IOException | NamingException | SQLException e) {
+								// TODO Auto-generated catch block
+								LOGGER.error("Error Datos Colegiales", e);
+								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+								e.printStackTrace();
 							}
-							response.setError(error);
+							if (resultadoPlTurno[0].equals("0")) {
+								response.setStatus(SigaConstants.OK);
+								org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+								GenDiccionarioExample example = new GenDiccionarioExample();
+								example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1])
+										.andIdlenguajeEqualTo(usuario.getIdlenguaje());
+								List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example);
+								if (null != diccionario && diccionario.size() > 0) {
+									error.setMessage(diccionario.get(0).getDescripcion());
+								} else {
+									error.setMessage(resultadoPlTurno[1]);
+								}
+								response.setError(error);
+							} else {
+								response.setStatus(SigaConstants.KO);
+								resultado = 0;
+								org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
+								GenDiccionarioExample example = new GenDiccionarioExample();
+								example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1])
+										.andIdlenguajeEqualTo(usuario.getIdlenguaje());
+								List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example);
+								if (null != diccionario && diccionario.size() > 0) {
+									error.setMessage(diccionario.get(0).getDescripcion());
+								} else {
+									error.setMessage(resultadoPlTurno[1]);
+								}
+								response.setError(error);
+								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+							}
 						} else {
 							response.setStatus(SigaConstants.KO);
-							resultado = 0;
-							org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
-							GenDiccionarioExample example = new GenDiccionarioExample();
-							example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1]).andIdlenguajeEqualTo(usuario.getIdlenguaje());
-							List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example );
-							if (null != diccionario && diccionario.size()>0) {
-								error.setMessage(diccionario.get(0).getDescripcion());
-							}else{
-								error.setMessage(resultadoPlTurno[1]);
-							}
-							response.setError(error);
-							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 						}
 					} else {
 						response.setStatus(SigaConstants.KO);
 					}
 				} catch (Exception e) {
-					LOGGER.error(
-							"Error Datos Colegiales",e);
+					LOGGER.error("Error Datos Colegiales", e);
 					LOGGER.warn(e.getMessage());
 					response.setStatus(SigaConstants.KO);
 				}
@@ -708,18 +756,17 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 									}
 
 									if (null != tipoCensoWeb) {
-										
-										
+
 										CenDirecciones direccionCensoWeb = null;
 										for (CenDirecciones cenDireccion : cenDireccionesList) {
 											if (cenDireccion.getIddireccion().equals(tipoCensoWeb.getIddireccion())) {
 												direccionCensoWeb = cenDireccion;
 											}
 										}
-	
+
 										// Si hay que añadir algun tipo de direccion lo añadimos
 										if (null != addTipoDirecciones && addTipoDirecciones.size() > 0) {
-	
+
 											for (Short tipo : addTipoDirecciones) {
 												CenDireccionTipodireccion cenDireccionTipodireccion = new CenDireccionTipodireccion();
 												cenDireccionTipodireccion.setFechamodificacion(new Date());
@@ -733,11 +780,12 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 												cenDireccionTipodireccion.setIdtipodireccion(tipo);
 												LOGGER.info(
 														"datosColegialesUpdateEstados() / cenDireccionTipodireccionExtendsMapper.insert -> Entrada a insertar la direccion");
-												cenDireccionTipodireccionExtendsMapper.insert(cenDireccionTipodireccion);
-	
+												cenDireccionTipodireccionExtendsMapper
+														.insert(cenDireccionTipodireccion);
+
 											}
 										}
-	
+
 										// Si hay que añadir algun tipo de direccion lo añadimos
 										if (null != addTipoDireccionesPreferentes
 												&& addTipoDireccionesPreferentes.size() > 0) {
@@ -748,7 +796,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 											for (String tipoPreferente : addTipoDireccionesPreferentes) {
 												addPref += tipoPreferente;
 											}
-	
+
 											direccionCensoWeb.setPreferente(addPref);
 											direccionCensoWeb.setUsumodificacion(usuario.getIdusuario());
 											direccionCensoWeb.setFechamodificacion(new Date());
@@ -784,8 +832,6 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							LOGGER.info(
 									"datosColegialesUpdateEstados() / cenDatoscolegialesestadoMapper.updateByPrimaryKeySelective() -> Entrada a cenDatoscolegialesestadoMapper para para actualizar el estado colegial");
 
-							
-							
 							if (ejecutarPL) {
 
 								// Llamamos al PL para mantener los colegiados
@@ -797,24 +843,19 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 								paramMandatos[4] = usuario.getIdusuario().toString();
 								String resultadoPl[] = new String[2];
 								try {
-									LOGGER.info(
-											"datosColegialesUpdateEstados() / Llamada al pl de actualizar letrado");
+									LOGGER.info("datosColegialesUpdateEstados() / Llamada al pl de actualizar letrado");
 									resultadoPl = callPLProcedure(
 											"{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
 											paramMandatos);
-									LOGGER.info(
-											"datosColegialesUpdateEstados() / salida al pl de actualizar letrado");
+									LOGGER.info("datosColegialesUpdateEstados() / salida al pl de actualizar letrado");
 								} catch (IOException | NamingException | SQLException e) {
 									// TODO Auto-generated catch block
-									LOGGER.error(
-											"Error Datos Colegiales",e);
+									LOGGER.error("Error Datos Colegiales", e);
 									e.printStackTrace();
 								}
 
-								
 							}
-							
-							
+
 							CenColegiadoExample cenColegiadoExample = new CenColegiadoExample();
 							cenColegiadoExample.createCriteria().andIdpersonaEqualTo(idPersonaColegial);
 
@@ -840,7 +881,6 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						if (listColegiadoItem.get(0).getCambioEstado() != null
 								&& listColegiadoItem.get(0).getCambioEstado()) {
 
-							
 							// Llamamos al PL para mantener los colegiados
 							Object[] paramTurno = new Object[3];
 							paramTurno[0] = usuario.getIdinstitucion().toString();
@@ -853,13 +893,12 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 								resultadoPlTurno = callPLProcedure(
 										"{call Pkg_Siga_Cambio_Colegiacion.Revision_Cambio_Estadocolegial(?,?,?,?,?)}",
 										2, paramTurno);
-								
+
 								LOGGER.info(
 										"datosColegialesUpdateEstados() / Salida al pl de Revision_Cambio_Estadocolegial");
 							} catch (IOException | NamingException | SQLException e) {
 								// TODO Auto-generated catch block
-								LOGGER.error(
-										"Error Datos Colegiales",e);
+								LOGGER.error("Error Datos Colegiales", e);
 								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 								e.printStackTrace();
 							}
@@ -867,28 +906,30 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 								response.setStatus(SigaConstants.OK);
 								org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
 								GenDiccionarioExample example = new GenDiccionarioExample();
-								example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1]).andIdlenguajeEqualTo(usuario.getIdlenguaje());
-								List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example );
-								if (null != diccionario && diccionario.size()>0) {
+								example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1])
+										.andIdlenguajeEqualTo(usuario.getIdlenguaje());
+								List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example);
+								if (null != diccionario && diccionario.size() > 0) {
 									error.setMessage(diccionario.get(0).getDescripcion());
-								}else{
+								} else {
 									error.setMessage(resultadoPlTurno[1]);
 								}
-								
+
 								response.setError(error);
 							} else {
 								response.setStatus(SigaConstants.KO);
 								resultado = 0;
 								org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
 								GenDiccionarioExample example = new GenDiccionarioExample();
-								example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1]).andIdlenguajeEqualTo(usuario.getIdlenguaje());
-								List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example );
-								if (null != diccionario && diccionario.size()>0) {
+								example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1])
+										.andIdlenguajeEqualTo(usuario.getIdlenguaje());
+								List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example);
+								if (null != diccionario && diccionario.size() > 0) {
 									error.setMessage(diccionario.get(0).getDescripcion());
-								}else{
+								} else {
 									error.setMessage(resultadoPlTurno[1]);
 								}
-								
+
 								response.setError(error);
 								TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
 							}
@@ -900,8 +941,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						response.setStatus(SigaConstants.KO);
 					}
 				} catch (Exception e) {
-					LOGGER.error(
-							"Error Datos Colegiales",e);
+					LOGGER.error("Error Datos Colegiales", e);
 					LOGGER.warn(e.getMessage());
 					response.setStatus(SigaConstants.KO);
 				}
@@ -1032,6 +1072,47 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					List<CenDatoscolegialesestado> cenDatoscolegialesestadosList = cenDatoscolegialesestadoExtendsMapper
 							.selectByExample(cenDatoscolegialesestadoExample);
 
+					// ACTUALIZAMOS CEN_COLEGIADO PARA ELIMINAR
+					CenColegiadoKey colegiadoKey = new CenColegiadoKey();
+					colegiadoKey.setIdinstitucion(idInstitucion);
+					colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+					CenColegiado colegiado = new CenColegiado();
+					colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+					colegiado.setIdinstitucion(idInstitucion);
+					colegiado.setUsumodificacion(usuario.getIdusuario());
+					if (colegiadoItem.getNumColegiado() != null) {
+						colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
+					}
+					if (colegiadoItem.getIdTiposSeguro() != null && colegiadoItem.getIdTiposSeguro() != "") {
+						colegiado.setIdtiposseguro(Short.parseShort(colegiadoItem.getIdTiposSeguro()));
+					} else {
+						colegiado.setIdtiposseguro(null);
+					}
+					if (colegiadoItem.getSituacionResidente() != null) {
+						colegiado.setSituacionresidente(
+							colegiadoItem.getSituacionResidente().equalsIgnoreCase("si") ? "1" : "0");
+					} else {
+						colegiado.setSituacionresidente("0");
+					}
+
+					if (colegiadoItem.getComunitario() != null) {
+						colegiado.setComunitario(colegiadoItem.getComunitario());
+					}
+					if (colegiadoItem.getnMutualista() != null && colegiadoItem.getnMutualista() != "") {
+						colegiado.setNmutualista(colegiadoItem.getnMutualista());
+					} else {
+						colegiado.setNmutualista(null);
+					}
+
+//					colegiado.setFechaincorporacion(colegiadoItem.getIncorporacionDate());
+					colegiado.setFechatitulacion(colegiadoItem.getFechaTitulacionDate());
+//					colegiado.setFechapresentacion(colegiadoItem.getFechapresentacionDate());
+					colegiado.setFechajura(colegiadoItem.getFechaJuraDate());
+
+					colegiado.setFechamodificacion(new Date());
+
+					cenColegiadoExtendsMapper.updateColegiado(colegiado);
+					
 					if (null != cenDatoscolegialesestadosList && cenDatoscolegialesestadosList.size() > 0) {
 						CenDatoscolegialesestado cenDatoscolegialesestadoBBDD = null;
 
@@ -1099,10 +1180,10 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 									direccionCensoWeb = cenDireccion;
 								}
 							}
-	
+
 							// Si hay que añadir algun tipo de direccion lo añadimos
 							if (null != addTipoDirecciones && addTipoDirecciones.size() > 0) {
-	
+
 								for (Short tipo : addTipoDirecciones) {
 									CenDireccionTipodireccion cenDireccionTipodireccion = new CenDireccionTipodireccion();
 									cenDireccionTipodireccion.setFechamodificacion(new Date());
@@ -1111,23 +1192,23 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 									cenDireccionTipodireccion.setUsumodificacion(usuario.getIdusuario());
 									cenDireccionTipodireccion.setIddireccion(direccionCensoWeb.getIddireccion());
 									cenDireccionTipodireccion.setIdtipodireccion(tipo);
-	
+
 									cenDireccionTipodireccionExtendsMapper.insert(cenDireccionTipodireccion);
-	
+
 								}
 							}
-	
+
 							// Si hay que añadir algun tipo de direccion lo añadimos
 							if (null != addTipoDireccionesPreferentes && addTipoDireccionesPreferentes.size() > 0) {
 								String addPref = direccionCensoWeb.getPreferente();
 								for (String tipoPreferente : addTipoDireccionesPreferentes) {
 									addPref += tipoPreferente;
 								}
-	
+
 								direccionCensoWeb.setPreferente(addPref);
 								direccionCensoWeb.setUsumodificacion(usuario.getIdusuario());
 								direccionCensoWeb.setFechamodificacion(new Date());
-	
+
 								cenDireccionesExtendsMapper.updateByPrimaryKey(direccionCensoWeb);
 							}
 						}
@@ -1151,12 +1232,10 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					paramMandatos[4] = usuario.getIdusuario().toString();
 					String resultadoPl[] = new String[2];
 					try {
-						LOGGER.info(
-								"datosColegialesInsertEstado() / llamada PL actualizar datos letrado");
+						LOGGER.info("datosColegialesInsertEstado() / llamada PL actualizar datos letrado");
 						resultadoPl = callPLProcedure("{call Pkg_Siga_Censo.Actualizardatosletrado(?,?,?,?,?,?,?)}", 2,
 								paramMandatos);
-						LOGGER.info(
-								"datosColegialesInsertEstado() / salida PL actualizar datos letrado");
+						LOGGER.info("datosColegialesInsertEstado() / salida PL actualizar datos letrado");
 					} catch (IOException | NamingException | SQLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -1172,13 +1251,11 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						paramTurno[2] = usuario.getIdusuario().toString();
 						String resultadoPlTurno[] = new String[2];
 						try {
-							LOGGER.info(
-									"datosColegialesInsertEstado() / llamada PL Revision_Cambio_Estadocolegial");
+							LOGGER.info("datosColegialesInsertEstado() / llamada PL Revision_Cambio_Estadocolegial");
 							resultadoPlTurno = callPLProcedure(
 									"{call Pkg_Siga_Cambio_Colegiacion.Revision_Cambio_Estadocolegial(?,?,?,?,?)}", 2,
 									paramTurno);
-							LOGGER.info(
-									"datosColegialesInsertEstado() / salida PL Revision_Cambio_Estadocolegial");
+							LOGGER.info("datosColegialesInsertEstado() / salida PL Revision_Cambio_Estadocolegial");
 						} catch (IOException | NamingException | SQLException e) {
 							// TODO Auto-generated catch block
 							TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -1187,13 +1264,14 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 						if (resultadoPlTurno[0].equals("0")) {
 							response.setStatus(SigaConstants.OK);
 							org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
-							
+
 							GenDiccionarioExample example = new GenDiccionarioExample();
-							example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1]).andIdlenguajeEqualTo(usuario.getIdlenguaje());
-							List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example );
-							if (null != diccionario && diccionario.size()>0) {
+							example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1])
+									.andIdlenguajeEqualTo(usuario.getIdlenguaje());
+							List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example);
+							if (null != diccionario && diccionario.size() > 0) {
 								error.setMessage(diccionario.get(0).getDescripcion());
-							}else{
+							} else {
 								error.setMessage(resultadoPlTurno[1]);
 							}
 							response.setError(error);
@@ -1202,11 +1280,12 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 							resultado = 0;
 							org.itcgae.siga.DTOs.gen.Error error = new org.itcgae.siga.DTOs.gen.Error();
 							GenDiccionarioExample example = new GenDiccionarioExample();
-							example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1]).andIdlenguajeEqualTo(usuario.getIdlenguaje());
-							List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example );
-							if (null != diccionario && diccionario.size()>0) {
+							example.createCriteria().andIdrecursoEqualTo(resultadoPlTurno[1])
+									.andIdlenguajeEqualTo(usuario.getIdlenguaje());
+							List<GenDiccionario> diccionario = genDiccionarioMapper.selectByExample(example);
+							if (null != diccionario && diccionario.size() > 0) {
 								error.setMessage(diccionario.get(0).getDescripcion());
-							}else{
+							} else {
 								error.setMessage(resultadoPlTurno[1]);
 							}
 							response.setError(error);
@@ -1366,10 +1445,10 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 			throw e;
 		}
 	}
-	
 
 	@Override
-	public ColegiadoDTO datosColegialesSearchActual(int numPagina, ColegiadoItem colegiadoItem, HttpServletRequest request) {
+	public ColegiadoDTO datosColegialesSearchActual(int numPagina, ColegiadoItem colegiadoItem,
+			HttpServletRequest request) {
 
 		LOGGER.info("datosColegialesSearch() -> Entrada al servicio para la búsqueda por filtros de direcciones");
 
@@ -1413,6 +1492,5 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 		LOGGER.info("datosColegialesSearch() -> Salida del servicio para la búsqueda por filtros de Colegiados");
 		return datosColegialesDTO;
 	}
-
 
 }

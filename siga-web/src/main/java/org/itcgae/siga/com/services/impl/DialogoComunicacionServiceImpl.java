@@ -1890,6 +1890,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		LOGGER.debug("Obtenemos la ruta de la plantilla");
 		String rutaPlantilla = getRutaPlantilla(rutaPlantillaClase);												
+		List<Map<String,Object>> listaDatosDoc = new ArrayList<Map<String,Object>>();
 		
 		//Si no existe el directorio temporal lo creamos
 		File dir = new File(rutaTmp);
@@ -1932,21 +1933,35 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				throw new BusinessException("Error al ejecutar la consulta " + consultaDatos.getDescripcion(), e);
 			}
 			
+			//Si la region no viene definida el documento no tiene region
 			if(consultaDatos.getRegion()!= null && !consultaDatos.getRegion().equalsIgnoreCase("")){
 				hDatosFinal.put(consultaDatos.getRegion(), resultDatos);
 			}else{
+				
 				if(resultDatos != null && resultDatos.size() > 0) {
 					hDatosGenerales.putAll(resultDatos.get(0));
 				}
+				hDatosFinal.put("row", hDatosGenerales);
+
+//				listaDatosDoc = resultDatos;
+//				if(resultDatos != null && resultDatos.size() > 0) {
+//					hDatosFinal.put("region", resultDatos);
+//				}
 			}
 			
+			
+			//Si hay error porque la region que viene de consultaDatos es erronea, se elimina de arriba y se hace en este else que esta comentado
 			if(esExcel) {
 				listaDatosExcel.add(resultDatos);
 				nombresConsultasDatos.add(nombreConsulta);
 			}
+//			else {
+//				listaDatosDoc = resultDatos;
+//				hDatosFinal.put("region", resultDatos);
+//			}
 		}
 		
-		hDatosFinal.put("row", hDatosGenerales);
+//		hDatosFinal.put("row", hDatosGenerales);
 		
 		//Obtenemos el sufijo del fichero para el caso de que se haya seleccionado el sufijo de entidad
 		String campoSufijoReplaced = "";
@@ -1976,7 +1991,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				try {
 					doc = new Document(rutaPlantilla + nombrePlantilla);
 				
-				
+					
 					doc = _generacionDocService.sustituyeDocumento(doc, hDatosFinal);																			
 					
 					boolean firmado = false;

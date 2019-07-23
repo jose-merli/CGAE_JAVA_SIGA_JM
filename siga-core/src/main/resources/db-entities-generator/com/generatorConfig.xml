@@ -25,10 +25,10 @@
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table> -->
 		
-<!-- 			<table schema="USCGAE" tableName="ENV_ENVIOS" > -->
-<!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
-<!-- 				<generatedKey column="IDENVIO" sqlStatement="SELECT SEQ_ENV_ENVIOS.NEXTVAL FROM DUAL"/> -->
-<!-- 			</table> -->
+  			<!--<table schema="USCGAE" tableName="ENV_ENVIOS" > 
+				<property name="ignoreQualifiersAtRuntime" value="true"/>
+				<generatedKey column="IDENVIO" sqlStatement="SELECT TO_NUMBER(TO_CHAR(SYSDATE, 'YYYY') || SEQ_ENV_ENVIOS.NEXTVAL) FROM DUAL"/>
+			</table--> 
 
 <!-- 			<table schema="USCGAE" tableName="CON_CONSULTA" > -->
 <!-- 				<property name="ignoreQualifiersAtRuntime" value="true"/> -->
@@ -120,9 +120,9 @@
 <!-- 					<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 				</table> -->
 
-				<table schema="USCGAE" tableName="ENV_CAMPOSENVIOS" > 
+				<!--<table schema="USCGAE" tableName="ENV_CAMPOSENVIOS" > 
 					<property name="ignoreQualifiersAtRuntime" value="true"/>
- 				</table> 
+ 				</table> -->
 
 
 <!-- 			<table schema="USCGAE" tableName="ENV_DESTINATARIOS" > -->

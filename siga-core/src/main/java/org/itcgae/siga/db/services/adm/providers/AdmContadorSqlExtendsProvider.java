@@ -14,7 +14,7 @@ public class AdmContadorSqlExtendsProvider extends AdmContadorSqlProvider{
 		SQL sql = new SQL();
 		
 		sql.SELECT("DISTINCT IDMODULO");
-		sql.SELECT("NOMBRE");
+		sql.SELECT("INITCAP(NOMBRE) AS NOMBRE");
 		sql.FROM("CON_MODULO");
 		sql.ORDER_BY("NOMBRE");
 		
@@ -26,11 +26,12 @@ public class AdmContadorSqlExtendsProvider extends AdmContadorSqlProvider{
 		SQL sql = new SQL();
 		
 		sql.SELECT("DISTINCT MODO.IDMODO");
-		sql.SELECT("REC.DESCRIPCION");
-		sql.FROM("ADM_CONTADOR CON ");
+		sql.SELECT("INITCAP(rec.DESCRIPCION) AS DESCRIPCION");
+		sql.FROM("ADM_CONTADOR CON");
 		sql.INNER_JOIN("ADM_MODO_CONTADOR MODO ON MODO.IDMODO = CON.MODO");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS REC ON REC.IDRECURSO =  MODO.DESCRIPCION ");
 		sql.WHERE("REC.IDLENGUAJE = '" + idLenguaje + "'");
+		sql.ORDER_BY("DESCRIPCION");
 		return sql.toString();
 	}
 	

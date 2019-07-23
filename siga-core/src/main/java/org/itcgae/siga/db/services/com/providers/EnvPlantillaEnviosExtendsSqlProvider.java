@@ -49,11 +49,9 @@ public class EnvPlantillaEnviosExtendsSqlProvider {
 	public String getPlantillasComunicacion(Short idInstitucion){
 		
 		SQL sql = new SQL();
-		
-		sql.SELECT("IDPLANTILLAENVIOS AS VALUE, INITCAP(NOMBRE) AS LABEL");
-		
+		sql.SELECT("IDPLANTILLAENVIOS AS VALUE");
+		sql.SELECT("INITCAP(NOMBRE) AS LABEL");		
 		sql.FROM("ENV_PLANTILLASENVIOS");
-		
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion + "' AND ANTIGUA = 'N' AND FECHABAJA is NULL");
 		sql.ORDER_BY("LABEL");
 		
