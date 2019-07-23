@@ -18,6 +18,7 @@ public class EnvDestinatariosExtendsSqlProvider {
 		sql.FROM("ENV_DESTINATARIOS");
 		sql.WHERE("IDINSTITUCION = '" + idInstitucion +"'");
 		sql.WHERE("IDENVIO = '" + idEnvio +"'");
+		sql.WHERE("ORIGENDESTINATARIO = 0");
 		
 		return sql.toString();
 	}
