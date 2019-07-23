@@ -117,8 +117,10 @@ public class EnviosServiceImpl implements IEnviosService{
     
     
     @Override
-    public void envioMail(String idInstitucion, String idEnvio, RemitenteDTO remitente, List<DestinatarioItem> destinatarios, String asuntoFinal, String cuerpoFinal, List<DatosDocumentoItem> documentosEnvio, boolean envioMasivo) throws Exception {
+    public Short envioMail(String idInstitucion, String idEnvio, RemitenteDTO remitente, List<DestinatarioItem> destinatarios, String asuntoFinal, String cuerpoFinal, List<DatosDocumentoItem> documentosEnvio, boolean envioMasivo) throws Exception {
         
+    	Short idEstadoEnvio = SigaConstants.ENVIO_PROCESADO;
+    	
         try {
             
             EnvEnviosKey envEnviosKey = new EnvEnviosKey();
@@ -301,9 +303,11 @@ public class EnviosServiceImpl implements IEnviosService{
                         insertaExcelRow(envEnvio, sheet, from, descFrom, documentosAdjuntos, destinatario, "OK");
                     } catch (BusinessException e) {
                         LOGGER.warn(e);
+                        idEstadoEnvio = SigaConstants.ENVIO_PROCESADO_CON_ERRORES;
                         insertaExcelRow(envEnvio, sheet, from, descFrom, documentosAdjuntos, destinatario, e.getMessage());
                     } catch(Exception e) {
                         LOGGER.error("Error al enviar el email", e);
+                        idEstadoEnvio = SigaConstants.ENVIO_PROCESADO_CON_ERRORES;
                         insertaExcelRow(envEnvio, sheet, from, descFrom, documentosAdjuntos, destinatario, "ERROR");
                     }
                 }
@@ -312,7 +316,7 @@ public class EnviosServiceImpl implements IEnviosService{
                 
             }
 
-            
+            return idEstadoEnvio;
             
         } catch(Exception e) {
             LOGGER.error("Error al enviar el email", e);
@@ -360,7 +364,6 @@ public class EnviosServiceImpl implements IEnviosService{
     	    short dateFormat = createHelper.createDataFormat().getFormat(SigaConstants.DATEST_FORMAT_MIN_SEC);
     	    cellStyle.setDataFormat(dateFormat);
     	    
-            
             for(int i = 0; i < SigaConstants.columnsExcelLogEnvios.length; i++) {
                 Cell cell = row.createCell(i);
                 switch (i) {
@@ -411,6 +414,7 @@ public class EnviosServiceImpl implements IEnviosService{
                 }
                 
             }
+            
         }
         
         
@@ -481,6 +485,8 @@ public class EnviosServiceImpl implements IEnviosService{
                         destinatariosCopia.add(destinatarioItem);
                         mapaCorreos.put(correo, true);
                     }
+                } else if (destinatarioItem != null) {//el correo es nulo o vacío pues lo añado también para que se marque como correo vacío
+                	destinatariosCopia.add(destinatarioItem);
                 }
             }
         }
@@ -780,22 +786,30 @@ public class EnviosServiceImpl implements IEnviosService{
 
         Pattern pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
         Matcher matcher = pattern.matcher(sArchivo);
-        sArchivo = matcher.replaceAll(destinatario.getNombre());
+        if (destinatario.getNombre() != null) {
+        	sArchivo = matcher.replaceAll(destinatario.getNombre());
+        }
         
-        etiqueta = SigaConstants.ETIQUETA_DEST_APELLIDO1;
-        pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
-        matcher = pattern.matcher(sArchivo);
-        sArchivo = matcher.replaceAll(destinatario.getApellidos1());
+        if (destinatario.getApellidos1() != null) {
+	        etiqueta = SigaConstants.ETIQUETA_DEST_APELLIDO1;
+	        pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+	        matcher = pattern.matcher(sArchivo);
+	        sArchivo = matcher.replaceAll(destinatario.getApellidos1());
+        }
         
-        etiqueta = SigaConstants.ETIQUETA_DEST_APELLIDO2;
-        pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
-        matcher = pattern.matcher(sArchivo);
-        sArchivo = matcher.replaceAll(destinatario.getApellidos2());
+        if (destinatario.getApellidos2() != null) {
+	        etiqueta = SigaConstants.ETIQUETA_DEST_APELLIDO2;
+	        pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+	        matcher = pattern.matcher(sArchivo);
+	        sArchivo = matcher.replaceAll(destinatario.getApellidos2());
+        }
         
-        etiqueta = SigaConstants.ETIQUETA_DEST_CIFNIF;
-        pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
-        matcher = pattern.matcher(sArchivo);
-        sArchivo = matcher.replaceAll(destinatario.getNIFCIF());
+        if (destinatario.getNIFCIF() != null) {
+	        etiqueta = SigaConstants.ETIQUETA_DEST_CIFNIF;
+	        pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+	        matcher = pattern.matcher(sArchivo);
+	        sArchivo = matcher.replaceAll(destinatario.getNIFCIF());
+        }
         
         
         //Obtenemos el tratamiento del destinatario
@@ -813,10 +827,12 @@ public class EnviosServiceImpl implements IEnviosService{
         matcher = pattern.matcher(sArchivo);        
         sArchivo = matcher.replaceAll(strDate);
         
-        etiqueta = SigaConstants.ETIQUETA_IDENVIO;
-        pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
-        matcher = pattern.matcher(sArchivo);
-        sArchivo = matcher.replaceAll(idEnvio);
+        if (idEnvio != null) {
+	        etiqueta = SigaConstants.ETIQUETA_IDENVIO;
+	        pattern = Pattern.compile(marcaInicioFin + etiqueta + marcaInicioFin);
+	        matcher = pattern.matcher(sArchivo);
+	        sArchivo = matcher.replaceAll(idEnvio);
+        }
         
         return sArchivo;
     }

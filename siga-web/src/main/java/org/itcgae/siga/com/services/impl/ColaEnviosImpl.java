@@ -271,15 +271,16 @@ public class ColaEnviosImpl implements IColaEnvios {
 			
 			//Generamos los informes para adjuntarlos al envio
 			List<DatosDocumentoItem> documentosEnvio = new ArrayList<DatosDocumentoItem>();
-			addDocumentosAdjuntos(envio, documentosEnvio);
-			
+			addDocumentosAdjuntos(envio, documentosEnvio);			
+
+			Short idEstadoEnvio = SigaConstants.ENVIO_PROCESADO;
 			
 			if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
-				_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
+				idEstadoEnvio = _enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 			}else{
 				
 				if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO)){					
-					_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, null, envioMasivo);
+					idEstadoEnvio = _enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, null, envioMasivo);
 				}
 				//Añadimos los informes al envio para que puedan ser descargados.
 				for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {
@@ -301,7 +302,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 				}
 			}
 			
-			envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+			envio.setIdestado(idEstadoEnvio);
 			envio.setFechamodificacion(new Date());
 			_envEnviosMapper.updateByPrimaryKey(envio);
 
