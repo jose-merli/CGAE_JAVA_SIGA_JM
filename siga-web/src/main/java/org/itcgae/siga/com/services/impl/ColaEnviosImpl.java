@@ -13,7 +13,6 @@ import org.itcgae.siga.DTOs.com.ConsultaItem;
 import org.itcgae.siga.DTOs.com.DatosDocumentoItem;
 import org.itcgae.siga.DTOs.com.DestinatarioItem;
 import org.itcgae.siga.DTOs.com.RemitenteDTO;
-import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.com.services.IColaEnvios;
 import org.itcgae.siga.com.services.IConsultasService;
 import org.itcgae.siga.com.services.IDialogoComunicacionService;
@@ -350,23 +349,23 @@ public class ColaEnviosImpl implements IColaEnvios {
 						_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, null, envioMasivo);
 					}
 					//Añadimos los informes al envio para que puedan ser descargados.
-					for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {
-						EnvDocumentos documento = new EnvDocumentos();
-						documento.setIdinstitucion(envio.getIdinstitucion());
-						documento.setIdenvio(envio.getIdenvio());
-						documento.setPathdocumento(datosDocumentoItem.getPathDocumento());
-						documento.setDescripcion(datosDocumentoItem.getFileName());
-						documento.setFechamodificacion(new Date());
-						documento.setUsumodificacion(1);
-						_envDocumentosMapper.insert(documento);		
-					}
-					
-					for (DestinatarioItem destinatario : destinatarios) {
-						destinatario.getNombre();
-						destinatario.getApellidos1();
-						destinatario.getApellidos2();
-						destinatario.getDomicilio();
-					}
+//					for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {
+//						EnvDocumentos documento = new EnvDocumentos();
+//						documento.setIdinstitucion(envio.getIdinstitucion());
+//						documento.setIdenvio(envio.getIdenvio());
+//						documento.setPathdocumento(datosDocumentoItem.getPathDocumento());
+//						documento.setDescripcion(datosDocumentoItem.getFileName());
+//						documento.setFechamodificacion(new Date());
+//						documento.setUsumodificacion(1);
+//						_envDocumentosMapper.insert(documento);		
+//					}
+//					
+//					for (DestinatarioItem destinatario : destinatarios) {
+//						destinatario.getNombre();
+//						destinatario.getApellidos1();
+//						destinatario.getApellidos2();
+//						destinatario.getDomicilio();
+//					}
 				}
 			}else{
 				LOGGER.error("No se han encontrado consultas de destinatarios asociadas a la plantilla de envío");
