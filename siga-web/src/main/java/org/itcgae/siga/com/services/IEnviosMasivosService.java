@@ -1,5 +1,6 @@
 package org.itcgae.siga.com.services;
 
+import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +23,9 @@ import org.itcgae.siga.DTOs.com.TarjetaConfiguracionDto;
 import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.commons.constants.SigaConstants.ENVIOS_MASIVOS_LOG_EXTENSION;
+import org.itcgae.siga.commons.utils.SIGAHelper;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -55,5 +59,7 @@ public interface IEnviosMasivosService {
 	public DatosDireccionesDTO obtenerDireccionesDisp(HttpServletRequest request, String nif);
 	public Resource recuperaPdfBuroSMS(Short idInstitucion, Long parseInt, Short idDocumento);
 	public String getPathFicheroEnvioMasivo(Short idInstitucion, Long idEnvio);
+	public File[] getFicherosLOGEnvioMasivo(Short idInstitucion, Long idEnvio);
+	public File getPathFicheroLOGEnvioMasivo(Short idInstitucion, Long idEnvio);
 }
 

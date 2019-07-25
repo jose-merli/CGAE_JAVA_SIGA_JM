@@ -326,7 +326,16 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
 					AdmUsuarios usuario = usuarios.get(0);
+					
+					// Consultamos si existe la consulta en la tabla
+					ModPlantillaenvioConsultaKey modPlantillaenvioConsultaKey = new ModPlantillaenvioConsultaKey();
+					modPlantillaenvioConsultaKey.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
+					modPlantillaenvioConsultaKey.setIdplantillaenvios(Integer.parseInt(consulta.getIdPlantillaEnvios()));
+					ModPlantillaenvioConsulta modPlantillaenvioConsulta = _modPlantillaenvioConsultaMapper.selectByPrimaryKey(modPlantillaenvioConsultaKey);
+					
+					// Preparamos el objeto a actualizar o insertar
 					ModPlantillaenvioConsulta consultaAsoc = new ModPlantillaenvioConsulta();
+					
 					consultaAsoc.setIdconsulta(Long.valueOf(consulta.getIdConsulta()));
 					consultaAsoc.setIdplantillaenvios(Integer.parseInt(consulta.getIdPlantillaEnvios()));
 					consultaAsoc.setIdinstitucion(idInstitucion);
@@ -334,7 +343,13 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 					consultaAsoc.setIdtipoenvios(Short.valueOf(consulta.getIdTipoEnvios()));
 					consultaAsoc.setUsumodificacion(usuario.getIdusuario());
 					consultaAsoc.setFechamodificacion(new Date());
-					_modPlantillaenvioConsultaMapper.insert(consultaAsoc);
+					 
+					if(modPlantillaenvioConsulta != null) {
+						_modPlantillaenvioConsultaMapper.updateByPrimaryKey(consultaAsoc);
+					}else {
+						_modPlantillaenvioConsultaMapper.insert(consultaAsoc);
+					}
+					
 					respuesta.setCode(200);
 					respuesta.setMessage("Consulta Asociada correctamente");
 				}
@@ -464,7 +479,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 			LOGGER.info("detalleConsultas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 			try{
 				if (null != usuarios && usuarios.size() > 0) {
-					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(idInstitucion, consulta.getIdPlantillaEnvios(), consulta.getIdTipoEnvios(), usuarios.get(0).getIdlenguaje());
+					consultaItems = _conConsultasExtendsMapper.selectConsultasPlantillas(Short.valueOf(consulta.getIdInstitucion()), consulta.getIdPlantillaEnvios(), consulta.getIdTipoEnvios(), usuarios.get(0).getIdlenguaje());
 					if(consultaItems != null && consultaItems.size()>0){
 						respuesta.setConsultaItem(consultaItems);
 					}
@@ -501,7 +516,7 @@ public class PlantillasEnvioServiceImpl implements IPlantillasEnvioService{
 				if (null != usuarios && usuarios.size() > 0) {
 					
 					EnvPlantillasenviosKey key = new EnvPlantillasenviosKey();
-					key.setIdinstitucion(idInstitucion);
+					key.setIdinstitucion(Short.valueOf(datosPlantilla.getIdInstitucion()));
 					key.setIdplantillaenvios(Integer.parseInt(datosPlantilla.getIdPlantillaEnvios()));
 					key.setIdtipoenvios(Short.valueOf(datosPlantilla.getIdTipoEnvios()));
 					EnvPlantillasenvios plantilla = _envPlantillasenviosMapper.selectByPrimaryKey(key);

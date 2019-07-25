@@ -123,6 +123,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 	@Autowired
 	private IEnviosMasivosService _enviosMasivosService;
 	
+	
 	//@Transactional
 	@Scheduled(cron = "${cron.pattern.scheduled.Envios: 0 * * ? * *}")
 	@Override
@@ -223,11 +224,6 @@ public class ColaEnviosImpl implements IColaEnvios {
 			throw new BusinessException(mensaje);
 		}
 		
-		if (remitente.getCorreoelectronico() == null || remitente.getCorreoelectronico().trim().equals("")) {
-			String mensaje = "La dirección del remitente no tiene una dirección de correo válida";
-			LOGGER.error(mensaje);
-			throw new BusinessException(mensaje);
-		}
 		
 		CenPersona personaRemitente = _cenPersonaMapper.selectByPrimaryKey(plantilla.getIdpersona());
 		RemitenteDTO remitentedto = new RemitenteDTO();
@@ -259,11 +255,11 @@ public class ColaEnviosImpl implements IColaEnvios {
 			
 			List<DestinatarioItem> destinatarios = new ArrayList<DestinatarioItem>();
 			//Obtenemos destinatarios de las etiquetas de envio
-			addDestintatariosEtiquetas(envio, destinatarios);
+			addDestintatariosEtiquetas(envio, destinatarios, false, null);
 			//Obtenemos destinatarios individuales.
-			addDestinatariosIndividuales(envio.getIdinstitucion(), envio.getIdenvio(), destinatarios);
+			addDestinatariosIndividuales(envio.getIdinstitucion(), envio.getIdenvio(), destinatarios, false, null);
 			//obtenemos los destinatarios por consultas de destinatarios
-			addDestinatariosConsultas(envio, destinatarios);
+			addDestinatariosConsultas(envio, destinatarios, false, null);
 			
 			
 			List<Map<String, Object>> resultadosConsultas = new ArrayList<Map<String, Object>>();
@@ -274,15 +270,16 @@ public class ColaEnviosImpl implements IColaEnvios {
 			
 			//Generamos los informes para adjuntarlos al envio
 			List<DatosDocumentoItem> documentosEnvio = new ArrayList<DatosDocumentoItem>();
-			addDocumentosAdjuntos(envio, documentosEnvio);
-			
+			addDocumentosAdjuntos(envio, documentosEnvio);			
+
+			Short idEstadoEnvio = SigaConstants.ENVIO_PROCESADO;
 			
 			if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_MAIL)){
-				_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
+				idEstadoEnvio = _enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, documentosEnvio, envioMasivo);
 			}else{
 				
 				if(envio.getIdtipoenvios().toString().equals(SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO)){					
-					_enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, null, envioMasivo);
+					idEstadoEnvio = _enviosService.envioMail(String.valueOf(envio.getIdinstitucion()), String.valueOf(envio.getIdenvio()), remitentedto, destinatarios, asuntoFinal, cuerpoFinal, null, envioMasivo);
 				}
 				//Añadimos los informes al envio para que puedan ser descargados.
 				for (DatosDocumentoItem datosDocumentoItem : documentosEnvio) {
@@ -304,7 +301,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 				}
 			}
 			
-			envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
+			envio.setIdestado(idEstadoEnvio);
 			envio.setFechamodificacion(new Date());
 			_envEnviosMapper.updateByPrimaryKey(envio);
 
@@ -456,7 +453,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 		
 	}
 
-	private void addDestintatariosEtiquetas(EnvEnvios envio, List<DestinatarioItem> destinatarios) {
+	private void addDestintatariosEtiquetas(EnvEnvios envio, List<DestinatarioItem> destinatarios, boolean isBuroSMS, List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms) {
 		EnvEnviosgrupoclienteExample exampleEtiquetas = new EnvEnviosgrupoclienteExample();
 		exampleEtiquetas.createCriteria().andIdenvioEqualTo(envio.getIdenvio());
 		List<EnvEnviosgrupocliente> etiquetasEnvio = _envEnviosgrupoclienteMapper.selectByExample(exampleEtiquetas);
@@ -475,8 +472,13 @@ public class ColaEnviosImpl implements IColaEnvios {
 				//Buscamos las direcciones de esa persona
 				CenDireccionesExample exampleDir = new CenDireccionesExample();
 				
+				String preferente = SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO;
 				//Obtenemos la direccion preferente de la persona
-				exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike("%" + SigaConstants.TIPO_PREFERENTE_CORREOELECTRONICO + "%");
+				if (SigaConstants.ID_ENVIO_SMS.equals(envio.getIdtipoenvios()) || SigaConstants.ID_ENVIO_BURO_SMS.equals(envio.getIdtipoenvios())) {
+					preferente = SigaConstants.TIPO_PREFERENTE_SMS;
+				}
+				exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike("%" + preferente + "%");
+				
 				List<CenDirecciones> direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
 				
 				if(direcciones == null || direcciones.size() == 0){
@@ -488,20 +490,34 @@ public class ColaEnviosImpl implements IColaEnvios {
 				if(direcciones != null && direcciones.size() > 0){
 					boolean añadido = false;
 					for (CenDirecciones dir : direcciones) {
-						if(dir.getCorreoelectronico() != null){
+						DestinatarioItem destinatario = null;
+						if((SigaConstants.ID_ENVIO_MAIL.equals(envio.getIdtipoenvios()) || SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO.equals(envio.getIdtipoenvios())) && dir.getCorreoelectronico() != null) {
 							if(!añadido){
-								DestinatarioItem destinatario = new DestinatarioItem();
-								destinatario.setCorreoElectronico(dir.getCorreoelectronico());
-								destinatario.setNombre(cenPersona.getNombre());
-								destinatario.setApellidos1(cenPersona.getApellidos1());
-								destinatario.setApellidos2(cenPersona.getApellidos2());
-								destinatario.setNIFCIF(cenPersona.getNifcif());
-								destinatario.setIdPersona(String.valueOf(persona.getIdpersona()));
-								destinatarios.add(destinatario);
+								destinatario = new DestinatarioItem();
 								añadido = true;
 //								LOGGER.info("PRUEBA ENVIOS ETIQUETAS : " + destinatarios.toString());
 							}
 						}
+
+						if((SigaConstants.ID_ENVIO_SMS.equals(envio.getIdtipoenvios()) || SigaConstants.ID_ENVIO_BURO_SMS.equals(envio.getIdtipoenvios())) && dir.getMovil() != null) {
+							if(!añadido){
+								destinatario = new DestinatarioItem();
+								añadido = true;
+								addDestBuroSMS(isBuroSMS, listEnvDestinatariosBurosms, envio.getIdenvio(), dir.getIdinstitucion(), dir.getIdpersona(), dir.getMovil());
+							}
+						}
+						
+						if (destinatario != null) {
+							destinatario.setCorreoElectronico(dir.getCorreoelectronico());
+							destinatario.setNombre(cenPersona.getNombre());
+							destinatario.setApellidos1(cenPersona.getApellidos1());
+							destinatario.setApellidos2(cenPersona.getApellidos2());
+							destinatario.setNIFCIF(cenPersona.getNifcif());
+							destinatario.setMovil(dir.getMovil());
+							destinatario.setIdPersona(String.valueOf(persona.getIdpersona()));
+							destinatarios.add(destinatario);
+						}
+						
 						insertaEnvDestinatarios(envio, dir, persona);
 					}
 				}
@@ -557,7 +573,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 //				respuesta.setDescription("Destinatario asociado con éxito");
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error(e);
 			}
 		} else {
 			try {
@@ -596,12 +612,12 @@ public class ColaEnviosImpl implements IColaEnvios {
 //				respuesta.setDescription("Destinatario asociado con éxito");
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				LOGGER.error(e);
 			}
 		}
 	}
 
-	private void addDestinatariosConsultas(EnvEnvios envio, List<DestinatarioItem> destinatarios) {
+	private void addDestinatariosConsultas(EnvEnvios envio, List<DestinatarioItem> destinatarios, boolean isBuroSMS, List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms) {
 				
 		List<ConsultaItem> consultaItem = _envDestConsultaEnvioExtendsMapper.selectConsultasDestEnvio(envio.getIdinstitucion(), envio.getIdenvio().toString());
 		if (consultaItem != null) {
@@ -611,28 +627,53 @@ public class ColaEnviosImpl implements IColaEnvios {
 				if(result != null && result.size() > 0){
 					
 					for (Map<String, Object> map : result) {
-						Object campo = map.get("CORREOELECTRONICO");
-	            		if(campo != null){
-	            			DestinatarioItem destinatario = new DestinatarioItem();
-	            			destinatario.setCorreoElectronico(campo.toString());
-	            			
-	            			campo = map.get("NOMBRE");
-	            			destinatario.setNombre(campo!=null? String.valueOf(campo):"");
-	            			
-	            			campo = map.get("APELLIDOS1");
-	            			destinatario.setApellidos1(campo!=null? String.valueOf(campo):"");
-	            			
-	            			campo = map.get("APELLIDOS2");
-	            			destinatario.setApellidos2(campo!=null? String.valueOf(campo):"");
-	            			
-	            			campo = map.get("NIFCIF");
-	            			destinatario.setNIFCIF(campo!=null? String.valueOf(campo):"");
-	            			
-	            			campo = map.get("IDPERSONA");
-	            			destinatario.setIdPersona(campo!=null? String.valueOf(campo):"");
-	
-	            			destinatarios.add(destinatario);
-	            		}
+						
+            			DestinatarioItem destinatario = new DestinatarioItem();
+            			Object campo = map.get("CORREOELECTRONICO");
+            			if (campo != null) {
+            				destinatario.setCorreoElectronico(campo.toString());
+            			}
+            			
+            			campo = map.get("MOVIL");
+            			if (campo != null) {
+            				destinatario.setMovil(campo.toString());	
+            			}
+            			
+            			campo = map.get("NOMBRE");
+            			destinatario.setNombre(campo!=null? String.valueOf(campo):"");
+            			
+            			campo = map.get("APELLIDOS1");
+            			destinatario.setApellidos1(campo!=null? String.valueOf(campo):"");
+            			
+            			campo = map.get("APELLIDOS2");
+            			destinatario.setApellidos2(campo!=null? String.valueOf(campo):"");
+            			
+            			campo = map.get("NIFCIF");
+            			destinatario.setNIFCIF(campo!=null? String.valueOf(campo):"");
+            			
+            			campo = map.get("IDPERSONA");
+            			destinatario.setIdPersona(campo!=null? String.valueOf(campo):"");
+            			
+            			Long idPersona = null;
+            			if (destinatario.getIdPersona() != null && !destinatario.getIdPersona().trim().equals("")) {
+            				idPersona = Long.parseLong(destinatario.getIdPersona());
+            				if (destinatario.getNIFCIF() == null || destinatario.getNIFCIF().trim().equals("")) {
+            					CenPersona cenPersona = _cenPersonaMapper.selectByPrimaryKey(idPersona);
+            					if (cenPersona != null) {
+            						destinatario.setNIFCIF(cenPersona.getNifcif());
+            						destinatario.setNombre(cenPersona.getNombre());
+            						destinatario.setApellidos1(cenPersona.getApellidos1());
+            						destinatario.setApellidos2(cenPersona.getApellidos2());
+            					}
+            				}
+            			}
+            			
+
+            			destinatarios.add(destinatario);
+            			
+            			//si la consulta tiene movil idpersona e idinstitucion se añade		            			
+            			addDestBuroSMS(isBuroSMS, listEnvDestinatariosBurosms, envio.getIdenvio(), envio.getIdinstitucion(), idPersona, destinatario.getMovil());
+
 	    				//Obtenemos la persona
 	    				CenPersona cenPersona = _cenPersonaMapper.selectByPrimaryKey(Long.parseLong(String.valueOf(map.get("IDPERSONA"))));
 	    				
@@ -660,7 +701,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 		
 	}
 
-	private void addDestinatariosIndividuales(Short idinstitucion, Long idenvio, List<DestinatarioItem> destinatarios) {
+	private void addDestinatariosIndividuales(Short idinstitucion, Long idenvio, List<DestinatarioItem> destinatarios, boolean isBuroSMS, List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms) {
 		if (idenvio != null && idinstitucion != null) {
 			LOGGER.debug("Buscamos los destinatarios individuales para el idinstitucion " + idinstitucion + " e idenvio = " + idenvio);
 			EnvDestinatariosExample example = new EnvDestinatariosExample();
@@ -674,8 +715,10 @@ public class ColaEnviosImpl implements IColaEnvios {
 					dest.setApellidos1(destinatario.getApellidos1());
 					dest.setApellidos2(destinatario.getApellidos2());
 					dest.setNIFCIF(destinatario.getNifcif());
+					dest.setMovil(destinatario.getMovil());
 					dest.setIdPersona(String.valueOf(destinatario.getIdpersona()));
 					destinatarios.add(dest);
+					addDestBuroSMS(isBuroSMS, listEnvDestinatariosBurosms, idenvio, idinstitucion, destinatario.getIdpersona(), destinatario.getMovil());
 				}
 			}
 		}
@@ -706,96 +749,17 @@ public class ColaEnviosImpl implements IColaEnvios {
 		List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms = new ArrayList<EnvDestinatariosBurosms>();
 		
 		if(envioMasivo){
-			//Obtenemos destinatarios de las etiquetas de envio
-			EnvEnviosgrupoclienteExample exampleEtiquetas = new EnvEnviosgrupoclienteExample();
-			exampleEtiquetas.createCriteria().andIdenvioEqualTo(envio.getIdenvio());
-			List<EnvEnviosgrupocliente> etiquetasEnvio = _envEnviosgrupoclienteMapper.selectByExample(exampleEtiquetas);
-			
 			List<DestinatarioItem> destinatarios = new ArrayList<DestinatarioItem>();
-			
-			
-			for (EnvEnviosgrupocliente envEnviosgrupocliente : etiquetasEnvio) {
-				CenGruposclienteClienteExample etiqueta = new CenGruposclienteClienteExample();
-				etiqueta.createCriteria().andIdgrupoEqualTo(envEnviosgrupocliente.getIdgrupo()).andIdinstitucionEqualTo(envio.getIdinstitucion());
-				List<CenGruposclienteCliente> personas = _cenGruposclienteClienteMapper.selectByExample(etiqueta);
-				for (CenGruposclienteCliente persona : personas) {
-					//Buscamos las direcciones de esa persona, primero la preferente
-					CenDireccionesExample exampleDir = new CenDireccionesExample();
-					exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull().andPreferenteLike("%" + SigaConstants.TIPO_PREFERENTE_SMS + "%");
-					List<CenDirecciones> direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
-					
-					if(direcciones == null || direcciones.size() == 0) {
-						exampleDir = new CenDireccionesExample();
-						exampleDir.createCriteria().andIdpersonaEqualTo(persona.getIdpersona()).andIdinstitucionEqualTo(persona.getIdinstitucion()).andFechabajaIsNull();
-						direcciones =  _cenDireccionesMapper.selectByExample(exampleDir);
-					}
-					
-					//Si la persona tiene mas de una direccion obtenemos todas hasta que encontremos una con movil
-					if(direcciones != null && direcciones.size() > 0){
-						boolean añadido = false;
-						for (CenDirecciones dir : direcciones) {
-							if(dir.getMovil() != null){
-								if(!añadido){
-									DestinatarioItem destinatario = new DestinatarioItem();
-									destinatario.setMovil(dir.getMovil());
-									destinatarios.add(destinatario);
-									añadido = true;
-									
-									addDestBuroSMS(isBuroSMS, listEnvDestinatariosBurosms, envio.getIdenvio(), dir.getIdinstitucion(), dir.getIdpersona(), dir.getMovil());
-								}
-							}
-						}
-					}
-				}
-			}
-			
+			//Obtenemos destinatarios de las etiquetas de envio
+			addDestintatariosEtiquetas(envio, destinatarios, isBuroSMS, listEnvDestinatariosBurosms);
 			//Obtenemos destinatarios individuales.
-			EnvDestinatariosExample example = new EnvDestinatariosExample();
-			example.createCriteria().andIdenvioEqualTo(envio.getIdenvio()).andIdinstitucionEqualTo(envio.getIdinstitucion());
-			List<EnvDestinatarios> destIndv = _envDestinatariosMapper.selectByExample(example);
-			for (EnvDestinatarios destinatario : destIndv) {
-				if(destinatario.getMovil()!=null){
-					DestinatarioItem dest = new DestinatarioItem();
-					dest.setMovil(destinatario.getMovil());
-					destinatarios.add(dest);
-					
-					addDestBuroSMS(isBuroSMS, listEnvDestinatariosBurosms, envio.getIdenvio(), envio.getIdinstitucion(), destinatario.getIdpersona(), destinatario.getMovil());
-				}
-			}
-			
+			addDestinatariosIndividuales(envio.getIdinstitucion(), envio.getIdenvio(), destinatarios, isBuroSMS, listEnvDestinatariosBurosms);
 			//obtenemos los destinatarios por consultas de destinatarios
-			List<ConsultaItem> consultaItem = _envDestConsultaEnvioExtendsMapper.selectConsultasDestEnvio(envio.getIdinstitucion(), envio.getIdenvio().toString());
-			for (ConsultaItem consulta : consultaItem) {
-				String sentenciaFinal = prepararConsulta(consulta.getSentencia(), envio.getIdtipoenvios(), envio.getIdinstitucion());
-				List<Map<String,Object>> result = _conConsultasExtendsMapper.ejecutarConsultaString(sentenciaFinal);
-				if(result != null && result.size() > 0){
-					
-					for (Map<String, Object> map : result) {
-						Object movil = map.get("MOVIL");
-						LOGGER.debug("MOVIL = " + movil);
-						
-	            		if(movil != null){
-	            			DestinatarioItem destinatario = new DestinatarioItem();
-	            			destinatario.setMovil(movil.toString());
-	            			String idPersona = (String) map.get("IDPERSONA");
-	            			LOGGER.debug("IDPERSONA = " + idPersona);
-	            			
-	            			if (idPersona != null && !idPersona.trim().equals("")) {
-	            				destinatarios.add(destinatario);
-		            			//si la consulta tiene movil idpersona e idinstitucion se añade		            			
-		            			addDestBuroSMS(isBuroSMS, listEnvDestinatariosBurosms, envio.getIdenvio(), envio.getIdinstitucion(), Long.valueOf(idPersona), movil.toString());
-	            			} else {
-	            				LOGGER.info("La consulta tiene el idinstitucion o idpersona nula");
-	            			}
-	            			
-	            		}
-					}
-				}
-			}
+			addDestinatariosConsultas(envio, destinatarios, isBuroSMS, listEnvDestinatariosBurosms);			
 			
 			LOGGER.info("Destinatarios encontrados: " + destinatarios.size());
 			
-		}else{
+		} else {
 			EnvDestinatariosExample exampleDest = new EnvDestinatariosExample();
 			exampleDest.createCriteria().andIdenvioEqualTo(envio.getIdenvio()).andIdinstitucionEqualTo(envio.getIdinstitucion());
 			List<EnvDestinatarios> destinatariosEntities = _envDestinatariosMapper.selectByExample(exampleDest);
@@ -874,30 +838,31 @@ public class ColaEnviosImpl implements IColaEnvios {
 		
 		for(EnvDestinatariosBurosms envDestinatariosBurosms: listEnvDestinatariosBurosms) {
 			String[] dest = new String[1];
-			if (envDestinatariosBurosms.getMovil() != null && !envDestinatariosBurosms.getMovil().trim().equals("")) { 
-				dest[0] = envDestinatariosBurosms.getMovil();
-				
-				try {
-					idSolicitudEcos = _enviosService.envioSMS(remitente, dest, envio.getIdinstitucion(), cuerpoFinal, isBuroSMS);
-					LOGGER.debug("El idSolicitudEcos para el número " + envDestinatariosBurosms.getMovil() + " es " + idSolicitudEcos);
-					if (isBuroSMS) {
-						
-						//añadimos un documento vacío para que al descargar desde la web vayamos a buscar el pdf a la pfd
-						EnvDocumentos envDocumentos = addEnvDocument(envio.getIdenvio(), envio.getIdinstitucion(), envDestinatariosBurosms.getMovil());
-						if (envDocumentos != null) {
-							LOGGER.debug("El identificador del documento insertado es " + envDocumentos.getIddocumento());
-						}	
-						
-						envDestinatariosBurosms.setIdsolicitudecos(idSolicitudEcos);
-						envDestinatariosBurosms.setIddocumento(envDocumentos.getIddocumento());
-						
-						buroSMSenviados += envDestinatariosBurosmsMapper.insert(envDestinatariosBurosms);						
-					}
-				}catch(Exception e) {
-					hayError = true;
-					LOGGER.error("Error al enviar el sms al destinatario: " + envDestinatariosBurosms.getMovil(), e);
-					throw new BusinessException("Error al enviar el sms al destinatario: " + envDestinatariosBurosms.getMovil(), e);
+			dest[0] = envDestinatariosBurosms.getMovil();
+			
+			try {
+				DestinatarioItem destinatarioItem = envDestinatariosBurosms2DestinatarioItem(envDestinatariosBurosms);
+				List<DestinatarioItem> listDestinatarioItems = new ArrayList<DestinatarioItem>();
+				listDestinatarioItems.add(destinatarioItem);
+				idSolicitudEcos = _enviosService.envioSMS(remitente, listDestinatarioItems, envio, cuerpoFinal, isBuroSMS);
+				LOGGER.debug("El idSolicitudEcos para el número " + envDestinatariosBurosms.getMovil() + " es " + idSolicitudEcos);
+				if (isBuroSMS && idSolicitudEcos != null && !idSolicitudEcos.trim().equals("")) {
+					
+					//añadimos un documento vacío para que al descargar desde la web vayamos a buscar el pdf a la pfd
+					EnvDocumentos envDocumentos = addEnvDocument(envio.getIdenvio(), envio.getIdinstitucion(), envDestinatariosBurosms.getMovil());
+					if (envDocumentos != null) {
+						LOGGER.debug("El identificador del documento insertado es " + envDocumentos.getIddocumento());
+					}	
+					
+					envDestinatariosBurosms.setIdsolicitudecos(idSolicitudEcos);
+					envDestinatariosBurosms.setIddocumento(envDocumentos.getIddocumento());
+					
+					buroSMSenviados += envDestinatariosBurosmsMapper.insert(envDestinatariosBurosms);						
 				}
+			}catch(Exception e) {
+				hayError = true;
+				LOGGER.error("Error al enviar el sms al destinatario: " + envDestinatariosBurosms.getMovil(), e);
+				throw new BusinessException("Error al enviar el sms al destinatario: " + envDestinatariosBurosms.getMovil(), e);
 			}
 		}
 		
@@ -911,6 +876,24 @@ public class ColaEnviosImpl implements IColaEnvios {
 		envio.setIdsolicitudecos(idSolicitudEcos);
 		_envEnviosMapper.updateByPrimaryKey(envio);
 		
+	}
+	
+	private DestinatarioItem envDestinatariosBurosms2DestinatarioItem(EnvDestinatariosBurosms envDestinatariosBurosms) {
+		DestinatarioItem returnDestinatario = new DestinatarioItem();
+		CenPersona cenPersona = _cenPersonaMapper.selectByPrimaryKey(envDestinatariosBurosms.getIdpersona());
+		
+		if (cenPersona != null) {
+			returnDestinatario.setNIFCIF(cenPersona.getNifcif());
+			returnDestinatario.setNombre(cenPersona.getNombre());
+			returnDestinatario.setApellidos1(cenPersona.getApellidos1());
+			returnDestinatario.setApellidos2(cenPersona.getApellidos2());
+		}
+
+		returnDestinatario.setIdPersona(envDestinatariosBurosms.getIdpersona().toString());
+//		returnDestinatario.setCorreoElectronico(envDestinatariosBurosms.getCorreoelectronico());
+		returnDestinatario.setMovil(envDestinatariosBurosms.getMovil());
+		
+		return returnDestinatario;
 	}
 
 	private EnvDocumentos addEnvDocument(Long idenvio, Short idinstitucion, String movil) {
@@ -928,14 +911,16 @@ public class ColaEnviosImpl implements IColaEnvios {
 	private void addDestBuroSMS(boolean isBuroSMS, List<EnvDestinatariosBurosms> listEnvDestinatariosBurosms, Long idenvio,
 			Short idinstitucion, Long idpersona, String numMovil) {
 		
-		EnvDestinatariosBurosms envDestinatariosBurosms = new EnvDestinatariosBurosms();
-		envDestinatariosBurosms.setIdenvio(idenvio);
-		envDestinatariosBurosms.setIdpersona(idpersona);
-		envDestinatariosBurosms.setIdinstitucion(idinstitucion);
-		envDestinatariosBurosms.setMovil(numMovil);									
-		envDestinatariosBurosms.setFechamodificacion(new Date());
-		envDestinatariosBurosms.setUsumodificacion(1);
-		listEnvDestinatariosBurosms.add(envDestinatariosBurosms);
+		if (listEnvDestinatariosBurosms != null) {
+			EnvDestinatariosBurosms envDestinatariosBurosms = new EnvDestinatariosBurosms();
+			envDestinatariosBurosms.setIdenvio(idenvio);
+			envDestinatariosBurosms.setIdpersona(idpersona);
+			envDestinatariosBurosms.setIdinstitucion(idinstitucion);
+			envDestinatariosBurosms.setMovil(numMovil);									
+			envDestinatariosBurosms.setFechamodificacion(new Date());
+			envDestinatariosBurosms.setUsumodificacion(1);
+			listEnvDestinatariosBurosms.add(envDestinatariosBurosms);
+		}
 	}
 
 	private String remplazarCamposAsunto(String asunto, List<Map<String, Object>> resultadosConsultas) {
