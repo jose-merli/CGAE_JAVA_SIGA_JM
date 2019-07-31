@@ -48,7 +48,10 @@ public class GenTablasMaestrasSqlExtendProvider {
 			sql.WHERE(" TAB." + tablaMaestra.getIdcampocodigoext() + " = '" + catalogo.getCodigoExt() + "'");
 		}
 		if (null != catalogo.getDescripcion() && !catalogo.getDescripcion().equals("")) {
-			sql.WHERE("REC.DESCRIPCION = '" + catalogo.getDescripcion() + "'");
+			String columna = "REC.DESCRIPCION";
+			String cadena = catalogo.getDescripcion();
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas(columna, cadena));
+			//sql.WHERE("REC.DESCRIPCION = '" + catalogo.getDescripcion() + "'");
 		}
        
         sql.ORDER_BY("REC.descripcion ASC");
@@ -174,7 +177,7 @@ public class GenTablasMaestrasSqlExtendProvider {
         sql.VALUES("BLOQUEADO", "'N'");
         sql.VALUES("USUMODIFICACION", "'" + String.valueOf(usuarioModificacion)+"'");
         sql.VALUES(tablaMaestra.getIdcampodescripcion(), ("NVL((SELECT MAX(IDRECURSO) IDRECURSO FROM (" + 
-        		"select TO_NUMBER(REPLACE(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'null',''),'99999999999') IDRECURSO from gen_recursos_catalogos  where NOMBRETABLA = " + "'" + tablaMaestra.getIdtablamaestra() +"' )),1)" ));
+        		"select TO_NUMBER(REPLACE(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'null',''),'9999999999999') IDRECURSO from gen_recursos_catalogos  where NOMBRETABLA = " + "'" + tablaMaestra.getIdtablamaestra() +"' )),1)" ));
         
         return sql.toString();
     }
@@ -191,7 +194,7 @@ public class GenTablasMaestrasSqlExtendProvider {
         
         sql.INSERT_INTO("GEN_RECURSOS_CATALOGOS");
         sql.VALUES("IDRECURSO", ("(SELECT MAX(IDRECURSO)+1 IDRECURSO FROM (" + 
-        		"select TO_NUMBER(REPLACE(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'null',''),'99999999999') IDRECURSO from gen_recursos_catalogos  ))" ));
+        		"select TO_NUMBER(REPLACE(REPLACE(REPLACE(REPLACE(IDRECURSO,'_',''),'-',''),'NULL',''),'null',''),'9999999999999') IDRECURSO from gen_recursos_catalogos  ))" ));
 
         if(catalogo.getLocal().equals("S")) {
         	sql.VALUES("IDINSTITUCION",  "'" +catalogo.getIdInstitucion()+"'");
@@ -245,7 +248,7 @@ public class GenTablasMaestrasSqlExtendProvider {
         sql.SELECT_DISTINCT(tablaMaestra.getIdcampocodigoext() + " AS CODIGOEXT");
         sql.SELECT("'" + tablaMaestra.getIdtablamaestra() + "'" + " AS CATALOGO");
         sql.SELECT("RECURSOS.DESCRIPCION AS DESCRIPCION");
-        sql.SELECT(tablaMaestra.getIdcampocodigo() + " AS IDREGISTRO");
+        sql.SELECT("RECURSOS.IDRECURSO AS IDREGISTRO");
         sql.SELECT("TABLA.FECHA_BAJA AS FECHABAJA");
         sql.FROM(tablaMaestra.getIdtablamaestra() + " TABLA" );
         
