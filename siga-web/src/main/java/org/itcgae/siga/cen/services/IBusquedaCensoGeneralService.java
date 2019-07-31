@@ -15,6 +15,8 @@ public interface IBusquedaCensoGeneralService {
 	
 	public BusquedaPerFisicaDTO search(int numPagina, BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, HttpServletRequest request);
 	
+	public BusquedaPerFisicaDTO searchExact(int numPagina, BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, HttpServletRequest request);
+
 	public NoColegiadoDTO searchCliente( NoColegiadoItem noColegiadoItem, HttpServletRequest request);
 
 	public ColegiadoDTO searchColegiado( ColegiadoItem colegiadoItem, HttpServletRequest request);
