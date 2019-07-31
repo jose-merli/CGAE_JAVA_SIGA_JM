@@ -836,7 +836,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-					plantillasList = _conListadoPlantillasExtendsMapper.selectListadoPlantillas(usuario.getIdinstitucion(),
+					plantillasList = _conListadoPlantillasExtendsMapper.selectListadoPlantillas(idInstitucion,
 							usuario.getIdlenguaje(), consulta.getIdConsulta());
 					if (plantillasList.size() > 0) {
 						conListadoPlantillasDTO.setListadoPlantillas(plantillasList);

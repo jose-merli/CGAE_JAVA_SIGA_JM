@@ -46,7 +46,6 @@ import org.itcgae.siga.age.service.IFichaEventosService;
 import org.itcgae.siga.com.services.impl.EnviosServiceImpl;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.commons.utils.ExcelHelper;
-import org.itcgae.siga.commons.utils.UtilidadesString;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.AgeAsistenciaEvento;
@@ -55,8 +54,6 @@ import org.itcgae.siga.db.entities.AgeCalendario;
 import org.itcgae.siga.db.entities.AgeCalendarioExample;
 import org.itcgae.siga.db.entities.AgeEvento;
 import org.itcgae.siga.db.entities.AgeEventoExample;
-import org.itcgae.siga.db.entities.AgeEventonotificacion;
-import org.itcgae.siga.db.entities.AgeEventonotificacionExample;
 import org.itcgae.siga.db.entities.AgeFestivos;
 import org.itcgae.siga.db.entities.AgeGeneracionnotificaciones;
 import org.itcgae.siga.db.entities.AgeGeneracionnotificacionesExample;
@@ -88,7 +85,6 @@ import org.itcgae.siga.db.entities.ForInscripcion;
 import org.itcgae.siga.db.entities.ForInscripcionExample;
 import org.itcgae.siga.db.entities.GenDiccionario;
 import org.itcgae.siga.db.entities.GenDiccionarioExample;
-import org.itcgae.siga.db.mappers.AgeEventonotificacionMapper;
 import org.itcgae.siga.db.mappers.AgeGeneracionnotificacionesMapper;
 import org.itcgae.siga.db.mappers.AgePersonaEventoMapper;
 import org.itcgae.siga.db.mappers.CenDireccionesMapper;
@@ -2692,20 +2688,15 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 								}
 								if (null != destinatarios && destinatarios.size() > 0) {
 									List<String> destinatariosMoviles = new ArrayList<String>();
-									List<DestinatarioItem> destinatariosMail = new ArrayList<DestinatarioItem>();
+									List<DestinatarioItem> destinatariosItem = new ArrayList<DestinatarioItem>();
 									// Insertamos los destinatarios del envío
 									for (Iterator iterator = destinatarios.iterator(); iterator.hasNext();) {
 										EnvDestinatarios envDestinatarios = (EnvDestinatarios) iterator.next();
 										_envDestinatariosMapper.insert(envDestinatarios);
-										// Preparamos destinatarios para SMS
-										if (!UtilidadesString.esCadenaVacia(envDestinatarios.getMovil())) {
-											destinatariosMoviles.add(envDestinatarios.getMovil());
-										}
-										if (!UtilidadesString.esCadenaVacia(envDestinatarios.getCorreoelectronico())) {
-											DestinatarioItem destItem = new DestinatarioItem();
-											destItem = envDestinatarios2DestinatarioItem(envDestinatarios);
-											destinatariosMail.add(destItem);
-										}
+										
+										DestinatarioItem destItem = new DestinatarioItem();
+										destItem = envDestinatarios2DestinatarioItem(envDestinatarios);
+										destinatariosItem.add(destItem);
 										// Preparamos destinatarios para Mail
 									}
 
@@ -2721,7 +2712,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 												envio.setFechamodificacion(new Date());
 												_envEnviosMapper.updateByPrimaryKey(envio);
 												envioService.envioMail(eventoCurso.get(0).getIdinstitucion().toString(),
-														idEnvio.toString(), remitenteMail, destinatariosMail,
+														idEnvio.toString(), remitenteMail, destinatariosItem,
 														plantilla.get(0).getAsunto(), plantilla.get(0).getCuerpo(),
 														null, false);
 												envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
@@ -2738,7 +2729,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 												envio.setFechamodificacion(new Date());
 												_envEnviosMapper.updateByPrimaryKey(envio);
 												envioService.envioMail(eventoCurso.get(0).getIdinstitucion().toString(),
-														idEnvio.toString(), remitenteMail, destinatariosMail,
+														idEnvio.toString(), remitenteMail, destinatariosItem,
 														plantilla.get(0).getAsunto(), plantilla.get(0).getCuerpo(),
 														null, false);
 												envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
@@ -2755,7 +2746,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 												envio.setFechamodificacion(new Date());
 												_envEnviosMapper.updateByPrimaryKey(envio);
 												envioService.envioMail(eventoCurso.get(0).getIdinstitucion().toString(),
-														idEnvio.toString(), remitenteMail, destinatariosMail,
+														idEnvio.toString(), remitenteMail, destinatariosItem,
 														plantilla.get(0).getAsunto(), plantilla.get(0).getCuerpo(),
 														null, false);
 												envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
@@ -2781,8 +2772,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 												envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
 												envio.setFechamodificacion(new Date());
 												_envEnviosMapper.updateByPrimaryKey(envio);
-												envioService.envioSMS(remitente, moviles,
-														eventoCurso.get(0).getIdinstitucion(),
+												envioService.envioSMS(remitente, destinatariosItem,
+														envio,
 														plantilla.get(0).getCuerpo(), false);
 												envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
 												envio.setFechamodificacion(new Date());
@@ -2808,8 +2799,9 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 												envio.setIdestado(SigaConstants.ENVIO_PROCESANDO);
 												envio.setFechamodificacion(new Date());
 												_envEnviosMapper.updateByPrimaryKey(envio);
-												envioService.envioSMS(remitente, moviles,
-														eventoCurso.get(0).getIdinstitucion(),
+												
+												envioService.envioSMS(remitente, destinatariosItem,
+														envio,
 														plantilla.get(0).getCuerpo(), true);
 												envio.setIdestado(SigaConstants.ENVIO_PROCESADO);
 												envio.setFechamodificacion(new Date());

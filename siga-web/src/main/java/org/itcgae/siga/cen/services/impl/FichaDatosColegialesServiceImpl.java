@@ -1072,6 +1072,47 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					List<CenDatoscolegialesestado> cenDatoscolegialesestadosList = cenDatoscolegialesestadoExtendsMapper
 							.selectByExample(cenDatoscolegialesestadoExample);
 
+					// ACTUALIZAMOS CEN_COLEGIADO PARA ELIMINAR
+					CenColegiadoKey colegiadoKey = new CenColegiadoKey();
+					colegiadoKey.setIdinstitucion(idInstitucion);
+					colegiadoKey.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+					CenColegiado colegiado = new CenColegiado();
+					colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
+					colegiado.setIdinstitucion(idInstitucion);
+					colegiado.setUsumodificacion(usuario.getIdusuario());
+					if (colegiadoItem.getNumColegiado() != null) {
+						colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
+					}
+					if (colegiadoItem.getIdTiposSeguro() != null && colegiadoItem.getIdTiposSeguro() != "") {
+						colegiado.setIdtiposseguro(Short.parseShort(colegiadoItem.getIdTiposSeguro()));
+					} else {
+						colegiado.setIdtiposseguro(null);
+					}
+					if (colegiadoItem.getSituacionResidente() != null) {
+						colegiado.setSituacionresidente(
+							colegiadoItem.getSituacionResidente().equalsIgnoreCase("si") ? "1" : "0");
+					} else {
+						colegiado.setSituacionresidente("0");
+					}
+
+					if (colegiadoItem.getComunitario() != null) {
+						colegiado.setComunitario(colegiadoItem.getComunitario());
+					}
+					if (colegiadoItem.getnMutualista() != null && colegiadoItem.getnMutualista() != "") {
+						colegiado.setNmutualista(colegiadoItem.getnMutualista());
+					} else {
+						colegiado.setNmutualista(null);
+					}
+
+//					colegiado.setFechaincorporacion(colegiadoItem.getIncorporacionDate());
+					colegiado.setFechatitulacion(colegiadoItem.getFechaTitulacionDate());
+//					colegiado.setFechapresentacion(colegiadoItem.getFechapresentacionDate());
+					colegiado.setFechajura(colegiadoItem.getFechaJuraDate());
+
+					colegiado.setFechamodificacion(new Date());
+
+					cenColegiadoExtendsMapper.updateColegiado(colegiado);
+					
 					if (null != cenDatoscolegialesestadosList && cenDatoscolegialesestadosList.size() > 0) {
 						CenDatoscolegialesestado cenDatoscolegialesestadoBBDD = null;
 

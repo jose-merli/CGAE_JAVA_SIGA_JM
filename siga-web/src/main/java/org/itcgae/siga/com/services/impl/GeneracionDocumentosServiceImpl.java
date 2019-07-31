@@ -144,7 +144,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 		DatosDocumentoItem documento = new DatosDocumentoItem();
 		try {
 			if (doc != null) {
-
+				doc.removeMacros();
 				doc.save(pathfinal + nombrefichero);
 				archivo = new File(pathfinal + nombrefichero);
 				if (!archivo.exists())
@@ -281,7 +281,7 @@ public class GeneracionDocumentosServiceImpl implements IGeneracionDocumentosSer
 										celda.setCellType(Cell.CELL_TYPE_STRING);
 										cellStyle.setAlignment(CellStyle.ALIGN_LEFT);
 										XSSFRichTextString textCell = new XSSFRichTextString(
-												SigaConstants.DATE_FORMAT_MIN_SEC.format(campo));
+												SigaConstants.DATE_FORMAT_MIN.format(campo));
 										celda.setCellValue(textCell);
 										celda.setCellStyle(cellStyle);
 									} else {
