@@ -178,10 +178,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			
 			if (null != usuarios && usuarios.size() > 0) {
-
 				
 				comboItems = _conModulosExtendsMapper.selectModulos();
-				
 				
 				comboDTO.setCombooItems(comboItems);
 				
