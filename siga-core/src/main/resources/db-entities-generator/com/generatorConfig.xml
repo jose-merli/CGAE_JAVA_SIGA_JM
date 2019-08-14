@@ -1,25 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-	<classPathEntry location="home/johndoe/ojdbc6.jar"/>
+	<classPathEntry location="C:\Users\DTUser\Downloads\ojdbc6.jar" />
 	  <context id="DB2Tables" targetRuntime="MyBatis3">
 	
 		<jdbcConnection 
-			connectionURL="jdbc:oracle:thin:@//vmcgaeap004.cloud.es.deloitte.com:1521/cgae" 
+			connectionURL="jdbc:oracle:thin:@//192.168.18.6:1546/SIGADES" 
 			driverClass="oracle.jdbc.OracleDriver"
 			userId="uscgae"
 			password="uscgae" />
 			
 			
-		<javaModelGenerator targetPackage="org.itcgae.siga.db.entities" targetProject="siga-core" />
+			<javaModelGenerator targetPackage="org.itcgae.siga.db.entities" targetProject="siga-core" />
 		<!-- <sqlMapGenerator targetPackage="com.cgae.db.mappers" targetProject="demo" /> -->
 		<javaClientGenerator targetPackage="org.itcgae.siga.db.mappers" targetProject="siga-core" type="ANNOTATEDMAPPER" implementationPackage="org.itcgae.siga.db.services" />
-		
-
 		
 <!-- 		<table schema="USCGAE_INT" tableName="ENV_TIPOENVIOS" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
 <!-- 		</table> -->
+		
+			<table schema="USCGAE" tableName="CEN_SOLICMODIFCAMBIARFOTO">
+			<property name="ignoreQualifiersAtRuntime" value="true"/>
+			<generatedKey column="IDSOLICITUD" 
+ 				sqlStatement="SELECT SEQ_CENSOLICMODIFCAMBIARFOTO.NEXTVAL FROM DUAL" />
+		</table>
 		
 <!-- 		<table schema="USCGAE_INT" tableName="ENV_ESTADOENVIO" > -->
 <!-- 			<property name="ignoreQualifiersAtRuntime" value="true"/> -->
