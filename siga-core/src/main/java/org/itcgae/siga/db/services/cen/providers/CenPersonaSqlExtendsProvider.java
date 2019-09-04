@@ -29,7 +29,8 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		return sql.toString();
 	}
 
-	public String searchPerFisica(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, String idLenguaje, String idinstitucion) {
+	public String searchPerFisica(BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, String idLenguaje,
+			String idinstitucion) {
 
 		SQL sql = new SQL();
 		SQL sql2 = new SQL();
@@ -42,13 +43,15 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT("CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2) AS APELLIDOS");
 		sql.SELECT("PER.APELLIDOS1 AS PRIMERAPELLIDO");
 		sql.SELECT("PER.APELLIDOS2 AS SEGUNDOAPELLIDO");
-		sql.SELECT("PER.NIFCIF AS NIF"); 
+		sql.SELECT("PER.NIFCIF AS NIF");
 		sql.SELECT("PER.FECHANACIMIENTO");
 		sql.SELECT("I.ABREVIATURA AS COLEGIO");
 		sql.SELECT("I.IDINSTITUCION");
-		sql.SELECT("NVL(DECODE(NVL(COL.COMUNITARIO,0),0, COL.NCOLEGIADO, COL.NCOMUNITARIO), COL.NCOLEGIADO) AS NUMEROCOLEGIADO");
-		sql.SELECT("NVL(CA.DESCRIPCION, DECODE(PER.IDTIPOIDENTIFICACION,20,'SOCIEDAD','NO COLEGIADO')) AS ESTADOCOLEGIAL");
-		//sql.SELECT("CA.DESCRIPCION AS ESTADOCOLEGIAL");
+		sql.SELECT(
+				"NVL(DECODE(NVL(COL.COMUNITARIO,0),0, COL.NCOLEGIADO, COL.NCOMUNITARIO), COL.NCOLEGIADO) AS NUMEROCOLEGIADO");
+		sql.SELECT(
+				"NVL(CA.DESCRIPCION, DECODE(PER.IDTIPOIDENTIFICACION,20,'SOCIEDAD','NO COLEGIADO')) AS ESTADOCOLEGIAL");
+		// sql.SELECT("CA.DESCRIPCION AS ESTADOCOLEGIAL");
 		sql.SELECT("DECODE(COL.SITUACIONRESIDENTE,'0','NO','1','SI') AS RESIDENTE");
 		sql.SELECT("MAX(DIR.IDPROVINCIA)  AS IDPROVINCIA");
 		sql.SELECT("ACT.IDACTIVIDADPROFESIONAL");
@@ -56,16 +59,18 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT("PER.IDESTADOCIVIL");
 		sql.SELECT("CLI.IDTRATAMIENTO");
 		sql.SELECT("PER.NATURALDE");
-		
+
 		sql.FROM("CEN_PERSONA PER");
 		// Mybatis cambia el orden de inner join y left_outer_join con sus funciones
 		// predefinidas=> siempre pone inner join antes
 		sql.LEFT_OUTER_JOIN(" CEN_CLIENTE CLI  ON (PER.IDPERSONA = CLI.IDPERSONA) ");
-		sql.LEFT_OUTER_JOIN("CEN_NOCOLEGIADO NOCOL  ON (PER.IDPERSONA = NOCOL.IDPERSONA AND CLI.IDINSTITUCION = NOCOL.IDINSTITUCION AND NOCOL.FECHA_BAJA IS NULL)");
-		sql.LEFT_OUTER_JOIN(" CEN_COLEGIADO COL  ON (PER.IDPERSONA = COL.IDPERSONA AND CLI.IDINSTITUCION = COL.IDINSTITUCION)");	
+		sql.LEFT_OUTER_JOIN(
+				"CEN_NOCOLEGIADO NOCOL  ON (PER.IDPERSONA = NOCOL.IDPERSONA AND CLI.IDINSTITUCION = NOCOL.IDINSTITUCION AND NOCOL.FECHA_BAJA IS NULL)");
+		sql.LEFT_OUTER_JOIN(
+				" CEN_COLEGIADO COL  ON (PER.IDPERSONA = COL.IDPERSONA AND CLI.IDINSTITUCION = COL.IDINSTITUCION)");
 		sql.LEFT_OUTER_JOIN(" CEN_INSTITUCION I ON (CLI.IDINSTITUCION = I.IDINSTITUCION) ");
 
-		sql2.SELECT("A.IDINSTITUCION"); 
+		sql2.SELECT("A.IDINSTITUCION");
 		sql2.SELECT("A.IDPERSONA");
 		sql2.SELECT("A.IDESTADO");
 
@@ -88,41 +93,44 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.LEFT_OUTER_JOIN(
 				"GEN_RECURSOS_CATALOGOS CA ON (ESTADOCOLEGIAL.DESCRIPCION = CA.IDRECURSO  AND CA.IDLENGUAJE = '"
 						+ idLenguaje + "')");
-		sql.LEFT_OUTER_JOIN("CEN_DIRECCIONES DIR ON (PER.IDPERSONA = DIR.IDPERSONA AND CLI.IDINSTITUCION = DIR.IDINSTITUCION)"); 
-		sql.LEFT_OUTER_JOIN("CEN_NOCOLEGIADO_ACTIVIDAD ACT ON (PER.IDPERSONA = ACT.IDPERSONA AND CLI.IDINSTITUCION = ACT.IDINSTITUCION)");
+		sql.LEFT_OUTER_JOIN(
+				"CEN_DIRECCIONES DIR ON (PER.IDPERSONA = DIR.IDPERSONA AND CLI.IDINSTITUCION = DIR.IDINSTITUCION)");
+		sql.LEFT_OUTER_JOIN(
+				"CEN_NOCOLEGIADO_ACTIVIDAD ACT ON (PER.IDPERSONA = ACT.IDPERSONA AND CLI.IDINSTITUCION = ACT.IDINSTITUCION)");
 		sql.WHERE("PER.IDTIPOIDENTIFICACION NOT IN ('20')");
-		sql.GROUP_BY("PER.IDPERSONA, PER.NOMBRE , CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2) , PER.APELLIDOS1 , PER.APELLIDOS2 , PER.NIFCIF , PER.FECHANACIMIENTO, I.ABREVIATURA , "
-				+ "I.IDINSTITUCION, NVL(DECODE(NVL(COL.COMUNITARIO,0),0, COL.NCOLEGIADO, COL.NCOMUNITARIO), COL.NCOLEGIADO) ,NVL(CA.DESCRIPCION, DECODE(PER.IDTIPOIDENTIFICACION,20,'SOCIEDAD','NO COLEGIADO')) ,"
-				+ " DECODE(COL.SITUACIONRESIDENTE,'0','NO','1','SI') , ACT.IDACTIVIDADPROFESIONAL, PER.SEXO, PER.IDESTADOCIVIL, PER.NATURALDE, CLI.IDTRATAMIENTO");
-		
+		sql.GROUP_BY(
+				"PER.IDPERSONA, PER.NOMBRE , CONCAT(PER.APELLIDOS1 || ' ',PER.APELLIDOS2) , PER.APELLIDOS1 , PER.APELLIDOS2 , PER.NIFCIF , PER.FECHANACIMIENTO, I.ABREVIATURA , "
+						+ "I.IDINSTITUCION, NVL(DECODE(NVL(COL.COMUNITARIO,0),0, COL.NCOLEGIADO, COL.NCOMUNITARIO), COL.NCOLEGIADO) ,NVL(CA.DESCRIPCION, DECODE(PER.IDTIPOIDENTIFICACION,20,'SOCIEDAD','NO COLEGIADO')) ,"
+						+ " DECODE(COL.SITUACIONRESIDENTE,'0','NO','1','SI') , ACT.IDACTIVIDADPROFESIONAL, PER.SEXO, PER.IDESTADOCIVIL, PER.NATURALDE, CLI.IDTRATAMIENTO");
 
-		
 		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
 			sql.WHERE("PER.NIFCIF = '" + busquedaPerFisicaSearchDTO.getNif() + "'");
 		}
-		
+
 		// si el dni no está en los filtros, buscamos por nombre y apellidos si los puso
-			if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNombre())) {
-				sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.NOMBRE", busquedaPerFisicaSearchDTO.getNombre()));
-			}
-			
-			if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getPrimerApellido())) {
-				sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.APELLIDOS1",
-						busquedaPerFisicaSearchDTO.getPrimerApellido()));
-			}
-			
-			if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getSegundoApellido())) {
-				sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.APELLIDOS2",
-						busquedaPerFisicaSearchDTO.getSegundoApellido()));
-			}
+		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNombre())) {
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.NOMBRE", busquedaPerFisicaSearchDTO.getNombre()));
+		}
+
+		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getPrimerApellido())) {
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.APELLIDOS1",
+					busquedaPerFisicaSearchDTO.getPrimerApellido()));
+		}
+
+		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getSegundoApellido())) {
+			sql.WHERE(UtilidadesString.filtroTextoBusquedas("PER.APELLIDOS2",
+					busquedaPerFisicaSearchDTO.getSegundoApellido()));
+		}
 
 		if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNumeroColegiado())) {
-			sql.WHERE(" (COL.NCOLEGIADO = '" + busquedaPerFisicaSearchDTO.getNumeroColegiado() + "' OR COL.NCOMUNITARIO = '" + busquedaPerFisicaSearchDTO.getNumeroColegiado() + "')");
+			sql.WHERE(" (COL.NCOLEGIADO = '" + busquedaPerFisicaSearchDTO.getNumeroColegiado()
+					+ "' OR COL.NCOMUNITARIO = '" + busquedaPerFisicaSearchDTO.getNumeroColegiado() + "')");
 		}
-		
+
+		String idInstituciones = "";
+
 		if (null != busquedaPerFisicaSearchDTO.getIdInstitucion()
 				&& busquedaPerFisicaSearchDTO.getIdInstitucion().length > 0) {
-			String idInstituciones = "";
 			if (busquedaPerFisicaSearchDTO.getIdInstitucion().length > 1) {
 				for (String string : busquedaPerFisicaSearchDTO.getIdInstitucion()) {
 					idInstituciones += "'" + string + "'";
@@ -134,13 +142,22 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 			}
 			sql.WHERE(" I.IDINSTITUCION  IN  (" + idInstituciones + ")");
 		}
-		
-		
+		//
+		// if(null != idInstituciones) {
+		// if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
+		// sql.WHERE("PER.NIFCIF = '" + busquedaPerFisicaSearchDTO.getNif() + "' OR
+		// (PER.NIFCIF = '" + busquedaPerFisicaSearchDTO.getNif() + "' AND
+		// I.IDINSTITUCION IN (" + idInstituciones + "))");
+		// }
+		// }else{
+		// if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
+		// sql.WHERE("(PER.NIFCIF = '" + busquedaPerFisicaSearchDTO.getNif() + "'");
+		// }
+		// }
 
 		return sql.toString();
 
 	}
-	
 
 	public String searchPerJuridica(int numpagina, BusquedaPerJuridicaSearchDTO busquedaPerJuridicaSearchDTO,
 			String idLenguaje) {
@@ -167,7 +184,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.FROM("cen_persona per");
 
 		sql.LEFT_OUTER_JOIN("cen_nocolegiado col  ON per.idpersona = col.idpersona");
-		sql.LEFT_OUTER_JOIN("cen_cliente cliColegiado ON per.idpersona = cliColegiado.idpersona"); 
+		sql.LEFT_OUTER_JOIN("cen_cliente cliColegiado ON per.idpersona = cliColegiado.idpersona");
 		sql.LEFT_OUTER_JOIN("cen_institucion i ON cliColegiado.idinstitucion = i.idinstitucion");
 		sql.LEFT_OUTER_JOIN("cen_tiposociedad tiposociedad ON tiposociedad.letracif = col.tipo");
 		sql.LEFT_OUTER_JOIN(
@@ -211,7 +228,10 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		if (null != busquedaPerJuridicaSearchDTO.getNif()
 				&& !busquedaPerJuridicaSearchDTO.getNif().equalsIgnoreCase("")) {
 			sql.WHERE("per.nifcif = '" + busquedaPerJuridicaSearchDTO.getNif() + "'");
+			// si trae un nif no tendrá en cuenta el tipo 'V' que es otros
+			sql.WHERE("col.tipo IN ('G','B','A','Y','E','J','F','C','H','P','Q','R','S','U')");
 		}
+
 		sql.GROUP_BY("cliColegiado.idinstitucion");
 		sql.GROUP_BY("per.idpersona");
 		sql.GROUP_BY("per.nifcif");
@@ -228,13 +248,15 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.GROUP_BY("col.fecha_baja ");
 
 		sql2.FROM("( " + sql + ") consulta");
-		
+
 		if (!UtilidadesString.esCadenaVacia(busquedaPerJuridicaSearchDTO.getDenominacion())) {
-			sql2.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.denominacion", busquedaPerJuridicaSearchDTO.getDenominacion()));
+			sql2.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.denominacion",
+					busquedaPerJuridicaSearchDTO.getDenominacion()));
 		}
-		
+
 		if (!UtilidadesString.esCadenaVacia(busquedaPerJuridicaSearchDTO.getAbreviatura())) {
-			sql2.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.abreviatura", busquedaPerJuridicaSearchDTO.getAbreviatura()));
+			sql2.WHERE(UtilidadesString.filtroTextoBusquedas("consulta.abreviatura",
+					busquedaPerJuridicaSearchDTO.getAbreviatura()));
 		}
 
 		return sql2.toString();
@@ -245,7 +267,8 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		SQL sql = new SQL();
 
 		sql.INSERT_INTO("CEN_PERSONA");
-		sql.VALUES("IDPERSONA", "(Select max(idpersona) +1 from cen_persona where idpersona like '" + usuario.getIdinstitucion() + "' || '%' )");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona) +1 from cen_persona where idpersona like '"
+				+ usuario.getIdinstitucion() + "' || '%' )");
 		sql.VALUES("NOMBRE", "'" + etiquetaUpdateDTO.getDenominacion().replace("'", "''") + "'");
 		// sql.VALUES("APELLIDOS1", "");
 		// sql.VALUES("APELLIDOS2", "");
@@ -282,50 +305,51 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 		return sql.toString();
 	}
-	
+
 	public String insertSelectiveForPerson(CenPersona crearPersonaDTO, AdmUsuarios usuario) {
 		SQL sql = new SQL();
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-		
 		sql.INSERT_INTO("CEN_PERSONA");
-		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona where idpersona like '" + usuario.getIdinstitucion() + "' || '%' )");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona where idpersona like '"
+				+ usuario.getIdinstitucion() + "' || '%' )");
 
 		if (!crearPersonaDTO.getNombre().equals("")) {
 			sql.VALUES("NOMBRE", "'" + crearPersonaDTO.getNombre().replace("'", "''") + "'");
 		}
 		if (!crearPersonaDTO.getApellidos1().equals("")) {
 			sql.VALUES("APELLIDOS1", "'" + crearPersonaDTO.getApellidos1().replace("'", "''") + "'");
-		}		
+		}
 		if (null != crearPersonaDTO.getApellidos2()) {
 			sql.VALUES("APELLIDOS2", "'" + crearPersonaDTO.getApellidos2().replace("'", "''") + "'");
 		} else {
 			sql.VALUES("APELLIDOS2", "null");
 		}
-		if(crearPersonaDTO.getFechanacimiento() != null) {
-			
+		if (crearPersonaDTO.getFechanacimiento() != null) {
+
 			String fechaNacimiento = dateFormat.format(crearPersonaDTO.getFechanacimiento());
 			sql.VALUES("FECHANACIMIENTO", "(TO_DATE('" + fechaNacimiento + "','DD/MM/YYYY'))");
-//			sql.VALUES("FECHANACIMIENTO", "'" + crearPersonaDTO.getFechanacimiento() + "'");
+			// sql.VALUES("FECHANACIMIENTO", "'" + crearPersonaDTO.getFechanacimiento() +
+			// "'");
 		}
 		if (!crearPersonaDTO.getNifcif().equals("")) {
 			sql.VALUES("NIFCIF", "'" + crearPersonaDTO.getNifcif() + "'");
 		} else {
 			sql.VALUES("NIFCIF", "null");
 		}
-		
-		if(!crearPersonaDTO.getIdtipoidentificacion().equals("")) {
+
+		if (!crearPersonaDTO.getIdtipoidentificacion().equals("")) {
 			sql.VALUES("IDTIPOIDENTIFICACION", "'" + crearPersonaDTO.getIdtipoidentificacion() + "'");
 		}
-		if(null != crearPersonaDTO.getSexo()) {
+		if (null != crearPersonaDTO.getSexo()) {
 			sql.VALUES("SEXO", "'" + crearPersonaDTO.getSexo() + "'");
 		}
-		if(null != crearPersonaDTO.getIdestadocivil()) {
+		if (null != crearPersonaDTO.getIdestadocivil()) {
 			sql.VALUES("IDESTADOCIVIL", "'" + crearPersonaDTO.getIdestadocivil() + "'");
 		}
-		
-		if(null != crearPersonaDTO.getNaturalde()) {
+
+		if (null != crearPersonaDTO.getNaturalde()) {
 			sql.VALUES("NATURALDE", "'" + crearPersonaDTO.getNaturalde().replace("'", "''") + "'");
 		}
 
@@ -339,7 +363,8 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		SQL sql = new SQL();
 
 		sql.INSERT_INTO("CEN_PERSONA");
-		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona where idpersona like '" + usuario.getIdinstitucion() + "' || '%' )");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona where idpersona like '"
+				+ usuario.getIdinstitucion() + "' || '%' )");
 
 		if (!crearPersonaDTO.getNombre().equals("")) {
 			sql.VALUES("NOMBRE", "'" + crearPersonaDTO.getNombre().replace("'", "''") + "'");
@@ -377,7 +402,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.WHERE("idpersona like '" + idInstitucion + "' || '%' ");
 		return sql.toString();
 	}
-	
+
 	public String selectMaxIdPersona2(String idinstitucion) {
 
 		SQL sql = new SQL();
@@ -385,11 +410,9 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT("max(IDPERSONA) +1 AS IDPERSONA");
 		sql.FROM("cen_persona");
 		sql.WHERE("idpersona like '" + idinstitucion + "' || '%' ");
-		
+
 		return sql.toString();
 	}
-
-
 
 	public String updatebyExampleDataLegalPerson(
 			PerJuridicaDatosRegistralesUpdateDTO perJuridicaDatosRegistralesUpdateDTO, AdmUsuarios usuario) {
@@ -419,7 +442,8 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 		sql.INSERT_INTO("CEN_PERSONA");
-		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona where idpersona like '" + usuario.getIdinstitucion() + "' || '%' )");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona+1)  from cen_persona where idpersona like '"
+				+ usuario.getIdinstitucion() + "' || '%' )");
 
 		if (!sociedadCreateDTO.getDenominacion().equals("")) {
 			sql.VALUES("NOMBRE", "'" + sociedadCreateDTO.getDenominacion().replace("'", "''") + "'");
@@ -445,7 +469,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 		return sql.toString();
 	}
-	
+
 	public String getPersonaisColegiadoWithIdPersona(String idPersona, String idInstitucion) {
 		SQL sql = new SQL();
 
@@ -453,14 +477,14 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		sql.SELECT("PER.NOMBRE AS NOMBRE");
 		sql.SELECT("PER.APELLIDOS1 AS APELLIDO1");
 		sql.SELECT("PER.APELLIDOS2 AS APELLIDO2");
-		sql.SELECT("PER.NIFCIF AS NIF"); 
+		sql.SELECT("PER.NIFCIF AS NIF");
 		sql.FROM("cen_persona per");
 		sql.WHERE("per.IDPERSONA = '" + idPersona + "'");
 
 		return sql.toString();
-		
+
 	}
-	
+
 	public String getIdPersonaWithNif(String personaNif) {
 		SQL sql = new SQL();
 
@@ -470,6 +494,5 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 
 		return sql.toString();
 	}
-	
 
 }

@@ -28,6 +28,7 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	private String identificacionReg;
 	private Date fechaInscripcion;
 	private Date fechaCancelacion;
+	private String cif;
 	
 
 	
@@ -362,6 +363,23 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	}
 	
 
+	/**
+	 */
+	public PerJuridicaDatosRegistralesUpdateDTO cif(String cif){
+		this.cif = cif;
+		return this;
+	}
+
+	@JsonProperty("cif")
+	public String getCif() {
+		return cif;
+	}
+
+
+
+	public void setCif(String cif) {
+		this.cif = cif;
+	}
 
 
 	@Override
@@ -384,13 +402,14 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	    		Objects.equals(this.idPersona, perJuridicaDatosRegistralesUpdateDTO.idPersona) &&
 	    		Objects.equals(this.prefijoNumsspp, perJuridicaDatosRegistralesUpdateDTO.prefijoNumsspp) &&
 	    		Objects.equals(this.contadorNumsspp, perJuridicaDatosRegistralesUpdateDTO.contadorNumsspp) &&
-	    		Objects.equals(this.sufijoNumsspp, perJuridicaDatosRegistralesUpdateDTO.sufijoNumsspp);
+	    		Objects.equals(this.sufijoNumsspp, perJuridicaDatosRegistralesUpdateDTO.sufijoNumsspp) &&
+	    Objects.equals(this.cif, perJuridicaDatosRegistralesUpdateDTO.cif);
 	}
  
 	
 	@Override
 	public int hashCode() {
-	    return Objects.hash(resena, objetoSocial, numeroPoliza, companiaAseg, fechaFin, fechaConstitucion, sociedadProfesional, actividades, idPersona, prefijoNumsspp, contadorNumsspp, sufijoNumsspp);
+	    return Objects.hash(resena, objetoSocial, numeroPoliza, companiaAseg, fechaFin, fechaConstitucion, sociedadProfesional, actividades, idPersona, prefijoNumsspp, contadorNumsspp, sufijoNumsspp, cif);
 	}
 
 	
@@ -411,6 +430,7 @@ public class PerJuridicaDatosRegistralesUpdateDTO {
 	    sb.append("    prefijoNumsspp: ").append(toIndentedString(prefijoNumsspp)).append("\n");
 	    sb.append("    contadorNumsspp: ").append(toIndentedString(contadorNumsspp)).append("\n");
 	    sb.append("    sufijoNumsspp: ").append(toIndentedString(sufijoNumsspp)).append("\n");
+	    sb.append("    cif: ").append(toIndentedString(cif)).append("\n");
 	    
 	    sb.append("}");
 	    return sb.toString();

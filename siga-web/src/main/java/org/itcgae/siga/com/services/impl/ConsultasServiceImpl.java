@@ -86,6 +86,7 @@ import org.itcgae.siga.db.services.com.mappers.ConModulosExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ConObjetivoExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.EnvTipoEnvioExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModKeyclasecomunicacionExtendsMapper;
+import org.itcgae.siga.db.services.com.mappers.ModModeloComunicacionExtendsMapper;
 import org.itcgae.siga.db.services.com.mappers.ModPlantillaDocumentoConsultaExtendsMapper;
 import org.itcgae.siga.exception.BusinessSQLException;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -158,6 +159,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 
 	@Autowired
 	private ModPlantillaDocumentoConsultaExtendsMapper _modPlantillaDocumentoConsultaExtendsMapper;
+	
+	@Autowired
+	private ModModeloComunicacionExtendsMapper _modModeloComunicacionExtendsMapper;
 
 	
 	@Override
@@ -397,6 +401,13 @@ public class ConsultasServiceImpl implements IConsultasService{
 							_modPlantilladocConsultaMapper.insert(mod);
 						}
 					}
+					
+					// Creando el modelo por defecto asociado a la copia
+					ModModelocomunicacion modeloCom = crearModelo(consulta, usuario, idInstitucion);
+					_modModelocomunicacionMapper.insert(modeloCom);
+					
+					generacionDeRelaciones(modeloCom, conConsulta, usuario, idInstitucion);
+					
 				
 				}catch (Exception e) {
 					error.setCode(500);
@@ -569,23 +580,7 @@ public class ConsultasServiceImpl implements IConsultasService{
 						
 						//Creamos el modelo de comunicación con la clase Consultas genericas para generacion de excel o informe
 						
-						ModModelocomunicacion modeloCom = new ModModelocomunicacion();
-						modeloCom.setDescripcion(consultaDTO.getNombre());
-						modeloCom.setFechamodificacion(new Date());
-						modeloCom.setIdclasecomunicacion(Short.parseShort(consultaDTO.getIdClaseComunicacion()));
-						modeloCom.setIdinstitucion(idInstitucion);
-						modeloCom.setNombre(consultaDTO.getNombre());
-//						modeloCom.setPordefecto("SI");
-						if(consultaDTO.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)){
-							modeloCom.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
-							modeloCom.setPordefecto(SigaConstants.SI);
-						}else{
-							modeloCom.setIdinstitucion(idInstitucion);
-							modeloCom.setPordefecto(SigaConstants.NO);
-						}		
-						modeloCom.setPreseleccionar("SI");
-						modeloCom.setUsumodificacion(usuario.getIdusuario());
-						modeloCom.setVisible((short)1);
+						ModModelocomunicacion modeloCom = crearModelo(consultaDTO, usuario, idInstitucion);
 //						
 //						SE INSERTA EL MODELO DE COMUNICACIÓN POR DEFECTO
 						_modModelocomunicacionMapper.insert(modeloCom);
@@ -610,43 +605,8 @@ public class ConsultasServiceImpl implements IConsultasService{
 //						plantilla.setIdioma("4");
 //						_modPlantillaDocumentoConsultaExtendsMapper.insertModPlantillaDocumento(plantilla);
 //						-------------------------------------
-						Integer i = 0;
-						do{
-							
-							ModPlantilladocumento plantilla = new ModPlantilladocumento();
-							plantilla.setFechamodificacion(new Date());
-							plantilla.setPlantilla(modeloCom.getNombre());
-							plantilla.setUsumodificacion(usuario.getIdusuario());
-							Integer idioma = i+1;
-								plantilla.setIdioma(idioma.toString());
-								_modPlantilladocumentoMapper.insert(plantilla);
-							
-							//Creamos la relación con la plantilla de documento para generación de excel
-							ModModeloPlantilladocumento plantillaDoc = new ModModeloPlantilladocumento();
-							plantillaDoc.setFechaasociacion(new Date());
-							plantillaDoc.setFechamodificacion(new Date());
-							plantillaDoc.setFormatosalida(String.valueOf(SigaConstants.FORMATO_SALIDA.XLS.getCodigo()));
-							plantillaDoc.setIdinforme((long)1);
-							plantillaDoc.setIdmodelocomunicacion(modeloCom.getIdmodelocomunicacion());
-							plantillaDoc.setNombreficherosalida(modeloCom.getNombre());
-							plantillaDoc.setUsumodificacion(usuario.getIdusuario());
-							plantillaDoc.setIdplantilladocumento(plantilla.getIdplantilladocumento());	
-							plantillaDoc.setGeneracionexcel(Short.parseShort(SigaConstants.DB_TRUE));
-							_modModeloPlantilladocumentoMapper.insert(plantillaDoc);
-							
-							//Asociamos la consulta a la plantilla de documento
-							
-							ModPlantilladocConsulta plantillaConsulta = new ModPlantilladocConsulta();
-							plantillaConsulta.setFechamodificacion(new Date());
-							plantillaConsulta.setIdconsulta(consulta.getIdconsulta());
-							plantillaConsulta.setIdinstitucion(idInstitucion);
-							plantillaConsulta.setIdinstitucionConsulta(idInstitucion);
-							plantillaConsulta.setIdmodelocomunicacion(modeloCom.getIdmodelocomunicacion());
-							plantillaConsulta.setIdplantilladocumento(plantilla.getIdplantilladocumento());
-							plantillaConsulta.setUsumodificacion(usuario.getIdusuario());
-							_modPlantilladocConsultaMapper.insert(plantillaConsulta);
-							i++;
-						}while(i<4);
+						
+						generacionDeRelaciones(modeloCom, consulta, usuario, idInstitucion);
 						
 						//Le añadimos al modelo todos los perfiles
 						List<ComboItem> comboItems = admPerfilExtendsMapper.selectListadoPerfiles(idInstitucion);
@@ -775,6 +735,68 @@ public class ConsultasServiceImpl implements IConsultasService{
 		return respuesta;
 	}
 
+	private ModModelocomunicacion crearModelo(ConsultaItem consulta, AdmUsuarios usuario, Short idInstitucion) {
+		ModModelocomunicacion modeloCom = new ModModelocomunicacion();
+		modeloCom.setDescripcion(consulta.getNombre());
+		modeloCom.setFechamodificacion(new Date());
+		modeloCom.setIdclasecomunicacion(Short.valueOf(SigaConstants.ID_CLASE_CONSULTA_GENERICA)); // para que el modelo por defecto salga en el ejecutar
+		modeloCom.setIdinstitucion(idInstitucion);
+		modeloCom.setNombre(consulta.getNombre());
+		
+		if(consulta.getIdInstitucion().equals(SigaConstants.IDINSTITUCION_0)){
+			modeloCom.setIdinstitucion(SigaConstants.IDINSTITUCION_2000);
+			modeloCom.setPordefecto(SigaConstants.SI);
+		}else{
+			modeloCom.setIdinstitucion(idInstitucion);
+			modeloCom.setPordefecto(SigaConstants.NO);
+		}		
+		modeloCom.setPreseleccionar("SI");
+		modeloCom.setUsumodificacion(usuario.getIdusuario());
+		modeloCom.setVisible((short)1);
+		
+		return modeloCom;
+	}
+	
+	private void generacionDeRelaciones(ModModelocomunicacion modeloCom, ConConsulta consulta, AdmUsuarios usuario, Short idInstitucion){
+		Integer i = 0;
+		do{
+			
+			ModPlantilladocumento plantilla = new ModPlantilladocumento();
+			plantilla.setFechamodificacion(new Date());
+			plantilla.setPlantilla(modeloCom.getNombre());
+			plantilla.setUsumodificacion(usuario.getIdusuario());
+			Integer idioma = i+1;
+				plantilla.setIdioma(idioma.toString());
+				_modPlantilladocumentoMapper.insert(plantilla);
+			
+			//Creamos la relación con la plantilla de documento para generación de excel
+			ModModeloPlantilladocumento plantillaDoc = new ModModeloPlantilladocumento();
+			plantillaDoc.setFechaasociacion(new Date());
+			plantillaDoc.setFechamodificacion(new Date());
+			plantillaDoc.setFormatosalida(String.valueOf(SigaConstants.FORMATO_SALIDA.XLS.getCodigo()));
+			plantillaDoc.setIdinforme((long)1);
+			plantillaDoc.setIdmodelocomunicacion(modeloCom.getIdmodelocomunicacion());
+			plantillaDoc.setNombreficherosalida(modeloCom.getNombre());
+			plantillaDoc.setUsumodificacion(usuario.getIdusuario());
+			plantillaDoc.setIdplantilladocumento(plantilla.getIdplantilladocumento());	
+			plantillaDoc.setGeneracionexcel(Short.parseShort(SigaConstants.DB_TRUE));
+			_modModeloPlantilladocumentoMapper.insert(plantillaDoc);
+			
+			//Asociamos la consulta a la plantilla de documento
+			
+			ModPlantilladocConsulta plantillaConsulta = new ModPlantilladocConsulta();
+			plantillaConsulta.setFechamodificacion(new Date());
+			plantillaConsulta.setIdconsulta(consulta.getIdconsulta());
+			plantillaConsulta.setIdinstitucion(idInstitucion);
+			plantillaConsulta.setIdinstitucionConsulta(idInstitucion);
+			plantillaConsulta.setIdmodelocomunicacion(modeloCom.getIdmodelocomunicacion());
+			plantillaConsulta.setIdplantilladocumento(plantilla.getIdplantilladocumento());
+			plantillaConsulta.setUsumodificacion(usuario.getIdusuario());
+			_modPlantilladocConsultaMapper.insert(plantillaConsulta);
+			i++;
+		}while(i<4);	
+	}
+	
 	@Override
 	public ConsultaListadoModelosDTO obtenerModelosComunicacion(HttpServletRequest request, ConsultaItem consulta) {
 	LOGGER.info("obtenerModelosComunicacion() -> Entrada al servicio de obtener modelos que contienen la consulta");
