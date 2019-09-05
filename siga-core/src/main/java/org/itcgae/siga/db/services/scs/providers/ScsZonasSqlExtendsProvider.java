@@ -91,7 +91,7 @@ public class ScsZonasSqlExtendsProvider extends ScsZonaSqlProvider{
 		sql.FROM("SCS_ZONA");
 		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
 		sql.WHERE("NOMBRE like '"+ nombre +"'");
-		sql.WHERE("IDZONA is not '" + idZona + "'");
+		sql.WHERE("IDZONA not in '" + idZona + "'");
 		
 		return sql.toString();
 	}
@@ -103,7 +103,7 @@ public class ScsZonasSqlExtendsProvider extends ScsZonaSqlProvider{
 		sql.SELECT("nombre");
 		sql.FROM("SCS_ZONA");
 		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
-		sql.WHERE("NOMBRE like '"+ nombre +"'");
+		sql.WHERE("UPPER(NOMBRE) like UPPER('"+ nombre +"')");
 		
 		return sql.toString();
 	}

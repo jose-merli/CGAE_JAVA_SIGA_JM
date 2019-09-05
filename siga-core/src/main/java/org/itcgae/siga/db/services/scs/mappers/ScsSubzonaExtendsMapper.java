@@ -29,6 +29,7 @@ public interface ScsSubzonaExtendsMapper extends ScsSubzonaMapper{
 		@Result(column = "IDSUBZONA", property = "idsubzona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DESCRIPCIONSUBZONA", property = "descripcionsubzona", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "JURISDICCION", property = "idpartido", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ZonasItem> searchSubzonas(String idZona, Short idInstitucion);
 	

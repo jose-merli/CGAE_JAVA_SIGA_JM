@@ -24,6 +24,8 @@ public class ScsSubzonaSqlExtendsProvider extends ScsSubzonaSqlProvider{
 		sql.SELECT("sub.idsubzona");
 		sql.SELECT("sub.nombre as descripcionsubzona");
 		sql.SELECT("LISTAGG(parjud.idpartido, ';') WITHIN GROUP (ORDER BY parjud.idpartido) AS jurisdiccion");
+		sql.SELECT("sub.fechabaja");
+		
 		sql.FROM("SCS_SUBZONA sub");
 		sql.INNER_JOIN("scs_subzonapartido subpar on subpar.idsubzona = sub.idsubzona and subpar.idinstitucion = sub.idinstitucion and sub.idzona = subpar.idzona");
 		sql.INNER_JOIN("cen_partidojudicial parjud on parjud.idpartido = subpar.idpartido");
@@ -31,7 +33,7 @@ public class ScsSubzonaSqlExtendsProvider extends ScsSubzonaSqlProvider{
 		sql.WHERE("sub.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("sub.idzona = '" + idZona + "'");
 		
-		sql.GROUP_BY("sub.idzona, sub.nombre, sub.idsubzona");
+		sql.GROUP_BY("sub.idzona, sub.nombre, sub.idsubzona, sub.fechabaja");
 		sql.ORDER_BY("descripcionsubzona");
 	
 		return sql.toString();

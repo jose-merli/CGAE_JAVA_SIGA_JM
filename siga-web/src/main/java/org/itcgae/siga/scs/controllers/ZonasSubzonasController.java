@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/maestros")
-public class MaestrosController {
+public class ZonasSubzonasController {
 
 	@Autowired
 	private IGestionZonasService gestionZonasService;
@@ -43,7 +43,7 @@ public class MaestrosController {
 	}
 	
 	@RequestMapping(value = "/fichaZonas/searchSubzones",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ZonasDTO> searchSubzonas(@RequestParam("idZona") String idZona, HttpServletRequest request) {
+	ResponseEntity<ZonasDTO> searchSubzones(@RequestParam("idZona") String idZona, HttpServletRequest request) {
 		ZonasDTO response = fichaZonasService.searchSubzones(idZona, request);
 		return new ResponseEntity<ZonasDTO>(response, HttpStatus.OK);
 	}

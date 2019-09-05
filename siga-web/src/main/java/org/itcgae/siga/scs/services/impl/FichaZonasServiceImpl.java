@@ -298,7 +298,8 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 
 					} else {
 						ScsZonaExample scsZonaExample = new ScsZonaExample();
-						scsZonaExample.createCriteria().andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()));
+						scsZonaExample.createCriteria().andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()))
+						.andIdinstitucionEqualTo(idInstitucion);
 
 						LOGGER.info(
 								"updateGroupZone() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Entrada a ageEventoExtendsMapper para buscar la sesión");
@@ -550,6 +551,9 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 					ScsZona scsZona = zonas.get(0);
 					zonaItem.setIdzona(scsZona.getIdzona().toString());
 					zonaItem.setDescripcionzona(scsZona.getNombre());
+					if(scsZona.getFechabaja() != null) {
+						zonaItem.setFechabaja(scsZona.getFechabaja().toString());
+					}
 				}
 
 				LOGGER.info(
@@ -623,7 +627,7 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 							scsSubzonapartidoExample.createCriteria()
 									.andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()))
 									.andIdinstitucionEqualTo(idInstitucion)
-									.andIdsubzonaEqualTo(Short.valueOf(zonaItem.getIdsubzona())).andFechabajaIsNull();
+									.andIdsubzonaEqualTo(Short.valueOf(zonaItem.getIdsubzona()));
 
 							LOGGER.info(
 									"updateZones() / scsSubzonapartidoMapper.selectByExample() -> Entrada a scsSubzonapartidoMapper para buscar los partidos asociados de la zona");
@@ -678,8 +682,7 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 								example.createCriteria().andIdpartidoEqualTo(Long.valueOf(partidoAdd.getValue()))
 										.andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()))
 										.andIdinstitucionEqualTo(idInstitucion)
-										.andIdsubzonaEqualTo(Short.valueOf(zonaItem.getIdsubzona()))
-										.andFechabajaIsNull();
+										.andIdsubzonaEqualTo(Short.valueOf(zonaItem.getIdsubzona()));
 
 								LOGGER.info(
 										"updateZones() / scsSubzonapartidoMapper.selectByExample() -> Entrada a scsSubzonapartidoMapper para buscar los partidos asociados de la zona");
@@ -884,7 +887,7 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 						ScsSubzonapartidoExample scsSubzonapartidoExample = new ScsSubzonapartidoExample();
 						scsSubzonapartidoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 								.andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()))
-								.andIdsubzonaEqualTo(Short.valueOf(zonaItem.getIdsubzona())).andFechabajaIsNull();
+								.andIdsubzonaEqualTo(Short.valueOf(zonaItem.getIdsubzona()));
 
 						LOGGER.info(
 								"deleteZones() / scsSubzonapartidoMapper.deleteByExample() -> Entrada a scsSubzonapartidoMapper para eliminar los partidos judiciales asociadoas a la zona");
