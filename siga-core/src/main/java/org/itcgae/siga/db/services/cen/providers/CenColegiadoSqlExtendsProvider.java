@@ -109,7 +109,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 			}
 			
 		}else {
-			sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and col.idinstitucion = cli.idinstitucion)");
+			sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and cli.idinstitucion = '" + idInstitucion + "')");
 		}
 
 		
