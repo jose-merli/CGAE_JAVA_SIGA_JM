@@ -16,13 +16,9 @@ public interface IFichaZonasService {
 	
 	public ZonasItem searchGroupZone(String idZona, HttpServletRequest request);
 	
-	public UpdateResponseDTO activateGroupZones(ZonasDTO zonasDTO, HttpServletRequest request);
-
 	public InsertResponseDTO createGroupZone(ZonasItem zonasItem, HttpServletRequest request);
 
 	public UpdateResponseDTO updateGroupZone(ZonasItem zonaItem, HttpServletRequest request);
-	
-	public UpdateResponseDTO deleteGroupZones(ZonasDTO zonasDTO, HttpServletRequest request);
 	
 	public InsertResponseDTO createZone(ZonasItem zonasItem, HttpServletRequest request);
 

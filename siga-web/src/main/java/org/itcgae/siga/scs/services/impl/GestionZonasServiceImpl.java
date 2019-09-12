@@ -1,5 +1,6 @@
 package org.itcgae.siga.scs.services.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,12 +13,21 @@ import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ScsSubzona;
+import org.itcgae.siga.db.entities.ScsSubzonaExample;
+import org.itcgae.siga.db.entities.ScsSubzonapartido;
+import org.itcgae.siga.db.entities.ScsSubzonapartidoExample;
+import org.itcgae.siga.db.entities.ScsZona;
+import org.itcgae.siga.db.entities.ScsZonaExample;
+import org.itcgae.siga.db.mappers.ScsSubzonapartidoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsSubzonaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsZonasExtendsMapper;
 import org.itcgae.siga.scs.service.IGestionZonasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class GestionZonasServiceImpl implements IGestionZonasService {
@@ -29,6 +39,12 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 	
 	@Autowired
 	private ScsZonasExtendsMapper scsZonasExtendsMapper;
+	
+	@Autowired
+	private ScsSubzonaExtendsMapper scsSubzonaExtendsMapper;
+	
+	@Autowired
+	private ScsSubzonapartidoMapper scsSubzonapartidoMapper;
 	
 	@Override
 	public ZonasDTO searchZones(ZonasItem zonasItem, HttpServletRequest request) {
@@ -55,8 +71,6 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				AdmUsuarios usuario = usuarios.get(0);
-			
 				LOGGER.info(
 						"searchZones() / cenTiposolicitudSqlExtendsMapper.selectTipoSolicitud() -> Entrada a cenTiposolicitudSqlExtendsMapper para obtener los tipos de solicitud");
 
@@ -77,8 +91,9 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 	}
 
 	@Override
-	public UpdateResponseDTO deleteGroupZone(ZonasDTO zonasDTO, HttpServletRequest request) {
-		LOGGER.info("deleteGroupZone() ->  Entrada al servicio para eliminar grupos zona");
+	@Transactional
+	public UpdateResponseDTO deleteGroupZones(ZonasDTO zonasDTO, HttpServletRequest request) {
+		LOGGER.info("deleteGroupZona() ->  Entrada al servicio para eliminar grupos zona");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -89,17 +104,17 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
 		if (null != idInstitucion) {
-			
+
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-			
+
 			LOGGER.info(
-					"updateGroupsZone() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-			
+					"deleteGroupZona() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-			
+
 			LOGGER.info(
-					"updateGroupsZone() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"deleteGroupZona() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -108,8 +123,112 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 
 					for (ZonasItem zonaItem : zonasDTO.getZonasItems()) {
 
-						//Eliminar zonas	
-						
+						// Eliminamos asociaciones partidos judiciales con zona
+						if (zonaItem.getIdsConjuntoSubzonas() != null) {
+
+							String[] idSubzonasZonas = zonaItem.getIdsConjuntoSubzonas().split(";");
+
+							for (String idSubzona : idSubzonasZonas) {
+
+								ScsSubzonapartidoExample scsSubzonapartidoExample = new ScsSubzonapartidoExample();
+								scsSubzonapartidoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+										.andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()))
+										.andIdsubzonaEqualTo(Short.valueOf(idSubzona));
+
+								LOGGER.info(
+										"deleteGroupZona() / scsSubzonapartidoMapper.selectByExample() -> Entrada a scsSubzonapartidoMapper para buscar los partidos judiciales asociados a la zona");
+
+								List<ScsSubzonapartido> partidosZonasList = scsSubzonapartidoMapper
+										.selectByExample(scsSubzonapartidoExample);
+
+								LOGGER.info(
+										"deleteGroupZona() / scsSubzonapartidoMapper.selectByExample() -> Salida de scsSubzonapartidoMapper para buscar los partidos judiciales asociados a la zona");
+
+								if (null != partidosZonasList && partidosZonasList.size() > 0) {
+
+									for (ScsSubzonapartido scsSubzonapartido : partidosZonasList) {
+
+										scsSubzonapartido.setFechabaja(new Date());
+										scsSubzonapartido.setFechamodificacion(new Date());
+										scsSubzonapartido.setUsumodificacion(usuario.getIdusuario());
+
+										LOGGER.info(
+												"deleteGroupZona() / scsSubzonapartidoMapper.updateByPrimaryKey() -> Entrada a scsSubzonapartidoMapper para dar de baja a los partidos judiciales asociadoas a la zona");
+
+										response = scsSubzonapartidoMapper.updateByPrimaryKey(scsSubzonapartido);
+
+										LOGGER.info(
+												"deleteGroupZona() / scsSubzonapartidoMapper.updateByPrimaryKey() -> Salida de scsSubzonapartidoMapper para dar de baja a los partidos judiciales asociadoas a la zona");
+
+									}
+								}
+
+								// Damos alta zonas
+
+								ScsSubzonaExample scsSubzonaExample = new ScsSubzonaExample();
+								scsSubzonaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+										.andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()))
+										.andIdsubzonaEqualTo(Short.valueOf(idSubzona));
+
+								LOGGER.info(
+										"deleteGroupZona() / scsSubzonaExtendsMapper.selectByExample() -> Entrada a scsSubzonaExtendsMapper para buscar las zonas");
+
+								List<ScsSubzona> zonasList = scsSubzonaExtendsMapper.selectByExample(scsSubzonaExample);
+
+								LOGGER.info(
+										"deleteGroupZona() / scsSubzonaExtendsMapper.selectByExample() -> Salida de scsSubzonaExtendsMapper para buscar las zonas");
+
+								if (null != zonasList && zonasList.size() > 0) {
+
+									for (ScsSubzona zona : zonasList) {
+
+										zona.setFechabaja(new Date());
+										zona.setFechamodificacion(new Date());
+										zona.setUsumodificacion(usuario.getIdusuario());
+
+										LOGGER.info(
+												"deleteGroupZona() / scsSubzonaExtendsMapper.updateByPrimaryKey() -> Entrada a scsSubzonaExtendsMapper para dar de alta las zonass asociadas al grupo zona");
+
+										response = scsSubzonaExtendsMapper.updateByPrimaryKey(zona);
+
+										LOGGER.info(
+												"deleteGroupZona() / scsSubzonaExtendsMapper.updateByPrimaryKey() -> Salida de scsSubzonaExtendsMapper para dar de alta las zonass asociadas al grupo zona");
+									}
+								}
+							}
+
+						}
+
+						// Eliminamos grupo zona
+						ScsZonaExample scsZonaExample = new ScsZonaExample();
+						scsZonaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()));
+
+						LOGGER.info(
+								"deleteGroupZona() / scsSubzonapartidoMapper.deleteByExample() -> Entrada a scsSubzonapartidoMapper para buscar el grupo zona");
+
+						List<ScsZona> grupoZonasList = scsZonasExtendsMapper.selectByExample(scsZonaExample);
+
+						LOGGER.info(
+								"deleteGroupZona() / scsSubzonapartidoMapper.deleteByExample() -> Salida de scsSubzonapartidoMapper para buscar el grupo zona");
+
+						if (null != grupoZonasList && grupoZonasList.size() > 0) {
+
+							ScsZona grupoZona = grupoZonasList.get(0);
+
+							grupoZona.setFechabaja(new Date());
+							grupoZona.setFechamodificacion(new Date());
+							grupoZona.setUsumodificacion(usuario.getIdusuario());
+
+							LOGGER.info(
+									"deleteGroupZona() / scsZonasExtendsMapper.deleteByExample() -> Entrada a scsZonasExtendsMapper para dar de baja a un grupo zona");
+
+							response = scsZonasExtendsMapper.updateByPrimaryKey(grupoZona);
+
+							LOGGER.info(
+									"deleteGroupZona() / scsZonasExtendsMapper.deleteByExample() -> Salida de scsZonasExtendsMapper para dar de baja a un grupo zona");
+						}
+
 					}
 
 				} catch (Exception e) {
@@ -133,9 +252,176 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("deleteGroupZone() -> Salida del servicio para eliminar un grupo zona");
+		LOGGER.info("deleteGroupZona() -> Salida del servicio para crear un nuevo grupo zona");
 
 		return updateResponseDTO;
 	}
 	
+	@Override
+	@Transactional
+	public UpdateResponseDTO activateGroupZones(ZonasDTO zonasDTO, HttpServletRequest request) {
+		LOGGER.info("activateGroupZones() ->  Entrada al servicio para dar de alta a grupos zona");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"activateGroupZones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"activateGroupZones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+
+					for (ZonasItem zonaItem : zonasDTO.getZonasItems()) {
+
+						// Damos de alta Grupo Zona
+						ScsZonaExample scsZonaExample = new ScsZonaExample();
+						scsZonaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()));
+
+						LOGGER.info(
+								"activateGroupZones() / scsSubzonapartidoMapper.deleteByExample() -> Entrada a scsSubzonapartidoMapper para buscar el grupo zona");
+
+						List<ScsZona> grupoZonasList = scsZonasExtendsMapper.selectByExample(scsZonaExample);
+
+						LOGGER.info(
+								"activateGroupZones() / scsSubzonapartidoMapper.deleteByExample() -> Salida de scsSubzonapartidoMapper para buscar el grupo zona");
+
+						if (null != grupoZonasList && grupoZonasList.size() > 0) {
+
+							ScsZona grupoZona = grupoZonasList.get(0);
+
+							grupoZona.setFechabaja(null);
+							grupoZona.setFechamodificacion(new Date());
+							grupoZona.setUsumodificacion(usuario.getIdusuario());
+
+							LOGGER.info(
+									"activateGroupZones() / scsZonasExtendsMapper.deleteByExample() -> Entrada a scsZonasExtendsMapper para dar de baja a un grupo zona");
+
+							response = scsZonasExtendsMapper.updateByPrimaryKey(grupoZona);
+
+							LOGGER.info(
+									"activateGroupZones() / scsZonasExtendsMapper.deleteByExample() -> Salida de scsZonasExtendsMapper para dar de baja a un grupo zona");
+						}
+
+						// Damos de alta a las asociaciones partidos judiciales con zona
+						if (zonaItem.getIdsConjuntoSubzonas() != null) {
+
+							String[] idSubzonasZonas = zonaItem.getIdsConjuntoSubzonas().split(";");
+
+							for (String idSubzona : idSubzonasZonas) {
+
+								ScsSubzonapartidoExample scsSubzonapartidoExample = new ScsSubzonapartidoExample();
+								scsSubzonapartidoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+										.andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()))
+										.andIdsubzonaEqualTo(Short.valueOf(idSubzona)).andFechabajaIsNull();
+
+								LOGGER.info(
+										"activateGroupZones() / scsSubzonapartidoMapper.selectByExample() -> Entrada a scsSubzonapartidoMapper para buscar los partidos judiciales asociados a la zona");
+
+								List<ScsSubzonapartido> partidosZonasList = scsSubzonapartidoMapper
+										.selectByExample(scsSubzonapartidoExample);
+
+								LOGGER.info(
+										"activateGroupZones() / scsSubzonapartidoMapper.selectByExample() -> Salida de scsSubzonapartidoMapper para buscar los partidos judiciales asociados a la zona");
+
+								if (null != partidosZonasList && partidosZonasList.size() > 0) {
+
+									for (ScsSubzonapartido scsSubzonapartido : partidosZonasList) {
+
+										scsSubzonapartido.setFechabaja(null);
+										scsSubzonapartido.setFechamodificacion(new Date());
+										scsSubzonapartido.setUsumodificacion(usuario.getIdusuario());
+
+										LOGGER.info(
+												"activateGroupZones() / scsSubzonapartidoMapper.updateByPrimaryKey() -> Entrada a scsSubzonapartidoMapper para dar de baja a los partidos judiciales asociadoas a la zona");
+
+										response = scsSubzonapartidoMapper.updateByPrimaryKey(scsSubzonapartido);
+
+										LOGGER.info(
+												"activateGroupZones() / scsSubzonapartidoMapper.updateByPrimaryKey() -> Salida de scsSubzonapartidoMapper para dar de baja a los partidos judiciales asociadoas a la zona");
+
+									}
+								}
+
+								// Eliminamos zonas
+
+								ScsSubzonaExample scsSubzonaExample = new ScsSubzonaExample();
+								scsSubzonaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+										.andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()))
+										.andIdsubzonaEqualTo(Short.valueOf(idSubzona));
+
+								LOGGER.info(
+										"activateGroupZones() / scsSubzonaExtendsMapper.selectByExample() -> Entrada a scsSubzonaExtendsMapper para buscar las zonas");
+
+								List<ScsSubzona> zonasList = scsSubzonaExtendsMapper.selectByExample(scsSubzonaExample);
+
+								LOGGER.info(
+										"activateGroupZones() / scsSubzonaExtendsMapper.selectByExample() -> Salida de scsSubzonaExtendsMapper para buscar las zonas");
+
+								if (null != zonasList && zonasList.size() > 0) {
+
+									for (ScsSubzona zona : zonasList) {
+
+										zona.setFechabaja(null);
+										zona.setFechamodificacion(new Date());
+										zona.setUsumodificacion(usuario.getIdusuario());
+
+										LOGGER.info(
+												"activateGroupZones() / scsSubzonaExtendsMapper.updateByPrimaryKey() -> Entrada a scsSubzonaExtendsMapper para dar de alta las zonass asociadas al grupo zona");
+
+										response = scsSubzonaExtendsMapper.updateByPrimaryKey(zona);
+
+										LOGGER.info(
+												"activateGroupZones() / scsSubzonaExtendsMapper.updateByPrimaryKey() -> Salida de scsSubzonaExtendsMapper para dar de alta las zonass asociadas al grupo zona");
+									}
+								}
+							}
+
+						}
+
+					}
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("No se han activado los grupos zonas");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("Se han actualizado los grupos zonas correctamente");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("activateGroupZones() -> Salida del servicio para dar de alta a grupos zona");
+
+		return updateResponseDTO;
+	}
+
 }

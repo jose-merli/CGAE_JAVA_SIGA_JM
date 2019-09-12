@@ -109,7 +109,7 @@ public class ZonasSubzonasController {
 	@RequestMapping(value = "/fichaZonas/deleteGroupZones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> deleteGroupZones(@RequestBody ZonasDTO zonasDTO, HttpServletRequest request) {
 
-		UpdateResponseDTO response = fichaZonasService.deleteGroupZones(zonasDTO, request);
+		UpdateResponseDTO response = gestionZonasService.deleteGroupZones(zonasDTO, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
@@ -120,7 +120,7 @@ public class ZonasSubzonasController {
 	@RequestMapping(value = "/fichaZonas/activateGroupZones", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> activateGroupZones(@RequestBody ZonasDTO zonasDTO, HttpServletRequest request) {
 
-		UpdateResponseDTO response = fichaZonasService.activateGroupZones(zonasDTO, request);
+		UpdateResponseDTO response = gestionZonasService.activateGroupZones(zonasDTO, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
