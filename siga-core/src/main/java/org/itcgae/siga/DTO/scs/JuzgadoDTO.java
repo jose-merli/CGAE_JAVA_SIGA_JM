@@ -8,34 +8,34 @@ import org.itcgae.siga.DTOs.gen.Error;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ZonasDTO   {
+public class JuzgadoDTO   {
   
-  private List<ZonasItem> zonasItems = new ArrayList<ZonasItem>();
+  private List<JuzgadoItem> juzgadoItems = new ArrayList<JuzgadoItem>();
   private Error error = null;
 
   
   /**
    * 
    **/
-  public ZonasDTO zonasItems(List<ZonasItem> zonasItems) {
-    this.zonasItems = zonasItems;
+  public JuzgadoDTO juzgadoItems(List<JuzgadoItem> juzgadoItems) {
+    this.juzgadoItems = juzgadoItems;
     return this;
   }
   
-  @JsonProperty("zonasItems")
-  public List<ZonasItem> getZonasItems() {
-    return zonasItems;
+  @JsonProperty("juzgadoItems")
+  public List<JuzgadoItem> getJuzgadoItems() {
+    return juzgadoItems;
   }
   
-  public void setZonasItems(List<ZonasItem> zonasItems) {
-    this.zonasItems = zonasItems;
+  public void setJuzgadoItems(List<JuzgadoItem> juzgadoItems) {
+    this.juzgadoItems = juzgadoItems;
   }
   
   
   /**
    * 
    **/
-  public ZonasDTO error(Error error) {
+  public JuzgadoDTO error(Error error) {
     this.error = error;
     return this;
   }
@@ -58,22 +58,22 @@ public class ZonasDTO   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ZonasDTO zonasDTO = (ZonasDTO) o;
-    return Objects.equals(this.zonasItems, zonasDTO.zonasItems) &&
-        Objects.equals(this.error, zonasDTO.error);
+    JuzgadoDTO juzgadoDTO = (JuzgadoDTO) o;
+    return Objects.equals(this.juzgadoItems, juzgadoDTO.juzgadoItems) &&
+        Objects.equals(this.error, juzgadoDTO.error);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(zonasItems, error);
+    return Objects.hash(juzgadoItems, error);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ZonasDTO {\n");
+    sb.append("class JuzgadoDTO {\n");
     
-    sb.append("    zonasItems: ").append(toIndentedString(zonasItems)).append("\n");
+    sb.append("    juzgadoItems: ").append(toIndentedString(juzgadoItems)).append("\n");
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("}");
     return sb.toString();

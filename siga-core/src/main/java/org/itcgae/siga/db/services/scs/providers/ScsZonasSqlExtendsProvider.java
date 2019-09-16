@@ -9,7 +9,9 @@ public class ScsZonasSqlExtendsProvider extends ScsZonaSqlProvider{
 	public String searchZonas(ZonasItem zonasItem, Short idInstitucion) {
 		
 		SQL sql = new SQL();
+		SQL sql1 = new SQL();
 		
+		sql1.SELECT("*");
 		sql.SELECT("scs_zona.idzona");
 		sql.SELECT("scs_zona.nombre");
 		sql.SELECT("scs_zona.idinstitucion");
@@ -18,7 +20,6 @@ public class ScsZonasSqlExtendsProvider extends ScsZonaSqlProvider{
 		sql.SELECT("LISTAGG(subzona.idsubzona,';') WITHIN GROUP(ORDER BY scs_zona.idinstitucion, scs_zona.idzona ) AS idsConjuntoSubzonas");
 		sql.SELECT("NVL(scs_zona.partidosjudiciales,' ') as partidosjudiciales");
 		sql.SELECT("nvl(scs_zona.idpartidosjudiciales,' ') AS idpartidosjudiciales");
-		
 		
 		SQL sql2 = new SQL();
 				
@@ -55,22 +56,24 @@ public class ScsZonasSqlExtendsProvider extends ScsZonaSqlProvider{
 			sql.WHERE("UPPER(scs_zona.nombre) like UPPER('%"+ zonasItem.getDescripcionzona() + "%')");
 		}
 		
-		if(zonasItem.getDescripcionsubzona() != null && zonasItem.getDescripcionsubzona() != "") {
-			sql.WHERE("UPPER(subzona.nombre) like UPPER('%"+ zonasItem.getDescripcionsubzona() + "%')");
-		}
-		
-		if(zonasItem.getDescripcionpartido() != null && zonasItem.getDescripcionpartido() != "") {
-			sql.WHERE("UPPER(scs_zona.partidosjudiciales) like UPPER('%"+ zonasItem.getDescripcionpartido() + "%')");
-		}
-		
 		if(!zonasItem.getHistorico()) {
 			sql.WHERE("scs_zona.fechabaja is null");
 		}
 		
 		sql.GROUP_BY("scs_zona.idzona, scs_zona.nombre, scs_zona.idinstitucion, scs_zona.partidosjudiciales, scs_zona.fechabaja, scs_zona.idpartidosjudiciales");
 		sql.ORDER_BY("scs_zona.nombre");
+		
+		sql1.FROM("(" + sql.toString() + ") consulta");
+		
+		if(zonasItem.getDescripcionsubzona() != null && zonasItem.getDescripcionsubzona() != "") {
+			sql1.WHERE("UPPER(consulta.nombre) like UPPER('%"+ zonasItem.getDescripcionsubzona() + "%')");
+		}
+		
+		if(zonasItem.getDescripcionpartido() != null && zonasItem.getDescripcionpartido() != "") {
+			sql1.WHERE("UPPER(consulta.partidosjudiciales) like UPPER('%"+ zonasItem.getDescripcionpartido() + "%')");
+		}
 	
-		return sql.toString();
+		return sql1.toString();
 	}
 	
 	public String getIdZona(Short idInstitucion) {

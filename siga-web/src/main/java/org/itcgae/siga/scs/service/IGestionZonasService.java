@@ -10,6 +10,9 @@ public interface IGestionZonasService {
 	
 	public ZonasDTO searchZones(ZonasItem zonasItem, HttpServletRequest request);
 
-	public UpdateResponseDTO deleteGroupZone(ZonasDTO zonasDTO, HttpServletRequest request);
+	public UpdateResponseDTO deleteGroupZones(ZonasDTO zonasDTO, HttpServletRequest request);
+	
+	public UpdateResponseDTO activateGroupZones(ZonasDTO zonasDTO, HttpServletRequest request);
+
 
 }
