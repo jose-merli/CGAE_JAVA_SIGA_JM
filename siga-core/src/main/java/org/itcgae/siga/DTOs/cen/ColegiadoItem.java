@@ -14,6 +14,7 @@ public class ColegiadoItem {
 	
 	private String idPersona;
 	private String noAparecerRedAbogacia;
+	private String noAparecerRedAbogacia2;
 	private Boolean searchLoggedUser;
 	private String institucion;
 	private String idInstitucion;
@@ -1201,7 +1202,13 @@ public class ColegiadoItem {
 		this.fechaEstadoNueva = fechaEstadoNueva;
 	}
 	
-	
+	public String getNoAparecerRedAbogacia2() {
+		return noAparecerRedAbogacia2;
+	}
+
+	public void setNoAparecerRedAbogacia2(String noAparecerRedAbogacia2) {
+		this.noAparecerRedAbogacia2 = noAparecerRedAbogacia2;
+	}
 
 	@Override
 	public int hashCode() {
