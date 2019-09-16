@@ -8,22 +8,38 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.scs.AreasDTO;
 import org.itcgae.siga.DTO.scs.AreasItem;
+import org.itcgae.siga.DTO.scs.MateriasDTO;
+import org.itcgae.siga.DTO.scs.MateriasItem;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ExpExpediente;
+import org.itcgae.siga.db.entities.ExpExpedienteExample;
 import org.itcgae.siga.db.entities.ScsArea;
-import org.itcgae.siga.db.entities.ScsAreaExample;
+import org.itcgae.siga.db.entities.ScsMateria;
+import org.itcgae.siga.db.entities.ScsMateriaExample;
+import org.itcgae.siga.db.entities.ScsMateriajurisdiccion;
+import org.itcgae.siga.db.entities.ScsMateriajurisdiccionExample;
+import org.itcgae.siga.db.entities.ScsTurno;
+import org.itcgae.siga.db.entities.ScsTurnoExample;
+import org.itcgae.siga.db.mappers.ExpExpedienteMapper;
+import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.ScsAreasMateriasExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.ScsJurisdiccionExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsAreasMateriasExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsJurisdiccionExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsMateriaExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsMateriaJurisdiccionExtendsMapper;
 import org.itcgae.siga.scs.service.IFichaAreasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class FichaAreasServiceImpl implements IFichaAreasService {
@@ -38,6 +54,18 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 
 	@Autowired
 	private ScsAreasMateriasExtendsMapper scsAreasMateriasExtendsMapper;
+	
+	@Autowired
+	private ScsMateriaExtendsMapper scsMateriaExtendsMapper;
+
+	@Autowired
+	private ScsTurnoMapper scsTurnoMapper;
+
+	@Autowired
+	private ExpExpedienteMapper expExpedienteMapper;
+
+	@Autowired
+	private ScsMateriaJurisdiccionExtendsMapper scsMateriaJurisdiccionExtendsMapper;
 
 	@Override
 	public ComboDTO getPartidoJudicial(HttpServletRequest request) {
@@ -112,18 +140,9 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 				LOGGER.info(
 						"searchSubzonas() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
 
-//				for (AreasItem area : areasItems) {
-//
-//					if (area.getIdpartido() != null) {
-//
-//						String[] partidosJudiciales = zona.getIdpartido().split(";");
-//						zona.setJurisdiccion(partidosJudiciales);
-//
-//					}
-//				}
 
 				if (areasItems != null) {
-					areasDTO.setareasItems(areasItems);
+					areasDTO.setAreasItems(areasItems);
 				}
 			}
 
@@ -132,6 +151,79 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 		return areasDTO;
 	}
 	
+	@Override
+	public UpdateResponseDTO updateArea(AreasItem areasItem, HttpServletRequest request) {
+		LOGGER.info("deleteZones() ->  Entrada al servicio para eliminar zonas de un grupo zona");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"deleteZones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"deleteZones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+						// Eliminamos asociaciones partidos judiciales con zona
+
+						ScsArea area = new ScsArea();
+						area.setContenido(areasItem.getContenido());
+						area.setFechamodificacion(new Date());
+						area.setIdarea(Short.parseShort(areasItem.getIdArea()));
+						area.setIdinstitucion(areasItem.getidInstitucion());
+						area.setNombre(areasItem.getNombreArea());
+						area.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+						LOGGER.info(
+								"deleteAreas() / scsAreasMateriasExtendsMapper.deleteByExample() -> Entrada a scsAreasMateriasExtendsMapper para eliminar las Areas seleccionadas");
+
+						response = scsAreasMateriasExtendsMapper.updateByPrimaryKey(area);
+
+						LOGGER.info(
+								"deleteAreas() / scsAreasMateriasExtendsMapper.deleteByExample() -> Salida de scsAreasMateriasExtendsMapper para eliminar las Areas seleccionadas");
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.eliminarError");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("deleteZones() -> Salida del servicio para eliminar zonas de un grupo zona");
+
+		return updateResponseDTO;
+	}
+
+
 	
 	@Override
 	public UpdateResponseDTO deleteAreas(AreasDTO areasDTO, HttpServletRequest request) {
@@ -162,9 +254,9 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 
 				try {
 
-					for (AreasItem areasItem : areasDTO.getareasItems()) {
+					for (AreasItem areasItem : areasDTO.getAreasItems()) {
 
-						// Eliminamos asociaciones partidos judiciales con zona
+						// Eliminamos areas
 
 						ScsArea area = new ScsArea();
 						area.setContenido(areasItem.getContenido());
@@ -192,7 +284,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -201,11 +293,11 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han eliminado las zonas");
+			error.setDescription("areasmaterias.materias.ficha.eliminarError");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se han actualizado las zonas correctamente");
+			error.setDescription("general.message.registro.actualizado");
 		}
 
 		updateResponseDTO.setError(error);
@@ -215,290 +307,460 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 		return updateResponseDTO;
 	}
 
+	@Override
+	@Transactional
+	public InsertResponseDTO createArea(AreasItem areasItem, HttpServletRequest request) {
+		LOGGER.info("createZone() ->  Entrada al servicio para crear una nueva zona");
 
-//	@Override
-//	public UpdateResponseDTO updateZones(ZonasDTO zonasDTO, HttpServletRequest request) {
-//		LOGGER.info("updateZones() ->  Entrada al servicio para editar zonas");
-//
-//		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-//		Error error = new Error();
-//		int response = 0;
-//
-//		String token = request.getHeader("Authorization");
-//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-//
-//		if (null != idInstitucion) {
-//
-//			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-//			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-//
-//			LOGGER.info(
-//					"updateZones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-//
-//			LOGGER.info(
-//					"updateZones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//			if (null != usuarios && usuarios.size() > 0) {
-//				AdmUsuarios usuario = usuarios.get(0);
-//
-//				try {
-//
-//					for (ZonasItem zonaItem : zonasDTO.getZonasItems()) {
-//
-//						ScsSubzonaExample scsSubzonaExample = new ScsSubzonaExample();
-//						scsSubzonaExample.createCriteria().andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()))
-//								.andIdinstitucionEqualTo(idInstitucion)
-//								.andIdsubzonaEqualTo(Short.valueOf(zonaItem.getIdsubzona()));
-//
-//						LOGGER.info(
-//								"updateZones() / scsSubzonaExtendsMapper.selectByExample() -> Entrada a scsSubzonaExtendsMapper para buscar la subzona");
-//
-//						List<ScsSubzona> scsSubzonasList = scsSubzonaExtendsMapper.selectByExample(scsSubzonaExample);
-//
-//						LOGGER.info(
-//								"updateZones() / scsSubzonaExtendsMapper.selectByExample() -> Salida a scsSubzonaExtendsMapper para buscar la subzona");
-//
-//						ScsSubzona subZona = scsSubzonasList.get(0);
-//
-//						subZona.setNombre(zonaItem.getDescripcionsubzona());
-//						subZona.setFechamodificacion(new Date());
-//						subZona.setUsumodificacion(usuario.getIdusuario().intValue());
-//
-//						response += scsSubzonaExtendsMapper.updateByPrimaryKey(subZona);
-//
-//						// MODIFICAR PARTIDOS
-//						if (zonaItem.getPartidosJudiciales() != null && zonaItem.getPartidosJudiciales().length > 0) {
-//
-//							// Eliminamos el partido judicial que no se encuentre en la lista actual
-//							ScsSubzonapartidoExample scsSubzonapartidoExample = new ScsSubzonapartidoExample();
-//							scsSubzonapartidoExample.createCriteria()
-//									.andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()))
-//									.andIdinstitucionEqualTo(idInstitucion)
-//									.andIdsubzonaEqualTo(Short.valueOf(zonaItem.getIdsubzona())).andFechabajaIsNull();
-//
-//							LOGGER.info(
-//									"updateZones() / scsSubzonapartidoMapper.selectByExample() -> Entrada a scsSubzonapartidoMapper para buscar los partidos asociados de la zona");
-//
-//							List<ScsSubzonapartido> partidosAntiguosList = scsSubzonapartidoMapper
-//									.selectByExample(scsSubzonapartidoExample);
-//
-//							LOGGER.info(
-//									"updateZones() / scsSubzonapartidoMapper.selectByExample() -> Salida a scsSubzonapartidoMapper para buscar los partidos asociados de la zona");
-//
-//							List<ScsSubzonapartido> partidosJuridicosEliminar = new ArrayList<ScsSubzonapartido>();
-//
-//							// Si hay temas que estan dados de alta, comprobamos que se encuentra en la
-//							// modificacion actual
-//							if (!partidosAntiguosList.isEmpty()) {
-//
-//								for (ScsSubzonapartido partidosAsignadosAntiguos : partidosAntiguosList) {
-//									boolean flag = false;
-//
-//									for (int i = 0; zonaItem.getPartidosJudiciales().length > i; i++) {
-//
-//										if (partidosAsignadosAntiguos.getIdpartido()
-//												.equals(Long.valueOf(zonaItem.getPartidosJudiciales()[i].getValue()))) {
-//											flag = true;
-//											i = zonaItem.getPartidosJudiciales().length;
-//										}
-//									}
-//
-//									// Si no se encuentra en la lista actual la borramos
-//									if (!flag) {
-//										partidosJuridicosEliminar.add(partidosAsignadosAntiguos);
-//									}
-//								}
-//
-//								for (ScsSubzonapartido partidoBaja : partidosJuridicosEliminar) {
-//
-//									LOGGER.info(
-//											"updateZones() / scsSubzonapartidoMapper.deleteByPrimaryKey() -> Entrada a scsSubzonapartidoMapper para eliminar un partido judicial");
-//
-//									response = scsSubzonapartidoMapper.deleteByPrimaryKey(partidoBaja);
-//
-//									LOGGER.info(
-//											"updateZones() / scsSubzonapartidoMapper.deleteByPrimaryKey() -> Salida a scsSubzonapartidoMapper para eliminar un partido judicial");
-//								}
-//							}
-//
-//							// Añadimos partidos
-//							for (ComboItem partidoAdd : zonaItem.getPartidosJudiciales()) {
-//								// Para cada temas comprobamos si ya existe la relacion
-//								// Eliminamos el partido judicial que no se encuentre en la lista actual
-//								ScsSubzonapartidoExample example = new ScsSubzonapartidoExample();
-//								example.createCriteria().andIdpartidoEqualTo(Long.valueOf(partidoAdd.getValue()))
-//										.andIdzonaEqualTo(Short.valueOf(zonaItem.getIdzona()))
-//										.andIdinstitucionEqualTo(idInstitucion)
-//										.andIdsubzonaEqualTo(Short.valueOf(zonaItem.getIdsubzona()))
-//										.andFechabajaIsNull();
-//
-//								LOGGER.info(
-//										"updateZones() / scsSubzonapartidoMapper.selectByExample() -> Entrada a scsSubzonapartidoMapper para buscar los partidos asociados de la zona");
-//
-//								List<ScsSubzonapartido> partidosList = scsSubzonapartidoMapper.selectByExample(example);
-//
-//								LOGGER.info(
-//										"updateZones() / scsSubzonapartidoMapper.selectByExample() -> Salida a scsSubzonapartidoMapper para buscar los partidos asociados de la zona");
-//
-//								// Si no existe la creamos
-//								if (partidosList.isEmpty()) {
-//
-//									ScsSubzonapartido partido = new ScsSubzonapartido();
-//
-//									partido.setFechabaja(null);
-//									partido.setFechamodificacion(new Date());
-//									partido.setUsumodificacion(usuario.getIdusuario().intValue());
-//									partido.setIdinstitucion(idInstitucion);
-//									partido.setIdsubzona(Short.valueOf(zonaItem.getIdsubzona()));
-//									partido.setIdzona(Short.valueOf(zonaItem.getIdzona()));
-//									partido.setIdpartido(Long.valueOf(partidoAdd.getValue()));
-//
-//									LOGGER.info(
-//											"createGroupZona() / scsSubzonapartidoMapper.insert() -> Entrada a scsSubzonapartidoMapper para insertar un partido judicial");
-//
-//									response = scsSubzonapartidoMapper.insert(partido);
-//
-//									LOGGER.info(
-//											"createGroupZona() / scsSubzonapartidoMapper.insert() -> Salida de scsSubzonapartidoMapper para insertar un partido judicial");
-//
-//								}
-//							}
-//
-//						}
-//
-//					}
-//
-//				} catch (Exception e) {
-//					response = 0;
-//					error.setCode(400);
-//					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-//					updateResponseDTO.setStatus(SigaConstants.KO);
-//				}
-//			}
-//
-//		}
-//
-//		if (response == 0) {
-//			error.setCode(400);
-//			error.setDescription("No se han actualizado las zonas");
-//			updateResponseDTO.setStatus(SigaConstants.KO);
-//		} else {
-//			error.setCode(200);
-//			error.setDescription("Se han actualizado las zonas correctamente");
-//		}
-//
-//		updateResponseDTO.setError(error);
-//
-//		LOGGER.info("updateGroupZone() -> Salida del servicio para editar grupos zona");
-//
-//		return updateResponseDTO;
-//	}
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
 
-//	@Override
-//	@Transactional
-//	public InsertResponseDTO createZone(ZonasItem zonaItem, HttpServletRequest request) {
-//		LOGGER.info("createZone() ->  Entrada al servicio para crear una nueva zona");
-//
-//		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-//		Error error = new Error();
-//		int response = 0;
-//
-//		String token = request.getHeader("Authorization");
-//		String dni = UserTokenUtils.getDniFromJWTToken(token);
-//		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-//
-//		if (null != idInstitucion) {
-//
-//			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-//			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-//
-//			LOGGER.info(
-//					"createZone() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-//
-//			LOGGER.info(
-//					"createZone() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-//
-//			if (null != usuarios && usuarios.size() > 0) {
-//				AdmUsuarios usuario = usuarios.get(0);
-//
-//				try {
-//
-//					ScsSubzona zona = new ScsSubzona();
-//					zona.setFechabaja(null);
-//					zona.setFechamodificacion(new Date());
-//					zona.setUsumodificacion(usuario.getIdusuario().intValue());
-//					zona.setIdinstitucion(idInstitucion);
-//					zona.setNombre(zonaItem.getDescripcionsubzona());
-//					zona.setIdzona(Short.valueOf(zonaItem.getIdzona()));
-//
-//					NewIdDTO idS = scsSubzonaExtendsMapper.getIdSubzona(usuario.getIdinstitucion(),
-//							Short.valueOf(zonaItem.getIdzona()).shortValue());
-//
-//					if (idS == null) {
-//						zona.setIdsubzona((short) 1);
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Short idAreaNueva = 0;
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"createZone() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"createZone() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+
+					AreasItem ejemplo = new AreasItem();
+					ejemplo.setNombreArea(areasItem.getNombreArea());
+					ejemplo.setidInstitucion(idInstitucion);
+					
+					List<AreasItem> areasDuplicadas = scsAreasMateriasExtendsMapper.searchAreas(ejemplo);
+
+					LOGGER.info(
+							"updateGroupZone() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
+
+					if (areasDuplicadas != null && areasDuplicadas.size() > 0) {
+						
+						error.setCode(400);
+						error.setDescription("messages.censo.nombreExiste");
+						
+					} else {
+						
+							ScsArea area = new ScsArea();
+							area.setContenido(areasItem.getContenido());
+							area.setFechamodificacion(new Date());
+							area.setIdinstitucion(idInstitucion);
+							area.setNombre(areasItem.getNombreArea());
+							area.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+							NewIdDTO idArea = scsAreasMateriasExtendsMapper.getIdArea(usuario.getIdinstitucion());
+
+							if (idArea == null) {
+								area.setIdarea((short) 1);
+							} else {
+								idAreaNueva = (short) (Integer.parseInt(idArea.getNewId()) + 1);
+								area.setIdarea(idAreaNueva);
+							}
+
+							LOGGER.info(
+									"createGroupZona() / scsAreasMateriasExtendsMapper.insert() -> Entrada a scsAreasMateriasExtendsMapper para insertar una nueva zona");
+
+							response = scsAreasMateriasExtendsMapper.insert(area);
+
+							
+							LOGGER.info(
+									"createGroupZona() / scsAreasMateriasExtendsMapper.insert() -> Salida de scsAreasMateriasExtendsMapper para insertar una nueva area");
+						}
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					insertResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			insertResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			insertResponseDTO.setId(String.valueOf(Short.valueOf(idAreaNueva)));
+			error.setDescription("messages.inserted.success");
+		}
+
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("createZone() -> Salida del servicio para crear un nuevo grupo zona");
+
+		return insertResponseDTO;
+	}
+	
+	@Override
+	public MateriasDTO searchMaterias(String idArea, HttpServletRequest request) {
+		LOGGER.info("searchMaterias() -> Entrada al servicio para obtener las Materias");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		MateriasDTO materiasDTO = new MateriasDTO();
+		List<MateriasItem> materiasItems = null;
+		MateriasItem materia = new MateriasItem();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchMaterias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchMaterias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"searchMaterias() / scsMateriaExtendsMapper.searchMateria() -> Entrada a scsMateriaExtendsMapper para obtener las Materias");
+				materia.setIdArea(idArea);
+				materia.setidInstitucion(idInstitucion);
+				materiasItems = scsMateriaExtendsMapper.searchMateria(materia);
+
+				LOGGER.info(
+						"searchMaterias() / scsMateriaExtendsMapper.searchMateria() -> Salida a scsMateriaExtendsMapper para obtener las Materias");
+
+				for (MateriasItem materias : materiasItems) {
+
+					if (materias.getJurisdiccion() != null) {
+
+						String[] materiasEnvio = materias.getJurisdiccion().split(";");
+						materias.setJurisdicciones(materiasEnvio);
+
+					}
+				}
+				materiasDTO.setmateriasItems(materiasItems);
+			}
+
+		}
+		LOGGER.info("searchMateria() -> Salida del servicio para obtener las Materias");
+		return materiasDTO;
+	}
+	
+
+	@Override
+	public UpdateResponseDTO updateMaterias(AreasDTO areasDTO, HttpServletRequest request) {
+		LOGGER.info("deleteZones() ->  Entrada al servicio para actualizar Materias");
+// PENDIENTE DE ACABAR
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"deleteZones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"deleteZones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+					
+					for (AreasItem areasItem : areasDTO.getAreasItems()) {
+					
+						ScsMateria materia = new ScsMateria();
+						materia.setIdmateria(Short.parseShort(areasItem.getIdMateria()));
+						materia.setFechamodificacion(new Date());
+						materia.setIdarea(Short.parseShort(areasItem.getIdArea()));
+						materia.setIdinstitucion(areasItem.getidInstitucion());
+						materia.setNombre(areasItem.getNombreMateria());
+						materia.setContenido(areasItem.getContenido());
+						materia.setUsumodificacion(usuarios.get(0).getIdusuario());
+						response = scsMateriaExtendsMapper.updateByPrimaryKeySelective(materia);
+						
+						String[] jurisdiccionesCombo  = areasItem.getJurisdiccion().split(";");
+						
+						ScsMateriajurisdiccionExample ejemploJurisdiccion = new ScsMateriajurisdiccionExample();
+						ejemploJurisdiccion.createCriteria().andIdinstitucionEqualTo(areasItem.getidInstitucion()).andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdmateriaEqualTo(Short.parseShort(areasItem.getIdMateria()));
+						List<ScsMateriajurisdiccion> jurisdiccionesAnteriores = scsMateriaJurisdiccionExtendsMapper.selectByExample(ejemploJurisdiccion);
+						
+							for (ScsMateriajurisdiccion jurisdicciones : jurisdiccionesAnteriores) {
+								scsMateriaJurisdiccionExtendsMapper.deleteByPrimaryKey(jurisdicciones);
+							}
+							
+							for (String jurisdicciones : jurisdiccionesCombo) {
+								ScsMateriajurisdiccion materiaJurisdiccion = new ScsMateriajurisdiccion();
+								materiaJurisdiccion.setFechamodificacion(new Date());
+								materiaJurisdiccion.setIdarea(Short.parseShort(areasItem.getIdArea()));
+								materiaJurisdiccion.setIdmateria(Short.parseShort(areasItem.getIdMateria()));
+								materiaJurisdiccion.setIdinstitucion(areasItem.getidInstitucion());
+								materiaJurisdiccion.setIdjurisdiccion(Short.parseShort(jurisdicciones));
+								materiaJurisdiccion.setUsumodificacion(usuarios.get(0).getIdusuario());
+								scsMateriaJurisdiccionExtendsMapper.insert(materiaJurisdiccion);
+							}
+						}
+						
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.actualizarerror");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("deleteZones() -> Salida del servicio para eliminar zonas de un grupo zona");
+
+		return updateResponseDTO;
+	}
+
+	@Override
+	public UpdateResponseDTO deleteMaterias(AreasDTO areasDTO, HttpServletRequest request) {
+		LOGGER.info("deleteZones() ->  Entrada al servicio para actualizar Materias");
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"deleteZones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"deleteZones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+					boolean existe = false;
+					
+					for (AreasItem areasItem : areasDTO.getAreasItems()) {
+						
+						ScsTurnoExample ejemploTurno = new ScsTurnoExample();
+						ejemploTurno.createCriteria().andIdmateriaEqualTo(Short.parseShort(areasItem.getIdMateria())).andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdinstitucionEqualTo(idInstitucion);
+						List<ScsTurno> turnos = scsTurnoMapper.selectByExample(ejemploTurno);
+
+						ExpExpedienteExample ejemploExpediente = new ExpExpedienteExample();
+						ejemploExpediente.createCriteria().andIdmateriaEqualTo(Short.parseShort(areasItem.getIdMateria())).andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdinstitucionEqualTo(idInstitucion);
+						List<ExpExpediente> expedientes = expExpedienteMapper.selectByExample(ejemploExpediente);
+
+						if(!(turnos == null || turnos.size() == 0) || !(expedientes == null || expedientes.size() == 0)) {
+							existe = true; 
+						}
+					}
+					
+					if(!existe) {
+						for (AreasItem areasItem : areasDTO.getAreasItems()) {
+							
+							ScsMateriajurisdiccionExample ejemploJurisdiccion = new ScsMateriajurisdiccionExample();
+							ejemploJurisdiccion.createCriteria().andIdinstitucionEqualTo(areasItem.getidInstitucion()).andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdmateriaEqualTo(Short.parseShort(areasItem.getIdMateria()));
+							List<ScsMateriajurisdiccion> jurisdiccionesAnteriores = scsMateriaJurisdiccionExtendsMapper.selectByExample(ejemploJurisdiccion);
+							
+								for (ScsMateriajurisdiccion jurisdicciones : jurisdiccionesAnteriores) {
+									scsMateriaJurisdiccionExtendsMapper.deleteByPrimaryKey(jurisdicciones);
+								}
+								
+							ScsMateriaExample example = new ScsMateriaExample();
+							example.createCriteria().andIdmateriaEqualTo(Short.parseShort(areasItem.getIdMateria())).andIdinstitucionEqualTo(idInstitucion).andIdareaEqualTo(Short.parseShort(areasItem.getIdArea()));
+							response = scsMateriaExtendsMapper.deleteByExample(example);
+							
+					}
+					}else {
+						response = 2;
+					}
+					
+					
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.erroreliminadomaterias");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		
+		} else if(response == 2) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.materiaEnUso");
+			updateResponseDTO.setStatus(SigaConstants.KO);	
+	
+		}else{
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("deleteZones() -> Salida del servicio para eliminar materias de un area");
+
+		return updateResponseDTO;
+	}
+	
+	@Override
+	@Transactional
+	public InsertResponseDTO createMaterias(AreasItem areasItem, HttpServletRequest request) {
+		LOGGER.info("createZone() ->  Entrada al servicio para crear una nueva zona");
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Short idMateriaNueva = 0;
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"createMaterias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"createMaterias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+
+//					MateriasItem ejemplo = new MateriasItem();
+//					ejemplo.setNombreMateria(areasItem.getNombreMateria());
+//					ejemplo.setIdArea(areasItem.getIdArea());
+//					ejemplo.setidInstitucion(idInstitucion);
+//					
+//					List<MateriasItem> materiasDuplicadas = scsMateriaExtendsMapper.searchMateria(ejemplo);
+
+					LOGGER.info(
+							"createMaterias() / scsAreasMateriasExtendsMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
+
+//					if (materiasDuplicadas != null && materiasDuplicadas.size() > 0) {
+//						
+//						error.setCode(400);
+//						error.setDescription("messages.censo.nombreExiste");
+//						
 //					} else {
-//						short idSubzona = (short) (Integer.parseInt(idS.getNewId()) + 1);
-//						zona.setIdsubzona(idSubzona);
-//					}
-//
-//					LOGGER.info(
-//							"createGroupZona() / scsSubzonaExtendsMapper.insert() -> Entrada a scsSubzonaExtendsMapper para insertar una nueva zona");
-//
-//					response = scsSubzonaExtendsMapper.insert(zona);
-//
-//					LOGGER.info(
-//							"createGroupZona() / scsSubzonaExtendsMapper.insert() -> Salida de scsSubzonaExtendsMapper para insertar una nueva zona");
-//
-//					for (ComboItem p : zonaItem.getPartidosJudiciales()) {
-//
-//						ScsSubzonapartido partido = new ScsSubzonapartido();
-//
-//						partido.setFechabaja(null);
-//						partido.setFechamodificacion(new Date());
-//						partido.setUsumodificacion(usuario.getIdusuario().intValue());
-//						partido.setIdinstitucion(idInstitucion);
-//						partido.setIdsubzona(zona.getIdsubzona());
-//						partido.setIdzona(zona.getIdzona());
-//						partido.setIdpartido(Long.valueOf(p.getValue()));
-//
-//						LOGGER.info(
-//								"createGroupZona() / scsSubzonapartidoMapper.insert() -> Entrada a scsSubzonapartidoMapper para insertar un partido judicial");
-//
-//						response = scsSubzonapartidoMapper.insert(partido);
-//
-//						LOGGER.info(
-//								"createGroupZona() / scsSubzonapartidoMapper.insert() -> Salida de scsSubzonapartidoMapper para insertar un partido judicial");
-//
-//					}
-//				} catch (Exception e) {
-//					response = 0;
-//					error.setCode(400);
-//					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
-//					insertResponseDTO.setStatus(SigaConstants.KO);
-//				}
-//			}
-//
-//		}
-//
-//		if (response == 0) {
-//			error.setCode(400);
-//			error.setDescription("No se ha insertado la zona");
-//			insertResponseDTO.setStatus(SigaConstants.KO);
-//		} else {
-//			error.setCode(200);
-//			error.setDescription("Se ha insertado la zona correctamente");
-//		}
-//
-//		insertResponseDTO.setError(error);
-//
-//		LOGGER.info("createZone() -> Salida del servicio para crear un nuevo grupo zona");
-//
-//		return insertResponseDTO;
-//	}
+						
+							ScsMateria materia = new ScsMateria();
+							materia.setContenido(areasItem.getContenido());
+							materia.setFechamodificacion(new Date());
+							materia.setIdinstitucion(idInstitucion);
+							materia.setNombre(areasItem.getNombreMateria());
+							materia.setUsumodificacion(usuarios.get(0).getIdusuario());
+							materia.setIdarea(Short.parseShort(areasItem.getIdArea()));
+							
+							String[] jurisdiccionesCombo = null;
+							
+							NewIdDTO idMateria = scsMateriaExtendsMapper.getIdMateria(usuario.getIdinstitucion());
+							if(areasItem.getJurisdiccion() != "" && areasItem.getJurisdiccion() != null) {
+								jurisdiccionesCombo  = areasItem.getJurisdiccion().split(";");
+							}
 
+							if (idMateria == null) {
+								idMateriaNueva = 1;
+								materia.setIdmateria((short) 1);
+							} else {
+								idMateriaNueva = (short) (Integer.parseInt(idMateria.getNewId()) + 1);
+								materia.setIdmateria(idMateriaNueva);
+							}
+
+							LOGGER.info(
+									"createMaterias() / scsAreasMateriasExtendsMapper.insert() -> Entrada a scsAreasMateriasExtendsMapper para insertar una nueva materia");
+
+							response = scsMateriaExtendsMapper.insert(materia);
+							if(jurisdiccionesCombo != null) {
+								for (String jurisdicciones : jurisdiccionesCombo) {
+									ScsMateriajurisdiccion materiaJurisdiccion = new ScsMateriajurisdiccion();
+									materiaJurisdiccion.setFechamodificacion(new Date());
+									materiaJurisdiccion.setIdarea(Short.parseShort(areasItem.getIdArea()));
+									materiaJurisdiccion.setIdmateria(idMateriaNueva);
+									materiaJurisdiccion.setIdinstitucion(idInstitucion);
+									materiaJurisdiccion.setIdjurisdiccion(Short.parseShort(jurisdicciones));
+									materiaJurisdiccion.setUsumodificacion(usuarios.get(0).getIdusuario());
+									scsMateriaJurisdiccionExtendsMapper.insert(materiaJurisdiccion);
+								}
+							}
+							
+							LOGGER.info(
+									"createGroupZona() / scsAreasMateriasExtendsMapper.insert() -> Salida de scsAreasMateriasExtendsMapper para insertar una nueva materia");
+//						}
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					insertResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			insertResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			insertResponseDTO.setId(String.valueOf(Short.valueOf(idMateriaNueva)));
+			error.setDescription("messages.inserted.success");
+		}
+
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("createZone() -> Salida del servicio para crear una nueva materia");
+
+		return insertResponseDTO;
+	}
+	
 }

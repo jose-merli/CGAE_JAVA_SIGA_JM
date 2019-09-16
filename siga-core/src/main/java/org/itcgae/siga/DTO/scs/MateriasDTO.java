@@ -8,34 +8,34 @@ import org.itcgae.siga.DTOs.gen.Error;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class AreasDTO   {
+public class MateriasDTO   {
   
-  private List<AreasItem> areasItems = new ArrayList<AreasItem>();
+  private List<MateriasItem> materiasItems = new ArrayList<MateriasItem>();
   private Error error = null;
 
   
   /**
    * 
    **/
-  public AreasDTO areasItems(List<AreasItem> areasItems) {
-    this.areasItems = areasItems;
+  public MateriasDTO materiasItems(List<MateriasItem> materiasItems) {
+    this.materiasItems = materiasItems;
     return this;
   }
   
-  @JsonProperty("areasItems")
-  public List<AreasItem> getAreasItems() {
-    return areasItems;
+  @JsonProperty("materiasItems")
+  public List<MateriasItem> getmateriasItems() {
+    return materiasItems;
   }
   
-  public void setAreasItems(List<AreasItem> areasItems) {
-    this.areasItems = areasItems;
+  public void setmateriasItems(List<MateriasItem> materiasItems) {
+    this.materiasItems = materiasItems;
   }
   
   
   /**
    * 
    **/
-  public AreasDTO error(Error error) {
+  public MateriasDTO error(Error error) {
     this.error = error;
     return this;
   }
@@ -58,22 +58,22 @@ public class AreasDTO   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    AreasDTO areasDTO = (AreasDTO) o;
-    return Objects.equals(this.areasItems, areasDTO.areasItems) &&
-        Objects.equals(this.error, areasDTO.error);
+    MateriasDTO materiasDTO = (MateriasDTO) o;
+    return Objects.equals(this.materiasItems, materiasDTO.materiasItems) &&
+        Objects.equals(this.error, materiasDTO.error);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(areasItems, error);
+    return Objects.hash(materiasItems, error);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class areasDTO {\n");
+    sb.append("class materiasDTO {\n");
     
-    sb.append("    areasItems: ").append(toIndentedString(areasItems)).append("\n");
+    sb.append("    materiasItems: ").append(toIndentedString(materiasItems)).append("\n");
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("}");
     return sb.toString();
