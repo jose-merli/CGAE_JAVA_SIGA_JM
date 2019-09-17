@@ -20,6 +20,7 @@ public class ScsMateriaSqlExtendsProvider extends ScsMateriaSqlProvider {
 		sql.WHERE("mat.IDAREA = '"+ materia.getIdArea() +"'");
 		sql.WHERE("mat.IDINSTITUCION = '"+ materia.getidInstitucion() + "'");
 		sql.GROUP_BY("mat.IDAREA, mat.IDMATERIA, mat.NOMBRE, mat.CONTENIDO, mat.IDINSTITUCION");
+		sql.ORDER_BY("NOMBREMATERIA");
 		return sql.toString();
 	}
 	
