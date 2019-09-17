@@ -53,17 +53,4 @@ public interface ScsJuzgadoExtendsMapper extends ScsJuzgadoMapper{
 	})
 	NewIdDTO getIdJuzgado(Short idInstitucion);
 	
-//	@SelectProvider(type = ScsZonasSqlExtendsProvider.class, method = "searchGroupZoneByName")
-//	@Results({
-//		@Result(column = "IDZONA", property = "idzona", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "NOMBRE", property = "descripcionzona", jdbcType = JdbcType.VARCHAR),
-//	})
-//	List<ZonasItem> searchGroupZoneByName(String idZona, String nombre, Short idInstitucion);
-//	
-//	@SelectProvider(type = ScsZonasSqlExtendsProvider.class, method = "searchGroupZoneOnlyByName")
-//	@Results({
-//		@Result(column = "IDZONA", property = "idzona", jdbcType = JdbcType.VARCHAR),
-//		@Result(column = "NOMBRE", property = "descripcionzona", jdbcType = JdbcType.VARCHAR),
-//	})
-//	List<ZonasItem> searchGroupZoneOnlyByName(String nombre, Short idInstitucion);
 }
