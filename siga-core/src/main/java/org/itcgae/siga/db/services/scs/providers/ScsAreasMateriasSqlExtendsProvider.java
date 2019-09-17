@@ -1,11 +1,21 @@
-package org.itcgae.siga.db.services.cen.providers;
+package org.itcgae.siga.db.services.scs.providers;
 
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.scs.AreasItem;
-import org.itcgae.siga.db.mappers.ScsJurisdiccionSqlProvider;
+import org.itcgae.siga.db.mappers.ScsAreaSqlProvider;
 
-public class ScsAreasMateriasSqlExtendsProvider extends ScsJurisdiccionSqlProvider {
+public class ScsAreasMateriasSqlExtendsProvider extends ScsAreaSqlProvider {
 
+	public String getIdArea(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDAREA) AS IDAREA");
+		sql.FROM("SCS_AREA");
+		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
+
+		return sql.toString();
+	}
+	
 	public String getJurisdicciones(String idInstitucion, String nif) {
 
 		SQL sql = new SQL();
@@ -27,9 +37,6 @@ public class ScsAreasMateriasSqlExtendsProvider extends ScsJurisdiccionSqlProvid
 		SQL sql1 = new SQL();
 		SQL sql2 = new SQL();
 		SQL sql3 = new SQL();
-		String leftjoin;
-		
-			leftjoin= "left join GEN_RECURSOS_CATALOGOS rec on rec.idrecurso = jurisdiccion.DESCRIPCION and rec.idlenguaje = 1";
 		
 		sql1.SELECT("*");
 		sql.SELECT("scs_area.idarea, scs_area.nombre, scs_area.contenido, scs_area.fechabaja, scs_area.idinstitucion,LISTAGG(materia.nombre, ';') WITHIN GROUP (ORDER BY scs_area.idinstitucion,scs_area.idarea) AS nombremateriagrup "
@@ -41,8 +48,8 @@ public class ScsAreasMateriasSqlExtendsProvider extends ScsJurisdiccionSqlProvid
 		sql2.FROM("scs_area");
 		
 		sql3.SELECT("distinct materiajurisdiccion.idinstitucion, materiajurisdiccion.idarea,rec.descripcion, jurisdiccion.idjurisdiccion from SCS_MATERIAJURISDICCION materiajurisdiccion "
-				+ "left join SCS_JURISDICCION jurisdiccion on jurisdiccion.IDJURISDICCION = materiajurisdiccion.IDJURISDICCION " + leftjoin );
-		sql2.INNER_JOIN("("+sql3.toString() + ") materiajurisdiccion on ( materiajurisdiccion.idinstitucion = scs_area.idinstitucion and materiajurisdiccion.idarea = scs_area.idarea)"); 
+				+ "left join SCS_JURISDICCION jurisdiccion on jurisdiccion.IDJURISDICCION = materiajurisdiccion.IDJURISDICCION left join GEN_RECURSOS_CATALOGOS rec on rec.idrecurso = jurisdiccion.DESCRIPCION and rec.idlenguaje = 1");
+		sql2.LEFT_OUTER_JOIN("("+sql3.toString() + ") materiajurisdiccion on ( materiajurisdiccion.idinstitucion = scs_area.idinstitucion and materiajurisdiccion.idarea = scs_area.idarea)"); 
 		sql2.WHERE("scs_area.idinstitucion = "+ areasItem.getidInstitucion());
 		if(areasItem.getNombreArea() != null && !areasItem.getNombreArea().isEmpty()) {
 			sql2.WHERE("LOWER(scs_area.nombre)  like '%" + areasItem.getNombreArea().toLowerCase()+"%'");
@@ -53,7 +60,7 @@ public class ScsAreasMateriasSqlExtendsProvider extends ScsJurisdiccionSqlProvid
 		sql2.GROUP_BY("scs_area.idarea, scs_area.nombre, scs_area.contenido,scs_area.idinstitucion, scs_area.fechabaja");
 		
 		sql.FROM("("+sql2.toString() + ") scs_area"); 
-		sql.INNER_JOIN("scs_materia materia on scs_area.idarea = materia.idarea and\r\n" + 
+		sql.LEFT_OUTER_JOIN("scs_materia materia on scs_area.idarea = materia.idarea and\r\n" + 
 				"scs_area.idinstitucion = materia.idinstitucion");
 		
 		sql.GROUP_BY("scs_area.idarea, scs_area.nombre, scs_area.contenido,\r\n" + 
@@ -64,6 +71,9 @@ public class ScsAreasMateriasSqlExtendsProvider extends ScsJurisdiccionSqlProvid
 		}
 		if(areasItem.getJurisdiccion() != null && !areasItem.getJurisdiccion().isEmpty()) {
 			sql1.WHERE(" LOWER(consulta.idjurisdicciones) like '%" + areasItem.getJurisdiccion().toLowerCase()+ "%'");
+		}
+		if(areasItem.getIdArea() != null && !areasItem.getIdArea().isEmpty()) {
+			sql1.WHERE(" LOWER(consulta.idArea) = '" + areasItem.getIdArea().toLowerCase()+ "'");
 		}
 		return sql1.toString();
 	}

@@ -1,4 +1,4 @@
-package org.itcgae.siga.db.services.cen.mappers;
+package org.itcgae.siga.db.services.scs.mappers;
 
 import java.util.List;
 

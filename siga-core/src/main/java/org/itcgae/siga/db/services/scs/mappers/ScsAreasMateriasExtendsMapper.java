@@ -1,4 +1,4 @@
-package org.itcgae.siga.db.services.cen.mappers;
+package org.itcgae.siga.db.services.scs.mappers;
 
 import java.util.List;
 
@@ -9,8 +9,10 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.scs.AreasItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ScsAreaMapper;
-import org.itcgae.siga.db.services.cen.providers.ScsAreasMateriasSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsAreasMateriasSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsSubzonaSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,11 @@ public interface ScsAreasMateriasExtendsMapper extends ScsAreaMapper{
 	})
 	List<AreasItem> searchAreas(AreasItem areasItem);
 	
+	
+	@SelectProvider(type = ScsAreasMateriasSqlExtendsProvider.class, method = "getIdArea")
+	@Results({ @Result(column = "IDAREA", property = "newId", jdbcType = JdbcType.VARCHAR)
+	})
+	NewIdDTO getIdArea(Short idInstitucion);
 	
 	
 }
