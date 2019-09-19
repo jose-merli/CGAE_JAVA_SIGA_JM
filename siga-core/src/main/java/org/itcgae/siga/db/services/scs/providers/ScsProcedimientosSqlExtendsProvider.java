@@ -1,6 +1,9 @@
 package org.itcgae.siga.db.services.scs.providers;
 
+import java.util.Date;
+
 import org.apache.ibatis.jdbc.SQL;
+import org.itcgae.siga.DTO.scs.ModulosItem;
 import org.itcgae.siga.db.mappers.ScsProcedimientosSqlProvider;
 
 public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlProvider{
@@ -27,4 +30,40 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		return sql.toString();
 	}
 
+	public String searchModulo(ModulosItem moduloItem) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("idprocedimiento");
+		sql.SELECT("nombre");
+		sql.SELECT("codigo");
+		sql.SELECT("rpad(precio,length(precio)+1,'€') precio");
+		sql.SELECT("complemento");
+		sql.SELECT("vigente");
+		sql.SELECT("idjurisdiccion");
+		sql.SELECT("orden");
+		sql.SELECT("codigoext");
+		sql.SELECT("permitiraniadirletrado");
+		sql.SELECT("TO_CHAR(fechadesdevigor, 'DD/MM/YYYY') AS fechadesdevigor");
+		sql.SELECT("TO_CHAR(fechahastavigor, 'DD/MM/YYYY') AS fechahastavigor");
+		sql.SELECT("fechabaja");
+		sql.SELECT("observaciones");
+
+		sql.FROM("SCS_PROCEDIMIENTOS");
+		
+		sql.WHERE("idinstitucion = '" + moduloItem.getidInstitucion() + "'");
+		if(moduloItem.getNombre() != null && moduloItem.getNombre() != "") {
+			sql.WHERE("UPPER(nombre) like UPPER('%" + moduloItem.getNombre() + "%')");
+		}
+		if(moduloItem.getCodigo() != null && moduloItem.getCodigo() != "") {
+			sql.WHERE("UPPER(codigo) like UPPER('%" + moduloItem.getCodigo() + "%')");
+		}
+		if(!moduloItem.isHistorico()) {
+			sql.WHERE("fechabaja is null");
+		}
+		sql.ORDER_BY("nombre"); 
+	
+		return sql.toString();
+	}
+	
 }
