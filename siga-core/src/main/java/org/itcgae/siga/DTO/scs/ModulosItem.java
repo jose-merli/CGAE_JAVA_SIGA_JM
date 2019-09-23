@@ -1,0 +1,170 @@
+package org.itcgae.siga.DTO.scs;
+
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class ModulosItem {
+
+	private String idInstitucion;
+	private String codigo;
+	private String nombre;
+	private String idProcedimiento;
+	private String precio;
+	private String idjurisdiccion;
+	private Date fechabaja;
+	private String complemento;
+	private String vigente;
+	private String orden;
+	private String codigoext;
+	private String permitiraniadirletrado;
+	private String fechadesdevigor;
+	private String fechahastavigor;
+	private String observaciones;
+	private boolean historico;
+	
+	
+	public String getIdProcedimiento() {
+		return idProcedimiento;
+	}
+
+	public void setIdProcedimiento(String idProcedimiento) {
+		this.idProcedimiento = idProcedimiento;
+	}
+
+	public String getPrecio() {
+		return precio;
+	}
+
+	public void setPrecio(String precio) {
+		this.precio = precio;
+	}
+
+	public String getIdjurisdiccion() {
+		return idjurisdiccion;
+	}
+
+	public void setIdjurisdiccion(String idjurisdiccion) {
+		this.idjurisdiccion = idjurisdiccion;
+	}
+
+	public String getComplemento() {
+		return complemento;
+	}
+
+	public void setComplemento(String complemento) {
+		this.complemento = complemento;
+	}
+
+	public String getVigente() {
+		return vigente;
+	}
+
+	public void setVigente(String vigente) {
+		this.vigente = vigente;
+	}
+
+	public String getOrden() {
+		return orden;
+	}
+
+	public void setOrden(String orden) {
+		this.orden = orden;
+	}
+
+	public String getCodigoext() {
+		return codigoext;
+	}
+
+	public void setCodigoext(String codigoext) {
+		this.codigoext = codigoext;
+	}
+
+	public String getPermitiraniadirletrado() {
+		return permitiraniadirletrado;
+	}
+
+	public void setPermitiraniadirletrado(String permitiraniadirletrado) {
+		this.permitiraniadirletrado = permitiraniadirletrado;
+	}
+
+	public String getFechadesdevigor() {
+		return fechadesdevigor;
+	}
+
+	public void setFechadesdevigor(String fechadesdevigor) {
+		this.fechadesdevigor = fechadesdevigor;
+	}
+
+	public String getFechahastavigor() {
+		return fechahastavigor;
+	}
+
+	public void setFechahastavigor(String fechahastavigor) {
+		this.fechahastavigor = fechahastavigor;
+	}
+
+	public String getObservaciones() {
+		return observaciones;
+	}
+
+	public void setObservaciones(String observaciones) {
+		this.observaciones = observaciones;
+	}
+
+	/**
+	 * 
+	 **/
+	public ModulosItem idInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+		return this;
+	}
+
+	@JsonProperty("idInstitucion")
+	public String getidInstitucion() {
+		return idInstitucion;
+	}
+
+	public void setidInstitucion(String idInstitucion) {
+		this.idInstitucion = idInstitucion;
+	}
+	
+	
+
+
+	/**
+	 * 
+	 **/
+
+	public Date getFechabaja() {
+		return fechabaja;
+	}
+
+	public void setFechabaja(Date fechabaja) {
+		this.fechabaja = fechabaja;
+	}
+
+	public String getCodigo() {
+		return codigo;
+	}
+
+	public void setCodigo(String codigo) {
+		this.codigo = codigo;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public boolean isHistorico() {
+		return historico;
+	}
+
+	public void setHistorico(boolean historico) {
+		this.historico = historico;
+	}
+}
