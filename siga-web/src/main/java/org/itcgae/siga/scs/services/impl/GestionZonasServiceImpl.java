@@ -234,7 +234,7 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -243,11 +243,10 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han actualizado las zonas");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se han actualizado las zonas correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		updateResponseDTO.setError(error);
@@ -401,7 +400,7 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -410,11 +409,11 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han activado los grupos zonas");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se han actualizado los grupos zonas correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
+
 		}
 
 		updateResponseDTO.setError(error);

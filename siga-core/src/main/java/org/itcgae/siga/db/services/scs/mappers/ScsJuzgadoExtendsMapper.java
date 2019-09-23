@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Primary
 public interface ScsJuzgadoExtendsMapper extends ScsJuzgadoMapper{
 
-	@SelectProvider(type = ScsJuzgadoSqlExtendsProvider.class, method = "searchJudged")
+	@SelectProvider(type = ScsJuzgadoSqlExtendsProvider.class, method = "searchCourt")
 	@Results({
 		@Result(column = "IDJUZGADO", property = "idJuzgado", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
@@ -45,7 +45,7 @@ public interface ScsJuzgadoExtendsMapper extends ScsJuzgadoMapper{
 		@Result(column = "NOMBREPROVINCIA", property = "nombreProvincia", jdbcType = JdbcType.VARCHAR),
 
 	})
-	List<JuzgadoItem> searchJudged(JuzgadoItem juzgadoItem, Short idInstitucion);
+	List<JuzgadoItem> searchCourt(JuzgadoItem juzgadoItem, Short idInstitucion);
 
 	@SelectProvider(type = ScsJuzgadoSqlExtendsProvider.class, method = "getIdJuzgado")
 	@Results({ @Result(column = "IDJUZGADO", property = "newId", jdbcType = JdbcType.VARCHAR)

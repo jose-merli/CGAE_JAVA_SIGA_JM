@@ -92,8 +92,8 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 					if (juzgadoList != null && juzgadoList.size() > 0) {
 						error.setCode(400);
-						error.setDescription("Ya existe un juzgado con ese nombre");
-
+						error.setDescription("messages.jgr.maestros.gestionJuzgado.existeJuzgadoMismoNombre");
+						insertResponseDTO.setStatus(SigaConstants.KO);
 					} else {
 
 						ScsJuzgado juzgado = new ScsJuzgado();
@@ -147,6 +147,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 						if (idJ == null) {
 							juzgado.setIdjuzgado((long) 1);
+							idJuzgado = 1;
 						} else {
 							idJuzgado = (Integer.parseInt(idJ.getNewId()) + 1);
 							juzgado.setIdjuzgado(idJuzgado);
@@ -165,7 +166,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -174,12 +175,11 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 		if (response == 0 && error.getDescription() == null) {
 			error.setCode(400);
-			error.setDescription("No se ha creado el juzgado");
 			insertResponseDTO.setStatus(SigaConstants.KO);
 		} else if (error.getCode() == null) {
 			error.setCode(200);
 			insertResponseDTO.setId(String.valueOf(idJuzgado));
-			error.setDescription("Se ha creado el juzgado correctamente");
+			insertResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		insertResponseDTO.setError(error);
@@ -406,7 +406,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -415,11 +415,10 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han asociado los procedimientos correctamente");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else if (response == 1) {
 			error.setCode(200);
-			error.setDescription("Se han asociado los procedimientos correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		updateResponseDTO.setError(error);
@@ -465,16 +464,16 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 							.andIdjuzgadoNotEqualTo(Long.decode(juzgadoItem.getIdJuzgado()));
 
 					LOGGER.info(
-							"updateCourt() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Entrada a ageEventoExtendsMapper para buscar la sesión");
+							"updateCourt() / scsJuzgadoExtendsMapper.selectByExample() -> Entrada a scsJuzgadoExtendsMapper para buscar juzgado");
 
 					List<ScsJuzgado> juzgadoList = scsJuzgadoExtendsMapper.selectByExample(example);
 
 					LOGGER.info(
-							"updateCourt() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
+							"updateCourt() / scsJuzgadoExtendsMapper.selectByExample() -> Salida a scsJuzgadoExtendsMapper para buscar juzgado");
 
 					if (juzgadoList != null && juzgadoList.size() > 0) {
 						error.setCode(400);
-						error.setDescription("Ya existe un juzgado con el mismo nombre");
+						error.setDescription("messages.jgr.maestros.gestionJuzgado.existeJuzgadoMismoNombre");
 
 					} else {
 
@@ -532,7 +531,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -541,11 +540,11 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se ha actualizado el juzgado correctamente");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else if(response == 1){
 			error.setCode(200);
-			error.setDescription("Se ha actualizado el juzgado correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
+
 		}
 
 		updateResponseDTO.setError(error);

@@ -66,12 +66,12 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 			if (usuarios != null && usuarios.size() > 0) {
 
 				LOGGER.info(
-						"searchCourt() / cenTiposolicitudSqlExtendsMapper.selectTipoSolicitud() -> Entrada a cenTiposolicitudSqlExtendsMapper para obtener los tipos de solicitud");
+						"searchCourt() / scsJuzgadoExtendsMapper.selectTipoSolicitud() -> Entrada a scsJuzgadoExtendsMapper para obtener los juzgados");
 
-				juzgadoItems = scsJuzgadoExtendsMapper.searchJudged(juzgadoItem, idInstitucion);
+				juzgadoItems = scsJuzgadoExtendsMapper.searchCourt(juzgadoItem, idInstitucion);
 
 				LOGGER.info(
-						"searchCourt() / cenTiposolicitudSqlExtendsMapper.selectTipoSolicitud() -> Salida a cenTiposolicitudSqlExtendsMapper para obtener los tipos de solicitud");
+						"searchCourt() / scsJuzgadoExtendsMapper.selectTipoSolicitud() -> Salida a scsJuzgadoExtendsMapper para obtener los juzgados");
 
 				if (juzgadoItems != null) {
 					juzgadoDTO.setJuzgadoItems(juzgadoItems);
@@ -185,7 +185,7 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -194,11 +194,10 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han eliminado los juzgados");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se han eliminado los juzgados correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		updateResponseDTO.setError(error);
@@ -266,12 +265,12 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 							juzgado.setUsumodificacion(usuario.getIdusuario());
 
 							LOGGER.info(
-									"activateJudged() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Entrada a scsJuzgadoExtendsMapper para dar de alta a un juzgado");
+									"activateCourt() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Entrada a scsJuzgadoExtendsMapper para dar de alta a un juzgado");
 
 							response = scsJuzgadoExtendsMapper.updateByPrimaryKey(juzgado);
 
 							LOGGER.info(
-									"activateJudged() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Salida de scsJuzgadoExtendsMapper para dar de alta a un juzgado");
+									"activateCourt() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Salida de scsJuzgadoExtendsMapper para dar de alta a un juzgado");
 
 							// Eliminamos asociaciones procedimientos
 
@@ -316,7 +315,7 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -325,11 +324,10 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han activado los juzgados");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se han actualizado los juzgados correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		updateResponseDTO.setError(error);

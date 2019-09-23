@@ -280,10 +280,10 @@ public class GestionCosteFijoServiceImpl implements IGestionCosteFijoService {
 						
 						if(costeFijo.getFechabaja() != null) {
 							error.setCode(400);
-							error.setDescription("Ya existe un coste fijo con las mismas características dado baja");
+							error.setDescription("messages.jgr.maestros.gestionCostesFijos.existeCosteFijoMismasCaracteristicasDadoBaja");
 						}else {
 							error.setCode(400);
-							error.setDescription("Ya existe un coste fijo con las mismas características");
+							error.setDescription("messages.jgr.maestros.gestionCostesFijos.existeCosteFijoMismasCaracteristicas");
 						}
 						
 
@@ -327,7 +327,7 @@ public class GestionCosteFijoServiceImpl implements IGestionCosteFijoService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -336,12 +336,12 @@ public class GestionCosteFijoServiceImpl implements IGestionCosteFijoService {
 
 		if (response == 0 && error.getDescription() == null) {
 			error.setCode(400);
-			error.setDescription("No se ha creado el coste fijo");
 			insertResponseDTO.setStatus(SigaConstants.KO);
 		} else if (error.getCode() == null) {
 			error.setCode(200);
 			insertResponseDTO.setId(String.valueOf(Short.valueOf(idZona)));
-			error.setDescription("Se ha creado el coste fijo correctamente");
+			insertResponseDTO.setStatus(SigaConstants.OK);
+
 		}
 
 		insertResponseDTO.setError(error);
@@ -353,7 +353,7 @@ public class GestionCosteFijoServiceImpl implements IGestionCosteFijoService {
 
 	@Override
 	public UpdateResponseDTO updateCosteFijo(CosteFijoDTO costeFijoDTO, HttpServletRequest request) {
-		LOGGER.info("updateCosteFijo() ->  Entrada al servicio para crear un nuevo coste fijo");
+		LOGGER.info("updateCosteFijo() ->  Entrada al servicio para modificar un coste fijo");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -363,8 +363,6 @@ public class GestionCosteFijoServiceImpl implements IGestionCosteFijoService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
-		int existentes = 0; 
-		
 		if (null != idInstitucion) {
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -409,62 +407,42 @@ public class GestionCosteFijoServiceImpl implements IGestionCosteFijoService {
 							scsTipoactuacioncostefijo.setUsumodificacion(usuario.getIdusuario().intValue());
 							scsTipoactuacioncostefijo.setIdinstitucion(idInstitucion);
 							
-//							if (costeFijoItem.getIdCosteFijo() != null) {
-//								scsTipoactuacioncostefijo.setIdcostefijo(Short.decode(costeFijoItem.getIdCosteFijo()));
-//							}
-//							
-//							if (costeFijoItem.getIdTipoActuacion() != null) {
-//								scsTipoactuacioncostefijo
-//										.setIdtipoactuacion(Short.decode(costeFijoItem.getIdTipoActuacion()));
-//							}
-//
-//							if (costeFijoItem.getIdTipoAsistencia() != null) {
-//								scsTipoactuacioncostefijo
-//										.setIdtipoasistencia(Short.decode(costeFijoItem.getIdTipoAsistencia()));
-//							}
-
 							if (costeFijoItem.getImporte() != null) {
 								scsTipoactuacioncostefijo
 										.setImporte(BigDecimal.valueOf(Float.valueOf(costeFijoItem.getImporte())));
 							}
 
 							LOGGER.info(
-									"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Entrada a scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
+									"updateCosteFijo() / scsTipoactuacioncostefijoMapper.updateByExample() -> Entrada a scsTipoactuacioncostefijoMapper para modificar coste fijo");
 
 							response = scsTipoactuacioncostefijoMapper.updateByExample(scsTipoactuacioncostefijo, example);
 
 							LOGGER.info(
-									"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
+									"updateCosteFijo() / scsTipoactuacioncostefijoMapper.updateByExample() -> Salida de scsTipoactuacioncostefijoMapper para modificar coste fijo");
 						}
 					}
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
 
 		}
 
-		if (response == 0 && error.getDescription() == null)
-		{
+		if (response == 0 && error.getDescription() == null){
 			error.setCode(400);
-			error.setDescription("No se ha modificado el coste fijo");
 			updateResponseDTO.setStatus(SigaConstants.KO);
-		}
-		else if(response == 1 && existentes != 0 ) {
-			error.setCode(200);
-			error.setDescription("Se han modificiado los costes fijos exceptuando algunos que tiene las mismas características");
-			
 		}else if (error.getCode() == null) {
 			error.setCode(200);
-			error.setDescription("Se ha modificado el coste fijo correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
+
 		}
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("updateCosteFijo() -> Salida del servicio para crear un nuevo coste fijo");
+		LOGGER.info("updateCosteFijo() -> Salida del servicio para modificar coste fijo");
 
 		return updateResponseDTO;
 	}
@@ -537,7 +515,7 @@ public class GestionCosteFijoServiceImpl implements IGestionCosteFijoService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -546,11 +524,11 @@ public class GestionCosteFijoServiceImpl implements IGestionCosteFijoService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han eliminado los costes fijos");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se han eliminado los costes fijos correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
+
 		}
 
 		updateResponseDTO.setError(error);
@@ -628,7 +606,7 @@ public class GestionCosteFijoServiceImpl implements IGestionCosteFijoService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -637,11 +615,10 @@ public class GestionCosteFijoServiceImpl implements IGestionCosteFijoService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han activado los costes fijos");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se han dado de alta a los costes fijos correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		updateResponseDTO.setError(error);
