@@ -51,8 +51,10 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 
 		sql.SET("OBSERVACIONES = '" + record.getObservaciones() + "'");
 		
-
-		sql.SET("FECHAMODIFICACION = TO_DATE('" + dateFormat.format(new Date()) + "', 'dd/MM/RRRR')");
+		if(record.getFechamodificacion() != null) {
+			sql.SET("FECHAMODIFICACION = TO_DATE('" + dateFormat.format(record.getFechamodificacion()) + "', 'dd/MM/RRRR')");
+		}
+	
 		sql.SET("USUMODIFICACION = " + record.getUsumodificacion());
 
 		if (fechaEstadoNueva != null) {
