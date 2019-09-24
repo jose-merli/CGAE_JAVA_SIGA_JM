@@ -836,7 +836,9 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 								if (!colegiadoItem.getObservaciones()
 										.equals(cenDatoscolegialesestadosBBDD.getObservaciones())
 										|| !(colegiadoItem.getSituacionResidente().equalsIgnoreCase("Si") ? "1" : "0")
-												.equals(cenDatoscolegialesestadosBBDD.getSituacionresidente())) {
+												.equals(cenDatoscolegialesestadosBBDD.getSituacionresidente())
+												|| !colegiadoItem.getIdEstado().equals(String.valueOf(cenDatoscolegialesestadosBBDD.getIdestado()))
+												|| (colegiadoItem.getFechaEstadoNueva() != null && colegiadoItem.getFechaEstadoNueva().compareTo(cenDatoscolegialesestadosBBDD.getFechaestado()) != 0)) {
 									updateDate = true;
 								}
 							}
