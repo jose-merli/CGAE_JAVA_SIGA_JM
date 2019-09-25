@@ -79,8 +79,6 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				AdmUsuarios usuario = usuarios.get(0);
-
 				LOGGER.info(
 						"getPartidoJudicial() / cenPartidojudicialExtendsMapper.getPartidosJudiciales() -> Entrada a cenPartidojudicialExtendsMapper para obtener los partidos judiciales");
 
@@ -121,8 +119,6 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 					"searchSubzonas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
-
-				AdmUsuarios usuario = usuarios.get(0);
 
 				LOGGER.info(
 						"searchSubzonas() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
@@ -194,7 +190,7 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 
 					if (zonasList != null && zonasList.size() > 0) {
 						error.setCode(400);
-						error.setDescription("Ya existe un grupo zona con esa descripción");
+						error.setDescription("messages.jgr.maestros.gestionZonasySubzonas.existeGrupoZonaMismaDescripcion");
 
 					} else {
 
@@ -227,7 +223,7 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -236,12 +232,11 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 
 		if (response == 0 && error.getDescription() == null) {
 			error.setCode(400);
-			error.setDescription("No se ha creado el grupo zona");
 			insertResponseDTO.setStatus(SigaConstants.KO);
 		} else if (error.getCode() == null) {
 			error.setCode(200);
 			insertResponseDTO.setId(String.valueOf(Short.valueOf(idZona)));
-			error.setDescription("Se ha creado el grupo zona correctamente");
+			insertResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		insertResponseDTO.setError(error);
@@ -292,7 +287,7 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 
 					if (zonasList != null && zonasList.size() > 0) {
 						error.setCode(400);
-						error.setDescription("Ya existe un grupo zona con esa descripción");
+						error.setDescription("messages.jgr.maestros.gestionZonasySubzonas.existeGrupoZonaMismaDescripcion");
 
 					} else {
 						ScsZonaExample scsZonaExample = new ScsZonaExample();
@@ -319,7 +314,7 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -328,11 +323,11 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han actualizado las zonas");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se han actualizado las zonas correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
+
 		}
 
 		updateResponseDTO.setError(error);
@@ -556,7 +551,7 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -565,11 +560,11 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han actualizado las zonas");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se han actualizado las zonas correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
+
 		}
 
 		updateResponseDTO.setError(error);
@@ -660,7 +655,7 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -669,11 +664,10 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se ha insertado la zona");
 			insertResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se ha insertado la zona correctamente");
+			insertResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		insertResponseDTO.setError(error);
@@ -709,7 +703,6 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 					"deleteZones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
-				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
 
@@ -749,7 +742,7 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -758,11 +751,10 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han eliminado las zonas");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se han actualizado las zonas correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		updateResponseDTO.setError(error);

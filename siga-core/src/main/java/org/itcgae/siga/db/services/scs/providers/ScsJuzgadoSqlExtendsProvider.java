@@ -6,7 +6,7 @@ import org.itcgae.siga.db.mappers.ScsJuzgadoSqlProvider;
 
 public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider{
 
-	public String searchJudged(JuzgadoItem juzgadoItem, Short idInstitucion) {
+	public String searchCourt(JuzgadoItem juzgadoItem, Short idInstitucion) {
 		
 		SQL sql = new SQL();
 		
@@ -75,30 +75,5 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider{
 		
 		return sql.toString();
 	}
-	
-//	public String searchGroupZoneByName(String idZona, String nombre, Short idInstitucion) {
-//		SQL sql = new SQL();
-//
-//		sql.SELECT("idzona");
-//		sql.SELECT("nombre");
-//		sql.FROM("SCS_ZONA");
-//		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
-//		sql.WHERE("NOMBRE like '"+ nombre +"'");
-//		sql.WHERE("IDZONA not in '" + idZona + "'");
-//		
-//		return sql.toString();
-//	}
-//	
-//	public String searchGroupZoneOnlyByName(String nombre, Short idInstitucion) {
-//		SQL sql = new SQL();
-//
-//		sql.SELECT("idzona");
-//		sql.SELECT("nombre");
-//		sql.FROM("SCS_ZONA");
-//		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
-//		sql.WHERE("UPPER(NOMBRE) like UPPER('"+ nombre +"')");
-//		
-//		return sql.toString();
-//	}
 	
 }

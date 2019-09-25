@@ -24,7 +24,7 @@ public class ZonasItem {
 	private String fechabaja;
 	private String idPartidosJudiciales;
 	private String idsConjuntoSubzonas;
-
+	private String nombrePartidosJudiciales;
 
 	/**
 	 **/
@@ -278,6 +278,22 @@ public class ZonasItem {
 	public void setIdsConjuntoSubzonas(String idsConjuntoSubzonas) {
 		this.idsConjuntoSubzonas = idsConjuntoSubzonas;
 	}
+	
+	/**
+	 **/
+	public ZonasItem nombrePartidosJudiciales(String nombrePartidosJudiciales) {
+		this.nombrePartidosJudiciales = nombrePartidosJudiciales;
+		return this;
+	}
+	
+	@JsonProperty("nombrePartidosJudiciales")
+	public String getNombrePartidosJudiciales() {
+		return nombrePartidosJudiciales;
+	}
+
+	public void setNombrePartidosJudiciales(String nombrePartidosJudiciales) {
+		this.nombrePartidosJudiciales = nombrePartidosJudiciales;
+	}
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -301,14 +317,16 @@ public class ZonasItem {
 				&& Objects.equals(this.historico, zonasItem.historico)
 				&& Objects.equals(this.fechabaja, zonasItem.fechabaja)
 				&& Objects.equals(this.idPartidosJudiciales, zonasItem.idPartidosJudiciales)
-				&& Objects.equals(this.idsConjuntoSubzonas, zonasItem.idsConjuntoSubzonas);
+				&& Objects.equals(this.idsConjuntoSubzonas, zonasItem.idsConjuntoSubzonas)
+				&& Objects.equals(this.nombrePartidosJudiciales, zonasItem.nombrePartidosJudiciales);
 
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(idzona, descripcionzona, idsubzona, usuModificacion, fechaModificacion, descripcionsubzona,
-				idpartido, descripcionpartido, idinstitucion, partidosJudiciales, historico, fechabaja, idPartidosJudiciales, idsConjuntoSubzonas);
+				idpartido, descripcionpartido, idinstitucion, partidosJudiciales, historico, fechabaja, 
+				idPartidosJudiciales, idsConjuntoSubzonas, nombrePartidosJudiciales);
 	}
 
 	@Override
@@ -330,6 +348,7 @@ public class ZonasItem {
 		sb.append("    fechabaja: ").append(toIndentedString(fechabaja)).append("\n");
 		sb.append("    idPartidosJudiciales: ").append(toIndentedString(idPartidosJudiciales)).append("\n");
 		sb.append("    idsConjuntoSubzonas: ").append(toIndentedString(idsConjuntoSubzonas)).append("\n");
+		sb.append("    nombrePartidosJudiciales: ").append(toIndentedString(nombrePartidosJudiciales)).append("\n");
 
 		sb.append("}");
 		return sb.toString();

@@ -5,7 +5,10 @@ import java.util.List;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.scs.ModulosItem;
 import org.itcgae.siga.DTO.scs.ProcedimientoItem;
 import org.itcgae.siga.db.mappers.ScsProcedimientosMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsProcedimientosSqlExtendsProvider;
@@ -27,5 +30,19 @@ public interface ScsProcedimientosExtendsMapper extends ScsProcedimientosMapper{
 
 	})
 	List<ProcedimientoItem> searchProcess(String idLenguaje, Short idInstitucion);
+
+	@SelectProvider(type = ScsProcedimientosSqlExtendsProvider.class, method = "searchModulo")
+	@Results({
+		@Result(column = "IDPROCEDIMIENTO", property = "idProcedimiento", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHAHASTAVIGOR", property = "fechahastavigor", jdbcType = JdbcType.DATE),
+		@Result(column = "FECHADESDEVIGOR", property = "fechadesdevigor", jdbcType = JdbcType.DATE),
+		@Result(column = "IMPORTE", property = "importe", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGO", property = "codigo", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "JURISDICCION", property = "jurisdiccion", jdbcType = JdbcType.VARCHAR),
+
+	})
+	List<ModulosItem> searchModulo(ModulosItem modulosItem);
 	
 }

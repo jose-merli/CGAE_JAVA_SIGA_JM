@@ -509,6 +509,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 								scsMateriaJurisdiccionExtendsMapper.deleteByPrimaryKey(jurisdicciones);
 							}
 							
+							if(jurisdiccionesCombo[0] != "")
 							for (String jurisdicciones : jurisdiccionesCombo) {
 								ScsMateriajurisdiccion materiaJurisdiccion = new ScsMateriajurisdiccion();
 								materiaJurisdiccion.setFechamodificacion(new Date());

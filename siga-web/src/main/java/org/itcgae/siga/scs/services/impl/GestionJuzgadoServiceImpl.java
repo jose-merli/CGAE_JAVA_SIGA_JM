@@ -48,8 +48,8 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 	private ScsJuzgadoProcedimientoExtendsMapper scsJuzgadoProcedimientoExtendsMapper;
 
 	@Override
-	public InsertResponseDTO createJudged(JuzgadoItem juzgadoItem, HttpServletRequest request) {
-		LOGGER.info("createJudged() ->  Entrada al servicio para crear un nuevo juzgado");
+	public InsertResponseDTO createCourt(JuzgadoItem juzgadoItem, HttpServletRequest request) {
+		LOGGER.info("createCourt() ->  Entrada al servicio para crear un nuevo juzgado");
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -66,12 +66,12 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"createJudged() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"createCourt() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"createJudged() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"createCourt() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -83,17 +83,17 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
 
 					LOGGER.info(
-							"createGroupZone() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Entrada a ageEventoExtendsMapper para buscar la sesión");
+							"createCourt() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Entrada a ageEventoExtendsMapper para buscar la sesión");
 
 					List<ScsJuzgado> juzgadoList = scsJuzgadoExtendsMapper.selectByExample(scsJuzgadoExample);
 
 					LOGGER.info(
-							"createGroupZone() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
+							"createCourt() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
 
 					if (juzgadoList != null && juzgadoList.size() > 0) {
 						error.setCode(400);
-						error.setDescription("Ya existe un juzgado con ese nombre");
-
+						error.setDescription("messages.jgr.maestros.gestionJuzgado.existeJuzgadoMismoNombre");
+						insertResponseDTO.setStatus(SigaConstants.KO);
 					} else {
 
 						ScsJuzgado juzgado = new ScsJuzgado();
@@ -147,25 +147,26 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 						if (idJ == null) {
 							juzgado.setIdjuzgado((long) 1);
+							idJuzgado = 1;
 						} else {
 							idJuzgado = (Integer.parseInt(idJ.getNewId()) + 1);
 							juzgado.setIdjuzgado(idJuzgado);
 						}
 
 						LOGGER.info(
-								"createJudged() / scsJuzgadoExtendsMapper.insert() -> Entrada a scsJuzgadoExtendsMapper para insertar el nuevo juzgado");
+								"createCourt() / scsJuzgadoExtendsMapper.insert() -> Entrada a scsJuzgadoExtendsMapper para insertar el nuevo juzgado");
 
 						response = scsJuzgadoExtendsMapper.insert(juzgado);
 
 						LOGGER.info(
-								"createJudged() / scsJuzgadoExtendsMapper.insert() -> Salida de scsJuzgadoExtendsMapper para insertar el nuevo juzgado");
+								"createCourt() / scsJuzgadoExtendsMapper.insert() -> Salida de scsJuzgadoExtendsMapper para insertar el nuevo juzgado");
 
 					}
 
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -174,17 +175,16 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 		if (response == 0 && error.getDescription() == null) {
 			error.setCode(400);
-			error.setDescription("No se ha creado el juzgado");
 			insertResponseDTO.setStatus(SigaConstants.KO);
 		} else if (error.getCode() == null) {
 			error.setCode(200);
 			insertResponseDTO.setId(String.valueOf(idJuzgado));
-			error.setDescription("Se ha creado el juzgado correctamente");
+			insertResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		insertResponseDTO.setError(error);
 
-		LOGGER.info("createJudged() -> Salida del servicio para crear un nuevo grupo zona");
+		LOGGER.info("createCourt() -> Salida del servicio para crear un nuevo juzgado");
 
 		return insertResponseDTO;
 	}
@@ -235,8 +235,8 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 	}
 
 	@Override
-	public ProcedimientoDTO searchProcJudged(String idJuzgado, HttpServletRequest request) {
-		LOGGER.info("searchProcJudged() -> Entrada al servicio para obtener los procedimientos asigandos a juzgados");
+	public ProcedimientoDTO searchProcCourt(String idJuzgado, HttpServletRequest request) {
+		LOGGER.info("searchProcCourt() -> Entrada al servicio para obtener los procedimientos asigandos a juzgados");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -250,25 +250,25 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchProcJudged() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchProcCourt() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchProcJudged() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchProcCourt() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
 				AdmUsuarios usuario = usuarios.get(0);
 
 				LOGGER.info(
-						"searchProcJudged() / scsProcedimientosExtendsMapper.searchProcJudged() -> Entrada a scsProcedimientosExtendsMapper para obtener procedimientos asigandos a juzgados");
+						"searchProcCourt() / scsProcedimientosExtendsMapper.searchProcJudged() -> Entrada a scsProcedimientosExtendsMapper para obtener procedimientos asigandos a juzgados");
 
 				procedimientos = scsJuzgadoProcedimientoExtendsMapper.searchProcJudged(usuario.getIdlenguaje(),
 						idInstitucion, idJuzgado);
 
 				LOGGER.info(
-						"searchProcJudged() / scsProcedimientosExtendsMapper.searchProcJudged() -> Salida a scsProcedimientosExtendsMapper para obtener procedimientos asigandos a juzgados");
+						"searchProcCourt() / scsProcedimientosExtendsMapper.searchProcJudged() -> Salida a scsProcedimientosExtendsMapper para obtener procedimientos asigandos a juzgados");
 
 				if (procedimientos != null) {
 					procedimientoDTO.setProcedimientosItems(procedimientos);
@@ -277,7 +277,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 		}
 		LOGGER.info(
-				"searchProcJudged() -> Salida del servicio para obtener los procedimientos los procedimientos asigandos a juzgados");
+				"searchProcCourt() -> Salida del servicio para obtener los procedimientos los procedimientos asigandos a juzgados");
 		return procedimientoDTO;
 	}
 
@@ -406,7 +406,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -415,11 +415,10 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han asociado los procedimientos correctamente");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else if (response == 1) {
 			error.setCode(200);
-			error.setDescription("Se han asociado los procedimientos correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		updateResponseDTO.setError(error);
@@ -430,8 +429,8 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 	}
 
 	@Override
-	public UpdateResponseDTO updateJudged(JuzgadoItem juzgadoItem, HttpServletRequest request) {
-		LOGGER.info("updateJudged() ->  Entrada al servicio para editar juzgado");
+	public UpdateResponseDTO updateCourt(JuzgadoItem juzgadoItem, HttpServletRequest request) {
+		LOGGER.info("updateCourt() ->  Entrada al servicio para editar juzgado");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -447,12 +446,12 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"updateJudged() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateCourt() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"updateJudged() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateCourt() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -465,16 +464,16 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 							.andIdjuzgadoNotEqualTo(Long.decode(juzgadoItem.getIdJuzgado()));
 
 					LOGGER.info(
-							"createGroupZone() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Entrada a ageEventoExtendsMapper para buscar la sesión");
+							"updateCourt() / scsJuzgadoExtendsMapper.selectByExample() -> Entrada a scsJuzgadoExtendsMapper para buscar juzgado");
 
 					List<ScsJuzgado> juzgadoList = scsJuzgadoExtendsMapper.selectByExample(example);
 
 					LOGGER.info(
-							"createGroupZone() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
+							"updateCourt() / scsJuzgadoExtendsMapper.selectByExample() -> Salida a scsJuzgadoExtendsMapper para buscar juzgado");
 
 					if (juzgadoList != null && juzgadoList.size() > 0) {
 						error.setCode(400);
-						error.setDescription("Ya existe un juzgado con el mismo nombre");
+						error.setDescription("messages.jgr.maestros.gestionJuzgado.existeJuzgadoMismoNombre");
 
 					} else {
 
@@ -483,12 +482,12 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 								.andIdinstitucionEqualTo(idInstitucion);
 
 						LOGGER.info(
-								"updateJudged() / scsSubzonaExtendsMapper.selectByExample() -> Entrada a scsSubzonaExtendsMapper para buscar la subzona");
+								"updateCourt() / scsSubzonaExtendsMapper.selectByExample() -> Entrada a scsSubzonaExtendsMapper para buscar la subzona");
 
 						List<ScsJuzgado> ScsJuzgadosList = scsJuzgadoExtendsMapper.selectByExample(scsJuzgadoExample);
 
 						LOGGER.info(
-								"updateJudged() / scsSubzonaExtendsMapper.selectByExample() -> Salida a scsSubzonaExtendsMapper para buscar la subzona");
+								"updateCourt() / scsSubzonaExtendsMapper.selectByExample() -> Salida a scsSubzonaExtendsMapper para buscar la subzona");
 
 						ScsJuzgado juzgado = ScsJuzgadosList.get(0);
 
@@ -532,7 +531,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -541,16 +540,16 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se ha actualizado el juzgado correctamente");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else if(response == 1){
 			error.setCode(200);
-			error.setDescription("Se ha actualizado el juzgado correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
+
 		}
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("updateJudged() -> Salida del servicio para editar juzgado");
+		LOGGER.info("updateCourt() -> Salida del servicio para editar juzgado");
 
 		return updateResponseDTO;
 	}

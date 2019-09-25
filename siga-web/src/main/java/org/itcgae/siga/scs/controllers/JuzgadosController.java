@@ -38,9 +38,9 @@ public class JuzgadosController {
 	@Autowired
 	private ITarjetaDatosIntegrantesService tarjetaDatosIntegrantesService;
 	
-	@RequestMapping(value = "/busquedaJuzgados/searchJudged",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<JuzgadoDTO> searchJudged(@RequestBody JuzgadoItem juzgadoItem, HttpServletRequest request) {
-		JuzgadoDTO response = busquedaJuzgadosService.searchJudged(juzgadoItem, request);
+	@RequestMapping(value = "/busquedaJuzgados/searchCourt",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<JuzgadoDTO> searchCourt(@RequestBody JuzgadoItem juzgadoItem, HttpServletRequest request) {
+		JuzgadoDTO response = busquedaJuzgadosService.searchCourt(juzgadoItem, request);
 		return new ResponseEntity<JuzgadoDTO>(response, HttpStatus.OK);
 	}
 	
@@ -56,10 +56,10 @@ public class JuzgadosController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/busquedaJuzgados/deleteJudged", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/busquedaJuzgados/deleteCourt", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> deleteJudged(@RequestBody JuzgadoDTO juzgadoDTO, HttpServletRequest request) {
 
-		UpdateResponseDTO response = busquedaJuzgadosService.deleteJudged(juzgadoDTO, request);
+		UpdateResponseDTO response = busquedaJuzgadosService.deleteCourt(juzgadoDTO, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
@@ -67,10 +67,10 @@ public class JuzgadosController {
 
 	}
 	
-	@RequestMapping(value = "/busquedaJuzgados/activateJudged", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/busquedaJuzgados/activateCourt", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> activateJudged(@RequestBody JuzgadoDTO juzgadoDTO, HttpServletRequest request) {
 
-		UpdateResponseDTO response = busquedaJuzgadosService.activateJudged(juzgadoDTO, request);
+		UpdateResponseDTO response = busquedaJuzgadosService.activateCourt(juzgadoDTO, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
@@ -84,16 +84,16 @@ public class JuzgadosController {
 		return new ResponseEntity<ProcedimientoDTO >(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/gestionJuzgados/searchProcJudged", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/gestionJuzgados/searchProcCourt", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ProcedimientoDTO> searchProcJudged(@RequestParam("idJuzgado") String idJuzgado, HttpServletRequest request) { 
-		ProcedimientoDTO response = gestionJuzgadosService.searchProcJudged(idJuzgado, request);
+		ProcedimientoDTO response = gestionJuzgadosService.searchProcCourt(idJuzgado, request);
 		return new ResponseEntity<ProcedimientoDTO >(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/gestionJuzgados/updateJudged", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/gestionJuzgados/updateCourt", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateJudged(@RequestBody JuzgadoItem juzgadoItem, HttpServletRequest request) {
 
-		UpdateResponseDTO response = gestionJuzgadosService.updateJudged(juzgadoItem, request);
+		UpdateResponseDTO response = gestionJuzgadosService.updateCourt(juzgadoItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
@@ -101,10 +101,10 @@ public class JuzgadosController {
 
 	}
 	
-	@RequestMapping(value = "/gestionJuzgados/createJudged", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<InsertResponseDTO> createJudged(@RequestBody JuzgadoItem juzgadoItem, HttpServletRequest request) {
+	@RequestMapping(value = "/gestionJuzgados/createCourt", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> createCourt(@RequestBody JuzgadoItem juzgadoItem, HttpServletRequest request) {
 
-		InsertResponseDTO response = gestionJuzgadosService.createJudged(juzgadoItem, request);
+		InsertResponseDTO response = gestionJuzgadosService.createCourt(juzgadoItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else

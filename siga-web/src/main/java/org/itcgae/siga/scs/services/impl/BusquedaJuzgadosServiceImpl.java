@@ -41,8 +41,8 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 	private ScsJuzgadoprocedimientoMapper scsJuzgadoprocedimientoMapper;
 
 	@Override
-	public JuzgadoDTO searchJudged(JuzgadoItem juzgadoItem, HttpServletRequest request) {
-		LOGGER.info("searchJudged() -> Entrada al servicio para obtener los juzgados");
+	public JuzgadoDTO searchCourt(JuzgadoItem juzgadoItem, HttpServletRequest request) {
+		LOGGER.info("searchCourt() -> Entrada al servicio para obtener los juzgados");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -56,22 +56,22 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchJudged() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchCourt() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchJudged() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchCourt() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
 				LOGGER.info(
-						"searchJudged() / cenTiposolicitudSqlExtendsMapper.selectTipoSolicitud() -> Entrada a cenTiposolicitudSqlExtendsMapper para obtener los tipos de solicitud");
+						"searchCourt() / scsJuzgadoExtendsMapper.selectTipoSolicitud() -> Entrada a scsJuzgadoExtendsMapper para obtener los juzgados");
 
-				juzgadoItems = scsJuzgadoExtendsMapper.searchJudged(juzgadoItem, idInstitucion);
+				juzgadoItems = scsJuzgadoExtendsMapper.searchCourt(juzgadoItem, idInstitucion);
 
 				LOGGER.info(
-						"searchJudged() / cenTiposolicitudSqlExtendsMapper.selectTipoSolicitud() -> Salida a cenTiposolicitudSqlExtendsMapper para obtener los tipos de solicitud");
+						"searchCourt() / scsJuzgadoExtendsMapper.selectTipoSolicitud() -> Salida a scsJuzgadoExtendsMapper para obtener los juzgados");
 
 				if (juzgadoItems != null) {
 					juzgadoDTO.setJuzgadoItems(juzgadoItems);
@@ -79,14 +79,14 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 			}
 
 		}
-		LOGGER.info("searchJudged() -> Salida del servicio para obtener los juzgados");
+		LOGGER.info("searchCourt() -> Salida del servicio para obtener los juzgados");
 		return juzgadoDTO;
 	}
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO deleteJudged(JuzgadoDTO juzgadoDTO, HttpServletRequest request) {
-		LOGGER.info("deleteJudged() ->  Entrada al servicio para eliminar juzgados");
+	public UpdateResponseDTO deleteCourt(JuzgadoDTO juzgadoDTO, HttpServletRequest request) {
+		LOGGER.info("deleteCourt() ->  Entrada al servicio para eliminar juzgados");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -102,12 +102,12 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"deleteJudged() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"deleteCourt() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"deleteJudged() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"deleteCourt() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -123,13 +123,13 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 								.andIdjuzgadoEqualTo(Long.valueOf(juzgadoItem.getIdJuzgado()));
 
 						LOGGER.info(
-								"deleteJudged() / scsJuzgadoprocedimientoMapper.selectByExample() -> Entrada a scsJuzgadoprocedimientoMapper para buscar los procedimientos asociados al juzgado");
+								"deleteCourt() / scsJuzgadoprocedimientoMapper.selectByExample() -> Entrada a scsJuzgadoprocedimientoMapper para buscar los procedimientos asociados al juzgado");
 
 						List<ScsJuzgadoprocedimiento> procedimientosList = scsJuzgadoprocedimientoMapper
 								.selectByExample(scsJuzgadoprocedimientoExample);
 
 						LOGGER.info(
-								"deleteJudged() / scsJuzgadoprocedimientoMapper.selectByExample() -> Salida de scsJuzgadoprocedimientoMapper para buscar los procedimientos asociados al juzgado");
+								"deleteCourt() / scsJuzgadoprocedimientoMapper.selectByExample() -> Salida de scsJuzgadoprocedimientoMapper para buscar los procedimientos asociados al juzgado");
 
 						if (null != procedimientosList && procedimientosList.size() > 0) {
 
@@ -140,12 +140,12 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 								scsJuzgadoprocedimiento.setUsumodificacion(usuario.getIdusuario());
 
 								LOGGER.info(
-										"deleteJudged() / scsJuzgadoprocedimientoMapper.updateByPrimaryKey() -> Entrada a scsJuzgadoprocedimientoMapper para dar de baja a los procedimientos asociados al juzgado");
+										"deleteCourt() / scsJuzgadoprocedimientoMapper.updateByPrimaryKey() -> Entrada a scsJuzgadoprocedimientoMapper para dar de baja a los procedimientos asociados al juzgado");
 
 								response = scsJuzgadoprocedimientoMapper.updateByPrimaryKey(scsJuzgadoprocedimiento);
 
 								LOGGER.info(
-										"deleteJudged() / scsJuzgadoprocedimientoMapper.updateByPrimaryKey() -> Salida de scsJuzgadoprocedimientoMapper para dar de baja a los procedimientos asociados al juzgado");
+										"deleteCourt() / scsJuzgadoprocedimientoMapper.updateByPrimaryKey() -> Salida de scsJuzgadoprocedimientoMapper para dar de baja a los procedimientos asociados al juzgado");
 
 							}
 						}
@@ -157,12 +157,12 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 								.andIdjuzgadoEqualTo(Long.valueOf(juzgadoItem.getIdJuzgado()));
 
 						LOGGER.info(
-								"deleteJudged() / scsJuzgadoExtendsMapper.selectByExample() -> Entrada a scsJuzgadoExtendsMapper para buscar el juzgado");
+								"deleteCourt() / scsJuzgadoExtendsMapper.selectByExample() -> Entrada a scsJuzgadoExtendsMapper para buscar el juzgado");
 
 						List<ScsJuzgado> juzgadosList = scsJuzgadoExtendsMapper.selectByExample(scsJuzgadoExample);
 
 						LOGGER.info(
-								"deleteJudged() / scsJuzgadoExtendsMapper.selectByExample() -> Salida de scsJuzgadoExtendsMapper para buscar el juzgado");
+								"deleteCourt() / scsJuzgadoExtendsMapper.selectByExample() -> Salida de scsJuzgadoExtendsMapper para buscar el juzgado");
 
 						if (null != juzgadosList && juzgadosList.size() > 0) {
 
@@ -173,19 +173,19 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 							juzgado.setUsumodificacion(usuario.getIdusuario());
 
 							LOGGER.info(
-									"deleteJudged() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Entrada a scsJuzgadoExtendsMapper para dar de baja a un juzgado");
+									"deleteCourt() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Entrada a scsJuzgadoExtendsMapper para dar de baja a un juzgado");
 
 							response = scsJuzgadoExtendsMapper.updateByPrimaryKey(juzgado);
 
 							LOGGER.info(
-									"deleteJudged() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Salida de scsJuzgadoExtendsMapper para dar de baja a un juzgado");
+									"deleteCourt() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Salida de scsJuzgadoExtendsMapper para dar de baja a un juzgado");
 						}
 					}
 
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -194,25 +194,24 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han eliminado los juzgados");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se han eliminado los juzgados correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("deleteJudged() -> Salida del servicio para eliminar juzgados");
+		LOGGER.info("deleteCourt() -> Salida del servicio para eliminar juzgados");
 
 		return updateResponseDTO;
 	}
 
 	@Override
 	@Transactional
-	public UpdateResponseDTO activateJudged(JuzgadoDTO juzgadoDTO, HttpServletRequest request) {
+	public UpdateResponseDTO activateCourt(JuzgadoDTO juzgadoDTO, HttpServletRequest request) {
 
-		LOGGER.info("activateJudged() ->  Entrada al servicio para dar de alta a grupos zona");
+		LOGGER.info("activateCourt() ->  Entrada al servicio para dar de alta a grupos zona");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -228,12 +227,12 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"activateJudged() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"activateCourt() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"activateJudged() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"activateCourt() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -250,12 +249,12 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 								.andFechabajaIsNotNull();
 
 						LOGGER.info(
-								"activateJudged() / scsJuzgadoExtendsMapper.selectByExample() -> Entrada a scsJuzgadoExtendsMapper para buscar el juzgado");
+								"activateCourt() / scsJuzgadoExtendsMapper.selectByExample() -> Entrada a scsJuzgadoExtendsMapper para buscar el juzgado");
 
 						List<ScsJuzgado> juzgadosList = scsJuzgadoExtendsMapper.selectByExample(scsJuzgadoExample);
 
 						LOGGER.info(
-								"activateJudged() / scsJuzgadoExtendsMapper.selectByExample() -> Salida de scsJuzgadoExtendsMapper para buscar el juzgado");
+								"activateCourt() / scsJuzgadoExtendsMapper.selectByExample() -> Salida de scsJuzgadoExtendsMapper para buscar el juzgado");
 
 						if (null != juzgadosList && juzgadosList.size() > 0) {
 
@@ -266,12 +265,12 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 							juzgado.setUsumodificacion(usuario.getIdusuario());
 
 							LOGGER.info(
-									"activateJudged() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Entrada a scsJuzgadoExtendsMapper para dar de alta a un juzgado");
+									"activateCourt() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Entrada a scsJuzgadoExtendsMapper para dar de alta a un juzgado");
 
 							response = scsJuzgadoExtendsMapper.updateByPrimaryKey(juzgado);
 
 							LOGGER.info(
-									"activateJudged() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Salida de scsJuzgadoExtendsMapper para dar de alta a un juzgado");
+									"activateCourt() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Salida de scsJuzgadoExtendsMapper para dar de alta a un juzgado");
 
 							// Eliminamos asociaciones procedimientos
 
@@ -281,13 +280,13 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 									.andFechabajaIsNotNull();
 
 							LOGGER.info(
-									"activateJudged() / scsJuzgadoprocedimientoMapper.selectByExample() -> Entrada a scsJuzgadoprocedimientoMapper para buscar los procedimientos asociados al juzgado");
+									"activateCourt() / scsJuzgadoprocedimientoMapper.selectByExample() -> Entrada a scsJuzgadoprocedimientoMapper para buscar los procedimientos asociados al juzgado");
 
 							List<ScsJuzgadoprocedimiento> procedimientosList = scsJuzgadoprocedimientoMapper
 									.selectByExample(scsJuzgadoprocedimientoExample);
 
 							LOGGER.info(
-									"activateJudged() / scsJuzgadoprocedimientoMapper.selectByExample() -> Salida de scsJuzgadoprocedimientoMapper para buscar los procedimientos asociados al juzgado");
+									"activateCourt() / scsJuzgadoprocedimientoMapper.selectByExample() -> Salida de scsJuzgadoprocedimientoMapper para buscar los procedimientos asociados al juzgado");
 
 							if (null != procedimientosList && procedimientosList.size() > 0) {
 
@@ -298,13 +297,13 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 									scsJuzgadoprocedimiento.setUsumodificacion(usuario.getIdusuario());
 
 									LOGGER.info(
-											"activateJudged() / scsJuzgadoprocedimientoMapper.updateByPrimaryKey() -> Entrada a scsJuzgadoprocedimientoMapper para dar de alta a los procedimientos asociados al juzgado");
+											"activateCourt() / scsJuzgadoprocedimientoMapper.updateByPrimaryKey() -> Entrada a scsJuzgadoprocedimientoMapper para dar de alta a los procedimientos asociados al juzgado");
 
 									response = scsJuzgadoprocedimientoMapper
 											.updateByPrimaryKey(scsJuzgadoprocedimiento);
 
 									LOGGER.info(
-											"activateJudged() / scsJuzgadoprocedimientoMapper.updateByPrimaryKey() -> Salida de scsJuzgadoprocedimientoMapper para dar de alta a los procedimientos asociados al juzgado");
+											"activateCourt() / scsJuzgadoprocedimientoMapper.updateByPrimaryKey() -> Salida de scsJuzgadoprocedimientoMapper para dar de alta a los procedimientos asociados al juzgado");
 
 								}
 							}
@@ -316,7 +315,7 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
-					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					error.setDescription("general.mensaje.error.bbdd");
 					updateResponseDTO.setStatus(SigaConstants.KO);
 				}
 			}
@@ -325,16 +324,15 @@ public class BusquedaJuzgadosServiceImpl implements IBusquedaJuzgadosService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("No se han activado los juzgados");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se han actualizado los juzgados correctamente");
+			updateResponseDTO.setStatus(SigaConstants.OK);
 		}
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("activateJudged() -> Salida del servicio para dar de alta a los juzgados");
+		LOGGER.info("activateCourt() -> Salida del servicio para dar de alta a los juzgados");
 
 		return updateResponseDTO;
 

@@ -8,9 +8,9 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 
 public interface IBusquedaJuzgadosService {
 
-	public JuzgadoDTO searchJudged(JuzgadoItem juzgadoItem, HttpServletRequest request);
+	public JuzgadoDTO searchCourt(JuzgadoItem juzgadoItem, HttpServletRequest request);
 
-	public UpdateResponseDTO deleteJudged(JuzgadoDTO juzgadoDTO, HttpServletRequest request);
+	public UpdateResponseDTO deleteCourt(JuzgadoDTO juzgadoDTO, HttpServletRequest request);
 
-	public UpdateResponseDTO activateJudged(JuzgadoDTO juzgadoDTO, HttpServletRequest request);
+	public UpdateResponseDTO activateCourt(JuzgadoDTO juzgadoDTO, HttpServletRequest request);
 }
