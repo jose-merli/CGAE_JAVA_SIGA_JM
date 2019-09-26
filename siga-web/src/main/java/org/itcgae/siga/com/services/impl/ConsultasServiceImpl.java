@@ -654,9 +654,9 @@ public class ConsultasServiceImpl implements IConsultasService{
 							//Destinarios
 							consulta.setTipoconsulta("E");
 							//camposIncorrectos = comprobarCamposDestinarios(consulta.getSentencia());
-							if(objetivoAnterior != Long.valueOf(consultaDTO.getIdObjetivo()).longValue()){
-								sentencia = insertarSelectDestinatarios(sentencia);
-							}
+//							if(objetivoAnterior != Long.valueOf(consultaDTO.getIdObjetivo()).longValue()){
+//								sentencia = insertarSelectDestinatarios(sentencia);
+//							} Se comenta esta parte para la resolución de la incidencia SIGARNV-1233
 							//insertarSelectDestinatarios(consulta.getSentencia());
 							break;
 						case "2":
