@@ -936,7 +936,8 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 
 					EnvDestinatariosExample destinatariosExample = new EnvDestinatariosExample();
 					destinatariosExample.createCriteria().andIdenvioEqualTo(idEnvio)
-							.andIdinstitucionEqualTo(idInstitucion);
+							.andIdinstitucionEqualTo(idInstitucion)
+							.andOrigendestinatarioEqualTo(Short.valueOf("0"));
 					List<EnvDestinatarios> destinatarios = _envDestinatariosMapper
 							.selectByExample(destinatariosExample);
 					for (EnvDestinatarios destinatario : destinatarios) {
