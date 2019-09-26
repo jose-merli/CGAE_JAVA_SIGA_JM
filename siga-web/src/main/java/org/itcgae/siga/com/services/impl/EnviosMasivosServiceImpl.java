@@ -468,7 +468,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							Short idEstado = 6;
 							envio.setIdestado(idEstado);
 							update = _envEnviosMapper.updateByPrimaryKey(envio);
-							if (update > 0) {
+							/*if (update > 0) {
 								EnvHistoricoestadoenvioExample example = new EnvHistoricoestadoenvioExample();
 								example.createCriteria().andIdenvioEqualTo(Long.parseLong(envios[i].getIdEnvio()))
 										.andIdinstitucionEqualTo(usuario.getIdinstitucion());
@@ -479,7 +479,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 								historico.get(0).setUsumodificacion(usuario.getIdusuario());
 								historico.get(0).setIdestado(idEstado);
 								_envHistoricoestadoenvioMapper.updateByPrimaryKey(historico.get(0));
-							}
+							}*/
 						}
 					}
 					respuesta.setCode(200);
@@ -604,7 +604,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						envio.setUsumodificacion(usuario.getIdusuario());
 						envio.setEnvio("M");
 						int insert = _envEnviosMapper.insert(envio);
-						if (insert > 0) {
+						/*if (insert > 0) {
 							EnvHistoricoestadoenvio historico = new EnvHistoricoestadoenvio();
 							historico.setIdenvio(envio.getIdenvio());
 							historico.setIdinstitucion(usuario.getIdinstitucion());
@@ -614,7 +614,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 							Short idEstado = 1;
 							historico.setIdestado(idEstado);
 							_envHistoricoestadoenvioMapper.insert(historico);
-						}
+						}*/
 
 						if (SigaConstants.ID_ENVIO_MAIL.equalsIgnoreCase(datosTarjeta.getIdTipoEnvios())
 								|| SigaConstants.ID_ENVIO_DOCUMENTACION_LETRADO
@@ -966,7 +966,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 					histExample.createCriteria().andIdenvioEqualTo(idEnvio).andIdinstitucionEqualTo(idInstitucion);
 					List<EnvHistoricoestadoenvio> historicosEstados = _envHistoricoestadoenvioMapper
 							.selectByExample(histExample);
-					for (EnvHistoricoestadoenvio envHistorico : historicosEstados) {
+					/*for (EnvHistoricoestadoenvio envHistorico : historicosEstados) {
 						// el id historico se debería de calcular con secuencia en bdd
 						envHistorico.setIdenvio(idEnvioNuevo);
 						envHistorico.setFechamodificacion(new Date());
@@ -974,7 +974,7 @@ public class EnviosMasivosServiceImpl implements IEnviosMasivosService {
 						envHistorico.setIdestado(idEstadoPendiente);
 						_envHistoricoestadoenvioMapper.insert(envHistorico);
 					}
-
+*/
 					// env_plantilla remitentes
 					// EnvPlantillaremitentesExample keyRemitentesExample = new
 					// EnvPlantillaremitentesExample();
