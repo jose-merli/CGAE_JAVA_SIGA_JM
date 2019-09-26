@@ -22,6 +22,8 @@ import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
 import org.itcgae.siga.db.entities.ScsTipofundamentocalif;
 import org.itcgae.siga.db.entities.ScsTipofundamentocalifExample;
+import org.itcgae.siga.db.entities.ScsTipofundamentos;
+import org.itcgae.siga.db.entities.ScsTipofundamentosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsFundamentoscalificacionExtendsMapper;
@@ -125,13 +127,13 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 			if (usuarios != null && usuarios.size() > 0) {
 
 				LOGGER.info(
-						"searchFundamentos() / cenTiposolicitudSqlExtendsMapper.selectTipoSolicitud() -> Entrada a scsFundamentoscalificacionExtendsMapper para realizar la query");
+						"searchFundamentos() / scsFundamentoscalificacionExtendsMapper.searchFundamentos() -> Entrada a scsFundamentoscalificacionExtendsMapper para realizar la query");
 
 				fundamentosItems = scsFundamentoscalificacionExtendsMapper.searchFundamentos(usuarios.get(0).getIdlenguaje(), idInstitucion.toString(),
 						fundamentosCalificacionItem);
 
 				LOGGER.info(
-						"searchFundamentos() / cenTiposolicitudSqlExtendsMapper.selectTipoSolicitud() -> Salida a scsFundamentoscalificacionExtendsMapper para realizar la query");
+						"searchFundamentos() / scsFundamentoscalificacionExtendsMapper.searchFundamentos() -> Salida a scsFundamentoscalificacionExtendsMapper para realizar la query");
 
 				if (fundamentosItems != null) {
 					fundamentosDTO.setFundamentosCalificacionesItems(fundamentosItems);
@@ -183,12 +185,12 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 								.andIdfundamentocalifEqualTo(Short.valueOf(funamentoCalificacionItem.getIdFundamento()));
 
 						LOGGER.info(
-								"deleteFundamentos() / scsJuzgadoExtendsMapper.selectByExample() -> Entrada a scsJuzgadoExtendsMapper para buscar el juzgado");
+								"deleteFundamentos() / scsFundamentoscalificacionExtendsMapper.selectByExample() -> Entrada a scsFundamentoscalificacionExtendsMapper para buscar el fundamento");
 
 						List<ScsTipofundamentocalif> fundamentosList = scsFundamentoscalificacionExtendsMapper.selectByExample(scsTipoFundamentoCalifExample);
 
 						LOGGER.info(
-								"deleteFundamentos() / scsJuzgadoExtendsMapper.selectByExample() -> Salida de scsJuzgadoExtendsMapper para buscar el juzgado");
+								"deleteFundamentos() / scsFundamentoscalificacionExtendsMapper.selectByExample() -> Salida de scsFundamentoscalificacionExtendsMapper para buscar el fundamento");
 
 						if (null != fundamentosList && fundamentosList.size() > 0) {
 
@@ -199,12 +201,12 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 							fundamentoCalificacion.setUsumodificacion(usuario.getIdusuario());
 
 							LOGGER.info(
-									"deleteFundamentos() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Entrada a scsJuzgadoExtendsMapper para dar de baja a un juzgado");
+									"deleteFundamentos() / scsFundamentoscalificacionExtendsMapper.updateByPrimaryKey() -> Entrada a scsFundamentoscalificacionExtendsMapper para dar de baja a un fundamento");
 
 							response = scsFundamentoscalificacionExtendsMapper.updateByPrimaryKey(fundamentoCalificacion);
 
 							LOGGER.info(
-									"deleteFundamentos() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Salida de scsJuzgadoExtendsMapper para dar de baja a un juzgado");
+									"deleteFundamentos() / scsFundamentoscalificacionExtendsMapper.updateByPrimaryKey() -> Salida de scsFundamentoscalificacionExtendsMapper para dar de baja a un fundamento");
 						}
 					}
 
@@ -229,7 +231,7 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("deleteFundamentos() -> Salida del servicio para eliminar juzgados");
+		LOGGER.info("deleteFundamentos() -> Salida del servicio para eliminar fundamentos");
 		return updateResponseDTO;
 		
 	}
@@ -275,12 +277,12 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 						.andIdfundamentocalifEqualTo(Short.valueOf(fundamentoItem.getIdFundamento()));
 
 						LOGGER.info(
-								"activateFundamentos() / scsJuzgadoExtendsMapper.selectByExample() -> Entrada a scsJuzgadoExtendsMapper para buscar el juzgado");
+								"activateFundamentos() / scsFundamentoscalificacionExtendsMapper.selectByExample() -> Entrada a scsFundamentoscalificacionExtendsMapper para buscar el fundamento");
 
 						List<ScsTipofundamentocalif> fundamentosList = scsFundamentoscalificacionExtendsMapper.selectByExample(scsTipoFundamentoCalifExample);
 
 						LOGGER.info(
-								"activateFundamentos() / scsJuzgadoExtendsMapper.selectByExample() -> Salida de scsJuzgadoExtendsMapper para buscar el juzgado");
+								"activateFundamentos() / scsFundamentoscalificacionExtendsMapper.selectByExample() -> Salida de scsFundamentoscalificacionExtendsMapper para buscar el fundamento");
 
 						if (null != fundamentosList && fundamentosList.size() > 0) {
 
@@ -291,12 +293,12 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 							fundamento.setUsumodificacion(usuario.getIdusuario());
 
 							LOGGER.info(
-									"activateFundamentos() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Entrada a scsJuzgadoExtendsMapper para dar de alta a un juzgado");
+									"activateFundamentos() / scsFundamentoscalificacionExtendsMapper.updateByPrimaryKey() -> Entrada a scsFundamentoscalificacionExtendsMapper para dar de alta a un fundamento");
 
 							response = scsFundamentoscalificacionExtendsMapper.updateByPrimaryKey(fundamento);
 
 							LOGGER.info(
-									"activateFundamentos() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Salida de scsJuzgadoExtendsMapper para dar de alta a un juzgado");
+									"activateFundamentos() / scsJuzgadoExtendsMapper.updateByPrimaryKey() -> Salida de scsFundamentoscalificacionExtendsMapper para dar de alta a un fundamento");
 
 							
 						}
@@ -319,12 +321,12 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
-			error.setDescription("Se han actualizado los juzgados correctamente");
+			error.setDescription("Se han actualizado los fundamentos correctamente");
 		}
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("activateFundamentos() -> Salida del servicio para dar de alta a los juzgados");
+		LOGGER.info("activateFundamentos() -> Salida del servicio para dar de alta a los fundamentos");
 		return updateResponseDTO;
 	}
 
@@ -332,7 +334,7 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 	@Override
 	public InsertResponseDTO insertFundamentos(FundamentosCalificacionItem fundamentosCalificacionItem, HttpServletRequest request) {
 		
-		LOGGER.info("insertFundamentos() ->  Entrada al servicio para crear un nuevo juzgado");
+		LOGGER.info("insertFundamentos() ->  Entrada al servicio para crear un nuevo fundamento");
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();
@@ -362,7 +364,7 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 				try {
 
 					LOGGER.info(
-							"insertFundamentos() / scsJuzgadoExtendsMapper.insert() -> Entrada a scsJuzgadoExtendsMapper para insertar el nuevo juzgado");
+							"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Entrada a scsFundamentoscalificacionExtendsMapper para insertar el nuevo juzgado");
 					GenRecursosCatalogosExample genRecursosCatalogosExample = new GenRecursosCatalogosExample();
 					genRecursosCatalogosExample.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).
 						andDescripcionEqualTo(fundamentosCalificacionItem.getDescripcionFundamento());
@@ -426,17 +428,17 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 							insertResponseDTO.setId(fundamento.getIdfundamentocalif().toString());
 	
 							LOGGER.info(
-									"insertFundamentos() / scsJuzgadoExtendsMapper.insert() -> Salida de scsJuzgadoExtendsMapper para insertar el nuevo juzgado");
+									"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Salida de scsFundamentoscalificacionExtendsMapper para insertar el nuevo fundamento");
 	
 	
 							LOGGER.info(
-									"insertFundamentos() / scsJuzgadoExtendsMapper.insert() -> Entrada a scsJuzgadoExtendsMapper para insertar el nuevo juzgado");
+									"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Entrada a scsFundamentoscalificacionExtendsMapper para insertar el nuevo fundamento");
 	
 							genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogos);
 							insertarRestoIdiomas(genRecursosCatalogos);
 						
 						LOGGER.info(
-								"insertFundamentos() / scsJuzgadoExtendsMapper.insert() -> Salida de scsJuzgadoExtendsMapper para insertar el nuevo juzgado");
+								"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Salida de scsFundamentoscalificacionExtendsMapper para insertar el nuevo fundamento");
 
 					}
 				} catch (Exception e) {
@@ -455,7 +457,7 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 		} else if (error.getCode() == null) {
 			error.setCode(200);
 			insertResponseDTO.setId(String.valueOf(idFundamento));
-			error.setDescription("Se ha creado el juzgado correctamente");
+			error.setDescription("Se ha creado el fundamento correctamente");
 		}
 
 		insertResponseDTO.setError(error);
@@ -468,7 +470,7 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 	
 	@Override
 	public UpdateResponseDTO updateFundamentosCalificacion(FundamentosCalificacionItem fundamentosCalificacionItem, HttpServletRequest request) {
-		LOGGER.info("updateFundamentosCalificacion() ->  Entrada al servicio para editar juzgado");
+		LOGGER.info("updateFundamentosCalificacion() ->  Entrada al servicio para editar fundamento");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -496,31 +498,55 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 
 				try {
 
+					// Obtenermos fundamento de resolucion que queremos modificar
+					// Obtenemos el fundamento de resolucion que queremos modificar
+					ScsTipofundamentocalifExample example = new ScsTipofundamentocalifExample();
+					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).
+							andIdfundamentocalifEqualTo(Short.valueOf(fundamentosCalificacionItem.getIdFundamento()))
+							.andFechabajaIsNull();
 
-					GenRecursosCatalogosExample genRecursosCatalogosExample = new GenRecursosCatalogosExample();
-					genRecursosCatalogosExample.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).
-						andDescripcionEqualTo(fundamentosCalificacionItem.getDescripcionFundamento());
-					List<GenRecursosCatalogos> l = genRecursosCatalogosExtendsMapper.selectByExample(genRecursosCatalogosExample);
+					LOGGER.info(
+							"updateFundamentoResolucion() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Entrada a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
 
-					
-					if (l != null && l.size() > 0) {
-						
-						error.setCode(400);
-						error.setDescription("general.existeDato");
+					List<ScsTipofundamentocalif> scsTipofundamentoscalifList = scsFundamentoscalificacionExtendsMapper
+							.selectByExample(example);
 
-					} else {
+					LOGGER.info(
+							"updateFundamentoResolucion() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Salida a scsTipofundamentosExtendsMapper para buscar  un fundamento resolucion");
 
+					if (scsTipofundamentoscalifList != null && scsTipofundamentoscalifList.size() > 0) {
+
+						ScsTipofundamentocalif scsTipofundamentocalif = scsTipofundamentoscalifList.get(0);
+
+						// Buscamos si existe una descripcion que sea igual en fundamentos q no sea el
+						// propio
+
+						GenRecursosCatalogosExample exampleRecursosRepetidos = new GenRecursosCatalogosExample();
+						exampleRecursosRepetidos.createCriteria()
+								.andDescripcionEqualTo(fundamentosCalificacionItem.getDescripcionFundamento())
+								.andCampotablaEqualTo("DESCRIPCION").andNombretablaEqualTo("SCS_TIPOFUNDAMENTOCALIF")
+								.andIdinstitucionEqualTo(idInstitucion)
+								.andIdrecursoNotEqualTo(scsTipofundamentocalif.getDescripcion());
+
+						List<GenRecursosCatalogos> recursosRepetidos = genRecursosCatalogosExtendsMapper
+								.selectByExample(exampleRecursosRepetidos);
+
+						// Si la descripcion se repite
+						if (recursosRepetidos != null && recursosRepetidos.size() > 0) {
+							error.setCode(400);
+							error.setDescription("messages.jgr.maestros.gestionFundamentosResolucion.existeFundamentosResolucionMismaDescripcion");
+						} else {
 						ScsTipofundamentocalifExample scsTipofundamentocalifExample = new ScsTipofundamentocalifExample();
 						scsTipofundamentocalifExample.createCriteria().andIdfundamentocalifEqualTo(Short.valueOf(fundamentosCalificacionItem.getIdFundamento()))
 								.andIdinstitucionEqualTo(idInstitucion);
 
 						LOGGER.info(
-								"updateFundamentosCalificacion() / scsSubzonaExtendsMapper.selectByExample() -> Entrada a scsSubzonaExtendsMapper para buscar la subzona");
+								"updateFundamentosCalificacion() / scsFundamentoscalificacionExtendsMapper.selectByExample() -> Entrada a scsFundamentoscalificacionExtendsMapper para buscar el fundamento");
 
 						List<ScsTipofundamentocalif> scsFundamentosList = scsFundamentoscalificacionExtendsMapper.selectByExample(scsTipofundamentocalifExample);
 
 						LOGGER.info(
-								"updateFundamentosCalificacion() / scsSubzonaExtendsMapper.selectByExample() -> Salida a scsSubzonaExtendsMapper para buscar la subzona");
+								"updateFundamentosCalificacion() / scsFundamentoscalificacionExtendsMapper.selectByExample() -> Salida a scsFundamentoscalificacionExtendsMapper para buscar el fundamento");
 
 
 						ScsTipofundamentocalif fundamento = scsFundamentosList.get(0);
@@ -546,8 +572,8 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 				
 							
 						
-					}
-				} catch (Exception e) {
+						}}}
+				catch (Exception e) {
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -567,7 +593,7 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("updateFundamentosCalificacion() -> Salida del servicio para editar juzgado");
+		LOGGER.info("updateFundamentosCalificacion() -> Salida del servicio para editar fundamento");
 		return updateResponseDTO;
 	}
 
