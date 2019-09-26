@@ -38,26 +38,44 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		sql.SELECT("nombre");
 		sql.SELECT("codigo");
 		sql.SELECT("rpad(precio,length(precio)+1,'€') precio");
+		sql.SELECT("precio as importe");
 		sql.SELECT("complemento");
 		sql.SELECT("vigente");
 		sql.SELECT("idjurisdiccion");
 		sql.SELECT("orden");
 		sql.SELECT("codigoext");
 		sql.SELECT("permitiraniadirletrado");
-		sql.SELECT("TO_CHAR(fechadesdevigor, 'DD/MM/YYYY') AS fechadesdevigor");
-		sql.SELECT("TO_CHAR(fechahastavigor, 'DD/MM/YYYY') AS fechahastavigor");
+		sql.SELECT("fechadesdevigor");
+		sql.SELECT("fechahastavigor");
 		sql.SELECT("fechabaja");
 		sql.SELECT("observaciones");
 
 		sql.FROM("SCS_PROCEDIMIENTOS");
 		
 		sql.WHERE("idinstitucion = '" + moduloItem.getidInstitucion() + "'");
-		if(moduloItem.getNombre() != null && moduloItem.getNombre() != "") {
-			sql.WHERE("UPPER(nombre) like UPPER('%" + moduloItem.getNombre() + "%')");
+		
+		if(moduloItem.getPrecio() == null) {
+			if(moduloItem.getNombre() != null && moduloItem.getNombre() != "") {
+				sql.WHERE("UPPER(nombre) like UPPER('%" + moduloItem.getNombre() + "%')");
+			}
+			if(moduloItem.getIdProcedimiento() != null && moduloItem.getIdProcedimiento() != "") {
+				sql.WHERE("idprocedimiento = '" + moduloItem.getIdProcedimiento() + "'");
+			}
+			if(moduloItem.getCodigo() != null && moduloItem.getCodigo() != "") {
+				sql.WHERE("UPPER(codigo) like UPPER('%" + moduloItem.getCodigo() + "%')");
+			}
+		}else {
+			if(moduloItem.getNombre() != null && moduloItem.getNombre() != "") {
+				sql.WHERE("UPPER(nombre) = UPPER('" + moduloItem.getNombre() + "')");
+			}
+			if(moduloItem.getIdProcedimiento() != null && moduloItem.getIdProcedimiento() != "") {
+				sql.WHERE("idprocedimiento = '" + moduloItem.getIdProcedimiento() + "'");
+			}
+			if(moduloItem.getCodigo() != null && moduloItem.getCodigo() != "") {
+				sql.WHERE("UPPER(codigo) = UPPER('" + moduloItem.getCodigo() + "')");
+			}
 		}
-		if(moduloItem.getCodigo() != null && moduloItem.getCodigo() != "") {
-			sql.WHERE("UPPER(codigo) like UPPER('%" + moduloItem.getCodigo() + "%')");
-		}
+		
 		if(!moduloItem.isHistorico()) {
 			sql.WHERE("fechabaja is null");
 		}
@@ -65,5 +83,16 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 	
 		return sql.toString();
 	}
+	
+	public String getIdProcedimiento(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDPROCEDIMIENTO) AS IDPROCEDIMIENTO");
+		sql.FROM("SCS_PROCEDIMIENTOS");
+		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
+
+		return sql.toString();
+	}
+	
 	
 }

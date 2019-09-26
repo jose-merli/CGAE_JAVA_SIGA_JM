@@ -11,7 +11,7 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 
 public interface IFichaAreasService {
 	
-	public ComboDTO getPartidoJudicial(HttpServletRequest request);
+	public ComboDTO getJurisdicciones(HttpServletRequest request);
 
 	public AreasDTO searchAreas(AreasItem areasItem, HttpServletRequest request);
 

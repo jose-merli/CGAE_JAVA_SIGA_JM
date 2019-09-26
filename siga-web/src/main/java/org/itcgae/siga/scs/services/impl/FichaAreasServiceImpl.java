@@ -68,8 +68,8 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 	private ScsMateriaJurisdiccionExtendsMapper scsMateriaJurisdiccionExtendsMapper;
 
 	@Override
-	public ComboDTO getPartidoJudicial(HttpServletRequest request) {
-		LOGGER.info("getPartidoJudicial() -> Entrada al servicio para obtener combo partidos judiciales");
+	public ComboDTO getJurisdicciones(HttpServletRequest request) {
+		LOGGER.info("getJurisdicciones() -> Entrada al servicio para obtener combo jurisdicciones");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -82,34 +82,34 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"getPartidoJudicial() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"getJurisdicciones() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"getPartidoJudicial() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"getJurisdicciones() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
 				LOGGER.info(
-						"getPartidoJudicial() / cenScsJurisdiccionExtendsMapper.getJurisdicciones() -> Entrada a cenPartidojudicialExtendsMapper para obtener los partidos judiciales");
+						"getJurisdicciones() / cenScsJurisdiccionExtendsMapper.getJurisdicciones() -> Entrada a cenJurisdiccionesExtendsMapper para obtener los jurisdicciones");
 	
 				List<ComboItem> comboItems = ScsJurisdiccionExtendsMapper.getJurisdicciones(idInstitucion.toString(), dni);
 
 				LOGGER.info(
-						"getPartidoJudicial() / cenScsJurisdiccionExtendsMapper.getJurisdicciones() -> Salida a cenPartidojudicialExtendsMapper para obtener los partidos judiciales");
+						"getJurisdicciones() / cenScsJurisdiccionExtendsMapper.getJurisdicciones() -> Salida a cenJurisdiccionesExtendsMapper para obtener los jurisdicciones");
 
 				combo.setCombooItems(comboItems);
 			}
 
 		}
-		LOGGER.info("getPartidoJudicial() -> Salida del servicio para obtener combo jurisdicciones");
+		LOGGER.info("getJurisdicciones() -> Salida del servicio para obtener combo jurisdicciones");
 		return combo;
 	}
 	
 	@Override
 	public AreasDTO searchAreas(AreasItem areasItem, HttpServletRequest request) {
-		LOGGER.info("searchSubzonas() -> Entrada al servicio para obtener las zonas");
+		LOGGER.info("searchareas() -> Entrada al servicio para obtener las areas");
 
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
@@ -123,22 +123,22 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"searchSubzonas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchareas() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"searchSubzonas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"searchareas() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (usuarios != null && usuarios.size() > 0) {
 
 				LOGGER.info(
-						"searchSubzonas() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
+						"searchareas() / scsAreasMateriasExtendsMapper.searchareas() -> Entrada a scsAreasMateriasExtendsMapper para obtener las areas");
 				areasItem.setidInstitucion(idInstitucion);
 				areasItems = scsAreasMateriasExtendsMapper.searchAreas(areasItem);
 
 				LOGGER.info(
-						"searchSubzonas() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
+						"searchareas() / scsAreasMateriasExtendsMapper.searchareas() -> Salida a scsAreasMateriasExtendsMapper para obtener las areas");
 
 
 				if (areasItems != null) {
@@ -147,13 +147,13 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 			}
 
 		}
-		LOGGER.info("searchSubzonas() -> Salida del servicio para obtener las zonas");
+		LOGGER.info("searchareas() -> Salida del servicio para obtener las areas");
 		return areasDTO;
 	}
 	
 	@Override
 	public UpdateResponseDTO updateArea(AreasItem areasItem, HttpServletRequest request) {
-		LOGGER.info("deleteZones() ->  Entrada al servicio para eliminar zonas de un grupo zona");
+		LOGGER.info("deleteZones() ->  Entrada al servicio para eliminar areas de un grupo zona");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -179,7 +179,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
-						// Eliminamos asociaciones partidos judiciales con zona
+						// Eliminamos asociaciones jurisdicciones con zona
 
 						ScsArea area = new ScsArea();
 						area.setContenido(areasItem.getContenido());
@@ -218,7 +218,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("deleteZones() -> Salida del servicio para eliminar zonas de un grupo zona");
+		LOGGER.info("deleteZones() -> Salida del servicio para eliminar areas de un grupo zona");
 
 		return updateResponseDTO;
 	}
@@ -227,7 +227,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 	
 	@Override
 	public UpdateResponseDTO deleteAreas(AreasDTO areasDTO, HttpServletRequest request) {
-		LOGGER.info("deleteZones() ->  Entrada al servicio para eliminar zonas de un grupo zona");
+		LOGGER.info("deleteZones() ->  Entrada al servicio para eliminar areas de un grupo zona");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -302,7 +302,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("deleteZones() -> Salida del servicio para eliminar zonas de un grupo zona");
+		LOGGER.info("deleteZones() -> Salida del servicio para eliminar areas de un grupo zona");
 
 		return updateResponseDTO;
 	}
@@ -544,7 +544,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("deleteZones() -> Salida del servicio para eliminar zonas de un grupo zona");
+		LOGGER.info("deleteZones() -> Salida del servicio para eliminar areas de un grupo zona");
 
 		return updateResponseDTO;
 	}
@@ -759,7 +759,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 
 		insertResponseDTO.setError(error);
 
-		LOGGER.info("createZone() -> Salida del servicio para crear una nueva materia");
+		LOGGER.info("createMaterias() -> Salida del servicio para crear una nueva materia");
 
 		return insertResponseDTO;
 	}
