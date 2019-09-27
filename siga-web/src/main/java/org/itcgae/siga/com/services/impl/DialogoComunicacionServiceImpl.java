@@ -418,7 +418,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		List<DatosDocumentoItem> listaFicheros = new ArrayList<DatosDocumentoItem>();
 		List<DatosEnvioDTO> listaConsultasYDestinatario = new ArrayList<DatosEnvioDTO>();
 		List<ModelosEnvioItem> listaModelosEnvio = new ArrayList<ModelosEnvioItem>();
-		DestinatarioItem destinatario = new DestinatarioItem();	
+		DestinatarioItem destinatario = null;
 		
 		String rutaPlantillaClase = "";
 		ModClasecomunicaciones modClasecomunicacion = null;
@@ -508,15 +508,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						}
 						
 						
-											
-						
 						// Nuevo envio = nueva lista de consultas
 						
 						List<ConsultaEnvioItem> listaConsultasEnvio = new ArrayList<ConsultaEnvioItem>();
-						
+						destinatario = new DestinatarioItem();	
+
 						ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatario);
-												
-									
+																				
 						// Por cada key seleccionada
 						if(esEnvio){
 							DatosEnvioDTO dato = new DatosEnvioDTO();
@@ -566,6 +564,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
+
 		
 		ModelosComunicacionSearch respuesta = new ModelosComunicacionSearch();
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -862,6 +861,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 													Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
 										}
 									}
+									
+									obtenerDatosDestinatario(destinatario,dest);
+
 
 								} else {
 									esDestinatario = true;
@@ -1521,7 +1523,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								//Insertamos los documentos asociados al envio
 								
 								// Si ya se ha insertado lo omitimos
-								if(!nombresFicheros.contains(consultaEnvio.getNombreFichero())) {
+								if(consultaEnvio.getNombreFichero() != null && !nombresFicheros.contains(consultaEnvio.getNombreFichero())) {
 									EnvDocumentos documento = new EnvDocumentos();
 									documento.setIdenvio(envio.getIdenvio());
 									documento.setIdinstitucion(usuario.getIdinstitucion());
