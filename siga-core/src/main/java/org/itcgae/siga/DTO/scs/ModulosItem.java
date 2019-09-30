@@ -8,6 +8,7 @@ public class ModulosItem {
 
 	private String idInstitucion;
 	private String codigo;
+	private String importe;
 	private String nombre;
 	private String idProcedimiento;
 	private String precio;
@@ -18,8 +19,8 @@ public class ModulosItem {
 	private String orden;
 	private String codigoext;
 	private String permitiraniadirletrado;
-	private String fechadesdevigor;
-	private String fechahastavigor;
+	private Date fechadesdevigor;
+	private Date fechahastavigor;
 	private String observaciones;
 	private boolean historico;
 	
@@ -88,19 +89,19 @@ public class ModulosItem {
 		this.permitiraniadirletrado = permitiraniadirletrado;
 	}
 
-	public String getFechadesdevigor() {
+	public Date getFechadesdevigor() {
 		return fechadesdevigor;
 	}
 
-	public void setFechadesdevigor(String fechadesdevigor) {
+	public void setFechadesdevigor(Date fechadesdevigor) {
 		this.fechadesdevigor = fechadesdevigor;
 	}
 
-	public String getFechahastavigor() {
+	public Date getFechahastavigor() {
 		return fechahastavigor;
 	}
 
-	public void setFechahastavigor(String fechahastavigor) {
+	public void setFechahastavigor(Date fechahastavigor) {
 		this.fechahastavigor = fechahastavigor;
 	}
 
@@ -166,5 +167,13 @@ public class ModulosItem {
 
 	public void setHistorico(boolean historico) {
 		this.historico = historico;
+	}
+
+	public String getImporte() {
+		return importe;
+	}
+
+	public void setImporte(String importe) {
+		this.importe = importe;
 	}
 }

@@ -35,7 +35,7 @@ public class AreasYMateriasController {
 	
 	@RequestMapping(value = "/areasMaterias/jurisdicciones",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getJurisdicciones(HttpServletRequest request) {
-		ComboDTO response = fichaAreasService.getPartidoJudicial(request);
+		ComboDTO response = fichaAreasService.getJurisdicciones(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
