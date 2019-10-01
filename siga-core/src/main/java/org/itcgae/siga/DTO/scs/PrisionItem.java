@@ -26,7 +26,16 @@ public class PrisionItem {
 	private String email;
 	private String nombrePoblacion;
 	private String nombreProvincia;
+	private Short visibleMovil;
 	
+
+	public Short getVisibleMovil() {
+		return visibleMovil;
+	}
+
+	public void setVisibleMovil(Short visibleMovil) {
+		this.visibleMovil = visibleMovil;
+	}
 
 	/**
 	 **/

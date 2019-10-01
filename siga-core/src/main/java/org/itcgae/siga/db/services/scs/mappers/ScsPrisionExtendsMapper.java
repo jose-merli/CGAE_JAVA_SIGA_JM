@@ -34,7 +34,7 @@ public interface ScsPrisionExtendsMapper extends ScsPrisionMapper{
 		@Result(column = "NOMBREPOBLACION", property = "nombrePoblacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREPROVINCIA", property = "nombreProvincia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "EMAIL", property = "email", jdbcType = JdbcType.VARCHAR),
-
+		@Result(column = "VISIBLEMOVIL", property = "visibleMovil", jdbcType = JdbcType.NUMERIC)
 	})
 	List<PrisionItem> searchPrisiones(PrisionItem prisionItem, Short idInstitucion);
 

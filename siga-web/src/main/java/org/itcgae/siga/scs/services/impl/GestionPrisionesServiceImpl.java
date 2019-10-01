@@ -14,7 +14,6 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.ScsJuzgado;
 import org.itcgae.siga.db.entities.ScsPrision;
 import org.itcgae.siga.db.entities.ScsPrisionExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -111,7 +110,7 @@ public class GestionPrisionesServiceImpl implements IGestionPrisionesService {
 						prision.setFax1(prisionItem.getFax());
 						prision.setCodigoext(prisionItem.getCodigoExt());
 						prision.setEmail(prisionItem.getEmail());
-
+						prision.setVisiblemovil(prisionItem.getVisibleMovil());
 
 						response = scsPrisionExtendsMapper.updateByPrimaryKey(prision);
 					}
@@ -208,6 +207,7 @@ public class GestionPrisionesServiceImpl implements IGestionPrisionesService {
 						prision.setFax1(prisionItem.getFax());
 						prision.setCodigoext(prisionItem.getCodigoExt());
 						prision.setEmail(prisionItem.getEmail());
+						prision.setVisiblemovil(prisionItem.getVisibleMovil());
 
 						NewIdDTO idP = scsPrisionExtendsMapper.getIdPrision(usuario.getIdinstitucion());
 

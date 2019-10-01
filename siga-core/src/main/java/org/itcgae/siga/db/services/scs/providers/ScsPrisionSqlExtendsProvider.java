@@ -23,6 +23,7 @@ public class ScsPrisionSqlExtendsProvider extends ScsPrisionSqlProvider {
 		sql.SELECT("prision.email");
 		sql.SELECT("prision.fechabaja");
 		sql.SELECT("prision.codigoext");
+		sql.SELECT("prision.visiblemovil");
 		sql.SELECT("POBLACION.NOMBRE AS NOMBREPOBLACION");
 		sql.SELECT("PROVINCIAS.NOMBRE AS NOMBREPROVINCIA");
 
