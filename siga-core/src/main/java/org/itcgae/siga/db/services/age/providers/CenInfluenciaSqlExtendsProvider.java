@@ -19,4 +19,13 @@ public class CenInfluenciaSqlExtendsProvider extends  CenInfluenciaSqlProvider{
 		return sql.toString();
 	}
 	
+	public String getIdZona(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDPARTIDO) AS IDPARTIDO");
+		sql.FROM("CEN_INFLUENCIA");
+		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
+		
+		return sql.toString();
+	}
 }
