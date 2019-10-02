@@ -88,10 +88,15 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 			}
 			LOGGER.debug("ValorColegiadoDocu : " + valorColegiadoDocu);
 			identificadorDS = docushareHelper.buscaCollectionCenso(valorColegiadoDocu, idInstitucion);
+			if (null != identificadorDS) {
+				config.get(0).setIdentificadords(identificadorDS);
+				cenColegiadoMapper.updateByPrimaryKeySelective(config.get(0));
+			}
 		} else {
 			LOGGER.debug("IdentificadorDS : " + config.get(0).getIdentificadords());
 			identificadorDS = config.get(0).getIdentificadords();
 		}
+		LOGGER.debug("IdentificadorDS : " + identificadorDS);
 		// NO COLEGIADO
 		// identificadorDS = "Collection-179";
 		if (identificadorDS != null) {
