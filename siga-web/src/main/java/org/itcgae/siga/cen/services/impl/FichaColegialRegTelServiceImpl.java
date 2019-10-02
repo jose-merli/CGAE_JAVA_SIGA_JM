@@ -81,7 +81,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		
 		if (config.get(0).getIdentificadords() == null) {
 			LOGGER.debug("IdentificadorDS null, buscamos por colegiado " );
-			if (config.get(0).getComunitario() == "0") {
+			if (config.get(0).getComunitario().equals("0")) {
 				valorColegiadoDocu = config.get(0).getNcolegiado();
 			} else {
 				valorColegiadoDocu = config.get(0).getNcomunitario();
