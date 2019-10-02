@@ -30,6 +30,7 @@ import org.itcgae.siga.db.entities.CenCliente;
 import org.itcgae.siga.db.entities.CenClienteKey;
 import org.itcgae.siga.db.entities.CenComponentes;
 import org.itcgae.siga.db.entities.CenNocolegiado;
+import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargoExtendsMapper;
@@ -203,6 +204,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 			if (!tarjetaIntegrantesUpdateDTO.getIdPersonaComponente().equals("")) {
 
 				int responseCenCliente = 1;
+				int responseInsertNoColegiado = 1;
 
 				// 1.1 Comprobamos que existe en tabla cen_cliente
 				CenCliente cenCliente = new CenCliente();
@@ -223,18 +225,38 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 					LOGGER.info(
 							"updateMember() / cenNocolegiadoExtendsMapper.insertSelective() -> Entrada a cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
 
-					CenNocolegiado cenNocolegiado = rellenarInsertCenNoColegiado(usuario,
-							Long.valueOf(tarjetaIntegrantesUpdateDTO.getIdPersonaComponente()), idInstitucion);
-					int responseInsertNoColegiado = cenNocolegiadoExtendsMapper.insertSelective(cenNocolegiado);
+					CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
+					cenNocolegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdpersonaEqualTo(Long.valueOf(tarjetaIntegrantesUpdateDTO.getIdPersona()));
 
 					LOGGER.info(
-							"updateMember() / cenNocolegiadoExtendsMapper.insertSelective() -> Salida de cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+							"createMember() / cenNocolegiadoExtendsMapper.selectByExample() -> Entrada a cenNocolegiadoExtendsMapper para obtener información no colegiado");
+
+					List<CenNocolegiado> cenNocolegiadoList = cenNocolegiadoExtendsMapper
+							.selectByExample(cenNocolegiadoExample);
+
+					LOGGER.info(
+							"createMember() / cenNocolegiadoExtendsMapper.selectByExample() -> Salida de cenNocolegiadoExtendsMapper para obtener información no colegiado");
+
+					if (null != cenNocolegiadoList && cenNocolegiadoList.size() > 0) {
+
+						CenNocolegiado cenNocolegiado = rellenarInsertCenNoColegiado(usuario,
+								Long.valueOf(tarjetaIntegrantesUpdateDTO.getIdPersonaComponente()), idInstitucion);
+						responseInsertNoColegiado = cenNocolegiadoExtendsMapper.insertSelective(cenNocolegiado);
+
+						LOGGER.info(
+								"updateMember() / cenNocolegiadoExtendsMapper.insertSelective() -> Salida de cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+
+					}
 
 					if (responseInsertNoColegiado == 1) {
+
 						LOGGER.info(
 								"getCargos() / cenComponentesExtendsMapper.updateMember() -> Entrada a cenComponentesExtendsMapper para actualizar datos de un integrante");
+
 						response = cenComponentesExtendsMapper.updateMember(tarjetaIntegrantesUpdateDTO, usuario,
 								String.valueOf(idInstitucion));
+
 						LOGGER.info(
 								"getCargos() / cenComponentesExtendsMapper.updateMember() -> Salida de cenComponentesExtendsMapper para actualizar datos de un integrante");
 
@@ -270,19 +292,25 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		List<ComboItem> comboItems = new ArrayList<ComboItem>();
 		AdmUsuarios usuario = new AdmUsuarios();
 		ComboItem comboItem = new ComboItem();
-
 		// Conseguimos información del usuario logeado
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 
+		if (null == tarjetaIntegrantesCreateDTO.getColegio()) {
+			tarjetaIntegrantesCreateDTO.setColegio(idInstitucion.toString());
+		}
+
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
 		LOGGER.info(
-				"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+				"createMember() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
 		List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
 		LOGGER.info(
-				"getCargos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+				"createMember() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 		if (null != usuarios && usuarios.size() > 0) {
 			usuario = usuarios.get(0);
@@ -291,6 +319,7 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 			if (!tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante().equals("")) {
 				int responseCenCliente = 1; // se puede crear o no => se inicializa a 1
 				int responseCenComponentes = 0; // se debe crear siempre
+				int responseInsertNoColegiado = 1;
 
 				// 1.1 Comprobamos que existe en tabla cen_cliente
 				CenCliente cenCliente = new CenCliente();
@@ -310,15 +339,32 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 					// 1.3 Comprobar si esta en cen_nocolegiado/cen_colegiado (no se hace ahora
 					// mismo)
 
-					LOGGER.info(
-							"createMember() / cenNocolegiadoExtendsMapper.insertSelective() -> Entrada a cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+					CenNocolegiadoExample cenNocolegiadoExample = new CenNocolegiadoExample();
+					cenNocolegiadoExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andIdpersonaEqualTo(Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()));
 
-					CenNocolegiado cenNocolegiado = rellenarInsertCenNoColegiado(usuario,
-							Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()), idInstitucion);
-					int responseInsertNoColegiado = cenNocolegiadoExtendsMapper.insertSelective(cenNocolegiado);
-					
 					LOGGER.info(
-							"createMember() / cenNocolegiadoExtendsMapper.insertSelective() -> Salida de cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+							"createMember() / cenNocolegiadoExtendsMapper.selectByExample() -> Entrada a cenNocolegiadoExtendsMapper para obtener información no colegiado");
+
+					List<CenNocolegiado> cenNocolegiadoList = cenNocolegiadoExtendsMapper
+							.selectByExample(cenNocolegiadoExample);
+
+					LOGGER.info(
+							"createMember() / cenNocolegiadoExtendsMapper.selectByExample() -> Salida de cenNocolegiadoExtendsMapper para obtener información no colegiado");
+
+					if (!(null != cenNocolegiadoList && cenNocolegiadoList.size() > 0)) {
+
+						LOGGER.info(
+								"createMember() / cenNocolegiadoExtendsMapper.insertSelective() -> Entrada a cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+
+						CenNocolegiado cenNocolegiado = rellenarInsertCenNoColegiado(usuario,
+								Long.valueOf(tarjetaIntegrantesCreateDTO.getIdPersonaIntegrante()), idInstitucion);
+						responseInsertNoColegiado = cenNocolegiadoExtendsMapper.insertSelective(cenNocolegiado);
+
+						LOGGER.info(
+								"createMember() / cenNocolegiadoExtendsMapper.insertSelective() -> Salida de cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+
+					}
 
 					if (responseInsertNoColegiado == 1) {
 

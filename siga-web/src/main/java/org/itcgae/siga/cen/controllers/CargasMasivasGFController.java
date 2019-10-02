@@ -32,7 +32,7 @@ public class CargasMasivasGFController {
 	SigaConstants sigaConstants;
 
 	@RequestMapping(value = "cargasMasivas/descargarEtiquetas", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-	public ResponseEntity<InputStreamResource> downloadExample(HttpServletRequest request) throws SigaExceptions {
+	public ResponseEntity<InputStreamResource> generateExcelEtiquetas(HttpServletRequest request) throws SigaExceptions {
 		ResponseEntity<InputStreamResource> response = cargasMasivasGFService.generateExcelEtiquetas();
 		return response;
 	}

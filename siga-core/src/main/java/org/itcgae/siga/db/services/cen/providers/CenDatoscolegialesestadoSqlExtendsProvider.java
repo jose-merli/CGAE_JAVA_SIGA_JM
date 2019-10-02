@@ -13,7 +13,8 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 		SQL sql = new SQL();
 		sql.INSERT_INTO("CEN_DATOSCOLEGIALESESTADO");
 
-		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona  where idpersona like '" + cenDatoscolegialesestado.getIdinstitucion() + "' || '%'  )");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona  where idpersona like '"
+				+ cenDatoscolegialesestado.getIdinstitucion() + "' || '%'  )");
 
 		sql.VALUES("IDINSTITUCION", "'" + cenDatoscolegialesestado.getIdinstitucion() + "'");
 
@@ -49,12 +50,18 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 			sql.SET("SITUACIONRESIDENTE = " + record.getSituacionresidente());
 		}
 
-		sql.SET("OBSERVACIONES = '" + record.getObservaciones() + "'");
-		
-		if(record.getFechamodificacion() != null) {
-			sql.SET("FECHAMODIFICACION = TO_DATE('" + dateFormat.format(record.getFechamodificacion()) + "', 'dd/MM/RRRR')");
+		if (record.getObservaciones() != null && !record.getObservaciones().equals("")) {
+			sql.SET("OBSERVACIONES = '" + record.getObservaciones() + "'");
+		}else {
+			sql.SET("OBSERVACIONES = " + null);
+
 		}
-	
+		
+		if (record.getFechamodificacion() != null) {
+			sql.SET("FECHAMODIFICACION = TO_DATE('" + dateFormat.format(record.getFechamodificacion())
+					+ "', 'dd/MM/RRRR')");
+		}
+
 		sql.SET("USUMODIFICACION = " + record.getUsumodificacion());
 
 		if (fechaEstadoNueva != null) {
@@ -66,11 +73,9 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 			sql.WHERE("TO_DATE(FECHAESTADO, 'dd/MM/RRRR') = TO_DATE('" + dateFormat.format(record.getFechaestado())
 					+ "', 'dd/MM/RRRR')");
 		}
-		
+
 		sql.WHERE("IDINSTITUCION = " + record.getIdinstitucion() + "");
 		sql.WHERE("IDPERSONA = " + record.getIdpersona() + "");
-
-		
 
 		return sql.toString();
 	}
