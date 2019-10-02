@@ -457,7 +457,8 @@ public class DocushareHelper {
 		if (MODO_DEBUG_LOCAL) {
 			return getDocumentMODO_DEBUG_LOCAL(title);
 		}
-
+		log.debug("titulo del documento a descargar Regtel: " + title);
+		log.debug("institucion del documento a descargar Regtel: " + idinstitucion);
 		// Extraer propiedad
 		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
 		genPropertiesExampleP.createCriteria().andParametroEqualTo("sjcs.directorioFisicoTemporalSJCSJava");
@@ -473,9 +474,10 @@ public class DocushareHelper {
 			createSession(idinstitucion);
 
 			DSDocument dsDocument = (DSDocument) dssession.getObject(new DSHandle(title));
-
+			log.debug("DsDocument: " + dsDocument);
 			DSContentElement[] dsContentElements = dsDocument.getContentElements();
 			for (int j = 0; j < dsContentElements.length; j++) {
+				log.debug("DsDocument número: " + j);
 				if (dsContentElements[j] instanceof FileContentElement) {
 					FileContentElement dsContentElement = (FileContentElement) dsContentElements[j];
 					fileParent.mkdirs();
