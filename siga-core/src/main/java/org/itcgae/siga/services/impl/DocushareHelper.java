@@ -181,7 +181,7 @@ public class DocushareHelper {
 			// BusinessManager.getInstance()
 			// .getService(GenParametrosService.class);
 			
-			
+			log.debug("Entramos a buscar la colección de Censo");
 			List<String> listaParametros = new ArrayList<>();
 			listaParametros.add(pathRecibido);
 			
@@ -201,17 +201,22 @@ public class DocushareHelper {
 
 			
 			String path = config.get(0).getValor();
-
+			log.debug("path: " +path);
 			if (path != null) {
 				if (!path.trim().endsWith(";")) {
 					path += ";";
 				}
 				path += title;
-
+				log.debug("new path: " +path);
 				String[] titles = path.split(";");
+				log.debug("DSCollection.title: " +DSCollection.title);
+				log.debug("titles: " +titles);
+				log.debug("DSSelectSet.NO_PROPERTIES: " +DSSelectSet.NO_PROPERTIES);
 				DSObject dsObject = dssession.getResolvedObject(DSCollection.title, titles, DSSelectSet.NO_PROPERTIES);
+				log.debug("dsObject: " +dsObject);
 				if (dsObject != null) {
 					idColl = dsObject.getHandle().toString();
+					log.debug("idColl: " +idColl);
 				}
 			}
 		} catch (Exception e) {

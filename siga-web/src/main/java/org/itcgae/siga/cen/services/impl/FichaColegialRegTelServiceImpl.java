@@ -80,13 +80,16 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		List<CenColegiado> config = cenColegiadoMapper.selectByExample(example);
 		
 		if (config.get(0).getIdentificadords() == null) {
-			if (config.get(0).getComunitario() == "0") {
+			LOGGER.debug("IdentificadorDS null, buscamos por colegiado " );
+			if (config.get(0).getComunitario().equals("0")) {
 				valorColegiadoDocu = config.get(0).getNcolegiado();
 			} else {
 				valorColegiadoDocu = config.get(0).getNcomunitario();
 			}
+			LOGGER.debug("ValorColegiadoDocu : " + valorColegiadoDocu);
 			identificadorDS = docushareHelper.buscaCollectionCenso(valorColegiadoDocu, idInstitucion);
 		} else {
+			LOGGER.debug("IdentificadorDS : " + config.get(0).getIdentificadords());
 			identificadorDS = config.get(0).getIdentificadords();
 		}
 		// NO COLEGIADO
