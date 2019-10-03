@@ -302,6 +302,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return respuesta;
 	}
 
+	
 
 
 	@Override
@@ -880,6 +881,8 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 							LOGGER.info("La consulta de destinatarios no ha devuelto resultados");
 						}
 					}
+				}else {
+					LOGGER.error("No hay consulta de destinatario para el informe: " + plantilla.getIdInforme());
 				}
 
 				LOGGER.debug("Obtenemos la consulta de multidocumento para la plantilla: " + plantilla.getIdInforme());
@@ -906,6 +909,18 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						List<Map<String, Object>> resultMulti;
 						try {
 							resultMulti = _consultasService.ejecutarConsultaConClaves(consultaEjecutarMulti);
+							
+							if(resultMulti != null && resultMulti.size() > 0){
+								for(int k = 0;k<resultMulti.size();k++){
+									// Por cada registro generamos un documento
+									numFicheros++;
+									generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
+											listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
+											hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
+											nombrePlantilla, esEnvio, esExcel, esDestinatario);
+								}														
+							}
+								
 						} catch (BusinessSQLException e) {
 							LOGGER.error(e);
 							throw new BusinessException("Error al ejecutar la consulta "
@@ -916,17 +931,20 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 									"Error al ejecutar la consulta " + consultaMulti.getDescripcion(), e);
 						}
 					}
-				}
-			
-				if (ejecutarConsulta) {
-					// Por cada resultado ejecutamos las consultas de datos
+				}else {
 					generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
 							listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
 							hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
 							nombrePlantilla, esEnvio, esExcel, esDestinatario);
-				} else {
-					LOGGER.error("No hay consulta de destinatario para el informe: " + plantilla.getIdInforme());
 				}
+			
+//				if (ejecutarConsulta) {
+//					// Por cada resultado ejecutamos las consultas de datos
+//					generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
+//							listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
+//							hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
+//							nombrePlantilla, esEnvio, esExcel, esDestinatario);
+//				} 
 			}
 		}						
 	}
