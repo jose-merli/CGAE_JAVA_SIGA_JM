@@ -249,6 +249,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		LOGGER.debug("updateUsers() -> Pone activo al usuario si no lo estaba");
 		if (!usuarioUpdateDTO.getActivo().equalsIgnoreCase("")
 				|| !usuarioUpdateDTO.getCodigoExterno().equalsIgnoreCase("")) {
+			if(usuarioUpdateDTO.getCodigoExterno() == null) {
+				usuarioUpdateDTO.setCodigoExterno("");
+			}
 			LOGGER.info(
 					"updateUsers() / admUsuariosExtendsMapper.updateUsersAdmUserTable() -> Entrada a admUsuariosExtendsMapper para poner un usuario a activo");
 			response1 = admUsuariosExtendsMapper.updateUsersAdmUserTable(usuarioUpdateDTO);
