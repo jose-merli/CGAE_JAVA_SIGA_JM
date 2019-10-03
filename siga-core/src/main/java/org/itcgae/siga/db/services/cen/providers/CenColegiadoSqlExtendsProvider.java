@@ -48,7 +48,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		sql.SELECT_DISTINCT("per.sexo");
 		sql.SELECT_DISTINCT("per.idestadocivil");
 		sql.SELECT_DISTINCT("cli.noaparecerredabogacia");
-
+		sql.SELECT_DISTINCT("cli2.noaparecerredabogacia as noaparecerredabogacia2");
 		sql.SELECT_DISTINCT("per.idtipoidentificacion");
 		sql.SELECT_DISTINCT("per.naturalde");
 		sql.SELECT("TO_CHAR(cli.fechaalta,'DD/MM/YYYY') AS fechaalta");
@@ -102,14 +102,16 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		if (idInstitucion != Short.parseShort("2000") && idInstitucion != Short.parseShort("3500")) {
 			if (idInstitucion > Short.parseShort("2001") && idInstitucion < Short.parseShort("2100") ) {
 				sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and col.idinstitucion = cli.idinstitucion)");
+				sql.INNER_JOIN("cen_cliente cli2 on (col.idpersona = cli2.idpersona and col.idinstitucion = cli2.idinstitucion)");
 			}
 			else{
 				sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and inst.cen_inst_IDINSTITUCION  =  cli.idinstitucion)");
-
+				sql.INNER_JOIN("cen_cliente cli2 on (col.idpersona = cli2.idpersona and inst.cen_inst_IDINSTITUCION  =  cli2.idinstitucion)");
 			}
 			
 		}else {
-			sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and cli.idinstitucion =  '"+ idInstitucion + "')");
+            sql.INNER_JOIN("cen_cliente cli on (col.idpersona = cli.idpersona and cli.idinstitucion =  '"+ idInstitucion + "')");
+			sql.INNER_JOIN("cen_cliente cli2 on (col.idpersona = cli2.idpersona and col.idinstitucion = cli2.idinstitucion)");
 		}
 
 		

@@ -80,15 +80,23 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		List<CenColegiado> config = cenColegiadoMapper.selectByExample(example);
 		
 		if (config.get(0).getIdentificadords() == null) {
-			if (config.get(0).getComunitario() == "0") {
+			LOGGER.debug("IdentificadorDS null, buscamos por colegiado " );
+			if (config.get(0).getComunitario().equals("0")) {
 				valorColegiadoDocu = config.get(0).getNcolegiado();
 			} else {
 				valorColegiadoDocu = config.get(0).getNcomunitario();
 			}
+			LOGGER.debug("ValorColegiadoDocu : " + valorColegiadoDocu);
 			identificadorDS = docushareHelper.buscaCollectionCenso(valorColegiadoDocu, idInstitucion);
+			if (null != identificadorDS) {
+				config.get(0).setIdentificadords(identificadorDS);
+				cenColegiadoMapper.updateByPrimaryKeySelective(config.get(0));
+			}
 		} else {
+			LOGGER.debug("IdentificadorDS : " + config.get(0).getIdentificadords());
 			identificadorDS = config.get(0).getIdentificadords();
 		}
+		LOGGER.debug("IdentificadorDS : " + identificadorDS);
 		// NO COLEGIADO
 		// identificadorDS = "Collection-179";
 		if (identificadorDS != null) {
@@ -124,10 +132,13 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		LOGGER.debug("docushareObjectVO ID: " + docushareObjectVO.getId());
+		LOGGER.debug("docushareObjectVO Parent: " + docushareObjectVO.getParent());
+		LOGGER.debug("identificadorDS: " + identificadorDS);
 		
 		file = docushareHelper.getDocument(idInstitucion, identificadorDS);
 		// Se convierte el fichero en array de bytes para enviarlo al front
-
+		LOGGER.debug("vuelta de obtener documento: ");
 		InputStream fileStream = null;
 		ResponseEntity<InputStreamResource> res = null;
 		try {

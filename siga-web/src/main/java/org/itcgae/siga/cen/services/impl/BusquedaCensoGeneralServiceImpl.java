@@ -115,13 +115,13 @@ public class BusquedaCensoGeneralServiceImpl implements IBusquedaCensoGeneralSer
 				com.colegiados.info.redabogacia.BusquedaColegiadoResponseDocument.BusquedaColegiadoResponse.Colegiado[] colegiadoName = null;
 				BusquedaColegiadoRequest colegiadoRequest = BusquedaColegiadoRequest.Factory.newInstance();
 
-				if (null != busquedaPerFisicaSearchDTO.getNombre()) {
+				if (null != busquedaPerFisicaSearchDTO.getNombre() && "" != busquedaPerFisicaSearchDTO.getNombre()) {
 					colegiadoRequest.setNombre(busquedaPerFisicaSearchDTO.getNombre());
 				}
-				if (null != busquedaPerFisicaSearchDTO.getPrimerApellido()) {
+				if (null != busquedaPerFisicaSearchDTO.getPrimerApellido() && "" != busquedaPerFisicaSearchDTO.getPrimerApellido()) {
 					colegiadoRequest.setApellido1(busquedaPerFisicaSearchDTO.getPrimerApellido());
 				}
-				if (null != busquedaPerFisicaSearchDTO.getSegundoApellido()) {
+				if (null != busquedaPerFisicaSearchDTO.getSegundoApellido() && "" != busquedaPerFisicaSearchDTO.getSegundoApellido()) {
 					colegiadoRequest.setApellido2(busquedaPerFisicaSearchDTO.getSegundoApellido());
 				}
 
