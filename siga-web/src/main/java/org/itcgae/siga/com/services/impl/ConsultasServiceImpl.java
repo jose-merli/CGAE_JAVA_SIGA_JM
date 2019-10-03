@@ -408,6 +408,20 @@ public class ConsultasServiceImpl implements IConsultasService{
 					
 					generacionDeRelaciones(modeloCom, conConsulta, usuario, idInstitucion);
 					
+					//Le añadimos al modelo todos los perfiles
+					List<ComboItem> comboItems = admPerfilExtendsMapper.selectListadoPerfiles(idInstitucion);
+					
+					if(comboItems != null && comboItems.size() > 0) {
+						for(ComboItem item: comboItems) {
+							ModModeloPerfiles perfil = new ModModeloPerfiles();
+							perfil.setIdmodelocomunicacion(Long.valueOf(modeloCom.getIdmodelocomunicacion()));
+							perfil.setFechamodificacion(new Date());
+							perfil.setIdperfil(item.getValue());
+							perfil.setUsumodificacion(usuario.getIdusuario());
+							perfil.setIdinstitucion(idInstitucion);
+							modModeloPerfilesMapper.insert(perfil);
+						}
+					}
 				
 				}catch (Exception e) {
 					error.setCode(500);

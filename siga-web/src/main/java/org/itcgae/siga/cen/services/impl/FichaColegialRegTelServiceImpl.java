@@ -132,10 +132,13 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		
 		String token = request.getHeader("Authorization");
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		LOGGER.debug("docushareObjectVO ID: " + docushareObjectVO.getId());
+		LOGGER.debug("docushareObjectVO Parent: " + docushareObjectVO.getParent());
+		LOGGER.debug("identificadorDS: " + identificadorDS);
 		
 		file = docushareHelper.getDocument(idInstitucion, identificadorDS);
 		// Se convierte el fichero en array de bytes para enviarlo al front
-
+		LOGGER.debug("vuelta de obtener documento: ");
 		InputStream fileStream = null;
 		ResponseEntity<InputStreamResource> res = null;
 		try {
