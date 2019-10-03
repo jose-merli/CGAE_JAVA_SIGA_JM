@@ -1,5 +1,7 @@
 package org.itcgae.siga.adm.controllers;
 
+import java.util.ArrayList;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
@@ -55,7 +57,7 @@ public class GestionUsuariosGruposController {
 	
 	
 	@RequestMapping(value = "/usuarios/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateUsers(@RequestBody UsuarioUpdateDTO usuarioUpdateDTO, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> updateUsers(@RequestBody ArrayList<UsuarioUpdateDTO> usuarioUpdateDTO, HttpServletRequest request) {
 		UpdateResponseDTO response = gestionUsuariosGruposService.updateUsers(usuarioUpdateDTO, request);
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
