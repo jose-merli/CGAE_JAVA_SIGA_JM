@@ -7,8 +7,10 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.CenInfluenciaMapper;
 import org.itcgae.siga.db.services.age.providers.CenInfluenciaSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsZonasSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -24,4 +26,9 @@ public interface CenInfluenciaExtendsMapper extends CenInfluenciaMapper {
 	})
 	List<ComboItem> getJudicialDistrict(String idInstitucion);
 	
+	@SelectProvider(type = CenInfluenciaSqlExtendsProvider.class, method = "getIdZona")
+	@Results({ @Result(column = "IDPARTIDO", property = "newId", jdbcType = JdbcType.VARCHAR)
+			
+	})
+	NewIdDTO getIdZona(Short idInstitucion);
 }

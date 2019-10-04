@@ -125,7 +125,7 @@ public class ColaEnviosImpl implements IColaEnvios {
 	
 	
 	//@Transactional
-	@Scheduled(cron = "${cron.pattern.scheduled.Envios: 0 * * ? * *}")
+//	@Scheduled(cron = "${cron.pattern.scheduled.Envios: 0 * * ? * *}")
 	@Override
 	public void execute() {
 		
