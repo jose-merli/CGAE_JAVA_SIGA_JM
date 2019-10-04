@@ -12,8 +12,19 @@ import org.itcgae.siga.DTOs.gen.Error;
 public class DocushareDTO {
 	private List<DocuShareObjectVO> docuShareObjectVOItem = new ArrayList<DocuShareObjectVO>();
 	private Error error = null;
+	private String identificadorDS = null;
 	
 	
+	public String getIdentificadorDS() {
+		return identificadorDS;
+	}
+
+
+	public void setIdentificadorDS(String identificadorDS) {
+		this.identificadorDS = identificadorDS;
+	}
+
+
 	/**
 	 */
 	public DocushareDTO nif(List<DocuShareObjectVO> docuShareObjectVOItem){

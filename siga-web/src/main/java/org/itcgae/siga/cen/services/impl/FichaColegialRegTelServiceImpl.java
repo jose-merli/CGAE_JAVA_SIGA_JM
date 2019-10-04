@@ -102,6 +102,7 @@ public class FichaColegialRegTelServiceImpl implements IFichaColegialRegTelServi
 		if (identificadorDS != null) {
 			List<DocuShareObjectVO> docus = docushareHelper.getContenidoCollection(idInstitucion, identificadorDS, identificadorDS);
 			docushareDTO.setDocuShareObjectVO(docus);
+			docushareDTO.setIdentificadorDS(identificadorDS);
 		}
 		return docushareDTO;
 	}
