@@ -2,7 +2,6 @@ package org.itcgae.siga.cen.services.impl;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +31,7 @@ import org.itcgae.siga.db.entities.CenComponentes;
 import org.itcgae.siga.db.mappers.CenClienteMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenCargoExtendsMapper;
+import org.itcgae.siga.db.services.cen.mappers.CenColegioprocuradorExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenComponentesExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenInstitucionExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPersonaExtendsMapper;
@@ -50,6 +50,9 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 
 	@Autowired
 	private CenComponentesExtendsMapper cenComponentesExtendsMapper;
+	
+	@Autowired
+	private CenColegioprocuradorExtendsMapper cenColegioprocuradorExtendsMapper;
 
 	@Autowired
 	private CenProvinciasExtendsMapper cenProvinciasExtendsMapper;
@@ -129,6 +132,24 @@ public class TarjetaDatosIntegrantesServiceImpl implements ITarjetaDatosIntegran
 		return comboDTO;
 	}
 
+	@Override
+	public ComboDTO getColegios(HttpServletRequest request) {
+		LOGGER.info("getProvinces() -> Entrada al servicio para búsqueda de las provincias");
+		ComboDTO comboDTO = new ComboDTO();
+		List<ComboItem> comboItems = new ArrayList<ComboItem>();
+
+		LOGGER.info(
+				"getProvinces() / cenProvinciasExtendsMapper.selectDistinctProvinces() -> Entrada a cenProvinciasExtendsMapper para obtener listado de provincias ");
+		comboItems = cenColegioprocuradorExtendsMapper.selectDistinctColegios();
+		LOGGER.info(
+				"getProvinces() / cenProvinciasExtendsMapper.selectDistinctProvinces() -> Salida de cenProvinciasExtendsMapper para obtener listado de provincias ");
+
+		comboDTO.setCombooItems(comboItems);
+
+		LOGGER.info("getProvinces() -> Salida al servicio para búsqueda de las provincias");
+		return comboDTO;
+	}
+	
 	@Override
 	public ComboDTO getCargos(HttpServletRequest request) {
 		LOGGER.info("getCargos() -> Entrada al servicio para búsqueda de cargos");
