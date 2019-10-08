@@ -4,7 +4,7 @@ import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.scs.TiposAsistenciaItem;
 import org.itcgae.siga.db.mappers.ScsTipoasistenciaSqlProvider;
 
-public class ScsTipoasistenciaSqlExtendsProvider extends ScsTipoasistenciaSqlProvider {
+public class ScsTipoasistenciaColegioSqlExtendsProvider extends ScsTipoasistenciaSqlProvider {
 
 	public String getComboAsistencia(String idLenguaje, Short idInstitucion) {
 
@@ -73,10 +73,25 @@ public class ScsTipoasistenciaSqlExtendsProvider extends ScsTipoasistenciaSqlPro
 		if(!historico) {
 			sql.WHERE("ASIS.FECHA_BAJA IS NULL");
 		}
+		else {
+			sql.WHERE("ASIS.FECHA_BAJA IS NOT NULL");
+		}
+		
+
 		sql.GROUP_BY("ASIS.IDINSTITUCION, ASIS.IDTIPOASISTENCIACOLEGIO, ASIS.IMPORTE, ASIS.IMPORTEMAXIMO, ASIS.VISIBLEMOVIL,ASIS.FECHA_BAJA, CAT.DESCRIPCION, ASIS.PORDEFECTO, DECODE(ASIS.PORDEFECTO,1,'SI','NO')");
 
 		return sql.toString();
 	}
 	
+	
+	public String getIdTipoasistenciacolegio(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDTIPOASISTENCIACOLEGIO) AS IDTIPOASISTENCIACOLEGIO");
+		sql.FROM("SCS_TIPOASISTENCIACOLEGIO");
+		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
+		
+		return sql.toString();
+	}
 	
 }

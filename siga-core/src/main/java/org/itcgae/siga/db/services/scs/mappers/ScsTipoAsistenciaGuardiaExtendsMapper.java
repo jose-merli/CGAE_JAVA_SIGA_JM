@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface ScsTipoasistenciaExtendsMapper extends ScsTipoasistenciaMapper{
+public interface ScsTipoAsistenciaGuardiaExtendsMapper extends ScsTipoasistenciaMapper{
 
 	@SelectProvider(type = ScsTipoasistenciaSqlExtendsProvider.class, method = "getComboAsistencia")
 	@Results({
