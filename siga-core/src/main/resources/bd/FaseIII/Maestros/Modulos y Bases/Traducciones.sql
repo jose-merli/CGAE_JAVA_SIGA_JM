@@ -53,3 +53,7 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('areasmaterias.materias.ficha.insertarerror','No se ha podido insertar el registro#EU','0','3',to_date('04/02/19','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('areasmaterias.materias.ficha.insertarerror','No se ha podido insertar el registro#GL','0','4',to_date('04/02/19','DD/MM/RR'),'0','19');
 
+update gen_diccionario set Descripcion = 'Código Externo' where idrecurso = 'general.codeext' and idlenguaje = 1;
+update gen_diccionario set Descripcion = 'Codi Externo' where idrecurso = 'general.codeext' and idlenguaje = 2;
+update gen_diccionario set Descripcion = 'Código Externo' where idrecurso = 'general.codeext' and idlenguaje = 3;
+update gen_diccionario set Descripcion = 'Código Externo' where idrecurso = 'general.codeext' and idlenguaje = 4;
