@@ -265,12 +265,13 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 						for(DatosDocumentoItem documento: listaDocumentos) {
 							LOGGER.debug("nombreFichero de pantalla : " + nombreFichero);
 							LOGGER.debug("nombreFichero generado en este método: " + documento.getFileName());
-							if(file == null && nombreFichero != null && nombreFichero.equalsIgnoreCase(documento.getFileName())){
+							//if( nombreFichero != null && nombreFichero.equalsIgnoreCase(documento.getFileName())){
+								documento.setFileName(nombreFichero);
 								file = new File(documento.getPathDocumento());
 								if(file != null && !file.exists()) {
 									file = null;
 								}
-							}
+							//}
 							
 						}
 					}
