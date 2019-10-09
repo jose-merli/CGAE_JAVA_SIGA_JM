@@ -213,6 +213,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	@Autowired
 	private ModClasecomunicacionesExtendsMapper _modClasecomunicacionesExtendsMapper;
 	
+	
+	static int numeroFicheros = 1; 
+	
 	@Override
 	public ComboDTO obtenerClaseComunicaciones(HttpServletRequest request, String rutaClaseComunicacion) {
 		LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clases comunicacion");
@@ -351,7 +354,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		LOGGER.info("descargarComunicacion() -> Entrada al servicio para descargar la documentación de la comunicación");
 		
 		File file = null;
-		
+		numeroFicheros = 1;
 		try {
 			
 			// Conseguimos información del usuario logeado
@@ -1116,6 +1119,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					sufijo = sufijo + String.valueOf(campoSufijo);
 				}
 			}
+			
+			if(!(sufijos != null && sufijos.size() > 0)) {
+				nombreFicheroSalida = nombreFicheroSalida + "_" + numeroFicheros;
+				numeroFicheros++;
+			} 
 			
 			String numero = "";
 			if(numFichero > 0){
