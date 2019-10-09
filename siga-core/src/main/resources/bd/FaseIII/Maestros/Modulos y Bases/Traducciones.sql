@@ -18,10 +18,10 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.Acreditaciones','Acreditaciones#EU','0','3',to_date('20/03/18','DD/MM/RR'),'0','22');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.Acreditaciones','Acreditaciones#GL','0','4',to_date('20/03/18','DD/MM/RR'),'0','22');
 
-Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.Acreditacion','Acreditacion','0','1',to_date('20/03/18','DD/MM/RR'),'0','22');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.Acreditacion','Acreditación','0','1',to_date('20/03/18','DD/MM/RR'),'0','22');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.Acreditacion','Acreditació','0','2',to_date('20/03/18','DD/MM/RR'),'0','22');
-Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.Acreditacion','Acreditacion#EU','0','3',to_date('20/03/18','DD/MM/RR'),'0','22');
-Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.Acreditacion','Acreditacion#GL','0','4',to_date('20/03/18','DD/MM/RR'),'0','22');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.Acreditacion','Acreditación#EU','0','3',to_date('20/03/18','DD/MM/RR'),'0','22');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.Acreditacion','Acreditación#GL','0','4',to_date('20/03/18','DD/MM/RR'),'0','22');
 
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.porcentaje','Porcentaje','0','1',to_date('11/04/05','DD/MM/RR'),'0','15');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.porcentaje','Porcentatge','0','2',to_date('11/04/05','DD/MM/RR'),'0','15');
@@ -53,3 +53,7 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('areasmaterias.materias.ficha.insertarerror','No se ha podido insertar el registro#EU','0','3',to_date('04/02/19','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('areasmaterias.materias.ficha.insertarerror','No se ha podido insertar el registro#GL','0','4',to_date('04/02/19','DD/MM/RR'),'0','19');
 
+update gen_diccionario set Descripcion = 'Código Externo' where idrecurso = 'general.codeext' and idlenguaje = 1;
+update gen_diccionario set Descripcion = 'Codi Externo' where idrecurso = 'general.codeext' and idlenguaje = 2;
+update gen_diccionario set Descripcion = 'Código Externo' where idrecurso = 'general.codeext' and idlenguaje = 3;
+update gen_diccionario set Descripcion = 'Código Externo' where idrecurso = 'general.codeext' and idlenguaje = 4;

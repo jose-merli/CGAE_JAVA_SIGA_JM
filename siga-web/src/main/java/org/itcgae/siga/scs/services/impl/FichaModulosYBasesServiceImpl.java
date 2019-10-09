@@ -111,7 +111,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 	
 	@Override
 	public UpdateResponseDTO updateModules(ModulosItem modulosItem, HttpServletRequest request) {
-		LOGGER.info("updateModules() ->  Entrada al servicio para eliminar modulos");
+		LOGGER.info("updateModules() ->  Entrada al servicio para actualizar modulos");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -138,7 +138,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 				List<ModulosItem> codigoExistente = null;
 				try {
 					
-					boolean continua = false;
+					boolean continua = true;
 					
 					ModulosItem ejemplo = new ModulosItem();
 					ejemplo.setidInstitucion(idInstitucion.toString());
@@ -151,19 +151,30 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					ejemplo2.setCodigo(modulosItem.getCodigo());
 					codigoExistente = scsProcedimientosExtendsMapper.searchModulo(ejemplo2);
 					}
-					
-					if(((modulosExistentes != null && modulosExistentes.size() > 0 )|| (codigoExistente != null && codigoExistente.size() > 0))) {
-						if(!(modulosExistentes.get(0).getIdProcedimiento().toString().equals(modulosItem.getIdProcedimiento().toString()) || !(modulosExistentes.get(0).getIdProcedimiento().toString().equals(modulosItem.getIdProcedimiento().toString())))) {
-							response = 0;
-							error.setCode(400);
-							error.setDescription("menu.justiciaGratuita.maestros.nombreCodigoExistente");
-						}else {
-							continua = true;
+					if(((modulosExistentes != null && modulosExistentes.size() > 0 ))) {
+						for(int i = 0; i < modulosExistentes.size() ; i++) {
+							if(!(modulosExistentes.get(i).getIdProcedimiento().toString().equals(modulosItem.getIdProcedimiento().toString()))) {
+								response = 0;
+								error.setCode(400);
+								error.setDescription("menu.justiciaGratuita.maestros.nombreCodigoExistente");
+								continua = false;
+							}
 						}
+						
 							
-						}else {
-							continua = true;
+					}
+					
+					if(codigoExistente != null && codigoExistente.size() > 0) {
+						for(int i = 0; i < codigoExistente.size() ; i++) {
+							if(!(codigoExistente.get(i).getIdProcedimiento().toString().equals(modulosItem.getIdProcedimiento().toString()))) {
+								response = 0;
+								error.setCode(400);
+								error.setDescription("menu.justiciaGratuita.maestros.nombreCodigoExistente");
+								continua = false;
+							}
 						}
+						
+					}
 						
 					if(continua) {
 						ScsProcedimientos modulo = new ScsProcedimientos();
@@ -186,12 +197,12 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						modulo.setUsumodificacion(usuarios.get(0).getIdusuario());
 						
 						LOGGER.info(
-								"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
+								"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para actualizar el modulo");
 
 						response = scsProcedimientosExtendsMapper.updateByPrimaryKey(modulo);
 
 						LOGGER.info(
-								"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
+								"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para actualizar el modulo");
 					}
 					
 				} catch (Exception e) {
@@ -216,7 +227,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("updateModules() -> Salida del servicio para eliminar modulos");
+		LOGGER.info("updateModules() -> Salida del servicio para actualizar modulos");
 
 		return updateResponseDTO;
 	}

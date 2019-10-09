@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface ScsTipoasistenciaExtendsMapper extends ScsTipoasistenciaMapper{
+public interface ScsTipoAsistenciaGuardiaExtendsMapper extends ScsTipoasistenciaMapper{
 
 	@SelectProvider(type = ScsTipoasistenciaSqlExtendsProvider.class, method = "getComboAsistencia")
 	@Results({
@@ -36,18 +36,6 @@ public interface ScsTipoasistenciaExtendsMapper extends ScsTipoasistenciaMapper{
         @Result(column="FECHA_BAJA", property="fechaBaja", jdbcType=JdbcType.TIMESTAMP)
     })
  List<TiposAsistenciaItem> searchTiposAsistencia(boolean historico, String idLenguaje, Short idInstitucion);
-	
-	@SelectProvider(type=ScsTipoasistenciaSqlExtendsProvider.class, method="searchTiposAsistenciaPorDefecto")
-    @Results({
-        @Result(column="IDTIPOASISTENCIA", property="idtipoasistencia", jdbcType=JdbcType.DECIMAL, id=true),
-        @Result(column="DESCRIPCION", property="descripcion", jdbcType=JdbcType.VARCHAR),
-        @Result(column="FECHAMODIFICACION", property="fechamodificacion", jdbcType=JdbcType.TIMESTAMP),
-        @Result(column="USUMODIFICACION", property="usumodificacion", jdbcType=JdbcType.DECIMAL),
-        @Result(column="CODIGOEXT", property="codigoext", jdbcType=JdbcType.VARCHAR),
-        @Result(column="BLOQUEADO", property="bloqueado", jdbcType=JdbcType.CHAR),
-        @Result(column="FECHA_BAJA", property="fechaBaja", jdbcType=JdbcType.TIMESTAMP)
-    })
- List<TiposAsistenciaItem> searchTiposAsistenciaPorDefecto(boolean historico, String idLenguaje, Short idInstitucion);
 	
 	@SelectProvider(type=ScsTipoasistenciaSqlExtendsProvider.class, method="getTiposGuardia")
     @Results({
