@@ -1580,7 +1580,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		String directorioPlantillaClase = "";
 		boolean esExcel = false;
 		List<List<Map<String,Object>>> listaDatosExcel = new ArrayList<List<Map<String,Object>>>();
-		
+		numeroFicheros = 1;
 		//Obtenemos la clase de comunicacion del modelo (si tiene)	
 		EnvEnviosExample envioExample = new EnvEnviosExample();
 		envioExample.createCriteria().andIdenvioEqualTo(Long.parseLong(idEnvio)).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
