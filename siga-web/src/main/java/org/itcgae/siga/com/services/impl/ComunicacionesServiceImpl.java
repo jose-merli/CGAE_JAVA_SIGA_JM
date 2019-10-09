@@ -263,6 +263,8 @@ public class ComunicacionesServiceImpl implements IComunicacionesService {
 						List<DatosDocumentoItem> listaDocumentos = _dialogoComunicacionService.generarDocumentosEnvio(String.valueOf(idInstitucion), idEnvio);
 						
 						for(DatosDocumentoItem documento: listaDocumentos) {
+							LOGGER.debug("nombreFichero de pantalla : " + nombreFichero);
+							LOGGER.debug("nombreFichero generado en este método: " + documento.getFileName());
 							if(file == null && nombreFichero != null && nombreFichero.equalsIgnoreCase(documento.getFileName())){
 								file = new File(documento.getPathDocumento());
 								if(file != null && !file.exists()) {
