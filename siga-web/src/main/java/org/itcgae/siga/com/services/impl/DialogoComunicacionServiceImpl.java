@@ -354,7 +354,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		LOGGER.info("descargarComunicacion() -> Entrada al servicio para descargar la documentación de la comunicación");
 		
 		File file = null;
-		numeroFicheros = 1;
+
 		try {
 			
 			// Conseguimos información del usuario logeado
@@ -419,7 +419,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		LOGGER.info("generarComunicacion() -> Entrada al servicio para generar los documentos a comunicar");
 		
 		GenerarComunicacionItem generarComunicacion = new GenerarComunicacionItem();
-		
+		numeroFicheros = 1;
 		List<DatosDocumentoItem> listaFicheros = new ArrayList<DatosDocumentoItem>();
 		List<DatosEnvioDTO> listaConsultasYDestinatario = new ArrayList<DatosEnvioDTO>();
 		List<ModelosEnvioItem> listaModelosEnvio = new ArrayList<ModelosEnvioItem>();
