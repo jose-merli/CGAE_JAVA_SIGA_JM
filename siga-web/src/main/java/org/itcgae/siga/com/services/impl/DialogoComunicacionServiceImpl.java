@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -2068,15 +2069,23 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		// Por cada resultado ejecutamos las consultas de datos
 		LOGGER.debug("Obtenemos las consultas de datos para la plantilla: " + plantilla.getIdInforme());
-		List<ConsultaItem> consultasItemDatos;
-		if(esDestinatario) {
-			consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
-		}else {
-			consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DATOS.getCodigo());
+		List<ConsultaItem> consultasItemFinal = new ArrayList<ConsultaItem>();
+		List<ConsultaItem> consultasItemDatos = new ArrayList<ConsultaItem>();
+		List<ConsultaItem> consultasItemDestinatario = new ArrayList<ConsultaItem>();	
+		
+		consultasItemDestinatario = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
+		for(ConsultaItem consultaDatosDestinatario:consultasItemDestinatario){
+			consultasItemFinal.add(consultaDatosDestinatario);
 		}
+
+		consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DATOS.getCodigo());
+		
+		for(ConsultaItem consultaDatosDatos:consultasItemDatos){
+			consultasItemFinal.add(consultaDatosDatos);
+		}		
 		ArrayList<String> nombresConsultasDatos = new ArrayList<String>();	
 		
-		for(ConsultaItem consultaDatos:consultasItemDatos){																			
+		for(ConsultaItem consultaDatos:consultasItemFinal){																			
 			
 			String consultaEjecutarDatos = reemplazarConsultaConClaves(usuario, dialogo, consultaDatos, mapaClave, esEnvio);
 			String nombreConsulta = consultaDatos.getDescripcion();
