@@ -57,7 +57,7 @@ public class ProcuradoresController {
 	}
 
 	@RequestMapping(value = "/gestionProcuradores/deleteProcuradores", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> deleteComisarias(@RequestBody ProcuradorDTO procuradorDTO, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> deleteProcuradores(@RequestBody ProcuradorDTO procuradorDTO, HttpServletRequest request) {
 
 		UpdateResponseDTO response = procuradoresService.deleteProcuradores(procuradorDTO, request);
 		if (response.getError().getCode() == 200)
@@ -68,7 +68,7 @@ public class ProcuradoresController {
 	}
 	
 	@RequestMapping(value = "/gestionProcuradores/activateProcuradores", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> activateComisarias(@RequestBody ProcuradorDTO procuradorDTO, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> activateProcuradores(@RequestBody ProcuradorDTO procuradorDTO, HttpServletRequest request) {
 
 		UpdateResponseDTO response = procuradoresService.activateProcuradores(procuradorDTO, request);
 		if (response.getError().getCode() == 200)
