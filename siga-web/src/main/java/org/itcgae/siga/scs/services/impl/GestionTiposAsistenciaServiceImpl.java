@@ -55,6 +55,7 @@ import org.itcgae.siga.db.entities.ScsPartidapresupuestariaExample;
 import org.itcgae.siga.db.entities.ScsProcedimientos;
 import org.itcgae.siga.db.entities.ScsTipoactuacioncostefijo;
 import org.itcgae.siga.db.entities.ScsTipoactuacioncostefijoExample;
+import org.itcgae.siga.db.entities.ScsTipoasistenciaExample;
 import org.itcgae.siga.db.entities.ScsTipoasistenciacolegio;
 import org.itcgae.siga.db.entities.ScsTipoasistenciacolegioExample;
 import org.itcgae.siga.db.entities.ScsTipoasistenciaguardia;
@@ -203,7 +204,7 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 	@Override
 	public UpdateResponseDTO updateTiposAsistencias(TiposAsistenciasDTO tiposAsistenciasDTO,
 			HttpServletRequest request) {
-		LOGGER.info("updateFundamentoResolucion() ->  Entrada al servicio para modificar un fundamento de resolucion");
+		LOGGER.info("updateTiposAsistencias() ->  Entrada al servicio para modificar un tipoasistencia");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -218,12 +219,12 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"updateFundamentoResolucion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateTiposAsistencias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"updateFundamentoResolucion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"updateTiposAsistencias() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
@@ -233,30 +234,21 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 					// Obtenermos fundamento de resolucion que queremos modificar
 					// Obtenemos el fundamento de resolucion que queremos modificar
 					for (TiposAsistenciaItem tiposAsistenciaItem : tiposAsistenciasDTO.getTiposAsistenciasItem()) {
-						
-						ScsTipoasistenciacolegioExample example = new ScsTipoasistenciacolegioExample();
-						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdtipoasistenciacolegioEqualTo(
-										Short.parseShort(tiposAsistenciaItem.getIdtipoasistenciacolegio()));
-						
-						
-						ScsTipoasistenciacolegioExample example3 = new ScsTipoasistenciacolegioExample();
-						example3.createCriteria().andIdinstitucionEqualTo(idInstitucion);
-						
-						
-						
+																				
 						String pordefectovalor = tiposAsistenciaItem.getPordefecto();
 						List<TiposAsistenciaItem> tiposAsistenciaItems = null;
 						
 						if(pordefectovalor.equals("1")) {
-							tiposAsistenciaItems =	scsTipoasistenciaExtendsMapper.searchTiposAsistencia(true,
+							tiposAsistenciaItems =	scsTipoasistenciaExtendsMapper.searchTiposAsistenciaPorDefecto(true,
 									usuario.getIdlenguaje(), idInstitucion);
+
 							for(TiposAsistenciaItem asistenciasActuales : tiposAsistenciaItems) {
 								ScsTipoasistenciacolegio colegio = new ScsTipoasistenciacolegio();
 								
 								ScsTipoasistenciacolegioExample asistenciasNuevas = new ScsTipoasistenciacolegioExample();
-								asistenciasNuevas.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtipoasistenciacolegioEqualTo(Short.parseShort(asistenciasActuales.getIdtipoasistenciacolegio()));
-
+								asistenciasNuevas.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdtipoasistenciacolegioEqualTo(Short.parseShort(asistenciasActuales.getIdtipoasistenciacolegio())).andPordefectoEqualTo(Short.parseShort("1"));
+								
 								if(tiposAsistenciaItem.getIdtipoasistenciacolegio() == asistenciasActuales.getIdtipoasistenciacolegio()) {
 									colegio.setPordefecto(Short.parseShort("1"));
 								}else {
@@ -266,18 +258,25 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 								colegio.setIdtipoasistenciacolegio(Short.parseShort(asistenciasActuales.getIdtipoasistenciacolegio()));
 								colegio.setUsumodificacion(usuario.getIdusuario());
 								colegio.setFechamodificacion(new Date());
-								scsTipoAsistenciaColegioMapper.updateByExampleSelective(colegio, asistenciasNuevas);							}
+								scsTipoAsistenciaColegioMapper.updateByExampleSelective(colegio, asistenciasNuevas);						
+								}
 						}
 							
 						
 						LOGGER.info(
-								"updateFundamentoResolucion() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Entrada a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
-
+								"updateTiposAsistencias() / scsTipoAsistenciaColegioMapper.selectByExample(example) -> Entrada a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
+						
+						
+						ScsTipoasistenciacolegioExample example = new ScsTipoasistenciacolegioExample();
+						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdtipoasistenciacolegioEqualTo(
+										Short.parseShort(tiposAsistenciaItem.getIdtipoasistenciacolegio()));
+						
 						List<ScsTipoasistenciacolegio> scsTipoasistenciacolegios = scsTipoAsistenciaColegioMapper
 								.selectByExample(example);
 
 						LOGGER.info(
-								"updateFundamentoResolucion() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Salida a scsTipofundamentosExtendsMapper para buscar  un fundamento resolucion");
+								"updateTiposAsistencias() / scsTipoAsistenciaColegioMapper.selectByExample(example) -> Salida a scsTipofundamentosExtendsMapper para buscar  un fundamento resolucion");
 
 						if (scsTipoasistenciacolegios != null && scsTipoasistenciacolegios.size() > 0) {
 
@@ -301,7 +300,7 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 							if (recursosRepetidos != null && recursosRepetidos.size() > 0) {
 								error.setCode(400);
 								error.setDescription(
-										"messages.jgr.maestros.gestionFundamentosResolucion.existeFundamentosResolucionMismaDescripcion");
+										"messages.jgr.maestros.gestionFundamentosResolucion.existeTipoAsistenciaMismaDescripcion");
 							} else {
 
 								// Si no se repite se modifica tanto la el fundamento como la descripcion del
@@ -332,12 +331,12 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 									recursoFundamento.setIdinstitucion(idInstitucion);
 
 									LOGGER.info(
-											"updateFundamentoResolucion() / genRecursosCatalogosExtendsMapper.updateByExample() -> Entrada a genRecursosCatalogosExtendsMapper para modificar un fundamento de resolucion");
+											"updateTiposAsistencias() / genRecursosCatalogosExtendsMapper.updateByExample() -> Entrada a genRecursosCatalogosExtendsMapper para modificar un fundamento de resolucion");
 
 									response = genRecursosCatalogosExtendsMapper.updateByPrimaryKey(recursoFundamento);
 
 									LOGGER.info(
-											"updateFundamentoResolucion() / genRecursosCatalogosExtendsMapper.updateByExample() -> Salida de genRecursosCatalogosExtendsMapper para modificar un fundamento de resolucion");
+											"updateTiposAsistencias() / genRecursosCatalogosExtendsMapper.updateByExample() -> Salida de genRecursosCatalogosExtendsMapper para modificar un fundamento de resolucion");
 
 									updateRestoIdiomas(recursoFundamento);
 								}
@@ -381,10 +380,10 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 										scsTipoAsistenciaGuardiaMapper.insert(tipoAsistenciaGuardia);
 									}
 								LOGGER.info(
-										"updateFundamentoResolucion() / scsTipofundamentosExtendsMapper.updateByExample() -> Entrada a scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
+										"updateTiposAsistencias() / scsTipofundamentosExtendsMapper.updateByExample() -> Entrada a scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
 
 								LOGGER.info(
-										"updateFundamentoResolucion() / scsTipofundamentosExtendsMapper.updateByExample() -> Salida de scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
+										"updateTiposAsistencias() / scsTipofundamentosExtendsMapper.updateByExample() -> Salida de scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
 							}
 						}
 					}
@@ -409,7 +408,7 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("updateFundamentoResolucion() -> Salida del servicio para editar un fundamento de resolucion");
+		LOGGER.info("updateTiposAsistencias() -> Salida del servicio para editar un tipo asistencia");
 
 		return updateResponseDTO;
 	}
@@ -630,33 +629,49 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"createFundamentosResolucion() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"createTiposAsistencia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"createFundamentosResolucion() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"createTiposAsistencia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
 
-					if (tiposAsistenciaItem != null) {
-						for (TiposAsistenciaItem tiposAsistenciaItem1 : tiposAsistenciaDTO.getTiposAsistenciasItem()) {
+					if (tiposAsistenciaItem != null) {							
+							ScsTipoasistenciacolegioExample example3 = new ScsTipoasistenciacolegioExample();
+							example3.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+							
+							String pordefectovalor = tiposAsistenciaItem.getPordefecto();
+							List<TiposAsistenciaItem> tiposAsistenciaItems = null;
+							
+							if(pordefectovalor.equals("1")) {
+								tiposAsistenciaItems =	scsTipoasistenciaExtendsMapper.searchTiposAsistenciaPorDefecto(true,
+										usuario.getIdlenguaje(), idInstitucion);
+								for(TiposAsistenciaItem asistenciasActuales : tiposAsistenciaItems) {
+									ScsTipoasistenciacolegio colegio = new ScsTipoasistenciacolegio();
+									
+									ScsTipoasistenciacolegioExample asistenciasNuevas = new ScsTipoasistenciacolegioExample();
+									asistenciasNuevas.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andIdtipoasistenciacolegioEqualTo(Short.parseShort(asistenciasActuales.getIdtipoasistenciacolegio())).andPordefectoEqualTo(Short.parseShort("1"));
 
-							ScsTipoasistenciacolegioExample example = new ScsTipoasistenciacolegioExample();
-							example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-									.andIdtipoasistenciacolegioEqualTo(
-											Short.parseShort(tiposAsistenciaItem1.getIdtipoasistenciacolegio()));
-							
-							String pordefectovalor = tiposAsistenciaItem1.getPordefecto();
-							
-							if(pordefectovalor == "1") {
-								tiposAsistenciaItem1.setPordefecto("0");
+									if(tiposAsistenciaItem.getIdtipoasistenciacolegio() == asistenciasActuales.getIdtipoasistenciacolegio()) {
+										colegio.setPordefecto(Short.parseShort("1"));
+									}else {
+										colegio.setPordefecto(Short.parseShort("0"));
+									}
+									colegio.setIdinstitucion(idInstitucion);
+									colegio.setIdtipoasistenciacolegio(Short.parseShort(asistenciasActuales.getIdtipoasistenciacolegio()));
+									colegio.setUsumodificacion(usuario.getIdusuario());
+									colegio.setFechamodificacion(new Date());
+									scsTipoAsistenciaColegioMapper.updateByExampleSelective(colegio, asistenciasNuevas);						
+									}
 							}
 							
-						}
+						
 						// Buscamos si se encuentra la descripcion del nuevo fundamento
 						GenRecursosCatalogosExample exampleRecursos = new GenRecursosCatalogosExample();
 						exampleRecursos.createCriteria()
