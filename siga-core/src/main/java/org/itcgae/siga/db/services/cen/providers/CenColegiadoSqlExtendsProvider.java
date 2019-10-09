@@ -349,19 +349,19 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 	}
 
 	public String updateColegiado(CenColegiado record) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 
 		SQL sql = new SQL();
 		sql.UPDATE("CEN_COLEGIADO");
 		if (record.getFechapresentacion() != null) {
 			// sql.SET("FECHAPRESENTACION = "+record.getFechapresentacion()+"");
 			String fechaF = dateFormat.format(record.getFechapresentacion());
-			sql.SET("FECHAPRESENTACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+			sql.SET("FECHAPRESENTACION = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 		}
 		
 		if (record.getFechaincorporacion() != null) {
 			String fechaF = dateFormat.format(record.getFechaincorporacion());
-			sql.SET("FECHAINCORPORACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+			sql.SET("FECHAINCORPORACION = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 		}
 
 		if (record.getIndtitulacion() != null) {
@@ -381,7 +381,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 		if (record.getFechamodificacion() != null) {
 			String fechaF = dateFormat.format(record.getFechamodificacion());
-			sql.SET("FECHAMODIFICACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+			sql.SET("FECHAMODIFICACION = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 		} else {
 			sql.SET("FECHAMODIFICACION = " + record.getFechamodificacion() + "");
 		}
@@ -396,7 +396,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 		if (record.getFechajura() != null) {
 			String fechaF = dateFormat.format(record.getFechajura());
-			sql.SET("FECHAJURA = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+			sql.SET("FECHAJURA = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 		} else {
 			sql.SET("FECHAJURA = " + record.getFechajura() + "");
 		}
@@ -405,7 +405,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 		if (record.getFechatitulacion() != null) {
 			String fechaF = dateFormat.format(record.getFechatitulacion());
-			sql.SET("FECHATITULACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+			sql.SET("FECHATITULACION = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 		} else {
 			sql.SET("FECHATITULACION = " + record.getFechatitulacion() + "");
 		}
@@ -414,13 +414,13 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 		}
 		if (record.getFechadeontologia() != null) {
 			String fechaF = dateFormat.format(record.getFechadeontologia());
-			sql.SET("FECHADEONTOLOGIA = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+			sql.SET("FECHADEONTOLOGIA = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 		} else {
 			sql.SET("FECHADEONTOLOGIA = " + record.getFechadeontologia() + "");
 		}
 		if (record.getFechamovimiento() != null) {
 			String fechaF = dateFormat.format(record.getFechamovimiento());
-			sql.SET("FECHAMOVIMIENTO = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+			sql.SET("FECHAMOVIMIENTO = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 		} else {
 			sql.SET("FECHAMOVIMIENTO = " + record.getFechamovimiento() + "");
 		}

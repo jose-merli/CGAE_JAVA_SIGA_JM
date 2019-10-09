@@ -528,11 +528,11 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 	public String updateCourse (CursoItem cursoItem, AdmUsuarios usuario) {
 		SQL sql = new SQL();
 		
- 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 		
 		sql.UPDATE("FOR_CURSO");
 		
-		sql.SET("FECHAMODIFICACION = TO_DATE('" + dateFormat.format(new Date()) + "','DD/MM/YYYY')");
+		sql.SET("FECHAMODIFICACION = TO_DATE('" + dateFormat.format(new Date()) + "','DD/MM/YYYY hh24:mi:ss')");
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		
  		if(null != cursoItem.getNombreCurso()) {
@@ -544,19 +544,19 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		}
 
  		if(null != cursoItem.getFechaImparticionDesdeDate()) {
-			sql.SET("FECHAIMPARTICIONDESDE = TO_DATE('" + dateFormat.format(cursoItem.getFechaImparticionDesdeDate()) + "','DD/MM/YYYY')");
+			sql.SET("FECHAIMPARTICIONDESDE = TO_DATE('" + dateFormat.format(cursoItem.getFechaImparticionDesdeDate()) + "','DD/MM/YYYY hh24:mi:ss')");
 		}
  		
  		if(null != cursoItem.getFechaImparticionHastaDate()) {
-			sql.SET("FECHAIMPARTICIONHASTA = TO_DATE('" + dateFormat.format(cursoItem.getFechaImparticionHastaDate()) + "','DD/MM/YYYY')");
+			sql.SET("FECHAIMPARTICIONHASTA = TO_DATE('" + dateFormat.format(cursoItem.getFechaImparticionHastaDate()) + "','DD/MM/YYYY hh24:mi:ss')");
 		}
  		
  		if(null != cursoItem.getFechaInscripcionDesdeDate()) {
-			sql.SET("FECHAINSCRIPCIONDESDE = TO_DATE('" + dateFormat.format(cursoItem.getFechaInscripcionDesdeDate()) + "','DD/MM/YYYY')");
+			sql.SET("FECHAINSCRIPCIONDESDE = TO_DATE('" + dateFormat.format(cursoItem.getFechaInscripcionDesdeDate()) + "','DD/MM/YYYY hh24:mi:ss')");
 		}
  		
  		if(null != cursoItem.getFechaInscripcionHastaDate()) {
-			sql.SET("FECHAINSCRIPCIONHASTA = TO_DATE('" + dateFormat.format(cursoItem.getFechaInscripcionHastaDate()) + "','DD/MM/YYYY')");
+			sql.SET("FECHAINSCRIPCIONHASTA = TO_DATE('" + dateFormat.format(cursoItem.getFechaInscripcionHastaDate()) + "','DD/MM/YYYY hh24:mi:ss')");
 		}
  		
  		if(null != cursoItem.getPlazasDisponibles()) {

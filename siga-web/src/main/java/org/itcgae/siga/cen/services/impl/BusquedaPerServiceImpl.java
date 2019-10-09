@@ -186,6 +186,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 						segundaBusqueda.setIdInstitucion(null);
 						busquedaJuridicaItems = cenPersonaExtendsMapper.searchPerJuridica(numPagina, segundaBusqueda,
 								idLenguaje);
+						
 						if (busquedaJuridicaItems.size() > 0) {
 							busquedaPerJuridicaDTO.setOnlyNif(true);
 						} else {
@@ -374,11 +375,29 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 						segundaBusqueda.setNif(busquedaPerFisicaSearchDTO.getNif());
 						busquedaPerFisicaItems = cenPersonaExtendsMapper.searchPerFisica(segundaBusqueda, idLenguaje,
 								null);
+						
+						boolean actualInstitution = false;
+						for (BusquedaPerFisicaItem item : busquedaPerFisicaItems) {
+							if(item.getNumeroInstitucion().equals(idInstitucion)) {
+								actualInstitution = true;
+								break;
+							}
+						}
+						
 						if (busquedaPerFisicaItems.size() > 0) {
-							busquedaPerFisicaDTO.setOnlyNif(true);
+							if(!actualInstitution) {
+								busquedaPerFisicaDTO.setOnlyNif(false);
+							}else {
+								busquedaPerFisicaDTO.setOnlyNif(true);
+							}
 						} else {
 							busquedaPerFisicaDTO.setOnlyNif(false);
 						}
+					}
+				}else {
+					// El nif ya existe en ese colegio
+					if(busquedaPerFisicaItems.size() == 1) { 
+						busquedaPerFisicaDTO.setOnlyNif(true);
 					}
 				}
 

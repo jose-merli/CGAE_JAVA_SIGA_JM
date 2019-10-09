@@ -434,7 +434,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			AdmUsuarios usuario) {
 		SQL sql = new SQL();
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 
 		sql.UPDATE("cen_nocolegiado");
 			sql.SET("RESENA = '" + perJuridicaDatosRegistralesUpdateDTO.getResena().replace("'", "''") + "'");
@@ -444,7 +444,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			
 		if(null != perJuridicaDatosRegistralesUpdateDTO.getFechaFin()) {
 			String fechaF = dateFormat.format(perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
-			sql.SET("FECHAFIN = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+			sql.SET("FECHAFIN = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 		}else {
 			sql.SET("FECHAFIN = " + perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
 		}

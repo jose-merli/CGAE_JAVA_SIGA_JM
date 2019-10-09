@@ -49,7 +49,7 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 	}
 	
 	public String updateCurriculo(CenDatoscv record) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 
 			SQL sql = new SQL();
 			SQL sql1 = new SQL();
@@ -61,11 +61,11 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 	
 			if (record.getFechainicio() != null) {				
 				String fechaF = dateFormat.format(record.getFechainicio());
-				sql.SET("FECHAINICIO = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+				sql.SET("FECHAINICIO = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 			}
 			if (record.getFechafin() != null) {
 				String fechaF = dateFormat.format(record.getFechafin());
-				sql.SET("FECHAFIN = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+				sql.SET("FECHAFIN = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 			}else {
 				sql.SET("FECHAFIN = null");
 			}
@@ -79,7 +79,7 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 			}
 			if (record.getFechamodificacion() != null) {
 				String fechaF = dateFormat.format(record.getFechamodificacion());
-				sql.SET("FECHAMODIFICACION = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+				sql.SET("FECHAMODIFICACION = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 			}							
 			if (record.getUsumodificacion() != null) {
 				sql.SET("USUMODIFICACION =  '"+record.getUsumodificacion() +"'");
@@ -94,14 +94,14 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 			}
 			if (record.getFechamovimiento() != null) {
 				String fechaF = dateFormat.format(record.getFechamovimiento());
-				sql.SET("FECHAMOVIMIENTO = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+				sql.SET("FECHAMOVIMIENTO = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 			}else {
 				sql.SET("FECHAMOVIMIENTO = null");
 
 			}
 			if (record.getFechabaja() != null) {
 				String fechaF = dateFormat.format(record.getFechabaja());
-				sql.SET("FECHABAJA = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+				sql.SET("FECHABAJA = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 			}else {
 				sql.SET("FECHABAJA = null");
 			}

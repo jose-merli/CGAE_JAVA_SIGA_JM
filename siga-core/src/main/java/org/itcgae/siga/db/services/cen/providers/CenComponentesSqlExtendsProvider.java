@@ -144,18 +144,18 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 	public String updateMember(TarjetaIntegrantesUpdateDTO tarjetaIntegrantesUpdateDTO, AdmUsuarios usuario, String idInstitucion) {
 		SQL sql = new SQL();
 		
- 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 		
 		sql.UPDATE("CEN_COMPONENTES");
 		
  		if(null != tarjetaIntegrantesUpdateDTO.getFechaCargo()) {
  			String fechaC = dateFormat.format(tarjetaIntegrantesUpdateDTO.getFechaCargo());
-			sql.SET("FECHACARGO = TO_DATE('" + fechaC + "','DD/MM/YYYY')");
+			sql.SET("FECHACARGO = TO_DATE('" + fechaC + "','DD/MM/YYYY hh24:mi:ss')");
 		}
  		
  		if(null != tarjetaIntegrantesUpdateDTO.getFechaBajaCargo()) {
  			String fechaB = dateFormat.format(tarjetaIntegrantesUpdateDTO.getFechaBajaCargo());
-			sql.SET("FECHABAJA = TO_DATE('" + fechaB + "','DD/MM/YYYY')");
+			sql.SET("FECHABAJA = TO_DATE('" + fechaB + "','DD/MM/YYYY hh24:mi:ss')");
 		}
  		
 		if(!tarjetaIntegrantesUpdateDTO.getCargo().equals("")) {
@@ -210,7 +210,7 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 	public String insertSelectiveForcreateMember(TarjetaIntegrantesCreateDTO tarjetaIntegrantesCreateDTO,AdmUsuarios usuario, String idInstitucion) {
 		SQL sql = new SQL();
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 		
 		sql.INSERT_INTO("CEN_COMPONENTES");
 		
@@ -224,13 +224,13 @@ public class CenComponentesSqlExtendsProvider extends CenComponentesSqlProvider{
 		
 		if(null != tarjetaIntegrantesCreateDTO.getFechaCargo()) {
 			String fechaC = dateFormat.format(tarjetaIntegrantesCreateDTO.getFechaCargo());
-			sql.VALUES("FECHACARGO","TO_DATE('" + fechaC + "','DD/MM/YYYY')");
+			sql.VALUES("FECHACARGO","TO_DATE('" + fechaC + "','DD/MM/YYYY hh24:mi:ss')");
 			
 		}
 		
 		if(null != tarjetaIntegrantesCreateDTO.getFechaBajaCargo()) {
 			String fechaB = dateFormat.format(tarjetaIntegrantesCreateDTO.getFechaBajaCargo());
-			sql.VALUES("FECHABAJA","TO_DATE('" + fechaB + "','DD/MM/YYYY')");
+			sql.VALUES("FECHABAJA","TO_DATE('" + fechaB + "','DD/MM/YYYY hh24:mi:ss')");
 			
 		}
 		

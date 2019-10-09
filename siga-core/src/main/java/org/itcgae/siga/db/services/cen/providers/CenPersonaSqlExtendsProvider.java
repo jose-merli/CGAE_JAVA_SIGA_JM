@@ -1,5 +1,6 @@
 package org.itcgae.siga.db.services.cen.providers;
 
+import java.util.Date;
 import java.text.SimpleDateFormat;
 
 import org.apache.ibatis.jdbc.SQL;
@@ -419,6 +420,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		SQL sql = new SQL();
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormatHMS = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 
 		sql.UPDATE("CEN_PERSONA");
 
@@ -431,7 +433,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 			sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		}
 
-		sql.SET("FECHAMODIFICACION = SYSDATE");
+		sql.SET("FECHAMODIFICACION = TO_DATE('" + dateFormatHMS.format(new Date()) + "','DD/MM/YYYY hh24:mi:ss')");
 
 		sql.WHERE("IDPERSONA = '" + perJuridicaDatosRegistralesUpdateDTO.getIdPersona() + "'");
 		return sql.toString();
