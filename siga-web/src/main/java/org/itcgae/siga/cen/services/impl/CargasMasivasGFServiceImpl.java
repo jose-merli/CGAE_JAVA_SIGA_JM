@@ -329,12 +329,12 @@ public class CargasMasivasGFServiceImpl implements ICargasMasivasGFService {
 							cenGruposclienteClienteBaja.setIdgrupo(cargaMasivaDatosGFVo.getIdGrupo());
 							cenGruposclienteClienteBaja
 									.setIdinstitucionGrupo(cargaMasivaDatosGFVo.getIdInstitucionGrupo());
-							cenGruposclienteClienteBaja.setFechamodificacion(new Date());
-							cenGruposclienteClienteBaja.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
-							cenGruposclienteClienteBaja.setFechaInicio(cargaMasivaDatosGFVo.getFechaInicio());
-							cenGruposclienteClienteBaja.setFechaBaja(new Date());
+//							cenGruposclienteClienteBaja.setFechamodificacion(new Date());
+//							cenGruposclienteClienteBaja.setUsumodificacion(Integer.valueOf(usuario.getIdusuario()));
+//							cenGruposclienteClienteBaja.setFechaInicio(cargaMasivaDatosGFVo.getFechaInicio());
+//							cenGruposclienteClienteBaja.setFechaBaja(new Date());
 
-							int result = cenGruposclienteClienteMapper.updateByPrimaryKeySelective(cenGruposclienteClienteBaja);
+							int result = cenGruposclienteClienteMapper.deleteByPrimaryKey(cenGruposclienteClienteBaja);
 
 							if (result == 0) {
 								errores += "Error al insertar una fila";

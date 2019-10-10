@@ -167,11 +167,10 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 
 				if (busquedaJuridicaItems.size() == 0 || null == busquedaJuridicaItems) {
 
-					 CenPersonaExample cenPersonaExample = new CenPersonaExample();
-					 cenPersonaExample.createCriteria()
-					 .andIdtipoidentificacionNotEqualTo(Short.valueOf("20"))
-					 .andNifcifEqualTo(busquedaPerJuridicaSearchDTO.getNif());
-					
+					CenPersonaExample cenPersonaExample = new CenPersonaExample();
+					cenPersonaExample.createCriteria().andIdtipoidentificacionNotEqualTo(Short.valueOf("20"))
+							.andNifcifEqualTo(busquedaPerJuridicaSearchDTO.getNif());
+
 					List<CenPersona> listPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
 
 					if (null != listPersona && listPersona.size() > 0) {
@@ -186,7 +185,7 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 						segundaBusqueda.setIdInstitucion(null);
 						busquedaJuridicaItems = cenPersonaExtendsMapper.searchPerJuridica(numPagina, segundaBusqueda,
 								idLenguaje);
-						
+
 						if (busquedaJuridicaItems.size() > 0) {
 							busquedaPerJuridicaDTO.setOnlyNif(true);
 						} else {
@@ -356,12 +355,11 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 						String.valueOf(idInstitucion));
 
 				if (busquedaPerFisicaItems.size() == 0 || null == busquedaPerFisicaItems) {
-					
-					 CenPersonaExample cenPersonaExample = new CenPersonaExample();
-					 cenPersonaExample.createCriteria()
-					 .andIdtipoidentificacionNotEqualTo(Short.valueOf("20"))
-					 .andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
-					
+
+					CenPersonaExample cenPersonaExample = new CenPersonaExample();
+					cenPersonaExample.createCriteria().andIdtipoidentificacionNotEqualTo(Short.valueOf("20"))
+							.andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
+
 					List<CenPersona> listPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
 
 					if (null != listPersona && listPersona.size() > 0) {
@@ -369,35 +367,18 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 						error.setMessage("general.mensaje.busquedaGeneral.noexiste.personaFisica");
 						busquedaPerFisicaDTO.setError(error);
 					}
-					
+
 					if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
 						BusquedaPerFisicaSearchDTO segundaBusqueda = new BusquedaPerFisicaSearchDTO();
 						segundaBusqueda.setNif(busquedaPerFisicaSearchDTO.getNif());
 						busquedaPerFisicaItems = cenPersonaExtendsMapper.searchPerFisica(segundaBusqueda, idLenguaje,
 								null);
-						
-						boolean actualInstitution = false;
-						for (BusquedaPerFisicaItem item : busquedaPerFisicaItems) {
-							if(item.getNumeroInstitucion().equals(idInstitucion)) {
-								actualInstitution = true;
-								break;
-							}
-						}
-						
+
 						if (busquedaPerFisicaItems.size() > 0) {
-							if(!actualInstitution) {
-								busquedaPerFisicaDTO.setOnlyNif(false);
-							}else {
-								busquedaPerFisicaDTO.setOnlyNif(true);
-							}
+							busquedaPerFisicaDTO.setOnlyNif(true);
 						} else {
 							busquedaPerFisicaDTO.setOnlyNif(false);
 						}
-					}
-				}else {
-					// El nif ya existe en ese colegio
-					if(busquedaPerFisicaItems.size() == 1) { 
-						busquedaPerFisicaDTO.setOnlyNif(true);
 					}
 				}
 
