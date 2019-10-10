@@ -213,6 +213,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	@Autowired
 	private ModClasecomunicacionesExtendsMapper _modClasecomunicacionesExtendsMapper;
 	
+	
+	static int numeroFicheros = 1; 
+	
 	@Override
 	public ComboDTO obtenerClaseComunicaciones(HttpServletRequest request, String rutaClaseComunicacion) {
 		LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clases comunicacion");
@@ -351,7 +354,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		LOGGER.info("descargarComunicacion() -> Entrada al servicio para descargar la documentación de la comunicación");
 		
 		File file = null;
-		
+
 		try {
 			
 			// Conseguimos información del usuario logeado
@@ -416,7 +419,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		LOGGER.info("generarComunicacion() -> Entrada al servicio para generar los documentos a comunicar");
 		
 		GenerarComunicacionItem generarComunicacion = new GenerarComunicacionItem();
-		
+		numeroFicheros = 1;
 		List<DatosDocumentoItem> listaFicheros = new ArrayList<DatosDocumentoItem>();
 		List<DatosEnvioDTO> listaConsultasYDestinatario = new ArrayList<DatosEnvioDTO>();
 		List<ModelosEnvioItem> listaModelosEnvio = new ArrayList<ModelosEnvioItem>();
@@ -1117,6 +1120,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				}
 			}
 			
+			if(!(sufijos != null && sufijos.size() > 0)) {
+				nombreFicheroSalida = nombreFicheroSalida + "_" + numeroFicheros;
+				numeroFicheros++;
+			} 
+			
 			String numero = "";
 			if(numFichero > 0){
 				numero = "_" + String.valueOf(numFichero);
@@ -1572,7 +1580,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		String directorioPlantillaClase = "";
 		boolean esExcel = false;
 		List<List<Map<String,Object>>> listaDatosExcel = new ArrayList<List<Map<String,Object>>>();
-		
+		numeroFicheros = 1;
 		//Obtenemos la clase de comunicacion del modelo (si tiene)	
 		EnvEnviosExample envioExample = new EnvEnviosExample();
 		envioExample.createCriteria().andIdenvioEqualTo(Long.parseLong(idEnvio)).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
