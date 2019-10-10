@@ -287,7 +287,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
-		int response = 2;
+		int response = 0;
 
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
@@ -504,8 +504,9 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 						juzgado.setCodigoext(juzgadoItem.getCodigoExt());
 						juzgado.setCodigoprocurador(juzgadoItem.getCodigoProcurador());
 						juzgado.setMovil(juzgadoItem.getMovil());
-
-						if (juzgadoItem.getIsCodigoEjis() != null) {
+						juzgado.setCodigoejis(juzgadoItem.getCodigoEjis());
+						
+						if (juzgadoItem.getEsDecano() != null) {
 							juzgado.setEsdecano(Short.valueOf(juzgadoItem.getEsDecano()));
 						}
 
@@ -520,8 +521,6 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 							juzgado.setFechacodigoejis(juzgadoItem.getFechaCodigoEjis());
 						}
 						
-						juzgado.setCodigoejis(juzgadoItem.getIsCodigoEjis());
-
 						if (juzgadoItem.getVisibleMovil() != null) {
 							juzgado.setVisiblemovil(Short.valueOf(juzgadoItem.getVisibleMovil()));
 						}
