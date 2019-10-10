@@ -116,7 +116,7 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 				sql.SET("IDTIPOCVSUBTIPO1 = "+record.getIdtipocvsubtipo1() + "");
 				sql.SET("IDINSTITUCION_SUBT1 = "+record.getIdinstitucionSubt1() + "");
 
-			}
+			}  
 			
 			if (record.getIdtipocvsubtipo2() != null) {
 				sql.SET("IDTIPOCVSUBTIPO2 = '"+ record.getIdtipocvsubtipo2() + "'");

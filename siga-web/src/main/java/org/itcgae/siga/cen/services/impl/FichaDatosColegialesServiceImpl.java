@@ -276,9 +276,9 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				colegiado.setIdpersona(Long.parseLong(colegiadoItem.getIdPersona()));
 				colegiado.setIdinstitucion(idInstitucion);
 				colegiado.setUsumodificacion(usuario.getIdusuario());
-				if (colegiadoItem.getNumColegiado() != null) {
+				/*if (colegiadoItem.getNumColegiado() != null) {
 					colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
-				}
+				}*/
 				if (colegiadoItem.getIdTiposSeguro() != null && colegiadoItem.getIdTiposSeguro() != "") {
 					colegiado.setIdtiposseguro(Short.parseShort(colegiadoItem.getIdTiposSeguro()));
 				} else {
@@ -293,6 +293,18 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 
 				if (colegiadoItem.getComunitario() != null) {
 					colegiado.setComunitario(colegiadoItem.getComunitario());
+					if (colegiadoItem.getNumColegiado() != null) {
+						if (colegiadoItem.getComunitario().equals("1")) {
+							colegiado.setNcomunitario(colegiadoItem.getNumColegiado());
+						}else{
+							
+							colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
+						}
+					}
+				}else{
+					if (colegiadoItem.getNumColegiado() != null) {
+						colegiado.setNcolegiado(colegiadoItem.getNumColegiado());
+					}
 				}
 				if (colegiadoItem.getnMutualista() != null && colegiadoItem.getnMutualista() != "") {
 					colegiado.setNmutualista(colegiadoItem.getnMutualista());
@@ -300,6 +312,7 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 					colegiado.setNmutualista(null);
 				}
 
+				
 				colegiado.setFechaincorporacion(colegiadoItem.getIncorporacionDate());
 				colegiado.setFechatitulacion(colegiadoItem.getFechaTitulacionDate());
 				colegiado.setFechapresentacion(colegiadoItem.getFechapresentacionDate());
