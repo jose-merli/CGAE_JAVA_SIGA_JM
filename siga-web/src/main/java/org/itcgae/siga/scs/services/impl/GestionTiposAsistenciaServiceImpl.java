@@ -53,6 +53,8 @@ import org.itcgae.siga.db.entities.ScsMateriajurisdiccionExample;
 import org.itcgae.siga.db.entities.ScsPartidapresupuestaria;
 import org.itcgae.siga.db.entities.ScsPartidapresupuestariaExample;
 import org.itcgae.siga.db.entities.ScsProcedimientos;
+import org.itcgae.siga.db.entities.ScsTipoactuacion;
+import org.itcgae.siga.db.entities.ScsTipoactuacionExample;
 import org.itcgae.siga.db.entities.ScsTipoactuacioncostefijo;
 import org.itcgae.siga.db.entities.ScsTipoactuacioncostefijoExample;
 import org.itcgae.siga.db.entities.ScsTipoasistenciaExample;
@@ -68,6 +70,7 @@ import org.itcgae.siga.db.entities.ScsZona;
 import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
 import org.itcgae.siga.db.mappers.GenRecursosCatalogosMapper;
 import org.itcgae.siga.db.mappers.ScsPartidapresupuestariaMapper;
+import org.itcgae.siga.db.mappers.ScsTipoactuacionMapper;
 import org.itcgae.siga.db.mappers.ScsTipoasistenciacolegioMapper;
 import org.itcgae.siga.db.mappers.ScsTipoasistenciaguardiaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
@@ -98,6 +101,10 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 
 	@Autowired
 	private ScsTipoasistenciacolegioMapper scsTipoAsistenciaColegioMapper;
+	
+	@Autowired
+	private ScsTipoactuacionMapper scsTipoActuacionMapper;
+	
 	@Autowired
 	private ScsTipoasistenciaguardiaMapper scsTipoAsistenciaGuardiaMapper;
 
@@ -457,8 +464,18 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 
 						List<ScsTipoasistenciacolegio> scsTipoasistenciacolegios = scsTipoAsistenciaColegioMapper
 								.selectByExample(example);
+						
+						ScsTipoactuacionExample example2 = new ScsTipoactuacionExample();
+						example2.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtipoasistenciaEqualTo(Short.parseShort(tiposAsistenciaItem.getIdtipoasistenciacolegio()));
+						
+						List<ScsTipoactuacion> scsTipoActuacion = scsTipoActuacionMapper.selectByExample(example2);
+						
 						if (scsTipoasistenciacolegios != null && scsTipoasistenciacolegios.size() > 0) {
-
+							if(scsTipoActuacion != null && scsTipoActuacion.size() > 0) {
+								error.setCode(400);
+								error.setDescription("general.message.nosepuedeeliminardependetipoactuacion");
+								updateResponseDTO.setStatus(SigaConstants.KO);
+							}else {
 							ScsTipoasistenciacolegio scsTipoAsistencia = scsTipoasistenciacolegios.get(0);
 							scsTipoAsistencia.setPordefecto(Short.parseShort("0"));
 							scsTipoAsistencia.setFechaBaja(new Date());
@@ -472,6 +489,7 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 
 							LOGGER.info(
 									"deleteCosteFijo() / scsTipoactuacioncostefijoMapper.updateByPrimaryKey() -> Salida de scsTipoactuacioncostefijoMapper para dar de baja a un coste fijo");
+							}
 						}
 						
 					}
@@ -621,7 +639,6 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 		Integer idTipoAsistencia = null;
 
 		ScsTipoasistenciacolegio scsTipoasistenciacolegio = null;
-		TiposAsistenciasDTO tiposAsistenciaDTO = new TiposAsistenciasDTO();
 		
 		if (null != idInstitucion) {
 

@@ -341,13 +341,8 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 				ScsActuacionasistenciaExample exampleasistencia = new ScsActuacionasistenciaExample();
 												exampleasistencia.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()))
 												.andIdtipoasistenciaEqualTo(tipoactuacion.getIdtipoasistencia());
-												
 												List<ScsActuacionasistencia> scsActuacionAsistencia = scsTipoActuacionAsistenciaMapper.selectByExample(exampleasistencia);
-														
-														
-														
-														
-														
+																																																																					
 													ScsTipoactuacionExample example3 = new ScsTipoactuacionExample();
 													example2.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()))
 													.andIdtipoasistenciaEqualTo(tipoactuacion.getIdtipoasistencia());
