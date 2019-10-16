@@ -43,7 +43,7 @@ public class ScsTipoactuacionSqlExtendsProvider extends ScsTipoactuacionSqlProvi
 				"GEN_RECURSOS_CATALOGOS catasis on (catasis.idrecurso = asis.descripcion and catasis.idlenguaje = '"+idLenguaje+"')");
 		sql.WHERE("ACTUACION.IDINSTITUCION = '"+idInstitucion+"'");
 		if(!historico) {
-			sql.WHERE("ASIS.FECHA_BAJA IS NULL");
+			sql.WHERE("ACTUACION.FECHABAJA IS NULL");
 		}
 		sql.GROUP_BY("ACTUACION.idinstitucion, ACTUACION.IDTIPOACTUACION, ACTUACION.importe, ACTUACION.importemaximo, ACTUACION.fechabaja, cat.descripcion");
 		sql.ORDER_BY("cat.descripcion");
@@ -61,6 +61,16 @@ public class ScsTipoactuacionSqlExtendsProvider extends ScsTipoactuacionSqlProvi
 		sql.WHERE("ASIS.IDINSTITUCION ='"+idInstitucion+"'");
 		sql.WHERE("FECHA_BAJA IS NULL");
 
+		return sql.toString();
+	}
+	
+	public String getIdTipoactuacion(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDTIPOACTUACION) AS IDTIPOACTUACION");
+		sql.FROM("SCS_TIPOACTUACION");
+		sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
+		
 		return sql.toString();
 	}
 

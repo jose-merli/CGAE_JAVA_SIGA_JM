@@ -8,11 +8,13 @@ import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.scs.TiposActuacionItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.ScsTipoactuacion;
 import org.itcgae.siga.db.entities.ScsTipoactuacionExample;
 import org.itcgae.siga.db.mappers.ScsTipoactuacionMapper;
 import org.itcgae.siga.db.mappers.ScsTipoactuacionSqlProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsTipoactuacionSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsTipoasistenciaColegioSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsTipoasistenciaSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -47,4 +49,10 @@ public interface ScsTipoactuacionExtendsMapper extends ScsTipoactuacionMapper{
         @Result(column="DESCRIPCION", property="label", jdbcType=JdbcType.VARCHAR)
     })
 	List<ComboItem> getTiposAsistencia(String idLenguaje,Short idInstitucion);
+	
+	@SelectProvider(type = ScsTipoactuacionSqlExtendsProvider.class, method = "getIdTipoactuacion")
+	@Results({ @Result(column = "IDTIPOACTUACION", property = "newId", jdbcType = JdbcType.VARCHAR)
+	
+	})
+	NewIdDTO getIdTipoactuacion(Short idInstitucion);
 }

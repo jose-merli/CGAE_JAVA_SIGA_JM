@@ -162,7 +162,7 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 	}
 
 	@Override
-	public ComboDTO getTiposAsistencia(HttpServletRequest request) {
+	public ComboDTO getTiposActuacion(HttpServletRequest request) {
 		LOGGER.info("getPartidoJudicial() -> Entrada al servicio para obtener combo partidos judiciales");
 
 		// Conseguimos información del usuario logeado
@@ -252,7 +252,7 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 						if (scsTipoactuaciones != null && scsTipoactuaciones.size() > 0) {
 
 							ScsTipoactuacion scsTipoActuacion = scsTipoactuaciones.get(0);
-
+							
 							// Buscamos si existe una descripcion que sea igual en fundamentos q no sea el
 							// propio
 
@@ -267,7 +267,7 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 							List<GenRecursosCatalogos> recursosRepetidos = genRecursosCatalogosExtendsMapper
 									.selectByExample(exampleRecursosRepetidos);
 
-							// Si la descripcion se repite
+							
 							if (recursosRepetidos != null && recursosRepetidos.size() > 0) {
 								error.setCode(400);
 								error.setDescription(
@@ -311,54 +311,31 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 
 									updateRestoIdiomas(recursoFundamento);
 								}
-
-//								BigDecimal importe = new BigDecimal(tiposActuacionItem.getImporte());
-//								BigDecimal importemaximo = new BigDecimal(tiposActuacionItem.getImportemaximo());
-//								scsTipoActuacion.setImporte(importe);
-//								scsTipoActuacion.setImportemaximo(importemaximo);								
-//								scsTipoActuacion.setFechamodificacion(new Date());
-//								scsTipoActuacion.setUsumodificacion(usuario.getIdusuario());
-//								scsTipoActuacion.setIdinstitucion(idInstitucion);
-//								scsTipoActuacion.setIdtipoactuacion(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
-//								response = scsTipoactuacionExtendsMapper.updateByPrimaryKey(scsTipoActuacion);
+								
 
 								String[] multiSelectTipos = tiposActuacionItem.getIdtipoasistencia().trim().split(",");
-								
 								ScsTipoactuacionExample example2 = new ScsTipoactuacionExample();
 								example2.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
-							
-								List<ScsTipoactuacion> scsTipoactuacionAnteriores = scsTipoActuacionMapper
-										.selectByExample(example2);		
+								scsTipoActuacionMapper.deleteByExample(example2);
+								
+//								
+								
 								
 								if (multiSelectTipos[0] != "")
-									for (String idtiposasistencia : multiSelectTipos) {
-										for(ScsTipoactuacion tipoactuacion : scsTipoactuacionAnteriores ) {
-											if(tipoactuacion.getIdtipoactuacion().equals(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()))) {
-												if(tipoactuacion.getIdtipoasistencia().equals(Short.parseShort(idtiposasistencia))) {
-													error.setCode(200);
-													updateResponseDTO.setStatus(SigaConstants.OK);
-												}											
-				ScsActuacionasistenciaExample exampleasistencia = new ScsActuacionasistenciaExample();
-												exampleasistencia.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()))
-												.andIdtipoasistenciaEqualTo(tipoactuacion.getIdtipoasistencia());
-												List<ScsActuacionasistencia> scsActuacionAsistencia = scsTipoActuacionAsistenciaMapper.selectByExample(exampleasistencia);
-																																																																					
-													ScsTipoactuacionExample example3 = new ScsTipoactuacionExample();
-													example2.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()))
-													.andIdtipoasistenciaEqualTo(tipoactuacion.getIdtipoasistencia());
-													response =	scsTipoactuacionExtendsMapper.deleteByExample(example3);																						
-											}
-											
-										}
-//										ScsTipoactuacion tipoAsistencia = new ScsTipoactuacion();
-//										tipoAsistencia.setFechamodificacion(new Date());
-//										tipoAsistencia.setIdinstitucion(idInstitucion);
-//										tipoAsistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
-//										tipoAsistencia.setIdtipoasistencia(Short.parseShort(idtiposasistencia));
-//										tipoAsistencia.setIdtipoactuacion(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
-//										tipoAsistencia.setIdtipoasistencia(Short.parseShort(idtiposasistencia));
-//										response = scsTipoActuacionMapper.insert(tipoAsistencia);
-									}
+									for (String idtiposguardia : multiSelectTipos) {
+										BigDecimal importe = new BigDecimal(tiposActuacionItem.getImporte());
+										BigDecimal importemaximo = new BigDecimal(tiposActuacionItem.getImportemaximo());
+										scsTipoActuacion.setImporte(importe);
+										scsTipoActuacion.setImportemaximo(importemaximo);												
+										scsTipoActuacion.setIdtipoasistencia(Short.parseShort(idtiposguardia));
+										scsTipoActuacion.setFechamodificacion(new Date());
+										scsTipoActuacion.setIdtipoactuacion(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
+										scsTipoActuacion.setUsumodificacion(usuario.getIdusuario());
+										scsTipoActuacion.setIdinstitucion(idInstitucion);
+										response = scsTipoActuacionMapper.insert(scsTipoActuacion);
+									}															
+								
+//									response = scsTipoActuacionMapper.insert(scsTipoActuacion2);
 								LOGGER.info(
 										"updateTiposAsistencias() / scsTipofundamentosExtendsMapper.updateByExample() -> Entrada a scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
 
@@ -366,8 +343,8 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 										"updateTiposAsistencias() / scsTipofundamentosExtendsMapper.updateByExample() -> Salida de scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
 							}
 						}
-					}
 					
+					}
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
@@ -393,468 +370,355 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 		return updateResponseDTO;
 	}
 
-	//
-	// @Override
-	// public UpdateResponseDTO deleteTipoAsitencia(TiposAsistenciasDTO
-	// tiposAsistenciasDTO, HttpServletRequest request) {
-	// LOGGER.info("updatePartidasPres() -> Entrada al servicio para guardar edicion
-	// de Partida presupuestaria");
-	//
-	// UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-	// Error error = new Error();
-	// int response = 0;
-	//
-	// String token = request.getHeader("Authorization");
-	// String dni = UserTokenUtils.getDniFromJWTToken(token);
-	// Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-	//
-	// int existentes = 0;
-	//
-	// if (null != idInstitucion) {
-	//
-	// AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-	// exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-	//
-	// LOGGER.info(
-	// "updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a
-	// admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	// List<AdmUsuarios> usuarios =
-	// admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	//
-	// LOGGER.info(
-	// "updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Salida de
-	// admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	// if (null != usuarios && usuarios.size() > 0) {
-	//
-	// try {
-	//
-	// for (TiposAsistenciaItem tiposAsistenciaItem :
-	// tiposAsistenciasDTO.getTiposAsistenciasItem()) {
-	//
-	// LOGGER.info(
-	// "updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example)
-	// -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos
-	// propios");
-	//
-	// ScsTipoasistenciacolegioExample example = new
-	// ScsTipoasistenciacolegioExample();
-	// example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-	// .andIdtipoasistenciacolegioEqualTo(
-	// Short.parseShort(tiposAsistenciaItem.getIdtipoasistenciacolegio()));
-	//
-	// List<ScsTipoasistenciacolegio> scsTipoasistenciacolegios =
-	// scsTipoAsistenciaColegioMapper
-	// .selectByExample(example);
-	// if (scsTipoasistenciacolegios != null && scsTipoasistenciacolegios.size() >
-	// 0) {
-	//
-	// ScsTipoasistenciacolegio scsTipoAsistencia =
-	// scsTipoasistenciacolegios.get(0);
-	// scsTipoAsistencia.setPordefecto(Short.parseShort("0"));
-	// scsTipoAsistencia.setFechaBaja(new Date());
-	// scsTipoAsistencia.setFechamodificacion(new Date());
-	// scsTipoAsistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
-	//
-	// LOGGER.info(
-	// "deleteCosteFijo() / scsTipoactuacioncostefijoMapper.updateByPrimaryKey() ->
-	// Entrada a scsTipoactuacioncostefijoMapper para dar de baja a un coste fijo");
-	//
-	// response =
-	// scsTipoAsistenciaColegioMapper.updateByPrimaryKey(scsTipoAsistencia);
-	//
-	// LOGGER.info(
-	// "deleteCosteFijo() / scsTipoactuacioncostefijoMapper.updateByPrimaryKey() ->
-	// Salida de scsTipoactuacioncostefijoMapper para dar de baja a un coste fijo");
-	// }
-	//
-	// }
-	//
-	// }
-	//
-	// catch (Exception e) {
-	// response = 0;
-	// error.setCode(400);
-	// error.setDescription("Se ha producido un error en BBDD contacte con su
-	// administrador");
-	// updateResponseDTO.setStatus(SigaConstants.KO);
-	// }
-	//
-	// if (response == 0 && error.getDescription() == null) {
-	// error.setCode(400);
-	// error.setDescription("No se ha modificado la partida presupuestaria");
-	// updateResponseDTO.setStatus(SigaConstants.KO);
-	// } else if (response == 1 && existentes != 0) {
-	// error.setCode(200);
-	// error.setDescription(
-	// "Se han modificiado la partida presupuestaria excepto algunos que tiene las
-	// mismas características");
-	//
-	// } else if (error.getCode() == null) {
-	// error.setCode(200);
-	// error.setDescription("Se ha modificado la partida presupuestaria
-	// correctamente");
-	// }
-	//
-	// updateResponseDTO.setError(error);
-	//
-	// LOGGER.info("updateCosteFijo() -> Salida del servicio para actualizar una
-	// partida presupuestaria");
-	//
-	// }
-	//
-	// }
-	// return updateResponseDTO;
-	// }
-	//
-	//
-	// @Override
-	// public UpdateResponseDTO activateTipoAsitencia(TiposAsistenciasDTO
-	// tiposAsistenciasDTO, HttpServletRequest request) {
-	// LOGGER.info("updatePartidasPres() -> Entrada al servicio para guardar edicion
-	// de Partida presupuestaria");
-	//
-	// UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
-	// Error error = new Error();
-	// int response = 0;
-	//
-	// String token = request.getHeader("Authorization");
-	// String dni = UserTokenUtils.getDniFromJWTToken(token);
-	// Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-	//
-	// int existentes = 0;
-	//
-	// if (null != idInstitucion) {
-	//
-	// AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-	// exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-	//
-	// LOGGER.info(
-	// "updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a
-	// admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	// List<AdmUsuarios> usuarios =
-	// admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	//
-	// LOGGER.info(
-	// "updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Salida de
-	// admUsuariosExtendsMapper para obtener información del usuario logeado");
-	//
-	// if (null != usuarios && usuarios.size() > 0) {
-	//
-	// try {
-	//
-	// for (TiposAsistenciaItem tiposAsistenciaItem :
-	// tiposAsistenciasDTO.getTiposAsistenciasItem()) {
-	//
-	// LOGGER.info(
-	// "updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example)
-	// -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos
-	// propios");
-	//
-	// ScsTipoasistenciacolegioExample example = new
-	// ScsTipoasistenciacolegioExample();
-	// example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-	// .andIdtipoasistenciacolegioEqualTo(
-	// Short.parseShort(tiposAsistenciaItem.getIdtipoasistenciacolegio()));
-	//
-	// List<ScsTipoasistenciacolegio> scsTipoasistenciacolegios =
-	// scsTipoAsistenciaColegioMapper
-	// .selectByExample(example);
-	// if (scsTipoasistenciacolegios != null && scsTipoasistenciacolegios.size() >
-	// 0) {
-	//
-	// ScsTipoasistenciacolegio scsTipoAsistencia =
-	// scsTipoasistenciacolegios.get(0);
-	//
-	// scsTipoAsistencia.setFechaBaja(null);
-	// scsTipoAsistencia.setFechamodificacion(new Date());
-	// scsTipoAsistencia.setUsumodificacion(usuarios.get(0).getIdusuario());
-	//
-	// LOGGER.info(
-	// "deleteCosteFijo() / scsTipoactuacioncostefijoMapper.updateByPrimaryKey() ->
-	// Entrada a scsTipoactuacioncostefijoMapper para dar de baja a un coste fijo");
-	//
-	// response =
-	// scsTipoAsistenciaColegioMapper.updateByPrimaryKey(scsTipoAsistencia);
-	//
-	// LOGGER.info(
-	// "deleteCosteFijo() / scsTipoactuacioncostefijoMapper.updateByPrimaryKey() ->
-	// Salida de scsTipoactuacioncostefijoMapper para dar de baja a un coste fijo");
-	// }
-	//
-	// }
-	//
-	// }
-	//
-	// catch (Exception e) {
-	// response = 0;
-	// error.setCode(400);
-	// error.setDescription("Se ha producido un error en BBDD contacte con su
-	// administrador");
-	// updateResponseDTO.setStatus(SigaConstants.KO);
-	// }
-	//
-	// if (response == 0 && error.getDescription() == null) {
-	// error.setCode(400);
-	// error.setDescription("No se ha modificado la partida presupuestaria");
-	// updateResponseDTO.setStatus(SigaConstants.KO);
-	// } else if (response == 1 && existentes != 0) {
-	// error.setCode(200);
-	// error.setDescription(
-	// "Se han modificiado la partida presupuestaria excepto algunos que tiene las
-	// mismas características");
-	//
-	// } else if (error.getCode() == null) {
-	// error.setCode(200);
-	// error.setDescription("Se ha modificado la partida presupuestaria
-	// correctamente");
-	// }
-	//
-	// updateResponseDTO.setError(error);
-	//
-	// LOGGER.info("updateCosteFijo() -> Salida del servicio para actualizar una
-	// partida presupuestaria");
-	//
-	// }
-	//
-	// }
-	// return updateResponseDTO;
-	// }
-	//
-	// @Override
-	// public InsertResponseDTO createTiposAsistencia(TiposAsistenciaItem
-	// tiposAsistenciaItem,
-	// HttpServletRequest request) {
-	// LOGGER.info("createFundamentosResolucion() -> Entrada al servicio para crear
-	// un fundamento resolucion");
-	//
-	// InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
-	// Error error = new Error();
-	// int response = 0;
-	//
-	// String token = request.getHeader("Authorization");
-	// String dni = UserTokenUtils.getDniFromJWTToken(token);
-	// Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-	//
-	// Integer idTipoAsistencia = null;
-	//
-	// ScsTipoasistenciacolegio scsTipoasistenciacolegio = null;
-	// TiposAsistenciasDTO tiposAsistenciaDTO = new TiposAsistenciasDTO();
-	//
-	// if (null != idInstitucion) {
-	//
-	// AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-	// exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-	//
-	// LOGGER.info(
-	// "createTiposAsistencia() / admUsuariosExtendsMapper.selectByExample() ->
-	// Entrada a admUsuariosExtendsMapper para obtener información del usuario
-	// logeado");
-	//
-	// List<AdmUsuarios> usuarios =
-	// admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-	//
-	// LOGGER.info(
-	// "createTiposAsistencia() / admUsuariosExtendsMapper.selectByExample() ->
-	// Salida de admUsuariosExtendsMapper para obtener información del usuario
-	// logeado");
-	//
-	// if (null != usuarios && usuarios.size() > 0) {
-	// AdmUsuarios usuario = usuarios.get(0);
-	//
-	// try {
-	//
-	// if (tiposAsistenciaItem != null) {
-	// ScsTipoasistenciacolegioExample example3 = new
-	// ScsTipoasistenciacolegioExample();
-	// example3.createCriteria().andIdinstitucionEqualTo(idInstitucion);
-	//
-	// String pordefectovalor = tiposAsistenciaItem.getPordefecto();
-	// List<TiposAsistenciaItem> tiposAsistenciaItems = null;
-	//
-	// if(pordefectovalor.equals("1")) {
-	// tiposAsistenciaItems =
-	// scsTipoasistenciaExtendsMapper.searchTiposAsistenciaPorDefecto(true,
-	// usuario.getIdlenguaje(), idInstitucion);
-	// for(TiposAsistenciaItem asistenciasActuales : tiposAsistenciaItems) {
-	// ScsTipoasistenciacolegio colegio = new ScsTipoasistenciacolegio();
-	//
-	// ScsTipoasistenciacolegioExample asistenciasNuevas = new
-	// ScsTipoasistenciacolegioExample();
-	// asistenciasNuevas.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-	// .andIdtipoasistenciacolegioEqualTo(Short.parseShort(asistenciasActuales.getIdtipoasistenciacolegio())).andPordefectoEqualTo(Short.parseShort("1"));
-	//
-	// if(tiposAsistenciaItem.getIdtipoasistenciacolegio() ==
-	// asistenciasActuales.getIdtipoasistenciacolegio()) {
-	// colegio.setPordefecto(Short.parseShort("1"));
-	// }else {
-	// colegio.setPordefecto(Short.parseShort("0"));
-	// }
-	// colegio.setIdinstitucion(idInstitucion);
-	// colegio.setIdtipoasistenciacolegio(Short.parseShort(asistenciasActuales.getIdtipoasistenciacolegio()));
-	// colegio.setUsumodificacion(usuario.getIdusuario());
-	// colegio.setFechamodificacion(new Date());
-	// scsTipoAsistenciaColegioMapper.updateByExampleSelective(colegio,
-	// asistenciasNuevas);
-	// }
-	// }
-	//
-	//
-	// // Buscamos si se encuentra la descripcion del nuevo fundamento
-	// GenRecursosCatalogosExample exampleRecursos = new
-	// GenRecursosCatalogosExample();
-	// exampleRecursos.createCriteria()
-	// .andDescripcionEqualTo(tiposAsistenciaItem.getTipoasistencia())
-	// .andCampotablaEqualTo("DESCRIPCION").andNombretablaEqualTo("SCS_TIPOASISTENCIACOLEGIO")
-	// .andIdinstitucionEqualTo(idInstitucion);
-	//
-	// List<GenRecursosCatalogos> recursos = genRecursosCatalogosExtendsMapper
-	// .selectByExample(exampleRecursos);
-	//
-	// if (recursos != null && recursos.size() > 0) {
-	// error.setCode(400);
-	// error.setDescription("messages.jgr.maestros.gestionFundamentosResolucion.existeFundamentosResolucionMismaDescripcion");
-	//
-	// } else {
-	//
-	// scsTipoasistenciacolegio = new ScsTipoasistenciacolegio();
-	// GenRecursosCatalogos genRecursosCatalogo = new GenRecursosCatalogos();
-	//
-	// genRecursosCatalogo.setCampotabla("DESCRIPCION");
-	// genRecursosCatalogo.setDescripcion(tiposAsistenciaItem.getTipoasistencia());
-	// genRecursosCatalogo.setFechamodificacion(new Date());
-	// genRecursosCatalogo.setIdinstitucion(idInstitucion);
-	// genRecursosCatalogo.setIdlenguaje(usuario.getIdlenguaje());
-	//
-	// NewIdDTO idRecursoBD = genRecursosCatalogosExtendsMapper
-	// .getMaxIdRecursoCatalogo(String.valueOf(idInstitucion),
-	// usuario.getIdlenguaje());
-	//
-	// if (idRecursoBD == null) {
-	// genRecursosCatalogo.setIdrecurso("1");
-	// } else {
-	// long idRecurso = Long.parseLong(idRecursoBD.getNewId()) + 1;
-	// genRecursosCatalogo.setIdrecurso(String.valueOf(idRecurso));
-	// }
-	//
-	// genRecursosCatalogo.setIdrecursoalias("SCS_TIPOASISTENCIACOLEGIO.descripcion."
-	// + idInstitucion
-	// + "." + genRecursosCatalogo.getIdrecurso());
-	//
-	// genRecursosCatalogo.setNombretabla("SCS_TIPOASISTENCIACOLEGIO");
-	// genRecursosCatalogo.setUsumodificacion(usuario.getUsumodificacion());
-	//
-	// LOGGER.info(
-	// "createFundamentosResolucion() /
-	// genRecursosCatalogosExtendsMapper.selectByExample(example) -> Entrada a
-	// genRecursosCatalogosExtendsMapper para guardar descripcion");
-	//
-	// response = genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
-	//
-	// LOGGER.info(
-	// "createFundamentosResolucion() /
-	// genRecursosCatalogosExtendsMapper.selectByExample(example) -> Salida a
-	// genRecursosCatalogosExtendsMapper para guardar descripcion");
-	//
-	// scsTipoasistenciacolegio.setDescripcion(genRecursosCatalogo.getIdrecurso());
-	//
-	// insertarRestoIdiomas(genRecursosCatalogo);
-	//
-	// LOGGER.info(
-	// "createFundamentosResolucion() /
-	// scsTipofundamentosExtendsMapper.getIdFundamentoResolucion(example) -> Entrada
-	// a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
-	//
-	// NewIdDTO idF =
-	// scsTipoAsistenciaColegioExtendsMapper.getIdTipoasistenciacolegio(idInstitucion);
-	//
-	// LOGGER.info(
-	// "createFundamentosResolucion() /
-	// scsTipofundamentosExtendsMapper.getIdFundamentoResolucion(example) -> Salida
-	// a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
-	//
-	// if (idF == null) {
-	// scsTipoasistenciacolegio.setIdtipoasistenciacolegio((short) 1);
-	// } else {
-	// idTipoAsistencia = (Integer.parseInt(idF.getNewId()) + 1);
-	// scsTipoasistenciacolegio.setIdtipoasistenciacolegio(Short.valueOf(idTipoAsistencia.toString()));
-	// }
-	// BigDecimal importe = new BigDecimal(tiposAsistenciaItem.getImporte());
-	// BigDecimal importemaximo = new
-	// BigDecimal(tiposAsistenciaItem.getImportemaximo());
-	// scsTipoasistenciacolegio.setImporte(importe);
-	// scsTipoasistenciacolegio.setImportemaximo(importemaximo);
-	// scsTipoasistenciacolegio.setPordefecto(Short.parseShort(tiposAsistenciaItem.getPordefecto()));
-	// scsTipoasistenciacolegio.setVisiblemovil(Short.parseShort(tiposAsistenciaItem.getVisiblemovil()));
-	// scsTipoasistenciacolegio.setFechamodificacion(new Date());
-	// scsTipoasistenciacolegio.setUsumodificacion(usuarios.get(0).getIdusuario());
-	// scsTipoasistenciacolegio.setIdinstitucion(idInstitucion);
-	//
-	// LOGGER.info(
-	// "createFundamentosResolucion() /
-	// scsTipofundamentosExtendsMapper.updateByExample() -> Entrada a
-	// scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
-	//
-	// response = scsTipoAsistenciaColegioMapper.insert(scsTipoasistenciacolegio);
-	//
-	//
-	// LOGGER.info(
-	// "createFundamentosResolucion() /
-	// scsTipofundamentosExtendsMapper.updateByExample() -> Salida de
-	// scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
-	//
-	// String[] multiSelectTipos =
-	// tiposAsistenciaItem.getIdtiposguardia().trim().split(",");
-	//
-	//
-	// if (multiSelectTipos[0] != "")
-	// for (String idtiposguardia : multiSelectTipos) {
-	// ScsTipoasistenciaguardia tipoAsistenciaGuardia = new
-	// ScsTipoasistenciaguardia();
-	// tipoAsistenciaGuardia.setFechamodificacion(new Date());
-	// tipoAsistenciaGuardia.setIdinstitucion(idInstitucion);
-	// tipoAsistenciaGuardia.setIdtipoasistenciacolegio(Short.parseShort(idTipoAsistencia.toString()));
-	// tipoAsistenciaGuardia.setUsumodificacion(usuarios.get(0).getIdusuario());
-	// tipoAsistenciaGuardia.setIdtipoguardia(Short.parseShort(idtiposguardia));
-	// scsTipoAsistenciaGuardiaMapper.insert(tipoAsistenciaGuardia);
-	// }
-	// }
-	//
-	// }
-	// }
-	// catch (Exception e) {
-	// response = 0;
-	// error.setCode(400);
-	// error.setDescription("general.mensaje.error.bbdd");
-	// insertResponseDTO.setStatus(SigaConstants.KO);
-	// }
-	//
-	//
-	// }
-	//
-	// if (response == 0 && error.getDescription() == null) {
-	// error.setCode(400);
-	// insertResponseDTO.setStatus(SigaConstants.KO);
-	// } else if (error.getCode() == null) {
-	// error.setCode(200);
-	// insertResponseDTO.setStatus(SigaConstants.OK);
-	// insertResponseDTO.setId(String.valueOf(scsTipoasistenciacolegio.getIdtipoasistenciacolegio()));
-	//
-	// }
-	//
-	// insertResponseDTO.setError(error);
-	//
-	// LOGGER.info("createFundamentosResolucion() -> Salida del servicio para crear
-	// un fundamento de resolucion");
-	//
-	// }
-	// return insertResponseDTO;
-	// }
-	//
-	//
-	//
+	@Override
+	public UpdateResponseDTO deleteTipoActuacion(TiposActuacionDTO tiposActuacionDTO, HttpServletRequest request) {
+		LOGGER.info("updatePartidasPres() ->  Entrada al servicio para guardar edicion de Partida presupuestaria");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		int existentes = 0;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					for (TiposActuacionItem tiposActuacionItem : tiposActuacionDTO.getTiposActuacionItem()) {
+
+						LOGGER.info(
+								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
+
+						ScsTipoactuacionExample example = new ScsTipoactuacionExample();
+						example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
+
+						List<ScsTipoactuacion> scsTipoactuacionExample = scsTipoActuacionMapper
+								.selectByExample(example);					
+						
+						if (scsTipoactuacionExample != null && scsTipoactuacionExample.size() > 0) {
+							
+							ScsTipoactuacion scsTipoActuaciones = scsTipoactuacionExample.get(0);
+							scsTipoActuaciones.setFechabaja(new Date());
+							scsTipoActuaciones.setFechamodificacion(new Date());
+							scsTipoActuaciones.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+							LOGGER.info(
+									"deleteCosteFijo() / scsTipoactuacioncostefijoMapper.updateByPrimaryKey() -> Entrada a scsTipoactuacioncostefijoMapper para dar de baja a un coste fijo");
+
+							response = scsTipoActuacionMapper.updateByPrimaryKey(scsTipoActuaciones);
+
+							LOGGER.info(
+									"deleteCosteFijo() / scsTipoactuacioncostefijoMapper.updateByPrimaryKey() -> Salida de scsTipoactuacioncostefijoMapper para dar de baja a un coste fijo");
+							}
+						
+					}
+
+				}
+
+				catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+
+				if (response == 0 && error.getDescription() == null) {
+					error.setCode(400);
+					error.setDescription("No se ha modificado la partida presupuestaria");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				} else if (response == 1 && existentes != 0) {
+					error.setCode(200);
+					error.setDescription(
+							"Se han modificiado la partida presupuestaria excepto algunos que tiene las mismas características");
+
+				} else if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha modificado la partida presupuestaria correctamente");
+				}
+
+				updateResponseDTO.setError(error);
+
+				LOGGER.info("updateCosteFijo() -> Salida del servicio para actualizar una partida presupuestaria");
+
+			}
+
+		}
+		return updateResponseDTO;
+	}
+	
+	@Override
+	public UpdateResponseDTO activateTipoActuacion(TiposActuacionDTO tiposActuacionDTO, HttpServletRequest request) {
+		LOGGER.info("updatePartidasPres() ->  Entrada al servicio para guardar edicion de Partida presupuestaria");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		int existentes = 0;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					for (TiposActuacionItem tiposActuacionItem : tiposActuacionDTO.getTiposActuacionItem()) {
+
+						LOGGER.info(
+								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
+
+						ScsTipoactuacionExample example = new ScsTipoactuacionExample();
+						example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
+
+						List<ScsTipoactuacion> scsTipoactuacionExample = scsTipoActuacionMapper
+								.selectByExample(example);	
+						if (scsTipoactuacionExample != null && scsTipoactuacionExample.size() > 0) {
+
+							ScsTipoactuacion scsTipoActuaciones = scsTipoactuacionExample.get(0);
+							scsTipoActuaciones.setFechabaja(null);
+							scsTipoActuaciones.setFechamodificacion(new Date());
+							scsTipoActuaciones.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+							LOGGER.info(
+									"deleteCosteFijo() / scsTipoactuacioncostefijoMapper.updateByPrimaryKey() -> Entrada a scsTipoactuacioncostefijoMapper para dar de baja a un coste fijo");
+
+							response = scsTipoActuacionMapper.updateByPrimaryKey(scsTipoActuaciones);
+
+							LOGGER.info(
+									"deleteCosteFijo() / scsTipoactuacioncostefijoMapper.updateByPrimaryKey() -> Salida de scsTipoactuacioncostefijoMapper para dar de baja a un coste fijo");
+						}
+						
+					}
+
+				}
+
+				catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+
+				if (response == 0 && error.getDescription() == null) {
+					error.setCode(400);
+					error.setDescription("No se ha modificado la partida presupuestaria");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				} else if (response == 1 && existentes != 0) {
+					error.setCode(200);
+					error.setDescription(
+							"Se han modificiado la partida presupuestaria excepto algunos que tiene las mismas características");
+
+				} else if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha modificado la partida presupuestaria correctamente");
+				}
+
+				updateResponseDTO.setError(error);
+
+				LOGGER.info("updateCosteFijo() -> Salida del servicio para actualizar una partida presupuestaria");
+
+			}
+
+		}
+		return updateResponseDTO;
+	}	
+	
+	
+	@Override
+	public InsertResponseDTO createTiposActuacion(TiposActuacionItem tiposActuacionItem,
+			HttpServletRequest request) {
+		LOGGER.info("createFundamentosResolucion() ->  Entrada al servicio para crear un fundamento resolucion");
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		Integer idTipoActuacion = null;
+
+		ScsTipoactuacion scsTipoactuacion = null;
+		
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"createTiposAsistencia() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"createTiposAsistencia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+
+				try {
+
+					if (tiposActuacionItem != null) {							
+							ScsTipoactuacionExample example3 = new ScsTipoactuacionExample();
+							example3.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+					
+						// Buscamos si se encuentra la descripcion del nuevo fundamento
+						GenRecursosCatalogosExample exampleRecursos = new GenRecursosCatalogosExample();
+						exampleRecursos.createCriteria()
+								.andDescripcionEqualTo(tiposActuacionItem.getDescripciontipoactuacion())
+								.andCampotablaEqualTo("DESCRIPCION").andNombretablaEqualTo("SCS_TIPOACTUACION")
+								.andIdinstitucionEqualTo(idInstitucion);
+
+						List<GenRecursosCatalogos> recursos = genRecursosCatalogosExtendsMapper
+								.selectByExample(exampleRecursos);
+
+						if (recursos != null && recursos.size() > 0) {
+							error.setCode(400);
+							error.setDescription("messages.jgr.maestros.gestionFundamentosResolucion.existeFundamentosResolucionMismaDescripcion");
+
+						} else {
+
+							scsTipoactuacion = new ScsTipoactuacion();
+							GenRecursosCatalogos genRecursosCatalogo = new GenRecursosCatalogos();
+
+							genRecursosCatalogo.setCampotabla("DESCRIPCION");
+							genRecursosCatalogo.setDescripcion(tiposActuacionItem.getDescripciontipoactuacion());
+							genRecursosCatalogo.setFechamodificacion(new Date());
+							genRecursosCatalogo.setIdinstitucion(idInstitucion);
+							genRecursosCatalogo.setIdlenguaje(usuario.getIdlenguaje());
+
+							NewIdDTO idRecursoBD = genRecursosCatalogosExtendsMapper
+									.getMaxIdRecursoCatalogo(String.valueOf(idInstitucion), usuario.getIdlenguaje());
+
+							if (idRecursoBD == null) {
+								genRecursosCatalogo.setIdrecurso("1");
+							} else {
+								long idRecurso = Long.parseLong(idRecursoBD.getNewId()) + 1;
+								genRecursosCatalogo.setIdrecurso(String.valueOf(idRecurso));
+							}
+
+							genRecursosCatalogo.setIdrecursoalias("SCS_TIPOACTUACION.descripcion." + idInstitucion
+									+ "." + genRecursosCatalogo.getIdrecurso());
+
+							genRecursosCatalogo.setNombretabla("SCS_TIPOACTUACION");
+							genRecursosCatalogo.setUsumodificacion(usuario.getUsumodificacion());
+
+							LOGGER.info(
+									"createFundamentosResolucion() / genRecursosCatalogosExtendsMapper.selectByExample(example) -> Entrada a genRecursosCatalogosExtendsMapper para guardar descripcion");
+
+							response = genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogo);
+
+							LOGGER.info(
+									"createFundamentosResolucion() / genRecursosCatalogosExtendsMapper.selectByExample(example) -> Salida a genRecursosCatalogosExtendsMapper para guardar descripcion");
+
+							scsTipoactuacion.setDescripcion(genRecursosCatalogo.getIdrecurso());
+
+							insertarRestoIdiomas(genRecursosCatalogo);
+
+							LOGGER.info(
+									"createFundamentosResolucion() / scsTipofundamentosExtendsMapper.getIdFundamentoResolucion(example) -> Entrada a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
+
+							NewIdDTO idF = scsTipoactuacionExtendsMapper.getIdTipoactuacion(idInstitucion);
+
+							LOGGER.info(
+									"createFundamentosResolucion() / scsTipofundamentosExtendsMapper.getIdFundamentoResolucion(example) -> Salida a scsTipofundamentosExtendsMapper para buscar  un fundamento resolucion");
+
+							if (idF == null) {
+								scsTipoactuacion.setIdtipoactuacion((short) 1);
+							} else {
+								idTipoActuacion = (Integer.parseInt(idF.getNewId()) + 1);
+								scsTipoactuacion.setIdtipoactuacion(Short.valueOf(idTipoActuacion.toString()));
+							}						
+
+							LOGGER.info(
+									"createFundamentosResolucion() / scsTipofundamentosExtendsMapper.updateByExample() -> Entrada a scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
+								
+							LOGGER.info(
+									"createFundamentosResolucion() / scsTipofundamentosExtendsMapper.updateByExample() -> Salida de scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
+							
+							String[] multiSelectTipos = tiposActuacionItem.getIdtipoasistencia().trim().split(",");
+
+
+							if (multiSelectTipos[0] != "")
+								for (String idtiposasistencias : multiSelectTipos) {
+									BigDecimal importe = new BigDecimal(tiposActuacionItem.getImporte());
+									BigDecimal importemaximo = new BigDecimal(tiposActuacionItem.getImportemaximo());
+									scsTipoactuacion.setImporte(importe);
+									scsTipoactuacion.setImportemaximo(importemaximo);
+									scsTipoactuacion.setFechamodificacion(new Date());
+									scsTipoactuacion.setUsumodificacion(usuarios.get(0).getIdusuario());
+									scsTipoactuacion.setIdinstitucion(idInstitucion);
+									scsTipoactuacion.setIdtipoactuacion(Short.parseShort(idTipoActuacion.toString()));
+									scsTipoactuacion.setIdtipoasistencia(Short.parseShort(idtiposasistencias));
+									scsTipoActuacionMapper.insert(scsTipoactuacion);
+								}
+								
+						}
+
+					}
+					}
+				 catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					insertResponseDTO.setStatus(SigaConstants.KO);
+				}
+			
+
+		}
+
+		if (response == 0 && error.getDescription() == null) {
+			error.setCode(400);
+			insertResponseDTO.setStatus(SigaConstants.KO);
+		} else if (error.getCode() == null) {
+			error.setCode(200);
+			insertResponseDTO.setStatus(SigaConstants.OK);
+			insertResponseDTO.setId(String.valueOf(scsTipoactuacion.getIdtipoactuacion()));
+
+		}
+
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("createFundamentosResolucion() -> Salida del servicio para crear un fundamento de resolucion");
+
+		}
+		return insertResponseDTO;
+	}
+				
+	
 	private int insertarRestoIdiomas(GenRecursosCatalogos genRecursosCatalogo) {
 
 		int response = 1;
