@@ -1,37 +1,26 @@
 package org.itcgae.siga.scs.services.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.AreasItem;
-import org.itcgae.siga.DTO.scs.CosteFijoDTO;
-import org.itcgae.siga.DTO.scs.CosteFijoItem;
 import org.itcgae.siga.DTO.scs.PartidasDTO;
 import org.itcgae.siga.DTO.scs.PartidasItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.ScsArea;
 import org.itcgae.siga.db.entities.ScsPartidapresupuestaria;
 import org.itcgae.siga.db.entities.ScsPartidapresupuestariaExample;
-import org.itcgae.siga.db.entities.ScsProcedimientos;
-import org.itcgae.siga.db.entities.ScsTipoactuacioncostefijo;
-import org.itcgae.siga.db.entities.ScsTipoactuacioncostefijoExample;
 import org.itcgae.siga.db.mappers.ScsPartidapresupuestariaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPartidasPresupuestariasExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsProcedimientosExtendsMapper;
-import org.itcgae.siga.scs.service.IModulosYBasesService;
 import org.itcgae.siga.scs.service.IPartidasPresupuestariasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +37,9 @@ public class FichaPartidasPresupuestariasServiceImpl implements IPartidasPresupu
 
 	@Autowired
 	private ScsPartidasPresupuestariasExtendsMapper scsPartidaPresupuestariaExtendsMapper;
+
+	@Autowired
+	private ScsPartidapresupuestariaMapper scsPartidapresupuestariaMapper;
 
 	@Override
 	public PartidasDTO searchPartida(PartidasItem partidasItem, HttpServletRequest request) {
@@ -332,19 +324,18 @@ public class FichaPartidasPresupuestariasServiceImpl implements IPartidasPresupu
 
 				try {
 
-					PartidasItem ejemplo = new PartidasItem();
-					ejemplo.setNombrepartida(partidasItem.getNombrepartida());
-//					ejemplo.setDescripcion(partidasItem.getDescripcion());
-					ejemplo.setIdinstitucion(idInstitucion.toString());  
+					ScsPartidapresupuestariaExample ejemplo = new ScsPartidapresupuestariaExample();
+					ejemplo.createCriteria().andNombrepartidaEqualTo(partidasItem.getNombrepartida())
+					.andIdinstitucionEqualTo(idInstitucion);  
 					
-					List<PartidasItem> nombrePartidasDuplicadas = scsPartidaPresupuestariaExtendsMapper.searchPartida(ejemplo);
+					List<ScsPartidapresupuestaria> nombrePartidasDuplicadas = scsPartidapresupuestariaMapper.selectByExample(ejemplo);
 
-					PartidasItem ejemplo2 = new PartidasItem();
-//					ejemplo.setNombrepartida(partidasItem.getNombrepartida());
-					ejemplo2.setDescripcion(partidasItem.getDescripcion());
-					ejemplo2.setIdinstitucion(idInstitucion.toString());  
+
+					ScsPartidapresupuestariaExample ejemplo2 = new ScsPartidapresupuestariaExample();
+					ejemplo2.createCriteria().andDescripcionEqualTo(partidasItem.getDescripcion())
+					.andIdinstitucionEqualTo(idInstitucion);  
 					
-					List<PartidasItem> descripcionPartidasDuplicadas = scsPartidaPresupuestariaExtendsMapper.searchPartida(ejemplo2);
+					List<ScsPartidapresupuestaria> descripcionPartidasDuplicadas = scsPartidapresupuestariaMapper.selectByExample(ejemplo2);
 					
 					LOGGER.info(
 							"updateGroupZone() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Salida a scsPartidaPresupuestariaExtendsMapper para buscar la partida");

@@ -283,7 +283,7 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
+		List<ScsMaestroretenciones> scsRetencionesList= null;
 		if (null != idInstitucion) {
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -303,21 +303,32 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 				for (RetencionIRPFItem retencionItem : retencionDTO.getRetencionIrpfItems()) {
 
 					try {
-						// Obtenemos el fundamento de resolucion que queremos modificar
 						ScsMaestroretencionesExample example = new ScsMaestroretencionesExample();
+
+						// Obtenemos el fundamento de resolucion que queremos modificar
+						if (retencionItem.getDescripcionSociedad() != null
+								&& retencionItem.getDescripcionSociedad() != "") {
 						example.createCriteria()
 								.andIdretencionNotEqualTo(Integer.valueOf(retencionItem.getIdRetencion()))
 								.andLetranifsociedadEqualTo(retencionItem.getDescripcionSociedad())
 								.andFechabajaIsNull();
-
+						
 						LOGGER.info(
 								"updateRetenciones() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Entrada a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
 
-						List<ScsMaestroretenciones> scsRetencionesList = scsRetencionesirpfExtendsMapper
+						scsRetencionesList = scsRetencionesirpfExtendsMapper
 								.selectByExample(example);
+						}
+						
+						example = new ScsMaestroretencionesExample();
+						example.createCriteria()
+						.andIdretencionEqualTo(Integer.valueOf(retencionItem.getIdRetencion()))
+						.andFechabajaIsNull();
+						List<ScsMaestroretenciones> scsRetencionesListAux = scsRetencionesirpfExtendsMapper.selectByExample(example);
 
 						GenRecursosCatalogosExample genRecursosCatalogosExample = new GenRecursosCatalogosExample();
 						genRecursosCatalogosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdrecursoNotEqualTo(scsRetencionesListAux.get(0).getDescripcion())
 								.andDescripcionEqualTo(retencionItem.getDescripcion());
 						List<GenRecursosCatalogos> scsRetencionesList2 = genRecursosCatalogosExtendsMapper
 								.selectByExample(genRecursosCatalogosExample);
@@ -352,8 +363,9 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 							maestros.setUsumodificacion(usuario.getIdusuario().intValue());
 
 							maestros.setClavem190(retencionItem.getClaveModelo());
-							maestros.setLetranifsociedad(retencionItem.getDescripcionSociedad());
-
+							if(retencionItem.getDescripcionSociedad() != null)
+								maestros.setLetranifsociedad(retencionItem.getDescripcionSociedad());
+							
 							GenRecursosCatalogos genRecursosCatalogos = new GenRecursosCatalogos();
 							genRecursosCatalogos.setIdrecurso(maestros.getDescripcion());
 							genRecursosCatalogos.setIdlenguaje(usuarios.get(0).getIdlenguaje());
