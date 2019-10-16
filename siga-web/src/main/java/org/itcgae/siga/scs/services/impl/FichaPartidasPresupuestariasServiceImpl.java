@@ -355,15 +355,13 @@ public class FichaPartidasPresupuestariasServiceImpl implements IPartidasPresupu
 						error.setDescription("Este nombre ya existe");
 
 					} else {
-						String importe2 = partidasItem.getImportepartida().toString();
-						String numerofinal = importe2.replaceAll(",", ".");
-						BigDecimal importe = new BigDecimal(numerofinal);
+
 						ScsPartidapresupuestaria partida = new ScsPartidapresupuestaria();
 						partida.setDescripcion(partidasItem.getDescripcion());
 						partida.setNombrepartida(partidasItem.getNombrepartida());
 						partida.setFechamodificacion(new Date());
 						partida.setIdinstitucion(idInstitucion);
-						partida.setImportepartida(importe);
+						partida.setImportepartida(BigDecimal.valueOf(Double.valueOf(partidasItem.getImportepartida())));
 						partida.setFechabaja(null);
 						partida.setUsumodificacion(usuarios.get(0).getIdusuario());
 						
