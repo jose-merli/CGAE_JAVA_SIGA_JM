@@ -22,6 +22,7 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ExpExpediente;
 import org.itcgae.siga.db.entities.ExpExpedienteExample;
 import org.itcgae.siga.db.entities.ScsArea;
+import org.itcgae.siga.db.entities.ScsAreaExample;
 import org.itcgae.siga.db.entities.ScsMateria;
 import org.itcgae.siga.db.entities.ScsMateriaExample;
 import org.itcgae.siga.db.entities.ScsMateriajurisdiccion;
@@ -29,6 +30,7 @@ import org.itcgae.siga.db.entities.ScsMateriajurisdiccionExample;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.mappers.ExpExpedienteMapper;
+import org.itcgae.siga.db.mappers.ScsAreaMapper;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAreasMateriasExtendsMapper;
@@ -54,6 +56,9 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 
 	@Autowired
 	private ScsAreasMateriasExtendsMapper scsAreasMateriasExtendsMapper;
+
+	@Autowired
+	private ScsAreaMapper scsAreasMapper;
 	
 	@Autowired
 	private ScsMateriaExtendsMapper scsMateriaExtendsMapper;
@@ -185,7 +190,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 						area.setContenido(areasItem.getContenido());
 						area.setFechamodificacion(new Date());
 						area.setIdarea(Short.parseShort(areasItem.getIdArea()));
-						area.setIdinstitucion(areasItem.getidInstitucion());
+						area.setIdinstitucion(idInstitucion);
 						area.setNombre(areasItem.getNombreArea());
 						area.setUsumodificacion(usuarios.get(0).getIdusuario());
 
@@ -338,11 +343,11 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 
 				try {
 
-					AreasItem ejemplo = new AreasItem();
-					ejemplo.setNombreArea(areasItem.getNombreArea());
-					ejemplo.setidInstitucion(idInstitucion);
+					ScsAreaExample example = new ScsAreaExample();
+					example.createCriteria().andNombreEqualTo(areasItem.getNombreArea())
+					.andIdinstitucionEqualTo(idInstitucion);
 					
-					List<AreasItem> areasDuplicadas = scsAreasMateriasExtendsMapper.searchAreas(ejemplo);
+					List<ScsArea> areasDuplicadas = scsAreasMapper.selectByExample(example);
 
 					LOGGER.info(
 							"updateGroupZone() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
