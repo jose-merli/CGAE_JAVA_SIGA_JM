@@ -6,6 +6,7 @@ import org.itcgae.siga.DTO.scs.AreasDTO;
 import org.itcgae.siga.DTO.scs.CosteFijoDTO;
 import org.itcgae.siga.DTO.scs.FundamentoResolucionItem;
 import org.itcgae.siga.DTO.scs.TiposActuacionDTO;
+import org.itcgae.siga.DTO.scs.TiposActuacionItem;
 import org.itcgae.siga.DTO.scs.TiposAsistenciaItem;
 import org.itcgae.siga.DTO.scs.TiposAsistenciasDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -38,32 +39,32 @@ public class TiposActuacionController {
 	
 	@RequestMapping(value = "/gestionTiposAsistencia/ComboTiposActuacion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getTiposAsistencia(HttpServletRequest request) {
-		ComboDTO response = TiposActuacionService.getTiposAsistencia(request);
+		ComboDTO response = TiposActuacionService.getTiposActuacion(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
-//	
-//	@RequestMapping(value = "/gestionTiposAsistencia/deleteTipoAsitencia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<UpdateResponseDTO> deleteTipoAsitencia(@RequestBody TiposAsistenciasDTO tiposAsistenciasDTO, HttpServletRequest request) {
-//
-//		UpdateResponseDTO response = TiposAsistenciaService.deleteTipoAsitencia(tiposAsistenciasDTO, request);
-//		if (response.getError().getCode() == 200)
-//			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-//		else
-//			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-//
-//	}
-//	
-//	@RequestMapping(value = "/gestionTiposAsistencia/activateTipoAsitencia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<UpdateResponseDTO> activateTipoAsitencia(@RequestBody TiposAsistenciasDTO tiposAsistenciasDTO, HttpServletRequest request) {
-//
-//		UpdateResponseDTO response = TiposAsistenciaService.activateTipoAsitencia(tiposAsistenciasDTO, request);
-//		if (response.getError().getCode() == 200)
-//			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
-//		else
-//			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-//
-//	}
-//	
+	
+	@RequestMapping(value = "/gestionTiposActuacion/deleteTipoActuacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> deleteTipoAsitencia(@RequestBody TiposActuacionDTO tiposActuacionDTO, HttpServletRequest request) {
+
+		UpdateResponseDTO response = TiposActuacionService.deleteTipoActuacion(tiposActuacionDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
+	@RequestMapping(value = "/gestionTiposActuacion/activateTipoActuacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> activateTipoAsitencia(@RequestBody TiposActuacionDTO tiposActuacionDTO, HttpServletRequest request) {
+
+		UpdateResponseDTO response = TiposActuacionService.activateTipoActuacion(tiposActuacionDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
 	@RequestMapping(value = "/gestionTiposActuacion/updateTiposActuacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updateTiposAsistencias(@RequestBody TiposActuacionDTO tiposActuacionDTO, HttpServletRequest request) {
 
@@ -74,15 +75,15 @@ public class TiposActuacionController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
-//	
-//	@RequestMapping(value = "/gestionTiposAsistencia/createTipoAsistencia", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<InsertResponseDTO> createTipoAsistencia(@RequestBody TiposAsistenciaItem tiposAsistenciaItem, HttpServletRequest request) {
-//
-//		InsertResponseDTO response = TiposAsistenciaService.createTiposAsistencia(tiposAsistenciaItem, request);
-//		if (response.getError().getCode() == 200)
-//			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
-//		else
-//			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-//
-//	}
+	
+	@RequestMapping(value = "/gestionTiposActuacion/createTipoActuacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> createTipoAsistencia(@RequestBody TiposActuacionItem tiposAsistenciaItem, HttpServletRequest request) {
+
+		InsertResponseDTO response = TiposActuacionService.createTiposActuacion(tiposAsistenciaItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
 }
