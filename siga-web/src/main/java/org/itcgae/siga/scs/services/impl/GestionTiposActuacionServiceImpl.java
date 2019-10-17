@@ -28,6 +28,7 @@ import org.itcgae.siga.db.mappers.ScsActuacionasistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsTipoactuacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTipoActuacionAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoactuacionExtendsMapper;
 import org.itcgae.siga.scs.service.IGestionTiposActuacionService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -48,6 +49,8 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 	@Autowired
 	private ScsActuacionasistenciaMapper scsActuacionAsistenciaMapper;
 	
+	@Autowired
+	private ScsTipoActuacionAsistenciaExtendsMapper scsActuacionAsistenciaExtendsMapper;
 	
 	@Autowired
 	private ScsTipoactuacionMapper scsTipoActuacionMapper;
@@ -212,7 +215,7 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 							if (recursosRepetidos != null && recursosRepetidos.size() > 1) {
 								error.setCode(400);
 								error.setDescription(
-										"messages.jgr.maestros.gestionFundamentosResolucion.existeTipoAsistenciaMismaDescripcion");
+										"messages.jgr.maestros.gestionFundamentosResolucion.existeTipoActuacionMismaDescripcion");
 							} else {
 
 								// Si no se repite se modifica tanto la el fundamento como la descripcion del
@@ -269,7 +272,7 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 											andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion())).
 											andIdtipoasistenciaEqualTo(Short.parseShort(idtiposasistencia.trim()));
 											
-											List<ScsActuacionasistencia> listaActuacionAsistencia = scsActuacionAsistenciaMapper.selectByExample(actuacionAsistenciaExample);
+											List<ScsActuacionasistencia> listaActuacionAsistencia = scsActuacionAsistenciaExtendsMapper.selectTiposActuacionasistencia(tiposActuacionItem, idtiposasistencia);
 											
 											if(listaActuacionAsistencia != null && listaActuacionAsistencia.size() > 0) {
 												TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
@@ -593,7 +596,7 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 						if (recursos != null && recursos.size() > 0) {
 							error.setCode(400);
 							error.setDescription(
-									"messages.jgr.maestros.gestionFundamentosResolucion.existeFundamentosResolucionMismaDescripcion");
+									"messages.jgr.maestros.gestionFundamentosResolucion.existeTipoActuacionMismaDescripcion");
 
 						} else {
 
