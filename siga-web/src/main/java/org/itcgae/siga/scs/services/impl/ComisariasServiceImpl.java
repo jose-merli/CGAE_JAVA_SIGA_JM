@@ -339,6 +339,7 @@ public class ComisariasServiceImpl implements IComisariasService {
 						comisaria.setIdprovincia(comisariaItem.getIdProvincia());
 						comisaria.setTelefono1(comisariaItem.getTelefono1());
 						comisaria.setTelefono2(comisariaItem.getTelefono2());
+						comisaria.setFax1(comisariaItem.getFax1());
 						comisaria.setCodigoext(comisariaItem.getCodigoExt());
 						comisaria.setVisiblemovil(comisariaItem.getVisibleMovil());
 						comisaria.setEmail(comisariaItem.getEmail());
@@ -436,6 +437,7 @@ public class ComisariasServiceImpl implements IComisariasService {
 						comisaria.setIdprovincia(comisariaItem.getIdProvincia());
 						comisaria.setTelefono1(comisariaItem.getTelefono1());
 						comisaria.setTelefono2(comisariaItem.getTelefono2());
+						comisaria.setFax1(comisariaItem.getFax1());
 						comisaria.setCodigoext(comisariaItem.getCodigoExt());
 						comisaria.setEmail(comisariaItem.getEmail());
 						comisaria.setVisiblemovil(comisariaItem.getVisibleMovil());

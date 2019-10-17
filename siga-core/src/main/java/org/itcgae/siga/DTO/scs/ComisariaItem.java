@@ -20,11 +20,21 @@ public class ComisariaItem {
 	private Date fechabaja;
 	private String telefono1;
 	private String telefono2;
+	private String fax1;
 	private String codigoExt;
 	private String email;
 	private String nombrePoblacion;
 	private String nombreProvincia;
 	private Short visibleMovil;
+	
+	@JsonProperty("fax1")
+	public String getFax1() {
+		return fax1;
+	}
+
+	public void setFax1(String fax1) {
+		this.fax1 = fax1;
+	}
 	
 	@JsonProperty("fechabaja")
 	public Date getFechaBaja() {
@@ -393,4 +403,5 @@ public class ComisariaItem {
 		}
 		return o.toString().replace("\n", "\n    ");
 	}
+
 }
