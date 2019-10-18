@@ -57,3 +57,9 @@ update gen_diccionario set Descripcion = 'Código Externo' where idrecurso = 'ge
 update gen_diccionario set Descripcion = 'Codi Externo' where idrecurso = 'general.codeext' and idlenguaje = 2;
 update gen_diccionario set Descripcion = 'Código Externo' where idrecurso = 'general.codeext' and idlenguaje = 3;
 update gen_diccionario set Descripcion = 'Código Externo' where idrecurso = 'general.codeext' and idlenguaje = 4;
+
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.gestionprocedimientos','Gestión Módulos','0','1',to_date('04/02/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.gestionprocedimientos','Gestión Mòduls','0','2',to_date('04/02/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.gestionprocedimientos','Gestión Módulos#EU','0','3',to_date('04/02/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.gestionprocedimientos','Gestión Módulos#GL','0','4',to_date('04/02/19','DD/MM/RR'),'0','19');
