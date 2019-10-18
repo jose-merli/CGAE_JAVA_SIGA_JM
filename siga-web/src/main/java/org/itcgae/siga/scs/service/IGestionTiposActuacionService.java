@@ -30,4 +30,6 @@ public interface IGestionTiposActuacionService {
 
 	public InsertResponseDTO createTiposActuacion(TiposActuacionItem tiposActuacionItem, HttpServletRequest request);
 
+	
+
 }

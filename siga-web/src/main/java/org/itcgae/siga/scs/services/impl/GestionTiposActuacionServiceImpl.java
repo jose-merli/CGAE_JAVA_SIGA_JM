@@ -1,116 +1,59 @@
 package org.itcgae.siga.scs.services.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.ibatis.jdbc.SQL;
 import org.apache.log4j.Logger;
-import org.itcgae.siga.DTO.scs.AcreditacionDTO;
-import org.itcgae.siga.DTO.scs.AcreditacionItem;
-import org.itcgae.siga.DTO.scs.AreasDTO;
-import org.itcgae.siga.DTO.scs.AreasItem;
-import org.itcgae.siga.DTO.scs.CosteFijoDTO;
-import org.itcgae.siga.DTO.scs.CosteFijoItem;
-import org.itcgae.siga.DTO.scs.FundamentoResolucionItem;
-import org.itcgae.siga.DTO.scs.PartidasDTO;
-import org.itcgae.siga.DTO.scs.PartidasItem;
 import org.itcgae.siga.DTO.scs.TiposActuacionDTO;
 import org.itcgae.siga.DTO.scs.TiposActuacionItem;
-import org.itcgae.siga.DTO.scs.TiposAsistenciaItem;
-import org.itcgae.siga.DTO.scs.TiposAsistenciasDTO;
-import org.itcgae.siga.DTO.scs.ZonasItem;
-import org.itcgae.siga.DTOs.adm.CatalogoMaestroItem;
-import org.itcgae.siga.DTOs.adm.CatalogoUpdateDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
-import org.itcgae.siga.DTOs.adm.InstitucionDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.cen.PartidasJudicialesDTO;
-import org.itcgae.siga.DTOs.cen.PartidasJudicialesItem;
-import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.CenInfluencia;
-import org.itcgae.siga.db.entities.CenInfluenciaExample;
-import org.itcgae.siga.db.entities.CenPartidojudicial;
-import org.itcgae.siga.db.entities.CenPartidojudicialExample;
-import org.itcgae.siga.db.entities.ExpExpediente;
-import org.itcgae.siga.db.entities.ExpExpedienteExample;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
-import org.itcgae.siga.db.entities.GenTablasMaestras;
-import org.itcgae.siga.db.entities.GenTablasMaestrasExample;
-import org.itcgae.siga.db.entities.ScsAcreditacionprocedimiento;
 import org.itcgae.siga.db.entities.ScsActuacionasistencia;
 import org.itcgae.siga.db.entities.ScsActuacionasistenciaExample;
-import org.itcgae.siga.db.entities.ScsArea;
-import org.itcgae.siga.db.entities.ScsMateriaExample;
-import org.itcgae.siga.db.entities.ScsMateriajurisdiccion;
-import org.itcgae.siga.db.entities.ScsMateriajurisdiccionExample;
-import org.itcgae.siga.db.entities.ScsPartidapresupuestaria;
-import org.itcgae.siga.db.entities.ScsPartidapresupuestariaExample;
-import org.itcgae.siga.db.entities.ScsProcedimientos;
 import org.itcgae.siga.db.entities.ScsTipoactuacion;
 import org.itcgae.siga.db.entities.ScsTipoactuacionExample;
-import org.itcgae.siga.db.entities.ScsTipoactuacioncostefijo;
-import org.itcgae.siga.db.entities.ScsTipoactuacioncostefijoExample;
-import org.itcgae.siga.db.entities.ScsTipoasistenciaExample;
-import org.itcgae.siga.db.entities.ScsTipoasistenciacolegio;
-import org.itcgae.siga.db.entities.ScsTipoasistenciacolegioExample;
-import org.itcgae.siga.db.entities.ScsTipoasistenciaguardia;
-import org.itcgae.siga.db.entities.ScsTipoasistenciaguardiaExample;
-import org.itcgae.siga.db.entities.ScsTipofundamentos;
-import org.itcgae.siga.db.entities.ScsTipofundamentosExample;
-import org.itcgae.siga.db.entities.ScsTurno;
-import org.itcgae.siga.db.entities.ScsTurnoExample;
-import org.itcgae.siga.db.entities.ScsZona;
-import org.itcgae.siga.db.mappers.AdmUsuariosMapper;
-import org.itcgae.siga.db.mappers.GenRecursosCatalogosMapper;
 import org.itcgae.siga.db.mappers.ScsActuacionasistenciaMapper;
-import org.itcgae.siga.db.mappers.ScsPartidapresupuestariaMapper;
 import org.itcgae.siga.db.mappers.ScsTipoactuacionMapper;
-import org.itcgae.siga.db.mappers.ScsTipoasistenciacolegioMapper;
-import org.itcgae.siga.db.mappers.ScsTipoasistenciaguardiaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
-import org.itcgae.siga.db.services.age.mappers.CenInfluenciaExtendsMapper;
-import org.itcgae.siga.db.services.cen.mappers.CenPartidasJudicialExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsCostefijoExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsPartidasPresupuestariasExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsProcedimientosExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsTipoAsistenciaColegioExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsTipoActuacionAsistenciaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoactuacionExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsTipoasistenciaExtendsMapper;
 import org.itcgae.siga.scs.service.IGestionTiposActuacionService;
-import org.itcgae.siga.scs.service.IGestionTiposAsistenciaService;
-import org.itcgae.siga.scs.service.IModulosYBasesService;
-import org.itcgae.siga.scs.service.IPartidasJudicialesService;
-import org.itcgae.siga.scs.service.IPartidasPresupuestariasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 @Service
+@Transactional
 public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionService {
 
 	private Logger LOGGER = Logger.getLogger(FichaPartidasJudicialesServiceImpl.class);
 
 	@Autowired
 	private ScsTipoactuacionExtendsMapper scsTipoactuacionExtendsMapper;
-
-	@Autowired
-	private ScsTipoactuacionMapper scsTipoActuacionMapper;
 	
 	@Autowired
-	private ScsActuacionasistenciaMapper scsTipoActuacionAsistenciaMapper;
+	private ScsActuacionasistenciaMapper scsActuacionAsistenciaMapper;
+	
+	@Autowired
+	private ScsTipoActuacionAsistenciaExtendsMapper scsActuacionAsistenciaExtendsMapper;
+	
+	@Autowired
+	private ScsTipoactuacionMapper scsTipoActuacionMapper;
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -203,8 +146,7 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 	}
 
 	@Override
-	public UpdateResponseDTO updateTiposActuaciones(TiposActuacionDTO tiposActuacionDTO,
-			HttpServletRequest request) {
+	public UpdateResponseDTO updateTiposActuaciones(TiposActuacionDTO tiposActuacionDTO, HttpServletRequest request) {
 		LOGGER.info("updateTiposAsistencias() ->  Entrada al servicio para modificar un tipoasistencia");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
@@ -235,15 +177,19 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 					// Obtenermos fundamento de resolucion que queremos modificar
 					// Obtenemos el fundamento de resolucion que queremos modificar
 					for (TiposActuacionItem tiposActuacionItem : tiposActuacionDTO.getTiposActuacionItem()) {
-												
+						
+						String[] multiSelectTipos = tiposActuacionItem.getIdtipoasistencia().trim().split(",");
+
+						List<TiposActuacionItem> tiposAsistenciaItems = null;
 						LOGGER.info(
 								"updateTiposAsistencias() / scsTipoAsistenciaColegioMapper.selectByExample(example) -> Entrada a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
-						
-						
+						tiposAsistenciaItems = scsTipoactuacionExtendsMapper.searchTiposActuacion(true,
+								usuario.getIdlenguaje(), idInstitucion);
+
 						ScsTipoactuacionExample example = new ScsTipoactuacionExample();
-						example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
-							
-						
+						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
+
 						List<ScsTipoactuacion> scsTipoactuaciones = scsTipoActuacionMapper.selectByExample(example);
 
 						LOGGER.info(
@@ -252,26 +198,24 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 						if (scsTipoactuaciones != null && scsTipoactuaciones.size() > 0) {
 
 							ScsTipoactuacion scsTipoActuacion = scsTipoactuaciones.get(0);
-							
+
 							// Buscamos si existe una descripcion que sea igual en fundamentos q no sea el
 							// propio
 
 							GenRecursosCatalogosExample exampleRecursosRepetidos = new GenRecursosCatalogosExample();
 							exampleRecursosRepetidos.createCriteria()
 									.andDescripcionEqualTo(tiposActuacionItem.getDescripciontipoactuacion())
-									.andCampotablaEqualTo("DESCRIPCION")
-									.andNombretablaEqualTo("SCS_TIPOACTUACION")
+									.andCampotablaEqualTo("DESCRIPCION").andNombretablaEqualTo("SCS_TIPOACTUACION")
 									.andIdinstitucionEqualTo(idInstitucion)
 									.andIdrecursoNotEqualTo(scsTipoActuacion.getDescripcion());
 
 							List<GenRecursosCatalogos> recursosRepetidos = genRecursosCatalogosExtendsMapper
 									.selectByExample(exampleRecursosRepetidos);
 
-							
-							if (recursosRepetidos != null && recursosRepetidos.size() > 0) {
+							if (recursosRepetidos != null && recursosRepetidos.size() > 1) {
 								error.setCode(400);
 								error.setDescription(
-										"messages.jgr.maestros.gestionFundamentosResolucion.existeTipoAsistenciaMismaDescripcion");
+										"messages.jgr.maestros.gestionFundamentosResolucion.existeTipoActuacionMismaDescripcion");
 							} else {
 
 								// Si no se repite se modifica tanto la el fundamento como la descripcion del
@@ -311,40 +255,76 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 
 									updateRestoIdiomas(recursoFundamento);
 								}
-								
+									
+								 for(TiposActuacionItem actuacionActuales : tiposAsistenciaItems) {
 
-								String[] multiSelectTipos = tiposActuacionItem.getIdtipoasistencia().trim().split(",");
-								ScsTipoactuacionExample example2 = new ScsTipoactuacionExample();
-								example2.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
-								scsTipoActuacionMapper.deleteByExample(example2);
+								ScsTipoactuacionExample asistenciasNuevas = new ScsTipoactuacionExample();
+								asistenciasNuevas.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+										.andIdtipoactuacionEqualTo(
+												Short.parseShort(actuacionActuales.getIdtipoactuacion()));																							
 								
-//								
-								
-								
-								if (multiSelectTipos[0] != "")
+								if(tiposActuacionItem.getIdtipoactuacion().equals(actuacionActuales.getIdtipoactuacion())) {
+									String[] multiSelectTipos2 = actuacionActuales.getIdtipoasistencia().trim().split(",");
+									if (multiSelectTipos2[0] != "")
+										for (String idtiposasistencia : multiSelectTipos2) {
+											ScsActuacionasistenciaExample actuacionAsistenciaExample = new ScsActuacionasistenciaExample();
+											actuacionAsistenciaExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).
+											andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion())).
+											andIdtipoasistenciaEqualTo(Short.parseShort(idtiposasistencia.trim()));
+											
+											List<ScsActuacionasistencia> listaActuacionAsistencia = scsActuacionAsistenciaExtendsMapper.selectTiposActuacionasistencia(tiposActuacionItem, idtiposasistencia);
+											
+											if(listaActuacionAsistencia != null && listaActuacionAsistencia.size() > 0) {
+												TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+												response = 0;
+												error.setCode(400);
+												error.setMessage(tiposActuacionItem.getDescripciontipoactuacion().toString());
+												error.setDescription("general.mensaje.error.tipoactuacion");
+												updateResponseDTO.setStatus(SigaConstants.KO);
+												updateResponseDTO.setError(error);
+												return updateResponseDTO;
+											}else {
+												ScsTipoactuacion scsTipoactuacion2 = new ScsTipoactuacion();
+												scsTipoactuacion2.setIdtipoasistencia(Short.parseShort(idtiposasistencia.trim()));
+												scsTipoactuacion2.setIdtipoactuacion(
+														Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
+												scsTipoactuacion2.setIdinstitucion(idInstitucion);
+												response =	scsTipoActuacionMapper.deleteByPrimaryKey(scsTipoactuacion2);
+											}
+										}
+									
 									for (String idtiposguardia : multiSelectTipos) {
+
 										BigDecimal importe = new BigDecimal(tiposActuacionItem.getImporte());
 										BigDecimal importemaximo = new BigDecimal(tiposActuacionItem.getImportemaximo());
 										scsTipoActuacion.setImporte(importe);
-										scsTipoActuacion.setImportemaximo(importemaximo);												
+										scsTipoActuacion.setImportemaximo(importemaximo);
 										scsTipoActuacion.setIdtipoasistencia(Short.parseShort(idtiposguardia));
+										scsTipoActuacion.setFechabaja(null);
 										scsTipoActuacion.setFechamodificacion(new Date());
-										scsTipoActuacion.setIdtipoactuacion(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
+										scsTipoActuacion.setIdtipoactuacion(
+												Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
 										scsTipoActuacion.setUsumodificacion(usuario.getIdusuario());
 										scsTipoActuacion.setIdinstitucion(idInstitucion);
+
 										response = scsTipoActuacionMapper.insert(scsTipoActuacion);
-									}															
+									}
 								
-//									response = scsTipoActuacionMapper.insert(scsTipoActuacion2);
+								
+								}
+									}
+
 								LOGGER.info(
 										"updateTiposAsistencias() / scsTipofundamentosExtendsMapper.updateByExample() -> Entrada a scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
 
 								LOGGER.info(
 										"updateTiposAsistencias() / scsTipofundamentosExtendsMapper.updateByExample() -> Salida de scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
+
 							}
 						}
 					
 					}
+
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
@@ -407,27 +387,33 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
 
 						ScsTipoactuacionExample example = new ScsTipoactuacionExample();
-						example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
+						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
 
 						List<ScsTipoactuacion> scsTipoactuacionExample = scsTipoActuacionMapper
-								.selectByExample(example);					
-						
+								.selectByExample(example);
+
 						if (scsTipoactuacionExample != null && scsTipoactuacionExample.size() > 0) {
+							String[] multiSelectTipos = tiposActuacionItem.getIdtipoasistencia().trim().split(",");
+							for (String idtiposguardia : multiSelectTipos) {
+								ScsTipoactuacion scsTipoActuaciones = scsTipoactuacionExample.get(0);
+								scsTipoActuaciones.setFechabaja(new Date());
+								scsTipoActuaciones.setFechamodificacion(new Date());
+								scsTipoActuaciones.setUsumodificacion(usuarios.get(0).getIdusuario());
+								scsTipoActuaciones.setIdtipoasistencia(Short.parseShort(idtiposguardia.trim()));
+								response = scsTipoActuacionMapper.updateByPrimaryKey(scsTipoActuaciones);
+							}
 							
-							ScsTipoactuacion scsTipoActuaciones = scsTipoactuacionExample.get(0);
-							scsTipoActuaciones.setFechabaja(new Date());
-							scsTipoActuaciones.setFechamodificacion(new Date());
-							scsTipoActuaciones.setUsumodificacion(usuarios.get(0).getIdusuario());
 
 							LOGGER.info(
 									"deleteCosteFijo() / scsTipoactuacioncostefijoMapper.updateByPrimaryKey() -> Entrada a scsTipoactuacioncostefijoMapper para dar de baja a un coste fijo");
 
-							response = scsTipoActuacionMapper.updateByPrimaryKey(scsTipoActuaciones);
+							
 
 							LOGGER.info(
 									"deleteCosteFijo() / scsTipoactuacioncostefijoMapper.updateByPrimaryKey() -> Salida de scsTipoactuacioncostefijoMapper para dar de baja a un coste fijo");
-							}
-						
+						}
+
 					}
 
 				}
@@ -462,7 +448,7 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 		}
 		return updateResponseDTO;
 	}
-	
+
 	@Override
 	public UpdateResponseDTO activateTipoActuacion(TiposActuacionDTO tiposActuacionDTO, HttpServletRequest request) {
 		LOGGER.info("updatePartidasPres() ->  Entrada al servicio para guardar edicion de Partida presupuestaria");
@@ -500,26 +486,30 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
 
 						ScsTipoactuacionExample example = new ScsTipoactuacionExample();
-						example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
+						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdtipoactuacionEqualTo(Short.parseShort(tiposActuacionItem.getIdtipoactuacion()));
 
 						List<ScsTipoactuacion> scsTipoactuacionExample = scsTipoActuacionMapper
-								.selectByExample(example);	
+								.selectByExample(example);
 						if (scsTipoactuacionExample != null && scsTipoactuacionExample.size() > 0) {
-
+							String[] multiSelectTipos = tiposActuacionItem.getIdtipoasistencia().trim().split(",");
+							for (String idtiposguardia : multiSelectTipos) {
 							ScsTipoactuacion scsTipoActuaciones = scsTipoactuacionExample.get(0);
 							scsTipoActuaciones.setFechabaja(null);
 							scsTipoActuaciones.setFechamodificacion(new Date());
 							scsTipoActuaciones.setUsumodificacion(usuarios.get(0).getIdusuario());
-
+							scsTipoActuaciones.setIdtipoasistencia(Short.parseShort(idtiposguardia.trim()));
+							response = scsTipoActuacionMapper.updateByPrimaryKey(scsTipoActuaciones);
+							}
 							LOGGER.info(
 									"deleteCosteFijo() / scsTipoactuacioncostefijoMapper.updateByPrimaryKey() -> Entrada a scsTipoactuacioncostefijoMapper para dar de baja a un coste fijo");
 
-							response = scsTipoActuacionMapper.updateByPrimaryKey(scsTipoActuaciones);
+							
 
 							LOGGER.info(
 									"deleteCosteFijo() / scsTipoactuacioncostefijoMapper.updateByPrimaryKey() -> Salida de scsTipoactuacioncostefijoMapper para dar de baja a un coste fijo");
 						}
-						
+
 					}
 
 				}
@@ -553,12 +543,10 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 
 		}
 		return updateResponseDTO;
-	}	
-	
-	
+	}
+
 	@Override
-	public InsertResponseDTO createTiposActuacion(TiposActuacionItem tiposActuacionItem,
-			HttpServletRequest request) {
+	public InsertResponseDTO createTiposActuacion(TiposActuacionItem tiposActuacionItem, HttpServletRequest request) {
 		LOGGER.info("createFundamentosResolucion() ->  Entrada al servicio para crear un fundamento resolucion");
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
@@ -572,7 +560,7 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 		Integer idTipoActuacion = null;
 
 		ScsTipoactuacion scsTipoactuacion = null;
-		
+
 		if (null != idInstitucion) {
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -591,10 +579,10 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 
 				try {
 
-					if (tiposActuacionItem != null) {							
-							ScsTipoactuacionExample example3 = new ScsTipoactuacionExample();
-							example3.createCriteria().andIdinstitucionEqualTo(idInstitucion);
-					
+					if (tiposActuacionItem != null) {
+						ScsTipoactuacionExample example3 = new ScsTipoactuacionExample();
+						example3.createCriteria().andIdinstitucionEqualTo(idInstitucion);
+
 						// Buscamos si se encuentra la descripcion del nuevo fundamento
 						GenRecursosCatalogosExample exampleRecursos = new GenRecursosCatalogosExample();
 						exampleRecursos.createCriteria()
@@ -607,7 +595,8 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 
 						if (recursos != null && recursos.size() > 0) {
 							error.setCode(400);
-							error.setDescription("messages.jgr.maestros.gestionFundamentosResolucion.existeFundamentosResolucionMismaDescripcion");
+							error.setDescription(
+									"messages.jgr.maestros.gestionFundamentosResolucion.existeTipoActuacionMismaDescripcion");
 
 						} else {
 
@@ -630,8 +619,8 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 								genRecursosCatalogo.setIdrecurso(String.valueOf(idRecurso));
 							}
 
-							genRecursosCatalogo.setIdrecursoalias("SCS_TIPOACTUACION.descripcion." + idInstitucion
-									+ "." + genRecursosCatalogo.getIdrecurso());
+							genRecursosCatalogo.setIdrecursoalias("SCS_TIPOACTUACION.descripcion." + idInstitucion + "."
+									+ genRecursosCatalogo.getIdrecurso());
 
 							genRecursosCatalogo.setNombretabla("SCS_TIPOACTUACION");
 							genRecursosCatalogo.setUsumodificacion(usuario.getUsumodificacion());
@@ -661,16 +650,15 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 							} else {
 								idTipoActuacion = (Integer.parseInt(idF.getNewId()) + 1);
 								scsTipoactuacion.setIdtipoactuacion(Short.valueOf(idTipoActuacion.toString()));
-							}						
+							}
 
 							LOGGER.info(
 									"createFundamentosResolucion() / scsTipofundamentosExtendsMapper.updateByExample() -> Entrada a scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
-								
+
 							LOGGER.info(
 									"createFundamentosResolucion() / scsTipofundamentosExtendsMapper.updateByExample() -> Salida de scsTipofundamentosExtendsMapper para modificar un fundamento de resolucion");
-							
-							String[] multiSelectTipos = tiposActuacionItem.getIdtipoasistencia().trim().split(",");
 
+							String[] multiSelectTipos = tiposActuacionItem.getIdtipoasistencia().trim().split(",");
 
 							if (multiSelectTipos[0] != "")
 								for (String idtiposasistencias : multiSelectTipos) {
@@ -685,40 +673,37 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 									scsTipoactuacion.setIdtipoasistencia(Short.parseShort(idtiposasistencias));
 									scsTipoActuacionMapper.insert(scsTipoactuacion);
 								}
-								
+
 						}
 
 					}
-					}
-				 catch (Exception e) {
+				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				}
-			
 
-		}
+			}
 
-		if (response == 0 && error.getDescription() == null) {
-			error.setCode(400);
-			insertResponseDTO.setStatus(SigaConstants.KO);
-		} else if (error.getCode() == null) {
-			error.setCode(200);
-			insertResponseDTO.setStatus(SigaConstants.OK);
-			insertResponseDTO.setId(String.valueOf(scsTipoactuacion.getIdtipoactuacion()));
+			if (response == 0 && error.getDescription() == null) {
+				error.setCode(400);
+				insertResponseDTO.setStatus(SigaConstants.KO);
+			} else if (error.getCode() == null) {
+				error.setCode(200);
+				insertResponseDTO.setStatus(SigaConstants.OK);
+				insertResponseDTO.setId(String.valueOf(scsTipoactuacion.getIdtipoactuacion()));
 
-		}
+			}
 
-		insertResponseDTO.setError(error);
+			insertResponseDTO.setError(error);
 
-		LOGGER.info("createFundamentosResolucion() -> Salida del servicio para crear un fundamento de resolucion");
+			LOGGER.info("createFundamentosResolucion() -> Salida del servicio para crear un fundamento de resolucion");
 
 		}
 		return insertResponseDTO;
 	}
-				
-	
+
 	private int insertarRestoIdiomas(GenRecursosCatalogos genRecursosCatalogo) {
 
 		int response = 1;

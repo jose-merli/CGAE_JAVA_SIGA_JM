@@ -66,9 +66,9 @@ public class TiposActuacionController {
 	}
 	
 	@RequestMapping(value = "/gestionTiposActuacion/updateTiposActuacion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<UpdateResponseDTO> updateTiposAsistencias(@RequestBody TiposActuacionDTO tiposActuacionDTO, HttpServletRequest request) {
+	ResponseEntity<UpdateResponseDTO> updateTiposAsistencias(@RequestBody TiposActuacionDTO tiposActuacionItem, HttpServletRequest request) {
 
-		UpdateResponseDTO response = TiposActuacionService.updateTiposActuaciones(tiposActuacionDTO, request);
+		UpdateResponseDTO response = TiposActuacionService.updateTiposActuaciones(tiposActuacionItem, request);
 		if (response.getError().getCode() == 200)
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 		else
