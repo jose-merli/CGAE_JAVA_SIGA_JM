@@ -24,7 +24,6 @@ import org.itcgae.siga.db.entities.ScsActuacionasistencia;
 import org.itcgae.siga.db.entities.ScsActuacionasistenciaExample;
 import org.itcgae.siga.db.entities.ScsTipoactuacion;
 import org.itcgae.siga.db.entities.ScsTipoactuacionExample;
-import org.itcgae.siga.db.mappers.ScsActuacionasistenciaMapper;
 import org.itcgae.siga.db.mappers.ScsTipoactuacionMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
@@ -45,9 +44,6 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 
 	@Autowired
 	private ScsTipoactuacionExtendsMapper scsTipoactuacionExtendsMapper;
-	
-	@Autowired
-	private ScsActuacionasistenciaMapper scsActuacionAsistenciaMapper;
 	
 	@Autowired
 	private ScsTipoActuacionAsistenciaExtendsMapper scsActuacionAsistenciaExtendsMapper;
@@ -295,8 +291,8 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 									
 									for (String idtiposguardia : multiSelectTipos) {
 
-										BigDecimal importe = new BigDecimal(tiposActuacionItem.getImporte());
-										BigDecimal importemaximo = new BigDecimal(tiposActuacionItem.getImportemaximo());
+										BigDecimal importe = new BigDecimal(Double.valueOf(tiposActuacionItem.getImporte()));
+										BigDecimal importemaximo = new BigDecimal(Double.valueOf(tiposActuacionItem.getImportemaximo()));
 										scsTipoActuacion.setImporte(importe);
 										scsTipoActuacion.setImportemaximo(importemaximo);
 										scsTipoActuacion.setIdtipoasistencia(Short.parseShort(idtiposguardia));
@@ -662,8 +658,8 @@ public class GestionTiposActuacionServiceImpl implements IGestionTiposActuacionS
 
 							if (multiSelectTipos[0] != "")
 								for (String idtiposasistencias : multiSelectTipos) {
-									BigDecimal importe = new BigDecimal(tiposActuacionItem.getImporte());
-									BigDecimal importemaximo = new BigDecimal(tiposActuacionItem.getImportemaximo());
+									BigDecimal importe = new BigDecimal(Double.valueOf(tiposActuacionItem.getImporte()));
+									BigDecimal importemaximo = new BigDecimal(Double.valueOf(tiposActuacionItem.getImportemaximo()));
 									scsTipoactuacion.setImporte(importe);
 									scsTipoactuacion.setImportemaximo(importemaximo);
 									scsTipoactuacion.setFechamodificacion(new Date());
