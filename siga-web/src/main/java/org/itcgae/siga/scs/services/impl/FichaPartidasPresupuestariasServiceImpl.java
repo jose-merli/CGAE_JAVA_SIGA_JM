@@ -234,6 +234,9 @@ public class FichaPartidasPresupuestariasServiceImpl implements IPartidasPresupu
 								scsPartidaPresupuestaria = scsPartidaPresupuestariaLista.get(0);
 								
 								String importe2 = partidasItems.getImportepartida().toString();
+								if(partidasItems.getImportepartida() == null || partidasItems.getImportepartida() =="") {
+									 importe2 = "0";
+								}
 								String numerofinal = importe2.replaceAll(",", ".");
 								BigDecimal importe = new BigDecimal(numerofinal);
 								scsPartidaPresupuestaria.setDescripcion(partidasItems.getDescripcion());
@@ -343,16 +346,21 @@ public class FichaPartidasPresupuestariasServiceImpl implements IPartidasPresupu
 					if ((nombrePartidasDuplicadas != null && nombrePartidasDuplicadas.size() > 0) || (descripcionPartidasDuplicadas != null && descripcionPartidasDuplicadas.size() > 0)) {
 						
 						error.setCode(400);
-						error.setDescription("informesycomunicaciones.modelosdecomunicacion.fichaModeloComuncaciones.nombreDuplicado");
+						error.setDescription("menu.justiciaGratuita.maestros.errorpartidapresupuestaria");
 
 					} else {
-
+						String importe2 = partidasItem.getImportepartida().toString();
+						if(partidasItem.getImportepartida() == null || partidasItem.getImportepartida() =="") {
+							 importe2 = "0";
+						}
+						String numerofinal = importe2.replaceAll(",", ".");
+						BigDecimal importe = new BigDecimal(numerofinal);
 						ScsPartidapresupuestaria partida = new ScsPartidapresupuestaria();
 						partida.setDescripcion(partidasItem.getDescripcion());
 						partida.setNombrepartida(partidasItem.getNombrepartida());
 						partida.setFechamodificacion(new Date());
 						partida.setIdinstitucion(idInstitucion);
-						partida.setImportepartida(BigDecimal.valueOf(Double.valueOf(partidasItem.getImportepartida())));
+						partida.setImportepartida(importe);
 						partida.setFechabaja(null);
 						partida.setUsumodificacion(usuarios.get(0).getIdusuario());
 						
