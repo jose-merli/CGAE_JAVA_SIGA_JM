@@ -420,7 +420,7 @@ public class CenPersonaSqlExtendsProvider extends CenPersonaSqlProvider {
 		SQL sql = new SQL();
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-		SimpleDateFormat dateFormatHMS = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+		SimpleDateFormat dateFormatHMS = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
 		sql.UPDATE("CEN_PERSONA");
 
