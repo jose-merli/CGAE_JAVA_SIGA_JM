@@ -409,12 +409,12 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 						tipoDoc.setIdinstitucion(idInstitucion);
 
 						LOGGER.info(
-								"createTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Entrada a scsDocumentacionEjgExtendsMapper para updatear un nuevo documento");
+								"updateTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Entrada a scsDocumentacionEjgExtendsMapper para updatear un nuevo documento");
 
 						response = scsDocumentacionEjgExtendsMapper.updateByPrimaryKey(tipoDoc);
 
 						LOGGER.info(
-								"createTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Salida de scsDocumentacionEjgExtendsMapper para updatear un nuevo documento");
+								"updateTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Salida de scsDocumentacionEjgExtendsMapper para updatear un nuevo documento");
 					}
 
 				} catch (Exception e) {
