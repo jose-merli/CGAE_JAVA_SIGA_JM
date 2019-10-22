@@ -29,6 +29,7 @@ public interface ScsComisariaExtendsMapper extends ScsComisariaMapper{
 		@Result(column = "IDPROVINCIA", property = "idProvincia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TELEFONO1", property = "telefono1", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TELEFONO2", property = "telefono2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FAX1", property = "fax1", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CODIGOEXT", property = "codigoExt", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VISIBLEMOVIL", property = "visibleMovil", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREPOBLACION", property = "nombrePoblacion", jdbcType = JdbcType.VARCHAR),

@@ -20,6 +20,7 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 		sql.SELECT("procurador.idpoblacion");
 		sql.SELECT("procurador.idprovincia");
 		sql.SELECT("procurador.telefono1");
+		sql.SELECT("procurador.fax1");
 		sql.SELECT_DISTINCT("concat(concat(procurador.apellidos1 || ' ', concat(procurador.apellidos2 , ', ')), procurador.nombre || ' ') AS nombreape");
 		sql.SELECT("procurador.telefono2");
 		sql.SELECT("procurador.fechabaja");
