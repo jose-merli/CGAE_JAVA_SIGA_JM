@@ -408,8 +408,9 @@ public class GestionCosteFijoServiceImpl implements IGestionCosteFijoService {
 							scsTipoactuacioncostefijo.setIdinstitucion(idInstitucion);
 							
 							if (costeFijoItem.getImporte() != null) {
+								BigDecimal importe = new BigDecimal(costeFijoItem.getImporte());
 								scsTipoactuacioncostefijo
-										.setImporte(BigDecimal.valueOf(Float.valueOf(costeFijoItem.getImporte())));
+										.setImporte(importe);
 							}
 
 							LOGGER.info(

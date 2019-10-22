@@ -13,7 +13,6 @@ import org.itcgae.siga.DTOs.cen.ComboColegiadoItem;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionItem;
 import org.itcgae.siga.DTOs.cen.FichaDatosColegialesItem;
 import org.itcgae.siga.DTOs.cen.StringDTO;
-import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenColegiado;
 import org.itcgae.siga.db.mappers.CenColegiadoMapper;

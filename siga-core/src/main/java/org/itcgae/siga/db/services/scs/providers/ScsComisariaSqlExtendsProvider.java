@@ -18,6 +18,7 @@ public class ScsComisariaSqlExtendsProvider extends ScsComisariaSqlProvider {
 		sql.SELECT("comisaria.idpoblacion");
 		sql.SELECT("comisaria.idprovincia");
 		sql.SELECT("comisaria.telefono1");
+		sql.SELECT("comisaria.fax1");
 		sql.SELECT("comisaria.telefono2");
 		sql.SELECT("comisaria.fechabaja");
 		sql.SELECT("comisaria.codigoext");

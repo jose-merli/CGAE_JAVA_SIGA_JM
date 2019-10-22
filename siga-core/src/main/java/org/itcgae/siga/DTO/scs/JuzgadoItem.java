@@ -33,7 +33,7 @@ public class JuzgadoItem {
 	private Date fechaCodigoEjis;
 	private String nombrePoblacion;
 	private String nombreProvincia;
-	
+	private String codigoEjis;
 
 	/**
 	 **/
@@ -66,6 +66,19 @@ public class JuzgadoItem {
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+	
+	/**
+	 * 
+	 **/
+	
+	@JsonProperty("codigoEjis")
+	public String getCodigoEjis() {
+		return codigoEjis;
+	}
+
+	public void setCodigoEjis(String codigoEjis) {
+		this.codigoEjis = codigoEjis;
 	}
 
 	/**
@@ -558,4 +571,5 @@ public class JuzgadoItem {
 		}
 		return o.toString().replace("\n", "\n    ");
 	}
+
 }

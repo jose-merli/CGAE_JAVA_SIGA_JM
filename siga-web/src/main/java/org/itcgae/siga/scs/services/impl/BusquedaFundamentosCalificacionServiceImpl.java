@@ -22,8 +22,6 @@ import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
 import org.itcgae.siga.db.entities.ScsTipofundamentocalif;
 import org.itcgae.siga.db.entities.ScsTipofundamentocalifExample;
-import org.itcgae.siga.db.entities.ScsTipofundamentos;
-import org.itcgae.siga.db.entities.ScsTipofundamentosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsFundamentoscalificacionExtendsMapper;
@@ -498,7 +496,6 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 
 				try {
 
-					// Obtenermos fundamento de resolucion que queremos modificar
 					// Obtenemos el fundamento de resolucion que queremos modificar
 					ScsTipofundamentocalifExample example = new ScsTipofundamentocalifExample();
 					example.createCriteria().andIdinstitucionEqualTo(idInstitucion).

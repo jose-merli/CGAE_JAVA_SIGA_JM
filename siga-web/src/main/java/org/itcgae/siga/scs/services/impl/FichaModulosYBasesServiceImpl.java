@@ -1,7 +1,6 @@
 package org.itcgae.siga.scs.services.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -14,29 +13,23 @@ import org.itcgae.siga.DTO.scs.ModulosDTO;
 import org.itcgae.siga.DTO.scs.ModulosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
+import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.ExpExpediente;
-import org.itcgae.siga.db.entities.ExpExpedienteExample;
-import org.itcgae.siga.db.entities.ScsAcreditacionExample;
 import org.itcgae.siga.db.entities.ScsAcreditacionprocedimiento;
-import org.itcgae.siga.db.entities.ScsAcreditacionprocedimientoExample;
 import org.itcgae.siga.db.entities.ScsActuaciondesigna;
 import org.itcgae.siga.db.entities.ScsActuaciondesignaExample;
 import org.itcgae.siga.db.entities.ScsProcedimientos;
-import org.itcgae.siga.db.entities.ScsTurno;
-import org.itcgae.siga.db.entities.ScsTurnoExample;
-import org.itcgae.siga.db.mappers.ScsAcreditacionMapper;
+import org.itcgae.siga.db.entities.ScsProcedimientosExample;
 import org.itcgae.siga.db.mappers.ScsAcreditacionprocedimientoMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
+import org.itcgae.siga.db.mappers.ScsProcedimientosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAcreditacionExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsAreasMateriasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsProcedimientosExtendsMapper;
 import org.itcgae.siga.scs.service.IModulosYBasesService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -54,6 +47,9 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 
 	@Autowired
 	private ScsProcedimientosExtendsMapper scsProcedimientosExtendsMapper;
+
+	@Autowired
+	private ScsProcedimientosMapper scsProcedimientosMapper;
 
 	@Autowired 
 	private ScsAcreditacionExtendsMapper scsAcreditacionExtendsMapper;
@@ -111,7 +107,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 	
 	@Override
 	public UpdateResponseDTO updateModules(ModulosItem modulosItem, HttpServletRequest request) {
-		LOGGER.info("updateModules() ->  Entrada al servicio para eliminar modulos");
+		LOGGER.info("updateModules() ->  Entrada al servicio para actualizar modulos");
 
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
@@ -135,35 +131,48 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					"updateModules() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
-				List<ModulosItem> codigoExistente = null;
+				List<ScsProcedimientos> codigoExistente = null;
 				try {
 					
-					boolean continua = false;
+					boolean continua = true;
 					
-					ModulosItem ejemplo = new ModulosItem();
-					ejemplo.setidInstitucion(idInstitucion.toString());
-					ejemplo.setNombre(modulosItem.getNombre());
-					List<ModulosItem> modulosExistentes = scsProcedimientosExtendsMapper.searchModulo(ejemplo);
+					ScsProcedimientosExample ejemplo = new ScsProcedimientosExample();
+					ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion).andNombreEqualTo(modulosItem.getNombre())
+					.andIdprocedimientoNotEqualTo(modulosItem.getIdProcedimiento());
+
+					List<ScsProcedimientos> modulosExistentes = scsProcedimientosMapper.selectByExample(ejemplo);
 
 					if(modulosItem.getCodigo() != null && modulosItem.getCodigo() != "") {
-					ModulosItem ejemplo2 = new ModulosItem();
-					ejemplo2.setidInstitucion(idInstitucion.toString());
-					ejemplo2.setCodigo(modulosItem.getCodigo());
-					codigoExistente = scsProcedimientosExtendsMapper.searchModulo(ejemplo2);
+					ScsProcedimientosExample ejemplo2 = new ScsProcedimientosExample();
+					ejemplo2.createCriteria().andIdinstitucionEqualTo(idInstitucion).andCodigoEqualTo(modulosItem.getCodigo())
+					.andIdprocedimientoNotEqualTo(modulosItem.getIdProcedimiento());
+
+					codigoExistente = scsProcedimientosMapper.selectByExample(ejemplo2);
+					}
+					if(((modulosExistentes != null && modulosExistentes.size() > 0 ))) {
+						for(int i = 0; i < modulosExistentes.size() ; i++) {
+							if(!(modulosExistentes.get(i).getIdprocedimiento().toString().equals(modulosItem.getIdProcedimiento().toString()))) {
+								response = 0;
+								error.setCode(400);
+								error.setDescription("menu.justiciaGratuita.maestros.nombreCodigoExistente");
+								continua = false;
+							}
+						}
+						
+							
 					}
 					
-					if(((modulosExistentes != null && modulosExistentes.size() > 0 )|| (codigoExistente != null && codigoExistente.size() > 0))) {
-						if(!(modulosExistentes.get(0).getIdProcedimiento().toString().equals(modulosItem.getIdProcedimiento().toString()) || !(modulosExistentes.get(0).getIdProcedimiento().toString().equals(modulosItem.getIdProcedimiento().toString())))) {
-							response = 0;
-							error.setCode(400);
-							error.setDescription("menu.justiciaGratuita.maestros.nombreCodigoExistente");
-						}else {
-							continua = true;
+					if(codigoExistente != null && codigoExistente.size() > 0) {
+						for(int i = 0; i < codigoExistente.size() ; i++) {
+							if(!(codigoExistente.get(i).getIdprocedimiento().toString().equals(modulosItem.getIdProcedimiento().toString()))) {
+								response = 0;
+								error.setCode(400);
+								error.setDescription("menu.justiciaGratuita.maestros.nombreCodigoExistente");
+								continua = false;
+							}
 						}
-							
-						}else {
-							continua = true;
-						}
+						
+					}
 						
 					if(continua) {
 						ScsProcedimientos modulo = new ScsProcedimientos();
@@ -186,12 +195,12 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						modulo.setUsumodificacion(usuarios.get(0).getIdusuario());
 						
 						LOGGER.info(
-								"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
+								"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para actualizar el modulo");
 
 						response = scsProcedimientosExtendsMapper.updateByPrimaryKey(modulo);
 
 						LOGGER.info(
-								"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
+								"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para actualizar el modulo");
 					}
 					
 				} catch (Exception e) {
@@ -216,7 +225,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 
 		updateResponseDTO.setError(error);
 
-		LOGGER.info("updateModules() -> Salida del servicio para eliminar modulos");
+		LOGGER.info("updateModules() -> Salida del servicio para actualizar modulos");
 
 		return updateResponseDTO;
 	}
@@ -250,18 +259,18 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 		
 
 			if (null != usuarios && usuarios.size() > 0) {
-				List<ModulosItem> codigoExistente = null;
+				List<ScsProcedimientos> codigoExistente = null;
 				try {
-						ModulosItem ejemplo = new ModulosItem();
-						ejemplo.setidInstitucion(idInstitucion.toString());
-						ejemplo.setNombre(modulosItem.getNombre());
-						List<ModulosItem> modulosExistentes = scsProcedimientosExtendsMapper.searchModulo(ejemplo);
+						ScsProcedimientosExample ejemplo = new ScsProcedimientosExample();
+						ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andNombreEqualTo(modulosItem.getNombre());
+						List<ScsProcedimientos> modulosExistentes = scsProcedimientosMapper.selectByExample(ejemplo);
 
 						if(modulosItem.getCodigo() != null && modulosItem.getCodigo() != "") {
-							ModulosItem ejemplo2 = new ModulosItem();
-							ejemplo2.setidInstitucion(idInstitucion.toString());
-							ejemplo2.setCodigo(modulosItem.getCodigo());
-							codigoExistente = scsProcedimientosExtendsMapper.searchModulo(ejemplo2);
+							ScsProcedimientosExample ejemplo2 = new ScsProcedimientosExample();
+							ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							.andCodigoEqualTo(modulosItem.getCodigo());
+							codigoExistente = scsProcedimientosMapper.selectByExample(ejemplo2);
 						}
 						
 						
@@ -377,7 +386,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						acreditacionProc.setIdprocedimiento(acreditacionItem.getIdprocedimiento());
 						ScsAcreditacionprocedimiento registro = scsAcreditacionProcedimientoMapper.selectByPrimaryKey(acreditacionProc);
 
-						BigDecimal porcentaje = new BigDecimal(acreditacionItem.getPorcentaje());
+						BigDecimal porcentaje = new BigDecimal(Double.valueOf(acreditacionItem.getPorcentaje()));
 						registro.setPorcentaje(porcentaje);
 //						registro.setNigNumprocedimiento(Short.parseShort(acreditacionItem.getNig_numprocedimiento()));
 						if(acreditacionItem.isNigProcedimiento()) {
@@ -735,7 +744,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					if(Existente == null) {
 						ScsAcreditacionprocedimiento registro = new ScsAcreditacionprocedimiento();
 
-						BigDecimal porcentaje = new BigDecimal(acreditacionItem.getPorcentaje());
+						BigDecimal porcentaje = new BigDecimal(Double.valueOf(acreditacionItem.getPorcentaje()));
 						registro.setIdacreditacion(Short.parseShort(acreditacionItem.getIdAcreditacion()));
 						registro.setIdprocedimiento(acreditacionItem.getIdprocedimiento());
 						registro.setPorcentaje(porcentaje);

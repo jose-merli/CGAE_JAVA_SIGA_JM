@@ -19,9 +19,9 @@ public interface ScsComisariaExtendsMapper extends ScsComisariaMapper{
 
 	@SelectProvider(type = ScsComisariaSqlExtendsProvider.class, method = "searchComisarias")
 	@Results({
-		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "IDINSTITUCION", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCOMISARIA", property = "idComisaria", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "DOMICILIO", property = "domicilio", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CODIGOPOSTAL", property = "codigoPostal", jdbcType = JdbcType.VARCHAR),
@@ -29,6 +29,7 @@ public interface ScsComisariaExtendsMapper extends ScsComisariaMapper{
 		@Result(column = "IDPROVINCIA", property = "idProvincia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TELEFONO1", property = "telefono1", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "TELEFONO2", property = "telefono2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FAX1", property = "fax1", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "CODIGOEXT", property = "codigoExt", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VISIBLEMOVIL", property = "visibleMovil", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NOMBREPOBLACION", property = "nombrePoblacion", jdbcType = JdbcType.VARCHAR),
