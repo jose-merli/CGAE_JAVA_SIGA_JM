@@ -57,6 +57,12 @@ public class MaestroCatalogosController {
 	   return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
 	}
    
+   @RequestMapping(value = "/catmaestros/activate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+   ResponseEntity<UpdateResponseDTO> activateCatalogos(@RequestBody CatalogoDeleteDTO catalogo,HttpServletRequest request) {
+	   UpdateResponseDTO response = maestroCatalogoService.activateDatosCatalogo(catalogo,request);
+	   return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+   
    @RequestMapping(value = "/catmaestros/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
    ResponseEntity<UpdateResponseDTO> createCatalogos(@RequestBody CatalogoUpdateDTO catalogo,HttpServletRequest request) {
 	   UpdateResponseDTO response = maestroCatalogoService.createDatosCatalogo(catalogo,request);

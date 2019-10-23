@@ -13,7 +13,8 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 		SQL sql = new SQL();
 		sql.INSERT_INTO("CEN_DATOSCOLEGIALESESTADO");
 
-		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona  where idpersona like '" + cenDatoscolegialesestado.getIdinstitucion() + "' || '%'  )");
+		sql.VALUES("IDPERSONA", "(Select max(idpersona)  from cen_persona  where idpersona like '"
+				+ cenDatoscolegialesestado.getIdinstitucion() + "' || '%'  )");
 
 		sql.VALUES("IDINSTITUCION", "'" + cenDatoscolegialesestado.getIdinstitucion() + "'");
 
@@ -36,8 +37,8 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 	}
 
 	public String updateEstadoColegial(CenDatoscolegialesestado record, Date fechaEstadoNueva) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		SimpleDateFormat dateFormatWhere = new SimpleDateFormat("dd/MM/yyyy");
 		SQL sql = new SQL();
 		sql.UPDATE("CEN_DATOSCOLEGIALESESTADO");
 
@@ -50,25 +51,27 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 		}
 
 		sql.SET("OBSERVACIONES = '" + record.getObservaciones() + "'");
-		
+ 
+		if (record.getFechamodificacion() != null) {
+			String fechaF = dateFormat.format(record.getFechamodificacion());
+			sql.SET("FECHAMODIFICACION = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
+		}
 
-		sql.SET("FECHAMODIFICACION = TO_DATE('" + dateFormat.format(new Date()) + "', 'dd/MM/RRRR')");
 		sql.SET("USUMODIFICACION = " + record.getUsumodificacion());
 
 		if (fechaEstadoNueva != null) {
-			sql.SET("FECHAESTADO = TO_DATE('" + dateFormat.format(fechaEstadoNueva) + "', 'dd/MM/RRRR')");
-			sql.WHERE("TO_DATE(FECHAESTADO, 'dd/MM/RRRR') = TO_DATE('" + dateFormat.format(record.getFechaestado())
+			sql.SET("FECHAESTADO = TO_DATE('" + dateFormatWhere.format(fechaEstadoNueva) + "', 'dd/MM/RRRR')");
+			sql.WHERE("TO_DATE(FECHAESTADO, 'dd/MM/RRRR') = TO_DATE('" + dateFormatWhere.format(record.getFechaestado())
 					+ "', 'dd/MM/RRRR')");
 		} else {
-			sql.SET("FECHAESTADO = TO_DATE('" + dateFormat.format(record.getFechaestado()) + "', 'dd/MM/RRRR')");
-			sql.WHERE("TO_DATE(FECHAESTADO, 'dd/MM/RRRR') = TO_DATE('" + dateFormat.format(record.getFechaestado())
+			sql.SET("FECHAESTADO = TO_DATE('" + dateFormatWhere.format(record.getFechaestado())
+					+ "', 'dd/MM/RRRR')");
+			sql.WHERE("TO_DATE(FECHAESTADO, 'dd/MM/RRRR') = TO_DATE('" + dateFormatWhere.format(record.getFechaestado())
 					+ "', 'dd/MM/RRRR')");
 		}
-		
+
 		sql.WHERE("IDINSTITUCION = " + record.getIdinstitucion() + "");
 		sql.WHERE("IDPERSONA = " + record.getIdpersona() + "");
-
-		
 
 		return sql.toString();
 	}
@@ -82,7 +85,7 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 		sql.WHERE("IDINSTITUCION = " + record.getIdinstitucion() + "");
 		sql.WHERE("IDPERSONA = " + record.getIdpersona() + "");
 		sql.WHERE("TO_DATE(FECHAESTADO, 'dd/MM/RRRR') = TO_DATE('" + dateFormat.format(record.getFechaestado())
-				+ "', 'dd/MM/RRRR')");
+				+ "', 'DD/MM/YYYY')");
 
 		return sql.toString();
 	}

@@ -1209,9 +1209,9 @@ public class TarjetaDatosBancariosServiceImpl implements ITarjetaDatosBancariosS
 				if (!comboItems.equals(null) && comboItems.size() > 0) {
 					// añade elemento vacio al principio para el dropdown de parte front
 					ComboItem comboItem = new ComboItem();
-					comboItem.setLabel("");
-					comboItem.setValue("");
-					comboItems.add(0, comboItem);
+//					comboItem.setLabel("");
+//					comboItem.setValue("");
+//					comboItems.add(0, comboItem);
 					combo.setCombooItems(comboItems);
 				}
 			}

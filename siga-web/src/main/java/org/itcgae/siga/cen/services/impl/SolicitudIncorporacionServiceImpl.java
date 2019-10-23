@@ -990,7 +990,7 @@ public class SolicitudIncorporacionServiceImpl implements ISolicitudIncorporacio
 		cliente.setUsumodificacion(usuario.getIdusuario());
 		cliente.setIdlenguaje(usuario.getIdlenguaje());
 		cliente.setExportarfoto(SigaConstants.DB_FALSE);
-		cliente.setLetrado("1");
+		cliente.setLetrado("0");
 		cliente.setNoenviarrevista("0");
 		cliente.setNoaparecerredabogacia("0");
 		cliente.setFechacarga(new Date());

@@ -129,9 +129,9 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 
 				if (comboItems != null && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
 					combo.setCombooItems(comboItems);
 				}
 			}
@@ -170,9 +170,9 @@ public class SolicitudModificacionServiceImpl implements ISolicitudModificacionS
 
 				if (comboItems != null && comboItems.size() > 0) {
 					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
 					combo.setCombooItems(comboItems);
 				}
 			}

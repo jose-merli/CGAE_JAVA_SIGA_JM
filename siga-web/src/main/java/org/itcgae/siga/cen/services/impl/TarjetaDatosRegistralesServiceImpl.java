@@ -31,6 +31,8 @@ import org.itcgae.siga.db.entities.CenNocolegiadoActividad;
 import org.itcgae.siga.db.entities.CenNocolegiadoActividadExample;
 import org.itcgae.siga.db.entities.CenNocolegiadoExample;
 import org.itcgae.siga.db.entities.CenNocolegiadoKey;
+import org.itcgae.siga.db.entities.CenPersona;
+import org.itcgae.siga.db.entities.CenPersonaExample;
 import org.itcgae.siga.db.entities.CenRegMercantil;
 import org.itcgae.siga.db.mappers.CenNocolegiadoActividadMapper;
 import org.itcgae.siga.db.mappers.CenRegMercantilMapper;
@@ -266,6 +268,18 @@ public class TarjetaDatosRegistralesServiceImpl implements ITarjetaDatosRegistra
 					}
 				}
 			}
+			
+			// Caso para extraer el idPersona cuando es una nueva sociedad
+			if(perJuridicaDatosRegistralesUpdateDTO.getIdPersona() == null) {
+				CenPersonaExample cenPersonaExample = new CenPersonaExample();
+				cenPersonaExample.createCriteria().andNifcifEqualTo(perJuridicaDatosRegistralesUpdateDTO.getCif());
+				List<CenPersona> cenPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+				
+				if(null != cenPersona && !cenPersona.isEmpty()) {
+					perJuridicaDatosRegistralesUpdateDTO.setIdPersona(String.valueOf(cenPersona.get(0).getIdpersona()));
+				}
+			}
+		
 			
 			// 1. Actualizar tabla cen_persona
 			LOGGER.info(

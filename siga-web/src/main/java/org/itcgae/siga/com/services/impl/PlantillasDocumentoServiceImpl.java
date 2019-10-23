@@ -229,9 +229,9 @@ public class PlantillasDocumentoServiceImpl implements IPlantillasDocumentoServi
 
 					if (null != comboItems && comboItems.size() > 0) {
 						ComboItemConsulta element = new ComboItemConsulta();
-						element.setLabel("");
-						element.setValue("");
-						comboItems.add(0, element);
+//						element.setLabel("");
+//						element.setValue("");
+//						comboItems.add(0, element);
 					}
 
 					comboConsultasDTO.setConsultasCondicional(comboItems);
