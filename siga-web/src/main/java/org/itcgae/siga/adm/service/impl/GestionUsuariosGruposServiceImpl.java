@@ -214,9 +214,13 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 	}
 
 	@Override
-	public UpdateResponseDTO updateUsers(UsuarioUpdateDTO usuarioUpdateDTO, HttpServletRequest request) {
+	public UpdateResponseDTO updateUsers(ArrayList<UsuarioUpdateDTO> usuarioUpdateDTOArr, HttpServletRequest request) {
 		LOGGER.info("updateUsers() -> Entrada al servicio para actualizar datos de usuario");
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		for (int j= 0; j<usuarioUpdateDTOArr.size() ; j++) {
+		UsuarioUpdateDTO usuarioUpdateDTO = new UsuarioUpdateDTO();
+		usuarioUpdateDTO = usuarioUpdateDTOArr.get(j);
+		
 		int response1 = 1;
 		int response2 = 0;
 		int response3 = 0;
@@ -245,6 +249,9 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		LOGGER.debug("updateUsers() -> Pone activo al usuario si no lo estaba");
 		if (!usuarioUpdateDTO.getActivo().equalsIgnoreCase("")
 				|| !usuarioUpdateDTO.getCodigoExterno().equalsIgnoreCase("")) {
+			if(usuarioUpdateDTO.getCodigoExterno() == null) {
+				usuarioUpdateDTO.setCodigoExterno("");
+			}
 			LOGGER.info(
 					"updateUsers() / admUsuariosExtendsMapper.updateUsersAdmUserTable() -> Entrada a admUsuariosExtendsMapper para poner un usuario a activo");
 			response1 = admUsuariosExtendsMapper.updateUsersAdmUserTable(usuarioUpdateDTO);
@@ -450,7 +457,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		}
 
 		// comprobar si ha actualizado en bd correctamente
-		if (response1 == 1 && response2 == 1 && response3 == 1 && serviceOK) {
+		if (response1 == 1 && response3 == 1 && serviceOK) {
 			updateResponseDTO.setStatus(SigaConstants.OK);
 			LOGGER.info("updateUsers() -> OK. Se han actualizado correctamente los datos de usuario");
 		} else {
@@ -459,6 +466,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		}
 
 		LOGGER.info("updateUsers() -> Salida del servicio para actualizar datos de usuario");
+	}//FIN BUCLE
 		return updateResponseDTO;
 	}
 
@@ -477,6 +485,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
 		// Asignacion de la institucion del token al usuario que queremos crear
 		usuarioCreateDTO.setIdInstitucion(institucion);
+		usuarioCreateDTO.setActivo("S");
 		AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 		exampleUsuarios.createCriteria().andNifEqualTo(dni)
 				.andIdinstitucionEqualTo(Short.valueOf(usuarioCreateDTO.getIdInstitucion()));
@@ -505,6 +514,7 @@ public class GestionUsuariosGruposServiceImpl implements IGestionUsuariosGruposS
 				if (userNifInstitucion.size() == 0) {
 					if (!usuarioCreateDTO.getIdInstitucion().equalsIgnoreCase("")
 							&& !usuarioCreateDTO.getIdInstitucion().equals(null)) {
+						usuarioCreateDTO.setFechaAlta(new Date());
 						LOGGER.info(
 								"createUsers() / admUsuariosExtendsMapper.createUserAdmUsuariosTable() -> Entrada a admUsuariosExtendsMapper añadir registro del usuario en tabla AdmUsuarios");
 						response1 = admUsuariosExtendsMapper.createUserAdmUsuariosTable(usuarioCreateDTO,

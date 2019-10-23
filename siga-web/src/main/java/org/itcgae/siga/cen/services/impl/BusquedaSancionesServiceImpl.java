@@ -90,9 +90,9 @@ public class BusquedaSancionesServiceImpl implements IBusquedaSancionesService {
 
 			// añade elemento vacio al principio para el dropdown de parte front
 			ComboItem comboItem = new ComboItem();
-			comboItem.setLabel("");
-			comboItem.setValue("");
-			comboItems.add(0, comboItem);
+//			comboItem.setLabel("");
+//			comboItem.setValue("");
+//			comboItems.add(0, comboItem);
 
 			comboDTO.setCombooItems(comboItems);
 		}

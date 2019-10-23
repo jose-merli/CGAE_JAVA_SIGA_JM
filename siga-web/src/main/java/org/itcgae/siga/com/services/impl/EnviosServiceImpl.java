@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+import javax.mail.Address;
 import javax.mail.BodyPart;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -236,6 +237,10 @@ public class EnviosServiceImpl implements IEnviosService{
                         //Se crea un nuevo Mensaje.
                         MimeMessage mensaje = new MimeMessage(sesion);
                         mensaje.setFrom(new InternetAddress(from,descFrom));
+						mensaje.setReplyTo(new javax.mail.Address[]
+								{
+									    new javax.mail.internet.InternetAddress(from)
+									});
                         InternetAddress toInternetAddress = new InternetAddress(sTo);
                         mensaje.addRecipient(MimeMessage.RecipientType.TO,toInternetAddress);
                         

@@ -33,6 +33,12 @@ public class BusquedaCensoGeneralController {
 		return new ResponseEntity<BusquedaPerFisicaDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "busquedaCensoGeneral/searchExact", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<BusquedaPerFisicaDTO> searchExact(@RequestParam("numPagina") int numPagina, @RequestBody BusquedaPerFisicaSearchDTO busquedaPerFisicaSearchDTO, HttpServletRequest request) { 
+		BusquedaPerFisicaDTO response = busquedaCensoGeneralService.searchExact(numPagina, busquedaPerFisicaSearchDTO, request);
+		return new ResponseEntity<BusquedaPerFisicaDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "busquedaCensoGeneral/searchCliente",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<NoColegiadoDTO> searchCliente(@RequestBody NoColegiadoItem noColegiadoItem, HttpServletRequest request) {
 		NoColegiadoDTO response = busquedaCensoGeneralService.searchCliente(noColegiadoItem, request);

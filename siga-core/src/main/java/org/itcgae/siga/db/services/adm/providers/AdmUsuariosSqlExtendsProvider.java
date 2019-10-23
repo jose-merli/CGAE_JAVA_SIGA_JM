@@ -144,6 +144,7 @@ public class AdmUsuariosSqlExtendsProvider extends AdmUsuariosSqlProvider{
 		sql.VALUES("FECHAALTA", "SYSDATE");
 		sql.VALUES("IDLENGUAJE", "'" + usuarioCreateDTO.getIdLenguaje() + "'");
 		//sql.VALUES("CODIGOEXT", "' '");
+		sql.VALUES("CODIGOEXT", "'" + usuarioCreateDTO.getCodigoExterno() + "'");
 
 		return sql.toString();
 	}

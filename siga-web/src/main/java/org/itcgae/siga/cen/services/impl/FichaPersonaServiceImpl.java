@@ -189,12 +189,27 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 				key.setIdpersona(Long.valueOf(asociarPersona.getIdPersonaAsociar()));
 				
 				CenCliente cliente = cenClienteMapper.selectByPrimaryKey(key );
+				int responseCenCliente = 0;
 				if (!(null != cliente)) {
 					CenCliente recordCliente = new CenCliente();
 					recordCliente = rellenarInsertCenCliente(usuario,asociarPersona.getIdPersonaAsociar(),idInstitucion);
-					int responseCenCliente = cenClienteMapper.insertSelective(recordCliente);
+					responseCenCliente = cenClienteMapper.insertSelective(recordCliente);
 				}
 
+				// Insertamos en NoColegiado
+				if(responseCenCliente == 1) {
+					
+					LOGGER.info(
+							"savePerson() / cenNocolegiadoExtendsMapper.insertSelective() -> Entrada a cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+
+					CenNocolegiado cenNocolegiado = rellenarInsertCenNoColegiado(usuario, Long.valueOf(asociarPersona.getIdPersonaAsociar()), idInstitucion);
+					cenNocolegiadoExtendsMapper
+							.insertSelective(cenNocolegiado);
+					
+					LOGGER.info(
+							"savePerson() / cenNocolegiadoExtendsMapper.insertSelective() -> Salida de cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+				}
+				
 				CenNocolegiadoExample cenNoColegiadoExample = new CenNocolegiadoExample();
 				cenNoColegiadoExample.createCriteria().andIdpersonaEqualTo(Long.valueOf(asociarPersona.getIdPersona())).andIdinstitucionEqualTo(idInstitucion);
 				colegiado.setIdpersonanotario(Long.valueOf(asociarPersona.getIdPersonaAsociar()));
@@ -282,6 +297,19 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			recordCliente = rellenarInsertCenCliente(usuario,maxIdPersona,idInstitucion);
 			int responseCenCliente = cenClienteMapper.insertSelective(recordCliente);
 			
+			// Insertamos en NoColegiado
+			if(responseCenCliente == 1) {
+				LOGGER.info(
+						"createPersonFile() / cenNocolegiadoExtendsMapper.insertSelective() -> Entrada a cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+
+				
+				CenNocolegiado cenNocolegiado = rellenarInsertCenNoColegiado(usuario, nuevoIdPersona, idInstitucion);
+				cenNocolegiadoExtendsMapper
+						.insertSelective(cenNocolegiado);
+				
+				LOGGER.info(
+						"createPersonFile() / cenNocolegiadoExtendsMapper.insertSelective() -> Salida de cenNocolegiadoExtendsMapper para crear un nuevo no colegiado");
+			}
 		}
 		
 		if(comboItems.isEmpty()) {
@@ -314,10 +342,10 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			comboItems = cenTipoidentificacionExtendsMapper.getIdentificationTypes(usuario.getIdlenguaje());
 
 			ComboItem comboItem = new ComboItem();
-			comboItem.setLabel("");
-			comboItem.setValue("");
-
-			comboItems.add(0, comboItem);
+//			comboItem.setLabel("");
+//			comboItem.setValue("");
+//
+//			comboItems.add(0, comboItem);
 		}
 		comboDTO.setCombooItems(comboItems);
 		
@@ -341,6 +369,17 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 		record.setExportarfoto(SigaConstants.DB_FALSE);
 		
 		return record;
+	}
+	
+	protected CenNocolegiado rellenarInsertCenNoColegiado(AdmUsuarios usuario, Long idPersona, Short idInstitucion) {
+		CenNocolegiado cenNocolegiado = new CenNocolegiado();
+		cenNocolegiado.setFechamodificacion(new Date());
+		cenNocolegiado.setIdpersona(idPersona);
+		cenNocolegiado.setUsumodificacion(usuario.getIdusuario());
+		cenNocolegiado.setIdinstitucion(idInstitucion);
+		cenNocolegiado.setTipo("1");
+		cenNocolegiado.setSociedadsj("0");
+		return cenNocolegiado;
 	}
 	
 	@Override

@@ -13,7 +13,7 @@ public class BusquedaPerJuridicaDTO {
 	
 	private List<BusquedaPerJuridicaItem> busquedaPerJuridicaItems = new ArrayList<BusquedaPerJuridicaItem>();
 	private Error error = null;
-	
+	private Boolean onlyNif = false;
 	
 	/**
 	 *
@@ -97,5 +97,14 @@ public class BusquedaPerJuridicaDTO {
 	      return "null";
 	    }
 	    return o.toString().replace("\n", "\n    ");
+	}
+	
+	public Boolean getOnlyNif() {
+		return onlyNif;
+	}
+
+
+	public void setOnlyNif(Boolean onlyNif) {
+		this.onlyNif = onlyNif;
 	}
 }

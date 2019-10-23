@@ -91,13 +91,21 @@ public class FichaCursosController {
 	@RequestMapping(value = "fichaCursos/saveCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> saveCourse(@RequestBody CursoItem cursoItem, HttpServletRequest request) {
 		InsertResponseDTO response = fichaCursosService.saveCourse(cursoItem, request);
-		return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		
+		if(response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "fichaCursos/updateCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> updatedCourse(@RequestBody CursoItem cursoItem, HttpServletRequest request) {
 		UpdateResponseDTO response = fichaCursosService.updateCourse(cursoItem, request);
-		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		
+		if(response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@RequestMapping(value = "fichaCursos/releaseOrAnnounceCourse", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -86,9 +86,9 @@ public class ContadoresServiceImpl implements IContadoresService{
 		if(!comboItems.equals(null) && comboItems.size() > 0) {
 			// añade elemento vacio al princpio para el dropdown de parte front
 			ComboItem comboItem = new ComboItem();
-			comboItem.setLabel("");
-			comboItem.setValue("-1");
-			comboItems.add(0, comboItem); 
+//			comboItem.setLabel("");
+//			comboItem.setValue("-1");
+//			comboItems.add(0, comboItem); 
 			combo.setCombooItems(comboItems);
 		}
 		else {

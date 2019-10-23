@@ -3,10 +3,7 @@ package org.itcgae.siga.db.services.com.providers;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.jdbc.SQL;
-import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.commons.constants.SigaConstants;
 
@@ -30,7 +27,6 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.SELECT("modelo.PRESELECCIONAR");
 		sql.SELECT("modelo.IDCLASECOMUNICACION");
 		sql.SELECT("modelo.FECHABAJA");
-		sql.SELECT("clase.NOMBRE AS NOMBRECLASE");
 		sql.SELECT("inst.ABREVIATURA");
 		sql.SELECT("modelo.PORDEFECTO");
 		sql.SELECT("modelo.IDPLANTILLAENVIOS");
@@ -38,6 +34,8 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		sql.SELECT(
 				"(SELECT CAT.DESCRIPCION FROM ENV_TIPOENVIOS PLA LEFT JOIN GEN_RECURSOS_CATALOGOS CAT ON CAT.IDRECURSO = PLA.NOMBRE WHERE PLA.IDTIPOENVIOS = modelo.IDTIPOENVIOS AND CAT.IDLENGUAJE = '"
 						+ idLenguaje + "') AS TIPOENVIO");
+		sql.SELECT("(SELECT CAT2.DESCRIPCION FROM MOD_CLASECOMUNICACIONES CLA LEFT JOIN GEN_RECURSOS_CATALOGOS CAT2 ON CAT2.IDRECURSO = CLA.DESCRIPCION WHERE CLA.IDCLASECOMUNICACION = modelo.IDCLASECOMUNICACION AND CLA. CAT2.IDLENGUAJE = '"
+						+ idLenguaje +"') AS NOMBRECLASE");
 
 		sql.FROM("MOD_MODELOCOMUNICACION modelo");
 
@@ -93,7 +91,7 @@ public class ModModeloComunicacionExtendsSqlProvider {
 		return sql.toString();
 	}
 
-	public String selectModelosComunicacionDialg(String idInstitucion, String idClaseComunicacion, String idModulo,
+	public String selectModelosComunicacionDialg(String idInstitucionLogueada, String idInstitucion, String idClaseComunicacion, String idModulo,
 			String idLenguaje, String idConsulta, List<String> perfiles) {
 
 		SQL sql = new SQL();
@@ -110,8 +108,8 @@ public class ModModeloComunicacionExtendsSqlProvider {
 
 		sql.FROM("MOD_MODELOCOMUNICACION MODELO");
 		sql.JOIN("MOD_CLASECOMUNICACIONES CLASE ON CLASE.IDCLASECOMUNICACION = MODELO.IDCLASECOMUNICACION");
-		sql.JOIN(
-				"MOD_MODELO_PERFILES PERFILES ON PERFILES.IDMODELOCOMUNICACION = MODELO.IDMODELOCOMUNICACION AND PERFILES.IDINSTITUCION = MODELO.IDINSTITUCION");
+		sql.JOIN( // = MODELO.IDINSTITUCION
+				"MOD_MODELO_PERFILES PERFILES ON PERFILES.IDMODELOCOMUNICACION = MODELO.IDMODELOCOMUNICACION AND PERFILES.IDINSTITUCION = " + idInstitucionLogueada);
 
 		if(idInstitucion.equals(SigaConstants.IDINSTITUCION_2000.toString())) {
 			sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND (CLASE.IDMODULO = " + idModulo
@@ -119,8 +117,8 @@ public class ModModeloComunicacionExtendsSqlProvider {
 			sql.WHERE("MODELO.VISIBLE = '1'");
 
 		}else {
-			sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND (CLASE.IDMODULO = " + idModulo
-					+ " OR CLASE.IDMODULO IS NULL) AND MODELO.FECHABAJA IS NULL ");	
+			// CLASE.IDMODULO = " + idModulo + " OR 
+			sql.WHERE("MODELO.IDCLASECOMUNICACION = " + idClaseComunicacion + " AND (CLASE.IDMODULO = " + idModulo + " OR CLASE.IDMODULO IS NULL) AND MODELO.FECHABAJA IS NULL ");	
 			sql.WHERE("((MODELO.IDINSTITUCION = " + idInstitucion + " AND MODELO.VISIBLE = '1') or (MODELO.IDINSTITUCION = " + SigaConstants.IDINSTITUCION_2000 + " AND MODELO.VISIBLE = '1' and modelo.pordefecto = 'SI'))");
 
 

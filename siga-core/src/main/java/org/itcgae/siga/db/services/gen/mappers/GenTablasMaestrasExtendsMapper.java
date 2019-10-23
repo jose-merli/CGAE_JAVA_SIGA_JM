@@ -74,6 +74,9 @@ public interface GenTablasMaestrasExtendsMapper extends GenTablasMaestrasMapper{
      */
     @UpdateProvider(type=GenTablasMaestrasSqlExtendProvider.class, method="deleteRecursos")
     int deleteRecursos(GenTablasMaestras example,CatalogoDeleteDTO catalogo, Boolean idInstitucion);
+    
+    @UpdateProvider(type=GenTablasMaestrasSqlExtendProvider.class, method="activateRecursos")
+    int activateRecursos(GenTablasMaestras example,CatalogoDeleteDTO catalogo, Boolean idInstitucion);
 
     
     /**
