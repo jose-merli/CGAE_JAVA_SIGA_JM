@@ -437,5 +437,15 @@ public class CenInstitucionSqlExtendsProvider extends CenInstitucionSqlProvider{
 		
 		return sql.toString();
 	}
+	
+	public String getInstitucionesConsejos(Short idInstitucion) {
+		SQL sql = new SQL();
+		sql.SELECT("IDINSTITUCION");
+		sql.SELECT("ABREVIATURA as NOMBRE");
+		sql.FROM("CEN_INSTITUCION");
+		sql.WHERE("CEN_INST_IDINSTITUCION = '" + idInstitucion + "' or IDINSTITUCION = '" + idInstitucion + "'");
+		sql.ORDER_BY("NOMBRE");
+		return sql.toString();
+	}
     
 }

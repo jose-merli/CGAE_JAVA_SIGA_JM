@@ -860,4 +860,11 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static String EXPRESION_REGULAR_MAIL = "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,10}$";
 	public static String EXPRESION_REGULAR_MOVIL = "(\\+34|0034|34|\\(\\+34\\)|\\(0034\\)|34)?[ -]*(6|7)[ -]*([0-9][ -]*){8}";
 	
+	public static String EVENTO_TIPO_FIESTA_NACIONAL = "Fiesta Nacional";
+	public static String EVENTO_TIPO_FIESTA_LOCAL = "Fiesta Local";
+	public static String EVENTO_TIPO_FIESTA_AUTONOMICA = "Fiesta Autonómica";
+	
+	public static String EVENTO_TIPO_FESTIVO = "9";
+
+	
 }
