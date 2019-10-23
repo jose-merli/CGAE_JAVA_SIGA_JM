@@ -528,7 +528,7 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 	public String updateCourse (CursoItem cursoItem, AdmUsuarios usuario) {
 		SQL sql = new SQL();
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		
 		sql.UPDATE("FOR_CURSO");
 		

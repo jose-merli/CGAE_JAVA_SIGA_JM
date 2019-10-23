@@ -49,7 +49,7 @@ public class CenDatoscvSqlExtendsProvider extends CenDatoscvSqlProvider{
 	}
 	
 	public String updateCurriculo(CenDatoscv record) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
 			SQL sql = new SQL();
 			SQL sql1 = new SQL();

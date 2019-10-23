@@ -37,7 +37,7 @@ public class CenDatoscolegialesestadoSqlExtendsProvider extends CenDatoscolegial
 	}
 
 	public String updateEstadoColegial(CenDatoscolegialesestado record, Date fechaEstadoNueva) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		SimpleDateFormat dateFormatWhere = new SimpleDateFormat("dd/MM/yyyy");
 		SQL sql = new SQL();
 		sql.UPDATE("CEN_DATOSCOLEGIALESESTADO");

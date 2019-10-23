@@ -69,7 +69,7 @@ public class CenSolicitudmodificacioncvSqlExtendsProvider extends CenSolicitudmo
 	
 
 	public String solicitudUpdateCurriculo(CenSolicitudmodificacioncv record) {
-		    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+		    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		
 			SQL sql = new SQL();
 			SQL sql1 = new SQL();
