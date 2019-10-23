@@ -11,6 +11,7 @@ public class ModulosItem {
 	private String importe;
 	private String nombre;
 	private String idProcedimiento;
+	private String procedimientos;
 	private String precio;
 	private String idjurisdiccion;
 	private Date fechabaja;
@@ -175,5 +176,13 @@ public class ModulosItem {
 
 	public void setImporte(String importe) {
 		this.importe = importe;
+	}
+
+	public String getProcedimientos() {
+		return procedimientos;
+	}
+
+	public void setProcedimientos(String procedimientos) {
+		this.procedimientos = procedimientos;
 	}
 }
