@@ -82,22 +82,24 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		SQL sql3 = new SQL();
 		sql3.SELECT("MIN(pys.valor) as PRECIODESDE");
 		sql3.SELECT("SERVICIOINST.DESCRIPCION");
+		sql3.SELECT("PYS.IDINSTITUCION");
 		sql3.FROM("PYS_SERVICIOS SERVICIO");
 		sql3.INNER_JOIN("PYS_SERVICIOSINSTITUCION SERVICIOINST ON SERVICIOINST.IDSERVICIO = SERVICIO.IDSERVICIO AND SERVICIO.IDTIPOSERVICIOS = SERVICIOINST.IDTIPOSERVICIOS");
 		sql3.INNER_JOIN("PYS_PRECIOSSERVICIOS PYS ON PYS.IDSERVICIO = SERVICIO.IDSERVICIO AND SERVICIO.IDTIPOSERVICIOS = PYS.IDTIPOSERVICIOS  "
-				+ "AND PYS.IDSERVICIOSINSTITUCION = SERVICIOINST.IDSERVICIOSINSTITUCION");
-		sql3.INNER_JOIN("PYS_PERIODICIDAD per on per.IDPERIODICIDAD = pys.IDPERIODICIDAD where pys.idInstitucion = '" + idInstitucion + "' GROUP BY SERVICIOINST.DESCRIPCION");
-		sql.LEFT_OUTER_JOIN("(" + sql3 + ")  MINPRECIO ON MINPRECIO.DESCRIPCION = CURSO.NOMBRECURSO");
+				+ "AND PYS.IDSERVICIOSINSTITUCION = SERVICIOINST.IDSERVICIOSINSTITUCION AND PYS.IDINSTITUCION = SERVICIOINST.IDINSTITUCION");
+		sql3.INNER_JOIN("PYS_PERIODICIDAD per on per.IDPERIODICIDAD = pys.IDPERIODICIDAD GROUP BY SERVICIOINST.DESCRIPCION, PYS.IDINSTITUCION");
+		sql.LEFT_OUTER_JOIN("(" + sql3 + ")  MINPRECIO ON MINPRECIO.DESCRIPCION = CURSO.NOMBRECURSO and MINPRECIO.IDINSTITUCION = CURSO.IDINSTITUCION");
 		
 		SQL sql4 = new SQL();
 		sql4.SELECT("MAX(pys.valor) as PRECIOHASTA");
 		sql4.SELECT("SERVICIOINST.DESCRIPCION");
+		sql4.SELECT("PYS.IDINSTITUCION");
 		sql4.FROM("PYS_SERVICIOS SERVICIO");
 		sql4.INNER_JOIN("PYS_SERVICIOSINSTITUCION SERVICIOINST ON SERVICIOINST.IDSERVICIO = SERVICIO.IDSERVICIO AND SERVICIO.IDTIPOSERVICIOS = SERVICIOINST.IDTIPOSERVICIOS");
 		sql4.INNER_JOIN("PYS_PRECIOSSERVICIOS PYS ON PYS.IDSERVICIO = SERVICIO.IDSERVICIO AND SERVICIO.IDTIPOSERVICIOS = PYS.IDTIPOSERVICIOS  "
-				+ "AND PYS.IDSERVICIOSINSTITUCION = SERVICIOINST.IDSERVICIOSINSTITUCION");
-		sql4.INNER_JOIN("PYS_PERIODICIDAD per on per.IDPERIODICIDAD = pys.IDPERIODICIDAD where pys.idInstitucion = '" + idInstitucion + "' GROUP BY SERVICIOINST.DESCRIPCION");
-		sql.LEFT_OUTER_JOIN("(" + sql4 + ")  MAXPRECIO ON MAXPRECIO.DESCRIPCION = CURSO.NOMBRECURSO");
+				+ "AND PYS.IDSERVICIOSINSTITUCION = SERVICIOINST.IDSERVICIOSINSTITUCION AND PYS.IDINSTITUCION = SERVICIOINST.IDINSTITUCION");
+		sql4.INNER_JOIN("PYS_PERIODICIDAD per on per.IDPERIODICIDAD = pys.IDPERIODICIDAD GROUP BY SERVICIOINST.DESCRIPCION, PYS.IDINSTITUCION");
+		sql.LEFT_OUTER_JOIN("(" + sql4 + ")  MAXPRECIO ON MAXPRECIO.DESCRIPCION = CURSO.NOMBRECURSO and MAXPRECIO.IDINSTITUCION = CURSO.IDINSTITUCION");
 		
 		sql.LEFT_OUTER_JOIN("FOR_EVENTO_CURSO EVENTOCURSO ON EVENTOCURSO.IDCURSO = CURSO.IDCURSO");
 		sql.LEFT_OUTER_JOIN("AGE_EVENTO EVENTO ON (EVENTO.IDEVENTO = EVENTOCURSO.IDEVENTO AND EVENTO.IDESTADOEVENTO <> 3 AND EVENTO.IDTIPOEVENTO = 8)");
@@ -526,11 +528,11 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 	public String updateCourse (CursoItem cursoItem, AdmUsuarios usuario) {
 		SQL sql = new SQL();
 		
- 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		
 		sql.UPDATE("FOR_CURSO");
 		
-		sql.SET("FECHAMODIFICACION = TO_DATE('" + dateFormat.format(new Date()) + "','DD/MM/YYYY')");
+		sql.SET("FECHAMODIFICACION = TO_DATE('" + dateFormat.format(new Date()) + "','DD/MM/YYYY hh24:mi:ss')");
 		sql.SET("USUMODIFICACION = '" + usuario.getIdusuario() + "'");
 		
  		if(null != cursoItem.getNombreCurso()) {
@@ -542,19 +544,19 @@ public class ForCursoSqlExtendsProvider extends ForCursoSqlProvider {
 		}
 
  		if(null != cursoItem.getFechaImparticionDesdeDate()) {
-			sql.SET("FECHAIMPARTICIONDESDE = TO_DATE('" + dateFormat.format(cursoItem.getFechaImparticionDesdeDate()) + "','DD/MM/YYYY')");
+			sql.SET("FECHAIMPARTICIONDESDE = TO_DATE('" + dateFormat.format(cursoItem.getFechaImparticionDesdeDate()) + "','DD/MM/YYYY hh24:mi:ss')");
 		}
  		
  		if(null != cursoItem.getFechaImparticionHastaDate()) {
-			sql.SET("FECHAIMPARTICIONHASTA = TO_DATE('" + dateFormat.format(cursoItem.getFechaImparticionHastaDate()) + "','DD/MM/YYYY')");
+			sql.SET("FECHAIMPARTICIONHASTA = TO_DATE('" + dateFormat.format(cursoItem.getFechaImparticionHastaDate()) + "','DD/MM/YYYY hh24:mi:ss')");
 		}
  		
  		if(null != cursoItem.getFechaInscripcionDesdeDate()) {
-			sql.SET("FECHAINSCRIPCIONDESDE = TO_DATE('" + dateFormat.format(cursoItem.getFechaInscripcionDesdeDate()) + "','DD/MM/YYYY')");
+			sql.SET("FECHAINSCRIPCIONDESDE = TO_DATE('" + dateFormat.format(cursoItem.getFechaInscripcionDesdeDate()) + "','DD/MM/YYYY hh24:mi:ss')");
 		}
  		
  		if(null != cursoItem.getFechaInscripcionHastaDate()) {
-			sql.SET("FECHAINSCRIPCIONHASTA = TO_DATE('" + dateFormat.format(cursoItem.getFechaInscripcionHastaDate()) + "','DD/MM/YYYY')");
+			sql.SET("FECHAINSCRIPCIONHASTA = TO_DATE('" + dateFormat.format(cursoItem.getFechaInscripcionHastaDate()) + "','DD/MM/YYYY hh24:mi:ss')");
 		}
  		
  		if(null != cursoItem.getPlazasDisponibles()) {

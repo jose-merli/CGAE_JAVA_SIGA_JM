@@ -370,9 +370,9 @@ public class TarjetaDatosDireccionesServiceImpl implements ITarjetaDatosDireccio
 		if (null != poblaciones && poblaciones.size() > 0) {
 			List<ComboItem> combooItems = new ArrayList<ComboItem>();
 			ComboItem comboItem = new ComboItem();
-			comboItem.setLabel("");
-			comboItem.setValue("");
-			combooItems.add(comboItem);
+//			comboItem.setLabel("");
+//			comboItem.setValue("");
+//			combooItems.add(comboItem);
 
 			for (CenPoblaciones cenPoblaciones : poblaciones) {
 				comboItem = new ComboItem();

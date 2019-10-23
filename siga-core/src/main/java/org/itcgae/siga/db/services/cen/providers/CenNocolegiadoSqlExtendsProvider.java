@@ -434,7 +434,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			AdmUsuarios usuario) {
 		SQL sql = new SQL();
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
 		sql.UPDATE("cen_nocolegiado");
 			sql.SET("RESENA = '" + perJuridicaDatosRegistralesUpdateDTO.getResena().replace("'", "''") + "'");
@@ -444,7 +444,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 			
 		if(null != perJuridicaDatosRegistralesUpdateDTO.getFechaFin()) {
 			String fechaF = dateFormat.format(perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
-			sql.SET("FECHAFIN = TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+			sql.SET("FECHAFIN = TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 		}else {
 			sql.SET("FECHAFIN = " + perJuridicaDatosRegistralesUpdateDTO.getFechaFin());
 		}
@@ -467,17 +467,17 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp())) {
 			sql.SET("PREFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp().replace("'", "''") + "'");
 		}else {
-			sql.SET("PREFIJO_NUMSSPP = " + perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp().replace("'", "''"));
+			sql.SET("PREFIJO_NUMSSPP = " + perJuridicaDatosRegistralesUpdateDTO.getPrefijoNumsspp());
 		}
 		if(!UtilidadesString.esCadenaVacia(perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp())) {
 			sql.SET("CONTADOR_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp().replace("'", "''") + "'");
 		}else {
-			sql.SET("CONTADOR_NUMSSPP = " + perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp().replace("'", "''"));
+			sql.SET("CONTADOR_NUMSSPP = " + perJuridicaDatosRegistralesUpdateDTO.getContadorNumsspp());
 		}
 		if(null!=perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp() && !perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp().equals("")) {
 			sql.SET("SUFIJO_NUMSSPP = '" + perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp().replace("'", "''") + "'");
 		}else {
-			sql.SET("SUFIJO_NUMSSPP = " + perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp().replace("'", "''"));
+			sql.SET("SUFIJO_NUMSSPP = " + perJuridicaDatosRegistralesUpdateDTO.getSufijoNumsspp());
 		}
 		
 		sql.SET("FECHAMODIFICACION = SYSDATE");

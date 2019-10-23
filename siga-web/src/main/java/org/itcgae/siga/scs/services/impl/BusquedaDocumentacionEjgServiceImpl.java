@@ -429,7 +429,7 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("areasmaterias.materias.ficha.eliminarError");
+//			error.setDescription("areasmaterias.materias.ficha.eliminarError");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);

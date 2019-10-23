@@ -165,12 +165,11 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				LOGGER.info(
 						"searchJuridica() / cenNocolegiadoExtendsMapper.searchLegalPersons() -> Salida de cenNocolegiadoExtendsMapper para búsqueda de personas juridicas por filtro");
 
-				if(busquedaJuridicaItems.size() == 0) {
-					
+				if (busquedaJuridicaItems.size() == 0 || null == busquedaJuridicaItems) {
+
 					CenPersonaExample cenPersonaExample = new CenPersonaExample();
-					cenPersonaExample.createCriteria()
-					.andIdtipoidentificacionNotEqualTo(Short.valueOf("20"))
-					.andNifcifEqualTo(busquedaPerJuridicaSearchDTO.getNif());
+					cenPersonaExample.createCriteria().andIdtipoidentificacionNotEqualTo(Short.valueOf("20"))
+							.andNifcifEqualTo(busquedaPerJuridicaSearchDTO.getNif());
 
 					List<CenPersona> listPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
 
@@ -180,7 +179,21 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 						busquedaPerJuridicaDTO.setError(error);
 					}
 
+					if (!UtilidadesString.esCadenaVacia(busquedaPerJuridicaSearchDTO.getNif())) {
+						BusquedaPerJuridicaSearchDTO segundaBusqueda = new BusquedaPerJuridicaSearchDTO();
+						segundaBusqueda.setNif(busquedaPerJuridicaSearchDTO.getNif());
+						segundaBusqueda.setIdInstitucion(null);
+						busquedaJuridicaItems = cenPersonaExtendsMapper.searchPerJuridica(numPagina, segundaBusqueda,
+								idLenguaje);
+
+						if (busquedaJuridicaItems.size() > 0) {
+							busquedaPerJuridicaDTO.setOnlyNif(true);
+						} else {
+							busquedaPerJuridicaDTO.setOnlyNif(false);
+						}
+					}
 				}
+
 				// Llamamos al WS de Sociedades para buscar personas jurídicas.
 				// if (null == busquedaJuridicaItems || busquedaJuridicaItems.size()==0) {
 				// AdmConfigExample example = new AdmConfigExample();
@@ -341,21 +354,33 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 				busquedaPerFisicaItems = cenPersonaExtendsMapper.searchPerFisica(busquedaPerFisicaSearchDTO, idLenguaje,
 						String.valueOf(idInstitucion));
 
-				// if(busquedaPerFisicaItems.size() == 0 || null == busquedaPerFisicaItems) {
-				// if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
-				// BusquedaPerFisicaSearchDTO segundaBusqueda = new
-				// BusquedaPerFisicaSearchDTO();
-				// segundaBusqueda.setNif(busquedaPerFisicaSearchDTO.getNif());
-				// busquedaPerFisicaItems =
-				// cenPersonaExtendsMapper.searchPerFisica(segundaBusqueda, idLenguaje,
-				// String.valueOf(idInstitucion));
-				// if(busquedaPerFisicaItems.size() > 0) {
-				// busquedaPerFisicaDTO.setOnlyNif(true);
-				// }else {
-				// busquedaPerFisicaDTO.setOnlyNif(false);
-				// }
-				// }
-				// }
+				if (busquedaPerFisicaItems.size() == 0 || null == busquedaPerFisicaItems) {
+
+					CenPersonaExample cenPersonaExample = new CenPersonaExample();
+					cenPersonaExample.createCriteria().andIdtipoidentificacionNotEqualTo(Short.valueOf("20"))
+							.andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
+
+					List<CenPersona> listPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
+
+					if (null != listPersona && listPersona.size() > 0) {
+						Error error = new Error();
+						error.setMessage("general.mensaje.busquedaGeneral.noexiste.personaFisica");
+						busquedaPerFisicaDTO.setError(error);
+					}
+
+					if (!UtilidadesString.esCadenaVacia(busquedaPerFisicaSearchDTO.getNif())) {
+						BusquedaPerFisicaSearchDTO segundaBusqueda = new BusquedaPerFisicaSearchDTO();
+						segundaBusqueda.setNif(busquedaPerFisicaSearchDTO.getNif());
+						busquedaPerFisicaItems = cenPersonaExtendsMapper.searchPerFisica(segundaBusqueda, idLenguaje,
+								null);
+
+						if (busquedaPerFisicaItems.size() > 0) {
+							busquedaPerFisicaDTO.setOnlyNif(true);
+						} else {
+							busquedaPerFisicaDTO.setOnlyNif(false);
+						}
+					}
+				}
 
 				LOGGER.info(
 						"searchPerFisica() / cenPersonaExtendsMapper.searchPerFisica() -> Salida de cenPersonaExtendsMapper para obtener lista de personas físicas");
@@ -420,9 +445,8 @@ public class BusquedaPerServiceImpl implements IBusquedaPerService {
 							// Buscamos si se encuentra en nuestra bbdd
 						} else {
 							CenPersonaExample cenPersonaExample = new CenPersonaExample();
-							cenPersonaExample.createCriteria()
-							.andIdtipoidentificacionEqualTo(Short.valueOf("20"))
-							.andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
+							cenPersonaExample.createCriteria().andIdtipoidentificacionEqualTo(Short.valueOf("20"))
+									.andNifcifEqualTo(busquedaPerFisicaSearchDTO.getNif());
 
 							List<CenPersona> listPersona = cenPersonaExtendsMapper.selectByExample(cenPersonaExample);
 

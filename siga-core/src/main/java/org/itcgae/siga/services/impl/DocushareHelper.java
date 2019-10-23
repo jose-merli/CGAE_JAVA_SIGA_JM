@@ -181,7 +181,7 @@ public class DocushareHelper {
 			// BusinessManager.getInstance()
 			// .getService(GenParametrosService.class);
 			
-			
+			log.debug("Entramos a buscar la colección de Censo");
 			List<String> listaParametros = new ArrayList<>();
 			listaParametros.add(pathRecibido);
 			
@@ -201,17 +201,22 @@ public class DocushareHelper {
 
 			
 			String path = config.get(0).getValor();
-
+			log.debug("path: " +path);
 			if (path != null) {
 				if (!path.trim().endsWith(";")) {
 					path += ";";
 				}
 				path += title;
-
+				log.debug("new path: " +path);
 				String[] titles = path.split(";");
+				log.debug("DSCollection.title: " +DSCollection.title);
+				log.debug("titles: " +titles);
+				log.debug("DSSelectSet.NO_PROPERTIES: " +DSSelectSet.NO_PROPERTIES);
 				DSObject dsObject = dssession.getResolvedObject(DSCollection.title, titles, DSSelectSet.NO_PROPERTIES);
+				log.debug("dsObject: " +dsObject);
 				if (dsObject != null) {
 					idColl = dsObject.getHandle().toString();
+					log.debug("idColl: " +idColl);
 				}
 			}
 		} catch (Exception e) {
@@ -452,7 +457,8 @@ public class DocushareHelper {
 		if (MODO_DEBUG_LOCAL) {
 			return getDocumentMODO_DEBUG_LOCAL(title);
 		}
-
+		log.debug("titulo del documento a descargar Regtel: " + title);
+		log.debug("institucion del documento a descargar Regtel: " + idinstitucion);
 		// Extraer propiedad
 		GenPropertiesExample genPropertiesExampleP = new GenPropertiesExample();
 		genPropertiesExampleP.createCriteria().andParametroEqualTo("sjcs.directorioFisicoTemporalSJCSJava");
@@ -468,9 +474,10 @@ public class DocushareHelper {
 			createSession(idinstitucion);
 
 			DSDocument dsDocument = (DSDocument) dssession.getObject(new DSHandle(title));
-
+			log.debug("DsDocument: " + dsDocument);
 			DSContentElement[] dsContentElements = dsDocument.getContentElements();
 			for (int j = 0; j < dsContentElements.length; j++) {
+				log.debug("DsDocument número: " + j);
 				if (dsContentElements[j] instanceof FileContentElement) {
 					FileContentElement dsContentElement = (FileContentElement) dsContentElements[j];
 					fileParent.mkdirs();

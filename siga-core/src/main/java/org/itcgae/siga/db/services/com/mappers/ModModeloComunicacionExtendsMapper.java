@@ -11,14 +11,14 @@ import org.itcgae.siga.DTOs.com.DatosModelosComunicacionesSearch;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.com.PlantillaModeloItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.db.mappers.ModModelocomunicacionMapper;
 import org.itcgae.siga.db.services.com.providers.ModModeloComunicacionExtendsSqlProvider;
-import org.itcgae.siga.db.services.com.providers.ModModeloPlantillaEnviosExtendsSqlProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service
 @Primary
-public interface ModModeloComunicacionExtendsMapper {
+public interface ModModeloComunicacionExtendsMapper extends ModModelocomunicacionMapper {
 
 	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "selectModelosComunicacion")
 	@Results({ @Result(column = "IDMODELOCOMUNICACION", property = "idModeloComunicacion", jdbcType = JdbcType.NUMERIC),
@@ -68,7 +68,7 @@ public interface ModModeloComunicacionExtendsMapper {
 			@Result(column = "VISIBLE", property = "visible", jdbcType = JdbcType.VARCHAR)
 
 	})
-	List<ModelosComunicacionItem> selectModelosComunicacionDialogo(String idInstitucion, String idClaseComunicacion,
+	List<ModelosComunicacionItem> selectModelosComunicacionDialogo(String idInstitucionLogueada, String idInstitucion, String idClaseComunicacion,
 			String idModulo, String idLenguaje, String idConsulta, List<String> perfiles);
 
 	@SelectProvider(type = ModModeloComunicacionExtendsSqlProvider.class, method = "selectModelosClasesComunicacion")

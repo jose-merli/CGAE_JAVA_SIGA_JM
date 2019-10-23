@@ -96,9 +96,9 @@ public class BusquedaPerJuridicaServiceImpl implements IBusquedaPerJuridicaServi
 						"getSocietyTypes() / cenTiposociedadExtendsMapper.getSocietyTypes() -> Salida de cenTiposociedadExtendsMapper para obtener lista de sociedades");
 				
 				ComboItem comboItem2 = new ComboItem();
-				comboItem2.setLabel("");
-				comboItem2.setValue("");
-				comboItem.add(0, comboItem2);
+//				comboItem2.setLabel("");
+//				comboItem2.setValue("");
+//				comboItem.add(0, comboItem2);
 				comboDTO.setCombooItems(comboItem);
 				
 			}

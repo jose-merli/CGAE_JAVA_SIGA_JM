@@ -69,8 +69,8 @@ public class CenSolicitudmodificacioncvSqlExtendsProvider extends CenSolicitudmo
 	
 
 	public String solicitudUpdateCurriculo(CenSolicitudmodificacioncv record) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
+		    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		
 			SQL sql = new SQL();
 			SQL sql1 = new SQL();
 			SQL sql2 = new SQL();
@@ -86,12 +86,12 @@ public class CenSolicitudmodificacioncvSqlExtendsProvider extends CenSolicitudmo
 			sql.VALUES("IDESTADOSOLIC", "10");
 			if (record.getFechainicio() != null) {				
 				String fechaF = dateFormat.format(record.getFechainicio());
-				sql.VALUES("FECHAINICIO", "TO_DATE('" + fechaF + "','DD/MM/YYYY')");
-				sql.VALUES("FECHAALTA", "TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+				sql.VALUES("FECHAINICIO", "TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
+				sql.VALUES("FECHAALTA", "TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 			}
 			if (record.getFechafin() != null) {
 				String fechaF = dateFormat.format(record.getFechafin());
-				sql.VALUES("FECHAFIN", "TO_DATE('" + fechaF + "','DD/MM/YYYY')");
+				sql.VALUES("FECHAFIN", "TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 			}else {
 				sql.VALUES("FECHAFIN","null");
 			}
@@ -105,7 +105,7 @@ public class CenSolicitudmodificacioncvSqlExtendsProvider extends CenSolicitudmo
 			}
 			if (record.getFechamodificacion() != null) {
 				String fechaF = dateFormat.format(record.getFechamodificacion());
-				sql.VALUES("FECHAMODIFICACION ","'" + fechaF + "'");
+				sql.VALUES("FECHAMODIFICACION ","TO_DATE('" + fechaF + "','DD/MM/YYYY hh24:mi:ss')");
 			}							
 			if (record.getUsumodificacion() != null) {
 				sql.VALUES("USUMODIFICACION ","'"+record.getUsumodificacion() +"'");

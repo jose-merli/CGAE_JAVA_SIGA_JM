@@ -350,7 +350,7 @@ public class FichaDatosCurricularesServiceImpl implements IFichaDatosCurriculare
 			// }
 			//
 			// }
-			response = cenDatoscvExtendsMapper.updateCurriculo(recordUpdate);
+			response = cenDatoscvExtendsMapper.updateByPrimaryKey(recordUpdate);
 
 			LOGGER.info(
 					"updateDatosCurriculares() / cenDireccionesExtendsMapper.updateMember() -> Salida de cenDireccionesExtendsMapper para actualizar un curriculum");

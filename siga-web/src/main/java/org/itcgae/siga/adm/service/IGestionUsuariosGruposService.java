@@ -1,5 +1,7 @@
 package org.itcgae.siga.adm.service;
 
+import java.util.ArrayList;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.adm.CreateResponseDTO;
@@ -24,7 +26,7 @@ public interface IGestionUsuariosGruposService {
 	
 	public UsuarioDTO getUsersSearch(int numPagina, UsuarioRequestDTO usuarioRequestDTO, HttpServletRequest request);
 	
-	public UpdateResponseDTO updateUsers(UsuarioUpdateDTO usuarioUpdateDTO, HttpServletRequest request);
+	public UpdateResponseDTO updateUsers(ArrayList<UsuarioUpdateDTO> usuarioUpdateDTO, HttpServletRequest request);
 	
 	public CreateResponseDTO createUsers(UsuarioCreateDTO usuarioCreateDTO, HttpServletRequest request);
 	
@@ -41,4 +43,6 @@ public interface IGestionUsuariosGruposService {
 	public UpdateResponseDTO createGroupUsers(UsuarioGrupoItem usuarioUpdateDTO, HttpServletRequest request);
 
 	public UpdateResponseDTO updateGrupoDefecto(UsuarioGrupoEditDTO usuarioUpdateDTO, HttpServletRequest request);
+
+	
 }

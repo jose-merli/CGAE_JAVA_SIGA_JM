@@ -81,7 +81,7 @@ public class ConsultasController {
 
 
 	@RequestMapping(value = "/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ConsultasDTO> cargasMasivasSearch(@RequestParam("numPagina") int numPagina,
+	ResponseEntity<ConsultasDTO> consultasSearch(@RequestParam("numPagina") int numPagina,
 			HttpServletRequest request, @RequestBody ConsultasSearch filtros) {
 
 		ConsultasDTO response = _consultasService.consultasSearch(request, filtros);

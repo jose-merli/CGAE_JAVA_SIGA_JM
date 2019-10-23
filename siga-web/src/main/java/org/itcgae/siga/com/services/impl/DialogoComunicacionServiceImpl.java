@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -212,6 +213,9 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 	@Autowired
 	private ModClasecomunicacionesExtendsMapper _modClasecomunicacionesExtendsMapper;
 	
+	
+	static int numeroFicheros = 1; 
+	
 	@Override
 	public ComboDTO obtenerClaseComunicaciones(HttpServletRequest request, String rutaClaseComunicacion) {
 		LOGGER.info("claseComunicacion() -> Entrada al servicio para obtener combo clases comunicacion");
@@ -272,7 +276,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			if (usuarios != null && usuarios.size() > 0) {
 				try{
 					AdmUsuarios usuario = usuarios.get(0);
-					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(modeloDTO.getIdInstitucion(), modeloDTO.getIdClaseComunicacion(), modeloDTO.getIdModulo(), usuario.getIdlenguaje(), modeloDTO.getIdConsulta(), perfiles);
+					List<ModelosComunicacionItem> modelos = _modModeloComunicacionExtendsMapper.selectModelosComunicacionDialogo(String.valueOf(idInstitucion), modeloDTO.getIdInstitucion(), modeloDTO.getIdClaseComunicacion(), modeloDTO.getIdModulo(), usuario.getIdlenguaje(), modeloDTO.getIdConsulta(), perfiles);
 					
 					/*for (ModelosComunicacionItem modelosComunicacionItem : modelos) {
 						ComboDTO comboDTO = new ComboDTO();
@@ -302,6 +306,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		return respuesta;
 	}
 
+	
 
 
 	@Override
@@ -349,7 +354,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		LOGGER.info("descargarComunicacion() -> Entrada al servicio para descargar la documentación de la comunicación");
 		
 		File file = null;
-		
+
 		try {
 			
 			// Conseguimos información del usuario logeado
@@ -414,11 +419,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		LOGGER.info("generarComunicacion() -> Entrada al servicio para generar los documentos a comunicar");
 		
 		GenerarComunicacionItem generarComunicacion = new GenerarComunicacionItem();
-		
+		numeroFicheros = 1;
 		List<DatosDocumentoItem> listaFicheros = new ArrayList<DatosDocumentoItem>();
 		List<DatosEnvioDTO> listaConsultasYDestinatario = new ArrayList<DatosEnvioDTO>();
 		List<ModelosEnvioItem> listaModelosEnvio = new ArrayList<ModelosEnvioItem>();
-		DestinatarioItem destinatario = new DestinatarioItem();	
+		DestinatarioItem destinatario = null;
 		
 		String rutaPlantillaClase = "";
 		ModClasecomunicaciones modClasecomunicacion = null;
@@ -508,15 +513,13 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 						}
 						
 						
-											
-						
 						// Nuevo envio = nueva lista de consultas
 						
 						List<ConsultaEnvioItem> listaConsultasEnvio = new ArrayList<ConsultaEnvioItem>();
-						
+						destinatario = new DestinatarioItem();	
+
 						ejecutaPlantillas(request ,modelosComunicacionItem, dialogo, usuario, mapaClave, esEnvio, listaConsultasEnvio, listaConsultasPlantillaEnvio, rutaPlantillaClase, campoSufijo, listaFicheros, ejecutarConsulta, destinatario);
-												
-									
+																				
 						// Por cada key seleccionada
 						if(esEnvio){
 							DatosEnvioDTO dato = new DatosEnvioDTO();
@@ -566,6 +569,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		List<String> perfiles = UserTokenUtils.getPerfilesFromJWTToken(token);
+
 		
 		ModelosComunicacionSearch respuesta = new ModelosComunicacionSearch();
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -573,6 +577,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 			
 		boolean continua = true;
+		boolean esDestinatario = false;
 		Long idConsultaEjecutarCondicional = null;
 		String consultaEjecutarCondicional = "";
 		int numFicheros = 0;
@@ -670,125 +675,282 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 				continua = true;
 			}
 			
-			if(continua){									
+//			Lo que había antes
+//			if(continua){									
+//				LOGGER.debug("Obtenemos la consulta de destinatario: " + plantilla.getIdInforme());
+//				List<ConsultaItem> consultasItemDest = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(usuario.getIdinstitucion(), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
+//				
+//				if(consultasItemDest != null && consultasItemDest.size() > 0){
+//					
+//					LOGGER.debug("Número de consultas de destintarios " + consultasItemCondicional.size());
+//					for(ConsultaItem consulta:consultasItemDest){	
+//																	
+//						String consultaEjecutarDestinatarios = reemplazarConsultaConClaves(usuario, dialogo, consulta, mapaClave, esEnvio);
+//
+//						List<Map<String, Object>> result;
+//						try {
+//							result = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDestinatarios);
+//						} catch (BusinessSQLException e) {
+//							LOGGER.error(e);
+//							throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(), e);
+//						} catch (Exception e) {
+//							LOGGER.warn("Error al ejejcutar la consulta" + e);
+//							throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
+//						}
+//						
+//						if(result != null && result.size() > 0){
+//							LOGGER.debug("Se han obtenido " + result.size() + " destinatarios");
+//							
+//							for(Map<String,Object> dest: result){
+//								LOGGER.debug("Guardamos el resultado de la query para cada destinatario");
+//								if(esEnvio){
+//									LOGGER.debug("Guardamos las consultas para la generación del envio");
+//									
+//									//Guardamos la consulta condicional
+//									
+//									if(idConsultaEjecutarCondicional != null) {
+//										listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,idConsultaEjecutarCondicional,consultaEjecutarCondicional,usuario.getIdinstitucion(),SigaConstants.OBJETIVO.CONDICIONAL.getCodigo(), Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+//									}														
+//									
+//									//Guardamos la consulta de destinatarios
+//									
+//									listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio, Long.parseLong(consulta.getIdConsulta()),consultaEjecutarDestinatarios, usuario.getIdinstitucion(), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo(), Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+//																		
+//									// Reemplazamos los campos para las consultas de la plantilla de envio
+//
+//									if(listaConsultasPlantillaEnvio != null && listaConsultasPlantillaEnvio.size() > 0){
+//										for(ConsultaItem consultaPlantilla:listaConsultasPlantillaEnvio){
+//											String consultaPlantillaEnvio = reemplazarConsultaConClaves(usuario, dialogo, consultaPlantilla, mapaClave, esEnvio);
+//											listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio, Long.parseLong(consultaPlantilla.getIdConsulta()),consultaPlantillaEnvio,usuario.getIdinstitucion(), Long.parseLong(consultaPlantilla.getIdObjetivo()), Short.parseShort(String.valueOf(usuario.getIdusuario())), null, Long.parseLong(plantilla.getIdInforme()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+//										}
+//									}
+//									
+//								}
+//								numFicheros = 0;
+//								
+//								hDatosGenerales = new HashMap<String, Object>();
+//								hDatosGenerales.putAll(dest);
+//								
+//								hDatosFinal = new HashMap<String, Object>();
+//								
+//								
+//								LOGGER.debug("Obtenemos la consulta de multidocumento para la plantilla: " + plantilla.getIdInforme());
+//								List<ConsultaItem> consultasItemMulti = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(usuario.getIdinstitucion(), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
+//								if(consultasItemMulti != null && consultasItemMulti.size() > 0){
+//									
+//									for(ConsultaItem consultaMulti:consultasItemMulti){	
+//										String consultaEjecutarMulti = reemplazarConsultaConClaves(usuario, dialogo, consultaMulti, mapaClave, esEnvio);
+//										
+//										if(esEnvio){
+//											//Guardamos la consulta multidocumento	
+//											listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio, Long.parseLong(consultaMulti.getIdConsulta()),consultaEjecutarMulti,usuario.getIdinstitucion(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo(), Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+//										}
+//										
+//										List<Map<String, Object>> resultMulti;
+//										try {
+//											resultMulti = _consultasService.ejecutarConsultaConClaves(consultaEjecutarMulti);
+//										} catch (BusinessSQLException e) {
+//											LOGGER.error(e);
+//											throw new BusinessException("Error al ejecutar la consulta " + consultaMulti.getDescripcion() + " " + e.getMessage(), e);
+//										} catch (Exception e) {
+//											LOGGER.error(e);
+//											throw new BusinessException("Error al ejecutar la consulta " + consultaMulti.getDescripcion(), e);
+//										}
+//										
+//										if(resultMulti != null && resultMulti.size() > 0){
+//											for(int k = 0;k<resultMulti.size();k++){
+//												// Por cada registro generamos un documento
+//												numFicheros++;
+//												generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar, listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal, hDatosGenerales, resultMulti.get(k), mapaClave, campoSufijo, numFicheros, rutaPlantillaClase, nombrePlantilla, esEnvio, esExcel);
+//											}														
+//										}
+//										
+//									}
+//								}else{
+//									LOGGER.debug("No hay consulta de multidocumento");									
+//									generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar, listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal, hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase, nombrePlantilla, esEnvio, esExcel);
+//								}
+//								
+//								//Obtenemos los campos del destinatario
+//								obtenerDatosDestinatario(destinatario,dest);
+//								
+//							}	
+//						}else{
+//							LOGGER.info("La consulta de destinatarios no ha devuelto resultados");
+//						}											
+//					}										
+//				}else{										
+//					if(ejecutarConsulta) {						
+//						// Por cada resultado ejecutamos las consultas de datos
+//						generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar, listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal, hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase, nombrePlantilla, esEnvio, esExcel);
+//					}else {
+//						LOGGER.error("No hay consulta de destinatario para el informe: " + plantilla.getIdInforme());
+//					}
+//				}
+//			}else{
+//				LOGGER.debug("No se ejecuta la generación del informe: " + plantilla.getIdInforme());
+//			}						
+			
+			if (continua) {
 				LOGGER.debug("Obtenemos la consulta de destinatario: " + plantilla.getIdInforme());
-				List<ConsultaItem> consultasItemDest = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(usuario.getIdinstitucion(), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
-				
-				if(consultasItemDest != null && consultasItemDest.size() > 0){
-					
+				List<ConsultaItem> consultasItemDest = _modPlantillaDocumentoConsultaExtendsMapper
+						.selectConsultaPorObjetivo(usuario.getIdinstitucion(),
+								Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+								plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
+
+				if (consultasItemDest != null && consultasItemDest.size() > 0) {
+
 					LOGGER.debug("Número de consultas de destintarios " + consultasItemCondicional.size());
-					for(ConsultaItem consulta:consultasItemDest){	
-																	
-						String consultaEjecutarDestinatarios = reemplazarConsultaConClaves(usuario, dialogo, consulta, mapaClave, esEnvio);
+					for (ConsultaItem consulta : consultasItemDest) {
+
+						String consultaEjecutarDestinatarios = reemplazarConsultaConClaves(usuario, dialogo, consulta,
+								mapaClave, esEnvio);
 
 						List<Map<String, Object>> result;
 						try {
 							result = _consultasService.ejecutarConsultaConClaves(consultaEjecutarDestinatarios);
 						} catch (BusinessSQLException e) {
 							LOGGER.error(e);
-							throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(), e);
+							throw new BusinessException(
+									"Error al ejecutar la consulta " + consulta.getDescripcion() + " " + e.getMessage(),
+									e);
 						} catch (Exception e) {
 							LOGGER.warn("Error al ejejcutar la consulta" + e);
-							throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(), e);
+							throw new BusinessException("Error al ejecutar la consulta " + consulta.getDescripcion(),
+									e);
 						}
-						
-						if(result != null && result.size() > 0){
+
+						if (result != null && result.size() > 0) {
 							LOGGER.debug("Se han obtenido " + result.size() + " destinatarios");
-							
-							for(Map<String,Object> dest: result){
+
+							for (Map<String, Object> dest : result) {
 								LOGGER.debug("Guardamos el resultado de la query para cada destinatario");
-								if(esEnvio){
+								if (esEnvio) {
 									LOGGER.debug("Guardamos las consultas para la generación del envio");
-									
-									//Guardamos la consulta condicional
-									
-									if(idConsultaEjecutarCondicional != null) {
-										listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,idConsultaEjecutarCondicional,consultaEjecutarCondicional,usuario.getIdinstitucion(),SigaConstants.OBJETIVO.CONDICIONAL.getCodigo(), Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
-									}														
-									
-									//Guardamos la consulta de destinatarios
-									
-									listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio, Long.parseLong(consulta.getIdConsulta()),consultaEjecutarDestinatarios, usuario.getIdinstitucion(), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo(), Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
-																		
+
+									// Guardamos la consulta condicional
+
+									if (idConsultaEjecutarCondicional != null) {
+										listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
+												idConsultaEjecutarCondicional, consultaEjecutarCondicional,
+												usuario.getIdinstitucion(),
+												SigaConstants.OBJETIVO.CONDICIONAL.getCodigo(),
+												Short.parseShort(String.valueOf(usuario.getIdusuario())),
+												idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()),
+												Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+									}
+
+									// Guardamos la consulta de destinatarios
+
+									listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
+											Long.parseLong(consulta.getIdConsulta()), consultaEjecutarDestinatarios,
+											usuario.getIdinstitucion(),
+											SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo(),
+											Short.parseShort(String.valueOf(usuario.getIdusuario())),
+											idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()),
+											Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+
 									// Reemplazamos los campos para las consultas de la plantilla de envio
 
-									if(listaConsultasPlantillaEnvio != null && listaConsultasPlantillaEnvio.size() > 0){
-										for(ConsultaItem consultaPlantilla:listaConsultasPlantillaEnvio){
-											String consultaPlantillaEnvio = reemplazarConsultaConClaves(usuario, dialogo, consultaPlantilla, mapaClave, esEnvio);
-											listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio, Long.parseLong(consultaPlantilla.getIdConsulta()),consultaPlantillaEnvio,usuario.getIdinstitucion(), Long.parseLong(consultaPlantilla.getIdObjetivo()), Short.parseShort(String.valueOf(usuario.getIdusuario())), null, Long.parseLong(plantilla.getIdInforme()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+									if (listaConsultasPlantillaEnvio != null
+											&& listaConsultasPlantillaEnvio.size() > 0) {
+										for (ConsultaItem consultaPlantilla : listaConsultasPlantillaEnvio) {
+											String consultaPlantillaEnvio = reemplazarConsultaConClaves(usuario,
+													dialogo, consultaPlantilla, mapaClave, esEnvio);
+											listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
+													Long.parseLong(consultaPlantilla.getIdConsulta()),
+													consultaPlantillaEnvio, usuario.getIdinstitucion(),
+													Long.parseLong(consultaPlantilla.getIdObjetivo()),
+													Short.parseShort(String.valueOf(usuario.getIdusuario())), null,
+													Long.parseLong(plantilla.getIdInforme()),
+													Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
 										}
 									}
 									
+									obtenerDatosDestinatario(destinatario,dest);
+
+
+								} else {
+									esDestinatario = true;
 								}
+
 								numFicheros = 0;
-								
+
 								hDatosGenerales = new HashMap<String, Object>();
 								hDatosGenerales.putAll(dest);
-								
-								hDatosFinal = new HashMap<String, Object>();
-								
-								
-								LOGGER.debug("Obtenemos la consulta de multidocumento para la plantilla: " + plantilla.getIdInforme());
-								List<ConsultaItem> consultasItemMulti = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(usuario.getIdinstitucion(), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
-								if(consultasItemMulti != null && consultasItemMulti.size() > 0){
-									
-									for(ConsultaItem consultaMulti:consultasItemMulti){	
-										String consultaEjecutarMulti = reemplazarConsultaConClaves(usuario, dialogo, consultaMulti, mapaClave, esEnvio);
-										
-										if(esEnvio){
-											//Guardamos la consulta multidocumento	
-											listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio, Long.parseLong(consultaMulti.getIdConsulta()),consultaEjecutarMulti,usuario.getIdinstitucion(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo(), Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar, Long.parseLong(plantilla.getIdInforme()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
-										}
-										
-										List<Map<String, Object>> resultMulti;
-										try {
-											resultMulti = _consultasService.ejecutarConsultaConClaves(consultaEjecutarMulti);
-										} catch (BusinessSQLException e) {
-											LOGGER.error(e);
-											throw new BusinessException("Error al ejecutar la consulta " + consultaMulti.getDescripcion() + " " + e.getMessage(), e);
-										} catch (Exception e) {
-											LOGGER.error(e);
-											throw new BusinessException("Error al ejecutar la consulta " + consultaMulti.getDescripcion(), e);
-										}
-										
-										if(resultMulti != null && resultMulti.size() > 0){
-											for(int k = 0;k<resultMulti.size();k++){
-												// Por cada registro generamos un documento
-												numFicheros++;
-												generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar, listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal, hDatosGenerales, resultMulti.get(k), mapaClave, campoSufijo, numFicheros, rutaPlantillaClase, nombrePlantilla, esEnvio, esExcel);
-											}														
-										}
-										
-									}
-								}else{
-									LOGGER.debug("No hay consulta de multidocumento");									
-									generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar, listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal, hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase, nombrePlantilla, esEnvio, esExcel);
-								}
-								
-								//Obtenemos los campos del destinatario
-								obtenerDatosDestinatario(destinatario,dest);
-								
-							}	
-						}else{
-							LOGGER.info("La consulta de destinatarios no ha devuelto resultados");
-						}											
-					}										
-				}else{										
-					if(ejecutarConsulta) {						
-						// Por cada resultado ejecutamos las consultas de datos
-						generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar, listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal, hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase, nombrePlantilla, esEnvio, esExcel);
-					}else {
-						LOGGER.error("No hay consulta de destinatario para el informe: " + plantilla.getIdInforme());
-					}
-				}
-			}else{
-				LOGGER.debug("No se ejecuta la generación del informe: " + plantilla.getIdInforme());
-			}						
-			
-			//Por cada plantilla							
-		}
 
-		
+								hDatosFinal = new HashMap<String, Object>();
+							}
+						} else {
+							LOGGER.info("La consulta de destinatarios no ha devuelto resultados");
+						}
+					}
+				}else {
+					LOGGER.error("No hay consulta de destinatario para el informe: " + plantilla.getIdInforme());
+				}
+
+				LOGGER.debug("Obtenemos la consulta de multidocumento para la plantilla: " + plantilla.getIdInforme());
+				List<ConsultaItem> consultasItemMulti = _modPlantillaDocumentoConsultaExtendsMapper
+						.selectConsultaPorObjetivo(usuario.getIdinstitucion(),
+								Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()),
+								plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo());
+				if (consultasItemMulti != null && consultasItemMulti.size() > 0) {
+
+					for (ConsultaItem consultaMulti : consultasItemMulti) {
+						String consultaEjecutarMulti = reemplazarConsultaConClaves(usuario, dialogo, consultaMulti,
+								mapaClave, esEnvio);
+
+						if (esEnvio) {
+							// Guardamos la consulta multidocumento
+							listaConsultasEnvio = guardarDatosConsultas(listaConsultasEnvio,
+									Long.parseLong(consultaMulti.getIdConsulta()), consultaEjecutarMulti,
+									usuario.getIdinstitucion(), SigaConstants.OBJETIVO.MULTIDOCUMENTO.getCodigo(),
+									Short.parseShort(String.valueOf(usuario.getIdusuario())), idPlantillaGenerar,
+									Long.parseLong(plantilla.getIdInforme()),
+									Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()));
+						}
+
+						List<Map<String, Object>> resultMulti;
+						try {
+							resultMulti = _consultasService.ejecutarConsultaConClaves(consultaEjecutarMulti);
+							
+							if(resultMulti != null && resultMulti.size() > 0){
+								for(int k = 0;k<resultMulti.size();k++){
+									// Por cada registro generamos un documento
+									numFicheros++;
+									generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
+											listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
+											hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
+											nombrePlantilla, esEnvio, esExcel, esDestinatario);
+								}														
+							}
+								
+						} catch (BusinessSQLException e) {
+							LOGGER.error(e);
+							throw new BusinessException("Error al ejecutar la consulta "
+									+ consultaMulti.getDescripcion() + " " + e.getMessage(), e);
+						} catch (Exception e) {
+							LOGGER.error(e);
+							throw new BusinessException(
+									"Error al ejecutar la consulta " + consultaMulti.getDescripcion(), e);
+						}
+					}
+				}else {
+					generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
+							listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
+							hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
+							nombrePlantilla, esEnvio, esExcel, esDestinatario);
+				}
+			
+//				if (ejecutarConsulta) {
+//					// Por cada resultado ejecutamos las consultas de datos
+//					generarDocumentoConDatos(usuario, dialogo, modelosComunicacionItem, plantilla, idPlantillaGenerar,
+//							listaConsultasEnvio, listaFicheros, listaDocumentos, listaDatosExcel, hDatosFinal,
+//							hDatosGenerales, null, mapaClave, campoSufijo, numFicheros, rutaPlantillaClase,
+//							nombrePlantilla, esEnvio, esExcel, esDestinatario);
+//				} 
+			}
+		}						
 	}
 
 
@@ -957,6 +1119,11 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 					sufijo = sufijo + String.valueOf(campoSufijo);
 				}
 			}
+			
+			if(!(sufijos != null && sufijos.size() > 0)) {
+				nombreFicheroSalida = nombreFicheroSalida + "_" + numeroFicheros;
+				numeroFicheros++;
+			} 
 			
 			String numero = "";
 			if(numFichero > 0){
@@ -1383,7 +1550,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 								//Insertamos los documentos asociados al envio
 								
 								// Si ya se ha insertado lo omitimos
-								if(!nombresFicheros.contains(consultaEnvio.getNombreFichero())) {
+								if(consultaEnvio.getNombreFichero() != null && !nombresFicheros.contains(consultaEnvio.getNombreFichero())) {
 									EnvDocumentos documento = new EnvDocumentos();
 									documento.setIdenvio(envio.getIdenvio());
 									documento.setIdinstitucion(usuario.getIdinstitucion());
@@ -1413,7 +1580,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		String directorioPlantillaClase = "";
 		boolean esExcel = false;
 		List<List<Map<String,Object>>> listaDatosExcel = new ArrayList<List<Map<String,Object>>>();
-		
+		numeroFicheros = 1;
 		//Obtenemos la clase de comunicacion del modelo (si tiene)	
 		EnvEnviosExample envioExample = new EnvEnviosExample();
 		envioExample.createCriteria().andIdenvioEqualTo(Long.parseLong(idEnvio)).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
@@ -1883,7 +2050,7 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 	}
 	
-	private void generarDocumentoConDatos(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ModelosComunicacionItem modelosComunicacionItem, PlantillaModeloDocumentoDTO plantilla, Long idPlantillaGenerar, List<ConsultaEnvioItem> listaConsultasEnvio, List<DatosDocumentoItem> listaFicheros, List<Document> listaDocumentos, List<List<Map<String,Object>>> listaDatosExcel, HashMap<String,Object> hDatosFinal, HashMap<String,Object> hDatosGenerales, Map<String, Object> resultMulti, HashMap<String, String> mapaClave, String campoSufijo, int numFicheros, String rutaPlantillaClase, String nombrePlantilla, boolean esEnvio, boolean esExcel) {
+	private void generarDocumentoConDatos(AdmUsuarios usuario, DialogoComunicacionItem dialogo, ModelosComunicacionItem modelosComunicacionItem, PlantillaModeloDocumentoDTO plantilla, Long idPlantillaGenerar, List<ConsultaEnvioItem> listaConsultasEnvio, List<DatosDocumentoItem> listaFicheros, List<Document> listaDocumentos, List<List<Map<String,Object>>> listaDatosExcel, HashMap<String,Object> hDatosFinal, HashMap<String,Object> hDatosGenerales, Map<String, Object> resultMulti, HashMap<String, String> mapaClave, String campoSufijo, int numFicheros, String rutaPlantillaClase, String nombrePlantilla, boolean esEnvio, boolean esExcel, boolean esDestinatario) {
 		
 		LOGGER.debug("Obtenemos la ruta temporal del fichero de salida");
 		String rutaTmp = getRutaFicheroSalida(dialogo.getIdInstitucion());
@@ -1910,10 +2077,23 @@ public class DialogoComunicacionServiceImpl implements IDialogoComunicacionServi
 		
 		// Por cada resultado ejecutamos las consultas de datos
 		LOGGER.debug("Obtenemos las consultas de datos para la plantilla: " + plantilla.getIdInforme());
-		List<ConsultaItem> consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DATOS.getCodigo());
+		List<ConsultaItem> consultasItemFinal = new ArrayList<ConsultaItem>();
+		List<ConsultaItem> consultasItemDatos = new ArrayList<ConsultaItem>();
+		List<ConsultaItem> consultasItemDestinatario = new ArrayList<ConsultaItem>();	
+		
+		consultasItemDestinatario = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DESTINATARIOS.getCodigo());
+		for(ConsultaItem consultaDatosDestinatario:consultasItemDestinatario){
+			consultasItemFinal.add(consultaDatosDestinatario);
+		}
+
+		consultasItemDatos = _modPlantillaDocumentoConsultaExtendsMapper.selectConsultaPorObjetivo(Short.valueOf(dialogo.getIdInstitucion()), Long.parseLong(modelosComunicacionItem.getIdModeloComunicacion()), plantilla.getIdPlantillas(), SigaConstants.OBJETIVO.DATOS.getCodigo());
+		
+		for(ConsultaItem consultaDatosDatos:consultasItemDatos){
+			consultasItemFinal.add(consultaDatosDatos);
+		}		
 		ArrayList<String> nombresConsultasDatos = new ArrayList<String>();	
 		
-		for(ConsultaItem consultaDatos:consultasItemDatos){																			
+		for(ConsultaItem consultaDatos:consultasItemFinal){																			
 			
 			String consultaEjecutarDatos = reemplazarConsultaConClaves(usuario, dialogo, consultaDatos, mapaClave, esEnvio);
 			String nombreConsulta = consultaDatos.getDescripcion();

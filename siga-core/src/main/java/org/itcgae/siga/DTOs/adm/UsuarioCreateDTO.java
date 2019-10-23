@@ -19,7 +19,7 @@ public class UsuarioCreateDTO {
 	private String activo;
 	private String idInstitucion;
 	private String idLenguaje;
-	
+	private String codigoExterno;
 	
 	/**
 	 *
@@ -234,6 +234,18 @@ public class UsuarioCreateDTO {
 	      return "null";
 	    }
 	    return o.toString().replace("\n", "\n    ");
+	}
+
+
+
+	public String getCodigoExterno() {
+		return codigoExterno;
+	}
+
+
+
+	public void setCodigoExterno(String codigoExterno) {
+		this.codigoExterno = codigoExterno;
 	}
 	
 }

@@ -30,4 +30,6 @@ public interface IModulosYBasesService {
 
 	public InsertResponseDTO createModules(ModulosItem modulosItem, HttpServletRequest request);
 
+	public ComboDTO getProcedimientos(HttpServletRequest request, String idJurisdiccion);
+
 }
