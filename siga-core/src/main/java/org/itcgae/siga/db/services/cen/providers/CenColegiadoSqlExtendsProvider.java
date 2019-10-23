@@ -349,7 +349,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 	}
 
 	public String updateColegiado(CenColegiado record) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
 		SQL sql = new SQL();
 		sql.UPDATE("CEN_COLEGIADO");

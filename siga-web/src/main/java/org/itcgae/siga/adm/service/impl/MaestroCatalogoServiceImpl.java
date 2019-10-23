@@ -76,9 +76,9 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		LOGGER.info("getTabla() / genTablasMaestrasExtendsMapper.selectByExample() -> Entrada a genTablasMaestrasExtendsMapper para obtener listado de entidades");
 		List<GenTablasMaestras> tablasMaestras = genTablasMaestrasExtendsMapper.selectByExample(exampleTablasMaestras);
 		LOGGER.info("getTabla() / genTablasMaestrasExtendsMapper.selectByExample() -> Salida de genTablasMaestrasExtendsMapper para obtener listado de entidades");
-		combo.setValue("");
-		combo.setLabel("");
-		combos.add(combo);
+//		combo.setValue("");
+//		combo.setLabel("");
+//		combos.add(combo);
 
 		if (null != tablasMaestras && tablasMaestras.size() > 0) {
 			for (Iterator<GenTablasMaestras> iterator = tablasMaestras.iterator(); iterator.hasNext();) {
@@ -348,7 +348,66 @@ public class MaestroCatalogoServiceImpl implements IMaestroCatalogoService {
 		return response;
 	}
 
-
+	@Override
+	public UpdateResponseDTO activateDatosCatalogo(CatalogoDeleteDTO catalogoDelete,HttpServletRequest request) {
+		//eliminamos los datos del catálogo con la tabla maestra seleccionada
+		LOGGER.info("deleteDatosCatalogo() -> Entrada al servicio para eliminar los datos del catálogo con la tabla maestra seleccionada");
+		int respuesta = 0;
+		UpdateResponseDTO response = new UpdateResponseDTO();
+		//Obtenemos la institución del Token
+		String token = request.getHeader("Authorization");
+		String institucion = UserTokenUtils.getInstitucionFromJWTTokenAsString(token);
+		
+		if(null != institucion) {
+			catalogoDelete.setIdInstitucion(institucion);
+			
+			GenTablasMaestrasExample exampleTablasMaestras = new GenTablasMaestrasExample();
+			exampleTablasMaestras.setDistinct(true);
+			exampleTablasMaestras.setOrderByClause("ALIASTABLA ASC");
+			exampleTablasMaestras.createCriteria().andIdtablamaestraEqualTo(catalogoDelete.getTabla());
+			LOGGER.info("deleteDatosCatalogo() / genTablasMaestrasExtendsMapper.selectByExample() -> Entrada a genTablasMaestrasExtendsMapper para obtener información de la tabla de un catálogo");
+			List<GenTablasMaestras> tablasMaestras = genTablasMaestrasExtendsMapper.selectByExample(exampleTablasMaestras);
+			LOGGER.info("deleteDatosCatalogo() / genTablasMaestrasExtendsMapper.selectByExample() -> Salida de genTablasMaestrasExtendsMapper para obtener información de la tabla de un catálogo");
+			//Modificamos la fecha de Baja para darle de baja
+			if (null != tablasMaestras && tablasMaestras.size() > 0) {
+				GenTablasMaestras tablaMaestra = (GenTablasMaestras) tablasMaestras.get(0);
+				LOGGER.info("deleteDatosCatalogo() / genTablasMaestrasExtendsMapper.selectColumnName() -> Entrada a genTablasMaestrasExtendsMapper para obtener institución de la columna de una tabla maestra");
+				InstitucionDTO idInstitucion = genTablasMaestrasExtendsMapper.selectColumnName(tablaMaestra);
+				LOGGER.info("deleteDatosCatalogo() / genTablasMaestrasExtendsMapper.selectColumnName() -> Salida de genTablasMaestrasExtendsMapper para obtener institución de la columna de una tabla maestra");
+				Boolean isInstitucion = Boolean.FALSE;
+				if (null != idInstitucion && idInstitucion.getIdInstitucion().equals("1")) {
+					isInstitucion =  Boolean.TRUE;
+				}
+				LOGGER.info("deleteDatosCatalogo() / genTablasMaestrasExtendsMapper.deleteRecursos() -> Entrada a genTablasMaestrasExtendsMapper eliminar un recurso");
+				respuesta = genTablasMaestrasExtendsMapper.activateRecursos(tablaMaestra,catalogoDelete,isInstitucion);
+				LOGGER.info("deleteDatosCatalogo() / genTablasMaestrasExtendsMapper.deleteRecursos() -> Salida de genTablasMaestrasExtendsMapper eliminar un recurso");
+				
+				// comprobacion de si se realizo el borrado bien
+				if(respuesta == 0) {
+					response.setStatus(SigaConstants.KO);
+					LOGGER.warn("deleteDatosCatalogo() -> KO. NO se ha podido eliminar los datos del catálogo con la tabla maestra seleccionada");
+				}
+				else {
+					response.setStatus(SigaConstants.OK);
+					LOGGER.info("deleteDatosCatalogo() -> OK. Se han eliminado los datos del catálogo con la tabla maestra seleccionada");
+					
+				}
+			}
+			else {
+				response.setStatus(SigaConstants.KO);
+				LOGGER.warn("deleteDatosCatalogo() -> KO. NO se ha podido obtener información de la tabla de un catálogo");
+			}
+		
+			
+		}
+		else {
+			response.setStatus(SigaConstants.KO);
+			LOGGER.warn("deleteDatosCatalogo() -> KO. NO se ha podido recuperar la institucion del token");
+		}
+		
+		LOGGER.info("deleteDatosCatalogo() -> Salida del servicio para eliminar los datos del catálogo con la tabla maestra seleccionada");
+		return response;
+	}
 
 
 	@Override

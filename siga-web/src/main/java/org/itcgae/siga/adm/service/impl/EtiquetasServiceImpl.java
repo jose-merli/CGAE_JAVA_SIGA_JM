@@ -60,9 +60,9 @@ public class EtiquetasServiceImpl implements IEtiquetasService{
 		
 		if(null != combooItems && combooItems.size() > 0){
 			// primer elemento a vacio para componente de pantalla dropdown
-			comboItem.setLabel("");
-			comboItem.setValue("");
-			combooItems.add(0,comboItem);
+//			comboItem.setLabel("");
+//			comboItem.setValue("");
+//			combooItems.add(0,comboItem);
 			comboDTO.setCombooItems(combooItems);
 		}
 		else {
@@ -180,10 +180,10 @@ public class EtiquetasServiceImpl implements IEtiquetasService{
 	
 		if(null != combooItems && combooItems.size() > 0){
 			// primer elemento a vacio para componente de pantalla dropdown
-			comboItem.setLabel("");
-			comboItem.setValue("");
+//			comboItem.setLabel("");
+//			comboItem.setValue("");
 			List<ComboItem> comboFiltrado = new ArrayList<ComboItem>();
-			comboFiltrado.add(0,comboItem);
+//			comboFiltrado.add(0,comboItem);
 			
 			for (ComboItem item : combooItems) {
 				for (CenInstitucionLenguajes lenguaje : lenguajes) {

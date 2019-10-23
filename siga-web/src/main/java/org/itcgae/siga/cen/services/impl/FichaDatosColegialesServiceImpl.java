@@ -175,10 +175,10 @@ public class FichaDatosColegialesServiceImpl implements IFichaDatosColegialesSer
 				comboItems = cenTiposseguroExtendsMapper.getTypeInsurances(usuario.getIdlenguaje());
 
 				if (null != comboItems && comboItems.size() > 0) {
-					ComboItem element = new ComboItem();
-					element.setLabel("");
-					element.setValue("");
-					comboItems.add(0, element);
+//					ComboItem element = new ComboItem();
+//					element.setLabel("");
+//					element.setValue("");
+//					comboItems.add(0, element);
 
 				}
 

@@ -342,10 +342,10 @@ public class FichaPersonaServiceImpl implements IFichaPersonaService{
 			comboItems = cenTipoidentificacionExtendsMapper.getIdentificationTypes(usuario.getIdlenguaje());
 
 			ComboItem comboItem = new ComboItem();
-			comboItem.setLabel("");
-			comboItem.setValue("");
-
-			comboItems.add(0, comboItem);
+//			comboItem.setLabel("");
+//			comboItem.setValue("");
+//
+//			comboItems.add(0, comboItem);
 		}
 		comboDTO.setCombooItems(comboItems);
 		
