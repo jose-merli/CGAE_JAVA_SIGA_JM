@@ -34,6 +34,12 @@ public class ModulosYBasesController {
 		return new ResponseEntity<ModulosDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/modulosybasesdecompensacion/procedimientos",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> getProcedimientos(@RequestParam("idJurisdiccion") String idJurisdiccion, HttpServletRequest request) {
+		ComboDTO response = ModulosYBasesService.getProcedimientos(request, idJurisdiccion);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/modulosybasesdecompensacion/deleteModulos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<UpdateResponseDTO> deleteModules(@RequestBody ModulosDTO modulosDTO, HttpServletRequest request) {
 		UpdateResponseDTO response = ModulosYBasesService.deleteModules(modulosDTO, request);

@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.impl;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,13 +24,17 @@ import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.ScsAcreditacionprocedimiento;
 import org.itcgae.siga.db.entities.ScsActuaciondesigna;
 import org.itcgae.siga.db.entities.ScsActuaciondesignaExample;
+import org.itcgae.siga.db.entities.ScsPretensionesproced;
+import org.itcgae.siga.db.entities.ScsPretensionesprocedExample;
 import org.itcgae.siga.db.entities.ScsProcedimientos;
 import org.itcgae.siga.db.entities.ScsProcedimientosExample;
 import org.itcgae.siga.db.mappers.ScsAcreditacionprocedimientoMapper;
+import org.itcgae.siga.db.mappers.ScsPretensionesprocedMapper;
 import org.itcgae.siga.db.mappers.ScsActuaciondesignaMapper;
 import org.itcgae.siga.db.mappers.ScsProcedimientosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAcreditacionExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsPretensionesProcedExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsProcedimientosExtendsMapper;
 import org.itcgae.siga.scs.service.IModulosYBasesService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -48,17 +53,57 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 	@Autowired
 	private ScsProcedimientosExtendsMapper scsProcedimientosExtendsMapper;
 
-	@Autowired
-	private ScsProcedimientosMapper scsProcedimientosMapper;
-
 	@Autowired 
 	private ScsAcreditacionExtendsMapper scsAcreditacionExtendsMapper;
+
+	@Autowired 
+	private ScsPretensionesProcedExtendsMapper scsPretensionesprocedMapper;
 	
 	@Autowired 
 	private ScsAcreditacionprocedimientoMapper scsAcreditacionProcedimientoMapper;
 
 	@Autowired 
 	private ScsActuaciondesignaMapper scsActuaciondesignaMapper;
+	
+	@Override
+	public ComboDTO getProcedimientos(HttpServletRequest request, String idJurisdiccion) {
+		LOGGER.info("getProcedimientos() -> Entrada al servicio para obtener combo jurisdicciones");
+
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO combo = new ComboDTO();
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"getProcedimientos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getProcedimientos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"getProcedimientos() / cenScsJurisdiccionExtendsMapper.getJurisdicciones() -> Entrada a cenJurisdiccionesExtendsMapper para obtener los jurisdicciones");
+	
+				List<ComboItem> comboItems = scsProcedimientosExtendsMapper.getProcedimientos(idInstitucion.toString(), idJurisdiccion, dni);
+
+				LOGGER.info(
+						"getProcedimientos() / cenScsJurisdiccionExtendsMapper.getJurisdicciones() -> Salida a cenJurisdiccionesExtendsMapper para obtener los jurisdicciones");
+
+				combo.setCombooItems(comboItems);
+			}
+
+		}
+		LOGGER.info("getProcedimientos() -> Salida del servicio para obtener combo jurisdicciones");
+		return combo;
+	}
 	
 	@Override
 	public ModulosDTO searchModules(ModulosItem modulosItem, HttpServletRequest request) {
@@ -140,15 +185,16 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion).andNombreEqualTo(modulosItem.getNombre())
 					.andIdprocedimientoNotEqualTo(modulosItem.getIdProcedimiento());
 
-					List<ScsProcedimientos> modulosExistentes = scsProcedimientosMapper.selectByExample(ejemplo);
+					List<ScsProcedimientos> modulosExistentes = scsProcedimientosExtendsMapper.selectByExample(ejemplo);
 
 					if(modulosItem.getCodigo() != null && modulosItem.getCodigo() != "") {
 					ScsProcedimientosExample ejemplo2 = new ScsProcedimientosExample();
 					ejemplo2.createCriteria().andIdinstitucionEqualTo(idInstitucion).andCodigoEqualTo(modulosItem.getCodigo())
 					.andIdprocedimientoNotEqualTo(modulosItem.getIdProcedimiento());
 
-					codigoExistente = scsProcedimientosMapper.selectByExample(ejemplo2);
+					codigoExistente = scsProcedimientosExtendsMapper.selectByExample(ejemplo2);
 					}
+					
 					if(((modulosExistentes != null && modulosExistentes.size() > 0 ))) {
 						for(int i = 0; i < modulosExistentes.size() ; i++) {
 							if(!(modulosExistentes.get(i).getIdprocedimiento().toString().equals(modulosItem.getIdProcedimiento().toString()))) {
@@ -158,8 +204,6 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 								continua = false;
 							}
 						}
-						
-							
 					}
 					
 					if(codigoExistente != null && codigoExistente.size() > 0) {
@@ -201,6 +245,45 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 
 						LOGGER.info(
 								"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para actualizar el modulo");
+						
+//						Combo multiselect de Procedimientos
+						if(modulosItem.getProcedimientos() != null && modulosItem.getProcedimientos().length()>0) {
+							ScsPretensionesprocedExample pretenprocedExample = new ScsPretensionesprocedExample();
+							pretenprocedExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdprocedimientoEqualTo(modulosItem.getIdProcedimiento());
+							List<ScsPretensionesproced> pretensionesAnteriores = scsPretensionesprocedMapper.selectByExample(pretenprocedExample);
+							
+							for(int i = 0; i < pretensionesAnteriores.size() ; i++) {
+								scsPretensionesprocedMapper.deleteByPrimaryKey(pretensionesAnteriores.get(i));
+							}
+							
+							String[] lista = modulosItem.getProcedimientos().split(",");
+							
+							for(int i = 0; i < lista.length ; i++) {
+								ScsPretensionesproced pretension = new ScsPretensionesproced();
+								pretension.setIdpretension(Short.parseShort(lista[i]));
+								pretension.setFechamodificacion(new Date());
+								pretension.setUsumodificacion(usuarios.get(0).getIdusuario());
+								pretension.setIdprocedimiento(modulosItem.getIdProcedimiento());
+								pretension.setIdinstitucion(idInstitucion);
+								LOGGER.info(
+										"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para actualizar los procedimientos");
+								scsPretensionesprocedMapper.insert(pretension);
+								LOGGER.info(
+										"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para actualizar los procedimientos");
+							}
+						
+							
+						}else {
+//							ELIMINAR TODOS
+							ScsPretensionesprocedExample pretenprocedExample = new ScsPretensionesprocedExample();
+							pretenprocedExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdprocedimientoEqualTo(modulosItem.getIdProcedimiento());
+							List<ScsPretensionesproced> pretensionesAnteriores = scsPretensionesprocedMapper.selectByExample(pretenprocedExample);
+							
+							for(int i = 0; i < pretensionesAnteriores.size() ; i++) {
+								scsPretensionesprocedMapper.deleteByPrimaryKey(pretensionesAnteriores.get(i));
+							}
+						}
+						
 					}
 					
 				} catch (Exception e) {
@@ -264,13 +347,13 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						ScsProcedimientosExample ejemplo = new ScsProcedimientosExample();
 						ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 							.andNombreEqualTo(modulosItem.getNombre());
-						List<ScsProcedimientos> modulosExistentes = scsProcedimientosMapper.selectByExample(ejemplo);
+						List<ScsProcedimientos> modulosExistentes = scsProcedimientosExtendsMapper.selectByExample(ejemplo);
 
 						if(modulosItem.getCodigo() != null && modulosItem.getCodigo() != "") {
 							ScsProcedimientosExample ejemplo2 = new ScsProcedimientosExample();
-							ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+							ejemplo2.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 							.andCodigoEqualTo(modulosItem.getCodigo());
-							codigoExistente = scsProcedimientosMapper.selectByExample(ejemplo2);
+							codigoExistente = scsProcedimientosExtendsMapper.selectByExample(ejemplo2);
 						}
 						
 						
@@ -317,6 +400,39 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 							LOGGER.info(
 									"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
 
+							
+//							Combo multiselect de Procedimientos
+							if(response == 1)
+							if(modulosItem.getProcedimientos() != null && modulosItem.getProcedimientos().length()>0) {
+								
+								String[] lista = modulosItem.getProcedimientos().split(",");
+								
+								for(int i = 0; i < lista.length ; i++) {
+									ScsPretensionesproced pretension = new ScsPretensionesproced();
+									pretension.setIdpretension(Short.parseShort(lista[i]));
+									pretension.setFechamodificacion(new Date());
+									pretension.setUsumodificacion(usuarios.get(0).getIdusuario());
+									pretension.setIdprocedimiento(modulo.getIdprocedimiento());
+									pretension.setIdinstitucion(idInstitucion);
+									LOGGER.info(
+											"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para actualizar los procedimientos");
+									scsPretensionesprocedMapper.insert(pretension);
+									LOGGER.info(
+											"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para actualizar los procedimientos");
+								}
+							
+								
+							}else {
+//								ELIMINAR TODOS
+								ScsPretensionesprocedExample pretenprocedExample = new ScsPretensionesprocedExample();
+								pretenprocedExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdprocedimientoEqualTo(modulo.getIdprocedimiento());
+								List<ScsPretensionesproced> pretensionesAnteriores = scsPretensionesprocedMapper.selectByExample(pretenprocedExample);
+								
+								for(int i = 0; i < pretensionesAnteriores.size() ; i++) {
+									scsPretensionesprocedMapper.deleteByPrimaryKey(pretensionesAnteriores.get(i));
+								}
+							}
+							
 						}
 						
 					

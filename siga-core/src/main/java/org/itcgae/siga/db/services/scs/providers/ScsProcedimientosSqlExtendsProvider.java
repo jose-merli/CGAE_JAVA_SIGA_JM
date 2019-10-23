@@ -30,55 +30,87 @@ public class ScsProcedimientosSqlExtendsProvider extends ScsProcedimientosSqlPro
 		return sql.toString();
 	}
 
+	public String getProcedimientos(String idInstitucion, String idJurisdiccion, String nif) {
+		
+		SQL sql = new SQL();
+		
+		sql.SELECT("procedimiento.idinstitucion");
+		sql.SELECT("procedimiento.idpretension");
+		sql.SELECT("cat.descripcion as nombre");
+		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS cat on (cat.idrecurso = procedimiento.DESCRIPCION and idlenguaje = (select idLenguaje from Adm_Usuarios where idInstitucion = "+ idInstitucion +" and nif = '"+ nif +"'))");;
+		
+		sql.FROM("SCS_PRETENSION procedimiento");
+		sql.WHERE("procedimiento.idinstitucion = '" + idInstitucion + "'");
+		sql.WHERE("procedimiento.idjurisdiccion = '"+idJurisdiccion+"'");
+		
+		sql.ORDER_BY("nombre");
+	
+		return sql.toString();
+	}
+	
+//
+//SELECT procedimiento.idprocedimiento, LISTAGG(prepro.idpretension, ',') WITHIN GROUP (ORDER BY prepro.idprocedimiento) AS procedimientos
+//, procedimiento.nombre, procedimiento.codigo, procedimiento.precio as importe, procedimiento.complemento, procedimiento.vigente, procedimiento.idjurisdiccion, procedimiento.orden, procedimiento.codigoext, procedimiento.permitiraniadirletrado, procedimiento.fechadesdevigor, procedimiento.fechahastavigor, procedimiento.fechabaja, procedimiento.observaciones
+//FROM SCS_PROCEDIMIENTOS procedimiento
+//Left JOIN SCS_PRETENSIONESPROCED prepro on (prepro.idprocedimiento = procedimiento.idprocedimiento AND PREPRO.IDINSTITUCION = PROCEDIMIENTO.IDINSTITUCION)
+//
+//WHERE (procedimiento.idinstitucion = '2003'  AND UPPER(procedimiento.nombre) like UPPER('%%') AND procedimiento.fechabaja is null)
+//GROUP BY procedimiento.idprocedimiento,  procedimiento.nombre, procedimiento.codigo, procedimiento.precio , procedimiento.complemento, procedimiento.vigente, procedimiento.idjurisdiccion, procedimiento.orden, procedimiento.codigoext, procedimiento.permitiraniadirletrado, procedimiento.fechadesdevigor, procedimiento.fechahastavigor, procedimiento.fechabaja, procedimiento.observaciones
+//ORDER BY nombre;
+
 	public String searchModulo(ModulosItem moduloItem) {
 		
 		SQL sql = new SQL();
 		
-		sql.SELECT("idprocedimiento");
-		sql.SELECT("nombre");
-		sql.SELECT("codigo");
-		sql.SELECT("rpad(precio,length(precio)+1,'€') precio");
-		sql.SELECT("precio as importe");
-		sql.SELECT("complemento");
-		sql.SELECT("vigente");
-		sql.SELECT("idjurisdiccion");
-		sql.SELECT("orden");
-		sql.SELECT("codigoext");
-		sql.SELECT("permitiraniadirletrado");
-		sql.SELECT("fechadesdevigor");
-		sql.SELECT("fechahastavigor");
-		sql.SELECT("fechabaja");
-		sql.SELECT("observaciones");
+		sql.SELECT("procedimiento.idprocedimiento");
+		sql.SELECT("procedimiento.nombre");
+		sql.SELECT("procedimiento.codigo");
+		sql.SELECT("LISTAGG(prepro.idpretension, ',') WITHIN GROUP (ORDER BY prepro.idprocedimiento) AS procedimientos");
+		sql.SELECT("procedimiento.precio as importe");
+		sql.SELECT("procedimiento.complemento");
+		sql.SELECT("procedimiento.vigente");
+		sql.SELECT("procedimiento.idjurisdiccion");
+		sql.SELECT("procedimiento.orden");
+		sql.SELECT("procedimiento.codigoext");
+		sql.SELECT("procedimiento.permitiraniadirletrado");
+		sql.SELECT("procedimiento.fechadesdevigor");
+		sql.SELECT("procedimiento.fechahastavigor");
+		sql.SELECT("procedimiento.fechabaja");
+		sql.SELECT("procedimiento.observaciones");
 
-		sql.FROM("SCS_PROCEDIMIENTOS");
+		sql.FROM("SCS_PROCEDIMIENTOS PROCEDIMIENTO");
 		
-		sql.WHERE("idinstitucion = '" + moduloItem.getidInstitucion() + "'");
+		sql.WHERE("procedimiento.idinstitucion = '" + moduloItem.getidInstitucion() + "'");
+		
+		sql.LEFT_OUTER_JOIN("SCS_PRETENSIONESPROCED prepro on (prepro.idprocedimiento = procedimiento.idprocedimiento AND PREPRO.IDINSTITUCION = PROCEDIMIENTO.IDINSTITUCION)");
 		
 		if(moduloItem.getPrecio() == null) {
 			if(moduloItem.getNombre() != null && moduloItem.getNombre() != "") {
-				sql.WHERE("UPPER(nombre) like UPPER('%" + moduloItem.getNombre() + "%')");
+				sql.WHERE("UPPER(procedimiento.nombre) like UPPER('%" + moduloItem.getNombre() + "%')");
 			}
 			if(moduloItem.getIdProcedimiento() != null && moduloItem.getIdProcedimiento() != "") {
-				sql.WHERE("idprocedimiento = '" + moduloItem.getIdProcedimiento() + "'");
+				sql.WHERE("procedimiento.idprocedimiento = '" + moduloItem.getIdProcedimiento() + "'");
 			}
 			if(moduloItem.getCodigo() != null && moduloItem.getCodigo() != "") {
-				sql.WHERE("UPPER(codigo) like UPPER('%" + moduloItem.getCodigo() + "%')");
+				sql.WHERE("UPPER(procedimiento.codigo) like UPPER('%" + moduloItem.getCodigo() + "%')");
 			}
 		}else {
 			if(moduloItem.getNombre() != null && moduloItem.getNombre() != "") {
-				sql.WHERE("UPPER(nombre) = UPPER('" + moduloItem.getNombre() + "')");
+				sql.WHERE("UPPER(procedimiento.nombre) = UPPER('" + moduloItem.getNombre() + "')");
 			}
 			if(moduloItem.getIdProcedimiento() != null && moduloItem.getIdProcedimiento() != "") {
-				sql.WHERE("idprocedimiento = '" + moduloItem.getIdProcedimiento() + "'");
+				sql.WHERE("procedimiento.idprocedimiento = '" + moduloItem.getIdProcedimiento() + "'");
 			}
 			if(moduloItem.getCodigo() != null && moduloItem.getCodigo() != "") {
-				sql.WHERE("UPPER(codigo) = UPPER('" + moduloItem.getCodigo() + "')");
+				sql.WHERE("UPPER(procedimiento.codigo) = UPPER('" + moduloItem.getCodigo() + "')");
 			}
 		}
 		
 		if(!moduloItem.isHistorico()) {
-			sql.WHERE("fechabaja is null");
+			sql.WHERE("procedimiento.fechabaja is null");
 		}
+		
+		sql.GROUP_BY("procedimiento.idprocedimiento,  procedimiento.nombre, procedimiento.codigo, procedimiento.precio , procedimiento.complemento, procedimiento.vigente, procedimiento.idjurisdiccion, procedimiento.orden, procedimiento.codigoext, procedimiento.permitiraniadirletrado, procedimiento.fechadesdevigor, procedimiento.fechahastavigor, procedimiento.fechabaja, procedimiento.observaciones");
 		sql.ORDER_BY("nombre"); 
 	
 		return sql.toString();
