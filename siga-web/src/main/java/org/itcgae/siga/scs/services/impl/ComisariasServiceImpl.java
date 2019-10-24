@@ -407,7 +407,7 @@ public class ComisariasServiceImpl implements IComisariasService {
 				try {
 
 					ScsComisariaExample scsComisariaExample = new ScsComisariaExample();
-					scsComisariaExample.createCriteria().andNombreLike(comisariaItem.getNombre())
+					scsComisariaExample.createCriteria().andNombreEqualTo(comisariaItem.getNombre())
 							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
 
 					LOGGER.info(
@@ -420,7 +420,7 @@ public class ComisariasServiceImpl implements IComisariasService {
 
 					if (comisariaList != null && comisariaList.size() > 0) {
 						error.setCode(400);
-						error.setDescription("messages.jgr.maestros.gestionJuzgado.existeJuzgadoMismoNombre");
+						error.setDescription("messages.jgr.maestros.comisarias.existeComisariaMismoNombre");
 						insertResponseDTO.setStatus(SigaConstants.KO);
 					} else {
 
