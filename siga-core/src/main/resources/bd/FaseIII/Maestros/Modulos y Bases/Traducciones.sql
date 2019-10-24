@@ -68,3 +68,9 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.maestros.Procedimiento','Procediment','0','2',to_date('11/09/19','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.maestros.Procedimiento','Procedimiento#GL','0','4',to_date('11/09/19','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.maestros.Procedimiento','Procedimiento#EU','0','3',to_date('11/09/19','DD/MM/RR'),'0','19');
+
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('administracion.parametrosGenerales.literal.hasta','hasta','0','1',to_date('24/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('administracion.parametrosGenerales.literal.hasta','fins','0','2',to_date('24/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('administracion.parametrosGenerales.literal.hasta','hasta#GL','0','4',to_date('24/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('administracion.parametrosGenerales.literal.hasta','hasta#EU','0','3',to_date('24/10/19','DD/MM/RR'),'0','19');
