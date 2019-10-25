@@ -424,12 +424,12 @@ public class ProcuradoresServiceImpl implements IProcuradoresService {
 
 					ScsProcuradorExample scsProcuradorExample = new ScsProcuradorExample();
 					if(procuradorItem.getApellido2()!= null)
-						scsProcuradorExample.createCriteria().andNombreLike(procuradorItem.getNombre().trim())
+						scsProcuradorExample.createCriteria().andNombreEqualTo(procuradorItem.getNombre().trim())
 						.andApellidos1EqualTo(procuradorItem.getApellido1().trim())
 						.andApellidos2EqualTo(procuradorItem.getApellido2().trim())
 						.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
 					else
-						scsProcuradorExample.createCriteria().andNombreLike(procuradorItem.getNombre().trim())
+						scsProcuradorExample.createCriteria().andNombreEqualTo(procuradorItem.getNombre().trim())
 						.andApellidos1EqualTo(procuradorItem.getApellido1().trim())
 						.andApellidos2IsNull()
 						.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
@@ -445,7 +445,7 @@ public class ProcuradoresServiceImpl implements IProcuradoresService {
 
 					if (procuradorList != null && procuradorList.size() > 0) {
 						error.setCode(400);
-						error.setDescription("messages.jgr.maestros.gestionJuzgado.existeJuzgadoMismoNombre");
+						error.setDescription("messages.jgr.maestros.procuradores.existeProcuradorMismoNombre");
 						insertResponseDTO.setStatus(SigaConstants.KO);
 					} else {
 
