@@ -19,5 +19,22 @@ public class ScsJurisdiccionSqlExtendsProvider extends ScsJurisdiccionSqlProvide
 
 		return sql.toString();
 	}
+	
+	
+	public String getComboJurisdiccion(String idLenguaje ) {
+		SQL sql = new SQL();
+		
+		sql.SELECT("SCS_JURISDICCION.IDJURISDICCION");
+		sql.SELECT("GEN_RECURSOS_CATALOGOS.DESCRIPCION.DESCRIPCION");
+		
+		sql.FROM("SCS_JURISDICCION");
+		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS ON SCS_JURISDICCION.DESCRIPCION = GEN_RECURSOS_CATALOGOS.IDRECURSO");
+		
+		sql.WHERE("FECHABAJA IS NULL");
+		sql.WHERE("GEN_RECURSOS_CATALOGOS.IDLENGUAJE = '"+idLenguaje+"'");
+	
+		return sql.toString();
+		
+	}
 
 }
