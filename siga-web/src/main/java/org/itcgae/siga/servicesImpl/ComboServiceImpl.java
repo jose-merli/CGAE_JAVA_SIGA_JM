@@ -301,8 +301,6 @@ public class ComboServiceImpl implements ComboService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				AdmUsuarios usuario = usuarios.get(0);
-
 				LOGGER.info(
 						"getComboActuacion() / scsTurnosExtendsMapper.comboTurnos() -> Entrada a scsTipoactuacionExtendsMapper para obtener las actuaciones");
 
@@ -340,8 +338,6 @@ public class ComboServiceImpl implements ComboService {
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				AdmUsuarios usuario = usuarios.get(0);
-
 				LOGGER.info(
 						"comboAreas() / scsTipoactuacionExtendsMapper.comboAreas() -> Entrada a scsTipoactuacionExtendsMapper para obtener las actuaciones");
 
@@ -359,9 +355,10 @@ public class ComboServiceImpl implements ComboService {
 	}
 
 	@Override
-	public ComboDTO comboTiposTurno(HttpServletRequest request, String idLenguaje) {
+	public ComboDTO comboTiposTurno(HttpServletRequest request) {
 		LOGGER.info("comboAreas() -> Entrada al servicio para búsqueda de las areas");
 		String token = request.getHeader("Authorization");
+		String idLenguaje = "";
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		ComboDTO comboDTO = new ComboDTO();
@@ -400,7 +397,6 @@ public class ComboServiceImpl implements ComboService {
 	@Override
 	public ComboDTO comboMaterias(HttpServletRequest request, String idArea, String filtro) {
 		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		ComboDTO materiasReturn = new ComboDTO();
 
@@ -412,10 +408,11 @@ public class ComboServiceImpl implements ComboService {
 	}
 
 	@Override
-	public ComboDTO comboTiposGuardia(HttpServletRequest request, String idLenguaje) {
+	public ComboDTO comboTiposGuardia(HttpServletRequest request) {
 		LOGGER.info("comboAreas() -> Entrada al servicio para búsqueda de las areas");
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		String idLenguaje = "";
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		ComboDTO comboDTO = new ComboDTO();
 		if (idInstitucion != null) {

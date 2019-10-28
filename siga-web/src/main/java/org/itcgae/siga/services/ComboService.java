@@ -12,9 +12,9 @@ public interface ComboService {
 	
 	public ComboDTO comboMaterias(HttpServletRequest request, String idArea,String filtro);
 	
-	public ComboDTO comboTiposTurno(HttpServletRequest request,String idLenguaje);
+	public ComboDTO comboTiposTurno(HttpServletRequest request);
 
-	public ComboDTO comboTiposGuardia(HttpServletRequest request,String idLenguaje);
+	public ComboDTO comboTiposGuardia(HttpServletRequest request);
 
 	public ComboDTO getComboZonas(HttpServletRequest request);
 
