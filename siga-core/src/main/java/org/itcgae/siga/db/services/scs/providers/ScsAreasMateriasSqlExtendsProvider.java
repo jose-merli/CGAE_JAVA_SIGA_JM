@@ -30,6 +30,16 @@ public class ScsAreasMateriasSqlExtendsProvider extends ScsAreaSqlProvider {
 
 		return sql.toString();
 	}
+	
+	public String comboAreas(Short idInstitucion) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("IDAREA, NOMBRE");
+		sql.FROM("SCS_AREA");
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion +"'");
+		return sql.toString();
+	}
 
 	public String searchAreas(AreasItem areasItem) {
 		
