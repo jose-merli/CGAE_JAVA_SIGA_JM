@@ -35,6 +35,17 @@ public class ScsMateriaSqlExtendsProvider extends ScsMateriaSqlProvider {
 		return sql.toString();
 	}
 	
+	public String comboMaterias(Short idInstitucion, String idArea) {
+
+		SQL sql = new SQL();
+
+		sql.SELECT("IDMATERIA, NOMBRE");
+		sql.FROM("SCS_MATERIA");
+		sql.WHERE("IDINSTITUCION = '"+idInstitucion +"' AND IDAREA ='"+idArea+"'");
+		
+		return sql.toString();
+	}
+	
 //	SQL sql = new SQL();
 //	
 //	sql.SELECT("sub.idzona");
