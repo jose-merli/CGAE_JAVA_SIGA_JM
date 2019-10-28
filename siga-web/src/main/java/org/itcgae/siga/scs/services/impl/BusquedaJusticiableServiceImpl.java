@@ -17,7 +17,6 @@ import org.itcgae.siga.db.entities.ScsTelefonospersona;
 import org.itcgae.siga.db.entities.ScsTelefonospersonaExample;
 import org.itcgae.siga.db.mappers.ScsTelefonospersonaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
-import org.itcgae.siga.db.services.scs.mappers.ScsPretensionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRolesJusticiablesExtendsMapper;
 import org.itcgae.siga.scs.service.IBusquedaJusticiablesService;
 import org.itcgae.siga.security.UserTokenUtils;

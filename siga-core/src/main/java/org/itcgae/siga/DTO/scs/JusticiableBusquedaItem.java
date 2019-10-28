@@ -3,8 +3,6 @@ package org.itcgae.siga.DTO.scs;
 import java.util.Date;
 import java.util.Objects;
 
-import org.itcgae.siga.DTOs.gen.ComboItem;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JusticiableBusquedaItem {
