@@ -6,7 +6,7 @@ import org.itcgae.siga.db.mappers.ScsTurnoSqlProvider;
 
 public class ScsTipoTurnosSqlExtendsProvider extends ScsTurnoSqlProvider {
 
-	public String comboTurnos(Short idInstitucion) {
+	public String comboTipoTurnos(Short idInstitucion) {
 
 		SQL sql = new SQL();
 
