@@ -23,4 +23,11 @@ public interface ScsJurisdiccionExtendsMapper extends ScsJurisdiccionMapper{
 	})
 	List<ComboItem> getJurisdicciones(String idInstitucion, String nif);
 	
+	@SelectProvider(type = ScsJurisdiccionSqlExtendsProvider.class, method = "getComboJurisdiccion")
+	@Results({
+		@Result(column = "IDJURISDICCION", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> getComboJurisdiccion(String idLenguaje);
+	
 }

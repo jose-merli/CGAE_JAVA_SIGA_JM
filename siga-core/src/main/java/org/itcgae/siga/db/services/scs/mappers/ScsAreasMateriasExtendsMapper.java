@@ -9,10 +9,12 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.scs.AreasItem;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ScsAreaMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsAreasMateriasSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsSubzonaSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsTurnosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -38,5 +40,10 @@ public interface ScsAreasMateriasExtendsMapper extends ScsAreaMapper{
 	})
 	NewIdDTO getIdArea(Short idInstitucion);
 	
-	
+	@SelectProvider(type = ScsAreasMateriasSqlExtendsProvider.class, method = "comboAreas")
+	@Results({
+		@Result(column = "IDAREA", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> comboAreas(Short idInstitucion);
 }
