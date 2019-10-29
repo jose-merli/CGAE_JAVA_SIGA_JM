@@ -27,9 +27,9 @@ public class CenPartidasJudicialSqlExtendsProvider extends CenPartidojudicialSql
 		sql.FROM("SCS_PROCEDIMIENTOS proc");
 		sql.INNER_JOIN("SCS_JURISDICCION jurisdiccion on jurisdiccion.IDJURISDICCION =  proc.IDJURISDICCION");
 		sql.INNER_JOIN("GEN_RECURSOS_CATALOGOS juris on (juris.idrecurso = jurisdiccion.DESCRIPCION and idlenguaje = '" + idLenguaje + "')");;
-		
-		sql.WHERE("proc.idinstitucion = '" + idInstitucion + "'");
-		
+		if(idInstitucion != 2000) {
+			sql.WHERE("proc.idinstitucion = '" + idInstitucion + "'");
+		}
 		sql.ORDER_BY("proc.nombre");
 	
 		return sql.toString();

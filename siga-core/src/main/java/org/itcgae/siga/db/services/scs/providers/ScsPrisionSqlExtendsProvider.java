@@ -30,9 +30,9 @@ public class ScsPrisionSqlExtendsProvider extends ScsPrisionSqlProvider {
 		sql.FROM("SCS_PRISION prision");
 		sql.LEFT_OUTER_JOIN("CEN_PROVINCIAS PROVINCIAS ON PROVINCIAS.IDPROVINCIA = prision.IDPROVINCIA");
 		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES POBLACION ON POBLACION.IDPOBLACION = prision.IDPOBLACION");
-
-		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
-
+		if(idInstitucion != 2000) {
+			sql.WHERE("idinstitucion = '" + idInstitucion + "'");
+		}
 		if (prisionItem.getNombre() != null && prisionItem.getNombre() != "") {
 			sql.WHERE("(TRANSLATE(LOWER( PRISION.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
 					+ prisionItem.getNombre() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");
