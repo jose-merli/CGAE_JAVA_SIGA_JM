@@ -32,7 +32,8 @@ public class ScsJurisdiccionSqlExtendsProvider extends ScsJurisdiccionSqlProvide
 		
 		sql.WHERE("FECHA_BAJA IS NULL");
 		sql.WHERE("GEN_RECURSOS_CATALOGOS.IDLENGUAJE = '"+idLenguaje+"'");
-	
+		sql.ORDER_BY("GEN_RECURSOS_CATALOGOS.DESCRIPCION");
+
 		return sql.toString();
 		
 	}
