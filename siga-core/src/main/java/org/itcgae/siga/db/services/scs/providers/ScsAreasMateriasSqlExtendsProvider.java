@@ -40,8 +40,8 @@ public class ScsAreasMateriasSqlExtendsProvider extends ScsAreaSqlProvider {
 		
 		sql1.SELECT("*");
 		sql.SELECT("scs_area.idarea, scs_area.nombre, scs_area.contenido, scs_area.fechabaja, scs_area.idinstitucion,LISTAGG(materia.nombre, ';') WITHIN GROUP (ORDER BY scs_area.idinstitucion,scs_area.idarea) AS nombremateriagrup "
-				+ ",scs_area.jurisdicciones, scs_area.idjurisdicciones");
-		
+				+ ",scs_area.jurisdicciones, scs_area.idjurisdicciones").ORDER_BY("scs_area.nombre");
+
 		sql2.SELECT("scs_area.idarea, scs_area.nombre, scs_area.contenido, scs_area.fechabaja, scs_area.idinstitucion,"
 				+ "LISTAGG(materiajurisdiccion.descripcion, ';') WITHIN GROUP (ORDER BY scs_area.idinstitucion,scs_area.idarea) AS jurisdicciones,"
 				+ "LISTAGG(materiajurisdiccion.idjurisdiccion, ';') WITHIN GROUP (ORDER BY scs_area.idinstitucion,scs_area.idarea) AS idjurisdicciones");
