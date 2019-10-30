@@ -10,25 +10,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TurnosDTO   {
   
-  private List<TurnosItem> turnosItems = new ArrayList<TurnosItem>();
+  private List<TurnosItem> turnosItem = new ArrayList<TurnosItem>();
   private Error error = null;
 
   
   /**
    * 
    **/
-  public TurnosDTO turnosItems(List<TurnosItem> turnosItems) {
-    this.turnosItems = turnosItems;
+  public TurnosDTO turnosItems(List<TurnosItem> turnosItem) {
+    this.turnosItem = turnosItem;
     return this;
   }
   
-  @JsonProperty("turnosItems")
+  @JsonProperty("turnosItem")
   public List<TurnosItem> getTurnosItems() {
-    return turnosItems;
+    return turnosItem;
   }
   
-  public void setTurnosItems(List<TurnosItem> turnosItems) {
-    this.turnosItems = turnosItems;
+  public void setTurnosItems(List<TurnosItem> turnosItem) {
+    this.turnosItem = turnosItem;
   }
   
   
@@ -59,13 +59,13 @@ public class TurnosDTO   {
       return false;
     }
     TurnosDTO turnosDTO = (TurnosDTO) o;
-    return Objects.equals(this.turnosItems, turnosDTO.turnosItems) &&
+    return Objects.equals(this.turnosItem, turnosDTO.turnosItem) &&
         Objects.equals(this.error, turnosDTO.error);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(turnosItems, error);
+    return Objects.hash(turnosItem, error);
   }
 
   @Override
@@ -73,7 +73,7 @@ public class TurnosDTO   {
     StringBuilder sb = new StringBuilder();
     sb.append("class areasDTO {\n");
     
-    sb.append("    areasItems: ").append(toIndentedString(turnosItems)).append("\n");
+    sb.append("    areasItems: ").append(toIndentedString(turnosItem)).append("\n");
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("}");
     return sb.toString();

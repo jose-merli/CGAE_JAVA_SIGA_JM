@@ -8,6 +8,8 @@ import org.itcgae.siga.DTO.scs.AreasItem;
 import org.itcgae.siga.DTO.scs.ComisariaDTO;
 import org.itcgae.siga.DTO.scs.ComisariaItem;
 import org.itcgae.siga.DTO.scs.MateriasDTO;
+import org.itcgae.siga.DTO.scs.PartidasDTO;
+import org.itcgae.siga.DTO.scs.PartidasItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
@@ -20,12 +22,15 @@ import org.itcgae.siga.DTO.scs.TiposActuacionDTO;
 import org.itcgae.siga.DTO.scs.TiposActuacionItem;
 import org.itcgae.siga.DTO.scs.TiposAsistenciaItem;
 import org.itcgae.siga.DTO.scs.TiposAsistenciasDTO;
+import org.itcgae.siga.DTO.scs.TurnosDTO;
+import org.itcgae.siga.DTO.scs.TurnosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.scs.service.IGestionTiposActuacionService;
 import org.itcgae.siga.scs.service.IGestionTiposAsistenciaService;
+import org.itcgae.siga.scs.service.IGestionTurnosService;
 import org.itcgae.siga.servicesImpl.ComboServiceImpl;
  
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,22 +46,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/oficio")
 public class TurnosController {
- 
-	
-	@Autowired
-	private IComisariasService comisariasService;
-
-	@RequestMapping(value = "/gestionTurnos/searchTurnos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComisariaDTO> searchCourt(@RequestBody ComisariaItem ComisariaItem, HttpServletRequest request) {
-		ComisariaDTO response = comisariasService.searchComisarias(ComisariaItem, request);
-		return new ResponseEntity<ComisariaDTO>(response, HttpStatus.OK);
-	}
-}
- 
 	@Autowired
 	private ComboServiceImpl comboService;
 	
+	@Autowired
+	private IGestionTurnosService turnosService;
 	
+	@RequestMapping(value = "/combossjcs/comboTurnos",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboTurnos(HttpServletRequest request) {
+		ComboDTO response = comboService.comboTurnos(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
 	
 	@RequestMapping(value = "/combossjcs/comboAreas",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboAreas(HttpServletRequest request) {
@@ -71,8 +71,8 @@ public class TurnosController {
 	}
 	
 	@RequestMapping(value = "/combossjcs/comboTiposTurno", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboTiposTurno(String idLenguaje, HttpServletRequest request) { 
-		ComboDTO response = comboService.comboTiposTurno(request,idLenguaje);
+	ResponseEntity<ComboDTO> comboTiposTurno(HttpServletRequest request) { 
+		ComboDTO response = comboService.comboTiposTurno(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
@@ -100,11 +100,20 @@ public class TurnosController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-//	@RequestMapping(value = "/gestionTiposAsistencia/busquedaTiposAsistencia", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<TiposAsistenciasDTO> searchTiposAsistencia(@RequestParam("historico") boolean historico, HttpServletRequest request) {
-//		TiposAsistenciasDTO response = TiposAsistenciaService.searchTiposAsistencia(historico, request);
-//		return new ResponseEntity<TiposAsistenciasDTO>(response, HttpStatus.OK);
-//	}
+	@RequestMapping(value = "/turnos/busquedaTurnos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<TurnosDTO> busquedaTurnos(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
+		TurnosDTO response = turnosService.busquedaTurnos(turnosItem, request);
+		return new ResponseEntity<TurnosDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/turnos/eliminateTurnos", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> deleteZones(@RequestBody TurnosDTO turnosDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = turnosService.eliminateTurnos(turnosDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 	
 }
  
