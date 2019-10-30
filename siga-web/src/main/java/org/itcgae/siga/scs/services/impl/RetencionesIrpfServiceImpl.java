@@ -456,7 +456,6 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 							&& retencionItem.getDescripcionSociedad() != "") {
 						ScsMaestroretencionesExample example = new ScsMaestroretencionesExample();
 						example.createCriteria()
-								.andIdretencionNotEqualTo(Integer.valueOf(retencionItem.getIdRetencion()))
 								.andLetranifsociedadEqualTo(retencionItem.getDescripcionSociedad())
 								.andFechabajaIsNull();
 

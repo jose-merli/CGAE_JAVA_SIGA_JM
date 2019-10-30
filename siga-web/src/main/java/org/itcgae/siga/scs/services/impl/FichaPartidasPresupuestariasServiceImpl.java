@@ -217,12 +217,7 @@ public class FichaPartidasPresupuestariasServiceImpl implements IPartidasPresupu
 							ejemplo2.setIdpartidapresupuestaria(partidasItems.getIdpartidapresupuestaria());
 							List<PartidasItem> descripcionPartidasDuplicadas = scsPartidaPresupuestariaExtendsMapper.searchPartidaPres(ejemplo2);
 							
-							if ((nombrePartidasDuplicadas != null && nombrePartidasDuplicadas.size() > 0)|| (descripcionPartidasDuplicadas != null && descripcionPartidasDuplicadas.size() > 0)) {
-								
-								error.setCode(400);
-								error.setDescription("Este nombre o descripción ya existe");
-
-							}else {
+							
 								LOGGER.info(
 										"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
 
@@ -261,7 +256,7 @@ public class FichaPartidasPresupuestariasServiceImpl implements IPartidasPresupu
 							
 						}
 					
-					}
+					
 											
 					 catch (Exception e) {
 						response = 0;
@@ -343,12 +338,7 @@ public class FichaPartidasPresupuestariasServiceImpl implements IPartidasPresupu
 					LOGGER.info(
 							"updateGroupZone() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Salida a scsPartidaPresupuestariaExtendsMapper para buscar la partida");
 
-					if ((nombrePartidasDuplicadas != null && nombrePartidasDuplicadas.size() > 0) || (descripcionPartidasDuplicadas != null && descripcionPartidasDuplicadas.size() > 0)) {
-						
-						error.setCode(400);
-						error.setDescription("menu.justiciaGratuita.maestros.errorpartidapresupuestaria");
-
-					} else {
+				
 						String importe2 = partidasItem.getImportepartida().toString();
 						if(partidasItem.getImportepartida() == null || partidasItem.getImportepartida() =="") {
 							 importe2 = "0";
@@ -380,7 +370,7 @@ public class FichaPartidasPresupuestariasServiceImpl implements IPartidasPresupu
 
 						LOGGER.info(
 								"createPartidaPres() / scsAreasMateriasExtendsMapper.insert() -> Salida de scsAreasMateriasExtendsMapper para insertar una nueva area");
-					}
+					
 
 				} catch (Exception e) {
 					response = 0;
