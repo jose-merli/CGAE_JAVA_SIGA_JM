@@ -21,16 +21,19 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	
 	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "searchGuardias")
 	@Results({ 
-		@Result(column = "turno", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "turno", property = "turno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDTURNO", property = "idTurno", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDGUARDIA", property = "idGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "nombre", property = "nombre", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "tipodeguardia", property = "tipoGuardia", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "obligatoriedad", property = "idinstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "obligatoriedad", property = "obligatoriedad", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "duracion", property = "duracion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMEROLETRADOSGUARDIA", property = "letradosGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "numeroletradosinscritos", property = "letradosIns", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "diaslaborables", property = "diasLab", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "diasfestivos", property = "diasFes", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALIDARJUSTIFICACIONES", property = "validaJustificacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
 	})
 	List<GuardiasItem> searchGuardias(GuardiasItem guardiaItem , String idInstitucion, String idLenguaje);
 	

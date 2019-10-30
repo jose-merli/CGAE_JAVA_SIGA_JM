@@ -7,6 +7,7 @@ public class GuardiasItem {
 
 	private String idGuardia;
 	private String idTurno;
+	private String turno;
 	private String nombre;
 	private String area;
 	private String materia;
@@ -19,7 +20,7 @@ public class GuardiasItem {
 	private String jurisdiccion;
 	private String grupoFacturacion;
 	private String partidaPresupuestaria;
-	private String tipoTurno;
+	private String tipoTurno;		
 	private String tipoGuardia;
 	private String tipoDia;
 	private String letradosGuardia;
@@ -27,9 +28,23 @@ public class GuardiasItem {
 	private String diasLab;
 	private String diasFes;
 	private Date fechabaja;
+	private boolean historico;
 	
 	
 	
+	
+	public String getTurno() {
+		return turno;
+	}
+	public void setTurno(String turno) {
+		this.turno = turno;
+	}
+	public boolean isHistorico() {
+		return historico;
+	}
+	public void setHistorico(boolean historico) {
+		this.historico = historico;
+	}
 	public String getDiasLab() {
 		return diasLab;
 	}

@@ -4,7 +4,10 @@ package org.itcgae.siga.scs.controllers.guardia;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.scs.guardia.GuardiasDTO;
+import org.itcgae.siga.DTO.scs.guardia.GuardiasItem;
+import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.scs.service.guardia.GuardiasService;
 import org.itcgae.siga.services.ComboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,10 +25,27 @@ public class GuardiaController {
 
 	@Autowired
 	ComboService comboService;
-//
-//	
-//	@PostMapping(value = "/busquedaGuardia/searchGuardias", produces = MediaType.APPLICATION_JSON_VALUE)
-//	ResponseEntity<GuardiasDTO>
+
+	@Autowired
+	GuardiasService guardiasService;
+	
+	@PostMapping(value = "/busquedaGuardia/searchGuardias", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<GuardiasDTO> searchGuardias(@RequestBody GuardiasItem guardiasItem, HttpServletRequest request){
+		GuardiasDTO response= guardiasService.searchGuardias(guardiasItem,request);
+		return new ResponseEntity<GuardiasDTO>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/busquedaGuardia/deleteGuardias", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> deleteGuardias(@RequestBody GuardiasDTO guardiasDTO, HttpServletRequest request){
+		UpdateResponseDTO response= guardiasService.deleteGuardias(guardiasDTO,request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
+
+	@PostMapping(value = "/busquedaGuardia/activateGuardias", produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> activateGuardias(@RequestBody GuardiasDTO guardiasDTO, HttpServletRequest request){
+		UpdateResponseDTO response= guardiasService.activateGuardias(guardiasDTO,request);
+		return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+	}
 	
 	@GetMapping(value = "/busquedaGuardia/comboZonas", produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> getComboZonas(HttpServletRequest request) {
