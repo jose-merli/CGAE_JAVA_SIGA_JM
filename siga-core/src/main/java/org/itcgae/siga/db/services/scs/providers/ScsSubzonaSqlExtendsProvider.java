@@ -16,7 +16,7 @@ public class ScsSubzonaSqlExtendsProvider extends ScsSubzonaSqlProvider{
 		return sql.toString();
 	}
 	
-	public String searchSubzonas(String idZona, Short idInstitucion) {
+	public String searchSubzonas(String idZona, String idSubZona, Short idInstitucion) {
 		
 		SQL sql = new SQL();
 		
@@ -34,6 +34,10 @@ public class ScsSubzonaSqlExtendsProvider extends ScsSubzonaSqlProvider{
 		
 		sql.WHERE("sub.idinstitucion = '" + idInstitucion + "'");
 		sql.WHERE("sub.idzona = '" + idZona + "'");
+		
+		if(idSubZona != null) {
+			sql.WHERE("sub.idsubzona = '" + idSubZona + "'");
+		}
 		
 		sql.GROUP_BY("sub.idzona, sub.nombre, sub.idsubzona, sub.fechabaja");
 		sql.ORDER_BY("descripcionsubzona");

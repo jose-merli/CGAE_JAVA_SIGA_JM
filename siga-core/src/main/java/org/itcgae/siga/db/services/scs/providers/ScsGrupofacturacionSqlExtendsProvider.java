@@ -17,6 +17,7 @@ public class ScsGrupofacturacionSqlExtendsProvider extends ScsGrupofacturacionSq
 		sql.WHERE("SCS_GRUPOFACTURACION.IDINSTITUCION = '"+idInstitucion+"'");
 		sql.WHERE("GEN_RECURSOS_CATALOGOS.IDLENGUAJE = '"+idLenguaje+"'");
 		
+		sql.ORDER_BY("GEN_RECURSOS_CATALOGOS.DESCRIPCION");
 		return sql.toString();
 	}
 }

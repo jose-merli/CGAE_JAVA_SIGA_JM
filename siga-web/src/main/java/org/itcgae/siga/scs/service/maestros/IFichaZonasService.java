@@ -12,7 +12,7 @@ public interface IFichaZonasService {
 	
 	public ComboDTO getPartidoJudicial(HttpServletRequest request);
 	
-	public ZonasDTO searchSubzones(String idZona, HttpServletRequest request);
+	public ZonasDTO searchSubzones(String idZona,String idSubZona, HttpServletRequest request);
 	
 	public ZonasItem searchGroupZone(String idZona, HttpServletRequest request);
 	

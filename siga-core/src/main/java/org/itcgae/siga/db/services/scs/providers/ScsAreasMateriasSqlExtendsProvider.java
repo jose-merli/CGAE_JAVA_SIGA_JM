@@ -38,6 +38,8 @@ public class ScsAreasMateriasSqlExtendsProvider extends ScsAreaSqlProvider {
 		sql.SELECT("IDAREA, NOMBRE");
 		sql.FROM("SCS_AREA");
 		sql.WHERE("IDINSTITUCION = '"+idInstitucion +"'");
+		sql.ORDER_BY("nombre");
+
 		return sql.toString();
 	}
 

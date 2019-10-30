@@ -43,8 +43,8 @@ public class ZonasSubzonasController {
 	}
 	
 	@RequestMapping(value = "/fichaZonas/searchSubzones",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ZonasDTO> searchSubzones(@RequestParam("idZona") String idZona, HttpServletRequest request) {
-		ZonasDTO response = fichaZonasService.searchSubzones(idZona, request);
+	ResponseEntity<ZonasDTO> searchSubzones(@RequestParam("idZona") String idZona,@RequestParam("idSubZona") String idSubZona, HttpServletRequest request) {
+		ZonasDTO response = fichaZonasService.searchSubzones(idZona,idSubZona, request);
 		return new ResponseEntity<ZonasDTO>(response, HttpStatus.OK);
 	}
 	

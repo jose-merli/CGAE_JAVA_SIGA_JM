@@ -96,7 +96,7 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 	}
 
 	@Override
-	public ZonasDTO searchSubzones(String idZona, HttpServletRequest request) {
+	public ZonasDTO searchSubzones(String idZona,String idSubZona, HttpServletRequest request) {
 		LOGGER.info("searchSubzonas() -> Entrada al servicio para obtener las zonas");
 
 		// Conseguimos información del usuario logeado
@@ -123,7 +123,7 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 				LOGGER.info(
 						"searchSubzonas() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
 
-				zonasItems = scsSubzonaExtendsMapper.searchSubzonas(idZona, idInstitucion);
+				zonasItems = scsSubzonaExtendsMapper.searchSubzonas(idZona,null, idInstitucion);
 
 				LOGGER.info(
 						"searchSubzonas() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
