@@ -97,7 +97,7 @@ public class ComboServiceImpl implements ComboService {
 				ScsZonaExample example = new ScsZonaExample();
 
 				example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
-
+                example.setOrderByClause("nombre");
 				List<ScsZona> zonas = scsZonasExtendsMapper.selectByExample(example);
 
 				List<ComboItem> comboItems = new ArrayList<ComboItem>();
@@ -144,7 +144,7 @@ public class ComboServiceImpl implements ComboService {
 
 				example.createCriteria().andIdzonaEqualTo(Short.valueOf(idZona)).andIdinstitucionEqualTo(idInstitucion)
 						.andFechabajaIsNull();
-
+                example.setOrderByClause("nombre");
 				List<ScsSubzona> subZonas = scsSubZonasExtendsMapper.selectByExample(example);
 
 				List<ComboItem> comboItems = new ArrayList<ComboItem>();
@@ -257,7 +257,7 @@ public class ComboServiceImpl implements ComboService {
 				ScsPartidapresupuestariaExample example = new ScsPartidapresupuestariaExample();
 
 				example.createCriteria().andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
-
+                example.setOrderByClause("nombrepartida");
 				List<ScsPartidapresupuestaria> partidas = scsPartidasPresupuestariasExtendsMapper
 						.selectByExample(example);
 
