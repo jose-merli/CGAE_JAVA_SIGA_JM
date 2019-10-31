@@ -2,6 +2,8 @@ package org.itcgae.siga.scs.services.impl.guardia;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -59,7 +61,12 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				List<GuardiasItem> guardias = scsGuardiasturnoExtendsMapper.searchGuardias(guardiasItem,
 						idInstitucion.toString(), usuarios.get(0).getIdlenguaje());
-
+				
+				guardias = guardias.stream().map( it ->{
+					it.setTipoDia(("Selección: Labor. "+it.getDiasLab()+", Fest. "+it.getDiasFes()).replace("null", ""));
+					return it;
+				}).collect(Collectors.toList());
+				
 				guardiaDTO.setGuardiaItems(guardias);
 
 				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
