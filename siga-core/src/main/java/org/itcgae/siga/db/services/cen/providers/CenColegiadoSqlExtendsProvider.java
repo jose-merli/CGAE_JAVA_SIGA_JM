@@ -279,8 +279,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 				String fechaIncorporacionDesde = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
 				String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
 
-				sql.WHERE("(col.fechaincorporacion >= TO_DATE('" + fechaIncorporacionDesde
-						+ "','DD/MM/YYYY') " + " and ( col.fechaincorporacion <= TO_DATE('"
+				sql.WHERE("(TO_CHAR(col.fechaincorporacion,'DD/MM/YYYY') >= TO_DATE('" + fechaIncorporacionDesde
+						+ "','DD/MM/YYYY') " + " and ( TO_CHAR(col.fechaincorporacion,'DD/MM/YYYY') <= TO_DATE('"
 						+ fechaIncorporacionHasta + "','DD/MM/YYYY')))");
 
 			} else if (colegiadoItem.getFechaIncorporacion()[0] != null
@@ -288,7 +288,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 				String fechaIncorporacionDesde = dateFormat.format(colegiadoItem.getFechaIncorporacion()[0]);
 
-				sql.WHERE("(col.fechaincorporacion >= TO_DATE('" + fechaIncorporacionDesde
+				sql.WHERE("(TO_CHAR(col.fechaincorporacion,'DD/MM/YYYY') >= TO_DATE('" + fechaIncorporacionDesde
 						+ "','DD/MM/YYYY'))");
 
 			} else if (colegiadoItem.getFechaIncorporacion()[0] == null
@@ -296,7 +296,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 				String fechaIncorporacionHasta = dateFormat.format(colegiadoItem.getFechaIncorporacion()[1]);
 
-				sql.WHERE("( col.fechaincorporacion <= TO_DATE('" + fechaIncorporacionHasta
+				sql.WHERE("(TO_CHAR(col.fechaincorporacion,'DD/MM/YYYY') <= TO_DATE('" + fechaIncorporacionHasta
 						+ "','DD/MM/YYYY'))");
 			}
 		}
@@ -312,8 +312,8 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 				String getFechaNacimientoDesde = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[0]);
 				String getFechaNacimientoHasta = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[1]);
 
-				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
-						+ "','DD/MM/YYYY') " + " and ( per.fechanacimiento <= TO_DATE('"
+				sql.WHERE("(TO_CHAR(per.fechanacimiento, 'DD-MM-YYYY') >= TO_DATE('" + getFechaNacimientoDesde
+						+ "','DD/MM/YYYY') " + " and ( TO_CHAR(per.fechanacimiento, 'DD-MM-YYYY') <= TO_DATE('"
 						+ getFechaNacimientoHasta + "','DD/MM/YYYY')))");
 
 			} else if (colegiadoItem.getFechaNacimientoRango()[0] != null
@@ -321,7 +321,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 				String getFechaNacimientoDesde = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[0]);
 
-				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
+				sql.WHERE("(TO_CHAR(per.fechanacimiento, 'DD-MM-YYYY') >= TO_DATE('" + getFechaNacimientoDesde
 						+ "','DD/MM/YYYY'))");
 
 			} else if (colegiadoItem.getFechaNacimientoRango()[0] == null
@@ -329,7 +329,7 @@ public class CenColegiadoSqlExtendsProvider extends CenColegiadoSqlProvider {
 
 				String getFechaNacimientoHasta = dateFormat.format(colegiadoItem.getFechaNacimientoRango()[1]);
 
-				sql.WHERE("( per.fechanacimiento <= TO_DATE('" + getFechaNacimientoHasta
+				sql.WHERE("( TO_CHAR(per.fechanacimiento, 'DD-MM-YYYY') <= TO_DATE('" + getFechaNacimientoHasta
 						+ "','DD/MM/YYYY'))");
 			}
 		}
