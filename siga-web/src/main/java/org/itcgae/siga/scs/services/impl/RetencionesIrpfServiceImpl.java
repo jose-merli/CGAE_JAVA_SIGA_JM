@@ -395,6 +395,7 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 
 		if (response == 0) {
 			error.setCode(400);
+			error.setDescription("general.mensaje.error.bbdd");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else if (response == 1) {
 			error.setCode(200);

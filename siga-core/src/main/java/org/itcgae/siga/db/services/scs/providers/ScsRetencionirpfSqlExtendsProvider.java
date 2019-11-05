@@ -28,7 +28,7 @@ public class ScsRetencionirpfSqlExtendsProvider extends ScsMaestroretencionesSql
 //		sql.WHERE("cat.idinstitucion = '" + retencionItem.getIdInstituxcion() + "'");
 		
 		
-		if(retencionItem.getDescripcion() != null && retencionItem.getDescripcion()!= "" && retencionItem.getDescripcion().length() > 2) {
+		if(retencionItem.getDescripcion() != null && retencionItem.getDescripcion()!= "") {
 			sql.WHERE("upper(cat.DESCRIPCION) like upper('%"+retencionItem.getDescripcion()+"%')");
 		}
 		if(retencionItem.getRetencion() != null && retencionItem.getRetencion() != "") {
