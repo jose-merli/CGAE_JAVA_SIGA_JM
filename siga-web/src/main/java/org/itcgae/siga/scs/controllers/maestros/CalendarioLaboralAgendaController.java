@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.age.EventoDTO;
 import org.itcgae.siga.DTOs.age.EventoItem;
-import org.itcgae.siga.scs.service.maestros.ICalendarioLaboralAgendaService;
+import org.itcgae.siga.scs.services.maestros.ICalendarioLaboralAgendaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

@@ -18,7 +18,7 @@ import org.itcgae.siga.db.entities.ScsPrision;
 import org.itcgae.siga.db.entities.ScsPrisionExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPrisionExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IGestionPrisionesService;
+import org.itcgae.siga.scs.services.maestros.IGestionPrisionesService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

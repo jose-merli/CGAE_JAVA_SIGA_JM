@@ -3,10 +3,7 @@ package org.itcgae.siga.scs.controllers.maestros;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.scs.service.maestros.IGestionTiposActuacionService;
-import org.itcgae.siga.scs.service.maestros.IGestionTiposAsistenciaService;
-import org.itcgae.siga.servicesImpl.ComboServiceImpl;
+import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TurnosController {
 
 	@Autowired
-	private ComboServiceImpl comboService;
+	private ComboService comboService;
 	
 	
 	

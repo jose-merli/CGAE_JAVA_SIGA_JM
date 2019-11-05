@@ -20,7 +20,7 @@ import org.itcgae.siga.db.entities.ScsJuzgadoprocedimientoExample;
 import org.itcgae.siga.db.mappers.ScsJuzgadoprocedimientoMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsJuzgadoExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IBusquedaJuzgadosService;
+import org.itcgae.siga.scs.services.maestros.IBusquedaJuzgadosService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

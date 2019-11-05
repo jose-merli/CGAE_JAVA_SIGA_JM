@@ -48,4 +48,30 @@ public interface ScsProcuradorExtendsMapper extends ScsProcuradorMapper{
 	})
 	NewIdDTO getIdProcurador(Short idInstitucion);
 	
+	
+	@SelectProvider(type= ScsProcuradorSqlExtendsProvider.class, method ="buscadorProcurador")
+	@Results({
+		@Result(column = "IDPROCURADOR", property = "idProcurador", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "abreviatura", property = "idInstitucion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDOS2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "DOMICILIO", property = "domicilio", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGOPOSTAL", property = "codigoPostal", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPOBLACION", property = "idPoblacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPROVINCIA", property = "idProvincia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TELEFONO1", property = "telefono1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "TELEFONO2", property = "telefono2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "FAX1", property = "fax1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREAPE", property = "nombreApe", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDCOLPROCURADOR", property = "idColProcurador", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "CODIGO", property = "codigoExt", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREPOBLACION", property = "nombrePoblacion", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBREPROVINCIA", property = "nombreProvincia", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "EMAIL", property = "email", jdbcType = JdbcType.VARCHAR),
+		})
+	List<ProcuradorItem> buscadorProcurador(String idInstitucion, ProcuradorItem procuradorItem);
 }
+

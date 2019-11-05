@@ -29,7 +29,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPartidojudicialExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSubzonaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsZonasExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IFichaZonasService;
+import org.itcgae.siga.scs.services.maestros.IFichaZonasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

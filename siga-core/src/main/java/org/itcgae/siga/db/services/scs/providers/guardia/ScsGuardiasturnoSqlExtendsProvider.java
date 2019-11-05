@@ -99,7 +99,7 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		// FILTRO POR NOMBRE DE GUARDIA
 		if (guardiaItem.getNombre() != null && guardiaItem.getNombre().trim() != "")
-			sql.WHERE("UPPER(SCS_GUARDIASTURNO.NOMBRE) LIKE  UPPER('" + guardiaItem.getNombre() + "')");
+			sql.WHERE("UPPER(SCS_GUARDIASTURNO.NOMBRE) LIKE  UPPER('%" + guardiaItem.getNombre() + "%')");
 
 		// FILTRO POR AREA
 		if (guardiaItem.getArea() != null && guardiaItem.getArea() != "")

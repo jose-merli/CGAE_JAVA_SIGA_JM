@@ -21,7 +21,7 @@ import org.itcgae.siga.db.entities.ScsPartidapresupuestariaExample;
 import org.itcgae.siga.db.mappers.ScsPartidapresupuestariaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPartidasPresupuestariasExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IPartidasPresupuestariasService;
+import org.itcgae.siga.scs.services.maestros.IPartidasPresupuestariasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

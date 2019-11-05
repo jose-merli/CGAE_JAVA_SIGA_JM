@@ -8,7 +8,7 @@ import org.itcgae.siga.DTO.scs.guardia.GuardiasItem;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.scs.service.guardia.GuardiasService;
-import org.itcgae.siga.services.ComboService;
+import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class GuardiaController {
 
 	@Autowired
-	ComboService comboService;
+	private ComboService comboService;
 
 	@Autowired
 	GuardiasService guardiasService;
