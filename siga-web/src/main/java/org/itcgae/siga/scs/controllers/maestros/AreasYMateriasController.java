@@ -8,7 +8,7 @@ import org.itcgae.siga.DTO.scs.MateriasDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.scs.service.maestros.IFichaAreasService;
+import org.itcgae.siga.scs.services.maestros.IFichaAreasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

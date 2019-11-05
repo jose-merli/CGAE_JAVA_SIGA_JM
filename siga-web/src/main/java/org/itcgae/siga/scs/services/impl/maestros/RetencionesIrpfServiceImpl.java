@@ -26,7 +26,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposociedadExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRetencionirpfExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IRetencionesIrpfService;
+import org.itcgae.siga.scs.services.maestros.IRetencionesIrpfService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

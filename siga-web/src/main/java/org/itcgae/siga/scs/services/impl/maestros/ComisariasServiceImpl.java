@@ -19,7 +19,7 @@ import org.itcgae.siga.db.entities.ScsComisaria;
 import org.itcgae.siga.db.entities.ScsComisariaExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsComisariaExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IComisariasService;
+import org.itcgae.siga.scs.services.maestros.IComisariasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

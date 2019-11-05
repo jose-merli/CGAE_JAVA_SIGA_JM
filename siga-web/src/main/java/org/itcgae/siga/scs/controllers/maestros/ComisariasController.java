@@ -9,7 +9,7 @@ import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.cen.services.ITarjetaDatosDireccionesService;
 import org.itcgae.siga.cen.services.ITarjetaDatosIntegrantesService;
-import org.itcgae.siga.scs.service.maestros.IComisariasService;
+import org.itcgae.siga.scs.services.maestros.IComisariasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

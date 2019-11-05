@@ -17,7 +17,7 @@ import org.itcgae.siga.db.entities.AgeEvento;
 import org.itcgae.siga.db.entities.AgeEventoExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.age.mappers.AgeEventoExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.ICalendarioLaboralAgendaService;
+import org.itcgae.siga.scs.services.maestros.ICalendarioLaboralAgendaService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

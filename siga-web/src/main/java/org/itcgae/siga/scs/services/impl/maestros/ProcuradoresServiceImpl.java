@@ -19,7 +19,7 @@ import org.itcgae.siga.db.entities.ScsProcurador;
 import org.itcgae.siga.db.entities.ScsProcuradorExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsProcuradorExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IProcuradoresService;
+import org.itcgae.siga.scs.services.maestros.IProcuradoresService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

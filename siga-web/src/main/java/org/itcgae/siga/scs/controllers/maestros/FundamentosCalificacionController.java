@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.scs.FundamentosCalificacionDTO;
 import org.itcgae.siga.DTO.scs.FundamentosCalificacionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.scs.service.maestros.IBusquedaFundamentosCalificacionService;
+import org.itcgae.siga.scs.services.maestros.IBusquedaFundamentosCalificacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
