@@ -1,4 +1,4 @@
-package org.itcgae.siga.scs.controllers.maestros;
+package org.itcgae.siga.scs.controllers.turnos;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -13,8 +13,7 @@ import org.itcgae.siga.DTO.scs.PartidasItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.scs.service.IComisariasService;
-import org.itcgae.siga.scs.service.IFichaAreasService;
+
  
 import org.itcgae.siga.DTO.scs.CosteFijoDTO;
 import org.itcgae.siga.DTO.scs.FundamentoResolucionItem;
@@ -28,8 +27,6 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
-import org.itcgae.siga.scs.service.IGestionTiposActuacionService;
-import org.itcgae.siga.scs.service.IGestionTiposAsistenciaService;
 import org.itcgae.siga.scs.service.IGestionTurnosService;
 import org.itcgae.siga.scs.service.maestros.IGestionTiposActuacionService;
 import org.itcgae.siga.scs.service.maestros.IGestionTiposAsistenciaService;
