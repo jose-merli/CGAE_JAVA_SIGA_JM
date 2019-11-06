@@ -1,4 +1,4 @@
-package org.itcgae.siga.scs.service.guardia;
+package org.itcgae.siga.scs.services.guardia;
 
 import javax.servlet.http.HttpServletRequest;
 

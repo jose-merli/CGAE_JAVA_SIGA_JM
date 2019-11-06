@@ -2,7 +2,6 @@ package org.itcgae.siga.scs.services.impl.guardia;
 
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +18,7 @@ import org.itcgae.siga.db.entities.ScsGuardiasturno;
 import org.itcgae.siga.db.entities.ScsGuardiasturnoExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.guardia.ScsGuardiasturnoExtendsMapper;
-import org.itcgae.siga.scs.service.guardia.GuardiasService;
+import org.itcgae.siga.scs.services.guardia.GuardiasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
