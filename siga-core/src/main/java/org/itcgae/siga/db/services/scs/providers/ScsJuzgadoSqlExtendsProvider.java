@@ -38,9 +38,9 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider{
 		sql.FROM("SCS_JUZGADO juzgado");
 		sql.LEFT_OUTER_JOIN("CEN_PROVINCIAS PROVINCIAS ON PROVINCIAS.IDPROVINCIA = juzgado.IDPROVINCIA");
 		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES POBLACION ON POBLACION.IDPOBLACION = juzgado.IDPOBLACION");
-		
-		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
-		
+		if(idInstitucion != 2000) {
+			sql.WHERE("idinstitucion = '" + idInstitucion + "'");
+		}
 		if(juzgadoItem.getNombre() != null && juzgadoItem.getNombre() != "") {
 			sql.WHERE("UPPER(juzgado.nombre) like UPPER('%"+ juzgadoItem.getNombre() + "%')");
 		}

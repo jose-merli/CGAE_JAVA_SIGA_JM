@@ -299,7 +299,7 @@ public class ComisariasServiceImpl implements IComisariasService {
 
 					ScsComisariaExample example = new ScsComisariaExample();
 					example.createCriteria().andNombreLike(comisariaItem.getNombre())
-							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull()
+							.andIdinstitucionEqualTo(idInstitucion)
 							.andIdcomisariaNotEqualTo(Long.decode(comisariaItem.getIdComisaria()));
 
 					LOGGER.info(
@@ -408,7 +408,7 @@ public class ComisariasServiceImpl implements IComisariasService {
 
 					ScsComisariaExample scsComisariaExample = new ScsComisariaExample();
 					scsComisariaExample.createCriteria().andNombreEqualTo(comisariaItem.getNombre())
-							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
+							.andIdinstitucionEqualTo(idInstitucion);
 
 					LOGGER.info(
 							"createPrision() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prisión");

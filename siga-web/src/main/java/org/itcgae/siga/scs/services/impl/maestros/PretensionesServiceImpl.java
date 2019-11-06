@@ -355,7 +355,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
 					} catch (Exception e) {
 						response = 0;
 						error.setCode(400);
-						error.setDescription("general.mensaje.error.bbdd");
+						error.setDescription("messages.jgr.maestros.pretension.existeProcedimientoMismoNombre");
 						updateResponseDTO.setStatus(SigaConstants.KO);
 					}
 				}
@@ -365,6 +365,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
 
 		if (response == 0) {
 			error.setCode(400);
+			error.setDescription("messages.jgr.maestros.pretension.existeProcedimientoMismoNombre");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else if (response == 1) {
 			error.setCode(200);

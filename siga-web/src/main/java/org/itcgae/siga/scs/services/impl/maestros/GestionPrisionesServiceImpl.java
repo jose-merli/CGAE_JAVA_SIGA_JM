@@ -67,7 +67,7 @@ public class GestionPrisionesServiceImpl implements IGestionPrisionesService {
 
 					ScsPrisionExample example = new ScsPrisionExample();
 					example.createCriteria().andNombreLike(prisionItem.getNombre())
-							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull()
+							.andIdinstitucionEqualTo(idInstitucion)
 							.andIdprisionNotEqualTo(Long.decode(prisionItem.getIdPrision()));
 
 					LOGGER.info(
@@ -175,7 +175,7 @@ public class GestionPrisionesServiceImpl implements IGestionPrisionesService {
 
 					ScsPrisionExample scsPrisionExample = new ScsPrisionExample();
 					scsPrisionExample.createCriteria().andNombreLike(prisionItem.getNombre())
-							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
+							.andIdinstitucionEqualTo(idInstitucion);
 
 					LOGGER.info(
 							"createPrision() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prisión");

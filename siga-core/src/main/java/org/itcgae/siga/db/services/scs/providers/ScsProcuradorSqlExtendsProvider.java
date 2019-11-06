@@ -35,8 +35,10 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 		sql.FROM("SCS_PROCURADOR procurador");
 		sql.LEFT_OUTER_JOIN("CEN_PROVINCIAS PROVINCIAS ON PROVINCIAS.IDPROVINCIA = procurador.IDPROVINCIA");
 		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES POBLACION ON POBLACION.IDPOBLACION = procurador.IDPOBLACION");
+		if(idInstitucion != 2000) {
+			sql.WHERE("idinstitucion = '" + idInstitucion + "'");
+		}
 
-		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
 
 		if (procuradorItem.getNombre() != null && procuradorItem.getNombre() != "") {
 			sql.AND();

@@ -204,8 +204,8 @@ public class BusquedaFundamentoResolucionServiceImpl implements IBusquedaFundame
 
 						ScsTipofundamentosExample scsTipofundamentosExample = new ScsTipofundamentosExample();
 						scsTipofundamentosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdfundamentoEqualTo(Short.valueOf(fundamentoItem.getIdFundamento()))
-								.andFechabajaIsNotNull();
+								.andIdfundamentoEqualTo(Short.valueOf(fundamentoItem.getIdFundamento()));
+
 
 						LOGGER.info(
 								"activateFundamentosResolucion() / scsTipofundamentosExtendsMapper.selectByExample() -> Entrada a scsTipofundamentosExtendsMapper para buscar el fundamento de resolucion");

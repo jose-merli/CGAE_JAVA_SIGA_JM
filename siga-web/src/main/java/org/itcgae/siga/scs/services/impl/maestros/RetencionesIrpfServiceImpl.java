@@ -395,6 +395,7 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 
 		if (response == 0) {
 			error.setCode(400);
+			error.setDescription("general.mensaje.error.bbdd");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else if (response == 1) {
 			error.setCode(200);
@@ -456,7 +457,6 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 							&& retencionItem.getDescripcionSociedad() != "") {
 						ScsMaestroretencionesExample example = new ScsMaestroretencionesExample();
 						example.createCriteria()
-								.andIdretencionNotEqualTo(Integer.valueOf(retencionItem.getIdRetencion()))
 								.andLetranifsociedadEqualTo(retencionItem.getDescripcionSociedad())
 								.andFechabajaIsNull();
 
