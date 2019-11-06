@@ -146,7 +146,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
 
 							ScsPretension pretension = pretensionesList.get(0);
 
-							pretension.setFechaBaja(new Date());
+							pretension.setFechabaja(new Date());
 							pretension.setFechamodificacion(new Date());
 							pretension.setUsumodificacion(usuario.getIdusuario());
 							pretension.setIdinstitucion(idInstitucion);
