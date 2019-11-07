@@ -12,7 +12,6 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 
 		sql.SELECT("SCS_TURNO.NOMBRE AS turno");
 
-		sql.SELECT("SCS_GUARDIASTURNO.NOMBRE AS nombre");
 		sql.SELECT("SCS_GUARDIASTURNO.IDTURNO AS idturno");
 		sql.SELECT("SCS_GUARDIASTURNO.IDGUARDIA AS idguardia");
 		sql.SELECT("SCS_GUARDIASTURNO.NOMBRE AS nombre");
@@ -136,6 +135,8 @@ public class ScsGuardiasturnoSqlExtendsProvider extends ScsGuardiasturnoSqlProvi
 		// FILTRO POR TIPOGUARDIA
 		if (guardiaItem.getTipoGuardia() != null && guardiaItem.getTipoGuardia() != "")
 			sql.WHERE("SCS_GUARDIASTURNO.IDTIPOGUARDIA = " + guardiaItem.getTipoGuardia());
+		
+		sql.ORDER_BY("SCS_TURNO.NOMBRE, SCS_GUARDIASTURNO.NOMBRE");
 
 		return sql.toString();
 	}
