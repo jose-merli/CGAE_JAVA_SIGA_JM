@@ -214,7 +214,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("areasmaterias.materias.ficha.eliminarError");
+			error.setDescription("messages.censo.nombreExiste");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
@@ -342,7 +342,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-
+					
 					ScsAreaExample example = new ScsAreaExample();
 					example.createCriteria().andNombreEqualTo(areasItem.getNombreArea())
 					.andIdinstitucionEqualTo(idInstitucion);

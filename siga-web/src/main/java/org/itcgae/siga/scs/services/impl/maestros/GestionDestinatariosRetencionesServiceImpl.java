@@ -254,7 +254,7 @@ public class GestionDestinatariosRetencionesServiceImpl implements IDestinatario
 					 catch (Exception e) {
 						response = 0;
 						error.setCode(400);
-						error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+						error.setDescription("general.mensaje.error.bbdd");
 						updateResponseDTO.setStatus(SigaConstants.KO);
 					}				
 							
@@ -271,7 +271,7 @@ public class GestionDestinatariosRetencionesServiceImpl implements IDestinatario
 				
 			}else if (error.getCode() == null) {
 				error.setCode(200);
-				error.setDescription("Se ha modificado la partida presupuestaria correctamente");
+				error.setDescription("messages.inserted.success");
 			}
 
 			updateResponseDTO.setError(error);
@@ -287,7 +287,7 @@ public class GestionDestinatariosRetencionesServiceImpl implements IDestinatario
 	@Override
 	@Transactional
 	public InsertResponseDTO createDestinatarioRetenc(DestinatariosItem destinatariosItem, HttpServletRequest request) {
-		LOGGER.info("createPartidaPres() ->  Entrada al servicio para crear una nueva partida presupuestaria");
+		LOGGER.info("createPartidaPres() ->  Entrada al servicio para crear un nuevo destinatario");
 
 		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
 		Error error = new Error();

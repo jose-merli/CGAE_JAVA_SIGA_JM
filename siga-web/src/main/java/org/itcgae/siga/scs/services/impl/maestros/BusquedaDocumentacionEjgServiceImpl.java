@@ -561,14 +561,14 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 						LOGGER.info(
 								"createTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Salida de scsDocumentacionEjgExtendsMapper para insertar un nuevo documento");
 					}
-
-				} catch (Exception e) {
+				}
+					catch (Exception e) {
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				}
-			}
+				}
 
 		}
 
@@ -584,6 +584,7 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 		insertResponseDTO.setError(error);
 
 		LOGGER.info("createZone() -> Salida del servicio para crear un nuvo tipo documento");
+		
 		return insertResponseDTO;
 	}
 

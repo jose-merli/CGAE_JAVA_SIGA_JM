@@ -27,13 +27,13 @@ public class ScsFundamentoscalificacionSqlExtendsProvider extends ScsTipofundame
 		sql.LEFT_OUTER_JOIN("GEN_RECURSOS_CATALOGOS catalogoDictamen on catalogoDictamen.idrecurso = tipodictamen.DESCRIPCION and catalogoDictamen.idlenguaje = "+idLenguaje);
 		
 		sql.WHERE("fundamento.idinstitucion = '"+idInstitucion+"'");
-		if(fundamentosCalificacionItem.getDescripcionFundamento()!= null && fundamentosCalificacionItem.getDescripcionFundamento().length()>2)
+		if(fundamentosCalificacionItem.getDescripcionFundamento()!= null)
 			sql.WHERE("upper(catalogoFundamento.descripcion) like upper('%"+fundamentosCalificacionItem.getDescripcionFundamento()+"%')");
 		if(fundamentosCalificacionItem.getDescripcionDictamen()!= null)
 			sql.WHERE("fundamento.IDTIPODICTAMENEJG = "+fundamentosCalificacionItem.getDescripcionDictamen()+"");
 		if(!fundamentosCalificacionItem.getHistorico())
 			sql.WHERE("fundamento.fechabaja is null");
-	
+		sql.ORDER_BY("DESCRIPCION");
 		return sql.toString();
 	}
 	
