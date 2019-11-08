@@ -7,8 +7,8 @@ import org.itcgae.siga.DTO.scs.ZonasItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.scs.service.maestros.IFichaZonasService;
-import org.itcgae.siga.scs.service.maestros.IGestionZonasService;
+import org.itcgae.siga.scs.services.maestros.IFichaZonasService;
+import org.itcgae.siga.scs.services.maestros.IGestionZonasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,7 +43,7 @@ public class ZonasSubzonasController {
 	}
 	
 	@RequestMapping(value = "/fichaZonas/searchSubzones",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ZonasDTO> searchSubzones(@RequestParam("idZona") String idZona,@RequestParam("idSubZona") String idSubZona, HttpServletRequest request) {
+	ResponseEntity<ZonasDTO> searchSubzones(@RequestParam("idZona") String idZona, String idSubZona, HttpServletRequest request) {
 		ZonasDTO response = fichaZonasService.searchSubzones(idZona,idSubZona, request);
 		return new ResponseEntity<ZonasDTO>(response, HttpStatus.OK);
 	}

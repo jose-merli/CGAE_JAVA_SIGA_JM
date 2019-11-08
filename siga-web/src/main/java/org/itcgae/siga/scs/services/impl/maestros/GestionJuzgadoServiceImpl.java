@@ -25,7 +25,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsJuzgadoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsJuzgadoProcedimientoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsProcedimientosExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IGestionJuzgadosService;
+import org.itcgae.siga.scs.services.maestros.IGestionJuzgadosService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -78,23 +78,15 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 				try {
 
-					ScsJuzgadoExample scsJuzgadoExample = new ScsJuzgadoExample();
-					scsJuzgadoExample.createCriteria().andNombreLike(juzgadoItem.getNombre())
-							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
 
 					LOGGER.info(
 							"createCourt() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Entrada a ageEventoExtendsMapper para buscar la sesión");
-
-					List<ScsJuzgado> juzgadoList = scsJuzgadoExtendsMapper.selectByExample(scsJuzgadoExample);
+					
 
 					LOGGER.info(
 							"createCourt() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Salida a ageEventoExtendsMapper para buscar la sesión");
 
-					if (juzgadoList != null && juzgadoList.size() > 0) {
-						error.setCode(400);
-						error.setDescription("messages.jgr.maestros.gestionJuzgado.existeJuzgadoMismoNombre");
-						insertResponseDTO.setStatus(SigaConstants.KO);
-					} else {
+					 
 
 						ScsJuzgado juzgado = new ScsJuzgado();
 
@@ -160,8 +152,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 						LOGGER.info(
 								"createCourt() / scsJuzgadoExtendsMapper.insert() -> Salida de scsJuzgadoExtendsMapper para insertar el nuevo juzgado");
-
-					}
+					
 
 				} catch (Exception e) {
 					response = 0;
@@ -169,7 +160,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				}
-			}
+			
 
 		}
 
@@ -185,7 +176,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 		insertResponseDTO.setError(error);
 
 		LOGGER.info("createCourt() -> Salida del servicio para crear un nuevo juzgado");
-
+		}
 		return insertResponseDTO;
 	}
 
@@ -458,24 +449,24 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 
 				try {
 
-					ScsJuzgadoExample example = new ScsJuzgadoExample();
-					example.createCriteria().andNombreLike(juzgadoItem.getNombre())
-							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull()
-							.andIdjuzgadoNotEqualTo(Long.decode(juzgadoItem.getIdJuzgado()));
-
-					LOGGER.info(
-							"updateCourt() / scsJuzgadoExtendsMapper.selectByExample() -> Entrada a scsJuzgadoExtendsMapper para buscar juzgado");
-
-					List<ScsJuzgado> juzgadoList = scsJuzgadoExtendsMapper.selectByExample(example);
-
-					LOGGER.info(
-							"updateCourt() / scsJuzgadoExtendsMapper.selectByExample() -> Salida a scsJuzgadoExtendsMapper para buscar juzgado");
-
-					if (juzgadoList != null && juzgadoList.size() > 0) {
-						error.setCode(400);
-						error.setDescription("messages.jgr.maestros.gestionJuzgado.existeJuzgadoMismoNombre");
-
-					} else {
+//					ScsJuzgadoExample example = new ScsJuzgadoExample();
+//					example.createCriteria().andNombreLike(juzgadoItem.getNombre())
+//							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull()
+//							.andIdjuzgadoNotEqualTo(Long.decode(juzgadoItem.getIdJuzgado()));
+//
+//					LOGGER.info(
+//							"updateCourt() / scsJuzgadoExtendsMapper.selectByExample() -> Entrada a scsJuzgadoExtendsMapper para buscar juzgado");
+//
+//					List<ScsJuzgado> juzgadoList = scsJuzgadoExtendsMapper.selectByExample(example);
+//
+//					LOGGER.info(
+//							"updateCourt() / scsJuzgadoExtendsMapper.selectByExample() -> Salida a scsJuzgadoExtendsMapper para buscar juzgado");
+//
+//					if (juzgadoList != null && juzgadoList.size() > 0) {
+//						error.setCode(400);
+//						error.setDescription("messages.jgr.maestros.gestionJuzgado.existeJuzgadoMismoNombre");
+//
+//					} else {
 
 						ScsJuzgadoExample scsJuzgadoExample = new ScsJuzgadoExample();
 						scsJuzgadoExample.createCriteria().andIdjuzgadoEqualTo(Long.valueOf(juzgadoItem.getIdJuzgado()))
@@ -526,7 +517,7 @@ public class GestionJuzgadoServiceImpl implements IGestionJuzgadosService {
 						}
 
 						response = scsJuzgadoExtendsMapper.updateByPrimaryKey(juzgado);
-					}
+//					}
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);

@@ -24,7 +24,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsCostefijoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoactuacionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoasistenciaExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IGestionCosteFijoService;
+import org.itcgae.siga.scs.services.maestros.IGestionCosteFijoService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

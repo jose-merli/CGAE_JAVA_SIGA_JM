@@ -18,6 +18,7 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.CenPartidojudicial;
 import org.itcgae.siga.db.entities.ScsSubzona;
 import org.itcgae.siga.db.entities.ScsSubzonaExample;
 import org.itcgae.siga.db.entities.ScsSubzonapartido;
@@ -29,7 +30,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenPartidojudicialExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSubzonaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsZonasExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IFichaZonasService;
+import org.itcgae.siga.scs.services.maestros.IFichaZonasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,8 +83,15 @@ public class FichaZonasServiceImpl implements IFichaZonasService {
 				LOGGER.info(
 						"getPartidoJudicial() / cenPartidojudicialExtendsMapper.getPartidosJudiciales() -> Entrada a cenPartidojudicialExtendsMapper para obtener los partidos judiciales");
 
-				List<ComboItem> comboItems = cenPartidojudicialExtendsMapper.getPartidosJudiciales();
+				List<CenPartidojudicial> cenPartidojudicialItems = cenPartidojudicialExtendsMapper.getPartidoByInstitucion(idInstitucion);
+				List<ComboItem> comboItems = new ArrayList<ComboItem>();
+				for(CenPartidojudicial cenPartidoJudicial: cenPartidojudicialItems) {
+					ComboItem comboItem = new ComboItem();
 
+					comboItem.setLabel(cenPartidoJudicial.getNombre());
+					comboItem.setValue(cenPartidoJudicial.getIdpartido().toString());
+					comboItems.add(comboItem);
+				}
 				LOGGER.info(
 						"getPartidoJudicial() / cenPartidojudicialExtendsMapper.getPartidosJudiciales() -> Salida a cenPartidojudicialExtendsMapper para obtener los partidos judiciales");
 

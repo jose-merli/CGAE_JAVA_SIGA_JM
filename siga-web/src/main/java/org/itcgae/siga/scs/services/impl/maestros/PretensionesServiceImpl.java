@@ -28,7 +28,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPretensionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsProcedimientosExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IPretensionesService;
+import org.itcgae.siga.scs.services.maestros.IPretensionesService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -355,7 +355,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
 					} catch (Exception e) {
 						response = 0;
 						error.setCode(400);
-						error.setDescription("general.mensaje.error.bbdd");
+						error.setDescription("messages.jgr.maestros.pretension.existeProcedimientoMismoNombre");
 						updateResponseDTO.setStatus(SigaConstants.KO);
 					}
 				}
@@ -365,6 +365,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
 
 		if (response == 0) {
 			error.setCode(400);
+			error.setDescription("messages.jgr.maestros.pretension.existeProcedimientoMismoNombre");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else if (response == 1) {
 			error.setCode(200);

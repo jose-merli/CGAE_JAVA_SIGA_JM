@@ -36,7 +36,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAcreditacionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPretensionesProcedExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsProcedimientosExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IModulosYBasesService;
+import org.itcgae.siga.scs.services.maestros.IModulosYBasesService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

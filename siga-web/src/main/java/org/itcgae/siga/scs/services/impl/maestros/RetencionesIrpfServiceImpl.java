@@ -26,7 +26,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.cen.mappers.CenTiposociedadExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRetencionirpfExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IRetencionesIrpfService;
+import org.itcgae.siga.scs.services.maestros.IRetencionesIrpfService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -395,6 +395,7 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 
 		if (response == 0) {
 			error.setCode(400);
+			error.setDescription("general.mensaje.error.bbdd");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else if (response == 1) {
 			error.setCode(200);
@@ -456,7 +457,6 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 							&& retencionItem.getDescripcionSociedad() != "") {
 						ScsMaestroretencionesExample example = new ScsMaestroretencionesExample();
 						example.createCriteria()
-								.andIdretencionNotEqualTo(Integer.valueOf(retencionItem.getIdRetencion()))
 								.andLetranifsociedadEqualTo(retencionItem.getDescripcionSociedad())
 								.andFechabajaIsNull();
 

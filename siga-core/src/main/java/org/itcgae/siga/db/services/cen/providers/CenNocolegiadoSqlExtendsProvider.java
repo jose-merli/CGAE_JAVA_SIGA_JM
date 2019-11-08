@@ -701,7 +701,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 		
 		sql.WHERE("NOCOL.IDINSTITUCION = '" + idInstitucion + "'");
 		//sql.WHERE("per.idtipoidentificacion not in '20'");
-		sql.WHERE("(dir.fechamodificacion = (select max(fechamodificacion) from cen_direcciones dir2 where dir2.idpersona = dir.idpersona and dir2.idinstitucion = dir.idinstitucion and dir2.idinstitucion = dir.idinstitucion and dir.fechabaja is null ) or dir.fechamodificacion is null)");
+		sql.WHERE("(dir.fechamodificacion = (select max(fechamodificacion) from cen_direcciones dir2 where dir2.idpersona = dir.idpersona and dir2.idinstitucion = dir.idinstitucion and dir2.idinstitucion = dir.idinstitucion and dir2.fechabaja is null ) or dir.fechamodificacion is null)");
 		
 		if(!noColegiadoItem.isHistorico()) {
 			sql.WHERE("NOCOL.FECHA_BAJA is NULL");
@@ -795,8 +795,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 				String getFechaNacimientoDesde = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[0]);
 				String getFechaNacimientoHasta = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[1]);
 
-				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
-						+ "','DD/MM/YYYY') " + " and ( per.fechanacimiento <= TO_DATE('"
+				sql.WHERE("(TO_CHAR(per.fechanacimiento, 'DD/MM/YYYY') >= TO_DATE('" + getFechaNacimientoDesde
+						+ "','DD/MM/YYYY') " + " and ( TO_CHAR(per.fechanacimiento, 'DD/MM/YYYY') <= TO_DATE('"
 						+ getFechaNacimientoHasta + "','DD/MM/YYYY')))");
 
 			} else if (noColegiadoItem.getFechaNacimientoRango()[0] != null
@@ -804,7 +804,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 				String getFechaNacimientoDesde = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[0]);
 
-				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
+				sql.WHERE("(TO_CHAR(per.fechanacimiento, 'DD/MM/YYYY') >= TO_DATE('" + getFechaNacimientoDesde
 						+ "','DD/MM/YYYY'))");
 
 			} else if (noColegiadoItem.getFechaNacimientoRango()[0] == null
@@ -812,7 +812,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 				String getFechaNacimientoHasta = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[1]);
 
-				sql.WHERE("( per.fechanacimiento <= TO_DATE('" + getFechaNacimientoHasta
+				sql.WHERE("( TO_CHAR(per.fechanacimiento, 'DD/MM/YYYY') <= TO_DATE('" + getFechaNacimientoHasta
 						+ "','DD/MM/YYYY'))");
 			}
 		}
@@ -992,8 +992,8 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 				String getFechaNacimientoDesde = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[0]);
 				String getFechaNacimientoHasta = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[1]);
 
-				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
-						+ "','DD/MM/YYYY') " + " and ( per.fechanacimiento <= TO_DATE('"
+				sql.WHERE("(TO_CHAR(per.fechanacimiento, 'DD/MM/YYYY') >= TO_DATE('" + getFechaNacimientoDesde
+						+ "','DD/MM/YYYY') " + " and ( TO_CHAR(per.fechanacimiento, 'DD/MM/YYYY') <= TO_DATE('"
 						+ getFechaNacimientoHasta + "','DD/MM/YYYY')))");
 
 			} else if (noColegiadoItem.getFechaNacimientoRango()[0] != null
@@ -1001,7 +1001,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 				String getFechaNacimientoDesde = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[0]);
 
-				sql.WHERE("(per.fechanacimiento >= TO_DATE('" + getFechaNacimientoDesde
+				sql.WHERE("(TO_CHAR(per.fechanacimiento, 'DD/MM/YYYY') >= TO_DATE('" + getFechaNacimientoDesde
 						+ "','DD/MM/YYYY'))");
 
 			} else if (noColegiadoItem.getFechaNacimientoRango()[0] == null
@@ -1009,7 +1009,7 @@ public class CenNocolegiadoSqlExtendsProvider extends CenNocolegiadoSqlProvider 
 
 				String getFechaNacimientoHasta = dateFormat.format(noColegiadoItem.getFechaNacimientoRango()[1]);
 
-				sql.WHERE("( per.fechanacimiento <= TO_DATE('" + getFechaNacimientoHasta
+				sql.WHERE("( TO_CHAR(per.fechanacimiento, 'DD/MM/YYYY') <= TO_DATE('" + getFechaNacimientoHasta
 						+ "','DD/MM/YYYY'))");
 			}
 		}

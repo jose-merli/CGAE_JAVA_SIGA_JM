@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.scs.ProcuradorDTO;
 import org.itcgae.siga.DTO.scs.ProcuradorItem;
-import org.itcgae.siga.scs.service.componentesGenerales.BuscadorProcuradoresService;
+import org.itcgae.siga.scs.services.componentesGenerales.BuscadorProcuradoresService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
