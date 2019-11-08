@@ -31,4 +31,8 @@ public interface IGestionTurnosService {
 //
 //	public InsertResponseDTO createTiposAsistencia(TiposAsistenciaItem tiposAsistenciaItem, HttpServletRequest request);
 
+	public TurnosDTO busquedaFichaTurnos(TurnosItem turnosItem, HttpServletRequest request);
+
+	public UpdateResponseDTO updateDatosGenerales(TurnosItem turnosItem, HttpServletRequest request);
+
 }

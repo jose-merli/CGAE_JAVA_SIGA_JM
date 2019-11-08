@@ -28,7 +28,79 @@ public class TurnosItem {
 	private String idtipoturno;
 	private Date fechamodificacion;
 	private String usumodificacion;
+	private String validarjustificaciones;
+	private String validarinscripciones;
+	private String designadirecta;
+	private String requisitos;
+	private String idpersona_ultimo;
+	private String descripcion;
+	private String activarretriccionacredit;
+	private String letradoasistencias;
+	private String letradoactuaciones;
+	private String codigoext;
+	private String fechasolicitud_ultimo;
+	private String idsubzona;
+	private String idpersonaUltimo;
+	private String fechasolicitudUltimo;
+	private String visiblemovil;
+	private String idgrupofacturacion;
+	private String idjurisdiccion;
 	
+	
+	public String getVisiblemovil() {
+		return visiblemovil;
+	}
+	public void setVisiblemovil(String visiblemovil) {
+		this.visiblemovil = visiblemovil;
+	}
+	public String getFechasolicitudUltimo() {
+		return fechasolicitudUltimo;
+	}
+	public void setFechasolicitudUltimo(String fechasolicitudUltimo) {
+		this.fechasolicitudUltimo = fechasolicitudUltimo;
+	}
+	public String getIdpersona_ultimo() {
+		return idpersona_ultimo;
+	}
+	public void setIdpersona_ultimo(String idpersona_ultimo) {
+		this.idpersona_ultimo = idpersona_ultimo;
+	}
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+	public String getActivarretriccionacredit() {
+		return activarretriccionacredit;
+	}
+	public void setActivarretriccionacredit(String activarretriccionacredit) {
+		this.activarretriccionacredit = activarretriccionacredit;
+	}
+	public String getLetradoasistencias() {
+		return letradoasistencias;
+	}
+	public void setLetradoasistencias(String letradoasistencias) {
+		this.letradoasistencias = letradoasistencias;
+	}
+	public String getLetradoactuaciones() {
+		return letradoactuaciones;
+	}
+	public void setLetradoactuaciones(String letradoactuaciones) {
+		this.letradoactuaciones = letradoactuaciones;
+	}
+	public String getCodigoext() {
+		return codigoext;
+	}
+	public void setCodigoext(String codigoext) {
+		this.codigoext = codigoext;
+	}
+	public String getFechasolicitud_ultimo() {
+		return fechasolicitud_ultimo;
+	}
+	public void setFechasolicitud_ultimo(String fechasolicitud_ultimo) {
+		this.fechasolicitud_ultimo = fechasolicitud_ultimo;
+	}
 	public String getNombre() {
 		return nombre;
 	}
@@ -155,6 +227,54 @@ public class TurnosItem {
 	}
 	public void setIdpartidapresupuestaria(String idpartidapresupuestaria) {
 		this.idpartidapresupuestaria = idpartidapresupuestaria;
+	}
+	public String getValidarjustificaciones() {
+		return validarjustificaciones;
+	}
+	public void setValidarjustificaciones(String validarjustificaciones) {
+		this.validarjustificaciones = validarjustificaciones;
+	}
+	public String getValidarinscripciones() {
+		return validarinscripciones;
+	}
+	public void setValidarinscripciones(String validarinscripciones) {
+		this.validarinscripciones = validarinscripciones;
+	}
+	public String getDesignadirecta() {
+		return designadirecta;
+	}
+	public void setDesignadirecta(String designadirecta) {
+		this.designadirecta = designadirecta;
+	}
+	public String getRequisitos() {
+		return requisitos;
+	}
+	public void setRequisitos(String requisitos) {
+		this.requisitos = requisitos;
+	}
+	public String getIdsubzona() {
+		return idsubzona;
+	}
+	public void setIdsubzona(String idsubzona) {
+		this.idsubzona = idsubzona;
+	}
+	public String getIdpersonaUltimo() {
+		return idpersonaUltimo;
+	}
+	public void setIdpersonaUltimo(String idpersonaUltimo) {
+		this.idpersonaUltimo = idpersonaUltimo;
+	}
+	public String getIdgrupofacturacion() {
+		return idgrupofacturacion;
+	}
+	public void setIdgrupofacturacion(String idgrupofacturacion) {
+		this.idgrupofacturacion = idgrupofacturacion;
+	}
+	public String getIdjurisdiccion() {
+		return idjurisdiccion;
+	}
+	public void setIdjurisdiccion(String idjurisdiccion) {
+		this.idjurisdiccion = idjurisdiccion;
 	}
 
 

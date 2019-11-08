@@ -86,8 +86,8 @@ public class TurnosController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/combossjcs/comboPartidaPresupuestaria",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboPartidaPresupuestaria(HttpServletRequest request) {
+	@RequestMapping(value = "/combossjcs/comboPartidasPresupuestaria",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboPartidasPresupuestaria(HttpServletRequest request) {
 		ComboDTO response = comboService.getComboPartidasPresupuestarias(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
@@ -113,5 +113,20 @@ public class TurnosController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/turnos/busquedaFichaTurnos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<TurnosDTO> busquedaFichaTurnos(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
+		TurnosDTO response = turnosService.busquedaFichaTurnos(turnosItem, request);
+		return new ResponseEntity<TurnosDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/turnos/updateDatosGenerales", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateDatosGenerales(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
+		UpdateResponseDTO response = turnosService.updateDatosGenerales(turnosItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
 }
  
