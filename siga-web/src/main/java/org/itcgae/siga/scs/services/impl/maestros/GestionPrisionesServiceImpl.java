@@ -18,7 +18,7 @@ import org.itcgae.siga.db.entities.ScsPrision;
 import org.itcgae.siga.db.entities.ScsPrisionExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPrisionExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IGestionPrisionesService;
+import org.itcgae.siga.scs.services.maestros.IGestionPrisionesService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,7 +67,7 @@ public class GestionPrisionesServiceImpl implements IGestionPrisionesService {
 
 					ScsPrisionExample example = new ScsPrisionExample();
 					example.createCriteria().andNombreLike(prisionItem.getNombre())
-							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull()
+							.andIdinstitucionEqualTo(idInstitucion)
 							.andIdprisionNotEqualTo(Long.decode(prisionItem.getIdPrision()));
 
 					LOGGER.info(
@@ -175,7 +175,7 @@ public class GestionPrisionesServiceImpl implements IGestionPrisionesService {
 
 					ScsPrisionExample scsPrisionExample = new ScsPrisionExample();
 					scsPrisionExample.createCriteria().andNombreLike(prisionItem.getNombre())
-							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
+							.andIdinstitucionEqualTo(idInstitucion);
 
 					LOGGER.info(
 							"createPrision() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prisión");

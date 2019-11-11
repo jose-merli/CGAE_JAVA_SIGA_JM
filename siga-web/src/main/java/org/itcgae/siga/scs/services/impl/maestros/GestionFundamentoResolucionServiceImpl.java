@@ -24,7 +24,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipofundamentosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTiporesolucionExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IGestionFundamentoResolucionService;
+import org.itcgae.siga.scs.services.maestros.IGestionFundamentoResolucionService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

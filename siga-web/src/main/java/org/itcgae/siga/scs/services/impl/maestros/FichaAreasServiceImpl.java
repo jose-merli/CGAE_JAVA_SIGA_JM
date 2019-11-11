@@ -37,7 +37,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsAreasMateriasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsJurisdiccionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsMateriaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsMateriaJurisdiccionExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IFichaAreasService;
+import org.itcgae.siga.scs.services.maestros.IFichaAreasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -214,7 +214,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("areasmaterias.materias.ficha.eliminarError");
+			error.setDescription("messages.censo.nombreExiste");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else {
 			error.setCode(200);
@@ -342,7 +342,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
-
+					
 					ScsAreaExample example = new ScsAreaExample();
 					example.createCriteria().andNombreEqualTo(areasItem.getNombreArea())
 					.andIdinstitucionEqualTo(idInstitucion);

@@ -19,7 +19,7 @@ import org.itcgae.siga.db.entities.ScsComisaria;
 import org.itcgae.siga.db.entities.ScsComisariaExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsComisariaExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IComisariasService;
+import org.itcgae.siga.scs.services.maestros.IComisariasService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -299,7 +299,7 @@ public class ComisariasServiceImpl implements IComisariasService {
 
 					ScsComisariaExample example = new ScsComisariaExample();
 					example.createCriteria().andNombreLike(comisariaItem.getNombre())
-							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull()
+							.andIdinstitucionEqualTo(idInstitucion)
 							.andIdcomisariaNotEqualTo(Long.decode(comisariaItem.getIdComisaria()));
 
 					LOGGER.info(
@@ -408,7 +408,7 @@ public class ComisariasServiceImpl implements IComisariasService {
 
 					ScsComisariaExample scsComisariaExample = new ScsComisariaExample();
 					scsComisariaExample.createCriteria().andNombreEqualTo(comisariaItem.getNombre())
-							.andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
+							.andIdinstitucionEqualTo(idInstitucion);
 
 					LOGGER.info(
 							"createPrision() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prisión");

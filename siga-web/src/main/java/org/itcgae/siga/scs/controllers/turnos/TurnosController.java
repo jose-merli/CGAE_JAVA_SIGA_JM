@@ -26,27 +26,26 @@ import org.itcgae.siga.DTO.scs.TurnosDTO;
 import org.itcgae.siga.DTO.scs.TurnosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.scs.service.IGestionTurnosService;
 import org.itcgae.siga.scs.service.maestros.IGestionTiposActuacionService;
 import org.itcgae.siga.scs.service.maestros.IGestionTiposAsistenciaService;
 import org.itcgae.siga.servicesImpl.ComboServiceImpl;
+
+import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/oficio")
 public class TurnosController {
 	@Autowired
-	private ComboServiceImpl comboService;
+	private ComboService comboService;
 	
 	@Autowired
 	private IGestionTurnosService turnosService;

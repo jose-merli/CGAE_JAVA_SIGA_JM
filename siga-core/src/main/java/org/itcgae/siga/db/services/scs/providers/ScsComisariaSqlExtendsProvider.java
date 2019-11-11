@@ -3,11 +3,11 @@ package org.itcgae.siga.db.services.scs.providers;
 import org.apache.ibatis.jdbc.SQL;
 import org.itcgae.siga.DTO.scs.ComisariaItem;
 import org.itcgae.siga.db.mappers.ScsComisariaSqlProvider;
+import org.itcgae.siga.security.UserTokenUtils;
 
 public class ScsComisariaSqlExtendsProvider extends ScsComisariaSqlProvider {
 
 	public String searchComisarias(ComisariaItem comisariaItem, Short idInstitucion) {
-
 		SQL sql = new SQL();
 
 		sql.SELECT("comisaria.idinstitucion");
@@ -30,9 +30,9 @@ public class ScsComisariaSqlExtendsProvider extends ScsComisariaSqlProvider {
 		sql.FROM("SCS_COMISARIA comisaria");
 		sql.LEFT_OUTER_JOIN("CEN_PROVINCIAS PROVINCIAS ON PROVINCIAS.IDPROVINCIA = comisaria.IDPROVINCIA");
 		sql.LEFT_OUTER_JOIN("CEN_POBLACIONES POBLACION ON POBLACION.IDPOBLACION = comisaria.IDPOBLACION");
-
-		sql.WHERE("idinstitucion = '" + idInstitucion + "'");
-
+		if(idInstitucion != 2000) {
+			sql.WHERE("idinstitucion = '" + idInstitucion + "'");
+		}
 		if (comisariaItem.getNombre() != null && comisariaItem.getNombre() != "") {
 			sql.WHERE("(TRANSLATE(LOWER( COMISARIA.NOMBRE),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN')  LIKE TRANSLATE(LOWER('%"
 					+ comisariaItem.getNombre() + "%'),'áéíóúüñÁÉÍÓÚÜÑ','aeiouunAEIOUUN'))");

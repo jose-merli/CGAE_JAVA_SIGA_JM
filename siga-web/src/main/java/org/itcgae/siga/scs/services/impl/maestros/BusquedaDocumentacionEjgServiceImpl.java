@@ -31,7 +31,7 @@ import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDocumentacionEjgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsDocumentoejgExtendsMapper;
-import org.itcgae.siga.scs.service.maestros.IBusquedaDocumentacionEjgService;
+import org.itcgae.siga.scs.services.maestros.IBusquedaDocumentacionEjgService;
 import org.itcgae.siga.security.UserTokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -561,14 +561,14 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 						LOGGER.info(
 								"createTipoDoc() / scsDocumentacionEjgExtendsMapper.insert() -> Salida de scsDocumentacionEjgExtendsMapper para insertar un nuevo documento");
 					}
-
-				} catch (Exception e) {
+				}
+					catch (Exception e) {
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setStatus(SigaConstants.KO);
 				}
-			}
+				}
 
 		}
 
@@ -584,6 +584,7 @@ public class BusquedaDocumentacionEjgServiceImpl implements IBusquedaDocumentaci
 		insertResponseDTO.setError(error);
 
 		LOGGER.info("createZone() -> Salida del servicio para crear un nuvo tipo documento");
+		
 		return insertResponseDTO;
 	}
 

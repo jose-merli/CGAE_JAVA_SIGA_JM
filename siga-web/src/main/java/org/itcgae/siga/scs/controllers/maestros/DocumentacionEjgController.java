@@ -11,7 +11,7 @@ import org.itcgae.siga.DTO.scs.ProcedimientoDTO;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-import org.itcgae.siga.scs.service.maestros.IBusquedaDocumentacionEjgService;
+import org.itcgae.siga.scs.services.maestros.IBusquedaDocumentacionEjgService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
