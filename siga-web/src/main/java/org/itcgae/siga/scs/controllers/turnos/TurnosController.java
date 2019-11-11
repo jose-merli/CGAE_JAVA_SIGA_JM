@@ -8,6 +8,7 @@ import org.itcgae.siga.DTO.scs.AreasItem;
 import org.itcgae.siga.DTO.scs.ComisariaDTO;
 import org.itcgae.siga.DTO.scs.ComisariaItem;
 import org.itcgae.siga.DTO.scs.MateriasDTO;
+import org.itcgae.siga.DTO.scs.ModulosItem;
 import org.itcgae.siga.DTO.scs.PartidasDTO;
 import org.itcgae.siga.DTO.scs.PartidasItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -127,6 +128,15 @@ public class TurnosController {
 		else
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
+	}
+	
+	@RequestMapping(value = "/turnos/createnewTurno", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<InsertResponseDTO> createTurnos(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
+		InsertResponseDTO response = turnosService.createTurnos(turnosItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
  

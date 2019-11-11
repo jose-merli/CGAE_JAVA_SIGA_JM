@@ -93,4 +93,21 @@ public String busquedaFichaTurnos(TurnosItem turnosItem, Short idInstitucion) {
 		
 	}
 
+	public String getIdTurno(Short idInstitucion) {
+	SQL sql = new SQL();
+
+	sql.SELECT("MAX(IDTURNO) AS IDTURNO");
+	sql.FROM("SCS_TURNO");
+	sql.WHERE("IDINSTITUCION = '"+ idInstitucion +"'");
+
+	return sql.toString();
+	}
+	
+	public String getIdOrdenacion(Short idInstitucion) {
+		SQL sql = new SQL();
+
+		sql.SELECT("MAX(IDORDENACIONCOLAS) AS IDORDENACIONCOLAS");
+		sql.FROM("scs_ordenacioncolas");
+		return sql.toString();
+		}
 }

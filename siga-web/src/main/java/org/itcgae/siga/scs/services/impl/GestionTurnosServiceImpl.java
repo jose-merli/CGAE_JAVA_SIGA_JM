@@ -7,19 +7,28 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.itcgae.siga.DTO.scs.ModulosItem;
 import org.itcgae.siga.DTO.scs.PartidasDTO;
 import org.itcgae.siga.DTO.scs.PartidasItem;
 import org.itcgae.siga.DTO.scs.TurnosDTO;
 import org.itcgae.siga.DTO.scs.TurnosItem;
+import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsPartidapresupuestaria;
 import org.itcgae.siga.db.entities.ScsPartidapresupuestariaExample;
+import org.itcgae.siga.db.entities.ScsPretensionesproced;
+import org.itcgae.siga.db.entities.ScsPretensionesprocedExample;
+import org.itcgae.siga.db.entities.ScsProcedimientos;
+import org.itcgae.siga.db.entities.ScsProcedimientosExample;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
+import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.service.IGestionTurnosService;
@@ -35,6 +44,9 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 	@Autowired
 	private ScsTurnosExtendsMapper scsTurnosExtendsMapper;
+	
+	@Autowired
+	private ScsOrdenacioncolasMapper scsOrdenacioncolasMapper;
 
 	@Autowired
 	private AdmUsuariosExtendsMapper admUsuariosExtendsMapper;
@@ -257,13 +269,15 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 								scsTurno.setCodigoext(turnosItem.getCodigoext());
 								scsTurno.setIdpartidapresupuestaria(Integer.parseInt(turnosItem.getIdpartidapresupuestaria()));
 								scsTurno.setIdgrupofacturacion(Short.parseShort(turnosItem.getIdgrupofacturacion()));
-								
+								scsTurno.setIdarea(Short.parseShort(turnosItem.getIdarea()));
+								scsTurno.setIdmateria(Short.parseShort(turnosItem.getIdmateria()));
+								scsTurno.setIdjurisdiccion(Short.parseShort(turnosItem.getIdjurisdiccion()));
+								scsTurno.setIdzona(Short.parseShort(turnosItem.getIdzona()));
+								scsTurno.setIdsubzona(Short.parseShort(turnosItem.getIdsubzona()));
+								scsTurno.setIdtipoturno(Short.parseShort(turnosItem.getIdtipoturno()));
 								scsTurno.setFechamodificacion(new Date());
-//								scsPartidaPresupuestaria.setDescripcion(partidasItems.getDescripcion());
-//								scsPartidaPresupuestaria.setFechabaja(partidasItems.getFechabaja());
-//								scsPartidaPresupuestaria.setFechamodificacion(partidasItems.getFechamodificacion());
-//								scsPartidaPresupuestaria.setImportepartida(importe);
-//								scsPartidaPresupuestaria.setNombrepartida(partidasItems.getNombrepartida());
+								scsTurno.setDescripcion(turnosItem.getDescripcion());
+								scsTurno.setRequisitos(turnosItem.getRequisitos());
 								scsTurno.setUsumodificacion(usuarios.get(0).getIdusuario());
 								LOGGER.info(
 										"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Salida a scsTipoactuacioncostefijoMapper para buscar los costes fijos propios");
@@ -312,4 +326,168 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 	}
 		return updateResponseDTO;
 }
+	
+	@Override
+	public InsertResponseDTO createTurnos(TurnosItem turnosItem, HttpServletRequest request) {
+		LOGGER.info("createModules() ->  Entrada al servicio para insertar modulos");
+
+		InsertResponseDTO insertResponseDTO = new InsertResponseDTO();
+		Error error = new Error();
+		int response = 0;
+		Integer idTurnoNuevo = 0;
+		Integer idOrdenacionNuevo = 0;
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"createModules() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"createModules() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+		
+
+			if (null != usuarios && usuarios.size() > 0) {
+				try {
+						ScsTurnoExample ejemplo = new ScsTurnoExample();
+						ejemplo.createCriteria().andIdinstitucionEqualTo(idInstitucion).andAbreviaturaEqualTo(turnosItem.getAbreviatura());
+
+
+						
+						List<ScsTurno> turnosExistentes = scsTurnosExtendsMapper.selectByExample(ejemplo);
+	
+						if((turnosExistentes != null && turnosExistentes.size() > 0)) {
+							response = 0;
+							error.setCode(400);
+							error.setDescription("menu.justiciaGratuita.maestros.nombreCodigoExistente");
+						}else {
+							ScsTurno turno = new ScsTurno();
+							ScsOrdenacioncolas ordenacion = new ScsOrdenacioncolas();
+							NewIdDTO idTurno = scsTurnosExtendsMapper.getIdTurno(idInstitucion);
+							NewIdDTO idOrdenacion = scsTurnosExtendsMapper.getIdOrdenacion(idInstitucion);
+							
+							if (idTurno == null) {
+								idTurnoNuevo = 1;
+								turno.setIdturno(1);
+							} else {
+								idOrdenacionNuevo = (Integer.parseInt(idOrdenacion.getNewId()) + 1);
+								
+								ordenacion.setIdordenacioncolas(Integer.parseInt(idOrdenacionNuevo.toString()));
+								ordenacion.setAlfabeticoapellidos(Short.parseShort("4"));
+								ordenacion.setFechamodificacion(new Date());
+								ordenacion.setFechanacimiento(Short.parseShort("0"));
+								ordenacion.setAntiguedadcola(Short.parseShort("0"));
+								ordenacion.setNumerocolegiado(Short.parseShort("0"));
+								ordenacion.setUsumodificacion(usuarios.get(0).getIdusuario());
+								response = scsOrdenacioncolasMapper.insert(ordenacion);
+							
+								turno.setIdordenacioncolas(Integer.parseInt(idOrdenacionNuevo.toString()));
+								idTurnoNuevo = (Integer.parseInt(idTurno.getNewId()) + 1);
+								turno.setIdturno(Integer.parseInt(idTurnoNuevo.toString()));
+							}
+
+							turno.setIdinstitucion(idInstitucion);
+							turno.setAbreviatura(turnosItem.getAbreviatura());
+							turno.setNombre(turnosItem.getNombre());
+							turno.setCodigoext(turnosItem.getCodigoext());
+							turno.setIdpartidapresupuestaria(Integer.parseInt(turnosItem.getIdpartidapresupuestaria()));
+							turno.setIdgrupofacturacion(Short.parseShort(turnosItem.getIdgrupofacturacion()));
+							turno.setIdarea(Short.parseShort(turnosItem.getIdarea()));
+							turno.setIdmateria(Short.parseShort(turnosItem.getIdmateria()));
+							turno.setIdjurisdiccion(Short.parseShort(turnosItem.getIdjurisdiccion()));
+							turno.setIdzona(Short.parseShort(turnosItem.getIdzona()));
+							turno.setIdsubzona(Short.parseShort(turnosItem.getIdsubzona()));
+							turno.setIdtipoturno(Short.parseShort(turnosItem.getIdtipoturno()));
+							turno.setFechamodificacion(new Date());
+							turno.setDescripcion(turnosItem.getDescripcion());
+							turno.setRequisitos(turnosItem.getRequisitos());
+							turno.setUsumodificacion(usuarios.get(0).getIdusuario());
+							turno.setGuardias(Short.parseShort("0"));
+							turno.setVisiblemovil(Short.parseShort("1"));
+							turno.setValidarjustificaciones("S");
+							turno.setActivarretriccionacredit("N");
+							turno.setLetradoactuaciones("N");
+							turno.setLetradoasistencias("S");
+							turno.setDesignadirecta("N");
+							turno.setValidarinscripciones("S");
+							turno.setVisibilidad("1");
+							
+							
+							LOGGER.info(
+									"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
+
+							response = scsTurnosExtendsMapper.insert(turno);
+
+							LOGGER.info(
+									"createModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para insertar los modulos seleccionados");
+
+							
+//							Combo multiselect de Procedimientos
+//							if(response == 1)
+//							if(modulosItem.getProcedimientos() != null && modulosItem.getProcedimientos().length()>0) {
+//								
+//								String[] lista = modulosItem.getProcedimientos().split(",");
+//								
+//								for(int i = 0; i < lista.length ; i++) {
+//									ScsPretensionesproced pretension = new ScsPretensionesproced();
+//									pretension.setIdpretension(Short.parseShort(lista[i]));
+//									pretension.setFechamodificacion(new Date());
+//									pretension.setUsumodificacion(usuarios.get(0).getIdusuario());
+//									pretension.setIdprocedimiento(modulo.getIdprocedimiento());
+//									pretension.setIdinstitucion(idInstitucion);
+//									LOGGER.info(
+//											"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Entrada a scsProcedimientosExtendsMapper para actualizar los procedimientos");
+//									scsPretensionesprocedMapper.insert(pretension);
+//									LOGGER.info(
+//											"updateModules() / scsProcedimientosExtendsMapper.updateByExample() -> Salida de scsProcedimientosExtendsMapper para actualizar los procedimientos");
+//								}
+//							
+//								
+//							}else {
+////								ELIMINAR TODOS
+//								ScsPretensionesprocedExample pretenprocedExample = new ScsPretensionesprocedExample();
+//								pretenprocedExample.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdprocedimientoEqualTo(modulo.getIdprocedimiento());
+//								List<ScsPretensionesproced> pretensionesAnteriores = scsPretensionesprocedMapper.selectByExample(pretenprocedExample);
+//								
+//								for(int i = 0; i < pretensionesAnteriores.size() ; i++) {
+//									scsPretensionesprocedMapper.deleteByPrimaryKey(pretensionesAnteriores.get(i));
+//								}
+//							}
+							
+						}
+						
+					
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					insertResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			if(error.getDescription() == null) {
+							error.setDescription("areasmaterias.materias.ficha.insertarerror");
+			}
+			insertResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			insertResponseDTO.setId(String.valueOf(idTurnoNuevo));
+			error.setCode(200);
+			error.setDescription("general.message.registro.insertado");
+		}
+		insertResponseDTO.setError(error);
+
+		LOGGER.info("updateModules() -> Salida del servicio para insertar modulos");
+
+		return insertResponseDTO;
+	}
 }

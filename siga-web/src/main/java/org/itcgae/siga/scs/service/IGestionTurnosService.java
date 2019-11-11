@@ -20,19 +20,13 @@ import org.itcgae.siga.DTOs.gen.ComboDTO;
 public interface IGestionTurnosService {
 	public TurnosDTO busquedaTurnos(TurnosItem turnosItem, HttpServletRequest request);
 
-//	public ComboDTO getTiposGuardia(HttpServletRequest request);
-//
-//
-//	public UpdateResponseDTO updateTiposAsistencias(TiposAsistenciasDTO tiposAsistenciasDTO, HttpServletRequest request);
-//
 	public UpdateResponseDTO eliminateTurnos(TurnosDTO turnosDTO, HttpServletRequest request);
-//
-//	public UpdateResponseDTO activateTipoAsitencia(TiposAsistenciasDTO tiposAsistenciasDTO, HttpServletRequest request);
-//
-//	public InsertResponseDTO createTiposAsistencia(TiposAsistenciaItem tiposAsistenciaItem, HttpServletRequest request);
 
 	public TurnosDTO busquedaFichaTurnos(TurnosItem turnosItem, HttpServletRequest request);
 
 	public UpdateResponseDTO updateDatosGenerales(TurnosItem turnosItem, HttpServletRequest request);
+
+	public InsertResponseDTO createTurnos(TurnosItem turnosItem, HttpServletRequest request);
+
 
 }

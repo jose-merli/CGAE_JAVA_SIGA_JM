@@ -8,7 +8,9 @@ import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.scs.TiposActuacionItem;
 import org.itcgae.siga.DTO.scs.TurnosItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ScsTurnoMapper;
+import org.itcgae.siga.db.services.scs.providers.ScsProcedimientosSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsTurnosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -90,4 +92,13 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper{
 			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
 	    List<TurnosItem> busquedaFichaTurnos(TurnosItem turnosItem,Short idInstitucion);
 
+	 @SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "getIdTurno")
+		@Results({ @Result(column = "IDTURNO", property = "newId", jdbcType = JdbcType.VARCHAR)
+		})
+		NewIdDTO getIdTurno(Short idInstitucion);
+	 
+	 @SelectProvider(type = ScsTurnosSqlExtendsProvider.class, method = "getIdOrdenacion")
+		@Results({ @Result(column = "IDORDENACIONCOLAS", property = "newId", jdbcType = JdbcType.VARCHAR)
+		})
+		NewIdDTO getIdOrdenacion(Short idInstitucion);
 }
