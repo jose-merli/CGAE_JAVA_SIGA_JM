@@ -19,6 +19,7 @@ import org.itcgae.siga.db.entities.ScsZonaExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsAreasMateriasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsGrupofacturacionExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsJurisdiccionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsMateriaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPartidasPresupuestariasExtendsMapper;
@@ -69,6 +70,9 @@ public class ComboServiceImpl implements ComboService {
 
 	@Autowired
 	private ScsPartidasPresupuestariasExtendsMapper scsPartidasPresupuestariasExtendsMapper;
+	
+	@Autowired
+	private ScsGuardiasturnoExtendsMapper scsGuardiasturnoExtendsMapper;
 
 	// PK
 
@@ -437,6 +441,38 @@ public class ComboServiceImpl implements ComboService {
 			}
 
 			LOGGER.info("getComboActuacion() -> Salida del servicio para obtener combo actuaciones");
+		}
+		return comboDTO;
+
+	}
+
+
+	@Override
+	public ComboDTO comboGuardias(HttpServletRequest request, String idTurno) {
+		LOGGER.info("comboGuardias() -> Entrada al servicio para búsqueda de las guardias");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				LOGGER.info(
+						"comboGuardias() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Entrada a scsGuardiasturnoExtendsMapper para obtener las guardias");
+
+				List<ComboItem> comboItems = scsGuardiasturnoExtendsMapper.comboGuardias(idTurno, idInstitucion.toString());
+
+				LOGGER.info(
+						"comboGuardias() / scsGuardiasturnoExtendsMapper.comboGuardias() -> Salida a scsGuardiasturnoExtendsMapper para obtener las guardias");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("comboGuardias() -> Salida del servicio para obtener combo guardias");
 		}
 		return comboDTO;
 

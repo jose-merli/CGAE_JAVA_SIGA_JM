@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.itcgae.siga.DTO.scs.ColegiadoJGItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaItem;
 import org.itcgae.siga.DTOs.cen.BusquedaPerFisicaSearchDTO;
 import org.itcgae.siga.DTOs.cen.BusquedaPerJuridicaItem;
@@ -148,5 +149,11 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	})
 	FichaPersonaItem getPersonaisColegiadoWithIdPersona(String idPersona, String idInstitucion);
 	
-	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "busquedaColegiadoExpress")//falta hacer query
+	@Results({
+		@Result(column = "NCOLEGIADO", property = "nColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "IDPERSONA", property = "idPersona", jdbcType = JdbcType.NUMERIC),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ColegiadoJGItem> busquedaColegiadoExpress(String colegiadoJGItem, String idInstitucion);
 }
