@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -18,10 +19,51 @@ public class EjgController {
 	@Autowired
 	private IBusquedaEJG busquedaEJG;
 	
-	
-	@GetMapping(value = "/filtros-ejg/comboTipoEJG" ,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<ComboDTO> comboCosteFijos(HttpServletRequest request) {
+	@RequestMapping(value = "/filtros-ejg/comboTipoEJG",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboTipoEJG(HttpServletRequest request) {
 		ComboDTO response = busquedaEJG.comboTipoEJG(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/filtros-ejg/comboTipoEJGColegio",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboTipoColegioEjg(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboTipoColegioEjg(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/filtros-ejg/comboFundamentoCalif",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboFundamentoCalificacion(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboFundamentoCalificacion(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	@RequestMapping(value = "/filtros-ejg/comboResolucion",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboResolucion(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboResolucion(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	@RequestMapping(value = "/filtros-ejg/comboFundamentoImpug",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboFundamentoImpug(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboFundamentoImpug(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	@RequestMapping(value = "/filtros-ejg/comboPreceptivo",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboPreceptivo(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboPreceptivo(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	@RequestMapping(value = "/filtros-ejg/comboRenuncia",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboRenuncia(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboRenuncia(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	@RequestMapping(value = "/filtros-ejg/comboCreadoDesde",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboCreadoDesde(HttpServletRequest request) {
+		ComboDTO response = busquedaEJG.comboCreadoDesde(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	@RequestMapping(value = "/filtros-ejg/comboFundamentoJurid",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> ComboFundamentoJurid(HttpServletRequest request, String resolucion) {
+		ComboDTO response = busquedaEJG.ComboFundamentoJurid(request, resolucion);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 }

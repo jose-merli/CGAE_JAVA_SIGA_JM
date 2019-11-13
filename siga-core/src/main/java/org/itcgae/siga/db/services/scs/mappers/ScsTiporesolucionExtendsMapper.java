@@ -12,6 +12,7 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.mappers.ScsJuzgadoMapper;
 import org.itcgae.siga.db.mappers.ScsTiporesolucionMapper;
 import org.itcgae.siga.db.services.scs.providers.ScsJuzgadoSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsTipofundamentosSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.ScsTiporesolucionSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -26,5 +27,6 @@ public interface ScsTiporesolucionExtendsMapper extends ScsTiporesolucionMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR)
 	})
 	List<ComboItem> getResoluciones(String idLenguaje);
+	
 
 }
