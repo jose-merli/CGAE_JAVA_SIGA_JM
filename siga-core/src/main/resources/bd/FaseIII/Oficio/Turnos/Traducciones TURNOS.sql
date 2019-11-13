@@ -77,7 +77,15 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.configuracioncolaoficio','Datos Configuración Cola Oficio#EU','0','3',to_date('09/10/19','DD/MM/RR'),'0','19');
 
 
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.validjustificación','Validación de la justificación','0','1',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.validjustificación','Validació de la justificació','0','2',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.validjustificación','Validación de la justificación#GL','0','4',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.validjustificación','Validación de la justificación#EU','0','3',to_date('09/10/19','DD/MM/RR'),'0','19');
 
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.validinscripbajas','Validación de Inscripciones y Bajas','0','1',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.validinscripbajas','Validació d''Inscripcions i baixes','0','2',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.validinscripbajas','Validación de Inscripciones y Bajas#GL','0','4',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.validinscripbajas','Validación de Inscripciones y Bajas#EU','0','3',to_date('09/10/19','DD/MM/RR'),'0','19');
 
 
 

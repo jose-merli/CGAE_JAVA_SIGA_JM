@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.itcgae.siga.DTO.scs.AreasDTO;
  
 import org.itcgae.siga.DTO.scs.AreasItem;
+import org.itcgae.siga.DTO.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTO.scs.ComisariaDTO;
 import org.itcgae.siga.DTO.scs.ComisariaItem;
 import org.itcgae.siga.DTO.scs.MateriasDTO;
@@ -13,6 +14,8 @@ import org.itcgae.siga.DTO.scs.PartidasDTO;
 import org.itcgae.siga.DTO.scs.PartidasItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
+import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 
  
@@ -28,15 +31,13 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.scs.service.IGestionTurnosService;
-import org.itcgae.siga.scs.service.maestros.IGestionTiposActuacionService;
-import org.itcgae.siga.scs.service.maestros.IGestionTiposAsistenciaService;
-import org.itcgae.siga.servicesImpl.ComboServiceImpl;
 
 import org.itcgae.siga.scs.services.componentesGenerales.ComboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,6 +54,12 @@ public class TurnosController {
 	@RequestMapping(value = "/combossjcs/comboTurnos",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<ComboDTO> comboTurnos(HttpServletRequest request) {
 		ComboDTO response = comboService.comboTurnos(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/combossjcs/comboGuardias",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboGuardias(HttpServletRequest request) {
+		ComboDTO response = comboService.comboTiposGuardia(request);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
@@ -98,6 +105,12 @@ public class TurnosController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/combossjcs/comboRequisitosGuardias",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboRequisitosGuardias(HttpServletRequest request) {
+		ComboDTO response = comboService.comboRequisitosGuardias(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/turnos/busquedaTurnos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<TurnosDTO> busquedaTurnos(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
 		TurnosDTO response = turnosService.busquedaTurnos(turnosItem, request);
@@ -136,6 +149,23 @@ public class TurnosController {
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<InsertResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@RequestMapping(value = "/combossjcs/ordenColaEnvios", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> ordenCola(String idordenacioncolas, HttpServletRequest request) { 
+		ComboDTO response = turnosService.ordenColaEnvios(request, idordenacioncolas);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	
+	@RequestMapping(value = "/combossjcs/ordenCola",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboColaOrdenadaDTO> ordenCola(HttpServletRequest request, @RequestBody TurnosItem turnosItem) {
+		
+		ComboColaOrdenadaDTO response = turnosService.ordenCola(request, turnosItem);
+		if(response.getError() == null)
+			return new ResponseEntity<ComboColaOrdenadaDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<ComboColaOrdenadaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
  

@@ -25,5 +25,7 @@ public interface ComboService {
 	public ComboDTO getComboGrupoFacturacion(HttpServletRequest request);
 
 	public ComboDTO getComboPartidasPresupuestarias(HttpServletRequest request);
+
+	public ComboDTO comboRequisitosGuardias(HttpServletRequest request);
 	
 }

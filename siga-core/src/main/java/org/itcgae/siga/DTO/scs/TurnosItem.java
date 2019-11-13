@@ -45,6 +45,10 @@ public class TurnosItem {
 	private String visiblemovil;
 	private String idgrupofacturacion;
 	private String idjurisdiccion;
+	private String idguardias;
+	private String idordenacioncolas;
+	private String orden;
+	private String nombrepartidosjudiciales;
 	
 	
 	public String getVisiblemovil() {
@@ -275,6 +279,30 @@ public class TurnosItem {
 	}
 	public void setIdjurisdiccion(String idjurisdiccion) {
 		this.idjurisdiccion = idjurisdiccion;
+	}
+	public String getIdguardias() {
+		return idguardias;
+	}
+	public void setIdguardias(String idguardias) {
+		this.idguardias = idguardias;
+	}
+	public String getIdordenacioncolas() {
+		return idordenacioncolas;
+	}
+	public void setIdordenacioncolas(String idordenacioncolas) {
+		this.idordenacioncolas = idordenacioncolas;
+	}
+	public String getOrden() {
+		return orden;
+	}
+	public void setOrden(String orden) {
+		this.orden = orden;
+	}
+	public String getNombrepartidosjudiciales() {
+		return nombrepartidosjudiciales;
+	}
+	public void setNombrepartidosjudiciales(String nombrepartidosjudiciales) {
+		this.nombrepartidosjudiciales = nombrepartidosjudiciales;
 	}
 
 

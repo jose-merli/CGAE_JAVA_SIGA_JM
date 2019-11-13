@@ -3,6 +3,7 @@ package org.itcgae.siga.scs.service;
 import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.scs.AcreditacionDTO;
+import org.itcgae.siga.DTO.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTO.scs.CosteFijoDTO;
 import org.itcgae.siga.DTO.scs.CosteFijoItem;
 import org.itcgae.siga.DTO.scs.FundamentoResolucionItem;
@@ -24,9 +25,12 @@ public interface IGestionTurnosService {
 
 	public TurnosDTO busquedaFichaTurnos(TurnosItem turnosItem, HttpServletRequest request);
 
+	public ComboColaOrdenadaDTO ordenCola(HttpServletRequest request, TurnosItem turnosItem);
+	
 	public UpdateResponseDTO updateDatosGenerales(TurnosItem turnosItem, HttpServletRequest request);
 
 	public InsertResponseDTO createTurnos(TurnosItem turnosItem, HttpServletRequest request);
-
+	
+	public ComboDTO ordenColaEnvios(HttpServletRequest request, String idordenacioncolas);
 
 }
