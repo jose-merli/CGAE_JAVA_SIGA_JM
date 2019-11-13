@@ -259,4 +259,59 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 	}
 
+	@Transactional
+	@Override
+	public GuardiasItem detalleGuardia(String idGuardia, HttpServletRequest request) {
+
+		LOGGER.info("getGuardia() ->  Entrada al servicio para obtener una guardia");
+
+		GuardiasItem guardiaItem = null;
+		
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"activagetGuardiateGuardias() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"getGuardia() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+						
+					LOGGER.info(
+							"getGuardia() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la guardia");
+
+						List<GuardiasItem> guardiasList = scsGuardiasturnoExtendsMapper.detalleGuardia(idGuardia, idInstitucion.toString());
+						if(guardiasList != null && guardiasList.size() > 0)
+							guardiaItem = guardiasList.get(0);
+						LOGGER.info(
+								"getGuardia() / scsPrisionExtendsMapper.selectByExample() -> Salida de scsPrisionExtendsMapper para buscar la prision");
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		
+
+
+		LOGGER.info("getGuardia() -> Salida del servicio para dar de alta a las prisiones");
+
+		return guardiaItem;
+
+	}
+
 }

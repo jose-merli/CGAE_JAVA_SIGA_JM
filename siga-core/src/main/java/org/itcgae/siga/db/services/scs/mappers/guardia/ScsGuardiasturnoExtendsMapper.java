@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
 import org.itcgae.siga.DTO.scs.guardia.GuardiasItem;
+import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
 import org.itcgae.siga.db.services.scs.providers.guardia.ScsGuardiasturnoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
@@ -38,5 +39,18 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 	List<GuardiasItem> searchGuardias(GuardiasItem guardiaItem , String idInstitucion, String idLenguaje);
 	
 	
+
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method = "comboGuardias")
+	@Results({
+		@Result(column = "IDGUARDIA", property = "value", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "label", jdbcType = JdbcType.VARCHAR),
+	})
+	List<ComboItem> comboGuardias(String idTurno, String idInstitucion);
 	
+	@SelectProvider(type = ScsGuardiasturnoSqlExtendsProvider.class, method ="detalleGuardia")
+	@Results({
+		@Result(column = "SELECCIONLABORABLES", property="diasLab", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "SELECCIONFESTIVOS", property="diasFes", jdbcType = JdbcType.VARCHAR),
+	})
+	List<GuardiasItem> detalleGuardia(String idGuardia, String idInstitucion);
 }

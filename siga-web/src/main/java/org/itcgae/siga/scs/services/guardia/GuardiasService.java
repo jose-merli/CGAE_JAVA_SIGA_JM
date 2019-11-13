@@ -14,5 +14,6 @@ public interface GuardiasService {
 	
 	public UpdateResponseDTO activateGuardias(GuardiasDTO guardiasDTO, HttpServletRequest request);
 
+	public GuardiasItem detalleGuardia(String idGuardia, HttpServletRequest request);
 
 }
