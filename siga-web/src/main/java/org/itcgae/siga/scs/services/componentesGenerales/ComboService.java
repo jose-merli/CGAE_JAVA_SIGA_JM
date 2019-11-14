@@ -26,4 +26,6 @@ public interface ComboService {
 
 	public ComboDTO getComboPartidasPresupuestarias(HttpServletRequest request);
 	
+	public ComboDTO comboGuardias(HttpServletRequest request, String idTurno);
+	
 }
