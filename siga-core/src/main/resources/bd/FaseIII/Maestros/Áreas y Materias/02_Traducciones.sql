@@ -1,3 +1,8 @@
+spool 02_Traducciones.log
+prompt 02_Traducciones.log
+select to_char(sysdate, 'hh24:mi:ss') as "Inicio" from dual;
+prompt .
+
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('maestros.areasmaterias.literal.contenido','Contenido#GL','0','4',to_date('20/04/19','DD/MM/RR'),'0','15');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('maestros.areasmaterias.literal.contenido','Contenido','0','1',to_date('20/04/19','DD/MM/RR'),'0','15');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('maestros.areasmaterias.literal.contenido','Contingut','0','2',to_date('20/04/19','DD/MM/RR'),'0','15');
@@ -37,3 +42,8 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.GestionAreasYMaterias','Gestión Àrees i Matèries','0','2',to_date('04/02/19','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.GestionAreasYMaterias','Gestión Áreas y Materias#EU','0','3',to_date('04/02/19','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('menu.justiciaGratuita.maestros.GestionAreasYMaterias','Gestión Áreas y Materias#GL','0','4',to_date('04/02/19','DD/MM/RR'),'0','19');
+
+commit;
+prompt .
+select to_char(sysdate, 'hh24:mi:ss') as "Fin" from dual;
+spool off

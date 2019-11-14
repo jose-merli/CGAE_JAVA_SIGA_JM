@@ -13,4 +13,3 @@ commit;
 prompt .
 select to_char(sysdate, 'hh24:mi:ss') as "Fin" from dual;
 spool off
-CostesFijosCosteFijoCaracterísticacoste fijo con las mismas características
