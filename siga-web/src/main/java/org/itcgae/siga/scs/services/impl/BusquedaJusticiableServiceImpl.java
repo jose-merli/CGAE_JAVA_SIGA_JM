@@ -8,15 +8,14 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.itcgae.siga.DTO.scs.JusticiableBusquedaDTO;
 import org.itcgae.siga.DTO.scs.JusticiableBusquedaItem;
-import org.itcgae.siga.DTO.scs.JusticiableTelefonoDTO;
+import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
-import org.itcgae.siga.db.entities.ScsTelefonospersona;
-import org.itcgae.siga.db.entities.ScsTelefonospersonaExample;
-import org.itcgae.siga.db.mappers.ScsTelefonospersonaMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRolesJusticiablesExtendsMapper;
 import org.itcgae.siga.scs.service.IBusquedaJusticiablesService;
 import org.itcgae.siga.security.UserTokenUtils;
@@ -33,10 +32,10 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 
 	@Autowired
 	private ScsRolesJusticiablesExtendsMapper scsRolesJusticiablesExtendsMapper;
-	
+
 	@Autowired
-	private ScsTelefonospersonaMapper scsTelefonospersonaMapper;
-	
+	private ScsPersonajgExtendsMapper scsPersonajgExtendsMapper;
+
 	@Override
 	public ComboDTO getComboRoles(HttpServletRequest request) {
 		LOGGER.info("getComboRoles() -> Entrada al servicio para obtener combo roles justiciables");
@@ -80,54 +79,9 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 	}
 
 	@Override
-	public JusticiableTelefonoDTO getTelefonos(HttpServletRequest request) {
-
-		LOGGER.info("getTelefonos() -> Entrada al servicio para obtener telefonos personas");
-
-		JusticiableTelefonoDTO justiciableTelefonoDTO = new JusticiableTelefonoDTO();
-
-		// Conseguimos información del usuario logeado
-		String token = request.getHeader("Authorization");
-		String dni = UserTokenUtils.getDniFromJWTToken(token);
-		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
-
-		if (idInstitucion != null) {
-			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
-			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
-
-			LOGGER.info(
-					"getTelefonos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
-
-			LOGGER.info(
-					"getTelefonos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
-
-			if (usuarios != null && usuarios.size() > 0) {
-
-				ScsTelefonospersonaExample scsTelefonospersonaExample = new ScsTelefonospersonaExample();
-				scsTelefonospersonaExample.createCriteria()
-				.andIdinstitucionEqualTo(idInstitucion);
-				
-				scsTelefonospersonaExample.setOrderByClause("NOMBRETELEFONO asc");
-				
-				List<ScsTelefonospersona> telefonospersonaList = scsTelefonospersonaMapper.selectByExample(scsTelefonospersonaExample);
-				
-				if (telefonospersonaList != null && telefonospersonaList.size() > 0) {
-					justiciableTelefonoDTO.setTelefonospersona(telefonospersonaList);
-				}
-			}
-		}
-		
-		LOGGER.info("getTelefonos() -> Salida del servicio para obtener telefonos personas");
-
-		return justiciableTelefonoDTO;
-	}
-
-	@Override
 	public JusticiableBusquedaDTO searchJusticiables(JusticiableBusquedaItem justiciableBusquedaItem,
 			HttpServletRequest request) {
-		
+
 		LOGGER.info("searchJusticiables() -> Entrada al servicio para obtener los justiciables");
 
 		// Conseguimos información del usuario logeado
@@ -135,10 +89,12 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		JusticiableBusquedaDTO justiciableBusquedaDTO = new JusticiableBusquedaDTO();
-		List<JusticiableBusquedaItem> justiciableBusquedaItems = new ArrayList<JusticiableBusquedaItem>();
+		List<StringDTO> idPersonaJusticiables = new ArrayList<StringDTO>();
+		List<JusticiableBusquedaItem> justiciablesItems = new ArrayList<JusticiableBusquedaItem>();
+		Error error = new Error();
 
 		if (idInstitucion != null) {
-		
+
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
@@ -152,17 +108,44 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 
 			if (usuarios != null && usuarios.size() > 0) {
 
-				LOGGER.info(
-						"searchJusticiables() / scsPretensionExtendsMapper.searchJusticiables() -> Entrada a scsPretensionExtendsMapper para obtener justiciables");
+				try {
 
-			//??
+					if(justiciableBusquedaItem.getIdPersona() != null && justiciableBusquedaItem.getIdPersona() != "") {
+						
+						StringDTO idPersona = new StringDTO();
+						idPersona.setValor(justiciableBusquedaItem.getIdPersona());
+						idPersonaJusticiables.add(idPersona);
+						
+					}else {
+						LOGGER.info(
+								"searchJusticiables() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
 
-				LOGGER.info(
-						"searchJusticiables() / scsPretensionExtendsMapper.searchJusticiables() -> Salida a scsPretensionExtendsMapper para obtener justiciables");
+						idPersonaJusticiables = scsPersonajgExtendsMapper.searchIdPersonaJusticiables(justiciableBusquedaItem, idInstitucion);
 
-				if (justiciableBusquedaItems != null) {
-					justiciableBusquedaDTO.setJusticiableBusquedaItem(justiciableBusquedaItems);
+						LOGGER.info(
+								"searchJusticiables() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Salida a scsPersonajgExtendsMapper para obtener las personas justiciables");
+					}
+					
+					if (idPersonaJusticiables != null && idPersonaJusticiables.size() > 0) {
+
+						LOGGER.info(
+								"searchJusticiables() / scsPersonajgExtendsMapper.searchJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener justiciables");
+
+						justiciablesItems = scsPersonajgExtendsMapper.searchJusticiables(idPersonaJusticiables, idInstitucion);
+
+						LOGGER.info(
+								"searchJusticiables() / scsPersonajgExtendsMapper.searchJusticiables() -> Salida a scsPersonajgExtendsMapper para obtener justiciables");
+
+
+
+						justiciableBusquedaDTO.setJusticiableBusquedaItem(justiciablesItems);
+					}
+
+				} catch (Exception e) {
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
 				}
+
 			}
 
 		}

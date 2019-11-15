@@ -1,6 +1,7 @@
 package org.itcgae.siga.DTO.scs;
 
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -14,6 +15,7 @@ public class JusticiableItem {
 	private Date fechaModificacion;
 	private Date fechaNacimiento;
 	private String idPais;
+	private String apellidos;
 	private String apellido1;
 	private String apellido2;
 	private String direccion;
@@ -61,8 +63,8 @@ public class JusticiableItem {
 	private String asistidoSolicitajg;
 	private String asistidoAutorizaeejg;
 	private String autorizaAvisoTelematico;
-	
-	
+	private List<JusticiableTelefonoItem> telefonos;
+
 	/**
 	 **/
 	public JusticiableItem idPersona(String idPersona) {
@@ -70,7 +72,7 @@ public class JusticiableItem {
 		return this;
 	}
 
-	@JsonProperty("idPersona")
+	@JsonProperty("idpersona")
 	public String getIdPersona() {
 		return idPersona;
 	}
@@ -78,7 +80,7 @@ public class JusticiableItem {
 	public void setIdPersona(String idPersona) {
 		this.idPersona = idPersona;
 	}
-	
+
 	/**
 	 **/
 	public JusticiableItem idInstitucion(String idInstitucion) {
@@ -86,7 +88,7 @@ public class JusticiableItem {
 		return this;
 	}
 
-	@JsonProperty("idInstitucion")
+	@JsonProperty("idinstitucion")
 	public String getIdInstitucion() {
 		return idInstitucion;
 	}
@@ -150,7 +152,7 @@ public class JusticiableItem {
 		return this;
 	}
 
-	@JsonProperty("fechaModificacion")
+	@JsonProperty("fechamodificacion")
 	public Date getFechaModificacion() {
 		return fechaModificacion;
 	}
@@ -166,7 +168,7 @@ public class JusticiableItem {
 		return this;
 	}
 
-	@JsonProperty("idPoblacion")
+	@JsonProperty("idpoblacion")
 	public String getIdPoblacion() {
 		return idPoblacion;
 	}
@@ -182,7 +184,7 @@ public class JusticiableItem {
 		return this;
 	}
 
-	@JsonProperty("idProvincia")
+	@JsonProperty("idprovincia")
 	public String getIdProvincia() {
 		return idProvincia;
 	}
@@ -198,7 +200,7 @@ public class JusticiableItem {
 		return this;
 	}
 
-	@JsonProperty("codigoPostal")
+	@JsonProperty("codigopostal")
 	public String getCodigoPostal() {
 		return codigoPostal;
 	}
@@ -206,7 +208,7 @@ public class JusticiableItem {
 	public void setCodigoPostal(String codigoPostal) {
 		this.codigoPostal = codigoPostal;
 	}
-	
+
 	/**
 	 **/
 	public JusticiableItem fechaNacimiento(Date fechaNacimiento) {
@@ -214,7 +216,7 @@ public class JusticiableItem {
 		return this;
 	}
 
-	@JsonProperty("codigoPostal")
+	@JsonProperty("fechanacimiento")
 	public Date getFechaNacimiento() {
 		return fechaNacimiento;
 	}
@@ -230,13 +232,29 @@ public class JusticiableItem {
 		return this;
 	}
 
-	@JsonProperty("codigoPostal")
+	@JsonProperty("idpais")
 	public String getIdPais() {
 		return idPais;
 	}
 
 	public void setIdPais(String idPais) {
 		this.idPais = idPais;
+	}
+
+	/**
+	 **/
+	public JusticiableItem apellidos(String apellidos) {
+		this.apellidos = apellidos;
+		return this;
+	}
+
+	@JsonProperty("apellidos")
+	public String getApellidos() {
+		return apellidos;
+	}
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
 	}
 
 	/**
@@ -261,7 +279,7 @@ public class JusticiableItem {
 		this.apellido2 = apellido2;
 		return this;
 	}
-	
+
 	@JsonProperty("apellido2")
 	public String getApellido2() {
 		return apellido2;
@@ -277,7 +295,7 @@ public class JusticiableItem {
 		this.direccion = direccion;
 		return this;
 	}
-	
+
 	@JsonProperty("direccion")
 	public String getDireccion() {
 		return direccion;
@@ -293,8 +311,8 @@ public class JusticiableItem {
 		this.idProfesion = idProfesion;
 		return this;
 	}
-	
-	@JsonProperty("idProfesion")
+
+	@JsonProperty("idprofesion")
 	public String getIdProfesion() {
 		return idProfesion;
 	}
@@ -309,8 +327,8 @@ public class JusticiableItem {
 		this.regimen_conyugal = regimen_conyugal;
 		return this;
 	}
-	
-	@JsonProperty("regimen_conyugal")
+
+	@JsonProperty("regimenConyugal")
 	public String getRegimen_conyugal() {
 		return regimen_conyugal;
 	}
@@ -325,8 +343,8 @@ public class JusticiableItem {
 		this.idEstadoCivil = idEstadoCivil;
 		return this;
 	}
-	
-	@JsonProperty("idEstadoCivil")
+
+	@JsonProperty("idestadocivil")
 	public String getIdEstadoCivil() {
 		return idEstadoCivil;
 	}
@@ -341,8 +359,8 @@ public class JusticiableItem {
 		this.tipoPersonajg = tipoPersonajg;
 		return this;
 	}
-	
-	@JsonProperty("tipoPersonajg")
+
+	@JsonProperty("tipopersonajg")
 	public String getTipoPersonajg() {
 		return tipoPersonajg;
 	}
@@ -357,8 +375,8 @@ public class JusticiableItem {
 		this.idTipoIdentificacion = idTipoIdentificacion;
 		return this;
 	}
-	
-	@JsonProperty("idTipoIdentificacion")
+
+	@JsonProperty("idtipoidentificacion")
 	public String getIdTipoIdentificacion() {
 		return idTipoIdentificacion;
 	}
@@ -373,7 +391,7 @@ public class JusticiableItem {
 		this.observaciones = observaciones;
 		return this;
 	}
-	
+
 	@JsonProperty("observaciones")
 	public String getObservaciones() {
 		return observaciones;
@@ -389,8 +407,8 @@ public class JusticiableItem {
 		this.idRepresentantejg = idRepresentantejg;
 		return this;
 	}
-	
-	@JsonProperty("idRepresentantejg")
+
+	@JsonProperty("idrepresentantejg")
 	public String getIdRepresentantejg() {
 		return idRepresentantejg;
 	}
@@ -405,8 +423,8 @@ public class JusticiableItem {
 		this.idTipoencalidad = idTipoencalidad;
 		return this;
 	}
-	
-	@JsonProperty("idTipoencalidad")
+
+	@JsonProperty("idtipoencalidad")
 	public String getIdTipoencalidad() {
 		return idTipoencalidad;
 	}
@@ -421,7 +439,7 @@ public class JusticiableItem {
 		this.sexo = sexo;
 		return this;
 	}
-	
+
 	@JsonProperty("sexo")
 	public String getSexo() {
 		return sexo;
@@ -437,8 +455,8 @@ public class JusticiableItem {
 		this.idLenguaje = idLenguaje;
 		return this;
 	}
-	
-	@JsonProperty("idLenguaje")
+
+	@JsonProperty("idlenguaje")
 	public String getIdLenguaje() {
 		return idLenguaje;
 	}
@@ -453,8 +471,8 @@ public class JusticiableItem {
 		this.numeroHijos = numeroHijos;
 		return this;
 	}
-	
-	@JsonProperty("numeroHijos")
+
+	@JsonProperty("numerohijos")
 	public String getNumeroHijos() {
 		return numeroHijos;
 	}
@@ -469,7 +487,7 @@ public class JusticiableItem {
 		this.fax = fax;
 		return this;
 	}
-	
+
 	@JsonProperty("fax")
 	public String getFax() {
 		return fax;
@@ -485,8 +503,8 @@ public class JusticiableItem {
 		this.correoElectronico = correoElectronico;
 		return this;
 	}
-	
-	@JsonProperty("correoElectronico")
+
+	@JsonProperty("correoelectronico")
 	public String getCorreoElectronico() {
 		return correoElectronico;
 	}
@@ -501,7 +519,7 @@ public class JusticiableItem {
 		this.edad = edad;
 		return this;
 	}
-	
+
 	@JsonProperty("edad")
 	public String getEdad() {
 		return edad;
@@ -517,8 +535,8 @@ public class JusticiableItem {
 		this.idMinusvalia = idMinusvalia;
 		return this;
 	}
-	
-	@JsonProperty("idMinusvalia")
+
+	@JsonProperty("idminusvalia")
 	public String getIdMinusvalia() {
 		return idMinusvalia;
 	}
@@ -533,8 +551,8 @@ public class JusticiableItem {
 		this.existeDomicilio = existeDomicilio;
 		return this;
 	}
-	
-	@JsonProperty("existeDomicilio")
+
+	@JsonProperty("existedomicilio")
 	public String getExisteDomicilio() {
 		return existeDomicilio;
 	}
@@ -549,8 +567,8 @@ public class JusticiableItem {
 		this.idProvincia2 = idProvincia2;
 		return this;
 	}
-	
-	@JsonProperty("idProvincia2")
+
+	@JsonProperty("idprovincia2")
 	public String getIdProvincia2() {
 		return idProvincia2;
 	}
@@ -565,8 +583,8 @@ public class JusticiableItem {
 		this.idPoblacion2 = idPoblacion2;
 		return this;
 	}
-	
-	@JsonProperty("idPoblacion2")
+
+	@JsonProperty("idpoblacion2")
 	public String getIdPoblacion2() {
 		return idPoblacion2;
 	}
@@ -581,7 +599,7 @@ public class JusticiableItem {
 		this.direccion2 = direccion2;
 		return this;
 	}
-	
+
 	@JsonProperty("direccion2")
 	public String getDireccion2() {
 		return direccion2;
@@ -597,8 +615,8 @@ public class JusticiableItem {
 		this.codigoPostal2 = codigoPostal2;
 		return this;
 	}
-	
-	@JsonProperty("codigoPostal2")
+
+	@JsonProperty("codigopostal2")
 	public String getCodigoPostal2() {
 		return codigoPostal2;
 	}
@@ -613,8 +631,8 @@ public class JusticiableItem {
 		this.idTipodir = idTipodir;
 		return this;
 	}
-	
-	@JsonProperty("idTipodir")
+
+	@JsonProperty("idtipodir")
 	public String getIdTipodir() {
 		return idTipodir;
 	}
@@ -629,8 +647,8 @@ public class JusticiableItem {
 		this.idTipodir2 = idTipodir2;
 		return this;
 	}
-	
-	@JsonProperty("idTipodir2")
+
+	@JsonProperty("idtipodir2")
 	public String getIdTipodir2() {
 		return idTipodir2;
 	}
@@ -645,7 +663,7 @@ public class JusticiableItem {
 		this.cnae = cnae;
 		return this;
 	}
-	
+
 	@JsonProperty("cnae")
 	public String getCnae() {
 		return cnae;
@@ -661,8 +679,8 @@ public class JusticiableItem {
 		this.idTipoVia = idTipoVia;
 		return this;
 	}
-	
-	@JsonProperty("idTipoVia")
+
+	@JsonProperty("idtipovia")
 	public String getIdTipoVia() {
 		return idTipoVia;
 	}
@@ -677,8 +695,8 @@ public class JusticiableItem {
 		this.numeroDir = numeroDir;
 		return this;
 	}
-	
-	@JsonProperty("numeroDir")
+
+	@JsonProperty("numerodir")
 	public String getNumeroDir() {
 		return numeroDir;
 	}
@@ -693,8 +711,8 @@ public class JusticiableItem {
 		this.escaleraDir = escaleraDir;
 		return this;
 	}
-	
-	@JsonProperty("escaleraDir")
+
+	@JsonProperty("escaleradir")
 	public String getEscaleraDir() {
 		return escaleraDir;
 	}
@@ -709,8 +727,8 @@ public class JusticiableItem {
 		this.pisoDir = pisoDir;
 		return this;
 	}
-	
-	@JsonProperty("pisoDir")
+
+	@JsonProperty("pisodir")
 	public String getPisoDir() {
 		return pisoDir;
 	}
@@ -725,8 +743,8 @@ public class JusticiableItem {
 		this.puertaDir = puertaDir;
 		return this;
 	}
-	
-	@JsonProperty("puertaDir")
+
+	@JsonProperty("puertadir")
 	public String getPuertaDir() {
 		return puertaDir;
 	}
@@ -741,8 +759,8 @@ public class JusticiableItem {
 		this.idTipoVia2 = idTipoVia2;
 		return this;
 	}
-	
-	@JsonProperty("idTipoVia2")
+
+	@JsonProperty("idtipovia2")
 	public String getIdTipoVia2() {
 		return idTipoVia2;
 	}
@@ -757,8 +775,8 @@ public class JusticiableItem {
 		this.numeroDir2 = numeroDir2;
 		return this;
 	}
-	
-	@JsonProperty("numeroDir2")
+
+	@JsonProperty("numerodir2")
 	public String getNumeroDir2() {
 		return numeroDir2;
 	}
@@ -773,8 +791,8 @@ public class JusticiableItem {
 		this.escaleraDir2 = escaleraDir2;
 		return this;
 	}
-	
-	@JsonProperty("escaleraDir2")
+
+	@JsonProperty("escaleradir2")
 	public String getEscaleraDir2() {
 		return escaleraDir2;
 	}
@@ -789,8 +807,8 @@ public class JusticiableItem {
 		this.pisoDir2 = pisoDir2;
 		return this;
 	}
-	
-	@JsonProperty("pisoDir2")
+
+	@JsonProperty("pisodir2")
 	public String getPisoDir2() {
 		return pisoDir2;
 	}
@@ -805,8 +823,8 @@ public class JusticiableItem {
 		this.puertaDir2 = puertaDir2;
 		return this;
 	}
-	
-	@JsonProperty("puertaDir2")
+
+	@JsonProperty("puertadir2")
 	public String getPuertaDir2() {
 		return puertaDir2;
 	}
@@ -821,8 +839,8 @@ public class JusticiableItem {
 		this.idpaisDir1 = idpaisDir1;
 		return this;
 	}
-	
-	@JsonProperty("idpaisDir1")
+
+	@JsonProperty("idpaisdir1")
 	public String getIdpaisDir1() {
 		return idpaisDir1;
 	}
@@ -837,8 +855,8 @@ public class JusticiableItem {
 		this.idpaisDir2 = idpaisDir2;
 		return this;
 	}
-	
-	@JsonProperty("idpaisDir2")
+
+	@JsonProperty("idpaisdir2")
 	public String getIdpaisDir2() {
 		return idpaisDir2;
 	}
@@ -853,8 +871,8 @@ public class JusticiableItem {
 		this.descPaisDir1 = descPaisDir1;
 		return this;
 	}
-	
-	@JsonProperty("descPaisDir1")
+
+	@JsonProperty("descpaisdir1")
 	public String getDescPaisDir1() {
 		return descPaisDir1;
 	}
@@ -869,8 +887,8 @@ public class JusticiableItem {
 		this.descPaisDir2 = descPaisDir2;
 		return this;
 	}
-	
-	@JsonProperty("descPaisDir2")
+
+	@JsonProperty("descpaisdir2")
 	public String getDescPaisDir2() {
 		return descPaisDir2;
 	}
@@ -885,8 +903,8 @@ public class JusticiableItem {
 		this.idTipoIdentificacionotros = idTipoIdentificacionotros;
 		return this;
 	}
-	
-	@JsonProperty("idTipoIdentificacionotros")
+
+	@JsonProperty("idtipoidentificacionotros")
 	public String getIdTipoIdentificacionotros() {
 		return idTipoIdentificacionotros;
 	}
@@ -901,8 +919,8 @@ public class JusticiableItem {
 		this.asistidoSolicitajg = asistidoSolicitajg;
 		return this;
 	}
-	
-	@JsonProperty("asistidoSolicitajg")
+
+	@JsonProperty("asistidosolicitajg")
 	public String getAsistidoSolicitajg() {
 		return asistidoSolicitajg;
 	}
@@ -917,8 +935,8 @@ public class JusticiableItem {
 		this.asistidoAutorizaeejg = asistidoAutorizaeejg;
 		return this;
 	}
-	
-	@JsonProperty("asistidoAutorizaeejg")
+
+	@JsonProperty("asistidoautorizaeejg")
 	public String getAsistidoAutorizaeejg() {
 		return asistidoAutorizaeejg;
 	}
@@ -933,8 +951,8 @@ public class JusticiableItem {
 		this.autorizaAvisoTelematico = autorizaAvisoTelematico;
 		return this;
 	}
-	
-	@JsonProperty("autorizaAvisoTelematico")
+
+	@JsonProperty("autorizaavisotelematico")
 	public String getAutorizaAvisoTelematico() {
 		return autorizaAvisoTelematico;
 	}
@@ -943,6 +961,21 @@ public class JusticiableItem {
 		this.autorizaAvisoTelematico = autorizaAvisoTelematico;
 	}
 
+	/**
+	 **/
+	public JusticiableItem telefonos(List<JusticiableTelefonoItem> telefonos) {
+		this.telefonos = telefonos;
+		return this;
+	}
+
+	@JsonProperty("telefonos")
+	public List<JusticiableTelefonoItem> getTelefonos() {
+		return telefonos;
+	}
+
+	public void setTelefonos(List<JusticiableTelefonoItem> telefonos) {
+		this.telefonos = telefonos;
+	}
 
 	@Override
 	public int hashCode() {
@@ -950,6 +983,7 @@ public class JusticiableItem {
 		int result = 1;
 		result = prime * result + ((apellido1 == null) ? 0 : apellido1.hashCode());
 		result = prime * result + ((apellido2 == null) ? 0 : apellido2.hashCode());
+		result = prime * result + ((apellidos == null) ? 0 : apellidos.hashCode());
 		result = prime * result + ((asistidoAutorizaeejg == null) ? 0 : asistidoAutorizaeejg.hashCode());
 		result = prime * result + ((asistidoSolicitajg == null) ? 0 : asistidoSolicitajg.hashCode());
 		result = prime * result + ((asuntos == null) ? 0 : asuntos.hashCode());
@@ -1003,6 +1037,7 @@ public class JusticiableItem {
 		result = prime * result + ((regimen_conyugal == null) ? 0 : regimen_conyugal.hashCode());
 		result = prime * result + ((sexo == null) ? 0 : sexo.hashCode());
 		result = prime * result + ((tipoPersonajg == null) ? 0 : tipoPersonajg.hashCode());
+		result = prime * result + ((telefonos == null) ? 0 : telefonos.hashCode());
 		return result;
 	}
 
@@ -1023,6 +1058,11 @@ public class JusticiableItem {
 		if (apellido2 == null) {
 			if (other.apellido2 != null)
 				return false;
+		if (apellidos == null) {
+			if (other.apellidos != null)
+				return false;
+		} else if (!apellidos.equals(other.apellidos))
+			return false;
 		} else if (!apellido2.equals(other.apellido2))
 			return false;
 		if (asistidoAutorizaeejg == null) {
@@ -1290,7 +1330,39 @@ public class JusticiableItem {
 				return false;
 		} else if (!tipoPersonajg.equals(other.tipoPersonajg))
 			return false;
+		if (telefonos == null) {
+			if (other.telefonos != null)
+				return false;
+		} else if (!telefonos.equals(other.telefonos))
+			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "JusticiableItem [idPersona=" + idPersona + ", idInstitucion=" + idInstitucion + ", nif=" + nif
+				+ ", nombre=" + nombre + ", asuntos=" + asuntos + ", fechaModificacion=" + fechaModificacion
+				+ ", fechaNacimiento=" + fechaNacimiento + ", idPais=" + idPais + ", apellidos=" + apellidos
+				+ ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", direccion=" + direccion
+				+ ", codigoPostal=" + codigoPostal + ", idProfesion=" + idProfesion + ", regimen_conyugal="
+				+ regimen_conyugal + ", idProvincia=" + idProvincia + ", idPoblacion=" + idPoblacion
+				+ ", idEstadoCivil=" + idEstadoCivil + ", tipoPersonajg=" + tipoPersonajg + ", idTipoIdentificacion="
+				+ idTipoIdentificacion + ", observaciones=" + observaciones + ", idRepresentantejg=" + idRepresentantejg
+				+ ", idTipoencalidad=" + idTipoencalidad + ", sexo=" + sexo + ", idLenguaje=" + idLenguaje
+				+ ", numeroHijos=" + numeroHijos + ", fax=" + fax + ", correoElectronico=" + correoElectronico
+				+ ", edad=" + edad + ", idMinusvalia=" + idMinusvalia + ", existeDomicilio=" + existeDomicilio
+				+ ", idProvincia2=" + idProvincia2 + ", idPoblacion2=" + idPoblacion2 + ", direccion2=" + direccion2
+				+ ", codigoPostal2=" + codigoPostal2 + ", idTipodir=" + idTipodir + ", idTipodir2=" + idTipodir2
+				+ ", cnae=" + cnae + ", idTipoVia=" + idTipoVia + ", numeroDir=" + numeroDir + ", escaleraDir="
+				+ escaleraDir + ", pisoDir=" + pisoDir + ", puertaDir=" + puertaDir + ", idTipoVia2=" + idTipoVia2
+				+ ", numeroDir2=" + numeroDir2 + ", escaleraDir2=" + escaleraDir2 + ", pisoDir2=" + pisoDir2
+				+ ", puertaDir2=" + puertaDir2 + ", idpaisDir1=" + idpaisDir1 + ", idpaisDir2=" + idpaisDir2
+				+ ", descPaisDir1=" + descPaisDir1 + ", descPaisDir2=" + descPaisDir2 + ", idTipoIdentificacionotros="
+				+ idTipoIdentificacionotros + ", asistidoSolicitajg=" + asistidoSolicitajg + ", asistidoAutorizaeejg="
+				+ asistidoAutorizaeejg + ", autorizaAvisoTelematico=" + autorizaAvisoTelematico + ", telefonos="
+				+ telefonos + "]";
+	}
+	
+	
 
 }

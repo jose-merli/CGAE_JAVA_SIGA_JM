@@ -22,7 +22,6 @@ import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.CenPersona;
 import org.itcgae.siga.db.mappers.CenPersonaMapper;
-import org.itcgae.siga.db.services.cen.providers.CenClienteSqlExtendsProvider;
 import org.itcgae.siga.db.services.cen.providers.CenPersonaSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -148,5 +147,14 @@ public interface CenPersonaExtendsMapper extends CenPersonaMapper{
 	})
 	FichaPersonaItem getPersonaisColegiadoWithIdPersona(String idPersona, String idInstitucion);
 	
-	
+	@SelectProvider(type = CenPersonaSqlExtendsProvider.class, method = "getColegiadoByIdPersona")
+	@Results({
+		@Result(column = "NCOLEGIADO", property = "numeroColegiado", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "NOMBRE", property = "nombre", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO1", property = "apellido1", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "APELLIDO2", property = "apellido2", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "COLEGIADO", property = "colegiado", jdbcType = JdbcType.VARCHAR),
+
+	})
+	FichaPersonaItem getColegiadoByIdPersona(String idPersona, Short idInstitucion);
 }

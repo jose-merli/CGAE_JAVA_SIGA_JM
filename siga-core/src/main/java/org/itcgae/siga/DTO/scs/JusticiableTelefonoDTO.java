@@ -5,31 +5,30 @@ import java.util.List;
 import java.util.Objects;
 
 import org.itcgae.siga.DTOs.gen.Error;
-import org.itcgae.siga.db.entities.ScsTelefonospersona;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class JusticiableTelefonoDTO {
 
-	 private List<ScsTelefonospersona> telefonospersonas = new ArrayList<ScsTelefonospersona>();
+	 private List<JusticiableTelefonoItem> telefonosJusticiables = new ArrayList<JusticiableTelefonoItem>();
 	  private Error error = null;
 
 	  
 	  /**
 	   * 
 	   **/
-	  public JusticiableTelefonoDTO telefonospersonas(List<ScsTelefonospersona> telefonospersonas) {
-	    this.telefonospersonas = telefonospersonas;
+	  public JusticiableTelefonoDTO telefonosJusticiables(List<JusticiableTelefonoItem> telefonosJusticiables) {
+	    this.telefonosJusticiables = telefonosJusticiables;
 	    return this;
 	  }
 	  
-	  @JsonProperty("telefonospersonas")
-	  public List<ScsTelefonospersona> getTelefonospersona() {
-	    return telefonospersonas;
+	  @JsonProperty("telefonosJusticiables")
+	  public List<JusticiableTelefonoItem> getTelefonosJusticiables() {
+	    return telefonosJusticiables;
 	  }
 	  
-	  public void setTelefonospersona(List<ScsTelefonospersona> telefonospersonas) {
-	    this.telefonospersonas = telefonospersonas;
+	  public void setTelefonosJusticiables(List<JusticiableTelefonoItem> telefonosJusticiables) {
+	    this.telefonosJusticiables = telefonosJusticiables;
 	  }
 	  
 	  
@@ -60,13 +59,13 @@ public class JusticiableTelefonoDTO {
 	      return false;
 	    }
 	    JusticiableTelefonoDTO justiciableTelefonoDTO = (JusticiableTelefonoDTO) o;
-	    return Objects.equals(this.telefonospersonas, justiciableTelefonoDTO.telefonospersonas) &&
+	    return Objects.equals(this.telefonosJusticiables, justiciableTelefonoDTO.telefonosJusticiables) &&
 	        Objects.equals(this.error, justiciableTelefonoDTO.error);
 	  }
 
 	  @Override
 	  public int hashCode() {
-	    return Objects.hash(telefonospersonas, error);
+	    return Objects.hash(telefonosJusticiables, error);
 	  }
 
 	  @Override
@@ -74,7 +73,7 @@ public class JusticiableTelefonoDTO {
 	    StringBuilder sb = new StringBuilder();
 	    sb.append("class JusticiableTelefonoDTO {\n");
 	    
-	    sb.append("    telefonospersonas: ").append(toIndentedString(telefonospersonas)).append("\n");
+	    sb.append("    telefonosJusticiables: ").append(toIndentedString(telefonosJusticiables)).append("\n");
 	    sb.append("    error: ").append(toIndentedString(error)).append("\n");
 	    sb.append("}");
 	    return sb.toString();

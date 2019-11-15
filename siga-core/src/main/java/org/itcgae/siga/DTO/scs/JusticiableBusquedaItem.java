@@ -11,6 +11,7 @@ public class JusticiableBusquedaItem {
 	private String idInstitucion;
 	private String nif;
 	private String nombre;
+	private String nombreSolo;
 	private String asuntos;
 	private Date fechaModificacion;
 	private String idRol;
@@ -20,6 +21,11 @@ public class JusticiableBusquedaItem {
 	private String idPoblacion;
 	private String idProvincia;
 	private String codigoPostal;
+	private String apellidos;
+	private String apellido1;
+	private String apellido2;
+	private String numeroAsuntos;
+	private String ultimoAsunto;
 	
 	
 	/**
@@ -70,6 +76,22 @@ public class JusticiableBusquedaItem {
 		this.nif = nif;
 	}
 
+	/**
+	 **/
+	public JusticiableBusquedaItem nombreSolo(String nombreSolo) {
+		this.nombreSolo = nombreSolo;
+		return this;
+	}
+
+	@JsonProperty("nombreSolo")
+	public String getNombreSolo() {
+		return nombreSolo;
+	}
+
+	public void setNombreSolo(String nombreSolo) {
+		this.nombreSolo = nombreSolo;
+	}
+	
 	/**
 	 **/
 	public JusticiableBusquedaItem nombre(String nombre) {
@@ -229,6 +251,86 @@ public class JusticiableBusquedaItem {
 	public void setCodigoPostal(String codigoPostal) {
 		this.codigoPostal = codigoPostal;
 	}
+	
+	/**
+	 **/
+	public JusticiableBusquedaItem apellido1(String apellido1) {
+		this.apellido1 = apellido1;
+		return this;
+	}
+
+	@JsonProperty("apellido1")	
+	public String getApellido1() {
+		return apellido1;
+	}
+
+	public void setApellido1(String apellido1) {
+		this.apellido1 = apellido1;
+	}
+
+	/**
+	 **/
+	public JusticiableBusquedaItem apellido2(String apellido2) {
+		this.apellido2 = apellido2;
+		return this;
+	}
+
+	@JsonProperty("apellido2")	
+	public String getApellido2() {
+		return apellido2;
+	}
+
+	public void setApellido2(String apellido2) {
+		this.apellido2 = apellido2;
+	}
+
+	/**
+	 **/
+	public JusticiableBusquedaItem apellidos(String apellidos) {
+		this.apellidos = apellidos;
+		return this;
+	}
+
+	@JsonProperty("apellidos")
+	public String getApellidos() {
+		return apellidos;
+	}
+
+	public void setApellidos(String apellidos) {
+		this.apellidos = apellidos;
+	}
+	
+	/**
+	 **/
+	public JusticiableBusquedaItem numeroAsuntos(String numeroAsuntos) {
+		this.numeroAsuntos = numeroAsuntos;
+		return this;
+	}
+
+	@JsonProperty("numeroAsuntos")
+	public String getNumeroAsuntos() {
+		return numeroAsuntos;
+	}
+
+	public void setNumeroAsuntos(String numeroAsuntos) {
+		this.numeroAsuntos = numeroAsuntos;
+	}
+
+	/**
+	 **/
+	public JusticiableBusquedaItem ultimoAsunto(String ultimoAsunto) {
+		this.ultimoAsunto = ultimoAsunto;
+		return this;
+	}
+
+	@JsonProperty("ultimoAsunto")
+	public String getUltimoAsunto() {
+		return ultimoAsunto;
+	}
+
+	public void setUltimoAsunto(String ultimoAsunto) {
+		this.ultimoAsunto = ultimoAsunto;
+	}
 
 	@Override
 	public boolean equals(java.lang.Object o) {
@@ -244,6 +346,7 @@ public class JusticiableBusquedaItem {
 				&& Objects.equals(this.idInstitucion, justiciableBusquedaItem.idInstitucion)
 				&& Objects.equals(this.nif, justiciableBusquedaItem.nif)
 				&& Objects.equals(this.nombre, justiciableBusquedaItem.nombre)
+				&& Objects.equals(this.nombreSolo, justiciableBusquedaItem.nombreSolo)
 				&& Objects.equals(this.fechaModificacion, justiciableBusquedaItem.fechaModificacion)
 				&& Objects.equals(this.asuntos, justiciableBusquedaItem.asuntos)
 				&& Objects.equals(this.idRol, justiciableBusquedaItem.idRol)
@@ -252,26 +355,32 @@ public class JusticiableBusquedaItem {
 				&& Objects.equals(this.anioDesde, justiciableBusquedaItem.anioDesde)
 				&& Objects.equals(this.idPoblacion, justiciableBusquedaItem.idPoblacion)
 				&& Objects.equals(this.idProvincia, justiciableBusquedaItem.idProvincia)
-				&& Objects.equals(this.codigoPostal, justiciableBusquedaItem.codigoPostal);
+				&& Objects.equals(this.codigoPostal, justiciableBusquedaItem.codigoPostal)
+				&& Objects.equals(this.apellidos, justiciableBusquedaItem.apellidos)
+				&& Objects.equals(this.apellido1, justiciableBusquedaItem.apellido1)
+				&& Objects.equals(this.apellido2, justiciableBusquedaItem.apellido2)
+				&& Objects.equals(this.numeroAsuntos, justiciableBusquedaItem.numeroAsuntos)
+				&& Objects.equals(this.ultimoAsunto, justiciableBusquedaItem.ultimoAsunto);
 	}
 
 	
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(idPersona, idInstitucion, nif, nombre, fechaModificacion, asuntos, idRol,
-				anio, anioHasta, anioDesde, idPoblacion, idProvincia, codigoPostal);
+		return Objects.hash(idPersona, idInstitucion, nif, nombre, nombreSolo, fechaModificacion, asuntos, idRol,
+				anio, anioHasta, anioDesde, idPoblacion, idProvincia, codigoPostal, apellidos, apellido1, apellido2, numeroAsuntos, ultimoAsunto);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("class ProcedimientoItem {\n");
+		sb.append("class JusticiableBusquedaItem {\n");
 
 		sb.append("    idPersona: ").append(toIndentedString(idPersona)).append("\n");
 		sb.append("    idInstitucion: ").append(toIndentedString(idInstitucion)).append("\n");
 		sb.append("    nif: ").append(toIndentedString(nif)).append("\n");
 		sb.append("    nombre: ").append(toIndentedString(nombre)).append("\n");
+		sb.append("    nombreSolo: ").append(toIndentedString(nombreSolo)).append("\n");
 		sb.append("    fechaModificacion: ").append(toIndentedString(fechaModificacion)).append("\n");
 		sb.append("    asuntos: ").append(toIndentedString(asuntos)).append("\n");
 		sb.append("    idRol: ").append(toIndentedString(idRol)).append("\n");
@@ -281,7 +390,11 @@ public class JusticiableBusquedaItem {
 		sb.append("    idPoblacion: ").append(toIndentedString(idPoblacion)).append("\n");
 		sb.append("    idProvincia: ").append(toIndentedString(idProvincia)).append("\n");
 		sb.append("    codigoPostal: ").append(toIndentedString(codigoPostal)).append("\n");
-
+		sb.append("    apellidos: ").append(toIndentedString(apellidos)).append("\n");
+		sb.append("    apellido1: ").append(toIndentedString(apellido1)).append("\n");
+		sb.append("    apellido2: ").append(toIndentedString(apellido2)).append("\n");
+		sb.append("    numeroAsuntos: ").append(toIndentedString(numeroAsuntos)).append("\n");
+		sb.append("    ultimoAsunto: ").append(toIndentedString(ultimoAsunto)).append("\n");
 		
 		sb.append("}");
 		return sb.toString();

@@ -865,6 +865,18 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static String EVENTO_TIPO_FIESTA_AUTONOMICA = "Fiesta Autonómica";
 	
 	public static String EVENTO_TIPO_FESTIVO = "9";
-
 	
+	public static final String JUSTICIABLE_ROL_SOLICITANTE = "1";
+	public static final String JUSTICIABLE_ROL_CONTRARIO = "2";
+	public static final String JUSTICIABLE_ROL_REPRESENTANTE = "3";
+	public static final String JUSTICIABLE_ROL_UNIDADFAMILIAR = "4";
+	
+	public static final String TIPO_ASUNTO_EJG = "E";
+	public static final String TIPO_ASUNTO_DESIGNA = "D";
+	public static final String TIPO_ASUNTO_ASISTENCIA = "A";
+	public static final String TIPO_ASUNTO_SOJ = "S";
+
+	public static final String TIPO_ESTADO_EJG_DICTAMINADO = "6";
+	public static final String TIPO_ESTADO_EJG_RESUELTO_COMISION = "10";
+	public static final String TIPO_ESTADO_EJG_RESUELTA_IMPUGNACION = "13";
 }
