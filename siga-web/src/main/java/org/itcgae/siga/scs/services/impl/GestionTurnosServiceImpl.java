@@ -17,6 +17,8 @@ import org.itcgae.siga.DTO.scs.TurnosDTO;
 import org.itcgae.siga.DTO.scs.TurnosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
+import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
+import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
@@ -24,6 +26,9 @@ import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.ModModeloPerfiles;
+import org.itcgae.siga.db.entities.ModModeloPerfilesExample;
+import org.itcgae.siga.db.entities.ModModeloPerfilesKey;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
 import org.itcgae.siga.db.entities.ScsPartidapresupuestaria;
@@ -342,6 +347,104 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 	}
 
 	@Override
+	public Error guardartarjetaPesos(HttpServletRequest request, TarjetaPesosDTO tarjetaPesos) {
+		
+		LOGGER.info("guardarPerfilesModelo() -> Entrada al servicio para guardar datos perfiles");
+		Integer idOrdenacionNuevo = 0;
+		Error respuesta = new Error();
+		int response = 0;
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		
+		if (null != idInstitucion) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+			
+			if (null != usuarios && usuarios.size() > 0) {
+				AdmUsuarios usuario = usuarios.get(0);
+				try{
+					ScsOrdenacioncolas ordenacion = new ScsOrdenacioncolas();
+					NewIdDTO idOrdenacion = scsTurnosExtendsMapper.getIdOrdenacion(idInstitucion);
+					
+					idOrdenacionNuevo = (Integer.parseInt(idOrdenacion.getNewId()) + 1);
+					//añadimos las etiquetas seleccionadas
+					ScsOrdenacioncolas key = new ScsOrdenacioncolas();
+					key.setIdordenacioncolas(idOrdenacionNuevo);
+					key.setFechamodificacion(new Date());
+					key.setUsumodificacion(usuario.getUsumodificacion());
+					key.setAlfabeticoapellidos(Short.parseShort("0"));
+					key.setAntiguedadcola(Short.parseShort("0"));
+					key.setFechanacimiento(Short.parseShort("0"));
+					key.setNumerocolegiado(Short.parseShort("0"));
+					for (int i = 0; i < tarjetaPesos.getPesosSeleccionados().size(); i++) {
+						switch (tarjetaPesos.getPesosSeleccionados().get(i).getPor_filas()) {
+						case "ALFABETICOAPELLIDOS":
+							if(tarjetaPesos.getPesosSeleccionados().get(i).getOrden().equals("ascendente")) {
+								key.setAlfabeticoapellidos(Short.parseShort(tarjetaPesos.getPesosSeleccionados().get(i).getNumero()));								
+							}else {
+								key.setAlfabeticoapellidos(Short.parseShort("-"+tarjetaPesos.getPesosSeleccionados().get(i).getNumero()));
+							}
+							break;
+							
+						case "NUMEROCOLEGIADO":
+							if(tarjetaPesos.getPesosSeleccionados().get(i).getOrden().equals("ascendente")) {
+								key.setNumerocolegiado(Short.parseShort(tarjetaPesos.getPesosSeleccionados().get(i).getNumero()));
+							}else {
+								key.setNumerocolegiado(Short.parseShort("-"+tarjetaPesos.getPesosSeleccionados().get(i).getNumero()));
+							}
+							break;
+							
+						case "ANTIGUEDADCOLA":
+							if(tarjetaPesos.getPesosSeleccionados().get(i).getOrden().equals("ascendente")) {
+								key.setAntiguedadcola(Short.parseShort(tarjetaPesos.getPesosSeleccionados().get(i).getNumero()));
+							}else {
+								key.setAntiguedadcola(Short.parseShort("-"+tarjetaPesos.getPesosSeleccionados().get(i).getNumero()));
+							}
+							break;
+
+						case "FECHANACIMIENTO":
+							if(tarjetaPesos.getPesosSeleccionados().get(i).getOrden().equals("ascendente")) {
+								key.setFechanacimiento(Short.parseShort(tarjetaPesos.getPesosSeleccionados().get(i).getNumero()));
+							}else {
+								key.setFechanacimiento(Short.parseShort("-"+tarjetaPesos.getPesosSeleccionados().get(i).getNumero()));
+							}
+							break;
+							
+						default:
+							break;
+						}		
+						
+					}
+					
+					scsOrdenacioncolasExtendsMapper.insert(key);
+					ScsTurno turno = new ScsTurno();
+					turno.setIdturno(Integer.parseInt(tarjetaPesos.getIdturno()));
+					turno.setIdinstitucion(idInstitucion);
+					turno.setIdordenacioncolas(idOrdenacionNuevo);
+					response = scsTurnosExtendsMapper.updateByPrimaryKeySelective(turno);
+					
+					respuesta.setCode(200);
+					respuesta.setDescription("Datos perfiles del modelo guardados correctamente");
+					respuesta.setMessage("Updates correcto");
+				}catch(Exception e){
+					response = 0;
+					respuesta.setCode(500);
+					respuesta.setDescription(e.getMessage());
+					respuesta.setMessage("Error");
+				}
+				
+				
+			}
+		}
+		LOGGER.info("guardarPerfilesModelo() -> Salida del servicio para guardar datos perfiles");
+		return respuesta;
+	}
+	
+	
+	@Override
 	public InsertResponseDTO createTurnos(TurnosItem turnosItem, HttpServletRequest request) {
 		LOGGER.info("createModules() ->  Entrada al servicio para insertar modulos");
 
@@ -429,6 +532,7 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 						turno.setLetradoactuaciones(turnosItem.getLetradoactuaciones());
 						turno.setLetradoasistencias(turnosItem.getLetradoasistencias());
 						turno.setGuardias(Short.parseShort(turnosItem.getIdguardias()));
+						
 						turno.setVisibilidad("1");
 						
 
@@ -489,6 +593,14 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 					AdmUsuarios usuario = usuarios.get(0);
 					comboItems = scsOrdenacioncolasExtendsMapper.ordenColas(turnosItem);
+					
+//					if(null != comboItems && comboItems.size() > 0) {						
+//						ComboColaOrdenadaItem element = new ComboColaOrdenadaItem();
+//						element.setNumero("1");
+//						element.setPor_filas("prueba2");
+//						element.setOrden("desc");
+//						comboItems.add(0,element);				
+//						}
 					comboDTO.setColaOrden(comboItems);
 
 				

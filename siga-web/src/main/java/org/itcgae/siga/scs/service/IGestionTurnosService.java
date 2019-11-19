@@ -16,7 +16,9 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.PartidasJudicialesDTO;
 import org.itcgae.siga.DTOs.cen.PartidasJudicialesItem;
+import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
+import org.itcgae.siga.DTOs.gen.Error;
 
 public interface IGestionTurnosService {
 	public TurnosDTO busquedaTurnos(TurnosItem turnosItem, HttpServletRequest request);
@@ -32,5 +34,7 @@ public interface IGestionTurnosService {
 	public InsertResponseDTO createTurnos(TurnosItem turnosItem, HttpServletRequest request);
 	
 	public ComboDTO ordenColaEnvios(HttpServletRequest request, String idordenacioncolas);
+
+	public Error guardartarjetaPesos(HttpServletRequest request,TarjetaPesosDTO tarjetaPesos);
 
 }

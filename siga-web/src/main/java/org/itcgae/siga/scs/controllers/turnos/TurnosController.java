@@ -16,9 +16,11 @@ import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
 import org.itcgae.siga.DTOs.adm.UpdateResponseDTO;
 import org.itcgae.siga.DTOs.cen.ComboInstitucionDTO;
 import org.itcgae.siga.DTOs.com.ModelosComunicacionItem;
+import org.itcgae.siga.DTOs.com.TarjetaEtiquetasDTO;
+import org.itcgae.siga.DTOs.com.TarjetaPerfilesDTO;
+import org.itcgae.siga.DTOs.com.TarjetaPesosDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
-
- 
+import org.itcgae.siga.DTOs.gen.Error;
 import org.itcgae.siga.DTO.scs.CosteFijoDTO;
 import org.itcgae.siga.DTO.scs.FundamentoResolucionItem;
 import org.itcgae.siga.DTO.scs.TiposActuacionDTO;
@@ -166,6 +168,16 @@ public class TurnosController {
 			return new ResponseEntity<ComboColaOrdenadaDTO>(response, HttpStatus.OK);
 		else
 			return new ResponseEntity<ComboColaOrdenadaDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	@RequestMapping(value = "/turnos/tarjetaGuardarPesos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<Error> guardartarjetaPesos(HttpServletRequest request, @RequestBody TarjetaPesosDTO tarjetaPesos) {
+
+		Error response = turnosService.guardartarjetaPesos(request,tarjetaPesos);
+		if(response.getCode() == 200)
+			return new ResponseEntity<Error>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<Error>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
  
