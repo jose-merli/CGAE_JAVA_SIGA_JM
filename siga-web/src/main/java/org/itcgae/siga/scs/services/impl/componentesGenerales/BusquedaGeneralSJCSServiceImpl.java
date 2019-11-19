@@ -68,7 +68,7 @@ public class BusquedaGeneralSJCSServiceImpl implements BusquedaGeneralSJCSServic
 			}
 
 		}
-		LOGGER.info("searchColegiadosSJCS() -> Salida del servicio para obtener las zonas");
+		LOGGER.info("searchColegiadosSJCS() -> Salida del servicio para obtener los colegiados");
 		return colegiadosSJCSDTO;
 
 	}
