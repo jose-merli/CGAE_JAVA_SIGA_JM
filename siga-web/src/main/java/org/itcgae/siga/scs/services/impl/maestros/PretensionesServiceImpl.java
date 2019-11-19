@@ -333,8 +333,8 @@ public class PretensionesServiceImpl implements IPretensionesService {
 							pretension.setCodigoext(pretensionItem.getCodigoExt());
 							pretension.setFechamodificacion(new Date());
 							pretension.setUsumodificacion(usuario.getIdusuario().intValue());
-
-							pretension.setIdjurisdiccion(Short.valueOf(pretensionItem.getIdJurisdiccion()));
+							if(pretensionItem.getIdJurisdiccion() != null)
+								pretension.setIdjurisdiccion(Short.valueOf(pretensionItem.getIdJurisdiccion()));
 
 							GenRecursosCatalogos genRecursosCatalogos = new GenRecursosCatalogos();
 							genRecursosCatalogos.setIdrecurso(pretension.getDescripcion());

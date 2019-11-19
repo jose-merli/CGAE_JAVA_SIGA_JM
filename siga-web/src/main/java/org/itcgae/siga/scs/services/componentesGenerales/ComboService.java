@@ -28,4 +28,6 @@ public interface ComboService {
 
 	public ComboDTO comboRequisitosGuardias(HttpServletRequest request);
 	
+	public ComboDTO comboGuardias(HttpServletRequest request, String idTurno);
+	
 }
