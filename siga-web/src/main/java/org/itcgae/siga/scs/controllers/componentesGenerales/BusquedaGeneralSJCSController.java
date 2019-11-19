@@ -4,12 +4,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.itcgae.siga.DTO.scs.ColegiadosSJCSDTO;
 import org.itcgae.siga.DTO.scs.ColegiadosSJCSItem;
-import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.scs.services.componentesGenerales.BusquedaGeneralSJCSService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
