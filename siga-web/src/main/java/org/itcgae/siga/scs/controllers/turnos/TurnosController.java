@@ -144,6 +144,16 @@ public class TurnosController {
 
 	}
 	
+	@RequestMapping(value = "/turnos/updateConfiguracion", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> updateConfiguracion(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
+		UpdateResponseDTO response = turnosService.updateConfiguracion(turnosItem, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
 	@RequestMapping(value = "/turnos/createnewTurno", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> createTurnos(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
 		InsertResponseDTO response = turnosService.createTurnos(turnosItem, request);

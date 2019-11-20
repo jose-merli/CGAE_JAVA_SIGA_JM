@@ -296,13 +296,13 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 					scsTurno.setDescripcion(turnosItem.getDescripcion());
 					scsTurno.setRequisitos(turnosItem.getRequisitos());
 					scsTurno.setUsumodificacion(usuarios.get(0).getIdusuario());
-					scsTurno.setVisiblemovil(Short.parseShort(turnosItem.getVisiblemovil()));
-					scsTurno.setActivarretriccionacredit(turnosItem.getActivarretriccionacredit());
-					scsTurno.setValidarjustificaciones(turnosItem.getValidarjustificaciones());
-					scsTurno.setValidarinscripciones(turnosItem.getValidarinscripciones());
-					scsTurno.setLetradoactuaciones(turnosItem.getLetradoactuaciones());
-					scsTurno.setLetradoasistencias(turnosItem.getLetradoasistencias());
-					scsTurno.setGuardias(Short.parseShort(turnosItem.getIdguardias()));
+//					scsTurno.setVisiblemovil(Short.parseShort(turnosItem.getVisiblemovil()));
+//					scsTurno.setActivarretriccionacredit(turnosItem.getActivarretriccionacredit());
+//					scsTurno.setValidarjustificaciones(turnosItem.getValidarjustificaciones());
+//					scsTurno.setValidarinscripciones(turnosItem.getValidarinscripciones());
+//					scsTurno.setLetradoactuaciones(turnosItem.getLetradoactuaciones());
+//					scsTurno.setLetradoasistencias(turnosItem.getLetradoasistencias());
+//					scsTurno.setGuardias(Short.parseShort(turnosItem.getIdguardias()));
 
 					LOGGER.info(
 							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Salida a scsTipoactuacioncostefijoMapper para buscar los costes fijos propios");
@@ -310,7 +310,96 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 					LOGGER.info(
 							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Entrada a scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
 
-					response = scsTurnosExtendsMapper.updateByExample(scsTurno, example);
+					response = scsTurnosExtendsMapper.updateByPrimaryKeySelective(scsTurno);
+
+					LOGGER.info(
+							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
+				}
+
+				catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+
+				if (response == 0 && error.getDescription() == null) {
+					error.setCode(400);
+					error.setDescription("No se ha modificado la partida presupuestaria");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				} else if (response == 1 && existentes != 0) {
+					error.setCode(200);
+					error.setDescription(
+							"Se han modificiado la partida presupuestaria excepto algunos que tiene las mismas características");
+
+				} else if (error.getCode() == null) {
+					error.setCode(200);
+					error.setDescription("Se ha modificado la partida presupuestaria correctamente");
+				}
+
+				updateResponseDTO.setError(error);
+
+				LOGGER.info("updateCosteFijo() -> Salida del servicio para actualizar una partida presupuestaria");
+
+			}
+		}
+		return updateResponseDTO;
+	}
+	
+	@Override
+	public UpdateResponseDTO updateConfiguracion(TurnosItem turnosItem, HttpServletRequest request) {
+		LOGGER.info("updatePartidasPres() ->  Entrada al servicio para guardar edicion de Partida presupuestaria");
+
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		int existentes = 0;
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"updateCosteFijo() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					LOGGER.info(
+							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
+
+					ScsTurno turno = new ScsTurno();
+					turno.setIdturno(Integer.parseInt(turnosItem.getIdturno()));
+					turno.setIdinstitucion(idInstitucion);
+					turno.setVisiblemovil(Short.parseShort(turnosItem.getVisiblemovil()));
+					turno.setActivarretriccionacredit(turnosItem.getActivarretriccionacredit());
+					turno.setDesignadirecta("N");
+					turno.setFechamodificacion(new Date());
+					turno.setGuardias(Short.parseShort(turnosItem.getIdguardias()));
+					turno.setLetradoactuaciones(turnosItem.getLetradoactuaciones());
+					turno.setLetradoasistencias(turnosItem.getLetradoasistencias());
+					turno.setValidarinscripciones(turnosItem.getValidarinscripciones());
+					turno.setValidarjustificaciones(turnosItem.getValidarjustificaciones());
+						
+					LOGGER.info(
+							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Salida a scsTipoactuacioncostefijoMapper para buscar los costes fijos propios");
+
+					LOGGER.info(
+							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Entrada a scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
+
+					response = scsTurnosExtendsMapper.updateByPrimaryKeySelective(turno);
 
 					LOGGER.info(
 							"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
@@ -524,15 +613,14 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 						turno.setDescripcion(turnosItem.getDescripcion());
 						turno.setRequisitos(turnosItem.getRequisitos());
 						turno.setUsumodificacion(usuarios.get(0).getIdusuario());
-						turno.setGuardias(Short.parseShort(turnosItem.getIdguardias()));
-						turno.setVisiblemovil(Short.parseShort(turnosItem.getVisiblemovil()));
-						turno.setActivarretriccionacredit(turnosItem.getActivarretriccionacredit());
-						turno.setValidarjustificaciones(turnosItem.getValidarjustificaciones());
-						turno.setValidarinscripciones(turnosItem.getValidarinscripciones());
-						turno.setLetradoactuaciones(turnosItem.getLetradoactuaciones());
-						turno.setLetradoasistencias(turnosItem.getLetradoasistencias());
-						turno.setGuardias(Short.parseShort(turnosItem.getIdguardias()));
-						
+						turno.setGuardias(Short.parseShort("0"));
+						turno.setVisiblemovil(Short.parseShort("0"));
+						turno.setActivarretriccionacredit("S");
+						turno.setValidarjustificaciones("S");
+						turno.setValidarinscripciones("S");
+						turno.setLetradoactuaciones("N");
+						turno.setLetradoasistencias("N");
+						turno.setDesignadirecta("N");
 						turno.setVisibilidad("1");
 						
 
@@ -551,6 +639,8 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
 					insertResponseDTO.setStatus(SigaConstants.KO);
+					insertResponseDTO.setError(error);
+					return insertResponseDTO;
 				}
 			}
 		}
