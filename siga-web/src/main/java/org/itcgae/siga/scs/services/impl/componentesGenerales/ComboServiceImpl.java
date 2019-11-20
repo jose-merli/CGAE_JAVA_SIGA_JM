@@ -23,6 +23,7 @@ import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsJurisdiccionExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsMateriaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPartidasPresupuestariasExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsRequisitosGuardiasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsSubzonaExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTipoTurnosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTiposGuardiasExtendsMapper;
@@ -64,6 +65,9 @@ public class ComboServiceImpl implements ComboService {
 
 	@Autowired
 	private ScsTiposGuardiasExtendsMapper scsTiposGuardiasExtendsMapper;
+	
+	@Autowired
+	private ScsRequisitosGuardiasExtendsMapper scsRequisitosGuardiasExtendsMapper;
 
 	@Autowired
 	private ScsGrupofacturacionExtendsMapper scsGrupofacturacionExtendsMapper;
@@ -433,6 +437,40 @@ public class ComboServiceImpl implements ComboService {
 						"comboAreas() / scsTipoactuacionExtendsMapper.comboAreas() -> Entrada a scsTipoactuacionExtendsMapper para obtener las actuaciones");
 
 				List<ComboItem> comboItems = scsTiposGuardiasExtendsMapper.comboTiposGuardia(idLenguaje);
+
+				LOGGER.info(
+						"getComboActuacion() / scsTipoactuacionExtendsMapper.comboAreas() -> Salida a scsTipoactuacionExtendsMapper para obtener las actuaciones");
+
+				comboDTO.setCombooItems(comboItems);
+			}
+
+			LOGGER.info("getComboActuacion() -> Salida del servicio para obtener combo actuaciones");
+		}
+		return comboDTO;
+
+	}
+	
+	@Override
+	public ComboDTO comboRequisitosGuardias(HttpServletRequest request) {
+		LOGGER.info("comboAreas() -> Entrada al servicio para búsqueda de las areas");
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		String idLenguaje = "";
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		ComboDTO comboDTO = new ComboDTO();
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+				idLenguaje = usuario.getIdlenguaje();
+				LOGGER.info(
+						"comboAreas() / scsTipoactuacionExtendsMapper.comboAreas() -> Entrada a scsTipoactuacionExtendsMapper para obtener las actuaciones");
+
+				List<ComboItem> comboItems = scsRequisitosGuardiasExtendsMapper.comboRequisitosGuardia();
 
 				LOGGER.info(
 						"getComboActuacion() / scsTipoactuacionExtendsMapper.comboAreas() -> Salida a scsTipoactuacionExtendsMapper para obtener las actuaciones");

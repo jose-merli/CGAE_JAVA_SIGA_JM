@@ -22,5 +22,4 @@ public interface ScsTipoTurnosExtendsMapper extends ScsTipoturnoMapper{
 		@Result(column = "DESCRIPCION", property = "label", jdbcType = JdbcType.VARCHAR),
 	})
 	List<ComboItem> comboTurnos(String idLenguaje);
-	
 }

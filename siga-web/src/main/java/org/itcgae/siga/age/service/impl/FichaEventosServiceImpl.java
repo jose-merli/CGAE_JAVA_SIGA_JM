@@ -295,6 +295,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 						} catch (Exception e) {
 							error.setCode(400);
+							LOGGER.error(e);
 							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 						}
 
@@ -326,6 +327,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 						} catch (Exception e) {
 							error.setCode(400);
+							LOGGER.error(e);
+
 							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 						}
 						// SI ES TIPO FESTIVO AUTONOMICO
@@ -352,6 +355,8 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 
 						} catch (Exception e) {
 							error.setCode(400);
+							LOGGER.error(e);
+
 							error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 						}
 
@@ -556,6 +561,7 @@ public class FichaEventosServiceImpl implements IFichaEventosService {
 			} catch (Exception e) {
 				response = 0;
 				error.setCode(400);
+				LOGGER.error(e);
 				error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
 			}
 		}
