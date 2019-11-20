@@ -1,5 +1,5 @@
 
-package org.itcgae.siga.DTO.scs.guardia;
+package org.itcgae.siga.DTO.scs;
 
 import java.util.Date;
 

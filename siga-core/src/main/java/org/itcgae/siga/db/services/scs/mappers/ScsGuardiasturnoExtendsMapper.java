@@ -1,4 +1,4 @@
-package org.itcgae.siga.db.services.scs.mappers.guardia;
+package org.itcgae.siga.db.services.scs.mappers;
 
 import java.util.List;
 
@@ -6,10 +6,10 @@ import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTO.scs.guardia.GuardiasItem;
+import org.itcgae.siga.DTO.scs.GuardiasItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
-import org.itcgae.siga.db.services.scs.providers.guardia.ScsGuardiasturnoSqlExtendsProvider;
+import org.itcgae.siga.db.services.scs.providers.ScsGuardiasturnoSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
