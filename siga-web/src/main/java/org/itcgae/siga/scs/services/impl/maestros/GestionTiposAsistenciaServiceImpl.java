@@ -701,7 +701,7 @@ public class GestionTiposAsistenciaServiceImpl implements IGestionTiposAsistenci
 
 						if (recursos != null && recursos.size() > 0) {
 							error.setCode(400);
-							error.setDescription("messages.jgr.maestros.gestionFundamentosResolucion.existeFundamentosResolucionMismaDescripcion");
+							error.setDescription("messages.jgr.maestros.gestionFundamentosResolucion.existeTipoAsistenciaMismaDescripcion");
 
 						} else {
 

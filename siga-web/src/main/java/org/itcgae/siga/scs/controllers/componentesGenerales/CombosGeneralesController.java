@@ -74,8 +74,14 @@ public class CombosGeneralesController {
 	}
 	
 	@GetMapping("/jurisdicciones")
-	public ResponseEntity<ComboDTO> combo(HttpServletRequest request) {
+	public ResponseEntity<ComboDTO> comboJurisdicciones(HttpServletRequest request) {
 		ComboDTO response = comboService.getJurisdicciones(request);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
+	@GetMapping("/guardias")
+	public ResponseEntity<ComboDTO> comboGuardias(HttpServletRequest request, String idTurno) {
+		ComboDTO response = comboService.comboGuardias(request, idTurno);
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
