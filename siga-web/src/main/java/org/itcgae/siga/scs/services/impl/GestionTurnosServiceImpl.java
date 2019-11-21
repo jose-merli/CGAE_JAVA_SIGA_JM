@@ -1,6 +1,8 @@
 package org.itcgae.siga.scs.services.impl;
 
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -683,14 +685,6 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 					AdmUsuarios usuario = usuarios.get(0);
 					comboItems = scsOrdenacioncolasExtendsMapper.ordenColas(turnosItem);
-					
-//					if(null != comboItems && comboItems.size() > 0) {						
-//						ComboColaOrdenadaItem element = new ComboColaOrdenadaItem();
-//						element.setNumero("1");
-//						element.setPor_filas("prueba2");
-//						element.setOrden("desc");
-//						comboItems.add(0,element);				
-//						}
 					comboDTO.setColaOrden(comboItems);
 
 				
@@ -744,5 +738,59 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		return comboDTO;
 	}
 
+	@Override
+	public TurnosDTO busquedaColaOficio(TurnosItem turnosItem, HttpServletRequest request) {
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		TurnosDTO turnosDTO = new TurnosDTO();
+		List<TurnosItem> turnosItems = null;
+		String busquedaOrden = "";
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+
+				LOGGER.info(
+						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
+				ComboDTO comboDTO = new ComboDTO();
+				List<ComboItem> comboItems = new ArrayList<ComboItem>();
+				comboItems = scsOrdenacioncolasExtendsMapper.ordenColasEnvios(turnosItem.getIdordenacioncolas());				
+				comboDTO.setCombooItems(comboItems);
+				
+				for(int i =0;i < comboDTO.getCombooItems().size();i++) {
+				busquedaOrden +=comboDTO.getCombooItems().get(i).getValue() +",";
+				}
+				busquedaOrden = busquedaOrden.substring(0,busquedaOrden.length()-1);
+			Date prueba =	turnosItem.getFechaActual();
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");  
+			String strDate = dateFormat.format(prueba);
+				turnosItems = scsTurnosExtendsMapper.busquedaColaOficio(turnosItem,strDate, busquedaOrden, idInstitucion);
+
+				LOGGER.info(
+						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
+
+				if (turnosItems != null) {
+					turnosDTO.setTurnosItems(turnosItems);
+				}
+			}
+
+		}
+		LOGGER.info("searchCostesFijos() -> Salida del servicio para obtener los costes fijos");
+		return turnosDTO;
+	}
+	
 }
 

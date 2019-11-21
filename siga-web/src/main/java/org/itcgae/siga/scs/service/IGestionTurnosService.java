@@ -38,5 +38,6 @@ public interface IGestionTurnosService {
 	public Error guardartarjetaPesos(HttpServletRequest request,TarjetaPesosDTO tarjetaPesos);
 
 	public UpdateResponseDTO updateConfiguracion(TurnosItem turnosItem, HttpServletRequest request);
-
+	
+	public TurnosDTO busquedaColaOficio(TurnosItem turnosItem, HttpServletRequest request); 
 }

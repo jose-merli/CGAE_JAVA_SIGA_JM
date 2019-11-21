@@ -49,8 +49,101 @@ public class TurnosItem {
 	private String idordenacioncolas;
 	private String orden;
 	private String nombrepartidosjudiciales;
+	private String idinstitucion;
+	private String fechavalidacion;
+	private String fechasolicitud;
+	private String nifcif;
+	private String idpersona;
+	private String nombrepersona;
+	private String apellido1;
+	private String apellido2;
+	private String alfabeticoapellidos;
+	private String numerocolegiado;
+	private Date fechanacimiento;
+	private Date antiguedadcola;
+	private String saltos;
+	private String compensaciones;
+	private String fechabajapersona;
+	private Date fechaActual;
 	
-	
+	public String getFechavalidacion() {
+		return fechavalidacion;
+	}
+	public void setFechavalidacion(String fechavalidacion) {
+		this.fechavalidacion = fechavalidacion;
+	}
+	public String getFechasolicitud() {
+		return fechasolicitud;
+	}
+	public void setFechasolicitud(String fechasolicitud) {
+		this.fechasolicitud = fechasolicitud;
+	}
+	public String getNifcif() {
+		return nifcif;
+	}
+	public void setNifcif(String nifcif) {
+		this.nifcif = nifcif;
+	}
+	public String getIdpersona() {
+		return idpersona;
+	}
+	public void setIdpersona(String idpersona) {
+		this.idpersona = idpersona;
+	}
+	public String getNombrepersona() {
+		return nombrepersona;
+	}
+	public void setNombrepersona(String nombrepersona) {
+		this.nombrepersona = nombrepersona;
+	}
+	public String getApellido1() {
+		return apellido1;
+	}
+	public void setApellido1(String apellido1) {
+		this.apellido1 = apellido1;
+	}
+	public String getApellido2() {
+		return apellido2;
+	}
+	public void setApellido2(String apellido2) {
+		this.apellido2 = apellido2;
+	}
+	public String getAlfabeticoapellidos() {
+		return alfabeticoapellidos;
+	}
+	public void setAlfabeticoapellidos(String alfabeticoapellidos) {
+		this.alfabeticoapellidos = alfabeticoapellidos;
+	}
+	public String getNumerocolegiado() {
+		return numerocolegiado;
+	}
+	public void setNumerocolegiado(String numerocolegiado) {
+		this.numerocolegiado = numerocolegiado;
+	}
+	public Date getFechanacimiento() {
+		return fechanacimiento;
+	}
+	public void setFechanacimiento(Date fechanacimiento) {
+		this.fechanacimiento = fechanacimiento;
+	}
+	public Date getAntiguedadcola() {
+		return antiguedadcola;
+	}
+	public void setAntiguedadcola(Date antiguedadcola) {
+		this.antiguedadcola = antiguedadcola;
+	}
+	public String getSaltos() {
+		return saltos;
+	}
+	public void setSaltos(String saltos) {
+		this.saltos = saltos;
+	}
+	public String getCompensaciones() {
+		return compensaciones;
+	}
+	public void setCompensaciones(String compensaciones) {
+		this.compensaciones = compensaciones;
+	}
 	public String getVisiblemovil() {
 		return visiblemovil;
 	}
@@ -303,6 +396,24 @@ public class TurnosItem {
 	}
 	public void setNombrepartidosjudiciales(String nombrepartidosjudiciales) {
 		this.nombrepartidosjudiciales = nombrepartidosjudiciales;
+	}
+	public String getIdinstitucion() {
+		return idinstitucion;
+	}
+	public void setIdinstitucion(String idinstitucion) {
+		this.idinstitucion = idinstitucion;
+	}
+	public String getFechabajapersona() {
+		return fechabajapersona;
+	}
+	public void setFechabajapersona(String fechabajapersona) {
+		this.fechabajapersona = fechabajapersona;
+	}
+	public Date getFechaActual() {
+		return fechaActual;
+	}
+	public void setFechaActual(Date fechaActual) {
+		this.fechaActual = fechaActual;
 	}
 
 

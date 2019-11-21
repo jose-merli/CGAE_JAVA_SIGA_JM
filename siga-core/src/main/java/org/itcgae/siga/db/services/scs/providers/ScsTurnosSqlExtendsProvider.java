@@ -122,4 +122,54 @@ public String busquedaFichaTurnos(TurnosItem turnosItem, Short idInstitucion) {
 		sql.FROM("scs_ordenacioncolas");
 		return sql.toString();
 		}
+	
+public String busquedaColaOficio(TurnosItem turnosItem,String busquedaOrden,String strDate, Short idInstitucion) {
+		
+		SQL sql = new SQL();
+		sql.SELECT("ROW_NUMBER()OVER(ORDER BY '"+busquedaOrden+"')as orden,consulta.*from(SELECT (CASE WHEN ins.fechavalidacion IS NOT NULL AND TRUNC(ins.fechavalidacion)<=nvl('"+strDate+"',ins.fechavalidacion)AND(ins.fechabaja is null or trunc(ins.fechabaja) > nvl('"+strDate+"','01/01/1900')) then '1' else '0' end)activo, ins.idinstitucion,ins.idturno, TO_CHAR(TRUNC(ins.fechavalidacion),'DD/MM/YYYY') as fechavalidacion, TO_CHAR(TRUNC(ins.fechabaja),'DD/MM/YYYY') as fechabajapersona,"
+				+ "ins.fechasolicitud as fechasolicitud, per.nifcif,per.idpersona,per.nombre as nombrepersona,per.apellidos1, DECODE(per.apellidos2, NULL,'',' ' || per.apellidos2) apellidos2,\r\n" + 
+				"    per.apellidos1 \r\n" + 
+				"    || DECODE(per.apellidos2,NULL,'',' '\r\n" + 
+				"    || per.apellidos2) alfabeticoapellidos,\r\n" + 
+				"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) numerocolegiado,\r\n" + 
+				"    per.fechanacimiento fechanacimiento,\r\n" + 
+				"    ins.fechavalidacion antiguedadcola,\r\n" + 
+				"     (\r\n" + 
+				"        SELECT\r\n" + 
+				"            COUNT(1) numero\r\n" + 
+				"        FROM\r\n" + 
+				"            scs_saltoscompensaciones salto\r\n" + 
+				"        WHERE\r\n" + 
+				"            salto.idinstitucion = tur.idinstitucion\r\n" + 
+				"            AND   salto.idturno = tur.IDTURNO\r\n" + 
+				"            AND   salto.idguardia IS NULL\r\n" + 
+				"            AND   salto.saltoocompensacion = 'S'\r\n" + 
+				"            AND   salto.fechacumplimiento IS NULL\r\n" + 
+				"            and   salto.idpersona = ins.IDPERSONA\r\n" + 
+				"    )  as saltos,\r\n" + 
+				"     (\r\n" + 
+				"        SELECT\r\n" + 
+				"            COUNT(1) numero\r\n" + 
+				"        FROM\r\n" + 
+				"            scs_saltoscompensaciones salto\r\n" + 
+				"        WHERE\r\n" + 
+				"            salto.idinstitucion = tur.idinstitucion\r\n" + 
+				"            AND   salto.idturno = tur.IDTURNO\r\n" + 
+				"            AND   salto.idguardia IS NULL\r\n" + 
+				"            AND   salto.saltoocompensacion = 'C'\r\n" + 
+				"            AND   salto.fechacumplimiento IS NULL\r\n" + 
+				"            and   salto.idpersona = ins.IDPERSONA\r\n" + 
+				"    )  as compensaciones\r\n" + 
+				"FROM\r\n" + 
+				"    scs_inscripcionturno ins\r\n" + 
+				"    INNER JOIN cen_persona per ON per.IDPERSONA = ins.IDPERSONA\r\n" + 
+				"    INNER JOIN cen_colegiado col ON col.idpersona = per.IDPERSONA and col.IDINSTITUCION = ins.IDINSTITUCION and col.IDPERSONA = ins.IDPERSONA \r\n" + 
+				"    INNER JOIN scs_turno tur ON tur.IDTURNO = ins.IDTURNO and tur.IDINSTITUCION = tur.IDINSTITUCION\r\n");
+		sql.WHERE("ins.fechavalidacion is not null and tur.idinstitucion= '"+idInstitucion+"'"+"and tur.idturno ='"+turnosItem.getIdturno()+"'");
+		if(!turnosItem.isHistorico()) {
+			sql.WHERE("ins.fechabaja is null");
+		}
+		return sql.toString()+")"+"consulta";
+		
+	}
 }
