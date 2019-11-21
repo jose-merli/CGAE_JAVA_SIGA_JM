@@ -14,7 +14,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 
 	private Logger LOGGER = Logger.getLogger(ScsPersonajgSqlExtendsProvider.class);
 
-	public String searchIdPersonaJusticiables(JusticiableBusquedaItem justiciableBusquedaItem, Short idInstitucion) {
+	public String searchIdPersonaJusticiables(JusticiableBusquedaItem justiciableBusquedaItem, Short idInstitucion, String tamMax){
 
 		LOGGER.info("INICIO MONTAJE SQL IDPERSONAS");
 
@@ -189,8 +189,12 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 			sql.WHERE("exists (" + sqlUnidadFamiliar + " union all " + sqlContrarioEjg + " union all "
 					+ sqlContrariosDesigna + " union all " + sqlDefendidosDesigna + " union all " + sqlSoj
 					+ " union all " + sqlContrariosAsistencia + " union all " + sqlAsistencia + ")");
+			
+		
 		}
 
+		sql.WHERE("rownum < " + tamMax);
+	
 		LOGGER.info("MONTADA SQL IDPERSONAS");
 
 		return sql.toString();
@@ -492,7 +496,7 @@ public class ScsPersonajgSqlExtendsProvider extends ScsPersonajgSqlProvider {
 
 		sql.GROUP_BY(
 				"idpersona , consulta.fechamodificacion, consulta.nif, consulta.nombre, consulta.apellido1, consulta.apellido2, consulta.idinstitucion");
-		sql.ORDER_BY("idpersona");
+		sql.ORDER_BY("apellidos");
 
 		LOGGER.info("MONTADA SQL JUSTICIABLES");
 

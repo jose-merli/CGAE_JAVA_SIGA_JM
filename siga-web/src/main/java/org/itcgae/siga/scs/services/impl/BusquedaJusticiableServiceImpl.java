@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,9 +13,13 @@ import org.itcgae.siga.DTOs.cen.StringDTO;
 import org.itcgae.siga.DTOs.gen.ComboDTO;
 import org.itcgae.siga.DTOs.gen.ComboItem;
 import org.itcgae.siga.DTOs.gen.Error;
+import org.itcgae.siga.commons.constants.SigaConstants;
 import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
+import org.itcgae.siga.db.entities.GenParametros;
+import org.itcgae.siga.db.entities.GenParametrosExample;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.adm.mappers.GenParametrosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPersonajgExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsRolesJusticiablesExtendsMapper;
 import org.itcgae.siga.scs.service.IBusquedaJusticiablesService;
@@ -35,6 +40,9 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 
 	@Autowired
 	private ScsPersonajgExtendsMapper scsPersonajgExtendsMapper;
+
+	@Autowired
+	private GenParametrosExtendsMapper genParametrosExtendsMapper;
 
 	@Override
 	public ComboDTO getComboRoles(HttpServletRequest request) {
@@ -92,6 +100,7 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 		List<StringDTO> idPersonaJusticiables = new ArrayList<StringDTO>();
 		List<JusticiableBusquedaItem> justiciablesItems = new ArrayList<JusticiableBusquedaItem>();
 		Error error = new Error();
+		List<GenParametros> tamMax = null;
 
 		if (idInstitucion != null) {
 
@@ -109,34 +118,55 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 			if (usuarios != null && usuarios.size() > 0) {
 
 				try {
+					// Solamente busca el valor de un justiciable
+					if (justiciableBusquedaItem.getIdPersona() != null
+							&& justiciableBusquedaItem.getIdPersona() != "") {
 
-					if(justiciableBusquedaItem.getIdPersona() != null && justiciableBusquedaItem.getIdPersona() != "") {
-						
 						StringDTO idPersona = new StringDTO();
 						idPersona.setValor(justiciableBusquedaItem.getIdPersona());
 						idPersonaJusticiables.add(idPersona);
+						// Busca los justiciables segun los filtros introducidos en la busqueda general
+						// de justiciables
+					} else {
+
+						GenParametrosExample genParametrosExample = new GenParametrosExample();
+
+						genParametrosExample.createCriteria().andModuloEqualTo("SCS")
+								.andParametroEqualTo("TAM_MAX_CONSULTA_JG")
+								.andIdinstitucionIn(Arrays.asList(SigaConstants.IDINSTITUCION_2000, idInstitucion));
+
+						genParametrosExample.setOrderByClause("IDINSTITUCION DESC");
+
+						LOGGER.info(
+								"searchJusticiables() / genParametrosExtendsMapper.selectByExample() -> Entrada a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
+						tamMax = genParametrosExtendsMapper.selectByExample(genParametrosExample);
+
+						LOGGER.info(
+								"searchJusticiables() / genParametrosExtendsMapper.selectByExample() -> Salida a genParametrosExtendsMapper para obtener tamaño máximo consulta");
+
 						
-					}else {
 						LOGGER.info(
 								"searchJusticiables() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener las personas justiciables");
 
-						idPersonaJusticiables = scsPersonajgExtendsMapper.searchIdPersonaJusticiables(justiciableBusquedaItem, idInstitucion);
+						idPersonaJusticiables = scsPersonajgExtendsMapper
+								.searchIdPersonaJusticiables(justiciableBusquedaItem, idInstitucion, tamMax.get(0).getValor());
 
 						LOGGER.info(
 								"searchJusticiables() / scsPersonajgExtendsMapper.searchIdPersonaJusticiables() -> Salida a scsPersonajgExtendsMapper para obtener las personas justiciables");
+
 					}
-					
+
 					if (idPersonaJusticiables != null && idPersonaJusticiables.size() > 0) {
 
 						LOGGER.info(
 								"searchJusticiables() / scsPersonajgExtendsMapper.searchJusticiables() -> Entrada a scsPersonajgExtendsMapper para obtener justiciables");
 
-						justiciablesItems = scsPersonajgExtendsMapper.searchJusticiables(idPersonaJusticiables, idInstitucion);
+						justiciablesItems = scsPersonajgExtendsMapper.searchJusticiables(idPersonaJusticiables,
+								idInstitucion);
 
 						LOGGER.info(
 								"searchJusticiables() / scsPersonajgExtendsMapper.searchJusticiables() -> Salida a scsPersonajgExtendsMapper para obtener justiciables");
-
-
 
 						justiciableBusquedaDTO.setJusticiableBusquedaItem(justiciablesItems);
 					}

@@ -14,6 +14,7 @@ public class JusticiableItem {
 	private String asuntos;
 	private Date fechaModificacion;
 	private Date fechaNacimiento;
+	private Date fechaAlta;
 	private String idPais;
 	private String apellidos;
 	private String apellido1;
@@ -64,6 +65,8 @@ public class JusticiableItem {
 	private String asistidoAutorizaeejg;
 	private String autorizaAvisoTelematico;
 	private List<JusticiableTelefonoItem> telefonos;
+	private String parentesco;
+	private String tipoJusticiable;
 
 	/**
 	 **/
@@ -159,6 +162,22 @@ public class JusticiableItem {
 
 	public void setFechaModificacion(Date fechaModificacion) {
 		this.fechaModificacion = fechaModificacion;
+	}
+	
+	/**
+	 **/
+	public JusticiableItem fechaAlta(Date fechaAlta) {
+		this.fechaAlta = fechaAlta;
+		return this;
+	}
+
+	@JsonProperty("fechaalta")
+	public Date getFechaAlta() {
+		return fechaAlta;
+	}
+
+	public void setFechaAlta(Date fechaAlta) {
+		this.fechaAlta = fechaAlta;
 	}
 
 	/**
@@ -976,6 +995,38 @@ public class JusticiableItem {
 	public void setTelefonos(List<JusticiableTelefonoItem> telefonos) {
 		this.telefonos = telefonos;
 	}
+	
+	/**
+	 **/
+	public JusticiableItem parentesco(String parentesco) {
+		this.parentesco = parentesco;
+		return this;
+	}
+
+	@JsonProperty("parentesco")
+	public String getParentesco() {
+		return parentesco;
+	}
+
+	public void setParentesco(String parentesco) {
+		this.parentesco = parentesco;
+	}
+	
+	/**
+	 **/
+	public JusticiableItem tipoJusticiable(String tipoJusticiable) {
+		this.tipoJusticiable = tipoJusticiable;
+		return this;
+	}
+
+	@JsonProperty("tipojusticiable")
+	public String getTipoJusticiable() {
+		return tipoJusticiable;
+	}
+
+	public void setTipoJusticiable(String tipoJusticiable) {
+		this.tipoJusticiable = tipoJusticiable;
+	}
 
 	@Override
 	public int hashCode() {
@@ -1001,6 +1052,7 @@ public class JusticiableItem {
 		result = prime * result + ((escaleraDir2 == null) ? 0 : escaleraDir2.hashCode());
 		result = prime * result + ((existeDomicilio == null) ? 0 : existeDomicilio.hashCode());
 		result = prime * result + ((fax == null) ? 0 : fax.hashCode());
+		result = prime * result + ((fechaAlta == null) ? 0 : fechaAlta.hashCode());
 		result = prime * result + ((fechaModificacion == null) ? 0 : fechaModificacion.hashCode());
 		result = prime * result + ((fechaNacimiento == null) ? 0 : fechaNacimiento.hashCode());
 		result = prime * result + ((idEstadoCivil == null) ? 0 : idEstadoCivil.hashCode());
@@ -1030,14 +1082,16 @@ public class JusticiableItem {
 		result = prime * result + ((numeroDir2 == null) ? 0 : numeroDir2.hashCode());
 		result = prime * result + ((numeroHijos == null) ? 0 : numeroHijos.hashCode());
 		result = prime * result + ((observaciones == null) ? 0 : observaciones.hashCode());
+		result = prime * result + ((parentesco == null) ? 0 : parentesco.hashCode());
 		result = prime * result + ((pisoDir == null) ? 0 : pisoDir.hashCode());
 		result = prime * result + ((pisoDir2 == null) ? 0 : pisoDir2.hashCode());
 		result = prime * result + ((puertaDir == null) ? 0 : puertaDir.hashCode());
 		result = prime * result + ((puertaDir2 == null) ? 0 : puertaDir2.hashCode());
 		result = prime * result + ((regimen_conyugal == null) ? 0 : regimen_conyugal.hashCode());
 		result = prime * result + ((sexo == null) ? 0 : sexo.hashCode());
-		result = prime * result + ((tipoPersonajg == null) ? 0 : tipoPersonajg.hashCode());
 		result = prime * result + ((telefonos == null) ? 0 : telefonos.hashCode());
+		result = prime * result + ((tipoJusticiable == null) ? 0 : tipoJusticiable.hashCode());
+		result = prime * result + ((tipoPersonajg == null) ? 0 : tipoPersonajg.hashCode());
 		return result;
 	}
 
@@ -1058,12 +1112,12 @@ public class JusticiableItem {
 		if (apellido2 == null) {
 			if (other.apellido2 != null)
 				return false;
+		} else if (!apellido2.equals(other.apellido2))
+			return false;
 		if (apellidos == null) {
 			if (other.apellidos != null)
 				return false;
 		} else if (!apellidos.equals(other.apellidos))
-			return false;
-		} else if (!apellido2.equals(other.apellido2))
 			return false;
 		if (asistidoAutorizaeejg == null) {
 			if (other.asistidoAutorizaeejg != null)
@@ -1149,6 +1203,11 @@ public class JusticiableItem {
 			if (other.fax != null)
 				return false;
 		} else if (!fax.equals(other.fax))
+			return false;
+		if (fechaAlta == null) {
+			if (other.fechaAlta != null)
+				return false;
+		} else if (!fechaAlta.equals(other.fechaAlta))
 			return false;
 		if (fechaModificacion == null) {
 			if (other.fechaModificacion != null)
@@ -1295,6 +1354,11 @@ public class JusticiableItem {
 				return false;
 		} else if (!observaciones.equals(other.observaciones))
 			return false;
+		if (parentesco == null) {
+			if (other.parentesco != null)
+				return false;
+		} else if (!parentesco.equals(other.parentesco))
+			return false;
 		if (pisoDir == null) {
 			if (other.pisoDir != null)
 				return false;
@@ -1325,15 +1389,20 @@ public class JusticiableItem {
 				return false;
 		} else if (!sexo.equals(other.sexo))
 			return false;
-		if (tipoPersonajg == null) {
-			if (other.tipoPersonajg != null)
-				return false;
-		} else if (!tipoPersonajg.equals(other.tipoPersonajg))
-			return false;
 		if (telefonos == null) {
 			if (other.telefonos != null)
 				return false;
 		} else if (!telefonos.equals(other.telefonos))
+			return false;
+		if (tipoJusticiable == null) {
+			if (other.tipoJusticiable != null)
+				return false;
+		} else if (!tipoJusticiable.equals(other.tipoJusticiable))
+			return false;
+		if (tipoPersonajg == null) {
+			if (other.tipoPersonajg != null)
+				return false;
+		} else if (!tipoPersonajg.equals(other.tipoPersonajg))
 			return false;
 		return true;
 	}
@@ -1342,9 +1411,9 @@ public class JusticiableItem {
 	public String toString() {
 		return "JusticiableItem [idPersona=" + idPersona + ", idInstitucion=" + idInstitucion + ", nif=" + nif
 				+ ", nombre=" + nombre + ", asuntos=" + asuntos + ", fechaModificacion=" + fechaModificacion
-				+ ", fechaNacimiento=" + fechaNacimiento + ", idPais=" + idPais + ", apellidos=" + apellidos
-				+ ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", direccion=" + direccion
-				+ ", codigoPostal=" + codigoPostal + ", idProfesion=" + idProfesion + ", regimen_conyugal="
+				+ ", fechaNacimiento=" + fechaNacimiento + ", fechaAlta=" + fechaAlta + ", idPais=" + idPais
+				+ ", apellidos=" + apellidos + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", direccion="
+				+ direccion + ", codigoPostal=" + codigoPostal + ", idProfesion=" + idProfesion + ", regimen_conyugal="
 				+ regimen_conyugal + ", idProvincia=" + idProvincia + ", idPoblacion=" + idPoblacion
 				+ ", idEstadoCivil=" + idEstadoCivil + ", tipoPersonajg=" + tipoPersonajg + ", idTipoIdentificacion="
 				+ idTipoIdentificacion + ", observaciones=" + observaciones + ", idRepresentantejg=" + idRepresentantejg
@@ -1360,9 +1429,10 @@ public class JusticiableItem {
 				+ ", descPaisDir1=" + descPaisDir1 + ", descPaisDir2=" + descPaisDir2 + ", idTipoIdentificacionotros="
 				+ idTipoIdentificacionotros + ", asistidoSolicitajg=" + asistidoSolicitajg + ", asistidoAutorizaeejg="
 				+ asistidoAutorizaeejg + ", autorizaAvisoTelematico=" + autorizaAvisoTelematico + ", telefonos="
-				+ telefonos + "]";
+				+ telefonos + ", parentesco=" + parentesco + ", tipoJusticiable=" + tipoJusticiable + "]";
 	}
-	
+
+
 	
 
 }

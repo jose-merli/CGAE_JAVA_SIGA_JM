@@ -70,7 +70,7 @@ public class JusticiablesController {
 	}
 	
 	@RequestMapping(value = "/gestionJusticiables/searchJusticiable", method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
-	ResponseEntity<JusticiableDTO> busquedaJusticiable(@RequestBody JusticiableBusquedaItem justiciableBusquedaItem,HttpServletRequest request) {
+	ResponseEntity<JusticiableDTO> searchJusticiable(@RequestBody JusticiableBusquedaItem justiciableBusquedaItem,HttpServletRequest request) {
 		JusticiableDTO response = gestionJusticiableService.searchJusticiable(justiciableBusquedaItem, request);
 		return new ResponseEntity<JusticiableDTO>(response, HttpStatus.OK);
 	}

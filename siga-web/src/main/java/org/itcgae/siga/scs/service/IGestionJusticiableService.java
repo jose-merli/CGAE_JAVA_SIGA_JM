@@ -26,7 +26,7 @@ public interface IGestionJusticiableService {
 
 	public JusticiableDTO searchJusticiable (JusticiableBusquedaItem justiciableBusquedaItem, HttpServletRequest request);
 
-	public InsertResponseDTO createJusticiable(JusticiableItem justiciableItem, HttpServletRequest request);
+	public InsertResponseDTO createJusticiable(JusticiableItem justiciableItem,  HttpServletRequest request);
 	
 	public UpdateResponseDTO updateJusticiable(JusticiableItem justiciableItem, boolean datosGenerales, HttpServletRequest request);
 	
@@ -40,8 +40,5 @@ public interface IGestionJusticiableService {
 
 	public UpdateResponseDTO associateRepresentante(JusticiableItem justiciableItem, HttpServletRequest request);
 
-	public UpdateResponseDTO disassociateRepresentante(JusticiableItem justiciableItem, HttpServletRequest request);
-
-
-	
+	public UpdateResponseDTO disassociateRepresentante(JusticiableItem justiciableItem, HttpServletRequest request);	
 }

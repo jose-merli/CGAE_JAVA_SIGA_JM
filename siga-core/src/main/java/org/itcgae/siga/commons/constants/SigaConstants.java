@@ -879,4 +879,15 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String TIPO_ESTADO_EJG_DICTAMINADO = "6";
 	public static final String TIPO_ESTADO_EJG_RESUELTO_COMISION = "10";
 	public static final String TIPO_ESTADO_EJG_RESUELTA_IMPUGNACION = "13";
+	
+	public static final String SCS_JUSTICIABLE = "0";
+	public static final String SCS_SOLICITANTE_EJG = "1";
+	public static final String SCS_UNIDAD_FAMILIAR_EJG = "2";
+	public static final String SCS_CONTRARIO_EJG = "3";
+	public static final String SCS_DESIGNACION = "4";
+	public static final String SCS_CONTRARIO_ASISTENCIA = "5";
+	public static final String SCS_SOLICITANTE_DESIGNACION = "6";
+	public static final String SCS_SOLICITANTE_ASISTENCIA = "7";
+
+	
 }
