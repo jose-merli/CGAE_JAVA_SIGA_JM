@@ -35,7 +35,7 @@ public class ScsPretensionSqlExtendsProvider extends ScsPretensionSqlProvider{
 		if(pretensionItem.getIdPretension() != null && pretensionItem.getIdPretension() != "") {
 			sql.WHERE("PRETENSIONESPROC.IDPROCEDIMIENTO = '" + pretensionItem.getIdPretension() + "'");
 		}
-		if(pretensionItem.getDescripcion() != null && pretensionItem.getDescripcion() != "" && pretensionItem.getDescripcion().length() > 2) {
+		if(pretensionItem.getDescripcion() != null && pretensionItem.getDescripcion() != "") {
 			sql.WHERE("UPPER(CATPRETENSION.DESCRIPCION) LIKE UPPER('%" + pretensionItem.getDescripcion() + "%')");
 		}
 	
