@@ -301,6 +301,7 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				for (RetencionIRPFItem retencionItem : retencionDTO.getRetencionIrpfItems()) {
+					scsRetencionesList= null;
 
 					try {
 						ScsMaestroretencionesExample example = new ScsMaestroretencionesExample();
