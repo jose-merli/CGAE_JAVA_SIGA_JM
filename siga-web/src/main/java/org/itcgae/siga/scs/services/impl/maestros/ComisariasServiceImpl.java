@@ -298,6 +298,8 @@ public class ComisariasServiceImpl implements IComisariasService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
+					if(comisariaItem.getCodigoExt() != null) {
+
 					ScsComisariaExample scsComisariaExample2 = new ScsComisariaExample();
 					scsComisariaExample2.createCriteria().andCodigoextEqualTo(comisariaItem.getCodigoExt())
 							.andIdinstitucionEqualTo(idInstitucion).andIdcomisariaNotEqualTo(Long.decode(comisariaItem.getIdComisaria())); ;
@@ -315,6 +317,7 @@ public class ComisariasServiceImpl implements IComisariasService {
 						error.setDescription("prisiones.error.literal.existeComisariaCode");
 						codeext = false;
 					} 
+					}
 					if(codeext) {
 
 					ScsComisariaExample example = new ScsComisariaExample();
@@ -429,6 +432,8 @@ public class ComisariasServiceImpl implements IComisariasService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
+					if(comisariaItem.getCodigoExt() != null) {
+
 					ScsComisariaExample scsComisariaExample2 = new ScsComisariaExample();
 					scsComisariaExample2.createCriteria().andCodigoextEqualTo(comisariaItem.getCodigoExt())
 							.andIdinstitucionEqualTo(idInstitucion);
@@ -446,6 +451,7 @@ public class ComisariasServiceImpl implements IComisariasService {
 						error.setDescription("prisiones.error.literal.existeComisariaCode");
 						insertResponseDTO.setStatus(SigaConstants.KO);
 						codeext = false;
+					}
 					}
 						if(codeext) {
 
