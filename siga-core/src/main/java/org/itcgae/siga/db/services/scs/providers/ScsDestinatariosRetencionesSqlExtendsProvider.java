@@ -30,7 +30,7 @@ public class ScsDestinatariosRetencionesSqlExtendsProvider extends FcsDestinatar
 			sql.WHERE("UPPER(nombre) like UPPER( '%" + destinatarioItem.getNombre() + "%')");
 		}
 		if (destinatarioItem.getOrden() != null && destinatarioItem.getOrden() != "") {
-			sql.WHERE("UPPER(orden) like UPPER('%" + destinatarioItem.getOrden() + "%')");
+			sql.WHERE("orden = '" + destinatarioItem.getOrden() + "'");
 		}
 		if (destinatarioItem.getCuentacontable() != null && destinatarioItem.getCuentacontable() != "") {
 			sql.WHERE("UPPER (cuentacontable) like UPPER('%" + destinatarioItem.getCuentacontable() + "%')");

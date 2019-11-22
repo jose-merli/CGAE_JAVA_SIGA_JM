@@ -206,13 +206,21 @@ public class GestionDestinatariosRetencionesServiceImpl implements IDestinatario
 								.selectByExample(example);
 
 						fcsDestinatariosRetenciones = fcsDestinatariosRetencionesLista.get(0);
-
+  
 						fcsDestinatariosRetenciones.setNombre(destinatariosItem.getNombre());
 						fcsDestinatariosRetenciones.setFechabaja(destinatariosItem.getFechabaja());
-						if (destinatariosItem.getOrden() != null && !destinatariosItem.getOrden().trim().equals(""))
+						if (destinatariosItem.getOrden() != null && !destinatariosItem.getOrden().trim().equals("")){
 							fcsDestinatariosRetenciones.setOrden(Short.parseShort(destinatariosItem.getOrden()));
-						if (destinatariosItem.getCuentacontable() != null && !destinatariosItem.getCuentacontable().trim().equals(""))
+						}else {
+							fcsDestinatariosRetenciones.setOrden(null);
+						}
+						
+						
+						if (destinatariosItem.getCuentacontable() != null && !destinatariosItem.getCuentacontable().trim().equals("")){
 							fcsDestinatariosRetenciones.setCuentacontable(destinatariosItem.getCuentacontable());
+						}else{
+							fcsDestinatariosRetenciones.setCuentacontable(null);
+						}
 						fcsDestinatariosRetenciones.setFechamodificacion(new Date());
 						fcsDestinatariosRetenciones.setUsumodificacion(usuario.getIdusuario());
 

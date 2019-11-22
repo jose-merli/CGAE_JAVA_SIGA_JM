@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class FichaZonasServiceImpl implements IFichaZonasService {
 
 	private Logger LOGGER = Logger.getLogger(FichaZonasServiceImpl.class);

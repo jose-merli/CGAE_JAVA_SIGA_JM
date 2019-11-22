@@ -44,6 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class FichaAreasServiceImpl implements IFichaAreasService {
 
 	private Logger LOGGER = Logger.getLogger(FichaAreasServiceImpl.class);
@@ -258,7 +259,25 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 			if (null != usuarios && usuarios.size() > 0) {
 
 				try {
+					boolean existe = false;
+					for (AreasItem areasItem : areasDTO.getAreasItems()) {
+						
+						ScsTurnoExample ejemploTurno = new ScsTurnoExample();
+						ejemploTurno.createCriteria().andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
+						List<ScsTurno> turnos = scsTurnoMapper.selectByExample(ejemploTurno);
 
+						ExpExpedienteExample ejemploExpediente = new ExpExpedienteExample();
+						ejemploExpediente.createCriteria().andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdinstitucionEqualTo(idInstitucion);
+						List<ExpExpediente> expedientes = expExpedienteMapper.selectByExample(ejemploExpediente);
+
+						if(!(turnos == null || turnos.size() == 0) || !(expedientes == null || expedientes.size() == 0)) {
+							existe = true; 
+						}
+					}
+					
+					if(!existe) {
+					
+					
 					for (AreasItem areasItem : areasDTO.getAreasItems()) {
 
 						// Eliminamos areas
@@ -285,6 +304,11 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 								"deleteAreas() / scsAreasMateriasExtendsMapper.deleteByExample() -> Salida de scsAreasMateriasExtendsMapper para eliminar las Areas seleccionadas");
 
 					}
+					}else{
+						
+							response = 2;
+						
+					}
 					
 				} catch (Exception e) {
 					response = 0;
@@ -300,7 +324,12 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 			error.setCode(400);
 			error.setDescription("areasmaterias.materias.ficha.eliminarError");
 			updateResponseDTO.setStatus(SigaConstants.KO);
-		} else {
+		}  else if(response == 2) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.areaEnUso");
+			updateResponseDTO.setStatus(SigaConstants.KO);	
+	
+		}else {
 			error.setCode(200);
 			error.setDescription("general.message.registro.actualizado");
 		}
@@ -602,7 +631,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 					for (AreasItem areasItem : areasDTO.getAreasItems()) {
 						
 						ScsTurnoExample ejemploTurno = new ScsTurnoExample();
-						ejemploTurno.createCriteria().andIdmateriaEqualTo(Short.parseShort(areasItem.getIdMateria())).andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdinstitucionEqualTo(idInstitucion);
+						ejemploTurno.createCriteria().andIdmateriaEqualTo(Short.parseShort(areasItem.getIdMateria())).andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
 						List<ScsTurno> turnos = scsTurnoMapper.selectByExample(ejemploTurno);
 
 						ExpExpedienteExample ejemploExpediente = new ExpExpedienteExample();
