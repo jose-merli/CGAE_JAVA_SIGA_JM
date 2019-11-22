@@ -256,6 +256,7 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 				}
 
 				} catch (Exception e) {
+					LOGGER.info(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -426,6 +427,7 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.info(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");

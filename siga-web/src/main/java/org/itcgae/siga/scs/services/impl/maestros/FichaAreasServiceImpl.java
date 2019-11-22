@@ -204,6 +204,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 								"deleteAreas() / scsAreasMateriasExtendsMapper.deleteByExample() -> Salida de scsAreasMateriasExtendsMapper para eliminar las Areas seleccionadas");
 
 				} catch (Exception e) {
+					LOGGER.info(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -311,6 +312,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 					}
 					
 				} catch (Exception e) {
+					LOGGER.info(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -415,6 +417,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 						}
 
 				} catch (Exception e) {
+					LOGGER.info(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -665,6 +668,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 					
 					
 				} catch (Exception e) {
+					LOGGER.info(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -789,6 +793,7 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 //						}
 
 				} catch (Exception e) {
+					LOGGER.info(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");

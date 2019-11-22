@@ -69,7 +69,7 @@ public class ScsProcuradorSqlExtendsProvider extends ScsProcuradorSqlProvider {
 		}
 		if (procuradorItem.getCodigoExt() != null && procuradorItem.getCodigoExt() != "") {
 			sql.AND();
-			sql.WHERE("UPPER(procurador.codigo) = UPPER('" + procuradorItem.getCodigoExt() + "')");
+			sql.WHERE("UPPER(procurador.codigo) like UPPER('%" + procuradorItem.getCodigoExt() + "%')");
 		}
 
 		if (!procuradorItem.getHistorico()) {
