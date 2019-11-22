@@ -461,11 +461,11 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 					List<GenRecursosCatalogos> l = genRecursosCatalogosExtendsMapper
 							.selectByExample(genRecursosCatalogosExample);
 
-					if (retencionItem.getDescripcionSociedad() != null
-							&& retencionItem.getDescripcionSociedad() != "") {
+					if (retencionItem.getTipoSociedad() != null
+							&& retencionItem.getTipoSociedad() != "") {
 						ScsMaestroretencionesExample example = new ScsMaestroretencionesExample();
 						example.createCriteria()
-								.andLetranifsociedadEqualTo(retencionItem.getDescripcionSociedad());
+								.andLetranifsociedadEqualTo(retencionItem.getTipoSociedad());
 
 						LOGGER.info(
 								"updateRetenciones() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Entrada a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
