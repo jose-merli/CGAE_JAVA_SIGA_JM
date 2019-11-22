@@ -145,6 +145,7 @@ public class ComisariasServiceImpl implements IComisariasService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -239,6 +240,7 @@ public class ComisariasServiceImpl implements IComisariasService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -274,7 +276,7 @@ public class ComisariasServiceImpl implements IComisariasService {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int response = 2;
-
+		Boolean codeext = true;
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -296,6 +298,24 @@ public class ComisariasServiceImpl implements IComisariasService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
+					ScsComisariaExample scsComisariaExample2 = new ScsComisariaExample();
+					scsComisariaExample2.createCriteria().andCodigoextEqualTo(comisariaItem.getCodigoExt())
+							.andIdinstitucionEqualTo(idInstitucion).andIdcomisariaNotEqualTo(Long.decode(comisariaItem.getIdComisaria())); ;
+
+					LOGGER.info(
+							"createComisaria() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prisión(CodigoExt)");
+
+					List<ScsComisaria> comisariaList2 = scsComisariaExtendsMapper.selectByExample(scsComisariaExample2);
+
+					LOGGER.info(
+							"createComisaria() / scsPrisionExtendsMapper.selectByExample() -> Salida a scsPrisionExtendsMapper para buscar la prisión(Códigoext)");
+
+					if (comisariaList2 != null && comisariaList2.size() > 0) {
+						error.setCode(400);
+						error.setDescription("prisiones.error.literal.existeComisariaCode");
+						codeext = false;
+					} 
+					if(codeext) {
 
 					ScsComisariaExample example = new ScsComisariaExample();
 					example.createCriteria().andNombreLike(comisariaItem.getNombre())
@@ -347,7 +367,9 @@ public class ComisariasServiceImpl implements IComisariasService {
 
 						response = scsComisariaExtendsMapper.updateByPrimaryKey(comisaria);
 					}
+					}
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -387,6 +409,8 @@ public class ComisariasServiceImpl implements IComisariasService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		long idComisaria = 0;
+		Boolean codeext = true;
+
 
 		if (null != idInstitucion) {
 
@@ -394,17 +418,36 @@ public class ComisariasServiceImpl implements IComisariasService {
 			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
 
 			LOGGER.info(
-					"createPrision() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"createComisaria() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
 
 			LOGGER.info(
-					"createPrision() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+					"createComisaria() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
 
 			if (null != usuarios && usuarios.size() > 0) {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
+					ScsComisariaExample scsComisariaExample2 = new ScsComisariaExample();
+					scsComisariaExample2.createCriteria().andCodigoextEqualTo(comisariaItem.getCodigoExt())
+							.andIdinstitucionEqualTo(idInstitucion);
+
+					LOGGER.info(
+							"createComisaria() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prisión(CodigoExt)");
+
+					List<ScsComisaria> comisariaList2 = scsComisariaExtendsMapper.selectByExample(scsComisariaExample2);
+
+					LOGGER.info(
+							"createComisaria() / scsPrisionExtendsMapper.selectByExample() -> Salida a scsPrisionExtendsMapper para buscar la prisión(Códigoext)");
+
+					if (comisariaList2 != null && comisariaList2.size() > 0) {
+						error.setCode(400);
+						error.setDescription("prisiones.error.literal.existeComisariaCode");
+						insertResponseDTO.setStatus(SigaConstants.KO);
+						codeext = false;
+					}
+						if(codeext) {
 
 					ScsComisariaExample scsComisariaExample = new ScsComisariaExample();
 					scsComisariaExample.createCriteria().andNombreEqualTo(comisariaItem.getNombre())
@@ -460,8 +503,9 @@ public class ComisariasServiceImpl implements IComisariasService {
 								"createPrision() / scsPrisionExtendsMapper.insert() -> Salida de scsPrisionExtendsMapper para insertar la nueva prision");
 
 					}
-
+					}
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");

@@ -287,6 +287,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					}
 					
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -437,6 +438,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 						
 					
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -526,6 +528,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					}
 					
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -613,6 +616,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					}
 					
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -702,6 +706,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					}
 					
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -886,6 +891,7 @@ public class FichaModulosYBasesServiceImpl implements IModulosYBasesService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400); 
 					error.setDescription("general.mensaje.error.bbdd");
