@@ -42,7 +42,7 @@ public class GestionPrisionesServiceImpl implements IGestionPrisionesService {
 		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
 		Error error = new Error();
 		int response = 2;
-
+		Boolean codeext = true;
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -64,26 +64,38 @@ public class GestionPrisionesServiceImpl implements IGestionPrisionesService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
+					if(prisionItem.getCodigoExt() != null) {
+						ScsPrisionExample scsPrisionExample2 = new ScsPrisionExample();
+						scsPrisionExample2.createCriteria().andCodigoextEqualTo(prisionItem.getCodigoExt())
+						.andIdprisionNotEqualTo(Long.valueOf(prisionItem.getIdPrision())).andIdinstitucionEqualTo(idInstitucion);
+						LOGGER.info(
+								"createPrision() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prision(codigoExt)");
 
-					ScsPrisionExample example = new ScsPrisionExample();
-					example.createCriteria().andNombreLike(prisionItem.getNombre())
-							.andIdinstitucionEqualTo(idInstitucion)
-							.andIdprisionNotEqualTo(Long.decode(prisionItem.getIdPrision()));
+						List<ScsPrision> prisionList2 = scsPrisionExtendsMapper.selectByExample(scsPrisionExample2);
 
-					LOGGER.info(
-							"updatePrision() / scsJuzgadoExtendsMapper.selectByExample() -> Entrada a scsJuzgadoExtendsMapper para buscar juzgado");
+						LOGGER.info(
+								"createPrision() / scsPrisionExtendsMapper.selectByExample() -> Salida a scsPrisionExtendsMapper para buscar la prisión (codigoExt)");
 
-					List<ScsPrision> prisionList = scsPrisionExtendsMapper.selectByExample(example);
+						if (prisionList2 != null && prisionList2.size() > 0) {
+							error.setCode(400);
+							error.setDescription("prisiones.error.literal.existePrisionCode");
+							codeext = false;
+						}
+					}
 
-					LOGGER.info(
-							"updatePrision() / scsJuzgadoExtendsMapper.selectByExample() -> Salida a scsJuzgadoExtendsMapper para buscar juzgado");
-
-					if (prisionList != null && prisionList.size() > 0) {
-						error.setCode(400);
-						error.setDescription("messages.jgr.maestros.gestionJuzgado.existeJuzgadoMismoNombre");
-
-					} else {
-
+					
+					if(codeext) {
+						ScsPrisionExample scsExample  = new ScsPrisionExample();
+						scsExample.createCriteria().andNombreEqualTo(prisionItem.getNombre())
+						.andIdprisionNotEqualTo(Long.valueOf(prisionItem.getIdPrision())).andIdinstitucionEqualTo(idInstitucion);
+						List<ScsPrision> scsPrisionListExample = scsPrisionExtendsMapper.selectByExample(scsExample);
+						if (scsPrisionListExample != null && scsPrisionListExample.size() > 0) {
+							error.setCode(400);
+							error.setDescription("prisiones.error.literal.existePrision");
+							codeext = false;
+						}else {
+						
+						
 						ScsPrisionExample scsPrisionExample  = new ScsPrisionExample();
 						scsPrisionExample.createCriteria().andIdprisionEqualTo(Long.valueOf(prisionItem.getIdPrision()))
 								.andIdinstitucionEqualTo(idInstitucion);
@@ -114,7 +126,10 @@ public class GestionPrisionesServiceImpl implements IGestionPrisionesService {
 
 						response = scsPrisionExtendsMapper.updateByPrimaryKey(prision);
 					}
+					}
+					
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -153,6 +168,7 @@ public class GestionPrisionesServiceImpl implements IGestionPrisionesService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		Boolean codeext = true;
 		long idPrision = 0;
 
 		if (null != idInstitucion) {
@@ -172,6 +188,29 @@ public class GestionPrisionesServiceImpl implements IGestionPrisionesService {
 				AdmUsuarios usuario = usuarios.get(0);
 
 				try {
+					
+					if(prisionItem.getCodigoExt() != null) {
+						ScsPrisionExample scsPrisionExample2 = new ScsPrisionExample();
+						scsPrisionExample2.createCriteria().andCodigoextLike(prisionItem.getCodigoExt())
+								.andIdinstitucionEqualTo(idInstitucion);
+						LOGGER.info(
+								"createPrision() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prision(codigoExt)");
+
+						List<ScsPrision> prisionList2 = scsPrisionExtendsMapper.selectByExample(scsPrisionExample2);
+
+						LOGGER.info(
+								"createPrision() / scsPrisionExtendsMapper.selectByExample() -> Salida a scsPrisionExtendsMapper para buscar la prisión (codigoExt)");
+
+						if (prisionList2 != null && prisionList2.size() > 0) {
+							error.setCode(400);
+							error.setDescription("prisiones.error.literal.existePrisionCode");
+							insertResponseDTO.setStatus(SigaConstants.KO);
+							codeext = false;
+						}
+					}
+
+					
+					if(codeext) {
 
 					ScsPrisionExample scsPrisionExample = new ScsPrisionExample();
 					scsPrisionExample.createCriteria().andNombreLike(prisionItem.getNombre())
@@ -187,7 +226,7 @@ public class GestionPrisionesServiceImpl implements IGestionPrisionesService {
 
 					if (prisionList != null && prisionList.size() > 0) {
 						error.setCode(400);
-						error.setDescription("messages.jgr.maestros.gestionJuzgado.existeJuzgadoMismoNombre");
+						error.setDescription("prisiones.error.literal.existePrision");
 						insertResponseDTO.setStatus(SigaConstants.KO);
 					} else {
 
@@ -228,8 +267,10 @@ public class GestionPrisionesServiceImpl implements IGestionPrisionesService {
 								"createPrision() / scsPrisionExtendsMapper.insert() -> Salida de scsPrisionExtendsMapper para insertar la nueva prision");
 
 					}
+					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");

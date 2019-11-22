@@ -20,6 +20,8 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
+import org.itcgae.siga.db.entities.ScsMaestroretenciones;
+import org.itcgae.siga.db.entities.ScsMaestroretencionesExample;
 import org.itcgae.siga.db.entities.ScsPretension;
 import org.itcgae.siga.db.entities.ScsPretensionExample;
 import org.itcgae.siga.db.entities.ScsProcedimientos;
@@ -161,6 +163,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -251,6 +254,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
 					}
 				}
 			} catch (Exception e) {
+				LOGGER.error(e);
 				response = 0;
 				error.setCode(400);
 				error.setDescription("general.mensaje.error.bbdd");
@@ -306,53 +310,76 @@ public class PretensionesServiceImpl implements IPretensionesService {
 				for (PretensionItem pretensionItem : pretensionDTO.getPretensionItems()) {
 
 					try {
-						// Obtenemos el fundamento de resolucion que queremos modificar
+
 						ScsPretensionExample example = new ScsPretensionExample();
-						example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdpretensionEqualTo(Short.valueOf(pretensionItem.getIdPretension()))
-								.andFechabajaIsNull();
+						example.createCriteria().andIdpretensionEqualTo(Short.valueOf(pretensionItem.getIdPretension()))
+								.andFechaBajaIsNull();
 
+						List<ScsPretension> scsPretensionListAux = scsPretensionExtendsMapper.selectByExample(example);
+
+						GenRecursosCatalogosExample genRecursosCatalogosExample = new GenRecursosCatalogosExample();
+						genRecursosCatalogosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+								.andIdrecursoNotEqualTo(scsPretensionListAux.get(0).getDescripcion())
+								.andDescripcionEqualTo(pretensionItem.getDescripcion())
+								.andCampotablaEqualTo("DESCRIPCION").andNombretablaEqualTo("scs_pretension");
+						List<GenRecursosCatalogos> scsPretensionesList = genRecursosCatalogosExtendsMapper
+								.selectByExample(genRecursosCatalogosExample);
 						LOGGER.info(
-								"updateFundamentoResolucion() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Entrada a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
+								"updateRetenciones() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Salida a scsTipofundamentosExtendsMapper para buscar  un fundamento resolucion");
+						if ((scsPretensionesList != null && scsPretensionesList.size() > 0)) {
+							error.setCode(400);
+							error.setDescription("messages.jgr.maestros.pretension.existeProcedimientoMismoNombre");
+						} else {
 
-						List<ScsPretension> scsPretensionList = scsPretensionExtendsMapper.selectByExample(example);
-
-						LOGGER.info(
-								"updateFundamentoResolucion() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Salida a scsTipofundamentosExtendsMapper para buscar  un fundamento resolucion");
-
-						if (scsPretensionList != null && scsPretensionList.size() > 0) {
+							// Obtenemos la pretension que queremos modificar
+							example = new ScsPretensionExample();
+							example.createCriteria().andIdinstitucionEqualTo(idInstitucion)
+									.andIdpretensionEqualTo(Short.valueOf(pretensionItem.getIdPretension()))
+									.andFechabajaIsNull();
 
 							LOGGER.info(
-									"updateFundamentosCalificacion() / scsFundamentoscalificacionExtendsMapper.selectByExample() -> Entrada a scsFundamentoscalificacionExtendsMapper para buscar el fundamento");
+									"updateFundamentoResolucion() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Entrada a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
+
+							List<ScsPretension> scsPretensionList = scsPretensionExtendsMapper.selectByExample(example);
 
 							LOGGER.info(
-									"updateFundamentosCalificacion() / scsFundamentoscalificacionExtendsMapper.selectByExample() -> Salida a scsFundamentoscalificacionExtendsMapper para buscar el fundamento");
+									"updateFundamentoResolucion() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Salida a scsTipofundamentosExtendsMapper para buscar  un fundamento resolucion");
 
-							ScsPretension pretension = scsPretensionList.get(0);
+							if (scsPretensionList != null && scsPretensionList.size() > 0) {
 
-							pretension.setCodigoext(pretensionItem.getCodigoExt());
-							pretension.setFechamodificacion(new Date());
-							pretension.setUsumodificacion(usuario.getIdusuario().intValue());
-							if(pretensionItem.getIdJurisdiccion() != null)
-								pretension.setIdjurisdiccion(Short.valueOf(pretensionItem.getIdJurisdiccion()));
+								LOGGER.info(
+										"updateFundamentosCalificacion() / scsFundamentoscalificacionExtendsMapper.selectByExample() -> Entrada a scsFundamentoscalificacionExtendsMapper para buscar el fundamento");
 
-							GenRecursosCatalogos genRecursosCatalogos = new GenRecursosCatalogos();
-							genRecursosCatalogos.setIdrecurso(pretension.getDescripcion());
-							genRecursosCatalogos.setIdinstitucion(idInstitucion);
-							genRecursosCatalogos.setIdlenguaje(usuarios.get(0).getIdlenguaje());
-							genRecursosCatalogos = genRecursosCatalogosExtendsMapper
-									.selectByPrimaryKey(genRecursosCatalogos);
-							genRecursosCatalogos.setFechamodificacion(new Date());
-							genRecursosCatalogos.setUsumodificacion(usuario.getIdusuario().intValue());
-							genRecursosCatalogos.setDescripcion(pretensionItem.getDescripcion());
-							response = scsPretensionExtendsMapper.updateByPrimaryKey(pretension);
+								LOGGER.info(
+										"updateFundamentosCalificacion() / scsFundamentoscalificacionExtendsMapper.selectByExample() -> Salida a scsFundamentoscalificacionExtendsMapper para buscar el fundamento");
 
-							genRecursosCatalogosExtendsMapper.updateByPrimaryKey(genRecursosCatalogos);
-							updateRestoIdiomas(genRecursosCatalogos);
+								ScsPretension pretension = scsPretensionList.get(0);
 
-							updateResponseDTO.setId(pretension.getIdpretension().toString());
+								pretension.setCodigoext(pretensionItem.getCodigoExt());
+								pretension.setFechamodificacion(new Date());
+								pretension.setUsumodificacion(usuario.getIdusuario().intValue());
+								if (pretensionItem.getIdJurisdiccion() != null)
+									pretension.setIdjurisdiccion(Short.valueOf(pretensionItem.getIdJurisdiccion()));
+
+								GenRecursosCatalogos genRecursosCatalogos = new GenRecursosCatalogos();
+								genRecursosCatalogos.setIdrecurso(pretension.getDescripcion());
+								genRecursosCatalogos.setIdinstitucion(idInstitucion);
+								genRecursosCatalogos.setIdlenguaje(usuarios.get(0).getIdlenguaje());
+								genRecursosCatalogos = genRecursosCatalogosExtendsMapper
+										.selectByPrimaryKey(genRecursosCatalogos);
+								genRecursosCatalogos.setFechamodificacion(new Date());
+								genRecursosCatalogos.setUsumodificacion(usuario.getIdusuario().intValue());
+								genRecursosCatalogos.setDescripcion(pretensionItem.getDescripcion());
+								response = scsPretensionExtendsMapper.updateByPrimaryKey(pretension);
+
+								genRecursosCatalogosExtendsMapper.updateByPrimaryKey(genRecursosCatalogos);
+								updateRestoIdiomas(genRecursosCatalogos);
+
+								updateResponseDTO.setId(pretension.getIdpretension().toString());
+							}
 						}
 					} catch (Exception e) {
+						LOGGER.error(e);
 						response = 0;
 						error.setCode(400);
 						error.setDescription("messages.jgr.maestros.pretension.existeProcedimientoMismoNombre");
@@ -418,7 +445,9 @@ public class PretensionesServiceImpl implements IPretensionesService {
 
 					GenRecursosCatalogosExample genRecursosCatalogosExample = new GenRecursosCatalogosExample();
 					genRecursosCatalogosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andDescripcionEqualTo(pretensionItem.getDescripcion());
+							.andDescripcionEqualTo(pretensionItem.getDescripcion()).andCampotablaEqualTo("DESCRIPCION")
+							.andNombretablaEqualTo("scs_maestroretenciones");
+					;
 					List<GenRecursosCatalogos> l = genRecursosCatalogosExtendsMapper
 							.selectByExample(genRecursosCatalogosExample);
 
@@ -454,8 +483,8 @@ public class PretensionesServiceImpl implements IPretensionesService {
 
 						genRecursosCatalogos.setNombretabla("SCS_PRETENSION");
 						genRecursosCatalogos.setCampotabla("DESCRIPCION");
-						NewIdDTO idRC = genRecursosCatalogosExtendsMapper.getMaxIdRecursoCatalogo(idInstitucion.toString(),
-								usuario.getIdlenguaje());
+						NewIdDTO idRC = genRecursosCatalogosExtendsMapper
+								.getMaxIdRecursoCatalogo(idInstitucion.toString(), usuario.getIdlenguaje());
 						NewIdDTO idP = scsPretensionExtendsMapper.getIdPretension(idInstitucion);
 
 						if (idP == null) {
@@ -469,8 +498,8 @@ public class PretensionesServiceImpl implements IPretensionesService {
 
 						} else {
 							genRecursosCatalogos.setIdrecurso((Long.parseLong(idRC.getNewId()) + 1) + "");
-							genRecursosCatalogos.setIdrecursoalias(
-									"SCS_PRETENSION.descripcion." + idInstitucion + "." + genRecursosCatalogos.getIdrecurso());
+							genRecursosCatalogos.setIdrecursoalias("SCS_PRETENSION.descripcion." + idInstitucion + "."
+									+ genRecursosCatalogos.getIdrecurso());
 							pretension.setDescripcion(genRecursosCatalogos.getIdrecurso());
 						}
 
@@ -488,6 +517,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");

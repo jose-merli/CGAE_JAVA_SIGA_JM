@@ -44,7 +44,7 @@ public class ScsComisariaSqlExtendsProvider extends ScsComisariaSqlProvider {
 		}
 
 		if (comisariaItem.getCodigoExt() != null && comisariaItem.getCodigoExt() != "") {
-			sql.WHERE("UPPER(comisaria.codigoext) = UPPER('" + comisariaItem.getCodigoExt() + "')");
+			sql.WHERE("UPPER(comisaria.codigoext) LIKE UPPER('%" + comisariaItem.getCodigoExt() + "%')");
 		}
 
 		if (comisariaItem.getIdPoblacion() != null && comisariaItem.getIdPoblacion() != "") {

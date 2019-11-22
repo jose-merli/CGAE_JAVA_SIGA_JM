@@ -44,7 +44,7 @@ public class ScsPrisionSqlExtendsProvider extends ScsPrisionSqlProvider {
 		}
 
 		if (prisionItem.getCodigoExt() != null && prisionItem.getCodigoExt() != "") {
-			sql.WHERE("UPPER(prision.codigoext) = UPPER('" + prisionItem.getCodigoExt() + "')");
+			sql.WHERE("UPPER(prision.codigoext) LIKE UPPER('%" + prisionItem.getCodigoExt() + "%')");
 		}
 
 		if (prisionItem.getIdPoblacion() != null && prisionItem.getIdPoblacion() != "") {
