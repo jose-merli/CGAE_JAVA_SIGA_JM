@@ -133,5 +133,5 @@ public interface ScsTurnosExtendsMapper extends ScsTurnoMapper{
 			@Result(column = "VISIBLEMOVIL", property = "visiblemovil", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "IDJURISDICCION", property = "idjurisdiccion", jdbcType = JdbcType.DECIMAL),
 			@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.TIMESTAMP) })
-	    List<TurnosItem> busquedaColaOficio(TurnosItem turnosItem,String strDate,String busquedaOrden,Short idInstitucion);
+	    List<TurnosItem> busquedaColaOficio(TurnosItem turnosItem,String busquedaOrden,String strDate,Short idInstitucion);
 }

@@ -123,7 +123,7 @@ public String busquedaFichaTurnos(TurnosItem turnosItem, Short idInstitucion) {
 		return sql.toString();
 		}
 	
-public String busquedaColaOficio(TurnosItem turnosItem,String busquedaOrden,String strDate, Short idInstitucion) {
+public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String busquedaOrden, Short idInstitucion) {
 		
 		SQL sql = new SQL();
 		sql.SELECT("ROW_NUMBER()OVER(ORDER BY '"+busquedaOrden+"')as orden,consulta.*from(SELECT (CASE WHEN ins.fechavalidacion IS NOT NULL AND TRUNC(ins.fechavalidacion)<=nvl('"+strDate+"',ins.fechavalidacion)AND(ins.fechabaja is null or trunc(ins.fechabaja) > nvl('"+strDate+"','01/01/1900')) then '1' else '0' end)activo, ins.idinstitucion,ins.idturno, TO_CHAR(TRUNC(ins.fechavalidacion),'DD/MM/YYYY') as fechavalidacion, TO_CHAR(TRUNC(ins.fechabaja),'DD/MM/YYYY') as fechabajapersona,"
