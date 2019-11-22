@@ -46,7 +46,7 @@ public class ScsJuzgadoSqlExtendsProvider extends ScsJuzgadoSqlProvider{
 		}
 		
 		if(juzgadoItem.getCodigoExt() != null && juzgadoItem.getCodigoExt() != "") {
-			sql.WHERE("UPPER(juzgado.codigoext) = UPPER('"+ juzgadoItem.getCodigoExt() + "')");
+			sql.WHERE("UPPER(juzgado.codigoext) like UPPER('%"+ juzgadoItem.getCodigoExt() + "%')");
 		}
 		
 		if(juzgadoItem.getIdPoblacion() != null && juzgadoItem.getIdPoblacion() != "") {

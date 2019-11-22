@@ -202,27 +202,28 @@ public class GestionDestinatariosRetencionesServiceImpl implements IDestinatario
 								.andIddestinatarioEqualTo(Integer.parseInt(destinatariosItem.getIddestinatario()));
 
 						FcsDestinatariosRetenciones fcsDestinatariosRetenciones = new FcsDestinatariosRetenciones();
-						List<FcsDestinatariosRetenciones> fcsDestinatariosRetencionesLista = scsDestinatariosRetencionesExtendsMapper
-								.selectByExample(example);
+						List<FcsDestinatariosRetenciones> fcsDestinatariosRetencionesLista = null;
+						scsDestinatariosRetencionesExtendsMapper.selectByExample(example);
 
-						fcsDestinatariosRetenciones = fcsDestinatariosRetencionesLista.get(0);
-  
+						 if (destinatariosItem.getOrden() != null &&
+						 !destinatariosItem.getOrden().trim().equals("")){
+						 fcsDestinatariosRetenciones.setOrden(Short.parseShort(destinatariosItem.getOrden()));
+						 }else {
+						 fcsDestinatariosRetenciones.setOrden(null);
+						 }
+						 if (destinatariosItem.getCuentacontable() != null &&
+						 !destinatariosItem.getCuentacontable().trim().equals("")){
+						 fcsDestinatariosRetenciones.setCuentacontable(destinatariosItem.getCuentacontable());
+						 }else{
+						 fcsDestinatariosRetenciones.setCuentacontable(null);
+						 }
+						fcsDestinatariosRetenciones.setIdinstitucion(idInstitucion);
+						fcsDestinatariosRetenciones.setIddestinatario(Integer.parseInt(destinatariosItem.getIddestinatario()));
 						fcsDestinatariosRetenciones.setNombre(destinatariosItem.getNombre());
 						fcsDestinatariosRetenciones.setFechabaja(destinatariosItem.getFechabaja());
-						if (destinatariosItem.getOrden() != null && !destinatariosItem.getOrden().trim().equals("")){
-							fcsDestinatariosRetenciones.setOrden(Short.parseShort(destinatariosItem.getOrden()));
-						}else {
-							fcsDestinatariosRetenciones.setOrden(null);
-						}
-						
-						
-						if (destinatariosItem.getCuentacontable() != null && !destinatariosItem.getCuentacontable().trim().equals("")){
-							fcsDestinatariosRetenciones.setCuentacontable(destinatariosItem.getCuentacontable());
-						}else{
-							fcsDestinatariosRetenciones.setCuentacontable(null);
-						}
 						fcsDestinatariosRetenciones.setFechamodificacion(new Date());
 						fcsDestinatariosRetenciones.setUsumodificacion(usuario.getIdusuario());
+						fcsDestinatariosRetenciones.setBloqueado("N");
 
 						LOGGER.info(
 								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Salida a scsTipoactuacioncostefijoMapper para buscar los costes fijos propios");
@@ -230,8 +231,8 @@ public class GestionDestinatariosRetencionesServiceImpl implements IDestinatario
 						LOGGER.info(
 								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Entrada a scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
 
-						response = scsDestinatariosRetencionesExtendsMapper.updateByExample(fcsDestinatariosRetenciones,
-								example);
+						response = scsDestinatariosRetencionesExtendsMapper
+								.updateByPrimaryKey(fcsDestinatariosRetenciones);
 
 						LOGGER.info(
 								"updateCosteFijo() / scsTipoactuacioncostefijoMapper.insert() -> Salida de scsTipoactuacioncostefijoMapper para insertar el nuevo coste fijo");
@@ -307,7 +308,8 @@ public class GestionDestinatariosRetencionesServiceImpl implements IDestinatario
 					destinatariosRetenc.setIdinstitucion(idInstitucion);
 					if (destinatariosItem.getOrden() != null && !destinatariosItem.getOrden().trim().equals(""))
 						destinatariosRetenc.setOrden(Short.parseShort(destinatariosItem.getOrden()));
-					if (destinatariosItem.getCuentacontable() != null && !destinatariosItem.getCuentacontable().trim().equals(""))
+					if (destinatariosItem.getCuentacontable() != null
+							&& !destinatariosItem.getCuentacontable().trim().equals(""))
 						destinatariosRetenc.setCuentacontable(destinatariosItem.getCuentacontable());
 					destinatariosRetenc.setFechabaja(null);
 					destinatariosRetenc.setUsumodificacion(usuarios.get(0).getIdusuario());
