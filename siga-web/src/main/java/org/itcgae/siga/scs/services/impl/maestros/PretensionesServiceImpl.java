@@ -1,5 +1,3 @@
-
-
 package org.itcgae.siga.scs.services.impl.maestros;
 
 import java.util.ArrayList;
@@ -168,7 +166,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
                                        } catch (Exception e) {
                                                  LOGGER.error(e);
                                                  response = 0;
-                                                 error.setCode(400);
+                                                  error.setCode(400);
                                                  error.setDescription("general.mensaje.error.bbdd");
                                                  updateResponseDTO.setStatus(SigaConstants.KO);
                                        }
@@ -315,14 +313,14 @@ public class PretensionesServiceImpl implements IPretensionesService {
                                                  try {
 
                                                            ScsPretensionExample example = new ScsPretensionExample();
-                                                 example.createCriteria().andIdpretensionEqualTo(Short.valueOf(pretensionItem.getIdPretension()))
-                                                                               .andFechaBajaIsNull();
+                                                 example.createCriteria().andIdpretensionEqualTo(Short.valueOf(pretensionItem.getIdPretension()));
+                                                                               
 
                                                            List<ScsPretension> scsPretensionListAux = scsPretensionExtendsMapper.selectByExample(example);
-
+                                                           ScsPretension newPretension = scsPretensionListAux.get(0); 
                                                            GenRecursosCatalogosExample genRecursosCatalogosExample = new GenRecursosCatalogosExample();
                                                  genRecursosCatalogosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-                                                                               .andIdrecursoNotEqualTo(scsPretensionListAux.get(0).getDescripcion())
+                                                                               .andIdrecursoNotEqualTo(newPretension.getDescripcion())
                                                                                .andDescripcionEqualTo(pretensionItem.getDescripcion())
                                                                      .andCampotablaEqualTo("DESCRIPCION").andNombretablaEqualTo("scs_pretension");
                                                            List<GenRecursosCatalogos> scsPretensionesList = genRecursosCatalogosExtendsMapper
@@ -385,7 +383,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
                                                            LOGGER.error(e);
                                                            response = 0;
                                                            error.setCode(400);
-                                                 error.setDescription("messages.jgr.maestros.pretension.existeProcedimientoMismoNombre");
+                                                           error.setDescription("general.mensaje.error.bbdd");
                                                            updateResponseDTO.setStatus(SigaConstants.KO);
                                                  }
                                        }
@@ -395,7 +393,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
 
                     if (response == 0) {
                               error.setCode(400);
-                    error.setDescription("messages.jgr.maestros.pretension.existeProcedimientoMismoNombre");
+                              error.setDescription("general.mensaje.error.bbdd");
                               updateResponseDTO.setStatus(SigaConstants.KO);
                     } else if (response == 1) {
                               error.setCode(200);
@@ -719,4 +717,5 @@ public class PretensionesServiceImpl implements IPretensionesService {
           }
 
 }
+
 
