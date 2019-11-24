@@ -20,6 +20,7 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
+import org.itcgae.siga.db.entities.ScsComisariaExample;
 import org.itcgae.siga.db.entities.ScsMaestroretenciones;
 import org.itcgae.siga.db.entities.ScsMaestroretencionesExample;
 import org.itcgae.siga.db.entities.ScsPretension;
@@ -312,14 +313,14 @@ public class PretensionesServiceImpl implements IPretensionesService {
 					try {
 
 						ScsPretensionExample example = new ScsPretensionExample();
-						example.createCriteria().andIdpretensionEqualTo(Short.valueOf(pretensionItem.getIdPretension()))
-								.andFechaBajaIsNull();
+						example.createCriteria().andIdpretensionEqualTo(Short.valueOf(pretensionItem.getIdPretension()));
+								
 
 						List<ScsPretension> scsPretensionListAux = scsPretensionExtendsMapper.selectByExample(example);
-
+						ScsPretension newPretension = scsPretensionListAux.get(0); 
 						GenRecursosCatalogosExample genRecursosCatalogosExample = new GenRecursosCatalogosExample();
 						genRecursosCatalogosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-								.andIdrecursoNotEqualTo(scsPretensionListAux.get(0).getDescripcion())
+								.andIdrecursoNotEqualTo(newPretension.getDescripcion())
 								.andDescripcionEqualTo(pretensionItem.getDescripcion())
 								.andCampotablaEqualTo("DESCRIPCION").andNombretablaEqualTo("scs_pretension");
 						List<GenRecursosCatalogos> scsPretensionesList = genRecursosCatalogosExtendsMapper
@@ -382,7 +383,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
 						LOGGER.error(e);
 						response = 0;
 						error.setCode(400);
-						error.setDescription("messages.jgr.maestros.pretension.existeProcedimientoMismoNombre");
+						error.setDescription("general.mensaje.error.bbdd");
 						updateResponseDTO.setStatus(SigaConstants.KO);
 					}
 				}
@@ -392,7 +393,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
 
 		if (response == 0) {
 			error.setCode(400);
-			error.setDescription("messages.jgr.maestros.pretension.existeProcedimientoMismoNombre");
+			error.setDescription("general.mensaje.error.bbdd");
 			updateResponseDTO.setStatus(SigaConstants.KO);
 		} else if (response == 1) {
 			error.setCode(200);
@@ -443,11 +444,13 @@ public class PretensionesServiceImpl implements IPretensionesService {
 					LOGGER.info(
 							"createPretension() / scsFundamentoscalificacionExtendsMapper.insert() -> Entrada a scsFundamentoscalificacionExtendsMapper para insertar el nuevo juzgado");
 
+					
 					GenRecursosCatalogosExample genRecursosCatalogosExample = new GenRecursosCatalogosExample();
-					genRecursosCatalogosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
-							.andDescripcionEqualTo(pretensionItem.getDescripcion()).andCampotablaEqualTo("DESCRIPCION")
-							.andNombretablaEqualTo("scs_maestroretenciones");
-					;
+					genRecursosCatalogosExample.createCriteria().andDescripcionEqualTo(pretensionItem.getDescripcion())
+					.andCampotablaEqualTo("DESCRIPCION")
+					.andNombretablaEqualTo("SCS_PRETENSION")
+					.andIdinstitucionEqualTo(idInstitucion);
+							
 					List<GenRecursosCatalogos> l = genRecursosCatalogosExtendsMapper
 							.selectByExample(genRecursosCatalogosExample);
 
@@ -515,6 +518,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
 								"createPretension() / scsPrisionExtendsMapper.insert() -> Salida de scsPrisionExtendsMapper para insertar la nueva prision");
 
 					}
+				
 
 				} catch (Exception e) {
 					LOGGER.error(e);
