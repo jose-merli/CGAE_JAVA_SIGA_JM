@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.impl.maestros;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -139,7 +140,19 @@ public class GestionZonasServiceImpl implements IGestionZonasService {
 						List<ScsTurno> turnos = scsTurnoMapper.selectByExample(ejemploTurno);
 
 						if(!(turnos == null || turnos.size() == 0)) {
-							existe = true; 
+							int totalTurnos = turnos.size();
+							int turnosBaja = 0;
+							for (Iterator iterator = turnos.iterator(); iterator.hasNext();) {
+								ScsTurno scsTurno = (ScsTurno) iterator.next();
+								if (null != scsTurno.getFechabaja() || scsTurno.getVisibilidad().equals("0") ) {
+									turnosBaja++;
+								}
+								
+							}
+							if (turnosBaja < totalTurnos ) {
+								//Todos los turnos están de baja
+								existe = true; 
+							}
 						}
 					}
 					if(!existe) {

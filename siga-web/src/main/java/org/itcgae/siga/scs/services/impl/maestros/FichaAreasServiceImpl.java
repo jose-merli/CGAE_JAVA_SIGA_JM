@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.impl.maestros;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -267,12 +268,25 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 						ejemploTurno.createCriteria().andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
 						List<ScsTurno> turnos = scsTurnoMapper.selectByExample(ejemploTurno);
 
-						ExpExpedienteExample ejemploExpediente = new ExpExpedienteExample();
-						ejemploExpediente.createCriteria().andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdinstitucionEqualTo(idInstitucion);
-						List<ExpExpediente> expedientes = expExpedienteMapper.selectByExample(ejemploExpediente);
+//						ExpExpedienteExample ejemploExpediente = new ExpExpedienteExample();
+//						ejemploExpediente.createCriteria().andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdinstitucionEqualTo(idInstitucion);
+//						List<ExpExpediente> expedientes = expExpedienteMapper.selectByExample(ejemploExpediente);
 
-						if(!(turnos == null || turnos.size() == 0) || !(expedientes == null || expedientes.size() == 0)) {
-							existe = true; 
+//						if(!(turnos == null || turnos.size() == 0) || !(expedientes == null || expedientes.size() == 0)) {
+						if(!(turnos == null || turnos.size() == 0) ) {
+							int totalTurnos = turnos.size();
+							int turnosBaja = 0;
+							for (Iterator iterator = turnos.iterator(); iterator.hasNext();) {
+								ScsTurno scsTurno = (ScsTurno) iterator.next();
+								if (null != scsTurno.getFechabaja() || scsTurno.getVisibilidad().equals("0") ) {
+									turnosBaja++;
+								}
+								
+							}
+							if (turnosBaja < totalTurnos ) {
+								//Todos los turnos están de baja
+								existe = true; 
+							}
 						}
 					}
 					
@@ -637,12 +651,25 @@ public class FichaAreasServiceImpl implements IFichaAreasService {
 						ejemploTurno.createCriteria().andIdmateriaEqualTo(Short.parseShort(areasItem.getIdMateria())).andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdinstitucionEqualTo(idInstitucion).andFechabajaIsNull();
 						List<ScsTurno> turnos = scsTurnoMapper.selectByExample(ejemploTurno);
 
-						ExpExpedienteExample ejemploExpediente = new ExpExpedienteExample();
-						ejemploExpediente.createCriteria().andIdmateriaEqualTo(Short.parseShort(areasItem.getIdMateria())).andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdinstitucionEqualTo(idInstitucion);
-						List<ExpExpediente> expedientes = expExpedienteMapper.selectByExample(ejemploExpediente);
-
-						if(!(turnos == null || turnos.size() == 0) || !(expedientes == null || expedientes.size() == 0)) {
-							existe = true; 
+//						ExpExpedienteExample ejemploExpediente = new ExpExpedienteExample();
+//						ejemploExpediente.createCriteria().andIdmateriaEqualTo(Short.parseShort(areasItem.getIdMateria())).andIdareaEqualTo(Short.parseShort(areasItem.getIdArea())).andIdinstitucionEqualTo(idInstitucion);
+//						List<ExpExpediente> expedientes = expExpedienteMapper.selectByExample(ejemploExpediente);
+//
+//						if(!(turnos == null || turnos.size() == 0) || !(expedientes == null || expedientes.size() == 0)) {
+						if(!(turnos == null || turnos.size() == 0) ) {
+							int totalTurnos = turnos.size();
+							int turnosBaja = 0;
+							for (Iterator iterator = turnos.iterator(); iterator.hasNext();) {
+								ScsTurno scsTurno = (ScsTurno) iterator.next();
+								if (null != scsTurno.getFechabaja() || scsTurno.getVisibilidad().equals("0") ) {
+									turnosBaja++;
+								}
+								
+							}
+							if (turnosBaja < totalTurnos ) {
+								//Todos los turnos están de baja
+								existe = true; 
+							}
 						}
 					}
 					
