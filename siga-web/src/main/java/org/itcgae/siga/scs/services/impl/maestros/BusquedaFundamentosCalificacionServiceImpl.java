@@ -554,16 +554,53 @@ public class BusquedaFundamentosCalificacionServiceImpl implements IBusquedaFund
 						
 						fundamento.setTextoplantilla(fundamentosCalificacionItem.getTextoEnPlantilla());
 						fundamento.setIdtipodictamenejg(Short.valueOf(fundamentosCalificacionItem.getIdTipoDictamenEjg()));
-
-						GenRecursosCatalogos genRecursosCatalogos = new GenRecursosCatalogos();
-						genRecursosCatalogos.setIdrecurso(fundamento.getDescripcion());
-						genRecursosCatalogos.setIdinstitucion(idInstitucion);
-						genRecursosCatalogos.setIdlenguaje(usuario.getIdlenguaje());
-						response = scsFundamentoscalificacionExtendsMapper.updateByPrimaryKey(fundamento);
 						
-						genRecursosCatalogos = genRecursosCatalogosExtendsMapper.selectByPrimaryKey(genRecursosCatalogos);
-						genRecursosCatalogosExtendsMapper.updateByPrimaryKey(genRecursosCatalogos);	
-						updateRestoIdiomas(genRecursosCatalogos);
+						
+						LOGGER.info(
+								"insertFundamentos() / scsFundamentoscalificacionExtendsMapper.insert() -> Entrada a scsFundamentoscalificacionExtendsMapper para insertar el nuevo juzgado");
+						GenRecursosCatalogosExample genRecursosCatalogosExample = new GenRecursosCatalogosExample();
+						genRecursosCatalogosExample.createCriteria().andIdinstitucionEqualTo(Short.valueOf(idInstitucion)).
+							andDescripcionEqualTo(fundamentosCalificacionItem.getDescripcionFundamento());
+						List<GenRecursosCatalogos> l = genRecursosCatalogosExtendsMapper.selectByExample(genRecursosCatalogosExample);
+						
+						GenRecursosCatalogos genRecursosCatalogos = new GenRecursosCatalogos();
+						if (l != null && l.size() > 0) {
+							genRecursosCatalogos.setIdrecurso(fundamento.getDescripcion());
+							genRecursosCatalogos.setIdinstitucion(idInstitucion);
+							genRecursosCatalogos.setIdlenguaje(usuario.getIdlenguaje());
+							genRecursosCatalogos = genRecursosCatalogosExtendsMapper.selectByPrimaryKey(genRecursosCatalogos);
+							genRecursosCatalogosExtendsMapper.updateByPrimaryKey(genRecursosCatalogos);	
+							updateRestoIdiomas(genRecursosCatalogos);
+							fundamento.setDescripcion(genRecursosCatalogos.getIdrecurso());
+						}else {
+							genRecursosCatalogos.setDescripcion(fundamentosCalificacionItem.getDescripcionFundamento());
+							genRecursosCatalogos.setFechamodificacion(new Date());
+							genRecursosCatalogos.setUsumodificacion(usuario.getIdusuario());
+							genRecursosCatalogos.setIdinstitucion(idInstitucion);
+							genRecursosCatalogos.setIdlenguaje(usuario.getIdlenguaje());
+							genRecursosCatalogos.setIdrecursoalias("scs_tipofundamentos.descripcion." + idInstitucion
+									+ "." + genRecursosCatalogos.getIdrecurso());
+							genRecursosCatalogos.setNombretabla("SCS_TIPOFUNDAMENTOCALIF");
+							genRecursosCatalogos.setCampotabla("DESCRIPCION");
+							NewIdDTO idJD = genRecursosCatalogosExtendsMapper.getMaxIdRecursoCatalogo(idInstitucion.toString(), usuario.getIdlenguaje());
+							if (idJD == null) {
+								genRecursosCatalogos.setIdrecurso("1");
+							} else {
+								genRecursosCatalogos.setIdrecurso((Long.parseLong(idJD.getNewId())+1)+"");
+							}
+							fundamento.setDescripcion(genRecursosCatalogos.getIdrecurso());
+							genRecursosCatalogosExtendsMapper.insert(genRecursosCatalogos);
+							insertarRestoIdiomas(genRecursosCatalogos);
+						}
+						
+						
+//						GenRecursosCatalogos genRecursosCatalogos = new GenRecursosCatalogos();
+//						genRecursosCatalogos.setIdrecurso(fundamento.getDescripcion());
+//						genRecursosCatalogos.setIdinstitucion(idInstitucion);
+//						genRecursosCatalogos.setIdlenguaje(usuario.getIdlenguaje());
+						response = scsFundamentoscalificacionExtendsMapper.updateByPrimaryKey(fundamento);
+							
+						
 							
 						updateResponseDTO.setId(fundamento.getIdfundamentocalif().toString());
 				
