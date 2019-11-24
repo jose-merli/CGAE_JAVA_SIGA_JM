@@ -173,6 +173,7 @@ public class BusquedaJusticiableServiceImpl implements IBusquedaJusticiablesServ
 
 				} catch (Exception e) {
 					error.setCode(400);
+					LOGGER.error(e);
 					error.setDescription("general.mensaje.error.bbdd");
 				}
 
