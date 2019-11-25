@@ -205,19 +205,23 @@ public class FichaPartidasPresupuestariasServiceImpl implements IPartidasPresupu
 							
 							PartidasItem ejemplo = new PartidasItem();
 							ejemplo.setNombrepartida(partidasItems.getNombrepartida());
-//							ejemplo.setDescripcion(partidasItem.getDescripcion());
 							ejemplo.setIdinstitucion(idInstitucion.toString());  
 							ejemplo.setIdpartidapresupuestaria(partidasItems.getIdpartidapresupuestaria());
 							List<PartidasItem> nombrePartidasDuplicadas = scsPartidaPresupuestariaExtendsMapper.searchPartidaPres(ejemplo);
 
 							PartidasItem ejemplo2 = new PartidasItem();
-//							ejemplo.setNombrepartida(partidasItem.getNombrepartida());
 							ejemplo2.setDescripcion(partidasItems.getDescripcion());
 							ejemplo2.setIdinstitucion(idInstitucion.toString());  
 							ejemplo2.setIdpartidapresupuestaria(partidasItems.getIdpartidapresupuestaria());
 							List<PartidasItem> descripcionPartidasDuplicadas = scsPartidaPresupuestariaExtendsMapper.searchPartidaPres(ejemplo2);
 							
-							
+							if((nombrePartidasDuplicadas != null && nombrePartidasDuplicadas.size() > 0) || (descripcionPartidasDuplicadas != null && descripcionPartidasDuplicadas.size()>0)) {
+								error.setCode(400);
+								error.setDescription("menu.justiciaGratuita.maestros.errorpartidapresupuestaria");
+								updateResponseDTO.setStatus(SigaConstants.KO);
+							}else {
+								
+						
 								LOGGER.info(
 										"updateCosteFijo() / scsTipoactuacioncostefijoMapper.selectByExample(example) -> Entrada a scsPartidasPresupuestariaMapper para buscar los costes fijos propios");
 
@@ -255,10 +259,11 @@ public class FichaPartidasPresupuestariasServiceImpl implements IPartidasPresupu
 							}
 							
 						}
-					
+				}
 					
 											
 					 catch (Exception e) {
+						LOGGER.error(e);
 						response = 0;
 						error.setCode(400);
 						error.setDescription("Se ha producido un error en BBDD contacte con su administrador");
@@ -335,6 +340,15 @@ public class FichaPartidasPresupuestariasServiceImpl implements IPartidasPresupu
 					
 					List<ScsPartidapresupuestaria> descripcionPartidasDuplicadas = scsPartidapresupuestariaMapper.selectByExample(ejemplo2);
 					
+					if((nombrePartidasDuplicadas != null && nombrePartidasDuplicadas.size() > 0) || (descripcionPartidasDuplicadas != null && descripcionPartidasDuplicadas.size()>0)) {
+						error.setCode(400);
+						error.setDescription("menu.justiciaGratuita.maestros.errorpartidapresupuestaria");
+						insertResponseDTO.setStatus(SigaConstants.KO);
+					}
+					else {
+						
+				
+					
 					LOGGER.info(
 							"updateGroupZone() / scsZonasExtendsMapper.selectByExample(ageEventoExample) -> Salida a scsPartidaPresupuestariaExtendsMapper para buscar la partida");
 
@@ -371,7 +385,7 @@ public class FichaPartidasPresupuestariasServiceImpl implements IPartidasPresupu
 						LOGGER.info(
 								"createPartidaPres() / scsAreasMateriasExtendsMapper.insert() -> Salida de scsAreasMateriasExtendsMapper para insertar una nueva area");
 					
-
+					}
 				} catch (Exception e) {
 					response = 0;
 					error.setCode(400);
