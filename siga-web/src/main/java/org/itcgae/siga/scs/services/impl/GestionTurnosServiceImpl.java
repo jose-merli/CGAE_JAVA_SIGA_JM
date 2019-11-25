@@ -31,6 +31,8 @@ import org.itcgae.siga.db.entities.ScsInscripcionturno;
 import org.itcgae.siga.db.entities.ScsInscripcionturnoExample;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolas;
 import org.itcgae.siga.db.entities.ScsOrdenacioncolasExample;
+import org.itcgae.siga.db.entities.ScsProcurador;
+import org.itcgae.siga.db.entities.ScsProcuradorExample;
 import org.itcgae.siga.db.entities.ScsTurno;
 import org.itcgae.siga.db.entities.ScsTurnoExample;
 import org.itcgae.siga.db.mappers.ScsGuardiasturnoMapper;
@@ -847,5 +849,96 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		LOGGER.info("busquedaColaOficio() -> Salida del servicio para obtener la busqueda Cola Oficio");
 		return turnosDTO;
 	}
+	
+	
+	@Override
+	public UpdateResponseDTO eliminateColaOficio(TurnosDTO turnosDTO, HttpServletRequest request) {
+		LOGGER.info("deleteModules() ->  Entrada al servicio para eliminar modulos");
 
+		UpdateResponseDTO updateResponseDTO = new UpdateResponseDTO();
+		Error error = new Error();
+		int response = 0;
+
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+
+		if (null != idInstitucion) {
+
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"deleteModules() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"deleteModules() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (null != usuarios && usuarios.size() > 0) {
+
+				try {
+
+					for (TurnosItem turnosItem : turnosDTO.getTurnosItems()) {
+						
+						ScsInscripcionturnoExample turno = new ScsInscripcionturnoExample();
+						turno.createCriteria().andIdinstitucionEqualTo(idInstitucion).andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno()))
+						.andIdpersonaEqualTo(Long.parseLong(turnosItem.getIdpersona()));
+
+
+						LOGGER.info(
+								"deleteProcuradores() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la prision");
+
+						List<ScsInscripcionturno> inscripcionturnosList = scsInscripcionturnoMapper.selectByExample(turno);
+														
+						if (null != inscripcionturnosList && inscripcionturnosList.size() > 0) {
+							
+							ScsInscripcionturno turnoupdate = inscripcionturnosList.get(0);
+									
+							if (turnosItem.getFechabajapersona() == null) {
+								turnoupdate.setFechabaja(new Date());
+							} else {
+								turnoupdate.setFechabaja(null);
+							}
+							turnoupdate.setFechamodificacion(new Date());
+							turnoupdate.setUsumodificacion(usuarios.get(0).getIdusuario());
+
+							LOGGER.info(
+									"deleteModules() / scsProcedimientosExtendsMapper.deleteByExample() -> Entrada a scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
+
+							response = scsInscripcionturnoMapper.updateByPrimaryKey(turnoupdate);
+						}
+						
+
+						LOGGER.info(
+								"deleteModules() / scsProcedimientosExtendsMapper.deleteByExample() -> Salida de scsProcedimientosExtendsMapper para eliminar los modulos seleccionados");
+
+					}
+
+				} catch (Exception e) {
+					response = 0;
+					error.setCode(400);
+					error.setDescription("general.mensaje.error.bbdd");
+					updateResponseDTO.setStatus(SigaConstants.KO);
+				}
+			}
+
+		}
+
+		if (response == 0) {
+			error.setCode(400);
+			error.setDescription("areasmaterias.materias.ficha.eliminarError");
+			updateResponseDTO.setStatus(SigaConstants.KO);
+		} else {
+			error.setCode(200);
+			error.setDescription("general.message.registro.actualizado");
+		}
+
+		updateResponseDTO.setError(error);
+
+		LOGGER.info("deleteModules() -> Salida del servicio para eliminar modulos");
+
+		return updateResponseDTO;
+	}
 }

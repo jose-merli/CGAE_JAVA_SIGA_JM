@@ -134,6 +134,15 @@ public class TurnosController {
 			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
+	@RequestMapping(value = "/turnos/eliminateColaOficio", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> eliminateColaOficio(@RequestBody TurnosDTO turnosDTO, HttpServletRequest request) {
+		UpdateResponseDTO response = turnosService.eliminateColaOficio(turnosDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
 	@RequestMapping(value = "/turnos/busquedaFichaTurnos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<TurnosDTO> busquedaFichaTurnos(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
 		TurnosDTO response = turnosService.busquedaFichaTurnos(turnosItem, request);
