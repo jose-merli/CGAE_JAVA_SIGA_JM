@@ -322,7 +322,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
                                                  genRecursosCatalogosExample.createCriteria().andIdinstitucionEqualTo(idInstitucion)
                                                                                .andIdrecursoNotEqualTo(newPretension.getDescripcion())
                                                                                .andDescripcionEqualTo(pretensionItem.getDescripcion())
-                                                                     .andCampotablaEqualTo("DESCRIPCION").andNombretablaEqualTo("scs_pretension");
+                                                                     .andCampotablaEqualTo("DESCRIPCION").andNombretablaEqualTo("SCS_PRETENSION");
                                                            List<GenRecursosCatalogos> scsPretensionesList = genRecursosCatalogosExtendsMapper
                                                                                .selectByExample(genRecursosCatalogosExample);
                                                            LOGGER.info(
