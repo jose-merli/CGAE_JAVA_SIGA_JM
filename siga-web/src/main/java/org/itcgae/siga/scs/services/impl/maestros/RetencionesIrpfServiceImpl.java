@@ -1,6 +1,7 @@
 package org.itcgae.siga.scs.services.impl.maestros;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -288,6 +289,8 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		List<ScsMaestroretenciones> scsRetencionesList= null;
+		List<ScsMaestroretenciones> scsRetencionesSociedadRepetidaList= null;
+		
 		if (null != idInstitucion) {
 
 			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
@@ -318,12 +321,35 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 								.andLetranifsociedadEqualTo(retencionItem.getTipoSociedad())
 								.andFechabajaIsNull();
 						
-						LOGGER.info(
-								"updateRetenciones() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Entrada a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
-
 						scsRetencionesList = scsRetencionesirpfExtendsMapper
 								.selectByExample(example);
 						}
+						
+
+//						Buscamos otra retención con el mismo tipo sociedad seleccionado
+						ScsMaestroretencionesExample ejemploRetencion = new ScsMaestroretencionesExample();
+
+						// Obtenemos el fundamento de resolucion que queremos modificar
+						if (retencionItem.getTipoSociedad() != null
+								&& retencionItem.getTipoSociedad() != "") {
+							ejemploRetencion.createCriteria()
+								.andIdretencionNotEqualTo(Integer.valueOf(retencionItem.getIdRetencion()))
+								.andLetranifsociedadEqualTo(retencionItem.getTipoSociedad());
+							LOGGER.info(
+									"updateRetenciones() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Entrada a scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
+
+							scsRetencionesSociedadRepetidaList = scsRetencionesirpfExtendsMapper
+									.selectByExample(ejemploRetencion);
+							LOGGER.info(
+									"updateRetenciones() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Salida de scsTipofundamentosExtendsMapper para buscar un fundamento resolucion");
+
+						}else {
+							scsRetencionesSociedadRepetidaList = new ArrayList<ScsMaestroretenciones>();
+						}
+						
+						
+						
+//						Continuamos solo si no encuentra más retenciones
 						
 						example = new ScsMaestroretencionesExample();
 						example.createCriteria()
@@ -342,10 +368,11 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 						LOGGER.info(
 								"updateRetenciones() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Salida a scsTipofundamentosExtendsMapper para buscar  un fundamento resolucion");
 						if ((scsRetencionesList != null && scsRetencionesList.size() > 0)
-								|| (scsRetencionesList2 != null && scsRetencionesList2.size() > 0)) {
+								|| (scsRetencionesList2 != null && scsRetencionesList2.size() > 0)
+								|| scsRetencionesSociedadRepetidaList.size()>0) {
 							error.setCode(400);
 							error.setDescription("messages.jgr.maestros.documentacionIRPF.existeRetencionMismoNombre");
-						} else {
+						}else {
 
 							example = new ScsMaestroretencionesExample();
 							example.createCriteria()
@@ -429,6 +456,8 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		List<ScsMaestroretenciones> scsRetencionesSociedadRepetidaList= null;
+
 		long idRetencion = 0;
 		List<ScsMaestroretenciones> scsRetencionesList2 = null;
 
@@ -478,8 +507,28 @@ public class RetencionesIrpfServiceImpl implements IRetencionesIrpfService {
 					LOGGER.info(
 							"createRetencion() / scsPrisionExtendsMapper.selectByExample() -> Salida a scsPrisionExtendsMapper para buscar la prisión");
 
+
+//					Buscamos otra retención con el mismo tipo sociedad seleccionado
+					ScsMaestroretencionesExample ejemploRetencion = new ScsMaestroretencionesExample();
+
+					// Obtenemos el fundamento de resolucion que queremos modificar
+					if (retencionItem.getTipoSociedad() != null
+							&& retencionItem.getTipoSociedad() != "") {
+						ejemploRetencion.createCriteria()
+							.andLetranifsociedadEqualTo(retencionItem.getTipoSociedad());
+						
+						scsRetencionesSociedadRepetidaList = scsRetencionesirpfExtendsMapper
+								.selectByExample(ejemploRetencion);
+					}else {
+						scsRetencionesSociedadRepetidaList = new ArrayList<ScsMaestroretenciones>();
+					}
+					
+					
+//					Continuamos solo si no encuentra más retenciones
+					
 					if ((l != null && l.size() > 0)
-							|| (scsRetencionesList2 != null && scsRetencionesList2.size() > 0)) {
+							|| (scsRetencionesList2 != null && scsRetencionesList2.size() > 0)
+							|| scsRetencionesSociedadRepetidaList.size() > 0) {
 						error.setCode(400);
 						error.setDescription("messages.jgr.maestros.documentacionIRPF.existeRetencionMismoNombre");
 						insertResponseDTO.setStatus(SigaConstants.KO);
