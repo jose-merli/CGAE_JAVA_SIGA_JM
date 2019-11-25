@@ -20,13 +20,11 @@ import org.itcgae.siga.db.entities.AdmUsuarios;
 import org.itcgae.siga.db.entities.AdmUsuariosExample;
 import org.itcgae.siga.db.entities.GenRecursosCatalogos;
 import org.itcgae.siga.db.entities.GenRecursosCatalogosExample;
-import org.itcgae.siga.db.entities.ScsComisariaExample;
-import org.itcgae.siga.db.entities.ScsMaestroretenciones;
-import org.itcgae.siga.db.entities.ScsMaestroretencionesExample;
 import org.itcgae.siga.db.entities.ScsPretension;
 import org.itcgae.siga.db.entities.ScsPretensionExample;
 import org.itcgae.siga.db.entities.ScsProcedimientos;
 import org.itcgae.siga.db.entities.ScsProcedimientosExample;
+import org.itcgae.siga.db.mappers.GenRecursosCatalogosMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
 import org.itcgae.siga.db.services.adm.mappers.GenRecursosCatalogosExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsPretensionExtendsMapper;
@@ -53,6 +51,9 @@ public class PretensionesServiceImpl implements IPretensionesService {
 
           @Autowired
           private GenRecursosCatalogosExtendsMapper genRecursosCatalogosExtendsMapper;
+          
+          @Autowired
+          private GenRecursosCatalogosMapper genRecursosCatalogosMapper;
 
           @Override
           public PretensionDTO searchPretensiones(PretensionItem pretensionItem, HttpServletRequest request) {
@@ -323,11 +324,17 @@ public class PretensionesServiceImpl implements IPretensionesService {
                                                                                .andIdrecursoNotEqualTo(newPretension.getDescripcion())
                                                                                .andDescripcionEqualTo(pretensionItem.getDescripcion())
                                                                      .andCampotablaEqualTo("DESCRIPCION").andNombretablaEqualTo("SCS_PRETENSION");
-                                                           List<GenRecursosCatalogos> scsPretensionesList = genRecursosCatalogosExtendsMapper
+                                                           List<GenRecursosCatalogos> scsPretensionesList = genRecursosCatalogosMapper
                                                                                .selectByExample(genRecursosCatalogosExample);
+                                                           
+                                                           LOGGER.info("Idrecurso consulta = " + newPretension.getDescripcion());
+                                                           LOGGER.info("Descripcion consulta = " + pretensionItem.getDescripcion());
                                                            LOGGER.info(
                                                                                "updateRetenciones() / scsTipofundamentosExtendsMapper.selectByExample(example) -> Salida a scsTipofundamentosExtendsMapper para buscar  un fundamento resolucion");
+                                                          
                                                            if ((scsPretensionesList != null && scsPretensionesList.size() > 0)) {
+                                                        	   LOGGER.info("Entramos a devolver error de pretensiones > 0");
+                                                        	   LOGGER.info("tamaño procedimientos: " +  scsPretensionesList.size());
                                                                      error.setCode(400);
                                                            error.setDescription("messages.jgr.maestros.pretension.existeProcedimientoMismoNombre");
                                                            } else {
