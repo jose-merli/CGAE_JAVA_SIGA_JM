@@ -314,7 +314,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
                                                  try {
 
                                                            ScsPretensionExample example = new ScsPretensionExample();
-                                                 example.createCriteria().andIdpretensionEqualTo(Short.valueOf(pretensionItem.getIdPretension()));
+                                                 example.createCriteria().andIdpretensionEqualTo(Short.valueOf(pretensionItem.getIdPretension())).andIdinstitucionEqualTo(idInstitucion);
                                                                                
 
                                                            List<ScsPretension> scsPretensionListAux = scsPretensionExtendsMapper.selectByExample(example);
@@ -410,7 +410,7 @@ public class PretensionesServiceImpl implements IPretensionesService {
 
                     updateResponseDTO.setError(error);
 
-                    LOGGER.info("updatePretension() -> Salida del servicio para editar prision");
+                    LOGGER.info("updatePretension() -> Salida del servicio para editar pretension");
 
                     return updateResponseDTO;
 
