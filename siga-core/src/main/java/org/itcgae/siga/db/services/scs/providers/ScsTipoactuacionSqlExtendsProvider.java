@@ -29,7 +29,7 @@ public class ScsTipoactuacionSqlExtendsProvider extends ScsTipoactuacionSqlProvi
 		sql.SELECT("ACTUACION.IDTIPOACTUACION");
 		sql.SELECT("ACTUACION.importe");
 		sql.SELECT("ACTUACION.importemaximo");
-		sql.SELECT("ACTUACION.fechabaja");
+		sql.SELECT("to_date(ACTUACION.fechabaja,'DD/MM/RRRR') as fechabaja ");
 		sql.SELECT("cat.descripcion as DESCRIPCIONTIPOACTUACION");
 		sql.SELECT("LISTAGG(catasis.descripcion, ', ') WITHIN GROUP (ORDER BY ACTUACION.IDTIPOACTUACION)  AS DESCRIPCIONTIPOASISTENCIA");
 		sql.SELECT("LISTAGG(ACTUACION.idtipoasistencia, ', ') WITHIN GROUP (ORDER BY ACTUACION.IDTIPOACTUACION)  AS IDTIPOASISTENCIA");
@@ -45,7 +45,7 @@ public class ScsTipoactuacionSqlExtendsProvider extends ScsTipoactuacionSqlProvi
 		if(!historico) {
 			sql.WHERE("ACTUACION.FECHABAJA IS NULL");
 		}
-		sql.GROUP_BY("ACTUACION.idinstitucion, ACTUACION.IDTIPOACTUACION, ACTUACION.importe, ACTUACION.importemaximo, ACTUACION.fechabaja, cat.descripcion");
+		sql.GROUP_BY("ACTUACION.idinstitucion, ACTUACION.IDTIPOACTUACION, ACTUACION.importe, ACTUACION.importemaximo, to_date(ACTUACION.fechabaja,'DD/MM/RRRR'), cat.descripcion");
 		sql.ORDER_BY("cat.descripcion");
 
 		return sql.toString();

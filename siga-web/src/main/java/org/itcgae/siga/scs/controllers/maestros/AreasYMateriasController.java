@@ -96,6 +96,17 @@ public class AreasYMateriasController {
 
 	}
 	
+	@RequestMapping(value = "/areasMaterias/activateMaterias", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<UpdateResponseDTO> activateMaterias(@RequestBody AreasDTO areasDTO, HttpServletRequest request) {
+
+		UpdateResponseDTO response = fichaAreasService.activateAreas(areasDTO, request);
+		if (response.getError().getCode() == 200)
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.OK);
+		else
+			return new ResponseEntity<UpdateResponseDTO>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+	}
+	
 	
 	@RequestMapping(value = "/areasMaterias/createMaterias",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<InsertResponseDTO> createMaterias(@RequestBody AreasItem areasItem, HttpServletRequest request) {
