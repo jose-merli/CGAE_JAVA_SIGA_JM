@@ -65,6 +65,7 @@ public class TurnosItem {
 	private String compensaciones;
 	private String fechabajapersona;
 	private Date fechaActual;
+	private String idcomboguardias;
 	
 	public String getFechavalidacion() {
 		return fechavalidacion;
@@ -414,6 +415,12 @@ public class TurnosItem {
 	}
 	public void setFechaActual(Date fechaActual) {
 		this.fechaActual = fechaActual;
+	}
+	public String getIdcomboguardias() {
+		return idcomboguardias;
+	}
+	public void setIdcomboguardias(String idcomboguardias) {
+		this.idcomboguardias = idcomboguardias;
 	}
 
 

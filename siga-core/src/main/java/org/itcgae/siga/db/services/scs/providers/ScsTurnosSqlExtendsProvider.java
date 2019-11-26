@@ -126,7 +126,7 @@ public String busquedaFichaTurnos(TurnosItem turnosItem, Short idInstitucion) {
 public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String busquedaOrden, Short idInstitucion) {
 		
 		SQL sql = new SQL();
-		sql.SELECT("ROW_NUMBER()OVER(ORDER BY '"+busquedaOrden+"')as orden,consulta.*from(SELECT (CASE WHEN ins.fechavalidacion IS NOT NULL AND TRUNC(ins.fechavalidacion)<=nvl('"+strDate+"',ins.fechavalidacion)AND(ins.fechabaja is null or trunc(ins.fechabaja) > nvl('"+strDate+"','01/01/1900')) then '1' else '0' end)activo, ins.idinstitucion,ins.idturno, TO_CHAR(TRUNC(ins.fechavalidacion),'DD/MM/YYYY') as fechavalidacion, TO_CHAR(TRUNC(ins.fechabaja),'DD/MM/YYYY') as fechabajapersona,"
+		sql.SELECT("ROW_NUMBER()OVER(ORDER BY '"+busquedaOrden+"')as orden,consulta.*from(SELECT (CASE WHEN ins.fechavalidacion IS NOT NULL AND TRUNC(ins.fechavalidacion)<=nvl('"+strDate+"',ins.fechavalidacion)AND(ins.fechabaja is null or trunc(ins.fechabaja) > nvl('"+strDate+"','01/01/1900')) then '1' else '0' end)activo, ins.idinstitucion,ins.idturno, TRUNC(ins.fechavalidacion) as fechavalidacion, TO_CHAR(TRUNC(ins.fechabaja),'DD/MM/YYYY') as fechabajapersona,"
 				+ "ins.fechasolicitud as fechasolicitud, per.nifcif,per.idpersona,per.nombre as nombrepersona,per.apellidos1, DECODE(per.apellidos2, NULL,'',' ' || per.apellidos2) apellidos2,\r\n" + 
 				"    per.apellidos1 \r\n" + 
 				"    || DECODE(per.apellidos2,NULL,'',' '\r\n" + 
@@ -164,7 +164,7 @@ public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String bus
 				"    scs_inscripcionturno ins\r\n" + 
 				"    INNER JOIN cen_persona per ON per.IDPERSONA = ins.IDPERSONA\r\n" + 
 				"    INNER JOIN cen_colegiado col ON col.idpersona = per.IDPERSONA and col.IDINSTITUCION = ins.IDINSTITUCION and col.IDPERSONA = ins.IDPERSONA \r\n" + 
-				"    INNER JOIN scs_turno tur ON tur.IDTURNO = ins.IDTURNO and tur.IDINSTITUCION = tur.IDINSTITUCION\r\n");
+				"    INNER JOIN scs_turno tur ON tur.IDTURNO = ins.IDTURNO and tur.IDINSTITUCION = ins.IDINSTITUCION\r\n");
 		sql.WHERE("ins.fechavalidacion is not null and tur.idinstitucion= '"+idInstitucion+"'"+"and tur.idturno ='"+turnosItem.getIdturno()+"'");
 		if(!turnosItem.isHistorico()) {
 			sql.WHERE("ins.fechabaja is null");
@@ -172,4 +172,80 @@ public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String bus
 		return sql.toString()+")"+"consulta";
 		
 	}
+
+public String busquedaColaGuardia(TurnosItem turnosItem,String strDate,String busquedaOrden, Short idInstitucion) {
+	
+	SQL sql = new SQL();
+	sql.SELECT("ROW_NUMBER() OVER(ORDER BY '"+busquedaOrden+"') as orden, consulta.* from (\r\n" + 
+			"\r\n" + 
+			"SELECT\r\n" + 
+			"    \r\n" + 
+			"    (\r\n" + 
+			"        CASE\r\n" + 
+			"            WHEN ins.fechavalidacion IS NOT NULL\r\n" + 
+			"                 AND trunc(ins.fechavalidacion) <= nvl('"+strDate+"',ins.fechavalidacion)\r\n" + 
+			"                 AND (\r\n" + 
+			"                ins.fechabaja IS NULL\r\n" + 
+			"                OR trunc(ins.fechabaja) > nvl('"+strDate+"','01/01/1900')\r\n" + 
+			"            ) THEN '1'\r\n" + 
+			"            ELSE '0'\r\n" + 
+			"        END\r\n" + 
+			"    ) activo,\r\n" + 
+			"    ins.idinstitucion,\r\n" + 
+			"    ins.idturno,\r\n" + 
+			"    trunc(ins.fechavalidacion) AS fechavalidacion,\r\n" + 
+			"    TO_CHAR(trunc(ins.fechabaja),'DD/MM/YYYY') AS fechabaja,\r\n" + 
+			"    ins.FECHASUSCRIPCION AS fechasolicitud,\r\n" + 
+			"    per.nifcif,\r\n" + 
+			"    per.idpersona,\r\n" + 
+			"    per.nombre,\r\n" + 
+			"    per.apellidos1,\r\n" + 
+			"    DECODE(per.apellidos2,NULL,'',' '\r\n" + 
+			"    || per.apellidos2) apellidos2,\r\n" + 
+			"    per.apellidos1 \r\n" + 
+			"    || DECODE(per.apellidos2,NULL,'',' '\r\n" + 
+			"    || per.apellidos2) alfabeticoapellidos,\r\n" + 
+			"    DECODE(col.comunitario,'1',col.ncomunitario,col.ncolegiado) numerocolegiado,\r\n" + 
+			"    per.fechanacimiento fechanacimiento,\r\n" + 
+			"    ins.fechavalidacion antiguedadcola,\r\n" + 
+			"     (\r\n" + 
+			"        SELECT\r\n" + 
+			"            COUNT(1) numero\r\n" + 
+			"        FROM\r\n" + 
+			"            scs_saltoscompensaciones salto\r\n" + 
+			"        WHERE\r\n" + 
+			"            salto.idinstitucion = gua.idinstitucion\r\n" + 
+			"            AND   salto.idturno = gua.IDTURNO\r\n" + 
+			"            AND   salto.idguardia =gua.idguardia\r\n" + 
+			"            AND   salto.saltoocompensacion = 'S'\r\n" + 
+			"            AND   salto.fechacumplimiento IS NULL\r\n" + 
+			"            and   salto.idpersona = ins.IDPERSONA\r\n" + 
+			"    )  as saltos,\r\n" + 
+			"     (\r\n" + 
+			"        SELECT\r\n" + 
+			"            COUNT(1) numero\r\n" + 
+			"        FROM\r\n" + 
+			"            scs_saltoscompensaciones salto\r\n" + 
+			"        WHERE\r\n" + 
+			"            salto.idinstitucion = gua.idinstitucion\r\n" + 
+			"            AND   salto.idturno = gua.IDTURNO\r\n" + 
+			"            AND   salto.idguardia = gua.idguardia\r\n" + 
+			"            AND   salto.saltoocompensacion = 'C'\r\n" + 
+			"            AND   salto.fechacumplimiento IS NULL\r\n" + 
+			"            and   salto.idpersona = ins.IDPERSONA\r\n" + 
+			"    )  as compensaciones\r\n" + 
+			"FROM\r\n" + 
+			"    scs_inscripcionguardia ins\r\n" + 
+			"    INNER JOIN cen_persona per ON per.IDPERSONA = ins.IDPERSONA\r\n" + 
+			"    INNER JOIN scs_guardiasturno gua ON gua.idturno = ins.idturno and gua.idguardia = ins.idguardia and gua.IDINSTITUCION = ins.IDINSTITUCION\r\n" + 
+			"    LEFT JOIN  scs_grupoguardiacolegiado gru ON gru.IDINSTITUCION = ins.IDINSTITUCION and gru.IDTURNO = ins.IDTURNO and gru.IDGUARDIA = ins.IDGUARDIA and gru.IDPERSONA = per.IDPERSONA and gru.FECHASUSCRIPCION = ins.FECHASUSCRIPCION\r\n" + 
+			"    LEFT JOIN scs_grupoguardia grg ON grg.IDGRUPOGUARDIA = gru.IDGRUPOGUARDIA\r\n" + 
+			"    INNER JOIN cen_colegiado col ON col.idpersona = per.IDPERSONA and col.IDINSTITUCION = ins.IDINSTITUCION and col.IDPERSONA = ins.IDPERSONA \r\n");
+	sql.WHERE("ins.fechavalidacion is not null and gua.idinstitucion= '"+idInstitucion+"'"+"and gua.idturno ='"+turnosItem.getIdturno()+"'and gua.idguardia ='"+turnosItem.getIdcomboguardias()+"'");
+	if(!turnosItem.isHistorico()) {
+		sql.WHERE("ins.fechabaja is null");
+	}
+	return sql.toString()+")"+"consulta";
+	
+}
 }

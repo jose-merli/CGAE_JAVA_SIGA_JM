@@ -113,6 +113,12 @@ public class TurnosController {
 		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/combossjcs/comboidGuardias",  method = RequestMethod.GET,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<ComboDTO> comboidGuardias(String idTurno ,HttpServletRequest request) {
+		ComboDTO response = comboService.comboGuardias(request, idTurno);
+		return new ResponseEntity<ComboDTO>(response, HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/turnos/busquedaTurnos",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<TurnosDTO> busquedaTurnos(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
 		TurnosDTO response = turnosService.busquedaTurnos(turnosItem, request);
@@ -122,6 +128,12 @@ public class TurnosController {
 	@RequestMapping(value = "/turnos/busquedaColaOficio",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
 	ResponseEntity<TurnosDTO> busquedaColaOficio(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
 		TurnosDTO response = turnosService.busquedaColaOficio(turnosItem, request);
+		return new ResponseEntity<TurnosDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/turnos/busquedaColaGuardia",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<TurnosDTO> busquedaColaGuardia(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
+		TurnosDTO response = turnosService.busquedaColaGuardia(turnosItem, request);
 		return new ResponseEntity<TurnosDTO>(response, HttpStatus.OK);
 	}
 	

@@ -423,8 +423,8 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 					exampleguardias.createCriteria().andIdinstitucionEqualTo(idInstitucion)
 							.andIdturnoEqualTo(Integer.parseInt(turnosItem.getIdturno()));
 					guardiasturno = scsGuardiasturnoMapper.selectByExample(exampleguardias);
-					if ((listaturno.get(0).getGuardias() == 1 && turnosItem.getIdguardias() == "0")
-							|| (listaturno.get(0).getGuardias() == 2 && turnosItem.getIdguardias() == "0")) {
+					if ((listaturno.get(0).getGuardias() == 1 && turnosItem.getIdguardias().equals("0"))
+							|| (listaturno.get(0).getGuardias() == 2 && turnosItem.getIdguardias().equals("0"))) {
 
 						for (int i = 0; i < inscripcionturno.size(); i++) {
 							Long persona = inscripcionturno.get(i).getIdpersona();
@@ -835,6 +835,61 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 				String strDate = dateFormat.format(prueba);
 				turnosItems = scsTurnosExtendsMapper.busquedaColaOficio(turnosItem, strDate, busquedaOrden,
+						idInstitucion);
+
+				LOGGER.info(
+						"busquedaColaOficio()  -> Salida a scsOrdenacioncolasExtendsMapper para obtener orden colas");
+
+				if (turnosItems != null) {
+					turnosDTO.setTurnosItems(turnosItems);
+				}
+			}
+
+		}
+		LOGGER.info("busquedaColaOficio() -> Salida del servicio para obtener la busqueda Cola Oficio");
+		return turnosDTO;
+	}
+	
+	@Override
+	public TurnosDTO busquedaColaGuardia(TurnosItem turnosItem, HttpServletRequest request) {
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		TurnosDTO turnosDTO = new TurnosDTO();
+		List<TurnosItem> turnosItems = null;
+		String busquedaOrden = "";
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"busquedaColaOficio() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"busquedaColaOficio() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+				AdmUsuarios usuario = usuarios.get(0);
+
+				LOGGER.info(
+						"busquedaColaOficio() -> Entrada a scsOrdenacioncolasExtendsMapper para obtener orden colas");
+				ComboDTO comboDTO = new ComboDTO();
+				List<ComboItem> comboItems = new ArrayList<ComboItem>();
+				comboItems = scsOrdenacioncolasExtendsMapper.ordenColasEnvios(turnosItem.getIdordenacioncolas());
+				comboDTO.setCombooItems(comboItems);
+
+				for (int i = 0; i < comboDTO.getCombooItems().size(); i++) {
+					busquedaOrden += comboDTO.getCombooItems().get(i).getValue() + ",";
+				}
+				busquedaOrden = busquedaOrden.substring(0, busquedaOrden.length() - 1);
+				Date prueba = turnosItem.getFechaActual();
+				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+				String strDate = dateFormat.format(prueba);
+				turnosItems = scsTurnosExtendsMapper.busquedaColaGuardia(turnosItem, strDate, busquedaOrden,
 						idInstitucion);
 
 				LOGGER.info(
