@@ -7,8 +7,13 @@ public class GuardiasItem {
 
 	private String idGuardia;
 	private String idTurno;
+	private String idOrdenacionColas;
+	private String idPersonaUltimo;
 	private String turno;
 	private String nombre;
+	private String descripcion;
+	private String descripcionPago;
+	private String descripcionFacturacion;
 	private String area;
 	private String materia;
 	private String grupoZona;
@@ -23,16 +28,99 @@ public class GuardiasItem {
 	private String tipoTurno;		
 	private String tipoGuardia;
 	private String tipoDia;
+	private String tipoDiasGuardia;
+	private String tipoDiasPeriodo;
 	private String letradosGuardia;
 	private String letradosIns;
-	private String diasLab;
-	private String diasFes;
+	private String seleccionLab;
+	private String seleccionFes;
+	private String diasPeriodo;
+	private String diasGuardia;
+	private String diasSeparacionGuardias;
+	private String envioCentralita;
+	private String porGrupos;
 	private Date fechabaja;
 	private boolean historico;
 	
 	
 	
 	
+	public String getIdPersonaUltimo() {
+		return idPersonaUltimo;
+	}
+	public void setIdPersonaUltimo(String idPersonaUltimo) {
+		this.idPersonaUltimo = idPersonaUltimo;
+	}
+	public String getTipoDiasGuardia() {
+		return tipoDiasGuardia;
+	}
+	public void setTipoDiasGuardia(String tipoDiasGuardia) {
+		this.tipoDiasGuardia = tipoDiasGuardia;
+	}
+	public String getTipoDiasPeriodo() {
+		return tipoDiasPeriodo;
+	}
+	public void setTipoDiasPeriodo(String tipoDiasPeriodo) {
+		this.tipoDiasPeriodo = tipoDiasPeriodo;
+	}
+	public String getDiasGuardia() {
+		return diasGuardia;
+	}
+	public void setDiasGuardia(String diasGuardia) {
+		this.diasGuardia = diasGuardia;
+	}
+	public String getDiasSeparacionGuardias() {
+		return diasSeparacionGuardias;
+	}
+	public void setDiasSeparacionGuardias(String diasSeparacionGuardias) {
+		this.diasSeparacionGuardias = diasSeparacionGuardias;
+	}
+	public void setSeleccionLab(String seleccionLab) {
+		this.seleccionLab = seleccionLab;
+	}
+	public String getDiasPeriodo() {
+		return diasPeriodo;
+	}
+	public void setDiasPeriodo(String diasPeriodo) {
+		this.diasPeriodo = diasPeriodo;
+	}
+	public String getIdOrdenacionColas() {
+		return idOrdenacionColas;
+	}
+	public void setIdOrdenacionColas(String idOrdenacionColas) {
+		this.idOrdenacionColas = idOrdenacionColas;
+	}
+	public String getPorGrupos() {
+		return porGrupos;
+	}
+	public void setPorGrupos(String porGrupos) {
+		this.porGrupos = porGrupos;
+	}
+	public String getDescripcionPago() {
+		return descripcionPago;
+	}
+	public void setDescripcionPago(String descripcionPago) {
+		this.descripcionPago = descripcionPago;
+	}
+	public String getDescripcionFacturacion() {
+		return descripcionFacturacion;
+	}
+	public void setDescripcionFacturacion(String descripcionFacturacion) {
+		this.descripcionFacturacion = descripcionFacturacion;
+	}
+	public String getEnvioCentralita() {
+		return envioCentralita;
+	}
+	public void setEnvioCentralita(String envioCentralita) {
+		this.envioCentralita = envioCentralita;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
 	public String getTurno() {
 		return turno;
 	}
@@ -45,17 +133,17 @@ public class GuardiasItem {
 	public void setHistorico(boolean historico) {
 		this.historico = historico;
 	}
-	public String getDiasLab() {
-		return diasLab;
+	public String getSeleccionLab() {
+		return seleccionLab;
 	}
-	public void setDiasLab(String diasLab) {
-		this.diasLab = diasLab;
+	public void setSeleccionsLab(String seleccionLab) {
+		this.seleccionLab = seleccionLab;
 	}
-	public String getDiasFes() {
-		return diasFes;
+	public String getSeleccionFes() {
+		return seleccionFes;
 	}
-	public void setDiasFes(String diasFes) {
-		this.diasFes = diasFes;
+	public void setSeleccionFes(String seleccionFes) {
+		this.seleccionFes = seleccionFes;
 	}
 	public String getIdGuardia() {
 		return idGuardia;

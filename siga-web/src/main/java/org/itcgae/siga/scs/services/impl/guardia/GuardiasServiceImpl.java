@@ -60,12 +60,13 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				List<GuardiasItem> guardias = scsGuardiasturnoExtendsMapper.searchGuardias(guardiasItem,
 						idInstitucion.toString(), usuarios.get(0).getIdlenguaje());
-				
-				guardias = guardias.stream().map( it ->{
-					it.setTipoDia(("Selección: Labor. "+it.getDiasLab()+", Fest. "+it.getDiasFes()).replace("null", ""));
+
+				guardias = guardias.stream().map(it -> {
+					it.setTipoDia(("Selección: Labor. " + it.getSeleccionLab() + ", Fest. " + it.getSeleccionFes())
+							.replace("null", ""));
 					return it;
 				}).collect(Collectors.toList());
-				
+
 				guardiaDTO.setGuardiaItems(guardias);
 
 				LOGGER.info("searchGuardias() -> Salida ya con los datos recogidos");
@@ -265,8 +266,8 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		LOGGER.info("getGuardia() ->  Entrada al servicio para obtener una guardia");
 
-		GuardiasItem guardiaItem = null;
-		
+		GuardiasItem guardiaItem = new GuardiasItem();
+
 		String token = request.getHeader("Authorization");
 		String dni = UserTokenUtils.getDniFromJWTToken(token);
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
@@ -288,15 +289,49 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 				try {
 
-						
 					LOGGER.info(
-							"getGuardia() / scsPrisionExtendsMapper.selectByExample() -> Entrada a scsPrisionExtendsMapper para buscar la guardia");
+							"getGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Entrada a la busqueda de la guardia");
 
-						List<GuardiasItem> guardiasList = scsGuardiasturnoExtendsMapper.detalleGuardia(idGuardia, idInstitucion.toString());
-						if(guardiasList != null && guardiasList.size() > 0)
-							guardiaItem = guardiasList.get(0);
+					ScsGuardiasturnoExample example = new ScsGuardiasturnoExample();
+					example.createCriteria().andIdguardiaEqualTo(Integer.valueOf(idGuardia))
+							.andIdinstitucionEqualTo(idInstitucion);
+
+					List<ScsGuardiasturno> guardiasList = scsGuardiasturnoExtendsMapper.selectByExample(example);
+					if (guardiasList != null && guardiasList.size() > 0) {
+
 						LOGGER.info(
-								"getGuardia() / scsPrisionExtendsMapper.selectByExample() -> Salida de scsPrisionExtendsMapper para buscar la prision");
+								"getGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Mapeamos lo recogido");
+						//Mapeo para Datos Generales
+					ScsGuardiasturno guardia = guardiasList.get(0);
+					guardiaItem.setNombre(guardia.getNombre());
+					guardiaItem.setDescripcion(guardia.getDescripcion());
+					guardiaItem.setTipoGuardia(guardia.getIdtipoguardia().toString());
+					guardiaItem.setEnvioCentralita(guardia.getEnviocentralita().toString());
+					guardiaItem.setDescripcionFacturacion(guardia.getDescripcionfacturacion());
+					guardiaItem.setDescripcionPago(guardia.getDescripcionpago());
+					
+						//Configuracion de cola
+					guardiaItem.setPorGrupos(guardia.getPorgrupos());
+					guardiaItem.setIdOrdenacionColas(guardia.getIdordenacioncolas().toString());
+					guardiaItem.setDiasPeriodo(guardia.getDiasperiodo().toString());
+					guardiaItem.setNombre(guardia.getNombre());
+
+						// Configuracion calendarios
+					guardiaItem.setDiasGuardia(guardia.getDiasguardia().toString());
+					guardiaItem.setDiasPeriodo(guardia.getDiasperiodo().toString());
+					guardiaItem.setTipoDiasGuardia(guardia.getTipodiasguardia());
+					guardiaItem.setTipoDiasPeriodo(guardia.getTipodiasperiodo());
+					guardiaItem.setDiasSeparacionGuardias(guardia.getDiasseparacionguardias().toString());
+					guardiaItem.setSeleccionLab(guardia.getSeleccionlaborables());
+					guardiaItem.setSeleccionFes(guardia.getSeleccionfestivos());
+
+						// Cola de guardia
+					guardiaItem.setIdPersonaUltimo(guardia.getIdpersonaUltimo().toString());
+					
+					
+					}
+					LOGGER.info(
+							"getGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Salida de la busqueda de guardia");
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -305,10 +340,7 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 		}
 
-		
-
-
-		LOGGER.info("getGuardia() -> Salida del servicio para dar de alta a las prisiones");
+		LOGGER.info("getGuardia() -> Salida del servicio para recoger una guardia");
 
 		return guardiaItem;
 
