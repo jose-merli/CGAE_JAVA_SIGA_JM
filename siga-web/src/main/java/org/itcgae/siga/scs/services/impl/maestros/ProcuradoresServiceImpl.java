@@ -145,6 +145,7 @@ public class ProcuradoresServiceImpl implements IProcuradoresService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -239,6 +240,7 @@ public class ProcuradoresServiceImpl implements IProcuradoresService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -364,6 +366,7 @@ public class ProcuradoresServiceImpl implements IProcuradoresService {
 						response = scsProcuradorExtendsMapper.updateByPrimaryKey(procurador);
 					}
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");
@@ -490,6 +493,7 @@ public class ProcuradoresServiceImpl implements IProcuradoresService {
 					}
 
 				} catch (Exception e) {
+					LOGGER.error(e);
 					response = 0;
 					error.setCode(400);
 					error.setDescription("general.mensaje.error.bbdd");

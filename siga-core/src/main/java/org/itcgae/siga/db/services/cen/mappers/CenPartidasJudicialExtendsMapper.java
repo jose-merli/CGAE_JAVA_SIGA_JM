@@ -4,27 +4,15 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.SelectProvider;
-import org.apache.ibatis.annotations.Update;
-import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
-import org.itcgae.siga.DTO.scs.ModulosItem;
-import org.itcgae.siga.DTO.scs.PartidasItem;
 import org.itcgae.siga.DTO.scs.ProcedimientoItem;
 import org.itcgae.siga.DTOs.cen.PartidasJudicialesItem;
 import org.itcgae.siga.DTOs.gen.ComboItem;
-import org.itcgae.siga.DTOs.gen.NewIdDTO;
 import org.itcgae.siga.db.entities.CenInfluencia;
 import org.itcgae.siga.db.mappers.CenPartidojudicialMapper;
-import org.itcgae.siga.db.mappers.ScsPartidapresupuestariaMapper;
-import org.itcgae.siga.db.mappers.ScsPartidapresupuestariaSqlProvider;
-import org.itcgae.siga.db.mappers.ScsProcedimientosMapper;
 import org.itcgae.siga.db.services.cen.providers.CenPartidojudicialSqlExtendsProvider;
 import org.itcgae.siga.db.services.scs.providers.CenPartidasJudicialSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsAreasMateriasSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsPartidasPresupuestariasSqlExtendsProvider;
-import org.itcgae.siga.db.services.scs.providers.ScsProcedimientosSqlExtendsProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
