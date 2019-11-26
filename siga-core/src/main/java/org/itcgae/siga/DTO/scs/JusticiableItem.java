@@ -1,5 +1,6 @@
 package org.itcgae.siga.DTO.scs;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -67,7 +68,10 @@ public class JusticiableItem {
 	private List<JusticiableTelefonoItem> telefonos;
 	private String parentesco;
 	private String tipoJusticiable;
+	private boolean checkNoInformadaDireccion;
 
+	private AsuntosJusticiableItem [] datosAsuntos;
+	
 	/**
 	 **/
 	public JusticiableItem idPersona(String idPersona) {
@@ -1027,6 +1031,38 @@ public class JusticiableItem {
 	public void setTipoJusticiable(String tipoJusticiable) {
 		this.tipoJusticiable = tipoJusticiable;
 	}
+	
+	/**
+	 **/
+	public JusticiableItem checkNoInformadaDireccion(boolean checkNoInformadaDireccion) {
+		this.checkNoInformadaDireccion = checkNoInformadaDireccion;
+		return this;
+	}
+
+	@JsonProperty("checkNoInformadaDireccion")
+	public boolean isCheckNoInformadaDireccion() {
+		return checkNoInformadaDireccion;
+	}
+
+	public void setCheckNoInformadaDireccion(boolean checkNoInformadaDireccion) {
+		this.checkNoInformadaDireccion = checkNoInformadaDireccion;
+	}
+	
+	/**
+	 **/
+	public JusticiableItem datosAsuntos(AsuntosJusticiableItem[] datosAsuntos) {
+		this.datosAsuntos = datosAsuntos;
+		return this;
+	}
+
+	@JsonProperty("datosAsuntos")
+	public AsuntosJusticiableItem[] getDatosAsuntos() {
+		return datosAsuntos;
+	}
+
+	public void setDatosAsuntos(AsuntosJusticiableItem[] datosAsuntos) {
+		this.datosAsuntos = datosAsuntos;
+	}
 
 	@Override
 	public int hashCode() {
@@ -1039,10 +1075,12 @@ public class JusticiableItem {
 		result = prime * result + ((asistidoSolicitajg == null) ? 0 : asistidoSolicitajg.hashCode());
 		result = prime * result + ((asuntos == null) ? 0 : asuntos.hashCode());
 		result = prime * result + ((autorizaAvisoTelematico == null) ? 0 : autorizaAvisoTelematico.hashCode());
+		result = prime * result + (checkNoInformadaDireccion ? 1231 : 1237);
 		result = prime * result + ((cnae == null) ? 0 : cnae.hashCode());
 		result = prime * result + ((codigoPostal == null) ? 0 : codigoPostal.hashCode());
 		result = prime * result + ((codigoPostal2 == null) ? 0 : codigoPostal2.hashCode());
 		result = prime * result + ((correoElectronico == null) ? 0 : correoElectronico.hashCode());
+		result = prime * result + Arrays.hashCode(datosAsuntos);
 		result = prime * result + ((descPaisDir1 == null) ? 0 : descPaisDir1.hashCode());
 		result = prime * result + ((descPaisDir2 == null) ? 0 : descPaisDir2.hashCode());
 		result = prime * result + ((direccion == null) ? 0 : direccion.hashCode());
@@ -1139,6 +1177,8 @@ public class JusticiableItem {
 				return false;
 		} else if (!autorizaAvisoTelematico.equals(other.autorizaAvisoTelematico))
 			return false;
+		if (checkNoInformadaDireccion != other.checkNoInformadaDireccion)
+			return false;
 		if (cnae == null) {
 			if (other.cnae != null)
 				return false;
@@ -1158,6 +1198,8 @@ public class JusticiableItem {
 			if (other.correoElectronico != null)
 				return false;
 		} else if (!correoElectronico.equals(other.correoElectronico))
+			return false;
+		if (!Arrays.equals(datosAsuntos, other.datosAsuntos))
 			return false;
 		if (descPaisDir1 == null) {
 			if (other.descPaisDir1 != null)
@@ -1429,9 +1471,10 @@ public class JusticiableItem {
 				+ ", descPaisDir1=" + descPaisDir1 + ", descPaisDir2=" + descPaisDir2 + ", idTipoIdentificacionotros="
 				+ idTipoIdentificacionotros + ", asistidoSolicitajg=" + asistidoSolicitajg + ", asistidoAutorizaeejg="
 				+ asistidoAutorizaeejg + ", autorizaAvisoTelematico=" + autorizaAvisoTelematico + ", telefonos="
-				+ telefonos + ", parentesco=" + parentesco + ", tipoJusticiable=" + tipoJusticiable + "]";
+				+ telefonos + ", parentesco=" + parentesco + ", tipoJusticiable=" + tipoJusticiable
+				+ ", checkNoInformadaDireccion=" + checkNoInformadaDireccion + ", datosAsuntos="
+				+ Arrays.toString(datosAsuntos) + "]";
 	}
-
 
 	
 

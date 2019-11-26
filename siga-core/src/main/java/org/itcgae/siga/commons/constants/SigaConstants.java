@@ -884,10 +884,20 @@ public static final String ESTADO_CURSO_ABIERTO = "0";
 	public static final String SCS_SOLICITANTE_EJG = "1";
 	public static final String SCS_UNIDAD_FAMILIAR_EJG = "2";
 	public static final String SCS_CONTRARIO_EJG = "3";
-	public static final String SCS_DESIGNACION = "4";
+	public static final String SCS_CONTRARIO_DESIGNACION = "4";
 	public static final String SCS_CONTRARIO_ASISTENCIA = "5";
 	public static final String SCS_SOLICITANTE_DESIGNACION = "6";
 	public static final String SCS_SOLICITANTE_ASISTENCIA = "7";
 
+	public static final String ROL_SOLICITANTE_EJG = "SE";
+	public static final String ROL_SOLICITANTE_ASISTENCIA = "SA";
+	public static final String ROL_SOLICITANTE_DESIGNACION = "SD";
+	public static final String ROL_UNIDAD_FAMILIAR_EJG = "UE";
+	public static final String ROL_CONTRARIO_EJG = "CE";
+	public static final String ROL_CONTRADIO_DESIGNACION = "CD";
+	public static final String ROL_CONTRARIO_ASISTENCIA = "CA";
+	public static final String ROL_REPRESENTANTE = "RE";
+	
+	
 	
 }

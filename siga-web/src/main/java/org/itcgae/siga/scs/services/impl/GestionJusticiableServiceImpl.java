@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -502,104 +503,67 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 				try {
 
-					ScsPersonajgExample example = new ScsPersonajgExample();
-					example.createCriteria().andNifEqualTo(justiciableItem.getNif());
+					ScsPersonajg scsPersonajg = new ScsPersonajg();
+					ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(scsPersonajg, true, justiciableItem);
+
+					justiciable.setIdinstitucion(idInstitucion);
+					justiciable.setUsumodificacion(usuario.getIdusuario());
 
 					LOGGER.info(
-							"updateJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para buscar si exite un justiciable con el mismo nif");
+							"createJusticiable() / scsPersonajgExtendsMapper.getIdPersonajg() -> Entrada a scsPersonajgExtendsMapper para obtener idPersonajg");
 
-					List<ScsPersonajg> existeNif = scsPersonajgExtendsMapper.selectByExample(example);
+					NewIdDTO idP = scsPersonajgExtendsMapper.getIdPersonajg(idInstitucion);
 
 					LOGGER.info(
-							"updateJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Salida de scsPersonajgExtendsMapper para buscar si exite un justiciable con el mismo nif");
+							"createJusticiable() / scsTelefonospersonaMapper.getIdPersonajg() -> Salida de scsPersonajgExtendsMapper para obtener idPersonajg");
 
-					if (null != existeNif && existeNif.size() > 0) {
-
-						error.setCode(400);
-						error.setDescription("Ya existe un justiciable con el mismo identificador");
-						insertResponseDTO.setStatus(SigaConstants.KO);
-						insertResponseDTO.setError(error);
-
-						return insertResponseDTO;
-
+					if (idP == null) {
+						justiciable.setIdpersona((long) 1);
+						idPersona = String.valueOf("1");
 					} else {
-						validacion = validacionDatosSegunTipoPcajg(justiciableItem.getTipoJusticiable(), idInstitucion,
-								justiciableItem);
+						long idPersonajg = (long) (Integer.parseInt(idP.getNewId()) + 1);
+						idPersona = String.valueOf(idPersonajg);
+						justiciable.setIdpersona(idPersonajg);
+					}
 
-						if (validacion != null) {
-							error.setCode(400);
-							error.setDescription(validacion);
-							insertResponseDTO.setStatus(SigaConstants.KO);
-							insertResponseDTO.setError(error);
+					LOGGER.info(
+							"createJusticiable() / scsPersonajgExtendsMapper.insert() -> Entrada de scsPersonajgExtendsMapper para insertar el nuevo justiciable");
 
-							return insertResponseDTO;
+					response = scsPersonajgExtendsMapper.insert(justiciable);
 
-						} else {
-							ScsPersonajg scsPersonajg = new ScsPersonajg();
-							ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(scsPersonajg, true,
-									justiciableItem);
+					LOGGER.info(
+							"createJusticiable() / scsPersonajgExtendsMapper.insert() -> Salida de scsPersonajgExtendsMapper para insertar el nuevo justiciable");
 
-							justiciable.setIdinstitucion(idInstitucion);
-							justiciable.setUsumodificacion(usuario.getIdusuario());
+					long count = 1;
 
-							LOGGER.info(
-									"createJusticiable() / scsPersonajgExtendsMapper.getIdPersonajg() -> Entrada a scsPersonajgExtendsMapper para obtener idPersonajg");
+					if (justiciableItem.getTelefonos() != null && justiciableItem.getTelefonos().size() > 0) {
 
-							NewIdDTO idP = scsPersonajgExtendsMapper.getIdPersonajg(idInstitucion);
+						for (JusticiableTelefonoItem telefono : justiciableItem.getTelefonos()) {
 
-							LOGGER.info(
-									"createJusticiable() / scsTelefonospersonaMapper.getIdPersonajg() -> Salida de scsPersonajgExtendsMapper para obtener idPersonajg");
+							ScsTelefonospersona scsTelefonospersona = new ScsTelefonospersona();
 
-							if (idP == null) {
-								justiciable.setIdpersona((long) 1);
-								idPersona = String.valueOf("1");
-							} else {
-								long idPersonajg = (long) (Integer.parseInt(idP.getNewId()) + 1);
-								idPersona = String.valueOf(idPersonajg);
-								justiciable.setIdpersona(idPersonajg);
+							scsTelefonospersona.setIdtelefono(count);
+							scsTelefonospersona.setIdpersona(justiciable.getIdpersona());
+							scsTelefonospersona.setIdinstitucion(idInstitucion);
+							scsTelefonospersona.setNombretelefono(telefono.getNombreTelefono());
+							scsTelefonospersona.setNumerotelefono(telefono.getNumeroTelefono());
+
+							if (telefono.getPreferenteSms() != null && telefono.getPreferenteSms() != "") {
+								scsTelefonospersona.setPreferentesms(Short.valueOf(telefono.getPreferenteSms()));
 							}
 
-							LOGGER.info(
-									"createJusticiable() / scsPersonajgExtendsMapper.insert() -> Entrada de scsPersonajgExtendsMapper para insertar el nuevo justiciable");
-
-							response = scsPersonajgExtendsMapper.insert(justiciable);
+							scsTelefonospersona.setFechamodificacion(new Date());
+							scsTelefonospersona.setUsumodificacion(usuario.getIdusuario());
 
 							LOGGER.info(
-									"createJusticiable() / scsPersonajgExtendsMapper.insert() -> Salida de scsPersonajgExtendsMapper para insertar el nuevo justiciable");
+									"updateJusticiable() / scsTelefonospersonaMapper.insert() -> Entrada a scsTelefonospersonaMapper para insertar los telefonos del justiciable");
 
-							long count = 1;
+							response = scsTelefonosPersonaExtendsMapper.insert(scsTelefonospersona);
 
-							if (justiciableItem.getTelefonos() != null && justiciableItem.getTelefonos().size() > 0) {
+							LOGGER.info(
+									"updateJusticiable() / scsTelefonospersonaMapper.insert() -> Salida de scsTelefonospersonaMapper para insertar los telefonos del justiciable");
 
-								for (JusticiableTelefonoItem telefono : justiciableItem.getTelefonos()) {
-
-									ScsTelefonospersona scsTelefonospersona = new ScsTelefonospersona();
-
-									scsTelefonospersona.setIdtelefono(count);
-									scsTelefonospersona.setIdpersona(justiciable.getIdpersona());
-									scsTelefonospersona.setIdinstitucion(idInstitucion);
-									scsTelefonospersona.setNombretelefono(telefono.getNombreTelefono());
-									scsTelefonospersona.setNumerotelefono(telefono.getNumeroTelefono());
-
-									if (telefono.getPreferenteSms() != null && telefono.getPreferenteSms() != "") {
-										scsTelefonospersona
-												.setPreferentesms(Short.valueOf(telefono.getPreferenteSms()));
-									}
-
-									scsTelefonospersona.setFechamodificacion(new Date());
-									scsTelefonospersona.setUsumodificacion(usuario.getIdusuario());
-
-									LOGGER.info(
-											"updateJusticiable() / scsTelefonospersonaMapper.insert() -> Entrada a scsTelefonospersonaMapper para insertar los telefonos del justiciable");
-
-									response = scsTelefonosPersonaExtendsMapper.insert(scsTelefonospersona);
-
-									LOGGER.info(
-											"updateJusticiable() / scsTelefonospersonaMapper.insert() -> Salida de scsTelefonospersonaMapper para insertar los telefonos del justiciable");
-
-									count += 1;
-								}
-							}
+							count += 1;
 						}
 					}
 
@@ -752,6 +716,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
 		String idPersona = null;
 		String validacion = null;
+		List<String> roles = new ArrayList<String>();
 
 		if (null != idInstitucion) {
 
@@ -772,133 +737,86 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 				try {
 
-					ScsPersonajgExample example = new ScsPersonajgExample();
-					example.createCriteria().andIdpersonaNotEqualTo(Long.valueOf(justiciableItem.getIdPersona()))
-							.andNifEqualTo(justiciableItem.getNif());
+					AsuntosJusticiableDTO asuntosJusticiableDTO = searchAsuntosJusticiable(
+							justiciableItem.getIdPersona(), request);
+					List<AsuntosJusticiableItem> asuntosList = asuntosJusticiableDTO.getAsuntosJusticiableItems();
 
-					LOGGER.info(
-							"updateJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para buscar si exite un justiciable con el mismo nif");
+					for (AsuntosJusticiableItem asunto : asuntosList) {
+						String rol = new String();
+						rol = asunto.getRol().substring(0, 1) + asunto.getAsunto().substring(0, 1);
+						roles.add(rol);
+					}
 
-					List<ScsPersonajg> existeNif = scsPersonajgExtendsMapper.selectByExample(example);
+					List<String> rolesDistinct = roles.stream().distinct().collect(Collectors.toList());
 
-					LOGGER.info(
-							"updateJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Salida de scsPersonajgExtendsMapper para buscar si exite un justiciable con el mismo nif");
+					for (String rol : rolesDistinct) {
 
-					if (null != existeNif && existeNif.size() > 0) {
+						String rolJusticiable = obtenerTipoRolJusticiable(rol);
 
+						validacion = validacionDatosSegunTipoPcajg(rolJusticiable, idInstitucion, justiciableItem);
+
+						if (validacion != null) {
+							break;
+						}
+					}
+
+					if (validacion != null) {
 						error.setCode(400);
-						error.setDescription("Ya existe un justiciable con el mismo identificador");
+						error.setDescription(validacion);
 						updateResponseDTO.setStatus(SigaConstants.KO);
 						updateResponseDTO.setError(error);
 
 						return updateResponseDTO;
 
 					} else {
-						validacion = validacionDatosSegunTipoPcajg(justiciableItem.getTipoJusticiable(), idInstitucion,
+						ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
+						scsPersonajgExample.createCriteria()
+								.andIdpersonaEqualTo(Long.valueOf(justiciableItem.getIdPersona()))
+								.andIdinstitucionEqualTo(Short.valueOf(justiciableItem.getIdInstitucion()));
+
+						LOGGER.info(
+								"updateJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para buscar al justiciable a editar");
+
+						List<ScsPersonajg> personaList = scsPersonajgExtendsMapper.selectByExample(scsPersonajgExample);
+
+						LOGGER.info(
+								"updateJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Salida de scsPersonajgExtendsMapper para buscar al justiciable a editar");
+
+						ScsPersonajg scsPersonajg = personaList.get(0);
+
+						ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(scsPersonajg, datosGenerales,
 								justiciableItem);
 
-						if (validacion != null) {
-							error.setCode(400);
-							error.setDescription(validacion);
-							updateResponseDTO.setStatus(SigaConstants.KO);
-							updateResponseDTO.setError(error);
+						justiciable.setUsumodificacion(usuario.getIdusuario());
 
-							return updateResponseDTO;
+						LOGGER.info(
+								"updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para modificar al justiciable");
 
-						} else {
-							ScsPersonajgExample scsPersonajgExample = new ScsPersonajgExample();
-							scsPersonajgExample.createCriteria()
-									.andIdpersonaEqualTo(Long.valueOf(justiciableItem.getIdPersona()))
-									.andIdinstitucionEqualTo(Short.valueOf(justiciableItem.getIdInstitucion()));
+						response = scsPersonajgExtendsMapper.updateByPrimaryKey(justiciable);
 
-							LOGGER.info(
-									"updateJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Entrada a scsPersonajgExtendsMapper para buscar al justiciable a editar");
+						LOGGER.info(
+								"updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Salida de scsPersonajgExtendsMapper para modificar al justiciable");
 
-							List<ScsPersonajg> personaList = scsPersonajgExtendsMapper
-									.selectByExample(scsPersonajgExample);
+						if (justiciableItem.getTelefonos() != null && justiciableItem.getTelefonos().size() > 0
+								&& datosGenerales) {
 
-							LOGGER.info(
-									"updateJusticiable() / scsPersonajgExtendsMapper.selectByExample() -> Salida de scsPersonajgExtendsMapper para buscar al justiciable a editar");
+							for (JusticiableTelefonoItem telefono : justiciableItem.getTelefonos()) {
 
-							ScsPersonajg scsPersonajg = personaList.get(0);
+								if (telefono.getIdTelefono() != null) {
 
-							ScsPersonajg justiciable = fillScsPersonasjsOfJusticiableItem(scsPersonajg, datosGenerales,
-									justiciableItem);
+									ScsTelefonospersonaExample scsTelefonospersonaExamples = new ScsTelefonospersonaExample();
+									scsTelefonospersonaExamples.createCriteria()
+											.andIdpersonaEqualTo(Long.valueOf(telefono.getIdPersona()))
+											.andIdtelefonoEqualTo(Long.valueOf(telefono.getIdTelefono()))
+											.andIdinstitucionEqualTo(Short.valueOf(telefono.getIdInstitucion()));
 
-							justiciable.setUsumodificacion(usuario.getIdusuario());
+									List<ScsTelefonospersona> telefonosList = scsTelefonosPersonaExtendsMapper
+											.selectByExample(scsTelefonospersonaExamples);
 
-							LOGGER.info(
-									"updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Entrada a scsPersonajgExtendsMapper para modificar al justiciable");
+									if (telefonosList != null && telefonosList.size() > 0) {
 
-							response = scsPersonajgExtendsMapper.updateByPrimaryKey(justiciable);
+										ScsTelefonospersona scsTelefonospersona = telefonosList.get(0);
 
-							LOGGER.info(
-									"updateJusticiable() / scsPersonajgExtendsMapper.updateByPrimaryKey() -> Salida de scsPersonajgExtendsMapper para modificar al justiciable");
-
-							if (justiciableItem.getTelefonos() != null && justiciableItem.getTelefonos().size() > 0
-									&& datosGenerales) {
-
-								for (JusticiableTelefonoItem telefono : justiciableItem.getTelefonos()) {
-
-									if (telefono.getIdTelefono() != null) {
-
-										ScsTelefonospersonaExample scsTelefonospersonaExamples = new ScsTelefonospersonaExample();
-										scsTelefonospersonaExamples.createCriteria()
-												.andIdpersonaEqualTo(Long.valueOf(telefono.getIdPersona()))
-												.andIdtelefonoEqualTo(Long.valueOf(telefono.getIdTelefono()))
-												.andIdinstitucionEqualTo(Short.valueOf(telefono.getIdInstitucion()));
-
-										List<ScsTelefonospersona> telefonosList = scsTelefonosPersonaExtendsMapper
-												.selectByExample(scsTelefonospersonaExamples);
-
-										if (telefonosList != null && telefonosList.size() > 0) {
-
-											ScsTelefonospersona scsTelefonospersona = telefonosList.get(0);
-
-											scsTelefonospersona.setNombretelefono(telefono.getNombreTelefono());
-											scsTelefonospersona.setNumerotelefono(telefono.getNumeroTelefono());
-
-											if (telefono.getPreferenteSms() != null
-													&& telefono.getPreferenteSms() != "") {
-												scsTelefonospersona
-														.setPreferentesms(Short.valueOf(telefono.getPreferenteSms()));
-											}
-
-											scsTelefonospersona.setFechamodificacion(new Date());
-											scsTelefonospersona.setUsumodificacion(usuario.getIdusuario());
-
-											LOGGER.info(
-													"updateJusticiable() / scsTelefonospersonaMapper.updateByPrimaryKey() -> Entrada a scsTelefonospersonaMapper para modificar los telefonos del justiciable");
-
-											response = scsTelefonosPersonaExtendsMapper
-													.updateByPrimaryKey(scsTelefonospersona);
-
-											LOGGER.info(
-													"updateJusticiable() / scsTelefonospersonaMapper.updateByPrimaryKey() -> Salida de scsTelefonospersonaMapper para modificar los telefonos del justiciable");
-
-										}
-									} else {
-
-										ScsTelefonospersona scsTelefonospersona = new ScsTelefonospersona();
-
-										LOGGER.info(
-												"updateJusticiable() / scsTelefonospersonaMapper.getIdTelefono() -> Entrada a scsTelefonospersonaMapper para obtener idTelefono a crear");
-
-										NewIdDTO idT = scsTelefonosPersonaExtendsMapper.getIdTelefono(justiciableItem,
-												idInstitucion);
-
-										if (idT == null) {
-											scsTelefonospersona.setIdtelefono((long) 1);
-										} else {
-											long idTelefono = (long) (Integer.parseInt(idT.getNewId()) + 1);
-											scsTelefonospersona.setIdtelefono(idTelefono);
-										}
-
-										LOGGER.info(
-												"updateJusticiable() / scsTelefonospersonaMapper.getIdTelefono() -> Salida de scsTelefonospersonaMapper para obtener idTelefono a crear");
-
-										scsTelefonospersona.setIdpersona(Long.valueOf(justiciableItem.getIdPersona()));
-										scsTelefonospersona.setIdinstitucion(idInstitucion);
 										scsTelefonospersona.setNombretelefono(telefono.getNombreTelefono());
 										scsTelefonospersona.setNumerotelefono(telefono.getNumeroTelefono());
 
@@ -913,18 +831,60 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 										LOGGER.info(
 												"updateJusticiable() / scsTelefonospersonaMapper.updateByPrimaryKey() -> Entrada a scsTelefonospersonaMapper para modificar los telefonos del justiciable");
 
-										response = scsTelefonosPersonaExtendsMapper.insert(scsTelefonospersona);
+										response = scsTelefonosPersonaExtendsMapper
+												.updateByPrimaryKey(scsTelefonospersona);
 
 										LOGGER.info(
 												"updateJusticiable() / scsTelefonospersonaMapper.updateByPrimaryKey() -> Salida de scsTelefonospersonaMapper para modificar los telefonos del justiciable");
 
 									}
+								} else {
+
+									ScsTelefonospersona scsTelefonospersona = new ScsTelefonospersona();
+
+									LOGGER.info(
+											"updateJusticiable() / scsTelefonospersonaMapper.getIdTelefono() -> Entrada a scsTelefonospersonaMapper para obtener idTelefono a crear");
+
+									NewIdDTO idT = scsTelefonosPersonaExtendsMapper.getIdTelefono(justiciableItem,
+											idInstitucion);
+
+									if (idT == null) {
+										scsTelefonospersona.setIdtelefono((long) 1);
+									} else {
+										long idTelefono = (long) (Integer.parseInt(idT.getNewId()) + 1);
+										scsTelefonospersona.setIdtelefono(idTelefono);
+									}
+
+									LOGGER.info(
+											"updateJusticiable() / scsTelefonospersonaMapper.getIdTelefono() -> Salida de scsTelefonospersonaMapper para obtener idTelefono a crear");
+
+									scsTelefonospersona.setIdpersona(Long.valueOf(justiciableItem.getIdPersona()));
+									scsTelefonospersona.setIdinstitucion(idInstitucion);
+									scsTelefonospersona.setNombretelefono(telefono.getNombreTelefono());
+									scsTelefonospersona.setNumerotelefono(telefono.getNumeroTelefono());
+
+									if (telefono.getPreferenteSms() != null && telefono.getPreferenteSms() != "") {
+										scsTelefonospersona
+												.setPreferentesms(Short.valueOf(telefono.getPreferenteSms()));
+									}
+
+									scsTelefonospersona.setFechamodificacion(new Date());
+									scsTelefonospersona.setUsumodificacion(usuario.getIdusuario());
+
+									LOGGER.info(
+											"updateJusticiable() / scsTelefonospersonaMapper.updateByPrimaryKey() -> Entrada a scsTelefonospersonaMapper para modificar los telefonos del justiciable");
+
+									response = scsTelefonosPersonaExtendsMapper.insert(scsTelefonospersona);
+
+									LOGGER.info(
+											"updateJusticiable() / scsTelefonospersonaMapper.updateByPrimaryKey() -> Salida de scsTelefonospersonaMapper para modificar los telefonos del justiciable");
 
 								}
 
 							}
 
 						}
+
 					}
 
 				} catch (Exception e) {
@@ -1939,6 +1899,40 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		return error;
 	}
 
+	private String obtenerTipoRolJusticiable(String rol) {
+
+		String rolJusticiable = null;
+
+		switch (rol) {
+		case SigaConstants.ROL_SOLICITANTE_EJG:
+			rolJusticiable = SigaConstants.SCS_SOLICITANTE_EJG;
+			break;
+		case SigaConstants.ROL_SOLICITANTE_ASISTENCIA:
+			rolJusticiable = SigaConstants.SCS_SOLICITANTE_ASISTENCIA;
+			break;
+		case SigaConstants.ROL_SOLICITANTE_DESIGNACION:
+			rolJusticiable = SigaConstants.SCS_SOLICITANTE_DESIGNACION;
+			break;
+		case SigaConstants.ROL_UNIDAD_FAMILIAR_EJG:
+			rolJusticiable = SigaConstants.SCS_UNIDAD_FAMILIAR_EJG;
+			break;
+		case SigaConstants.ROL_CONTRADIO_DESIGNACION:
+			rolJusticiable = SigaConstants.SCS_CONTRARIO_DESIGNACION;
+			break;
+		case SigaConstants.ROL_CONTRARIO_ASISTENCIA:
+			rolJusticiable = SigaConstants.SCS_CONTRARIO_ASISTENCIA;
+			break;
+		case SigaConstants.ROL_CONTRARIO_EJG:
+			rolJusticiable = SigaConstants.SCS_CONTRARIO_EJG;
+			break;
+		default:
+			rolJusticiable = SigaConstants.SCS_JUSTICIABLE;
+			break;
+		}
+
+		return rolJusticiable;
+	}
+
 	private String validateDatosTipoPcajg2y3(String tipoJusticiable, JusticiableItem justiciableItem) {
 
 		LOGGER.info("validateDatosTipoPcajg2y3() -> Entrada al servicio para validar los datos segun tipo Pcajg 2y3");
@@ -1966,15 +1960,33 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
 				|| tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_DESIGNACION)) {
 
-			if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
-					&& justiciableItem.getSexo() != null && justiciableItem.getSexo() != ""
-					&& justiciableItem.getIdEstadoCivil() != null && justiciableItem.getIdEstadoCivil() != ""
-					&& justiciableItem.getRegimen_conyugal() != null && justiciableItem.getRegimen_conyugal() != "") {
+			if (justiciableItem.isCheckNoInformadaDireccion()) {
+				if (justiciableItem.getSexo() != null && justiciableItem.getSexo() != ""
+						&& justiciableItem.getIdEstadoCivil() != null && justiciableItem.getIdEstadoCivil() != ""
+						&& justiciableItem.getRegimen_conyugal() != null
+						&& justiciableItem.getRegimen_conyugal() != "") {
 
-				error = null;
+					error = null;
+				} else {
+					error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.sex.estcivil.regconyugal";
+				}
 			} else {
-				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.sex.estcivil.regconyugal";
+				if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
+						&& justiciableItem.getIdTipoVia() != null && justiciableItem.getIdTipoVia() != ""
+						&& justiciableItem.getCodigoPostal() != null && justiciableItem.getCodigoPostal() != ""
+						&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
+						&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
+						&& justiciableItem.getSexo() != null && justiciableItem.getSexo() != ""
+						&& justiciableItem.getIdEstadoCivil() != null && justiciableItem.getIdEstadoCivil() != ""
+						&& justiciableItem.getRegimen_conyugal() != null
+						&& justiciableItem.getRegimen_conyugal() != "") {
+
+					error = null;
+				} else {
+					error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.sex.estcivil.regconyugal";
+				}
 			}
+
 		}
 
 		if (tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
@@ -1988,7 +2000,7 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 
 		if (tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_ASISTENCIA)
 				|| tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_EJG)
-				|| tipoJusticiable.equals(SigaConstants.SCS_DESIGNACION)) {
+				|| tipoJusticiable.equals(SigaConstants.SCS_CONTRARIO_DESIGNACION)) {
 
 			if (justiciableItem.getIdPais() != "" && justiciableItem.getIdPais() != null) {
 				error = null;
@@ -2010,14 +2022,29 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
 				|| tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
-			if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
-					&& justiciableItem.getIdPais() != null && justiciableItem.getIdPais() != ""
-					&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != "") {
+			if (justiciableItem.isCheckNoInformadaDireccion()) {
+				if (justiciableItem.getIdPais() != null && justiciableItem.getIdPais() != ""
+						&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != "") {
 
-				error = null;
+					error = null;
+				} else {
+					error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.nacionalidad.parentesco";
+				}
 			} else {
-				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.nacionalidad.parentesco";
+				if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
+						&& justiciableItem.getIdTipoVia() != null && justiciableItem.getIdTipoVia() != ""
+						&& justiciableItem.getCodigoPostal() != null && justiciableItem.getCodigoPostal() != ""
+						&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
+						&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
+						&& justiciableItem.getIdPais() != null && justiciableItem.getIdPais() != ""
+						&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != "") {
+
+					error = null;
+				} else {
+					error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.nacionalidad.parentesco";
+				}
 			}
+
 		}
 
 		LOGGER.info("validateDatosTipoPcajg5() -> Salida del servicio para validar los datos segun tipo Pcajg 5");
@@ -2033,14 +2060,29 @@ public class GestionJusticiableServiceImpl implements IGestionJusticiableService
 		if (tipoJusticiable.equals(SigaConstants.SCS_SOLICITANTE_EJG)
 				|| tipoJusticiable.equals(SigaConstants.SCS_UNIDAD_FAMILIAR_EJG)) {
 
-			if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
-					&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != ""
-					&& justiciableItem.getFechaNacimiento() != null) {
+			if (justiciableItem.isCheckNoInformadaDireccion()) {
+				if (justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != ""
+						&& justiciableItem.getFechaNacimiento() != null) {
 
-				error = null;
+					error = null;
+				} else {
+					error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.fechaNac.parentesco";
+				}
 			} else {
-				error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.fechaNac.parentesco";
+				if (justiciableItem.getDireccion() != null && justiciableItem.getDireccion() != ""
+						&& justiciableItem.getIdTipoVia() != null && justiciableItem.getIdTipoVia() != ""
+						&& justiciableItem.getCodigoPostal() != null && justiciableItem.getCodigoPostal() != ""
+						&& justiciableItem.getIdProvincia() != null && justiciableItem.getIdProvincia() != ""
+						&& justiciableItem.getIdPoblacion() != null && justiciableItem.getIdPoblacion() != ""
+						&& justiciableItem.getParentesco() != null && justiciableItem.getParentesco() != ""
+						&& justiciableItem.getFechaNacimiento() != null) {
+
+					error = null;
+				} else {
+					error = "justiciaGratuita.justiciables.message.validacion.tipoPcajg.dir.fechaNac.parentesco";
+				}
 			}
+
 		}
 
 		LOGGER.info("validateDatosTipoPcajg6() -> Salida del servicio para validar los datos segun tipo Pcajg 6");
