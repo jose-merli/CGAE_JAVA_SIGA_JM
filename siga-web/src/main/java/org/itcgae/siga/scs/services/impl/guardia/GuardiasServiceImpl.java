@@ -301,40 +301,51 @@ public class GuardiasServiceImpl implements GuardiasService {
 
 						LOGGER.info(
 								"getGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Mapeamos lo recogido");
-						//Mapeo para Datos Generales
-					ScsGuardiasturno guardia = guardiasList.get(0);
-					guardiaItem.setNombre(guardia.getNombre());
-					guardiaItem.setDescripcion(guardia.getDescripcion());
-					guardiaItem.setTipoGuardia(guardia.getIdtipoguardia().toString());
-					guardiaItem.setEnvioCentralita(guardia.getEnviocentralita().toString());
-					guardiaItem.setDescripcionFacturacion(guardia.getDescripcionfacturacion());
-					guardiaItem.setDescripcionPago(guardia.getDescripcionpago());
-					
-						//Configuracion de cola
-					guardiaItem.setPorGrupos(guardia.getPorgrupos());
-					guardiaItem.setIdOrdenacionColas(guardia.getIdordenacioncolas().toString());
-					guardiaItem.setDiasPeriodo(guardia.getDiasperiodo().toString());
-					guardiaItem.setNombre(guardia.getNombre());
+						// Mapeo para Datos Generales
+						ScsGuardiasturno guardia = guardiasList.get(0);
+						guardiaItem.setNombre(guardia.getNombre());
+						guardiaItem.setDescripcion(guardia.getDescripcion());
+						if (guardia.getIdtipoguardia() != null)
+							guardiaItem.setTipoGuardia(guardia.getIdtipoguardia() + "");
+						if (guardia.getEnviocentralita() != null)
+							guardiaItem.setEnvioCentralita(guardia.getEnviocentralita() + "");
+						guardiaItem.setDescripcionFacturacion(guardia.getDescripcionfacturacion());
+						guardiaItem.setDescripcionPago(guardia.getDescripcionpago());
+						guardiaItem.setIdTurno(guardia.getIdturno() + "");
+						guardiaItem.setIdGuardia(guardia.getIdguardia() + "");
+
+						// Configuracion de cola
+						guardiaItem.setPorGrupos(guardia.getPorgrupos());
+						if (guardia.getIdordenacioncolas() != null)
+							guardiaItem.setIdOrdenacionColas(guardia.getIdordenacioncolas() + "");
+						if (guardia.getDiasperiodo() != null)
+							guardiaItem.setDiasPeriodo(guardia.getDiasperiodo() + "");
+						guardiaItem.setNombre(guardia.getNombre());
 
 						// Configuracion calendarios
-					guardiaItem.setDiasGuardia(guardia.getDiasguardia().toString());
-					guardiaItem.setDiasPeriodo(guardia.getDiasperiodo().toString());
-					guardiaItem.setTipoDiasGuardia(guardia.getTipodiasguardia());
-					guardiaItem.setTipoDiasPeriodo(guardia.getTipodiasperiodo());
-					guardiaItem.setDiasSeparacionGuardias(guardia.getDiasseparacionguardias().toString());
-					guardiaItem.setSeleccionLab(guardia.getSeleccionlaborables());
-					guardiaItem.setSeleccionFes(guardia.getSeleccionfestivos());
+						if (guardia.getDiasguardia() != null)
+							guardiaItem.setDiasGuardia(guardia.getDiasguardia() + "");
+						if (guardia.getDiasperiodo() != null)
+							guardiaItem.setDiasPeriodo(guardia.getDiasperiodo() + "");
+						guardiaItem.setTipoDiasGuardia(guardia.getTipodiasguardia());
+						guardiaItem.setTipoDiasPeriodo(guardia.getTipodiasperiodo());
+						if (guardia.getDiasseparacionguardias() != null)
+							guardiaItem.setDiasSeparacionGuardias(guardia.getDiasseparacionguardias() + "");
+						guardiaItem.setSeleccionLab(guardia.getSeleccionlaborables());
+						guardiaItem.setSeleccionFes(guardia.getSeleccionfestivos());
 
 						// Cola de guardia
-					guardiaItem.setIdPersonaUltimo(guardia.getIdpersonaUltimo().toString());
-					
-					
+						if (guardia.getIdpersonaUltimo() != null)
+							guardiaItem.setIdPersonaUltimo(guardia.getIdpersonaUltimo() + "");
+						if (guardia.getIdordenacioncolas() != null)
+							guardiaItem.setIdOrdenacionColas(guardia.getIdordenacioncolas() + "");
+
 					}
 					LOGGER.info(
 							"getGuardia() / scsGuardiasturnoExtendsMapper.selectByExample() -> Salida de la busqueda de guardia");
 
 				} catch (Exception e) {
-					e.printStackTrace();
+					LOGGER.error(e);
 				}
 			}
 

@@ -31,8 +31,8 @@ public interface ScsGuardiasturnoExtendsMapper extends ScsGuardiasturnoMapper{
 		@Result(column = "duracion", property = "duracion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "NUMEROLETRADOSGUARDIA", property = "letradosGuardia", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "numeroletradosinscritos", property = "letradosIns", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "diaslaborables", property = "diasLab", jdbcType = JdbcType.VARCHAR),
-		@Result(column = "diasfestivos", property = "diasFes", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "diaslaborables", property = "seleccionLab", jdbcType = JdbcType.VARCHAR),
+		@Result(column = "diasfestivos", property = "seleccionFes", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "VALIDARJUSTIFICACIONES", property = "validaJustificacion", jdbcType = JdbcType.VARCHAR),
 		@Result(column = "FECHABAJA", property = "fechabaja", jdbcType = JdbcType.VARCHAR),
 	})
