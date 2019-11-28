@@ -43,5 +43,7 @@ public interface IGestionTurnosService {
 	
 	public TurnosDTO busquedaColaGuardia(TurnosItem turnosItem, HttpServletRequest request);
 
-	public UpdateResponseDTO eliminateColaOficio(TurnosDTO turnosDTO, HttpServletRequest request); 
+	public UpdateResponseDTO eliminateColaOficio(TurnosDTO turnosDTO, HttpServletRequest request);
+
+	public UpdateResponseDTO eliminateColaGuardia(TurnosDTO turnosDTO, HttpServletRequest request); 
 }

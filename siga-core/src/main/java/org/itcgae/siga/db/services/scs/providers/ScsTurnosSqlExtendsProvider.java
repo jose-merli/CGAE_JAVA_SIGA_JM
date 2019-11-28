@@ -160,11 +160,10 @@ public String busquedaColaOficio(TurnosItem turnosItem,String strDate,String bus
 				"            AND   salto.fechacumplimiento IS NULL\r\n" + 
 				"            and   salto.idpersona = ins.IDPERSONA\r\n" + 
 				"    )  as compensaciones\r\n" + 
-				"FROM\r\n" + 
-				"    scs_inscripcionturno ins\r\n" + 
-				"    INNER JOIN cen_persona per ON per.IDPERSONA = ins.IDPERSONA\r\n" + 
-				"    INNER JOIN cen_colegiado col ON col.idpersona = per.IDPERSONA and col.IDINSTITUCION = ins.IDINSTITUCION and col.IDPERSONA = ins.IDPERSONA \r\n" + 
-				"    INNER JOIN scs_turno tur ON tur.IDTURNO = ins.IDTURNO and tur.IDINSTITUCION = ins.IDINSTITUCION\r\n");
+				sql.FROM("scs_inscripcionturno ins" + 
+						" INNER JOIN cen_persona per ON per.IDPERSONA = ins.IDPERSONA" + 
+						" INNER JOIN cen_colegiado col ON col.idpersona = per.IDPERSONA and col.IDINSTITUCION = ins.IDINSTITUCION and col.IDPERSONA = ins.IDPERSONA" + 
+						" INNER JOIN scs_turno tur ON tur.IDTURNO = ins.IDTURNO and tur.IDINSTITUCION = ins.IDINSTITUCION"));
 		sql.WHERE("ins.fechavalidacion is not null and tur.idinstitucion= '"+idInstitucion+"'"+"and tur.idturno ='"+turnosItem.getIdturno()+"'");
 		if(!turnosItem.isHistorico()) {
 			sql.WHERE("ins.fechabaja is null");
@@ -194,11 +193,11 @@ public String busquedaColaGuardia(TurnosItem turnosItem,String strDate,String bu
 			"    ins.idinstitucion,\r\n" + 
 			"    ins.idturno,\r\n" + 
 			"    trunc(ins.fechavalidacion) AS fechavalidacion,\r\n" + 
-			"    TO_CHAR(trunc(ins.fechabaja),'DD/MM/YYYY') AS fechabaja,\r\n" + 
+			"    TO_CHAR(trunc(ins.fechabaja),'DD/MM/YYYY') AS fechabajaguardia,\r\n" + 
 			"    ins.FECHASUSCRIPCION AS fechasolicitud,\r\n" + 
 			"    per.nifcif,\r\n" + 
 			"    per.idpersona,\r\n" + 
-			"    per.nombre,\r\n" + 
+			"    per.nombre as nombreguardia," + 
 			"    per.apellidos1,\r\n" + 
 			"    DECODE(per.apellidos2,NULL,'',' '\r\n" + 
 			"    || per.apellidos2) apellidos2,\r\n" + 

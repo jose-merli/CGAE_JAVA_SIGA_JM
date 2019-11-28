@@ -164,6 +164,22 @@ Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFIC
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.ncolegiadoprimero','Nº Colegiado Primer Letrado#GL','0','4',to_date('09/10/19','DD/MM/RR'),'0','19');
 Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.ncolegiadoprimero','Nº Colegiado Primer Letrado#EU','0','3',to_date('09/10/19','DD/MM/RR'),'0','19');
 
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.coladeguardias','Cola de Guardias','0','1',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.coladeguardias','Cua de Guàrdies','0','2',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.coladeguardias','Cola de Guardias#GL','0','4',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.coladeguardias','Cola de Guardias#EU','0','3',to_date('09/10/19','DD/MM/RR'),'0','19');
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.mostrarinscripciones','Mostrar inscripciones a fecha de','0','1',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.mostrarinscripciones','Mostra inscripcions a data de','0','2',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.mostrarinscripciones','Mostrar inscripciones a fecha de#GL','0','4',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.mostrarinscripciones','Mostrar inscripciones a fecha de#EU','0','3',to_date('09/10/19','DD/MM/RR'),'0','19');
+
+
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.seleccionarguardia','Seleccionar Guardia:','0','1',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.seleccionarguardia','Seleccionar Guàrdia:','0','2',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.seleccionarguardia','Seleccionar Guardia:#GL','0','4',to_date('09/10/19','DD/MM/RR'),'0','19');
+Insert into GEN_DICCIONARIO (IDRECURSO,DESCRIPCION,ERROR,IDLENGUAJE,FECHAMODIFICACION,USUMODIFICACION,IDPROPIEDAD) values ('justiciaGratuita.oficio.turnos.seleccionarguardia','Seleccionar Guardia:#EU','0','3',to_date('09/10/19','DD/MM/RR'),'0','19');
+
 
 commit;
 prompt .

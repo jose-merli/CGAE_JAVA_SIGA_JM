@@ -66,6 +66,9 @@ public class TurnosItem {
 	private String fechabajapersona;
 	private Date fechaActual;
 	private String idcomboguardias;
+	private String nombreguardia;
+	private String fechabajaguardia;
+	
 	
 	public String getFechavalidacion() {
 		return fechavalidacion;
@@ -421,6 +424,18 @@ public class TurnosItem {
 	}
 	public void setIdcomboguardias(String idcomboguardias) {
 		this.idcomboguardias = idcomboguardias;
+	}
+	public String getNombreguardia() {
+		return nombreguardia;
+	}
+	public void setNombreguardia(String nombreguardia) {
+		this.nombreguardia = nombreguardia;
+	}
+	public String getFechabajaguardia() {
+		return fechabajaguardia;
+	}
+	public void setFechabajaguardia(String fechabajaguardia) {
+		this.fechabajaguardia = fechabajaguardia;
 	}
 
 
