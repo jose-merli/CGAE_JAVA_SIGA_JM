@@ -2,6 +2,8 @@ package org.itcgae.siga.scs.service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTO.scs.GuardiasDTO;
+import org.itcgae.siga.DTO.scs.GuardiasItem;
 import org.itcgae.siga.DTO.scs.TurnosDTO;
 import org.itcgae.siga.DTO.scs.TurnosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -30,5 +32,7 @@ public interface IGestionTurnosService {
 
 	public UpdateResponseDTO eliminateColaOficio(TurnosDTO turnosDTO, HttpServletRequest request);
 
-	public UpdateResponseDTO eliminateColaGuardia(TurnosDTO turnosDTO, HttpServletRequest request); 
+	public UpdateResponseDTO eliminateColaGuardia(TurnosDTO turnosDTO, HttpServletRequest request);
+
+	public GuardiasDTO busquedaGuardias(TurnosItem turnosItem, HttpServletRequest request); 
 }

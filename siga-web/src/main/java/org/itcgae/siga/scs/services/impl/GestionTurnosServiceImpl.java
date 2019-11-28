@@ -14,7 +14,8 @@ import org.apache.log4j.Logger;
 
 import org.itcgae.siga.DTO.scs.ComboColaOrdenadaDTO;
 import org.itcgae.siga.DTO.scs.ComboColaOrdenadaItem;
-
+import org.itcgae.siga.DTO.scs.GuardiasDTO;
+import org.itcgae.siga.DTO.scs.GuardiasItem;
 import org.itcgae.siga.DTO.scs.TurnosDTO;
 import org.itcgae.siga.DTO.scs.TurnosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -48,6 +49,7 @@ import org.itcgae.siga.db.mappers.ScsInscripcionguardiaMapper;
 import org.itcgae.siga.db.mappers.ScsInscripcionturnoMapper;
 import org.itcgae.siga.db.mappers.ScsOrdenacioncolasMapper;
 import org.itcgae.siga.db.services.adm.mappers.AdmUsuariosExtendsMapper;
+import org.itcgae.siga.db.services.scs.mappers.ScsGuardiasturnoExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsOrdenacionColasExtendsMapper;
 import org.itcgae.siga.db.services.scs.mappers.ScsTurnosExtendsMapper;
 import org.itcgae.siga.scs.service.IGestionTurnosService;
@@ -72,6 +74,10 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 
 	@Autowired
 	private ScsGuardiasturnoMapper scsGuardiasturnoMapper;
+	
+	@Autowired
+	private ScsGuardiasturnoExtendsMapper scsGuardiasturnoExtendsMapper;
+	
 	@Autowired
 	private ScsInscripcionguardiaMapper scsInscripcionguardiaMapper;
 
@@ -1061,5 +1067,47 @@ public class GestionTurnosServiceImpl implements IGestionTurnosService {
 		LOGGER.info("deleteModules() -> Salida del servicio para eliminar modulos");
 
 		return updateResponseDTO;
+	}
+	
+	@Override
+	public GuardiasDTO busquedaGuardias(TurnosItem turnosItem, HttpServletRequest request) {
+		// Conseguimos información del usuario logeado
+		String token = request.getHeader("Authorization");
+		String dni = UserTokenUtils.getDniFromJWTToken(token);
+		Short idInstitucion = UserTokenUtils.getInstitucionFromJWTToken(token);
+		GuardiasDTO guardiasDTO = new GuardiasDTO();
+		List<GuardiasItem> guardiaItems = null;
+
+		if (idInstitucion != null) {
+			AdmUsuariosExample exampleUsuarios = new AdmUsuariosExample();
+			exampleUsuarios.createCriteria().andNifEqualTo(dni).andIdinstitucionEqualTo(Short.valueOf(idInstitucion));
+
+			LOGGER.info(
+					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Entrada a admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			List<AdmUsuarios> usuarios = admUsuariosExtendsMapper.selectByExample(exampleUsuarios);
+
+			LOGGER.info(
+					"searchCostesFijos() / admUsuariosExtendsMapper.selectByExample() -> Salida de admUsuariosExtendsMapper para obtener información del usuario logeado");
+
+			if (usuarios != null && usuarios.size() > 0) {
+
+
+				LOGGER.info(
+						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Entrada a scsSubzonaExtendsMapper para obtener las subzonas");
+
+				guardiaItems = scsGuardiasturnoExtendsMapper.searchGuardias(turnosItem, idInstitucion.toString(), usuarios.get(0).getIdlenguaje().toString());
+
+				LOGGER.info(
+						"searchCostesFijos() / scsSubzonaExtendsMapper.selectTipoSolicitud() -> Salida a scsSubzonaExtendsMapper para obtener las subzonas");
+
+				if (guardiaItems != null) {
+					guardiasDTO.setGuardiaItems(guardiaItems);
+				}
+			}
+
+		}
+		LOGGER.info("searchCostesFijos() -> Salida del servicio para obtener los costes fijos");
+		return guardiasDTO;
 	}
 }

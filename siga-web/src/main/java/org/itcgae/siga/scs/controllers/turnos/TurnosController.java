@@ -2,6 +2,8 @@ package org.itcgae.siga.scs.controllers.turnos;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.itcgae.siga.DTO.scs.GuardiasDTO;
+import org.itcgae.siga.DTO.scs.GuardiasItem;
 import org.itcgae.siga.DTO.scs.TurnosDTO;
 import org.itcgae.siga.DTO.scs.TurnosItem;
 import org.itcgae.siga.DTOs.adm.InsertResponseDTO;
@@ -105,6 +107,12 @@ public class TurnosController {
 	ResponseEntity<TurnosDTO> busquedaColaOficio(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
 		TurnosDTO response = turnosService.busquedaColaOficio(turnosItem, request);
 		return new ResponseEntity<TurnosDTO>(response, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/turnos/busquedaGuardias",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
+	ResponseEntity<GuardiasDTO> busquedaGuardias(@RequestBody TurnosItem turnosItem, HttpServletRequest request) {
+		GuardiasDTO response = turnosService.busquedaGuardias(turnosItem, request);
+		return new ResponseEntity<GuardiasDTO>(response, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/turnos/busquedaColaGuardia",  method = RequestMethod.POST,  produces = MediaType.APPLICATION_JSON_VALUE)
